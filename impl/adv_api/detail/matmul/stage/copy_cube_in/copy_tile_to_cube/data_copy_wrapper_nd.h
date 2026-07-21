@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-/*!
+/* !
  * \file data_copy_wrapper_nd.h
  * \brief
  */
@@ -29,13 +29,10 @@
 namespace AscendC {
 namespace Impl {
 namespace Detail {
-
-template <typename IMPL, const auto& MM_CFG, class INPUT_TYPE>
-class DataCopyWrapper<
-    IMPL, MM_CFG, INPUT_TYPE,
-    enable_if_t<
-        !MatmulFeatureTrait<MM_CFG>::IsNeedUB() && INPUT_TYPE::format == CubeFormat::ND &&
-        !(INPUT_TYPE::TAG == InputTypeTag::scaleA || INPUT_TYPE::TAG == InputTypeTag::scaleB)>> {
+template <typename IMPL, const auto &MM_CFG, class INPUT_TYPE>
+class DataCopyWrapper<IMPL, MM_CFG, INPUT_TYPE,
+    enable_if_t<!MatmulFeatureTrait<MM_CFG>::IsNeedUB() && INPUT_TYPE::format == CubeFormat::ND &&
+    !(INPUT_TYPE::TAG == InputTypeTag::scaleA || INPUT_TYPE::TAG == InputTypeTag::scaleB)>> {
     MATMUL_USE_MODULE_ON(CopyCubeInParams, INPUT_TYPE::TAG);
     MATMUL_USE_MODULE(MatmulShapeTiling);
     MATMUL_USE_MODULE(LocalWorkspace);
@@ -47,20 +44,18 @@ public:
     __aicore__ inline DataCopyWrapper() = default;
     __aicore__ inline ~DataCopyWrapper() = default;
 
-    __aicore__ inline void CopyND2NZ(
-        const LocalTensor<TransT>& dst, const GlobalTensor<SrcT>& src, const int32_t row, const int32_t col,
-        const int32_t height, const int32_t width, const int32_t gCol, const int32_t ndNum = 1,
+    __aicore__ inline void CopyND2NZ(const LocalTensor<TransT> &dst, const GlobalTensor<SrcT> &src, const int32_t row,
+        const int32_t col, const int32_t height, const int32_t width, const int32_t gCol, const int32_t ndNum = 1,
         const int32_t srcNdMatrixStride = 0, const int32_t dstNzMatrixStride = 0, const bool kAlignToC0Size = false)
     {
         ASCENDC_ASSERT((row >= 0), { KERNEL_LOG(KERNEL_ERROR, "row is %d, which should be no less than 0.", row); });
         ASCENDC_ASSERT((col >= 0), { KERNEL_LOG(KERNEL_ERROR, "col is %d, which should be no less than 0.", col); });
-        ASCENDC_ASSERT(
-            (height > 0), { KERNEL_LOG(KERNEL_ERROR, "height is %d, which should be no less than 0.", height); });
-        ASCENDC_ASSERT(
-            (width > 0), { KERNEL_LOG(KERNEL_ERROR, "width is %d, which should be no less than 0.", width); });
+        ASCENDC_ASSERT((height > 0),
+                       { KERNEL_LOG(KERNEL_ERROR, "height is %d, which should be no less than 0.", height); });
+        ASCENDC_ASSERT((width > 0),
+                       { KERNEL_LOG(KERNEL_ERROR, "width is %d, which should be no less than 0.", width); });
         ASCENDC_ASSERT((gCol >= width), {
-            KERNEL_LOG(
-                KERNEL_ERROR,
+            KERNEL_LOG(KERNEL_ERROR,
                 "ND2NZ width larger than origin matrix width, gCol is %d, which should be no less than width %d.", gCol,
                 width);
         });
@@ -76,9 +71,8 @@ public:
         }
         int64_t srcOffset;
         if constexpr (IsSupportB4<TransT>()) {
-            srcOffset =
-                (static_cast<int64_t>(row) * static_cast<int64_t>(gCol) * INT4_TWO +
-                 static_cast<int64_t>(col) * INT4_TWO);
+            srcOffset = (static_cast<int64_t>(row) * static_cast<int64_t>(gCol) * INT4_TWO +
+                static_cast<int64_t>(col) * INT4_TWO);
         } else {
             srcOffset = (static_cast<int64_t>(row) * static_cast<int64_t>(gCol) + static_cast<int64_t>(col));
         }
@@ -106,7 +100,8 @@ public:
         }
         nd2nzParams.dstNzNStride = 1;
         nd2nzParams.dstNzMatrixStride = dstNzMatrixStride;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
         if constexpr (!ToMatmulConfig(MM_CFG).intrinsicsCheck) {
             DataCopy(dst, src[srcOffset], nd2nzParams);
         } else {
@@ -125,13 +120,11 @@ public:
 #endif
     }
 
-    __aicore__ inline void CopyND2NZ(
-        const LocalTensor<TransT>& dst, const LocalTensor<SrcT>& src, const int32_t row, const int32_t col,
-        const int32_t height, const int32_t width, const int32_t gCol, bool kAlignToC0Size = false)
+    __aicore__ inline void CopyND2NZ(const LocalTensor<TransT> &dst, const LocalTensor<SrcT> &src, const int32_t row,
+        const int32_t col, const int32_t height, const int32_t width, const int32_t gCol, bool kAlignToC0Size = false)
     {
-        ASCENDC_ASSERT(gCol >= width, {
-            KERNEL_LOG(KERNEL_ERROR, "Copy ND block ub->L1 width larger than origin matrix width.");
-        });
+        ASCENDC_ASSERT(gCol >= width,
+                       { KERNEL_LOG(KERNEL_ERROR, "Copy ND block ub->L1 width larger than origin matrix width."); });
         int32_t calcWidth = width / c0Size_; // cube block numbers that do not need to be pad zero
         int32_t dstOffset = 0;
         int32_t srcOffset = row * gCol + col;
@@ -159,7 +152,7 @@ public:
             // each block len is only 32B
             for (int32_t i = 0; i < calcWidth; i++) {
                 for (int32_t j = 0; j < height; j++) {
-                    DataCopy(dst[dstOffset], src[srcOffset], {1, 1, 0, 0}, enhancedParams);
+                    DataCopy(dst[dstOffset], src[srcOffset], { 1, 1, 0, 0 }, enhancedParams);
                     dstOffset += c0Size_;
                     srcOffset += gCol;
                 }
@@ -168,9 +161,8 @@ public:
         } else {
             // data copy stride is aligned
             for (int32_t i = 0; i < calcWidth; i++) {
-                DataCopy(
-                    dst[dstOffset], src[srcOffset],
-                    {static_cast<uint16_t>(height), 1, static_cast<uint16_t>(srcStride), 0}, enhancedParams);
+                DataCopy(dst[dstOffset], src[srcOffset],
+                    { static_cast<uint16_t>(height), 1, static_cast<uint16_t>(srcStride), 0 }, enhancedParams);
                 dstOffset += calcHeightExr * c0Size_;
                 srcOffset += c0Size_;
             }
@@ -181,8 +173,7 @@ private:
     template <bool IS_TRANS = false, typename INPUT_TYPE_ALIAS = INPUT_TYPE>
     __aicore__ constexpr enable_if_t<INPUT_TYPE_ALIAS::TAG == InputTypeTag::A, int32_t> GetStaticTileHeight() const
     {
-        if constexpr (
-            (INPUT_TYPE_ALIAS::layout != LayoutMode::NONE) &&
+        if constexpr ((INPUT_TYPE_ALIAS::layout != LayoutMode::NONE) &&
             (ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1)) {
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK();
@@ -192,10 +183,10 @@ private:
         } else if constexpr (DoMatmulMDL(MM_CFG) || DoMatmulSpecialMDL(MM_CFG)) {
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepKa() *
-                       MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
+                    MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
             } else {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepM() *
-                       MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM();
+                    MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM();
             }
         } else {
             return MATMUL_MODULE(CopyCubeInParams)->template GetBaseHeight<IS_TRANS>();
@@ -205,8 +196,7 @@ private:
     template <bool IS_TRANS = false, typename INPUT_TYPE_ALIAS = INPUT_TYPE>
     __aicore__ constexpr enable_if_t<INPUT_TYPE_ALIAS::TAG == InputTypeTag::A, int32_t> GetStaticTileWidth() const
     {
-        if constexpr (
-            (INPUT_TYPE_ALIAS::layout != LayoutMode::NONE) &&
+        if constexpr ((INPUT_TYPE_ALIAS::layout != LayoutMode::NONE) &&
             (ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1)) {
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreM();
@@ -216,10 +206,10 @@ private:
         } else if constexpr (DoMatmulMDL(MM_CFG) || DoMatmulSpecialMDL(MM_CFG)) {
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepM() *
-                       MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM();
+                    MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM();
             } else {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepKa() *
-                       MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
+                    MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
             }
         } else {
             return MATMUL_MODULE(CopyCubeInParams)->template GetBaseWidth<IS_TRANS>();
@@ -229,8 +219,7 @@ private:
     template <bool IS_TRANS = false, typename INPUT_TYPE_ALIAS = INPUT_TYPE>
     __aicore__ inline enable_if_t<INPUT_TYPE_ALIAS::TAG == InputTypeTag::B, int32_t> GetStaticTileHeight() const
     {
-        if constexpr (
-            (INPUT_TYPE_ALIAS::layout != LayoutMode::NONE) &&
+        if constexpr ((INPUT_TYPE_ALIAS::layout != LayoutMode::NONE) &&
             (ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1)) {
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreN();
@@ -240,10 +229,10 @@ private:
         } else if constexpr (DoMatmulMDL(MM_CFG) || DoMatmulSpecialMDL(MM_CFG)) {
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepN() *
-                       MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
+                    MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
             } else {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepKb() *
-                       MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
+                    MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
             }
         } else {
             return MATMUL_MODULE(CopyCubeInParams)->template GetBaseHeight<IS_TRANS>();
@@ -253,8 +242,7 @@ private:
     template <bool IS_TRANS = false, typename INPUT_TYPE_ALIAS = INPUT_TYPE>
     __aicore__ inline enable_if_t<INPUT_TYPE_ALIAS::TAG == InputTypeTag::B, int32_t> GetStaticTileWidth() const
     {
-        if constexpr (
-            (INPUT_TYPE_ALIAS::layout != LayoutMode::NONE) &&
+        if constexpr ((INPUT_TYPE_ALIAS::layout != LayoutMode::NONE) &&
             (ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1)) {
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK();
@@ -264,10 +252,10 @@ private:
         } else if constexpr (DoMatmulMDL(MM_CFG) || DoMatmulSpecialMDL(MM_CFG)) {
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepKb() *
-                       MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
+                    MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
             } else {
                 return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepN() *
-                       MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
+                    MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
             }
         } else {
             return MATMUL_MODULE(CopyCubeInParams)->template GetBaseWidth<IS_TRANS>();
@@ -275,9 +263,8 @@ private:
     }
 
     template <typename T, uint8_t MultiOfByte>
-    __aicore__ inline void StaticPadCommon(
-        const LocalTensor<T>& padTensor, const int32_t staticHeight, const int32_t staticWidth,
-        const int32_t tileHeight, const int32_t tileWidth)
+    __aicore__ inline void StaticPadCommon(const LocalTensor<T> &padTensor, const int32_t staticHeight,
+        const int32_t staticWidth, const int32_t tileHeight, const int32_t tileWidth)
     {
         int32_t tileWidthC0 = Ceil(tileWidth, c0Size_);
         int32_t staticWidthC0 = Ceil(staticWidth, c0Size_);
@@ -310,9 +297,8 @@ private:
     }
 
     template <typename DataType>
-    __aicore__ inline void StaticPadNd2Nz(
-        const LocalTensor<DataType>& dst, const int32_t staticHeight, const int32_t staticWidth,
-        const int32_t tileHeight, const int32_t tileWidth)
+    __aicore__ inline void StaticPadNd2Nz(const LocalTensor<DataType> &dst, const int32_t staticHeight,
+        const int32_t staticWidth, const int32_t tileHeight, const int32_t tileWidth)
     {
         if constexpr (IsSupportB8<DataType>() && !IsSameTypeV<DataType, int8_t>) {
             auto padTensor = dst.template ReinterpretCast<uint16_t>();
@@ -330,10 +316,8 @@ private:
                 StaticPadCommon<DataType, 1>(padTensor, staticHeight, staticWidth, tileHeight, tileWidth);
             } else if constexpr (DoMatmulMDL(MM_CFG) || DoMatmulSpecialMDL(MM_CFG)) {
                 using params = InitConstValueParams<DataType>;
-                InitConstValue(
-                    dst,
-                    params{
-                        1, static_cast<uint16_t>(staticHeight * staticWidth * sizeof(DataType) / ONE_BLK_SIZE), 0, 0});
+                InitConstValue(dst, params{ 1,
+                    static_cast<uint16_t>(staticHeight * staticWidth * sizeof(DataType) / ONE_BLK_SIZE), 0, 0 });
             }
         }
     }
@@ -344,7 +328,8 @@ private:
 } // namespace Detail
 } // namespace Impl
 } // namespace AscendC
-#endif // IMPL_MATMUL_STAGE_COPY_CUBE_IN_COPY_TILE_TO_CUBE_DATA_COPY_WRAPPER_ND_H
+#endif \
+    // IMPL_MATMUL_STAGE_COPY_CUBE_IN_COPY_TILE_TO_CUBE_DATA_COPY_WRAPPER_ND_H
 
 #if defined( \
     __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_COPY_CUBE_IN_COPY_TILE_TO_CUBE_DATA_COPY_WRAPPER_ND_H__)

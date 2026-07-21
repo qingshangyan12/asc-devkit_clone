@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-/*!
+/* !
  * \file sigmoid_common_impl.h
  * \brief
  */
@@ -37,31 +37,27 @@
 #include "sigmoid_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 1001
 #include "sigmoid_v100_impl.h"
-#elif defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 #include "sigmoid_3510_impl.h"
 #endif
 
 namespace AscendC {
-
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 1001)
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void SigmoidImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-    const uint32_t calCount)
+__aicore__ inline void SigmoidImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
+    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t calCount)
 {
     CHECK_FUNC_HIGHLEVEL_API(Sigmoid, (T, isReuseSource), (dstTensor, srcTensor, sharedTmpBuffer, calCount));
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
         return;
     }
-    ASSERT(
-        ((TPosition)dstTensor.GetPosition() == TPosition::VECIN ||
-         (TPosition)dstTensor.GetPosition() == TPosition::VECOUT ||
-         (TPosition)dstTensor.GetPosition() == TPosition::VECCALC));
+    ASSERT(((TPosition)dstTensor.GetPosition() == TPosition::VECIN ||
+        (TPosition)dstTensor.GetPosition() == TPosition::VECOUT ||
+        (TPosition)dstTensor.GetPosition() == TPosition::VECCALC));
     ASCENDC_ASSERT((calCount <= srcTensor.GetSize()), {
-        KERNEL_LOG(
-            KERNEL_ERROR,
+        KERNEL_LOG(KERNEL_ERROR,
             "calCount is %u, which should not "
             "larger than srcTensor size %u",
             calCount, srcTensor.GetSize());
@@ -78,8 +74,8 @@ __aicore__ inline void SigmoidImpl(
 #endif
 
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void SigmoidImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
+__aicore__ inline void SigmoidImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
+    const uint32_t calCount)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -91,7 +87,8 @@ __aicore__ inline void SigmoidImpl(
     SigmoidImpl<T, isReuseSource>(dstTensor, srcTensor, stackBuffer, calCount);
 }
 } // namespace AscendC
-#endif // IMPL_ACTIVATION_SIGMOID_SIGMOID_COMMON_IMPL_H
+#endif \
+    // IMPL_ACTIVATION_SIGMOID_SIGMOID_COMMON_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIGMOID_COMMON_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

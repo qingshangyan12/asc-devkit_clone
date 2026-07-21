@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-/*!
+/* !
  * \file kernel_utils_base.h
  * \brief
  */
@@ -40,9 +40,15 @@ __BLOCK_LOCAL__ extern __inline__ half g_deqValue;
 #endif
 class AscendCUtils {
 public:
-    __aicore__ static inline int32_t GetBitSize(int32_t byteSize) { return byteSize * ONE_BYTE_BIT_SIZE; }
+    __aicore__ static inline int32_t GetBitSize(int32_t byteSize)
+    {
+        return byteSize * ONE_BYTE_BIT_SIZE;
+    }
 
-    __aicore__ static inline int32_t GetC0Size() { return DEFAULT_C0_SIZE; }
+    __aicore__ static inline int32_t GetC0Size()
+    {
+        return DEFAULT_C0_SIZE;
+    }
 
     __aicore__ static inline void InitCoupledArchSpr()
     {
@@ -107,12 +113,18 @@ public:
         return GetC0Size() / dtypeSize;
     }
 
-    __aicore__ static inline int32_t GetDefaultBlockNum() { return DEFAULT_BLK_NUM; }
+    __aicore__ static inline int32_t GetDefaultBlockNum()
+    {
+        return DEFAULT_BLK_NUM;
+    }
 
-    __aicore__ static inline int64_t GetRsvdCnt() { return get_rsvd_cnt(); }
+    __aicore__ static inline int64_t GetRsvdCnt()
+    {
+        return get_rsvd_cnt();
+    }
 
     template <typename T, bool isSetMask = true>
-    __aicore__ static inline void SetMask(const uint64_t& maskHigh, const uint64_t& maskLow)
+    __aicore__ static inline void SetMask(const uint64_t &maskHigh, const uint64_t &maskLow)
     {
         if constexpr (!isSetMask) {
             return;
@@ -121,12 +133,11 @@ public:
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         if (sizeof(T) >= sizeof(int32_t)) {
-            ASCENDC_ASSERT(
-                (maskHigh == 0ULL), { KERNEL_LOG(KERNEL_ERROR, "maskHigh must be 0 for type b32 and b64"); });
+            ASCENDC_ASSERT((maskHigh == 0ULL),
+                           { KERNEL_LOG(KERNEL_ERROR, "maskHigh must be 0 for type b32 and b64"); });
         }
-        ASCENDC_ASSERT(((maskLow != 0ULL) || (maskHigh != 0ULL)), {
-            KERNEL_LOG(KERNEL_ERROR, "maskLow and maskHigh can not be zero at the same time");
-        });
+        ASCENDC_ASSERT(((maskLow != 0ULL) || (maskHigh != 0ULL)),
+                       { KERNEL_LOG(KERNEL_ERROR, "maskLow and maskHigh can not be zero at the same time"); });
 #endif
 #endif
         if ASCEND_IS_NOT_AIC {
@@ -134,8 +145,7 @@ public:
         }
     }
 
-    template <typename T, bool isSetMask = true>
-    __aicore__ static inline void SetMask(int32_t len)
+    template <typename T, bool isSetMask = true> __aicore__ static inline void SetMask(int32_t len)
     {
         if constexpr (!isSetMask) {
             return;
@@ -162,28 +172,24 @@ public:
             SetMask<T>(FULL_MASK, FULL_MASK);
             return;
         }
-        SetMask<T>(
+        SetMask<T>(static_cast<uint64_t>(
+            (len > halfTypeLen) ? (((static_cast<uint64_t>(1)) << static_cast<uint32_t>(len - halfTypeLen)) - 1) : 0),
             static_cast<uint64_t>(
-                (len > halfTypeLen) ? (((static_cast<uint64_t>(1)) << static_cast<uint32_t>(len - halfTypeLen)) - 1) :
-                                      0),
-            static_cast<uint64_t>(
-                (len > halfTypeLen) ? FULL_MASK : (((static_cast<uint64_t>(1)) << static_cast<uint32_t>(len)) - 1)));
+            (len > halfTypeLen) ? FULL_MASK : (((static_cast<uint64_t>(1)) << static_cast<uint32_t>(len)) - 1)));
     }
 
-    template <typename T>
-    __aicore__ static inline void SetMaskCount()
+    template <typename T> __aicore__ static inline void SetMaskCount()
     {
         set_mask_count();
     }
 
-    template <typename T>
-    __aicore__ static inline void SetMaskNorm()
+    template <typename T> __aicore__ static inline void SetMaskNorm()
     {
         set_mask_norm();
     }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || \
-                              (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161)) || \
+    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161)) ||                          \
     (__NPU_ARCH__ == 3003) || __NPU_ARCH__ == 3113
     __aicore__ static inline void SetOverflow(uint64_t ctrlValue)
     {
@@ -209,8 +215,7 @@ public:
     }
 #endif
 
-    template <bool isSetMask = true>
-    __aicore__ static inline void ResetMask()
+    template <bool isSetMask = true> __aicore__ static inline void ResetMask()
     {
         if constexpr (!isSetMask) {
             return;
@@ -221,8 +226,8 @@ public:
     }
 
     template <bool isInt4 = false>
-    __aicore__ inline static IntriInfo CalIntriInfo(
-        const uint32_t dtypeSize, const uint32_t count, uint32_t repStride = DEFAULT_BLK_NUM)
+    __aicore__ inline static IntriInfo CalIntriInfo(const uint32_t dtypeSize, const uint32_t count,
+        uint32_t repStride = DEFAULT_BLK_NUM)
     {
         IntriInfo retIntriInfo;
         retIntriInfo.c0Count = GetC0Count(dtypeSize);
@@ -239,71 +244,65 @@ public:
     }
 
     template <typename T>
-    __aicore__ static inline __ubuf__ T* GetTemporaryBufferAddr(const int32_t bufferOffset, const int32_t bufferSize)
+    __aicore__ static inline __ubuf__ T *GetTemporaryBufferAddr(const int32_t bufferOffset, const int32_t bufferSize)
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((bufferOffset % ONE_BLK_SIZE == 0), {
-            KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset);
-        });
+        ASCENDC_ASSERT((bufferOffset % ONE_BLK_SIZE == 0),
+                       { KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset); });
         ASCENDC_ASSERT(
             (bufferOffset + bufferSize * sizeof(T) <= ConstDefiner::Instance().bufferInitLen.at(Hardware::UB)), {
-                KERNEL_LOG(
-                    KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of ub %d", bufferOffset,
-                    bufferSize, ConstDefiner::Instance().bufferInitLen.at(Hardware::UB));
+                KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of ub %d",
+                    bufferOffset, bufferSize, ConstDefiner::Instance().bufferInitLen.at(Hardware::UB));
             });
         const int32_t maxTempSize = 0x100000;
         ASCENDC_ASSERT((bufferSize < maxTempSize), {
-            KERNEL_LOG(
-                KERNEL_ERROR, "bufferSize is %d, which exceed the maxTempSize limits %d", bufferSize, maxTempSize);
+            KERNEL_LOG(KERNEL_ERROR, "bufferSize is %d, which exceed the maxTempSize limits %d", bufferSize,
+                maxTempSize);
         });
-        T* addr = reinterpret_cast<T*>(ConstDefiner::Instance().hardwareCpuBufferMap.at(Hardware::UB) + bufferOffset);
+        T *addr = reinterpret_cast<T *>(ConstDefiner::Instance().hardwareCpuBufferMap.at(Hardware::UB) + bufferOffset);
 #else
         (void)bufferSize;
-        __ubuf__ T* addr = reinterpret_cast<__ubuf__ T*>(get_imm(0) + bufferOffset);
+        __ubuf__ T *addr = reinterpret_cast<__ubuf__ T *>(get_imm(0) + bufferOffset);
 #endif
         return addr;
     }
 
-    template <typename T>
-    __aicore__ static inline void FreeTemporaryBuffer(__ubuf__ T* addr)
+    template <typename T> __aicore__ static inline void FreeTemporaryBuffer(__ubuf__ T *addr)
     {
         (void)addr;
     }
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5161))
+    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5161))
     template <typename T>
-    __aicore__ static inline __fbuf__ T* GetTemporaryFbBufferAddr(const int32_t bufferOffset, const int32_t bufferSize)
+    __aicore__ static inline __fbuf__ T *GetTemporaryFbBufferAddr(const int32_t bufferOffset, const int32_t bufferSize)
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((bufferOffset % ONE_BLK_SIZE == 0), {
-            KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset);
-        });
+        ASCENDC_ASSERT((bufferOffset % ONE_BLK_SIZE == 0),
+                       { KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset); });
         ASCENDC_ASSERT(
             (bufferOffset + bufferSize * sizeof(T) <= ConstDefiner::Instance().bufferInitLen.at(Hardware::FIXBUF)), {
-                KERNEL_LOG(
-                    KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of fixbuf %d",
+                KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of fixbuf %d",
                     bufferOffset, bufferSize, ConstDefiner::Instance().bufferInitLen.at(Hardware::FIXBUF));
             });
-        T* addr =
-            reinterpret_cast<T*>(ConstDefiner::Instance().hardwareCpuBufferMap.at(Hardware::FIXBUF) + bufferOffset);
+        T *addr =
+            reinterpret_cast<T *>(ConstDefiner::Instance().hardwareCpuBufferMap.at(Hardware::FIXBUF) + bufferOffset);
 #else
         (void)bufferSize;
-        __fbuf__ T* addr = reinterpret_cast<__fbuf__ T*>(get_imm(0) + bufferOffset);
+        __fbuf__ T *addr = reinterpret_cast<__fbuf__ T *>(get_imm(0) + bufferOffset);
 #endif
         return addr;
     }
 
-    template <typename T>
-    __aicore__ static inline void FreeTemporaryFbBuffer(__fbuf__ T* addr)
+    template <typename T> __aicore__ static inline void FreeTemporaryFbBuffer(__fbuf__ T *addr)
     {
         (void)addr;
     }
 #endif
 
-    __aicore__ static inline uint64_t GetGMLen(
-        const DataCopyParams& intriParams, const bool& isSrc, const bool& isMovAlignIntri)
+    __aicore__ static inline uint64_t GetGMLen(const DataCopyParams &intriParams, const bool &isSrc,
+        const bool &isMovAlignIntri)
     {
         uint16_t stride = intriParams.dstStride;
         uint16_t burstLenUnit = 32;
@@ -319,12 +318,12 @@ public:
             return 0;
         }
         uint64_t gmLen = static_cast<uint64_t>(intriParams.blockCount) * intriParams.blockLen * burstLenUnit +
-                         (intriParams.blockCount - 1) * stride * strideUnit;
+            (intriParams.blockCount - 1) * stride * strideUnit;
         return gmLen;
     }
 
-    __aicore__ static inline uint64_t GetGMLen(
-        const DataCopyExtParams& intriParams, const bool& isSrc, const bool& isMovAlignIntri)
+    __aicore__ static inline uint64_t GetGMLen(const DataCopyExtParams &intriParams, const bool &isSrc,
+        const bool &isMovAlignIntri)
     {
         int64_t stride = intriParams.dstStride;
         uint16_t burstLenUnit = 32;
@@ -339,31 +338,29 @@ public:
         if (intriParams.blockLen == 0) {
             return 0;
         }
-        uint64_t gmLen = static_cast<uint64_t>(
-            static_cast<int64_t>(intriParams.blockCount * intriParams.blockLen * burstLenUnit) +
+        uint64_t gmLen =
+            static_cast<uint64_t>(static_cast<int64_t>(intriParams.blockCount * intriParams.blockLen * burstLenUnit) +
             (intriParams.blockCount - 1) * stride * strideUnit);
         return gmLen;
     }
 
-    __aicore__ static inline uint64_t GetGMLen(const uint64_t& srcEleSize, const Nd2NzParams& intriParams)
+    __aicore__ static inline uint64_t GetGMLen(const uint64_t &srcEleSize, const Nd2NzParams &intriParams)
     {
         uint64_t gmLen = (static_cast<uint64_t>(intriParams.ndNum) - 1) * srcEleSize * intriParams.srcNdMatrixStride +
-                         (intriParams.nValue - 1) * intriParams.srcDValue * srcEleSize +
-                         intriParams.dValue * srcEleSize;
+            (intriParams.nValue - 1) * intriParams.srcDValue * srcEleSize + intriParams.dValue * srcEleSize;
         return gmLen;
     }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510))
-    __aicore__ static inline uint64_t GetGMLen(const uint64_t& srcEleSize, const Dn2NzParams& intriParams)
+    __aicore__ static inline uint64_t GetGMLen(const uint64_t &srcEleSize, const Dn2NzParams &intriParams)
     {
         uint64_t gmLen = (intriParams.dnNum - 1) * intriParams.srcDnMatrixStride * srcEleSize +
-                         intriParams.nValue * srcEleSize +
-                         (intriParams.dValue - 1) * intriParams.srcDValue * srcEleSize;
+            intriParams.nValue * srcEleSize + (intriParams.dValue - 1) * intriParams.srcDValue * srcEleSize;
         return gmLen;
     }
 #endif
 
-    __aicore__ static inline bool OOMCheckAddrIsOverflow(uintptr_t gmAddrConvert, const uint64_t& gmLen)
+    __aicore__ static inline bool OOMCheckAddrIsOverflow(uintptr_t gmAddrConvert, const uint64_t &gmLen)
     {
         (void)gmAddrConvert;
         (void)gmLen;
@@ -399,7 +396,7 @@ public:
     }
 
     template <typename T>
-    __aicore__ static inline void CheckGmMemOverflow(__gm__ T* gmAddr, const bool& isSrc, const uint64_t& gmLen)
+    __aicore__ static inline void CheckGmMemOverflow(__gm__ T *gmAddr, const bool &isSrc, const uint64_t &gmLen)
     {
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
         if (gmLen == 0) {
@@ -419,20 +416,23 @@ public:
                 if (oriGmAddr >= l2Cacheoffset) {
                     oriGmAddr -= l2Cacheoffset;
                 }
-#else  // ifndef __NPU_DEVICE__
+#else \
+    // ifndef __NPU_DEVICE__
                 if (oriGmAddr >= g_opSystemRunCfg.l2Cacheoffset) {
                     oriGmAddr -= g_opSystemRunCfg.l2Cacheoffset;
                 }
-#endif // __NPU_DEVICE__
+#endif \
+    // __NPU_DEVICE__
                 gmAddrConvert = reinterpret_cast<uintptr_t>(oriGmAddr);
                 status = OOMCheckAddrIsOverflow(gmAddrConvert, gmLen);
             }
         }
-#endif // L2_CACHE_HINT
+#endif \
+    // L2_CACHE_HINT
         constexpr uint64_t errCode = 0X5A5A0001;
         if (status) {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5161))
+    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5161))
             trap();
 #else
             trap(errCode);
@@ -442,9 +442,8 @@ public:
     }
 
     template <typename T>
-    __aicore__ static inline void CheckGmMemOverflowNormal(
-        __gm__ T* gmAddr, __gm__ uint8_t* workSpace, const bool isSrc, const bool isMovAlignIntri,
-        const DataCopyParams& intriParams)
+    __aicore__ static inline void CheckGmMemOverflowNormal(__gm__ T *gmAddr, __gm__ uint8_t *workSpace,
+        const bool isSrc, const bool isMovAlignIntri, const DataCopyParams &intriParams)
     {
         (void)(workSpace);
         uint64_t gmLen = GetGMLen(intriParams, isSrc, isMovAlignIntri);
@@ -452,9 +451,8 @@ public:
     }
 
     template <typename T>
-    __aicore__ static inline void CheckGmMemOverflowNormal(
-        __gm__ T* gmAddr, __gm__ uint8_t* workSpace, const bool isSrc, const bool isMovAlignIntri,
-        const DataCopyExtParams& intriParams)
+    __aicore__ static inline void CheckGmMemOverflowNormal(__gm__ T *gmAddr, __gm__ uint8_t *workSpace,
+        const bool isSrc, const bool isMovAlignIntri, const DataCopyExtParams &intriParams)
     {
         (void)(workSpace);
         uint64_t gmLen = GetGMLen(intriParams, isSrc, isMovAlignIntri);
@@ -462,8 +460,8 @@ public:
     }
 
     template <typename T>
-    __aicore__ static inline void CheckGmMemOverflowNd2Nz(
-        __gm__ T* gmAddr, __gm__ uint8_t* workSpace, const bool isSrc, const Nd2NzParams& intriParams)
+    __aicore__ static inline void CheckGmMemOverflowNd2Nz(__gm__ T *gmAddr, __gm__ uint8_t *workSpace, const bool isSrc,
+        const Nd2NzParams &intriParams)
     {
         (void)(workSpace);
         uint64_t srcEleSize = sizeof(T);
@@ -473,8 +471,8 @@ public:
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510))
     template <typename T>
-    __aicore__ static inline void CheckGmMemOverflowDn2Nz(
-        __gm__ T* gmAddr, __gm__ uint8_t* workSpace, const bool& isSrc, const Dn2NzParams& intriParams)
+    __aicore__ static inline void CheckGmMemOverflowDn2Nz(__gm__ T *gmAddr, __gm__ uint8_t *workSpace,
+        const bool &isSrc, const Dn2NzParams &intriParams)
     {
         (void)(workSpace);
         uint64_t srcEleSize = sizeof(T);
@@ -483,7 +481,7 @@ public:
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113 && __NPU_ARCH__ != 5161)
     template <typename T, uint8_t dim>
-    __aicore__ static inline void CheckGmMemOverflowNddma(__gm__ T* gmAddr, const MultiCopyLoopInfo<dim>& params)
+    __aicore__ static inline void CheckGmMemOverflowNddma(__gm__ T *gmAddr, const MultiCopyLoopInfo<dim> &params)
     {
         uint64_t maxOffset = 1;
         for (int32_t i = dim - 1; i >= 0; i--) {
@@ -500,7 +498,8 @@ public:
 };
 } // namespace AscendC
 
-#endif // ASCENDC_MODULE_UTILS_BASE_H
+#endif \
+    // ASCENDC_MODULE_UTILS_BASE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_BASE_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_BASE_H__

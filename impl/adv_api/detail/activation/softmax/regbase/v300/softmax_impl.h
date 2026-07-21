@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -27,23 +27,21 @@
 
 namespace AscendC {
 template <typename T1, typename T2, bool isBasicBlock = false>
-__aicore__ inline void SoftMaxNZImpl(
-    const LocalTensor<T1>& dst, const LocalTensor<T2>& sumTensor, const LocalTensor<T2>& maxTensor,
-    const LocalTensor<T1>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
-    const SoftMaxTiling& tiling)
+__aicore__ inline void SoftMaxNZImpl(const LocalTensor<T1> &dst, const LocalTensor<T2> &sumTensor,
+    const LocalTensor<T2> &maxTensor, const LocalTensor<T1> &src, const LocalTensor<float> &workLocal,
+    const LastAxisShapeND &originalSrcShape, const SoftMaxTiling &tiling)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "softmax format NZ is not supported on current device!"); });
 }
 template <bool isFlashV2 = false>
-__aicore__ inline void SoftMaxGenericNDImpl(
-    const LocalTensor<half>& dst, const LocalTensor<half>& sumTensor, const LocalTensor<half>& maxTensor,
-    const LocalTensor<half>& src, const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling,
-    const uint32_t& offset1, const uint32_t& offset2, const uint32_t& splitSize, const uint32_t& reduceSize,
-    const ReduceLastND& reduceParam)
+__aicore__ inline void SoftMaxGenericNDImpl(const LocalTensor<half> &dst, const LocalTensor<half> &sumTensor,
+    const LocalTensor<half> &maxTensor, const LocalTensor<half> &src, const LocalTensor<float> &workLocal,
+    const SoftMaxTiling &tiling, const uint32_t &offset1, const uint32_t &offset2, const uint32_t &splitSize,
+    const uint32_t &reduceSize, const ReduceLastND &reduceParam)
 {
-    const LocalTensor<float>& tmpBuffer0 = workLocal[0];
-    const LocalTensor<float>& tmpBuffer2 = workLocal[tiling.splitSize];
-    const LocalTensor<float>& tmpBuffer3 = workLocal[tiling.splitSize + tiling.reduceSize]; // need splitM * 64
+    const LocalTensor<float> &tmpBuffer0 = workLocal[0];
+    const LocalTensor<float> &tmpBuffer2 = workLocal[tiling.splitSize];
+    const LocalTensor<float> &tmpBuffer3 = workLocal[tiling.splitSize + tiling.reduceSize]; // need splitM * 64
 
     auto halfBuffer0 = tmpBuffer0.ReinterpretCast<half>();
     ReduceMaxImpl(maxTensor[offset2], src[offset1], halfBuffer0, reduceParam);
@@ -63,13 +61,12 @@ __aicore__ inline void SoftMaxGenericNDImpl(
 }
 
 template <bool isFlashV2 = false>
-__aicore__ inline void SoftMaxGenericNDImpl(
-    const LocalTensor<float>& dst, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
-    const LocalTensor<float>& src, const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling,
-    const uint32_t& offset1, const uint32_t& offset2, const uint32_t& splitSize, const uint32_t& reduceSize,
-    const ReduceLastND& reduceParam)
+__aicore__ inline void SoftMaxGenericNDImpl(const LocalTensor<float> &dst, const LocalTensor<float> &sumTensor,
+    const LocalTensor<float> &maxTensor, const LocalTensor<float> &src, const LocalTensor<float> &workLocal,
+    const SoftMaxTiling &tiling, const uint32_t &offset1, const uint32_t &offset2, const uint32_t &splitSize,
+    const uint32_t &reduceSize, const ReduceLastND &reduceParam)
 {
-    const LocalTensor<float>& tmpBuffer1 = workLocal[0]; // need splitM * 64
+    const LocalTensor<float> &tmpBuffer1 = workLocal[0]; // need splitM * 64
 
     ReduceMaxImpl(maxTensor[offset2], src[offset1], tmpBuffer1, reduceParam);
     SubNDImpl(dst[offset1], src[offset1], maxTensor[offset2], reduceParam.originalSrcM, tiling.srcK, tiling.reduceK);
@@ -78,27 +75,26 @@ __aicore__ inline void SoftMaxGenericNDImpl(
 
     ReduceSumImpl(sumTensor[offset2], dst[offset1], tmpBuffer1, reduceParam);
     if constexpr (!isFlashV2) {
-        DivNDImpl(
-            dst[offset1], dst[offset1], sumTensor[offset2], reduceParam.originalSrcM, tiling.srcK, tiling.reduceK);
+        DivNDImpl(dst[offset1], dst[offset1], sumTensor[offset2], reduceParam.originalSrcM, tiling.srcK,
+            tiling.reduceK);
     }
 }
 
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 template <bool isFlashV2 = false>
-__aicore__ inline void SoftMaxGenericNDImpl(
-    const LocalTensor<half>& dst, const LocalTensor<half>& sumTensor, const LocalTensor<half>& maxTensor,
-    const LocalTensor<half>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
-    const SoftMaxTiling& tiling)
+__aicore__ inline void SoftMaxGenericNDImpl(const LocalTensor<half> &dst, const LocalTensor<half> &sumTensor,
+    const LocalTensor<half> &maxTensor, const LocalTensor<half> &src, const LocalTensor<float> &workLocal,
+    const LastAxisShapeND &originalSrcShape, const SoftMaxTiling &tiling)
 {
     uint16_t srcK = tiling.srcK;
     uint16_t reduceK = HALF_NUM_PER_BLK;
     uint16_t srcM = tiling.srcM;
     uint16_t originK = (uint16_t)originalSrcShape.k;
 
-    const LocalTensor<float>& tmpBuffer0 = workLocal;
-    const LocalTensor<float>& tmpBuffer1 = workLocal[tiling.splitSize];
-    const LocalTensor<float>& tmpBuffer2 = workLocal[tiling.splitSize + tiling.reduceSize]; // need splitM * 64
+    const LocalTensor<float> &tmpBuffer0 = workLocal;
+    const LocalTensor<float> &tmpBuffer1 = workLocal[tiling.splitSize];
+    const LocalTensor<float> &tmpBuffer2 = workLocal[tiling.splitSize + tiling.reduceSize]; // need splitM * 64
     auto halfWorkLocal = workLocal.ReinterpretCast<half>();
     for (uint16_t i = 0; i < (uint16_t)srcM; i++) {
         ReduceMax(maxTensor[i * reduceK], src[i * srcK], halfWorkLocal, originK);
@@ -121,10 +117,9 @@ __aicore__ inline void SoftMaxGenericNDImpl(
 }
 
 template <bool isFlashV2 = false>
-__aicore__ inline void SoftMaxGenericNDImpl(
-    const LocalTensor<float>& dst, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
-    const LocalTensor<float>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
-    const SoftMaxTiling& tiling)
+__aicore__ inline void SoftMaxGenericNDImpl(const LocalTensor<float> &dst, const LocalTensor<float> &sumTensor,
+    const LocalTensor<float> &maxTensor, const LocalTensor<float> &src, const LocalTensor<float> &workLocal,
+    const LastAxisShapeND &originalSrcShape, const SoftMaxTiling &tiling)
 {
     uint16_t srcK = tiling.srcK;
     uint16_t reduceK = FLOAT_NUM_PER_BLK;
@@ -148,26 +143,25 @@ __aicore__ inline void SoftMaxGenericNDImpl(
     }
 }
 #endif
-template <typename T1, typename T2, bool isBasicBlock = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-__aicore__ inline void SoftMaxNDImpl(
-    const LocalTensor<T1>& dst, const LocalTensor<T2>& sumTensor, const LocalTensor<T2>& maxTensor,
-    const LocalTensor<T1>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
-    const SoftMaxTiling& tiling)
+template <typename T1, typename T2, bool isBasicBlock = false, const SoftmaxConfig &config = SOFTMAX_DEFAULT_CFG>
+__aicore__ inline void SoftMaxNDImpl(const LocalTensor<T1> &dst, const LocalTensor<T2> &sumTensor,
+    const LocalTensor<T2> &maxTensor, const LocalTensor<T1> &src, const LocalTensor<float> &workLocal,
+    const LastAxisShapeND &originalSrcShape, const SoftMaxTiling &tiling)
 {
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
     SoftMaxGenericNDImpl(dst, sumTensor, maxTensor, src, workLocal, originalSrcShape, tiling);
 #else
-    ReduceLastND reduceParam = {tiling.splitM, originalSrcShape.k, tiling.splitM,
-                                tiling.splitK, tiling.reduceM,     tiling.reduceK};
+    ReduceLastND reduceParam = { tiling.splitM, originalSrcShape.k, tiling.splitM,
+        tiling.splitK, tiling.reduceM,     tiling.reduceK };
     uint32_t offset1 = 0;
     uint32_t offset2 = 0;
     uint32_t splitSize = tiling.splitSize;
     uint32_t reduceSize = tiling.reduceSize;
 
     for (uint32_t i = 0; i <= tiling.rangeM; i++) {
-        SoftMaxGenericNDImpl(
-            dst, sumTensor, maxTensor, src, workLocal, tiling, offset1, offset2, splitSize, reduceSize, reduceParam);
+        SoftMaxGenericNDImpl(dst, sumTensor, maxTensor, src, workLocal, tiling, offset1, offset2, splitSize, reduceSize,
+            reduceParam);
         offset1 += tiling.splitSize;
         offset2 += tiling.reduceSize;
         if (i == (tiling.rangeM - 1)) {
@@ -185,34 +179,32 @@ __aicore__ inline void SoftMaxNDImpl(
     }
 #endif
 }
-template <typename T1, typename T2, bool isBasicBlock = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-__aicore__ inline void SoftMaxNDImpl(
-    const LocalTensor<half>& dst, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
-    const LocalTensor<half>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
-    const SoftMaxTiling& tiling)
+template <typename T1, typename T2, bool isBasicBlock = false, const SoftmaxConfig &config = SOFTMAX_DEFAULT_CFG>
+__aicore__ inline void SoftMaxNDImpl(const LocalTensor<half> &dst, const LocalTensor<float> &sumTensor,
+    const LocalTensor<float> &maxTensor, const LocalTensor<half> &src, const LocalTensor<float> &workLocal,
+    const LastAxisShapeND &originalSrcShape, const SoftMaxTiling &tiling)
 {
-    ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "softmax current data type is not supported on current device!"); });
+    ASCENDC_ASSERT(false,
+                   { KERNEL_LOG(KERNEL_ERROR, "softmax current data type is not supported on current device!"); });
 }
 template <typename T1, typename T2, bool isBasicBlock = false>
-__aicore__ inline void SoftMaxNZImpl(
-    const LocalTensor<half>& dst, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
-    const LocalTensor<half>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
-    const SoftMaxTiling& tiling)
+__aicore__ inline void SoftMaxNZImpl(const LocalTensor<half> &dst, const LocalTensor<float> &sumTensor,
+    const LocalTensor<float> &maxTensor, const LocalTensor<half> &src, const LocalTensor<float> &workLocal,
+    const LastAxisShapeND &originalSrcShape, const SoftMaxTiling &tiling)
 {
-    ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "softmax current data type is not supported on current device!"); });
+    ASCENDC_ASSERT(false,
+                   { KERNEL_LOG(KERNEL_ERROR, "softmax current data type is not supported on current device!"); });
 }
 
 template <typename T1, typename T2, bool isDataFormatNZ = false, uint8_t stepSizeMode = 0>
-__aicore__ inline bool AdjustSoftMaxResBaseImpl(
-    const LocalTensor<T1>& softMaxRes, const LocalTensor<T2>& maxTensor, const uint32_t from, const T1 to,
-    const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline bool AdjustSoftMaxResBaseImpl(const LocalTensor<T1> &softMaxRes, const LocalTensor<T2> &maxTensor,
+    const uint32_t from, const T1 to, const SoftMaxShapeInfo &softmaxShapeInfo)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AdjustSoftMax is not supported on current device!"); });
 }
 } // namespace AscendC
-#endif // IMPL_ACTIVATION_SOFTMAX_V300_SOFTMAX_IMPL_H
+#endif
+// IMPL_ACTIVATION_SOFTMAX_V300_SOFTMAX_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_IMPL_H__

@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -22,8 +22,8 @@
 #ifndef IMPL_ACTIVATION_SOFTMAX_SOFTMAX_GRAD_BASE_IMPL_H
 #define IMPL_ACTIVATION_SOFTMAX_SOFTMAX_GRAD_BASE_IMPL_H
 
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 #include "regbase/3510/softmax_grad_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
 #include "regbase/v300/softmax_grad_impl.h"
@@ -40,12 +40,11 @@
 
 namespace AscendC {
 template <typename T, bool isBasicBlock = false, bool isDataFormatNZ = false>
-__aicore__ inline void SoftmaxGradFrontImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline void SoftmaxGradFrontImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &gradTensor,
+    const LocalTensor<T> &srcTensor, const LocalTensor<float> &workLocal, const SoftMaxTiling &tiling,
+    const SoftMaxShapeInfo &softmaxShapeInfo)
 {
-    CHECK_FUNC_HIGHLEVEL_API(
-        SoftmaxGradFront, (T, isBasicBlock, isDataFormatNZ),
+    CHECK_FUNC_HIGHLEVEL_API(SoftmaxGradFront, (T, isBasicBlock, isDataFormatNZ),
         (dstTensor, gradTensor, srcTensor, workLocal, tiling, softmaxShapeInfo));
     ShapeInfo srcShape = srcTensor.GetShapeInfo();
     uint32_t elementNumPerBlk = ONE_BLK_SIZE / sizeof(T);
@@ -55,8 +54,8 @@ __aicore__ inline void SoftmaxGradFrontImpl(
         srcNDinfo = GetLastAxisShapeND(srcShape);
         originalSrcShape = GetLastAxisOriginShapeND(srcShape);
     } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
+        srcNDinfo = { softmaxShapeInfo.srcM, softmaxShapeInfo.srcK };
+        originalSrcShape = { softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK };
     }
     if constexpr (isDataFormatNZ) {
         if (unlikely(srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM)) {
@@ -70,44 +69,41 @@ __aicore__ inline void SoftmaxGradFrontImpl(
         if (unlikely(srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM)) {
             SoftMaxTiling newTiling = tiling;
             SoftMaxGradTilingFunc(workLocal.GetSize(), srcNDinfo, newTiling, elementNumPerBlk, true, isBasicBlock);
-            SoftmaxGradFrontNDImpl<T, isBasicBlock>(
-                dstTensor, gradTensor, srcTensor, workLocal, newTiling, originalSrcShape);
+            SoftmaxGradFrontNDImpl<T, isBasicBlock>(dstTensor, gradTensor, srcTensor, workLocal, newTiling,
+                originalSrcShape);
         } else {
-            SoftmaxGradFrontNDImpl<T, isBasicBlock>(
-                dstTensor, gradTensor, srcTensor, workLocal, tiling, originalSrcShape);
+            SoftmaxGradFrontNDImpl<T, isBasicBlock>(dstTensor, gradTensor, srcTensor, workLocal, tiling,
+                originalSrcShape);
         }
     }
 }
 
 template <typename T, bool isBasicBlock = false, bool isDataFormatNZ = false>
-__aicore__ inline void SoftmaxGradFrontImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
-    const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline void SoftmaxGradFrontImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &gradTensor,
+    const LocalTensor<T> &srcTensor, const SoftMaxTiling &tiling, const SoftMaxShapeInfo &softmaxShapeInfo)
 {
     LocalTensor<float> workLocal;
     PopStackBuffer<float, TPosition::LCM>(workLocal);
-    SoftmaxGradFrontImpl<T, isBasicBlock, isDataFormatNZ>(
-        dstTensor, gradTensor, srcTensor, workLocal, tiling, softmaxShapeInfo);
+    SoftmaxGradFrontImpl<T, isBasicBlock, isDataFormatNZ>(dstTensor, gradTensor, srcTensor, workLocal, tiling,
+        softmaxShapeInfo);
 }
 
 template <typename T, bool isBasicBlock = false, bool isDataFormatNZ = false>
-__aicore__ inline void SoftmaxGradFrontImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline void SoftmaxGradFrontImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &gradTensor,
+    const LocalTensor<T> &srcTensor, const LocalTensor<uint8_t> &sharedTmpBuffer, const SoftMaxTiling &tiling,
+    const SoftMaxShapeInfo &softmaxShapeInfo)
 {
     auto workLocal = sharedTmpBuffer.ReinterpretCast<float>();
-    SoftmaxGradFrontImpl<T, isBasicBlock, isDataFormatNZ>(
-        dstTensor, gradTensor, srcTensor, workLocal, tiling, softmaxShapeInfo);
+    SoftmaxGradFrontImpl<T, isBasicBlock, isDataFormatNZ>(dstTensor, gradTensor, srcTensor, workLocal, tiling,
+        softmaxShapeInfo);
 }
 
 template <typename T, bool isReuseSource = false, bool isDataFormatNZ = false>
-__aicore__ inline void SoftmaxGradImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling, bool isFront,
-    const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline void SoftmaxGradImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &gradTensor,
+    const LocalTensor<T> &srcTensor, const LocalTensor<float> &workLocal, const SoftMaxTiling &tiling, bool isFront,
+    const SoftMaxShapeInfo &softmaxShapeInfo)
 {
-    CHECK_FUNC_HIGHLEVEL_API(
-        SoftmaxGrad, (T, isReuseSource, isDataFormatNZ),
+    CHECK_FUNC_HIGHLEVEL_API(SoftmaxGrad, (T, isReuseSource, isDataFormatNZ),
         (dstTensor, gradTensor, srcTensor, workLocal, tiling, isFront, softmaxShapeInfo));
 
     ShapeInfo srcShape = srcTensor.GetShapeInfo();
@@ -119,8 +115,8 @@ __aicore__ inline void SoftmaxGradImpl(
         srcNDinfo = GetLastAxisShapeND(srcShape);
         originalSrcShape = GetLastAxisOriginShapeND(srcShape);
     } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
+        srcNDinfo = { softmaxShapeInfo.srcM, softmaxShapeInfo.srcK };
+        originalSrcShape = { softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK };
     }
     if constexpr (isDataFormatNZ) {
         if (unlikely(srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM)) {
@@ -134,8 +130,8 @@ __aicore__ inline void SoftmaxGradImpl(
         if (unlikely(srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM)) {
             SoftMaxTiling newTiling = tiling;
             SoftMaxGradTilingFunc(workLocal.GetSize(), srcNDinfo, newTiling, elementNumPerBlk, isFront, false);
-            SoftmaxGradPostProcess<T>(
-                dstTensor, gradTensor, srcTensor, workLocal, newTiling, originalSrcShape, isFront);
+            SoftmaxGradPostProcess<T>(dstTensor, gradTensor, srcTensor, workLocal, newTiling, originalSrcShape,
+                isFront);
         } else {
             SoftmaxGradPostProcess<T>(dstTensor, gradTensor, srcTensor, workLocal, tiling, originalSrcShape, isFront);
         }
@@ -143,27 +139,27 @@ __aicore__ inline void SoftmaxGradImpl(
 }
 
 template <typename T, bool isReuseSource = false, bool isDataFormatNZ = false>
-__aicore__ inline void SoftmaxGradImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
-    const SoftMaxTiling& tiling, bool isFront, const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline void SoftmaxGradImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &gradTensor,
+    const LocalTensor<T> &srcTensor, const SoftMaxTiling &tiling, bool isFront,
+    const SoftMaxShapeInfo &softmaxShapeInfo)
 {
     LocalTensor<float> workLocal;
     PopStackBuffer<float, TPosition::LCM>(workLocal);
-    SoftmaxGradImpl<T, isReuseSource, isDataFormatNZ>(
-        dstTensor, gradTensor, srcTensor, workLocal, tiling, isFront, softmaxShapeInfo);
+    SoftmaxGradImpl<T, isReuseSource, isDataFormatNZ>(dstTensor, gradTensor, srcTensor, workLocal, tiling, isFront,
+        softmaxShapeInfo);
 }
 template <typename T, bool isReuseSource = false, bool isDataFormatNZ = false>
-__aicore__ inline void SoftmaxGradImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, bool isFront,
-    const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline void SoftmaxGradImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &gradTensor,
+    const LocalTensor<T> &srcTensor, const LocalTensor<uint8_t> &sharedTmpBuffer, const SoftMaxTiling &tiling,
+    bool isFront, const SoftMaxShapeInfo &softmaxShapeInfo)
 {
     auto workLocal = sharedTmpBuffer.ReinterpretCast<float>();
-    SoftmaxGradImpl<T, isReuseSource, isDataFormatNZ>(
-        dstTensor, gradTensor, srcTensor, workLocal, tiling, isFront, softmaxShapeInfo);
+    SoftmaxGradImpl<T, isReuseSource, isDataFormatNZ>(dstTensor, gradTensor, srcTensor, workLocal, tiling, isFront,
+        softmaxShapeInfo);
 }
 } // namespace AscendC
-#endif // IMPL_ACTIVATION_SOFTMAX_SOFTMAX_GRAD_BASE_IMPL_H
+#endif \
+    // IMPL_ACTIVATION_SOFTMAX_SOFTMAX_GRAD_BASE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_GRAD_BASE_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_GRAD_BASE_IMPL_H__

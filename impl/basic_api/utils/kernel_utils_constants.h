@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-/*!
+/* !
  * \file kernel_utils_constants.h
  * \brief
  */
@@ -210,7 +210,8 @@ const uint16_t ONE_BLK_SIZE = 32;
 const int32_t CUBE_MAX_SIZE = 256;
 #endif
 
-#else // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
+#else \
+    // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
 
 #ifndef ASCC_PARAM_BLOCK_CUBE
 #define ASCC_PARAM_BLOCK_CUBE
@@ -227,7 +228,8 @@ constexpr uint32_t ONE_BLK_SIZE = 32;
 constexpr int32_t CUBE_MAX_SIZE = 256;
 #endif
 
-#endif // !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
+#endif \
+    // !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
 const uint8_t PAD_SIZE = 4;
 const uint8_t MRG_SORT_ELEMENT_LEN = 4;
 const uint8_t DEFAULT_DATA_COPY_NBURST = 1;
@@ -464,36 +466,33 @@ namespace Internal {
 constexpr uint8_t REGION_PROPOSAL_ELEMENT_NUM = 8;
 }
 
-#endif // (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+#endif \
+    // (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 
-template <typename T>
-std::string ScalarToString(T scalarValue);
-template <>
-inline std::string ScalarToString(half scalarValue)
+template <typename T> std::string ScalarToString(T scalarValue);
+template <> inline std::string ScalarToString(half scalarValue)
 {
     return std::to_string(scalarValue.ToFloat());
 }
-template <>
-inline std::string ScalarToString(bfloat16_t scalarValue)
+template <> inline std::string ScalarToString(bfloat16_t scalarValue)
 {
     return std::to_string(scalarValue.ToFloat());
 }
 
-template <typename T>
-uint64_t GetScalarBitcode(T scalarValue);
+template <typename T> uint64_t GetScalarBitcode(T scalarValue);
 // deq tensor ptr could not be passed by cce instructions, so pass ptr to model by this function
-void SetModelDeqTensor(void* deqTensor);
+void SetModelDeqTensor(void *deqTensor);
 #if __NPU_ARCH__ == 3002
 void SetEleSrcPara(uint64_t baseAddr);
 #endif
 #if __NPU_ARCH__ == 2002
-void SetVbiSrc0Param(half* vbiSrc0Ptr, int32_t vbiSrc0Size);
+void SetVbiSrc0Param(half *vbiSrc0Ptr, int32_t vbiSrc0Size);
 void SetUnzipCompressedLen(uint32_t compressedLength);
 #endif
-void SetModelBiasTensor(void* biasTensor);
-void SetIndexMatrix(void* indexMatrix);
+void SetModelBiasTensor(void *biasTensor);
+void SetIndexMatrix(void *indexMatrix);
 
 // src0 of gatherb instr could not be accessed by cce instructions, so pass ptr to model by this function
 void SetModelGatherbSrc0Tensor(uint64_t src0, const uint32_t length);
@@ -501,66 +500,55 @@ void SetModelGatherbSrc0Tensor(uint64_t src0, const uint32_t length);
 // dst0 of scatter instr could not be accessed by cce instructions, so pass ptr to model by this function
 void SetModelScatterDst0Tensor(uint64_t dst0, const uint32_t length);
 
-#endif // ASCENDC_CPU_DEBUG
+#endif \
+    // ASCENDC_CPU_DEBUG
 
-template <typename T>
-struct GetPadValueType {
+template <typename T> struct GetPadValueType {
     using Type = T;
 };
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 // To support FP8 datacopypad, pad type needs transfer to b8
-template <>
-struct GetPadValueType<fp8_e5m2_t> {
+template <> struct GetPadValueType<fp8_e5m2_t> {
     using Type = uint8_t;
 };
 
-template <>
-struct GetPadValueType<fp8_e4m3fn_t> {
+template <> struct GetPadValueType<fp8_e4m3fn_t> {
     using Type = uint8_t;
 };
 
-template <>
-struct GetPadValueType<fp8_e8m0_t> {
+template <> struct GetPadValueType<fp8_e8m0_t> {
     using Type = uint8_t;
 };
 
-template <>
-struct GetPadValueType<hifloat8_t> {
+template <> struct GetPadValueType<hifloat8_t> {
     using Type = uint8_t;
 };
 
 // To support FP4 datacopypad, pad type needs transfer to b8
-template <>
-struct GetPadValueType<fp4x2_e1m2_t> {
+template <> struct GetPadValueType<fp4x2_e1m2_t> {
     using Type = uint8_t;
 };
 
-template <>
-struct GetPadValueType<fp4x2_e2m1_t> {
+template <> struct GetPadValueType<fp4x2_e2m1_t> {
     using Type = uint8_t;
 };
 #endif
 
-template <bool condition, class T1, class T2>
-struct Conditional {
+template <bool condition, class T1, class T2> struct Conditional {
     using type = T1;
 };
 
-template <class T1, class T2>
-struct Conditional<false, T1, T2> {
+template <class T1, class T2> struct Conditional<false, T1, T2> {
     using type = T2;
 };
 
-template <bool condition1, bool condition2, class T1, class T2, class T3, class T4>
-struct ConditionalMulti {
-    using type = typename Conditional<
-        condition1, typename Conditional<condition2, T1, T2>::type,
+template <bool condition1, bool condition2, class T1, class T2, class T3, class T4> struct ConditionalMulti {
+    using type = typename Conditional<condition1, typename Conditional<condition2, T1, T2>::type,
         typename Conditional<condition2, T3, T4>::type>::type;
 };
 
-template <int bitNum, bool sign = true>
-struct IntegerSubType {
+template <int bitNum, bool sign = true> struct IntegerSubType {
     static int const kBits = bitNum;
     static bool const kSigned = sign;
 
@@ -571,9 +559,9 @@ struct IntegerSubType {
     Storage storage;
     __aicore__ inline IntegerSubType() = default;
 
-    __aicore__ inline IntegerSubType(uint32_t value) : storage(reinterpret_cast<Storage const&>(value) & mask) {}
+    __aicore__ inline IntegerSubType(uint32_t value) : storage(reinterpret_cast<Storage const &>(value) & mask) {}
 
-    __aicore__ inline IntegerSubType(int32_t value) : storage(reinterpret_cast<Storage const&>(value) & mask) {}
+    __aicore__ inline IntegerSubType(int32_t value) : storage(reinterpret_cast<Storage const &>(value) & mask) {}
 
     __aicore__ inline operator T() const
     {
@@ -584,11 +572,17 @@ struct IntegerSubType {
         return T(storage);
     }
 
-    __aicore__ inline bool operator==(IntegerSubType const& rhs) const { return storage == rhs.storage; }
+    __aicore__ inline bool operator == (IntegerSubType const & rhs) const
+    {
+        return storage == rhs.storage;
+    }
 
-    __aicore__ inline bool operator!=(IntegerSubType const& rhs) const { return storage != rhs.storage; }
+    __aicore__ inline bool operator != (IntegerSubType const & rhs) const
+    {
+        return storage != rhs.storage;
+    }
 
-    __aicore__ inline bool operator>(IntegerSubType const& rhs) const
+    __aicore__ inline bool operator > (IntegerSubType const & rhs) const
     {
         bool lhsIsNeg = (this->storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(this->kBits - 1)));
         bool rhsIsNeg = (rhs.storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(rhs.kBits - 1)));
@@ -598,7 +592,7 @@ struct IntegerSubType {
         return this->storage > rhs.storage;
     }
 
-    __aicore__ inline bool operator>=(IntegerSubType const& rhs) const
+    __aicore__ inline bool operator >= (IntegerSubType const & rhs) const
     {
         bool lhsIsNeg = (this->storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(this->kBits - 1)));
         bool rhsIsNeg = (rhs.storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(rhs.kBits - 1)));
@@ -608,9 +602,15 @@ struct IntegerSubType {
         return storage >= rhs.storage;
     }
 
-    __aicore__ inline bool operator<(IntegerSubType const& rhs) const { return !(*this >= rhs); }
+    __aicore__ inline bool operator < (IntegerSubType const & rhs) const
+    {
+        return !(*this >= rhs);
+    }
 
-    __aicore__ inline bool operator<=(IntegerSubType const& rhs) const { return !(*this > rhs); }
+    __aicore__ inline bool operator <= (IntegerSubType const & rhs) const
+    {
+        return !(*this > rhs);
+    }
 };
 
 using int4b_t = integer_sub_type<INT4_BIT_NUM, true>;
@@ -626,8 +626,7 @@ using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
 using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
 #endif
-#if !(                                                                                                        \
-    (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))) || defined(__NPU_HOST__) || \
+#if !((defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))) || defined(__NPU_HOST__) || \
     defined(__ASC_NPU_HOST__))
 using fp8_e8m0_t = uint8_t;
 #elif !defined(ASCENDC_CPU_DEBUG)
@@ -638,23 +637,19 @@ using mx_fp8_e5m2_t = struct {};
 using mx_fp8_e4m3_t = struct {};
 using mx_fp8_e8m0_t = struct {};
 
-template <typename T>
-struct GetDstType {
+template <typename T> struct GetDstType {
     using Type = T;
 };
 
-template <>
-struct GetDstType<mx_fp8_e5m2_t> {
+template <> struct GetDstType<mx_fp8_e5m2_t> {
     using Type = fp8_e5m2_t;
 };
 
-template <>
-struct GetDstType<mx_fp8_e4m3_t> {
+template <> struct GetDstType<mx_fp8_e4m3_t> {
     using Type = fp8_e4m3fn_t;
 };
 
-template <>
-struct GetDstType<mx_fp8_e8m0_t> {
+template <> struct GetDstType<mx_fp8_e8m0_t> {
     using Type = fp8_e8m0_t;
 };
 
@@ -662,8 +657,7 @@ struct BasicAPIMaskStruct {
     uint64_t maskArray[MASK_ARRAY_SIZE] = {0};
 };
 
-template <typename T>
-__aicore__ constexpr bool IsHalfByteDataType()
+template <typename T> __aicore__ constexpr bool IsHalfByteDataType()
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     return SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>();
@@ -672,59 +666,49 @@ __aicore__ constexpr bool IsHalfByteDataType()
 #endif
 }
 
-template <typename T>
-struct SizeOfBits {
+template <typename T> struct SizeOfBits {
     static constexpr uint32_t value = sizeof(T) * ONE_BYTE_BIT_SIZE;
 };
 
-template <>
-struct SizeOfBits<int4b_t> {
+template <> struct SizeOfBits<int4b_t> {
     static int const value = INT4_BIT_NUM;
 };
 
 #if (__NPU_ARCH__ == 5102)
-template <>
-struct SizeOfBits<int2b_t> {
+template <> struct SizeOfBits<int2b_t> {
     static constexpr uint32_t value = INT2_BIT_NUM;
 };
 
-template <>
-struct SizeOfBits<uint1b_t> {
+template <> struct SizeOfBits<uint1b_t> {
     static constexpr uint32_t value = INT1_BIT_NUM;
 };
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
-template <>
-struct SizeOfBits<uint4b_t> {
+template <> struct SizeOfBits<uint4b_t> {
     static int const value = INT4_BIT_NUM;
 };
 
-template <>
-struct SizeOfBits<uint3b_t> {
+template <> struct SizeOfBits<uint3b_t> {
     static int const value = INT3_BIT_NUM;
 };
 
-template <>
-struct SizeOfBits<uint2b_t> {
+template <> struct SizeOfBits<uint2b_t> {
     static int const value = INT2_BIT_NUM;
 };
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-template <>
-struct SizeOfBits<fp4x2_e2m1_t> {
+template <> struct SizeOfBits<fp4x2_e2m1_t> {
     static constexpr uint32_t value = INT4_BIT_NUM;
 };
-template <>
-struct SizeOfBits<fp4x2_e1m2_t> {
+template <> struct SizeOfBits<fp4x2_e1m2_t> {
     static constexpr uint32_t value = INT4_BIT_NUM;
 };
 #endif
 
-__aicore__ inline bool CheckCastOverlappingHigh(
-    const uint64_t dstAddr, const uint64_t srcAddr, const uint32_t dstTypeSize, const uint32_t srcTypeSize,
-    const uint32_t count)
+__aicore__ inline bool CheckCastOverlappingHigh(const uint64_t dstAddr, const uint64_t srcAddr,
+    const uint32_t dstTypeSize, const uint32_t srcTypeSize, const uint32_t count)
 {
     uint64_t addrLow = dstAddr > srcAddr ? srcAddr : dstAddr;
     uint64_t addrHigh = dstAddr > srcAddr ? dstAddr : srcAddr;
@@ -784,8 +768,8 @@ constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_CTRL_SPLIT_CORE = 1U << 15;
 } // namespace Internal
 
 #if defined(__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__)
-__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmBaseAddr;
-__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmAddr;
+__BLOCK_LOCAL__ __inline__ __gm__ uint8_t *g_superKernelAutoSyncAllConfigGmBaseAddr;
+__BLOCK_LOCAL__ __inline__ __gm__ uint8_t *g_superKernelAutoSyncAllConfigGmAddr;
 __BLOCK_LOCAL__ __inline__ uint32_t g_superKernelAutoSyncAllSyncIdx;
 __BLOCK_LOCAL__ __inline__ uint32_t g_superKernelAutoSyncAllEnable;
 constexpr uint8_t SK_AUTO_SYNC_ALL_VALID_MAGIC_NUM = 0x0;
@@ -806,7 +790,8 @@ __aicore__ inline void SuperKernelAutoSyncAllDcciBarrier()
 }
 #endif
 } // namespace AscendC
-#endif // ASCENDC_MODULE_UTILS_CONSTANTS_H
+#endif \
+    // ASCENDC_MODULE_UTILS_CONSTANTS_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CONSTANTS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CONSTANTS_H__

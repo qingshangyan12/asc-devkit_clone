@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-/*!
+/* !
  * \file scheduler_base.h
  * \brief
  */
@@ -28,7 +28,6 @@
 namespace AscendC {
 namespace Impl {
 namespace Detail {
-
 /*
     MatmulSchedulerBase is considered entirely experimental.
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
@@ -39,8 +38,7 @@ namespace Detail {
     MatmulSchedulerBase is the base class for other specialized MatmulScheduler,
     it implements the common GetResult methods.
 */
-template <
-    typename IMPL, class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG,
+template <typename IMPL, class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG,
     PolicyType POLICY_TYPE = PolicyType::MATMUL_DEFAULT, typename = void>
 class MatmulSchedulerBase {
 public:
@@ -65,18 +63,17 @@ public:
     using SrcAT = typename A_TYPE::T;
     using SrcBT = typename B_TYPE::T;
 
-    __aicore__ inline void Init(const TCubeTiling* __restrict cubeTiling, TPipe* tpipe)
+    __aicore__ inline void Init(const TCubeTiling *__restrict cubeTiling, TPipe *tpipe)
     {
         if constexpr (!NormInitScene<MM_CFG> && !MdlInitScene<MM_CFG> && !DoMatmulIBShareNorm(MM_CFG)) {
             ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Unsupported matmul version."); });
             return;
         }
-        static_assert(
-            !(ToMatmulConfig(MM_CFG).doNorm && ToMatmulConfig(MM_CFG).doIBShareNorm),
+        static_assert(!(ToMatmulConfig(MM_CFG).doNorm && ToMatmulConfig(MM_CFG).doIBShareNorm),
             "Neither Norm nor IBShareNorm can be enabled simultaneously!");
         MATMUL_MODULE(MatmulShapeTiling)->SetTiling(cubeTiling);
         MATMUL_MODULE(MatmulShapeTiling)->template CheckTiling<SrcAT, L0cT>();
-        auto& var = MATMUL_PARAM_VAR;
+        auto &var = MATMUL_PARAM_VAR;
         var.tpipe_ = tpipe;
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3002)
@@ -97,14 +94,13 @@ public:
             SetMMLayoutTransform(C_TYPE::format == CubeFormat::ND);
         }
 
-        const auto& tiling = MATMUL_MODULE(MatmulShapeTiling)->GetTiling();
+        const auto &tiling = MATMUL_MODULE(MatmulShapeTiling)->GetTiling();
         uint32_t shareUbSize = static_cast<uint32_t>(tiling.GetShareUbSize());
         // shareL1Size, shareL0CSize, shareUbSize
         int32_t sharedL0cSize = PhyPosIsL0C(C_TYPE::pos) ? 0 : tiling.GetShareL0CSize();
         uint32_t shareLens[SHARE_LEN_SIZE] = {
             static_cast<uint32_t>(tiling.GetShareL1Size()), static_cast<uint32_t>(sharedL0cSize), shareUbSize};
-        InitShareBufStart(
-            var.tpipe_, tiling.GetShareMode(), shareLens, SHARE_LEN_SIZE,
+        InitShareBufStart(var.tpipe_, tiling.GetShareMode(), shareLens, SHARE_LEN_SIZE,
             MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx());
         MATMUL_MODULE(CopyCubeInA)->Init();
         MATMUL_MODULE(CopyCubeInB)->Init();
@@ -112,16 +108,16 @@ public:
                                                    tiling.GetBaseM() * tiling.GetBaseN();
 
         uint32_t lenFactor = 1;
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || \
-    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         if constexpr (MdlInitScene<MM_CFG> && ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT) {
             lenFactor = DOUBLE_SIZE;
         }
 #endif
         MATMUL_MODULE(CubeOutBuffer)->Init(baseMN, lenFactor);
         if constexpr (NormInitScene<MM_CFG>) {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || \
-    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             MATMUL_MODULE(BiasScheduler)->Init();
 #endif
         } else {
@@ -132,7 +128,7 @@ public:
         if constexpr (IsSameTypeV<SrcAT, half> && IsSameTypeV<SrcBT, half> && IsTypeOneOfV<DstT, half, bfloat16_t>) {
             constexpr float FIX_VAL_RECIPROCAL = 1.0f;
             const uint64_t quantScalar =
-                static_cast<const uint64_t>(*reinterpret_cast<const int32_t*>(&FIX_VAL_RECIPROCAL));
+                static_cast<const uint64_t>(*reinterpret_cast<const int32_t *>(&FIX_VAL_RECIPROCAL));
             MATMUL_MODULE(MatmulQuantProcessor)->SetQuantScalar(quantScalar);
         }
         if constexpr (IsDecompMode<MM_CFG>()) {
@@ -151,7 +147,7 @@ public:
         }
     }
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
-    __aicore__ inline void Init(const __gm__ TCubeTiling* gmCubeTiling, TPipe* tpipe)
+    __aicore__ inline void Init(const __gm__ TCubeTiling *gmCubeTiling, TPipe *tpipe)
     {
         TCubeTiling cubeTiling;
         CopyTiling<A_TYPE, B_TYPE, MM_CFG>(gmCubeTiling, cubeTiling);
@@ -173,8 +169,7 @@ public:
         if constexpr (MatmulFeatureTrait<MM_CFG>::IsSupportUBToL1Singleshape()) {
             MATMUL_MODULE(MatmulCrossCoreSync)->End();
         }
-        if constexpr (
-            unlikely(Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsUnitFlagEnabled()) &&
+        if constexpr (unlikely(Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsUnitFlagEnabled()) &&
             C_TYPE::format == CubeFormat::ND) {
             SetMMLayoutTransform(0);
         }
@@ -195,12 +190,12 @@ public:
         return false;
     }
 
-    __aicore__ inline void Schedule(
-        const GlobalTensor<DstT>& gm, uint8_t enAtomic, bool enSequentialWrite, bool fakeMsg)
+    __aicore__ inline void Schedule(const GlobalTensor<DstT> &gm, uint8_t enAtomic, bool enSequentialWrite,
+        bool fakeMsg)
     {}
 
     template <class T>
-    __aicore__ inline bool Schedule(const T& dst, uint8_t enAtomic = 0, bool enSequentialWrite = false)
+    __aicore__ inline bool Schedule(const T &dst, uint8_t enAtomic = 0, bool enSequentialWrite = false)
     {
         ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Matching error. This is an empty implementation."); });
         return false;
@@ -211,22 +206,21 @@ public:
         ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Matching error. This is an empty implementation."); });
     }
 
-    __aicore__ inline void GetResult(
-        const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0, bool enSequentialWrite = false)
+    __aicore__ inline void GetResult(const LocalTensor<DstT> &co2Local, uint8_t enAtomic = 0,
+        bool enSequentialWrite = false)
     {
         static_assert(ToMatmulConfig(MM_CFG).scheduleType != ScheduleType::OUTER_PRODUCT, "Unsupported scheduleType");
         GetResultImpl(co2Local, enAtomic, enSequentialWrite);
     }
 
-    __aicore__ inline void GetResult(const GlobalTensor<DstT>& gm, uint8_t enAtomic = 0, bool enSequentialWrite = false)
+    __aicore__ inline void GetResult(const GlobalTensor<DstT> &gm, uint8_t enAtomic = 0, bool enSequentialWrite = false)
     {
         GetResultImpl(gm, enAtomic, enSequentialWrite);
     }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002)
-    __aicore__ inline void GetResult(
-        const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0,
-        bool enSequentialWrite = false)
+    __aicore__ inline void GetResult(const GlobalTensor<DstT> &gm, const LocalTensor<DstT> &co2Local,
+        uint8_t enAtomic = 0, bool enSequentialWrite = false)
     {
         static_assert(ToMatmulConfig(MM_CFG).scheduleType != ScheduleType::OUTER_PRODUCT, "Unsupported scheduleType");
         GetResultImpl(gm, co2Local, enAtomic, enSequentialWrite);
@@ -237,9 +231,8 @@ private:
     constexpr static uint8_t multiOfB16b4 = 4;
 
 protected:
-    __aicore__ inline void StaticPadCommon(
-        const LocalTensor<uint16_t>& padTensor, const int32_t repeatTimes, const int32_t blockNum, const int32_t dstGap,
-        const int32_t offset)
+    __aicore__ inline void StaticPadCommon(const LocalTensor<uint16_t> &padTensor, const int32_t repeatTimes,
+        const int32_t blockNum, const int32_t dstGap, const int32_t offset)
     {
         InitConstValueParams<uint16_t> initConstValueParams;
         initConstValueParams.repeatTimes = repeatTimes;
@@ -249,7 +242,7 @@ protected:
         InitConstValue(padTensor[offset], initConstValueParams);
     }
 
-    __aicore__ inline void PadZeroForAInL1(const LocalTensor<SrcAT>& a1)
+    __aicore__ inline void PadZeroForAInL1(const LocalTensor<SrcAT> &a1)
     {
         int32_t aSingleHeight;
         int32_t aSingleWidth;
@@ -264,12 +257,10 @@ protected:
             auto padTensor = a1.template ReinterpretCast<uint16_t>();
             if (aSingleCeilHeight > aSingleHeight) {
                 if constexpr (IsSupportB8<SrcAT>() && !IsSameTypeV<SrcAT, int8_t>) {
-                    StaticPadCommon(
-                        padTensor, tileWidthC0, aSingleCeilHeight - aSingleHeight, aSingleHeight,
+                    StaticPadCommon(padTensor, tileWidthC0, aSingleCeilHeight - aSingleHeight, aSingleHeight,
                         aSingleHeight * c0Size_ / multiOfB16b8);
                 } else if constexpr (IsSupportB4<SrcAT>() && !IsSameTypeV<SrcAT, int4b_t>) {
-                    StaticPadCommon(
-                        padTensor, tileWidthC0, aSingleCeilHeight - aSingleHeight, aSingleHeight,
+                    StaticPadCommon(padTensor, tileWidthC0, aSingleCeilHeight - aSingleHeight, aSingleHeight,
                         aSingleHeight * c0Size_ / multiOfB16b4);
                 }
             }
@@ -283,19 +274,17 @@ protected:
             auto padTensor = a1.template ReinterpretCast<uint16_t>();
             if (staticWidthC0 > tileWidthC0) {
                 if constexpr (IsSupportB8<SrcAT>() && !IsSameTypeV<SrcAT, int8_t>) {
-                    StaticPadCommon(
-                        padTensor, 1, (staticWidthC0 - tileWidthC0) * aSingleHeight, 0,
+                    StaticPadCommon(padTensor, 1, (staticWidthC0 - tileWidthC0) * aSingleHeight, 0,
                         aSingleCeilHeight * tileWidthC0 * c0Size_ / multiOfB16b8);
                 } else if constexpr (IsSupportB4<SrcAT>() && !IsSameTypeV<SrcAT, int4b_t>) {
-                    StaticPadCommon(
-                        padTensor, 1, (staticWidthC0 - tileWidthC0) * aSingleHeight, 0,
+                    StaticPadCommon(padTensor, 1, (staticWidthC0 - tileWidthC0) * aSingleHeight, 0,
                         aSingleCeilHeight * tileWidthC0 * c0Size_ / multiOfB16b4);
                 }
             }
         }
     }
 
-    __aicore__ inline void PadZeroForBInL1(const LocalTensor<SrcBT>& b1)
+    __aicore__ inline void PadZeroForBInL1(const LocalTensor<SrcBT> &b1)
     {
         int32_t bSingleHeight;
         int32_t bSingleWidth;
@@ -310,12 +299,10 @@ protected:
             auto padTensor = b1.template ReinterpretCast<uint16_t>();
             if (bSingleCeilHeight > bSingleHeight) {
                 if constexpr (IsSupportB8<SrcBT>() && !IsSameTypeV<SrcBT, int8_t>) {
-                    StaticPadCommon(
-                        padTensor, tileWidthC0, bSingleCeilHeight - bSingleHeight, bSingleHeight,
+                    StaticPadCommon(padTensor, tileWidthC0, bSingleCeilHeight - bSingleHeight, bSingleHeight,
                         bSingleHeight * c0Size_ / multiOfB16b8);
                 } else if constexpr (IsSupportB4<SrcBT>() && !IsSameTypeV<SrcBT, int4b_t>) {
-                    StaticPadCommon(
-                        padTensor, tileWidthC0, bSingleCeilHeight - bSingleHeight, bSingleHeight,
+                    StaticPadCommon(padTensor, tileWidthC0, bSingleCeilHeight - bSingleHeight, bSingleHeight,
                         bSingleHeight * c0Size_ / multiOfB16b4);
                 }
             }
@@ -329,19 +316,17 @@ protected:
             auto padTensor = b1.template ReinterpretCast<uint16_t>();
             if (staticWidthC0 > tileWidthC0) {
                 if constexpr (IsSupportB8<SrcBT>() && !IsSameTypeV<SrcBT, int8_t>) {
-                    StaticPadCommon(
-                        padTensor, 1, (staticWidthC0 - tileWidthC0) * bSingleHeight, 0,
+                    StaticPadCommon(padTensor, 1, (staticWidthC0 - tileWidthC0) * bSingleHeight, 0,
                         bSingleCeilHeight * tileWidthC0 * c0Size_ / multiOfB16b8);
                 } else if constexpr (IsSupportB4<SrcBT>() && !IsSameTypeV<SrcBT, int4b_t>) {
-                    StaticPadCommon(
-                        padTensor, 1, (staticWidthC0 - tileWidthC0) * bSingleHeight, 0,
+                    StaticPadCommon(padTensor, 1, (staticWidthC0 - tileWidthC0) * bSingleHeight, 0,
                         bSingleCeilHeight * tileWidthC0 * c0Size_ / multiOfB16b4);
                 }
             }
         }
     }
 
-    __aicore__ inline void PadZeroForABL1(const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1)
+    __aicore__ inline void PadZeroForABL1(const LocalTensor<SrcAT> &a1, const LocalTensor<SrcBT> &b1)
     {
         if constexpr (PhyPosIsUB(A_TYPE::pos)) {
             PadZeroForAInL1(a1);
@@ -374,8 +359,8 @@ protected:
     __aicore__ inline void CheckSupportTrianMatmul()
     {
         if constexpr (!MatmulFeatureTrait<MM_CFG>::IsSupportTrianMatmul()) {
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "Triangular Matmul is not supported on current device."); });
+            ASCENDC_ASSERT((false),
+                           { KERNEL_LOG(KERNEL_ERROR, "Triangular Matmul is not supported on current device."); });
         }
     }
 
@@ -395,7 +380,7 @@ protected:
         return true;
     }
 
-    __aicore__ inline void GetResultImpl(const LocalTensor<DstT>& co2Local, uint8_t enAtomic, bool enSequentialWrite)
+    __aicore__ inline void GetResultImpl(const LocalTensor<DstT> &co2Local, uint8_t enAtomic, bool enSequentialWrite)
     {
         (void)(enAtomic);
         auto co1Local = MATMUL_MODULE(CubeOutBuffer)->GetTensor();
@@ -407,16 +392,16 @@ protected:
         }
         if (enSequentialWrite) {
             MATMUL_MODULE(CopyCubeOut)
-                ->template Copy<true>(
-                    co2Local, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-                    MATMUL_MODULE(MLoop)->GetBaseShape(), MATMUL_MODULE(NLoop)->GetBaseShape(),
-                    MATMUL_MODULE(MLoop)->GetBaseBlockShape(), MATMUL_MODULE(NLoop)->GetBaseBlockShape());
+                ->template Copy<true>(co2Local, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(),
+                MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(MLoop)->GetBaseShape(),
+                MATMUL_MODULE(NLoop)->GetBaseShape(), MATMUL_MODULE(MLoop)->GetBaseBlockShape(),
+                MATMUL_MODULE(NLoop)->GetBaseBlockShape());
         } else {
             MATMUL_MODULE(CopyCubeOut)
-                ->template Copy<false>(
-                    co2Local, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-                    MATMUL_MODULE(MLoop)->GetBaseShape(), MATMUL_MODULE(NLoop)->GetBaseShape(),
-                    MATMUL_MODULE(MLoop)->GetBaseBlockShape(), MATMUL_MODULE(NLoop)->GetBaseBlockShape());
+                ->template Copy<false>(co2Local, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(),
+                MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(MLoop)->GetBaseShape(),
+                MATMUL_MODULE(NLoop)->GetBaseShape(), MATMUL_MODULE(MLoop)->GetBaseBlockShape(),
+                MATMUL_MODULE(NLoop)->GetBaseBlockShape());
         }
         MATMUL_MODULE(CubeOutBuffer)->FreeTensor(co1Local);
     }
@@ -429,7 +414,7 @@ protected:
         }
     }
 
-    __aicore__ inline void GetResultImpl(const GlobalTensor<DstT>& gm, uint8_t enAtomic, bool enSequentialWrite)
+    __aicore__ inline void GetResultImpl(const GlobalTensor<DstT> &gm, uint8_t enAtomic, bool enSequentialWrite)
     {
         auto co1Local = MATMUL_MODULE(CubeOutBuffer)->GetTensor();
         MATMUL_MODULE(CubeOutBuffer)->EnQue(co1Local);
@@ -438,24 +423,24 @@ protected:
 
         if (enSequentialWrite) {
             MATMUL_MODULE(CopyCubeOut)
-                ->template Copy<true>(
-                    gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-                    MATMUL_MODULE(MLoop)->GetBaseShape(), MATMUL_MODULE(NLoop)->GetBaseShape(),
-                    MATMUL_MODULE(MLoop)->GetBaseBlockShape(), MATMUL_MODULE(NLoop)->GetBaseBlockShape());
+                ->template Copy<true>(gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(),
+                MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(MLoop)->GetBaseShape(),
+                MATMUL_MODULE(NLoop)->GetBaseShape(), MATMUL_MODULE(MLoop)->GetBaseBlockShape(),
+                MATMUL_MODULE(NLoop)->GetBaseBlockShape());
         } else {
             MATMUL_MODULE(CopyCubeOut)
-                ->template Copy<false>(
-                    gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-                    MATMUL_MODULE(MLoop)->GetBaseShape(), MATMUL_MODULE(NLoop)->GetBaseShape(),
-                    MATMUL_MODULE(MLoop)->GetBaseBlockShape(), MATMUL_MODULE(NLoop)->GetBaseBlockShape());
+                ->template Copy<false>(gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(),
+                MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(MLoop)->GetBaseShape(),
+                MATMUL_MODULE(NLoop)->GetBaseShape(), MATMUL_MODULE(MLoop)->GetBaseBlockShape(),
+                MATMUL_MODULE(NLoop)->GetBaseBlockShape());
         }
 
         ClearAtomic(enAtomic);
         MATMUL_MODULE(CubeOutBuffer)->FreeTensor(co1Local);
     }
 
-    __aicore__ inline void GetResultImpl(
-        const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& co2Local, uint8_t enAtomic, bool enSequentialWrite)
+    __aicore__ inline void GetResultImpl(const GlobalTensor<DstT> &gm, const LocalTensor<DstT> &co2Local,
+        uint8_t enAtomic, bool enSequentialWrite)
     {
         auto co1Local = MATMUL_MODULE(CubeOutBuffer)->GetTensor();
         MATMUL_MODULE(CubeOutBuffer)->EnQue(co1Local);
@@ -464,16 +449,16 @@ protected:
 
         if (enSequentialWrite) {
             MATMUL_MODULE(CopyCubeOut)
-                ->template Copy<true>(
-                    gm, co2Local, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-                    MATMUL_MODULE(MLoop)->GetBaseShape(), MATMUL_MODULE(NLoop)->GetBaseShape(),
-                    MATMUL_MODULE(MLoop)->GetBaseBlockShape(), MATMUL_MODULE(NLoop)->GetBaseBlockShape());
+                ->template Copy<true>(gm, co2Local, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(),
+                MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(MLoop)->GetBaseShape(),
+                MATMUL_MODULE(NLoop)->GetBaseShape(), MATMUL_MODULE(MLoop)->GetBaseBlockShape(),
+                MATMUL_MODULE(NLoop)->GetBaseBlockShape());
         } else {
             MATMUL_MODULE(CopyCubeOut)
-                ->template Copy<false>(
-                    gm, co2Local, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-                    MATMUL_MODULE(MLoop)->GetBaseShape(), MATMUL_MODULE(NLoop)->GetBaseShape(),
-                    MATMUL_MODULE(MLoop)->GetBaseBlockShape(), MATMUL_MODULE(NLoop)->GetBaseBlockShape());
+                ->template Copy<false>(gm, co2Local, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(),
+                MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(MLoop)->GetBaseShape(),
+                MATMUL_MODULE(NLoop)->GetBaseShape(), MATMUL_MODULE(MLoop)->GetBaseBlockShape(),
+                MATMUL_MODULE(NLoop)->GetBaseBlockShape());
         }
 
         ClearAtomic(enAtomic);
@@ -494,10 +479,9 @@ protected:
         }
     }
 
-    __aicore__ inline void GetResultImpl(const GlobalTensor<DstT>& gm, uint8_t enAtomic, bool enSequentialWrite)
+    __aicore__ inline void GetResultImpl(const GlobalTensor<DstT> &gm, uint8_t enAtomic, bool enSequentialWrite)
     {
-        if constexpr (
-            C_TYPE::format != CubeFormat::ND && C_TYPE::format != CubeFormat::ND_ALIGN &&
+        if constexpr (C_TYPE::format != CubeFormat::ND && C_TYPE::format != CubeFormat::ND_ALIGN &&
             C_TYPE::format != CubeFormat::NZ && C_TYPE::format != CubeFormat::COLUMN_MAJOR) {
             ASCENDC_ASSERT((false), {
                 KERNEL_LOG(KERNEL_ERROR, "Data format of C matrix should be ND, ND_ALIGN, COLUMN_MAJOR or NZ.");
@@ -516,16 +500,16 @@ protected:
 
         if (enSequentialWrite) {
             MATMUL_MODULE(CopyCubeOut)
-                ->template Copy<true>(
-                    gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-                    MATMUL_MODULE(MLoop)->GetBaseShape(), MATMUL_MODULE(NLoop)->GetBaseShape(),
-                    MATMUL_MODULE(MLoop)->GetBaseBlockShape(), MATMUL_MODULE(NLoop)->GetBaseBlockShape());
+                ->template Copy<true>(gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(),
+                MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(MLoop)->GetBaseShape(),
+                MATMUL_MODULE(NLoop)->GetBaseShape(), MATMUL_MODULE(MLoop)->GetBaseBlockShape(),
+                MATMUL_MODULE(NLoop)->GetBaseBlockShape());
         } else {
             MATMUL_MODULE(CopyCubeOut)
-                ->template Copy<false>(
-                    gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-                    MATMUL_MODULE(MLoop)->GetBaseShape(), MATMUL_MODULE(NLoop)->GetBaseShape(),
-                    MATMUL_MODULE(MLoop)->GetBaseBlockShape(), MATMUL_MODULE(NLoop)->GetBaseBlockShape());
+                ->template Copy<false>(gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(),
+                MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(MLoop)->GetBaseShape(),
+                MATMUL_MODULE(NLoop)->GetBaseShape(), MATMUL_MODULE(MLoop)->GetBaseBlockShape(),
+                MATMUL_MODULE(NLoop)->GetBaseBlockShape());
         }
 
         ClearAtomic(enAtomic);
@@ -540,7 +524,6 @@ protected:
         }
     }
 };
-
 } // namespace Detail
 } // namespace Impl
 } // namespace AscendC

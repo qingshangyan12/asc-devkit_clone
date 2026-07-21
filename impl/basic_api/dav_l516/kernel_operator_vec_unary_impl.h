@@ -1,19 +1,20 @@
-/**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+/* *
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
-/*!
+/* !
  * \file kernel_operator_vec_unary_impl.h
  * \brief AscendC l311 support vector unary api.
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/dav_l311/kernel_operator_vec_unary_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/basic_api/dav_l311/kernel_operator_vec_unary_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_UNARY_IMPL_H__
 #endif
@@ -48,8 +49,8 @@ __aicore__ inline void VecUnaryLevel0VFImpl(__ubuf__ T *dst, __ubuf__ T *src, co
         Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcVreg,
             src + index * repeatParams.srcRepStride * ElePerBlkT, repeatParams.srcBlkStride, maskReg);
         func(dstVreg, srcVreg, maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + index * repeatParams.dstRepStride * ElePerBlkT,
+            dstVreg, repeatParams.dstBlkStride, maskReg);
     }
 }
 
@@ -103,101 +104,104 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
 } // namespace Internal
 
 // Macros for level-0 api with type not support
-#define UNARY_VEC_NORMAL_NOT_SUPPORT(FUNC_NAME)                                                                                  \
-    template <typename T, bool isSetMask = true>                                                                                 \
-    __aicore__ inline void FUNC_NAME(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask,                                      \
-        const uint8_t repeatTime, const UnaryRepeatParams& reapeatParams)                                                       \
-    {                                                                                                                            \
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });                             \
-    }                                                                                                                            \
+#define UNARY_VEC_NORMAL_NOT_SUPPORT(FUNC_NAME)                                                                       \
+    template <typename T, bool isSetMask = true>                                                                      \
+    __aicore__ inline void FUNC_NAME(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask, const uint8_t repeatTime, \
+        const UnaryRepeatParams &reapeatParams)                                                                       \
+    {                                                                                                                 \
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });                  \
+    }
 
-#define UNARY_VEC_BITWISE_NOT_SUPPORT(FUNC_NAME)                                                                                 \
-    template <typename T, bool isSetMask = true>                                                                                 \
-    __aicore__ inline void FUNC_NAME(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[2],                                   \
-        const uint8_t repeatTime, const UnaryRepeatParams& reapeatParams)                                                       \
-    {                                                                                                                            \
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });                             \
-    }                                                                                                                            \
+#define UNARY_VEC_BITWISE_NOT_SUPPORT(FUNC_NAME)                                                     \
+    template <typename T, bool isSetMask = true>                                                     \
+    __aicore__ inline void FUNC_NAME(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[2],       \
+        const uint8_t repeatTime, const UnaryRepeatParams &reapeatParams)                            \
+    {                                                                                                \
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); }); \
+    }
 
 // Macros for level-2 api with type not support
-#define UNARY_VEC_COUNTER_NOT_SUPPORT(FUNC_NAME)                                                                                 \
-    template <typename T>                                                                                                        \
-    __aicore__ inline void FUNC_NAME(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)                                  \
-    {                                                                                                                            \
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });                             \
-    }                                                                                                                            \
+#define UNARY_VEC_COUNTER_NOT_SUPPORT(FUNC_NAME)                                                                   \
+    template <typename T> __aicore__ inline void FUNC_NAME(__ubuf__ T *dst, __ubuf__ T *src, const int32_t &count) \
+    {                                                                                                              \
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });               \
+    }
 
 // Macros for level-0 api
 // for normal op
-#define UNARY_VEC_NORMAL_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                                           \
-template <typename T = DATA_TYPE, bool isSetMask = true>                                                                         \
-__aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask,                          \
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)                                                            \
-{                                                                                                                                \
-    __VEC_SCOPE__                                                                                                                \
-    {                                                                                                                            \
-        RegTensor<DATA_TYPE> vreg0;                                                                                              \
-        RegTensor<DATA_TYPE> vreg1;                                                                                              \
-        uint32_t sreg = (uint32_t)mask;                                                                                          \
-        MaskReg preg = CreatePredicate<DATA_TYPE>(sreg);                                                                         \
-        uint32_t strideConfig0 = (uint32_t)repeatParams.srcBlkStride;                                                            \
-        uint32_t repeatStrideConfig0 = (uint32_t)repeatParams.srcRepStride;                                                      \
-        uint32_t strideConfig1 = (uint32_t)repeatParams.dstBlkStride;                                                            \
-        uint32_t repeatStrideConfig1 = (uint32_t)repeatParams.dstRepStride;                                                      \
-        for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                                                   \
-            DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg0, src, strideConfig0, repeatStrideConfig0, preg);            \
-            OP_NAME(vreg1, vreg0, preg);                                                                                         \
-            DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(dst, vreg1, strideConfig1, repeatStrideConfig1, preg);            \
-        }                                                                                                                        \
-    }                                                                                                                            \
-}                                                                                                                                \
+#define UNARY_VEC_NORMAL_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                             \
+    template <typename T = DATA_TYPE, bool isSetMask = true>                                                       \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE *dst, __ubuf__ DATA_TYPE *src, const uint64_t mask,        \
+        const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)                                           \
+    {                                                                                                              \
+        __VEC_SCOPE__                                                                                              \
+        {                                                                                                          \
+            RegTensor<DATA_TYPE> vreg0;                                                                            \
+            RegTensor<DATA_TYPE> vreg1;                                                                            \
+            uint32_t sreg = (uint32_t)mask;                                                                        \
+            MaskReg preg = CreatePredicate<DATA_TYPE>(sreg);                                                       \
+            uint32_t strideConfig0 = (uint32_t)repeatParams.srcBlkStride;                                          \
+            uint32_t repeatStrideConfig0 = (uint32_t)repeatParams.srcRepStride;                                    \
+            uint32_t strideConfig1 = (uint32_t)repeatParams.dstBlkStride;                                          \
+            uint32_t repeatStrideConfig1 = (uint32_t)repeatParams.dstRepStride;                                    \
+            for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                                  \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg0, src, strideConfig0, repeatStrideConfig0, \
+                    preg);                                                                                         \
+                OP_NAME(vreg1, vreg0, preg);                                                                       \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(dst, vreg1, strideConfig1, repeatStrideConfig1, \
+                    preg);                                                                                         \
+            }                                                                                                      \
+        }                                                                                                          \
+    }
 
 // for bit-wise op
-#define UNARY_VEC_BITWISE_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                                          \
-    template <typename T = DATA_TYPE, bool isSetMask = true>                                                                     \
-    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask[2],                   \
-        const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)                                                        \
-    {                                                                                                                            \
-        if constexpr (isSetMask) {                                                                                               \
-            SetVectorMask<DATA_TYPE>(mask[1], mask[0]);                                                                          \
-        }                                                                                                                        \
-        __VEC_SCOPE__                                                                                                            \
-        {                                                                                                                        \
-            RegTensor<DATA_TYPE> vreg0;                                                                                          \
-            RegTensor<DATA_TYPE> vreg1;                                                                                          \
-            MaskReg preg = MovePredicate<DATA_TYPE>();                                                                           \
-            uint32_t strideConfig0 = (uint32_t)repeatParams.srcBlkStride;                                                        \
-            uint32_t repeatStrideConfig0 = (uint32_t)repeatParams.srcRepStride;                                                  \
-            uint32_t strideConfig1 = (uint32_t)repeatParams.dstBlkStride;                                                        \
-            uint32_t repeatStrideConfig1 = (uint32_t)repeatParams.dstRepStride;                                                  \
-            for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                                               \
-                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg0, src, strideConfig0, repeatStrideConfig0, preg);        \
-                OP_NAME(vreg1, vreg0, preg);                                                                                     \
-                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(dst, vreg1, strideConfig1, repeatStrideConfig1, preg);        \
-            }                                                                                                                    \
-        }                                                                                                                        \
-    }                                                                                                                            \
+#define UNARY_VEC_BITWISE_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                            \
+    template <typename T = DATA_TYPE, bool isSetMask = true>                                                       \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE *dst, __ubuf__ DATA_TYPE *src, const uint64_t mask[2],     \
+        const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)                                           \
+    {                                                                                                              \
+        if constexpr (isSetMask) {                                                                                 \
+            SetVectorMask<DATA_TYPE>(mask[1], mask[0]);                                                            \
+        }                                                                                                          \
+        __VEC_SCOPE__                                                                                              \
+        {                                                                                                          \
+            RegTensor<DATA_TYPE> vreg0;                                                                            \
+            RegTensor<DATA_TYPE> vreg1;                                                                            \
+            MaskReg preg = MovePredicate<DATA_TYPE>();                                                             \
+            uint32_t strideConfig0 = (uint32_t)repeatParams.srcBlkStride;                                          \
+            uint32_t repeatStrideConfig0 = (uint32_t)repeatParams.srcRepStride;                                    \
+            uint32_t strideConfig1 = (uint32_t)repeatParams.dstBlkStride;                                          \
+            uint32_t repeatStrideConfig1 = (uint32_t)repeatParams.dstRepStride;                                    \
+            for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                                  \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg0, src, strideConfig0, repeatStrideConfig0, \
+                    preg);                                                                                         \
+                OP_NAME(vreg1, vreg0, preg);                                                                       \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(dst, vreg1, strideConfig1, repeatStrideConfig1, \
+                    preg);                                                                                         \
+            }                                                                                                      \
+        }                                                                                                          \
+    }
 
 // for counter level-2 op
-#define UNARY_VEC_COUNTER_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                                          \
-__aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const int32_t& count)                      \
-{                                                                                                                                \
-    __VEC_SCOPE__                                                                                                                \
-    {                                                                                                                            \
-        RegTensor<DATA_TYPE> vreg0;                                                                                              \
-        RegTensor<DATA_TYPE> vreg1;                                                                                              \
-        uint32_t sreg = (uint32_t)count;                                                                                      \
-        MaskReg preg;                                                                                                            \
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(DATA_TYPE));                                                   \
-        uint16_t repeatTime = CeilDivision(count, sregLower);                                                                \
-        for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                                                   \
-            preg = CreatePredicate<DATA_TYPE>(sreg);                                                                             \
-            DataCopy(vreg0, src, i * sregLower);                                                                                 \
-            OP_NAME(vreg1, vreg0, preg);                                                                                         \
-            DataCopy(dst, vreg1, i * sregLower, preg);                                                                           \
-        }                                                                                                                        \
-    }                                                                                                                            \
-}                                                                                                                                \
+#define UNARY_VEC_COUNTER_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                      \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE *dst, __ubuf__ DATA_TYPE *src, const int32_t &count) \
+    {                                                                                                        \
+        __VEC_SCOPE__                                                                                        \
+        {                                                                                                    \
+            RegTensor<DATA_TYPE> vreg0;                                                                      \
+            RegTensor<DATA_TYPE> vreg1;                                                                      \
+            uint32_t sreg = (uint32_t)count;                                                                 \
+            MaskReg preg;                                                                                    \
+            uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(DATA_TYPE));                           \
+            uint16_t repeatTime = CeilDivision(count, sregLower);                                            \
+            for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                            \
+                preg = CreatePredicate<DATA_TYPE>(sreg);                                                     \
+                DataCopy(vreg0, src, i *sregLower);                                                          \
+                OP_NAME(vreg1, vreg0, preg);                                                                 \
+                DataCopy(dst, vreg1, i *sregLower, preg);                                                    \
+            }                                                                                                \
+        }                                                                                                    \
+    }
 
 /* **************************************************************************************************
  * Abs                                             *
@@ -286,25 +290,25 @@ __simd_callee__ inline void Rsqrt(RegT &dstReg, RegT &srcReg, Reg::MaskReg &mask
         Reg::Select(dstReg, srcReg, dstReg, cmpMask);
     } else {
         if constexpr (SupportType<T, half>()) {
-            static constexpr AscendC::Reg::SqrtSpecificMode SqrtMode = 
-                                    {Reg::MaskMergeMode::ZEROING, false, SqrtAlgo::PRECISION_1ULP_FTZ_FALSE};
+            static constexpr AscendC::Reg::SqrtSpecificMode SqrtMode = { Reg::MaskMergeMode::ZEROING, false,
+                SqrtAlgo::PRECISION_1ULP_FTZ_FALSE };
             Reg::Sqrt<T, &SqrtMode>(srcReg, srcReg, mask);
-            static constexpr AscendC::Reg::DivSpecificMode divMode = 
-                                    {Reg::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_1ULP_FTZ_FALSE};
+            static constexpr AscendC::Reg::DivSpecificMode divMode = { Reg::MaskMergeMode::ZEROING, false,
+                DivAlgo::PRECISION_1ULP_FTZ_FALSE };
             Reg::Div<T, &divMode>(dstReg, dstReg, srcReg, mask);
         } else {
-            static constexpr AscendC::Reg::SqrtSpecificMode SqrtMode = 
-                                    {Reg::MaskMergeMode::ZEROING, false, SqrtAlgo::PRECISION_0ULP_FTZ_FALSE};
+            static constexpr AscendC::Reg::SqrtSpecificMode SqrtMode = { Reg::MaskMergeMode::ZEROING, false,
+                SqrtAlgo::PRECISION_0ULP_FTZ_FALSE };
             Reg::Sqrt<T, &SqrtMode>(srcReg, srcReg, mask);
-            static constexpr AscendC::Reg::DivSpecificMode divMode = 
-                                    {Reg::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_0ULP_FTZ_FALSE};
+            static constexpr AscendC::Reg::DivSpecificMode divMode = { Reg::MaskMergeMode::ZEROING, false,
+                DivAlgo::PRECISION_0ULP_FTZ_FALSE };
             Reg::Div<T, &divMode>(dstReg, dstReg, srcReg, mask);
         }
     }
 }
 } // namespace RegRsqrt
 
-template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
+template <typename T, bool isSetMask = true, const RsqrtConfig &config = DEFAULT_RSQRT_CONFIG>
 __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams &repeatParams)
 {
@@ -312,14 +316,14 @@ __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_
     if constexpr (config.algo == RsqrtAlgo::INTRINSIC || config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = RegRsqrt::Rsqrt<T, Reg::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
-    } else if constexpr (config.algo == RsqrtAlgo::FAST_INVERSE || config.algo == RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE || 
-                        config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
+    } else if constexpr (config.algo == RsqrtAlgo::FAST_INVERSE || config.algo == RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE ||
+        config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
         constexpr auto func = RegRsqrt::Rsqrt<T, Reg::RegTensor<T>, true>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
     }
 }
 
-template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
+template <typename T, bool isSetMask = true, const RsqrtConfig &config = DEFAULT_RSQRT_CONFIG>
 __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams &repeatParams)
 {
@@ -327,8 +331,8 @@ __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_
     if constexpr (config.algo == RsqrtAlgo::INTRINSIC || config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = RegRsqrt::Rsqrt<T, Reg::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
-    } else if constexpr (config.algo == RsqrtAlgo::FAST_INVERSE || config.algo == RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE || 
-                        config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
+    } else if constexpr (config.algo == RsqrtAlgo::FAST_INVERSE || config.algo == RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE ||
+        config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
         constexpr auto func = RegRsqrt::Rsqrt<T, Reg::RegTensor<T>, true>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
     }
@@ -428,7 +432,6 @@ __aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t 
     constexpr auto func = Reg::Exp<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
     Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
 }
-
 }
 #endif // ASCENDC_MODULE_OPERATOR_VEC_UNARY_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_UNARY_IMPL_H__)

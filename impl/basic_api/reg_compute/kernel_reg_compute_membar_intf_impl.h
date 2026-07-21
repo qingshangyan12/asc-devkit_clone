@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -44,17 +44,15 @@
 
 namespace AscendC {
 namespace Reg {
-
-template <MemType src, MemType dst>
-__simd_callee__ inline void LocalMemBar()
+template <MemType src, MemType dst> __simd_callee__ inline void LocalMemBar()
 {
     LocalMemBarImpl<src, dst>();
 }
-
 } // namespace Reg
 } // namespace AscendC
 
-#endif // ASCENDC_KERNEL_REG_COMPUTE_MEMBAR_INTERFACE_IMPL_H
+#endif \
+    // ASCENDC_KERNEL_REG_COMPUTE_MEMBAR_INTERFACE_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_MEMBAR_INTF_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

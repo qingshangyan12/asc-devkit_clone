@@ -1,19 +1,20 @@
-/**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+/* *
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
-/*!
+/* !
  * \file kernel_operator_fixpipe_impl.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/dav_l311/kernel_operator_fixpipe_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/basic_api/dav_l311/kernel_operator_fixpipe_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_IMPL_H__
 #endif
@@ -23,7 +24,6 @@
 #include "kernel_operator_set_spr_impl.h"
 
 namespace AscendC {
-
 __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)
 {
     (void)(config);
@@ -46,7 +46,7 @@ __aicore__ inline void SetFixPipeConfigImpl(const LocalTensor<T> &reluPre, const
     uint64_t config = 0;
     config = config | ((uint64_t)reluPre.GetPhyAddr() >> 6);         // align with 64bit, FPC[7:0], ReluPreAddr
     config = config | (((uint64_t)quantPre.GetPhyAddr() >> 7) << 8); // align with 128bit, FPC[15:8], QuantPreAddr.
-    config = config | (static_cast<uint64_t>(isUnitFlag) << 63);                  // FPC[63], UnitFlag.
+    config = config | (static_cast<uint64_t>(isUnitFlag) << 63);     // FPC[63], UnitFlag.
     set_fpc(config);
 }
 
@@ -57,8 +57,7 @@ __aicore__ inline void SetFixPipeConfigImpl(const LocalTensor<T> &preTensor, boo
     if constexpr (setRelu) {
         config = config | ((uint64_t)preTensor.GetPhyAddr() >> 6); // align with 64bit, FPC[7:0], ReluPreAddr.
     } else {
-        config =
-            config | (((uint64_t)preTensor.GetPhyAddr() >> 7) << 8); // align with 128bit, FPC[15:8], QuantPreAddr.
+        config = config | (((uint64_t)preTensor.GetPhyAddr() >> 7) << 8); // align with 128bit, FPC[15:8], QuantPreAddr.
     }
     config = config | (static_cast<uint64_t>(isUnitFlag) << 63); // FPC[63], UnitFlag.
     set_fpc(config);
@@ -70,7 +69,7 @@ __aicore__ inline void SetFixpipeNz2ndFlagImpl(uint16_t ndNum, uint16_t srcNdStr
     // ND_PARA[31:16], src nd stride in uint of C0_SIZE
     // ND_PARA[15:0], nd number.
     uint64_t config = (static_cast<uint64_t>(dstNdStride) << 32) | (static_cast<uint64_t>(srcNdStride) << 16) |
-                        (static_cast<uint64_t>(ndNum));
+        (static_cast<uint64_t>(ndNum));
     set_loop3_para(config);
 }
 
@@ -82,29 +81,24 @@ __aicore__ inline void SetFixpipePreQuantFlagImpl(uint64_t config)
 /* **************************************************************************************************
  * Fixpipe                                             *
  * ************************************************************************************************* */
-template <CO2Layout format>
-struct TransformParamsL311 {};
+template <CO2Layout format> struct TransformParamsL311 {};
 
-template <>
-struct TransformParamsL311<CO2Layout::NZ> {
+template <> struct TransformParamsL311<CO2Layout::NZ> {
     __aicore__ inline TransformParamsL311(){};
     using PARAMS = uint8_t;
 };
 
-template <>
-struct TransformParamsL311<CO2Layout::ROW_MAJOR> {
+template <> struct TransformParamsL311<CO2Layout::ROW_MAJOR> {
     __aicore__ inline TransformParamsL311(){};
     using PARAMS = Nz2NdParams;
 };
 
-template <>
-struct TransformParamsL311<CO2Layout::COLUMN_MAJOR> {
+template <> struct TransformParamsL311<CO2Layout::COLUMN_MAJOR> {
     __aicore__ inline TransformParamsL311(){};
     using PARAMS = uint8_t;
 };
 
-template <CO2Layout format = CO2Layout::ROW_MAJOR>
-struct FixpipeParamsL311 {
+template <CO2Layout format = CO2Layout::ROW_MAJOR> struct FixpipeParamsL311 {
     __aicore__ FixpipeParamsL311() {}
 
     __aicore__ FixpipeParamsL311(const uint16_t nSizeIn_, const uint16_t mSizeIn_, const uint16_t srcStrideIn_,
@@ -117,7 +111,7 @@ struct FixpipeParamsL311 {
     }
 
     uint16_t nSize = 0;
-    uint16_t mSize = 0;  // M-DirectionSize
+    uint16_t mSize = 0; // M-DirectionSize
     uint16_t srcStride = 0;
     uint32_t dstStride = 0;
     // Params: used for Quant
@@ -164,21 +158,19 @@ __aicore__ inline FixpipeTiling GenFixpipeTiling(uint16_t n)
 __aicore__ inline bool IsVectorQuantMode(QuantMode_t quantPre)
 {
     return (quantPre == QuantMode_t::VDEQF16 || quantPre == QuantMode_t::VQF162B8_PRE ||
-            quantPre == QuantMode_t::VREQ8 || quantPre == QuantMode_t::VQF162S4_PRE ||
-            quantPre == QuantMode_t::VREQ4 || quantPre == QuantMode_t::VDEQS16 ||
-            quantPre == QuantMode_t::VQF162S16_PRE);
+        quantPre == QuantMode_t::VREQ8 || quantPre == QuantMode_t::VQF162S4_PRE || quantPre == QuantMode_t::VREQ4 ||
+        quantPre == QuantMode_t::VDEQS16 || quantPre == QuantMode_t::VQF162S16_PRE);
 }
 
 __aicore__ inline bool IsScalarQuantMode(QuantMode_t quantPre)
 {
-    return (quantPre == QuantMode_t::DEQF16 || quantPre == QuantMode_t::QF162B8_PRE ||
-            quantPre == QuantMode_t::REQ8 || quantPre == QuantMode_t::QF162S4_PRE ||
-            quantPre == QuantMode_t::REQ4 || quantPre == QuantMode_t::DEQS16 ||
-            quantPre == QuantMode_t::QF162S16_PRE);
+    return (quantPre == QuantMode_t::DEQF16 || quantPre == QuantMode_t::QF162B8_PRE || quantPre == QuantMode_t::REQ8 ||
+        quantPre == QuantMode_t::QF162S4_PRE || quantPre == QuantMode_t::REQ4 || quantPre == QuantMode_t::DEQS16 ||
+        quantPre == QuantMode_t::QF162S16_PRE);
 }
 
-__aicore__ inline void CopyDeqTensorToFbuf(
-    __cbuf__ uint64_t *cbufWorkspace, const FixpipeTiling &fixpipeTiling, uint16_t calNSize, uint16_t nIterIndex)
+__aicore__ inline void CopyDeqTensorToFbuf(__cbuf__ uint64_t *cbufWorkspace, const FixpipeTiling &fixpipeTiling,
+    uint16_t calNSize, uint16_t nIterIndex)
 {
     constexpr uint32_t deqTensorAddrAlignValue = 128;
     uint16_t deqDataSize = DivCeil(calNSize * sizeof(uint64_t), deqTensorAddrAlignValue) * deqTensorAddrAlignValue;
@@ -196,38 +188,39 @@ __aicore__ inline void CopyDeqTensorToFbuf(
     AscendCUtils::FreeTemporaryFbBuffer<uint64_t>(deqTensorTempBuf);
 }
 
-template <const FixpipeConfig& config>
-__aicore__ inline void SetLoop3Para(const FixpipeParamsL311<config.format>& intriParams)
+template <const FixpipeConfig &config>
+__aicore__ inline void SetLoop3Para(const FixpipeParamsL311<config.format> &intriParams)
 {
     // the loop3DstStride range has increased.
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         ASCENDC_ASSERT((intriParams.params.ndNum > 0), { KERNEL_LOG(KERNEL_ERROR, "ndNum must larger than 0"); });
         // Loop3_dst_stride in uint of element
-        uint64_t loop3Para = static_cast<uint64_t>(intriParams.params.dstNdStride) << 32;  // LOOP3_PARA[63:32]
+        uint64_t loop3Para = static_cast<uint64_t>(intriParams.params.dstNdStride) << 32; // LOOP3_PARA[63:32]
         // original src_nd_stride in uint of fractal_size(1024B = 16 * 16 * sizeof(SrcT))
         // src_nd_stride in unit of C0_SIZE, Loop3_src_stride
-        loop3Para |= static_cast<uint64_t>(intriParams.params.ndNum);              // LOOP3_PARA[15:0]
-        loop3Para |= static_cast<uint64_t>(intriParams.params.srcNdStride) << 16;  // LOOP3_PARA[31:16]
+        loop3Para |= static_cast<uint64_t>(intriParams.params.ndNum);             // LOOP3_PARA[15:0]
+        loop3Para |= static_cast<uint64_t>(intriParams.params.srcNdStride) << 16; // LOOP3_PARA[31:16]
         set_loop3_para(loop3Para);
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
         ASCENDC_ASSERT((intriParams.params.dnNum > 0), { KERNEL_LOG(KERNEL_ERROR, "dnNum must larger than 0"); });
         // Loop3_dst_stride in uint of element
-        uint64_t loop3Para = static_cast<uint64_t>(intriParams.params.dstDnMatrixStride) << 32;  // LOOP3_PARA[63:32]
+        uint64_t loop3Para = static_cast<uint64_t>(intriParams.params.dstDnMatrixStride) << 32; // LOOP3_PARA[63:32]
         // src_nd_stride in unit of C0_SIZE, Loop3_src_stride
-        loop3Para |= static_cast<uint64_t>(intriParams.params.dnNum);                    // LOOP3_PARA[15:0]
-        loop3Para |= static_cast<uint64_t>(intriParams.params.srcNzMatrixStride) << 16;  // LOOP3_PARA[31:16]
+        loop3Para |= static_cast<uint64_t>(intriParams.params.dnNum);                   // LOOP3_PARA[15:0]
+        loop3Para |= static_cast<uint64_t>(intriParams.params.srcNzMatrixStride) << 16; // LOOP3_PARA[31:16]
         set_loop3_para(loop3Para);
     }
 }
 
 // contains loop info and cal n size for each loop
 // move data L0C->L1
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0cToL1(__cbuf__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsL311<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
+__aicore__ inline void FixpipeL0cToL1(__cbuf__ DstT *dst, __cc__ SrcT *src,
+    const FixpipeParamsL311<config.format> &intriParams, const FixpipeTiling &fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex = 0)
 {
-    ASCENDC_DEBUG_ASSERT((!(intriParams.isChannelSplit)), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check isChannelSplit in Fixpipe, when src position is "
+    ASCENDC_DEBUG_ASSERT((!(intriParams.isChannelSplit)),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check isChannelSplit in Fixpipe, when src position is "
         "CO1 and dst position is C1, isChannelSplit must be set as false \n"));
 
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
@@ -248,46 +241,45 @@ __aicore__ inline void FixpipeL0cToL1(__cbuf__ DstT* dst, __cc__ SrcT* src,
         dstOffset = cburstNum * nIterIndex * intriParams.dstStride * DEFAULT_C0_SIZE / sizeof(DstT);
     }
     // LOC -> L1 only n direction need fixpipeTiling, m no need fixpipeTiling
-    return copy_matrix_cc_to_cbuf((__cbuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
-        0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride,
-        0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
-        static_cast<uint8_t>(intriParams.reluEn), false, nz2ndEn,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
-        false, false, nz2dnEn);
+    return copy_matrix_cc_to_cbuf((__cbuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset), 0, calNSize,
+        intriParams.mSize, intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
+        static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn), false, nz2ndEn,
+        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false, nz2dnEn);
 }
 
-template <const FixpipeConfig& config>
-__aicore__ inline uint64_t GetGMLen(const FixpipeParamsL311<config.format>& intriParams,
-                                    const uint16_t calNSize, const uint16_t dstEleSize)
+template <const FixpipeConfig &config>
+__aicore__ inline uint64_t GetGMLen(const FixpipeParamsL311<config.format> &intriParams, const uint16_t calNSize,
+    const uint16_t dstEleSize)
 {
     constexpr uint16_t fracNsize = 16;
     uint64_t cburstNum = calNSize / fracNsize;
-    uint64_t gmLen = (cburstNum - 1) * intriParams.dstStride * dstEleSize +
-                     intriParams.mSize * fracNsize * dstEleSize;
+    uint64_t gmLen = (cburstNum - 1) * intriParams.dstStride * dstEleSize + intriParams.mSize * fracNsize * dstEleSize;
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         // dstStride is dst_D Loop2_dst_stride
         gmLen = (static_cast<uint64_t>(intriParams.params.ndNum) - 1) * dstEleSize * intriParams.params.dstNdStride +
-                (intriParams.mSize - 1) * intriParams.dstStride * dstEleSize +
-                cburstNum * fracNsize * dstEleSize;
+            (intriParams.mSize - 1) * intriParams.dstStride * dstEleSize + cburstNum * fracNsize * dstEleSize;
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        gmLen = (static_cast<uint64_t>(intriParams.params.dnNum) - 1) * dstEleSize * intriParams.params.dstDnMatrixStride +
-                (intriParams.nSize - 1) * intriParams.dstStride * dstEleSize +
-                intriParams.mSize / fracNsize * fracNsize * dstEleSize;
+        gmLen =
+            (static_cast<uint64_t>(intriParams.params.dnNum) - 1) * dstEleSize * intriParams.params.dstDnMatrixStride +
+            (intriParams.nSize - 1) * intriParams.dstStride * dstEleSize +
+            intriParams.mSize / fracNsize * fracNsize * dstEleSize;
     }
     return gmLen;
 }
 
 // contains loop info and cal n size for each loop
 // move data L0C->GM
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0cToOut(__gm__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsL311<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
+__aicore__ inline void FixpipeL0cToOut(__gm__ DstT *dst, __cc__ SrcT *src,
+    const FixpipeParamsL311<config.format> &intriParams, const FixpipeTiling &fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex = 0)
 {
     if (intriParams.isChannelSplit) {
-        ASCENDC_DEBUG_ASSERT((IsSameType<SrcT, float>::value && IsSameType<DstT, float>::value), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+        ASCENDC_DEBUG_ASSERT((IsSameType<SrcT, float>::value && IsSameType<DstT, float>::value),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
             "isChannelSplit value in Fixpipe, isChannelSplit can be set true only when src and dst are both float \n"));
-        ASCENDC_DEBUG_ASSERT((config.format == CO2Layout::NZ), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check format value in Fixpipe, "
+        ASCENDC_DEBUG_ASSERT((config.format == CO2Layout::NZ),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check format value in Fixpipe, "
             "when isChannelSplit is set true, format must be set as NZ \n"));
     }
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
@@ -308,25 +300,24 @@ __aicore__ inline void FixpipeL0cToOut(__gm__ DstT* dst, __cc__ SrcT* src,
         bool isSrc = false;
         uint16_t dstEleSize = sizeof(DstT);
         uint64_t gmLen = GetGMLen<config>(intriParams, calNSize, dstEleSize);
-        AscendCUtils::CheckGmMemOverflow((__gm__ DstT*)(dst + dstOffset), isSrc, gmLen);
+        AscendCUtils::CheckGmMemOverflow((__gm__ DstT *)(dst + dstOffset), isSrc, gmLen);
     }
 
     // LOC -> GM only n direction need fixpipeTiling, m no need fixpipeTiling
     if constexpr (!(IsSameType<SrcT, float>::value || IsSameType<DstT, float>::value)) {
-        return copy_matrix_cc_to_gm((__gm__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
-            0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride,
-            0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
-            static_cast<uint8_t>(intriParams.reluEn), intriParams.isChannelSplit, nz2ndEn,
-            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
-            false, false, nz2dnEn);
+        return copy_matrix_cc_to_gm((__gm__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset), 0, calNSize,
+            intriParams.mSize, intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
+            static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
+            intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
+            false, false, false, false, false, nz2dnEn);
     }
-    ASCENDC_DEBUG_ASSERT(!(IsSameType<SrcT, float>::value || IsSameType<DstT, float>::value), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "unsupported float L0c 2 GM "));
+    ASCENDC_DEBUG_ASSERT(!(IsSameType<SrcT, float>::value || IsSameType<DstT, float>::value),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "unsupported float L0c 2 GM "));
 }
 
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0C2L1ImplN(__cbuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
-    const FixpipeParamsL311<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
+__aicore__ inline void FixpipeL0C2L1ImplN(__cbuf__ DstT *dst, __cc__ SrcT *src, __cbuf__ uint64_t *cbufWorkspace,
+    const FixpipeParamsL311<config.format> &intriParams, const FixpipeTiling &fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex)
 {
     // mov deq tensor from L1 to FB
@@ -336,9 +327,9 @@ __aicore__ inline void FixpipeL0C2L1ImplN(__cbuf__ DstT* dst, __cc__ SrcT* src, 
     FixpipeL0cToL1<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, calNSize, nIterIndex);
 }
 
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0C2GMImplN(__gm__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
-    const FixpipeParamsL311<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
+__aicore__ inline void FixpipeL0C2GMImplN(__gm__ DstT *dst, __cc__ SrcT *src, __cbuf__ uint64_t *cbufWorkspace,
+    const FixpipeParamsL311<config.format> &intriParams, const FixpipeTiling &fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex)
 {
     // mov deq tensor from L1 to FB
@@ -348,9 +339,9 @@ __aicore__ inline void FixpipeL0C2GMImplN(__gm__ DstT* dst, __cc__ SrcT* src, __
     FixpipeL0cToOut<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, calNSize, nIterIndex);
 }
 
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0C2L1Impl(
-    __cbuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsL311<config.format>& intriParams)
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
+__aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT *dst, __cc__ SrcT *src,
+    const FixpipeParamsL311<config.format> &intriParams)
 {
     // nz2nd/nz2dn need set LOOP3_PARA
     SetLoop3Para<config>(intriParams);
@@ -358,8 +349,7 @@ __aicore__ inline void FixpipeL0C2L1Impl(
     // nz2dn mode need set CHANNEL_PARA extra
     if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
         // Loop0_dst_stride in uint of CO_SIZE
-        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride)
-                                << 48;  // CHANNEL_PARA[63:48]
+        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride) << 48; // CHANNEL_PARA[63:48]
         set_channel_para(channelPara);
     }
     /*
@@ -377,8 +367,8 @@ __aicore__ inline void FixpipeL0C2L1Impl(
     FixpipeL0cToL1<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, intriParams.nSize);
 }
 
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
+__aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT *dst, __cc__ SrcT *src, __cbuf__ uint64_t *cbufWorkspace,
     const FixpipeParamsL311<config.format> &intriParams)
 {
     // nz2nd/nz2dn need set LOOP3_PARA
@@ -387,8 +377,7 @@ __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT* dst, __cc__ SrcT* src, _
     // nz2dn mode need set CHANNEL_PARA extra
     if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
         // Loop0_dst_stride in uint of CO_SIZE
-        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride)
-                                << 48;  // CHANNEL_PARA[63:48]
+        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride) << 48; // CHANNEL_PARA[63:48]
         set_channel_para(channelPara);
     }
     /*
@@ -400,28 +389,27 @@ __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT* dst, __cc__ SrcT* src, _
     if (IsVectorQuantMode(intriParams.quantPre)) {
         FixpipeTiling fixpipeTiling = GenFixpipeTiling(intriParams.nSize);
         for (uint16_t i = 0; i < fixpipeTiling.nIterNum; ++i) {
-            FixpipeL0C2L1ImplN<DstT, SrcT, config>(
-                dst, src, cbufWorkspace, intriParams, fixpipeTiling, fixpipeTiling.nSize, i);
+            FixpipeL0C2L1ImplN<DstT, SrcT, config>(dst, src, cbufWorkspace, intriParams, fixpipeTiling,
+                fixpipeTiling.nSize, i);
         }
         // deal with the tail, it also need copy deq/relu tensor from L1 to fb1
         if (fixpipeTiling.tailNSize > 0) {
-            FixpipeL0C2L1ImplN<DstT, SrcT, config>(dst, src, cbufWorkspace, intriParams,
-                fixpipeTiling, fixpipeTiling.tailNSize, fixpipeTiling.nIterNum);
+            FixpipeL0C2L1ImplN<DstT, SrcT, config>(dst, src, cbufWorkspace, intriParams, fixpipeTiling,
+                fixpipeTiling.tailNSize, fixpipeTiling.nIterNum);
         }
         return;
     }
 }
 
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsL311<config.format>& intriParams)
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
+__aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT *dst, __cc__ SrcT *src,
+    const FixpipeParamsL311<config.format> &intriParams)
 {
     // nz2nd/nz2dn need set LOOP3_PARA
     SetLoop3Para<config>(intriParams);
     // nz2dn mode need set CHANNEL_PARA extra
     if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride)
-                                << 48;  // CHANNEL_PARA[63:48]
+        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride) << 48; // CHANNEL_PARA[63:48]
         set_channel_para(channelPara);
     }
     /*
@@ -438,16 +426,15 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src,
     FixpipeL0cToOut<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, intriParams.nSize);
 }
 
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
-    const FixpipeParamsL311<config.format>& intriParams)
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
+__aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT *dst, __cc__ SrcT *src, __cbuf__ uint64_t *cbufWorkspace,
+    const FixpipeParamsL311<config.format> &intriParams)
 {
     // nz2nd/nz2dn need set LOOP3_PARA
     SetLoop3Para<config>(intriParams);
     // nz2dn mode need set CHANNEL_PARA extra
     if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride)
-                                << 48;  // CHANNEL_PARA[63:48]
+        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride) << 48; // CHANNEL_PARA[63:48]
         set_channel_para(channelPara);
     }
     /*
@@ -459,21 +446,21 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src, __c
     FixpipeTiling fixpipeTiling = GenFixpipeTiling(intriParams.nSize);
     if (IsVectorQuantMode(intriParams.quantPre)) {
         for (uint16_t i = 0; i < fixpipeTiling.nIterNum; ++i) {
-            FixpipeL0C2GMImplN<DstT, SrcT, config>(
-                dst, src, cbufWorkspace, intriParams, fixpipeTiling, fixpipeTiling.nSize, i);
+            FixpipeL0C2GMImplN<DstT, SrcT, config>(dst, src, cbufWorkspace, intriParams, fixpipeTiling,
+                fixpipeTiling.nSize, i);
         }
         // deal with the tail, it also need copy deq/relu tensor from L1 to fb1
         if (fixpipeTiling.tailNSize > 0) {
-            FixpipeL0C2GMImplN<DstT, SrcT, config>(dst, src, cbufWorkspace, intriParams,
-                fixpipeTiling, fixpipeTiling.tailNSize, fixpipeTiling.nIterNum);
+            FixpipeL0C2GMImplN<DstT, SrcT, config>(dst, src, cbufWorkspace, intriParams, fixpipeTiling,
+                fixpipeTiling.tailNSize, fixpipeTiling.nIterNum);
         }
         return;
     }
 }
 
 template <CO2Layout format>
-__aicore__ inline void TransFixpipeParamsV220ToFixpipeParamsL311(
-    const FixpipeParamsV220 &intriParams, FixpipeParamsL311<format> &dstParams)
+__aicore__ inline void TransFixpipeParamsV220ToFixpipeParamsL311(const FixpipeParamsV220 &intriParams,
+    FixpipeParamsL311<format> &dstParams)
 {
     dstParams.nSize = intriParams.nSize;
     dstParams.mSize = intriParams.mSize;
@@ -487,15 +474,15 @@ __aicore__ inline void TransFixpipeParamsV220ToFixpipeParamsL311(
     if constexpr (format == CO2Layout::ROW_MAJOR) {
         dstParams.params.ndNum = intriParams.ndNum;
         dstParams.params.dstNdStride = intriParams.dstNdStride;
-        dstParams.params.srcNdStride =  intriParams.srcNdStride;       
-    } else if constexpr(format == CO2Layout::COLUMN_MAJOR) {
+        dstParams.params.srcNdStride = intriParams.srcNdStride;
+    } else if constexpr (format == CO2Layout::COLUMN_MAJOR) {
         dstParams.params.ndNum = intriParams.ndNum;
         dstParams.params.dstNdStride = intriParams.srcNdStride;
         dstParams.params.srcNdStride = intriParams.srcNdStride;
     }
 }
 
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT *dst, __cc__ SrcT *src, const FixpipeParamsV220 &intriParams)
 {
     FixpipeParamsL311<config.format> params;
@@ -503,16 +490,16 @@ __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT *dst, __cc__ SrcT *src, c
     FixpipeL0C2L1Impl<DstT, SrcT, config>(dst, src, params);
 }
 
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0C2L1Impl(
-    __cbuf__ DstT *dst, __cc__ SrcT *src, __cbuf__ uint64_t *cbufWorkspace, const FixpipeParamsV220 &intriParams)
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
+__aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT *dst, __cc__ SrcT *src, __cbuf__ uint64_t *cbufWorkspace,
+    const FixpipeParamsV220 &intriParams)
 {
     FixpipeParamsL311<config.format> params;
     TransFixpipeParamsV220ToFixpipeParamsL311(intriParams, params);
     FixpipeL0C2L1Impl<DstT, SrcT, config>(dst, src, cbufWorkspace, params);
 }
 
-template <typename DstT, typename SrcT, const FixpipeConfig& config>
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT *dst, __cc__ SrcT *src, const FixpipeParamsV220 &intriParams)
 {
     FixpipeParamsL311<config.format> params;
@@ -521,8 +508,8 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT *dst, __cc__ SrcT *src, con
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig &config>
-__aicore__ inline void FixpipeL0C2GMImpl(
-    __gm__ DstT *dst, __cc__ SrcT *src, __cbuf__ uint64_t *cbufWorkspace, const FixpipeParamsV220 &intriParams)
+__aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT *dst, __cc__ SrcT *src, __cbuf__ uint64_t *cbufWorkspace,
+    const FixpipeParamsV220 &intriParams)
 {
     FixpipeParamsL311<config.format> params;
     TransFixpipeParamsV220ToFixpipeParamsL311(intriParams, params);
@@ -536,15 +523,13 @@ __aicore__ inline void FixpipeL0C2UBImpl(__ubuf__ T *dst, __cc__ U *src, const F
 }
 
 template <typename T, typename U, const FixpipeConfig &config>
-__aicore__ inline void FixpipeL0C2UBImpl(
-    __ubuf__ T *dst, __cc__ U *src, __cbuf__ uint64_t *cbufWorkspace, const FixpipeParamsV220 &intriParams)
+__aicore__ inline void FixpipeL0C2UBImpl(__ubuf__ T *dst, __cc__ U *src, __cbuf__ uint64_t *cbufWorkspace,
+    const FixpipeParamsV220 &intriParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Fixpipe doesn't support L0C to UB on current device\n"); });
 }
-
-
-}  // namespace AscendC
-#endif  // ASCENDC_MODULE_OPERATOR_FIXPIPE_IMPL_H
+} // namespace AscendC
+#endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_IMPL_H__

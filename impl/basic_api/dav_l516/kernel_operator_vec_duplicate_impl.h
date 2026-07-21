@@ -1,19 +1,20 @@
-/**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+/* *
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
-/*!
+/* !
  * \file kernel_operator_vec_duplicate_impl.h
  * \brief AscendC l311 support vector duplicate api.
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/dav_l311/kernel_operator_vec_duplicate_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/basic_api/dav_l311/kernel_operator_vec_duplicate_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_DUPLICATE_IMPL_H__
 #endif
@@ -27,26 +28,26 @@
 namespace AscendC {
 template <typename T> constexpr __aicore__ inline void CheckDuplicateSupportedType()
 {
-    static_assert(std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value ||
-        std::is_same<T, half>::value || std::is_same<T, int16_t>::value || std::is_same<T, uint16_t>::value ||
-        std::is_same<T, int32_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, float>::value,
+    static_assert(std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value || std::is_same<T, half>::value ||
+        std::is_same<T, int16_t>::value || std::is_same<T, uint16_t>::value || std::is_same<T, int32_t>::value ||
+        std::is_same<T, uint32_t>::value || std::is_same<T, float>::value,
         "Duplicate instr only support uint8_t/int8_t/half/int16_t/uint16_t/int32_t/uint32_t/float type");
 }
 
 template <typename T> constexpr __aicore__ inline void CheckDuplicateL0SupportedType()
 {
-    static_assert(SupportType<T, half, int16_t, uint16_t,
-        int32_t, uint32_t, float>(),
+    static_assert(SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "Duplicate instr only support half/int16_t/uint16_t/int32_t/"
         "uint32_t/float type on current device");
 }
 namespace Internal {
 template <bool isSetMask, bool isMaskBitMode, bool isNormalMode, typename T>
-__simd_vf__ inline void VecDupLevel0VFImpl(__ubuf__ T *dst, const T scalarValue, const BasicAPIMaskStruct maskArrayStruct,
-    const uint64_t maskCount, const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride,
-    __ubuf__ uint64_t *maskBuf)
+__simd_vf__ inline void VecDupLevel0VFImpl(__ubuf__ T *dst, const T scalarValue,
+    const BasicAPIMaskStruct maskArrayStruct, const uint64_t maskCount, const uint8_t repeatTime,
+    const uint16_t dstBlockStride, const uint8_t dstRepeatStride, __ubuf__ uint64_t *maskBuf)
 {
-    uint32_t count = VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArrayStruct.maskArray, maskCount, maskBuf);
+    uint32_t count =
+        VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArrayStruct.maskArray, maskCount, maskBuf);
     uint16_t newRepeatTimes = 0;
     newRepeatTimes = VecMicroGetRepeatTimes<T, isNormalMode>(count, repeatTime);
     Reg::MaskReg maskReg;
@@ -63,13 +64,13 @@ __simd_vf__ inline void VecDupLevel0VFImpl(__ubuf__ T *dst, const T scalarValue,
         if constexpr (!isNormalMode) {
             maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dst + index * dstRepeatStride * ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + index * dstRepeatStride * ElePerBlkT, dstVreg,
+            dstBlockStride, maskReg);
     }
 }
 
 template <bool isSetMask, bool isMaskBitMode, typename T>
-__aicore__ inline void VecDupLevel0Template(__ubuf__ T *dst, const T& scalarValue, const uint64_t maskArray[],
+__aicore__ inline void VecDupLevel0Template(__ubuf__ T *dst, const T &scalarValue, const uint64_t maskArray[],
     const uint64_t maskCount, const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
 {
     BasicAPIMaskStruct maskArrayStruct;
@@ -83,8 +84,8 @@ __aicore__ inline void VecDupLevel0Template(__ubuf__ T *dst, const T& scalarValu
         if constexpr (!isSetMask) {
             maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2); // maskReg 256bit PK-> 128bit
         }
-        VecDupLevel0VFImpl<isSetMask, isMaskBitMode, false, T>(dst, scalarValue, maskArrayStruct, maskCount,
-            repeatTime, dstBlockStride, dstRepeatStride, maskBuf);
+        VecDupLevel0VFImpl<isSetMask, isMaskBitMode, false, T>(dst, scalarValue, maskArrayStruct, maskCount, repeatTime,
+            dstBlockStride, dstRepeatStride, maskBuf);
         if constexpr (!isSetMask) {
             AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
         }
@@ -108,8 +109,8 @@ __aicore__ inline void VecDupLevel0Template(__ubuf__ T *dst, const T& scalarValu
             }
         }
         // when isSetMask is false, normal mode, maskBuf = nullptr, not support B8
-        VecDupLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(dst, scalarValue, maskArrayStruct, maskCount,
-            repeatTime, dstBlockStride, dstRepeatStride, maskBuf);
+        VecDupLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(dst, scalarValue, maskArrayStruct, maskCount, repeatTime,
+            dstBlockStride, dstRepeatStride, maskBuf);
         if constexpr (isMaskBitMode && SupportBytes<T, 1>()) {
             AscendC::AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
         }
@@ -119,33 +120,19 @@ __aicore__ inline void VecDupLevel0Template(__ubuf__ T *dst, const T& scalarValu
 
 // level 2
 template <typename T>
-typename std::enable_if_t<
-!std::is_same<T, uint8_t>::value &&
-!std::is_same<T, int8_t>::value &&
-!std::is_same<T, uint16_t>::value &&
-!std::is_same<T, int16_t>::value &&
-!std::is_same<T, half>::value &&
-!std::is_same<T, uint32_t>::value &&
-!std::is_same<T, int32_t>::value &&
-!std::is_same<T, float>::value
->
-__aicore__ inline DuplicateImpl(__ubuf__ T* dst, const T scalarValue, const int32_t& count)
+typename std::enable_if_t<!std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value &&
+    !std::is_same<T, uint16_t>::value && !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value &&
+    !std::is_same<T, uint32_t>::value && !std::is_same<T, int32_t>::value && !std::is_same<T, float>::value>
+    __aicore__ inline DuplicateImpl(__ubuf__ T *dst, const T scalarValue, const int32_t &count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 template <typename T>
-typename std::enable_if_t<
-std::is_same<T, uint8_t>::value ||
-std::is_same<T, int8_t>::value ||
-std::is_same<T, uint16_t>::value ||
-std::is_same<T, int16_t>::value ||
-std::is_same<T, half>::value ||
-std::is_same<T, uint32_t>::value ||
-std::is_same<T, int32_t>::value ||
-std::is_same<T, float>::value
->
-__aicore__ inline DuplicateImpl(__ubuf__ T* dst, const T scalarValue, const int32_t& count)
+typename std::enable_if_t<std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value ||
+    std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, half>::value ||
+    std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value>
+    __aicore__ inline DuplicateImpl(__ubuf__ T *dst, const T scalarValue, const int32_t &count)
 {
     __VEC_SCOPE__
     {
@@ -164,22 +151,22 @@ __aicore__ inline DuplicateImpl(__ubuf__ T* dst, const T scalarValue, const int3
 
 // level 0, continuous mode
 template <typename T, bool isSetMask = true>
-__aicore__ inline void DuplicateImpl(__ubuf__ T* dst, const T& scalarValue, uint64_t mask,
-    const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
+__aicore__ inline void DuplicateImpl(__ubuf__ T *dst, const T &scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
 {
     CheckDuplicateL0SupportedType<T>();
-    Internal::VecDupLevel0Template<isSetMask, false>(dst, scalarValue, nullptr, mask,
-                                    repeatTime, dstBlockStride, dstRepeatStride);
+    Internal::VecDupLevel0Template<isSetMask, false>(dst, scalarValue, nullptr, mask, repeatTime, dstBlockStride,
+        dstRepeatStride);
 }
 
 // level 0, mask bit mode
 template <typename T, bool isSetMask = true>
-__aicore__ inline void DuplicateImpl(__ubuf__ T* dst, const T& scalarValue, uint64_t mask[],
-    const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
+__aicore__ inline void DuplicateImpl(__ubuf__ T *dst, const T &scalarValue, uint64_t mask[], const uint8_t repeatTime,
+    const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
 {
     CheckDuplicateL0SupportedType<T>();
-    Internal::VecDupLevel0Template<isSetMask, true>(dst, scalarValue, mask, 0,
-                                        repeatTime, dstBlockStride, dstRepeatStride);
+    Internal::VecDupLevel0Template<isSetMask, true>(dst, scalarValue, mask, 0, repeatTime, dstBlockStride,
+        dstRepeatStride);
 }
 
 template <typename T, bool hasUnalign = true>
@@ -286,12 +273,10 @@ __simd_vf__ inline void InterleaveImplB64(__ubuf__ T *dst0Local, __ubuf__ T *dst
             Reg::DataCopyUnAlign(src1RegTmp1, ureg,
                 src1Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
             // simulate dual intlv to combine two regs
-            Reg::DeInterleave((Reg::RegTensor<uint32_t> &)src0Reg.reg[0],
-                (Reg::RegTensor<uint32_t> &)src0Reg.reg[1], (Reg::RegTensor<uint32_t> &)src0RegTmp0,
-                (Reg::RegTensor<uint32_t> &)src0RegTmp1);
-            Reg::DeInterleave((Reg::RegTensor<uint32_t> &)src1Reg.reg[0],
-                (Reg::RegTensor<uint32_t> &)src1Reg.reg[1], (Reg::RegTensor<uint32_t> &)src1RegTmp0,
-                (Reg::RegTensor<uint32_t> &)src1RegTmp1);
+            Reg::DeInterleave((Reg::RegTensor<uint32_t> &)src0Reg.reg[0], (Reg::RegTensor<uint32_t> &)src0Reg.reg[1],
+                (Reg::RegTensor<uint32_t> &)src0RegTmp0, (Reg::RegTensor<uint32_t> &)src0RegTmp1);
+            Reg::DeInterleave((Reg::RegTensor<uint32_t> &)src1Reg.reg[0], (Reg::RegTensor<uint32_t> &)src1Reg.reg[1],
+                (Reg::RegTensor<uint32_t> &)src1RegTmp0, (Reg::RegTensor<uint32_t> &)src1RegTmp1);
             // dual intlv
             Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
             preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
@@ -306,8 +291,8 @@ template <typename T>
 __aicore__ inline void InterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Local, __ubuf__ T *src0Local,
     __ubuf__ T *src1Local, const int32_t calCount)
 {
-    static_assert(SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float,
-        uint64_t, int64_t>(),
+    static_assert(
+        SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t>(),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((calCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount % 2 = 0!"); });
     if constexpr (sizeof(T) != 8) {
@@ -435,12 +420,10 @@ __simd_vf__ inline void DeInterleaveImplB64(__ubuf__ T *dst0Local, __ubuf__ T *d
             __ubuf__ T *dst0LocalTmp = dst0Local + halfCount + i * sregLower;
             __ubuf__ T *dst1LocalTmp = dst1Local + halfCount + i * sregLower;
             // simulate dual intlv to combine two regs
-            Reg::Interleave((Reg::RegTensor<uint32_t> &)dst0RegTmp0,
-                (Reg::RegTensor<uint32_t> &)dst0RegTmp1, (Reg::RegTensor<uint32_t> &)dst0Reg.reg[0],
-                (Reg::RegTensor<uint32_t> &)dst0Reg.reg[1]);
-            Reg::Interleave((Reg::RegTensor<uint32_t> &)dst1RegTmp0,
-                (Reg::RegTensor<uint32_t> &)dst1RegTmp1, (Reg::RegTensor<uint32_t> &)dst1Reg.reg[0],
-                (Reg::RegTensor<uint32_t> &)dst1Reg.reg[1]);
+            Reg::Interleave((Reg::RegTensor<uint32_t> &)dst0RegTmp0, (Reg::RegTensor<uint32_t> &)dst0RegTmp1,
+                (Reg::RegTensor<uint32_t> &)dst0Reg.reg[0], (Reg::RegTensor<uint32_t> &)dst0Reg.reg[1]);
+            Reg::Interleave((Reg::RegTensor<uint32_t> &)dst1RegTmp0, (Reg::RegTensor<uint32_t> &)dst1RegTmp1,
+                (Reg::RegTensor<uint32_t> &)dst1Reg.reg[0], (Reg::RegTensor<uint32_t> &)dst1Reg.reg[1]);
             // unalign process, copy element is sregeLower / 2
             Reg::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, sregLower / 2);
             Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
@@ -487,8 +470,8 @@ template <typename T>
 __aicore__ inline void DeInterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Local, __ubuf__ T *src0Local,
     __ubuf__ T *src1Local, const int32_t calCount)
 {
-    static_assert(SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float,
-        uint64_t, int64_t>(),
+    static_assert(
+        SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t>(),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((calCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount % 2 = 0!"); });
     if constexpr (sizeof(T) != 8) {
@@ -510,8 +493,8 @@ template <typename T>
 __aicore__ inline void DeInterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Local, __ubuf__ T *srcLocal,
     const int32_t srcCount)
 {
-    static_assert(SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float,
-        uint64_t, int64_t>(),
+    static_assert(
+        SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t>(),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((srcCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "srcCount % 2 = 0!"); });
     // no unalign problem

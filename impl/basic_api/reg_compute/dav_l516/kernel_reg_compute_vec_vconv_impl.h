@@ -1,20 +1,21 @@
-/**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+/* *
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
-/*!
+/* !
  * \file kernel_reg_compute_vec_vconv_impl.h
  * \brief
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic/reg_compute/dav_l311/kernel_reg_compute_vec_vconv_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use \"#include \"reg_compute/kernel_reg_compute_vec_vconv_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/basic/reg_compute/dav_l311/kernel_reg_compute_vec_vconv_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use \"#include \"reg_compute/kernel_reg_compute_vec_vconv_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_VCONV_IMPL__
 #endif
@@ -33,7 +34,8 @@ __simd_callee__ inline void CastImpl(RegTensor<T> &dstReg, RegTensor<U> &srcReg,
     constexpr bool partCondition = SupportType<Tuple<T, U>, Tuple<uint16_t, uint8_t>, Tuple<int16_t, int8_t>,
         Tuple<uint32_t, uint16_t>, Tuple<uint32_t, int16_t>, Tuple<int32_t, int16_t>, Tuple<float, half>,
         Tuple<half, uint8_t>, Tuple<half, int8_t>, Tuple<float, int16_t>>();
-    constexpr bool ppCondition = SupportType<Tuple<T, U>, Tuple<uint32_t, uint8_t>, Tuple<int32_t, int8_t>, Tuple<half, int4x2_t>>();
+    constexpr bool ppCondition =
+        SupportType<Tuple<T, U>, Tuple<uint32_t, uint8_t>, Tuple<int32_t, int8_t>, Tuple<half, int4x2_t>>();
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (partCondition) {
         // vcvt_ii u82u16/s82s16/u162u32/s162u32/s162s32
@@ -143,7 +145,7 @@ __simd_callee__ inline void CastImpl(RegTensor<T> &dstReg, RegTensor<U> &srcReg,
 
 // truncate f162f16/f322f32
 template <typename T, RoundMode roundMode, MaskMergeMode mode, typename U>
-__simd_callee__ inline void TruncateImpl(U& dstReg, U& srcReg, MaskReg& mask)
+__simd_callee__ inline void TruncateImpl(U &dstReg, U &srcReg, MaskReg &mask)
 {
     using ActualT = typename U::ActualT;
     static_assert(SupportType<ActualT, half, float>(), "current trunc data type is not supported on current device!");
@@ -165,12 +167,11 @@ __simd_callee__ inline void CastImpl(RegT &dstReg, RegU &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     using ActualU = typename RegU::ActualT;
-    static_assert(
-        SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Cast api only supported Mode ZEROING on current device!");
-    static_assert(SupportType<Tuple<ActualT, ActualU>,
-        Tuple<int64_t, float>>(),
+    static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current Cast api only supported Mode ZEROING on current device!");
+    static_assert(SupportType<Tuple<ActualT, ActualU>, Tuple<int64_t, float>>(),
         "CastImpl unsupport this datatype on current device");
-    static_assert(CheckRegTrait<RegU, RegTraitNumOne>(),  "RegTensor srcReg can only be RegTraitNumOne");
+    static_assert(CheckRegTrait<RegU, RegTraitNumOne>(), "RegTensor srcReg can only be RegTraitNumOne");
     RegTensor<float> tmpReg0;
     RegTensor<float> tmpReg1;
     RegTensor<int32_t> zeroReg;
@@ -179,8 +180,10 @@ __simd_callee__ inline void CastImpl(RegT &dstReg, RegU &srcReg, MaskReg &mask)
     MaskReg lowMask, highMask;
     MaskInterleave<int32_t>(lowMask, highMask, mask, mask);
     Interleave(tmpReg0, tmpReg1, srcReg, (RegTensor<float> &)zeroReg);
-    CastImpl<ActualT, ActualU, roundMode, satMode, RegLayout::ZERO, mode>((RegTensor<int64_t> &)tmpReg0, tmpReg0, lowMask);
-    CastImpl<ActualT, ActualU, roundMode, satMode, RegLayout::ZERO, mode>((RegTensor<int64_t> &)tmpReg1, tmpReg1, highMask);
+    CastImpl<ActualT, ActualU, roundMode, satMode, RegLayout::ZERO, mode>((RegTensor<int64_t> &)tmpReg0, tmpReg0,
+        lowMask);
+    CastImpl<ActualT, ActualU, roundMode, satMode, RegLayout::ZERO, mode>((RegTensor<int64_t> &)tmpReg1, tmpReg1,
+        highMask);
     DeInterleave((RegTensor<float> &)dstReg.reg[0], (RegTensor<float> &)dstReg.reg[1], tmpReg0, tmpReg1);
 }
 
@@ -213,11 +216,10 @@ __simd_callee__ inline void CastImpl(RegT &dstReg, RegU &srcReg, MaskReg &mask)
         CastImpl<ActualT, ActualU, trait.satMode, trait.layoutMode, trait.mrgMode>(dstReg, srcReg, mask);
     } else if constexpr (rndSatLayoutMergeCast) {
         if constexpr (CheckRegTrait<RegT, RegTraitNumTwo>()) {
-            CastImpl<T, U, trait.roundMode, trait.satMode, trait.mrgMode, RegT, RegU>(
-                dstReg, srcReg, mask);
+            CastImpl<T, U, trait.roundMode, trait.satMode, trait.mrgMode, RegT, RegU>(dstReg, srcReg, mask);
         } else {
-            CastImpl<ActualT, ActualU, trait.roundMode, trait.satMode, trait.layoutMode, trait.mrgMode>(
-                dstReg, srcReg, mask);
+            CastImpl<ActualT, ActualU, trait.roundMode, trait.satMode, trait.layoutMode, trait.mrgMode>(dstReg, srcReg,
+                mask);
         }
     } else if constexpr (rndSatMergeCast) {
         CastImpl<ActualT, ActualU, trait.roundMode, trait.satMode, trait.mrgMode>(dstReg, srcReg, mask);

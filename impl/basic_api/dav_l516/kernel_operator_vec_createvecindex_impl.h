@@ -1,20 +1,21 @@
-/**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+/* *
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
-/*!
+/* !
  * \file kernel_operator_vec_createvecindex_impl.h
  * \brief
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/dav_l311/kernel_operator_vec_createvecindex_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/basic_api/dav_l311/kernel_operator_vec_createvecindex_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CREATEVECINDEX_IMPL_H__
 #endif
@@ -35,9 +36,8 @@ template <typename T> constexpr __aicore__ inline void CheckCreateVecIndexApi0Su
 
 template <typename T> constexpr __aicore__ inline void CheckCreateVecIndexApi2SupportedType()
 {
-    static_assert(std::is_same<T, int8_t>::value ||
-        std::is_same<T, int16_t>::value || std::is_same<T, int32_t>::value ||
-        std::is_same<T, half>::value || std::is_same<T, float>::value,
+    static_assert(std::is_same<T, int8_t>::value || std::is_same<T, int16_t>::value ||
+        std::is_same<T, int32_t>::value || std::is_same<T, half>::value || std::is_same<T, float>::value,
         "CreateVecIndex level-2 api only support int8_t/int16_t/int32_t/half/float");
 }
 namespace Internal {
@@ -60,8 +60,8 @@ __aicore__ inline void VecCreateVecIndexLevel0VFImpl(__ubuf__ T *dst, const T fi
         if constexpr (!isNormalMode) {
             maskReg = VecMicroGetMaskReg<T, true, isNormalMode, isMaskBitMode>(maskBuf, count);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dst + index * dstRepStride * ElePerBlkT, dstVreg, dstBlkStride, maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + index * dstRepStride * ElePerBlkT, dstVreg,
+            dstBlkStride, maskReg);
         Reg::Adds(dstVreg, dstVreg, static_cast<int32_t>(sreg), maskReg);
     }
 }
@@ -96,18 +96,19 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> &dstLocal, const T firs
 {
     CheckCreateVecIndexApi0SupportedType<T>();
 
-    __ubuf__ T* dst = (__ubuf__ T*)dstLocal.GetPhyAddr();
-    Internal::VecCreateVecIndexLevel0Template<false>(dst, firstValue, nullptr, mask, repeatTime, dstBlkStride, dstRepStride);
+    __ubuf__ T *dst = (__ubuf__ T *)dstLocal.GetPhyAddr();
+    Internal::VecCreateVecIndexLevel0Template<false>(dst, firstValue, nullptr, mask, repeatTime, dstBlkStride,
+        dstRepStride);
 }
 
 // VCI level-0 bitwise
 template <typename T>
-__aicore__ inline void CreateVecIndexCalc(LocalTensor<T> &dstLocal, const T firstValue,
-    uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+__aicore__ inline void CreateVecIndexCalc(LocalTensor<T> &dstLocal, const T firstValue, uint64_t mask[],
+    uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
 {
     CheckCreateVecIndexApi0SupportedType<T>();
 
-    __ubuf__ T* dst = (__ubuf__ T*)dstLocal.GetPhyAddr();
+    __ubuf__ T *dst = (__ubuf__ T *)dstLocal.GetPhyAddr();
     Internal::VecCreateVecIndexLevel0Template<true>(dst, firstValue, mask, 0, repeatTime, dstBlkStride, dstRepStride);
 }
 
@@ -117,7 +118,7 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> dstLocal, const T first
 {
     CheckCreateVecIndexApi2SupportedType<T>();
 
-    __ubuf__ T* dstLocalAddr = (__ubuf__ T*)dstLocal.GetPhyAddr();
+    __ubuf__ T *dstLocalAddr = (__ubuf__ T *)dstLocal.GetPhyAddr();
     uint32_t sreg = (uint32_t)count;
     uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));
     uint16_t repeatTimes = CeilDivision(count, sregLower);
@@ -136,7 +137,6 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> dstLocal, const T first
         }
     }
 }
-
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CREATEVECINDEX_IMPL_H__)

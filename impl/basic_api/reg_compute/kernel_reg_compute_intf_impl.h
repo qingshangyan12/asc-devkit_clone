@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -23,8 +23,8 @@
 #ifndef ASCENDC_KERNEL_REG_COMPUTE_INTF_IMPL_H
 #define ASCENDC_KERNEL_REG_COMPUTE_INTF_IMPL_H
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__) || (__NPU_ARCH__ == 5161) || \
-    (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__) || \
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5102)
 #include "kernel_reg_compute_maskreg_intf_impl.h"
 #include "kernel_reg_compute_addrreg_intf_impl.h"
 #include "kernel_reg_compute_common_intf_impl.h"

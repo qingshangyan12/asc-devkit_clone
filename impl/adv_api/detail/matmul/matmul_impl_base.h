@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-/*!
+/* !
  * \file matmul_impl_base.h
  * \brief
  */
@@ -33,50 +33,48 @@
 #include "utils/matmul_utils.h"
 
 namespace AscendC {
-
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG = CFG_NORM,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG = CFG_NORM,
     class MM_CB = MatmulCallBackFunc<nullptr, nullptr, nullptr>, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
 class MatmulImplBase : MATMUL_IMPORT_MODULE(Context),
-                       MATMUL_IMPORT_MODULE(CubeOutBuffer),
-                       MATMUL_IMPORT_MODULE(CopyCubeOut),
-                       MATMUL_IMPORT_MODULE(CopyCubeInA),
-                       MATMUL_IMPORT_MODULE(CopyCubeInB),
-                       MATMUL_IMPORT_MODULE(CubeInBufferA),
-                       MATMUL_IMPORT_MODULE(CubeInBufferB),
-                       MATMUL_IMPORT_MODULE(Scheduler),
-                       MATMUL_IMPORT_MODULE(BiasScheduler),
-                       MATMUL_IMPORT_MODULE_PRIVATE(CopyCubeInParamsA),
-                       MATMUL_IMPORT_MODULE_PRIVATE(CopyCubeInParamsB),
-                       MATMUL_IMPORT_MODULE_PRIVATE(DataCopyUtilsA),
-                       MATMUL_IMPORT_MODULE_PRIVATE(DataCopyUtilsB),
-                       MATMUL_IMPORT_MODULE_PRIVATE(DataCopyWrapperA),
-                       MATMUL_IMPORT_MODULE_PRIVATE(DataCopyWrapperB),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulQuantProcessor),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulShapeInfo),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulTensorInfoA),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulTensorInfoB),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulSubBlockInfo),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulShapeTiling),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulCrossCoreSync),
-                       MATMUL_IMPORT_MODULE_PRIVATE(L1Manager),
-                       MATMUL_IMPORT_MODULE_PRIVATE(LocalWorkspace),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulUserDefineInfo),
-                       MATMUL_IMPORT_MODULE_PRIVATE(LoadToA2),
-                       MATMUL_IMPORT_MODULE_PRIVATE(LoadToB2),
-                       MATMUL_IMPORT_MODULE_PRIVATE(TBufPoolL0),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MmadCompute),
-                       MATMUL_IMPORT_MODULE_PRIVATE(CopyBiasIn),
-                       MATMUL_IMPORT_MODULE_PRIVATE(LoadBias2C2),
-                       MATMUL_IMPORT_MODULE_PRIVATE(C1Buffer),
-                       MATMUL_IMPORT_MODULE_PRIVATE(C2Buffer),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulUnitFlag),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MLoop),
-                       MATMUL_IMPORT_MODULE_PRIVATE(NLoop),
-                       MATMUL_IMPORT_MODULE_PRIVATE(KLoop),
-                       MATMUL_IMPORT_MODULE_PRIVATE(CopyCubeOutUtils),
-                       MATMUL_IMPORT_MODULE_PRIVATE(MatmulAntiQuantProcessor),
-                       MATMUL_IMPORT_MODULE_PRIVATE(QtableProcessor) {
+    MATMUL_IMPORT_MODULE(CubeOutBuffer),
+    MATMUL_IMPORT_MODULE(CopyCubeOut),
+    MATMUL_IMPORT_MODULE(CopyCubeInA),
+    MATMUL_IMPORT_MODULE(CopyCubeInB),
+    MATMUL_IMPORT_MODULE(CubeInBufferA),
+    MATMUL_IMPORT_MODULE(CubeInBufferB),
+    MATMUL_IMPORT_MODULE(Scheduler),
+    MATMUL_IMPORT_MODULE(BiasScheduler),
+    MATMUL_IMPORT_MODULE_PRIVATE(CopyCubeInParamsA),
+    MATMUL_IMPORT_MODULE_PRIVATE(CopyCubeInParamsB),
+    MATMUL_IMPORT_MODULE_PRIVATE(DataCopyUtilsA),
+    MATMUL_IMPORT_MODULE_PRIVATE(DataCopyUtilsB),
+    MATMUL_IMPORT_MODULE_PRIVATE(DataCopyWrapperA),
+    MATMUL_IMPORT_MODULE_PRIVATE(DataCopyWrapperB),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulQuantProcessor),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulShapeInfo),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulTensorInfoA),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulTensorInfoB),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulSubBlockInfo),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulShapeTiling),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulCrossCoreSync),
+    MATMUL_IMPORT_MODULE_PRIVATE(L1Manager),
+    MATMUL_IMPORT_MODULE_PRIVATE(LocalWorkspace),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulUserDefineInfo),
+    MATMUL_IMPORT_MODULE_PRIVATE(LoadToA2),
+    MATMUL_IMPORT_MODULE_PRIVATE(LoadToB2),
+    MATMUL_IMPORT_MODULE_PRIVATE(TBufPoolL0),
+    MATMUL_IMPORT_MODULE_PRIVATE(MmadCompute),
+    MATMUL_IMPORT_MODULE_PRIVATE(CopyBiasIn),
+    MATMUL_IMPORT_MODULE_PRIVATE(LoadBias2C2),
+    MATMUL_IMPORT_MODULE_PRIVATE(C1Buffer),
+    MATMUL_IMPORT_MODULE_PRIVATE(C2Buffer),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulUnitFlag),
+    MATMUL_IMPORT_MODULE_PRIVATE(MLoop),
+    MATMUL_IMPORT_MODULE_PRIVATE(NLoop),
+    MATMUL_IMPORT_MODULE_PRIVATE(KLoop),
+    MATMUL_IMPORT_MODULE_PRIVATE(CopyCubeOutUtils),
+    MATMUL_IMPORT_MODULE_PRIVATE(MatmulAntiQuantProcessor),
+    MATMUL_IMPORT_MODULE_PRIVATE(QtableProcessor) {
 public:
     using AType = A_TYPE;
     using BType = B_TYPE;
@@ -93,63 +91,56 @@ private:
 
 public:
     __aicore__ inline MatmulImplBase(){};
-    __aicore__ inline void Init(const TCubeTiling* __restrict cubeTiling, TPipe* tpipe = nullptr);
+    __aicore__ inline void Init(const TCubeTiling *__restrict cubeTiling, TPipe *tpipe = nullptr);
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
-    __aicore__ inline void Init(const __gm__ TCubeTiling* gmCubeTiling, TPipe* tpipe = nullptr);
+    __aicore__ inline void Init(const __gm__ TCubeTiling *gmCubeTiling, TPipe *tpipe = nullptr);
 #endif
     __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgK);
     __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgKa, int orgKb, int orgKc = 0);
     __aicore__ inline void SetSingleShape(int singleM, int singleN, int singleK);
     __aicore__ inline void SetTail(int tailM = -1, int tailN = -1, int tailK = -1);
-    __aicore__ inline void SetTensorA(const GlobalTensor<SrcAT>& gm, bool isTransposeA = false);
-    __aicore__ inline void SetTensorB(const GlobalTensor<SrcBT>& gm, bool isTransposeB = false);
-    __aicore__ inline void SetBias(const GlobalTensor<BiasT>& biasGlobal);
-    template <class T>
-    __aicore__ inline void SetSelfDefineData(T dataPtr);
-    __aicore__ inline void SetSparseIndex(const GlobalTensor<uint8_t>& indexGlobal);
+    __aicore__ inline void SetTensorA(const GlobalTensor<SrcAT> &gm, bool isTransposeA = false);
+    __aicore__ inline void SetTensorB(const GlobalTensor<SrcBT> &gm, bool isTransposeB = false);
+    __aicore__ inline void SetBias(const GlobalTensor<BiasT> &biasGlobal);
+    template <class T> __aicore__ inline void SetSelfDefineData(T dataPtr);
+    __aicore__ inline void SetSparseIndex(const GlobalTensor<uint8_t> &indexGlobal);
     __aicore__ inline void SetUserDefInfo(const uint64_t tilingPtr);
     __aicore__ inline void SetQuantScalar(const uint64_t quantScalar);
-    __aicore__ inline void SetQuantVector(const GlobalTensor<uint64_t>& quantTensor);
-    __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor);
-    __aicore__ inline void SetTensorA(const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false);
-    __aicore__ inline void SetTensorB(const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false);
+    __aicore__ inline void SetQuantVector(const GlobalTensor<uint64_t> &quantTensor);
+    __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t> &quantTensor);
+    __aicore__ inline void SetTensorA(const LocalTensor<SrcAT> &leftMatrix, bool isTransposeA = false);
+    __aicore__ inline void SetTensorB(const LocalTensor<SrcBT> &rightMatrix, bool isTransposeB = false);
     __aicore__ inline void SetTensorA(SrcAT aScalar);
     __aicore__ inline void SetTensorB(SrcBT bScalar);
-    __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias);
+    __aicore__ inline void SetBias(const LocalTensor<BiasT> &inputBias);
     __aicore__ inline void DisableBias();
     __aicore__ inline void ClearBias();
-    template <bool sync = true>
-    __aicore__ inline bool Iterate(bool enPartialSum = false);
+    template <bool sync = true> __aicore__ inline bool Iterate(bool enPartialSum = false);
     template <bool sync = true, typename T>
-    __aicore__ inline bool Iterate(bool enPartialSum, const LocalTensor<T>& localCmatrix);
+    __aicore__ inline bool Iterate(bool enPartialSum, const LocalTensor<T> &localCmatrix);
     template <bool sync = true>
-    __aicore__ inline void GetTensorC(
-        const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0, bool enSequentialWrite = false);
-    template <bool sync = true>
-    __aicore__ inline void GetTensorC(
-        const GlobalTensor<DstT>& gm, uint8_t enAtomic = 0, bool enSequentialWrite = false);
-    template <bool sync = true>
-    __aicore__ inline void GetTensorC(
-        const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0,
+    __aicore__ inline void GetTensorC(const LocalTensor<DstT> &co2Local, uint8_t enAtomic = 0,
         bool enSequentialWrite = false);
-    template <bool isTurnOnDebug = true>
-    __aicore__ inline MatrixOffset GetOffsetC();
+    template <bool sync = true>
+    __aicore__ inline void GetTensorC(const GlobalTensor<DstT> &gm, uint8_t enAtomic = 0,
+        bool enSequentialWrite = false);
+    template <bool sync = true>
+    __aicore__ inline void GetTensorC(const GlobalTensor<DstT> &gm, const LocalTensor<DstT> &co2Local,
+        uint8_t enAtomic = 0, bool enSequentialWrite = false);
+    template <bool isTurnOnDebug = true> __aicore__ inline MatrixOffset GetOffsetC();
     __aicore__ inline void End();
     __aicore__ inline void SetHF32(bool enableHF32 = false, int32_t transMode = 0);
     __aicore__ inline void SetSubBlockIdx(uint8_t subBlockIdx);
     __aicore__ inline uint8_t GetSubBlockIdx();
-    template <class T>
-    __aicore__ inline void SetWorkspace(__gm__ const T* addr, int size)
-    {}
+    template <class T> __aicore__ inline void SetWorkspace(__gm__ const T *addr, int size) {}
 
-    template <class T>
-    __aicore__ inline void SetWorkspace(GlobalTensor<T>& addr)
+    template <class T> __aicore__ inline void SetWorkspace(GlobalTensor<T> &addr)
     {
         ASSERT(addr.GetSize() > 0);
         SetWorkspace(addr.GetPhyAddr(), addr.GetSize() * sizeof(T));
     }
 
-    __aicore__ inline void SetLocalWorkspace(const LocalTensor<uint8_t>& tmpBuffer)
+    __aicore__ inline void SetLocalWorkspace(const LocalTensor<uint8_t> &tmpBuffer)
     {
         MATMUL_MODULE(LocalWorkspace)->Init(tmpBuffer);
     }
@@ -218,8 +209,7 @@ public:
     using CallBack = MM_CB;
 
 private:
-    template <typename, typename>
-    friend struct DfxProxy;
+    template <typename, typename> friend struct DfxProxy;
     using IMPL = MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
     MATMUL_USE_MODULE(CopyCubeInA);
     MATMUL_USE_MODULE(CopyCubeInB);
@@ -246,29 +236,25 @@ private:
     MATMUL_USE_MODULE(QtableProcessor);
 
 private:
-    template <
-        class A_TYPE_, class B_TYPE_, class C_TYPE_, class BIAS_TYPE_, const auto& MM_CFG_, class MM_CB_,
+    template <class A_TYPE_, class B_TYPE_, class C_TYPE_, class BIAS_TYPE_, const auto &MM_CFG_, class MM_CB_,
         MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY_)>
     friend __aicore__ inline void SetTPipe(
-        MatmulImpl<A_TYPE_, B_TYPE_, C_TYPE_, BIAS_TYPE_, MM_CFG_, MM_CB_, MATMUL_POLICY_>& mm, TPipe* tpipe);
+        MatmulImpl<A_TYPE_, B_TYPE_, C_TYPE_, BIAS_TYPE_, MM_CFG_, MM_CB_, MATMUL_POLICY_> &mm, TPipe *tpipe);
 
-    template <
-        class A_TYPE_, class B_TYPE_, class C_TYPE_, class BIAS_TYPE_, const auto& MM_CFG_, class MM_CB_,
+    template <class A_TYPE_, class B_TYPE_, class C_TYPE_, class BIAS_TYPE_, const auto &MM_CFG_, class MM_CB_,
         MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY_)>
     friend __aicore__ inline void KfcSetIntraAId(
-        MatmulImpl<A_TYPE_, B_TYPE_, C_TYPE_, BIAS_TYPE_, MM_CFG_, MM_CB_, MATMUL_POLICY_>& mm, uint8_t intraId);
+        MatmulImpl<A_TYPE_, B_TYPE_, C_TYPE_, BIAS_TYPE_, MM_CFG_, MM_CB_, MATMUL_POLICY_> &mm, uint8_t intraId);
 
-    template <
-        class A_TYPE_, class B_TYPE_, class C_TYPE_, class BIAS_TYPE_, const auto& MM_CFG_, class MM_CB_,
+    template <class A_TYPE_, class B_TYPE_, class C_TYPE_, class BIAS_TYPE_, const auto &MM_CFG_, class MM_CB_,
         MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY_)>
     friend __aicore__ inline void KfcSetIntraBId(
-        MatmulImpl<A_TYPE_, B_TYPE_, C_TYPE_, BIAS_TYPE_, MM_CFG_, MM_CB_, MATMUL_POLICY_>& mm, uint8_t intraId);
+        MatmulImpl<A_TYPE_, B_TYPE_, C_TYPE_, BIAS_TYPE_, MM_CFG_, MM_CB_, MATMUL_POLICY_> &mm, uint8_t intraId);
 
-    template <
-        class A_TYPE_, class B_TYPE_, class C_TYPE_, class BIAS_TYPE_, const auto& MM_CFG_, class MM_CB_,
+    template <class A_TYPE_, class B_TYPE_, class C_TYPE_, class BIAS_TYPE_, const auto &MM_CFG_, class MM_CB_,
         MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY_)>
     friend __aicore__ inline MatrixL1Addr KfcGetMatrixL1Addr(
-        MatmulImpl<A_TYPE_, B_TYPE_, C_TYPE_, BIAS_TYPE_, MM_CFG_, MM_CB_, MATMUL_POLICY_>& mm);
+        MatmulImpl<A_TYPE_, B_TYPE_, C_TYPE_, BIAS_TYPE_, MM_CFG_, MM_CB_, MATMUL_POLICY_> &mm);
 
     __aicore__ inline void SetIntraAId(uint8_t intraId);
     __aicore__ inline void SetIntraBId(uint8_t intraId);
@@ -279,46 +265,41 @@ protected:
     using POLICY = MATMUL_POLICY<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>;
 };
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
-__aicore__ inline void SetTPipe(
-    MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>& mm, TPipe* tpipe)
+__aicore__ inline void SetTPipe(MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY> &mm,
+    TPipe *tpipe)
 {
     mm.var.tpipe_ = tpipe;
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
-__aicore__ inline void KfcSetIntraAId(
-    MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>& mm, uint8_t intraId)
+__aicore__ inline void KfcSetIntraAId(MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY> &mm,
+    uint8_t intraId)
 {
     mm.SetIntraAId(intraId);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
-__aicore__ inline void KfcSetIntraBId(
-    MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>& mm, uint8_t intraId)
+__aicore__ inline void KfcSetIntraBId(MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY> &mm,
+    uint8_t intraId)
 {
     mm.SetIntraBId(intraId);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline MatrixL1Addr KfcGetMatrixL1Addr(
-    MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>& mm)
+    MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY> &mm)
 {
     struct MatrixL1Addr matrixL1Addr;
     matrixL1Addr = mm.GetMatrixL1Addr();
     return matrixL1Addr;
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 template <class T>
 __aicore__ inline void
@@ -327,21 +308,20 @@ MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>:
     MATMUL_MODULE(MatmulUserDefineInfo)->SetSelfDefineData(dataPtr);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetSparseIndex(
-    const GlobalTensor<uint8_t>& indexGlobal)
+    const GlobalTensor<uint8_t> &indexGlobal)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
     if constexpr (DoMatmulMDL(MM_CFG) && HasSparseIndex<B_TYPE>()) {
         MATMUL_MODULE(CopyCubeInB)->SetSparseIndex(indexGlobal);
     }
 #endif
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetUserDefInfo(
     const uint64_t tilingPtr)
@@ -349,8 +329,7 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     MATMUL_MODULE(MatmulUserDefineInfo)->SetUserDefineInfo(tilingPtr);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetQuantScalar(
     const uint64_t quantScalar)
@@ -358,28 +337,25 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     MatmulQuantProcessor::SetQuantScalar(quantScalar);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetQuantVector(
-    const GlobalTensor<uint64_t>& quantTensor)
+    const GlobalTensor<uint64_t> &quantTensor)
 {
     MatmulQuantProcessor::SetQuantVector(quantTensor);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetQuantVector(
-    const LocalTensor<uint64_t>& quantTensor)
+    const LocalTensor<uint64_t> &quantTensor)
 {
-    static_assert(
-        (!Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsNeedUB()), "Quant from L1 doesn't support current platform.");
+    static_assert((!Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsNeedUB()),
+        "Quant from L1 doesn't support current platform.");
     MatmulQuantProcessor::SetQuantVector(quantTensor);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetIntraAId(
     uint8_t intraId)
@@ -387,8 +363,7 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     MATMUL_MODULE(MatmulCrossCoreSync)->SetIntraAId(intraId);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetIntraBId(
     uint8_t intraId)
@@ -396,8 +371,7 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     MATMUL_MODULE(MatmulCrossCoreSync)->SetIntraBId(intraId);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline MatrixL1Addr
 MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::GetMatrixL1Addr()
@@ -416,8 +390,7 @@ MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>:
     return matrixL1Addr;
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline uint8_t
 MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::GetSubBlockIdx()
@@ -425,28 +398,25 @@ MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>:
     return MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::Init(
-    const TCubeTiling* __restrict cubeTiling, TPipe* tpipe)
+    const TCubeTiling *__restrict cubeTiling, TPipe *tpipe)
 {
     auto tpipePtr = GetTPipePtr();
     MATMUL_MODULE(Scheduler)->Init(cubeTiling, tpipePtr);
 }
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::Init(
-    const __gm__ TCubeTiling* gmCubeTiling, TPipe* tpipe)
+    const __gm__ TCubeTiling *gmCubeTiling, TPipe *tpipe)
 {
     auto tpipePtr = GetTPipePtr();
     MATMUL_MODULE(Scheduler)->Init(gmCubeTiling, tpipePtr);
 }
 #endif
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetOrgShape(
     int orgM, int orgN, int orgK)
@@ -454,8 +424,7 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     SetOrgShape(orgM, orgN, orgK, orgK);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetOrgShape(
     int orgM, int orgN, int orgKa, int orgKb, int orgKc)
@@ -464,8 +433,7 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     MATMUL_MODULE(MatmulShapeInfo)->SetOrgShape(orgM, orgN, orgKa, orgKb, orgKc);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetSingleShape(
     int singleM, int singleN, int singleK)
@@ -473,15 +441,13 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     SetTail(singleM, singleN, singleK);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetHF32(
     bool enableHF32, int32_t transMode)
 {
-    ASCENDC_ASSERT((transMode == 0 || transMode == 1), {
-        KERNEL_LOG(KERNEL_ERROR, "transMode is %d , which should only be 0 / 1", transMode);
-    });
+    ASCENDC_ASSERT((transMode == 0 || transMode == 1),
+                   { KERNEL_LOG(KERNEL_ERROR, "transMode is %d , which should only be 0 / 1", transMode); });
     if (unlikely(enableHF32)) {
         SetHF32Mode(1);
     } else {
@@ -494,8 +460,7 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     }
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetSubBlockIdx(
     uint8_t subBlockIdx)
@@ -503,16 +468,14 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     MATMUL_MODULE(MatmulSubBlockInfo)->SetSubBlockIdx(subBlockIdx);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::End()
 {
     MATMUL_MODULE(Scheduler)->End();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetTail(
     int tailM, int tailN, int tailK)
@@ -521,14 +484,14 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     shapeInfo->CheckTailShape(tailM, tailN, tailK);
     if constexpr (ToMatmulConfig(MM_CFG).intraBlockPartSum) {
         int singleM = (MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx() == 0) ?
-                          shapeInfo->GetSingleCoreM() :
-                          shapeInfo->template GetSingleCoreM<true>();
+            shapeInfo->GetSingleCoreM() :
+            shapeInfo->template GetSingleCoreM<true>();
         int singleN = (MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx() == 0) ?
-                          shapeInfo->GetSingleCoreN() :
-                          shapeInfo->template GetSingleCoreN<true>();
+            shapeInfo->GetSingleCoreN() :
+            shapeInfo->template GetSingleCoreN<true>();
         int singleK = (MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx() == 0) ?
-                          shapeInfo->GetSingleCoreK() :
-                          shapeInfo->template GetSingleCoreK<true>();
+            shapeInfo->GetSingleCoreK() :
+            shapeInfo->template GetSingleCoreK<true>();
         singleM = (tailM != -1) ? tailM : singleM;
         singleN = (tailN != -1) ? tailN : singleN;
         singleK = (tailK != -1) ? tailK : singleK;
@@ -554,28 +517,25 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     shapeInfo->CheckSpecificShape();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetTensorA(
-    const GlobalTensor<SrcAT>& gm, bool isTransposeA)
+    const GlobalTensor<SrcAT> &gm, bool isTransposeA)
 {
     MATMUL_MODULE(CopyCubeInA)->SetInput(gm, isTransposeA);
     MATMUL_MODULE(Scheduler)->Reset();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetTensorA(
-    const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA)
+    const LocalTensor<SrcAT> &leftMatrix, bool isTransposeA)
 {
     MATMUL_MODULE(CopyCubeInA)->SetInput(leftMatrix, isTransposeA);
     MATMUL_MODULE(Scheduler)->Reset();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetTensorA(
     SrcAT aScalar)
@@ -583,8 +543,7 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     MATMUL_MODULE(LoadToA2)->SetScalar(aScalar);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetTensorB(
     SrcBT bScalar)
@@ -592,70 +551,63 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "It is not allowed to set matrix B with scalar."); });
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetTensorB(
-    const GlobalTensor<SrcBT>& gm, bool isTransposeB)
+    const GlobalTensor<SrcBT> &gm, bool isTransposeB)
 {
     MATMUL_MODULE(CopyCubeInB)->SetInput(gm, isTransposeB);
     MATMUL_MODULE(Scheduler)->Reset();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetTensorB(
-    const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB)
+    const LocalTensor<SrcBT> &rightMatrix, bool isTransposeB)
 {
     MATMUL_MODULE(CopyCubeInB)->SetInput(rightMatrix, isTransposeB);
     MATMUL_MODULE(Scheduler)->Reset();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetBias(
-    const GlobalTensor<BiasT>& biasGlobal)
+    const GlobalTensor<BiasT> &biasGlobal)
 {
-    ASCENDC_ASSERT(
-        (!ToMatmulConfig(MM_CFG).isPartialOutput), { KERNEL_LOG(KERNEL_ERROR, "PartialOutput not support bias."); });
+    ASCENDC_ASSERT((!ToMatmulConfig(MM_CFG).isPartialOutput),
+                   { KERNEL_LOG(KERNEL_ERROR, "PartialOutput not support bias."); });
     MATMUL_MODULE(BiasScheduler)->SetInput(biasGlobal);
     MATMUL_MODULE(BiasScheduler)->SetBias(true);
     MATMUL_MODULE(Scheduler)->Reset();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetBias(
-    const LocalTensor<BiasT>& inputBias)
+    const LocalTensor<BiasT> &inputBias)
 {
-    ASCENDC_ASSERT(
-        (!ToMatmulConfig(MM_CFG).isPartialOutput), { KERNEL_LOG(KERNEL_ERROR, "PartialOutput not support bias."); });
+    ASCENDC_ASSERT((!ToMatmulConfig(MM_CFG).isPartialOutput),
+                   { KERNEL_LOG(KERNEL_ERROR, "PartialOutput not support bias."); });
     MATMUL_MODULE(BiasScheduler)->SetInput(inputBias);
     MATMUL_MODULE(BiasScheduler)->SetBias(true);
     MATMUL_MODULE(Scheduler)->Reset();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::DisableBias()
 {
     MATMUL_MODULE(BiasScheduler)->SetBias(false);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::ClearBias()
 {
     DisableBias();
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 template <bool isTurnOnDebug>
 __aicore__ inline MatrixOffset
@@ -667,12 +619,11 @@ MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>:
     return {};
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 template <bool sync>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::GetTensorC(
-    const LocalTensor<DstT>& co2Local, uint8_t enAtomic, bool enSequentialWrite)
+    const LocalTensor<DstT> &co2Local, uint8_t enAtomic, bool enSequentialWrite)
 {
     if constexpr (!Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsSupportL0CToUB()) {
         static_assert(!ToMatmulConfig(MM_CFG).isPartialOutput, "PartialOutput not support local postion output");
@@ -685,47 +636,43 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     }
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 template <bool sync>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::GetTensorC(
-    const GlobalTensor<DstT>& gm, uint8_t enAtomic, bool enSequentialWrite)
+    const GlobalTensor<DstT> &gm, uint8_t enAtomic, bool enSequentialWrite)
 {
     MATMUL_MODULE(Scheduler)->GetResult(gm, enAtomic, enSequentialWrite);
 }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002)
 // v100, v200
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 template <bool sync>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::GetTensorC(
-    const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& co2Local, uint8_t enAtomic, bool enSequentialWrite)
+    const GlobalTensor<DstT> &gm, const LocalTensor<DstT> &co2Local, uint8_t enAtomic, bool enSequentialWrite)
 {
     MATMUL_MODULE(Scheduler)->GetResult(gm, co2Local, enAtomic, enSequentialWrite);
 }
 #endif
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 template <bool sync>
 __aicore__ inline bool MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::Iterate(
     bool enPartialSum)
 {
-    static_assert(
-        POLICY::POLICY_TYPE != PolicyType::MATMUL_NBUFFER_33, "Iterate does not support NBuffer33MatmulPolicy.");
+    static_assert(POLICY::POLICY_TYPE != PolicyType::MATMUL_NBUFFER_33,
+        "Iterate does not support NBuffer33MatmulPolicy.");
     return MATMUL_MODULE(Scheduler)->ScheduleOnce(enPartialSum);
 }
 
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 template <bool sync, typename T>
 __aicore__ inline bool MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::Iterate(
-    bool enPartialSum, const LocalTensor<T>& localCmatrix)
+    bool enPartialSum, const LocalTensor<T> &localCmatrix)
 {
     if constexpr (PhyPosIsL0C(C_TYPE::pos)) {
         static_assert((C_TYPE::format == CubeFormat::NZ), "Unsupported format type for output matrix.");

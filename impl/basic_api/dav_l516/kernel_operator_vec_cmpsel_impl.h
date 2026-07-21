@@ -1,19 +1,20 @@
-/**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+/* *
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
-/*!
+/* !
  * \file kernel_operator_vec_cmpsel_impl.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/dav_l311/kernel_operator_vec_cmpsel_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/basic_api/dav_l311/kernel_operator_vec_cmpsel_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__
 #endif
@@ -25,60 +26,60 @@
 #include "kernel_struct_unary.h"
 namespace AscendC {
 namespace CmpSelInternal {
-    constexpr uint32_t maskBitToByte = 8;
+constexpr uint32_t maskBitToByte = 8;
 }
 /* ***************************************************************************************
  * ************************************** Compare ****************************************
  * ************************************************************************************** */
-#define COUNTER_MODE_B8_VCMPV_VF(cmpMode)                                                         \
-    __VEC_SCOPE__                                                                                 \
-    {                                                                                             \
-        RegTensor<T> vSrc0;                                                                       \
-        RegTensor<T> vSrc1;                                                                       \
-        uint32_t sreg = (uint32_t)count;                                                       \
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                            \
+#define COUNTER_MODE_B8_VCMPV_VF(cmpMode)                                                     \
+    __VEC_SCOPE__                                                                             \
+    {                                                                                         \
+        RegTensor<T> vSrc0;                                                                   \
+        RegTensor<T> vSrc1;                                                                   \
+        uint32_t sreg = (uint32_t)count;                                                      \
+        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                        \
         uint16_t repeatTime = CeilDivision(count, sregLower);                                 \
-        MaskReg preg;                                                                             \
-        MaskReg dstReg;                                                                           \
-        AddrReg dstOffset;                                                                        \
-        for (uint16_t i = 0; i < repeatTime; ++i) {                                              \
-            preg = CreatePredicate<T>(sreg);                                                      \
-            dstReg = CreatePredicate<T>();                                                        \
-            dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);              \
-            DataCopy(vSrc0, src0, i * sregLower);                                                 \
-            DataCopy(vSrc1, src1, i * sregLower);                                                 \
-            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                      \
-            DataCopy<uint32_t, Dist::DIST_NORM>((__ubuf__ uint32_t *)dst, dstReg, dstOffset);     \
-        }                                                                                         \
+        MaskReg preg;                                                                         \
+        MaskReg dstReg;                                                                       \
+        AddrReg dstOffset;                                                                    \
+        for (uint16_t i = 0; i < repeatTime; ++i) {                                           \
+            preg = CreatePredicate<T>(sreg);                                                  \
+            dstReg = CreatePredicate<T>();                                                    \
+            dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);          \
+            DataCopy(vSrc0, src0, i *sregLower);                                              \
+            DataCopy(vSrc1, src1, i *sregLower);                                              \
+            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                  \
+            DataCopy<uint32_t, Dist::DIST_NORM>((__ubuf__ uint32_t *)dst, dstReg, dstOffset); \
+        }                                                                                     \
     }
 
-#define COUNTER_MODE_B16_VCMPV_VF(cmpMode)                                                      \
-    __VEC_SCOPE__                                                                               \
-    {                                                                                           \
-        RegTensor<T> vSrc0;                                                                     \
-        RegTensor<T> vSrc1;                                                                     \
-        uint32_t sreg = (uint32_t)count;                                                     \
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                          \
+#define COUNTER_MODE_B16_VCMPV_VF(cmpMode)                                                  \
+    __VEC_SCOPE__                                                                           \
+    {                                                                                       \
+        RegTensor<T> vSrc0;                                                                 \
+        RegTensor<T> vSrc1;                                                                 \
+        uint32_t sreg = (uint32_t)count;                                                    \
+        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                      \
         uint16_t repeatTime = CeilDivision(count, sregLower);                               \
-        MaskReg preg;                                                                           \
-        MaskReg dstReg;                                                                         \
-        AddrReg dstOffset;                                                                      \
-        for (uint16_t i = 0; i < repeatTime; ++i) {                                            \
-            preg = CreatePredicate<T>(sreg);                                                    \
-            dstReg = CreatePredicate<T>();                                                      \
-            dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);            \
-            DataCopy(vSrc0, src0, i * sregLower);                                               \
-            DataCopy(vSrc1, src1, i * sregLower);                                               \
-            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                    \
-            DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dst, dstReg, dstOffset);     \
-        }                                                                                       \
+        MaskReg preg;                                                                       \
+        MaskReg dstReg;                                                                     \
+        AddrReg dstOffset;                                                                  \
+        for (uint16_t i = 0; i < repeatTime; ++i) {                                         \
+            preg = CreatePredicate<T>(sreg);                                                \
+            dstReg = CreatePredicate<T>();                                                  \
+            dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);        \
+            DataCopy(vSrc0, src0, i *sregLower);                                            \
+            DataCopy(vSrc1, src1, i *sregLower);                                            \
+            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                \
+            DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dst, dstReg, dstOffset); \
+        }                                                                                   \
     }
 
 #define COUNTER_MODE_B32_VCMPV_VF(cmpMode)                                                                         \
-    uint32_t sreg = (uint32_t)count;                                                                            \
+    uint32_t sreg = (uint32_t)count;                                                                               \
     uint32_t sregLower = VECTOR_REG_WIDTH / sizeof(T);                                                             \
-    uint16_t repeatTime = CeilDivision(count, sregLower);                                                      \
-    uint16_t halfRepeatTimes = repeatTime / 2;                                                                    \
+    uint16_t repeatTime = CeilDivision(count, sregLower);                                                          \
+    uint16_t halfRepeatTimes = repeatTime / 2;                                                                     \
     if (halfRepeatTimes > 0) {                                                                                     \
         __VEC_SCOPE__                                                                                              \
         {                                                                                                          \
@@ -102,7 +103,7 @@ namespace CmpSelInternal {
             }                                                                                                      \
         }                                                                                                          \
     }                                                                                                              \
-    uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;                                                        \
+    uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;                                                         \
     if (tailTimes > 0) {                                                                                           \
         __ubuf__ T *src0Tail = src0 + sregLower * halfRepeatTimes * 2;                                             \
         __ubuf__ T *src1Tail = src1 + sregLower * halfRepeatTimes * 2;                                             \
@@ -115,8 +116,8 @@ namespace CmpSelInternal {
                 MaskReg dstReg1 = CreatePredicate<T>();                                                            \
                 AddrReg dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);                   \
                 MaskReg preg = CreatePredicate<T>(sreg);                                                           \
-                DataCopy(vSrc0, src0Tail, i * sregLower);                                                          \
-                DataCopy(vSrc1, src1Tail, i * sregLower);                                                          \
+                DataCopy(vSrc0, src0Tail, i *sregLower);                                                           \
+                DataCopy(vSrc1, src1Tail, i *sregLower);                                                           \
                 Compare<T, cmpMode>(dstReg0, vSrc0, vSrc1, preg);                                                  \
                 PredicatePack(dstReg1, dstReg0);                                                                   \
                 DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dstTail, dstReg1, dstOffset);               \
@@ -125,49 +126,49 @@ namespace CmpSelInternal {
     }
 
 // level 0, mask count mode
-#define CONTINUOUS_MODE_B8_VCMPV_VF(cmpMode)                                                            \
-    __VEC_SCOPE__                                                                                       \
-    {                                                                                                   \
-        RegTensor<T> vSrc0;                                                                             \
-        RegTensor<T> vSrc1;                                                                             \
-        uint32_t sreg = (uint32_t)mask;                                                                 \
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                                  \
-        uint32_t dstCalcElm = sregLower /  ONE_BYTE_BIT_SIZE;                                \
-        MaskReg preg = CreatePredicate<T>(sreg);                                                        \
-        MaskReg dstReg = CreatePredicate<T>();                                                          \
-        for (uint16_t i = 0; i < repeatTime; ++i) {                                                    \
-            uint32_t dstOffsetUint32 = i * dstCalcElm;                                                  \
-            DataCopy(vSrc0, src0, repeatParams.src0BlkStride, i * repeatParams.src0RepStride, preg);    \
-            DataCopy(vSrc1, src1, repeatParams.src1BlkStride, i * repeatParams.src1RepStride, preg);    \
-            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                            \
-            DataCopy<uint32_t, Dist::DIST_NORM>((__ubuf__ uint32_t *)dst, dstReg, dstOffsetUint32);     \
-        }                                                                                               \
+#define CONTINUOUS_MODE_B8_VCMPV_VF(cmpMode)                                                        \
+    __VEC_SCOPE__                                                                                   \
+    {                                                                                               \
+        RegTensor<T> vSrc0;                                                                         \
+        RegTensor<T> vSrc1;                                                                         \
+        uint32_t sreg = (uint32_t)mask;                                                             \
+        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                              \
+        uint32_t dstCalcElm = sregLower / ONE_BYTE_BIT_SIZE;                                        \
+        MaskReg preg = CreatePredicate<T>(sreg);                                                    \
+        MaskReg dstReg = CreatePredicate<T>();                                                      \
+        for (uint16_t i = 0; i < repeatTime; ++i) {                                                 \
+            uint32_t dstOffsetUint32 = i * dstCalcElm;                                              \
+            DataCopy(vSrc0, src0, repeatParams.src0BlkStride, i *repeatParams.src0RepStride, preg); \
+            DataCopy(vSrc1, src1, repeatParams.src1BlkStride, i *repeatParams.src1RepStride, preg); \
+            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                        \
+            DataCopy<uint32_t, Dist::DIST_NORM>((__ubuf__ uint32_t *)dst, dstReg, dstOffsetUint32); \
+        }                                                                                           \
     }
 
-#define CONTINUOUS_MODE_B16_VCMPV_VF(cmpMode)                                                         \
-    __VEC_SCOPE__                                                                                     \
-    {                                                                                                 \
-        RegTensor<T> vSrc0;                                                                           \
-        RegTensor<T> vSrc1;                                                                           \
-        uint32_t sreg = (uint32_t)mask;                                                               \
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                                \
-        uint32_t dstCalcElm = sregLower / ONE_BYTE_BIT_SIZE;                              \
-        MaskReg preg = CreatePredicate<T>(sreg);                                                      \
-        MaskReg dstReg = CreatePredicate<T>();                                                        \
-        for (uint16_t i = 0; i < repeatTime; ++i) {                                                  \
-            uint32_t dstOffsetUint32 = i * dstCalcElm;                                                \
-            DataCopy(vSrc0, src0, repeatParams.src0BlkStride, i * repeatParams.src0RepStride, preg);  \
-            DataCopy(vSrc1, src1, repeatParams.src1BlkStride, i * repeatParams.src1RepStride, preg);  \
-            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                          \
-            DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dst, dstReg, dstOffsetUint32);     \
-        }                                                                                             \
+#define CONTINUOUS_MODE_B16_VCMPV_VF(cmpMode)                                                       \
+    __VEC_SCOPE__                                                                                   \
+    {                                                                                               \
+        RegTensor<T> vSrc0;                                                                         \
+        RegTensor<T> vSrc1;                                                                         \
+        uint32_t sreg = (uint32_t)mask;                                                             \
+        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                              \
+        uint32_t dstCalcElm = sregLower / ONE_BYTE_BIT_SIZE;                                        \
+        MaskReg preg = CreatePredicate<T>(sreg);                                                    \
+        MaskReg dstReg = CreatePredicate<T>();                                                      \
+        for (uint16_t i = 0; i < repeatTime; ++i) {                                                 \
+            uint32_t dstOffsetUint32 = i * dstCalcElm;                                              \
+            DataCopy(vSrc0, src0, repeatParams.src0BlkStride, i *repeatParams.src0RepStride, preg); \
+            DataCopy(vSrc1, src1, repeatParams.src1BlkStride, i *repeatParams.src1RepStride, preg); \
+            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                        \
+            DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dst, dstReg, dstOffsetUint32);   \
+        }                                                                                           \
     }
 
 #define CONTINUOUS_MODE_B32_VCMPV_VF(cmpMode)                                                                       \
     uint32_t sreg = (uint32_t)mask;                                                                                 \
     uint32_t sregLower = VECTOR_REG_WIDTH / sizeof(T);                                                              \
-    uint16_t halfRepeatTimes = repeatTime / 2;                                                                     \
-    uint32_t dstCalcElm = 2 * sregLower / ONE_BYTE_BIT_SIZE;                                            \
+    uint16_t halfRepeatTimes = repeatTime / 2;                                                                      \
+    uint32_t dstCalcElm = 2 * sregLower / ONE_BYTE_BIT_SIZE;                                                        \
     if (halfRepeatTimes > 0) {                                                                                      \
         __VEC_SCOPE__                                                                                               \
         {                                                                                                           \
@@ -191,7 +192,7 @@ namespace CmpSelInternal {
             }                                                                                                       \
         }                                                                                                           \
     }                                                                                                               \
-    uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;                                                         \
+    uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;                                                          \
     if (tailTimes > 0) {                                                                                            \
         __ubuf__ T *src0Tail = src0 + sregLower * halfRepeatTimes * 2 * repeatParams.src0BlkStride;                 \
         __ubuf__ T *src1Tail = src1 + sregLower * halfRepeatTimes * 2 * repeatParams.src1BlkStride;                 \
@@ -214,29 +215,29 @@ namespace CmpSelInternal {
     }
 
 // level 0, mask bit mode
-#define BITS_MODE_B16_VCMPV_VF(cmpMode)                                                               \
-    __VEC_SCOPE__                                                                                     \
-    {                                                                                                 \
-        RegTensor<T> vSrc0;                                                                           \
-        RegTensor<T> vSrc1;                                                                           \
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                                \
-        uint32_t dstCalcElm = sregLower / ONE_BYTE_BIT_SIZE;                              \
-        MaskReg preg;                                                                                 \
-        DataCopy<uint32_t, Dist::DIST_US>(preg, ((__ubuf__ uint32_t *)tempBuf), 0);                   \
-        for (uint16_t i = 0; i < repeatTime; ++i) {                                                  \
-            MaskReg dstReg = CreatePredicate<T>();                                                    \
-            uint32_t dstOffsetUint32 = i * dstCalcElm;                                                \
-            DataCopy(vSrc0, src0, repeatParams.src0BlkStride, i * repeatParams.src0RepStride, preg);  \
-            DataCopy(vSrc1, src1, repeatParams.src1BlkStride, i * repeatParams.src1RepStride, preg);  \
-            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                          \
-            DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dst, dstReg, dstOffsetUint32);     \
-        }                                                                                             \
+#define BITS_MODE_B16_VCMPV_VF(cmpMode)                                                             \
+    __VEC_SCOPE__                                                                                   \
+    {                                                                                               \
+        RegTensor<T> vSrc0;                                                                         \
+        RegTensor<T> vSrc1;                                                                         \
+        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                              \
+        uint32_t dstCalcElm = sregLower / ONE_BYTE_BIT_SIZE;                                        \
+        MaskReg preg;                                                                               \
+        DataCopy<uint32_t, Dist::DIST_US>(preg, ((__ubuf__ uint32_t *)tempBuf), 0);                 \
+        for (uint16_t i = 0; i < repeatTime; ++i) {                                                 \
+            MaskReg dstReg = CreatePredicate<T>();                                                  \
+            uint32_t dstOffsetUint32 = i * dstCalcElm;                                              \
+            DataCopy(vSrc0, src0, repeatParams.src0BlkStride, i *repeatParams.src0RepStride, preg); \
+            DataCopy(vSrc1, src1, repeatParams.src1BlkStride, i *repeatParams.src1RepStride, preg); \
+            Compare<T, cmpMode>(dstReg, vSrc0, vSrc1, preg);                                        \
+            DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dst, dstReg, dstOffsetUint32);   \
+        }                                                                                           \
     }
 
 #define BITS_MODE_B32_VCMPV_VF(cmpMode)                                                                              \
     uint32_t sregLower = VECTOR_REG_WIDTH / sizeof(T);                                                               \
-    uint16_t halfRepeatTimes = repeatTime / 2;                                                                      \
-    uint32_t dstCalcElm = 2 * sregLower / ONE_BYTE_BIT_SIZE;                                             \
+    uint16_t halfRepeatTimes = repeatTime / 2;                                                                       \
+    uint32_t dstCalcElm = 2 * sregLower / ONE_BYTE_BIT_SIZE;                                                         \
     if (halfRepeatTimes > 0) {                                                                                       \
         __VEC_SCOPE__                                                                                                \
         {                                                                                                            \
@@ -263,7 +264,7 @@ namespace CmpSelInternal {
             }                                                                                                        \
         }                                                                                                            \
     }                                                                                                                \
-    uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;                                                          \
+    uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;                                                           \
     if (tailTimes > 0) {                                                                                             \
         __ubuf__ T *src0Tail = src0 + sregLower * halfRepeatTimes * 2 * repeatParams.src0BlkStride;                  \
         __ubuf__ T *src1Tail = src1 + sregLower * halfRepeatTimes * 2 * repeatParams.src1BlkStride;                  \
@@ -291,26 +292,19 @@ namespace CmpSelInternal {
 
 // Compare::Level 2
 template <typename U, typename T>
-typename std::enable_if_t<
-!std::is_same<T, uint8_t>::value &&
-!std::is_same<T, int8_t>::value &&
-!std::is_same<T, uint16_t>::value &&
-!std::is_same<T, int16_t>::value &&
-!std::is_same<T, half>::value &&
-!std::is_same<T, uint32_t>::value &&
-!std::is_same<T, int32_t>::value &&
-!std::is_same<T, float>::value
->
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint32_t count)
+typename std::enable_if_t<!std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value &&
+    !std::is_same<T, uint16_t>::value && !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value &&
+    !std::is_same<T, uint32_t>::value && !std::is_same<T, int32_t>::value && !std::is_same<T, float>::value>
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint32_t count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 template <typename U, typename T>
 typename std::enable_if_t<std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value>
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint32_t count)
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -343,13 +337,10 @@ __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
 }
 
 template <typename U, typename T>
-typename std::enable_if_t<
-std::is_same<T, uint16_t>::value ||
-std::is_same<T, int16_t>::value ||
-std::is_same<T, half>::value
->
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
+    std::is_same<T, half>::value>
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -382,13 +373,10 @@ __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
 }
 
 template <typename U, typename T>
-typename std::enable_if_t<
-std::is_same<T, uint32_t>::value ||
-std::is_same<T, int32_t>::value ||
-std::is_same<T, float>::value
->
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+    std::is_same<T, float>::value>
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -422,26 +410,19 @@ __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
 
 // Compare::Level 0 - mask count mode
 template <typename T, typename U, bool isSetMask = true>
-typename std::enable_if_t<
-!std::is_same<T, uint8_t>::value &&
-!std::is_same<T, int8_t>::value &&
-!std::is_same<T, uint16_t>::value &&
-!std::is_same<T, int16_t>::value &&
-!std::is_same<T, half>::value &&
-!std::is_same<T, uint32_t>::value &&
-!std::is_same<T, int32_t>::value &&
-!std::is_same<T, float>::value
->
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
+typename std::enable_if_t<!std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value &&
+    !std::is_same<T, uint16_t>::value && !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value &&
+    !std::is_same<T, uint32_t>::value && !std::is_same<T, int32_t>::value && !std::is_same<T, float>::value>
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 template <typename T, typename U, bool isSetMask = true>
 typename std::enable_if_t<std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value>
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -474,13 +455,10 @@ __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
 }
 
 template <typename T, typename U, bool isSetMask = true>
-typename std::enable_if_t<
-std::is_same<T, uint16_t>::value ||
-std::is_same<T, int16_t>::value ||
-std::is_same<T, half>::value
->
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
+typename std::enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
+    std::is_same<T, half>::value>
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -513,13 +491,10 @@ __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
 }
 
 template <typename T, typename U, bool isSetMask = true>
-typename std::enable_if_t<
-std::is_same<T, uint32_t>::value ||
-std::is_same<T, int32_t>::value ||
-std::is_same<T, float>::value
->
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
+typename std::enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+    std::is_same<T, float>::value>
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -553,32 +528,24 @@ __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
 
 // Compare::Level 0 - mask bit mode
 template <typename T, typename U, bool isSetMask = true>
-typename std::enable_if_t<
-!std::is_same<T, uint16_t>::value &&
-!std::is_same<T, int16_t>::value &&
-!std::is_same<T, half>::value &&
-!std::is_same<T, uint32_t>::value &&
-!std::is_same<T, int32_t>::value &&
-!std::is_same<T, float>::value
->
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint64_t mask[2], uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
+typename std::enable_if_t<!std::is_same<T, uint16_t>::value && !std::is_same<T, int16_t>::value &&
+    !std::is_same<T, half>::value && !std::is_same<T, uint32_t>::value && !std::is_same<T, int32_t>::value &&
+    !std::is_same<T, float>::value>
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint64_t mask[2], uint16_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 template <typename T, typename U, bool isSetMask = true>
-typename std::enable_if_t<
-std::is_same<T, uint16_t>::value ||
-std::is_same<T, int16_t>::value ||
-std::is_same<T, half>::value
->
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint64_t mask[2], uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
+typename std::enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
+    std::is_same<T, half>::value>
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint64_t mask[2], uint16_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
-    __ubuf__ uint8_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
-    (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf)) = ((uint64_t)mask[0]);
-    (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf + 1)) = ((uint64_t)mask[1]);
+    __ubuf__ uint8_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
+    (*(__ubuf__ uint64_t *)((__ubuf__ uint64_t *)tempBuf)) = ((uint64_t)mask[0]);
+    (*(__ubuf__ uint64_t *)((__ubuf__ uint64_t *)tempBuf + 1)) = ((uint64_t)mask[1]);
 
     event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
@@ -616,17 +583,14 @@ __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
 }
 
 template <typename T, typename U, bool isSetMask = true>
-typename std::enable_if_t<
-std::is_same<T, uint32_t>::value ||
-std::is_same<T, int32_t>::value ||
-std::is_same<T, float>::value
->
-__aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint64_t mask[2], uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
+typename std::enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+    std::is_same<T, float>::value>
+    __aicore__ inline VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode,
+    const uint64_t mask[2], uint16_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
-    __ubuf__ uint8_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
-    (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf)) = ((uint64_t)mask[0]);
-    (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf + 1)) = ((uint64_t)mask[1]);
+    __ubuf__ uint8_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
+    (*(__ubuf__ uint64_t *)((__ubuf__ uint64_t *)tempBuf)) = ((uint64_t)mask[0]);
+    (*(__ubuf__ uint64_t *)((__ubuf__ uint64_t *)tempBuf + 1)) = ((uint64_t)mask[1]);
 
     event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
@@ -669,8 +633,8 @@ __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1,
  * ************************************************************************************** */
 // CompareScalar::Level 0 - bit mode / continious mode
 template <typename T, typename U, CMPMODE cmpMode, bool isSetMask>
-__simd_vf__ inline void CompareScalarLevel0CounterMode(__ubuf__ U *dst, __ubuf__ T *src0, const T src1, const uint64_t mask, __ubuf__ uint64_t *tempBuf,
-    const UnaryRepeatParams repeatParams)
+__simd_vf__ inline void CompareScalarLevel0CounterMode(__ubuf__ U *dst, __ubuf__ T *src0, const T src1,
+    const uint64_t mask, __ubuf__ uint64_t *tempBuf, const UnaryRepeatParams repeatParams)
 {
     Reg::MaskReg maskReg;
     Reg::RegTensor<T> src0Reg;
@@ -691,8 +655,9 @@ __simd_vf__ inline void CompareScalarLevel0CounterMode(__ubuf__ U *dst, __ubuf__
         uint32_t dstOffsetUint32 = sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE;
         for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
             maskReg = Reg::UpdateMask<T>(sreg);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
-                src0Reg, src0, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(src0Reg, src0,
+                static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride),
+                maskReg);
             Reg::CompareScalar<T, cmpMode>(dstReg, src0Reg, src1, maskReg);
             Reg::DataCopy<uint32_t, Reg::PostLiteral::POST_MODE_UPDATE, Reg::MaskDist::DIST_PACK>(
                 (__ubuf__ uint32_t *&)dst, dstReg, dstOffsetUint32);
@@ -759,8 +724,9 @@ __simd_vf__ inline void CompareScalarLevel0NormalMode(__ubuf__ U *dst, __ubuf__ 
     if constexpr (sizeof(T) == 2) {
         uint32_t dstOffsetUint32 = sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE;
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
-                src0Reg, src0, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(src0Reg, src0,
+                static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride),
+                maskReg);
             Reg::CompareScalar<T, cmpMode>(dstReg, src0Reg, src1, maskReg);
             Reg::DataCopy<uint32_t, Reg::PostLiteral::POST_MODE_UPDATE, Reg::MaskDist::DIST_PACK>(
                 (__ubuf__ uint32_t *&)dst, dstReg, dstOffsetUint32);
@@ -815,33 +781,33 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src
         __ubuf__ uint64_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2);
         switch (cmpMode) {
             case CMPMODE::LT: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::LT, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::LT, isSetMask>(dst, src0, src1, mask[0], tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::GT: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::GT, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::GT, isSetMask>(dst, src0, src1, mask[0], tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::EQ: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::EQ, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::EQ, isSetMask>(dst, src0, src1, mask[0], tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::LE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::LE, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::LE, isSetMask>(dst, src0, src1, mask[0], tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::GE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::GE, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::GE, isSetMask>(dst, src0, src1, mask[0], tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::NE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::NE, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::NE, isSetMask>(dst, src0, src1, mask[0], tempBuf,
+                    repeatParams);
                 break;
             }
             default:
@@ -854,33 +820,33 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src
         }
         switch (cmpMode) {
             case CMPMODE::LT: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::LT, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::LT, true, isSetMask>(dst, src0, src1, 0, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::GT: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::GT, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::GT, true, isSetMask>(dst, src0, src1, 0, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::EQ: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::EQ, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::EQ, true, isSetMask>(dst, src0, src1, 0, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::LE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::LE, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::LE, true, isSetMask>(dst, src0, src1, 0, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::GE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::GE, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::GE, true, isSetMask>(dst, src0, src1, 0, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::NE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::NE, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::NE, true, isSetMask>(dst, src0, src1, 0, repeatTime,
+                    repeatParams);
                 break;
             }
             default:
@@ -901,33 +867,33 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src
         __ubuf__ uint64_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2);
         switch (cmpMode) {
             case CMPMODE::LT: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::LT, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::LT, isSetMask>(dst, src0, src1, mask, tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::GT: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::GT, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::GT, isSetMask>(dst, src0, src1, mask, tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::EQ: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::EQ, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::EQ, isSetMask>(dst, src0, src1, mask, tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::LE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::LE, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::LE, isSetMask>(dst, src0, src1, mask, tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::GE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::GE, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::GE, isSetMask>(dst, src0, src1, mask, tempBuf,
+                    repeatParams);
                 break;
             }
             case CMPMODE::NE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::NE, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
+                CompareScalarLevel0CounterMode<T, U, CMPMODE::NE, isSetMask>(dst, src0, src1, mask, tempBuf,
+                    repeatParams);
                 break;
             }
             default:
@@ -937,33 +903,33 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src
     } else {
         switch (cmpMode) {
             case CMPMODE::LT: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::LT, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::LT, false, isSetMask>(dst, src0, src1, mask, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::GT: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::GT, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::GT, false, isSetMask>(dst, src0, src1, mask, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::EQ: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::EQ, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::EQ, false, isSetMask>(dst, src0, src1, mask, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::LE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::LE, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::LE, false, isSetMask>(dst, src0, src1, mask, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::GE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::GE, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::GE, false, isSetMask>(dst, src0, src1, mask, repeatTime,
+                    repeatParams);
                 break;
             }
             case CMPMODE::NE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::NE, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
+                CompareScalarLevel0NormalMode<T, U, CMPMODE::NE, false, isSetMask>(dst, src0, src1, mask, repeatTime,
+                    repeatParams);
                 break;
             }
             default:
@@ -973,51 +939,51 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src
 }
 
 // CompareScalar::Level 2
-#define COUNTER_MODE_B8_VCMPVS_VF(cmpMode)                                                        \
-    __VEC_SCOPE__                                                                                 \
-    {                                                                                             \
-        RegTensor<T> vSrc0;                                                                       \
-        uint32_t sreg = (uint32_t)count;                                                       \
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                            \
+#define COUNTER_MODE_B8_VCMPVS_VF(cmpMode)                                                    \
+    __VEC_SCOPE__                                                                             \
+    {                                                                                         \
+        RegTensor<T> vSrc0;                                                                   \
+        uint32_t sreg = (uint32_t)count;                                                      \
+        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                        \
         uint16_t repeatTime = CeilDivision(count, sregLower);                                 \
-        MaskReg preg;                                                                             \
-        MaskReg dstReg;                                                                           \
-        AddrReg dstOffset;                                                                        \
-        for (uint16_t i = 0; i < repeatTime; ++i) {                                              \
-            preg = CreatePredicate<T>(sreg);                                                      \
-            dstReg = CreatePredicate<T>();                                                        \
-            dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);              \
-            DataCopy(vSrc0, src0, i * sregLower);                                                 \
-            CompareScalar<T, cmpMode>(dstReg, vSrc0, src1Scalar, preg);                           \
-            DataCopy<uint32_t, Dist::DIST_NORM>((__ubuf__ uint32_t *)dst, dstReg, dstOffset);     \
-        }                                                                                         \
+        MaskReg preg;                                                                         \
+        MaskReg dstReg;                                                                       \
+        AddrReg dstOffset;                                                                    \
+        for (uint16_t i = 0; i < repeatTime; ++i) {                                           \
+            preg = CreatePredicate<T>(sreg);                                                  \
+            dstReg = CreatePredicate<T>();                                                    \
+            dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);          \
+            DataCopy(vSrc0, src0, i *sregLower);                                              \
+            CompareScalar<T, cmpMode>(dstReg, vSrc0, src1Scalar, preg);                       \
+            DataCopy<uint32_t, Dist::DIST_NORM>((__ubuf__ uint32_t *)dst, dstReg, dstOffset); \
+        }                                                                                     \
     }
 
-#define COUNTER_MODE_B16_VCMPVS_VF(cmpMode)                                                     \
-    __VEC_SCOPE__                                                                               \
-    {                                                                                           \
-        RegTensor<T> vSrc0;                                                                     \
-        uint32_t sreg = (uint32_t)count;                                                     \
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                          \
+#define COUNTER_MODE_B16_VCMPVS_VF(cmpMode)                                                 \
+    __VEC_SCOPE__                                                                           \
+    {                                                                                       \
+        RegTensor<T> vSrc0;                                                                 \
+        uint32_t sreg = (uint32_t)count;                                                    \
+        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));                      \
         uint16_t repeatTime = CeilDivision(count, sregLower);                               \
-        MaskReg preg;                                                                           \
-        MaskReg dstReg;                                                                         \
-        AddrReg dstOffset;                                                                      \
-        for (uint16_t i = 0; i < repeatTime; ++i) {                                            \
-            preg = CreatePredicate<T>(sreg);                                                    \
-            dstReg = CreatePredicate<T>();                                                      \
-            dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);            \
-            DataCopy(vSrc0, src0, i * sregLower);                                               \
-            CompareScalar<T, cmpMode>(dstReg, vSrc0, src1Scalar, preg);                         \
-            DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dst, dstReg, dstOffset);     \
-        }                                                                                       \
+        MaskReg preg;                                                                       \
+        MaskReg dstReg;                                                                     \
+        AddrReg dstOffset;                                                                  \
+        for (uint16_t i = 0; i < repeatTime; ++i) {                                         \
+            preg = CreatePredicate<T>(sreg);                                                \
+            dstReg = CreatePredicate<T>();                                                  \
+            dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);        \
+            DataCopy(vSrc0, src0, i *sregLower);                                            \
+            CompareScalar<T, cmpMode>(dstReg, vSrc0, src1Scalar, preg);                     \
+            DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dst, dstReg, dstOffset); \
+        }                                                                                   \
     }
 
 #define COUNTER_MODE_B32_VCMPVS_VF(cmpMode)                                                                        \
-    uint32_t sreg = (uint32_t)count;                                                                            \
+    uint32_t sreg = (uint32_t)count;                                                                               \
     uint32_t sregLower = VECTOR_REG_WIDTH / sizeof(T);                                                             \
-    uint16_t repeatTime = CeilDivision(count, sregLower);                                                      \
-    uint16_t halfRepeatTimes = repeatTime / 2;                                                                    \
+    uint16_t repeatTime = CeilDivision(count, sregLower);                                                          \
+    uint16_t halfRepeatTimes = repeatTime / 2;                                                                     \
     if (halfRepeatTimes > 0) {                                                                                     \
         __VEC_SCOPE__                                                                                              \
         {                                                                                                          \
@@ -1038,7 +1004,7 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src
             }                                                                                                      \
         }                                                                                                          \
     }                                                                                                              \
-    uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;                                                        \
+    uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;                                                         \
     if (tailTimes > 0) {                                                                                           \
         __ubuf__ T *src0Tail = src0 + sregLower * halfRepeatTimes * 2;                                             \
         __ubuf__ U *dstTail = (__ubuf__ U *)dst + halfRepeatTimes * sregLower * 2 / sizeof(U) / ONE_BYTE_BIT_SIZE; \
@@ -1050,7 +1016,7 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src
                 MaskReg dstReg1 = CreatePredicate<T>();                                                            \
                 AddrReg dstOffset = CreateAddrReg<U>(sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE);                   \
                 MaskReg preg = CreatePredicate<T>(sreg);                                                           \
-                DataCopy(vSrc0, src0Tail, i * sregLower);                                                          \
+                DataCopy(vSrc0, src0Tail, i *sregLower);                                                           \
                 CompareScalar<T, cmpMode>(dstReg0, vSrc0, src1Scalar, preg);                                       \
                 PredicatePack(dstReg1, dstReg0);                                                                   \
                 DataCopy<uint32_t, Dist::DIST_PK>((__ubuf__ uint32_t *)dstTail, dstReg1, dstOffset);               \
@@ -1060,26 +1026,19 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src
 
 // CompareScalar::Level 2
 template <typename U, typename T>
-typename std::enable_if_t<
-!std::is_same<T, uint8_t>::value &&
-!std::is_same<T, int8_t>::value &&
-!std::is_same<T, uint16_t>::value &&
-!std::is_same<T, int16_t>::value &&
-!std::is_same<T, half>::value &&
-!std::is_same<T, uint32_t>::value &&
-!std::is_same<T, int32_t>::value &&
-!std::is_same<T, float>::value
->
-__aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar,
-    CMPMODE cmpMode, const uint32_t count)
+typename std::enable_if_t<!std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value &&
+    !std::is_same<T, uint16_t>::value && !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value &&
+    !std::is_same<T, uint32_t>::value && !std::is_same<T, int32_t>::value && !std::is_same<T, float>::value>
+    __aicore__ inline VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src1Scalar, CMPMODE cmpMode,
+    const uint32_t count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 template <typename U, typename T>
 typename std::enable_if_t<std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value>
-__aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar,
-    CMPMODE cmpMode, const uint32_t count)
+    __aicore__ inline VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src1Scalar, CMPMODE cmpMode,
+    const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -1112,13 +1071,10 @@ __aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scal
 }
 
 template <typename U, typename T>
-typename std::enable_if_t<
-std::is_same<T, uint16_t>::value ||
-std::is_same<T, int16_t>::value ||
-std::is_same<T, half>::value
->
-__aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar,
-    CMPMODE cmpMode, const uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
+    std::is_same<T, half>::value>
+    __aicore__ inline VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src1Scalar, CMPMODE cmpMode,
+    const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -1151,13 +1107,10 @@ __aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scal
 }
 
 template <typename U, typename T>
-typename std::enable_if_t<
-std::is_same<T, uint32_t>::value ||
-std::is_same<T, int32_t>::value ||
-std::is_same<T, float>::value
->
-__aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar,
-    CMPMODE cmpMode, const uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+    std::is_same<T, float>::value>
+    __aicore__ inline VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, const T src1Scalar, CMPMODE cmpMode,
+    const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -1194,29 +1147,18 @@ __aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scal
 //  * ************************************************************************************** */
 // Level 2, select mode: 1
 template <typename T, typename U>
-typename std::enable_if_t<
-!std::is_same<T, uint8_t>::value &&
-!std::is_same<T, int8_t>::value &&
-!std::is_same<T, uint16_t>::value &&
-!std::is_same<T, int16_t>::value &&
-!std::is_same<T, half>::value &&
-!std::is_same<T, uint32_t>::value &&
-!std::is_same<T, int32_t>::value &&
-!std::is_same<T, float>::value
->
-__aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
-    T src1, SELMODE selMode, uint32_t count)
+typename std::enable_if_t<!std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value &&
+    !std::is_same<T, uint16_t>::value && !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value &&
+    !std::is_same<T, uint32_t>::value && !std::is_same<T, int32_t>::value && !std::is_same<T, float>::value>
+    __aicore__ inline VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, T src1, SELMODE selMode,
+    uint32_t count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 template <typename T, typename U>
-typename std::enable_if_t<
-std::is_same<T, uint8_t>::value ||
-std::is_same<T, int8_t>::value
->
-__aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
-    T src1, SELMODE selMode, uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value> __aicore__ inline VselImpl(
+    __ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, T src1, SELMODE selMode, uint32_t count)
 {
     __VEC_SCOPE__
     {
@@ -1239,13 +1181,10 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
 }
 
 template <typename T, typename U>
-typename std::enable_if_t<
-std::is_same<T, uint16_t>::value ||
-std::is_same<T, int16_t>::value ||
-std::is_same<T, half>::value
->
-__aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
-    T src1, SELMODE selMode, uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
+    std::is_same<T, half>::value>
+    __aicore__ inline VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, T src1, SELMODE selMode,
+    uint32_t count)
 {
     __VEC_SCOPE__
     {
@@ -1268,13 +1207,10 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
 }
 
 template <typename T, typename U>
-typename std::enable_if_t<
-std::is_same<T, uint32_t>::value ||
-std::is_same<T, int32_t>::value ||
-std::is_same<T, float>::value
->
-__aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
-    T src1, SELMODE selMode, uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+    std::is_same<T, float>::value>
+    __aicore__ inline VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, T src1, SELMODE selMode,
+    uint32_t count)
 {
     uint32_t sreg = (uint32_t)count;
     uint32_t sregLower = VECTOR_REG_WIDTH / sizeof(T);
@@ -1309,9 +1245,9 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
 
     uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;
     if (tailTimes > 0) {
-        __ubuf__ T* src0Tail = src0 + halfRepeatTimes * sregLower * 2;
-        __ubuf__ U* selTail = (__ubuf__ U *)sel + halfRepeatTimes * 2 * sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE;
-        __ubuf__ T* dstTail = dst + halfRepeatTimes * sregLower * 2;
+        __ubuf__ T *src0Tail = src0 + halfRepeatTimes * sregLower * 2;
+        __ubuf__ U *selTail = (__ubuf__ U *)sel + halfRepeatTimes * 2 * sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE;
+        __ubuf__ T *dstTail = dst + halfRepeatTimes * sregLower * 2;
         __VEC_SCOPE__
         {
             RegTensor<T> vSrc1;
@@ -1335,29 +1271,18 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
 
 // Level 2, select mode: 0/2
 template <typename T, typename U>
-typename std::enable_if_t<
-!std::is_same<T, uint8_t>::value &&
-!std::is_same<T, int8_t>::value &&
-!std::is_same<T, uint16_t>::value &&
-!std::is_same<T, int16_t>::value &&
-!std::is_same<T, half>::value &&
-!std::is_same<T, uint32_t>::value &&
-!std::is_same<T, int32_t>::value &&
-!std::is_same<T, float>::value
->
-__aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
-    __ubuf__ T* src1, SELMODE selMode, uint32_t count)
+typename std::enable_if_t<!std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value &&
+    !std::is_same<T, uint16_t>::value && !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value &&
+    !std::is_same<T, uint32_t>::value && !std::is_same<T, int32_t>::value && !std::is_same<T, float>::value>
+    __aicore__ inline VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, __ubuf__ T *src1, SELMODE selMode,
+    uint32_t count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 template <typename T, typename U>
-typename std::enable_if_t<
-std::is_same<T, uint8_t>::value ||
-std::is_same<T, int8_t>::value
->
-__aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
-    __ubuf__ T* src1, SELMODE selMode, uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value> __aicore__ inline VselImpl(
+    __ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, __ubuf__ T *src1, SELMODE selMode, uint32_t count)
 {
     __VEC_SCOPE__
     {
@@ -1369,8 +1294,7 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
         uint32_t selMaskOffset;
         if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
             selMaskOffset = 0;
-        }
-        else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
+        } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
             selMaskOffset = sregLower / ONE_BYTE_BIT_SIZE;
         }
         for (uint16_t i = 0; i < repeatTime; ++i) {
@@ -1386,13 +1310,10 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
 }
 
 template <typename T, typename U>
-typename std::enable_if_t<
-std::is_same<T, uint16_t>::value ||
-std::is_same<T, int16_t>::value ||
-std::is_same<T, half>::value
->
-__aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
-    __ubuf__ T* src1, SELMODE selMode, uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
+    std::is_same<T, half>::value>
+    __aicore__ inline VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, __ubuf__ T *src1, SELMODE selMode,
+    uint32_t count)
 {
     __VEC_SCOPE__
     {
@@ -1404,8 +1325,7 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
         uint32_t selMaskOffset;
         if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
             selMaskOffset = 0;
-        }
-        else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
+        } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
             selMaskOffset = sregLower / ONE_BYTE_BIT_SIZE;
         }
         for (uint16_t i = 0; i < repeatTime; ++i) {
@@ -1421,13 +1341,10 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
 }
 
 template <typename T, typename U>
-typename std::enable_if_t<
-std::is_same<T, uint32_t>::value ||
-std::is_same<T, int32_t>::value ||
-std::is_same<T, float>::value
->
-__aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
-    __ubuf__ T* src1, SELMODE selMode, uint32_t count)
+typename std::enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+    std::is_same<T, float>::value>
+    __aicore__ inline VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, __ubuf__ T *src1, SELMODE selMode,
+    uint32_t count)
 {
     uint32_t sreg = (uint32_t)count;
     uint32_t sregLower = VECTOR_REG_WIDTH / sizeof(T);
@@ -1437,8 +1354,7 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
         uint32_t selMaskOffset;
         if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
             selMaskOffset = 0;
-        }
-        else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
+        } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
             selMaskOffset = 2 * sregLower / ONE_BYTE_BIT_SIZE;
         }
         __VEC_SCOPE__
@@ -1461,8 +1377,7 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
                 Select<T>(vDst0, vSrc00, vSrc10, preg2);
                 if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
                     Select<T>(vDst1, vSrc01, vSrc11, preg2); // SELMODE::VSEL_CMPMASK_SPR使用preg2,固定使用前64bit
-                }
-                else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
+                } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
                     Select<T>(vDst1, vSrc01, vSrc11, preg3); // SELMODE::VSEL_TENSOR_TENSOR_MODE使用preg3,连续消耗
                 }
                 DataCopy(dst, vDst0, 2 * i * sregLower, dstReg);
@@ -1473,17 +1388,16 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
 
     uint16_t tailTimes = repeatTime - halfRepeatTimes * 2;
     if (tailTimes > 0) {
-        __ubuf__ T* src0Tail = src0 + halfRepeatTimes * sregLower * 2;
-        __ubuf__ T* src1Tail = src1 + halfRepeatTimes * sregLower * 2;
+        __ubuf__ T *src0Tail = src0 + halfRepeatTimes * sregLower * 2;
+        __ubuf__ T *src1Tail = src1 + halfRepeatTimes * sregLower * 2;
         uint16_t selMaskOffset;
         if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
             selMaskOffset = 0;
-        }
-        else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
+        } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
             selMaskOffset = halfRepeatTimes * 2 * sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE; // 单位为元素个数
         }
-        __ubuf__ U* selTail = (__ubuf__ U *)sel + selMaskOffset;
-        __ubuf__ T* dstTail = dst + halfRepeatTimes * sregLower * 2;
+        __ubuf__ U *selTail = (__ubuf__ U *)sel + selMaskOffset;
+        __ubuf__ T *dstTail = dst + halfRepeatTimes * sregLower * 2;
         __VEC_SCOPE__
         {
             for (uint16_t i = 0; i < tailTimes; ++i) {
@@ -1505,8 +1419,8 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
 }
 
 template <typename T, bool isCounterMode>
-__aicore__ inline void SelectWithoutMaskMode0ImplVF(
-    __ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, __ubuf__ uint64_t *tempBuf, int32_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void SelectWithoutMaskMode0ImplVF(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
+    __ubuf__ uint64_t *tempBuf, int32_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     Reg::RegTensor<T> srcReg0, srcReg1, dstReg;
     Reg::MaskReg maskReg, selMask;
@@ -1536,19 +1450,19 @@ __aicore__ inline void SelectWithoutMaskMode0ImplVF(
         if constexpr (isCounterMode) {
             maskReg = Reg::UpdateMask<T>(sreg);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcReg0,
-            src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcReg1,
-            src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcReg0, src0 + i * blockElm * repeatParams.src0RepStride,
+            static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcReg1, src1 + i * blockElm * repeatParams.src1RepStride,
+            static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
         Reg::Select(dstReg, srcReg0, srcReg1, selMask);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + i * blockElm * repeatParams.dstRepStride,
-            dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + i * blockElm * repeatParams.dstRepStride, dstReg,
+            static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
     }
 }
 
 template <typename T, bool isCounterMode>
-__aicore__ inline void SelectWithoutMaskMode2ImplVF(
-    __ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, __ubuf__ uint64_t *tempBuf, uint64_t selAddr, int32_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void SelectWithoutMaskMode2ImplVF(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
+    __ubuf__ uint64_t *tempBuf, uint64_t selAddr, int32_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     Reg::RegTensor<T> srcReg0, srcReg1, dstReg;
     Reg::MaskReg maskReg, selMask;
@@ -1579,19 +1493,19 @@ __aicore__ inline void SelectWithoutMaskMode2ImplVF(
             Reg::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t *)selAddr + i * selOffset);
             Reg::MaskGenWithRegTensor<uint32_t, 0>(selMask, (Reg::RegTensor<uint32_t> &)selReg);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            srcReg0, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            srcReg1, src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcReg0, src0 + i * blockElm * repeatParams.src0RepStride,
+            static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcReg1, src1 + i * blockElm * repeatParams.src1RepStride,
+            static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
         Reg::Select(dstReg, srcReg0, srcReg1, selMask);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + i * blockElm * repeatParams.dstRepStride, dstReg,
+            static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
     }
 }
 
 template <typename T, SELMODE selMode>
-__aicore__ inline void SelectCal(
-    __ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, int32_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void SelectCal(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, int32_t repeatTime,
+    const BinaryRepeatParams &repeatParams)
 {
     static_assert(SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "current data type is not supported!");
@@ -1615,8 +1529,7 @@ __aicore__ inline void SelectCal(
         } else {
             VF_CALL<SelectWithoutMaskMode0ImplVF<T, false>>(dst, src0, src1, tempBuf, repeatTime, repeatParams);
         }
-    }
-    else if constexpr (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
+    } else if constexpr (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
         uint64_t selAddr = Internal::g_cmpMaskLow;
         event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
@@ -1624,15 +1537,16 @@ __aicore__ inline void SelectCal(
         if (isCounterMode) {
             VF_CALL<SelectWithoutMaskMode2ImplVF<T, true>>(dst, src0, src1, tempBuf, selAddr, repeatTime, repeatParams);
         } else {
-            VF_CALL<SelectWithoutMaskMode2ImplVF<T, false>>(dst, src0, src1, tempBuf, selAddr, repeatTime, repeatParams);
+            VF_CALL<SelectWithoutMaskMode2ImplVF<T, false>>(dst, src0, src1, tempBuf, selAddr, repeatTime,
+                repeatParams);
         }
     }
     AscendCUtils::FreeTemporaryBuffer<uint64_t>(tempBuf);
 }
 
 template <typename T, typename U, bool isCounterMode>
-__simd_callee__ inline void SelectWithoutMaskMode1ImplVF(
-    __ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, T scalar, __ubuf__ uint64_t *tempBuf, int32_t repeatTime, const BinaryRepeatParams &repeatParams)
+__simd_callee__ inline void SelectWithoutMaskMode1ImplVF(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, T scalar,
+    __ubuf__ uint64_t *tempBuf, int32_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     Reg::RegTensor<T> srcReg0, srcReg1, dstReg;
     Reg::MaskReg maskReg, selMask;
@@ -1664,23 +1578,23 @@ __simd_callee__ inline void SelectWithoutMaskMode1ImplVF(
             Reg::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
             Reg::MaskGenWithRegTensor<uint32_t, 0>(selMask, (Reg::RegTensor<uint32_t> &)selReg);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            srcReg0, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcReg0, src0 + i * blockElm * repeatParams.src0RepStride,
+            static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
         Reg::Select(dstReg, srcReg0, srcReg1, selMask);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + i * blockElm * repeatParams.dstRepStride, dstReg,
+            static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
     }
 }
 
 template <typename T, typename U>
-__aicore__ inline void SelectCal(
-    __ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, int32_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void SelectCal(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, int32_t repeatTime,
+    const BinaryRepeatParams &repeatParams)
 {
     static_assert(SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "current data type is not supported!");
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
-    T scalar = *reinterpret_cast<T*>(&Internal::g_cmpMaskLow);
+    T scalar = *reinterpret_cast<T *>(&Internal::g_cmpMaskLow);
     event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
@@ -1696,8 +1610,9 @@ __aicore__ inline void SelectCal(
 // ============ select mode: 0/2 ============
 // ================Level2====================
 template <typename T, typename U, bool isBitMap, bool isCounterMode>
-__simd_callee__ inline void SelectMode0Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1,
-    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams) {
+__simd_callee__ inline void SelectMode0Level0(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, __ubuf__ T *src1,
+    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+{
     constexpr uint32_t blockElm = GetDataBlockSizeInBytes() / sizeof(T);
     constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
     Reg::RegTensor<T> src0Reg, src1Reg, dstReg;
@@ -1724,19 +1639,20 @@ __simd_callee__ inline void SelectMode0Level0(__ubuf__ T* dst, __ubuf__ U* sel, 
         if constexpr (isCounterMode) {
             maskReg = Reg::UpdateMask<T>(sreg);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            src0Reg, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            src1Reg, src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src0Reg, src0 + i * blockElm * repeatParams.src0RepStride,
+            static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src1Reg, src1 + i * blockElm * repeatParams.src1RepStride,
+            static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
         Reg::Select(dstReg, src0Reg, src1Reg, selMask);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + i * blockElm * repeatParams.dstRepStride, dstReg,
+            static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
     }
 }
 
 template <typename T, typename U, bool isBitMap, bool isCounterMode>
-__simd_callee__ inline void SelectMode2Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1,
-    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams) {
+__simd_callee__ inline void SelectMode2Level0(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, __ubuf__ T *src1,
+    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+{
     constexpr uint32_t blockElm = GetDataBlockSizeInBytes() / sizeof(T);
     constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
     uint16_t newRepeatTimes = repeatTime;
@@ -1757,7 +1673,7 @@ __simd_callee__ inline void SelectMode2Level0(__ubuf__ T* dst, __ubuf__ U* sel, 
                 maskReg = Reg::UpdateMask<T>(sreg);
             }
         }
-        
+
         Reg::MaskReg selMask0, selMask1, tmpMask0;
         Reg::MaskReg tmpMask1 = Reg::CreateMask<uint8_t, Reg::MaskPattern::ALL>();
         uint16_t tail = newRepeatTimes % unRollConstant;
@@ -1768,23 +1684,29 @@ __simd_callee__ inline void SelectMode2Level0(__ubuf__ T* dst, __ubuf__ U* sel, 
             }
             Reg::DataCopy<uint8_t, Reg::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
             Reg::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src0Reg, src0 + i * unRollConstant * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src1Reg, src1 + i * unRollConstant * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src0Reg,
+                src0 + i * unRollConstant * blockElm * repeatParams.src0RepStride,
+                static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src1Reg,
+                src1 + i * unRollConstant * blockElm * repeatParams.src1RepStride,
+                static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             Reg::Select(dst0Reg, src0Reg, src1Reg, selMask0);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst +
+                i * unRollConstant * blockElm * repeatParams.dstRepStride,
+                dst0Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             if constexpr (isCounterMode) {
                 maskReg = Reg::UpdateMask<T>(sreg);
             }
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src2Reg, src0 + (i * unRollConstant + 1) * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src3Reg, src1 + (i * unRollConstant + 1) * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src2Reg,
+                src0 + (i * unRollConstant + 1) * blockElm * repeatParams.src0RepStride,
+                static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src3Reg,
+                src1 + (i * unRollConstant + 1) * blockElm * repeatParams.src1RepStride,
+                static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             Reg::Select(dst1Reg, src2Reg, src3Reg, selMask1);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst +
+                (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride,
+                dst1Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
         Reg::RegTensor<T> src4Reg, src5Reg, dst2Reg;
         Reg::MaskReg selMask2;
@@ -1799,13 +1721,13 @@ __simd_callee__ inline void SelectMode2Level0(__ubuf__ T* dst, __ubuf__ U* sel, 
             }
             Reg::DataCopy<uint8_t, Reg::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
             Reg::MaskUnPack(selMask2, selMask2);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src4Reg, src0 + offset0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src5Reg, src1 + offset1, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src4Reg, src0 + offset0,
+                static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src5Reg, src1 + offset1,
+                static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             Reg::Select(dst2Reg, src4Reg, src5Reg, selMask2);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dst + offset2, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + offset2, dst2Reg,
+                static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     } else {
         constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
@@ -1828,20 +1750,22 @@ __simd_callee__ inline void SelectMode2Level0(__ubuf__ T* dst, __ubuf__ U* sel, 
                 maskReg = Reg::UpdateMask<T>(sreg);
             }
             Reg::DataCopy<uint8_t, Reg::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src0Reg, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src1Reg, src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src0Reg,
+                src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride),
+                maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src1Reg,
+                src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride),
+                maskReg);
             Reg::Select(dstReg, src0Reg, src1Reg, selMask);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + i * blockElm * repeatParams.dstRepStride, dstReg,
+                static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     }
 }
 
 template <typename T, typename U>
-__aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1,
-    SELMODE selMode, const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, __ubuf__ T *src1, SELMODE selMode,
+    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     static_assert(SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "current data type is not supported!");
@@ -1863,8 +1787,8 @@ __aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* sr
 }
 
 template <typename T, typename U>
-__aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1,
-    SELMODE selMode, const uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, __ubuf__ T *src1, SELMODE selMode,
+    const uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     static_assert(SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "current data type is not supported!");
@@ -1889,15 +1813,16 @@ __aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* sr
 // ================Level0====================
 
 template <typename T, typename U, bool isBitMap, bool isCounterMode>
-__simd_callee__ inline void SelectMode1Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1,
-    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams) {
+__simd_callee__ inline void SelectMode1Level0(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, T src1,
+    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+{
     constexpr uint32_t blockElm = GetDataBlockSizeInBytes() / sizeof(T);
     constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
     uint16_t newRepeatTimes = repeatTime;
     uint32_t sreg;
     if constexpr (sizeof(T) == 2) {
         Reg::RegTensor<T> src0Reg, src1Reg, dstReg;
-        Reg::Duplicate(src1Reg, (const T &) src1);
+        Reg::Duplicate(src1Reg, (const T &)src1);
         Reg::MaskReg maskReg;
         constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
         if constexpr (isCounterMode) {
@@ -1917,11 +1842,12 @@ __simd_callee__ inline void SelectMode1Level0(__ubuf__ T* dst, __ubuf__ U* sel, 
                 maskReg = Reg::UpdateMask<T>(sreg);
             }
             Reg::DataCopy<uint8_t, Reg::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src0Reg, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src0Reg,
+                src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride),
+                maskReg);
             Reg::Select(dstReg, src0Reg, src1Reg, selMask);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + i * blockElm * repeatParams.dstRepStride, dstReg,
+                static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     } else {
         Reg::RegTensor<T> scalarReg, src0Reg, src1Reg, dst0Reg, dst1Reg;
@@ -1943,26 +1869,30 @@ __simd_callee__ inline void SelectMode1Level0(__ubuf__ T* dst, __ubuf__ U* sel, 
         Reg::MaskReg tmpMask1 = Reg::CreateMask<uint8_t, Reg::MaskPattern::ALL>();
         uint16_t tail = newRepeatTimes % unRollConstant;
         newRepeatTimes = newRepeatTimes / unRollConstant;
-        Reg::Duplicate(scalarReg, (const T &) src1);
+        Reg::Duplicate(scalarReg, (const T &)src1);
         for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
             if constexpr (isCounterMode) {
                 maskReg = Reg::UpdateMask<T>(sreg);
             }
             Reg::DataCopy<uint8_t, Reg::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
             Reg::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src0Reg, src0 + i * unRollConstant * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src0Reg,
+                src0 + i * unRollConstant * blockElm * repeatParams.src0RepStride,
+                static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
             Reg::Select(dst0Reg, src0Reg, scalarReg, selMask0);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst +
+                i * unRollConstant * blockElm * repeatParams.dstRepStride,
+                dst0Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             if constexpr (isCounterMode) {
                 maskReg = Reg::UpdateMask<T>(sreg);
             }
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src1Reg, src0 + (i * unRollConstant + 1) * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src1Reg,
+                src0 + (i * unRollConstant + 1) * blockElm * repeatParams.src0RepStride,
+                static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
             Reg::Select(dst1Reg, src1Reg, scalarReg, selMask1);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst +
+                (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride,
+                dst1Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
         Reg::RegTensor<T> src2Reg, dst2Reg;
         Reg::MaskReg selMask2;
@@ -1976,18 +1906,18 @@ __simd_callee__ inline void SelectMode1Level0(__ubuf__ T* dst, __ubuf__ U* sel, 
             }
             Reg::DataCopy<uint8_t, Reg::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
             Reg::MaskUnPack(selMask2, selMask2);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                src2Reg, src0 + offset0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(src2Reg, src0 + offset0,
+                static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
             Reg::Select(dst2Reg, src2Reg, scalarReg, selMask2);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dst + offset1, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + offset1, dst2Reg,
+                static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     }
 }
 
 template <typename T, typename U>
-__aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1,
-    SELMODE selMode, const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, T src1, SELMODE selMode,
+    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     static_assert(SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "current data type is not supported!");
@@ -2001,8 +1931,8 @@ __aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* sr
 }
 
 template <typename T, typename U>
-__aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1,
-    SELMODE selMode, const uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void VselImpl(__ubuf__ T *dst, __ubuf__ U *sel, __ubuf__ T *src0, T src1, SELMODE selMode,
+    const uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     static_assert(SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "current data type is not supported!");
@@ -2016,8 +1946,7 @@ __aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* sr
     }
 }
 
-template <typename T>
-__aicore__ inline void GetCmpMaskImpl(__ubuf__ T* dst)
+template <typename T> __aicore__ inline void GetCmpMaskImpl(__ubuf__ T *dst)
 {
     pipe_barrier(PIPE_ALL);
     ((__ubuf__ uint64_t *)dst)[0] = Internal::g_cmpMaskLow;
@@ -2025,8 +1954,7 @@ __aicore__ inline void GetCmpMaskImpl(__ubuf__ T* dst)
     pipe_barrier(PIPE_ALL);
 }
 
-template <typename T>
-__aicore__ inline void SetCmpMaskImpl(__ubuf__ T* src)
+template <typename T> __aicore__ inline void SetCmpMaskImpl(__ubuf__ T *src)
 {
     pipe_barrier(PIPE_ALL);
     Internal::g_cmpMaskLow = reinterpret_cast<uint64_t>(((__ubuf__ uint64_t *)src)[0]);
@@ -2035,19 +1963,18 @@ __aicore__ inline void SetCmpMaskImpl(__ubuf__ T* src)
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void VcmpImpl(__ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint64_t mask[2], const BinaryRepeatParams& repeatParams)
+__aicore__ inline void VcmpImpl(__ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode, const uint64_t mask[2],
+    const BinaryRepeatParams &repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Vcmp is not supported!"); });
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void VcmpImpl(__ubuf__ T* src0, __ubuf__ T* src1,
-    CMPMODE cmpMode, const uint64_t mask, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void VcmpImpl(__ubuf__ T *src0, __ubuf__ T *src1, CMPMODE cmpMode, const uint64_t mask,
+    const BinaryRepeatParams &repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Vcmp is not supported!"); });
 }
-
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__)

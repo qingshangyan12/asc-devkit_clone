@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -31,29 +31,24 @@
 #include "softmax_common/softmax_common_arithmetic.h"
 
 namespace AscendC {
-
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
-template <typename T>
-constexpr __aicore__ inline void SoftmaxApiSupportedTypeCheck()
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
+template <typename T> constexpr __aicore__ inline void SoftmaxApiSupportedTypeCheck()
 {
-    static_assert(
-        std::is_same<T, half>::value || std::is_same<T, float>::value,
+    static_assert(std::is_same<T, half>::value || std::is_same<T, float>::value,
         "This Related Api of Softmax only support half/float input dtype");
 }
 #endif
 
-__aicore__ inline void CreateSpecialFormatMask(
-    uint64_t& lowMask, const uint32_t& maskLen, const uint32_t& nzBlockCount,
-    const uint32_t& totalLen = SOFTMAX_SHAPE_NZ_BASIC_COUNT)
+__aicore__ inline void CreateSpecialFormatMask(uint64_t &lowMask, const uint32_t &maskLen, const uint32_t &nzBlockCount,
+    const uint32_t &totalLen = SOFTMAX_SHAPE_NZ_BASIC_COUNT)
 {
     // create mask in "01111111 11111111 01111111 11111111" format
     // maskLen is 1-15
     ASCENDC_ASSERT((maskLen <= totalLen), { KERNEL_LOG(KERNEL_ERROR, "maskLen must be less than totalLen"); });
     if (totalLen == SOFTMAX_SHAPE_NZ_BASIC_COUNT) {
-        ASCENDC_ASSERT((nzBlockCount <= B32_BYTE_SIZE), {
-            KERNEL_LOG(KERNEL_ERROR, "nzBlockCount must be less than 4 when totalLen is 16");
-        });
+        ASCENDC_ASSERT((nzBlockCount <= B32_BYTE_SIZE),
+                       { KERNEL_LOG(KERNEL_ERROR, "nzBlockCount must be less than 4 when totalLen is 16"); });
     }
     if (totalLen >= B32_DATA_NUM_PER_BLOCK) {
         ASCENDC_ASSERT((nzBlockCount <= B64_BYTE_SIZE), {
@@ -71,12 +66,10 @@ __aicore__ inline void CreateSpecialFormatMask(
     }
 }
 
-__aicore__ inline void BinaryComputeWithSpecialMask(
-    const LocalTensor<float>& dst, const LocalTensor<float>& src0, const LocalTensor<float>& src1, uint64_t mask[2],
-    const uint32_t& lastBlockMaskLen, const uint32_t& splitCount,
-    void (*func)(
-        const LocalTensor<float>&, const LocalTensor<float>&, const LocalTensor<float>&, uint64_t*, const uint8_t,
-        const BinaryRepeatParams&))
+__aicore__ inline void BinaryComputeWithSpecialMask(const LocalTensor<float> &dst, const LocalTensor<float> &src0,
+    const LocalTensor<float> &src1, uint64_t mask[2], const uint32_t &lastBlockMaskLen, const uint32_t &splitCount,
+    void (*func)(const LocalTensor<float> &, const LocalTensor<float> &, const LocalTensor<float> &, uint64_t *,
+    const uint8_t, const BinaryRepeatParams &))
 {
     uint32_t repeat = splitCount / FLOAT_REPEAT_SIZE;
     uint32_t tail = splitCount % FLOAT_REPEAT_SIZE;
@@ -89,30 +82,26 @@ __aicore__ inline void BinaryComputeWithSpecialMask(
     uint32_t src1Offset = 0;
 
     for (uint32_t i = 0; i < repeatRange; i++) {
-        func(
-            dst[i * offsetCount], src0[i * offsetCount], src1[i * offsetCount], mask, MAX_REPEAT_TIMES,
-            {1, 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+        func(dst[i * offsetCount], src0[i * offsetCount], src1[i * offsetCount], mask, MAX_REPEAT_TIMES,
+            { 1, 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE });
     }
     if (repeatTail != 0) {
-        func(
-            dst[repeatRange * offsetCount], src0[repeatRange * offsetCount], src1[repeatRange * offsetCount], mask,
-            repeatTail, {1, 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+        func(dst[repeatRange * offsetCount], src0[repeatRange * offsetCount], src1[repeatRange * offsetCount], mask,
+            repeatTail, { 1, 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE });
     }
 
     if (tail != 0) {
         uint64_t tailMask[2] = {0, 0};
         CreateSpecialFormatMask(tailMask[0], lastBlockMaskLen, tail / SOFTMAX_SHAPE_NZ_BASIC_COUNT);
-        func(
-            dst[repeat * FLOAT_REPEAT_SIZE], src0[repeat * FLOAT_REPEAT_SIZE], src1[repeat * FLOAT_REPEAT_SIZE],
-            tailMask, 1, {1, 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+        func(dst[repeat * FLOAT_REPEAT_SIZE], src0[repeat * FLOAT_REPEAT_SIZE], src1[repeat * FLOAT_REPEAT_SIZE],
+            tailMask, 1, { 1, 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE });
     }
 }
 
-__aicore__ inline void UnaryComputeWithSpecialMask(
-    const LocalTensor<float>& dst, const LocalTensor<float>& src, uint64_t mask[2], const uint32_t& lastBlockMaskLen,
-    const uint32_t& splitCount,
-    void (*func)(
-        const LocalTensor<float>&, const LocalTensor<float>&, uint64_t*, const uint8_t, const UnaryRepeatParams&))
+__aicore__ inline void UnaryComputeWithSpecialMask(const LocalTensor<float> &dst, const LocalTensor<float> &src,
+    uint64_t mask[2], const uint32_t &lastBlockMaskLen, const uint32_t &splitCount,
+    void (*func)(const LocalTensor<float> &, const LocalTensor<float> &, uint64_t *, const uint8_t,
+    const UnaryRepeatParams &))
 {
     uint32_t repeat = splitCount / FLOAT_REPEAT_SIZE;
     uint32_t tail = splitCount % FLOAT_REPEAT_SIZE;
@@ -125,25 +114,21 @@ __aicore__ inline void UnaryComputeWithSpecialMask(
     uint32_t src1Offset = 0;
 
     for (uint32_t i = 0; i < repeatRange; i++) {
-        func(
-            dst[i * offsetCount], src[i * offsetCount], mask, MAX_REPEAT_TIMES,
-            {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+        func(dst[i * offsetCount], src[i * offsetCount], mask, MAX_REPEAT_TIMES,
+            { 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE });
     }
     if (repeatTail != 0) {
-        func(
-            dst[repeatRange * offsetCount], src[repeatRange * offsetCount], mask, repeatTail,
-            {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+        func(dst[repeatRange * offsetCount], src[repeatRange * offsetCount], mask, repeatTail,
+            { 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE });
     }
 
     if (tail != 0) {
         uint64_t tailMask[2] = {0, 0};
         CreateSpecialFormatMask(tailMask[0], lastBlockMaskLen, tail / SOFTMAX_SHAPE_NZ_BASIC_COUNT);
-        func(
-            dst[repeat * FLOAT_REPEAT_SIZE], src[repeat * FLOAT_REPEAT_SIZE], tailMask, 1,
-            {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+        func(dst[repeat * FLOAT_REPEAT_SIZE], src[repeat * FLOAT_REPEAT_SIZE], tailMask, 1,
+            { 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE });
     }
 }
-
 };     // namespace AscendC
 #endif // IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_COMMON_H__)

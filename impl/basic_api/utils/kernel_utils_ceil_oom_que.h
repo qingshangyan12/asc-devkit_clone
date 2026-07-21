@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-/*!
+/* !
  * \file kernel_utils_ceil_oom_que.h
  * \brief
  */
@@ -31,21 +31,33 @@ namespace AscendC {
     do {                                              \
         uint64_t pc;                                  \
         asm volatile("mov %0, pc \n" : "=l"(pc) : :); \
-        preload((void*)pc, len);                      \
+        preload((void *)pc, len);                     \
     } while (0)
 
 #endif
 
-__aicore__ constexpr inline uint32_t DivCeil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
+__aicore__ constexpr inline uint32_t DivCeil(uint32_t a, uint32_t b)
+{
+    return (a + b - 1) / b;
+}
 
-__aicore__ constexpr inline uint32_t AlignUp(uint32_t a, uint32_t b) { return DivCeil(a, b) * b; }
+__aicore__ constexpr inline uint32_t AlignUp(uint32_t a, uint32_t b)
+{
+    return DivCeil(a, b) * b;
+}
 
-__aicore__ constexpr inline uint32_t ConstCeil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
+__aicore__ constexpr inline uint32_t ConstCeil(uint32_t a, uint32_t b)
+{
+    return (a + b - 1) / b;
+}
 
-__aicore__ inline uint32_t Ceil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
+__aicore__ inline uint32_t Ceil(uint32_t a, uint32_t b)
+{
+    return (a + b - 1) / b;
+}
 
-#if defined(__NPU_ARCH__) &&                                                                                      \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161)) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161)) ||                                                    \
     defined(__ASC_NPU_HOST__)
 __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {
@@ -80,7 +92,7 @@ __aicore__ inline void WriteBackOverflow(GM_ADDR overflowStatus)
     uint64_t statusMask = 0x520;
     statusOverflow[0] = statusOverflow[0] & statusMask;
     if (statusOverflow[0] != 0) {
-        uint64_t* ptr = (uint64_t*)get_imm(0x43FE0);
+        uint64_t *ptr = (uint64_t *)get_imm(0x43FE0);
         uint64_t buff[0x4];
         buff[0x0] = ptr[0x0];
         buff[0x1] = ptr[0x1];
@@ -92,20 +104,19 @@ __aicore__ inline void WriteBackOverflow(GM_ADDR overflowStatus)
         }
         ptr[0x2] = buff[0x2];
 
-        __ubuf__ uint8_t* tmpStatus = (__ubuf__ uint8_t*)get_imm(0);
+        __ubuf__ uint8_t *tmpStatus = (__ubuf__ uint8_t *)get_imm(0);
         *tmpStatus = 0;
         if (buff[0x2] > 0) {
             *tmpStatus = 0x3;
         }
         pipe_barrier(PIPE_ALL);
-        copy_ubuf_to_gm(((__gm__ int32_t*)overflowStatus), ((__ubuf__ int32_t*)tmpStatus), 0, 1, 1, 0, 0);
+        copy_ubuf_to_gm(((__gm__ int32_t *)overflowStatus), ((__ubuf__ int32_t *)tmpStatus), 0, 1, 1, 0, 0);
         pipe_barrier(PIPE_ALL);
     }
 #endif
 }
 
-template <typename T>
-__aicore__ static inline void OOMCheckTensorListRange(__gm__ T* gmInputAddr, const int inputSize)
+template <typename T> __aicore__ static inline void OOMCheckTensorListRange(__gm__ T *gmInputAddr, const int inputSize)
 {
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
     uint64_t ioCount = g_oomAddrArange.count;
@@ -119,8 +130,8 @@ __aicore__ static inline void OOMCheckTensorListRange(__gm__ T* gmInputAddr, con
 #endif
 }
 
-__aicore__ static inline bool OOMCheckAddrInTensorList(
-    uint64_t index, uintptr_t gmAddrConvert, uintptr_t& inputOutputAddr, uint64_t& inputOutputLen)
+__aicore__ static inline bool OOMCheckAddrInTensorList(uint64_t index, uintptr_t gmAddrConvert,
+    uintptr_t &inputOutputAddr, uint64_t &inputOutputLen)
 {
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
     uintptr_t gmInputAddr = g_oomAddrArange.addr[index];
@@ -128,10 +139,10 @@ __aicore__ static inline bool OOMCheckAddrInTensorList(
     uint64_t scaleTmp = (g_oomAddrArange.len[index] >> 16) & 0xffff; // high 16bit is scale value
     uint64_t scaleValue = (scaleTmp == 0) ? 1 : scaleTmp;
 
-    __gm__ uint64_t* dynamicPtr = (__gm__ uint64_t*)gmInputAddr;
+    __gm__ uint64_t *dynamicPtr = (__gm__ uint64_t *)gmInputAddr;
     uint64_t dynamicOffset = *dynamicPtr / 8;
     uint64_t offset = 1;
-    __gm__ uint64_t* dynAddr = dynamicPtr + dynamicOffset;
+    __gm__ uint64_t *dynAddr = dynamicPtr + dynamicOffset;
     while (offset < dynamicOffset) {
         dynamicPtr += 1;
         offset += 1;
@@ -158,8 +169,7 @@ __aicore__ static inline bool OOMCheckAddrInTensorList(
     return false;
 }
 
-template <typename T>
-__aicore__ static inline void OOMCheckAddrRange(__gm__ T* gmAddr, const uint64_t gmSize)
+template <typename T> __aicore__ static inline void OOMCheckAddrRange(__gm__ T *gmAddr, const uint64_t gmSize)
 {
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
     uint64_t ioCount = g_oomAddrArange.count;
@@ -173,8 +183,7 @@ __aicore__ static inline void OOMCheckAddrRange(__gm__ T* gmAddr, const uint64_t
 #endif
 }
 
-template <typename T>
-__aicore__ static inline void OOMAddAddrForL2Cache(__gm__ T* gmAddr, __gm__ T* oriAddr)
+template <typename T> __aicore__ static inline void OOMAddAddrForL2Cache(__gm__ T *gmAddr, __gm__ T *oriAddr)
 {
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
     uint64_t ioCount = g_oomAddrArange.count;
@@ -185,12 +194,10 @@ __aicore__ static inline void OOMAddAddrForL2Cache(__gm__ T* gmAddr, __gm__ T* o
     // gmAddr: addr with l2cache offset
     if (gmAddr != oriAddr) {
         for (uint32_t i = 0; i < ioCount; i++) {
-            if (g_oomAddrArange.addr[i] <= reinterpret_cast<uintptr_t>(oriAddr) &&
-                reinterpret_cast<uintptr_t>(oriAddr) <
-                    reinterpret_cast<uintptr_t>(g_oomAddrArange.addr[i]) + g_oomAddrArange.len[i]) {
+            if (g_oomAddrArange.addr[i] <= reinterpret_cast<uintptr_t>(oriAddr) && reinterpret_cast<uintptr_t>(
+                oriAddr) < reinterpret_cast<uintptr_t>(g_oomAddrArange.addr[i]) + g_oomAddrArange.len[i]) {
                 g_oomAddrArange.addr[ioCount] = reinterpret_cast<uintptr_t>(gmAddr);
-                g_oomAddrArange.len[ioCount] =
-                    g_oomAddrArange.len[i] -
+                g_oomAddrArange.len[ioCount] = g_oomAddrArange.len[i] -
                     (reinterpret_cast<uintptr_t>(oriAddr) - reinterpret_cast<uintptr_t>(g_oomAddrArange.addr[i]));
                 g_oomAddrArange.isLevelOnePointer[ioCount] = 1;
                 g_oomAddrArange.count += 1;
@@ -220,9 +227,9 @@ struct TQueConfig {
     bool enableLoopQueue = false;
 };
 
-__aicore__ constexpr TQueConfig GetTQueConfig(
-    bool nd2nzIn, bool nz2ndIn, bool scmBlockGroupIn, uint32_t bufferLenIn, uint32_t bufferNumberIn,
-    uint32_t consumerSizeIn, const TPosition consumerIn[], bool enableStaticEvtIdIn, bool enableLoopQueueIn)
+__aicore__ constexpr TQueConfig GetTQueConfig(bool nd2nzIn, bool nz2ndIn, bool scmBlockGroupIn, uint32_t bufferLenIn,
+    uint32_t bufferNumberIn, uint32_t consumerSizeIn, const TPosition consumerIn[], bool enableStaticEvtIdIn,
+    bool enableLoopQueueIn)
 {
     return {
         .nd2nz = nd2nzIn,
@@ -231,11 +238,11 @@ __aicore__ constexpr TQueConfig GetTQueConfig(
         .bufferLen = bufferLenIn,
         .bufferNumber = bufferNumberIn,
         .consumerSize = consumerSizeIn,
-        .consumer =
-            {consumerIn[0], consumerIn[1], consumerIn[2], consumerIn[3], consumerIn[4], consumerIn[5], consumerIn[6],
-             consumerIn[7]},
+        .consumer = { consumerIn[0], consumerIn[1], consumerIn[2], consumerIn[3], consumerIn[4], consumerIn[5],
+        consumerIn[6], consumerIn[7] },
         .enableStaticEvtId = enableStaticEvtIdIn,
-        .enableLoopQueue = enableLoopQueueIn};
+        .enableLoopQueue = enableLoopQueueIn
+    };
 }
 
 __aicore__ constexpr TQueConfig GetTQueConfig(const int32_t mask)
@@ -247,14 +254,14 @@ __aicore__ constexpr TQueConfig GetTQueConfig(const int32_t mask)
         .bufferLen = 0,
         .bufferNumber = 0,
         .consumerSize = 0,
-        .consumer =
-            {TPosition::MAX, TPosition::MAX, TPosition::MAX, TPosition::MAX, TPosition::MAX, TPosition::MAX,
-             TPosition::MAX, TPosition::MAX},
+        .consumer = { TPosition::MAX, TPosition::MAX, TPosition::MAX, TPosition::MAX, TPosition::MAX, TPosition::MAX,
+        TPosition::MAX, TPosition::MAX },
         .enableStaticEvtId = false,
-        .enableLoopQueue = false};
+        .enableLoopQueue = false
+    };
 }
 
-__aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig* conf)
+__aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig *conf)
 {
     return {
         .nd2nz = conf->nd2nz,
@@ -263,11 +270,11 @@ __aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig* conf)
         .bufferLen = conf->bufferLen,
         .bufferNumber = conf->bufferNumber,
         .consumerSize = conf->consumerSize,
-        .consumer =
-            {conf->consumer[0], conf->consumer[1], conf->consumer[2], conf->consumer[3], conf->consumer[4],
-             conf->consumer[5], conf->consumer[6], conf->consumer[7]},
+        .consumer = { conf->consumer[0], conf->consumer[1], conf->consumer[2], conf->consumer[3], conf->consumer[4],
+        conf->consumer[5], conf->consumer[6], conf->consumer[7] },
         .enableStaticEvtId = conf->enableStaticEvtId,
-        .enableLoopQueue = conf->enableLoopQueue};
+        .enableLoopQueue = conf->enableLoopQueue
+    };
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
@@ -288,8 +295,7 @@ __aicore__ constexpr bool IdentifyPos(TQueConfig config, TPosition pos)
 }
 #endif
 
-template <bool b>
-struct BoolInst {
+template <bool b> struct BoolInst {
     using Type = BoolInst<b>;
     static constexpr bool value = b;
 };
@@ -297,17 +303,13 @@ struct BoolInst {
 using TrueType = BoolInst<true>;
 using FalseType = BoolInst<false>;
 
-template <typename T, typename U>
-struct IsSameType : public FalseType {};
+template <typename T, typename U> struct IsSameType : public FalseType {};
 
-template <typename T>
-struct IsSameType<T, T> : public TrueType {};
+template <typename T> struct IsSameType<T, T> : public TrueType {};
 
-template <typename... Arg>
-struct Tuple {};
+template <typename... Arg> struct Tuple {};
 
-template <typename T, typename U, typename... Args>
-__aicore__ constexpr bool SupportType()
+template <typename T, typename U, typename... Args> __aicore__ constexpr bool SupportType()
 {
     if constexpr (sizeof...(Args) > 0) {
         return IsSameType<T, U>::value || SupportType<T, Args...>();
@@ -315,8 +317,7 @@ __aicore__ constexpr bool SupportType()
     return IsSameType<T, U>::value;
 }
 
-template <auto T, auto U, auto... Args>
-__aicore__ constexpr bool SupportEnum()
+template <auto T, auto U, auto... Args> __aicore__ constexpr bool SupportEnum()
 {
     if constexpr (sizeof...(Args) > 0) {
         return T == U || SupportEnum<T, Args...>();
@@ -325,29 +326,25 @@ __aicore__ constexpr bool SupportEnum()
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
-template <typename T>
-struct GetComplexElementType {
+template <typename T> struct GetComplexElementType {
     using Type = T;
 };
 
-template <class T>
-struct Complex {
+template <class T> struct Complex {
     using EleType = typename GetComplexElementType<T>::Type;
     __simd_callee__ inline Complex() : real(0), imag(0) {}
     __simd_callee__ inline Complex(T realTmp, T imagTmp) : real(realTmp), imag(imagTmp) {}
 
-    template <class U>
-    __simd_callee__ inline Complex(const U realTmp) : real(T(realTmp)), imag(0)
-    {}
+    template <class U> __simd_callee__ inline Complex(const U realTmp) : real(T(realTmp)), imag(0) {}
 
-    __simd_callee__ inline Complex(const Complex& other) : real(other.real), imag(other.imag) {}
+    __simd_callee__ inline Complex(const Complex &other) : real(other.real), imag(other.imag) {}
 
-    __simd_callee__ inline bool operator==(const Complex& val) const
+    __simd_callee__ inline bool operator == (const Complex &val) const
     {
         return (real == val.real) && (imag == val.imag);
     }
 
-    __simd_callee__ inline Complex& operator=(const Complex& other)
+    __simd_callee__ inline Complex &operator = (const Complex &other)
     {
         if (this == &other) {
             return *this;
@@ -362,8 +359,7 @@ struct Complex {
 };
 #endif
 
-template <typename T, int U, int... Args>
-__aicore__ constexpr bool SupportBytes()
+template <typename T, int U, int... Args> __aicore__ constexpr bool SupportBytes()
 {
     if constexpr (sizeof...(Args) > 0) {
         return sizeof(T) == U || SupportBytes<T, Args...>();
@@ -371,10 +367,12 @@ __aicore__ constexpr bool SupportBytes()
     return sizeof(T) == U;
 }
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
-template <auto funcPtr, typename... Args>
-__aicore__ inline void VF_CALL(Args&&... args)
+template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&... args)
 {
-    __VEC_SCOPE__ { funcPtr(args...); }
+    __VEC_SCOPE__
+    {
+        funcPtr(args...);
+    }
 }
 #endif
 } // namespace AscendC
@@ -384,60 +382,54 @@ using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
 namespace AscendC {
-template <typename T>
-class LocalTensor;
+template <typename T> class LocalTensor;
 
 namespace TypeUtils {
-template <typename T>
-__aicore__ constexpr bool IsInnerDefaultType()
+template <typename T> __aicore__ constexpr bool IsInnerDefaultType()
 {
-    return SupportType<
-        T, bool, uint8_t, int8_t, half, bfloat16_t, int16_t, uint16_t, float, int32_t, uint32_t, fp8_e5m2_t,
-        fp8_e4m3fn_t, fp8_e8m0_t, int64_t, uint64_t, complex32, complex64, double>();
+    return SupportType<T, bool, uint8_t, int8_t, half, bfloat16_t, int16_t, uint16_t, float, int32_t, uint32_t,
+        fp8_e5m2_t, fp8_e4m3fn_t, fp8_e8m0_t, int64_t, uint64_t, complex32, complex64, double>();
 }
 
-template <typename T, typename U>
-__aicore__ constexpr bool IsInnerDefaultType()
+template <typename T, typename U> __aicore__ constexpr bool IsInnerDefaultType()
 {
     return IsInnerDefaultType<T>() && IsInnerDefaultType<U>();
 }
 
-template <typename T>
-struct IsLocalTensor : public FalseType {};
+template <typename T> struct IsLocalTensor : public FalseType {};
 
-template <typename T>
-struct IsLocalTensor<LocalTensor<T>> : public TrueType {};
+template <typename T> struct IsLocalTensor<LocalTensor<T>> : public TrueType {};
 
-template <typename T>
-__aicore__ constexpr bool IsLocalTensorType()
+template <typename T> __aicore__ constexpr bool IsLocalTensorType()
 {
     if constexpr (IsLocalTensor<T>::value) {
-        return SupportType<
-            typename T::PrimType, bool, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, float, fp8_e5m2_t,
-            fp8_e4m3fn_t, fp8_e8m0_t, int32_t, uint32_t, int64_t, uint64_t, complex32, complex64, double>();
+        return SupportType<typename T::PrimType, bool, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, float,
+            fp8_e5m2_t, fp8_e4m3fn_t, fp8_e8m0_t, int32_t, uint32_t, int64_t, uint64_t, complex32, complex64, double>();
     } else {
         return false;
     }
 }
 
-template <typename T, typename U>
-__aicore__ constexpr bool IsLocalTensorType()
+template <typename T, typename U> __aicore__ constexpr bool IsLocalTensorType()
 {
     return IsLocalTensorType<T>() && IsLocalTensorType<U>();
 }
 } // namespace TypeUtils
 
-template <auto funcPtr, typename... Args>
-__aicore__ inline void VF_CALL(Args&&... args)
+template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&... args)
 {
 #if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102) || defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
-    __VEC_SCOPE__ { funcPtr(args...); }
+    __VEC_SCOPE__
+    {
+        funcPtr(args...);
+    }
 #endif
 }
 } // namespace AscendC
 #endif
 
-#endif // ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
+#endif \
+    // ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H__

@@ -1,19 +1,20 @@
-/**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+/* *
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
-/*!
+/* !
  * \file kernel_operator_vec_binary_impl.h
  * \brief AscendC l311 support vector binary api.
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/dav_l311/kernel_operator_vec_binary_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/basic_api/dav_l311/kernel_operator_vec_binary_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_IMPL_H__
 #endif
@@ -24,10 +25,9 @@
 #include "kernel_operator_vec_binary_continuous_impl.h"
 
 namespace AscendC {
-
 namespace CastParam {
-constexpr Reg::CastTrait mulAddDstTrait = {Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN,
-    Reg::MaskMergeMode::ZEROING, RoundMode::UNKNOWN};
+constexpr Reg::CastTrait mulAddDstTrait = { Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN, Reg::MaskMergeMode::ZEROING,
+    RoundMode::UNKNOWN };
 }
 
 const uint32_t B64_DATA_NUM_PER_REPEAT = 32;
@@ -35,89 +35,93 @@ const uint32_t B4_BYTE_SIZE_PER_REPEAT = 64;
 const uint32_t L1_DUMP_UB_SIZE = TOTAL_UB_SIZE - 32 * 1024;
 
 // for Level 0 binary op
-#define BINARY_OP_IMPL_NOT_SUPPORT(FUNC_NAME)                                                                      \
-    template <typename T, bool isSetMask = true>                                                                   \
-    __aicore__ inline void FUNC_NAME(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask[2],  \
-        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)                                         \
-    {                                                                                                              \
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });               \
+#define BINARY_OP_IMPL_NOT_SUPPORT(FUNC_NAME)                                                                     \
+    template <typename T, bool isSetMask = true>                                                                  \
+    __aicore__ inline void FUNC_NAME(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask[2], \
+        const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)                                         \
+    {                                                                                                             \
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });              \
     }
 // for Level 0 binary op
-#define BINARY_OP_CONTINUOUS_MASK_IMPL_NOT_SUPPORT(FUNC_NAME)                                                      \
-    template <typename T, bool isSetMask = true>                                                                   \
-    __aicore__ inline void FUNC_NAME(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask,     \
-        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)                                         \
-    {                                                                                                              \
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });               \
+#define BINARY_OP_CONTINUOUS_MASK_IMPL_NOT_SUPPORT(FUNC_NAME)                                                  \
+    template <typename T, bool isSetMask = true>                                                               \
+    __aicore__ inline void FUNC_NAME(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask, \
+        const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)                                      \
+    {                                                                                                          \
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });           \
     }
 /* **************************************************************************************************
  * bit mask                                         *
  * ************************************************************************************************* */
 // Level 0
-#define BINARY_OP_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE)                                                                        \
-    template <typename T, bool isSetMask = true>                                                                             \
-    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src0, __ubuf__ DATA_TYPE* src1,            \
-        const uint64_t mask[2],                                                                                              \
-        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)                                                   \
-    {                                                                                                                        \
-        if constexpr (isSetMask) {                                                                                           \
-            SetVectorMask<DATA_TYPE>(mask[1], mask[0]);                                                                      \
-        }                                                                                                                    \
-        __VEC_SCOPE__                                                                                                        \
-        {                                                                                                                    \
-            RegTensor<DATA_TYPE> vreg0;                                                                                      \
-            RegTensor<DATA_TYPE> vreg1;                                                                                      \
-            RegTensor<DATA_TYPE> vreg2;                                                                                      \
-            MaskReg preg = MovePredicate<DATA_TYPE>();                                                                       \
-            uint32_t strideConfig0 = (uint32_t)repeatParams.src0BlkStride;                                                   \
-            uint32_t repeatStrideConfig0 = (uint32_t)repeatParams.src0RepStride;                                             \
-            uint32_t strideConfig1 = (uint32_t)repeatParams.src1BlkStride;                                                   \
-            uint32_t repeatStrideConfig1 = (uint32_t)repeatParams.src1RepStride;                                             \
-            uint32_t strideConfig2 = (uint32_t)repeatParams.dstBlkStride;                                                    \
-            uint32_t repeatStrideConfig2 = (uint32_t)repeatParams.dstRepStride;                                              \
-            for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                                           \
-                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg0, src0, strideConfig0, repeatStrideConfig0, preg);    \
-                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg1, src1, strideConfig1, repeatStrideConfig1, preg);    \
-                OP_NAME(vreg2, vreg0, vreg1, preg);                                                                          \
-                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(dst, vreg2, strideConfig2, repeatStrideConfig2, preg);     \
-            }                                                                                                                \
-        }                                                                                                                    \
+#define BINARY_OP_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE)                                                               \
+    template <typename T, bool isSetMask = true>                                                                    \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE *dst, __ubuf__ DATA_TYPE *src0, __ubuf__ DATA_TYPE *src1,   \
+        const uint64_t mask[2], const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)                   \
+    {                                                                                                               \
+        if constexpr (isSetMask) {                                                                                  \
+            SetVectorMask<DATA_TYPE>(mask[1], mask[0]);                                                             \
+        }                                                                                                           \
+        __VEC_SCOPE__                                                                                               \
+        {                                                                                                           \
+            RegTensor<DATA_TYPE> vreg0;                                                                             \
+            RegTensor<DATA_TYPE> vreg1;                                                                             \
+            RegTensor<DATA_TYPE> vreg2;                                                                             \
+            MaskReg preg = MovePredicate<DATA_TYPE>();                                                              \
+            uint32_t strideConfig0 = (uint32_t)repeatParams.src0BlkStride;                                          \
+            uint32_t repeatStrideConfig0 = (uint32_t)repeatParams.src0RepStride;                                    \
+            uint32_t strideConfig1 = (uint32_t)repeatParams.src1BlkStride;                                          \
+            uint32_t repeatStrideConfig1 = (uint32_t)repeatParams.src1RepStride;                                    \
+            uint32_t strideConfig2 = (uint32_t)repeatParams.dstBlkStride;                                           \
+            uint32_t repeatStrideConfig2 = (uint32_t)repeatParams.dstRepStride;                                     \
+            for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                                   \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg0, src0, strideConfig0, repeatStrideConfig0, \
+                    preg);                                                                                          \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg1, src1, strideConfig1, repeatStrideConfig1, \
+                    preg);                                                                                          \
+                OP_NAME(vreg2, vreg0, vreg1, preg);                                                                 \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(dst, vreg2, strideConfig2, repeatStrideConfig2,  \
+                    preg);                                                                                          \
+            }                                                                                                       \
+        }                                                                                                           \
     }
 
 /* **************************************************************************************************
  * continuous mask                                            *
  * ************************************************************************************************* */
 // Level 0
-#define BINARY_OP_CONTINUOUS_MASK_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE)                                                       \
-    template <typename T, bool isSetMask = true>                                                                             \
-    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src0, __ubuf__ DATA_TYPE* src1,           \
-        const uint64_t mask,                                                                                                \
-        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)                                                  \
-    {                                                                                                                       \
-        __VEC_SCOPE__                                                                                                       \
-        {                                                                                                                   \
-            RegTensor<DATA_TYPE> vreg0;                                                                                     \
-            RegTensor<DATA_TYPE> vreg1;                                                                                     \
-            RegTensor<DATA_TYPE> vreg2;                                                                                     \
-            uint32_t sreg = (uint32_t)mask;                                                                                 \
-            MaskReg preg = CreatePredicate<DATA_TYPE>(sreg);                                                                \
-            uint32_t strideConfig0 = (uint32_t)repeatParams.src0BlkStride;                                                  \
-            uint32_t repeatStrideConfig0 = (uint32_t)repeatParams.src0RepStride;                                            \
-            uint32_t strideConfig1 = (uint32_t)repeatParams.src1BlkStride;                                                  \
-            uint32_t repeatStrideConfig1 = (uint32_t)repeatParams.src1RepStride;                                            \
-            uint32_t strideConfig2 = (uint32_t)repeatParams.dstBlkStride;                                                   \
-            uint32_t repeatStrideConfig2 = (uint32_t)repeatParams.dstRepStride;                                             \
-            for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                                          \
-                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg0, src0, strideConfig0, repeatStrideConfig0, preg);   \
-                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg1, src1, strideConfig1, repeatStrideConfig1, preg);   \
-                OP_NAME(vreg2, vreg0, vreg1, preg);                                                                         \
-                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(dst, vreg2, strideConfig2, repeatStrideConfig2, preg);    \
-            }                                                                                                               \
-        }                                                                                                                   \
+#define BINARY_OP_CONTINUOUS_MASK_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE)                                               \
+    template <typename T, bool isSetMask = true>                                                                    \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE *dst, __ubuf__ DATA_TYPE *src0, __ubuf__ DATA_TYPE *src1,   \
+        const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)                      \
+    {                                                                                                               \
+        __VEC_SCOPE__                                                                                               \
+        {                                                                                                           \
+            RegTensor<DATA_TYPE> vreg0;                                                                             \
+            RegTensor<DATA_TYPE> vreg1;                                                                             \
+            RegTensor<DATA_TYPE> vreg2;                                                                             \
+            uint32_t sreg = (uint32_t)mask;                                                                         \
+            MaskReg preg = CreatePredicate<DATA_TYPE>(sreg);                                                        \
+            uint32_t strideConfig0 = (uint32_t)repeatParams.src0BlkStride;                                          \
+            uint32_t repeatStrideConfig0 = (uint32_t)repeatParams.src0RepStride;                                    \
+            uint32_t strideConfig1 = (uint32_t)repeatParams.src1BlkStride;                                          \
+            uint32_t repeatStrideConfig1 = (uint32_t)repeatParams.src1RepStride;                                    \
+            uint32_t strideConfig2 = (uint32_t)repeatParams.dstBlkStride;                                           \
+            uint32_t repeatStrideConfig2 = (uint32_t)repeatParams.dstRepStride;                                     \
+            for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {                                                   \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg0, src0, strideConfig0, repeatStrideConfig0, \
+                    preg);                                                                                          \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(vreg1, src1, strideConfig1, repeatStrideConfig1, \
+                    preg);                                                                                          \
+                OP_NAME(vreg2, vreg0, vreg1, preg);                                                                 \
+                DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(dst, vreg2, strideConfig2, repeatStrideConfig2,  \
+                    preg);                                                                                          \
+            }                                                                                                       \
+        }                                                                                                           \
     }
 /* **************************************************************************************************
  * And                                                                                              *
- * **************************************************************************************************/
+ * ************************************************************************************************* */
 // And::Level 0
 // BINARY_OP_IMPL_NOT_SUPPORT(AndImpl)
 
@@ -143,7 +147,7 @@ __aicore__ inline void AndImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *sr
 
 /* **************************************************************************************************
  * Or                                                                                               *
- * **************************************************************************************************/
+ * ************************************************************************************************* */
 // Or::Level 0
 template <typename T, bool isSetMask = true>
 __aicore__ inline void OrImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask[],
@@ -339,11 +343,11 @@ __aicore__ inline void MulAddDst(S &dstReg, V &srcReg0, V &srcReg1, Reg::MaskReg
         Reg::RegTensor<half> fp16RegTemp;
         Reg::RegTensor<float> castReg1, castReg2;
         // the first 64 half is needed to do muladddst in each repeat
-        Reg::UnPack<uint32_t, uint16_t, AscendC::Reg::HighLowPart::LOWEST>(
-            (Reg::RegTensor<uint32_t> &)fp16RegTemp, (Reg::RegTensor<uint16_t> &)srcReg0);
+        Reg::UnPack<uint32_t, uint16_t, AscendC::Reg::HighLowPart::LOWEST>((Reg::RegTensor<uint32_t> &)fp16RegTemp,
+            (Reg::RegTensor<uint16_t> &)srcReg0);
         Reg::Cast<float, half, CastParam::mulAddDstTrait>(castReg1, fp16RegTemp, mask);
-        Reg::UnPack<uint32_t, uint16_t, AscendC::Reg::HighLowPart::LOWEST>(
-            (Reg::RegTensor<uint32_t> &)fp16RegTemp, (Reg::RegTensor<uint16_t> &)srcReg1);
+        Reg::UnPack<uint32_t, uint16_t, AscendC::Reg::HighLowPart::LOWEST>((Reg::RegTensor<uint32_t> &)fp16RegTemp,
+            (Reg::RegTensor<uint16_t> &)srcReg1);
         Reg::Cast<float, half, CastParam::mulAddDstTrait>(castReg2, fp16RegTemp, mask);
         Reg::MulAddDst(dstReg, castReg1, castReg2, mask);
     }
@@ -351,8 +355,8 @@ __aicore__ inline void MulAddDst(S &dstReg, V &srcReg0, V &srcReg1, Reg::MaskReg
 } // namespace RegMulAddDst
 
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void MulAddDstImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U *src1,
-    const uint64_t mask[2], const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void MulAddDstImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U *src1, const uint64_t mask[2],
+    const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     static_assert(SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<float, half>>(), "Failed to "
         "check dtype in MulAddDst, current api support dtype combination is src: half, dst: half / float; src: float, "
@@ -365,8 +369,8 @@ __aicore__ inline void MulAddDstImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__
 }
 
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void MulAddDstImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U *src1,
-    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void MulAddDstImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U *src1, const uint64_t mask,
+    const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     static_assert(SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<float, half>>(), "Failed to "
         "check dtype in MulAddDst, current api support dtype combination is src: half, dst: half / float; src: float, "
@@ -381,7 +385,7 @@ __aicore__ inline void MulAddDstImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__
  * ************************************************************************************************* */
 // MulAddDst::Level 2
 template <typename T, typename U>
-__aicore__ inline void MulAddDstImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1, const int32_t count)
+__aicore__ inline void MulAddDstImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U *src1, const int32_t count)
 {
     static_assert(SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<float, half>>(),
         "Failed to check dtype in MulAddDst, current api "
@@ -405,23 +409,22 @@ __aicore__ inline void MulAddDstImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__
     }
 }
 
-__aicore__ inline void MulAddDstImpl(__ubuf__ float* dst, __ubuf__ half* src0, __ubuf__ half* src1,
-    const int32_t count)
+__aicore__ inline void MulAddDstImpl(__ubuf__ float *dst, __ubuf__ half *src0, __ubuf__ half *src1, const int32_t count)
 {
-    uint32_t sregB32 = static_cast<uint32_t>(count);     // updated when float calculation
-    constexpr uint16_t numPerRep = VECTOR_REG_WIDTH / sizeof(float);     // each repeat 64 half->float to calculate
+    uint32_t sregB32 = static_cast<uint32_t>(count);                 // updated when float calculation
+    constexpr uint16_t numPerRep = VECTOR_REG_WIDTH / sizeof(float); // each repeat 64 half->float to calculate
     const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(count, numPerRep));
     __VEC_SCOPE__
     {
         Reg::RegTensor<half> src0Reg, src1Reg;
         Reg::RegTensor<float> dstReg, castReg1, castReg2;
-        Reg::MaskReg maskB32;                              // updated when float calculation
+        Reg::MaskReg maskB32; // updated when float calculation
         for (uint16_t i = 0; i < repeatTime; ++i) {
             maskB32 = Reg::UpdateMask<float>(sregB32);
             Reg::DataCopy<half, Reg::LoadDist::DIST_UNPACK_B16>(src0Reg, src0 + i * numPerRep); // 64 half
             Reg::DataCopy<half, Reg::LoadDist::DIST_UNPACK_B16>(src1Reg, src1 + i * numPerRep); // 64 half
-            Reg::Cast<float, half, CastParam::mulAddDstTrait>(castReg1, src0Reg, maskB32);           // 64 float
-            Reg::Cast<float, half, CastParam::mulAddDstTrait>(castReg2, src1Reg, maskB32);           // 64 float
+            Reg::Cast<float, half, CastParam::mulAddDstTrait>(castReg1, src0Reg, maskB32);      // 64 float
+            Reg::Cast<float, half, CastParam::mulAddDstTrait>(castReg2, src1Reg, maskB32);      // 64 float
             Reg::DataCopy(dstReg, dst + i * numPerRep);
             Reg::MulAddDst(dstReg, castReg1, castReg2, maskB32);
             Reg::DataCopy(dst + i * numPerRep, dstReg, maskB32);
@@ -430,22 +433,21 @@ __aicore__ inline void MulAddDstImpl(__ubuf__ float* dst, __ubuf__ half* src0, _
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void AddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
-    const uint64_t mask[2], const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void AddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask[2],
+    const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported AddRelu"); });
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void AddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
-    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void AddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask,
+    const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported AddRelu"); });
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void AddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
-    const int32_t &count)
+__aicore__ inline void AddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const int32_t &count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported AddRelu"); });
 }
@@ -454,8 +456,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void FusedMulAddImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask[],
     const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
-    static_assert(SupportType<T, half, float>(),
-        "Failed to check dtype in FusedMulAdd, current api support dtype "
+    static_assert(SupportType<T, half, float>(), "Failed to check dtype in FusedMulAdd, current api support dtype "
         "combination is src and dst both: half/float.");
     constexpr auto func = Reg::FusedMulDstAdd<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
     Internal::VecBinaryImplTemplate<func, isSetMask, true, Internal::BinaryFuncMode::DST_SRC_INPUT>(dst, src0, src1,
@@ -466,8 +467,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void FusedMulAddImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
-    static_assert(SupportType<T, half, float>(),
-        "Failed to check dtype in FusedMulAdd, current api support dtype "
+    static_assert(SupportType<T, half, float>(), "Failed to check dtype in FusedMulAdd, current api support dtype "
         "combination is src and dst both: half/float.");
     constexpr auto func = Reg::FusedMulDstAdd<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
     Internal::VecBinaryImplTemplate<func, isSetMask, false, Internal::BinaryFuncMode::DST_SRC_INPUT>(dst, src0, src1,
@@ -475,8 +475,7 @@ __aicore__ inline void FusedMulAddImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf
 }
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void FusedMulAddImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
-    const int32_t &count)
+__aicore__ inline void FusedMulAddImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const int32_t &count)
 {
     static_assert(SupportType<T, half, float>(), "Failed to check dtype in FusedMulAdd,"
         "current api support dtype combination is src and dst both: half / float.");
@@ -523,22 +522,21 @@ __aicore__ inline void FusedMulAddImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void FusedMulAddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
-    const uint64_t mask[2], const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void FusedMulAddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask[2],
+    const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported FusedMulAddRelu"); });
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void FusedMulAddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
-    const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+__aicore__ inline void FusedMulAddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask,
+    const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported FusedMulAddRelu"); });
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void FusedMulAddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
-    const int32_t &count)
+__aicore__ inline void FusedMulAddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const int32_t &count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported FusedMulAddRelu"); });
 }
@@ -548,8 +546,7 @@ __aicore__ inline void FusedMulAddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __
  * ************************************************************************************************* */
 // SubRelu::Level 0
 namespace RegSubRelu {
-template <typename T, typename U>
-__aicore__ inline void SubRelu(U &dstReg, U &srcReg0, U &srcReg1, Reg::MaskReg &mask)
+template <typename T, typename U> __aicore__ inline void SubRelu(U &dstReg, U &srcReg0, U &srcReg1, Reg::MaskReg &mask)
 {
     Reg::Sub(dstReg, srcReg0, srcReg1, mask);
     Reg::Maxs(dstReg, dstReg, (T)0, mask);
@@ -582,8 +579,7 @@ __aicore__ inline void SubReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T
  * ************************************************************************************************* */
 // SubRelu::Level 2
 template <typename T>
-__aicore__ inline void SubReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1,
-    const int32_t &count)
+__aicore__ inline void SubReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const int32_t &count)
 {
     static_assert(SupportType<T, half, float, int16_t, uint64_t, int64_t>(), "Failed to check dtype in SubRelu, "
         "current api support dtype combination is src and dst both: half / float / int16_t / uint64_t / int64_t.");
