@@ -17,16 +17,13 @@
 #include <string>
 
 using namespace std;
-using namespace ops_hccl;
+using namespace mc2_ops_hccl;
 extern "C" unsigned int LaunchAicpuKernel(OpParam *param);
 
 HcclResult HcclReduceScatter(void *sendBuf, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
     HcclReduceOp op, HcclComm comm, aclrtStream stream)
 {
     HCCL_INFO("Start to run execute HcclReduceScatter");
-    if (GetHcommVersion() < CANN_VERSION(9, 0, 0)) { // compat handle
-        return HcclReduceScatterInner(sendBuf, recvBuf, recvCount, dataType, op, comm, stream);
-    }
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
 #ifdef MACRO_DEV_TYPE_NEW
@@ -126,7 +123,7 @@ HcclResult HcclReduceScatterGraphMode(void *sendBuf, void *recvBuf, uint64_t rec
     return HCCL_SUCCESS;
 }
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 HcclResult CheckReduceScatterInputPara(const HcclComm comm, const void* sendBuf, const void* recvBuf, const aclrtStream stream)
 {
     // 入参合法性校验
@@ -185,11 +182,6 @@ HcclResult ReduceScatterOutPlace(OpParam &param, void *sendBuf, void *recvBuf, u
  	    OpMode::OPBASE));
     
     CHK_RET(HcclGetOpExpansionMode(comm, param));
-
-    // 9.0.0 ccu模式走老流程
-    if (GetHcommVersion() == CANN_VERSION(9, 0, 0) && param.engine == CommEngine::COMM_ENGINE_CCU) {
-        return HcclReduceScatterInner(sendBuf, recvBuf, recvCount, dataType, op, comm, stream);
-    }
 
     CcuFastLaunchCtx *ccuFastLaunchCtx = nullptr;
     if (ShouldGoCcuFastLaunch(comm, param, &ccuFastLaunchCtx)) {

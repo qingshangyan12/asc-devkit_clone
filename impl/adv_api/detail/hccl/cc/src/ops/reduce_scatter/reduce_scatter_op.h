@@ -19,9 +19,6 @@
 #include "executor_v2_base.h"
 #include "alg_type.h"
 #include "execute_selector.h"
-#ifdef ENABLE_EXPERIMENTAL
-#include "reduce_scatter_op_experimental.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,7 +35,7 @@ HcclResult HcclReduceScatterGraphMode(void *sendBuf, void *recvBuf, uint64_t rec
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 HcclResult ReduceScatterOutPlace(OpParam &param, void *sendBuf, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
     HcclReduceOp op, HcclComm comm, aclrtStream stream, u32 userRankSize);
 
@@ -51,10 +48,10 @@ HcclResult CheckReduceScatterInputPara(const HcclComm comm, const void* sendBuf,
 
 HcclResult GetAlgResReduceScatter(HcclComm comm, OpParam &param, std::shared_ptr<InsCollAlgBase> &executor,
     TopoInfoWithNetLayerDetails* topoInfo, AlgResourceCtx** resCtx, aclrtNotify* notifies);
-    
+
 HcclResult ReduceScatterEntryLog(void *sendBuf, void *recvBuf, uint64_t recvCount, HcclDataType dataType, HcclReduceOp op,
     aclrtStream stream, const char *tag, const std::string &opName, bool forceLog = false);
 
-}
+} // namespace mc2_ops_hccl
 
 #endif
