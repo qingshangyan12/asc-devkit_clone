@@ -47,17 +47,18 @@ jobs:
             export ASCEND_3RD_LIB_PATH=/home/jenkins/opensource
             BuildAccelerate bash .gitcode/workflows/x86_compile.sh
           AC_SERVER_IP: ${{ vars.AC_SERVER_IP }}
-      # -
-      #   name: api_check
-      #   uses: cann/.gitcode/actions/api-check@master
-      #   with:
-      #     org_name: ${{ env.org_name }}
-      #     task_name: ${{ inputs.task_name }}
-      #     repo_name: ${{ env.repo_name }}
-      #     merge_id: ${{ env.MERGE_ID }}
-      #     workspace: ${{ steps.process_checkout.outputs.path }}
-      #     source_branch: ${{ env.SOURCE_BRANCH }}
-      #     target_branch: ${{ env.TARGET_BRANCH }}
+      -
+        name: api-check
+        identifier: api-check
+        uses: cann/.gitcode/actions/api-check@master
+        with:
+          org_name: ${{ env.org_name }}
+          mode: ${{ steps.compile.outputs.api-check }}
+          repo_name: ${{ env.repo_name }}
+          merge_id: ${{ env.MERGE_ID }}
+          workspace: ${{ steps.process_checkout.outputs.path }}
+          source_branch: ${{ env.SOURCE_BRANCH }}
+          target_branch: ${{ env.TARGET_BRANCH }}
       -
         name: verify_package
         uses: cann/.gitcode/actions/verify-package@master

@@ -13,6 +13,11 @@ fi
 gcc --version
 source /home/jenkins/Ascend/cann/bin/setenv.bash
 set +e
+if [[ "${task_name}" =~ x86_compile_ubuntu24 ]]; then
+    echo "api-check=compile" >> "${ATOMGIT_OUTPUT}"
+else
+    echo "api-check=continue" >> "${ATOMGIT_OUTPUT}"
+fi
 case "${task_name}" in
     x86_compile_ubuntu24)
         sed -i "1i set(CMAKE_EXPORT_COMPILE_COMMANDS ON)" "CMakeLists.txt"
