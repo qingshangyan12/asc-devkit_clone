@@ -182,7 +182,8 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
         }
         GroupCopy(ctx, localDst, src[arg->rankId], ctx.goSize);
         HCCL_INFO("[A2A_DBG] branch B before EventWait, allBit[%u]", (unsigned)allBit);
-        ccu::EventWait(ctx.event, allBit);
+        // ==== 实验2：注释 DoAlltoAll(branchB) EventWait 定位是否卡在此 ====
+        // ccu::EventWait(ctx.event, allBit);
         HCCL_INFO("[A2A_DBG] branch B after EventWait (passed)");
     }
 
