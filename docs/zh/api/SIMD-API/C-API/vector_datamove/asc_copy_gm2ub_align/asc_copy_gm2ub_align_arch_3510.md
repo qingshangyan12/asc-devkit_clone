@@ -51,7 +51,7 @@
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ float* dst, __gm__ float* src, uint32_t size)
     ```
 
-- 前n个数据同步搬运
+- 同步搬运
 
     ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
