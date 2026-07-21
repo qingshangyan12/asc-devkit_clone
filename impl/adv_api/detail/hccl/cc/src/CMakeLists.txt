@@ -45,14 +45,12 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/topo
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/interface_graph_mode
 
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/executor
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/selector
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aicpu
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aiv
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu/kernel
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor
