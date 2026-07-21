@@ -216,7 +216,19 @@ void PrintCommContext(const char *prefix, const CommContext &ctx)
         static_cast<unsigned long long>(ctx.len));
 }
 
-bool ReportPendingException()
+void CollectCachedContexts(uint32_t rank, std::vector<ChannelHandle> &channels, std::vector<CommContext> &contexts)
+{
+    std::lock_guard<std::mutex> lock(g_dumpMutex);
+    for (const auto &ctx : g_contexts) {
+        if (ctx.rankId != rank || ctx.channelHandle == 0) {
+            continue;
+        }
+        contexts.push_back(ctx);
+        channels.push_back(static_cast<ChannelHandle>(ctx.channelHandle));
+    }
+}
+
+bool ReportPendingException(uint32_t rank)
 {
     ExceptionSummary summary;
     uint64_t count = 0;
@@ -242,30 +254,23 @@ bool ReportPendingException()
 
     std::vector<ChannelHandle> channels;
     std::vector<CommContext> contexts;
-    {
-        std::lock_guard<std::mutex> lock(g_dumpMutex);
-        channels = g_channels;
-        contexts = g_contexts;
-    }
+    CollectCachedContexts(rank, channels, contexts);
     for (const auto &cachedCtx : contexts) {
         PrintCommContext("[hcomm_fault_runner] cached ctx", cachedCtx);
     }
-    std::printf("[hcomm_fault_runner] dump cached channels because exception dev args are unavailable.\n");
+    std::printf("[hcomm_fault_runner] dump rank %u cached channels because exception dev args are unavailable.\n", rank);
     DumpChannels(channels);
     return true;
 }
 
-void DumpCachedChannelsForDiagnosis()
+void DumpCachedChannelsForDiagnosis(uint32_t rank)
 {
     std::vector<ChannelHandle> channels;
     std::vector<CommContext> contexts;
-    {
-        std::lock_guard<std::mutex> lock(g_dumpMutex);
-        channels = g_channels;
-        contexts = g_contexts;
-    }
-    std::printf("[hcomm_fault_runner] no pending exception after polling, dump cached channels for diagnosis. "
+    CollectCachedContexts(rank, channels, contexts);
+    std::printf("[hcomm_fault_runner] no pending exception after polling, dump rank %u cached channels for diagnosis. "
                 "callbackCount=%llu channelNum=%zu\n",
+        rank,
         static_cast<unsigned long long>(g_exceptionCount.load(std::memory_order_relaxed)),
         channels.size());
     for (const auto &cachedCtx : contexts) {
@@ -462,14 +467,14 @@ int RunRank(RankContext *ctx)
         std::printf("[hcomm_fault_runner] rank=0 aclrtSynchronizeStream ret=%d\n", syncRet);
         bool reported = false;
         for (uint32_t retry = 0; retry < 20; ++retry) {
-            if (ReportPendingException()) {
+            if (ReportPendingException(rank)) {
                 reported = true;
                 break;
             }
             usleep(100000);
         }
         if (!reported) {
-            DumpCachedChannelsForDiagnosis();
+            DumpCachedChannelsForDiagnosis(rank);
         }
     }
     ctx->barrier->Wait();
