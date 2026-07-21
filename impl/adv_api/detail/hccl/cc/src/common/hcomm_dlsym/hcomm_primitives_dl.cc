@@ -53,6 +53,27 @@ DEFINE_WEAK_FUNC(
 DEFINE_WEAK_FUNC(
     HcclResult, HcclCommSymWinGet, HcclComm comm, void* ptr, size_t size, HcclCommSymWindow* winHandle, size_t* offset);
 
+using HcclHcommBatchTransferOnThreadFunc =
+    int32_t (*)(ThreadHandle, ChannelHandle, const HcclHcommBatchTransferDesc *, uint32_t);
+
+static bool g_HcommBatchTransferOnThreadSupported = false;
+static HcclHcommBatchTransferOnThreadFunc g_HcommBatchTransferOnThread = nullptr;
+
+extern "C" bool HcommIsSupportHcommBatchTransferOnThread(void)
+{
+    return g_HcommBatchTransferOnThreadSupported;
+}
+
+extern "C" int32_t HcclHcommBatchTransferOnThread(ThreadHandle thread, ChannelHandle channel,
+    const HcclHcommBatchTransferDesc *transferDescs, uint32_t transferDescNum)
+{
+    if (g_HcommBatchTransferOnThread == nullptr) {
+        HCCL_ERROR("[HcclWrapper] HcommBatchTransferOnThread not supported");
+        return -1;
+    }
+    return g_HcommBatchTransferOnThread(thread, channel, transferDescs, transferDescNum);
+}
+
 // ---------- 初始化函数 ----------
 void HcommPrimitivesDlInit(void* libHcommHandle)
 {
@@ -78,4 +99,12 @@ void HcommPrimitivesDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcommThreadJoin);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclSymWinGetPeerPointer);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclCommSymWinGet);
+    g_HcommBatchTransferOnThread = reinterpret_cast<HcclHcommBatchTransferOnThreadFunc>(
+        dlsym(libHcommHandle, "HcommBatchTransferOnThread"));
+    if (g_HcommBatchTransferOnThread == nullptr) {
+        g_HcommBatchTransferOnThreadSupported = false;
+        HCCL_DEBUG("[HcclWrapper] %s not supported", "HcommBatchTransferOnThread");
+    } else {
+        g_HcommBatchTransferOnThreadSupported = true;
+    }
 }
