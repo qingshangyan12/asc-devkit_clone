@@ -72,7 +72,7 @@ $$dstReg_i = srcReg0_i + srcReg1_i$$
 | srcReg0 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg1 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
-| carry | 输出 | 目的操作数。输出借位值。<br>类型为[MaskReg](../寄存器数据类型/MaskReg.md)。 |
+| carry | 输出 | 目的操作数。输出进位值。<br>类型为[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 数据类型
 
@@ -131,4 +131,3 @@ $$dstReg_i = srcReg0_i + srcReg1_i$$
         }
     }
     ```
-

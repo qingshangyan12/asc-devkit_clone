@@ -90,7 +90,7 @@ $$dstReg_i = srcReg0_i - srcReg1_i$$
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-- 计算结果不保留进位
+- 计算结果不保留借位
 
     ```cpp
     template<typename T>
@@ -110,7 +110,7 @@ $$dstReg_i = srcReg0_i - srcReg1_i$$
     }
     ```
 
-- 计算结果保留进位
+- 计算结果保留借位
 
     ```cpp
     template <typename T>
@@ -131,4 +131,3 @@ $$dstReg_i = srcReg0_i - srcReg1_i$$
         }
     }
     ```
-
