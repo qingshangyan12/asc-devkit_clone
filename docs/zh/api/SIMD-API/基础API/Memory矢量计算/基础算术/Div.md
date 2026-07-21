@@ -238,10 +238,10 @@ $dst_i = src0_i / src1_i$
     ```cpp
     // Div 0ulp.
     static constexpr DivConfig config = { DivAlgo::DIFF_COMPENSATION };
-    Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
+    Div<T, config>(dstLocalX, srcLocalX, srcLocalY, 512);
     // Div Subnormal.
-    static constexpr DivConfig config = { DivAlgo::PRECISION_0ULP_FTZ_FALSE };
-    Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
+    static constexpr DivConfig config2 = { DivAlgo::PRECISION_0ULP_FTZ_FALSE };
+    Div<T, config2>(dstLocalX, srcLocalX, srcLocalY, 512);
     ```
     <!-- end id31 -->
 
