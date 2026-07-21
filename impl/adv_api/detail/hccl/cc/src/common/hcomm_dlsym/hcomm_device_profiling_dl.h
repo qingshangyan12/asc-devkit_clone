@@ -46,6 +46,10 @@ DECL_WEAK_FUNC(HcclResult, HcommProfilingEnd, ThreadHandle* threads, uint32_t th
 DECL_WEAK_FUNC(HcclResult, HcommProfilingReportDeviceOp, const char* groupname);
 DECL_WEAK_FUNC(HcclResult, HcommProfilingReportKernelStartTask, uint64_t thread, const char* groupname);
 DECL_WEAK_FUNC(HcclResult, HcommProfilingReportKernelEndTask, uint64_t thread, const char* groupname);
+DECL_WEAK_FUNC(HcclResult, HcclDfxRegOpInfoByCommId, char* commId, void* hcclDfxOpInfo);
+// device 侧 op info 注册 kernel：直接调 AicpuDfxOpInfoInit（不依赖 host-device notifyId），mc2 server 用它注册 op
+// info。 入参为 InitTask{ uint64_t context; char commTag[256]; }，context 指向 HcclDfxOpInfo。
+DECL_WEAK_FUNC(uint32_t, RunAicpuDfxOpInfoInitV2, void* args);
 
 // 动态库管理接口
 void HcommDeviceProfilingDlInit(void* libHcommHandle);
