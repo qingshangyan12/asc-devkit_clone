@@ -15,12 +15,20 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_SIMD_DUMP_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_SIMD_DUMP_IMPL_H
 
-#ifndef ASCENDC_CPU_DEBUG
-
 #include "impl/utils/sys_macros.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "impl/basic_api/kernel_log.h"
+#else
 #include "impl/utils/debug/asc_debug_utils.h"
+#endif
 
 namespace __asc_simd_vf {
+__simd_callee__ inline uint32_t get_reg_dump_u32_count(uint32_t dump_size_bytes)
+{
+    return (dump_size_bytes + sizeof(uint32_t) - 1) / sizeof(uint32_t);
+}
+
+#ifndef ASCENDC_CPU_DEBUG
 enum class DumpTensorPosition : uint16_t { GM = 0, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, REG, MAX };
 
 template <DumpTensorPosition dumpPosition, typename T, typename U>
@@ -65,10 +73,10 @@ __simd_callee__ inline void set_dump_tlv_data_reg(
 {
     __ubuf__ T* dump_dst_addr = reinterpret_cast<__ubuf__ T*>(dump_tlv + 1);
 
-    uint32_t count = dump_tlv->dumpSize / sizeof(T);
+    const uint32_t count = get_reg_dump_u32_count(dump_tlv->dumpSize);
     vector_align ureg;
-    vstus(ureg, count * 2, (vector_u32&)src, (__ubuf__ uint32_t*&)dump_dst_addr, POST_UPDATE);
-    vstas(ureg, (__ubuf__ uint32_t*&)dump_dst_addr, count * 2, POST_UPDATE);
+    vstus(ureg, count, (vector_u32&)src, (__ubuf__ uint32_t*&)dump_dst_addr, POST_UPDATE);
+    vstas(ureg, (__ubuf__ uint32_t*&)dump_dst_addr, 0, POST_UPDATE);
 }
 
 template <DumpTensorPosition dumpPosition, typename T, typename U>
@@ -76,10 +84,23 @@ __simd_callee__ inline void asc_dump_impl_reg(U& src, uint32_t desc, uint32_t du
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __ubuf__ BlockVFBufInfo* block_info = get_printf_ubuf_addr(0);
+    if (has_debug_overflow(block_info)) {
+        return;
+    }
 
     constexpr uint16_t data_block_size = 32;
-    uint32_t align_dump_len = align_up(dump_size * sizeof(T), data_block_size);
-    uint32_t tlv_len = sizeof(DumpTensorTlv) + align_dump_len;
+    constexpr uint32_t max_dump_data_len = ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE > sizeof(DumpTensorTlv) ?
+                                               ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE - sizeof(DumpTensorTlv) :
+                                               0;
+    if (dump_size > max_dump_data_len / sizeof(T)) {
+        mark_debug_overflow(block_info);
+        return;
+    }
+    const uint32_t align_dump_len = align_up(dump_size * sizeof(T), data_block_size);
+    const uint32_t tlv_len = sizeof(DumpTensorTlv) + align_dump_len;
+    if (!reserve_debug_tlv(block_info, tlv_len)) {
+        return;
+    }
 
     __ubuf__ DumpTensorTlv* dump_tlv =
         (__ubuf__ DumpTensorTlv*)((__ubuf__ uint8_t*)(block_info->buffer) + block_info->writeLen);
@@ -97,10 +118,23 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_s
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __ubuf__ BlockVFBufInfo* block_info = get_printf_ubuf_addr(0);
+    if (has_debug_overflow(block_info)) {
+        return;
+    }
 
     constexpr uint16_t data_block_size = 32;
-    uint32_t align_dump_len = align_up(dump_size * sizeof(T), data_block_size);
-    uint32_t tlv_len = sizeof(DumpTensorTlv) + align_dump_len;
+    constexpr uint32_t max_dump_data_len = ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE > sizeof(DumpTensorTlv) ?
+                                               ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE - sizeof(DumpTensorTlv) :
+                                               0;
+    if (dump_size > max_dump_data_len / sizeof(T)) {
+        mark_debug_overflow(block_info);
+        return;
+    }
+    const uint32_t align_dump_len = align_up(dump_size * sizeof(T), data_block_size);
+    const uint32_t tlv_len = sizeof(DumpTensorTlv) + align_dump_len;
+    if (!reserve_debug_tlv(block_info, tlv_len)) {
+        return;
+    }
 
     __ubuf__ DumpTensorTlv* dump_tlv =
         (__ubuf__ DumpTensorTlv*)((__ubuf__ uint8_t*)(block_info->buffer) + block_info->writeLen);
@@ -112,15 +146,20 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_s
     block_info->pidx += 1;
 #endif
 }
+#endif
 
 template <typename T, typename U>
 __ASC_USE_RESERVED_UBUF__(
     3510, "asc_dump_reg is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_size)
 {
+#ifdef ASCENDC_CPU_DEBUG
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "asc_dump_reg is not supported in cpu mode."); });
+#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     asc_dump_impl_reg<DumpTensorPosition::REG, T>(input, desc, dump_size);
+#endif
 #endif
 }
 
@@ -129,9 +168,13 @@ __ASC_USE_RESERVED_UBUF__(
     3510, "asc_dump_ubuf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 {
+#ifdef ASCENDC_CPU_DEBUG
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "asc_dump_ubuf is not supported in cpu mode."); });
+#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     asc_dump_impl<DumpTensorPosition::UB, T>(input, desc, dump_size);
+#endif
 #endif
 }
 
@@ -139,9 +182,13 @@ template <typename T, typename U>
 __ASC_USE_RESERVED_UBUF__(3510, "asc_dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size)
 {
+#ifdef ASCENDC_CPU_DEBUG
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "asc_dump is not supported in cpu mode."); });
+#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     asc_dump_impl_reg<DumpTensorPosition::REG, T>(input, desc, dump_size);
+#endif
 #endif
 }
 
@@ -149,13 +196,15 @@ template <typename T>
 __ASC_USE_RESERVED_UBUF__(3510, "asc_dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 {
+#ifdef ASCENDC_CPU_DEBUG
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "asc_dump is not supported in cpu mode."); });
+#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     asc_dump_impl<DumpTensorPosition::UB, T>(input, desc, dump_size);
 #endif
+#endif
 }
 } // namespace __asc_simd_vf
-
-#endif // ASCENDC_CPU_DEBUG
 
 #endif // IMPL_UTILS_DEBUG_ASC_SIMD_DUMP_IMPL_H
