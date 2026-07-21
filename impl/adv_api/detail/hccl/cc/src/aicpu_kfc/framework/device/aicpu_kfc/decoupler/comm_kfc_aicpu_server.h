@@ -76,6 +76,11 @@ public:
         std::vector<uint8_t>& runParam);
     const ServerExecCtx* MatchExecCtx(u64 opParamKey) const;
 
+    void ReportProfilingKernelStart(const ServerExecCtx& execCtx);
+    void ReportProfilingKernelEnd(const ServerExecCtx& execCtx, const HcclApi::HcclMsg& msg);
+    void RegisterDfxOpInfo(const ServerExecCtx& execCtx, const HcclApi::HcclMsg& msg);
+    static bool IsProfilingEnabled();
+
 private:
 #ifdef CCL_LLT
     static constexpr u64 KFC_NSEC_PER_SEC = 1000000UL;
