@@ -11,6 +11,7 @@ This directory provides usage examples for different Ascend C programming modes,
 | [03_simt_api](./03_simt_api) | Ascend C SIMT programming examples, covering getting started, debugging tools, core features, and practice references |
 | [04_aicpu](./04_aicpu) | Ascend C AICPU programming examples, covering getting started and features |
 | [05_simd_simt_hybrid](./05_simd_simt_hybrid) | Ascend C SIMD and SIMT hybrid programming examples, covering getting started and high-performance optimization examples |
+| [06_hccl](./06_hccl) | HCCL collective communication examples, covering the usage of collective communication operations |
 
 ## npu-arch Build Option Description
 

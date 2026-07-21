@@ -11,6 +11,7 @@
 | [03_simt_api](./03_simt_api) | Ascend C SIMT编程样例，覆盖入门、调试工具、核心特性和实践参考 |
 | [04_aicpu](./04_aicpu) | Ascend C AICPU编程样例，覆盖入门和功能特性 |
 | [05_simd_simt_hybrid](./05_simd_simt_hybrid) | Ascend C SIMD与SIMT混合编程样例，覆盖入门和高性能优化样例 |
+| [06_hccl](./06_hccl) | HCCL 集合通信样例，覆盖集合通信操作的使用方法 |
 
 ## npu-arch编译选项说明
 
