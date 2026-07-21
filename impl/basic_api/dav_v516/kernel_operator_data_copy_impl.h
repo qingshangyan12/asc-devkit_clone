@@ -1197,10 +1197,9 @@ template <typename T>
 __aicore__ inline __in_pipe__(FIX)
     __out_pipe__(FIX) void DataCopyL12FBImpl(__fbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
-    constexpr uint16_t unitCoeff = 2;
-    copy_cbuf_to_fbuf(
-        (__fbuf__ void*)dst, (__cbuf__ void*)src, intriParams.blockCount, intriParams.blockLen * unitCoeff,
-        intriParams.srcStride, intriParams.dstStride * unitCoeff);
+    copy_cbuf_to_fbuf_v2(
+        (__fbuf__ void*)dst, (__cbuf__ void*)src, 0, intriParams.blockCount, intriParams.blockLen,
+        intriParams.srcStride, intriParams.dstStride);
 }
 
 template <typename T>
