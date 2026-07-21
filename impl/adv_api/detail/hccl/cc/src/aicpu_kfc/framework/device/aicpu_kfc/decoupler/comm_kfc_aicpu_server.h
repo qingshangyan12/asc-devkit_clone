@@ -76,6 +76,11 @@ public:
         std::vector<uint8_t>& runParam);
     const ServerExecCtx* MatchExecCtx(u64 opParamKey) const;
 
+    void ReportProfilingKernelStart(const ServerExecCtx& execCtx);
+    void ReportProfilingKernelEnd(const ServerExecCtx& execCtx, const HcclApi::HcclMsg& msg);
+    void RegisterDfxOpInfo(const ServerExecCtx& execCtx, const HcclApi::HcclMsg& msg, u64 beginTime, u64 endTime);
+    static bool IsProfilingEnabled();
+
 private:
 #ifdef CCL_LLT
     static constexpr u64 KFC_NSEC_PER_SEC = 1000000UL;
@@ -104,6 +109,7 @@ private:
     u32 groupIdx_;
     u32 rankNum_{0U};
     ServerProgress lastProgress_{};
+    u64 profOpBeginTime_{0UL}; // 与 HcclLaunchAicpuKernel 对齐：算子起始时刻，start 采集、end 上报
 };
 
 #endif // HCCL_COMM_KFC_AICPU_SERVER_H
