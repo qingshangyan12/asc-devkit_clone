@@ -100,6 +100,10 @@ private:
     __aicore__ inline void PollCqWhenSqOverflow(
         ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead);
     __aicore__ inline uint32_t PollCq(ChannelHandle channel, uint32_t expectTail);
+    // Read one SQ WQE at the given ring slot back from GM into the UB scratch and dump it.
+    __aicore__ inline void DumpOneSqWqe(const SqContext& sqCtx, uint32_t slot);
+    // Dump every SQ WQE in the ring; used on the CQE-timeout path where no valid CQE points back to a slot.
+    __aicore__ inline void DumpAllSqWqe(const SqContext& sqCtx);
 
 private:
     LocalTensor<uint32_t> wqeItem_;
