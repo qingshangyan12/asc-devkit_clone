@@ -32,12 +32,12 @@ __global__ __cube__ void matmul_custom(...)
     AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
 
     // Allocate L1 Buffer for matrix A and B
-    LocalTensor<half> l1a_buffer = l1Allocator.Alloc<half, m_size * k_size>();
-    LocalTensor<half> l1b_buffer = l1Allocator.Alloc<half, k_size * n_size>();
+    AscendC::LocalTensor<half> l1a_buffer = l1Allocator.Alloc<half, m_size * k_size>();
+    AscendC::LocalTensor<half> l1b_buffer = l1Allocator.Alloc<half, k_size * n_size>();
     // Allocate L0A/L0B/L0C Buffer for matrix computation
-    LocalTensor<half> l0a_buffer = l0aAllocator.Alloc<half, m_size * k_size>();
-    LocalTensor<half> l0b_buffer = l0bAllocator.Alloc<half, k_size * n_size>();
-    LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
+    AscendC::LocalTensor<half> l0a_buffer = l0aAllocator.Alloc<half, m_size * k_size>();
+    AscendC::LocalTensor<half> l0b_buffer = l0bAllocator.Alloc<half, k_size * n_size>();
+    AscendC::LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
 
     // ... Use Buffer for matrix computation
 }
@@ -130,7 +130,7 @@ Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩�
 
 该能力主要实现将矩阵从GM搬运至L1 Buffer，并支持在数据搬运时进行ND到Nz格式的转换。
 
-该能力通过`DataCopy`接口配合`Nd2NzParams`参数实现，配置`nd_num`、`src_d_value`等参数完成GM2L1搬运和ND2NZ格式转换。
+该能力通过`DataCopy`接口配合`Nd2NzParams`参数实现，配置`ndNum`、`srcDValue`等参数完成GM2L1搬运和ND2NZ格式转换。
 
 ![GM到L1的ND2NZ搬运示例](../../../../figures/GM到L1的ND2NZ搬运示例.png)
 
@@ -147,7 +147,7 @@ AscendC::GlobalTensor<half> srcGlobal;
 srcGlobal.SetGlobalBuffer((__gm__ half*)src);
 
 // Set parameters for Nd2NzParams
-AscendC::Nd2NzParams intriParams{/*ndNum*/1, /*nValue*/16, /*dValue*/23, /*srcNdMatrixStride*/0, /*srcDValue*/32, /*dstNzC0Stride*/32, /*dstNzNStride*/1, /*dstNzMatrixStride*/0};
+AscendC::Nd2NzParams intriParams{/*ndNum*/1, /*nValue*/16, /*dValue*/23, /*srcNdMatrixStride*/0, /*srcDValue*/32, /*dstNzC0Stride*/16, /*dstNzNStride*/1, /*dstNzMatrixStride*/0};
 
 // Global Memory -> Local Memory with ND2NZ conversion
 AscendC::DataCopy(dst, srcGlobal, intriParams);
@@ -155,7 +155,7 @@ AscendC::DataCopy(dst, srcGlobal, intriParams);
 
 #### L12L0 数据搬运
 
-该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分形转换到Zz或Zn格式，C++ Tensor编程提供了`LoadData`接口配合`LoadData2DParamsV2`参数，其中针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)的L12L0A搬运可将L1 Buffer中512B大小的矩阵搬运到L0A Buffer，支持2D搬运、转置搬运、3D搬运等模式。
+该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分形转换到Zz或Zn格式。针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，C++ Tensor编程提供了`LoadData`接口配合`LoadData2DParamsV2`参数，以512B数据分形为基本单位完成L1 Buffer到L0A/L0B Buffer的2D搬运，并可通过`ifTranspose`配置分形转置。
 
 ![L12L0A非转置搬运](../../../../figures/L12L0A非转置搬运.png)
 
@@ -185,7 +185,7 @@ AscendC::LoadData(l0a_buffer, l1_buffer, l12l0Params);
 
 搬运到L0B Buffer采用同样的`LoadData`接口实现，接口参数及实现功能同L12L0A，可参考[矩阵计算的搬入](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵计算的搬入.md)查看更多内容。
 
-当输入A矩阵（GM）是转置排布(K×M)时，搬入到L1 Buffer为(K×M)排布的Nz分形。要使L0A Buffer存放(M×K)的Zz或Nz格式（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)），需要在L12L0A时进行转置，调用带transpose参数的接口。
+当输入A矩阵（GM）是转置排布（K×M）时，搬入到L1 Buffer后为K×M排布的Nz分形。要使L0A Buffer存放M×K的矩阵，需要在L1 Buffer到L0A Buffer的搬运过程中进行转置。针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，可使用`LoadDataWithTranspose`接口，调用示例如下。
 
 ![需要转置的处理场景](../../../../figures/需要转置的处理场景.png)
 
@@ -204,9 +204,11 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 }
 ```
 
+针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，`LoadDataWithTranspose`不支持L1 Buffer到L0A Buffer通路，需要使用`LoadData`接口配合`LoadData2DParamsV2`参数，并将`ifTranspose`设置为`true`。
+
 ### 矩阵数据搬出
 
-矩阵搬出接口实现L0C到Global Memory或L1 Buffer的数据传输，支持随路量化、ReLU、格式转换(NZ2ND)、通道拆分合并等操作，开发者通过配置参数控制搬运路径、位置、长度等以充分利用硬件能力，通常在Mmad接口后使用，而针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)还支持L0C到UB Buffer的传输、NZ2ND格式转换以及UB双目标模式，矩阵搬出能力如下图所示：
+矩阵搬出接口实现L0C Buffer到Global Memory或L1 Buffer的数据传输，支持随路量化、ReLU、NZ2ND格式转换、通道拆分合并等操作。开发者通过配置参数控制搬运路径、位置和长度等，通常在`Mmad`接口后使用。针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，还支持L0C Buffer到UB的搬运以及UB双目标模式。L0C Buffer到Global Memory通路的NZ2ND格式转换同时支持NPU架构版本2201和3510。矩阵搬出能力如下图所示：
 
 [NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)下的矩阵搬出流程为：
 
@@ -216,7 +218,7 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 
 ![矩阵搬出流程](../../../../figures/矩阵搬出流程-Ascend950PR.png)
 
-矩阵搬出接口支持多种随路能力的灵活组合，以L0C到Global Memory的搬运场景为例：矩阵计算结果暂存于L0C Buffer后需搬运至GM，在此过程中可协同执行随路量化、ReLU激活、格式转换及通道拆分合并等操作。下图分别展示了不同NPU架构版本下这些随路能力的有效组合、中间数据类型及完整数据路径。例如，L0C中的F32数据可通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU后经NZ2NZ/NZ2ND格式转换输出至GM。图中F32→F16和F32→BF16为数据类型转换，其余路径为随路scalar/vector量化模式；针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，还额外支持NZ2ND格式转换。
+矩阵搬出接口支持多种随路能力的灵活组合，以L0C Buffer到Global Memory的搬运场景为例：矩阵计算结果暂存于L0C Buffer后需搬运至GM，在此过程中可协同执行随路量化、ReLU激活、格式转换及通道拆分合并等操作。下图分别展示了不同NPU架构版本下这些随路能力的有效组合、中间数据类型及完整数据路径。例如，L0C Buffer中的F32数据可通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU后经NZ2NZ/NZ2ND格式转换输出至GM。图中F32->F16和F32->BF16为数据类型转换，其余路径为随路Scalar/Vector量化模式。
 
 [NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)下的矩阵搬出能力为：
 
@@ -228,9 +230,10 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 
 C++ Tensor编程提供了`DataCopy`接口配合`DataCopyCO12DstParams`参数来使能发挥芯片的各种随路能力，通过直接传入配置参数可完成随路搬运的操作。
 示例：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8_t，结果矩阵的数据类型为int32_t。量化模式为DEQF16，Scalar量化参数为2.0，将Mmad计算出的结果由int32_t量化成half并搬出。
+
 ```cpp
 // Scalar quantization, quantization parameter is 2.0
-float quantScalar = 2.0;
+float quantScalar = 2.0f;
 uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantScalar));
 // Write scalar quantization parameter to register for subsequent DataCopy instructions
 AscendC::SetFixpipePreQuantFlag(deqScalar);
@@ -243,11 +246,14 @@ intriParams.dstStride = n;
 intriParams.quantPre = QuantMode_t::DEQF16;
 intriParams.reluPre = 1; // Enable ReLU
 intriParams.nz2ndEn = true; // Enable NZ2ND format conversion
+// Set NZ2ND parameters before enabling NZ2ND in DataCopy
+AscendC::SetFixpipeNz2ndFlag(/*ndNum*/1, /*srcNdStride*/0, /*dstNdStride*/1);
 // Execute data transfer based on configurations in intriParams
 AscendC::DataCopy(cGM, cLocal, intriParams);
 ```
 
-另外，对于unit_flag的开启及nz2nd信息的设置，需配置相应参数以启用不同功能。对应的接口和处理能力如下：
+另外，开发者可通过`SetFixPipeConfig`设置Tensor量化参数或清除unitFlag，通过`SetFixpipeNz2ndFlag`设置NZ2ND格式转换信息。`SetFixPipeConfig`的`reluPreTensor`和`quantPreTensor`需要为Fixpipe Buffer上数据类型为`uint64_t`的`LocalTensor`，当前`reluPreTensor`传入空`LocalTensor`即可。对应的接口和处理能力如下：
+
 ```cpp
 // Set vector quantization parameters for on-the-fly quantization during data transfer
 AscendC::SetFixPipeConfig(reluPreTensor, quantPreTensor, isUnitFlag);
@@ -256,15 +262,15 @@ AscendC::SetFixPipeConfig(reluPreTensor, quantPreTensor, isUnitFlag);
 // Number of ND matrices
 uint16_t ndNum = 1;
 // Source stride in fractal unit, offset between adjacent source NZ matrix headers
-uint16_t srcNdStride = 2;
+uint16_t srcNdStride = 0;
 // Destination stride, offset between adjacent destination ND matrix headers
 uint16_t dstNdStride = 1;
 AscendC::SetFixpipeNz2ndFlag(ndNum, srcNdStride, dstNdStride);
 
 // Set scalar quantization parameter for on-the-fly quantization in DataCopy (L0C->GM, L0C->L1)
-float tmp = (float)0.5;
+float tmp = 0.5f;
 // Convert float value tmp to uint64_t deqScalar
-uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp)); 
+uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
 AscendC::SetFixpipePreQuantFlag(deqScalar);
 ```
 
@@ -314,10 +320,10 @@ mmadParams.k = 64;
 mmadParams.unitFlag = 0;
 // disableGemv: Configures whether to enable GEMV mode when M=1
 mmadParams.disableGemv = false;
-// cmatrixInitVal: Enables C matrix initial value loading
-mmadParams.cmatrixInitVal = false;
-// cmatrixSource: Enables C matrix default zero initialization
-mmadParams.cmatrixSource = true;
+// cmatrixInitVal: Initializes C matrix to zero before computation
+mmadParams.cmatrixInitVal = true;
+// cmatrixSource: Does not initialize C matrix from BiasTable Buffer
+mmadParams.cmatrixSource = false;
 
 AscendC::Mmad(c_matrix, a_matrix, b_matrix, mmadParams);
 ```
@@ -329,7 +335,7 @@ AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异
 当开发者进行一个矩阵乘法计算时（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品），可通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这四个步骤的同步。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品可使用`SetFlag`&`WaitFlag`实现相同同步效果，详见[同步机制](../基于Tensor的CPP编程/CPPTensor编程概述.md#同步机制)。
 
 ```cpp
-__global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
+__global__ __cube__ void matmul_kernel(__gm__ half* x, __gm__ half* y, __gm__ float* z)
 {
     uint8_t mutex_id = 1;
     
@@ -346,15 +352,17 @@ __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ 
     
     AscendC::GlobalTensor<half> aGm, bGm;
     AscendC::GlobalTensor<float> cGm;
-    aGm.SetGlobalBuffer((__gm__ half*)x);
-    bGm.SetGlobalBuffer((__gm__ half*)y);
-    cGm.SetGlobalBuffer((__gm__ float*)z);
+    aGm.SetGlobalBuffer(x);
+    bGm.SetGlobalBuffer(y);
+    cGm.SetGlobalBuffer(z);
     
     // Step 1: Data transfer in (Global Memory → L1 Buffer), pipeline is PIPE_MTE2
     AscendC::Mutex::Lock<PIPE_MTE2>(mutex_id);
-    AscendC::Nd2NzParams nd2nzParamsA{1, 16, 23, 0, 32, 32, 1, 0};
+    AscendC::Nd2NzParams nd2nzParamsA{
+        1, BLOCK_M, BLOCK_K, 0, BLOCK_K, (BLOCK_M + 15) / 16 * 16, 1, 0};
     AscendC::DataCopy(al1ATensor, aGm, nd2nzParamsA);
-    AscendC::Nd2NzParams nd2nzParamsB{1, 16, 23, 0, 32, 32, 1, 0};
+    AscendC::Nd2NzParams nd2nzParamsB{
+        1, BLOCK_K, BLOCK_N, 0, BLOCK_N, (BLOCK_K + 15) / 16 * 16, 1, 0};
     AscendC::DataCopy(bl1BTensor, bGm, nd2nzParamsB);
     AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
     
@@ -367,7 +375,7 @@ __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ 
     
     // Step 3: Matrix computation (L0A/B Buffer → L0C Buffer), pipeline is PIPE_M
     AscendC::Mutex::Lock<PIPE_M>(mutex_id);
-    AscendC::MmadParams mmadParams{BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, true};
+    AscendC::MmadParams mmadParams{BLOCK_M, BLOCK_N, BLOCK_K, 0, false, true};
     AscendC::Mmad(l0cTensor, l0aTensor, l0bTensor, mmadParams);
     AscendC::Mutex::Unlock<PIPE_M>(mutex_id);
     
@@ -436,73 +444,83 @@ Stride = ((C0_ELEMENT, C0_ELEMENT * Std::Int<16>{}), (Std::Int<1>{}, C0_ELEMENT 
 
 ### Layout的构造
 
-结合如上分形表达的描述，基于Layout的能力，C++ Tensor编程提供了原始的Layout构造接口，例如，需要创建一个多维的内存排布的形状(128, 256, 128)时，可通过`MakeLayout`接口直接构造。
+结合如上分形表达的描述，基于Layout的能力，C++ Tensor编程提供了原始的Layout构造接口。例如，需要创建一个形状为（128，256，128）的多维内存排布时，可通过`MakeLayout`接口直接构造。
 
 ```cpp
 auto threeDimLayout = AscendC::Te::MakeLayout(AscendC::Te::MakeShape(128, 256, 128));
 ```
 
-而对于一个Nz分形的排布，也可以通过`MakeLayout`来构造一个层次化的Layout表达，譬如，对于外层大小为(128, 256)，数据类型为half的Nz数据而言，其可以通过`MakeLayout`构造一个四维的Layout排布：
+对于一个Nz分形的排布，也可以通过`MakeLayout`构造层次化的Layout表达。例如，对于外层大小为（128，256），数据类型为`half`的Nz数据，可以通过`MakeLayout`构造四维Layout排布：
+
 ```cpp
 // Define Nz fractal with shape (128, 256), its 4D representation is: ((16, 128 / 16), (16, 256 / 16))
-auto NzLayout = AscendC::Te::MakeLayout(AscendC::Te::MakeShape((16, 8), (16, 16)));
+auto NzLayout = AscendC::Te::MakeLayout(AscendC::Te::MakeShape(
+    AscendC::Te::MakeShape(16, 8), AscendC::Te::MakeShape(16, 16)));
 ```
 
 Cube矩阵计算中对于不同的内部存储都有着自己独特的分形结构，为了简化用户的编写，C++ Tensor编程提供了`MakeFrameLayout`来简化用户编写生成如上的四维Layout定义：
+
 ```cpp
 // Use MakeFrameLayout to simplify Nz fractal definition, user only needs to perceive the fractal structure of corresponding storage, no need to directly express 4D structure
-auto NzLayout = AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(128, 256);
+auto NzLayout = AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn, half>(128, 256);
 ```
 
 ### 基于Layout的Tensor表达
 
-扩展的Tensor即是将上述的Layout信息内置到Tensor结构中，该Tensor是对基础Tensor的扩展实现，其由数据指针和数据布局组成。一个Tensor对象同时描述"数据放在哪里"和"数据长什么样"。
-C++ Tensor提供了`MakeTensor`函数让开发者能够简便地构造出带有Layout的扩展Tensor结构，定义一个(shape = (128, 256), type = half)的Global Memory和一个同等大小的L1 Buffer数据块(Nz分形布局)，通过结合Layout构造函数可以表达为：
+扩展的Tensor是将上述Layout信息内置到Tensor结构中，由数据指针和数据布局组成。一个Tensor对象同时描述“数据放在哪里”和“数据长什么样”。
+C++ Tensor提供了`MakeTensor`函数，用于构造带有Layout的扩展Tensor结构。例如，定义一个形状为（128，256）、数据类型为`half`的Global Memory数据块，以及一个同等大小的L1 Buffer数据块（Nz分形布局），可表达为：
 
 ```cpp
 // Construct Layout for Global Memory & L1 Buffer 
 auto globalLayout = AscendC::Te::MakeLayout(AscendC::Te::MakeShape(128, 256));
-auto l1Layout = AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(128, 256);
+auto l1Layout = AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn, half>(128, 256);
 
-// Construct GlobalTensor & L1 LocalTensor through pointer + Layout
-auto globalTensor = AscendC::Te::MakeTensor(gmPtr, globalLayout);
-auto l1Tensor = AscendC::Te::MakeTensor(l1Ptr, l1Layout);
+// Construct GlobalTensor & L1 LocalTensor through memory pointer + Layout
+auto globalTensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(gmPtr), globalLayout);
+auto l1Tensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(l1Ptr), l1Layout);
 ```
 
-扩展Tensor提供了operator()元素访问、Slice()切片提取、Reshape()形状重组等布局调整接口，大幅简化多维数据的操作流程。相较于基础Tensor需要手动计算偏移地址、步长参数和搬运长度，扩展Tensor的接口可自动推导这些底层参数，开发者只需关注数据逻辑即可。这种抽象封装方式不仅降低了编程复杂度，也减少了参数配置错误的风险，让开发者能将精力集中于算子性能优化与算法实现，显著提升开发效率。
+扩展Tensor提供了`operator[]`元素访问、`operator()`子Tensor提取和`Slice()`切片提取等布局调整接口，大幅简化多维数据的操作流程。相较于基础Tensor需要手动计算偏移地址、步长参数和搬运长度，扩展Tensor的接口可自动推导这些底层参数，开发者只需关注数据逻辑即可。这种抽象封装方式不仅降低了编程复杂度，也减少了参数配置错误的风险，让开发者能将精力集中于算子性能优化与算法实现，显著提升开发效率。
 
 ```cpp
 // Construct tensor for Global Memory
 auto globalLayout = AscendC::Te::MakeLayout(AscendC::Te::MakeShape(128, 256));
-auto globalTensor = AscendC::Te::MakeTensor(gmPtr, globalLayout);
+auto globalTensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(gmPtr), globalLayout);
 
 auto subTensor = globalTensor.Slice(AscendC::Te::MakeCoord(32, 64), AscendC::Te::MakeShape(32, 32));
 ```
 
 ### 矩阵搬运和计算
 
-基础搬运接口需手动传入`count`或`DataCopyParams`参数指定搬运长度和搬运模式。扩展Tensor携带Shape、Stride和存储位置信息，编译器自动推断搬运参数和物理通路，简化接口调用。同时提供**Atom定制接口**，开发者可基于CopyTraits自定义搬运行为（如自定义搬运模式、随路处理等），满足特殊场景定制需求。
+基础搬运接口需手动传入`count`或`DataCopyParams`参数指定搬运长度和搬运模式。扩展Tensor携带Shape、Stride和存储位置信息，编译器自动推断搬运参数和物理通路，简化接口调用。同时提供**Atom定制接口**，开发者可基于`CopyTraits`自定义搬运行为（如自定义搬运模式、随路处理等），满足特殊场景定制需求。
 
-- **GM2L1搬运**: `Copy(dst, src)`搬运矩阵数据到L1 Buffer，支持随路格式转换（ND2NZ、DN2NZ、NZ2NZ等），开发者定义源Tensor和目的Tensor的Layout，接口自动处理格式转换。
+- **GM2L1搬运**：`Copy(atomCopy, dst, src)`搬运矩阵数据到L1 Buffer，支持随路格式转换（ND2NZ、DN2NZ、NZ2NZ等）。开发者定义源Tensor和目的Tensor的Layout，并使用`MakeCopy`构造GM到L1 Buffer的搬运原子对象，接口自动推导底层搬运参数和格式转换方式。
+
 ```cpp
-// Directly specify Global Tensor and Local Tensor for equal size copy, interface automatically infers copy parameters
-AscendC::Te::Copy(l1Tensor, globalBias);
+// Construct GM-to-L1 CopyAtom with the default trait
+auto atomCopy = AscendC::Te::MakeCopy(
+    AscendC::Te::CopyGM2L1{}, AscendC::Te::CopyGM2L1TraitDefault{});
+
+// Copy equal-size tensors, and infer copy parameters from Layout
+AscendC::Te::Copy(atomCopy, l1Tensor, globalTensor);
 
 // Specify Global Tensor offset to copy a slice from Global Tensor
-AscendC::Te::Copy(l1Tensor, globalBias.Slice(AscendC::Te::MakeCoord(0, j * baseN), AscendC::Te::MakeShape(1, curN)));
-
-// Create custom CopyAtom based on OP, CopyGM2L1 implements custom GM->L1 copy capability
-auto atomCopy = AscendC::Te::MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
-AscendC::Te::Copy(atomCopy, dstTensor, srcTensor);
+AscendC::Te::Copy(atomCopy, l1BiasTensor,
+    globalBias.Slice(AscendC::Te::MakeCoord(0, j * baseN), AscendC::Te::MakeShape(1, curN)));
 ```
 
-- **L0C2GM搬出**: 基于CopyTraits定制随路处理（如Fixpipe量化），将L0C Buffer计算结果搬出至GM。
+- **L0C2GM搬出**：基于`CopyTraits`定制随路处理（如Fixpipe量化），将L0C Buffer计算结果搬出至GM。
+
 ```cpp
 // Fixpipe inline quantization example
-AscendC::Te::Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}, globalC, l0CTensor, quantScalar);
+float quantValue = 0.5f;
+uint64_t quantScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantValue));
+auto atomCopy = AscendC::Te::MakeCopy(
+    AscendC::Te::CopyL0C2GM{}, AscendC::Te::CopyL0C2GMTraitDefault{}).with(AscendC::Te::FixpipeParams{});
+AscendC::Te::Copy(atomCopy, globalC, l0CTensor, quantScalar);
 ```
 
-同样，L1 Buffer到L0A Buffer/L0B Buffer的搬运接口以及矩阵计算接口只需指定操作Tensor，开发者无需关注细节参数，极大简化了矩阵算子编写难度。
+同样，L1 Buffer到L0A/L0B Buffer的搬运需要构造对应通路的`CopyAtom`，矩阵计算需要构造`MmadAtom`。开发者传入搬运或计算原子对象以及操作Tensor后，接口可根据Layout推导底层参数。
 
 ### 基于扩展Tensor的矩阵计算示例
 
