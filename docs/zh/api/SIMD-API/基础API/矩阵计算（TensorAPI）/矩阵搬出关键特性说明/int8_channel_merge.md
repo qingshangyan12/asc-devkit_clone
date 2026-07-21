@@ -10,7 +10,7 @@ Int8 Channel Merge：当目标数据类型为`int8_t`，M为32，N为48时，硬
 
 **图1**  Int8 Channel Merge示意图
 
-![Int8 Channel Merge示意图](../../../../../figures/Fixpipe_Int8_Channel_Merge.png)
+![Int8 Channel Merge示意图](../../../../figures/Fixpipe_Int8_Channel_Merge.png)
 
 ## 约束说明
 
