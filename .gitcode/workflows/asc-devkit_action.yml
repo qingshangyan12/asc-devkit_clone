@@ -184,7 +184,7 @@ stages:
         name: adv_test_two
         uses: .gitcode/workflows/llt_action.yml
         with:
-          ut_type: 'UT_Test_adv_test_two'
+          ut_type: 'adv_test_two'
           ut_package: 'coverage_*.info'
           image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
           arch: 'x64'
