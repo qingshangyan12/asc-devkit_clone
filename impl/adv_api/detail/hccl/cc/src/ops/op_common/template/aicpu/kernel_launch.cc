@@ -15,6 +15,7 @@
 #include "coll_alg_exec_registry.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "hcomm_primitives.h"
+#include "hccl_api_data.h"
 #include "dfx/task_exception_fun.h"
 #include "kernel_launch.h"
 #include "hcomm_diag_dl.h"
@@ -342,9 +343,8 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             }
         }
         HCCL_DEBUG(
-            "[%s]Notify wait on thread[%llu], maxNotifyNum[%u], timeout[%u]", __func__, thread, maxNotifyNum,
-            CUSTOM_TIMEOUT);
-        CHK_RET(static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(thread, maxNotifyNum, CUSTOM_TIMEOUT)));
+            "[%s]Notify wait on thread[%llu], maxNotifyNum[%u]", __func__, thread, maxNotifyNum);
+        CHK_RET(static_cast<HcclResult>(HcommThreadNotifyWaitOnThreadWithDefaultTimeout(thread, maxNotifyNum)));
 
         std::shared_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, algName);
         if (executor.get() == nullptr) {
@@ -414,10 +414,10 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
 
             // 主thread等待Host stream的通知
             HCCL_DEBUG(
-                "[%s]Notify wait on thread[%llu], notifyNumOnMainThread[%u], timeout[%u]", __func__, thread,
-                notifyNumOnMainThread, CUSTOM_TIMEOUT);
+                "[%s]Notify wait on thread[%llu], notifyNumOnMainThread[%u]", __func__, thread,
+                notifyNumOnMainThread);
             CHK_RET(
-                static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(thread, notifyNumOnMainThread, CUSTOM_TIMEOUT)));
+                static_cast<HcclResult>(HcommThreadNotifyWaitOnThreadWithDefaultTimeout(thread, notifyNumOnMainThread)));
         } else {
             if (HcommAclrtNotifyWaitOnThread(thread, resCtx->notifyIds[0], CUSTOM_TIMEOUT) != HCCL_SUCCESS) {
                 HCCL_ERROR("failed to wait notify[%d] from host main stream", resCtx->notifyIds[0]);

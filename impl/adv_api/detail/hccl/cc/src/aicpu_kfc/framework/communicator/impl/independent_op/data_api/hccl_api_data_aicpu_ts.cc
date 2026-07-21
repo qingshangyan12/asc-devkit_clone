@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include <cmath>
 #include "hccl_api_data.h"
 #include "dispatcher.h"
 #include "new/hccl_primitive_local.h"
@@ -31,6 +32,8 @@ using namespace hccl;
 thread_local LaunchContext g_threadLaunchCtx;
 
 bool IsBatchLaunchMode() { return g_threadLaunchCtx.IsBatchLaunchMode(); }
+
+uint32_t GetSqFullTimeOut() { return g_threadLaunchCtx.GetSqFullTimeOut(); }
 
 namespace {
 struct AicpuOrderDfxThreadInfo {
@@ -1124,6 +1127,70 @@ int32_t HcommSetLaunchMode(const char* launchTag, HcommLaunchMode mode)
 int32_t HcommBatchModeStart(const char* batchTag) { return HcommSetLaunchMode(batchTag, HCOMM_LAUNCH_MODE_BATCH); }
 
 int32_t HcommBatchModeEnd(const char* batchTag) { return HcommSetLaunchMode(batchTag, HCOMM_LAUNCH_MODE_EAGER); }
+
+// 设置notify wait的等待超时时间，默认单位为秒
+int32_t HcommSetNotifyWaitTimeOut(float timeOut)
+{
+    if (std::isnan(timeOut) || timeOut < 0.0f || timeOut > static_cast<float>(UINT32_MAX)) {
+        HCCL_ERROR("[%s] in aicpu_ts timeOut[%f] is invalid.", __func__, timeOut);
+        return HCCL_E_PARA;
+    }
+    uint32_t timeOutInt = static_cast<uint32_t>(timeOut);
+    HCCL_INFO("[%s] START in aicpu_ts. timeOut[%u].", __func__, timeOutInt);
+    return g_threadLaunchCtx.SetNotifyWaitTimeOut(timeOutInt);
+}
+
+int32_t HcommThreadResAcquireTimeOut(float timeOut)
+{
+    if (std::isnan(timeOut) || timeOut < 0.0f || timeOut > static_cast<float>(UINT32_MAX)) {
+        HCCL_ERROR("[%s] in aicpu_ts timeOut[%f] is invalid.", __func__, timeOut);
+        return HCCL_E_PARA;
+    }
+    uint32_t timeOutInt = static_cast<uint32_t>(timeOut);
+    HCCL_INFO("[%s] START in aicpu_ts. timeOut[%u].", __func__, timeOutInt);
+    return g_threadLaunchCtx.SetSqFullTimeOut(timeOutInt);
+}
+
+int32_t HcommChannelNotifyWaitOnThreadWithDefaultTimeout(ThreadHandle thread, ChannelHandle channel, uint32_t localNotifyIdx)
+{
+    HCCL_INFO("[%s] START. thread[0x%llx], channel[0x%llx], localNotifyIdx[%u].",
+        __func__, thread, channel, localNotifyIdx);
+
+    uint32_t notifyWaitTimeOut;
+    g_threadLaunchCtx.GetNotifyWaitTimeOut(notifyWaitTimeOut);
+
+    HCCL_DEBUG("[%s] Using default timeout: %u s", __func__, notifyWaitTimeOut);
+
+    int32_t ret = HcommChannelNotifyWaitOnThread(thread, channel, localNotifyIdx, notifyWaitTimeOut);
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR("[%s] HcommChannelNotifyWaitOnThread FAILED. thread[0x%llx], channel[0x%llx], localNotifyIdx[%u], ret[%d]",
+            __func__, thread, channel, localNotifyIdx, ret);
+        return ret;
+    }
+
+    HCCL_INFO("[%s] SUCCESS.", __func__);
+    return HCCL_SUCCESS;
+}
+
+int32_t HcommThreadNotifyWaitOnThreadWithDefaultTimeout(ThreadHandle thread, uint32_t notifyIdx)
+{
+    HCCL_INFO("[%s] START. thread[0x%llx], notifyIdx[%u].", __func__, thread, notifyIdx);
+
+    uint32_t notifyWaitTimeOut;
+    g_threadLaunchCtx.GetNotifyWaitTimeOut(notifyWaitTimeOut);
+
+    HCCL_DEBUG("[%s] Using default timeout: %u s", __func__, notifyWaitTimeOut);
+
+    int32_t ret = HcommThreadNotifyWaitOnThread(thread, notifyIdx, notifyWaitTimeOut);
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR("[%s] HcommThreadNotifyWaitOnThread FAILED. thread[0x%llx], notifyIdx[%u], ret[%d]",
+            __func__, thread, notifyIdx, ret);
+        return ret;
+    }
+
+    HCCL_INFO("[%s] SUCCESS.", __func__);
+    return HCCL_SUCCESS;
+}
 
 int32_t HcommAcquireComm(const char* commId)
 {

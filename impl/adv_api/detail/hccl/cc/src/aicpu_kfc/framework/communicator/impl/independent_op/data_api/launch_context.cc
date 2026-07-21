@@ -4,92 +4,70 @@
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root directory of the software repository for the full text of the License.
  */
 #include "launch_context.h"
 #include "new/hccl_primitive_local.h"
 
+constexpr u32 THREAD_VECTOR_DEFAULT_SIZE = 128; // 设置vector初始长度，避免频繁扩容
+constexpr u32 NOTIFY_WAIT_TIMEOUT_OFFSET = 50; // AICPU device侧notify等待超时偏移量
+
 extern HcclResult CommTaskLaunch(ThreadHandle* threads, uint32_t threadNum); // host ffts+或aicpu stars使用"
-extern HcclResult CommTaskPrepare(char* key, uint32_t keyLen);               // host ffts+使用
+extern HcclResult CommTaskPrepare(char* key, uint32_t keyLen); // host ffts+使用
 extern HcclResult DispatchAllStreams(ThreadHandle* threads, uint32_t threadNum);
 
-void LaunchContext::AddThread(ThreadHandle thread)
+LaunchContext::LaunchContext()
 {
-    if (mode_ != HCOMM_LAUNCH_MODE_BATCH) {
-        // 仅 BATCH 模式缓存线程
-        return;
-    }
-    // 检查线程是否已存在，避免重复添加
-    auto& threadSet = launchModeMap_[launchTag_];
-    if (threadSet.find(thread) != threadSet.end()) {
-        HCCL_INFO("[%s] Thread already exists, launchTag[%s], thread[%lu].", __func__, launchTag_.c_str(), thread);
-        return;
-    }
-
-    threadSet.insert(thread);
-    HCCL_INFO(
-        "[%s] AddThread end, launchTag[%s], launchMode[%d], thread[%lu].", __func__, launchTag_.c_str(),
-        static_cast<int32_t>(mode_), thread);
+    threadVec_.reserve(THREAD_VECTOR_DEFAULT_SIZE);
 }
 
 HcclResult LaunchContext::HandleEagerMode()
 {
-    auto it = launchModeMap_.find(launchTag_);
-    if (it == launchModeMap_.end()) {
-        HCCL_WARNING("[%s] launchTag[%s] not found.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    // 带launchTag部分
+    if (!launchModeMap_.empty()) {
+        auto it = launchModeMap_.find(launchTag_);
+        if (it != launchModeMap_.end()) {
+            std::vector<ThreadHandle> threadVec(it->second.begin(), it->second.end());
+            CHK_RET(CommTaskLaunch(threadVec.data(), threadVec.size()));
+            HCCL_INFO("[%s]success, launchTag[%s], size[%u]", __func__, launchTag_.c_str(), threadVec.size());
+        }
     }
 
-    const auto& threadSet = it->second;
-    if (threadSet.empty()) {
-        HCCL_WARNING("[%s] launchTag[%s] has no threads.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    // 不带launchTag部分
+    if (!threadVec_.empty()) {
+        CHK_RET(CommTaskLaunch(threadVec_.data(), threadVec_.size()));
+        HCCL_INFO("[%s]success, size[%u]", __func__, threadVec_.size());
     }
-
-    std::vector<ThreadHandle> threadVec(threadSet.begin(), threadSet.end());
-    for (size_t i = 0; i < threadVec.size(); i++) {
-        HCCL_INFO(
-            "[%s] HandleEagerMode begin, launchTag[%s], launchMode[%d], thread[%lu].", __func__, launchTag_.c_str(),
-            static_cast<int32_t>(mode_), threadVec[i]);
-    }
-    return CommTaskLaunch(threadVec.data(), threadVec.size());
+    return HCCL_SUCCESS;
 }
 
 HcclResult LaunchContext::HandleDispatchAllStreams()
 {
-    auto it = launchModeMap_.find(launchTag_);
-    if (it == launchModeMap_.end()) {
-        HCCL_DEBUG("[%s] launchTag[%s] not found.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    // 带launchTag部分
+    if (!launchModeMap_.empty()) {
+        auto it = launchModeMap_.find(launchTag_);
+        if (it != launchModeMap_.end()) {
+            std::vector<ThreadHandle> threadVec(it->second.begin(), it->second.end());
+            CHK_RET(DispatchAllStreams(threadVec.data(), threadVec.size()));
+        }
     }
 
-    const auto& threadSet = it->second;
-    if (threadSet.empty()) {
-        HCCL_DEBUG("[%s] launchTag[%s] has no threads.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    // 不带launchTag部分
+    if (!threadVec_.empty()) {
+        CHK_RET(DispatchAllStreams(threadVec_.data(), threadVec_.size()));
     }
-
-    std::vector<ThreadHandle> threadVec(threadSet.begin(), threadSet.end());
-    for (size_t i = 0; i < threadVec.size(); i++) {
-        HCCL_DEBUG(
-            "[%s] HandleDispatchAllStreams begin, launchTag[%s], thread[%lu].", __func__, launchTag_.c_str(),
-            threadVec[i]);
-    }
-    return DispatchAllStreams(threadVec.data(), threadVec.size());
+    return HCCL_SUCCESS;
 }
 
 HcclResult LaunchContext::HandleClear()
 {
-    auto it = launchModeMap_.find(launchTag_);
-    if (it == launchModeMap_.end()) {
-        HCCL_WARNING("[%s] launchTag[%s] not found.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    threadVec_.clear();
+    if (!launchModeMap_.empty()) {
+        launchModeMap_.erase(launchTag_);
     }
-
-    launchModeMap_.erase(it);
-    HCCL_INFO(
-        "[%s] begin clear, launchTag[%s], launchMode[%d]", __func__, launchTag_.c_str(), static_cast<int32_t>(mode_));
+    HCCL_INFO("[%s] begin clear, launchTag[%s], launchMode[%d].",
+        __func__, launchTag_.c_str(), static_cast<int32_t>(mode_));
 
     DevType devType = DevType::DEV_TYPE_COUNT;
     hrtGetDeviceType(devType);
@@ -98,6 +76,36 @@ HcclResult LaunchContext::HandleClear()
         return HCCL_SUCCESS;
     }
     return HcclTaskClear(launchTag_);
+}
+
+HcclResult LaunchContext::SetNotifyWaitTimeOut(uint32_t timeout)
+{
+    notifyWaitTimeoutConfig_.notifyWaitTimeout = timeout;
+    notifyWaitTimeoutConfig_.isSet = true;
+    return HCCL_SUCCESS;
+}
+
+HcclResult LaunchContext::GetNotifyWaitTimeOut(uint32_t& timeout)
+{
+    timeout = notifyWaitTimeoutConfig_.notifyWaitTimeout;
+#ifndef CCL_KERNEL_AICPU
+    if (!notifyWaitTimeoutConfig_.isSet) {
+        timeout = timeout + NOTIFY_WAIT_TIMEOUT_OFFSET;
+    }
+#endif
+    return HCCL_SUCCESS;
+}
+
+HcclResult LaunchContext::SetSqFullTimeOut(uint32_t timeout)
+{
+    sqFullTimeoutConfig_.sqFullTimeout = timeout;
+    sqFullTimeoutConfig_.isSet = true;
+    return HCCL_SUCCESS;
+}
+
+uint32_t LaunchContext::GetSqFullTimeOut()
+{
+    return sqFullTimeoutConfig_.sqFullTimeout;
 }
 
 /*
@@ -134,9 +142,8 @@ HcclResult LaunchContext::SetLaunchMode(const char* launchTag, HcommLaunchMode m
     // 统一处理 launchTag
     bool defaultTag = (launchTag == nullptr);
     launchTag_ = defaultTag ? "" : std::string(launchTag);
-    HCCL_INFO(
-        "[%s] SetLaunchMode begin, launchTag[%s], launchMode[%d].", __func__, launchTag_.c_str(),
-        static_cast<int32_t>(mode));
+    HCCL_INFO("[%s] SetLaunchMode begin, launchTag[%s], launchMode[%d].",
+        __func__, launchTag_.c_str(), static_cast<int32_t>(mode));
 
 #ifndef CCL_KERNEL_AICPU
     DevType devType = DevType::DEV_TYPE_COUNT;
@@ -154,8 +161,8 @@ HcclResult LaunchContext::SetLaunchMode(const char* launchTag, HcommLaunchMode m
                 // 仅非缺省 tag 需要准备任务缓存
                 return CommTaskPrepare(const_cast<char*>(launchTag_.c_str()), launchTag_.length());
             }
-            return HCCL_SUCCESS;
 #endif
+            return HCCL_SUCCESS;
         case HCOMM_LAUNCH_MODE_EAGER:
             CHK_RET(HandleEagerMode());
             // 缺省 tag 模式下清理缓存
