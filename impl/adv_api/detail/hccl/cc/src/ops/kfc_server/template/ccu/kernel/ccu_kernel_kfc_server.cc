@@ -142,17 +142,18 @@ void MissionPostSync(KfcServerContext &ctx)
     }
 }
 
-void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartSig, KfcServerContext &ctx)
+CcuResult WaitTurnStartSig(
+    const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartSig, KfcServerContext &ctx)
 {
     // TODO GetDieId()
     const uint32_t getDieId = 1;
     // 单Die场景：等待HBM中的信号
     CCU_WHILE(turnStartSig != 1)
     {
-        ccu::Load(hbmSigAddr, turnStartSig);     // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
+        CCU_CHK_RET(ccu::Load(hbmSigAddr, turnStartSig)); // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
     }
     turnStartSig = 0;                       // reset Xn
-    ccu::Store(hbmSigAddr, turnStartSig);        // reset HBM
+    CCU_CHK_RET(ccu::Store(hbmSigAddr, turnStartSig)); // reset HBM
     /*
     CCU_IF (ctx.dieNum == SINGLE_DIE) {
         // 单Die场景：等待HBM中的信号
@@ -179,12 +180,14 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
         }
     }
     */
+    return CCU_SUCCESS;
 }
 
-void SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEndSig, KfcServerContext &ctx)
+CcuResult SetTurnEndSig(
+    const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEndSig, KfcServerContext &ctx)
 {
     const uint32_t getDieId = 1;    // TODO GetDieId()
-    ccu::Store(hbmSigAddr, turnEndSig);
+    CCU_CHK_RET(ccu::Store(hbmSigAddr, turnEndSig));
     /*
     CCU_IF (ctx.dieNum == SINGLE_DIE) {
         // 单Die场景：Set本轮完成信号到HBM
@@ -201,9 +204,11 @@ void SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEnd
         }
     }
     */
+    return CCU_SUCCESS;
 }
 
-void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable> &param, KfcServerContext &ctx)
+CcuResult LoadFuncParamFromMemory(
+    ccu::Variable &paramAddr, ccu::Array<ccu::Variable> &param, KfcServerContext &ctx)
 {
     // 双Die场景Die1需要读后32个参数，其他场景都是读取前32个参数
     ccu::Variable doubleDie;
@@ -222,7 +227,8 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
     */
 
     // 一次性读取本轮32个参数
-    ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE);
+    CCU_CHK_RET(ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE));
+    return CCU_SUCCESS;
 }
 
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, CcuKernelArg &arg, KfcServerContext &ctx)
@@ -254,7 +260,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, CcuKernelArg 
     }
 }
 
-void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
+CcuResult KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 {
     HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
     g_currentKfcArg = arg;
@@ -296,11 +302,11 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
     CCU_WHILE(repeatCond == 0)
     {
         // 等待本轮开始信号
-        WaitTurnStartSig(waitAddr, turnStartSig, ctx);
+        CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));
         HCCL_INFO("[KfcServerGenCircularQueue] WaitTurnStartSig finished.");
 
         // 读取本轮参数
-        LoadFuncParamFromMemory(paramAddr, param, ctx);
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx));
         HCCL_INFO("[KfcServerGenCircularQueue] LoadFuncParamFromMemory finished.");
 
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) {
@@ -316,7 +322,7 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
             HCCL_INFO("[KfcServerGenCircularQueue] MissionPostSync finished.");
 
             // Set本轮完成信号
-            SetTurnEndSig(recordAddr, turnEndSig, ctx);
+            CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
             HCCL_INFO("[KfcServerGenCircularQueue] SetTurnEndSig finished.");
         }
 
@@ -331,9 +337,10 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
             queueIdx = 0;
         }
     }
+    return CCU_SUCCESS;
 }
 
-void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
+CcuResult SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 {
     // 算子签名
     ccu::Variable signature;
@@ -354,7 +361,7 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         MissionPreSync(signature, ctx);
 
         // 读取本轮参数
-        LoadFuncParamFromMemory(paramAddr, param, ctx);
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx));
 
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) {
             repeatCond = 1;
@@ -371,6 +378,7 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         */
         MissionPostSync(ctx);
     }
+    return CCU_SUCCESS;
 }
 
 // ============================================================================
@@ -392,9 +400,9 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     HCCL_INFO("[GenCircularQueue] KfcServer start");
     // KfcServerGenCircularQueue(arg, ctx);
     CCU_IF(ctx.missionIndex == 0) {
-        KfcServerGenCircularQueue(arg, ctx);
+        CCU_CHK_RET(KfcServerGenCircularQueue(arg, ctx));
     } CCU_ELSE {
-        SlaveKfcServerGenCircularQueue(arg, ctx);
+        CCU_CHK_RET(SlaveKfcServerGenCircularQueue(arg, ctx));
     }
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
