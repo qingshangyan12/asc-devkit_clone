@@ -26,6 +26,7 @@
 #include "coll_comm_aicpu_mgr.h"
 #include "stream_lite.h"
 #include "thread.h"
+#include "profiling_handler_lite.h"
 
 using namespace HcclApi;
 namespace {
@@ -560,6 +561,20 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
+    // if (execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
+    //     CHK_PTR_NULL(execCtx->collCommAicpu);
+    //     auto* dfxLite = execCtx->collCommAicpu->GetHcclCommDfxLite();
+    //     CHK_PTR_NULL(dfxLite);
+    //     CHK_RET(dfxLite->UpdateProfStat());
+
+    //     auto dfxOpInfo = std::make_shared<Hccl::DfxOpInfo>();
+    //     dfxOpInfo->groupName_ = execCtx->commName;
+    //     dfxOpInfo->rankSize_ = rankNum_;
+    //     dfxOpInfo->isIndop_ = true;
+    //     dfxOpInfo->beginTime_ = ProfGetCurCpuTimestamp();
+    //     CHK_RET(dfxLite->SetCurrDfxOpInfo(std::move(dfxOpInfo)));
+    // }
+
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
@@ -647,6 +662,17 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     }
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
+
+    // if (execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
+    //     auto* dfxLite = execCtx->collCommAicpu->GetHcclCommDfxLite();
+    //     CHK_PTR_NULL(dfxLite);
+    //     CHK_RET(dfxLite->ReportAllTasks());
+    //     auto* mirrorTaskMgrLite = dfxLite->GetMirrorTaskManagerLite();
+    //     if (mirrorTaskMgrLite != nullptr && mirrorTaskMgrLite->GetCurrDfxOpInfo() != nullptr) {
+    //         Hccl::ProfilingHandlerLite::GetInstance().ReportHcclOpInfo(*mirrorTaskMgrLite->GetCurrDfxOpInfo());
+    //     }
+    // }
+
     return HCCL_SUCCESS;
 }
 
