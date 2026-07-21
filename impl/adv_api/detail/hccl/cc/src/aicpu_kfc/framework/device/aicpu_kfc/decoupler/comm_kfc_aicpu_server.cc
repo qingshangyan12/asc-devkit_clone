@@ -26,6 +26,8 @@
 #include "coll_comm_aicpu_mgr.h"
 #include "stream_lite.h"
 #include "thread.h"
+#include "hcomm_device_profiling_dl.h"
+#include "timing_stat.h"
 
 using namespace HcclApi;
 namespace {
@@ -560,6 +562,10 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
+    uint32_t tsOrchProfStart = TimingStatStart("Orchestrate_ReportProfilingKernelStart");
+    ReportProfilingKernelStart(*execCtx);
+    TimingStatEnd(tsOrchProfStart);
+
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
@@ -647,7 +653,216 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     }
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
+
+    uint32_t tsOrchProfEnd = TimingStatStart("Orchestrate_ReportProfilingKernelEnd");
+    ReportProfilingKernelEnd(*execCtx, msg);
+    TimingStatEnd(tsOrchProfEnd);
+
+    TIMING_STAT_DUMP();
+
     return HCCL_SUCCESS;
+}
+
+bool CommKfcAicpuServer::IsProfilingEnabled()
+{
+    auto& handler = Hccl::ProfilingHandlerLite::GetInstance();
+    return handler.GetProfL0State() || handler.GetProfL1State();
+}
+
+void CommKfcAicpuServer::ReportProfilingKernelStart(const ServerExecCtx& execCtx)
+{
+    if (execCtx.resourceType != ServerExecResourceType::NEXT_AICPU) {
+        HCCL_INFO(
+            "[MC2_PROF][StartSkip] group %u, commName[%s], resourceType %u is not NEXT_AICPU.", groupIdx_,
+            execCtx.commName.c_str(), static_cast<u32>(execCtx.resourceType));
+        return;
+    }
+    if (!IsProfilingEnabled()) {
+        HCCL_INFO(
+            "[MC2_PROF][StartProfOff] group %u, commName[%s], profiling is off, skip.", groupIdx_,
+            execCtx.commName.c_str());
+        return;
+    }
+
+    uint32_t tsAcquire = TimingStatStart("ProfStart_AcquireComm");
+    if (HcommAcquireComm(execCtx.commName.c_str()) != HCCL_SUCCESS) {
+        TimingStatEnd(tsAcquire);
+        HCCL_WARNING(
+            "[MC2_PROF][StartAcquireFail] group %u, commName[%s], skip profiling report.", groupIdx_,
+            execCtx.commName.c_str());
+        return;
+    }
+    TimingStatEnd(tsAcquire);
+    HCCL_INFO("[MC2_PROF][StartAcquireOk] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+
+    uint32_t tsTimestamp = TimingStatStart("ProfStart_GetTimestamp");
+    profOpBeginTime_ = ProfGetCurCpuTimestamp();
+    TimingStatEnd(tsTimestamp);
+
+    uint32_t tsReportStart = TimingStatStart("ProfStart_ReportStartTask");
+    HcclResult profRet = HcommProfilingReportKernelStartTask(execCtx.mainThread, execCtx.commName.c_str());
+    TimingStatEnd(tsReportStart);
+    if (profRet != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[MC2_PROF][StartReportFail] group %u, mainThread %#llx, commName[%s], ret %u.", groupIdx_,
+            static_cast<unsigned long long>(execCtx.mainThread), execCtx.commName.c_str(), static_cast<u32>(profRet));
+    } else {
+        HCCL_INFO(
+            "[MC2_PROF][StartReportOk] group %u, mainThread %#llx, commName[%s].", groupIdx_,
+            static_cast<unsigned long long>(execCtx.mainThread), execCtx.commName.c_str());
+    }
+
+    uint32_t tsRelease = TimingStatStart("ProfStart_ReleaseComm");
+    if (HcommReleaseComm(execCtx.commName.c_str()) != HCCL_SUCCESS) {
+        TimingStatEnd(tsRelease);
+        HCCL_WARNING("[MC2_PROF][StartReleaseFail] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    } else {
+        TimingStatEnd(tsRelease);
+    }
+}
+
+void CommKfcAicpuServer::FillDfxOpInfoFromMsg(
+    HcclDfxOpInfo& dfxOpInfo, const HcclMsg& msg, u64 beginTime, u64 endTime) const
+{
+    dfxOpInfo.beginTime = beginTime;
+    dfxOpInfo.endTime = endTime;
+    dfxOpInfo.opType = static_cast<u32>(msg.commType.prepareType);
+    dfxOpInfo.reduceOp = static_cast<u32>(msg.opType);
+    dfxOpInfo.dataType = static_cast<u32>(msg.addMsg.v1Msg.hcclDataType);
+    dfxOpInfo.dataCount = static_cast<u64>(msg.dataCnt);
+}
+
+void CommKfcAicpuServer::FillDfxOpInfoFromBaseParam(HcclDfxOpInfo& dfxOpInfo, const ServerExecCtx& execCtx) const
+{
+    if (execCtx.baseOpParam.size() < sizeof(mc2_ops_hccl::OpParam)) {
+        HCCL_WARNING(
+            "[MC2_PROF][RegOpNoBaseParam] group %u, commName[%s], baseOpParam size %zu < OpParam size %zu, "
+            "static fields skipped.",
+            groupIdx_, execCtx.commName.c_str(), execCtx.baseOpParam.size(), sizeof(mc2_ops_hccl::OpParam));
+        return;
+    }
+
+    const auto* param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(execCtx.baseOpParam.data());
+    dfxOpInfo.opMode = static_cast<u32>(param->opMode);
+    dfxOpInfo.root = param->root;
+    dfxOpInfo.engine = param->engine;
+    dfxOpInfo.cpuTsThread = static_cast<uint64_t>(param->opThread);
+    const s32 sRet = strncpy_s(dfxOpInfo.algTag, sizeof(dfxOpInfo.algTag), param->algTag, sizeof(dfxOpInfo.algTag) - 1);
+    if (sRet != EOK) {
+        HCCL_WARNING(
+            "[MC2_PROF][RegOpAlgTag] group %u, commName[%s], strncpy_s algTag failed, ret %d.", groupIdx_,
+            execCtx.commName.c_str(), sRet);
+    }
+}
+
+void CommKfcAicpuServer::RunDfxOpInfoInit(const HcclDfxOpInfo& dfxOpInfo, const ServerExecCtx& execCtx) const
+{
+    struct DfxInitTask {
+        uint64_t context;
+        char commTag[256];
+    };
+    DfxInitTask initTask{};
+    initTask.context = reinterpret_cast<uint64_t>(&dfxOpInfo);
+    const s32 tagRet =
+        strncpy_s(initTask.commTag, sizeof(initTask.commTag), execCtx.commName.c_str(), sizeof(initTask.commTag) - 1);
+    if (tagRet != EOK) {
+        HCCL_WARNING(
+            "[MC2_PROF][RegOpCommTag] group %u, commName[%s], strncpy_s commTag failed, ret %d.", groupIdx_,
+            execCtx.commName.c_str(), tagRet);
+    }
+    if (RunAicpuDfxOpInfoInitV2(static_cast<void*>(&initTask)) != 0U) {
+        HCCL_WARNING("[MC2_PROF][RegOpFail] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    } else {
+        HCCL_INFO("[MC2_PROF][RegOpOk] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    }
+}
+
+void CommKfcAicpuServer::RegisterDfxOpInfo(const ServerExecCtx& execCtx, const HcclMsg& msg, u64 beginTime, u64 endTime)
+{
+    HcclDfxOpInfo dfxOpInfo{};
+
+    uint32_t tsFillMsg = TimingStatStart("RegDfx_FillFromMsg");
+    FillDfxOpInfoFromMsg(dfxOpInfo, msg, beginTime, endTime);
+    TimingStatEnd(tsFillMsg);
+
+    uint32_t tsFillBase = TimingStatStart("RegDfx_FillFromBaseParam");
+    FillDfxOpInfoFromBaseParam(dfxOpInfo, execCtx);
+    TimingStatEnd(tsFillBase);
+
+    HCCL_INFO(
+        "[MC2_PROF][StartDfxMeta] group %u, commName[%s], opMode %u, opType %u, reduceOp %u, dataType %u, "
+        "dataCount %llu, root %u, engine %u, algTag[%s], beginTime %llu, endTime %llu.",
+        groupIdx_, execCtx.commName.c_str(), dfxOpInfo.opMode, dfxOpInfo.opType, dfxOpInfo.reduceOp, dfxOpInfo.dataType,
+        static_cast<unsigned long long>(dfxOpInfo.dataCount), dfxOpInfo.root, static_cast<u32>(dfxOpInfo.engine),
+        dfxOpInfo.algTag, static_cast<unsigned long long>(dfxOpInfo.beginTime),
+        static_cast<unsigned long long>(dfxOpInfo.endTime));
+
+    uint32_t tsInit = TimingStatStart("RegDfx_Init");
+    RunDfxOpInfoInit(dfxOpInfo, execCtx);
+    TimingStatEnd(tsInit);
+}
+
+void CommKfcAicpuServer::ReportProfilingKernelEnd(const ServerExecCtx& execCtx, const HcclMsg& msg)
+{
+    if (execCtx.resourceType != ServerExecResourceType::NEXT_AICPU) {
+        HCCL_INFO(
+            "[MC2_PROF][EndSkip] group %u, commName[%s], resourceType %u is not NEXT_AICPU.", groupIdx_,
+            execCtx.commName.c_str(), static_cast<u32>(execCtx.resourceType));
+        return;
+    }
+    if (!IsProfilingEnabled()) {
+        HCCL_INFO(
+            "[MC2_PROF][EndProfOff] group %u, commName[%s], profiling is off, skip.", groupIdx_,
+            execCtx.commName.c_str());
+        return;
+    }
+
+    uint32_t tsEndAcquire = TimingStatStart("ProfEnd_AcquireComm");
+    if (HcommAcquireComm(execCtx.commName.c_str()) != HCCL_SUCCESS) {
+        TimingStatEnd(tsEndAcquire);
+        HCCL_WARNING(
+            "[MC2_PROF][EndAcquireFail] group %u, commName[%s], skip profiling report.", groupIdx_,
+            execCtx.commName.c_str());
+        return;
+    }
+    TimingStatEnd(tsEndAcquire);
+    HCCL_INFO("[MC2_PROF][EndAcquireOk] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+
+    uint32_t tsRegDfx = TimingStatStart("ProfEnd_RegisterDfx");
+    RegisterDfxOpInfo(execCtx, msg, profOpBeginTime_, ProfGetCurCpuTimestamp());
+    TimingStatEnd(tsRegDfx);
+
+    uint32_t tsReportDev = TimingStatStart("ProfEnd_ReportDeviceOp");
+    HcclResult profRet = HcommProfilingReportDeviceOp(execCtx.commName.c_str());
+    TimingStatEnd(tsReportDev);
+    if (profRet != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[MC2_PROF][EndReportDeviceOpFail] group %u, commName[%s], ret %u.", groupIdx_, execCtx.commName.c_str(),
+            static_cast<u32>(profRet));
+    } else {
+        HCCL_INFO("[MC2_PROF][EndReportDeviceOpOk] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    }
+
+    uint32_t tsReportEnd = TimingStatStart("ProfEnd_ReportEndTask");
+    profRet = HcommProfilingReportKernelEndTask(execCtx.mainThread, execCtx.commName.c_str());
+    TimingStatEnd(tsReportEnd);
+    if (profRet != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[MC2_PROF][EndReportTaskFail] group %u, mainThread %#llx, commName[%s], ret %u.", groupIdx_,
+            static_cast<unsigned long long>(execCtx.mainThread), execCtx.commName.c_str(), static_cast<u32>(profRet));
+    } else {
+        HCCL_INFO(
+            "[MC2_PROF][EndReportTaskOk] group %u, mainThread %#llx, commName[%s].", groupIdx_,
+            static_cast<unsigned long long>(execCtx.mainThread), execCtx.commName.c_str());
+    }
+
+    uint32_t tsEndRelease = TimingStatStart("ProfEnd_ReleaseComm");
+    if (HcommReleaseComm(execCtx.commName.c_str()) != HCCL_SUCCESS) {
+        TimingStatEnd(tsEndRelease);
+        HCCL_WARNING("[MC2_PROF][EndReleaseFail] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    } else {
+        TimingStatEnd(tsEndRelease);
+    }
 }
 
 HcclResult CommKfcAicpuServer::Finalize(u32 msgPos)
