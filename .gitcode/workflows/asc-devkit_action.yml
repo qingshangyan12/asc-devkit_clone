@@ -94,8 +94,6 @@ stages:
         if: "${{ default() }}"
         runs-on:
         - default
-        runs-on:
-        - default
     pre:
     - type: auto
     fail-fast: true
