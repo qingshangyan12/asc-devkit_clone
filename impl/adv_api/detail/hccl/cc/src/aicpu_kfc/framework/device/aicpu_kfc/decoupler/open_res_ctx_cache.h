@@ -18,8 +18,7 @@
 namespace mc2_open {
 using OpenResCtxHolder = std::shared_ptr<const mc2_ops_hccl::AlgResourceCtxSerializable>;
 
-HcclResult AcquireOpenResCtx(
-    uint64_t opParamKey, const mc2_ops_hccl::OpParam& param, OpenResCtxHolder& holder);
+HcclResult AcquireOpenResCtx(uint64_t opParamKey, const mc2_ops_hccl::OpParam& param, OpenResCtxHolder& holder);
 } // namespace mc2_open
 
 #endif // HCCL_OPEN_RES_CTX_CACHE_H

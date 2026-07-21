@@ -273,8 +273,7 @@ HcclResult FormatOpenOpParamDataFromMsg(
     return HCCL_SUCCESS;
 }
 
-HcclResult LaunchOpenOpParamData(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
 {
     if (opParam.empty()) {
         HCCL_ERROR("Op param is empty.");

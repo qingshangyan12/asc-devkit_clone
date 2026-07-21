@@ -118,8 +118,7 @@ HcclResult BuildCacheKey(const mc2_ops_hccl::OpParam& param, CacheKey& key)
     return HCCL_SUCCESS;
 }
 
-HcclResult BuildHolder(
-    const mc2_ops_hccl::OpParam& param, mc2_open::OpenResCtxHolder& holder)
+HcclResult BuildHolder(const mc2_ops_hccl::OpParam& param, mc2_open::OpenResCtxHolder& holder)
 {
     const auto* ctx = static_cast<const char*>(param.resCtx);
     const size_t ctxSize = static_cast<size_t>(param.ctxSize);
@@ -175,10 +174,9 @@ void EvictOldestIfNeeded()
     if (g_cache.size() < OPEN_RES_CTX_CACHE_CAPACITY) {
         return;
     }
-    auto oldest = std::min_element(
-        g_cache.begin(), g_cache.end(), [](const auto& lhs, const auto& rhs) {
-            return lhs.second.lastAccess < rhs.second.lastAccess;
-        });
+    auto oldest = std::min_element(g_cache.begin(), g_cache.end(), [](const auto& lhs, const auto& rhs) {
+        return lhs.second.lastAccess < rhs.second.lastAccess;
+    });
     if (oldest != g_cache.end()) {
         g_missLoggedKeys.erase(oldest->first);
         g_cache.erase(oldest);
@@ -198,8 +196,8 @@ HcclResult AcquireOpenResCtx(uint64_t opParamKey, const mc2_ops_hccl::OpParam& p
 {
     holder.reset();
     if (opParamKey == 0U) {
-        HCCL_ERROR("Invalid opParamKey %#llx for open resource ctx cache.",
-            static_cast<unsigned long long>(opParamKey));
+        HCCL_ERROR(
+            "Invalid opParamKey %#llx for open resource ctx cache.", static_cast<unsigned long long>(opParamKey));
         return HCCL_E_PARA;
     }
 
