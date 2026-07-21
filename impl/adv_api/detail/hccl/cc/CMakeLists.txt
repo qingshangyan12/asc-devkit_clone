@@ -93,9 +93,9 @@ else()
             MANIFEST "bin_hash.cfg"
             TAR_ROOT_DIR "aicpu_kernels_device"
         )
-        sign_file(
+        add_cann_sign_file(
             INPUT "mc2_server.tar.gz"
-            CONFIG "${HCCL_CC_DIR}/scripts/sign/hccl_check_cfg.xml"
+            CONFIG "${HCCL_CC_DIR}/sign.xml"
             RESULT_VAR "mc2_server_sign_file"
             DEPENDS generate_device_aicpu_package
         )
