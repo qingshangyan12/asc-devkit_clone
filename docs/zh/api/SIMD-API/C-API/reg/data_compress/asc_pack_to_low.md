@@ -1,4 +1,4 @@
-# asc_pack
+# asc_pack_to_low
 
 ## 产品支持情况
 
@@ -28,11 +28,7 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-将源操作数中的元素选取低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的低半部分或高半部分。
-
-- asc_pack_to_low：将源操作数写入目的操作数的低半部分。
-
-- asc_pack_to_high：将源操作数写入目的操作数的高半部分。
+将源操作数中的元素选取低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的低半部分。
 
 ## 函数原型
 
@@ -42,11 +38,6 @@ __simd_callee__ inline void asc_pack_to_low(vector_uint8_t& dst, vector_int16_t 
 __simd_callee__ inline void asc_pack_to_low(vector_uint16_t& dst, vector_uint32_t src)
 __simd_callee__ inline void asc_pack_to_low(vector_uint16_t& dst, vector_int32_t src)
 __simd_callee__ inline void asc_pack_to_low(vector_bool& dst, vector_bool src)
-__simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_uint16_t src)
-__simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_int16_t src)
-__simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_uint32_t src)
-__simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_int32_t src)
-__simd_callee__ inline void asc_pack_to_high(vector_bool& dst, vector_bool src)
 ```
 
 ## 参数说明
@@ -76,5 +67,4 @@ PIPE_V
 vector_uint8_t dst;
 vector_uint16_t src;
 asc_pack_to_low(dst, src);    // 将src的低8位写入dst的低半部分
-asc_pack_to_high(dst, src);    // 将src的低8位写入dst的高半部分
 ```
