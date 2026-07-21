@@ -19,6 +19,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <unistd.h>
 
 #include "acl/acl.h"
 #include "acl/acl_rt.h"
@@ -121,6 +122,8 @@ HcommChannelInfoDumpFunc ResolveChannelDumpFunc()
             std::printf("[hcomm_fault_runner] dlsym HcommChannelInfoDump failed: %s\n", error);
             return nullptr;
         }
+        std::printf("[hcomm_fault_runner] resolved HcommChannelInfoDump from %s\n", soPath);
+        std::fflush(stdout);
         return reinterpret_cast<HcommChannelInfoDumpFunc>(symbol);
     }();
     return dumpFunc;
@@ -130,10 +133,18 @@ void DumpChannels(const std::vector<ChannelHandle> &channels)
 {
     auto dumpFunc = ResolveChannelDumpFunc();
     if (dumpFunc == nullptr || channels.empty()) {
+        std::printf("[hcomm_fault_runner] skip channel dump, dumpFunc=%p channelNum=%zu\n",
+            reinterpret_cast<void *>(dumpFunc), channels.size());
+        std::fflush(stdout);
         return;
     }
     std::vector<ChannelHandle> channelCopy = channels;
+    std::printf("[hcomm_fault_runner] call HcommChannelInfoDump channelNum=%zu first=0x%llx\n",
+        channelCopy.size(), static_cast<unsigned long long>(channelCopy[0]));
+    std::fflush(stdout);
     dumpFunc(static_cast<uint32_t>(channelCopy.size()), channelCopy.data());
+    std::printf("[hcomm_fault_runner] HcommChannelInfoDump returned\n");
+    std::fflush(stdout);
 }
 
 bool TryCopyCommContext(void *devArgs, uint32_t devArgsLen, CommContext &hostCtx)
@@ -168,8 +179,19 @@ void CustomCallback(aclrtExceptionInfo *exceptionInfo)
         std::lock_guard<std::mutex> lock(g_exceptionMutex);
         g_lastException = summary;
     }
-    g_exceptionCount.fetch_add(1, std::memory_order_relaxed);
+    uint64_t count = g_exceptionCount.fetch_add(1, std::memory_order_relaxed) + 1;
     g_exceptionPending.store(true, std::memory_order_release);
+    std::printf("[hcomm_fault_runner] CustomCallback entered count=%llu task=%u stream=%u thread=%u device=%u "
+                "error=%u devArgs=%p devArgsLen=%u\n",
+        static_cast<unsigned long long>(count),
+        summary.taskId,
+        summary.streamId,
+        summary.threadId,
+        summary.deviceId,
+        summary.errorCode,
+        summary.devArgs,
+        summary.devArgsLen);
+    std::fflush(stdout);
 }
 
 bool TakePendingException(ExceptionSummary &summary, uint64_t &count)
@@ -194,12 +216,12 @@ void PrintCommContext(const char *prefix, const CommContext &ctx)
         static_cast<unsigned long long>(ctx.len));
 }
 
-void ReportPendingException()
+bool ReportPendingException()
 {
     ExceptionSummary summary;
     uint64_t count = 0;
     if (!TakePendingException(summary, count)) {
-        return;
+        return false;
     }
 
     std::printf("[hcomm_fault_runner] runtime exception count=%llu task=%u stream=%u thread=%u device=%u error=%u\n",
@@ -215,7 +237,7 @@ void ReportPendingException()
         PrintCommContext("[hcomm_fault_runner] exception ctx", ctx);
         ChannelHandle channel = static_cast<ChannelHandle>(ctx.channelHandle);
         DumpChannels({channel});
-        return;
+        return true;
     }
 
     std::vector<ChannelHandle> channels;
@@ -229,6 +251,26 @@ void ReportPendingException()
         PrintCommContext("[hcomm_fault_runner] cached ctx", cachedCtx);
     }
     std::printf("[hcomm_fault_runner] dump cached channels because exception dev args are unavailable.\n");
+    DumpChannels(channels);
+    return true;
+}
+
+void DumpCachedChannelsForDiagnosis()
+{
+    std::vector<ChannelHandle> channels;
+    std::vector<CommContext> contexts;
+    {
+        std::lock_guard<std::mutex> lock(g_dumpMutex);
+        channels = g_channels;
+        contexts = g_contexts;
+    }
+    std::printf("[hcomm_fault_runner] no pending exception after polling, dump cached channels for diagnosis. "
+                "callbackCount=%llu channelNum=%zu\n",
+        static_cast<unsigned long long>(g_exceptionCount.load(std::memory_order_relaxed)),
+        channels.size());
+    for (const auto &cachedCtx : contexts) {
+        PrintCommContext("[hcomm_fault_runner] cached ctx", cachedCtx);
+    }
     DumpChannels(channels);
 }
 
@@ -418,7 +460,17 @@ int RunRank(RankContext *ctx)
         }
         aclError syncRet = aclrtSynchronizeStream(stream);
         std::printf("[hcomm_fault_runner] rank=0 aclrtSynchronizeStream ret=%d\n", syncRet);
-        ReportPendingException();
+        bool reported = false;
+        for (uint32_t retry = 0; retry < 20; ++retry) {
+            if (ReportPendingException()) {
+                reported = true;
+                break;
+            }
+            usleep(100000);
+        }
+        if (!reported) {
+            DumpCachedChannelsForDiagnosis();
+        }
     }
     ctx->barrier->Wait();
 
@@ -445,6 +497,8 @@ int main(int argc, char **argv)
 
     ACL_CHECK(aclInit(nullptr));
     ACL_CHECK(aclrtSetExceptionInfoCallback(CustomCallback));
+    std::printf("[hcomm_fault_runner] exception callback registered\n");
+    std::fflush(stdout);
 
     uint32_t devCount = 0;
     ACL_CHECK(aclrtGetDeviceCount(&devCount));
