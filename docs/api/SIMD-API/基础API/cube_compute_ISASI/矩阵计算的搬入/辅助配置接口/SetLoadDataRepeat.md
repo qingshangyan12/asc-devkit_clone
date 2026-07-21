@@ -1,4 +1,4 @@
-# SetLoadDataRepeat<a name="ZH-CN_TOPIC_0000001788021082"></a>
+﻿# SetLoadDataRepeat<a name="ZH-CN_TOPIC_0000001788021082"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：basic_api/kernel_operator_mm_intf.h。
+头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
 用于设置[Load3D](../矩阵数据搬入至L0-Buffer/Load3D.md)接口的repeat参数。设置repeat参数后，可以通过调用一次Load3D接口完成多个迭代的数据搬运。
 

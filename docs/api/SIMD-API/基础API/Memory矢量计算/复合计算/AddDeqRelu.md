@@ -1,4 +1,4 @@
-# AddDeqRelu<a name="ZH-CN_TOPIC_0000001815255356"></a>
+﻿# AddDeqRelu<a name="ZH-CN_TOPIC_0000001815255356"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -27,7 +27,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_vec_ternary_scalar_intf.h"。
+头文件路径为：`""basic_api/kernel_operator_vec_ternary_scalar_intf.h"`"。
 
 依次计算按元素求和、结果进行deq量化后再进行relu计算（结果和0对比取较大值）。计算公式如下：
 
