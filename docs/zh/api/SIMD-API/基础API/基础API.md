@@ -2,13 +2,13 @@
 
 - **[数据结构](数据结构/数据结构.md)**  
 
-- **[数据结构（TensorAPI）](数据结构（TensorAPI）/数据结构（TensorAPI）.md)**  
+- **[数据结构(TensorAPI)](数据结构(TensorAPI)/数据结构(TensorAPI).md)**  
 
 - **[数据搬运导览](数据搬运导览/数据搬运导览.md)**  
 
 - **[矩阵计算（ISASI）](矩阵计算（ISASI）/矩阵计算（ISASI）.md)**  
 
-- **[矩阵计算（Tensor API）](矩阵计算（TensorAPI）/矩阵计算（TensorAPI）.md)** 
+- **[矩阵计算(Tensor API)](矩阵计算(TensorAPI)/矩阵计算(TensorAPI).md)** 
 
 - **[Memory矢量计算](Memory矢量计算/Memory矢量计算.md)**  
 
