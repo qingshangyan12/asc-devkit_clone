@@ -41,6 +41,7 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable outputRepeatStride;
     ccu::Variable normalSliceSize;
     ccu::Variable lastSliceSize;
+    ccu::Variable scratchRepeatStride;
     ccu::Variable repeatNum;
     GroupOpSizeVars goSize;
     ccu::LocalAddr myInput;
@@ -94,6 +95,7 @@ static CcuResult LoadArgs(KfcReduceScatterMesh1DMem2MemContext &ctx, ccu::Variab
     ctx.outputRepeatStride = outputRepeatStride;
     ctx.normalSliceSize = normalSliceSize;
     ctx.lastSliceSize = lastSliceSize;
+    ctx.scratchRepeatStride = scratchRepeatStride;
     ctx.repeatNum = repeatNum;
     ctx.goSize.addrOffset = addrOffset;
     ctx.goSize.loopParam = loopParam;
