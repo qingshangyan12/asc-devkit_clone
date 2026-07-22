@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_vconv_intf.h"`。
 
-对输入做量化并进行精度转换，对输出结果的溢出采用饱和处理。本接口需要与[SetDeqScale](../类型转换/寄存器配置说明/SetDeqScale.md)接口配合使用。
+对输入做量化并进行精度转换，对输出结果的溢出采用饱和处理。本接口需要与[SetDeqScale](../%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E8%BE%85%E5%8A%A9%E9%85%8D%E7%BD%AE%E6%8E%A5%E5%8F%A3/SetDeqScale.md)接口配合使用。
 
 - 输入数据类型为int16_t，关闭向量量化模式。
 
