@@ -32,13 +32,10 @@
 #include "c_api/sys_var/sys_var.h"
 #include "c_api/vector_datamove/vector_datamove.h"
 #include "c_api/vector_compute/vector_compute.h"
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "c_api/reg_compute/reg_convert.h"
 #include "c_api/reg_compute/reg_load.h"
 #include "c_api/reg_compute/reg_store.h"
 #include "c_api/reg_compute/reg_vector.h"
-#endif
 
 #endif
 
