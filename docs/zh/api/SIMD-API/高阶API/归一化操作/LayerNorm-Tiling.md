@@ -130,6 +130,8 @@ Ascend C提供一组LayerNorm Tiling API，方便用户获取LayerNorm kernel计
 
 ## 参数说明
 
+关于函数原型中`AscendC::TensorShape`的说明，请参见[高阶API Tiling接口公共类型](../../通用说明和约束.md#high_level_api_tiling_types)。
+
 **表1**  GetLayerNormMaxMinTmpSize接口参数列表
 
 | 接口 | 输入/输出 | 功能 |
