@@ -156,13 +156,36 @@ void DumpChannels(const std::vector<ChannelHandle> &channels)
 
 bool TryCopyCommContext(void *devArgs, uint32_t devArgsLen, CommContext &hostCtx)
 {
-    if (devArgs == nullptr || devArgsLen < sizeof(CommContext)) {
+    if (devArgs == nullptr) {
         std::printf("[hcomm_fault_runner] exception dev args are unavailable, len=%u\n", devArgsLen);
         return false;
     }
-    aclError ret = aclrtMemcpy(&hostCtx, sizeof(hostCtx), devArgs, sizeof(CommContext), ACL_MEMCPY_DEVICE_TO_HOST);
+
+    void *ctxAddr = devArgs;
+    if (devArgsLen == sizeof(uint64_t)) {
+        uint64_t rawCtxAddr = 0;
+        aclError ret = aclrtMemcpy(&rawCtxAddr, sizeof(rawCtxAddr), devArgs, sizeof(rawCtxAddr),
+            ACL_MEMCPY_DEVICE_TO_HOST);
+        if (ret != ACL_SUCCESS) {
+            std::printf("[hcomm_fault_runner] copy exception dev args pointer failed, ret=%d\n", ret);
+            return false;
+        }
+        ctxAddr = reinterpret_cast<void *>(rawCtxAddr);
+        std::printf("[hcomm_fault_runner] exception dev args point to CommContext device addr=%p\n", ctxAddr);
+    } else if (devArgsLen < sizeof(CommContext)) {
+        std::printf("[hcomm_fault_runner] exception dev args len is too small, len=%u expect=%zu\n",
+            devArgsLen, sizeof(CommContext));
+        return false;
+    }
+
+    if (ctxAddr == nullptr) {
+        std::printf("[hcomm_fault_runner] exception CommContext device addr is null\n");
+        return false;
+    }
+    aclError ret = aclrtMemcpy(&hostCtx, sizeof(hostCtx), ctxAddr, sizeof(CommContext), ACL_MEMCPY_DEVICE_TO_HOST);
     if (ret != ACL_SUCCESS) {
-        std::printf("[hcomm_fault_runner] copy CommContext failed at report point, ret=%d\n", ret);
+        std::printf("[hcomm_fault_runner] copy CommContext failed at report point, ret=%d ctxAddr=%p\n",
+            ret, ctxAddr);
         return false;
     }
     return true;

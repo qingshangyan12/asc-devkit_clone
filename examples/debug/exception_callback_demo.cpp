@@ -103,14 +103,30 @@ void ReportPendingException()
     std::printf("[ExceptionCallbackDemo] runtime exception task=%u stream=%u thread=%u device=%u error=%u\n",
         summary.taskId, summary.streamId, summary.threadId, summary.deviceId, summary.errorCode);
 
-    if (summary.devArgs == nullptr || summary.devArgsLen < sizeof(CommContext)) {
+    if (summary.devArgs == nullptr) {
         std::printf("[ExceptionCallbackDemo] exception dev args are unavailable, len=%u, skip channel dump.\n",
             summary.devArgsLen);
         return;
     }
 
+    void *ctxAddr = summary.devArgs;
+    if (summary.devArgsLen == sizeof(uint64_t)) {
+        uint64_t rawCtxAddr = 0;
+        aclError ret = aclrtMemcpy(&rawCtxAddr, sizeof(rawCtxAddr), summary.devArgs, sizeof(rawCtxAddr),
+            ACL_MEMCPY_DEVICE_TO_HOST);
+        if (ret != ACL_SUCCESS) {
+            std::printf("[ExceptionCallbackDemo] copy exception dev args pointer failed, ret=%d.\n", ret);
+            return;
+        }
+        ctxAddr = reinterpret_cast<void *>(rawCtxAddr);
+    } else if (summary.devArgsLen < sizeof(CommContext)) {
+        std::printf("[ExceptionCallbackDemo] exception dev args len is too small, len=%u, skip channel dump.\n",
+            summary.devArgsLen);
+        return;
+    }
+
     CommContext ctx = {};
-    aclError ret = aclrtMemcpy(&ctx, sizeof(ctx), summary.devArgs, sizeof(ctx), ACL_MEMCPY_DEVICE_TO_HOST);
+    aclError ret = aclrtMemcpy(&ctx, sizeof(ctx), ctxAddr, sizeof(ctx), ACL_MEMCPY_DEVICE_TO_HOST);
     if (ret != ACL_SUCCESS) {
         std::printf("[ExceptionCallbackDemo] copy CommContext failed at report point, ret=%d.\n", ret);
         return;
