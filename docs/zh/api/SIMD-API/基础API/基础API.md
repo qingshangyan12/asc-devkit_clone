@@ -1,6 +1,8 @@
 # 基础API<a name="ZH-CN_TOPIC_0000001780067408"></a>
 
-- **[数据结构](数据结构/数据结构.md)**  
+- **[数据结构](数据结构/数据结构.md)**
+
+- **[辅助数据结构](辅助数据结构/辅助数据结构.md)**
 
 - **[数据结构(TensorAPI)](data_structure_TensorAPI/data_structure_TensorAPI.md)**  
 
