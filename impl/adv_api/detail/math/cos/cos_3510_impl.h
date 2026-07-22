@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-/*!
+/* !
  * \file cos_3510_impl.h
  * \brief
  */
@@ -24,9 +24,9 @@
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../common/common.h"
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-#if __NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
+#if __NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113 && __NPU_ARCH__ != 5161
 #include "../sincos/sincos_3510_impl.h"
 #endif
 #include "cos_common_utils.h"
@@ -56,9 +56,8 @@ constexpr float COS_M4_SCA = 4.0;
 constexpr float COS_K2_SCA = -2.0;
 constexpr float SCALAR_ONE = 1.0;
 
-__simd_callee__ inline void CosPolynomialApproximation(
-    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg, Reg::RegTensor<float>& x,
-    Reg::RegTensor<float>& round, Reg::RegTensor<float>& kpi, Reg::MaskReg mask)
+__simd_callee__ inline void CosPolynomialApproximation(Reg::RegTensor<float> &dstReg, Reg::RegTensor<float> &srcReg,
+    Reg::RegTensor<float> &x, Reg::RegTensor<float> &round, Reg::RegTensor<float> &kpi, Reg::MaskReg mask)
 {
     // k = round(x * invpi + 1/2)
     Reg::Muls(round, srcReg, COS_PI_FOR_X_TODIV, mask);
@@ -125,7 +124,7 @@ __simd_callee__ inline void CosPolynomialApproximation(
 }
 
 template <typename T>
-__simd_vf__ inline void CosPolynomial(__ubuf__ T* dst, __ubuf__ T* src, uint32_t calCount, uint16_t repeat)
+__simd_vf__ inline void CosPolynomial(__ubuf__ T *dst, __ubuf__ T *src, uint32_t calCount, uint16_t repeat)
 {
     Reg::RegTensor<T> x;
     Reg::RegTensor<float> xTmp;
@@ -155,8 +154,7 @@ __simd_vf__ inline void CosPolynomial(__ubuf__ T* dst, __ubuf__ T* src, uint32_t
 }
 } // namespace Internal
 
-template <typename T>
-__aicore__ inline void CosPolynomialImpl(__ubuf__ T* dst, __ubuf__ T* src, uint32_t calCount)
+template <typename T> __aicore__ inline void CosPolynomialImpl(__ubuf__ T *dst, __ubuf__ T *src, uint32_t calCount)
 {
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(float);
     uint16_t repeat = CeilDivision(calCount, oneRepSize);
@@ -169,17 +167,15 @@ __aicore__ inline constexpr uint32_t GetCosTmpBufferLiveNode()
     return tmpBufferLiveNode;
 }
 
-template <typename T>
-__aicore__ inline uint32_t GetCosTmpBufferSize(const LocalTensor<uint8_t>& sharedTmpBuffer)
+template <typename T> __aicore__ inline uint32_t GetCosTmpBufferSize(const LocalTensor<uint8_t> &sharedTmpBuffer)
 {
     uint32_t sharedTmpBufferSize = sharedTmpBuffer.GetSize() / GetCosTmpBufferLiveNode();
     return AlignUp(sharedTmpBufferSize, GetDataBlockSizeInBytes()) / sizeof(T);
 }
 
-template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
-__aicore__ inline void CosImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-    const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
+__aicore__ inline void CosImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
+    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t calCount)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -191,18 +187,16 @@ __aicore__ inline void CosImpl(
     CheckTensorPos<T>(srcTensor, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "Cos");
     CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN / VECCALC / VECOUT", "Cos");
     ASCENDC_ASSERT((calCount <= srcTensor.GetSize()), {
-        KERNEL_LOG(
-            KERNEL_ERROR, "calCount is %u, which should not be larger than srcTensor length %u", calCount,
+        KERNEL_LOG(KERNEL_ERROR, "calCount is %u, which should not be larger than srcTensor length %u", calCount,
             srcTensor.GetSize());
     });
     ASCENDC_ASSERT((calCount <= dstTensor.GetSize()), {
-        KERNEL_LOG(
-            KERNEL_ERROR, "calCount is %u, which should not be larger than dstTensor length %u", calCount,
+        KERNEL_LOG(KERNEL_ERROR, "calCount is %u, which should not be larger than dstTensor length %u", calCount,
             dstTensor.GetSize());
     });
 
     if constexpr (config.algo == CosAlgo::POLYNOMIAL_APPROXIMATION) {
-        CosPolynomialImpl((__ubuf__ T*)dstTensor.GetPhyAddr(), (__ubuf__ T*)srcTensor.GetPhyAddr(), calCount);
+        CosPolynomialImpl((__ubuf__ T *)dstTensor.GetPhyAddr(), (__ubuf__ T *)srcTensor.GetPhyAddr(), calCount);
     } else if constexpr (config.algo == CosAlgo::RADIAN_REDUCTION) {
         uint32_t sharedTmpBufferSize = GetCosTmpBufferSize<T>(sharedTmpBuffer);
         uint32_t count = calCount;
@@ -210,17 +204,16 @@ __aicore__ inline void CosImpl(
         for (uint16_t i = 0; i < repeatTimes; i++) {
             uint32_t remainCount = count - sharedTmpBufferSize * i;
             uint32_t oneRepSize = remainCount < sharedTmpBufferSize ? remainCount : sharedTmpBufferSize;
-            CosRadianReductionImpl(
-                (__ubuf__ T*)dstTensor.GetPhyAddr() + i * sharedTmpBufferSize,
-                (__ubuf__ T*)srcTensor.GetPhyAddr() + i * sharedTmpBufferSize,
-                (__ubuf__ uint32_t*)sharedTmpBuffer.GetPhyAddr(), oneRepSize);
+            CosRadianReductionImpl((__ubuf__ T *)dstTensor.GetPhyAddr() + i * sharedTmpBufferSize,
+                (__ubuf__ T *)srcTensor.GetPhyAddr() + i * sharedTmpBufferSize,
+                (__ubuf__ uint32_t *)sharedTmpBuffer.GetPhyAddr(), oneRepSize);
         }
     }
 }
 
-template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
-__aicore__ inline void CosImpl(
-    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
+__aicore__ inline void CosImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
+    const uint32_t calCount)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -234,14 +227,13 @@ __aicore__ inline void CosImpl(
     CosImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-__ASC_USE_RESERVED_UBUF__(3510,
-    "Cos is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
-__aicore__ inline void CosCastFullMask(
-    const LocalTensor<float>& dstTensor, const LocalTensor<float>& srcTensor, RoundMode castType)
+__ASC_USE_RESERVED_UBUF__(3510, "Cos is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void CosCastFullMask(const LocalTensor<float> &dstTensor, const LocalTensor<float> &srcTensor,
+    RoundMode castType)
 {
     uint64_t newMask = 64;
-    Cast<float, float, false>(
-        dstTensor, srcTensor, castType, newMask, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+    Cast<float, float, false>(dstTensor, srcTensor, castType, newMask, 1,
+        { 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE });
     PipeBarrier<PIPE_V>();
 }
 } // namespace AscendC

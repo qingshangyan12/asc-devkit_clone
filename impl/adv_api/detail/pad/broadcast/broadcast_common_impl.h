@@ -1,4 +1,4 @@
-/**
+/* *
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -30,35 +30,32 @@
 #include "../../api_check/kernel_check/pad/broadcast/broadcast_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 #include "broadcast_3510_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "broadcast_v220_impl.h"
 #else
 #include "broadcast_v200_impl.h"
 #endif
-#if (                                                                                                 \
-    defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161))
 
 namespace AscendC {
 constexpr uint32_t TWO_DIM = 2;
 constexpr uint32_t HALF_ONE_BLK_SIZE = 16;
 
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-template <typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr>
-__aicore__ inline void GetBroadcastTilingInfoImpl(
-    uint32_t rank, const uint32_t* dstShape, const uint32_t* srcShape, bool srcInnerPad, BroadcastTiling& tiling)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
+template <typename T, int constRank = -1, uint32_t *constDstShape = nullptr, uint32_t *constSrcShape = nullptr>
+__aicore__ inline void GetBroadcastTilingInfoImpl(uint32_t rank, const uint32_t *dstShape, const uint32_t *srcShape,
+    bool srcInnerPad, BroadcastTiling &tiling)
 {
-    static_assert(
-        (constRank == -1) || (constRank <= 9 && constRank > 0),
+    static_assert((constRank == -1) || (constRank <= 9 && constRank > 0),
         "constRank only supports -1 and the range between 1 and 9");
     ASCENDC_ASSERT((rank <= 9 && rank > 0), { KERNEL_LOG(KERNEL_ERROR, "rank should be in range [1, 9]"); });
-    ASCENDC_ASSERT((constRank == -1) || (constRank == rank), {
-        KERNEL_LOG(KERNEL_ERROR, "constRank should be equal to rank when constRank != -1");
-    });
+    ASCENDC_ASSERT((constRank == -1) || (constRank == rank),
+                   { KERNEL_LOG(KERNEL_ERROR, "constRank should be equal to rank when constRank != -1"); });
     constexpr uint32_t maxDim = 9;
 
     uint32_t srcSize = 1;
@@ -167,14 +164,14 @@ __aicore__ inline void GetBroadcastTilingInfoImpl(
 }
 
 template <typename T, int32_t constRank>
-__aicore__ inline void BroadcastCompute(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape, const uint32_t* dstStride,
-    const uint32_t* srcStride, int32_t dim, uint32_t srcSize, uint32_t dstSize, uint32_t loopNum)
+__aicore__ inline void BroadcastCompute(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t *dstShape,
+    const uint32_t *dstStride, const uint32_t *srcStride, int32_t dim, uint32_t srcSize, uint32_t dstSize,
+    uint32_t loopNum)
 {
     BroadcastInternal::DstShapeCheck(dstShape, dim);
     using BrcType = typename AscendC::BroadcastInternal::ExtractUnsignedTypeBySize<sizeof(T)>::T;
-    __ubuf__ BrcType* dstUb = (__ubuf__ BrcType*)dst.GetPhyAddr();
-    __ubuf__ BrcType* srcUb = (__ubuf__ BrcType*)src.GetPhyAddr();
+    __ubuf__ BrcType *dstUb = (__ubuf__ BrcType *)dst.GetPhyAddr();
+    __ubuf__ BrcType *srcUb = (__ubuf__ BrcType *)src.GetPhyAddr();
     bool isReduceBranch = false;
     if (srcSize == dstSize) {
         const uint32_t alignSize = ONE_BLK_SIZE / sizeof(T);
@@ -206,8 +203,8 @@ __aicore__ inline void BroadcastCompute(
             if constexpr (constRank == 2) {
                 if constexpr (sizeof(T) == sizeof(uint64_t)) {
                     if (dim != constRank) {
-                        BroadcastInternal::BrcNlastWrapperForThreeDim<BrcType, constRank>(
-                            dstUb, srcUb, dstShape, srcStride);
+                        BroadcastInternal::BrcNlastWrapperForThreeDim<BrcType, constRank>(dstUb, srcUb, dstShape,
+                            srcStride);
                     } else {
                         BroadcastInternal::BrcNlastWrapperForTwoDim<BrcType, constRank>(dstUb, srcUb, dstShape);
                     }
@@ -217,24 +214,24 @@ __aicore__ inline void BroadcastCompute(
             } else if constexpr (constRank == 3) {
                 if constexpr (sizeof(T) == sizeof(uint64_t)) {
                     if (dim != constRank) {
-                        BroadcastInternal::BrcNlastWrapperForFourDim<BrcType, constRank>(
-                            dstUb, srcUb, dstShape, srcStride);
+                        BroadcastInternal::BrcNlastWrapperForFourDim<BrcType, constRank>(dstUb, srcUb, dstShape,
+                            srcStride);
                     } else {
-                        BroadcastInternal::BrcNlastWrapperForThreeDim<BrcType, constRank>(
-                            dstUb, srcUb, dstShape, srcStride);
+                        BroadcastInternal::BrcNlastWrapperForThreeDim<BrcType, constRank>(dstUb, srcUb, dstShape,
+                            srcStride);
                     }
                 } else {
-                    BroadcastInternal::BrcNlastWrapperForThreeDim<BrcType, constRank>(
-                        dstUb, srcUb, dstShape, srcStride);
+                    BroadcastInternal::BrcNlastWrapperForThreeDim<BrcType, constRank>(dstUb, srcUb, dstShape,
+                        srcStride);
                 }
             } else if constexpr (constRank == 4) {
                 if constexpr (sizeof(T) == sizeof(uint64_t)) {
                     if (dim != constRank) {
-                        BroadcastInternal::BrcNlastWrapperForMoreDim<BrcType>(
-                            dstUb, srcUb, dstShape, dstStride, srcStride);
+                        BroadcastInternal::BrcNlastWrapperForMoreDim<BrcType>(dstUb, srcUb, dstShape, dstStride,
+                            srcStride);
                     } else {
-                        BroadcastInternal::BrcNlastWrapperForFourDim<BrcType, constRank>(
-                            dstUb, srcUb, dstShape, srcStride);
+                        BroadcastInternal::BrcNlastWrapperForFourDim<BrcType, constRank>(dstUb, srcUb, dstShape,
+                            srcStride);
                     }
                 } else {
                     BroadcastInternal::BrcNlastWrapperForFourDim<BrcType, constRank>(dstUb, srcUb, dstShape, srcStride);
@@ -255,41 +252,37 @@ __aicore__ inline void BroadcastCompute(
         }
         if (isReduceBranch) {
             loopNum = loopNum == 0 ? 1 : loopNum;
-            __ubuf__ BrcType* dstUbTmp = dstUb;
-            __ubuf__ BrcType* srcUbTmp = srcUb;
+            __ubuf__ BrcType *dstUbTmp = dstUb;
+            __ubuf__ BrcType *srcUbTmp = srcUb;
             for (uint16_t h = 0; h < loopNum; ++h) {
                 dstUb = dstUbTmp + h * dstStride[0] * dstShape[0];
                 srcUb = srcUbTmp + h * srcStride[9];
                 if (srcStride[dim - 1] == 0) {
-                    BroadcastInternal::BrcLastWrapperForMoreDimDynamicShape<BrcType>(
-                        dstUb, srcUb, dim, dstShape, dstStride, srcStride);
+                    BroadcastInternal::BrcLastWrapperForMoreDimDynamicShape<BrcType>(dstUb, srcUb, dim, dstShape,
+                        dstStride, srcStride);
                 } else {
-                    BroadcastInternal::BrcNlastWrapperForMoreDimDynamicShape<BrcType>(
-                        dstUb, srcUb, dim, dstShape, dstStride, srcStride);
+                    BroadcastInternal::BrcNlastWrapperForMoreDimDynamicShape<BrcType>(dstUb, srcUb, dim, dstShape,
+                        dstStride, srcStride);
                 }
             }
         }
     }
 }
 
-template <
-    typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr,
+template <typename T, int constRank = -1, uint32_t *constDstShape = nullptr, uint32_t *constSrcShape = nullptr,
     bool constSrcInnerPad = false>
-__aicore__ inline void BroadcastImpl(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape, const uint32_t* srcShape,
-    BroadcastTiling* tiling)
+__aicore__ inline void BroadcastImpl(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t *dstShape,
+    const uint32_t *srcShape, BroadcastTiling *tiling)
 {
     CheckTensorPos<T>(dst, Hardware::UB, "dstTensor", "VECIN / VECCALC / VECOUT", "Broadcast");
     CheckTensorPos<T>(src, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "Broadcast");
-    static_assert(
-        (constRank == -1) || (constRank <= 9 && constRank > 0),
+    static_assert((constRank == -1) || (constRank <= 9 && constRank > 0),
         "constRank only supports -1 and the range between 1 and 9");
     static_assert(SupportBytes<T, 1, 2, 4, 8>(), "Broadcast only supports type b8/b16/b32/b64 on current device");
     ASCENDC_ASSERT((tiling != nullptr), "BroadcastTiling could not be empty!");
     if constexpr (constRank != -1) {
-        ASCENDC_ASSERT((tiling->oriRank == constRank), {
-            KERNEL_LOG(KERNEL_ERROR, "Tilling original rank and constRank should be equal!");
-        });
+        ASCENDC_ASSERT((tiling->oriRank == constRank),
+                       { KERNEL_LOG(KERNEL_ERROR, "Tilling original rank and constRank should be equal!"); });
     }
     BroadcastInternal::ShapeCheck(tiling->oriDstShape, dstShape, tiling->oriRank);
     BroadcastInternal::ShapeCheck(tiling->oriSrcShape, srcShape, tiling->oriRank);
@@ -297,9 +290,9 @@ __aicore__ inline void BroadcastImpl(
     uint32_t srcSize = tiling->srcSize;
     uint32_t dstSize = tiling->dstSize;
     uint32_t loopNum = tiling->loopNum;
-    uint32_t* dstStride = tiling->dstStride;
-    uint32_t* srcStride = tiling->srcStride;
-    uint32_t* newDstShape = tiling->dstShape;
+    uint32_t *dstStride = tiling->dstStride;
+    uint32_t *srcStride = tiling->srcStride;
+    uint32_t *newDstShape = tiling->dstShape;
     int32_t dim = tiling->rank;
 
     BroadcastCompute<T, constRank>(dst, src, newDstShape, dstStride, srcStride, dim, srcSize, dstSize, loopNum);
@@ -307,14 +300,13 @@ __aicore__ inline void BroadcastImpl(
 #else
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void TwoDimBroadCastFirstDim(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim], LocalTensor<T>& tmpBuffer)
+__aicore__ inline void TwoDimBroadCastFirstDim(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<T> &tmpBuffer)
 {
     const uint32_t firstDim = dstShape[0];
     const uint32_t numBlocks = dstShape[1];
-    ASCENDC_ASSERT(
-        (numBlocks * sizeof(T) % ONE_BLK_SIZE == 0), { KERNEL_LOG(KERNEL_ERROR, "Non-alignment is not supported!"); });
+    ASCENDC_ASSERT((numBlocks * sizeof(T) % ONE_BLK_SIZE == 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "Non-alignment is not supported!"); });
 
     constexpr uint32_t oneBlockElementNum = ONE_BLK_SIZE / sizeof(T);
     constexpr uint32_t FIRST_DIM_LOOP_LIMITE = MAX_REPEAT_NUM * oneBlockElementNum;
@@ -332,9 +324,8 @@ __aicore__ inline void TwoDimBroadCastFirstDim(
 }
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void BroadCastCompute(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim], LocalTensor<T>& tmpBuffer)
+__aicore__ inline void BroadCastCompute(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<T> &tmpBuffer)
 {
     uint32_t srcSize = 1;
     uint32_t dstSize = 1;
@@ -371,29 +362,24 @@ __aicore__ inline void BroadCastCompute(
 #endif
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void BroadCast(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim]);
+__aicore__ inline void BroadCast(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim]);
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void BroadCast(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer);
+__aicore__ inline void BroadCast(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<uint8_t> &sharedTmpBuffer);
 
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void BroadCastCommon(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim])
+__aicore__ inline void BroadCastCommon(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim])
 {
     static_assert(SupportBytes<T, 1, 2, 4>(), "Broadcast only supports type b8/b16/b32 on current device");
-    ASCENDC_ASSERT((dim <= 2 && dim > 0), {
-        KERNEL_LOG(KERNEL_ERROR, "Now only support dim = 1 or dim = 2, but we get dim= %d", dim);
-    });
-    ASCENDC_ASSERT((axis == 1 || axis == 0), {
-        KERNEL_LOG(KERNEL_ERROR, "Now only support axis = 0 or axis = 1, but we get axis= %d", dim);
-    });
+    ASCENDC_ASSERT((dim <= 2 && dim > 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "Now only support dim = 1 or dim = 2, but we get dim= %d", dim); });
+    ASCENDC_ASSERT((axis == 1 || axis == 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "Now only support axis = 0 or axis = 1, but we get axis= %d", dim); });
 
     uint32_t srcSize = 1;
     uint32_t dstSize = 1;
@@ -421,18 +407,16 @@ __aicore__ inline void BroadCastCommon(
 }
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void BroadCastCommon(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer)
+__aicore__ inline void BroadCastCommon(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<uint8_t> &sharedTmpBuffer)
 {
     BroadCast<T, dim, axis, isReuseSource>(dstLocal, srcLocal, dstShape, srcShape);
 }
 
 #else
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void BroadCastCommon(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim])
+__aicore__ inline void BroadCastCommon(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim])
 {
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
@@ -441,9 +425,8 @@ __aicore__ inline void BroadCastCommon(
 }
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void BroadCastCommon(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer)
+__aicore__ inline void BroadCastCommon(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<uint8_t> &sharedTmpBuffer)
 {
     TRACE_START(TraceId::BroadCast);
     if constexpr (sizeof(T) == 1) {
@@ -461,17 +444,15 @@ __aicore__ inline void BroadCastCommon(
         auto tempTempBuffer = dstTempBuffer[alignDstSize];
         SetMaskCount();
         SetVectorMask<T, MaskMode::COUNTER>(srcSize);
-        Cast<half, T, false>(
-            srcTempBuffer, srcLocal, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-            {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
+        Cast<half, T, false>(srcTempBuffer, srcLocal, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+            { 1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE });
         PipeBarrier<PIPE_V>();
         // After BroadCastCompute, Reset to Counter model
-        BroadCastCompute<half, dim, axis, isReuseSource>(
-            dstTempBuffer, srcTempBuffer, dstShape, srcShape, tempTempBuffer);
+        BroadCastCompute<half, dim, axis, isReuseSource>(dstTempBuffer, srcTempBuffer, dstShape, srcShape,
+            tempTempBuffer);
         SetVectorMask<T, MaskMode::COUNTER>(dstSize);
-        Cast<T, half, false>(
-            dstLocal, dstTempBuffer, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-            {1, 1, HALF_DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+        Cast<T, half, false>(dstLocal, dstTempBuffer, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+            { 1, 1, HALF_DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE });
         PipeBarrier<PIPE_V>();
         SetMaskNorm();
         ResetMask();
@@ -487,9 +468,8 @@ __aicore__ inline void BroadCastCommon(
 #endif
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource>
-__aicore__ inline void BroadCast(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim])
+__aicore__ inline void BroadCast(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim])
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -499,20 +479,20 @@ __aicore__ inline void BroadCast(
 }
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource>
-__aicore__ inline void BroadCast(
-    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-    const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer)
+__aicore__ inline void BroadCast(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<uint8_t> &sharedTmpBuffer)
 {
     if ASCEND_IS_AIC {
         return;
     }
-    CHECK_FUNC_HIGHLEVEL_API(
-        Broadcast, (T, dim, axis, isReuseSource), (dstLocal, srcLocal, dstShape, srcShape, sharedTmpBuffer));
+    CHECK_FUNC_HIGHLEVEL_API(Broadcast, (T, dim, axis, isReuseSource),
+        (dstLocal, srcLocal, dstShape, srcShape, sharedTmpBuffer));
     BroadCastCommon<T, dim, axis, isReuseSource>(dstLocal, srcLocal, dstShape, srcShape, sharedTmpBuffer);
 }
 } // namespace AscendC
 #endif
-#endif // IMPL_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H
+#endif \
+    // IMPL_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
