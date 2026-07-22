@@ -59,6 +59,8 @@ PIPE_S
 - 必须保证每个flag_id的计数器不溢出，否则将引发异常。
 - 必须保证相同的ID在同一时间仅被一条流水线等待。
 
+- 必须保证配套使用[asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)和asc_sync_subblock_wait，避免计算核一直处于阻塞阶段。
+
 ## 调用示例
 
 <!-- npu="A3,910b" id9 -->

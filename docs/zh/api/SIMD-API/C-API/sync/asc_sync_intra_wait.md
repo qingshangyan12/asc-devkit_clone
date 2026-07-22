@@ -63,6 +63,8 @@ PIPE_S
     - ID为0~15的CUBECORE的asc_sync_intra_arrive指令会被映射到VECCORE0的0~15的ID。 
     - ID为16~31的CUBECORE的asc_sync_intra_arrive指令会被映射到VECCORE1的0~15的ID。 
 
+- 必须保证配套使用[asc_sync_intra_arrive](asc_sync_intra_arrive.md)和asc_sync_intra_wait，避免计算核一直处于阻塞阶段。
+
 ## 调用示例
 
 ```cpp

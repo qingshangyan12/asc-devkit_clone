@@ -56,6 +56,9 @@ PIPE_S
 - 不建议开发者同时使用该接口和Matmul高阶API，否则会有flag_id冲突的风险。
 - 同一flag_id的计数器最多设置15次。
 
+- 必须保证配套使用asc_sync_inter_arrive和[asc_sync_inter_wait](asc_sync_inter_wait.md)，否则会出现未定义行为。
+- 需要保证每个flag_id的计数器不溢出，否则将引发异常。
+
 ## 调用示例
 
 <!-- npu="A3,910b" id5 -->
