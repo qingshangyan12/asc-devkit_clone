@@ -52,6 +52,8 @@ DEFINE_WEAK_FUNC(
     HcclResult, HcclSymWinGetPeerPointer, HcclCommSymWindow winHandle, size_t offset, uint32_t peerRank, void** ptr);
 DEFINE_WEAK_FUNC(
     HcclResult, HcclCommSymWinGet, HcclComm comm, void* ptr, size_t size, HcclCommSymWindow* winHandle, size_t* offset);
+DEFINE_WEAK_FUNC(int32_t, HcommBatchTransferOnThread, ThreadHandle thread, ChannelHandle channel,
+    const HcommBatchTransferDesc* transferDescs, uint32_t transferDescNum);
 
 // ---------- 初始化函数 ----------
 void HcommPrimitivesDlInit(void* libHcommHandle)
@@ -78,4 +80,5 @@ void HcommPrimitivesDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcommThreadJoin);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclSymWinGetPeerPointer);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclCommSymWinGet);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcommBatchTransferOnThread);
 }

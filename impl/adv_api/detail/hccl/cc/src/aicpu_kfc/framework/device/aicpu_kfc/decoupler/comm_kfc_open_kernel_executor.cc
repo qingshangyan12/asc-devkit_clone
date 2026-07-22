@@ -14,6 +14,7 @@
 
 #include "log.h"
 #include "alg_param.h"
+#include "alg_data_trans_wrapper.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
 
@@ -130,6 +131,7 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
     char* ctx = static_cast<char*>(param->resCtx);
     std::vector<char> seq(ctx, ctx + param->ctxSize);
     resCtx.DeSerialize(seq);
+    CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
     HCCL_INFO(
         "[MC2_OPEN_DIAG][Launch] opType %u, algName[%s], inputPtr %p, outputPtr %p, resCtx %p, ctxSize %llu, stream %p."
         "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.",

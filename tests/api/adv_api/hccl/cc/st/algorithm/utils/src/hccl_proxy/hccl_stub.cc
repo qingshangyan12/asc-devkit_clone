@@ -829,6 +829,11 @@ int32_t HcommBatchModeEnd(const char* batchTag)
     return HCCL_SUCCESS;
 }
 
+bool HcommIsSupportHcommBatchTransferOnThread()
+{
+    return false;
+}
+
 int32_t HcommAcquireComm(const char* commId) { return 0; }
 
 int32_t HcommReleaseComm(const char* commId) { return 0; }
