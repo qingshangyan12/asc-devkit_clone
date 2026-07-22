@@ -481,7 +481,6 @@ HcclResult PrepareTopoInfoForOp(HcclComm comm, OpParam& opParam, std::unique_ptr
     opParam.hcclComm = comm;
     CHK_RET(HcclGetOpExpansionMode(comm, opParam));
     CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
-    CHK_RET(CheckAsymmetricTopoSupport(opParam.opType, topoInfo.get()));
     return HCCL_SUCCESS;
 }
 
@@ -668,6 +667,7 @@ HcclResult GetOpParamResCtx(
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    opParam.cacheValid = isResourceReused;
     opParam.resCtx = *resCtxOut;
     return HCCL_SUCCESS;
 }

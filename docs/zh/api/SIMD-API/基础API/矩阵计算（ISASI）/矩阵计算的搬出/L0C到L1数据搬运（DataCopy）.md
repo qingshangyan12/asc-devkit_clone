@@ -34,13 +34,13 @@
 下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
 <!-- npu="A3,910b" id9 -->
-**图1** L0C2L1流程图（[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
+**图1** L0C2L1流程图（[NPU架构版本2201](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination.png)
 <!-- end id9 -->
 
 <!-- npu="950" id11 -->
-**图2** L0C2L1流程图（[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
+**图2** L0C2L1流程图（[NPU架构版本3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination_DataCopy_950.png)
 <!-- end id11 -->
@@ -197,6 +197,26 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     对于整数类型只有饱和模式。
 <!-- end id24 -->
 
+<!-- npu="950,A3,910b" id25 -->
 ## 调用示例<a id="zh-cn_topic_0000002511188540_section088124295117"></a>
 
-无
+示例：通路L0C Buffer->L1 Buffer。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8_t，不开启NZ2ND的格式转换，开启scalar量化。
+    
+    ```cpp
+    constexpr uint16_t c0Size = 32;
+    AscendC::DataCopyCO12DstParams dataCopyParams;
+
+    dataCopyParams.dstStride = baseM * c0Size * sizeof(outputType) / AscendC::ONE_BLK_SIZE;
+    dataCopyParams.mSize = baseM;
+    dataCopyParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
+    dataCopyParams.nSize = baseN;
+    dataCopyParams.quantPre = QuantMode_t::QF322B8_PRE;
+
+    uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantScalar));
+    constexpr bool sign = (AscendC::IsSameType<outputType, int8_t>::value) ? true : false;
+    deqScalar = (deqScalar & ~(static_cast<uint64_t>(1) << 46)) | (static_cast<uint64_t>(sign) << 46);
+    AscendC::SetFixpipePreQuantFlag(deqScalar);
+    AscendC::DataCopy(c1Local, c, dataCopyParams);
+    ```
+<!-- end id25 -->
+
