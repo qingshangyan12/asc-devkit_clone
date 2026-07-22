@@ -67,15 +67,6 @@ PIPE_V
 
 mask未筛选的元素在输出中置零。
 
-## 理论性能
-
-
-| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
-|---|---|---|
-| half | half | 128 |
-| int32_t | int32_t | 64 |
-| float | float | 64 |
-
 ## 调用示例
 
 ```cpp

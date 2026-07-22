@@ -83,19 +83,6 @@ dst的索引按照dst的数据类型存储，比如dst为half类型时，索引�
 
 归约产生两个有效结果，需要分别提取。
 
-## 理论性能
-
-
-| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
-|---|---|---|
-| int16_t | int16_t | 128 |
-| uint16_t | uint16_t | 128 |
-| half | half | 128 |
-| int32_t | int32_t | 64 |
-| uint32_t | uint32_t | 64 |
-| float | float | 64 |
-
-
 ## 调用示例
 
 ```cpp

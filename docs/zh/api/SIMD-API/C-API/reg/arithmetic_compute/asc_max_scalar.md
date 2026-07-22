@@ -72,22 +72,6 @@ PIPE_V
 - 输入`src`为-0、`value`为+0的情况下，输出`dst`为 +0。
 - mask未筛选的元素在输出中置零。
 
-## 理论性能
-
-
-| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
-|---|---|---|
-| int8_t | int8_t | 256 |
-| uint8_t | uint8_t | 256 |
-| int16_t | int16_t | 128 |
-| uint16_t | uint16_t | 128 |
-| half | half | 128 |
-| bfloat16_t | bfloat16_t | 128 |
-| int32_t | int32_t | 64 |
-| uint32_t | uint32_t | 64 |
-| float | float | 64 |
-
-
 ## 调用示例
 
 ```cpp

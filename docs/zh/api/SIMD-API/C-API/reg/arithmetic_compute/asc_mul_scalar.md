@@ -69,19 +69,6 @@ PIPE_V
 
 mask对应位置为0的元素不参与计算，且在输出中置零。
 
-## 理论性能
-
-
-| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
-|---|---|---|
-| int16_t | int16_t | 64 |
-| uint16_t | uint16_t | 64 |
-| half | half | 128 |
-| int32_t | int32_t | 32 |
-| uint32_t | uint32_t | 32 |
-| float | float | 64 |
-
-
 ## 调用示例
 
 ```cpp

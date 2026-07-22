@@ -67,19 +67,6 @@ PIPE_V
 - 未被mask选中的元素被视为最小值（浮点数为-INF），如果一个DataBlock中所有元素都未被mask选中，-INF将被填充到目的操作数的指定位置
 - 仅输出最值，不输出索引下标
 
-## 理论性能
-
-
-| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
-|---|---|---|
-| int16_t | int16_t | 128 |
-| uint16_t | uint16_t | 128 |
-| half | half | 128 |
-| int32_t | int32_t | 64 |
-| uint32_t | uint32_t | 64 |
-| float | float | 64 |
-
-
 ## 调用示例
 
 ```cpp

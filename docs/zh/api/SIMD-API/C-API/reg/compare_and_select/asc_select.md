@@ -77,25 +77,6 @@ PIPE_V
 
 通过mask参数控制的未选中的元素保持源操作数的值而非清零。
 
-## 理论性能
-
-
-| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
-|---|---|---|
-| bool | bool | 256 |
-| int8_t | int8_t | 256 |
-| uint8_t | uint8_t | 256 |
-| hifloat8_t | hifloat8_t | 256 |
-| fp8_e5m2_t | fp8_e5m2_t | 256 |
-| fp8_e4m3fn_t | fp8_e4m3fn_t | 256 |
-| int16_t | int16_t | 128 |
-| uint16_t | uint16_t | 128 |
-| half | half | 128 |
-| bfloat16_t | bfloat16_t | 128 |
-| int32_t | int32_t | 64 |
-| uint32_t | uint32_t | 64 |
-| float | float | 64 |
-
 ## 调用示例
 
 ```cpp

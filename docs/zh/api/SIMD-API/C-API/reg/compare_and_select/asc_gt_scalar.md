@@ -73,22 +73,6 @@ PIPE_V
 - mask未筛选的元素在输出中置零。
 - 浮点数据类型比较，涉及`NaN`时比较结果为0。
 
-## 理论性能
-
-
-| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
-|---|---|---|
-| int8_t | bool | 256 |
-| uint8_t | bool | 256 |
-| int16_t | bool | 128 |
-| uint16_t | bool | 128 |
-| half | bool | 128 |
-| bfloat16_t | bool | 128 |
-| int32_t | bool | 64 |
-| uint32_t | bool | 64 |
-| float | bool | 64 |
-
-
 ## 调用示例
 
 ```cpp
