@@ -33,6 +33,13 @@ template <class... Args>
 __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 ```
 
+以下接口为SIMT中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
+
+```
+template <class... Args>
+static __attribute__((noinline)) void printf(const char* fmt, Args&&... args)
+```
+
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
@@ -47,6 +54,16 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 ## 约束说明
 
 -   本接口不支持打印除换行符之外的其他转义字符。
+-   SIMT场景的支持情况如下：
+      <!-- npu="950" id10 -->
+    - Ascend 950PR/Ascend 950DT：支持。
+      <!-- end id10 -->
+      <!-- npu="A3" id11 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持。
+      <!-- end id11 -->
+      <!-- npu="910b" id12 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
+      <!-- end id12 -->
 -   SIMT中printf功能需要占用额外的Global Memory空间用于数据缓存，缓存空间大小默认为2MB。您可以通过acl.json中的"simt\_printf\_fifo\_size"字段进行配置，配置范围最小为1MB，最大为64MB。当打印数据量较大时，建议增加缓存空间。
 -   使用printf接口会增加算子运行时间，请控制打印数据量，避免算子超时。建议在代码中判断线程ID，仅在部分线程中打印调试信息，减少重复内容的打印，更有利于调试。
 -   SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为32KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过acl.json中的"simd\_printf\_fifo\_size\_per\_core"字段进行配置，配置范围最小为1KB，最大为64MB。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
