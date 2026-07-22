@@ -122,9 +122,9 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         ccu::NotifyRecord(channels[i], A2AV_POST_SYNC_CKE_IDX, selfBit);
     }
     // 【定位step1】怀疑 PostSync 死锁时，注释掉下面这三行 NotifyWait
-    // for (uint32_t i = 0; i < channelCount; i++) {
-    //     ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, allOtherBit);
-    // }
+    for (uint32_t i = 0; i < channelCount; i++) {
+        ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, allOtherBit);
+    }
     return CCU_SUCCESS;
 }
 
