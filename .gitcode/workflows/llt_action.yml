@@ -75,13 +75,14 @@ jobs:
               echo "run ut fail"
               exit 1
           fi
-          if [ $ret -eq 0 ]; then
-              if [ "$coverage_save" = "true" ];then
-                echo "ut_process=coverage" >> $ATOMGIT_OUTPUT
-              else
-                echo "ut_process=ut_cov" >> $ATOMGIT_OUTPUT
-              fi
-          fi
+          # if [ $ret -eq 0 ]; then
+          #     if [ "$coverage_save" = "true" ];then
+          #       echo "ut_process=coverage" >> $ATOMGIT_OUTPUT
+          #     else
+          #       echo "ut_process=ut_cov" >> $ATOMGIT_OUTPUT
+          #     fi
+          # fi
+          echo "ut_process=coverage" >> "${ATOMGIT_OUTPUT}"
           exit 0
       -
         name: ut_cov
