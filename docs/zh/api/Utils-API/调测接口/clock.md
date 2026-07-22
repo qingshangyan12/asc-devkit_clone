@@ -39,10 +39,10 @@ __aicore__ inline uint64_t clock(void)
 ```
 
 <!-- npu="950" id9 -->
-以下接口为SIMT VF中所使用的clock接口，仅支持Ascend 950PR/Ascend 950DT。
+以下接口为SIMT中所使用的clock接口，仅支持Ascend 950PR/Ascend 950DT。
 
 ```
-__simt_callee__ inline uint64_t clock(void)
+inline uint64_t clock(void)
 ```
 <!-- end id9 -->
 
