@@ -1,4 +1,4 @@
-﻿# SetDeqScale<a name="ZH-CN_TOPIC_0000002573904763"></a>
+# SetDeqScale<a name="ZH-CN_TOPIC_0000002573904763"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002563051145_section815614567413"></a>
 

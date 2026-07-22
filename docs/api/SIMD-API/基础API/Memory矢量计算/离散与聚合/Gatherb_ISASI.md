@@ -1,4 +1,4 @@
-﻿# Gatherb\(ISASI\)<a name="ZH-CN_TOPIC_0000001493030392"></a>
+# Gatherb\(ISASI\)<a name="ZH-CN_TOPIC_0000001493030392"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 

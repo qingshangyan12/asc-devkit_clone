@@ -1,4 +1,4 @@
-﻿# L0C到L1数据搬运（Fixpipe）<a id="ZH-CN_TOPIC_0000002538231198"></a>
+# L0C到L1数据搬运（Fixpipe）<a id="ZH-CN_TOPIC_0000002538231198"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002511188540_section796754519912"></a>
 
