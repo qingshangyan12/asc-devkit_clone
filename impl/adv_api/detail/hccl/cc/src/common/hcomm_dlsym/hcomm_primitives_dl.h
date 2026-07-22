@@ -28,6 +28,10 @@ DECL_WEAK_FUNC(
 DECL_WEAK_FUNC(
     HcclResult, HcclCommSymWinGet, HcclComm comm, void* ptr, size_t size, HcclCommSymWindow* winHandle, size_t* offset);
 
+DECL_WEAK_FUNC(int32_t, HcommBatchTransferOnThread, ThreadHandle thread, ChannelHandle channel,
+    const HcommBatchTransferDesc* transferDescs, uint32_t transferDescNum);
+DECL_SUPPORT_FLAG(HcommBatchTransferOnThread);
+
 void HcommPrimitivesDlInit(void* libHcommHandle); // 本模块独立初始化
 
 #ifdef __cplusplus

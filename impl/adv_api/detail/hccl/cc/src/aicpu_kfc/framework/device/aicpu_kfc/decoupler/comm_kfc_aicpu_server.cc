@@ -611,7 +611,16 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
+        const char* algTag = reinterpret_cast<const mc2_ops_hccl::OpParam*>(runParam.data())->algTag;
+        if (HcommBatchModeStart(algTag) != HCCL_SUCCESS) {
+            HCCL_ERROR("Group %u: failed set batch mode, tag is %s.", groupIdx_, algTag);
+            return HCCL_E_INTERNAL;
+        }
         ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+        if (HcommBatchModeEnd(algTag) != HCCL_SUCCESS) {
+            HCCL_ERROR("Group %u: failed set eager mode, tag is %s.", groupIdx_, algTag);
+            return HCCL_E_INTERNAL;
+        }
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,

@@ -389,6 +389,76 @@ extern int32_t HcommBatchModeStart(const char* batchTag);
  */
 extern int32_t HcommBatchModeEnd(const char* batchTag);
 
+/**
+ * @brief 传输类型枚举
+ */
+typedef enum {
+    HCOMM_TRANSFER_TYPE_INVALID = -1,
+    HCOMM_TRANSFER_TYPE_WRITE = 0,
+    HCOMM_TRANSFER_TYPE_WRITE_REDUCE = 1,
+    HCOMM_TRANSFER_TYPE_WRITE_WITH_NOTIFY = 2,
+    HCOMM_TRANSFER_TYPE_WRITE_REDUCE_WITH_NOTIFY = 3,
+    HCOMM_TRANSFER_TYPE_READ = 4,
+    HCOMM_TRANSFER_TYPE_READ_REDUCE = 5,
+    HCOMM_TRANSFER_TYPE_NOTIFY_RECORD = 6
+} HcommTransferType;
+
+/**
+ * @brief 批量传输描述符
+ */
+typedef struct {
+    HcommTransferType transType;     ///< 传输类型
+    uint8_t reserved[4];
+    union {
+        uint8_t raws[56];            ///< 通用数据
+        struct {
+            uint64_t len;
+            void *dst;
+            void *src;
+        } write;
+        struct {
+            uint64_t len;
+            void *dst;
+            void *src;
+        } read;
+        struct {
+            uint64_t count;
+            void *dst;
+            void *src;
+            HcommReduceOp reduceOp;
+            HcommDataType dataType;
+        } reduce;
+        struct {
+            uint32_t notifyIdx;
+        } notifyRecord;
+        struct {
+            uint64_t len;
+            void *dst;
+            void *src;
+            uint32_t notifyIdx;
+        } writeWithNotify;
+        struct {
+            uint64_t count;
+            void *dst;
+            void *src;
+            HcommReduceOp reduceOp;
+            HcommDataType dataType;
+            uint32_t notifyIdx;
+        } writeReduceWithNotify;
+    } transferInfo;
+} HcommBatchTransferDesc;
+
+/**
+ * @brief 批量传输操作
+ * @param[in] thread 线程句柄
+ * @param[in] channel 通道句柄
+ * @param[in] transferDescs 批量传输描述符数组
+ * @param[in] transferDescNum 批量传输描述符数量
+ * @return int32_t 执行结果，0表示成功
+ */
+extern int32_t HcommBatchTransferOnThread(ThreadHandle thread, ChannelHandle channel,
+    const HcommBatchTransferDesc *transferDescs, uint32_t transferDescNum);
+
 /** @} */ // 批量下发设置接口
 
 /** @} */ // 数据面编程接口
