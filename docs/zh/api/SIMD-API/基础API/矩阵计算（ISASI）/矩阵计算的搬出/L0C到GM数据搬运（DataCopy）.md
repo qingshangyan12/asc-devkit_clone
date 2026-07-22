@@ -1,4 +1,4 @@
-﻿# L0C到GM数据搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002569070977"></a>
+# L0C到GM数据搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002569070977"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002542828493_section796754519912"></a>
 

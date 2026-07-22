@@ -1,4 +1,4 @@
-﻿# GMToL1-2D矩阵搬运（LoadData）<a id="ZH-CN_TOPIC_0000002538231138"></a>
+# GMToL1-2D矩阵搬运（LoadData）<a id="ZH-CN_TOPIC_0000002538231138"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002567745223_section796754519912"></a>
 

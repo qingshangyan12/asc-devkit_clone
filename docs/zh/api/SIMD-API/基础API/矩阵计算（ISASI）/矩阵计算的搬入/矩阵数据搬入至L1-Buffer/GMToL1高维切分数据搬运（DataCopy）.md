@@ -1,4 +1,4 @@
-﻿# GMToL1高维切分数据搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002538231128"></a>
+# GMToL1高维切分数据搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002538231128"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002566658905_section796754519912"></a>
 

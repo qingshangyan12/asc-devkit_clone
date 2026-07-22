@@ -1,4 +1,4 @@
-﻿# MmadBitMode<a name="ZH-CN_TOPIC_000000253823118101"></a>
+# MmadBitMode<a name="ZH-CN_TOPIC_000000253823118101"></a>
 
 ## 产品支持情况
 

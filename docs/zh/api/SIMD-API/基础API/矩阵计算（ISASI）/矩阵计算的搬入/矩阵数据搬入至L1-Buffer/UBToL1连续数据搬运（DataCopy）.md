@@ -1,4 +1,4 @@
-﻿# UBToL1连续数据搬运（DataCopy）
+# UBToL1连续数据搬运（DataCopy）
 
 ## 产品支持情况
 
