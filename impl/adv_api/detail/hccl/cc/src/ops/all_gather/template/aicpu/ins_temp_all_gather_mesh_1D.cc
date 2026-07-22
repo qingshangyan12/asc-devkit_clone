@@ -211,9 +211,11 @@ HcclResult InsTempAllGatherMesh1D::RunAllGatherMesh(
 
         TxRxSlicesList sendRecvSlicesList({txSrcSlicesAll, txDstSlicesAll}, {rxSrcSlicesAll, rxDstSlicesAll});
         TxRxChannels sendRecvChannels(linkRemote, linkRemote);
-        SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList);
+
+        // TODO: Hcomm仓里没有这个修改
+        SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList, dataType_);
         CHK_PRT_RET(
-            SendRecvRead(sendRecvInfo, threads[threadIdx]),
+            SendRecvBatchWrite(sendRecvInfo, threads[threadIdx]),
             HCCL_ERROR("[InsTempAllGatherMesh1D] RunAllGather Send failed"), HcclResult::HCCL_E_INTERNAL);
     }
     return HcclResult::HCCL_SUCCESS;
