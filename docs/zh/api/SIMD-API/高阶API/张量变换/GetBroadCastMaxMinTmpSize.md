@@ -10,7 +10,7 @@ kernel侧Broadcast接口的计算需要开发者预留/申请临时空间，本�
 ## 函数原型
 
 ```
-void GetBroadCastMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape,const ge::Shape& dstShape, uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetBroadCastMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape,const AscendC::TensorShape& dstShape, uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -43,8 +43,8 @@ auto platformInfo = context_->GetPlatformInfo();
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfo);
 std::vector<int64_t> srcShapeVec = {1024, 1};
 std::vector<int64_t> dstShapeVec = {1024, 16};
-ge::Shape srcShape(srcShapeVec);
-ge::Shape dstShape(dstShapeVec);
+AscendC::TensorShape srcShape(srcShapeVec);
+AscendC::TensorShape dstShape(dstShapeVec);
 uint32_t maxValue{0};
 uint32_t minValue{0};
 AscendC::GetBroadCastMaxMinTmpSize(ascendcPlatform, srcShape, dstShape, 2, false, maxValue, minValue);

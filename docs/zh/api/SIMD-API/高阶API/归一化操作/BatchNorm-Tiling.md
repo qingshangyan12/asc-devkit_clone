@@ -43,15 +43,15 @@ BatchNorm Tiling API用于获取BatchNorm kernel计算时所需的Tiling参数�
 ## 函数原型
 
 ```
-bool GetBatchNormMaxMinTmpSize(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,uint32_t& minValue, const bool isBasicBlock = false)
+bool GetBatchNormMaxMinTmpSize(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,uint32_t& minValue, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
+bool GetBatchNormNDTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
+bool GetBatchNormNDTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
 ```
 
 ## 参数说明
@@ -124,8 +124,8 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
         ...
         std::vector<int64_t> shapeVec = {16, 16, 16};   //{b,s,h}
         std::vector<int64_t> originShapeVec = {15, 16, 16}; //{originB,originS,originH}
-        ge::Shape srcShape(shapeVec);
-        ge::Shape originSrcShape(originShapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
+        AscendC::TensorShape originSrcShape(originShapeVec);
         uint32_t minSize = 0;
         uint32_t maxSize = 0;
         // 本样例中仅作为样例说明，通过GetBatchNormMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小

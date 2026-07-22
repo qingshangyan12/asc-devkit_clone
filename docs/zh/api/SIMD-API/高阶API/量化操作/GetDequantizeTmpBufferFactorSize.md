@@ -23,7 +23,7 @@
 ## 函数原型
 
 ```
-void GetDequantizeTmpBufferFactorSize(const ge::Shape& srcShape, uint32_t& maxLiveNodeCnt, uint32_t& extraBuf)
+void GetDequantizeTmpBufferFactorSize(const AscendC::TensorShape& srcShape, uint32_t& maxLiveNodeCnt, uint32_t& extraBuf)
 ```
 
 ## 参数说明
@@ -48,7 +48,7 @@ void GetDequantizeTmpBufferFactorSize(const ge::Shape& srcShape, uint32_t& maxLi
 
 ```
 std::vector<int64_t> shapeVec = {2, 1024};
-ge::Shape srcShape(shapeVec);
+AscendC::TensorShape srcShape(shapeVec);
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuf = 0;
 AscendC::GetDequantizeTmpBufferFactorSize(srcShape, maxLiveNodeCount, extraBuf);

@@ -51,15 +51,15 @@ Ascend C提供DeepNorm Tiling API，方便用户获取DeepNorm kernel计算时�
 ## 函数原型
 
 ```
-bool GetDeepNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, uint32_t& maxValue, uint32_t& minValue)
+bool GetDeepNormMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, optiling::DeepNormTiling& tiling)
+bool GetDeepNormTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, optiling::DeepNormTiling& tiling)
 ```
 
 ```
-bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, AscendC::tiling::DeepNormTiling& tiling)
+bool GetDeepNormTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, AscendC::tiling::DeepNormTiling& tiling)
 ```
 
 ## 参数说明
@@ -127,8 +127,8 @@ bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrc
         ...
         std::vector<int64_t> shapeVec = {2, 16, 64};
         std::vector<int64_t> oriShapeVec = {2, 16, 64};
-        ge::Shape srcShape(shapeVec);
-        ge::Shape originSrcShape(oriShapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
+        AscendC::TensorShape originSrcShape(oriShapeVec);
 
         // 本样例中仅作为样例说明，通过GetDeepNormMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         uint32_t minValue = 0;

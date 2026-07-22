@@ -92,40 +92,40 @@ Ascend C提供一组LayerNorm Tiling API，方便用户获取LayerNorm kernel计
     -   输出归一化结果、均值和方差的LayerNorm接口所需的临时空间
 
         ```
-        void GetLayerNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+        void GetLayerNormMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
         ```
 
     -   输出归一化结果、均值和标准差的倒数的LayerNorm接口所需的临时空间
 
         ```
-        void GetLayerNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
+        void GetLayerNormMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
         ```
 
 -   GetLayerNormNDTilingInfo/GetLayerNormNDTillingInfo接口
     -   输出归一化结果、均值和方差的LayerNorm接口所需的tiling参数
 
         ```
-        void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormTiling& tiling)
+        void GetLayerNormNDTilingInfo(const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormTiling& tiling)
         ```
 
         ```
-        void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::LayerNormTiling& tiling)
+        void GetLayerNormNDTilingInfo(const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::LayerNormTiling& tiling)
         ```
 
     -   输出归一化结果、均值和方差的LayerNorm接口所需的tiling参数（不推荐使用）
 
         ```
-        void GetLayerNormNDTillingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormTiling& tilling)
+        void GetLayerNormNDTillingInfo(const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormTiling& tilling)
         ```
 
     -   输出归一化结果、均值和标准差的倒数的LayerNorm接口所需的tiling参数
 
         ```
-        void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd, optiling::LayerNormSeparateTiling& tiling)
+        void GetLayerNormNDTilingInfo(const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd, optiling::LayerNormSeparateTiling& tiling)
         ```
 
         ```
-        void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd, AscendC::tiling::LayerNormSeparateTiling& tiling)
+        void GetLayerNormNDTilingInfo(const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd, AscendC::tiling::LayerNormSeparateTiling& tiling)
         ```
 
 ## 参数说明
@@ -194,7 +194,7 @@ Ascend C提供一组LayerNorm Tiling API，方便用户获取LayerNorm kernel计
         ...
         // {B, S, storageHLength, originHLength}
         std::vector<int64_t> shapeVec = {2, 16, 64, 64};
-        ge::Shape srcShape(shapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
         // 本样例中仅作为样例说明，通过GetLayerNormMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         uint32_t max;
         uint32_t min;
@@ -255,7 +255,7 @@ Ascend C提供一组LayerNorm Tiling API，方便用户获取LayerNorm kernel计
         ...
         // {A, R}
         std::vector<int64_t> shapeVec = {2, 64};
-        ge::Shape srcShape(shapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
         // 本样例中仅作为样例说明，通过GetLayerNormMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         uint32_t max;
         uint32_t min;

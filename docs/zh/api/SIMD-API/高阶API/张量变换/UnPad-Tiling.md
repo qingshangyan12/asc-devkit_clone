@@ -7,15 +7,15 @@
 ## 函数原型
 
 ```
-void GetUnPadMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
+void GetUnPadMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-void UnPadTilingFunc(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, optiling::UnPadTiling& tiling)
+void UnPadTilingFunc(const AscendC::TensorShape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, optiling::UnPadTiling& tiling)
 ```
 
 ```
-void UnPadTilingFunc(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, AscendC::tiling::UnPadTiling& tiling)
+void UnPadTilingFunc(const AscendC::TensorShape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, AscendC::tiling::UnPadTiling& tiling)
 ```
 
 ## 参数说明
@@ -78,7 +78,7 @@ void UnPadTilingFunc(const ge::Shape srcShape, const uint32_t stackBufferSize, c
         // 设置其他Tiling参数
         ...
         std::vector<int64_t> shapeVec = {320, 64};
-        ge::Shape srcShape(shapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
         uint32_t maxValue = 0;
         uint32_t minValue = 0;
         auto platformInfo = context->GetPlatformInfo();

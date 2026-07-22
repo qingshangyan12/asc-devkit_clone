@@ -57,7 +57,7 @@ bool GetTopKMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatfo
 ```
 
 ```
-bool GetTopKMaxMinTmpSize(const int32_t inner, const int32_t outter, const int32_t k, const bool isReuseSource, const bool isInitIndex, enum TopKMode mode, const bool isLargest, ge::DataType dataType, const TopKConfig& config, uint32_t& maxValue, uint32_t& minValue)
+bool GetTopKMaxMinTmpSize(const int32_t inner, const int32_t outter, const int32_t k, const bool isReuseSource, const bool isInitIndex, enum TopKMode mode, const bool isLargest, AscendC::TensorDataType dataType, const TopKConfig& config, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
@@ -207,7 +207,7 @@ TopKTilingFunc返回值为true/false，true表示成功拿到TopK的Tiling各项
     namespace optiling {
     static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
-        std::map<ge::DataType, uint32_t> dtypeSizes = {{ge::DataType::DT_UINT32, 4}, {ge::DataType::DT_INT32, 4}};
+        std::map<AscendC::TensorDataType, uint32_t> dtypeSizes = {{AscendC::TensorDataType::DT_UINT32, 4}, {AscendC::TensorDataType::DT_INT32, 4}};
         RadixtopkCustomTilingData tiling;
         const gert::RuntimeAttrs* attrs = context->GetAttrs();
         const uint32_t is_init_index = *(attrs->GetAttrPointer<uint32_t>(0));

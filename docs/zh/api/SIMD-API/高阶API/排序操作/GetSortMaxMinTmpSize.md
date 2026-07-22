@@ -10,7 +10,7 @@
 ## 函数原型
 
 ```
-void GetSortMaxMinTmpSize(const ge::Shape& srcShape, ge::DataType valueType, ge::DataType indexType, bool isReuseSource, const SortConfig& config, uint32_t& maxValue, uint32_t& minValue)
+void GetSortMaxMinTmpSize(const AscendC::TensorShape& srcShape, AscendC::TensorDataType valueType, AscendC::TensorDataType indexType, bool isReuseSource, const SortConfig& config, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -55,9 +55,9 @@ struct SortConfig {
 ```
 // 输入shape信息为1024;算子输入的数据类型为uint32_t;不允许修改源操作数
 std::vector<int64_t> shape_vec = {1024};
-ge::Shape srcShape(shape_vec);
-ge::DataType valueType = ge::DT_UINT32;
-ge::DataType indexType = ge::DT_UINT32;
+AscendC::TensorShape srcShape(shape_vec);
+AscendC::TensorDataType valueType = AscendC::TensorDataType::DT_UINT32;
+AscendC::TensorDataType indexType = AscendC::TensorDataType::DT_UINT32;
 bool isDescend = true;
 bool hasSrcIndex = false;
 bool hasDstIndex = false;
