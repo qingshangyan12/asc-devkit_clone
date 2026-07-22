@@ -237,7 +237,7 @@ __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 }
 
 template <class... Args>
-__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_assert();
@@ -246,7 +246,7 @@ __aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args
 }
 
 template <typename... Args>
-inline __aicore__ void printf_impl_assert_msg(
+static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
     const __gm__ char* fmt, Args&&... args)
 {
@@ -285,7 +285,7 @@ __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 }
 
 template <class... Args>
-__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     std::printf(fmt, args...);
@@ -293,7 +293,7 @@ __aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args
 }
 
 template <typename... Args>
-inline __aicore__ void printf_impl_assert_msg(
+static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
     const __gm__ char* fmt, Args&&... args)
 {
@@ -318,7 +318,7 @@ using namespace __asc_aicore;
 #if !defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__) && !defined(__CHECK_FEATURE_AT_PRECOMPILE)
 namespace __asc_aicore {
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     printf_impl(fmt, args...);
@@ -326,7 +326,7 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 }
 
 template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     printf_impl(fmt, args...);
