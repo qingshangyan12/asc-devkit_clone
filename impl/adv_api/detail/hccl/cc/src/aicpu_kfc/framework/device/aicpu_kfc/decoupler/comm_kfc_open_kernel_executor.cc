@@ -15,9 +15,28 @@
 #include "log.h"
 #include "alg_param.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "common/aicpu_timing_recorder.h"
 #include "cann_dispatch_bridge.h"
 
 namespace {
+using TimingMetric = Hccl::AicpuTimingRecorder::Metric;
+
+uint64_t StartTiming(Hccl::AicpuTimingRecorder* timingRecorder)
+{
+    return timingRecorder == nullptr || !timingRecorder->IsFullEnabled() ? 0U : timingRecorder->Now();
+}
+
+void AddElapsedMetric(Hccl::AicpuTimingRecorder* timingRecorder, TimingMetric metric, uint64_t beginNs)
+{
+    if (timingRecorder == nullptr || !timingRecorder->IsFullEnabled()) {
+        return;
+    }
+    const uint64_t endNs = timingRecorder->Now();
+    if (endNs >= beginNs) {
+        (void)timingRecorder->AddMetric(metric, endNs - beginNs);
+    }
+}
+
 mc2_ops_hccl::OpParam* AsOpenOpParam(std::vector<uint8_t>& opParam)
 {
     return reinterpret_cast<mc2_ops_hccl::OpParam*>(opParam.data());
@@ -116,7 +135,7 @@ HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam& param, const mc2_ops_hc
 }
 } // namespace
 
-HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
+HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam, Hccl::AicpuTimingRecorder* timingRecorder)
 {
     auto* param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);
@@ -127,9 +146,11 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
         static_cast<unsigned long long>(param->varMemSize), static_cast<u32>(param->opType), param->algName);
     mc2_ops_hccl::AlgResourceCtxSerializable resCtx;
 
+    const uint64_t deserializeBeginNs = StartTiming(timingRecorder);
     char* ctx = static_cast<char*>(param->resCtx);
     std::vector<char> seq(ctx, ctx + param->ctxSize);
     resCtx.DeSerialize(seq);
+    AddElapsedMetric(timingRecorder, TimingMetric::RESOURCE_DESERIALIZE, deserializeBeginNs);
     HCCL_INFO(
         "[MC2_OPEN_DIAG][Launch] opType %u, algName[%s], inputPtr %p, outputPtr %p, resCtx %p, ctxSize %llu, stream %p."
         "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.",
@@ -173,13 +194,16 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
         static_cast<unsigned long long>(inputBegin + inputBytes), static_cast<unsigned long long>(outputBegin),
         static_cast<unsigned long long>(outputBegin + outputBytes), isAllGather, static_cast<u32>(param->engine));
 
-    CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+    const uint64_t restoreBeginNs = StartTiming(timingRecorder);
+    HcclResult restoreRet = RestoreVarDataIfNeeded(*param, resCtx);
+    AddElapsedMetric(timingRecorder, TimingMetric::VARIABLE_DATA_RESTORE, restoreBeginNs);
+    CHK_RET(restoreRet);
 
     const bool useCannBridge =
         (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
          param->opType == HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
-        HcclResult cannRet = mc2_ops_hccl::LaunchViaCann(*param, resCtx);
+        HcclResult cannRet = mc2_ops_hccl::LaunchViaCann(*param, resCtx, timingRecorder);
         CHK_PRT_RET(
             cannRet != HCCL_SUCCESS,
             HCCL_ERROR(
@@ -189,11 +213,15 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
         return HCCL_SUCCESS;
     }
 
+    const uint64_t resolveBeginNs = StartTiming(timingRecorder);
     auto executor =
         mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
+    AddElapsedMetric(timingRecorder, TimingMetric::EXECUTOR_RESOLVE, resolveBeginNs);
     CHK_SMART_PTR_NULL(executor);
 
+    const uint64_t orchestrateBeginNs = StartTiming(timingRecorder);
     HcclResult ret = executor->Orchestrate(*param, resCtx);
+    AddElapsedMetric(timingRecorder, TimingMetric::EXECUTOR_ORCHESTRATE, orchestrateBeginNs);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
 
     return HCCL_SUCCESS;

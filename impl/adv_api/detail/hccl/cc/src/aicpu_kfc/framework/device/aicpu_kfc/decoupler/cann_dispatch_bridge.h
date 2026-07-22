@@ -13,6 +13,10 @@
 #include <string>
 #include "alg_param.h"
 
+namespace Hccl {
+class AicpuTimingRecorder;
+}
+
 namespace mc2_ops_hccl {
 namespace cann_abi {
 
@@ -29,7 +33,9 @@ public:
 
 } // namespace cann_abi
 
-HcclResult LaunchViaCann(const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx);
+HcclResult LaunchViaCann(
+    const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx,
+    Hccl::AicpuTimingRecorder* timingRecorder = nullptr);
 
 } // namespace mc2_ops_hccl
 
