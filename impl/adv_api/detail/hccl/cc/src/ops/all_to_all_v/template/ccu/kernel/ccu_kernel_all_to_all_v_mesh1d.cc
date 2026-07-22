@@ -16,8 +16,8 @@ constexpr uint32_t A2AV_EXT_FIELD_NUM = 4;
 constexpr uint32_t A2AV_SEND_SIZE_IDX = 0;
 constexpr uint32_t A2AV_SEND_OFFSET_IDX = 2;
 constexpr uint32_t A2AV_RECV_OFFSET_IDX = 3;
-constexpr int A2AV_OUTPUT_XN_ID = 0;
-constexpr int A2AV_TOKEN_XN_ID = 1;
+constexpr int A2AV_OUTPUT_XN_ID = 1;
+constexpr int A2AV_TOKEN_XN_ID = 2;
 constexpr int A2AV_POST_SYNC_CKE_IDX = 0;
 constexpr int A2AV_OUTPUT_CKE_IDX = 1;
 constexpr int A2AV_TOKEN_CKE_IDX = 2;
@@ -73,6 +73,7 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         channelIdx++;
     }
 
+    // 【定位step3】怀疑 PreSync 死锁时，注释掉下面这两行 NotifyWait
     for (uint32_t i = 0; i < channelCount; i++) {
         ccu::NotifyWait(channels[i], A2AV_OUTPUT_CKE_IDX, allOtherBit);
         ccu::NotifyWait(channels[i], A2AV_TOKEN_CKE_IDX, allOtherBit);
@@ -103,10 +104,12 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         CCU_IF(extArgs[extBase + A2AV_SEND_SIZE_IDX] != 0) {
             if (rankIdx == rankId) {
                 ccu::LocalCopy(localDst, src[rankIdx], extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1);
+                // 【定位step2】怀疑传输死锁时，注释掉下面这行 EventWait
                 ccu::EventWait(event, 1);
             } else {
                 ccu::Write(channels[channelIdx], dst[rankIdx], src[rankIdx],
                     extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1);
+                // 【定位step2】怀疑传输死锁时，注释掉下面这行 EventWait
                 ccu::EventWait(event, 1);
             }
         }
@@ -118,9 +121,10 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
     for (uint32_t i = 0; i < channelCount; i++) {
         ccu::NotifyRecord(channels[i], A2AV_POST_SYNC_CKE_IDX, selfBit);
     }
-    for (uint32_t i = 0; i < channelCount; i++) {
-        ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, allOtherBit);
-    }
+    // 【定位step1】怀疑 PostSync 死锁时，注释掉下面这三行 NotifyWait
+    // for (uint32_t i = 0; i < channelCount; i++) {
+    //     ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, allOtherBit);
+    // }
     return CCU_SUCCESS;
 }
 
