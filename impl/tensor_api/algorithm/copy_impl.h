@@ -50,6 +50,26 @@ __aicore__ inline void Copy(
     atomCopy.Call(dst, src, quant);
 }
 
+template <typename AtomType, typename DstTensor, typename SrcTensor, typename Coord, typename Shape,
+          Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Coord>> && Std::is_tuple_v<Std::remove_cvref_t<Shape>>,
+                           int> = 0>
+__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
+                            const Coord& coord, const Shape& shape)
+{
+    atomCopy.Call(dst, src, coord, shape);
+}
+
+template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam, typename Coord,
+          typename Shape,
+          Std::enable_if_t<IsCopyQuantParamV<QuantParam> && Std::is_tuple_v<Std::remove_cvref_t<Coord>> &&
+                               Std::is_tuple_v<Std::remove_cvref_t<Shape>>,
+                           int> = 0>
+__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
+                            const QuantParam& quant, const Coord& coord, const Shape& shape)
+{
+    atomCopy.Call(dst, src, quant, coord, shape);
+}
+
 template <typename CopyOperationType>
 __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation)
 {

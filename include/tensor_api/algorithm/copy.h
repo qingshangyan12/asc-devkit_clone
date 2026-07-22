@@ -52,6 +52,42 @@ __aicore__ inline void Copy(
     const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src, const QuantParam& quant);
 
 /**
+ * @brief Perform a copy operation with a preconstructed CopyAtom, passing coord and shape to the source.
+ * @param atomCopy : Copy atom object that determines the copy behavior.
+ * @param dst : Destination tensor.
+ * @param src : Source tensor.
+ * @param coord : Source coordinate offset, constructed by MakeCoord.
+ * @param shape : Source region shape, constructed by MakeShape.
+ */
+template <
+    typename AtomType, typename DstTensor, typename SrcTensor, typename Coord, typename Shape,
+    Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Coord>> && Std::is_tuple_v<Std::remove_cvref_t<Shape>>, int>
+        Enable>
+__aicore__ inline void Copy(
+    const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src, const Coord& coord,
+    const Shape& shape);
+
+/**
+ * @brief Perform a copy operation with a preconstructed CopyAtom, quantization parameter, coord, and shape.
+ * @param atomCopy : Copy atom object that determines the copy behavior.
+ * @param dst : Destination tensor.
+ * @param src : Source tensor.
+ * @param quant : Quantization parameter, which can be a scalar or a Tensor API tensor.
+ * @param coord : Source coordinate offset, constructed by MakeCoord.
+ * @param shape : Source region shape, constructed by MakeShape.
+ */
+template <
+    typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam, typename Coord, typename Shape,
+    Std::enable_if_t<
+        IsCopyQuantParamV<QuantParam> && Std::is_tuple_v<Std::remove_cvref_t<Coord>> &&
+            Std::is_tuple_v<Std::remove_cvref_t<Shape>>,
+        int>
+        Enable>
+__aicore__ inline void Copy(
+    const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src, const QuantParam& quant,
+    const Coord& coord, const Shape& shape);
+
+/**
  * @brief Construct a CopyAtom from the copy operation object.
  * @param copyOperation : Copy operation object.
  */
