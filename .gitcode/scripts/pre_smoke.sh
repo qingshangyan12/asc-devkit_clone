@@ -46,7 +46,7 @@ for op in "${ops[@]}"; do
   cd ./scripts && bash devkit_dir_check.sh 2>&1 | tee -a ./run_test.log
   cd ${WORKSPACE}
   obs_base="https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${obs_path}/${package_name}"
-
+  echo ${obs_base}
   arm_package="cann-asc-devkit_linux-aarch64.run"
   if [ -n "${arm_run_url}" ]; then
     wget -nv -O ${arm_package} "${arm_run_url}" 2>/dev/null
