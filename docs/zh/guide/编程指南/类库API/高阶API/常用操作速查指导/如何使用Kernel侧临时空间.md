@@ -21,7 +21,7 @@ for (auto dim : srcDims) {
     srcSize *= dim;
 }
 uint32_t typeSize = 2;
-ge::Shape shape(srcDims);
+AscendC::TensorShape shape(srcDims);
 uint32_t minValue = 0;
 uint32_t maxValue = 0;
 AscendC::GetAsinMaxMinTmpSize(shape, typeSize, false, maxValue, minValue);

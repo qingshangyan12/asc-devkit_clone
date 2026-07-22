@@ -7,15 +7,15 @@ Host侧接口，用于获取Log接口能完成计算所需最小的临时空间�
 ## 函数原型
 
 ```
-void GetLogMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetLogMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-void GetLog10MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetLog10MaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-void GetLog2MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetLog2MaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -47,7 +47,7 @@ void GetLog2MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, co
     ```
     // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
     std::vector<int64_t> shape_vec = {1024};
-    ge::Shape shape(shape_vec);
+    AscendC::TensorShape shape(shape_vec);
     uint32_t maxValue = 0;
     uint32_t minValue = 0;
     AscendC::GetLogMaxMinTmpSize(shape, 2, false, maxValue, minValue);
@@ -58,7 +58,7 @@ void GetLog2MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, co
     ```
     // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
     std::vector<int64_t> shape_vec = {1024};
-    ge::Shape shape(shape_vec);
+    AscendC::TensorShape shape(shape_vec);
     uint32_t maxValue = 0;
     uint32_t minValue = 0;
     AscendC::GetLog10MaxMinTmpSize(shape, 2, false, maxValue, minValue);
@@ -69,7 +69,7 @@ void GetLog2MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, co
     ```
     // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
     std::vector<int64_t> shape_vec = {1024};
-    ge::Shape shape(shape_vec);
+    AscendC::TensorShape shape(shape_vec);
     uint32_t maxValue = 0;
     uint32_t minValue = 0;
     AscendC::GetLog2MaxMinTmpSize(shape, 2, false, maxValue, minValue);

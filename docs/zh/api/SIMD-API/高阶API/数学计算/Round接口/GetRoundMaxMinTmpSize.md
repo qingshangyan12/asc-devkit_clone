@@ -10,7 +10,7 @@ kernel侧Round接口的计算需要开发者预留/申请临时空间，本接�
 ## 函数原型
 
 ```
-void GetRoundMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetRoundMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -42,7 +42,7 @@ void GetRoundMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatf
 // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
 auto plat = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 std::vector<int64_t> shape_vec = {1024};
-ge::Shape shape(shape_vec);
+AscendC::TensorShape shape(shape_vec);
 uint32_t maxValue = 0;
 uint32_t minValue = 0;
 AscendC::GetRoundMaxMinTmpSize(plat, shape, 2, false, maxValue, minValue);

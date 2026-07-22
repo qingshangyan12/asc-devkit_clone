@@ -10,7 +10,7 @@ kernel侧SwiGLU接口的计算需要开发者预留/申请临时空间，本接�
 ## 函数原型
 
 ```
-void GetSwiGLUMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isReuseSource)
+void GetSwiGLUMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isReuseSource)
 ```
 
 ## 参数说明
@@ -38,7 +38,7 @@ void GetSwiGLUMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, 
 ```
 // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
 std::vector<int64_t> shape_vec = {1024};
-ge::Shape shape(shape_vec);
+AscendC::TensorShape shape(shape_vec);
 uint32_t max;
 uint32_t min;
 AscendC::GetSwiGLUMaxMinTmpSize(shape, 2, max, min, false);

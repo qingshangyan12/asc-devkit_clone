@@ -37,15 +37,15 @@ Ascend C提供RmsNorm Tiling API，方便用户获取RmsNorm kernel计算时所�
 ## 函数原型
 
 ```
-bool GetRmsNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false)
+bool GetRmsNormMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+bool GetRmsNormTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+bool GetRmsNormTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ## 参数说明
@@ -110,9 +110,9 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
         // 设置其他Tiling参数
         ...
         std::vector<int64_t> shapeVec = {2, 16, 64};
-        ge::Shape srcShape(shapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
         std::vector<int64_t> oriShapeVec = {2, 16, 64};
-        ge::Shape oriSrcShape(oriShapeVec);
+        AscendC::TensorShape oriSrcShape(oriShapeVec);
         // 本样例中仅作为样例说明，通过GetRmsNormMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         uint32_t minValue = 0;
         uint32_t maxValue = 0;
