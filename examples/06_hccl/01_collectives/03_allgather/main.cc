@@ -138,6 +138,6 @@ int main()
 
     // 释放资源
     ACLCHECK(aclrtFreeHost(rootInfoBuf));  // 释放 Host 内存
-    ACLCHECK(aclrtFinalize());               // 设备去初始化
+    ACLCHECK(aclFinalize());                // 设备去初始化
     return 0;
 }
