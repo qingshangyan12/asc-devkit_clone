@@ -15,7 +15,6 @@
 #include "coll_alg_exec_registry.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "hcomm_primitives.h"
-#include "hccl_api_data.h"
 #include "dfx/task_exception_fun.h"
 #include "kernel_launch.h"
 #include "hcomm_diag_dl.h"
@@ -24,6 +23,9 @@
 #include <unordered_map>
 #include <shared_mutex>
 #include <atomic>
+
+// 前向声明，避免引入 hccl_api_data.h 导致 HcclMemType 重复定义
+extern int32_t HcommThreadNotifyWaitOnThreadWithDefaultTimeout(ThreadHandle thread, uint32_t notifyIdx);
 
 using namespace mc2_ops_hccl;
 namespace {
