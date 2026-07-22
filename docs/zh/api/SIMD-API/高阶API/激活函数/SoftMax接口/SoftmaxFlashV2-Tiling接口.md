@@ -35,7 +35,7 @@
 
 | 参数名 | 输入/输出 | 功能 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入srcTensor的shape信息。 |
+| srcShape | 输入 | 输入srcTensor的shape信息，参数类型为[AscendC::TensorShape](../../数据结构/TensorShape.md)。 |
 | dataTypeSize1 | 输入 | 计算的源数据的数据类型大小，比如half=2。 |
 | dataTypeSize2 | 输入 | 参与计算的expSumTensor和maxTensor的数据类型大小，比如half=2。 |
 | isUpdate | 输入 | 是否开启刷新功能，和kernel侧SoftmaxFlashV2接口一致。 |
@@ -46,7 +46,7 @@
 
 | 参数名 | 输入/输出 | 功能 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入srcTensor的shape信息。 |
+| srcShape | 输入 | 输入srcTensor的shape信息，参数类型为[AscendC::TensorShape](../../数据结构/TensorShape.md)。 |
 | localWorkSpaceSize | 输入 | 剩余的可供SoftmaxFlashV2接口计算的空间大小。localWorkSpaceSize的取值必须大于GetSoftMaxFlashV2MinTmpSize接口返回的计算所需的最小临时空间大小。 |
 | dataTypeSize1 | 输入 | 计算的源数据的数据类型，比如half=2。 |
 | dataTypeSize2 | 输入 | 参与计算的maxTensor和sumTensor的数据类型，比如half=2。 |
