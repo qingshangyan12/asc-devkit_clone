@@ -98,6 +98,9 @@ add_library(${HCCL_CHECKER_EXECUTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
+    ${HCCL_DEV_BASE}/src/ops/all_gather/template/ccu/ccu_temp_all_gather_mesh_1D_mem2mem.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/template/ccu_alg_template_base.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/template/ccu/ccu_kernel_utils.cc
 )
 
 target_include_directories(${HCCL_CHECKER_EXECUTOR_TARGET} PRIVATE
@@ -163,6 +166,9 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
+    ${HCCL_DEV_BASE}/src/ops/all_gather/template/ccu/ccu_temp_all_gather_mesh_1D_mem2mem.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/template/ccu_alg_template_base.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/template/ccu/ccu_kernel_utils.cc
 )
 
 target_sources(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE
