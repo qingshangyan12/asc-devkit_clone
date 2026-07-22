@@ -16,7 +16,7 @@ kernel侧WelfordFinalize接口的计算需要开发者预留/申请临时空间�
 ## 函数原型
 
 ```
-void GetWelfordFinalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetWelfordFinalizeMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -77,7 +77,7 @@ void GetWelfordFinalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t t
         const uint32_t tailLength = *(attrs->GetAttrPointer<uint32_t>(7));
 
         std::vector<int64_t> srcDims = {abLength};
-        ge::Shape srcShape(srcDims);
+        AscendC::TensorShape srcShape(srcDims);
 
         // 本样例中仅作为样例说明，通过GetWelfordFinalizeMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         uint32_t maxTmpsize = 0;

@@ -71,7 +71,7 @@ Ascend C提供一组SoftMax Tiling API，方便用户获取SoftMax kernel计算�
         // 设置其他Tiling参数
         ...
         std::vector<int64_t> shapeVec = {320,64};
-        ge::Shape srcShape(shapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
         // 本样例中仅作为样例说明，通过GetSoftMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         const uint32_t localWorkSpaceSize = AscendC::GetSoftMaxMinTmpSize(srcShape, sizeof(half), false);
         // 获取SoftMax Tiling参数

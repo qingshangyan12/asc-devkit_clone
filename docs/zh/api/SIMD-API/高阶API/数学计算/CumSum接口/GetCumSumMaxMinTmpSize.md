@@ -10,7 +10,7 @@ kernel侧CumSum接口的计算需要开发者预留/申请临时空间，本接�
 ## 函数原型
 
 ```
-void GetCumSumMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isLastAxis, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetCumSumMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isLastAxis, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -42,7 +42,7 @@ void GetCumSumMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, 
 uint32_t firstDim = 32;
 uint32_t lastDim = 32;
 std::vector<int64_t> srcShapeDims = {firstDim, lastDim};
-auto srcShape = ge::Shape(srcShapeDims);
+auto srcShape = AscendC::TensorShape(srcShapeDims);
 uint32_t maxValue = 0;
 uint32_t minValue = 0;
 AscendC::GetCumSumMaxMinTmpSize(srcShape, 2, true, false, maxValue, minValue);

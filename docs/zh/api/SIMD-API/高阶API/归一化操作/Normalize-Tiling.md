@@ -14,7 +14,7 @@ kernel侧Normalize接口的计算需要开发者预留/申请临时空间，GetN
 ## 函数原型
 
 ```
-void GetNormalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource, const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
+void GetNormalizeMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource, const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -76,7 +76,7 @@ void GetNormalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSiz
         uint32_t rLength = shape.GetDim(1);
         uint32_t rLengthWithPadding = (rLength + alignNum - 1) / alignNum * alignNum;
         std::vector<int64_t> srcDims = {aLength, rLength};
-        ge::Shape srcShape(srcDims);
+        AscendC::TensorShape srcShape(srcDims);
 
         uint32_t maxTmpsize = 0;
         uint32_t minTmpsize = 0;

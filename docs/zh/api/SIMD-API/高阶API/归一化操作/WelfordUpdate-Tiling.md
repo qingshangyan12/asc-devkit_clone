@@ -16,7 +16,7 @@ kernel侧WelfordUpdate接口的计算需要开发者预留/申请临时空间，
 ## 函数原型
 
 ```
-void GetWelfordUpdateMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSizeT, const uint32_t typeSizeU, const bool isReuseSource, const bool isInplace, uint32_t& maxValue, uint32_t& minValue)
+void GetWelfordUpdateMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSizeT, const uint32_t typeSizeU, const bool isReuseSource, const bool isInplace, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -76,7 +76,7 @@ void GetWelfordUpdateMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typ
         auto rLength = shape.GetDim(1);
 
         std::vector<int64_t> srcDims = {nLength, rLength};
-        ge::Shape srcShape(srcDims);
+        AscendC::TensorShape srcShape(srcDims);
 
         uint32_t maxTmpsize = 0;
         uint32_t minTmpsize = 0;

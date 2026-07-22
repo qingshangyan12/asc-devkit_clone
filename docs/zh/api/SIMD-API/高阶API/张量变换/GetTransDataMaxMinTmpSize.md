@@ -10,7 +10,7 @@ kernel侧TransData接口的计算需要开发者预留/申请临时空间，本�
 ## 函数原型
 
 ```
-bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,const ge::DataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
+bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform, const AscendC::TensorShape& srcShape, const AscendC::TensorShape& dstShape,const AscendC::TensorDataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -22,7 +22,7 @@ bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform
 | platform | 输入 | 传入硬件平台的信息，PlatformAscendC定义请参见[构造及析构函数](../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md)。 |
 | srcShape | 输入 | 输入源操作数的shape大小，参数取值与TransData接口的params.srcLayout参数中的shape信息保持一致。 |
 | dstShape | 输入 | 输出目的操作数的shape大小，参数取值与TransData接口的params.dstLayout参数中的shape信息保持一致。 |
-| dataType | 输入 | 输入的数据类型，ge::DataType类型，当前只支持half/float/uint16_t/int16_t数据类型的输入。 |
+| dataType | 输入 | 输入的数据类型，AscendC::TensorDataType类型，当前只支持half/float/uint16_t/int16_t数据类型的输入。 |
 | config | 输入 | 数据格式转换的场景，参数取值与TransData接口的config参数保持一致。当前支持的转换场景有：NCDHW -> NDC1HWC0、NDC1HWC0 -> NCDHW、NCDHW -> FRACTAL_Z_3D、FRACTAL_Z_3D -> NCDHW。TransDataConfig类型，具体定义如下方代码所示。 |
 | maxValue | 输出 | TransData接口能完成计算所需的最大临时空间大小，超出该值的空间不会被该接口使用。 <br>maxValue仅作为参考值，有可能大于Unified Buffer剩余空间的大小，该场景下，开发者需要根据Unified Buffer剩余空间的大小来选取合适的临时空间大小。 |
 | minValue | 输出 | TransData接口能完成计算所需最小临时空间大小。为保证功能正确，接口计算时预留/申请的临时空间不能小于该数值。 |
@@ -62,10 +62,10 @@ GetTransDataMaxMinTmpSize返回值为true/false，true表示成功获取TransDat
 uint32_t maxSize;
 uint32_t minSize;
 int32_t n = 1, c = 16, d = 2, h = 4, w = 4, c1 = 1, c0 = 16;
-auto ncdhwShape = ge::Shape({n, c, d, h, w});
-auto ndc1hwc0Shape = ge::Shape({n, d, c1, h, w, c0});
+auto ncdhwShape = AscendC::TensorShape({n, c, d, h, w});
+auto ndc1hwc0Shape = AscendC::TensorShape({n, d, c1, h, w, c0});
 auto plat = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 TransDataConfig config = {DataFormat::NCDHW, DataFormat::NDC1HWC0};
 bool ret =
-    GetTransDataMaxMinTmpSize(plat, ncdhwShape, ndc1hwc0Shape, ge::DataType::DT_FLOAT16, config, maxSize, minSize);
+    GetTransDataMaxMinTmpSize(plat, ncdhwShape, ndc1hwc0Shape, AscendC::TensorDataType::DT_FLOAT16, config, maxSize, minSize);
 ```

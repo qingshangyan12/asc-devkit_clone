@@ -7,15 +7,15 @@
 ## 函数原型
 
 ```
-void GetPadMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
+void GetPadMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-void PadTilingFunc(const ge::Shape srcShape, const ge::Shape oriSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, optiling::PadTiling& tiling)
+void PadTilingFunc(const AscendC::TensorShape srcShape, const AscendC::TensorShape oriSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, optiling::PadTiling& tiling)
 ```
 
 ```
-void PadTilingFunc(const ge::Shape srcShape, const ge::Shape oriSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, AscendC::tiling::PadTiling& tiling)
+void PadTilingFunc(const AscendC::TensorShape srcShape, const AscendC::TensorShape oriSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, AscendC::tiling::PadTiling& tiling)
 ```
 
 ## 参数说明
@@ -78,9 +78,9 @@ void PadTilingFunc(const ge::Shape srcShape, const ge::Shape oriSrcShape, const 
         // 设置其他Tiling参数
         ...
         std::vector<int64_t> shapeVec = {320, 63};
-        ge::Shape srcShape(shapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
         std::vector<int64_t> oriShapeVec = {320, 63};
-        ge::Shape oriSrcShape(oriShapeVec);
+        AscendC::TensorShape oriSrcShape(oriShapeVec);
 
         uint32_t maxValue = 0;
         uint32_t minValue = 0;

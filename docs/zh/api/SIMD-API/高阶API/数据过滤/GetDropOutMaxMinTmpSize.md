@@ -7,15 +7,15 @@
 ## 函数原型
 
 ```
-uint32_t GetDropOutMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
+uint32_t GetDropOutMaxTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 ```
 
 ```
-uint32_t GetDropOutMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
+uint32_t GetDropOutMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 ```
 
 ```
-void GetDropOutMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetDropOutMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -72,7 +72,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
     std::vector<int64_t> srcDims = {firstAxis, srcLastAxis, maskLastAxis};
 
     uint32_t typeSize = 2;
-    ge::Shape shape(srcDims);
+    AscendC::TensorShape shape(srcDims);
     uint32_t minValue = 0;
     uint32_t maxValue = 0;
     AscendC::GetDropOutMaxMinTmpSize(shape, typeSize, false, maxValue, minValue);

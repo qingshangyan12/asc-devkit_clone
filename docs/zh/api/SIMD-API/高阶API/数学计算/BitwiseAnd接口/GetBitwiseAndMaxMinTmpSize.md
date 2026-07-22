@@ -10,7 +10,7 @@ Kernel侧BitwiseAnd接口的计算需要开发者预留/申请临时空间，本
 ## 函数原型
 
 ```
-void GetBitwiseAndMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetBitwiseAndMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -41,7 +41,7 @@ void GetBitwiseAndMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendc
 ```
 // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
 std::vector<int64_t> shape_vec = {1024};
-ge::Shape shape(shape_vec);
+AscendC::TensorShape shape(shape_vec);
 uint32_t maxValue = 0;
 uint32_t minValue = 0;
 auto plat = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());

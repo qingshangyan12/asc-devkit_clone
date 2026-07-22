@@ -12,7 +12,7 @@ kernel侧Power接口的计算需要开发者预留/申请临时空间，本接�
 ## 函数原型
 
 ```
-void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape2, const bool typeIsInt, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetPowerMaxMinTmpSize(const AscendC::TensorShape& srcShape1, const AscendC::TensorShape& srcShape2, const bool typeIsInt, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -46,7 +46,7 @@ void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape
     ```
     // srcTensor1、srcTensor2输入shape信息均为512;算子输入的数据类型为float;不允许修改源操作数
     std::vector<int64_t> shape_vec = {1024};
-    ge::Shape shape(shape_vec);
+    AscendC::TensorShape shape(shape_vec);
     uint32_t maxValue = 0;
     uint32_t minValue = 0;
     AscendC::GetPowerMaxMinTmpSize(shape, shape, false, 4, false, maxValue, minValue);
@@ -58,8 +58,8 @@ void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape
     // srcTensor1输入shape信息为128*128，scalarValue的shape为1;算子输入的数据类型为half;不允许修改源操作数
     std::vector<int64_t> shape1_vec = {128, 128};
     std::vector<int64_t> shape2_vec = {1};
-    ge::Shape shape1(shape1_vec);
-    ge::Shape shape2(shape2_vec);
+    AscendC::TensorShape shape1(shape1_vec);
+    AscendC::TensorShape shape2(shape2_vec);
     uint32_t maxValue = 0;
     uint32_t minValue = 0;
     AscendC::GetPowerMaxMinTmpSize(shape1, shape2, false, 2, false, maxValue, minValue);
@@ -71,8 +71,8 @@ void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape
     // scalarValue的shape为1，srcTensor2输入shape信息为128*128;算子输入的数据类型为float;不允许修改源操作数
     std::vector<int64_t> shape1_vec = {1};
     std::vector<int64_t> shape2_vec = {128, 128};
-    ge::Shape shape1(shape1_vec);
-    ge::Shape shape2(shape2_vec);
+    AscendC::TensorShape shape1(shape1_vec);
+    AscendC::TensorShape shape2(shape2_vec);
     uint32_t maxValue = 0;
     uint32_t minValue = 0;
     AscendC::GetPowerMaxMinTmpSize(shape1, shape2, false, 4, false, maxValue, minValue);
