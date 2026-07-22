@@ -179,6 +179,8 @@ l12l0Params.kStartPosition = 2;
 l12l0Params.srcStride = 5;
 // dstStride is 3: indicates interval between fractal starting addresses in M direction
 l12l0Params.dstStride = 3;
+// Do not transpose the fractal in this example
+l12l0Params.ifTranspose = false;
 
 AscendC::LoadData(l0a_buffer, l1_buffer, l12l0Params);
 ```
@@ -205,6 +207,26 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 ```
 
 针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，`LoadDataWithTranspose`仅支持L1 Buffer到L0B Buffer通路，推荐使用`LoadData2dTransposeParamsV2`作为搬运参数，不支持本节所述的L1 Buffer到L0A Buffer转置场景。该场景需要改用`LoadData`接口配合`LoadData2DParamsV2`参数，并将`ifTranspose`设置为`true`。
+
+以`half`数据类型为例，A矩阵在L1 Buffer上为（K×M）的Nz分形，在L0A Buffer上需要转换为（M×K）的Nz分形，可按如下方式配置：
+
+```cpp
+constexpr uint32_t fractalShape[2] = {16, 32 / sizeof(half)};
+uint32_t kAlignL1 = CeilAlign(k, fractalShape[0]);
+uint32_t mAlignL1 = CeilAlign(m, fractalShape[1]);
+uint32_t mAlignL0 = CeilAlign(m, fractalShape[0]);
+
+AscendC::LoadData2DParamsV2 loadDataParams;
+loadDataParams.mStartPosition = 0;
+loadDataParams.kStartPosition = 0;
+loadDataParams.mStep = CeilDivision(kAlignL1, fractalShape[0]);
+loadDataParams.kStep = CeilDivision(mAlignL1, fractalShape[1]);
+loadDataParams.srcStride = CeilDivision(kAlignL1, fractalShape[0]);
+loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]);
+loadDataParams.ifTranspose = true;
+loadDataParams.sid = 0;
+AscendC::LoadData(l0aTensor, l1aTensor, loadDataParams);
+```
 
 ### 矩阵数据搬出
 
