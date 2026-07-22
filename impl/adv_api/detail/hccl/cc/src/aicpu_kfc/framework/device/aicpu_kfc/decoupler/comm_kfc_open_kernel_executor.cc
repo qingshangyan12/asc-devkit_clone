@@ -14,6 +14,7 @@
 
 #include "log.h"
 #include "alg_param.h"
+#include "alg_data_trans_wrapper.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
 
@@ -126,6 +127,12 @@ HcclResult LaunchOpenOpParamDataImpl(
         "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
         __FILE__, __LINE__, opParam.size(), sizeof(mc2_ops_hccl::OpParam), offsetof(mc2_ops_hccl::OpParam, varMemSize),
         static_cast<unsigned long long>(param->varMemSize), static_cast<u32>(param->opType), param->algName);
+    mc2_ops_hccl::AlgResourceCtxSerializable resCtx;
+
+    char* ctx = static_cast<char*>(param->resCtx);
+    std::vector<char> seq(ctx, ctx + param->ctxSize);
+    resCtx.DeSerialize(seq);
+    CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
     HCCL_INFO(
         "[MC2_OPEN_DIAG][Launch] opType %u, algName[%s], inputPtr %p, outputPtr %p, resCtx %p, ctxSize %llu, stream %p."
         "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.",

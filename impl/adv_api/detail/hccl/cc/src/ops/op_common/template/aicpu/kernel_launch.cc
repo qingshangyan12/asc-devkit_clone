@@ -15,6 +15,7 @@
 #include "coll_alg_exec_registry.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "hcomm_primitives.h"
+#include "alg_data_trans_wrapper.h"
 #include "dfx/task_exception_fun.h"
 #include "kernel_launch.h"
 #include "hcomm_diag_dl.h"
@@ -318,6 +319,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         }
         // 获取Device测主thread
         ThreadHandle thread = resCtx.threads[0];
+        CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
         if (HcommBatchModeStart(param->algTag) != HCCL_SUCCESS) {
             HCCL_ERROR("failed set batch mode, tag is %s.", param->algTag);
             return 1;
@@ -393,6 +395,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         ThreadHandle thread = threadHandlePtr[0];
         ThreadHandle exportedAicpuTsThread = resCtx->opThread;
         u32 notifyNumOnMainThread = resCtx->notifyNumOnMainThread;
+        CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx->isHcommBatchTransferOnThreadSupported));
         if (HcommBatchModeStart(param->algTag) != HCCL_SUCCESS) {
             HCCL_ERROR("failed set batch mode, tag is %s.", param->algTag);
             return 1;
