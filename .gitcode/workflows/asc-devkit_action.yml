@@ -374,8 +374,12 @@ stages:
                 set -e
                 export repo_name=${{env.repo_name}}
                 export pr_id=${{ env.MERGE_ID }}
+                export download_path=${{ steps.process_download.outputs.download-path }}
+                export package_name=${{jobs.Compile_Ascend_ARM_ubuntu24.outputs.package_name}}
+                export obs_path=${{env.obs_path}}
                 export AK=${{secrets.AK}}
                 export SK=${{secrets.SK}}
+                export obs_smoke_path=${{ env.obs_smoke_path }}
                 mkdir -p /home/taskspace && cd /home/taskspace
                 wget -nv ${{ steps.process_upload.outputs.primary-url }}
                 tar -zxf $(basename "${{ steps.process_upload.outputs.primary-url }}")
