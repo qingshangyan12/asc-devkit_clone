@@ -51,7 +51,7 @@ for op in "${ops[@]}"; do
   if [ -n "${arm_run_url}" ]; then
     wget -nv -O ${arm_package} "${arm_run_url}" 2>/dev/null
   else
-    wget -nv -O ${arm_package} ${obs_base} 2>/dev/null
+    wget -nv -O  ${obs_base} ${arm_package} 2>/dev/null
   fi
 
   if [ ! -f "${arm_package}" ] || [ ! -s "${arm_package}" ]; then
