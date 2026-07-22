@@ -37,12 +37,10 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(cons
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 namespace __asc_aicore {
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
-
-template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args);
 } // namespace __asc_aicore
 
 namespace __asc_simd_vf {
