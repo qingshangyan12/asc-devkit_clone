@@ -63,6 +63,30 @@ __aicore__ inline int64_t asc_get_system_cycle();
 
 __aicore__ inline void asc_set_ctrl(uint64_t config);
 
+__aicore__ inline bool asc_get_saturation_flag_fp_general_sat();
+
+__aicore__ inline bool asc_get_saturation_flag_fp_general_pass();
+
+__aicore__ inline bool asc_get_saturation_flag_int_calc_sat();
+
+__aicore__ inline bool asc_get_saturation_flag_int_calc_trunc();
+
+__aicore__ inline bool asc_get_saturation_flag_int_conv_sat();
+
+__aicore__ inline bool asc_get_saturation_flag_int_conv_trunc();
+
+__aicore__ inline void asc_set_saturation_flag_fp_general_sat();
+
+__aicore__ inline void asc_set_saturation_flag_fp_general_pass();
+
+__aicore__ inline void asc_set_saturation_flag_int_calc_sat();
+
+__aicore__ inline void asc_set_saturation_flag_int_calc_trunc();
+
+__aicore__ inline void asc_set_saturation_flag_int_conv_sat();
+
+__aicore__ inline void asc_set_saturation_flag_int_conv_trunc();
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline int64_t asc_get_ffts_base_addr();
@@ -113,6 +137,22 @@ __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 
 __aicore__ inline int64_t asc_get_squeeze_status();
+
+__aicore__ inline bool asc_get_saturation_flag_fp_nan_sat();
+
+__aicore__ inline bool asc_get_saturation_flag_fp_nan_pass();
+
+__aicore__ inline void asc_set_saturation_flag_fp_nan_sat();
+
+__aicore__ inline void asc_set_saturation_flag_fp_nan_pass();
+
+__aicore__ inline bool asc_get_saturation_strategy_glabal();
+
+__aicore__ inline bool asc_get_saturation_strategy_loacal();
+
+__aicore__ inline void asc_set_saturation_strategy_glabal();
+
+__aicore__ inline void asc_set_saturation_strategy_loacal();
 
 #endif
 

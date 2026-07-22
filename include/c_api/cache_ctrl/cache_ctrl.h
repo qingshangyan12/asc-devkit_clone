@@ -54,6 +54,38 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_dci();
+
+__aicore__ inline bool asc_get_scalar_cache_read_normal();
+
+__aicore__ inline bool asc_get_scalar_cache_read_last();
+
+__aicore__ inline bool asc_get_scalar_cache_read_persistent();
+
+__aicore__ inline bool asc_get_scalar_cache_read_disable();
+
+__aicore__ inline bool asc_get_scalar_cache_write_normal();
+
+__aicore__ inline bool asc_get_scalar_cache_write_last();
+
+__aicore__ inline bool asc_get_scalar_cache_write_persistent();
+
+__aicore__ inline bool asc_get_scalar_cache_write_disable();
+
+__aicore__ inline void asc_set_scalar_cache_read_normal();
+
+__aicore__ inline void asc_set_scalar_cache_read_last();
+
+__aicore__ inline void asc_set_scalar_cache_read_persistent();
+
+__aicore__ inline void asc_set_scalar_cache_read_disable();
+
+__aicore__ inline void asc_set_scalar_cache_write_normal();
+
+__aicore__ inline void asc_set_scalar_cache_write_last();
+
+__aicore__ inline void asc_set_scalar_cache_write_persistent();
+
+__aicore__ inline void asc_set_scalar_cache_write_disable();
 #endif
 
 #endif

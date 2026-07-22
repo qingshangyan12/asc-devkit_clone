@@ -36,6 +36,18 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_phy_stack_base_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_status_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_sys_virtual_base_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_saturation_flag_fp_general_sat_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_saturation_flag_fp_general_pass_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_saturation_flag_int_calc_sat_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_saturation_flag_int_calc_trunc_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_saturation_flag_int_conv_sat_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_saturation_flag_int_conv_trunc_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_set_saturation_flag_fp_general_sat_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_set_saturation_flag_fp_general_pass_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_set_saturation_flag_int_calc_sat_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_set_saturation_flag_int_calc_trunc_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_set_saturation_flag_int_conv_sat_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_set_saturation_flag_int_conv_trunc_impl.h"
 
 __aicore__ inline int64_t asc_get_core_id() { return asc_get_core_id_impl(); }
 
@@ -72,6 +84,30 @@ __aicore__ inline int64_t asc_get_phy_stack_base() { return asc_get_phy_stack_ba
 __aicore__ inline int64_t asc_get_status() { return asc_get_status_impl(); }
 
 __aicore__ inline int64_t asc_get_sys_virtual_base() { return asc_get_sys_virtual_base_impl(); }
+
+__aicore__ inline bool asc_get_saturation_flag_fp_general_sat() { return asc_get_saturation_flag_fp_general_sat_impl(); }
+
+__aicore__ inline bool asc_get_saturation_flag_fp_general_pass() { return asc_get_saturation_flag_fp_general_pass_impl(); }
+
+__aicore__ inline bool asc_get_saturation_flag_int_calc_sat() { return asc_get_saturation_flag_int_calc_sat_impl(); }
+
+__aicore__ inline bool asc_get_saturation_flag_int_calc_trunc() { return asc_get_saturation_flag_int_calc_trunc_impl(); }
+
+__aicore__ inline bool asc_get_saturation_flag_int_conv_sat() { return asc_get_saturation_flag_int_conv_sat_impl(); }
+
+__aicore__ inline bool asc_get_saturation_flag_int_conv_trunc() { return asc_get_saturation_flag_int_conv_trunc_impl(); }
+
+__aicore__ inline void asc_set_saturation_flag_fp_general_sat() { asc_set_saturation_flag_fp_general_sat_impl(); }
+
+__aicore__ inline void asc_set_saturation_flag_fp_general_pass() { asc_set_saturation_flag_fp_general_pass_impl(); }
+
+__aicore__ inline void asc_set_saturation_flag_int_calc_sat() { asc_set_saturation_flag_int_calc_sat_impl(); }
+
+__aicore__ inline void asc_set_saturation_flag_int_calc_trunc() { asc_set_saturation_flag_int_calc_trunc_impl(); }
+
+__aicore__ inline void asc_set_saturation_flag_int_conv_sat() { asc_set_saturation_flag_int_conv_sat_impl(); }
+
+__aicore__ inline void asc_set_saturation_flag_int_conv_trunc() { asc_set_saturation_flag_int_conv_trunc_impl(); }
 
 #endif
 
