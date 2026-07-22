@@ -45,13 +45,13 @@ for op in "${ops[@]}"; do
 
   cd ./scripts && bash devkit_dir_check.sh 2>&1 | tee -a ./run_test.log
   cd ${WORKSPACE}
-  obs_base="https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${obs_path}/${package_name}"
+  obs_base="https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${obs_path}/${arm_package}"
   echo ${obs_base}
   arm_package="cann-asc-devkit_9.1.0_linux-aarch64.run"
   if [ -n "${arm_run_url}" ]; then
     wget -nv -O ${arm_package} "${arm_run_url}" 2>/dev/null
   else
-    wget -nv -O  ${obs_base} ${arm_package} 2>/dev/null
+    wget -nv -O  ${obs_base} 2>/dev/null
   fi
 
   if [ ! -f "${arm_package}" ] || [ ! -s "${arm_package}" ]; then
