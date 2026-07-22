@@ -372,10 +372,6 @@ stages:
               manifest_image: swr.cn-south-1.myhuaweicloud.com/pre_smoke/${{ jobs.JOB_image.outputs.PreSmoke_A900 }}
               custom_shell_script: |-
                 set -e
-                export single_tar_url=${{jobs.JOB_compile_single_ubuntu24.outputs.arm_run_url}}
-                export experimental_arm_run_url=${{jobs.JOB_Compile_Ascend_arm_experimental_ubuntu24.outputs.arm_run_url}}
-                export experimental_x86_run_url=${{jobs.JOB_Compile_Ascend_x86_experimental_ubuntu24.outputs.arm_run_url}}
-                # export fatrelu_run_url=${{jobs.JOB_Pre_compile.outputs.arm_run_url}}
                 export repo_name=${{env.repo_name}}
                 export pr_id=${{ env.MERGE_ID }}
                 export AK=${{secrets.AK}}
