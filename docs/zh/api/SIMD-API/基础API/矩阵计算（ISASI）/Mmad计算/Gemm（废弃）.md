@@ -1,4 +1,4 @@
-# Geaaaaaaaaaaaaaaaamm（废弃）
+# Gemm（废弃）
 
 ## 产品支持情况
 
