@@ -2,6 +2,8 @@
 
 Ascend C提供一组SoftMax Tiling API，方便用户获取SoftMax kernel计算时所需的Tiling参数。
 
+关于示例中`AscendC::TensorShape`的说明，请参见[高阶API Tiling接口公共类型](../../../通用说明和约束.md#high_level_api_tiling_types)。
+
 获取Tiling参数主要分为如下两步：
 
 1.  获取SoftMax接口计算所需最小和最大临时空间大小，注意该步骤不是必须的，只是作为一个参考，供合理分配计算空间。

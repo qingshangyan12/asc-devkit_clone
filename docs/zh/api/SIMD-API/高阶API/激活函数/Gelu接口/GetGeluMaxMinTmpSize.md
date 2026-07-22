@@ -29,6 +29,8 @@ kernel侧Gelu、FasterGelu、FasterGeluV2接口的计算需要开发者预留/�
 
 ## 参数说明
 
+关于函数原型中`AscendC::TensorShape`的说明，请参见[高阶API Tiling接口公共类型](../../../通用说明和约束.md#high_level_api_tiling_types)。
+
 **表1**  参数列表
 
 | 参数名 | 输入/输出 | 功能 |
