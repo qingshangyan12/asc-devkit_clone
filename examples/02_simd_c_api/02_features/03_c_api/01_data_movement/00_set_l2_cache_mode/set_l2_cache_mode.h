@@ -192,7 +192,7 @@ private:
      * \brief 双缓冲核心流水线
      * \param l2CacheMode  0=NORMAL, 4=DISABLE
      */
-    __aicore__ inline void ProcessDoubleBufferImpl(uint8_t l2CacheMode)
+    __aicore__ inline void ProcessDoubleBufferImpl(asc_load_l2_cache_mode l2CacheMode)
     {
         constexpr uint32_t totalBufSize = 6 * max_data_copy_len;
         __ubuf__ half ubBuf[totalBufSize];
@@ -243,7 +243,7 @@ private:
             asc_sync_notify(PIPE_V, PIPE_MTE3, eventID);
             asc_sync_wait(PIPE_V, PIPE_MTE3, eventID);
 
-            asc_copy_ub2gm_align(zGm + startElement, zLocal, 1, curLen * sizeof(half), 0, 0, 0);
+            asc_copy_ub2gm_align(zGm + startElement, zLocal, 1, curLen * sizeof(half), asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
 
             asc_sync_notify(PIPE_MTE3, PIPE_V, eventID);
         }
