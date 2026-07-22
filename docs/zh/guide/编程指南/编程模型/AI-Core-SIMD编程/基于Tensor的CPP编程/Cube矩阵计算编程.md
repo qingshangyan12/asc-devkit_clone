@@ -155,7 +155,7 @@ AscendC::DataCopy(dst, srcGlobal, intriParams);
 
 #### L12L0 数据搬运
 
-该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分形转换到Zz或Zn格式。针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，C++ Tensor编程提供了`LoadData`接口配合`LoadData2DParamsV2`参数，以512B数据分形为基本单位完成L1 Buffer到L0A/L0B Buffer的2D搬运，并可通过`ifTranspose`配置分形转置。
+该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer，并支持从Nz分形转换到Zz或Zn格式。针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，C++ Tensor编程提供了`LoadData`接口配合`LoadData2DParamsV2`参数，以512B数据分形为基本单位完成L1 Buffer到L0A/L0B Buffer的2D搬运，并可通过`ifTranspose`配置分形转置。对于3D搬运场景，需要使用`LoadData`接口配合`LoadData3DParamsV1`或`LoadData3DParamsV2`参数；其中NPU架构版本3510不支持`LoadData3DParamsV1`，需使用`LoadData3DParamsV2`。
 
 ![L12L0A非转置搬运](../../../../figures/L12L0A非转置搬运.png)
 
