@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include "hccl_msg.h"
 #include <hccl/hccl_types.h>
+#include "aicpu_timing_recorder.h"
 #include "aicpu_hccl_common.h"
 #include "common/aicpu_kfc_def.h"
 #include "comm_kfc_open_kernel_adapter.h"
@@ -63,7 +64,9 @@ public:
     HcclApi::HcclMsgArea* GetMsgAreaAddr() const { return msgArea_; }
     u32 GetRankNum() const { return rankNum_; }
     HcclResult AddOpContext(const HcclApi::OpResCtx* ctx);
-    HcclResult Orchestrate(const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, u32 msgPos);
+    HcclResult Orchestrate(
+        const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, u32 msgPos,
+        mc2_aicpu_timing::AicpuTimingSample* timingSample);
     HcclResult Finalize(u32 msgPos);
     HcclResult IsAllTaskFinished(u32 msgPos, bool& isFinish);
     HcclResult InterGroupSync(const CommKfcAicpuServer& otherServer, HcclHandle handle);
@@ -73,7 +76,8 @@ public:
     HcclResult LaunchOpenCcoreWait(
         const ServerExecCtx& execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast);
     HcclResult LaunchOpenAicpuKernelServer(
-        std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
+        std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+        mc2_aicpu_timing::AicpuTimingSample* timingSample);
     HcclResult FormatOpParamFromMsg(
         const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, const ServerExecCtx& execCtx, u32 repeat,
         std::vector<uint8_t>& runParam);

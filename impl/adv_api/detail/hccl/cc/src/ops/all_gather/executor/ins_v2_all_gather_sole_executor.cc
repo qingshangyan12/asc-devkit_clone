@@ -22,6 +22,19 @@
 #include "topo_match_ubx.h"
 #include <cstddef>
 namespace mc2_ops_hccl {
+#if defined(AICPU_COMPILE)
+namespace {
+template <typename T>
+void SetTemplateTimingSample(T&, mc2_aicpu_timing::AicpuTimingSample*)
+{}
+
+void SetTemplateTimingSample(
+    InsTempAllGatherMesh1D& algTemplate, mc2_aicpu_timing::AicpuTimingSample* timingSample)
+{
+    algTemplate.SetAicpuTimingSample(timingSample);
+}
+} // namespace
+#endif
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllGatherSoleExecutor()
@@ -65,6 +78,11 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
+#if defined(AICPU_COMPILE)
+    {
+        mc2_aicpu_timing::AicpuTimingScope timingScope(
+            timingSample_, mc2_aicpu_timing::Segment::EXECUTOR_SETUP);
+#endif
     HCCL_INFO(
         "[MC2_OPEN_DIAG][InsV2AllGatherSoleExecutor][Orchestrate] Orchestrate Start, file[%s:%d], "
         "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
@@ -86,7 +104,14 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         "[InsV2AllGatherSoleExecutor][Orchestrate] myRank[%u], threadsSize[%lu], "
         "dataCount[%llu], dataTypeSize[%lu]",
         myRank_, threads_.size(), dataCount_, dataTypeSize_);
+#if defined(AICPU_COMPILE)
+    }
+#endif
     HcclResult ret = OrchestrateLoop(param, resCtx);
+#if defined(AICPU_COMPILE)
+    mc2_aicpu_timing::AicpuTimingScope timingScope(
+        timingSample_, mc2_aicpu_timing::Segment::EXECUTOR_TAIL);
+#endif
     CHK_PRT_RET(
         ret != HCCL_SUCCESS,
         HCCL_ERROR(
@@ -100,6 +125,9 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
+#if defined(AICPU_COMPILE)
+    const uint64_t templateSetupBegin = timingSample_ == nullptr ? 0U : timingSample_->Now();
+#endif
     HCCL_INFO("[InsV2AllGatherSoleExecutor][OrchestrateLoop] Start");
 
     // 准备资源
@@ -134,6 +162,9 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         templateAlgRes.channels.size(), templateAlgRes.threads.size());
     // 构建template
     InsAlgTemplate algTemplate(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
+#if defined(AICPU_COMPILE)
+    SetTemplateTimingSample(algTemplate, timingSample_);
+#endif
     u32 templateScratchMultiplier =
         algTemplate.CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
@@ -158,6 +189,12 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         "[InsV2AllGatherSoleExecutor][OrchestrateLoop] myRank[%u], templateScratchMultiplier[%u] "
         "maxCountPerLoop[%llu], loopTimes[%llu]",
         myRank_, templateScratchMultiplier, maxCountPerLoop, loopTimes);
+#if defined(AICPU_COMPILE)
+    if (timingSample_ != nullptr) {
+        timingSample_->AddDuration(
+            mc2_aicpu_timing::Segment::TEMPLATE_SETUP, templateSetupBegin, timingSample_->Now());
+    }
+#endif
     for (u64 loop = 0; loop < loopTimes; loop++) {
         u64 currDataCount = (loop == loopTimes - 1) ? dataCount_ - processedDataCount : maxCountPerLoop;
         tempAlgParams.buffInfo.inBuffBaseOff = processedDataCount * dataTypeSize_;

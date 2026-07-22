@@ -13,6 +13,25 @@
 #include "template_utils.h"
 #include "hcomm_primitives_dl.h"
 namespace mc2_ops_hccl {
+#if defined(AICPU_COMPILE)
+namespace {
+void RecordEmptyMeshStages(mc2_aicpu_timing::AicpuTimingSample* timingSample, bool includeLocalCopy)
+{
+    if (timingSample == nullptr) {
+        return;
+    }
+    const uint64_t now = timingSample->Now();
+    if (includeLocalCopy) {
+        timingSample->AddDuration(mc2_aicpu_timing::Segment::LOCAL_COPY_EXPAND, now, now);
+    }
+    timingSample->AddDuration(mc2_aicpu_timing::Segment::PRE_SYNC_EXPAND, now, now);
+    timingSample->AddDuration(mc2_aicpu_timing::Segment::PEER_SLICE_PREPARE, now, now);
+    timingSample->AddDuration(mc2_aicpu_timing::Segment::SEND_RECV_READ_EXPAND, now, now);
+    timingSample->AddDuration(mc2_aicpu_timing::Segment::POST_SYNC_EXPAND, now, now);
+}
+} // namespace
+#endif
+
 InsTempAllGatherMesh1D::InsTempAllGatherMesh1D(
     const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
     : InsAlgTemplateBase(param, rankId, subCommRanks)
@@ -60,6 +79,9 @@ HcclResult InsTempAllGatherMesh1D::KernelRun(
     HCCL_INFO("[InsTempAllGatherMesh1D] Run start");
     if (tempAlgParams.sliceSize == 0 && tempAlgParams.tailSize == 0) {
         HCCL_INFO("[InsTempAllGatherMesh1D] Rank [%d], get slicesize zero.", myRank_);
+#if defined(AICPU_COMPILE)
+        RecordEmptyMeshStages(timingSample_, true);
+#endif
         return HCCL_SUCCESS;
     }
     inputSymWindow_ = param.inputSymWindow;
@@ -71,23 +93,52 @@ HcclResult InsTempAllGatherMesh1D::KernelRun(
     tempAlgParams_ = tempAlgParams;
     dataType_ = param.DataDes.dataType;
     HCCL_DEBUG("[InsTempAllGatherMesh1D] Rank [%d], get threadNum_[%d].", myRank_, threadNum_);
-    CHK_RET(LocalDataCopy(templateResource.threads));
+    HcclResult ret;
+#if defined(AICPU_COMPILE)
+    {
+        mc2_aicpu_timing::AicpuTimingScope timingScope(
+            timingSample_, mc2_aicpu_timing::Segment::LOCAL_COPY_EXPAND);
+#endif
+        ret = LocalDataCopy(templateResource.threads);
+#if defined(AICPU_COMPILE)
+    }
+#endif
+    CHK_RET(ret);
     if (templateRankSize_ == 1) {
+#if defined(AICPU_COMPILE)
+        RecordEmptyMeshStages(timingSample_, false);
+#endif
         return HcclResult::HCCL_SUCCESS;
     }
+#if defined(AICPU_COMPILE)
+    {
+        mc2_aicpu_timing::AicpuTimingScope timingScope(
+            timingSample_, mc2_aicpu_timing::Segment::PRE_SYNC_EXPAND);
+#endif
     if (threadNum_ > 1) {
         std::vector<ThreadHandle> subThreads(templateResource.threads.begin() + 1, templateResource.threads.end());
         GetNotifyIdxMainToSub(notifyIdxMainToSub_);
         CHK_RET(PreSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxMainToSub_));
     }
+#if defined(AICPU_COMPILE)
+    }
+#endif
 
     CHK_RET(RunAllGatherMesh(templateResource.threads, templateResource.channels));
 
+#if defined(AICPU_COMPILE)
+    {
+        mc2_aicpu_timing::AicpuTimingScope timingScope(
+            timingSample_, mc2_aicpu_timing::Segment::POST_SYNC_EXPAND);
+#endif
     if (threadNum_ > 1) {
         std::vector<ThreadHandle> subThreads(templateResource.threads.begin() + 1, templateResource.threads.end());
         GetNotifyIdxSubToMain(notifyIdxSubToMain_);
         CHK_RET(PostSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxSubToMain_));
     }
+#if defined(AICPU_COMPILE)
+    }
+#endif
     HCCL_INFO("[InsTempAllGatherMesh1D] Run End");
     return HcclResult::HCCL_SUCCESS;
 }
@@ -101,6 +152,12 @@ HcclResult InsTempAllGatherMesh1D::RunAllGatherMesh(
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], myAlgRank));
     const u32 dataTypeSize = DATATYPE_SIZE_TABLE[dataType_];
     for (u32 threadIdx = 0; threadIdx < subCommRanks_[0].size() - 1; threadIdx++) {
+#if defined(AICPU_COMPILE)
+        if (timingSample_ != nullptr) {
+            timingSample_->AddPeer();
+        }
+        const uint64_t peerPrepareBegin = timingSample_ == nullptr ? 0U : timingSample_->Now();
+#endif
         u32 connectedRank = subCommRanks_[0][(myAlgRank + 1 + threadIdx) % subCommRanks_[0].size()];
 
         u32 connectedAlgRank = 0;
@@ -212,8 +269,24 @@ HcclResult InsTempAllGatherMesh1D::RunAllGatherMesh(
         TxRxSlicesList sendRecvSlicesList({txSrcSlicesAll, txDstSlicesAll}, {rxSrcSlicesAll, rxDstSlicesAll});
         TxRxChannels sendRecvChannels(linkRemote, linkRemote);
         SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList);
+#if defined(AICPU_COMPILE)
+        if (timingSample_ != nullptr) {
+            timingSample_->AddDuration(
+                mc2_aicpu_timing::Segment::PEER_SLICE_PREPARE, peerPrepareBegin, timingSample_->Now());
+        }
+#endif
+        HcclResult sendRecvRet;
+#if defined(AICPU_COMPILE)
+        {
+            mc2_aicpu_timing::AicpuTimingScope timingScope(
+                timingSample_, mc2_aicpu_timing::Segment::SEND_RECV_READ_EXPAND);
+#endif
+            sendRecvRet = SendRecvRead(sendRecvInfo, threads[threadIdx]);
+#if defined(AICPU_COMPILE)
+        }
+#endif
         CHK_PRT_RET(
-            SendRecvRead(sendRecvInfo, threads[threadIdx]),
+            sendRecvRet != HCCL_SUCCESS,
             HCCL_ERROR("[InsTempAllGatherMesh1D] RunAllGather Send failed"), HcclResult::HCCL_E_INTERNAL);
     }
     return HcclResult::HCCL_SUCCESS;

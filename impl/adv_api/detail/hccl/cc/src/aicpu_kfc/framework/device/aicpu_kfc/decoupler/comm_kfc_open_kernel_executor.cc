@@ -15,6 +15,7 @@
 #include "log.h"
 #include "alg_param.h"
 #include "alg_data_trans_wrapper.h"
+#include "aicpu_timing_recorder.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
 #include "hcomm_primitives.h"
@@ -124,16 +125,24 @@ bool IsMc2BatchModeOp(HcclCMDType opType)
 }
 
 template <typename Func>
-HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
+HcclResult RunWithMc2BatchMode(
+    const mc2_ops_hccl::OpParam& param, mc2_aicpu_timing::AicpuTimingSample* timingSample, Func func)
 {
     if (!IsMc2BatchModeOp(param.opType)) {
+        mc2_aicpu_timing::AicpuTimingScope timingScope(
+            timingSample, mc2_aicpu_timing::Segment::EXECUTOR_ORCHESTRATE);
         return func();
     }
 
     HCCL_DEBUG(
         "[MC2_BATCH][Start] opType[%u], algName[%s], algTag[%s].", static_cast<u32>(param.opType), param.algName,
         param.algTag);
-    HcclResult startRet = static_cast<HcclResult>(HcommBatchModeStart(param.algTag));
+    HcclResult startRet;
+    {
+        mc2_aicpu_timing::AicpuTimingScope timingScope(
+            timingSample, mc2_aicpu_timing::Segment::BATCH_START);
+        startRet = static_cast<HcclResult>(HcommBatchModeStart(param.algTag));
+    }
     CHK_PRT_RET(
         startRet != HCCL_SUCCESS,
         HCCL_ERROR(
@@ -141,8 +150,18 @@ HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
             static_cast<int>(startRet), static_cast<u32>(param.opType), param.algName, param.algTag),
         startRet);
 
-    HcclResult execRet = func();
-    HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+    HcclResult execRet;
+    {
+        mc2_aicpu_timing::AicpuTimingScope timingScope(
+            timingSample, mc2_aicpu_timing::Segment::EXECUTOR_ORCHESTRATE);
+        execRet = func();
+    }
+    HcclResult endRet;
+    {
+        mc2_aicpu_timing::AicpuTimingScope timingScope(
+            timingSample, mc2_aicpu_timing::Segment::BATCH_END_FLUSH);
+        endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+    }
     HCCL_DEBUG(
         "[MC2_BATCH][End] opType[%u], algName[%s], algTag[%s], execRet[%d], endRet[%d].",
         static_cast<u32>(param.opType), param.algName, param.algTag, static_cast<int>(execRet),
@@ -169,10 +188,16 @@ HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
 } // namespace
 
 HcclResult LaunchOpenOpParamDataImpl(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    mc2_aicpu_timing::AicpuTimingSample* timingSample)
 {
+    const uint64_t openLaunchSetupBegin = timingSample == nullptr ? 0U : timingSample->Now();
     auto* param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);
+    if (timingSample != nullptr) {
+        timingSample->SetMetadata(
+            resCtx.topoInfo.userRank, static_cast<uint32_t>(param->opType), param->algName);
+    }
     HCCL_INFO(
         "[MC2_OPEN_DIAG][LaunchOpenOpParamDataImpl] file[%s:%d], opParamSize %zu, "
         "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
@@ -227,8 +252,23 @@ HcclResult LaunchOpenOpParamDataImpl(
         (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
          param->opType == HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
+        mc2_ops_hccl::CannDispatchContext dispatchContext;
+        HcclResult prepareRet = mc2_ops_hccl::PrepareCannDispatch(*param, resCtx, dispatchContext);
+        if (timingSample != nullptr) {
+            timingSample->AddDuration(
+                mc2_aicpu_timing::Segment::OPEN_LAUNCH_SETUP, openLaunchSetupBegin, timingSample->Now());
+        }
+        CHK_PRT_RET(
+            prepareRet != HCCL_SUCCESS,
+            HCCL_ERROR(
+                "[CannBridge] prepare failed (ret=%d), opType=%u algName[%s]", static_cast<int>(prepareRet),
+                static_cast<u32>(param->opType), param->algName),
+            prepareRet);
         HcclResult cannRet = RunWithMc2BatchMode(
-            *param, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
+            *param, timingSample,
+            [&]() -> HcclResult {
+                return mc2_ops_hccl::ExecuteCannDispatch(*param, resCtx, dispatchContext);
+            });
         CHK_PRT_RET(
             cannRet != HCCL_SUCCESS,
             HCCL_ERROR(
@@ -244,8 +284,18 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(
         resCtx.isHcommBatchTransferOnThreadSupported));
+#if defined(AICPU_COMPILE)
+    auto* timingAwareExecutor = dynamic_cast<mc2_aicpu_timing::AicpuTimingAwareExecutor*>(executor.get());
+    if (timingAwareExecutor != nullptr) {
+        timingAwareExecutor->SetAicpuTimingSample(timingSample);
+    }
+#endif
+    if (timingSample != nullptr) {
+        timingSample->AddDuration(
+            mc2_aicpu_timing::Segment::OPEN_LAUNCH_SETUP, openLaunchSetupBegin, timingSample->Now());
+    }
     HcclResult ret = RunWithMc2BatchMode(
-        *param, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
+        *param, timingSample, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
 
     return HCCL_SUCCESS;

@@ -516,16 +516,19 @@ HcclResult CommKfcAicpuServer::FormatOpParamFromMsg(
 }
 
 HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    mc2_aicpu_timing::AicpuTimingSample* timingSample)
 {
     LogOpenOpParamBrief("KernelServerBegin", opParam);
-    HcclResult ret = LaunchOpenOpParamData(opParam, resCtx);
+    HcclResult ret = LaunchOpenOpParamData(opParam, resCtx, timingSample);
     HCCL_INFO("[MC2_OPEN_DIAG][KernelServerEnd] ret %u, opParamSize %zu.", ret, opParam.size());
     return ret;
 }
 
-HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMsg, u32 msgPos)
+HcclResult CommKfcAicpuServer::Orchestrate(
+    const HcclMsg& msg, HcclMsgExt& extMsg, u32 msgPos, mc2_aicpu_timing::AicpuTimingSample* timingSample)
 {
+    const uint64_t serverSetupBegin = timingSample == nullptr ? 0U : timingSample->Now();
     KeepAlive();
     CHK_PTR_NULL(msgArea_);
     const HcclCMDType opType = static_cast<HcclCMDType>(msg.commType.prepareType);
@@ -559,9 +562,15 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounterWindow("ServerMsg", groupIdx_, msgArea_);
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
+    if (timingSample != nullptr) {
+        timingSample->AddDuration(mc2_aicpu_timing::Segment::SERVER_SETUP, serverSetupBegin, timingSample->Now());
+    }
 
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
+        if (timingSample != nullptr) {
+            timingSample->BeginTurn();
+        }
         const u32 turnIdx = i + 1U;
         UpdateProgress("LoopBegin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
@@ -577,7 +586,12 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         LogAicpuOrderDfxCounter(
             "BeforeFormat", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
             execCtx);
-        HcclResult ret = FormatOpParamFromMsg(msg, extMsg, *execCtx, i, runParam);
+        HcclResult ret;
+        {
+            mc2_aicpu_timing::AicpuTimingScope timingScope(
+                timingSample, mc2_aicpu_timing::Segment::FORMAT_PARAM);
+            ret = FormatOpParamFromMsg(msg, extMsg, *execCtx, i, runParam);
+        }
         UpdateProgress("AfterFormat", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterFormat", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -594,7 +608,11 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
+        {
+            mc2_aicpu_timing::AicpuTimingScope timingScope(
+                timingSample, mc2_aicpu_timing::Segment::CCORE_WAIT_SUBMIT);
+            ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
+        }
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterWait", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -611,7 +629,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+        ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder, timingSample);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -628,7 +646,11 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
+        {
+            mc2_aicpu_timing::AicpuTimingScope timingScope(
+                timingSample, mc2_aicpu_timing::Segment::CCORE_POST_SUBMIT);
+            ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
+        }
         UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterPost", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,

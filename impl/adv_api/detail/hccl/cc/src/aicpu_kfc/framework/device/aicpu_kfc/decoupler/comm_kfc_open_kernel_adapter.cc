@@ -19,7 +19,8 @@
 #include "alg_param.h"
 
 extern HcclResult LaunchOpenOpParamDataImpl(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    mc2_aicpu_timing::AicpuTimingSample* timingSample);
 
 namespace {
 u64 GetDataTypeSize(HcclDataType dataType)
@@ -273,11 +274,13 @@ HcclResult FormatOpenOpParamDataFromMsg(
     return HCCL_SUCCESS;
 }
 
-HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+HcclResult LaunchOpenOpParamData(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    mc2_aicpu_timing::AicpuTimingSample* timingSample)
 {
     if (opParam.empty()) {
         HCCL_ERROR("Op param is empty.");
         return HCCL_E_PARA;
     }
-    return LaunchOpenOpParamDataImpl(opParam, resCtx);
+    return LaunchOpenOpParamDataImpl(opParam, resCtx, timingSample);
 }

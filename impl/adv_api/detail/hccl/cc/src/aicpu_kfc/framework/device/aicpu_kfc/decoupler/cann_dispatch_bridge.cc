@@ -112,7 +112,8 @@ HcclResult InitCannBatchTransferIfSupported(
 } // namespace
 } // namespace cann_abi
 
-HcclResult LaunchViaCann(const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx)
+HcclResult PrepareCannDispatch(
+    const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx, CannDispatchContext& dispatchContext)
 {
     const cann_abi::CannSyms& syms = cann_abi::LoadCannSyms();
     if (!syms.ok) {
@@ -125,22 +126,34 @@ HcclResult LaunchViaCann(const OpParam& ascParam, const AlgResourceCtxSerializab
     // 需要保证 OpParam / AlgResourceCtxSerializable 布局与 CANN 对齐，直接传入，无需逐字段转换。
     CHK_RET(cann_abi::InitCannBatchTransferIfSupported(syms, ascParam, ascResCtx));
     void* self = syms.instance();
-    std::unique_ptr<cann_abi::InsCollAlgBase> executor =
-        syms.getAlgExec(self, ascParam.opType, std::string(ascParam.algName));
-    if (executor == nullptr) {
+    dispatchContext.executor = syms.getAlgExec(self, ascParam.opType, std::string(ascParam.algName));
+    if (dispatchContext.executor == nullptr) {
         HCCL_ERROR(
             "[CannBridge] GetAlgExec returned null. opType=%u algName[%s]", static_cast<u32>(ascParam.opType),
             ascParam.algName);
         return HCCL_E_NOT_SUPPORT;
     }
+    return HCCL_SUCCESS;
+}
 
-    HcclResult ret = executor->Orchestrate(ascParam, ascResCtx);
+HcclResult ExecuteCannDispatch(
+    const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx, CannDispatchContext& dispatchContext)
+{
+    CHK_SMART_PTR_NULL(dispatchContext.executor);
+    HcclResult ret = dispatchContext.executor->Orchestrate(ascParam, ascResCtx);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR(
             "[CannBridge] CANN Orchestrate failed, ret=%d. opType=%u algName[%s]", static_cast<int>(ret),
             static_cast<u32>(ascParam.opType), ascParam.algName);
     }
     return ret;
+}
+
+HcclResult LaunchViaCann(const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx)
+{
+    CannDispatchContext dispatchContext;
+    CHK_RET(PrepareCannDispatch(ascParam, ascResCtx, dispatchContext));
+    return ExecuteCannDispatch(ascParam, ascResCtx, dispatchContext);
 }
 
 } // namespace mc2_ops_hccl

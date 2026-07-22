@@ -10,6 +10,7 @@
 #ifndef MC2_OPS_HCCL_CANN_DISPATCH_BRIDGE_H
 #define MC2_OPS_HCCL_CANN_DISPATCH_BRIDGE_H
 
+#include <memory>
 #include <string>
 #include "alg_param.h"
 
@@ -29,6 +30,14 @@ public:
 
 } // namespace cann_abi
 
+struct CannDispatchContext {
+    std::unique_ptr<cann_abi::InsCollAlgBase> executor;
+};
+
+__attribute__((visibility("hidden"))) HcclResult PrepareCannDispatch(
+    const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx, CannDispatchContext& dispatchContext);
+__attribute__((visibility("hidden"))) HcclResult ExecuteCannDispatch(
+    const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx, CannDispatchContext& dispatchContext);
 HcclResult LaunchViaCann(const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx);
 
 } // namespace mc2_ops_hccl
