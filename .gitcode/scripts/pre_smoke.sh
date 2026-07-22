@@ -45,12 +45,13 @@ for op in "${ops[@]}"; do
 
   cd ./scripts && bash devkit_dir_check.sh 2>&1 | tee -a ./run_test.log
   cd ${WORKSPACE}
+  obs_base="https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${obs_path}/${package_name}"
 
   arm_package="cann-asc-devkit_linux-aarch64.run"
   if [ -n "${arm_run_url}" ]; then
     wget -nv -O ${arm_package} "${arm_run_url}" 2>/dev/null
   else
-    wget -nv -O ${arm_package} https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${repo_name}/package/${pr_id}/${arm_package} 2>/dev/null
+    wget -nv -O ${arm_package} ${obs_base} 2>/dev/null
   fi
 
   if [ ! -f "${arm_package}" ] || [ ! -s "${arm_package}" ]; then
@@ -66,18 +67,15 @@ for op in "${ops[@]}"; do
   bash run_presmoke.sh 2>&1 | tee -a ./run_test.log
 done
 
-# ==============================
-# 打包并上传 log
-# ==============================
+# 打包plog
 mkdir -p /root/ascend
 slog_name="slog.tar.gz"
-tar -zcf "${slog_name}" -C /root/ascend log
-
-if ! python3 ${WORKSPACE}/CI/pipeline/scripts/upload.py "${slog_name}" "${repo_name}/package/${pr_id}/${slog_name}"; then
-  echo "【Error】: upload.py execution failed with non-zero exit code." >&2
-  exit 1
+tar -zcf slog.tar.gz -C /root/ascend log
+OBS_KEY="${obs_smoke_path}/plog/${slog_name}"
+# upload plog
+if python3 /home/upload.py --bucket-name "ascend-ci" --action upload  --local-file "slog.tar.gz" --obs-object-key "${OBS_KEY}"; then
+  echo "::set-output var=plog_url:https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${OBS_KEY}"
 fi
-rm -rf /root/ascend/log/*
 
 # ==============================
 # 检查 NPU 状态
