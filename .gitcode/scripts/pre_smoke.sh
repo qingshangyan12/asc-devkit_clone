@@ -50,7 +50,7 @@ for op in "${ops[@]}"; do
   if [ -n "${arm_run_url}" ]; then
     wget -nv -O ${arm_package} "${arm_run_url}" 2>/dev/null
   else
-    wget -nv -O ${arm_package} https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${REPOSITORY_NAME}/package/${pr_id}/${arm_package} 2>/dev/null
+    wget -nv -O ${arm_package} https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${repo_name}/package/${pr_id}/${arm_package} 2>/dev/null
   fi
 
   if [ ! -f "${arm_package}" ] || [ ! -s "${arm_package}" ]; then
@@ -71,12 +71,9 @@ done
 # ==============================
 mkdir -p /root/ascend
 slog_name="slog.tar.gz"
-if [ -n "${soc_version}" ]; then
-  slog_name="slog_${soc_version}.tar.gz"
-fi
 tar -zcf "${slog_name}" -C /root/ascend log
 
-if ! python3 ${WORKSPACE}/CI/pipeline/scripts/upload.py "${slog_name}" "${REPOSITORY_NAME}/package/${pr_id}/${slog_name}"; then
+if ! python3 ${WORKSPACE}/CI/pipeline/scripts/upload.py "${slog_name}" "${repo_name}/package/${pr_id}/${slog_name}"; then
   echo "【Error】: upload.py execution failed with non-zero exit code." >&2
   exit 1
 fi
@@ -90,8 +87,8 @@ mkdir -p ./npu_log
 npu-smi info 2>&1 | tee ./npu_log/npu_info.log
 if grep "dcmi module initialize failed" "./npu_log/npu_info.log"; then
   date_time=$(date '+%Y%m%d.%H%M%S')
-  echo "$date_time : ${REPOSITORY_NAME}_${pr_id} dcmi module initialize failed" >> ./npu_log/`date +%Y%m%d`.log
-  python3 /home/aa/check_npu.py $REPOSITORY_NAME $pr_id `cat /home/aa/hostname`
+  echo "$date_time : ${repo_name}_${pr_id} dcmi module initialize failed" >> ./npu_log/`date +%Y%m%d`.log
+  python3 /home/aa/check_npu.py $repo_name $pr_id `cat /home/aa/hostname`
   exit 1
 fi
 
