@@ -29,7 +29,9 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品: 支持
 
 头文件路径：`"c_api/sync/sync.h"`。
 
-核间同步寄存器同步指令，每个flag_id均分配有计数器，执行asc_sync_inter_arrive后计数器将递增；执行asc_sync_inter_wait时如果对应的计数器数值为0则阻塞；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+核间同步寄存器同步指令，与[asc_sync_inter_arrive](asc_sync_inter_arrive.md)配合使用（通过flag_id关联），用于组间block的信号同步。
+
+每个flag_id均分配有计数器，执行asc_sync_inter_arrive后计数器将递增；执行asc_sync_inter_wait时如果对应的计数器数值为0则阻塞；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
 ## 函数原型
 
@@ -58,6 +60,8 @@ PIPE_S
 - flag_id的取值范围为0至15，每个flag_id的计数器范围为0至15。
 - 必须保证每个flag_id的计数器不溢出，否则将引发异常。
 - 必须保证相同的ID在同一时间仅被一条流水线等待。
+
+- 必须保证配套使用[asc_sync_inter_arrive](asc_sync_inter_arrive.md)和asc_sync_inter_wait，避免计算核一直处于阻塞阶段。
 
 ## 调用示例
 

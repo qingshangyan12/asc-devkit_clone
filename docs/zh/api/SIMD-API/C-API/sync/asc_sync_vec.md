@@ -50,7 +50,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+asc_sync_vec会等待所有流水线中所有先前提交的接口完成，这会对性能产生影响。若仅需阻塞单条流水线，应避免随意调用asc_sync_vec，可选用asc_sync_pipe、asc_sync_mte2、asc_sync_mte3等接口精准控制，以提升性能。
 
 ## 调用示例
 

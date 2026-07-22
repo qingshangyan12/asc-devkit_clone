@@ -79,4 +79,3 @@ asc_sync_block_arrive(PIPE_S, flag_id);
 asc_sync_block_wait(PIPE_S, flag_id);  
 ```
 <!-- end id10 -->
-

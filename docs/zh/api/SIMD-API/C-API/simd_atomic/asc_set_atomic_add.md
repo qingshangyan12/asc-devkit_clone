@@ -29,6 +29,7 @@
 头文件路径：`"c_api/atomic/atomic.h"`。
 
 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型支持int8_t、int16_t、int32_t、bfloat16_t、half、float。
+开启原子累加后，后续执行搬运操作从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory时，Global Memory中原始数据将与新搬运数据进行逐元素累加，累加结果写回Global Memory。
 <!-- npu="950" id8 -->
 特别地，针对Ascend 950PR/Ascend 950DT，不支持L1 Buffer到Global Memory的通路。
 <!-- end id8 -->
