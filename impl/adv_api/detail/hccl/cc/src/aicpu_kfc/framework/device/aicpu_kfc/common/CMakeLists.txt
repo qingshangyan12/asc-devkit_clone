@@ -10,5 +10,9 @@
 if(TARGET mc2_server)
     add_mc2_server_ccl_object(mc2_server_aicpu_kfc_common
         ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc_utils.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_timing_recorder.cc
+    )
+    target_include_directories(mc2_server_aicpu_kfc_common PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../ops/op_common/inc
     )
 endif()

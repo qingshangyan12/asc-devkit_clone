@@ -13,6 +13,9 @@
 
 #include "alg_v2_template_base.h"
 #include "executor_base.h"
+#if defined(AICPU_COMPILE)
+#include "aicpu_timing_recorder.h"
+#endif
 
 namespace mc2_ops_hccl {
 
@@ -47,6 +50,12 @@ public:
     virtual HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels);
     void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMianToSub) override;
     void GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) override;
+#if defined(AICPU_COMPILE)
+    void SetAicpuTimingSample(mc2_aicpu_timing::AicpuTimingSample* sample)
+    {
+        timingSample_ = sample;
+    }
+#endif
 
 protected:
     virtual HcclResult RunAllGatherMesh(
@@ -59,6 +68,9 @@ protected:
     void* inputSymWindow_{nullptr};
     void* outputSymWindow_{nullptr};
     u32 channelsPerRank_{1};
+#if defined(AICPU_COMPILE)
+    mc2_aicpu_timing::AicpuTimingSample* timingSample_{nullptr};
+#endif
 };
 
 } // namespace mc2_ops_hccl

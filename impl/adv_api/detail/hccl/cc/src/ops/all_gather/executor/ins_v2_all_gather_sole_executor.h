@@ -11,10 +11,17 @@
 #define HCCLV2_INS_V2_ALL_GATHER_SOLE_EXECUTOR_H
 
 #include "executor_common_ops.h"
+#if defined(AICPU_COMPILE)
+#include "aicpu_timing_recorder.h"
+#endif
 
 namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate>
-class InsV2AllGatherSoleExecutor : public InsCollAlgBase {
+class InsV2AllGatherSoleExecutor : public InsCollAlgBase
+#if defined(AICPU_COMPILE)
+    , public mc2_aicpu_timing::AicpuTimingAwareExecutor
+#endif
+{
 public:
     explicit InsV2AllGatherSoleExecutor();
     ~InsV2AllGatherSoleExecutor() override = default;
@@ -28,12 +35,21 @@ public:
 
     HcclResult CalcAlgHierarchyInfo(
         HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
+#if defined(AICPU_COMPILE)
+    void SetAicpuTimingSample(mc2_aicpu_timing::AicpuTimingSample* sample) override
+    {
+        timingSample_ = sample;
+    }
+#endif
 
 protected:
     /* *************** 算法编排 *************** */
     HcclResult OrchestrateLoop(const OpParam& param, const AlgResourceCtxSerializable& resCtx);
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
     std::vector<ThreadHandle> threads_;
+#if defined(AICPU_COMPILE)
+    mc2_aicpu_timing::AicpuTimingSample* timingSample_{nullptr};
+#endif
 };
 } // namespace mc2_ops_hccl
 

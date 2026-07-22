@@ -12,6 +12,7 @@
 #include "hccl_msg.h"
 
 #include "common/aicpu_kfc_utils.h"
+#include "aicpu_timing_recorder.h"
 #include "comm_kfc_aicpu_server.h"
 
 using namespace HcclApi;
@@ -25,13 +26,20 @@ struct AscCommServerInfo {
     u32 retryCnt{0U};
     bool finalizeFlag{false};
     bool finishFlag{false};
-    AscCommServerInfo(u32 groupIdx) : serverIns(groupIdx) { extMsg = std::make_shared<HcclMsgExt>(); }
+    mc2_aicpu_timing::AicpuTimingRecorder timingRecorder;
+    AscCommServerInfo(u32 groupIdx) : serverIns(groupIdx), timingRecorder(groupIdx)
+    {
+        extMsg = std::make_shared<HcclMsgExt>();
+    }
 };
 static constexpr u32 MAX_RETRY_CNT = 10U;
+constexpr char COMPLETE_STATUS[] = "complete";
+constexpr char INCOMPLETE_STATUS[] = "incomplete";
 
 HcclResult CreateServerList(void* args[], u32 ctxNum, std::vector<AscCommServerInfo>& serverList)
 {
     CHK_PRT_RET(ctxNum == 0U, HCCL_ERROR("Invalid context number."), HCCL_E_PARA);
+    serverList.reserve(ctxNum);
     std::unordered_map<uintptr_t, size_t> workspaceToServerIdx{};
     for (u32 i = 0U; i < ctxNum; ++i) {
         const HcclApi::OpResCtx* ctx = static_cast<const HcclApi::OpResCtx*>(args[i]);
@@ -40,10 +48,9 @@ HcclResult CreateServerList(void* args[], u32 ctxNum, std::vector<AscCommServerI
         auto it = workspaceToServerIdx.find(workspace);
         if (it == workspaceToServerIdx.end()) {
             const u32 serverIdx = static_cast<u32>(serverList.size());
-            AscCommServerInfo server(serverIdx);
-            CHK_SMART_PTR_NULL(server.extMsg);
+            serverList.emplace_back(serverIdx);
+            CHK_SMART_PTR_NULL(serverList.back().extMsg);
             HCCL_INFO("Server for group %u is created.", serverIdx);
-            serverList.emplace_back(server);
             it = workspaceToServerIdx.emplace(workspace, serverList.size() - 1U).first;
         }
         CHK_PRT_RET(
@@ -119,17 +126,33 @@ HcclResult InterGroupSyncProcess(std::vector<AscCommServerInfo>& serverList, u32
 
 HcclResult PrepareProcess(AscCommServerInfo& server, u32& expectSeqNum)
 {
+    const uint64_t dispatchBegin = mc2_aicpu_timing::AicpuTimingRecorder::ReadCounter();
     const u32 seqNum = static_cast<u32>(server.msg.addMsg.v1Msg.seqNum);
     if (expectSeqNum != seqNum) {
         HCCL_INFO("Expect seq id %u but receive %u.", expectSeqNum, seqNum);
         ++(server.retryCnt);
     } else {
-        CHK_RET(server.serverIns.Orchestrate(server.msg, *(server.extMsg), server.msgPos));
+        mc2_aicpu_timing::AicpuTimingSample timingSample = server.timingRecorder.CreateSample();
+        timingSample.AddDuration(
+            mc2_aicpu_timing::Segment::PREPARE_DISPATCH, dispatchBegin, timingSample.Now());
+        HcclResult ret = server.serverIns.Orchestrate(server.msg, *(server.extMsg), server.msgPos, &timingSample);
+        timingSample.AddDuration(mc2_aicpu_timing::Segment::PREPARE_TOTAL, dispatchBegin, timingSample.Now());
+        if (ret != HCCL_SUCCESS) {
+            timingSample.MarkIncomplete();
+            return ret;
+        }
         server.msgPos = (server.msgPos + 1U) % HCCL_MSG_CNT;
         ++expectSeqNum;
         server.retryCnt = 0;
     }
     return HCCL_SUCCESS;
+}
+
+void ReportTiming(std::vector<AscCommServerInfo>& serverList, const char* status)
+{
+    for (auto& server : serverList) {
+        server.timingRecorder.Report(status);
+    }
 }
 
 HcclResult GroupServerProcess(std::vector<AscCommServerInfo>& serverList, u32 groupIdx, u32& expectSeq, u32& finishCnt)
@@ -187,16 +210,25 @@ HcclResult GroupServerProcess(std::vector<AscCommServerInfo>& serverList, u32 gr
 u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum)
 {
     std::vector<AscCommServerInfo> serverList{};
-    CHK_RET(CreateServerList(args, ctxNum, serverList));
+    HcclResult ret = CreateServerList(args, ctxNum, serverList);
+    if (ret != HCCL_SUCCESS) {
+        ReportTiming(serverList, INCOMPLETE_STATUS);
+        return ret;
+    }
 
     u32 finishCnt = 0U;
     u32 expectSeqNum = 0U;
     while (finishCnt != serverList.size()) {
         for (u32 i = 0U; i < serverList.size(); ++i) {
-            HcclResult ret = GroupServerProcess(serverList, i, expectSeqNum, finishCnt);
-            CHK_RET(serverList[i].serverIns.ErrorDfxProcess(ret));
+            ret = GroupServerProcess(serverList, i, expectSeqNum, finishCnt);
+            ret = serverList[i].serverIns.ErrorDfxProcess(ret);
+            if (ret != HCCL_SUCCESS) {
+                ReportTiming(serverList, INCOMPLETE_STATUS);
+                return ret;
+            }
         }
     }
 
+    ReportTiming(serverList, COMPLETE_STATUS);
     return HCCL_SUCCESS;
 }
