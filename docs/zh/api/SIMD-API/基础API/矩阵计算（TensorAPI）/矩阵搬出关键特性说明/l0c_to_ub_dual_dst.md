@@ -52,7 +52,7 @@ M方向切分示例：
 
 **图1**  NZ2NZ双目标搬运模式设置示意图
 
-![NZ2NZ双目标搬运模式设置示意图](../../../../../figures/nz2nz_dual_target_movement_mode_setting.png)
+![NZ2NZ双目标搬运模式设置示意图](../../../../figures/nz2nz_dual_target_movement_mode_setting.png)
 
 ## NZ2ND双目标模式
 
@@ -68,7 +68,7 @@ M方向切分示例：
 
 **图2**  NZ2ND双目标搬运模式设置示意图
 
-![NZ2ND双目标搬运模式设置示意图](../../../../../figures/enable_nz2nd_param_dual_in_mode_setting.png)
+![NZ2ND双目标搬运模式设置示意图](../../../../figures/enable_nz2nd_param_dual_in_mode_setting.png)
 
 ## 约束说明
 
