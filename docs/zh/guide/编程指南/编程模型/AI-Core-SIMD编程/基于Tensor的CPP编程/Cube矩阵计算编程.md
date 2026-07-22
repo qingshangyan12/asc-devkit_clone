@@ -204,7 +204,7 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 }
 ```
 
-针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，`LoadDataWithTranspose`不支持L1 Buffer到L0A Buffer通路，需要使用`LoadData`接口配合`LoadData2DParamsV2`参数，并将`ifTranspose`设置为`true`。
+针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，`LoadDataWithTranspose`仅支持L1 Buffer到L0B Buffer通路，推荐使用`LoadData2dTransposeParamsV2`作为搬运参数，不支持本节所述的L1 Buffer到L0A Buffer转置场景。该场景需要改用`LoadData`接口配合`LoadData2DParamsV2`参数，并将`ifTranspose`设置为`true`。
 
 ### 矩阵数据搬出
 
