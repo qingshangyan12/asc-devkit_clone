@@ -9,7 +9,7 @@
  */
 #ifndef HCCL_ALLOC_CTX_RES_H
 #define HCCL_ALLOC_CTX_RES_H
-
+ 
 #include "topo_host.h"
 #include "adapter_error_manager_pub.h"
 #include "alg_param.h"
