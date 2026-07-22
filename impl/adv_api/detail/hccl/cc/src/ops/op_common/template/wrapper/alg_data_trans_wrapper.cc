@@ -334,6 +334,20 @@ HcclResult SendRecvBatchWriteReduce(const SendRecvReduceInfo& sendRecvInfo, cons
         HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     auto processSlice = [&sendRecvInfo](u32 i, const DataSlice& srcSlice, const DataSlice& dstSlice,
         std::vector<HcommBatchTransferDesc>& transferDescs) -> HcclResult {
+        CHK_PRT_RET(
+            srcSlice.count_ * DATATYPE_SIZE_TABLE[sendRecvInfo.dataType_] != srcSlice.size_,
+            HCCL_ERROR(
+                "[AlgDataTransWrapper] SendRecvBatchWriteReduce: src slice count [%u] is not mate to src slice size "
+                "[%u], dataType is [%d].",
+                srcSlice.size_, srcSlice.size_, sendRecvInfo.dataType_),
+            HcclResult::HCCL_E_INTERNAL);
+        CHK_PRT_RET(
+            dstSlice.count_ * DATATYPE_SIZE_TABLE[sendRecvInfo.dataType_] != dstSlice.size_,
+            HCCL_ERROR(
+                "[AlgDataTransWrapper] SendRecvBatchWriteReduce: dst slice count [%u] is not mate to dst slice size "
+                "[%u], dataType is [%d].",
+                dstSlice.size_, dstSlice.size_, sendRecvInfo.dataType_),
+            HcclResult::HCCL_E_INTERNAL);
         void* dst = GetSliceAddr(dstSlice);
         void* src = GetSliceAddr(srcSlice);
         transferDescs.push_back(MakeBatchReduceDesc(HCOMM_TRANSFER_TYPE_WRITE_REDUCE, dst, src, srcSlice.count_,
@@ -360,6 +374,20 @@ HcclResult SendBatchWriteReduce(const DataReduceInfo& sendInfo, const ThreadHand
         HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     auto processSlice = [&sendInfo](u32 i, const DataSlice& srcSlice, const DataSlice& dstSlice,
         std::vector<HcommBatchTransferDesc>& transferDescs) -> HcclResult {
+        CHK_PRT_RET(
+            srcSlice.count_ * DATATYPE_SIZE_TABLE[sendInfo.dataType_] != srcSlice.size_,
+            HCCL_ERROR(
+                "[AlgDataTransWrapper] SendBatchWriteReduce: src slice count [%u] is not mate to src slice size "
+                "[%u], dataType is [%d].",
+                srcSlice.size_, srcSlice.size_, sendInfo.dataType_),
+            HcclResult::HCCL_E_INTERNAL);
+        CHK_PRT_RET(
+            dstSlice.count_ * DATATYPE_SIZE_TABLE[sendInfo.dataType_] != dstSlice.size_,
+            HCCL_ERROR(
+                "[AlgDataTransWrapper] SendBatchWriteReduce: dst slice count [%u] is not mate to dst slice size "
+                "[%u], dataType is [%d].",
+                dstSlice.size_, dstSlice.size_, sendInfo.dataType_),
+            HcclResult::HCCL_E_INTERNAL);
         void* dst = GetSliceAddr(dstSlice);
         void* src = GetSliceAddr(srcSlice);
         transferDescs.push_back(MakeBatchReduceDesc(HCOMM_TRANSFER_TYPE_WRITE_REDUCE, dst, src, srcSlice.count_,
@@ -548,6 +576,20 @@ HcclResult RecvBatchReadReduce(const DataReduceInfo& recvInfo, const ThreadHandl
         HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     auto processSlice = [&recvInfo](u32 i, const DataSlice& srcSlice, const DataSlice& dstSlice,
         std::vector<HcommBatchTransferDesc>& transferDescs) -> HcclResult {
+        CHK_PRT_RET(
+            srcSlice.count_ * DATATYPE_SIZE_TABLE[recvInfo.dataType_] != srcSlice.size_,
+            HCCL_ERROR(
+                "[AlgDataTransWrapper] RecvBatchReadReduce: src slice count [%u] is not mate to src slice size "
+                "[%u], dataType is [%d].",
+                srcSlice.size_, srcSlice.size_, recvInfo.dataType_),
+            HcclResult::HCCL_E_INTERNAL);
+        CHK_PRT_RET(
+            dstSlice.count_ * DATATYPE_SIZE_TABLE[recvInfo.dataType_] != dstSlice.size_,
+            HCCL_ERROR(
+                "[AlgDataTransWrapper] RecvBatchReadReduce: dst slice count [%u] is not mate to dst slice size "
+                "[%u], dataType is [%d].",
+                dstSlice.size_, dstSlice.size_, recvInfo.dataType_),
+            HcclResult::HCCL_E_INTERNAL);
         void* dst = GetSliceAddr(dstSlice);
         void* src = GetSliceAddr(srcSlice);
         transferDescs.push_back(MakeBatchReduceDesc(HCOMM_TRANSFER_TYPE_READ_REDUCE, dst, src, srcSlice.count_,
@@ -622,6 +664,20 @@ HcclResult SendRecvBatchReadReduce(const SendRecvReduceInfo& sendRecvInfo, const
         HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     auto processSlice = [&sendRecvInfo](u32 i, const DataSlice& srcSlice, const DataSlice& dstSlice,
         std::vector<HcommBatchTransferDesc>& transferDescs) -> HcclResult {
+        CHK_PRT_RET(
+            srcSlice.count_ * DATATYPE_SIZE_TABLE[sendRecvInfo.dataType_] != srcSlice.size_,
+            HCCL_ERROR(
+                "[AlgDataTransWrapper] SendRecvBatchReadReduce: src slice count [%u] is not mate to src slice size "
+                "[%u], dataType is [%d].",
+                srcSlice.size_, srcSlice.size_, sendRecvInfo.dataType_),
+            HcclResult::HCCL_E_INTERNAL);
+        CHK_PRT_RET(
+            dstSlice.count_ * DATATYPE_SIZE_TABLE[sendRecvInfo.dataType_] != dstSlice.size_,
+            HCCL_ERROR(
+                "[AlgDataTransWrapper] SendRecvBatchReadReduce: dst slice count [%u] is not mate to dst slice size "
+                "[%u], dataType is [%d].",
+                dstSlice.size_, dstSlice.size_, sendRecvInfo.dataType_),
+            HcclResult::HCCL_E_INTERNAL);
         void* dst = GetSliceAddr(dstSlice);
         void* src = GetSliceAddr(srcSlice);
         transferDescs.push_back(MakeBatchReduceDesc(HCOMM_TRANSFER_TYPE_READ_REDUCE, dst, src, srcSlice.count_,
