@@ -39,12 +39,12 @@ using TimingMetric = Hccl::AicpuTimingRecorder::Metric;
 
 uint64_t StartTiming(Hccl::AicpuTimingRecorder* timingRecorder)
 {
-    return timingRecorder == nullptr ? 0U : timingRecorder->Now();
+    return timingRecorder == nullptr || !timingRecorder->IsFullEnabled() ? 0U : timingRecorder->Now();
 }
 
 void AddElapsedMetric(Hccl::AicpuTimingRecorder* timingRecorder, TimingMetric metric, uint64_t beginNs)
 {
-    if (timingRecorder == nullptr) {
+    if (timingRecorder == nullptr || !timingRecorder->IsFullEnabled()) {
         return;
     }
     const uint64_t endNs = timingRecorder->Now();

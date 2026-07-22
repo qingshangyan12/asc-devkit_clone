@@ -25,7 +25,10 @@ constexpr char A5_HCCL_KERNEL_SCENARIO[] = "a5_hccl_kernel";
 extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
 {
     Hccl::AicpuTimingRecorder timingRecorder(A5_HCCL_KERNEL_SCENARIO);
-    (void)timingRecorder.Record(Hccl::AicpuTimingRecorder::Stage::KERNEL_ENTRY);
+    const bool timingEnabled = timingRecorder.IsEnabled();
+    if (timingEnabled) {
+        (void)timingRecorder.Record(Hccl::AicpuTimingRecorder::Stage::KERNEL_ENTRY);
+    }
     if (args == nullptr) {
         HCCL_ERROR("args is null.");
         return HCCL_E_PARA;
@@ -34,8 +37,12 @@ extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void*
     constexpr int DESC_POS = 0;
     uint64_t descValue = reinterpret_cast<uint64_t>(args[DESC_POS]);
     auto* desc = reinterpret_cast<CommKfcParamDesc*>(&descValue);
-    (void)timingRecorder.Record(Hccl::AicpuTimingRecorder::Stage::KERNEL_ARGS_PARSED);
+    if (timingEnabled) {
+        (void)timingRecorder.Record(Hccl::AicpuTimingRecorder::Stage::KERNEL_ARGS_PARSED);
+    }
     AicpuKfcUtils::PrintHcclCommParamDesc(*desc);
-    (void)timingRecorder.Record(Hccl::AicpuTimingRecorder::Stage::DISPATCHER_ENTER);
+    if (timingEnabled) {
+        (void)timingRecorder.Record(Hccl::AicpuTimingRecorder::Stage::DISPATCHER_ENTER);
+    }
     return CommKfcDispatcher::Run(&(args[1]), desc->itemNum, timingRecorder);
 }

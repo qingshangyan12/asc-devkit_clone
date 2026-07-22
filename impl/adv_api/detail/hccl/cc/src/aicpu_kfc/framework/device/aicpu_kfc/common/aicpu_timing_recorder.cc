@@ -20,7 +20,7 @@ constexpr uint64_t NANOSECONDS_PER_SECOND = 1000000000ULL;
 constexpr char UNKNOWN_NAME[] = "unknown";
 constexpr char INCOMPLETE_STATUS[] = "incomplete";
 constexpr char NO_PREVIOUS_STAGE[] = "none";
-constexpr char TIMING_LOG_ENABLE_ENV[] = "HCCL_AICPU_TIMING_LOG_ENABLE";
+constexpr char TIMING_LEVEL_ENV[] = "HCCL_AICPU_TIMING_LOG_ENABLE";
 
 struct PhaseRange {
     const char* name;
@@ -59,7 +59,12 @@ uint64_t AicpuTimingRecorder::MonotonicNow()
 AicpuTimingRecorder::AicpuTimingRecorder(const char* scenario, Clock clock)
     : scenario_((scenario == nullptr || scenario[0] == '\0') ? UNKNOWN_NAME : scenario),
       clock_(clock == nullptr ? MonotonicNow : clock)
-{}
+{
+    const char* timingLevel = getenv(TIMING_LEVEL_ENV);
+    if (timingLevel != nullptr && timingLevel[0] >= '0' && timingLevel[0] <= '4' && timingLevel[1] == '\0') {
+        level_ = static_cast<Level>(timingLevel[0] - '0');
+    }
+}
 
 AicpuTimingRecorder::~AicpuTimingRecorder()
 {
@@ -70,12 +75,30 @@ AicpuTimingRecorder::~AicpuTimingRecorder()
 
 uint64_t AicpuTimingRecorder::Now() const { return clock_(); }
 
+bool AicpuTimingRecorder::IsEnabled() const { return level_ != Level::DISABLED; }
+
+bool AicpuTimingRecorder::IsFullEnabled() const
+{
+    return level_ == Level::FULL_TIMING || level_ == Level::FULL_TIMING_WITH_LOG;
+}
+
+bool AicpuTimingRecorder::IsLogEnabled() const
+{
+    return level_ == Level::BASIC_TIMING_WITH_LOG || level_ == Level::FULL_TIMING_WITH_LOG;
+}
+
 bool AicpuTimingRecorder::Record(Stage stage, RecordPolicy policy)
 {
+    if (!IsEnabled()) {
+        return true;
+    }
     const std::size_t index = StageIndex(stage);
     if (index == STAGE_COUNT) {
         HCCL_WARNING("[TIMING_STAT] Reject an invalid stage in scenario[%s].", scenario_);
         return false;
+    }
+    if (!IsStageEnabled(stage)) {
+        return true;
     }
     if (reported_) {
         HCCL_WARNING("[TIMING_STAT] Reject stage[%s] after scenario[%s] was reported.", StageName(stage), scenario_);
@@ -90,10 +113,16 @@ bool AicpuTimingRecorder::Record(Stage stage, RecordPolicy policy)
 
 bool AicpuTimingRecorder::RecordAt(Stage stage, uint64_t timestampNs, RecordPolicy policy)
 {
+    if (!IsEnabled()) {
+        return true;
+    }
     const std::size_t index = StageIndex(stage);
     if (index == STAGE_COUNT) {
         HCCL_WARNING("[TIMING_STAT] Reject an invalid stage in scenario[%s].", scenario_);
         return false;
+    }
+    if (!IsStageEnabled(stage)) {
+        return true;
     }
     if (reported_) {
         HCCL_WARNING("[TIMING_STAT] Reject stage[%s] after scenario[%s] was reported.", StageName(stage), scenario_);
@@ -114,8 +143,17 @@ bool AicpuTimingRecorder::RecordAt(Stage stage, uint64_t timestampNs, RecordPoli
 
 bool AicpuTimingRecorder::AddMetric(Metric metric, uint64_t elapsedNs)
 {
+    if (!IsEnabled()) {
+        return true;
+    }
     const std::size_t index = MetricIndex(metric);
-    if (index == METRIC_COUNT || reported_) {
+    if (index == METRIC_COUNT) {
+        return false;
+    }
+    if (!IsMetricEnabled(metric)) {
+        return true;
+    }
+    if (reported_) {
         return false;
     }
 
@@ -134,8 +172,17 @@ bool AicpuTimingRecorder::AddMetric(Metric metric, uint64_t elapsedNs)
 
 bool AicpuTimingRecorder::IncrementCounter(Counter counter, uint64_t amount)
 {
+    if (!IsEnabled()) {
+        return true;
+    }
     const std::size_t index = CounterIndex(counter);
-    if (index == COUNTER_COUNT || reported_) {
+    if (index == COUNTER_COUNT) {
+        return false;
+    }
+    if (!IsFullEnabled()) {
+        return true;
+    }
+    if (reported_) {
         return false;
     }
     counters_[index] += amount;
@@ -148,8 +195,7 @@ void AicpuTimingRecorder::Report(const char* status)
         return;
     }
     reported_ = true;
-    const char* timingLogEnable = getenv(TIMING_LOG_ENABLE_ENV);
-    if (timingLogEnable == nullptr || timingLogEnable[0] != '1' || timingLogEnable[1] != '\0') {
+    if (!IsLogEnabled()) {
         return;
     }
 
@@ -203,10 +249,12 @@ void AicpuTimingRecorder::Report(const char* status)
             static_cast<unsigned long long>(stats.maxNs));
     }
 
-    for (std::size_t i = 0U; i < COUNTER_COUNT; ++i) {
-        HCCL_RUN_INFO(
-            "[TIMING_STAT][COUNTER][%zu] scenario[%s], counter[%s], value[%llu].", i, scenario_,
-            CounterName(static_cast<Counter>(i)), static_cast<unsigned long long>(counters_[i]));
+    if (IsFullEnabled()) {
+        for (std::size_t i = 0U; i < COUNTER_COUNT; ++i) {
+            HCCL_RUN_INFO(
+                "[TIMING_STAT][COUNTER][%zu] scenario[%s], counter[%s], value[%llu].", i, scenario_,
+                CounterName(static_cast<Counter>(i)), static_cast<unsigned long long>(counters_[i]));
+        }
     }
 }
 
@@ -281,6 +329,31 @@ std::size_t AicpuTimingRecorder::CounterIndex(Counter counter)
 {
     const std::size_t index = static_cast<std::size_t>(counter);
     return index < COUNTER_COUNT ? index : COUNTER_COUNT;
+}
+
+bool AicpuTimingRecorder::IsStageEnabled(Stage stage) const
+{
+    if (IsFullEnabled()) {
+        return true;
+    }
+    switch (stage) {
+        case Stage::KERNEL_ENTRY:
+        case Stage::FIRST_PREPARE_ACCEPTED:
+        case Stage::FIRST_PREPARE_EXPAND_END:
+        case Stage::LAST_PREPARE_EXPAND_END:
+        case Stage::FIRST_COMM_TURN_FINISHED_OBSERVED:
+        case Stage::ALL_COMMUNICATION_FINISHED_OBSERVED:
+        case Stage::LAST_FINALIZE_RECEIVED:
+        case Stage::ALL_SERVERS_FINISHED:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool AicpuTimingRecorder::IsMetricEnabled(Metric metric) const
+{
+    return IsFullEnabled() || metric == Metric::SUBMIT_TO_COMPLETION_OBSERVED;
 }
 
 const char* AicpuTimingRecorder::StageName(Stage stage)

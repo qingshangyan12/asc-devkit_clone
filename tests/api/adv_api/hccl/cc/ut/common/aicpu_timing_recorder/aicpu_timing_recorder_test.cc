@@ -18,7 +18,7 @@
 namespace {
 using Recorder = Hccl::AicpuTimingRecorder;
 
-constexpr char TIMING_LOG_ENABLE_ENV[] = "HCCL_AICPU_TIMING_LOG_ENABLE";
+constexpr char TIMING_LEVEL_ENV[] = "HCCL_AICPU_TIMING_LOG_ENABLE";
 uint64_t g_currentTimestamp = 0U;
 uint64_t g_clockStep = 1U;
 uint32_t g_clockCallCount = 0U;
@@ -39,12 +39,12 @@ protected:
         g_clockStep = 10U;
         g_clockCallCount = 0U;
         AicpuTimingRecorderTestLogCount() = 0U;
-        (void)unsetenv(TIMING_LOG_ENABLE_ENV);
+        ASSERT_EQ(setenv(TIMING_LEVEL_ENV, "4", 1), 0);
     }
 
     void TearDown() override
     {
-        (void)unsetenv(TIMING_LOG_ENABLE_ENV);
+        (void)unsetenv(TIMING_LEVEL_ENV);
     }
 };
 
@@ -178,32 +178,127 @@ TEST_F(AicpuTimingRecorderTest, RecordsCompleteFourPointTimeline)
     EXPECT_EQ(elapsedNs, 10U);
 }
 
-TEST_F(AicpuTimingRecorderTest, PrintsReportOnlyWhenEnvironmentVariableIsEnabled)
+TEST_F(AicpuTimingRecorderTest, DisablesAllTimingForMissingZeroAndInvalidLevels)
 {
-    {
-        Recorder timingRecorder("unset_env", TestClock);
+    const char* levels[] = {nullptr, "0", "", "5", "10", "invalid"};
+    for (const char* level : levels) {
+        SCOPED_TRACE(level == nullptr ? "unset" : level);
+        if (level == nullptr) {
+            ASSERT_EQ(unsetenv(TIMING_LEVEL_ENV), 0);
+        } else {
+            ASSERT_EQ(setenv(TIMING_LEVEL_ENV, level, 1), 0);
+        }
+        g_clockCallCount = 0U;
+        AicpuTimingRecorderTestLogCount() = 0U;
+
+        Recorder timingRecorder("disabled", TestClock);
+        EXPECT_FALSE(timingRecorder.IsEnabled());
+        EXPECT_FALSE(timingRecorder.IsFullEnabled());
+        EXPECT_FALSE(timingRecorder.IsLogEnabled());
         EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ENTRY));
+        EXPECT_TRUE(timingRecorder.AddMetric(Recorder::Metric::SUBMIT_TO_COMPLETION_OBSERVED, 10U));
+        EXPECT_TRUE(timingRecorder.IncrementCounter(Recorder::Counter::PREPARE));
+        EXPECT_EQ(timingRecorder.Size(), 0U);
+        EXPECT_EQ(g_clockCallCount, 0U);
+
+        Recorder::MetricStats stats{};
+        EXPECT_FALSE(timingRecorder.GetMetric(Recorder::Metric::SUBMIT_TO_COMPLETION_OBSERVED, stats));
+        uint64_t counter = 1U;
+        EXPECT_TRUE(timingRecorder.GetCounter(Recorder::Counter::PREPARE, counter));
+        EXPECT_EQ(counter, 0U);
+
         timingRecorder.Report("complete");
-        EXPECT_TRUE(timingRecorder.IsReported());
+        EXPECT_FALSE(timingRecorder.IsReported());
         EXPECT_EQ(AicpuTimingRecorderTestLogCount(), 0U);
     }
+}
 
-    ASSERT_EQ(setenv(TIMING_LOG_ENABLE_ENV, "0", 1), 0);
-    {
-        Recorder timingRecorder("disabled_env", TestClock);
+TEST_F(AicpuTimingRecorderTest, RecordsOnlyBasicTimingAtLevelsOneAndTwo)
+{
+    const char* levels[] = {"1", "2"};
+    for (const char* level : levels) {
+        SCOPED_TRACE(level);
+        ASSERT_EQ(setenv(TIMING_LEVEL_ENV, level, 1), 0);
+        g_currentTimestamp = 100U;
+        g_clockCallCount = 0U;
+        AicpuTimingRecorderTestLogCount() = 0U;
+
+        Recorder timingRecorder("basic", TestClock);
+        EXPECT_TRUE(timingRecorder.IsEnabled());
+        EXPECT_FALSE(timingRecorder.IsFullEnabled());
+        EXPECT_EQ(timingRecorder.IsLogEnabled(), level[0] == '2');
+
         EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ENTRY));
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ARGS_PARSED));
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::FIRST_PREPARE_ACCEPTED));
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::FIRST_PREPARE_EXPAND_END));
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::LAST_PREPARE_EXPAND_END));
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::FIRST_COMM_TURN_FINISHED_OBSERVED));
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::ALL_COMMUNICATION_FINISHED_OBSERVED));
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::LAST_FINALIZE_RECEIVED));
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::ALL_SERVERS_FINISHED));
+        EXPECT_EQ(timingRecorder.Size(), 8U);
+        EXPECT_EQ(g_clockCallCount, 8U);
+
+        EXPECT_TRUE(timingRecorder.AddMetric(Recorder::Metric::PARAM_FORMAT, 20U));
+        EXPECT_TRUE(timingRecorder.AddMetric(Recorder::Metric::SUBMIT_TO_COMPLETION_OBSERVED, 30U));
+        Recorder::MetricStats stats{};
+        EXPECT_FALSE(timingRecorder.GetMetric(Recorder::Metric::PARAM_FORMAT, stats));
+        EXPECT_TRUE(timingRecorder.GetMetric(Recorder::Metric::SUBMIT_TO_COMPLETION_OBSERVED, stats));
+        EXPECT_EQ(stats.totalNs, 30U);
+
+        EXPECT_TRUE(timingRecorder.IncrementCounter(Recorder::Counter::PREPARE));
+        uint64_t counter = 1U;
+        EXPECT_TRUE(timingRecorder.GetCounter(Recorder::Counter::PREPARE, counter));
+        EXPECT_EQ(counter, 0U);
+
         timingRecorder.Report("complete");
         EXPECT_TRUE(timingRecorder.IsReported());
-        EXPECT_EQ(AicpuTimingRecorderTestLogCount(), 0U);
+        if (level[0] == '1') {
+            EXPECT_EQ(AicpuTimingRecorderTestLogCount(), 0U);
+        } else {
+            EXPECT_GT(AicpuTimingRecorderTestLogCount(), 0U);
+        }
     }
+}
 
-    ASSERT_EQ(setenv(TIMING_LOG_ENABLE_ENV, "1", 1), 0);
-    {
-        Recorder timingRecorder("enabled_env", TestClock);
+TEST_F(AicpuTimingRecorderTest, RecordsFullTimingAtLevelsThreeAndFour)
+{
+    const char* levels[] = {"3", "4"};
+    for (const char* level : levels) {
+        SCOPED_TRACE(level);
+        ASSERT_EQ(setenv(TIMING_LEVEL_ENV, level, 1), 0);
+        g_currentTimestamp = 100U;
+        g_clockCallCount = 0U;
+        AicpuTimingRecorderTestLogCount() = 0U;
+
+        Recorder timingRecorder("full", TestClock);
+        EXPECT_TRUE(timingRecorder.IsEnabled());
+        EXPECT_TRUE(timingRecorder.IsFullEnabled());
+        EXPECT_EQ(timingRecorder.IsLogEnabled(), level[0] == '4');
+
         EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ENTRY));
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ARGS_PARSED));
+        EXPECT_EQ(timingRecorder.Size(), 2U);
+        EXPECT_EQ(g_clockCallCount, 2U);
+
+        EXPECT_TRUE(timingRecorder.AddMetric(Recorder::Metric::PARAM_FORMAT, 20U));
+        Recorder::MetricStats stats{};
+        EXPECT_TRUE(timingRecorder.GetMetric(Recorder::Metric::PARAM_FORMAT, stats));
+        EXPECT_EQ(stats.totalNs, 20U);
+
+        EXPECT_TRUE(timingRecorder.IncrementCounter(Recorder::Counter::PREPARE, 2U));
+        uint64_t counter = 0U;
+        EXPECT_TRUE(timingRecorder.GetCounter(Recorder::Counter::PREPARE, counter));
+        EXPECT_EQ(counter, 2U);
+
         timingRecorder.Report("complete");
         EXPECT_TRUE(timingRecorder.IsReported());
-        EXPECT_GT(AicpuTimingRecorderTestLogCount(), 0U);
+        if (level[0] == '3') {
+            EXPECT_EQ(AicpuTimingRecorderTestLogCount(), 0U);
+        } else {
+            EXPECT_GT(AicpuTimingRecorderTestLogCount(), 0U);
+        }
     }
 }
 } // namespace

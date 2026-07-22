@@ -343,7 +343,9 @@ HcclResult PrepareProcess(
         uint64_t bookkeepingBeginNs = 0U;
         if (timingRecorder != nullptr) {
             const uint64_t expandEndNs = timingRecorder->Now();
-            bookkeepingBeginNs = expandEndNs;
+            if (timingRecorder->IsFullEnabled()) {
+                bookkeepingBeginNs = expandEndNs;
+            }
             (void)timingRecorder->RecordAt(TimingStage::FIRST_PREPARE_EXPAND_END, expandEndNs);
             (void)timingRecorder->RecordAt(
                 TimingStage::LAST_PREPARE_EXPAND_END, expandEndNs, TimingPolicy::KEEP_LATEST);
@@ -354,7 +356,7 @@ HcclResult PrepareProcess(
         server.msgPos = (server.msgPos + 1U) % HCCL_MSG_CNT;
         ++expectSeqNum;
         server.retryCnt = 0;
-        if (timingRecorder != nullptr) {
+        if (timingRecorder != nullptr && timingRecorder->IsFullEnabled()) {
             const uint64_t bookkeepingEndNs = timingRecorder->Now();
             if (bookkeepingEndNs >= bookkeepingBeginNs) {
                 (void)timingRecorder->AddMetric(
@@ -476,5 +478,5 @@ u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum) { return RunDispatcher(args
 
 u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum, Hccl::AicpuTimingRecorder& timingRecorder)
 {
-    return RunDispatcher(args, ctxNum, &timingRecorder);
+    return RunDispatcher(args, ctxNum, timingRecorder.IsEnabled() ? &timingRecorder : nullptr);
 }

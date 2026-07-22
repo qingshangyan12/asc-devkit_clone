@@ -69,6 +69,14 @@ public:
         KEEP_LATEST,
     };
 
+    enum class Level : uint8_t {
+        DISABLED = 0,
+        BASIC_TIMING,
+        BASIC_TIMING_WITH_LOG,
+        FULL_TIMING,
+        FULL_TIMING_WITH_LOG,
+    };
+
     using Clock = uint64_t (*)();
 
     struct MetricStats {
@@ -89,6 +97,9 @@ public:
     AicpuTimingRecorder& operator=(AicpuTimingRecorder&&) = delete;
 
     uint64_t Now() const;
+    bool IsEnabled() const;
+    bool IsFullEnabled() const;
+    bool IsLogEnabled() const;
     bool Record(Stage stage, RecordPolicy policy = RecordPolicy::KEEP_FIRST);
     bool RecordAt(Stage stage, uint64_t timestampNs, RecordPolicy policy = RecordPolicy::KEEP_FIRST);
     bool AddMetric(Metric metric, uint64_t elapsedNs);
@@ -116,12 +127,15 @@ private:
     static std::size_t StageIndex(Stage stage);
     static std::size_t MetricIndex(Metric metric);
     static std::size_t CounterIndex(Counter counter);
+    bool IsStageEnabled(Stage stage) const;
+    bool IsMetricEnabled(Metric metric) const;
     static const char* StageName(Stage stage);
     static const char* MetricName(Metric metric);
     static const char* CounterName(Counter counter);
 
     const char* scenario_;
     Clock clock_;
+    Level level_{Level::DISABLED};
     std::array<TimePoint, STAGE_COUNT> points_{};
     std::array<MetricStats, METRIC_COUNT> metrics_{};
     std::array<uint64_t, COUNTER_COUNT> counters_{};
