@@ -28,6 +28,7 @@ class Stream;
 } // namespace hccl
 class CollCommAicpuMgr;
 class CollCommAicpu;
+struct HcclDfxOpInfo;
 
 enum class ServerExecResourceType { LEGACY, NEXT_AICPU };
 
@@ -79,12 +80,20 @@ public:
         std::vector<uint8_t>& runParam);
     const ServerExecCtx* MatchExecCtx(u64 opParamKey) const;
 
+    void ReportProfilingKernelStart(const ServerExecCtx& execCtx);
+    void ReportProfilingKernelEnd(const ServerExecCtx& execCtx, const HcclApi::HcclMsg& msg);
+    void RegisterDfxOpInfo(const ServerExecCtx& execCtx, const HcclApi::HcclMsg& msg, u64 beginTime, u64 endTime);
+    static bool IsProfilingEnabled();
+
 private:
 #ifdef CCL_LLT
     static constexpr u64 KFC_NSEC_PER_SEC = 1000000UL;
 #else
     static constexpr u64 KFC_NSEC_PER_SEC = 1000000000UL;
 #endif
+    void FillDfxOpInfoFromMsg(HcclDfxOpInfo& dfxOpInfo, const HcclApi::HcclMsg& msg, u64 beginTime, u64 endTime) const;
+    void FillDfxOpInfoFromBaseParam(HcclDfxOpInfo& dfxOpInfo, const ServerExecCtx& execCtx) const;
+    void RunDfxOpInfoInit(const HcclDfxOpInfo& dfxOpInfo, const ServerExecCtx& execCtx) const;
     HcclResult GetServerInfoForSync(HcclHandle handle, u32& msgPos, u32& repeat) const;
     void DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const;
     void UpdateProgress(
@@ -107,6 +116,7 @@ private:
     u32 groupIdx_;
     u32 rankNum_{0U};
     ServerProgress lastProgress_{};
+    u64 profOpBeginTime_{0UL}; // 与 HcclLaunchAicpuKernel 对齐：算子起始时刻，start 采集、end 上报
 };
 
 #endif // HCCL_COMM_KFC_AICPU_SERVER_H
