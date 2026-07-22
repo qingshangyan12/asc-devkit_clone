@@ -30,6 +30,8 @@
 
 extern void run_hcomm_urma_timeout_fault(CommContext *ctx, aclrtStream stream);
 extern void run_hcomm_cqe_error_fault(CommContext *ctx, aclrtStream stream);
+extern "C" void HcommUrmaTimeoutFaultKernel(CommContext *ctx);
+extern "C" void HcommCqeErrorFaultKernel(CommContext *ctx);
 
 namespace {
 using HcommChannelInfoDumpFunc = void (*)(uint32_t, ChannelHandle *);
@@ -82,6 +84,11 @@ std::mutex g_exceptionMutex;
 std::atomic<bool> g_exceptionPending{false};
 std::atomic<uint64_t> g_exceptionCount{0};
 ExceptionSummary g_lastException;
+
+using AclrtGetFuncBySymbolFunc = aclError (*)(const void *, aclrtFuncHandle *);
+using AclrtFunctionGetBinaryFunc = aclError (*)(aclrtFuncHandle, aclrtBinHandle *);
+using AclrtExceptionInfoCallbackFunc = void (*)(aclrtExceptionInfo *);
+using AclrtBinarySetExceptionCallbackFunc = aclError (*)(aclrtBinHandle, AclrtExceptionInfoCallbackFunc, void *);
 
 #define ACL_CHECK(expr)                                                                                  \
     do {                                                                                                 \
@@ -192,6 +199,76 @@ void CustomCallback(aclrtExceptionInfo *exceptionInfo)
         summary.devArgs,
         summary.devArgsLen);
     std::fflush(stdout);
+}
+
+template <typename T>
+T ResolveAclRtSymbol(const char *symbol)
+{
+    dlerror();
+    void *func = dlsym(RTLD_DEFAULT, symbol);
+    const char *error = dlerror();
+    if (error != nullptr || func == nullptr) {
+        std::printf("[hcomm_fault_runner] optional runtime symbol %s unavailable: %s\n",
+            symbol, error == nullptr ? "null" : error);
+        std::fflush(stdout);
+        return nullptr;
+    }
+    return reinterpret_cast<T>(func);
+}
+
+bool BindOneKernelExceptionArgs(const char *kernelName, const void *kernelSymbol, CommContext *devContext,
+    AclrtGetFuncBySymbolFunc getFuncBySymbol, AclrtFunctionGetBinaryFunc functionGetBinary,
+    AclrtBinarySetExceptionCallbackFunc binarySetExceptionCallback)
+{
+    aclrtFuncHandle funcHandle = nullptr;
+    aclrtBinHandle binHandle = nullptr;
+    aclError ret = getFuncBySymbol(kernelSymbol, &funcHandle);
+    if (ret != ACL_SUCCESS || funcHandle == nullptr) {
+        std::printf("[hcomm_fault_runner] aclrtGetFuncBySymbol %s failed, ret=%d func=%p\n",
+            kernelName, ret, reinterpret_cast<void *>(funcHandle));
+        std::fflush(stdout);
+        return false;
+    }
+
+    ret = functionGetBinary(funcHandle, &binHandle);
+    if (ret != ACL_SUCCESS || binHandle == nullptr) {
+        std::printf("[hcomm_fault_runner] aclrtFunctionGetBinary %s failed, ret=%d bin=%p\n",
+            kernelName, ret, reinterpret_cast<void *>(binHandle));
+        std::fflush(stdout);
+        return false;
+    }
+
+    ret = binarySetExceptionCallback(binHandle, CustomCallback, devContext);
+    if (ret != ACL_SUCCESS) {
+        std::printf("[hcomm_fault_runner] aclrtBinarySetExceptionCallback %s failed, ret=%d devContext=%p\n",
+            kernelName, ret, devContext);
+        std::fflush(stdout);
+        return false;
+    }
+
+    std::printf("[hcomm_fault_runner] exception args bound for %s devContext=%p\n", kernelName, devContext);
+    std::fflush(stdout);
+    return true;
+}
+
+void TryBindFaultKernelExceptionArgs(CommContext *devContext)
+{
+    auto getFuncBySymbol = ResolveAclRtSymbol<AclrtGetFuncBySymbolFunc>("aclrtGetFuncBySymbol");
+    auto functionGetBinary = ResolveAclRtSymbol<AclrtFunctionGetBinaryFunc>("aclrtFunctionGetBinary");
+    auto binarySetExceptionCallback =
+        ResolveAclRtSymbol<AclrtBinarySetExceptionCallbackFunc>("aclrtBinarySetExceptionCallback");
+    if (getFuncBySymbol == nullptr || functionGetBinary == nullptr || binarySetExceptionCallback == nullptr) {
+        std::printf("[hcomm_fault_runner] skip binary exception args binding; runtime binding API unavailable\n");
+        std::fflush(stdout);
+        return;
+    }
+
+    (void)BindOneKernelExceptionArgs("HcommUrmaTimeoutFaultKernel",
+        reinterpret_cast<const void *>(HcommUrmaTimeoutFaultKernel), devContext, getFuncBySymbol, functionGetBinary,
+        binarySetExceptionCallback);
+    (void)BindOneKernelExceptionArgs("HcommCqeErrorFaultKernel",
+        reinterpret_cast<const void *>(HcommCqeErrorFaultKernel), devContext, getFuncBySymbol, functionGetBinary,
+        binarySetExceptionCallback);
 }
 
 bool TakePendingException(ExceptionSummary &summary, uint64_t &count)
@@ -453,6 +530,9 @@ int RunRank(RankContext *ctx)
     }
     ACL_CHECK(aclrtMalloc(reinterpret_cast<void **>(&devContext), sizeof(CommContext), ACL_MEM_MALLOC_HUGE_ONLY));
     ACL_CHECK(aclrtMemcpy(devContext, sizeof(CommContext), &hostCtx, sizeof(hostCtx), ACL_MEMCPY_HOST_TO_DEVICE));
+    if (rank == 0) {
+        TryBindFaultKernelExceptionArgs(devContext);
+    }
 
     ctx->barrier->Wait();
     if (rank == 0) {
