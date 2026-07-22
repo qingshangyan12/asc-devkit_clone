@@ -566,14 +566,14 @@
 | --- | --- |
 | [Async](工具接口/执行模式/Async.md) | Async通过模板函数的方式对这种隔离模式进行了封装，提供了一个统一的接口，用于在不同执行单元（AIC或AIV）下执行特定函数，从而避免在代码中使用硬件条件分支。 |
 | [InitSocState](工具接口/系统初始化/InitSocState.md) | 本接口对AI Core的全局状态进行初始化，包括AIC（Cube Core）与AIV（Vector Core）的公共状态及各自特有状态。由于不同产品的实现存在差异，实际执行的初始化项也有所不同。 |
-| [Max](工具接口/NumericLimits工具类/Max.md) | 返回指定数据类型的最大有限值。 |
-| [Lowest](工具接口/NumericLimits工具类/Lowest.md) | 返回指定数据类型的最低有限值，即满足无其他有限值y符合y < x的有限值x。 |
-| [Min](工具接口/NumericLimits工具类/Min.md) | 返回指定数据类型的最小有限值。 |
-| [Infinity](工具接口/NumericLimits工具类/Infinity.md) | 返回指定数据类型的正无穷大值。 |
-| [NegativeInfinity](工具接口/NumericLimits工具类/NegativeInfinity.md) | 返回指定数据类型的负无穷大值。 |
-| [QuietNaN](工具接口/NumericLimits工具类/QuietNaN.md) | 返回指定数据类型的安静NaN值（浮点尾数最高位为1）。 |
-| [SignalingNaN](工具接口/NumericLimits工具类/SignalingNaN.md) | 返回指定数据类型的发信NaN值（浮点尾数最高位为0）。 |
-| [DeNormMin](工具接口/NumericLimits工具类/DeNormMin.md) | 返回指定数据类型的最小正的非正规值。 |
+| [Max](工具接口/数值边界/Max.md) | 返回指定数据类型的最大有限值。 |
+| [Lowest](工具接口/数值边界/Lowest.md) | 返回指定数据类型的最低有限值，即满足无其他有限值y符合y < x的有限值x。 |
+| [Min](工具接口/数值边界/Min.md) | 返回指定数据类型的最小有限值。 |
+| [Infinity](工具接口/数值边界/Infinity.md) | 返回指定数据类型的正无穷大值。 |
+| [NegativeInfinity](工具接口/数值边界/NegativeInfinity.md) | 返回指定数据类型的负无穷大值。 |
+| [QuietNaN](工具接口/数值边界/QuietNaN.md) | 返回指定数据类型的安静NaN值（浮点尾数最高位为1）。 |
+| [SignalingNaN](工具接口/数值边界/SignalingNaN.md) | 返回指定数据类型的发信NaN值（浮点尾数最高位为0）。 |
+| [DeNormMin](工具接口/数值边界/DeNormMin.md) | 返回指定数据类型的最小正的非正规值。 |
 | [GetTaskRatio](工具接口/系统资源与变量/GetTaskRatio.md) | 分离模式下，获取任务启动的Cube Core（AIC）或者Vector Core（AIV）的数量与逻辑AI Core数量的比例。 |
 | [GetUBSizeInBytes](工具接口/系统资源与变量/GetUBSizeInBytes.md) | 获取UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。 |
 | [GetRuntimeUBSize](工具接口/系统资源与变量/GetRuntimeUBSize.md) | 获取运行时UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。 |
