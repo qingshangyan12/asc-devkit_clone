@@ -25,7 +25,7 @@ void GetWelfordUpdateMaxMinTmpSize(const AscendC::TensorShape& srcShape, const u
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入的shape信息{rnLength, abLength}。其中rnLength、abLength与[WelfordUpdate](WelfordUpdate.md)接口含义一致。 |
+| srcShape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。输入的shape信息{rnLength, abLength}。其中rnLength、abLength与[WelfordUpdate](WelfordUpdate.md)接口含义一致。 |
 | typeSizeT | 输入 | 输入(inputX)的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | typeSizeU | 输入 | 均值、方差(outputMean、outputVariance、inputMean、inputVariance)的数据类型大小，单位为字节。比如输入的数据类型为float，此处应传入4。 |
 | isReuseSource | 输入 | 是否允许修改源操作数。与[WelfordUpdate](WelfordUpdate.md)接口一致。 |

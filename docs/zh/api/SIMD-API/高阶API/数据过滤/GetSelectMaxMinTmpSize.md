@@ -48,10 +48,10 @@ kernel侧Select接口的计算需要开发者申请临时空间，本接口用�
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src0Shape | 输入 | 输入src0的shape信息。src0为scalar时，shape应为{1}。 |
-| src1Shape | 输入 | 输入src1的shape信息。src1为scalar时，shape应为{1}。 |
+| src0Shape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。输入src0的shape信息。src0为scalar时，shape应为{1}。 |
+| src1Shape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。输入src1的shape信息。src1为scalar时，shape应为{1}。 |
 | srcTypeSize | 输入 | 输入srcTensor的数据类型大小，比如数据类型为half，此处应传入2。 |
-| maskShape | 输入 | 输入maskTensor的shape信息。 |
+| maskShape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。输入maskTensor的shape信息。 |
 | maskTypeSize | 输入 | 输入maskTensor的数据类型大小，比如数据类型为bool，此处应传入1。 |
 | isReuseMask | 输入 | 是否复用maskTensor输入的空间。与kernel侧保持一致。 |
 | maxValue | 输出 | Select接口能完成计算所需最大临时空间大小。<br> 说明：maxValue仅作为参考值，有可能大于Unified Buffer剩余空间的大小，该场景下，开发者需要根据Unified Buffer剩余空间的大小来选取合适的临时空间大小。 |

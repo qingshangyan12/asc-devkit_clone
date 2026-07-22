@@ -35,7 +35,7 @@
 
 | 参数名  | 输入/输出 | 功能 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入srcTensor的shape信息。 |
+| srcShape | 输入 | 参数类型为[AscendC::TensorShape](../../数据结构/TensorShape.md)。输入srcTensor的shape信息。 |
 | dataTypeSize | 输入 | 参与计算的max和sum的数据类型，比如half=2。 |
 | isReuseSource | 输入 | 与kernel侧接口配置保持一致。 |
 
@@ -43,7 +43,7 @@
 
 | 参数名  | 输入/输出 | 功能 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入srcTensor的shape信息。 |
+| srcShape | 输入 | 参数类型为[AscendC::TensorShape](../../数据结构/TensorShape.md)。输入srcTensor的shape信息。 |
 | dataTypeSize | 输入 | 参与计算的max和sum的数据类型，比如half=2。 |
 | localWorkSpaceSize | 输入 | 剩余的可供SoftMax接口计算的空间大小，单位为Byte。localWorkSpaceSize的取值必须大于GetSoftMaxMinTmpSize接口返回的计算所需的最小临时空间大小。 |
 | softmaxTiling | 输出 | 输出SoftMax接口所需的tiling信息，支持optiling::SoftMaxTiling形式入参和AscendC::tiling::SoftMaxTiling形式入参。 |

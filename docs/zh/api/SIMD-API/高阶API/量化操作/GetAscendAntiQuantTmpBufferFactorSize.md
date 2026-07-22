@@ -32,11 +32,11 @@ void GetAscendAntiQuantTmpBufferFactorSize(const AscendC::TensorShape& srcShape,
 
 | 参数名 | 输入/输出 | 功能 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入srcTensor的shape信息。 |
-| scaleShape | 输入 | 输入scale的shape信息。 |
+| srcShape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。输入srcTensor的shape信息。 |
+| scaleShape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。输入scale的shape信息。 |
 | isTranspose | 输入 | 是否转置。 |
-| inputDataType | 输入 | 输入数据类型。AscendC::TensorDataType类型。 |
-| outputDataType | 输入 | 输出数据类型。AscendC::TensorDataType类型。 |
+| inputDataType | 输入 | 输入数据类型。[AscendC::TensorDataType](../数据结构/TensorDataType.md)类型。 |
+| outputDataType | 输入 | 输出数据类型。[AscendC::TensorDataType](../数据结构/TensorDataType.md)类型。 |
 | maxLiveNodeCount | 输出 | 最大存活节点数，表示临时空间是单次计算数据量所占空间的多少倍。 |
 | extraBuf | 输出 | 使用的额外临时空间大小，单位为字节。 |
 

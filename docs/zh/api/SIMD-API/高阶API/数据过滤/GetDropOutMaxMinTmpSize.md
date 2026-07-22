@@ -24,7 +24,7 @@ void GetDropOutMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入的shape信息。 |
+| srcShape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。输入的shape信息。 |
 | typeSize | 输入 | 计算的数据类型大小，half=2，float=4。 |
 | isReuseSource | 输入 | 预留参数，暂未启用，保持默认值false即可。 |
 | maxValue | 输出 | 输出DropOut接口所需的tiling信息（最大临时空间大小）。<br> 说明：maxValue仅作为参考值，有可能大于Unified Buffer剩余空间的大小，该场景下，开发者需要根据Unified Buffer剩余空间的大小来选取合适的临时空间大小。 |

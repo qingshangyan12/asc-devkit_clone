@@ -19,8 +19,8 @@ void GetReduceProdMaxMinTmpSize(const AscendC::TensorShape& srcShape, const Asce
 
 | 接口 | 输入/输出 | 功能 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入数据的shape大小，参数取值与ReduceProd接口的srcShape参数保持一致。 |
-| dataType | 输入 | 输入的数据类型，AscendC::TensorDataType类型，当前支持的数据类型与ReduceProd接口的模板参数T保持一致。 |
+| srcShape | 输入 | 参数类型为[AscendC::TensorShape](../../数据结构/TensorShape.md)。输入数据的shape大小，参数取值与ReduceProd接口的srcShape参数保持一致。 |
+| dataType | 输入 | 输入的数据类型，[AscendC::TensorDataType](../../数据结构/TensorDataType.md)类型，当前支持的数据类型与ReduceProd接口的模板参数T保持一致。 |
 | pattern | 输入 | 用于指定ReduceProd的计算轴。ReducePattern类型，该类型的定义如下代码所示，包括Reduce轴和Normal轴。pattern由与输入向量维度数量相同的A、R字母组合形成，字母A表示Normal轴，R表示Reduce轴。该参数的取值与ReduceProd接口的pattern参数保持一致，当前只支持取值为AscendC::ReducePattern::AR，AscendC::ReducePattern::RA。 |
 | isSrcInnerPad | 输入 | 表示实际需要计算的最内层轴数据是否32Bytes对齐，参数取值与ReduceProd接口的isSrcInnerPad参数保持一致。 |
 | isReuseSource | 输入 | 是否复用源操作数输入的空间，参数取值与ReduceProd接口的isReuseSource参数保持一致。 |

@@ -21,8 +21,8 @@ void GetPowerMaxMinTmpSize(const AscendC::TensorShape& srcShape1, const AscendC:
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| srcShape1 | 输入 | 输入srcTensor1的shape信息。 |
-| srcShape2 | 输入 | 输入srcTensor2的shape信息。 |
+| srcShape1 | 输入 | 参数类型为[AscendC::TensorShape](../../数据结构/TensorShape.md)。输入srcTensor1的shape信息。 |
+| srcShape2 | 输入 | 参数类型为[AscendC::TensorShape](../../数据结构/TensorShape.md)。输入srcTensor2的shape信息。 |
 | typeIsInt | 输入 | bool类型，true表示输入是int32_t。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 是否复用源操作数输入的空间，与Power接口一致。 |

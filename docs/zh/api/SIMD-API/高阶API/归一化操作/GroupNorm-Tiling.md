@@ -70,7 +70,7 @@ void GetGroupNormNDTilingInfo(const AscendC::TensorShape& srcShape, const uint32
 
 | 接口 | 输入/输出 | 功能 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入数据inputX的shape信息[N, C, H, W]。 |
+| srcShape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。输入数据inputX的shape信息[N, C, H, W]。 |
 | typeSize | 输入 | 输入数据inputX的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 中间变量是否能够复用输入内存。 |
 | groupNum | 输入 | 在C维度上的分组数。 |
@@ -81,7 +81,7 @@ void GetGroupNormNDTilingInfo(const AscendC::TensorShape& srcShape, const uint32
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入数据inputX的shape信息[N, C, H, W]。 |
+| srcShape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。输入数据inputX的shape信息[N, C, H, W]。 |
 | stackBufferSize | 输入 | 可供GroupNorm接口使用的空间大小，单位Byte。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 是否可以复用inputX的内存空间。 |

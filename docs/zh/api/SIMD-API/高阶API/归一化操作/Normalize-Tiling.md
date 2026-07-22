@@ -23,7 +23,7 @@ void GetNormalizeMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint3
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| srcShape | 输入 | Normalize输入数据inputX的shape信息{A, R}。 |
+| srcShape | 输入 | 参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。Normalize输入数据inputX的shape信息{A, R}。 |
 | typeSizeU | 输入 | 输入数据gamma, beta的数据类型大小，单位为字节。比如输入的数据类型为float，此处应传入4。 |
 | typeSizeT | 输入 | 输入数据inputX的数据类型大小，单位为字节。比如输入的数据类型为float，此处应传入4。 |
 | isReuseSource | 输入 | 是否复用源操作数的内存空间，与[Normalize](Normalize.md)接口一致。 |
