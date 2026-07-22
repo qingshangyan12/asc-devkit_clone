@@ -28,11 +28,17 @@
 
 头文件路径：`"basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"`。
 
-该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求差操作，将结果写入目的操作数dstReg，计算公式如下：
+该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求差操作，将结果写入目的操作数dstReg。
+
+计算结果不保留借位计算公式如下：
 
 $$dstReg_i = srcReg0_i - srcReg1_i$$
 
 同时可以在carry（MaskReg寄存器）中标记每次减法是否产生借位，若srcReg0，srcReg1输入按位相减最高位有借位，在MaskReg carry中对应位置每4bit的最低位写0，否则写1。
+
+计算结果保留借位计算公式如下：
+
+$$\{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, ~srcReg1_i\} + 33'b1$$
 
 ![](../../../../figures/reg_sub.png)
 
