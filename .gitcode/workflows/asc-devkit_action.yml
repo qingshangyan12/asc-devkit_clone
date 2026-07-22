@@ -13,6 +13,7 @@ env:
   org_name: "opencann"
   MERGE_ID: ${{atomgit.event.pull_request.number}}
   obs_path: "test/asc-devkit/package/${{ env.MERGE_ID }}"
+  obs_smoke_path: "${{ env.obs_path }}/presmoke/2"
   repo_name: "asc-devkit"
   TARGET_BRANCH: ${{atomgit.ref_name}}
   SOURCE_BRANCH: ${{atomgit.head_ref}}
