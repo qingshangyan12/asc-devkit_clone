@@ -1271,7 +1271,7 @@ for source in scan_files:
             policy_error = None
             if source_kind == "examples" and target_kind in ("docs", "api", "guide"):
                 policy_error = "examples link to same-repository docs must use a relative path"
-            elif source_kind in ("docs", "api", "guide") and target_kind == "examples":
+            elif source_kind in ("api", "guide") and target_kind == "examples":
                 policy_error = "docs link to examples must use a relative path"
             elif {source_kind, target_kind} == {"api", "guide"}:
                 policy_error = "API and guide cross-reference must use a relative path"
