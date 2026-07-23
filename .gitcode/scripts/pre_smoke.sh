@@ -41,22 +41,20 @@ log "start run test case, please wait ..."
 
 for op in "${ops[@]}"; do
   echo "Processing: $op"
+  mode="eager"
+  [ "$op" = "crop_and_resize" ] && mode="graph"
   source /usr/local/Ascend/cann/set_env.sh
 
-  cd ./scripts && bash devkit_dir_check.sh 2>&1 | tee -a ./run_test.log
   cd ${WORKSPACE}
-  arm_package='cann-asc-devkit_linux-aarch64.run'
-  obs_base="https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${obs_path}/${arm_package}"
-  echo ${obs_base}
-  if [ -n "${obs_base}" ]; then
-    wget -nv -O ${arm_package} "${arm_run_url}" 2>/dev/null
-  else
-    wget -nv -O  ${obs_base} 2>/dev/null
-  fi
+  arm_package="cann-asc-devkit_linux-aarch64.run"
+  (cd ./scripts && bash devkit_dir_check.sh 2>&1 | tee -a ./run_test.log)
+
+  wget -nv -O "${arm_package}" \
+    "https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${obs_path}/${arm_package}" 2>/dev/null
 
   if [ ! -f "${arm_package}" ] || [ ! -s "${arm_package}" ]; then
     echo "No custom package found, This PR no need excute smoke."
-    rm -f ${arm_package}
+    rm -f "${arm_package}"
     exit 0
   fi
 
