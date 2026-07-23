@@ -39,6 +39,14 @@ def get_specified_suffix_file(root_dir, suffix):
     return sorted(all_suffix_files)
 
 
+def is_static_compile_manifest(json_file):
+    manifest_dir = os.path.dirname(os.path.normpath(json_file))
+    return (
+        os.path.basename(json_file) == "manifest.json"
+        and os.path.basename(os.path.dirname(manifest_dir)) == "static_compile"
+    )
+
+
 def add_dict_key(dict_to_add, key, value):
     if value is None:
         return
@@ -298,7 +306,11 @@ def gen_all_config(
         flag = check_single_op_is_void(root_dir, skip_error)
         if flag is False:
             return flag
-    all_json_files = get_specified_suffix_file(root_dir, ".json")
+    all_json_files = [
+        json_file
+        for json_file in get_specified_suffix_file(root_dir, ".json")
+        if not is_static_compile_manifest(json_file)
+    ]
     relocatable_json_files = get_specified_suffix_file(root_dir, "_relocatable.json")
     normal_json_files = list(set(all_json_files) - set(relocatable_json_files))
     os.makedirs(out_dir, exist_ok=True)
