@@ -869,19 +869,7 @@ DataCopy的使用说明中给出了DataCopyParams结构体参数的配置图示�
 
 ## 9 调用示例规范
 
-### API-EXAMPLE-00 样例代码须增加注释说明
-
-【级别】建议
-
-【描述】样例代码中的输入参数、关键接口、复杂逻辑代码须增加注释说明，描述配置原因。示例代码须与功能描述或性能优化手段相匹配。
-
-### API-EXAMPLE-01 样例代码须符合编码规范和接口约束
-
-【级别】强制
-
-【描述】样例代码须符合编码规范和接口约束（例如TQue不允许申请VECCALC空间、SetFixpipe的参数dstNdStride不能为0）。调用示例的顺序须与函数原型的顺序保持一致。调用示例中调用接口的参数个数、类型、顺序须准确，与函数原型保持一致。调用示例不应包含未对外公开的接口，如pipe_barrier、ffts_cross_core_sync、wait_flag_dev、set_flag_dev。不应与算子开发方式（Kernel直调开发方式和工程化开发方式）强相关，只能在某一种开发方式下使用的API属于例外场景。除静态Tensor中为保证结果正确需要手动添加PIPE_ALL外，其他场景下须根据流水具体情况插入合适的同步，不能无脑插入PIPE_ALL，否则缺失资料指导意义。样例中不应出现using namespace AscendC、\_\_CCE\_AICORE\_\_ == 300 || defined(\_\_DAV\_M310\_\_)等不规范用法。
-
-### API-EXAMPLE-02 须通过codetype cpp格式呈现关键代码片段
+### API-EXAMPLE-00 须通过codetype cpp格式呈现关键代码片段
 
 【级别】建议
 
@@ -905,7 +893,7 @@ AscendC::Cos(dstLocal, srcLocal, sharedTmpBuffer, 512);
 输出数据(dstLocal): [0.8753044 0.98267525 ... 0.7430419 0.6633976]
 ```
 
-### API-EXAMPLE-03 调用示例配套了完整样例的，需要在调用示例章节增加到完整样例的链接。
+### API-EXAMPLE-01 调用示例配套了完整样例的，需要在调用示例章节增加到完整样例的链接。
 
 【级别】建议
 
@@ -930,6 +918,36 @@ AscendC::Cos(dstLocal, srcLocal, sharedTmpBuffer, 512);
     uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
     ```
+
+### API-EXAMPLE-02 样例代码须增加注释说明
+
+【级别】建议
+
+【描述】样例代码中的输入参数、关键接口、复杂逻辑代码须增加注释说明，描述配置原因。示例代码须与功能描述或性能优化手段相匹配。
+
+### API-EXAMPLE-03 样例代码须符合编码规范和接口约束
+
+【级别】强制
+
+【描述】样例代码须符合编码规范和接口约束。调用示例的顺序须与函数原型的顺序保持一致，调用接口的参数个数、类型、顺序须准确，与函数原型保持一致。
+
+### API-EXAMPLE-04 调用示例不应包含未对外公开的接口
+
+【级别】强制
+
+【描述】调用示例不应包含未对外公开的接口。
+
+### API-EXAMPLE-05 调用示例不应与特定算子开发方式强相关
+
+【级别】强制
+
+【描述】调用示例不应与算子开发方式（Kernel直调开发方式和工程化开发方式）强相关，只能在某一种开发方式下使用的API属于例外场景。
+
+### API-EXAMPLE-06 样例代码须使用规范的命名空间和宏定义
+
+【级别】强制
+
+【描述】样例代码中不应出现`using namespace AscendC`、`__CCE_AICORE__ == 300 || defined(__DAV_M310__)`等不规范用法。
 
 ## 10 业务规范
 
@@ -1115,10 +1133,10 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 | 2 | 标点符号 | 标点符号须完整、准确，避免括号未闭合、标点缺失或多余的情况。 |
 | 3 | 标点符号 | 中英文混排时，英文单词前后不加空格。 |
 | 4 | 数据类型 | 文档中的数据类型写法须与代码中的数据类型写法保持一致。数据类型的写作顺序须保持一致（原则：位宽从小到大、有符号数→无符号数→浮点数、浮点数按指数位大小排序）：bool、int4b_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。接口支持的数据类型只与位宽有关时，可通过位宽表达：b8、b16、b32、b64。 |
-| 5 | 术语 | 须使用统一的概念术语，如L1 Buffer、L0A Buffer、AI Core等。术语表参考：[LINK](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900/programug/Ascendcopdevg/atlas_ascendc_10_00013.html)。 |
-| 6 | 预览格式 | 预览后须检查缩进、换行是否正确，避免出现文字与代码/表格连在同一行等问题。 |
+| 5 | 术语 | 须使用统一的概念术语，如L1 Buffer、L0A Buffer、AI Core等。术语表参考：[LINK](./guide/技术附录/概念原理和术语/术语表.md)。 |
+| 6 | 预览格式 | 预览后须检查缩进、换行是否正确，避免出现文字与代码/表格/图片连在同一行等问题。 |
 | 7 | 语句逻辑 | 语句须通顺、逻辑清晰，避免出现语病或语义歧义。例如，"本节主要描述不同数据类型之间精度转换时的舍入行为"不应写成"本节主要描述不同数据类型之间精度转换时的舍入行为进行介绍"。 |
-| 8 | 链接引用 | 链接引用规则：编程指南引用编程指南须使用相对路径；API引用API须使用相对路径；编程指南与API之间相互引用须使用https绝对路径；引用样例仓须使用https绝对路径。 |
+| 8 | 链接引用 | 链接引用规则：同一个代码仓内编程指南和API、example样例之间的链接均使用相对链接。 |
 | 9 | 列表 | 当只有一个条目时，不应使用无序列表符号，直接以正文形式呈现。 |
 
 
