@@ -66,7 +66,7 @@ GM地址上做原子操作前的数据。
 
 ## 约束说明<a name="section24727811123"></a>
 
-- 在[满足使用约束](../同步控制/核内同步/关键特性说明.md#使用约束-1)的前提下，毕昇编译器能够自动在PIPE_MTE2与PIPE_S、PIPE_MTE3与PIPE_S之间插入同步（详见[开启cce-auto-sync，支持的同步类型](../同步控制/核内同步/关键特性说明.md#支持的同步类型-1)）。但AtomicAdd属于PIPE_S接口，若读写GM时与搬运流水（PIPE_MTE2、PIPE_MTE3）之间存在数据依赖，毕昇编译器无法自动插入同步，开发者需根据实际情况手动插入同步。
+- 在[满足使用约束](../同步控制/核内同步/关键特性说明.md#使用约束-1)的前提下，毕昇编译器通常能够自动在PIPE_MTE2与PIPE_S、PIPE_MTE3与PIPE_S之间插入同步（详见[开启cce-auto-sync，支持的同步类型](../同步控制/核内同步/关键特性说明.md#支持的同步类型-1)）。但AtomicAdd属于例外情况：该接口虽归属PIPE_S，若读写GM时与搬运流水（PIPE_MTE2、PIPE_MTE3）之间存在数据依赖，毕昇编译器仍无法自动插入同步，开发者需根据实际情况手动插入同步。
 - Scalar原子操作会绕过DCache，需要调用[DataCacheCleanAndInvalid](../缓存控制/DataCacheCleanAndInvalid.md)接口确保GM与DCache的一致性。
 
 ## 调用示例<a name="section191505489122"></a>
