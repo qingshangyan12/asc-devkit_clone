@@ -754,6 +754,85 @@ struct LoadImageToLocalParams {
     uint8_t sid = 0;
 };
 
+enum class WaippOutputDataType : uint8_t {
+    UINT16 = 0,
+    UINT12 = 2,
+    UINT8 = 3,
+    FP16 = 6,
+    BYPASS = 7,
+    UINT12_MSB4_ZERO = 8,
+    UINT12_LSB4_ZERO = 9,
+    UINT10 = 10,
+    UINT10_MSB4_ZERO = 11,
+    UINT10_LSB4_ZERO = 12
+};
+
+enum class WaippChannelTransformMode : uint8_t {
+    CHANNEL_16_TURN_3 = 0,
+    CHANNEL_4_TURN_1 = 1,
+    CHANNEL_16_TURN_4 = 2,
+    BYPASS = 3,
+    CHANNEL_4_TO_3 = 4,
+    CHANNEL_2_TO_1 = 5,
+    CHANNEL_16_TURN_1 = 6,
+    CHANNEL_16_TO_3 = 7,
+    CHANNEL_16_TO_4_TURN_1 = 8,
+    CHANNEL_16_TO_4_DISCARD_12 = 9,
+    DTS_5CH_PACKED_4x4 = 16,
+    DTS_YUV400_2x2 = 17,
+    DTS_YUV400_4x4 = 18,
+    DTS_YUV400_6x6 = 19,
+    DTS_YUV420_2x2 = 21,
+    DTS_YUV420_4x4 = 22,
+    DTS_YUV420_5x6 = 23,
+    DTS_YUV444_2x2 = 25,
+    DTS_YUV444_4x4 = 26,
+    DTS_YUV444_5x6 = 27,
+    DTS_RGB888_2x2 = 29,
+    DTS_RGB888_4x4 = 30,
+    DTS_RGB888_6x6 = 31
+};
+
+struct WaippDataTypeConvParams {
+    __aicore__ WaippDataTypeConvParams() {}
+
+    __aicore__ WaippDataTypeConvParams(
+        const uint16_t dstGainIn, const uint32_t dstOffsetIn, const uint8 roundingModeIn)
+        : dstGain(dstGainIn),
+          dstOffset(dstOffsetIn),
+          roundingMode(roundingModeIn)
+    {}
+    uint16_t dtcGain = 256;
+    uint32_t dtcOffset = 0;
+    uint8_t roundingMode = 0;
+};
+
+struct StoreImageToGlobalParams {
+    __aicore__ StoreImageToGlobalParams() {}
+
+    __aicore__ StoreImageToGlobalParams(
+        const WaippOutputDataType outputDataTypeIn, const WaippChannelTransformMode channelTransformModeIn, 
+        const WaippDataTypeConvParams dtcParamsIn, const uint32_t dstImageWidthIn, const uint16_t dstImageHeaghtIn, 
+        const uint16_t srcImageStrideIn, const uint16_t dstImageSrideIn, const uint8_t sidIn)
+        : outputDataType(outputDataTypeIn),
+          channelTransformMode(channelTransformModeIn),
+          dtcParams(dtcParamsIn),
+          dstImageWidth(dstImageWidthIn),
+          dstImageHeaght(dstImageHeaghtIn),
+          srcImageStride(srcImageStrideIn),
+          dstImageSride(dstImageSrideIn),
+          sid(sidIn)
+    {}
+    WaippOutputDataType outputDataType = WaippOutputDataType::UINT8;
+    WaippChannelTransformMode channelTransformMode = WaippChannelTransformMode:BYPASS;
+    WaippDataTypeConvParams dtcParams;
+    uint32_t dstImageWidth = 0;
+    uint32_t dstImageHeaght = 0;
+    uint32_t srcImageStride = 0;
+    uint32_t dstImageStride = 0
+    uint8_t sid = 0;
+};
+
 struct CheckLocalMemoryIAParam {
     __aicore__ CheckLocalMemoryIAParam() {}
 

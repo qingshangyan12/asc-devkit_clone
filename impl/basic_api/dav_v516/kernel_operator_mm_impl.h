@@ -1015,6 +1015,46 @@ __aicore__ inline void ConvFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Sr
     }
 }
 
+
+/* **************************************************************************************************
+ * Aipp/Waipp                                                                                        *
+ * ************************************************************************************************* */
+template <typename T>
+__aicore__ inline void LoadImageToLocalCal(__cbuf__ T* dest,  const LoadImageToLocalParams &params)
+{
+    static_assert((SupportType<T, uint8_t, int8_t, int16_t>()), 
+        "LoadImageToLocal only support uint8_t/int8_t/int16_t on current device")
+    load_image_to_cbuf(dst,
+        static_cast<uint16_t>(params.horizSize - 1),
+        static_cast<uint16_t>(params.vertSize - 1),
+        params.horizStartPos,
+        params.vertStartPos,
+        static_cast<uint16_t>(params.srcHorizSize - 1),
+        params.topPadSize,
+        params.botPadSize,
+        params.leftPadSize,
+        params.rightPadSize,
+        params.sid);
+}
+
+tepmplate <typename T, typename U>
+__aicore__ inline void StoreImageToGlobalCal(__gm__ T *dest,  __cbuf__ U *src, const StoreImageToGlobalParams &params)
+{
+    static_assert((SupportType<T, uint8_t, int16_t>()), 
+        "StoreImageToGlobal only support uint8_t/int16_t on current device")
+    store_l1_to_out_image((__gm__ void *)dst, src,
+        static_cast<uint16_t>(params.dstImageWidth - 1),
+        static_cast<uint8_t>(params.outputDataType),
+        static_cast<uint16_t>(params.dstImageHeight - 1),
+        static_cast<uint8_t>(params.channelTransformMode),
+        static_cast<uint16_t>(params.dstImageStride),
+        static_cast<uint8_t>(params.sid),
+        static_cast<bool>(params.dtcParams.roundingMode),
+        static_cast<uint32_t>(params.dtcParams.dstOffset),
+        static_cast<uint8_t>(params.dtcParams.dtcGain),
+        static_cast<uint16_t>(params.srcImageStride));
+}
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__)
