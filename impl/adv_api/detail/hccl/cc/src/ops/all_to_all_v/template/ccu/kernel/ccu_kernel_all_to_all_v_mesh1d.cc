@@ -76,12 +76,21 @@ static CcuResult PreSync(AlltoAllVMesh1DContext &ctx)
     ccu::Variable tempDst;
 
     uint32_t channelIdx = 0;
+    // 探针：打印 PreSync 决定循环/mask 走向的标量参数（这些是生成期真值，可信）。
+    // 注意：tempDst/output/token/recvOffset 是 ccu::Variable(运行时寄存器)，printf 打不出真值，故不打。
+    HCCL_INFO("[A2AV PreSync] rankSize:%u, rankId:%u, channelCount:%u, "
+                    "OUTPUT_XN_ID:%d, TOKEN_XN_ID:%d, CKE_IDX_0:%d, CKE_IDX_1:%d, allBit:%u",
+                    ctx.rankSize, ctx.rankId, ctx.channelCount,
+                    OUTPUT_XN_ID, TOKEN_XN_ID, CKE_IDX_0, CKE_IDX_1,
+                    (unsigned)((1 << OUTPUT_XN_ID) | (1 << TOKEN_XN_ID)));
     for (uint32_t id = 0; id < ctx.rankSize; id++) {
         if (id == ctx.rankId) {
             continue;
         }
+        // 探针：确认循环实际走到的 id / channelIdx（生成期真值）
+        HCCL_INFO("[A2AV PreSync] loop id:%u, channelIdx:%u", id, channelIdx);
         tempDst = ctx.output[ctx.rankId];
-        // tempDst += ctx.sendRecvInfo[id].recvOffset;
+        tempDst += ctx.sendRecvInfo[id].recvOffset;
         // index = 0，传递 output 信息
         ccu::WriteVariableWithNotify(ctx.channels[channelIdx], tempDst, OUTPUT_XN_ID, CKE_IDX_0, 1 << OUTPUT_XN_ID);
         // index = 1，传递 token 信息

@@ -79,7 +79,14 @@ __aicore__ inline void AssembleHcclMsgExtForCCU(
         reinterpret_cast<uint64_t>(ccuParam.ccuMsgExt), reinterpret_cast<uint64_t>(ccuMsgExt));
     
 
+    // 探针1：确认 rankNum/dataSize/extAddr 与整体入参
+    AscendC::printf("ApiClient AssembleExt IN rankNum:%u, dataSize:%llu, repeatIndex:%u, ccuMsgExt:0x%llx",
+        ccuParam.rankNum, dataSize, ccuParam.repeatIndex, reinterpret_cast<uint64_t>(ccuMsgExt));
     for (uint32_t i = 0U; i < ccuParam.rankNum; ++i) {
+        // 探针2：确认输入源(来自 allToAllVParam_，若这里是垃圾则根因在更上游)
+        AscendC::printf("ApiClient AssembleExt SRC rankIndex:%u, sendCounts:%llu, sdispls:%llu, recvCounts:%llu, rdispls:%llu",
+            i, allToAllVParam->sendCounts[i], allToAllVParam->sdispls[i],
+            allToAllVParam->recvCounts[i], allToAllVParam->rdispls[i]);
         uint64_t sendSize = allToAllVParam->sendCounts[i] * dataSize;
         ccuMsgExt[i].sendSize = sendSize % CCU_MAX_COMM_DATA;
         ccuMsgExt[i].sendOffset = allToAllVParam->sdispls[i] * dataSize + sendSize * ccuParam.repeatIndex;
