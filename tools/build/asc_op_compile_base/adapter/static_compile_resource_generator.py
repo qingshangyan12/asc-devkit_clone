@@ -194,6 +194,27 @@ def normalize_static_program(kind):
         raise ValueError(f"unsupported static command kind: {kind}") from error
 
 
+def _is_uri_component(parts, index):
+    if (
+        index < 2
+        or parts[index - 1] != ":"
+        or not parts[index].startswith("//")
+    ):
+        return False
+    return re.search(
+        r"(?:^|=)[A-Za-z][A-Za-z0-9+.-]*$", parts[index - 2]
+    ) is not None
+
+
+def _contains_compound_absolute_path(value, allow_uri=True):
+    parts = re.split(r"([:,])", value)
+    return any(
+        parts[index].startswith("/")
+        and not (allow_uri and _is_uri_component(parts, index))
+        for index in range(0, len(parts), 2)
+    )
+
+
 def _contains_literal_absolute_path(value):
     if value.startswith(("/", "@/")):
         return True
@@ -204,20 +225,42 @@ def _contains_literal_absolute_path(value):
     if "=/" in value:
         return True
     if value.startswith(("-Wl,", "-Wa,")):
-        return any(field.startswith("/") for field in value.split(",")[1:])
+        fields = value.split(",")
+        for field_index, field in enumerate(fields[1:], 1):
+            path_parts = _split_absolute_path_argument(
+                field, extra_prefixes=("-T", "-R")
+            )
+            if path_parts is not None and path_parts[1].startswith("/"):
+                return True
+            allow_uri = not (
+                fields[field_index - 1] in {"-rpath", "-R"}
+                or field.startswith(("-rpath=", "-R"))
+            )
+            if _contains_compound_absolute_path(field, allow_uri=allow_uri):
+                return True
+        return False
+    equals_index = value.find("=")
+    if equals_index >= 0:
+        return _contains_compound_absolute_path(value[equals_index + 1:])
+    for prefix in ("@",) + _JOINED_PATH_PREFIXES:
+        if value.startswith(prefix):
+            return _contains_compound_absolute_path(value[len(prefix):])
     return False
 
 
-def _split_absolute_path_argument(value):
+def _split_absolute_path_argument(value, extra_prefixes=()):
     if value.startswith("/"):
         return "", value
-    if value.startswith("@/"):
-        return "@", value[1:]
-    for prefix in _JOINED_PATH_PREFIXES:
+    if value.startswith("${env:"):
+        return "", value
+    for prefix in tuple(extra_prefixes) + ("@",) + _JOINED_PATH_PREFIXES:
         path = value[len(prefix):] if value.startswith(prefix) else ""
-        if path.startswith("/"):
+        if path.startswith(("/", "${env:")):
             return prefix, path
     equals_index = value.find("=/")
+    if equals_index >= 0:
+        return value[:equals_index + 1], value[equals_index + 1:]
+    equals_index = value.find("=${env:")
     if equals_index >= 0:
         return value[:equals_index + 1], value[equals_index + 1:]
     return None
@@ -240,10 +283,13 @@ def _canonical_cann_argument(path, cann_root):
     return "${env:ASCEND_HOME_PATH}/" + relative, canonical_path
 
 
-def _normalize_cann_path_list(path_list, cann_root):
+def _normalize_cann_path_list(path_list, cann_root, allow_uri=True):
     parts = re.split(r"([:,])", path_list)
     for index in range(0, len(parts), 2):
-        if not parts[index].startswith("/"):
+        if (
+            not parts[index].startswith("/")
+            or (allow_uri and _is_uri_component(parts, index))
+        ):
             continue
         portable_path, canonical_path = _canonical_cann_argument(
             parts[index], cann_root
@@ -275,15 +321,27 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
         if value.startswith(("-Wl,", "-Wa,")):
             fields = value.split(",")
             for field_index in range(1, len(fields)):
+                field_parts = _split_absolute_path_argument(
+                    fields[field_index], extra_prefixes=("-T", "-R")
+                )
+                prefix, path = (
+                    field_parts
+                    if field_parts is not None
+                    else ("", fields[field_index])
+                )
+                allow_uri = not (
+                    fields[field_index - 1] in {"-rpath", "-R"}
+                    or fields[field_index].startswith(("-rpath=", "-R"))
+                )
                 portable_path, _ = _normalize_cann_path_list(
-                    fields[field_index], cann_root
+                    path, cann_root, allow_uri=allow_uri
                 )
                 if portable_path is None:
                     raise ValueError(
                         f"command[{command_index}][{argv_index}] contains "
                         f"non-portable absolute path: {argument}"
                     )
-                fields[field_index] = portable_path
+                fields[field_index] = prefix + portable_path
             value = ",".join(fields)
         absolute_parts = _split_absolute_path_argument(value)
         if absolute_parts is not None:
@@ -347,6 +405,8 @@ def _resource_reference_path(value, context):
     logical_path = _relative_path(value, context)
     if logical_path == _RESERVED_MACHINE_MANIFEST:
         raise ValueError(f"{context} names the reserved machine manifest")
+    if logical_path == "manifest.json":
+        raise ValueError(f"{context} names the reserved author manifest")
     return logical_path
 
 

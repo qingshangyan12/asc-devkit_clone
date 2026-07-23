@@ -280,6 +280,97 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 [placeholder + "/bin/bisheng", ordinary],
             )
 
+    def test_normalizes_compound_paths_after_environment_placeholders(self):
+        with tempfile.TemporaryDirectory() as root:
+            cann_root = os.path.join(root, "cann")
+            host_root = os.path.join(root, "host")
+            os.makedirs(cann_root)
+            cann_include = os.path.join(cann_root, "include")
+            host_include = os.path.join(host_root, "include")
+            env_path = "${env:ASCEND_HOME_PATH}/include"
+            alt_path = "${env:ALT_HOME}/include"
+            placeholder = "${env:ASCEND_HOME_PATH}"
+            self.assertEqual(
+                normalize_static_command(
+                    "compile",
+                    [
+                        f"-DSEARCH={env_path}:{cann_include}",
+                        f"-I{env_path}:{cann_include}",
+                        f"-DALL={env_path}:{alt_path}",
+                        f"-I{env_path}:{alt_path}",
+                    ],
+                    cann_root,
+                    0,
+                ),
+                [
+                    placeholder + "/bin/bisheng",
+                    f"-DSEARCH={env_path}:{placeholder}/include",
+                    f"-I{env_path}:{placeholder}/include",
+                    f"-DALL={env_path}:{alt_path}",
+                    f"-I{env_path}:{alt_path}",
+                ],
+            )
+            for argument in (
+                f"-DSEARCH={env_path}:{host_include}",
+                f"-I{env_path}:{host_include}",
+                f"-Wl,-rpath,{env_path}:{host_include}",
+                "-Wl,-rpath,https://example.com/lib",
+            ):
+                with self.subTest(argument=argument):
+                    with self.assertRaisesRegex(
+                        ValueError, "non-portable absolute path"
+                    ):
+                        normalize_static_command(
+                            "compile", [argument], cann_root, 0
+                        )
+            accepted = [
+                "-DURL=https://example.com/toolchain",
+                "-Wl,-plugin-opt=https://example.com/toolchain",
+                "label:/tmp/host,relative:value",
+            ]
+            self.assertEqual(
+                normalize_static_command("compile", accepted, cann_root, 0),
+                [placeholder + "/bin/bisheng"] + accepted,
+            )
+
+    def test_normalizes_nested_response_and_joined_comma_domain_paths(self):
+        with tempfile.TemporaryDirectory() as root:
+            cann_root = os.path.join(root, "cann")
+            os.makedirs(cann_root)
+            placeholder = "${env:ASCEND_HOME_PATH}"
+            owned = os.path.join(cann_root, "owned")
+            self.assertEqual(
+                normalize_static_command(
+                    "compile",
+                    [
+                        f"-Wl,@{owned}", f"-Wl,-T{owned}",
+                        f"-Wl,-R{owned}", f"-Wa,-I{owned}",
+                    ],
+                    cann_root,
+                    0,
+                ),
+                [
+                    placeholder + "/bin/bisheng",
+                    f"-Wl,@{placeholder}/owned",
+                    f"-Wl,-T{placeholder}/owned",
+                    f"-Wl,-R{placeholder}/owned",
+                    f"-Wa,-I{placeholder}/owned",
+                ],
+            )
+            for argument in (
+                "-Wl,@/tmp/link.rsp",
+                "-Wl,-T/tmp/script.ld",
+                "-Wl,-R/tmp/lib",
+                "-Wa,-I/tmp/include",
+            ):
+                with self.subTest(argument=argument):
+                    with self.assertRaisesRegex(
+                        ValueError, "non-portable absolute path"
+                    ):
+                        normalize_static_command(
+                            "compile", [argument], cann_root, 0
+                        )
+
     def test_rejects_dot_segments_in_logical_resource_paths(self):
         with tempfile.TemporaryDirectory() as root:
             source = os.path.join(root, "kernel.cpp")
@@ -669,7 +760,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             with open(source, "w", encoding="utf-8") as file_obj:
                 file_obj.write("{}\n")
 
-            def generate(*, argument="tool", patches=None):
+            def generate(*, resource_path, argument="tool", patches=None):
                 kernel = {
                     "kernel_name": "kernel",
                     "targets": [{
@@ -690,19 +781,25 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                     resource_id="kernel",
                     resources=[{
                         "source": source,
-                        "path": ".sc/manifest.json",
+                        "path": resource_path,
                     }],
                     kernels=[kernel],
                 )
 
-            with self.assertRaisesRegex(ValueError, "reserved machine manifest"):
-                generate(argument="${resource:.sc/manifest.json}")
-            with self.assertRaisesRegex(ValueError, "reserved machine manifest"):
-                generate(patches=[{
-                    "file": ".sc/manifest.json",
-                    "token": "@@TILING@@",
-                    "value": "tiling_data",
-                }])
+            for resource_path in (".sc/manifest.json", "manifest.json"):
+                with self.subTest(resource_path=resource_path, owner="command"):
+                    with self.assertRaisesRegex(ValueError, "reserved.*manifest"):
+                        generate(
+                            resource_path=resource_path,
+                            argument="${resource:" + resource_path + "}",
+                        )
+                with self.subTest(resource_path=resource_path, owner="patch"):
+                    with self.assertRaisesRegex(ValueError, "reserved.*manifest"):
+                        generate(resource_path=resource_path, patches=[{
+                            "file": resource_path,
+                            "token": "@@TILING@@",
+                            "value": "tiling_data",
+                        }])
 
     def test_rejects_any_suffix_after_resource_or_output_placeholder(self):
         with tempfile.TemporaryDirectory() as root:
