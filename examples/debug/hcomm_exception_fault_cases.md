@@ -5,8 +5,8 @@ This directory contains two AIV fault kernels for validating exception callback 
 ## Kernels
 
 - `HcommUrmaTimeoutFaultKernel`: calls `Hcomm::WriteNbi` with `len > 256MB` and then `Drain`.
-- `HcommCqeErrorFaultKernel`: posts a valid WQE, seeds a non-zero CQE error record for dump validation, then triggers a
-  Runtime exception.
+- `HcommCqeSeedDumpKernel`: seeds recognizable non-zero WQE/CQE records into the channel SQ/CQ ring for dump validation.
+- `HcommCqeErrorFaultKernel`: triggers a Runtime exception after the seed kernel has completed on the same stream.
 
 Both kernels take a device pointer to `CommContext`.
 
@@ -43,11 +43,12 @@ The callback is intentionally lightweight. It only records Runtime exception fie
 by `aclrtGetArgsFromExceptionInfo`, then sets a pending flag. It does not call `aclrtMemcpy`, does not synchronize a
 stream, and does not call the channel dump interface.
 
-5. Launch one fault kernel:
+5. Launch the target fault path:
 
 ```cpp
 HcommUrmaTimeoutFaultKernel<<<1, nullptr, stream>>>(devContext);
 // or
+HcommCqeSeedDumpKernel<<<1, nullptr, stream>>>(devContext);
 HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 ```
 
@@ -177,11 +178,12 @@ aclrtSetExceptionInfoCallback(CustomCallback);
 aclrtBinarySetExceptionCallback(binHandle, CustomCallback, devContext);
 ```
 
-4. Launch one fault kernel:
+4. Launch the target fault path:
 
 ```cpp
 HcommUrmaTimeoutFaultKernel<<<1, nullptr, stream>>>(devContext);
 // or
+HcommCqeSeedDumpKernel<<<1, nullptr, stream>>>(devContext);
 HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 ```
 
@@ -191,8 +193,9 @@ HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 
 - URMA timeout case: callback-triggered report calls `HcommChannelDumpInfo`, which returns raw channel/SQ/CQ/WQE/CQE
   bytes; asc-devkit parses and prints the protocol fields.
-- CQE error case: same reporting flow as above. Use `CqContext`, `Hcomm URMA CQE`, `status`, `substatus`, and
-  `entryIdx` as log filters.
+- CQE error case: the runner first launches `HcommCqeSeedDumpKernel` and then launches
+  `HcommCqeErrorFaultKernel` on the same stream. The dump should therefore contain non-zero WQE/CQE fields seeded by
+  the first kernel. Use `CqContext`, `Hcomm URMA CQE`, `status`, `substatus`, and `entryIdx` as log filters.
 
 ## Validation Checklist
 
