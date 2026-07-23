@@ -62,9 +62,15 @@ for op in "${ops[@]}"; do
 
   chmod +x ${arm_package}
   yes "y" | bash "${arm_package}" --full --install-path=/usr/local/Ascend --quiet
-  python3 -m pip install tensorflow -i https://pypi.tuna.tsinghua.edu.cn/simple
+  update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 10; update-alternatives --config gcc <<< '1'
+  update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 10; update-alternatives --config g++ <<< '1'
   source /usr/local/Ascend/cann/set_env.sh
-  bash run_presmoke.sh 2>&1 | tee -a ./run_test.log
+  python3 -m pip install -r .devcontainer/requirements.txt
+  (cd ./scripts && bash run_presmoke.sh  2>&1 | tee -a ./run_test.log)
+  if [ -d "presmoke_reports" ];then
+    mv presmoke_reports /root/ascend/log
+  fi
+  cd ./scripts
 done
 
 # 打包plog

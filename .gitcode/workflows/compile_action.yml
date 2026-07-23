@@ -1,4 +1,4 @@
-name: x86_compile_action
+name: compile_action
 
 on:
   workflow_call:
@@ -9,6 +9,14 @@ on:
       image_version:
         required: true
         type: string
+      package_name:
+        required: false
+        type: string
+        default: ''
+      arch:
+        required: false
+        type: string
+        default: 'x64'
     outputs:
       arm_run_url:
         value: ${{jobs.JOB_compile.outputs.primary-url}}
@@ -53,6 +61,18 @@ jobs:
             export ASCEND_3RD_LIB_PATH=/home/jenkins/opensource
             BuildAccelerate bash .gitcode/scripts/compile.sh
           AC_SERVER_IP: ${{ vars.AC_SERVER_IP }}
+      -
+        name: rename_package
+        if: ${{ inputs.package_name != '' }}
+        run: |
+          cd ${{ steps.process_checkout.outputs.path }}/build_out
+          for f in *.run; do
+            [ -f "$f" ] || continue
+            [ "$f" = "${{ inputs.package_name }}" ] && continue
+            mv "$f" "${{ inputs.package_name }}"
+            echo "Renamed: $f -> ${{ inputs.package_name }}"
+            break
+          done
       -
         name: api-check
         identifier: api-check
