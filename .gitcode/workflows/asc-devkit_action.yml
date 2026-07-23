@@ -105,12 +105,6 @@ stages:
   stage2:
     name: compile
     jobs:
-      JOB_codecheck_action:
-        name: codecheck_action
-        uses: .gitcode/workflows/codecheck_action.yml
-        with:
-          precommit_image_version: ${{ jobs.JOB_image.outputs.precommit }}
-          codecheck_image_version: ${{ jobs.JOB_image.outputs.codecheck }}
       JOB_x86_compile_ubuntu24:
         name: x86_compile_ubuntu24
         uses: .gitcode/workflows/compile_action.yml
@@ -143,6 +137,12 @@ stages:
           image_version: ${{ jobs.JOB_image.outputs.Compile_Ascend_ARM }}
           arch: 'arm64'
           package_name: 'cann-asc-devkit_linux-aarch64.run'
+      JOB_codecheck_action:
+        name: CodeCheck
+        uses: .gitcode/workflows/codecheck_action.yml
+        with:
+          precommit_image_version: ${{ jobs.JOB_image.outputs.precommit }}
+          codecheck_image_version: ${{ jobs.JOB_image.outputs.codecheck }}
       JOB_staticcheck_markdown:
         name: CodeCheck_staticcheck_markdown
         uses: .gitcode/workflows/staticcheck_action.yml
@@ -197,7 +197,7 @@ stages:
           image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ jobs.JOB_image.outputs.API_Check }}
       JOB_UT_Test_adv_test_one:
         name: UT_Test_adv_test_one
-        uses: .gitcode/workflows/llt_action.yml
+        uses: .gitcode/workflows/ut_action.yml
         with:
           ut_type: 'adv_test'
           ut_package: 'coverage_*.info'
@@ -205,7 +205,7 @@ stages:
           arch: 'x64'
       JOB_UT_Test_adv_test_two:
         name: UT_Test_adv_test_two
-        uses: .gitcode/workflows/llt_action.yml
+        uses: .gitcode/workflows/ut_action.yml
         with:
           ut_type: 'adv_test_two'
           ut_package: 'coverage_*.info'
@@ -213,7 +213,7 @@ stages:
           arch: 'x64'
       JOB_UT_Test_basic_test_one:
         name: UT_Test_basic_test_one
-        uses: .gitcode/workflows/llt_action.yml
+        uses: .gitcode/workflows/ut_action.yml
         with:
           ut_type: 'basic_test_one'
           ut_package: 'coverage_*.info'
@@ -221,7 +221,7 @@ stages:
           arch: 'x64'
       JOB_UT_Test_basic_test_two:
         name: UT_Test_basic_test_two
-        uses: .gitcode/workflows/llt_action.yml
+        uses: .gitcode/workflows/ut_action.yml
         with:
           ut_type: 'basic_test_two'
           ut_package: 'coverage_*.info'
@@ -229,7 +229,7 @@ stages:
           arch: 'x64'
       JOB_UT_Test_basic_test_three:
         name: UT_Test_basic_test_three
-        uses: .gitcode/workflows/llt_action.yml
+        uses: .gitcode/workflows/ut_action.yml
         with:
           ut_type: 'basic_test_three'
           ut_package: 'coverage_*.info'
@@ -237,7 +237,7 @@ stages:
           arch: 'x64'
       JOB_UT_Test_basic_test_four:
         name: UT_Test_basic_test_four
-        uses: .gitcode/workflows/llt_action.yml
+        uses: .gitcode/workflows/ut_action.yml
         with:
           ut_type: 'basic_test_four'
           ut_package: 'coverage_*.info'
@@ -245,7 +245,7 @@ stages:
           arch: 'x64'
       JOB_UT_Test_basic_test_five:
         name: UT_Test_basic_test_five
-        uses: .gitcode/workflows/llt_action.yml
+        uses: .gitcode/workflows/ut_action.yml
         with:
           ut_type: 'basic_test_five'
           ut_package: 'coverage_*.info'
@@ -253,7 +253,7 @@ stages:
           arch: 'x64'
       JOB_UT_Test_arm:
         name: UT_Test_arm
-        uses: .gitcode/workflows/llt_action.yml
+        uses: .gitcode/workflows/ut_action.yml
         with:
           ut_type: 'arm_test'
           ut_package: 'coverage_*.info'
