@@ -45,7 +45,7 @@ for op in "${ops[@]}"; do
 
   cd ./scripts && bash devkit_dir_check.sh 2>&1 | tee -a ./run_test.log
   cd ${WORKSPACE}
-  arm_package="cann-asc-devkit_9.1.0_linux-aarch64.run"
+  arm_package='cann-asc-devkit_linux-aarch64.run'
   obs_base="https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${obs_path}/${arm_package}"
   echo ${obs_base}
   if [ -n "${obs_base}" ]; then
