@@ -15,9 +15,8 @@ namespace mc2_ops_hccl {
 [[maybe_unused]] constexpr int INPUT_XN_ID = 0; // mesh1d 窗口布局：0=INPUT
 constexpr int OUTPUT_XN_ID = 1; //                  1=OUTPUT
 constexpr int TOKEN_XN_ID  = 2; //                  2=TOKEN
-constexpr int PRE_OUTPUT_CKE_IDX = 0; // 前同步：output 通知
-constexpr int PRE_TOKEN_CKE_IDX  = 1; // 前同步：token 通知
-constexpr int POST_SYNC_CKE_IDX  = 2; // 后同步
+constexpr int CKE_IDX_0 = 0; // 前同步：output 通知
+constexpr int CKE_IDX_1  = 1; // 前同步：token 通知
 constexpr int CONST_ONE          = 1;
 
 // ext 内存布局 CCUMsgExt{sendSize, loopNum, sendOffset, recvOffset}，每 rank 4 个 uint64。
