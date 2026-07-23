@@ -1,4 +1,4 @@
-﻿# LoadData（MX矩阵搬运）<a id="ZH-CN_TOPIC_0000002517258774"></a>
+# LoadData（MX矩阵搬运）<a id="ZH-CN_TOPIC_0000002517258774"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>
 
