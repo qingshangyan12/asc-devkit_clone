@@ -76,7 +76,7 @@ def collect_local_include_files(source_path):
 
 def resolve_symbol_tiling_sizes(symbols, tiling_keys, tiling_key_data_size, fallback_size):
     """Resolve per-symbol ABI byte sizes while keeping lookup symbol-based."""
-    if not isinstance(fallback_size, int) or fallback_size <= 0:
+    if type(fallback_size) is not int or fallback_size <= 0:
         raise ValueError("fallback tiling size must be a positive integer")
     keys = sorted((str(key) for key in tiling_keys), key=len, reverse=True)
     result = {}
@@ -87,12 +87,12 @@ def resolve_symbol_tiling_sizes(symbols, tiling_keys, tiling_key_data_size, fall
             if symbol.endswith("_" + key) or ("_" + key + "_") in symbol:
                 matched_key = key
                 candidate = tiling_key_data_size.get(key)
-                if isinstance(candidate, int) and candidate > 0:
+                if type(candidate) is int and candidate > 0:
                     size = candidate
                 break
         if len(keys) > 1 and (
             matched_key is None
-            or not isinstance(tiling_key_data_size.get(matched_key), int)
+            or type(tiling_key_data_size.get(matched_key)) is not int
             or tiling_key_data_size[matched_key] <= 0
         ):
             raise ValueError(
@@ -183,18 +183,46 @@ def _contains_literal_absolute_path(value):
     return re.search(r"(?:^|[=,:@\s])/", value) is not None
 
 
+def _split_absolute_path_argument(value):
+    if value.startswith("/"):
+        return "", value
+    for prefix in ("-include", "-I", "-L"):
+        path = value[len(prefix):] if value.startswith(prefix) else ""
+        if path.startswith("/"):
+            return prefix, path
+    equals_index = value.find("=/")
+    if equals_index >= 0:
+        return value[:equals_index + 1], value[equals_index + 1:]
+    return None
+
+
+def _canonical_cann_argument(path, cann_root):
+    canonical_path = os.path.realpath(os.path.normpath(path))
+    if not cann_root:
+        return None, canonical_path
+    try:
+        owned = os.path.commonpath([cann_root, canonical_path]) == cann_root
+    except ValueError:
+        owned = False
+    if not owned:
+        return None, canonical_path
+    relative = os.path.relpath(canonical_path, cann_root).replace(os.sep, "/")
+    if relative == ".":
+        return "${env:ASCEND_HOME_PATH}", canonical_path
+    relative = _relative_path(relative, "CANN command path")
+    return "${env:ASCEND_HOME_PATH}/" + relative, canonical_path
+
+
 def normalize_static_command(kind, argv, ascend_home, command_index):
     """Return a shell-free command whose paths are portable across CANN installs."""
     if not isinstance(argv, (list, tuple)):
         raise ValueError(f"command[{command_index}] argv must be a list")
     result = [normalize_static_program(kind)]
-    cann_roots = []
-    if ascend_home:
-        for root in (os.path.abspath(ascend_home), os.path.realpath(ascend_home)):
-            root = root.rstrip(os.sep)
-            if root and root not in cann_roots:
-                cann_roots.append(root)
-    cann_roots.sort(key=len, reverse=True)
+    cann_root = (
+        os.path.realpath(os.path.normpath(os.path.abspath(ascend_home))).rstrip(os.sep)
+        if ascend_home
+        else ""
+    )
     for argv_index, argument in enumerate(argv):
         if not isinstance(argument, str) or not argument:
             raise ValueError(
@@ -203,12 +231,29 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
         value = argument.replace("${resource.", "${resource:")
         value = value.replace("${artifact.", "${output:")
         value = value.replace("${launch.block_dim}", "${context:block_dim}")
-        for cann_root in cann_roots:
-            value = re.sub(
-                re.escape(cann_root) + r"(?=/|$)",
-                "${env:ASCEND_HOME_PATH}",
-                value,
+        absolute_parts = _split_absolute_path_argument(value)
+        if absolute_parts is not None:
+            prefix, path = absolute_parts
+            portable_path, canonical_path = _canonical_cann_argument(
+                path, cann_root
             )
+            if portable_path is not None:
+                value = prefix + portable_path
+            else:
+                standalone_include = (
+                    prefix == ""
+                    and argv_index > 0
+                    and argv[argv_index - 1] == "-I"
+                )
+                include_prefix = prefix in {"-I", "-I="} or standalone_include
+                if include_prefix and not os.path.isdir(canonical_path):
+                    if standalone_include and result[-1] == "-I":
+                        result.pop()
+                    continue
+                raise ValueError(
+                    f"command[{command_index}][{argv_index}] contains "
+                    f"non-portable absolute path: {argument}"
+                )
         env_path = re.search(r"(\$\{env:[A-Z_][A-Z0-9_]*\})/([^}]*)$", value)
         if env_path:
             normalized_suffix = posixpath.normpath(env_path.group(2))
@@ -218,8 +263,6 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
                 + "/"
                 + normalized_suffix
             )
-        if value.startswith("-I/") and not os.path.isdir(value[2:]):
-            continue
         if _contains_literal_absolute_path(value):
             raise ValueError(
                 f"command[{command_index}][{argv_index}] contains "
@@ -252,9 +295,9 @@ def _validate_target(target, context):
         raise ValueError(f"{context}.required must be bool")
     parameter_index = target.get("parameter_index")
     byte_size = target.get("byte_size")
-    if not isinstance(parameter_index, int) or parameter_index < 0:
+    if type(parameter_index) is not int or parameter_index < 0:
         raise ValueError(f"{context}.parameter_index must be a nonnegative integer")
-    if not isinstance(byte_size, int) or byte_size <= 0:
+    if type(byte_size) is not int or byte_size <= 0:
         raise ValueError(f"{context}.byte_size must be a positive integer")
 
 

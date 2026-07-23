@@ -88,6 +88,57 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         self.assertEqual(first, second)
 
+    def test_canonicalizes_cann_paths_before_classifying_ownership(self):
+        with tempfile.TemporaryDirectory() as root:
+            cann_root = os.path.join(root, "cann")
+            os.makedirs(cann_root)
+            parent_spelling = os.path.join(
+                cann_root, "..", "cann", "missing", "include"
+            )
+            self.assertEqual(
+                normalize_static_command(
+                    "compile",
+                    [
+                        "-I" + parent_spelling,
+                        "-include" + os.path.join(
+                            cann_root, "..", "cann", "missing", "version.h"
+                        ),
+                        "--sysroot=" + os.path.join(
+                            cann_root, "..", "cann", "sysroot"
+                        ),
+                    ],
+                    cann_root,
+                    2,
+                ),
+                [
+                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                    "-I${env:ASCEND_HOME_PATH}/missing/include",
+                    "-include${env:ASCEND_HOME_PATH}/missing/version.h",
+                    "--sysroot=${env:ASCEND_HOME_PATH}/sysroot",
+                ],
+            )
+
+    def test_canonicalizes_alternate_symlink_spelling_of_cann_root(self):
+        with tempfile.TemporaryDirectory() as root:
+            actual = os.path.join(root, "actual")
+            first_alias = os.path.join(root, "cann-current")
+            second_alias = os.path.join(root, "toolkit-current")
+            os.makedirs(os.path.join(actual, "include"))
+            os.symlink(actual, first_alias)
+            os.symlink(actual, second_alias)
+            self.assertEqual(
+                normalize_static_command(
+                    "compile",
+                    ["-I" + os.path.join(second_alias, "include")],
+                    first_alias,
+                    0,
+                ),
+                [
+                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                    "-I${env:ASCEND_HOME_PATH}/include",
+                ],
+            )
+
     def test_rejects_unclassified_absolute_command_path(self):
         with self.assertRaisesRegex(
             ValueError, r"command\[3\]\[1\].*non-portable absolute path"
@@ -205,6 +256,14 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "exact tiling byte size"):
             resolve_symbol_tiling_sizes(
                 ["add_7", "add_9"], ["7", "9"], {"7": 32}, 64
+            )
+
+    def test_rejects_boolean_tiling_sizes(self):
+        with self.assertRaisesRegex(ValueError, "fallback tiling size"):
+            resolve_symbol_tiling_sizes(["add"], ["0"], {}, True)
+        with self.assertRaisesRegex(ValueError, "exact tiling byte size"):
+            resolve_symbol_tiling_sizes(
+                ["add_7", "add_9"], ["7", "9"], {"7": True, "9": 32}, 64
             )
 
     def test_generates_minimal_direct_v4_manifest(self):
@@ -325,6 +384,49 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                     resources=[{"source": source, "path": "resources/src/kernel.cpp"}],
                     kernels=[kernel],
                 )
+
+    def test_rejects_boolean_target_integer_fields(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.cpp")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+            for field, value in (
+                ("parameter_index", True),
+                ("parameter_index", False),
+                ("byte_size", True),
+                ("byte_size", False),
+            ):
+                with self.subTest(field=field, value=value):
+                    target = {
+                        "name": "tiling_data",
+                        "parameter_index": 4,
+                        "byte_size": 8,
+                    }
+                    target[field] = value
+                    with self.assertRaisesRegex(
+                        ValueError, rf"targets\[0\]\.{field}"
+                    ):
+                        generate_static_compile_resources(
+                            output_root=root,
+                            kernel_base="Kernel_x",
+                            resource_id="kernel",
+                            resources=[{
+                                "source": source,
+                                "path": "resources/src/kernel.cpp",
+                            }],
+                            kernels=[{
+                                "kernel_name": "kernel",
+                                "targets": [target],
+                                "recipes": {"normal": {
+                                    "commands": [[
+                                        "cp",
+                                        "${resource:resources/src/kernel.cpp}",
+                                        "${output:artifacts/kernel.o}",
+                                    ]],
+                                    "artifact": "artifacts/kernel.o",
+                                }},
+                            }],
+                        )
 
     def test_cleans_staging_directory_when_resource_copy_fails(self):
         with tempfile.TemporaryDirectory() as root:
