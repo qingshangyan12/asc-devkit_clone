@@ -36,7 +36,8 @@
 #include "../../../impl/adv_api/detail/api_check/kernel_api_check.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/sort/topk/topk_common_impl.h"
 #endif
@@ -46,7 +47,8 @@
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 #include "../../../impl/adv_api/detail/sort/topk/topk_v200_impl.h"
 #elif defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
 #include "../../../impl/adv_api/detail/sort/topk/topk_3510_impl.h"
 #endif
 #endif
@@ -54,7 +56,8 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
 /*
  * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.

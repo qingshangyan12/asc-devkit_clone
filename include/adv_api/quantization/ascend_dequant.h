@@ -27,7 +27,8 @@
 #include "include/adv_api/quantization/ascend_dequant_utils.h"
 #include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
 #include "../../../impl/adv_api/detail/quantization/dequant/ascend_dequant_common_impl.h"
 #endif
 
@@ -61,7 +62,8 @@ __aicore__ inline void AscendDequant(
     const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams params)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     AscendDequantImpl<dstT, scaleT, true, mode>(
         dstTensor, srcTensor, deqScale, sharedTmpBuffer, params, params.m * params.n);
 #endif
@@ -92,7 +94,8 @@ __aicore__ inline void AscendDequant(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     AscendDequantImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, params);
 #endif
 }
@@ -123,7 +126,8 @@ __aicore__ inline void AscendDequant(
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     AscendDequantCalcountImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, calCount);
 #endif
 }
@@ -152,7 +156,8 @@ __aicore__ inline void AscendDequant(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     AscendDequantCalcountImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, calCount);
 #endif
 }
@@ -183,7 +188,8 @@ __aicore__ inline void AscendDequant(
     const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     AscendDequantNoCalcountImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, sharedTmpBuffer);
 #endif
 }
@@ -211,7 +217,8 @@ __aicore__ inline void AscendDequant(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     AscendDequantNoCalcountImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale);
 #endif
 }
@@ -246,7 +253,8 @@ __aicore__ inline void AscendDequant(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     AscendDequantScalarImpl<dstT, scaleT, true, mode>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, params);
 #endif
 }
@@ -276,7 +284,8 @@ __aicore__ inline void AscendDequant(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     AscendDequantScalarImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, params);
 #endif
 }

@@ -39,6 +39,15 @@ constexpr int32_t BT_SIZE = 1024;
 
 constexpr int32_t UB_SIZE = 118 * 1024;
 constexpr int32_t L1_SIZE = 512 * 1024; // do not support nfc
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5161)
+constexpr int32_t L0C_SIZE = 128 * 1024;
+constexpr int32_t L0A_SIZE = 64 * 1024;
+constexpr int32_t L0B_SIZE = 64 * 1024;
+
+constexpr int32_t BT_SIZE = 1024;
+
+constexpr int32_t UB_SIZE = 118 * 1024;
+constexpr int32_t L1_SIZE = 1280 * 1024; // do not support nfc
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
 constexpr int32_t L0C_SIZE = 128 * 1024;
 constexpr int32_t L0A_SIZE = 64 * 1024;
