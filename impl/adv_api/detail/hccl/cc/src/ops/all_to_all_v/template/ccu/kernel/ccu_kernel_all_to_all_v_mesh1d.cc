@@ -105,12 +105,12 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
             if (rankIdx == rankId) {
                 ccu::LocalCopy(localDst, src[rankIdx], extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1);
                 // 【定位step2】怀疑传输死锁时，注释掉下面这行 EventWait
-                ccu::EventWait(event, 1);
+                // ccu::EventWait(event, 1);
             } else {
                 ccu::Write(channels[channelIdx], dst[rankIdx], src[rankIdx],
                     extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1);
                 // 【定位step2】怀疑传输死锁时，注释掉下面这行 EventWait
-                ccu::EventWait(event, 1);
+                // ccu::EventWait(event, 1);
             }
         }
         if (rankIdx != rankId) {
