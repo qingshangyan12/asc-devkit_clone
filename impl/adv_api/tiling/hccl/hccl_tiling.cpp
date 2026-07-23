@@ -144,7 +144,8 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     }
     if ((impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALL) ||
         impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALLV) ||
-        impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER)) &&
+        impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
+        impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) &&
         (impl_.commEngine_ == 5 || impl_.commEngine_ == 6)) {
         tilingInner->version = INIT_TILING_CCU_NEW_VERSION;
     }
