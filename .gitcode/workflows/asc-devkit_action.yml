@@ -1,4 +1,4 @@
-name: asc-devkit_action
+name: PR-pipeline_asc-devkit
 
 on:
   pull_request_comment:
@@ -24,7 +24,7 @@ stages:
     name: image
     jobs:
       JOB_image:
-        name: image
+        name: Test_image
         steps:
           - name: revise_image
             identifier: revise_image
@@ -42,7 +42,7 @@ stages:
         container:
           image: swr.cn-north-4.myhuaweicloud.com/ci_cann/ubuntu20.04.05_x86:k8s_v1.1006
       JOB_pr:
-        name: get_pr_files
+        name: Test_get-pr
         steps:
           -
             name: Checkout
@@ -76,7 +76,7 @@ stages:
         runs-on:
         - default
       JOB_shell:
-        name: get_shell_files
+        name: Test_get-shell
         steps:
           -
             name: Checkout
@@ -144,31 +144,31 @@ stages:
           arch: 'arm64'
           package_name: 'cann-asc-devkit_linux-aarch64.run'
       JOB_staticcheck_markdown:
-        name: staticcheck_markdown
+        name: CodeCheck_staticcheck_markdown
         uses: .gitcode/workflows/staticcheck_action.yml
         with:
           check_type: 'markdown'
           image_version: ${{ jobs.JOB_image.outputs.staticcheck }}
       JOB_staticcheck_codespell_check:
-        name: staticcheck_codespell_check
+        name: CodeCheck_staticcheck_codespell_check
         uses: .gitcode/workflows/staticcheck_action.yml
         with:
           check_type: 'codespell_check'
           image_version: ${{ jobs.JOB_image.outputs.staticcheck }}
       JOB_staticcheck_tag_closed_check:
-        name: staticcheck_tag_closed_check
+        name: CodeCheck_staticcheck_tag_closed_check
         uses: .gitcode/workflows/staticcheck_action.yml
         with:
           check_type: 'tag_closed_check'
           image_version: ${{ jobs.JOB_image.outputs.staticcheck }}
       JOB_staticcheck_resource_existence_check:
-        name: staticcheck_resource_existence_check
+        name: CodeCheck_staticcheck_resource_existence_check
         uses: .gitcode/workflows/staticcheck_action.yml
         with:
           check_type: 'resource_existence_check'
           image_version: ${{ jobs.JOB_image.outputs.staticcheck }}
       JOB_staticcheck_link_validity_check:
-        name: staticcheck_link_validity_check
+        name: CodeCheck_staticcheck_link_validity_check
         uses: .gitcode/workflows/staticcheck_action.yml
         with:
           check_type: 'link_validity_check'
@@ -266,7 +266,7 @@ stages:
     name: ut_report
     jobs:
       JOB_ut_report_lcov:
-        name: ut_report_lcov
+        name: UT_report
         steps:
           -
             name: Checkout
@@ -317,7 +317,7 @@ stages:
     name: PreSmoke
     jobs:
       A2_smoke:
-        name: A2_pre_smoke
+        name: PreSmoke_A2
         steps:
           -
             name: Checkout

@@ -1,4 +1,4 @@
-name: llt_action
+name: ut_action
 
 on:
   workflow_call:
