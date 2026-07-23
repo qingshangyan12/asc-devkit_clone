@@ -21,14 +21,12 @@ namespace mc2_ops_hccl {
 using namespace hcomm;
 
 CcuResult CcuReduceScatterMesh1DMem2MemKernel(ccu::Variable inputAddr, ccu::Variable outputAddr,
- 	                                        ccu::Variable tokenInfo, ccu::Variable scratch, ccu::Variable currentRankSliceInputOffset,
- 	                                        ccu::Variable currentRankSliceOutputOffset, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
- 	                                        ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable scratchRepeatStride,
- 	                                        ccu::Variable repeatNum, ccu::Variable addrOffset, ccu::Variable loopParam,
- 	                                        ccu::Variable parallelParam, ccu::Variable residual,
- 	                                        const ChannelHandle channels[], uint32_t channelCount,
- 	                                        uint32_t rankSize, uint32_t rankId, const HcclDataType &dataType,
- 	                                        const HcclDataType &outputType, const HcclReduceOp &reduceType);
+                                              ccu::Variable tokenInfo, ccu::Variable scratch,
+                                              ccu::Variable currentRankSliceInputOffset, ccu::Variable sliceSize,
+                                              ccu::Variable repeatNum, const ChannelHandle channels[],
+                                              uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
+                                              const HcclDataType &dataType, const HcclDataType &outputType,
+                                              const HcclReduceOp &reduceType);
 
 } // namespace mc2_ops_hccl
 #endif // HCCLV2_CCU_KERNEL_REDUCE_SCATTER_MESH_1D_MEM2MEM

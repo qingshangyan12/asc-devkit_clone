@@ -145,19 +145,23 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
 // 构建 opResCtx 基础字段
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx)
 {
-    // 1. 分配workspace、comParam（XN）、comSync（CKE）
+    // 1. 分配workspace、scratch、comParam（XN）、comSync（CKE）
     constexpr uint32_t comSyncNum = 2;
+    constexpr uint64_t scratchSize = Hccl::MC2_WORKSPACE_SIZE;
     uint64_t comParamBufSize = Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
     uint64_t comSyncBufSize = Hccl::CCU_TASK_NUM_MAX * comSyncNum * Hccl::CCU_ONE_PARAM_SIZE;
 
     std::string tagWorkspace = ctxTag + "_ccu_workspace";
+    std::string tagScratch = ctxTag + "_ccu_scratch";
     std::string tagComParam = ctxTag + "_ccu_comParam";
 
     void* workspacePtr = nullptr;
+    void* scratchPtr = nullptr;
     void* comParamPtr = nullptr;
     void* comSyncPtr = nullptr;
 
     CHK_RET(HcclEngineCtxCreate(comm, tagWorkspace.c_str(), COMM_ENGINE_AIV, Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
+    CHK_RET(HcclEngineCtxCreate(comm, tagScratch.c_str(), COMM_ENGINE_AIV, scratchSize, &scratchPtr));
     CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_AIV, comParamBufSize, &comParamPtr));
     // Experimental path: allocate comSync like the legacy DevBuffer/HrtMalloc(HBM) flow to validate CCU write access.
     CHK_RET(AllocCcuComSyncLikeLegacy(comSyncBufSize, &comSyncPtr));
@@ -168,11 +172,13 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     opResCtx.rankSize = rankSize;
     opResCtx.xnAddr = reinterpret_cast<uint64_t>(comParamPtr);
     opResCtx.ckeAddr = reinterpret_cast<uint64_t>(comSyncPtr);
+    opResCtx.res[0] = reinterpret_cast<uint64_t>(scratchPtr);
 
-    HCCL_INFO("[AllocCcuOpResCtx] workspace[%p], workspaceSize[%llu], "
+    HCCL_INFO("[AllocCcuOpResCtx] workspace[%p], workspaceSize[%llu], scratch[%p], scratchSize[%llu], "
               "comParam[%p], comParamBufSize[%llu], comSync[%p], comSyncBufSize[%llu], "
               "rankId[%u], rankSize[%u], xnAddr[0x%llx], ckeAddr[0x%llx]",
               workspacePtr, Hccl::MC2_WORKSPACE_SIZE,
+              scratchPtr, scratchSize,
               comParamPtr, comParamBufSize, comSyncPtr, comSyncBufSize,
               userRank, rankSize,
               static_cast<unsigned long long>(opResCtx.xnAddr),
