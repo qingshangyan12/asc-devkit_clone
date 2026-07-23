@@ -10,6 +10,7 @@
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/comm_kfc_aicpu_server.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/comm_kfc_dispatcher.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/timing_stat.cc
 )
 
 set(OPEN_HCCL_SRC_ROOT
@@ -121,6 +122,7 @@ if(TARGET mc2_server)
     target_include_directories(mc2_server_decoupler PRIVATE
         ${HCCL_HCOMM_HEADER_DIR}/../
         ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+        ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
 
