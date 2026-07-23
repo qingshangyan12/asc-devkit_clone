@@ -5,8 +5,8 @@ This directory contains two AIV fault kernels for validating exception callback 
 ## Kernels
 
 - `HcommUrmaTimeoutFaultKernel`: calls `Hcomm::WriteNbi` with `len > 256MB` and then `Drain`.
-- `HcommCqeSeedDumpKernel`: seeds recognizable non-zero WQE/CQE records into the channel SQ/CQ ring for dump validation.
-- `HcommCqeErrorFaultKernel`: triggers a Runtime exception after the seed kernel has completed on the same stream.
+- `HcommCqeErrorFaultKernel`: calls `Hcomm::WriteNbi` with a valid remote buffer and an invalid local source address,
+  then calls `Drain` to trigger the CQE error path through the real HCOMM submission flow.
 
 Both kernels take a device pointer to `CommContext`.
 
@@ -30,10 +30,6 @@ hostCtx.len = HCOMM_CQE_ERROR_TEST_LEN;
 hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
 ```
 
-For the CQE case, `CommContext.seedState`, `seedSqVa`, `seedCqVa`, `seedSqDw0`, and `seedCqDw0` are diagnostic
-fields written by `HcommCqeSeedDumpKernel`. They are printed by the host report path to prove whether the seed kernel
-ran and which SQ/CQ VA it attempted to write.
-
 3. Allocate and copy `CommContext` to device.
 4. Register the Runtime exception callback and, when supported by the Runtime, bind the device `CommContext` as
    exception args for the fault kernel binary:
@@ -52,7 +48,6 @@ stream, and does not call the channel dump interface.
 ```cpp
 HcommUrmaTimeoutFaultKernel<<<1, nullptr, stream>>>(devContext);
 // or
-HcommCqeSeedDumpKernel<<<1, nullptr, stream>>>(devContext);
 HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 ```
 
@@ -187,7 +182,6 @@ aclrtBinarySetExceptionCallback(binHandle, CustomCallback, devContext);
 ```cpp
 HcommUrmaTimeoutFaultKernel<<<1, nullptr, stream>>>(devContext);
 // or
-HcommCqeSeedDumpKernel<<<1, nullptr, stream>>>(devContext);
 HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 ```
 
@@ -197,11 +191,9 @@ HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 
 - URMA timeout case: callback-triggered report calls `HcommChannelDumpInfo`, which returns raw channel/SQ/CQ/WQE/CQE
   bytes; asc-devkit parses and prints the protocol fields.
-- CQE error case: the runner first launches `HcommCqeSeedDumpKernel` and then launches
-  `HcommCqeErrorFaultKernel` on the same stream. The dump should therefore contain non-zero WQE/CQE fields seeded by
-  the first kernel. Use `CqContext`, `Hcomm URMA CQE`, `status`, `substatus`, and `entryIdx` as log filters.
-  If the parsed WQE/CQE remains all zero, first check the `exception ctx ... seedState=... seedSqVa=... seedCqVa=...`
-  line. `seedState=0x48444351` means the seed kernel ran and wrote its diagnostic fields.
+- CQE error case: the runner launches `HcommCqeErrorFaultKernel`, which posts one real HCOMM WQE with an invalid local
+  source address and then drains the channel. Use `CqContext`, `Hcomm URMA CQE`, `status`, `substatus`, and `entryIdx`
+  as log filters.
 
 ## Validation Checklist
 
@@ -234,5 +226,4 @@ Useful filters:
 grep -E "CustomCallback entered|runtime exception|exception dev args point|exception ctx|HcommChannelDumpInfo ret=0" urma_950.log
 grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" urma_950.log
 grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" cqe_950.log
-grep -E "exception ctx|seedState|seedSqVa|seedCqVa|Hcomm URMA WQE raw\\[000\\]|Hcomm URMA CQE raw\\[000\\]" cqe_950.log
 ```

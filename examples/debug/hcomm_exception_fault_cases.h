@@ -23,11 +23,6 @@ struct CommContext {
     uint64_t remoteBufferAddr;
     uint64_t len;
     uint64_t invalidBufferAddr;
-    uint64_t seedSqVa;
-    uint64_t seedCqVa;
-    uint32_t seedSqDw0;
-    uint32_t seedCqDw0;
-    uint32_t seedState;
     uint32_t rankId;
     uint32_t reserved;
 };
