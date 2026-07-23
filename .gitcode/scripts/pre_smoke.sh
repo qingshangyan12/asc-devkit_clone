@@ -48,7 +48,7 @@ for op in "${ops[@]}"; do
   arm_package="cann-asc-devkit_9.1.0_linux-aarch64.run"
   obs_base="https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${obs_path}/${arm_package}"
   echo ${obs_base}
-  if [ -n "${arm_run_url}" ]; then
+  if [ -n "${obs_base}" ]; then
     wget -nv -O ${arm_package} "${arm_run_url}" 2>/dev/null
   else
     wget -nv -O  ${obs_base} 2>/dev/null
