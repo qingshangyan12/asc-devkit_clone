@@ -132,11 +132,10 @@ from .static_compile_resource_generator import (
     collect_kernel_symbols,
     collect_local_include_files,
     generate_static_compile_resources,
-    parse_compile_option_macros,
+    normalize_static_command,
     portable_wrapper_text,
     resolve_symbol_tiling_sizes,
     static_tiling_template_text,
-    super_kernel_build_extension,
 )
 
 DEFAULT_TILING_KEY = "0"
@@ -1794,6 +1793,111 @@ def _static_resource_bind_argv(compile_option_tuple, source_path, output_path, a
     ]
 
 
+def _static_resource_id(op_type):
+    value = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", op_type)
+    value = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", value)
+    value = re.sub(r"[^A-Za-z0-9]+", "_", value).strip("_").lower()
+    if not value:
+        raise ValueError("static compile resource id cannot be empty")
+    return value
+
+
+def _static_normal_recipe(compile_argv, relocatable, artifact, ascend_home):
+    return {
+        "commands": [
+            normalize_static_command("compile", compile_argv, ascend_home, 0),
+            normalize_static_command(
+                "link",
+                [
+                    "-m", "aicorelinux", "-Ttext=0",
+                    "${output:" + relocatable + "}", "-static", "-o",
+                    "${output:" + artifact + "}", "-q",
+                ],
+                ascend_home,
+                1,
+            ),
+        ],
+        "artifact": artifact,
+    }
+
+
+def _static_super_kernel_recipe(
+    normal_recipe, normal_relocatable, sk_symbol, sk_argv, bind_argv,
+    output_prefix, ascend_home,
+):
+    sk_output = output_prefix + ".sk.o"
+    split_outputs = [output_prefix + f".sk_split{index}.o" for index in range(1, 4)]
+    archive_output = output_prefix + ".sk.a"
+    bind_output = output_prefix + ".sk_bind.o"
+    merged_output = output_prefix + ".sk_merged.o"
+    final_output = output_prefix + ".static_with_sk.o"
+    commands = [list(command) for command in normal_recipe["commands"]]
+    specifications = [("compile", sk_argv)]
+    specifications.extend(
+        (
+            "objcopy",
+            [
+                f"--redefine-sym={sk_symbol}={sk_symbol}_split{index}",
+                "${output:" + sk_output + "}",
+                "${output:" + split_output + "}",
+            ],
+        )
+        for index, split_output in enumerate(split_outputs, 1)
+    )
+    specifications.extend(
+        [
+            (
+                "archive",
+                ["rcs", "${output:" + archive_output + "}"]
+                + [
+                    "${output:" + path + "}"
+                    for path in [sk_output] + split_outputs
+                ],
+            ),
+            ("compile", bind_argv),
+            (
+                "link",
+                [
+                    "-r", "-o", "${output:" + merged_output + "}",
+                    "${output:" + normal_relocatable + "}",
+                    "${output:" + bind_output + "}",
+                    "${output:" + archive_output + "}",
+                ],
+            ),
+            (
+                "link",
+                [
+                    "-m", "aicorelinux", "-Ttext=0",
+                    "${output:" + merged_output + "}", "-static", "-o",
+                    "${output:" + final_output + "}", "-q",
+                ],
+            ),
+        ]
+    )
+    for kind, argv in specifications:
+        commands.append(
+            normalize_static_command(kind, argv, ascend_home, len(commands))
+        )
+    return {"commands": commands, "artifact": final_output}
+
+
+def _deduplicate_static_resources(resources):
+    unique = {}
+    result = []
+    for resource in resources:
+        logical_path = resource["path"]
+        source = os.path.realpath(resource["source"])
+        previous = unique.get(logical_path)
+        if previous is None:
+            unique[logical_path] = source
+            result.append(resource)
+        elif previous != source:
+            raise ValueError(
+                f"conflicting static compile resource path: {logical_path}"
+            )
+    return result
+
+
 def _emit_static_compile_resources(
     compile_info,
     op_info,
@@ -1867,6 +1971,7 @@ def _emit_static_compile_resources(
         and os.path.isfile(sk_bind_source_path)
     )
     sk_wrapper_logical = ""
+    sk_source_logical = ""
     sk_wrapper_template_path = ""
     sk_wrapper_template = ""
     sk_pairs = {}
@@ -1874,6 +1979,9 @@ def _emit_static_compile_resources(
     if sk_enabled:
         sk_wrapper_logical = "resources/src/" + os.path.basename(
             sk_compile_info.gen_kernel_func_file
+        )
+        sk_source_logical = "resources/src/" + os.path.basename(
+            sk_compile_info.src_file
         )
         sk_wrapper_template_path = sk_compile_info.gen_kernel_func_file + ".static_compile"
         with open(sk_compile_info.gen_kernel_func_file, "r", encoding="utf-8") as file_obj:
@@ -1895,7 +2003,6 @@ def _emit_static_compile_resources(
             with open(sk_wrapper_template_path, "w", encoding="utf-8") as file_obj:
                 file_obj.write(sk_wrapper_template)
             generated_paths.append(sk_wrapper_template_path)
-        macros = parse_compile_option_macros(compile_option_tuple.compile_options)
         kernels = []
         resources = [
             {"source": wrapper_template_path, "path": wrapper_logical},
@@ -1909,14 +2016,24 @@ def _emit_static_compile_resources(
             )
         )
         if sk_enabled:
-            resources.append(
-                {"source": sk_wrapper_template_path, "path": sk_wrapper_logical}
+            resources.extend(
+                [
+                    {"source": sk_wrapper_template_path, "path": sk_wrapper_logical},
+                    {"source": sk_compile_info.src_file, "path": sk_source_logical},
+                ]
             )
+            resources.extend(
+                {"source": source, "path": "resources/src/" + relative_path}
+                for source, relative_path in collect_local_include_files(
+                    sk_compile_info.src_file
+                )
+            )
+        ascend_home = os.environ.get("ASCEND_HOME_PATH", "")
         for symbol in symbols:
             tiling_key = _static_resource_tiling_key(
                 symbol, compile_info.tiling_key_list
             )
-            architecture, kernel_type = _static_resource_arch_and_type(
+            architecture, _ = _static_resource_arch_and_type(
                 compile_info, tiling_key
             )
             output_stem = re.sub(r"[^A-Za-z0-9_.-]", "_", symbol)
@@ -1929,38 +2046,14 @@ def _emit_static_compile_resources(
                 architecture,
                 tiling_key,
                 symbol,
-                "${resource." + wrapper_logical + "}",
-                "${resource." + tiling_logical + "}",
-                "${artifact." + relocatable_logical + "}",
+                "${resource:" + wrapper_logical + "}",
+                "${resource:" + tiling_logical + "}",
+                "${output:" + relocatable_logical + "}",
             )
-            build = {
-                "base": {
-                    "steps": [
-                        {
-                            "id": "compile_static_normal",
-                            "kind": "compile",
-                            "backend": "bisheng",
-                            "argv": argv,
-                            "depends_on": [],
-                            "inputs": [wrapper_logical, source_logical, tiling_logical],
-                            "outputs": [relocatable_logical],
-                        },
-                        {
-                            "id": "link_static_normal",
-                            "kind": "link",
-                            "argv": [
-                                "-m", "aicorelinux", "-Ttext=0",
-                                "${artifact." + relocatable_logical + "}",
-                                "-static", "-o",
-                                "${artifact." + output_logical + "}", "-q",
-                            ],
-                            "depends_on": ["compile_static_normal"],
-                            "inputs": [relocatable_logical],
-                            "outputs": [output_logical],
-                        },
-                    ]
-                }
-            }
+            normal_recipe = _static_normal_recipe(
+                argv, relocatable_logical, output_logical, ascend_home
+            )
+            recipes = {"normal": normal_recipe}
             if symbol in sk_pairs:
                 sk_symbol = sk_pairs[symbol]
                 output_prefix = "artifacts/" + re.sub(
@@ -1988,56 +2081,45 @@ def _emit_static_compile_resources(
                     architecture,
                     tiling_key,
                     sk_symbol,
-                    "${resource." + sk_wrapper_logical + "}",
-                    "${resource." + tiling_logical + "}",
-                    "${artifact." + sk_output + "}",
-                    ["-D__SUPER_KERNEL_STATIC_BLOCK_NUM__=${launch.block_dim}"],
+                    "${resource:" + sk_wrapper_logical + "}",
+                    "${resource:" + tiling_logical + "}",
+                    "${output:" + sk_output + "}",
+                    ["-D__SUPER_KERNEL_STATIC_BLOCK_NUM__=${context:block_dim}"],
                 )
                 bind_output = output_prefix + ".sk_bind.o"
                 bind_argv = _static_resource_bind_argv(
                     sk_compile_option_tuple,
-                    "${resource." + bind_logical + "}",
-                    "${artifact." + bind_output + "}",
+                    "${resource:" + bind_logical + "}",
+                    "${output:" + bind_output + "}",
                     architecture,
                 )
-                build["extensions"] = super_kernel_build_extension(
+                recipes["super_kernel"] = _static_super_kernel_recipe(
+                    normal_recipe=normal_recipe,
                     normal_relocatable=relocatable_logical,
-                    normal_link_dependency="link_static_normal",
                     sk_symbol=sk_symbol,
                     sk_argv=sk_argv,
-                    sk_inputs=[sk_wrapper_logical, source_logical, tiling_logical],
                     bind_argv=bind_argv,
-                    bind_input=bind_logical,
                     output_prefix=output_prefix,
+                    ascend_home=ascend_home,
                 )
             kernels.append(
                 {
                     "kernel_name": symbol,
-                    "kernel_type": kernel_type,
-                    "architecture": architecture,
-                    "macros": macros,
-                    "static_targets": [
+                    "targets": [
                         {
                             "name": "tiling_data",
-                            "value_type": "bytes",
-                            "required": True,
                             "parameter_index": workspace_idx + 1,
                             "byte_size": tiling_sizes[symbol],
                         }
                     ],
-                    "actions": [
+                    "patches": [
                         {
-                            "input": "tiling_data",
-                            "transform": "bytes_to_cpp_uint8_array@1",
-                            "params": {"symbol": "__ascendc_static_tiling_data"},
-                            "placement": {
-                                "mode": "replace_exact",
-                                "file": tiling_logical,
-                                "token": "@@STATIC_VALUE_tiling_data@@",
-                            },
+                            "file": tiling_logical,
+                            "token": "@@STATIC_VALUE_tiling_data@@",
+                            "value": "tiling_data",
                         }
                     ],
-                    "build": build,
+                    "recipes": recipes,
                 }
             )
         if compile_info.tiling_and_dfx_utils_file and os.path.isfile(
@@ -2050,13 +2132,12 @@ def _emit_static_compile_resources(
                     + os.path.basename(compile_info.tiling_and_dfx_utils_file),
                 }
             )
+        resources = _deduplicate_static_resources(resources)
         result = generate_static_compile_resources(
             output_root=kernel_meta_dir,
             kernel_base=compile_info.kernel_name,
-            op_type=op_info.op_type,
-            binary_path=dynamic_binary_path,
+            resource_id=_static_resource_id(op_info.op_type),
             resources=resources,
-            include_dirs=["resources/include"],
             kernels=kernels,
         )
         CommonUtility.print_compile_log(

@@ -209,10 +209,14 @@ class TestCompileOp(unittest.TestCase):
                 mllvm_options=[],
             )
             op_info = mock.Mock(op_type="Add")
+            def compile_command(source_path, output_path, static_options, *_args):
+                return ["bisheng", "-c"] + static_options.compile_options + [
+                    source_path, "-o", output_path,
+                ]
             with mock.patch.object(
                 compile_op_module,
                 "gen_compile_cmd_v220",
-                return_value=["bisheng", "-c", "source", "-o", "output"],
+                side_effect=compile_command,
             ), mock.patch.object(
                 compile_op_module, "generate_static_compile_resources", return_value="ok"
             ) as generate, mock.patch.object(
@@ -225,45 +229,128 @@ class TestCompileOp(unittest.TestCase):
                     "ok",
                 )
             kernel = generate.call_args.kwargs["kernels"][0]
+            self.assertEqual(
+                set(kernel), {"kernel_name", "targets", "patches", "recipes"}
+            )
             self.assertEqual(kernel["kernel_name"], "actual_7")
-            self.assertEqual(kernel["static_targets"][0]["parameter_index"], 5)
-            self.assertEqual(kernel["static_targets"][0]["byte_size"], 32)
-            self.assertEqual(kernel["macros"][0]["kind"], "dtype")
-            self.assertNotIn("dfx", json.dumps(kernel).lower())
-            self.assertNotIn("oom", json.dumps(kernel).lower())
-            base_steps = kernel["build"]["base"]["steps"]
-            self.assertEqual(len(base_steps), 2)
-            self.assertEqual(base_steps[0]["id"], "compile_static_normal")
+            self.assertEqual(kernel["targets"][0]["parameter_index"], 5)
+            self.assertEqual(kernel["targets"][0]["byte_size"], 32)
+            normal = kernel["recipes"]["normal"]
+            self.assertEqual(normal["artifact"], "artifacts/actual_7.o")
+            self.assertEqual(len(normal["commands"]), 2)
             self.assertEqual(
-                base_steps[0]["outputs"], ["intermediates/actual_7.rel.o"]
+                normal["commands"][0][0],
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
             )
+            self.assertEqual(normal["commands"][0].count("-DDTYPE_X=half"), 1)
+            self.assertEqual(normal["commands"][0].count("-DFORMAT_X=FORMAT_ND"), 1)
             self.assertEqual(
-                base_steps[1],
-                {
-                    "id": "link_static_normal",
-                    "kind": "link",
-                    "argv": [
-                        "-m",
-                        "aicorelinux",
-                        "-Ttext=0",
-                        "${artifact.intermediates/actual_7.rel.o}",
-                        "-static",
-                        "-o",
-                        "${artifact.artifacts/actual_7.o}",
-                        "-q",
-                    ],
-                    "depends_on": ["compile_static_normal"],
-                    "inputs": ["intermediates/actual_7.rel.o"],
-                    "outputs": ["artifacts/actual_7.o"],
-                },
+                normal["commands"][1],
+                [
+                    "${env:ASCEND_HOME_PATH}/bin/ld.lld", "-m", "aicorelinux",
+                    "-Ttext=0", "${output:intermediates/actual_7.rel.o}",
+                    "-static", "-o", "${output:artifacts/actual_7.o}", "-q",
+                ],
             )
-            artifact_outputs = [
-                output
-                for step in base_steps
-                for output in step["outputs"]
-                if output.startswith("artifacts/")
+            self.assertEqual(generate.call_args.kwargs["resource_id"], "add")
+            serialized = json.dumps(kernel)
+            for forbidden in ("macros", "build", "static_targets", "actions"):
+                self.assertNotIn(forbidden, serialized)
+
+    def test_emit_static_compile_resources_flattens_self_contained_sk_recipe(self):
+        with TemporaryDirectory() as root:
+            paths = {
+                name: os.path.join(root, name)
+                for name in (
+                    "Add_x.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_tiling.h",
+                    "Add_x.json", "Add_x_sk_kernel.cpp", "add_sk.cpp", "sk_bind.cpp",
+                )
+            }
+            for name in ("Add_x.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_sk_kernel.cpp", "add_sk.cpp"):
+                with open(paths[name], "w", encoding="utf-8") as file_obj:
+                    file_obj.write("source\n")
+            with open(paths["Add_x_tiling.h"], "w", encoding="utf-8") as file_obj:
+                file_obj.write(
+                    "#ifndef T\n#define T\nclass AddTiling {};\n"
+                    "#define GET_TILING_DATA(v, p) InitTilingData<AddTiling>(p, &v)\n#endif\n"
+                )
+            with open(paths["Add_x.json"], "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelList": [{"kernelName": "actual_7"}]}, file_obj)
+            with open(paths["sk_bind.cpp"], "w", encoding="utf-8") as file_obj:
+                file_obj.write("SK_BIND(actual_7, 3, actual_7_sk, x);\n")
+
+            info = CompileInfo()
+            info.dst_file = paths["Add_x.o"]
+            info.src_file = paths["add.cpp"]
+            info.gen_kernel_func_file = paths["Add_x_kernel.cpp"]
+            info.kernel_name = "Add_x"
+            info.origin_func_name = "Add"
+            info.tiling_key_list = ["7"]
+            info.tiling_key_kernel_type = {"7": KernelMetaType.KERNEL_TYPE_AIV_ONLY}
+            info.global_kernel_symbols = ["actual_7"]
+            info.global_kernel_attribute = "__aicore__"
+            info.static_compile_tiling_size = 32
+            info.static_compile_tiling_key_data_size = {"7": 32}
+            sk_info = CompileInfo()
+            sk_info.src_file = paths["add.cpp"]
+            sk_info.gen_kernel_func_file = paths["Add_x_sk_kernel.cpp"]
+            sk_info.origin_func_name = "Add"
+            sk_info.global_kernel_symbols = ["actual_7_sk"]
+            tiling = mock.Mock(
+                static_shape_flag=False,
+                tiling_data_file_path=paths["Add_x_tiling.h"],
+                tiling_key_data_size={},
+                tiling_data_size=32,
+            )
+            options = mock.Mock(compile_options=["-DDTYPE_X=half"], mllvm_options=[])
+            sk_options = mock.Mock(compile_options=[], mllvm_options=[])
+
+            def compile_command(source_path, output_path, static_options, *_args):
+                return ["bisheng", "-c"] + static_options.compile_options + [
+                    source_path, "-o", output_path,
+                ]
+
+            with mock.patch.object(
+                compile_op_module, "gen_compile_cmd_v220", side_effect=compile_command
+            ), mock.patch.object(
+                compile_op_module, "generate_static_compile_resources", return_value="ok"
+            ) as generate, mock.patch.object(
+                compile_op_module.CommonUtility, "get_chip_version", return_value="c220"
+            ):
+                compile_op_module._emit_static_compile_resources(
+                    info, mock.Mock(op_type="LeakyReluCustom"), tiling, options, 4, root,
+                    sk_compile_info=sk_info,
+                    sk_compile_option_tuple=sk_options,
+                    sk_bind_source_path=paths["sk_bind.cpp"],
+                )
+
+            kernel = generate.call_args.kwargs["kernels"][0]
+            commands = kernel["recipes"]["super_kernel"]["commands"]
+            self.assertEqual(commands[:2], kernel["recipes"]["normal"]["commands"])
+            self.assertEqual(
+                [command[0] for command in commands[2:]],
+                [
+                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                    "${env:ASCEND_HOME_PATH}/bin/llvm-ar",
+                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                    "${env:ASCEND_HOME_PATH}/bin/ld.lld",
+                    "${env:ASCEND_HOME_PATH}/bin/ld.lld",
+                ],
+            )
+            self.assertIn("${context:block_dim}", json.dumps(commands))
+            self.assertNotIn("${launch.block_dim}", json.dumps(commands))
+            self.assertEqual(
+                kernel["recipes"]["super_kernel"]["artifact"],
+                "artifacts/actual_7.static_with_sk.o",
+            )
+            self.assertEqual(generate.call_args.kwargs["resource_id"], "leaky_relu_custom")
+            resource_paths = [
+                resource["path"] for resource in generate.call_args.kwargs["resources"]
             ]
-            self.assertEqual(artifact_outputs, ["artifacts/actual_7.o"])
+            self.assertEqual(len(resource_paths), len(set(resource_paths)))
 
     def test_static_resource_bind_argv_uses_c310_architecture(self):
         options = mock.Mock(compile_options=["-DORIGINAL=1"])

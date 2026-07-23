@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-import hashlib
 import importlib.util
 import json
 import os
-import sys
 import tempfile
 import unittest
 
@@ -23,11 +21,11 @@ MODULE_SPEC.loader.exec_module(MODULE)
 generate_static_compile_resources = MODULE.generate_static_compile_resources
 collect_kernel_symbols = MODULE.collect_kernel_symbols
 collect_local_include_files = MODULE.collect_local_include_files
-parse_compile_option_macros = MODULE.parse_compile_option_macros
+normalize_static_command = MODULE.normalize_static_command
+normalize_static_program = MODULE.normalize_static_program
 portable_wrapper_text = MODULE.portable_wrapper_text
 resolve_symbol_tiling_sizes = MODULE.resolve_symbol_tiling_sizes
 static_tiling_template_text = MODULE.static_tiling_template_text
-super_kernel_build_extension = MODULE.super_kernel_build_extension
 
 
 class TestStaticCompileResourceGenerator(unittest.TestCase):
@@ -48,39 +46,83 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 [(header, "tiling.h"), (detail, "detail/types.h")],
             )
 
-    def test_builds_optional_super_kernel_extension_from_launch_context(self):
-        extension = super_kernel_build_extension(
-            normal_relocatable="intermediates/normal.rel.o",
-            normal_link_dependency="link_static_normal",
-            sk_symbol="add_sk",
-            sk_argv=["-c", "-D__SUPER_KERNEL_STATIC_BLOCK_NUM__=${launch.block_dim}"],
-            sk_inputs=["resources/src/sk.cpp", "resources/include/tiling.h"],
-            bind_argv=["-c", "resources/src/bind.cpp"],
-            bind_input="resources/src/bind.cpp",
-            output_prefix="artifacts/add",
-        )
-        steps = extension["super_kernel"]["steps"]
+    def test_normalizes_programs_and_portable_command_paths(self):
         self.assertEqual(
-            [step["kind"] for step in steps],
-            ["compile", "objcopy", "objcopy", "objcopy", "archive", "compile", "link", "link"],
-        )
-        self.assertIn("${launch.block_dim}", " ".join(steps[0]["argv"]))
-        self.assertEqual(steps[0]["depends_on"], ["link_static_normal"])
-        self.assertEqual(steps[5]["depends_on"], ["link_static_normal"])
-        self.assertEqual(
-            steps[6]["inputs"],
+            [normalize_static_program(kind) for kind in ("compile", "link", "objcopy", "archive")],
             [
-                "intermediates/normal.rel.o",
-                "artifacts/add.sk_bind.o",
-                "artifacts/add.sk.a",
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                "${env:ASCEND_HOME_PATH}/bin/ld.lld",
+                "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                "${env:ASCEND_HOME_PATH}/bin/llvm-ar",
             ],
         )
-        self.assertIn(
-            "${artifact.intermediates/normal.rel.o}", steps[6]["argv"]
+        argv = [
+            "-I/usr/local/Ascend/cann-9.2.0/aarch64-linux/asc/include",
+            "-I/usr/local/Ascend/cann-9.2.0/aarch64-linux/asc/../ascendc/act",
+            "-I/tmp/generated/op_build/ascendc/common",
+            "${resource.resources/src/k.cpp}",
+            "-o",
+            "${artifact.artifacts/k.o}",
+        ]
+        self.assertEqual(
+            normalize_static_command(
+                "compile", argv, "/usr/local/Ascend/cann-9.2.0", 0
+            ),
+            [
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                "-I${env:ASCEND_HOME_PATH}/aarch64-linux/asc/include",
+                "-I${env:ASCEND_HOME_PATH}/aarch64-linux/ascendc/act",
+                "${resource:resources/src/k.cpp}",
+                "-o",
+                "${output:artifacts/k.o}",
+            ],
         )
-        self.assertNotIn("${artifact.artifacts/normal.o}", steps[6]["argv"])
-        self.assertIn("compile_static_normal", steps[6]["depends_on"])
-        self.assertEqual(steps[-1]["outputs"], ["artifacts/add.static_with_sk.o"])
+
+    def test_normalized_commands_are_stable_across_cann_roots(self):
+        suffix = "/aarch64-linux/asc/include"
+        first = normalize_static_command(
+            "compile", ["-I/opt/cann-a" + suffix, "-c"], "/opt/cann-a", 0
+        )
+        second = normalize_static_command(
+            "compile", ["-I/srv/cann-b" + suffix, "-c"], "/srv/cann-b", 0
+        )
+        self.assertEqual(first, second)
+
+    def test_rejects_unclassified_absolute_command_path(self):
+        with self.assertRaisesRegex(
+            ValueError, r"command\[3\]\[1\].*non-portable absolute path"
+        ):
+            normalize_static_command(
+                "link", ["-o", "/tmp/generated/kernel.o"], "/opt/cann", 3
+            )
+        with self.assertRaisesRegex(ValueError, "non-portable absolute path"):
+            normalize_static_command(
+                "compile", ["--sysroot=/opt/cann-other"], "/opt/cann", 0
+            )
+
+    def test_rejects_dot_segments_in_logical_resource_paths(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.cpp")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+            with self.assertRaisesRegex(ValueError, "stay inside"):
+                generate_static_compile_resources(
+                    output_root=root,
+                    kernel_base="Kernel_x",
+                    resource_id="kernel",
+                    resources=[{
+                        "source": source,
+                        "path": "resources/src/./kernel.cpp",
+                    }],
+                    kernels=[{
+                        "kernel_name": "kernel",
+                        "recipes": {"normal": {
+                            "commands": [["cp", "${resource:resources/src/kernel.cpp}",
+                                          "${output:artifacts/kernel.o}"]],
+                            "artifact": "artifacts/kernel.o",
+                        }},
+                    }],
+                )
 
     def test_rewrites_only_the_original_source_include_for_portability(self):
         wrapper = '#include "/tmp/build/add.cpp"\n#include "kernel_common.h"\n'
@@ -96,6 +138,11 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertIn("#ifdef CONST_TILING", result)
         self.assertIn("convert_from_bytes<AddTilingData>", result)
         self.assertIn("__ascendc_static_tiling_data", result)
+        self.assertIn(
+            "static constexpr uint8_t __ascendc_static_tiling_data[] = "
+            "@@STATIC_VALUE_tiling_data@@;",
+            result,
+        )
         self.assertIn("#define GET_TILING_DATA_WITH_STRUCT", result)
         self.assertIn("#define GET_TILING_DATA_MEMBER", result)
         self.assertEqual(result.count("@@STATIC_VALUE_tiling_data@@"), 1)
@@ -115,22 +162,6 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertIn("convert_from_bytes<tiling_type>", result)
         self.assertNotIn("static_assert(false", result)
         self.assertIn("#define GET_TILING_DATA(tiling_data, tiling_arg)", result)
-
-    def test_extracts_compile_macros_with_stable_kinds(self):
-        self.assertEqual(
-            parse_compile_option_macros([
-                "-O3", "-DDTYPE_X=half", "-DORIG_DTYPE_X=DT_FLOAT16",
-                "-DFORMAT_X=FORMAT_ND", "-DASCENDC_DUMP=1",
-                "-DL2_CACHE_HINT", "-DDTYPE_X=half",
-            ]),
-            [
-                {"name": "DTYPE_X", "value": "half", "kind": "dtype"},
-                {"name": "ORIG_DTYPE_X", "value": "DT_FLOAT16", "kind": "dtype"},
-                {"name": "FORMAT_X", "value": "FORMAT_ND", "kind": "format"},
-                {"name": "ASCENDC_DUMP", "value": "1", "kind": "compile"},
-                {"name": "L2_CACHE_HINT", "value": "1", "kind": "compile"},
-            ],
-        )
 
     def test_collects_actual_symbols_from_final_metadata(self):
         metadata = {
@@ -176,89 +207,136 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 ["add_7", "add_9"], ["7", "9"], {"7": 32}, 64
             )
 
-    def test_generates_symbol_indexed_resource_directory(self):
+    def test_generates_minimal_direct_v4_manifest(self):
         with tempfile.TemporaryDirectory() as root:
-            binary = os.path.join(root, "AddCustom.o")
             source = os.path.join(root, "kernel.cpp")
-            with open(binary, "wb") as file_obj:
-                file_obj.write(b"dynamic-binary")
             with open(source, "w", encoding="utf-8") as file_obj:
-                file_obj.write("kernel source\n")
+                file_obj.write("@@STATIC_VALUE_tiling_data@@\n")
 
             result = generate_static_compile_resources(
                 output_root=root,
                 kernel_base="AddCustom_xxx",
-                op_type="AddCustom",
-                binary_path=binary,
+                resource_id="add_custom",
                 resources=[
                     {"source": source, "path": "resources/src/kernel.cpp"}
                 ],
-                include_dirs=["resources/include"],
                 kernels=[
                     {
                         "kernel_name": "add_custom_0",
-                        "kernel_type": "KERNEL_TYPE_AIV_ONLY",
-                        "architecture": "dav-c220-vec",
-                        "macros": [
-                            {"name": "DTYPE_X", "value": "half", "kind": "dtype"},
-                            {"name": "FORMAT_X", "value": "FORMAT_ND", "kind": "format"},
-                        ],
-                        "static_targets": [
+                        "targets": [
                             {
                                 "name": "tiling_data",
-                                "value_type": "bytes",
                                 "required": True,
                                 "parameter_index": 4,
                                 "byte_size": 8,
                             }
                         ],
-                        "actions": [],
-                        "build": {
-                            "base": {"steps": []},
-                            "extensions": {"super_kernel": {"steps": []}},
+                        "patches": [{
+                            "file": "resources/src/kernel.cpp",
+                            "token": "@@STATIC_VALUE_tiling_data@@",
+                            "value": "tiling_data",
+                            "format": "cpp_uint8_array",
+                        }],
+                        "recipes": {
+                            "normal": {
+                                "commands": [[
+                                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                                    "-DDTYPE_X=half",
+                                    "${resource:resources/src/kernel.cpp}",
+                                    "-o", "${output:artifacts/add_custom_0.o}",
+                                ]],
+                                "artifact": "artifacts/add_custom_0.o",
+                            }
                         },
                     }
                 ],
             )
 
-            manifest_path = os.path.join(result, "op_resource.json")
+            manifest_path = os.path.join(result, "manifest.json")
             with open(manifest_path, "r", encoding="utf-8") as file_obj:
                 manifest = json.load(file_obj)
-            self.assertEqual(manifest["contract_version"], "3.0")
             self.assertEqual(
-                manifest["op"]["binary"]["sha256"],
-                hashlib.sha256(b"dynamic-binary").hexdigest(),
+                set(manifest), {"schema_version", "resource_id", "kernels"}
             )
-            kernel = manifest["op"]["kernels"][0]
+            self.assertEqual(manifest["schema_version"], "4.0")
+            self.assertEqual(manifest["resource_id"], "add_custom")
+            kernel = manifest["kernels"][0]
+            self.assertEqual(
+                set(kernel), {"kernel_name", "targets", "patches", "recipes"}
+            )
             self.assertEqual(kernel["kernel_name"], "add_custom_0")
-            self.assertEqual(kernel["static_targets"][0]["parameter_index"], 4)
-            self.assertEqual(kernel["static_targets"][0]["byte_size"], 8)
-            self.assertIn("super_kernel", kernel["build"]["extensions"])
-            self.assertNotIn("dfx", json.dumps(manifest).lower())
-            self.assertNotIn("oom", json.dumps(manifest).lower())
+            self.assertEqual(kernel["targets"][0]["parameter_index"], 4)
+            self.assertEqual(kernel["targets"][0]["byte_size"], 8)
+            self.assertNotIn("required", kernel["targets"][0])
+            self.assertNotIn("format", kernel["patches"][0])
+            serialized = json.dumps(manifest)
+            for forbidden in (
+                "macros", "architecture", "kernel_type", "build",
+                "binary", "filePath", "contract_version", "sha256",
+            ):
+                self.assertNotIn(forbidden, serialized)
             copied = os.path.join(result, "resources/src/kernel.cpp")
             self.assertTrue(os.path.isfile(copied))
-            self.assertEqual(
-                manifest["op"]["resources"]["files"][0]["sha256"],
-                hashlib.sha256(b"kernel source\n").hexdigest(),
+
+    def test_rejects_unknown_fields_and_missing_command_resources(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.cpp")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+            kernel = {
+                "kernel_name": "kernel",
+                "recipes": {"normal": {
+                    "commands": [["cp", "${resource:resources/src/missing.cpp}",
+                                  "${output:artifacts/kernel.o}"]],
+                    "artifact": "artifacts/kernel.o",
+                }},
+            }
+            with self.assertRaisesRegex(ValueError, "missing resource"):
+                generate_static_compile_resources(
+                    output_root=root, kernel_base="Kernel_x", resource_id="kernel",
+                    resources=[{"source": source, "path": "resources/src/kernel.cpp"}],
+                    kernels=[kernel],
+                )
+            kernel["recipes"]["normal"]["commands"][0][1] = (
+                "${resource:resources/src/kernel.cpp}"
             )
+            kernel["recipes"]["normal"]["commands"][0].append(
+                "-I${env:ASCEND_HOME_PATH}/../host/include"
+            )
+            with self.assertRaisesRegex(ValueError, "stay inside"):
+                generate_static_compile_resources(
+                    output_root=root, kernel_base="Kernel_x", resource_id="kernel",
+                    resources=[{"source": source, "path": "resources/src/kernel.cpp"}],
+                    kernels=[kernel],
+                )
+            kernel["recipes"]["normal"]["commands"][0].pop()
+            missing_name = dict(kernel)
+            missing_name.pop("kernel_name")
+            with self.assertRaisesRegex(ValueError, "kernel_name"):
+                generate_static_compile_resources(
+                    output_root=root, kernel_base="Kernel_x", resource_id="kernel",
+                    resources=[{"source": source, "path": "resources/src/kernel.cpp"}],
+                    kernels=[missing_name],
+                )
+            kernel["architecture"] = "dav-c220-vec"
+            with self.assertRaisesRegex(ValueError, "unknown fields"):
+                generate_static_compile_resources(
+                    output_root=root, kernel_base="Kernel_x", resource_id="kernel",
+                    resources=[{"source": source, "path": "resources/src/kernel.cpp"}],
+                    kernels=[kernel],
+                )
 
     def test_cleans_staging_directory_when_resource_copy_fails(self):
         with tempfile.TemporaryDirectory() as root:
-            binary = os.path.join(root, "AddCustom.o")
-            with open(binary, "wb") as file_obj:
-                file_obj.write(b"dynamic-binary")
             with self.assertRaises(FileNotFoundError):
                 generate_static_compile_resources(
                     output_root=root,
                     kernel_base="AddCustom_xxx",
-                    op_type="AddCustom",
-                    binary_path=binary,
+                    resource_id="add_custom",
                     resources=[
                         {"source": os.path.join(root, "missing.cpp"),
                          "path": "resources/src/kernel.cpp"}
                     ],
-                    include_dirs=[],
                     kernels=[],
                 )
             static_root = os.path.join(root, "static_compile")

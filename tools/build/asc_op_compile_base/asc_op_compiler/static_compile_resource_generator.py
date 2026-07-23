@@ -11,43 +11,13 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import copy
-import hashlib
 import json
 import os
+import posixpath
 import re
 import shutil
 import tempfile
 from pathlib import PurePosixPath
-
-
-def parse_compile_option_macros(compile_options):
-    """Return stable, typed macro definitions from compiler -D options."""
-    macros = []
-    seen = {}
-    for option in compile_options:
-        if not isinstance(option, str) or not option.startswith("-D") or len(option) == 2:
-            continue
-        definition = option[2:]
-        name, separator, value = definition.partition("=")
-        if not name:
-            continue
-        value = value if separator else "1"
-        previous = seen.get(name)
-        if previous is not None:
-            if previous != value:
-                raise ValueError(
-                    f"compile macro {name} has conflicting values {previous} and {value}"
-                )
-            continue
-        if name.startswith("DTYPE_") or name.startswith("ORIG_DTYPE_"):
-            kind = "dtype"
-        elif name.startswith("FORMAT_") or name.startswith("ORIG_FORMAT_"):
-            kind = "format"
-        else:
-            kind = "compile"
-        seen[name] = value
-        macros.append({"name": name, "value": value, "kind": kind})
-    return macros
 
 
 def collect_kernel_symbols(metadata, linked_symbols=None):
@@ -145,7 +115,10 @@ def static_tiling_template_text(dynamic_header):
     class_name = class_names[0] if class_names else None
     marker = "@@STATIC_VALUE_tiling_data@@"
     slash = "\\"
-    lines = ["#ifdef CONST_TILING", marker]
+    lines = [
+        "#ifdef CONST_TILING",
+        f"static constexpr uint8_t __ascendc_static_tiling_data[] = {marker};",
+    ]
     for macro in ("GET_TILING_DATA", "GET_TILING_DATA_WITH_STRUCT", "GET_TILING_DATA_MEMBER"):
         lines.extend([f"#ifdef {macro}", f"#undef {macro}", "#endif"])
     if class_name is None:
@@ -192,140 +165,90 @@ def portable_wrapper_text(wrapper_text, original_source_path):
     )
 
 
-def super_kernel_build_extension(
-    *,
-    normal_relocatable,
-    normal_link_dependency,
-    sk_symbol,
-    sk_argv,
-    sk_inputs,
-    bind_argv,
-    bind_input,
-    output_prefix,
-):
-    """Build the optional SK graph appended after the normal base compile."""
-    sk_output = output_prefix + ".sk.o"
-    split_outputs = [output_prefix + f".sk_split{index}.o" for index in range(1, 4)]
-    archive_output = output_prefix + ".sk.a"
-    bind_output = output_prefix + ".sk_bind.o"
-    merged_output = output_prefix + ".sk_merged.o"
-    final_output = output_prefix + ".static_with_sk.o"
-    steps = [
-        {
-            "id": "compile_static_sk",
-            "kind": "compile",
-            "backend": "bisheng",
-            "argv": list(sk_argv),
-            "depends_on": [normal_link_dependency],
-            "inputs": list(sk_inputs),
-            "outputs": [sk_output],
-        }
-    ]
-    for index, split_output in enumerate(split_outputs, 1):
-        steps.append(
-            {
-                "id": f"split_static_sk_{index}",
-                "kind": "objcopy",
-                "argv": [
-                    f"--redefine-sym={sk_symbol}={sk_symbol}_split{index}",
-                    "${artifact." + sk_output + "}",
-                    "${artifact." + split_output + "}",
-                ],
-                "depends_on": ["compile_static_sk"],
-                "inputs": [sk_output],
-                "outputs": [split_output],
-            }
-        )
-    steps.extend(
-        [
-            {
-                "id": "archive_static_sk",
-                "kind": "archive",
-                "argv": ["rcs", "${artifact." + archive_output + "}"]
-                + ["${artifact." + path + "}" for path in [sk_output] + split_outputs],
-                "depends_on": [f"split_static_sk_{index}" for index in range(1, 4)],
-                "inputs": [sk_output] + split_outputs,
-                "outputs": [archive_output],
-            },
-            {
-                "id": "compile_static_sk_bind",
-                "kind": "compile",
-                "backend": "bisheng",
-                "argv": list(bind_argv),
-                "depends_on": [normal_link_dependency],
-                "inputs": [bind_input],
-                "outputs": [bind_output],
-            },
-            {
-                "id": "link_static_sk_objects",
-                "kind": "link",
-                "argv": [
-                    "-r", "-o", "${artifact." + merged_output + "}",
-                    "${artifact." + normal_relocatable + "}",
-                    "${artifact." + bind_output + "}",
-                    "${artifact." + archive_output + "}",
-                ],
-                "depends_on": [
-                    "archive_static_sk",
-                    "compile_static_sk_bind",
-                    "compile_static_normal",
-                ],
-                "inputs": [normal_relocatable, bind_output, archive_output],
-                "outputs": [merged_output],
-            },
-            {
-                "id": "link_static_sk_final",
-                "kind": "link",
-                "argv": [
-                    "-m", "aicorelinux", "-Ttext=0",
-                    "${artifact." + merged_output + "}", "-static", "-o",
-                    "${artifact." + final_output + "}", "-q",
-                ],
-                "depends_on": ["link_static_sk_objects"],
-                "inputs": [merged_output],
-                "outputs": [final_output],
-            },
-        ]
-    )
-    return {"super_kernel": {"steps": steps}}
+def normalize_static_program(kind):
+    try:
+        return {
+            "compile": "${env:ASCEND_HOME_PATH}/bin/bisheng",
+            "link": "${env:ASCEND_HOME_PATH}/bin/ld.lld",
+            "objcopy": "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+            "archive": "${env:ASCEND_HOME_PATH}/bin/llvm-ar",
+        }[kind]
+    except KeyError as error:
+        raise ValueError(f"unsupported static command kind: {kind}") from error
 
 
-def _sha256_file(path):
-    digest = hashlib.sha256()
-    with open(path, "rb") as file_obj:
-        while True:
-            block = file_obj.read(1024 * 1024)
-            if not block:
-                break
-            digest.update(block)
-    return digest.hexdigest()
+def _contains_literal_absolute_path(value):
+    if value.startswith(("/", "-I/", "-L/", "-include/")):
+        return True
+    return re.search(r"(?:^|[=,:@\s])/", value) is not None
+
+
+def normalize_static_command(kind, argv, ascend_home, command_index):
+    """Return a shell-free command whose paths are portable across CANN installs."""
+    if not isinstance(argv, (list, tuple)):
+        raise ValueError(f"command[{command_index}] argv must be a list")
+    result = [normalize_static_program(kind)]
+    cann_roots = []
+    if ascend_home:
+        for root in (os.path.abspath(ascend_home), os.path.realpath(ascend_home)):
+            root = root.rstrip(os.sep)
+            if root and root not in cann_roots:
+                cann_roots.append(root)
+    cann_roots.sort(key=len, reverse=True)
+    for argv_index, argument in enumerate(argv):
+        if not isinstance(argument, str) or not argument:
+            raise ValueError(
+                f"command[{command_index}][{argv_index}] must be a non-empty string"
+            )
+        value = argument.replace("${resource.", "${resource:")
+        value = value.replace("${artifact.", "${output:")
+        value = value.replace("${launch.block_dim}", "${context:block_dim}")
+        for cann_root in cann_roots:
+            value = re.sub(
+                re.escape(cann_root) + r"(?=/|$)",
+                "${env:ASCEND_HOME_PATH}",
+                value,
+            )
+        env_path = re.search(r"(\$\{env:[A-Z_][A-Z0-9_]*\})/([^}]*)$", value)
+        if env_path:
+            normalized_suffix = posixpath.normpath(env_path.group(2))
+            value = (
+                value[:env_path.start()]
+                + env_path.group(1)
+                + "/"
+                + normalized_suffix
+            )
+        if value.startswith("-I/") and not os.path.isdir(value[2:]):
+            continue
+        if _contains_literal_absolute_path(value):
+            raise ValueError(
+                f"command[{command_index}][{argv_index}] contains "
+                f"non-portable absolute path: {argument}"
+            )
+        result.append(value)
+    return result
 
 
 def _relative_path(value, context):
     if not isinstance(value, str) or not value:
         raise ValueError(f"{context} must be a non-empty string")
+    raw_parts = value.split("/")
+    if "\\" in value or any(part in {"", ".", ".."} for part in raw_parts):
+        raise ValueError(f"{context} must stay inside the resource directory: {value}")
     path = PurePosixPath(value)
     if path.is_absolute() or ".." in path.parts or "." in path.parts:
         raise ValueError(f"{context} must stay inside the resource directory: {value}")
     return path.as_posix()
 
 
-def _validate_static_target(target, context):
-    allowed = {
-        "name",
-        "value_type",
-        "required",
-        "parameter_index",
-        "byte_size",
-    }
+def _validate_target(target, context):
+    allowed = {"name", "required", "parameter_index", "byte_size"}
     unknown = set(target) - allowed
     if unknown:
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
     if not isinstance(target.get("name"), str) or not target["name"]:
         raise ValueError(f"{context}.name must be a non-empty string")
-    if target.get("value_type") != "bytes":
-        raise ValueError(f"{context}.value_type must be bytes")
-    if not isinstance(target.get("required"), bool):
+    if "required" in target and not isinstance(target["required"], bool):
         raise ValueError(f"{context}.required must be bool")
     parameter_index = target.get("parameter_index")
     byte_size = target.get("byte_size")
@@ -335,53 +258,154 @@ def _validate_static_target(target, context):
         raise ValueError(f"{context}.byte_size must be a positive integer")
 
 
-def _validate_kernel(kernel, context):
-    allowed = {
-        "kernel_name",
-        "kernel_type",
-        "architecture",
-        "macros",
-        "static_targets",
-        "actions",
-        "build",
-    }
+def _validate_patch(patch, context, target_names, resource_paths):
+    allowed = {"file", "token", "value", "format"}
+    unknown = set(patch) - allowed
+    if unknown:
+        raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
+    if set(patch) - {"format"} != {"file", "token", "value"}:
+        raise ValueError(f"{context} must contain file, token, and value")
+    file_path = _relative_path(patch["file"], f"{context}.file")
+    if file_path not in resource_paths:
+        raise ValueError(f"{context}.file references missing resource: {file_path}")
+    if not isinstance(patch["token"], str) or not patch["token"]:
+        raise ValueError(f"{context}.token must be a non-empty string")
+    if patch["value"] not in target_names:
+        raise ValueError(f"{context}.value references unknown target: {patch['value']}")
+    if patch.get("format", "cpp_uint8_array") not in {
+        "cpp_uint8_array", "raw_text", "hex"
+    }:
+        raise ValueError(f"{context}.format is unsupported")
+
+
+def _validate_argument(argument, context, resource_paths):
+    if not isinstance(argument, str) or not argument:
+        raise ValueError(f"{context} must be a non-empty string")
+    legacy = re.search(r"\$\{(?:resource|artifact)\.", argument)
+    if legacy:
+        raise ValueError(f"{context} contains a legacy placeholder")
+    placeholders = list(re.finditer(r"\$\{([^}:]+):([^}]+)\}", argument))
+    scrubbed = argument
+    for match in placeholders:
+        namespace, path = match.groups()
+        if namespace == "env":
+            if not re.fullmatch(r"[A-Z_][A-Z0-9_]*", path):
+                raise ValueError(f"{context} has invalid environment placeholder")
+            suffix = argument[match.end():]
+            if suffix.startswith("/"):
+                _relative_path(suffix[1:], context)
+        elif namespace in {"resource", "output"}:
+            logical_path = _relative_path(path, context)
+            if argument[match.end():].startswith("/"):
+                raise ValueError(f"{context} has a path suffix outside its placeholder")
+            if namespace == "resource" and logical_path not in resource_paths:
+                raise ValueError(
+                    f"{context} references missing resource: {logical_path}"
+                )
+        elif not (namespace == "context" and path == "block_dim"):
+            raise ValueError(f"{context} has unsupported placeholder namespace")
+        scrubbed = scrubbed.replace(match.group(0), "PLACEHOLDER")
+    if "${" in scrubbed or _contains_literal_absolute_path(scrubbed):
+        raise ValueError(f"{context} contains a non-portable path or placeholder")
+
+
+def _validate_recipe(recipe, context, kernel_name, target_names, resource_paths):
+    if not isinstance(recipe, dict):
+        raise ValueError(f"{context} must be an object")
+    unknown = set(recipe) - {"commands", "artifact", "patches"}
+    if unknown:
+        raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
+    commands = recipe.get("commands")
+    if not isinstance(commands, list) or not commands:
+        raise ValueError(f"{context}.commands must be a non-empty list")
+    for command_index, command in enumerate(commands):
+        if not isinstance(command, list) or not command:
+            raise ValueError(f"{context}.commands[{command_index}] must be a non-empty argv list")
+        for argv_index, argument in enumerate(command):
+            _validate_argument(
+                argument,
+                f"{context}.commands[{command_index}][{argv_index}]",
+                resource_paths,
+            )
+    artifact = recipe.get("artifact")
+    if isinstance(artifact, str):
+        _relative_path(artifact, f"{context}.artifact")
+    elif isinstance(artifact, dict):
+        unknown = set(artifact) - {"file", "entry", "format"}
+        if unknown or "file" not in artifact:
+            raise ValueError(f"{context}.artifact has invalid fields")
+        _relative_path(artifact["file"], f"{context}.artifact.file")
+        entry = artifact.get("entry", kernel_name)
+        if not isinstance(entry, str) or not entry:
+            raise ValueError(f"{context}.artifact.entry must be a non-empty string")
+        if artifact.get("format", "elf") not in {"elf", "archive"}:
+            raise ValueError(f"{context}.artifact.format is unsupported")
+    else:
+        raise ValueError(f"{context}.artifact must be a path or object")
+    for index, patch in enumerate(recipe.get("patches", [])):
+        if not isinstance(patch, dict):
+            raise ValueError(f"{context}.patches[{index}] must be an object")
+        _validate_patch(
+            patch, f"{context}.patches[{index}]", target_names, resource_paths
+        )
+
+
+def _normalize_and_validate_kernel(kernel, context, resource_paths):
+    allowed = {"kernel_name", "targets", "patches", "recipes"}
     unknown = set(kernel) - allowed
     if unknown:
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
-    for field in ("kernel_name", "kernel_type", "architecture"):
-        if not isinstance(kernel.get(field), str) or not kernel[field]:
-            raise ValueError(f"{context}.{field} must be a non-empty string")
-    macros = kernel.get("macros")
-    if not isinstance(macros, list):
-        raise ValueError(f"{context}.macros must be a list")
-    macro_names = set()
-    for index, macro in enumerate(macros):
-        macro_context = f"{context}.macros[{index}]"
-        if not isinstance(macro, dict) or set(macro) != {"name", "value", "kind"}:
-            raise ValueError(f"{macro_context} must contain name, value, and kind")
-        if not all(isinstance(macro[field], str) and macro[field] for field in macro):
-            raise ValueError(f"{macro_context} fields must be non-empty strings")
-        if macro["name"] in macro_names:
-            raise ValueError(f"{context} has duplicate macro {macro['name']}")
-        macro_names.add(macro["name"])
-    targets = kernel.get("static_targets")
+    if not isinstance(kernel.get("kernel_name"), str) or not kernel["kernel_name"]:
+        raise ValueError(f"{context}.kernel_name must be a non-empty string")
+    targets = kernel.get("targets", [])
     if not isinstance(targets, list):
-        raise ValueError(f"{context}.static_targets must be a list")
+        raise ValueError(f"{context}.targets must be a list")
     target_names = set()
     for index, target in enumerate(targets):
         if not isinstance(target, dict):
-            raise ValueError(f"{context}.static_targets[{index}] must be an object")
-        _validate_static_target(target, f"{context}.static_targets[{index}]")
+            raise ValueError(f"{context}.targets[{index}] must be an object")
+        _validate_target(target, f"{context}.targets[{index}]")
         if target["name"] in target_names:
-            raise ValueError(f"{context} has duplicate static target {target['name']}")
+            raise ValueError(f"{context} has duplicate target {target['name']}")
         target_names.add(target["name"])
-    if not isinstance(kernel.get("actions"), list):
-        raise ValueError(f"{context}.actions must be a list")
-    build = kernel.get("build")
-    if not isinstance(build, dict) or not isinstance(build.get("base"), dict):
-        raise ValueError(f"{context}.build.base must be an object")
-    if not isinstance(build["base"].get("steps"), list):
-        raise ValueError(f"{context}.build.base.steps must be a list")
+    patches = kernel.get("patches", [])
+    if not isinstance(patches, list):
+        raise ValueError(f"{context}.patches must be a list")
+    for index, patch in enumerate(patches):
+        if not isinstance(patch, dict):
+            raise ValueError(f"{context}.patches[{index}] must be an object")
+        _validate_patch(
+            patch, f"{context}.patches[{index}]", target_names, resource_paths
+        )
+    recipes = kernel.get("recipes")
+    if not isinstance(recipes, dict) or not recipes:
+        raise ValueError(f"{context}.recipes must be a non-empty object")
+    unknown_recipes = set(recipes) - {"normal", "super_kernel"}
+    if unknown_recipes:
+        raise ValueError(f"{context}.recipes has unknown recipes: {sorted(unknown_recipes)}")
+    for name, recipe in recipes.items():
+        _validate_recipe(
+            recipe, f"{context}.recipes.{name}", kernel["kernel_name"],
+            target_names, resource_paths,
+        )
+    normalized = copy.deepcopy(kernel)
+    for target in normalized.get("targets", []):
+        if target.get("required") is True:
+            target.pop("required")
+    for patch in normalized.get("patches", []):
+        if patch.get("format") == "cpp_uint8_array":
+            patch.pop("format")
+    for recipe in normalized["recipes"].values():
+        for patch in recipe.get("patches", []):
+            if patch.get("format") == "cpp_uint8_array":
+                patch.pop("format")
+        artifact = recipe.get("artifact")
+        if isinstance(artifact, dict):
+            if artifact.get("entry") == kernel["kernel_name"]:
+                artifact.pop("entry")
+            if artifact.get("format") == "elf":
+                artifact.pop("format")
+    return normalized
 
 
 def _publish_directory(stage_dir, target_dir):
@@ -406,22 +430,24 @@ def generate_static_compile_resources(
     *,
     output_root,
     kernel_base,
-    op_type,
-    binary_path,
+    resource_id,
     resources,
-    include_dirs,
     kernels,
 ):
-    if not isinstance(kernel_base, str) or not kernel_base or os.path.basename(kernel_base) != kernel_base:
+    if (
+        not isinstance(kernel_base, str)
+        or not kernel_base
+        or kernel_base in {".", ".."}
+        or os.path.basename(kernel_base) != kernel_base
+        or "\\" in kernel_base
+    ):
         raise ValueError("kernel_base must be one path component")
-    if not isinstance(op_type, str) or not op_type:
-        raise ValueError("op_type must be a non-empty string")
-    if not os.path.isfile(binary_path):
-        raise FileNotFoundError(binary_path)
+    if not isinstance(resource_id, str) or re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9_.-]*", resource_id
+    ) is None:
+        raise ValueError("resource_id must be a non-empty portable name")
     if not isinstance(resources, list) or not resources:
         raise ValueError("resources must be a non-empty list")
-    if not isinstance(include_dirs, list):
-        raise ValueError("include_dirs must be a list")
     if not isinstance(kernels, list) or not kernels:
         # Resource existence is checked first so publication failures remain diagnosable.
         for resource in resources:
@@ -434,7 +460,6 @@ def generate_static_compile_resources(
     stage_dir = tempfile.mkdtemp(prefix=f".{kernel_base}.", dir=static_root)
     target_dir = os.path.join(static_root, kernel_base)
     try:
-        manifest_files = []
         seen_paths = set()
         for index, resource in enumerate(resources):
             if not isinstance(resource, dict) or set(resource) != {"source", "path"}:
@@ -449,40 +474,28 @@ def generate_static_compile_resources(
             destination = os.path.join(stage_dir, *PurePosixPath(logical_path).parts)
             os.makedirs(os.path.dirname(destination), exist_ok=True)
             shutil.copyfile(source, destination)
-            manifest_files.append(
-                {"path": logical_path, "sha256": _sha256_file(destination)}
-            )
-
-        normalized_include_dirs = []
-        for index, include_dir in enumerate(include_dirs):
-            logical_dir = _relative_path(include_dir, f"include_dirs[{index}]")
-            normalized_include_dirs.append(logical_dir)
-            os.makedirs(os.path.join(stage_dir, *PurePosixPath(logical_dir).parts), exist_ok=True)
 
         seen_kernels = set()
         normalized_kernels = []
         for index, kernel in enumerate(kernels):
             if not isinstance(kernel, dict):
                 raise ValueError(f"kernels[{index}] must be an object")
-            _validate_kernel(kernel, f"kernels[{index}]")
-            if kernel["kernel_name"] in seen_kernels:
-                raise ValueError(f"duplicate kernel symbol: {kernel['kernel_name']}")
-            seen_kernels.add(kernel["kernel_name"])
-            normalized_kernels.append(copy.deepcopy(kernel))
+            normalized = _normalize_and_validate_kernel(
+                kernel, f"kernels[{index}]", seen_paths
+            )
+            if normalized["kernel_name"] in seen_kernels:
+                raise ValueError(
+                    f"duplicate kernel symbol: {normalized['kernel_name']}"
+                )
+            seen_kernels.add(normalized["kernel_name"])
+            normalized_kernels.append(normalized)
 
         manifest = {
-            "contract_version": "3.0",
-            "op": {
-                "op_type": op_type,
-                "resources": {
-                    "files": sorted(manifest_files, key=lambda item: item["path"]),
-                    "include_dirs": normalized_include_dirs,
-                },
-                "binary": {"sha256": _sha256_file(binary_path)},
-                "kernels": normalized_kernels,
-            },
+            "schema_version": "4.0",
+            "resource_id": resource_id,
+            "kernels": normalized_kernels,
         }
-        manifest_path = os.path.join(stage_dir, "op_resource.json")
+        manifest_path = os.path.join(stage_dir, "manifest.json")
         with open(manifest_path, "w", encoding="utf-8") as file_obj:
             json.dump(manifest, file_obj, indent=2, sort_keys=True)
             file_obj.write("\n")
