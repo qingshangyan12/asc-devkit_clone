@@ -33,6 +33,7 @@ extern void run_hcomm_urma_timeout_fault(CommContext *ctx, aclrtStream stream);
 extern void run_hcomm_cqe_error_fault(CommContext *ctx, aclrtStream stream);
 extern "C" void HcommUrmaTimeoutFaultKernel(CommContext *ctx);
 extern "C" void HcommCqeErrorFaultKernel(CommContext *ctx);
+extern "C" void HcommCqeSeedDumpKernel(CommContext *ctx);
 
 namespace {
 using HcommChannelGetDumpInfoSizeFunc = int32_t (*)(uint32_t, ChannelHandle *, uint32_t *);
@@ -577,6 +578,9 @@ void TryBindFaultKernelExceptionArgs(CommContext *devContext)
     (void)BindOneKernelExceptionArgs("HcommCqeErrorFaultKernel",
         reinterpret_cast<const void *>(HcommCqeErrorFaultKernel), devContext, getFuncBySymbol, functionGetBinary,
         binarySetExceptionCallback);
+    (void)BindOneKernelExceptionArgs("HcommCqeSeedDumpKernel",
+        reinterpret_cast<const void *>(HcommCqeSeedDumpKernel), devContext, getFuncBySymbol, functionGetBinary,
+        binarySetExceptionCallback);
 }
 
 bool TakePendingException(ExceptionSummary &summary, uint64_t &count)
@@ -592,13 +596,19 @@ bool TakePendingException(ExceptionSummary &summary, uint64_t &count)
 
 void PrintCommContext(const char *prefix, const CommContext &ctx)
 {
-    std::printf("%s rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu\n",
+    std::printf("%s rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu "
+                "seedState=0x%x seedSqVa=0x%llx seedCqVa=0x%llx seedSqDw0=0x%x seedCqDw0=0x%x\n",
         prefix,
         ctx.rankId,
         static_cast<unsigned long long>(ctx.channelHandle),
         static_cast<unsigned long long>(ctx.localBufferAddr),
         static_cast<unsigned long long>(ctx.remoteBufferAddr),
-        static_cast<unsigned long long>(ctx.len));
+        static_cast<unsigned long long>(ctx.len),
+        ctx.seedState,
+        static_cast<unsigned long long>(ctx.seedSqVa),
+        static_cast<unsigned long long>(ctx.seedCqVa),
+        ctx.seedSqDw0,
+        ctx.seedCqDw0);
 }
 
 void CollectCachedContexts(uint32_t rank, std::vector<ChannelHandle> &channels, std::vector<CommContext> &contexts)

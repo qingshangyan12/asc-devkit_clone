@@ -30,6 +30,10 @@ hostCtx.len = HCOMM_CQE_ERROR_TEST_LEN;
 hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
 ```
 
+For the CQE case, `CommContext.seedState`, `seedSqVa`, `seedCqVa`, `seedSqDw0`, and `seedCqDw0` are diagnostic
+fields written by `HcommCqeSeedDumpKernel`. They are printed by the host report path to prove whether the seed kernel
+ran and which SQ/CQ VA it attempted to write.
+
 3. Allocate and copy `CommContext` to device.
 4. Register the Runtime exception callback and, when supported by the Runtime, bind the device `CommContext` as
    exception args for the fault kernel binary:
@@ -196,6 +200,8 @@ HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 - CQE error case: the runner first launches `HcommCqeSeedDumpKernel` and then launches
   `HcommCqeErrorFaultKernel` on the same stream. The dump should therefore contain non-zero WQE/CQE fields seeded by
   the first kernel. Use `CqContext`, `Hcomm URMA CQE`, `status`, `substatus`, and `entryIdx` as log filters.
+  If the parsed WQE/CQE remains all zero, first check the `exception ctx ... seedState=... seedSqVa=... seedCqVa=...`
+  line. `seedState=0x48444351` means the seed kernel ran and wrote its diagnostic fields.
 
 ## Validation Checklist
 
@@ -228,4 +234,5 @@ Useful filters:
 grep -E "CustomCallback entered|runtime exception|exception dev args point|exception ctx|HcommChannelDumpInfo ret=0" urma_950.log
 grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" urma_950.log
 grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" cqe_950.log
+grep -E "exception ctx|seedState|seedSqVa|seedCqVa|Hcomm URMA WQE raw\\[000\\]|Hcomm URMA CQE raw\\[000\\]" cqe_950.log
 ```
