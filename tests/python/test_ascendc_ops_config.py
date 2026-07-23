@@ -24,9 +24,12 @@ class AscendcOpsConfigTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir) / "ascend910b" / "add_custom"
             manifest = root / "static_compile" / "kernel_id" / "manifest.json"
+            resource_manifest = manifest.parent / "resources" / "manifest.json"
             metadata = root / "kernel.json"
-            manifest.parent.mkdir(parents=True)
-            manifest.write_text('{"schema_version":"4.0"}', encoding="utf-8")
+            resource_manifest.parent.mkdir(parents=True)
+            manifest.write_bytes(b'{\n "schema_version": "4.0"\n}\n')
+            original_manifest_bytes = manifest.read_bytes()
+            resource_manifest.write_text('{"kind":"resource"}', encoding="utf-8")
             metadata.write_text('{"op_type":"AddCustom"}', encoding="utf-8")
 
             generated_inputs = []
@@ -45,12 +48,13 @@ class AscendcOpsConfigTest(unittest.TestCase):
                     )
                 )
 
-            self.assertEqual(
-                json.loads(manifest.read_text(encoding="utf-8")),
-                {"schema_version": "4.0"},
+            self.assertEqual(manifest.read_bytes(), original_manifest_bytes)
+            self.assertIn(
+                "filePath", json.loads(resource_manifest.read_text(encoding="utf-8"))
             )
             self.assertIn("filePath", json.loads(metadata.read_text(encoding="utf-8")))
             self.assertNotIn(str(manifest), generated_inputs)
+            self.assertIn(str(resource_manifest), generated_inputs)
             self.assertIn(str(metadata), generated_inputs)
 
     def test_only_exact_static_compile_manifest_layout_is_excluded(self):
