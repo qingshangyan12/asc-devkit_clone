@@ -1,8 +1,8 @@
-# LoadData3DV2 Data Transfer Example in Matrix Multiplication
+# LoadData (convolution data transfer) v2 Data Transfer Example in Matrix Multiplication
 
 ## Overview
 
-This example introduces the usage scenarios and methods of the LoadData3DV2 instruction in matrix multiplication. LoadData3DV2 can transfer 2D A and B matrices from L1 to L0A/L0B, where A and B represent the left and right input matrices of matrix multiplication respectively.
+This example introduces the usage scenarios and methods of the LoadData (convolution data transfer) v2 instruction in matrix multiplication. LoadData (convolution data transfer) v2 can transfer 2D A and B matrices from L1 to L0A/L0B, where A and B represent the left and right input matrices of matrix multiplication respectively.
 
 ## Supported Products and CANN Versions
 
@@ -27,7 +27,7 @@ This example introduces the usage scenarios and methods of the LoadData3DV2 inst
 ```
 ## Example Description
 
-The LoadData3DV2 instruction (referred to as load3dv2 in this example) supports the following data types:
+The LoadData (convolution data transfer) v2 instruction (referred to as load3dv2 in this example) supports the following data types:
 - Ascend 950PR/Ascend 950DT: int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t, int32_t, uint32_t, float.
 
 - Atlas A3 Training Series Products/Atlas A3 Inference Series Products and Atlas A2 Training Series Products/Atlas A2 Inference Series Products:
@@ -40,7 +40,7 @@ Transpose capabilities of the load3dv2 instruction for 2D matrices:
 
 Since this example does not currently support int4b_t input data type, it demonstrates the following five load3dv2 usage scenarios in matrix multiplication:
 
-### Load3Dv2 Interface Scenario Table
+### LoadData (convolution data transfer) v2 Interface Scenario Table
 
 | scenarioNum | Input Data Type | A Matrix Transpose | B Matrix Transpose |
 | --- | --- | --- | --- |
@@ -60,7 +60,7 @@ Note: For Atlas A3 Training Series Products/Atlas A3 Inference Series Products a
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables  
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -70,22 +70,32 @@ Run the following steps in the root directory of this example to build and run t
 
   Run the following commands in the example directory.
   ```bash
-  SCENARIO_NUM=4 M=30 K=40 N=70
+  SCENARIO_NUM=4
   mkdir -p build && cd build;      # Create and enter the build directory
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM -DM_SIZE=$M -DK_SIZE=$K -DN_SIZE=$N;make -j;    # Build the project
-  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM -m=$M -k=$K -n=$N   # Generate test input data
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;    # Build the project in NPU mode by default
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # Generate test input data
   ./demo                           # Run the compiled executable to execute the example
   python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # Verify whether the output result is correct and confirm algorithm logic is correct
   ```
+
+  To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` option.
+
+  Examples:
+
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j; # CPU debug mode
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j; # NPU simulation mode
+  ```
+
+  > **Notice:** Clear the CMake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then rerun CMake.
+
 - Build option description
 
   | Option | Values | Description |
   |--------|--------|-------------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim`, `cpu` | Run mode: NPU execution, NPU simulation, CPU debug |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2/A3 training and inference products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`, `2`, `3`, `4` (default), `5` | Scenario number |
-  | `M_SIZE` | `30` (default) | Number of elements on M axis |
-  | `K_SIZE` | `40` (default) | Number of elements on K axis |
-  | `N_SIZE` | `70` (default) | Number of elements on N axis |
 
 - Execution result
 

@@ -40,22 +40,22 @@ Note: `ReducePairElem` is the renamed API after CANN 9.1.0. For CANN 9.0.0 and e
   <tr><td rowspan="2" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
    <tr><td rowspan="2" align="center">Example Output</td></tr>
-   <tr><td align="center">y</td><td align="center">[1, 64]</td><td align="center">half</td><td align="center">ND</td></tr>
+   <tr><td align="center">z</td><td align="center">[1, 64]</td><td align="center">half</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">reduce_pair_elem_custom</td></tr>
   </table>
 
 - Example implementation:  
-  This example implements a `ReducePairElem<SUM>` example with fixed input shape x[1, 128] and output shape y[1, 64].
+  This example implements a `ReducePairElem<SUM>` example with fixed input shape x[1, 128] and output shape z[1, 64].
 
-  The Compute task is responsible for summing each pair of adjacent elements (even index and odd index) in srcLocal and storing the results in dstLocal.
+  In the kernel, `ReducePairElem<SUM>` sums each pair of adjacent elements (even index and odd index) in `srcLocal` and stores the results in `dstLocal`.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
 - Configure environment variables  
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh

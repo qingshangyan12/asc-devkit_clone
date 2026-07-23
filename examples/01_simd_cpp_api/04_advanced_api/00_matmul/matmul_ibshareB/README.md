@@ -89,9 +89,9 @@
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
     ```cpp
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, 0, stream>>>(x1, x2, bias, y, workspaceDevice,
                           tilingDevice);       // 方式一：非纯Cube模式，SetDim设置为AIV:AIC组合的核数
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum, 0, stream>>>(x1, x2, bias, y, workspaceDevice,
                           tilingDevice);       // 方式二：纯Cube模式，SetDim设置为AIC的核数                          
     ```
 
@@ -99,7 +99,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

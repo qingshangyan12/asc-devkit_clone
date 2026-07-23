@@ -17,7 +17,7 @@
 
 ## 支持的CANN软件版本
 
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -44,9 +44,9 @@ gather算子实现了从长度为100000的一维输入向量中获取指定索�
 bisheng -lib kernel.asc -o libkernel.a --npu-arch=dav-3510 --enable-simt
 ```
 
-其中，`--npu-arch` 为编译时指定的 AI 处理器架构，本样例仅支持 `dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。`--enable-simt` 用于指定SIMT方式编译。
+其中，`--npu-arch` 为编译时指定的 AI 处理器架构，本样例仅支持 `dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。`--enable-simt` 用于指定SIMT方式编译。
 
-更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md)。
+更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md)。
 
 ### CMake方式编译
 
@@ -62,7 +62,7 @@ add_library(kernel STATIC
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh

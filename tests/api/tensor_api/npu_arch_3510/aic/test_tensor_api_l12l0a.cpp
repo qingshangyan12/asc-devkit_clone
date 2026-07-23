@@ -9,7 +9,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "tensor_api/stub/cce_stub.h"
+#include "c_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 #include <mockcpp/mockcpp.hpp>
 
@@ -168,7 +168,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchNz2Nz)
         load_cbuf_to_ca,
         void(__ca__ float*, __cbuf__ float*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool))
         .times(1)
-        .will(invoke(&load_cbuf_to_ca_batch_stub<float, 8, 2, 8, 8>));
+        .will(invoke(&load_cbuf_to_ca_batch_stub<float, 2, 8, 2, 2>));
 
     Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
 

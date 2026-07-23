@@ -23,7 +23,8 @@
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── CMakeLists.txt                 // cmake编译文件
 │   ├── data_copy_gm2l1.asc            // Ascend C样例实现 & 调用样例
-│   └── README.md                      // 样例说明文档
+│   ├── README.md                      // 中文样例说明文档
+│   └── README_en.md                   // 英文样例说明文档
 ```
 
 ## 场景详细说明
@@ -84,7 +85,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

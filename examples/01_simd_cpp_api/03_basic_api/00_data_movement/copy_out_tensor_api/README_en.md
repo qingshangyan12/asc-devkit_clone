@@ -1,5 +1,6 @@
 # Copy Out Tensor API Example
 
+
 ## Overview
 
 This example implements dynamic Shape matrix multiplication with Bias based on the Tensor API programming approach, demonstrating the usage of Copy Out APIs (L0C to GM, L0C to UB) and Mmad (matrix multiply-add) Tensor APIs. Select different write-back modes through the build-time parameter `SCENARIO_NUM`. Shape parameters are dynamically passed at runtime through the `MatmulTiling` structure.
@@ -16,9 +17,9 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
 
 ```text
 ├── copy_out_tensor_api
-│   └── scripts
-│       ├── gen_data.py                    // Input data and ground truth generation script
-│       └── verify_result.py               // Ground truth comparison file
+│   ├── scripts
+│   │   ├── gen_data.py                    // Input data and ground truth generation script
+│   │   └── verify_result.py               // Ground truth comparison file
 │   ├── CMakeLists.txt                     // Build configuration file
 │   ├── data_utils.h                       // Data read/write functions
 │   ├── copy_out_tensor_api.asc            // Ascend C example implementation & invocation example
@@ -153,7 +154,7 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
 Run the following steps in the root directory of this example to build and run it.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../docs/quick_start.md#下载-cann-master) is supported.**
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../docs/zh/quick_start.md#下载-cann-master) is supported.**
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

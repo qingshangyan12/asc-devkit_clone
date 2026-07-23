@@ -30,7 +30,7 @@ This example implements vector self-addition based on the RegBase programming pa
   <tr><td rowspan="2" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">x</td><td align="center">[256, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">y</td><td align="center">[256, 256]</td><td align="center">float</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Name</td><td colspan="4" align="center">vector_add</td></tr>
+  <tr><td rowspan="1" align="center">Kernel Name</td><td colspan="3" align="center">vector_add</td></tr>
   </table>
 
 - Example Implementation:
@@ -51,7 +51,7 @@ This example implements vector self-addition based on the RegBase programming pa
 
 Execute the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables  
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

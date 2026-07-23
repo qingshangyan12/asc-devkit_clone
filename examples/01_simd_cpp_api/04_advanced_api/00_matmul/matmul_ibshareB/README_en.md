@@ -89,9 +89,9 @@ An example that enables the IBShare feature to reuse the same matrix A or matrix
   - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
     ```cpp
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, 0, stream>>>(x1, x2, bias, y, workspaceDevice,
                           tilingDevice);       // Method 1: Non-pure Cube mode, SetDim sets the core count for AIV:AIC combination
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum, 0, stream>>>(x1, x2, bias, y, workspaceDevice,
                           tilingDevice);       // Method 2: Pure Cube mode, SetDim sets the AIC core count                          
     ```
 
@@ -99,7 +99,7 @@ An example that enables the IBShare feature to reuse the same matrix A or matrix
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

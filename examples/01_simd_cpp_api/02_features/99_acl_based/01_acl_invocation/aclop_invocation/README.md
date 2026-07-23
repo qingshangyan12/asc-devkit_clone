@@ -43,7 +43,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -55,7 +55,8 @@
   在本样例根目录下执行如下步骤，运行该样例。
 
   ```bash
-  mkdir -p build; cd build
+  mkdir -p build && cd build
+  python3 ../scripts/gen_data.py
   # 使用atc模型转换工具生成单算子离线模型
   atc --singleop=../add_custom.json --output=. --soc_version=${soc_version}
   cmake .. && make -j

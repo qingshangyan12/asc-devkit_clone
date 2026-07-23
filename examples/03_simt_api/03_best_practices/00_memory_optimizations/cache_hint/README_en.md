@@ -10,7 +10,7 @@ This example uses table-lookup sin computation to demonstrate data cache optimiz
 
 ## Supported CANN Software Version
 
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## Directory Structure
 
@@ -205,7 +205,7 @@ asc_stcg(&output[idx], y);
 
 Run the following steps in the root directory of this example to build and execute the example.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -239,10 +239,10 @@ Run the following steps in the root directory of this example to build and execu
 
 ## Performance Analysis
 
-Use the `msprof` tool to collect detailed performance data:
+Use the `msOpProf` tool to collect detailed performance data:
 
 ```bash
-msprof op ./data_cache_hint   # Analyze case performance
+msopprof ./data_cache_hint   # Analyze case performance
 ```
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:

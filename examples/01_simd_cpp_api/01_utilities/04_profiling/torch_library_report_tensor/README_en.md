@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example demonstrates how to display operator input/output Shape, data type, and Format information in `msprof` results when using the `torch.library` custom operator invocation method.
+This example demonstrates how to display operator input/output Shape, data type, and Format information in `msopprof` results when using the `torch.library` custom operator invocation method.
 
 ## Supported Products and CANN Software Versions
 
@@ -16,7 +16,7 @@ This example demonstrates how to display operator input/output Shape, data type,
 
 ```
 ├── torch_library_report_tensor
-│   ├── CMakeLists.txt           // Build project file
+│   ├── CMakeLists.txt                   // Build project file
 │   ├── torch_library_report_tensor.py   // PyTorch invocation script
 │   ├── torch_library_report_tensor.asc  // torch.library operator registration, Profiling reporting, and Add Kernel implementation
 │   └── README.md                        // Example description document
@@ -58,9 +58,9 @@ This example demonstrates how to display operator input/output Shape, data type,
 
   2. Profiling Shape Information Recording
 
-     The `ascendc_add` function constructs Profiling metadata before dispatching the Kernel and passes it to `msprof` through `aclprofRangePushEx`. After the Kernel dispatch completes, `aclprofRangePop` is called to end the current Profiling range.
+     The `ascendc_add` function constructs Profiling metadata before dispatching the Kernel and passes it to `msopprof` through `aclprofRangePushEx`. After the Kernel dispatch completes, `aclprofRangePop` is called to end the current Profiling range.
 
-     The purpose is to enable `msprof` to display input/output Tensor information in the current custom operator record when generating `op_summary_*.csv`, for example:
+     The purpose is to enable `msopprof` to display input/output Tensor information in the current custom operator record when generating `PipeUtilization.csv`, for example:
 
      ```text
      Input Shapes: "8,2048;8,2048"
@@ -81,7 +81,7 @@ This example demonstrates how to display operator input/output Shape, data type,
 
   3. Add Kernel Implementation
 
-     The device-side `add_custom` Kernel uses static Tensor programming to implement minimal Add computation. The Kernel template parameters only include a fixed Shape: `<8, 2048>`. When the Kernel launches, the block count is passed through `<<<blockNum, nullptr, stream>>>`, and the Kernel internally calculates the data length processed by each block through `AscendC::GetBlockNum()`.
+     The device-side `add_custom` Kernel uses static Tensor programming to implement minimal Add computation. The Kernel template parameters only include a fixed Shape: `<8, 2048>`. When the Kernel launches, the block count is passed through `<<<blockNum, 0, stream>>>`, and the Kernel internally calculates the data length processed by each block through `AscendC::GetBlockNum()`.
 
      This example Kernel only supports `[8, 2048]`, `float16` input. If the input Shape does not meet the requirements, the host side reports an error through `TORCH_CHECK`.
 
@@ -105,7 +105,7 @@ This example demonstrates how to display operator input/output Shape, data type,
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -119,7 +119,7 @@ This example demonstrates how to display operator input/output Shape, data type,
   ```bash
   mkdir -p build; cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j
-  msprof --application="python3 ../torch_library_report_tensor.py" --output="../result"
+  msopprof --application="python3 ../torch_library_report_tensor.py" --output="../result"
   ```
 
 - Build options
@@ -139,7 +139,7 @@ This example demonstrates how to display operator input/output Shape, data type,
 
 - Shape information display
 
-  Open `../result/PROF_000001_*/mindstudio_profiler_output/op_summary_*.csv` to view Shape information. The Shape information in this example is written to the following fields.
+  Open `../result/OPPROF_*/PipeUtilization.csv` to view Shape information. The Shape information in this example is written to the following fields.
 
   <table>
     <tr>

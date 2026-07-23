@@ -39,6 +39,8 @@ This example demonstrates how to use the Fill interface to initialize the L0A Bu
 <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">fill</td></tr>
 </table>
 
+> **Note:** In the specification table, x and y are placeholders used only in the end-to-end process (to generate the input files and golden data). The kernel does not actually read these two GM inputs. Instead, it uses the `Fill` interface to construct all-ones matrices for the `Mmad` computation. Therefore, the values of x and y do not affect the computation result.
+
 ### Example Implementation
 
    1. First, initialize the L0A Buffer and L0B Buffer. Different hardware architectures use different methods:
@@ -53,7 +55,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

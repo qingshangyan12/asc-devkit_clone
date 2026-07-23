@@ -1,9 +1,10 @@
 
-# 矩阵乘法中LoadData3DV2数据搬运示例
+# 矩阵乘法中LoadData（卷积数据搬运）v2数据搬运示例
+
 
 ## 概述
 
-本样例介绍LoadData3DV2指令在矩阵乘法中的使用场景和方法。LoadData3DV2可以将二维的A、B矩阵从L1搬运到L0A/L0B，其中 A 和 B 分别表示矩阵乘法的左右输入矩阵。
+本样例介绍LoadData（卷积数据搬运）v2指令在矩阵乘法中的使用场景和方法。LoadData（卷积数据搬运）v2可以将二维的A、B矩阵从L1搬运到L0A/L0B，其中 A 和 B 分别表示矩阵乘法的左右输入矩阵。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -28,7 +29,7 @@
 ```
 ## 算子描述
 
-LoadData3DV2指令以下简称load3dv2，该指令支持的数据类型：
+LoadData（卷积数据搬运）v2指令以下简称load3dv2，该指令支持的数据类型：
 - Ascend 950PR/Ascend 950DT，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。
 
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品：
@@ -41,7 +42,7 @@ load3dv2指令对于二维矩阵的转置能力：
 
 由于本样例暂不支持输入数据类型为int4b_t，因此本样例展示了以下五种load3dv2在矩阵乘法的使用：
 
-### Load3Dv2接口场景对照表
+### LoadData（卷积数据搬运）v2接口场景对照表
 
 | scenarioNum | 输入数据类型 | A矩阵转置 | B矩阵转置 |
 | --- | --- | --- | --- |
@@ -53,7 +54,7 @@ load3dv2指令对于二维矩阵的转置能力：
 
 注：Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，输入数据类型为B8时且目的地址位于L0B时，不支持load3dv2指令，为保种兼容性，当scenarioNum=5时，SplitB中调用的是load2d指令。
 
-  本样例中scenarioNum=3和4中A矩阵分别与样例[load_data_l12l0](../load_data_l12l0/README.md)中scenarioNum=12和13场景一致，B矩阵与该样例中scenarioNum=13场景一致，因此load3dv2指令具体的参数配置和示意图可以参考该样例readme的"6. L1到L0（LoadData）"小节中对Load3DV2接口的介绍。
+  本样例中scenarioNum=3和4中A矩阵分别与样例[load_data_l12l0](../load_data_l12l0/README.md)中scenarioNum=12和13场景一致，B矩阵与该样例中scenarioNum=13场景一致，因此load3dv2指令具体的参数配置和示意图可以参考该样例readme的"6. L1到L0（LoadData）"小节中对LoadData（卷积数据搬运）v2接口的介绍。
 
   由于输入数据类型不同，对于load3dv2指令配置参数的影响不大，因此本样例中其余场景可以参考scenarioNum=3和4。
 
@@ -61,7 +62,7 @@ load3dv2指令对于二维矩阵的转置能力：
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

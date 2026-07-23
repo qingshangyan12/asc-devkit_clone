@@ -16,13 +16,13 @@
 
 ```
 ├── matmul_leakyrelu_advanced_api
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
+│   ├── CMakeLists.txt                    // 编译工程文件
+│   ├── data_utils.h                      // 数据读入写出函数
 │   ├── matmul_leakyrelu_advanced_api.asc // Ascend C样例实现 & 调用样例
 │   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│   │   └── verify_result.py    // 真值对比文件
-│   └── README.md               // 样例说明文档
+│   │   ├── gen_data.py                   // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py              // 真值对比文件
+│   └── README.md                         // 样例说明文档
 ```
 
 ## 样例描述
@@ -116,13 +116,13 @@
       uint16_t dstGap;      // 目的操作数相邻连续数据块的间隔，单位为DataBlock（32字节）
   };
   ```
-  本样例搬出C矩阵分块时使用`{tiling.baseM, tiling.baseN * sizeof(float) / AscendC::DEFAULT_C0_SIZE, 0, (tiling.N - tiling.baseN) * sizeof(float) / AscendC::DEFAULT_C0_SIZE}`。其中，`blockCount`表示按`baseM`行搬运，`blockLen`表示每行搬运`baseN`个C矩阵元素对应的数据量；`dstGap`表示目的端相邻行之间跨过的元素间隔，用于将`baseM * baseN`分块写回到完整`M * N`矩阵的对应列范围。
+  本样例搬出C矩阵分块时使用`{tiling.baseM, tiling.baseN * sizeof(float) / AscendC::DEFAULT_C0_SIZE, 0, (tiling.N - tiling.baseN) * sizeof(float) / AscendC::DEFAULT_C0_SIZE}`。其中，`blockCount`表示按`baseM`行搬运，`blockLen`表示每行搬运`baseN`个C矩阵元素对应的数据量；`dstGap`表示目的端相邻行之间的间隔（单位为DataBlock），用于将`baseM * baseN`分块写回到完整`M * N`矩阵的对应列范围。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

@@ -33,7 +33,7 @@
   C = A * B
   $$
 - 样例规格：
-  本样例参数M = 512, N = 1024, K = 512，调用16个核完成计算，输入规格如下表所示：
+  本样例参数M = 512, N = 1024, K = 512，调用16个核完成计算，输入输出规格如下表所示：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -93,7 +93,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量，**当前仅支持使用[CANN master](../../../../../docs/quick_start.md#下载-cann-master)**。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量，**当前仅支持使用[CANN master](../../../../../docs/zh/quick_start.md#下载-cann-master)**。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

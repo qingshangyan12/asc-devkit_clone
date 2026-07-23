@@ -1,5 +1,6 @@
 # Scatter兼容性样例
 
+
 ## 概述
 
 本样例演示数据离散功能，可根据输入张量和目的地址偏移张量，将输入张量分散到结果张量中。
@@ -52,7 +53,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

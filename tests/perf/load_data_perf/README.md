@@ -39,12 +39,12 @@
 
 | SCENARIO_NUM | 输入数据类型 | 数据源 | 执行路径 | 说明 | 理论带宽(Byte/cycle) | 带宽延迟(cycle) |
 |--------------|--------------|--------|----------|------|----------------------|-----------------|
-| 1 | bfloat16 | A矩阵 | L1 -> L0A | Load2D 从 L1 加载到 L0A | 256 | 28 |
-| 2 | bfloat16 | B矩阵 | L1 -> L0B | Load2D 从 L1 加载到 L0B | 128 | 28 |
+| 1 | bfloat16 | A矩阵 | L1 -> L0A | LoadData（2D矩阵搬运） 从 L1 加载到 L0A | 256 | 28 |
+| 2 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（2D矩阵搬运） 从 L1 加载到 L0B | 128 | 28 |
 | 3 | bfloat16 | A矩阵 | L1 -> L0A（转置） | LoadDataWithTranspose 从 L1 加载到 L0A（转置） | 256 | 28 |
 | 4 | bfloat16 | B矩阵 | L1 -> L0B（转置） | LoadDataWithTranspose 从 L1 加载到 L0B（转置） | 128 | 28 |
-| 5 | bfloat16 | A矩阵 | L1 -> L0A | Load3Dv2 从 L1 加载到 L0A | 32-256 | 50 |
-| 6 | bfloat16 | B矩阵 | L1 -> L0B | Load3Dv2 从 L1 加载到 L0B | 28.4-128 | 50 |
+| 5 | bfloat16 | A矩阵 | L1 -> L0A | LoadData（卷积数据搬运）v2 从 L1 加载到 L0A | 32-256 | 50 |
+| 6 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（卷积数据搬运）v2 从 L1 加载到 L0B | 28.4-128 | 50 |
 | 7 | int8_t | B矩阵 | L1 -> L0B | LoadDataWithSparse 从 L1 加载到 L0B（稀疏加载） | 128 | 30 |
 | 8 | float | Bias | L1 -> BiasTable Buffer | 从 L1 加载到 BiasTable Buffer | 32 | 20 |
 | 9 | uint64_t | FixPipe | L1 -> Fixpipe Buffer | 从 L1 加载到 Fixpipe Buffer | 32 | 20 |
@@ -53,12 +53,12 @@
 
 | SCENARIO_NUM | 输入数据类型 | 数据源 | 执行路径 | 说明 | 理论带宽(Byte/cycle) | 带宽延迟(cycle) |
 |--------------|--------------|--------|----------|------|----------------------|-----------------|
-| 11 | bfloat16 | A矩阵 | L1 -> L0A | Load2Dv2 从 L1 加载到 L0A | 256 | 30 |
-| 12 | bfloat16 | B矩阵 | L1 -> L0B | Load2Dv2 从 L1 加载到 L0B | 256 | 30 |
-| 13 | fp8_e4m3fn | A矩阵 + ScaleA | L1 -> L0A + L0A_MX | Load2DMx 从 L1 加载到 L0A 和 L0A_MX（带 scale） | 256/32 | 30 |
-| 14 | fp8_e4m3fn | B矩阵 + ScaleB | L1 -> L0B + L0B_MX | Load2DMx 从 L1 加载到 L0B 和 L0B_MX（带 scale） | 256/32 | 30 |
-| 15 | bfloat16 | A矩阵 | L1 -> L0A | Load3Dv2 从 L1 加载到 L0A | 32-256 | 50 |
-| 16 | bfloat16 | B矩阵 | L1 -> L0B | Load3Dv2 从 L1 加载到 L0B | 32-256 | 50 |
+| 11 | bfloat16 | A矩阵 | L1 -> L0A | LoadData（2D矩阵搬运V2） 从 L1 加载到 L0A | 256 | 30 |
+| 12 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（2D矩阵搬运V2） 从 L1 加载到 L0B | 256 | 30 |
+| 13 | fp8_e4m3fn | A矩阵 + ScaleA | L1 -> L0A + L0A_MX | LoadData（MX矩阵搬运） 从 L1 加载到 L0A 和 L0A_MX（带 scale） | 256/32 | 30 |
+| 14 | fp8_e4m3fn | B矩阵 + ScaleB | L1 -> L0B + L0B_MX | LoadData（MX矩阵搬运） 从 L1 加载到 L0B 和 L0B_MX（带 scale） | 256/32 | 30 |
+| 15 | bfloat16 | A矩阵 | L1 -> L0A | LoadData（卷积数据搬运）v2 从 L1 加载到 L0A | 32-256 | 50 |
+| 16 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（卷积数据搬运）v2 从 L1 加载到 L0B | 32-256 | 50 |
 | 17 | bfloat16 | B矩阵 | L1 -> L0B（转置） | LoadDataWithTranspose 从 L1 加载到 L0B（转置） | 256 | 28 |
 | 18 | float | Bias | L1 -> BiasTable Buffer | 从 L1 加载到 BiasTable Buffer | 32 | 20 |
 | 19 | uint64_t | FixPipe | L1 -> Fixpipe Buffer | 从 L1 加载到 Fixpipe Buffer | 32 | 26 |
@@ -69,7 +69,7 @@
 
 ### 配置环境变量
 
-请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，配置环境变量。
+请根据当前环境上CANN开发套件包的[安装方式](../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
 ```bash
 source ${install_path}/cann/set_env.sh
@@ -115,13 +115,13 @@ make -j
 
 ## 性能数据获取
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
-msprof op ./demo 1 128 128 128
+msopprof ./demo 1 128 128 128
 ```
 
-  > 💡 使用 `msprof` 工具需安装 CANN 商用/社区版，详细信息可参考[msprof工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。
+  > 💡 使用 `msOpProf` 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。
 
   命令完成后，会在默认目录下生成以`OPPROF_{timestamp}_XXX`命名的文件夹，性能数据文件夹结构示例如下：
 
@@ -154,7 +154,7 @@ cat ./OPPROF_*/PipeUtilization.csv
 
 ## 性能测试脚本
 
-`perf.sh` 用于批量编译、执行 `msprof op`、提取性能指标并生成 CSV 汇总结果。
+`perf.sh` 用于批量编译、执行 `msopprof`、提取性能指标并生成 CSV 汇总结果。
 
 ```bash
 # 查看帮助
@@ -183,7 +183,7 @@ cat ./OPPROF_*/PipeUtilization.csv
 
 其中，A矩阵搬运数据量为M * K，B矩阵搬运数据量为K * N，Bias Table Buffer和Fixpipe Buffer搬运数据量为N，可以按需调整。
 
-测试完成后，结果保存在 `perf_data_${timestamp}_scenario${SCENARIO}/perf_result_scenario${SCENARIO}.csv`，原始 `msprof` 数据保存在同目录下的 `test_${id}_${M}_${K}_${N}` 子目录。
+测试完成后，结果保存在 `perf_data_${timestamp}_scenario${SCENARIO}/perf_result_scenario${SCENARIO}.csv`，原始 `msopprof` 数据保存在同目录下的 `test_${id}_${M}_${K}_${N}` 子目录。
 
 ## 性能指标说明
 
@@ -203,7 +203,7 @@ CSV 中的计算列如下：
 
 ### 性能指标计算方法
 
-`msprof` 在 `PipeUtilization.csv` 中采集到的 `aic_mte1_time(us)`、`aic_fixpipe_time(us)` 均为微秒（us）单位的耗时。`perf.sh` 会读取对应时间列，并结合平台主频和测试数据量计算 Cycle 数与实测带宽。
+`msopprof` 在 `PipeUtilization.csv` 中采集到的 `aic_mte1_time(us)`、`aic_fixpipe_time(us)` 均为微秒（us）单位的耗时。`perf.sh` 会读取对应时间列，并结合平台主频和测试数据量计算 Cycle 数与实测带宽。
 
 #### Time(us) 转换为 Cycle
 
@@ -213,13 +213,13 @@ CSV 中的计算列如下：
 Cycle = Time(us) * Frequency(MHz)
 ```
 
-例如 当 Atlas A3/A2 训练/推理平台主频为 1800 MHz 时，若 `msprof` 采集到 `aic_mte1_time(us) = 0.021111`：
+例如 当 Atlas A3/A2 训练/推理平台主频为 1800 MHz 时，若 `msopprof` 采集到 `aic_mte1_time(us) = 0.021111`：
 
 ```text
 Cycle = 0.021111 * 1800 = 38.00 cycles
 ```
 
-当 Ascend 950PR/950DT 平台主频为 1650 MHz 时，若 `msprof` 采集到 `aic_mte1_time(us) = 0.030000`：
+当 Ascend 950PR/950DT 平台主频为 1650 MHz 时，若 `msopprof` 采集到 `aic_mte1_time(us) = 0.030000`：
 
 ```text
 Cycle = 0.030000 * 1650 = 49.50 cycles
@@ -326,5 +326,5 @@ python3 generate_roofline_with_latency.py \
 
 1. 场景编号与平台架构必须匹配：Atlas A3/A2 训练/推理平台使用场景 1-9，Ascend 950PR/950DT 平台使用场景 11-19。
 2. 场景 7（LoadSparse）仅支持 dav-2201 架构。
-3. 场景 13/14（Load2DMx）仅支持 dav-3510 架构。
+3. 场景 13/14（LoadData（MX矩阵搬运））仅支持 dav-3510 架构。
 4. 不同场景对矩阵规格有不同的对齐要求，建议使用符合对齐要求的矩阵规格（如 16、32、64 的倍数）。

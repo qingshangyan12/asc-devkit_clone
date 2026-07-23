@@ -75,7 +75,7 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
 Run the following steps in the root directory of this example to build and execute the example.
 
 - Configure Environment Variables
-  Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -118,6 +118,7 @@ Run the following steps in the root directory of this example to build and execu
   > **Notice:** Before switching build modes, clean the cmake cache by running `rm CMakeCache.txt` in the build directory and then re-run cmake.
 
 - Build Options Description
+
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, NPU simulation |

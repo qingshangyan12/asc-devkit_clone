@@ -12,6 +12,11 @@
  * \file hcomm.h
  * \brief Hcomm interface
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "hcomm.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #ifndef INCLUDE_ADV_API_HCOMM_HCOMM_H
 #define INCLUDE_ADV_API_HCOMM_HCOMM_H
 
@@ -99,6 +104,47 @@ public:
         auto const& config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t WriteWithNotifyNbi(
         ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
+
+    /*!
+     * @class Hcomm
+     * @brief @brief The task launching interface of the Fetch-and-add point-to-point communication operator.
+     * @tparam T: The data type of the atomic operation. Only int32_t, uint32_t, int64_t, uint64_t is supported.
+     * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
+     * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
+     * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
+     * @tparam config: URMA WQE control config, only used by URMA. Default: strongly ordered + fence + CQE enabled.
+     * @param [in] channel: The handle of the communication channel.
+     * @param [out] dst: The destination address of the data.
+     * @param [out] fetchAddr: The address to store the old value before atomic add.
+     * @param [in] addVal: The remote add value.
+     * @return 0 indicates success and -1 indicates failure.
+     * @note Must be called after channel initialization.
+     */
+    template <
+        typename T, bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const& config = URMA_DEFAULT_CFG>
+    __aicore__ inline int32_t AtomicFAA(ChannelHandle channel, GM_ADDR dst, GM_ADDR fetchAddr, T addVal);
+
+    /*!
+     * @class Hcomm
+     * @brief @brief The task launching interface of the Compare-and-swap point-to-point communication operator.
+     * @tparam T: The data type of the atomic operation. Only int32_t, uint32_t, int64_t, uint64_t is supported.
+     * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
+     * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
+     * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
+     * @tparam config: URMA WQE control config, only used by URMA. Default: strongly ordered + fence + CQE enabled.
+     * @param [in] channel: The handle of the communication channel.
+     * @param [out] dst: The destination address of the data.
+     * @param [out] fetchAddr: The address to store the old value before atomic compare-and-swap.
+     * @param [in] compareVal: The value to compare against the value at the destination address.
+     * @param [in] swapVal: The value to swap into the destination address if comparison succeeds.
+     * @return 0 indicates success and -1 indicates failure.
+     * @note Must be called after channel initialization.
+     */
+    template <
+        typename T, bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const& config = URMA_DEFAULT_CFG>
+    __aicore__ inline int32_t AtomicCAS(ChannelHandle channel, GM_ADDR dst, GM_ADDR fetchAddr, T compareVal, T swapVal);
 
     /*!
      * @class Hcomm

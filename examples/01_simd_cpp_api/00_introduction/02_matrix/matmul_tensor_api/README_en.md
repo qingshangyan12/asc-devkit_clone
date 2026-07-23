@@ -93,7 +93,7 @@ This example primarily uses the following Tensor API capabilities for implementa
 Execute the following steps in the root directory of this example to build and run the sample.
 
 - Configure Environment Variables
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment. **Currently only [CANN master](../../../../../docs/quick_start.md#下载-cann-master) is supported**.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment. **Currently only [CANN master](../../../../../docs/zh/quick_start.md#下载-cann-master) is supported**.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -126,6 +126,7 @@ Execute the following steps in the root directory of this example to build and r
   | Option | Available Values | Description |
   |--------|------------------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
 
   > **Note:** This example only supports dav-3510 architecture (corresponding to Ascend 950PR/Ascend 950DT).
 

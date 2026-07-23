@@ -4,7 +4,7 @@
 
 This example implements the setting of L1 Buffer boundary values, isolating different hardware implementations through compile-time macros.
 
-Atlas A2/A3 Series Products set the L1 Buffer boundary value through the `SetLoadDataBoundary` interface, while the new Ascend 950PR/950DT architecture does not support this interface and requires manually splitting Load3D instructions to implement the data wrap-around function for circular data reading.
+Atlas A2/A3 Series Products set the L1 Buffer boundary value through the `SetLoadDataBoundary` interface, while the new Ascend 950PR/950DT architecture does not support this interface and requires manually splitting LoadData (convolution data transfer) instructions to implement the data wrap-around function for circular data reading.
 
 ## Supported Products and CANN Versions
 
@@ -32,8 +32,7 @@ Atlas A2/A3 Series Products set the L1 Buffer boundary value through the `SetLoa
 <table>
 <caption>Example Specification Table</caption>
 <tr><td rowspan="1" align="center">Category</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td rowspan="3" align="center">Example Input</td></tr>
-<tr><td align="center">x</td><td align="center">[32, 32]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">Example Input</td><td align="center">x</td><td align="center">[32, 32]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td align="center">y</td><td align="center">[32, 32]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[32, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">set_loaddata_boundary</td></tr>
@@ -41,9 +40,9 @@ Atlas A2/A3 Series Products set the L1 Buffer boundary value through the `SetLoa
 
 ## Example Implementation
     
-- **Atlas A2/A3 Training/Inference Series Products**: Set the L1 Buffer boundary value to 1024 bytes through the SetLoadDataBoundary interface. When the Load3D instruction processes the source operand, if the source operand address on the L1 Buffer exceeds the set boundary, data is automatically read from the start address of the L1 Buffer, implementing the circular data reading function.
+- **Atlas A2/A3 Training/Inference Series Products**: Set the L1 Buffer boundary value to 1024 bytes through the SetLoadDataBoundary interface. When the LoadData (convolution data transfer) instruction processes the source operand, if the source operand address on the L1 Buffer exceeds the set boundary, data is automatically read from the start address of the L1 Buffer, implementing the circular data reading function.
 
-- **Ascend 950PR/950DT**: The new architecture hardware has removed the L1 Buffer boundary value setting registers and no longer supports the SetLoadDataBoundary interface. To implement the same circular data reading function, the Load3D interface must be manually split into multiple instructions, implementing manual wrap-around by adjusting the destination operand address offset.
+- **Ascend 950PR/950DT**: The new architecture hardware has removed the L1 Buffer boundary value setting registers and no longer supports the SetLoadDataBoundary interface. To implement the same circular data reading function, the LoadData (convolution data transfer) interface must be manually split into multiple instructions, implementing manual wrap-around by adjusting the destination operand address offset.
 
 ## Build and Run
 
@@ -51,7 +50,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

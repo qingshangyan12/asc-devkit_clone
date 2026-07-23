@@ -45,7 +45,7 @@ Scalar单元访问Global Memory，首先会访问每个核内的DataCache，因�
     **第一步：每个核分别执行归约计算**
 
     - 将GM（Global Memory）上的输入数据（对应行1024个元素）搬运到UB（Unified Buffer）上
-    - 调用WholeReduceSum接口，每256B数据归约为一个sum元素，结果共16个float
+    - 调用`ReduceRepeat<AscendC::ReduceType::SUM>`接口，每256B数据归约为一个sum元素，结果共16个float
     - 将计算结果搬出至GM上的workspace
 
     **第二步：每个核写入标志位**
@@ -58,7 +58,7 @@ Scalar单元访问Global Memory，首先会访问每个核内的DataCache，因�
     - 除了0核外的其他核return，停止运行
     - 0核调用DataCacheCleanAndInvalid接口，获取最新数据
     - 通过Scalar单元依次读取所有核的标志位，判断其他核是否完成计算
-    - 若其他核的标志位都符合预期，则再次调用WholeReduceSum接口，完成最终的归约计算
+    - 若其他核的标志位都符合预期，则再次调用`ReduceRepeat<AscendC::ReduceType::SUM>`接口，完成最终的归约计算
 
   - 调用实现
     使用内核调用符<<<>>>调用核函数，启动4个核并行执行。
@@ -68,7 +68,7 @@ Scalar单元访问Global Memory，首先会访问每个核内的DataCache，因�
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

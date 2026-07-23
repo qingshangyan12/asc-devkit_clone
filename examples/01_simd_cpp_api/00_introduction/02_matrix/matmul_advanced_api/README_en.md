@@ -21,7 +21,7 @@ This sample uses the Matmul high-level API to implement matrix multiplication.
 │   │   └── verify_result.py    // Golden value comparison file
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read and write functions
-│   ├── matmul_advanced_api.asc  // Ascend C sample implementation & invocation sample
+│   ├── matmul_advanced_api.asc // Ascend C sample implementation & invocation sample
 │   └── README.md               // Sample documentation
 ```
 
@@ -47,7 +47,7 @@ This sample uses the Matmul high-level API to implement matrix multiplication.
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 
-  This sample is a pure Cube matrix computation scenario and generates tiling with a fixed 2 Cube cores. Under this sample's specifications, the tiling result divides `M = 512` equally among 2 cores, with each core processing `singleCoreM = 256`, `singleCoreN = 512`, and `singleCoreKa = singleCoreKb = 128`.
+  This sample is a pure Cube matrix computation scenario and generates tiling with a fixed 2 Cube cores. Under this sample's specifications, the tiling result divides `M = 512` equally among 2 cores, with each core processing `singleCoreM = 256`, `singleCoreN = 512`, and `singleCoreK = 128`. The original K dimension corresponds to `tiling.Ka = tiling.Kb = 128`.
 
 - Sample Implementation:
   - Tiling Generation Process
@@ -87,7 +87,7 @@ This sample uses the Matmul high-level API to implement matrix multiplication.
 
 Execute the following steps in the root directory of this sample to build and run the sample.
 - Configure Environment Variables
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development toolkit on the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development toolkit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

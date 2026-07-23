@@ -16,13 +16,13 @@ This example uses high-level APIs to implement fused computation of Matmul and L
 
 ```
 ├── matmul_leakyrelu_advanced_api
-│   ├── CMakeLists.txt          // Build project file
-│   ├── data_utils.h            // Data read and write functions
+│   ├── CMakeLists.txt                    // Build project file
+│   ├── data_utils.h                      // Data read and write functions
 │   ├── matmul_leakyrelu_advanced_api.asc // Ascend C example implementation & invocation example
 │   ├── scripts
-│   │   ├── gen_data.py         // Input data and golden data generation script
-│   │   └── verify_result.py    // Golden data comparison file
-│   └── README.md               // Example documentation
+│   │   ├── gen_data.py                   // Input data and golden data generation script
+│   │   └── verify_result.py              // Golden data comparison file
+│   └── README.md                         // Example documentation
 ```
 
 ## Example Description
@@ -116,13 +116,13 @@ This example uses high-level APIs to implement fused computation of Matmul and L
       uint16_t dstGap;      // Gap between adjacent consecutive data blocks of destination operand, in DataBlock (32 bytes)
   };
   ```
-  This example uses `{tiling.baseM, tiling.baseN * sizeof(float) / AscendC::DEFAULT_C0_SIZE, 0, (tiling.N - tiling.baseN) * sizeof(float) / AscendC::DEFAULT_C0_SIZE}` when moving out matrix C blocks. Here, `blockCount` indicates moving `baseM` rows, `blockLen` indicates the amount of data corresponding to `baseN` matrix C elements per row. `dstGap` indicates the element gap between adjacent rows on the destination side, used to write `baseM * baseN` blocks back to the corresponding column range of the complete `M * N` matrix.
+  This example uses `{tiling.baseM, tiling.baseN * sizeof(float) / AscendC::DEFAULT_C0_SIZE, 0, (tiling.N - tiling.baseN) * sizeof(float) / AscendC::DEFAULT_C0_SIZE}` when moving out matrix C blocks. Here, `blockCount` indicates moving `baseM` rows, `blockLen` indicates the amount of data corresponding to `baseN` matrix C elements per row. `dstGap` indicates the gap (in DataBlock) between adjacent rows on the destination side, used to write `baseM * baseN` blocks back to the corresponding column range of the complete `M * N` matrix.
 
 ## Build and Run
 
 Execute the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

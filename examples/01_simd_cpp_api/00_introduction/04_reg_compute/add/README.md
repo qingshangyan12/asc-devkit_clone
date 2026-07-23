@@ -1,4 +1,4 @@
-# 基于RegBase编程add样例
+# 基于RegBase编程的add样例
 
 ## 概述
 本样例基于RegBase编程范式实现向量自加计算，计算逻辑为`y = x + x`。样例先将输入数据从GM（Global Memory）搬运到UB（Unified Buffer），再通过VF函数调用RegBase接口完成寄存器级别的Add计算，最后将结果从UB写回GM。
@@ -51,7 +51,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
