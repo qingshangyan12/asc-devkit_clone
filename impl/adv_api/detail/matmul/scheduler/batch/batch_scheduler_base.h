@@ -336,12 +336,18 @@ public:
         LocalTensor<TransAT> a2 = bufferPool.template GetBuffer<TPosition::A2, TransAT>();
         LocalTensor<TransBT> b2 = bufferPool.template GetBuffer<TPosition::B2, TransBT>();
         // split
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(bufferPool)));
+#endif
         MATMUL_MODULE(LoadToA2)->Load(
             a2, a1[ctx.offsetA], ctx.aL0Params.axisL1Len, ctx.aL0Params.kAxisL1Len, ctx.aL0Params.axisL0Len, kL0Len,
             ctx.aL0Params.axisL1Offset, ctx.aL0Params.kAxisL1Offset, isATranspose);
         MATMUL_MODULE(LoadToB2)->Load(
             b2, b1[ctx.offsetB], ctx.bL0Params.axisL1Len, ctx.bL0Params.kAxisL1Len, ctx.bL0Params.axisL0Len, kL0Len,
             ctx.bL0Params.axisL1Offset, ctx.bL0Params.kAxisL1Offset, isBTranspose);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(bufferPool)));
+#endif
         bufferPool.EnQue();
         bufferPool.DeQue();
 
@@ -355,11 +361,17 @@ public:
                       MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN() *
                       (MATMUL_MODULE(BatchLoop)->GetBatchOutCacheNum() - 1);
         }
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(bufferPool)));
+#endif
         MATMUL_MODULE(MmadCompute)
             ->Compute(
                 MATMUL_MODULE(CubeOutBuffer)->GetTensor()[offsetC], a2, b2, ctx.aL0Params.axisL0Len, kL0Len,
                 ctx.bL0Params.axisL0Len, isATranspose, isBTranspose,
                 MATMUL_MODULE(MatmulUnitFlag)->GetUnitFlag(sL0CLast), cmatrixSource, cmatrixInitVal, false);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(bufferPool)));
+#endif
         bufferPool.Free();
         MATMUL_MODULE(BiasScheduler)->Free();
     }

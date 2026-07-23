@@ -250,9 +250,17 @@ private:
         // Split
         if (!(MATMUL_MODULE(TBufPoolL0)->template Hit<TPosition::A2>(posA))) {
             a2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, TransAT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             MATMUL_MODULE(LoadToA2)->Load(
                 a2, a1, aL0Params.axisL1Len, aL0Params.kAxisL1Len, aL0Params.axisL0Len,
                 MATMUL_MODULE(KLoop)->GetTileShapeA(), aL0Params.axisL1Offset, aL0Params.kAxisL1Offset, isATranspose);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
         } else {
             a2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, TransAT>();
         }
@@ -267,9 +275,17 @@ private:
         LocalTensor<TransBT> b2;
         if (!(MATMUL_MODULE(TBufPoolL0)->template Hit<TPosition::B2>(posB))) {
             b2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, TransBT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             MATMUL_MODULE(LoadToB2)->Load(
                 b2, b1, bL0Params.axisL1Len, bL0Params.kAxisL1Len, bL0Params.axisL0Len,
                 MATMUL_MODULE(KLoop)->GetTileShapeA(), bL0Params.axisL1Offset, bL0Params.kAxisL1Offset, isBTranspose);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
         } else {
             b2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, TransBT>();
         }
@@ -286,10 +302,18 @@ private:
         bool cmatrixSource;
         bool cmatrixInitVal;
         BASE_MODULE::UpdateBiasParams(enPartialSum, sL0CInit, cmatrixSource, cmatrixInitVal, isBias);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_M>(
+            GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
         MATMUL_MODULE(MmadCompute)
             ->Compute(
                 cMatrix, a2, b2, madM, madK, madN, isATranspose, isBTranspose, unitFlag, cmatrixSource, cmatrixInitVal,
                 isBias);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_M>(
+            GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
         MATMUL_MODULE(TBufPoolL0)->Free();
         // clear data in related buffers
         MATMUL_MODULE(BiasScheduler)->Free();
