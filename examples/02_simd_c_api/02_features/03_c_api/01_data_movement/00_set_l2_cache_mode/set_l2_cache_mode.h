@@ -175,14 +175,20 @@ public:
      * 但 Add 的输入 x、y 均为流式数据（每个元素只读一次），写入 L2 是纯浪费的。
      * 与 Case 4 对比，展示 L2 bypass 对流式数据的优化效果。
      */
-    __aicore__ inline void ProcessDoubleBuffer() { ProcessDoubleBufferImpl(asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);}
+    __aicore__ inline void ProcessDoubleBuffer()
+    {
+        ProcessDoubleBufferImpl(asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
+    }
 
     /* !
      * \brief Case 4：Add 双缓冲 + L2 Cache DISABLE（L2 bypass）
      *
      * 设计意图：流式数据通过 L2 bypass 跳过 L2 Cache 写回，节省带宽。
      */
-    __aicore__ inline void ProcessDoubleBufferL2Bypass() { ProcessDoubleBufferImpl(asc_load_l2_cache_mode::NOTALLOC_KEEP);}
+    __aicore__ inline void ProcessDoubleBufferL2Bypass()
+    {
+        ProcessDoubleBufferImpl(asc_load_l2_cache_mode::NOTALLOC_KEEP);
+    }
 
 private:
     static constexpr uint32_t max_data_copy_len = 20992;
