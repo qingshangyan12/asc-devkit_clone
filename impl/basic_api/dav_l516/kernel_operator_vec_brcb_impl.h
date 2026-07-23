@@ -31,7 +31,8 @@ template <typename T>
 typename std::enable_if_t<
     !std::is_same<T, uint16_t>::value && !std::is_same<T, half>::value && !std::is_same<T, uint32_t>::value &&
     !std::is_same<T, float>::
-        value> __aicore__ inline BrcbImpl(__ubuf__ T* dst, __ubuf__ T* src0, const uint8_t repeatTime, const BrcbRepeatParams& repeatParams)
+        value> __aicore__ inline BrcbImpl(__ubuf__ T* dst, __ubuf__ T* src0, const uint8_t repeatTime,
+            const BrcbRepeatParams& repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }

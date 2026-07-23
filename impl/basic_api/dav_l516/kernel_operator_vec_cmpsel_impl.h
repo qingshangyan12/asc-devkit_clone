@@ -298,7 +298,8 @@ typename std::enable_if_t<
     !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value && !std::is_same<T, uint32_t>::value &&
     !std::is_same<T, int32_t>::value &&
     !std::is_same<T, float>::
-        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint32_t count)
+        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode,
+            const uint32_t count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
@@ -342,7 +343,8 @@ template <typename U, typename T>
 typename std::enable_if_t<
     std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
     std::is_same<T, half>::
-        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint32_t count)
+        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode,
+            const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -378,7 +380,8 @@ template <typename U, typename T>
 typename std::enable_if_t<
     std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
     std::is_same<T, float>::
-        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint32_t count)
+        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode,
+            const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -417,7 +420,8 @@ typename std::enable_if_t<
     !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value && !std::is_same<T, uint32_t>::value &&
     !std::is_same<T, int32_t>::value &&
     !std::is_same<T, float>::
-        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
+        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode,
+            const uint64_t mask, uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
@@ -460,7 +464,8 @@ typename std::
 
 template <typename T, typename U, bool isSetMask = true>
 typename std::
-    enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, half>::value> __aicore__ inline VcmpvImpl(
+    enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, half>::value>
+    __aicore__ inline VcmpvImpl(
         __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask, uint16_t repeatTime,
         const BinaryRepeatParams& repeatParams)
 {
@@ -496,7 +501,8 @@ typename std::
 
 template <typename T, typename U, bool isSetMask = true>
 typename std::
-    enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value> __aicore__ inline VcmpvImpl(
+    enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value>
+    __aicore__ inline VcmpvImpl(
         __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask, uint16_t repeatTime,
         const BinaryRepeatParams& repeatParams)
 {
@@ -536,14 +542,16 @@ typename std::enable_if_t<
     !std::is_same<T, uint16_t>::value && !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value &&
     !std::is_same<T, uint32_t>::value && !std::is_same<T, int32_t>::value &&
     !std::is_same<T, float>::
-        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask[2], uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
+        value> __aicore__ inline VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode,
+            const uint64_t mask[2], uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 template <typename T, typename U, bool isSetMask = true>
 typename std::
-    enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, half>::value> __aicore__ inline VcmpvImpl(
+    enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, half>::value>
+    __aicore__ inline VcmpvImpl(
         __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask[2],
         uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
@@ -588,7 +596,8 @@ typename std::
 
 template <typename T, typename U, bool isSetMask = true>
 typename std::
-    enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value> __aicore__ inline VcmpvImpl(
+    enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value>
+    __aicore__ inline VcmpvImpl(
         __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask[2],
         uint16_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
@@ -1036,9 +1045,9 @@ template <typename U, typename T>
 typename std::enable_if_t<
     !std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value && !std::is_same<T, uint16_t>::value &&
     !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value && !std::is_same<T, uint32_t>::value &&
-    !std::is_same<T, int32_t>::value &&
-    !std::is_same<T, float>::
-        value> __aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar, CMPMODE cmpMode, const uint32_t count)
+    !std::is_same<T, int32_t>::value && !std::is_same<T, float>::value>
+    __aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar, CMPMODE cmpMode,
+        const uint32_t count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
@@ -1080,9 +1089,9 @@ typename std::
 
 template <typename U, typename T>
 typename std::enable_if_t<
-    std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
-    std::is_same<T, half>::
-        value> __aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar, CMPMODE cmpMode, const uint32_t count)
+    std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, half>::value>
+    __aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar, CMPMODE cmpMode,
+        const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -1117,8 +1126,9 @@ typename std::enable_if_t<
 template <typename U, typename T>
 typename std::enable_if_t<
     std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
-    std::is_same<T, float>::
-        value> __aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar, CMPMODE cmpMode, const uint32_t count)
+    std::is_same<T, float>::value>
+    __aicore__ inline VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, const T src1Scalar, CMPMODE cmpMode,
+        const uint32_t count)
 {
     switch (cmpMode) {
         case CMPMODE::LT: {
@@ -1158,9 +1168,9 @@ template <typename T, typename U>
 typename std::enable_if_t<
     !std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value && !std::is_same<T, uint16_t>::value &&
     !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value && !std::is_same<T, uint32_t>::value &&
-    !std::is_same<T, int32_t>::value &&
-    !std::is_same<T, float>::
-        value> __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, uint32_t count)
+    !std::is_same<T, int32_t>::value && !std::is_same<T, float>::value>
+    __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode,
+        uint32_t count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
@@ -1191,9 +1201,9 @@ typename std::enable_if_t<std::is_same<T, uint8_t>::value || std::is_same<T, int
 
 template <typename T, typename U>
 typename std::enable_if_t<
-    std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
-    std::is_same<T, half>::
-        value> __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, uint32_t count)
+    std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, half>::value>
+    __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode,
+        uint32_t count)
 {
     __VEC_SCOPE__
     {
@@ -1217,9 +1227,9 @@ typename std::enable_if_t<
 
 template <typename T, typename U>
 typename std::enable_if_t<
-    std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
-    std::is_same<T, float>::
-        value> __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, uint32_t count)
+    std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value>
+    __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode,
+        uint32_t count)
 {
     uint32_t sreg = (uint32_t)count;
     uint32_t sregLower = VECTOR_REG_WIDTH / sizeof(T);
@@ -1282,9 +1292,9 @@ template <typename T, typename U>
 typename std::enable_if_t<
     !std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value && !std::is_same<T, uint16_t>::value &&
     !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value && !std::is_same<T, uint32_t>::value &&
-    !std::is_same<T, int32_t>::value &&
-    !std::is_same<T, float>::
-        value> __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, uint32_t count)
+    !std::is_same<T, int32_t>::value && !std::is_same<T, float>::value>
+    __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1,
+        SELMODE selMode, uint32_t count)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
@@ -1320,7 +1330,8 @@ typename std::enable_if_t<std::is_same<T, uint8_t>::value || std::is_same<T, int
 
 template <typename T, typename U>
 typename std::
-    enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, half>::value> __aicore__ inline VselImpl(
+    enable_if_t<std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, half>::value>
+    __aicore__ inline VselImpl(
         __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, uint32_t count)
 {
     __VEC_SCOPE__
@@ -1350,7 +1361,8 @@ typename std::
 
 template <typename T, typename U>
 typename std::
-    enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value> __aicore__ inline VselImpl(
+    enable_if_t<std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value>
+    __aicore__ inline VselImpl(
         __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, uint32_t count)
 {
     uint32_t sreg = (uint32_t)count;
