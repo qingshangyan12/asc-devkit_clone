@@ -15,18 +15,20 @@
 
 namespace mc2_ops_hccl {
 
-// 本卡对某个 rank 的收发信息。参考 hccl A2AsingleSendRecvInfo，但只保留 MC2 单发用到的 3 个字段
-// （hccl 的 loopNum / tailGoSize 是多轮分块才需要的，0305 不需要）。
-// ext 内存布局为 CCUMsgExt{sendSize, loopNum, sendOffset, recvOffset}，本结构只取其中 3 个。
+struct CcuKernelArgAlltoAllVMesh1D : CcuKernelArgBase {
+    uint64_t                            rankSize;
+    uint32_t                            rankId;
+    bool                                loadFromMem;
+    OpParam                             opParam;
+    std::vector<std::vector<uint32_t>>  subCommRanks;
+};
+
 struct A2AsingleSendRecvInfo {
     ccu::Variable sendSize;   // 本卡发往该 rank 的字节数（单发即整块大小）
     ccu::Variable sendOffset; // 本卡 input 中发往该 rank 的偏移
     ccu::Variable recvOffset; // 该 rank 在“本卡 output”中的接收偏移
 };
 
-// 参考 hccl AlltoAllVMesh1DContext 的分段思路，只保留 0305 单发路径需要的字段
-// （hccl 的 srcStride/xnMaxTransportGoSize/completedRankCount/flag/xnConst1/dataType 等多轮循环
-//  专用字段一律不带）。
 struct AlltoAllVMesh1DContext {
     // ---- 由 kfc_server 入参填充 ----
     uint32_t rankSize{0};

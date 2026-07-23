@@ -12,24 +12,20 @@
 
 namespace mc2_ops_hccl {
 
-// ==== 常量：命名/取值对齐 hccl ccu_kernel_all_to_all_v_mesh1d.cc ====
-[[maybe_unused]] constexpr int INPUT_XN_ID = 0; // mesh1d 窗口布局：0=INPUT（0305 单发未用，仅备注布局）
+[[maybe_unused]] constexpr int INPUT_XN_ID = 0; // mesh1d 窗口布局：0=INPUT
 constexpr int OUTPUT_XN_ID = 1; //                  1=OUTPUT
 constexpr int TOKEN_XN_ID  = 2; //                  2=TOKEN
-constexpr int CKE_IDX_0    = 0; // pre  前同步
-constexpr int CKE_IDX_1    = 1; // post 后同步
-constexpr int CONST_ONE    = 1;
+constexpr int PRE_OUTPUT_CKE_IDX = 0; // 前同步：output 通知
+constexpr int PRE_TOKEN_CKE_IDX  = 1; // 前同步：token 通知
+constexpr int POST_SYNC_CKE_IDX  = 2; // 后同步
+constexpr int CONST_ONE          = 1;
 
-// 0305 ext 内存布局 CCUMsgExt{sendSize, loopNum, sendOffset, recvOffset}，每 rank 4 个 uint64。
+// ext 内存布局 CCUMsgExt{sendSize, loopNum, sendOffset, recvOffset}，每 rank 4 个 uint64。
 constexpr uint32_t EXT_FIELD_NUM  = 4;
 constexpr uint32_t EXT_SIZE_IDX   = 0; // sendSize
 constexpr uint32_t EXT_SEND_IDX   = 2; // sendOffset
 constexpr uint32_t EXT_RECV_IDX   = 3; // recvOffset
 
-// ---------------------------------------------------------------------------
-// InitResource：参考 hccl InitResource——取每个对端的 OUTPUT/TOKEN 远端 Variable
-//               （0305 单发不取对端 INPUT 窗，src 恒用本卡 input）
-// ---------------------------------------------------------------------------
 static CcuResult InitResource(AlltoAllVMesh1DContext &ctx, ccu::Variable inputAddr,
                               ccu::Variable outputAddr, ccu::Variable tokenInfo)
 {
@@ -42,13 +38,10 @@ static CcuResult InitResource(AlltoAllVMesh1DContext &ctx, ccu::Variable inputAd
     ctx.src.resize(ctx.rankSize);
     ctx.dst.resize(ctx.rankSize);
 
-    // 本端：直接用入参地址。src 恒为“本卡 input”，故只存一份 ctx.input，不取对端 INPUT 窗
-    // （hccl 也未真正使用对端 input 窗，此处不抄其冗余）。
     ctx.input = inputAddr;
     ctx.output[ctx.rankId] = outputAddr;
     ctx.token[ctx.rankId] = tokenInfo;
 
-    // 只取对端的 OUTPUT / TOKEN 远端 Variable（数据要写到对端 output、用对端 token 寻址）。
     uint32_t channelIdx = 0;
     for (uint32_t peerId = 0; peerId < ctx.rankSize; peerId++) {
         if (peerId == ctx.rankId) {
@@ -61,10 +54,6 @@ static CcuResult InitResource(AlltoAllVMesh1DContext &ctx, ccu::Variable inputAd
     return CCU_SUCCESS;
 }
 
-// ---------------------------------------------------------------------------
-// LoadArgs：对齐 hccl LoadArgs——恢复本卡对所有 rank 的收发信息 sendRecvInfo
-// 0305 从 extAddr 一次 Load rankSize*4 个字段（CCUMsgExt 数组）
-// ---------------------------------------------------------------------------
 static CcuResult LoadArgs(AlltoAllVMesh1DContext &ctx)
 {
     const uint32_t extArgNum = ctx.rankSize * EXT_FIELD_NUM;
@@ -82,10 +71,6 @@ static CcuResult LoadArgs(AlltoAllVMesh1DContext &ctx)
     return CCU_SUCCESS;
 }
 
-// ---------------------------------------------------------------------------
-// PreSync：对齐 hccl PreSync——把本卡 output 中为每个对端预留的接收基址 + token
-//          交换到对端窗口，notify 到 CKE_0（mask 用 XN 窗位），再逐 channel 等齐
-// ---------------------------------------------------------------------------
 static CcuResult PreSync(AlltoAllVMesh1DContext &ctx)
 {
     HCCL_INFO("[CcuKernelAlltoAllVMesh1D] PreSync begain!");
@@ -107,15 +92,12 @@ static CcuResult PreSync(AlltoAllVMesh1DContext &ctx)
 
     uint16_t allBit = 1 << OUTPUT_XN_ID | 1 << TOKEN_XN_ID;
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
-        // ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, allBit);
+        ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, allBit);
     }
     HCCL_INFO("[CcuKernelAlltoAllVMesh1D] PreSync end");
     return CCU_SUCCESS;
 }
 
-// ---------------------------------------------------------------------------
-// CalcGroupSrcDst：对齐 hccl CalcGroupSrcDst——算每个 rank 的 src / dst / myDst
-// ---------------------------------------------------------------------------
 static void CalcGroupSrcDst(AlltoAllVMesh1DContext &ctx)
 {
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
@@ -140,10 +122,6 @@ static void CalcGroupSrcDst(AlltoAllVMesh1DContext &ctx)
     }
 }
 
-// ---------------------------------------------------------------------------
-// DoAll2AllV：MC2 单发场景——每个 rank 单次搬完（对齐 hccl loadFromMem 分支的语义，
-//             去掉了非 MC2 才需要的多轮分块 CCU_WHILE）
-// ---------------------------------------------------------------------------
 static CcuResult DoAll2AllV(AlltoAllVMesh1DContext &ctx)
 {
     uint32_t channelIdx = 0;
@@ -165,9 +143,6 @@ static CcuResult DoAll2AllV(AlltoAllVMesh1DContext &ctx)
     return CCU_SUCCESS;
 }
 
-// ---------------------------------------------------------------------------
-// PostSync：对齐 hccl PostSync——逐 channel 互发/互等 CKE_1，mask 固定 1<<CONST_ONE
-// ---------------------------------------------------------------------------
 static void PostSync(AlltoAllVMesh1DContext &ctx)
 {
     HCCL_INFO("[CcuKernelAlltoAllVMesh1D] PostSync!");
@@ -181,7 +156,7 @@ static void PostSync(AlltoAllVMesh1DContext &ctx)
 }
 
 // ============================================================================
-// 主入口 Kernel 函数（对齐 hccl 的调用顺序：InitResource → LoadArgs → PreSync
+// 主入口 Kernel 函数（调用顺序：InitResource → LoadArgs → PreSync
 //                       → CalcGroupSrcDst → DoAll2AllV → PostSync）
 // ============================================================================
 CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
