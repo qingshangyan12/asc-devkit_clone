@@ -145,6 +145,128 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 ],
             )
 
+    def test_option_sets_match_cpp_validator(self):
+        self.assertEqual(
+            MODULE._JOINED_PATH_PREFIXES,
+            (
+                "--gcc-toolchain=", "-iwithprefixbefore", "-iwithprefix",
+                "--sysroot=", "-idirafter", "-isysroot", "-isystem",
+                "-imacros", "-include", "-iprefix", "-iquote", "-MF",
+                "-I", "-L", "-B", "-R", "-T", "-o",
+            ),
+        )
+        self.assertEqual(
+            MODULE._LINKER_PATH_LIST_OPTIONS,
+            frozenset({
+                "-R", "-rpath", "--rpath", "-rpath-link", "--rpath-link",
+            }),
+        )
+
+    def test_normalizes_cpp_joined_and_linker_path_list_options(self):
+        with tempfile.TemporaryDirectory() as root:
+            cann_root = os.path.join(root, "cann")
+            host_root = os.path.join(root, "host")
+            os.makedirs(cann_root)
+            owned = os.path.join(cann_root, "path")
+            host = os.path.join(host_root, "path")
+            placeholder = "${env:ASCEND_HOME_PATH}/path"
+            self.assertEqual(
+                normalize_static_command(
+                    "compile",
+                    [f"-R{owned}", f"-T{owned}", "-R", owned,
+                     "-R", "relative/lib"],
+                    cann_root,
+                    0,
+                ),
+                [
+                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                    "-R" + placeholder,
+                    "-T" + placeholder,
+                    "-R", placeholder,
+                    "-R", "relative/lib",
+                ],
+            )
+            for argv in (
+                ["-R" + host],
+                ["-T" + host],
+                ["-R", host],
+                ["-R", "relative/lib:" + host],
+            ):
+                with self.subTest(argv=argv):
+                    with self.assertRaisesRegex(
+                        ValueError, "non-portable absolute path"
+                    ):
+                        normalize_static_command("compile", argv, cann_root, 0)
+
+            for option in sorted(MODULE._LINKER_PATH_LIST_OPTIONS):
+                with self.subTest(option=option, form="separate-owned"):
+                    self.assertEqual(
+                        normalize_static_command(
+                            "compile", [f"-Wl,{option},{owned}"], cann_root, 0
+                        ),
+                        [
+                            "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                            f"-Wl,{option},{placeholder}",
+                        ],
+                    )
+                with self.subTest(option=option, form="assignment-owned"):
+                    self.assertEqual(
+                        normalize_static_command(
+                            "compile", [f"-Wl,{option}={owned}"], cann_root, 0
+                        ),
+                        [
+                            "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                            f"-Wl,{option}={placeholder}",
+                        ],
+                    )
+                for value in (host, "relative/lib:" + host, "https://host/lib"):
+                    with self.subTest(option=option, value=value):
+                        with self.assertRaisesRegex(
+                            ValueError, "non-portable absolute path"
+                        ):
+                            normalize_static_command(
+                                "compile", [f"-Wl,{option},{value}"],
+                                cann_root, 0
+                            )
+                relative = f"-Wl,{option},relative/lib"
+                self.assertEqual(
+                    normalize_static_command("compile", [relative], cann_root, 0),
+                    ["${env:ASCEND_HOME_PATH}/bin/bisheng", relative],
+                )
+
+            ordinary = [
+                "-DURL=https://example.com/toolchain",
+                "-Wl,-plugin-opt=https://example.com/toolchain",
+                "label:/tmp/host,relative:value",
+            ]
+            self.assertEqual(
+                normalize_static_command("compile", ordinary, cann_root, 0),
+                ["${env:ASCEND_HOME_PATH}/bin/bisheng"] + ordinary,
+            )
+
+    def test_rejects_separate_linker_R_compound_path_in_manifest(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.cpp")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+            with self.assertRaisesRegex(ValueError, "non-portable absolute path"):
+                generate_static_compile_resources(
+                    output_root=root,
+                    kernel_base="Kernel_x",
+                    resource_id="kernel",
+                    resources=[{
+                        "source": source,
+                        "path": "resources/src/kernel.cpp",
+                    }],
+                    kernels=[{
+                        "kernel_name": "kernel",
+                        "recipes": {"normal": {
+                            "commands": [["tool", "-R", "relative/lib:/tmp/host"]],
+                            "artifact": "artifacts/kernel.o",
+                        }},
+                    }],
+                )
+
     def test_canonicalizes_alternate_symlink_spelling_of_cann_root(self):
         with tempfile.TemporaryDirectory() as root:
             actual = os.path.join(root, "actual")

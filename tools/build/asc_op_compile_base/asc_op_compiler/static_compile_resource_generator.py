@@ -29,8 +29,12 @@ _RESERVED_MACHINE_MANIFEST = ".sc/manifest.json"
 _JOINED_PATH_PREFIXES = (
     "--gcc-toolchain=", "-iwithprefixbefore", "-iwithprefix",
     "--sysroot=", "-idirafter", "-isysroot", "-isystem", "-imacros",
-    "-include", "-iprefix", "-iquote", "-MF", "-I", "-L", "-B", "-o",
+    "-include", "-iprefix", "-iquote", "-MF", "-I", "-L", "-B", "-R",
+    "-T", "-o",
 )
+_LINKER_PATH_LIST_OPTIONS = frozenset({
+    "-R", "-rpath", "--rpath", "-rpath-link", "--rpath-link",
+})
 
 
 def collect_kernel_symbols(metadata, linked_symbols=None):
@@ -215,6 +219,18 @@ def _contains_compound_absolute_path(value, allow_uri=True):
     )
 
 
+def _is_linker_path_list_value(fields, field_index):
+    field = fields[field_index]
+    if field_index > 0 and fields[field_index - 1] in _LINKER_PATH_LIST_OPTIONS:
+        return True
+    if field.startswith("-R"):
+        return True
+    return any(
+        field.startswith(option + "=")
+        for option in _LINKER_PATH_LIST_OPTIONS - {"-R"}
+    )
+
+
 def _contains_literal_absolute_path(value):
     if value.startswith(("/", "@/")):
         return True
@@ -227,15 +243,10 @@ def _contains_literal_absolute_path(value):
     if value.startswith(("-Wl,", "-Wa,")):
         fields = value.split(",")
         for field_index, field in enumerate(fields[1:], 1):
-            path_parts = _split_absolute_path_argument(
-                field, extra_prefixes=("-T", "-R")
-            )
+            path_parts = _split_absolute_path_argument(field)
             if path_parts is not None and path_parts[1].startswith("/"):
                 return True
-            allow_uri = not (
-                fields[field_index - 1] in {"-rpath", "-R"}
-                or field.startswith(("-rpath=", "-R"))
-            )
+            allow_uri = not _is_linker_path_list_value(fields, field_index)
             if _contains_compound_absolute_path(field, allow_uri=allow_uri):
                 return True
         return False
@@ -244,7 +255,9 @@ def _contains_literal_absolute_path(value):
         return _contains_compound_absolute_path(value[equals_index + 1:])
     for prefix in ("@",) + _JOINED_PATH_PREFIXES:
         if value.startswith(prefix):
-            return _contains_compound_absolute_path(value[len(prefix):])
+            return _contains_compound_absolute_path(
+                value[len(prefix):], allow_uri=prefix == "@"
+            )
     return False
 
 
@@ -318,21 +331,27 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
         value = argument.replace("${resource.", "${resource:")
         value = value.replace("${artifact.", "${output:")
         value = value.replace("${launch.block_dim}", "${context:block_dim}")
+        separate_linker_path = argv_index > 0 and argv[argv_index - 1] == "-R"
+        if separate_linker_path:
+            portable_path, _ = _normalize_cann_path_list(
+                value, cann_root, allow_uri=False
+            )
+            if portable_path is None:
+                raise ValueError(
+                    f"command[{command_index}][{argv_index}] contains "
+                    f"non-portable absolute path: {argument}"
+                )
+            value = portable_path
         if value.startswith(("-Wl,", "-Wa,")):
             fields = value.split(",")
             for field_index in range(1, len(fields)):
-                field_parts = _split_absolute_path_argument(
-                    fields[field_index], extra_prefixes=("-T", "-R")
-                )
+                field_parts = _split_absolute_path_argument(fields[field_index])
                 prefix, path = (
                     field_parts
                     if field_parts is not None
                     else ("", fields[field_index])
                 )
-                allow_uri = not (
-                    fields[field_index - 1] in {"-rpath", "-R"}
-                    or fields[field_index].startswith(("-rpath=", "-R"))
-                )
+                allow_uri = not _is_linker_path_list_value(fields, field_index)
                 portable_path, _ = _normalize_cann_path_list(
                     path, cann_root, allow_uri=allow_uri
                 )
@@ -347,7 +366,7 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
         if absolute_parts is not None:
             prefix, path = absolute_parts
             portable_path, canonical_path = _normalize_cann_path_list(
-                path, cann_root
+                path, cann_root, allow_uri=prefix not in _JOINED_PATH_PREFIXES
             )
             if portable_path is not None:
                 value = prefix + portable_path
@@ -512,12 +531,21 @@ def _validate_recipe(recipe, context, kernel_name, target_names, resource_paths)
                 f"{context}.commands[{command_index}] must be a bounded "
                 "non-empty argv array"
             )
+        expect_linker_path = False
         for argv_index, argument in enumerate(command):
+            if expect_linker_path and _contains_compound_absolute_path(
+                argument, allow_uri=False
+            ):
+                raise ValueError(
+                    f"{context}.commands[{command_index}][{argv_index}] "
+                    f"contains a non-portable absolute path: {argument}"
+                )
             _validate_argument(
                 argument,
                 f"{context}.commands[{command_index}][{argv_index}]",
                 resource_paths,
             )
+            expect_linker_path = argument == "-R"
     artifact = recipe.get("artifact")
     if isinstance(artifact, str):
         _relative_path(artifact, f"{context}.artifact")
