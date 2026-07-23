@@ -356,6 +356,8 @@ AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异
 
 当开发者进行一个矩阵乘法计算时（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品），可通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这四个步骤的同步。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品可使用`SetFlag`&`WaitFlag`实现相同同步效果，详见[同步机制](../基于Tensor的CPP编程/CPPTensor编程概述.md#同步机制)。
 
+以下示例中，Kernel入参`x`、`y`、`z`的指针类型与对应`GlobalTensor`的模板类型一致，因此调用`SetGlobalBuffer`时可省略显式类型转换。若实参指针类型与`GlobalTensor`的模板类型不一致，需要先将其显式转换为对应的`__gm__ PrimType*`类型。
+
 ```cpp
 __global__ __cube__ void matmul_kernel(__gm__ half* x, __gm__ half* y, __gm__ float* z)
 {
@@ -397,7 +399,13 @@ __global__ __cube__ void matmul_kernel(__gm__ half* x, __gm__ half* y, __gm__ fl
     
     // Step 3: Matrix computation (L0A/B Buffer → L0C Buffer), pipeline is PIPE_M
     AscendC::Mutex::Lock<PIPE_M>(mutex_id);
-    AscendC::MmadParams mmadParams{BLOCK_M, BLOCK_N, BLOCK_K, 0, false, true};
+    AscendC::MmadParams mmadParams;
+    mmadParams.m = BLOCK_M;
+    mmadParams.n = BLOCK_N;
+    mmadParams.k = BLOCK_K;
+    mmadParams.unitFlag = 0;
+    mmadParams.cmatrixSource = false;
+    mmadParams.cmatrixInitVal = true;
     AscendC::Mmad(l0cTensor, l0aTensor, l0bTensor, mmadParams);
     AscendC::Mutex::Unlock<PIPE_M>(mutex_id);
     
@@ -418,6 +426,9 @@ __global__ __cube__ void matmul_kernel(__gm__ half* x, __gm__ half* y, __gm__ fl
 [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)在Tensor基础上引入Layout布局概念，将Shape和Stride移到编译期确定，实现类型安全和分形布局自动生成。开发者只需定义Tensor的Layout，搬运和计算接口自动推断底层参数，大幅降低矩阵算子开发难度。
 
 > 📌 扩展Tensor（带有Layout）能力从[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)开始支持。
+
+> [!NOTE]说明
+> 本节扩展Tensor示例以CANN9.1.0接口为准。对于本节使用的Nz布局，`MakeFrameLayout`的类型模板参数可按需省略；示例显式传入`half`，用于确保Layout的类型和C0推导与Tensor数据类型一致，并非接口新增了强制参数。若代码将原始指针直接传入`MakeTensor`，或使用`Copy(dst, src)`形式调用搬运接口，需要分别使用`MakeMemPtr`封装内存指针，并通过`MakeCopy`构造与搬运通路匹配的`CopyAtom`，再调用`Copy(atomCopy, dst, src)`。
 
 ### Layout的层次化表述
 
