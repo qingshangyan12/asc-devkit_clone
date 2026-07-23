@@ -31,12 +31,14 @@
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    __NPU_ARCH__ == 5161)
 #include "log_3510_impl.h"
 #endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              __NPU_ARCH__ == 5161)
 
 namespace AscendC {
 template <typename T>
@@ -93,7 +95,8 @@ __aicore__ inline void LogImpl(const LocalTensor<T>& dstTensor, const LocalTenso
     CHECK_FUNC_HIGHLEVEL_API(Log, (T, isReuseSource), (dstTensor, srcTensor, calCount));
 
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    __NPU_ARCH__ == 5161)
     LogImpl((__ubuf__ T*)dstTensor.GetPhyAddr(), (__ubuf__ T*)srcTensor.GetPhyAddr(), calCount);
 #else
     const UnaryRepeatParams unaryParams;
@@ -111,7 +114,8 @@ __aicore__ inline void Log2Impl(
     uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    __NPU_ARCH__ == 5161)
     const float Ln2Reciprocal = 1.4426950408889634; // 1.0/Ln2;
     LogXImpl((__ubuf__ T*)dstTensor.GetPhyAddr(), (__ubuf__ T*)srcTensor.GetPhyAddr(), calCount, Ln2Reciprocal);
 #else
@@ -153,7 +157,8 @@ __aicore__ inline void Log10Impl(const LocalTensor<T>& dstTensor, const LocalTen
     const UnaryRepeatParams unaryParams;
 
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    __NPU_ARCH__ == 5161)
     LogXImpl((__ubuf__ T*)dstTensor.GetPhyAddr(), (__ubuf__ T*)srcTensor.GetPhyAddr(), calCount, Ln10Reciprocal);
 #else
     SetMaskCount();
