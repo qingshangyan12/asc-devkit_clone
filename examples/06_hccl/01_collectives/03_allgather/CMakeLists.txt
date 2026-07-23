@@ -29,6 +29,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -fstack-protector-strong -fPIE -
 # 头文件和库文件路径
 set(ASCEND_INC_DIR $ENV{ASCEND_HOME_PATH}/include)
 set(ASCEND_LIB_DIR $ENV{ASCEND_HOME_PATH}/lib64)
+# devkit 仓 mc2_client 库的安装路径
+set(DEVKIT_LIB_DIR $ENV{ASCEND_HOME_PATH}/${CMAKE_SYSTEM_PROCESSOR}-linux/lib64)
 
 # 编译目标
 add_executable(${PROJECT_NAME}
@@ -41,9 +43,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${ASCEND_LIB_DIR}
+    ${DEVKIT_LIB_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}
+    mc2_client
     hccl
     ascendcl
     pthread

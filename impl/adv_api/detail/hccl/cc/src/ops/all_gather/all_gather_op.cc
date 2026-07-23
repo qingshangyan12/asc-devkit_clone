@@ -21,6 +21,7 @@ extern "C" unsigned int LaunchAicpuKernel(OpParam* param);
 HcclResult HcclAllGather(
     void* sendBuf, void* recvBuf, uint64_t sendCount, HcclDataType dataType, HcclComm comm, aclrtStream stream)
 {
+    HCCL_INFO("[DEVKIT_VERIFY] HcclAllGather entered from devkit impl");
     if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
         return HcclAllGatherInner(sendBuf, recvBuf, sendCount, dataType, comm, stream);
     }
