@@ -10,6 +10,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 import os
+import re
 import sys
 import shutil
 import unittest
@@ -278,6 +279,103 @@ class TestCompileOp(unittest.TestCase):
             serialized = json.dumps(kernel)
             for forbidden in ("macros", "build", "static_targets", "actions"):
                 self.assertNotIn(forbidden, serialized)
+
+    def test_emit_static_compile_resources_publishes_fresh_root_closure(self):
+        with TemporaryDirectory() as root:
+            source_root = os.path.join(root, "input")
+            output_root = os.path.join(root, "output")
+            detail_dir = os.path.join(source_root, "detail")
+            os.makedirs(detail_dir)
+            os.makedirs(output_root)
+            binary = os.path.join(source_root, "Add_x.o")
+            source = os.path.join(source_root, "add.cpp")
+            wrapper = os.path.join(source_root, "Add_x_kernel.cpp")
+            tiling_header = os.path.join(source_root, "Add_x_tiling_data.h")
+            metadata = os.path.join(output_root, "Add_x.json")
+            with open(binary, "wb") as file_obj:
+                file_obj.write(b"dynamic")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write('#include "local.h"\n')
+            with open(os.path.join(source_root, "local.h"), "w", encoding="utf-8") as file_obj:
+                file_obj.write('#include "detail/value.h"\n')
+            with open(os.path.join(detail_dir, "value.h"), "w", encoding="utf-8") as file_obj:
+                file_obj.write("constexpr int kValue = 1;\n")
+            with open(wrapper, "w", encoding="utf-8") as file_obj:
+                file_obj.write(f'#include "{source}"\n')
+            with open(tiling_header, "w", encoding="utf-8") as file_obj:
+                file_obj.write(
+                    "#ifndef T\n#define T\nclass AddTiling {};\n"
+                    "#define GET_TILING_DATA(v, p) InitTilingData<AddTiling>(p, &v)\n#endif\n"
+                )
+            with open(metadata, "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelList": [{"kernelName": "actual_7"}]}, file_obj)
+
+            info = CompileInfo()
+            info.dst_file = binary
+            info.src_file = source
+            info.gen_kernel_func_file = wrapper
+            info.kernel_name = "Add_x"
+            info.origin_func_name = "Add"
+            info.tiling_key_list = ["7"]
+            info.tiling_key_kernel_type = {
+                "7": KernelMetaType.KERNEL_TYPE_AIV_ONLY
+            }
+            info.global_kernel_symbols = []
+            info.static_compile_tiling_size = 64
+            info.static_compile_tiling_key_data_size = {"7": 32}
+            tiling = mock.Mock(
+                static_shape_flag=False,
+                tiling_data_file_path=tiling_header,
+                tiling_key_data_size={},
+                tiling_data_size=0,
+            )
+            options = mock.Mock(
+                compile_options=["-DDTYPE_X=half", "-DFORMAT_X=FORMAT_ND"],
+                mllvm_options=[],
+            )
+
+            def compile_command(source_path, output_path, static_options, *_args):
+                return ["bisheng", "-c"] + static_options.compile_options + [
+                    source_path, "-o", output_path,
+                ]
+
+            with mock.patch.object(
+                compile_op_module, "gen_compile_cmd_v220", side_effect=compile_command
+            ), mock.patch.object(
+                compile_op_module.CommonUtility, "get_chip_version", return_value="c220"
+            ):
+                published = compile_op_module._emit_static_compile_resources(
+                    info, mock.Mock(op_type="Add"), tiling, options, 4, output_root
+                )
+
+            shutil.rmtree(source_root)
+            manifest_path = os.path.join(published, "manifest.json")
+            with open(manifest_path, "r", encoding="utf-8") as file_obj:
+                manifest = json.load(file_obj)
+            self.assertEqual(manifest["schema_version"], "4.0")
+            self.assertEqual(manifest["resource_id"], "add")
+            serialized = json.dumps(manifest)
+            self.assertNotIn(source_root, serialized)
+            for logical_path in re.findall(r"\$\{resource:([^}]+)\}", serialized):
+                resource_path = os.path.realpath(os.path.join(published, logical_path))
+                self.assertEqual(os.path.commonpath([published, resource_path]), published)
+                self.assertTrue(os.path.isfile(resource_path), logical_path)
+            for relative_path in ("local.h", "detail/value.h"):
+                self.assertTrue(
+                    os.path.isfile(os.path.join(published, "resources/src", relative_path))
+                )
+            with open(
+                os.path.join(published, "resources/src/Add_x_kernel.cpp"),
+                "r",
+                encoding="utf-8",
+            ) as file_obj:
+                self.assertEqual(file_obj.read(), '#include "add.cpp"\n')
+            with open(
+                os.path.join(published, "resources/include/Add_x_tiling_data.h"),
+                "r",
+                encoding="utf-8",
+            ) as file_obj:
+                self.assertIn("@@STATIC_VALUE_tiling_data@@", file_obj.read())
 
     def test_emit_static_compile_resources_flattens_self_contained_sk_recipe(self):
         with TemporaryDirectory() as root:

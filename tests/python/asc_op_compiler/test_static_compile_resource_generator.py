@@ -46,6 +46,33 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 [(header, "tiling.h"), (detail, "detail/types.h")],
             )
 
+    def test_rejects_quoted_includes_outside_source_root(self):
+        with tempfile.TemporaryDirectory() as root:
+            source_root = os.path.join(root, "src")
+            os.makedirs(source_root)
+            source = os.path.join(source_root, "kernel.cpp")
+            external = os.path.join(root, "common.h")
+            with open(external, "w", encoding="utf-8") as file_obj:
+                file_obj.write("common\n")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write('#include "../common.h"\n')
+            with self.assertRaisesRegex(ValueError, "outside source root"):
+                collect_local_include_files(source)
+
+    def test_rejects_quoted_include_symlink_escape(self):
+        with tempfile.TemporaryDirectory() as root:
+            source_root = os.path.join(root, "src")
+            os.makedirs(source_root)
+            source = os.path.join(source_root, "kernel.cpp")
+            external = os.path.join(root, "common.h")
+            with open(external, "w", encoding="utf-8") as file_obj:
+                file_obj.write("common\n")
+            os.symlink(external, os.path.join(source_root, "common.h"))
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write('#include "common.h"\n#include <../system.h>\n')
+            with self.assertRaisesRegex(ValueError, "outside source root"):
+                collect_local_include_files(source)
+
     def test_normalizes_programs_and_portable_command_paths(self):
         self.assertEqual(
             [normalize_static_program(kind) for kind in ("compile", "link", "objcopy", "archive")],
@@ -149,6 +176,65 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "non-portable absolute path"):
             normalize_static_command(
                 "compile", ["--sysroot=/opt/cann-other"], "/opt/cann", 0
+            )
+
+    def test_matches_cpp_validator_absolute_argument_forms(self):
+        rejected = [
+            "-isystem/tmp/include",
+            "-idirafter/tmp/include",
+            "-isysroot/tmp/sysroot",
+            "-iquote/tmp/include",
+            "-imacros/tmp/macros.h",
+            "-iprefix/tmp/prefix",
+            "-iwithprefix/tmp/include",
+            "-iwithprefixbefore/tmp/include",
+            "-MF/tmp/deps.d",
+            "-B/tmp/toolchain",
+            "--gcc-toolchain=/tmp/toolchain",
+            "@/tmp/args.rsp",
+            "-Wl,-rpath,/tmp/lib",
+            "-Wa,/tmp/input.s",
+        ]
+        for argument in rejected:
+            with self.subTest(argument=argument):
+                with self.assertRaisesRegex(ValueError, "non-portable absolute path"):
+                    normalize_static_command("compile", [argument], "/opt/cann", 0)
+        ordinary_comma = "s,/tmp/source,relative/source,g"
+        self.assertEqual(
+            normalize_static_command("compile", [ordinary_comma], "/opt/cann", 0),
+            ["${env:ASCEND_HOME_PATH}/bin/bisheng", ordinary_comma],
+        )
+
+    def test_normalizes_cpp_validator_path_forms_owned_by_cann(self):
+        with tempfile.TemporaryDirectory() as root:
+            cann_root = os.path.join(root, "cann")
+            os.makedirs(cann_root)
+            owned = os.path.join(cann_root, "missing", "path")
+            command = normalize_static_command(
+                "compile",
+                [
+                    "-isystem" + owned,
+                    "-include", owned,
+                    "--gcc-toolchain=" + owned,
+                    "@" + owned,
+                    "-Wl,-rpath," + owned,
+                    "-Wa," + owned,
+                ],
+                cann_root,
+                0,
+            )
+            placeholder = "${env:ASCEND_HOME_PATH}/missing/path"
+            self.assertEqual(
+                command,
+                [
+                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                    "-isystem" + placeholder,
+                    "-include", placeholder,
+                    "--gcc-toolchain=" + placeholder,
+                    "@" + placeholder,
+                    "-Wl,-rpath," + placeholder,
+                    "-Wa," + placeholder,
+                ],
             )
 
     def test_rejects_dot_segments_in_logical_resource_paths(self):
@@ -423,6 +509,99 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                                         "${resource:resources/src/kernel.cpp}",
                                         "${output:artifacts/kernel.o}",
                                     ]],
+                                    "artifact": "artifacts/kernel.o",
+                                }},
+                            }],
+                        )
+
+    def test_enforces_cpp_schema_collection_limits(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.cpp")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+
+            def generate(*, targets=None, commands=None, patches_marker=None):
+                kernel = {
+                    "kernel_name": "kernel",
+                    "recipes": {"normal": {
+                        "commands": commands or [["tool"]],
+                        "artifact": "artifacts/kernel.o",
+                    }},
+                }
+                if targets is not None:
+                    kernel["targets"] = targets
+                if patches_marker == "kernel":
+                    kernel["patches"] = []
+                elif patches_marker == "recipe":
+                    kernel["recipes"]["normal"]["patches"] = []
+                return generate_static_compile_resources(
+                    output_root=root,
+                    kernel_base="Kernel_x",
+                    resource_id="kernel",
+                    resources=[{
+                        "source": source,
+                        "path": "resources/src/kernel.cpp",
+                    }],
+                    kernels=[kernel],
+                )
+
+            targets = [
+                {"name": f"target_{index}", "parameter_index": index, "byte_size": 1}
+                for index in range(256)
+            ]
+            self.assertTrue(os.path.isdir(generate(targets=targets)))
+            for invalid_targets in ([], targets + [{
+                "name": "overflow", "parameter_index": 256, "byte_size": 1,
+            }]):
+                with self.subTest(target_count=len(invalid_targets)):
+                    with self.assertRaisesRegex(ValueError, "targets.*bounded non-empty"):
+                        generate(targets=invalid_targets)
+
+            max_bytes = 16 * 1024 * 1024
+            self.assertTrue(os.path.isdir(generate(targets=[{
+                "name": "tiling_data", "parameter_index": 0,
+                "byte_size": max_bytes,
+            }])))
+            with self.assertRaisesRegex(ValueError, "byte_size.*supported range"):
+                generate(targets=[{
+                    "name": "tiling_data", "parameter_index": 0,
+                    "byte_size": max_bytes + 1,
+                }])
+
+            self.assertTrue(os.path.isdir(generate(commands=[["tool"]] * 64)))
+            with self.assertRaisesRegex(ValueError, "commands.*bounded non-empty"):
+                generate(commands=[["tool"]] * 65)
+            self.assertTrue(os.path.isdir(generate(commands=[["arg"] * 256])))
+            with self.assertRaisesRegex(ValueError, "bounded non-empty argv"):
+                generate(commands=[["arg"] * 257])
+            for owner in ("kernel", "recipe"):
+                with self.subTest(empty_patches_owner=owner):
+                    with self.assertRaisesRegex(ValueError, "patches.*non-empty"):
+                        generate(patches_marker=owner)
+
+    def test_rejects_any_suffix_after_resource_or_output_placeholder(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.cpp")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+            for argument in (
+                "${resource:resources/src/kernel.cpp}.bak",
+                "${output:artifacts/kernel.o}-suffix",
+            ):
+                with self.subTest(argument=argument):
+                    with self.assertRaisesRegex(ValueError, "path-changing suffix"):
+                        generate_static_compile_resources(
+                            output_root=root,
+                            kernel_base="Kernel_x",
+                            resource_id="kernel",
+                            resources=[{
+                                "source": source,
+                                "path": "resources/src/kernel.cpp",
+                            }],
+                            kernels=[{
+                                "kernel_name": "kernel",
+                                "recipes": {"normal": {
+                                    "commands": [["tool", argument]],
                                     "artifact": "artifacts/kernel.o",
                                 }},
                             }],
