@@ -77,6 +77,7 @@ __aicore__ inline void AssembleHcclMsgExtForCCU(
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient AssembleHcclMsgExtForCCU ccuParam.ccuMsgExt:0x%llx, ccuMsgExt:0x%llx",
         reinterpret_cast<uint64_t>(ccuParam.ccuMsgExt), reinterpret_cast<uint64_t>(ccuMsgExt));
+    
 
     for (uint32_t i = 0U; i < ccuParam.rankNum; ++i) {
         uint64_t sendSize = allToAllVParam->sendCounts[i] * dataSize;
@@ -86,6 +87,8 @@ __aicore__ inline void AssembleHcclMsgExtForCCU(
             allToAllVParam->rdispls[i] * dataSize + (allToAllVParam->recvCounts[i] * dataSize) * ccuParam.repeatIndex;
         KERNEL_LOG(
             KERNEL_INFO, "ApiClient ccuMsgExt rankIndex:%u, sendSize:%d, sendOffset:%d, recvOffset:%d", i,
+            ccuMsgExt[i].sendSize, ccuMsgExt[i].sendOffset, ccuMsgExt[i].recvOffset);
+        AscendC::printf("ApiClient ccuMsgExt rankIndex:%u, sendSize:%d, sendOffset:%d, recvOffset:%d", i,
             ccuMsgExt[i].sendSize, ccuMsgExt[i].sendOffset, ccuMsgExt[i].recvOffset);
     }
 

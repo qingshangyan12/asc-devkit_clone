@@ -81,7 +81,7 @@ static CcuResult PreSync(AlltoAllVMesh1DContext &ctx)
             continue;
         }
         tempDst = ctx.output[ctx.rankId];
-        tempDst += ctx.sendRecvInfo[id].recvOffset;
+        // tempDst += ctx.sendRecvInfo[id].recvOffset;
         // index = 0，传递 output 信息
         ccu::WriteVariableWithNotify(ctx.channels[channelIdx], tempDst, OUTPUT_XN_ID, CKE_IDX_0, 1 << OUTPUT_XN_ID);
         // index = 1，传递 token 信息
