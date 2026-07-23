@@ -34,10 +34,10 @@
 
 | 接口名 | 功能描述 |
 | --- | --- |
+| [GMToL1 Load2D指令搬运](cube_compute_ISASI/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1-Load2D指令搬运.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。 |
 | [GMToL1连续数据搬运（DataCopy）](cube_compute_ISASI/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/DataCopy_GMToL1_continuous.md) | 该接口能够将矩阵从Global Memory连续搬运至L1 Buffer（TPosition为A1/B1），数据搬运时格式和内容保持不变。 |
 | [GMToL1高维切分数据搬运（DataCopy）](cube_compute_ISASI/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/DataCopy_GMToL1_highdim_split.md) | 该接口主要实现将矩阵从Global Memory搬运至L1 Buffer（TPosition为A1/B1），数据搬运时格式和内容保持不变。 |
 | [GMToL1随路转换-ND2NZ搬运（DataCopy）](cube_compute_ISASI/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/DataCopy_GMToL1_ND2NZ.md) | 该接口主要实现将矩阵从Global Memory搬运至L1 Buffer（TPosition为A1/B1），并支持在数据搬运时进行ND到NZ格式的转换。 |
-| [GMToL1 Load2D指令搬运](cube_compute_ISASI/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1-Load2D指令搬运.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。 |
 | [UBToL1连续数据搬运（DataCopy）](cube_compute_ISASI/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/DataCopy_UBToL1_continuous.md) | 该接口实现将矩阵从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，搬运方式为连续搬运，数据搬运时格式和内容保持不变。 |
 | [UBToL1高维切分数据搬运（DataCopy）](cube_compute_ISASI/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/DataCopy_UBToL1_highdim_split.md) | 该接口实现将矩阵从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，支持非连续搬运和连续搬运，数据搬运时格式和内容保持不变。 |
 | [UBToL1非对齐数据搬运（DataCopyPad）](cube_compute_ISASI/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/DataCopyPad_UBToL1.md) | 该接口提供从Unified Buffer到L1 Buffer的数据非对齐搬运功能。 |
@@ -70,9 +70,9 @@
 
 | 接口名 | 功能描述 |
 | --- | --- |
+| [SetMMColumnMajor/SetMMRowMajor](cube_compute_ISASI/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md) | 控制Mmad/MmadWithSparse优先通过M/N的哪个方向。 |
 | [SetHF32Mode](cube_compute_ISASI/Mmad计算/寄存器配置说明/SetHF32Mode.md) | 用于设置Mmad计算是否开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。 |
 | [SetHF32TransMode](cube_compute_ISASI/Mmad计算/寄存器配置说明/SetHF32TransMode.md) | 设置HF32模式取整的具体方式，需要先使用SetHF32Mode开启HF32取整模式。 |
-| [SetMMColumnMajor/SetMMRowMajor](cube_compute_ISASI/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md) | 控制Mmad/MmadWithSparse优先通过M/N的哪个方向。 |
 
 ### 矩阵计算的搬出
 
@@ -448,13 +448,6 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [LocalMemBar](Reg矢量计算/同步控制/LocalMemBar.md) | Reg矢量计算宏函数内不同流水线之间的同步指令。该同步指令指定src源流水线和dst目的流水线，目的流水线将等待源流水线上所有指令完成才进行执行。读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令顺序执行，则需要插入同步指令，写写场景同理。 |
-| [AllocMutexID (ISASI)](同步控制/核内同步/AllocMutexID_ISASI.md) | 从框架获取并占用一个MutexID，与ReleaseMutexID配合使用，管理MutexID的获取和释放。获取的MutexID可以传入Mutex接口使用，此时Mutex可以与TQue等其他接口配合使用。 |
-| [DataSyncBarrier(ISASI)](同步控制/核内同步/DataSyncBarrier_ISASI.md) | 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。 |
-| [PipeBarrier(ISASI)](同步控制/核内同步/PipeBarrier_ISASI.md) | 完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。其作用是，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。 |
-| [ReleaseMutexID (ISASI)](同步控制/核内同步/ReleaseMutexID_ISASI.md) | 从框架释放一个MutexID，与AllocMutexID配合使用。 |
-| [SetFlag/WaitFlag(ISASI)](同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |
-| [CrossCoreSetFlag(ISASI)](同步控制/核间同步/CrossCoreSetFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。 |
-| [CrossCoreWaitFlag(ISASI)](同步控制/核间同步/CrossCoreWaitFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag](同步控制/核间同步/CrossCoreSetFlag_ISASI.md)。 |
 
 ### 系统变量访问
 | 接口名 | 功能描述 |
@@ -477,6 +470,7 @@
 | [CountLeadingZero](标量计算/CountLeadingZero.md) | 统计uint64_t类型数值的二进制表示中前导0的个数（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。 |
 | [CountBitsCntSameAsSignBit](标量计算/CountBitsCntSameAsSignBit.md) | 统计int64_t类型数值的二进制表示中，从最高数值位开始与符号位相同的连续比特位的个数。 |
 | [GetSFFValue](标量计算/GetSFFValue.md) | 查找uint64_t类型数值的二进制表示中从最低有效位开始的首个指定比特值（0或1）的位置，如果没找到则返回-1。 |
+| [CeilDivision](标量计算/CeilDivision.md) | 计算两个整数num1和num2相除后向上取整结果。 |
 | [Cast（float转half/int32_t）](标量计算/Cast_float_to_half_int32.md) | 对标量的数据类型进行转换。 |
 | [Cast（float转bfloat16_t）](标量计算/Cast_float_to_bfloat16.md) | float类型标量数据转换成bfloat16_t类型标量数据。 |
 | [Cast（多类型转float）](标量计算/Cast_multi_type_to_float.md) | 该接口将输入数据转换为float类型。 |
@@ -496,18 +490,25 @@
 | [InitSpmBuffer](资源管理/Pipe和Que框架/TPipe/InitSpmBuffer.md) | 初始化SPM Buffer。 |
 | [WriteSpmBuffer](资源管理/Pipe和Que框架/TPipe/WriteSpmBuffer.md) | 将需要溢出暂存的数据拷贝到SPM Buffer中。 |
 | [ReadSpmBuffer](资源管理/Pipe和Que框架/TPipe/ReadSpmBuffer.md) | 从SPM Buffer读回到local数据中。 |
-| [GetUserWorkspace](资源管理/临时空间管理/workspace/GetUserWorkspace.md) | 获取用户使用的workspace指针。 |
-| [SetSysWorkSpace](资源管理/临时空间管理/workspace/SetSysWorkSpace.md) | 在进行融合算子编程时，由于框架通信机制需要使用到workspace，也就是系统workspace，所以在该场景下，开发者要调用该接口，设置系统workspace的指针。 |
 | [GetSysWorkSpacePtr](资源管理/临时空间管理/workspace/GetSysWorkSpacePtr.md) | 获取系统workspace指针。 |
+| [SetSysWorkSpace](资源管理/临时空间管理/workspace/SetSysWorkSpace.md) | 在进行融合算子编程时，由于框架通信机制需要使用到workspace，也就是系统workspace，所以在该场景下，开发者要调用该接口，设置系统workspace的指针。 |
+| [GetUserWorkspace](资源管理/临时空间管理/workspace/GetUserWorkspace.md) | 获取用户使用的workspace指针。 |
 | [PopStackBuffer](资源管理/临时空间管理/PopStackBuffer.md) | 在指定position（逻辑位置）申请临时空间，空间大小为指定position的全部剩余空间。 |
 
 ## 同步控制
 | 接口名 | 功能描述 |
 | --- | --- |
 | [TQueSync](同步控制/核内同步/TQueSync/TQueSync.md) | TQueSync类提供同步控制接口，开发者可以使用这类API来自行完成同步控制。 |
+| [SetFlag/WaitFlag(ISASI)](同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |
+| [PipeBarrier(ISASI)](同步控制/核内同步/PipeBarrier_ISASI.md) | 完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。其作用是，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。 |
+| [DataSyncBarrier(ISASI)](同步控制/核内同步/DataSyncBarrier_ISASI.md) | 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。 |
+| [AllocMutexID (ISASI)](同步控制/核内同步/AllocMutexID_ISASI.md) | 从框架获取并占用一个MutexID，与ReleaseMutexID配合使用，管理MutexID的获取和释放。获取的MutexID可以传入Mutex接口使用，此时Mutex可以与TQue等其他接口配合使用。 |
+| [ReleaseMutexID (ISASI)](同步控制/核内同步/ReleaseMutexID_ISASI.md) | 从框架释放一个MutexID，与AllocMutexID配合使用。 |
 | [IBSet](同步控制/核间同步/IBSet.md) | 调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。 |
 | [IBWait](同步控制/核间同步/IBWait.md) | 调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。 |
 | [SyncAll](同步控制/核间同步/SyncAll.md) | SyncAll是核间同步控制接口。 |
+| [CrossCoreSetFlag(ISASI)](同步控制/核间同步/CrossCoreSetFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。 |
+| [CrossCoreWaitFlag(ISASI)](同步控制/核间同步/CrossCoreWaitFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag](同步控制/核间同步/CrossCoreSetFlag_ISASI.md)。 |
 | [InitDetermineComputeWorkspace](同步控制/核间同步/InitDetermineComputeWorkspace.md) | InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初始化配置接口，能够初始化GM共享内存的值，完成初始化后才可以调用WaitPreBlock和NotifyNextBlock。以上三个接口共同完成基于核间顺序执行的确定性计算，确定性计算的具体含义请参考确定性计算。 |
 | [NotifyNextBlock](同步控制/核间同步/NotifyNextBlock.md) | WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。 |
 | [WaitPreBlock](同步控制/核间同步/WaitPreBlock.md) | WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。 |
@@ -571,7 +572,6 @@
 | [QuietNaN](工具接口/NumericLimits工具类/QuietNaN.md) | 返回指定数据类型的安静NaN值（浮点尾数最高位为1）。 |
 | [SignalingNaN](工具接口/NumericLimits工具类/SignalingNaN.md) | 返回指定数据类型的发信NaN值（浮点尾数最高位为0）。 |
 | [DeNormMin](工具接口/NumericLimits工具类/DeNormMin.md) | 返回指定数据类型的最小正的非正规值。 |
-| [CeilDivision](标量计算/CeilDivision.md) | 计算两个整数num1和num2相除后向上取整结果。 |
 | [GetTaskRatio](工具接口/系统资源与变量/GetTaskRatio.md) | 分离模式下，获取任务启动的Cube Core（AIC）或者Vector Core（AIV）的数量与逻辑AI Core数量的比例。 |
 | [GetUBSizeInBytes](工具接口/系统资源与变量/GetUBSizeInBytes.md) | 获取UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。 |
 | [GetRuntimeUBSize](工具接口/系统资源与变量/GetRuntimeUBSize.md) | 获取运行时UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。 |
