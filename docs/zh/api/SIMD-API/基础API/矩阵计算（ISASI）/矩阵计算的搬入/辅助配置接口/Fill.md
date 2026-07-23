@@ -1,4 +1,4 @@
-﻿# Fill<a name="ZH-CN_TOPIC_0000001834660669"></a>
+# Fill<a name="ZH-CN_TOPIC_0000001834660669"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -32,7 +32,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：basic_api/kernel_operator_mm_intf.h。
+头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
 将特定物理存储位置的LocalTensor初始化为某一具体数值。仅支持L1 Buffer/L0A Buffer/L0B Buffer上的LocalTensor初始化。
 
@@ -126,4 +126,4 @@ uint32_t kLength = 16;
 Fill(leftMatrix, {1, static_cast<uint16_t>(mLength * kLength * sizeof(float) / 32), 0, 1}); // 给leftMatrix填充mLength * kLength长度的数据为1，按32B的颗粒度进行填充
 ```
 
-若接口用于对L1 Buffer/L0A Buffer/L0B Buffer上的LocalTensor清0使用，示例请参考：[Fill调用样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/fill)。
+若接口用于对L1 Buffer/L0A Buffer/L0B Buffer上的LocalTensor清0使用，示例请参考：[Fill调用样例](../../../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)。

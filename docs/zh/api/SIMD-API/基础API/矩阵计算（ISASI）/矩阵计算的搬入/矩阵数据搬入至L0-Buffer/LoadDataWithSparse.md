@@ -1,4 +1,4 @@
-﻿# LoadDataWithSparse<a name="ZH-CN_TOPIC_0000002568950935"></a>
+# LoadDataWithSparse<a name="ZH-CN_TOPIC_0000002568950935"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002512171654_section796754519912"></a>
 
@@ -32,7 +32,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002512171654_section106841136114319"></a>
 
-头文件路径为：basic_api/kernel_operator_mm_intf.h。
+头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
 用于从L1 Buffer中搬运以512字节为单位存放的稠密权重矩阵到L0B Buffer里，同时搬运以128字节为单位的索引矩阵到内置的专用buffer空间（用于后续MmadWithSparse接口进行读取）。
 
@@ -89,4 +89,4 @@ __aicore__ inline void LoadDataWithSparse(const LocalTensor<T>& dst, const Local
 
 ## 调用示例<a name="zh-cn_topic_0000002512171654_section088124295117"></a>
 
-本接口用于配合Sparse Mmad使用，完整示例请参考：[MmadWithSparse调用样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_with_sparse)。
+本接口用于配合Sparse Mmad使用，完整示例请参考：[MmadWithSparse调用样例](../../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_with_sparse)。

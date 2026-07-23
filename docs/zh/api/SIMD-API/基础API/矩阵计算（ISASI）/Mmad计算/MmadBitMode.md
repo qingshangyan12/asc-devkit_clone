@@ -1,4 +1,4 @@
-﻿# MmadBitMode<a name="ZH-CN_TOPIC_000000253823118101"></a>
+# MmadBitMode<a name="ZH-CN_TOPIC_000000253823118101"></a>
 
 ## 产品支持情况
 
@@ -64,7 +64,7 @@
 
 ## 功能说明
 
-头文件路径为：basic_api/kernel_operator_mm_intf.h。
+头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
 MmadBitMode对于MmadParams结构体构造进行了优化，本接口适用于scalar流水成为性能优化瓶颈的场景，支持基础Mmad/MmadMx计算功能。本接口与Mmad/MmadMx接口的差异在于参数传入的方式不同，本接口传入的是联合结构体MmadBitModeParams。MmadBitModeParams类参数设计思想说明：
 
@@ -184,4 +184,4 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 
 ## 调用示例
 
-样例请参考[Mmad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
+样例请参考[Mmad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
