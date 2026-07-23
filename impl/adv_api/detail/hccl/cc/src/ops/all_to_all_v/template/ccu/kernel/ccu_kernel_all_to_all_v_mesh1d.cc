@@ -62,8 +62,19 @@ static CcuResult InitResource(AlltoAllVMesh1DContext &ctx, ccu::Variable inputAd
 }
 
 // ---------------------------------------------------------------------------
-// LoadArgs：对齐 hccl LoadArgs——恢复本卡对所有 rank 的收发信息 sendRecvInfo
-// 0305 从 extAddr 一次 Load rankSize*4 个字段（CCUMsgExt 数组）
+// LoadArgs：恢复本卡对所有 rank 的收发信息 sendRecvInfo（相当于 hccl LoadArgs 的 loadFromMem 分支）
+//
+// 【与 hccl 的两处不同，都是有意为之，勿改成 hccl 的写法】
+// (1) 读法：hccl 用 Load(addr, 单个Variable) 一个个读、手动 addr+=8；
+//     0305 用 Load(addr, Array, num) 一次批量读整块。等价，更简洁。
+// (2) 内存布局（每 rank 4 个 8 字节 slot，两边 slot 含义不同，下标不能照抄 hccl）：
+//        slot idx |   hccl 布局   | 0305 布局 CCUMsgExt
+//        ---------+--------------+---------------------
+//           0     | size         | sendSize      ← 读
+//           1     | sendOffset   | loopNum       （0305 跳过）
+//           2     | recvSize     | sendOffset    ← 读
+//           3     | recvOffset   | recvOffset    ← 读
+//     hccl 读 0/1/3；0305 读 0/2/3。各自与自家 host 写入布局配套自洽。
 // ---------------------------------------------------------------------------
 static CcuResult LoadArgs(AlltoAllVMesh1DContext &ctx)
 {
