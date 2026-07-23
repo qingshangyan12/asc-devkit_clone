@@ -13,7 +13,7 @@ on:
 
 jobs:
   JOB_precommit:
-    name: precommit
+    name: CodeCheck_precommit
     steps:
       -
         name: Checkout
@@ -53,7 +53,7 @@ jobs:
     container:
       image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.precommit_image_version }}
   JOB_check_pr:
-    name: check_pr
+    name: CodeCheck_check-pr
     steps:
       -
         name: Checkout
@@ -83,7 +83,7 @@ jobs:
     container:
       image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.codecheck_image_version }}
   JOB_sca:
-    name: sca
+    name: SCA
     steps:
       -
         name: Checkout
@@ -111,7 +111,7 @@ jobs:
     container:
       image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.codecheck_image_version }}
   JOB_antiposion:
-    name: antiposion
+    name: Antipoison
     steps:
       -
         name: Checkout
@@ -139,7 +139,7 @@ jobs:
     container:
       image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.codecheck_image_version }}
   JOB_codecheck:
-    name: codecheck
+    name: CodeCheck
     steps:
       -
         name: Checkout
@@ -166,42 +166,3 @@ jobs:
     runs-on: [dedicate-hosted, x64, large]
     container:
       image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.codecheck_image_version }}
-  # JOB_precommit_openlibing:
-  #   name: precommit_openlibing
-  #   steps:
-  #     -
-  #       name: Checkout
-  #       identifier: process_checkout
-  #       uses: checkout
-  #       with:
-  #         ref: ${{ atomgit.event.pull_request.merge_commit_sha }}
-  #         token: ${{secrets.GIT_TOKEN}}
-  #     -
-  #       name: setup-python
-  #       uses: setup-python
-  #       with:
-  #         python-version: '3.9'
-  #     -
-  #       name: download
-  #       uses: obs-download
-  #       with:
-  #         endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
-  #         bucket: "ascend-ci"
-  #         key: "${{ env.obs_path }}/pr_filelist_precommit.txt"
-  #         path: ${{ steps.process_checkout.outputs.path }}
-  #     -
-  #       name: cat pr_filelist
-  #       identifier: pr
-  #       run: |
-  #         cd ${{ steps.process_checkout.outputs.path }}
-  #         pr_files=$(cat pr_filelist_precommit.txt | tr '\n' ' ')
-  #         echo "pr_files=${pr_files}" >> $ATOMGIT_OUTPUT
-  #     -
-  #       name: run pre-commit
-  #       uses: openlibing-pre-commit-action
-  #       with:
-  #         extra_args: '--files ${{ steps.pr.outputs.pr_files }}'
-  #   if: "${{ default() }}"
-  #   runs-on: [dedicate-hosted, x64, large]
-  #   container:
-  #     image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.precommit_image_version }}
