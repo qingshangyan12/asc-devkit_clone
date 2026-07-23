@@ -74,10 +74,10 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
     }
 
     // 【定位step3】怀疑 PreSync 死锁时，注释掉下面这两行 NotifyWait
-    for (uint32_t i = 0; i < channelCount; i++) {
-        ccu::NotifyWait(channels[i], A2AV_OUTPUT_CKE_IDX, allOtherBit);
-        ccu::NotifyWait(channels[i], A2AV_TOKEN_CKE_IDX, allOtherBit);
-    }
+    // for (uint32_t i = 0; i < channelCount; i++) {
+    //     ccu::NotifyWait(channels[i], A2AV_OUTPUT_CKE_IDX, allOtherBit);
+    //     ccu::NotifyWait(channels[i], A2AV_TOKEN_CKE_IDX, allOtherBit);
+    // }
 
     for (uint32_t rankIdx = 0; rankIdx < rankSize; rankIdx++) {
         const uint32_t extBase = rankIdx * A2AV_EXT_FIELD_NUM;
