@@ -108,11 +108,11 @@ static CcuResult PreSync(KfcReduceScatterMesh1DMem2MemContext &ctx)
 {
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         CCU_CHK_RET(ccu::WriteVariableWithNotify(ctx.channels[i], ctx.input[ctx.rankId],
-                    CKE_IDX_0, INPUT_XN_ID, 1 << INPUT_XN_ID)); // bit index = 1，传递input信息
+                    INPUT_XN_ID, CKE_IDX_0, 1 << INPUT_XN_ID)); // bit index = 1，传递input信息
         CCU_CHK_RET(ccu::WriteVariableWithNotify(ctx.channels[i], ctx.scratch[ctx.rankId],
-                    CKE_IDX_0, SCRATCH_XN_ID, 1 << SCRATCH_XN_ID)); // bit index = 2, 传递scratch信息
+                    SCRATCH_XN_ID, CKE_IDX_0, 1 << SCRATCH_XN_ID)); // bit index = 2, 传递scratch信息
         CCU_CHK_RET(ccu::WriteVariableWithNotify(ctx.channels[i], ctx.token[ctx.rankId],
-                    CKE_IDX_0, TOKEN_XN_ID, 1 << TOKEN_XN_ID)); // bit index = 3，传递output信息
+                    TOKEN_XN_ID, CKE_IDX_0, 1 << TOKEN_XN_ID)); // bit index = 3，传递output信息
     }
     uint32_t allBit = 1 << INPUT_XN_ID | 1 << SCRATCH_XN_ID | 1 << TOKEN_XN_ID;
     for (uint32_t i = 0; i < ctx.channelCount; i++) {

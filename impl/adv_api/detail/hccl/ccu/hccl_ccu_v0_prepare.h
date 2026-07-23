@@ -238,10 +238,17 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
-    xnData_[4] = rankSliceOffset;
-    xnData_[7] = sliceSize;
-    xnData_[8] = UINT64_MAX - 1;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+    // Keep this layout in sync with DispatchKfcSubKernel's
+    // CcuReduceScatterMesh1DMem2MemKernel arguments (XN 0 is the op id).
+    xnData_[4] = rankSliceOffset;                 // currentRankSliceInputOffset
+    xnData_[5] = 0;                               // currentRankSliceOutputOffset
+    xnData_[6] = 0;                               // inputRepeatStride
+    xnData_[7] = 0;                               // outputRepeatStride
+    xnData_[8] = sliceSize;                       // normalSliceSize
+    xnData_[9] = sliceSize;                       // lastSliceSize
+    xnData_[10] = ccuParam_.rankNum * sliceSize; // scratchRepeatStride
+    xnData_[11] = UINT64_MAX - 1;                 // one kernel-internal repeat
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[12]);
 }
 } // namespace AscendC
 
