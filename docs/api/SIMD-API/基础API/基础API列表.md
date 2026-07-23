@@ -477,6 +477,7 @@
 | [CountLeadingZero](标量计算/CountLeadingZero.md) | 统计uint64_t类型数值的二进制表示中前导0的个数（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。 |
 | [CountBitsCntSameAsSignBit](标量计算/CountBitsCntSameAsSignBit.md) | 统计int64_t类型数值的二进制表示中，从最高数值位开始与符号位相同的连续比特位的个数。 |
 | [GetSFFValue](标量计算/GetSFFValue.md) | 查找uint64_t类型数值的二进制表示中从最低有效位开始的首个指定比特值（0或1）的位置，如果没找到则返回-1。 |
+| [CeilDivision](标量计算/CeilDivision.md) | 计算两个整数num1和num2相除后向上取整结果。 |
 | [Cast（float转half/int32_t）](标量计算/Cast_float_to_half_int32.md) | 对标量的数据类型进行转换。 |
 | [Cast（float转bfloat16_t）](标量计算/Cast_float_to_bfloat16.md) | float类型标量数据转换成bfloat16_t类型标量数据。 |
 | [Cast（多类型转float）](标量计算/Cast_multi_type_to_float.md) | 该接口将输入数据转换为float类型。 |
@@ -571,7 +572,6 @@
 | [QuietNaN](工具接口/NumericLimits工具类/QuietNaN.md) | 返回指定数据类型的安静NaN值（浮点尾数最高位为1）。 |
 | [SignalingNaN](工具接口/NumericLimits工具类/SignalingNaN.md) | 返回指定数据类型的发信NaN值（浮点尾数最高位为0）。 |
 | [DeNormMin](工具接口/NumericLimits工具类/DeNormMin.md) | 返回指定数据类型的最小正的非正规值。 |
-| [CeilDivision](标量计算/CeilDivision.md) | 计算两个整数num1和num2相除后向上取整结果。 |
 | [GetTaskRatio](工具接口/系统资源与变量/GetTaskRatio.md) | 分离模式下，获取任务启动的Cube Core（AIC）或者Vector Core（AIV）的数量与逻辑AI Core数量的比例。 |
 | [GetUBSizeInBytes](工具接口/系统资源与变量/GetUBSizeInBytes.md) | 获取UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。 |
 | [GetRuntimeUBSize](工具接口/系统资源与变量/GetRuntimeUBSize.md) | 获取运行时UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。 |
