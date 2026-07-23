@@ -103,7 +103,7 @@ private:
                 uint32_t curCols = (nIdx + tileN > n) ? (n - nIdx) : tileN;
                 asc_copy_gm2ub_align(
                     ubLocal, srcGlobal + mIdx * n + nIdx, (uint16_t)tileM, (uint32_t)(curCols * sizeof(half)), 0, 0, 0,
-                    0, (uint64_t)((n - curCols) * sizeof(half)), 0);
+                    asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, (uint64_t)((n - curCols) * sizeof(half)), 0);
             }
         }
     }
@@ -124,7 +124,8 @@ private:
                     uint32_t nIdx = nBlockIdx * tileN;
                     asc_copy_gm2ub_align(
                         ubLocal, srcGlobal + mIdx * n + nStart + nIdx, (uint16_t)tileM,
-                        (uint32_t)(tileN * sizeof(half)), 0, 0, 0, 0, (uint64_t)((n - tileN) * sizeof(half)), 0);
+                        (uint32_t)(tileN * sizeof(half)), 0, 0, 0, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
+                        (uint64_t)((n - tileN) * sizeof(half)), 0);
                 }
             }
         }
