@@ -237,6 +237,49 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 ],
             )
 
+    def test_normalizes_compound_cann_paths_without_hiding_host_paths(self):
+        with tempfile.TemporaryDirectory() as root:
+            cann_root = os.path.join(root, "cann")
+            host_root = os.path.join(root, "host")
+            os.makedirs(cann_root)
+            cann_lib = os.path.join(cann_root, "lib")
+            cann_include = os.path.join(cann_root, "include")
+            host_lib = os.path.join(host_root, "lib")
+            normalized = normalize_static_command(
+                "compile",
+                [
+                    f"-Wl,-rpath,{cann_lib}:{cann_include}",
+                    f"-DSEARCH={cann_include}:{cann_lib}",
+                ],
+                cann_root,
+                0,
+            )
+            placeholder = "${env:ASCEND_HOME_PATH}"
+            self.assertEqual(
+                normalized,
+                [
+                    placeholder + "/bin/bisheng",
+                    f"-Wl,-rpath,{placeholder}/lib:{placeholder}/include",
+                    f"-DSEARCH={placeholder}/include:{placeholder}/lib",
+                ],
+            )
+            for argument in (
+                f"-Wl,-rpath,{cann_lib}:{host_lib}",
+                f"-DSEARCH={cann_include}:{host_lib}",
+            ):
+                with self.subTest(argument=argument):
+                    with self.assertRaisesRegex(
+                        ValueError, "non-portable absolute path"
+                    ):
+                        normalize_static_command(
+                            "compile", [argument], cann_root, 0
+                        )
+            ordinary = "label:/tmp/host,relative:value"
+            self.assertEqual(
+                normalize_static_command("compile", [ordinary], cann_root, 0),
+                [placeholder + "/bin/bisheng", ordinary],
+            )
+
     def test_rejects_dot_segments_in_logical_resource_paths(self):
         with tempfile.TemporaryDirectory() as root:
             source = os.path.join(root, "kernel.cpp")
@@ -578,6 +621,88 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 with self.subTest(empty_patches_owner=owner):
                     with self.assertRaisesRegex(ValueError, "patches.*non-empty"):
                         generate(patches_marker=owner)
+
+    def test_rejects_integer_values_outside_cpp_int64(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.cpp")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+
+            def generate(target):
+                return generate_static_compile_resources(
+                    output_root=root,
+                    kernel_base="Kernel_x",
+                    resource_id="kernel",
+                    resources=[{
+                        "source": source,
+                        "path": "resources/src/kernel.cpp",
+                    }],
+                    kernels=[{
+                        "kernel_name": "kernel",
+                        "targets": [target],
+                        "recipes": {"normal": {
+                            "commands": [["tool"]],
+                            "artifact": "artifacts/kernel.o",
+                        }},
+                    }],
+                )
+
+            self.assertTrue(os.path.isdir(generate({
+                "name": "tiling_data",
+                "parameter_index": (1 << 63) - 1,
+                "byte_size": 1,
+            })))
+            for field in ("parameter_index", "byte_size"):
+                target = {
+                    "name": "tiling_data",
+                    "parameter_index": 0,
+                    "byte_size": 1,
+                }
+                target[field] = 2 ** 80
+                with self.subTest(field=field):
+                    with self.assertRaisesRegex(ValueError, field):
+                        generate(target)
+
+    def test_rejects_reserved_machine_manifest_references(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "manifest.json")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("{}\n")
+
+            def generate(*, argument="tool", patches=None):
+                kernel = {
+                    "kernel_name": "kernel",
+                    "targets": [{
+                        "name": "tiling_data",
+                        "parameter_index": 0,
+                        "byte_size": 1,
+                    }],
+                    "recipes": {"normal": {
+                        "commands": [[argument]],
+                        "artifact": "artifacts/kernel.o",
+                    }},
+                }
+                if patches is not None:
+                    kernel["patches"] = patches
+                return generate_static_compile_resources(
+                    output_root=root,
+                    kernel_base="Kernel_x",
+                    resource_id="kernel",
+                    resources=[{
+                        "source": source,
+                        "path": ".sc/manifest.json",
+                    }],
+                    kernels=[kernel],
+                )
+
+            with self.assertRaisesRegex(ValueError, "reserved machine manifest"):
+                generate(argument="${resource:.sc/manifest.json}")
+            with self.assertRaisesRegex(ValueError, "reserved machine manifest"):
+                generate(patches=[{
+                    "file": ".sc/manifest.json",
+                    "token": "@@TILING@@",
+                    "value": "tiling_data",
+                }])
 
     def test_rejects_any_suffix_after_resource_or_output_placeholder(self):
         with tempfile.TemporaryDirectory() as root:

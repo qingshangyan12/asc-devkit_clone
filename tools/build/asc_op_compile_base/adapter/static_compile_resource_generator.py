@@ -24,6 +24,8 @@ _MAX_TARGET_COUNT = 256
 _MAX_TARGET_BYTES = 16 * 1024 * 1024
 _MAX_COMMANDS = 64
 _MAX_ARGS = 256
+_MAX_INT64 = (1 << 63) - 1
+_RESERVED_MACHINE_MANIFEST = ".sc/manifest.json"
 _JOINED_PATH_PREFIXES = (
     "--gcc-toolchain=", "-iwithprefixbefore", "-iwithprefix",
     "--sysroot=", "-idirafter", "-isysroot", "-isystem", "-imacros",
@@ -238,6 +240,20 @@ def _canonical_cann_argument(path, cann_root):
     return "${env:ASCEND_HOME_PATH}/" + relative, canonical_path
 
 
+def _normalize_cann_path_list(path_list, cann_root):
+    parts = re.split(r"([:,])", path_list)
+    for index in range(0, len(parts), 2):
+        if not parts[index].startswith("/"):
+            continue
+        portable_path, canonical_path = _canonical_cann_argument(
+            parts[index], cann_root
+        )
+        if portable_path is None:
+            return None, canonical_path
+        parts[index] = portable_path
+    return "".join(parts), None
+
+
 def normalize_static_command(kind, argv, ascend_home, command_index):
     """Return a shell-free command whose paths are portable across CANN installs."""
     if not isinstance(argv, (list, tuple)):
@@ -259,9 +275,7 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
         if value.startswith(("-Wl,", "-Wa,")):
             fields = value.split(",")
             for field_index in range(1, len(fields)):
-                if not fields[field_index].startswith("/"):
-                    continue
-                portable_path, _ = _canonical_cann_argument(
+                portable_path, _ = _normalize_cann_path_list(
                     fields[field_index], cann_root
                 )
                 if portable_path is None:
@@ -274,7 +288,7 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
         absolute_parts = _split_absolute_path_argument(value)
         if absolute_parts is not None:
             prefix, path = absolute_parts
-            portable_path, canonical_path = _canonical_cann_argument(
+            portable_path, canonical_path = _normalize_cann_path_list(
                 path, cann_root
             )
             if portable_path is not None:
@@ -286,7 +300,12 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
                     and argv[argv_index - 1] == "-I"
                 )
                 include_prefix = prefix in {"-I", "-I="} or standalone_include
-                if include_prefix and not os.path.isdir(canonical_path):
+                if (
+                    include_prefix
+                    and ":" not in path
+                    and "," not in path
+                    and not os.path.isdir(canonical_path)
+                ):
                     if standalone_include and result[-1] == "-I":
                         result.pop()
                     continue
@@ -324,6 +343,13 @@ def _relative_path(value, context):
     return path.as_posix()
 
 
+def _resource_reference_path(value, context):
+    logical_path = _relative_path(value, context)
+    if logical_path == _RESERVED_MACHINE_MANIFEST:
+        raise ValueError(f"{context} names the reserved machine manifest")
+    return logical_path
+
+
 def _validate_target(target, context):
     allowed = {"name", "required", "parameter_index", "byte_size"}
     unknown = set(target) - allowed
@@ -335,7 +361,11 @@ def _validate_target(target, context):
         raise ValueError(f"{context}.required must be bool")
     parameter_index = target.get("parameter_index")
     byte_size = target.get("byte_size")
-    if type(parameter_index) is not int or parameter_index < 0:
+    if (
+        type(parameter_index) is not int
+        or parameter_index < 0
+        or parameter_index > _MAX_INT64
+    ):
         raise ValueError(f"{context}.parameter_index must be a nonnegative integer")
     if type(byte_size) is not int or byte_size <= 0:
         raise ValueError(f"{context}.byte_size must be a positive integer")
@@ -350,7 +380,7 @@ def _validate_patch(patch, context, target_names, resource_paths):
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
     if set(patch) - {"format"} != {"file", "token", "value"}:
         raise ValueError(f"{context} must contain file, token, and value")
-    file_path = _relative_path(patch["file"], f"{context}.file")
+    file_path = _resource_reference_path(patch["file"], f"{context}.file")
     if file_path not in resource_paths:
         raise ValueError(f"{context}.file references missing resource: {file_path}")
     if not isinstance(patch["token"], str) or not patch["token"]:
@@ -386,10 +416,12 @@ def _validate_argument(argument, context, resource_paths):
                     f"{context} has a path-changing suffix after "
                     f"${{{namespace}:{path}}}"
                 )
-            if namespace == "resource" and logical_path not in resource_paths:
-                raise ValueError(
-                    f"{context} references missing resource: {logical_path}"
-                )
+            if namespace == "resource":
+                logical_path = _resource_reference_path(path, context)
+                if logical_path not in resource_paths:
+                    raise ValueError(
+                        f"{context} references missing resource: {logical_path}"
+                    )
         elif not (namespace == "context" and path == "block_dim"):
             raise ValueError(f"{context} has unsupported placeholder namespace")
         scrubbed = scrubbed.replace(match.group(0), "PLACEHOLDER")
