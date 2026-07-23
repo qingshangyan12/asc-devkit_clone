@@ -74,9 +74,9 @@ MTE2的搬运效率还可以通过查看其带宽利用率进行验证，如下�
 
 ## 设计优化方案<a name="section33901368431"></a>
 
-开启K轴错峰访问内存：在创建Matmul对象时，将MatmulConfig中的enableKdimReorderLoad参数设置为true。enableKdimReorderLoad参数的详细介绍请参考[MatmulConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)。
+开启K轴错峰访问内存：在创建Matmul对象时，将MatmulConfig中的enableKdimReorderLoad参数设置为true。enableKdimReorderLoad参数的详细介绍请参考[MatmulConfig](../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)。
 
-开启K轴错峰访问内存的完整样例请参考[K轴错峰加载数据的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_k_reorder_load)。开启该功能的主要步骤如下：
+开启K轴错峰访问内存的完整样例请参考[K轴错峰加载数据的算子样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_k_reorder_load)。开启该功能的主要步骤如下：
 
 1.  配置MDL模板参数，将其中的enableKdimReorderLoad参数设置为true，开启多核K轴错峰访问Device内存。
 

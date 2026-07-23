@@ -1,4 +1,4 @@
-﻿# MmadWithSparse<a name="ZH-CN_TOPIC_000000253823118110"></a>
+# MmadWithSparse<a name="ZH-CN_TOPIC_000000253823118110"></a>
 
 ## 产品支持情况
 
@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径为：basic_api/kernel_operator_mm_intf.h。
+头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
 MmadWithSparse接口负责完成特殊稀疏矩阵乘加操作。稀疏矩阵是一种特殊类型的矩阵，即矩阵中包含较多的零元素。4：2结构化稀疏要求一个连续的4个权重或激活值的组（通常是张量中的一行或一列）中，最多只有2个值为非零，其余2个强制为零。
 
@@ -38,7 +38,7 @@ $$
 C = A \times B + C
 $$
 
-完整示例请参考：[MmadWithSparse样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_with_sparse)。
+完整示例请参考：[MmadWithSparse样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_with_sparse)。
 
 **表1** Sparse矩阵计算矩阵A、B、C解释说明
 
@@ -152,7 +152,7 @@ __aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTens
 
 ## 调用示例
 
-完整使用样例请参见[MmadWithSparse样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_with_sparse)。
+完整使用样例请参见[MmadWithSparse样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_with_sparse)。
 
 ```cpp
 AscendC::LocalTensor<int8_t> a1Local(AscendC::TPosition::A1, a1Addr, aSize);

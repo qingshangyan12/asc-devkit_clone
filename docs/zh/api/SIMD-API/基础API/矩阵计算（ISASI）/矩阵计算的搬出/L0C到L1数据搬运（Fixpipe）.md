@@ -32,7 +32,7 @@
 
 ## 功能说明<a id="zh-cn_topic_0000002511188540_section106841136114319"></a>
 
-头文件路径为：basic_api/kernel_operator_fixpipe_intf.h、basic_api/kernel_operator_data_copy_intf.h。
+头文件路径为：`"basic_api/kernel_operator_fixpipe_intf.h、basic_api/kernel_operator_data_copy_intf.h"`。
 
 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至L1 Buffer中，并且在搬运过程中支持随路格式转换等操作。
 
@@ -41,13 +41,13 @@
 下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
 <!-- npu="A3,910b" id11 -->
-**图1** L0C2L1流程图（[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
+**图1** L0C2L1流程图（[NPU架构版本2201](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination.png)
 <!-- end id11 -->
 
 <!-- npu="950" id13 -->
-**图2** L0C2L1流程图（[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>  
+**图2** L0C2L1流程图（[NPU架构版本3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination_950.png)
 <!-- end id13 -->
@@ -249,7 +249,7 @@
 ## 调用示例<a id="zh-cn_topic_0000002511188540_section088124295117"></a>
 
 <!-- npu="950,A3,910b" id32 -->
-Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1)。
+Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1)。
 
 - 示例：通路L0C Buffer->L1 Buffer。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8_t，不开启NZ2ND的格式转换，开启scalar量化。
 

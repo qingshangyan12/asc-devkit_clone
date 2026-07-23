@@ -32,7 +32,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002540198372_section106841136114319"></a>
 
-头文件路径为：basic_api/kernel_operator_data_copy_intf.h。
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 该接口能够将矩阵从L1 Buffer连续搬运至Global Memory，数据搬运时格式和内容保持不变。
 
@@ -106,4 +106,4 @@ Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、hal
 
 ## 调用示例<a name="zh-cn_topic_0000002540198372_section088124295117"></a>
 
-L1到GM连续数据搬运的样例请参考[L1到GM搬运样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)。
+L1到GM连续数据搬运的样例请参考[L1到GM搬运样例](../../../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)。
