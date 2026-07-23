@@ -1320,14 +1320,18 @@ def get_header_and_sub_struct_def(tiling_def, struct_tiling_def_base):
 
 def get_tilingdata_preload():
     class_body = "constexpr uint32_t DC_PRLOAD_LOOP = (all_bytes)/512;\n"
-    class_body += "for (uint64_t loop_dc=0; loop_dc < DC_PRLOAD_LOOP; loop_dc++) {\n"
-    class_body += "    uint64_t offset = loop_dc*512;\n"
+    class_body += "bool is_odd_core = (get_block_idx() & 1);\n"
+    class_body += "int64_t step_dc = is_odd_core ? -1 : 1;\n"
+    class_body += "int64_t idx_dc = is_odd_core ? (int64_t)(DC_PRLOAD_LOOP - 1) : 0;\n"
+    class_body += "for (uint64_t loop_dc=0; loop_dc < DC_PRLOAD_LOOP; loop_dc++, idx_dc += step_dc) {\n"
+    class_body += "    uint64_t offset = (uint64_t)idx_dc * 512;\n"
     class_body += "    dc_preload((uint64_t *)tilingdata, offset);\n"
     class_body += "}\n"
     class_body += "uint64_t tiling_offset = ((uint64_t)(&tilingdata))%64;\n"
     class_body += "uint32_t DC_PRLOAD_LOOP1 = (all_bytes+63+tiling_offset)/64;\n"
-    class_body += "for (uint64_t loop_dc=0; loop_dc < DC_PRLOAD_LOOP1; loop_dc++) {\n"
-    class_body += "    uint64_t offset = loop_dc*64;\n"
+    class_body += "int64_t idx_dc1 = is_odd_core ? (int64_t)(DC_PRLOAD_LOOP1 - 1) : 0;\n"
+    class_body += "for (uint64_t loop_dc=0; loop_dc < DC_PRLOAD_LOOP1; loop_dc++, idx_dc1 += step_dc) {\n"
+    class_body += "    uint64_t offset = (uint64_t)idx_dc1 * 64;\n"
     class_body += "    dc_preload((uint64_t *)tilingdata, offset);\n"
     class_body += "}\n\n"
     return class_body
