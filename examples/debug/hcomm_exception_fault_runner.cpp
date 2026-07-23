@@ -35,7 +35,6 @@ extern "C" void HcommUrmaTimeoutFaultKernel(CommContext *ctx);
 extern "C" void HcommCqeErrorFaultKernel(CommContext *ctx);
 
 namespace {
-using HcommChannelInfoDumpFunc = void (*)(uint32_t, ChannelHandle *);
 using HcommChannelGetDumpInfoSizeFunc = int32_t (*)(uint32_t, ChannelHandle *, uint32_t *);
 using HcommChannelDumpInfoFunc = int32_t (*)(uint32_t, ChannelHandle *, void *, uint32_t);
 
@@ -141,13 +140,6 @@ void *ResolveChannelDumpSymbol(const char *symbolName)
         return nullptr;
     }
     return symbol;
-}
-
-HcommChannelInfoDumpFunc ResolveChannelDumpFunc()
-{
-    static HcommChannelInfoDumpFunc dumpFunc =
-        reinterpret_cast<HcommChannelInfoDumpFunc>(ResolveChannelDumpSymbol("HcommChannelInfoDump"));
-    return dumpFunc;
 }
 
 HcommChannelGetDumpInfoSizeFunc ResolveChannelGetDumpInfoSizeFunc()
@@ -444,23 +436,7 @@ bool DumpChannelsByInfoApi(const std::vector<ChannelHandle> &channels)
 
 void DumpChannels(const std::vector<ChannelHandle> &channels)
 {
-    if (DumpChannelsByInfoApi(channels)) {
-        return;
-    }
-    auto dumpFunc = ResolveChannelDumpFunc();
-    if (dumpFunc == nullptr || channels.empty()) {
-        std::printf("[hcomm_fault_runner] skip channel dump, dumpFunc=%p channelNum=%zu\n",
-            reinterpret_cast<void *>(dumpFunc), channels.size());
-        std::fflush(stdout);
-        return;
-    }
-    std::vector<ChannelHandle> channelCopy = channels;
-    std::printf("[hcomm_fault_runner] call HcommChannelInfoDump channelNum=%zu first=0x%llx\n",
-        channelCopy.size(), static_cast<unsigned long long>(channelCopy[0]));
-    std::fflush(stdout);
-    dumpFunc(static_cast<uint32_t>(channelCopy.size()), channelCopy.data());
-    std::printf("[hcomm_fault_runner] HcommChannelInfoDump returned\n");
-    std::fflush(stdout);
+    (void)DumpChannelsByInfoApi(channels);
 }
 
 bool TryCopyCommContext(void *devArgs, uint32_t devArgsLen, CommContext &hostCtx)

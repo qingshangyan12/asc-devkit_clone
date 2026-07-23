@@ -19,7 +19,6 @@ using ChannelHandle = uint64_t;
 #endif
 
 namespace {
-using DumpFunc = void (*)(uint32_t, ChannelHandle *);
 using GetDumpInfoSizeFunc = int32_t (*)(uint32_t, ChannelHandle *, uint32_t *);
 using DumpInfoFunc = int32_t (*)(uint32_t, ChannelHandle *, void *, uint32_t);
 
@@ -55,12 +54,6 @@ void *ResolveRealSymbol(const char *symbolName)
     return symbol;
 }
 
-DumpFunc ResolveRealDumpFunc()
-{
-    static DumpFunc dumpFunc = reinterpret_cast<DumpFunc>(ResolveRealSymbol("HcommChannelInfoDump"));
-    return dumpFunc;
-}
-
 GetDumpInfoSizeFunc ResolveRealGetDumpInfoSizeFunc()
 {
     static GetDumpInfoSizeFunc getSizeFunc =
@@ -74,19 +67,6 @@ DumpInfoFunc ResolveRealDumpInfoFunc()
     return dumpInfoFunc;
 }
 } // namespace
-
-extern "C" void HcommChannelInfoDump(uint32_t channelNum, ChannelHandle *channels)
-{
-    DumpFunc dumpFunc = ResolveRealDumpFunc();
-    if (dumpFunc == nullptr) {
-        return;
-    }
-    std::printf("[hcomm_channel_dump_shim] call real HcommChannelInfoDump channelNum=%u\n", channelNum);
-    std::fflush(stdout);
-    dumpFunc(channelNum, channels);
-    std::printf("[hcomm_channel_dump_shim] real HcommChannelInfoDump returned\n");
-    std::fflush(stdout);
-}
 
 extern "C" int32_t HcommChannelGetDumpInfoSize(uint32_t channelNum, ChannelHandle *channels, uint32_t *len)
 {

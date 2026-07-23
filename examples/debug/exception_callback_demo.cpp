@@ -14,17 +14,20 @@
 #include <dlfcn.h>
 #include <atomic>
 #include <mutex>
+#include <vector>
 
 #include "acl/acl_rt.h"
+#include "hcomm_channel_dump_info.h"
 #include "hcomm_exception_fault_cases.h"
 
 namespace {
 using ChannelHandle = uint64_t;
-using HcommChannelInfoDumpFunc = void (*)(uint32_t, ChannelHandle *);
+using HcommChannelGetDumpInfoSizeFunc = int32_t (*)(uint32_t, ChannelHandle *, uint32_t *);
+using HcommChannelDumpInfoFunc = int32_t (*)(uint32_t, ChannelHandle *, void *, uint32_t);
 
-HcommChannelInfoDumpFunc ResolveChannelDumpFunc()
+void *ResolveChannelDumpSymbol(const char *symbolName)
 {
-    static HcommChannelInfoDumpFunc dumpFunc = []() -> HcommChannelInfoDumpFunc {
+    static void *handle = []() -> void * {
         const char *soPath = std::getenv("HCOMM_CHANNEL_DUMP_SO");
         if (soPath == nullptr || soPath[0] == '\0') {
             soPath = "libhcomm_channel_dump.so";
@@ -35,17 +38,34 @@ HcommChannelInfoDumpFunc ResolveChannelDumpFunc()
             std::printf("[ExceptionCallbackDemo] dlopen %s failed: %s\n", soPath, dlerror());
             return nullptr;
         }
-
-        dlerror();
-        void *symbol = dlsym(handle, "HcommChannelInfoDump");
-        const char *error = dlerror();
-        if (error != nullptr) {
-            std::printf("[ExceptionCallbackDemo] dlsym HcommChannelInfoDump failed: %s\n", error);
-            return nullptr;
-        }
-        return reinterpret_cast<HcommChannelInfoDumpFunc>(symbol);
+        return handle;
     }();
-    return dumpFunc;
+    if (handle == nullptr) {
+        return nullptr;
+    }
+
+    dlerror();
+    void *symbol = dlsym(handle, symbolName);
+    const char *error = dlerror();
+    if (error != nullptr) {
+        std::printf("[ExceptionCallbackDemo] dlsym %s failed: %s\n", symbolName, error);
+        return nullptr;
+    }
+    return symbol;
+}
+
+HcommChannelGetDumpInfoSizeFunc ResolveChannelGetDumpInfoSizeFunc()
+{
+    static HcommChannelGetDumpInfoSizeFunc getSizeFunc =
+        reinterpret_cast<HcommChannelGetDumpInfoSizeFunc>(ResolveChannelDumpSymbol("HcommChannelGetDumpInfoSize"));
+    return getSizeFunc;
+}
+
+HcommChannelDumpInfoFunc ResolveChannelDumpInfoFunc()
+{
+    static HcommChannelDumpInfoFunc dumpInfoFunc =
+        reinterpret_cast<HcommChannelDumpInfoFunc>(ResolveChannelDumpSymbol("HcommChannelDumpInfo"));
+    return dumpInfoFunc;
 }
 
 struct ExceptionSummary {
@@ -139,11 +159,21 @@ void ReportPendingException()
         static_cast<unsigned long long>(ctx.remoteBufferAddr));
 
     ChannelHandle channel = static_cast<ChannelHandle>(ctx.channelHandle);
-    auto dumpFunc = ResolveChannelDumpFunc();
-    if (dumpFunc == nullptr || channel == 0) {
+    auto getSizeFunc = ResolveChannelGetDumpInfoSizeFunc();
+    auto dumpInfoFunc = ResolveChannelDumpInfoFunc();
+    if (getSizeFunc == nullptr || dumpInfoFunc == nullptr || channel == 0) {
         return;
     }
-    dumpFunc(1, &channel);
+
+    uint32_t len = 0;
+    int32_t dumpRet = getSizeFunc(1, &channel, &len);
+    if (dumpRet != 0 || len < sizeof(HcommChannelDumpData)) {
+        std::printf("[ExceptionCallbackDemo] HcommChannelGetDumpInfoSize failed, ret=%d len=%u.\n", dumpRet, len);
+        return;
+    }
+    std::vector<uint8_t> buffer(len, 0);
+    dumpRet = dumpInfoFunc(1, &channel, buffer.data(), len);
+    std::printf("[ExceptionCallbackDemo] HcommChannelDumpInfo ret=%d len=%u.\n", dumpRet, len);
 }
 } // namespace
 

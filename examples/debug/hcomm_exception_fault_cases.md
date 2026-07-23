@@ -5,8 +5,8 @@ This directory contains two AIV fault kernels for validating exception callback 
 ## Kernels
 
 - `HcommUrmaTimeoutFaultKernel`: calls `Hcomm::WriteNbi` with `len > 256MB` and then `Drain`.
-- `HcommCqeErrorFaultKernel`: calls `Hcomm::WriteNbi` with a valid remote GM address and an invalid local GM address,
-  then `Drain`.
+- `HcommCqeErrorFaultKernel`: posts a valid WQE, seeds a non-zero CQE error record for dump validation, then triggers a
+  Runtime exception.
 
 Both kernels take a device pointer to `CommContext`.
 
@@ -51,9 +51,8 @@ HcommUrmaTimeoutFaultKernel<<<1, nullptr, stream>>>(devContext);
 HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 ```
 
-6. Synchronize the stream and report at the host safe point. The callback path is preferred. If the Runtime reports the
-stream error without entering the callback, the runner falls back to the cached current-rank `ChannelHandle` and still
-calls the HCOMM dump API for diagnosis.
+6. Synchronize the stream and report at the host safe point. The callback path records the exception and the report path
+   calls the HCOMM dump buffer API for diagnosis.
 
 ## Verified Callback Pattern
 
@@ -156,8 +155,8 @@ Optional environment variables:
 - `CMAKE_ASC_ARCHITECTURES=dav-2201`: target 950 NPU architecture.
 - `CMAKE_ASC_COMPILER=/path/to/tools/bisheng_compiler/bin/bisheng`: optional Ascend C compiler override.
 - `HCOMM_CHANNEL_DUMP_SO=/path/to/libhcomm_channel_dump.so`: shim dump library path.
-- `HCOMM_REAL_DUMP_SO=/path/to/libhccl.so`: real library that exports `HcommChannelGetDumpInfoSize`,
-  `HcommChannelDumpInfo`, and the legacy `HcommChannelInfoDump` fallback.
+- `HCOMM_REAL_DUMP_SO=/path/to/libhccl.so`: real library that exports `HcommChannelGetDumpInfoSize` and
+  `HcommChannelDumpInfo`.
 - `HCOMM_DFX_QUEUE_READ_KERNEL_PATH=/path/to/hccl_dfx_queue_read_kernel_910_95.o`: optional HCCL DFX queue read helper
   kernel path. If unset, HCCL looks for it under `$ASCEND_HOME_PATH/lib64`.
 
@@ -190,9 +189,8 @@ HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 
 ## Expected Logs
 
-- URMA timeout case: the preferred path is callback-triggered report. On Runtime builds that only return the stream
-  error, the runner prints `callbackCount=0` and dumps the cached current-rank channel. `HcommChannelDumpInfo` returns
-  raw channel/SQ/CQ/WQE/CQE bytes; asc-devkit parses and prints the protocol fields.
+- URMA timeout case: callback-triggered report calls `HcommChannelDumpInfo`, which returns raw channel/SQ/CQ/WQE/CQE
+  bytes; asc-devkit parses and prints the protocol fields.
 - CQE error case: same reporting flow as above. Use `CqContext`, `Hcomm URMA CQE`, `status`, `substatus`, and
   `entryIdx` as log filters.
 
