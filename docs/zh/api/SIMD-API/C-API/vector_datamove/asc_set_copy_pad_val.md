@@ -74,5 +74,5 @@ PIPE_S
 ```cpp
 // 源操作数非对齐，需要填补数据
 asc_set_copy_pad_val(0);
-asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 0, 0, true, 0, 0, 0);
+asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 0, 0, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
 ```
