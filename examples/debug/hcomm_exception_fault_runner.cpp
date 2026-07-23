@@ -26,6 +26,7 @@
 #include "hccl/hccl.h"
 #include "hccl/hccl_rank_graph.h"
 #include "hccl/hccl_res.h"
+#include "hcomm_channel_dump_info.h"
 #include "hcomm_exception_fault_cases.h"
 
 extern void run_hcomm_urma_timeout_fault(CommContext *ctx, aclrtStream stream);
@@ -35,6 +36,8 @@ extern "C" void HcommCqeErrorFaultKernel(CommContext *ctx);
 
 namespace {
 using HcommChannelInfoDumpFunc = void (*)(uint32_t, ChannelHandle *);
+using HcommChannelGetDumpInfoSizeFunc = int32_t (*)(uint32_t, ChannelHandle *, uint32_t *);
+using HcommChannelDumpInfoFunc = int32_t (*)(uint32_t, ChannelHandle *, void *, uint32_t);
 
 enum class FaultCase {
     URMA_TIMEOUT,
@@ -108,9 +111,9 @@ using AclrtBinarySetExceptionCallbackFunc = aclError (*)(aclrtBinHandle, AclrtEx
         }                                                                                                \
     } while (0)
 
-HcommChannelInfoDumpFunc ResolveChannelDumpFunc()
+void *ResolveChannelDumpSymbol(const char *symbolName)
 {
-    static HcommChannelInfoDumpFunc dumpFunc = []() -> HcommChannelInfoDumpFunc {
+    static void *handle = []() -> void * {
         const char *soPath = std::getenv("HCOMM_CHANNEL_DUMP_SO");
         if (soPath == nullptr || soPath[0] == '\0') {
             soPath = "libhcomm_channel_dump.so";
@@ -121,23 +124,329 @@ HcommChannelInfoDumpFunc ResolveChannelDumpFunc()
             std::printf("[hcomm_fault_runner] dlopen %s failed: %s\n", soPath, dlerror());
             return nullptr;
         }
-
-        dlerror();
-        void *symbol = dlsym(handle, "HcommChannelInfoDump");
-        const char *error = dlerror();
-        if (error != nullptr) {
-            std::printf("[hcomm_fault_runner] dlsym HcommChannelInfoDump failed: %s\n", error);
-            return nullptr;
-        }
-        std::printf("[hcomm_fault_runner] resolved HcommChannelInfoDump from %s\n", soPath);
+        std::printf("[hcomm_fault_runner] loaded HCOMM dump library from %s\n", soPath);
         std::fflush(stdout);
-        return reinterpret_cast<HcommChannelInfoDumpFunc>(symbol);
+        return handle;
     }();
+    if (handle == nullptr) {
+        return nullptr;
+    }
+
+    dlerror();
+    void *symbol = dlsym(handle, symbolName);
+    const char *error = dlerror();
+    if (error != nullptr) {
+        std::printf("[hcomm_fault_runner] dlsym %s failed: %s\n", symbolName, error);
+        std::fflush(stdout);
+        return nullptr;
+    }
+    return symbol;
+}
+
+HcommChannelInfoDumpFunc ResolveChannelDumpFunc()
+{
+    static HcommChannelInfoDumpFunc dumpFunc =
+        reinterpret_cast<HcommChannelInfoDumpFunc>(ResolveChannelDumpSymbol("HcommChannelInfoDump"));
     return dumpFunc;
+}
+
+HcommChannelGetDumpInfoSizeFunc ResolveChannelGetDumpInfoSizeFunc()
+{
+    static HcommChannelGetDumpInfoSizeFunc getSizeFunc =
+        reinterpret_cast<HcommChannelGetDumpInfoSizeFunc>(ResolveChannelDumpSymbol("HcommChannelGetDumpInfoSize"));
+    return getSizeFunc;
+}
+
+HcommChannelDumpInfoFunc ResolveChannelDumpInfoFunc()
+{
+    static HcommChannelDumpInfoFunc dumpInfoFunc =
+        reinterpret_cast<HcommChannelDumpInfoFunc>(ResolveChannelDumpSymbol("HcommChannelDumpInfo"));
+    return dumpInfoFunc;
+}
+
+struct UrmaSqeHeader {
+    uint32_t dw0;
+    uint32_t dw1;
+    uint32_t dw2;
+    uint32_t dw3;
+    uint64_t rmtEidL;
+    uint64_t rmtEidH;
+    uint32_t rmtTokenValue;
+    uint32_t dw4;
+    uint32_t rmtAddrLOrTokenId;
+    uint32_t rmtAddrHOrTokenValue;
+};
+
+struct UrmaSgeCtx {
+    uint32_t len;
+    uint32_t tokenId;
+    uint64_t va;
+};
+
+struct UrmaNotifyCtx {
+    uint32_t dw0;
+    uint32_t notifyTokenValue;
+    uint32_t notifyAddrL;
+    uint32_t notifyAddrH;
+    uint32_t notifyDataL;
+    uint32_t notifyDataH;
+    uint32_t rsv2[2];
+};
+
+struct UrmaCqeCtx {
+    uint32_t dw0;
+    uint32_t dw1;
+    uint32_t dw2;
+    uint32_t dw3;
+    uint32_t byteCnt;
+    uint32_t userDataL;
+    uint32_t userDataH;
+    uint32_t rmtEid[4];
+    uint32_t dataL;
+    uint32_t dataH;
+    uint32_t inlineData[3];
+};
+
+uint32_t Bits(uint32_t value, uint32_t shift, uint32_t mask)
+{
+    return (value >> shift) & mask;
+}
+
+template <typename T>
+bool ReadEntryObject(const HcommChannelDumpQueueEntry &entry, uint32_t offset, T &object)
+{
+    if (offset > entry.size || entry.size - offset < sizeof(T)) {
+        return false;
+    }
+    std::memcpy(&object, entry.data + offset, sizeof(T));
+    return true;
+}
+
+void PrintRawBytes(const char *name, const HcommChannelDumpQueueEntry &entry)
+{
+    constexpr uint32_t bytesPerLine = 16U;
+    for (uint32_t offset = 0; offset < entry.size; offset += bytesPerLine) {
+        uint32_t lineSize = std::min<uint32_t>(bytesPerLine, entry.size - offset);
+        std::printf("[hcomm_fault_runner][parsed] %s raw[%03u]", name, offset);
+        for (uint32_t idx = 0; idx < lineSize; ++idx) {
+            std::printf(" %02x", entry.data[offset + idx]);
+        }
+        std::printf("\n");
+    }
+}
+
+void PrintParsedNotify(const UrmaNotifyCtx &notify)
+{
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA WQE: notifyTokenId:%x notifyTokenValue:%x "
+                "notifyAddrL:%x notifyAddrH:%x notifyDataL:%x notifyDataH:%x\n",
+        Bits(notify.dw0, 0, 0xFFFFFU), notify.notifyTokenValue, notify.notifyAddrL, notify.notifyAddrH,
+        notify.notifyDataL, notify.notifyDataH);
+}
+
+void PrintParsedSge(const HcommChannelDumpQueueEntry &entry, uint32_t offset, uint32_t sgeNum)
+{
+    constexpr uint32_t maxPrintedSge = 8U;
+    uint32_t printNum = std::min<uint32_t>(sgeNum, maxPrintedSge);
+    for (uint32_t idx = 0; idx < printNum; ++idx) {
+        UrmaSgeCtx sge = {};
+        if (!ReadEntryObject(entry, offset + idx * sizeof(UrmaSgeCtx), sge)) {
+            std::printf("[hcomm_fault_runner][parsed] Hcomm URMA SGE: truncated at idx:%u offset:%u size:%u\n",
+                idx, offset + idx * static_cast<uint32_t>(sizeof(UrmaSgeCtx)), entry.size);
+            return;
+        }
+        std::printf("[hcomm_fault_runner][parsed] Hcomm URMA SGE: sge idx:%u va:0x%llx sge_len:%u tokenId:%u\n",
+            idx, static_cast<unsigned long long>(sge.va), sge.len, sge.tokenId);
+    }
+    if (sgeNum > maxPrintedSge) {
+        std::printf("[hcomm_fault_runner][parsed] Hcomm URMA SGE: skipped %u entries after max printed entries\n",
+            sgeNum - maxPrintedSge);
+    }
+}
+
+void PrintParsedAmo(const HcommChannelDumpQueueEntry &entry, uint32_t offset, uint32_t opcode)
+{
+    constexpr uint32_t opcodeCas = 7U;
+    constexpr uint32_t opcodeFaa = 0xBU;
+    if (opcode == opcodeFaa) {
+        uint64_t addValue = 0;
+        if (ReadEntryObject(entry, offset, addValue)) {
+            std::printf("[hcomm_fault_runner][parsed] Hcomm URMA SGE: addValue:0x%llx\n",
+                static_cast<unsigned long long>(addValue));
+        }
+    } else if (opcode == opcodeCas) {
+        uint64_t swapValue = 0;
+        uint64_t condValue = 0;
+        if (ReadEntryObject(entry, offset, swapValue) && ReadEntryObject(entry, offset + sizeof(uint64_t), condValue)) {
+            std::printf("[hcomm_fault_runner][parsed] Hcomm URMA SGE: condValue:0x%llx swapValue:0x%llx\n",
+                static_cast<unsigned long long>(condValue), static_cast<unsigned long long>(swapValue));
+        }
+    }
+}
+
+void PrintParsedWqe(const HcommChannelDumpQueueEntry &entry)
+{
+    if (entry.size < sizeof(UrmaSqeHeader)) {
+        return;
+    }
+    UrmaSqeHeader sqe = {};
+    std::memcpy(&sqe, entry.data, sizeof(sqe));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA WQE: queue=%u slot=%u cursor=%u addr=0x%llx\n",
+        entry.queueIndex, entry.entryIndex, entry.cursor, static_cast<unsigned long long>(entry.addr));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA WQE: sqe_bb_idx:%x flag:%x rsv0:%x nf:%x "
+                "token_en:%x rmt_jetty_type:%x\n",
+        Bits(sqe.dw0, 0, 0xFFFFU), Bits(sqe.dw0, 16, 0xFFU), Bits(sqe.dw0, 24, 0x7U),
+        Bits(sqe.dw0, 27, 0x1U), Bits(sqe.dw0, 28, 0x1U), Bits(sqe.dw0, 29, 0x3U));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA WQE: owner:%x target_hint:%x opcode:%x rsv1:%x "
+                "inline_msg_len:%x tp_id:%x\n",
+        Bits(sqe.dw0, 31, 0x1U), Bits(sqe.dw1, 0, 0xFFU), Bits(sqe.dw1, 8, 0xFFU),
+        Bits(sqe.dw1, 16, 0x3FU), Bits(sqe.dw1, 22, 0x3FFU), Bits(sqe.dw2, 0, 0xFFFFFFU));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA WQE: sge_num:%x rmt_jetty_or_seg_id:%x rsv2:%x\n",
+        Bits(sqe.dw2, 24, 0xFFU), Bits(sqe.dw3, 0, 0xFFFFFU), Bits(sqe.dw3, 20, 0xFFFU));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA WQE: rmt_eid:0x%llx, 0x%llx\n",
+        static_cast<unsigned long long>(sqe.rmtEidL), static_cast<unsigned long long>(sqe.rmtEidH));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA WQE: rmt_token_value:%x udf_type:%x "
+                "reduce_data_type:%x reduce_opcode:%x\n",
+        sqe.rmtTokenValue, Bits(sqe.dw4, 0, 0xFFU), Bits(sqe.dw4, 8, 0xFU), Bits(sqe.dw4, 12, 0xFU));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA WQE: rmt_addr_l_or_token_id:%x "
+                "rmt_addr_h_or_token_value:%x\n",
+        sqe.rmtAddrLOrTokenId, sqe.rmtAddrHOrTokenValue);
+
+    constexpr uint32_t opcodeWriteWithNotify = 5U;
+    uint32_t opcode = Bits(sqe.dw1, 8, 0xFFU);
+    uint32_t sgeNum = Bits(sqe.dw2, 24, 0xFFU);
+    uint32_t sgeOffset = sizeof(UrmaSqeHeader);
+    if (opcode == opcodeWriteWithNotify) {
+        UrmaNotifyCtx notify = {};
+        if (ReadEntryObject(entry, sgeOffset, notify)) {
+            PrintParsedNotify(notify);
+            sgeOffset += sizeof(UrmaNotifyCtx);
+        } else {
+            std::printf("[hcomm_fault_runner][parsed] Hcomm URMA WQE: notify truncated offset:%u size:%u\n",
+                sgeOffset, entry.size);
+            return;
+        }
+    }
+    PrintParsedSge(entry, sgeOffset, sgeNum);
+    PrintParsedAmo(entry, sgeOffset + sgeNum * static_cast<uint32_t>(sizeof(UrmaSgeCtx)), opcode);
+    PrintRawBytes("Hcomm URMA WQE", entry);
+}
+
+void PrintParsedCqe(const HcommChannelDumpQueueEntry &entry)
+{
+    if (entry.size < sizeof(UrmaCqeCtx)) {
+        return;
+    }
+    UrmaCqeCtx cqe = {};
+    std::memcpy(&cqe, entry.data, sizeof(cqe));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: queue=%u index=%u cursor=%u addr=0x%llx\n",
+        entry.queueIndex, entry.entryIndex, entry.cursor, static_cast<unsigned long long>(entry.addr));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: DW0 - sR:%u isJetty:%u owner:%u inlineEn:%u "
+                "opcode:%u fd:%u substatus:%u status:%u\n",
+        Bits(cqe.dw0, 0, 0x1U), Bits(cqe.dw0, 1, 0x1U), Bits(cqe.dw0, 2, 0x1U), Bits(cqe.dw0, 3, 0x1U),
+        Bits(cqe.dw0, 4, 0x7U), Bits(cqe.dw0, 7, 0x1U), Bits(cqe.dw0, 16, 0xFFU), Bits(cqe.dw0, 24, 0xFFU));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: DW1 - entryIdx:%u localNumL:%u\n",
+        Bits(cqe.dw1, 0, 0xFFFFU), Bits(cqe.dw1, 16, 0xFFFFU));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: DW2 - localNumH:%u rmtIdx:%u\n",
+        Bits(cqe.dw2, 0, 0xFU), Bits(cqe.dw2, 4, 0xFFFFFU));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: DW3 - tpn:%u\n", Bits(cqe.dw3, 0, 0xFFFFFFU));
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: DW4 - byteCnt:%u\n", cqe.byteCnt);
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: DW5-DW6 - userData:0x%x%x\n",
+        cqe.userDataH, cqe.userDataL);
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: DW7-DW10 - rmtEid:[0x%x, 0x%x, 0x%x, 0x%x]\n",
+        cqe.rmtEid[0], cqe.rmtEid[1], cqe.rmtEid[2], cqe.rmtEid[3]);
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: DW11-DW12 - data:0x%x%x\n", cqe.dataH, cqe.dataL);
+    std::printf("[hcomm_fault_runner][parsed] Hcomm URMA CQE: DW13-DW15 - inlineData:[0x%x, 0x%x, 0x%x]\n",
+        cqe.inlineData[0], cqe.inlineData[1], cqe.inlineData[2]);
+    PrintRawBytes("Hcomm URMA CQE", entry);
+}
+
+void PrintParsedDumpInfo(const HcommChannelDumpInfo &dumpInfo)
+{
+    if (dumpInfo.magic != HCOMM_CHANNEL_DUMP_MAGIC) {
+        std::printf("[hcomm_fault_runner][parsed] invalid dump info magic=0x%x\n", dumpInfo.magic);
+        return;
+    }
+    for (uint32_t ch = 0; ch < dumpInfo.channelNum && ch < HCOMM_CHANNEL_DUMP_MAX_CHANNELS; ++ch) {
+        const auto &channel = dumpInfo.channels[ch];
+        if (channel.valid == 0) {
+            continue;
+        }
+        std::printf("[hcomm_fault_runner][parsed] Channel[%u] handle=0x%llx engine=%d protocol=%d "
+                    "localBufferNum=%u remoteBufferNum=%u sqNum=%u cqNum=%u wqeCnt=%u\n",
+            ch, static_cast<unsigned long long>(channel.handle), channel.engine, channel.protocol,
+            channel.localBufferNum, channel.remoteBufferNum, channel.sqNum, channel.cqNum, channel.wqeCnt);
+        for (uint32_t idx = 0; idx < channel.localBufferDumpNum; ++idx) {
+            const auto &buffer = channel.localBuffers[idx];
+            std::printf("[hcomm_fault_runner][parsed] localBuffer[%u] type=%d addr=0x%llx size=%llu\n",
+                idx, buffer.type, static_cast<unsigned long long>(buffer.addr),
+                static_cast<unsigned long long>(buffer.size));
+        }
+        for (uint32_t idx = 0; idx < channel.remoteBufferDumpNum; ++idx) {
+            const auto &buffer = channel.remoteBuffers[idx];
+            std::printf("[hcomm_fault_runner][parsed] remoteBuffer[%u] type=%d addr=0x%llx size=%llu\n",
+                idx, buffer.type, static_cast<unsigned long long>(buffer.addr),
+                static_cast<unsigned long long>(buffer.size));
+        }
+        for (uint32_t idx = 0; idx < channel.sqContextDumpNum; ++idx) {
+            const auto &sq = channel.sqContexts[idx];
+            std::printf("[hcomm_fault_runner][parsed] SqContext[%u] type=%d sqVa=0x%llx depth=%u entrySize=%u "
+                        "head=%u%s tail=%u%s dbVa=0x%llx\n",
+                idx, sq.type, static_cast<unsigned long long>(sq.va), sq.depth, sq.entrySize, sq.head,
+                sq.headValid ? "" : "(invalid)", sq.tail, sq.tailValid ? "" : "(invalid)",
+                static_cast<unsigned long long>(sq.dbVa));
+        }
+        for (uint32_t idx = 0; idx < channel.cqContextDumpNum; ++idx) {
+            const auto &cq = channel.cqContexts[idx];
+            std::printf("[hcomm_fault_runner][parsed] CqContext[%u] type=%d cqVa=0x%llx depth=%u entrySize=%u "
+                        "head=%u%s tail=%u%s dbVa=0x%llx\n",
+                idx, cq.type, static_cast<unsigned long long>(cq.va), cq.depth, cq.entrySize, cq.head,
+                cq.headValid ? "" : "(invalid)", cq.tail, cq.tailValid ? "" : "(invalid)",
+                static_cast<unsigned long long>(cq.dbVa));
+        }
+        for (uint32_t idx = 0; idx < channel.queueEntryDumpNum; ++idx) {
+            const auto &entry = channel.queueEntries[idx];
+            if (entry.valid == 0) {
+                continue;
+            }
+            if (entry.entryType == HCOMM_CHANNEL_DUMP_ENTRY_URMA_WQE) {
+                PrintParsedWqe(entry);
+            } else if (entry.entryType == HCOMM_CHANNEL_DUMP_ENTRY_URMA_CQE) {
+                PrintParsedCqe(entry);
+            }
+        }
+    }
+}
+
+bool DumpChannelsByInfoApi(const std::vector<ChannelHandle> &channels)
+{
+    auto getSizeFunc = ResolveChannelGetDumpInfoSizeFunc();
+    auto dumpInfoFunc = ResolveChannelDumpInfoFunc();
+    if (getSizeFunc == nullptr || dumpInfoFunc == nullptr || channels.empty()) {
+        return false;
+    }
+    std::vector<ChannelHandle> channelCopy = channels;
+    uint32_t len = 0;
+    int32_t ret = getSizeFunc(static_cast<uint32_t>(channelCopy.size()), channelCopy.data(), &len);
+    if (ret != 0 || len < sizeof(HcommChannelDumpInfo)) {
+        std::printf("[hcomm_fault_runner] HcommChannelGetDumpInfoSize failed ret=%d len=%u\n", ret, len);
+        return false;
+    }
+    std::vector<uint8_t> buffer(len, 0);
+    ret = dumpInfoFunc(static_cast<uint32_t>(channelCopy.size()), channelCopy.data(), buffer.data(), len);
+    std::printf("[hcomm_fault_runner] HcommChannelDumpInfo ret=%d len=%u\n", ret, len);
+    if (ret != 0) {
+        return false;
+    }
+    PrintParsedDumpInfo(*reinterpret_cast<const HcommChannelDumpInfo *>(buffer.data()));
+    std::fflush(stdout);
+    return true;
 }
 
 void DumpChannels(const std::vector<ChannelHandle> &channels)
 {
+    if (DumpChannelsByInfoApi(channels)) {
+        return;
+    }
     auto dumpFunc = ResolveChannelDumpFunc();
     if (dumpFunc == nullptr || channels.empty()) {
         std::printf("[hcomm_fault_runner] skip channel dump, dumpFunc=%p channelNum=%zu\n",

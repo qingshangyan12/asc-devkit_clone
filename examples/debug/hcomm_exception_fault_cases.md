@@ -53,7 +53,72 @@ HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 
 6. Synchronize the stream and report at the host safe point. The callback path is preferred. If the Runtime reports the
 stream error without entering the callback, the runner falls back to the cached current-rank `ChannelHandle` and still
-calls `HcommChannelInfoDump` for diagnosis.
+calls the HCOMM dump API for diagnosis.
+
+## Verified Callback Pattern
+
+The validated Runtime behavior on 950 is:
+
+- `aclrtSetExceptionInfoCallback` registers the global callback entry.
+- `aclrtBinarySetExceptionCallback(binHandle, CustomCallback, devContext)` binds the fault kernel binary to the device
+  `CommContext`.
+- In the callback, `aclrtGetArgsFromExceptionInfo` returns a pointer-sized argument (`devArgsLen == 8`). The argument is
+  not the full `CommContext`; it is a device-side pointer to `CommContext`.
+- The callback must stay lightweight. It records Runtime fields and `devArgs`, then sets a pending flag.
+- After `aclrtSynchronizeStream` returns, the host report path copies the pointer-sized argument first, then copies the
+  real `CommContext`, then calls `HcommChannelGetDumpInfoSize` and `HcommChannelDumpInfo`.
+- HCCL returns a binary raw dump buffer. The demo parses that buffer in asc-devkit and prints WQE/CQE fields compatible
+  with the former device-side `AscendC::printf` diagnostics.
+
+Recommended shape:
+
+```cpp
+struct ExceptionSummary {
+    uint32_t taskId;
+    uint32_t streamId;
+    uint32_t threadId;
+    uint32_t deviceId;
+    uint32_t errorCode;
+    void *devArgs;
+    uint32_t devArgsLen;
+};
+
+void CustomCallback(aclrtExceptionInfo *info)
+{
+    ExceptionSummary summary = {};
+    summary.taskId = aclrtGetTaskIdFromExceptionInfo(info);
+    summary.streamId = aclrtGetStreamIdFromExceptionInfo(info);
+    summary.threadId = aclrtGetThreadIdFromExceptionInfo(info);
+    summary.deviceId = aclrtGetDeviceIdFromExceptionInfo(info);
+    summary.errorCode = aclrtGetErrorCodeFromExceptionInfo(info);
+    (void)aclrtGetArgsFromExceptionInfo(info, &summary.devArgs, &summary.devArgsLen);
+
+    SaveSummaryAndSetPending(summary);
+}
+
+void ReportPendingException()
+{
+    ExceptionSummary summary = TakePendingSummary();
+
+    uint64_t devCtxAddr = 0;
+    if (summary.devArgsLen == sizeof(uint64_t)) {
+        aclrtMemcpy(&devCtxAddr, sizeof(devCtxAddr), summary.devArgs, sizeof(devCtxAddr),
+            ACL_MEMCPY_DEVICE_TO_HOST);
+    } else {
+        devCtxAddr = reinterpret_cast<uint64_t>(summary.devArgs);
+    }
+
+    CommContext ctx = {};
+    aclrtMemcpy(&ctx, sizeof(ctx), reinterpret_cast<void *>(devCtxAddr), sizeof(ctx), ACL_MEMCPY_DEVICE_TO_HOST);
+
+    ChannelHandle channel = static_cast<ChannelHandle>(ctx.channelHandle);
+    uint32_t len = 0;
+    HcommChannelGetDumpInfoSize(1, &channel, &len);
+    std::vector<uint8_t> buffer(len, 0);
+    HcommChannelDumpInfo(1, &channel, buffer.data(), len);
+    ParseAndPrintHcommChannelDumpInfo(buffer.data(), len);
+}
+```
 
 ## Build
 
@@ -91,7 +156,8 @@ Optional environment variables:
 - `CMAKE_ASC_ARCHITECTURES=dav-2201`: target 950 NPU architecture.
 - `CMAKE_ASC_COMPILER=/path/to/tools/bisheng_compiler/bin/bisheng`: optional Ascend C compiler override.
 - `HCOMM_CHANNEL_DUMP_SO=/path/to/libhcomm_channel_dump.so`: shim dump library path.
-- `HCOMM_REAL_DUMP_SO=/path/to/libhccl.so`: real library that exports `HcommChannelInfoDump`.
+- `HCOMM_REAL_DUMP_SO=/path/to/libhccl.so`: real library that exports `HcommChannelGetDumpInfoSize`,
+  `HcommChannelDumpInfo`, and the legacy `HcommChannelInfoDump` fallback.
 - `HCOMM_DFX_QUEUE_READ_KERNEL_PATH=/path/to/hccl_dfx_queue_read_kernel_910_95.o`: optional HCCL DFX queue read helper
   kernel path. If unset, HCCL looks for it under `$ASCEND_HOME_PATH/lib64`.
 
@@ -125,7 +191,40 @@ HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 ## Expected Logs
 
 - URMA timeout case: the preferred path is callback-triggered report. On Runtime builds that only return the stream
-  error, the runner prints `callbackCount=0` and dumps the cached current-rank channel. `HcommChannelInfoDump` prints
-  channel handle, local/remote buffer addresses, SQ/CQ context, WQE fields, and CQ bytes.
-- CQE error case: same reporting flow as above. `HcommChannelInfoDump` prints the channel dump together with SQ/CQ/WQE
-  and CQE raw bytes. Use `CqContext`, `CqHead`, `CqTail`, `CqTailEntries`, and `scqVa` as log filters.
+  error, the runner prints `callbackCount=0` and dumps the cached current-rank channel. `HcommChannelDumpInfo` returns
+  raw channel/SQ/CQ/WQE/CQE bytes; asc-devkit parses and prints the protocol fields.
+- CQE error case: same reporting flow as above. Use `CqContext`, `Hcomm URMA CQE`, `status`, `substatus`, and
+  `entryIdx` as log filters.
+
+## Validation Checklist
+
+Callback flow is considered valid when the log contains all of the following:
+
+```text
+CustomCallback entered
+runtime exception count=...
+exception dev args point to CommContext device addr=...
+exception ctx rank=... channel=0x...
+HcommChannelDumpInfo ret=0
+[hcomm_fault_runner][parsed] Channel[0] handle=0x...
+```
+
+Channel dump content is considered basically valid when these values match the runner setup:
+
+- `exception ctx channel` equals the channel handle printed during channel creation.
+- `exception ctx local` equals the current-rank local buffer printed during channel creation.
+- `exception ctx remote` equals the peer buffer printed during channel creation.
+- `[parsed] SqContext sqVa/depth/entrySize/head/tail` is printed.
+- `[parsed] Hcomm URMA WQE` is printed and contains protocol fields such as `sqe_bb_idx`, `owner`, `opcode`, `tp_id`,
+  `sge_num`, plus SGE/notify/AMO fields when present in the captured raw bytes.
+- `[parsed] CqContext cqVa/depth/entrySize/head/tail` is printed.
+- `[parsed] Hcomm URMA CQE` is printed and contains `owner`, `opcode`, `status`, `substatus`, `entryIdx`, `byteCnt`,
+  `rmtIdx`, and `tpn`.
+
+Useful filters:
+
+```bash
+grep -E "CustomCallback entered|runtime exception|exception dev args point|exception ctx|HcommChannelDumpInfo ret=0" urma_950.log
+grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" urma_950.log
+grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" cqe_950.log
+```
