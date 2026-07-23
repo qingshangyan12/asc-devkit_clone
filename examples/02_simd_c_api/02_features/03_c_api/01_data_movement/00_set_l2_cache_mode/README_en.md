@@ -203,11 +203,12 @@ Note: The working set per tile is smaller, making it easier to retain in L2 Cach
 - `l2_cache_mode = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM` causes MTE2 to perform additional L2 Cache write operations during GM to UB data movement. These writes do not help performance and instead consume L2 controller management bandwidth and pollute the L2 Cache space.
 
 **Performance optimization suggestions**:
+
 - For streaming data, configure `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP` to bypass L2 Cache writes, eliminating unnecessary cache management overhead.
 
 ### Case4: Add with double buffer + `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP`
 
-**Design intent**: The only difference from Case3 is that `asc_copy_gm2ub_align` is called with `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP` (DISABLE) instead of `l2_cache_mode = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM`. For streaming data that is read only once, disabling L2 Cache allows MTE2 to move data directly from GM to UB, avoiding unnecessary cache write overhead and preventing streaming data from occupying L2 space.
+**Design intent**: The only difference from Case3 is that `asc_copy_gm2ub_align` is called with `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP` instead of `l2_cache_mode = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM`. For streaming data that is read only once, disabling L2 Cache allows MTE2 to move data directly from GM to UB, avoiding unnecessary cache write overhead and preventing streaming data from occupying L2 space.
 
 **Key code**:
 
@@ -242,10 +243,12 @@ __aicore__ inline void ProcessDoubleBufferImpl(asc_load_l2_cache_mode l2CacheMod
 - aiv_vec_time remained nearly unchanged (83.14μs to 82.462μs, a change of **0.8%**), indicating that L2 Cache bypass does not affect vector computation time.
 
 **Principle**:
-- `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP` (DISABLE) bypasses L2 Cache writes. MTE2 moves data directly from GM to UB, eliminating unnecessary cache write operations and Cache Line allocation overhead.
+
+- `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP` bypasses L2 Cache writes. MTE2 moves data directly from GM to UB, eliminating unnecessary cache write operations and Cache Line allocation overhead.
 
 **Performance optimization suggestions**:
-- For large amounts of streaming data that are read only once (such as inputs to element-wise operators like Add and Mul), configure `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP` (DISABLE) in `asc_copy_gm2ub_align` to bypass unnecessary cache writes and improve MTE2 data movement efficiency.
+
+- For large amounts of streaming data that are read only once (such as inputs to element-wise operators like Add and Mul), configure `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP` in `asc_copy_gm2ub_align` to bypass unnecessary cache writes and improve MTE2 data movement efficiency.
 
 ## Optimization Summary
 

@@ -203,6 +203,7 @@ GM 矩阵: [M, N]
 - `l2_cache_mode = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM`会使MTE2在GM→UB搬运时额外执行L2 Cache写入操作，这些写入对性能无帮助，反而占用L2控制器管理带宽并污染L2 Cache空间。
 
 **性能优化建议**：
+
 - 对于流式访问的数据，应配置`l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP`跳过L2 Cache写入，省去不必要的cache管理开销。
 
 ### Case4: Add双缓冲 + `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP`
@@ -242,9 +243,11 @@ __aicore__ inline void ProcessDoubleBufferImpl(asc_load_l2_cache_mode l2CacheMod
 - aiv_vec_time基本不变（83.14μs → 82.462μs，变化**0.8%**），说明L2 Cache bypass不影响向量计算部分的耗时。
 
 **原理说明**：
+
 - `l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP`跳过L2 Cache写入，MTE2直接将数据从GM搬运到UB，省去了不必要的cache写操作和Cache Line分配开销。
 
 **性能优化建议**：
+
 - 对于数据量大且只读取一次的流式数据（如Add、Mul等逐元素算子的输入），建议在`asc_copy_gm2ub_align`中配置`l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP`，跳过不必要的cache写入，提升MTE2搬运效率。
 
 ## 优化要点总结
