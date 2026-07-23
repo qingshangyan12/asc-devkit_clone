@@ -128,7 +128,7 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMesh2D", CcuAllGatherMesh2D},
     {"CcuReduceScatterMesh1D", CcuReduceScatterMesh1D},
-    {"CcuReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D},
+    {"CcuReduceScatterMeshMem2Mem1D", CcuReduceScatterMeshMem2Mem1D},
     {"CcuReduceScatterMesh2D", CcuReduceScatterMesh2D},
     {"CcuAllReduceMesh1D", CcuAllReduceMesh1D},
     {"CcuAllReduceMeshMem2Mem1D", CcuAllReduceMeshMem2Mem1D},
@@ -188,18 +188,8 @@ HcclResult PrepareOpParams(HcclComm comm, const std::string& tag, const Mc2CcTil
 HcclResult InitOpParamByTiling(
     HcclComm comm, void* stream, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam);
 
-<<<<<<< HEAD
-HcclResult PrepareTopoInfoForOp(HcclComm comm, OpParam& opParam, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo)
-{
-    opParam.hcclComm = comm;
-    CHK_RET(HcclGetOpExpansionMode(comm, opParam));
-    CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
-    return HCCL_SUCCESS;
-}
-=======
 HcclResult PrepareTopoInfoForOp(
     HcclComm comm, OpParam& opParam, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo);
->>>>>>> 2b1e3d68b (rebase)
 
 HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName);
 
