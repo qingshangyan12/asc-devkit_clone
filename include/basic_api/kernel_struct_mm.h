@@ -545,6 +545,17 @@ struct MatrixMxParams {
     uint32_t l0BMxAddr;
 }
 
+struct ConvStrideParams {
+    __aicore__ ConvStrideParams() {}
+
+    __aicore__ ConvStrideParams(const uint32_t loop3DstStrideIn, const uint32_t loop4DstStrideIn)
+        : loop3DstStride(loop3DstStrideIn), loop4DstStride(loop4DstStrideIn)
+    {}
+
+    uint32_t loop3DstStride;
+    uint32_t loop4DstStride;
+}
+
 struct ConvKernelParams {
     __aicore__ ConvKernelParams() {}
 
