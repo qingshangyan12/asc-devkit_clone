@@ -592,13 +592,15 @@ bool TakePendingException(ExceptionSummary &summary, uint64_t &count)
 
 void PrintCommContext(const char *prefix, const CommContext &ctx)
 {
-    std::printf("%s rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu\n",
+    std::printf("%s rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu writeRet=%d drainRet=%d\n",
         prefix,
         ctx.rankId,
         static_cast<unsigned long long>(ctx.channelHandle),
         static_cast<unsigned long long>(ctx.localBufferAddr),
         static_cast<unsigned long long>(ctx.remoteBufferAddr),
-        static_cast<unsigned long long>(ctx.len));
+        static_cast<unsigned long long>(ctx.len),
+        ctx.writeRet,
+        ctx.drainRet);
 }
 
 void CollectCachedContexts(uint32_t rank, std::vector<ChannelHandle> &channels, std::vector<CommContext> &contexts)

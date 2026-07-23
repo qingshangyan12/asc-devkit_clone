@@ -30,6 +30,9 @@ hostCtx.len = HCOMM_CQE_ERROR_TEST_LEN;
 hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
 ```
 
+`writeRet` and `drainRet` are filled by the fault kernels and printed by the host report path. They help distinguish
+whether HCOMM posted a WQE successfully before the exception.
+
 3. Allocate and copy `CommContext` to device.
 4. Register the Runtime exception callback and, when supported by the Runtime, bind the device `CommContext` as
    exception args for the fault kernel binary:
@@ -213,6 +216,7 @@ Channel dump content is considered basically valid when these values match the r
 - `exception ctx channel` equals the channel handle printed during channel creation.
 - `exception ctx local` equals the current-rank local buffer printed during channel creation.
 - `exception ctx remote` equals the peer buffer printed during channel creation.
+- `exception ctx writeRet` is `0` when HCOMM accepted the WQE before the fault path.
 - `[parsed] SqContext sqVa/depth/entrySize/head/tail` is printed.
 - `[parsed] Hcomm URMA WQE` is printed and contains protocol fields such as `sqe_bb_idx`, `owner`, `opcode`, `tp_id`,
   `sge_num`, plus SGE/notify/AMO fields when present in the captured raw bytes.

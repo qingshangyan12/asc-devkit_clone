@@ -23,6 +23,8 @@ struct CommContext {
     uint64_t remoteBufferAddr;
     uint64_t len;
     uint64_t invalidBufferAddr;
+    int32_t writeRet;
+    int32_t drainRet;
     uint32_t rankId;
     uint32_t reserved;
 };
