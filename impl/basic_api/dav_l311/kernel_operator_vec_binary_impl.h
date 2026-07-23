@@ -357,7 +357,7 @@ __simd_vf__ inline void AddDeqReluImpl(
         Reg::Muls<float>(tmpReg, tmpReg, static_cast<float>(DEQ_SHIFT_LEFT_17_BIT), preg);
         Reg::Maxs<float>(tmpReg, tmpReg, scalarValue, preg);
         Reg::Cast<half, float, CastParam::float2halfCastTrait>(dstReg, tmpReg, preg);
-        Reg::StoreAlign<half, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, dstReg, preg);
+        Reg::DataCopy<half, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, dstReg, preg);
     }
 }
 
