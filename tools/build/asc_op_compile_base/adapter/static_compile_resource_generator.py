@@ -35,6 +35,7 @@ _JOINED_PATH_PREFIXES = (
 _LINKER_PATH_LIST_OPTIONS = frozenset({
     "-R", "-rpath", "--rpath", "-rpath-link", "--rpath-link",
 })
+_COMMA_OPTION_PREFIXES = ("-Wl,", "-Wa,", "-Wp,")
 
 
 def collect_kernel_symbols(metadata, linked_symbols=None):
@@ -240,7 +241,7 @@ def _contains_literal_absolute_path(value):
                 return True
     if "=/" in value:
         return True
-    if value.startswith(("-Wl,", "-Wa,")):
+    if value.startswith(_COMMA_OPTION_PREFIXES):
         fields = value.split(",")
         for field_index, field in enumerate(fields[1:], 1):
             path_parts = _split_absolute_path_argument(field)
@@ -342,7 +343,7 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
                     f"non-portable absolute path: {argument}"
                 )
             value = portable_path
-        if value.startswith(("-Wl,", "-Wa,")):
+        if value.startswith(_COMMA_OPTION_PREFIXES):
             fields = value.split(",")
             for field_index in range(1, len(fields)):
                 field_parts = _split_absolute_path_argument(fields[field_index])

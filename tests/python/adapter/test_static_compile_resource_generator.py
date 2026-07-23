@@ -161,6 +161,10 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 "-R", "-rpath", "--rpath", "-rpath-link", "--rpath-link",
             }),
         )
+        self.assertEqual(
+            MODULE._COMMA_OPTION_PREFIXES,
+            ("-Wl,", "-Wa,", "-Wp,"),
+        )
 
     def test_normalizes_cpp_joined_and_linker_path_list_options(self):
         with tempfile.TemporaryDirectory() as root:
@@ -266,6 +270,77 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                         }},
                     }],
                 )
+
+    def test_normalizes_preprocessor_comma_domain_paths(self):
+        with tempfile.TemporaryDirectory() as root:
+            cann_root = os.path.join(root, "cann")
+            os.makedirs(cann_root)
+            owned = os.path.join(cann_root, "include")
+            placeholder = "${env:ASCEND_HOME_PATH}/include"
+            self.assertEqual(
+                normalize_static_command(
+                    "compile",
+                    [f"-Wp,-I,{owned}", f"-Wp,-include,{owned}"],
+                    cann_root,
+                    0,
+                ),
+                [
+                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                    f"-Wp,-I,{placeholder}",
+                    f"-Wp,-include,{placeholder}",
+                ],
+            )
+            for argument in (
+                "-Wp,-I,/tmp/include",
+                "-Wp,-include,/abs/file",
+            ):
+                with self.subTest(argument=argument):
+                    with self.assertRaisesRegex(
+                        ValueError, "non-portable absolute path"
+                    ):
+                        normalize_static_command(
+                            "compile", [argument], cann_root, 0
+                        )
+            accepted = [
+                "-Wp,-I,relative/include",
+                "-Wp,-include,relative/header.h",
+                "-Wp,-DCSV=a,b,c",
+                "ordinary,comma,value",
+            ]
+            self.assertEqual(
+                normalize_static_command("compile", accepted, cann_root, 0),
+                ["${env:ASCEND_HOME_PATH}/bin/bisheng"] + accepted,
+            )
+
+    def test_rejects_preprocessor_comma_paths_in_manifest(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.cpp")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+            for argument in (
+                "-Wp,-I,/tmp/include",
+                "-Wp,-include,/abs/file",
+            ):
+                with self.subTest(argument=argument):
+                    with self.assertRaisesRegex(
+                        ValueError, "non-portable path"
+                    ):
+                        generate_static_compile_resources(
+                            output_root=root,
+                            kernel_base="Kernel_x",
+                            resource_id="kernel",
+                            resources=[{
+                                "source": source,
+                                "path": "resources/src/kernel.cpp",
+                            }],
+                            kernels=[{
+                                "kernel_name": "kernel",
+                                "recipes": {"normal": {
+                                    "commands": [["tool", argument]],
+                                    "artifact": "artifacts/kernel.o",
+                                }},
+                            }],
+                        )
 
     def test_canonicalizes_alternate_symlink_spelling_of_cann_root(self):
         with tempfile.TemporaryDirectory() as root:
