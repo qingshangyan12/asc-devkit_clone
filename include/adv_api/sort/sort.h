@@ -29,7 +29,8 @@
 #include "kernel_tensor.h"
 #include "include/adv_api/sort/sort_utils.h"
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
 #include "../../../impl/adv_api/detail/sort/sort/sort_impl.h"
 #endif
 
@@ -75,7 +76,8 @@ __aicore__ inline void Sort(
     const LocalTensor<U>& srcIndexTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
     Reg::internal::SortImpl<T, U, isReuseSource, config>(
         dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, sharedTmpBuffer, calCount);
 #endif
@@ -102,7 +104,8 @@ __aicore__ inline void Sort(
     const LocalTensor<U>& srcIndexTensor, const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
     Reg::internal::SortImpl<T, U, isReuseSource, config>(
         dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, calCount);
 #endif
@@ -131,7 +134,8 @@ __aicore__ inline void Sort(
     const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
     Reg::internal::SortImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 #endif
 }
@@ -152,7 +156,8 @@ template <typename T, bool isReuseSource = false, const SortConfig& config = DEF
 __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
     Reg::internal::SortImpl<T, isReuseSource, config>(dstTensor, srcTensor, calCount);
 #endif
 }
@@ -181,7 +186,8 @@ __aicore__ inline void Sort(
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
     Reg::internal::SortImpl<T, isReuseSource, config>(dstTensor, dstIndexTensor, srcTensor, sharedTmpBuffer, calCount);
 #endif
 }
@@ -205,7 +211,8 @@ __aicore__ inline void Sort(
     const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
     Reg::internal::SortImpl<T, isReuseSource, config>(dstTensor, dstIndexTensor, srcTensor, calCount);
 #endif
 }

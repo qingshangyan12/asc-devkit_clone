@@ -29,7 +29,8 @@
 #include "kernel_tensor.h"
 #include "include/adv_api/pad/broadcast_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
 #include "../../../impl/adv_api/detail/pad/broadcast/broadcast_common_impl.h"
 #endif
 
@@ -50,7 +51,8 @@ __aicore__ inline void Broadcast(
     const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     BroadCast<T, dim, axis, isReuseSource>(dstLocal, srcLocal, dstShape, srcShape, sharedTmpBuffer);
 #endif
 }
@@ -69,7 +71,8 @@ __aicore__ inline void Broadcast(
     const uint32_t srcShape[dim])
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              (__NPU_ARCH__ == 5161))
     BroadCast<T, dim, axis, isReuseSource>(dstLocal, srcLocal, dstShape, srcShape);
 #endif
 }
@@ -88,7 +91,8 @@ __aicore__ inline void GetBroadcastTilingInfo(
     uint32_t rank, const uint32_t* dstShape, const uint32_t* srcShape, bool srcInnerPad, BroadcastTiling& tiling)
 {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
     GetBroadcastTilingInfoImpl<T, constRank, constDstShape, constSrcShape>(
         rank, dstShape, srcShape, srcInnerPad, tiling);
 #endif
@@ -111,7 +115,8 @@ __aicore__ inline void Broadcast(
     BroadcastTiling* tiling)
 {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 5161))
     BroadcastImpl<T, constRank, constDstShape, constSrcShape, constSrcInnerPad>(dst, src, dstShape, srcShape, tiling);
 #endif
 }

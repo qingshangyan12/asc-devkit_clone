@@ -38,8 +38,8 @@ __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__) &&                                                                                      \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
-    defined(__ASC_NPU_HOST__)
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+         (__NPU_ARCH__ == 5161)) || defined(__ASC_NPU_HOST__)
 #include "../../../impl/basic_api/reg_compute/kernel_reg_compute_histograms_intf_impl.h"
 #endif
 #endif // ASCENDC_MODULE_REG_COMPUTE_HISTOGRAMS_INTERFACE_H
