@@ -1,13 +1,13 @@
 #!/bin/bash
-# ============================================================
-# pre_smoke.sh - asc-devkit 冒烟测试脚本
-# 依赖环境变量：
-#   REPOSITORY_NAME - 仓库名 (asc-devkit)
-#   pr_id           - PR ID
-#   arm_run_url     - (可选) arm 运行包下载地址，传入则替代 OBS 拼接路径
-#   WORKSPACE       - 工作目录 (默认当前目录)
-#   soc_version     - (可选) SoC 版本，用于 slog 命名
-# ============================================================
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
 set +e
 
 shopt -s extglob
