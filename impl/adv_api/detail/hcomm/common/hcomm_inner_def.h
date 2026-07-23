@@ -393,16 +393,6 @@ typedef struct {
     uint32_t inlineData[3];
 } HcommUrmaJfcCqeCtx;
 
-#define HCOMM_WQE_BDSL_OFFSET 0
-#define HCOMM_WQE_TSL_OFFSET 16
-#define HCOMM_WQE_VA_OFFSET 21
-#define HCOMM_WQE_CR_OFFSET 23
-#define HCOMM_WQE_CTRLSL_OFFSET 29
-#define HCOMM_WQE_CL_OFFSET 28
-#define HCOMM_WQE_OWNER_OFFSET 31
-#define HCOMM_WQE_OP_TYPE_OFFSET 24
-#define HCOMM_WQE_C_OFFSET 29
-
 } // namespace AscendC
 #endif // IMPL_HCOMM_HCOMM_INNER_DEF_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCOMM_INNER_DEF_H__)

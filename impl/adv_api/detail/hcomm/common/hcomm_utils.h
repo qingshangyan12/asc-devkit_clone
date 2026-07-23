@@ -39,8 +39,8 @@ __aicore__ inline uint16_t HtoNS(uint16_t x)
 
 __aicore__ inline uint32_t HtoNL(uint32_t x)
 {
-    return ((x & 0x000000ffU) << BITS_3BYTE) | ((x & 0x0000ff00U) << BITS_1BYTE) |
-           ((x & 0x00ff0000U) >> BITS_1BYTE) | ((x & 0xff000000U) >> BITS_3BYTE);
+    return ((x & 0x000000ffU) << BITS_3BYTE) | ((x & 0x0000ff00U) << BITS_1BYTE) | ((x & 0x00ff0000U) >> BITS_1BYTE) |
+           ((x & 0xff000000U) >> BITS_3BYTE);
 }
 
 __aicore__ inline uint64_t HtoNLL(uint64_t x)
