@@ -1759,12 +1759,12 @@ __aicore__ inline void DataCopyPad(
 template <typename T, TPosition pos>
 __aicore__ inline void SetPadValue(T paddingValue)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003)
     if (g_coreType == AIC) {
         return;
     }
     set_mov_pad_val(GetScalarBitcodeValue((T)paddingValue));
-#elif (__NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#elif (__NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3113)
     if constexpr (pos == TPosition::MAX || GetPhyType(pos) == Hardware::UB) {
         set_pad_val_outtoub(GetScalarBitcodeValue((T)paddingValue));
     } else if constexpr (GetPhyType(pos) == Hardware::L1) {
