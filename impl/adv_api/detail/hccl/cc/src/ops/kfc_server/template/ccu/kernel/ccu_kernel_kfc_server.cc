@@ -258,7 +258,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, CcuKernelArg 
     if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
         CcuReduceScatterMesh1DMem2MemKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
                                             param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_7],
-                                            ctx.arg->channels, ctx.arg->channelCount,
+                                            param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
                                             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
                                             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
     }
