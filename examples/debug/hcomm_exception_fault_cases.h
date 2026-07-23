@@ -16,7 +16,6 @@
 constexpr uint64_t HCOMM_URMA_TIMEOUT_TEST_LEN = 256ULL * 1024ULL * 1024ULL + 4096ULL;
 constexpr uint64_t HCOMM_CQE_ERROR_TEST_LEN = 4096ULL;
 constexpr uint64_t HCOMM_INVALID_BUFFER_ADDR = 0x7fff00000000ULL;
-constexpr uint64_t HCOMM_INVALID_REMOTE_ADDR = HCOMM_INVALID_BUFFER_ADDR;
 
 struct CommContext {
     uint64_t channelHandle;
