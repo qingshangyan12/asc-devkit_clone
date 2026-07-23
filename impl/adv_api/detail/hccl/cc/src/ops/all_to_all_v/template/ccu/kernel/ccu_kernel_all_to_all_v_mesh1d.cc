@@ -99,15 +99,15 @@ static CcuResult PreSync(AlltoAllVMesh1DContext &ctx)
         tempDst = ctx.output[ctx.rankId];
         tempDst += ctx.sendRecvInfo[id].recvOffset;
         // index = 0，传递 output 信息
-        // ccu::WriteVariableWithNotify(ctx.channels[channelIdx], tempDst, OUTPUT_XN_ID, CKE_IDX_0, 1 << OUTPUT_XN_ID);
+        ccu::WriteVariableWithNotify(ctx.channels[channelIdx], tempDst, OUTPUT_XN_ID, CKE_IDX_0, 1 << OUTPUT_XN_ID);
         // index = 1，传递 token 信息
-        // ccu::WriteVariableWithNotify(ctx.channels[channelIdx], ctx.token[ctx.rankId], TOKEN_XN_ID, CKE_IDX_0, 1 << TOKEN_XN_ID);
+        ccu::WriteVariableWithNotify(ctx.channels[channelIdx], ctx.token[ctx.rankId], TOKEN_XN_ID, CKE_IDX_0, 1 << TOKEN_XN_ID);
         channelIdx++;
     }
 
     uint16_t allBit = 1 << OUTPUT_XN_ID | 1 << TOKEN_XN_ID;
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
-        ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, allBit);
+        // ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, allBit);
     }
     HCCL_INFO("[CcuKernelAlltoAllVMesh1D] PreSync end");
     return CCU_SUCCESS;
