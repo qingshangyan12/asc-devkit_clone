@@ -85,7 +85,7 @@ struct HcommChannelDumpChannelInfo {
     HcommChannelDumpQueueEntry queueEntries[HCOMM_CHANNEL_DUMP_MAX_QUEUE_ENTRIES];
 };
 
-struct HcommChannelDumpInfo {
+struct HcommChannelDumpData {
     uint32_t magic;
     uint32_t version;
     uint32_t size;

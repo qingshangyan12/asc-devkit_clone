@@ -360,7 +360,7 @@ void PrintParsedCqe(const HcommChannelDumpQueueEntry &entry)
     PrintRawBytes("Hcomm URMA CQE", entry);
 }
 
-void PrintParsedDumpInfo(const HcommChannelDumpInfo &dumpInfo)
+void PrintParsedDumpInfo(const HcommChannelDumpData &dumpInfo)
 {
     if (dumpInfo.magic != HCOMM_CHANNEL_DUMP_MAGIC) {
         std::printf("[hcomm_fault_runner][parsed] invalid dump info magic=0x%x\n", dumpInfo.magic);
@@ -427,7 +427,7 @@ bool DumpChannelsByInfoApi(const std::vector<ChannelHandle> &channels)
     std::vector<ChannelHandle> channelCopy = channels;
     uint32_t len = 0;
     int32_t ret = getSizeFunc(static_cast<uint32_t>(channelCopy.size()), channelCopy.data(), &len);
-    if (ret != 0 || len < sizeof(HcommChannelDumpInfo)) {
+    if (ret != 0 || len < sizeof(HcommChannelDumpData)) {
         std::printf("[hcomm_fault_runner] HcommChannelGetDumpInfoSize failed ret=%d len=%u\n", ret, len);
         return false;
     }
@@ -437,7 +437,7 @@ bool DumpChannelsByInfoApi(const std::vector<ChannelHandle> &channels)
     if (ret != 0) {
         return false;
     }
-    PrintParsedDumpInfo(*reinterpret_cast<const HcommChannelDumpInfo *>(buffer.data()));
+    PrintParsedDumpInfo(*reinterpret_cast<const HcommChannelDumpData *>(buffer.data()));
     std::fflush(stdout);
     return true;
 }
