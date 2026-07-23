@@ -80,13 +80,13 @@ using make_unsigned_t = typename make_unsigned_impl<T>::type;
 
 } // namespace numeric_detail
 
-// ceil_div: divides a by b, rounding up if there is a remainder
+// div_ceil: divides a by b, rounding up if there is a remainder
 // Precondition: a >= 0 (for signed types), b > 0
 template <typename T, typename U>
-__host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
+__host__ __aicore__ inline constexpr auto div_ceil(const T& a, const U& b)
 {
-    static_assert(is_integral_v<T>, "AscendC::Std::ceil_div: T must be an integral type");
-    static_assert(is_integral_v<U>, "AscendC::Std::ceil_div: U must be an integral type");
+    static_assert(is_integral_v<T>, "AscendC::Std::div_ceil: T must be an integral type");
+    static_assert(is_integral_v<U>, "AscendC::Std::div_ceil: U must be an integral type");
 
     using Prom  = decltype(T{} / U{});
     using UProm = numeric_detail::make_unsigned_t<Prom>;
