@@ -16,6 +16,22 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_dcci_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_icache_preload_status_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_dci_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_scalar_cache_read_normal_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_scalar_cache_read_last_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_scalar_cache_read_persistent_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_scalar_cache_read_disable_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_scalar_cache_write_normal_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_scalar_cache_write_last_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_scalar_cache_write_persistent_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_scalar_cache_write_disable_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_set_scalar_cache_read_normal_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_set_scalar_cache_read_last_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_set_scalar_cache_read_persistent_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_set_scalar_cache_read_disable_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_set_scalar_cache_write_normal_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_set_scalar_cache_write_last_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_set_scalar_cache_write_persistent_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_set_scalar_cache_write_disable_impl.h"
 
 // ==========asc_icache_preload==========
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len)
@@ -45,5 +61,39 @@ __aicore__ inline int64_t asc_get_icache_preload_status() { return asc_get_icach
 
 //==============asc_dci===============
 __aicore__ inline void asc_dci() { asc_dci_impl(); }
+
+//==============asc_get_scalar_cache_mode===============
+__aicore__ inline bool asc_get_scalar_cache_read_normal() { return asc_get_scalar_cache_read_normal_impl(); }
+
+__aicore__ inline bool asc_get_scalar_cache_read_last() { return asc_get_scalar_cache_read_last_impl(); }
+
+__aicore__ inline bool asc_get_scalar_cache_read_persistent() { return asc_get_scalar_cache_read_persistent_impl(); }
+
+__aicore__ inline bool asc_get_scalar_cache_read_disable() { return asc_get_scalar_cache_read_disable_impl(); }
+
+__aicore__ inline bool asc_get_scalar_cache_write_normal() { return asc_get_scalar_cache_write_normal_impl(); }
+
+__aicore__ inline bool asc_get_scalar_cache_write_last() { return asc_get_scalar_cache_write_last_impl(); }
+
+__aicore__ inline bool asc_get_scalar_cache_write_persistent() { return asc_get_scalar_cache_write_persistent_impl(); }
+
+__aicore__ inline bool asc_get_scalar_cache_write_disable() { return asc_get_scalar_cache_write_disable_impl(); }
+
+//==============asc_set_scalar_cache_mode===============
+__aicore__ inline void asc_set_scalar_cache_read_normal() { asc_set_scalar_cache_read_normal_impl(); }
+
+__aicore__ inline void asc_set_scalar_cache_read_last() { asc_set_scalar_cache_read_last_impl(); }
+
+__aicore__ inline void asc_set_scalar_cache_read_persistent() { asc_set_scalar_cache_read_persistent_impl(); }
+
+__aicore__ inline void asc_set_scalar_cache_read_disable() { asc_set_scalar_cache_read_disable_impl(); }
+
+__aicore__ inline void asc_set_scalar_cache_write_normal() { asc_set_scalar_cache_write_normal_impl(); }
+
+__aicore__ inline void asc_set_scalar_cache_write_last() { asc_set_scalar_cache_write_last_impl(); }
+
+__aicore__ inline void asc_set_scalar_cache_write_persistent() { asc_set_scalar_cache_write_persistent_impl(); }
+
+__aicore__ inline void asc_set_scalar_cache_write_disable() { asc_set_scalar_cache_write_disable_impl(); }
 
 #endif
