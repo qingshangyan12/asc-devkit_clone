@@ -234,7 +234,9 @@ __simd_vf__ inline void FusedExpSubImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubu
             mask = Reg::UpdateMask<T>(sreg);
             Reg::LoadAlign<U, Reg::LoadDist::DIST_UNPACK_B16>(vSrcReg0, src0 + i * sregLower);
             Reg::LoadAlign<U, Reg::LoadDist::DIST_UNPACK_B16>(vSrcReg1, src1 + i * sregLower);
-            Reg::FusedExpSub(vDstReg0, vSrcReg0, vSrcReg1, mask);
+            Reg::SubImpl<U>(vSrcReg0, vSrcReg0, vSrcReg1, mask);
+            Reg::CastImpl<T, U, Reg::RegLayout::ZERO, Reg::MaskMergeMode::ZEROING>(vDstReg0, vSrcReg0, mask);
+            Reg::ExpImpl<T>(vDstReg0, vDstReg0, mask);
             Reg::StoreAlign(dst + i * sregLower, vDstReg0, mask);
         }
     } else if constexpr (IsSameType<U, float>::value) {
