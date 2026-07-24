@@ -860,6 +860,8 @@ int RunRank(RankContext *ctx)
     hostCtx.remoteBufferAddr = reinterpret_cast<uint64_t>(remoteBuffer);
     hostCtx.len = bufferSize;
     hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
+    hostCtx.writeRet = -9999;
+    hostCtx.drainRet = -9999;
     hostCtx.rankId = rank;
     {
         std::lock_guard<std::mutex> lock(g_dumpMutex);
