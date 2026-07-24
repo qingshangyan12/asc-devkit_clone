@@ -26,17 +26,19 @@
 
 ## 功能说明
 
-针对所有流水线执行同步操作。
+针对PIPE_V流水线执行同步操作。
 
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_sync_vec()
+__aicore__ inline void asc_sync_vec(int id)
 ```
 
 ## 参数说明
 
-无
+| 参数名 | 输入/输出 | 描述 |
+| :--- | :--- | :--- |
+| id | 输入 | 同步ID。 |
 
 ## 返回值说明
 
@@ -48,7 +50,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+同步ID的取值范围为：0-7。
 
 ## 调用示例
 
@@ -63,12 +65,12 @@ asc_copy_gm2ub(src0, src0_gm, total_length * sizeof(float));
 asc_copy_gm2ub(src1, src1_gm, total_length * sizeof(float));
 
 // 同步操作：前置操作完成后才能启动后续操作。
-asc_sync_vec();
+asc_sync();
 
 asc_add(dst, src1, src0, total_length);
 
-// 同步操作：前置操作完成后才能启动后续操作。
-asc_sync_vec();
+// 同步操作：矢量计算操作（asc_add, PIPE_V流水）完成后才能启动后续操作。
+asc_sync_vec(0);
 
 asc_copy_ub2gm(dst_gm, dst, total_length * sizeof(float));
 ```
