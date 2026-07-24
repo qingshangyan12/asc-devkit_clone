@@ -31,8 +31,10 @@
 
 extern void run_hcomm_urma_timeout_fault(CommContext *ctx, aclrtStream stream);
 extern void run_hcomm_cqe_error_fault(CommContext *ctx, aclrtStream stream);
+extern void run_hcomm_cqe_seed_fault_queues(CommContext *ctx, aclrtStream stream);
 extern "C" void HcommUrmaTimeoutFaultKernel(CommContext *ctx);
 extern "C" void HcommCqeErrorFaultKernel(CommContext *ctx);
+extern "C" void HcommCqeSeedFaultQueuesKernel(CommContext *ctx);
 
 namespace {
 using HcommChannelGetDumpInfoSizeFunc = int32_t (*)(uint32_t, ChannelHandle *, uint32_t *);
@@ -640,6 +642,9 @@ void TryBindFaultKernelExceptionArgs(CommContext *devContext)
     (void)BindOneKernelExceptionArgs("HcommCqeErrorFaultKernel",
         reinterpret_cast<const void *>(HcommCqeErrorFaultKernel), devContext, getFuncBySymbol, functionGetBinary,
         binarySetExceptionCallback);
+    (void)BindOneKernelExceptionArgs("HcommCqeSeedFaultQueuesKernel",
+        reinterpret_cast<const void *>(HcommCqeSeedFaultQueuesKernel), devContext, getFuncBySymbol, functionGetBinary,
+        binarySetExceptionCallback);
 }
 
 bool TakePendingException(ExceptionSummary &summary, uint64_t &count)
@@ -950,6 +955,19 @@ int RunRank(RankContext *ctx)
             std::printf("[hcomm_fault_runner] launch URMA timeout fault kernel.\n");
             run_hcomm_urma_timeout_fault(devContext, stream);
         } else {
+            std::printf("[hcomm_fault_runner] launch CQE seed queue kernel.\n");
+            run_hcomm_cqe_seed_fault_queues(devContext, stream);
+            aclError seedRet = aclrtSynchronizeStream(stream);
+            std::printf("[hcomm_fault_runner] rank=0 cqe seed aclrtSynchronizeStream ret=%d\n", seedRet);
+            CommContext seededCtx = {};
+            if (TryCopyCommContext(devContext, sizeof(CommContext), seededCtx)) {
+                PrintCommContext("[hcomm_fault_runner] cqe seed ctx", seededCtx);
+            }
+            if (seedRet != ACL_SUCCESS) {
+                (void)ReportPendingException(rank);
+                DumpChannels({channel});
+                return static_cast<int>(seedRet);
+            }
             std::printf("[hcomm_fault_runner] launch CQE error fault kernel.\n");
             run_hcomm_cqe_error_fault(devContext, stream);
         }
