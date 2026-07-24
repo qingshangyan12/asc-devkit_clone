@@ -25,6 +25,7 @@
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 #include "impl/tensor_api/arch/cube/l1_to_ub/routing.h"
+#include "impl/tensor_api/utils/npu_debug_check.h"
 
 namespace AscendC {
 namespace Te {
@@ -58,6 +59,22 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(src.Data().Get()) % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyL12UB, src L1 address must be 32-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL12UB, dst UB address must be 32-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsShapeValid(dst.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor shape in CopyL12UB, all dst tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsLayoutStrideValid(dst.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor stride in CopyL12UB, all dst tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the dst tensor format defines it and the corresponding shape size is 1."));
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsShapeValid(src.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor shape in CopyL12UB, all src tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsLayoutStrideValid(src.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor stride in CopyL12UB, all src tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the src tensor format defines it and the corresponding shape size is 1."));
         using CopyL12UBImpl = typename CopyL12UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL12UBImpl::template Run<trait, T, U>(dst, src);
     }

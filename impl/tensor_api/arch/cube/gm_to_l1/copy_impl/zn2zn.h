@@ -71,6 +71,12 @@ public:
         auto srcStride = srcStrideSize * sizeof(type);
         auto dstStride = dstStrideSize * sizeof(type);
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((srcStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check srcStride in CopyGM2L1 ZN2ZN fp4 path, srcStride must be divisible by 2 before b4 "
+                "conversion."));
+            ASCENDC_DEBUG_ASSERT((dstStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dstStride in CopyGM2L1 ZN2ZN fp4 path, dstStride must be divisible by 2 before b4 "
+                "conversion."));
             // move fp4 as b8, need to be divided by 2
             srcStride = srcStride >> 1;
             dstStride = dstStride >> 1;

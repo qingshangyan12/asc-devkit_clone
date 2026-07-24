@@ -48,6 +48,9 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((!transpose || sizeof(T) != 4 || kStep % 2 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0A transpose instruction, kStep must be even for 32-bit data."));
         if constexpr (transpose) {
             asc_copy_l12l0a_transpose(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         } else {
