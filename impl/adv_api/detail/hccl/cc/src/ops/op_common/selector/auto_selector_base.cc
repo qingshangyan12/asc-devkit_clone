@@ -71,6 +71,14 @@ SelectorStatus AutoSelectorBase::Select(
         return ret;
     }
     if (IsStarsState(opParam.opExecuteConfig)) {
+        if (topoInfo->level0PcieMix && topoInfo->level0BigClosRange) {
+            opParam.opExecuteConfig = OpExecuteConfig::AIV_ONLY;
+            HCCL_INFO(
+                "[asc][AlgoSelect][AutoSelectorBase::Select] level0 is PCIE mix and CLOS scale > 8, "
+                "switch to AIV_ONLY, opType[%d].",
+                opParam.opType);
+            return SelectAivAlgo(topoInfo, opParam, configAlgMap, selectAlgName);
+        }
         HCCL_DEBUG(
             "[asc][AlgoSelect][AutoSelectorBase::Select] try AICPU algo, opType[%d], opExecuteConfig[%d].",
             opParam.opType, opParam.opExecuteConfig);
