@@ -8,10 +8,20 @@
 -- See LICENSE in the root of the software repository for the full text of the License.
 -- ----------------------------------------------------------------------------------------------------------
 
+-- Configure NPU architecture via command line, for example:
+--   xmake f --npu_arch=dav-2201
+option("npu_arch")
+    set_default("dav-2201")
+    set_showmenu(true)
+    set_description("NPU architecture for this sample (dav-2201 for Atlas A2/A3)")
+option_end()
+
 add_rules("mode.debug", "mode.release")
 
 target("xmake_add")
     set_kind("binary")
+    -- Use Ascend C toolchain provided by CANN (bisheng / ASC).
     set_toolchains("ascendc")
     add_files("add.asc")
-    add_ascnpuarchs("dav-2201")
+    -- Pass architecture from option instead of hardcoding in the script.
+    add_ascnpuarchs(get_config("npu_arch"))
