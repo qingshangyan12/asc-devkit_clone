@@ -20,6 +20,8 @@
 #ifndef INCLUDE_C_API_SYS_VAR_SYS_VAR_H
 #define INCLUDE_C_API_SYS_VAR_SYS_VAR_H
 
+#include "utils/base/sys_enums.h"
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -113,6 +115,14 @@ __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 
 __aicore__ inline int64_t asc_get_squeeze_status();
+
+__aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat);
+
+__aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode);
+
+__aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy);
+
+__aicore__ inline asc_override_strategy asc_get_saturation_strategy();
 
 #endif
 
