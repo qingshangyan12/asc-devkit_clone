@@ -5,8 +5,9 @@ This directory contains two AIV fault kernels for validating exception callback 
 ## Kernels
 
 - `HcommUrmaTimeoutFaultKernel`: calls `Hcomm::WriteNbi` with `len > 256MB` and then `Drain`.
-- `HcommCqeErrorFaultKernel`: posts one real WQE with valid local/remote buffers, writes a recognizable CQE error record
-  into CQ ring for dump validation, then triggers a Runtime exception so the callback report path can dump the state.
+- `HcommCqeErrorFaultKernel`: triggers a Runtime exception through an invalid device address. This case is kept as a
+  negative callback/dump path for CQE investigation; it does not currently guarantee that hardware has produced a
+  non-zero CQE error entry before the dump.
 
 Both kernels take a device pointer to `CommContext`.
 
@@ -32,8 +33,6 @@ hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
 
 `writeRet` and `drainRet` are filled by the fault kernels and printed by the host report path. They help distinguish
 whether HCOMM posted a WQE successfully before the exception.
-The CQE case also records a kernel-side DFX snapshot including `sqVa`, `cqVa`, `wqeCnt`, SQ/CQ cursors, and the first
-four DWs read back from SQ/CQ VA.
 
 3. Allocate and copy `CommContext` to device.
 4. Register the Runtime exception callback and, when supported by the Runtime, bind the device `CommContext` as
@@ -196,9 +195,10 @@ HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 
 - URMA timeout case: callback-triggered report calls `HcommChannelDumpInfo`, which returns raw channel/SQ/CQ/WQE/CQE
   bytes; asc-devkit parses and prints the protocol fields.
-- CQE error case: the runner launches `HcommCqeErrorFaultKernel`, which posts one real HCOMM WQE with valid buffers,
-  seeds a CQE error record for validation, and then triggers Runtime exception. Use `CqContext`, `Hcomm URMA CQE`,
-  `status`, `substatus`, and `entryIdx` as log filters.
+- CQE error case: the runner launches `HcommCqeErrorFaultKernel` to trigger Runtime exception and exercise the same
+  callback/report path. Current validation showed that several attempted CQE construction methods did not reliably
+  produce non-zero WQE/CQE contents on 950, so this case should be treated as callback path coverage rather than a
+  guaranteed CQE hardware-error reproducer.
 
 ## Validation Checklist
 
@@ -218,7 +218,6 @@ Channel dump content is considered basically valid when these values match the r
 - `exception ctx channel` equals the channel handle printed during channel creation.
 - `exception ctx local` equals the current-rank local buffer printed during channel creation.
 - `exception ctx remote` equals the peer buffer printed during channel creation.
-- `exception ctx writeRet` is `0` when HCOMM accepted the WQE before the fault path.
 - `[parsed] SqContext sqVa/depth/entrySize/head/tail` is printed.
 - `[parsed] Hcomm URMA WQE` is printed and contains protocol fields such as `sqe_bb_idx`, `owner`, `opcode`, `tp_id`,
   `sge_num`, plus SGE/notify/AMO fields when present in the captured raw bytes.
@@ -232,5 +231,4 @@ Useful filters:
 grep -E "CustomCallback entered|runtime exception|exception dev args point|exception ctx|HcommChannelDumpInfo ret=0" urma_950.log
 grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" urma_950.log
 grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" cqe_950.log
-grep -E "exception ctx|dfx sqVa|dfx sqDw|Channel\\[0\\]|SqContext|CqContext|Hcomm URMA WQE: queue=|Hcomm URMA CQE: queue=|raw\\[000\\]" cqe_950.log
 ```

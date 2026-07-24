@@ -31,16 +31,8 @@
 
 extern void run_hcomm_urma_timeout_fault(CommContext *ctx, aclrtStream stream);
 extern void run_hcomm_cqe_error_fault(CommContext *ctx, aclrtStream stream);
-extern void run_hcomm_cqe_seed_fault_queues(CommContext *ctx, aclrtStream stream);
-extern void run_hcomm_cqe_mark_context(CommContext *ctx, aclrtStream stream);
-extern void run_hcomm_cqe_probe_local_gm(CommContext *ctx, aclrtStream stream);
-extern void run_hcomm_cqe_probe_queue_read(CommContext *ctx, aclrtStream stream);
 extern "C" void HcommUrmaTimeoutFaultKernel(CommContext *ctx);
 extern "C" void HcommCqeErrorFaultKernel(CommContext *ctx);
-extern "C" void HcommCqeSeedFaultQueuesKernel(CommContext *ctx);
-extern "C" void HcommCqeMarkContextKernel(CommContext *ctx);
-extern "C" void HcommCqeProbeLocalGmKernel(CommContext *ctx);
-extern "C" void HcommCqeProbeQueueReadKernel(CommContext *ctx);
 
 namespace {
 using HcommChannelGetDumpInfoSizeFunc = int32_t (*)(uint32_t, ChannelHandle *, uint32_t *);
@@ -99,7 +91,6 @@ using AclrtGetFuncBySymbolFunc = aclError (*)(const void *, aclrtFuncHandle *);
 using AclrtFunctionGetBinaryFunc = aclError (*)(aclrtFuncHandle, aclrtBinHandle *);
 using AclrtExceptionInfoCallbackFunc = void (*)(aclrtExceptionInfo *);
 using AclrtBinarySetExceptionCallbackFunc = aclError (*)(aclrtBinHandle, AclrtExceptionInfoCallbackFunc, void *);
-using CqeDiagLaunchFunc = void (*)(CommContext *, aclrtStream);
 
 #define ACL_CHECK(expr)                                                                                  \
     do {                                                                                                 \
@@ -443,69 +434,6 @@ bool DumpChannelsByInfoApi(const std::vector<ChannelHandle> &channels)
     return true;
 }
 
-bool FillQueueContextForCqeSeed(ChannelHandle channel, CommContext &ctx)
-{
-    auto getSizeFunc = ResolveChannelGetDumpInfoSizeFunc();
-    auto dumpInfoFunc = ResolveChannelDumpInfoFunc();
-    if (getSizeFunc == nullptr || dumpInfoFunc == nullptr || channel == 0) {
-        std::printf("[hcomm_fault_runner] cannot resolve queue context for CQE seed.\n");
-        std::fflush(stdout);
-        return false;
-    }
-
-    ChannelHandle channelCopy = channel;
-    uint32_t len = 0;
-    int32_t ret = getSizeFunc(1, &channelCopy, &len);
-    if (ret != 0 || len < sizeof(HcommChannelDumpData)) {
-        std::printf("[hcomm_fault_runner] CQE seed get dump size failed ret=%d len=%u\n", ret, len);
-        std::fflush(stdout);
-        return false;
-    }
-
-    std::vector<uint8_t> buffer(len, 0);
-    ret = dumpInfoFunc(1, &channelCopy, buffer.data(), len);
-    if (ret != 0) {
-        std::printf("[hcomm_fault_runner] CQE seed dump channel failed ret=%d len=%u\n", ret, len);
-        std::fflush(stdout);
-        return false;
-    }
-
-    const auto &dumpInfo = *reinterpret_cast<const HcommChannelDumpData *>(buffer.data());
-    if (dumpInfo.magic != HCOMM_CHANNEL_DUMP_MAGIC || dumpInfo.channelNum == 0) {
-        std::printf("[hcomm_fault_runner] CQE seed dump info invalid magic=0x%x channelNum=%u\n",
-            dumpInfo.magic, dumpInfo.channelNum);
-        std::fflush(stdout);
-        return false;
-    }
-
-    const auto &channelInfo = dumpInfo.channels[0];
-    if (channelInfo.valid == 0 || channelInfo.sqContextDumpNum == 0 || channelInfo.cqContextDumpNum == 0) {
-        std::printf("[hcomm_fault_runner] CQE seed queue context missing valid=%u sqNum=%u cqNum=%u\n",
-            channelInfo.valid, channelInfo.sqContextDumpNum, channelInfo.cqContextDumpNum);
-        std::fflush(stdout);
-        return false;
-    }
-
-    const auto &sq = channelInfo.sqContexts[0];
-    const auto &cq = channelInfo.cqContexts[0];
-    ctx.sqVa = sq.va;
-    ctx.cqVa = cq.va;
-    ctx.preWqeCnt = channelInfo.wqeCnt;
-    ctx.preSqHead = sq.head;
-    ctx.preSqTail = sq.tail;
-    ctx.preCqTail = cq.tail;
-    std::printf("[hcomm_fault_runner] CQE seed queue ctx sqVa=0x%llx cqVa=0x%llx "
-                "wqeCnt=%u sqHead=%u sqTail=%u cqTail=%u\n",
-        static_cast<unsigned long long>(ctx.sqVa),
-        static_cast<unsigned long long>(ctx.cqVa),
-        ctx.preWqeCnt,
-        ctx.preSqHead,
-        ctx.preSqTail,
-        ctx.preCqTail);
-    std::fflush(stdout);
-    return ctx.sqVa != 0 && ctx.cqVa != 0;
-}
-
 void DumpChannels(const std::vector<ChannelHandle> &channels)
 {
     (void)DumpChannelsByInfoApi(channels);
@@ -646,20 +574,8 @@ void TryBindFaultKernelExceptionArgs(CommContext *devContext)
     (void)BindOneKernelExceptionArgs("HcommUrmaTimeoutFaultKernel",
         reinterpret_cast<const void *>(HcommUrmaTimeoutFaultKernel), devContext, getFuncBySymbol, functionGetBinary,
         binarySetExceptionCallback);
-    (void)BindOneKernelExceptionArgs("HcommCqeMarkContextKernel",
-        reinterpret_cast<const void *>(HcommCqeMarkContextKernel), devContext, getFuncBySymbol, functionGetBinary,
-        binarySetExceptionCallback);
-    (void)BindOneKernelExceptionArgs("HcommCqeProbeLocalGmKernel",
-        reinterpret_cast<const void *>(HcommCqeProbeLocalGmKernel), devContext, getFuncBySymbol, functionGetBinary,
-        binarySetExceptionCallback);
-    (void)BindOneKernelExceptionArgs("HcommCqeProbeQueueReadKernel",
-        reinterpret_cast<const void *>(HcommCqeProbeQueueReadKernel), devContext, getFuncBySymbol, functionGetBinary,
-        binarySetExceptionCallback);
     (void)BindOneKernelExceptionArgs("HcommCqeErrorFaultKernel",
         reinterpret_cast<const void *>(HcommCqeErrorFaultKernel), devContext, getFuncBySymbol, functionGetBinary,
-        binarySetExceptionCallback);
-    (void)BindOneKernelExceptionArgs("HcommCqeSeedFaultQueuesKernel",
-        reinterpret_cast<const void *>(HcommCqeSeedFaultQueuesKernel), devContext, getFuncBySymbol, functionGetBinary,
         binarySetExceptionCallback);
 }
 
@@ -676,45 +592,15 @@ bool TakePendingException(ExceptionSummary &summary, uint64_t &count)
 
 void PrintCommContext(const char *prefix, const CommContext &ctx)
 {
-    std::printf("%s rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu "
-                "stage=%u initRet=%d writeRet=%d drainRet=%d\n",
+    std::printf("%s rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu writeRet=%d drainRet=%d\n",
         prefix,
         ctx.rankId,
         static_cast<unsigned long long>(ctx.channelHandle),
         static_cast<unsigned long long>(ctx.localBufferAddr),
         static_cast<unsigned long long>(ctx.remoteBufferAddr),
         static_cast<unsigned long long>(ctx.len),
-        ctx.stage,
-        ctx.initRet,
         ctx.writeRet,
         ctx.drainRet);
-    std::printf("%s dfx sqVa=0x%llx cqVa=0x%llx wqeCnt=%u->%u->%u "
-                "sqHead=%u->%u->%u sqTail=%u->%u->%u cqTail=%u->%u->%u\n",
-        prefix,
-        static_cast<unsigned long long>(ctx.sqVa),
-        static_cast<unsigned long long>(ctx.cqVa),
-        ctx.preWqeCnt,
-        ctx.postWriteWqeCnt,
-        ctx.postDrainWqeCnt,
-        ctx.preSqHead,
-        ctx.postWriteSqHead,
-        ctx.postDrainSqHead,
-        ctx.preSqTail,
-        ctx.postWriteSqTail,
-        ctx.postDrainSqTail,
-        ctx.preCqTail,
-        ctx.postWriteCqTail,
-        ctx.postDrainCqTail);
-    std::printf("%s dfx sqDw[0..3]=0x%x 0x%x 0x%x 0x%x cqDw[0..3]=0x%x 0x%x 0x%x 0x%x\n",
-        prefix,
-        ctx.sqDw[0],
-        ctx.sqDw[1],
-        ctx.sqDw[2],
-        ctx.sqDw[3],
-        ctx.cqDw[0],
-        ctx.cqDw[1],
-        ctx.cqDw[2],
-        ctx.cqDw[3]);
 }
 
 void CollectCachedContexts(uint32_t rank, std::vector<ChannelHandle> &channels, std::vector<CommContext> &contexts)
@@ -778,27 +664,6 @@ void DumpCachedChannelsForDiagnosis(uint32_t rank)
         PrintCommContext("[hcomm_fault_runner] cached ctx", cachedCtx);
     }
     DumpChannels(channels);
-}
-
-bool RunCqeDiagStep(const char *name, CqeDiagLaunchFunc launch, CommContext *devContext, aclrtStream stream,
-    uint32_t rank, ChannelHandle channel)
-{
-    std::printf("[hcomm_fault_runner] launch CQE diag step: %s.\n", name);
-    std::fflush(stdout);
-    launch(devContext, stream);
-    aclError syncRet = aclrtSynchronizeStream(stream);
-    std::printf("[hcomm_fault_runner] CQE diag step %s aclrtSynchronizeStream ret=%d\n", name, syncRet);
-    CommContext stepCtx = {};
-    if (TryCopyCommContext(devContext, sizeof(CommContext), stepCtx)) {
-        std::string prefix = std::string("[hcomm_fault_runner] cqe diag ") + name + " ctx";
-        PrintCommContext(prefix.c_str(), stepCtx);
-    }
-    DumpChannels({channel});
-    if (syncRet != ACL_SUCCESS) {
-        (void)ReportPendingException(rank);
-        return false;
-    }
-    return true;
 }
 
 bool ParseFaultCase(int argc, char **argv, FaultCase &faultCase)
@@ -968,14 +833,9 @@ int RunRank(RankContext *ctx)
     hostCtx.remoteBufferAddr = reinterpret_cast<uint64_t>(remoteBuffer);
     hostCtx.len = bufferSize;
     hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
-    hostCtx.stage = 0;
-    hostCtx.initRet = -9999;
     hostCtx.writeRet = -9999;
     hostCtx.drainRet = -9999;
     hostCtx.rankId = rank;
-    if (rank == 0 && ctx->faultCase == FaultCase::CQE_ERROR && !FillQueueContextForCqeSeed(channel, hostCtx)) {
-        return 1;
-    }
     {
         std::lock_guard<std::mutex> lock(g_dumpMutex);
         g_contexts.push_back(hostCtx);
@@ -992,18 +852,6 @@ int RunRank(RankContext *ctx)
             std::printf("[hcomm_fault_runner] launch URMA timeout fault kernel.\n");
             run_hcomm_urma_timeout_fault(devContext, stream);
         } else {
-            if (!RunCqeDiagStep("mark-context", run_hcomm_cqe_mark_context, devContext, stream, rank, channel)) {
-                return 1;
-            }
-            if (!RunCqeDiagStep("local-gm", run_hcomm_cqe_probe_local_gm, devContext, stream, rank, channel)) {
-                return 1;
-            }
-            if (!RunCqeDiagStep("queue-read", run_hcomm_cqe_probe_queue_read, devContext, stream, rank, channel)) {
-                return 1;
-            }
-            if (!RunCqeDiagStep("seed-queue", run_hcomm_cqe_seed_fault_queues, devContext, stream, rank, channel)) {
-                return 1;
-            }
             std::printf("[hcomm_fault_runner] launch CQE error fault kernel.\n");
             run_hcomm_cqe_error_fault(devContext, stream);
         }
