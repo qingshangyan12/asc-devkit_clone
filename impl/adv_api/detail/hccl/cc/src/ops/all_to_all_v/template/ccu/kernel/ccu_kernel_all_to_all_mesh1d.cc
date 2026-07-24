@@ -58,8 +58,8 @@ static CcuResult InitResource(KfcAlltoAllMesh1DContext &ctx)
 }
 
 static CcuResult LoadArgs(KfcAlltoAllMesh1DContext &ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-                        ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
-                        ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                        ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset,
+                        ccu::Variable dstOffset, ccu::Variable goSize1, ccu::Variable goSize2,
                         ccu::Variable goSize3, ccu::Variable goSize4)
 {
     ctx.input = inputAddr;
@@ -161,8 +161,8 @@ static CcuResult DoAlltoAll(KfcAlltoAllMesh1DContext &ctx)
 // kfc server调用函数
 // ============================================================================
 CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-                                  ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
-                                  ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                                  ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset,
+                                  ccu::Variable dstOffset, ccu::Variable goSize1, ccu::Variable goSize2,
                                   ccu::Variable goSize3, ccu::Variable goSize4,
                                   const ChannelHandle channels[], uint32_t channelCount,
                                   uint32_t rankSize, uint32_t rankId, bool loadFromMem)
@@ -181,7 +181,7 @@ CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputA
     ctx.moRes.bufCount = 0;
     ctx.enginePool = 0;
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset, sliceSize,
+    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset,
                                   goSize1, goSize2, goSize3, goSize4));
     PreSync(ctx);
     CCU_CHK_RET(DoAlltoAll(ctx));
