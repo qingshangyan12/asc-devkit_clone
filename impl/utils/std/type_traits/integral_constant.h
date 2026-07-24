@@ -49,7 +49,7 @@ using Int = integral_constant<size_t, v>;
 
 #define STD_INT_BINARY_OP(OP) \
 template <auto t, auto u> \
-__aicore__ inline constexpr Int<(t OP u)> operator OP (Int<t>, Int<u>) { \
+__host_aicore__ inline constexpr Int<(t OP u)> operator OP (Int<t>, Int<u>) { \
     return {}; \
 }
 
