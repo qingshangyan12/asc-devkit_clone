@@ -219,6 +219,12 @@ HcclResult AllGatherOutPlaceCommon(
     param.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
     param.enableDetour = false;
     param.deviceType = deviceType;
+    // 调试用，to delete
+    HCCL_INFO(
+        "[HcclDataSize][AllGather] count[%llu], dataType[%u], dataTypeSize[%u], inputSize[%llu] bytes, "
+        "outputSize[%llu] bytes, rankSize[%u].",
+        static_cast<unsigned long long>(sendCount), static_cast<u32>(dataType), perDataSize,
+        static_cast<unsigned long long>(inputSize), static_cast<unsigned long long>(outputSize), userRankSize);
 
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
