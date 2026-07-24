@@ -287,6 +287,7 @@ __aicore__ static inline void AscVFCallImpl(Args&&... args)
     funcPtr(args...);
 
     if constexpr (Internal::SimdVfDebugTraits<DebugTag>::enabled) {
+        AscVFDebugFinishFlag();
         const bool hasOverflow = AscVFDebugTransferUb();
 #ifdef ASCENDC_INTERNAL_SIMD_VF_OVERFLOW_WARNING_ENABLED
         if (hasOverflow) {
