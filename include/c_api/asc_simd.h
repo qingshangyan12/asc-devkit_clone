@@ -45,10 +45,11 @@
 #include "c_api/sync/sync.h"
 #include "c_api/sys_var/sys_var.h"
 #include "c_api/vector_datamove/vector_datamove.h"
-#include "c_api/reg_compute/reg_convert.h"
-#include "c_api/reg_compute/reg_load.h"
-#include "c_api/reg_compute/reg_store.h"
-#include "c_api/reg_compute/reg_vector.h"
+#include "c_api/reg_vector/reg_convert.h"
+#include "c_api/reg_vector/reg_load.h"
+#include "c_api/reg_vector/reg_store.h"
+#include "c_api/reg_vector/reg_copy.h"
+#include "c_api/reg_vector/reg_compute.h"
 
 #endif
 
