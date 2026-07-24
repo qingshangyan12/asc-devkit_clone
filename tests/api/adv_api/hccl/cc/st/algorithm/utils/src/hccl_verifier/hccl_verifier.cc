@@ -125,13 +125,36 @@ HcclResult CheckAll2All(HcclSim::AllRankTaskQueues& taskQueues, u32 rankSize, Hc
 HcclResult CheckAll2AllV(
     HcclSim::AllRankTaskQueues& taskQueues, u32 rankSize, HcclDataType sendType, std::vector<u64> sendCountMatrix)
 {
+    std::vector<u64> sendDisplsMatrix(rankSize * rankSize, 0);
+    std::vector<u64> recvDisplsMatrix(rankSize * rankSize, 0);
+    for (u32 rank = 0; rank < rankSize; ++rank) {
+        for (u32 peer = 1; peer < rankSize; ++peer) {
+            sendDisplsMatrix[rank * rankSize + peer] =
+                sendDisplsMatrix[rank * rankSize + peer - 1] + sendCountMatrix[rank * rankSize + peer - 1];
+            recvDisplsMatrix[rank * rankSize + peer] =
+                recvDisplsMatrix[rank * rankSize + peer - 1] + sendCountMatrix[(peer - 1) * rankSize + rank];
+        }
+    }
+    return CheckAll2AllV(taskQueues, rankSize, sendType, sendCountMatrix, sendDisplsMatrix, recvDisplsMatrix);
+}
+
+HcclResult CheckAll2AllV(
+    HcclSim::AllRankTaskQueues& taskQueues, u32 rankSize, HcclDataType sendType,
+    const std::vector<u64>& sendCountMatrix, const std::vector<u64>& sendDisplsMatrix,
+    const std::vector<u64>& recvDisplsMatrix)
+{
+    CHK_PRT_RET(
+        sendCountMatrix.size() != rankSize * rankSize || sendDisplsMatrix.size() != rankSize * rankSize ||
+            recvDisplsMatrix.size() != rankSize * rankSize,
+        HCCL_ERROR("AllToAllV verifier matrix size mismatch."), HCCL_E_PARA);
     All2AllDataDesTag all2AllDataDes;
     all2AllDataDes.sendType = sendType;
     all2AllDataDes.recvType = sendType;
     all2AllDataDes.sendCountMatrix = sendCountMatrix;
+    all2AllDataDes.sdispls = sendDisplsMatrix;
+    all2AllDataDes.rdispls = recvDisplsMatrix;
     Checker checker;
-    // 复用all2allVC的校验逻辑
-    TaskCheckOpSemantics opSemanticsChecker(rankSize, HcclCMDType::HCCL_CMD_ALLTOALLVC, sendType, 0);
+    TaskCheckOpSemantics opSemanticsChecker(rankSize, HcclCMDType::HCCL_CMD_ALLTOALLV, sendType, 0);
     opSemanticsChecker.SetAll2AllDataDes(all2AllDataDes);
     CHK_RET(checker.GenAndCheckGraph(taskQueues, opSemanticsChecker));
     return HCCL_SUCCESS;

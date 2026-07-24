@@ -10,4 +10,5 @@
 add_subdirectory(op_common)
 add_subdirectory(reduce_scatter)
 add_subdirectory(all_gather)
+add_subdirectory(all_to_all_v)
 add_subdirectory(interface_graph_mode)

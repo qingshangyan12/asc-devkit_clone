@@ -142,6 +142,11 @@ HcclResult CheckAll2All(HcclSim::AllRankTaskQueues& taskQueues, u32 rankSize, Hc
 HcclResult CheckAll2AllV(
     HcclSim::AllRankTaskQueues& taskQueues, u32 rankSize, HcclDataType sendType, std::vector<u64> sendCountMatrix);
 
+HcclResult CheckAll2AllV(
+    HcclSim::AllRankTaskQueues& taskQueues, u32 rankSize, HcclDataType sendType,
+    const std::vector<u64>& sendCountMatrix, const std::vector<u64>& sendDisplsMatrix,
+    const std::vector<u64>& recvDisplsMatrix);
+
 HcclResult CheckAll2AllVC(
     HcclSim::AllRankTaskQueues& taskQueues, u32 rankSize, HcclDataType sendType, std::vector<u64> sendCountMatrix);
 
