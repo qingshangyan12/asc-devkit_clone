@@ -32,6 +32,10 @@ __aicore__ static inline void asc_vf_call_impl(Args&&... args)
     funcPtr(args...);
 
     if constexpr (AscendC::Internal::SimdVfDebugTraits<DebugTag>::enabled) {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
+    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+        __asc_simd_vf::asc_finish_flag();
+#endif
         const bool hasOverflow = AscVFDebugTransferUb();
 #ifdef ASCENDC_INTERNAL_SIMD_VF_OVERFLOW_WARNING_ENABLED
         if (hasOverflow) {
