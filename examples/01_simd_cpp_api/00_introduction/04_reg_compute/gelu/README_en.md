@@ -32,7 +32,7 @@ $$
 
 **Note**: GELU is a commonly used activation function in neural networks, used to replace ReLU for smoother gradient characteristics.
 
-This example implements GELU computation using the RegBase programming approach. Compared to the MemBase approach (based on [LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md) + Compute API) used in the [01_add/add example](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/01_add/add/README.md), RegBase allows intermediate computation results to be temporarily stored in registers rather than in UB, reducing the number of UB read/write operations, which is suitable for multi-step fusion computation scenarios.
+This example implements GELU computation using the RegBase programming approach. Compared to the MemBase approach (based on [LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md) + Compute API) used in the [01_add/add example](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/01_add/add/README_en.md), RegBase allows intermediate computation results to be temporarily stored in registers rather than in UB, reducing the number of UB read/write operations, which is suitable for multi-step fusion computation scenarios.
 
 The complete data path is: GM → UB → Register (step-by-step computation) → UB → GM.
 
