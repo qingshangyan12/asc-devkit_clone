@@ -54,7 +54,7 @@ static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext &ctx)
     uint32_t channelIdx = 0;
 
     if (ctx.channelCount == 0) {
-        HCCL_ERROR("[CcuKfcAllGatherMesh1D] channels is empty!");
+        HCCL_ERROR("[KfcReduceScatterMesh1DMem2Mem] channels is empty!");
         return CcuResult::CCU_E_INTERNAL;
     }
 
