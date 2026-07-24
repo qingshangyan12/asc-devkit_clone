@@ -743,14 +743,17 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             self.assertEqual(kernel["kernel_name"], "add_custom_0")
             self.assertEqual(kernel["targets"][0]["parameter_index"], 4)
             self.assertEqual(kernel["targets"][0]["byte_size"], 8)
-            self.assertNotIn("required", kernel["targets"][0])
-            self.assertNotIn("format", kernel["patches"][0])
-            serialized = json.dumps(manifest)
-            for forbidden in (
-                "macros", "architecture", "kernel_type", "build",
-                "binary", "filePath", "contract_version", "sha256",
-            ):
-                self.assertNotIn(forbidden, serialized)
+            self.assertEqual(
+                set(kernel["targets"][0]),
+                {"name", "parameter_index", "byte_size"},
+            )
+            self.assertEqual(
+                set(kernel["patches"][0]), {"file", "token", "value"}
+            )
+            self.assertEqual(set(kernel["recipes"]), {"normal"})
+            self.assertEqual(
+                set(kernel["recipes"]["normal"]), {"commands", "artifact"}
+            )
             copied = os.path.join(result, "resources/src/kernel.cpp")
             self.assertTrue(os.path.isfile(copied))
 
