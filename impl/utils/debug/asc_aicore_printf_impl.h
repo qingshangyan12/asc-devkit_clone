@@ -229,21 +229,21 @@ __aicore__ inline void printf_impl_common(DumpType debugType, __gm__ const char*
 }
 
 template <class... Args>
-__aicore__ __attribute__((noinline)) void printf_impl(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl(__gm__ const char* fmt, Args&&... args)
 {
     enable_asc_diagnostics();
     printf_impl_common(DumpType::DUMP_SCALAR, fmt, args...);
 }
 
 template <class... Args>
-__aicore__ __attribute__((noinline)) void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
 {
     enable_asc_assert();
     printf_impl_common(DumpType::DUMP_ASSERT, fmt, args...);
 }
 
 template <typename... Args>
-__attribute__((noinline)) __aicore__ void printf_impl_assert_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
+static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
     const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
     uint64_t ctrlValue = get_ctrl();
 
@@ -266,19 +266,19 @@ enum class DumpType : uint8_t {
 };
 
 template <class... Args>
-__aicore__ __attribute__((noinline)) void printf_impl(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl(__gm__ const char* fmt, Args&&... args)
 {
     std::printf(fmt, args...);
 }
 
 template <class... Args>
-__aicore__ __attribute__((noinline)) void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
 {
     std::printf(fmt, args...);
 }
 
 template <typename... Args>
-__attribute__((noinline)) __aicore__ void printf_impl_assert_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
+static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
     const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
     std::printf(fmt, args...);
     std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n",  __file, __line, __function, __assertion);
