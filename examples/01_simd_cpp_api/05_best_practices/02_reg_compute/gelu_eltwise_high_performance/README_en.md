@@ -4,7 +4,7 @@
 
 This example uses Gelu+Element-wise computation (introducing a series of Element-wise computation operations after Gelu to increase computation depth) to introduce RegBase vector performance tuning methods. The example demonstrates performance benefits from parallelism adjustment, loop splitting, and loop unrolling.
 
-> **Recommendation**: Before reading this example, it is recommended to first read the [Gelu Performance Optimization Example](../gelu_high_performance/README.md) to understand the basic VF fusion optimization principles, then learn the more complex loop splitting optimization methods in this example.
+> **Recommendation**: Before reading this example, it is recommended to first read the [Gelu Performance Optimization Example](../gelu_high_performance/README_en.md) to understand the basic VF fusion optimization principles, then learn the more complex loop splitting optimization methods in this example.
 
 **Optimization Path**:
 - Case 0: Single loop computation, parallelism adjusted to 128 bytes
