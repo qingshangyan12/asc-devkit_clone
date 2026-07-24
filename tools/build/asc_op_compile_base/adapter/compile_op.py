@@ -126,6 +126,15 @@ from .super_kernel_option_parse import parse_super_kernel_options
 from .kernel_info_infer import KernelInfoInfer
 from .ascendc_compile_utils import check_custom_dcci_end_false, check_if_gen_placehoder
 from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manager
+from .static_compile_resource_generator import (
+    collect_kernel_symbols,
+    collect_local_include_files,
+    generate_static_compile_resources,
+    normalize_static_command,
+    portable_wrapper_text,
+    resolve_symbol_tiling_sizes,
+    static_tiling_template_text,
+)
 
 DEFAULT_TILING_KEY = "0"
 COMPILE_INFO_KEY = "compileInfo"
@@ -448,6 +457,7 @@ the superkernel cannot be integrated with the operator.",
     # get max tiling size when use tiling old
     else:
         max_tiling_size = tiling_info.tiling_data_size
+    compile_info.static_compile_tiling_size = int(max_tiling_size)
 
     # updata op_param size by flag of oom
     if "oom" in get_current_build_config("tir.op_debug_config"):
@@ -1275,6 +1285,11 @@ def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
             )
             max_tiling_size = max(max_tiling_size, dec_data)
     compile_info.max_tiling_size = max_tiling_size
+    compile_info.static_compile_tiling_key_data_size = {
+        str(key): value[1]
+        for key, value in tiling_key_struct_size_map.items()
+        if isinstance(value, tuple) and len(value) == 2 and value[1] > 0
+    }
     return tiling_key_struct_size_map
 
 
@@ -1732,6 +1747,502 @@ def compile_sk_bind(
     return sk_bind_dst_file
 
 
+def _static_resource_tiling_key(kernel_name, tiling_keys):
+    for tiling_key in sorted((str(key) for key in tiling_keys), key=len, reverse=True):
+        if kernel_name.endswith("_" + tiling_key) or ("_" + tiling_key + "_") in kernel_name:
+            return tiling_key
+    return str(tiling_keys[0]) if tiling_keys else DEFAULT_TILING_KEY
+
+
+def _static_resource_arch_and_type(compile_info, tiling_key):
+    kernel_type = compile_info.tiling_key_kernel_type.get(
+        tiling_key, compile_info.default_kernel_type
+    )
+    kernel_type_name = getattr(kernel_type, "name", str(kernel_type))
+    chip_version = CommonUtility.get_chip_version()
+    cube_type = "AIC" in kernel_type_name and "AIV" not in kernel_type_name
+    architecture = f"dav-{chip_version}-{'cube' if cube_type else 'vec'}"
+    return architecture, kernel_type_name
+
+
+def _static_resource_compile_argv(
+    compile_info,
+    compile_option_tuple,
+    architecture,
+    tiling_key,
+    kernel_name,
+    wrapper_path,
+    tiling_path,
+    output_path,
+    extra_options=None,
+):
+    static_options = copy.deepcopy(compile_option_tuple)
+    static_options.compile_options = [
+        option
+        for option in static_options.compile_options
+        if option != "-DCONST_TILING"
+        and not option.startswith("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
+    ]
+    static_options.compile_options.append("-DCONST_TILING")
+    static_options.compile_options.extend(extra_options or [])
+    command = gen_compile_cmd_v220(
+        wrapper_path,
+        output_path,
+        static_options,
+        architecture,
+        tiling_path,
+    )
+    command.extend(
+        [
+            f"-Dauto_gen_{compile_info.origin_func_name}_kernel={kernel_name}",
+            f"-D{TILING_KEY_MACRO}={tiling_key}UL",
+            f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey",
+        ]
+    )
+    try:
+        compile_index = command.index("-c")
+    except ValueError as error:
+        raise ValueError("static compile command has no -c option") from error
+    return command[compile_index:]
+
+
+def _static_resource_bind_source(normal_symbol, sk_symbol, attribute, cap_bitmap):
+    return (
+        '#include "kernel_operator.h"\n'
+        f'extern "C" {attribute} void {normal_symbol}();\n'
+        f'extern "C" {attribute} void {sk_symbol}();\n'
+        f'extern "C" {attribute} void {sk_symbol}_split1();\n'
+        f'extern "C" {attribute} void {sk_symbol}_split2();\n'
+        f'extern "C" {attribute} void {sk_symbol}_split3();\n'
+        f"SK_BIND({normal_symbol}, {cap_bitmap}, {sk_symbol}, {sk_symbol}_split1, "
+        f"{sk_symbol}_split2, {sk_symbol}_split3);\n"
+    )
+
+
+def _static_resource_bind_argv(compile_option_tuple, source_path, output_path, architecture):
+    options = [
+        option
+        for option in compile_option_tuple.compile_options
+        if option != "-DCONST_TILING"
+        and not option.startswith("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
+    ]
+    is_c310 = architecture.startswith("dav-c310")
+    bind_architecture = "dav-c310-cube" if is_c310 else "dav-c220-cube"
+    if is_c310 and "-D__DAV_C310__" not in options:
+        options.append("-D__DAV_C310__")
+    return ["-c", "-O3"] + options + [
+        "-xcce", source_path, f"--cce-aicore-arch={bind_architecture}",
+        "--cce-aicore-only", "-std=c++17", "-DTILING_KEY_VAR=0",
+        "-o", output_path,
+    ]
+
+
+def _static_resource_id(op_type):
+    value = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", op_type)
+    value = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", value)
+    value = re.sub(r"[^A-Za-z0-9]+", "_", value).strip("_").lower()
+    if not value:
+        raise ValueError("static compile resource id cannot be empty")
+    return value
+
+
+def _static_runtime_kernel_base(kernel_base, sk_enabled):
+    suffix = "_relocatable"
+    if sk_enabled and kernel_base.endswith(suffix):
+        return kernel_base[:-len(suffix)]
+    return kernel_base
+
+
+def _static_runtime_kernel_symbol(symbol, compile_base, runtime_base):
+    if compile_base == runtime_base:
+        return symbol
+    if symbol.startswith(compile_base):
+        return runtime_base + symbol[len(compile_base):]
+    if symbol.startswith(runtime_base):
+        return symbol
+    raise ValueError(
+        f"cannot map relocatable kernel symbol {symbol} to runtime base {runtime_base}"
+    )
+
+
+def _static_normal_recipe(compile_argv, relocatable, artifact, ascend_home):
+    return {
+        "commands": [
+            normalize_static_command("compile", compile_argv, ascend_home, 0),
+            normalize_static_command(
+                "link",
+                [
+                    "-m", "aicorelinux", "-Ttext=0",
+                    "${output:" + relocatable + "}", "-static", "-o",
+                    "${output:" + artifact + "}", "-q",
+                ],
+                ascend_home,
+                1,
+            ),
+        ],
+        "artifact": artifact,
+    }
+
+
+def _static_super_kernel_recipe(
+    normal_recipe, normal_relocatable, sk_symbol, sk_argv, bind_argv,
+    output_prefix, ascend_home,
+):
+    sk_output = output_prefix + ".sk.o"
+    split_outputs = [output_prefix + f".sk_split{index}.o" for index in range(1, 4)]
+    archive_output = output_prefix + ".sk.a"
+    bind_output = output_prefix + ".sk_bind.o"
+    merged_output = output_prefix + ".sk_merged.o"
+    final_output = output_prefix + ".static_with_sk.o"
+    commands = [list(command) for command in normal_recipe["commands"]]
+    specifications = [("compile", sk_argv)]
+    specifications.extend(
+        (
+            "objcopy",
+            [
+                f"--redefine-sym={sk_symbol}={sk_symbol}_split{index}",
+                "${output:" + sk_output + "}",
+                "${output:" + split_output + "}",
+            ],
+        )
+        for index, split_output in enumerate(split_outputs, 1)
+    )
+    specifications.extend(
+        [
+            (
+                "archive",
+                ["rcs", "${output:" + archive_output + "}"]
+                + [
+                    "${output:" + path + "}"
+                    for path in [sk_output] + split_outputs
+                ],
+            ),
+            ("compile", bind_argv),
+            (
+                "link",
+                [
+                    "-r", "-o", "${output:" + merged_output + "}",
+                    "${output:" + normal_relocatable + "}",
+                    "${output:" + bind_output + "}",
+                    "${output:" + archive_output + "}",
+                ],
+            ),
+            (
+                "link",
+                [
+                    "-m", "aicorelinux", "-Ttext=0",
+                    "${output:" + merged_output + "}", "-static", "-o",
+                    "${output:" + final_output + "}", "-q",
+                ],
+            ),
+        ]
+    )
+    for kind, argv in specifications:
+        commands.append(
+            normalize_static_command(kind, argv, ascend_home, len(commands))
+        )
+    return {"commands": commands, "artifact": final_output}
+
+
+def _deduplicate_static_resources(resources):
+    unique = {}
+    result = []
+    for resource in resources:
+        logical_path = resource["path"]
+        source = os.path.realpath(resource["source"])
+        previous = unique.get(logical_path)
+        if previous is None:
+            unique[logical_path] = source
+            result.append(resource)
+        elif previous != source:
+            raise ValueError(
+                f"conflicting static compile resource path: {logical_path}"
+            )
+    return result
+
+
+def _static_resource_runtime_identity(value):
+    return value.replace("_relocatable_", "_")
+
+
+def _emit_static_compile_resources(
+    compile_info,
+    op_info,
+    tiling_info,
+    compile_option_tuple,
+    workspace_idx,
+    kernel_meta_dir,
+    dynamic_binary_path=None,
+    sk_compile_info=None,
+    sk_compile_option_tuple=None,
+    sk_bind_source_path=None,
+):
+    if tiling_info.static_shape_flag:
+        return None
+    json_path = os.path.join(kernel_meta_dir, compile_info.kernel_name + ".json")
+    dynamic_binary_path = dynamic_binary_path or compile_info.dst_file
+    required_files = [
+        dynamic_binary_path,
+        compile_info.src_file,
+        compile_info.gen_kernel_func_file,
+        tiling_info.tiling_data_file_path,
+        json_path,
+    ]
+    missing_files = [path for path in required_files if not os.path.isfile(path)]
+    if missing_files:
+        raise FileNotFoundError(
+            "static compile resources require files: " + ", ".join(missing_files)
+        )
+    with open(json_path, "r", encoding="utf-8") as file_obj:
+        metadata = json.load(file_obj)
+    compiled_symbols = collect_kernel_symbols(metadata, compile_info.global_kernel_symbols)
+    if not compiled_symbols:
+        raise ValueError("dynamic compile metadata contains no executable kernel symbol")
+    symbols = [_static_resource_runtime_identity(symbol) for symbol in compiled_symbols]
+    sk_enabled = (
+        sk_compile_info is not None
+        and sk_compile_option_tuple is not None
+        and sk_bind_source_path is not None
+        and os.path.isfile(sk_compile_info.gen_kernel_func_file)
+        and os.path.isfile(sk_bind_source_path)
+    )
+    runtime_kernel_base = _static_runtime_kernel_base(
+        compile_info.kernel_name, sk_enabled
+    )
+    runtime_symbols = {
+        symbol: _static_runtime_kernel_symbol(
+            symbol, compile_info.kernel_name, runtime_kernel_base
+        )
+        for symbol in symbols
+    }
+    fallback_tiling_size = tiling_info.tiling_data_size
+    if fallback_tiling_size <= 0:
+        fallback_tiling_size = compile_info.static_compile_tiling_size
+    if fallback_tiling_size <= 0:
+        fallback_tiling_size = compile_info.max_tiling_size
+    if fallback_tiling_size <= 0:
+        raise ValueError(
+            "static compile resources require an exact positive tiling byte size: "
+            f"tiling_info={tiling_info.tiling_data_size}, "
+            f"compile_info={compile_info.static_compile_tiling_size}, "
+            f"max={compile_info.max_tiling_size}, "
+            f"exact={compile_info.static_compile_tiling_key_data_size}"
+        )
+    exact_tiling_sizes = dict(
+        getattr(compile_info, "static_compile_tiling_key_data_size", {})
+    )
+    exact_tiling_sizes.update(tiling_info.tiling_key_data_size)
+    tiling_sizes = resolve_symbol_tiling_sizes(
+        symbols,
+        compile_info.tiling_key_list,
+        exact_tiling_sizes,
+        fallback_tiling_size,
+    )
+
+    wrapper_name = os.path.basename(compile_info.gen_kernel_func_file)
+    source_name = os.path.basename(compile_info.src_file)
+    tiling_name = os.path.basename(tiling_info.tiling_data_file_path)
+    wrapper_logical = "resources/src/" + wrapper_name
+    source_logical = "resources/src/" + source_name
+    tiling_logical = "resources/include/" + tiling_name
+    template_path = tiling_info.tiling_data_file_path + ".static_compile"
+    wrapper_template_path = compile_info.gen_kernel_func_file + ".static_compile"
+    with open(tiling_info.tiling_data_file_path, "r", encoding="utf-8") as file_obj:
+        tiling_template = static_tiling_template_text(file_obj.read())
+    with open(compile_info.gen_kernel_func_file, "r", encoding="utf-8") as file_obj:
+        wrapper_template = _static_resource_runtime_identity(
+            portable_wrapper_text(file_obj.read(), compile_info.src_file)
+        )
+    for symbol, runtime_symbol in runtime_symbols.items():
+        wrapper_template = wrapper_template.replace(symbol, runtime_symbol)
+    sk_wrapper_logical = ""
+    sk_source_logical = ""
+    sk_wrapper_template_path = ""
+    sk_wrapper_template = ""
+    sk_pairs = {}
+    if sk_enabled:
+        sk_wrapper_logical = "resources/src/" + os.path.basename(
+            sk_compile_info.gen_kernel_func_file
+        )
+        sk_source_logical = "resources/src/" + os.path.basename(
+            sk_compile_info.src_file
+        )
+        sk_wrapper_template_path = sk_compile_info.gen_kernel_func_file + ".static_compile"
+        with open(sk_compile_info.gen_kernel_func_file, "r", encoding="utf-8") as file_obj:
+            sk_wrapper_template = _static_resource_runtime_identity(
+                portable_wrapper_text(file_obj.read(), sk_compile_info.src_file)
+            )
+        for symbol, runtime_symbol in runtime_symbols.items():
+            sk_wrapper_template = sk_wrapper_template.replace(symbol, runtime_symbol)
+        cap_bitmap = 0
+        if sk_compile_info.super_kernel_early_start_wait_flag:
+            cap_bitmap |= 1
+        if sk_compile_info.super_kernel_early_start_set_flag:
+            cap_bitmap |= 2
+        cap_bitmap |= _get_dcci_disable_cap_bitmap(sk_compile_info, symbols)
+        sk_pairs = {
+            symbol: (runtime_symbols[symbol] + "_static_sk", str(cap_bitmap))
+            for symbol in symbols
+        }
+    generated_paths = [template_path, wrapper_template_path]
+    try:
+        with open(template_path, "w", encoding="utf-8") as file_obj:
+            file_obj.write(tiling_template)
+        with open(wrapper_template_path, "w", encoding="utf-8") as file_obj:
+            file_obj.write(wrapper_template)
+        if sk_enabled:
+            with open(sk_wrapper_template_path, "w", encoding="utf-8") as file_obj:
+                file_obj.write(sk_wrapper_template)
+            generated_paths.append(sk_wrapper_template_path)
+        kernels = []
+        resources = [
+            {"source": wrapper_template_path, "path": wrapper_logical},
+            {"source": compile_info.src_file, "path": source_logical},
+            {"source": template_path, "path": tiling_logical},
+        ]
+        resources.extend(
+            {"source": source, "path": "resources/src/" + relative_path}
+            for source, relative_path in collect_local_include_files(
+                compile_info.src_file
+            )
+        )
+        if sk_enabled:
+            resources.extend(
+                [
+                    {"source": sk_wrapper_template_path, "path": sk_wrapper_logical},
+                    {"source": sk_compile_info.src_file, "path": sk_source_logical},
+                ]
+            )
+            resources.extend(
+                {"source": source, "path": "resources/src/" + relative_path}
+                for source, relative_path in collect_local_include_files(
+                    sk_compile_info.src_file
+                )
+            )
+        ascend_home = os.environ.get("ASCEND_HOME_PATH", "")
+        for symbol in symbols:
+            runtime_symbol = runtime_symbols[symbol]
+            tiling_key = _static_resource_tiling_key(
+                symbol, compile_info.tiling_key_list
+            )
+            architecture, _ = _static_resource_arch_and_type(
+                compile_info, tiling_key
+            )
+            output_stem = re.sub(r"[^A-Za-z0-9_.-]", "_", runtime_symbol)
+            output_name = output_stem + ".o"
+            output_logical = "artifacts/" + output_name
+            relocatable_logical = "intermediates/" + output_stem + ".rel.o"
+            argv = _static_resource_compile_argv(
+                compile_info,
+                compile_option_tuple,
+                architecture,
+                tiling_key,
+                runtime_symbol,
+                "${resource:" + wrapper_logical + "}",
+                "${resource:" + tiling_logical + "}",
+                "${output:" + relocatable_logical + "}",
+            )
+            normal_recipe = _static_normal_recipe(
+                argv, relocatable_logical, output_logical, ascend_home
+            )
+            recipes = {"normal": normal_recipe}
+            if symbol in sk_pairs:
+                sk_symbol, cap_bitmap = sk_pairs[symbol]
+                output_prefix = "artifacts/" + re.sub(
+                    r"[^A-Za-z0-9_.-]", "_", runtime_symbol
+                )
+                bind_name = "sk_bind_" + re.sub(
+                    r"[^A-Za-z0-9_.-]", "_", runtime_symbol
+                ) + ".cpp"
+                bind_logical = "resources/src/" + bind_name
+                bind_path = os.path.join(kernel_meta_dir, bind_name + ".static_compile")
+                bind_text = _static_resource_bind_source(
+                    runtime_symbol,
+                    sk_symbol,
+                    compile_info.global_kernel_attribute,
+                    cap_bitmap,
+                )
+                with open(bind_path, "w", encoding="utf-8") as file_obj:
+                    file_obj.write(bind_text)
+                generated_paths.append(bind_path)
+                resources.append({"source": bind_path, "path": bind_logical})
+                sk_output = output_prefix + ".sk.o"
+                sk_argv = _static_resource_compile_argv(
+                    sk_compile_info,
+                    sk_compile_option_tuple,
+                    architecture,
+                    tiling_key,
+                    sk_symbol,
+                    "${resource:" + sk_wrapper_logical + "}",
+                    "${resource:" + tiling_logical + "}",
+                    "${output:" + sk_output + "}",
+                    ["-D__SUPER_KERNEL_STATIC_BLOCK_NUM__=${context:block_dim}"],
+                )
+                bind_output = output_prefix + ".sk_bind.o"
+                bind_argv = _static_resource_bind_argv(
+                    sk_compile_option_tuple,
+                    "${resource:" + bind_logical + "}",
+                    "${output:" + bind_output + "}",
+                    architecture,
+                )
+                recipes["super_kernel"] = _static_super_kernel_recipe(
+                    normal_recipe=normal_recipe,
+                    normal_relocatable=relocatable_logical,
+                    sk_symbol=sk_symbol,
+                    sk_argv=sk_argv,
+                    bind_argv=bind_argv,
+                    output_prefix=output_prefix,
+                    ascend_home=ascend_home,
+                )
+            kernels.append(
+                {
+                    "kernel_name": runtime_symbol,
+                    "static_inputs": [
+                        {
+                            "name": "tiling_data",
+                            "parameter_index": workspace_idx + 1,
+                            "byte_size": tiling_sizes[symbol],
+                        }
+                    ],
+                    "patches": [
+                        {
+                            "file": tiling_logical,
+                            "token": "@@STATIC_VALUE_tiling_data@@",
+                            "value": "tiling_data",
+                        }
+                    ],
+                    "recipes": recipes,
+                }
+            )
+        if compile_info.tiling_and_dfx_utils_file and os.path.isfile(
+            compile_info.tiling_and_dfx_utils_file
+        ):
+            resources.append(
+                {
+                    "source": compile_info.tiling_and_dfx_utils_file,
+                    "path": "resources/src/"
+                    + os.path.basename(compile_info.tiling_and_dfx_utils_file),
+                }
+            )
+        resources = _deduplicate_static_resources(resources)
+        result = generate_static_compile_resources(
+            output_root=kernel_meta_dir,
+            kernel_base=runtime_kernel_base,
+            resource_id=_static_resource_id(op_info.op_type),
+            resources=resources,
+            kernels=kernels,
+        )
+        CommonUtility.print_compile_log(
+            compile_info.kernel_name,
+            "generated static compile resources: " + result,
+            AscendCLogLevel.LOG_INFO,
+        )
+        return result
+    finally:
+        for generated_path in generated_paths:
+            CommonUtility.remove_temp_file(generated_path)
+
+
 def compile_op_common_part(
     cce_file: str,
     origin_func_name: str,
@@ -1906,6 +2417,14 @@ def compile_op_common_part(
         distinct_tag,
         kernel_meta_dir,
     )
+    static_resource_workspace_idx = workspace_idx
+    static_resource_compile_info = compile_info
+    static_resource_compile_options = compile_option_tuple
+    static_resource_tiling_info = tiling_info
+    dynamic_binary_path = compile_info.dst_file
+    static_resource_sk_compile_info = None
+    static_resource_sk_compile_options = None
+    static_resource_sk_bind_source = None
     # handle compile options
     handle_compile_options(
         compile_info, compile_option_tuple, tiling_info, workspace_idx
@@ -1922,6 +2441,9 @@ def compile_op_common_part(
         get_context().get_addition("super_kernel_sub_combine") is True
         and global_var_storage.get_variable("ascendc_enable_super_kernel") is True
     ):
+        static_resource_tiling_info = copy.deepcopy(tiling_info)
+        static_resource_sk_compile_info = copy.deepcopy(compile_info)
+        static_resource_sk_compile_options = copy.deepcopy(compile_option_tuple)
         # reset sk opt
         global_var_storage.set_variable("ascendc_enable_super_kernel", False)
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
@@ -1947,6 +2469,8 @@ def compile_op_common_part(
         handle_compile_options(
             compile_info_origin, compile_option_tuple_origin, tiling_info, workspace_idx
         )
+        static_resource_compile_info = compile_info_origin
+        static_resource_compile_options = compile_option_tuple_origin
         compile_kernel_and_meta(
             compile_info_origin, op_info, compile_option_tuple_origin, tiling_info
         )
@@ -1955,14 +2479,17 @@ def compile_op_common_part(
         sk_bind_dst_file = compile_sk_bind(
             compile_info, compile_info_origin, compile_option_tuple, kernel_meta_dir
         )
+        static_resource_sk_bind_source = os.path.join(kernel_meta_dir, "sk_bind.cpp")
 
-        # link norm.o and sk.o and sk_bind.o
-        link_sk_norm_combine(
-            compile_info.dst_file,
-            compile_info_origin.dst_file,
-            sk_bind_dst_file,
-            compile_info.compile_log_path,
-        )
+        # Dynamic-shape SK output is a relocatable ELF. Only static-shape SK
+        # output is packed as the archive consumed by link_sk_norm_combine.
+        if tiling_info.static_shape_flag:
+            link_sk_norm_combine(
+                compile_info.dst_file,
+                compile_info_origin.dst_file,
+                sk_bind_dst_file,
+                compile_info.compile_log_path,
+            )
 
         global_var_storage.set_variable("ascendc_enable_super_kernel", True)
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
@@ -1976,6 +2503,26 @@ def compile_op_common_part(
         input_gen_placehoder,
         output_gen_placehoder,
         compile_log_path,
+    )
+    if static_resource_compile_info is not compile_info:
+        static_resource_compile_info.static_compile_tiling_size = (
+            compile_info.static_compile_tiling_size
+        )
+        static_resource_compile_info.max_tiling_size = compile_info.max_tiling_size
+        static_resource_compile_info.static_compile_tiling_key_data_size = copy.deepcopy(
+            compile_info.static_compile_tiling_key_data_size
+        )
+    _emit_static_compile_resources(
+        static_resource_compile_info,
+        op_info,
+        static_resource_tiling_info,
+        static_resource_compile_options,
+        static_resource_workspace_idx,
+        kernel_meta_dir,
+        dynamic_binary_path,
+        static_resource_sk_compile_info,
+        static_resource_sk_compile_options,
+        static_resource_sk_bind_source,
     )
     if not global_var_storage.get_variable("ascendc_compile_debug_config"):
         tiling_info.remove_file()

@@ -253,6 +253,28 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             param_info.dtype_list, param_info.format_list, input_size, output_size
         )
 
+    def _apply_super_kernel_context(self: any, op_node: dict):
+        super_kernel_options = ""
+        for option in sorted(self.op_super_config):
+            if option.startswith("--op_super_kernel_options="):
+                super_kernel_options = option.split("=", 1)[1]
+        op_node["extra_settings"] = [
+            {
+                "key": "super_kernel_sub_info",
+                "value": {
+                    "enable_super_kernel": True,
+                    "super_kernel_options": super_kernel_options,
+                    "super_kernel_sub_loc": "middle",
+                },
+                "type": "addition",
+            },
+            {
+                "key": "super_kernel_sub_combine",
+                "value": True,
+                "type": "addition",
+            },
+        ]
+
     def gen_input_json_with_super_config(self: any, param_file: str):
         with open(param_file, "r") as f:
             data = json.load(f)
@@ -261,6 +283,7 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             for op_node in data["op_list"]:
                 if "bin_filename" in op_node:
                     op_node["bin_filename"] += "_relocatable"
+                    self._apply_super_kernel_context(op_node)
                 else:
                     print(
                         f"[WARNING]The op_node in {param_file} does not have bin_filename field, please check!!!"
@@ -455,6 +478,7 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             if self.op_super_config:
                 bin_file += "_relocatable"
                 op_node["bin_filename"] = bin_file
+                self._apply_super_kernel_context(op_node)
                 param_file = os.path.join(self.out_path, bin_file + "_param.json")
                 param_file = os.path.realpath(param_file)
                 self._write_build_json(param_file, param)

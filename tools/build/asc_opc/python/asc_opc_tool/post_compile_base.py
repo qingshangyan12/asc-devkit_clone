@@ -16,7 +16,9 @@ post_compile
 
 import json
 import os
+import shutil
 import stat
+import tempfile
 
 from shutil import copy as file_copy
 from asc_op_compile_base.common.utils import log as logger
@@ -208,6 +210,30 @@ class PostCompilation:
         finally:
             pass
 
+    @staticmethod
+    def copy_static_compile_resources(json_file_path, output_path):
+        source = os.path.join(os.path.dirname(json_file_path), "static_compile")
+        if not os.path.isdir(source):
+            return
+        destination = os.path.join(output_path, "static_compile")
+        os.makedirs(output_path, exist_ok=True)
+        transaction_dir = tempfile.mkdtemp(prefix=".static_compile.", dir=output_path)
+        staged = os.path.join(transaction_dir, "staged")
+        backup = os.path.join(transaction_dir, "previous")
+        moved_previous = False
+        try:
+            shutil.copytree(source, staged)
+            if os.path.lexists(destination):
+                os.replace(destination, backup)
+                moved_previous = True
+            os.replace(staged, destination)
+        except Exception:
+            if moved_previous and not os.path.lexists(destination):
+                os.replace(backup, destination)
+            raise
+        finally:
+            shutil.rmtree(transaction_dir, ignore_errors=True)
+
     def copy_compile_res_files_to_output(self, json_file_path):
         """
         single build result files(.json and .o files) to output path
@@ -223,6 +249,9 @@ class PostCompilation:
                     "jsonList" not in build_res
                 ):  # traditional pattern with one json file and one object file
                     PostCompilation.copy_one_json_file_with_one_obj_file(
+                        json_file_path, output_path
+                    )
+                    PostCompilation.copy_static_compile_resources(
                         json_file_path, output_path
                     )
                     return
@@ -248,6 +277,9 @@ class PostCompilation:
                     PostCompilation.copy_one_json_file_with_one_obj_file(
                         sub_json_file_path, output_path
                     )
+                PostCompilation.copy_static_compile_resources(
+                    json_file_path, output_path
+                )
         except Exception as e:
             raise RuntimeError(
                 "File [%s] doesn't exist, reason: %s." % (json_file_path, str(e))

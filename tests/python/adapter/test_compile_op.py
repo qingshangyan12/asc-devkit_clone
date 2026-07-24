@@ -10,6 +10,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 import os
+import re
 import sys
 import shutil
 import unittest
@@ -162,6 +163,354 @@ class TestCompileOp(unittest.TestCase):
         compile_op_module.global_var_storage.set_variable(
             "ascendc_tiling_no_register", False
         )
+
+    def test_emit_static_compile_resources_uses_symbol_and_acl_tiling_abi(self):
+        with TemporaryDirectory() as root:
+            binary = os.path.join(root, "Add_x.o")
+            source = os.path.join(root, "add.cpp")
+            wrapper = os.path.join(root, "Add_x_kernel.cpp")
+            tiling_header = os.path.join(root, "Add_x_tiling_data.h")
+            metadata = os.path.join(root, "Add_x.json")
+            for path, content in (
+                (binary, b"dynamic"),
+                (source, b"source"),
+                (wrapper, b"wrapper"),
+            ):
+                with open(path, "wb") as file_obj:
+                    file_obj.write(content)
+            with open(tiling_header, "w", encoding="utf-8") as file_obj:
+                file_obj.write(
+                    "#ifndef T\n#define T\nclass AddTiling {};\n"
+                    "#define GET_TILING_DATA(v, p) InitTilingData<AddTiling>(p, &v)\n#endif\n"
+                )
+            with open(metadata, "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelList": [{"kernelName": "actual_7"}]}, file_obj)
+
+            info = CompileInfo()
+            info.dst_file = binary
+            info.src_file = source
+            info.gen_kernel_func_file = wrapper
+            info.kernel_name = "Add_x"
+            info.origin_func_name = "Add"
+            info.tiling_key_list = ["7"]
+            info.tiling_key_kernel_type = {
+                "7": KernelMetaType.KERNEL_TYPE_AIV_ONLY
+            }
+            info.global_kernel_symbols = []
+            info.static_compile_tiling_size = 64
+            info.static_compile_tiling_key_data_size = {"7": 32}
+            tiling = mock.Mock(
+                static_shape_flag=False,
+                tiling_data_file_path=tiling_header,
+                tiling_key_data_size={},
+                tiling_data_size=0,
+            )
+            options = mock.Mock(
+                compile_options=["-DDTYPE_X=half", "-DFORMAT_X=FORMAT_ND"],
+                mllvm_options=[],
+            )
+            op_info = mock.Mock(op_type="Add")
+            def compile_command(source_path, output_path, static_options, *_args):
+                return ["bisheng", "-c"] + static_options.compile_options + [
+                    source_path, "-o", output_path,
+                ]
+            with mock.patch.object(
+                compile_op_module,
+                "gen_compile_cmd_v220",
+                side_effect=compile_command,
+            ), mock.patch.object(
+                compile_op_module, "generate_static_compile_resources", return_value="ok"
+            ) as generate, mock.patch.object(
+                compile_op_module.CommonUtility, "get_chip_version", return_value="c220"
+            ):
+                self.assertEqual(
+                    compile_op_module._emit_static_compile_resources(
+                        info, op_info, tiling, options, 4, root
+                    ),
+                    "ok",
+                )
+            kernel = generate.call_args.kwargs["kernels"][0]
+            self.assertEqual(
+                set(kernel), {"kernel_name", "static_inputs", "patches", "recipes"}
+            )
+            self.assertEqual(kernel["kernel_name"], "actual_7")
+            self.assertEqual(kernel["static_inputs"][0]["parameter_index"], 5)
+            self.assertEqual(kernel["static_inputs"][0]["byte_size"], 32)
+            normal = kernel["recipes"]["normal"]
+            self.assertEqual(normal["artifact"], "artifacts/actual_7.o")
+            self.assertEqual(len(normal["commands"]), 2)
+            self.assertEqual(
+                normal["commands"][0][0],
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+            )
+            self.assertEqual(normal["commands"][0].count("-DDTYPE_X=half"), 1)
+            self.assertEqual(normal["commands"][0].count("-DFORMAT_X=FORMAT_ND"), 1)
+            self.assertEqual(
+                normal["commands"][1],
+                [
+                    "${env:ASCEND_HOME_PATH}/bin/ld.lld", "-m", "aicorelinux",
+                    "-Ttext=0", "${output:intermediates/actual_7.rel.o}",
+                    "-static", "-o", "${output:artifacts/actual_7.o}", "-q",
+                ],
+            )
+            self.assertEqual(generate.call_args.kwargs["resource_id"], "add")
+            serialized = json.dumps(kernel)
+            for forbidden in ("macros", "build", "static_targets", "actions"):
+                self.assertNotIn(forbidden, serialized)
+
+    def test_emit_static_compile_resources_publishes_fresh_root_closure(self):
+        with TemporaryDirectory() as root:
+            source_root = os.path.join(root, "input")
+            output_root = os.path.join(root, "output")
+            detail_dir = os.path.join(source_root, "detail")
+            os.makedirs(detail_dir)
+            os.makedirs(output_root)
+            binary = os.path.join(source_root, "Add_x.o")
+            source = os.path.join(source_root, "add.cpp")
+            wrapper = os.path.join(source_root, "Add_x_kernel.cpp")
+            tiling_header = os.path.join(source_root, "Add_x_tiling_data.h")
+            metadata = os.path.join(output_root, "Add_x.json")
+            with open(binary, "wb") as file_obj:
+                file_obj.write(b"dynamic")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write('#include "local.h"\n')
+            with open(os.path.join(source_root, "local.h"), "w", encoding="utf-8") as file_obj:
+                file_obj.write('#include "detail/value.h"\n')
+            with open(os.path.join(detail_dir, "value.h"), "w", encoding="utf-8") as file_obj:
+                file_obj.write("constexpr int kValue = 1;\n")
+            with open(wrapper, "w", encoding="utf-8") as file_obj:
+                file_obj.write(f'#include "{source}"\n')
+            with open(tiling_header, "w", encoding="utf-8") as file_obj:
+                file_obj.write(
+                    "#ifndef T\n#define T\nclass AddTiling {};\n"
+                    "#define GET_TILING_DATA(v, p) InitTilingData<AddTiling>(p, &v)\n#endif\n"
+                )
+            with open(metadata, "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelList": [{"kernelName": "actual_7"}]}, file_obj)
+
+            info = CompileInfo()
+            info.dst_file = binary
+            info.src_file = source
+            info.gen_kernel_func_file = wrapper
+            info.kernel_name = "Add_x"
+            info.origin_func_name = "Add"
+            info.tiling_key_list = ["7"]
+            info.tiling_key_kernel_type = {
+                "7": KernelMetaType.KERNEL_TYPE_AIV_ONLY
+            }
+            info.global_kernel_symbols = []
+            info.static_compile_tiling_size = 64
+            info.static_compile_tiling_key_data_size = {"7": 32}
+            tiling = mock.Mock(
+                static_shape_flag=False,
+                tiling_data_file_path=tiling_header,
+                tiling_key_data_size={},
+                tiling_data_size=0,
+            )
+            options = mock.Mock(
+                compile_options=["-DDTYPE_X=half", "-DFORMAT_X=FORMAT_ND"],
+                mllvm_options=[],
+            )
+
+            def compile_command(source_path, output_path, static_options, *_args):
+                return ["bisheng", "-c"] + static_options.compile_options + [
+                    source_path, "-o", output_path,
+                ]
+
+            with mock.patch.object(
+                compile_op_module, "gen_compile_cmd_v220", side_effect=compile_command
+            ), mock.patch.object(
+                compile_op_module.CommonUtility, "get_chip_version", return_value="c220"
+            ):
+                published = compile_op_module._emit_static_compile_resources(
+                    info, mock.Mock(op_type="Add"), tiling, options, 4, output_root
+                )
+
+            shutil.rmtree(source_root)
+            manifest_path = os.path.join(published, "manifest.json")
+            with open(manifest_path, "r", encoding="utf-8") as file_obj:
+                manifest = json.load(file_obj)
+            self.assertEqual(manifest["schema_version"], "4.0")
+            self.assertEqual(manifest["resource_id"], "add")
+            serialized = json.dumps(manifest)
+            self.assertNotIn(source_root, serialized)
+            for logical_path in re.findall(r"\$\{resource:([^}]+)\}", serialized):
+                resource_path = os.path.realpath(os.path.join(published, logical_path))
+                self.assertEqual(os.path.commonpath([published, resource_path]), published)
+                self.assertTrue(os.path.isfile(resource_path), logical_path)
+            for relative_path in ("local.h", "detail/value.h"):
+                self.assertTrue(
+                    os.path.isfile(os.path.join(published, "resources/src", relative_path))
+                )
+            with open(
+                os.path.join(published, "resources/src/Add_x_kernel.cpp"),
+                "r",
+                encoding="utf-8",
+            ) as file_obj:
+                self.assertEqual(file_obj.read(), '#include "add.cpp"\n')
+            with open(
+                os.path.join(published, "resources/include/Add_x_tiling_data.h"),
+                "r",
+                encoding="utf-8",
+            ) as file_obj:
+                self.assertIn("@@STATIC_VALUE_tiling_data@@", file_obj.read())
+
+    def test_emit_static_compile_resources_flattens_self_contained_sk_recipe(self):
+        with TemporaryDirectory() as root:
+            paths = {
+                name: os.path.join(root, name)
+                for name in (
+                    "Add_x_relocatable.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_tiling.h",
+                    "Add_x_relocatable.json", "Add_x_sk_kernel.cpp", "add_sk.cpp", "sk_bind.cpp",
+                )
+            }
+            for name in ("Add_x_relocatable.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_sk_kernel.cpp", "add_sk.cpp"):
+                with open(paths[name], "w", encoding="utf-8") as file_obj:
+                    file_obj.write("source\n")
+            with open(paths["Add_x_tiling.h"], "w", encoding="utf-8") as file_obj:
+                file_obj.write(
+                    "#ifndef T\n#define T\nclass AddTiling {};\n"
+                    "#define GET_TILING_DATA(v, p) InitTilingData<AddTiling>(p, &v)\n#endif\n"
+                )
+            with open(paths["Add_x_relocatable.json"], "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelList": [{"kernelName": "Add_x_relocatable_7"}]}, file_obj)
+            with open(paths["sk_bind.cpp"], "w", encoding="utf-8") as file_obj:
+                file_obj.write("SK_BIND(actual_7, 3, actual_7_sk, x);\n")
+
+            info = CompileInfo()
+            info.dst_file = paths["Add_x_relocatable.o"]
+            info.src_file = paths["add.cpp"]
+            info.gen_kernel_func_file = paths["Add_x_kernel.cpp"]
+            info.kernel_name = "Add_x_relocatable"
+            info.origin_func_name = "Add"
+            info.tiling_key_list = ["7"]
+            info.tiling_key_kernel_type = {"7": KernelMetaType.KERNEL_TYPE_AIV_ONLY}
+            info.global_kernel_symbols = ["Add_x_relocatable_7"]
+            info.global_kernel_attribute = "__aicore__"
+            info.static_compile_tiling_size = 32
+            info.static_compile_tiling_key_data_size = {"7": 32}
+            sk_info = CompileInfo()
+            sk_info.src_file = paths["add.cpp"]
+            sk_info.gen_kernel_func_file = paths["Add_x_sk_kernel.cpp"]
+            sk_info.origin_func_name = "Add"
+            sk_info.global_kernel_symbols = ["actual_7_sk"]
+            tiling = mock.Mock(
+                static_shape_flag=False,
+                tiling_data_file_path=paths["Add_x_tiling.h"],
+                tiling_key_data_size={},
+                tiling_data_size=32,
+            )
+            options = mock.Mock(compile_options=["-DDTYPE_X=half"], mllvm_options=[])
+            sk_options = mock.Mock(compile_options=[], mllvm_options=[])
+
+            def compile_command(source_path, output_path, static_options, *_args):
+                return ["bisheng", "-c"] + static_options.compile_options + [
+                    source_path, "-o", output_path,
+                ]
+
+            with mock.patch.object(
+                compile_op_module, "gen_compile_cmd_v220", side_effect=compile_command
+            ), mock.patch.object(
+                compile_op_module, "generate_static_compile_resources", return_value="ok"
+            ) as generate, mock.patch.object(
+                compile_op_module.CommonUtility, "get_chip_version", return_value="c220"
+            ):
+                compile_op_module._emit_static_compile_resources(
+                    info, mock.Mock(op_type="LeakyReluCustom"), tiling, options, 4, root,
+                    sk_compile_info=sk_info,
+                    sk_compile_option_tuple=sk_options,
+                    sk_bind_source_path=paths["sk_bind.cpp"],
+                )
+
+            kernel = generate.call_args.kwargs["kernels"][0]
+            self.assertEqual(kernel["kernel_name"], "Add_x_7")
+            self.assertEqual(generate.call_args.kwargs["kernel_base"], "Add_x")
+            commands = kernel["recipes"]["super_kernel"]["commands"]
+            self.assertEqual(commands[:2], kernel["recipes"]["normal"]["commands"])
+            self.assertEqual(
+                [command[0] for command in commands[2:]],
+                [
+                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                    "${env:ASCEND_HOME_PATH}/bin/llvm-ar",
+                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                    "${env:ASCEND_HOME_PATH}/bin/ld.lld",
+                    "${env:ASCEND_HOME_PATH}/bin/ld.lld",
+                ],
+            )
+            self.assertIn("${context:block_dim}", json.dumps(commands))
+            self.assertNotIn("${launch.block_dim}", json.dumps(commands))
+            self.assertEqual(
+                kernel["recipes"]["super_kernel"]["artifact"],
+                "artifacts/Add_x_7.static_with_sk.o",
+            )
+            self.assertNotIn("_relocatable", json.dumps(kernel))
+            self.assertEqual(generate.call_args.kwargs["resource_id"], "leaky_relu_custom")
+            resource_paths = [
+                resource["path"] for resource in generate.call_args.kwargs["resources"]
+            ]
+            self.assertEqual(len(resource_paths), len(set(resource_paths)))
+
+    def test_static_resource_bind_argv_uses_c310_architecture(self):
+        options = mock.Mock(compile_options=["-DORIGINAL=1"])
+        argv = compile_op_module._static_resource_bind_argv(
+            options, "bind.cpp", "bind.o", "dav-c310-vec"
+        )
+        self.assertIn("--cce-aicore-arch=dav-c310-cube", argv)
+        self.assertIn("-D__DAV_C310__", argv)
+
+    def test_emit_static_compile_resources_rejects_missing_required_files(self):
+        info = CompileInfo()
+        info.kernel_name = "Missing_x"
+        info.dst_file = "/missing/dynamic.o"
+        info.src_file = "/missing/source.cpp"
+        info.gen_kernel_func_file = "/missing/wrapper.cpp"
+        tiling = mock.Mock(
+            static_shape_flag=False,
+            tiling_data_file_path="/missing/tiling.h",
+        )
+        with self.assertRaises(FileNotFoundError):
+            compile_op_module._emit_static_compile_resources(
+                info,
+                mock.Mock(op_type="Missing"),
+                tiling,
+                mock.Mock(compile_options=[], mllvm_options=[]),
+                4,
+                "/missing",
+            )
+
+    def test_emit_static_compile_resources_rejects_unknown_tiling_size(self):
+        with TemporaryDirectory() as root:
+            info = CompileInfo()
+            info.kernel_name = "UnknownSize_x"
+            info.dst_file = os.path.join(root, "UnknownSize_x.o")
+            info.src_file = os.path.join(root, "source.cpp")
+            info.gen_kernel_func_file = os.path.join(root, "wrapper.cpp")
+            info.global_kernel_symbols = ["unknown_size"]
+            info.static_compile_tiling_size = 0
+            info.max_tiling_size = 0
+            tiling_path = os.path.join(root, "tiling.h")
+            for path in (info.dst_file, info.src_file, info.gen_kernel_func_file, tiling_path):
+                with open(path, "w", encoding="utf-8") as file_obj:
+                    file_obj.write("content")
+            with open(os.path.join(root, "UnknownSize_x.json"), "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelName": "unknown_size"}, file_obj)
+            tiling = mock.Mock(
+                static_shape_flag=False,
+                tiling_data_file_path=tiling_path,
+                tiling_data_size=0,
+            )
+            with self.assertRaises(ValueError):
+                compile_op_module._emit_static_compile_resources(
+                    info,
+                    mock.Mock(op_type="UnknownSize"),
+                    tiling,
+                    mock.Mock(compile_options=[], mllvm_options=[]),
+                    4,
+                    root,
+                )
 
     def test_decode_mode(self):
         mode1 = decode_mode(10)
