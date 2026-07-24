@@ -21,11 +21,12 @@ case_build() {
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'make -j')
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py')
+    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'msopprof simulator --soc-version=<soc_version> ./demo')
 }
 
 case_run() {
     mkdir -p "$BUILD_DIR"
-    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'msopprof simulator --soc-version=<soc_version> ./demo')
+    :
 }
 
 case_verify() {
