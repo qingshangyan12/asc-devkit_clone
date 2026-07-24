@@ -137,7 +137,7 @@ target("xmake_add")
   xmake run xmake_add
   ```
 
-  各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)查询。本样例当前支持`dav-2201`（Atlas A2/A3系列产品）。
+  各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)查询。本样例当前支持`dav-2201`（Atlas A2/A3系列产品）。
 
 - 编译选项说明
 

@@ -137,7 +137,7 @@ Run the following steps in the root directory of this example to build and run t
   xmake run xmake_add
   ```
 
-  For the mapping between product models and architecture versions, see the [architecture mapping table](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114). This example currently supports `dav-2201` (Atlas A2/A3 series products).
+  For the mapping between product models and architecture versions, see the [architecture mapping table](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch). This example currently supports `dav-2201` (Atlas A2/A3 series products).
 
 - Build option description
 
