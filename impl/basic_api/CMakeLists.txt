@@ -84,6 +84,7 @@ install(CODE "file(CREATE_LINK ../simt_api \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX
 install(CODE "file(CREATE_LINK ../../utils/debug \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/debug SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../utils/common_types.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/common_types.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../../utils/base/sys_constants.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/base/sys_constants.h SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../../../utils/base/sys_enums.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/base/sys_enums.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../../utils/base/sys_macros.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/base/sys_macros.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/core_mng \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/core_mng SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_common.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_common.h SYMBOLIC)" COMPONENT asc-devkit)
