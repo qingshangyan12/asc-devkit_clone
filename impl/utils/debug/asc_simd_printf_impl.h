@@ -189,17 +189,32 @@ __simd_callee__ inline void scalar_printf_impl(DumpType debug_type, __ubuf__ con
 
     uint32_t args_num = 0;
     const uint32_t tlv_len = get_print_tlv_len_simd(args_num, fmt, args...);
+    uint32_t write_len = block_info->writeLen;
+
+    if (tlv_len > block_info->length || write_len > block_info->length) {
+        block_info->flag = 1;
+        return;
+    }
+
+    if (write_len + tlv_len > block_info->length) {
+        wait_vf_debug_buffer_drained(block_info);
+        block_info->writeLen = 0;
+        block_info->readLen = 0;
+        block_info->pidx = 0;
+        write_len = 0;
+    }
+
     if (!reserve_debug_tlv(block_info, tlv_len)) {
         return;
     }
 
     __ubuf__ PrintTlv* print_tlv =
-        reinterpret_cast<__ubuf__ PrintTlv*>((__ubuf__ uint8_t*)(block_info->buffer) + block_info->writeLen);
+        reinterpret_cast<__ubuf__ PrintTlv*>((__ubuf__ uint8_t*)(block_info->buffer) + write_len);
     set_print_tlv_info_vf(debug_type, print_tlv, tlv_len, args_num, block_info->blockIdx);
     set_print_tlv_data_vf(print_tlv, fmt, args...);
 
     block_info->magic = ASCENDC_SIMD_VF_MAGIC_NUMBER;
-    block_info->writeLen += tlv_len;
+    block_info->writeLen = write_len + tlv_len;
     block_info->pidx += 1;
 }
 
