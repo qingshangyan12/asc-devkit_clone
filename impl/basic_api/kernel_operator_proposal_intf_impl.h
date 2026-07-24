@@ -424,7 +424,7 @@ __aicore__ inline void MrgSort(
     uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
 {
     using PrimType = PrimT<T>;
-#if (__NPU_ARCH__ != 5102)
+#if (__NPU_ARCH__ != 5102 && __NPU_ARCH__ != 5162)
     if ASCEND_IS_AIC {
         return;
     }

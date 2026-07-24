@@ -422,7 +422,7 @@ __aicore__ static inline void CheckLoadDataWithTranspose(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const __gm__ char* apiName)
 {
 // dav_c310 + dav_m510 + dav_m310 not support A1 -> A2
-#if __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102 && __NPU_ARCH__ != 3102
+#if __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102 && __NPU_ARCH__ != 5162 && __NPU_ARCH__ != 3102
     CheckTensorPhyPosition<Hardware::L1>(src, "src", "A1 / B1", apiName);
     CheckTensorPhyPosition<Hardware::L0A, Hardware::L0B>(dst, "dst", "A2 / B2", apiName);
     if ((TPosition)dst.GetPosition() == TPosition::A2) {

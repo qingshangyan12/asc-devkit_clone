@@ -466,12 +466,10 @@ __aicore__ inline void SetAippFunctionsImpl9(AippInputFormat format, AippParams<
     set_aipp_spr_9(aippConfig9);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
 template <typename T>
 __aicore__ inline void SetAippFunctionsImpl18(AippParams<T>& config)
 {
-#if __NPU_ARCH__ != 3002 && (__NPU_ARCH__ != 5102)
-    return;
-#endif
     float dtcVarCh0f = static_cast<float>(config.dtcParams.dtcVarCh0);
     float dtcVarCh1f = static_cast<float>(config.dtcParams.dtcVarCh1);
     uint32_t dtcVarCh0 = GetScalarBitcodeValue(dtcVarCh0f);
@@ -486,9 +484,6 @@ __aicore__ inline void SetAippFunctionsImpl18(AippParams<T>& config)
 template <typename T>
 __aicore__ inline void SetAippFunctionsImpl19(AippParams<T>& config)
 {
-#if __NPU_ARCH__ != 3002 && (__NPU_ARCH__ != 5102)
-    return;
-#endif
     float dtcVarCh2f = static_cast<float>(config.dtcParams.dtcVarCh2);
     uint32_t dtcVarCh2 = GetScalarBitcodeValue(dtcVarCh2f);
     uint64_t aippConfig19 = static_cast<uint64_t>(dtcVarCh2);
@@ -498,9 +493,6 @@ __aicore__ inline void SetAippFunctionsImpl19(AippParams<T>& config)
 template <typename T>
 __aicore__ inline void SetAippFunctionsImpl20(AippParams<T>& config)
 {
-#if __NPU_ARCH__ != 3002 && (__NPU_ARCH__ != 5102)
-    return;
-#endif
     float dtcMeanCh0f = static_cast<float>(config.dtcParams.dtcMeanCh0 * 1.0f);
     float dtcMeanCh1f = static_cast<float>(config.dtcParams.dtcMeanCh1 * 1.0f);
 
@@ -516,14 +508,12 @@ __aicore__ inline void SetAippFunctionsImpl20(AippParams<T>& config)
 template <typename T>
 __aicore__ inline void SetAippFunctionsImpl21(AippParams<T>& config)
 {
-#if __NPU_ARCH__ != 3002 && (__NPU_ARCH__ != 5102)
-    return;
-#endif
     float dtcMeanCh2f = static_cast<float>(config.dtcParams.dtcMeanCh2 * 1.0f);
     uint32_t dtcMeanCh2 = GetScalarBitcodeValue(dtcMeanCh2f);
     uint64_t aippConfig21 = static_cast<uint64_t>(dtcMeanCh2);
     set_aipp_spr_21(aippConfig21);
 }
+#endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T>

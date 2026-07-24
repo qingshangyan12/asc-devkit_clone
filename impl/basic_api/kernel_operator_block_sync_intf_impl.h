@@ -141,7 +141,7 @@ __aicore__ inline void IBSet(
 {
     int32_t blockNum = GetBlockNum();
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-#if (__NPU_ARCH__ != 5102)
+#if (__NPU_ARCH__ != 5102 && __NPU_ARCH__ != 5162)
     if ASCEND_IS_AIC {
         return;
     }
@@ -183,7 +183,7 @@ __aicore__ inline void IBWait(
 {
     int32_t blockNum = GetBlockNum();
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-#if (__NPU_ARCH__ != 5102)
+#if (__NPU_ARCH__ != 5102 && __NPU_ARCH__ != 5162)
     if ASCEND_IS_AIC {
         return;
     }

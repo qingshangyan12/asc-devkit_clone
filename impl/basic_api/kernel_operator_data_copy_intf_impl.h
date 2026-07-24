@@ -1408,7 +1408,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         dst, src, dataCopyParams, "DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams");
 #endif
 #endif
-#if (__NPU_ARCH__ != 5102)
+#if (__NPU_ARCH__ != 5102 && __NPU_ARCH__ != 5162)
     if ASCEND_IS_AIC {
         return;
     }
@@ -1674,7 +1674,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     MstxTensor::GetMstxDataCopyPadInfo(dst, src, dataCopyParams, "DataCopyPad");
 #endif
     using PrimType = PrimT<T>;
-#if (__NPU_ARCH__ != 5102)
+#if (__NPU_ARCH__ != 5102 && __NPU_ARCH__ != 5162)
     if ASCEND_IS_AIC {
         return;
     }
@@ -1785,7 +1785,7 @@ __aicore__ inline void DataCopy(
 #ifdef ASCENDC_TIME_STAMP_ON
     PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
 #endif
-#if (__NPU_ARCH__ != 5102)
+#if (__NPU_ARCH__ != 5102 && __NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
     }
