@@ -12,11 +12,12 @@
 #include "ins_temp_reduce_scatter_mesh_1D.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "alg_data_trans_wrapper.h"
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-#include "ccu_temp_reduce_scatter_nhr_1D_mem2mem.h"
-#include "ccu_temp_reduce_scatter_mesh_1D_mem2mem.h"
-#include "ccu_temp_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
-#endif
+// CCU legacy templates are disabled in this executor.
+// #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+// #include "ccu_temp_reduce_scatter_nhr_1D_mem2mem.h"
+// #include "ccu_temp_reduce_scatter_mesh_1D_mem2mem.h"
+// #include "ccu_temp_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
+// #endif
 
 namespace mc2_ops_hccl {
 
@@ -39,6 +40,9 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
+    CHK_PRT_RET(
+        param.engine == COMM_ENGINE_CCU,
+        HCCL_ERROR("[InsReduceScatterParallelExecutor][CalcRes] CCU path is disabled."), HCCL_E_NOT_SUPPORT);
     // 构建template
     std::vector<std::vector<u32>> temp0HierarchyInfo;
     std::vector<std::vector<u32>> temp1HierarchyInfo;
@@ -79,26 +83,23 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     resourceRequest.notifyNumPerThread.insert(
         resourceRequest.notifyNumPerThread.end(), interTempRequest.notifyNumPerThread.begin(),
         interTempRequest.notifyNumPerThread.end());
-    if (param.engine != COMM_ENGINE_CCU) {
-        resourceRequest.channels.emplace_back(intraTempRequest.channels[0]);
-        resourceRequest.channels.emplace_back(interTempRequest.channels[0]);
-    } else {
-        // ccu
-        HCCL_INFO(
-            "[InsReduceScatterParallelExecutor][CalcRes] intraTemplate has [%d] kernels.",
-            intraTempRequest.ccuKernelNum[0]);
-        resourceRequest.ccuKernelInfos.insert(
-            resourceRequest.ccuKernelInfos.end(), intraTempRequest.ccuKernelInfos.begin(),
-            intraTempRequest.ccuKernelInfos.end());
-        resourceRequest.ccuKernelNum.emplace_back(intraTempRequest.ccuKernelNum[0]);
-        HCCL_INFO(
-            "[InsReduceScatterParallelExecutor][CalcRes] interTemplate has [%d] kernels.",
-            interTempRequest.ccuKernelNum[0]);
-        resourceRequest.ccuKernelInfos.insert(
-            resourceRequest.ccuKernelInfos.end(), interTempRequest.ccuKernelInfos.begin(),
-            interTempRequest.ccuKernelInfos.end());
-        resourceRequest.ccuKernelNum.emplace_back(interTempRequest.ccuKernelNum[0]);
-    }
+    resourceRequest.channels.emplace_back(intraTempRequest.channels[0]);
+    resourceRequest.channels.emplace_back(interTempRequest.channels[0]);
+    // CCU resource collection is disabled in this executor.
+    // HCCL_INFO(
+    //     "[InsReduceScatterParallelExecutor][CalcRes] intraTemplate has [%d] kernels.",
+    //     intraTempRequest.ccuKernelNum[0]);
+    // resourceRequest.ccuKernelInfos.insert(
+    //     resourceRequest.ccuKernelInfos.end(), intraTempRequest.ccuKernelInfos.begin(),
+    //     intraTempRequest.ccuKernelInfos.end());
+    // resourceRequest.ccuKernelNum.emplace_back(intraTempRequest.ccuKernelNum[0]);
+    // HCCL_INFO(
+    //     "[InsReduceScatterParallelExecutor][CalcRes] interTemplate has [%d] kernels.",
+    //     interTempRequest.ccuKernelNum[0]);
+    // resourceRequest.ccuKernelInfos.insert(
+    //     resourceRequest.ccuKernelInfos.end(), interTempRequest.ccuKernelInfos.begin(),
+    //     interTempRequest.ccuKernelInfos.end());
+    // resourceRequest.ccuKernelNum.emplace_back(interTempRequest.ccuKernelNum[0]);
 
     return HCCL_SUCCESS;
 }
@@ -274,7 +275,10 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     maxTmpMemSize_ = resCtx.cclMem.size;
     // 给channels_和threads_赋值
     threads_ = resCtx.threads;
-    if (param.engine != CommEngine::COMM_ENGINE_AIV && param.engine != CommEngine::COMM_ENGINE_CCU) {
+    CHK_PRT_RET(
+        param.engine == CommEngine::COMM_ENGINE_CCU,
+        HCCL_ERROR("[InsReduceScatterParallelExecutor][Orchestrate] CCU path is disabled."), HCCL_E_NOT_SUPPORT);
+    if (param.engine != CommEngine::COMM_ENGINE_AIV) {
         CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
         intraChannelMap_ = remoteRankToChannelInfo_[0];
         interChannelMap_ = remoteRankToChannelInfo_[1];
@@ -287,7 +291,7 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
     std::vector<std::vector<u32>> temp0HierarchyInfo;
     std::vector<std::vector<u32>> temp1HierarchyInfo;
-    if (resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS) {
+    if (resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !resCtx.topoInfo.level0PcieMix) {
         temp0HierarchyInfo = {resCtx.algHierarchyInfo.infos[0][0]};
         std::vector<u32> closRanks;
         u32 meshSize = resCtx.algHierarchyInfo.infos[0][0].size();
@@ -376,17 +380,20 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
     TemplateResource templateAlgResIntra;
     TemplateResource templateAlgResInter;
-    if (param.engine == COMM_ENGINE_CCU) {
-        templateAlgResIntra.ccuKernels.insert(
-            templateAlgResIntra.ccuKernels.end(), resCtx.ccuKernels.begin(),
-            resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0]);
-        templateAlgResInter.ccuKernels.insert(
-            templateAlgResInter.ccuKernels.end(), resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0],
-            resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0] + resCtx.ccuKernelNum[1]);
-    } else {
-        templateAlgResIntra.channels = intraChannelMap_;
-        templateAlgResInter.channels = interChannelMap_;
-    }
+    templateAlgResIntra.channels = intraChannelMap_;
+    templateAlgResInter.channels = interChannelMap_;
+    // CCU kernel resource split is disabled in this executor.
+    // if (param.engine == COMM_ENGINE_CCU) {
+    //     templateAlgResIntra.ccuKernels.insert(
+    //         templateAlgResIntra.ccuKernels.end(), resCtx.ccuKernels.begin(),
+    //         resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0]);
+    //     templateAlgResInter.ccuKernels.insert(
+    //         templateAlgResInter.ccuKernels.end(), resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0],
+    //         resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0] + resCtx.ccuKernelNum[1]);
+    // } else {
+    //     templateAlgResIntra.channels = intraChannelMap_;
+    //     templateAlgResInter.channels = interChannelMap_;
+    // }
     templateAlgResIntra.threads = intraThreads_;
     templateAlgResInter.threads = interThreads_;
     for (u32 loopIndex = 0; loopIndex < loopTimes; loopIndex++) {
@@ -411,12 +418,13 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
         // 第一步做完后回到主流做尾同步
         CHK_RET(PostSyncInterThreads(controlThread_, templateMainThreads_, notifyIdxTemplatesToControl_));
 
-#ifndef AICPU_COMPILE
-        if (loopTimes == 1 && param.engine == CommEngine::COMM_ENGINE_CCU) {
-            ccuKernelLaunchNumIntra0_ = templateAlgResIntra.submitInfos.size();
-            ccuKernelLaunchNumInter1_ = templateAlgResInter.submitInfos.size();
-        }
-#endif
+        // CCU fast-launch bookkeeping is disabled in this executor.
+        // #ifndef AICPU_COMPILE
+        // if (loopTimes == 1 && param.engine == CommEngine::COMM_ENGINE_CCU) {
+        //     ccuKernelLaunchNumIntra0_ = templateAlgResIntra.submitInfos.size();
+        //     ccuKernelLaunchNumInter1_ = templateAlgResInter.submitInfos.size();
+        // }
+        // #endif
 
         // 第二步开始前同步
         CHK_RET(PreSyncInterThreads(controlThread_, templateMainThreads_, notifyIdxControlToTemplates_));
@@ -432,11 +440,12 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
         CHK_RET(PostSyncInterThreads(controlThread_, templateMainThreads_, notifyIdxTemplatesToControl_));
     }
 
-#ifndef AICPU_COMPILE
-    if (loopTimes == 1 && param.engine == CommEngine::COMM_ENGINE_CCU) {
-        CHK_RET(FastLaunchSaveCtx(param, templateAlgResIntra, templateAlgResInter));
-    }
-#endif
+    // CCU fast-launch context saving is disabled in this executor.
+    // #ifndef AICPU_COMPILE
+    // if (loopTimes == 1 && param.engine == CommEngine::COMM_ENGINE_CCU) {
+    //     CHK_RET(FastLaunchSaveCtx(param, templateAlgResIntra, templateAlgResInter));
+    // }
+    // #endif
 
     HCCL_INFO("[InsReduceScatterParallelExecutor][OrchestrateLoop] End.");
     return HcclResult::HCCL_SUCCESS;
@@ -447,123 +456,21 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::FastLaunchSaveCtx(
     const OpParam& param, const TemplateResource& templateAlgResIntra, const TemplateResource& templateAlgResInter)
 {
-    HCCL_INFO("[InsReduceScatterParallelExecutor] loopTimes==1, save fast launch ctx.");
-    ccuKernelLaunchNumIntra1_ = templateAlgResIntra.submitInfos.size() - ccuKernelLaunchNumIntra0_;
-    ccuKernelLaunchNumInter0_ = templateAlgResInter.submitInfos.size() - ccuKernelLaunchNumInter1_;
-    u32 threadNum = threads_.size();
-    u32 ccuKernelNum =
-        ccuKernelLaunchNumIntra1_ + ccuKernelLaunchNumInter0_ + ccuKernelLaunchNumIntra0_ + ccuKernelLaunchNumInter1_;
-    if (ccuKernelNum < 1) {
-        HCCL_INFO("[InsReduceScatterParallelExecutor] ccu kernel num is 0, no need to save.");
-        return HCCL_SUCCESS;
-    }
-    HCCL_INFO(
-        "[InsReduceScatterParallelExecutor][HcclEngineCtxCreate] threadNum[%llu], ccuKernelNum[%llu]", threadNum,
-        ccuKernelNum);
-
-    u64 size = CcuFastLaunchCtx::GetCtxSize(threadNum, ccuKernelNum);
-    // 申请ctx
-    void* ctxPtr = nullptr;
-    HCCL_INFO("[InsReduceScatterParallelExecutor][HcclEngineCtxCreate] Tag[%s], size[%llu]", param.fastLaunchTag, size);
-    CHK_RET(HcclEngineCtxCreate(param.hcclComm, param.fastLaunchTag, CommEngine::COMM_ENGINE_CCU, size, &ctxPtr));
-
-    CcuFastLaunchCtx* ccuFastLaunchCtx = reinterpret_cast<CcuFastLaunchCtx*>(ctxPtr);
-    // 1 算法名
-    CHK_SAFETY_FUNC_RET(strcpy_s(ccuFastLaunchCtx->algName, sizeof(ccuFastLaunchCtx->algName), param.algName));
-    HCCL_INFO("[InsReduceScatterParallelExecutor][FastLaunchSaveCtx] algName[%s]", ccuFastLaunchCtx->algName);
-
-    // 2 thread
-    ccuFastLaunchCtx->threadNum = threadNum;
-    ThreadHandle* threads = ccuFastLaunchCtx->GetThreadHandlePtr();
-    for (u32 i = 0; i < threadNum; i++) {
-        threads[i] = threads_[i];
-    }
-
-    // 3 ccu kernel handle, taskArg入参
-    u32 templateIdx = 0;
-    ccuFastLaunchCtx->ccuKernelNum[templateIdx++] = ccuKernelLaunchNumIntra0_;
-    ccuFastLaunchCtx->ccuKernelNum[templateIdx++] = ccuKernelLaunchNumInter1_;
-    ccuFastLaunchCtx->ccuKernelNum[templateIdx++] = ccuKernelLaunchNumInter0_;
-    ccuFastLaunchCtx->ccuKernelNum[templateIdx++] = ccuKernelLaunchNumIntra1_;
-    CcuKernelSubmitInfo* kernelSubmitInfos = ccuFastLaunchCtx->GetCcuKernelSubmitInfoPtr();
-
-    for (u32 i = 0; i < threadNum; i++) {
-        threads[i] = threads_[i];
-    }
-    u32 kernelIdx = 0;
-    for (u32 i = 0; i < ccuKernelLaunchNumIntra0_; i++) {
-        kernelSubmitInfos[kernelIdx++] = templateAlgResIntra.submitInfos[i];
-    }
-    for (u32 i = 0; i < ccuKernelLaunchNumInter1_; i++) {
-        kernelSubmitInfos[kernelIdx++] = templateAlgResInter.submitInfos[i];
-    }
-    for (u32 i = ccuKernelLaunchNumInter1_; i < ccuKernelLaunchNumInter0_ + ccuKernelLaunchNumInter1_; i++) {
-        kernelSubmitInfos[kernelIdx++] = templateAlgResInter.submitInfos[i];
-    }
-    for (u32 i = ccuKernelLaunchNumIntra0_; i < ccuKernelLaunchNumIntra1_ + ccuKernelLaunchNumIntra0_; i++) {
-        kernelSubmitInfos[kernelIdx++] = templateAlgResIntra.submitInfos[i];
-    }
-    return HCCL_SUCCESS;
+    (void)param;
+    (void)templateAlgResIntra;
+    (void)templateAlgResInter;
+    HCCL_ERROR("[InsReduceScatterParallelExecutor][FastLaunchSaveCtx] CCU path is disabled.");
+    return HCCL_E_NOT_SUPPORT;
 }
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::FastLaunch(
     const OpParam& param, const CcuFastLaunchCtx* ctx)
 {
-    InsAlgTemplate0 intraTempAlg{};
-    InsAlgTemplate1 interTempAlg{};
-
-    TemplateFastLaunchCtx tempFastLaunchCtxIntra0, tempFastLaunchCtxInter0;
-    TemplateFastLaunchCtx tempFastLaunchCtxInter1, tempFastLaunchCtxIntra1;
-
-    TemplateResource templateAlgResIntra, templateAlgResInter;
-    ThreadHandle* threads = ctx->GetThreadHandlePtr();
-    threads_.assign(threads, threads + ctx->threadNum);
-    PrepareResForTemplate(intraTempAlg, interTempAlg);
-
-    CcuKernelSubmitInfo* ccuKernelSubmitInfos = ctx->GetCcuKernelSubmitInfoPtr();
-
-    // 第一步开始前同步
-    HCCL_INFO("[InsReduceScatterParallelExecutor][FastLaunch] Intra0 ccuKernelNum[%llu]", ctx->ccuKernelNum[0]);
-    CHK_RET(PreSyncInterThreads(controlThread_, templateMainThreads_, notifyIdxControlToTemplates_));
-    // 数据0的server内的mesh算法
-    CHK_RET(SetTempFastLaunchAddr(tempFastLaunchCtxIntra0, param.inputPtr, param.hcclBuff.addr, param.hcclBuff));
-    tempFastLaunchCtxIntra0.threads = intraThreads_;
-    tempFastLaunchCtxIntra0.ccuKernelSubmitInfos.assign(
-        ccuKernelSubmitInfos, ccuKernelSubmitInfos + ctx->ccuKernelNum[0]);
-    ccuKernelSubmitInfos += ctx->ccuKernelNum[0];
-    // 把每个template需要的queue传进去，比如stars的mesh要传多条queue
-    CHK_RET(intraTempAlg.FastLaunch(param, tempFastLaunchCtxIntra0));
-    // 数据1的server间的nhr算法
-    CHK_RET(SetTempFastLaunchAddr(tempFastLaunchCtxInter1, param.inputPtr, param.hcclBuff.addr, param.hcclBuff));
-    tempFastLaunchCtxInter1.threads = interThreads_;
-    tempFastLaunchCtxInter1.ccuKernelSubmitInfos.assign(
-        ccuKernelSubmitInfos, ccuKernelSubmitInfos + ctx->ccuKernelNum[1]);
-    ccuKernelSubmitInfos += ctx->ccuKernelNum[1];
-    CHK_RET(interTempAlg.FastLaunch(param, tempFastLaunchCtxInter1));
-    // 第一步做完后回到主流做尾同步
-    CHK_RET(PostSyncInterThreads(controlThread_, templateMainThreads_, notifyIdxTemplatesToControl_));
-
-    // 第二步开始前同步
-    CHK_RET(PreSyncInterThreads(controlThread_, templateMainThreads_, notifyIdxControlToTemplates_));
-    // 数据0的server间的nhr算法
-    CHK_RET(SetTempFastLaunchAddr(tempFastLaunchCtxInter0, param.hcclBuff.addr, param.outputPtr, param.hcclBuff));
-    tempFastLaunchCtxInter0.threads = interThreads_;
-    tempFastLaunchCtxInter0.ccuKernelSubmitInfos.assign(
-        ccuKernelSubmitInfos, ccuKernelSubmitInfos + ctx->ccuKernelNum[2]);
-    ccuKernelSubmitInfos += ctx->ccuKernelNum[2];
-    CHK_RET(interTempAlg.FastLaunch(param, tempFastLaunchCtxInter0));
-    // 数据1的server内的mesh算法
-    CHK_RET(SetTempFastLaunchAddr(tempFastLaunchCtxIntra1, param.hcclBuff.addr, param.outputPtr, param.hcclBuff));
-    tempFastLaunchCtxIntra1.threads = intraThreads_;
-    tempFastLaunchCtxIntra1.ccuKernelSubmitInfos.assign(
-        ccuKernelSubmitInfos, ccuKernelSubmitInfos + ctx->ccuKernelNum[3]);
-    CHK_RET(intraTempAlg.FastLaunch(param, tempFastLaunchCtxIntra1));
-    // 尾同步
-    CHK_RET(PostSyncInterThreads(controlThread_, templateMainThreads_, notifyIdxTemplatesToControl_));
-
-    HCCL_INFO("[InsReduceScatterParallelExecutor][FastLaunch] End.");
-    return HCCL_SUCCESS;
+    (void)param;
+    (void)ctx;
+    HCCL_ERROR("[InsReduceScatterParallelExecutor][FastLaunch] CCU path is disabled.");
+    return HCCL_E_NOT_SUPPORT;
 }
 #endif
 
@@ -588,12 +495,14 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterParallelMesh1DNHRPcie, InsReduceScatterParallelExecutor,
     TopoMatchPcieMix, InsTempReduceScatterMesh1D, InsTempReduceScatterNHR);
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-REGISTER_EXECUTOR_BY_TWO_TEMPS(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterParallelMesh1DNHR, InsReduceScatterParallelExecutor,
-    TopoMatchMultilevel, CcuTempReduceScatterMesh1DMem2Mem, CcuTempReduceScatterNHR1DMem2Mem);
-REGISTER_EXECUTOR_BY_TWO_TEMPS(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterParallelMesh1DNHRMultiJetty, InsReduceScatterParallelExecutor,
-    TopoMatchUBX, CcuTempReduceScatterMesh1DMem2Mem, CcuTempReduceScatterNhrMultiJettyMem2Mem1D);
-#endif
+// CCU executor registrations are disabled in this executor.
+// #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+// REGISTER_EXECUTOR_BY_TWO_TEMPS(
+//     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterParallelMesh1DNHR, InsReduceScatterParallelExecutor,
+//     TopoMatchMultilevel, CcuTempReduceScatterMesh1DMem2Mem, CcuTempReduceScatterNHR1DMem2Mem);
+// REGISTER_EXECUTOR_BY_TWO_TEMPS(
+//     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterParallelMesh1DNHRMultiJetty,
+//     InsReduceScatterParallelExecutor, TopoMatchUBX, CcuTempReduceScatterMesh1DMem2Mem,
+//     CcuTempReduceScatterNhrMultiJettyMem2Mem1D);
+// #endif
 } // namespace mc2_ops_hccl
