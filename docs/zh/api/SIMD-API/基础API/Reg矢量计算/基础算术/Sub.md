@@ -30,13 +30,13 @@
 
 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求差操作，将结果写入目的操作数dstReg。
 
-计算结果不保留借位计算公式如下：
+计算结果不保留carry，计算公式如下：
 
 $$dstReg_i = srcReg0_i - srcReg1_i$$
 
-同时可以在carry（MaskReg寄存器）中标记每次减法是否产生借位，若srcReg0，srcReg1输入按位相减最高位有借位，在MaskReg carry中对应位置每4bit的最低位写0，否则写1。
+同时可以在carry（MaskReg寄存器）中标记每次减法是否产生借位，减法运算在硬件底层通过补码加法实现，若srcReg0，~srcReg1，33'b1，按位相加后最高位有进位，在carry中对应位置每4bit设置1，否则写0。
 
-计算结果保留借位计算公式如下：
+计算结果保留carry，计算公式如下：
 
 $$\{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, ~srcReg1_i\} + 33'b1$$
 
@@ -46,14 +46,14 @@ $$\{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, ~srcReg1_i\} + 33'b1$$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
--   计算结果不保留借位
+-   计算结果不保留carry
 
     ```cpp
     template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
     __simd_callee__ inline void Sub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
     ```
 
--   计算结果保留借位
+-   计算结果保留carry
 
     ```cpp
     template <typename T = DefaultType, typename U>
@@ -78,13 +78,13 @@ $$\{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, ~srcReg1_i\} + 33'b1$$
 | srcReg0 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg1 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
-| carry | 输出 | 目的操作数。输出借位值。类型为[MaskReg](../寄存器数据类型/MaskReg.md)。 |
+| carry | 输出 | 目的操作数。输出进位值。类型为[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 数据类型
 
 目的操作数与源操作数的数据类型需要保持一致。
-- 计算结果不保留借位时，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。
-- 计算结果保留借位时，支持的数据类型为：int32_t、uint32_t。
+- 计算结果不保留carry时，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。
+- 计算结果保留carry时，支持的数据类型为：int32_t、uint32_t。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -96,7 +96,7 @@ $$\{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, ~srcReg1_i\} + 33'b1$$
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-- 计算结果不保留借位
+- 计算结果不保留carry
 
     ```cpp
     template<typename T>
@@ -116,7 +116,7 @@ $$\{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, ~srcReg1_i\} + 33'b1$$
     }
     ```
 
-- 计算结果保留借位
+- 计算结果保留carry
 
     ```cpp
     template <typename T>

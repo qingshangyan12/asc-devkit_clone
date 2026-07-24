@@ -28,7 +28,7 @@
 
 头文件路径：`"basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"`。
 
-该接口根据mask，对源操作数srcReg0、srcReg1及输入借位carrySrc进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dstReg，同时将每个元素的进位结果写入carry。计算公式如下：
+该接口根据mask，对源操作数srcReg0、srcReg1及输入进位carrySrc进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dstReg，同时将每个元素的进位结果写入carry。计算公式如下：
 
 $$\{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, ~srcReg1_i\} + \{32'b0,carrySrc_i\}$$
 
@@ -64,7 +64,7 @@ __simd_callee__ inline void SubC(MaskReg& carry, U& dstReg, U& srcReg0, U& srcRe
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg0 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg1 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
-| carrySrc | 输入 | 源操作数。输入借位值。<br>类型为[MaskReg](../寄存器数据类型/MaskReg.md)。 |
+| carrySrc | 输入 | 源操作数。输入进位值。<br>类型为[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 数据类型
