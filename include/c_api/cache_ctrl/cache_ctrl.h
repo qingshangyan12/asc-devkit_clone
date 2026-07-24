@@ -54,6 +54,10 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_dci();
+
+__aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache_mode);
+
+__aicore__ inline asc_load_l2_cache_mode asc_get_scalar_cache_mode();
 #endif
 
 #endif

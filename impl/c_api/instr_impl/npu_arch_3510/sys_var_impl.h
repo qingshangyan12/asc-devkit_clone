@@ -35,6 +35,10 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sub_block_id_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sub_block_num_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sys_virtual_base_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_saturation_flag_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_saturation_flag_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_saturation_strategy_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_saturation_strategy_impl.h"
 
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
              "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
@@ -96,5 +100,25 @@ __aicore__ inline int64_t asc_get_phy_stack_base() { return asc_get_phy_stack_ba
 __aicore__ inline int64_t asc_get_status() { return asc_get_status_impl(); }
 
 __aicore__ inline int64_t asc_get_sys_virtual_base() { return asc_get_sys_virtual_base_impl(); }
+
+__aicore__ inline void asc_set_saturation_flag(AscendC::SaturationMode saturation_mode, bool enable_sat)
+{
+    asc_set_saturation_flag_impl(saturation_mode, enable_sat);
+}
+
+__aicore__ inline bool asc_get_saturation_flag(AscendC::SaturationMode saturation_mode)
+{
+    return asc_get_saturation_flag_impl(saturation_mode);
+}
+
+__aicore__ inline void asc_set_saturation_strategy(AscendC::OverrideStrategy strategy)
+{
+    asc_set_saturation_strategy_impl(strategy);
+}
+
+__aicore__ inline AscendC::OverrideStrategy asc_get_saturation_strategy()
+{
+    return asc_get_saturation_strategy_impl();
+}
 
 #endif
