@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍simd_vf侧printf接口使用方法。核函数使用固定输入（不依赖外部数据），通过`printf`接口在vector函数中打印调试信息及计算结果。
+本样例介绍simd_vf侧printf接口的FIFO传输能力。核函数通过单次`asc_vf_call`打印超过2KB的数据，验证打印数据跨越预留UB边界后仍可完整输出。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -12,7 +12,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── simd_vf_printf
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── simd_vf_printf.asc      // Ascend C样例实现&调用样例
@@ -23,27 +23,11 @@
 
 - 样例功能：
 
-  使用vector编程模式，核函数内使用固定输入展示simd_vf printf接口的基本使用方法。核函数依次调用simd_vf侧printf接口打印不同类型的数据和计算结果。
-
-  本样例展示以下printf功能：
-  1. `printf`打印int/uint/float/string格式数据
-  2. `printf`打印hex/ptr格式数据
-  3. simd_vf侧`printf`打印纯字符串
-  4. 在`.asc`内使用固定输入写入静态`LocalTensor`，通过AICore侧`AscendC::Add`完成tensor加法，并通过simd_vf侧`printf`打印计算结果
-  5. aicore侧`AscendC::printf`打印核函数开始、blockIdx和结束信息
-
-  | 格式符 | 说明 | 示例 |
-  |--------|------|------|
-  | `%d` | 整型打印 | `printf(fmt, 10);` |
-  | `%u` | 无符号整型打印 | `printf(fmt, 20U);` |
-  | `%x` | 十六进制打印 | `printf(fmt, 255);` |
-  | `%f` | 浮点型打印(float) | `printf(fmt, 3.14f);` |
-  | `%s` | 字符串打印 | `printf(fmt, "test");` |
-  | `%p` | 指针打印 | `printf(fmt, ptr);` |
+  使用vector编程模式，在一个simd_vf函数中连续打印32条带序号的固定格式记录。每条记录至少96字节，总文本数据至少3072字节，超过2KB预留UB空间。
 
 - 调用实现
 
-  在`__global__ __vector__`核函数内使用`asc_vf_call<FuncName>()`调用simd_vf函数。核函数使用固定输入值，不依赖外部数据或host侧数据搬运。Add演示中，AICore侧将固定数据写入静态UB `LocalTensor`，调用`AscendC::Add`生成结果，再将UB地址传给simd_vf函数打印。
+  在`__global__ __vector__`核函数内只调用一次`asc_vf_call<SimdVfPrintFifoData>(PRINT_RECORD_COUNT)`。simd_vf函数内部循环调用`printf`，打印从`record=0`到`record=31`的完整序列。输出跨越FIFO缓冲区边界，因此完整看到首尾记录可验证FIFO持续传输正常。
 
 ## 编译运行
 
@@ -73,13 +57,12 @@
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU架构：dav-3510对应Ascend 950PR/Ascend 950DT |
 
 - 执行结果
-  执行日志中可以看到aicore侧和simd_vf侧printf输出。
+  执行日志中应包含从`record=0`到`record=31`的全部32条simd_vf记录。以下省略中间记录：
   ```bash
-  [AIV Block 0/1] [aicore] simd_vf printf demo start ...
-  [AIV Block 0/1] [aicore] blockIdx=0
-  [simd_vf] int=10, uint=20, float=3.140000, string=hello
-  [simd_vf] hex=ff, ptr=0x12ff
-  [simd_vf] This is a simd_vf printf demo string.
-  [simd_vf] add[0]: 1.250000 + 10.000000 = 11.250000
-  [AIV Block 0/1] [aicore] simd_vf printf demo end ...
+  [AIV Block 0/1] [aicore] simd_vf fifo printf demo start ...
+  [simd_vf][fifo] record=0 payload=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+  [simd_vf][fifo] record=1 payload=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+  ...
+  [simd_vf][fifo] record=31 payload=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+  [AIV Block 0/1] [aicore] simd_vf fifo printf demo end ...
   ```
