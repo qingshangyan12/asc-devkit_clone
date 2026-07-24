@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -12,9 +12,8 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/utils_intf.h"
 
-class TestSimdAtomicSetAtomicMaxInt : public testing::Test {
+class TestAtomicSetAtomicMaxInt32 : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -25,12 +24,12 @@ void set_atomic_max_Stub() {}
 void set_atomic_s32_Stub() {}
 } // namespace
 
-TEST_F(TestSimdAtomicSetAtomicMaxInt, set_atomic_max_int_Succ)
+TEST_F(TestAtomicSetAtomicMaxInt32, set_atomic_max_int32_Succ)
 {
     MOCKER(set_atomic_max, void(void)).times(1).will(invoke(set_atomic_max_Stub));
 
     MOCKER(set_atomic_s32, void(void)).times(1).will(invoke(set_atomic_s32_Stub));
 
-    asc_set_atomic_max_int();
+    asc_set_atomic_max_int32();
     GlobalMockObject::verify();
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -14,18 +14,23 @@
 #include "c_api/asc_simd.h"
 #include "c_api/utils_intf.h"
 
-class TestSimdAtomicSetAtomicAddInt : public testing::Test {
+class TestSimdAtomicSetAtomicMinInt32 : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
 };
 
-TEST_F(TestSimdAtomicSetAtomicAddInt, set_atomic_add_int_Succ)
+namespace {
+void set_atomic_min_Stub() {}
+void set_atomic_s32_Stub() {}
+} // namespace
+
+TEST_F(TestSimdAtomicSetAtomicMinInt32, set_atomic_min_int32_Succ)
 {
-    MOCKER(set_atomic_add, void(void)).times(1).will(ignoreReturnValue());
+    MOCKER(set_atomic_min, void(void)).times(1).will(invoke(set_atomic_min_Stub));
 
-    MOCKER(set_atomic_s32, void(void)).times(1).will(ignoreReturnValue());
+    MOCKER(set_atomic_s32, void(void)).times(1).will(invoke(set_atomic_s32_Stub));
 
-    asc_set_atomic_add_int();
+    asc_set_atomic_min_int32();
     GlobalMockObject::verify();
 }

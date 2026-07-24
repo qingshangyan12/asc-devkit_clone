@@ -14,23 +14,23 @@
 #include "c_api/asc_simd.h"
 #include "c_api/utils_intf.h"
 
-class TestSimdAtomicSetAtomicMinInt : public testing::Test {
+class TestSimdAtomicSetAtomicMaxInt32 : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
 };
 
 namespace {
-void set_atomic_min_Stub() {}
+void set_atomic_max_Stub() {}
 void set_atomic_s32_Stub() {}
 } // namespace
 
-TEST_F(TestSimdAtomicSetAtomicMinInt, set_atomic_min_int_Succ)
+TEST_F(TestSimdAtomicSetAtomicMaxInt32, set_atomic_max_int32_Succ)
 {
-    MOCKER(set_atomic_min, void(void)).times(1).will(invoke(set_atomic_min_Stub));
+    MOCKER(set_atomic_max, void(void)).times(1).will(invoke(set_atomic_max_Stub));
 
     MOCKER(set_atomic_s32, void(void)).times(1).will(invoke(set_atomic_s32_Stub));
 
-    asc_set_atomic_min_int();
+    asc_set_atomic_max_int32();
     GlobalMockObject::verify();
 }

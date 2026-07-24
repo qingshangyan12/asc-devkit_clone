@@ -13,7 +13,7 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-class TestAtomicSetAtomicMinInt : public testing::Test {
+class TestAtomicSetAtomicMinInt32 : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -24,12 +24,12 @@ void set_atomic_min_Stub() {}
 void set_atomic_s32_Stub() {}
 } // namespace
 
-TEST_F(TestAtomicSetAtomicMinInt, set_atomic_min_int_Succ)
+TEST_F(TestAtomicSetAtomicMinInt32, set_atomic_min_int32_Succ)
 {
     MOCKER(set_atomic_min, void(void)).times(1).will(invoke(set_atomic_min_Stub));
 
     MOCKER(set_atomic_s32, void(void)).times(1).will(invoke(set_atomic_s32_Stub));
 
-    asc_set_atomic_min_int();
+    asc_set_atomic_min_int32();
     GlobalMockObject::verify();
 }
