@@ -64,6 +64,90 @@ private:
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        if constexpr (DstLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Shape()) > 0 && Get<1>(dst.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in Mmad, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0>(dst.Layout().Stride()))>, _0> ||
+                Get<0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1>(dst.Layout().Stride()))>, _0> ||
+                Get<1>(dst.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in Mmad, all runtime dst stride leaves should be greater than 0."));
+        } else if constexpr (DstLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<0, 1>(dst.Layout().Shape()) > 0 && Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in Mmad, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0, 0>(dst.Layout().Stride()))>, _0> ||
+                Get<0, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<0, 1>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 1>(dst.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in Mmad, all runtime dst stride leaves should be greater than 0."));
+        }
+        if constexpr (FmLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(fm.Layout().Shape()) > 0 && Get<1>(fm.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm shape in Mmad, all fm shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0>(fm.Layout().Stride()))>, _0> ||
+                Get<0>(fm.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1>(fm.Layout().Stride()))>, _0> ||
+                Get<1>(fm.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm stride in Mmad, all runtime fm stride leaves should be greater than 0."));
+        } else if constexpr (FmLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(fm.Layout().Shape()) > 0 &&
+                Get<0, 1>(fm.Layout().Shape()) > 0 && Get<1, 0>(fm.Layout().Shape()) > 0 &&
+                Get<1, 1>(fm.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm shape in Mmad, all fm shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0, 0>(fm.Layout().Stride()))>, _0> ||
+                Get<0, 0>(fm.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(fm.Layout().Stride()))>, _0> ||
+                Get<0, 1>(fm.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(fm.Layout().Stride()))>, _0> ||
+                Get<1, 0>(fm.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(fm.Layout().Stride()))>, _0> ||
+                Get<1, 1>(fm.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm stride in Mmad, all runtime fm stride leaves should be greater than 0."));
+        }
+        if constexpr (FilterLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(filter.Layout().Shape()) > 0 && Get<1>(filter.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter shape in Mmad, all filter shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0>(filter.Layout().Stride()))>, _0> ||
+                Get<0>(filter.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1>(filter.Layout().Stride()))>, _0> ||
+                Get<1>(filter.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter stride in Mmad, all runtime filter stride leaves should be greater than 0."));
+        } else if constexpr (FilterLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(filter.Layout().Shape()) > 0 &&
+                Get<0, 1>(filter.Layout().Shape()) > 0 && Get<1, 0>(filter.Layout().Shape()) > 0 &&
+                Get<1, 1>(filter.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter shape in Mmad, all filter shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0, 0>(filter.Layout().Stride()))>, _0> ||
+                Get<0, 0>(filter.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(filter.Layout().Stride()))>, _0> ||
+                Get<0, 1>(filter.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(filter.Layout().Stride()))>, _0> ||
+                Get<1, 0>(filter.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(filter.Layout().Stride()))>, _0> ||
+                Get<1, 1>(filter.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter stride in Mmad, all runtime filter stride leaves should be greater than 0."));
+        }
         using MmadImpl = typename MmadRouting<
             CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, Location::INVALID>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, params);
@@ -90,6 +174,118 @@ private:
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        if constexpr (DstLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Shape()) > 0 && Get<1>(dst.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in Mmad with bias, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0>(dst.Layout().Stride()))>, _0> ||
+                Get<0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1>(dst.Layout().Stride()))>, _0> ||
+                Get<1>(dst.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in Mmad with bias, all runtime dst stride leaves should be greater than 0."));
+        } else if constexpr (DstLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<0, 1>(dst.Layout().Shape()) > 0 && Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in Mmad with bias, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0, 0>(dst.Layout().Stride()))>, _0> ||
+                Get<0, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<0, 1>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 1>(dst.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in Mmad with bias, all runtime dst stride leaves should be greater than 0."));
+        }
+        if constexpr (FmLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(fm.Layout().Shape()) > 0 && Get<1>(fm.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm shape in Mmad with bias, all fm shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0>(fm.Layout().Stride()))>, _0> ||
+                Get<0>(fm.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1>(fm.Layout().Stride()))>, _0> ||
+                Get<1>(fm.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm stride in Mmad with bias, all runtime fm stride leaves should be greater than 0."));
+        } else if constexpr (FmLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(fm.Layout().Shape()) > 0 &&
+                Get<0, 1>(fm.Layout().Shape()) > 0 && Get<1, 0>(fm.Layout().Shape()) > 0 &&
+                Get<1, 1>(fm.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm shape in Mmad with bias, all fm shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0, 0>(fm.Layout().Stride()))>, _0> ||
+                Get<0, 0>(fm.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(fm.Layout().Stride()))>, _0> ||
+                Get<0, 1>(fm.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(fm.Layout().Stride()))>, _0> ||
+                Get<1, 0>(fm.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(fm.Layout().Stride()))>, _0> ||
+                Get<1, 1>(fm.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm stride in Mmad with bias, all runtime fm stride leaves should be greater than 0."));
+        }
+        if constexpr (FilterLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(filter.Layout().Shape()) > 0 && Get<1>(filter.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter shape in Mmad with bias, all filter shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0>(filter.Layout().Stride()))>, _0> ||
+                Get<0>(filter.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1>(filter.Layout().Stride()))>, _0> ||
+                Get<1>(filter.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter stride in Mmad with bias, all runtime filter stride leaves should be greater than 0."));
+        } else if constexpr (FilterLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(filter.Layout().Shape()) > 0 &&
+                Get<0, 1>(filter.Layout().Shape()) > 0 && Get<1, 0>(filter.Layout().Shape()) > 0 &&
+                Get<1, 1>(filter.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter shape in Mmad with bias, all filter shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0, 0>(filter.Layout().Stride()))>, _0> ||
+                Get<0, 0>(filter.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(filter.Layout().Stride()))>, _0> ||
+                Get<0, 1>(filter.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(filter.Layout().Stride()))>, _0> ||
+                Get<1, 0>(filter.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(filter.Layout().Stride()))>, _0> ||
+                Get<1, 1>(filter.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter stride in Mmad with bias, all runtime filter stride leaves should be greater than 0."));
+        }
+        if constexpr (Std::remove_cvref_t<decltype(bias.Layout())>::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(bias.Layout().Shape()) > 0 && Get<1>(bias.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check bias shape in Mmad with bias, all bias shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0>(bias.Layout().Stride()))>, _0> ||
+                Get<0>(bias.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1>(bias.Layout().Stride()))>, _0> ||
+                Get<1>(bias.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check bias stride in Mmad with bias, all runtime bias stride leaves should be greater than 0."));
+        } else if constexpr (Std::remove_cvref_t<decltype(bias.Layout())>::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(bias.Layout().Shape()) > 0 &&
+                Get<0, 1>(bias.Layout().Shape()) > 0 && Get<1, 0>(bias.Layout().Shape()) > 0 &&
+                Get<1, 1>(bias.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check bias shape in Mmad with bias, all bias shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<
+                Std::remove_cvref_t<decltype(Get<0, 0>(bias.Layout().Stride()))>, _0> ||
+                Get<0, 0>(bias.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(bias.Layout().Stride()))>, _0> ||
+                Get<0, 1>(bias.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(bias.Layout().Stride()))>, _0> ||
+                Get<1, 0>(bias.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(bias.Layout().Stride()))>, _0> ||
+                Get<1, 1>(bias.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check bias stride in Mmad with bias, all runtime bias stride leaves should be greater than 0."));
+        }
         using MmadImpl =
             typename MmadRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, biasPos>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, bias, params);

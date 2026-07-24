@@ -63,6 +63,10 @@ private:
         uint16_t kStartPosition = 0;
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+        ASCENDC_DEBUG_ASSERT((mStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mStep in CopyL12L0A NZ2NZ path, mStep should be no greater than 255."));
+        ASCENDC_DEBUG_ASSERT((kStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0A NZ2NZ path, kStep should be no greater than 255."));
         // Nz -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / STRIDE_UNIT;
@@ -76,12 +80,19 @@ private:
         using DstType = typename T::elementType;
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
+        ASCENDC_DEBUG_ASSERT((Get<0>(srcLayout.Shape()) == Get<0>(dstLayout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check batch shape in CopyL12L0A NZ2NZ path, source and destination batch shape should be equal."));
         auto dstNoBatchLayout = RemoveBatchDim(dstLayout);
         auto srcNoBatchLayout = RemoveBatchDim(srcLayout);
         uint16_t mStartPosition = 0;
         uint16_t kStartPosition = 0;
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstNoBatchLayout);
         auto kStep = Get<0>(dstLayout.Shape()) * GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout);
+        ASCENDC_DEBUG_ASSERT((mStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mStep in CopyL12L0A batch NZ2NZ path, mStep should be no greater than 255."));
+        ASCENDC_DEBUG_ASSERT((kStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0A batch NZ2NZ path, kStep should be no greater than 255."));
         // Nz -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcNoBatchLayout) / STRIDE_UNIT;

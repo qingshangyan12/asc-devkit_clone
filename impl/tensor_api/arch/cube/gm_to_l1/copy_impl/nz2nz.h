@@ -71,6 +71,10 @@ public:
         auto srcStride = srcStrideSize * sizeof(type);
         auto dstStride = dstStrideSize * sizeof(type);
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((srcStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyGM2L1 NZ2NZ fp4 path, source stride in bytes should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((dstStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyGM2L1 NZ2NZ fp4 path, destination stride in bytes should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             srcStride = srcStride >> 1;
             dstStride = dstStride >> 1;

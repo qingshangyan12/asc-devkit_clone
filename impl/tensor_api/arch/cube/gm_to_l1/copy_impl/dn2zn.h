@@ -66,6 +66,12 @@ public:
         }
         auto dstRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((dValue % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src row shape in CopyGM2L1 DN2ZN fp4 path, source row shape should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcRowStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src column stride in CopyGM2L1 DN2ZN fp4 path, source column stride should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcDnMatrixStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src batch stride in CopyGM2L1 DN2ZN fp4 path, source batch stride should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             dValue = dValue >> 1;
             srcRowStride = srcRowStride >> 1;

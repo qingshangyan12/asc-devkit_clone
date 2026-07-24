@@ -94,6 +94,8 @@ public:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((ndNum <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check ndNum in CopyGM2L1 ND2NZ instruction, ndNum should be no greater than 4095."));
         uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
         mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
         mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
@@ -128,6 +130,8 @@ public:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((dnNum <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dnNum in CopyGM2L1 DN2NZ instruction, dnNum should be no greater than 4095."));
 
         uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
         mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]

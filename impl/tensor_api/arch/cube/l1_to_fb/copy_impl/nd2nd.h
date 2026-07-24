@@ -63,10 +63,40 @@ private:
         uint16_t dstRow;
         uint16_t blockCount;
         if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout) <= 4095),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockCount in CopyL12FB ND path, blockCount should be no greater than 4095."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout) <=
+                (65534U * fbufBurstLenUnit) / sizeof(srcType) &&
+                Std::ceil_align(GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout) * sizeof(srcType),
+                    deqTensorAddrAlignValue) / fbufBurstLenUnit <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyL12FB ND path, blockLen should be no greater than 65535."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout) > 0 &&
+                GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout) <= 4096 / sizeof(srcType) &&
+                Std::ceil_align(GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout) * sizeof(srcType),
+                    deqTensorAddrAlignValue) <=
+                    4096 / GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check data amount in CopyL12FB ND path, data amount should be no greater than 4096 bytes."));
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
         } else {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) <= 4095),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockCount in CopyL12FB NDExt path, blockCount should be no greater than 4095."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) <=
+                (65534U * fbufBurstLenUnit) / sizeof(srcType) &&
+                Std::ceil_align(GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) * sizeof(srcType),
+                    deqTensorAddrAlignValue) / fbufBurstLenUnit <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyL12FB NDExt path, blockLen should be no greater than 65535."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) > 0 &&
+                GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) <= 4096 / sizeof(srcType) &&
+                Std::ceil_align(GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) * sizeof(srcType),
+                    deqTensorAddrAlignValue) <=
+                    4096 / GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check data amount in CopyL12FB NDExt path, data amount should be no greater than 4096 bytes."));
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);

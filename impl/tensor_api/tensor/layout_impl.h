@@ -58,6 +58,53 @@ __aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const Layou
         NestingDepthV<ShapeType> == NestingDepthV<CoordType> &&
             Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>,
         "Shape and coord must have same tuple structure");
+    if constexpr (NestingDepthV<CoordType> == TWO_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0>(coord) >= 0 && Get<0>(coord) < Get<0>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[0] in MakeCoordLayout, coord should be in range [0, layout.Shape()[0])."));
+        ASCENDC_DEBUG_ASSERT((Get<1>(coord) >= 0 && Get<1>(coord) < Get<1>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[1] in MakeCoordLayout, coord should be in range [0, layout.Shape()[1])."));
+    } else if constexpr (NestingDepthV<CoordType> == THREE_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0>(coord) >= 0 && Get<0>(coord) < Get<0>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[0] in MakeCoordLayout, coord should be in range [0, layout.Shape()[0])."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0>(coord) >= 0 && Get<1, 0>(coord) < Get<1, 0>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[1][0] in MakeCoordLayout, coord should be in range [0, layout.Shape()[1][0])."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1>(coord) >= 0 && Get<1, 1>(coord) < Get<1, 1>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[1][1] in MakeCoordLayout, coord should be in range [0, layout.Shape()[1][1])."));
+    } else if constexpr (NestingDepthV<CoordType> == FOUR_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0, 0>(coord) >= 0 && Get<0, 0>(coord) < Get<0, 0>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[0][0] in MakeCoordLayout, coord should be in range [0, layout.Shape()[0][0])."));
+        ASCENDC_DEBUG_ASSERT((Get<0, 1>(coord) >= 0 && Get<0, 1>(coord) < Get<0, 1>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[0][1] in MakeCoordLayout, coord should be in range [0, layout.Shape()[0][1])."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0>(coord) >= 0 && Get<1, 0>(coord) < Get<1, 0>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[1][0] in MakeCoordLayout, coord should be in range [0, layout.Shape()[1][0])."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1>(coord) >= 0 && Get<1, 1>(coord) < Get<1, 1>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[1][1] in MakeCoordLayout, coord should be in range [0, layout.Shape()[1][1])."));
+    } else if constexpr (NestingDepthV<CoordType> == FIVE_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0>(coord) >= 0 && Get<0>(coord) < Get<0>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[0] in MakeCoordLayout, coord should be in range [0, layout.Shape()[0])."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0, 0>(coord) >= 0 && Get<1, 0, 0>(coord) < Get<1, 0, 0>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[1][0][0] in MakeCoordLayout, coord should be in range [0, layout.Shape()[1][0][0])."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0, 1>(coord) >= 0 && Get<1, 0, 1>(coord) < Get<1, 0, 1>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[1][0][1] in MakeCoordLayout, coord should be in range [0, layout.Shape()[1][0][1])."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1, 0>(coord) >= 0 && Get<1, 1, 0>(coord) < Get<1, 1, 0>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[1][1][0] in MakeCoordLayout, coord should be in range [0, layout.Shape()[1][1][0])."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1, 1>(coord) >= 0 && Get<1, 1, 1>(coord) < Get<1, 1, 1>(layout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord[1][1][1] in MakeCoordLayout, coord should be in range [0, layout.Shape()[1][1][1])."));
+    }
     auto coordShape = TransformTupleApply(layout.Shape(), coord, DiffOp{});
     using TraitType = GetLayoutTrait<LayoutType>;
     using PatternType = GetLayoutPattern<LayoutType>;
@@ -77,6 +124,39 @@ __aicore__ inline decltype(auto) MakeSameShapeSliceLayout(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     auto coordLayout = MakeCoordLayout(coord, layout);
+    if constexpr (NestingDepthV<SliceShape> == TWO_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[0] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[1] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+    } else if constexpr (NestingDepthV<SliceShape> == THREE_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[0] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[1][0] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[1][1] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+    } else if constexpr (NestingDepthV<SliceShape> == FOUR_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0, 0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[0][0] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<0, 1>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[0][1] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[1][0] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[1][1] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+    } else if constexpr (NestingDepthV<SliceShape> == FIVE_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[0] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0, 0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[1][0][0] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0, 1>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[1][0][1] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1, 0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[1][1][0] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1, 1>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check sliceShape[1][1][1] in MakeSameShapeSliceLayout, sliceShape should be greater than 0."));
+    }
     auto realShape = TransformTupleApply(coordLayout.Shape(), sliceShape, MinOp{});
     return MakeSlicePatternLayout(layout, realShape);
 }
@@ -89,9 +169,19 @@ __aicore__ inline decltype(auto) MakeFourDimSliceLayout(
     auto innerRow = Get<0, 0>(layout.Shape());
     auto innerCol = Get<1, 0>(layout.Shape());
 
+    ASCENDC_DEBUG_ASSERT((Get<0>(coord) >= 0 && Get<0>(coord) < innerRow * Get<0, 1>(layout.Shape())),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check coord[0] in MakeFourDimSliceLayout, coord should be in range [0, logical row shape)."));
+    ASCENDC_DEBUG_ASSERT((Get<1>(coord) >= 0 && Get<1>(coord) < innerCol * Get<1, 1>(layout.Shape())),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check coord[1] in MakeFourDimSliceLayout, coord should be in range [0, logical column shape)."));
     auto srcRow = innerRow * Get<0, 1>(layout.Shape()) - Get<0>(coord);
     auto srcCol = innerCol * Get<1, 1>(layout.Shape()) - Get<1>(coord);
 
+    ASCENDC_DEBUG_ASSERT((Get<0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check sliceShape[0] in MakeFourDimSliceLayout, sliceShape should be greater than 0."));
+    ASCENDC_DEBUG_ASSERT((Get<1>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check sliceShape[1] in MakeFourDimSliceLayout, sliceShape should be greater than 0."));
     auto realRow = Std::min(srcRow, Get<0>(sliceShape));
     auto realCol = Std::min(srcCol, Get<1>(sliceShape));
     return MakeSlicePatternLayout(layout, MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)));
@@ -105,10 +195,25 @@ __aicore__ inline decltype(auto) MakeFiveDimSliceLayout(
     auto innerRow = Get<1, 0, 0>(layout.Shape());
     auto innerCol = Get<1, 1, 0>(layout.Shape());
 
+    ASCENDC_DEBUG_ASSERT((Get<0>(coord) >= 0 && Get<0>(coord) < Get<0>(layout.Shape())),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check coord[0] in MakeFiveDimSliceLayout, coord should be in range [0, layout.Shape()[0])."));
+    ASCENDC_DEBUG_ASSERT((Get<1, 0>(coord) >= 0 && Get<1, 0>(coord) < innerRow * Get<1, 0, 1>(layout.Shape())),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check coord[1][0] in MakeFiveDimSliceLayout, coord should be in range [0, logical row shape)."));
+    ASCENDC_DEBUG_ASSERT((Get<1, 1>(coord) >= 0 && Get<1, 1>(coord) < innerCol * Get<1, 1, 1>(layout.Shape())),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check coord[1][1] in MakeFiveDimSliceLayout, coord should be in range [0, logical column shape)."));
     auto srcBatch = Get<0>(layout.Shape()) - Get<0>(coord);
     auto srcRow = innerRow * Get<1, 0, 1>(layout.Shape()) - Get<1, 0>(coord);
     auto srcCol = innerCol * Get<1, 1, 1>(layout.Shape()) - Get<1, 1>(coord);
 
+    ASCENDC_DEBUG_ASSERT((Get<0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check sliceShape[0] in MakeFiveDimSliceLayout, sliceShape should be greater than 0."));
+    ASCENDC_DEBUG_ASSERT((Get<1, 0>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check sliceShape[1][0] in MakeFiveDimSliceLayout, sliceShape should be greater than 0."));
+    ASCENDC_DEBUG_ASSERT((Get<1, 1>(sliceShape) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check sliceShape[1][1] in MakeFiveDimSliceLayout, sliceShape should be greater than 0."));
     auto realBatch = Std::min(srcBatch, Get<0>(sliceShape));
     auto realRow = Std::min(srcRow, Get<1, 0>(sliceShape));
     auto realCol = Std::min(srcCol, Get<1, 1>(sliceShape));
@@ -153,6 +258,39 @@ __aicore__ inline decltype(auto) MakeSliceLayout(
     static_assert(SrcLayoutType::rank == DstLayoutType::rank, "SrcLayout Rank must be equal to DstLayout Rank");
 
     auto sliceLayout = MakeCoordLayout(coord, srcLayout);
+    if constexpr (NestingDepthV<Std::remove_cvref_t<decltype(dstLayout.Shape())>> == TWO_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[0] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[1] in MakeSliceLayout, shape should be greater than 0."));
+    } else if constexpr (NestingDepthV<Std::remove_cvref_t<decltype(dstLayout.Shape())>> == THREE_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[0] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[1][0] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[1][1] in MakeSliceLayout, shape should be greater than 0."));
+    } else if constexpr (NestingDepthV<Std::remove_cvref_t<decltype(dstLayout.Shape())>> == FOUR_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0, 0>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[0][0] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<0, 1>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[0][1] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[1][0] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[1][1] in MakeSliceLayout, shape should be greater than 0."));
+    } else if constexpr (NestingDepthV<Std::remove_cvref_t<decltype(dstLayout.Shape())>> == FIVE_DIM_DATA) {
+        ASCENDC_DEBUG_ASSERT((Get<0>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[0] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0, 0>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[1][0][0] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 0, 1>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[1][0][1] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1, 0>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[1][1][0] in MakeSliceLayout, shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Get<1, 1, 1>(dstLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstLayout.Shape()[1][1][1] in MakeSliceLayout, shape should be greater than 0."));
+    }
     auto sliceShape = TransformTupleApply(sliceLayout.Shape(), dstLayout.Shape(), MinOp{});
     using TraitType = GetLayoutTrait<SrcLayoutType>;
     using PatternType = GetLayoutPattern<SrcLayoutType>;
