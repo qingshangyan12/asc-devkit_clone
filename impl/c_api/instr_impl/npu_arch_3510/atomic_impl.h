@@ -79,7 +79,10 @@ __aicore__ inline void asc_set_atomic_min_float16() { asc_set_atomic_min_float16
 
 // ==========asc_set_atomic_add_int==========
 [[deprecated("NOTICE: asc_set_atomic_add_int is deprecated. Please use asc_set_atomic_add_int32 instead.")]]
-__aicore__ inline void asc_set_atomic_add_int() { asc_set_atomic_add_int_impl(); }
+__aicore__ inline void asc_set_atomic_add_int()
+{
+    asc_set_atomic_add_int_impl();
+}
 
 // ==========asc_set_atomic_add_int8==========
 __aicore__ inline void asc_set_atomic_add_int8() { asc_set_atomic_add_int8_impl(); }
@@ -92,7 +95,10 @@ __aicore__ inline void asc_set_atomic_add_int32() { asc_set_atomic_add_int32_imp
 
 // ==========asc_set_atomic_max_int==========
 [[deprecated("NOTICE: asc_set_atomic_max_int is deprecated. Please use asc_set_atomic_max_int32 instead.")]]
-__aicore__ inline void asc_set_atomic_max_int() { asc_set_atomic_max_int_impl(); }
+__aicore__ inline void asc_set_atomic_max_int()
+{
+    asc_set_atomic_max_int_impl();
+}
 
 // ==========asc_set_atomic_max_int8==========
 __aicore__ inline void asc_set_atomic_max_int8() { asc_set_atomic_max_int8_impl(); }
@@ -105,7 +111,10 @@ __aicore__ inline void asc_set_atomic_max_int32() { asc_set_atomic_max_int32_imp
 
 // ==========asc_set_atomic_min_int==========
 [[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]
-__aicore__ inline void asc_set_atomic_min_int() { asc_set_atomic_min_int_impl(); }
+__aicore__ inline void asc_set_atomic_min_int()
+{
+    asc_set_atomic_min_int_impl();
+}
 
 // ==========asc_set_atomic_min_int8==========
 __aicore__ inline void asc_set_atomic_min_int8() { asc_set_atomic_min_int8_impl(); }
