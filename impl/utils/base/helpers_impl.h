@@ -20,6 +20,17 @@
 
 #include "../debug/asc_debug_utils.h"
 
+namespace __asc_simd_vf {
+__no_simd_vf_fusion__ __simd_vf__ static inline void asc_finish_flag()
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
+    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr(0);
+    blockInfo->finish = 1;
+#endif
+}
+} // namespace __asc_simd_vf
+
 namespace asc {
 namespace details {
 template <auto funcPtr, typename DebugTag = AscendC::Internal::SimdVfDebugTag, typename... Args>
@@ -32,14 +43,17 @@ __aicore__ static inline void asc_vf_call_impl(Args&&... args)
     funcPtr(args...);
 
     if constexpr (AscendC::Internal::SimdVfDebugTraits<DebugTag>::enabled) {
-        const bool hasOverflow = AscVFDebugTransferUb();
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
+    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+        __asc_simd_vf::asc_finish_flag();
+#endif
+        const bool transferFailed = AscVFDebugTransferUb();
 #ifdef ASCENDC_INTERNAL_SIMD_VF_OVERFLOW_WARNING_ENABLED
-        if (hasOverflow) {
-            __asc_aicore::printf_impl(
-                "[WARNING]: SIMD VF debug buffer overflow (max limit is 2KB), output was truncated.\n");
+        if (transferFailed) {
+            __asc_aicore::printf_impl("[WARNING]: SIMD VF debug transfer failed, output may be incomplete.\n");
         }
 #else
-        (void)hasOverflow;
+        (void)transferFailed;
 #endif
     }
 }
