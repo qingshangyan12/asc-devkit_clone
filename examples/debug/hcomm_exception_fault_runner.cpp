@@ -601,6 +601,33 @@ void PrintCommContext(const char *prefix, const CommContext &ctx)
         static_cast<unsigned long long>(ctx.len),
         ctx.writeRet,
         ctx.drainRet);
+    std::printf("%s dfx sqVa=0x%llx cqVa=0x%llx wqeCnt=%u->%u->%u "
+                "sqHead=%u->%u->%u sqTail=%u->%u->%u cqTail=%u->%u->%u\n",
+        prefix,
+        static_cast<unsigned long long>(ctx.sqVa),
+        static_cast<unsigned long long>(ctx.cqVa),
+        ctx.preWqeCnt,
+        ctx.postWriteWqeCnt,
+        ctx.postDrainWqeCnt,
+        ctx.preSqHead,
+        ctx.postWriteSqHead,
+        ctx.postDrainSqHead,
+        ctx.preSqTail,
+        ctx.postWriteSqTail,
+        ctx.postDrainSqTail,
+        ctx.preCqTail,
+        ctx.postWriteCqTail,
+        ctx.postDrainCqTail);
+    std::printf("%s dfx sqDw[0..3]=0x%x 0x%x 0x%x 0x%x cqDw[0..3]=0x%x 0x%x 0x%x 0x%x\n",
+        prefix,
+        ctx.sqDw[0],
+        ctx.sqDw[1],
+        ctx.sqDw[2],
+        ctx.sqDw[3],
+        ctx.cqDw[0],
+        ctx.cqDw[1],
+        ctx.cqDw[2],
+        ctx.cqDw[3]);
 }
 
 void CollectCachedContexts(uint32_t rank, std::vector<ChannelHandle> &channels, std::vector<CommContext> &contexts)

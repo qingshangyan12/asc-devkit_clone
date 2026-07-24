@@ -32,6 +32,8 @@ hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
 
 `writeRet` and `drainRet` are filled by the fault kernels and printed by the host report path. They help distinguish
 whether HCOMM posted a WQE successfully before the exception.
+The CQE case also records a kernel-side DFX snapshot including `sqVa`, `cqVa`, `wqeCnt`, SQ/CQ cursors, and the first
+four DWs read back from SQ/CQ VA.
 
 3. Allocate and copy `CommContext` to device.
 4. Register the Runtime exception callback and, when supported by the Runtime, bind the device `CommContext` as
@@ -230,4 +232,5 @@ Useful filters:
 grep -E "CustomCallback entered|runtime exception|exception dev args point|exception ctx|HcommChannelDumpInfo ret=0" urma_950.log
 grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" urma_950.log
 grep -E "rank=0 channel=|exception ctx|\\[parsed\\] SqContext|\\[parsed\\] Hcomm URMA WQE|\\[parsed\\] CqContext|\\[parsed\\] Hcomm URMA CQE" cqe_950.log
+grep -E "exception ctx|dfx sqVa|dfx sqDw|Channel\\[0\\]|SqContext|CqContext|Hcomm URMA WQE: queue=|Hcomm URMA CQE: queue=|raw\\[000\\]" cqe_950.log
 ```
