@@ -32,6 +32,10 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        if constexpr (U::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check batch shape in CopyGM2L1 ScaleA ZZ2ZZ path, source batch shape should be no greater than 4095."));
+        }
         DataCopyImpl<trait>(dst, src);
     }
 
