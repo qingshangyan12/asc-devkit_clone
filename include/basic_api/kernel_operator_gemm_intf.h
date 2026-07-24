@@ -62,6 +62,20 @@ __aicore__ inline GemmTiling GetGemmTiling(uint32_t m, uint32_t k, uint32_t n);
  * @param [in] tiling.kHasTileEle Judge whether the tail block exists
  * @param [in] tiling.KtailEle K-axis tail block element
  * @param [in] tiling.kThreadNum K-axis passes
+ * @param [in] tiling.blockSize size of block
+ * @param [in] tiling.mNum args of m
+ * @param [in] tiling.nNum args of n
+ * @param [in] tiling.kNum args of k
+ * @param [in] tiling.roundM/N/K Rounding parameter
+ * @param [in] tiling.c0Size The byte length of a block
+ * @param [in] tiling.dtypeSize Byte length of the incoming data type
+ * @param [in] tiling.m/n/kBlockNum Number of blocks of m/n/k axis
+ * @param [in] tiling.m/n/kIterNum Number of traversal dimensions
+ * @param [in] tiling.m/k/nTileBlock Number of M/N/K axis cutting blocks
+ * @param [in] tiling.m/n/kHasTailNumber of tail blocks of M/K/N axis
+ * @param [in] tiling.kHasTileEle Judge whether the tail block exists
+ * @param [in] tiling.KtailEle K-axis tail block element
+ * @param [in] tiling.kThreadNum K-axis passes
  * @param [in] partialsum judge whether the calculation result is moved out
  * @param [in] initValue Initialization parameters
  */

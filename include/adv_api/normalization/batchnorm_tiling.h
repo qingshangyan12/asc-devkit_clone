@@ -52,10 +52,10 @@ bool GetBatchNormMaxMinTmpSize(
 bool GetBatchNormNDTilingInfo(
     const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape,
     const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource,
-    optiling::BatchNormTiling& tilling, const bool isBasicBlock = false);
+    optiling::BatchNormTiling& tiling, const bool isBasicBlock = false);
 bool GetBatchNormNDTilingInfo(
     const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape,
     const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource,
-    AscendC::tiling::BatchNormTiling& tilling, const bool isBasicBlock = false);
+    AscendC::tiling::BatchNormTiling& tiling, const bool isBasicBlock = false);
 } // namespace AscendC
 #endif // LIB_NORMALIZATION_BATCHNORM_TILING_H

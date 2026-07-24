@@ -47,11 +47,11 @@ bool GetBatchNormMaxMinTmpSize(const ge::Shape& srcShape, const ge::Shape& origi
 ```
 
 ```
-bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
+bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
+bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ## 参数说明
@@ -77,7 +77,7 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
 | stackBufferByteSize | 输入 | 可供BatchNorm接口使用的空间大小，单位Byte。 |
 | typeSize | 输入 | 输入数据类型的字节大小。 |
 | isReuseSource | 输入 | 中间变量是否能够复用输入内存。该参数预留，传入默认值false即可。 |
-| tilling | 输出 | 输入数据的切分信息。 |
+| tiling | 输出 | 输入数据的切分信息。 |
 | isBasicBlock | 输入 | 是否开启基本块，与BatchNorm接口一致。 |
 
 ## 返回值说明
