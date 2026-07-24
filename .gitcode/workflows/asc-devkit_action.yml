@@ -257,7 +257,7 @@ stages:
         with:
           ut_type: 'arm_test'
           ut_package: 'coverage_*.info'
-          image_version: ${{ jobs.JOB_image.outputs.Compile_Ascend_ARM_A5 }}
+          image_version: ${{ jobs.JOB_image.outputs.UT_Test_arm }}
           arch: 'arm64'
     pre:
     - type: auto
