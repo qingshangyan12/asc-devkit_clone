@@ -72,7 +72,7 @@ enum class HardEvent : uint8_t {
     MTE1_FIX,
     FIX_MTE1,
     FIX_FIX,
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003))
     FIX_V,
     V_FIX,
 #endif
@@ -235,7 +235,7 @@ __aicore__ constexpr uint8_t EventToIndexAiv(HardEvent evt)
 __aicore__ constexpr uint8_t EventToIndex(HardEvent evt)
 {
 #if defined(ASCENDC_CPU_DEBUG) || \
-    defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || ((__NPU_ARCH__ != 2201) && (__NPU_ARCH__ != 3510)))
+    defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || ((__NPU_ARCH__ != 2201) && (__NPU_ARCH__ != 3510)))
     return static_cast<uint8_t>(evt);
 #elif defined(SPLIT_CORE_CUBE)
     return EventToIndexAic(evt);
@@ -408,7 +408,7 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
         hard = Hardware::L1;
     } else if (pos == TPosition::C2) {
         hard = Hardware::BIAS;
-#elif (__NPU_ARCH__ == 5102)
+#elif (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     } else if (pos == TPosition::C1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::C2) {
@@ -448,7 +448,7 @@ __aicore__ constexpr TPosition GetPosition(TPosition srcPos, TPosition dstPos)
     }
 #elif defined(__NPU_ARCH__) &&                                                                               \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
-     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     if ((dstPos == TPosition::GM) || (dstPos == TPosition::CO2)) {
         return srcPos;
     }
@@ -467,7 +467,7 @@ __aicore__ constexpr Hardware GetBufferPos(TPosition srcPos, TPosition dstPos)
     }
 #elif defined(__NPU_ARCH__) &&                                                                               \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
-     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     if ((dstPos == TPosition::GM) || (dstPos == TPosition::CO2)) {
         return GetPhyType(srcPos);
     }
@@ -521,7 +521,7 @@ __aicore__ constexpr bool IsTQuePositionForVec(TPosition src, TPosition dst)
 template <typename T>
 __aicore__ constexpr bool UseBufIdSync()
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     return IsTQuePositionForVec(T::srcPosition, T::dstPosition) || T::config.enableStaticEvtId;
 #else
     return false;
@@ -530,7 +530,7 @@ __aicore__ constexpr bool UseBufIdSync()
 
 __aicore__ constexpr bool UseBufIdSync(TPosition src, TPosition dst, bool enableStaticEvtId)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     return IsTQuePositionForVec(src, dst) || enableStaticEvtId;
 #else
     return false;
@@ -612,7 +612,7 @@ __aicore__ constexpr HardEvent GetQueEvt(
         ASSERT(dst == Hardware::UB);
         return fwdDirect ? HardEvent::M_V : HardEvent::V_M;
     }
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     } else if (src == Hardware::L0C) {
         ASSERT(dst == Hardware::GM);
         return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
@@ -673,7 +673,7 @@ __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdD
 
 using TBufId = uint8_t;
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 #ifdef ASCENDC_CPU_DEBUG
 class BufIdTracker {
 public:
@@ -820,7 +820,7 @@ __aicore__ constexpr bool IsUseBufId(Hardware src, Hardware dst)
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
-     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <MemDsbT arg>
 __aicore__ inline void DataSyncBarrierImpl()
 {
@@ -998,7 +998,7 @@ __aicore__ inline void SetFlagImpl(int32_t eventID)
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
-     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113)))
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113)))
         case HardEvent::M_FIX:
             SetFlagInternal<PIPE_M, PIPE_FIX>(e);
             break;
@@ -1027,7 +1027,7 @@ __aicore__ inline void SetFlagImpl(int32_t eventID)
             PipeBarrierInternal<PIPE_FIX>();
             break;
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
         case HardEvent::FIX_V:
             SetFlagInternal<PIPE_FIX, PIPE_V>(e);
             break;
@@ -1126,7 +1126,7 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
 #endif
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
-     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113)))
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113)))
         case HardEvent::FIX_M:
             WaitFlagInternal<PIPE_FIX, PIPE_M>(e);
             break;
@@ -1155,7 +1155,7 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
             PipeBarrierInternal<PIPE_FIX>();
             break;
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
         case HardEvent::FIX_V:
             WaitFlagInternal<PIPE_FIX, PIPE_V>(e);
             break;

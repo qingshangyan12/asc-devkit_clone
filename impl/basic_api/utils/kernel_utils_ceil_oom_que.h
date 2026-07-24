@@ -45,7 +45,7 @@ __aicore__ constexpr inline uint32_t ConstCeil(uint32_t a, uint32_t b) { return 
 __aicore__ inline uint32_t Ceil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
 #if defined(__NPU_ARCH__) &&                                                                                      \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
     defined(__ASC_NPU_HOST__)
 __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {
@@ -72,7 +72,7 @@ __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
 __aicore__ inline void WriteBackOverflow(GM_ADDR overflowStatus)
 {
     (void)overflowStatus;
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
     uint64_t statusOverflow[1] = {0};
     statusOverflow[0] = get_status();
@@ -270,7 +270,7 @@ __aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig* conf)
         .enableLoopQueue = conf->enableLoopQueue};
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)) || defined(__ASC_NPU_HOST__)
 __aicore__ constexpr bool UseAltBufId(TPosition queDstPos, TPosition dstConsumerPos, uint32_t consumerSize)
 {
     if (consumerSize <= 1) {
@@ -324,7 +324,7 @@ __aicore__ constexpr bool SupportEnum()
     return T == U;
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)) || defined(__ASC_NPU_HOST__)
 template <typename T>
 struct GetComplexElementType {
     using Type = T;
@@ -379,7 +379,7 @@ __aicore__ inline void VF_CALL(Args&&... args)
 #endif
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)) || defined(__ASC_NPU_HOST__)
 using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
@@ -430,7 +430,7 @@ __aicore__ constexpr bool IsLocalTensorType()
 template <auto funcPtr, typename... Args>
 __aicore__ inline void VF_CALL(Args&&... args)
 {
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102) || defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162) || defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
     __VEC_SCOPE__ { funcPtr(args...); }
 #endif
 }

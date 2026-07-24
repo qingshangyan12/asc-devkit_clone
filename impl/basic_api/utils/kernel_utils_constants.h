@@ -80,7 +80,7 @@ constexpr uint32_t POWER_INT32_BITS = 32;
 constexpr uint32_t INT4_TWO = 2;
 constexpr uint32_t INT4_BIT_NUM = 4;
 
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 // int2b_t param
 constexpr uint32_t INT2_FOUR = 4;
 constexpr uint32_t INT1_EIGHT = 8;
@@ -107,7 +107,7 @@ constexpr float DEQ_SHIFT_RIGHT_17_BIT = 1.0 / DEQ_SHIFT_LEFT_17_BIT;
 constexpr int8_t ADDDEQRELU_MASK_MODE_ONE = 1;
 constexpr int8_t ADDDEQRELU_MASK_MODE_TWO = 2;
 
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 248 * 1024;
 const uint32_t TOTAL_UB_SIZE = 248 * 1024;
 const uint32_t TMP_UB_OFFSET = 248 * 1024;
@@ -234,7 +234,7 @@ const uint16_t ONE_PARAM_SIZE = 8;
 const int32_t BLOCK_COUT = 16;
 const uint16_t TWO_BLK_SIZE = 64;
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 const uint16_t AIV_CORE_NUM = 72;
 #else
 const uint16_t AIV_CORE_NUM = 50;
@@ -253,7 +253,7 @@ const uint8_t B16_DATA_NUM_PER_BLOCK = 16;
 const int32_t B16_DATA_NUM_PER_REPEAT = 128;
 const int32_t B32_DATA_NUM_PER_REPEAT = 64;
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 const uint32_t B64_DATA_NUM_PER_REPEAT = 32;
 const uint32_t B4_BYTE_SIZE_PER_REPEAT = 64;
 const uint32_t L1_DUMP_UB_SIZE = TOTAL_UB_SIZE - 32 * 1024;
@@ -278,7 +278,7 @@ constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #elif (__NPU_ARCH__ == 3102)
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
 constexpr size_t RESERVED_WORKSPACE = 0;
@@ -498,7 +498,7 @@ struct GetPadValueType {
     using Type = T;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 // To support FP8 datacopypad, pad type needs transfer to b8
 template <>
 struct GetPadValueType<fp8_e5m2_t> {
@@ -605,7 +605,7 @@ struct IntegerSubType {
 
 using int4b_t = integer_sub_type<INT4_BIT_NUM, true>;
 
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 using int2b_t = IntegerSubType<INT2_BIT_NUM, true>;
 using int1b_t = IntegerSubType<INT1_BIT_NUM, true>;
 using uint1b_t = IntegerSubType<INT1_BIT_NUM, false>;
@@ -617,7 +617,7 @@ using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
 #endif
 #if !(                                                                                                        \
-    (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))) || defined(__NPU_HOST__) || \
+    (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))) || defined(__NPU_HOST__) || \
     defined(__ASC_NPU_HOST__))
 using fp8_e8m0_t = uint8_t;
 #elif !defined(ASCENDC_CPU_DEBUG)
@@ -655,7 +655,7 @@ struct BasicAPIMaskStruct {
 template <typename T>
 __aicore__ constexpr bool IsHalfByteDataType()
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     return SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>();
 #else
     return IsSameType<T, int4b_t>::value;
@@ -672,7 +672,7 @@ struct SizeOfBits<int4b_t> {
     static int const value = INT4_BIT_NUM;
 };
 
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 template <>
 struct SizeOfBits<int2b_t> {
     static constexpr uint32_t value = INT2_BIT_NUM;
@@ -701,7 +701,7 @@ struct SizeOfBits<uint2b_t> {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 template <>
 struct SizeOfBits<fp4x2_e2m1_t> {
     static constexpr uint32_t value = INT4_BIT_NUM;

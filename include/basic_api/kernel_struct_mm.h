@@ -151,7 +151,7 @@ struct LoadData2DMxParams {
     uint16_t dstStride = 0;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5162))
 template <typename TYPE>
 struct LoadData3DParamsV1 {
     using T = typename GetPadValueType<TYPE>::Type;
@@ -217,7 +217,7 @@ struct LoadData3DParamsV1 {
     int16_t leftTopH = 0;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5162))
 template <typename TYPE>
 struct LoadData3DParamsV2 {
     using T = typename GetPadValueType<TYPE>::Type;
@@ -432,7 +432,7 @@ struct MmadParams {
     bool cmatrixSource = false;
     // Indicates the initial matrix, 1: the number in C matrix is 0, 0：use the real number in C matrix
     bool cmatrixInitVal = true;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5162))
     bool disableGemv = false;
 #endif
 #ifdef CANN_ASC_ENABLE_FIX_SHIFT
@@ -676,7 +676,7 @@ enum class FmatrixMode : uint8_t {
     FMATRIX_RIGHT = 1,
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5162))
 struct LoadDataRepeatParam {
     __aicore__ LoadDataRepeatParam() {}
 
@@ -708,7 +708,7 @@ struct LoadDataRepeatParam {
 #endif // Turing versions
 
 struct LoadDataRepeatParamWithStride {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5162))
     __aicore__ LoadDataRepeatParamWithStride() {}
 
     __aicore__ LoadDataRepeatParamWithStride(

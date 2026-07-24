@@ -43,6 +43,8 @@
 #include "dav_3510/kernel_operator_fixpipe_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_fixpipe_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_fixpipe_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_fixpipe_impl.h"
 #elif __NPU_ARCH__ == 3113
@@ -80,7 +82,7 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
     SetFixPipeConfigImpl<T, setRelu>(preData, isUnitFlag);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
 {
     SetFixpipeNz2ndFlagImpl(ndNum, srcNdStride, dstNdStride);
@@ -182,7 +184,7 @@ __aicore__ inline void Fixpipe(
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 // L0C->L1/UB
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(
@@ -245,7 +247,7 @@ __aicore__ inline void Fixpipe(
     }
 #endif // ASCENDC_CPU_DEBUG
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(), intriParams, cacheMode);
@@ -271,7 +273,7 @@ __aicore__ inline void Fixpipe(
     using SrcPrimType = PrimT<U>;
     CheckTensorPos(src, Hardware::L0C, "src", "CO1", "Fixpipe");
     CheckTensorPos(cbufWorkspace, Hardware::L1, "cbufWorkspace", "A1", "Fixpipe");
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(),
