@@ -798,22 +798,23 @@ def normalize_target(source_file, target):
     return normalized, suffix
 
 
-def normalize_gitcode_examples_target(target):
+def normalize_gitcode_content_target(target):
     parsed = urlparse(target.strip().strip("<>").strip("\"'"))
     if parsed.scheme not in ("http", "https") or parsed.netloc != "gitcode.com":
         return None
 
     parts = [unquote(part) for part in parsed.path.split("/") if part]
-    if len(parts) < 5 or parts[:2] != ["cann", "asc-devkit"]:
+    if len(parts) < 5 or parts[:2] != ["cann", "asc-devkit"] or parts[3] != "master":
         return None
-    if parts[2] not in ("blob", "tree"):
+    if parts[2] not in ("blob", "tree", "raw"):
         return None
 
-    try:
-        path_start = parts.index("examples", 4)
-    except ValueError:
+    target_path = posixpath.normpath("/".join(parts[4:]))
+    target = repo_root / target_path
+    if parts[2] == "tree" and not target.is_dir():
         return None
-    target_path = posixpath.normpath("/".join(parts[path_start:]))
+    if parts[2] in ("blob", "raw") and not target.is_file():
+        return None
     suffix = (f"?{parsed.query}" if parsed.query else "") + (
         f"#{parsed.fragment}" if parsed.fragment else ""
     )
@@ -894,8 +895,6 @@ for raw_line in scan_set_file.read_text(encoding="utf-8").splitlines():
 errors = []
 for source in scan_files:
     source_kind = source_area(source)
-    if source_kind is None:
-        continue
 
     source_path = repo_root / source
     try:
@@ -917,19 +916,21 @@ for source in scan_files:
             normalized = normalize_target(source, target)
             is_gitcode_target = False
             if normalized is None:
-                normalized = normalize_gitcode_examples_target(target)
+                normalized = normalize_gitcode_content_target(target)
                 is_gitcode_target = normalized is not None
             if normalized is None:
                 continue
 
             target_path, suffix = normalized
             target_kind = source_area(target_path)
-            if is_gitcode_target and source_kind == target_kind == "examples":
+            if is_gitcode_target:
                 relative_target = posixpath.relpath(target_path, posixpath.dirname(source))
                 errors.append(
-                    f"{source}:{line_number}: examples links to other examples must use a relative path: "
+                    f"{source}:{line_number}: links to same-repository content must use a relative path: "
                     f"{target} -> {relative_target}{suffix}"
                 )
+                continue
+            if source_kind is None:
                 continue
             if source_kind == target_kind == "examples":
                 language_error = readme_language_error(source, target_path, suffix)
