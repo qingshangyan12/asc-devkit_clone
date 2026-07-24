@@ -54,6 +54,16 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) >= 1 &&
+            GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) <= 4095),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyUB2L1, blockCount should be in range [1, 4095]."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) /
+            C0_ELEMENT<SrcType> >= GetTotalColumnShape(srcLayout)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src row stride in CopyUB2L1 ZN path, src row stride should cover one copied block."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) /
+            C0_ELEMENT<DstType> >= GetTotalColumnShape(srcLayout)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst row stride in CopyUB2L1 ZN path, dst row stride should cover one copied block."));
         uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         uint32_t blockLen = GetTotalColumnShape(srcLayout);
         int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / C0_ELEMENT<SrcType> - blockLen;

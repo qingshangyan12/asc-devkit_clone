@@ -45,6 +45,10 @@ public:
         if ASCEND_IS_AIC {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((blockCount >= 1 && blockCount <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyUB2L1 instruction, blockCount should be in range [1, 4095]."));
+        ASCENDC_DEBUG_ASSERT((blockLen >= 1 && blockLen <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyUB2L1 instruction, blockLen should be in range [1, 65535]."));
 
         asc_copy_ub2l1(dst, src, blockCount, blockLen, srcStride, dstStride);
     }

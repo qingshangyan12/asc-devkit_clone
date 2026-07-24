@@ -32,6 +32,10 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        if constexpr (U::layoutType::depth == THREE_DIM_DATA || U::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check batch shape in CopyGM2L1 ND2ND path, source batch shape should be no greater than 4095."));
+        }
         // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
         // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
         constexpr auto gmDepth = NestingDepthV<decltype(src.Layout().Shape())>;
@@ -103,6 +107,12 @@ private:
             dstStride = blockLen;
         }
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyGM2L1 ND2ND fp4 path, source copy length should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyGM2L1 ND2ND fp4 path, source row stride in bytes should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((dstStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyGM2L1 ND2ND fp4 path, destination row stride in bytes should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
             srcStride = srcStride >> 1;
@@ -156,6 +166,12 @@ private:
         uint32_t dstStride = dstBatchStride * sizeof(type);
 
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyGM2L1 batched ND2ND fp4 path, source copy length should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyGM2L1 batched ND2ND fp4 path, source batch stride in bytes should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((dstStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyGM2L1 batched ND2ND fp4 path, destination batch stride in bytes should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
             srcStride = srcStride >> 1;

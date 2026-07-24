@@ -125,6 +125,116 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info)
     {
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), Layout().Shape(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check source shape in Slice, all source shape leaves should be greater than 0."));
+        if constexpr (IsSameStructureV<decltype(Layout().Stride()),
+                          Std::tuple<Std::tuple<int, int>, Std::tuple<int, int>>> &&
+            IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn, ScaleANDLayoutPtn,
+                ScaleADNLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((
+                (((IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<0, 0>(Layout().Stride()))>::value) ||
+                    Get<0, 0>(Layout().Stride()) > 0) && Get<0, 1>(Layout().Stride()) > 0 &&
+                ((IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<1, 0>(Layout().Stride()))>::value) ||
+                    Get<1, 0>(Layout().Stride()) > 0) && Get<1, 1>(Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check source stride in Slice, dynamic source stride leaves should be greater than 0."));
+        } else if constexpr (IsSameStructureV<decltype(Layout().Stride()),
+                                 Std::tuple<int, Std::tuple<Std::tuple<int, int>, Std::tuple<int, int>>>> &&
+            IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn, ScaleANDLayoutPtn,
+                ScaleADNLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(Layout().Stride()) > 0 &&
+                (((IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<1, 0, 0>(Layout().Stride()))>::value) ||
+                    Get<1, 0, 0>(Layout().Stride()) > 0) && Get<1, 0, 1>(Layout().Stride()) > 0 &&
+                ((IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<1, 1, 0>(Layout().Stride()))>::value) ||
+                    Get<1, 1, 0>(Layout().Stride()) > 0) && Get<1, 1, 1>(Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check source stride in Slice, dynamic source stride leaves should be greater than 0."));
+        } else if constexpr (IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                                 ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), Layout().Stride(),
+                [](const auto& shape, const auto& stride) __aicore__ {
+                    return stride > 0 ||
+                        (shape == 1 && Std::is_constant<0, decltype(stride)>::value);
+                })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check source stride in Slice, dynamic source stride leaves should be greater than 0."));
+        } else {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Stride(), Layout().Stride(),
+                [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check source stride in Slice, dynamic source stride leaves should be greater than 0."));
+        }
+        if constexpr (IsLayoutV<Info>) {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(info.Shape(), info.Shape(),
+                [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check info shape in Slice, all dynamic info shape leaves should be greater than 0."));
+        } else {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(info, info,
+                [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check info shape in Slice, all dynamic info shape leaves should be greater than 0."));
+        }
+        if constexpr (IsLayoutV<Info>) {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                [](const auto& shape, const auto& coordinate) __aicore__ {
+                    return coordinate >= 0 && coordinate < shape;
+                })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+        } else if constexpr (Std::tuple_size_v<Std::remove_cvref_t<Info>> != 2 || LayoutType::rank != 2) {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                [](const auto& shape, const auto& coordinate) __aicore__ {
+                    return coordinate >= 0 && coordinate < shape;
+                })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+        } else if constexpr (!Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<0>(info))>> &&
+                             !Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1>(info))>> &&
+                             Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<0>(Layout().Shape()))>> &&
+                             Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1>(Layout().Shape()))>>) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(coord) >= 0 && Get<0>(coord) < Product{}(Get<0>(Layout().Shape())) &&
+                Get<1>(coord) >= 0 && Get<1>(coord) < Product{}(Get<1>(Layout().Shape()))),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check coord in Slice, logical row and column coordinates should be in source range."));
+        } else if constexpr (!Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<0>(info))>> &&
+                             Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1>(info))>> &&
+                             !Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<0>(Layout().Shape()))>> &&
+                             Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1>(Layout().Shape()))>>) {
+            if constexpr (Std::tuple_size_v<Std::remove_cvref_t<decltype(Get<1>(info))>> != 2 ||
+                          Std::tuple_size_v<Std::remove_cvref_t<decltype(Get<1>(Layout().Shape()))>> != 2) {
+                ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                    [](const auto& shape, const auto& coordinate) __aicore__ {
+                        return coordinate >= 0 && coordinate < shape;
+                    })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+            } else if constexpr (!Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1, 0>(info))>> &&
+                          !Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1, 1>(info))>> &&
+                          Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1, 0>(Layout().Shape()))>> &&
+                          Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1, 1>(Layout().Shape()))>>) {
+                ASCENDC_DEBUG_ASSERT((Get<0>(coord) >= 0 && Get<0>(coord) < Get<0>(Layout().Shape()) &&
+                    Get<1, 0>(coord) >= 0 && Get<1, 0>(coord) < Product{}(Get<1, 0>(Layout().Shape())) &&
+                    Get<1, 1>(coord) >= 0 && Get<1, 1>(coord) < Product{}(Get<1, 1>(Layout().Shape()))),
+                    KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "Failed to check coord in Slice, batch, logical row, and column coordinates should be in source range."));
+            } else {
+                ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                    [](const auto& shape, const auto& coordinate) __aicore__ {
+                        return coordinate >= 0 && coordinate < shape;
+                    })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+            }
+        } else {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                [](const auto& shape, const auto& coordinate) __aicore__ {
+                    return coordinate >= 0 && coordinate < shape;
+                })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+        }
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);
@@ -133,6 +243,116 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const
     {
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), Layout().Shape(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check source shape in Slice, all source shape leaves should be greater than 0."));
+        if constexpr (IsSameStructureV<decltype(Layout().Stride()),
+                          Std::tuple<Std::tuple<int, int>, Std::tuple<int, int>>> &&
+            IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn, ScaleANDLayoutPtn,
+                ScaleADNLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((
+                (((IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<0, 0>(Layout().Stride()))>::value) ||
+                    Get<0, 0>(Layout().Stride()) > 0) && Get<0, 1>(Layout().Stride()) > 0 &&
+                ((IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<1, 0>(Layout().Stride()))>::value) ||
+                    Get<1, 0>(Layout().Stride()) > 0) && Get<1, 1>(Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check source stride in Slice, dynamic source stride leaves should be greater than 0."));
+        } else if constexpr (IsSameStructureV<decltype(Layout().Stride()),
+                                 Std::tuple<int, Std::tuple<Std::tuple<int, int>, Std::tuple<int, int>>>> &&
+            IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn, ScaleANDLayoutPtn,
+                ScaleADNLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(Layout().Stride()) > 0 &&
+                (((IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<1, 0, 0>(Layout().Stride()))>::value) ||
+                    Get<1, 0, 0>(Layout().Stride()) > 0) && Get<1, 0, 1>(Layout().Stride()) > 0 &&
+                ((IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<1, 1, 0>(Layout().Stride()))>::value) ||
+                    Get<1, 1, 0>(Layout().Stride()) > 0) && Get<1, 1, 1>(Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check source stride in Slice, dynamic source stride leaves should be greater than 0."));
+        } else if constexpr (IsOneOfAttrV<GetLayoutPattern<LayoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                                 ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), Layout().Stride(),
+                [](const auto& shape, const auto& stride) __aicore__ {
+                    return stride > 0 ||
+                        (shape == 1 && Std::is_constant<0, decltype(stride)>::value);
+                })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check source stride in Slice, dynamic source stride leaves should be greater than 0."));
+        } else {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Stride(), Layout().Stride(),
+                [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check source stride in Slice, dynamic source stride leaves should be greater than 0."));
+        }
+        if constexpr (IsLayoutV<Info>) {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(info.Shape(), info.Shape(),
+                [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check info shape in Slice, all dynamic info shape leaves should be greater than 0."));
+        } else {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(info, info,
+                [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check info shape in Slice, all dynamic info shape leaves should be greater than 0."));
+        }
+        if constexpr (IsLayoutV<Info>) {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                [](const auto& shape, const auto& coordinate) __aicore__ {
+                    return coordinate >= 0 && coordinate < shape;
+                })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+        } else if constexpr (Std::tuple_size_v<Std::remove_cvref_t<Info>> != 2 || LayoutType::rank != 2) {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                [](const auto& shape, const auto& coordinate) __aicore__ {
+                    return coordinate >= 0 && coordinate < shape;
+                })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+        } else if constexpr (!Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<0>(info))>> &&
+                             !Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1>(info))>> &&
+                             Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<0>(Layout().Shape()))>> &&
+                             Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1>(Layout().Shape()))>>) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(coord) >= 0 && Get<0>(coord) < Product{}(Get<0>(Layout().Shape())) &&
+                Get<1>(coord) >= 0 && Get<1>(coord) < Product{}(Get<1>(Layout().Shape()))),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check coord in Slice, logical row and column coordinates should be in source range."));
+        } else if constexpr (!Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<0>(info))>> &&
+                             Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1>(info))>> &&
+                             !Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<0>(Layout().Shape()))>> &&
+                             Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1>(Layout().Shape()))>>) {
+            if constexpr (Std::tuple_size_v<Std::remove_cvref_t<decltype(Get<1>(info))>> != 2 ||
+                          Std::tuple_size_v<Std::remove_cvref_t<decltype(Get<1>(Layout().Shape()))>> != 2) {
+                ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                    [](const auto& shape, const auto& coordinate) __aicore__ {
+                        return coordinate >= 0 && coordinate < shape;
+                    })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+            } else if constexpr (!Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1, 0>(info))>> &&
+                          !Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1, 1>(info))>> &&
+                          Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1, 0>(Layout().Shape()))>> &&
+                          Std::is_tuple_v<Std::remove_cvref_t<decltype(Get<1, 1>(Layout().Shape()))>>) {
+                ASCENDC_DEBUG_ASSERT((Get<0>(coord) >= 0 && Get<0>(coord) < Get<0>(Layout().Shape()) &&
+                    Get<1, 0>(coord) >= 0 && Get<1, 0>(coord) < Product{}(Get<1, 0>(Layout().Shape())) &&
+                    Get<1, 1>(coord) >= 0 && Get<1, 1>(coord) < Product{}(Get<1, 1>(Layout().Shape()))),
+                    KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "Failed to check coord in Slice, batch, logical row, and column coordinates should be in source range."));
+            } else {
+                ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                    [](const auto& shape, const auto& coordinate) __aicore__ {
+                        return coordinate >= 0 && coordinate < shape;
+                    })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+            }
+        } else {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(Layout().Shape(), coord,
+                [](const auto& shape, const auto& coordinate) __aicore__ {
+                    return coordinate >= 0 && coordinate < shape;
+                })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check coord in Slice, all coordinates should be in corresponding source shape range."));
+        }
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);

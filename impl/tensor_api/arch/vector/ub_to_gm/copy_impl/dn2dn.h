@@ -54,6 +54,9 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
+        ASCENDC_DEBUG_ASSERT((GetTotalColumnShape(srcLayout) >= 1 && GetTotalColumnShape(srcLayout) <= 4095),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyUB2GM, blockCount should be in range [1, 4095]."));
         uint16_t blockCount = GetTotalColumnShape(srcLayout);
         uint32_t blockLen =
             Std::min(GetTotalRowShape(srcLayout) * sizeof(SrcType), GetTotalRowShape(dstLayout) * sizeof(DstType));

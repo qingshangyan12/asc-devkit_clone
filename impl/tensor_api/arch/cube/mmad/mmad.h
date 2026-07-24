@@ -58,12 +58,50 @@ private:
         static_assert(Std::is_same_v<dstPos, Location::L0C>, "When Mmad, dst tensor must be from L0C.");
         static_assert(Std::is_same_v<fmPos, Location::L0A>, "When Mmad, fm tensor must be from L0A.");
         static_assert(Std::is_same_v<filterPos, Location::L0B>, "When Mmad, filter tensor must be from L0B.");
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 64 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in Mmad, dst address should be 64-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(fm.Data().Get()) % 512 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm address in Mmad, fm address should be 512-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(filter.Data().Get()) % 512 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter address in Mmad, filter address should be 512-byte aligned."));
         using DstLayout = typename T::layoutType;
         using FmLayout = typename U::layoutType;
         using FilterLayout = typename S::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        ASCENDC_DEBUG_ASSERT((params.m > 0 && params.m <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in Mmad, MmadParams.m should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((params.n > 0 && params.n <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.n in Mmad, MmadParams.n should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((params.k > 0 && params.k <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.k in Mmad, MmadParams.k should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((params.unitFlag == 0 || params.unitFlag == 2 || params.unitFlag == 3),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.unitFlag in Mmad, supported values are 0, 2, and 3."));
+        ASCENDC_DEBUG_ASSERT((trait.disableGemv || params.m == 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in Mmad, MmadParams.m should be 1 when GEMV is enabled."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(dst.Layout().Shape(), dst.Layout().Shape(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst shape in Mmad, all dst shape leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(dst.Layout().Stride(), dst.Layout().Stride(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in Mmad, all dynamic dst stride leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(fm.Layout().Shape(), fm.Layout().Shape(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm shape in Mmad, all fm shape leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(fm.Layout().Stride(), fm.Layout().Stride(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm stride in Mmad, all dynamic fm stride leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(filter.Layout().Shape(), filter.Layout().Shape(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter shape in Mmad, all filter shape leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(filter.Layout().Stride(), filter.Layout().Stride(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter stride in Mmad, all dynamic filter stride leaves should be greater than 0."));
         using MmadImpl = typename MmadRouting<
             CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, Location::INVALID>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, params);
@@ -84,12 +122,87 @@ private:
         static_assert(
             Std::is_same_v<biasPos, Location::L0C> || Std::is_same_v<biasPos, Location::BIAS>,
             "When Mmad, bias tensor must be from L0C or BIAS.");
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 64 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in Mmad with bias, dst address should be 64-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(fm.Data().Get()) % 512 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm address in Mmad with bias, fm address should be 512-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(filter.Data().Get()) % 512 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter address in Mmad with bias, filter address should be 512-byte aligned."));
         using DstLayout = typename T::layoutType;
         using FmLayout = typename U::layoutType;
         using FilterLayout = typename S::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        ASCENDC_DEBUG_ASSERT((params.m > 0 && params.m <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in Mmad with bias, MmadParams.m should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((params.n > 0 && params.n <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.n in Mmad with bias, MmadParams.n should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((params.k > 0 && params.k <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.k in Mmad with bias, MmadParams.k should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((params.unitFlag == 0 || params.unitFlag == 2 || params.unitFlag == 3),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.unitFlag in Mmad with bias, supported values are 0, 2, and 3."));
+        ASCENDC_DEBUG_ASSERT((trait.disableGemv || params.m == 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in Mmad with bias, MmadParams.m should be 1 when GEMV is enabled."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(dst.Layout().Shape(), dst.Layout().Shape(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst shape in Mmad with bias, all dst shape leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(dst.Layout().Stride(), dst.Layout().Stride(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in Mmad with bias, all dynamic dst stride leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(fm.Layout().Shape(), fm.Layout().Shape(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm shape in Mmad with bias, all fm shape leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(fm.Layout().Stride(), fm.Layout().Stride(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm stride in Mmad with bias, all dynamic fm stride leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(filter.Layout().Shape(), filter.Layout().Shape(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter shape in Mmad with bias, all filter shape leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(filter.Layout().Stride(), filter.Layout().Stride(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter stride in Mmad with bias, all dynamic filter stride leaves should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(bias.Layout().Shape(), bias.Layout().Shape(),
+            [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check bias shape in Mmad with bias, all bias shape leaves should be greater than 0."));
+        if constexpr (Std::remove_cvref_t<decltype(bias.Layout())>::depth == FOUR_DIM_DATA &&
+            IsOneOfAttrV<GetLayoutPattern<typename V::layoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((
+                (((IsOneOfAttrV<GetLayoutPattern<typename V::layoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<0, 0>(bias.Layout().Stride()))>::value) ||
+                    Get<0, 0>(bias.Layout().Stride()) > 0) && Get<0, 1>(bias.Layout().Stride()) > 0 &&
+                ((IsOneOfAttrV<GetLayoutPattern<typename V::layoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<1, 0>(bias.Layout().Stride()))>::value) ||
+                    Get<1, 0>(bias.Layout().Stride()) > 0) && Get<1, 1>(bias.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check bias stride in Mmad with bias, all dynamic bias stride leaves should be greater than 0."));
+        } else if constexpr (Std::remove_cvref_t<decltype(bias.Layout())>::depth == FIVE_DIM_DATA &&
+            IsOneOfAttrV<GetLayoutPattern<typename V::layoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(bias.Layout().Stride()) > 0 &&
+                (((IsOneOfAttrV<GetLayoutPattern<typename V::layoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleADNLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<1, 0, 0>(bias.Layout().Stride()))>::value) ||
+                    Get<1, 0, 0>(bias.Layout().Stride()) > 0) && Get<1, 0, 1>(bias.Layout().Stride()) > 0 &&
+                ((IsOneOfAttrV<GetLayoutPattern<typename V::layoutType>, NDExtLayoutPtn, DNExtLayoutPtn,
+                    ScaleANDLayoutPtn, ScaleBNDLayoutPtn, ScaleBDNLayoutPtn> &&
+                    Std::is_constant<0, decltype(Get<1, 1, 0>(bias.Layout().Stride()))>::value) ||
+                    Get<1, 1, 0>(bias.Layout().Stride()) > 0) && Get<1, 1, 1>(bias.Layout().Stride()) > 0)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check bias stride in Mmad with bias, all dynamic bias stride leaves should be greater than 0."));
+        } else {
+            ASCENDC_DEBUG_ASSERT((Product{}(TransformTupleApply(bias.Layout().Stride(), bias.Layout().Stride(),
+                [](const auto& value, const auto&) __aicore__ { return value > 0; })) != 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check bias stride in Mmad with bias, all dynamic bias stride leaves should be greater than 0."));
+        }
         using MmadImpl =
             typename MmadRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, biasPos>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, bias, params);
