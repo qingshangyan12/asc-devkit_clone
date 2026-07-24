@@ -117,6 +117,8 @@ endif()
 
 if (BUILD_OPEN_PROJECT)
     add_subdirectory(detail/hccl/cc)
+    # 引入 asc-comm AICPU hcomm 头文件安装规则。
+    include(${PROJECT_SOURCE_DIR}/cmake/3rdparty/asc-comm.cmake)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
