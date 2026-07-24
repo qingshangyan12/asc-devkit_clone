@@ -47,6 +47,82 @@ public:
         static_assert(Std::is_same_v<dstPos, Location::GM>, "When Copy tensor from L0C to GM, dst tensor must on GM");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to GM, src tensor must on L0C");
 
+        CheckLayoutPattern<T, U>();
+        if constexpr (T::layoutType::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, all dst stride leaves should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == THREE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, all dst stride leaves should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<0, 1>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 1>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, runtime dst row-one and column-one strides should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0, 1>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 0, 1>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, dst batch, row-one and column-one strides should be greater than 0."));
+        }
+        if constexpr (U::layoutType::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(src.Layout().Shape()) > 0 &&
+                Get<0, 1>(src.Layout().Shape()) > 0 &&
+                Get<1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL0C2GM, all src shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(src.Layout().Stride()) > 0 &&
+                Get<0, 1>(src.Layout().Stride()) > 0 &&
+                Get<1, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 1>(src.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL0C2GM, all src stride leaves should be greater than 0."));
+        } else if constexpr (U::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(src.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 0, 1>(src.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL0C2GM, all src shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(src.Layout().Stride()) > 0 &&
+                Get<1, 0, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 0, 1>(src.Layout().Stride()) > 0 &&
+                Get<1, 1, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 1, 1>(src.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL0C2GM, all src stride leaves should be greater than 0."));
+        }
+
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
 
@@ -63,6 +139,82 @@ public:
         static_assert(Std::is_same_v<dstPos, Location::GM>, "When Copy tensor from L0C to GM, dst tensor must on GM");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to GM, src tensor must on L0C");
 
+        CheckLayoutPattern<T, U>();
+        if constexpr (T::layoutType::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, all dst stride leaves should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == THREE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, all dst stride leaves should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<0, 1>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 1>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, runtime dst row-one and column-one strides should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0, 1>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 0, 1>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, dst batch, row-one and column-one strides should be greater than 0."));
+        }
+        if constexpr (U::layoutType::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(src.Layout().Shape()) > 0 &&
+                Get<0, 1>(src.Layout().Shape()) > 0 &&
+                Get<1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL0C2GM, all src shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(src.Layout().Stride()) > 0 &&
+                Get<0, 1>(src.Layout().Stride()) > 0 &&
+                Get<1, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 1>(src.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL0C2GM, all src stride leaves should be greater than 0."));
+        } else if constexpr (U::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(src.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 0, 1>(src.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL0C2GM, all src shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(src.Layout().Stride()) > 0 &&
+                Get<1, 0, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 0, 1>(src.Layout().Stride()) > 0 &&
+                Get<1, 1, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 1, 1>(src.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL0C2GM, all src stride leaves should be greater than 0."));
+        }
+
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
 
@@ -78,6 +230,127 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::GM>, "When Copy tensor from L0C to GM, dst tensor must on GM");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to GM, src tensor must on L0C");
+
+        CheckLayoutPattern<T, U, S>();
+        if constexpr (T::layoutType::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, all dst stride leaves should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == THREE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, all dst stride leaves should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<0, 1>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 1>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, runtime dst row-one and column-one strides should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0, 1>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL0C2GM, all dst shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 0, 1>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL0C2GM, dst batch, row-one and column-one strides should be greater than 0."));
+        }
+        if constexpr (U::layoutType::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(src.Layout().Shape()) > 0 &&
+                Get<0, 1>(src.Layout().Shape()) > 0 &&
+                Get<1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL0C2GM, all src shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(src.Layout().Stride()) > 0 &&
+                Get<0, 1>(src.Layout().Stride()) > 0 &&
+                Get<1, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 1>(src.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL0C2GM, all src stride leaves should be greater than 0."));
+        } else if constexpr (U::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(src.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 0, 1>(src.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL0C2GM, all src shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(src.Layout().Stride()) > 0 &&
+                Get<1, 0, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 0, 1>(src.Layout().Stride()) > 0 &&
+                Get<1, 1, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 1, 1>(src.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL0C2GM, all src stride leaves should be greater than 0."));
+        }
+        if constexpr (S::layoutType::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(quant.Layout().Shape()) > 0 &&
+                Get<1>(quant.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check quant shape in CopyL0C2GM, all quant shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(quant.Layout().Stride()) > 0 &&
+                Get<1>(quant.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check quant stride in CopyL0C2GM, all quant stride leaves should be greater than 0."));
+        } else if constexpr (S::layoutType::depth == THREE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(quant.Layout().Shape()) > 0 &&
+                Get<1, 0>(quant.Layout().Shape()) > 0 &&
+                Get<1, 1>(quant.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check quant shape in CopyL0C2GM, all quant shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(quant.Layout().Stride()) > 0 &&
+                Get<1, 0>(quant.Layout().Stride()) > 0 &&
+                Get<1, 1>(quant.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check quant stride in CopyL0C2GM, all quant stride leaves should be greater than 0."));
+        } else if constexpr (S::layoutType::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 0>(quant.Layout().Shape()) > 0 &&
+                Get<0, 1>(quant.Layout().Shape()) > 0 &&
+                Get<1, 0>(quant.Layout().Shape()) > 0 &&
+                Get<1, 1>(quant.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check quant shape in CopyL0C2GM, all quant shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0, 1>(quant.Layout().Stride()) > 0 &&
+                Get<1, 1>(quant.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check quant stride in CopyL0C2GM, runtime quant row-one and column-one strides should be greater than 0."));
+        } else if constexpr (S::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(quant.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(quant.Layout().Shape()) > 0 &&
+                Get<1, 0, 1>(quant.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(quant.Layout().Shape()) > 0 &&
+                Get<1, 1, 1>(quant.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check quant shape in CopyL0C2GM, all quant shape leaves should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((
+                Get<0>(quant.Layout().Stride()) > 0 &&
+                Get<1, 0, 1>(quant.Layout().Stride()) > 0 &&
+                Get<1, 1, 1>(quant.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check quant stride in CopyL0C2GM, quant batch, row-one and column-one strides should be greater than 0."));
+        }
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;

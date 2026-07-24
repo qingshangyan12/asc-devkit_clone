@@ -61,6 +61,10 @@ private:
         uint16_t kStartPosition = 0;
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+        ASCENDC_DEBUG_ASSERT((mStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mStep in CopyL12L0ScaleA path, mStep should be no greater than 255."));
+        ASCENDC_DEBUG_ASSERT((kStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0ScaleA path, kStep should be no greater than 255."));
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) >> 5;
         auto dstStride = kStep;
         uint64_t mxDstAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.Data().Get()));

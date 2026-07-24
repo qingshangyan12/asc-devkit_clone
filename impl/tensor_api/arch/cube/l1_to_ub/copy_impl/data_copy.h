@@ -33,6 +33,7 @@ public:
     template <const CopyL12UBTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        CheckLayoutPattern<T, U>();
         Execute<trait>(dst, src);
     }
 
@@ -73,6 +74,7 @@ public:
     template <const CopyL12UBTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        CheckLayoutPattern<T, U>();
         Execute<trait>(dst, src);
     }
 
@@ -113,6 +115,7 @@ public:
     template <const CopyL12UBTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        CheckLayoutPattern<T, U>();
         Execute<trait>(dst, src);
     }
 

@@ -45,6 +45,13 @@ public:
         if ASCEND_IS_AIC {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((blockCount >= 1 && blockCount <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyUB2GM instruction, blockCount should be in range [1, 4095]."));
+        ASCENDC_DEBUG_ASSERT((blockLen >= 1 && blockLen <= 2097151), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyUB2GM instruction, blockLen should be in range [1, 2097151]."));
+        ASCENDC_DEBUG_ASSERT((srcStride == static_cast<int64_t>(blockLen) || srcStride % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check srcStride in CopyUB2GM instruction, srcStride should equal blockLen or be 32-byte aligned."));
         asc_copy_ub2gm_align(dst, src, blockCount, blockLen, cacheMode, dstStride, static_cast<uint32_t>(srcStride));
     }
 };

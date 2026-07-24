@@ -32,6 +32,10 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        if constexpr (U::layoutType::depth == THREE_DIM_DATA || U::layoutType::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check batch shape in CopyGM2L1 DN2ZN path, source batch shape should be no greater than 4095."));
+        }
         RunGmToL1Batched<trait, CopyGmToCbufMultiDN2Zn, T, U>(dst, src);
     }
 
@@ -66,6 +70,12 @@ public:
         }
         auto dstRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((dValue % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src row shape in CopyGM2L1 DN2ZN fp4 path, source row shape should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcRowStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src column stride in CopyGM2L1 DN2ZN fp4 path, source column stride should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcDnMatrixStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src batch stride in CopyGM2L1 DN2ZN fp4 path, source batch stride should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             dValue = dValue >> 1;
             srcRowStride = srcRowStride >> 1;
