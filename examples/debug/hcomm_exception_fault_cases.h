@@ -23,6 +23,8 @@ struct CommContext {
     uint64_t remoteBufferAddr;
     uint64_t len;
     uint64_t invalidBufferAddr;
+    uint32_t stage;
+    int32_t initRet;
     int32_t writeRet;
     int32_t drainRet;
     uint64_t sqVa;

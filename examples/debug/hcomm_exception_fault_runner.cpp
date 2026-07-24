@@ -592,13 +592,16 @@ bool TakePendingException(ExceptionSummary &summary, uint64_t &count)
 
 void PrintCommContext(const char *prefix, const CommContext &ctx)
 {
-    std::printf("%s rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu writeRet=%d drainRet=%d\n",
+    std::printf("%s rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu "
+                "stage=%u initRet=%d writeRet=%d drainRet=%d\n",
         prefix,
         ctx.rankId,
         static_cast<unsigned long long>(ctx.channelHandle),
         static_cast<unsigned long long>(ctx.localBufferAddr),
         static_cast<unsigned long long>(ctx.remoteBufferAddr),
         static_cast<unsigned long long>(ctx.len),
+        ctx.stage,
+        ctx.initRet,
         ctx.writeRet,
         ctx.drainRet);
     std::printf("%s dfx sqVa=0x%llx cqVa=0x%llx wqeCnt=%u->%u->%u "
@@ -860,6 +863,8 @@ int RunRank(RankContext *ctx)
     hostCtx.remoteBufferAddr = reinterpret_cast<uint64_t>(remoteBuffer);
     hostCtx.len = bufferSize;
     hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
+    hostCtx.stage = 0;
+    hostCtx.initRet = -9999;
     hostCtx.writeRet = -9999;
     hostCtx.drainRet = -9999;
     hostCtx.rankId = rank;
