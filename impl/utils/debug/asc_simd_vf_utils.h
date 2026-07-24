@@ -26,9 +26,10 @@ __simd_callee__ inline void init_debug_buffer(__ubuf__ BlockVFBufInfo* blockInfo
     blockInfo->writeLen = 0;
     blockInfo->pidx = 0;
     blockInfo->flag = 0;
-    blockInfo->resv1 = 0;
+    blockInfo->finish = 0;
     blockInfo->blockIdx = blockIdx;
     blockInfo->resv2 = 0;
+    blockInfo->readLen = 0;
 }
 
 __simd_callee__ inline bool reserve_debug_tlv(__ubuf__ BlockVFBufInfo* blockInfo, uint32_t tlvLen)
@@ -44,6 +45,11 @@ __simd_callee__ inline bool reserve_debug_tlv(__ubuf__ BlockVFBufInfo* blockInfo
         return false;
     }
     return true;
+}
+
+__simd_callee__ inline void set_debug_finish_flag(__ubuf__ BlockVFBufInfo* blockInfo)
+{
+    blockInfo->finish = 1;
 }
 } // namespace __asc_simd_vf
 
