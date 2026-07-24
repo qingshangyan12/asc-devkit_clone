@@ -17,7 +17,7 @@
 
 ## 支持的CANN软件版本
 
-- \>= CANN 9.1.0
+- \>= CANN 9.2.0
 
 ## 目录结构介绍
 
@@ -60,7 +60,8 @@ output[i] = input[i] / divisor
 两个Case共用的数据搬运和SIMT调用流程如下：
 
 ```cpp
-asc_copy_gm2ub_align(input_buf, input + block_offset, 1, blk_length, 0, 0, false, 0, 0, 0);
+asc_copy_gm2ub_align(input_buf, input + block_offset, 1, blk_length, 0, 0, false,
+    asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
 
 if ASC_IS_AIV {
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
@@ -78,7 +79,8 @@ if ASC_IS_AIV {
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
 }
 
-asc_copy_ub2gm_align(output + block_offset, output_buf, 1, blk_length, 0, 0, 0);
+asc_copy_ub2gm_align(output + block_offset, output_buf, 1, blk_length,
+    asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
 ```
 
 ### 性能指标说明
