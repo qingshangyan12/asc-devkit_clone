@@ -54,10 +54,6 @@ __simd_callee__ inline void asc_pack_to_high(vector_bool& dst, vector_bool src)
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 无
