@@ -65,9 +65,9 @@ template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void Fill(GlobalTensor<T>& gmWorkspaceAddr, const uint64_t size, const T value)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || \
-                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 2201 || \
-                              __NPU_ARCH__ == 5161)
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+     __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 5161)
     InitGlobalMemoryImpl<T>(gmWorkspaceAddr, size, value);
 #endif
 }

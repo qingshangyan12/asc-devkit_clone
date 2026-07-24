@@ -65,9 +65,9 @@ __aicore__ inline U Cast(T valueIn);
 template <typename T, typename U, RoundMode roundMode>
 __aicore__ inline U ScalarCast(T valueIn);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
-                              (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-                              (__NPU_ARCH__ == 5161))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
 // 所有架构共用的：float -> bfloat16_t
 __aicore__ inline bfloat16_t Cast(const float& fVal);
 #endif

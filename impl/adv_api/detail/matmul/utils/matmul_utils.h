@@ -239,8 +239,8 @@ __aicore__ constexpr bool PhyPosIsL1(TPosition pos)
     if (pos == TPosition::A1 || pos == TPosition::B1 || pos == TPosition::SHM || pos == TPosition::TSCM) {
         return true;
     }
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113) || \
+#if defined(__NPU_ARCH__) &&                                                                              \
+        (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113) || \
     (__NPU_ARCH__ == 5161)
     if (pos == TPosition::C1) {
         return true;
@@ -260,8 +260,9 @@ __aicore__ constexpr bool PhyPosIsUB(TPosition pos)
     if (pos == TPosition::C2) {
         return false;
     }
-#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-    (__NPU_ARCH__ == 5161)))
+#elif (                      \
+    defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || (__NPU_ARCH__ == 5161)))
     if (pos == TPosition::C1 || pos == TPosition::C2 || pos == TPosition::CO2 || pos == TPosition::C2PIPE2GM) {
         return false;
     }
@@ -279,8 +280,9 @@ __aicore__ constexpr bool PhyPosIsGM(TPosition pos)
     if (pos == TPosition::GM) {
         return true;
     }
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-    (__NPU_ARCH__ == 5161)))
+#if (                        \
+    defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || (__NPU_ARCH__ == 5161)))
     if (pos == TPosition::CO2) {
         return true;
     }
@@ -550,12 +552,12 @@ __aicore__ inline void CopyTiling(const __gm__ TCubeTiling* gmCubeTiling, TCubeT
 }
 #endif
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool isNormEnableScheduler = DoMatmulNorm(MM_CFG) && (A_TYPE::layout == LayoutMode::NONE) &&
-                                       !ToMatmulConfig(MM_CFG).intraBlockPartSum;
+constexpr bool isNormEnableScheduler =
+    DoMatmulNorm(MM_CFG) && (A_TYPE::layout == LayoutMode::NONE) && !ToMatmulConfig(MM_CFG).intraBlockPartSum;
 
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool isNormDisableScheduler = DoMatmulNorm(MM_CFG) && ((A_TYPE::layout != LayoutMode::NONE) ||
-                                                                 ToMatmulConfig(MM_CFG).intraBlockPartSum);
+constexpr bool isNormDisableScheduler =
+    DoMatmulNorm(MM_CFG) && ((A_TYPE::layout != LayoutMode::NONE) || ToMatmulConfig(MM_CFG).intraBlockPartSum);
 
 template <const auto& MM_CFG>
 constexpr bool IsBasicBlockEnable = DoMatmulBasicBlock(MM_CFG) || DoMatmulSpecialBasicBlock(MM_CFG);

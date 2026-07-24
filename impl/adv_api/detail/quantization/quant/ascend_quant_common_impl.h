@@ -82,9 +82,8 @@ __aicore__ inline void AscendQuantImpl(
         dstTensor, srcTensor, stackTensor, scaleTensor, offsetTensor, scaleCount, offsetCount, calCount);
 }
 
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-    (__NPU_ARCH__ == 5161))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+                              __NPU_ARCH__ == 3113 || (__NPU_ARCH__ == 5161))
 template <typename dstT, typename srcT, bool isReuseSource = false>
 __aicore__ inline void AscendQuantImpl(
     const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const float scale, const float offset,

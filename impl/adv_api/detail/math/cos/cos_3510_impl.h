@@ -24,9 +24,8 @@
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../common/common.h"
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-    __NPU_ARCH__ == 5161)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+                              __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 #if __NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113 && (__NPU_ARCH__ != 5161)
 #include "../sincos/sincos_3510_impl.h"
 #endif
@@ -235,8 +234,7 @@ __aicore__ inline void CosImpl(
     CosImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-__ASC_USE_RESERVED_UBUF__(3510,
-    "Cos is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, "Cos is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void CosCastFullMask(
     const LocalTensor<float>& dstTensor, const LocalTensor<float>& srcTensor, RoundMode castType)
 {
