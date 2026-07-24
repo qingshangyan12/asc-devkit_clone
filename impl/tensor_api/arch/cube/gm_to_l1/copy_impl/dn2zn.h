@@ -56,24 +56,67 @@ public:
         uint32_t dValue;
         uint32_t srcRowStride;
         if constexpr (IsSatisfiedPtnFormatV<U, DNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout) <= 16384),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check nValue in CopyGM2L1 DN2ZN, nValue should be no greater than 16384."));
+            ASCENDC_DEBUG_ASSERT(((static_cast<uint64_t>(GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout)) >>
+                (IsB4Type<type> ? 1 : 0)) <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dValue in CopyGM2L1 DN2ZN, converted dValue should be no greater than 65535."));
+            ASCENDC_DEBUG_ASSERT(((static_cast<uint64_t>(GetElement<AttrInfo::Stride, AttrInfo::Column>(srcLayout)) >>
+                (IsB4Type<type> ? 1 : 0)) > 0 &&
+                (static_cast<uint64_t>(GetElement<AttrInfo::Stride, AttrInfo::Column>(srcLayout)) >>
+                (IsB4Type<type> ? 1 : 0)) <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check srcDValue in CopyGM2L1 DN2ZN, converted srcDValue should be in range (0, 65535]."));
             nValue = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout);
             dValue = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
             srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Column>(srcLayout);
         } else {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) <= 16384),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check nValue in CopyGM2L1 DN2ZN, nValue should be no greater than 16384."));
+            ASCENDC_DEBUG_ASSERT(((static_cast<uint64_t>(GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout)) >>
+                (IsB4Type<type> ? 1 : 0)) <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dValue in CopyGM2L1 DN2ZN, converted dValue should be no greater than 65535."));
+            ASCENDC_DEBUG_ASSERT(((static_cast<uint64_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout)) >>
+                (IsB4Type<type> ? 1 : 0)) > 0 &&
+                (static_cast<uint64_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout)) >>
+                (IsB4Type<type> ? 1 : 0)) <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check srcDValue in CopyGM2L1 DN2ZN, converted srcDValue should be in range (0, 65535]."));
             nValue = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             dValue = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
             srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
         }
+        ASCENDC_DEBUG_ASSERT((dValue > 0 && dValue <= 65535 && nValue > 0 && nValue <= 16384),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 DN2ZN, source row shape should be in range (0, 65535] and source column shape should be in range (0, 16384]."));
         auto dstRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((dValue % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src row shape in CopyGM2L1 DN2ZN fp4 path, source row shape should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcRowStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src column stride in CopyGM2L1 DN2ZN fp4 path, source column stride should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcDnMatrixStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src batch stride in CopyGM2L1 DN2ZN fp4 path, source batch stride should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             dValue = dValue >> 1;
             srcRowStride = srcRowStride >> 1;
             srcDnMatrixStride = srcDnMatrixStride >> 1;
         }
+        ASCENDC_DEBUG_ASSERT((srcDnMatrixStride <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check srcNdMatrixStride in CopyGM2L1 DN2ZN, converted srcNdMatrixStride should be no greater than 65535."));
+        ASCENDC_DEBUG_ASSERT((dstRowStride % C0_ELEMENT<type> == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst row stride in CopyGM2L1 DN2ZN, destination row stride should be divisible by C0_ELEMENT."));
+        ASCENDC_DEBUG_ASSERT((dstNzMatrixStride % C0_ELEMENT<type> == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 DN2ZN, destination batch stride should be divisible by C0_ELEMENT."));
 
         uint64_t srcDValue = srcRowStride;
+        ASCENDC_DEBUG_ASSERT(((static_cast<uint64_t>(dstRowStride) / C0_ELEMENT<type>) > 0 &&
+            (static_cast<uint64_t>(dstRowStride) / C0_ELEMENT<type>) <= 16384),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstNzC0Stride in CopyGM2L1 DN2ZN, dstNzC0Stride should be in range (0, 16384]."));
         uint16_t dstNzC0Stride = dstRowStride / C0_ELEMENT<type>;
+        ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0 && dstNzC0Stride <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst row stride in CopyGM2L1 DN2ZN, converted destination C0 stride should be in range (0, 16384]."));
         uint16_t dstNzNStride = 1;
 
         uint64_t loop1SrcStride = srcDValue * sizeof(type);
@@ -82,7 +125,12 @@ public:
         uint16_t loop2DstStride = dstNzNStride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3DstStride = dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_stride
         // loop4_dst_stride : dst_nz_matrix_stride * size_of_dst_type / C0_SIZE
+        ASCENDC_DEBUG_ASSERT(((static_cast<uint64_t>(dstNzMatrixStride) >> (IsB4Type<type> ? 1 : 0)) <= 16384),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstNzMatrixStride in CopyGM2L1 DN2ZN, converted dstNzMatrixStride should be no greater than 16384."));
         uint16_t loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride / C0_ELEMENT<type>);
+        ASCENDC_DEBUG_ASSERT((loop4DstStride <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 DN2ZN, converted destination batch stride should be no greater than 65535."));
 
         uint8_t cacheMode = src.Engine().GetCacheMode();
 

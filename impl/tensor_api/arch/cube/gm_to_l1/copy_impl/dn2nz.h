@@ -56,21 +56,52 @@ public:
         uint32_t srcColShape;
         uint32_t srcColStride;
         if constexpr (IsSatisfiedPtnFormatV<U, DNLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout) <= 16384),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check nValue in CopyGM2L1 DN2NZ, nValue should be no greater than 16384."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column>(srcLayout) > 0 &&
+                static_cast<uint64_t>(GetElement<AttrInfo::Stride, AttrInfo::Column>(srcLayout)) <=
+                ((1ULL << 40) - 1)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check srcDValue in CopyGM2L1 DN2NZ, srcDValue should be in range (0, 2^40 - 1]."));
             srcRowShape = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
             srcColShape = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout);
             srcColStride = GetElement<AttrInfo::Stride, AttrInfo::Column>(srcLayout);
         } else {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) <= 16384),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check nValue in CopyGM2L1 DN2NZ, nValue should be no greater than 16384."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) > 0 &&
+                static_cast<uint64_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout)) <=
+                ((1ULL << 40) - 1)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check srcDValue in CopyGM2L1 DN2NZ, srcDValue should be in range (0, 2^40 - 1]."));
             srcRowShape = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
             srcColShape = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             srcColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
         }
+        ASCENDC_DEBUG_ASSERT((srcRowShape > 0 && srcRowShape <= 16384 && srcColShape > 0 && srcColShape <= 65535),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 DN2NZ, source row shape should be in range (0, 16384] and source column shape should be in range (0, 65535]."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) % C0_ELEMENT<type> == 0 &&
+            (static_cast<uint64_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout)) /
+            C0_ELEMENT<type>) > 0 &&
+            (static_cast<uint64_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout)) /
+            C0_ELEMENT<type>) <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstNzC0Stride in CopyGM2L1 DN2NZ, dstNzC0Stride should be in range (0, 16384]."));
         uint16_t dstBColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
+        ASCENDC_DEBUG_ASSERT((dstBColStride % C0_ELEMENT<type> == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst column stride in CopyGM2L1 DN2NZ, destination column stride should be divisible by C0_ELEMENT."));
+        ASCENDC_DEBUG_ASSERT((dstNzMatrixStride % C0_ELEMENT<type> == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 DN2NZ, destination batch stride should be divisible by C0_ELEMENT."));
 
         uint16_t nValue = srcRowShape;
         uint32_t dValue = srcColShape;
         uint64_t srcDValue = srcColStride;
 
         uint16_t dstNzC0Stride = dstBColStride / C0_ELEMENT<type>;
+        ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0 && dstNzC0Stride <= 16384),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst column stride in CopyGM2L1 DN2NZ, converted destination C0 stride should be in range (0, 16384]."));
         uint16_t dstNzNStride = 1;
 
         uint64_t loop1SrcStride = srcDValue * sizeof(type);
@@ -79,7 +110,13 @@ public:
         uint16_t loop2DstStride = dstNzNStride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3DstStride = dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
         // loop4_dst_stride: dst_nz_matrix_stride * size_of_dst_type / C0_size
+        ASCENDC_DEBUG_ASSERT((srcDnMatrixStride <= ((1ULL << 40) - 1)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check srcDnMatrixStride in CopyGM2L1 DN2NZ, srcDnMatrixStride should be no greater than 2^40 - 1."));
+        ASCENDC_DEBUG_ASSERT((dstNzMatrixStride <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstNzMatrixStride in CopyGM2L1 DN2NZ, dstNzMatrixStride should be no greater than 16384."));
         uint16_t loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride / C0_ELEMENT<type>);
+        ASCENDC_DEBUG_ASSERT((loop4DstStride <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 DN2NZ, converted destination batch stride should be no greater than 65535."));
 
         uint8_t cacheMode = src.Engine().GetCacheMode();
 

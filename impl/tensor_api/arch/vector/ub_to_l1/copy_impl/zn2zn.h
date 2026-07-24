@@ -56,6 +56,14 @@ private:
 
         uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         uint32_t blockLen = GetTotalColumnShape(srcLayout);
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) % C0_ELEMENT<SrcType> == 0 &&
+            GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / C0_ELEMENT<SrcType> >= blockLen),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyUB2L1 ZN path, source row stride should be divisible by C0 and no less than blockLen in C0 units."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) % C0_ELEMENT<DstType> == 0 &&
+            GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) / C0_ELEMENT<DstType> >= blockLen),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyUB2L1 ZN path, destination row stride should be divisible by C0 and no less than blockLen in C0 units."));
         int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / C0_ELEMENT<SrcType> - blockLen;
         int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) / C0_ELEMENT<DstType> - blockLen;
 

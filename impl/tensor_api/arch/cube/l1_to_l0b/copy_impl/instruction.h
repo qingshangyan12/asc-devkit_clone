@@ -48,6 +48,15 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((mStep > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mStep in CopyL12L0B instruction, mStep should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((kStep > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0B instruction, kStep should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((dstStride > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstStride in CopyL12L0B instruction, dstStride should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((!transpose || sizeof(T) != 4 || kStep % 2 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0B transpose instruction, kStep should be even for 32-bit data."));
         if constexpr (transpose) {
             asc_copy_l12l0b_transpose(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         } else {

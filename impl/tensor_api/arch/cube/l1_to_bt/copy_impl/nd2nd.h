@@ -64,10 +64,40 @@ private:
         uint16_t dstRow;
         uint16_t blockCount;
         if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout) <= 4095),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockCount in CopyL12BT ND path, blockCount should be no greater than 4095."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout) <=
+                (IsOneOfAttrV<typename U::elementType, float, int32_t> ? 65534U : 65535U) *
+                    C0_ELEMENT<typename U::elementType>), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyL12BT ND path, blockLen should be no greater than 65535."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout) > 0 &&
+                GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout) <=
+                    4096 / sizeof(typename T::elementType) &&
+                Std::ceil_align(GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout) *
+                    sizeof(typename T::elementType), 64) <=
+                    4096 / GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check destination data amount in CopyL12BT ND path, destination data amount should be no greater than 4096 bytes."));
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
         } else {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) <= 4095),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockCount in CopyL12BT NDExt path, blockCount should be no greater than 4095."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) <=
+                (IsOneOfAttrV<typename U::elementType, float, int32_t> ? 65534U : 65535U) *
+                    C0_ELEMENT<typename U::elementType>), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyL12BT NDExt path, blockLen should be no greater than 65535."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) > 0 &&
+                GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) <=
+                    4096 / sizeof(typename T::elementType) &&
+                Std::ceil_align(GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) *
+                    sizeof(typename T::elementType), 64) <=
+                    4096 / GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check destination data amount in CopyL12BT NDExt path, destination data amount should be no greater than 4096 bytes."));
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
@@ -93,6 +123,10 @@ private:
             blockLen = Std::ceil_align(blockLen, 2);
         }
 
+        ASCENDC_DEBUG_ASSERT((srcRow >= srcCol), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12BT ND path, source row stride should be no less than source column shape."));
+        ASCENDC_DEBUG_ASSERT((dstRow >= srcCol), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12BT ND path, destination row stride should be no less than source column shape."));
         uint16_t srcStride = (srcRow - srcCol) / C0_ELEMENT<srcType>;
         uint16_t dstStride = Std::ceil_align((dstRow - srcCol) / C0_ELEMENT<dstType>, 2);
         CopyL12BTInstr::DataCopy(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
@@ -119,6 +153,11 @@ private:
         auto srcLayout = src.Layout();
         auto dstLayout = dst.Layout();
 
+        ASCENDC_DEBUG_ASSERT((Get<0>(srcLayout.Shape()) == Get<0>(dstLayout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check batch shape in CopyL12BT, source and destination batch shapes should be equal."));
+        ASCENDC_DEBUG_ASSERT((Get<0>(srcLayout.Shape()) <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyL12BT batch path, blockCount should be no greater than 4095."));
         uint16_t batchSize = Get<0>(srcLayout.Shape());
         uint32_t srcBatchStride = Get<0>(srcLayout.Stride());
         uint32_t dstBatchStride = Get<0>(dstLayout.Stride());
@@ -126,6 +165,11 @@ private:
         // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
         // would read the batch axis as row/column.
         auto srcInner = Te::Get<1>(srcLayout);
+        ASCENDC_DEBUG_ASSERT((
+            static_cast<uint64_t>(GetTotalColumnShape(srcInner)) * sizeof(srcType) % 32 == 0 &&
+            static_cast<uint64_t>(GetTotalColumnShape(Te::Get<1>(dstLayout))) * sizeof(dstType) % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check column shape in CopyL12BT batch path, source and destination column shape sizes should be 32-byte aligned."));
 
         uint32_t srcShapeRows;
         uint32_t srcShapeColumns;
@@ -136,6 +180,19 @@ private:
             srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcInner);
             srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcInner);
         }
+        ASCENDC_DEBUG_ASSERT((Get<0>(srcLayout.Shape()) > 0 && srcShapeColumns > 0 &&
+            srcShapeRows <= 4096 / sizeof(dstType) / srcShapeColumns &&
+            Std::ceil_align(srcShapeRows * srcShapeColumns * sizeof(dstType), 64) <=
+                4096 / Get<0>(srcLayout.Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check destination data amount in CopyL12BT batch path, destination data amount should be no greater than 4096 bytes."));
+        ASCENDC_DEBUG_ASSERT((srcShapeColumns > 0 &&
+            srcShapeRows <= ((IsOneOfAttrV<srcType, float, int32_t> ? 65534U : 65535U) *
+                C0_ELEMENT<srcType>) / srcShapeColumns &&
+            (IsOneOfAttrV<srcType, float, int32_t> ?
+                Std::ceil_align(Std::ceil_division(srcShapeRows * srcShapeColumns, C0_ELEMENT<srcType>), 2) :
+                Std::ceil_division(srcShapeRows * srcShapeColumns, C0_ELEMENT<srcType>)) <= 65535),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyL12BT batch path, blockLen should be no greater than 65535."));
 
         bool convControl = false;
         if (IsOneOfAttrV<srcType, half> && IsOneOfAttrV<dstType, float>) {
@@ -150,6 +207,10 @@ private:
         if constexpr (IsOneOfAttrV<srcType, float, int32_t>) {
             blockLen = Std::ceil_align(blockLen, 2);
         }
+        ASCENDC_DEBUG_ASSERT((srcBatchStride >= matrixElems), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12BT batch path, source batch stride should be no less than one matrix element count."));
+        ASCENDC_DEBUG_ASSERT((dstBatchStride >= matrixElems), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12BT batch path, destination batch stride should be no less than one matrix element count."));
         uint16_t srcStride = (srcBatchStride - matrixElems) / C0_ELEMENT<srcType>;
         uint16_t dstStride = Std::ceil_align((dstBatchStride - matrixElems) / C0_ELEMENT<dstType>, 2);
 

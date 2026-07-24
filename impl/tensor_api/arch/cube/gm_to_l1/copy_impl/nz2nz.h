@@ -68,9 +68,18 @@ public:
 
         auto blockCount = bigFractalSize * matrixNum;
         auto blockLen = smallFractalSize * C0_SIZE<>;
+        ASCENDC_DEBUG_ASSERT((smallFractalSize > 0 && blockCount > 0 && blockCount <= 4095),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 NZ2NZ, source small-fractal shape should be greater than 0 and source big-fractal shape times batch shape should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((blockLen <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 NZ2NZ, source small-fractal copy length should be no greater than 65535 bytes."));
         auto srcStride = srcStrideSize * sizeof(type);
         auto dstStride = dstStrideSize * sizeof(type);
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((srcStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyGM2L1 NZ2NZ fp4 path, source column stride in bytes should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((dstStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyGM2L1 NZ2NZ fp4 path, destination column stride in bytes should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             srcStride = srcStride >> 1;
             dstStride = dstStride >> 1;

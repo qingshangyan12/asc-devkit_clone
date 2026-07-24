@@ -82,6 +82,11 @@ private:
             dstShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
             dstStrideRows = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         }
+        ASCENDC_DEBUG_ASSERT((srcShapeRows > 0 && srcShapeRows <= 4095 && srcShapeColumns > 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 ND2ND, source row shape should be in range (0, 4095] and source column shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((dstShapeColumns > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst shape in CopyGM2L1 ND2ND, destination column shape should be greater than 0."));
 
         uint8_t cacheMode = src.Engine().GetCacheMode();
 
@@ -103,11 +108,19 @@ private:
             dstStride = blockLen;
         }
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyGM2L1 ND2ND fp4 path, source copy length should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyGM2L1 ND2ND fp4 path, source row stride in bytes should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((dstStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyGM2L1 ND2ND fp4 path, destination row stride in bytes should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
             srcStride = srcStride >> 1;
             dstStride = dstStride >> 1;
         }
+        ASCENDC_DEBUG_ASSERT((blockLen <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 ND2ND, source copy length should be no greater than 65535 bytes after dtype conversion."));
         CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
     }
 
@@ -145,6 +158,10 @@ private:
             srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcInner);
             srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcInner);
         }
+        ASCENDC_DEBUG_ASSERT((batchSize > 0 && batchSize <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check batch shape in CopyGM2L1 batched ND2ND, source batch shape should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((srcShapeRows > 0 && srcShapeColumns > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 batched ND2ND, source row and column shape should be greater than 0."));
 
         uint32_t matrixElems = srcShapeRows * srcShapeColumns;
         uint8_t cacheMode = src.Engine().GetCacheMode();
@@ -156,11 +173,19 @@ private:
         uint32_t dstStride = dstBatchStride * sizeof(type);
 
         if constexpr (IsB4Type<type>) {
+            ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyGM2L1 batched ND2ND fp4 path, source matrix copy length should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src batch stride in CopyGM2L1 batched ND2ND fp4 path, source batch stride in bytes should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((dstStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst batch stride in CopyGM2L1 batched ND2ND fp4 path, destination batch stride in bytes should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
             srcStride = srcStride >> 1;
             dstStride = dstStride >> 1;
         }
+        ASCENDC_DEBUG_ASSERT((blockLen <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 batched ND2ND, source matrix copy length should be no greater than 65535 bytes after dtype conversion."));
         CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
     }
 };

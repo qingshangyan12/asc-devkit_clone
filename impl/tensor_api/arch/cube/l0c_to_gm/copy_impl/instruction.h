@@ -44,6 +44,35 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((!isChannelSplit || (Std::is_same_v<T, float> && Std::is_same_v<U, float>)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check isChannelSplit in CopyL0C2GM instruction, isChannelSplit requires both dst and src type to be float."));
+        ASCENDC_DEBUG_ASSERT((!isChannelSplit || (!nz2ndEn && !nz2dnEn)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check isChannelSplit in CopyL0C2GM instruction, isChannelSplit can only be used on NZ output path."));
+        ASCENDC_DEBUG_ASSERT((!isChannelSplit || (nSize >= 1 && nSize <= 4095 && nSize % 8 == 0)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2GM instruction, nSize should be in range [1, 4095] and divisible by 8 when isChannelSplit is true."));
+        ASCENDC_DEBUG_ASSERT((isChannelSplit || !nz2ndEn || (nSize >= 1 && nSize <= 4095)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2GM NZ2ND instruction, nSize should be in range [1, 4095]."));
+        ASCENDC_DEBUG_ASSERT((isChannelSplit || !nz2dnEn || (mSize >= 1 && mSize <= 32767)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mSize in CopyL0C2GM NZ2DN instruction, mSize should be in range [1, 32767]."));
+        ASCENDC_DEBUG_ASSERT((isChannelSplit || nz2ndEn || nz2dnEn ||
+            (nSize >= 1 && nSize <= 4095 && nSize % 16 == 0)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2GM NZ instruction, nSize should be in range [1, 4095] and divisible by 16."));
+        ASCENDC_DEBUG_ASSERT((mSize >= 1 && mSize <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mSize in CopyL0C2GM instruction, mSize should be in range [1, 65535]."));
+        ASCENDC_DEBUG_ASSERT((dstStride > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstStride in CopyL0C2GM instruction, dstStride should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((srcStride <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check srcStride in CopyL0C2GM instruction, srcStride should be no greater than 65535."));
+        ASCENDC_DEBUG_ASSERT((!nz2dnEn || nSize <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2GM NZ2DN instruction, nSize should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((unitFlag == 0 || unitFlag == 2 || unitFlag == 3), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check unitFlag in CopyL0C2GM instruction, unitFlag should be 0, 2 or 3."));
+        ASCENDC_DEBUG_ASSERT((!isChannelSplit || unitFlag == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check unitFlag in CopyL0C2GM instruction, unitFlag should be 0 when isChannelSplit is true."));
 
         asc_copy_l0c2gm(
             dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,

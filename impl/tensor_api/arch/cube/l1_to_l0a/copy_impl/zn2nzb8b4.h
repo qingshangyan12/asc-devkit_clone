@@ -60,6 +60,8 @@ private:
         const T& dst, const U& src, uint16_t mStartPosition, uint16_t kStartPosition, uint8_t mStep, uint8_t kStep,
         int16_t srcStride, uint16_t dstStride)
     {
+        ASCENDC_DEBUG_ASSERT((mStep % mStepMinVal == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mStep in CopyL12L0A ZN2NZ B8/B4 split path, mStep should be divisible by split step."));
         uint16_t mLoop = mStep / mStepMinVal;
         mStep = mStepMinVal;
         for (uint16_t idx = 0; idx < mLoop; ++idx) {
@@ -84,11 +86,24 @@ private:
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout) *
                      GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout) / FRACTAL_FIXED;
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+        ASCENDC_DEBUG_ASSERT((mStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mStep in CopyL12L0A ZN2NZ B8/B4 path, mStep should be no greater than 255."));
+        ASCENDC_DEBUG_ASSERT((kStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0A ZN2NZ B8/B4 path, kStep should be no greater than 255."));
         // Zn -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) % STRIDE_UNIT == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12L0A ZN2NZ B8/B4 path, source row stride should be divisible by STRIDE_UNIT."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) % STRIDE_UNIT == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12L0A ZN2NZ B8/B4 path, destination column stride should be divisible by STRIDE_UNIT."));
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / STRIDE_UNIT;
         if (m1 < FRACTAL_FIXED) {
+            ASCENDC_DEBUG_ASSERT((mStep % (IsB4Type<DstType> ? M_STEP_MIN_VAL_B4 : M_STEP_MIN_VAL_B8) == 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check mStep in CopyL12L0A ZN2NZ B8/B4 path, mStep should be divisible by 4 for b4 or by 2 for b8."));
             LoadCbufToCa::LoadData<true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         } else if constexpr (IsB4Type<DstType>) {
             LoadDataImplSplit<M_STEP_MIN_VAL_B4>(
@@ -110,6 +125,9 @@ private:
     {
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
+        ASCENDC_DEBUG_ASSERT((Get<0>(srcLayout.Shape()) == Get<0>(dstLayout.Shape())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check batch shape in CopyL12L0A ZN2NZ B8/B4 path, source and destination batch shape should be equal."));
         auto dstNoBatchLayout = RemoveBatchDim(dstLayout);
         auto srcNoBatchLayout = RemoveBatchDim(srcLayout);
         auto batchNum = Get<0>(dstLayout.Shape());

@@ -84,6 +84,14 @@ private:
         uint64_t srcStride = srcStrideRowsB * sizeof(type);
         uint32_t dstStride = dstStrideRows * sizeof(type);
 
+        ASCENDC_DEBUG_ASSERT((batchNum > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check batch shape in CopyGM2L1 ScaleA ZZ2ZZ, source batch shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((blockCount > 0 && blockCount <= 4095 && srcShapeRowsS > 0 && srcShapeColumns > 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 ScaleA ZZ2ZZ, source big row shape should be in range (0, 4095] and other source row/column shapes should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((blockLen <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape and stride in CopyGM2L1 ScaleA ZZ2ZZ, source copy length should be no greater than 65535 bytes."));
+
         uint8_t leftPaddingCnt = 0;
         uint8_t rightPaddingCnt = 0;
         for (uint16_t batchIndex = 0; batchIndex < batchNum; ++batchIndex) {
