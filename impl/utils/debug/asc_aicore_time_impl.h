@@ -49,7 +49,7 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
     update_write_info(write_info, tlv_len);
 }
 
-__aicore__ inline void asc_time_stamp(uint32_t desc_id)
+__aicore__ __attribute__((noinline)) void asc_time_stamp(uint32_t desc_id)
 {
     enable_asc_diagnostics();
     asc_time_stamp_impl(desc_id);
@@ -93,7 +93,7 @@ __aicore__ inline void asc_mark_stamp()
 #include "../../basic_api/kernel_log.h"
 
 namespace __asc_aicore {
-__aicore__ inline void asc_time_stamp(uint32_t desc_id) {
+__aicore__ __attribute__((noinline)) void asc_time_stamp(uint32_t desc_id) {
     ASCENDC_ASSERT((false), "asc_time_stamp is not supported in cpu mode.");
 }
 } // namespace __asc_aicore
