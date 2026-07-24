@@ -39,12 +39,12 @@ template <
 __aicore__ inline void CheckFuncTopK(
     __gm__ const char* apiName, const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal,
     const LocalTensor<T>& srcLocal, const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal,
-    const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo,
+    const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tiling, const TopKInfo& topKInfo,
     const bool isLargest = true)
 {
     CheckFuncClassTopKTmpBuf<T, isInitIndex, isHasfinish, isReuseSrc, topkMode> checkFun(apiName);
     checkFun.VerifyingParameters(
-        dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, tmpLocal, k, tilling, topKInfo, isLargest);
+        dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, tmpLocal, k, tiling, topKInfo, isLargest);
 }
 
 template <
@@ -53,11 +53,11 @@ template <
 __aicore__ inline void CheckFuncTopK(
     __gm__ const char* apiName, const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal,
     const LocalTensor<T>& srcLocal, const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal,
-    const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+    const int32_t k, const TopkTiling& tiling, const TopKInfo& topKInfo, const bool isLargest = true)
 {
     CheckFuncClassTopK<T, isInitIndex, isHasfinish, isReuseSrc, topkMode> checkFun(apiName);
     checkFun.VerifyingParameters(
-        dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
+        dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tiling, topKInfo, isLargest);
 }
 
 } // namespace HighLevelApiCheck

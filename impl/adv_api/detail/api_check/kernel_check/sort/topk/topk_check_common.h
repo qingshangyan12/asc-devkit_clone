@@ -42,13 +42,13 @@ public:
     __aicore__ inline void CheckTopKParams(
         const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
         const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k,
-        const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+        const TopkTiling& tiling, const TopKInfo& topKInfo, const bool isLargest = true)
     {
         VerifyingParameters<T, isInitIndex, isHasfinish, isReuseSrc, topkMode>(
-            dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
+            dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tiling, topKInfo, isLargest);
         if constexpr (HighLevelAPIParametersPrint) {
             PrintParameters<T, isInitIndex, isHasfinish, isReuseSrc, topkMode>(
-                dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
+                dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tiling, topKInfo, isLargest);
         }
     }
 
@@ -59,7 +59,7 @@ private:
     __aicore__ inline void VerifyingParametersNormal(
         const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
         const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k,
-        const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+        const TopkTiling& tiling, const TopKInfo& topKInfo, const bool isLargest = true)
     {
         ASCENDC_ASSERT((topKInfo.inner <= CHECK_TOPK_NORMAL_INNER_MAX_LEN) || HighLevelAPIParametersPrint, {
             KERNEL_LOG(
@@ -110,7 +110,7 @@ private:
     __aicore__ inline void VerifyingParametersSmall(
         const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
         const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k,
-        const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+        const TopkTiling& tiling, const TopKInfo& topKInfo, const bool isLargest = true)
     {
         ASCENDC_ASSERT((topKInfo.inner == CHECK_TOPK_NSMALL_INNER_LEN) || HighLevelAPIParametersPrint, {
             KERNEL_LOG(
@@ -155,7 +155,7 @@ private:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
         const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k,
-        const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+        const TopkTiling& tiling, const TopKInfo& topKInfo, const bool isLargest = true)
     {
         ASCENDC_ASSERT(((1 <= k) && (k <= topKInfo.n)) || HighLevelAPIParametersPrint, {
             KERNEL_LOG(
@@ -189,12 +189,12 @@ private:
 
         if constexpr (topkMode == TopKMode::TOPK_NORMAL) {
             VerifyingParametersNormal<T, isInitIndex, isHasfinish, isReuseSrc>(
-                dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
+                dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tiling, topKInfo, isLargest);
         }
 
         if constexpr (topkMode == TopKMode::TOPK_NSMALL) {
             VerifyingParametersSmall<T, isInitIndex, isHasfinish, isReuseSrc>(
-                dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
+                dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tiling, topKInfo, isLargest);
         }
 
 #if __NPU_ARCH__ == 2002
@@ -216,7 +216,7 @@ private:
     __aicore__ inline void PrintParameters(
         const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
         const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k,
-        const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+        const TopkTiling& tiling, const TopKInfo& topKInfo, const bool isLargest = true)
     {
         KERNEL_LOG(
             KERNEL_INFO,
@@ -246,7 +246,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
         const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal,
-        const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo,
+        const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tiling, const TopKInfo& topKInfo,
         const bool isLargest = true)
     {
         DataTypeCheckFuncBasicClass::DataTypeVerifyingParameters<T, half, float>(
@@ -262,7 +262,7 @@ public:
             VA_ARGS_TO_MAKE_TUPLE(tmpLocal), VA_ARGS_TO_MAKE_TUPLE_STRING(TPosition::VECCALC));
 
         CheckTopKParamsClass::CheckTopKParams<T, isInitIndex, isHasfinish, isReuseSrc, topkMode>(
-            dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
+            dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tiling, topKInfo, isLargest);
         MultipleTensorCheckFuncBasicClass::TensorReuseVerifyingParameters(
             VA_ARGS_TO_MAKE_TUPLE(dstValueLocal, dstIndexLocal, srcLocal));
 
@@ -299,7 +299,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
         const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k,
-        const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+        const TopkTiling& tiling, const TopKInfo& topKInfo, const bool isLargest = true)
     {
         DataTypeCheckFuncBasicClass::DataTypeVerifyingParameters<T, half, float>(
             "template parameter (T) is not half or float");
@@ -314,7 +314,7 @@ public:
             VA_ARGS_TO_MAKE_TUPLE(dstValueLocal, dstIndexLocal, srcLocal));
 
         CheckTopKParamsClass::CheckTopKParams<T, isInitIndex, isHasfinish, isReuseSrc, topkMode>(
-            dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
+            dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tiling, topKInfo, isLargest);
 
         if (isInitIndex) {
             MultipleTensorCheckFuncBasicClass::TensorReuseVerifyingParameters(
