@@ -42,6 +42,7 @@ namespace __asc_aicore {
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
 {
     copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
+    
 }
 
 __aicore__ inline void enable_asc_diagnostics()
