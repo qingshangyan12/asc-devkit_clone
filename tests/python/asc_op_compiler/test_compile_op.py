@@ -253,11 +253,11 @@ class TestCompileOp(unittest.TestCase):
                 )
             kernel = generate.call_args.kwargs["kernels"][0]
             self.assertEqual(
-                set(kernel), {"kernel_name", "targets", "patches", "recipes"}
+                set(kernel), {"kernel_name", "static_inputs", "patches", "recipes"}
             )
             self.assertEqual(kernel["kernel_name"], "actual_7")
-            self.assertEqual(kernel["targets"][0]["parameter_index"], 5)
-            self.assertEqual(kernel["targets"][0]["byte_size"], 32)
+            self.assertEqual(kernel["static_inputs"][0]["parameter_index"], 5)
+            self.assertEqual(kernel["static_inputs"][0]["byte_size"], 32)
             normal = kernel["recipes"]["normal"]
             self.assertEqual(normal["artifact"], "artifacts/actual_7.o")
             self.assertEqual(len(normal["commands"]), 2)

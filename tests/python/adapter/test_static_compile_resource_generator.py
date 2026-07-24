@@ -699,7 +699,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 kernels=[
                     {
                         "kernel_name": "add_custom_0",
-                        "targets": [
+                        "static_inputs": [
                             {
                                 "name": "tiling_data",
                                 "required": True,
@@ -738,13 +738,13 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             self.assertEqual(manifest["resource_id"], "add_custom")
             kernel = manifest["kernels"][0]
             self.assertEqual(
-                set(kernel), {"kernel_name", "targets", "patches", "recipes"}
+                set(kernel), {"kernel_name", "static_inputs", "patches", "recipes"}
             )
             self.assertEqual(kernel["kernel_name"], "add_custom_0")
-            self.assertEqual(kernel["targets"][0]["parameter_index"], 4)
-            self.assertEqual(kernel["targets"][0]["byte_size"], 8)
+            self.assertEqual(kernel["static_inputs"][0]["parameter_index"], 4)
+            self.assertEqual(kernel["static_inputs"][0]["byte_size"], 8)
             self.assertEqual(
-                set(kernel["targets"][0]),
+                set(kernel["static_inputs"][0]),
                 {"name", "parameter_index", "byte_size"},
             )
             self.assertEqual(
@@ -804,8 +804,19 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                     resources=[{"source": source, "path": "resources/src/kernel.cpp"}],
                     kernels=[kernel],
                 )
+            kernel.pop("architecture")
+            kernel["recipes"]["normal"]["artifact"] = {
+                "file": "artifacts/kernel.o",
+                "format": "elf",
+            }
+            with self.assertRaisesRegex(ValueError, "artifact has invalid fields"):
+                generate_static_compile_resources(
+                    output_root=root, kernel_base="Kernel_x", resource_id="kernel",
+                    resources=[{"source": source, "path": "resources/src/kernel.cpp"}],
+                    kernels=[kernel],
+                )
 
-    def test_rejects_boolean_target_integer_fields(self):
+    def test_rejects_boolean_static_input_integer_fields(self):
         with tempfile.TemporaryDirectory() as root:
             source = os.path.join(root, "kernel.cpp")
             with open(source, "w", encoding="utf-8") as file_obj:
@@ -817,14 +828,14 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 ("byte_size", False),
             ):
                 with self.subTest(field=field, value=value):
-                    target = {
+                    static_input = {
                         "name": "tiling_data",
                         "parameter_index": 4,
                         "byte_size": 8,
                     }
-                    target[field] = value
+                    static_input[field] = value
                     with self.assertRaisesRegex(
-                        ValueError, rf"targets\[0\]\.{field}"
+                        ValueError, rf"static_inputs\[0\]\.{field}"
                     ):
                         generate_static_compile_resources(
                             output_root=root,
@@ -836,7 +847,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                             }],
                             kernels=[{
                                 "kernel_name": "kernel",
-                                "targets": [target],
+                                "static_inputs": [static_input],
                                 "recipes": {"normal": {
                                     "commands": [[
                                         "cp",
@@ -854,7 +865,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             with open(source, "w", encoding="utf-8") as file_obj:
                 file_obj.write("source\n")
 
-            def generate(*, targets=None, commands=None, patches_marker=None):
+            def generate(*, static_inputs=None, commands=None, patches_marker=None):
                 kernel = {
                     "kernel_name": "kernel",
                     "recipes": {"normal": {
@@ -862,8 +873,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                         "artifact": "artifacts/kernel.o",
                     }},
                 }
-                if targets is not None:
-                    kernel["targets"] = targets
+                if static_inputs is not None:
+                    kernel["static_inputs"] = static_inputs
                 if patches_marker == "kernel":
                     kernel["patches"] = []
                 elif patches_marker == "recipe":
@@ -879,25 +890,25 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                     kernels=[kernel],
                 )
 
-            targets = [
-                {"name": f"target_{index}", "parameter_index": index, "byte_size": 1}
+            static_inputs = [
+                {"name": f"input_{index}", "parameter_index": index, "byte_size": 1}
                 for index in range(256)
             ]
-            self.assertTrue(os.path.isdir(generate(targets=targets)))
-            for invalid_targets in ([], targets + [{
+            self.assertTrue(os.path.isdir(generate(static_inputs=static_inputs)))
+            for invalid_inputs in ([], static_inputs + [{
                 "name": "overflow", "parameter_index": 256, "byte_size": 1,
             }]):
-                with self.subTest(target_count=len(invalid_targets)):
-                    with self.assertRaisesRegex(ValueError, "targets.*bounded non-empty"):
-                        generate(targets=invalid_targets)
+                with self.subTest(input_count=len(invalid_inputs)):
+                    with self.assertRaisesRegex(ValueError, "static_inputs.*bounded non-empty"):
+                        generate(static_inputs=invalid_inputs)
 
             max_bytes = 16 * 1024 * 1024
-            self.assertTrue(os.path.isdir(generate(targets=[{
+            self.assertTrue(os.path.isdir(generate(static_inputs=[{
                 "name": "tiling_data", "parameter_index": 0,
                 "byte_size": max_bytes,
             }])))
             with self.assertRaisesRegex(ValueError, "byte_size.*supported range"):
-                generate(targets=[{
+                generate(static_inputs=[{
                     "name": "tiling_data", "parameter_index": 0,
                     "byte_size": max_bytes + 1,
                 }])
@@ -919,7 +930,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             with open(source, "w", encoding="utf-8") as file_obj:
                 file_obj.write("source\n")
 
-            def generate(target):
+            def generate(static_input):
                 return generate_static_compile_resources(
                     output_root=root,
                     kernel_base="Kernel_x",
@@ -930,7 +941,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                     }],
                     kernels=[{
                         "kernel_name": "kernel",
-                        "targets": [target],
+                        "static_inputs": [static_input],
                         "recipes": {"normal": {
                             "commands": [["tool"]],
                             "artifact": "artifacts/kernel.o",
@@ -944,15 +955,15 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 "byte_size": 1,
             })))
             for field in ("parameter_index", "byte_size"):
-                target = {
+                static_input = {
                     "name": "tiling_data",
                     "parameter_index": 0,
                     "byte_size": 1,
                 }
-                target[field] = 2 ** 80
+                static_input[field] = 2 ** 80
                 with self.subTest(field=field):
                     with self.assertRaisesRegex(ValueError, field):
-                        generate(target)
+                        generate(static_input)
 
     def test_rejects_reserved_machine_manifest_references(self):
         with tempfile.TemporaryDirectory() as root:
@@ -963,7 +974,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             def generate(*, resource_path, argument="tool", patches=None):
                 kernel = {
                     "kernel_name": "kernel",
-                    "targets": [{
+                    "static_inputs": [{
                         "name": "tiling_data",
                         "parameter_index": 0,
                         "byte_size": 1,

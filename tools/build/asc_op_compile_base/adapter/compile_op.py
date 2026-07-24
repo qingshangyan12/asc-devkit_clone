@@ -2138,7 +2138,7 @@ def _emit_static_compile_resources(
             kernels.append(
                 {
                     "kernel_name": symbol,
-                    "targets": [
+                    "static_inputs": [
                         {
                             "name": "tiling_data",
                             "parameter_index": workspace_idx + 1,

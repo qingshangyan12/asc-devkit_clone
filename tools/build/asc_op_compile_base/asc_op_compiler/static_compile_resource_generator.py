@@ -20,8 +20,8 @@ import tempfile
 from pathlib import PurePosixPath
 
 
-_MAX_TARGET_COUNT = 256
-_MAX_TARGET_BYTES = 16 * 1024 * 1024
+_MAX_STATIC_INPUT_COUNT = 256
+_MAX_STATIC_INPUT_BYTES = 16 * 1024 * 1024
 _MAX_COMMANDS = 64
 _MAX_ARGS = 256
 _MAX_INT64 = (1 << 63) - 1
@@ -430,17 +430,17 @@ def _resource_reference_path(value, context):
     return logical_path
 
 
-def _validate_target(target, context):
+def _validate_static_input(static_input, context):
     allowed = {"name", "required", "parameter_index", "byte_size"}
-    unknown = set(target) - allowed
+    unknown = set(static_input) - allowed
     if unknown:
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
-    if not isinstance(target.get("name"), str) or not target["name"]:
+    if not isinstance(static_input.get("name"), str) or not static_input["name"]:
         raise ValueError(f"{context}.name must be a non-empty string")
-    if "required" in target and not isinstance(target["required"], bool):
+    if "required" in static_input and not isinstance(static_input["required"], bool):
         raise ValueError(f"{context}.required must be bool")
-    parameter_index = target.get("parameter_index")
-    byte_size = target.get("byte_size")
+    parameter_index = static_input.get("parameter_index")
+    byte_size = static_input.get("byte_size")
     if (
         type(parameter_index) is not int
         or parameter_index < 0
@@ -449,11 +449,11 @@ def _validate_target(target, context):
         raise ValueError(f"{context}.parameter_index must be a nonnegative integer")
     if type(byte_size) is not int or byte_size <= 0:
         raise ValueError(f"{context}.byte_size must be a positive integer")
-    if byte_size > _MAX_TARGET_BYTES:
+    if byte_size > _MAX_STATIC_INPUT_BYTES:
         raise ValueError(f"{context}.byte_size is outside the supported range")
 
 
-def _validate_patch(patch, context, target_names, resource_paths):
+def _validate_patch(patch, context, input_names, resource_paths):
     allowed = {"file", "token", "value", "format"}
     unknown = set(patch) - allowed
     if unknown:
@@ -465,8 +465,10 @@ def _validate_patch(patch, context, target_names, resource_paths):
         raise ValueError(f"{context}.file references missing resource: {file_path}")
     if not isinstance(patch["token"], str) or not patch["token"]:
         raise ValueError(f"{context}.token must be a non-empty string")
-    if patch["value"] not in target_names:
-        raise ValueError(f"{context}.value references unknown target: {patch['value']}")
+    if patch["value"] not in input_names:
+        raise ValueError(
+            f"{context}.value references unknown static input: {patch['value']}"
+        )
     if patch.get("format", "cpp_uint8_array") not in {
         "cpp_uint8_array", "raw_text", "hex"
     }:
@@ -509,7 +511,7 @@ def _validate_argument(argument, context, resource_paths):
         raise ValueError(f"{context} contains a non-portable path or placeholder")
 
 
-def _validate_recipe(recipe, context, kernel_name, target_names, resource_paths):
+def _validate_recipe(recipe, context, kernel_name, input_names, resource_paths):
     if not isinstance(recipe, dict):
         raise ValueError(f"{context} must be an object")
     unknown = set(recipe) - {"commands", "artifact", "patches"}
@@ -551,15 +553,13 @@ def _validate_recipe(recipe, context, kernel_name, target_names, resource_paths)
     if isinstance(artifact, str):
         _relative_path(artifact, f"{context}.artifact")
     elif isinstance(artifact, dict):
-        unknown = set(artifact) - {"file", "entry", "format"}
+        unknown = set(artifact) - {"file", "entry"}
         if unknown or "file" not in artifact:
             raise ValueError(f"{context}.artifact has invalid fields")
         _relative_path(artifact["file"], f"{context}.artifact.file")
         entry = artifact.get("entry", kernel_name)
         if not isinstance(entry, str) or not entry:
             raise ValueError(f"{context}.artifact.entry must be a non-empty string")
-        if artifact.get("format", "elf") not in {"elf", "archive"}:
-            raise ValueError(f"{context}.artifact.format is unsupported")
     else:
         raise ValueError(f"{context}.artifact must be a path or object")
     if "patches" in recipe and (
@@ -570,34 +570,38 @@ def _validate_recipe(recipe, context, kernel_name, target_names, resource_paths)
         if not isinstance(patch, dict):
             raise ValueError(f"{context}.patches[{index}] must be an object")
         _validate_patch(
-            patch, f"{context}.patches[{index}]", target_names, resource_paths
+            patch, f"{context}.patches[{index}]", input_names, resource_paths
         )
 
 
 def _normalize_and_validate_kernel(kernel, context, resource_paths):
-    allowed = {"kernel_name", "targets", "patches", "recipes"}
+    allowed = {"kernel_name", "static_inputs", "patches", "recipes"}
     unknown = set(kernel) - allowed
     if unknown:
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
     if not isinstance(kernel.get("kernel_name"), str) or not kernel["kernel_name"]:
         raise ValueError(f"{context}.kernel_name must be a non-empty string")
-    targets = kernel.get("targets", [])
-    if "targets" in kernel and (
-        not isinstance(targets, list)
-        or not targets
-        or len(targets) > _MAX_TARGET_COUNT
+    static_inputs = kernel.get("static_inputs", [])
+    if "static_inputs" in kernel and (
+        not isinstance(static_inputs, list)
+        or not static_inputs
+        or len(static_inputs) > _MAX_STATIC_INPUT_COUNT
     ):
         raise ValueError(
-            f"{context}.targets must be a bounded non-empty array when present"
+            f"{context}.static_inputs must be a bounded non-empty array when present"
         )
-    target_names = set()
-    for index, target in enumerate(targets):
-        if not isinstance(target, dict):
-            raise ValueError(f"{context}.targets[{index}] must be an object")
-        _validate_target(target, f"{context}.targets[{index}]")
-        if target["name"] in target_names:
-            raise ValueError(f"{context} has duplicate target {target['name']}")
-        target_names.add(target["name"])
+    input_names = set()
+    for index, static_input in enumerate(static_inputs):
+        if not isinstance(static_input, dict):
+            raise ValueError(f"{context}.static_inputs[{index}] must be an object")
+        _validate_static_input(
+            static_input, f"{context}.static_inputs[{index}]"
+        )
+        if static_input["name"] in input_names:
+            raise ValueError(
+                f"{context} has duplicate static input {static_input['name']}"
+            )
+        input_names.add(static_input["name"])
     patches = kernel.get("patches", [])
     if "patches" in kernel and (
         not isinstance(patches, list) or not patches
@@ -607,7 +611,7 @@ def _normalize_and_validate_kernel(kernel, context, resource_paths):
         if not isinstance(patch, dict):
             raise ValueError(f"{context}.patches[{index}] must be an object")
         _validate_patch(
-            patch, f"{context}.patches[{index}]", target_names, resource_paths
+            patch, f"{context}.patches[{index}]", input_names, resource_paths
         )
     recipes = kernel.get("recipes")
     if not isinstance(recipes, dict) or not recipes:
@@ -618,12 +622,12 @@ def _normalize_and_validate_kernel(kernel, context, resource_paths):
     for name, recipe in recipes.items():
         _validate_recipe(
             recipe, f"{context}.recipes.{name}", kernel["kernel_name"],
-            target_names, resource_paths,
+            input_names, resource_paths,
         )
     normalized = copy.deepcopy(kernel)
-    for target in normalized.get("targets", []):
-        if target.get("required") is True:
-            target.pop("required")
+    for static_input in normalized.get("static_inputs", []):
+        if static_input.get("required") is True:
+            static_input.pop("required")
     for patch in normalized.get("patches", []):
         if patch.get("format") == "cpp_uint8_array":
             patch.pop("format")
@@ -635,8 +639,6 @@ def _normalize_and_validate_kernel(kernel, context, resource_paths):
         if isinstance(artifact, dict):
             if artifact.get("entry") == kernel["kernel_name"]:
                 artifact.pop("entry")
-            if artifact.get("format") == "elf":
-                artifact.pop("format")
     return normalized
 
 
