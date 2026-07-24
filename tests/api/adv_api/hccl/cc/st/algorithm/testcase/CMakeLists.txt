@@ -11,6 +11,7 @@
 set(src_list
     main.cc
     all_gather_aicpu_testcase.cc
+    all_to_all_v_aicpu_testcase.cc
     reduce_scatter_aicpu_testcase.cc
 )
 

@@ -9,6 +9,9 @@
  */
 
 #include "check_utils.h"
+
+#include <algorithm>
+
 #include "sim_task.h"
 
 namespace HcclSim {
@@ -74,19 +77,23 @@ void CalcInputOutputSize(
         inputSize = curSendOffset;
         outputSize = curRecvOffset;
     } else if (opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        u64 curSendOffset = 0;
-        u64 curRecvOffset = 0;
+        const bool hasPerRankData = all2AllDataDes.sendCountMatrix.size() == rankSize * rankSize &&
+                                    all2AllDataDes.sdispls.size() == rankSize * rankSize &&
+                                    all2AllDataDes.rdispls.size() == rankSize * rankSize;
+        u64 maxSendEnd = 0;
+        u64 maxRecvEnd = 0;
         for (u32 i = 0; i < rankSize; i++) {
-            u64 curSendCounts = all2AllDataDes.sendCounts[i];
-            u64 curSendLength = curSendCounts * SIZE_TABLE[all2AllDataDes.sendType];
-            curSendOffset += curSendLength;
-
-            u64 curRecvCounts = all2AllDataDes.recvCounts[i];
-            u64 curRecvLength = curRecvCounts * SIZE_TABLE[all2AllDataDes.recvType];
-            curRecvOffset += curRecvLength;
+            const u64 sendCount =
+                hasPerRankData ? all2AllDataDes.sendCountMatrix[myRank * rankSize + i] : all2AllDataDes.sendCounts[i];
+            const u64 recvCount =
+                hasPerRankData ? all2AllDataDes.sendCountMatrix[i * rankSize + myRank] : all2AllDataDes.recvCounts[i];
+            const u64 sendDispl = hasPerRankData ? all2AllDataDes.sdispls[myRank * rankSize + i] : maxSendEnd;
+            const u64 recvDispl = hasPerRankData ? all2AllDataDes.rdispls[myRank * rankSize + i] : maxRecvEnd;
+            maxSendEnd = std::max(maxSendEnd, sendDispl + sendCount);
+            maxRecvEnd = std::max(maxRecvEnd, recvDispl + recvCount);
         }
-        inputSize = curSendOffset;
-        outputSize = curRecvOffset;
+        inputSize = maxSendEnd * SIZE_TABLE[all2AllDataDes.sendType];
+        outputSize = maxRecvEnd * SIZE_TABLE[all2AllDataDes.recvType];
     } else if (opType == HcclCMDType::HCCL_CMD_BATCH_SEND_RECV) {
         inputSize = count * unitSize * rankSize;
         outputSize = count * unitSize * rankSize;
