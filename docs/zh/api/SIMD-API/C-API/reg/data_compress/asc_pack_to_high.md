@@ -37,9 +37,7 @@
 
 ```cpp
 __simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_uint16_t src)
-__simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_int16_t src)
 __simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_uint32_t src)
-__simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_int32_t src)
 __simd_callee__ inline void asc_pack_to_high(vector_bool& dst, vector_bool src)
 ```
 
