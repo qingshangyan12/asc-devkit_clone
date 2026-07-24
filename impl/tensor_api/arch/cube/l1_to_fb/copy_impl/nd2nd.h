@@ -63,10 +63,26 @@ private:
         uint16_t dstRow;
         uint16_t blockCount;
         if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout) <= 4095),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockCount in CopyL12FB ND path, blockCount should be no greater than 4095."));
+            ASCENDC_DEBUG_ASSERT((Std::ceil_align(
+                static_cast<uint64_t>(GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout)) * sizeof(srcType),
+                static_cast<uint64_t>(deqTensorAddrAlignValue)) /
+                static_cast<uint64_t>(fbufBurstLenUnit) <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyL12FB ND path, blockLen should be no greater than 65535."));
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
         } else {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) <= 4095),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockCount in CopyL12FB NDExt path, blockCount should be no greater than 4095."));
+            ASCENDC_DEBUG_ASSERT((Std::ceil_align(
+                static_cast<uint64_t>(GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout)) * sizeof(srcType),
+                static_cast<uint64_t>(deqTensorAddrAlignValue)) /
+                static_cast<uint64_t>(fbufBurstLenUnit) <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyL12FB NDExt path, blockLen should be no greater than 65535."));
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);

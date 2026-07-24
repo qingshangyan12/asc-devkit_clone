@@ -56,6 +56,104 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(src.Data().Get()) % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyL12BT, src L1 address should be 32-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 64 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL12BT, dst BiasTable address should be 64-byte aligned."));
+        if constexpr (DstLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Shape()) > 0 && Get<1>(dst.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL12BT, dst row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Stride()) > 0 && Get<1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL12BT, all dst strides should be greater than 0."));
+        } else if constexpr (DstLayout::depth == THREE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Shape()) > 0 && Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL12BT, dst batch, row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 0>(dst.Layout().Stride()) > 0 && Get<1, 1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL12BT, all dst strides should be greater than 0."));
+        } else if constexpr (DstLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<0, 1>(dst.Layout().Shape()) > 0 && Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL12BT, all dst row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((((Std::is_same_v<DstLayoutPtn, NDExtLayoutPtn> &&
+                Std::is_constant<0, decltype(Get<0, 0>(dst.Layout().Stride()))>::value) ||
+                Get<0, 0>(dst.Layout().Stride()) > 0) &&
+                ((Std::is_same_v<DstLayoutPtn, NDExtLayoutPtn> &&
+                Std::is_constant<0, decltype(Get<1, 0>(dst.Layout().Stride()))>::value) ||
+                Get<1, 0>(dst.Layout().Stride()) > 0) &&
+                Get<0, 1>(dst.Layout().Stride()) > 0 && Get<1, 1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL12BT, all dynamic dst strides should be greater than 0."));
+        } else if constexpr (DstLayout::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(dst.Layout().Shape()) > 0 && Get<1, 0, 1>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(dst.Layout().Shape()) > 0 && Get<1, 1, 1>(dst.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyL12BT, dst batch and all dst row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Stride()) > 0 &&
+                ((Std::is_same_v<DstLayoutPtn, NDExtLayoutPtn> &&
+                Std::is_constant<0, decltype(Get<1, 0, 0>(dst.Layout().Stride()))>::value) ||
+                Get<1, 0, 0>(dst.Layout().Stride()) > 0) &&
+                ((Std::is_same_v<DstLayoutPtn, NDExtLayoutPtn> &&
+                Std::is_constant<0, decltype(Get<1, 1, 0>(dst.Layout().Stride()))>::value) ||
+                Get<1, 1, 0>(dst.Layout().Stride()) > 0) &&
+                Get<1, 0, 1>(dst.Layout().Stride()) > 0 && Get<1, 1, 1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyL12BT, all dynamic dst strides should be greater than 0."));
+        }
+        if constexpr (SrcLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) > 0 && Get<1>(src.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL12BT, source row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Stride()) > 0 && Get<1>(src.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL12BT, all source strides should be greater than 0."));
+        } else if constexpr (SrcLayout::depth == THREE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) > 0 && Get<1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL12BT, source batch, row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Stride()) > 0 &&
+                Get<1, 0>(src.Layout().Stride()) > 0 && Get<1, 1>(src.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL12BT, all source strides should be greater than 0."));
+        } else if constexpr (SrcLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(src.Layout().Shape()) > 0 &&
+                Get<0, 1>(src.Layout().Shape()) > 0 && Get<1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL12BT, all source row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((((Std::is_same_v<SrcLayoutPtn, NDExtLayoutPtn> &&
+                Std::is_constant<0, decltype(Get<0, 0>(src.Layout().Stride()))>::value) ||
+                Get<0, 0>(src.Layout().Stride()) > 0) &&
+                ((Std::is_same_v<SrcLayoutPtn, NDExtLayoutPtn> &&
+                Std::is_constant<0, decltype(Get<1, 0>(src.Layout().Stride()))>::value) ||
+                Get<1, 0>(src.Layout().Stride()) > 0) &&
+                Get<0, 1>(src.Layout().Stride()) > 0 && Get<1, 1>(src.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL12BT, all dynamic src strides should be greater than 0."));
+        } else if constexpr (SrcLayout::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(src.Layout().Shape()) > 0 && Get<1, 0, 1>(src.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(src.Layout().Shape()) > 0 && Get<1, 1, 1>(src.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyL12BT, source batch and all source row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Stride()) > 0 &&
+                ((Std::is_same_v<SrcLayoutPtn, NDExtLayoutPtn> &&
+                Std::is_constant<0, decltype(Get<1, 0, 0>(src.Layout().Stride()))>::value) ||
+                Get<1, 0, 0>(src.Layout().Stride()) > 0) &&
+                ((Std::is_same_v<SrcLayoutPtn, NDExtLayoutPtn> &&
+                Std::is_constant<0, decltype(Get<1, 1, 0>(src.Layout().Stride()))>::value) ||
+                Get<1, 1, 0>(src.Layout().Stride()) > 0) &&
+                Get<1, 0, 1>(src.Layout().Stride()) > 0 && Get<1, 1, 1>(src.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL12BT, all dynamic src strides should be greater than 0."));
+        }
         using CopyL12BTImpl = typename CopyL12BTRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL12BTImpl::template Run<trait, T, U>(dst, src);
     }
