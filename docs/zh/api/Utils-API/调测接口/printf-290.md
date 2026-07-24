@@ -41,7 +41,7 @@
 
 ```
 template <class... Args>
-__aicore__ inline void printf( const __gm__ char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf( const __gm__ char* fmt, Args&&... args)
 ```
 
 <!-- npu="950" id9 -->
