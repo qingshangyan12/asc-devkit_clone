@@ -56,6 +56,12 @@ private:
 
         uint16_t blockCount = GetTotalRowShape(srcLayout);
         uint32_t blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SrcType>);
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) >= GetTotalColumnShape(srcLayout)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyUB2L1 ND path, source row stride should be no less than source column shape."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) >= GetTotalColumnShape(srcLayout)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyUB2L1 ND path, destination row stride should be no less than source column shape."));
         int64_t srcStride = Std::ceil_division(
             GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) - GetTotalColumnShape(srcLayout),
             C0_ELEMENT<SrcType>);

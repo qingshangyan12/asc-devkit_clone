@@ -45,6 +45,30 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((!isChannelSplit), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check isChannelSplit in CopyL0C2UB instruction, isChannelSplit should be false when dst is UB."));
+        ASCENDC_DEBUG_ASSERT((!nz2ndEn || (nSize >= 1 && nSize <= 4095)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2UB NZ2ND instruction, nSize should be in range [1, 4095]."));
+        ASCENDC_DEBUG_ASSERT((!nz2ndEn || (nSize * sizeof(T) % 32 == 0)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2UB NZ2ND instruction, nSize * sizeof(dst type) should be divisible by 32."));
+        ASCENDC_DEBUG_ASSERT((!nz2dnEn || (mSize >= 1 && mSize <= 32767)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mSize in CopyL0C2UB NZ2DN instruction, mSize should be in range [1, 32767]."));
+        ASCENDC_DEBUG_ASSERT((!nz2dnEn || (mSize * sizeof(T) % 32 == 0)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mSize in CopyL0C2UB NZ2DN instruction, mSize * sizeof(dst type) should be divisible by 32."));
+        ASCENDC_DEBUG_ASSERT((nz2ndEn || nz2dnEn || (nSize >= 1 && nSize <= 4095 && nSize % 16 == 0)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2UB NZ instruction, nSize should be in range [1, 4095] and divisible by 16."));
+        ASCENDC_DEBUG_ASSERT((mSize >= 1 && mSize <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mSize in CopyL0C2UB instruction, mSize should be in range [1, 65535]."));
+        ASCENDC_DEBUG_ASSERT((dstStride > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstStride in CopyL0C2UB instruction, dstStride should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT(!(dualDstCtl != 0 && (nz2dnEn || quantPre != QuantMode_t::NoQuant || reluEn)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dualDstCtl in CopyL0C2UB instruction, dual destination mode requires non-NZ2DN path with quant and relu disabled."));
+        ASCENDC_DEBUG_ASSERT(!(dualDstCtl == 1 && mSize % 2 != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dualDstCtl in CopyL0C2UB instruction, mSize should be divisible by 2 when dualDstCtl splits M."));
+        ASCENDC_DEBUG_ASSERT(!(dualDstCtl == 2 && nSize % 32 != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dualDstCtl in CopyL0C2UB instruction, nSize should be divisible by 32 when dualDstCtl splits N."));
 
         asc_copy_l0c2ub(
             dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,

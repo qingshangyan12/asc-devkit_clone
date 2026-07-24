@@ -64,13 +64,22 @@ public:
             srcColShape = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
         }
+        ASCENDC_DEBUG_ASSERT((srcRowShape > 0 && srcRowShape <= 65535 && srcColShape > 0 && srcColShape <= 16384),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 ND2ZN, source row shape should be in range (0, 65535] and source column shape should be in range (0, 16384]."));
         auto dstBRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
+        ASCENDC_DEBUG_ASSERT((dstBRowStride % C0_ELEMENT<type> == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst row stride in CopyGM2L1 ND2ZN, destination row stride should be divisible by C0_ELEMENT."));
+        ASCENDC_DEBUG_ASSERT((dstNzMatrixStride % C0_ELEMENT<type> == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 ND2ZN, destination batch stride should be divisible by C0_ELEMENT."));
 
         uint16_t nValue = srcColShape;
         uint32_t dValue = srcRowShape;
         uint64_t srcDValue = srcRowStride;
 
         uint16_t dstNzC0Stride = dstBRowStride / C0_ELEMENT<type>;
+        ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0 && dstNzC0Stride <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst row stride in CopyGM2L1 ND2ZN, converted destination C0 stride should be in range (0, 16384]."));
         uint16_t dstNzNStride = 1;
 
         uint64_t loop1SrcStride = srcDValue * sizeof(type);
@@ -80,6 +89,8 @@ public:
         uint16_t loop3DstStride = dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
         // loop4_dst_stride: dst_nz_matrix_stride * size_of_dst_type / C0_size
         uint16_t loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride / C0_ELEMENT<type>);
+        ASCENDC_DEBUG_ASSERT((loop4DstStride <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 ND2ZN, converted destination batch stride should be no greater than 65535."));
 
         uint8_t cacheMode = src.Engine().GetCacheMode();
 

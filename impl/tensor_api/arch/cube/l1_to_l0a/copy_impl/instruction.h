@@ -48,6 +48,12 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((mStep > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mStep in CopyL12L0A instruction, mStep should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((kStep > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0A instruction, kStep should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((dstStride > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstStride in CopyL12L0A instruction, dstStride should be greater than 0."));
         if constexpr (transpose) {
             asc_copy_l12l0a_transpose(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         } else {

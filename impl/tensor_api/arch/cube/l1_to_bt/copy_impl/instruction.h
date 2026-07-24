@@ -48,6 +48,14 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((blockCount > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyL12BT instruction, blockCount should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((blockLen > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyL12BT instruction, blockLen should be greater than 0."));
+        if constexpr (IsOneOfAttrV<T, float, int32_t>) {
+            ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyL12BT instruction, blockLen should be divisible by 2 for float or int32_t source."));
+        }
 
         asc_copy_l12bt(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
     }

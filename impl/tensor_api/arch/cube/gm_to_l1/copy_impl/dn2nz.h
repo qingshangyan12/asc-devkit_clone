@@ -64,13 +64,24 @@ public:
             srcColShape = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             srcColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
         }
+        ASCENDC_DEBUG_ASSERT((srcRowShape > 0 && srcRowShape <= 16384 && srcColShape > 0 && srcColShape <= 65535),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 DN2NZ, source row shape should be in range (0, 16384] and source column shape should be in range (0, 65535]."));
         uint16_t dstBColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
+        ASCENDC_DEBUG_ASSERT((dstBColStride % C0_ELEMENT<type> == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst column stride in CopyGM2L1 DN2NZ, destination column stride should be divisible by C0_ELEMENT."));
+        ASCENDC_DEBUG_ASSERT((dstNzMatrixStride % C0_ELEMENT<type> == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 DN2NZ, destination batch stride should be divisible by C0_ELEMENT."));
 
         uint16_t nValue = srcRowShape;
         uint32_t dValue = srcColShape;
         uint64_t srcDValue = srcColStride;
 
         uint16_t dstNzC0Stride = dstBColStride / C0_ELEMENT<type>;
+        ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0 && dstNzC0Stride <= 16384),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst column stride in CopyGM2L1 DN2NZ, converted destination C0 stride should be in range (0, 16384]."));
         uint16_t dstNzNStride = 1;
 
         uint64_t loop1SrcStride = srcDValue * sizeof(type);
@@ -80,6 +91,8 @@ public:
         uint16_t loop3DstStride = dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
         // loop4_dst_stride: dst_nz_matrix_stride * size_of_dst_type / C0_size
         uint16_t loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride / C0_ELEMENT<type>);
+        ASCENDC_DEBUG_ASSERT((loop4DstStride <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 DN2NZ, converted destination batch stride should be no greater than 65535."));
 
         uint8_t cacheMode = src.Engine().GetCacheMode();
 
