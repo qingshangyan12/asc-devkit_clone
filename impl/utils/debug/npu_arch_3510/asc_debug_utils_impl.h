@@ -18,6 +18,10 @@
 #include "impl/utils/sys_macros.h"
 #include "impl/utils/debug/asc_simd_vf_utils.h"
 
+#if !defined(ASC_VF_WAIT_TIMEOUT)
+#define ASC_VF_WAIT_TIMEOUT 100000000U
+#endif
+
 namespace __asc_simd_vf {
 template <typename T, typename U, typename... Args>
 __simd_callee__ constexpr bool is_same_in_list()
@@ -46,6 +50,40 @@ __simd_callee__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
 }
 
 __simd_callee__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b) { return div_ceil(a, b) * b; }
+
+__simd_callee__ inline bool wait_vf_debug_buffer_drained(__ubuf__ BlockVFBufInfo* block_info, uint32_t write_len)
+{
+    /*
+     * The FIFO producer only reuses the reserved UB block after the host-side
+     * AICore-side consumer has advanced readLen to the producer's writeLen snapshot.
+     *
+     * Direct implementation 1, unbounded for-loop:
+     *   for (;;) {
+     *       if (block_info->readLen == write_len) {
+     *           break;
+     *       }
+     *       __asm__ __volatile__("");
+     *   }
+     *
+     * Direct implementation 2, unbounded while-loop:
+     *   while (block_info->readLen != write_len) {
+     *       __asm__ __volatile__("");
+     *   }
+     *
+     * Both unbounded forms match the FIFO wait semantics, but they cannot be
+     * enabled for SIMD VF: current Bisheng either crashes during jump
+     * optimization or rejects the infinite loop. Keep the compiled code
+     * bounded and treat timeout as "consumer did not drain in time".
+     */
+    uint32_t wait_count = 0;
+    for (; wait_count < ASC_VF_WAIT_TIMEOUT; wait_count++) {
+        if (block_info->readLen == write_len) {
+            break;
+        }
+        __asm__ __volatile__("");
+    }
+    return wait_count < ASC_VF_WAIT_TIMEOUT;
+}
 
 template <typename T>
 __simd_callee__ constexpr inline DumpTensorDataType get_dump_datatype_impl();
@@ -102,6 +140,14 @@ __simd_callee__ __ubuf__ inline BlockVFBufInfo* init_printf_ubuf_addr(uint16_t b
     return get_printf_ubuf_addr(get_vf_debug_reserved_ub_addr(), blockIdx);
 }
 
+__simd_callee__ inline void asc_finish_flag()
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr(0);
+    blockInfo->finish = 1;
+#endif
+}
+
 __simd_callee__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size)
 {
     __cce_scalar::copy_ubuf_to_ubuf(dst, src, 1, size / 32, 0, 0);
@@ -109,6 +155,8 @@ __simd_callee__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* sr
 } // namespace __asc_simd_vf
 
 namespace __asc_aicore {
+__aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo, const uint32_t& tlvLen);
+
 __aicore__ inline void asc_entire_dcci_impl(__gm__ uint64_t* ptr)
 {
     dcci(ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
@@ -246,41 +294,99 @@ __aicore__ inline void update_write_info(
     asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(writeInfo));
 }
 
+__aicore__ static bool count_vf_tlv_packages(
+    __ubuf__ uint8_t* tlv, uint32_t tlvLen, uint32_t& packageNum)
+{
+    constexpr uint32_t tlvHeadLen = sizeof(uint32_t[2]);
+
+    uint32_t offset = 0;
+    packageNum = 0;
+
+    while (offset + tlvHeadLen <= tlvLen) {
+        __ubuf__ uint32_t* head = reinterpret_cast<__ubuf__ uint32_t*>(tlv + offset);
+        uint32_t payloadLen = head[1];
+
+        if (payloadLen > tlvLen - offset - tlvHeadLen) {
+            return false;
+        }
+
+        offset += tlvHeadLen + payloadLen;
+        packageNum += 1;
+    }
+
+    return packageNum != 0 && offset == tlvLen;
+}
+
+__aicore__ inline bool asc_vf_debug_publish(
+    __ubuf__ BlockVFBufInfo* blockInfo, uint32_t curWriteLen, uint32_t curReadLen)
+{
+    const uint32_t tlvLen = curWriteLen - curReadLen;
+    __ubuf__ uint8_t* tlv = reinterpret_cast<__ubuf__ uint8_t*>(blockInfo->buffer) + curReadLen;
+
+    uint32_t packageNum = 0;
+    if (!count_vf_tlv_packages(tlv, tlvLen, packageNum)) {
+        blockInfo->flag = 1;
+        return false;
+    }
+
+    __gm__ BlockRingBufInfo* blockRingBufInfo = get_block_ring_buf_info();
+    auto* debugBlockInfo = reinterpret_cast<__gm__ DebugBlockHeadInfo*>(blockRingBufInfo);
+    if (!check_ringbuf_space(debugBlockInfo, tlvLen)) {
+        return false;
+    }
+    __gm__ uint8_t* dstTlv = reinterpret_cast<__gm__ uint8_t*>(call_get_ring_buf_tlv(blockRingBufInfo));
+
+    constexpr uint32_t sizeU32 = sizeof(uint32_t);
+    const uint32_t totalWords = tlvLen / sizeU32;
+    auto* dstWords = reinterpret_cast<__gm__ uint32_t*>(dstTlv);
+    auto* srcWords = reinterpret_cast<__ubuf__ uint32_t*>(tlv);
+    for (uint32_t i = 0; i < totalWords; ++i) {
+        dstWords[i] = srcWords[i];
+    }
+    for (uint32_t i = totalWords * sizeU32; i < tlvLen; ++i) {
+        dstTlv[i] = tlv[i];
+    }
+    asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(dstTlv));
+
+    __gm__ RingBufWriteInfo* writeInfo = get_ring_buf_write_info(blockRingBufInfo);
+    update_write_info(writeInfo, tlvLen, packageNum);
+    return true;
+}
+
 __aicore__ inline bool asc_vf_debug_ub2gm()
 {
     __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr_aicore(0);
-    __ubuf__ uint8_t* tlv = reinterpret_cast<__ubuf__ uint8_t*>(blockInfo->buffer);
+    for (;;) {
+        uint8_t curFinishFlag = blockInfo->finish;
+        uint32_t curReadLen = blockInfo->readLen;
+        uint32_t curWriteLen = blockInfo->writeLen;
 
-    __gm__ BlockRingBufInfo* blockRingBufInfo = get_block_ring_buf_info();
-    const bool isValidHeader = blockInfo->magic == ASCENDC_SIMD_VF_MAGIC_NUMBER &&
-                               blockInfo->length <= ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE &&
-                               blockInfo->writeLen <= blockInfo->length;
-    if (!isValidHeader) {
-        blockInfo->flag = 1;
-    }
-    const uint32_t tlvLen = isValidHeader ? blockInfo->writeLen : 0;
-    const uint32_t packageNum = isValidHeader ? blockInfo->pidx : 0;
-
-    sync_all_impl();
-    constexpr uint32_t sizeU32 = sizeof(uint32_t);
-    if (tlvLen > 0) {
-        __gm__ uint8_t* dstTlv = reinterpret_cast<__gm__ uint8_t*>(call_get_ring_buf_tlv(blockRingBufInfo));
-        const uint32_t totalWords = tlvLen / sizeU32;
-        auto* dstWords = reinterpret_cast<__gm__ uint32_t*>(dstTlv);
-        auto* srcWords = reinterpret_cast<__ubuf__ uint32_t*>(tlv);
-        for (uint32_t i = 0; i < totalWords; ++i) {
-            dstWords[i] = srcWords[i];
+        const bool isValidHeader = blockInfo->magic == ASCENDC_SIMD_VF_MAGIC_NUMBER &&
+                                   blockInfo->length <= ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE &&
+                                   curWriteLen <= blockInfo->length;
+        if (!isValidHeader) {
+            blockInfo->flag = 1;
+            break;
         }
-        for (uint32_t i = totalWords * sizeU32; i < tlvLen; ++i) {
-            dstTlv[i] = tlv[i];
+        if (curReadLen > curWriteLen) {
+            continue;
         }
-        sync_all_impl();
 
-        asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(dstTlv));
-    }
-    if (tlvLen > 0) {
-        __gm__ RingBufWriteInfo* writeInfo = get_ring_buf_write_info(blockRingBufInfo);
-        update_write_info(writeInfo, tlvLen, packageNum);
+        if (curWriteLen != curReadLen) {
+            bool handled = asc_vf_debug_publish(blockInfo, curWriteLen, curReadLen);
+            if (!handled) {
+                if (blockInfo->flag != 0) {
+                    break;
+                }
+                continue;
+            }
+
+            blockInfo->readLen = curWriteLen;
+        }
+
+        if (curFinishFlag == 1) {
+            break;
+        }
     }
     return blockInfo->flag != 0;
 }
