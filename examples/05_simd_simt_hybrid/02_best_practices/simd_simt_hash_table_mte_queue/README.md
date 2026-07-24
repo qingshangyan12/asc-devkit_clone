@@ -192,16 +192,10 @@ public:
             uint32_t simt_assign_id = *reinterpret_cast<__ubuf__ volatile uint32_t*>(simt_assign_id_);
             uint32_t proc_count = min(max_proc_batch, simt_assign_id - mte_finish_id);
             ...
-            for (uint32_t i = 0; i < proc_count; ++i) {
-                // 计算搬运源地址和目的地址
-                asc_copy_gm2ub_align(value_local_, src_addr, 1, value_bytes, 0, 0, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
-            }
+            asc_copy_gm2ub_align(value_local_, src_addr, 1, value_bytes, 0, 0, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
             asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
             asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            for (uint32_t i = 0; i < proc_count; ++i) {
-                // 计算搬运源地址和目的地址
-                asc_copy_ub2gm_align(dst_addr, value_local_, 1, value_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
-            }
+            asc_copy_ub2gm_align(dst_addr, value_local_, 1, value_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0)；
             asc_sync_notify(PIPE_MTE3, PIPE_S, EVENT_ID0);
             asc_sync_wait(PIPE_MTE3, PIPE_S, EVENT_ID0);
             *reinterpret_cast<__ubuf__ volatile uint32_t*>(mte_finish_id_) = mte_finish_id + proc_count;
