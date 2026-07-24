@@ -10,7 +10,7 @@ on:
       keyword: '^(?:\/)?compile*'
 
 env:
-  org_name: "opencann"
+  org_name: "cann"
   MERGE_ID: ${{atomgit.event.pull_request.number}}
   obs_path: "test/asc-devkit/package/${{ env.MERGE_ID }}"
   obs_smoke_path: "${{ env.obs_path }}/presmoke/2"
@@ -30,7 +30,7 @@ stages:
             identifier: revise_image
             uses: cann/.gitcode/actions/revise-img@master
             with:
-              repo_name: "ops-math"
+              repo_name: "asc-devkit"
               target_branch: ${{ env.TARGET_BRANCH }}
               repo_url: ${{ vars.CI_PATH }}
           -

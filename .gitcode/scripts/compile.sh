@@ -31,10 +31,10 @@ case "${task_name}" in
         sed -i "1i set(CMAKE_EXPORT_COMPILE_COMMANDS ON)" "CMakeLists.txt"
         ;;
 esac
-if [ "${GIT_TARGET_BRANCH}" == master ]; then
+if [ "${TARGET_BRANCH}" == master ]; then
         bash build.sh --pkg --cann_3rd_lib_path="/home/jenkins/opensource" -f "pr_filelist.txt"
         echo "exec cmd: [bash build.sh --pkg --cann_3rd_lib_path="/home/jenkins/opensource" -f "pr_filelist.txt"]"
-elif [ "${GIT_TARGET_BRANCH}" == exp/kadc] || [ "${GIT_TARGET_BRANCH}" == feature/tensor_api_from_9.0.0 ]; then
+elif [ "${TARGET_BRANCH}" == exp/kadc] || [ "${TARGET_BRANCH}" == feature/tensor_api_from_9.0.0 ]; then
         echo "not need build"
         mkdir -p build_out
         touch ${WORKSPACE}/build_out/cann-asc-devkit.run

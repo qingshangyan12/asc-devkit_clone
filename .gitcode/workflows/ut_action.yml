@@ -48,7 +48,7 @@ jobs:
           export WORKSPACE=${{ steps.process_checkout.outputs.path }}
           cd ${{ steps.process_checkout.outputs.path }}
           export ut_type=${{ inputs.ut_type }}
-          export GIT_TARGET_BRANCH=${{ env.TARGET_BRANCH }}
+          export TARGET_BRANCH=${{ env.TARGET_BRANCH }}
           bash .gitcode/scripts/ut.sh
       -
         name: ut_cov
