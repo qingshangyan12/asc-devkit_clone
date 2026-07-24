@@ -114,6 +114,14 @@ __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 
 __aicore__ inline int64_t asc_get_squeeze_status();
 
+__aicore__ inline void asc_set_saturation_flag(AscendC::SaturationMode saturation_mode, bool enable_sat);
+
+__aicore__ inline bool asc_get_saturation_flag(AscendC::SaturationMode saturation_mode);
+
+__aicore__ inline void asc_set_saturation_strategy(AscendC::OverrideStrategy strategy);
+
+__aicore__ inline AscendC::OverrideStrategy asc_get_saturation_strategy();
+
 #endif
 
 #endif

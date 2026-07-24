@@ -46,4 +46,91 @@ __aicore__ inline int64_t asc_get_icache_preload_status() { return asc_get_icach
 //==============asc_dci===============
 __aicore__ inline void asc_dci() { asc_dci_impl(); }
 
+//=========asc_set_scalar_cache_mode (READ)=========
+__aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode cache_mode)
+{
+    constexpr uint8_t startBit = 16; // READ mode: CTRL[19:16]
+    uint64_t cacheBits = 0;
+    switch (cache_mode) {
+        case asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM:
+            cacheBits = 0;
+            break;
+        case asc_load_l2_cache_mode::NORMAL_LAST_VICTIM:
+            cacheBits = 1;
+            break;
+        case asc_load_l2_cache_mode::NORMAL_PERSISTENT:
+            cacheBits = 2;
+            break;
+        case asc_load_l2_cache_mode::NOTALLOC_KEEP:
+            cacheBits = 4;
+            break;
+        default: // NOTALLOC_CLEAN(5), NOTALLOC_DROP(6) not supported
+            return;
+    }
+    uint64_t mask = ~(uint64_t(0xF) << startBit);
+    int64_t ctrlValue = get_ctrl() & mask;
+    ctrlValue |= (cacheBits << startBit);
+    set_ctrl(ctrlValue);
+}
+
+//=========asc_set_scalar_cache_mode (WRITE)=========
+__aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode cache_mode)
+{
+    constexpr uint8_t startBit = 20; // WRITE mode: CTRL[23:20]
+    uint64_t mask = ~(uint64_t(0xF) << startBit);
+    int64_t ctrlValue = get_ctrl() & mask;
+    ctrlValue |= (static_cast<uint64_t>(cache_mode) << startBit);
+    set_ctrl(ctrlValue);
+}
+
+//=========asc_get_scalar_cache_mode (READ)=========
+__aicore__ inline void asc_get_scalar_cache_mode(asc_load_l2_cache_mode& cache_mode)
+{
+    constexpr uint8_t startBit = 16; // READ mode: CTRL[19:16]
+    uint8_t cacheBits = static_cast<uint8_t>((get_ctrl() >> startBit) & 0xF);
+
+    switch (cacheBits) {
+        case 0:
+            cache_mode = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM;
+            break;
+        case 1:
+            cache_mode = asc_load_l2_cache_mode::NORMAL_LAST_VICTIM;
+            break;
+        case 2:
+            cache_mode = asc_load_l2_cache_mode::NORMAL_PERSISTENT;
+            break;
+        case 4:
+            cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;
+            break;
+        default:
+            cache_mode = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM;
+            break;
+    }
+}
+
+//=========asc_get_scalar_cache_mode (WRITE)=========
+__aicore__ inline void asc_get_scalar_cache_mode(asc_store_l2_cache_mode& cache_mode)
+{
+    constexpr uint8_t startBit = 20; // WRITE mode: CTRL[23:20]
+    uint8_t cacheBits = static_cast<uint8_t>((get_ctrl() >> startBit) & 0xF);
+
+    switch (cacheBits) {
+        case 0:
+            cache_mode = asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM;
+            break;
+        case 1:
+            cache_mode = asc_store_l2_cache_mode::NORMAL_LAST_VICTIM;
+            break;
+        case 2:
+            cache_mode = asc_store_l2_cache_mode::NORMAL_PERSISTENT;
+            break;
+        case 4:
+            cache_mode = asc_store_l2_cache_mode::NOTALLOC_CLEAN;
+            break;
+        default:
+            cache_mode = asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM;
+            break;
+    }
+}
+
 #endif
