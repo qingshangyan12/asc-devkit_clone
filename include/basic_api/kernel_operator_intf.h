@@ -131,7 +131,7 @@
 #include "include/adv_api/reduce/reduce_xor_sum.h"
 #include "include/adv_api/math/cumsum.h"
 #endif
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // SIMT API
 #include "simt_api/cpp/kernel_simt_intf.h"
 #endif

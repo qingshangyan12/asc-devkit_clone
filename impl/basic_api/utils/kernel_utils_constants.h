@@ -40,6 +40,7 @@ const int32_t DEFAULT_C0_SIZE = 32;
 const int32_t DEFAULT_BLOCK_SIZE = 256;
 const int32_t MAX_REPEAT_TIMES = 255;
 const int32_t MIN_REPEAT_TIMES = 0;
+const int16_t TWO_BLK_SIZE = 64;
 const bool DEFAULT_REPEAT_STRIDE_MODE = 0;
 const bool STRIDE_SIZE_MODE = 0;
 const int32_t ONE_BYTE_BIT_SIZE = 8;
@@ -80,10 +81,18 @@ constexpr uint32_t POWER_INT32_BITS = 32;
 constexpr uint32_t INT4_TWO = 2;
 constexpr uint32_t INT4_BIT_NUM = 4;
 
-#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 5102)
 // int2b_t param
 constexpr uint32_t INT2_FOUR = 4;
 constexpr uint32_t INT1_EIGHT = 8;
+constexpr uint32_t INT2_BIT_NUM = 2;
+constexpr uint32_t INT1_BIT_NUM = 1;
+#endif
+
+#if (__NPU_ARCH__ == 5162)
+constexpr uint32_t INT2_FOUR = 4;
+constexpr uint32_t INT1_EIGHT = 8;
+constexpr uint32_t INT3_BIT_NUM = 3;
 constexpr uint32_t INT2_BIT_NUM = 2;
 constexpr uint32_t INT1_BIT_NUM = 1;
 #endif
@@ -107,7 +116,7 @@ constexpr float DEQ_SHIFT_RIGHT_17_BIT = 1.0 / DEQ_SHIFT_LEFT_17_BIT;
 constexpr int8_t ADDDEQRELU_MASK_MODE_ONE = 1;
 constexpr int8_t ADDDEQRELU_MASK_MODE_TWO = 2;
 
-#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 5102)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 248 * 1024;
 const uint32_t TOTAL_UB_SIZE = 248 * 1024;
 const uint32_t TMP_UB_OFFSET = 248 * 1024;
@@ -181,6 +190,17 @@ const uint32_t TOTAL_L1_SIZE = 512 * 1024;
 const uint32_t TOTAL_L0C_SIZE = 64 * 1024;
 const uint32_t VECTOR_REG_WIDTH = 256;
 const uint32_t ONE_BLOCK_SIZE = 32;
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+const int32_t TOTAL_VEC_LOCAL_SIZE = 120 * 1024;
+const uint32_t TOTAL_UB_SIZE = 120 * 1024;
+const uint32_t TMP_UB_OFFSET = 120 * 1024;
+const uint32_t TOTAL_L1_SIZE = 768 * 1024;
+const uint32_t TOTAL_L0C_SIZE = 32 * 1024;
+const uint32_t SINGLE_MSG_SIZE = 64;
+const uint32_t CACHE_LINE_SIZE = 64;
+const uint32_t VECTOR_REG_WIDTH = 32;
+const uint32_t VECTOR_REG_WIDTH_2XVL = 64;
+const uint32_t ONE_BLOCK_SIZE = 32;
 #else
 const uint32_t VECTOR_REG_WIDTH = 256;
 #endif
@@ -250,13 +270,24 @@ const uint8_t B16_BYTE_SIZE = 2;
 const uint8_t B8_BYTE_SIZE = 1;
 const uint8_t B32_DATA_NUM_PER_BLOCK = 8;
 const uint8_t B16_DATA_NUM_PER_BLOCK = 16;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+const int32_t B16_DATA_NUM_PER_REPEAT = 16;
+const int32_t B32_DATA_NUM_PER_REPEAT = 8;
+#else
 const int32_t B16_DATA_NUM_PER_REPEAT = 128;
 const int32_t B32_DATA_NUM_PER_REPEAT = 64;
+#endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 const uint32_t B64_DATA_NUM_PER_REPEAT = 32;
 const uint32_t B4_BYTE_SIZE_PER_REPEAT = 64;
 const uint32_t L1_DUMP_UB_SIZE = TOTAL_UB_SIZE - 32 * 1024;
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+const uint32_t B64_DATA_NUM_PER_REPEAT = 4;
+const uint32_t B4_BYTE_SIZE_PER_REPEAT = 8;
+const uint32_t L1_DUMP_UB_SIZE = TOTAL_UB_SIZE - 16 * 1024;
 #endif
 
 const int32_t BLOCK_STRIDE_POS_IN_SM = 16;
@@ -308,9 +339,15 @@ const uint32_t ONE_BLK_HALF_NUM = ONE_BLK_SIZE / B16_BYTE_SIZE;
 const uint32_t ONE_BLK_FLOAT_NUM = ONE_BLK_SIZE / B32_BYTE_SIZE;
 
 namespace ConstantsInternal {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+const uint32_t ONE_BLK_FP4_NUM = 8;
+const uint32_t ONE_BLK_B2_NUM = 16;
+const uint32_t ONE_BLK_B1_NUM = 32;
+#else
 const uint32_t ONE_BLK_FP4_NUM = 64;
 const uint32_t ONE_BLK_B2_NUM = 128;
 const uint32_t ONE_BLK_B1_NUM = 256;
+#enidf
 } // namespace ConstantsInternal
 
 const uint32_t BRCB_BROADCAST_NUMBER = 8;
@@ -611,7 +648,7 @@ using int1b_t = IntegerSubType<INT1_BIT_NUM, true>;
 using uint1b_t = IntegerSubType<INT1_BIT_NUM, false>;
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5162))
 using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
 using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
@@ -647,6 +684,13 @@ template <>
 struct GetDstType<mx_fp8_e8m0_t> {
     using Type = fp8_e8m0_t;
 };
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T>
+struct GetDstType<T> {
+    using Type = int32_t;
+};
+#endif
 
 struct BasicAPIMaskStruct {
     uint64_t maskArray[MASK_ARRAY_SIZE] = {0};
