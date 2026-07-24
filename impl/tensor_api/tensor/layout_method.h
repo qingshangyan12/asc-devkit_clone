@@ -31,32 +31,32 @@ template <typename... Ts>
 struct HasZeroIntegralConstant : Std::bool_constant<(... || Std::is_same_v<Std::remove_cvref_t<Ts>, Std::Int<0>>)> {};
 
 template <typename T, typename... Ts>
-__aicore__ inline constexpr Shape<T, Ts...> MakeShape(const T& t, const Ts&... ts)
+__host_aicore__ inline constexpr Shape<T, Ts...> MakeShape(const T& t, const Ts&... ts)
 {
     static_assert(!HasZeroIntegralConstant<T, Ts...>::value, "MakeShape does not accept Int<0> arguments.");
     return {t, ts...};
 }
 
 template <typename T, typename... Ts>
-__aicore__ inline constexpr Stride<T, Ts...> MakeStride(const T& t, const Ts&... ts)
+__host_aicore__ inline constexpr Stride<T, Ts...> MakeStride(const T& t, const Ts&... ts)
 {
     return {t, ts...};
 }
 
 template <typename T, typename... Ts>
-__aicore__ inline constexpr Tile<T, Ts...> MakeTile(const T& t, const Ts&... ts)
+__host_aicore__ inline constexpr Tile<T, Ts...> MakeTile(const T& t, const Ts&... ts)
 {
     return {t, ts...};
 }
 
 template <typename T, typename... Ts>
-__aicore__ inline constexpr Coord<T, Ts...> MakeCoord(const T& t, const Ts&... ts)
+__host_aicore__ inline constexpr Coord<T, Ts...> MakeCoord(const T& t, const Ts&... ts)
 {
     return {t, ts...};
 }
 
 template <typename T, typename U>
-__aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride)
+__host_aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride)
 {
     static_assert(Std::is_tuple_v<T> && Std::is_tuple_v<U>, "Shape or Stride is not tuple!");
     static_assert(
@@ -69,7 +69,7 @@ __aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride)
 // stride[0][0] = 1; stride[0][i] = shape[0][i-1]*shape[1][i-1]*stride[0][i-1]; stride[1][i] = shape[0][i]*stride[0][i]
 template <size_t I, typename Row, typename Col>
 struct StrideRowElem {
-    __aicore__ static inline constexpr auto value(const Row& row, const Col& col)
+    __host_aicore__ static inline constexpr auto value(const Row& row, const Col& col)
     {
         if constexpr (I == 0) {
             return _1{};
@@ -81,26 +81,28 @@ struct StrideRowElem {
 
 template <size_t I, typename Row, typename Col>
 struct StrideColElem {
-    __aicore__ static inline constexpr auto value(const Row& row, const Col& col)
+    __host_aicore__ static inline constexpr auto value(const Row& row, const Col& col)
     {
         return Std::get<I>(row) * StrideRowElem<I, Row, Col>::value(row, col);
     }
 };
 
 template <typename Row, typename Col, size_t... Is>
-__aicore__ inline constexpr auto BuildStrideRowImpl(const Row& row, const Col& col, Std::index_sequence<Is...>)
+__host_aicore__ inline constexpr auto BuildStrideRowImpl(
+    const Row& row, const Col& col, Std::index_sequence<Is...>)
 {
     return MakeStride(StrideRowElem<Is, Row, Col>::value(row, col)...);
 }
 
 template <typename Row, typename Col, size_t... Is>
-__aicore__ inline constexpr auto BuildStrideColImpl(const Row& row, const Col& col, Std::index_sequence<Is...>)
+__host_aicore__ inline constexpr auto BuildStrideColImpl(
+    const Row& row, const Col& col, Std::index_sequence<Is...>)
 {
     return MakeStride(StrideColElem<Is, Row, Col>::value(row, col)...);
 }
 
 template <typename ShapeType>
-__aicore__ inline constexpr auto ComputeStride(const ShapeType& shape)
+__host_aicore__ inline constexpr auto ComputeStride(const ShapeType& shape)
 {
     static_assert(
         Std::is_tuple_v<ShapeType> && Std::tuple_size_v<ShapeType> == 2, "ShapeType must be tuple of two tuples");
@@ -120,7 +122,7 @@ __aicore__ inline constexpr auto ComputeStride(const ShapeType& shape)
 // shape = (x1, x2, x3, ..., xn) -> stride = (x2*x3*...*xn, ..., x_{n-1}*xn, xn, 1)
 template <size_t I, typename ShapeType>
 struct FlatStrideElem {
-    __aicore__ static inline constexpr auto value(const ShapeType& shape)
+    __host_aicore__ static inline constexpr auto value(const ShapeType& shape)
     {
         constexpr size_t N = Std::tuple_size_v<ShapeType>;
         static_assert(N > 0, "ShapeType must not be empty");
@@ -133,13 +135,14 @@ struct FlatStrideElem {
 };
 
 template <typename ShapeType, size_t... Is>
-__aicore__ inline constexpr auto BuildFlatStrideImpl(const ShapeType& shape, Std::index_sequence<Is...>)
+__host_aicore__ inline constexpr auto BuildFlatStrideImpl(
+    const ShapeType& shape, Std::index_sequence<Is...>)
 {
     return MakeStride(FlatStrideElem<Is, ShapeType>::value(shape)...);
 }
 
 template <typename ShapeType>
-__aicore__ inline constexpr auto ComputeFlatStride(const ShapeType& shape)
+__host_aicore__ inline constexpr auto ComputeFlatStride(const ShapeType& shape)
 {
     static_assert(Std::is_tuple_v<ShapeType>, "ShapeType must be tuple");
     constexpr size_t N = Std::tuple_size_v<ShapeType>;
@@ -147,7 +150,7 @@ __aicore__ inline constexpr auto ComputeFlatStride(const ShapeType& shape)
 }
 
 template <typename ShapeType>
-__aicore__ inline constexpr auto MakeLayout(const ShapeType& shape)
+__host_aicore__ inline constexpr auto MakeLayout(const ShapeType& shape)
 {
     static_assert(Std::is_tuple_v<ShapeType>, "ShapeType is not tuple!");
     using ElemT = Std::remove_cvref_t<decltype(Std::get<0>(shape))>;
@@ -159,32 +162,32 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape)
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetShape(const LayoutType& layout)
+__host_aicore__ inline constexpr auto GetShape(const LayoutType& layout)
 {
     return layout.template Shape<Is...>();
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetShape(LayoutType& layout)
+__host_aicore__ inline constexpr auto GetShape(LayoutType& layout)
 {
     return layout.template Shape<Is...>();
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetStride(const LayoutType& layout)
+__host_aicore__ inline constexpr auto GetStride(const LayoutType& layout)
 {
     return layout.template Stride<Is...>();
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetStride(LayoutType& layout)
+__host_aicore__ inline constexpr auto GetStride(LayoutType& layout)
 {
     return layout.template Stride<Is...>();
 }
 
 struct CoshapeSum {
     template <typename... Args>
-    __aicore__ inline constexpr auto operator()(const Args&... args) const
+    __host_aicore__ inline constexpr auto operator()(const Args&... args) const
     {
         return (_0{} + ... + args);
     }
@@ -192,7 +195,7 @@ struct CoshapeSum {
 
 struct CoshapeCompute {
     template <typename T, typename U>
-    __aicore__ inline constexpr auto operator()(const T& shape, const U& stride) const
+    __host_aicore__ inline constexpr auto operator()(const T& shape, const U& stride) const
     {
         if constexpr (Std::is_tuple_v<T> && Std::is_tuple_v<U>) {
             static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "Mismatched ranks");
@@ -206,7 +209,7 @@ struct CoshapeCompute {
 };
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Coshape(const LayoutType& layout)
+__host_aicore__ inline constexpr auto Coshape(const LayoutType& layout)
 {
     auto shape = GetShape<Is...>(layout);
     auto stride = GetStride<Is...>(layout);
@@ -215,37 +218,37 @@ __aicore__ inline constexpr auto Coshape(const LayoutType& layout)
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Cosize(const LayoutType& layout)
+__host_aicore__ inline constexpr auto Cosize(const LayoutType& layout)
 {
     return TupleSize(Coshape<Is...>(layout));
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Rank(const LayoutType& layout)
+__host_aicore__ inline constexpr auto Rank(const LayoutType& layout)
 {
     return layout.template Rank<Is...>();
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Select(const LayoutType& layout)
+__host_aicore__ inline constexpr auto Select(const LayoutType& layout)
 {
     return MakeLayout(SelectTuple<Is...>(layout.Shape()), SelectTuple<Is...>(layout.Stride()));
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Get(const LayoutType& layout)
+__host_aicore__ inline constexpr auto Get(const LayoutType& layout)
 {
     return MakeLayout(GetTuple<Is...>(layout.Shape()), GetTuple<Is...>(layout.Stride()));
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Size(const LayoutType& layout)
+__host_aicore__ inline constexpr auto Size(const LayoutType& layout)
 {
     return layout.template Size<Is...>();
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Capacity(const LayoutType& layout)
+__host_aicore__ inline constexpr auto Capacity(const LayoutType& layout)
 {
     return layout.template Capacity<Is...>();
 }
