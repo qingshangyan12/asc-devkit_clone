@@ -711,7 +711,7 @@ import posixpath
 import re
 import sys
 from pathlib import Path
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 
 repo_root = Path(sys.argv[1])
 scan_set_file = Path(sys.argv[2])
@@ -796,6 +796,28 @@ def normalize_target(source_file, target):
     else:
         normalized = posixpath.normpath(posixpath.join(posixpath.dirname(source_file), decoded))
     return normalized, suffix
+
+
+def normalize_gitcode_examples_target(target):
+    parsed = urlparse(target.strip().strip("<>").strip("\"'"))
+    if parsed.scheme not in ("http", "https") or parsed.netloc != "gitcode.com":
+        return None
+
+    parts = [unquote(part) for part in parsed.path.split("/") if part]
+    if len(parts) < 5 or parts[:2] != ["cann", "asc-devkit"]:
+        return None
+    if parts[2] not in ("blob", "tree"):
+        return None
+
+    try:
+        path_start = parts.index("examples", 4)
+    except ValueError:
+        return None
+    target_path = posixpath.normpath("/".join(parts[path_start:]))
+    suffix = (f"?{parsed.query}" if parsed.query else "") + (
+        f"#{parsed.fragment}" if parsed.fragment else ""
+    )
+    return target_path, suffix
 
 
 def readme_language(path):
@@ -893,11 +915,22 @@ for source in scan_files:
 
         for target in iter_links(strip_inline_code(line)):
             normalized = normalize_target(source, target)
+            is_gitcode_target = False
+            if normalized is None:
+                normalized = normalize_gitcode_examples_target(target)
+                is_gitcode_target = normalized is not None
             if normalized is None:
                 continue
 
             target_path, suffix = normalized
             target_kind = source_area(target_path)
+            if is_gitcode_target and source_kind == target_kind == "examples":
+                relative_target = posixpath.relpath(target_path, posixpath.dirname(source))
+                errors.append(
+                    f"{source}:{line_number}: examples links to other examples must use a relative path: "
+                    f"{target} -> {relative_target}{suffix}"
+                )
+                continue
             if source_kind == target_kind == "examples":
                 language_error = readme_language_error(source, target_path, suffix)
                 if language_error is not None:
