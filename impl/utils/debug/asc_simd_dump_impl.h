@@ -120,7 +120,6 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_s
 
     block_info->magic = ASCENDC_SIMD_VF_MAGIC_NUMBER;
     block_info->writeLen += tlv_len;
-    block_info->pidx += 1;
 #endif
 }
 
