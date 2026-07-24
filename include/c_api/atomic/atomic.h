@@ -30,11 +30,14 @@ __aicore__ inline void asc_set_atomic_add_float();
 
 __aicore__ inline void asc_set_atomic_max_float16();
 
+[[deprecated("NOTICE: asc_set_atomic_add_int is deprecated. Please use asc_set_atomic_add_int32 instead.")]]
 __aicore__ inline void asc_set_atomic_add_int();
 
 __aicore__ inline void asc_set_atomic_add_int8();
 
 __aicore__ inline void asc_set_atomic_add_int16();
+
+__aicore__ inline void asc_set_atomic_add_int32();
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
@@ -52,11 +55,14 @@ __aicore__ inline void asc_set_atomic_max_bfloat();
 
 __aicore__ inline void asc_set_atomic_max_float();
 
+[[deprecated("NOTICE: asc_set_atomic_max_int is deprecated. Please use asc_set_atomic_max_int32 instead.")]]
 __aicore__ inline void asc_set_atomic_max_int();
 
 __aicore__ inline void asc_set_atomic_max_int8();
 
 __aicore__ inline void asc_set_atomic_max_int16();
+
+__aicore__ inline void asc_set_atomic_max_int32();
 
 __aicore__ inline void asc_set_atomic_min_bfloat();
 
@@ -64,11 +70,14 @@ __aicore__ inline void asc_set_atomic_min_float();
 
 __aicore__ inline void asc_set_atomic_min_float16();
 
+[[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]
 __aicore__ inline void asc_set_atomic_min_int();
 
 __aicore__ inline void asc_set_atomic_min_int8();
 
 __aicore__ inline void asc_set_atomic_min_int16();
+
+__aicore__ inline void asc_set_atomic_min_int32();
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
@@ -84,17 +93,23 @@ __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& conf
              "Please use asc_atomic_add instead for atomic add operation.")]]
 __aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
 
+[[deprecated("NOTICE: asc_set_atomic_max_int is deprecated. Please use asc_set_atomic_max_int32 instead.")]]
 __aicore__ inline void asc_set_atomic_max_int();
 
 __aicore__ inline void asc_set_atomic_max_int8();
 
 __aicore__ inline void asc_set_atomic_max_int16();
 
+__aicore__ inline void asc_set_atomic_max_int32();
+
+[[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]
 __aicore__ inline void asc_set_atomic_min_int();
 
 __aicore__ inline void asc_set_atomic_min_int8();
 
 __aicore__ inline void asc_set_atomic_min_int16();
+
+__aicore__ inline void asc_set_atomic_min_int32();
 
 #endif
 
