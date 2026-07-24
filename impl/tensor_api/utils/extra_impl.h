@@ -26,7 +26,6 @@
 #include <utility>
 #include <type_traits>
 #include "impl/tensor_api/utils/macro_impl.h"
-#include "impl/utils/std/type_traits/integral_constant.h"
 #include "utils/std/tuple.h"
 #include "utils/std/type_traits.h"
 #include "utils/std/utility.h"
