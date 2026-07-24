@@ -26,10 +26,22 @@ __simd_callee__ inline void init_debug_buffer(__ubuf__ BlockVFBufInfo* blockInfo
     blockInfo->writeLen = 0;
     blockInfo->pidx = 0;
     blockInfo->flag = 0;
-    blockInfo->resv1 = 0;
+    blockInfo->finish = 0;
     blockInfo->blockIdx = blockIdx;
     blockInfo->resv2 = 0;
+    blockInfo->readLen = 0;
 }
+
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
+    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+__simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t addr, uint16_t blockIdx);
+
+__no_simd_vf_fusion__ __simd_vf__ static inline void asc_finish_flag()
+{
+    __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr(0, 0);
+    blockInfo->finish = 1;
+}
+#endif
 
 __simd_callee__ inline bool reserve_debug_tlv(__ubuf__ BlockVFBufInfo* blockInfo, uint32_t tlvLen)
 {
