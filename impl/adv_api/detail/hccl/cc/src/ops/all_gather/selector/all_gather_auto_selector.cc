@@ -13,6 +13,7 @@
 namespace mc2_ops_hccl {
 constexpr u64 AG_2D_SMALL_DATA_SIZE = 1024 * 1024;
 constexpr u32 MAX_RANK_NUM_FOR_CONCURRENT_ALGO = 4;
+constexpr u32 PCIE_BASIC_RS_MAX_DATA_SIZE = 4 * 1024 * 1024;
 
 SelectorStatus AllGatherAutoSelector::SelectCcuMsAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
@@ -211,6 +212,17 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
         if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
             selectAlgName = "InsAllGatherMesh1D";
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
+            // PCIE-SW定制机型，Mesh无法链接全卡时，需要跨pcie链路，选择适配算法
+            if (topoInfo->level0PcieMix) {
+                if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
+                    selectAlgName = "InsAllGatherMesh1D";
+                } else {
+                    selectAlgName = (dataSize < PCIE_BASIC_RS_MAX_DATA_SIZE) ? "InsAllGatherParallelMesh1DNHRPcie" :
+                                                                          "InsV2AllGatherOmniPipePcie";
+                }
+                HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
+                return SelectorStatus::MATCH;
+            }
             // UBX机型
             bool isMeshNumEqualToClosNum = false;
             bool isClosNumMultipleOfMeshNum = false;
