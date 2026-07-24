@@ -830,10 +830,7 @@ int32_t HcommBatchModeEnd(const char* batchTag)
     return HCCL_SUCCESS;
 }
 
-bool HcommIsSupportHcommBatchTransferOnThread(void)
-{
-    return false;
-}
+bool HcommIsSupportHcommBatchTransferOnThread(void) { return false; }
 
 int32_t HcclHcommBatchTransferOnThread(
     ThreadHandle thread, ChannelHandle channel, const HcclHcommBatchTransferDesc* transferDescs,

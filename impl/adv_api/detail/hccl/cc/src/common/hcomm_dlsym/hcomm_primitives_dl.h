@@ -77,8 +77,7 @@ static_assert(sizeof(HcommReduceOp) == 4, "Hcomm reduce op ABI size mismatch");
 static_assert(sizeof(HcommDataType) == 4, "Hcomm data type ABI size mismatch");
 static_assert(sizeof(HcclHcommBatchTransferDesc) == 64, "Hcomm batch transfer descriptor ABI size mismatch");
 static_assert(
-    offsetof(HcclHcommBatchTransferDesc, transferInfo) == 8,
-    "Hcomm batch transfer descriptor ABI offset mismatch");
+    offsetof(HcclHcommBatchTransferDesc, transferInfo) == 8, "Hcomm batch transfer descriptor ABI offset mismatch");
 #endif
 
 #ifdef __cplusplus

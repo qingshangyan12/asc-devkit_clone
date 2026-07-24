@@ -137,8 +137,8 @@ HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
     CHK_PRT_RET(
         startRet != HCCL_SUCCESS,
         HCCL_ERROR(
-            "[MC2_BATCH][Start] failed, ret[%d], opType[%u], algName[%s], algTag[%s].",
-            static_cast<int>(startRet), static_cast<u32>(param.opType), param.algName, param.algTag),
+            "[MC2_BATCH][Start] failed, ret[%d], opType[%u], algName[%s], algTag[%s].", static_cast<int>(startRet),
+            static_cast<u32>(param.opType), param.algName, param.algTag),
         startRet);
 
     HcclResult execRet = func();
@@ -227,8 +227,8 @@ HcclResult LaunchOpenOpParamDataImpl(
         (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
          param->opType == HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
-        HcclResult cannRet = RunWithMc2BatchMode(
-            *param, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
+        HcclResult cannRet =
+            RunWithMc2BatchMode(*param, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
         CHK_PRT_RET(
             cannRet != HCCL_SUCCESS,
             HCCL_ERROR(
@@ -242,10 +242,8 @@ HcclResult LaunchOpenOpParamDataImpl(
         mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
     CHK_SMART_PTR_NULL(executor);
 
-    CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(
-        resCtx.isHcommBatchTransferOnThreadSupported));
-    HcclResult ret = RunWithMc2BatchMode(
-        *param, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
+    CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
+    HcclResult ret = RunWithMc2BatchMode(*param, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
 
     return HCCL_SUCCESS;

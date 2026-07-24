@@ -319,8 +319,8 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         }
         if (InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported) != HCCL_SUCCESS) {
             HCCL_ERROR(
-                "failed to initialize HcommBatchTransferOnThread support, tag is %s, supported is %d.",
-                param->algTag, static_cast<int>(resCtx.isHcommBatchTransferOnThreadSupported));
+                "failed to initialize HcommBatchTransferOnThread support, tag is %s, supported is %d.", param->algTag,
+                static_cast<int>(resCtx.isHcommBatchTransferOnThreadSupported));
             return 1;
         }
         // 获取Device测主thread

@@ -69,9 +69,8 @@ const CannSyms& LoadCannSyms()
         if (s.initBatchTransfer == nullptr || initBatchTransferError != nullptr) {
             s.initBatchTransfer = nullptr;
             HCCL_DEBUG(
-                "[MC2_BATCH_TRANSFER][CannInit][SkipNoSymbol] symbol[%s], lib[%s], error[%s].",
-                kSymInitBatchTransfer, libName,
-                initBatchTransferError == nullptr ? "none" : initBatchTransferError);
+                "[MC2_BATCH_TRANSFER][CannInit][SkipNoSymbol] symbol[%s], lib[%s], error[%s].", kSymInitBatchTransfer,
+                libName, initBatchTransferError == nullptr ? "none" : initBatchTransferError);
         }
         s.ok = true;
         HCCL_RUN_INFO(

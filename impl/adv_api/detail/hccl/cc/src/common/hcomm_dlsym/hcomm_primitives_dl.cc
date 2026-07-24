@@ -18,10 +18,7 @@ using HcclHcommBatchTransferOnThreadFunc =
 static bool g_HcommBatchTransferOnThreadSupported = false;
 static HcclHcommBatchTransferOnThreadFunc g_HcommBatchTransferOnThread = nullptr;
 
-extern "C" bool HcommIsSupportHcommBatchTransferOnThread(void)
-{
-    return g_HcommBatchTransferOnThreadSupported;
-}
+extern "C" bool HcommIsSupportHcommBatchTransferOnThread(void) { return g_HcommBatchTransferOnThreadSupported; }
 
 extern "C" int32_t HcclHcommBatchTransferOnThread(
     ThreadHandle thread, ChannelHandle channel, const HcclHcommBatchTransferDesc* transferDescs,
@@ -102,17 +99,15 @@ void HcommPrimitivesDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcclCommSymWinGet);
 
     dlerror();
-    g_HcommBatchTransferOnThread = reinterpret_cast<HcclHcommBatchTransferOnThreadFunc>(
-        dlsym(libHcommHandle, "HcommBatchTransferOnThread"));
+    g_HcommBatchTransferOnThread =
+        reinterpret_cast<HcclHcommBatchTransferOnThreadFunc>(dlsym(libHcommHandle, "HcommBatchTransferOnThread"));
     const char* batchTransferError = dlerror();
-    g_HcommBatchTransferOnThreadSupported =
-        (g_HcommBatchTransferOnThread != nullptr && batchTransferError == nullptr);
+    g_HcommBatchTransferOnThreadSupported = (g_HcommBatchTransferOnThread != nullptr && batchTransferError == nullptr);
     if (!g_HcommBatchTransferOnThreadSupported) {
         g_HcommBatchTransferOnThread = nullptr;
     }
     HCCL_DEBUG(
         "[MC2_BATCH_TRANSFER][RuntimeSupport] supported[%d], func[%p], error[%s].",
-        static_cast<int>(g_HcommBatchTransferOnThreadSupported),
-        reinterpret_cast<void*>(g_HcommBatchTransferOnThread),
+        static_cast<int>(g_HcommBatchTransferOnThreadSupported), reinterpret_cast<void*>(g_HcommBatchTransferOnThread),
         batchTransferError == nullptr ? "none" : batchTransferError);
 }
