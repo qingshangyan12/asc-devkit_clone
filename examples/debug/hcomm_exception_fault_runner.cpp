@@ -434,6 +434,69 @@ bool DumpChannelsByInfoApi(const std::vector<ChannelHandle> &channels)
     return true;
 }
 
+bool FillQueueContextForCqeSeed(ChannelHandle channel, CommContext &ctx)
+{
+    auto getSizeFunc = ResolveChannelGetDumpInfoSizeFunc();
+    auto dumpInfoFunc = ResolveChannelDumpInfoFunc();
+    if (getSizeFunc == nullptr || dumpInfoFunc == nullptr || channel == 0) {
+        std::printf("[hcomm_fault_runner] cannot resolve queue context for CQE seed.\n");
+        std::fflush(stdout);
+        return false;
+    }
+
+    ChannelHandle channelCopy = channel;
+    uint32_t len = 0;
+    int32_t ret = getSizeFunc(1, &channelCopy, &len);
+    if (ret != 0 || len < sizeof(HcommChannelDumpData)) {
+        std::printf("[hcomm_fault_runner] CQE seed get dump size failed ret=%d len=%u\n", ret, len);
+        std::fflush(stdout);
+        return false;
+    }
+
+    std::vector<uint8_t> buffer(len, 0);
+    ret = dumpInfoFunc(1, &channelCopy, buffer.data(), len);
+    if (ret != 0) {
+        std::printf("[hcomm_fault_runner] CQE seed dump channel failed ret=%d len=%u\n", ret, len);
+        std::fflush(stdout);
+        return false;
+    }
+
+    const auto &dumpInfo = *reinterpret_cast<const HcommChannelDumpData *>(buffer.data());
+    if (dumpInfo.magic != HCOMM_CHANNEL_DUMP_MAGIC || dumpInfo.channelNum == 0) {
+        std::printf("[hcomm_fault_runner] CQE seed dump info invalid magic=0x%x channelNum=%u\n",
+            dumpInfo.magic, dumpInfo.channelNum);
+        std::fflush(stdout);
+        return false;
+    }
+
+    const auto &channelInfo = dumpInfo.channels[0];
+    if (channelInfo.valid == 0 || channelInfo.sqContextDumpNum == 0 || channelInfo.cqContextDumpNum == 0) {
+        std::printf("[hcomm_fault_runner] CQE seed queue context missing valid=%u sqNum=%u cqNum=%u\n",
+            channelInfo.valid, channelInfo.sqContextDumpNum, channelInfo.cqContextDumpNum);
+        std::fflush(stdout);
+        return false;
+    }
+
+    const auto &sq = channelInfo.sqContexts[0];
+    const auto &cq = channelInfo.cqContexts[0];
+    ctx.sqVa = sq.va;
+    ctx.cqVa = cq.va;
+    ctx.preWqeCnt = channelInfo.wqeCnt;
+    ctx.preSqHead = sq.head;
+    ctx.preSqTail = sq.tail;
+    ctx.preCqTail = cq.tail;
+    std::printf("[hcomm_fault_runner] CQE seed queue ctx sqVa=0x%llx cqVa=0x%llx "
+                "wqeCnt=%u sqHead=%u sqTail=%u cqTail=%u\n",
+        static_cast<unsigned long long>(ctx.sqVa),
+        static_cast<unsigned long long>(ctx.cqVa),
+        ctx.preWqeCnt,
+        ctx.preSqHead,
+        ctx.preSqTail,
+        ctx.preCqTail);
+    std::fflush(stdout);
+    return ctx.sqVa != 0 && ctx.cqVa != 0;
+}
+
 void DumpChannels(const std::vector<ChannelHandle> &channels)
 {
     (void)DumpChannelsByInfoApi(channels);
@@ -868,6 +931,9 @@ int RunRank(RankContext *ctx)
     hostCtx.writeRet = -9999;
     hostCtx.drainRet = -9999;
     hostCtx.rankId = rank;
+    if (rank == 0 && ctx->faultCase == FaultCase::CQE_ERROR && !FillQueueContextForCqeSeed(channel, hostCtx)) {
+        return 1;
+    }
     {
         std::lock_guard<std::mutex> lock(g_dumpMutex);
         g_contexts.push_back(hostCtx);
