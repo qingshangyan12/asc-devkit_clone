@@ -16,6 +16,7 @@ constexpr u64 RS_AICPU_1D_MAX_DATA_SIZE = 16 * 1024 * 1024;
 constexpr u64 RS_AICPU_1D_MIN_DATA_SIZE = 4 * 1024 * 1024;
 constexpr u64 RS_AICPU_1D_TWO_LEVER_DATA_SIZE_THRESHOLD = 1536 * 1024 * 1024;
 constexpr u64 RS_AICPU_SEQUENCE_SIZE_THRESHOLD = 1 * 1024 * 1024 * 1024;
+constexpr u32 PCIE_BASIC_RS_MAX_DATA_SIZE = 4 * 1024 * 1024;
 
 SelectorStatus ReduceScatterAutoSelector::SelectCcuMsAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
@@ -230,6 +231,10 @@ SelectorStatus ReduceScatterAutoSelector::SelectAicpuAlgo(
     u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
     u64 dataSize = opParam.DataDes.count * perDataSize;
     if (topoInfo->topoLevelNums > 1) {
+        if (topoInfo->level0PcieMix) {
+            // 加个注释，pcie mixed + 多层topology，不支持
+            return SelectorStatus::NOT_MATCH;
+        }
         if (Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD) {
             selectAlgName = "InsReduceScatterAicpuReduceNHR";
         } else if (topoInfo->Level1Nhr) {
@@ -358,13 +363,17 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoAicpuForMesh1DClos(
     bool isClosNumMultipleOfMeshNum, std::string& selectAlgName) const
 {
     if (topoInfo->level0PcieMix) {
-        // PCIE mixed topology uses the parallel AICPU executor in this scope.
+        // PCIE机型算法选择
         if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
             selectAlgName = "InsReduceScatterMesh1D";
         } else if (Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD) {
             selectAlgName = "InsReduceScatterAicpuReduceNHR";
         } else {
-            selectAlgName = "InsReduceScatterParallelMesh1DNHRPcie";
+            if (dataSize < PCIE_BASIC_RS_MAX_DATA_SIZE) {
+                selectAlgName = "InsReduceScatterParallelMesh1DNHRPcie";
+            } else {
+                selectAlgName = "InsV2ReduceScatterOmniPipePcie";
+            }
         }
     } else if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
         // MESH_1D 即可链接所有卡， 使用 MESH_1D 算法
