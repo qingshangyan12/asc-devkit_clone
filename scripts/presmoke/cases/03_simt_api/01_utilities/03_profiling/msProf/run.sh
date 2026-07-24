@@ -20,11 +20,12 @@ case_build() {
     mkdir -p "$BUILD_DIR"
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'make -j')
+    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'msopprof ./demo')
 }
 
 case_run() {
     mkdir -p "$BUILD_DIR"
-    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'msopprof ./demo')
+    :
 }
 
 case_verify() {
