@@ -5056,25 +5056,17 @@ asc_pack_v2(vector_bool& dst, vector_bool src)
     asc_pack_v2_impl(dst, src);
 }
 
-// ==========asc_pack_to_low(bool/uint16_t/int16_t/uint32_t/int32_t)==========
+// ==========asc_pack_to_low(bool/uint16_t/uint32_t)==========
 __simd_callee__ inline void asc_pack_to_low(vector_uint8_t& dst, vector_uint16_t src) { asc_pack_impl(dst, src); }
-
-__simd_callee__ inline void asc_pack_to_low(vector_uint8_t& dst, vector_int16_t src) { asc_pack_impl(dst, src); }
 
 __simd_callee__ inline void asc_pack_to_low(vector_uint16_t& dst, vector_uint32_t src) { asc_pack_impl(dst, src); }
 
-__simd_callee__ inline void asc_pack_to_low(vector_uint16_t& dst, vector_int32_t src) { asc_pack_impl(dst, src); }
-
 __simd_callee__ inline void asc_pack_to_low(vector_bool& dst, vector_bool src) { asc_pack_impl(dst, src); }
 
-// ==========asc_pack_to_high(bool/uint16_t/int16_t/uint32_t/int32_t)==========
+// ==========asc_pack_to_high(bool/uint16_t/uint32_t)==========
 __simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_uint16_t src) { asc_pack_v2_impl(dst, src); }
 
-__simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_int16_t src) { asc_pack_v2_impl(dst, src); }
-
 __simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_uint32_t src) { asc_pack_v2_impl(dst, src); }
-
-__simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_int32_t src) { asc_pack_v2_impl(dst, src); }
 
 __simd_callee__ inline void asc_pack_to_high(vector_bool& dst, vector_bool src) { asc_pack_v2_impl(dst, src); }
 
