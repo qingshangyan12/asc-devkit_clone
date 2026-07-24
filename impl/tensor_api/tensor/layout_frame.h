@@ -92,7 +92,7 @@ public:
 };
 
 template <typename LayoutPattern, typename TraitType = Std::ignore_t, typename... Args>
-ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
+__host_aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
 {
     using Trait = typename TraitConversion<LayoutPattern, TraitType>::type;
     using LayoutMaker = typename LayoutFormatSet::template Get<LayoutPattern>;
@@ -101,7 +101,7 @@ ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&.
 }
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
-ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
+__host_aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
 {
     return MakeFrameLayout<LayoutPattern, Std::Int<C0Element>>(args...);
 }
@@ -109,7 +109,7 @@ ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&.
 template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>>
 struct FrameLayoutFormat {
     template <typename... Args>
-    ASCENDC_HOST_AICORE inline constexpr decltype(auto) operator()(const Args&... args)
+    __host_aicore__ inline constexpr decltype(auto) operator()(const Args&... args)
     {
         return MakeFrameLayout<LayoutPattern, TraitType>(args...);
     }

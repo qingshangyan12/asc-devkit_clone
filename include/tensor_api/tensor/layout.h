@@ -31,70 +31,70 @@ namespace Te {
 
 // layout construction
 template <typename LayoutPattern, typename TraitType, typename ShapeType, typename StrideType>
-ASCENDC_HOST_AICORE inline constexpr auto MakePatternLayout(const ShapeType& shape, const StrideType& stride);
+__host_aicore__ inline constexpr auto MakePatternLayout(const ShapeType& shape, const StrideType& stride);
 
 template <typename... Ts>
-ASCENDC_HOST_AICORE inline constexpr Shape<Ts...> MakeShape(const Ts&... t);
+__host_aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t);
 
 template <typename... Ts>
-ASCENDC_HOST_AICORE inline constexpr Stride<Ts...> MakeStride(const Ts&... t);
+__host_aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t);
 
 template <typename... Ts>
-ASCENDC_HOST_AICORE inline constexpr Tile<Ts...> MakeTile(const Ts&... t);
+__host_aicore__ inline constexpr Tile<Ts...> MakeTile(const Ts&... t);
 
 template <typename... Ts>
-ASCENDC_HOST_AICORE inline constexpr Coord<Ts...> MakeCoord(const Ts&... t);
+__host_aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts&... t);
 
 template <typename T, typename U>
-ASCENDC_HOST_AICORE inline constexpr auto MakeLayout(const T& shape, const U& stride);
+__host_aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride);
 
 template <typename T>
-ASCENDC_HOST_AICORE inline constexpr auto MakeLayout(const T& shape);
+__host_aicore__ inline constexpr auto MakeLayout(const T& shape);
 
 template <typename T, typename Shape, typename Stride>
-ASCENDC_HOST_AICORE inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
+__host_aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
 
 template <typename T, typename LayoutType, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout);
+__host_aicore__ inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout);
 
 template <size_t I, typename Tuple, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Get(Tuple&& t);
+__host_aicore__ inline constexpr auto Get(Tuple&& t);
 
 template <size_t I0, size_t I1, size_t... Is, typename Tuple, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Get(Tuple&& t);
+__host_aicore__ inline constexpr auto Get(Tuple&& t);
 
 template <typename Tuple, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Get(Tuple&& t);
+__host_aicore__ inline constexpr auto Get(Tuple&& t);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Coshape(const LayoutType& layout);
+__host_aicore__ inline constexpr auto Coshape(const LayoutType& layout);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Cosize(const LayoutType& layout);
+__host_aicore__ inline constexpr auto Cosize(const LayoutType& layout);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Rank(const LayoutType& layout);
+__host_aicore__ inline constexpr auto Rank(const LayoutType& layout);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Select(const LayoutType& layout);
+__host_aicore__ inline constexpr auto Select(const LayoutType& layout);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Get(const LayoutType& layout);
+__host_aicore__ inline constexpr auto Get(const LayoutType& layout);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Size(const LayoutType& layout);
+__host_aicore__ inline constexpr auto Size(const LayoutType& layout);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-ASCENDC_HOST_AICORE inline constexpr auto Capacity(const LayoutType& layout);
+__host_aicore__ inline constexpr auto Capacity(const LayoutType& layout);
 
 template <typename Tensor, typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);
 
 template <typename LayoutPattern, typename TraitType, typename... Args>
-ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
+__host_aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
-ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
+__host_aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
 
 template <size_t... SqueezeDims, typename T, typename Enable>
 __aicore__ inline constexpr auto Squeeze(const T& x);
