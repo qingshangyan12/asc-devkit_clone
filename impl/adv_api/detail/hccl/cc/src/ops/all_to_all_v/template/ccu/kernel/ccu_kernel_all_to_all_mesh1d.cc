@@ -17,7 +17,7 @@ constexpr int TOKEN_XN_ID  = 2;
 constexpr int CKE_IDX_0    = 0;
 constexpr int CKE_IDX_1    = 1;
 
-struct KfcAlltoAllMesh1DContext : CcuKernelCtxBase {
+struct KfcAlltoAllMesh1DContext {
     const ChannelHandle *channels{nullptr};
     uint32_t channelCount{0};
     uint32_t rankSize{0};
@@ -30,9 +30,7 @@ struct KfcAlltoAllMesh1DContext : CcuKernelCtxBase {
     ccu::Variable srcStride;
     ccu::Variable srcOffset;
     ccu::Variable dstOffset;
-    GroupOpSizeVars goSize;
     ccu::Event event;
-    bool loadFromMem = false;
 };
 
 static CcuResult InitResource(KfcAlltoAllMesh1DContext &ctx)
@@ -53,14 +51,12 @@ static CcuResult InitResource(KfcAlltoAllMesh1DContext &ctx)
             channelIdx++;
         }
     }
-    ctx.resourceAllocated = false;
     return CCU_SUCCESS;
 }
 
 static CcuResult LoadArgs(KfcAlltoAllMesh1DContext &ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                         ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset,
-                        ccu::Variable dstOffset, ccu::Variable goSize1, ccu::Variable goSize2,
-                        ccu::Variable goSize3, ccu::Variable goSize4)
+                        ccu::Variable dstOffset)
 {
     ctx.input = inputAddr;
     ctx.output[ctx.rankId] = outputAddr;
@@ -69,10 +65,6 @@ static CcuResult LoadArgs(KfcAlltoAllMesh1DContext &ctx, ccu::Variable inputAddr
     ctx.srcStride = srcStride;
     ctx.srcOffset = srcOffset;
     ctx.dstOffset = dstOffset;
-    ctx.goSize.addrOffset = goSize1;
-    ctx.goSize.loopParam = goSize2;
-    ctx.goSize.parallelParam = goSize3;
-    ctx.goSize.residual = goSize4;
 
     ctx.srcOffset += ctx.input;
     return CCU_SUCCESS;
@@ -122,37 +114,28 @@ static CcuResult DoAlltoAll(KfcAlltoAllMesh1DContext &ctx)
         }
 
         src[rankIdx].addr = ctx.srcOffset;
-        src[rankIdx].token = ctx.token[rankIdx];
+        // 所有源地址都位于本 rank 的 input buffer，必须使用本 rank token。
+        src[rankIdx].token = ctx.token[ctx.rankId];
         for (uint64_t i = 0; i < rankIdx; i++) {
             src[rankIdx].addr += ctx.srcStride;
         }
     }
 
     uint32_t channelId = 0;
-    uint16_t allBit = ((1 << ctx.rankSize) - 1) & (~(1 << ctx.rankId)); // 仅rankid位为0，其他位为1，代表远端准备好了
+    uint16_t allBit = (1 << ctx.rankSize) - 1;
 
-    if (ctx.loadFromMem) {
-        for(uint64_t r = 0; r < ctx.rankSize; r++) {
-            if (r == ctx.rankId) {
-                ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1 << r);
-            }
-            else {
-                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
-                channelId++;
-            }
+    // 参照 KFC AllGather/ReduceScatter，直接使用 LocalCopy + Write，避免 GroupCopy
+    // 创建 LoopGroup、LoopEntity 和内部 CCU buffer 导致资源超限。
+    for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
+        if (rankIdx == ctx.rankId) {
+            ccu::LocalCopy(localDst, src[rankIdx], ctx.sliceSize, ctx.event, 1 << rankIdx);
+        } else {
+            ccu::Write(ctx.channels[channelId], dst[rankIdx], src[rankIdx], ctx.sliceSize,
+                       ctx.event, 1 << rankIdx);
+            channelId++;
         }
-        // 等读完所有对端
-        ccu::EventWait(ctx.event, (1 << ctx.rankSize) - 1);
-    } else {
-        for(uint64_t r = 0; r < ctx.rankSize; r++) {
-            if (r != ctx.rankId) {
-                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
-                channelId++;
-            }
-        }
-        GroupCopy(ctx, localDst, src[ctx.rankId], ctx.goSize);
-        ccu::EventWait(ctx.event, allBit);
     }
+    ccu::EventWait(ctx.event, allBit);
 
     return CCU_SUCCESS;
 }
@@ -167,22 +150,19 @@ CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputA
                                   const ChannelHandle channels[], uint32_t channelCount,
                                   uint32_t rankSize, uint32_t rankId, bool loadFromMem)
 {
+    (void)goSize1;
+    (void)goSize2;
+    (void)goSize3;
+    (void)goSize4;
+    (void)loadFromMem;
+
     KfcAlltoAllMesh1DContext ctx;
     ctx.channels = channels;
     ctx.channelCount = channelCount;
     ctx.rankSize = rankSize;
     ctx.rankId = rankId;
-    ctx.loadFromMem = loadFromMem;
-    ctx.resourceAllocated = false;
-    ctx.moConfig.msInterleave = 0;
-    ctx.moConfig.loopCount = 0;
-    ctx.moConfig.memSlice = 0;
-    ctx.moRes.eventCount = 0;
-    ctx.moRes.bufCount = 0;
-    ctx.enginePool = 0;
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset,
-                                  goSize1, goSize2, goSize3, goSize4));
+    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset));
     PreSync(ctx);
     CCU_CHK_RET(DoAlltoAll(ctx));
     PostSync(ctx);
