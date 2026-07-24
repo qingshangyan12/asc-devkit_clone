@@ -180,6 +180,13 @@ HcclResult ReduceScatterOutPlace(
     HCCL_INFO("Start to execute ReduceScatterOutPlace");
     CHK_RET(PrepareReduceScatterParam(
         param, sendBuf, recvBuf, recvCount, dataType, op, comm, stream, userRankSize, OpMode::OPBASE));
+    // 调试用，to delete
+    HCCL_INFO(
+        "[HcclDataSize][ReduceScatter] count[%llu], dataType[%u], dataTypeSize[%u], outputSize[%llu] bytes, "
+        "inputSize[%llu] bytes, rankSize[%u].",
+        static_cast<unsigned long long>(recvCount), static_cast<u32>(dataType), DATATYPE_SIZE_TABLE[dataType],
+        static_cast<unsigned long long>(param.outputSize), static_cast<unsigned long long>(param.inputSize),
+        userRankSize);
 
     CcuFastLaunchCtx* ccuFastLaunchCtx = nullptr;
     if (ShouldGoCcuFastLaunch(comm, param, &ccuFastLaunchCtx)) {
@@ -237,6 +244,13 @@ HcclResult ReduceScatterOutPlaceGraphMode(
 
     CHK_RET(PrepareReduceScatterParam(
         param, sendBuf, recvBuf, recvCount, dataType, op, comm, stream, userRankSize, OpMode::OFFLOAD));
+    // 调试用，to delete
+    HCCL_INFO(
+        "[HcclDataSize][ReduceScatter] count[%llu], dataType[%u], dataTypeSize[%u], outputSize[%llu] bytes, "
+        "inputSize[%llu] bytes, rankSize[%u].",
+        static_cast<unsigned long long>(recvCount), static_cast<u32>(dataType), DATATYPE_SIZE_TABLE[dataType],
+        static_cast<unsigned long long>(param.outputSize), static_cast<unsigned long long>(param.inputSize),
+        userRankSize);
 
     if (userRankSize == 1) {
         HCCL_WARNING("[%s] rankSize == 1, enter SingleRankProc", __func__);
