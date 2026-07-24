@@ -45,7 +45,7 @@
     __aicore__ inline LocalTensor<T> AllocTensor()
     ```
 
--   inplace接口：直接使用传入的Tensor作为内存管理的对象，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
+-   inplace接口：直接使用传入的Tensor作为内存管理的对象，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](../../../../../../guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
 
     ```cpp
     template <typename T>
@@ -65,7 +65,7 @@
 </thead>
 <tbody><tr id="row1550117591914"><td class="cellrowborder" valign="top" width="12.139999999999999%" headers="mcps1.2.3.1.1 "><p id="p185019592913"><a name="p185019592913"></a><a name="p185019592913"></a>T</p>
 </td>
-<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p12101541625"><a name="p12101541625"></a><a name="p12101541625"></a><span>Tensor的数据类型，支持的类型请见<a href="../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>相关描述。</span></p>
+<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p12101541625"><a name="p12101541625"></a><a name="p12101541625"></a><span>Tensor的数据类型，支持的类型请见<a href="../../../数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>相关描述。</span></p>
 </td>
 </tr>
 </tbody>
@@ -86,7 +86,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="12.591259125912593%" headers="mcps1.2.4.1.2 "><p id="p1653714592515"><a name="p1653714592515"></a><a name="p1653714592515"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.93749374937492%" headers="mcps1.2.4.1.3 "><p id="p165371945142512"><a name="p165371945142512"></a><a name="p165371945142512"></a>inplace接口需要传入<a href="../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>作为内存管理的对象。</p>
+<td class="cellrowborder" valign="top" width="74.93749374937492%" headers="mcps1.2.4.1.3 "><p id="p165371945142512"><a name="p165371945142512"></a><a name="p165371945142512"></a>inplace接口需要传入<a href="../../../数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>作为内存管理的对象。</p>
 </td>
 </tr>
 </tbody>

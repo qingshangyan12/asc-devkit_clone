@@ -26,24 +26,16 @@
 
 ## 功能说明<a id="zh-cn_topic_0000002542828493_section106841136114319"></a>
 
-头文件路径为：basic_api/kernel_operator_data_copy_intf.h。
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 矩阵计算的结果存放在L0C Buffer，DataCopy接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。
 
 <!-- npu="950,A3,910b" id8 -->
 下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
-<!-- npu="A3,910b" id9 -->
-**图1** L0C2GM流程图（[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
+**图1** L0C2GM流程图<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
 
 ![](../../../../figures/L0C2GM_Function_Combination.png)
-<!-- end id9 -->
-
-<!-- npu="950" id11 -->
-**图2** L0C2GM流程图（[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
-
-![](../../../../figures/L0C2GM_Function_Combination_950.png)
-<!-- end id11 -->
 <!-- end id8 -->
 
 ## 函数原型<a id="zh-cn_topic_0000002542828493_section82039854412"></a>
@@ -102,8 +94,8 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | eltWiseOp | <!-- npu="950,A3,910b" id15 -->该参数仅在Atlas 200I/500 A2 推理产品支持。<br><!-- end id15 --><!-- npu="310b" id16 -->用于配置是否开启Elementwise操作及操作模式。Elementwise操作是指进行随路量化后，可以逐个元素加/减一个LocalTensor，大小为mSize * nSize，具体LocalTensor地址相关参数需要调用[SetFixPipeAddr](./寄存器配置说明/SetFixPipeAddr.md)来设置。<br>eltWiseOp参数类型为uint8_t，取值如下：<br>&nbsp;&nbsp;&bull; 0：不开启Elementwise；<br>&nbsp;&nbsp;&bull; 1：Elementwise Addition；<br>&nbsp;&nbsp;&bull; 2：Elementwise Subtraction。<br><!-- end id16 --> |
 | quantPre | 用于控制量化模式，QuantMode_t类型，具体定义如下：<br>&nbsp;&nbsp;&bull; float/int32_t输出此需配置为QuantMode_t::NoQuant。<br>&nbsp;&nbsp;&bull; half/bfloat16_t输出，此参数需配置为QuantMode_t::F322F16/QuantMode_t::F322BF16。<br>&nbsp;&nbsp;&bull; 配置为scalar量化时，需要调用[SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)接口来设置scalar量化参数。<br>&nbsp;&nbsp;&bull; 配置为tensor量化时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置tensor量化参数，其中tensor量化参数需要通过DataCopy从L1 Buffer搬运至Fixpipe Buffer。<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。<br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能<br>    F322F16,      // Float32_2_Float16：float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16：float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16：int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16：int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8：float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8：int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8：int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre> |
 | reluPre | 用于配置ReLU操作的模式，类型为uint8_t，取值如下：<br>&nbsp;&nbsp;&bull; 0：不开启ReLU；<br>&nbsp;&nbsp;&bull; 1：Normal ReLU。 |
-| channelSplit | 类型为bool，配置是否开启通道切分功能，仅在L0C Buffer(CO1) -> GM通路下NZ格式float类型输出时生效。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
-| nz2ndEn | 类型为bool，配置是否开启NZ2ND的格式转换，仅在L0C Buffer(CO1) -> GM通路生效。<br>如果要开启NZ2ND的功能需要同步调用[SetFixpipeNz2ndFlag](./寄存器配置说明/SetFixpipeNz2ndFlag.md)来设置格式转换的相关配置信息。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
+| channelSplit | 类型为bool，配置是否开启通道切分功能，仅在NZ格式float类型输出时生效。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
+| nz2ndEn | 类型为bool，配置是否开启NZ2ND的格式转换。<br>如果要开启NZ2ND的功能需要同步调用[SetFixpipeNz2ndFlag](./寄存器配置说明/SetFixpipeNz2ndFlag.md)来设置格式转换的相关配置信息。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
 
 ## 数据类型<a id="zh-cn_topic_0000002542828493_section4219135304818"></a>
 
@@ -169,7 +161,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 ## 调用示例<a id="zh-cn_topic_0000002542828493_section088124295117"></a>
 
 <!-- npu="950,A3,910b" id21 -->
-- 示例一：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8\_t，结果矩阵的数据类型为int32\_t。量化模式DEQF16，Scalar量化参数为2.0，将Mmad计算出的结果由int32\_t量化成half并搬出。DataCopy完整样例请参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
+- 示例一：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8\_t，结果矩阵的数据类型为int32\_t。量化模式DEQF16，Scalar量化参数为2.0，将Mmad计算出的结果由int32\_t量化成half并搬出。DataCopy完整样例请参考[data_copy_l0c2gm](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
 
     ```cpp
     // Scalar量化，量化参数为2.0
@@ -190,7 +182,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     AscendC::DataCopy(cGM, cLocal, intriParams);
     ```
 
-- 示例二：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8\_t，结果矩阵的数据类型为int32\_t。量化模式VDEQF16，Tensor量化，将Mmad计算出的结果由int32\_t量化成half并搬出。DataCopy完整样例请参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
+- 示例二：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8\_t，结果矩阵的数据类型为int32\_t。量化模式VDEQF16，Tensor量化，将Mmad计算出的结果由int32\_t量化成half并搬出。DataCopy完整样例请参考[data_copy_l0c2gm](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
 
     ```cpp
     // CeilAlign定义如下

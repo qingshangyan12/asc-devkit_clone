@@ -169,7 +169,7 @@ AddKernelInvocationNeo
     >ACLRT_LAUNCH_KERNEL(kernel_name)(numBlocks, stream, argument list);
     >```
     >- kernel\_name：算子核函数的名称。
-    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)来获取block\_idx。
+    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](../../../api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)来获取block\_idx。
     >- stream，类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在Device上执行。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
     >- argument list：参数列表，与核函数的参数列表保持一致。
 
@@ -450,9 +450,15 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 
 基于Kernel直调样例工程，通过ACLRT\_LAUNCH\_KERNEL接口调用核函数时，可实现CPU与NPU域的代码的统一，且该方式仅支持以下型号：
 
+<!-- npu="A3" id1 -->
 -   Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id1 -->
+<!-- npu="910b" id2 -->
 -   Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id2 -->
+<!-- npu="310p" id3 -->
 -   Atlas 推理系列产品
+<!-- end id3 -->
 
 下面代码以add\_custom算子为例，介绍算子核函数在CPU侧验证时，算子调用的应用程序如何编写（通过ACLRT\_LAUNCH\_KERNEL接口调用核函数的方式）。您在实现自己的应用程序时，需要关注由于算子核函数不同带来的修改，包括算子核函数名，入参出参的不同等，合理安排相应的内存分配、内存拷贝和文件读写等，相关API的调用方式直接复用即可。
 

@@ -53,6 +53,15 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 ```
 <!-- end id9 -->
 
+<!-- npu="950" id10 -->
+以下接口为SIMT中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
+
+```
+template <class... Args>
+static __attribute__((noinline)) void printf(const char* fmt, Args&&... args);
+```
+<!-- end id10 -->
+
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
@@ -67,9 +76,20 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 ## 约束说明
 
 -   本接口不支持打印除换行符之外的其他转义字符。
+<!-- npu="950,A3,910b" id14 -->
+-   SIMT场景的支持情况如下：
+      <!-- npu="950" id11 -->
+    - Ascend 950PR/Ascend 950DT：支持。
+      <!-- end id11 -->
+      <!-- npu="A3" id12 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持。
+      <!-- end id12 -->
+      <!-- npu="910b" id13 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
+      <!-- end id13 -->
+<!-- end id14 -->
 -   SIMT中printf功能需要占用额外的Global Memory空间用于数据缓存，缓存空间大小默认为2MB。您可以通过acl.json中的"simt\_printf\_fifo\_size"字段进行配置，配置范围最小为1MB，最大为64MB。当打印数据量较大时，建议增加缓存空间。
--   在SIMT中调用printf接口，会占用SIMT栈空间，请控制每次printf打印的数据量，防止SIMT栈溢出。
--   使用printf接口会增加算子运行时间，请控制打印数据量，避免算子超时。建议在代码中判断线程ID，仅在部分线程中打印调试信息，减少重复内容的打印，更有利于调试。
+-   SIMT中使用printf接口会增加算子运行时间，请控制打印数据量，避免算子超时。建议在代码中判断线程ID，仅在部分线程中打印调试信息，减少重复内容的打印，更有利于调试。
 -   SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为32KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过acl.json中的"simd\_printf\_fifo\_size\_per\_core"字段进行配置，配置范围最小为1KB，最大为64MB。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
 -   SIMD场景下，根据算子执行方式的不同，printf的打印结果输出方式不同。动态图或者单算子直调场景下，待输出内容会被解析并打印在屏幕上；静态图场景下，整图算子需要全下沉到NPU侧执行，无法直接调用接口打印出单个算子的信息，因此需要在模型执行完毕后，将待输出内容落盘在dump文件中，dump文件需要通过工具解析为可读内容。
     -   dump文件落盘路径按照优先级排列如下：
@@ -90,6 +110,10 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
     ```
     __ubuf__ const char* fmt = "simd vf: int=%d, uint=%u, float=%f, string=%s\n";
     ```
+
+-   在`simd_vf`场景下，每个AIV核在单次`asc_vf_call`执行期间最多能使用2KB的UB空间；同一次`asc_vf_call`中的所有`simd_vf`的`printf`和`asc_dump`调用共享该预留空间。
+-   每次调用`simd_vf`的`printf`时，除格式字符串和参数外，还会固定占用32字节；整条打印数据需要按8字节对齐。
+-   `simd_vf`调测接口不会检查上述预留空间是否越界。超过限制可能越界写入预留空间，导致打印结果异常，并可能影响算子执行。
 
 ## 需要包含的头文件
 
@@ -157,7 +181,39 @@ simd vf: int=1, uint=2, float=5.000000, string=AscendC
 ......
 ```
 
-## SIMT示例
+## SIMT编程场景调用示例
+
+```
+#include "simt_api/asc_simt.h"
+#include "utils/debug/asc_printf.h"
+
+// 核函数线程启动参数：dim3(8, 2, 8)
+__global__ void SimtCompute()
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+    int z = threadIdx.z;
+    printf("simt: d: (%d, %d, %d), f: %f, s: %s\n", x, y, z, 3.14f, "pass");
+}
+```
+
+NPU模式下，程序运行时打印效果如下：
+
+```
+simt: d: (0, 0, 0), f: 3.140000, s: pass
+simt: d: (1, 0, 0), f: 3.140000, s: pass
+simt: d: (2, 0, 0), f: 3.140000, s: pass
+simt: d: (3, 0, 0), f: 3.140000, s: pass
+simt: d: (4, 0, 0), f: 3.140000, s: pass
+simt: d: (5, 0, 0), f: 3.140000, s: pass
+simt: d: (6, 0, 0), f: 3.140000, s: pass
+simt: d: (7, 0, 0), f: 3.140000, s: pass
+simt: d: (0, 1, 0), f: 3.140000, s: pass
+simt: d: (1, 1, 0), f: 3.140000, s: pass
+......
+```
+
+## SIMD与SIMT混合编程场景SIMT VF调用示例
 
 ```
 #include "kernel_operator.h"
@@ -178,14 +234,14 @@ NPU模式下，程序运行时打印效果如下：
 
 ```
 simt vf: d: (0, 0, 0), f: 3.140000, s: pass
-simt vf: d: (0, 0, 1), f: 3.140000, s: pass
-simt vf: d: (0, 0, 2), f: 3.140000, s: pass
-simt vf: d: (0, 0, 3), f: 3.140000, s: pass
-simt vf: d: (0, 0, 4), f: 3.140000, s: pass
-simt vf: d: (0, 0, 5), f: 3.140000, s: pass
-simt vf: d: (0, 0, 6), f: 3.140000, s: pass
-simt vf: d: (0, 0, 7), f: 3.140000, s: pass
+simt vf: d: (1, 0, 0), f: 3.140000, s: pass
+simt vf: d: (2, 0, 0), f: 3.140000, s: pass
+simt vf: d: (3, 0, 0), f: 3.140000, s: pass
+simt vf: d: (4, 0, 0), f: 3.140000, s: pass
+simt vf: d: (5, 0, 0), f: 3.140000, s: pass
+simt vf: d: (6, 0, 0), f: 3.140000, s: pass
+simt vf: d: (7, 0, 0), f: 3.140000, s: pass
 simt vf: d: (0, 1, 0), f: 3.140000, s: pass
-simt vf: d: (0, 1, 1), f: 3.140000, s: pass
+simt vf: d: (1, 1, 0), f: 3.140000, s: pass
 ......
 ```

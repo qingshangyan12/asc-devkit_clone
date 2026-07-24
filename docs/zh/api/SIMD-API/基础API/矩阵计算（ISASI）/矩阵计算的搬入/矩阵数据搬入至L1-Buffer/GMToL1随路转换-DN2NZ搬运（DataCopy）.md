@@ -1,4 +1,4 @@
-﻿# GMToL1随路转换-DN2NZ搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002563847574"></a>
+# GMToL1随路转换-DN2NZ搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002563847574"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>
 
@@ -32,7 +32,7 @@
 
 ## 功能说明<a id="section474617392321"></a>
 
-头文件路径为：basic_api/kernel_operator_data_copy_intf.h。
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 随路格式转换数据搬运，适用于在搬运时进行DN到NZ格式的转换。数据从Global Memory搬运至L1 Buffer（TPosition为A1/B1），搬运过程中完成DN->NZ格式转换。
 
@@ -63,7 +63,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为L1 Buffer（TPosition为A1/B1）。 |
-| src | 输入 | 源操作数，类型为GlobalTensor。<br>[SetL2CacheHint](../../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/SetL2CacheHint.md)支持的L2 Cache控制模式如下：CacheMode::CACHE_MODE_DISABLE、CacheMode::CACHE_MODE_NORMAL。 |
+| src | 输入 | 源操作数，类型为GlobalTensor。<br>[SetL2CacheHint](../../../数据结构/GlobalTensor/SetL2CacheHint.md)支持的L2 Cache控制模式如下：CacheMode::CACHE_MODE_DISABLE、CacheMode::CACHE_MODE_NORMAL。 |
 | intriParams | 输入 | 搬运参数，Dn2NzParams类型，具体参数说明请参考[表3](#table9182515919)。 |
 
 **表3** Dn2NzParams结构体参数定义<a id="table9182515919"></a>
@@ -160,7 +160,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ![](../../../../../figures/datacopy_gm2l1_dn2nz_demo.png)
 
-示例代码片段如下，完整示例请参考[data_copy_gm2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景3。
+示例代码片段如下，完整示例请参考[data_copy_gm2l1样例](../../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景3。
 
 ```cpp
 // m=40,k=56,fractalShape[0] = 16,fractalShape[1] = 16,fractalSize = 16 * fractalShape[1] 

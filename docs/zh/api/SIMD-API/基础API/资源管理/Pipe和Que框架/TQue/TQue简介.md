@@ -21,7 +21,7 @@ template <TPosition pos, int32_t depth, auto mask = 0> class TQue{...};
 </thead>
 <tbody><tr id="row1550117591914"><td class="cellrowborder" valign="top" width="14.099999999999998%" headers="mcps1.2.3.1.1 "><p id="p185019592913"><a name="p185019592913"></a><a name="p185019592913"></a>pos</p>
 </td>
-<td class="cellrowborder" valign="top" width="85.9%" headers="mcps1.2.3.1.2 "><p id="p35011591693"><a name="p35011591693"></a><a name="p35011591693"></a>队列逻辑位置，可以为<span>VECIN、VECOUT、</span>A1<span>、</span>A2<span>、</span>B1<span>、</span>B2<span>、</span>CO1<span>、</span>CO2。<span>关于TPosition的具体介绍请参考</span><a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>。</p>
+<td class="cellrowborder" valign="top" width="85.9%" headers="mcps1.2.3.1.2 "><p id="p35011591693"><a name="p35011591693"></a><a name="p35011591693"></a>队列逻辑位置，可以为<span>VECIN、VECOUT、</span>A1<span>、</span>A2<span>、</span>B1<span>、</span>B2<span>、</span>CO1<span>、</span>CO2。<span>关于TPosition的具体介绍请参考</span><a href="../../../辅助数据结构//TPosition.md">TPosition</a>。</p>
 </td>
 </tr>
 <tr id="row12501859799"><td class="cellrowborder" valign="top" width="14.099999999999998%" headers="mcps1.2.3.1.1 "><p id="p1650113599915"><a name="p1650113599915"></a><a name="p1650113599915"></a>depth</p>
@@ -29,7 +29,7 @@ template <TPosition pos, int32_t depth, auto mask = 0> class TQue{...};
 <td class="cellrowborder" valign="top" width="85.9%" headers="mcps1.2.3.1.2 "><p id="p8510214185418"><a name="p8510214185418"></a><a name="p8510214185418"></a>队列的深度表示该队列可以连续进行入队/出队的次数，在代码运行时，对同一个队列有n次连续的EnQue（中间没有DeQue），那么该队列的深度就需要设置为n。</p>
 <p id="p7674135716528"><a name="p7674135716528"></a><a name="p7674135716528"></a>注意，这里的队列深度和double buffer无关，队列机制用于实现流水线并行，double buffer在此基础上进一步提高流水线的利用率。即使队列的深度为1，仍可以开启double buffer。</p>
 <p id="p1334591855410"><a name="p1334591855410"></a><a name="p1334591855410"></a>非Tensor原地操作的场景下，队列的深度设置为1时，编译器对这种场景做了特殊优化，性能通常更好，<strong id="b0597122135416"><a name="b0597122135416"></a><a name="b0597122135416"></a>推荐设置为1</strong>。</p>
-<p id="p1167810565476"><a name="p1167810565476"></a><a name="p1167810565476"></a><span id="ph280915815592"><a name="ph280915815592"></a><a name="ph280915815592"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md" target="_blank" rel="noopener noreferrer">Tensor原地操作</a></span>的场景下，需要设置为0。</p>
+<p id="p1167810565476"><a name="p1167810565476"></a><a name="p1167810565476"></a><span id="ph280915815592"><a name="ph280915815592"></a><a name="ph280915815592"></a><a href="../../../../../../guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md" target="_blank" rel="noopener noreferrer">Tensor原地操作</a></span>的场景下，需要设置为0。</p>
 <a name="ul26757572527"></a><a name="ul26757572527"></a><ul id="ul26757572527"><li>如下样例中队列没有连续入队，队列的深度设置为1。<a name="screen17724335125812"></a><a name="screen17724335125812"></a><pre class="screen" codetype="Cpp" id="screen17724335125812">a1 = que.AllocTensor(); 
 que.EnQue(a1);
 a1 = que.DeQue();

@@ -188,7 +188,7 @@
 </thead>
 <tbody><tr id="row167376215416"><td class="cellrowborder" valign="top" width="12.34%" headers="mcps1.2.3.1.1 "><p id="p14568152324113"><a name="p14568152324113"></a><a name="p14568152324113"></a>bufPos</p>
 </td>
-<td class="cellrowborder" valign="top" width="87.66000000000001%" headers="mcps1.2.3.1.2 "><p id="p188271137124113"><a name="p188271137124113"></a><a name="p188271137124113"></a>TBuf所在的逻辑位置，<a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>类型。</p>
+<td class="cellrowborder" valign="top" width="87.66000000000001%" headers="mcps1.2.3.1.2 "><p id="p188271137124113"><a name="p188271137124113"></a><a name="p188271137124113"></a>TBuf所在的逻辑位置，<a href="../../../辅助数据结构//TPosition.md">TPosition</a>类型。</p>
 </td>
 </tr>
 </tbody>
@@ -229,7 +229,7 @@
 -   一个kernel中所有使用的Buffer数量之和不能超过64。
 -   自定义地址InitBuffer方式分配不建议与不指定地址的混用，可能会导致内存冲突。
 <!-- npu="950" id10 -->
-- 针对Ascend 950PR/Ascend 950DT，对UB的内存分配，会基于静态内存的基础上进行分配，即动态内存初始位置，参考[内存层级](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/内存层级.md)。
+- 针对Ascend 950PR/Ascend 950DT，对UB的内存分配，会基于静态内存的基础上进行分配，即动态内存初始位置，参考[内存层级](../../../../../../guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/内存层级.md)。
 <!-- end id10 -->
 - 当前暂不支持与L1 Buffer, L0A Buffer, L0B Buffer, L0C Buffer, BiasTable静态数组混用。
 

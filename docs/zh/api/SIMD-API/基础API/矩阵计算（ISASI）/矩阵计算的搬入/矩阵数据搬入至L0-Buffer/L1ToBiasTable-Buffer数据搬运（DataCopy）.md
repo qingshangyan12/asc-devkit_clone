@@ -1,4 +1,4 @@
-﻿# L1ToBiasTable Buffer数据搬运<a id="ZH-CN_TOPIC_0000002538071240"></a>
+# L1ToBiasTable Buffer数据搬运<a id="ZH-CN_TOPIC_0000002538071240"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002566886667_section796754519912"></a>
 
@@ -32,7 +32,7 @@
 
 ## 功能说明<a id="zh-cn_topic_0000002566886667_section106841136114319"></a>
 
-头文件路径为：basic_api/kernel_operator_data_copy_intf.h。
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动到BiasTable Buffer。
 
@@ -165,4 +165,4 @@ __aicore__ inline void SplitBias(AscendC::LocalTensor<outputType> bias1Local,
 }
 ```
 
-完整示例请参考[data_copy_gm2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景4。
+完整示例请参考[data_copy_gm2l1样例](../../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景4。

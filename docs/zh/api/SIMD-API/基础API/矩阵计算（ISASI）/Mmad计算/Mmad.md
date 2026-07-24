@@ -1,4 +1,4 @@
-﻿# Mmad<a name="ZH-CN_TOPIC_00000025382311899"></a>
+# Mmad<a name="ZH-CN_TOPIC_00000025382311899"></a>
 
 ## 产品支持情况
 
@@ -64,7 +64,7 @@
 
 ## 功能说明
 
-头文件路径为：basic_api/kernel_operator_mm_intf.h。
+头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
 Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。
 
@@ -85,7 +85,7 @@ $$C = A \times B + C$$
 
 **图1** Mmad接口矩阵乘分形示意图（Ascend 950PR/Ascend 950DT）<a id="zh_cn_topic_mmad_section2_figure1"></a>
 
-![](../../../../figures/mmad_demo_a5.png "Mmad接口计算分形示意图")
+![Mmad接口计算分形示意图](../../../../figures/mmad_demo_a5.png)
 <!-- end id19 -->
 
 <!-- npu="A3,910b" id20 -->
@@ -332,4 +332,4 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 调用示例
 
-矩阵乘的样例请参考[Mmad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
+矩阵乘的样例请参考[Mmad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。

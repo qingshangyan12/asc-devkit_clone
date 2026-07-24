@@ -46,7 +46,7 @@
         __aicore__ inline LocalTensor<T> DeQue()
         ```
 
-    -   inplace接口：通过出参的方式返回，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
+    -   inplace接口：通过出参的方式返回，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](../../../../../../guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
 
         ```cpp
         template <typename T>
@@ -75,7 +75,7 @@
 </thead>
 <tbody><tr id="row1550117591914"><td class="cellrowborder" valign="top" width="12.139999999999999%" headers="mcps1.2.3.1.1 "><p id="p185019592913"><a name="p185019592913"></a><a name="p185019592913"></a>T</p>
 </td>
-<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p12101541625"><a name="p12101541625"></a><a name="p12101541625"></a><span>Tensor的数据类型，支持的类型请见<a href="../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>相关描述。</span></p>
+<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p12101541625"><a name="p12101541625"></a><a name="p12101541625"></a><span>Tensor的数据类型，支持的类型请见<a href="../../../数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>相关描述。</span></p>
 </td>
 </tr>
 <tr id="row1629562101416"><td class="cellrowborder" valign="top" width="12.139999999999999%" headers="mcps1.2.3.1.1 "><p id="p174916484213"><a name="p174916484213"></a><a name="p174916484213"></a>srcUserPos</p>
@@ -119,7 +119,7 @@
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-non-inplace接口和指定源和目的位置的接口返回值为从队列中取出的[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)；inplace接口没有返回值。
+non-inplace接口和指定源和目的位置的接口返回值为从队列中取出的[LocalTensor](../../../数据结构/LocalTensor/LocalTensor.md)；inplace接口没有返回值。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

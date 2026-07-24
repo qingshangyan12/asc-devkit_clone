@@ -1,11 +1,11 @@
 # RTC<a name="ZH-CN_TOPIC_0000002462620725"></a>
 
-RTC是Ascend C运行时编译库，通过[aclrtc](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/Utils-API/RTC/RTC.md)接口，在程序运行时，将中间代码动态编译成目标机器码，提升程序运行性能。
+RTC是Ascend C运行时编译库，通过[aclrtc](../../../../api/Utils-API/RTC/RTC.md)接口，在程序运行时，将中间代码动态编译成目标机器码，提升程序运行性能。
 
 运行时编译库提供以下核心接口：
 -   aclrtcCreateProg：根据输入参数（字符串形式表达的Ascend C源代码等）创建aclrtcProg程序实例。
 -   aclrtcAddNameExpr（可选）：注册需要导出的核函数名表达式，支持模板参数（如"Kernel::add_custom\<float\>"），非模板核函数可跳过。
--   aclrtcCompileProg：编译给定的程序，支持用户自定义编译选项，比如指定[NPU架构版本号](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)：--npu-arch=dav-2201。支持的编译选项可以参考[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
+-   aclrtcCompileProg：编译给定的程序，支持用户自定义编译选项，比如指定[NPU架构版本号](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)：--npu-arch=dav-2201。支持的编译选项可以参考[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 -   aclrtcGetBinDataSize：获取编译后的Device侧二进制数据的大小。
 -   aclrtcGetBinData：获取编译后的Device侧二进制数据。
 -   aclrtcGetLoweredName（可选）：获取核函数编译后的mangled name，用于后续通过aclrtBinaryGetFunction查找核函数句柄，非模板核函数可跳过。
@@ -18,7 +18,7 @@ RTC是Ascend C运行时编译库，通过[aclrtc](https://gitcode.com/cann/asc-d
 4.  调用aclrtLaunchKernelWithArgsArray接口，在已创建的Stream上按参数数组方式启动对应算子的计算任务。无参数核函数可传入空参数数组；有参数核函数需保证参数数组元素按核函数入参顺序排列，且每个元素指向Host侧的参数值。
 5.  调用aclrtSynchronizeStream、aclrtBinaryUnLoad、aclrtDestroyStream、aclrtResetDevice、aclFinalize等接口完成同步和资源释放。
 
-如下样例演示了如何使用aclrtc接口编译并运行一个核函数，该核函数中调用了printf进行打印。完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/05_aclrtc/rtc_hello_world/README.md)。
+如下样例演示了如何使用aclrtc接口编译并运行一个核函数，该核函数中调用了printf进行打印。完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/05_aclrtc/rtc_hello_world/README.md)。
 
 
 ```c++
@@ -127,4 +127,4 @@ const char* manglingName = "";
 aclrtcGetLoweredName(prog, kernelNameExpr, &manglingName);
 ```
 
-完整样例请参考：[rtc_template_add](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/05_aclrtc/rtc_template_add/README.md)。
+完整样例请参考：[rtc_template_add](../../../../../../examples/01_simd_cpp_api/02_features/05_aclrtc/rtc_template_add/README.md)。

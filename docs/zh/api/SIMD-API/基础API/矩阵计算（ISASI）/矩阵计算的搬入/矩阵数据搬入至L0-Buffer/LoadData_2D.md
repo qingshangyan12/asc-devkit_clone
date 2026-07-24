@@ -1,4 +1,4 @@
-﻿# LoadData（2D矩阵搬运）
+# LoadData（2D矩阵搬运）
 
 ## 产品支持情况
 
@@ -32,7 +32,7 @@
 
 ## 功能说明
 
-头文件路径为：basic_api/kernel_operator_mm_intf.h。
+头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行搬运，支持如下数据通路的搬运：
 
@@ -47,7 +47,7 @@
 - 对于b16数据类型，每个数据分形为一个16×16的矩阵。
 - 对于b32数据类型，每个数据分形在L0A Buffer中为一个16×8的矩阵，在L0B Buffer中为一个8×16的矩阵。
 
-实现原理可参考伪代码：[LoadData（2D矩阵搬运）伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load2d.py)。
+实现原理可参考伪代码：[LoadData（2D矩阵搬运）伪代码](../../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load2d.py)。
 
 ## 函数原型
 
@@ -256,7 +256,7 @@ dstGap为2：表示目的操作数上，前一个数据分形的尾地址与后�
 
 ![](../../../../../figures/load2d_l12l0a_nontrans.png)
 
-示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](../../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize;
@@ -278,7 +278,7 @@ for (int i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
 
 ![](../../../../../figures/load2d_l12l0a_trans.png)
 
-示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](../../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32_t dstOffset = CeilDivision(k, fractalShape[0]) * fractalSize;
