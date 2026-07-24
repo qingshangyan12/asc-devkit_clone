@@ -9,6 +9,7 @@
 # ----------------------------------------------------------------------------------------------------------
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_v2_reduce_scatter_sole_executor.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ins_v2_reduce_scatter_omnipipe_executor.cc
     # Legacy parallel/concurrent executors include direct CCU headers removed from the current hcomm API.
     # Old-flow calls are routed by opbase to IndvHcclWrapper instead of this KFC-only mc2_client.
     # ${CMAKE_CURRENT_SOURCE_DIR}/ins_reduce_scatter_parallel_executor.cc
