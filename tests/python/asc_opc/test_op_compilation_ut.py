@@ -1270,7 +1270,7 @@ class TestOpCompilationUt(unittest.TestCase):
             with open(os.path.join(kernel_meta, "Add_x.o"), "wb") as file_obj:
                 file_obj.write(b"binary")
             with open(
-                os.path.join(kernel_meta, "static_compile", "Add_x", "op_resource.json"),
+                os.path.join(kernel_meta, "static_compile", "Add_x", "manifest.json"),
                 "w",
                 encoding="utf-8",
             ) as file_obj:
@@ -1284,7 +1284,7 @@ class TestOpCompilationUt(unittest.TestCase):
             post_compilation.copy_compile_res_files_to_output(json_path)
             self.assertTrue(
                 os.path.isfile(
-                    os.path.join(output, "static_compile", "Add_x", "op_resource.json")
+                    os.path.join(output, "static_compile", "Add_x", "manifest.json")
                 )
             )
             self.assertFalse(os.path.exists(stale_dir))
