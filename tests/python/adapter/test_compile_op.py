@@ -360,11 +360,11 @@ class TestCompileOp(unittest.TestCase):
             paths = {
                 name: os.path.join(root, name)
                 for name in (
-                    "Add_x.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_tiling.h",
-                    "Add_x.json", "Add_x_sk_kernel.cpp", "add_sk.cpp", "sk_bind.cpp",
+                    "Add_x_relocatable.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_tiling.h",
+                    "Add_x_relocatable.json", "Add_x_sk_kernel.cpp", "add_sk.cpp", "sk_bind.cpp",
                 )
             }
-            for name in ("Add_x.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_sk_kernel.cpp", "add_sk.cpp"):
+            for name in ("Add_x_relocatable.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_sk_kernel.cpp", "add_sk.cpp"):
                 with open(paths[name], "w", encoding="utf-8") as file_obj:
                     file_obj.write("source\n")
             with open(paths["Add_x_tiling.h"], "w", encoding="utf-8") as file_obj:
@@ -372,20 +372,20 @@ class TestCompileOp(unittest.TestCase):
                     "#ifndef T\n#define T\nclass AddTiling {};\n"
                     "#define GET_TILING_DATA(v, p) InitTilingData<AddTiling>(p, &v)\n#endif\n"
                 )
-            with open(paths["Add_x.json"], "w", encoding="utf-8") as file_obj:
-                json.dump({"kernelList": [{"kernelName": "actual_7"}]}, file_obj)
+            with open(paths["Add_x_relocatable.json"], "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelList": [{"kernelName": "Add_x_relocatable_7"}]}, file_obj)
             with open(paths["sk_bind.cpp"], "w", encoding="utf-8") as file_obj:
                 file_obj.write("SK_BIND(actual_7, 3, actual_7_sk, x);\n")
 
             info = CompileInfo()
-            info.dst_file = paths["Add_x.o"]
+            info.dst_file = paths["Add_x_relocatable.o"]
             info.src_file = paths["add.cpp"]
             info.gen_kernel_func_file = paths["Add_x_kernel.cpp"]
-            info.kernel_name = "Add_x"
+            info.kernel_name = "Add_x_relocatable"
             info.origin_func_name = "Add"
             info.tiling_key_list = ["7"]
             info.tiling_key_kernel_type = {"7": KernelMetaType.KERNEL_TYPE_AIV_ONLY}
-            info.global_kernel_symbols = ["actual_7"]
+            info.global_kernel_symbols = ["Add_x_relocatable_7"]
             info.global_kernel_attribute = "__aicore__"
             info.static_compile_tiling_size = 32
             info.static_compile_tiling_key_data_size = {"7": 32}
@@ -423,6 +423,8 @@ class TestCompileOp(unittest.TestCase):
                 )
 
             kernel = generate.call_args.kwargs["kernels"][0]
+            self.assertEqual(kernel["kernel_name"], "Add_x_7")
+            self.assertEqual(generate.call_args.kwargs["kernel_base"], "Add_x")
             commands = kernel["recipes"]["super_kernel"]["commands"]
             self.assertEqual(commands[:2], kernel["recipes"]["normal"]["commands"])
             self.assertEqual(
@@ -442,8 +444,9 @@ class TestCompileOp(unittest.TestCase):
             self.assertNotIn("${launch.block_dim}", json.dumps(commands))
             self.assertEqual(
                 kernel["recipes"]["super_kernel"]["artifact"],
-                "artifacts/actual_7.static_with_sk.o",
+                "artifacts/Add_x_7.static_with_sk.o",
             )
+            self.assertNotIn("_relocatable", json.dumps(kernel))
             self.assertEqual(generate.call_args.kwargs["resource_id"], "leaky_relu_custom")
             resource_paths = [
                 resource["path"] for resource in generate.call_args.kwargs["resources"]

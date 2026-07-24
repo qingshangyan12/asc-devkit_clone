@@ -24,7 +24,7 @@ from .ascendc_common_utility import (
     get_kernel_fun_name_with_tiling_key_and_kernel_type,
 )
 from .get_op_tiling import TilingInfo
-from asc_op_compile_base.common.utils.log_utils import CompileStage
+from asc_op_compile_base.common.utils.log_utils import AscendCLogLevel, CompileStage
 from .ascendc_constants import (
     CORE_TYPE_MIX,
     CORE_TYPE_CUBE,
@@ -480,6 +480,30 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
         )
     else:
         kernel_func_name = param.compile_info.kernel_name + "_%s" % param.tiling_key
+    if param.sub_arch is not None:
+        if param.code_channel == CORE_TYPE_MIX:
+            kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+            kernel_arch = param.sub_arch
+        elif param.compile_info.hard_sync:
+            kernel_type = (
+                KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+                if param.compile_info.code_channel == CORE_TYPE_VEC
+                else KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+            )
+            kernel_arch = param.sub_arch
+        else:
+            kernel_type = (
+                KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                if "cube" in param.sub_arch
+                else KernelMetaType.KERNEL_TYPE_AIV_ONLY
+            )
+            kernel_arch = "AiCore"
+        kernel_func_name = gen_sub_kernel_name(
+            kernel_func_name,
+            kernel_arch,
+            kernel_type.name,
+            dst_file,
+        )
     if param.code_channel == CORE_TYPE_MIX:
         compile_cmd += [f"-D{MIX_CORE_MACRO}={1}"]
     if CommonUtility.is_c310() or CommonUtility.is_m510():
@@ -496,6 +520,8 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
     set_dynamic_sub_func_names_of_super_kernel(
         param.tiling_key, param.compile_info, param.sub_arch, kernel_func_name
     )
+    if global_var_storage.get_variable("ascendc_sk_double_compile") is True:
+        param.compile_info.global_kernel_symbols.append(kernel_func_name)
     return compile_cmd, kernel_func_name
 
 
@@ -932,6 +958,31 @@ def decode_mode(mode) -> int:
         return mode
 
 
+def _run_infer_channel_compile(compile_cmd, compile_log_path):
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        proc = subprocess.Popen(
+            compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        )
+        (out, _) = proc.communicate()
+        output = out.decode()
+        transient_rename = (
+            "unable to rename temporary" in output
+            and "No such file or directory" in output
+        )
+        if proc.returncode == 0 or not transient_rename or attempt + 1 == max_attempts:
+            CommonUtility.dump_build_log(
+                output, compile_cmd, CompileStage.INFERCHANNEL, proc.returncode
+            )
+            return
+        CommonUtility.print_compile_log(
+            "",
+            f"retry infer-channel compile after transient output rename failure "
+            f"({attempt + 1}/{max_attempts - 1})",
+            AscendCLogLevel.LOG_WARNING,
+        )
+
+
 def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
     if params.tiling_info.static_shape_flag:
         # static shape use tiling_key itself
@@ -965,13 +1016,7 @@ def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
         CommonUtility.dump_compile_log(
             compile_cmd, CompileStage.INFERCHANNEL, params.compile_log_path
         )
-        proc = subprocess.Popen(
-            compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-        )
-        (out, _) = proc.communicate()
-        CommonUtility.dump_build_log(
-            out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode
-        )
+        _run_infer_channel_compile(compile_cmd, params.compile_log_path)
         objdump_cmd = ["llvm-objdump", "-s", "-j", ".text", "{}".format(dst_file)]
 
         CommonUtility.dump_compile_log(

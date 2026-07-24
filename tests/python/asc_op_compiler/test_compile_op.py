@@ -66,6 +66,7 @@ from asc_op_compile_base.asc_op_compiler.compile_op import (
 )
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import (
     call_bisheng_v220,
+    compile_single_tiling_v220,
     get_ktype_section_variable,
     decode_mode,
     v220_mode,
@@ -97,7 +98,89 @@ compile_op_module = importlib.import_module(
 super_kernel_compile_module = importlib.import_module(
     "asc_op_compile_base.asc_op_compiler.super_kernel_op_compile"
 )
+ascendc_compile_v220_module = importlib.import_module(
+    "asc_op_compile_base.asc_op_compiler.ascendc_compile_v220"
+)
 from unittest.mock import Mock, patch
+
+
+class TestV220SuperKernelSymbols(unittest.TestCase):
+    def test_infer_channel_compile_retries_transient_output_rename(self):
+        transient = Mock()
+        transient.returncode = 1
+        transient.communicate.return_value = (
+            b"unable to rename temporary file: No such file or directory",
+            None,
+        )
+        success = Mock()
+        success.returncode = 0
+        success.communicate.return_value = (b"", None)
+
+        with mock.patch.object(
+            ascendc_compile_v220_module.subprocess,
+            "Popen",
+            side_effect=[transient, success],
+        ) as popen, mock.patch.object(
+            ascendc_compile_v220_module.CommonUtility,
+            "dump_build_log",
+        ) as dump_build_log, mock.patch.object(
+            ascendc_compile_v220_module.CommonUtility,
+            "print_compile_log",
+        ):
+            ascendc_compile_v220_module._run_infer_channel_compile(
+                ["bisheng"], "/tmp/compile.log"
+            )
+
+        self.assertEqual(popen.call_count, 2)
+        dump_build_log.assert_called_once_with(
+            "", ["bisheng"], CompileStage.INFERCHANNEL, 0
+        )
+
+    def test_dynamic_tiling_records_symbol_for_sk_double_compile(self):
+        compile_info = Mock()
+        compile_info.dst_file = "/tmp/Add_x.o"
+        compile_info.gen_kernel_func_file = "/tmp/Add_x_kernel.cpp"
+        compile_info.origin_func_name = "add"
+        compile_info.kernel_name = "Add_x"
+        compile_info.hard_sync = False
+        compile_info.code_channel = CORE_TYPE_VEC
+        compile_info.global_kernel_symbols = []
+        param = SingleTilingKeyCompileParams(
+            "7",
+            compile_info,
+            "dav-c220-vec",
+            Mock(),
+            CORE_TYPE_VEC,
+            Mock(),
+        )
+        global_var_storage.set_variable("ascendc_sk_double_compile", True)
+        try:
+            with mock.patch.object(
+                ascendc_compile_v220_module,
+                "gen_compile_cmd_v220",
+                return_value=["bisheng"],
+            ), mock.patch.object(
+                ascendc_compile_v220_module,
+                "gen_sub_kernel_name",
+                return_value="Add_x_7_middle",
+            ), mock.patch.object(
+                ascendc_compile_v220_module,
+                "set_dynamic_sub_func_names_of_super_kernel",
+            ), mock.patch.object(
+                ascendc_compile_v220_module.CommonUtility,
+                "is_c310",
+                return_value=False,
+            ), mock.patch.object(
+                ascendc_compile_v220_module.CommonUtility,
+                "is_m510",
+                return_value=False,
+            ):
+                _, kernel_name = compile_single_tiling_v220(param)
+        finally:
+            global_var_storage.set_variable("ascendc_sk_double_compile", False)
+
+        self.assertEqual(kernel_name, "Add_x_7_middle")
+        self.assertEqual(compile_info.global_kernel_symbols, ["Add_x_7_middle"])
 from tempfile import TemporaryDirectory
 
 
@@ -382,11 +465,11 @@ class TestCompileOp(unittest.TestCase):
             paths = {
                 name: os.path.join(root, name)
                 for name in (
-                    "Add_x.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_tiling.h",
-                    "Add_x.json", "Add_x_sk_kernel.cpp", "add_sk.cpp", "sk_bind.cpp",
+                    "Add_x_relocatable.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_tiling.h",
+                    "Add_x_relocatable.json", "Add_x_sk_kernel.cpp", "add_sk.cpp", "sk_bind.cpp",
                 )
             }
-            for name in ("Add_x.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_sk_kernel.cpp", "add_sk.cpp"):
+            for name in ("Add_x_relocatable.o", "add.cpp", "Add_x_kernel.cpp", "Add_x_sk_kernel.cpp", "add_sk.cpp"):
                 with open(paths[name], "w", encoding="utf-8") as file_obj:
                     file_obj.write("source\n")
             with open(paths["Add_x_tiling.h"], "w", encoding="utf-8") as file_obj:
@@ -394,20 +477,20 @@ class TestCompileOp(unittest.TestCase):
                     "#ifndef T\n#define T\nclass AddTiling {};\n"
                     "#define GET_TILING_DATA(v, p) InitTilingData<AddTiling>(p, &v)\n#endif\n"
                 )
-            with open(paths["Add_x.json"], "w", encoding="utf-8") as file_obj:
-                json.dump({"kernelList": [{"kernelName": "actual_7"}]}, file_obj)
+            with open(paths["Add_x_relocatable.json"], "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelList": [{"kernelName": "Add_x_relocatable_7"}]}, file_obj)
             with open(paths["sk_bind.cpp"], "w", encoding="utf-8") as file_obj:
                 file_obj.write("SK_BIND(actual_7, 3, actual_7_sk, x);\n")
 
             info = CompileInfo()
-            info.dst_file = paths["Add_x.o"]
+            info.dst_file = paths["Add_x_relocatable.o"]
             info.src_file = paths["add.cpp"]
             info.gen_kernel_func_file = paths["Add_x_kernel.cpp"]
-            info.kernel_name = "Add_x"
+            info.kernel_name = "Add_x_relocatable"
             info.origin_func_name = "Add"
             info.tiling_key_list = ["7"]
             info.tiling_key_kernel_type = {"7": KernelMetaType.KERNEL_TYPE_AIV_ONLY}
-            info.global_kernel_symbols = ["actual_7"]
+            info.global_kernel_symbols = ["Add_x_relocatable_7"]
             info.global_kernel_attribute = "__aicore__"
             info.static_compile_tiling_size = 32
             info.static_compile_tiling_key_data_size = {"7": 32}
@@ -445,6 +528,8 @@ class TestCompileOp(unittest.TestCase):
                 )
 
             kernel = generate.call_args.kwargs["kernels"][0]
+            self.assertEqual(kernel["kernel_name"], "Add_x_7")
+            self.assertEqual(generate.call_args.kwargs["kernel_base"], "Add_x")
             commands = kernel["recipes"]["super_kernel"]["commands"]
             self.assertEqual(commands[:2], kernel["recipes"]["normal"]["commands"])
             self.assertEqual(
@@ -464,8 +549,9 @@ class TestCompileOp(unittest.TestCase):
             self.assertNotIn("${launch.block_dim}", json.dumps(commands))
             self.assertEqual(
                 kernel["recipes"]["super_kernel"]["artifact"],
-                "artifacts/actual_7.static_with_sk.o",
+                "artifacts/Add_x_7.static_with_sk.o",
             )
+            self.assertNotIn("_relocatable", json.dumps(kernel))
             self.assertEqual(generate.call_args.kwargs["resource_id"], "leaky_relu_custom")
             resource_paths = [
                 resource["path"] for resource in generate.call_args.kwargs["resources"]

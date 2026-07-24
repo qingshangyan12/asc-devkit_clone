@@ -24,7 +24,7 @@ from .ascendc_common_utility import (
     get_kernel_fun_name_with_tiling_key_and_kernel_type,
 )
 from .get_op_tiling import TilingInfo
-from .log_utils import CompileStage
+from .log_utils import AscendCLogLevel, CompileStage
 from .ascendc_constants import (
     CORE_TYPE_MIX,
     CORE_TYPE_CUBE,
@@ -932,6 +932,31 @@ def decode_mode(mode) -> int:
         return mode
 
 
+def _run_infer_channel_compile(compile_cmd, compile_log_path):
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        proc = subprocess.Popen(
+            compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        )
+        (out, _) = proc.communicate()
+        output = out.decode()
+        transient_rename = (
+            "unable to rename temporary" in output
+            and "No such file or directory" in output
+        )
+        if proc.returncode == 0 or not transient_rename or attempt + 1 == max_attempts:
+            CommonUtility.dump_build_log(
+                output, compile_cmd, CompileStage.INFERCHANNEL, proc.returncode
+            )
+            return
+        CommonUtility.print_compile_log(
+            "",
+            f"retry infer-channel compile after transient output rename failure "
+            f"({attempt + 1}/{max_attempts - 1})",
+            AscendCLogLevel.LOG_WARNING,
+        )
+
+
 def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
     if params.tiling_info.static_shape_flag:
         # static shape use tiling_key itself
@@ -965,13 +990,7 @@ def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
         CommonUtility.dump_compile_log(
             compile_cmd, CompileStage.INFERCHANNEL, params.compile_log_path
         )
-        proc = subprocess.Popen(
-            compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-        )
-        (out, _) = proc.communicate()
-        CommonUtility.dump_build_log(
-            out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode
-        )
+        _run_infer_channel_compile(compile_cmd, params.compile_log_path)
         objdump_cmd = ["llvm-objdump", "-s", "-j", ".text", "{}".format(dst_file)]
 
         CommonUtility.dump_compile_log(
