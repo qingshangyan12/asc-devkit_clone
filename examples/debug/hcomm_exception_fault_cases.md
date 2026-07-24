@@ -5,8 +5,8 @@ This directory contains two AIV fault kernels for validating exception callback 
 ## Kernels
 
 - `HcommUrmaTimeoutFaultKernel`: calls `Hcomm::WriteNbi` with `len > 256MB` and then `Drain`.
-- `HcommCqeErrorFaultKernel`: calls `Hcomm::WriteNbi` with a valid remote buffer and an invalid local source address,
-  then calls `Drain` to trigger the CQE error path through the real HCOMM submission flow.
+- `HcommCqeErrorFaultKernel`: posts one real WQE with valid local/remote buffers, writes a recognizable CQE error record
+  into CQ ring for dump validation, then triggers a Runtime exception so the callback report path can dump the state.
 
 Both kernels take a device pointer to `CommContext`.
 
@@ -196,9 +196,9 @@ HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 
 - URMA timeout case: callback-triggered report calls `HcommChannelDumpInfo`, which returns raw channel/SQ/CQ/WQE/CQE
   bytes; asc-devkit parses and prints the protocol fields.
-- CQE error case: the runner launches `HcommCqeErrorFaultKernel`, which posts one real HCOMM WQE with an invalid local
-  source address and then drains the channel. Use `CqContext`, `Hcomm URMA CQE`, `status`, `substatus`, and `entryIdx`
-  as log filters.
+- CQE error case: the runner launches `HcommCqeErrorFaultKernel`, which posts one real HCOMM WQE with valid buffers,
+  seeds a CQE error record for validation, and then triggers Runtime exception. Use `CqContext`, `Hcomm URMA CQE`,
+  `status`, `substatus`, and `entryIdx` as log filters.
 
 ## Validation Checklist
 
