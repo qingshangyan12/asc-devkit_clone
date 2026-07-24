@@ -77,7 +77,7 @@ __simd_vf__ inline void ReduceAlignCall(
     Reg::RegTensor<T> srcVreg;
     Reg::RegTensor<T> dstVreg;
     for (uint16_t i = 0; i < newRepeatTimes; ++i) {
-        if constexpr (isCounterMode) {
+        if constexpr (isCounterMode) { // countermode
             mask = Reg::UpdateMask<T>(countSreg);
         }
         Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
