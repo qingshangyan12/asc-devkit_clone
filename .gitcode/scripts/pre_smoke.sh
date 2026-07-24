@@ -53,11 +53,11 @@ for op in "${ops[@]}"; do
     "https://ascend-ci.obs.cn-north-4.myhuaweicloud.com/${obs_path}/${arm_package}" 2>/dev/null
 
   if [ ! -f "${arm_package}" ] || [ ! -s "${arm_package}" ]; then
-    echo "No custom package found, This PR no need excute smoke."
+    echo "No custom package found, This PR no need execute smoke."
     rm -f "${arm_package}"
     exit 0
   fi
-
+e
   chmod +x ${arm_package}
   yes "y" | bash "${arm_package}" --full --install-path=/usr/local/Ascend --quiet
   update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 10; update-alternatives --config gcc <<< '1'

@@ -20,7 +20,6 @@ on:
 jobs:
   JOB_ut:
     name: ut
-    # needs: [JOB_2]
     steps:
       -
         name: Checkout
