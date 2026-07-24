@@ -1297,6 +1297,7 @@
             -   [asc_sync_pipe](SIMD-API/C-API/sync/asc_sync_pipe.md)
             -   [asc_sync_subblock_arrive](SIMD-API/C-API/sync/asc_sync_subblock_arrive.md)
             -   [asc_sync_subblock_wait](SIMD-API/C-API/sync/asc_sync_subblock_wait.md)
+            -   [asc_sync_vec（废弃）](SIMD-API/C-API/sync/asc_sync_vec_deprecated.md)
             -   [asc_sync_vec](SIMD-API/C-API/sync/asc_sync_vec.md)
             -   [asc_sync_wait](SIMD-API/C-API/sync/asc_sync_wait.md)
             -   [asc_unlock](SIMD-API/C-API/sync/asc_unlock.md)
