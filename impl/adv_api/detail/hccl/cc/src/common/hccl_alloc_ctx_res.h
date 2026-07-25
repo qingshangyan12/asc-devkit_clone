@@ -133,6 +133,7 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuReduceScatterMeshMem2Mem1D", CcuReduceScatterMeshMem2Mem1D},
     {"CcuReduceScatterMesh2D", CcuReduceScatterMesh2D},
     {"CcuAllReduceMesh1D", CcuAllReduceMesh1D},
+    {"CcuAllReduceMesh1DMem2Mem", CcuAllReduceMeshMem2Mem1D},
     {"CcuAllReduceMeshMem2Mem1D", CcuAllReduceMeshMem2Mem1D},
     {"CcuAllReduceMesh2DOneShot", CcuAllReduceMesh2DOneShot},
     {"CcuAlltoAllMesh1D", CcuAlltoAllMesh1D},
