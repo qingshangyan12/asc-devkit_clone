@@ -482,7 +482,6 @@ HcclResult PrepareTopoInfoForOp(
     HCCL_INFO("[SelectAlgAndPrepareEngine]  successfully!");
     CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
     HCCL_INFO("[SelectAlgAndPrepareEngine]HcclCalcTopoInfo successfully!");
-    CHK_RET(CheckAsymmetricTopoSupport(opParam.opType, topoInfo.get()));
     return HCCL_SUCCESS;
 }
 
