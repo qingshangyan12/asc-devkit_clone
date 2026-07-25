@@ -28,15 +28,17 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-按照元素对应位置执行矢量加法运算，i为元素索引。
+该接口根据mask，对源操作数src0、src1进行按元素求和操作，将结果写入目的操作数dst。
+ 	 
+Carry flag（进位/借位标志）用于表示加法进位或者减法无借位。该接口可以在carry（掩码寄存器）中标记每次加法是否产生进位，若src0，src1输入按位相加后最高位有进位，在carry中对应位置每4bit的最低位写1，否则写0。
 
-计算公式如下：
+计算结果不保留进位，计算公式如下：
+ 	 
+$$dst_i = src0_i + src1_i$$
 
-$$
-dst_i = src0_i + src1_i
-$$
+计算结果保留进位，计算公式如下：
 
-执行带进位的加法运算时，可以在进位输出（掩码寄存器）中标记每次加法是否产生进位，若src0，src1输入按位相加后最高位有进位，在carry中对应位置每4bit的最低位写1，否则写0。
+$$\{carry_i, dst_i\} = src0_i + src1_i$$
 
 ![](../../figures/asc_add.png)
 
@@ -45,23 +47,23 @@ $$
 ## 函数原型
 
 - 不带进位数据的接口
-```cpp
-__simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-```
+  ```cpp
+  __simd_callee__ inline void asc_add(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+  __simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
+  __simd_callee__ inline void asc_add(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+  __simd_callee__ inline void asc_add(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+  __simd_callee__ inline void asc_add(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
+  __simd_callee__ inline void asc_add(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+  __simd_callee__ inline void asc_add(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+  __simd_callee__ inline void asc_add(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+  __simd_callee__ inline void asc_add(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+  ```
 
 - 带进位数据的接口
-```cpp
-__simd_callee__ inline void asc_add(vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-```
+  ```cpp
+  __simd_callee__ inline void asc_add(vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+  __simd_callee__ inline void asc_add(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+  ```
 
 ## 参数说明
 
@@ -69,11 +71,13 @@ __simd_callee__ inline void asc_add(vector_bool& carry, vector_uint32_t& dst, ve
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| carry | 输出 | 目的进位值（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
-| dst | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。 |
-| src0 | 输入 | 源操作数0（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。 |
-| src1 | 输入 | 源操作数1（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。 |
-| mask | 输入 | 源操作数掩码（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| carry | 输出 | 目的操作数（掩码寄存器）。用来存储加法计算后的进位数据。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| src0 | 输入 | 源操作数（矢量数据寄存器）。 |
+| src1 | 输入 |源操作数（矢量数据寄存器）。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -83,14 +87,10 @@ __simd_callee__ inline void asc_add(vector_bool& carry, vector_uint32_t& dst, ve
 
 - mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
-- 不带进位数据的接口
-
-  默认执行非饱和运算，此时相同位宽的有符号和无符号数据类型硬件实现完全相同。
-
 - 带进位数据的接口
   - 仅支持int32_t和uint32_t类型。
   - 需手动调用，接口内部不支持自动识别触发。
-  - 运算输出完整计算结果（包含进位位），硬件不会对输出进行饱和或截断。
+  - 运算输出完整计算结果（包含进位位），不受[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
 
 ## 调用示例
 
