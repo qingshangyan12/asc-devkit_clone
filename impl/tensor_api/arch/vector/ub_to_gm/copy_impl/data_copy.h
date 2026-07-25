@@ -48,7 +48,7 @@ protected:
             dstStride = dstStride >> 1;
         }
 
-        uint8_t cacheMode = dst.Engine().GetCacheMode();
+        auto cacheMode = static_cast<asc_store_l2_cache_mode>(dst.Engine().GetCacheMode());
         CopyUbufToGmAlignV2Instr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride, cacheMode);
     }
 };

@@ -56,7 +56,9 @@ public:
     template <typename T>
     __aicore__ inline static void CopyUbufToGmAlignV2(__gm__ T* dst, __ubuf__ T* src, const uint16_t blockCount,
                                                       const uint32_t blockLen, const int64_t srcStride,
-                                                      const int64_t dstStride, const uint8_t cacheMode = 0)
+                                                      const int64_t dstStride,
+                                                      const asc_store_l2_cache_mode cacheMode =
+                                                          asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM)
     {
         if ASCEND_IS_AIC {
             return;

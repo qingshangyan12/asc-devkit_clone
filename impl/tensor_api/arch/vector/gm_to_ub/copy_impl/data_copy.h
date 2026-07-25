@@ -50,7 +50,7 @@ protected:
 
         constexpr uint8_t leftPaddingCnt = 0;
         constexpr uint8_t rightPaddingCnt = 0;
-        uint8_t cacheMode = src.Engine().GetCacheMode();
+        auto cacheMode = static_cast<asc_load_l2_cache_mode>(src.Engine().GetCacheMode());
         CopyGmToUbufAlignV2Instr::DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, srcStride,
                                            dstStride, cacheMode);
     }
