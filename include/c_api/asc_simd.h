@@ -25,6 +25,8 @@
 #include "c_api/cache_ctrl/cache_ctrl.h"
 #include "c_api/composite/cube_compute.h"
 #include "c_api/composite/vector_compute.h"
+#include "c_api/composite/cube_memcpy.h"
+#include "c_api/composite/vector_memcpy.h"
 #include "c_api/cube_compute/cube_compute.h"
 #include "c_api/cube_memcpy/cube_memcpy.h"
 #include "c_api/scalar/scalar_compute.h"

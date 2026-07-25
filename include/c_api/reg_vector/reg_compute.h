@@ -32,7 +32,6 @@
 #include "c_api/reg_vector/compute/reg_mask.h"
 #include "c_api/reg_vector/compute/reg_permute_sel.h"
 #include "c_api/reg_vector/compute/reg_reduce.h"
-#include "c_api/reg_vector/compute/reg_scatter.h"
 
 #endif
 
