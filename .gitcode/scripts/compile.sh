@@ -34,15 +34,10 @@ esac
 if [ "${TARGET_BRANCH}" == master ]; then
         bash build.sh --pkg --cann_3rd_lib_path="/home/jenkins/opensource" -f "pr_filelist.txt"
         echo "exec cmd: [bash build.sh --pkg --cann_3rd_lib_path="/home/jenkins/opensource" -f "pr_filelist.txt"]"
-elif [ "${TARGET_BRANCH}" == exp/kadc] || [ "${TARGET_BRANCH}" == feature/tensor_api_from_9.0.0 ]; then
+elif [ "${TARGET_BRANCH}" == exp/kadc ] || [ "${TARGET_BRANCH}" == feature/tensor_api_from_9.0.0 ]; then
         echo "not need build"
         mkdir -p build_out
         touch ${WORKSPACE}/build_out/cann-asc-devkit.run
 else
         bash build.sh --pkg --cann_3rd_lib_path="/home/jenkins/opensource"
-fi
-
-if [ ! -f "build_out/"*.run ]; then
-    mkdir -p build_out
-    touch build_out/cann-ops-math-test_linux-x86_64.run
 fi

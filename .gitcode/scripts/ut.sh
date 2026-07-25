@@ -18,6 +18,7 @@ set +e
 if [ "$TARGET_BRANCH" = "master" ] || [ "$TARGET_BRANCH" == "9.1.0-beta.2" ]; then
     bash build.sh --${ut_type} --cov --cann_3rd_lib_path="/home/jenkins/opensource" -f "pr_filelist.txt"
     ret=$?
+    coverage_save="true"
 elif [ "$TARGET_BRANCH" = "exp/kadc" ]; then
     echo "not need run ut"
     exit 0
@@ -25,6 +26,7 @@ elif [ "$TARGET_BRANCH" = "exp/kadc" ]; then
 elif [ "$TARGET_BRANCH" = "feature/tensor_api_from_9.0.0" ]; then
   if [ "${ut_type}" = "UT_Test_basic_test_three" ] || [ "${ut_type}" == "UT_Test_basic_test_two" ] || [ "${ut_type}" == "UT_Test_basic_test_one" ]; then
     bash build.sh --${ut_type} --cann_3rd_lib_path="/home/jenkins/opensource"
+    coverage_save="true"
   else
     echo "not need run ut"
     exit 0
@@ -33,6 +35,7 @@ elif [ "$TARGET_BRANCH" = "feature/tensor_api_from_9.0.0" ]; then
 else
   if [ "${ut_type}" = "UT_Test_basic_test_three" ] || [ "${ut_type}" == "UT_Test_basic_test_two" ] || [ "${ut_type}" == "UT_Test_basic_test_one" ] || [ "${ut_type}" == "UT_Test_adv_test*" ]; then
     bash build.sh --${ut_type} --cov --cann_3rd_lib_path="/home/jenkins/opensource"
+    coverage_save="true"
   else
     echo "not need run ut"
     exit 0
@@ -45,5 +48,11 @@ if [ $ret -ne 200 ] && [ $ret -ne 0 ]; then
     exit 1
 fi
 
-echo "ut_process=coverage" >> "${ATOMGIT_OUTPUT}"
+if [ $ret -eq 0 ]; then
+    if [ "$coverage_save" = "true" ];then
+    echo "ut_process=coverage" >> $ATOMGIT_OUTPUT
+    else
+    echo "ut_process=ut_cov" >> $ATOMGIT_OUTPUT
+    fi
+fi
 exit 0
