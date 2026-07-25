@@ -9,7 +9,7 @@
  */
 
 #include "ins_v2_all_to_all_v_sole_executor.h"
-#include "ccu_temp_all_to_all_mesh_1D.h"
+#include "ccu_temp_all_to_all_v_mesh_1D.h"
 
 #define CONST_ZERO 0
 #define CONST_ONE 1
@@ -421,9 +421,6 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
     return HCCL_SUCCESS;
 }
 
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-        CcuTempAlltoAllMesh1D);
-
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLV, CcuAlltoAllVMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-        CcuTempAlltoAllMesh1D);
+        CcuTempAlltoAllVMesh1D);
 }  // namespace mc2_ops_hccl

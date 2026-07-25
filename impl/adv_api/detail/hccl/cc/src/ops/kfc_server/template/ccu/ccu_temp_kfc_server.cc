@@ -23,7 +23,16 @@ void InheritKfcServerKernelArg(const CcuKernelInfo &srcKernel, CcuKernelInfo &ds
     std::string srcName(srcKernel.kernelFuncName);
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
 
-    if (srcName == "CcuKernelAlltoAllMesh1D") {
+    if (srcName == "CcuKernelAlltoAllVMesh1D") {
+        // 变长 alltoallv
+        auto *srcArg = static_cast<CcuKernelArgAlltoAllVMesh1D*>(srcKernel.kernelArg);
+        kfcArg->rankSize = srcArg->rankSize;
+        kfcArg->rankId = srcArg->rankId;
+        kfcArg->loadFromMem = srcArg->loadFromMem;
+        kfcArg->opParam = srcArg->opParam;
+        kfcArg->subCommRanks = srcArg->subCommRanks;
+    } else if (srcName == "CcuKernelAlltoAllMesh1D") {
+        // 定长 alltoall
         auto *srcArg = static_cast<CcuKernelArgAlltoAllMesh1D*>(srcKernel.kernelArg);
         kfcArg->rankSize = srcArg->rankSize;
         kfcArg->rankId = srcArg->rankId;
