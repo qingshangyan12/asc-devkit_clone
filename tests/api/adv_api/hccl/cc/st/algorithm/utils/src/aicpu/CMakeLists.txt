@@ -50,6 +50,12 @@ set(INCLUDE_LIST
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/ccu
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aiv
 
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/executor
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu
+
     ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
 )
 
@@ -60,6 +66,7 @@ list(APPEND INCLUDE_LIST
 add_library(${HCCL_CHECKER_SELECTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/selector/all_gather_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
 )
 
 target_include_directories(${HCCL_CHECKER_SELECTOR_TARGET} PRIVATE
@@ -98,6 +105,9 @@ add_library(${HCCL_CHECKER_EXECUTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
+
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
 )
 
 target_include_directories(${HCCL_CHECKER_EXECUTOR_TARGET} PRIVATE
@@ -163,6 +173,9 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
+
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
 )
 
 target_sources(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE
@@ -179,6 +192,7 @@ target_sources(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE
     ${HCCL_DEV_BASE}/src/ops/all_gather/selector/all_gather_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/reduce_scatter_op.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
+    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
 )
 
 target_include_directories(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE

@@ -10,6 +10,7 @@
 
 #include "all2allv_semantics_checker.h"
 
+#include <algorithm>
 #include <map>
 #include <vector>
 #include "log.h"
@@ -19,90 +20,62 @@ namespace HcclSim {
 HcclResult TaskCheckAll2AllVSemantics(
     std::map<RankId, RankMemorySemantics>& allRankMemSemantics, All2AllDataDesTag& all2AllDataDes)
 {
-    u32 rankSize = allRankMemSemantics.size();
-    void* recvCounts = static_cast<void*>(const_cast<u64*>(all2AllDataDes.recvCounts.data()));
+    const u32 rankSize = allRankMemSemantics.size();
+    const size_t matrixSize = static_cast<size_t>(rankSize) * rankSize;
+    if (all2AllDataDes.sendCountMatrix.size() != matrixSize || all2AllDataDes.sdispls.size() != matrixSize ||
+        all2AllDataDes.rdispls.size() != matrixSize) {
+        HCCL_ERROR("AllToAllV semantic matrices do not match rank size %u", rankSize);
+        return HcclResult::HCCL_E_PARA;
+    }
 
-    // 对于all2allv来说，checker当前只支持均匀的数据收发
-    // 每个rank的sdispls都一样，因此这边取本rank的sdispls即可
-    void* sdispls = static_cast<void*>(const_cast<u64*>(all2AllDataDes.sdispls.data()));
-
-    HcclDataType sendType = all2AllDataDes.sendType;
-    HcclDataType recvType = all2AllDataDes.recvType;
-
-    for (RankId rankId = 0; rankId < rankSize; rankId++) {
-        // 对应的rank不存在需要报错
-        if (allRankMemSemantics.count(rankId) == 0) {
-            HCCL_ERROR("Missing rank %d mem semantics", rankId);
+    const u64 sendTypeSize = SIZE_TABLE[all2AllDataDes.sendType];
+    const u64 recvTypeSize = SIZE_TABLE[all2AllDataDes.recvType];
+    for (RankId dstRank = 0; dstRank < rankSize; ++dstRank) {
+        auto rankIt = allRankMemSemantics.find(dstRank);
+        if (rankIt == allRankMemSemantics.end()) {
+            HCCL_ERROR("Missing rank %u mem semantics", dstRank);
             return HcclResult::HCCL_E_PARA;
         }
 
-        u64 totalSize = 0;
-        RankId curRankId = 0;
-        u64 curDataSize = 0;
-        for (auto& ele : allRankMemSemantics[rankId][BufferType::OUTPUT]) {
-            if (ele.startAddr != totalSize) {
-                HCCL_ERROR(
-                    "[rankId:%u]Missing buffer semantic: "
-                    "exepected startAddr is %llu, while cur buffer semantic startAddr is %llu, cur buffer semantic is "
-                    "%s",
-                    rankId, totalSize, ele.startAddr, ele.Describe().c_str());
+        std::vector<u64> checkedSize(rankSize, 0);
+        const auto& outputSemantics = rankIt->second[BufferType::OUTPUT];
+        for (const auto& semantic : outputSemantics) {
+            bool matched = false;
+            for (RankId srcRank = 0; srcRank < rankSize && !matched; ++srcRank) {
+                const size_t countIndex = static_cast<size_t>(srcRank) * rankSize + dstRank;
+                const size_t displIndex = static_cast<size_t>(dstRank) * rankSize + srcRank;
+                const u64 expectedSize = all2AllDataDes.sendCountMatrix[countIndex] * recvTypeSize;
+                const u64 expectedDstStart = all2AllDataDes.rdispls[displIndex] * recvTypeSize;
+                const u64 semanticEnd = semantic.startAddr + semantic.size;
+                const u64 expectedDstEnd = expectedDstStart + expectedSize;
+                if (semantic.startAddr < expectedDstStart || semanticEnd > expectedDstEnd) {
+                    continue;
+                }
+                const u64 expectedSrcStart = all2AllDataDes.sdispls[countIndex] * sendTypeSize;
+                if (semantic.srcBufs.size() != 1 || semantic.srcBufs.begin()->rankId != srcRank ||
+                    semantic.srcBufs.begin()->bufType != BufferType::INPUT ||
+                    semantic.srcBufs.begin()->srcAddr != expectedSrcStart + semantic.startAddr - expectedDstStart) {
+                    HCCL_ERROR(
+                        "[rankId:%u]Invalid AllToAllV semantic from rank %u: %s", dstRank, srcRank,
+                        semantic.Describe().c_str());
+                    return HcclResult::HCCL_E_PARA;
+                }
+                checkedSize[srcRank] += semantic.size;
+                matched = true;
+            }
+            if (!matched) {
+                HCCL_ERROR("[rankId:%u]Unexpected AllToAllV output semantic: %s", dstRank, semantic.Describe().c_str());
                 return HcclResult::HCCL_E_PARA;
             }
-
-            if (ele.srcBufs.size() != 1) {
-                HCCL_ERROR(
-                    "[rankId:%u]Cur buffer semantic should not be reduce, which mean srcBufs size should be 1, "
-                    "while cur buffer semantic is %s",
-                    rankId, ele.Describe().c_str());
-                return HcclResult::HCCL_E_PARA;
-            }
-
-            if (ele.srcBufs.begin()->rankId != curRankId) {
-                HCCL_ERROR(
-                    "[rankId:%u]Cur buffer semantic should come from rank %u, while it come from rank %u, "
-                    "cur buffer semantic is %s",
-                    rankId, curRankId, ele.srcBufs.begin()->rankId, ele.Describe().c_str());
-                return HcclResult::HCCL_E_PARA;
-            }
-
-            if (ele.srcBufs.begin()->bufType != BufferType::INPUT) {
-                HCCL_ERROR(
-                    "[rankId:%u]Cur buffer semantic srcBufs bufType is not INPUT, cur buffer semantic is %s", rankId,
-                    ele.Describe().c_str());
-                return HcclResult::HCCL_E_PARA;
-            }
-
-            u64 sendOffset = *(static_cast<const u64*>(sdispls) + rankId) * SIZE_TABLE[sendType];
-            ;
-            if (ele.srcBufs.begin()->srcAddr != sendOffset + curDataSize) {
-                HCCL_ERROR(
-                    "[rankId:%u]Cur buffer semantic srcBufs srcAddr should be %llu, while it is %llu, cur buffer "
-                    "semantic is %s",
-                    rankId, sendOffset + curDataSize, ele.srcBufs.begin()->srcAddr, ele.Describe().c_str());
-                return HcclResult::HCCL_E_PARA;
-            }
-
-            curDataSize += ele.size;
-            u64 recvCountFromCurRank = *(static_cast<const u64*>(recvCounts) + rankId);
-            u64 recvDataSizeFromCurRank = recvCountFromCurRank * SIZE_TABLE[recvType];
-            if (curDataSize == recvDataSizeFromCurRank) {
-                curDataSize = 0;
-                curRankId++;
-            } else if (curDataSize > recvDataSizeFromCurRank) {
-                HCCL_ERROR(
-                    "[rankId:%u]Accumulated semantic size from rank %u is %llu, greater than expected %llu", rankId,
-                    curRankId, curDataSize, recvDataSizeFromCurRank);
-                return HcclResult::HCCL_E_PARA;
-            }
-            totalSize += ele.size;
         }
-        // 如果curRankId等于rankSize，表示已经接受到其他所有rank的数据
-        if (curRankId != rankSize) {
-            HCCL_ERROR(
-                "[rankId:%u]Missing buffer semantics in tail: already checked total size is %llu, "
-                "accumulated semantic size from rank %u is %llu, while rankSize is %u",
-                rankId, totalSize, curRankId, curDataSize, rankSize);
-            return HcclResult::HCCL_E_PARA;
+        for (RankId srcRank = 0; srcRank < rankSize; ++srcRank) {
+            const u64 expectedSize = all2AllDataDes.sendCountMatrix[srcRank * rankSize + dstRank] * recvTypeSize;
+            if (checkedSize[srcRank] != expectedSize) {
+                HCCL_ERROR(
+                    "[rankId:%u]AllToAllV data from rank %u has size %llu, expected %llu", dstRank, srcRank,
+                    checkedSize[srcRank], expectedSize);
+                return HcclResult::HCCL_E_PARA;
+            }
         }
     }
 
