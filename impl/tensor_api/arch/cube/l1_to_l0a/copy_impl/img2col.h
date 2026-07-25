@@ -46,11 +46,13 @@ public:
 
         LoadCbufToCaImg2Col::SetFMatrix(l1H, l1W, params.padList);
         LoadCbufToCaImg2Col::SetPadding(params.padValue);
-        LoadCbufToCaImg2Col::SetRepeat(static_cast<uint16_t>(Std::ceil_division(params.mExtension, FRACTAL_FIXED)));
+        LoadCbufToCaImg2Col::SetRepeat(
+            static_cast<uint16_t>(Std::ceil_division(params.extensionStepsM, FRACTAL_FIXED)));
         LoadCbufToCaImg2Col::LoadData(
-            dst, src, params.kExtension, params.mExtension, kStartPt, mStartPt, params.strideW, params.strideH,
-            params.filterW, params.filterH, params.dilationFilterW, params.dilationFilterH, params.filterSizeW,
-            params.filterSizeH, params.transpose, params.fMatrixCtrl, channelSize);
+            dst, src, params.extensionStepsK, params.extensionStepsM, kStartPt, mStartPt, params.strideW,
+            params.strideH, params.filterW, params.filterH, params.dilationFilterW, params.dilationFilterH,
+            params.enableFilterWExtend, params.enableFilterHExtend, params.enableTranpose, params.enableRightFmatrix,
+            channelSize);
     }
 };
 
