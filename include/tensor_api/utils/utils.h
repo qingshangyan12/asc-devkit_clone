@@ -84,8 +84,8 @@ struct FixpipeParams {
 
 template <typename T>
 struct Img2ColParams {
-    uint16_t mExtension = 0;
-    uint16_t kExtension = 0;
+    uint16_t extensionStepsM = 0;
+    uint16_t extensionStepsK = 0;
     uint8_t padList[4] = {0, 0, 0, 0};
     uint8_t strideW = 1;
     uint8_t strideH = 1;
@@ -93,10 +93,10 @@ struct Img2ColParams {
     uint8_t filterH = 1;
     uint8_t dilationFilterW = 1;
     uint8_t dilationFilterH = 1;
-    bool filterSizeW = false;
-    bool filterSizeH = false;
-    bool transpose = false;
-    bool fMatrixCtrl = false;
+    bool enableFilterWExtend = false;
+    bool enableFilterHExtend = false;
+    bool enableTranpose = false;
+    bool enableRightFmatrix = false;
     T padValue = 0;
 };
 
