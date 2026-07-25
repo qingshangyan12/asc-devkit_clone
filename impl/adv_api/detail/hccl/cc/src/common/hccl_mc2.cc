@@ -315,6 +315,7 @@ HcclAllocComResourceByTiling(HcclComm comm, void* stream, void* mc2Tiling, void*
             ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
         HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_SCHED!");
+        CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum));
         CHK_RET(AllocComResourceByTilingCcu(comm, stream, mc2Tiling,
             ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else {

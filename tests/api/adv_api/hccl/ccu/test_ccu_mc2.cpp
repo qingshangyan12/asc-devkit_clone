@@ -29,11 +29,9 @@ static u32 g_stubRankId = 0;
 static DevType g_stubDeviceType = DevType::DEV_TYPE_950;
 static std::vector<void*> g_allocatedPtrs;
 static std::unordered_map<uint32_t, std::string> g_opTypeToAlgName = {
-    {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1D"},
+    {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem"},
     {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE), "CcuAllReduceMesh1D"},
     {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuReduceScatterMesh1D"},
-    {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuAlltoAllMesh1D"},
-    {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuAlltoAllVMesh1D"},
 };
 
 static void StubCleanup() {
@@ -46,7 +44,9 @@ static void StubCleanup() {
 }
 
 static void SetCommEngineEnv(uint8_t commEngine) {
-    if (commEngine == COMM_ENGINE_CCU) {
+    if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
+    } else if (commEngine == COMM_ENGINE_CCU) {
         setenv("HCCL_OP_EXPANSION_MODE", "CCU_MS", 1);
     } else if (commEngine == COMM_ENGINE_AICPU) {
         setenv("HCCL_OP_EXPANSION_MODE", "AI_CPU", 1);
@@ -79,7 +79,8 @@ static Mc2TilingTestData BuildMc2Tiling(uint32_t tilingNum, uint8_t commEngine,
     const uint32_t opTypes[], const uint8_t srcDataTypes[]) {
     SetCommEngineEnv(commEngine);
     Mc2TilingTestData tiling{};
-    tiling.version = MC2_TILING_VERSION;
+    tiling.version = commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED) ?
+        INIT_TILING_CCU_NEW_VERSION : INIT_TILING_VERSION;
     tiling.cnt = tilingNum;
     uint32_t baseOffset = offsetof(Mc2TilingTestData, ccTiling);
     constexpr uint32_t ACTUAL_MAX_OP_NUM = 8;  // 使用明确常量，避免命名空间污染
@@ -152,109 +153,37 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather) {
     
     Mc2CcTilingInner ccTiling{};
     ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
-    ccTiling.commEngine = COMM_ENGINE_CCU;
+    ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
     const void* ccTilingList[] = {&ccTiling};
     std::string topoTag[] = {"tag0"};
     
     EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
     EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
-    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAllGatherMesh1D));
+    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
 }
 
-TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllReduce) {
-    SetCommEngineEnv(COMM_ENGINE_CCU);
-    
-    OpResCtx resCtx{};
-    ASSERT_EQ(AllocCcuOpResCtx(comm_, "allreduce_ctx", g_stubRankSize, g_stubRankId, resCtx), HCCL_SUCCESS);
-    
-    Mc2CcTilingInner ccTiling{};
-    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
-    ccTiling.commEngine = COMM_ENGINE_CCU;
-    const void* ccTilingList[] = {&ccTiling};
-    std::string topoTag[] = {"tag0"};
-    
-    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
-    EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE));
-    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAllReduceMesh1D));
-}
+TEST_F(CcuMc2TestSuite, CheckCcuKfcFlow_RejectsMixedOps) {
+    Mc2InitTilingInner initTiling{};
+    initTiling.version = INIT_TILING_CCU_NEW_VERSION;
+    initTiling.mc2HcommCnt = 2U;
+    Mc2CcTilingInner allGather{};
+    allGather.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    allGather.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    Mc2CcTilingInner allReduce = allGather;
+    allReduce.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
+    const void* ccTilingList[] = {&allGather, &allReduce};
 
-TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatter) {
-    SetCommEngineEnv(COMM_ENGINE_CCU);
-    
-    OpResCtx resCtx{};
-    ASSERT_EQ(AllocCcuOpResCtx(comm_, "reducescatter_ctx", g_stubRankSize, g_stubRankId, resCtx), HCCL_SUCCESS);
-    
-    Mc2CcTilingInner ccTiling{};
-    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
-    ccTiling.commEngine = COMM_ENGINE_CCU;
-    const void* ccTilingList[] = {&ccTiling};
-    std::string topoTag[] = {"tag0"};
-    
-    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
-    EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER));
-    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuReduceScatterMesh1D));
-}
-
-TEST_F(CcuMc2TestSuite, CcuSelectAlg_AlltoAll) {
-    SetCommEngineEnv(COMM_ENGINE_CCU);
-    
-    OpResCtx resCtx{};
-    ASSERT_EQ(AllocCcuOpResCtx(comm_, "alltoall_ctx", g_stubRankSize, g_stubRankId, resCtx), HCCL_SUCCESS);
-    
-    Mc2CcTilingInner ccTiling{};
-    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
-    ccTiling.commEngine = COMM_ENGINE_CCU;
-    const void* ccTilingList[] = {&ccTiling};
-    std::string topoTag[] = {"tag0"};
-    
-    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
-    EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL));
-    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAlltoAllMesh1D));
-}
-
-TEST_F(CcuMc2TestSuite, CcuSelectAlg_MultipleTilings) {
-    SetCommEngineEnv(COMM_ENGINE_CCU);
-    
-    OpResCtx resCtx{};
-    ASSERT_EQ(AllocCcuOpResCtx(comm_, "test_ctx_tag", g_stubRankSize, g_stubRankId, resCtx), HCCL_SUCCESS);
-    
-    Mc2CcTilingInner ccTiling0{};
-    ccTiling0.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
-    ccTiling0.commEngine = COMM_ENGINE_CCU;
-    ccTiling0.srcDataType = HCCL_DATA_TYPE_FP16;
-    
-    Mc2CcTilingInner ccTiling1{};
-    ccTiling1.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
-    ccTiling1.commEngine = COMM_ENGINE_CCU;
-    ccTiling1.srcDataType = HCCL_DATA_TYPE_FP16;
-    ccTiling1.reduceType = HCCL_REDUCE_SUM;
-    
-    const void* ccTilingList[] = {&ccTiling0, &ccTiling1};
-    std::string topoTag[] = {"tag0_allgather", "tag1_allreduce"};
-    
-    std::cout << "Debug: Starting CcuSelectAlg with 2 tilings\n";
-    std::cout << "Debug: resCtx.workSpace = " << (void*)resCtx.workSpace << "\n";
-    std::cout << "Debug: resCtx.xnAddr = " << (void*)resCtx.xnAddr << "\n";
-    std::cout << "Debug: resCtx.ckeAddr = " << (void*)resCtx.ckeAddr << "\n";
-    
-    HcclResult ret = CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 2, resCtx);
-    std::cout << "Debug: CcuSelectAlg returned " << ret << "\n";
-    
-    EXPECT_EQ(ret, HCCL_SUCCESS);
-    EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
-    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAllGatherMesh1D));
-    EXPECT_EQ(resCtx.opType[1], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE));
-    EXPECT_EQ(resCtx.algorithmType[1], static_cast<uint32_t>(CcuAllReduceMesh1D));
+    EXPECT_EQ(CheckCcuKfcFlow(&initTiling, ccTilingList, 2U), HCCL_E_NOT_SUPPORT);
 }
 
 TEST_F(CcuMc2TestSuite, ObtainCommEngine_AllCcu) {
     Mc2CcTilingInner t0{}, t1{};
-    t0.commEngine = COMM_ENGINE_CCU;
-    t1.commEngine = COMM_ENGINE_CCU;
+    t0.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    t1.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
     const void* list[] = {&t0, &t1};
     uint8_t engine;
     EXPECT_EQ(ObtainCommEngine(list, 2, engine), HCCL_SUCCESS);
-    EXPECT_EQ(engine, static_cast<uint8_t>(COMM_ENGINE_CCU));
+    EXPECT_EQ(engine, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
 }
 
 TEST_F(CcuMc2TestSuite, ObtainCommEngine_AllAicpu) {
@@ -285,19 +214,9 @@ TEST_F(CcuMc2TestSuite, ObtainCommEngine_UnsupportedEngine) {
 }
 
 TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries) {
-    EXPECT_EQ(algorithmMap.at("CcuAllGatherMesh1D"), CcuAllGatherMesh1D);
+    EXPECT_EQ(algorithmMap.at("CcuAllGatherMesh1DMem2Mem"), CcuAllGatherMeshMem2Mem1D);
     EXPECT_EQ(algorithmMap.at("CcuAllGatherMeshMem2Mem1D"), CcuAllGatherMeshMem2Mem1D);
-    EXPECT_EQ(algorithmMap.at("CcuAllGatherMesh2D"), CcuAllGatherMesh2D);
-    EXPECT_EQ(algorithmMap.at("CcuReduceScatterMesh1D"), CcuReduceScatterMesh1D);
-    EXPECT_EQ(algorithmMap.at("CcuReduceScatterMeshMem2Mem1D"), CcuReduceScatterMeshMem2Mem1D);
-    EXPECT_EQ(algorithmMap.at("CcuReduceScatterMesh2D"), CcuReduceScatterMesh2D);
-    EXPECT_EQ(algorithmMap.at("CcuAllReduceMesh1D"), CcuAllReduceMesh1D);
-    EXPECT_EQ(algorithmMap.at("CcuAllReduceMeshMem2Mem1D"), CcuAllReduceMeshMem2Mem1D);
-    EXPECT_EQ(algorithmMap.at("CcuAllReduceMesh2DOneShot"), CcuAllReduceMesh2DOneShot);
-    EXPECT_EQ(algorithmMap.at("CcuAlltoAllMesh1D"), CcuAlltoAllMesh1D);
-    EXPECT_EQ(algorithmMap.at("CcuAlltoAllVMesh1D"), CcuAlltoAllVMesh1D);
-    EXPECT_EQ(algorithmMap.at("CcuHalfAll2AllVMesh1D"), CcuHalfAll2AllVMesh1D);
-    EXPECT_EQ(algorithmMap.size(), 12U);
+    EXPECT_EQ(algorithmMap.size(), 2U);
 }
 
 TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues) {
@@ -310,14 +229,12 @@ TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues) {
     EXPECT_EQ(CcuAllReduceMesh1D, 100);
     EXPECT_EQ(CcuAllReduceMeshMem2Mem1D, 101);
     EXPECT_EQ(CcuAllReduceMesh2DOneShot, 102);
-    EXPECT_EQ(CcuAlltoAllMesh1D, 150);
-    EXPECT_EQ(CcuAlltoAllVMesh1D, 151);
-    EXPECT_EQ(CcuHalfAll2AllVMesh1D, 152);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath) {
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
-    Mc2TilingTestData tiling = BuildMc2Tiling(1, COMM_ENGINE_CCU, opTypes, nullptr);
+    Mc2TilingTestData tiling = BuildMc2Tiling(
+        1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
     void* opResCtx = nullptr;
     HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
     EXPECT_EQ(ret, HCCL_SUCCESS);
@@ -330,7 +247,7 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath) {
     EXPECT_NE(ctx->xnAddr, 0U);
     EXPECT_NE(ctx->ckeAddr, 0U);
     EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
-    EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAllGatherMesh1D));
+    EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuPath) {
@@ -342,18 +259,15 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuPath) {
     ASSERT_NE(opResCtx, nullptr);
 }
 
-TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_MultipleOps) {
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_MixedOpsRejected) {
     uint32_t opTypes[] = {
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER),
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)
     };
-    Mc2TilingTestData tiling = BuildMc2Tiling(2, COMM_ENGINE_CCU, opTypes, nullptr);
+    Mc2TilingTestData tiling = BuildMc2Tiling(
+        2, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
     void* opResCtx = nullptr;
-    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_SUCCESS);
-    ASSERT_NE(opResCtx, nullptr);
-    OpResCtx* ctx = static_cast<OpResCtx*>(opResCtx);
-    EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
-    EXPECT_EQ(ctx->opType[1], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE));
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_NOT_SUPPORT);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_NullComm) {
@@ -396,7 +310,7 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_UnsupportedEngine) {
     EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_NOT_SUPPORT);
 }
 
-TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
+TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs) {
     SetCommEngineEnv(COMM_ENGINE_CCU);
 
     // 动态获取CCL buffer地址
@@ -413,19 +327,19 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
 
     // 2. 构造OpParam，模拟CcuSelectAlg中的准备流程
     Mc2CcTilingInner ccTiling{};
-    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
-    ccTiling.commEngine = COMM_ENGINE_CCU;
+    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
     ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.reduceType = HCCL_REDUCE_SUM;
 
     OpParam opParam{};
-    ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "alltoall_tag", &ccTiling, opParam), HCCL_SUCCESS);
+    ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "allgather_tag", &ccTiling, opParam), HCCL_SUCCESS);
 
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam, algName, topoInfo), HCCL_SUCCESS);
-    ASSERT_EQ(algName, "CcuAlltoAllMesh1D");
+    ASSERT_EQ(algName, "CcuAllGatherMesh1DMem2Mem");
     ASSERT_EQ(opParam.engine, COMM_ENGINE_CCU);
 
     int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
@@ -484,8 +398,8 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse) {
     ASSERT_EQ(AllocCcuOpResCtx(comm_, "ctx_tag1", g_stubRankSize, g_stubRankId, opResCtx1), HCCL_SUCCESS);
 
     Mc2CcTilingInner ccTiling{};
-    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
-    ccTiling.commEngine = COMM_ENGINE_CCU;
+    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
     ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.reduceType = HCCL_REDUCE_SUM;
@@ -496,7 +410,7 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse) {
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam1, algName, topoInfo), HCCL_SUCCESS);
-    ASSERT_EQ(algName, "CcuAlltoAllMesh1D");
+    ASSERT_EQ(algName, "CcuAllGatherMesh1DMem2Mem");
 
     int result = sprintf_s(opParam1.algName, sizeof(opParam1.algName), "%s", algName.c_str());
     ASSERT_GT(result, 0);

@@ -23,14 +23,7 @@ void InheritKfcServerKernelArg(const CcuKernelInfo &srcKernel, CcuKernelInfo &ds
     std::string srcName(srcKernel.kernelFuncName);
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
 
-    if (srcName == "CcuKernelAlltoAllMesh1D") {
-        auto *srcArg = static_cast<CcuKernelArgAlltoAllMesh1D*>(srcKernel.kernelArg);
-        kfcArg->rankSize = srcArg->rankSize;
-        kfcArg->rankId = srcArg->rankId;
-        kfcArg->loadFromMem = srcArg->loadFromMem;
-        kfcArg->opParam = srcArg->opParam;
-        kfcArg->subCommRanks = srcArg->subCommRanks;
-    } else if (srcName == "CcuKernelAllGatherMesh1D" || param.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+    if (srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;
@@ -64,6 +57,10 @@ HcclResult CcuTempKfcServer::CalcRes(HcclComm comm, const OpParam& param, const 
                                      AlgResourceRequest& resourceRequest)
 {
     HCCL_INFO("[CcuTempKfcServer::CalcRes start]");
+    if (param.opType != HcclCMDType::HCCL_CMD_ALLGATHER) {
+        HCCL_ERROR("[CcuTempKfcServer::CalcRes] unsupported opType[%u]", static_cast<uint32_t>(param.opType));
+        return HCCL_E_NOT_SUPPORT;
+    }
     // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;
     resourceRequest.slaveThreadNum = 0;
@@ -77,6 +74,12 @@ HcclResult CcuTempKfcServer::CalcRes(HcclComm comm, const OpParam& param, const 
 
     // 从 ccuKernelInfos 最后一项继承属性到当前 KfcServer kernel，然后替换最后一项
     if (!resourceRequest.ccuKernelInfos.empty()) {
+        if (std::string(resourceRequest.ccuKernelInfos.back().kernelFuncName) !=
+            "CcuKernelAllGatherMesh1DMem2Mem") {
+            HCCL_ERROR("[CcuTempKfcServer::CalcRes] unsupported source kernel[%s]",
+                       resourceRequest.ccuKernelInfos.back().kernelFuncName);
+            return HCCL_E_NOT_SUPPORT;
+        }
         HCCL_INFO("[CcuTempKfcServer::CalcRes] inheriting kernelargs from[%s]",
                    resourceRequest.ccuKernelInfos.back().kernelFuncName);
         InheritKfcServerKernelArg(resourceRequest.ccuKernelInfos.back(), kernelInfo, param,

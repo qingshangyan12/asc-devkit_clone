@@ -115,6 +115,41 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
     return HCCL_SUCCESS;
 }
 
+namespace {
+bool IsCcuKfcSupportedOp(uint32_t opType)
+{
+    return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+}
+} // namespace
+
+HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum)
+{
+    CHK_PTR_NULL(mc2Tiling);
+    CHK_PTR_NULL(ccTilingList);
+    const auto* initTiling = static_cast<const Mc2InitTilingInner*>(mc2Tiling);
+    if (initTiling->version != INIT_TILING_CCU_NEW_VERSION) {
+        HCCL_ERROR("Invalid CCU KFC tiling version %u, expected %u.", initTiling->version,
+                   INIT_TILING_CCU_NEW_VERSION);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    if (tilingNum == 0U || tilingNum > MAX_CC_TILING_NUM || tilingNum != initTiling->mc2HcommCnt) {
+        HCCL_ERROR("Invalid CCU KFC tiling number %u, init tiling number %u.", tilingNum,
+                   initTiling->mc2HcommCnt);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    for (uint32_t i = 0U; i < tilingNum; ++i) {
+        const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
+        CHK_PTR_NULL(ccTiling);
+        if (!IsCcuKfcSupportedOp(ccTiling->opType) ||
+            ccTiling->commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+            HCCL_ERROR("Unsupported CCU KFC tiling at index %u, opType %u, commEngine %u.", i,
+                       ccTiling->opType, ccTiling->commEngine);
+            return HCCL_E_NOT_SUPPORT;
+        }
+    }
+    return HCCL_SUCCESS;
+}
+
 // 构建 opResCtx 基础字段
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx)
 {

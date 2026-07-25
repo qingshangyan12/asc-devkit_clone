@@ -78,11 +78,6 @@ set(CCU_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/selector
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
-    
     ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/types
     ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/utils
     
