@@ -83,6 +83,7 @@ TEST_F(Tensor_Api_Vector_Copy_3510, CopyUB2GMNDLayout2NDLayout)
 
     auto ubTensor = MakeTensorAt<Location::UB>(src, MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
     auto gmTensor = MakeTensorAt<Location::GM>(dst, MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    gmTensor.SetL2CacheHint(CacheMode::CACHE_MODE_DISABLE);
 
     RunCopyCallPaths<CopyUB2GM, CopyUB2GMTraitDefault>(gmTensor, ubTensor);
     RunCopyWithPaths<CopyUB2GM, CopyUB2GMTraitDefault>(gmTensor, ubTensor);
