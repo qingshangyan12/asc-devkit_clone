@@ -62,6 +62,13 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/ccu/kernel
+
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/selector
