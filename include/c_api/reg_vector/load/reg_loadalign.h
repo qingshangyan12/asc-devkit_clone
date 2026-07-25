@@ -809,164 +809,132 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
 
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(vector_float& dst, __ubuf__ float*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_unpack_postupdate_v2(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_unpack_postupdate_v2(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_unpack_postupdate_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_unpack_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_unpack_postupdate_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_unpack_postupdate_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_unpack_postupdate_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_uint16_t& dst, __ubuf__ uint16_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_half& dst, __ubuf__ half*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-    "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
+             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v2(vector_float& dst, __ubuf__ float*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-    "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
+             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v3(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-    "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
+             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v3(vector_uint16_t& dst, __ubuf__ uint16_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-    "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
+             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v3(vector_half& dst, __ubuf__ half*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-    "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
+             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-    "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
+             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v3(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-    "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
+             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v3(vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset);
 
-[[deprecated(
-    "NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-    "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
+             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
 asc_loadalign_brc_postupdate_v3(vector_float& dst, __ubuf__ float*& src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
