@@ -20,9 +20,6 @@
 #ifndef INCLUDE_C_API_ASC_SIMD_H
 #define INCLUDE_C_API_ASC_SIMD_H
 
-// TODO
-#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
-
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510))
 #include "c_api/atomic/atomic.h"
 #include "c_api/cache_ctrl/cache_ctrl.h"
@@ -46,7 +43,6 @@
 #include "c_api/reg_vector/reg_copy.h"
 #include "c_api/reg_vector/reg_sync.h"
 #include "c_api/reg_vector/reg_compute.h"
-
 #include "c_api/composite/reg_loadunalign.h"
 #include "c_api/composite/reg_storeunalign.h"
 #endif

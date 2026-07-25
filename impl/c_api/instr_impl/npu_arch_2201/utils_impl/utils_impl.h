@@ -25,7 +25,7 @@
 
 #include <cstdint>
 #include <type_traits>
-#include "c_api/utils_intf.h"
+#include "c_api/defs/defs.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_type.h"
 #include "impl/utils/common_types.h"
 #include "impl/utils/sys_macros.h"

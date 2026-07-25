@@ -34,17 +34,7 @@ __aicore__ inline void asc_mrgsort4(
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
     uint8_t valid_bit);
 
-__aicore__ inline void asc_mrgsort4_sync(
-    __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
-    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
-    uint8_t valid_bit);
-
 __aicore__ inline void asc_mrgsort4(
-    __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
-    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
-    uint8_t valid_bit);
-
-__aicore__ inline void asc_mrgsort4_sync(
     __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
     uint8_t valid_bit);
@@ -54,25 +44,13 @@ __aicore__ inline void asc_mrgsort4_sync(
 // ==========asc_bitsort(half/float)==========
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
-__aicore__ inline void asc_bitsort_sync(
-    __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
 __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
-__aicore__ inline void asc_bitsort_sync(
-    __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
-__aicore__ inline void asc_bitsort_sync(
-    __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
 __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
-__aicore__ inline void asc_bitsort_sync(
-    __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
 #endif
 #endif
