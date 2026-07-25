@@ -184,7 +184,7 @@ L0C Buffer到Unified Buffer搬运根据是否传入量化参数自动选择量�
 
 ## 关键特性
 
-L0C Buffer到Unified Buffer搬运涉及[随路量化](../../矩阵计算（ISASI）/矩阵搬出关键特性说明/随路量化.md)、[随路Relu](../../矩阵计算（ISASI）/矩阵搬出关键特性说明/随路ReLU.md)、[Int8 Channel Merge](../../矩阵计算（ISASI）/矩阵搬出关键特性说明/Int8-Channel-Merge.md)、[L0C Buffer到Unified Buffer双目标模式](../../矩阵计算（ISASI）/矩阵搬出关键特性说明/L0C-Buffer到UB双目标模式.md)和[batch搬运](../矩阵搬出关键特性说明/batch_copy.md)等关键特性。
+L0C Buffer到Unified Buffer搬运涉及[随路量化](../矩阵搬出关键特性说明/quant_pre.md)、[随路Relu](../矩阵搬出关键特性说明/relu_pre.md)、[Int8 Channel Merge](../矩阵搬出关键特性说明/int8_channel_merge.md)、[L0C Buffer到Unified Buffer双目标模式](../矩阵搬出关键特性说明/l0c_to_ub_dual_dst.md)和[batch搬运](../矩阵搬出关键特性说明/batch_copy.md)等关键特性。
 
 ## 调用示例
 
