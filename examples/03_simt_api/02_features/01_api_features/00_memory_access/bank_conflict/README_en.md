@@ -29,7 +29,7 @@ This example introduces UB bank conflicts that may occur when multiple threads i
 
 This example is used to verify UB bank conflict behavior when multiple threads in the same Warp access UB in Ascend C SIMT programming. The example uses the compile-time parameter `SCENARIO_NUM` to select different cases and construct typical access patterns, including same-address merge, cross-subbank distributed access, same 8B-range merge in contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
-On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/Utils-API/调测接口/clock.md) to count the cycles spent reading UB data.
+On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](../../../../../../docs/zh/api/Utils-API/调测接口/clock.md) to count the cycles spent reading UB data.
 
 ### Example Specifications
 
@@ -293,7 +293,7 @@ In Case 4, the 32 threads concentrate on same-index subbank resources in the sam
 
 Case 0 and Case 2 show that mergeable access does not form subbank conflicts, and Case 1 is the conflict-free baseline. The cycles of Case 3 and Case 4 increase significantly, indicating that concentrating accesses on same-index subbanks in the same bank group causes subbank resource contention.
 
-When writing SIMT code, avoid concentrating multiple threads in the same Warp on same-index subbanks in the same bank group in one UB access instruction. If such an access pattern is unavoidable, consider adjusting the data layout, access stride, or adding padding in UB to distribute subbank accesses. For an optimization example that avoids access conflicts, see the [matrix transpose example](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice).
+When writing SIMT code, avoid concentrating multiple threads in the same Warp on same-index subbanks in the same bank group in one UB access instruction. If such an access pattern is unavoidable, consider adjusting the data layout, access stride, or adding padding in UB to distribute subbank accesses. For an optimization example that avoids access conflicts, see the [matrix transpose example](../../../../03_best_practices/00_memory_optimizations/matrix_transpose_practice).
 
 ## Build and Run
 

@@ -26,7 +26,7 @@ SIMT VF函数定义中的关键修饰符说明如下：
 | \_\_gm\_\_ | 内存空间修饰符，标识内存空间为GM。 |
 | \_\_ubuf\_\_ | 内存空间修饰符，标识内存空间为UB。 |
 
-只支持在核函数或\_\_aicore\_\_函数中调用SIMT VF函数，调用接口为[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md#asc_vf_call调用)，示例如下：
+只支持在核函数或\_\_aicore\_\_函数中调用SIMT VF函数，调用接口为[asc\_vf\_call](../../../api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md#asc_vf_call调用)，示例如下：
 
 ```
 asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
@@ -95,9 +95,9 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 
 最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动VF任务的dim3线程数保持一致。
 
-**表1**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
+**表1**  \_\_launch\_bounds\_\_(N)与每个线程可用寄存器个数的关系
 
-| Thread的个数(个) | 每个Thread可用寄存器个数(个) |
+| N | 每个线程可用寄存器个数 |
 | --- | --- |
 | 1025~2048 | 16 |
 | 513~1024 | 32 |
@@ -168,7 +168,7 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 ### SIMD VF的asc\_vf\_call调用
 
 使用`asc_vf_call`接口调用SIMD VF入口函数启动VF子任务，详细接口说明参见
-[asc\_vf\_call接口说明](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md)。
+[asc\_vf\_call接口说明](../../../api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md)。
 
 ### SIMT VF与SIMD VF的调用差异
 

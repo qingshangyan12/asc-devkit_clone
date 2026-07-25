@@ -52,7 +52,7 @@ def Gatherb(dst, src, offset, repeatTime, repeatParams):
             dst[dstBlockStartIndex : dstBlockEndIndex] = src[srcBlockStartIndex : srcBlockEndIndex]
 ```
 
-完整示例请参考：[Gatherb真值计算](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)。
+完整示例请参考：[Gatherb真值计算](../../../../../../../examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)。
 
 ## 函数原型<a name="section15660625202219"></a>
 
@@ -73,7 +73,7 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 
 | 参数名称 | 输入/输出 | 含义 |
 | :------- | :-------- | :--- |
-| dst | 输出 | 目的操作数，类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
 | offset | 输入 | 每个DataBlock在源操作数中对应的地址偏移，类型为LocalTensor，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br><br>LocalTensor的起始地址需要按照32字节对齐。<br><br>该偏移量是相对于src的基地址而言的。每个元素值要大于等于0，单位为字节。取值要求见[约束说明](#约束说明)。 |
 | repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
@@ -149,7 +149,7 @@ Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、i
 <!-- end id18 -->
 ## 调用示例<a name="section11276201527"></a>
 
-完整使用样例请参见[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景四。
+完整使用样例请参见[Gather类样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景四。
 
 ```cpp
 uint32_t bufferLen = 128;

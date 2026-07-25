@@ -1,4 +1,4 @@
-﻿# And<a name="ZH-CN_TOPIC_0000001956986921"></a>
+# And<a name="ZH-CN_TOPIC_0000001956986921"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -36,7 +36,7 @@
 
 - 对`MaskReg`操作：
 
-  根据mask对两个输入`MaskReg`数据src0、src1执行按位与操作，将结果写入dst。
+  根据mask对两个输入`MaskReg`数据src0、src1执行按位与（&）操作，将结果写入dst。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

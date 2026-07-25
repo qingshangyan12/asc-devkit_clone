@@ -27,7 +27,7 @@
 <!-- npu="A3,910b" id8 -->
 >[!NOTE]说明
 >
->该API不支持Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，如果需要在上述AI处理器实现数据离散功能，建议参考[Scatter兼容样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/scatter)进行适配。
+>该API不支持Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，如果需要在上述AI处理器实现数据离散功能，建议参考[Scatter兼容样例](../../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/scatter)进行适配。
 <!-- end id8 -->
 
 ## 功能说明<a name="section17600329101418"></a>
@@ -74,7 +74,7 @@
 
 | 参数名称 | 输入/输出 | 含义 |
 | :------- | :-------- | :--- |
-| dst | 输出 | 目的操作数，类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
 | dstOffset | 输入 | 每个元素在dst中对应的地址偏移，类型为LocalTensor，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br><br>LocalTensor的起始地址需要32字节对齐。<br><br>该偏移量是相对于dst的起始基地址dstBaseAddr而言的。单位为字节。取值要求见[约束说明](#约束说明)。|
 | dstBaseAddr | 输入 | 用于指定dst的起始偏移地址，单位为字节。取值应保证dst元素类型位宽对齐，否则会导致非预期行为。 |
@@ -147,7 +147,7 @@ Atlas 推理系列产品AI Core，支持的数据类型为：uint16_t、half、u
 
 ## 调用示例<a name="section11276201527"></a>
 
-完整使用样例请参见[Scatter兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/scatter)。
+完整使用样例请参见[Scatter兼容性样例](../../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/scatter)。
 
 ```cpp
 uint32_t COUNT = 128;

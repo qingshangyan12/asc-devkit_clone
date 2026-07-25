@@ -1,4 +1,4 @@
-﻿# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
+# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
 本文介绍基于统一缓存（Unified Buffer，下文简称UB）的Ascend C矢量计算开发方法，该计算能力简称Memory矢量计算编程，是Ascend C中最基础、应用最广泛的矢量编程方式。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)原生支持完整的UB直接编程能力；[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器计算能力，推荐使用Reg矢量计算编程以获得更高性能。
 
@@ -146,7 +146,7 @@ asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_p
 ```
 > 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入，[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
-以上为GM向UB的数据搬入逻辑，UB向GM的数据搬出可使用同系列接口实现。更多搬运接口说明可参考[API手册](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/C-API/vector_datamove/矢量数据搬运.md)。
+以上为GM向UB的数据搬入逻辑，UB向GM的数据搬出可使用同系列接口实现。更多搬运接口说明可参考[API手册](../../../../../api/SIMD-API/C-API/vector_datamove/矢量数据搬运.md)。
 
 ## Memory数据计算
 
@@ -327,4 +327,4 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ## Memory矢量计算示例
 
-结合上文介绍的数据搬运、计算、同步能力，即可基于C语言开发完整的Memory矢量计算算子。完整工程示例可参考：[c_api_add样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)。
+结合上文介绍的数据搬运、计算、同步能力，即可基于C语言开发完整的Memory矢量计算算子。完整工程示例可参考：[c_api_add样例](../../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add)。
