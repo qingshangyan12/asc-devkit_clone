@@ -103,7 +103,7 @@ stages:
     - type: auto
     fail-fast: true
   stage2:
-    name: compile
+    name: Compile
     jobs:
       JOB_x86_compile_ubuntu24:
         name: Compile_x86_ubuntu24
@@ -177,7 +177,7 @@ stages:
     - type: auto
     fail-fast: false
   stage3:
-    name: ut
+    name: Ut
     jobs:
       JOB_api_check:
         name: API_Check
@@ -263,7 +263,7 @@ stages:
     - type: auto
     fail-fast: false
   stage4:
-    name: ut_report
+    name: Ut_report
     jobs:
       JOB_ut_report_lcov:
         name: UT_report
