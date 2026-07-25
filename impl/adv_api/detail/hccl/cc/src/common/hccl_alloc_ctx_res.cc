@@ -118,7 +118,8 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
 namespace {
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
-    return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
 }
 } // namespace
 
@@ -137,11 +138,16 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
                    initTiling->mc2HcommCnt);
         return HCCL_E_NOT_SUPPORT;
     }
+    uint32_t expectedOpType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_INVALID);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         CHK_PTR_NULL(ccTiling);
+        if (expectedOpType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_INVALID)) {
+            expectedOpType = ccTiling->opType;
+        }
         if (!IsCcuKfcSupportedOp(ccTiling->opType) ||
-            ccTiling->commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+            ccTiling->commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED) ||
+            ccTiling->opType != expectedOpType) {
             HCCL_ERROR("Unsupported CCU KFC tiling at index %u, opType %u, commEngine %u.", i,
                        ccTiling->opType, ccTiling->commEngine);
             return HCCL_E_NOT_SUPPORT;
@@ -153,20 +159,24 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
 // 构建 opResCtx 基础字段
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx)
 {
-    // 1. 分配workspace、comParam（XN）、comSync（CKE）
+    // 1. 分配workspace、scratch、comParam（XN）、comSync（CKE）
     constexpr uint32_t comSyncNum = 2;
+    constexpr uint64_t scratchSize = Hccl::MC2_WORKSPACE_SIZE;
     uint64_t comParamBufSize = Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
     uint64_t comSyncBufSize = Hccl::CCU_TASK_NUM_MAX * comSyncNum * Hccl::CCU_ONE_PARAM_SIZE;
 
     std::string tagWorkspace = ctxTag + "_ccu_workspace";
+    std::string tagScratch = ctxTag + "_ccu_scratch";
     std::string tagComParam = ctxTag + "_ccu_comParam";
     std::string tagComSync = ctxTag + "_ccu_comSync";
 
     void* workspacePtr = nullptr;
+    void* scratchPtr = nullptr;
     void* comParamPtr = nullptr;
     void* comSyncPtr = nullptr;
 
     CHK_RET(HcclEngineCtxCreate(comm, tagWorkspace.c_str(), COMM_ENGINE_AIV, Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
+    CHK_RET(HcclEngineCtxCreate(comm, tagScratch.c_str(), COMM_ENGINE_AIV, scratchSize, &scratchPtr));
     CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_AIV, comParamBufSize, &comParamPtr));
     CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_AIV, comSyncBufSize, &comSyncPtr));
 
@@ -184,11 +194,14 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     opResCtx.rankSize = rankSize;
     opResCtx.xnAddr = reinterpret_cast<uint64_t>(comParamPtr);
     opResCtx.ckeAddr = reinterpret_cast<uint64_t>(comSyncPtr);
+    // ReduceScatter KFC follows pr_4523 and partitions this fixed 16 MiB buffer as rankSize * sliceSize.
+    opResCtx.res[0] = reinterpret_cast<uint64_t>(scratchPtr);
 
-    HCCL_INFO("[AllocCcuOpResCtx] workspace[%p], workspaceSize[%llu], "
+    HCCL_INFO("[AllocCcuOpResCtx] workspace[%p], workspaceSize[%llu], scratch[%p], scratchSize[%llu], "
               "comParam[%p], comParamBufSize[%llu], comSync[%p], comSyncBufSize[%llu], "
               "rankId[%u], rankSize[%u], xnAddr[0x%llx], ckeAddr[0x%llx]",
               workspacePtr, Hccl::MC2_WORKSPACE_SIZE,
+              scratchPtr, scratchSize,
               comParamPtr, comParamBufSize, comSyncPtr, comSyncBufSize,
               userRank, rankSize,
               static_cast<unsigned long long>(opResCtx.xnAddr),
@@ -380,6 +393,7 @@ HcclResult PrepareParamForAllReduce(
     param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
     param.reduceType = static_cast<HcclReduceOp>(ccTiling->reduceType);
     param.DataDes.dataType = static_cast<HcclDataType>(ccTiling->srcDataType);
+    param.DataDes.outputType = param.DataDes.dataType;
     param.DataDes.count = 0;
 
     HCCL_INFO("Print PrepareParamForAllReduce.");
@@ -387,6 +401,7 @@ HcclResult PrepareParamForAllReduce(
     HCCL_INFO("opType %u", static_cast<uint32_t>(param.opType));
     HCCL_INFO("reduceType %u", static_cast<uint32_t>(param.reduceType));
     HCCL_INFO("DataDes.dataType %u", static_cast<uint32_t>(param.DataDes.dataType));
+    HCCL_INFO("DataDes.outputType %u", static_cast<uint32_t>(param.DataDes.outputType));
     HCCL_INFO("DataDes.count %lu", param.DataDes.count);
     HCCL_INFO("Execute PrepareParamForAllReduce success.");
     return HCCL_SUCCESS;
