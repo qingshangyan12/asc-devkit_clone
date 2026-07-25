@@ -96,7 +96,7 @@ struct AippScalingParams {
     AippScalingMethod horizScalingMethod[2]{AippScalingMethod::BILINEAR, AippScalingMethod::BILINEAR};
 
     bool raw12Square{false};
-    uint8 raw12SquareRShift{0}; /* valid: 0~9 */
+    uint8_t raw12SquareRShift{0}; /* valid: 0~9 */
 
     uint32_t outputWidth{0};
     uint32_t outputHeight{0};

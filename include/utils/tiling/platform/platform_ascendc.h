@@ -81,6 +81,7 @@ enum class SocVersion {
     SD3403,
     KIRINX90,
     KIRIN9030,
+    ASCEND5162A,
     MC32DM11A,
     ASCEND350,  // ASCEND350, __DAV_C310__
     RESERVED_VERSION = 99999

@@ -172,7 +172,7 @@ struct FixpipeParamsV516 {
         : nSize(nSizeIn),
           mSize(mSizeIn),
           srcStride(srcStrideIn),
-          dstStride(dstStrideIn),
+          dstStride(dstStrideIn)
     {}
 
     __aicore__ FixpipeParamsV516(
@@ -184,7 +184,7 @@ struct FixpipeParamsV516 {
           dstStride(dstStrideIn),
           ndNum(ndNumIn),
           srcNdStride(srcNdStrideIn),
-          dstNdStride(dstNdStrideIn),
+          dstNdStride(dstNdStrideIn)
     {}
 
     uint16_t nSize = 0;

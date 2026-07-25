@@ -169,9 +169,9 @@ __aicore__ inline void SetFixpipePostQuantImpl(const FixPipePostQuantParams &par
     set_m_quant_post(config);
 }
 
-__aicore__ inline void SetFixpipeEltAnitqImplImpl(uint64_t config) { set_m_elt_antiq_para(config); }
+__aicore__ inline void SetFixpipeEltAnitqImpl(uint64_t config) { set_m_elt_antiq_para(config); }
 
-__aicore__ inline void SetFixpipeEltAnitqImplImpl(const FixPipeEltAntiqParams &params)
+__aicore__ inline void SetFixpipeEltAnitqImpl(const FixPipeEltAntiqParams &params)
 {
     uint64_t config = 0;
 

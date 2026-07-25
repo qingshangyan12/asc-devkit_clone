@@ -454,7 +454,7 @@ struct MmadFixParams {
           preReluMode(preReluModeIn),
           postQuantMode(postQuantModeIn),
           actPostEnable(actPostEnableIn),
-          preClipReluModeIn(preClipReluModeIn)
+          preClipReluMode(preClipReluModeIn)
     {}
 
     uint16_t                   n = 0;
