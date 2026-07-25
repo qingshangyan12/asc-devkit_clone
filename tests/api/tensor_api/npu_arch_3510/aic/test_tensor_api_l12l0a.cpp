@@ -360,8 +360,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0AImg2Col)
 
     // dst NZ ceil-aligned M/K, now provided by the caller via Img2ColParams.
     Img2ColParams<int16_t> params;
-    params.mExtension = static_cast<uint16_t>(mAlign);
-    params.kExtension = static_cast<uint16_t>(kAlign);
+    params.extensionStepsM = static_cast<uint16_t>(mAlign);
+    params.extensionStepsK = static_cast<uint16_t>(kAlign);
     params.filterW = filterW;
     params.filterH = filterH;
     params.strideW = 1;
