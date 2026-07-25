@@ -30,6 +30,17 @@ __aicore__ inline int64_t asc_get_ctrl();
 
 __aicore__ inline void asc_set_ctrl(uint64_t config);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+
+[[deprecated("NOTICE: asc_get_ar_spr is deprecated. Please use asc_get_squeeze_status instead.")]]
+__aicore__ inline int64_t asc_get_ar_spr();
+
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+__aicore__ inline int64_t asc_get_squeeze_status();
+
+#endif
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)

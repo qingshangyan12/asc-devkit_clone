@@ -3154,6 +3154,28 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+__aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
+
+__aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
+
+__aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);
+
+__aicore__ inline void asc_set_l13d_padding(uint64_t config);
+
+__aicore__ inline void asc_set_l13d_padding(half config);
+
+__aicore__ inline void asc_set_l13d_padding(int16_t config);
+
+__aicore__ inline void asc_set_l13d_padding(uint16_t config);
+
+__aicore__ inline void asc_set_l12l0_padding_val(uint64_t config);
+
+__aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
+
+__aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
+#endif
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)

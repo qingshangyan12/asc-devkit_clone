@@ -9,7 +9,7 @@
  */
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "scalar_compute.h cannot be used with compile flag --enable-simt enabled."
+#error "scalar_atomic.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
@@ -17,63 +17,18 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
 #endif
 
-#ifndef INCLUDE_C_API_SCALAR_COMPUTE_H
-#define INCLUDE_C_API_SCALAR_COMPUTE_H
+#ifndef INCLUDE_C_API_ATOMIC_SCALAR_ATOMIC_H
+#define INCLUDE_C_API_ATOMIC_SCALAR_ATOMIC_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/instr_impl/npu_arch_2201/scalar_compute_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl.h"
 #endif
 
-__aicore__ inline int64_t asc_sflbits(int64_t value);
-
-__aicore__ inline int64_t asc_ffz(uint64_t value);
-
-__aicore__ inline int64_t asc_ffs(uint64_t value);
-
-__aicore__ inline int64_t asc_popc(uint64_t value);
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
-__aicore__ inline int64_t asc_clz(uint64_t value_in);
-
-__aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value);
-
-__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx);
-
-__aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx);
-
-__aicore__ inline int32_t asc_float2int32_rd(float value);
-
-__aicore__ inline int32_t asc_float2int32_ru(float value);
-
-__aicore__ inline int32_t asc_float2int32_rn(float value);
-
-__aicore__ inline int32_t asc_float2int32_rna(float value);
-
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-__aicore__ inline void asc_store_dev(__gm__ int8_t* addr, int8_t value);
-
-__aicore__ inline void asc_store_dev(__gm__ uint8_t* addr, uint8_t value);
-
-__aicore__ inline void asc_store_dev(__gm__ int16_t* addr, int16_t value);
-
-__aicore__ inline void asc_store_dev(__gm__ uint16_t* addr, uint16_t value);
-
-__aicore__ inline void asc_store_dev(__gm__ int32_t* addr, int32_t value);
-
-__aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value);
-
-__aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value);
-
-__aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value);
-
-__aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx);
-
-__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx);
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 namespace __asc_aicore {
 
 __aicore__ inline int32_t asc_atomic_add(__gm__ int32_t* address, int32_t val);
@@ -169,6 +124,23 @@ __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address, uint32_t val
 __aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t* address, uint64_t val);
 } // namespace __asc_aicore
 
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+
+__aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
+
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
+
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+[[deprecated("NOTICE: asc_get_store_atomic_config is deprecated on Ascend 950PR/Ascend 950DT."
+             "Please use asc_atomic_add instead for atomic add operation.")]]
+__aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
+
+[[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."
+             "Please use asc_atomic_add instead for atomic add operation.")]]
+__aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
 #endif
 
 #endif
