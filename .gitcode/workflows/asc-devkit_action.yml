@@ -177,7 +177,7 @@ stages:
     - type: auto
     fail-fast: false
   stage3:
-    name: Ut
+    name: UT
     jobs:
       JOB_api_check:
         name: API_Check
@@ -263,7 +263,7 @@ stages:
     - type: auto
     fail-fast: false
   stage4:
-    name: Ut_report
+    name: UT_report
     jobs:
       JOB_ut_report_lcov:
         name: UT_report
