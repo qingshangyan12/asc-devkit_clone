@@ -77,7 +77,7 @@ bool GetBatchNormNDTilingInfo(const AscendC::TensorShape& srcShape, const Ascend
 | stackBufferByteSize | 输入 | 可供BatchNorm接口使用的空间大小，单位Byte。 |
 | typeSize | 输入 | 输入数据类型的字节大小。 |
 | isReuseSource | 输入 | 中间变量是否能够复用输入内存。该参数预留，传入默认值false即可。 |
-| tilling | 输出 | 输入数据的切分信息。 |
+| tiling | 输出 | 输入数据的切分信息。 |
 | isBasicBlock | 输入 | 是否开启基本块，与BatchNorm接口一致。 |
 
 ## 返回值说明

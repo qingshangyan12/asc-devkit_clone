@@ -38,7 +38,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
         const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal,
-        const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo,
+        const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tiling, const TopKInfo& topKInfo,
         const bool isLargest = true){};
 };
 
@@ -54,7 +54,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
         const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k,
-        const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true){};
+        const TopkTiling& tiling, const TopKInfo& topKInfo, const bool isLargest = true){};
 };
 
 } // namespace HighLevelApiCheck
