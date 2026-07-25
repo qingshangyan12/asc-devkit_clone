@@ -123,6 +123,11 @@ if(TARGET mc2_server)
         ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
+        ${HCCL_BASE_DIR}/framework/common/src/config
+        ${HCCL_BASE_DIR}/framework/device/inc
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator/aicpu
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/dfx
+        ${HCCL_BASE_DIR}/legacy/framework/dfx/aicpu/profiling
 
         ${MC2_SERVER_CCL_INCLUDE_LIST}
         ${MC2_SERVER_ORION_HEAD_LIST}

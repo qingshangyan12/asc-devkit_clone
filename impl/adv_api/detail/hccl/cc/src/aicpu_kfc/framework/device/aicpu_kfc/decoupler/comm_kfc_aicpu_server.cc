@@ -21,11 +21,18 @@
 #include "sqe_build_a5.h"
 #endif
 #include "hccl_common.h"
+#include "aicpu_indop_env.h"
 #include "aicpu_indop_process.h"
 #include "coll_comm_aicpu.h"
 #include "coll_comm_aicpu_mgr.h"
+#include "hcclCommDfxLite.h"
+#include "hcclCommOp.h"
+#include "profiling_handler_lite.h"
+#include "profiling_manager_device.h"
 #include "stream_lite.h"
 #include "thread.h"
+
+extern HcclResult HcommThreadGetNotifyId(ThreadHandle thread, uint32_t notifyIdx, uint32_t* notifyId);
 
 using namespace HcclApi;
 namespace {
@@ -93,6 +100,55 @@ HcclResult GetNextThreadAndStream(const ServerExecCtx& execCtx, hccl::Thread*& t
     streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
     CHK_PTR_NULL(streamLite);
     CHK_PTR_NULL(streamLite->GetRtsq());
+    return HCCL_SUCCESS;
+}
+
+bool IsReduceDfxOp(HcclCMDType opType)
+{
+    return opType == HCCL_CMD_ALLREDUCE || opType == HCCL_CMD_REDUCE ||
+           opType == HCCL_CMD_REDUCE_SCATTER || opType == HCCL_CMD_REDUCE_SCATTER_V;
+}
+
+u32 GetOpenDfxDataType(const mc2_ops_hccl::OpParam& param)
+{
+    if (param.opType == HCCL_CMD_ALLTOALL || param.opType == HCCL_CMD_ALLTOALLV) {
+        return static_cast<u32>(param.all2AllVDataDes.sendType);
+    }
+    return static_cast<u32>(param.DataDes.dataType);
+}
+
+u64 GetOpenDfxDataCount(const mc2_ops_hccl::OpParam& param, u32 rankNum)
+{
+    if (param.opType != HCCL_CMD_ALLTOALL && param.opType != HCCL_CMD_ALLTOALLV) {
+        return param.DataDes.count;
+    }
+    if (param.all2AllVDataDes.sendCounts == nullptr) {
+        return 0U;
+    }
+    const auto* sendCounts = reinterpret_cast<const u64*>(param.all2AllVDataDes.sendCounts);
+    u64 dataCount = 0U;
+    for (u32 i = 0U; i < rankNum; ++i) {
+        dataCount += sendCounts[i];
+    }
+    return dataCount;
+}
+
+HcclResult FillOpenDfxDynamicInfo(
+    const mc2_ops_hccl::OpParam& param, u32 rankNum, HcclDfxOpInfo& dfxOpInfo)
+{
+    dfxOpInfo.opType = static_cast<u32>(param.opType);
+    dfxOpInfo.reduceOp = IsReduceDfxOp(param.opType) ?
+                             static_cast<u32>(param.reduceType) :
+                             static_cast<u32>(HcclReduceOp::HCCL_REDUCE_RESERVED);
+    dfxOpInfo.dataType = GetOpenDfxDataType(param);
+    dfxOpInfo.outputType = (param.opType == HCCL_CMD_ALLTOALL || param.opType == HCCL_CMD_ALLTOALLV) ?
+                               static_cast<u32>(param.all2AllVDataDes.recvType) :
+                               static_cast<u32>(param.DataDes.outputType);
+    dfxOpInfo.dataCount = GetOpenDfxDataCount(param, rankNum);
+    dfxOpInfo.inputMemAddr = reinterpret_cast<u64>(param.inputPtr);
+    dfxOpInfo.inputMemSize = param.inputSize;
+    dfxOpInfo.outputMemAddr = reinterpret_cast<u64>(param.outputPtr);
+    dfxOpInfo.outputMemSize = param.outputSize;
     return HCCL_SUCCESS;
 }
 
@@ -194,6 +250,115 @@ void LogAicpuOrderDfxCounterWindow(const char* stage, u32 groupIdx, const HcclMs
 }
 } // namespace
 
+HcclResult CommKfcAicpuServer::InitOpenDfxContext(ServerExecCtx& execCtx)
+{
+    if (execCtx.resourceType != ServerExecResourceType::NEXT_AICPU) {
+        return HCCL_SUCCESS;
+    }
+    CHK_PTR_NULL(execCtx.collCommAicpu);
+    CHK_PRT_RET(
+        execCtx.baseOpParam.size() < sizeof(mc2_ops_hccl::OpParam),
+        HCCL_ERROR(
+            "Group %u: invalid base op param size %zu for DFX context, opParamKey %#llx.", groupIdx_,
+            execCtx.baseOpParam.size(), execCtx.opParamKey),
+        HCCL_E_PARA);
+
+    const auto* param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(execCtx.baseOpParam.data());
+    CHK_PTR_NULL(param);
+    OpenDfxContext& dfxContext = execCtx.dfxContext;
+    dfxContext.collCommAicpu = execCtx.collCommAicpu;
+    HcclDfxOpInfo& dfxOpInfo = dfxContext.opInfoTemplate;
+    dfxOpInfo.opMode = static_cast<u32>(param->opMode);
+    dfxOpInfo.root = param->root;
+    dfxOpInfo.engine = param->engine;
+    dfxOpInfo.cpuTsThread = (param->opThread == 0U) ? execCtx.mainThread : param->opThread;
+    dfxOpInfo.cpuWaitAicpuNotifyIdx = param->aicpuRecordCpuIdx;
+    CHK_PRT_RET(
+        dfxOpInfo.cpuTsThread == 0U,
+        HCCL_ERROR(
+            "Group %u: invalid DFX op thread for commName[%s], opParamKey %#llx.", groupIdx_,
+            execCtx.commName.c_str(), execCtx.opParamKey),
+        HCCL_E_PARA);
+
+    const char* algTag = (param->algTag[0] == '\0') ? param->algName : param->algTag;
+    const s32 copyRet = strncpy_s(dfxOpInfo.algTag, sizeof(dfxOpInfo.algTag), algTag, sizeof(dfxOpInfo.algTag) - 1U);
+    CHK_PRT_RET(
+        copyRet != EOK,
+        HCCL_ERROR(
+            "Group %u: failed to copy DFX alg tag[%s], ret %d, opParamKey %#llx.", groupIdx_, algTag, copyRet,
+            execCtx.opParamKey),
+        HCCL_E_MEMORY);
+
+    CHK_RET(FillOpenDfxDynamicInfo(*param, rankNum_, dfxOpInfo));
+    CHK_RET(static_cast<HcclResult>(HcommThreadGetNotifyId(
+        dfxOpInfo.cpuTsThread, dfxOpInfo.cpuWaitAicpuNotifyIdx, &dfxOpInfo.cpuWaitAicpuNotifyId)));
+    dfxContext.initialized = true;
+    HCCL_DEBUG(
+        "[MC2_DFX_REPORT][CONTEXT] group=%u comm=%s op=%u key=%#llx thread=%#llx notifyIdx=%u notifyId=%u.",
+        groupIdx_, execCtx.commName.c_str(), dfxOpInfo.opType,
+        static_cast<unsigned long long>(execCtx.opParamKey),
+        static_cast<unsigned long long>(dfxOpInfo.cpuTsThread), dfxOpInfo.cpuWaitAicpuNotifyIdx,
+        dfxOpInfo.cpuWaitAicpuNotifyId);
+    return HCCL_SUCCESS;
+}
+
+HcclResult CommKfcAicpuServer::RegisterCurrentDfxOpInfo(
+    const ServerExecCtx& execCtx, const std::vector<uint8_t>& opParam) const
+{
+    CHK_PRT_RET(
+        !execCtx.dfxContext.initialized || execCtx.dfxContext.collCommAicpu == nullptr,
+        HCCL_ERROR(
+            "Group %u: DFX context is not initialized for commName[%s], opParamKey %#llx.", groupIdx_,
+            execCtx.commName.c_str(), execCtx.opParamKey),
+        HCCL_E_INTERNAL);
+    CHK_PRT_RET(
+        opParam.size() < sizeof(mc2_ops_hccl::OpParam),
+        HCCL_ERROR(
+            "Group %u: invalid run op param size %zu for DFX registration, opParamKey %#llx.", groupIdx_,
+            opParam.size(), execCtx.opParamKey),
+        HCCL_E_PARA);
+
+    const auto* param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(opParam.data());
+    CHK_PTR_NULL(param);
+    HcclDfxOpInfo dfxOpInfo = execCtx.dfxContext.opInfoTemplate;
+    CHK_RET(FillOpenDfxDynamicInfo(*param, rankNum_, dfxOpInfo));
+
+    auto currentDfxOpInfo = hccl::ConvertToDfxOpInfo(dfxOpInfo);
+    CHK_SMART_PTR_NULL(currentDfxOpInfo);
+    CollCommAicpu* collCommAicpu = execCtx.dfxContext.collCommAicpu;
+    currentDfxOpInfo->opIndex_ = collCommAicpu->UpdateIndex();
+    currentDfxOpInfo->comm_ = reinterpret_cast<void*>(collCommAicpu);
+    currentDfxOpInfo->isIndop_ = true;
+    currentDfxOpInfo->groupName_ = collCommAicpu->GetIdentifier();
+    currentDfxOpInfo->rankSize_ = collCommAicpu->GetTopoInfo().userRankSize;
+    currentDfxOpInfo->op_.opTag = collCommAicpu->GetIdentifier();
+    currentDfxOpInfo->op_.myRank = static_cast<Hccl::RankId>(collCommAicpu->GetTopoInfo().userRank);
+
+    hccl::HcclCommDfxLite* dfxLite = collCommAicpu->GetHcclCommDfxLite();
+    CHK_PTR_NULL(dfxLite);
+    CHK_RET(dfxLite->SetCurrDfxOpInfo(std::move(currentDfxOpInfo)));
+    return HCCL_SUCCESS;
+}
+
+HcclResult CommKfcAicpuServer::ReportCurrentDfxOp(const ServerExecCtx& execCtx) const
+{
+    CollCommAicpu* collCommAicpu = execCtx.dfxContext.collCommAicpu;
+    CHK_PTR_NULL(collCommAicpu);
+    hccl::HcclCommDfxLite* dfxLite = collCommAicpu->GetHcclCommDfxLite();
+    CHK_PTR_NULL(dfxLite);
+    Hccl::ProfilingHandlerLite& profilingHandler = Hccl::ProfilingHandlerLite::GetInstance();
+    profilingHandler.SetCachedGroupName(
+        collCommAicpu->GetIdentifier(), collCommAicpu->GetTopoInfo().userRankSize);
+    CHK_RET(dfxLite->ReportAllTasks());
+
+    Hccl::MirrorTaskManagerLite* taskManager = dfxLite->GetMirrorTaskManagerLite();
+    CHK_PTR_NULL(taskManager);
+    const auto& currentDfxOpInfo = taskManager->GetCurrDfxOpInfo();
+    CHK_SMART_PTR_NULL(currentDfxOpInfo);
+    EXECEPTION_CATCH(profilingHandler.ReportHcclOpInfo(*currentDfxOpInfo), return HCCL_E_INTERNAL);
+    return HCCL_SUCCESS;
+}
+
 HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
 {
     CHK_PTR_NULL(ctx);
@@ -272,6 +437,16 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
             execCtx.commMgr = commMgr;
             execCtx.collCommAicpu = collCommAicpu;
             execCtx.mainThread = execCtx.resCtxHolder->threads[0];
+            const HcclResult dfxInitRet = InitOpenDfxContext(execCtx);
+            if (dfxInitRet != HCCL_SUCCESS &&
+                (dfx::ProfilingManager::GetProfL1State() ||
+                 Hccl::ProfilingHandlerLite::GetInstance().GetProfL1State() ||
+                 hcomm::GetTaskExceptionEnable())) {
+                HCCL_ERROR(
+                    "Group %u: failed to initialize required open DFX context, ret %u, opParamKey %#llx.",
+                    groupIdx_, dfxInitRet, opParamKey);
+                return dfxInitRet;
+            }
         } else {
 #ifdef MC2_SERVER_ONLY
             HCCL_ERROR(
@@ -560,7 +735,31 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
+    bool l1ProfilingEnabled =
+        dfx::ProfilingManager::GetProfL1State() || Hccl::ProfilingHandlerLite::GetInstance().GetProfL1State();
+    if (l1ProfilingEnabled) {
+        CHK_PRT_RET(
+            !execCtx->dfxContext.initialized || execCtx->dfxContext.collCommAicpu == nullptr,
+            HCCL_ERROR(
+                "Group %u: Level-1 Profiling is enabled but DFX context is unavailable, opParamKey %#llx.",
+                groupIdx_, opParamKey),
+            HCCL_E_INTERNAL);
+        hccl::HcclCommDfxLite* dfxLite = execCtx->dfxContext.collCommAicpu->GetHcclCommDfxLite();
+        CHK_PTR_NULL(dfxLite);
+        CHK_RET(dfxLite->UpdateProfStat());
+        l1ProfilingEnabled = Hccl::ProfilingHandlerLite::GetInstance().GetProfL1State();
+    }
+    const bool registerDfxOpInfo = l1ProfilingEnabled || hcomm::GetTaskExceptionEnable();
+    if (l1ProfilingEnabled && !execCtx->dfxContext.enableLogged) {
+        HCCL_DEBUG(
+            "[MC2_DFX_REPORT][ENABLE] group=%u comm=%s op=%u key=%#llx.",
+            groupIdx_, execCtx->commName.c_str(), static_cast<u32>(opType),
+            static_cast<unsigned long long>(opParamKey));
+        execCtx->dfxContext.enableLogged = true;
+    }
+
     std::vector<uint8_t> runParam{};
+    u32 reportedTurns = 0U;
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
         UpdateProgress("LoopBegin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
@@ -604,6 +803,16 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             i, turnIdx, ret);
         CHK_RET(ret);
 
+        if (registerDfxOpInfo) {
+            ret = RegisterCurrentDfxOpInfo(*execCtx, runParam);
+            CHK_PRT_RET(
+                ret != HCCL_SUCCESS,
+                HCCL_ERROR(
+                    "Group %u: failed to register current DFX op info, ret %u, opParamKey %#llx, turnIdx %u.",
+                    groupIdx_, ret, opParamKey, turnIdx),
+                ret);
+        }
+
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "BeforeKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -638,12 +847,30 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             i, turnIdx, ret);
         CHK_RET(ret);
 
+        if (l1ProfilingEnabled) {
+            ret = ReportCurrentDfxOp(*execCtx);
+            CHK_PRT_RET(
+                ret != HCCL_SUCCESS,
+                HCCL_ERROR(
+                    "Group %u: failed to report current DFX op after task submission, ret %u, "
+                    "opParamKey %#llx, turnIdx %u.",
+                    groupIdx_, ret, opParamKey, turnIdx),
+                ret);
+            ++reportedTurns;
+        }
+
         UpdateProgress("LoopEnd", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "LoopEnd", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
             execCtx);
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopEnd] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i, turnIdx);
+    }
+    if (l1ProfilingEnabled) {
+        HCCL_DEBUG(
+            "[MC2_DFX_REPORT][SUMMARY] group=%u comm=%s op=%u key=%#llx turns=%u reportedTurns=%u.",
+            groupIdx_, execCtx->commName.c_str(), static_cast<u32>(opType),
+            static_cast<unsigned long long>(opParamKey), repeatCnt, reportedTurns);
     }
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
