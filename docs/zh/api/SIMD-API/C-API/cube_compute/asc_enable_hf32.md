@@ -35,7 +35,7 @@
 <!-- npu="A3,910b" id8 -->
 **表1** HF32对Mmad计算理论性能的影响（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123815311"></a>  
 
-| 接口 | 左矩阵A | 右矩阵B | cube<sub>m</sub> | cube<sub>n</sub> | cube<sub>k</sub> | k<sub>0</sub> |
+| 接口 | 左矩阵A | 右矩阵B | $cube_m$ | $cube_n$ | $cube_k$ | $k_0$ |
 | --- | --- | --- | --- | --- | --- | --- |
 | asc_mmad（不开启HF32） | float | float | 16 | 16 | 4 | 8 |
 | asc_mmad（开启HF32） | float | float | 16 | 16 | 8 | 8 |
@@ -44,7 +44,7 @@
 <!-- npu="950" id9 -->
 **表2** HF32对Mmad计算理论性能的影响（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123815915"></a>  
 
-| 接口 | 左矩阵A | 右矩阵B | cube<sub>m</sub> | cube<sub>n</sub> | cube<sub>k</sub> | k<sub>0</sub> |
+| 接口 | 左矩阵A | 右矩阵B | $cube_m$ | $cube_n$ | $cube_k$ | $k_0$ |
 | --- | --- | --- | --- | --- | --- | --- |
 | asc_mmad（不开启HF32） | float | float | 16 | 16 | 1 | 8 |
 | asc_mmad（开启HF32） | float | float | 16 | 16 | 8 | 8 |
@@ -70,8 +70,6 @@ $$
 - $cube_m, cube_n, cube_k$：硬件真实并行度（单位：elements/cycle）。
 - $k_0$：L0 Buffer上最小分型K方向大小。
 - $\Delta t$：头开销cycle数。
-
-更多性能数据请参考[Cube指令理论性能汇总](../../../附录/Cube指令理论性能汇总.md)。
 
 开启HF32模式后，L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32格式，舍入模式由[asc_enable_hf32_trans](asc_enable_hf32_trans.md)接口配置，中间计算使用HF32格式，最终的运算结果仍以FP32格式输出，以保证后续处理的兼容性。
 
