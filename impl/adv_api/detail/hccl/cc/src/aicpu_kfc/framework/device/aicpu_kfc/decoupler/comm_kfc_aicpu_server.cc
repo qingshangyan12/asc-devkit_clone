@@ -14,6 +14,7 @@
 #include "alg_param.h"
 #include "log.h"
 #include "common/aicpu_kfc_utils.h"
+#include "hcomm_desc_cache_dl.h"
 #ifndef MC2_SERVER_ONLY
 #include "hccl_mc2_ex.h"
 #include "framework/aicpu_communicator.h"
@@ -33,6 +34,54 @@ static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 120UL;
 static constexpr u32 AICPU_ORDER_DFX_INVALID_VALUE = 0xFFFFFFFFU;
 static const std::vector<HcclCMDType> SUPPORT_OP_LIST{
     HCCL_CMD_ALLREDUCE, HCCL_CMD_ALLGATHER, HCCL_CMD_REDUCE_SCATTER, HCCL_CMD_ALLTOALLV, HCCL_CMD_ALLTOALL};
+
+class AicpuDescCacheSession {
+public:
+    AicpuDescCacheSession(bool enable, u32 repeatCount)
+    {
+        if (enable && HcommAicpuDescCacheDlSupported() && HcommAicpuDescCacheDlBegin(repeatCount) == HCCL_SUCCESS) {
+            active_ = true;
+        }
+    }
+
+    ~AicpuDescCacheSession() { Abort(); }
+
+    void BeginRound(u32 roundIndex)
+    {
+        if (active_ && HcommAicpuDescCacheDlBeginRound(roundIndex) != HCCL_SUCCESS) {
+            Abort();
+        }
+    }
+
+    void EndRound(HcclResult result)
+    {
+        if (!active_) {
+            return;
+        }
+        if (result != HCCL_SUCCESS || HcommAicpuDescCacheDlEndRound() != HCCL_SUCCESS) {
+            Abort();
+        }
+    }
+
+    void Complete()
+    {
+        if (active_) {
+            (void)HcommAicpuDescCacheDlEnd();
+            active_ = false;
+        }
+    }
+
+private:
+    void Abort()
+    {
+        if (active_) {
+            (void)HcommAicpuDescCacheDlAbort();
+            active_ = false;
+        }
+    }
+
+    bool active_{false};
+};
 
 #define MC2_TIMEOUT_LOG(isHardTimeout, format, ...) \
     do {                                            \
@@ -560,6 +609,14 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
+    const bool cacheOpSupported = opType == HCCL_CMD_ALLGATHER || opType == HCCL_CMD_REDUCE_SCATTER;
+    bool cacheEnabled = false;
+    if (cacheOpSupported && repeatCnt > 1U) {
+        bool isDevice950 = false;
+        cacheEnabled = IsDevice950(isDevice950) == HCCL_SUCCESS && isDevice950;
+    }
+    AicpuDescCacheSession descCacheSession(cacheEnabled, repeatCnt);
+
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
@@ -611,7 +668,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
+        descCacheSession.BeginRound(i);
         ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+        descCacheSession.EndRound(ret);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -645,6 +704,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopEnd] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i, turnIdx);
     }
+    descCacheSession.Complete();
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
     return HCCL_SUCCESS;
