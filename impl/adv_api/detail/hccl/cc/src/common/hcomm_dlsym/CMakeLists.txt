@@ -130,6 +130,7 @@ endif()
 if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
     add_library(mc2_kernel_compat SHARED
         hcomm_device_dlsym.cc
+        hcomm_desc_cache_dl.cc
         hcomm_primitives_dl.cc
         hcomm_diag_dl.cc
         hcomm_device_profiling_dl.cc
