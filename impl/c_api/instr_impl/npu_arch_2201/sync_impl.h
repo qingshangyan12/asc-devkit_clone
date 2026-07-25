@@ -39,9 +39,15 @@
 
 [[deprecated("NOTICE: asc_sync_vec() is deprecated. "
              "Please use asc_sync() instead")]]
-__aicore__ inline void asc_sync_vec() { asc_sync_vec_impl(); }
+__aicore__ inline void asc_sync_vec()
+{
+    asc_sync_vec_impl();
+}
 
-__aicore__ inline void asc_sync_vec(int id) { asc_sync_vec_impl(id); }
+__aicore__ inline void asc_sync_vec(int id)
+{
+    asc_sync_vec_impl(id);
+}
 
 __aicore__ inline void asc_sync_mte3(int id) { asc_sync_mte3_impl(id); }
 
