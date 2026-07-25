@@ -118,7 +118,6 @@ __simd_callee__ inline void asc_sqrt(vector_half& dst, vector_half src, vector_b
 
 __simd_callee__ inline void asc_sqrt(vector_float& dst, vector_float src, vector_bool mask);
 
-
 // ==========asc_mul(int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
 __simd_callee__ inline void asc_mul(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
@@ -224,8 +223,6 @@ __simd_callee__ inline void asc_min_scalar(vector_uint8_t& dst, vector_uint8_t s
 __simd_callee__ inline void asc_min_scalar(vector_float& dst, vector_float src, float value, vector_bool mask);
 
 __simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, half value, vector_bool mask);
-
-
 
 // ==========asc_exp(half/float)==========
 __simd_callee__ inline void asc_exp(vector_half& dst, vector_half src, vector_bool mask);

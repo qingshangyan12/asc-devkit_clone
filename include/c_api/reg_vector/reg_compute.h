@@ -34,23 +34,6 @@
 #include "c_api/reg_vector/compute/reg_reduce.h"
 #include "c_api/reg_vector/compute/reg_scatter.h"
 
-//===================asc_set_va_reg=====================
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array);
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)

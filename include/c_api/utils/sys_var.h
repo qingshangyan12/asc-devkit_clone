@@ -59,7 +59,6 @@ __aicore__ inline int64_t asc_get_sub_block_id();
 
 __aicore__ inline int64_t asc_get_system_cycle();
 
-
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline int64_t asc_get_ffts_base_addr();
