@@ -183,7 +183,7 @@ L0C Buffer到Global Memory搬运根据是否传入量化参数自动选择量化
 
 ## 关键特性
 
-L0C Buffer到Global Memory搬运涉及[随路量化](../../矩阵计算（ISASI）/矩阵搬出关键特性说明/随路量化.md)、[随路Relu](../../矩阵计算（ISASI）/矩阵搬出关键特性说明/随路ReLU.md)、[F32 Channel Split](../../矩阵计算（ISASI）/矩阵搬出关键特性说明/F32-Channel-Split.md)、[Int8 Channel Merge](../../矩阵计算（ISASI）/矩阵搬出关键特性说明/Int8-Channel-Merge.md)和[batch搬运](../矩阵搬出关键特性说明/batch_copy.md)等关键特性。
+L0C Buffer到Global Memory搬运涉及[随路量化](../矩阵搬出关键特性说明/quant_pre.md)、[随路Relu](../矩阵搬出关键特性说明/relu_pre.md)、[F32 Channel Split](../矩阵搬出关键特性说明/f32_channel_split.md)、[Int8 Channel Merge](../矩阵搬出关键特性说明/int8_channel_merge.md)和[batch搬运](../矩阵搬出关键特性说明/batch_copy.md)等关键特性。
 
 ## 调用示例
 
