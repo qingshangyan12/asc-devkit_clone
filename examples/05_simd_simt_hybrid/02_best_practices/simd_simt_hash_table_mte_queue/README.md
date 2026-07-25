@@ -195,7 +195,7 @@ public:
             asc_copy_gm2ub_align(value_local_, src_addr, 1, value_bytes, 0, 0, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
             asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
             asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_copy_ub2gm_align(dst_addr, value_local_, 1, value_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0)；
+            asc_copy_ub2gm_align(dst_addr, value_local_, 1, value_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
             asc_sync_notify(PIPE_MTE3, PIPE_S, EVENT_ID0);
             asc_sync_wait(PIPE_MTE3, PIPE_S, EVENT_ID0);
             *reinterpret_cast<__ubuf__ volatile uint32_t*>(mte_finish_id_) = mte_finish_id + proc_count;
