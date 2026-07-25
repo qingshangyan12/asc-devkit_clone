@@ -26,7 +26,7 @@
 #include "c_api/mem_vector/compute/vector_convert.h"
 #include "c_api/mem_vector/compute/vector_fused.h"
 #include "c_api/mem_vector/compute/vector_gather.h"
-#include "c_api/mem_vector/compute/vector_logit.h"
+#include "c_api/mem_vector/compute/vector_logic.h"
 #include "c_api/mem_vector/compute/vector_mask_config.h"
 #include "c_api/mem_vector/compute/vector_permute_sel.h"
 #include "c_api/mem_vector/compute/vector_reduce.h"
