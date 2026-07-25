@@ -1,8 +1,8 @@
 # 输出shape依赖计算
 
-NonZero等算子在Kernel计算完成前无法确定实际输出shape。此类输出需要在原型定义中调用`OutputShapeDependOnCompute()`标记，并由Kernel按照固定格式把实际shape写入框架追加的shape输出地址。
+本文属于扩展内容，介绍输出shape依赖Kernel计算结果时的实现方法。NonZero等算子在Kernel计算完成前无法确定实际输出shape。此类输出需要在原型定义中调用`OutputShapeDependOnCompute()`标记，并由Kernel按照固定格式把实际shape写入框架追加的shape输出地址。
 
-## 1. 在算子原型中标记输出
+## 在算子原型中标记输出
 
 `OutputShapeDependOnCompute()`只能用于输出。以下示例表示输出`y`的shape需要等待Kernel计算结果：
 
@@ -16,7 +16,7 @@ this->Output("y")
 
 算子有多个输出时，只在实际依赖计算的输出上增加该标记。输入输出声明方法见[算子原型定义](../算子原型定义.md)。
 
-## 2. Kernel入口增加shape输出参数
+## Kernel入口增加shape输出参数
 
 框架会在所有普通输出之后、`workspace`和`tiling`之前追加一个`GM_ADDR`参数，用于保存依赖计算的输出shape。Kernel入口保持以下顺序：
 
@@ -37,7 +37,7 @@ extern "C" __global__ __aicore__ void non_zero_custom(
 
 即使有多个输出依赖计算，也只增加一个shape输出地址。各输出的shape信息在该地址中按原型输出顺序连续排列。
 
-## 3. shape信息排布格式
+## shape信息排布格式
 
 shape输出按`uint64_t`数组组织。每个待刷新输出固定占9个`uint64_t`元素：
 
@@ -59,7 +59,7 @@ uint64_t encodedRank = UINT64_SHAPE_FLAG | rank;
 
 输出Tensor为`uint32_t`时不设置该标记，直接写入rank。
 
-## 4. 写入单个输出shape
+## 写入单个输出shape
 
 假设输出`y`的数据类型为`uint32_t`，Kernel计算后得到实际shape为`[32, 64]`：
 
@@ -99,7 +99,7 @@ shapeGlobal.SetValue(3, 128);
 shapeGlobal.SetValue(4, 128);
 ```
 
-## 5. 写入多个输出shape
+## 写入多个输出shape
 
 假设两个输出都依赖计算，数据类型均为`uint64_t`，实际shape分别为`[16, 32]`和`[1, 16, 16, 32]`：
 
@@ -128,8 +128,8 @@ shapeGlobal.SetValue(13, 32);
 
 当算子还包含不依赖计算的普通输出时，shape输出区域只为调用了`OutputShapeDependOnCompute()`的输出分配槽位，但槽位顺序仍按这些输出在原型中的先后顺序排列。
 
-## 6. 相关文档
+## 相关文档
 
 - [Kernel侧算子实现](./基本流程.md)：Kernel入口格式和参数顺序。
 - [算子原型定义](../算子原型定义.md)：输入输出声明和shape推导关系。
-- [OutputShapeDependOnCompute](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/Utils-API/原型注册与管理/OpParamDef/OutputShapeDependOnCompute.md)：接口定义和工程版本约束。
+- [OutputShapeDependOnCompute](../../../../../../api/Utils-API/原型注册与管理/OpParamDef/OutputShapeDependOnCompute.md)：接口定义和工程版本约束。
