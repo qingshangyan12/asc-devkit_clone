@@ -1,0 +1,192 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+#include "ccu_kernel_alg_base.h"
+#include "ccu_kernel_all_to_all_mesh1d.h"
+
+namespace mc2_ops_hccl {
+
+constexpr int OUTPUT_XN_ID = 1;
+constexpr int TOKEN_XN_ID  = 2;
+constexpr int CKE_IDX_0    = 0;
+constexpr int CKE_IDX_1    = 1;
+
+struct KfcAlltoAllMesh1DContext : CcuKernelCtxBase {
+    const ChannelHandle *channels{nullptr};
+    uint32_t channelCount{0};
+    uint32_t rankSize{0};
+    uint32_t rankId{0};
+
+    ccu::Variable input;
+    std::vector<ccu::Variable> output;
+    std::vector<ccu::Variable> token;
+    ccu::Variable sliceSize;
+    ccu::Variable srcStride;
+    ccu::Variable srcOffset;
+    ccu::Variable dstOffset;
+    GroupOpSizeVars goSize;
+    ccu::Event event;
+    bool loadFromMem = false;
+};
+
+static CcuResult InitResource(KfcAlltoAllMesh1DContext &ctx)
+{
+    uint32_t channelIdx = 0;
+    if (ctx.channelCount == 0) {
+        HCCL_ERROR("[KfcAlltoAllMesh1D] channels is empty!");
+        return CcuResult::CCU_E_INTERNAL;
+    }
+
+    // 按照rank号从小到大遍历channels，遇到本rank就填充本地资源，否则依次取远端资源，要求算法返回的Link同样是按顺序排列的
+    ctx.output.resize(ctx.rankSize);
+    ctx.token.resize(ctx.rankSize);
+    for (uint64_t peerId = 0; peerId < ctx.rankSize; peerId++) {
+        if (peerId != ctx.rankId) {
+            ctx.output[peerId] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], OUTPUT_XN_ID);
+            ctx.token[peerId] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], TOKEN_XN_ID);
+            channelIdx++;
+        }
+    }
+    ctx.resourceAllocated = false;
+    return CCU_SUCCESS;
+}
+
+static CcuResult LoadArgs(KfcAlltoAllMesh1DContext &ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                        ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset,
+                        ccu::Variable dstOffset, ccu::Variable goSize1, ccu::Variable goSize2,
+                        ccu::Variable goSize3, ccu::Variable goSize4)
+{
+    ctx.input = inputAddr;
+    ctx.output[ctx.rankId] = outputAddr;
+    ctx.token[ctx.rankId] = tokenInfo;
+    ctx.sliceSize = sliceSize;
+    ctx.srcStride = srcStride;
+    ctx.srcOffset = srcOffset;
+    ctx.dstOffset = dstOffset;
+    ctx.goSize.addrOffset = goSize1;
+    ctx.goSize.loopParam = goSize2;
+    ctx.goSize.parallelParam = goSize3;
+    ctx.goSize.residual = goSize4;
+
+    ctx.srcOffset += ctx.input;
+    return CCU_SUCCESS;
+}
+
+static void PreSync(KfcAlltoAllMesh1DContext &ctx)
+{
+    for (uint32_t i = 0; i < ctx.channelCount; i++) {
+        ccu::WriteVariableWithNotify(ctx.channels[i], ctx.output[ctx.rankId],
+                    OUTPUT_XN_ID, CKE_IDX_0, 1 << OUTPUT_XN_ID);
+        ccu::WriteVariableWithNotify(ctx.channels[i], ctx.token[ctx.rankId],
+                    TOKEN_XN_ID, CKE_IDX_0, 1 << TOKEN_XN_ID);
+    }
+
+    uint32_t allBit = (1 << OUTPUT_XN_ID) | (1 << TOKEN_XN_ID);
+    for (uint32_t i = 0; i < ctx.channelCount; i++) {
+        ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, allBit);
+    }
+}
+
+static void PostSync(KfcAlltoAllMesh1DContext &ctx)
+{
+    uint16_t postBit = 1 << 5;
+    for (uint32_t i = 0; i < ctx.channelCount; i++) {
+        ccu::NotifyRecord(ctx.channels[i], CKE_IDX_1, postBit);
+    }
+    for (uint32_t i = 0; i < ctx.channelCount; i++) {
+        ccu::NotifyWait(ctx.channels[i], CKE_IDX_1, postBit);
+    }
+}
+
+static CcuResult DoAlltoAll(KfcAlltoAllMesh1DContext &ctx)
+{
+    std::vector<ccu::LocalAddr> src(ctx.rankSize);
+    std::vector<ccu::RemoteAddr> dst(ctx.rankSize);
+    ccu::LocalAddr localDst;
+
+    for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
+        if (rankIdx != ctx.rankId) {
+            dst[rankIdx].token = ctx.token[rankIdx];
+            dst[rankIdx].addr = ctx.output[rankIdx];
+            dst[rankIdx].addr += ctx.dstOffset;
+        } else {
+            localDst.token = ctx.token[rankIdx];
+            localDst.addr = ctx.output[rankIdx];
+            localDst.addr += ctx.dstOffset;
+        }
+
+        src[rankIdx].addr = ctx.srcOffset;
+        src[rankIdx].token = ctx.token[rankIdx];
+        for (uint64_t i = 0; i < rankIdx; i++) {
+            src[rankIdx].addr += ctx.srcStride;
+        }
+    }
+
+    uint32_t channelId = 0;
+    uint16_t allBit = ((1 << ctx.rankSize) - 1) & (~(1 << ctx.rankId)); // 仅rankid位为0，其他位为1，代表远端准备好了
+
+    if (ctx.loadFromMem) {
+        for(uint64_t r = 0; r < ctx.rankSize; r++) {
+            if (r == ctx.rankId) {
+                ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1 << r);
+            }
+            else {
+                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
+                channelId++;
+            }
+        }
+        // 等读完所有对端
+        ccu::EventWait(ctx.event, (1 << ctx.rankSize) - 1);
+    } else {
+        for(uint64_t r = 0; r < ctx.rankSize; r++) {
+            if (r != ctx.rankId) {
+                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
+                channelId++;
+            }
+        }
+        GroupCopy(ctx, localDst, src[ctx.rankId], ctx.goSize);
+        ccu::EventWait(ctx.event, allBit);
+    }
+
+    return CCU_SUCCESS;
+}
+
+// ============================================================================
+// kfc server调用函数
+// ============================================================================
+CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                                  ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset,
+                                  ccu::Variable dstOffset, ccu::Variable goSize1, ccu::Variable goSize2,
+                                  ccu::Variable goSize3, ccu::Variable goSize4,
+                                  const ChannelHandle channels[], uint32_t channelCount,
+                                  uint32_t rankSize, uint32_t rankId, bool loadFromMem)
+{
+    KfcAlltoAllMesh1DContext ctx;
+    ctx.channels = channels;
+    ctx.channelCount = channelCount;
+    ctx.rankSize = rankSize;
+    ctx.rankId = rankId;
+    ctx.loadFromMem = loadFromMem;
+    ctx.resourceAllocated = false;
+    ctx.moConfig.msInterleave = 0;
+    ctx.moConfig.loopCount = 0;
+    ctx.moConfig.memSlice = 0;
+    ctx.moRes.eventCount = 0;
+    ctx.moRes.bufCount = 0;
+    ctx.enginePool = 0;
+    CCU_CHK_RET(InitResource(ctx));
+    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset,
+                                  goSize1, goSize2, goSize3, goSize4));
+    PreSync(ctx);
+    CCU_CHK_RET(DoAlltoAll(ctx));
+    PostSync(ctx);
+    return CCU_SUCCESS;
+}
+
+}// namespace mc2_ops_hccl

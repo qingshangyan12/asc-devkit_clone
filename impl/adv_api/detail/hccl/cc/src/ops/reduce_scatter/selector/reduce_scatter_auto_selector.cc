@@ -46,11 +46,9 @@ SelectorStatus ReduceScatterAutoSelector::SelectCcuMsAlgo(
         return SelectorStatus::NOT_MATCH;
     }
 
-    SelectorStatus ret = SelectMeshAlgoCcums(topoInfo, opParam, selectAlgName);
-    if (ret == SelectorStatus::MATCH) {
-        HCCL_INFO("[ReduceScatterAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
-    }
-    return ret;
+    selectAlgName = "CcuReduceScatterMesh1DMem2Mem";
+    HCCL_INFO("[ReduceScatterAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+    return SelectorStatus::MATCH;
 }
 
 SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoCcums(
