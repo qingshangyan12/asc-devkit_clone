@@ -184,7 +184,7 @@ __aicore__ inline void Fixpipe(
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 // L0C->L1/UB
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(
@@ -247,7 +247,7 @@ __aicore__ inline void Fixpipe(
     }
 #endif // ASCENDC_CPU_DEBUG
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(), intriParams, cacheMode);
@@ -262,7 +262,7 @@ __aicore__ inline void Fixpipe(
     }
 #endif // ASCENDC_CPU_DEBUG
 }
-
+#endif
 // L0C->GM deq tensor quant
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(
@@ -284,7 +284,6 @@ __aicore__ inline void Fixpipe(
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 #endif
 }
-#endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_IMPL_H__)
