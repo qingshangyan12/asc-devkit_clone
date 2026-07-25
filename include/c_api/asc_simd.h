@@ -24,17 +24,19 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510))
-#include "c_api/cache_ctrl/cache_ctrl.h"
 #include "c_api/atomic/atomic.h"
+#include "c_api/cache_ctrl/cache_ctrl.h"
+#include "c_api/composite/cube_compute.h"
+#include "c_api/composite/vector_compute.h"
 #include "c_api/cube_compute/cube_compute.h"
 #include "c_api/cube_memcpy/cube_memcpy.h"
 #include "c_api/scalar/scalar_compute.h"
 #include "c_api/scalar/scalar_store.h"
+#include "c_api/spr/spr.h"
 #include "c_api/sync/sync.h"
 #include "c_api/utils/utils.h"
 #include "c_api/mem_vector/vector_compute.h"
 #include "c_api/vector_memcpy/vector_memcpy.h"
-#include "c_api/spr/spr.h"
 #endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -44,6 +46,9 @@
 #include "c_api/reg_vector/reg_copy.h"
 #include "c_api/reg_vector/reg_sync.h"
 #include "c_api/reg_vector/reg_compute.h"
+
+#include "c_api/composite/reg_loadunalign.h"
+#include "c_api/composite/reg_storeunalign.h"
 #endif
 
 #endif
