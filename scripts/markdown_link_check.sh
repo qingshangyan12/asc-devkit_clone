@@ -218,7 +218,6 @@ input_files = sys.argv[3:]
 
 markdown_exts = (".md", ".markdown", ".mdx")
 excluded_prefixes = ()
-precommit_excluded_paths = {"CHANGELOG.md", "CHANGELOG_en.md"}
 config_file = repo_root / "markdown-link-check.toml"
 full_scan = os.environ.get("FULL_SCAN") == "1"
 full_reason = ""
@@ -407,22 +406,6 @@ def ci_markdown_changes():
             markdown_paths = [p for p in paths if is_markdown_path(p)]
             changed.extend(markdown_paths)
     return changed, reverse_targets
-
-
-def should_skip_chunk(input_paths, changed):
-    if not changed:
-        return False
-    input_set = {path for path in input_paths if path}
-    if not input_set:
-        return False
-    owner = next(
-        (
-            path for path in changed
-            if path not in precommit_excluded_paths and (repo_root / path).is_file()
-        ),
-        None,
-    )
-    return owner is not None and owner not in input_set
 
 
 def staged_markdown_changes():
@@ -629,56 +612,43 @@ else:
     input_paths = [to_rel(decode_git_path(path)) for path in input_files]
     input_paths = [path for path in input_paths if is_markdown_path(path)]
     changed = list(input_paths)
-
-    ci_changes = []
-    ci_reverse_targets = set()
     reverse_targets = set()
     if ci_mod_filelist_exists:
-        ci_changes, ci_reverse_targets = ci_markdown_changes()
-        changed = list(dict.fromkeys(ci_changes))
-        reverse_targets = set(ci_reverse_targets)
-
-    staged_changes, staged_reverse_targets = staged_markdown_changes()
-    base_changes = []
-    base_reverse_targets = set()
-    if not ci_mod_filelist_exists:
-        base_changes, base_reverse_targets = base_markdown_changes()
-
-    chunk_changes = ci_changes if ci_mod_filelist_exists else (staged_changes or base_changes)
-    if should_skip_chunk(input_paths, chunk_changes):
-        scan_set = []
+        changed, reverse_targets = ci_markdown_changes()
     else:
-        if not ci_mod_filelist_exists:
-            changed.extend(path for path in staged_changes if path not in changed)
-            changed.extend(path for path in base_changes if path not in changed)
-            reverse_targets.update(staged_reverse_targets)
-            reverse_targets.update(base_reverse_targets)
+        staged_changes, staged_reverse_targets = staged_markdown_changes()
+        base_changes, base_reverse_targets = base_markdown_changes()
+        changed.extend(staged_changes)
+        changed.extend(base_changes)
+        reverse_targets.update(staged_reverse_targets)
+        reverse_targets.update(base_reverse_targets)
 
-        changed_targets = {path for path in changed if path}
-        changed_targets.update(reverse_targets)
-        changed_existing = {
-            path for path in changed_targets
-            if (repo_root / path).is_file()
-        }
+    changed = list(dict.fromkeys(changed))
+    changed_targets = {path for path in changed if path}
+    changed_targets.update(reverse_targets)
+    changed_existing = {
+        path for path in changed_targets
+        if (repo_root / path).is_file()
+    }
 
-        all_markdown = existing_markdown_files()
-        scan_set = set(changed_existing)
-        for source in all_markdown:
-            source_path = repo_root / source
-            try:
-                text = source_path.read_text(encoding="utf-8")
-            except UnicodeDecodeError:
-                text = source_path.read_text(encoding="utf-8", errors="ignore")
-            except OSError:
-                continue
+    all_markdown = existing_markdown_files()
+    scan_set = set(changed_existing)
+    for source in all_markdown:
+        source_path = repo_root / source
+        try:
+            text = source_path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            text = source_path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
 
-            for target in extract_link_targets(text):
-                normalized = normalize_target(source, target)
-                if normalized is None:
-                    normalized = normalize_gitcode_self_target(target)
-                if normalized in changed_targets:
-                    scan_set.add(source)
-                    break
+        for target in extract_link_targets(text):
+            normalized = normalize_target(source, target)
+            if normalized is None:
+                normalized = normalize_gitcode_self_target(target)
+            if normalized in changed_targets:
+                scan_set.add(source)
+                break
 
     scan_set = sorted(scan_set)
 
