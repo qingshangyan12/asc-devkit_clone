@@ -22,7 +22,7 @@
 **表1**  数据排布转换类指令理论性能汇总
 
 <a name="table950001"></a>
-| 接口 | 理论并行度（Bytes/instruction） |
+| 接口 | 理论并行度（bytes/cycle） |
 | --- | --- |
 | Transpose | 256 |
 
@@ -39,7 +39,7 @@
 **表3**  数据搬运类指令理论性能汇总
 
 <a name="table950003"></a>
-| 接口 | 理论并行度（Bytes/cycle） |
+| 接口 | 理论并行度（bytes/cycle） |
 | --- | --- |
 | DataCopy(UB->UB) | 256 |
 
