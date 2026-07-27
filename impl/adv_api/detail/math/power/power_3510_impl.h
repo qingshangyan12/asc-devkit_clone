@@ -50,19 +50,24 @@ constexpr float LOG2_REDUCE_COEFF1 = 0.70710678f;
 constexpr int32_t LOG2_REDUCE_COEFF2 = 0xff800000;
 constexpr float LOG2_REDUCE_FMAF_COEFF1 = 1.19209290e-7f;
 
-constexpr float LOG2_BEST_FMAF_COEFF1 = 0.129394531f;
-constexpr float LOG2_BEST_FMAF_COEFF2 = 0.141957462f;
-constexpr float LOG2_BEST_FMAF_COEFF3 = 0.200015724f;
-constexpr float LOG2_BEST_FMAF_COEFF4 = 0.333333254f;
-constexpr float LOG2_HI1 = 6.93147182e-1f;
-constexpr float LOG2_HI2 = -6.93147182e-1f;
-constexpr float LOG2_LO = -1.90465421e-9f;
+constexpr float LOG2_BEST_FMAF_COEFF1 = 0.37282535f;
+constexpr float LOG2_BEST_FMAF_COEFF2 = 0.4097556f;
+constexpr float LOG2_BEST_FMAF_COEFF3 = 0.57711965f;
+constexpr float LOG2_BEST_FMAF_COEFF4 = 0.96179646f;
+constexpr float LOG2_BEST_FMAF_COEFF5 = 2.88539f;
+constexpr float LOG2_BEST_FMAF_COEFF6 = 0.00000003851926f;
+
+constexpr float EXPF_BEST_FMAF_COEFF1 = 0.000152392517f;
+constexpr float EXPF_BEST_FMAF_COEFF2 = 0.00133913534f;
+constexpr float EXPF_BEST_FMAF_COEFF3 = 0.00961883925f;
+constexpr float EXPF_BEST_FMAF_COEFF4 = 0.0555035882f;
+constexpr float EXPF_BEST_FMAF_COEFF5 = 0.240226448f;
+constexpr float EXPF_BEST_FMAF_COEFF6 = 0.693147182f;
 
 constexpr int32_t EXPF_INTERVAL_CMP = -2097152000;
 constexpr int32_t EXPF_INTERVAL_CAST = 2130706432;
 
-constexpr float EXP_OVFL_UNFL_F = -104.0f;
-constexpr float EXP_MIN_F = 88.7228390f;
+constexpr float EXP_OVFL_UNFL_F = 152.0f;
 constexpr int32_t INF = 0x7f800000;
 constexpr int32_t NEG_INF = 0xff800000;
 constexpr int32_t I32_NAN = 0x7f7fffff;
@@ -75,35 +80,12 @@ constexpr int16_t COMPARE_ZERO_OFFSET = 31;
 constexpr int16_t SHIFT_OFFSET = 23;
 constexpr float F32_FRACTIONS = -23.0f;
 
-struct PowerLogParams {
-    Reg::RegTensor<float> zeroReg;
-    Reg::RegTensor<float> oneReg;
-    Reg::RegTensor<float> fractionReg;
-    Reg::RegTensor<float> subReg;
-    Reg::RegTensor<int32_t> intReg;
-    Reg::RegTensor<float> rReg;
-    Reg::RegTensor<float> addReg1;
-    Reg::RegTensor<float> addReg2;
-};
-
-__simd_callee__ inline void PowerLogParamsInit(PowerLogParams& params)
+__simd_callee__ inline void IsInfNum(Reg::MaskReg& infMask, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
 {
-    Reg::Duplicate(params.zeroReg, 0.0f);
-    Reg::Duplicate(params.oneReg, 1.0f);
-    Reg::Duplicate(params.fractionReg, F32_FRACTIONS);
-    Reg::Duplicate(params.subReg, LOG2_REDUCE_COEFF1);
-    Reg::Duplicate(params.intReg, LOG2_REDUCE_COEFF2);
-    Reg::Duplicate(params.rReg, LOG2_BEST_FMAF_COEFF2);
-    Reg::Duplicate(params.addReg1, LOG2_BEST_FMAF_COEFF3);
-    Reg::Duplicate(params.addReg2, LOG2_BEST_FMAF_COEFF4);
-}
-
-__simd_callee__ inline void IsInfNum(
-    Reg::MaskReg& infMask, Reg::RegTensor<float>& srcReg, Reg::RegTensor<int32_t>& tmpR12Reg, Reg::MaskReg& mask)
-{
-    Reg::RegTensor<float> tmpFloatReg;
-    Reg::And((Reg::RegTensor<int32_t>&)tmpFloatReg, (Reg::RegTensor<int32_t>&)srcReg, tmpR12Reg, mask);
-    Reg::CompareScalar<int32_t, CMPMODE::EQ>(infMask, (Reg::RegTensor<int32_t>&)tmpFloatReg, INF, mask);
+    Reg::MaskReg tmpMask;
+    Reg::CompareScalar<int32_t, CMPMODE::EQ>(tmpMask, (Reg::RegTensor<int32_t>&)srcReg, INF, mask);
+    Reg::CompareScalar<int32_t, CMPMODE::EQ>(infMask, (Reg::RegTensor<int32_t>&)srcReg, NEG_INF, mask);
+    Reg::MaskOr(infMask, infMask, tmpMask, mask);
 }
 
 __simd_callee__ inline void IsNanNum(Reg::MaskReg& nanMask, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
@@ -120,11 +102,7 @@ __aicore__ inline void CompareNegZero(Reg::MaskReg& filterMask, Reg::RegTensor<f
 {
     Reg::RegTensor<uint32_t> tmpReg;
     Reg::ShiftRights(tmpReg, (Reg::RegTensor<uint32_t>&)srcReg, COMPARE_ZERO_OFFSET, mask);
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-    Reg::CompareScalar<uint32_t, CMPMODE::EQ>(filterMask, tmpReg, 0, mask);
-#else
     Reg::CompareScalar<uint32_t, CMPMODE::EQ>(filterMask, tmpReg, 0.0f, mask);
-#endif
 }
 
 __aicore__ inline void CopySignF(
@@ -140,13 +118,32 @@ __aicore__ inline void CopySignF(
     Reg::Select(dstReg, tmpFloatReg, tmpFloatReg2, cmpMask1);
 }
 
-__simd_callee__ inline void GetLogFExtStepOne(
-    Reg::RegTensor<float>& tmpIReg, Reg::RegTensor<float>& tmpMReg, Reg::RegTensor<float>& tmpRReg,
-    Reg::RegTensor<float>& srcReg, PowerLogParams& params, Reg::MaskReg& mask)
+__simd_callee__ inline void FMaf(
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg1, Reg::RegTensor<float>& srcReg2,
+    Reg::RegTensor<float>& srcReg3, Reg::MaskReg& mask)
 {
-    Reg::RegTensor<float> tmpAReg, tmpFloatReg;
-    Reg::RegTensor<int32_t> tmpEReg;
-    /* init variable a and i:
+    Reg::RegTensor<float> tmpReg = srcReg1;
+    Reg::FusedMulDstAdd(tmpReg, srcReg2, srcReg3, mask);
+    dstReg = tmpReg;
+}
+
+__simd_callee__ inline void FMaf(
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg1, float scalarValue, Reg::RegTensor<float>& srcReg2,
+    Reg::MaskReg& mask)
+{
+    Reg::RegTensor<float> tmpReg;
+    Reg::Duplicate(tmpReg, scalarValue, mask);
+    FMaf(dstReg, srcReg1, tmpReg, srcReg2, mask);
+}
+
+__simd_callee__ inline void GetLogFExt(
+    Reg::RegTensor<float>& logHigh, Reg::RegTensor<float>& logLow, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
+{
+    Reg::RegTensor<float> tmpIReg, tmpAReg;
+    Reg::RegTensor<int32_t> tmpEReg, tmpIntReg;
+    Reg::RegTensor<float> tmpFloatReg, tmpFloatReg2;
+    Reg::Duplicate(tmpIReg, 0.0f, mask);
+    /* init varaiable a and i:
      *  if (a < 1.175494351e-38f){ // 0x1.0p-126
      *      a = a * 8388608.0f; // 0x1.0p+23
      *      i = -23.0f;
@@ -155,14 +152,16 @@ __simd_callee__ inline void GetLogFExtStepOne(
     Reg::MaskReg cmpMask;
     Reg::CompareScalar<float, CMPMODE::LT>(cmpMask, srcReg, LOG2_LOWEST_VALUE, mask);
     Reg::Muls(tmpAReg, srcReg, LOG2_LOWEST_VALUE_MULS, mask);
-    Reg::Select(tmpAReg, tmpAReg, srcReg, cmpMask);
-    Reg::Select(tmpIReg, params.fractionReg, params.zeroReg, cmpMask);
+    Reg::Duplicate(tmpFloatReg, F32_FRACTIONS, mask);
+    Reg::Select(tmpIReg, tmpFloatReg, tmpIReg, cmpMask);
     // step 1: e = (__float_as_int (a) - __float_as_int (0.70710678f)) & 0xff800000;
-    tmpFloatReg = params.subReg;
-    Reg::Sub(tmpEReg, (Reg::RegTensor<int32_t>&)tmpAReg, (Reg::RegTensor<int32_t>&)tmpFloatReg, mask);
-    Reg::And(tmpEReg, tmpEReg, params.intReg, mask);
+    Reg::Duplicate(tmpFloatReg, LOG2_REDUCE_COEFF1, mask);
+    Reg::Sub(tmpEReg, (Reg::RegTensor<int32_t>&)srcReg, (Reg::RegTensor<int32_t>&)tmpFloatReg, mask);
+    Reg::Duplicate(tmpIntReg, LOG2_REDUCE_COEFF2, mask);
+    Reg::And(tmpEReg, tmpEReg, tmpIntReg, mask);
     // step 2: m = __int_as_float (__float_as_int (a) - e);
-    Reg::Sub((Reg::RegTensor<int32_t>&)tmpMReg, (Reg::RegTensor<int32_t>&)tmpAReg, tmpEReg, mask);
+    Reg::RegTensor<float> tmpMReg;
+    Reg::Sub((Reg::RegTensor<int32_t>&)tmpMReg, (Reg::RegTensor<int32_t>&)srcReg, tmpEReg, mask);
     // step 3: i = fmaf ((float)e, 1.19209290e-7f, i);
     Reg::Cast<float, int32_t, castTraitF32I32>(tmpFloatReg, tmpEReg, mask);
     Reg::Axpy(tmpIReg, tmpFloatReg, LOG2_REDUCE_FMAF_COEFF1, mask);
@@ -171,90 +170,145 @@ __simd_callee__ inline void GetLogFExtStepOne(
     Reg::Adds(tmpPReg, tmpMReg, 1.0f, mask);
     Reg::Adds(tmpMReg, tmpMReg, -1.0f, mask);
     // step 5：r = 1.0f / p
-    Reg::Div(tmpRReg, params.oneReg, tmpPReg, mask);
-}
-
-__simd_callee__ inline void GetLogFExtStepTwo(
-    Reg::RegTensor<float>& logHigh, Reg::RegTensor<float>& logLow, Reg::RegTensor<float>& tmpIReg,
-    Reg::RegTensor<float>& tmpMReg, Reg::RegTensor<float>& tmpRReg, PowerLogParams& params, Reg::MaskReg& mask)
-{
+    Reg::RegTensor<float> tmpRReg;
+    Reg::Duplicate(tmpFloatReg, 1.0f, mask);
+    Reg::Div(tmpRReg, tmpFloatReg, tmpPReg, mask);
     // step 6：qhi = m * r;
     Reg::RegTensor<float> tmpQHIReg, tmpQLOReg;
-    Reg::RegTensor<float> tmpFloatReg, tmpFloatReg2;
     Reg::Mul(tmpQHIReg, tmpMReg, tmpRReg, mask);
     // step 7：qhi1 = fmaf (qhi, -m, fmaf (qhi, -2.0f, m))
     Reg::Muls(tmpFloatReg, tmpQHIReg, -2.0f, mask);
     Reg::Add(tmpFloatReg, tmpFloatReg, tmpMReg, mask);
     Reg::Neg(tmpFloatReg2, tmpMReg, mask);
-    Reg::FusedMulDstAdd(tmpFloatReg2, tmpQHIReg, tmpFloatReg, mask);
+
+    Reg::Mul(tmpFloatReg2, tmpQHIReg, tmpFloatReg2, mask);
+    Reg::Add(tmpFloatReg, tmpFloatReg2, tmpFloatReg, mask);
+
     // step 8：qlo = r * qhi1
-    Reg::Mul(tmpQLOReg, tmpRReg, tmpFloatReg2, mask);
+    Reg::Mul(tmpQLOReg, tmpRReg, tmpFloatReg, mask);
     // step 9：s = qhi * qhi;
     Reg::RegTensor<float> tmpSReg;
     Reg::Mul(tmpSReg, tmpQHIReg, tmpQHIReg, mask);
     /*
-     * step 10:
-     * r =  0.129394531f;
-     * r = fmaf (r, s, 0.141957462f)
-     * r = fmaf (r, s, 0.200015724f)
-     * r = fmaf (r, s, 0.333333254f)
+     * step 10：
+     * r =  0.37282535f;
+     * r = fmaf (r, s, 0.4097556f)
+     * r = fmaf (r, s, 0.57711965f)
+     * r = fmaf (r, s, 0.96179646f)
      */
-    tmpRReg = params.rReg;
+    Reg::Duplicate(tmpRReg, LOG2_BEST_FMAF_COEFF2, mask);
     Reg::Axpy<float>(tmpRReg, tmpSReg, LOG2_BEST_FMAF_COEFF1, mask);
-    Reg::FusedMulDstAdd<float>(tmpRReg, tmpSReg, params.addReg1, mask);
-    Reg::FusedMulDstAdd<float>(tmpRReg, tmpSReg, params.addReg2, mask);
+    Reg::Duplicate(tmpFloatReg, LOG2_BEST_FMAF_COEFF3, mask);
+    Reg::FusedMulDstAdd<float>(tmpRReg, tmpSReg, tmpFloatReg, mask);
+    Reg::Duplicate(tmpFloatReg, LOG2_BEST_FMAF_COEFF4, mask);
+    Reg::FusedMulDstAdd<float>(tmpRReg, tmpSReg, tmpFloatReg, mask);
     // step 11：r = r * s
     Reg::Mul(tmpRReg, tmpRReg, tmpSReg, mask);
     /*
      * step 12:
-     * qhi = qhi + qhi
-     * qlo = qlo + qlo
+     * first_hi = fmaf(2.88539f, qhi, i)
+     * first_lo = fmaf(2.88539f, qhi, i-first_hi)
      */
-    Reg::Add(tmpQHIReg, tmpQHIReg, tmpQHIReg, mask);
-    Reg::Add(tmpQLOReg, tmpQLOReg, tmpQLOReg, mask);
-    // step 13: first_hi = fmaf(LOG2_HI, i, qhi)
     Reg::RegTensor<float> tmpFHIReg, tmpFLOReg;
-    Reg::Muls(tmpFHIReg, tmpIReg, LOG2_HI1, mask);
-    Reg::Add(tmpFHIReg, tmpFHIReg, tmpQHIReg, mask);
-    // step 14: first_lo = fmaf(-LOG2_HI, i, first_hi)
-    tmpFloatReg2 = tmpFHIReg;
-    Reg::Axpy(tmpFloatReg2, tmpIReg, LOG2_HI2, mask);
-    Reg::Sub(tmpFLOReg, tmpQHIReg, tmpFloatReg2, mask);
-    // step 15: second_lo = fmaf(r, qhi, first_lo)
-    Reg::FusedMulDstAdd(tmpQHIReg, tmpRReg, tmpFLOReg, mask);
-    // step 16: last_lo = fmaf(3*qlo, r, qlo)
-    Reg::Muls(tmpFloatReg, tmpQLOReg, 3.0f, mask);
-    Reg::MulAddDst(tmpQLOReg, tmpFloatReg, tmpRReg, mask);
-    // step 17: sum_lo = fmaf(LOG2_LO, i, last_lo) + second_lo
-    Reg::Axpy(tmpQLOReg, tmpIReg, LOG2_LO, mask);
-    Reg::Add(tmpQLOReg, tmpQLOReg, tmpQHIReg, mask);
+    FMaf(tmpFHIReg, tmpQHIReg, LOG2_BEST_FMAF_COEFF5, tmpIReg, mask);
+    Reg::Sub(tmpFloatReg2, tmpIReg, tmpFHIReg, mask);
+    FMaf(tmpFLOReg, tmpQHIReg, LOG2_BEST_FMAF_COEFF5, tmpFloatReg2, mask);
     /*
-     * step 18:
-     * loghi = first_hi + sum_lo;
+     * step 13:
+     * GOOD:
+     * last_lo= fmaf(r,qhi,fmaf(2.88539f,qlo,first_lo));
+     * sum_lo=fmaf(0.00000003851926f,qhi,last_lo);
+     * BETTER:
+     * last_lo= fmaf(r,qhi,fmaf(2.88539f,qlo,r*qlo));
+     * sum_lo=fmaf(0.00000003851926f,qhi,last_lo)+first_lo;
+     * BEST:
+     * last_lo= fmaf(r,qhi,fmaf(2.88539f,qlo,3.0f*r*qlo));
+     * sum_lo=fmaf(0.00000003851926f,qhi,last_lo)+first_lo;
+     */
+    Reg::RegTensor<float> tmpLLOReg, tmpSLOReg;
+    Reg::Mul(tmpLLOReg, tmpRReg, tmpQLOReg, mask);
+    Reg::Axpy(tmpLLOReg, tmpQLOReg, LOG2_BEST_FMAF_COEFF5, mask);
+    Reg::MulAddDst(tmpLLOReg, tmpRReg, tmpQHIReg, mask);
+    Reg::Axpy(tmpLLOReg, tmpQHIReg, LOG2_BEST_FMAF_COEFF6, mask);
+    Reg::Add(tmpSLOReg, tmpLLOReg, tmpFLOReg, mask);
+    /*
+     * step 14:
+     * loghi = first_hi+sum_lo;
      * loglo = (first_hi - *loghi) + sum_lo;
      */
-    Reg::Add(logHigh, tmpFHIReg, tmpQLOReg, mask);
-    Reg::Sub(tmpFloatReg, tmpFHIReg, logHigh, mask);
-    Reg::Add(logLow, tmpFloatReg, tmpQLOReg, mask);
+    Reg::Add(logHigh, tmpFHIReg, tmpSLOReg, mask);
+    Reg::Sub(tmpFloatReg2, tmpFHIReg, logHigh, mask);
+    Reg::Add(logLow, tmpFloatReg2, tmpSLOReg, mask);
 }
 
-__simd_callee__ inline void ComputeExpoOddInt(
-    Reg::MaskReg& oddMask, Reg::RegTensor<float>& expReg, Reg::RegTensor<float>& twoReg, Reg::MaskReg& mask)
+__simd_callee__ inline void GetExpfUnchecked(
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& tmPHIReg, Reg::RegTensor<float>& tmPLOReg, Reg::MaskReg& mask)
+{
+    /*
+     * step 1:
+     * r = fmaf (0.000152392517f, plo, 0.00133913534f);
+     * r = fmaf (r, plo, 0.00961883925f);
+     * r = fmaf (r, plo, 0.0555035882f);
+     * r = fmaf (r, plo, 0.240226448f);
+     * r = fmaf (r, plo, 0.693147182f);
+     * r = fmaf (r, plo, 1.0f);
+     */
+    Reg::RegTensor<float> tmpFloatReg, tmpFloatReg2, tmpRReg;
+    Reg::Duplicate(tmpRReg, EXPF_BEST_FMAF_COEFF2, mask);
+    Reg::Axpy(tmpRReg, tmPLOReg, EXPF_BEST_FMAF_COEFF1, mask);
+    Reg::Duplicate(tmpFloatReg, EXPF_BEST_FMAF_COEFF3, mask);
+    Reg::FusedMulDstAdd(tmpRReg, tmPLOReg, tmpFloatReg, mask);
+    Reg::Duplicate(tmpFloatReg, EXPF_BEST_FMAF_COEFF4, mask);
+    Reg::FusedMulDstAdd(tmpRReg, tmPLOReg, tmpFloatReg, mask);
+    Reg::Duplicate(tmpFloatReg, EXPF_BEST_FMAF_COEFF5, mask);
+    Reg::FusedMulDstAdd(tmpRReg, tmPLOReg, tmpFloatReg, mask);
+    Reg::Duplicate(tmpFloatReg, EXPF_BEST_FMAF_COEFF6, mask);
+    Reg::FusedMulDstAdd(tmpRReg, tmPLOReg, tmpFloatReg, mask);
+    Reg::Duplicate(tmpFloatReg, 1.0f, mask);
+    Reg::FusedMulDstAdd(tmpRReg, tmPLOReg, tmpFloatReg, mask);
+
+    // step2: r1 = (phi>0.0f) ? 0 : -2097152000;
+    Reg::RegTensor<float> tmpF1Reg, tmpF2Reg;
+    Reg::RegTensor<int32_t> tmpR1Reg, tmpR2Reg;
+    Reg::MaskReg cmpMask;
+    Reg::CompareScalar<float, CMPMODE::LE>(cmpMask, tmPHIReg, 0, mask);
+    Reg::Duplicate(tmpR1Reg, EXPF_INTERVAL_CMP, cmpMask);
+    // step3: r2 = r1 + 2130706432;
+    Reg::Adds(tmpR2Reg, tmpR1Reg, EXPF_INTERVAL_CAST, mask);
+    // step4: f1 = r * s32_to_f32(r2);
+    Reg::Mul(tmpF1Reg, tmpRReg, (Reg::RegTensor<float>&)tmpR2Reg, mask);
+    /*
+     * step5: int32_t r5 = cvt_rzi(phi);
+     * if (phi < 0.0f) return (int32_t)ceilf(phi);
+     * else return (int32_t)floorf(phi);
+     */
+    Reg::RegTensor<int32_t> tmpR5Reg;
+    Reg::MaskReg condMask;
+    Reg::Cast<int32_t, float, castTraitI32F32>(tmpR5Reg, tmPHIReg, mask);
+    // step6: f2 = s32_to_f32((r5 << 23) - r1);
+    Reg::RegTensor<int32_t> tmpTReg;
+    Reg::ShiftLefts(tmpR5Reg, tmpR5Reg, SHIFT_OFFSET, mask);
+    Reg::Sub(tmpTReg, tmpR5Reg, tmpR1Reg, mask);
+    tmpF2Reg = (Reg::RegTensor<float>&)tmpTReg;
+    // step7: f1 * f2
+    Reg::Mul(dstReg, tmpF1Reg, tmpF2Reg, mask);
+}
+
+__simd_callee__ inline void ComputeExpoOddInt(Reg::MaskReg& oddMask, Reg::RegTensor<float>& expReg, Reg::MaskReg& mask)
 {
     // calculate exp is odd or not: expo_odd_int = fmaf (-2.0f, floorf (0.5f * b), b) == 1.0f;
     Reg::RegTensor<float> tmpFloatReg;
     Reg::Muls(tmpFloatReg, expReg, 0.5f, mask);
     RFloor(tmpFloatReg, tmpFloatReg, mask);
-    Reg::FusedMulDstAdd(tmpFloatReg, twoReg, expReg, mask);
+    FMaf(tmpFloatReg, tmpFloatReg, -2.0f, expReg, mask);
     Reg::CompareScalar<float, CMPMODE::EQ>(oddMask, tmpFloatReg, 1.0f, mask);
 }
 
 __simd_callee__ inline void ProcessSpecialCaseForPowF(
-    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& baseReg, Reg::RegTensor<float>& expReg,
-    Reg::RegTensor<int32_t>& tmpR10Reg, Reg::RegTensor<int32_t>& tmpR12Reg, Reg::RegTensor<float>& twoReg,
-    Reg::MaskReg& mask)
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& baseReg, Reg::RegTensor<float>& expReg, Reg::MaskReg& mask)
 {
     Reg::RegTensor<float> tmpFloatReg, tmpFloatReg2;
+    Reg::RegTensor<int32_t> tmpINFReg, tmpNANReg;
     Reg::MaskReg cmpMask1, cmpMask2, curMask;
     /*
      * bool p3_b_eq_0 = (b==0.0f);
@@ -276,28 +330,34 @@ __simd_callee__ inline void ProcessSpecialCaseForPowF(
     Reg::MaskXor(curMask, cmpMask2, curMask, mask);
     /*
      * if (isinf(a) || (a==0.0f))
-     *     int32_t r10 = f32_to_s32(a);
-     *     int32_t r11 = r10 ^ 0x7F800000;
+     *     int32_t r10=f32_to_s32(a);
+     *     int32_t r11=r10^0x7F800000;
      *     bool p8_a_lower_0 = (b < 0.0f);
      *     int32_t r12 = (p8_a_lower_0 ? r11 : r10);
-     *     int32_t r13 = r12 & 0x7FFFFFFF;
-     *     return s32_to_f32(p1_expo_odd_int ? r12 : r13);
+     *     int32_t r13= r12 & 0x7FFFFFFF;
+     *     return s32_to_f32(p1_expo_odd_int?r12:r13);
      *
      */
-    IsInfNum(cmpMask1, baseReg, tmpR12Reg, curMask);
+    IsInfNum(cmpMask1, baseReg, curMask);
     Reg::CompareScalar<float, CMPMODE::EQ>(cmpMask2, baseReg, 0.0f, curMask);
     Reg::MaskOr(cmpMask1, cmpMask1, cmpMask2, mask);
     Reg::CompareScalar<float, CMPMODE::LT>(cmpMask2, expReg, 0.0f, cmpMask1);
-    Reg::Xor((Reg::RegTensor<int32_t>&)tmpFloatReg, (Reg::RegTensor<int32_t>&)baseReg, tmpR10Reg, curMask);
+    Reg::Duplicate((Reg::RegTensor<int32_t>&)tmpFloatReg, R10_COEFF, mask);
+    Reg::Xor(
+        (Reg::RegTensor<int32_t>&)tmpFloatReg, (Reg::RegTensor<int32_t>&)baseReg, (Reg::RegTensor<int32_t>&)tmpFloatReg,
+        curMask);
     Reg::Select(tmpFloatReg, tmpFloatReg, baseReg, cmpMask2);
-    Reg::And((Reg::RegTensor<int32_t>&)tmpFloatReg2, (Reg::RegTensor<int32_t>&)tmpFloatReg, tmpR12Reg, curMask);
-    ComputeExpoOddInt(cmpMask2, expReg, twoReg, mask);
+    Reg::Duplicate((Reg::RegTensor<int32_t>&)tmpFloatReg2, R12_COEFF, mask);
+    Reg::And(
+        (Reg::RegTensor<int32_t>&)tmpFloatReg2, (Reg::RegTensor<int32_t>&)tmpFloatReg,
+        (Reg::RegTensor<int32_t>&)tmpFloatReg2, curMask);
+    ComputeExpoOddInt(cmpMask2, expReg, mask);
     Reg::Select(tmpFloatReg, tmpFloatReg, tmpFloatReg2, cmpMask2);
     Reg::Select(dstReg, tmpFloatReg, dstReg, cmpMask1);
     Reg::MaskXor(curMask, cmpMask1, curMask, mask);
     /*
      * if (a < 0.0f)
-     *    float tmp_r = p1_expo_odd_int ? (-r) : r;
+     *    float tmp_r=p1_expo_odd_int?(-r):r;
      *     r = (b != floorf(b)) ? NAN : tmp_r;
      *
      */
@@ -324,30 +384,30 @@ __simd_callee__ inline void GetExpCore(
     Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& tmpLHIReg, Reg::RegTensor<float>& tmpLLOReg,
     Reg::RegTensor<float>& expReg, Reg::MaskReg& mask)
 {
-    Reg::RegTensor<float> tmPHIReg, tmPLOReg, tmpRReg;
+    Reg::RegTensor<float> tmpTHIReg, tmPHIReg, tmPLOReg, tmpRReg;
     // step 1: thi = lhi * b;
-    Reg::Mul(tmPHIReg, tmpLHIReg, expReg, mask);
-    // step 2: plo = fmaf(lhi, b, -phi) + llo*b;
+    Reg::Mul(tmpTHIReg, tmpLHIReg, expReg, mask);
+    // step 2: phi = roundf(thi);
+    Reg::Truncate<float, RoundMode::CAST_ROUND>(tmPHIReg, tmpTHIReg, mask);
+    // step 3: plo = fmaf(lhi, b, -phi)+llo*b;
     Reg::RegTensor<float> tmpFloatReg, tmpFloatReg2;
     Reg::Neg(tmPLOReg, tmPHIReg, mask);
     Reg::MulAddDst(tmPLOReg, tmpLHIReg, expReg, mask);
     Reg::MulAddDst(tmPLOReg, tmpLLOReg, expReg, mask);
-    // step 3: r = exp(phi)
-    Reg::Exp(tmpRReg, tmPHIReg, mask);
-    // step 4: r = plo*r + r
-    Reg::MulAddDst(tmpRReg, tmPLOReg, tmpRReg, mask);
+    // step 4: my_expf__improved(phi, plo, &r);
+    GetExpfUnchecked(tmpRReg, tmPHIReg, tmPLOReg, mask);
     /*
      * step 5:
-     * tmp_r =(phi < 0.0f) ?0.0f : MY_INF_F;
-     * r = (phi > EXP_MIN_F or phi < EXP_OVFL_UNFL_F) ? tmp_r : r;
+     * tmp_r =(thi < 0.0f) ?0.0f : MY_INF_F;
+     * r = (fabsf(thi) > EXP_OVFL_UNFL_F) ? tmp_r : r;
      */
+    Reg::RegTensor<int32_t> tmpINFReg;
     Reg::MaskReg cmpMask1, cmpMask2;
-    Reg::CompareScalar<float, CMPMODE::GE>(cmpMask1, tmPHIReg, 0.0f, mask);
+    Reg::CompareScalar<float, CMPMODE::GE>(cmpMask1, tmpTHIReg, 0.0f, mask);
     // mode zeroing dup inf/zero reg.
     Reg::Duplicate((Reg::RegTensor<int32_t>&)tmpFloatReg, INF, cmpMask1);
-    Reg::CompareScalar<float, CMPMODE::GE>(cmpMask2, tmPHIReg, EXP_MIN_F, mask);
-    Reg::CompareScalar<float, CMPMODE::LT>(cmpMask1, tmPHIReg, EXP_OVFL_UNFL_F, mask);
-    Reg::MaskOr(cmpMask2, cmpMask1, cmpMask2, mask);
+    Reg::Abs(tmpFloatReg2, tmpTHIReg, mask);
+    Reg::CompareScalar<float, CMPMODE::GT>(cmpMask2, tmpFloatReg2, EXP_OVFL_UNFL_F, mask);
     Reg::Select(dstReg, tmpFloatReg, tmpRReg, cmpMask2);
 }
 
@@ -394,105 +454,42 @@ __simd_callee__ inline void StoreDstData(
 }
 
 template <typename T>
-__simd_vf__ inline void ComputePowFBaseLogStepOneImpl(
-    __ubuf__ float* tmpLHIBuffer, __ubuf__ float* tmpLLOBuffer, __ubuf__ float* tmpLogBuffer, __ubuf__ T* src0,
-    uint32_t calCount, uint16_t repeatTime)
+__simd_vf__ inline void ComputePowFBaseLogImpl(
+    __ubuf__ float* tmpLHIBuffer, __ubuf__ float* tmpLLOBuffer, __ubuf__ T* src0, uint32_t calCount,
+    uint16_t repeatTime)
 {
     Reg::MaskReg mask;
     Reg::RegTensor<float> tmpBaseReg, tmpDstReg;
-    Reg::RegTensor<float> tmpLHIReg, tmpLLOReg, tmpRReg;
-
-    PowerLogParams params;
-    PowerLogParamsInit(params);
+    Reg::RegTensor<float> tmpLHIReg, tmpLLOReg;
 
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = Reg::UpdateMask<float>(calCount);
         LoadSrcData(tmpBaseReg, src0, i, mask);
 
         Reg::Abs(tmpDstReg, tmpBaseReg, mask);
-        GetLogFExtStepOne(tmpLHIReg, tmpLLOReg, tmpRReg, tmpDstReg, params, mask);
+        GetLogFExt(tmpLHIReg, tmpLLOReg, tmpDstReg, mask);
 
-        Reg::StoreAlign(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
-        Reg::StoreAlign(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
-        Reg::StoreAlign(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
+        Reg::DataCopy(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
+        Reg::DataCopy(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
     }
 }
 
 template <typename T>
-__simd_vf__ inline void ComputePowFBaseLogStepOneImpl(
-    __ubuf__ float* tmpLHIBuffer, __ubuf__ float* tmpLLOBuffer, __ubuf__ float* tmpLogBuffer, const T scalarValue,
-    uint32_t calCount, uint16_t repeatTime)
+__simd_vf__ inline void ComputePowFBaseLogImpl(
+    __ubuf__ float* tmpLHIBuffer, __ubuf__ float* tmpLLOBuffer, const T scalarValue, uint32_t calCount,
+    uint16_t repeatTime)
 {
     Reg::MaskReg mask;
     Reg::RegTensor<float> tmpBaseReg, tmpDstReg;
-    Reg::RegTensor<float> tmpLHIReg, tmpLLOReg, tmpRReg;
+    Reg::RegTensor<float> tmpLHIReg, tmpLLOReg;
     LoadSrcScalarData(tmpBaseReg, scalarValue);
 
-    PowerLogParams params;
-    PowerLogParamsInit(params);
-
-    Reg::MaskReg fullMask = Reg::CreateMask<float, Reg::MaskPattern::ALL>();
-    Reg::Abs(tmpDstReg, tmpBaseReg, fullMask);
-    GetLogFExtStepOne(tmpLHIReg, tmpLLOReg, tmpRReg, tmpDstReg, params, fullMask);
-
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = Reg::UpdateMask<float>(calCount);
-        Reg::StoreAlign(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
-        Reg::StoreAlign(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
-        Reg::StoreAlign(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
-    }
-}
-
-template <typename T>
-__simd_vf__ inline void ComputePowFBaseLogStepTwoImpl(
-    __ubuf__ float* tmpLHIBuffer, __ubuf__ float* tmpLLOBuffer, __ubuf__ float* tmpLogBuffer, __ubuf__ T* src0,
-    uint32_t calCount, uint16_t repeatTime)
-{
-    Reg::MaskReg mask;
-    Reg::RegTensor<float> tmpLHIReg, tmpLLOReg;
-    Reg::RegTensor<float> tmpIReg, tmpMReg, tmpRReg;
-
-    PowerLogParams params;
-    PowerLogParamsInit(params);
-
-    for (uint16_t i = 0; i < repeatTime; i++) {
-        mask = Reg::UpdateMask<float>(calCount);
-        LoadSrcData(tmpIReg, tmpLHIBuffer, i, mask);
-        LoadSrcData(tmpMReg, tmpLLOBuffer, i, mask);
-        LoadSrcData(tmpRReg, tmpLogBuffer, i, mask);
-
-        GetLogFExtStepTwo(tmpLHIReg, tmpLLOReg, tmpIReg, tmpMReg, tmpRReg, params, mask);
-
-        Reg::StoreAlign(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
-        Reg::StoreAlign(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
-        Reg::StoreAlign(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
-    }
-}
-
-template <typename T>
-__simd_vf__ inline void ComputePowFBaseLogStepTwoImpl(
-    __ubuf__ float* tmpLHIBuffer, __ubuf__ float* tmpLLOBuffer, __ubuf__ float* tmpLogBuffer, const T scalarValue,
-    uint32_t calCount, uint16_t repeatTime)
-{
-    Reg::MaskReg mask;
-    Reg::RegTensor<float> tmpLHIReg, tmpLLOReg;
-    Reg::RegTensor<float> tmpIReg, tmpMReg, tmpRReg;
-
-    PowerLogParams params;
-    PowerLogParamsInit(params);
-
-    Reg::MaskReg fullMask = Reg::CreateMask<float, Reg::MaskPattern::ALL>();
-    LoadSrcData(tmpIReg, tmpLHIBuffer, 0, fullMask);
-    LoadSrcData(tmpMReg, tmpLLOBuffer, 0, fullMask);
-    LoadSrcData(tmpRReg, tmpLogBuffer, 0, fullMask);
-
-    GetLogFExtStepTwo(tmpLHIReg, tmpLLOReg, tmpIReg, tmpMReg, tmpRReg, params, fullMask);
-
-    for (uint16_t i = 0; i < repeatTime; i++) {
-        mask = Reg::UpdateMask<float>(calCount);
-        Reg::StoreAlign(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
-        Reg::StoreAlign(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
-        Reg::StoreAlign(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
+        Reg::Abs(tmpDstReg, tmpBaseReg, mask);
+        GetLogFExt(tmpLHIReg, tmpLLOReg, tmpDstReg, mask);
+        Reg::DataCopy(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
+        Reg::DataCopy(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
     }
 }
 
@@ -522,7 +519,6 @@ __simd_vf__ inline void ComputePowFExpImpl(
     Reg::MaskReg mask;
     Reg::RegTensor<float> tmpLHIReg, tmpLLOReg, tmpExpReg, tmpDstReg;
     LoadSrcScalarData(tmpExpReg, scalarValue);
-
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = Reg::UpdateMask<float>(calCount);
         LoadSrcData(tmpLHIReg, tmpLogHighBuffer, i, mask);
@@ -538,17 +534,14 @@ __simd_vf__ inline void ComputePowFSpecialCaseImpl(
     uint16_t repeatTime)
 {
     Reg::MaskReg mask;
-    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
-    Reg::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
-    Reg::Duplicate(tmpR10Reg, R10_COEFF);
-    Reg::Duplicate(tmpR12Reg, R12_COEFF);
-    Reg::Duplicate(twoReg, -2.0f);
+    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
+
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = Reg::UpdateMask<float>(calCount);
         LoadSrcData(tmpBaseReg, src0, i, mask);
         LoadSrcData(tmpExpReg, src1, i, mask);
         Reg::LoadAlign(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, mask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, mask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -559,17 +552,13 @@ __simd_vf__ inline void ComputePowFSpecialCaseImpl(
     uint16_t repeatTime)
 {
     Reg::MaskReg mask;
-    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
-    Reg::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
-    Reg::Duplicate(tmpR10Reg, R10_COEFF);
-    Reg::Duplicate(tmpR12Reg, R12_COEFF);
-    Reg::Duplicate(twoReg, -2.0f);
+    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
     LoadSrcScalarData(tmpExpReg, scalarValue);
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = Reg::UpdateMask<float>(calCount);
         LoadSrcData(tmpBaseReg, src0, i, mask);
         Reg::LoadAlign(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, mask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, mask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -580,28 +569,23 @@ __simd_vf__ inline void ComputePowFSpecialCaseImpl(
     uint16_t repeatTime)
 {
     Reg::MaskReg mask;
-    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
-    Reg::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
-    Reg::Duplicate(tmpR10Reg, R10_COEFF);
-    Reg::Duplicate(tmpR12Reg, R12_COEFF);
-    Reg::Duplicate(twoReg, -2.0f);
+    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
     LoadSrcScalarData(tmpBaseReg, scalarValue);
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = Reg::UpdateMask<float>(calCount);
         LoadSrcData(tmpExpReg, src1, i, mask);
         Reg::LoadAlign(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, mask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, mask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
 
 __aicore__ inline void InitTmpBuffer(
-    __ubuf__ uint32_t*& tmpBuffer, __ubuf__ float*& tmpHighBuffer, __ubuf__ float*& tmpLowBuffer,
-    __ubuf__ float*& tmpLogBuffer, const uint32_t alignCount)
+    __ubuf__ uint32_t*& tmpBuffer, __ubuf__ float*& tmpLogBuffer, __ubuf__ float*& tmpExpBuffer,
+    const uint32_t alignCount)
 {
-    tmpHighBuffer = (__ubuf__ float*)tmpBuffer;
-    tmpLowBuffer = (__ubuf__ float*)((__ubuf__ uint8_t*)tmpHighBuffer + sizeof(float) * alignCount);
-    tmpLogBuffer = (__ubuf__ float*)((__ubuf__ uint8_t*)tmpLowBuffer + sizeof(float) * alignCount);
+    tmpLogBuffer = (__ubuf__ float*)tmpBuffer;
+    tmpExpBuffer = (__ubuf__ float*)((__ubuf__ uint8_t*)tmpLogBuffer + sizeof(float) * alignCount);
 }
 
 template <typename T>
@@ -612,15 +596,13 @@ __aicore__ inline void PowFComputeImpl(
     uint16_t repeatTime = DivCeil(calCount, eleCountPerVL);
     __ubuf__ float* tmpLowBuffer;
     __ubuf__ float* tmpHighBuffer;
-    __ubuf__ float* tmpLogBuffer;
 
     uint32_t alignCount = (calCount + 31) / 32 * 32;
 
-    InitTmpBuffer(tmpBuffer, tmpHighBuffer, tmpLowBuffer, tmpLogBuffer, alignCount);
+    InitTmpBuffer(tmpBuffer, tmpHighBuffer, tmpLowBuffer, alignCount);
     __ubuf__ float* tmpExpBuffer = tmpHighBuffer;
 
-    ComputePowFBaseLogStepOneImpl<T>(tmpHighBuffer, tmpLowBuffer, tmpLogBuffer, src0, calCount, repeatTime);
-    ComputePowFBaseLogStepTwoImpl<T>(tmpHighBuffer, tmpLowBuffer, tmpLogBuffer, src0, calCount, repeatTime);
+    ComputePowFBaseLogImpl<T>(tmpHighBuffer, tmpLowBuffer, src0, calCount, repeatTime);
     ComputePowFExpImpl<T>(tmpExpBuffer, tmpHighBuffer, tmpLowBuffer, src1, calCount, repeatTime);
     ComputePowFSpecialCaseImpl<T>(dst, src0, src1, tmpExpBuffer, calCount, repeatTime);
 }
@@ -633,15 +615,14 @@ __aicore__ inline void PowFComputeImpl(
     uint16_t repeatTime = DivCeil(calCount, eleCountPerVL);
     __ubuf__ float* tmpLowBuffer;
     __ubuf__ float* tmpHighBuffer;
-    __ubuf__ float* tmpLogBuffer;
 
     uint32_t alignCount = (calCount + 31) / 32 * 32;
 
-    InitTmpBuffer(tmpBuffer, tmpHighBuffer, tmpLowBuffer, tmpLogBuffer, alignCount);
+    InitTmpBuffer(tmpBuffer, tmpHighBuffer, tmpLowBuffer, alignCount);
+
     __ubuf__ float* tmpExpBuffer = tmpHighBuffer;
 
-    ComputePowFBaseLogStepOneImpl<T>(tmpHighBuffer, tmpLowBuffer, tmpLogBuffer, src0, calCount, repeatTime);
-    ComputePowFBaseLogStepTwoImpl<T>(tmpHighBuffer, tmpLowBuffer, tmpLogBuffer, src0, calCount, repeatTime);
+    ComputePowFBaseLogImpl<T>(tmpHighBuffer, tmpLowBuffer, src0, calCount, repeatTime);
     ComputePowFExpImpl<T>(tmpExpBuffer, tmpHighBuffer, tmpLowBuffer, scalarValue, calCount, repeatTime);
     ComputePowFSpecialCaseImpl<T>(dst, src0, scalarValue, tmpExpBuffer, calCount, repeatTime);
 }
@@ -654,15 +635,13 @@ __aicore__ inline void PowFComputeImpl(
     uint16_t repeatTime = DivCeil(calCount, eleCountPerVL);
     __ubuf__ float* tmpLowBuffer;
     __ubuf__ float* tmpHighBuffer;
-    __ubuf__ float* tmpLogBuffer;
 
     uint32_t alignCount = (calCount + 31) / 32 * 32;
 
-    InitTmpBuffer(tmpBuffer, tmpHighBuffer, tmpLowBuffer, tmpLogBuffer, alignCount);
+    InitTmpBuffer(tmpBuffer, tmpHighBuffer, tmpLowBuffer, alignCount);
     __ubuf__ float* tmpExpBuffer = tmpHighBuffer;
 
-    ComputePowFBaseLogStepOneImpl<T>(tmpHighBuffer, tmpLowBuffer, tmpLogBuffer, scalarValue, calCount, repeatTime);
-    ComputePowFBaseLogStepTwoImpl<T>(tmpHighBuffer, tmpLowBuffer, tmpLogBuffer, scalarValue, calCount, repeatTime);
+    ComputePowFBaseLogImpl<T>(tmpHighBuffer, tmpLowBuffer, scalarValue, calCount, repeatTime);
     ComputePowFExpImpl<T>(tmpExpBuffer, tmpHighBuffer, tmpLowBuffer, src1, calCount, repeatTime);
     ComputePowFSpecialCaseImpl<T>(dst, scalarValue, src1, tmpExpBuffer, calCount, repeatTime);
 }
@@ -684,18 +663,15 @@ __simd_vf__ inline void PowFIntrinsicTensorTensorImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, uint32_t calCount, uint16_t repeatTime)
 {
     Reg::MaskReg mask, tmpMask;
-    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
-    Reg::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
-    Reg::Duplicate(tmpR10Reg, R10_COEFF);
-    Reg::Duplicate(tmpR12Reg, R12_COEFF);
-    Reg::Duplicate(twoReg, -2.0f);
+    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
+
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = Reg::UpdateMask<float>(calCount);
         tmpMask = mask;
         LoadSrcData(tmpBaseReg, src0, i, mask);
         LoadSrcData(tmpExpReg, src1, i, mask);
         GetPowFIntrinsicCore(castDstReg, tmpBaseReg, tmpExpReg, mask);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, tmpMask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpMask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -705,18 +681,15 @@ __simd_vf__ inline void PowFIntrinsicTensorScalarImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, const T scalarValue, uint32_t calCount, uint16_t repeatTime)
 {
     Reg::MaskReg mask, tmpMask;
-    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
-    Reg::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
-    Reg::Duplicate(tmpR10Reg, R10_COEFF);
-    Reg::Duplicate(tmpR12Reg, R12_COEFF);
-    Reg::Duplicate(twoReg, -2.0f);
+    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
     LoadSrcScalarData(tmpExpReg, scalarValue);
+
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = Reg::UpdateMask<float>(calCount);
         tmpMask = mask;
         LoadSrcData(tmpBaseReg, src0, i, mask);
         GetPowFIntrinsicCore(castDstReg, tmpBaseReg, tmpExpReg, mask);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, tmpMask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpMask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -726,18 +699,15 @@ __simd_vf__ inline void PowFIntrinsicScalarTensorImpl(
     __ubuf__ T* dst, const T scalarValue, __ubuf__ T* src1, uint32_t calCount, uint16_t repeatTime)
 {
     Reg::MaskReg mask, tmpMask;
-    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
-    Reg::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
-    Reg::Duplicate(tmpR10Reg, R10_COEFF);
-    Reg::Duplicate(tmpR12Reg, R12_COEFF);
-    Reg::Duplicate(twoReg, -2.0f);
+    Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
     LoadSrcScalarData(tmpBaseReg, scalarValue);
+
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = Reg::UpdateMask<float>(calCount);
         tmpMask = mask;
         LoadSrcData(tmpExpReg, src1, i, mask);
         GetPowFIntrinsicCore(castDstReg, tmpBaseReg, tmpExpReg, mask);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, tmpMask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpMask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -785,9 +755,9 @@ __simd_callee__ inline void GetPowI(
     // step 3: result = select(mask, result1, result);
     Reg::CompareScalar<T, CMPMODE::EQ>(expMask, tmpReg2, 1, mask);
     Reg::Select(dstReg, tmpReg, dstReg, expMask);
-    // step 4: b /= 2;
+    // step4: b /= 2;
     Reg::ShiftRights(expReg, expReg, SHIFT_ONE_BIT, mask);
-    // step 5: a *= a;
+    // step5: a *= a;
     Reg::Mul(baseReg, baseReg, baseReg, mask);
 }
 
@@ -1159,9 +1129,9 @@ __aicore__ inline void PowerCommonImpl(
         return;
     }
     PowCheckType<T, config>();
-    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN/VECOUT/VECCALC", "Power");
-    CheckTensorPos<T>(src1Tensor, Hardware::UB, "src1Tensor", "VECIN/VECOUT/VECCALC", "Power");
-    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN/VECOUT/VECCALC", "Power");
+    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN / VECOUT / VECCALC", "Power");
+    CheckTensorPos<T>(src1Tensor, Hardware::UB, "src1Tensor", "VECIN / VECOUT / VECCALC", "Power");
+    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN / VECOUT / VECCALC", "Power");
     CheckCalCount(calCount, "calCount", src1Tensor, "src1Tensor", "Power");
     CheckCalCount(calCount, "calCount", dstTensor, "dstTensor", "Power");
 
@@ -1177,9 +1147,9 @@ __aicore__ inline void PowerCommonImpl(
         return;
     }
     PowCheckType<T, config>();
-    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN/VECOUT/VECCALC", "Power");
-    CheckTensorPos<T>(src0Tensor, Hardware::UB, "src0Tensor", "VECIN/VECOUT/VECCALC", "Power");
-    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN/VECOUT/VECCALC", "Power");
+    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN / VECOUT / VECCALC", "Power");
+    CheckTensorPos<T>(src0Tensor, Hardware::UB, "src0Tensor", "VECIN / VECOUT / VECCALC", "Power");
+    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN / VECOUT / VECCALC", "Power");
     CheckCalCount(calCount, "calCount", src0Tensor, "src0Tensor", "Power");
     CheckCalCount(calCount, "calCount", dstTensor, "dstTensor", "Power");
 
@@ -1195,10 +1165,10 @@ __aicore__ inline void PowerCommonImpl(
         return;
     }
     PowCheckType<T, config>();
-    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN/VECOUT/VECCALC", "Power");
-    CheckTensorPos<T>(src0Tensor, Hardware::UB, "src0Tensor", "VECIN/VECOUT/VECCALC", "Power");
-    CheckTensorPos<T>(src1Tensor, Hardware::UB, "src1Tensor", "VECIN/VECOUT/VECCALC", "Power");
-    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN/VECOUT/VECCALC", "Power");
+    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN / VECOUT / VECCALC", "Power");
+    CheckTensorPos<T>(src0Tensor, Hardware::UB, "src0Tensor", "VECIN / VECOUT / VECCALC", "Power");
+    CheckTensorPos<T>(src1Tensor, Hardware::UB, "src1Tensor", "VECIN / VECOUT / VECCALC", "Power");
+    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN / VECOUT / VECCALC", "Power");
     CheckCalCount(calCount, "calCount", src0Tensor, "src0Tensor", "Power");
     CheckCalCount(calCount, "calCount", src1Tensor, "src1Tensor", "Power");
     CheckCalCount(calCount, "calCount", dstTensor, "dstTensor", "Power");
