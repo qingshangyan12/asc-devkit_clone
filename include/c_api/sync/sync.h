@@ -68,7 +68,7 @@ __aicore__ inline void asc_sync();
 
 #define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
 
-__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode = ASC_LOCK_BLOCK)
+__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode = ASC_LOCK_BLOCK);
 
 #define asc_unlock(pipe, mutex_id, ...) asc_unlock_impl((pipe), (mutex_id), (ASC_LOCK_BLOCK, ##__VA_ARGS__))
 
