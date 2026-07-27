@@ -12,7 +12,7 @@ on:
 env:
   org_name: "cann"
   MERGE_ID: ${{atomgit.event.pull_request.number}}
-  obs_path: "test/asc-devkit/package/${{ env.MERGE_ID }}"
+  obs_path: "${{ vars.OBS_PATH }}/${{ env.MERGE_ID }}"
   obs_smoke_path: "${{ env.obs_path }}/presmoke/2"
   repo_name: "asc-devkit"
   TARGET_BRANCH: ${{atomgit.ref_name}}
@@ -310,7 +310,7 @@ stages:
                 ${{ steps.process_checkout.outputs.path }}/ut_cov_*.tar.gz
               object-prefix: ${{ env.obs_path }}/
         if: "${{ default() }}"
-        runs-on: [dedicate-hosted, x64, xlarge]
+        runs-on: [dedicate-hosted, x64, large]
         container:
           image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ jobs.JOB_image.outputs.UT_Test }}
   stage5:
@@ -402,3 +402,22 @@ stages:
     pre:
     - type: auto
     fail-fast: true
+
+post:
+  jobs:
+    job_post:
+      name: Test_finish
+      steps:
+        -
+          name: query_pipeline
+          uses: cann/.gitcode/actions/query-pipeline@master
+          with:
+            owner: ${{ env.org_name }}
+            repo: ${{ env.repo_name }}
+            run_id: ${{atomgit. workflow_run_id}}
+            token: ${{ secrets.GIT_TOKEN }}
+            pr_number: ${{ env.MERGE_ID }}
+            apply_label: ${{ vars.APPLY_LABEL }}
+      runs-on: [dedicate-hosted, x64, small]
+      container:
+        image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ jobs.JOB_image.outputs.codecheck }}
