@@ -34,7 +34,6 @@ enum class ServerExecResourceType { LEGACY, NEXT_AICPU };
 
 struct OpenDfxContext {
     HcclDfxOpInfo opInfoTemplate{};
-    CollCommAicpu* collCommAicpu{nullptr};
     bool initialized{false};
     mutable bool enableLogged{false};
 };

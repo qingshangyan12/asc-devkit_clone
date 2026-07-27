@@ -21,6 +21,25 @@ DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportDeviceOp, const char* groupname
 DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportKernelStartTask, uint64_t thread, const char* groupname);
 DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportKernelEndTask, uint64_t thread, const char* groupname);
 
+using HcclDfxRegOpInfoByCommIdFunc = HcclResult (*)(char*, void*);
+
+static bool g_HcclDfxRegOpInfoByCommIdSupported = false;
+static HcclDfxRegOpInfoByCommIdFunc g_HcclDfxRegOpInfoByCommId = nullptr;
+
+extern "C" bool HcommIsSupportHcclDfxRegOpInfoByCommId(void)
+{
+    return g_HcclDfxRegOpInfoByCommIdSupported;
+}
+
+extern "C" HcclResult HcclHcommDfxRegOpInfoByCommId(char* commId, void* hcclDfxOpInfo)
+{
+    if (g_HcclDfxRegOpInfoByCommId == nullptr) {
+        HCCL_ERROR("[HcclWrapper] HcclDfxRegOpInfoByCommId not supported");
+        return HCCL_E_NOT_SUPPORT;
+    }
+    return g_HcclDfxRegOpInfoByCommId(commId, hcclDfxOpInfo);
+}
+
 // 初始化
 void HcommDeviceProfilingDlInit(void* libHcommHandle)
 {
@@ -32,4 +51,19 @@ void HcommDeviceProfilingDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcommProfilingReportDeviceOp);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommProfilingReportKernelStartTask);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommProfilingReportKernelEndTask);
+
+    dlerror();
+    g_HcclDfxRegOpInfoByCommId =
+        reinterpret_cast<HcclDfxRegOpInfoByCommIdFunc>(dlsym(libHcommHandle, "HcclDfxRegOpInfoByCommId"));
+    const char* dfxRegError = dlerror();
+    g_HcclDfxRegOpInfoByCommIdSupported =
+        (g_HcclDfxRegOpInfoByCommId != nullptr && dfxRegError == nullptr);
+    if (!g_HcclDfxRegOpInfoByCommIdSupported) {
+        g_HcclDfxRegOpInfoByCommId = nullptr;
+    }
+    HCCL_DEBUG(
+        "[MC2_DFX_REPORT][RuntimeSupport] HcclDfxRegOpInfoByCommId supported[%d], func[%p], error[%s].",
+        static_cast<int>(g_HcclDfxRegOpInfoByCommIdSupported),
+        reinterpret_cast<void*>(g_HcclDfxRegOpInfoByCommId),
+        dfxRegError == nullptr ? "none" : dfxRegError);
 }
