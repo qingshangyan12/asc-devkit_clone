@@ -28,6 +28,11 @@
 namespace AscendC {
 namespace Te {
 
+/**
+ * @brief Construct a tensor from a hardware memory iterator and layout information.
+ * @param iter : Hardware memory iterator used as the tensor data source.
+ * @param args : A layout, or a shape and stride, used to describe the tensor.
+ */
 template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args);
 

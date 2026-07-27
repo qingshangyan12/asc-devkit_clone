@@ -24,9 +24,24 @@
 namespace AscendC {
 namespace Te {
 
+/**
+ * @brief Copy operation that transfers data from Global Memory to Unified Buffer.
+ */
 struct CopyGM2UB;
+
+/**
+ * @brief Copy operation that transfers data from Unified Buffer to L1 Buffer.
+ */
 struct CopyUB2L1;
+
+/**
+ * @brief Copy operation that transfers data from Unified Buffer to Global Memory.
+ */
 struct CopyUB2GM;
+
+/**
+ * @brief Copy operation that transfers data within Unified Buffer.
+ */
 struct CopyUB2UB;
 
 } // namespace Te
