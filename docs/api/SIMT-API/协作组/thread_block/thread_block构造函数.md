@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```c++
+```cpp
 thread_block this_thread_block()
 ```
 

@@ -16,11 +16,11 @@
 
 ## 函数原型
 
-```
+```cpp
 inline uint32_t asc_atomic_inc(uint32_t *address, uint32_t val)
 ```
 
-```
+```cpp
 inline uint64_t asc_atomic_inc(uint64_t *address, uint64_t val)
 ```
 
@@ -54,7 +54,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 使用该接口需要包含"simt\_api/device\_atomic\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_atomic_functions.h"
 ```
 

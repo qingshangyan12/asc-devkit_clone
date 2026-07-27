@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```c++
+```cpp
 void sync() const
 ```
 
@@ -36,7 +36,7 @@ void sync() const
 
 - SIMT编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
@@ -51,7 +51,7 @@ void sync() const
 
 - SIMD与SIMT混合编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
