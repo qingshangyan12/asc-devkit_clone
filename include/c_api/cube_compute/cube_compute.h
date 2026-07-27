@@ -320,6 +320,8 @@ __aicore__ inline void asc_mmad_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val);
 
+__aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mode);
+
 __aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
 
 __aicore__ inline void asc_enable_hf32();
