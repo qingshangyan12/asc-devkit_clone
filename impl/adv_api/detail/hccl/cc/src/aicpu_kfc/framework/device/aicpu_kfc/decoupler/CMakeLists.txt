@@ -121,8 +121,11 @@ if(TARGET mc2_server)
     target_include_directories(mc2_server_decoupler PRIVATE
         ${HCCL_HCOMM_HEADER_DIR}/../
         ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+        ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
+        ${HCCL_BASE_DIR}/framework/common/src/config
+        ${HCCL_BASE_DIR}/framework/device/inc
 
         ${MC2_SERVER_CCL_INCLUDE_LIST}
         ${MC2_SERVER_ORION_HEAD_LIST}

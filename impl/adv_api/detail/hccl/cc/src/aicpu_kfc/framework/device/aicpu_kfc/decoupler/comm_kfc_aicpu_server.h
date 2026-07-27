@@ -21,6 +21,7 @@
 #include "open_res_ctx_cache.h"
 #include "dispatcher.h"
 #include "hcomm_primitives.h"
+#include "hccl/hccl_diag.h"
 
 namespace hccl {
 class HcclCommAicpu;
@@ -30,6 +31,12 @@ class CollCommAicpuMgr;
 class CollCommAicpu;
 
 enum class ServerExecResourceType { LEGACY, NEXT_AICPU };
+
+struct OpenDfxContext {
+    HcclDfxOpInfo opInfoTemplate{};
+    bool initialized{false};
+    mutable bool enableLogged{false};
+};
 
 struct ServerExecCtx {
     u64 offset;
@@ -44,6 +51,7 @@ struct ServerExecCtx {
     CollCommAicpu* collCommAicpu{nullptr};
     ThreadHandle mainThread{0};
     mc2_open::OpenResCtxHolder resCtxHolder{};
+    OpenDfxContext dfxContext{};
 };
 
 struct ServerProgress {
@@ -86,6 +94,9 @@ private:
     static constexpr u64 KFC_NSEC_PER_SEC = 1000000000UL;
 #endif
     HcclResult GetServerInfoForSync(HcclHandle handle, u32& msgPos, u32& repeat) const;
+    HcclResult InitOpenDfxContext(ServerExecCtx& execCtx);
+    HcclResult RegisterCurrentDfxOpInfo(const ServerExecCtx& execCtx, const std::vector<uint8_t>& opParam) const;
+    HcclResult ReportCurrentDfxOp(const ServerExecCtx& execCtx) const;
     void DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const;
     void UpdateProgress(
         const char* stage, u32 msgPos, u32 repeatIdx, u32 turnIdx, u64 opParamKey, u64 waitAddr, u64 recordAddr);
