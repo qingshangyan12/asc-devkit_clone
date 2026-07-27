@@ -46,6 +46,30 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::L1>, "When Copy tensor from L0C to L1, dst tensor must on L1");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to L1, src tensor must on L0C");
+        TENSOR_API_DEBUG_ASSERT(
+                (reinterpret_cast<uintptr_t>(src.Data().Get()) % sizeof(typename U::elementType) == 0),
+                TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src address in CopyL0C2L1, src address must be aligned to the src element size; "
+                "current address is %llu and src element size is %u.",
+                static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(src.Data().Get())),
+                static_cast<unsigned int>(sizeof(typename U::elementType))));
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 32 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL0C2L1, dst L1 address must be 32-byte aligned; current address is "
+            "%llu.", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(dst.Data().Get()))));
+
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyL0C2L1"));
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
@@ -62,6 +86,30 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::L1>, "When Copy tensor from L0C to L1, dst tensor must on L1");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to L1, src tensor must on L0C");
+        TENSOR_API_DEBUG_ASSERT(
+            (reinterpret_cast<uintptr_t>(src.Data().Get()) % sizeof(typename U::elementType) == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyL0C2L1, src address must be aligned to the src element size; current "
+            "address is %llu and src element size is %u.",
+            static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(src.Data().Get())),
+            static_cast<unsigned int>(sizeof(typename U::elementType))));
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 32 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL0C2L1, dst L1 address must be 32-byte aligned; current address is "
+            "%llu.", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(dst.Data().Get()))));
+
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyL0C2L1"));
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
@@ -78,6 +126,36 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::L1>, "When Copy tensor from L0C to L1, dst tensor must on L1");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to L1, src tensor must on L0C");
+        TENSOR_API_DEBUG_ASSERT(
+            (reinterpret_cast<uintptr_t>(src.Data().Get()) % sizeof(typename U::elementType) == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyL0C2L1, src address must be aligned to the src element size; current "
+            "address is %llu and src element size is %u.",
+            static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(src.Data().Get())),
+            static_cast<unsigned int>(sizeof(typename U::elementType))));
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 32 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL0C2L1, dst L1 address must be 32-byte aligned; current address is "
+            "%llu.", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(dst.Data().Get()))));
+
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(quant.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, quant.Layout(), "quant", "CopyL0C2L1"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(quant.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, quant.Layout(), "quant", "CopyL0C2L1"));
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;

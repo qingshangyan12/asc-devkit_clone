@@ -55,6 +55,26 @@ public:
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
         using SrcPattern = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(src.Data().Get()) % 32 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyL12L0A, src L1 address must be 32-byte aligned; current address is "
+            "%llu.", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(src.Data().Get()))));
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 512 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL12L0A, dst L0A address must be 512-byte aligned; current address is "
+            "%llu.", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(dst.Data().Get()))));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyL12L0A"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyL12L0A"));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyL12L0A"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyL12L0A"));
         if constexpr (Std::is_same_v<SrcPattern, NC1HWC0LayoutPtn>) {
             // Img2Col: NZ<-NC1HWC0 for conv feature maps; params drives filter/stride/pad.
             using CopyL12L0AImpl =
@@ -62,6 +82,24 @@ public:
             CopyL12L0AImpl::template Run<trait, T, U, PadT>(dst, src, params);
         } else {
             // Common load (NZ<-NZ / NZ<-ZN): params unused.
+            if constexpr (DstLayout::depth == FIVE_DIM_DATA && SrcLayout::depth == FIVE_DIM_DATA) {
+                TENSOR_API_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) == Get<0>(dst.Layout().Shape())),
+                    TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                        "Failed to check src and dst batch shape sizes in CopyL12L0A, src batch shape size must equal "
+                        "dst batch shape size; current srcBatchShape is %lld, dstBatchShape is %lld.",
+                        static_cast<long long>(Get<0>(src.Layout().Shape())),
+                        static_cast<long long>(Get<0>(dst.Layout().Shape()))));
+                TENSOR_API_DEBUG_ASSERT((Get<0>(src.Layout().Stride()) == RemoveBatchDim(src.Layout()).Capacity() &&
+                    Get<0>(dst.Layout().Stride()) == RemoveBatchDim(dst.Layout()).Capacity()),
+                    TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                        "Failed to check src and dst batch strides in CopyL12L0A, src batch stride must equal the src "
+                        "matrix capacity, and dst batch stride must equal the dst matrix capacity; current "
+                        "srcBatchStride is %lld, srcMatrixCapacity is %lld, dstBatchStride is %lld, "
+                        "dstMatrixCapacity is %lld.", static_cast<long long>(Get<0>(src.Layout().Stride())),
+                        static_cast<long long>(RemoveBatchDim(src.Layout()).Capacity()),
+                        static_cast<long long>(Get<0>(dst.Layout().Stride())),
+                        static_cast<long long>(RemoveBatchDim(dst.Layout()).Capacity())));
+            }
             constexpr auto isB8B4Type = sizeof(typename T::elementType) == 1;
             constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>;
             using CopyL12L0AMode =
