@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
@@ -46,6 +52,7 @@ __simd_callee__ inline void asc_div(vector_uint16_t& dst, vector_uint16_t src0, 
 __simd_callee__ inline void asc_div(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 __simd_callee__ inline void asc_div(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 ```
+
 ## 参数说明
 
 **表1** 参数说明
@@ -68,6 +75,8 @@ __simd_callee__ inline void asc_div(vector_uint32_t& dst, vector_uint32_t src0, 
 - mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 - 注意除零错误，结果请参考[Div特殊值/边界值输入的计算结果说明](../../../../附录/Reg矢量计算接口边界值汇总.md#table1325925915217)。
+
+- vector_int16_t、vector_uint16_t、vector_int32_t、vector_uint32_t数据类型计划于CANN 9.2.0或更高版本支持，在CANN 9.1.0以下版本中不支持。
 
 ## 调用示例
 
