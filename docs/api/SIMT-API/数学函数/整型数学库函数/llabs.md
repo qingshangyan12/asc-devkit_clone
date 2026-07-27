@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline long long int llabs(long long int x)
 ```
 
@@ -40,7 +40,7 @@ inline long long int llabs(long long int x)
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -48,7 +48,7 @@ inline long long int llabs(long long int x)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelLlabs(long long int* dst, long long int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -58,7 +58,7 @@ inline long long int llabs(long long int x)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelLlabs(__gm__ long long int* dst, __gm__ long long int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

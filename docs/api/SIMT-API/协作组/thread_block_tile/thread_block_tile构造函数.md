@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```c++
+```cpp
 template <unsigned int Size, typename ParentT>
 thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 ```
@@ -42,7 +42,7 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 
 - SIMT编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
@@ -57,7 +57,7 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 
 - SIMD与SIMT混合编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {

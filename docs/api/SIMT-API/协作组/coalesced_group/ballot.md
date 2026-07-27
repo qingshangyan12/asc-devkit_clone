@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```c++
+```cpp
 unsigned int ballot(int predicate) const
 ```
 
@@ -40,7 +40,7 @@ unsigned int ballot(int predicate) const
 
 - SIMT编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
@@ -55,7 +55,7 @@ unsigned int ballot(int predicate) const
 
 - SIMD与SIMT混合编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {

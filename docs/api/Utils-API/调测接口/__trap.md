@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline void __trap()
 ```
 
@@ -36,7 +36,7 @@ inline void __trap()
 
 使用该接口需要包含"utils/debug/asc\_assert.h"头文件。
 
-```
+```cpp
 #include "utils/debug/asc_assert.h"
 ```
 
@@ -44,7 +44,7 @@ inline void __trap()
 
 -   SIMT编程场景：
 
-    ```c++
+    ```cpp
     __global__ __launch_bounds__(1024) inline void SimtKernel(float* dst, float* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -57,7 +57,7 @@ inline void __trap()
 
 -   SIMD与SIMT混合编程场景：
 
-    ```c++
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void SimtKernel(__gm__ float* dst, __gm__ float* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
