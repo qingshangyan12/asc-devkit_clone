@@ -54,6 +54,18 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
+        ASCENDC_DEBUG_ASSERT((GetTotalColumnShape(srcLayout) >= 1 && GetTotalColumnShape(srcLayout) <= 4095),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src column shape size in CopyUB2L1 DN path, src column shape size must be in range "
+                "[1, 4095]."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) >=
+            GetTotalRowShape(srcLayout)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src column stride in CopyUB2L1 DN path, src column stride must be no less than the "
+                "src row shape size."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) >=
+            GetTotalRowShape(srcLayout)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst column stride in CopyUB2L1 DN path, dst column stride must be no less than the "
+                "src row shape size."));
         uint16_t blockCount = GetTotalColumnShape(srcLayout);
         uint32_t blockLen = Std::ceil_division(GetTotalRowShape(srcLayout), C0_ELEMENT<SrcType>);
         int64_t srcStride = Std::ceil_division(

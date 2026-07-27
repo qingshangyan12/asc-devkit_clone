@@ -45,6 +45,20 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((!isChannelSplit || (Std::is_same_v<T, float> && Std::is_same_v<U, float>)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check enableChannelSplit in CopyL0C2L1 instruction, both dst and src data types must be "
+                "float when enableChannelSplit is enabled."));
+        ASCENDC_DEBUG_ASSERT((nSize >= 1 && nSize <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2L1 instruction, nSize must be in range [1, 4095]."));
+        ASCENDC_DEBUG_ASSERT((mSize >= 1 && mSize <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mSize in CopyL0C2L1 instruction, mSize must be in range [1, 65535]."));
+        ASCENDC_DEBUG_ASSERT((dstStride > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstStride in CopyL0C2L1 instruction, dstStride must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((srcStride <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check srcStride in CopyL0C2L1 instruction, srcStride must be no greater than 65535."));
+        ASCENDC_DEBUG_ASSERT((unitFlag == 0 || unitFlag == 2 || unitFlag == 3), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check unitFlag in CopyL0C2L1 instruction, unitFlag must be 0, 2, or 3."));
 
         asc_copy_l0c2l1(
             dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,

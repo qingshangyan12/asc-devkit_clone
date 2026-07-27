@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_TENSOR_TENSOR_IMPL_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/utils/npu_debug_check.h"
 #include "impl/tensor_api/tensor/layout_impl.h"
 #include "impl/tensor_api/tensor/engine_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
@@ -125,6 +126,20 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info)
     {
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsShapeValid(Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check source tensor shape in Slice, all source tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsLayoutStrideValid(Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check source tensor stride in Slice, all source tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the tensor format defines it and the corresponding shape size is 1."));
+        if constexpr (IsLayoutV<Info>) {
+            ASCENDC_DEBUG_ASSERT((NpuDebug::IsShapeValid(info.Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check slice shape in Slice, all slice shape sizes must be greater than 0."));
+        } else {
+            ASCENDC_DEBUG_ASSERT((NpuDebug::IsShapeValid(info)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check slice shape in Slice, all slice shape sizes must be greater than 0."));
+        }
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsCoordInShape(coord, Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord in Slice, coord must be non-negative and within the source tensor shape range."));
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);
@@ -133,6 +148,20 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const
     {
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsShapeValid(Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check source tensor shape in Slice, all source tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsLayoutStrideValid(Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check source tensor stride in Slice, all source tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the tensor format defines it and the corresponding shape size is 1."));
+        if constexpr (IsLayoutV<Info>) {
+            ASCENDC_DEBUG_ASSERT((NpuDebug::IsShapeValid(info.Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check slice shape in Slice, all slice shape sizes must be greater than 0."));
+        } else {
+            ASCENDC_DEBUG_ASSERT((NpuDebug::IsShapeValid(info)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check slice shape in Slice, all slice shape sizes must be greater than 0."));
+        }
+        ASCENDC_DEBUG_ASSERT((NpuDebug::IsCoordInShape(coord, Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check coord in Slice, coord must be non-negative and within the source tensor shape range."));
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);
