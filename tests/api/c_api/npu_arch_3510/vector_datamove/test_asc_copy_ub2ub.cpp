@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
-#include "include/c_api/vector_datamove/vector_datamove.h"
+#include "include/c_api/vector_memcpy/vector_memcpy.h"
 
 class TestAscCopyUB2UB : public testing::Test {
 protected:
