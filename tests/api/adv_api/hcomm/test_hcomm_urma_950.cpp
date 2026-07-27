@@ -66,12 +66,12 @@ public:
 
     AscendC::ChannelHandle GetHandle() { return reinterpret_cast<AscendC::ChannelHandle>(&channel_); }
 
-    uint32_t GetSqHead() const { return sqHead_; }
+    uint32_t GetSqHead() const { return channel_.sqHead; }
 
     void CompleteCurrentSq()
     {
-        cqTail_ = sqHead_;
-        sqTail_ = sqHead_;
+        channel_.cqTail = channel_.cqHead;
+        channel_.sqTail = channel_.cqHead;
     }
 
 private:
@@ -178,7 +178,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
 }
 
 // WriteWithNotifyNbi occupies 2 BBs, WriteNbi occupies 1 BB
-// Verified by reading sqHead from channel's headAddr (where st_dev writes curHead)
+// Verified by reading sqHead from ChannelEntity
 TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify_WqeBbCnt)
 {
     UrmaChannelResource channel;
