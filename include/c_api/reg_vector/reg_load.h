@@ -18,6 +18,6 @@
 #include "c_api/reg_vector/load/reg_loadalign.h"
 #include "c_api/reg_vector/load/reg_loadunalign.h"
 #include "c_api/reg_vector/gather/reg_gather_load.h"
-#include "c_api/composite/reg_loadunalign.h"
+#include "c_api/composite/reg_loadunalign_composite.h"
 
 #endif

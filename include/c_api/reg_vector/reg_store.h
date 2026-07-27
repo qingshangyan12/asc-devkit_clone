@@ -18,6 +18,6 @@
 #include "c_api/reg_vector/store/reg_storealign.h"
 #include "c_api/reg_vector/store/reg_storeunalign.h"
 #include "c_api/reg_vector/scatter/reg_scatter_store.h"
-#include "c_api/composite/reg_storeunalign.h"
+#include "c_api/composite/reg_storeunalign_composite.h"
 
 #endif
