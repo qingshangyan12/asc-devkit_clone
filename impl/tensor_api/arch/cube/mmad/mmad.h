@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_H
 
 #include "impl/tensor_api/arch/cube/mmad/routing.h"
+#include "impl/tensor_api/utils/npu_debug_check.h"
 
 namespace AscendC {
 namespace Te {
@@ -58,12 +59,47 @@ private:
         static_assert(Std::is_same_v<dstPos, Location::L0C>, "When Mmad, dst tensor must be from L0C.");
         static_assert(Std::is_same_v<fmPos, Location::L0A>, "When Mmad, fm tensor must be from L0A.");
         static_assert(Std::is_same_v<filterPos, Location::L0B>, "When Mmad, filter tensor must be from L0B.");
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 64 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in Mmad, dst address must be 64-byte aligned."));
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(fm.Data().Get()) % 512 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm address in Mmad, fm address must be 512-byte aligned."));
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(filter.Data().Get()) % 512 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter address in Mmad, filter address must be 512-byte aligned."));
         using DstLayout = typename T::layoutType;
         using FmLayout = typename U::layoutType;
         using FilterLayout = typename S::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        TENSOR_API_DEBUG_ASSERT((params.m > 0 && params.m <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check m in Mmad, m must be in range (0, 4095]."));
+        TENSOR_API_DEBUG_ASSERT((params.n > 0 && params.n <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check n in Mmad, n must be in range (0, 4095]."));
+        TENSOR_API_DEBUG_ASSERT((params.k > 0 && params.k <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check k in Mmad, k must be in range (0, 4095]."));
+        TENSOR_API_DEBUG_ASSERT((params.unitFlag == 0 || params.unitFlag == 2 || params.unitFlag == 3),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check unitFlag in Mmad, unitFlag must be 0, 2, or 3."));
+        TENSOR_API_DEBUG_ASSERT((trait.disableGemv || params.m == 1), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check m in Mmad, m must be 1 when GEMV is enabled."));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst shape in Mmad, all dst shape sizes must be greater than 0."));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in Mmad, all dst strides must be greater than 0; a zero stride is allowed "
+            "only when the dst format defines it and the corresponding dst shape size is 1."));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(fm.Layout().Shape())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm shape in Mmad, all fm shape sizes must be greater than 0."));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(fm.Layout())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm stride in Mmad, all fm strides must be greater than 0; a zero stride is allowed "
+            "only when the fm format defines it and the corresponding fm shape size is 1."));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(filter.Layout().Shape())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter shape in Mmad, all filter shape sizes must be greater than 0."));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(filter.Layout())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter stride in Mmad, all filter strides must be greater than 0; a zero stride is "
+            "allowed only when the filter format defines it and the corresponding filter shape size is 1."));
         using MmadImpl = typename MmadRouting<
             CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, Location::INVALID>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, params);
@@ -84,12 +120,52 @@ private:
         static_assert(
             Std::is_same_v<biasPos, Location::L0C> || Std::is_same_v<biasPos, Location::BIAS>,
             "When Mmad, bias tensor must be from L0C or BIAS.");
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 64 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in Mmad with bias, dst address must be 64-byte aligned."));
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(fm.Data().Get()) % 512 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm address in Mmad with bias, fm address must be 512-byte aligned."));
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(filter.Data().Get()) % 512 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter address in Mmad with bias, filter address must be 512-byte aligned."));
         using DstLayout = typename T::layoutType;
         using FmLayout = typename U::layoutType;
         using FilterLayout = typename S::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        TENSOR_API_DEBUG_ASSERT((params.m > 0 && params.m <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check m in Mmad with bias, m must be in range (0, 4095]."));
+        TENSOR_API_DEBUG_ASSERT((params.n > 0 && params.n <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check n in Mmad with bias, n must be in range (0, 4095]."));
+        TENSOR_API_DEBUG_ASSERT((params.k > 0 && params.k <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check k in Mmad with bias, k must be in range (0, 4095]."));
+        TENSOR_API_DEBUG_ASSERT((params.unitFlag == 0 || params.unitFlag == 2 || params.unitFlag == 3),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check unitFlag in Mmad with bias, unitFlag must be 0, 2, or 3."));
+        TENSOR_API_DEBUG_ASSERT((trait.disableGemv || params.m == 1), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check m in Mmad with bias, m must be 1 when GEMV is enabled."));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst shape in Mmad with bias, all dst shape sizes must be greater than 0."));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in Mmad with bias, all dst strides must be greater than 0; a zero stride "
+            "is allowed only when the dst format defines it and the corresponding dst shape size is 1."));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(fm.Layout().Shape())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm shape in Mmad with bias, all fm shape sizes must be greater than 0."));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(fm.Layout())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm stride in Mmad with bias, all fm strides must be greater than 0; a zero stride is "
+            "allowed only when the fm format defines it and the corresponding fm shape size is 1."));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(filter.Layout().Shape())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter shape in Mmad with bias, all filter shape sizes must be greater than 0."));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(filter.Layout())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter stride in Mmad with bias, all filter strides must be greater than 0; a zero "
+            "stride is allowed only when the filter format defines it and the corresponding filter shape size is 1."));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(bias.Layout().Shape())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check bias shape in Mmad with bias, all bias shape sizes must be greater than 0."));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(bias.Layout())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check bias stride in Mmad with bias, all bias strides must be greater than 0; a zero stride "
+            "is allowed only when the bias format defines it and the corresponding bias shape size is 1."));
         using MmadImpl =
             typename MmadRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, biasPos>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, bias, params);

@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_TENSOR_TENSOR_IMPL_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/utils/npu_debug_check.h"
 #include "impl/tensor_api/tensor/layout_impl.h"
 #include "impl/tensor_api/tensor/engine_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
@@ -125,6 +126,9 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info)
     {
+#ifdef ASCENDC_DEBUG
+        CheckSlice(Layout(), coord, info);
+#endif
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);
@@ -133,6 +137,9 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const
     {
+#ifdef ASCENDC_DEBUG
+        CheckSlice(Layout(), coord, info);
+#endif
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);
