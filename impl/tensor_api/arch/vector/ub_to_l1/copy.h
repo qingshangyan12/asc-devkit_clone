@@ -53,6 +53,23 @@ private:
         using srcTPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstTPos, Location::L1>, "When Copy tensor from UB to L1, dst tensor must on L1");
         static_assert(Std::is_same_v<srcTPos, Location::UB>, "When Copy tensor from UB to L1, src tensor must on UB");
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(src.Data().Get()) % 32 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyUB2L1, src address must be 32-byte aligned."));
+        TENSOR_API_DEBUG_ASSERT(
+            (reinterpret_cast<uintptr_t>(dst.Data().Get()) % sizeof(typename T::elementType) == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyUB2L1, dst address must be aligned to the dst element size."));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor shape in CopyUB2L1, all dst tensor shape sizes must be greater than 0."));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor stride in CopyUB2L1, all dst tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the dst tensor format defines it and the corresponding shape size is 1."));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor shape in CopyUB2L1, all src tensor shape sizes must be greater than 0."));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor stride in CopyUB2L1, all src tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the src tensor format defines it and the corresponding shape size is 1."));
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
         using CopyUB2L1Impl = typename CopyUB2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
