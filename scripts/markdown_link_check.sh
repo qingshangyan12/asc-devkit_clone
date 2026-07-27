@@ -218,6 +218,7 @@ input_files = sys.argv[3:]
 
 markdown_exts = (".md", ".markdown", ".mdx")
 excluded_prefixes = ()
+precommit_excluded_paths = {"CHANGELOG.md", "CHANGELOG_en.md"}
 config_file = repo_root / "markdown-link-check.toml"
 full_scan = os.environ.get("FULL_SCAN") == "1"
 full_reason = ""
@@ -414,7 +415,14 @@ def should_skip_chunk(input_paths, changed):
     input_set = {path for path in input_paths if path}
     if not input_set:
         return False
-    return changed[0] not in input_set
+    owner = next(
+        (
+            path for path in changed
+            if path not in precommit_excluded_paths and (repo_root / path).is_file()
+        ),
+        None,
+    )
+    return owner is not None and owner not in input_set
 
 
 def staged_markdown_changes():
@@ -619,8 +627,8 @@ if full_scan:
     scan_set = existing_markdown_files()
 else:
     input_paths = [to_rel(decode_git_path(path)) for path in input_files]
+    input_paths = [path for path in input_paths if is_markdown_path(path)]
     changed = list(input_paths)
-    changed = [path for path in changed if is_markdown_path(path)]
 
     ci_changes = []
     ci_reverse_targets = set()
@@ -631,16 +639,19 @@ else:
         reverse_targets = set(ci_reverse_targets)
 
     staged_changes, staged_reverse_targets = staged_markdown_changes()
-    if not ci_mod_filelist_exists and staged_changes and should_skip_chunk(input_paths, staged_changes):
+    base_changes = []
+    base_reverse_targets = set()
+    if not ci_mod_filelist_exists:
+        base_changes, base_reverse_targets = base_markdown_changes()
+
+    chunk_changes = ci_changes if ci_mod_filelist_exists else (staged_changes or base_changes)
+    if should_skip_chunk(input_paths, chunk_changes):
         scan_set = []
     else:
-        reverse_targets.update(staged_reverse_targets)
-        if not changed:
-            changed = staged_changes
-
         if not ci_mod_filelist_exists:
-            base_changes, base_reverse_targets = base_markdown_changes()
+            changed.extend(path for path in staged_changes if path not in changed)
             changed.extend(path for path in base_changes if path not in changed)
+            reverse_targets.update(staged_reverse_targets)
             reverse_targets.update(base_reverse_targets)
 
         changed_targets = {path for path in changed if path}
