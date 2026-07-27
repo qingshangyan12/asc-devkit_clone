@@ -19,6 +19,7 @@
 // Reserved UB space is 2K in total. 20 bytes for BlockVFBufInfo header, leaving 2028 bytes for buffer.
 #define ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE 2028
 #endif
+
 #define ASCENDC_SIMD_VF_MAGIC_NUMBER 0xF0A00B0F
 
 struct BlockVFBufInfo {
@@ -26,12 +27,39 @@ struct BlockVFBufInfo {
     uint32_t length = ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE;
     uint32_t writeLen = 0;
     uint16_t pidx = 0;
-    uint8_t flag = 0;
+    uint8_t flag = 0; // 0: normal, nonzero: overflow
     uint8_t resv1 = 0;
     uint16_t blockIdx = 0;
     uint16_t resv2 = 0;
     uint8_t buffer[ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE];
 };
+
+#ifdef ASCENDC_TRACE_ON
+enum class TraceId : uint32_t {
+    KFC_CLIENT_POST_MSG = 0x7001,
+    KFC_CLIENT_REV_MSG_GM = 0x7002,
+    KFC_CLIENT_REV_MSG_UB = 0x7003,
+    KFC_SERVER_RUN = 0x7101,
+    KFC_SERVER_REV_MSG = 0x7102,
+    KFC_SERVER_PROCESS_MSG = 0x7103,
+    MatMul_PROCESS_MSG = 0x8001,
+    MatMul_CALC,
+    Conv = 0x8101,
+    DropOut = 0x8201,
+    SoftMax = 0x8301,
+    SoftmaxGrad,
+    SoftmaxFlash,
+    SoftmaxFlashV2,
+    LogSoftMax,
+    SoftmaxFlashV3,
+    LayerNorm = 0x8401,
+    LayerNormGrad,
+    LayerNormGradBeta,
+    Pad = 0x8501,
+    UnPad,
+    BroadCast = 0x8601,
+};
+#endif
 
 namespace __asc_aicore {
 
@@ -155,33 +183,6 @@ struct TimeStampTlv {
     uint64_t entry = 0U;                                              // entry system cycle
     uint32_t resvMem[2];                                              // reserved
 };
-
-#ifdef ASCENDC_TRACE_ON
-enum class TraceId : uint32_t {
-    KFC_CLIENT_POST_MSG = 0x7001,
-    KFC_CLIENT_REV_MSG_GM = 0x7002,
-    KFC_CLIENT_REV_MSG_UB = 0x7003,
-    KFC_SERVER_RUN = 0x7101,
-    KFC_SERVER_REV_MSG = 0x7102,
-    KFC_SERVER_PROCESS_MSG = 0x7103,
-    MatMul_PROCESS_MSG = 0x8001,
-    MatMul_CALC,
-    Conv = 0x8101,
-    DropOut = 0x8201,
-    SoftMax = 0x8301,
-    SoftmaxGrad,
-    SoftmaxFlash,
-    SoftmaxFlashV2,
-    LogSoftMax,
-    SoftmaxFlashV3,
-    LayerNorm = 0x8401,
-    LayerNormGrad,
-    LayerNormGradBeta,
-    Pad = 0x8501,
-    UnPad,
-    BroadCast = 0x8601,
-};
-#endif
 
 struct BlockRingBufInfo {
     uint32_t length = 0U;      // total size per block (include head and r/w info)

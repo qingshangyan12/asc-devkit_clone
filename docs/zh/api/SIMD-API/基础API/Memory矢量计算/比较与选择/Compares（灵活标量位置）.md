@@ -88,18 +88,18 @@ $dst_i = Compares(scalar_{idx}, src_i)$
 
 | 参数名称 | 输入/输出 | 含义 |
 | :--- | :--- | :--- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>dst用于存储比较结果，将dst中uint8_t类型的数据按照bit位展开，由左至右依次表征对应位置的src0和src1的比较结果，如果比较后的结果为真，则对应比特位为1，否则为0。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>dst用于存储比较结果，将dst中uint8_t类型的数据按照bit位展开，由左至右依次表征对应位置的src0和src1的比较结果，如果比较后的结果为真，则对应比特位为1，否则为0。 |
 | src0/src1 | 输入 | 灵活标量位置接口中源操作数。<br>支持类型为LocalTensor或标量。数据类型需要与目的操作数保持一致。<br> 类型为LocalTensor时，支持当作矢量操作数或标量单点元素，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。|
 | cmpMode | 输入 | CMPMODE类型，表示比较模式，包括EQ，NE，GE，LE，GT，LT。<br>- LT:src0小于（less than）src1<br>- GT:src0大于（greater than）src1<br>- GE：src0大于或等于（greater than or equal to）src1<br>- EQ：src0等于（equal to）src1<br>- NE：src0不等于（not equal to）src1<br>- LE：src0小于或等于（less than or equal to）src1 |
-| mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
+| mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分API](../SIMD计算说明/高维切分.md)。 |
-| repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../数据结构/辅助数据结构//UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
+| repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../辅助数据结构//UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 | count | 输入 | 参与计算的元素个数。**设置count时，需要保证count个元素所占空间256字节对齐。** |
 
 ## 数据类型
 
 <!-- npu="950" id8 -->
-Ascend 950PR/Ascend 950DT，目的操作数dst支持的数据类型为：uint8_t。源操作数src支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/float/int32_t/uint32_t/int64_t/uint64_t/double。其中，int8\_t/uint8\_t/uint64\_t/int64\_t/double数据类型仅支持tensor前n个数据计算接口，double数据类型只支持CMPMODE::EQ。
+Ascend 950PR/Ascend 950DT，目的操作数dst支持的数据类型为：uint8_t。源操作数src支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、float、int32_t、uint32_t、int64_t、uint64_t、double。其中，int8\_t、uint8\_t、uint64\_t、int64\_t、double数据类型仅支持tensor前n个数据计算接口，double数据类型只支持CMPMODE::EQ。
 <!-- end id8 -->
 
 ## 返回值说明<a name="section128671456102513"></a>
@@ -112,7 +112,7 @@ Ascend 950PR/Ascend 950DT，目的操作数dst支持的数据类型为：uint8_t
 -   调用灵活标量位置接口且源操作数为LocalTensor单点元素的场景，不支持源操作数和目的操作数地址重叠。
 
 -   dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
--   **使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。**
+-   使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。
 -   左操作数及右操作数中，必须有一个为矢量；当前不支持左右操作数同时为标量。
 -   本接口传入LocalTensor单点数据作为标量时，idx参数需要传入编译期已知的常量，传入变量时需要声明为constexpr。
 
@@ -120,7 +120,7 @@ Ascend 950PR/Ascend 950DT，目的操作数dst支持的数据类型为：uint8_t
 
 对于灵活标量位置接口，支持直接传入立即数或单点LocalTensor作为标量，并且支持标量在前和在后两种调用方式。
 
-完整的调用样例可参考[Compare类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/compare)场景四。
+完整的调用样例可参考[Compare类样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/compare)场景四。
 
 -   tensor前n个数据计算接口样例
 

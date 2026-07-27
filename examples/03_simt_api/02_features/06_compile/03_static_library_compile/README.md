@@ -17,7 +17,7 @@
 
 ## 支持的CANN软件版本
 
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -44,7 +44,7 @@ gather算子实现了从长度为100000的一维输入向量中获取指定索�
 bisheng -lib kernel.asc -o libkernel.a --npu-arch=dav-3510 --enable-simt
 ```
 
-其中，`--npu-arch` 为编译时指定的 AI 处理器架构，本样例仅支持 `dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。`--enable-simt` 用于指定SIMT方式编译。
+其中，`--npu-arch` 为编译时指定的 AI 处理器架构，本样例仅支持 `dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)进行查询。`--enable-simt` 用于指定SIMT方式编译。
 
 更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md)。
 

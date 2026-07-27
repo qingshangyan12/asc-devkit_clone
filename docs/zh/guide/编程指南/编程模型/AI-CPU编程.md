@@ -7,9 +7,15 @@ AI CPU是位于Device侧ARM64架构的处理器，其具备与AI Core相同的�
 
 本节介绍的AI CPU编程仅支持如下产品型号：
 
+<!-- npu="950" id1 -->
 -   Ascend 950PR/Ascend 950DT
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 -   Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 -   Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id3 -->
 
 ## AI CPU核函数定义<a name="section4987175618443"></a>
 
@@ -81,4 +87,4 @@ template extern __global__ __aicpu__ uint32_t hello_world<KernelArgs, 4096>(void
 ## 更多进阶用法<a name="section109268265171"></a>
 
 >[!NOTE]说明 
->更多AI CPU API的使用方法请参考[AI CPU API](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/AI-CPU-API/AI-CPU-API.md)。
+>更多AI CPU API的使用方法请参考[AI CPU API](../../../api/AI-CPU-API/AI-CPU-API.md)。

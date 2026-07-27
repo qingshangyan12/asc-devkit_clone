@@ -29,6 +29,7 @@
 #endif
 
 namespace __asc_aicore {
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T>
 __aicore__ inline void set_scalar_param(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
 {
@@ -256,20 +257,31 @@ inline __aicore__ void printf_impl_assert_msg(
     set_atomic_none();
 #ifdef __DAV_VEC__
     scalar_printf_impl(
-        DumpType::DUMP_ASSERT, fmt, "[AIV Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num(),
-        args...);
+        DumpType::DUMP_ASSERT, fmt, "[AIV Block %u/%u] [ASSERT] %s:%u: %s: Assertion `%s' failed. ",
+        asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion, args...);
 #else
     scalar_printf_impl(
-        DumpType::DUMP_ASSERT, fmt, "[AIC Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num(),
-        args...);
+        DumpType::DUMP_ASSERT, fmt, "[AIC Block %u/%u] [ASSERT] %s:%u: %s: Assertion `%s' failed. ",
+        asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion, args...);
 #endif
-    scalar_printf_impl(
-        DumpType::DUMP_ASSERT, "[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", "", __file, __line, __function,
-        __assertion);
     set_ctrl(ctrlValue);
 #endif
 }
+#else
+template <class... Args>
+__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
+{}
 
+template <class... Args>
+__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+{}
+
+template <typename... Args>
+inline __aicore__ void printf_impl_assert_msg(
+    const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
+    const __gm__ char* fmt, Args&&... args)
+{}
+#endif
 } // namespace __asc_aicore
 #else
 #include <cstdio>
@@ -301,21 +313,30 @@ inline __aicore__ void printf_impl_assert_msg(
     const __gm__ char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed. ", __file, __line, __function, __assertion);
     std::printf(fmt, args...);
-    std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", __file, __line, __function, __assertion);
 #endif
 }
-
-template <class... Args>
-__aicore__ inline void scalar_printf_impl(
-    DumpType debugType, __gm__ const char* fmt, __gm__ const char* dumphead, Args&&... args)
-{}
-
-__aicore__ inline void enable_asc_diagnostics() {}
 
 } // namespace __asc_aicore
 
 using namespace __asc_aicore;
+#endif
+
+#if !defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__) && !defined(__CHECK_FEATURE_AT_PRECOMPILE)
+namespace __asc_aicore {
+template <class... Args>
+__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+{
+    printf_impl(fmt, args...);
+}
+
+template <class... Args>
+__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+{
+    printf_impl(fmt, args...);
+}
+} // namespace __asc_aicore
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_PRINTF_IMPL__)

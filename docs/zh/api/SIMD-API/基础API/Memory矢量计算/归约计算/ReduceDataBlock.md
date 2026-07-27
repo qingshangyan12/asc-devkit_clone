@@ -73,9 +73,9 @@
 
 | 参数名称 | 输入/输出 | 含义 |
 | -------- | -------- | ---- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，存储位置为UB（TPosition为VECIN、VECCALC、VECOUT）。 |
-| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，存储位置为UB（TPosition为VECIN、VECCALC、VECOUT）。 |
-| mask[]/mask | 输入 | `mask`用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，存储位置为UB（TPosition为VECIN、VECCALC、VECOUT）。 |
+| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，存储位置为UB（TPosition为VECIN、VECCALC、VECOUT）。 |
+| mask[]/mask | 输入 | `mask`用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码.md)。 |
 | repeatTime | 输入 | 迭代次数。取值范围为[0, 255]。 |
 | dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长。<br>以一个`repeatTime`归约后的长度为单位，在`half`数据类型时，单位为16字节；在`float`数据类型时，单位为32字节。取值范围为[0, $2^{16}-1$]。<!-- npu="910" id29 --><br>**注意：Atlas 训练系列产品不支持配置0。**<!-- end id29 --> |
 | srcBlkStride | 输入 | 源操作数单次迭代内DataBlock间的地址步长，单位为32字节。取值范围为[0, $2^{16}-1$]。 |
@@ -196,7 +196,7 @@
 
 ## 调用示例
 
-本样例中只展示`Compute`流程中的部分代码。更多样例可参考[ReduceDataBlock系列归约指令样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_data_block)。
+本样例中只展示`Compute`流程中的部分代码。更多样例可参考[ReduceDataBlock系列归约指令样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_data_block)。
 
 - `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-`mask`连续模式：
 
