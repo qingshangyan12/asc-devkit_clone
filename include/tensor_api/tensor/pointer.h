@@ -29,12 +29,24 @@
 namespace AscendC {
 namespace Te {
 
+/**
+ * @brief Construct a typed hardware memory pointer from an address offset.
+ * @param addr : Address offset used to construct the memory pointer.
+ */
 template <typename PtrPattern, typename DataType, typename Addr, EnableMakePtrByTrait<PtrPattern, Addr> Enable>
 __aicore__ inline auto MakeMemPtr(Addr addr);
 
+/**
+ * @brief Construct a hardware memory pointer at a specified memory location from an iterator.
+ * @param iterator : Iterator used to construct the memory pointer.
+ */
 template <typename PtrPattern, typename Iterator, EnableMakeHardwarePtr<PtrPattern, Iterator> Enable>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator);
 
+/**
+ * @brief Construct a hardware memory pointer by inferring the memory location from an iterator.
+ * @param iterator : Iterator used to construct the memory pointer.
+ */
 template <typename Iterator, EnableMakePtrByIter<Iterator> Enable>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator);
 
