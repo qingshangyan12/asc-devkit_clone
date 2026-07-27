@@ -365,6 +365,7 @@ template <typename T>
 __aicore__ inline void DataCopyUB2GMNZ2NDImpl(
     __gm__ T* dst, __ubuf__ T* src, const Nz2NdParamsFull& intriParams, const uint8_t cacheMode = 0)
 {
+    (void)cacheMode;
     const uint16_t ndNum = intriParams.ndNum;
     const uint16_t nValue = intriParams.nValue;
     const uint16_t dValue = intriParams.dValue;
