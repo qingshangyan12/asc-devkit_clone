@@ -33,6 +33,7 @@
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #endif
 
+#include "../../../include/basic_api/kernel_base_types.h"
 #include "../kernel_macros.h"
 #include "../kernel_log.h"
 #include "../kernel_event.h"
@@ -228,8 +229,6 @@ __aicore__ inline constexpr static auto IsLite(void*) -> T;
 
 template <typename T>
 using PrimT = decltype(IsLite<T>(0));
-
-enum class CacheMode { CACHE_MODE_DISABLE = 0, CACHE_MODE_NORMAL = 1, CACHE_MODE_LAST = 2, CACHE_MODE_PERSISTENT = 4 };
 
 enum class CacheRwMode { READ = 1, WRITE = 2, RW = 3 };
 

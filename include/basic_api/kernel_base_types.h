@@ -28,6 +28,12 @@ enum class SaturationMode : uint8_t { FLOAT, FLOAT8, INT, CAST };
 
 enum class OverrideStrategy : uint8_t { USE_API = 0, USE_GLOBAL = 1 };
 
+enum class CacheMode : uint8_t {
+    CACHE_MODE_DISABLE = 0,
+    CACHE_MODE_NORMAL = 1,
+    CACHE_MODE_LAST = 2,
+    CACHE_MODE_PERSISTENT = 4
+};
 } // namespace AscendC
 #endif // ASCENDC_MODULE_BASE_TYPES_H
 
