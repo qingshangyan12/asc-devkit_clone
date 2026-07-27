@@ -98,6 +98,53 @@ __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config) { SetFixpipePreQu
 
 __aicore__ inline void SetFixPipeClipRelu(uint64_t config) { SetFixPipeClipReluImpl(config); }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T1, typename T2>
+__aicore__ inline void SetFixPipeClipRelu(const FixpipeClipReluParams<T1, T2>& params)
+{
+    SetFixPipeClipReluImpl(params);
+}
+
+__aicore__ inline void SetFixPipeConfig(uint64_t config) { SetFixPipeConfigImpl(config); }
+
+__aicore__ inline void SetFixPipeConfig(const FixPipeConfigParams& params) { SetFixPipeConfigImpl(params); }
+
+template <typename T>
+__aicore__ inline void SetFixpipePreQuantFlag(const FixPipePreQuantParams<T>& params)
+{
+    SetFixpipePreQuantFlagImpl(params);
+}
+
+__aicore__ inline void SetFixpipeLeakyReluAlpha(uint64_t config) { SetFixpipeLeakyReluAlphaImpl(config); }
+
+__aicore__ inline void SetFixpipeLeakyReluAlpha(const FixPipeLeakyReluAlphaParams& params)
+{
+    SetFixpipeLeakyReluAlphaImpl(params);
+}
+
+__aicore__ inline void SetFixpipePostQuant(uint64_t config) { SetFixpipePostQuantImpl(config); }
+
+__aicore__ inline void SetFixpipePostQuant(const FixPipePostQuantParams& params)
+{
+    SetFixpipePostQuantImpl(params);
+}
+
+template <typename T>
+__aicore__ inline void SetFixpipeEltAnitq(const FixPipeEltAntiqParams<T>& params)
+{
+    SetFixpipeEltAnitqImpl(params);
+}
+
+__aicore__ inline void SetFixpipeEltAnitq(uint64_t config) { SetFixpipeEltAnitqImpl(config); }
+
+__aicore__ inline void SetFixpipeEltwiseAddr(uint64_t config) { SetFixpipeEltwiseAddrImpl(config); }
+
+__aicore__ inline void SetFixpipeEltwiseAddr(const FixpipeEltwiseAddrParams& params)
+{
+    SetFixpipeEltwiseAddrImpl(params);
+}
+#endif
+
 template <typename T>
 __aicore__ inline void SetFixPipeAddr(const LocalTensor<T>& eleWiseData, uint16_t c0ChStride)
 {
@@ -273,7 +320,7 @@ __aicore__ inline void Fixpipe(
     using SrcPrimType = PrimT<U>;
     CheckTensorPos(src, Hardware::L0C, "src", "CO1", "Fixpipe");
     CheckTensorPos(cbufWorkspace, Hardware::L1, "cbufWorkspace", "A1", "Fixpipe");
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(),
@@ -284,6 +331,42 @@ __aicore__ inline void Fixpipe(
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 #endif
 }
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+// L1->L1/UB
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void Fixpipe(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV516& intriParams)
+{
+    using DstPrimType = PrimT<T>;
+    using SrcPrimType = PrimT<U>;
+    const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
+    if (dstScope == Hardware::L1) {
+        FixpipeL12L1Impl<DstPrimType, SrcPrimType, config>(
+            (__cbuf__ DstPrimType*)dst.GetPhyAddr(), (__cbuf__ SrcPrimType*)src.GetPhyAddr(), intriParams);
+    } else if (dstScope == Hardware::UB) {
+        FixpipeL12UbImpl<DstPrimType, SrcPrimType, config>(
+            (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__cbuf__ SrcPrimType*)src.GetPhyAddr(), intriParams);
+    } else {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(KERNEL_ERROR, "Failed to check dst tensor position in Fixpipe, supported positions are A1 or UB");
+        });
+    }
+}
+
+// L1->GM
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void Fixpipe(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV516& intriParams)
+{
+    using DstPrimType = PrimT<T>;
+    using SrcPrimType = PrimT<U>;
+    FixpipeL12GmImpl<DstPrimType, SrcPrimType, config>(
+        (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cbuf__ SrcPrimType*)src.GetPhyAddr(), intriParams);
+}
+#endif
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_IMPL_H__)

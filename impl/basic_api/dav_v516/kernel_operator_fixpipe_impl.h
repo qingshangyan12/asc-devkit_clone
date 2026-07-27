@@ -186,13 +186,13 @@ __aicore__ inline void SetFixpipeEltAnitqImpl(const FixPipeEltAntiqParams &param
     config |= ((uint64_t)params.b8Offset & 0xFF) << 20;
     config |= ((uint64_t)params.s16Offset & 0xFFFF) << 28;
     config |= ((uint64_t)params.eltAntiqCfg & 0xF) << 44;
-    
+
     set_m_elt_antiq_para(config);
 }
 
 __aicore__ inline void SetFixpipeEltwiseAddrImpl(uint64_t config) { set_m_elt_src_para(config); }
 
-__aicore__ inline void SetFixpipeEltwiseAddrImpl(const FixPipePostEltwiseAddrParams &params)
+__aicore__ inline void SetFixpipeEltwiseAddrImpl(const FixpipeEltwiseAddrParams &params)
 {
     uint64_t config = 0;
 
