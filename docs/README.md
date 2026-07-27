@@ -26,7 +26,7 @@
 
 | 文档  | 面向对象  | 内容介绍  |
 |---|---|---|
-| [API列表](https://ccache.dev/documentation.html) | 基于Ascend C开源仓，开发定制化API或算子的开发者。 | 介绍项目包含的所有API。  |
+| [API列表](./zh/api/README.md) | 基于Ascend C开源仓，开发定制化API或算子的开发者。 | 介绍项目包含的所有API。  |
 | [高阶API贡献指南](./zh/asc_adv_api_contributing.md) | 基于Ascend C开源仓，开发定制化API的开发者。 | 介绍如何扩展或开发Ascend C高阶API。高阶API基于单核对常见算法进行抽象和封装，实现常用的计算算法，旨在提高算子开发效率。  |
 | [基础API贡献指南](./zh/asc_basic_api_contributing.md) | 基于Ascend C开源仓，开发定制化API的开发者。 | 介绍如何扩展或开发Ascend C基础API。基础API实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。  |
 | [C API贡献指南](./zh/asc_c_api_contributing.md) | 基于Ascend C开源仓，开发定制化API的开发者。 | 介绍如何扩展或开发Ascend C C API。C API提供纯C风格的接口，符合C语言算子开发习惯，开放芯片完备编程能力。  |

@@ -16,7 +16,15 @@ MARKDOWN_LINK_CHECK_FULL="${MARKDOWN_LINK_CHECK_FULL:-0}"
 MARKDOWN_LINK_CHECK_DRY_RUN="${MARKDOWN_LINK_CHECK_DRY_RUN:-0}"
 MARKDOWN_LINK_CHECK_VERBOSE="${MARKDOWN_LINK_CHECK_VERBOSE:-0}"
 MARKDOWN_LINK_CHECK_ONLINE="${MARKDOWN_LINK_CHECK_ONLINE:-1}"
+MARKDOWN_LINK_CHECK_NETWORK_RETRIES="${MARKDOWN_LINK_CHECK_NETWORK_RETRIES:-2}"
 MARKDOWN_LINK_CHECK_START=$SECONDS
+
+case "$MARKDOWN_LINK_CHECK_NETWORK_RETRIES" in
+    ""|*[!0-9]*)
+        echo "[Markdown check] MARKDOWN_LINK_CHECK_NETWORK_RETRIES must be a non-negative integer." >&2
+        exit 1
+        ;;
+esac
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 cd "$REPO_ROOT"
@@ -36,6 +44,7 @@ Set MARKDOWN_LINK_CHECK_FULL=1 or pass --full to scan tracked Markdown files in 
 Set MARKDOWN_LINK_CHECK_DRY_RUN=1 to print the computed scan set only.
 Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
 Set MARKDOWN_LINK_CHECK_ONLINE=0 to skip remote HTTP(S) links.
+Set MARKDOWN_LINK_CHECK_NETWORK_RETRIES to control retries after transient network errors (default: 2).
 Set MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL, MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL, or
 MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
 EOF
@@ -951,16 +960,29 @@ PY
 CROSS_LINK_RC=$?
 set -e
 
-set +e
 LYCHEE_BIN=$(find_lychee)
 LYCHEE_ARGS=(--no-progress --config "$CONFIG_FILE")
 if [ "$MARKDOWN_LINK_CHECK_ONLINE" != "1" ]; then
     LYCHEE_ARGS+=(--offline)
 fi
-set +e
-"$LYCHEE_BIN" "${LYCHEE_ARGS[@]}" "${SCAN_FILES[@]}" >"$LYCHEE_OUTPUT_FILE" 2>&1
-LYCHEE_RC=$?
-set -e
+
+LYCHEE_RETRY_COUNT=0
+while true; do
+    set +e
+    "$LYCHEE_BIN" "${LYCHEE_ARGS[@]}" "${SCAN_FILES[@]}" >"$LYCHEE_OUTPUT_FILE" 2>&1
+    LYCHEE_RC=$?
+    set -e
+
+    if [ "$LYCHEE_RC" -eq 0 ] \
+        || [ "$LYCHEE_RETRY_COUNT" -ge "$MARKDOWN_LINK_CHECK_NETWORK_RETRIES" ] \
+        || ! grep -Fqi "Network error:" "$LYCHEE_OUTPUT_FILE"; then
+        break
+    fi
+
+    LYCHEE_RETRY_COUNT=$((LYCHEE_RETRY_COUNT + 1))
+    echo "[Markdown check] Retrying lychee after network error ($LYCHEE_RETRY_COUNT/$MARKDOWN_LINK_CHECK_NETWORK_RETRIES)..." >&2
+    sleep 2
+done
 
 LYCHEE_DURATION=$(markdown_check_duration)
 python3 - "$LYCHEE_OUTPUT_FILE" "$FILTERED_OUTPUT_FILE" "$LYCHEE_RC" "${#SCAN_FILES[@]}" "$LYCHEE_DURATION" <<'PY'
