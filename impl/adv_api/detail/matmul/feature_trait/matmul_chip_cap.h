@@ -62,6 +62,7 @@ private:
         CHIP_TYPE_510R2,
         CHIP_TYPE_L300,
         CHIP_TYPE_L311,
+        CHIP_TYPE_L516,
     };
 
     __aicore__ inline constexpr static uint8_t GetChipType()
@@ -78,6 +79,8 @@ private:
         return CHIP_TYPE_L300;
 #elif __NPU_ARCH__ == 3113
         return CHIP_TYPE_L311;
+#elif __NPU_ARCH__ == 5161
+        return CHIP_TYPE_L516;
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         return CHIP_TYPE_310;
 #elif __NPU_ARCH__ == 5102
