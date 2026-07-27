@@ -717,9 +717,66 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
 }
 
 template <typename T>
-__aicore__ inline void DataCopyGM2UBND2NZImpl(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline void DataCopyGM2UBSingleImpl(
+    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const int copyTime, const int computeNum)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to ubuf nd2nz"); });
+    const uint16_t& nValue = intriParams.nValue;
+    const uint16_t& dValue = intriParams.dValue;
+    const uint16_t& computeLen = computeNum * sizeof(T);
+    const uint16_t& c0Count = DEFAULT_C0_SIZE / sizeof(T);
+    const uint16_t& maxC0Count = MAX_REPEAT_TIMES * c0Count;
+    const uint16_t& maxdValue = MAX_REPEAT_TIMES * dValue;
+    const uint16_t& dstNzNStride = intriParams.dstNzNStride;
+    const uint16_t& dstNzC0Stride = intriParams.dstNzC0Stride;
+    const uint16_t& repeatCount = nValue / MAX_REPEAT_TIMES;
+    const uint16_t& repeatTail = nValue % MAX_REPEAT_TIMES;
+    const uint16_t& srcCopyStartOffset = copyTime * c0Count;
+    const uint16_t& dstCopyStartOffset = copyTime * dstNzC0Stride * (DEFAULT_C0_SIZE / sizeof(T));
+    DataCopyExtParams copyParams = {
+        MAX_REPEAT_TIMES, static_cast<uint32_t>(computeLen),
+        static_cast<uint32_t>(intriParams.srcDValue * sizeof(T) - computeLen),
+        static_cast<uint32_t>(
+            (static_cast<uint16_t>(dstNzNStride * static_cast<uint16_t>(DEFAULT_C0_SIZE)) - 
+            static_cast<uint16_t>(DEFAULT_C0_SIZE)) / 
+           static_cast<uint16_t>(DEFAULT_C0_SIZE)),
+        0};
+    DataCopyPadExtParams<T> padParams;
+    for (int repeatTime = 0; repeatTime < repeatCount; ++repeatTime) {
+        DataCopyPadGm2UBImpl(
+            (__ubuf__ T*)(dst + dstCopyStartOffset + repeatTime * maxC0Count),
+            (__gm__ T*)(src + srcCopyStartOffset + repeatTime * maxdValue), copyParams, padParams);
+    }
+    copyParams.blockCount = repeatTail;
+    if (repeatTail != 0) {
+        int dstOffset = (dstCopyStartOffset + repeatCount * MAX_REPEAT_TIMES * c0Count);
+        int srcOffset = (srcCopyStartOffset + repeatCount * MAX_REPEAT_TIMES * dValue);
+        DataCopyPadGm2UBImpl(
+            (__ubuf__ T*)(dst + dstOffset), (__gm__ T*)(src + srcOffset), copyParams, padParams);
+    }
+}
+
+template <typename T>
+__aicore__ inline void DataCopyGM2UBND2NZImpl(
+    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
+{
+    (void)cacheMode;
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
+    }
+    const uint16_t& ndNum = intriParams.ndNum;
+    const uint16_t& dValue = intriParams.dValue;
+    const uint16_t& srcNdMatrixStride = intriParams.srcNdMatrixStride;
+    const uint16_t& dstNzMatrixStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride);
+    const uint16_t& c0Count = DEFAULT_C0_SIZE / sizeof(T);
+    for (int index = 0; index < ndNum; ++index) {
+        int16_t copyNum = (dValue + c0Count - 1) / c0Count;
+        for (int copyTime = 0; copyTime < copyNum; ++copyTime) {
+            int computeCount = (dValue >= (copyTime + 1) * c0Count) ? c0Count : (dValue % c0Count);
+            DataCopyGM2UBSingleImpl(
+                dst + dstNzMatrixStride, src + srcNdMatrixStride, intriParams, copyTime, computeCount);
+        }
+    }
 }
 
 template <typename T>
