@@ -387,14 +387,14 @@ __aicore__ constexpr int32_t GetTypeSize()
 }
 
 template <typename T>
-__aicore__ inline T Ceil(T num1, T num2)
+__aicore__ inline T constexpr Ceil(T num1, T num2)
 {
     ASCENDC_ASSERT((num2 > 0), { KERNEL_LOG(KERNEL_ERROR, "num2 is %d , which should be larger than 0", num2); });
     return (num1 + num2 - 1) / num2;
 }
 
 template <typename T>
-__aicore__ inline T CeilAlign(T num1, T num2)
+__aicore__ inline T constexpr CeilAlign(T num1, T num2)
 {
     ASSERT(num2 > 0);
     return Ceil(num1, num2) * num2;
