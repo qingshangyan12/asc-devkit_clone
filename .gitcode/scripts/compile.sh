@@ -45,3 +45,4 @@ fi
 if [ ! -f "build_out/"*.run ]; then
         mkdir -p build_out
         touch build_out/cann-asc-devkit.run
+fi
