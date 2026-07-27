@@ -29,9 +29,15 @@ namespace AscendC {
 
 constexpr uint32_t HCOMM_URMA_MAX_RETRY_TIMES = 1000000;
 constexpr uint32_t HCOMM_URMA_DEFAULT_QP_IDX = 0;
-constexpr uint32_t HCOMM_URMA_TMP_BUF_SIZE = 512;
 constexpr uint32_t HCOMM_URMA_WQE_U32_NUM = 32;
 constexpr uint32_t HCOMM_URMA_CQE_U32_NUM = 16;
+constexpr uint32_t HCOMM_URMA_BATCH_WQE_NUM = 256;
+constexpr uint32_t HCOMM_URMA_WRITE_WQE_BYTES = 64;
+constexpr uint32_t HCOMM_URMA_WRITE_WQE_U32_NUM =
+    HCOMM_URMA_WRITE_WQE_BYTES / sizeof(uint32_t);
+constexpr uint32_t HCOMM_URMA_TMP_BUF_SIZE =
+    (HCOMM_URMA_WQE_U32_NUM + HCOMM_URMA_CQE_U32_NUM +
+        HCOMM_URMA_BATCH_WQE_NUM * HCOMM_URMA_WRITE_WQE_U32_NUM) * sizeof(uint32_t);
 
 template <typename T>
 struct UdmaParams {
@@ -105,6 +111,8 @@ private:
 private:
     LocalTensor<uint32_t> wqeItem_;
     LocalTensor<uint32_t> cqeItem_;
+    LocalTensor<uint32_t> wqeStage_;
+    uint32_t pendingWqeCount_;
 };
 } // namespace AscendC
 

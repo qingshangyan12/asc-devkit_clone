@@ -260,6 +260,8 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(__ubuf__ uint8_
 #endif
     wqeItem_.SetAddr(addr);
     cqeItem_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM];
+    wqeStage_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM + HCOMM_URMA_CQE_U32_NUM];
+    pendingWqeCount_ = 0;
     return HCOMM_SUCCESS;
 }
 
@@ -272,6 +274,8 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(const LocalTens
 
     wqeItem_ = buff.template ReinterpretCast<uint32_t>();
     cqeItem_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM];
+    wqeStage_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM + HCOMM_URMA_CQE_U32_NUM];
+    pendingWqeCount_ = 0;
     return HCOMM_SUCCESS;
 }
 
@@ -309,19 +313,42 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     }
 
     auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    constexpr bool useBatchWrite = !commit && opCode == HcommUrmaOpCode::WRITE;
     uint32_t curHead = channelEntity->sqHead;
+    if constexpr (useBatchWrite) {
+        curHead += pendingWqeCount_;
+    }
     // Temporary implementation: use cqHead as the WQE counter, will be refined later
     uint32_t wqeCnt = channelEntity->cqHead;
+    uint32_t wqeSize = sqCtx.contextInfo.ubJfs.wqeSize;
     KERNEL_LOG(
         KERNEL_INFO, "Hcomm URMA PostSend resolved remoteIdx=%d curHead=%u wqeCnt=%u sqDepth=%u \n", remoteIdx, curHead,
         wqeCnt, sqCtx.contextInfo.ubJfs.sqDepth);
 
-    // poll cq if send queue is full
-    auto cqCtx = channelEntity->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-    PollCqWhenSqOverflow(channel, cqCtx, wqeCnt);
+    if constexpr (useBatchWrite) {
+        if (wqeSize != HCOMM_URMA_WRITE_WQE_BYTES) {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Hcomm URMA PostSend batch write failed with invalid wqeSize=%u \n", wqeSize);
+            return HCOMM_FAILED;
+        }
+        if (pendingWqeCount_ >= HCOMM_URMA_BATCH_WQE_NUM) {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Hcomm URMA PostSend batch write failed with pendingWqeCount=%u \n",
+                pendingWqeCount_);
+            return HCOMM_FAILED;
+        }
+    } else {
+        // poll cq if send queue is full
+        auto cqCtx = channelEntity->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+        PollCqWhenSqOverflow(channel, cqCtx, wqeCnt);
+    }
 
     // write SQE
-    __ubuf__ HcommUrmaSqeCtx* sqeCtx = (__ubuf__ HcommUrmaSqeCtx*)wqeItem_.GetPhyAddr();
+    LocalTensor<uint32_t> currentWqe = wqeItem_;
+    if constexpr (useBatchWrite) {
+        currentWqe = wqeStage_[pendingWqeCount_ * HCOMM_URMA_WRITE_WQE_U32_NUM];
+    }
+    __ubuf__ HcommUrmaSqeCtx* sqeCtx = (__ubuf__ HcommUrmaSqeCtx*)currentWqe.GetPhyAddr();
     auto remoteMemInfo = channelEntity->remoteBufferAddr[remoteIdx];
     HcommUrmaFillSqeCtx<opCode, config>(
         sqeCtx, (__gm__ uint8_t*)remoteAddr, sqCtx, remoteMemInfo, curHead, notifyAddr, params.value);
@@ -334,27 +361,29 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     __ubuf__ HcommUrmaSgeCtx* sgeCtx = (__ubuf__ HcommUrmaSgeCtx*)sgeAddr;
     HcommUrmaFillSgeCtx<opCode>(sgeCtx, len, (__gm__ uint8_t*)localAddr, params);
 
-    // SQE & SGE cache flush
-    uint64_t sqBaseAddr = sqCtx.contextInfo.ubJfs.sqVa;
-    uint32_t wqeSize = sqCtx.contextInfo.ubJfs.wqeSize;
-    uint32_t baseBlockCount = sqCtx.contextInfo.ubJfs.sqDepth;
-    __gm__ uint8_t* sqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % baseBlockCount));
-    AscendC::GlobalTensor<uint32_t> sqeGlobal;
-    sqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqeAddr);
-
+    // stage or flush SQE & SGE
     constexpr uint32_t wqeBbCnt = (opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY || opCode == HcommUrmaOpCode::FAA ||
                                    opCode == HcommUrmaOpCode::CAS) ?
                                       2U :
                                       1U;
-    SyncAction<HardEvent::S_MTE3>();
+    if constexpr (useBatchWrite) {
+        pendingWqeCount_++;
+    } else {
+        uint64_t sqBaseAddr = sqCtx.contextInfo.ubJfs.sqVa;
+        uint32_t baseBlockCount = sqCtx.contextInfo.ubJfs.sqDepth;
+        __gm__ uint8_t* sqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % baseBlockCount));
+        AscendC::GlobalTensor<uint32_t> sqeGlobal;
+        sqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqeAddr);
 
-    DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / sizeof(uint32_t));
-    SyncAction<HardEvent::MTE3_S>();
+        SyncAction<HardEvent::S_MTE3>();
+        DataCopy(sqeGlobal, currentWqe, wqeSize * wqeBbCnt / sizeof(uint32_t));
+        SyncAction<HardEvent::MTE3_S>();
 
-    wqeCnt++;
-    curHead += wqeBbCnt;
-    channelEntity->cqHead = wqeCnt;
-    channelEntity->sqHead = curHead;
+        wqeCnt++;
+        curHead += wqeBbCnt;
+        channelEntity->cqHead = wqeCnt;
+        channelEntity->sqHead = curHead;
+    }
 
     if constexpr (commit) {
         st_dev(curHead, reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.dbVa), 0);
@@ -480,9 +509,83 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Commit(ChannelHandle
     (void)pipe;
     __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
     auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-    uint32_t curHead = channelEntity->sqHead;
+    uint32_t submittedHead = channelEntity->sqHead;
+    uint32_t pendingWqeCount = pendingWqeCount_;
 
-    st_dev(curHead, (__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.dbVa, 0);
+    if (pendingWqeCount == 0) {
+        st_dev(submittedHead, (__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.dbVa, 0);
+        return HCOMM_SUCCESS;
+    }
+
+    uint32_t wqeSize = sqCtx.contextInfo.ubJfs.wqeSize;
+    if (wqeSize != HCOMM_URMA_WRITE_WQE_BYTES) {
+        KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA Commit failed with invalid wqeSize=%u \n", wqeSize);
+        return HCOMM_FAILED;
+    }
+
+    auto cqCtx = channelEntity->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    uint32_t sqDepth = sqCtx.contextInfo.ubJfs.sqDepth;
+    uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
+    uint32_t queueDepth = sqDepth < cqDepth ? sqDepth : cqDepth;
+    constexpr uint32_t POLL_CQ_THRESHOLD = 10;
+    if (queueDepth <= POLL_CQ_THRESHOLD) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "Hcomm URMA Commit failed with invalid sqDepth=%u cqDepth=%u \n", sqDepth, cqDepth);
+        return HCOMM_FAILED;
+    }
+
+    uint32_t usableDepth = queueDepth - POLL_CQ_THRESHOLD;
+    if (pendingWqeCount > usableDepth) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "Hcomm URMA Commit failed with pendingWqeCount=%u usableDepth=%u \n",
+            pendingWqeCount, usableDepth);
+        return HCOMM_FAILED;
+    }
+
+    uint32_t preparedHead = submittedHead + pendingWqeCount;
+    uint32_t completedHead = channelEntity->sqTail;
+    if (preparedHead - completedHead > usableDepth) {
+        uint32_t expectTail = preparedHead - usableDepth;
+        if (expectTail > submittedHead) {
+            KERNEL_LOG(
+                KERNEL_ERROR,
+                "Hcomm URMA Commit failed with expectTail=%u submittedHead=%u completedHead=%u \n",
+                expectTail, submittedHead, completedHead);
+            return HCOMM_FAILED;
+        }
+        uint32_t ret = PollCq(channel, expectTail);
+        if (ret != HCOMM_SUCCESS) {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Hcomm URMA Commit failed to poll cq expectTail=%u pollRet=%u \n",
+                expectTail, ret);
+            return HCOMM_FAILED;
+        }
+    }
+
+    uint32_t startSlot = submittedHead % sqDepth;
+    uint32_t firstCount =
+        pendingWqeCount < sqDepth - startSlot ? pendingWqeCount : sqDepth - startSlot;
+    uint32_t secondCount = pendingWqeCount - firstCount;
+    uint64_t sqBaseAddr = sqCtx.contextInfo.ubJfs.sqVa;
+    __gm__ uint8_t* firstSqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * startSlot);
+    AscendC::GlobalTensor<uint32_t> firstSqeGlobal;
+    firstSqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)firstSqeAddr);
+
+    SyncAction<HardEvent::S_MTE3>();
+    DataCopy(firstSqeGlobal, wqeStage_, firstCount * HCOMM_URMA_WRITE_WQE_U32_NUM);
+    if (secondCount != 0) {
+        AscendC::GlobalTensor<uint32_t> secondSqeGlobal;
+        secondSqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqBaseAddr);
+        LocalTensor<uint32_t> secondWqe =
+            wqeStage_[firstCount * HCOMM_URMA_WRITE_WQE_U32_NUM];
+        DataCopy(secondSqeGlobal, secondWqe, secondCount * HCOMM_URMA_WRITE_WQE_U32_NUM);
+    }
+    SyncAction<HardEvent::MTE3_S>();
+
+    channelEntity->cqHead += pendingWqeCount;
+    channelEntity->sqHead = preparedHead;
+    st_dev(preparedHead, (__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.dbVa, 0);
+    pendingWqeCount_ = 0;
 
     return HCOMM_SUCCESS;
 }
