@@ -54,6 +54,11 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
+        TENSOR_API_DEBUG_ASSERT((GetTotalColumnShape(srcLayout) >= 1 && GetTotalColumnShape(srcLayout) <= 4095),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src column shape size in CopyGM2UB DN path, src column shape size must be in range "
+                "[1, 4095]. Current src column shape is %u.",
+                static_cast<unsigned int>(GetTotalColumnShape(srcLayout))));
         uint16_t blockCount = GetTotalColumnShape(srcLayout);
         uint32_t blockLen = GetTotalRowShape(srcLayout) * sizeof(SrcType);
         int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SrcType);

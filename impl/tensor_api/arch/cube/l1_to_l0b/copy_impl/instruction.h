@@ -48,6 +48,10 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        TENSOR_API_DEBUG_ASSERT((!transpose || sizeof(T) != 4 || kStep % 2 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0B transpose instruction, kStep must be even for 32-bit data; current "
+            "value is %u.", static_cast<unsigned int>(kStep)));
         if constexpr (transpose) {
             asc_copy_l12l0b_transpose(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         } else {

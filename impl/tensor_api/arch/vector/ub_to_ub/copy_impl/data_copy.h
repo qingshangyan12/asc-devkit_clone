@@ -48,6 +48,10 @@ protected:
             dstStride = dstStride >> 1;
         }
 
+        TENSOR_API_DEBUG_ASSERT((blockLen % 32 == 0 && (blockLen >> 5) >= 1 && (blockLen >> 5) <= 65535),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyUB2UB, blockLen must be a multiple of 32 bytes, and blockLen / 32 "
+                "must be in range [1, 65535]. Current blockLen is %u.", static_cast<unsigned int>(blockLen)));
         // Convert from bytes to 32B units for asc_copy_ub2ub
         uint16_t blockLenIn32B = static_cast<uint16_t>(blockLen >> 5);
         uint16_t srcStrideIn32B = static_cast<uint16_t>(srcStride >> 5);

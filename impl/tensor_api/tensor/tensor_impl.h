@@ -23,6 +23,8 @@
 #define IMPL_TENSOR_API_TENSOR_TENSOR_IMPL_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/utils/npu_debug_assert.h"
+#include "impl/tensor_api/utils/npu_debug_check.h"
 #include "impl/tensor_api/tensor/layout_impl.h"
 #include "impl/tensor_api/tensor/engine_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
@@ -125,6 +127,25 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info)
     {
+#ifdef ASCENDC_DEBUG
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportSliceError<SliceErrorKind::SOURCE_SHAPE>, Layout(), coord, info));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportSliceError<SliceErrorKind::SOURCE_STRIDE>, Layout(), coord, info));
+        if constexpr (IsLayoutV<Info>) {
+            TENSOR_API_DEBUG_ASSERT((IsShapeValid(info.Shape())),
+                TENSOR_API_REPORT_INTERNAL(
+                    ReportSliceError<SliceErrorKind::SLICE_SHAPE>, Layout(), coord, info));
+        } else {
+            TENSOR_API_DEBUG_ASSERT((IsShapeValid(info)),
+                TENSOR_API_REPORT_INTERNAL(
+                    ReportSliceError<SliceErrorKind::SLICE_SHAPE>, Layout(), coord, info));
+        }
+        TENSOR_API_DEBUG_ASSERT((IsCoordInShape(coord, Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(ReportSliceError<SliceErrorKind::COORD>, Layout(), coord, info));
+#endif
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);
@@ -133,6 +154,25 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const
     {
+#ifdef ASCENDC_DEBUG
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportSliceError<SliceErrorKind::SOURCE_SHAPE>, Layout(), coord, info));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportSliceError<SliceErrorKind::SOURCE_STRIDE>, Layout(), coord, info));
+        if constexpr (IsLayoutV<Info>) {
+            TENSOR_API_DEBUG_ASSERT((IsShapeValid(info.Shape())),
+                TENSOR_API_REPORT_INTERNAL(
+                    ReportSliceError<SliceErrorKind::SLICE_SHAPE>, Layout(), coord, info));
+        } else {
+            TENSOR_API_DEBUG_ASSERT((IsShapeValid(info)),
+                TENSOR_API_REPORT_INTERNAL(
+                    ReportSliceError<SliceErrorKind::SLICE_SHAPE>, Layout(), coord, info));
+        }
+        TENSOR_API_DEBUG_ASSERT((IsCoordInShape(coord, Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(ReportSliceError<SliceErrorKind::COORD>, Layout(), coord, info));
+#endif
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);
@@ -189,7 +229,14 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
 {
     static_assert(
         IsHardwareMemPtrV<Iterator>, "MakeTensor expects the first argument to be a memory pointer or iterator");
-    return MakeTensorBuilder<Iterator>{}(iter, args...);
+    auto tensor = MakeTensorBuilder<Iterator>{}(iter, args...);
+    TENSOR_API_DEBUG_ASSERT((IsShapeValid(tensor.Layout().Shape())),
+        TENSOR_API_REPORT_INTERNAL(
+            ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, tensor.Layout(), "result", "MakeTensor"));
+    TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(tensor.Layout())),
+        TENSOR_API_REPORT_INTERNAL(
+            ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, tensor.Layout(), "result", "MakeTensor"));
+    return tensor;
 }
 
 // Construct a single-batch sub-tensor from a batched tensor by offsetting the engine pointer

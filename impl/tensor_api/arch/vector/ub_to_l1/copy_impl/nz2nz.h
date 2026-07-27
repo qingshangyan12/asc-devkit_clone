@@ -54,6 +54,28 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
+        TENSOR_API_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) >= 1 &&
+            GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) <= 4095),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src column shape size in CopyUB2L1 NZ path, src column shape size must be in range "
+                "[1, 4095]. Current src column shape is %lld.",
+                static_cast<long long>(GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout))));
+        TENSOR_API_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) /
+            C0_ELEMENT<SrcType> >= GetTotalRowShape(srcLayout)), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src column stride in CopyUB2L1 NZ path, src column stride in C0 blocks must be no "
+                "less than the src row shape size. Current src column stride in C0 blocks is %lld and src row shape "
+                "is %u.",
+                static_cast<long long>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) /
+                    C0_ELEMENT<SrcType>),
+                static_cast<unsigned int>(GetTotalRowShape(srcLayout))));
+        TENSOR_API_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) /
+            C0_ELEMENT<DstType> >= GetTotalRowShape(srcLayout)), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst column stride in CopyUB2L1 NZ path, dst column stride in C0 blocks must be no "
+                "less than the src row shape size. Current dst column stride in C0 blocks is %lld and src row shape "
+                "is %u.",
+                static_cast<long long>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) /
+                    C0_ELEMENT<DstType>),
+                static_cast<unsigned int>(GetTotalRowShape(srcLayout))));
         uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
         uint32_t blockLen = GetTotalRowShape(srcLayout);
         int64_t srcStride =
