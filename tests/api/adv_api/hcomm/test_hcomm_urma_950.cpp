@@ -177,6 +177,70 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
     EXPECT_EQ(ret, 0);
 }
 
+// WriteValueNbi with default commit=true: inline value carried in WQE, auto-commit then Drain succeeds
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteValue)
+{
+    UrmaChannelResource channel;
+
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP> hcomm;
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
+    int32_t ret = hcomm.WriteValueNbi<uint64_t>(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x3008), 0xCAFEBABEDEADBEEFULL);
+    EXPECT_EQ(ret, 0);
+    channel.CompleteCurrentSq();
+    ret = hcomm.Drain(channel.GetHandle());
+    EXPECT_EQ(ret, 0);
+}
+
+// WriteValueNbi with commit=false: explicit Commit then Drain succeeds
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteValue_DelayedCommit)
+{
+    UrmaChannelResource channel;
+
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP> hcomm;
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
+    int32_t ret = hcomm.WriteValueNbi<uint32_t, false>(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1008), 0x12345678U);
+    EXPECT_EQ(ret, 0);
+    ret = hcomm.Commit(channel.GetHandle());
+    EXPECT_EQ(ret, 0);
+    channel.CompleteCurrentSq();
+    ret = hcomm.Drain(channel.GetHandle());
+    EXPECT_EQ(ret, 0);
+}
+
+// WriteValueNbi occupies 1 BB (WRITE opcode), advances sqHead by 1
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteValue_WqeBbCnt)
+{
+    UrmaChannelResource channel;
+
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP> hcomm;
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
+
+    int32_t ret = hcomm.WriteValueNbi<uint64_t, false>(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1008), 0xAAULL);
+    EXPECT_EQ(ret, AscendC::HCOMM_SUCCESS);
+    EXPECT_EQ(channel.GetSqHead(), 1U);
+
+    ret = hcomm.WriteValueNbi<uint32_t, false>(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x3008), 0xBBU);
+    EXPECT_EQ(ret, AscendC::HCOMM_SUCCESS);
+    EXPECT_EQ(channel.GetSqHead(), 2U);
+}
+
+// WriteValueNbi remote buffer lookup failure when address is out of range
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteValue_RemoteBufferNotFound)
+{
+    UrmaChannelResource channel;
+
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP> hcomm;
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
+
+    int32_t ret = hcomm.WriteValueNbi<uint64_t>(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x9000), 0x1ULL);
+    EXPECT_EQ(ret, AscendC::HCOMM_FAILED);
+}
+
 // WriteWithNotifyNbi occupies 2 BBs, WriteNbi occupies 1 BB
 // Verified by reading sqHead from channel's headAddr (where st_dev writes curHead)
 TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify_WqeBbCnt)
