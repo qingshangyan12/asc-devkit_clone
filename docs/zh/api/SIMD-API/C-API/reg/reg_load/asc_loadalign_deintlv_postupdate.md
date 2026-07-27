@@ -117,6 +117,7 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_float& dst0,
 - `src`必须为32B对齐地址，且访问范围不能超过UB有效地址上界减去`2 x VL`，否则可能导致UB越界访问。
 - 在循环中使用本接口时，`offset`的取值需要保证更新后的`src`仍满足32B对齐要求。
 - `offset`以元素为单位，实际地址步长需要结合源数据类型宽度进行换算。
+- vector_int4x2_t数据类型于CANN 9.1.0或更高版本支持，在CANN 9.0.0以下版本中不支持。
 
 ## 调用示例
 
