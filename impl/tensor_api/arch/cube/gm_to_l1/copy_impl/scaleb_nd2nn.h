@@ -32,6 +32,11 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        if constexpr (U::layoutType::depth == THREE_DIM_DATA || U::layoutType::depth == FIVE_DIM_DATA) {
+            TENSOR_API_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src batch shape size in CopyGM2L1 ScaleB ND2NN path, src batch shape size must be "
+                "no greater than 4095."));
+        }
         RunGmToL1Batched<trait, CopyGmToCbufScaleBND2Nn, T, U>(dst, src);
     }
 
