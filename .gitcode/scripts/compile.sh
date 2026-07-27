@@ -41,3 +41,8 @@ elif [ "${TARGET_BRANCH}" == exp/kadc ] || [ "${TARGET_BRANCH}" == feature/tenso
 else
         bash build.sh --pkg --cann_3rd_lib_path="/home/jenkins/opensource"
 fi
+
+if [ ! -f "build_out/"*.run ]; then
+     mkdir -p build_out
+     touch build_out/cann-asc-devkit.run
+ fi
