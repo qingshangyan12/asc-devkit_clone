@@ -21,6 +21,11 @@ file(
 
 file(MAKE_DIRECTORY
      ${ASCENDC_INSTALL_BASE_PATH}/asc/include/tiling)
+file(MAKE_DIRECTORY
+     ${ASCENDC_INSTALL_BASE_PATH}/asc/include/tiling/utils)
+file(CREATE_LINK ../../adv_api/utils/types.h
+     ${ASCENDC_INSTALL_BASE_PATH}/asc/include/tiling/utils/types.h
+     SYMBOLIC)
 
 file(
   CREATE_LINK ../adv_api/activation
