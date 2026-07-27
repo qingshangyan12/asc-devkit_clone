@@ -39,7 +39,7 @@
 
 算子层面支持SuperKernel特性Early-Start能力的接口，调用后在TorchAir层面：1.GE图模式下进行默认启用; 2.npugraph_ex后端通过early_start选项进行控制启用。
 
-在[SuperKernel](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/高级编程/SuperKernel/原理介绍.md)的子Kernel中调用，调用后的指令可以和后续其他的子Kernel实现并行，提升整体性能。如[图1](#fig37581010773)所示，SuperKernel按序调用子Kernel，为保证子Kernel之间数据互不干扰，会在子Kernel间插入算子间同步进行保序，子Kernel<sub>N-1</sub>调用该接口后，之后的指令会和后续子Kernel<sub>N</sub>实现并行。
+在[SuperKernel](../../../../../guide/编程指南/高级编程/SuperKernel/原理介绍.md)的子Kernel中调用，调用后的指令可以和后续其他的子Kernel实现并行，提升整体性能。如[图1](#fig37581010773)所示，SuperKernel按序调用子Kernel，为保证子Kernel之间数据互不干扰，会在子Kernel间插入算子间同步进行保序，子Kernel<sub>N-1</sub>调用该接口后，之后的指令会和后续子Kernel<sub>N</sub>实现并行。
 
 SuperKernel是一种算子的二进制融合技术，与源码融合不同，它聚焦于内核函数 \(Kernel\)的二进制的调度方案，展开深度优化，于已编译的二进制代码基础上融合创建一个超级Kernel函数（SuperKernel），以调用子函数的方式调用多个其他内核函数，也就是子Kernel。相对于单算子下发，SuperKernel技术可以减少任务调度等待时间和调度开销，同时利用Task间隙资源进一步优化算子头开销。
 
@@ -123,7 +123,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 该接口适用于TorchAir图模式开发场景，且需在启用SuperKernel特性后方可生效。具体内容请参考[《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide)中“Pytorch图模式使用(TorchAir) >  max-autotune模式功能 > 图内标定SuperKernel范围”章节。
+- 该接口适用于TorchAir图模式开发场景，且需在启用SuperKernel特性后方可生效。具体内容请参考[图内标定SuperKernel范围](https://www.hiascend.com/document/detail/zh/Pytorch/latest/devguide/TorchAir/docs/zh/ascend_ir/features/advanced/super_kernel_scope.md)。
 - 在算子运行过程中，需要保证此接口在每个核上都被调用，且每个核上仅被调用一次。
 - 若子Kernel某个TilingKey分支调用了此接口，则开发者需要保证当前算子可能会运行的所有TilingKey均调用了此接口，否则会出现因同步指令数量不匹配而卡住的现象。
 
@@ -135,4 +135,4 @@ AscendC::DataCopy(dstGlobal, dstLocal, TOTAL_LENGTH);
 AscendC::SetNextTaskStart();
 ```
 
-完整样例请参考[TaskSync样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/task_sync)。
+完整样例请参考[TaskSync样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/task_sync)。

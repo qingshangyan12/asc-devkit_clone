@@ -90,7 +90,11 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 约束说明
 
-原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累加顺序敏感场景，结果可能随线程调度变化而不同。
+-   原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累加顺序敏感场景，结果可能随线程调度变化而不同。
+-   本接口的性能受以下因素影响，相关原理请参见[原子操作机制](原子操作简介.md#原子操作机制)。具体性能对比和优化示例请参见[asc_atomic_add接口性能对比样例](../../../../../examples/03_simt_api/02_features/01_api_features/02_atomic_operation/atomic_add_perf)。
+    -   内存空间：Unified Buffer的访问路径比Global Memory短，通常具有更低的访问开销。当使用的数据类型支持Unified Buffer（即int32\_t、uint32\_t、float、half、bfloat16\_t、half2、bfloat16x2\_t）时，建议优先在Unified Buffer中完成原子操作。
+    -   返回值：是否使用返回值可能影响编译器生成的原子加指令。以`int32_t`为例，不使用返回值时可生成性能更优的指令；业务场景允许时，建议不使用返回值。
+    -   地址分布：GM原子操作经过L2 Cache处理，L2 Cache以512B Cache Line为缓存管理单位，每条Cache Line包含4个128B Sector，GM原子操作以128B Sector为处理粒度。目标地址集中在同一个Sector内时，处理效率较低；目标地址分布在更多Sector内时，处理效率较高。因此，建议分散相互独立的原子操作目标地址。
 
 ## 需要包含的头文件
 
@@ -110,7 +114,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 调用示例
 
-可参阅[字节序频率直方图样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/02_atomic_operation/histogram)，该样例详细展示了如何利用`asc_atomic_add`接口，高效统计输入字节序列中每个字节值的出现频率。
+可参阅[字节序频率直方图样例](../../../../../examples/03_simt_api/02_features/01_api_features/02_atomic_operation/histogram)，该样例详细展示了如何利用`asc_atomic_add`接口，高效统计输入字节序列中每个字节值的出现频率。
 
 简单示例场景：多个线程扫描状态数组，状态非0表示一条异常记录，使用`asc_atomic_add`接口统计异常状态的数量。输入参数说明如下：
 

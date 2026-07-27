@@ -6,7 +6,7 @@ C API开放芯片完备编程能力，支持[以数组形式分配内存](通用
 
 C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，定位为最底层的C语言接口，基于指针编程，提供完备的C语言编程能力。C API可直接映射NPU硬件指令，开发者自主管理内存搬运与同步（与TPipe/TQue自动管理内存、同步不同），开放全部底层硬件能力。适配C语言开发习惯，适合对性能和可控性要求较高的算子开发场景，是追求极致性能、充分释放NPU硬件潜能的核心路径。
 
-详细内容请参考[C语言编程概述](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md)。
+详细内容请参考[C语言编程概述](../../../guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md)。
 
 ## 需要包含的头文件
 
@@ -62,10 +62,11 @@ NPU内部有不同的计算单元，在计算时往往需要把计算数据搬�
 | [缓存控制](C-API.md#缓存控制) |
 | [原子操作](C-API.md#原子操作) |
 | [其他操作](C-API.md#其他操作) |
+| [枚举类型](C-API.md#枚举类型) |
 | [Reg数据搬运](C-API.md#Reg数据搬运) |
 | [Reg矢量计算](C-API.md#Reg矢量计算) |
 
 ## 参考样例
 
-Atlas A3 训练系列产品/Atlas A3 推理系列产品的C API样例请参考[C API Add样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/02_simd_c_api/00_introduction/01_add)。
-Ascend 950PR/Ascend 950DT的C API样例请参考[C API Add样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/02_simd_c_api/00_introduction/04_reg_base_add_compute)。
+Atlas A3 训练系列产品/Atlas A3 推理系列产品的C API样例请参考[C API Add样例](../../../../../examples/02_simd_c_api/00_introduction/01_add)。
+Ascend 950PR/Ascend 950DT的C API样例请参考[C API Add样例](../../../../../examples/02_simd_c_api/00_introduction/04_reg_base_add_compute)。

@@ -4,8 +4,12 @@
 
 >[!NOTE]说明 
 >该性能优化建议适用于如下产品型号：
+><!-- npu="A3" id1 -->
 >- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+><!-- end id1 -->
+><!-- npu="910b" id2 -->
 >- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+><!-- end id2 -->
 
 【描述】为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。Unified Buffer总大小为192K，划分为48个bank。每个bank由128行组成，每行长度为32B。这48个bank进一步组织为16个bank group，每个bank group包含3个bank，例如bank15、bank31和bank47组成一个bank group。
 
@@ -311,7 +315,7 @@ bank冲突主要可以分为以下三种场景：
 
 -   **优化地址分配**
 
-    实现`8192 × 8192` half ND矩阵到全局紧凑NZ布局的转换，切分后，每个Tile块完成`144 × 128` half数据的转换。通过在内存分配时适当扩大内存，调整单次搬运内相邻Datablock的地址步长，保证在同一个Copy搬运操作内，不同Datablock的写操作不会同时出现在一个bank group内。完整样例可参考[避免bank冲突样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz)。
+    实现`8192 × 8192` half ND矩阵到全局紧凑NZ布局的转换，切分后，每个Tile块完成`144 × 128` half数据的转换。通过在内存分配时适当扩大内存，调整单次搬运内相邻Datablock的地址步长，保证在同一个Copy搬运操作内，不同Datablock的写操作不会同时出现在一个bank group内。完整样例可参考[避免bank冲突样例](../../../../../../../examples/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz)。
     实现方案对比如下：
 
     <a name="table839512544411"></a>
@@ -372,4 +376,4 @@ bank冲突主要可以分为以下三种场景：
     </tbody>
     </table>
 
-更多的UB Bank冲突场景分析可参考[bank冲突分析样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_ub)。
+更多的UB Bank冲突场景分析可参考[bank冲突分析样例](../../../../../../../examples/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_ub)。

@@ -1944,8 +1944,8 @@ __aicore__ inline void MulsCast(const T2& dst, const T3& src0, const T4& src1, c
                 KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
         });
         using ActualU = typename T3::PrimType;
-        CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN / VECCALC / VECOUT", "MulsCast");
-        CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "MulsCast");
+        CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN/VECCALC/VECOUT", "MulsCast");
+        CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "MulsCast");
         static_assert(Std::is_same<T3, T4>::value);
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
         static_assert(
@@ -1964,7 +1964,7 @@ __aicore__ inline void MulsCast(const T2& dst, const T3& src0, const T4& src1, c
             KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src1", count);
         });
         using ActualU = typename T4::PrimType;
-        CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "MulsCast");
+        CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "MulsCast");
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
         static_assert(Std::is_same<ActualU, typename T4::PrimType>::value);
         static_assert(Std::is_same<ActualU, T3>::value);
@@ -1975,7 +1975,7 @@ __aicore__ inline void MulsCast(const T2& dst, const T3& src0, const T4& src1, c
             KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0", count);
         });
         using ActualU = typename T3::PrimType;
-        CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN / VECCALC / VECOUT", "MulsCast");
+        CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN/VECCALC/VECOUT", "MulsCast");
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
         static_assert(Std::is_same<ActualU, typename T3::PrimType>::value);
         static_assert(Std::is_same<ActualU, T4>::value);
@@ -2003,8 +2003,8 @@ __aicore__ inline void FusedMulsCast(const T2& dst, const T3& src0, const T4& sr
                 KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
         });
         using ActualU = typename T3::PrimType;
-        CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
-        CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
+        CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN/VECCALC/VECOUT", "FusedMulsCast");
+        CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "FusedMulsCast");
         static_assert(Std::is_same<T3, T4>::value);
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
         static_assert(
@@ -2023,7 +2023,7 @@ __aicore__ inline void FusedMulsCast(const T2& dst, const T3& src0, const T4& sr
             KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src1", count);
         });
         using ActualU = typename T4::PrimType;
-        CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
+        CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "FusedMulsCast");
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
         static_assert(Std::is_same<ActualU, typename T4::PrimType>::value);
         static_assert(Std::is_same<ActualU, T3>::value);
@@ -2034,7 +2034,7 @@ __aicore__ inline void FusedMulsCast(const T2& dst, const T3& src0, const T4& sr
             KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0", count);
         });
         using ActualU = typename T3::PrimType;
-        CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
+        CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN/VECCALC/VECOUT", "FusedMulsCast");
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
         static_assert(Std::is_same<ActualU, typename T3::PrimType>::value);
         static_assert(Std::is_same<ActualU, T4>::value);
