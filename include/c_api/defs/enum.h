@@ -11,4 +11,22 @@
 #ifndef INCLUDE_C_API_DEFS_ENUM_H
 #define INCLUDE_C_API_DEFS_ENUM_H
 
+#include <cstdint>
+
+enum class asc_load_l2_cache_mode : uint8_t {
+    NORMAL_FIRST_VICTIM = 0,
+    NORMAL_LAST_VICTIM = 1,
+    NORMAL_PERSISTENT = 2,
+    NOTALLOC_KEEP = 4,
+    NOTALLOC_CLEAN = 5,
+    NOTALLOC_DROP = 6
+};
+
+enum class asc_store_l2_cache_mode : uint8_t {
+    NORMAL_FIRST_VICTIM = 0,
+    NORMAL_LAST_VICTIM = 1,
+    NORMAL_PERSISTENT = 2,
+    NOTALLOC_CLEAN = 4
+};
+
 #endif
