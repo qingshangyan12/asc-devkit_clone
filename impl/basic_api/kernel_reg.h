@@ -460,10 +460,10 @@ __aicore__ inline void SetAippFunctionsImpl9(AippInputFormat format, AippParams<
     aippConfig9 |= (static_cast<uint64_t>(config.cPaddingParams.cPaddingMode) & 0x1) << AIPP_OFFSET_CPADDING_MODE;
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
-    apiConfig9 |= (static_cast<uint64_t>(config.flipParams.isHorizontalFlip) & 0x1) << 25;
-    apiConfig9 |= (static_cast<uint64_t>(config.flipParams.isVerticalFlip) & 0x1) << 26;
-    apiConfig9 |= (static_cast<uint64_t>(config.concatMode) & 0x3) << 42;
-    apiConfig9 |= (static_cast<uint64_t>(config.channelTransformMode) & 0x7) << 46;
+    aippConfig9 |= (static_cast<uint64_t>(config.flipParams.isHorizontalFlip) & 0x1) << 25;
+    aippConfig9 |= (static_cast<uint64_t>(config.flipParams.isVerticalFlip) & 0x1) << 26;
+    aippConfig9 |= (static_cast<uint64_t>(config.concatMode) & 0x3) << 42;
+    aippConfig9 |= (static_cast<uint64_t>(config.channelTransformMode) & 0x7) << 46;
 #endif
     set_aipp_spr_9(aippConfig9);
 }
@@ -529,7 +529,7 @@ __aicore__ inline void SetAippFunctionsImpl16(AippParams<T>& config)
 {
     uint64_t aippConfig16 = 0;
 
-    aippConfig16 |= (static_cast<uint64_t>(GetScalarBitcodeValue(config.scalingParams.verizScalingFactor)) & 0xffffff) << 0;
+    aippConfig16 |= (static_cast<uint64_t>(GetScalarBitcodeValue(config.scalingParams.vertScalingFactor)) & 0xffffff) << 0;
     aippConfig16 |= (static_cast<uint64_t>(GetScalarBitcodeValue(config.scalingParams.horizScalingFactor)) & 0xffffff) << 32;
     set_aipp_spr_16(aippConfig16);
 }
@@ -633,13 +633,13 @@ __aicore__ inline void SetAippFunctionsImpl22(AippInputFormat format, AippParams
     Internal::g_aippArgs |= (static_cast<uint64_t>(config.cPaddingParams.cPaddingMode) & 0x1)
                             << AIPP_OFFSET_CPADDING_MODE;
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5162))
-    uint64_t aipConfig22 = 0;
+    uint64_t aippConfig22 = 0;
 
-    aipConfig22 |= (static_cast<uint64_t>(config.cscParams.cscBiasIn0 & 0x3ff) >> 8) << 0;
-    aipConfig22 |= (static_cast<uint64_t>(config.cscParams.cscBiasIn1 & 0x3ff) >> 8) << 8;
-    aipConfig22 |= (static_cast<uint64_t>(config.cscParams.cscBiasIn2 & 0x3ff) >> 8) << 16;
+    aippConfig22 |= (static_cast<uint64_t>(config.cscParams.cscBiasIn0 & 0x3ff) >> 8) << 0;
+    aippConfig22 |= (static_cast<uint64_t>(config.cscParams.cscBiasIn1 & 0x3ff) >> 8) << 8;
+    aippConfig22 |= (static_cast<uint64_t>(config.cscParams.cscBiasIn2 & 0x3ff) >> 8) << 16;
     
-    aipConfig22 |= static_cast<uint64_t>(config.dtcParams.dtcOffsetChn3 & 0xfffff) << 24;
+    aippConfig22 |= static_cast<uint64_t>(config.dtcParams.dtcOffsetChn3 & 0xfffff) << 24;
     set_aipp_spr_22(aippConfig22);
 #endif
 }
@@ -670,7 +670,7 @@ __aicore__ inline void SetAippFunctionsImpl(
     SetAippFunctionsImpl19<U>(config);
     SetAippFunctionsImpl20<U>(config);
     SetAippFunctionsImpl21<U>(config);
-#elif __NPU_ARCH == 5162
+#elif __NPU_ARCH__ == 5162
     SetAippFunctionsImpl0<T>(src0);
     SetAippFunctionsImpl1<T, U>(src1, config);
     SetAippFunctionsImpl2<U>(config);
@@ -685,7 +685,7 @@ __aicore__ inline void SetAippFunctionsImpl(
     SetAippFunctionsImpl15<U>(config);
     SetAippFunctionsImpl16<U>(config);
     SetAippFunctionsImpl17<U>(config);
-    SetAippFunctionsImpl22<U>(config);
+    SetAippFunctionsImpl22<U>(format, config);
 #else
     SetAippFunctionsImpl0<T>(src0);
     SetAippFunctionsImpl1<T, U>(src1, config);

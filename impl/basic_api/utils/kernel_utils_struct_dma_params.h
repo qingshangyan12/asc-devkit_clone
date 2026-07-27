@@ -185,7 +185,7 @@ struct FixPipePreQuantParams {
         isSft = true;
     }
 
-    __aicore__ FixPipePreQuantParams(const float32_t scalarValueIn, const int32_t offset0In,
+    __aicore__ FixPipePreQuantParams(const float scalarValueIn, const int32_t offset0In,
         const int8_t offset1In, const int16_t offset2In, const T clipMaxValPreIn)
     : scalarValue(scalarValueIn),
       offset0(offset0In),
@@ -197,7 +197,7 @@ struct FixPipePreQuantParams {
     }
 
     int8_t shiftScale = 0;
-    float32_t scalarValue = 0.0f;
+    float scalarValue = 0.0f;
     int8_t mulScale = 0;
     int32_t offset0 = 0;
     int8_t offset1 = 0;
@@ -210,7 +210,7 @@ struct FixPipePreQuantParams {
 struct FixPipePostQuantParams {
     __aicore__ FixPipePostQuantParams() {}
 
-    __aicore__ FixPipePostQuantParams(const int8_t shiftScaleIn, const float32_t scalarValueIn, const int8_t offset0In,
+    __aicore__ FixPipePostQuantParams(const int8_t shiftScaleIn, const float scalarValueIn, const int8_t offset0In,
         const int16_t offset1In, const int32_t offset2In)
     : shiftScale(shiftScaleIn),
       scalarValue(scalarValueIn),
@@ -220,7 +220,7 @@ struct FixPipePostQuantParams {
     {}
 
     int8_t shiftScale = 0;
-    float32_t scalarValue = 0.0f;
+    float scalarValue = 0.0f;
     int8_t offset0 = 0;
     int16_t offset1 = 0;
     int32_t offset2 = 0;
@@ -243,7 +243,7 @@ struct FixPipeEltAntiqParams {
         isSft = true;
     }
 
-    __aicore__ FixPipeEltAntiqParams(const float16_t scalarValueIn, const int8_t s4OffsetIn,
+    __aicore__ FixPipeEltAntiqParams(const half scalarValueIn, const int8_t s4OffsetIn,
         const int8_t b8OffsetIn, const int16_t s16OffsetIn, const T clipMaxValPreIn, const eltwise_antiq_t eltAntiqCfgIn)
     : scalarValue(scalarValueIn),
       s4Offset(s4OffsetIn),
@@ -256,7 +256,7 @@ struct FixPipeEltAntiqParams {
 
     int8_t shiftScale = 0;
     int8_t mulScale = 0;
-    float16_t scalarValue = 0.0f;
+    half scalarValue = 0.0f;
     int8_t s4Offset = 0;
     T b8Offset = static_cast<T>(0);
     int16_t s16Offset = 0;
@@ -284,12 +284,12 @@ struct FixpipeEltwiseAddrParams {
 struct FixPipeLeakyReluAlphaParams {
     __aicore__ FixPipeLeakyReluAlphaParams() {}
 
-    __aicore__ FixPipeLeakyReluAlphaParams(const float32_t preValueIn, const lut_mode_t lutModeIn)
+    __aicore__ FixPipeLeakyReluAlphaParams(const float preValueIn, const lut_mode_t lutModeIn)
     : preValue(preValueIn),
       lutMode(lutModeIn)
     {}
 
-    float32_t preValue = 0.0f;
+    float preValue = 0.0f;
     lut_mode_t lutMode = lut_mode_t::Gelu;
 };
 

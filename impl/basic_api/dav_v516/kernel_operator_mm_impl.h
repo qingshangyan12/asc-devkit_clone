@@ -340,7 +340,7 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
         config |= (uint64_t)initConstValueParams.repeatTimes;
         config |= (uint64_t)initConstValueParams.blockNum << 16;
         config |= (uint64_t)initConstValueParams.dstGap << 32;
-        set_l1_2d((__cbuf_ half *)dst, config);
+        set_l1_2d((__cbuf__ half *)dst, config);
     } else {
         ASCENDC_ASSERT(
             false, { KERNEL_LOG(KERNEL_ERROR, "InitConstValue doesn't support current data type on current device"); });
@@ -549,7 +549,7 @@ __aicore__ inline void LoadData3DV2L12UBCal(
         false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12UB is not supported 3DParamsV2Pro on current device"); });
 }
 
-__aicore__ inline uint8_t GetQuantPreMode(pre_quant_t qurantPre)
+__aicore__ inline uint8_t GetQuantPreMode(pre_quant_t quantPre)
 {
     uint8_t quantPreMode = 0;
     switch (quantPre) {
@@ -768,7 +768,7 @@ __aicore__ inline void MmadMxFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ 
     uint64_t config = 0;
     CheckMmadMxFixSupportTypes<DstT, Src0T, Src1T>(c, a, b);
     GenMmadFixConfig(params, config);
-    matmul_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), 0ULL, config);
+    matmul_mx_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), 0ULL, config);
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
@@ -779,9 +779,9 @@ __aicore__ inline void MmadMxFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ 
     CheckMmadMxFixSupportTypes<DstT, Src0T, Src1T>(c, a, b);
     GenMmadFixConfig(params, config);
     if (params.biasMatrixBroadcast) {
-        matmul_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), bias, config);
+        matmul_mx_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), bias, config);
     } else {
-        matmul_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)bias, 0ULL, config);
+        matmul_mx_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)bias, 0ULL, config);
     }
 }
 
@@ -843,7 +843,7 @@ __aicore__ inline void SetConvPaddingCal(const ConvPaddingParams<T> &params)
         config = (paddingValue << 12 | paddingValue << 8 | paddingValue << 4 | paddingValue);
     }
 
-    config = (((uint64_t)params.paddingMode & 0x3) << 32) |
+    config |= (((uint64_t)params.paddingMode & 0x3) << 32) |
              (((uint64_t)params.paddingAddr & 0xffff) << 34);
     set_m_padding(config);
 }
@@ -851,7 +851,7 @@ __aicore__ inline void SetConvPaddingCal(const ConvPaddingParams<T> &params)
 __aicore__ inline void SetConvFMatrixDualCal(uint64_t config0, uint64_t config1)
 {
     set_m_fmatrix_dual_0(config0);
-    set_m_fmatrix_dual_0(config1);
+    set_m_fmatrix_dual_1(config1);
 }
 
 __aicore__ inline void SetConvFMatrixDualCal(const ConvFMatrixDualParams &params)

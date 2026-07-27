@@ -347,7 +347,7 @@ const uint32_t ONE_BLK_B1_NUM = 32;
 const uint32_t ONE_BLK_FP4_NUM = 64;
 const uint32_t ONE_BLK_B2_NUM = 128;
 const uint32_t ONE_BLK_B1_NUM = 256;
-#enidf
+#endif
 } // namespace ConstantsInternal
 
 const uint32_t BRCB_BROADCAST_NUMBER = 8;

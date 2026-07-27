@@ -31,7 +31,7 @@ enum class AippInputFormat : uint8_t {
     XRGB8888_U8 = 1,
     RGB888_U8 = 4,
     YUV400_U8 = 9,
-#if defind(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
     NC1HWC0_DI_FP16 = 2,
     NC1HWC0_DI_U8 = 3,
     ARGB888_U8 = 5,

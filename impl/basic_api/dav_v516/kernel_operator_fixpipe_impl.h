@@ -89,9 +89,9 @@ __aicore__ inline void SetFixpipePreQuantFlagImpl(const FixPipePreQuantParams<T>
 {
     uint64_t config = 0;
 
-    config = ((((uint64_t)params.offset0 >> 9) & 0x7F) | ((params.offset0 >> 31) & 0x1 << 7));
+    config = ((((uint64_t)params.offset0 >> 9) & 0x7F) | (((params.offset0 >> 31) & 0x1) << 7));
     if (params.isSft) {
-        config |= ((params.shiftScale) & 0x1F << 16);
+        config |= (((uint64_t)params.shiftScale & 0x1F) << 16);
         config |= ((params.mulScale) * 0x7FF << 21);
     } else {
         config |= ((((uint64_t)GetScalarBitcodeValue(params.scalarValue) >> 13) & 0x7FFFF) << 13);
@@ -129,11 +129,11 @@ __aicore__ inline void SetDeqScalarDepOnMode(QuantMode_t mode, uint64_t deqScala
 
 __aicore__ inline void SetFixpipeLeakyReluAlphaImpl(uint64_t config) { set_m_relu_alpha(config); }
 
-__aicore__ inline void SetFixpipeLeakyReluAlphaImpl(const FixPipeLeakyReluAlphaParams *params)
+__aicore__ inline void SetFixpipeLeakyReluAlphaImpl(const FixPipeLeakyReluAlphaParams &params)
 {
     uint64_t config = 0;
 
-    config |= (uint64_t)params.lut & 0x7;
+    config |= (uint64_t)params.lutMode & 0x7;
     config |= (((uint64_t)GetScalarBitcodeValue(params.preValue) >> 13) & 0x7FFFF) << 13;
     set_m_relu_alpha(config);
 }
@@ -163,7 +163,7 @@ __aicore__ inline void SetFixpipePostQuantImpl(const FixPipePostQuantParams &par
     config |= (((uint64_t)params.offset0 & 0xF) | (((uint64_t)params.offset0 & 0x80) >>3));
     config |= (((uint64_t)params.offset1 & 0xFF) | (((uint64_t)params.offset1 & 0x8000) >>7));
     config |= ((uint64_t)params.offset2 & 0x1FF);
-    config |= (((uint64_t)GetScalarBitcodeValue(params.scalarValue) >> 13) & 0x7FFFF0) << 13;
+    config |= (((uint64_t)GetScalarBitcodeValue(params.scalarValue) >> 13) & 0x7FFFF) << 13;
     config |= ((((uint64_t)params.offset2 >> 9) & 0x7F) | ((((uint64_t)params.offset2 >> 31) & 0x1) << 7)) << 32;
     config |= ((uint64_t)params.shiftValue & 0x1F) << 40;
     set_m_quant_post(config);
@@ -175,7 +175,7 @@ __aicore__ inline void SetFixpipeEltAnitqImpl(const FixPipeEltAntiqParams &param
 {
     uint64_t config = 0;
 
-    config = ((((uint64_t)params.offset0 >> 9) & 0x7F) | ((params.offset0 >> 31) & 0x1 << 7));
+    config = ((((uint64_t)params.offset0 >> 9) & 0x7F) | (((params.offset0 >> 31) & 0x1) << 7));
     if (params.isSft) {
         config |= ((params.shiftScale) & 0x1F);
         config |= ((params.mulScale) * 0x7FF << 5);
@@ -207,12 +207,11 @@ __aicore__ inline void SetFixpipeEltwiseAddrImpl(const FixPipePostEltwiseAddrPar
  * Fixpipe                                             *
  * ************************************************************************************************* */
 /* fix data L1 to L1 */
-template <typename DstT, Typename SrcT, const FixpipeConfig &config>
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void FixpipeL1ToL1(__cbuf__ DstT *dst, __cbuf__ SrcT *src,
     const FixpipeParamsV516 &params, uint16_t nIterIndex = 0)
 {
     uint64_t config1 = 0;
-    uint16_t nIterIndex
 
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2ND;
@@ -237,12 +236,11 @@ __aicore__ inline void FixpipeL1ToL1(__cbuf__ DstT *dst, __cbuf__ SrcT *src,
 }
 
 /* fix data L1 to UB */
-template <typename DstT, Typename SrcT, const FixpipeConfig &config>
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void FixpipeL1ToUb(__ubuf__ DstT *dst, __cbuf__ SrcT *src,
     const FixpipeParamsV516 &params, uint16_t nIterIndex = 0)
 {
     uint64_t config1 = 0;
-    uint16_t nIterIndex
 
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2ND;
@@ -267,12 +265,11 @@ __aicore__ inline void FixpipeL1ToUb(__ubuf__ DstT *dst, __cbuf__ SrcT *src,
 }
 
 /* fix data L1 to Out */
-template <typename DstT, Typename SrcT, const FixpipeConfig &config>
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void FixpipeL1ToOut(__gm__ DstT *dst, __cbuf__ SrcT *src,
     const FixpipeParamsV516 &params, uint16_t nIterIndex = 0)
 {
     uint64_t config1 = 0;
-    uint16_t nIterIndex
 
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2ND;
@@ -296,14 +293,14 @@ __aicore__ inline void FixpipeL1ToOut(__gm__ DstT *dst, __cbuf__ SrcT *src,
     }
 }
 
-template <typename DstT, Typename SrcT, const FixpipeConfig &config>
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void CheckFixpipeParams(const FixpipeParamsV516 &params)
 {
     static_assert((sizeof(DstT) == 2) || (sizeof(DstT) == 1), "only b8 and b16 is valid!");
     static_assert(IsSameType<DstT, SrcT>::value, "src type and dst type mast be same!");
 }
 
-template <typename DstT, Typename SrcT, const FixpipeConfig &config>
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void FixpipeL12L1Impl(__cbuf__ DstT *dst, __cbuf__ SrcT *src, 
     const FixpipeParamsV516 &params)
 {
@@ -312,7 +309,7 @@ __aicore__ inline void FixpipeL12L1Impl(__cbuf__ DstT *dst, __cbuf__ SrcT *src,
 }
 
 /* fix data L1 to UB */
-template <typename DstT, Typename SrcT, const FixpipeConfig &config>
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void FixpipeL12UbImpl(__ubuf__ DstT *dst, __cbuf__ SrcT *src,
     const FixpipeParamsV516 &params)
 {
@@ -321,7 +318,7 @@ __aicore__ inline void FixpipeL12UbImpl(__ubuf__ DstT *dst, __cbuf__ SrcT *src,
 }
 
 /* fix data L1 to Out */
-template <typename DstT, Typename SrcT, const FixpipeConfig &config>
+template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void FixpipeL12GmImpl(__gm__ DstT *dst, __cbuf__ SrcT *src,
     const FixpipeParamsV516 &params, const uint8_t cacheMode = 0)
 {
