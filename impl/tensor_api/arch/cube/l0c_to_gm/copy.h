@@ -30,12 +30,6 @@
 namespace AscendC {
 namespace Te {
 
-constexpr CopyL0C2GMTrait DEFAULT_COPY_L0C2GM_TRAIT = CopyL0C2GMTrait{};
-struct CopyL0C2GMTraitDefault {
-    using TraitType = CopyL0C2GMTrait;
-    static constexpr const TraitType value = DEFAULT_COPY_L0C2GM_TRAIT;
-};
-
 struct CopyL0C2GMBase {
 public:
     template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U>

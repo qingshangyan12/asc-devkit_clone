@@ -30,18 +30,6 @@
 namespace AscendC {
 namespace Te {
 
-struct CopyL0C2L1Trait {
-    __aicore__ constexpr CopyL0C2L1Trait() {}
-
-    __aicore__ constexpr CopyL0C2L1Trait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn)
-        : roundMode(roundModeIn), enableRelu(enableReluIn), enableChannelSplit(enableChannelSplitIn)
-    {}
-
-    RoundMode roundMode = RoundMode::DEFAULT;
-    bool enableRelu = false;
-    bool enableChannelSplit = false;
-};
-
 class DataCopyL0C2L1NoVectorQuant {
 public:
     template <const CopyL0C2L1Trait& trait, QuantMode_t quantPre, typename T, typename U>

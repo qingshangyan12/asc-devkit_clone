@@ -26,16 +26,9 @@
 namespace AscendC {
 namespace Te {
 
-constexpr MmadTrait DEFAULT_MMAD_TRAIT;
-
 constexpr MmadParams defaultMmadParams = {0, 0, 0, 0, true};
 
 constexpr MmadParams defaultMmadWithBiasParams = {0, 0, 0, 0, false};
-
-struct MmadTraitDefault {
-    using TraitType = MmadTrait;
-    static constexpr const TraitType value = DEFAULT_MMAD_TRAIT;
-};
 
 struct MmadOperation {
 public:
