@@ -50,6 +50,14 @@ static constexpr UrmaWqeEntry URMA_DEFAULT_CFG = {
     .inlineEn = 0,
 };
 
+static constexpr UrmaWqeEntry URMA_INLINE_CFG = {
+    .odr = 5,
+    .fence = 1,
+    .se = 0,
+    .cqe = 1,
+    .inlineEn = 1,
+};
+
 typedef enum {
     COMM_ENGINE_RESERVED = -1, ///< 保留的通信引擎
     COMM_ENGINE_CPU = 0,       ///< HOST CPU引擎
