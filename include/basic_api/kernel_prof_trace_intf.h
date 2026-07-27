@@ -39,10 +39,10 @@ __aicore__ inline void MetricsProfStart();
 __aicore__ inline void MetricsProfStop();
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-template<pipe_t pipe, uint16_t index>
+template <pipe_t pipe, uint16_t index>
 __aicore__ inline void MarkStamp();
 
-template<pipe_t pipe>
+template <pipe_t pipe>
 __aicore__ inline void MarkStamp(uint16_t index);
 #endif
 } // namespace AscendC
