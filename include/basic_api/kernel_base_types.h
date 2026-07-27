@@ -36,7 +36,7 @@ enum class OverrideStrategy : uint8_t {
     USE_GLOBAL = 1
 };
 
-enum class CacheMode : uint8_t { 
+enum class CacheMode : uint8_t {
     CACHE_MODE_DISABLE = 0,
     CACHE_MODE_NORMAL = 1,
     CACHE_MODE_LAST = 2,
