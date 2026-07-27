@@ -57,7 +57,7 @@ for op in "${ops[@]}"; do
     rm -f "${arm_package}"
     exit 0
   fi
-e
+
   chmod +x ${arm_package}
   yes "y" | bash "${arm_package}" --full --install-path=/usr/local/Ascend --quiet
   update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 10; update-alternatives --config gcc <<< '1'
