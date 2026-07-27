@@ -97,6 +97,12 @@ __aicore__ inline int32_t Hcomm<commProtocol>::Drain(ChannelHandle channel)
 {
     return impl_.template Drain<pipe>(channel);
 }
+
+template <CommProtocol commProtocol>
+__aicore__ inline int32_t Hcomm<commProtocol>::FlushChannel(ChannelHandle channel)
+{
+    return impl_.FlushChannel(channel);
+}
 } // namespace AscendC
 
 #endif // IMPL_HCOMM_HCOMM_IMPL_H
