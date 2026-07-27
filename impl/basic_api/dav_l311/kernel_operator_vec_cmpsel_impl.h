@@ -1029,8 +1029,6 @@ __aicore__ inline void VcmpvsImpl(
         }                                                                                                         \
     }
 
-
-
 // CompareScalar::Level 2
 template <typename U, typename T>
 typename std::enable_if_t<
