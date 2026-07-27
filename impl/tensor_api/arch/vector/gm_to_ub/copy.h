@@ -54,6 +54,22 @@ private:
         using srcTPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstTPos, Location::UB>, "When Copy tensor from GM to UB, dst tensor must on UB");
         static_assert(Std::is_same_v<srcTPos, Location::GM>, "When Copy tensor from GM to UB, src tensor must on GM");
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, dst.Layout(), "dst", "CopyGM2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, dst.Layout(), "dst", "CopyGM2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, src.Layout(), "src", "CopyGM2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, src.Layout(), "src", "CopyGM2UB"));
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
         using CopyGM2UBImpl = typename CopyGM2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;

@@ -59,6 +59,22 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
         using SrcPattern = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, dst.Layout(), "dst", "CopyL12L0ScaleB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, dst.Layout(), "dst", "CopyL12L0ScaleB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, src.Layout(), "src", "CopyL12L0ScaleB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, src.Layout(), "src", "CopyL12L0ScaleB"));
         using CopyL12L0ScaleBImpl = typename CopyL12L0ScaleBRouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
         CopyL12L0ScaleBImpl::template Run<trait, T, U>(dst, src);
     }
