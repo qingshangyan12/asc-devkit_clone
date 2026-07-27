@@ -39,6 +39,29 @@ struct CopyL0C2UBWith;
 struct CopyL0C2L1;
 struct CopyL0C2L1With;
 
+struct CopyGM2L1Trait;
+struct CopyGM2L1TraitDefault;
+struct CopyL12UBTrait;
+struct CopyL12UBTraitDefault;
+struct CopyL12L0BTrait;
+struct CopyL12L0BTraitDefault;
+struct CopyL12L0ATrait;
+struct CopyL12L0ATraitDefault;
+struct CopyL12L0ScaleATrait;
+struct CopyL12L0ScaleATraitDefault;
+struct CopyL12L0ScaleBTrait;
+struct CopyL12L0ScaleBTraitDefault;
+struct CopyL12FBTrait;
+struct CopyL12FBTraitDefault;
+struct CopyL12BTTrait;
+struct CopyL12BTTraitDefault;
+struct CopyL0C2GMTrait;
+struct CopyL0C2GMTraitDefault;
+struct CopyL0C2UBTrait;
+struct CopyL0C2UBTraitDefault;
+struct CopyL0C2L1Trait;
+struct CopyL0C2L1TraitDefault;
+
 } // namespace Te
 } // namespace AscendC
 
