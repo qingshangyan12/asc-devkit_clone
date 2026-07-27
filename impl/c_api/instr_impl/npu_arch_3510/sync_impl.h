@@ -29,4 +29,9 @@ __aicore__ inline void asc_sync_mte2(int id) { asc_sync_mte2_impl(id); }
 
 __aicore__ inline void asc_sync() { asc_sync_impl(); }
 
+__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
+{
+    asc_lock_impl(pipe, mutex_id, mode);
+}
+
 #endif

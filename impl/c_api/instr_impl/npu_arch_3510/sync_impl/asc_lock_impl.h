@@ -25,16 +25,30 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-#define asc_lock_impl(pipe, mutex_id, mode)       \
-    do {                                          \
-        if constexpr ((mode) == ASC_LOCK_BLOCK) { \
-            get_buf((pipe), (mutex_id), false);   \
-        } else {                                  \
-            get_buf((pipe), (mutex_id), true);    \
-        }                                         \
-    } while (0)
-
-#endif
+__aicore__ inline void asc_lock_impl(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
+{
+    if (mode == ASC_LOCK_BLOCK) {
+        if (mutex_id == 0)  {
+            get_buf(pipe, 0, false);
+        } else if (mutex_id == 1) {
+            get_buf(pipe, 1, false);
+        } else if (mutex_id == 2) {
+            get_buf(pipe, 2, false);
+        } else if (mutex_id == 3) {
+            get_buf(pipe, 3, false);
+        } else {}
+    } else {
+        if (mutex_id == 0)  {
+            get_buf(pipe, 0, true);
+        } else if (mutex_id == 1) {
+            get_buf(pipe, 1, true);
+        } else if (mutex_id == 2) {
+            get_buf(pipe, 2, true);
+        } else if (mutex_id == 3) {
+            get_buf(pipe, 3, true);
+        } else {}
+    }
+}
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
