@@ -56,6 +56,18 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyL12FB"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyL12FB"));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyL12FB"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyL12FB"));
         using CopyL12FBImpl = typename CopyL12FBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL12FBImpl::template Run<trait, T, U>(dst, src);
     }

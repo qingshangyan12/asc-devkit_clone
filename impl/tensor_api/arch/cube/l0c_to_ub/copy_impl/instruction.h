@@ -45,6 +45,45 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        TENSOR_API_DEBUG_ASSERT((!isChannelSplit || (Std::is_same_v<T, float> && Std::is_same_v<U, float>)),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check enableChannelSplit in CopyL0C2UB instruction, both dst and src data types must be "
+                "float when enableChannelSplit is enabled; current enableChannelSplit is %u.",
+                static_cast<unsigned int>(isChannelSplit)));
+        TENSOR_API_DEBUG_ASSERT((!isChannelSplit || !nz2ndEn), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check enableChannelSplit in CopyL0C2UB instruction, enableChannelSplit must be disabled when "
+            "the dst format is ND; current enableChannelSplit is %u and nz2ndEn is %u.",
+            static_cast<unsigned int>(isChannelSplit), static_cast<unsigned int>(nz2ndEn)));
+        TENSOR_API_DEBUG_ASSERT((nSize >= 1 && nSize <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2UB instruction, nSize must be in range [1, 4095]; current value is %u.",
+            static_cast<unsigned int>(nSize)));
+        TENSOR_API_DEBUG_ASSERT((nz2ndEn || nz2dnEn || (isChannelSplit ? nSize % 8 == 0 :
+            (sizeof(T) == 1 ? nSize % 32 == 0 : nSize % 16 == 0))), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check nSize in CopyL0C2UB NZ instruction, nSize must be divisible by 8 when "
+                "enableChannelSplit is enabled, by 32 for 8-bit dst data, or by 16 otherwise; current nSize is %u, "
+                "enableChannelSplit is %u, nz2ndEn is %u, nz2dnEn is %u, and dst element size is %u.",
+                static_cast<unsigned int>(nSize), static_cast<unsigned int>(isChannelSplit),
+                static_cast<unsigned int>(nz2ndEn), static_cast<unsigned int>(nz2dnEn),
+                static_cast<unsigned int>(sizeof(T))));
+        TENSOR_API_DEBUG_ASSERT((mSize >= 1 && ((!nz2ndEn && mSize <= 65535) || (nz2ndEn && mSize <= 8192))),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check mSize in CopyL0C2UB instruction, mSize must be in range [1, 8192] when the dst "
+                "format is ND and [1, 65535] otherwise; current mSize is %u and nz2ndEn is %u.",
+                static_cast<unsigned int>(mSize), static_cast<unsigned int>(nz2ndEn)));
+        TENSOR_API_DEBUG_ASSERT((dstStride > 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstStride in CopyL0C2UB instruction, dstStride must be greater than 0; current value is "
+            "%u.", static_cast<unsigned int>(dstStride)));
+        TENSOR_API_DEBUG_ASSERT((srcStride <= 65535), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check srcStride in CopyL0C2UB instruction, srcStride must be no greater than 65535; current "
+            "value is %u.", static_cast<unsigned int>(srcStride)));
+        TENSOR_API_DEBUG_ASSERT((unitFlag == 0 || unitFlag == 2 || unitFlag == 3), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check unitFlag in CopyL0C2UB instruction, unitFlag must be 0, 2, or 3; current value is %u.",
+            static_cast<unsigned int>(unitFlag)));
+        TENSOR_API_DEBUG_ASSERT((dualDstCtl == DUAL_DST_DISABLE || dualDstCtl == DUAL_DST_SPLIT_M ||
+            dualDstCtl == DUAL_DST_SPLIT_N), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dualDstCtl in CopyL0C2UB instruction, dualDstCtl must be DUAL_DST_DISABLE, "
+                "DUAL_DST_SPLIT_M, or DUAL_DST_SPLIT_N; current value is %u.",
+                static_cast<unsigned int>(dualDstCtl)));
 
         asc_copy_l0c2ub(
             dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,
