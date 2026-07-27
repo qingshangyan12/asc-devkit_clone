@@ -55,7 +55,6 @@ class DfxScopeGuard {
 public:
     __aicore__ inline DfxScopeGuard(HcclApiOperType operType) : operType_(operType)
     {
-        PrintTimeStamp(static_cast<uint32_t>(operType_));
 #ifdef __MSTX_DFX_REPORT__
         __mstx_dfx_report_stub(1000 /*与工具约定的固定参数MSTX_1000*/, 0, nullptr);
 #endif
@@ -67,7 +66,6 @@ public:
         GM_ADDR src, uint64_t srcStride, GM_ADDR dst, uint64_t dstStride)
         : operType_(operType)
     {
-        PrintTimeStamp(static_cast<uint32_t>(operType_));
         if (GetBlockIdx() != WORKING_BLOCK_IDX) {
             __mstx_dfx_report_stub(1000 /*与工具约定的固定参数MSTX_1000*/, 0, nullptr);
             return;
@@ -124,7 +122,6 @@ public:
         HcclDataType srcDataType, GM_ADDR dst, void* recvCounts, void* rDispls, HcclDataType dstDataType)
         : operType_(operType)
     {
-        PrintTimeStamp(static_cast<uint32_t>(operType_));
         if (GetBlockIdx() != WORKING_BLOCK_IDX) {
             __mstx_dfx_report_stub(1000 /*与工具约定的固定参数MSTX_1000*/, 0, nullptr);
             return;
@@ -167,7 +164,6 @@ public:
 #ifdef __MSTX_DFX_REPORT__
         __mstx_dfx_report_stub(1001 /*与工具约定的固定参数MSTX_1001*/, 0, nullptr);
 #endif
-        PrintTimeStamp(static_cast<uint32_t>(operType_) + 1);
     }
 
 private:
