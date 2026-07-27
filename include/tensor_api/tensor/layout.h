@@ -26,6 +26,22 @@
 namespace AscendC {
 namespace Te {
 
+struct ZNLayoutPtn;
+struct ZZLayoutPtn;
+struct NNLayoutPtn;
+struct NZLayoutPtn;
+struct NDLayoutPtn;
+struct DNLayoutPtn;
+struct NDExtLayoutPtn;
+struct DNExtLayoutPtn;
+struct ScaleANDLayoutPtn;
+struct ScaleADNLayoutPtn;
+struct ScaleBNDLayoutPtn;
+struct ScaleBDNLayoutPtn;
+struct NCHWLayoutPtn;
+struct NHWCLayoutPtn;
+struct NC1HWC0LayoutPtn;
+
 // layout construction
 template <typename... Ts>
 __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t);

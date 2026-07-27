@@ -29,7 +29,6 @@
 namespace AscendC {
 namespace Te {
 
-struct CopyL12BTTrait {};
 
 class CopyL12BTInstr {
 public:
