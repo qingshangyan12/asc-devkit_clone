@@ -26,6 +26,7 @@
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
 #include "impl/tensor_api/arch/cube/l0c_to_ub/routing.h"
+#include "impl/tensor_api/utils/npu_debug_check.h"
 
 namespace AscendC {
 namespace Te {
@@ -46,9 +47,31 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::UB>, "When Copy tensor from L0C to UB, dst tensor must on UB");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to UB, src tensor must on L0C");
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(src.Data().Get()) % 64 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyL0C2UB, src L0C address must be 64-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL0C2UB, dst UB address must be 32-byte aligned."));
+
+        ASCENDC_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor shape in CopyL0C2UB, all dst tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor stride in CopyL0C2UB, all dst tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the dst tensor format defines it and the corresponding shape size is 1."));
+        ASCENDC_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor shape in CopyL0C2UB, all src tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor stride in CopyL0C2UB, all src tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the src tensor format defines it and the corresponding shape size is 1."));
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        if constexpr (Std::is_same_v<DstLayoutPtn, NZLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((trait.dualDstCtl != DUAL_DST_SPLIT_N), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dualDstCtl in CopyL0C2UB, dualDstCtl must not be DUAL_DST_SPLIT_N when the dst "
+                "format is NZ."));
+        }
 
         using CopyL0C2UBImpl = typename CopyL0C2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL0C2UBImpl::template Run<trait>(dst, src, params);
@@ -62,9 +85,31 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::UB>, "When Copy tensor from L0C to UB, dst tensor must on UB");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to UB, src tensor must on L0C");
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(src.Data().Get()) % 64 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyL0C2UB, src L0C address must be 64-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL0C2UB, dst UB address must be 32-byte aligned."));
+
+        ASCENDC_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor shape in CopyL0C2UB, all dst tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor stride in CopyL0C2UB, all dst tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the dst tensor format defines it and the corresponding shape size is 1."));
+        ASCENDC_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor shape in CopyL0C2UB, all src tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor stride in CopyL0C2UB, all src tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the src tensor format defines it and the corresponding shape size is 1."));
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        if constexpr (Std::is_same_v<DstLayoutPtn, NZLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((trait.dualDstCtl != DUAL_DST_SPLIT_N), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dualDstCtl in CopyL0C2UB, dualDstCtl must not be DUAL_DST_SPLIT_N when the dst "
+                "format is NZ."));
+        }
 
         using CopyL0C2UBImpl = typename CopyL0C2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL0C2UBImpl::template Run<trait>(dst, src, quant, params);
@@ -78,9 +123,40 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::UB>, "When Copy tensor from L0C to UB, dst tensor must on UB");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to UB, src tensor must on L0C");
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(src.Data().Get()) % 64 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyL0C2UB, src L0C address must be 64-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL0C2UB, dst UB address must be 32-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(quant.Data().Get()) % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check quant address in CopyL0C2UB, quant L1 address must be 32-byte aligned."));
+
+        ASCENDC_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor shape in CopyL0C2UB, all dst tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor stride in CopyL0C2UB, all dst tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the dst tensor format defines it and the corresponding shape size is 1."));
+        ASCENDC_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor shape in CopyL0C2UB, all src tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor stride in CopyL0C2UB, all src tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the src tensor format defines it and the corresponding shape size is 1."));
+        ASCENDC_DEBUG_ASSERT((IsShapeValid(quant.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check quant tensor shape in CopyL0C2UB, all quant tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((IsLayoutStrideValid(quant.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check quant tensor stride in CopyL0C2UB, all quant tensor strides must be greater than 0; a "
+            "zero "
+            "stride is allowed only when the quant tensor format defines it and the corresponding shape size is 1."));
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        if constexpr (Std::is_same_v<DstLayoutPtn, NZLayoutPtn>) {
+            ASCENDC_DEBUG_ASSERT((trait.dualDstCtl != DUAL_DST_SPLIT_N), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dualDstCtl in CopyL0C2UB, dualDstCtl must not be DUAL_DST_SPLIT_N when the dst "
+                "format is NZ."));
+        }
 
         using CopyL0C2UBImpl = typename CopyL0C2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL0C2UBImpl::template Run<trait>(dst, src, quant, params);

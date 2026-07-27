@@ -36,6 +36,8 @@ protected:
     __aicore__ inline static void EmitCopy(
         const T& dst, const U& src, uint16_t blockCount, uint32_t blockLen, int64_t srcStride, int64_t dstStride)
     {
+        ASCENDC_DEBUG_ASSERT((blockLen >= 1 && blockLen <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyUB2L1, blockLen must be in range [1, 65535]."));
         CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
 };

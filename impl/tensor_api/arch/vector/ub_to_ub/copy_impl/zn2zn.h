@@ -54,6 +54,10 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) >= 1 &&
+            GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) <= 4095),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src row shape size in CopyUB2UB ZN path, src row shape size must be in range [1, 4095]."));
         uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         uint32_t blockLen =
             GetTotalColumnShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout) * sizeof(SrcType);

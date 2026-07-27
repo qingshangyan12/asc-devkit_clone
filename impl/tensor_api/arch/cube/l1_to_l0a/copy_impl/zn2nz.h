@@ -62,6 +62,10 @@ private:
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout) *
                      GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout) / C0_ELEMENT<DstType>;
+        ASCENDC_DEBUG_ASSERT((mStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mStep in CopyL12L0A ZN2NZ path, mStep must be no greater than 255."));
+        ASCENDC_DEBUG_ASSERT((kStep <= 255), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0A ZN2NZ path, kStep must be no greater than 255."));
         // Zn -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / STRIDE_UNIT;

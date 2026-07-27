@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_H
 
 #include "impl/tensor_api/arch/cube/gm_to_l1/routing.h"
+#include "impl/tensor_api/utils/npu_debug_check.h"
 
 namespace AscendC {
 namespace Te {
@@ -56,6 +57,19 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        ASCENDC_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 32 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyGM2L1, dst L1 address must be 32-byte aligned."));
+        ASCENDC_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor shape in CopyGM2L1, all dst tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst tensor stride in CopyGM2L1, all dst tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the dst tensor format defines it and the corresponding shape size is 1."));
+        ASCENDC_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor shape in CopyGM2L1, all src tensor shape sizes must be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src tensor stride in CopyGM2L1, all src tensor strides must be greater than 0; a zero "
+            "stride is allowed only when the src tensor format defines it and the corresponding shape size is 1."));
         using CopyGM2L1Impl = typename CopyGM2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyGM2L1Impl::template Run<trait, T, U>(dst, src);
     }
