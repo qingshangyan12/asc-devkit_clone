@@ -61,9 +61,16 @@ __aicore__ inline void HcommUrmaFillSqeCtx(
     uint32_t baseBlockCount = sqCtx.contextInfo.ubJfs.sqDepth;
     sqeCtx->owner = (curHead & baseBlockCount) == 0 ? 1 : 0;
     sqeCtx->targetHint = 0;
-    sqeCtx->inlineMsgLen = 0;
+    if constexpr (config.inlineEn == 1) {
+        sqeCtx->inlineMsgLen = sizeof(T);
+        sqeCtx->sgeNum = 0;
+        __ubuf__ T* inlineAddr = (__ubuf__ T*)((__ubuf__ uint8_t*)sqeCtx + sizeof(HcommUrmaSqeCtx));
+        *inlineAddr = value;
+    } else {
+        sqeCtx->inlineMsgLen = 0;
+        sqeCtx->sgeNum = 1;
+    } 
     sqeCtx->tpId = sqCtx.contextInfo.ubJfs.tpID;
-    sqeCtx->sgeNum = 1;
     sqeCtx->rmtJettyOrSegId = remoteMemInfo.bufferInfo.rma.protectionInfo.memInfo.ub.tokenId;
     sqeCtx->rmtTokenValue = remoteMemInfo.bufferInfo.rma.protectionInfo.memInfo.ub.tokenValue;
     uint64_t remoteAddrValue = reinterpret_cast<uint64_t>(remoteAddr);
@@ -327,14 +334,16 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     auto remoteMemInfo = channelEntity->remoteBufferAddr[remoteIdx];
     HcommUrmaFillSqeCtx<opCode, config>(
         sqeCtx, (__gm__ uint8_t*)remoteAddr, sqCtx, remoteMemInfo, curHead, notifyAddr, params.value);
-
-    // write SGE
-    __ubuf__ uint8_t* sgeAddr = (__ubuf__ uint8_t*)sqeCtx + sizeof(HcommUrmaSqeCtx);
-    if constexpr (opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY) {
-        sgeAddr += sizeof(HcommUrmaNotifyCtx);
+    
+    if constexpr (config.inlineEn == 0) {
+        // write SGE
+        __ubuf__ uint8_t* sgeAddr = (__ubuf__ uint8_t*)sqeCtx + sizeof(HcommUrmaSqeCtx);
+        if constexpr (opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY) {
+            sgeAddr += sizeof(HcommUrmaNotifyCtx);
+        }
+        __ubuf__ HcommUrmaSgeCtx* sgeCtx = (__ubuf__ HcommUrmaSgeCtx*)sgeAddr;
+        HcommUrmaFillSgeCtx<opCode>(sgeCtx, len, (__gm__ uint8_t*)localAddr, params);
     }
-    __ubuf__ HcommUrmaSgeCtx* sgeCtx = (__ubuf__ HcommUrmaSgeCtx*)sgeAddr;
-    HcommUrmaFillSgeCtx<opCode>(sgeCtx, len, (__gm__ uint8_t*)localAddr, params);
 
     // SQE & SGE cache flush
     uint64_t sqBaseAddr = sqCtx.contextInfo.ubJfs.sqVa;
@@ -443,6 +452,15 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::ReadNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::READ, config>(channel, src, dst, len);
+}
+
+template <typename T, bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const& config>
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteValueNbi(ChannelHandle channel, GM_ADDR dst, T value)
+{
+    static_assert(config.inlineEn == 1, "WriteValueNbi requires inline data in WQE");
+    UdmaParams<T> params{value, 0};
+    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE, config>(
+        channel, dst, nullptr, sizeof(T), nullptr, params);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const& config>
