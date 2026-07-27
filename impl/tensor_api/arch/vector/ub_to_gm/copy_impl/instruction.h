@@ -50,7 +50,6 @@ public:
             static_assert(sizeof(srcType) == 1 || sizeof(srcType) == 2 || sizeof(srcType) == 4 || sizeof(srcType) == 8,
                           "Unsupported data type size for CopyGmToUbufAlignV2");
         }
-        CopyUbufToGmAlignV2(dst.Data().Get(), src.Data().Get(), params...); 
     }
 
     template <typename T>
