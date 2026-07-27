@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 **该接口已废弃，请使用 [asc_pack_to_low](asc_pack_to_low.md) 和 [asc_pack_to_high](asc_pack_to_high.md) 替代。**

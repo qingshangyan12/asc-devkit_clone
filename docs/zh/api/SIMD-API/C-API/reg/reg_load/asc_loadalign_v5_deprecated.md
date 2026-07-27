@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_load.h"`。
@@ -95,7 +101,7 @@ PIPE_V
 
 ## 约束说明
 
-无
+- vector_int4x2_t数据类型于CANN 9.1.0或更高版本支持，在CANN 9.0.0以下版本不支持。
 
 ## 调用示例
 

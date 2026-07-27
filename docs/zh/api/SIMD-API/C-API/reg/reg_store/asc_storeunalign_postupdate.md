@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_store.h"`。
@@ -145,6 +151,7 @@ PIPE_V
 - 该接口中的dst不需要32B对齐。
 - 使用uint32_t作为存储偏移量时，本接口应与[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)接口配合使用。asc_storeunalign_post_postupdate接口用于处理该场景下非对齐搬出的尾块。
 - 使用addr_reg作为存储偏移量时，本接口应与[asc_storeunalign_post](asc_storeunalign_post.md)接口配合使用。asc_storeunalign_post接口用于处理该场景下非对齐搬出的尾块。
+- int4b_t数据类型和针对不指定存储偏移量的场景于CANN 9.1.0或更高版本支持，在CANN 9.0.0以下版本不支持。
 
 ## 调用示例
 

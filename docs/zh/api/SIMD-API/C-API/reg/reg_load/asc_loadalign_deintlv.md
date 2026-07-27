@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_load.h"`。
@@ -156,6 +162,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 - 对于[基址寻址接口](#base-addressing-api)，`src`必须为32B对齐地址，且访问范围不能超过UB有效地址上界减去`2 x VL`。
 - 对于[标量偏移寻址接口](#base-scalar-offset-api)和[地址寄存器偏移寻址接口](#base-register-indexed-api)，实际访问地址必须为32B对齐，且访问范围不能超过UB有效地址上界减去`2 x VL`。
 - 使用地址寄存器偏移寻址接口时，需要先通过[`asc_update_addr_reg`](../reg_data_types/asc_update_addr_reg.md)完成地址寄存器初始化。
+- vector_int4x2_t数据类型于CANN 9.1.0或更高版本支持，在CANN 9.0.0以下版本不支持。
 
 ## 调用示例
 

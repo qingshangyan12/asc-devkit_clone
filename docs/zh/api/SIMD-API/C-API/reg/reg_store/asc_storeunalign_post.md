@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_store.h"`。
@@ -148,6 +154,7 @@ PIPE_V
 - 该接口中的dst不需要32B对齐，但数据类型为T的dst需要sizeof(T) Byte对齐。
 - 调用本接口之前，需要调用[asc_storeunalign](asc_storeunalign.md)接口，或者[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)接口，且本接口与前序接口的非对齐寄存器要保持一致。
 - 需要保证目的操作数的地址加上offset对应的偏移地址，结果等于数据搬运的结束地址，具体见调用示例。
+- int4b_t数据类型和针对不指定偏移量的场景于CANN 9.1.0或更高版本支持，在CANN 9.0.0以下版本不支持。
 
 ## 调用示例
 

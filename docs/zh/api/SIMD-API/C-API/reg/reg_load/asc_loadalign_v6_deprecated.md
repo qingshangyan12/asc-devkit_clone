@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_load.h"`。
@@ -76,6 +82,7 @@ PIPE_V
 
 - offset在缺省时默认偏移值offset=0。
 - 用户可以通过自增基地址或者偏移的方式传入offset参数。
+- addr_reg数据类型于CANN 9.1.0或更高版本支持，在CANN 9.0.0以下版本不支持。
 
 ## 调用示例
 

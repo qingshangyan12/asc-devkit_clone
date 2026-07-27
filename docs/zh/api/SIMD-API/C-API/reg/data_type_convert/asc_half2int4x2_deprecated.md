@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_convert.h"`。
@@ -138,6 +144,8 @@ PIPE_V
 ## 约束说明
 
 - 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
+- asc_half2int4x2_rn、asc_half2int4x2_rn_v2、asc_half2int4x2_rn_sat、asc_half2int4x2_rn_sat_v2、asc_half2int4x2_rn_v3、asc_half2int4x2_rn_sat_v3、asc_half2int4x2_rn_v4、asc_half2int4x2_rn_sat_v4、asc_half2int4x2_rna、asc_half2int4x2_rna_v2、asc_half2int4x2_rna_sat、asc_half2int4x2_rna_sat_v2、asc_half2int4x2_rna_v3、asc_half2int4x2_rna_sat_v3、asc_half2int4x2_rna_v4、asc_half2int4x2_rna_sat_v4、asc_half2int4x2_ru、asc_half2int4x2_ru_v2、asc_half2int4x2_ru_sat、asc_half2int4x2_ru_sat_v2、asc_half2int4x2_ru_v3、asc_half2int4x2_ru_sat_v3、asc_half2int4x2_ru_v4、
+asc_half2int4x2_ru_sat_v4、asc_half2int4x2_rz、asc_half2int4x2_rz_v2、asc_half2int4x2_rz_sat、asc_half2int4x2_rz_sat_v2、asc_half2int4x2_rz_v3、asc_half2int4x2_rz_sat_v3、asc_half2int4x2_rz_v4、asc_half2int4x2_rz_sat_v4函数原型计划于CANN 9.1.0或更高版本支持，在CANN 9.0.0以下版本不支持。
 
 ## 调用示例
 
