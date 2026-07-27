@@ -28,7 +28,7 @@
 
 头文件路径：`"c_api/cube_compute/cube_compute.h"`。
 
-设置HF32模式取整方式。使用该接口前需要先使用[asc_enable_hf32](./asc_enable_hf32.md)开启HF32取整模式。
+设置HF32模式舍入方式。使用该接口前需要先使用[asc_enable_hf32](./asc_enable_hf32.md)开启HF32模式。
 
 ## 函数原型
 
@@ -40,7 +40,7 @@ __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mo
 
 | 参数名 | 输入/输出 | 描述 |
 |:-------|:----------|:------|
-| hf32_round_mode | 输入 | HF32取整模式控制入参，[asc_hf32_round_mode](../enum/asc_hf32_round_mode.md)枚举类型，支持如下2种枚举值：<br>&nbsp;&nbsp;&bull; NEAREST_ZERO：FP32将以向零靠近的方式四舍五入为HF32。<br>&nbsp;&nbsp;&bull; NEAREST_EVEN：FP32将以最接近偶数的方式四舍五入为HF32。 |
+| hf32_round_mode | 输入 | HF32舍入模式控制入参，[asc_hf32_round_mode](../enum/asc_hf32_round_mode.md)枚举类型，支持如下2种枚举值：<br>&nbsp;&nbsp;&bull; NEAREST_ZERO：FP32将以向零靠近的方式四舍五入为HF32。<br>&nbsp;&nbsp;&bull; NEAREST_EVEN：FP32将以最接近偶数的方式四舍五入为HF32。 |
 
 ## 返回值说明
 
