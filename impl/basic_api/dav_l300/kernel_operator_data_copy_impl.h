@@ -329,15 +329,55 @@ __aicore__ inline void DataCopyL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const D
 
 template <typename T>
 __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
-    __gm__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t high, uint16_t width, uint16_t srcNStride, uint16_t dstDStride)
+    __gm__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t high, uint16_t width, uint16_t srcNStride, uint16_t dstDStride,
+    const uint8_t cacheMode = 0)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from ub to gm nz2nd"); });
+    (void)cacheMode;
+    const uint16_t highBlock = MAX_REPEAT_TIMES;
+    const uint16_t highBlocks = high / highBlock;
+    const uint16_t highTail = high % highBlock;
+    const uint16_t widthFractal = (width + BLOCK_CUBE - 1) / BLOCK_CUBE;
+
+    for (int i = 0; i < widthFractal; ++i) {
+        uint16_t computeCount = (i + 1) * BLOCK_CUBE;
+        uint16_t leftLen = width >= computeCount ? BLOCK_CUBE : (width - i * BLOCK_CUBE);
+        uint16_t srcLeftLen = (sizeof(T) == B32_BYTE_SIZE && leftLen <= DEFAULT_BLK_NUM) ? MIN_BLOCK_LEN : 0;
+        for (int j = 0; j < highBlocks; ++j) {
+            DataCopyPadUB2GMImpl(
+                dstAddr + i * BLOCK_CUBE + j * highBlock * dstDStride,
+                srcAddr + i * srcNStride * BLOCK_CUBE + j * highBlock * BLOCK_CUBE,
+                DataCopyExtParams{
+                    highBlock, static_cast<uint32_t>(leftLen * sizeof(T)), srcLeftLen,
+                    static_cast<uint32_t>((dstDStride - leftLen) * sizeof(T)), 0});
+        }
+        if (highTail) {
+            DataCopyPadUB2GMImpl(
+                dstAddr + i * BLOCK_CUBE + highBlocks * highBlock * dstDStride,
+                srcAddr + i * srcNStride * BLOCK_CUBE + highBlocks * highBlock * BLOCK_CUBE,
+                DataCopyExtParams{
+                    highTail, static_cast<uint32_t>(leftLen * sizeof(T)), srcLeftLen,
+                    static_cast<uint32_t>((dstDStride - leftLen) * sizeof(T)), 0});
+        }
+    }
 }
 
 template <typename T>
-__aicore__ inline void DataCopyUB2GMNZ2NDImpl(__gm__ T* dst, __ubuf__ T* src, const Nz2NdParamsFull& intriParams)
+__aicore__ inline void DataCopyUB2GMNZ2NDImpl(
+    __gm__ T* dst, __ubuf__ T* src, const Nz2NdParamsFull& intriParams, const uint8_t cacheMode = 0)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from ub to gm nz2nd"); });
+    const uint16_t ndNum = intriParams.ndNum;
+    const uint16_t nValue = intriParams.nValue;
+    const uint16_t dValue = intriParams.dValue;
+    const uint16_t srcNdMatrixStride = intriParams.srcNdMatrixStride;
+    const uint16_t srcNStride = intriParams.srcNStride;
+    const uint16_t dstDStride = intriParams.dstDStride;
+    const uint16_t dstNdMatrixStride = intriParams.dstNdMatrixStride;
+
+    for (int i = 0; i < ndNum; ++i) {
+        DataCopyUB2GMNZ2NDImplBase(
+            dst + i * dstNdMatrixStride, src + i * srcNdMatrixStride * BLOCK_CUBE * BLOCK_CUBE, nValue, dValue,
+            srcNStride, dstDStride, cacheMode);
+    }
 }
 
 template <typename T>
