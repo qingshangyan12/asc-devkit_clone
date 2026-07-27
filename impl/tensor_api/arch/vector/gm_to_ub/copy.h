@@ -54,6 +54,32 @@ private:
         using srcTPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstTPos, Location::UB>, "When Copy tensor from GM to UB, dst tensor must on UB");
         static_assert(Std::is_same_v<srcTPos, Location::GM>, "When Copy tensor from GM to UB, src tensor must on GM");
+        if constexpr (sizeof(typename U::elementType) == sizeof(uint64_t)) {
+            TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(src.Data().Get()) % sizeof(uint32_t) == 0),
+                TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                    "Failed to check src address in CopyGM2UB, src address must be 4-byte aligned for 64-bit src "
+                    "elements, current address is %llu.",
+                    static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(src.Data().Get()))));
+        } else {
+            TENSOR_API_DEBUG_ASSERT(
+                (reinterpret_cast<uintptr_t>(src.Data().Get()) % sizeof(typename U::elementType) == 0),
+                TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src address in CopyGM2UB, src address must be aligned to the src element size, "
+                "current address is %llu.",
+                static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(src.Data().Get()))));
+        }
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 32 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyGM2UB, dst address must be 32-byte aligned, current address is %llu.",
+            static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(dst.Data().Get()))));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())), TENSOR_API_REPORT_INTERNAL(
+            ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyGM2UB"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())), TENSOR_API_REPORT_INTERNAL(
+            ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyGM2UB"));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())), TENSOR_API_REPORT_INTERNAL(
+            ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyGM2UB"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())), TENSOR_API_REPORT_INTERNAL(
+            ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyGM2UB"));
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
         using CopyGM2UBImpl = typename CopyGM2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;

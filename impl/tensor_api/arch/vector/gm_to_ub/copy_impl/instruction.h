@@ -62,6 +62,17 @@ private:
         if ASCEND_IS_AIC {
             return;
         }
+        TENSOR_API_DEBUG_ASSERT((blockCount >= 1 && blockCount <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyGM2UB instruction, blockCount must be in range [1, 4095]. Current "
+            "blockCount is %u.", static_cast<unsigned int>(blockCount)));
+        TENSOR_API_DEBUG_ASSERT((blockLen >= 1 && blockLen <= 2097151), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyGM2UB instruction, blockLen must be in range [1, 2097151]. Current "
+            "blockLen is %u.", static_cast<unsigned int>(blockLen)));
+        TENSOR_API_DEBUG_ASSERT((dstStride == static_cast<int64_t>(blockLen) || dstStride % 32 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dstStride in CopyGM2UB instruction, dstStride must equal blockLen or be a multiple "
+                "of 32 bytes. Current dstStride is %lld and blockLen is %u.",
+                static_cast<long long>(dstStride), static_cast<unsigned int>(blockLen))));
 
         asc_copy_gm2ub_align(dst, src, blockCount, blockLen, leftPaddingCount, rightPaddingCount, isPad,
                                     cacheMode, srcStride, dstStride);

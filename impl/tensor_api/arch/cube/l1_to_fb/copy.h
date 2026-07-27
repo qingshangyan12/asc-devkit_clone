@@ -56,6 +56,26 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(src.Data().Get()) % 32 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src address in CopyL12FB, src L1 address must be 32-byte aligned; current address is "
+            "%llu.", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(src.Data().Get()))));
+        TENSOR_API_DEBUG_ASSERT((reinterpret_cast<uintptr_t>(dst.Data().Get()) % 128 == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst address in CopyL12FB, dst Fixpipe address must be 128-byte aligned; current address "
+            "is %llu.", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(dst.Data().Get()))));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyL12FB"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyL12FB"));
+        TENSOR_API_DEBUG_ASSERT((IsShapeValid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyL12FB"));
+        TENSOR_API_DEBUG_ASSERT((IsLayoutStrideValid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyL12FB"));
         using CopyL12FBImpl = typename CopyL12FBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL12FBImpl::template Run<trait, T, U>(dst, src);
     }

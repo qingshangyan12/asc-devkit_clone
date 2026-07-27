@@ -32,6 +32,12 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        if constexpr (U::layoutType::depth == THREE_DIM_DATA || U::layoutType::depth == FIVE_DIM_DATA) {
+            TENSOR_API_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src batch shape size in CopyGM2L1 DN2ZN path, src batch shape size must be no "
+                "greater than 4095; current value is %lld.",
+                static_cast<long long>(Get<0>(src.Layout().Shape()))));
+        }
         RunGmToL1Batched<trait, CopyGmToCbufMultiDN2Zn, T, U>(dst, src);
     }
 
@@ -66,6 +72,16 @@ public:
         }
         auto dstRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         if constexpr (IsB4Type<type>) {
+            TENSOR_API_DEBUG_ASSERT((dValue % 2 == 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dValue in CopyGM2L1 DN2ZN fp4 path, dValue must be divisible by 2 before b4 "
+                "conversion; current value is %u.", static_cast<unsigned int>(dValue)));
+            TENSOR_API_DEBUG_ASSERT((srcRowStride % 2 == 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src column stride in CopyGM2L1 DN2ZN fp4 path, src column stride must be divisible "
+                "by 2 before b4 conversion; current value is %u.", static_cast<unsigned int>(srcRowStride)));
+            TENSOR_API_DEBUG_ASSERT((srcDnMatrixStride % 2 == 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check srcDnMatrixStride in CopyGM2L1 DN2ZN fp4 path, srcDnMatrixStride must be divisible "
+                "by 2 before b4 conversion; current value is %u.",
+                static_cast<unsigned int>(srcDnMatrixStride)));
             // move fp4 as b8, need to be divided by 2
             dValue = dValue >> 1;
             srcRowStride = srcRowStride >> 1;
