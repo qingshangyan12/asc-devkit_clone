@@ -142,37 +142,92 @@ asc_add_sync(dst, src0, src1, count);
 ```text
 asc-devkit/
 ├── include/
-│   └── c_api/                    # C API header files
-│       ├── vector_compute/       # Vector computation
-│       │   └── vector_compute.h
-│       ├── scalar_compute/       # Scalar computation
-│       │   └── scalar_compute.h
-│       ├── vector_datamove/      # Vector data movement
-│       │   └── vector_datamove.h
-│       ├── cube_compute/         # Cube computation
-│       │   └── cube_compute.h
-│       ├── cube_datamove/        # Cube data movement
-│       │   └── cube_datamove.h
-│       ├── sync/                 # Synchronization control
-│       │   └── sync.h
-│       ├── cache_ctrl/           # Cache control
+│   └── c_api/                            # C API header files
+│       ├── atomic/                       # Atomic operations
+│       │   ├── atomic.h
+│       │   ├── memcpy_atomic.h
+│       │   └── scalar_atomic.h
+│       ├── cache_ctrl/                   # Cache control
 │       │   └── cache_ctrl.h
-│       ├── atomic/               # Atomic operations
-│       │   └── atomic.h
-│       ├── sys_var/              # System variables
-│       │   └── sys_var.h
-│       ├── misc/                 # Miscellaneous
-│       │   └── misc.h
-│       ├── utils/                # Utilities and constants
-│       │   ├── debug/
-│       │   │   ├── asc_dump.h
-│       │   │   ├── asc_printf.h
-│       │   │   └── asc_assert.h
-│       │   ├── c_api_constants.h
-│       │   ├── c_api_union.h
-│       │   └── c_api_utils_intf.h
-│       ├── asc_simd.h            # Main entry
-│       └── c_api_utils_intf.h    # Utility interface
+│       ├── composite/                    # Composite operations
+│       │   ├── cube_compute.h
+│       │   ├── reg_loadunalign.h
+│       │   ├── reg_storeunalign.h
+│       │   └── vector_compute.h
+│       ├── cube_compute/                 # Cube computation
+│       │   └── cube_compute.h
+│       ├── cube_memcpy/                  # Cube data movement
+│       │   └── cube_memcpy.h
+│       ├── defs/                         # Common definitions
+│       │   ├── constant.h
+│       │   ├── defs.h
+│       │   ├── enum.h
+│       │   ├── macro.h
+│       │   ├── struct.h
+│       │   ├── type.h
+│       │   └── union.h
+│       ├── mem_vector/                   # Memory vector compute
+│       │   ├── vector_compute.h
+│       │   └── compute/
+│       │       ├── vector_arith.h
+│       │       ├── vector_broadcast.h
+│       │       ├── vector_compare.h
+│       │       ├── vector_convert.h
+│       │       ├── vector_fused.h
+│       │       ├── vector_gather.h
+│       │       ├── vector_logic.h
+│       │       ├── vector_mask_config.h
+│       │       ├── vector_permute_sel.h
+│       │       ├── vector_reduce.h
+│       │       └── vector_sort.h
+│       ├── reg_vector/                   # Register vector compute
+│       │   ├── reg_compute.h
+│       │   ├── reg_convert.h
+│       │   ├── reg_copy.h
+│       │   ├── reg_load.h
+│       │   ├── reg_store.h
+│       │   ├── reg_sync.h
+│       │   ├── compute/
+│       │   │   ├── reg_addr_reg.h
+│       │   │   ├── reg_arith.h
+│       │   │   ├── reg_broadcast.h
+│       │   │   ├── reg_compare.h
+│       │   │   ├── reg_fused.h
+│       │   │   ├── reg_gather.h
+│       │   │   ├── reg_histogram.h
+│       │   │   ├── reg_index.h
+│       │   │   ├── reg_logic.h
+│       │   │   ├── reg_mask.h
+│       │   │   ├── reg_permute_sel.h
+│       │   │   └── reg_reduce.h
+│       │   ├── gather/
+│       │   │   └── reg_gather_load.h
+│       │   ├── load/
+│       │   │   ├── reg_loadalign.h
+│       │   │   └── reg_loadunalign.h
+│       │   ├── scatter/
+│       │   │   └── reg_scatter_store.h
+│       │   └── store/
+│       │       ├── reg_storealign.h
+│       │       └── reg_storeunalign.h
+│       ├── scalar/                       # Scalar operations
+│       │   ├── scalar_compute.h
+│       │   ├── scalar_store.h
+│       │   └── compute/
+│       │       ├── scalar_bit.h
+│       │       └── scalar_convert.h
+│       ├── spr/                          # Special-purpose registers
+│       │   └── spr.h
+│       ├── sync/                         # Synchronization control
+│       │   └── sync.h
+│       ├── utils/                        # Utility functions
+│       │   ├── enum.h
+│       │   ├── sys_init.h
+│       │   ├── sys_var.h
+│       │   └── utils.h
+│       ├── vector_memcpy/                # Vector data movement
+│       │   └── vector_memcpy.h
+│       └── asc_simd.h                    # Main entry
 │
 ├── impl/
 │   └── c_api/                    # C API implementation

@@ -142,37 +142,92 @@ asc_add_sync(dst, src0, src1, count);
 ```text
 asc-devkit/
 ├── include/
-│   └── c_api/                    # C API头文件
-│       ├── vector_compute/       # 矢量计算
-│       │   └── vector_compute.h
-│       ├── scalar_compute/       # 标量计算
-│       │   └── scalar_compute.h
-│       ├── vector_datamove/      # 矢量数据搬运
-│       │   └── vector_datamove.h
-│       ├── cube_compute/         # Cube计算
-│       │   └── cube_compute.h
-│       ├── cube_datamove/        # Cube数据搬运
-│       │   └── cube_datamove.h
-│       ├── sync/                 # 同步控制
-│       │   └── sync.h
-│       ├── cache_ctrl/           # 缓存控制
+│   └── c_api/                            # C API头文件
+│       ├── atomic/                       # 原子操作
+│       │   ├── atomic.h
+│       │   ├── memcpy_atomic.h
+│       │   └── scalar_atomic.h
+│       ├── cache_ctrl/                   # 缓存控制
 │       │   └── cache_ctrl.h
-│       ├── atomic/               # 原子操作
-│       │   └── atomic.h
-│       ├── sys_var/              # 系统变量
-│       │   └── sys_var.h
-│       ├── misc/                 # 杂项
-│       │   └── misc.h
-│       ├── utils/                # 工具和常量
-│       │   ├── debug/
-│       │   │   ├── asc_dump.h
-│       │   │   ├── asc_printf.h
-│       │   │   └── asc_assert.h
-│       │   ├── c_api_constants.h
-│       │   ├── c_api_union.h
-│       │   └── c_api_utils_intf.h
-│       ├── asc_simd.h            # 总入口
-│       └── c_api_utils_intf.h    # 工具接口
+│       ├── composite/                    # 组合操作
+│       │   ├── cube_compute.h
+│       │   ├── reg_loadunalign.h
+│       │   ├── reg_storeunalign.h
+│       │   └── vector_compute.h
+│       ├── cube_compute/                 # Cube计算
+│       │   └── cube_compute.h
+│       ├── cube_memcpy/                  # Cube数据搬运
+│       │   └── cube_memcpy.h
+│       ├── defs/                         # 通用定义
+│       │   ├── constant.h
+│       │   ├── defs.h
+│       │   ├── enum.h
+│       │   ├── macro.h
+│       │   ├── struct.h
+│       │   ├── type.h
+│       │   └── union.h
+│       ├── mem_vector/                   # Memory矢量计算
+│       │   ├── vector_compute.h
+│       │   └── compute/
+│       │       ├── vector_arith.h
+│       │       ├── vector_broadcast.h
+│       │       ├── vector_compare.h
+│       │       ├── vector_convert.h
+│       │       ├── vector_fused.h
+│       │       ├── vector_gather.h
+│       │       ├── vector_logic.h
+│       │       ├── vector_mask_config.h
+│       │       ├── vector_permute_sel.h
+│       │       ├── vector_reduce.h
+│       │       └── vector_sort.h
+│       ├── reg_vector/                   # Reg矢量计算
+│       │   ├── reg_compute.h
+│       │   ├── reg_convert.h
+│       │   ├── reg_copy.h
+│       │   ├── reg_load.h
+│       │   ├── reg_store.h
+│       │   ├── reg_sync.h
+│       │   ├── compute/
+│       │   │   ├── reg_addr_reg.h
+│       │   │   ├── reg_arith.h
+│       │   │   ├── reg_broadcast.h
+│       │   │   ├── reg_compare.h
+│       │   │   ├── reg_fused.h
+│       │   │   ├── reg_gather.h
+│       │   │   ├── reg_histogram.h
+│       │   │   ├── reg_index.h
+│       │   │   ├── reg_logic.h
+│       │   │   ├── reg_mask.h
+│       │   │   ├── reg_permute_sel.h
+│       │   │   └── reg_reduce.h
+│       │   ├── gather/
+│       │   │   └── reg_gather_load.h
+│       │   ├── load/
+│       │   │   ├── reg_loadalign.h
+│       │   │   └── reg_loadunalign.h
+│       │   ├── scatter/
+│       │   │   └── reg_scatter_store.h
+│       │   └── store/
+│       │       ├── reg_storealign.h
+│       │       └── reg_storeunalign.h
+│       ├── scalar/                       # 标量操作
+│       │   ├── scalar_compute.h
+│       │   ├── scalar_store.h
+│       │   └── compute/
+│       │       ├── scalar_bit.h
+│       │       └── scalar_convert.h
+│       ├── spr/                          # 特殊寄存器
+│       │   └── spr.h
+│       ├── sync/                         # 同步控制
+│       │   └── sync.h
+│       ├── utils/                        # 工具函数
+│       │   ├── enum.h
+│       │   ├── sys_init.h
+│       │   ├── sys_var.h
+│       │   └── utils.h
+│       ├── vector_memcpy/                # 矢量数据搬运
+│       │   └── vector_memcpy.h
+│       └── asc_simd.h                    # 总入口
 │
 ├── impl/
 │   └── c_api/                    # C API实现
