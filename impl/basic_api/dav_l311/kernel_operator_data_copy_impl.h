@@ -69,49 +69,6 @@ __aicore__ inline void CopyGmToUbufAlignV2(
     }
 }
 
-template <typename T, PaddingMode mode>
-__aicore__ inline void CopyGmToUbufAlignV2(
-    __ubuf__ T* dst, __gm__ T* src, const uint16_t blockCount, const uint32_t blockLen, const uint8_t leftPaddingCount,
-    const uint8_t rightPaddingCount, const int64_t srcStride, const int64_t dstStride, const bool isDataCopyPad,
-    const uint8_t cacheMode = 0, const bool isPad = true)
-{
-    if ASCEND_IS_AIV {
-        // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte
-        uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
-        uint32_t burstLength = blockLen * unitOfBytes;
-        uint32_t padLength = leftPaddingCount * sizeof(T) + rightPaddingCount * sizeof(T);
-        uint64_t srcStride310 = srcStride * unitOfBytes + burstLength; // GM  DataCopy:32Bytes, DataCopyPad:1Byte
-        uint32_t dstStride310 = 0;
-        uint8_t leftPaddingCnt = leftPaddingCount;
-        uint8_t rigntPaddingCnt = rightPaddingCount;
-        if constexpr (mode == PaddingMode::Normal) {
-            dstStride310 =
-                AlignUp(static_cast<uint32_t>(dstStride) * BYTE_32_ALIGN + burstLength + padLength, BYTE_32_ALIGN);
-        } else {
-            dstStride310 = burstLength;
-            rigntPaddingCnt = 0;
-            leftPaddingCnt = 0;
-        }
-        if constexpr (sizeof(T) == 8) { // B64
-            copy_gm_to_ubuf_align_v2(
-                (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt * 2,
-                rigntPaddingCnt * 2, isPad, cacheMode, srcStride310, dstStride310);
-        } else if constexpr (sizeof(T) == 4) {
-            copy_gm_to_ubuf_align_v2(
-                (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt,
-                rigntPaddingCnt, isPad, cacheMode, srcStride310, dstStride310);
-        } else if constexpr (sizeof(T) == 2) {
-            copy_gm_to_ubuf_align_v2(
-                (__ubuf__ uint16_t*)dst, (__gm__ uint16_t*)src, 0, blockCount, burstLength, leftPaddingCnt,
-                rigntPaddingCnt, isPad, cacheMode, srcStride310, dstStride310);
-        } else if constexpr (sizeof(T) == 1) {
-            copy_gm_to_ubuf_align_v2(
-                (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, blockCount, burstLength, leftPaddingCnt,
-                rigntPaddingCnt, isPad, cacheMode, srcStride310, dstStride310);
-        }
-    }
-}
-
 // only support VecCore   PIPE_MTE3
 // UB -> GM: copy_ubuf_to_gm_align_v2: Note: switch the order between srcStride and dstStride!!!!
 template <typename T>
@@ -745,9 +702,9 @@ __aicore__ inline void DataCopyPadGm2UBImpl(
     }
 
     CheckSrcGmDataCopyExtParamsRange(intriParams);
-    CopyGmToUbufAlignV2<T, mode>(
+    CopyGmToUbufAlignV2<T>(
         dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
-        intriParams.srcStride, intriParams.dstStride, true, cacheMode, padParams.isPad);
+        static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride), true, padParams.isPad, 0);
 }
 
 template <typename T>
