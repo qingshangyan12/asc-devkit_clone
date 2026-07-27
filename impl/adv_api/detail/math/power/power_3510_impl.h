@@ -678,7 +678,7 @@ __simd_vf__ inline void PowFIntrinsicTensorTensorImpl(
 
 template <typename T>
 __simd_vf__ inline void PowFIntrinsicTensorScalarImpl(
-    __ubuf__ T* dst, __ubuf__ T* src0, const T& scalarValue, uint32_t calCount, uint16_t repeatTime)
+    __ubuf__ T* dst, __ubuf__ T* src0, const T scalarValue, uint32_t calCount, uint16_t repeatTime)
 {
     Reg::MaskReg mask, tmpMask;
     Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
@@ -696,7 +696,7 @@ __simd_vf__ inline void PowFIntrinsicTensorScalarImpl(
 
 template <typename T>
 __simd_vf__ inline void PowFIntrinsicScalarTensorImpl(
-    __ubuf__ T* dst, const T& scalarValue, __ubuf__ T* src1, uint32_t calCount, uint16_t repeatTime)
+    __ubuf__ T* dst, const T scalarValue, __ubuf__ T* src1, uint32_t calCount, uint16_t repeatTime)
 {
     Reg::MaskReg mask, tmpMask;
     Reg::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
