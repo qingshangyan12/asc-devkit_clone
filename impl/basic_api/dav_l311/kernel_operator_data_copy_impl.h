@@ -423,9 +423,9 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
         }
         if (highTail) {
             CopyUbufToGmAlignV2<T>(
-                dstAddr + i * BLOCK_CUBE + j * highBlock * dstDStride,
-                srcAddr + i * srcNStride * BLOCK_CUBE + j * highBlock * BLOCK_CUBE,
-                highBlock,
+                dstAddr + i * BLOCK_CUBE + highBlocks * highBlock * dstDStride,
+                srcAddr + i * srcNStride * BLOCK_CUBE + j * highBlocks * BLOCK_CUBE,
+                highTail,
                 leftLen * sizeof(T),
                 srcLeftLen,
                 (dstDStride - leftLen) * sizeof(T),
@@ -636,10 +636,9 @@ __aicore__ inline void CheckSrcGmDataCopyExtParamsRange(const DataCopyExtParams&
     });
 }
 
-template <typename T, PaddingMode mode = PaddingMode::Normal>
+template <typename T>
 __aicore__ inline void DataCopyPadGm2UBImpl(
-    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams,
-    const uint8_t cacheMode = 0)
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams)
 {
     if ASCEND_IS_AIC {
         return;
@@ -803,20 +802,20 @@ __aicore__ inline void DataCopyGM2UBSingleImpl(
         MAX_REPEAT_TIMES, static_cast<uint32_t>(computeLen),
         static_cast<uint32_t>(intriParams.srcDValue * sizeof(T) - computeLen),
         static_cast<uint32_t>(
-            (dstNzNStride - static_cast<uint16_t>(DEFAULT_C0_SIZE)) / static_cast<uint16_t>(DEFAULT_C0_SIZE)),
+            (static_cast<uint16_t>(dstNzNStride * static_cast<uint16_t>(DEFAULT_C0_SIZE)) - static_cast<uint16_t>(DEFAULT_C0_SIZE)) / static_cast<uint16_t>(DEFAULT_C0_SIZE)),
         0};
     DataCopyPadExtParams<T> padParams;
     for (int repeatTime = 0; repeatTime < repeatCount; ++repeatTime) {
         DataCopyPadGm2UBImpl(
             (__ubuf__ T*)(dst + dstCopyStartOffset + repeatTime * maxC0Count),
-            (__gm__ T*)(src + srcCopyStartOffset + repeatTime * maxdValue), copyParams, padParams, cacheMode);
+            (__gm__ T*)(src + srcCopyStartOffset + repeatTime * maxdValue), copyParams, padParams);
     }
     copyParams.blockCount = repeatTail;
     if (repeatTail != 0) {
         int dstOffset = (dstCopyStartOffset + repeatCount * MAX_REPEAT_TIMES * c0Count);
         int srcOffset = (srcCopyStartOffset + repeatCount * MAX_REPEAT_TIMES * dValue);
         DataCopyPadGm2UBImpl(
-            (__ubuf__ T*)(dst + dstOffset), (__gm__ T*)(src + srcOffset), copyParams, padParams, cacheMode);
+            (__ubuf__ T*)(dst + dstOffset), (__gm__ T*)(src + srcOffset), copyParams, padParams);
     }
 }
 
