@@ -64,6 +64,55 @@ private:
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        TENSOR_API_DEBUG_ASSERT(
+            (params.m > 0 && params.m <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check m in Mmad, m must be in range (0, 4095]; current value is %u.",
+                static_cast<unsigned int>(params.m)));
+        TENSOR_API_DEBUG_ASSERT(
+            (params.n > 0 && params.n <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check n in Mmad, n must be in range (0, 4095]; current value is %u.",
+                static_cast<unsigned int>(params.n)));
+        TENSOR_API_DEBUG_ASSERT(
+            (params.k > 0 && params.k <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check k in Mmad, k must be in range (0, 4095]; current value is %u.",
+                static_cast<unsigned int>(params.k)));
+        TENSOR_API_DEBUG_ASSERT(
+            (params.unitFlag == 0 || params.unitFlag == 2 || params.unitFlag == 3),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check unitFlag in Mmad, unitFlag must be 0, 2, or 3; current value is %u.",
+                static_cast<unsigned int>(params.unitFlag)));
+        TENSOR_API_DEBUG_ASSERT(
+            (trait.disableGemv || params.m == 1),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check m in Mmad, m must be 1 when GEMV is enabled; current value is %u.",
+                static_cast<unsigned int>(params.m)));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "Mmad"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "Mmad"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(fm.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, fm.Layout(), "fm", "Mmad"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(fm.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, fm.Layout(), "fm", "Mmad"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(filter.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, filter.Layout(), "filter", "Mmad"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(filter.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, filter.Layout(), "filter", "Mmad"));
         using MmadImpl = typename MmadRouting<
             CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, Location::INVALID>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, params);
@@ -90,6 +139,65 @@ private:
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        TENSOR_API_DEBUG_ASSERT(
+            (params.m > 0 && params.m <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check m in Mmad with bias, m must be in range (0, 4095]; current value is %u.",
+                static_cast<unsigned int>(params.m)));
+        TENSOR_API_DEBUG_ASSERT(
+            (params.n > 0 && params.n <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check n in Mmad with bias, n must be in range (0, 4095]; current value is %u.",
+                static_cast<unsigned int>(params.n)));
+        TENSOR_API_DEBUG_ASSERT(
+            (params.k > 0 && params.k <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check k in Mmad with bias, k must be in range (0, 4095]; current value is %u.",
+                static_cast<unsigned int>(params.k)));
+        TENSOR_API_DEBUG_ASSERT(
+            (params.unitFlag == 0 || params.unitFlag == 2 || params.unitFlag == 3),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check unitFlag in Mmad with bias, unitFlag must be 0, 2, or 3; current value is %u.",
+                static_cast<unsigned int>(params.unitFlag)));
+        TENSOR_API_DEBUG_ASSERT(
+            (trait.disableGemv || params.m == 1),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check m in Mmad with bias, m must be 1 when GEMV is enabled; current value is %u.",
+                static_cast<unsigned int>(params.m)));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "Mmad with bias"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "Mmad with bias"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(fm.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, fm.Layout(), "fm", "Mmad with bias"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(fm.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, fm.Layout(), "fm", "Mmad with bias"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(filter.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, filter.Layout(), "filter", "Mmad with bias"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(filter.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, filter.Layout(), "filter", "Mmad with bias"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(bias.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, bias.Layout(), "bias", "Mmad with bias"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(bias.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, bias.Layout(), "bias", "Mmad with bias"));
         using MmadImpl =
             typename MmadRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, biasPos>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, bias, params);

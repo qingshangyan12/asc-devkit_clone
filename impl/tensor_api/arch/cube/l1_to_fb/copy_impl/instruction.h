@@ -48,6 +48,20 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        TENSOR_API_DEBUG_ASSERT(
+            (blockCount > 0),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check blockCount in CopyL12FB instruction, blockCount must be greater than 0; current value "
+                "is %u.",
+                static_cast<unsigned int>(blockCount)));
+        TENSOR_API_DEBUG_ASSERT(
+            (blockLen > 0),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check blockLen in CopyL12FB instruction, blockLen must be greater than 0; current value is "
+                "%u.",
+                static_cast<unsigned int>(blockLen)));
 
         asc_copy_l12fb(dst, src, blockCount, blockLen, srcStride, dstStride);
     }

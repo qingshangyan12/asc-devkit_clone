@@ -64,10 +64,58 @@ private:
         uint16_t dstRow;
         uint16_t blockCount;
         if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            TENSOR_API_DEBUG_ASSERT(
+                (GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout) <= 4095),
+                TENSOR_API_LOG_INTERNAL(
+                    KERNEL_ERROR,
+                    "Failed to check src row shape size in CopyL12BT ND path, src row shape size must be no greater "
+                    "than 4095; current value is %lld.",
+                    static_cast<long long>(GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout))));
+            TENSOR_API_DEBUG_ASSERT(
+                (Std::ceil_align(
+                     Std::ceil_division(
+                         static_cast<uint64_t>(GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout)),
+                         static_cast<uint64_t>(C0_ELEMENT<typename U::elementType>)),
+                     static_cast<uint64_t>(IsOneOfAttrV<typename U::elementType, float, int32_t> ? 2 : 1)) <= 65535),
+                TENSOR_API_LOG_INTERNAL(
+                    KERNEL_ERROR,
+                    "Failed to check src column shape size in CopyL12BT ND path, the aligned C0 block count derived "
+                    "from the src column shape size must be no greater than 65535; current srcColumnShape is %lld, "
+                    "alignedBlockCount is %lld.",
+                    static_cast<long long>(GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout)),
+                    static_cast<long long>(Std::ceil_align(
+                        Std::ceil_division(
+                            static_cast<uint64_t>(GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout)),
+                            static_cast<uint64_t>(C0_ELEMENT<typename U::elementType>)),
+                        static_cast<uint64_t>(IsOneOfAttrV<typename U::elementType, float, int32_t> ? 2 : 1)))));
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
         } else {
+            TENSOR_API_DEBUG_ASSERT(
+                (GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) <= 4095),
+                TENSOR_API_LOG_INTERNAL(
+                    KERNEL_ERROR,
+                    "Failed to check src row shape size in CopyL12BT NDExt path, src row shape size must be no "
+                    "greater than 4095; current value is %lld.",
+                    static_cast<long long>(GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout))));
+            TENSOR_API_DEBUG_ASSERT(
+                (Std::ceil_align(
+                     Std::ceil_division(
+                         static_cast<uint64_t>(GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout)),
+                         static_cast<uint64_t>(C0_ELEMENT<typename U::elementType>)),
+                     static_cast<uint64_t>(IsOneOfAttrV<typename U::elementType, float, int32_t> ? 2 : 1)) <= 65535),
+                TENSOR_API_LOG_INTERNAL(
+                    KERNEL_ERROR,
+                    "Failed to check src column shape size in CopyL12BT NDExt path, the aligned C0 block count "
+                    "derived from the src column shape size must be no greater than 65535; current srcColumnShape is "
+                    "%lld, alignedBlockCount is %lld.",
+                    static_cast<long long>(GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout)),
+                    static_cast<long long>(Std::ceil_align(
+                        Std::ceil_division(
+                            static_cast<uint64_t>(GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout)),
+                            static_cast<uint64_t>(C0_ELEMENT<typename U::elementType>)),
+                        static_cast<uint64_t>(IsOneOfAttrV<typename U::elementType, float, int32_t> ? 2 : 1)))));
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
@@ -93,6 +141,20 @@ private:
             blockLen = Std::ceil_align(blockLen, 2);
         }
 
+        TENSOR_API_DEBUG_ASSERT(
+            (srcRow >= srcCol),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check src row stride in CopyL12BT, src row stride must be no less than the src column shape "
+                "size; current srcRowStride is %u, srcColumnShape is %u.",
+                static_cast<unsigned int>(srcRow), static_cast<unsigned int>(srcCol)));
+        TENSOR_API_DEBUG_ASSERT(
+            (dstRow >= srcCol),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check dst row stride in CopyL12BT, dst row stride must be no less than the src column shape "
+                "size; current dstRowStride is %u, srcColumnShape is %u.",
+                static_cast<unsigned int>(dstRow), static_cast<unsigned int>(srcCol)));
         uint16_t srcStride = (srcRow - srcCol) / C0_ELEMENT<srcType>;
         uint16_t dstStride = Std::ceil_align((dstRow - srcCol) / C0_ELEMENT<dstType>, 2);
         CopyL12BTInstr::DataCopy(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
@@ -119,6 +181,20 @@ private:
         auto srcLayout = src.Layout();
         auto dstLayout = dst.Layout();
 
+        TENSOR_API_DEBUG_ASSERT(
+            (Get<0>(srcLayout.Shape()) == Get<0>(dstLayout.Shape())),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check src and dst batch shape sizes in CopyL12BT, src batch shape size must equal dst "
+                "batch shape size; current srcBatchShape is %lld, dstBatchShape is %lld.",
+                static_cast<long long>(Get<0>(srcLayout.Shape())), static_cast<long long>(Get<0>(dstLayout.Shape()))));
+        TENSOR_API_DEBUG_ASSERT(
+            (Get<0>(srcLayout.Shape()) <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check src batch shape size in CopyL12BT batch path, src batch shape size must be no greater "
+                "than 4095; current value is %lld.",
+                static_cast<long long>(Get<0>(srcLayout.Shape()))));
         uint16_t batchSize = Get<0>(srcLayout.Shape());
         uint32_t srcBatchStride = Get<0>(srcLayout.Stride());
         uint32_t dstBatchStride = Get<0>(dstLayout.Stride());
@@ -126,6 +202,16 @@ private:
         // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
         // would read the batch axis as row/column.
         auto srcInner = Te::Get<1>(srcLayout);
+        TENSOR_API_DEBUG_ASSERT(
+            (static_cast<uint64_t>(GetTotalColumnShape(srcInner)) * sizeof(srcType) % 32 == 0 &&
+             static_cast<uint64_t>(GetTotalColumnShape(Te::Get<1>(dstLayout))) * sizeof(dstType) % 32 == 0),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check src and dst column byte sizes in CopyL12BT batch path, src and dst column byte "
+                "sizes must be 32-byte aligned; current srcColumnBytes is %llu, dstColumnBytes is %llu.",
+                static_cast<unsigned long long>(static_cast<uint64_t>(GetTotalColumnShape(srcInner)) * sizeof(srcType)),
+                static_cast<unsigned long long>(
+                    static_cast<uint64_t>(GetTotalColumnShape(Te::Get<1>(dstLayout))) * sizeof(dstType))));
 
         uint32_t srcShapeRows;
         uint32_t srcShapeColumns;
@@ -137,6 +223,18 @@ private:
             srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcInner);
         }
 
+        TENSOR_API_DEBUG_ASSERT(
+            (Std::ceil_align(
+                 Std::ceil_division(
+                     static_cast<uint64_t>(srcShapeRows) * static_cast<uint64_t>(srcShapeColumns),
+                     static_cast<uint64_t>(C0_ELEMENT<srcType>)),
+                 static_cast<uint64_t>(IsOneOfAttrV<srcType, float, int32_t> ? 2 : 1)) <= 65535),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check src row and column shape sizes in CopyL12BT batch path, the aligned C0 block count "
+                "derived from the src row and column shape sizes must be no greater than 65535; current "
+                "srcRowShape is %u, srcColumnShape is %u.",
+                static_cast<unsigned int>(srcShapeRows), static_cast<unsigned int>(srcShapeColumns)));
         bool convControl = false;
         if (IsOneOfAttrV<srcType, half> && IsOneOfAttrV<dstType, float>) {
             convControl = true;
@@ -144,6 +242,20 @@ private:
 
         uint32_t matrixElems = srcShapeRows * srcShapeColumns;
 
+        TENSOR_API_DEBUG_ASSERT(
+            (srcBatchStride >= matrixElems),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check src batch stride in CopyL12BT batch path, src batch stride must be no less than "
+                "matrixElems; current srcBatchStride is %u, matrixElems is %u.",
+                static_cast<unsigned int>(srcBatchStride), static_cast<unsigned int>(matrixElems)));
+        TENSOR_API_DEBUG_ASSERT(
+            (dstBatchStride >= matrixElems),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check dst batch stride in CopyL12BT batch path, dst batch stride must be no less than "
+                "matrixElems; current dstBatchStride is %u, matrixElems is %u.",
+                static_cast<unsigned int>(dstBatchStride), static_cast<unsigned int>(matrixElems)));
         // batch-strided: B blocks, stride encodes per-matrix end-to-next-start gap.
         uint16_t blockCount = batchSize;
         uint16_t blockLen = Std::ceil_division(matrixElems, C0_ELEMENT<srcType>);

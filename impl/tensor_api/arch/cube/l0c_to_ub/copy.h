@@ -46,9 +46,34 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::UB>, "When Copy tensor from L0C to UB, dst tensor must on UB");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to UB, src tensor must on L0C");
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyL0C2UB"));
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        if constexpr (Std::is_same_v<DstLayoutPtn, NZLayoutPtn>) {
+            TENSOR_API_DEBUG_ASSERT(
+                (trait.dualDstCtl != DUAL_DST_SPLIT_N),
+                TENSOR_API_LOG_INTERNAL(
+                    KERNEL_ERROR,
+                    "Failed to check dualDstCtl in CopyL0C2UB, dualDstCtl must not be DUAL_DST_SPLIT_N when the dst "
+                    "format is NZ; current value is %u.",
+                    static_cast<unsigned int>(trait.dualDstCtl)));
+        }
 
         using CopyL0C2UBImpl = typename CopyL0C2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL0C2UBImpl::template Run<trait>(dst, src, params);
@@ -62,9 +87,34 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::UB>, "When Copy tensor from L0C to UB, dst tensor must on UB");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to UB, src tensor must on L0C");
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyL0C2UB"));
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        if constexpr (Std::is_same_v<DstLayoutPtn, NZLayoutPtn>) {
+            TENSOR_API_DEBUG_ASSERT(
+                (trait.dualDstCtl != DUAL_DST_SPLIT_N),
+                TENSOR_API_LOG_INTERNAL(
+                    KERNEL_ERROR,
+                    "Failed to check dualDstCtl in CopyL0C2UB, dualDstCtl must not be DUAL_DST_SPLIT_N when the dst "
+                    "format is NZ; current value is %u.",
+                    static_cast<unsigned int>(trait.dualDstCtl)));
+        }
 
         using CopyL0C2UBImpl = typename CopyL0C2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL0C2UBImpl::template Run<trait>(dst, src, quant, params);
@@ -78,9 +128,42 @@ public:
         using srcPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstPos, Location::UB>, "When Copy tensor from L0C to UB, dst tensor must on UB");
         static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to UB, src tensor must on L0C");
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, dst.Layout(), "dst", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, dst.Layout(), "dst", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, src.Layout(), "src", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, src.Layout(), "src", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsShapeValid(quant.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::SHAPE>, quant.Layout(), "quant", "CopyL0C2UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (IsLayoutStrideValid(quant.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                ReportTensorLayoutError<TensorLayoutErrorKind::STRIDE>, quant.Layout(), "quant", "CopyL0C2UB"));
 
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        if constexpr (Std::is_same_v<DstLayoutPtn, NZLayoutPtn>) {
+            TENSOR_API_DEBUG_ASSERT(
+                (trait.dualDstCtl != DUAL_DST_SPLIT_N),
+                TENSOR_API_LOG_INTERNAL(
+                    KERNEL_ERROR,
+                    "Failed to check dualDstCtl in CopyL0C2UB, dualDstCtl must not be DUAL_DST_SPLIT_N when the dst "
+                    "format is NZ; current value is %u.",
+                    static_cast<unsigned int>(trait.dualDstCtl)));
+        }
 
         using CopyL0C2UBImpl = typename CopyL0C2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL0C2UBImpl::template Run<trait>(dst, src, quant, params);

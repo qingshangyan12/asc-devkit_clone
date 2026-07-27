@@ -62,6 +62,20 @@ private:
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout) *
                      GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout) / C0_ELEMENT<DstType>;
+        TENSOR_API_DEBUG_ASSERT(
+            (mStep <= 255),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check mStep in CopyL12L0A ZN2NZ path, mStep must be no greater than 255; current value is "
+                "%lld.",
+                static_cast<long long>(mStep)));
+        TENSOR_API_DEBUG_ASSERT(
+            (kStep <= 255),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check kStep in CopyL12L0A ZN2NZ path, kStep must be no greater than 255; current value is "
+                "%lld.",
+                static_cast<long long>(kStep)));
         // Zn -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / STRIDE_UNIT;

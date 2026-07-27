@@ -54,6 +54,14 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
+        TENSOR_API_DEBUG_ASSERT(
+            (GetTotalRowShape(srcLayout) >= 1 && GetTotalRowShape(srcLayout) <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                KERNEL_ERROR,
+                "Failed to check src row shape size in CopyUB2GM ND path, src row shape size must be in range [1, "
+                "4095]. "
+                "Current src row shape is %u.",
+                static_cast<unsigned int>(GetTotalRowShape(srcLayout))));
         uint16_t blockCount = GetTotalRowShape(srcLayout);
         uint32_t blockLen = Std::min(
             GetTotalColumnShape(srcLayout) * sizeof(SrcType), GetTotalColumnShape(dstLayout) * sizeof(DstType));
