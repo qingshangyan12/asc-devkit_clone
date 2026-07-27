@@ -45,6 +45,40 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        TENSOR_API_DEBUG_ASSERT(
+            (!isChannelSplit || (Std::is_same_v<T, float> && Std::is_same_v<U, float>)),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check enableChannelSplit in CopyL0C2L1 instruction, both dst and src data types must be "
+                "float when enableChannelSplit is enabled; current enableChannelSplit is %u.",
+                static_cast<unsigned int>(isChannelSplit)));
+        TENSOR_API_DEBUG_ASSERT(
+            (nSize >= 1 && nSize <= 4095), TENSOR_API_LOG_INTERNAL(
+                                               "Failed to check nSize in CopyL0C2L1 instruction, nSize must be in "
+                                               "range [1, 4095]; current value is %u.",
+                                               static_cast<unsigned int>(nSize)));
+        TENSOR_API_DEBUG_ASSERT(
+            (mSize >= 1 && mSize <= 65535),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check mSize in CopyL0C2L1 instruction, mSize must be in range [1, 65535]; current value is "
+                "%u.",
+                static_cast<unsigned int>(mSize)));
+        TENSOR_API_DEBUG_ASSERT(
+            (dstStride > 0), TENSOR_API_LOG_INTERNAL(
+                                 "Failed to check dstStride in CopyL0C2L1 instruction, dstStride must be greater than "
+                                 "0; current value is "
+                                 "%u.",
+                                 static_cast<unsigned int>(dstStride)));
+        TENSOR_API_DEBUG_ASSERT(
+            (srcStride <= 65535),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check srcStride in CopyL0C2L1 instruction, srcStride must be no greater than 65535; current "
+                "value is %u.",
+                static_cast<unsigned int>(srcStride)));
+        TENSOR_API_DEBUG_ASSERT(
+            (unitFlag == 0 || unitFlag == 2 || unitFlag == 3),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check unitFlag in CopyL0C2L1 instruction, unitFlag must be 0, 2, or 3; current value is %u.",
+                static_cast<unsigned int>(unitFlag)));
 
         asc_copy_l0c2l1(
             dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,
