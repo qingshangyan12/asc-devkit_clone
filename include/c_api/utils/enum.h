@@ -29,4 +29,9 @@ enum class asc_store_l2_cache_mode : uint8_t {
     NOTALLOC_CLEAN = 4
 };
 
+enum ascMutexExecuteMode {
+    ASC_LOCK_BLOCK = 0,    // Block the execution of the pipeline indicated by pipe (Default).
+    ASC_LOCK_NON_BLOCK = 1 // Won't block execution of the pipeline.
+};
+
 #endif

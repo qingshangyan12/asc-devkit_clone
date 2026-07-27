@@ -68,11 +68,6 @@ __aicore__ inline void asc_sync();
 
 #define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
 
-enum ascMutexExecuteMode {
-    ASC_LOCK_BLOCK = 0,    // Block the execution of the pipeline indicated by pipe (Default).
-    ASC_LOCK_NON_BLOCK = 1 // Won't block execution of the pipeline.
-};
-
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode = ASC_LOCK_BLOCK)
 
 #define asc_unlock(pipe, mutex_id, ...) asc_unlock_impl((pipe), (mutex_id), (ASC_LOCK_BLOCK, ##__VA_ARGS__))

@@ -29,26 +29,28 @@ __aicore__ inline void asc_lock_impl(pipe_t pipe, uint8_t mutex_id, const ascMut
 {
     if (mode == ASC_LOCK_BLOCK) {
         if (mutex_id == 0)  {
-            get_buf(pipe, 0, false);
+            get_buf(pipe, (uint8_t)0, false);
         } else if (mutex_id == 1) {
-            get_buf(pipe, 1, false);
+            get_buf(pipe, (uint8_t)1, false);
         } else if (mutex_id == 2) {
-            get_buf(pipe, 2, false);
+            get_buf(pipe, (uint8_t)2, false);
         } else if (mutex_id == 3) {
-            get_buf(pipe, 3, false);
+            get_buf(pipe, (uint8_t)3, false);
         } else {}
     } else {
         if (mutex_id == 0)  {
-            get_buf(pipe, 0, true);
+            get_buf(pipe, (uint8_t)0, true);
         } else if (mutex_id == 1) {
-            get_buf(pipe, 1, true);
+            get_buf(pipe, (uint8_t)1, true);
         } else if (mutex_id == 2) {
-            get_buf(pipe, 2, true);
+            get_buf(pipe, (uint8_t)2, true);
         } else if (mutex_id == 3) {
-            get_buf(pipe, 3, true);
+            get_buf(pipe, (uint8_t)3, true);
         } else {}
     }
 }
+
+#endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
