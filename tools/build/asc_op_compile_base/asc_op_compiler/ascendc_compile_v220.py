@@ -233,7 +233,7 @@ def _gen_compile_cmd_m510(
         "--cce-aicore-only",
         "-o",
         dst_file,
-        "-Werror",
+        "-Werror", 
         "-mllvm",
         "-cce-aicore-stack-size=0x8000",
         "-mllvm",
