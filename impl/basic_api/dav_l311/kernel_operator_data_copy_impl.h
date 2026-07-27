@@ -422,12 +422,14 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
                 true);
         }
         if (highTail) {
-            DataCopyPadUB2GMImpl(
-                dstAddr + i * BLOCK_CUBE + highBlocks * highBlock * dstDStride,
-                srcAddr + i * srcNStride * BLOCK_CUBE + highBlocks * highBlock * BLOCK_CUBE,
-                DataCopyExtParams{
-                    highTail, static_cast<uint32_t>(leftLen * sizeof(T)), srcLeftLen,
-                    static_cast<uint32_t>((dstDStride - leftLen) * sizeof(T)), 0});
+            CopyUbufToGmAlignV2<T>(
+                dstAddr + i * BLOCK_CUBE + j * highBlock * dstDStride,
+                srcAddr + i * srcNStride * BLOCK_CUBE + j * highBlock * BLOCK_CUBE,
+                highBlock,
+                leftLen * sizeof(T),
+                srcLeftLen,
+                (dstDStride - leftLen) * sizeof(T),
+                true);
         }
     }
 }
