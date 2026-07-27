@@ -29,15 +29,27 @@
 namespace AscendC {
 namespace Te {
 
+/**
+ * @brief Traits that bind a copy operation to its static and runtime configuration.
+ */
 template <typename CopyOperation, typename... CopyOpArgs>
 struct CopyTraits;
 
+/**
+ * @brief Copy atom that encapsulates a copy operation and its configuration.
+ */
 template <typename... Args>
 struct CopyAtom;
 
+/**
+ * @brief Copy atom constructed from a copy operation with default traits.
+ */
 template <typename CopyOperation>
 struct CopyAtom<CopyOperation>;
 
+/**
+ * @brief Copy atom constructed from an explicit CopyTraits type.
+ */
 template <typename... Args>
 struct CopyAtom<CopyTraits<Args...>>;
 

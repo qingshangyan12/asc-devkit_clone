@@ -29,15 +29,27 @@
 namespace AscendC {
 namespace Te {
 
+/**
+ * @brief Traits that bind a matrix multiply-accumulate operation to its configuration.
+ */
 template <typename MmadOperation, typename... MmadOpArgs>
 struct MmadTraits;
 
+/**
+ * @brief Matrix multiply-accumulate atom that encapsulates an operation and its configuration.
+ */
 template <typename... Args>
 struct MmadAtom;
 
+/**
+ * @brief Matrix multiply-accumulate atom constructed from an operation with default traits.
+ */
 template <typename MmadOperation>
 struct MmadAtom<MmadOperation>;
 
+/**
+ * @brief Matrix multiply-accumulate atom constructed from an explicit MmadTraits type.
+ */
 template <typename MmadOperation, typename... Args>
 struct MmadAtom<MmadTraits<MmadOperation, Args...>>;
 
