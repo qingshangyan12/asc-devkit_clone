@@ -336,6 +336,149 @@ __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams);
 
+/* **************************************************************************************************
+ * MmadFix                                                                                          *
+ * **************************************************************************************************/
+/*
+ * @ingroup MmadFix
+ * @brief Matrix multiplication and addition with fix-point post-processing, output to L1
+ * @param [out] dst output LocalTensor, stored in L1
+ * @param [in] fm input LocalTensor, stored in L1 (left matrix)
+ * @param [in] filter input LocalTensor, stored in L0B (right matrix)
+ * @param [in] mmadFixParams.n right matrix column number
+ * @param [in] mmadFixParams.biasMatrixInitVal indicates the initial bias matrix, 1: init to 0, 0: use real value
+ * @param [in] mmadFixParams.biasMatrixBroadcast whether bias matrix is broadcast
+ * @param [in] mmadFixParams.preQuantMode pre-quantization mode
+ * @param [in] mmadFixParams.preReluMode pre-ReLU mode
+ * @param [in] mmadFixParams.postQuantMode post-quantization mode
+ * @param [in] mmadFixParams.actPostEnable activation post-processing enable
+ * @param [in] mmadFixParams.preClipReluMode pre-clip ReLU mode
+ * @param [in] mmadFixParams.eltwiseOp element-wise operation mode
+ * @param [in] mmadFixParams.eltwiseAntiqEnable element-wise anti-quantization enable
+ * @param [in] mmadFixParams.eltwiseBroadcastEnable element-wise broadcast enable
+ * @param [in] mmadFixParams.lsbMask LSB mask mode
+ * @param [in] mmadFixParams.gemvCtrl GEMV control
+ * @param [in] mmadFixParams.dependEnable dependency enable
+ * @param [in] mmadFixParams.postProcessBandwithCtrl post-process bandwidth control
+ * @param [in] mmadFixParams.instrId instruction ID
+ */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const MmadFixParams& mmadFixParams);
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const MmadFixParams& mmadFixParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config);
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const uint64_t config);
+#endif
+
+/* **************************************************************************************************
+ * MmadMxFix                                                                                        *
+ * **************************************************************************************************/
+/*
+ * @ingroup MmadMxFix
+ * @brief Matrix multiplication and addition in microscaling scenario with fix-point post-processing, output to L1
+ * @param [out] dst output LocalTensor, stored in L1
+ * @param [in] fm input LocalTensor, stored in L1 (left matrix)
+ * @param [in] filter input LocalTensor, stored in L0B (right matrix)
+ * @param [in] mmadFixParams.n right matrix column number
+ * @param [in] mmadFixParams.biasMatrixInitVal indicates the initial bias matrix, 1: init to 0, 0: use real value
+ * @param [in] mmadFixParams.biasMatrixBroadcast whether bias matrix is broadcast
+ * @param [in] mmadFixParams.preQuantMode pre-quantization mode
+ * @param [in] mmadFixParams.preReluMode pre-ReLU mode
+ * @param [in] mmadFixParams.postQuantMode post-quantization mode
+ * @param [in] mmadFixParams.actPostEnable activation post-processing enable
+ * @param [in] mmadFixParams.preClipReluMode pre-clip ReLU mode
+ * @param [in] mmadFixParams.eltwiseOp element-wise operation mode
+ * @param [in] mmadFixParams.eltwiseAntiqEnable element-wise anti-quantization enable
+ * @param [in] mmadFixParams.eltwiseBroadcastEnable element-wise broadcast enable
+ * @param [in] mmadFixParams.lsbMask LSB mask mode
+ * @param [in] mmadFixParams.gemvCtrl GEMV control
+ * @param [in] mmadFixParams.dependEnable dependency enable
+ * @param [in] mmadFixParams.postProcessBandwithCtrl post-process bandwidth control
+ * @param [in] mmadFixParams.instrId instruction ID
+ */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const MmadFixParams& mmadFixParams);
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const MmadFixParams& mmadFixParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config);
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const uint64_t config);
+#endif
+
+/* **************************************************************************************************
+ * ConvFix                                                                                          *
+ * **************************************************************************************************/
+/*
+ * @ingroup ConvFix
+ * @brief Convolution computation with fix-point post-processing, output to L1
+ * @param [out] dst output LocalTensor, stored in L1
+ * @param [in] fm input LocalTensor, stored in L1 (left matrix / feature)
+ * @param [in] filter input LocalTensor, stored in L0B (right matrix / weight)
+ * @param [in] convFixParams.n right matrix column number
+ * @param [in] convFixParams.biasMatrixInitVal indicates the initial bias matrix, 1: init to 0, 0: use real value
+ * @param [in] convFixParams.biasMatrixBroadcast whether bias matrix is broadcast
+ * @param [in] convFixParams.preQuantMode pre-quantization mode
+ * @param [in] convFixParams.preReluMode pre-ReLU mode
+ * @param [in] convFixParams.postQuantMode post-quantization mode
+ * @param [in] convFixParams.actPostEnable activation post-processing enable
+ * @param [in] convFixParams.preClipReluMode pre-clip ReLU mode
+ * @param [in] convFixParams.eltwiseOp element-wise operation mode
+ * @param [in] convFixParams.eltwiseAntiqEnable element-wise anti-quantization enable
+ * @param [in] convFixParams.eltwiseBroadcastEnable element-wise broadcast enable
+ * @param [in] convFixParams.lsbMask LSB mask mode
+ * @param [in] convFixParams.dualSrcEnable dual source enable
+ * @param [in] convFixParams.compactEnable compact enable
+ * @param [in] convFixParams.dependEnable dependency enable
+ * @param [in] convFixParams.postProcessBandwithCtrl post-process bandwidth control
+ * @param [in] convFixParams.nonBroadcastBias non-broadcast bias
+ * @param [in] convFixParams.instrId instruction ID
+ */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const ConvFixParams& convFixParams);
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const ConvFixParams& convFixParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config);
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const uint64_t config);
+#endif
+
 template <
     typename T = int32_t, typename U = int8_t,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true,
@@ -442,6 +585,29 @@ __aicore__ inline void SetLoadDataRepeatWithStride(const LoadDataRepeatParamWith
  */
 template <typename T>
 __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadImageToLocalParams& loadDataParams);
+
+/* **************************************************************************************************
+ * StoreImageToGlobal                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup StoreImageToGlobal
+ * @brief store image from L1 to global memory
+ * @param [out] dst output GlobalTensor
+ * @param [in] src input LocalTensor, stored in L1
+ * @param [in] storeImageToGlobalParams.outputDataType output data type
+ * @param [in] storeImageToGlobalParams.channelTransformMode channel transform mode
+ * @param [in] storeImageToGlobalParams.dtcParams data type conversion parameters (dtcGain, dtcOffset, roundingMode)
+ * @param [in] storeImageToGlobalParams.dstImageWidth destination image width
+ * @param [in] storeImageToGlobalParams.dstImageHeight destination image height
+ * @param [in] storeImageToGlobalParams.srcImageStride source image stride
+ * @param [in] storeImageToGlobalParams.dstImageStride destination image stride
+ * @param [in] storeImageToGlobalParams.sid SMMU SID
+ */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(MTE3) void StoreImageToGlobal(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const StoreImageToGlobalParams& params);
+#endif
 
 /* **************************************************************************************************
  * LoadDataUnzip                                             *

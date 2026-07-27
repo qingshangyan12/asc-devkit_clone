@@ -232,7 +232,7 @@ __aicore__ inline void LoadData2DGM2L0BCal(
     }
 }
 
-template <typename T>
+template <typename T, typename U>
 __aicore__ inline void LoadData2DGM2L0BCal(
     __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2 &nd2nzParams)
 {
@@ -421,12 +421,12 @@ __aicore__ inline void Load3DSetPaddingCal(const T padValue)
 __aicore__ inline void SetLoadDataRepeatWithStrideCal(const LoadDataRepeatParamWithStride repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SetLoadDataRepeatWithStride is not supported on current device"); });
-
 }
 
 __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam repeatParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SetLoadDataRepeat is not supported on current device"); });
+}
 
 /* **************************************************************************************************
  * SetLoadDataBoundary                                             *
@@ -611,7 +611,7 @@ __aicore__ inline void SetMatrixParaCal(const MatrixParams &params)
 {
     uint64_t config = 0;
 
-    confog = (((uint64_t)params.m & 0xffff) << 0) | 
+    config = (((uint64_t)params.m & 0xffff) << 0) |
              (((uint64_t)params.k & 0xffff) << 16);
     set_matrix_para(config);
 }
@@ -625,7 +625,7 @@ __aicore__ inline void SetMmadStrideParaCal(const MmadStrideParams &params)
 {
     uint64_t config = 0;
 
-    confog = (((uint64_t)params.loop4SrcStride & 0xffff) << 0) | 
+    config = (((uint64_t)params.loop4SrcStride & 0xffff) << 0) |
              (((uint64_t)params.loop4DstStride & 0xffff) << 16);
     set_cube_stride_para(config);
 }
@@ -639,7 +639,7 @@ __aicore__ inline void SetMatrixMxParaCal(const MatrixMxParams &params)
 {
     uint64_t config = 0;
 
-    confog = (((uint64_t)params.l0AMxAddr & 0xffff) << 0) | 
+    config = (((uint64_t)params.l0AMxAddr & 0xffff) << 0) |
              (((uint64_t)params.l0BMxAddr & 0xffff) << 32);
     set_mx_buf_addr(config);
 }
@@ -662,22 +662,22 @@ __aicore__ inline void CheckCubeFixSupportTypes(__cbuf__ DstT* c, __cbuf__ Src0T
 __aicore__ inline void GenMmadFixConfig(const MmadFixParams& params, uint64_t &config)
 {
     config = 0;
-    config | = (((uint64_t)params.biasMatrixInitVal & 0x1) << 0);
-    config | = (((uint64_t)params.biasMatrixBroadcast & 0x1) << 1);
-    config | = (((uint64_t)GetQuantPreMode(params.preQuantMode) & 0x1F) << 2);
-    config | = (((uint64_t)params.preReluMode & 0x7) << 7);
-    config | = (((uint64_t)params.postQuantMode & 0x1f) << 10);
-    config | = (((uint64_t)params.actPostEnable & 0x7) << 15);
-    config | = (((uint64_t)params.preClipReluMode & 0x1) << 18);
-    config | = (((uint64_t)params.eltwiseOp & 0x7) << 20);
-    config | = (((uint64_t)params.eltwiseAntiqEnable & 0x1) << 23);
-    config | = (((uint64_t)params.eltwiseBroadcastEnable & 0x1) << 24);
-    config | = (((uint64_t)params.lsbMask & 0x7) << 28);
-    config | = (((uint64_t)params.gemvCtrl & 0x1) << 31);
-    config | = (((uint64_t)params.dependEnable & 0x1) << 36);
-    config | = (((uint64_t)params.instrId & 0x3) << 37);
-    config | = (((uint64_t)params.postProcessBandwithCtrl & 0x1) << 39);
-    config | = (((uint64_t)params.n & 0xffff) << 48);
+    config |= (((uint64_t)params.biasMatrixInitVal & 0x1) << 0);
+    config |= (((uint64_t)params.biasMatrixBroadcast & 0x1) << 1);
+    config |= (((uint64_t)GetQuantPreMode(params.preQuantMode) & 0x1F) << 2);
+    config |= (((uint64_t)params.preReluMode & 0x7) << 7);
+    config |= (((uint64_t)params.postQuantMode & 0x1f) << 10);
+    config |= (((uint64_t)params.actPostEnable & 0x7) << 15);
+    config |= (((uint64_t)params.preClipReluMode & 0x1) << 18);
+    config |= (((uint64_t)params.eltwiseOp & 0x7) << 20);
+    config |= (((uint64_t)params.eltwiseAntiqEnable & 0x1) << 23);
+    config |= (((uint64_t)params.eltwiseBroadcastEnable & 0x1) << 24);
+    config |= (((uint64_t)params.lsbMask & 0x7) << 28);
+    config |= (((uint64_t)params.gemvCtrl & 0x1) << 31);
+    config |= (((uint64_t)params.dependEnable & 0x1) << 36);
+    config |= (((uint64_t)params.instrId & 0x3) << 37);
+    config |= (((uint64_t)params.postProcessBandwithCtrl & 0x1) << 39);
+    config |= (((uint64_t)params.n & 0xffff) << 48);
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
@@ -789,7 +789,7 @@ template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadMxFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, uint64_t config)
 {
     CheckMmadMxFixSupportTypes<DstT, Src0T, Src1T>(c, a, b);
-    matmul_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), 0ULL, config);
+    matmul_mx_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), 0ULL, config);
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
@@ -797,10 +797,10 @@ __aicore__ inline void MmadMxFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ 
     uint64_t config)
 {
     CheckMmadMxFixSupportTypes<DstT, Src0T, Src1T>(c, a, b);
-    if (params.biasMatrixBroadcast) {
-        matmul_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), bias, config);
+    if (config & 0x2) {
+        matmul_mx_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), bias, config);
     } else {
-        matmul_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)bias, 0ULL, config);
+        matmul_mx_to_cbuf((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)bias, 0ULL, config);
     }
 }
 
@@ -816,7 +816,7 @@ __aicore__ inline void SetConvStrideParaCal(const ConvStrideParams &params)
 {
     uint64_t config = 0;
 
-    confog = (((uint64_t)params.loop3DstStride & 0xffff) << 0) | 
+    config = (((uint64_t)params.loop3DstStride & 0xffff) << 0) |
              (((uint64_t)params.loop4DstStride & 0xffff) << 16);
     set_cube_stride_para(config);
 }
@@ -843,7 +843,7 @@ __aicore__ inline void SetConvPaddingCal(const ConvPaddingParams<T> &params)
         config = (paddingValue << 12 | paddingValue << 8 | paddingValue << 4 | paddingValue);
     }
 
-    confog = (((uint64_t)params.paddingMode & 0x3) << 32) | 
+    config = (((uint64_t)params.paddingMode & 0x3) << 32) |
              (((uint64_t)params.paddingAddr & 0xffff) << 34);
     set_m_padding(config);
 }
@@ -859,14 +859,14 @@ __aicore__ inline void SetConvFMatrixDualCal(const ConvFMatrixDualParams &params
     uint64_t config0 = 0;
     uint64_t config1 = 0;
 
-    config0 |= (uint64_t)params.dualAddr & 0xffffffff
+    config0 |= (uint64_t)params.dualAddr & 0xffffffff;
     config0 |= (((uint64_t)params.dualSize & 0xffff) << 32);
 
-    config1 |= (uint64_t)params.dualStride1 & 0xffff
+    config1 |= (uint64_t)params.dualStride1 & 0xffff;
     config1 |= (((uint64_t)params.dualStride2 & 0xffff) << 32);
 
     set_m_fmatrix_dual_0(config0);
-    set_m_fmatrix_dual_0(config1);
+    set_m_fmatrix_dual_1(config1);
 }
 
 __aicore__ inline void SetConvFMatrixStepPosCal(uint64_t config)
@@ -908,7 +908,7 @@ __aicore__ inline void SetConvKernelCal(uint64_t config)
     set_kernel(config);
 }
 
-__aicore__ inline void SetConvFMatrixCal(const ConvKernelParams &params)
+__aicore__ inline void SetConvKernelCal(const ConvKernelParams &params)
 {
     uint64_t config = 0;
     config |= (((uint64_t)params.wStride & 0x3f) << 0);
@@ -925,23 +925,23 @@ __aicore__ inline void SetConvFMatrixCal(const ConvKernelParams &params)
 __aicore__ inline void GenConvFixConfig(const ConvFixParams& params, uint64_t &config)
 {
     config = 0;
-    config | = (((uint64_t)params.biasMatrixInitVal & 0x1) << 0);
-    config | = (((uint64_t)params.biasMatrixBroadcast & 0x1) << 1);
-    config | = (((uint64_t)GetQuantPreMode(params.preQuantMode) & 0x1F) << 2);
-    config | = (((uint64_t)params.preReluMode & 0x7) << 7);
-    config | = (((uint64_t)params.postQuantMode & 0x1f) << 10);
-    config | = (((uint64_t)params.actPostEnable & 0x7) << 15);
-    config | = (((uint64_t)params.preClipReluMode & 0x1) << 18);
-    config | = (((uint64_t)params.eltwiseOp & 0x7) << 20);
-    config | = (((uint64_t)params.eltwiseAntiqEnable & 0x1) << 23);
-    config | = (((uint64_t)params.eltwiseBroadcastEnable & 0x1) << 24);
-    config | = (((uint64_t)params.lsbMask & 0x7) << 28);
-    config | = (((uint64_t)params.dualSrcEnable & 0x1) << 34);
-    config | = (((uint64_t)params.dependEnable & 0x1) << 36);
-    config | = (((uint64_t)params.instrId & 0x3) << 37);
-    config | = (((uint64_t)params.postProcessBandwithCtrl & 0x1) << 39);
-    config | = (((uint64_t)params.nonBroadcastBias & 0x1) << 40);
-    config | = (((uint64_t)params.n & 0xffff) << 48);
+    config |= (((uint64_t)params.biasMatrixInitVal & 0x1) << 0);
+    config |= (((uint64_t)params.biasMatrixBroadcast & 0x1) << 1);
+    config |= (((uint64_t)GetQuantPreMode(params.preQuantMode) & 0x1F) << 2);
+    config |= (((uint64_t)params.preReluMode & 0x7) << 7);
+    config |= (((uint64_t)params.postQuantMode & 0x1f) << 10);
+    config |= (((uint64_t)params.actPostEnable & 0x7) << 15);
+    config |= (((uint64_t)params.preClipReluMode & 0x1) << 18);
+    config |= (((uint64_t)params.eltwiseOp & 0x7) << 20);
+    config |= (((uint64_t)params.eltwiseAntiqEnable & 0x1) << 23);
+    config |= (((uint64_t)params.eltwiseBroadcastEnable & 0x1) << 24);
+    config |= (((uint64_t)params.lsbMask & 0x7) << 28);
+    config |= (((uint64_t)params.dualSrcEnable & 0x1) << 34);
+    config |= (((uint64_t)params.dependEnable & 0x1) << 36);
+    config |= (((uint64_t)params.instrId & 0x3) << 37);
+    config |= (((uint64_t)params.postProcessBandwithCtrl & 0x1) << 39);
+    config |= (((uint64_t)params.nonBroadcastBias & 0x1) << 40);
+    config |= (((uint64_t)params.n & 0xffff) << 48);
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
@@ -984,7 +984,7 @@ __aicore__ inline void ConvFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Sr
 
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void ConvFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, uint64_t bias,
-    const MmadFixParams& params)
+    const ConvFixParams& params)
 {
     uint64_t config = 0;
     CheckCubeFixSupportTypes<DstT, Src0T, Src1T>(c, a, b);
@@ -1023,8 +1023,8 @@ template <typename T>
 __aicore__ inline void LoadImageToLocalCal(__cbuf__ T* dest,  const LoadImageToLocalParams &params)
 {
     static_assert((SupportType<T, uint8_t, int8_t, int16_t>()), 
-        "LoadImageToLocal only support uint8_t/int8_t/int16_t on current device")
-    load_image_to_cbuf(dst,
+        "LoadImageToLocal only support uint8_t/int8_t/int16_t on current device");
+    load_image_to_cbuf(dest,
         static_cast<uint16_t>(params.horizSize - 1),
         static_cast<uint16_t>(params.vertSize - 1),
         params.horizStartPos,
@@ -1037,12 +1037,12 @@ __aicore__ inline void LoadImageToLocalCal(__cbuf__ T* dest,  const LoadImageToL
         params.sid);
 }
 
-tepmplate <typename T, typename U>
+template <typename T, typename U>
 __aicore__ inline void StoreImageToGlobalCal(__gm__ T *dest,  __cbuf__ U *src, const StoreImageToGlobalParams &params)
 {
     static_assert((SupportType<T, uint8_t, int16_t>()), 
-        "StoreImageToGlobal only support uint8_t/int16_t on current device")
-    store_l1_to_out_image((__gm__ void *)dst, src,
+        "StoreImageToGlobal only support uint8_t/int16_t on current device");
+    store_l1_to_out_image((__gm__ void *)dest, src,
         static_cast<uint16_t>(params.dstImageWidth - 1),
         static_cast<uint8_t>(params.outputDataType),
         static_cast<uint16_t>(params.dstImageHeight - 1),
@@ -1050,7 +1050,7 @@ __aicore__ inline void StoreImageToGlobalCal(__gm__ T *dest,  __cbuf__ U *src, c
         static_cast<uint16_t>(params.dstImageStride),
         static_cast<uint8_t>(params.sid),
         static_cast<bool>(params.dtcParams.roundingMode),
-        static_cast<uint32_t>(params.dtcParams.dstOffset),
+        static_cast<uint32_t>(params.dtcParams.dtcOffset),
         static_cast<uint8_t>(params.dtcParams.dtcGain),
         static_cast<uint16_t>(params.srcImageStride));
 }

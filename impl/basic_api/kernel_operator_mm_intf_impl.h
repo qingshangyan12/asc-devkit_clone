@@ -454,6 +454,110 @@ __aicore__ inline void MmadMx(
 }
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+/* **************************************************************************************************
+ * MmadFix                                             *
+ * ************************************************************************************************* */
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadFixImpl(dst, fm, filter, mmadFixParams);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadFixImpl(dst, fm, filter, bias, mmadFixParams);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config)
+{
+    MmadFixImpl(dst, fm, filter, config);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const uint64_t config)
+{
+    MmadFixImpl(dst, fm, filter, bias, config);
+}
+
+/* **************************************************************************************************
+ * MmadMxFix                                             *
+ * ************************************************************************************************* */
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadMxFixImpl(dst, fm, filter, mmadFixParams);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadMxFixImpl(dst, fm, filter, bias, mmadFixParams);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config)
+{
+    MmadMxFixImpl(dst, fm, filter, config);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const uint64_t config)
+{
+    MmadMxFixImpl(dst, fm, filter, bias, config);
+}
+
+/* **************************************************************************************************
+ * ConvFix                                             *
+ * ************************************************************************************************* */
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const ConvFixParams& convFixParams)
+{
+    ConvFixImpl(dst, fm, filter, convFixParams);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const ConvFixParams& convFixParams)
+{
+    ConvFixImpl(dst, fm, filter, bias, convFixParams);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config)
+{
+    ConvFixImpl(dst, fm, filter, config);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const uint64_t config)
+{
+    ConvFixImpl(dst, fm, filter, bias, config);
+}
+#endif
+
 #if __NPU_ARCH__ == 2201
 template <
     typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type,
@@ -657,6 +761,18 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(
             ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
     }
 }
+
+/* **************************************************************************************************
+ * StoreImageToGlobal                                             *
+ * ************************************************************************************************* */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(MTE3) void StoreImageToGlobal(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const StoreImageToGlobalParams& params)
+{
+    StoreImageToGlobalImpl(dst, src, params);
+}
+#endif
 
 /* **************************************************************************************************
  * LoadDataUnzip                                             *

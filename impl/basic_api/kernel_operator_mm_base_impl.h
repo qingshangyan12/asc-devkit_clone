@@ -625,6 +625,188 @@ __aicore__ inline void MmadMxImpl(
 }
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+/* **************************************************************************************************
+ * MmadFix                                             *
+ * ************************************************************************************************* */
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), mmadFixParams);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const LocalTensor<V>& bias, const MmadFixParams& mmadFixParams)
+{
+    const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
+    if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in MmadFix, supported positions are CO1 or C2");
+        });
+    }
+    MmadFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config)
+{
+    MmadFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), config);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const LocalTensor<V>& bias, const uint64_t config)
+{
+    const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
+    if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in MmadFix, supported positions are CO1 or C2");
+        });
+    }
+    MmadFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), config);
+}
+
+/* **************************************************************************************************
+ * MmadMxFix                                             *
+ * ************************************************************************************************* */
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadMxFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), mmadFixParams);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const LocalTensor<V>& bias, const MmadFixParams& mmadFixParams)
+{
+    const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
+    if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in MmadMxFix, supported positions are CO1 or C2");
+        });
+    }
+    MmadMxFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config)
+{
+    MmadMxFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), config);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const LocalTensor<V>& bias, const uint64_t config)
+{
+    const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
+    if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in MmadMxFix, supported positions are CO1 or C2");
+        });
+    }
+    MmadMxFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), config);
+}
+
+/* **************************************************************************************************
+ * ConvFix                                             *
+ * ************************************************************************************************* */
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const ConvFixParams& convFixParams)
+{
+    ConvFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), convFixParams);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const LocalTensor<V>& bias, const ConvFixParams& convFixParams)
+{
+    const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
+    if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in ConvFix, supported positions are CO1 or C2");
+        });
+    }
+    ConvFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), convFixParams);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config)
+{
+    ConvFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), config);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const LocalTensor<V>& bias, const uint64_t config)
+{
+    const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
+    if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in ConvFix, supported positions are CO1 or C2");
+        });
+    }
+    ConvFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
+        (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), config);
+}
+
+/* **************************************************************************************************
+ * StoreImageToGlobal                                             *
+ * ************************************************************************************************* */
+template <typename T, typename U>
+__aicore__ inline void StoreImageToGlobalImpl(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const StoreImageToGlobalParams& params)
+{
+    const Hardware srcScope = GetPhyType((TPosition)src.GetPosition());
+    if (srcScope == Hardware::L1) {
+        StoreImageToGlobalCal(
+            (__gm__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)src.GetPhyAddr(), params);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "A1 / B1", "StoreImageToGlobal",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
+    }
+}
+#endif
+
 #if __NPU_ARCH__ == 2201
 template <
     typename T = int32_t, typename U = int8_t,

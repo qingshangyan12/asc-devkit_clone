@@ -462,7 +462,7 @@ struct MmadFixParams {
     bool     biasMatrixBroadcast = false;
     pre_quant_t     preQuantMode = pre_quant_t::No_Quant;
     ReluMode_t       preReluMode = ReluMode_t::NoRelu;
-    post_quant_t   postQuantMode = post_quant_t:No_Quant;
+    post_quant_t   postQuantMode = post_quant_t::No_Quant;
     bool           actPostEnable = false;
     bool         preClipReluMode = false;
     eltwise_op_t       eltwiseOp = eltwise_op_t::No_Eltwise;
@@ -472,7 +472,7 @@ struct MmadFixParams {
     bool                gemvCtrl = false;
     bool            dependEnable = false;
     bool postProcessBandwithCtrl = false;
-    instr_id_t           instrId = instr_id_t:ID0;
+    instr_id_t           instrId = instr_id_t::ID0;
 };
 
 struct ConvFixParams {
@@ -489,7 +489,7 @@ struct ConvFixParams {
           preReluMode(preReluModeIn),
           postQuantMode(postQuantModeIn),
           actPostEnable(actPostEnableIn),
-          preClipReluModeIn(preClipReluModeIn)
+          preClipReluMode(preClipReluModeIn)
     {}
 
     uint16_t                   n = 0;
@@ -497,7 +497,7 @@ struct ConvFixParams {
     bool     biasMatrixBroadcast = false;
     pre_quant_t     preQuantMode = pre_quant_t::No_Quant;
     ReluMode_t       preReluMode = ReluMode_t::NoRelu;
-    post_quant_t   postQuantMode = post_quant_t:No_Quant;
+    post_quant_t   postQuantMode = post_quant_t::No_Quant;
     bool           actPostEnable = false;
     bool         preClipReluMode = false;
     eltwise_op_t       eltwiseOp = eltwise_op_t::No_Eltwise;
@@ -509,7 +509,7 @@ struct ConvFixParams {
     bool            dependEnable = false;
     bool postProcessBandwithCtrl = false;
     bool        nonBroadcastBias = false;
-    instr_id_t           instrId = instr_id_t:ID0;
+    instr_id_t           instrId = instr_id_t::ID0;
 };
 
 struct MatrixParams {
@@ -521,7 +521,7 @@ struct MatrixParams {
 
     uint16_t m;
     uint16_t k;
-}
+};
 
 struct MmadStrideParams {
     __aicore__ MmadStrideParams() {}
@@ -532,7 +532,7 @@ struct MmadStrideParams {
 
     uint32_t loop4SrcStride;
     uint32_t loop4DstStride;
-}
+};
 
 struct MatrixMxParams {
     __aicore__ MatrixMxParams() {}
@@ -543,7 +543,7 @@ struct MatrixMxParams {
 
     uint32_t l0AMxAddr;
     uint32_t l0BMxAddr;
-}
+};
 
 struct ConvStrideParams {
     __aicore__ ConvStrideParams() {}
@@ -554,7 +554,7 @@ struct ConvStrideParams {
 
     uint32_t loop3DstStride;
     uint32_t loop4DstStride;
-}
+};
 
 struct ConvKernelParams {
     __aicore__ ConvKernelParams() {}
@@ -579,7 +579,7 @@ struct ConvKernelParams {
     uint8_t wDilation = 1;
     uint8_t hDilation = 1;
     uint16_t kernelNum = 1;
-}
+};
 
 template <typename T>
 struct ConvPaddingParams {
@@ -595,7 +595,7 @@ struct ConvPaddingParams {
     T paddingValue = 0;
     padding_mode_t paddingMode = padding_mode_t::ConstantPadding;
     uint32_t paddingAddr = 0;
-}
+};
 
 struct ConvFMatrixStepPosParams {
     __aicore__ ConvFMatrixStepPosParams() {}
@@ -629,7 +629,7 @@ struct ConvFMatrixDualParams {
     uint16_t dualSize = 0;
     uint16_t dualStride1 = 0;
     uint16_t dualStride2 = 0;
-}
+};
 
 struct ConvFMatrixParams {
     __aicore__ ConvFMatrixParams() {}
@@ -650,7 +650,7 @@ struct ConvFMatrixParams {
     uint8_t  rightPaddingSize = 0;
     uint8_t  topPaddingSize = 0;
     uint8_t  bottomPaddingSize = 0;
-}
+};
 
 template <typename T>
 struct InitConstValueParams {
@@ -797,9 +797,9 @@ struct WaippDataTypeConvParams {
     __aicore__ WaippDataTypeConvParams() {}
 
     __aicore__ WaippDataTypeConvParams(
-        const uint16_t dstGainIn, const uint32_t dstOffsetIn, const uint8 roundingModeIn)
-        : dstGain(dstGainIn),
-          dstOffset(dstOffsetIn),
+        const uint16_t dtcGainIn, const uint32_t dtcOffsetIn, const uint8_t roundingModeIn)
+        : dtcGain(dtcGainIn),
+          dtcOffset(dtcOffsetIn),
           roundingMode(roundingModeIn)
     {}
     uint16_t dtcGain = 256;
@@ -812,24 +812,24 @@ struct StoreImageToGlobalParams {
 
     __aicore__ StoreImageToGlobalParams(
         const WaippOutputDataType outputDataTypeIn, const WaippChannelTransformMode channelTransformModeIn, 
-        const WaippDataTypeConvParams dtcParamsIn, const uint32_t dstImageWidthIn, const uint16_t dstImageHeaghtIn, 
-        const uint16_t srcImageStrideIn, const uint16_t dstImageSrideIn, const uint8_t sidIn)
+        const WaippDataTypeConvParams dtcParamsIn, const uint32_t dstImageWidthIn, const uint16_t dstImageHeightIn, 
+        const uint16_t srcImageStrideIn, const uint16_t dstImageStrideIn, const uint8_t sidIn)
         : outputDataType(outputDataTypeIn),
           channelTransformMode(channelTransformModeIn),
           dtcParams(dtcParamsIn),
           dstImageWidth(dstImageWidthIn),
-          dstImageHeaght(dstImageHeaghtIn),
+          dstImageHeight(dstImageHeightIn),
           srcImageStride(srcImageStrideIn),
-          dstImageSride(dstImageSrideIn),
+          dstImageStride(dstImageStrideIn),
           sid(sidIn)
     {}
     WaippOutputDataType outputDataType = WaippOutputDataType::UINT8;
-    WaippChannelTransformMode channelTransformMode = WaippChannelTransformMode:BYPASS;
+    WaippChannelTransformMode channelTransformMode = WaippChannelTransformMode::BYPASS;
     WaippDataTypeConvParams dtcParams;
     uint32_t dstImageWidth = 0;
-    uint32_t dstImageHeaght = 0;
+    uint32_t dstImageHeight = 0;
     uint32_t srcImageStride = 0;
-    uint32_t dstImageStride = 0
+    uint32_t dstImageStride = 0;
     uint8_t sid = 0;
 };
 
