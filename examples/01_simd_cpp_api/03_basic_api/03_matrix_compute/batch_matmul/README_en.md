@@ -21,8 +21,8 @@ This example introduces batched matrix multiplication with float data type input
 │   │   └── verify_result.py        // Script for verifying whether output data matches ground truth data
 │   ├── CMakeLists.txt              // Build project file
 │   ├── data_utils.h                // Data read/write functions
-│   ├── batch_matmul.asc              // Ascend C example implementation & invocation example
-│   └── README.md                     // Example documentation
+│   ├── batch_matmul.asc            // Ascend C example implementation & invocation example
+│   └── README.md                   // Example documentation
 ```
 
 ## Example Description
@@ -162,7 +162,7 @@ Users can obtain the memory sizes of L1, L0A, L0B, L0C storage spaces on the har
 Run the following steps in the root directory of this example to build and run the operator.
 
 - Configure environment variables  
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

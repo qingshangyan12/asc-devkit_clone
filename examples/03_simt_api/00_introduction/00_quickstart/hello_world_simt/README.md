@@ -9,7 +9,7 @@
 - Ascend 950PR/Ascend 950DT
 
 ## 支持的CANN软件版本
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -24,7 +24,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

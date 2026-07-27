@@ -5,11 +5,11 @@
 <h4>Build multi-level APIs based on C/C++, provide complete chip programming capabilities, and support achieving ultimate performance</h4>
 
 [![community](https://img.shields.io/badge/docs-community-brightgreen.svg?style=flat)](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)
-[![repo](https://img.shields.io/badge/docs-repo-blue.svg?style=flat)](https://gitcode.com/cann/asc-devkit/tree/master/docs)
-[![examples](https://img.shields.io/badge/examples-repo-orange.svg?style=flat)](https://gitcode.com/cann/asc-devkit/tree/master/examples)
+[![repo](https://img.shields.io/badge/docs-repo-blue.svg?style=flat)](docs)
+[![examples](https://img.shields.io/badge/examples-repo-orange.svg?style=flat)](examples)
 [![asc-tools](https://img.shields.io/badge/asc--tools-repo-6f42c1.svg?style=flat)](https://gitcode.com/cann/asc-tools)
-[![license](https://img.shields.io/badge/license-CANN_Open_2.0-lightgrey.svg)](https://gitcode.com/cann/asc-devkit/blob/master/LICENSE)
-[![contributing](https://img.shields.io/badge/CONTRIBUTING-teal)](https://gitcode.com/cann/asc-devkit/blob/master/CONTRIBUTING_en.md)
+[![license](https://img.shields.io/badge/license-CANN_Open_2.0-lightgrey.svg)](LICENSE)
+[![contributing](https://img.shields.io/badge/CONTRIBUTING-teal)](CONTRIBUTING_en.md)
 [![SIG](https://img.shields.io/badge/SIG-ascendc-yellow)](https://gitcode.com/cann/community/tree/master/CANN/sigs/ascendc)
 [![VS Marketplace](https://vsmarketplacebadges.dev/version/HICANN.ascend-c-toolkit.svg)](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)
 [![Installs](https://vsmarketplacebadges.dev/installs-short/HICANN.ascend-c-toolkit.svg)](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)
@@ -74,7 +74,7 @@ Additionally, Ascend C provides high-level APIs and operator template libraries 
 
 The overall logical architecture diagram is shown below:
 
-<img src="docs/guide/figures/architecture_ascendc.png" alt="Architecture Diagram"  width="1000px">
+<img src="docs/zh/guide/figures/architecture_ascendc.png" alt="Architecture Diagram"  width="1000px">
 
 - **Language Extension Layer C API**: Pure C interfaces, supporting array memory allocation and pointer-based calculation interfaces, providing a C programming experience consistent with industry standards and opening complete chip programming capabilities. Atlas A2/A3 supports SIMD pure C interfaces; Ascend 950PR/Ascend 950DT will support SIMT programming capabilities similar to industry standards and SIMD/SIMT hybrid programming capabilities.
 - **Basic API**: Single-instruction abstracted C++ class library API, generally based on Tensor programming; gradually improving Tensor programming capabilities based on Layout.

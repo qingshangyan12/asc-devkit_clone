@@ -972,13 +972,13 @@ template <typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
 __aicore__ inline void CheckQuantizeParams(
     const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset)
 {
-    CheckTensorPosition(dstTensor, "dstTensor", "VECIN, VECOUT, VECCALC");
-    CheckTensorPosition(srcTensor, "srcTensor", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(dstTensor, "dstTensor", "VECIN/VECOUT/VECCALC");
+    CheckTensorPosition(srcTensor, "srcTensor", "VECIN/VECOUT/VECCALC");
     if constexpr (TypeUtils::IsLocalTensorType<ScaleT>()) {
-        CheckTensorPosition(scale, "scale", "VECIN, VECOUT, VECCALC");
+        CheckTensorPosition(scale, "scale", "VECIN/VECOUT/VECCALC");
     }
     if constexpr (TypeUtils::IsLocalTensorType<OffsetT>()) {
-        CheckTensorPosition(offset, "offset", "VECIN, VECOUT, VECCALC");
+        CheckTensorPosition(offset, "offset", "VECIN/VECOUT/VECCALC");
     }
     static_assert(
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)

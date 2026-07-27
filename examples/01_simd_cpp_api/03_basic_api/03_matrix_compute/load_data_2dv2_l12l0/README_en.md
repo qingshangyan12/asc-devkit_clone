@@ -187,7 +187,7 @@ The subsequent code and parameter descriptions repeatedly use fractal and alignm
   </tr>
 </table>
 
-- `CeilAlign`: Ceiling alignment operation. For example, when `m = 30`, `CeilAlign(30, 16) = 32`.
+- `CeilAlign`: Ceiling alignment operation. For example, when `m = 30`, `CeilAlign(30, 16) = 32`, meaning that the m-axis is aligned to 16 and its aligned length is 32.
 
   ```cpp
   __aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue) {
@@ -196,7 +196,7 @@ The subsequent code and parameter descriptions repeatedly use fractal and alignm
   ```
 
 - `CeilDivision`: Ceiling division, generally used to compute loop counts after ceiling alignment.
-- `mAlignValue`: m axis aligns to `mAlignValue`. Similarly `nAlignValue`, `kaAlignValue`, `kbAlignValue`.
+- `mAlignValue`: m axis aligns to `mAlignValue`. For example, when `mAlignValue = 32`, the m axis is aligned to 32. Similarly `nAlignValue`, `kaAlignValue`, `kbAlignValue`.
 - `mAlignL1` and `mAlignL0`: Aligned values of m axis when A matrix is on L1 and L0A respectively. Similarly `nAlignL1`, `nAlignL0`, `kaAlignL1`, `kaAlignL0`, `kbAlignL1`, `kbAlignL0`.
 
 ### 4. Alignment Requirements
@@ -625,7 +625,7 @@ AscendC::LoadData(b2Local, b1Local, loadDataParams);
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

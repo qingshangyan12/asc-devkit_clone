@@ -35,7 +35,7 @@ This example demonstrates the end-to-end implementation of int4 matrix multiplic
   <tr><td rowspan="4" align="center">Example Input</td></tr>
   <tr><td align="center">x4</td><td align="center">[256, 256]</td><td align="center">int4b_t</td><td align="center">ND</td></tr>
   <tr><td align="center">y4</td><td align="center">[256, 256]</td><td align="center">int4b_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">tiling</td><td align="center">[1, 64]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">tiling</td><td align="center">[1, 32]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[256, 256]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">matmul_s4</td></tr>
   </table>
@@ -51,7 +51,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

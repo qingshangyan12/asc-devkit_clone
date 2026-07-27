@@ -18,7 +18,7 @@ This example demonstrates the usage of the GetUBSizeInBytes and GetRuntimeUBSize
   <tr>
     <td align="center">2</td>
     <td align="center">GetRuntimeUBSize</td>
-    <td>Returns a runtime variable representing the maximum usable UB (Unified Buffer) size. Applicable to SIMT and SIMD mixed programming scenarios, where SIMT scenarios reserve some space in UB for Dcache. For example, in the Ascend 950PR/Ascend 950DT scenario, SIMT programming allocates 32KB for Dcache, the system reserves 8KB, UB totals 256KB, and returns 216KB</td>
+    <td>Returns a runtime variable representing the maximum usable UB (Unified Buffer) size. Applicable to SIMT and SIMD mixed programming scenarios, where SIMT scenarios reserve some space in UB for Dcache. For example, in the Ascend 950PR/Ascend 950DT scenario, SIMT programming allocates 32KB for Dcache, the system reserves 8KB, UB totals 256KB, and returns 216KB. In scenarios that do not use mixed SIMT and SIMD programming, it returns a fixed value of 248KB</td>
   </tr>
 </table>
 
@@ -121,7 +121,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

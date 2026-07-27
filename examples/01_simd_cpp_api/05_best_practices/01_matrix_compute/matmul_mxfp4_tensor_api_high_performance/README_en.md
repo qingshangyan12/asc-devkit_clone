@@ -110,8 +110,8 @@ Physical Address                               Pipeline
   |  B:CopyGM2L1 / ScaleB:CopyGM2L1   MTE2
   v
   L1
-  |  A:CopyL10L0A / ScaleA:CopyL10L0ScaleA        MTE1
-  |  B:CopyL10L0B / ScaleB:CopyL10L0ScaleB        MTE1
+  |  A:CopyL12L0A / ScaleA:CopyL12L0ScaleA        MTE1
+  |  B:CopyL12L0B / ScaleB:CopyL12L0ScaleB        MTE1
   v
   L0A / L0B / L0ScaleA / L0ScaleB
   |
@@ -153,8 +153,8 @@ MxMatmul input is not two-way but four-way: A, B, ScaleA, ScaleB. Therefore each
 |------|----------|-----------|---------|
 | A | `Copy` | `[singleCoreM, singleCoreK]` | `[baseM, stepK * baseK]` |
 | B | `Copy` | `[singleCoreN, singleCoreK]` | `[baseN, stepK * baseK]` |
-| ScaleA | `Copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseK]` |
-| ScaleB | `Copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseK]` |
+| ScaleA | `Copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseSK]` |
+| ScaleB | `Copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseSK]` |
 
 Through `stepK=2`, transfer `stepK * baseM * baseK` A matrix data and `stepK * baseN * baseK` B matrix data at once, reducing transfer instruction count and improving GM to L1 transfer efficiency.
 
@@ -166,7 +166,7 @@ Taking A matrix data transfer as example, `Copy` transfers `stepK` K direction b
 AscendC::Te::Copy(gm2L1Atom, l1TensorAPing, a.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), AscendC::Te::MakeShape(curM, stepCurK)));
 ```
 
-Taking ScaleA matrix data transfer as example, `Copy` transfers `scaleFactorK * stepK` K direction base blocks at once, each base block being `baseM * baseK`:
+Taking ScaleA matrix data transfer as example, `Copy` transfers `scaleFactorK * stepK` K direction base blocks at once, each base block being `baseM * baseSK` (where `baseSK = align_even(ceil(baseK / 32))`):
 
 ```cpp
 AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), AscendC::Te::MakeShape(curM, stepCurScaleK)));
@@ -217,7 +217,7 @@ Cube                                               | Mmad Ping ---|   | Mmad Pon
 L0C->GM                                                           | Copy L0C to GM ---
 ```
 
-The horizontal line lengths in the figure only express that different stages may have different durations and do not represent measured ratios; actual durations require `msprof` collection results.
+The horizontal line lengths in the figure only express that different stages may have different durations and do not represent measured ratios; actual durations require `msopprof` collection results.
 
 In the K loop, when the current K block enters Cube computation, the next batch of A/B/ScaleA/ScaleB can initiate transfer in advance. Ping and Pong alternate, with producers and consumers confirming buffer writability and data readability through event synchronization.
 
@@ -358,7 +358,7 @@ Ascend 950PR chip performance data:
 |------|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
 | Tensor API MxMatmul | 682.316 | 32 | 681.54 | 640.591 | 0.94 | 63.466 | 0.093 | 315.894 | 0.464 | 589.308 | 0.865 | 31.646 | 0.046 |
 
-It can be seen that this example has reached `94.0%` of theoretical peak performance (that is, `aic_mac_ratio` in the table).
+The Cube computation time ratio in this example reaches `94.0%` (that is, `aic_mac_ratio` in the table).
 
 ### Cube Computation Performance Analysis
 
@@ -438,7 +438,7 @@ python3 -m pip install ml_dtypes==0.2.0 en_dtypes==0.0.4
 
 ### Configure Environment Variables
 
-Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment. **Currently only supports using [CANN master](../../../../../docs/quick_start.md#下载-cann-master)**.
+Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment. **Currently only supports using [CANN master](../../../../../docs/zh/quick_start.md#下载-cann-master)**.
 
 ```bash
 source ${install_path}/cann/set_env.sh
@@ -482,27 +482,37 @@ test pass!
 
 ### NPU Mode Performance Analysis
 
-Use the `msprof` tool to obtain detailed NPU mode runtime performance data:
+### Introduction to the msOpProf Tool
+
+msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps users identify anomalies in operator memory, code, and instructions for comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and file types (executables or operator binary `.o` files).
+
+- On-device performance collection
+
+    On-device performance collection directly measures the operator's execution time on the Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+
+    Run msopprof on the `demo` executable for operator tuning:
+    ```
+    msopprof ./demo
+    ```
+
+    - Performance data description  
+      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+
+      ```bash
+      ├──dump                       # Raw performance data; users do not need to inspect it
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+      ├──OpBasicInfo.csv            # Basic operator information
+      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+      └──visualize_data.bin         # MindStudio Insight presentation file
+      ```
+
+View the detailed performance analysis results:
 
 ```bash
-msprof ./demo
-```
-
-A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores performance data summaries. Performance data analysis is recommended to view files in this directory:
-
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-├── host
-├── mindstudio_profiler_log
-└── mindstudio_profiler_output
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
-
-View the specific performance analysis results:
-
-```bash
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

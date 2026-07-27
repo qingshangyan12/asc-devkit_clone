@@ -23,7 +23,7 @@ This example first introduces the necessity and specific implementation scheme o
 │   ├── set_atomic_add_multi_aiv.h                // Multi-AIV core synchronization implementation
 │   ├── set_atomic_add_single_aiv.h               // Single-AIV core synchronization implementation
 │   ├── set_atomic_deterministic_computation.asc  // Ascend C example implementation & invocation example
-│   └── README.md                                    // Example description document
+│   └── README.md                                 // Example description document
 ```
 
 ## 1. Deterministic Computation
@@ -313,7 +313,7 @@ When SCENARIO_NUM=2, it calls `IBSet` and `IBWait` for inter-core synchronizatio
 ## Build and Run
 Run the following steps in the root directory of this example to build and run it.
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例展示了如何利用 Ascend C 的SIMT的[`asc_atomic_add()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/原子操作/asc_atomic_add.md)接口，高效统计输入字节序列中每个字节值的出现频率。功能示意如下图：<br>
+本样例展示了如何利用 Ascend C 的SIMT的[`asc_atomic_add()`](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md)接口，高效统计输入字节序列中每个字节值的出现频率。功能示意如下图：<br>
 <img src="figures/introduction.png" alt="intro" style="width: 50%; height: auto;">
 
 ## 支持的产品
@@ -11,7 +11,7 @@
 
 ## 支持的CANN软件版本
 
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -73,7 +73,7 @@ Warp对局部直方图中每个桶的计数是在UB中通过`asc_atomic_add`进�
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh

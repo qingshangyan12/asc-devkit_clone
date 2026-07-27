@@ -21,8 +21,8 @@ This example introduces the usage of the asc_dump_xxx series APIs to enable tens
 │   │   └── verify_result.py    // Script for verifying output data against ground truth data
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read/write functions
-│   ├── dump.asc               // Ascend C example implementation & invocation example
-│   └── README.md              // Example description document
+│   ├── dump.asc                // Ascend C example implementation & invocation example
+│   └── README.md               // Example description document
 ```
 
 ## Example Description
@@ -74,7 +74,7 @@ This example introduces the usage of the asc_dump_xxx series APIs to enable tens
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
