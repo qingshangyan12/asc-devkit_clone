@@ -353,7 +353,9 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / sizeof(uint32_t));
     SyncAction<HardEvent::MTE3_S>();
 
-    wqeCnt++;
+    if constexpr (config.cqe != 0) {
+        wqeCnt++;
+    }
     curHead += wqeBbCnt;
     // Pack curHead into the low 32 bits and wqeCnt into the high 32 bits, then write in one shot.
     headVal = static_cast<uint64_t>(curHead) | (static_cast<uint64_t>(wqeCnt) << 32);
