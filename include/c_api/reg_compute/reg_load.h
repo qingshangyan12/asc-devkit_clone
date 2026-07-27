@@ -20,10 +20,10 @@
 // ==========源操作数为起初地址，目的数为寄存器=========
 // ==========asc_gather(u8/s8/half/u16/s16/float/u32/s32/bf16/e4m3/e5m2/e8m0)=========
 __simd_callee__ inline void asc_gather(
-    vector_int16_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask);
+    vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask);
 
 __simd_callee__ inline void asc_gather(
-    vector_uint16_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask);
+    vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask);
 
 __simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint16_t index, vector_bool mask);

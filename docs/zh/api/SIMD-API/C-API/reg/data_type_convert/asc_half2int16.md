@@ -30,7 +30,7 @@
 
 将half类型数据转换为int16_t，并支持多种舍入模式，饱和/非饱和模式。
 
-关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
+关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../data_type_convert/rounding_mode.md)。
 
 ## 函数原型
 
