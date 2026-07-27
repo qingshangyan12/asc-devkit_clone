@@ -69,6 +69,6 @@ install(TARGETS acl_rtc
     RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR}/lib64 ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../include/aclrtc/acl_rt_compile.h
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../include/acl/acl_rt_compile.h
     DESTINATION ${INSTALL_LIBRARY_DIR}/include/acl COMPONENT asc-devkit
 )
