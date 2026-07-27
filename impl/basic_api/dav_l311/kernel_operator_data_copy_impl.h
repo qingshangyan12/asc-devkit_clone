@@ -424,7 +424,7 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
         if (highTail) {
             CopyUbufToGmAlignV2<T>(
                 dstAddr + i * BLOCK_CUBE + highBlocks * highBlock * dstDStride,
-                srcAddr + i * srcNStride * BLOCK_CUBE + j * highBlocks * BLOCK_CUBE,
+                srcAddr + i * srcNStride * BLOCK_CUBE + highBlocks * highBlock * BLOCK_CUBE,
                 highTail,
                 leftLen * sizeof(T),
                 srcLeftLen,
@@ -823,23 +823,21 @@ template <typename T>
 __aicore__ inline void DataCopyGM2UBND2NZImpl(
     __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
 {
-    if ASCEND_IS_AIV {
-        if constexpr (g_gm_overflow_check) {
-            __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-            AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
-        }
-        const uint16_t& ndNum = intriParams.ndNum;
-        const uint16_t& dValue = intriParams.dValue;
-        const uint16_t& srcNdMatrixStride = intriParams.srcNdMatrixStride;
-        const uint16_t& dstNzMatrixStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride);
-        const uint16_t& c0Count = DEFAULT_C0_SIZE / sizeof(T);
-        for (int index = 0; index < ndNum; ++index) {
-            int16_t copyNum = (dValue + c0Count - 1) / c0Count;
-            for (int copyTime = 0; copyTime < copyNum; ++copyTime) {
-                int computeCount = (dValue >= (copyTime + 1) * c0Count) ? c0Count : (dValue % c0Count);
-                DataCopyGM2UBSingleImpl(
-                    dst + dstNzMatrixStride, src + srcNdMatrixStride, intriParams, copyTime, computeCount, cacheMode);
-            }
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
+    }
+    const uint16_t& ndNum = intriParams.ndNum;
+    const uint16_t& dValue = intriParams.dValue;
+    const uint16_t& srcNdMatrixStride = intriParams.srcNdMatrixStride;
+    const uint16_t& dstNzMatrixStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride);
+    const uint16_t& c0Count = DEFAULT_C0_SIZE / sizeof(T);
+    for (int index = 0; index < ndNum; ++index) {
+        int16_t copyNum = (dValue + c0Count - 1) / c0Count;
+        for (int copyTime = 0; copyTime < copyNum; ++copyTime) {
+            int computeCount = (dValue >= (copyTime + 1) * c0Count) ? c0Count : (dValue % c0Count);
+            DataCopyGM2UBSingleImpl(
+                dst + dstNzMatrixStride, src + srcNdMatrixStride, intriParams, copyTime, computeCount, cacheMode);
         }
     }
 }
