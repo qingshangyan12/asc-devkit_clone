@@ -28,7 +28,7 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-lt（less than），该接口用于对两个源操作数执行逐元素小于比较。对于src0_i < src1_i，目的操作数对应结果位为1，否则为0，每个元素的比较结果占一个bit。
+lt（less than），该接口用于逐元素比较两个源操作数大小，将比较结果写入目的操作数（掩码寄存器）对应比特位，如果比较结果为真，则对应比特位为1，否则为0。
 
 计算公式如下：
 
@@ -61,7 +61,7 @@ __simd_callee__ inline void asc_lt(vector_bool& dst, vector_float src0, vector_f
 | src1 | 输入 | 源操作数（矢量数据寄存器）。|
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -75,11 +75,18 @@ __simd_callee__ inline void asc_lt(vector_bool& dst, vector_float src0, vector_f
 ## 调用示例
 
 ```cpp
-vector_bool dst;
-vector_half src0;
-vector_half src1;
-vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址。
-asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
-asc_lt(dst, src0, src1, mask);
+__simd_vf__ inline void lt_vf(__ubuf__ uint16_t* dst_addr, __ubuf__ half* src0_addr, __ubuf__ half* src1_addr, uint32_t count, uint16_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+{
+    vector_half src0;
+    vector_half src1;
+    vector_bool dst;
+    vector_bool mask;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b16(count);
+        asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
+        asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
+        asc_lt(dst, src0, src1, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_block_size);
+    }
+}
 ```

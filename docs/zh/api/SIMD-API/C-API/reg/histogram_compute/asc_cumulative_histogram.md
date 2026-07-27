@@ -53,7 +53,7 @@
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -67,9 +67,16 @@
 ## 调用示例
 
 ```cpp
-vector_uint16_t dst;
-vector_uint8_t src;
-vector_bool mask = asc_create_mask_b8(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_cumulative_histogram_bin0(dst, src, mask);
+__simd_vf__ inline void cumulative_histogram_vf(__ubuf__ uint16_t* dst_addr, __ubuf__ uint8_t* src_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+{
+    vector_uint16_t dst;
+    vector_uint8_t src;
+    vector_bool mask;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b8(count);
+        asc_loadalign(src, src_addr + i * one_repeat_size);
+        asc_cumulative_histogram_bin0(dst, src, mask);
+    }
+    asc_storealign(dst_addr, dst, mask);
+}
 ```

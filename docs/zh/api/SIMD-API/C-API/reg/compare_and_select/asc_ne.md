@@ -28,7 +28,7 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-ne（not equal），该接口用于对两个源操作数执行逐元素不等于比较。当src0_i != src1_i时，目的操作数对应结果位为1，否则为0，每个元素的比较结果占一个bit。
+ne（not equal），该接口用于逐元素比较两个源操作数大小，将比较结果写入目的操作数（掩码寄存器）对应比特位，如果比较结果为真，则对应比特位为1，否则为0。
 
 计算公式如下：
 
@@ -74,11 +74,18 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_float src0, vector_f
 ## 调用示例
 
 ```cpp
-vector_bool dst;
-vector_uint8_t src0;
-vector_uint8_t src1;
-vector_bool mask = asc_create_mask_b8(PAT_ALL);
-asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址
-asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
-asc_ne(dst, src0, src1, mask);
+__simd_vf__ inline void ne_vf(__ubuf__ uint8_t* dst_addr, __ubuf__ uint8_t* src0_addr, __ubuf__ uint8_t* src1_addr, uint32_t count, uint16_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+{
+    vector_uint8_t src0;
+    vector_uint8_t src1;
+    vector_bool dst;
+    vector_bool mask;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b8(count);
+        asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
+        asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
+        asc_ne(dst, src0, src1, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_block_size);
+    }
+}
 ```
