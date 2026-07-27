@@ -86,29 +86,6 @@ __aicore__ inline void CopyUbufToGmAlignV2(
     copy_ubuf_to_gm_align_v2(dst, src, 0, blockCount, burstLength, dstStride310, srcStride310);
 }
 
-template <typename T, PaddingMode mode>
-__aicore__ inline void CopyUbufToGmAlignV2(
-    __gm__ T* dst, __ubuf__ T* src, const uint16_t blockCount, const uint32_t blockLen, const int64_t srcStride,
-    const int64_t dstStride, const bool isDataCopyPad, const uint8_t cacheMode = 0)
-{
-    if ASCEND_IS_AIV {
-        // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte / 32bytes
-        uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
-        uint32_t burstLength = blockLen * unitOfBytes;
-        uint32_t srcStride310 = 0;
-        if constexpr (mode == PaddingMode::Normal) {
-            srcStride310 = static_cast<uint32_t>(srcStride) * BYTE_32_ALIGN +
-                           burstLength; // UB   DataCopy:32Bytes, DataCopyPad:32Bytes
-            // srcstride should be 32B aligned
-            srcStride310 = DivCeil(srcStride310, BYTE_32_ALIGN) * BYTE_32_ALIGN;
-        } else {
-            srcStride310 = burstLength;
-        }
-        uint64_t dstStride310 = dstStride * unitOfBytes + burstLength; // GM   DataCopy:32Bytes, DataCopyPad:1Byte
-        copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, burstLength, cacheMode, dstStride310, srcStride310);
-    }
-}
 
 // only support CubeCore   PIPE_MTE2
 // GM -> L1: copy_gm_to_cbuf_align_v2
@@ -419,37 +396,12 @@ __aicore__ inline void DataCopyL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const D
         dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride);
 }
 
-// UB -> GM   DataCopyPad with DataCopyExtParams
-template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline void DataCopyPadUB2GMImpl(
-    __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& intriParams, const uint8_t cacheMode = 0)
-{
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
-    }
-    ASCENDC_ASSERT((intriParams.dstStride <= static_cast<int64_t>(1ul << 40 - 1)), {
-        KERNEL_LOG(KERNEL_ERROR, "dstStride is %ld, which should be no more than 2^40-1", intriParams.dstStride);
-    });
-    ASCENDC_ASSERT((intriParams.dstStride >= static_cast<int64_t>(0)), {
-        KERNEL_LOG(KERNEL_ERROR, "dstStride is %ld, which should be no less than 0", intriParams.dstStride);
-    });
-    ASCENDC_ASSERT((intriParams.srcStride <= static_cast<int64_t>(65535)), {
-        KERNEL_LOG(KERNEL_ERROR, "srcStride is %ld, which should be no more than 65535", intriParams.srcStride);
-    });
-    ASCENDC_ASSERT((intriParams.srcStride >= static_cast<int64_t>(0)), {
-        KERNEL_LOG(KERNEL_ERROR, "srcStride is %ld, which should be no less than 0", intriParams.srcStride);
-    });
-    CopyUbufToGmAlignV2<T, mode>(
-        dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, true,
-        cacheMode);
-}
 
 template <typename T>
 __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
-    __gm__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t high, uint16_t width, uint16_t srcNStride, uint16_t dstDStride,
-    const uint8_t cacheMode = 0)
+    __gm__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t high, uint16_t width, uint16_t srcNStride, uint16_t dstDStride)
 {
+    (void)cacheMode;
     const uint16_t highBlock = MAX_REPEAT_TIMES;
     const uint16_t highBlocks = high / highBlock;
     const uint16_t highTail = high % highBlock;
@@ -460,12 +412,14 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
         uint16_t leftLen = width >= computeCount ? BLOCK_CUBE : (width - i * BLOCK_CUBE);
         uint16_t srcLeftLen = (sizeof(T) == B32_BYTE_SIZE && leftLen <= DEFAULT_BLK_NUM) ? MIN_BLOCK_LEN : 0;
         for (int j = 0; j < highBlocks; ++j) {
-            DataCopyPadUB2GMImpl(
+            CopyUbufToGmAlignV2<T>(
                 dstAddr + i * BLOCK_CUBE + j * highBlock * dstDStride,
                 srcAddr + i * srcNStride * BLOCK_CUBE + j * highBlock * BLOCK_CUBE,
-                DataCopyExtParams{
-                    highBlock, static_cast<uint32_t>(leftLen * sizeof(T)), srcLeftLen,
-                    static_cast<uint32_t>((dstDStride - leftLen) * sizeof(T)), 0});
+                highBlock,
+                leftLen * sizeof(T),
+                srcLeftLen,
+                (dstDStride - leftLen) * sizeof(T),
+                true);
         }
         if (highTail) {
             DataCopyPadUB2GMImpl(
