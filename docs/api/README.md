@@ -46,8 +46,6 @@
                 -   [ReinterpretCast](SIMD-API/基础API/数据结构/GlobalTensor/ReinterpretCast-8.md)
 
         -   [数据结构(TensorAPI)](SIMD-API/基础API/data_structure_TensorAPI/data_structure_TensorAPI.md)
-            -   [内置数据类型](SIMD-API/基础API/数据结构/内置数据类型.md)
-            -   [精度转换](SIMD-API/基础API/数据结构/precision_conversion.md)
             -   [Layout数据结构及相关接口](SIMD-API/基础API/data_structure_TensorAPI/layout_structure/layout_structure.md)
                 -   [Capacity](SIMD-API/基础API/data_structure_TensorAPI/layout_structure/Capacity.md)
                 -   [Coord](SIMD-API/基础API/data_structure_TensorAPI/layout_structure/Coord.md)
@@ -248,17 +246,8 @@
                 
         -   [矩阵计算（TensorAPI）](SIMD-API/基础API/cube_compute_TensorAPI/cube_compute_TensorAPI.md)
             -   [概述](SIMD-API/基础API/cube_compute_TensorAPI/概述/概述.md)
-                -   [矩阵计算单元](SIMD-API/基础API/cube_compute_ISASI/概述/矩阵计算单元.md)
-                -   [矩阵计算流程](SIMD-API/基础API/cube_compute_TensorAPI/概述/矩阵计算流程.md)
-            -   [矩阵计算分形介绍](SIMD-API/基础API/cube_compute_TensorAPI/矩阵计算分形介绍/矩阵计算分形介绍.md)
-                -   [背景与核心概念](SIMD-API/基础API/cube_compute_ISASI/矩阵计算分形介绍/背景与核心概念.md)
-                -   [关键分形格式详解](SIMD-API/基础API/cube_compute_ISASI/矩阵计算分形介绍/关键分形格式详解.md)
-                <cann-filter npu-type="910b,A3,A5">
-                -   [辅助矩阵分形格式详解](SIMD-API/基础API/cube_compute_ISASI/矩阵计算分形介绍/辅助矩阵分形格式详解.md)
-                </cann-filter>
             -   [矩阵计算的搬入](SIMD-API/基础API/cube_compute_TensorAPI/矩阵计算的搬入/矩阵计算的搬入.md)
                 -   [总体说明](SIMD-API/基础API/cube_compute_TensorAPI/矩阵计算的搬入/总体说明.md)
-                -   [L1 Buffer/L0A Buffer/L0B Buffer内存结构介绍](SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/L1-L0A-B内存结构介绍.md)
                 -   [Copy（Global Memory到L1 Buffer数据搬运）](SIMD-API/基础API/cube_compute_TensorAPI/矩阵计算的搬入/Copy_GMToL1.md)
                 -   [Copy（L1 Buffer到L0A Buffer数据搬运）](SIMD-API/基础API/cube_compute_TensorAPI/矩阵计算的搬入/Copy_L1ToL0A.md)
                 -   [Copy（L1 Buffer到L0B Buffer数据搬运）](SIMD-API/基础API/cube_compute_TensorAPI/矩阵计算的搬入/Copy_L1ToL0B.md)
@@ -273,9 +262,6 @@
                 -   [HF32](SIMD-API/基础API/cube_compute_TensorAPI/Mmad计算关键特性说明/HF32.md)
                 -   [UnitFlag](SIMD-API/基础API/cube_compute_TensorAPI/Mmad计算关键特性说明/UnitFlag.md)
             -   [Mmad计算辅助配置接口](SIMD-API/基础API/cube_compute_TensorAPI/Mmad计算辅助配置接口/Mmad计算辅助配置接口.md)
-                -   [SetMMColumnMajor/SetMMRowMajor](SIMD-API/基础API/cube_compute_ISASI/Mmad计算辅助配置接口/SetMMColumnMajor-SetMMRowMajor.md)
-                -   [SetHF32Mode](SIMD-API/基础API/cube_compute_ISASI/Mmad计算辅助配置接口/SetHF32Mode.md)
-                -   [SetHF32TransMode](SIMD-API/基础API/cube_compute_ISASI/Mmad计算辅助配置接口/SetHF32TransMode.md)
             -   [矩阵计算的搬出](SIMD-API/基础API/cube_compute_TensorAPI/矩阵计算的搬出/矩阵计算的搬出.md)
                 -   [总体说明](SIMD-API/基础API/cube_compute_TensorAPI/矩阵计算的搬出/总体说明.md)
                 -   [Copy（L0C Buffer到Global Memory数据搬运）](SIMD-API/基础API/cube_compute_TensorAPI/矩阵计算的搬出/Copy_L0CToGM.md)
@@ -390,20 +376,13 @@
                 -   [SetDeqScale](SIMD-API/基础API/Memory矢量计算/类型转换辅助配置接口/SetDeqScale.md)
 
             -   [归约计算](SIMD-API/基础API/Memory矢量计算/归约计算/归约计算.md)
-            
-                - [概述](SIMD-API/基础API/Memory矢量计算/归约计算/Introduction.md)
-                
-                - [ReduceDataBlock](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceDataBlock.md) 
-                
-                - [ReduceRepeat](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceRepeat.md)  
-                
-                - [ReducePairElem](SIMD-API/基础API/Memory矢量计算/归约计算/ReducePairElem.md)  
-                
-                - [ReduceMax](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)  
-                
-                - [ReduceMin](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)  
-                
-                - [ReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)  
+                -   [概述](SIMD-API/基础API/Memory矢量计算/归约计算/Introduction.md)
+                -   [ReduceDataBlock](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceDataBlock.md) 
+                -   [ReduceRepeat](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceRepeat.md)  
+                -   [ReducePairElem](SIMD-API/基础API/Memory矢量计算/归约计算/ReducePairElem.md)  
+                -   [ReduceMax](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)  
+                -   [ReduceMin](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)  
+                -   [ReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)  
 
             -   [归约计算辅助配置接口](SIMD-API/基础API/Memory矢量计算/归约计算辅助配置接口/归约计算辅助配置接口.md)
                 -   [GetReduceRepeatSumSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算辅助配置接口/GetReduceRepeatSumSpr_ISASI.md)
