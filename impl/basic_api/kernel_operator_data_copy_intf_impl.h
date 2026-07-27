@@ -951,7 +951,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
             false, "src", "VECOUT / CO2", "DataCopy with Nz2NdParamsFull",
             ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
 #else
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5162))
         if (srcHWPos == Hardware::L1) {
             DataCopyL12GMNZ2NDImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), intriParams);
             return;

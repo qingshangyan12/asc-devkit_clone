@@ -340,6 +340,11 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L1) {
         LoadData2DGM2L1Cal((__cbuf__ T*)dst.GetPhyAddr(), (__gm__ U*)src.GetPhyAddr(), loadDataParams, nd2nzParams);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+    } else if (dstScope == Hardware::L0B) {
+        LoadData2DGM2L0BCal((__cb__ T*)dst.GetPhyAddr(), (__gm__ U*)src.GetPhyAddr(), loadDataParams, nd2nzParams);
+    }
+#endif
     } else {
         ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dst only support A1/B1"); });
     }

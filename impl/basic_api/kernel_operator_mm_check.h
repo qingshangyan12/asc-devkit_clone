@@ -61,6 +61,7 @@ __aicore__ static inline void CheckMmadAlign(
     CheckTensorAlign<S>(filter, VALUE_512, "filter", "Mmad");
 }
 
+#if defined (__NPU_ARCH__) && (__NPU_ARCH__ != 5162)
 __aicore__ inline void CheckMmadParamsCommon(const MmadParams& mmadParams, const __gm__ char* apiName)
 {
     CheckValueRange<uint16_t>(mmadParams.m, 0, UINT12_MAX, "m", apiName);
@@ -304,6 +305,7 @@ __aicore__ inline void CheckFixpipeTensor(
     CheckFixpipeTensor<T, U, config>(dst, src, intriParams, apiName);
     CheckFixpipeWorkspace(cbufWorkspace, intriParams, apiName);
 }
+#endif
 
 // check LoadData2D datatype
 template <typename T>

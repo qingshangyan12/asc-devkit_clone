@@ -341,17 +341,17 @@ __aicore__ inline void Fixpipe(
 {
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
-    const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-    if (dstScope == Hardware::L1) {
+    CheckTensorPos(src, Hardware::L1, "src", "CO1", "Fixpipe");
+    ASCENDC_CHECK_TPOSITION(
+        (GetPhyType((TPosition)dst.GetPosition()) == Hardware::L1) ||
+            (GetPhyType((TPosition)dst.GetPosition()) == Hardware::UB),
+        "dst", "A1", "Fixpipe", ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+    if constexpr (config.isToUB) {
         FixpipeL12L1Impl<DstPrimType, SrcPrimType, config>(
-            (__cbuf__ DstPrimType*)dst.GetPhyAddr(), (__cbuf__ SrcPrimType*)src.GetPhyAddr(), intriParams);
-    } else if (dstScope == Hardware::UB) {
-        FixpipeL12UbImpl<DstPrimType, SrcPrimType, config>(
             (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__cbuf__ SrcPrimType*)src.GetPhyAddr(), intriParams);
     } else {
-        ASCENDC_ASSERT((false), {
-            KERNEL_LOG(KERNEL_ERROR, "Failed to check dst tensor position in Fixpipe, supported positions are A1 or UB");
-        });
+        FixpipeL12UbImpl<DstPrimType, SrcPrimType, config>(
+            (__cbuf__ DstPrimType*)dst.GetPhyAddr(), (__cbuf__ SrcPrimType*)src.GetPhyAddr(), intriParams);
     }
 }
 
@@ -362,6 +362,7 @@ __aicore__ inline void Fixpipe(
 {
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
+    CheckTensorPos(src, Hardware::L1, "src", "CO1", "Fixpipe");
     FixpipeL12GmImpl<DstPrimType, SrcPrimType, config>(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cbuf__ SrcPrimType*)src.GetPhyAddr(), intriParams);
 }

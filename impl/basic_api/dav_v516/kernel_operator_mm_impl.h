@@ -282,6 +282,38 @@ __aicore__ inline void LoadData2DGM2L1Cal(
     }
 }
 
+template <typename T>
+__aicore__ inline void LoadData2DL12L1Cal(__cbuf__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParam)
+{
+    static_assert(
+        SupportType<
+            T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, fp8_e5m2_t, fp8_e4m3fn_t, hifloat8_t, half,
+            bfloat16_t, uint16_t, int16_t>(),
+        "LoadData 2dv2 only support  int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, fp8_e5m2_t, fp8_e4m3fn_t, "
+        "hifloat8_t, half, bfloat16_t, uint16_t, int16_t on current device!");
+    if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
+        if (loadDataParam.ifTranspose) {
+            load_cbuf_to_cbuf_s4(
+                (__cbuf__ void*)dst, (__cbuf__ void*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+                loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, 1);
+        } else {
+            load_cbuf_to_cbuf_s4(
+                (__cbuf__ void*)dst, (__cbuf__ void*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+                loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, 0);
+        }
+    } else {
+        if (loadDataParam.ifTranspose) {
+            load_cbuf_to_cbuf(
+                dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.mStep,
+                loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, 1);
+        } else {
+            load_cbuf_to_cbuf(
+                dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.mStep,
+                loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, 0);
+        }
+    }
+}
+
 /* **************************************************************************************************
  * LoadDataWithTranspose                                        *
  * ************************************************************************************************* */
@@ -295,6 +327,20 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
+{
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose from B1 to B2 is not supported on current device"); });
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0ATransposeCal(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
+{
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose from A1 to A2 is not supported on current device"); });
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0BTransposeCal(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
 {
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose from B1 to B2 is not supported on current device"); });
 }
