@@ -16,15 +16,15 @@
 
 ## 函数原型
 
-```
+```cpp
 int __ffs(int x)
 ```
 
-```
+```cpp
 int __ffs(long long x)
 ```
 
-```
+```cpp
 int __ffs(long x)
 ```
 
@@ -51,7 +51,7 @@ int __ffs(long x)
 
 使用该接口需要包含"simt\_api/device\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_functions.h"
 ```
 
@@ -59,7 +59,7 @@ int __ffs(long x)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelFfs(int* dst, int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -67,7 +67,7 @@ int __ffs(long x)
     }
     ```
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelFfs(int* dst, long long* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -77,7 +77,7 @@ int __ffs(long x)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelFfs(__gm__ int* dst, __gm__ int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -85,7 +85,7 @@ int __ffs(long x)
     }
     ```
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelFfs(__gm__ int* dst, __gm__ long long* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

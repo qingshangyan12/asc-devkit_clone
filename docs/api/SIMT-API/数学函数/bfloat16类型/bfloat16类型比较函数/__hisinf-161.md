@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline bool __hisinf(bfloat16_t x)
 ```
 
@@ -43,7 +43,7 @@ inline bool __hisinf(bfloat16_t x)
 
 使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_bf16.h"
 ```
 
@@ -51,7 +51,7 @@ inline bool __hisinf(bfloat16_t x)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelIsInf(bool* dst, bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -61,7 +61,7 @@ inline bool __hisinf(bfloat16_t x)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelIsInf(__gm__ bool* dst, __gm__ bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

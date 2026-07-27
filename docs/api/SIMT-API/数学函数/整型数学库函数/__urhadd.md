@@ -18,7 +18,7 @@
 
 ## 函数原型
 
-```
+```cpp
 unsigned int __urhadd(unsigned int x, unsigned int y)
 ```
 
@@ -43,7 +43,7 @@ unsigned int __urhadd(unsigned int x, unsigned int y)
 
 使用该接口需要包含"simt\_api/device\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_functions.h"
 ```
 
@@ -51,7 +51,7 @@ unsigned int __urhadd(unsigned int x, unsigned int y)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelUrhadd(unsigned int* dst, unsigned int* x, unsigned int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -61,7 +61,7 @@ unsigned int __urhadd(unsigned int x, unsigned int y)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelUrhadd(__gm__ unsigned int* dst, __gm__ unsigned int* x, __gm__ unsigned int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

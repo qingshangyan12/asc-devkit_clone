@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t laneid()
 ```
 
@@ -36,7 +36,7 @@ int32_t laneid()
 
 使用该接口需要包含"simt\_api/device\_functions.h"头文件。 
 
-``` 
+```cpp
 #include "simt_api/device_functions.h" 
 ```
 
@@ -44,7 +44,7 @@ int32_t laneid()
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void kernel_laneid(int32_t* dst)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -55,7 +55,7 @@ int32_t laneid()
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) void kernel_laneid(__gm__ int32_t* dst)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
