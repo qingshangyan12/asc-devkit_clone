@@ -89,6 +89,7 @@ public:
     __aicore__ inline int32_t Commit(ChannelHandle channel);
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Drain(ChannelHandle channel);
+    __aicore__ inline int32_t FlushChannel(ChannelHandle channel);
 
 private:
     template <
@@ -98,7 +99,7 @@ private:
         ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr = nullptr,
         const UdmaParams<T>& params = UdmaParams<T>{});
     __aicore__ inline void PollCqWhenSqOverflow(
-        ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead);
+        ChannelHandle channel, const CqContext& cqCtx, uint32_t sqHead);
     __aicore__ inline uint32_t PollCq(ChannelHandle channel, uint32_t expectTail);
 
 private:
