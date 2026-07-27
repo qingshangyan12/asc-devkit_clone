@@ -54,6 +54,9 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
+        TENSOR_API_DEBUG_ASSERT((GetTotalRowShape(srcLayout) >= 1 && GetTotalRowShape(srcLayout) <= 4095),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src row shape size in CopyUB2UB ND path, src row shape size must be in range [1, 4095]."));
         uint16_t blockCount = GetTotalRowShape(srcLayout);
         uint32_t blockLen = GetTotalColumnShape(srcLayout) * sizeof(SrcType);
         int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) * sizeof(SrcType);

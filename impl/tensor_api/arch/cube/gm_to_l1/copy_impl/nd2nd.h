@@ -32,6 +32,11 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        if constexpr (U::layoutType::depth == THREE_DIM_DATA || U::layoutType::depth == FIVE_DIM_DATA) {
+            TENSOR_API_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) <= 4095), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src batch shape size in CopyGM2L1 ND2ND path, src batch shape size must be no "
+                "greater than 4095."));
+        }
         // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
         // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
         constexpr auto gmDepth = NestingDepthV<decltype(src.Layout().Shape())>;
@@ -103,6 +108,15 @@ private:
             dstStride = blockLen;
         }
         if constexpr (IsB4Type<type>) {
+            TENSOR_API_DEBUG_ASSERT((blockLen % 2 == 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyGM2L1 ND2ND fp4 path, blockLen must be divisible by 2 before b4 "
+                "conversion."));
+            TENSOR_API_DEBUG_ASSERT((srcStride % 2 == 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check srcStride in CopyGM2L1 ND2ND fp4 path, srcStride must be divisible by 2 before b4 "
+                "conversion."));
+            TENSOR_API_DEBUG_ASSERT((dstStride % 2 == 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dstStride in CopyGM2L1 ND2ND fp4 path, dstStride must be divisible by 2 before b4 "
+                "conversion."));
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
             srcStride = srcStride >> 1;
@@ -156,6 +170,15 @@ private:
         uint32_t dstStride = dstBatchStride * sizeof(type);
 
         if constexpr (IsB4Type<type>) {
+            TENSOR_API_DEBUG_ASSERT((blockLen % 2 == 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check blockLen in CopyGM2L1 batched ND2ND fp4 path, blockLen must be divisible by 2 "
+                "before b4 conversion."));
+            TENSOR_API_DEBUG_ASSERT((srcStride % 2 == 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check srcStride in CopyGM2L1 batched ND2ND fp4 path, srcStride must be divisible by 2 "
+                "before b4 conversion."));
+            TENSOR_API_DEBUG_ASSERT((dstStride % 2 == 0), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dstStride in CopyGM2L1 batched ND2ND fp4 path, dstStride must be divisible by 2 "
+                "before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
             srcStride = srcStride >> 1;

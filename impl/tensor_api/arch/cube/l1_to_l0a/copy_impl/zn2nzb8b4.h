@@ -84,11 +84,19 @@ private:
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout) *
                      GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout) / FRACTAL_FIXED;
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+        TENSOR_API_DEBUG_ASSERT((kStep <= 255), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check kStep in CopyL12L0A ZN2NZ B8/B4 path, kStep must be no greater than 255."));
+        TENSOR_API_DEBUG_ASSERT((mStep % (IsB4Type<DstType> ? M_STEP_MIN_VAL_B4 : M_STEP_MIN_VAL_B8) == 0),
+            TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check mStep in CopyL12L0A ZN2NZ B8/B4 path, mStep must be divisible by 4 for b4 or by 2 "
+                "for b8."));
         // Zn -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / STRIDE_UNIT;
         if (m1 < FRACTAL_FIXED) {
+            TENSOR_API_DEBUG_ASSERT((mStep <= 255), TENSOR_API_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check mStep in CopyL12L0A ZN2NZ B8/B4 path, mStep must be no greater than 255."));
             LoadCbufToCa::LoadData<true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         } else if constexpr (IsB4Type<DstType>) {
             LoadDataImplSplit<M_STEP_MIN_VAL_B4>(
