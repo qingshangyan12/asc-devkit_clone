@@ -51,10 +51,9 @@ __aicore__ inline void asc_write_time_stamp_tlv(
     update_write_info(write_info, tlv_len);
 }
 
-__aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
+__aicore__ inline void asc_time_stamp_impl(uint32_t desc_id, uint64_t time)
 {
 #ifdef ASCENDC_TIME_STAMP_ON
-    const uint64_t time = asc_debug_get_system_cycle();
     const uint64_t entry = static_cast<uint64_t>(__get_entry_sys_cnt());
     __gm__ DebugBlockHeadInfo* block_info = get_block_info();
     if (block_info == nullptr) {
@@ -69,10 +68,19 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
 #endif
 }
 
+__aicore__ inline void asc_time_stamp_with_cycle(uint32_t desc_id, uint64_t time)
+{
+    enable_asc_diagnostics();
+    asc_time_stamp_impl(desc_id, time);
+}
+
 __aicore__ inline void asc_time_stamp(uint32_t desc_id)
 {
     enable_asc_diagnostics();
-    asc_time_stamp_impl(desc_id);
+#ifdef ASCENDC_TIME_STAMP_ON
+    const uint64_t time = asc_debug_get_system_cycle();
+    asc_time_stamp_impl(desc_id, time);
+#endif
 }
 
 __aicore__ inline void asc_prof_start() { bisheng::cce::metrics_prof_start(); }

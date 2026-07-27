@@ -98,9 +98,16 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
 
 __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
 {
+#ifndef ASCENDC_CPU_DEBUG
+    const uint64_t time = __asc_aicore::asc_debug_get_system_cycle();
+#endif
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
+#ifndef ASCENDC_CPU_DEBUG
+        __asc_aicore::asc_time_stamp_with_cycle(descId, time);
+#else
         __asc_aicore::asc_time_stamp(descId);
+#endif
     }
 }
 
