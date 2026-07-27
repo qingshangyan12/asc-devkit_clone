@@ -91,6 +91,7 @@ def gen_compile_cmd_v200(
         "--cce-aicore-only",
         "-o",
         dst_file,
+        "-Werror",
         "-mllvm",
         "-cce-aicore-record-overflow=false",
         "-mllvm",
