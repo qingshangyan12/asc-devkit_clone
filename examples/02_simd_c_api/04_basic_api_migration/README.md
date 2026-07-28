@@ -17,10 +17,11 @@
 │   └── element_wise_arithmetic/  # LeakyReLU
 ├── 00_data_movement/
 │   └── copy_ub2ub/               # UB 内数据搬运
+│   └── data_copy_gm2l1/           # GM→L1、矩阵乘、Bias 与向量量化
 ├── MIGRATION_NOTES.md            # 映射、证据与待确认项
 └── README.md
 ```
 
 ## 目标架构
 
-样例的 CMake 工程固定使用 `dav-3510`。本次仅进行了静态文档、声明和实现核对，未执行配置、编译或运行。
+样例的 CMake 工程固定使用 `dav-3510`。其中 `data_copy_gm2l1` 已完整覆盖原基础 API 的五个场景：Nz、ND、DN、ND+float Bias 与 ND+Vector Quant。本次仅进行了静态文档、声明和实现核对，未执行配置、编译或运行。
