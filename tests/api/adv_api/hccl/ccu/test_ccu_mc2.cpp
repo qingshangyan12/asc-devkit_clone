@@ -149,6 +149,18 @@ TEST_F(CcuMc2TestSuite, AllocCcuOpResCtx_FourAddrsDistinct) {
     EXPECT_NE(resCtx.res[0], resCtx.ckeAddr);
 }
 
+TEST_F(CcuMc2TestSuite, AllocCcuOpResCtx_ReuseExistingMemory) {
+    OpResCtx firstResCtx{};
+    OpResCtx secondResCtx{};
+    ASSERT_EQ(AllocCcuOpResCtx(comm_, "reuse_tag", 4, 0, firstResCtx), HCCL_SUCCESS);
+    ASSERT_EQ(AllocCcuOpResCtx(comm_, "reuse_tag", 4, 0, secondResCtx), HCCL_SUCCESS);
+
+    EXPECT_EQ(secondResCtx.workSpace, firstResCtx.workSpace);
+    EXPECT_EQ(secondResCtx.res[0], firstResCtx.res[0]);
+    EXPECT_EQ(secondResCtx.xnAddr, firstResCtx.xnAddr);
+    EXPECT_EQ(secondResCtx.ckeAddr, firstResCtx.ckeAddr);
+}
+
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather) {
     SetCommEngineEnv(COMM_ENGINE_CCU);
     
