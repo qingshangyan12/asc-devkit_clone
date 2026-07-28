@@ -30,7 +30,9 @@
 
 提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer (UB)，并支持8位/16位/32位数据类型搬运。
 
-循环搬运时，需要通过接口[asc_set_gm2ub_loop_size](../asc_set_gm2ub_loop_size.md)、[asc_set_gm2ub_loop1_stride](../asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](../asc_set_gm2ub_loop2_stride.md)设置循环模式，和该接口配合使用。
+高维切分搬运原生采用Compact模式。在32字节补齐处理上，接口将`n_burst`指定的所有数据块组成一个大数据块；若该大数据块的总长度非32字节对齐，则仅在大数据块末尾补齐至32字节对齐。
+
+如需实现Normal模式，即将每个非32字节对齐的数据块分别补齐至32字节对齐，需要将本接口的`n_burst`设置为1，并通过[asc_set_gm2ub_loop_size](../asc_set_gm2ub_loop_size.md)、[asc_set_gm2ub_loop1_stride](../asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](../asc_set_gm2ub_loop2_stride.md)配置循环次数和地址步长，逐个数据块循环搬运。循环搬运结束后，需要再次调用[asc_set_gm2ub_loop_size](../asc_set_gm2ub_loop_size.md)将循环次数复位为1。
 
 ## 函数原型
 
