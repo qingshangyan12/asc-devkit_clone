@@ -10,11 +10,15 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-import os
 import subprocess
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+FUNC_CMAKE = REPO_ROOT / "cmake/asc/fwk_modules/func.cmake"
 
 
 def _write(path, content="{}"):
@@ -148,3 +152,101 @@ def test_compile_kernel_collection_is_optional(monkeypatch, tmp_path):
         "collection_root": enabled_args.jit_collection_root,
         "working_dir": enabled.working_dir,
     }]
+
+
+def _configure_project(tmp_path, body):
+    source = tmp_path / "source"
+    build = tmp_path / "build"
+    source.mkdir(parents=True)
+    (source / "CMakeLists.txt").write_text(
+        "cmake_minimum_required(VERSION 3.16)\n"
+        "project(jit_package_api NONE)\n"
+        'include("{}")\n'.format(FUNC_CMAKE.as_posix()) + body,
+        encoding="utf-8",
+    )
+    return subprocess.run(
+        ["cmake", "-S", str(source), "-B", str(build)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
+def _fake_generator(tmp_path, executable=True):
+    generator = tmp_path / "tools with spaces" / "manifest_generator"
+    _write(generator, "#!/bin/sh\nexit 0\n")
+    generator.chmod(0o755 if executable else 0o644)
+    return generator
+
+
+def _jit_call(generator, package_type="RUN", package="demo", vendor="customize"):
+    return (
+        'set_property(GLOBAL PROPERTY _ASC_PKG_{0}_TYPE {1})\n'
+        'set_property(GLOBAL PROPERTY _ASC_PKG_{0}_VENDOR_NAME {2})\n'
+        'npu_op_package_jit({0} GENERATOR "{3}")\n'
+    ).format(package, package_type, vendor, generator.as_posix())
+
+
+@pytest.mark.parametrize(
+    "name,body,error",
+    [
+        ("unknown", 'npu_op_package_jit(missing GENERATOR "/missing")\n', "not specified"),
+        ("non_run", None, "only supports RUN"),
+        ("missing_generator", (
+            "set_property(GLOBAL PROPERTY _ASC_PKG_demo_TYPE RUN)\n"
+            "set_property(GLOBAL PROPERTY _ASC_PKG_demo_VENDOR_NAME customize)\n"
+            "npu_op_package_jit(demo)\n"
+        ), "must provide GENERATOR"),
+    ],
+)
+def test_jit_package_rejects_invalid_package_contract(tmp_path, name, body, error):
+    if name == "non_run":
+        body = _jit_call(_fake_generator(tmp_path), package_type="SHARED")
+    result = _configure_project(tmp_path / name, body)
+    assert result.returncode != 0
+    assert error in result.stdout + result.stderr
+
+
+def test_jit_package_rejects_missing_or_non_executable_generator(tmp_path):
+    missing = tmp_path / "missing generator"
+    missing_result = _configure_project(
+        tmp_path / "missing", _jit_call(missing)
+    )
+    assert missing_result.returncode != 0
+    assert "does not exist" in missing_result.stdout + missing_result.stderr
+
+    non_executable = _fake_generator(tmp_path, executable=False)
+    non_executable_result = _configure_project(
+        tmp_path / "non executable", _jit_call(non_executable)
+    )
+    assert non_executable_result.returncode != 0
+    assert "not executable" in non_executable_result.stdout + non_executable_result.stderr
+
+
+def test_jit_package_stores_normalized_properties(tmp_path):
+    generator = _fake_generator(tmp_path)
+    expected_root = (tmp_path / "valid" / "build" / "jit_resources" / "demo").as_posix()
+    body = _jit_call(generator) + (
+        "get_property(enabled GLOBAL PROPERTY _ASC_PKG_demo_ENABLE_JIT_PACKAGE)\n"
+        "get_property(actual_generator GLOBAL PROPERTY _ASC_PKG_demo_JIT_GENERATOR)\n"
+        "get_property(collection GLOBAL PROPERTY _ASC_PKG_demo_JIT_COLLECTION_ROOT)\n"
+        "get_property(work GLOBAL PROPERTY _ASC_PKG_demo_JIT_WORK_DIR)\n"
+        "get_property(output GLOBAL PROPERTY _ASC_PKG_demo_JIT_OUTPUT_SO)\n"
+        "if(NOT enabled)\n"
+        '  message(FATAL_ERROR "JIT package property was not enabled")\n'
+        "endif()\n"
+        'if(NOT actual_generator STREQUAL "{}")\n'
+        '  message(FATAL_ERROR "unexpected generator: ${{actual_generator}}")\n'
+        "endif()\n"
+        'if(NOT collection STREQUAL "{}/collected")\n'
+        '  message(FATAL_ERROR "unexpected collection: ${{collection}}")\n'
+        "endif()\n"
+        'if(NOT work STREQUAL "{}/work")\n'
+        '  message(FATAL_ERROR "unexpected work: ${{work}}")\n'
+        "endif()\n"
+        'if(NOT output STREQUAL "{}/libcustomize_compile_resource.so")\n'
+        '  message(FATAL_ERROR "unexpected output: ${{output}}")\n'
+        "endif()\n"
+    ).format(generator.resolve().as_posix(), expected_root, expected_root, expected_root)
+    result = _configure_project(tmp_path / "valid", body)
+    assert result.returncode == 0, result.stdout + result.stderr
