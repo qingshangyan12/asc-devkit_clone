@@ -71,8 +71,6 @@
         GlobalMockObject::verify();                                                                       \
     }
 
-TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, int8_t, vector_int16_t, uint16_t);
-TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, uint8_t, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, int16_t, vector_int16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, uint16_t, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, int32_t, vector_int32_t, uint32_t);
@@ -110,6 +108,12 @@ namespace {
 void vgather2_hifloat8_stub(
     vector_fp8_e5m2_t& dst, __ubuf__ float8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
 {}
+void vgather2_int8_stub(
+    vector_fp8_e5m2_t& dst, __ubuf__ float8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
+{}
+void vgather2_uint8_stub(
+    vector_fp8_e5m2_t& dst, __ubuf__ float8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
+{}
 void vselr_hifloat8_stub(vector_uint8_t& dst, vector_uint8_t src, vector_uint8_t index) {}
 } // namespace
 
@@ -137,5 +141,35 @@ TEST_F(TestCApiVectorDataMoveAscGatherHifloat8, vselr_Succ)
     MOCKER_CPP(vselr, void(vector_uint8_t&, vector_uint8_t, vector_uint8_t)).times(1).will(invoke(vselr_hifloat8_stub));
 
     asc_gather(dst, src, index);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestCApiVectorDataMoveAscGatherInt8, vgather2_Succ)
+{
+    __ubuf__ int8_t* src = reinterpret_cast<__ubuf__ int8_t*>(0);
+    vector_int8_t dst;
+    vector_uint16_t index;
+    vector_bool mask;
+
+    MOCKER_CPP(vgather2, void(vector_fp8_e5m2_t&, __ubuf__ float8_e5m2_t*, vector_uint16_t, vector_bool))
+        .times(1)
+        .will(invoke(vgather2_int8_stub));
+
+    asc_gather(dst, src, index, mask);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestCApiVectorDataMoveAscGatherUint8, vgather2_Succ)
+{
+    __ubuf__ uint8_t* src = reinterpret_cast<__ubuf__ uint8_t*>(0);
+    vector_uint8_t dst;
+    vector_uint16_t index;
+    vector_bool mask;
+
+    MOCKER_CPP(vgather2, void(vector_fp8_e5m2_t&, __ubuf__ float8_e5m2_t*, vector_uint16_t, vector_bool))
+        .times(1)
+        .will(invoke(vgather2_uint8_stub));
+
+    asc_gather(dst, src, index, mask);
     GlobalMockObject::verify();
 }
