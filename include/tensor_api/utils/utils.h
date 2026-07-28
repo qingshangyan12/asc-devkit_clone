@@ -178,21 +178,66 @@ struct FixpipeParams {
     bool subBlockId = false;
 };
 
+/**
+ * @brief Runtime parameters for an Img2Col copy from L1 Buffer to L0A Buffer.
+ */
 template <typename T>
 struct Img2ColParams {
+    /**
+     * @brief M-dimension extent of the destination NZ matrix.
+     */
     uint16_t mExtension = 0;
+    /**
+     * @brief K-dimension extent of the destination NZ matrix.
+     */
     uint16_t kExtension = 0;
+    /**
+     * @brief Left, right, top, and bottom padding sizes, in that order.
+     */
     uint8_t padList[4] = {0, 0, 0, 0};
+    /**
+     * @brief Horizontal convolution stride.
+     */
     uint8_t strideW = 1;
+    /**
+     * @brief Vertical convolution stride.
+     */
     uint8_t strideH = 1;
+    /**
+     * @brief Convolution filter width.
+     */
     uint8_t filterW = 1;
+    /**
+     * @brief Convolution filter height.
+     */
     uint8_t filterH = 1;
+    /**
+     * @brief Horizontal filter dilation.
+     */
     uint8_t dilationFilterW = 1;
+    /**
+     * @brief Vertical filter dilation.
+     */
     uint8_t dilationFilterH = 1;
+    /**
+     * @brief Filter-width control flag passed to the Img2Col instruction.
+     */
     bool filterSizeW = false;
+    /**
+     * @brief Filter-height control flag passed to the Img2Col instruction.
+     */
     bool filterSizeH = false;
+    /**
+     * @brief Whether to transpose the generated matrix.
+     */
     bool transpose = false;
+    /**
+     * @brief FMatrix control flag passed to the Img2Col instruction.
+     */
     bool fMatrixCtrl = false;
+    /**
+     * @brief Value used to fill padded positions.
+     */
     T padValue = 0;
 };
 
