@@ -32,11 +32,12 @@
 
 本接口不支持设置填充值。若搬运的数据长度非32字节对齐，搬出时会在读取UB数据时自动补充dummy假数据至32字节对齐，写入GM时会丢弃补充的dummy假数据。
 
-高维切分搬运原生采用Compact模式。在32字节补齐处理上，接口将`n_burst`指定的所有数据块视为一个整体。当`src_stride`等于`len_burst`时，多个数据块可以在UB中紧密排列，无需将每个数据块的起始地址分别按32字节对齐。若所有数据块的总长度非32字节对齐，则在读取UB数据时仅在整体末尾补充dummy假数据至32字节对齐，写入GM时会丢弃补充的dummy假数据。Compact模式可以减少UB中数据块之间的对齐空洞和搬运通路中的补齐数据量。
+高维切分搬运没有独立的模式参数，通过UB侧相邻数据块的块首间距`src_stride`选择Normal模式或Compact模式：
 
-例如，搬运3个长度为48字节的数据块时，Compact模式下将`src_stride`设置为48，各数据块在UB中的起始偏移依次为0、48、96，仅在144字节有效数据的末尾补充16字节dummy假数据。Normal模式下各数据块独立按32字节边界组织，各数据块在UB中的起始偏移依次为0、64、128，每个数据块分别补充16字节dummy假数据。两种模式下，dummy假数据均不会写入GM。
+- Compact模式：将`src_stride`设置为`len_burst`。多个数据块在UB中紧密排列，在32字节补齐处理上被视为一个整体；若所有数据块的总长度非32字节对齐，则在读取UB数据时仅在整体末尾补充dummy假数据至32字节对齐，写入GM时会丢弃补充的dummy假数据。该模式可以减少UB中数据块之间的对齐空洞和搬运通路中的补齐数据量。
+- Normal模式：将`src_stride`设置为不等于`len_burst`的32字节对齐值。每个数据块在读取UB数据时分别补充dummy假数据至32字节对齐，写入GM时会分别丢弃补充的dummy假数据。无额外块间隔时，可以将`src_stride`设置为不小于`len_burst`的最小32字节对齐值。
 
-如需实现Normal模式，即将每个非32字节对齐的数据块分别补齐至32字节对齐，需要将本接口的`n_burst`设置为1，并通过[asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md)、[asc_set_ub2gm_loop1_stride](../asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](../asc_set_ub2gm_loop2_stride.md)配置循环次数和地址步长，逐个数据块循环搬运。循环搬运结束后，需要再次调用[asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md)将循环次数复位为1。
+例如，搬运3个长度为48字节的数据块时，Compact模式下将`src_stride`设置为48，各数据块在UB中的起始偏移依次为0、48、96，仅在144字节有效数据的末尾补充16字节dummy假数据；Normal模式下将`src_stride`设置为64，各数据块在UB中的起始偏移依次为0、64、128，每个数据块分别补充16字节dummy假数据。两种模式下，dummy假数据均不会写入GM。当只搬运1个数据块，或`len_burst`已经32字节对齐时，两种模式的搬运结果相同。
 
 ## 函数原型
 
@@ -122,7 +123,7 @@
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[1, 2097151]。 |
 | l2_cache_mode | 输入 | [asc_store_l2_cache_mode](../../enum/asc_store_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
 | dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br> 只搬运1个数据块，即n_burst=1时，可以将此参数设置为0。 |
-| src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br>当src_stride等于len_burst时，源数据块在UB中紧密排列；当src_stride不等于len_burst时，src_stride需要满足32字节对齐要求。 |
+| src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节，用于选择数据搬运模式。<br>&bull; 等于len_burst：Compact模式，源数据块在UB中紧密排列。<br>&bull; 不等于len_burst：Normal模式，src_stride需要满足32字节对齐要求。 |
 
 ## 返回值说明
 
