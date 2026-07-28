@@ -55,7 +55,6 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
     -   纯Cube模式（只有矩阵计算）模式暂不支持该接口
     -   Atlas 200I/500 A2 推理产品暂不支持同时输出至GM和VECIN
 
-<a id="async-scene"></a>
 -   获取异步场景用于缓存结果的Workspace上的C矩阵，后续使用过程由开发者自行控制
 
     C矩阵输出到VECIN时，分配给VECIN的Unified Buffer的大小会影响Matmul计算的力度，分配给VECIN的大小过小时，无法充分利用硬件算力。提供该接口支持返回缓存在Workspace上的C矩阵，由开发者自行控制后续使用过程。
@@ -91,13 +90,13 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 | c/co2Local | 输出 | 取出C矩阵到VECIN。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。不同型号支持的数据格式请参考[支持的数据格式](#li12616155731721)。 |
 | gm | 输出 | 取出C矩阵到GM，数据格式可以为ND或NZ。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。 |
 | enAtomic | 输入 | 是否开启Atomic操作，默认值为0。<br><br>参数取值：<br><br>0：不开启Atomic操作<br><br>1：开启AtomicAdd累加操作<br><br>2：开启AtomicMax求最大值操作<br><br>3：开启AtomicMin求最小值操作<br><br>对于Atlas 推理系列产品AI Core，只有输出位置是GM才支持开启Atomic操作。<br><br>对于Atlas 200I/500 A2 推理产品，只有输出位置是GM才支持开启Atomic操作。 |
-<a id="non-sequential-write"></a>
-<a id="sequential-write"></a>
 | enSequentialWrite | 输入 | 是否开启连续写模式（连续写，写入[baseM, baseN]；非连续写，写入[singleCoreM, singleCoreN]中对应的位置），默认值false（非连续写模式）。<br><br>注意：非连续写模式，内部会按照迭代顺序算好偏移，开发者不需要关注；如果开发者需要决定排布顺序，可以选择连续写模式，自行按照设定的偏移进行搬运操作。<br><br>对于Atlas 200I/500 A2 推理产品，只支持非连续写模式。 |
 
+ <a id="non-sequential-write"></a>
 **图1**  非连续写模式示意图  
 ![](../../../../figures/非连续写模式示意图.png "非连续写模式示意图")
 
+<a id="sequential-write"></a>
 **图2**  连续写模式示意图  
 ![](../../../../figures/连续写模式示意图.png "连续写模式示意图")
 
@@ -109,7 +108,7 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 
 -   传入的C矩阵地址空间大小需要保证不小于baseM \* baseN。
 -   异步场景时，需要使用一块临时空间来缓存Iterate计算结果，调用GetTensorC时会在该临时空间中获取C的矩阵分片。临时空间通过[SetWorkspace](SetWorkspace.md)接口进行设置。SetWorkspace接口需要在Iterate接口之前调用。
--   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#enablemixdualmaster)设置为true，不支持使用该接口。
+-   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#table-2)设置为true，不支持使用该接口。
 -   支持的数据类型<a id="li12616155731720"></a>
 
     Ascend 950PR/Ascend 950DT，支持的数据类型为：half、float、bfloat16_t、int32_t、int8_t、fp8_e4m3fn_t、hifloat8_t。
