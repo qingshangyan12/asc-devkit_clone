@@ -18,7 +18,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int __rhadd(int x, int y)
 ```
 
@@ -43,7 +43,7 @@ int __rhadd(int x, int y)
 
 使用该接口需要包含"simt\_api/device\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_functions.h"
 ```
 
@@ -51,8 +51,8 @@ int __rhadd(int x, int y)
 
 -   SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(1024) void KerneRhadd(int* dst, int* x, int* y)
+    ```cpp
+    __global__ __launch_bounds__(1024) void KernelRhadd(int* dst, int* x, int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __rhadd(x[idx], y[idx]);
@@ -61,8 +61,8 @@ int __rhadd(int x, int y)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(1024) inline void KerneRhadd(__gm__ int* dst, __gm__ int* x, __gm__ int* y)
+    ```cpp
+    __simt_vf__ __launch_bounds__(1024) inline void KernelRhadd(__gm__ int* dst, __gm__ int* x, __gm__ int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __rhadd(x[idx], y[idx]);

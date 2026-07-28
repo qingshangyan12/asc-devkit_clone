@@ -18,7 +18,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline void asc_dcci_single(void *dst)
 ```
 
@@ -42,7 +42,7 @@ inline void asc_dcci_single(void *dst)
 
 使用该接口需要包含"simt\_api/device\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_functions.h"
 ```
 
@@ -50,7 +50,7 @@ inline void asc_dcci_single(void *dst)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void kernelDcci_single(uint32_t* data, uint32_t* output) {
         // 线程块0的线程0进行数据写操作
         if (blockIdx.x == 0 && threadIdx.x == 0) {
@@ -71,7 +71,7 @@ inline void asc_dcci_single(void *dst)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernelDcci_single(__gm__ uint32_t* data, __gm__ uint32_t* output)
     {
         // 线程块0的线程0进行数据写操作

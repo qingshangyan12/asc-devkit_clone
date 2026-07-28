@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline half2 __float22half2_rz(const float2 x)
 ```
 
@@ -44,7 +44,7 @@ inline half2 __float22half2_rz(const float2 x)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
     __aicore__ void simt_float22half2_rz(float2* input, half2* output, uint32_t input_total_length)
     {
@@ -64,7 +64,7 @@ inline half2 __float22half2_rz(const float2 x)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_float22half2_rz(__gm__ float2* input, __gm__ half2* output, uint32_t input_total_length)
     {

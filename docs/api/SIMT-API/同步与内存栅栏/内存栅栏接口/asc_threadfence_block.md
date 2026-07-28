@@ -18,7 +18,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline void asc_threadfence_block()
 ```
 
@@ -38,7 +38,7 @@ inline void asc_threadfence_block()
 
 使用该接口需要包含"simt\_api/device\_sync\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_sync_functions.h"
 ```
 
@@ -46,7 +46,7 @@ inline void asc_threadfence_block()
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelThreadFenceBlock(float* dst, float* src)
     {
         src[0] = src[0] + 1;
@@ -57,7 +57,7 @@ inline void asc_threadfence_block()
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelThreadFenceBlock(__gm__ float* dst, __gm__ float* src)
     {
         src[0] = src[0] + 1;
