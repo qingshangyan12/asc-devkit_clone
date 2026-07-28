@@ -13,25 +13,25 @@ Besides the 4 default positive cases, `ub_usage_limit.asc` also contains 4 built
 
 The exact test procedure, commands, and outputs for these 4 probes are recorded in the **Empirical Findings and Troubleshooting** section below (see `README.md` for the full Chinese write-up), and can be reproduced directly with the commands shown there.
 
-## Supported Products
+## Supported Products and CANN Software Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Version
-
-- > CANN 9.0.0
+| Product | CANN Software Version |
+| ------- | --------------------- |
+| Ascend 950PR/Ascend 950DT | > CANN 9.0.0 |
 
 ## Directory Structure
 
 ```text
 ├── simd_simt_ub_usage_limit
-│   ├── CMakeLists.txt
-│   ├── ub_usage_limit.asc
-│   ├── README.md
-│   └── README_en.md
+│   ├── CMakeLists.txt         // Build configuration file
+│   ├── ub_usage_limit.asc     // Ascend C sample implementation and invocation
+│   ├── README.md              // Chinese documentation
+│   └── README_en.md           // English documentation
 ```
 
-## UB Capacity Model
+## Sample Description
+
+### UB Capacity Model
 
 In hybrid programming, SIMD/MainScalar, SIMD VF, and SIMT VF share the same UB resource on a Vector Core. This sample uses the following capacity model:
 
@@ -45,7 +45,9 @@ In hybrid programming, SIMD/MainScalar, SIMD VF, and SIMT VF share the same UB r
 
 When a kernel contains SIMT VF, static UB, dynamic UB, UB used by SIMD VF, UB used by SIMT VF, and UB used by MainScalar must be counted together against the user-available UB limit.
 
-## Cases
+## Sample Implementation
+
+### Cases
 
 | Case | Purpose |
 | --- | --- |
@@ -61,7 +63,7 @@ Case 1, Case 3, and Case 5 each have a measured nuance beyond the table above �
 - Case 3: the dynamic UB limit does equal `216KB - static1 - static2`, but "static1 + static2" must also include MainScalar's own static UB, not just the two VFs.
 - Case 5: out-of-bounds writes within roughly 8KB past the configured allocation are tolerated silently; beyond that, they trigger a catchable aicore runtime error — but this boundary is implementation-dependent and must not be assumed safe in general.
 
-## Empirical Findings and Troubleshooting
+### Empirical Findings and Troubleshooting
 
 Four hardware probes were used to answer the questions above on real Ascend 950PR (`dav-3510`) hardware. The full step-by-step commands, raw outputs, and analysis (in Chinese) are in `README.md`'s "实测结论与定位方法" section. Summary:
 
@@ -74,17 +76,36 @@ Note: the documented bisheng flag `--cce-disable-vf-stack-reserved-ubuf` (meant 
 
 ## Build and Run
 
-Run the following commands in this sample directory:
+Perform the following steps in the root directory of this sample.
 
-```bash
-source ${install_path}/cann/set_env.sh
-cmake -S . -B build
-cmake --build build
-./build/ub_usage_limit
-```
+- Configure environment variables
 
-The default output prints `used_bytes`, `limit_bytes`, and verification status for the four positive cases. The sample passes when all cases are `PASSED` and the final output is:
+  Configure the environment variables according to the CANN development kit [installation guide](../../../../docs/en/quick_start.md#prepare&install).
 
-```text
-[Success] All UB usage limit cases are verification passed.
-```
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
+
+  > **Note:** `${install_path}` is the CANN installation directory. If no directory is specified during installation, the default directory is `/usr/local/Ascend`.
+
+- Run the sample
+
+  Run the following commands in this sample directory:
+
+  ```bash
+  cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-3510
+  cmake --build build -j
+  ./build/ub_usage_limit
+  ```
+
+  The default output prints `used_bytes`, `limit_bytes`, and verification status for the four positive cases. The sample passes when all cases are `PASSED` and the final output is:
+
+  ```text
+  [Success] All UB usage limit cases are verification passed.
+  ```
+
+- Build options
+
+  | Option | Available Value | Description |
+  | ------ | --------------- | ----------- |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: Ascend 950PR/Ascend 950DT |
