@@ -20,9 +20,36 @@ import numpy as np
 relative_tol = 1e-6
 absolute_tol = 1e-9
 error_tol = 1e-4
+SAMPLE_COUNT = 8
+
+
+def print_file_sample(label, path, dtype):
+    """Print a fixed-size raw-data sample without affecting verification."""
+    if not os.path.isfile(path):
+        print("%s: unavailable (%s)" % (label, path))
+        return
+    data = np.fromfile(path, dtype=dtype, count=SAMPLE_COUNT)
+    print("%s (%s, first %d): %s" % (label, np.dtype(dtype).name, data.size, data))
+
+
+def print_samples(output_path, golden_path):
+    """Print input, output, and golden samples for both passing and failing runs."""
+    input_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(golden_path))), "input")
+    golden_size = os.path.getsize(golden_path)
+    output_dtype = np.int8 if golden_size == 128 * 256 * np.dtype(np.int8).itemsize else np.float32
+
+    print("===== data samples =====")
+    print_file_sample("input/x1_gm.bin", os.path.join(input_dir, "x1_gm.bin"), np.float16)
+    print_file_sample("input/x2_gm.bin", os.path.join(input_dir, "x2_gm.bin"), np.float16)
+    print_file_sample("input/bias_gm.bin", os.path.join(input_dir, "bias_gm.bin"), np.float32)
+    print_file_sample("input/quant_pre.bin", os.path.join(input_dir, "quant_pre.bin"), np.uint64)
+    print_file_sample("output", output_path, output_dtype)
+    print_file_sample("golden", golden_path, output_dtype)
+    print("========================")
 
 
 def verify_result(output_path, golden_path):
+    print_samples(output_path, golden_path)
     output_size = os.path.getsize(output_path)
     golden_size = os.path.getsize(golden_path)
     if output_size != golden_size:
