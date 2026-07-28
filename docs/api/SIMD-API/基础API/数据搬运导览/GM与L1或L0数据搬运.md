@@ -17,9 +17,7 @@ Global Memory与L1 Buffer/L0 Buffer之间的数据搬运提供了灵活、分层
 | Global Memory->L1 Buffer | LoadData（GM -> L1-[NZ](../cube_compute_ISASI/矩阵计算分形介绍/关键分形格式详解.md#zh-cn_topic_0000002545089965_section363412741113)数据搬运-2DV2） | 负责完成[NZ](../cube_compute_ISASI/矩阵计算分形介绍/关键分形格式详解.md#zh-cn_topic_0000002545089965_section363412741113)矩阵的数据搬运。 |
 | Global Memory->L0A Buffer | LoadData（GM -> L0A-2D格式分形矩阵搬运） | 负责完成普通矩阵计算所需的2D格式数据的搬运。 |
 | Global Memory->L0B Buffer | LoadData（GM -> L0B-2D格式分形矩阵搬运） | 负责完成普通矩阵计算所需的2D格式数据的搬运。 |
-<a id="datacopy-l0c-gm-quantization-activation"></a>
 | L0C Buffer->Global Memory | DataCopy（L0C -> GM-随路量化激活搬运） | 支持多种随路能力的组合，需要设置不同的寄存器，配合DataCopy接口使能不同的数据搬运能力。 |
-<a id="fixpipe-l0c-gm-quantization-activation"></a>
 | L0C Buffer->Global Memory | Fixpipe（L0C -> GM-随路量化激活搬运） | 支持多种随路能力的组合，FixPipe接口内包含了设置寄存器与数据搬运能力。 |
 
 ## DataCopy（GM与L1-连续数据搬运）<a name="ZH-CN_TOPIC_0000002574022813"></a>
@@ -231,7 +229,7 @@ template <typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
 ```
 
-## DataCopy（L0C到GM-随路量化激活搬运）<a name="ZH-CN_TOPIC_0000002573902843"></a>
+## DataCopy（L0C到GM-随路量化激活搬运）<a id="datacopy-l0c-gm-quantization-activation"></a>
 
 该接口主要实现将数据从L0C Buffer搬运至Global Memory，并支持多种随路能力的组合，需要设置不同的寄存器。
 
@@ -249,7 +247,7 @@ template <typename T, typename U>
 __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
 ```
 
-## Fixpipe（L0C到GM-随路量化激活搬运）<a name="ZH-CN_TOPIC_0000002543422576"></a>
+## Fixpipe（L0C到GM-随路量化激活搬运）<a id="fixpipe-l0c-gm-quantization-activation"></a>
 
 该接口主要实现将数据从L0C Buffer搬运至Global Memory，并支持多种随路能力的组合，接口内包含了设置寄存器与数据搬运能力。
 
