@@ -418,6 +418,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
     }
 
+
+
     AscendC::PRINTF(
         "ApiClient CcuSendMsg ccuMsg_.xnAddr, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: "
         "0x%llx, Id6: 0x%llx, Id7: 0x%llx, Id8: 0x%llx, Id9: 0x%llx, Id10: 0x%llx, Id11: 0x%llx, Id12: 0x%llx, Id13: "
@@ -522,7 +524,12 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     uint8_t reqId = handleReqId_[handleId] + handleFinishCnt_[handleId];
     reqId %= CCU_MAX_MSG_NUM;
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
-
+    if (workingFlag_) {
+        uint64_t waitCketest = ReadHBMData(waitCKEAddr);
+        AscendC::PRINTF("ApiClient workflag Wait Start:,waitCKEAddr is %p, value is %d", waitCKEAddr, waitCketest);
+    } else {
+        AscendC::PRINTF("ApiClient normal core Wait Start:  BlockIdx is %d",  GetBlockIdx());
+    }
 #ifndef ASCENDC_CPU_DEBUG
     while (true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
@@ -543,6 +550,12 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     }
 #endif
 
+    if (workingFlag_) {
+        AscendC::PRINTF("ApiClient workflag Wait end Break!!!!!");
+    } else {
+        AscendC::PRINTF("ApiClient  normal core Wait end:  BlockIdx is %d",  GetBlockIdx());
+    }
+
     msgQueueIsAvailable_[reqId] = true;
     handleFinishCnt_[handleId]++;
     finishNum_++;
@@ -560,8 +573,9 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         }
     }
 
-    KERNEL_LOG(
-        KERNEL_INFO, "ApiClient Wait finish finishCntGM_:%d, finishCnt_:%d", *finishCntGM_, handleFinishCnt_[handleId]);
+    // if (workingFlag_) {
+    //     AscendC::PRINTF("ApiClient Wait finish finishCntGM_:%d, finishCnt_:%d", *finishCntGM_, handleFinishCnt_[handleId]);
+    // }
     return HCCL_SUCCESS;
 }
 
