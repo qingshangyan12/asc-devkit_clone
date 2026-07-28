@@ -59,7 +59,7 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void *sendCounts, void *
 -   每张卡发送给卡rank\_j的数据量sendCounts\[j\]，与rank\_j接收对应卡rank\_i的数据量recvCounts\[i\]，必须相等。
 -   对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，一个通信域内，最大支持128卡通信。
 -   对于Ascend 950PR/Ascend 950DT，一个通信域内，所有Prepare接口的总调用次数不能超过63。
--   对于Ascend 950PR/Ascend 950DT，通信服务端为CCU时，单次最大通信数据量不能超过256M。
+-   对于Ascend 950PR/Ascend 950DT，通信服务端为CCU时，单次最大通信数据量不能超过256M，默认仅支持FullMesh算法。
 
 ## 调用示例
 
