@@ -82,7 +82,8 @@ INSTANTIATE_TEST_CASE_P(
         AscendDequantTestParams{24, 4, AscendDequantKernel<float, float, false, 0>},
         AscendDequantTestParams{24, 4, AscendDequantKernel<float, float, false, 1>}
 #if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-        ,AscendDequantTestParams{16, 4, AscendDequantKernel<bfloat16_t, bfloat16_t, true, 0>},
+        ,
+        AscendDequantTestParams{16, 4, AscendDequantKernel<bfloat16_t, bfloat16_t, true, 0>},
         AscendDequantTestParams{128, 4, AscendDequantKernel<float, bfloat16_t, true, 0>},
         AscendDequantTestParams{128, 4, AscendDequantKernel<float, bfloat16_t, true, 1>},
         AscendDequantTestParams{16, 4, AscendDequantKernel<bfloat16_t, bfloat16_t, false, 0>},
@@ -90,8 +91,8 @@ INSTANTIATE_TEST_CASE_P(
         AscendDequantTestParams{128, 4, AscendDequantKernel<float, bfloat16_t, false, 1>},
         AscendDequantTestParams{5120, 4, AscendDequantKernel<bfloat16_t, bfloat16_t, true, 0>}
 #endif
-));
-
+        ));
+ 
 TEST_P(AscendDequantTestsuite, AscendDequantTestCase)
 {
     auto param = GetParam();

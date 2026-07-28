@@ -702,10 +702,10 @@ INSTANTIATE_TEST_CASE_P(
             {2, 256, 256},
             sizeof(float),
             true,
-            testRadixTopK<
-                float, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false>}
+            testRadixTopK<float, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false>}
 #if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-        ,TopKTestParams{
+        ,
+        TopKTestParams{
             512,
             GetKPad<float>(512),
             {1, 512, 512},
@@ -771,7 +771,7 @@ INSTANTIATE_TEST_CASE_P(
             testRadixTopK<
                 bfloat16_t, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false>}
 #endif
-));
+        ));
 
 TEST_P(AdvanceTopKTestSuite, testRadixTopK)
 {
@@ -791,3 +791,4 @@ TEST_P(AdvanceTopKTestSuite, testRadixTopK)
         EXPECT_EQ(outputGmValue[i], 0x00);
     }
 }
+ 

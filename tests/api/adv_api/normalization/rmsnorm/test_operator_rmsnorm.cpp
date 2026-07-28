@@ -188,10 +188,11 @@ INSTANTIATE_TEST_CASE_P(
         RmsnormTestParams{2, 32, 64, sizeof(half), main_rmsnorm_test<half, true>},
         RmsnormTestParams{4, 8, 512, sizeof(half), main_rmsnorm_test<half, false>}
 #if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-        ,RmsnormTestParams{1, 7, 2048, sizeof(float), main_rmsnorm_test<float, true>},
+        ,
+        RmsnormTestParams{1, 7, 2048, sizeof(float), main_rmsnorm_test<float, true>},
         RmsnormTestParams{2, 256, 32, sizeof(float), main_rmsnorm_test<float, false>}
 #endif
-));
+        ));
 
 TEST_P(RmsnormTestSuite, RmsnormTestCase)
 {
