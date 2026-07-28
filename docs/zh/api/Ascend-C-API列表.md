@@ -27,21 +27,23 @@ Ascend C提供了一套层次化的API体系，涵盖了从底层C扩展到高�
 
 | 头文件 | 说明 | 对应的库文件 |
 | --- | --- | --- |
-| simt/asc_simt.h | 提供 SIMT API对外接口，若计算只需要特定的数据类型如fp8，可只包含simt_api/asc_fp8.h | 不涉及 |
+| simt/asc_simt.h | 提供SIMT API对外接口，若计算只需要特定的数据类型如fp8，可只包含simt_api/asc_fp8.h。 | 不涉及 |
+
+**关于SIMT编程头文件包含的更多细节请参考[SIMT-API](SIMT-API/概述.md)。**
 
 **表 3**  SIMD基础编程能力头文件列表
 
 | API能力层级| 开发场景 | 头文件 | 说明 | 对应的库文件 |
 | --- | --- | --- | --- | --- |
-| 基于C语言指针编程 | 开发任意算子（含融合算子） | c_api/asc_simd.h | 提供全量 SIMD C API 对外接口。 | 不涉及 |
-| 基于C++ Tensor编程 | 开发任意算子（含融合算子） | tensor_api/tensor.h | 提供全量 SIMD C++ Tensor API 对外接口。 | 不涉及 |
-| 基于TPipe/TQue框架编程 | 开发任意算子（含融合算子） | basic_api/kernel_basic_intf.h | 提供全量 SIMD 基于TPipe/TQue框架编程对外接口。 | 不涉及 |
-| 基于TPipe/TQue框架编程 | 只开发矢量算子 | basic_api/kernel_vec_intf.h | 提供矢量计算依赖的 SIMD 基于TPipe/TQue框架编程对外接口。 | 不涉及 |
-| 基于TPipe/TQue框架编程 | 只开发矩阵算子 | basic_api/kernel_cube_intf.h | 提供矩阵计算依赖的 SIMD 基于TPipe/TQue框架编程对外接口。 | 不涉及 |
+| 基于C语言指针编程 | 开发任意算子（含融合算子） | c_api/asc_simd.h | 提供全量SIMD C API对外接口。 | 不涉及 |
+| 基于C++ Tensor编程 | 开发任意算子（含融合算子） | tensor_api/tensor.h | 提供全量SIMD C++ Tensor API对外接口。 | 不涉及 |
+| 基于TPipe/TQue框架编程 | 开发任意算子（含融合算子） | basic_api/kernel_basic_intf.h | 提供全量SIMD基于TPipe/TQue框架编程对外接口。 | 不涉及 |
+| 基于TPipe/TQue框架编程 | 只开发矢量算子 | basic_api/kernel_vec_intf.h | 提供矢量计算依赖的SIMD基于TPipe/TQue框架编程对外接口。 | 不涉及 |
+| 基于TPipe/TQue框架编程 | 只开发矩阵算子 | basic_api/kernel_cube_intf.h | 提供矩阵计算依赖的SIMD基于TPipe/TQue框架编程对外接口。 | 不涉及 |
 
 **表 4**  SIMD高阶API头文件列表
 
 | 头文件 | 说明 | 对应的库文件 |
 | --- | --- | --- |
-| adv_api/kernel_api.h | 提供 SIMD 高阶 API Device 侧对外接口。仅支持基于TPipe/TQue框架编程方式下调用。 | 不涉及 |
-| adv_api/tiling_api.h | 提供 SIMD 高阶 API Host 侧对外接口。仅支持基于TPipe/TQue框架编程方式下调用。 | libtiling_api.a |
+| adv_api/kernel_api.h | 提供SIMD高阶API Device侧对外接口。仅支持基于TPipe/TQue框架编程方式下调用。 | 不涉及 |
+| adv_api/tiling_api.h | 提供SIMD高阶API Host侧对外接口。仅支持基于TPipe/TQue框架编程方式下调用。 | libtiling_api.a |
