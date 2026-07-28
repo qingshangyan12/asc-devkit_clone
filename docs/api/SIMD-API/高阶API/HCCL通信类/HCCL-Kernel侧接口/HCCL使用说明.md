@@ -66,7 +66,8 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     // }
     ```
 
-    示例的Prepare接口为[ReduceScatter](ReduceScatter.md)，其他接口可参考后续章节的内容。其中的参数AscendC::HCCL\_DATA\_TYPE\_FP16是HCCL任务的数据类型，其数据结构为HcclDataType，对应的参数说明参考[表1](#table116710585514)；参数HCCL\_REDUCE\_SUM是一种Reduce操作，AllReduce和ReduceScatter归约操作支持的Reduce操作类型参见[表2](#table2469980529)。
+    <a id="table-2"></a>
+    示例的Prepare接口为[ReduceScatter](ReduceScatter.md)，其他接口可参考后续章节的内容。其中的参数AscendC::HCCL\_DATA\_TYPE\_FP16是HCCL任务的数据类型，其数据结构为HcclDataType，对应的参数说明参考[表1](#table116710585514)；参数HCCL\_REDUCE\_SUM是一种Reduce操作，AllReduce和ReduceScatter归约操作支持的Reduce操作类型参见[表2](#table-2)。
 
     **表1**  HcclDataType参数说明
 
@@ -98,6 +99,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     };
     ```
 
+    <a id="hcclreduceop"></a>
     **表2**  HcclReduceOp参数说明
 
     <a name="table2469980529"></a>

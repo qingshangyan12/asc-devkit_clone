@@ -14,7 +14,7 @@
 
 用于配置BasicBlock模板的参数，获取自定义BasicBlock模板。BasicBlock模板的介绍请参考[表 模板特性](MatmulConfig.md#table6981133810309)。
 
-使用该接口时可以优先考虑使用模板常量化。相比BasicBlock模板仅实现baseM、baseN、baseK常量化，模板常量化可以在此基础上实现singleCoreM、singleCoreN、singleCoreK、baseM、baseN、baseK的常量化，模板常量化的具体使用方式请参考[Matmul Tiling常量化](GetMatmulApiTiling.md#section618mcpsimp)。
+使用该接口时可以优先考虑使用模板常量化。相比BasicBlock模板仅实现baseM、baseN、baseK常量化，模板常量化可以在此基础上实现singleCoreM、singleCoreN、singleCoreK、baseM、baseN、baseK的常量化，模板常量化的具体使用方式请参考[Matmul Tiling常量化](GetMatmulApiTiling.md#matmul-tiling-constant)。
 
 ## 函数原型
 
