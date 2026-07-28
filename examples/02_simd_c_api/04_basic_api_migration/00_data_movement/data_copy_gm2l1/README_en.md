@@ -23,6 +23,7 @@ This example applies to Ascend 950PR/Ascend 950DT (`dav-3510`) and can run in NP
 │   ├── data_utils.h                   // Data input/output helpers
 │   ├── CMakeLists.txt                 // CMake build file
 │   ├── data_copy_gm2l1.asc            // C API implementation and launcher
+│   ├── data_copy_gm2l1_nd_core_example.asc // Scenario 2 device-side core invocation example (not built separately)
 │   ├── README.md                      // Chinese example documentation
 │   └── README_en.md                   // English example documentation
 ```
@@ -61,6 +62,7 @@ All device-side movement and compute use asynchronous Ascend C C API calls. `asc
 - Output: C [128, 256] in `float` ND format
 - Implementation: Configure ND2NZ parameters with `asc_set_gm2l1_nz_para`, then use `asc_copy_gm2l1_nd2nz` to move ND input data from GM to L1 and convert it to Nz
 - Description: The ND inputs are converted to Nz during the movement
+- Core invocation example: `data_copy_gm2l1_nd_core_example.asc` retains only the GM-to-L1, L1-to-L0, matrix-multiplication, and L0C-to-GM call sequence for this scenario. It omits host code, data generation, and verification.
 <p align="center">
   <img src="figures/data_copy_gm2l1_nd2nz.png" width="800">
 </p>

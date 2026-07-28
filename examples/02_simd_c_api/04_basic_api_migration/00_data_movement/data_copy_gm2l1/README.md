@@ -23,6 +23,7 @@
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── CMakeLists.txt                 // cmake编译文件
 │   ├── data_copy_gm2l1.asc            // C API样例实现及调用代码
+│   ├── data_copy_gm2l1_nd_core_example.asc // 场景2的设备端核心调用示例（不单独编译）
 │   ├── README.md                      // 中文样例说明文档
 │   └── README_en.md                   // 英文样例说明文档
 ```
@@ -61,6 +62,7 @@
 - 输出：C [128, 256] float类型，ND格式
 - 实现：使用`asc_set_gm2l1_nz_para`配置ND2NZ参数，再使用`asc_copy_gm2l1_nd2nz`将ND格式的输入数据从GM搬运到L1，并转换为Nz格式
 - 说明：输入数据为ND格式，在搬运过程中自动转换为Nz格式
+- 核心调用示例：`data_copy_gm2l1_nd_core_example.asc`仅保留本场景的GM→L1、L1→L0、矩阵乘和L0C→GM调用链，不包含主机侧、数据生成和校验逻辑
 <p align="center">
   <img src="figures/data_copy_gm2l1_nd2nz.png" width="800">
 </p>
