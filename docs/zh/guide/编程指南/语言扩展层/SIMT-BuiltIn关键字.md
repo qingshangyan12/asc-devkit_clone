@@ -30,14 +30,14 @@
 
 -   静态内存通过数组分配：
 
-    ```
+    ```cpp
     __ubuf__ half staticBuf[1024];
     ```
 
 -   动态内存通过以下方式申请使用：
 
-    ```
-    extern __ubuf__ half dynamicBuf[]; 
+    ```cpp
+    extern __ubuf__ half dynamicBuf[];
     ```
 
     动态内存的实际内存大小需要在核函数启动时配置，具体内容请参考[核函数配置](#section97005415463)。
@@ -65,7 +65,7 @@
 
     用于指定3个不同维度的大小，三维总数为x \* y \* z。开发者可以通过如下方式创建dim3结构。
 
-    ```
+    ```cpp
     dim3(x); // 创建一维结构，dimy和dimz为默认值1
     dim3(x, y); // 创建二维结构，dimz为默认值1
     dim3(x, y, z); // 创建三维结构
@@ -101,14 +101,14 @@
 
     -   对于二维线程块，其线程ID为二维结构，其计算公式为：
 
-        ```
+        ```cpp
         thread_id_x = blockIdx.x * blockDim.x + threadIdx.x;
         thread_id_y = blockIdx.y * blockDim.y + threadIdx.y;
         ```
 
     -   对于三维线程块，其线程ID为三维结构，其计算公式为：
 
-        ```
+        ```cpp
         thread_id_x = blockIdx.x * blockDim.x + threadIdx.x;
         thread_id_y = blockIdx.y * blockDim.y + threadIdx.y;
         thread_id_z = blockIdx.z * blockDim.z + threadIdx.z;
@@ -228,9 +228,9 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 
 运算符使用示例如下所示：
 
-```
+```cpp
 // 加法运算
-res[idx] = x[idx] + y[idx]; 
+res[idx] = x[idx] + y[idx];
 
 // 取反运算
 x[idx] = (-x[idx]);
@@ -258,7 +258,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
 
-```
+```cpp
 <<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>
 ```
 
@@ -271,7 +271,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 
 以下示例展示了内核函数的声明与调用方式。
 
-```
+```cpp
 // 声明
 __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length);
 // 调用
@@ -292,11 +292,11 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程驻留在AI处理器上。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
-  
+
     函数标记宏，在核函数上可选配置，用于指定核函数启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现寄存器溢出等问题。建议最大线程数与启动核函数时的dim3线程数保持一致。
 
     **表5**  \_\_launch\_bounds\_\_(N)与每个线程可用的寄存器个数的关系
-    
+
     <a name="table1715318510594"></a>
 
     | N | 每个线程可用寄存器个数 |
@@ -308,7 +308,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
     配置SIMT函数最大线程数为512，每个Thread可用寄存器数为64，示例如下：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
     ```
     \_\_launch\_bounds\_\_\(N\)的参数N需要满足：
@@ -340,6 +340,6 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
     配置SIMT函数单个线程最多可分配的寄存器数量为64，示例如下：
 
-    ```
+    ```cpp
     __global__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
     ```
