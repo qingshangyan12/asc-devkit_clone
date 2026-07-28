@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```c++
+```cpp
 void sync() const
 ```
 
@@ -42,13 +42,13 @@ void sync() const
 
 ## 约束说明
 
-无
+- 必须保证`thread_block_tile`组内所有线程都能执行到同一个`sync()`调用，否则会导致卡死。
 
 ## 调用示例
 
 - SIMT编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
@@ -62,7 +62,7 @@ void sync() const
 
 - SIMD与SIMT混合编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {

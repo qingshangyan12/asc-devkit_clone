@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline void sincosf(float x, float *s, float *c)
 ```
 
@@ -50,13 +50,13 @@ inline void sincosf(float x, float *s, float *c)
 
 ## 约束说明
 
-使用本接口时，线程配置最大不超过1024，否则有栈溢出风险。
+无
 
 ## 需要包含的头文件
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -64,7 +64,7 @@ inline void sincosf(float x, float *s, float *c)
 
 - SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(256) void compute_sincosf(float *sin_result, float *cos_result, const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -77,7 +77,7 @@ inline void sincosf(float x, float *s, float *c)
 
 - SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(256) inline void compute_sincosf_vf(__gm__ float *sin_result, __gm__ float *cos_result, __gm__ const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;

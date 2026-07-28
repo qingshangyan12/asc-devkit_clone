@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline half hsin(half x)
 ```
 
@@ -56,13 +56,13 @@ inline half hsin(half x)
 
 ## 约束说明
 
-使用本接口时，线程配置最大不超过1024，否则有栈溢出风险。
+无
 
 ## 需要包含的头文件
 
 使用half类型接口需要包含"simt\_api/asc\_fp16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp16.h"
 ```
 
@@ -70,7 +70,7 @@ inline half hsin(half x)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelSin(half* dst, half* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -80,7 +80,7 @@ inline half hsin(half x)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelSin(__gm__ half* dst, __gm__ half* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

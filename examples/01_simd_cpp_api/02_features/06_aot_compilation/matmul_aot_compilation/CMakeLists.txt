@@ -28,7 +28,3 @@ target_link_libraries(matmul_aot_example PRIVATE
     m
     dl
 )
-
-target_compile_options(matmul_aot_example PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-)

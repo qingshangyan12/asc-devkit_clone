@@ -50,7 +50,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline void asc_threadfence()
 ```
 
@@ -70,17 +70,17 @@ inline void asc_threadfence()
 
 使用该接口需要包含"simt\_api/device\_sync\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_sync_functions.h"
 ```
 
 ## 调用示例
 
-完整样例请参考[MemoryFence样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/01_sync_instruction/memory_fence/README.md)。
+完整样例请参考[MemoryFence样例](../../../../../../examples/03_simt_api/02_features/01_api_features/01_sync_instruction/memory_fence/README.md)。
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelThreadFence(float* dst, float* src)
     {
         src[0] = src[0] + 1;
@@ -91,7 +91,7 @@ inline void asc_threadfence()
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelThreadFence(__gm__ float* dst, __gm__ float* src)
     {
         src[0] = src[0] + 1;
