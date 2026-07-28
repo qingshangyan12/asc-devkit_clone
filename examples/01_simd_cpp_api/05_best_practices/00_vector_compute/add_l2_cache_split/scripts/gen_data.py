@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-# ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
@@ -9,25 +8,38 @@
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
-# ----------------------------------------------------------------------------------------------------------
+
+"""Generate the fixed input used by both examples."""
+
+import struct
+from pathlib import Path
 
 
-import os
-import numpy as np
-
-TOTAL_LEN = 40000000
+TOTAL_DATA_ELEMENTS = 201326592
+CHUNK_ELEMENTS = 65536
 
 
-def gen_golden_data_simple():
-    input_x = np.random.uniform(1, 100, [TOTAL_LEN]).astype(np.float16)
-    input_y = np.random.uniform(1, 100, [TOTAL_LEN]).astype(np.float16)
-    golden = (input_x + input_y).astype(np.float16)
-    os.makedirs("input", exist_ok=True)
-    os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
-    input_y.tofile("./input/input_y.bin")
-    golden.tofile("./output/golden.bin")
+def main():
+    sample_dir = Path(__file__).resolve().parent.parent
+    input_dir = sample_dir / "input"
+    input_dir.mkdir(exist_ok=True)
+
+    input_path = input_dir / "input.bin"
+    with input_path.open("wb") as input_file:
+        offset = 0
+        while offset < TOTAL_DATA_ELEMENTS:
+            count = min(CHUNK_ELEMENTS, TOTAL_DATA_ELEMENTS - offset)
+            input_values = [float(((offset + index) % 32) - 16) for index in range(count)]
+            input_file.write(struct.pack(f"<{count}e", *input_values))
+            offset += count
+
+    bytes_per_half = 2
+    total_data_mib = TOTAL_DATA_ELEMENTS * bytes_per_half / 1024 / 1024
+    print(
+        f"total_data_elements={TOTAL_DATA_ELEMENTS}, "
+        f"total_data={total_data_mib:.0f} MiB"
+    )
 
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    main()

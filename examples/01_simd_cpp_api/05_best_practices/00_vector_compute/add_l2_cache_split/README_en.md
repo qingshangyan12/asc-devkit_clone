@@ -1,367 +1,179 @@
-# L2 Cache Tiling Optimization
+# L2 Cache Splitting Optimization Sample
 
 ## Overview
 
-This sample demonstrates the performance impact of the **L2 Cache tiling** strategy using vector addition as an example. By comparing two implementations — **without tiling (negative example)** and **with tiling (positive example)** — it shows how L2 Cache tiling improves data transfer efficiency when data volume exceeds the L2 Cache capacity (assuming the AI processor's L2 Cache size is 192 MiB).
+This sample compares two implementations with identical work and different L2 Cache-level loop orders:
 
-**Key differences**:
-- **Negative example (nosplit)**: Data is evenly partitioned by core count. Each core processes a fixed-size data block. When the total data exceeds L2 Cache size, the L2Cache hit rate is low (the Cache only retains the most recently accessed data; previously accessed data is evicted), causing subsequent accesses to reload from GM, leading to cache misses and becoming the performance bottleneck.
+- Negative round-first: `Round -> L2 Batch -> UB Tile`
+- Positive L2-batch-first: `L2 Batch -> Round -> UB Tile`
 
-**Figure 1** Without L2 Cache Tiling (Negative Example)
-![](../../../../../docs/zh/guide/figures/未使能L2-Cache切分.png "Without L2-Cache Tiling")
+The sample uses one 384MiB GM data buffer. Each round computes `data = data + 1` in place, so the result after two rounds is `input + 2`. Both implementations issue the same GM-to-UB copies, UB-to-GM copies, Adds operations, and inter-core synchronizations, so their performance difference comes only from traversal order.
 
-- **Positive example (split)**: Global tiling is performed based on L2 Cache capacity. The total data is split into multiple tiles that each fit within L2 Cache. All cores collaboratively process the first tile, then move on to the next. Data reuse can directly read from L2 Cache, improving bandwidth utilization.
+## Supported Products
 
-**Figure 2** With L2 Cache Tiling (Positive Example)
-![](../../../../../docs/zh/guide/figures/使能L2-Cache切分.png "With L2-Cache Tiling")
+**Table 1**  Supported products
 
-## Supported Products and CANN Versions
-
-| Product | CANN Version |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series/Atlas A3 Inference Series | >= CANN 9.0.0 |
-| Atlas A2 Training Series/Atlas A2 Inference Series | >= CANN 9.0.0 |
+| Product | Architecture | CANN version |
+| --- | --- | --- |
+| Atlas A2 training and inference series | dav-2201 | >= 9.0.0 |
+| Atlas A3 training and inference series | dav-2201 | >= 9.0.0 |
+| Ascend 950PR/Ascend 950DT | dav-3510 | >= 9.1.0 |
 
 ## Directory Structure
 
-```
-├── add_l2_cache_split
-│   ├── CMakeLists.txt               // Build configuration
-│   ├── data_utils.h                 // Data read/write utilities
-│   ├── l2_cache_optimizer.h         // L2 Cache tiling optimizer
-│   ├── add_l2cache_split.asc        // Positive example: with L2 Cache tiling
-│   ├── add_l2cache_nosplit.asc      // Negative example: without L2 Cache tiling
-│   ├── scripts
-│   │   ├── gen_data.py              // Generate test data
-│   │   └── verify_result.py         // Verify computation results
-│   ├── README.md                    // Sample documentation (Chinese)
-│   └── README_en.md                 // Sample documentation (English)
-```
-
-## Sample Description
-
-**Functionality**:
-
-  This sample implements vector addition of `TOTAL_LEN = 40000000` half-precision elements.
-
-  The Add formula is:
-
-$$
-  z = x + y
-$$
-
-  - x: input, length 40000000, data type half (40000000 × 2B = 80000000B, i.e., 76.29 MiB);
-  - y: input, length 40000000, data type half (40000000 × 2B = 80000000B, i.e., 76.29 MiB);
-  - z: output, length 40000000, data type half (40000000 × 2B = 80000000B, i.e., 76.29 MiB);
-
-  Total data size is 40000000 × 2B × 3 = 240000000B (i.e., 228.88 MiB), which exceeds the Atlas A2 series L2 Cache capacity (192 MiB) — a typical scenario that triggers L2 Cache tiling.
-
-## Core Implementation Comparison
-
-### Data Partitioning Strategy
-
-| Aspect | Negative (nosplit) | Positive (split) |
-|:---|:---|:---|
-| Partitioning | Even partition by core count | Global tiling by L2Cache capacity |
-| Data view | Each core independently processes a fixed segment | All 20 cores collaboratively process the same tile, batch by batch |
-| L2Cache awareness | Not aware of L2Cache capacity | Aware via `L2CacheOptimizer` |
-| Core utilization | All 20 cores active | All 20 cores active (participate in every tile) |
-| L2Cache hit | All cores access non-overlapping data simultaneously; total exceeds L2Cache → **Cache miss** | 100 MiB per tile (controlled by L2_TILE_THRESHOLD=100×1024²) fits in L2Cache; next-round access hits → **Cache hit** |
-| Instantaneous L2Cache working set | 240000000B/228.88 MiB (20 cores × 40000000/20 × 3 × 2B) | up to 100 MiB (controlled by L2_TILE_THRESHOLD=100×1024², total data per tile) |
-
-### Negative Example Key Code (add_l2cache_nosplit.asc)
-
-Data is evenly partitioned by core count. Each core independently processes its fixed-size block. Within each core, data is further split into `TILE_NUM=2` sub-tiles processed alternately. The outer `LOOP_COUNT=2` repeats processing of the same data. When returning to the first tile, L2Cache has already been replaced by later tile data, causing a cache miss:
-
-```cpp
-int64_t blockLen = Ceil(totalLen_, blockNum);
-int64_t blockOffset = curBlockIdx * blockLen;
-int64_t tileLen = Ceil(curBlockLen, TILE_NUM);
-
-for (int32_t i = 0; i < LOOP_COUNT; i++) {
-    for (int32_t j = 0; j < TILE_NUM; j++) {
-        // Global offset of the j-th tile
-        int64_t tileOffset = blockOffset + j * tileLen;
-        // Chunked transfer by MAX_DATA_COPY_LEN + pipelined compute
-        for (int64_t k = 0; k < totalBlocks; k++) {
-            DataCopy x, DataCopy y, Add, DataCopy z
-        }
-        PipeBarrier<PIPE_ALL>();  // Sync between tiles
-    }
-}
+```text
+add_l2_cache_split/
+|-- add_l2cache_nosplit.asc
+|-- add_l2cache_split.asc
+|-- l2_cache_kernel.h
+|-- l2_cache_runner.h
+|-- data_utils.h
+|-- CMakeLists.txt
+|-- scripts/
+|   `-- gen_data.py
+|-- README.md
+`-- README_en.md
 ```
 
-### Positive Example Key Code (add_l2cache_split.asc)
+## Sample Design
 
-`L2CacheOptimizer` splits the global data into multiple tiles based on the L2Cache threshold. **All 20 cores collaboratively process the same tile**, with per-core data evenly partitioned within each tile. After processing, `PipeBarrier` synchronizes all cores before entering the next tile:
+The `data` buffer contains 201,326,592 half elements and occupies 384MiB in GM. With a 100MiB effective L2 Cache working-set threshold, ceiling division produces four L2 batches. The data is then split evenly into four contiguous, non-overlapping 96MiB ranges. Each L2 batch contains 50,331,648 half elements.
 
-```cpp
-L2CacheOptimizer l2Opt(totalLen_, blockNum);
+Each round reads and writes the complete 384MiB buffer at the same GM addresses. The logical GM-to-UB read traffic per kernel is therefore 768MiB, and the logical UB-to-GM write traffic is also 768MiB. Logical GM-to-UB traffic is not the same as physical GM-to-L2 traffic: an L2 Cache hit does not read main memory, while an L2 Cache miss fetches data into L2 Cache.
 
-for (int64_t tileIdx = 0; tileIdx < l2Opt.GetTileNum(); tileIdx++) {
-    int64_t tileLen = l2Opt.GetBlockLen(tileIdx);
-    int64_t tileOffset = l2Opt.GetBlockOffset(tileIdx);
+B0 through B3 are logical index ranges within the single `data` buffer, not additional buffers. Every round loads the current range into UB, applies `Adds`, and stores the result back to the same GM addresses. Splitting limits the repeatedly accessed range to 96MiB under the 100MiB threshold.
 
-    // Within this tile, evenly split data among cores
-    int64_t perCoreLen = Ceil(tileLen, blockNum);
-    int64_t coreStart = tileOffset + curBlockIdx * perCoreLen;
-    int64_t coreLen = min(perCoreLen, tileLen - curBlockIdx * perCoreLen);
+One L2 batch contains 3,145,728 32-byte DataBlocks. With 20 Vector cores, the first eight cores process 157,287 DataBlocks, or 2,516,592 half elements, and the remaining cores process 157,286 DataBlocks, or 2,516,576 elements. Each core processes 153 full UB tiles plus one aligned tail tile. A full UB tile holds 16,384 elements; the two tail sizes are 9,840 and 9,824 elements.
 
-    // Chunked transfer by MAX_DATA_COPY_LEN + pipelined compute
-    for (int64_t i = 0; i < totalBlocks; i++) {
-        DataCopy x, DataCopy y, Add, DataCopy z
-    }
+For L2 batches B0 through B3, round-first executes:
 
-    PipeBarrier<PIPE_ALL>();  // All cores sync before next tile
-}
+```text
+Round 0: B0 -> B1 -> B2 -> B3
+Round 1: B0 -> B1 -> B2 -> B3
 ```
 
-### L2CacheOptimizer Splitting Logic
+Processing B1 through B3 can evict B0 before Round 1 returns to it. L2-batch-first instead executes:
 
-> Note: `L2_TILE_THRESHOLD = 100 × 1024² = 100 MiB` is an example threshold. Different hardware has different L2Cache sizes (e.g., Atlas A2 is 192 MiB, Ascend 950 series may be larger). Adjust this value based on your target hardware. It is recommended to set the threshold slightly below the actual L2Cache capacity to leave headroom for other data.
-
-```cpp
-constexpr int64_t L2_TILE_THRESHOLD = 100 * 1024 * 1024; // 100 MiB threshold, adjust for actual L2Cache size on target hardware
-
-L2CacheOptimizer(int64_t totalLen, int64_t blockNum) {
-    int64_t totalByteSize = totalLen * sizeof(half) * 3;
-    if (totalByteSize <= L2_TILE_THRESHOLD) {
-        // Data fits in L2Cache, no tiling needed
-        tileNum_ = blockNum_;
-    } else {
-        // Split into multiple tiles based on L2Cache threshold
-        baseTileLen_ = L2_TILE_THRESHOLD / (3 * sizeof(half));
-        tileNum_ = Ceil(totalLen_, baseTileLen_);
-    }
-}
+```text
+Batch B0: Round 0 -> Round 1
+Batch B1: Round 0 -> Round 1
+Batch B2: Round 0 -> Round 1
+Batch B3: Round 0 -> Round 1
 ```
 
-## Build and Run
+The second round of each batch is therefore more likely to read the first-round result from L2 Cache. Software `SyncAll` is called after each batch/round stage. Its GM workspace uses 32 bytes per core and is initialized to zero.
 
-- Configure environment variables
+## Test Cases
 
-  Configure the environment variables according to the installation method of the CANN development kit.
-  ```bash
-  source ${install_path}/cann/set_env.sh
-  ```
+Only the negative and positive implementations of the fixed workload are retained:
 
-- Build
+**Table 2**  Negative and positive test cases
 
-  ```bash
-  mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..
-  make -j
-  ```
+| Case | Kernel | Loop order | Data elements | Data size | Cores | Batches | Rounds |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Negative | `l2_cache_nosplit` | Round-first | 201326592 | 384MiB | 20 | 4 | 2 |
+| Positive | `l2_cache_split` | L2-batch-first | 201326592 | 384MiB | 20 | 4 | 2 |
 
-  Two executables will be generated:
-  - `demo_split`: Positive example, with L2 Cache tiling
-  - `demo_nosplit`: Negative example, without L2 Cache tiling
+Both implementations read `input/input.bin` and write their results under `output/`. For performance attribution, manually compare `GM_to_UB_datas(KB)` in the profile reports and confirm that the logical GM-to-UB traffic is close.
 
-  Build options:
+## Build And Run
 
-  | Option | Values | Description |
-  |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 for Atlas A2/A3 series, dav-3510 for Ascend 950 series |
-
-- Generate test data and run
-
-  ```bash
-  python3 ../scripts/gen_data.py    # Generate input test data
-  ./demo_split                      # Run positive example
-  ./demo_nosplit                    # Run negative example
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # Verify accuracy
-  ```
-
-## Performance Profiling and Analysis
-
-### Profiling with msopprof
+Run from this directory:
 
 ```bash
-# Profile positive example
-msopprof --output=./prof_split ./demo_split
+python3 scripts/gen_data.py
 
-# Profile negative example
-msopprof --output=./prof_nosplit ./demo_nosplit
+cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-2201
+cmake --build build -j
+
+./build/demo_nosplit
+./build/demo_split
 ```
 
-After profiling, an `OPPROF_*` directory is generated with the following structure:
+`demo_nosplit` and `demo_split` are separate processes and do not accept `--mode`. `CMAKE_ASC_ARCHITECTURES` accepts `dav-2201` and `dav-3510`; use the architecture matching the current NPU.
 
+## Profile Collection And Analysis
+
+### Collect Profiles
+
+Launch the two implementations in separate processes so the first kernel's cache state does not affect the second:
+
+```bash
+msopprof --output=./prof_384m_inplace_round_first_1 \
+  ./build/demo_nosplit
+
+msopprof --output=./prof_384m_inplace_l2_batch_first_1 \
+  ./build/demo_split
 ```
+
+Use a new output directory for every independent collection and alternate which implementation is collected first. For five pairs, use suffixes `_1` through `_5` for both directory groups.
+
+After collection, manually inspect the `OPPROF_*` report files under each profile directory. Pair the round-first and batch-first directories by collection order, first confirm that total `GM_to_UB_datas(KB)` values are close, then compare L2 Cache hit rates, MTE2 time, and `Task Duration(us)`.
+
+### Report Files
+
+```text
 OPPROF_<timestamp>/
-├── OpBasicInfo.csv              // Operator basic info and Task Duration
-├── PipeUtilization.csv          // Per-unit time, ratio, effective bandwidth (per core)
-├── L2Cache.csv                  // L2Cache read/write hit rate (per core)
-├── MemoryL0.csv                 // L0A/L0B/L0C read/write bandwidth
-├── Memory.csv                   // UB, L1, and main memory r/w bandwidth
-├── MemoryUB.csv                 // Vector and scalar to UB r/w bandwidth
-├── ArithmeticUtilization.csv    // Cube/vector instruction cycle ratio
-└── ResourceConflictRatio.csv    // UB bank group / bank conflict ratio
+|-- OpBasicInfo.csv
+|-- PipeUtilization.csv
+|-- L2Cache.csv
+|-- Memory.csv
+|-- MemoryL0.csv
+|-- MemoryUB.csv
+|-- ArithmeticUtilization.csv
+`-- ResourceConflictRatio.csv
 ```
 
-### Performance Metrics
+### Key Metrics
 
-The performance data below was collected on the Atlas A2 Training Series and Ascend 950 Series with CANN 9.1.0. Key metrics are defined as follows:
+**Table 3**  Profile metrics
 
-| Field | Meaning | Source File |
-|:---:|:---|:---|
-| Task Duration(μs) | Total task time, including scheduling and accelerator execution | OpBasicInfo.csv |
-| aiv_time(μs) | Task execution time on AI Vector Core | PipeUtilization.csv |
-| aiv_mte2_time(μs) | mte2 instruction time (GM→UB data transfer), reflecting read efficiency | PipeUtilization.csv |
-| aiv_mte2_ratio | mte2 instruction cycle ratio in aiv_total_cycles | PipeUtilization.csv |
-| aiv_mte3_time(μs) | mte3 instruction time (UB→GM data transfer), reflecting write efficiency | PipeUtilization.csv |
-| aiv_mte2_active_bw(GB/s) | mte2 effective r/w bandwidth = read data volume / mte2 time. Higher bandwidth indicates better GM access efficiency | PipeUtilization.csv |
-| aiv_vec_time(μs) | vec instruction time (vector computation) | PipeUtilization.csv |
-| aiv_write_hit_rate(%) | L2Cache write hit rate | L2Cache.csv |
-| aiv_read_hit_rate(%) | L2Cache read hit rate | L2Cache.csv |
-| aiv_gm_to_ub_bw(GB/s) | GM→UB average effective bandwidth (mte2 transfer efficiency metric on 3510) | Memory.csv |
-| GM_to_UB_datas(KB) | GM→UB data volume per core | Memory.csv |
+| Field | Meaning | Aggregation | Source |
+| --- | --- | --- | --- |
+| `Task Duration(us)` | Kernel task duration | Kernel record | `OpBasicInfo.csv` |
+| `aiv_time(us)` | Vector Core execution time | Maximum across cores | `PipeUtilization.csv` |
+| `aiv_mte2_time(us)` | MTE2 load time | Mean across cores | `PipeUtilization.csv` |
+| `aiv_mte2_active_bw(GB/s)` | Active MTE2 bandwidth | Mean across cores | `PipeUtilization.csv` |
+| `aiv_gm_to_ub_bw(GB/s)` | Effective GM-to-UB bandwidth | Mean across cores | `Memory.csv` |
+| `GM_to_UB_datas(KB)` | Logical GM-to-UB traffic | Sum across cores | `Memory.csv` |
+| `read_main_memory_datas(KB)` | Main-memory read counter | Sum across cores | `Memory.csv` |
+| `aiv_read_hit_rate(%)` | L2 read hit rate | Mean across cores | `L2Cache.csv` |
+| `aiv_write_hit_rate(%)` | L2 write hit rate | Mean across cores | `L2Cache.csv` |
+| `aiv_total_hit_rate(%)` | L2 total hit rate | Mean across cores | `L2Cache.csv` |
 
-### Measured Performance Data (Atlas A2 Training Series)
+`aiv_gm_to_ub_bw(GB/s)` is effective bandwidth, not GM traffic. Interpret `read_main_memory_datas(KB)` together with L2 hit rates and MTE2 time because its semantics can vary by architecture and profiler version.
 
-The following data is aggregated from `PipeUtilization.csv` (20 cores per-core) and `L2Cache.csv`.
+### Measured Results For The 384MiB Workload
 
-**Table 1 Overall Performance Summary (OpBasicInfo + PipeUtilization)**
+Existing profiles were collected with a different data size or the previous two-buffer implementation. They do not represent the current single-buffer, 384MiB in-place workload and must not be mixed into new results. The following data was recollected on 2026-07-28 with the current sample, CANN 9.1.0, `dav-2201`, 20 Vector cores, and a 1650MHz NPU frequency. The profile directories are `prof_384m_inplace_20260728_085319_round_first_1` through `prof_384m_inplace_20260728_085319_round_first_5`, and `prof_384m_inplace_20260728_085319_batch_first_1` through `prof_384m_inplace_20260728_085319_batch_first_5`.
 
-| Metric | Negative (nosplit) | Positive (split) | Speedup |
-|:---|---:|---:|---:|
-| Task Duration(μs) | 415.1 | **224.6** | **1.85x** |
-| aiv_time(μs) | 402.9 | 215.2 | 1.87x |
-| aiv_mte2_time(μs) | 353.9 (87.9%) | 187.4 (87.1%) | **1.89x** |
-| aiv_mte3_time(μs) | 111.1 (27.6%) | 53.0 (24.6%) | **2.10x** |
-| aiv_vec_time(μs) | 41.2 (10.2%) | 20.6 (9.6%) | 2.00x |
+The logical GM-to-UB traffic difference was below 1% in all five pairs, so the A/B fairness requirement is met.
 
-**Table 2 L2Cache Hit Rate Comparison (L2Cache Per-Core Average)**
+**Table 4**  Per-pair fairness and speedup
 
-| Metric | Negative (nosplit) | Positive (split) |
-|:---|---:|---:|
-| aiv_write_hit_rate | 1.6% | **2.6%** |
-| aiv_read_hit_rate | 0.60% | **0.72%** |
-| aiv_total_hit_rate | 0.71% | **0.94%** |
-| Instantaneous L2Cache working set | 240000000B/228.88 MiB (20 cores × 40000000/20 × 3 × 2B) | up to 100 MiB (controlled by L2_TILE_THRESHOLD=100×1024², total data per tile) |
+| Pair | Negative `Task Duration(us)` | Positive `Task Duration(us)` | Logical GM-to-UB difference | Speedup |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 1475.3495 | 1071.5614 | 0.0435% | 1.3768x |
+| 2 | 1468.6694 | 1056.6211 | 0.1516% | 1.3900x |
+| 3 | 1475.9095 | 1072.4814 | 0.0401% | 1.3762x |
+| 4 | 1470.4694 | 1054.2811 | 0.1670% | 1.3948x |
+| 5 | 1470.3694 | 1075.2015 | 0.0543% | 1.3675x |
 
-**Table 3 MTE2 Effective Bandwidth Per-Core Comparison (PipeUtilization blk0)**
+**Table 5**  Median metrics
 
-| Metric | Negative (nosplit) | Positive (split) |
-|:---|---:|---:|
-| aiv_mte2_active_bw | 41.3 GB/s | **57.9 GB/s** |
-| aiv_mte2_time (blk0) | 361.2 μs | 128.8 μs |
-| aiv_mte2_ratio (blk0) | 89.0% | 84.8% |
+| Metric | Negative round-first | Positive L2-batch-first | Change |
+| --- | ---: | ---: | ---: |
+| `Task Duration(us)` | 1470.4694 | 1071.5614 | 27.13% lower |
+| `aiv_time(us)` | 1470.2946 | 1071.1370 | 27.15% lower |
+| `aiv_mte2_time(us)` | 1333.5366 | 905.1114 | 32.13% lower |
+| `aiv_mte2_active_bw(GB/s)` | 28.2165 | 41.6265 | 47.53% higher |
+| `aiv_gm_to_ub_bw(GB/s)` | 25.6037 | 35.1896 | 37.44% higher |
+| `GM_to_UB_datas(KB)` | 789575.0000 | 790076.8750 | 0.06% higher |
+| `read_main_memory_datas(KB)` | 789592.5000 | 790121.2500 | 0.07% higher |
+| `aiv_read_hit_rate(%)` | 1.2606 | 48.7423 | 47.4817 percentage points higher |
+| `aiv_write_hit_rate(%)` | 99.9988 | 99.9451 | 0.0537 percentage points lower |
+| `aiv_total_hit_rate(%)` | 21.5098 | 59.2343 | 37.7245 percentage points higher |
 
-### Measured Performance Data (Ascend 950 Series)
+The measured result is that the positive implementation does not reduce logical GM-to-UB traffic. Instead, processing both rounds of one L2 batch back to back increases the probability that the second-round read hits L2 Cache. The median L2 read hit rate increased from 1.2606% to 48.7423%, median MTE2 time dropped from 1333.5366us to 905.1114us, and median `Task Duration(us)` dropped from 1470.4694us to 1071.5614us. The median paired speedup is 1.3768x.
 
-The following data was collected on the Ascend 950 Series (dav-3510, 28 cores) with CANN 9.1.0, aggregated from `msopprof` profiling results.
-
-> Note: On the 3510 platform, `PipeUtilization.csv` does **not** directly provide `aiv_mte2_time` and `aiv_mte3_time` fields. mte2/mte3 metrics should be obtained from `Memory.csv` via `aiv_gm_to_ub_bw` (GM→UB effective bandwidth) and `aiv_mte2_ratio`.
-
-**Table 1 Overall Performance Summary**
-
-| Metric | Negative (nosplit) | Positive (split) | Speedup | Source |
-|:---|---:|---:|---:|:---|
-| Task Duration(μs) | 309.1 | **149.3** | **2.07x** | OpBasicInfo.csv |
-| aiv_time(μs) | 300.0 | 145.7 | 2.06x | PipeUtilization.csv |
-| aiv_vec_time(μs) | 29.8 | 14.9 | 2.00x | PipeUtilization.csv |
-| aiv_gm_to_ub_bw(GB/s) | 35.6 | 36.6 | +3% | Memory.csv |
-| aiv_mte2_ratio | 88.3% | 87.8% | — | Memory.csv |
-| GM_to_UB_datas(KB/core) | 11193 | 5597 | — | Memory.csv |
-
-**Table 2 L2Cache Hit Rate Comparison (Per-Core Average)**
-
-| Metric | Negative (nosplit) | Positive (split) | Source |
-|:---|---:|---:|:---|
-| aiv_write_hit_rate | 32.29% | 20.04% | L2Cache.csv |
-| aiv_read_hit_rate | ~0% | ~0% | L2Cache.csv |
-
-**Table 3 Compute Unit Utilization (Per-Core Average)**
-
-| Metric | Negative (nosplit) | Positive (split) | Source |
-|:---|---:|---:|:---|
-| aiv_vec_ratio | 10.1% | 10.5% | ArithmeticUtilization.csv |
-
-**3510 Platform Performance Analysis**
-
-**1. Data Transfer Volume and Speedup Source**
-
-In the negative example, each core reads 11193 KB (x+y combined), while the positive example reads 5597 KB — exactly half. The reason: `LOOP_COUNT=2` in the negative example causes the same data to be read twice, whereas the positive example processes only one round per core. `aiv_gm_to_ub_bw` (effective bandwidth) is nearly identical for both (~36 GB/s), indicating bandwidth is not the bottleneck — the speedup comes purely from **halving the transferred data volume**.
-
-**2. mte2 Remains Dominant**
-
-mte2 instruction ratio on the 3510 still dominates (negative 88.3%, positive 87.8%), consistent with the A2 platform. Add is an I/O-bound operation; vector computation accounts for only ~10%.
-
-**3. L2Cache Hit Rate Interpretation**
-
-On the 3510, `L2Cache.csv` has a different format than A2, distinguishing close/far hits. `read_hit_rate` is ~0% because Add's streaming access reads each address only once with no reuse. `write_hit_rate` (negative 32.29% > positive 20.04%) appears counterintuitive — the negative example has a higher write hit rate yet worse performance. This is because `LOOP_COUNT=2` writes the same addresses repeatedly, and the profiler counts these as "hits" even though they still trigger write-allocation and do not actually save bandwidth.
-
-**4. Cross-Platform Comparison (A2 vs 3510)**
-
-| Platform | Cores | Task Duration Speedup | gm_to_ub_bw Difference |
-|------|------|-------------------|-------------------|
-| Atlas A2 (2201) | 20 | 1.85x | +40% (41.3→57.9 GB/s) |
-| Ascend 950 (3510) | 28 | 2.07x | +3% (35.6→36.6 GB/s) |
-
-On A2, L2Cache tiling simultaneously improves effective bandwidth (indicating data can hit the L2Cache path), while on 3510, bandwidth is virtually unchanged — the speedup stems entirely from reducing transferred data volume rather than bandwidth improvement. The acceleration paths differ across platforms, but the conclusion is consistent: L2Cache tiling effectively reduces unnecessary data transfer.
-
-### Performance Analysis
-
-**1. MTE2 transfer efficiency is the key differentiator**
-
-In the negative example, 20 cores each process independent data. At any moment, the L2Cache working set is 240000000B (228.88 MiB), exceeding the 192 MiB capacity, causing frequent cache misses requiring GM re-reads. The positive example splits data into 3 tiles based on L2Cache capacity, each tile up to 100 MiB (total size of x, y, z three tensor data per tile = L2_TILE_THRESHOLD), fitting entirely in L2Cache:
-
-- Positive example L2Cache hit rate (0.94%) is 32% higher than the negative example (0.71%)
-- MTE2 effective bandwidth improves from 41.3 GB/s to 57.9 GB/s (+40%)
-- MTE2 absolute time drops from 353.9 μs to 187.4 μs (-47%)
-
-**2. Positive Example Three-Phase Per-Tile Breakdown (PipeUtilization per-core)**
-
-| Tile | Data Range | Per-Core Data | Per-Core mte2 Time | Per-Core aiv_time |
-|:---|---:|---:|---:|---:|
-| Tile 0 | [0, 17.5M) | 0.87M half | ~129 μs | ~152 μs |
-| Tile 1 | [17.5M, 34.9M) | 0.87M half | ~190 μs | ~215 μs |
-| Tile 2 | [34.9M, 40M) | 0.25M half | ~139 μs | ~163 μs |
-
-The three tiles are processed sequentially with `PipeBarrier<PIPE_ALL>()` synchronization between them. All 20 cores participate in each tile. Tile 2 has a smaller data volume, but its per-core aiv_time is still ~163 μs due to synchronization overhead. Total aiv_time is the cumulative time of the slowest core (~215 μs).
-
-**3. Negative Example L2Cache Thrashing Mechanism**
-
-In the negative example, `LOOP_COUNT=2` repeats processing of the same data twice (simulating a data reuse scenario in training). Within each iteration, `TILE_NUM=2` alternately processes two data segments:
-
-```
-Round 1: [Tile0 → Tile1] → L2Cache finally holds Tile1
-Round 2: [Tile0 → Tile1] → Returning to Tile0, L2Cache holds Tile1 → Cache miss
-```
-
-`PipeBarrier` ensures correct data consistency across tile boundaries, but Tile0 data in round 2 must be reloaded from GM. All 20 cores are simultaneously busy, causing L2Cache thrashing.
-
-**4. Theoretical Speedup Source**
-
-L2Cache r/w mixed bandwidth is approximately 7 TB/s, while GM bandwidth is approximately 1.6 TB/s — a ~4.4x difference. Reasons the measured 1.85x speedup is lower than the theoretical value:
-
-- The positive example incurs 3 × `PipeBarrier<PIPE_ALL>` synchronization overhead
-- L2Cache hit rate, although improved (0.94% vs 0.71%), remains low in absolute terms — this is inherent to the streaming access pattern of Add operations where data is read only once; cache hits only occur during recursive/repeated access
-- The MTE2 engine's own bandwidth ceiling is far below L2Cache theoretical bandwidth
-
-## Principle Illustration
-
-**Figure 1** Without L2 Cache Tiling (Negative Example)
-
-Data is partitioned per core, with each core transferring data via GM→L2Cache→UB. When the outer loop returns to the initial data, L2Cache holds the tail data and must reload from GM:
-
-```
-Core 0: [Tile0→Tile1→Tile0→Tile1]  ← On second access to Tile0, L2 already holds Tile1
-Core 1: [Tile0→Tile1→Tile0→Tile1]
- ...
-
-Timeline: Cores process independently → L2Cache frequent eviction → inefficient bandwidth
-```
-
-**Figure 2** With L2 Cache Tiling (Positive Example)
-
-Data is first tiled globally by L2Cache capacity. All cores collaboratively process the same tile, then move to the next:
-
-```
-Tile0: Core0|Core1|...|CoreN  → L2Cache fully holds Tile0 data
-Tile1: Core0|Core1|...|CoreN  → L2Cache fully holds Tile1 data
-
-Timeline: All cores synchronized → L2Cache efficiently utilized → improved bandwidth
-```
+The median `read_main_memory_datas(KB)` counter stays nearly flat, like the logical GM-to-UB traffic. With the current architecture and profiler semantics, this counter alone must not be used as proof that physical main-memory reads decreased. Attribute the result by first confirming logical-traffic fairness, then checking L2 read hit rate, MTE2 time, and task duration together. Profiler diagnostics show that this sample has low Vector compute utilization, so the observed benefit mainly comes from the load path and improved access locality.

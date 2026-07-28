@@ -18,34 +18,29 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-add_executable(demo_split
-    add_l2cache_split.asc
-)
-
-target_link_libraries(demo_split PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
-)
-
-target_compile_options(demo_split PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-)
-
 add_executable(demo_nosplit
     add_l2cache_nosplit.asc
 )
 
-target_link_libraries(demo_nosplit PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
+add_executable(demo_split
+    add_l2cache_split.asc
 )
 
-target_compile_options(demo_nosplit PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-)
+if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201" AND
+   NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+    message(FATAL_ERROR "Unsupported CMAKE_ASC_ARCHITECTURES=${CMAKE_ASC_ARCHITECTURES}")
+endif()
+
+foreach(target IN ITEMS demo_nosplit demo_split)
+    target_compile_options(${target} PRIVATE
+        $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    )
+
+    target_link_libraries(${target} PRIVATE
+        tiling_api
+        register
+        platform
+        m
+        dl
+    )
+endforeach()

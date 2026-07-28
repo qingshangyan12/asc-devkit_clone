@@ -2,363 +2,208 @@
 
 ## 概述
 
-本样例以向量加法为例，展示 **L2 Cache切分**（L2 Cache Tiling）策略对性能的影响。通过对比 **未开启切分（反例）** 与 **开启切分（正例）** 两种实现（假设，AI处理器的L2 Cache大小为192MB），展示当数据量超过L2 Cache容量时，L2 Cache切分策略如何提升数据搬运效率。
+本样例使用固定负载对比两种工作量完全相同、仅L2 Cache级循环顺序不同的实现：
 
-**核心差异**：
-- **反例（nosplit）**：按核数均匀切分数据，每个核处理固定大小的数据块。当总数据量超过L2 Cache大小时，各核访问数据L2 Cache命中率较低（Cache 中仅保留最近访问的数据，之前的数据被逐出（eviction）），导致后续访问时需要从GM重新加载，引发 Cache miss，成为性能瓶颈。
+- 反例round-first：`Round -> L2 Batch -> UB Tile`。
+- 正例L2-batch-first：`L2 Batch -> Round -> UB Tile`。
 
-**图1**  未开启L2 Cache切分<a name="fig126831114552"></a>
-![](../../../../../docs/zh/guide/figures/未使能L2-Cache切分.png "未开启L2-Cache切分")
+样例使用一份384MiB的GM数据，每轮在同一Buffer上原地执行`data = data + 1`。每个元素完成两轮计算后，最终结果为`input + 2`。两种实现的GM->UB搬运量、UB->GM搬运量、Adds计算量和全核同步次数相同，性能差异只来自访问顺序。
 
-- **正例（split）**：基于L2 Cache容量进行全局Tiling，将总数据切分为多个能完整放入L2 Cache的Tile，所有核先共同处理第一个Tile，再处理下一个Tile。使得数据复用时可直接从L2 Cache读取，提升带宽利用率。
+## 支持范围
 
-**图2**  开启L2 Cache切分<a name="fig1623673819553"></a>
-![](../../../../../docs/zh/guide/figures/使能L2-Cache切分.png "开启L2-Cache切分")
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：架构为dav-3510，CANN版本不低于9.1.0。
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：架构为dav-2201，CANN版本不低于9.0.0。
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：架构为dav-2201，CANN版本不低于9.0.0。
+<!-- end id3 -->
 
-## 本样例支持的产品及CANN软件版本
+## 目录结构
 
-| 产品 | CANN软件版本 |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
-
-## 目录结构介绍
-
-```
-├── add_l2_cache_split
-│   ├── CMakeLists.txt               // 编译工程文件
-│   ├── data_utils.h                 // 数据读入写出函数
-│   ├── l2_cache_optimizer.h         // L2 Cache切分优化器
-│   ├── add_l2cache_split.asc        // 正例：开启L2 Cache切分
-│   ├── add_l2cache_nosplit.asc      // 反例：未开启L2 Cache切分
-│   ├── scripts
-│   │   ├── gen_data.py              // 生成测试数据
-│   │   └── verify_result.py         // 验证计算结果
-│   ├── README.md                    // 样例说明文档（中文）
-│   └── README_en.md                 // 样例说明文档（英文）
+```text
+add_l2_cache_split/
+├── add_l2cache_nosplit.asc       // 反例Kernel入口和循环顺序
+├── add_l2cache_split.asc         // 正例Kernel入口和循环顺序
+├── l2_cache_kernel.h             // 固定负载和公共Device处理逻辑
+├── l2_cache_runner.h             // 公共Host运行逻辑
+├── data_utils.h                  // 二进制文件读写工具
+├── CMakeLists.txt                // 双目标编译工程文件
+├── scripts/
+│   └── gen_data.py               // 生成固定输入
+├── README.md                     // 中文说明
+└── README_en.md                  // 英文说明
 ```
 
-## 样例描述
+## 样例设计
 
-**样例功能**：
+### 固定负载
 
-  样例实现的是 `TOTAL_LEN = 40000000` 个half类型元素的向量加法。
+样例的`data`包含201326592个`half`元素，整份GM数据占384MiB。以100MiB作为单个L2 Batch的有效工作集阈值时，先向上取整得到4个L2 Batch，再将数据等分为每批96MiB。每个L2 Batch是`data`上一段连续且不重叠的索引范围，包含50331648个`half`元素：
 
-  Add的计算公式为：
-
-$$
-  z = x + y
-$$
-
-  - x：输入，长度为40000000，数据类型为half（40000000 × 2B = 80000000B，即 76.29MiB）。
-  - y：输入，长度为40000000，数据类型为half（40000000 × 2B = 80000000B，即 76.29MiB）。
-  - z：输出，长度为40000000，数据类型为half（40000000 × 2B = 80000000B，即 76.29MiB）。
-
-  三份数据总大小为 40000000 × 2B × 3 = 240000000B（即 228.88MiB），超过Atlas A2系列L2 Cache容量（192MiB），可采用L2 Cache切分策略进行性能优化。
-
-## 核心实现对比
-
-### 数据切分策略差异
-
-| 维度 | 反例（nosplit） | 正例（split） |
-|:---|:---|:---|
-| 切分方式 | 按核数均匀切分 | 按L2Cache容量做全局Tiling |
-| 数据视图 | 每个核独立处理整段数据的固定一段 | 所有20核协同处理同一Tile，按Tile分批 |
-| 数据总量感知 | 不感知L2Cache容量 | 通过 `L2CacheOptimizer` 感知L2Cache容量 |
-| 核利用率 | 20核全部工作 | 20核全部工作（每个Tile中均参与） |
-| L2Cache命中 | 所有核同时访问不重叠数据，总数据超出L2Cache → **Cache miss** | 每Tile 100MiB（由L2_TILE_THRESHOLD=100×1024²控制）放入L2Cache，下一轮访问命中 → **Cache hit** |
-| 单时刻L2Cache数据量 | 240000000B/228.88MiB（20核 × 40000000/20 × 3 × 2B） | 最大100MiB（由L2_TILE_THRESHOLD=100×1024²控制，1个Tile总数据量） |
-
-### 反例关键代码（add_l2cache_nosplit.asc）
-
-按核数均匀切分，每个核独立处理自己的固定数据块。核内再分 `TILE_NUM=2` 个子Tile交替处理，外层 `LOOP_COUNT=2` 重复处理同一数据。当回到首轮Tile时L2Cache中已被后续Tile数据替换，导致Cache miss：
-
-```cpp
-int64_t blockLen = Ceil(totalLen_, blockNum);
-int64_t blockOffset = curBlockIdx * blockLen;
-int64_t tileLen = Ceil(curBlockLen, TILE_NUM);
-
-for (int32_t i = 0; i < LOOP_COUNT; i++) {
-    for (int32_t j = 0; j < TILE_NUM; j++) {
-        // 第j个Tile的全局偏移
-        int64_t tileOffset = blockOffset + j * tileLen;
-        // 按MAX_DATA_COPY_LEN分块搬运 + 流水线计算
-        for (int64_t k = 0; k < totalBlocks; k++) {
-            DataCopy x, DataCopy y, Add, DataCopy z
-        }
-    }
-}
+```text
+l2BatchNum       = ceil(384MiB / 100MiB) = 4
+l2BatchBytes     = 384MiB / 4 = 96MiB
+l2BatchElements  = 96MiB / sizeof(half) = 50331648
 ```
 
-### 正例关键代码（add_l2cache_split.asc）
+两轮计算每轮都读取并写回整份384MiB数据，因此单次Kernel的逻辑GM->UB读量为768MiB，逻辑UB->GM写量也为768MiB。逻辑GM->UB读量不等于实际GM->L2读量：L2 Cache命中不访问主存储器，只有Cache Miss才会从主存储器取数并填充L2 Cache。
 
-通过 `L2CacheOptimizer` 根据L2Cache阈值将全局数据切分为多个Tile。**所有20核协同处理同一个Tile**，Tile内将数据按核数均分，处理完毕通过 `PipeBarrier` 同步后再进入下一Tile：
+B0至B3不是额外申请的Buffer，而是单个`data`上的四个连续索引区间。每轮都从当前区间搬入UB，完成`Adds`后写回同一GM地址。分批的唯一目的是将一次连续复用的数据范围控制在96MiB，不超过100MiB阈值。
 
-```cpp
-L2CacheOptimizer l2Opt(totalLen_, blockNum);
+一个L2 Batch包含3145728个32字节DataBlock。使用20个Vector Core时，前8个核各处理157287个DataBlock，即2516592个`half`元素；其余12个核各处理157286个DataBlock，即2516576个`half`元素。每核包含153个完整UB Tile和1个尾部UB Tile，完整Tile容量为16384个元素，尾部Tile分别处理9840或9824个元素。所有搬运长度均保持32字节对齐。
 
-for (int64_t tileIdx = 0; tileIdx < l2Opt.GetTileNum(); tileIdx++) {
-    int64_t tileLen = l2Opt.GetBlockLen(tileIdx);
-    int64_t tileOffset = l2Opt.GetBlockOffset(tileIdx);
+### 反例round-first
 
-    // 本Tile内，按核数均分数据
-    int64_t perCoreLen = Ceil(tileLen, blockNum);
-    int64_t coreStart = tileOffset + curBlockIdx * perCoreLen;
-    int64_t coreLen = min(perCoreLen, tileLen - curBlockIdx * perCoreLen);
+假设四个L2 Batch分别为B0至B3，反例执行顺序如下：
 
-    // 按MAX_DATA_COPY_LEN分块搬运 + 流水线计算
-    for (int64_t i = 0; i < totalBlocks; i++) {
-        DataCopy x, DataCopy y, Add, DataCopy z
-    }
-}
+```text
+Round 0: B0 -> B1 -> B2 -> B3
+Round 1: B0 -> B1 -> B2 -> B3
 ```
 
-### L2CacheOptimizer 切分逻辑
+Round 0处理B1至B3时，B0可能已被替换出L2 Cache。Round 1再次访问B0时，更可能需要从GM重新读取。
 
-> 注：`L2_TILE_THRESHOLD = 100 × 1024² = 100MiB` 是示例阈值，不同硬件L2Cache容量不同（如Atlas A2为192MiB，Ascend 950系列可能更大），使用者可根据目标硬件调整该值。阈值建议设置为略小于实际L2Cache容量，为其他数据留出余量。
+### 正例L2-batch-first
 
-```cpp
-constexpr int64_t L2_TILE_THRESHOLD = 100 * 1024 * 1024; // 100MiB阈值，不同硬件L2Cache大小不同，可根据实际情况调整
+正例只交换外层循环顺序：
 
-L2CacheOptimizer(int64_t totalLen, int64_t blockNum) {
-    int64_t totalByteSize = totalLen * sizeof(half) * 3;
-    if (totalByteSize <= L2_TILE_THRESHOLD) {
-        // 数据量在L2Cache内，不需切分
-        tileNum_ = blockNum_;
-    } else {
-        // 按L2Cache阈值切分为多个Tile
-        baseTileLen_ = L2_TILE_THRESHOLD / (3 * sizeof(half));
-        tileNum_ = Ceil(totalLen_, baseTileLen_);
-    }
-}
+```text
+Batch B0: Round 0 -> Round 1
+Batch B1: Round 0 -> Round 1
+Batch B2: Round 0 -> Round 1
+Batch B3: Round 0 -> Round 1
 ```
+
+同一批连续完成两轮计算，中间没有其他大数据批次插入，因此第2轮更有机会从L2 Cache读取第1轮结果。
+
+### 多核同步
+
+每个L2 Batch由20个Vector Core共同处理。每个L2 Batch与Round组合结束后调用软件`AscendC::SyncAll`，确保所有核完成当前阶段的UB->GM搬运后，再进入下一阶段。同步GM空间按每核32字节申请并初始化为0。
+
+## 测试用例
+
+只保留固定负载下的两个正反例：
+
+**表 1**  正反例测试用例
+
+| 用例 | 入口 | 循环结构 | 数据元素数 | 数据量 | 核数 | 批次数 | 轮数 |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 反例 | `l2_cache_nosplit` | Round优先 | 201326592 | 384MiB | 20 | 4 | 2 |
+| 正例 | `l2_cache_split` | L2 Batch优先 | 201326592 | 384MiB | 20 | 4 | 2 |
+
+两者均使用`input/input.bin`作为输入，并将计算结果写入`output/`目录。性能归因时，建议手动对比Profile中的`GM_to_UB_datas(KB)`，确认正反例逻辑GM->UB搬运量接近。
 
 ## 编译运行
 
-- 配置环境变量
+在本目录执行以下命令：
 
-  请根据当前环境上CANN开发套件包的安装方式配置环境变量。
-  ```bash
-  source ${install_path}/cann/set_env.sh
-  ```
+```bash
+python3 scripts/gen_data.py
 
-- 编译
+cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-2201
+cmake --build build -j
 
-  ```bash
-  mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..
-  make -j
-  ```
+./build/demo_nosplit
+./build/demo_split
+```
 
-  编译后将生成两个可执行文件：
-  - `demo_split`：正例，开启L2 Cache切分
-  - `demo_nosplit`：反例，未开启L2 Cache切分
+`demo_nosplit`和`demo_split`是两个独立进程，不需要使用`--mode`选择Kernel。
 
-  编译选项说明：
-
-  | 选项 | 可选值 | 说明 |
-  |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认） | 运行模式：NPU运行 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950 系列 |
-
-- 生成测试数据并运行
-
-  ```bash
-  python3 ../scripts/gen_data.py    # 生成测试输入数据
-  ./demo_split                      # 运行正例
-  ./demo_nosplit                    # 运行反例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # 验证精度
-  ```
+`CMAKE_ASC_ARCHITECTURES`支持`dav-2201`和`dav-3510`。实际运行时，编译架构需要与当前NPU架构一致。
 
 ## 性能采集与分析
 
-### 使用 msopprof 采集性能
+### 使用msopprof采集性能
+
+分别启动独立进程采集正反例，避免同一进程中前一个Kernel残留的Cache状态影响后一个Kernel：
 
 ```bash
-# 采集正例性能
-msopprof --output=./prof_split ./demo_split
+msopprof --output=./prof_384m_inplace_round_first_1 \
+  ./build/demo_nosplit
 
-# 采集反例性能
-msopprof --output=./prof_nosplit ./demo_nosplit
+msopprof --output=./prof_384m_inplace_l2_batch_first_1 \
+  ./build/demo_split
 ```
 
-采集后会在当前目录生成 `OPPROF_*` 目录，文件结构如下：
+正反例各采集5次时，每次使用新的输出目录，并交替安排正反例的采集顺序。例如，两个目录组分别使用`prof_384m_inplace_round_first_1`至`prof_384m_inplace_round_first_5`和`prof_384m_inplace_l2_batch_first_1`至`prof_384m_inplace_l2_batch_first_5`。
 
-```
+采集完成后，用户可手动打开各Profile目录下的`OPPROF_*`报告文件，对比`OpBasicInfo.csv`、`PipeUtilization.csv`、`L2Cache.csv`和`Memory.csv`中的关键指标。正反例目录按采集顺序配对，先确认`GM_to_UB_datas(KB)`总量接近，再对比L2 Cache命中率、MTE2耗时和`Task Duration(us)`。
+
+### Profile报告结构
+
+`msopprof`在输出目录下生成`OPPROF_*`报告，主要文件如下：
+
+```text
 OPPROF_<timestamp>/
-├── OpBasicInfo.csv              # 算子基本信息和Task Duration
-├── PipeUtilization.csv          # 各Pipeline单元耗时、占比、有效带宽（逐核）
-├── L2Cache.csv                  # L2Cache读写命中率（逐核）
-├── MemoryL0.csv                 # L0A/L0B/L0C读写带宽
-├── Memory.csv                   # UB、L1和主存储器读写带宽
-├── MemoryUB.csv                 # Vector和Scalar到UB的读写带宽
-├── ArithmeticUtilization.csv    # cube/vector指令cycle占比
-└── ResourceConflictRatio.csv    # UB bank group / bank conflict占比
+├── OpBasicInfo.csv               // Kernel基本信息和Task Duration
+├── PipeUtilization.csv           // 各流水耗时和有效带宽
+├── L2Cache.csv                   // L2 Cache读写命中率
+├── Memory.csv                    // GM与UB搬运量和有效带宽
+├── MemoryL0.csv                  // L0 Buffer带宽
+├── MemoryUB.csv                  // Unified Buffer带宽
+├── ArithmeticUtilization.csv     // 计算指令利用率
+└── ResourceConflictRatio.csv     // 资源冲突比例
 ```
 
 ### 性能指标说明
 
-本节性能数据分别在Atlas A2训练系列和Ascend 950系列产品上运行得到，CANN 版本为 CANN 9.1.0。关键指标定义如下：
+**表 2**  性能指标
 
-| 字段名 | 字段含义 | 来源文件 |
-|:---:|:---|:---|
-| Task Duration(μs) | Task整体耗时，包含调度和在加速器上的执行时间 | OpBasicInfo.csv |
-| aiv_time(μs) | Task在AI Vector Core上的执行时间 | PipeUtilization.csv |
-| aiv_mte2_time(μs) | mte2类型指令耗时（GM→UB数据搬运），反映数据读入效率 | PipeUtilization.csv |
-| aiv_mte2_ratio | mte2指令cycle数在aiv_total_cycles中的占比 | PipeUtilization.csv |
-| aiv_mte3_time(μs) | mte3类型指令耗时（UB→GM数据搬运），反映数据写出效率 | PipeUtilization.csv |
-| aiv_mte2_active_bw(GB/s) | mte2有效读写带宽，= 读数据量 / mte2耗时。带宽越高说明GM访问效率越高 | PipeUtilization.csv |
-| aiv_vec_time(μs) | vec类型指令耗时（向量计算） | PipeUtilization.csv |
-| aiv_write_hit_rate(%) | L2Cache写命中率 | L2Cache.csv |
-| aiv_read_hit_rate(%) | L2Cache读命中率 | L2Cache.csv |
-| aiv_gm_to_ub_bw(GB/s) | GM→UB平均有效带宽（3510平台mte2搬运效率指标） | Memory.csv |
-| GM_to_UB_datas(KB) | 每核GM→UB搬运数据量 | Memory.csv |
+| 字段名 | 含义 | 汇总方式 | 来源文件 |
+| --- | --- | --- | --- |
+| `Task Duration(us)` | Kernel任务整体耗时 | 取Kernel记录 | `OpBasicInfo.csv` |
+| `aiv_time(us)` | Vector Core执行耗时 | 取所有核最大值 | `PipeUtilization.csv` |
+| `aiv_mte2_time(us)` | MTE2搬入耗时 | 取所有核平均值 | `PipeUtilization.csv` |
+| `aiv_mte2_active_bw(GB/s)` | MTE2活跃期间有效带宽 | 取所有核平均值 | `PipeUtilization.csv` |
+| `aiv_gm_to_ub_bw(GB/s)` | GM->UB平均有效带宽 | 取所有核平均值 | `Memory.csv` |
+| `GM_to_UB_datas(KB)` | 逻辑GM->UB搬运量 | 对所有核求和 | `Memory.csv` |
+| `read_main_memory_datas(KB)` | 主存储器读取计数 | 对所有核求和 | `Memory.csv` |
+| `aiv_read_hit_rate(%)` | L2 Cache读命中率 | 取所有核平均值 | `L2Cache.csv` |
+| `aiv_write_hit_rate(%)` | L2 Cache写命中率 | 取所有核平均值 | `L2Cache.csv` |
+| `aiv_total_hit_rate(%)` | L2 Cache总命中率 | 取所有核平均值 | `L2Cache.csv` |
 
-### 实测性能数据（Atlas A2训练系列）
+`aiv_gm_to_ub_bw(GB/s)`是有效带宽，不是GM读取量。该值在优化后可能升高，不能将“带宽降低”作为优化预期。`read_main_memory_datas(KB)`的统计口径与架构和工具版本相关，需要与L2 Cache命中率、MTE2耗时共同分析。
 
-以下数据采集自 `PipeUtilization.csv`（20核逐核）与 `L2Cache.csv`，汇总后得到。
+### 384MiB负载实测结果
 
-**表1 整体性能汇总（OpBasicInfo + PipeUtilization）**
+原有Profile数据来自不同的数据量或双Buffer实现，不适用于当前单个Buffer、384MiB原地计算负载，不应混入新的性能结论。以下数据于2026-07-28基于当前样例重新采集，环境为CANN 9.1.0、`dav-2201`编译架构、20个Vector Core、NPU频率1650MHz。采集目录为`prof_384m_inplace_20260728_085319_round_first_1`至`prof_384m_inplace_20260728_085319_round_first_5`，以及`prof_384m_inplace_20260728_085319_batch_first_1`至`prof_384m_inplace_20260728_085319_batch_first_5`。
 
-| 指标 | 反例（nosplit） | 正例（split） | 加速比 |
-|:---|---:|---:|---:|
-| Task Duration(μs) | 415.1 | **224.6** | **1.85x** |
-| aiv_time(μs) | 402.9 | 215.2 | 1.87x |
-| aiv_mte2_time(μs) | 353.9 (87.9%) | 187.4 (87.1%) | **1.89x** |
-| aiv_mte3_time(μs) | 111.1 (27.6%) | 53.0 (24.6%) | **2.10x** |
-| aiv_vec_time(μs) | 41.2 (10.2%) | 20.6 (9.6%) | 2.00x |
+5组Profile的逻辑GM->UB搬运量差异均小于1%，满足A/B公平性要求。
 
-**表2 L2Cache命中率对比（L2Cache 逐核平均值）**
+**表 3**  逐组公平性和加速比
 
-| 指标 | 反例（nosplit） | 正例（split） |
-|:---|---:|---:|
-| aiv_write_hit_rate | 1.6% | **2.6%** |
-| aiv_read_hit_rate | 0.60% | **0.72%** |
-| aiv_total_hit_rate | 0.71% | **0.94%** |
-| 单时刻L2Cache工作集 | 240000000B/228.88MiB（20核 × 40000000/20 × 3 × 2B） | 最大100MiB（由L2_TILE_THRESHOLD=100×1024²控制，1个Tile总数据量） |
+| 组号 | 反例`Task Duration(us)` | 正例`Task Duration(us)` | 逻辑GM->UB差异 | 加速比 |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 1475.3495 | 1071.5614 | 0.0435% | 1.3768x |
+| 2 | 1468.6694 | 1056.6211 | 0.1516% | 1.3900x |
+| 3 | 1475.9095 | 1072.4814 | 0.0401% | 1.3762x |
+| 4 | 1470.4694 | 1054.2811 | 0.1670% | 1.3948x |
+| 5 | 1470.3694 | 1075.2015 | 0.0543% | 1.3675x |
 
-**表3 MTE2有效带宽逐核对比（PipeUtilization blk0）**
+**表 4**  中位数指标对比
 
-| 指标 | 反例（nosplit） | 正例（split） |
-|:---|---:|---:|
-| aiv_mte2_active_bw | 41.3 GB/s | **57.9 GB/s** |
-| aiv_mte2_time (blk0) | 361.2 μs | 128.8 μs |
-| aiv_mte2_ratio (blk0) | 89.0% | 84.8% |
+| 指标 | 反例round-first | 正例L2-batch-first | 变化 |
+| --- | ---: | ---: | ---: |
+| `Task Duration(us)` | 1470.4694 | 1071.5614 | 降低27.13% |
+| `aiv_time(us)` | 1470.2946 | 1071.1370 | 降低27.15% |
+| `aiv_mte2_time(us)` | 1333.5366 | 905.1114 | 降低32.13% |
+| `aiv_mte2_active_bw(GB/s)` | 28.2165 | 41.6265 | 提升47.53% |
+| `aiv_gm_to_ub_bw(GB/s)` | 25.6037 | 35.1896 | 提升37.44% |
+| `GM_to_UB_datas(KB)` | 789575.0000 | 790076.8750 | 提升0.06% |
+| `read_main_memory_datas(KB)` | 789592.5000 | 790121.2500 | 提升0.07% |
+| `aiv_read_hit_rate(%)` | 1.2606 | 48.7423 | 提升47.4817个百分点 |
+| `aiv_write_hit_rate(%)` | 99.9988 | 99.9451 | 降低0.0537个百分点 |
+| `aiv_total_hit_rate(%)` | 21.5098 | 59.2343 | 提升37.7245个百分点 |
 
-### 实测性能数据（Ascend 950系列）
+本轮实测结论是：正例没有减少逻辑GM->UB搬运量，而是通过同一L2 Batch连续完成两轮计算，提高第2轮读取时的L2 Cache命中概率。正例L2读命中率中位数从1.2606%提升到48.7423%，MTE2耗时中位数从1333.5366us降到905.1114us，`Task Duration(us)`中位数从1470.4694us降到1071.5614us，中位数加速比为1.3768x。
 
-以下数据采集自 Ascend 950 系列（dav-3510, 28核），CANN 版本为 CANN 9.1.0，使用 `msopprof` 采集并汇总得到。
+`read_main_memory_datas(KB)`中位数与逻辑GM->UB搬运量一样基本持平，在当前架构和工具统计口径下不能单独作为实际主存储器读量降低的判据。分析时应以逻辑搬运量公平性为前提，结合L2 Cache读命中率、MTE2耗时和整体任务耗时进行归因。Profiler诊断显示该样例Vector计算占比较低，主要收益来自数据搬入路径和访问局部性改善。
 
-> 注：3510 平台 msopprof 的 `PipeUtilization.csv` **不直接提供** `aiv_mte2_time` 和 `aiv_mte3_time` 字段，mte2/mte3 指标需从 `Memory.csv` 的 `aiv_gm_to_ub_bw`（GM→UB有效带宽）和 `aiv_mte2_ratio` 获取。
+## 验收标准
 
-**表1 整体性能汇总**
-
-| 指标 | 反例（nosplit） | 正例（split） | 加速比 | 数据来源 |
-|:---|---:|---:|---:|:---|
-| Task Duration(μs) | 309.1 | **149.3** | **2.07x** | OpBasicInfo.csv |
-| aiv_time(μs) | 300.0 | 145.7 | 2.06x | PipeUtilization.csv |
-| aiv_vec_time(μs) | 29.8 | 14.9 | 2.00x | PipeUtilization.csv |
-| aiv_gm_to_ub_bw(GB/s) | 35.6 | 36.6 | +3% | Memory.csv |
-| aiv_mte2_ratio | 88.3% | 87.8% | — | Memory.csv |
-| GM_to_UB_datas(KB/核) | 11193 | 5597 | — | Memory.csv |
-
-**表2 L2Cache命中率对比（逐核平均值）**
-
-| 指标 | 反例（nosplit） | 正例（split） | 数据来源 |
-|:---|---:|---:|:---|
-| aiv_write_hit_rate | 32.29% | 20.04% | L2Cache.csv |
-| aiv_read_hit_rate | ~0% | ~0% | L2Cache.csv |
-
-**表3 计算单元利用率（逐核平均值）**
-
-| 指标 | 反例（nosplit） | 正例（split） | 数据来源 |
-|:---|---:|---:|:---|
-| aiv_vec_ratio | 10.1% | 10.5% | ArithmeticUtilization.csv |
-
-**3510平台性能差异分析**
-
-**1. 数据搬运量与加速来源**
-
-nosplit 每核读入 11193KB（x+y 各占一半），split 每核读入 5597KB——恰好为前者一半。原因：nosplit 的 `LOOP_COUNT=2` 导致同一份数据被读入两次，而 split 每核只处理一轮。`aiv_gm_to_ub_bw`（有效带宽）两者几乎相同（~36 GB/s），说明带宽不是瓶颈——加速纯粹来自**搬运数据量减半**。
-
-**2. mte2 占比主导性**
-
-mte2 指令占比在 3510 上仍占绝对主导（nosplit 88.3%, split 87.8%），与 A2 平台趋势一致。Add 是 I/O-bound 操作，向量计算仅占 ~10%。
-
-**3. L2Cache 命中率解读差异**
-
-3510 的 `L2Cache.csv` 与 A2 格式不同，区分 close/far hit。read_hit_rate 为 ~0%，因为 Add 的流式访问每个地址只读一次，无复用；write_hit_rate（nosplit 32.29% > split 20.04%）看似反常——nosplit 写命中率更高却更慢。这是因为 LOOP_COUNT=2 重复写相同地址时 profiler 将其计为"命中"，但这些 hits 实际仍触发写分配（write-allocate），并未真正节省带宽。
-
-**4. 与 A2 平台对比**
-
-| 平台 | 核数 | Task Duration 提升 | gm_to_ub_bw 差异 |
-|------|------|-------------------|-------------------|
-| Atlas A2 (2201) | 20核 | 1.85x | +40%（41.3→57.9 GB/s） |
-| Ascend 950 (3510) | 28核 | 2.07x | +3%（35.6→36.6 GB/s） |
-
-在 A2 上 L2Cache 切分同时提升了有效带宽（表明数据能命中 L2Cache 通道），而在 3510 上带宽几乎不变——说明加速完全来自搬运量减半而非带宽变化。两种平台的加速路径不同，但最终结论一致：L2Cache 切分能有效减少不必要的数据搬运。
-
-### 性能差异分析
-
-**1. MTE2搬运效率是核心差异**
-
-反例中20个核各自处理独立数据，同时刻L2Cache工作集为240000000B（228.88MiB），超出192MiB容量，频繁触发Cache miss重读GM。正例将数据按L2Cache容量切为3个Tile，每Tile最大100MiB（1个Tile的x、y、z三份数据总大小 = L2_TILE_THRESHOLD），完整放入L2Cache：
-
-- 正例 L2Cache 命中率（0.94%）比反例（0.71%）高 32%
-- MTE2 有效带宽从 41.3 GB/s 提升至 57.9 GB/s（+40%）
-- MTE2 绝对耗时从 353.9 μs 降至 187.4 μs（-47%）
-
-**2. 正例三阶段逐Tile分解（PipeUtilization 逐核拆解）**
-
-| Tile | 数据范围 | per-core 数据量 | 单核 mte2 耗时 | 单核 aiv_time |
-|:---|---:|---:|---:|---:|
-| Tile 0 | [0, 17.5M) | 0.87M half | ~129 μs | ~152 μs |
-| Tile 1 | [17.5M, 34.9M) | 0.87M half | ~190 μs | ~215 μs |
-| Tile 2 | [34.9M, 40M) | 0.25M half | ~139 μs | ~163 μs |
-
-三个Tile之间通过 `PipeBarrier<PIPE_ALL>()` 同步后依次处理，所有20核均参与每个Tile。Tile 2 数据量较小但因同步开销，单核 aiv_time 仍约163 μs。总 aiv_time 取所有核中最慢核的累积时间（即约215 μs）。
-
-**3. 反例的 L2Cache Thrashing 机制**
-
-反例中 `LOOP_COUNT=2` 将同一份数据重复计算两次（模拟训练中 data reuse 场景）。每次迭代核内 `TILE_NUM=2` 交替处理前后两段数据：
-
-```
-第一轮: [Tile0 → Tile1]  → L2Cache 中最后缓存 Tile1
-第二轮: [Tile0 → Tile1]  → 回到 Tile0 时 L2Cache 中已是 Tile1，Cache miss
-```
-
-`PipeBarrier` 确保 tile 间同步后数据一致性正确，但第二轮中 Tile0 数据必须从 GM 重新加载。所有20核同时忙，造成 L2Cache Thrashing。
-
-**4. 理论加速来源**
-
-L2Cache 读写混合带宽约 7 TB/s，而 GM 带宽约 1.6 TB/s，相差约 4.4x。实测加速比 1.85x 低于理论值的原因：
-
-- 正例引入了 3 次 `PipeBarrier<PIPE_ALL>` 的同步开销
-- L2Cache 命中率虽有提升（0.94% vs 0.71%）但绝对值仍很低——这是 Add 操作"只读一次"的流式访问特征决定的，数据仅在递归/重复使用时才产生 Cache 命中
-- 正例的 MTE2 单元自身带宽上限远低于 L2Cache 理论带宽
-
-## 原理图示
-
-**图1** 未开启L2 Cache切分（反例）
-
-数据按核切分，各核从GM→L2Cache→UB搬运。当外层循环回到首轮数据时，L2Cache中缓存的是末尾数据，需从GM重新加载：
-
-```
-Core 0: [Tile0→Tile1→Tile0→Tile1]  ← Tile0第2次访问时L2中已是Tile1
-Core 1: [Tile0→Tile1→Tile0→Tile1]
- ...
-
-时间线: Core各自独立处理 → L2Cache频繁换入换出 → 带宽低效
-```
-
-**图2** 开启L2 Cache切分（正例）
-
-先按L2Cache容量切分为全局Tile，所有核协同处理同一Tile，处理完毕再进入下一Tile：
-
-```
-Tile0: Core0|Core1|...|CoreN  → L2Cache中全量持有Tile0数据
-Tile1: Core0|Core1|...|CoreN  → L2Cache中全量持有Tile1数据
-
-时间线: 所有核同步 → L2Cache高效利用 → 带宽提升
-```
+- `dav-2201`和`dav-3510`均编译通过。
+- 每组正反例Profile的`GM_to_UB_datas(KB)`差异不超过1%。
+- 正例的L2 Cache读命中率高于反例，MTE2耗时和`Task Duration(us)`低于反例。
