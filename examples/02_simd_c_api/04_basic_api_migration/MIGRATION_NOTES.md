@@ -5,6 +5,7 @@
 | 原基础 API 样例 | C API 样例 | 迁移方式 | API 证据 |
 | --- | --- | --- | --- |
 | `00_data_movement/copy_ub2ub` | `00_data_movement/copy_ub2ub` | 逐结果等价重写 | `asc_copy_gm2ub_sync`、`asc_copy_ub2ub_sync`、`asc_copy_ub2gm_sync` |
+| `00_data_movement/data_copy_gm2l1` | `00_data_movement/data_copy_gm2l1` | 直接 C API 重写 | `asc_copy_gm2l1_sync`、`asc_copy_l12ub_sync`、`asc_copy_ub2gm_sync` |
 | `00_data_movement/data_copy_gm2ub_nddma` | `00_data_movement/data_copy_gm2ub_nddma` | 直接 C API 重写（二维固定值 Padding） | `asc_set_ndim_loop{0..4}_stride`、`asc_set_ndim_pad_value`、`asc_set_ndim_pad_count`、`asc_ndim_copy_gm2ub` |
 | `00_data_movement/reg_auxscalar` | `00_data_movement/reg_auxscalar` | 直接 C API Reg 重写 | `asc_load`、`asc_add_scalar`、`asc_store`、`asc_create_mask_b16` |
 | `01_memory_vector_compute/element_wise_arithmetic` | `01_memory_vector_compute/element_wise_arithmetic` | 功能等价重写 | `asc_copy_gm2ub_sync`、`asc_copy_ub2gm_sync`、`asc_sync_pipe` |
@@ -24,6 +25,8 @@
 | `asc_copy_gm2ub_sync` | `docs/zh/api/SIMD-API/C-API/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md` | `include/c_api/vector_datamove/vector_datamove.h` | `(__ubuf__ void*, __gm__ void*, uint32_t)` | `dav-3510`，half | 大小和起始地址按 32 字节对齐。 |
 | `asc_copy_ub2gm_sync` | `docs/zh/api/SIMD-API/C-API/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md` | `include/c_api/vector_datamove/vector_datamove.h` | `(__gm__ void*, __ubuf__ void*, uint32_t)` | `dav-3510`，half | 大小和起始地址按 32 字节对齐。 |
 | `asc_copy_ub2ub_sync` | `docs/zh/api/SIMD-API/C-API/vector_datamove/asc_copy_ub2ub.md` | `include/c_api/vector_datamove/vector_datamove.h` | `(__ubuf__ void*, __ubuf__ void*, uint32_t)` 和 `(uint16_t, uint16_t, uint16_t, uint16_t)` | `dav-3510`，int32 | 前 n 个数据搬运大小按 32 字节对齐；二维形式的长度、间隔单位为 32 字节 DataBlock。 |
+| `asc_copy_gm2l1_sync` | `docs/zh/api/SIMD-API/C-API/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_3510.md` | `include/c_api/cube_datamove/cube_datamove.h` | `(__cbuf__ void*, __gm__ void*, uint32_t)` | `dav-3510`，half | 连续搬运大小为 1024 字节，满足 32 字节 DataBlock 对齐。 |
+| `asc_copy_l12ub_sync` | `docs/zh/api/SIMD-API/C-API/cube_datamove/asc_copy_l12ub.md` | `include/c_api/cube_datamove/cube_datamove.h` | `(__ubuf__ void*, __cbuf__ void*, bool, uint16_t, uint16_t, uint16_t, uint16_t)` | `dav-3510`，half | 该接口跨 Cube/Vector 核，kernel 入口不使用 `__cube__` 或 `__vector__` 修饰。 |
 | `asc_ndim_copy_gm2ub` | `docs/zh/api/SIMD-API/C-API/vector_datamove/asc_ndim_copy_gm2ub.md` | `include/c_api/vector_datamove/vector_datamove.h` | `(__ubuf__ float*, __gm__ float*, 5 个 loop size, loop0 padding, mode, L2 mode)` | `dav-3510`，float | 维度 stride 和第 1 至 4 维 padding 必须先经对应 setter 写入。 |
 | `asc_sync_notify` / `asc_sync_wait` | `docs/zh/api/SIMD-API/C-API/sync/asc_sync_notify.md`、`asc_sync_wait.md` | `include/c_api/sync/sync.h` | `(PIPE_MTE2, PIPE_MTE3, EVENT_ID0)` | `dav-3510` | 使 UB→GM 搬运等待多维 GM→UB 搬运完成。 |
 | `asc_load` / `asc_store` | `docs/zh/api/SIMD-API/C-API/reg/reg_load/asc_load.md`、`reg_store/asc_store.md` | `include/c_api/reg_compute/reg_load.h`、`reg_store.h` | `vector_half` 与 `__ubuf__ half*` | `dav-3510`，half | 每次搬运 VL 个元素；连续搬运需要手动更新地址。 |

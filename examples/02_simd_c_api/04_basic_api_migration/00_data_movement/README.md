@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | `copy_ub2ub` | 已迁移 | C API 连续与二维 UB 搬运。 |
 | `data_copy_gm2ub_nddma` | 部分迁移 | 已迁移可由 C API 文档直接核对的二维固定值 Padding。 |
-| `data_copy_gm2l1` | 已有等价样例 | 见仓内 `examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_gm2l1`；后续纳入本迁移目录。 |
+| `data_copy_gm2l1` | 已迁移 | 使用 C API 的 GM→L1、L1→UB 与 UB→GM 通路，提供可回写观察的最小端到端样例。 |
 | `data_copy_l0c2gm` | 已有等价样例 | 见仓内 `examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm`；后续纳入本迁移目录。 |
 | `data_copy_ub2l1` | 已有等价样例 | 见仓内 `examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1`；后续纳入本迁移目录。 |
 | `data_copy_gm2ub_slice` | 待迁移 | 需要核对基础 `SliceInfo` 到 C API ndim 配置的映射。 |
