@@ -7,7 +7,6 @@
 ## 函数原型
 
 ```
-<a id="istrans"></a>
 int32_t SetAType(TPosition pos, CubeFormat type, DataType dataType, bool isTrans = false)
 ```
 
