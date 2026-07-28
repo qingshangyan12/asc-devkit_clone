@@ -23,7 +23,14 @@
 namespace AscendC {
 namespace Te {
 
+/**
+ * @brief Default trait provider for matrix multiply-accumulate operations.
+ */
 struct MmadTraitDefault;
+
+/**
+ * @brief Matrix multiply-accumulate operation executed by the Cube unit.
+ */
 struct MmadOperation;
 
 } // namespace Te
