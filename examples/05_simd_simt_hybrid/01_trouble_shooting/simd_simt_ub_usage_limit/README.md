@@ -1,4 +1,4 @@
-# SIMD&SIMT混合编程UB使用上限样例
+# SIMD与SIMT混合编程UB使用上限样例
 
 ## 概述
 
@@ -13,24 +13,25 @@
 
 这 4 组探针的实测方法、命令和输出记录在下面的《实测结论与定位方法》章节中，均可在样例目录下按文中给出的命令直接复现。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- > CANN 9.0.0
+| 产品 | CANN软件版本 |
+| ---- | ------------ |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
 ```text
 ├── simd_simt_ub_usage_limit
-│   ├── CMakeLists.txt       // 编译工程文件
-│   ├── ub_usage_limit.asc   // Ascend C样例实现
-│   └── README.md
+│   ├── CMakeLists.txt         // 编译工程文件
+│   ├── ub_usage_limit.asc     // Ascend C样例实现和调用样例
+│   ├── README.md              // 中文说明
+│   └── README_en.md           // 英文说明
 ```
 
-## UB容量口径
+## 样例描述
+
+### UB容量口径
 
 在混合编程场景中，SIMD/MainScalar、SIMD VF 和 SIMT VF 访问的是同一块 UB，需要按同一资源池统一计算容量。样例使用以下口径说明容量边界：
 
@@ -79,11 +80,11 @@ Case4DynamicUbKernel<<<blockNum, case4DynamicUbBytes, stream>>>(outputDevice + R
 
 Case 5 不是一个默认运行的正向 case，而是内置的一个可控越界探针 `case5_probe`（见下方实测 3），Host 侧固定配置 4KB 动态 UB，通过命令行参数控制 SIMT VF 实际访问的越界字数，在真实 NPU 上逐步逼近失败边界。完整的定位步骤、命令和输出见下方实测 3。
 
-## 实测结论与定位方法
+### 实测结论与定位方法
 
 以下 4 组实测均基于同一份 `ub_usage_limit.asc`，通过 CMake 编译期开关或运行时命令行参数控制探针行为，在 Ascend 950PR（`dav-3510`）真实硬件上执行，所有命令均可直接复现。
 
-### 实测 1：无 SIMT VF 时，SIMD 能否用满 256KB 静态 UB
+#### 实测 1：无 SIMT VF 时，SIMD 能否用满 256KB 静态 UB
 
 **结论：不能一概而论——取决于 kernel 内是否发生过 `asc_vf_call`。**
 
@@ -92,7 +93,7 @@ Case 5 不是一个默认运行的正向 case，而是内置的一个可控越�
 
 也就是说，README 顶部 UB 容量口径表中"无 SIMT VF 时用户可用空间 = 248KB”这一行，严格来说只在"kernel 内调用过 VF 函数”的前提下成立；如果 kernel 完全不使用 VF 编程模型，248KB 这个上限是保守估计，实测可以逼近 256KB。
 
-#### 复现步骤
+##### 复现步骤
 
 `ub_usage_limit.asc` 中的 `Case1Probe1Kernel`（需要 `ENABLE_UB_PROBE1=ON` 才会参与编译）支持两种模式，通过 CMake 选项 `UB_PROBE1_NO_VF` 切换：
 
@@ -158,7 +159,7 @@ cmake --build build_probe1
 
 即：完全不使用 VF 编程模型时，静态 UB 边界精确落在 `256KB - 32B(MainScalar本地result数组)` = 262112 字节，8KB 预留空间**没有**被扣除。
 
-#### 关于 `--cce-disable-vf-stack-reserved-ubuf` 的说明（已知限制）
+##### 关于 `--cce-disable-vf-stack-reserved-ubuf` 的说明（已知限制）
 
 devkit 文档中提到可以通过 bisheng 编译选项 `--cce-disable-vf-stack-reserved-ubuf` 主动关闭 8KB VF 栈预留空间，把它当作普通 UB 使用（但用户需自行保证不发生寄存器 spill）。本样例尝试通过 CMake 选项 `UB_PROBE1_DISABLE_RESERVED` 传递该编译选项进行实测，但在当前 CANN 9.0.0 环境下编译报错：
 
@@ -168,7 +169,7 @@ bisheng: error: unsupported option '--cce-disable-vf-stack-reserved-ubuf'
 
 排查过 `bisheng --help`、`bisheng --help-hidden`，以及对 CANN 9.0.0/9.1.0 两个版本的 `bisheng`/`ccec` 二进制做过字符串搜索，均未找到该选项的实现，只找到一个不相关的 `-cce-vf-stack-size=` 选项。因此该选项**在当前实测环境下不可用**，`UB_PROBE1_DISABLE_RESERVED` 这个 CMake 开关目前只是占位，打开后编译会直接失败，请勿在当前工具链版本下依赖该选项。
 
-### 实测 2：SIMT VF 和 SIMD VF 都有静态 UB 时，动态 UB 上限是否等于 `216KB - 静态1 - 静态2`
+#### 实测 2：SIMT VF 和 SIMD VF 都有静态 UB 时，动态 UB 上限是否等于 `216KB - 静态1 - 静态2`
 
 **结论：公式成立，但"静态1 + 静态2”必须把 MainScalar 自身的静态 UB 一起算进去，否则会高估。**
 
@@ -181,7 +182,7 @@ bisheng: error: unsupported option '--cce-disable-vf-stack-reserved-ubuf'
 
 预测公式：`216KB(USER_UB_BYTES_WITH_SIMT) - 128KB(两个VF静态UB) - 96B(MainScalar本地静态) = 90016 字节`。
 
-#### 复现步骤
+##### 复现步骤
 
 ```bash
 source ${install_path}/cann/set_env.sh
@@ -210,13 +211,13 @@ cmake -S . -B build && cmake --build build
 
 注意 `predicted_max_dynamic_bytes` 输出的 90112 是代码里只按"两个 VF 静态UB”算出来的粗略预测值（`216KB - 128KB`），并未扣掉 MainScalar 本地的 96 字节；实测边界恰好落在 `90112 - 96 = 90016`，与"总UB - 静态1 - 静态2 - MainScalar本地静态”精确吻合，比"总UB - 静态1 - 静态2”更准确。这证明动态 UB 上限确实是对同一块 UB 资源池做减法，但减去的静态部分必须覆盖**所有**执行空间（SIMT VF、SIMD VF、MainScalar），不能只统计两个 VF。
 
-### 实测 3：动态 UB 越界到不同程度，是静默通过还是触发 aicore 运行时错误
+#### 实测 3：动态 UB 越界到不同程度，是静默通过还是触发 aicore 运行时错误
 
 **结论：两者都会发生，且边界不是"整 8KB”这种可预测的整数，不能凭直觉估算，只能用同样的方法逐步实测。**
 
 `Case5OobProbeKernel` 固定 Host 侧配置 4096 字节（1024 word）动态 UB，通过运行时参数 `actualAccessWords` 控制 SIMT VF 实际写入的字数（可以远超过配置值）。
 
-#### 复现步骤（二分定位过程）
+##### 复现步骤（二分定位过程）
 
 ```bash
 source ${install_path}/cann/set_env.sh
@@ -266,13 +267,13 @@ words=3097 bytes=12388 -> [Case5Probe][RuntimeError] aclrtSynchronizeStream repo
 
 即：Host 侧配置 4096 字节动态 UB，实际访问 12384 字节（超出配置值 8288 字节）仍能静默运行；一旦超出 12388 字节（超出配置值 8292 字节），立即触发 `aclrtGetLastError`/`aclrtSynchronizeStream` 可捕获的 aicore 运行时错误。
 
-#### 结论解读
+##### 结论解读
 
 - 越界量在大致 8KB（8192 字节）附近仍会被静默容忍，这与理论口径中"8KB 系统预留空间”紧邻在动态 UB 之后的布局是吻合的：越界写入先落入这段预留区域，暂时不会破坏 SIMT 自身在 Data Cache 中的运行状态，因此不报错，但数据已经被覆盖，属于"静默的算子精度问题”。
 - 实测边界（8288~8292 字节）比 8192 字节整数略大一些，说明真实边界还受编译器对 `extern __ubuf__` 动态数组的对齐/布局细节影响，并非一个用户可以精确计算的公开常量。
 - **最重要的结论是：不能假设"越界在 8KB 以内就是安全的”。** 该边界依赖具体 kernel 的静态 UB 布局、VF 调用方式等实现细节，换一个 kernel（比如实测1、实测2中的 kernel）这个具体数字会变化。唯一可靠的做法是让实际访问范围严格不超过启动时配置的动态 UB 大小，任何越界都应被视为未定义行为，即使当前某次运行没有报错，也不能保证在其它编译版本、其它输入规模下同样"安全”。
 
-#### 通用定位步骤（可用于排查真实越界问题）
+##### 通用定位步骤（可用于排查真实越界问题）
 
 1. 先确认现象：如果算子输出数据异常但没有报错日志，先怀疑静默越界；如果 `aclrtSynchronizeStream`/`aclrtGetLastError` 返回非 0（如 `107000`），说明越界已经严重到触发了 aicore 运行时校验。**注意 `aclrtSynchronizeStream` 单独调用可能不够**：某些越界是在 kernel 启动（`<<<...>>>`）时就被校验拦截的，必须在启动语句之后立即调用 `aclrtGetLastError(ACL_RT_THREAD_LEVEL)` 才能捕获，否则会把失败误判为成功（本样例在开发过程中就实际踩过这个坑，`aclrtSynchronizeStream` 返回 0 但 stderr 已经打印了 `[ERROR] [Bisheng] Launch kernel failure! ret 107000`）。
 2. 统计该 kernel 里 MainScalar、SIMD VF、SIMT VF 中所有静态 UB 声明的字节数，以及 `<<<...>>>` 启动参数里配置的动态 UB 字节数。
@@ -281,13 +282,13 @@ words=3097 bytes=12388 -> [Case5Probe][RuntimeError] aclrtSynchronizeStream repo
 5. 如果怀疑越界但没有报错，参照本样例 `case5_probe` 的做法：固定配置一个较小的动态 UB，通过一个可控的运行时参数逐步增大实际访问范围（可用二分法），观察 `aclrtGetLastError` 何时由 0 变为非 0，从而定位真实的失败边界，而不是依赖理论公式直接下结论。
 6. 修复方式是让实际访问范围严格落在已申请/已配置的 UB 范围内；存在 SIMT VF 时还需保证 Data Cache 剩余空间不低于 32KB，不应该通过压缩预留空间的方式换取用户 UB。
 
-### 实测 4：`GetCoreMemSize(CoreMemType::UB)` 在无 VF / 有 SIMD VF / 有 SIMT VF 场景下获取到的分别是什么
+#### 实测 4：`GetCoreMemSize(CoreMemType::UB)` 在无 VF / 有 SIMD VF / 有 SIMT VF 场景下获取到的分别是什么
 
 **结论：`GetCoreMemSize(CoreMemType::UB, ...)` 是 Host 侧对当前 SoC 的静态硬件规格查询，不感知也不跟随某一次 kernel launch 里是否调用了 VF、调用的是 SIMT VF 还是 SIMD VF——无论运行哪个 kernel、运行前还是运行后查询，返回值都是同一个常量。**
 
 `GetCoreMemSize` 的实现（`impl/utils/tiling/platform/platform_ascendc.cpp`）直接读取 `PlatformInfoManager` 缓存的当前 SoC 平台信息表里的 `LocalMemSize(UB)`，只在两种情况下会减去额外字节：SoC 是 `Ascend910B`（本样例目标架构 `dav-3510`/Ascend950PR 不属于这一分支）时减去 256 字节 KFC 保留区；以及用户显式调用过 `ReserveLocalMemory(ReservedSize)` 时减去对应字节（`reservedMemSize_` 默认为 0，本样例未调用该接口）。也就是说这个接口读到的是"平台侧登记的 UB 物理容量表项"，和某次 kernel 里 Device 侧代码到底有没有调用 `asc_vf_call`、调用的是 `__simt_vf__` 还是 `__simd_vf__` 完全无关——它不是一个运行期按 kernel 实际占用回填的值。
 
-#### 复现步骤
+##### 复现步骤
 
 `ub_usage_limit.asc` 新增的 `platform_query` 模式依次执行：查询一次 `GetCoreMemSize(CoreMemType::UB)` → 运行不调用任何 VF 的 `Case1NoSimtVfKernel` → 再查询一次 → 运行调用 SIMT VF 的 `Case2WithSimtVfKernel` → 再查询一次 → 运行同时调用 SIMT VF 和 SIMD VF 静态内存的 `Case3StaticUbInVfKernel` → 再查询一次，对比 4 次查询结果是否发生变化。该模式复用默认 build，不需要额外 CMake 选项，但依赖 `target_link_libraries(ub_usage_limit PRIVATE m platform tiling_api dl)` 把 `platform`/`tiling_api` 库链接进可执行文件（否则会报 `undefined symbol: platform_ascendc::PlatformAscendCManager::...`）。
 
@@ -308,7 +309,7 @@ cmake -S . -B build && cmake --build build
 
 四次查询结果完全一致，均为 253952 字节（= 256KB - 8KB - 32B），与运行过哪个 kernel、kernel 内是否调用 VF、调用的是 SIMT VF 还是 SIMD VF 无关，证实了上面的结论。
 
-#### 结论解读
+##### 结论解读
 
 - 253952 字节恰好等于实测 1 中"kernel 内调用过 VF 函数"分支下的静态 UB 边界（`256KB - 8KB(预留) - 32B(MainScalar本地result数组)`），这是因为本样例的 Host 侧代码始终在同一个进程里、针对同一张 `PlatformInfoManager` 平台信息表发起查询，而这张表在进程启动时基于当前 SoC 型号一次性加载，之后不会因为某次 kernel 调用而改变。**不要把 `GetCoreMemSize` 的返回值理解为"这次 kernel 实际可用的 UB"**：它给出的是当前 SoC 型号下 UB 这块资源的登记容量（已经减去了平台侧统一维护的固定预留，但没有减去 32KB Data Cache 保留、也没有减去任何 kernel 自身的静态/动态 UB 占用）。
 - 是否存在 SIMT VF、是否调用了 `asc_vf_call`、静态 UB 声明了多大，这些都是 Device 侧编译期/kernel 级别的信息，`GetCoreMemSize` 这个 Host 侧接口在设计上就没有入参能表达"某个具体 kernel"，因此它不可能，也不应该被期望随 kernel 形态变化。真正需要按 kernel 形态区分预留（比如是否需要额外扣 32KB Data Cache）的场景，要按本 README《UB 容量口径》一节里的公式手动计算，`GetCoreMemSize` 只能提供公式里"总 UB"这一项的起点。
@@ -316,24 +317,43 @@ cmake -S . -B build && cmake --build build
 
 ## 编译运行
 
-### 默认4个正向case
+在本样例根目录下执行如下步骤，编译并运行样例。
 
-在样例目录下执行：
+- 配置环境变量
 
-```bash
-source ${install_path}/cann/set_env.sh
-cmake -S . -B build
-cmake --build build
-./build/ub_usage_limit
-```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
-默认输出包含 4 个 case 的 `used_bytes`、`limit_bytes` 和校验状态。所有 case 均输出 `PASSED` 且最终出现如下信息时，表示样例运行通过：
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-```text
-[Success] All UB usage limit cases are verification passed.
-```
+  > **说明：** `${install_path}`为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`下。
 
-### 实测探针（非默认路径，用于复现上文4组实测）
+- 样例执行
+
+  在本样例目录下执行如下命令：
+
+  ```bash
+  cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-3510
+  cmake --build build -j
+  ./build/ub_usage_limit
+  ```
+
+  默认输出包含4个case的`used_bytes`、`limit_bytes`和校验状态。所有case均输出`PASSED`且最终出现如下信息时，表示样例运行通过：
+
+  ```text
+  [Success] All UB usage limit cases are verification passed.
+  ```
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  | ---- | ------ | ---- |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：Ascend 950PR/Ascend 950DT |
+
+### 实测探针
+
+以下探针为非默认运行路径，用于复现上文4组实测：
 
 ```bash
 # 实测1：需要单独打开CMake选项后重新编译，见"实测1"章节的具体命令
