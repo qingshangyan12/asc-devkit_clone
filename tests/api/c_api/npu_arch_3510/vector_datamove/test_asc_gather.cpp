@@ -103,6 +103,16 @@ protected:
     void SetUp() {}
     void TearDown() {}
 };
+class TestCApiVectorDataMoveAscGatherInt8 : public testing::Test {
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
+class TestCApiVectorDataMoveAscGatherUint8 : public testing::Test {
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
 
 namespace {
 void vgather2_hifloat8_stub(
@@ -129,18 +139,6 @@ TEST_F(TestCApiVectorDataMoveAscGatherHifloat8, vgather2_Succ)
         .will(invoke(vgather2_hifloat8_stub));
 
     asc_gather(dst, src, index, mask);
-    GlobalMockObject::verify();
-}
-
-TEST_F(TestCApiVectorDataMoveAscGatherHifloat8, vselr_Succ)
-{
-    vector_hifloat8_t src;
-    vector_hifloat8_t dst;
-    vector_uint8_t index;
-
-    MOCKER_CPP(vselr, void(vector_uint8_t&, vector_uint8_t, vector_uint8_t)).times(1).will(invoke(vselr_hifloat8_stub));
-
-    asc_gather(dst, src, index);
     GlobalMockObject::verify();
 }
 
@@ -171,5 +169,17 @@ TEST_F(TestCApiVectorDataMoveAscGatherUint8, vgather2_Succ)
         .will(invoke(vgather2_uint8_stub));
 
     asc_gather(dst, src, index, mask);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestCApiVectorDataMoveAscGatherHifloat8, vselr_Succ)
+{
+    vector_hifloat8_t src;
+    vector_hifloat8_t dst;
+    vector_uint8_t index;
+
+    MOCKER_CPP(vselr, void(vector_uint8_t&, vector_uint8_t, vector_uint8_t)).times(1).will(invoke(vselr_hifloat8_stub));
+
+    asc_gather(dst, src, index);
     GlobalMockObject::verify();
 }
