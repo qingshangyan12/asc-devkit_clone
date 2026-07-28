@@ -61,10 +61,6 @@ __simd_callee__ inline void asc_int322int64_v2(vector_int64_t& dst, vector_int32
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 mask未筛选的元素在输出中置零。
@@ -72,10 +68,16 @@ mask未筛选的元素在输出中置零。
 ## 调用示例
 
 ```cpp
-vector_int64_t dst;
-vector_int32_t src;
-vector_bool mask;
-mask = asc_create_mask_b32(PAT_ALL);
-asc_int322int64(dst, src, mask);    // 将src的上半部分转换成vector_int64_t类型并写入dst
-asc_int322int64_v2(dst, src, mask);    // 将src的下半部分转换成vector_int64_t类型并写入dst
+__simd_vf__ inline void int322int64_vf(__ubuf__ int32_t* srcAddr, __ubuf__ int64_t* dstAddr, uint32_t count, uint16_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+{
+    vector_int32_t src;
+    vector_int64_t dst;
+    vector_bool mask;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b32(count);
+        asc_loadalign_postupdate(src, srcAddr, one_repeat_size);
+        asc_int322int64(dst, src, mask);
+        asc_storealign_pack_postupdate(dstAddr, dst, one_block_size, mask);
+    }
+}
 ```

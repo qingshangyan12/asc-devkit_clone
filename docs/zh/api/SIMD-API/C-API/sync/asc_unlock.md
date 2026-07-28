@@ -99,9 +99,115 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-//buffer标号为1
-uint8_t mutex_id = 1;
-//等待PIPE_S中所有前置指令完成后释放标号为1的Mutex
-asc_lock(PIPE_S, mutex_id);
-asc_unlock(PIPE_S, mutex_id); 
+__simd_vf__ inline void add_vf(__ubuf__ half* src0Addr, __ubuf__ half* src1Addr, __ubuf__ half* dstAddr,
+                               uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+{
+    vector_half src0, src1, dst;
+    vector_bool mask;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b16(count);
+        asc_loadalign_postupdate(src0, src0Addr, one_repeat_size);
+        asc_loadalign_postupdate(src1, src1Addr, one_repeat_size);
+        asc_add(dst, src0, src1, mask);
+        asc_storealign_postupdate(dstAddr, dst, one_repeat_size, mask);
+    }
+}
+
+__aicore__ inline void add_kernel(__gm__ half* x_gm, __gm__ half* y_gm, __gm__ half* z_gm)
+{
+    __ubuf__ half x_local[256];
+    __ubuf__ half y_local[256];
+    __ubuf__ half z_local[256];
+    uint8_t mutex_id = 1;
+
+    // 1. PIPE_MTE2流水线：数据从GM搬入UB
+    asc_lock(PIPE_MTE2, mutex_id);
+    asc_copy_gm2ub_align(x_local, x_gm, 256 * sizeof(half));
+    asc_copy_gm2ub_align(y_local, y_gm, 256 * sizeof(half));
+    // 数据搬入完成后释放mutex_id，使后续相同mutex_id的asc_lock不再阻塞
+    asc_unlock(PIPE_MTE2, mutex_id);
+
+    // 2. PIPE_V流水线：矢量计算（asc_lock阻塞，等待上方PIPE_MTE2的asc_unlock执行完成）
+    asc_lock(PIPE_V, mutex_id);
+    uint32_t count = 256;
+    add_vf(x_local, y_local, z_local, count, 128, 2);
+    // 计算完成后释放mutex_id，使后续PIPE_MTE3的asc_lock不再阻塞
+    asc_unlock(PIPE_V, mutex_id);
+
+    // 3. PIPE_MTE3流水线：数据从UB搬出至GM
+    asc_lock(PIPE_MTE3, mutex_id);
+    asc_copy_ub2gm_align(z_gm, z_local, 256 * sizeof(half));
+    asc_unlock(PIPE_MTE3, mutex_id);
+}
+```
+
+上述示例的流水线时序如下，三条流水线严格串行执行：
+
+```
+MTE2: |==搬入==|
+V:              |==计算==|
+MTE3:                   |==搬出==|
+```
+
+### 多重循环场景：双 buffer 流水线
+
+当多轮循环中需要相邻轮次的 MTE2（搬入）与 MTE3（搬出）并行执行时，可使用**两个 mutex_id 交替**配合**双 buffer**。`asc_unlock` 释放 mutex_id 后，下一轮使用不同 mutex_id 的 `asc_lock` 不会阻塞，从而允许相邻轮次的搬运与计算重叠执行。
+
+```cpp
+__simd_vf__ inline void add_vf(__ubuf__ half* src0Addr, __ubuf__ half* src1Addr, __ubuf__ half* dstAddr,
+                               uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+{
+    vector_half src0, src1, dst;
+    vector_bool mask;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b16(count);
+        asc_loadalign_postupdate(src0, src0Addr, one_repeat_size);
+        asc_loadalign_postupdate(src1, src1Addr, one_repeat_size);
+        asc_add(dst, src0, src1, mask);
+        asc_storealign_postupdate(dstAddr, dst, one_repeat_size, mask);
+    }
+}
+
+__aicore__ inline void add_kernel(__gm__ half* x_gm, __gm__ half* y_gm, __gm__ half* z_gm)
+{
+    // 双 buffer：buf0 和 buf1 交替使用
+    __ubuf__ half x_buf[2][256];
+    __ubuf__ half y_buf[2][256];
+    __ubuf__ half z_buf[2][256];
+
+    for (uint32_t i = 0; i < TILE_NUM; i++) {
+        // 交替使用 mutex_id 0 和 1
+        uint8_t mutex_id = i % 2;
+        uint32_t offset = i * 256;
+
+        // 1. PIPE_MTE2流水线：数据从GM搬入UB buf[mutex_id]
+        asc_lock(PIPE_MTE2, mutex_id);
+        asc_copy_gm2ub_align(x_buf[mutex_id], x_gm + offset, 256 * sizeof(half));
+        asc_copy_gm2ub_align(y_buf[mutex_id], y_gm + offset, 256 * sizeof(half));
+        // 释放 mutex_id，使本轮 PIPE_V 的 asc_lock 不再阻塞
+        asc_unlock(PIPE_MTE2, mutex_id);
+
+        // 2. PIPE_V流水线：矢量计算
+        asc_lock(PIPE_V, mutex_id);
+        uint32_t count = 256;
+        add_vf(x_buf[mutex_id], y_buf[mutex_id], z_buf[mutex_id], count, 128, 2);
+        // 释放 mutex_id，使本轮 PIPE_MTE3 的 asc_lock 不再阻塞
+        asc_unlock(PIPE_V, mutex_id);
+
+        // 3. PIPE_MTE3流水线：数据从UB搬出至GM
+        // 释放 mutex_id 后，下一轮使用不同 mutex_id 的 asc_lock 不会阻塞
+        // 因此下一轮的 MTE2 可与本轮 MTE3 并行执行
+        asc_lock(PIPE_MTE3, mutex_id);
+        asc_copy_ub2gm_align(z_gm + offset, z_buf[mutex_id], 256 * sizeof(half));
+        asc_unlock(PIPE_MTE3, mutex_id);
+    }
+}
+```
+
+上述示例的流水线时序如下，相邻轮次的 MTE2 与 MTE3 可并行执行：
+
+```
+MTE2: |==id0==|        |==id1==|        |==id0==|        |==id1==|
+V:          |==id0==|        |==id1==|        |==id0==|        |==id1==|
+MTE3:            |==id0==|        |==id1==|        |==id0==|        |==id1==|
 ```
