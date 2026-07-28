@@ -23,7 +23,7 @@
 
 ```
 template <class... Args>
-__aicore__ inline void printf( const __gm__ char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf( const __gm__ char* fmt, Args&&... args)
 ```
 
 以下接口为simd\_vf中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
