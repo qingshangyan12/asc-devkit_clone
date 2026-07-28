@@ -959,6 +959,6 @@
 | 基础API > 归约计算 | ReduceRepeat、ReduceDataBlock、ReducePairElem |
 | 基础API > 数据填充 | Duplicate |
 | 基础API > Kernel-Tiling | GET_TILING_DATA、GET_TILING_DATA_WITH_STRUCT、GET_TILING_DATA_MEMBER |
-| Utils API > 调测接口（SIMD VF） | printf、asc_dump_reg、asc_dump、asc_dump_ubuf |
+| Utils API > 调测接口（SIMD VF） | asc_dump_reg、asc_dump、asc_dump_ubuf |
 | 高阶API | AscendAntiQuant、AdjustSoftMaxRes、TopK |
 <!-- end id6 -->

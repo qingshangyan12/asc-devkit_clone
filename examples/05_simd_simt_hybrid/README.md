@@ -31,7 +31,6 @@ SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，�
 | sanitizer | 展示如何使用Sanitizer定位内存越界、非法访问等问题，适用于混合编程调试阶段的问题排查。样例链接：[sanitizer](../01_simd_cpp_api/01_utilities/05_sanitizer)。 | - |
 | simulator | 展示如何使用Simulator在仿真模式下进行功能调试和基础性能数据采集。样例链接：[simulator](../01_simd_cpp_api/01_utilities/08_simulator)。 | - |
 | printf（核函数） | 展示如何在SIMD编程样例的核函数入口中使用`AscendC::printf`打印调试信息。样例链接：[printf（核函数）](../01_simd_cpp_api/01_utilities/00_printf/simple_printf)。 | - |
-| printf（SIMD VF函数） | 展示如何在SIMD VF函数中使用`printf`打印不同类型数据、指针信息和计算结果。样例链接：[printf（SIMD VF函数）](../01_simd_cpp_api/01_utilities/00_printf/simd_vf_printf)。 | - |
 | printf（SIMT VF函数） | 展示如何在SIMT VF中打印调试信息。样例链接：[printf（SIMT VF函数）](../03_simt_api/01_utilities/00_printf)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
 | assert（核函数） | 展示如何在SIMD编程样例的核函数入口中使用`ascendc_assert`进行断言检查。样例链接：[assert（核函数）](../01_simd_cpp_api/01_utilities/01_assert)。 | - |
 | assert（SIMT VF函数） | 展示如何在SIMT VF中进行断言检查。样例链接：[assert（SIMT VF函数）](../03_simt_api/01_utilities/01_assert)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
