@@ -15,6 +15,8 @@
 04_basic_api_migration/
 ├── 01_memory_vector_compute/
 │   └── element_wise_arithmetic/  # LeakyReLU
+├── 02_reg_vector_compute/
+│   └── vf_add/                   # dav-3510 VF Reg Add
 ├── 00_data_movement/
 │   └── copy_ub2ub/               # UB 内数据搬运
 │   └── data_copy_gm2l1/           # GM→L1、矩阵乘、Bias 与向量量化

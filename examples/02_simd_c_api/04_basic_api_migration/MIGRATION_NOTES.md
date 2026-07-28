@@ -9,6 +9,7 @@
 | `00_data_movement/data_copy_gm2ub_nddma` | `00_data_movement/data_copy_gm2ub_nddma` | 直接 C API 重写（二维固定值 Padding） | `asc_set_ndim_loop{0..4}_stride`、`asc_set_ndim_pad_value`、`asc_set_ndim_pad_count`、`asc_ndim_copy_gm2ub` |
 | `00_data_movement/reg_auxscalar` | `00_data_movement/reg_auxscalar` | 直接 C API Reg 重写 | `asc_load`、`asc_add_scalar`、`asc_store`、`asc_create_mask_b16` |
 | `01_memory_vector_compute/element_wise_arithmetic` | `01_memory_vector_compute/element_wise_arithmetic` | 功能等价重写 | `asc_copy_gm2ub_sync`、`asc_copy_ub2gm_sync`、`asc_sync_pipe` |
+| `04_memory_management/tensor_allocation`（场景4） | `02_reg_vector_compute/vf_add` | VF Add场景等价重写 | `asc_get_vf_len`、`asc_create_mask_b32`、`asc_load`、`asc_add`、`asc_store`、`asc_copy_gm2ub_sync`、`asc_copy_ub2gm_sync` |
 
 ## 不确定项与处理
 
@@ -18,6 +19,7 @@
 | C++ 管线/对象类接口 | `TensorAPI`、`TPipe`、`TQue`、`TBufPool`、`ListTensorDesc`、`DataCopyPad`、`CrossCoreWaitFlag` 等未找到 C API 等价文档。 | 对涉及这些接口的原样例按功能而非对象模型重写；每个样例会单独补充映射说明。 |
 | `data_copy_gm2ub_nddma` 的其余四个场景 | 原样例还包括最近值 Padding、转置、广播和切片。`asc_ndim_copy_gm2ub` 文档包含这些模式，但原 `NdDmaLoopInfo` 字段到 C API 五维 stride/padding 寄存器的精确映射未在文档中给出。 | 先迁移文档可直接核对的二维固定值 Padding 场景；其余四个场景保留为待映射项，不猜测寄存器参数。 |
 | `data_copy_gm2l1` 的 Bias 到 BTable 参数 | C API 文档和 `03_c_api/03_matrix_compute/mmad/mmad_s1.h` 均使用`asc_copy_l12bt`的16B目标地址单位；原基础 API 通过`SplitBias`隐式管理该布局。 | Bias样例固定使用BTable地址0，按32B DataBlock计算并传入1024B Bias；该换算已静态核对，未在当前机器执行。 |
+| `tensor_allocation` 场景4的 `asc_vf_call<AddVF>` | C API未提供基础 API `asc_vf_call` 的直接等价封装；C API Reg接口声明为`__simd_callee__`，现有C API Add样例直接从`__simd_vf__`辅助函数调用。 | 在`vf_add`中保留`__simd_vf__`分层，直接顺序调用`asc_load`、`asc_add`、`asc_store`。`dav-3510`的VL为256B，1024个float正好是16个VL，不需尾块掩码。 |
 
 ## API 证据日志
 
@@ -35,3 +37,5 @@
 | `asc_add_scalar` | `docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_add_scalar.md` | `include/c_api/reg_compute/reg_vector.h` | `(vector_half&, vector_half, half, vector_bool)` | `dav-3510`，half | mask 未覆盖的输出元素归零。 |
 | `asc_create_mask_b16` / `asc_get_vf_len` | `docs/zh/api/SIMD-API/C-API/reg/reg_data_types/asc_create_mask.md`、`sys_var/asc_get_vf_len.md` | `include/c_api/reg_compute/reg_vector.h`、`sys_var/sys_var.h` | `PAT_ALL`，运行时 VL 查询 | `dav-3510`，half | b16 全掩码覆盖一个 VL；本样例长度为 VL 的整倍数。 |
 | `asc_sync_pipe` | `docs/zh/api/SIMD-API/C-API/sync/asc_sync_pipe.md` | `include/c_api/sync/sync.h` | `(PIPE_ALL)` | `dav-3510` | `PIPE_ALL` 会等待全部流水，仅用作核结束收敛。 |
+| `asc_load` / `asc_add` / `asc_store` | `docs/zh/api/SIMD-API/C-API/reg/reg_load/asc_load.md`、`reg/arithmetic_compute/asc_add.md`、`reg/reg_store/asc_store.md` | `include/c_api/reg_compute/reg_load.h`、`reg_vector.h`、`reg_store.h` | `vector_float`与`__ubuf__ float*` | `dav-3510`，float | 每轮处理一个VL；Add使用b32全掩码；样例长度1024能被float VL整除。 |
+| `asc_create_mask_b32` / `asc_get_vf_len` | `docs/zh/api/SIMD-API/C-API/reg/reg_data_types/asc_create_mask.md`、`sys_var/asc_get_vf_len.md` | `include/c_api/reg_compute/reg_vector.h`、`sys_var/sys_var.h` | `PAT_ALL`、无参数 | `dav-3510`，float | `asc_get_vf_len()`为256B，float VL为64元素。 |
