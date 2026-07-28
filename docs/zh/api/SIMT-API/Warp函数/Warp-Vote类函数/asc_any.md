@@ -80,7 +80,7 @@ inline int32_t asc_any(int32_t predicate)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void SimtAny(
+    __simt_vf__ __launch_bounds__(1024) inline void KernelAny(
         __gm__ const int32_t* input, __gm__ int32_t* output, uint64_t total_length)
     {
         // asc_vf_call参数：dim3{1024, 1, 1}

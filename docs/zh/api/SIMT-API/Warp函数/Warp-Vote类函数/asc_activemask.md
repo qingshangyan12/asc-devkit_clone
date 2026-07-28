@@ -78,7 +78,7 @@ inline uint32_t asc_activemask()
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void SimtActiveMask(
+    __simt_vf__ __launch_bounds__(1024) inline void KernelActiveMask(
         __gm__ uint32_t* active_masks, uint64_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

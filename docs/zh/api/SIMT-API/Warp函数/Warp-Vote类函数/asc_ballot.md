@@ -85,7 +85,7 @@ inline uint32_t asc_ballot(int32_t predicate)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void SimtBallot(
+    __simt_vf__ __launch_bounds__(1024) inline void KernelBallot(
         __gm__ const float* input, __gm__ uint32_t* selected_mask, uint64_t total_length, float threshold)
     {
         // asc_vf_call参数：dim3{1024, 1, 1}
