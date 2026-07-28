@@ -25,7 +25,6 @@
 02_simd_c_api/00_introduction/00_quickstart/hello_world_npu
 02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add
 05_simd_simt_hybrid/02_best_practices/simd_simt_matrix_transpose
-01_simd_cpp_api/01_utilities/00_printf/simd_vf_printf
 01_simd_cpp_api/03_basic_api/05_sync_control/group_barrier
 01_simd_cpp_api/03_basic_api/02_reg_vector_compute/mergemode
 01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2ub_nddma
@@ -142,7 +141,6 @@
 01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub
 01_simd_cpp_api/03_basic_api/05_sync_control/cross_core_set_wait_flag
 01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz
-01_simd_cpp_api/01_utilities/02_dump/simd_vf_dump
 01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_tensor_api
 01_simd_cpp_api/01_utilities/00_printf/simple_printf
 01_simd_cpp_api/03_basic_api/04_memory_management/list_tensor_desc_input
