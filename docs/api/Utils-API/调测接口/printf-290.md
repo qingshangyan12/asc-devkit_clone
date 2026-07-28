@@ -26,13 +26,6 @@ template <class... Args>
 __aicore__ inline void printf( const __gm__ char* fmt, Args&&... args)
 ```
 
-以下接口为simd\_vf中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
-
-```
-template <class... Args>
-__simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
-```
-
 以下接口为SIMT中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
 
 ```
@@ -69,15 +62,6 @@ static __attribute__((noinline)) void printf(const char* fmt, Args&&... args)
 -   SIMT中printf功能需要占用额外的Global Memory空间用于数据缓存，缓存空间大小默认为2MB。您可以通过[aclInit接口](https://hiascend.com/document/redirect/CannCommunityruntimeapiaclinit)中的"simt\_printf\_fifo\_size"字段进行配置，配置范围为`[1MB,64MB]`。当打印数据量较大时，建议增加缓存空间。
 -   SIMT中使用printf接口会增加算子运行时间，请控制打印数据量，避免算子超时。建议在代码中判断线程ID，仅在部分线程中打印调试信息，减少重复内容的打印，更有利于调试。
 -   SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过[aclInit接口](https://hiascend.com/document/redirect/CannCommunityruntimeapiaclinit)中的"simd\_printf\_fifo\_size\_per\_core"字段进行配置，配置范围为`[1KB,64MB]`。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
--   由于在simd vf中不能直接访问gm地址，因此使用simd vf中的printf时，需要先定义一个ubuf的字符串，该字符串即为原来的fmt变量。
-
-    ```cpp
-    __ubuf__ const char* fmt = "simd vf: int=%d, uint=%u, float=%f, string=%s\n";
-    ```
-
--   在`simd_vf`场景下，每个AIV核在单次`asc_vf_call`执行期间最多能使用2KB的UB空间；同一次`asc_vf_call`中的所有`simd_vf`的`printf`和`asc_dump`调用共享该预留空间。
--   每次调用`simd_vf`的`printf`时，除格式字符串和参数外，还会固定占用32字节；整条打印数据需要按8字节对齐。
--   `simd_vf`调测接口不会检查上述预留空间是否越界。超过限制可能越界写入预留空间，导致打印结果异常，并可能影响算子执行。
 
 ## 需要包含的头文件
 
@@ -120,28 +104,6 @@ NPU模式下，程序运行时打印效果如下：
 [AIV Block 3/8] hello world device
 [AIV Block 3/8] fmt string int: 291
 [AIV Block 3/8] fmt string float: 3.140000
-......
-```
-
-## SIMD VF调用示例
-
-```cpp
-#include "kernel_operator.h"
-#include "utils/debug/asc_printf.h"
-
-__simd_vf__ inline void SimdVfPrint()
-{
-    __ubuf__ const char* fmt = "simd vf: int=%d, uint=%u, float=%f, string=%s\n";
-    printf(fmt, 1, 2U, 5.0f, "AscendC");
-}
-```
-
-NPU模式下，程序运行时打印效果如下：
-
-```
-simd vf: int=1, uint=2, float=5.000000, string=AscendC
-simd vf: int=1, uint=2, float=5.000000, string=AscendC
-simd vf: int=1, uint=2, float=5.000000, string=AscendC
 ......
 ```
 
