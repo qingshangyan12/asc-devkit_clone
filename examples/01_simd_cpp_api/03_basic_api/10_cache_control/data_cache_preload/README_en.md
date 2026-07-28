@@ -123,7 +123,7 @@ $$
   - Consecutive calls should not exceed 4, otherwise the Reservation Station may stall
   - Preload is an async instruction that can overlap with subsequent computation/memory access
 
-## Performance Observation
+## Performance Data and Analysis
 
 When profiling with `msprof`, compare the execution time of the two kernels:
 - `kernel_no_preload`: High DCache miss rate, large Scalar read latency
@@ -133,13 +133,12 @@ When profiling with `msprof`, compare the execution time of the two kernels:
 
 The following performance data is the average of 5 independent runs to eliminate random fluctuations.
 
-#### Atlas A2/A3 Series Products (dav-2201 Architecture)
+#### Atlas A2 Training Series Products (dav-2201 Architecture)
 
 | Metric | kernel_no_preload | kernel_with_preload | Improvement |
 |------|------------------|---------------------|---------|
 | **Task Duration (us)** | 31.237 | 19.840 | **1.57x speedup** |
 | **aiv_scalar_time (us)** | 29.254 | 17.748 | **Reduced by 39.3%** |
-| **aiv_scalar_ratio** | 95.2% | 91.9% | Scalar remains the main bottleneck |
 
 #### Ascend 950 Series Products (dav-3510 Architecture)
 
@@ -147,14 +146,12 @@ The following performance data is the average of 5 independent runs to eliminate
 |------|------------------|---------------------|---------|
 | **Task Duration (us)** | 31.018 | 20.445 | **1.52x speedup** |
 | **aiv_scalar_time (us)** | 28.344 | 17.910 | **Reduced by 36.8%** |
-| **aiv_scalar_ratio** | 94.3% | 91.9% | Scalar remains the main bottleneck |
 
 > **Metric Descriptions:**
 > - **Task Duration**: End-to-end kernel execution time, the most direct performance indicator
 > - **aiv_scalar_time**: Scalar unit execution time; in indirect index scenarios, Scalar memory access is the main bottleneck
-> - **aiv_scalar_ratio**: Percentage of Scalar time in total time, used to identify performance bottlenecks
 
-#### Detailed Data from 5 Independent Runs (Atlas A2/A3 Series)
+#### Detailed Data from 5 Independent Runs (Atlas A2 Training Series)
 
 | Run | no_preload Duration(us) | with_preload Duration(us) | Speedup |
 |---------|------------------------|--------------------------|--------|
@@ -178,7 +175,7 @@ The following performance data is the average of 5 independent runs to eliminate
 
 ### Conclusion
 
-**DataCachePreload demonstrates significant optimization on both Atlas A2/A3 series and Ascend 950 series products**, with `kernel_with_preload` showing substantially lower Task Duration and aiv_scalar_time compared to `kernel_no_preload`. In indirect index (random-hopping) scenarios, preloading the next round's data into DCache via DataCachePreload **effectively hides Scalar memory access latency, achieving approximately 1.57x performance improvement on Atlas A2/A3 and 1.52x on Ascend 950**.
+**DataCachePreload demonstrates significant optimization in indirect index (random-hopping) scenarios**. By proactively loading the next round's data into DCache, **Scalar memory access latency is effectively hidden, achieving approximately 1.5x performance improvement**.
 
 ## Compilation and Execution
 
