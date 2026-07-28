@@ -37,9 +37,11 @@ namespace AscendC {
  *          3) Launch comm tasks asynchronously through the corresponding interface,
  *             and the server starts assembling and launching comm tasks as soon as it listens.
  *          4) If commit is false when launching task, call the Commit interface to notify the execution of the
- * corresponding comm task. 5) Call the Drain interface (blocking) to wait for the server to complete the corresponding
- * comm task.
- * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
+ *             corresponding comm task.
+ *          5) Call the Drain interface (blocking) to wait for the server to complete the corresponding comm task.
+ *          6) For UBC_CTP, call FlushChannel on every channel whose state needs to be visible in GM.
+ * @tparam commProtocol: The communication protocol to use. COMM_PROTOCOL_UBC_CTP (implemented through URMA) is used
+ *                       by default.
  */
 template <CommProtocol commProtocol = COMM_PROTOCOL_UBC_CTP>
 class Hcomm {
@@ -185,6 +187,18 @@ public:
      */
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Drain(ChannelHandle channel);
+
+    /*!
+     * @brief Flush the SQ/CQ head and tail counters of a channel from the current AI Core's Data Cache to GM.
+     * @param [in] channel: The handle of the communication channel.
+     * @return 0 indicates success and -1 indicates failure.
+     * @note This interface is supported only by COMM_PROTOCOL_UBC_CTP on Ascend 950.
+     *       It must be called on the same AI Core that updated the channel, after the last operation (including Drain)
+     *       that changes the channel counters. In a multi-channel scenario, call it once for every updated channel.
+     *       A channel must not be updated concurrently by multiple AI Cores. This interface neither submits
+     *       communication tasks nor waits for their completion.
+     */
+    __aicore__ inline int32_t FlushChannel(ChannelHandle channel);
 
 private:
     HcommImpl<commProtocol> impl_;

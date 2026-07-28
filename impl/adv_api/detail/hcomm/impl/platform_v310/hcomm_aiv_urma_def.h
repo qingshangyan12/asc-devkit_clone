@@ -29,9 +29,15 @@ namespace AscendC {
 
 constexpr uint32_t HCOMM_URMA_MAX_RETRY_TIMES = 1000000;
 constexpr uint32_t HCOMM_URMA_DEFAULT_QP_IDX = 0;
-constexpr uint32_t HCOMM_URMA_TMP_BUF_SIZE = 512;
 constexpr uint32_t HCOMM_URMA_WQE_U32_NUM = 32;
 constexpr uint32_t HCOMM_URMA_CQE_U32_NUM = 16;
+constexpr uint32_t HCOMM_URMA_BATCH_WQE_NUM = 256;
+constexpr uint32_t HCOMM_URMA_WRITE_WQE_BYTES = 64;
+constexpr uint32_t HCOMM_URMA_WRITE_WQE_U32_NUM =
+    HCOMM_URMA_WRITE_WQE_BYTES / sizeof(uint32_t);
+constexpr uint32_t HCOMM_URMA_TMP_BUF_SIZE =
+    (HCOMM_URMA_WQE_U32_NUM + HCOMM_URMA_CQE_U32_NUM +
+        HCOMM_URMA_BATCH_WQE_NUM * HCOMM_URMA_WRITE_WQE_U32_NUM) * sizeof(uint32_t);
 
 template <typename T>
 struct UdmaParams {
@@ -89,6 +95,7 @@ public:
     __aicore__ inline int32_t Commit(ChannelHandle channel);
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Drain(ChannelHandle channel);
+    __aicore__ inline int32_t FlushChannel(ChannelHandle channel);
 
 private:
     template <
@@ -98,12 +105,14 @@ private:
         ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr = nullptr,
         const UdmaParams<T>& params = UdmaParams<T>{});
     __aicore__ inline void PollCqWhenSqOverflow(
-        ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead);
+        ChannelHandle channel, const CqContext& cqCtx, uint32_t sqHead);
     __aicore__ inline uint32_t PollCq(ChannelHandle channel, uint32_t expectTail);
 
 private:
     LocalTensor<uint32_t> wqeItem_;
     LocalTensor<uint32_t> cqeItem_;
+    LocalTensor<uint32_t> wqeStage_;
+    uint32_t pendingWqeCount_;
 };
 } // namespace AscendC
 
