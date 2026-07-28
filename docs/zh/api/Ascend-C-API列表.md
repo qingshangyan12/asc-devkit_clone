@@ -6,6 +6,8 @@ Ascend C提供了一套层次化的API体系，涵盖了从底层C扩展到高�
 
 下表展示了Ascend C API的总体分类，帮助开发者根据编程模型和功能需求快速定位所需API。
 
+**表 1**  Ascend C API分类
+
 | API一级分类 | API二级分类 | 分类说明 |
 | --- | --- | --- |
 | [SIMD API](SIMD-API/基础API/基础API列表.md) | [基础API](SIMD-API/基础API/基础API.md) | 实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。标注为ISASI（Instruction Set Architecture Special Interface，硬件体系结构相关的接口）类别的API，不能保证跨硬件版本兼容。 |
