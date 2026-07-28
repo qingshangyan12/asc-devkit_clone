@@ -60,28 +60,33 @@ inline int32_t asc_all(int32_t predicate)
 
 ## 调用示例
 
+以下样例比较两组输入数据，并由Lane 0写出当前Warp负责的数据是否全部相等。
+
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelAll(const int32_t* input, int32_t* output, uint64_t total_length)
+    __global__ __launch_bounds__(1024) void KernelAll(
+        const int32_t* lhs, const int32_t* rhs, int32_t* equal_flags, uint64_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         if (idx >= total_length) {
             return;
         }
 
-        if (!asc_all(input[idx] > 0)) {
-            return; // Warp内存在非正数，所有活跃线程统一退出。
+        uint32_t lane_id = threadIdx.x % warpSize;
+        uint32_t warp_id = idx / warpSize;
+        int32_t all_equal = asc_all(lhs[idx] == rhs[idx]);
+        if (lane_id == 0) {
+            equal_flags[warp_id] = all_equal;
         }
-        output[idx] = input[idx];
     }
     ```
 
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void SimtAll(
-        __gm__ const int32_t* input, __gm__ int32_t* output, uint64_t total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelAll(
+        __gm__ const int32_t* lhs, __gm__ const int32_t* rhs, __gm__ int32_t* equal_flags, uint64_t total_length)
     {
         // asc_vf_call参数：dim3{1024, 1, 1}
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -89,9 +94,11 @@ inline int32_t asc_all(int32_t predicate)
             return;
         }
 
-        if (!asc_all(input[idx] > 0)) {
-            return; // Warp内存在非正数，所有活跃线程统一退出。
+        uint32_t lane_id = threadIdx.x % warpSize;
+        uint32_t warp_id = idx / warpSize;
+        int32_t all_equal = asc_all(lhs[idx] == rhs[idx]);
+        if (lane_id == 0) {
+            equal_flags[warp_id] = all_equal;
         }
-        output[idx] = input[idx];
     }
     ```
