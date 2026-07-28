@@ -25,7 +25,7 @@ SIMT编程方式下subbank冲突主要有以下几种：
 
 【反例】矩阵转置使用UB做中转，转置读阶段产生较严重bank冲突。
 
-```
+```cpp
 constexpr int TILE_DIM = 32;
 
 __global__ void transpose_coalesced_kernel(float *output, const float *input, int width, int height)
@@ -61,7 +61,7 @@ __global__ void transpose_coalesced_kernel(float *output, const float *input, in
 
 【正例】为UB tile增加padding，打散列方向访问的bank分布。
 
-```
+```cpp
 constexpr int TILE_DIM = 32;
 
 __global__ void transpose_avoid_bank_conflicts_kernel(float *output, const float *input, int width, int height)
