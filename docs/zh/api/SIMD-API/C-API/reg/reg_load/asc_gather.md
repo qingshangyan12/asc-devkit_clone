@@ -41,8 +41,8 @@
 - 收集UB中的元素
 
     ```cpp
-    __simd_callee__ inline void asc_gather(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
+    __simd_callee__ inline void asc_gather(vector_int16_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
+    __simd_callee__ inline void asc_gather(vector_uint16_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
     __simd_callee__ inline void asc_gather(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask)
     __simd_callee__ inline void asc_gather(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask)
     __simd_callee__ inline void asc_gather(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
@@ -114,7 +114,11 @@
 
     - 对于mask筛选需要搬运的元素，对应的地址需要在UB有效范围内；对于mask未筛选的元素，对应的地址不会触发任何地址越界异常，同时dst中对应的元素将被置零。
 
-    - 当src的数据类型和index的数据类型不一致时，UB中的元素保存在目的操作数的偶数索引位置，奇数索引位置自动补0。
+    - 当src的数据类型为b8数据类型，dst为b16数据类型，这种情况下目的操作数的低8位与源操作数相同，高8位自动补0。例如src为int8_t数据类型：
+
+        40 = 0b00101000 -> 0b0000000000101000,扩充至16位后等于40；
+
+        -40 = 0b11011000 -> 0b0000000011011000，扩充至16位后等于216。
 
 - 收集矢量数据寄存器中的元素
 
@@ -132,9 +136,9 @@
         vector_bool mask;
         for (uint16_t i = 0; i < repeat_time; ++i) {
             mask = asc_update_mask_b16(count);
-            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_loadalign(index, index_addr, one_repeat_size);
             asc_gather(dst, src_addr, index, mask);
-            asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
+            asc_storealign(dst_addr, dst, one_block_size, mask);
         }
     }
     ```
@@ -150,10 +154,10 @@
         vector_bool mask;
         for (uint16_t i = 0; i < repeat_time; ++i) {
             mask = asc_update_mask_b16(count);
-            asc_loadalign_postupdate(src, src_addr, one_repeat_size);
-            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_loadalign(src, src_addr, one_repeat_size);
+            asc_loadalign(index, index_addr, one_repeat_size);
             asc_gather(dst, src, index);
-            asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
+            asc_storealign(dst_addr, dst, one_block_size, mask);
         }
     }
     ```

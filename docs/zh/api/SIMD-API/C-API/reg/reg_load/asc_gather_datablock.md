@@ -86,7 +86,7 @@
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| index | 输入 | 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。单位是字节，每个DataBlock的源地址为index + src。 |
+| index | 输入 | 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**单位是字节，每个DataBlock的源地址为index + src。** |
 | mask | 输入 | 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
@@ -113,9 +113,9 @@
         vector_bool mask;
         for (uint16_t i = 0; i < repeat_time; ++i) {
             mask = asc_update_mask_b8(count);
-            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_loadalign(index, index_addr, one_repeat_size);
             asc_gather_datablock(dst, src_addr, index, mask);
-            asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
+            asc_storealign(dst_addr, dst, one_block_size, mask);
         }
     }
     ```
@@ -128,9 +128,9 @@
         vector_bool mask;
         for (uint16_t i = 0; i < repeat_time; ++i) {
             mask = asc_update_mask_b8(count);
-            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_loadalign(index, index_addr, one_repeat_size);
             asc_gather_datablock(dst, src_addr, index);
-            asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
+            asc_storealign(dst_addr, dst, one_block_size, mask);
         }
     }
     ```

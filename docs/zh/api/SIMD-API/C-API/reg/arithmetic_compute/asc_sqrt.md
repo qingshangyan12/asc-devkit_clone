@@ -63,7 +63,7 @@ __simd_callee__ inline void asc_sqrt(vector_float& dst, vector_float src, vector
 ## 约束说明
 
 - mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
-- 输入为负数时结果为NaN。
+- 输入为负数时结果为nan。
 - 输入为-0时结果为-0。
 
 ## 调用示例
@@ -76,9 +76,9 @@ __simd_vf__ inline void sqrt_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src, src_addr, one_repeat_size);
+        asc_loadalign(src, src_addr, one_repeat_size);
         asc_sqrt(dst, src, mask);
-        asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
+        asc_storealign(dst_addr, dst, one_block_size, mask);
     }
 }
 ```
