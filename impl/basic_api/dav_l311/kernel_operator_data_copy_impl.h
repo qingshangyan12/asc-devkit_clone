@@ -399,7 +399,8 @@ __aicore__ inline void DataCopyL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const D
 
 template <typename T>
 __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
-    __gm__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t high, uint16_t width, uint16_t srcNStride, uint16_t dstDStride)
+    __gm__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t high, uint16_t width, uint16_t srcNStride, uint16_t dstDStride,
+    const uint8_t cacheMode = 0)
 {
     (void)cacheMode;
     const uint16_t highBlock = MAX_REPEAT_TIMES;
