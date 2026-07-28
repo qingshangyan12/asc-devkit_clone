@@ -42,7 +42,7 @@ AI CPU启动下发通信任务前，需获取固定的通信配置，如[表1](#
 | reserved | 预留字段，不需要配置。 |
 | groupName | 当前通信任务所在的通信域。char *类型，支持最大长度128。 |
 | algConfig | 通信算法配置。char *类型，支持最大长度128。<br><br>当前支持的取值为：<br>"AllGather=level0:doublering"：AllGather通信任务。<br>"ReduceScatter=level0:doublering"：ReduceScatter通信任务。<br>"AlltoAll=level0:fullmesh;level1:pairwise"：AlltoAllV通信任务。 |
-| opType | 表示通信任务类型。uint32_t类型，取值详见[HcclCMDType](HCCL-Tiling构造函数.md#hcclcmdtype)参数说明。 |
+| opType | 表示通信任务类型。uint32_t类型，取值详见[HcclCMDType](HCCL-Tiling构造函数.md#table-2)参数说明。 |
 | reduceType | 归约操作类型，仅对有归约操作的通信任务生效。uint32_t类型，取值详见[HcclReduceOp](../HCCL-Kernel侧接口/HCCL使用说明.md#hcclreduceop)参数说明。 |
 
 ## 约束说明
