@@ -46,7 +46,7 @@ $$\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, ~src1_i\} + 33'b1$$
 
 ## 函数原型
 
-- 不带进位数据的接口
+- 不支持进位计算接口
 
     ```cpp
     __simd_callee__ inline void asc_sub(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
@@ -60,7 +60,7 @@ $$\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, ~src1_i\} + 33'b1$$
     __simd_callee__ inline void asc_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
     ```
 
-- 带进位数据的接口
+- 支持进位计算接口
 
     ```cpp
     __simd_callee__ inline void asc_sub(vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
@@ -89,7 +89,7 @@ $$\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, ~src1_i\} + 33'b1$$
 
 - mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
-- 带借位数据的接口
+- 支持进位计算接口
   - 仅支持int32_t和uint32_t类型。
   - 需手动调用，接口内部不支持自动识别触发。
   - 运算输出完整计算结果（包含进位位），不受[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
