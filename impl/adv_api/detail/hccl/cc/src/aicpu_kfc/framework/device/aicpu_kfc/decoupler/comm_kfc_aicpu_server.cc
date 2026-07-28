@@ -493,7 +493,7 @@ HcclResult CommKfcAicpuServer::IsAllTaskFinished(u32 msgPos, bool &isFinish)
         HCCL_INFO("Group %u: next aicpu tasks are treated as finished at message pos %u.", groupIdx_, msgPos);
         return HCCL_SUCCESS;
     }
-
+// TODO KgeJ5FeQ9sarSxRiV9jjcHrk
 #ifdef MC2_SERVER_ONLY
     HCCL_ERROR("Group %u: mc2_server does not support legacy task finish check.", groupIdx_);
     return HCCL_E_INTERNAL;
