@@ -17,12 +17,16 @@ project(kernel_samples LANGUAGES ASC CXX)
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
 
-# Probe 1 is an opt-in rebuild used to实测Case 1（无SIMT VF）场景下静态UB可用上限，
-# 默认关闭，不影响4个正向case的默认编译运行路径。
-option(ENABLE_UB_PROBE1 "Build the Case1 no-SIMT-VF static UB limit probe kernel" OFF)
-set(UB_PROBE1_STATIC_BYTES "253920" CACHE STRING "Probe1 static UB size in bytes (no-SIMT-VF experiment)")
-option(UB_PROBE1_NO_VF "Probe1 kernel fills the static UB directly from MainScalar without calling any VF function" OFF)
-option(UB_PROBE1_DISABLE_RESERVED "Pass --cce-disable-vf-stack-reserved-ubuf when building probe1 (NOTE: not supported by CANN 9.0.0 bisheng, kept for forward compatibility)" OFF)
+set(SCENARIO_NUM "1" CACHE STRING "Case number to build (0-4)")
+if(NOT SCENARIO_NUM MATCHES "^[0-4]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be one of 0, 1, 2, 3, 4.")
+endif()
+
+set(UB_BOUNDARY_STATIC_BYTES "253920" CACHE STRING "Static UB array size used by the Case 2 limit study")
+option(UB_BOUNDARY_NO_SIMD_VF "Fill static UB directly in MainScalar without calling a SIMD VF" OFF)
+option(UB_BOUNDARY_DISABLE_RESERVED "Disable the VF stack reserved UB region" OFF)
+set(CASE3_DYNAMIC_BYTES "221152" CACHE STRING "Dynamic UB size used by Case 3")
+set(CASE4_DYNAMIC_BYTES "213920" CACHE STRING "Dynamic UB size used by Case 4")
 
 add_executable(ub_usage_limit
     ub_usage_limit.asc
@@ -31,27 +35,30 @@ add_executable(ub_usage_limit
 target_compile_options(ub_usage_limit PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
+target_compile_definitions(ub_usage_limit PRIVATE SCENARIO_NUM=${SCENARIO_NUM})
 
-# platform_ascendc::PlatformAscendCManager/PlatformAscendC 的实现来自 platform/tiling_api，
-# 用于实测 GetCoreMemSize(CoreMemType::UB) 在无VF/有SIMD VF/有SIMT VF场景下的返回值。
 target_link_libraries(ub_usage_limit PRIVATE
     m
-    platform
-    tiling_api
-    dl
 )
 
-if(ENABLE_UB_PROBE1)
+if(SCENARIO_NUM STREQUAL "2")
     target_compile_definitions(ub_usage_limit PRIVATE
-        ENABLE_UB_PROBE1=1
-        UB_PROBE1_STATIC_BYTES=${UB_PROBE1_STATIC_BYTES}
+        UB_BOUNDARY_STATIC_BYTES=${UB_BOUNDARY_STATIC_BYTES}
     )
-    if(UB_PROBE1_NO_VF)
-        target_compile_definitions(ub_usage_limit PRIVATE UB_PROBE1_NO_VF=1)
+    if(UB_BOUNDARY_NO_SIMD_VF)
+        target_compile_definitions(ub_usage_limit PRIVATE UB_BOUNDARY_NO_SIMD_VF=1)
     endif()
-    if(UB_PROBE1_DISABLE_RESERVED)
+    if(UB_BOUNDARY_DISABLE_RESERVED)
         target_compile_options(ub_usage_limit PRIVATE
             $<$<COMPILE_LANGUAGE:ASC>:--cce-disable-vf-stack-reserved-ubuf>
         )
     endif()
+elseif(UB_BOUNDARY_NO_SIMD_VF OR UB_BOUNDARY_DISABLE_RESERVED)
+    message(WARNING "UB boundary options are ignored unless SCENARIO_NUM=2")
+endif()
+
+if(SCENARIO_NUM STREQUAL "3")
+    target_compile_definitions(ub_usage_limit PRIVATE CASE3_DYNAMIC_BYTES=${CASE3_DYNAMIC_BYTES})
+elseif(SCENARIO_NUM STREQUAL "4")
+    target_compile_definitions(ub_usage_limit PRIVATE CASE4_DYNAMIC_BYTES=${CASE4_DYNAMIC_BYTES})
 endif()
