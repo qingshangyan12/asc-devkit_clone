@@ -1,7 +1,7 @@
 # DataCachePreload Indirect Index Preload Sample
 
 ## Overview
-This sample demonstrates how to use [DataCachePreload](../../../../../docs/api/SIMD-API/基础API/缓存控制/DataCachePreload.md) in an indirect index (random-hopping) access scenario: when the Scalar unit reads scattered data from GM, DataCachePreload is used to proactively load upcoming Cache Lines into DCache, reducing Scalar memory access wait time and improving performance.
+**This sample is for testing and validation only, not for actual operator usage.** This sample demonstrates how to use [DataCachePreload](../../../../../docs/api/SIMD-API/基础API/缓存控制/DataCachePreload.md) in an indirect index (random-hopping) access scenario: when the Scalar unit reads scattered data from GM, DataCachePreload is used to proactively load upcoming Cache Lines into DCache, reducing Scalar memory access wait time and improving performance.
 
 ## Supported Products and CANN Software Versions
 
@@ -21,7 +21,6 @@ This sample demonstrates how to use [DataCachePreload](../../../../../docs/api/S
 │   ├── CMakeLists.txt              // Build project file
 │   ├── data_utils.h                // Data read/write utility functions
 │   ├── data_cache_preload.asc      // Ascend C sample implementation & invocation
-│   ├── test.sh                     // One-click build and run script
 │   └── README.md                   // Sample documentation
 ```
 

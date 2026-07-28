@@ -1,7 +1,7 @@
 # DataCachePreload 间接索引预加载样例
 
 ## 概述
-本样例演示[DataCachePreload](../../../../../docs/api/SIMD-API/基础API/缓存控制/DataCachePreload.md)在间接索引（随机跳转）场景下的使用方法：通过Scalar单元读取GM中分散的数据时，利用DataCachePreload提前将即将访问的Cache Line加载到DCache，减少Scalar访存等待时间，提升性能。
+**本样例为测试验证场景，并非实际算子使用场景。**本样例演示[DataCachePreload](../../../../../docs/api/SIMD-API/基础API/缓存控制/DataCachePreload.md)在间接索引（随机跳转）场景下的使用方法：通过Scalar单元读取GM中分散的数据时，利用DataCachePreload提前将即将访问的Cache Line加载到DCache，减少Scalar访存等待时间，提升性能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -21,7 +21,6 @@
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── data_utils.h                // 数据读入写出函数
 │   ├── data_cache_preload.asc      // Ascend C样例实现 & 调用样例
-│   ├── test.sh                     // 一键编译执行脚本
 │   └── README.md                   // 样例说明文档
 ```
 
