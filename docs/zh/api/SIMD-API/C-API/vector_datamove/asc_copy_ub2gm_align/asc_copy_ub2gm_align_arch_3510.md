@@ -30,7 +30,9 @@
 
 将数据从Unified Buffer (UB)搬运到Global Memory (GM)，支持8位/16位/32位数据类型搬运。
 
-高维切分搬运原生采用Compact模式。在32字节补齐处理上，接口将`n_burst`指定的所有数据块组成一个大数据块；若该大数据块的总长度非32字节对齐，则仅在大数据块末尾补齐至32字节对齐。
+本接口不支持设置填充值。若搬运的数据长度非32字节对齐，搬出时会在读取UB数据时自动补充dummy假数据至32字节对齐，写入GM时会丢弃补充的dummy假数据。
+
+高维切分搬运原生采用Compact模式。在32字节补齐处理上，接口将`n_burst`指定的所有数据块组成一个大数据块；若该大数据块的总长度非32字节对齐，则在读取UB数据时仅在大数据块末尾补充dummy假数据至32字节对齐，写入GM时会丢弃补充的dummy假数据。
 
 如需实现Normal模式，即将每个非32字节对齐的数据块分别补齐至32字节对齐，需要将本接口的`n_burst`设置为1，并通过[asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md)、[asc_set_ub2gm_loop1_stride](../asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](../asc_set_ub2gm_loop2_stride.md)配置循环次数和地址步长，逐个数据块循环搬运。循环搬运结束后，需要再次调用[asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md)将循环次数复位为1。
 

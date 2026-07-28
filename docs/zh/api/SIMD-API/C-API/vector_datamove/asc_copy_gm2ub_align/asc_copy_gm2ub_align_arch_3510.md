@@ -30,7 +30,12 @@
 
 提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer (UB)，并支持8位/16位/32位数据类型搬运。
 
-高维切分搬运原生采用Compact模式。在32字节补齐处理上，接口将`n_burst`指定的所有数据块组成一个大数据块；若该大数据块的总长度非32字节对齐，则仅在大数据块末尾补齐至32字节对齐。
+只有从GM搬运到UB时可以设置填充值。非32字节对齐场景支持以下两种填充方式：
+
+- 手动填充：搬运前调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)设置填充值，并将`enable_constant_pad`设置为true。
+- 自动填充：将`enable_constant_pad`设置为false，由硬件自动填充dummy假数据，dummy假数据的值为输入数据的第一个值。
+
+高维切分搬运原生采用Compact模式。在32字节补齐处理上，接口将`n_burst`指定的所有数据块组成一个大数据块；若该大数据块的总长度非32字节对齐，则仅在大数据块末尾通过上述手动或自动填充方式补齐至32字节对齐。
 
 如需实现Normal模式，即将每个非32字节对齐的数据块分别补齐至32字节对齐，需要将本接口的`n_burst`设置为1，并通过[asc_set_gm2ub_loop_size](../asc_set_gm2ub_loop_size.md)、[asc_set_gm2ub_loop1_stride](../asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](../asc_set_gm2ub_loop2_stride.md)配置循环次数和地址步长，逐个数据块循环搬运。循环搬运结束后，需要再次调用[asc_set_gm2ub_loop_size](../asc_set_gm2ub_loop_size.md)将循环次数复位为1。
 
@@ -118,7 +123,7 @@
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[1, 2097151]。 |
 | left_padding_num | 输入 | 连续搬运数据块左侧需要补充的数据范围，单位为元素个数，left_padding_num的字节数不能超过32。|
 | right_padding_num | 输入 | 连续搬运数据块右侧需要补充的数据范围，单位为元素个数，right_padding_num的字节数不能超过32。|
-| enable_constant_pad | 输入 | 配置非对齐填充值是否为常量。取值说明如下：  <br>&bull; true：填充值为接口[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)设置的值。 <br>&bull; false：填充值为输入数据的第一个值。 |
+| enable_constant_pad | 输入 | 配置非对齐场景的填充方式。取值说明如下：  <br>&bull; true：手动填充，填充值为接口[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)设置的值。 <br>&bull; false：自动填充，由硬件填充dummy假数据，dummy假数据的值为输入数据的第一个值。 |
 | l2_cache_mode | 输入 | [asc_load_l2_cache_mode](../../enum/asc_load_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
 | src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br>只搬运1个数据块，即n_burst=1时，可以将此参数设置为0。 |
 | dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br>只搬运1个数据块，即n_burst=1时，可以将此参数设置为0。 |
