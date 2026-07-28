@@ -22,6 +22,7 @@ import const_var
 import ascendc_impl_build
 import ascendc_bin_param_build
 import ascendc_op_info
+from ascendc_jit_resource import collect_custom_op_resources
 from opdesc_parser import _trans_soc_ver_to_short
 
 
@@ -41,6 +42,21 @@ class CompileKernel:
         self.target_name = args.target_name
         self.auto_gen_path = args.auto_gen_path
         self.source_ini_file = os.path.join(self.auto_gen_path, self.target_name + "_custom_source_files.ini")
+
+        jit_options = (
+            getattr(args, "jit_resource_generator", None),
+            getattr(args, "jit_custom_op_root", None),
+            getattr(args, "jit_collection_root", None),
+        )
+        jit_options_set = tuple(value not in (None, "") for value in jit_options)
+        if any(jit_options_set) and not all(jit_options_set):
+            raise ValueError(
+                "--jit-resource-generator, --jit-custom-op-root, and "
+                "--jit-collection-root must all be provided"
+            )
+        self.jit_resource_generator = jit_options[0] if all(jit_options_set) else None
+        self.jit_custom_op_root = jit_options[1] if all(jit_options_set) else None
+        self.jit_collection_root = jit_options[2] if all(jit_options_set) else None
 
         if os.path.exists(self.source_ini_file):
             self.get_op_cpp_file()
@@ -98,6 +114,16 @@ class CompileKernel:
         if 'dump_cce' not in self.op_debug_config:
             shutil.rmtree(self.working_dir)
         return
+
+    def collect_jit_resources(self: any):
+        if self.jit_resource_generator is None:
+            return
+        collect_custom_op_resources(
+            generator=self.jit_resource_generator,
+            custom_op_root=self.jit_custom_op_root,
+            collection_root=self.jit_collection_root,
+            working_dir=self.working_dir,
+        )
 
     def ascendc_gen_impl(self: any):
         rep_cfg = {}
@@ -259,6 +285,18 @@ def args_parse():
     parser.add_argument(
         "-a", "--auto-gen-path", nargs="?", default=None, help="auto gen file path."
     )
+    parser.add_argument(
+        "--jit-resource-generator", nargs="?", default=None,
+        help="manifest generator used to collect JIT compile resources."
+    )
+    parser.add_argument(
+        "--jit-custom-op-root", nargs="?", default=None,
+        help="custom-op source root used for JIT resource validation."
+    )
+    parser.add_argument(
+        "--jit-collection-root", nargs="?", default=None,
+        help="package-level JIT resource collection directory."
+    )
     return parser.parse_args()
 
 
@@ -275,4 +313,5 @@ if __name__ == "__main__":
         kernel_builder.ascendc_put_json()
         kernel_builder.ascendc_put_tiling()
         kernel_builder.ascendc_build()
+        kernel_builder.collect_jit_resources()
         kernel_builder.clean()
