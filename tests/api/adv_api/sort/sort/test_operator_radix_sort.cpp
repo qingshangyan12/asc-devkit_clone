@@ -228,7 +228,7 @@ INSTANTIATE_TEST_CASE_P(
             8, 8, 1024, 1024, testRadixSort<int64_t, int64_t, AscendC::SortType::RADIX_SORT, true, false, true, 2>}
 #endif
         ));
- 
+
 TEST_P(AdvanceSortTestSuite, testRadixSort)
 {
     auto param = GetParam();

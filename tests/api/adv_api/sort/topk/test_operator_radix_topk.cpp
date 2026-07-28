@@ -791,4 +791,3 @@ TEST_P(AdvanceTopKTestSuite, testRadixTopK)
         EXPECT_EQ(outputGmValue[i], 0x00);
     }
 }
- 

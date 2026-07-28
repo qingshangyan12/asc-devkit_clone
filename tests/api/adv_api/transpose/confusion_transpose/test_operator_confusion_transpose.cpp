@@ -453,7 +453,7 @@ INSTANTIATE_TEST_CASE_P(
         ConfusionTransposeSecondTestParams{
             4, ConfusionTransposeSecond<float>, 16, 32, 32, TransposeType::TRANSPOSE_NZ2NZ_0213}
 #endif
-        )); 
+        ));
 
 TEST_P(ConfusionTransposeSecondTestsuite, ConfusionTransposeSecondTestCase)
 {

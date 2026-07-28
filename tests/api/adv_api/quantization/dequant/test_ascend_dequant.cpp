@@ -92,7 +92,7 @@ INSTANTIATE_TEST_CASE_P(
         AscendDequantTestParams{5120, 4, AscendDequantKernel<bfloat16_t, bfloat16_t, true, 0>}
 #endif
         ));
- 
+
 TEST_P(AscendDequantTestsuite, AscendDequantTestCase)
 {
     auto param = GetParam();

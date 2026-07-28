@@ -148,7 +148,7 @@ INSTANTIATE_TEST_CASE_P(
         antiquantParams{12288, 96, 81920, testAntiQuant<int8_t, bfloat16_t>},
         antiquantParams{2048, 64, 1024, testAntiQuant<int8_t, bfloat16_t, false>}
 #endif
-        )); 
+        ));
 
 TEST_P(AntiquantTestsuite, testAntiquant)
 {
