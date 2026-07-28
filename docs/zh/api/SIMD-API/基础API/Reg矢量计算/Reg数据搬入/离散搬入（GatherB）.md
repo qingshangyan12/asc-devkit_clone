@@ -36,6 +36,18 @@
 
 其中，index中仅前8个元素有效，每个元素对应一个DataBlock。例如，第一个元素为96（3 * 32），表示选取DataBlock3写入dstReg中对应的位置。
 
+以下Python代码用于等价描述GatherB的数据选择过程。其中，baseAddr列表中的每个元素表示一个DataBlock，index中的元素表示相对于baseAddr的字节偏移。
+
+```python
+def gather_b(base_addr, index):
+    data_block_size = 32
+    dst_reg = []
+    for offset in index[:8]:
+        data_block_id = offset // data_block_size
+        dst_reg.append(base_addr[data_block_id])
+    return dst_reg
+```
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
@@ -99,4 +111,3 @@ __simd_vf__ inline void GatherBVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ub
     }
 }
 ```
-
