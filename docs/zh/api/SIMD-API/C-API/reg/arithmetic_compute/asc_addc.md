@@ -40,14 +40,13 @@ $$
 
 ![](../../figures/asc_addc_1.png)
 
-以int64_t类型数据计算-1 + 8 = 7为例，asc_add/asc_addc接口的适用场景如下图：
+以uint64_t类型数据计算0xFFFFFFFF FFFFFFFF + 0x00000000 00000008 = 0x00000000 00000007为例，asc_add/asc_addc接口的适用场景如下图：
 
 ![](../../figures/asc_addc_2.png)
 
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_addc(vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src, vector_bool mask)
 __simd_callee__ inline void asc_addc(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src, vector_bool mask)
 ```
 
