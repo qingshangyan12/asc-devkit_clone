@@ -52,14 +52,14 @@
 
 -   TrianUpperMatmulPolicy（上三角模板策略）
 
-    一次矩阵乘指令计算的结果为[baseM \* baseN](../Matmul-Tiling类/TCubeTiling结构体.md#p17899165811566)大小的矩阵块，称该矩阵块为基本块。若Matmul结果矩阵C中的基本块位于下三角位置，则Matmul内部做数据计算和数据搬出时，将不对该基本块进行处理，最后得到的矩阵C为一个上三角矩阵。上三角模板策略如下图所示，图示中矩阵形状的相关大小为M=N=512，K=256，baseM=baseN=baseK=32。
+    一次矩阵乘指令计算的结果为[baseM \* baseN](../Matmul-Tiling类/TCubeTiling结构体.md#tcubetiling-struct)大小的矩阵块，称该矩阵块为基本块。若Matmul结果矩阵C中的基本块位于下三角位置，则Matmul内部做数据计算和数据搬出时，将不对该基本块进行处理，最后得到的矩阵C为一个上三角矩阵。上三角模板策略如下图所示，图示中矩阵形状的相关大小为M=N=512，K=256，baseM=baseN=baseK=32。
 
     **图1**  上三角模板策略示意图  
     ![](../../../../figures/上三角模板策略示意图.png "上三角模板策略示意图")
 
 -   TrianLowerMatmulPolicy（下三角模板策略）
 
-    一次矩阵乘指令计算的结果为[baseM \* baseN](../Matmul-Tiling类/TCubeTiling结构体.md#p17899165811566)大小的矩阵块，称该矩阵块为基本块。若Matmul结果矩阵C中的基本块位于上三角位置，则Matmul内部做数据计算和数据搬出时，将不对该基本块进行处理，最后得到的矩阵C为一个下三角矩阵。下三角模板策略如下图所示，图示中矩阵形状的相关大小为M=N=512，K=256，baseM=baseN=baseK=32。
+    一次矩阵乘指令计算的结果为[baseM \* baseN](../Matmul-Tiling类/TCubeTiling结构体.md#tcubetiling-struct)大小的矩阵块，称该矩阵块为基本块。若Matmul结果矩阵C中的基本块位于上三角位置，则Matmul内部做数据计算和数据搬出时，将不对该基本块进行处理，最后得到的矩阵C为一个下三角矩阵。下三角模板策略如下图所示，图示中矩阵形状的相关大小为M=N=512，K=256，baseM=baseN=baseK=32。
 
     **图2**  下三角模板策略示意图  
     ![](../../../../figures/下三角模板策略示意图.png "下三角模板策略示意图")
@@ -67,7 +67,7 @@
 -   NBuffer33MatmulPolicy（NBuffer33模板策略）
 <a name="li194081238103913"></a>
 
-    一次矩阵乘指令计算的结果为[baseM \* baseN](../Matmul-Tiling类/TCubeTiling结构体.md#p17899165811566)大小的矩阵块，称该矩阵块为基本块。单核计算的A矩阵切分为3x3个基本块，该3x3个A矩阵的基本块全载和保持在L1 Buffer中，每次与3x1个B矩阵的基本块计算矩阵乘，同时DoubleBuffer并行搬入下次计算所需的3x1个B矩阵基本块，直到singleCoreN方向的矩阵乘计算完成。NBuffer33模板策略如下图所示，图中[singleCoreM、singleCoreN、singleCoreK](../Matmul-Tiling类/TCubeTiling结构体.md#singlecorek)表示单核内A、B矩阵的shape大小，单核计算的A矩阵切分为3x3个基本块，3x3个基本块全载在L1 Buffer上，这些基本块每次与B矩阵的3x1个基本块计算矩阵乘。
+    一次矩阵乘指令计算的结果为[baseM \* baseN](../Matmul-Tiling类/TCubeTiling结构体.md#tcubetiling-struct)大小的矩阵块，称该矩阵块为基本块。单核计算的A矩阵切分为3x3个基本块，该3x3个A矩阵的基本块全载和保持在L1 Buffer中，每次与3x1个B矩阵的基本块计算矩阵乘，同时DoubleBuffer并行搬入下次计算所需的3x1个B矩阵基本块，直到singleCoreN方向的矩阵乘计算完成。NBuffer33模板策略如下图所示，图中[singleCoreM、singleCoreN、singleCoreK](../Matmul-Tiling类/TCubeTiling结构体.md#tcubetiling-struct)表示单核内A、B矩阵的shape大小，单核计算的A矩阵切分为3x3个基本块，3x3个基本块全载在L1 Buffer上，这些基本块每次与B矩阵的3x1个基本块计算矩阵乘。
 
     **图3**  NBuffer33模板策略示意图  
     ![](../../../../figures/NBuffer33模板策略示意图.png "NBuffer33模板策略示意图")
@@ -97,8 +97,8 @@
 
 ## 约束说明
 
--   TrianUpperMatmulPolicy当前只支持[Norm模板](MatmulConfig.md#norm-template)和[MDL模板](MatmulConfig.md#mdl-template)。
--   TrianLowerMatmulPolicy当前只支持[Norm模板](MatmulConfig.md#norm-template)和[MDL模板](MatmulConfig.md#mdl-template)。
+-   TrianUpperMatmulPolicy当前只支持[Norm模板](MatmulConfig.md#table6981133810309)和[MDL模板](MatmulConfig.md#table6981133810309)。
+-   TrianLowerMatmulPolicy当前只支持[Norm模板](MatmulConfig.md#table6981133810309)和[MDL模板](MatmulConfig.md#table6981133810309)。
 -   NBuffer33MatmulPolicy：
     -   当前只支持[MDL模板](MatmulConfig.md#mdl-template)。
     -   A矩阵、B矩阵的内存逻辑位置只支持TPosition::GM。
@@ -110,19 +110,19 @@
 
 -   MatmulWithScalePolicy：
     -   仅在Ascend 950PR/Ascend 950DT上支持。
-    -   当前只支持[Norm模板](MatmulConfig.md#norm-template)和[MDL模板](MatmulConfig.md#mdl-template)。
+    -   当前只支持[Norm模板](MatmulConfig.md#table6981133810309)和[MDL模板](MatmulConfig.md#table6981133810309)。
 
 -   SplitMMatmulPolicy：
     -   仅在Ascend 950PR/Ascend 950DT上支持。
     -   只支持C矩阵输出到Unified Buffer。
-    -   A矩阵、B矩阵类型信息MatmulType中的参数[IBSHARE](Matmul使用说明.md#ibshare)必须为true。
+    -   A矩阵、B矩阵类型信息MatmulType中的参数[IBSHARE](Matmul使用说明.md#table1188045714378)必须为true。
 
 -   SplitNMatmulPolicy：
     -   仅在Ascend 950PR/Ascend 950DT上支持。
     -   只支持C矩阵输出到Unified Buffer。
     -   baseN必须满足是16的倍数。
-    -   [Tiling参数](../Matmul-Tiling类/TCubeTiling结构体.md#table1563162142915)必须满足：singleCoreM = baseM，singleCoreN = baseN，singleCoreK = baseK。
-    -   A矩阵、B矩阵类型信息MatmulType中的参数[IBSHARE](Matmul使用说明.md#ibshare)必须为true。
+    -   [Tiling参数](../Matmul-Tiling类/TCubeTiling结构体.md#tcubetiling-struct)必须满足：singleCoreM = baseM，singleCoreN = baseN，singleCoreK = baseK。
+    -   A矩阵、B矩阵类型信息MatmulType中的参数[IBSHARE](Matmul使用说明.md#table1188045714378)必须为true。
 
 ## 调用示例
 
