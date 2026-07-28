@@ -1285,8 +1285,12 @@ HcclResult GetAlgResCcu(
     uint64_t size = seq.size();
 
     void *ctx = nullptr;
-    CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AIV, size, &ctx));
-    HCCL_INFO("[GetAlgResCCU]HcclEngineCtxCreate successfully!");
+    if (HcclEngineCtxGet(comm, param.algTag, COMM_ENGINE_AIV, &ctx, &size) == HCCL_SUCCESS) {
+        HCCL_INFO("[GetAlgResCCU] reuse context success, algTag[%s], ctx[%p], size[%llu], requiredSize[%llu].",
+            param.algTag, ctx, size, size);
+    } else {
+        CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AIV, size, &ctx));
+    }
     aclError aclRet = aclrtMemcpy(ctx, size, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
     if (aclRet != ACL_SUCCESS) {
         HCCL_ERROR("[GetAlgResCcu] aclrtMemcpy H2D failed, ret[%d], dst[%p], src[%p], size[%llu].",
