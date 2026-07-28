@@ -115,6 +115,21 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
     return HCCL_SUCCESS;
 }
 
+static HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& ctxTag, uint64_t ctxSize, void** ctx)
+{
+    CHK_PTR_NULL(ctx);
+    uint64_t cachedSize = 0;
+    if (HcclEngineCtxGet(comm, ctxTag.c_str(), COMM_ENGINE_AIV, ctx, &cachedSize) == HCCL_SUCCESS) {
+        HCCL_INFO("[GetOrCreateCcuCtx] reuse context success, ctxTag[%s], ctx[%p], cachedSize[%llu]",
+            ctxTag.c_str(), *ctx, cachedSize);
+        return HCCL_SUCCESS;
+    }
+    CHK_RET(HcclEngineCtxCreate(comm, ctxTag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx));
+    HCCL_INFO("[GetOrCreateCcuCtx] create context success, ctxTag[%s], ctx[%p], ctxSize[%llu]",
+        ctxTag.c_str(), *ctx, ctxSize);
+    return HCCL_SUCCESS;
+}
+
 // 构建 opResCtx 基础字段
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx)
 {
@@ -131,9 +146,9 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     void* comParamPtr = nullptr;
     void* comSyncPtr = nullptr;
 
-    CHK_RET(HcclEngineCtxCreate(comm, tagWorkspace.c_str(), COMM_ENGINE_AIV, Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
-    CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_AIV, comParamBufSize, &comParamPtr));
-    CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_AIV, comSyncBufSize, &comSyncPtr));
+    CHK_RET(GetOrCreateCcuCtx(comm, tagWorkspace, Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
+    CHK_RET(GetOrCreateCcuCtx(comm, tagComParam, comParamBufSize, &comParamPtr));
+    CHK_RET(GetOrCreateCcuCtx(comm, tagComSync, comSyncBufSize, &comSyncPtr));
 
     uint64_t ckeTokenInfo = hcomm::CcuRep::GetTokenInfo(
         reinterpret_cast<uint64_t>(comSyncPtr), comSyncBufSize);
