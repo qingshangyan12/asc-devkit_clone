@@ -43,7 +43,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品不支持SetSelfDefineDat
 ## 约束说明
 
 -   若回调函数中需要使用dataPtr参数时，必须调用此接口；若回调函数不使用dataPtr参数，无需调用此接口。
--   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#enablemixdualmaster)设置为true，不支持使用该接口。
+-   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#table-2)设置为true，不支持使用该接口。
 -   本接口必须在SetTensorA接口、SetTensorB接口之前调用。
 
 ## 调用示例
