@@ -7,7 +7,6 @@ MxMatmul场景，设置scaleB矩阵的位置、数据格式、是否转置等信
 ## 函数原型
 
 ```
-<a id="isscaletrans"></a>
 int32_t SetScaleBType(TPosition scalePos, CubeFormat scaleType, bool isScaleTrans = true)
 ```
 

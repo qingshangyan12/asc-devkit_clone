@@ -24,7 +24,7 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const ui
 
 ## 参数说明
 
-本接口的所有参数用于设置[MatmulConfig结构体](MatmulConfig.md#table1761013213153)中的参数，其中互相对应的参数的功能作用相同。
+本接口的所有参数用于设置[MatmulConfig结构体](MatmulConfig.md#matmulconfig-params)中的参数，其中互相对应的参数的功能作用相同。
 
 **表1**  接口参数说明
 
@@ -39,12 +39,12 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const ui
 
 ## 返回值说明
 
-[MatmulConfig结构体](MatmulConfig.md#table1761013213153)。
+[MatmulConfig结构体](MatmulConfig.md#matmulconfig-params)。
 
 ## 约束说明
 
 -   使用本接口时，基本块大小baseM、baseN需满足：singleCoreM能被baseM整除，singleCoreN能被baseN整除。
--   本接口的参数basicM、basicN、basicK应与[TCubeTiling结构体](../Matmul-Tiling类/TCubeTiling结构体.md#p17899165811566)的baseM、baseN、baseK设置保持一致。
+-   本接口的参数basicM、basicN、basicK应与[TCubeTiling结构体](../Matmul-Tiling类/TCubeTiling结构体.md#tcubetiling-struct)的baseM、baseN、baseK设置保持一致。
 
 ## 调用示例
 
