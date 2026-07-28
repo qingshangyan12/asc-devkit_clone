@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-Hccl类定义如下，模板参数说明见[表1 Hccl类模板参数说明](#table884518212555)。
+Hccl类定义如下，模板参数说明见[表1 Hccl类模板参数说明](#hccl-template-params)。
 
 ```
 template <HcclServerType serverType = HcclServerType::HCCL_SERVER_TYPE_AICPU, const auto &config = DEFAULT_CFG>

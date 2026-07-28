@@ -158,6 +158,7 @@ struct BatchWriteItem {
     }
     ```
 
+<a id="multi-queue-p2p"></a>
 -   多个队列的点对点通信
 
     在Atlas A3 训练系列产品/Atlas A3 推理系列产品上，假设要将一段数据分别拷贝到两个不同的Global Memory上，可以通过调用一次BatchWrite接口，实现批量点对点通信。

@@ -1,6 +1,6 @@
 # TCubeTiling结构体
 
-TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递给Matmul Kernel侧，用于Matmul的切块、搬运和计算过程等。TCubeTiling结构体的参数说明见[表1](#table1563162142915)。
+TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递给Matmul Kernel侧，用于Matmul的切块、搬运和计算过程等。TCubeTiling结构体的参数说明见[表1](#tcubetiling-struct)。
 
 
 <a id="tcubetiling-struct"></a>
@@ -27,7 +27,7 @@ TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递�
 | singleBatchN | int | 该参数预留，开发者无需关注。 |
 | mxTypePara | int | 组合参数，在MxMatmul场景使用 ，表示scaleA/scaleB载入L1的大小与A/B矩阵载入L1大小的倍数，具体如下：<br>0~6bit表示scaleA与A矩阵在K方向载入数据量的比例系数，scaleFactorKa，即scaleFactorKa=scaleA在K方向载入数据量/A矩阵在K方向载入数据量，数据范围为[1, 127]；<br>8~14bit表示scaleB与B矩阵在K方向载入数据量的比例系数，scaleFactorKb，即scaleFactorKb=scaleB在K方向载入数据量/B矩阵在K方向载入数据量，数据范围为[1, 127]；<br>16~22bit表示scaleA与A矩阵在M方向载入数据量的比例系数，scaleFactorM，即scaleFactorM=scaleA在M方向载入数据量/A矩阵在M方向载入数据量，数据范围为[1, 127]；<br>24~30bit表示scaleB与B矩阵在N方向载入数据量的比例系数，scaleFactorN，即scaleFactorN=scaleB在N方向载入数据量/B矩阵在N方向载入数据量，数据范围为[1, 127]；<br><br>注意：<br>对于scaleA矩阵，仅当Ka方向全载时，支持开启M方向的多倍载入。即baseK * stepKa * scaleFactorKa >= singleCoreK时，才能设置scaleFactorM为大于1的取值。<br>对于scaleB矩阵，仅当Kb方向全载时，支持开启N方向的多倍载入。即baseK * stepKb * scaleFactorKb >= singleCoreK时，才能设置scaleFactorN为大于1的取值。<br>scaleA、scaleB在M、N、K方向的载入数据量不能超过实际大小。<br>该参数仅在MDL模板生效。 |
 
-多数情况下，用户通过调用[GetTiling](GetTiling.md)接口获取TCubeTiling结构体，具体流程请参考[使用说明](Matmul-Tiling类使用说明.md)。如果用户自定义TCubeTiling参数，各个参数的取值需要满足[表1](#table1563162142915)和[表2](#table1275812182115)中的对应参数的约束条件。如果用户通过调用[GetTiling](GetTiling.md)接口获取TCubeTiling结构体后，需要修改调整Tiling，请参考如下TCubeTiling参数约束和性能调优推荐取值，进行参数的设置。
+多数情况下，用户通过调用[GetTiling](GetTiling.md)接口获取TCubeTiling结构体，具体流程请参考[使用说明](Matmul-Tiling类使用说明.md)。如果用户自定义TCubeTiling参数，各个参数的取值需要满足[表1](#tcubetiling-struct)和[表2](#table1275812182115)中的对应参数的约束条件。如果用户通过调用[GetTiling](GetTiling.md)接口获取TCubeTiling结构体后，需要修改调整Tiling，请参考如下TCubeTiling参数约束和性能调优推荐取值，进行参数的设置。
 
 -   TCubeTiling参数约束
 
