@@ -139,7 +139,6 @@ $$
 |------|------------------|---------------------|---------|
 | **Task Duration (us)** | 31.237 | 19.840 | **加速1.57x** |
 | **aiv_scalar_time (us)** | 29.254 | 17.748 | **降低39.3%** |
-| **aiv_scalar_ratio** | 95.2% | 91.9% | Scalar仍为主要瓶颈 |
 
 #### Ascend 950系列产品（dav-3510架构）
 
@@ -147,12 +146,10 @@ $$
 |------|------------------|---------------------|---------|
 | **Task Duration (us)** | 31.018 | 20.445 | **加速1.52x** |
 | **aiv_scalar_time (us)** | 28.344 | 17.910 | **降低36.8%** |
-| **aiv_scalar_ratio** | 94.3% | 91.9% | Scalar仍为主要瓶颈 |
 
 > **指标说明：**
 > - **Task Duration**：核函数端到端执行耗时，是最直观的性能指标
 > - **aiv_scalar_time**：Scalar单元耗时，间接索引场景下Scalar访存是主要瓶颈
-> - **aiv_scalar_ratio**：Scalar耗时占总时间的比例，用于定位性能瓶颈所在
 
 #### 5次独立运行详细数据（Atlas A2/A3系列产品）
 
@@ -178,7 +175,7 @@ $$
 
 ### 分析结论
 
-**DataCachePreload在Atlas A2/A3系列和Ascend 950系列产品上均有显著优化效果**，`kernel_with_preload`的Task Duration、aiv_scalar_time均明显低于`kernel_no_preload`。在间接索引（随机跳转）场景下，通过DataCachePreload将下一轮数据提前加载到DCache，**可有效隐藏Scalar访存延迟，实现约1.57倍（Atlas A2/A3）和约1.52倍（Ascend 950）的性能加速**。
+**DataCachePreload在间接索引（随机跳转）场景下具有显著的优化效果**，通过将下一轮数据提前加载到DCache，**可有效隐藏Scalar访存延迟，实现约1.5倍的性能加速**。
 
 ## 编译运行
 
