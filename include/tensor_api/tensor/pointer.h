@@ -31,21 +31,27 @@ namespace Te {
 
 /**
  * @brief Construct a typed hardware memory pointer from an address offset.
- * @param addr : Address offset used to construct the memory pointer.
+ * @param[in] addr : Address offset used to construct the memory pointer.
+ * @return A typed memory pointer tagged with the specified hardware location.
+ * @note The hardware location must be supported, and addr is interpreted as an offset from the physical buffer base.
  */
 template <typename PtrPattern, typename DataType, typename Addr, EnableMakePtrByTrait<PtrPattern, Addr> Enable>
 __aicore__ inline auto MakeMemPtr(Addr addr);
 
 /**
  * @brief Construct a hardware memory pointer at a specified memory location from an iterator.
- * @param iterator : Iterator used to construct the memory pointer.
+ * @param[in] iterator : Iterator used to construct the memory pointer.
+ * @return A memory pointer tagged with the specified hardware location.
+ * @note The iterator must satisfy the hardware memory pointer iterator requirements.
  */
 template <typename PtrPattern, typename Iterator, EnableMakeHardwarePtr<PtrPattern, Iterator> Enable>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator);
 
 /**
  * @brief Construct a hardware memory pointer by inferring the memory location from an iterator.
- * @param iterator : Iterator used to construct the memory pointer.
+ * @param[in] iterator : Iterator used to construct the memory pointer.
+ * @return A memory pointer whose hardware location is inferred from the iterator.
+ * @note The iterator must carry recognizable hardware location information.
  */
 template <typename Iterator, EnableMakePtrByIter<Iterator> Enable>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator);

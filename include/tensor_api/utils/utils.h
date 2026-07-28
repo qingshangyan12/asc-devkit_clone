@@ -60,11 +60,11 @@ struct MmadTrait {
 
     /**
      * @brief Construct a matrix multiply-accumulate trait with the specified configuration.
-     * @param fmOffsetIn : Feature-map offset retained for compatibility.
-     * @param kDirectionAlignIn : K-direction alignment setting retained for compatibility.
-     * @param cmatrixSourceIn : Whether to initialize the result matrix from Bias Table Buffer.
-     * @param disableGemvIn : Whether to disable GEMV mode when M is 1.
-     * @param mmadTypeIn : Matrix multiply-accumulate calculation mode.
+     * @param[in] fmOffsetIn : Feature-map offset retained for compatibility.
+     * @param[in] kDirectionAlignIn : K-direction alignment setting retained for compatibility.
+     * @param[in] cmatrixSourceIn : Whether to initialize the result matrix from Bias Table Buffer.
+     * @param[in] disableGemvIn : Whether to disable GEMV mode when M is 1.
+     * @param[in] mmadTypeIn : Matrix multiply-accumulate calculation mode.
      */
     __aicore__ constexpr MmadTrait(
         int32_t fmOffsetIn, bool kDirectionAlignIn, bool cmatrixSourceIn, bool disableGemvIn, MmadType mmadTypeIn)
@@ -109,11 +109,11 @@ struct MmadParams {
 
     /**
      * @brief Construct matrix multiply-accumulate parameters with the specified matrix dimensions and controls.
-     * @param mIn : Height of the left and result matrices.
-     * @param nIn : Width of the right and result matrices.
-     * @param kIn : Shared dimension of the left and right matrices.
-     * @param unitFlagIn : Unit flag used for fine-grained synchronization with result copies.
-     * @param cmatrixInitValIn : Whether to initialize the result matrix before accumulation.
+     * @param[in] mIn : Height of the left and result matrices.
+     * @param[in] nIn : Width of the right and result matrices.
+     * @param[in] kIn : Shared dimension of the left and right matrices.
+     * @param[in] unitFlagIn : Unit flag used for fine-grained synchronization with result copies.
+     * @param[in] cmatrixInitValIn : Whether to initialize the result matrix before accumulation.
      */
     __aicore__ constexpr MmadParams(uint16_t mIn, uint16_t nIn, uint16_t kIn, uint8_t unitFlagIn, bool cmatrixInitValIn)
         : m(mIn), n(nIn), k(kIn), unitFlag(unitFlagIn), cmatrixInitVal(cmatrixInitValIn){};
@@ -161,8 +161,8 @@ struct FixpipeParams {
 
     /**
      * @brief Construct result-copy parameters with synchronization and destination controls.
-     * @param unitFlagIn : Unit flag used for fine-grained synchronization with matrix calculation.
-     * @param subBlockIdIn : Destination Unified Buffer identifier in single-destination mode.
+     * @param[in] unitFlagIn : Unit flag used for fine-grained synchronization with matrix calculation.
+     * @param[in] subBlockIdIn : Destination Unified Buffer identifier in single-destination mode.
      */
     __aicore__ constexpr FixpipeParams(uint8_t unitFlagIn, bool subBlockIdIn = false)
         : unitFlag(unitFlagIn), subBlockId(subBlockIdIn){};
