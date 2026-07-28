@@ -20,18 +20,20 @@
 
 // ==========源操作数为起初地址，目的数为寄存器=========
 __simd_callee__ inline void asc_gather_impl(
-    vector_int16_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
+    vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vgather2(dst, src, index, mask);
+        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
+        vgather2(reinterpret_cast<vector_fp8_e5m2_t&>(dst), src_tmp, index, mask);
     }
 }
 
 __simd_callee__ inline void asc_gather_impl(
-    vector_uint16_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
+    vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vgather2(dst, src, index, mask);
+        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
+        vgather2(reinterpret_cast<vector_fp8_e5m2_t&>(dst), src_tmp, index, mask);
     }
 }
 

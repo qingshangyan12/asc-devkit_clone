@@ -41,8 +41,8 @@
 - 收集UB中的元素
 
     ```cpp
-    __simd_callee__ inline void asc_gather(vector_int16_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather(vector_uint16_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
+    __simd_callee__ inline void asc_gather(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
+    __simd_callee__ inline void asc_gather(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
     __simd_callee__ inline void asc_gather(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask)
     __simd_callee__ inline void asc_gather(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask)
     __simd_callee__ inline void asc_gather(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
@@ -114,11 +114,9 @@
 
     - 对于mask筛选需要搬运的元素，对应的地址需要在UB有效范围内；对于mask未筛选的元素，对应的地址不会触发任何地址越界异常，同时dst中对应的元素将被置零。
 
-    - 当src的数据类型为b8数据类型，dst为b16数据类型，这种情况下目的操作数的低8位与源操作数相同，高8位自动补0。例如src为int8_t数据类型：
+    - 当src与index数据类型不一致时，数据写入dst索引为偶数的位置。例如src为int8_t数据类型，index为uint16_t数据类型时，适用场景如下图：
 
-        40 = 0b00101000 -> 0b0000000000101000,扩充至16位后等于40；
-
-        -40 = 0b11011000 -> 0b0000000011011000，扩充至16位后等于216。
+    ![](../../figures/asc_gather_different_type.png)
 
 - 收集矢量数据寄存器中的元素
 
