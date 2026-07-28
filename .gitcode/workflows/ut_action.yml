@@ -50,7 +50,7 @@ jobs:
           cd ${{ steps.process_checkout.outputs.path }}
           export ut_type=${{ inputs.ut_type }}
           export TARGET_BRANCH=${{ env.TARGET_BRANCH }}
-          bash .gitcode/scripts/ut.sh
+          bash ut.sh
       -
         name: ut_cov
         identifier: ut_cov
