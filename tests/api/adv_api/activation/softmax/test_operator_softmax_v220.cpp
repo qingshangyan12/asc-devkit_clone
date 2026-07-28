@@ -188,7 +188,7 @@ INSTANTIATE_TEST_CASE_P(
         SoftMaxTestParams{2, 8, 880, MainSoftmax<half, half>}, SoftMaxTestParams{2, 50, 144, MainSoftmax<half, half>},
         SoftMaxTestParams{2, 50, 288, MainSoftmax<half, float>},
         SoftMaxTestParams{4, 100, 32, MainSoftmax<float, float>},
-#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))      
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
         SoftMaxTestParams{4, 50, 288, MainSoftmax<float, float>},
 #endif
         SoftMaxTestParams{4, 1, 512, MainSoftmax<float, float>},
@@ -196,13 +196,13 @@ INSTANTIATE_TEST_CASE_P(
         SoftMaxTestParams{2, 8, 1024, MainSoftmax<half, half, true>},
         SoftMaxTestParams{2, 8, 960, MainSoftmax<half, half, true>},
         SoftMaxTestParams{2, 1, 16, MainSoftmax<half, half, false>},
-#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))    
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
         SoftMaxTestParams{2, 100, 256, MainSoftmax<half, half, false>},
 #endif
         SoftMaxTestParams{2, 64, 128, MainSoftmax<half, float, true>},
         SoftMaxTestParams{4, 64, 128, MainSoftmax<float, float, true>},
         SoftMaxTestParams{4, 50, 144, MainSoftmax<float, float, false>},
-#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))    
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
         SoftMaxTestParams{4, 16, 960, MainSoftmax<float, float, true>},
 #endif
         SoftMaxTestParams{4, 8, 1024, MainSoftmax<float, float, true>},

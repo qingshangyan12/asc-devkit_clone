@@ -310,7 +310,7 @@ INSTANTIATE_TEST_CASE_P(
             true,
             testRadixTopK<
                 int8_t, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false>},
-#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))    
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
         TopKTestParams{
             512,
             GetKPad<int8_t>(512),
@@ -704,7 +704,7 @@ INSTANTIATE_TEST_CASE_P(
             true,
             testRadixTopK<
                 float, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false>}
-#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))        
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
         ,TopKTestParams{
             512,
             GetKPad<float>(512),

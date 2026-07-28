@@ -269,11 +269,11 @@ file(GLOB ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES
     quantization/dequant/test_ascend_dequant.cpp
     activation/gelu/test_operator_fast_gelu.cpp
     activation/softmax/test_operator_softmax_v220.cpp
-) 
+)
 
 set(ASCENDC_TEST_KirinX90_AIV_CASE_SRC_FILES
     ${ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES}
-) 
+)
 
 # Kirin9030 aiv test cases
 file(GLOB ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES
@@ -313,11 +313,11 @@ file(GLOB ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES
     activation/softmax/test_operator_softmax_v220.cpp
     activation/gelu/test_operator_gelu.cpp
     activation/silu/test_operator_silu.cpp
-) 
+)
 
 set(ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_FILES
     ${ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES}
-) 
+)
 
 # ascend950pr_9599 test cases
 file(GLOB ASCENDC_TEST_ascend950pr_9599_AIC_CASE_SRC_FILES
