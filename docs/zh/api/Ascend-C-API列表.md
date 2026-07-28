@@ -27,7 +27,7 @@ Ascend C提供了一套层次化的API体系，涵盖了从底层C扩展到高�
 
 | 头文件 | 说明 | 对应的库文件 |
 | --- | --- | --- |
-| simt/asc_simt.h | 提供 SIMD C API Device 侧对外接口，若计算只需要特定的数据类型如fp8，可只包含simt_api/asc_fp8.h | 不涉及 |
+| simt/asc_simt.h | 提供 SIMT API对外接口，若计算只需要特定的数据类型如fp8，可只包含simt_api/asc_fp8.h | 不涉及 |
 
 **表 3**  SIMD基础编程能力头文件列表
 
