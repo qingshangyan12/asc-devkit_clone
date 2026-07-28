@@ -56,6 +56,8 @@ inline uint32_t asc_activemask()
 
 ## 调用示例
 
+以下样例获取当前Warp中各个线程的活跃状态，并由Lane 0将结果写入GM。
+
 -   SIMT编程场景：
 
     ```cpp
@@ -70,7 +72,7 @@ inline uint32_t asc_activemask()
         uint32_t warp_id = idx / warpSize;
         uint32_t active_mask = asc_activemask(); // 获取当前Warp中仍然活跃的线程掩码。
         if (lane_id == 0) {
-            active_masks[warp_id] = active_mask; // 由Lane 0负责写出当前Warp的掩码。
+            active_masks[warp_id] = active_mask; // 由Lane 0负责写出当前Warp的各个线程的是否活跃的状态。
         }
     }
     ```
@@ -78,7 +80,7 @@ inline uint32_t asc_activemask()
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void SimtActiveMask(
+    __simt_vf__ __launch_bounds__(1024) inline void KernelActiveMask(
         __gm__ uint32_t* active_masks, uint64_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -91,7 +93,7 @@ inline uint32_t asc_activemask()
         uint32_t warp_id = idx / warpSize;
         uint32_t active_mask = asc_activemask(); // 获取当前Warp中仍然活跃的线程掩码。
         if (lane_id == 0) {
-            active_masks[warp_id] = active_mask; // 由Lane 0负责写出当前Warp的掩码。
+            active_masks[warp_id] = active_mask; // 由Lane 0负责写出当前Warp的各个线程的是否活跃的状态。
         }
     }
     ```
