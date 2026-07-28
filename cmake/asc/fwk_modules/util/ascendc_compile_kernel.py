@@ -159,7 +159,12 @@ class CompileKernel:
         base_dir = os.path.dirname(self.op_cfg_ini)
         opc_config_file = os.path.join(base_dir, "custom_opc_options.ini")
         ascendc_bin_param_build.gen_bin_param_file(
-            self.op_cfg_ini, bin_param_path, self.op_soc_ver, opc_config_file, [self.op_type]
+            self.op_cfg_ini,
+            bin_param_path,
+            self.op_soc_ver,
+            opc_config_file,
+            [self.op_type],
+            preserve_kernel_meta=self.jit_resource_generator is not None,
         )
         tiling_key_info, op_debug_config, kernel_json_file, _, kernel_template_input_info = (
             ascendc_bin_param_build.parse_op_debug_config(

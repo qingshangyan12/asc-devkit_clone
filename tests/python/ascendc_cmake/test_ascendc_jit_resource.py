@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import subprocess
+from collections import defaultdict
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -152,6 +153,105 @@ def test_compile_kernel_collection_is_optional(monkeypatch, tmp_path):
         "collection_root": enabled_args.jit_collection_root,
         "working_dir": enabled.working_dir,
     }]
+
+
+@pytest.mark.parametrize("jit_enabled", [False, True])
+def test_compile_kernel_requests_kernel_meta_for_jit(monkeypatch, tmp_path, jit_enabled):
+    import ascendc_compile_kernel
+
+    monkeypatch.chdir(tmp_path)
+    recorded = []
+
+    def fake_gen_bin_param_file(*args, **kwargs):
+        recorded.append(kwargs)
+        out_dir = Path(args[1])
+        _write(out_dir / "input.json")
+        _write(out_dir / "compile.sh", "#!/bin/sh\n")
+
+    monkeypatch.setattr(
+        ascendc_compile_kernel.ascendc_bin_param_build,
+        "gen_bin_param_file",
+        fake_gen_bin_param_file,
+    )
+    monkeypatch.setattr(
+        ascendc_compile_kernel.ascendc_bin_param_build,
+        "parse_op_debug_config",
+        lambda *args: (defaultdict(set), defaultdict(set), {}, {}, {}),
+    )
+
+    jit_options = {}
+    if jit_enabled:
+        jit_options = {
+            "jit_resource_generator": "/tool/manifest_generator",
+            "jit_custom_op_root": "/custom op",
+            "jit_collection_root": "/collection",
+        }
+    kernel = ascendc_compile_kernel.CompileKernel(_compile_args(tmp_path, **jit_options))
+    kernel.ascendc_gen_param()
+
+    assert recorded == [{"preserve_kernel_meta": jit_enabled}]
+
+
+def test_bin_param_preserves_existing_debug_config_when_jit_keeps_kernel_meta(
+    monkeypatch, tmp_path
+):
+    import ascendc_bin_param_build
+
+    class FakeOpDesc:
+        def __init__(self):
+            self.op_type = "AddCustom"
+            self.json_file = ""
+            self.debug_config = set()
+
+        def set_soc_version(self, _soc):
+            pass
+
+        def set_out_path(self, _out_dir):
+            pass
+
+        def set_op_debug_config(self, config):
+            self.debug_config = set(config)
+
+        def set_op_super_config(self, _config):
+            pass
+
+        def set_tiling_key(self, _config):
+            pass
+
+        def set_kernel_template_input(self, _config):
+            pass
+
+        def gen_input_json(self, _auto_gen_path):
+            pass
+
+    op_desc = FakeOpDesc()
+    monkeypatch.setattr(
+        ascendc_bin_param_build.opdesc_parser,
+        "get_op_desc",
+        lambda *args: [op_desc],
+    )
+    monkeypatch.setattr(
+        ascendc_bin_param_build,
+        "parse_op_debug_config",
+        lambda *args: (
+            defaultdict(set),
+            defaultdict(set, {"AddCustom": {"ccec_g"}}),
+            {},
+            {},
+            {},
+        ),
+    )
+    cfg_file = tmp_path / "ops-info.ini"
+    _write(cfg_file, "")
+
+    ascendc_bin_param_build.gen_bin_param_file(
+        str(cfg_file),
+        str(tmp_path / "bin_param"),
+        "ascend910b",
+        preserve_kernel_meta=True,
+    )
+
+    assert op_desc.debug_config == {"ccec_g", "dump_cce"}
 
 
 def _configure_project(tmp_path, body):

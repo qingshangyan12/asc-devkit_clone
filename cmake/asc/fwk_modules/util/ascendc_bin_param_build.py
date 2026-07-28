@@ -641,7 +641,8 @@ def gen_option_config(debug_config, super_config, op_debug_config):
 
 
 def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str,
-                        opc_config_file: str = '', ops: list = None):
+                        opc_config_file: str = '', ops: list = None,
+                        preserve_kernel_meta: bool = False):
     if not os.path.exists(cfgfile):
         print(f'INFO: {cfgfile} does not exists in this project, skip generating compile commands.')
         return
@@ -658,10 +659,12 @@ def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str,
     for op_desc in op_descs:
         op_desc.set_soc_version(soc)
         op_desc.set_out_path(out_dir)
-        if op_desc.op_type in debug_config:
-            op_desc.set_op_debug_config(debug_config[op_desc.op_type])
+        selected_debug_config = set(debug_config.get(op_desc.op_type, set()))
         if all_soc_key in debug_config:
-            op_desc.set_op_debug_config(debug_config[all_soc_key])
+            selected_debug_config = set(debug_config[all_soc_key])
+        if preserve_kernel_meta:
+            selected_debug_config.add("dump_cce")
+        op_desc.set_op_debug_config(selected_debug_config)
         if op_desc.op_type in super_config:
             op_desc.set_op_super_config(super_config[op_desc.op_type])
         if all_soc_key in super_config:
