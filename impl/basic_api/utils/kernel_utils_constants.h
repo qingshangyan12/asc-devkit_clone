@@ -260,7 +260,6 @@ const uint16_t AIV_CORE_NUM = 72;
 const uint16_t AIV_CORE_NUM = 50;
 #endif
 const uint16_t DUMP_MSG_HEAD_SIZE = 24;
-const int32_t ONE_REPEAT_BYTE_SIZE = 256;
 const int32_t FULL_MASK_LEN = 128;
 const int32_t HALF_MASK_LEN = 64;
 const int32_t DEFAULT_REDUCE_DST_REP_STRIDE = 1;
@@ -271,9 +270,11 @@ const uint8_t B8_BYTE_SIZE = 1;
 const uint8_t B32_DATA_NUM_PER_BLOCK = 8;
 const uint8_t B16_DATA_NUM_PER_BLOCK = 16;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+const int32_t ONE_REPEAT_BYTE_SIZE = 32;
 const int32_t B16_DATA_NUM_PER_REPEAT = 16;
 const int32_t B32_DATA_NUM_PER_REPEAT = 8;
 #else
+const int32_t ONE_REPEAT_BYTE_SIZE = 256;
 const int32_t B16_DATA_NUM_PER_REPEAT = 128;
 const int32_t B32_DATA_NUM_PER_REPEAT = 64;
 #endif

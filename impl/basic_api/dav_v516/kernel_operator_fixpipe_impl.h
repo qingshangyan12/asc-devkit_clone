@@ -220,7 +220,7 @@ __aicore__ inline void FixpipeL1ToL1(__cbuf__ DstT *dst, __cbuf__ SrcT *src,
         config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
         set_fixp_nz_para(config1);
         uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_cbuf((__cbuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0, transMode);
+        fix_cbuf_to_cbuf((__cbuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.mSize, params.nSize, loop2DstStride, params.srcStride, 0, transMode);
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2DN;
         config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
@@ -228,7 +228,7 @@ __aicore__ inline void FixpipeL1ToL1(__cbuf__ DstT *dst, __cbuf__ SrcT *src,
         config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
         set_fixp_nz_para(config1);
         uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_cbuf((__cbuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0, transMode);
+        fix_cbuf_to_cbuf((__cbuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.mSize, params.nSize, loop2DstStride, params.srcStride, 0, transMode);
     } else {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NORMAL_DMA;
         fix_cbuf_to_cbuf((__cbuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.mSize, params.nSize, params.dstStride, params.srcStride, 0, transMode);
@@ -249,7 +249,7 @@ __aicore__ inline void FixpipeL1ToUb(__ubuf__ DstT *dst, __cbuf__ SrcT *src,
         config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
         set_fixp_nz_para(config1);
         uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_ubuf((__ubuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0, transMode);
+        fix_cbuf_to_ubuf((__ubuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.mSize, params.nSize, loop2DstStride, params.srcStride, 0, transMode);
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2DN;
         config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
@@ -257,7 +257,7 @@ __aicore__ inline void FixpipeL1ToUb(__ubuf__ DstT *dst, __cbuf__ SrcT *src,
         config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
         set_fixp_nz_para(config1);
         uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_ubuf((__ubuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0, transMode);
+        fix_cbuf_to_ubuf((__ubuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.nSize, params.nSize, loop2DstStride, params.srcStride, 0, transMode);
     } else {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NORMAL_DMA;
         fix_cbuf_to_ubuf((__ubuf__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.mSize, params.nSize, params.dstStride, params.srcStride, 0, transMode);
@@ -278,7 +278,7 @@ __aicore__ inline void FixpipeL1ToOut(__gm__ DstT *dst, __cbuf__ SrcT *src,
         config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
         set_fixp_nz_para(config1);
         uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_gm((__gm__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0, transMode);
+        fix_cbuf_to_gm((__gm__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.mSize, params.nSize, loop2DstStride, params.srcStride, 0, transMode);
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2DN;
         config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
@@ -286,7 +286,7 @@ __aicore__ inline void FixpipeL1ToOut(__gm__ DstT *dst, __cbuf__ SrcT *src,
         config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
         set_fixp_nz_para(config1);
         uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_gm((__gm__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0, transMode);
+        fix_cbuf_to_gm((__gm__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.mSize, params.nSize, loop2DstStride, params.srcStride, 0, transMode);
     } else {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NORMAL_DMA;
         fix_cbuf_to_gm((__gm__ DstT *)(dst), (__cbuf__ SrcT *)(src), params.mSize, params.nSize, params.dstStride, params.srcStride, 0, transMode);
