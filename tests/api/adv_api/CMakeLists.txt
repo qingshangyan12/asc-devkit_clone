@@ -258,7 +258,6 @@ file(GLOB ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES
     matmul/test_matmul_shape_info.cpp
     matmul/test_matmul_shape_info_left.cpp
     matmul/test_matmul_l0c_buffer.cpp
-
     normalization/rmsnorm/test_operator_rmsnorm.cpp
     math/sinh/test_operator_sinh.cpp
     sort/sort/test_operator_radix_sort.cpp
@@ -301,7 +300,6 @@ file(GLOB ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES
     matmul/test_matmul_shape_info.cpp
     matmul/test_matmul_shape_info_left.cpp
     matmul/test_matmul_l0c_buffer.cpp
-
     normalization/rmsnorm/test_operator_rmsnorm.cpp
     math/sinh/test_operator_sinh.cpp
     sort/sort/test_operator_radix_sort.cpp
