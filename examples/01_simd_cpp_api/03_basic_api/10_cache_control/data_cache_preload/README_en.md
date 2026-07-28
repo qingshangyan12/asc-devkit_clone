@@ -71,16 +71,54 @@ $$
 
 ## Sample Implementation
 
-- How to Use DataCachePreload
-  1. Create a `GlobalTensor<uint64_t>` bound to data_gm:
-     ```cpp
-     AscendC::GlobalTensor<uint64_t> dataGlobal;
-     dataGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(data_gm), size);
-     ```
-  2. Compute Cache-Line-aligned offset: `cacheOffset = idx & ~63ULL` (align to 64B boundary)
-  3. Call `DataCachePreload(dataGlobal, cacheOffset)` to load 64B into DCache
+### SCENARIO_NUM=1 (Without DataCachePreload)
 
-- Constraints
+`kernel_no_preload` implementation:
+1. Create a `GlobalTensor<uint64_t>` bound to data_gm and copy GM data to UB via `DataCopy`:
+   ```cpp
+   AscendC::GlobalTensor<uint64_t> dataGlobal;
+   dataGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(data_gm),
+                              bufferSize / sizeof(uint64_t));
+   AscendC::LocalTensor<uint64_t> xLocal = ubAllocator.Alloc<uint64_t, dataLen / 8>();
+   AscendC::DataCopy(xLocal, dataGlobal, dataLen / 8);
+   ```
+2. Directly read `data_gm[indices[i]]` via Scalar in the loop and accumulate:
+   ```cpp
+   for (uint32_t i = 0; i < count; i++) {
+       uint32_t idx = indices[i];
+       sum += data_gm[idx];
+   }
+   ```
+3. Since indices are randomly scattered across 64KB, most Scalar reads trigger DCache misses, making memory access latency the main bottleneck
+
+### SCENARIO_NUM=2 (With DataCachePreload)
+
+`kernel_with_preload` implementation:
+1. Create a `GlobalTensor<uint64_t>` bound to data_gm and copy GM data to UB via `DataCopy` (same as Scenario 1)
+2. Compute Cache-Line-aligned offset: `cacheOffset = idx & ~63ULL` (align to 64B boundary)
+3. Preload the first index's Cache Line before the loop via `DataCachePreload(dataGlobal, cacheOffset)`
+4. In the loop: read current data → preload the next Cache Line, forming a pipeline:
+   ```cpp
+   // First preload
+   uint32_t idxCurr = indices[0];
+   int64_t cacheOffset = (int64_t)(idxCurr & ~63ULL);
+   AscendC::DataCachePreload(dataGlobal, cacheOffset);
+
+   for (uint32_t i = 0; i < count; i++) {
+       // Read current (preloaded in previous iteration, likely DCache hit)
+       uint8_t val = data_gm[idxCurr];
+       sum += val;
+       // Preload next
+       if (i + 1 < count) {
+           uint32_t idxNext = indices[i + 1];
+           int64_t offsetNext = (int64_t)(idxNext & ~63ULL);
+           AscendC::DataCachePreload(dataGlobal, offsetNext);
+           idxCurr = idxNext;
+       }
+   }
+   ```
+
+- DataCachePreload Constraints
   - Each call preloads exactly 1 Cache Line (64B)
   - Consecutive calls should not exceed 4, otherwise the Reservation Station may stall
   - Preload is an async instruction that can overlap with subsequent computation/memory access
@@ -93,35 +131,54 @@ When profiling with `msprof`, compare the execution time of the two kernels:
 
 ### Performance Comparison
 
-The following performance data was collected on **Atlas A2/A3 series products (dav-2201 architecture)**. The data below is the average of 5 independent runs to eliminate random fluctuations. **DataCachePreload achieves a 1.64x speedup in end-to-end execution time for indirect index access scenarios.**
+The following performance data is the average of 5 independent runs to eliminate random fluctuations.
+
+#### Atlas A2/A3 Series Products (dav-2201 Architecture)
 
 | Metric | kernel_no_preload | kernel_with_preload | Improvement |
 |------|------------------|---------------------|---------|
-| **Task Duration (us)** | 44.000 | 26.760 | **1.64x speedup** |
-| **aiv_total_cycles** | 78,230 | 47,189 | **Reduced by 39.7%** |
-| **aiv_scalar_time (us)** | 41.942 | 24.622 | **Reduced by 41.3%** |
-| **aiv_scalar_ratio** | 96.5% | 93.9% | Scalar remains the main bottleneck |
+| **Task Duration (us)** | 31.237 | 19.840 | **1.57x speedup** |
+| **aiv_scalar_time (us)** | 29.254 | 17.748 | **Reduced by 39.3%** |
+| **aiv_scalar_ratio** | 95.2% | 91.9% | Scalar remains the main bottleneck |
+
+#### Ascend 950 Series Products (dav-3510 Architecture)
+
+| Metric | kernel_no_preload | kernel_with_preload | Improvement |
+|------|------------------|---------------------|---------|
+| **Task Duration (us)** | 31.018 | 20.445 | **1.52x speedup** |
+| **aiv_scalar_time (us)** | 28.344 | 17.910 | **Reduced by 36.8%** |
+| **aiv_scalar_ratio** | 94.3% | 91.9% | Scalar remains the main bottleneck |
 
 > **Metric Descriptions:**
 > - **Task Duration**: End-to-end kernel execution time, the most direct performance indicator
-> - **aiv_total_cycles**: Total cycles of the Vector core, reflecting combined computation + memory access overhead at hardware level
 > - **aiv_scalar_time**: Scalar unit execution time; in indirect index scenarios, Scalar memory access is the main bottleneck
 > - **aiv_scalar_ratio**: Percentage of Scalar time in total time, used to identify performance bottlenecks
 
-#### Detailed Data from 5 Independent Runs
+#### Detailed Data from 5 Independent Runs (Atlas A2/A3 Series)
 
 | Run | no_preload Duration(us) | with_preload Duration(us) | Speedup |
 |---------|------------------------|--------------------------|--------|
-| Run 1 | 43.780 | 26.900 | 1.63x |
-| Run 2 | 43.400 | 27.200 | 1.60x |
-| Run 3 | 43.820 | 27.140 | 1.61x |
-| Run 4 | 45.160 | 26.300 | 1.72x |
-| Run 5 | 43.840 | 26.260 | 1.67x |
-| **Average** | **44.000** | **26.760** | **1.64x** |
+| Run 1 | 31.261 | 20.280 | 1.54x |
+| Run 2 | 30.941 | 19.361 | 1.60x |
+| Run 3 | 30.361 | 19.341 | 1.57x |
+| Run 4 | 31.120 | 19.940 | 1.56x |
+| Run 5 | 32.501 | 20.280 | 1.60x |
+| **Average** | **31.237** | **19.840** | **1.57x** |
+
+#### Detailed Data from 5 Independent Runs (Ascend 950 Series)
+
+| Run | no_preload Duration(us) | with_preload Duration(us) | Speedup |
+|---------|------------------------|--------------------------|--------|
+| Run 1 | 31.130 | 20.375 | 1.53x |
+| Run 2 | 30.914 | 20.344 | 1.52x |
+| Run 3 | 30.526 | 20.552 | 1.49x |
+| Run 4 | 31.554 | 20.399 | 1.55x |
+| Run 5 | 30.968 | 20.554 | 1.51x |
+| **Average** | **31.018** | **20.445** | **1.52x** |
 
 ### Conclusion
 
-**DataCachePreload demonstrates significant optimization on Atlas A2/A3 series products**, with `kernel_with_preload` showing substantially lower Task Duration, aiv_total_cycles, and aiv_scalar_time compared to `kernel_no_preload`. In indirect index (random-hopping) scenarios, preloading the next round's data into DCache via DataCachePreload **effectively hides Scalar memory access latency, achieving approximately 1.64x performance improvement**.
+**DataCachePreload demonstrates significant optimization on both Atlas A2/A3 series and Ascend 950 series products**, with `kernel_with_preload` showing substantially lower Task Duration and aiv_scalar_time compared to `kernel_no_preload`. In indirect index (random-hopping) scenarios, preloading the next round's data into DCache via DataCachePreload **effectively hides Scalar memory access latency, achieving approximately 1.57x performance improvement on Atlas A2/A3 and 1.52x on Ascend 950**.
 
 ## Compilation and Execution
 

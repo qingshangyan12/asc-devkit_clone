@@ -71,16 +71,54 @@ $$
 
 ## 样例实现
 
-- DataCachePreload使用方法
-  1. 创建`GlobalTensor<uint64_t>`绑定data_gm：
-     ```cpp
-     AscendC::GlobalTensor<uint64_t> dataGlobal;
-     dataGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(data_gm), size);
-     ```
-  2. 计算Cache Line对齐偏移：`cacheOffset = idx & ~63ULL`（对齐到64B边界）
-  3. 调用`DataCachePreload(dataGlobal, cacheOffset)`将64B加载到DCache
+### SCENARIO_NUM=1（无DataCachePreload）
 
-- 约束说明
+`kernel_no_preload`核函数实现：
+1. 创建`GlobalTensor<uint64_t>`绑定data_gm，将GM数据通过`DataCopy`搬到UB：
+   ```cpp
+   AscendC::GlobalTensor<uint64_t> dataGlobal;
+   dataGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(data_gm),
+                              bufferSize / sizeof(uint64_t));
+   AscendC::LocalTensor<uint64_t> xLocal = ubAllocator.Alloc<uint64_t, dataLen / 8>();
+   AscendC::DataCopy(xLocal, dataGlobal, dataLen / 8);
+   ```
+2. 循环中直接通过Scalar读取`data_gm[indices[i]]`并累加：
+   ```cpp
+   for (uint32_t i = 0; i < count; i++) {
+       uint32_t idx = indices[i];
+       sum += data_gm[idx];
+   }
+   ```
+3. 由于indices随机分散在64KB范围内，绝大多数Scalar读触发DCache miss，访存延迟成为主要瓶颈
+
+### SCENARIO_NUM=2（有DataCachePreload）
+
+`kernel_with_preload`核函数实现：
+1. 创建`GlobalTensor<uint64_t>`绑定data_gm，将GM数据通过`DataCopy`搬到UB（与场景1相同）
+2. 计算Cache Line对齐偏移：`cacheOffset = idx & ~63ULL`（对齐到64B边界）
+3. 首轮先调用`DataCachePreload(dataGlobal, cacheOffset)`预加载第一个索引所在的Cache Line
+4. 循环中：读取当前轮数据 → 预加载下一轮所在Cache Line，形成流水线：
+   ```cpp
+   // 首轮preload
+   uint32_t idxCurr = indices[0];
+   int64_t cacheOffset = (int64_t)(idxCurr & ~63ULL);
+   AscendC::DataCachePreload(dataGlobal, cacheOffset);
+
+   for (uint32_t i = 0; i < count; i++) {
+       // 读取当前轮（上一轮已preload，DCache大概率命中）
+       uint8_t val = data_gm[idxCurr];
+       sum += val;
+       // 预取下一轮
+       if (i + 1 < count) {
+           uint32_t idxNext = indices[i + 1];
+           int64_t offsetNext = (int64_t)(idxNext & ~63ULL);
+           AscendC::DataCachePreload(dataGlobal, offsetNext);
+           idxCurr = idxNext;
+       }
+   }
+   ```
+
+- DataCachePreload约束说明
   - 每次调用只预加载1个Cache Line（64B）
   - 连续调用建议不超过4次，否则可能导致保留站拥塞
   - preload是异步指令，可与后续计算/访存重叠
@@ -99,17 +137,17 @@ $$
 
 | 指标 | kernel_no_preload | kernel_with_preload | 优化效果 |
 |------|------------------|---------------------|---------|
-| **Task Duration (us)** | 44.000 | 26.760 | **加速1.64x** |
-| **aiv_scalar_time (us)** | 41.942 | 24.622 | **降低41.3%** |
-| **aiv_scalar_ratio** | 96.5% | 93.9% | Scalar仍为主要瓶颈 |
+| **Task Duration (us)** | 31.237 | 19.840 | **加速1.57x** |
+| **aiv_scalar_time (us)** | 29.254 | 17.748 | **降低39.3%** |
+| **aiv_scalar_ratio** | 95.2% | 91.9% | Scalar仍为主要瓶颈 |
 
 #### Ascend 950系列产品（dav-3510架构）
 
 | 指标 | kernel_no_preload | kernel_with_preload | 优化效果 |
 |------|------------------|---------------------|---------|
-| **Task Duration (us)** | 72.897 | 42.051 | **加速1.73x** |
-| **aiv_scalar_time (us)** | 70.230 | 39.242 | **降低44.1%** |
-| **aiv_scalar_ratio** | 97.7% | 95.7% | Scalar仍为主要瓶颈 |
+| **Task Duration (us)** | 31.018 | 20.445 | **加速1.52x** |
+| **aiv_scalar_time (us)** | 28.344 | 17.910 | **降低36.8%** |
+| **aiv_scalar_ratio** | 94.3% | 91.9% | Scalar仍为主要瓶颈 |
 
 > **指标说明：**
 > - **Task Duration**：核函数端到端执行耗时，是最直观的性能指标
@@ -120,27 +158,27 @@ $$
 
 | 执行次数 | no_preload Duration(us) | with_preload Duration(us) | 加速比 |
 |---------|------------------------|--------------------------|--------|
-| 第1次 | 43.780 | 26.900 | 1.63x |
-| 第2次 | 43.400 | 27.200 | 1.60x |
-| 第3次 | 43.820 | 27.140 | 1.61x |
-| 第4次 | 45.160 | 26.300 | 1.72x |
-| 第5次 | 43.840 | 26.260 | 1.67x |
-| **平均** | **44.000** | **26.760** | **1.64x** |
+| 第1次 | 31.261 | 20.280 | 1.54x |
+| 第2次 | 30.941 | 19.361 | 1.60x |
+| 第3次 | 30.361 | 19.341 | 1.57x |
+| 第4次 | 31.120 | 19.940 | 1.56x |
+| 第5次 | 32.501 | 20.280 | 1.60x |
+| **平均** | **31.237** | **19.840** | **1.57x** |
 
 #### 5次独立运行详细数据（Ascend 950系列产品）
 
 | 执行次数 | no_preload Duration(us) | with_preload Duration(us) | 加速比 |
 |---------|------------------------|--------------------------|--------|
-| 第1次 | 72.773 | 42.396 | 1.72x |
-| 第2次 | 73.002 | 41.780 | 1.75x |
-| 第3次 | 73.046 | 42.002 | 1.74x |
-| 第4次 | 73.130 | 42.032 | 1.74x |
-| 第5次 | 72.535 | 42.043 | 1.73x |
-| **平均** | **72.897** | **42.051** | **1.73x** |
+| 第1次 | 31.130 | 20.375 | 1.53x |
+| 第2次 | 30.914 | 20.344 | 1.52x |
+| 第3次 | 30.526 | 20.552 | 1.49x |
+| 第4次 | 31.554 | 20.399 | 1.55x |
+| 第5次 | 30.968 | 20.554 | 1.51x |
+| **平均** | **31.018** | **20.445** | **1.52x** |
 
 ### 分析结论
 
-**DataCachePreload在Atlas A2/A3系列和Ascend 950系列产品上均有显著优化效果**，`kernel_with_preload`的Task Duration、aiv_scalar_time均明显低于`kernel_no_preload`。在间接索引（随机跳转）场景下，通过DataCachePreload将下一轮数据提前加载到DCache，**可有效隐藏Scalar访存延迟，实现约1.64倍（Atlas A2/A3）和约1.73倍（Ascend 950）的性能加速**。
+**DataCachePreload在Atlas A2/A3系列和Ascend 950系列产品上均有显著优化效果**，`kernel_with_preload`的Task Duration、aiv_scalar_time均明显低于`kernel_no_preload`。在间接索引（随机跳转）场景下，通过DataCachePreload将下一轮数据提前加载到DCache，**可有效隐藏Scalar访存延迟，实现约1.57倍（Atlas A2/A3）和约1.52倍（Ascend 950）的性能加速**。
 
 ## 编译运行
 
