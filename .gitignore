@@ -1,5 +1,6 @@
 .vscode
 .idea/
+/.worktrees/
 /build/
 build_out
 output
