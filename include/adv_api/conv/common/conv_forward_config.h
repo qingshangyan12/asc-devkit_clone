@@ -1,17 +1,21 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file conv_config.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "conv_forward_config.h cannot be used with compile flag --enable-simt enabled."
+#endif
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -22,19 +26,14 @@
 #define ADV_API_CONV_COMMON_CONV_FORWARD_CONFIG_H
 
 #include <climits>
-#include "kernel_utils.h"
+#include "../../../../impl/basic_api/kernel_utils.h"
 #include "conv_common.h"
 #include "../../../../impl/adv_api/detail/conv/common/conv_forward_framework_util.h"
 #include "../../../../impl/adv_api/detail/conv/common/conv_forward_util.h"
 
 namespace ConvApi {
 
-enum ConvCfgTypeID {
-    CONV_ID_Unknown,
-    CONV_ID_Normal,
-    CONV_ID_Test,
-    CONV_ID_END
-};
+enum ConvCfgTypeID { CONV_ID_Unknown, CONV_ID_Normal, CONV_ID_Test, CONV_ID_END };
 
 struct ConvParam {
     __aicore__ inline ConvParam(){};
@@ -108,24 +107,21 @@ struct ConvDataType {
     constexpr static bool isBias = true;
 
     using ContextData = struct _ {
-        __aicore__ inline _()
-        {}
+        __aicore__ inline _() {}
     };
 };
 
 template <class ConvDataType>
 struct ConvConfig : public ConvDataType {
 public:
-    __aicore__ inline ConvConfig()
-    {}
+    __aicore__ inline ConvConfig() {}
 
     using ContextData = struct _ : public ConvDataType::ContextData {
-        __aicore__ inline _()
-        {}
+        __aicore__ inline _() {}
     };
 };
 
-}  // namespace conv
+} // namespace ConvApi
 #endif // ADV_API_CONV_COMMON_CONV_FORWARD_CONFIG_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CONV_FORWARD_CONFIG_H__)

@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "kernel_operator.h"
 #include "activation/geglu.h"
 #include "activation/gelu.h"
@@ -149,13 +159,13 @@ using AscendC::Lgamma;
 using AscendC::Log;
 using AscendC::Log10;
 using AscendC::Log2;
-using AscendC::LogSoftMax;
 using AscendC::LogicalAnd;
 using AscendC::LogicalAnds;
 using AscendC::LogicalNot;
 using AscendC::LogicalOr;
 using AscendC::LogicalOrs;
 using AscendC::LogicalXor;
+using AscendC::LogSoftMax;
 using AscendC::MakeLayout;
 using AscendC::MakeShape;
 using AscendC::MakeStride;
@@ -165,7 +175,6 @@ using AscendC::Pad;
 using AscendC::PhiloxRandom;
 using AscendC::Power;
 using AscendC::Quantize;
-using AscendC::ReGlu;
 using AscendC::ReduceAll;
 using AscendC::ReduceAny;
 using AscendC::ReduceMax;
@@ -174,6 +183,7 @@ using AscendC::ReduceMin;
 using AscendC::ReduceProd;
 using AscendC::ReduceSum;
 using AscendC::ReduceXorSum;
+using AscendC::ReGlu;
 using AscendC::Rint;
 using AscendC::RmsNorm;
 using AscendC::Round;

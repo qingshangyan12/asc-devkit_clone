@@ -1,25 +1,26 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file kernel_utils_dump_constants.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/utils/kernel_utils_dump_constants.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/basic_api/utils/kernel_utils_dump_constants.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_DUMP_CONSTANTS_H__
 #endif
 #ifndef ASCENDC_MODULE_UTILS_DUMP_CONSTANTS_H
 #define ASCENDC_MODULE_UTILS_DUMP_CONSTANTS_H
-#include "utils/kernel_utils_ceil_oom_que.h"
+#include "kernel_utils_ceil_oom_que.h"
 namespace AscendC {
 const int32_t ONE_DUMP_BACKUP_SIZE = 1024;
 const int32_t DUMP_UB_SIZE = 256;
@@ -34,7 +35,7 @@ const uint32_t BLOCK_INFO_MAGIC_POS = 4;
 const uint32_t BLOCK_INFO_RSV_POS = 5;
 const uint32_t BLOCK_INFO_DUMP_ADDR = 6;
 const uint32_t BLOCK_INFO_MAGIC_NUM = 0x5aa5bccd;
-// DUMP_META Pos ÒÔuint8_tÎªµ¥Î»¼ÆËãÎ»ÖÃ
+// DUMP_META Pos ï¿½ï¿½uint8_tÎªï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 const uint32_t DUMP_META_TYPE_POS = 0;
 const uint32_t DUMP_META_LEN_POS = 4;
 const uint16_t DUMP_META_BLOCK_DIM_POS = 8;
@@ -56,7 +57,8 @@ const uint32_t DUMP_SCALAR_POS = 8;
 const uint32_t DUMP_CORE_COUNT = 108;
 #ifdef ASCENDC_RECOGNIZE_SIMT_VF
 constexpr uint32_t DUMP_SIMT_CORE_COUNT = 72;
-const uint32_t DUMP_WORKSPACE_SIZE = DUMP_CORE_COUNT * ONE_CORE_DUMP_SIZE + DUMP_SIMT_CORE_COUNT * SIMT_ONE_CORE_DUMP_SIZE;
+const uint32_t DUMP_WORKSPACE_SIZE =
+    DUMP_CORE_COUNT * ONE_CORE_DUMP_SIZE + DUMP_SIMT_CORE_COUNT * SIMT_ONE_CORE_DUMP_SIZE;
 #else
 const uint32_t DUMP_WORKSPACE_SIZE = DUMP_CORE_COUNT * ONE_CORE_DUMP_SIZE;
 #endif
@@ -122,7 +124,7 @@ constexpr uint64_t INT_64_MAX = 0x7FFFFFFFFFFFFFFF;
 #endif
 
 // DumpTimeStamp
-const uint32_t DUMP_TIME_STAMP_LEN = 24; // desc_id(uint32_t)+rsv(uint32_t)+cycle(uint64_t)
+const uint32_t DUMP_TIME_STAMP_LEN = 24;       // desc_id(uint32_t)+rsv(uint32_t)+cycle(uint64_t)
 const uint32_t DUMP_TIME_STAMP_TOTAL_LEN = 32; // 6 * 4
 const uint32_t DUMP_TIME_STAMP_LEN_POS = 1;
 const uint32_t DUMP_TIME_STAMP_ID_POS = 2;

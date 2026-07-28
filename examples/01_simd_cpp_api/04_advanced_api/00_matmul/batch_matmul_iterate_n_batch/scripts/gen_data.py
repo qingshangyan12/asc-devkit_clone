@@ -21,18 +21,40 @@ def gen_golden_data():
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     src_type, dst_type = np.float16, np.float32
-                  
-    a_layout_info = {'b': 1, 's': m, 'n': 1, 'g': b, 'd': k}
-    b_layout_info = {'b': 1, 's': n, 'n': 1, 'g': b, 'd': k}
-    c_layout_info = {'b': 1, 'n': 1, 'g': 1, 'd': n}
 
-    x1_gm = np.random.uniform(-1, 1, [a_layout_info['s'] * a_layout_info['g'], a_layout_info['d']]).astype(src_type)
-    x2_gm = np.random.uniform(-1, 1, [b_layout_info['d'], b_layout_info['g'] * b_layout_info['s']]).astype(src_type)
+    a_layout_info = {"b": 1, "s": m, "n": 1, "g": b, "d": k}
+    b_layout_info = {"b": 1, "s": n, "n": 1, "g": b, "d": k}
+    c_layout_info = {"b": 1, "n": 1, "g": 1, "d": n}
+
+    x1_gm = np.random.uniform(
+        -1, 1, [a_layout_info["s"] * a_layout_info["g"], a_layout_info["d"]]
+    ).astype(src_type)
+    x2_gm = np.random.uniform(
+        -1, 1, [b_layout_info["d"], b_layout_info["g"] * b_layout_info["s"]]
+    ).astype(src_type)
     input_bias = np.random.uniform(-1, 1, [1, n]).astype(dst_type)
 
-    a_shape = [a_layout_info['b'], a_layout_info['s'], a_layout_info['n'], a_layout_info['g'], a_layout_info['d']]
-    b_shape = [b_layout_info['b'], b_layout_info['s'], b_layout_info['n'], b_layout_info['g'], b_layout_info['d']]
-    bias_shape = [c_layout_info['b'], 1, c_layout_info['n'], c_layout_info['g'], c_layout_info['d']]
+    a_shape = [
+        a_layout_info["b"],
+        a_layout_info["s"],
+        a_layout_info["n"],
+        a_layout_info["g"],
+        a_layout_info["d"],
+    ]
+    b_shape = [
+        b_layout_info["b"],
+        b_layout_info["s"],
+        b_layout_info["n"],
+        b_layout_info["g"],
+        b_layout_info["d"],
+    ]
+    bias_shape = [
+        c_layout_info["b"],
+        1,
+        c_layout_info["n"],
+        c_layout_info["g"],
+        c_layout_info["d"],
+    ]
 
     a = x1_gm.astype(dst_type).reshape(a_shape)
     b = x2_gm.astype(dst_type).reshape(b_shape)
@@ -43,22 +65,26 @@ def gen_golden_data():
     input_bias = np.transpose(input_bias, axes=(0, 2, 3, 1, 4))
 
     a_broadcast_shape = [
-        max(a_layout_info['b'], b_layout_info['b']), 
-        max(a_layout_info['n'], b_layout_info['n']), 
-        max(a_layout_info['g'], b_layout_info['g']), 
-        a_layout_info['s'], a_layout_info['d']]
+        max(a_layout_info["b"], b_layout_info["b"]),
+        max(a_layout_info["n"], b_layout_info["n"]),
+        max(a_layout_info["g"], b_layout_info["g"]),
+        a_layout_info["s"],
+        a_layout_info["d"],
+    ]
     b_broadcast_shape = [
-        max(a_layout_info['b'], b_layout_info['b']), 
-        max(a_layout_info['n'], b_layout_info['n']), 
-        max(a_layout_info['g'], b_layout_info['g']), 
-        b_layout_info['d'], b_layout_info['s']]
+        max(a_layout_info["b"], b_layout_info["b"]),
+        max(a_layout_info["n"], b_layout_info["n"]),
+        max(a_layout_info["g"], b_layout_info["g"]),
+        b_layout_info["d"],
+        b_layout_info["s"],
+    ]
     a_broadcast = np.broadcast_to(a_t, a_broadcast_shape)
     b_broadcast = np.broadcast_to(b_t, b_broadcast_shape)
 
     golden = np.matmul(a_broadcast, b_broadcast).astype(dst_type)
     golden = golden + input_bias
     golden = np.transpose(golden, axes=(0, 3, 1, 2, 4))
-    
+
     x1_gm.tofile("./input/x1_gm.bin")
     x2_gm.tofile("./input/x2_gm.bin")
     input_bias.tofile("./input/bias_gm.bin")

@@ -1,5 +1,6 @@
 # GetUBSize样例
 
+
 ## 概述
 
 本样例展示GetUBSizeInBytes和GetRuntimeUBSize接口使用方法，用于获取用户最大可使用的UB（Unified Buffer）大小（单位为Byte）。本样例给出了2种不同的测试场景（scenario）。
@@ -18,7 +19,7 @@
   <tr>
     <td align="center">2</td>
     <td align="center">GetRuntimeUBSize</td>
-    <td>返回运行时变量，表示用户最大可使用的UB（Unified Buffer）大小。适用于SIMT和SIMD混合编程场景，SIMT场景会在UB预留一部分空间用于Dcache。例如Ascend 950PR/Ascend 950DT场景，SIMT编程申请32KB空间用于Dcache，系统预留8KB，UB总共256KB，返回216KB</td>
+    <td>返回运行时变量，表示用户最大可使用的UB（Unified Buffer）大小。在SIMT和SIMD混合编程场景下，SIMT场景会在UB预留一部分空间用于Dcache。例如Ascend 950PR/Ascend 950DT场景，SIMT编程申请32KB空间用于Dcache，系统预留8KB，UB总共256KB，返回216KB。在非SIMT和SIMD混合编程场景下，返回固定值248KB</td>
   </tr>
 </table>
 
@@ -121,7 +122,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

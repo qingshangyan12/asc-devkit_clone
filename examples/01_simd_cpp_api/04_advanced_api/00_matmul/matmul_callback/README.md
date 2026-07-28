@@ -1,6 +1,7 @@
-# Matmul 模板参数MatmulCallbackFunc直调样例
+# Matmul 模板参数AscendC::MatmulCallBackFunc直调样例
+
 ## 概述
-Matmul API模板参数MatmulCallbackFunc的自定义使用方式。MatmulCallbackFunc用于配置左矩阵从Global Memory拷贝到A1(L1 Buffer)、右矩阵从Global Memory拷贝到B1(L1 Buffer)、计算结果从CO1（L0C Buffer）拷贝到Global Memory的自定义函数，本样例以Global Memory自定义搬运到A1(L1 Buffer)的回调函数为例，介绍该模板参数如何使用。
+Matmul API模板参数AscendC::MatmulCallBackFunc的自定义使用方式。AscendC::MatmulCallBackFunc用于配置左矩阵从Global Memory拷贝到A1(L1 Buffer)、右矩阵从Global Memory拷贝到B1(L1 Buffer)、计算结果从CO1（L0C Buffer）拷贝到Global Memory的自定义函数，本样例以Global Memory自定义搬运到A1(L1 Buffer)的回调函数为例，介绍该模板参数如何使用。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -13,7 +14,7 @@ Matmul API模板参数MatmulCallbackFunc的自定义使用方式。MatmulCallbac
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

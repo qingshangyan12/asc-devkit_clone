@@ -7,7 +7,7 @@
 
 基于Ubuntu 24.04的AscendC NPU算子开发容器化环境。
 
-## 📋 前置条件
+## 📋 前置条件<a name="prerequisites"></a>
 
 | 依赖项 | 有NPU | 无NPU |
 | -------- | :--------: | :--------: |
@@ -46,10 +46,10 @@ curl -fsSL "https://github.com/docker/buildx/releases/download/${version}/buildx
 chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 ```
 
-## 🧑‍💻 快速开始（人类用户）
+## 🧑‍💻 快速开始（人类用户）<a name="human-quick-start"></a>
 
 > [!NOTE] 说明
-> 如您是AI Agent，请跳至[快速开始（AI Agent）](#快速开始ai-agent)。
+> 如您是AI Agent，请跳至[快速开始（AI Agent）](#ai-agent-quick-start)。
 >
 > 以下步骤假设您在**Linux宿主机**上使用VS Code进行开发（Ascend驱动仅支持Linux）。
 
@@ -117,13 +117,13 @@ Dev Containers扩展会自动构建镜像并启动容器。首次构建约需5�
 
 ### 步骤六：容器内安装CANN
 
-容器启动后，在容器终端参考[📥 下载安装CANN包](../docs/quick_start.md#cann-install)章节完成toolkit和ops包的下载与安装。
+容器启动后，在容器终端参考[📥 下载安装CANN包](../docs/zh/quick_start.md#cann-install)章节完成toolkit和ops包的下载与安装。
 
 ### 步骤七：验证环境
 
-在容器终端参考[✅ 环境验证](../docs/quick_start.md#cann-verify)章节确认NPU设备与CANN包状态，然后按[⚙️ 环境变量配置](../docs/quick_start.md#cann-env-setup)加载环境变量，即可开始算子开发。
+在容器终端参考[✅ 环境验证](../docs/zh/quick_start.md#cann-verify)章节确认NPU设备与CANN包状态，然后按[⚙️ 环境变量配置](../docs/zh/quick_start.md#cann-env-setup)加载环境变量，即可开始算子开发。
 
-## 🤖 快速开始（AI Agent）<a name="快速开始ai-agent"></a>
+## 🤖 快速开始（AI Agent）<a name="ai-agent-quick-start"></a>
 
 AI Agent（如Claude Code、CI Runner）可不依赖VS Code，直接运行容器。
 
@@ -180,9 +180,9 @@ docker run -itd --name ascendc_container ascendc:ubuntu24.04
 > [!IMPORTANT] 重要
 >
 > - 若用户需要挂载数据目录，以`-v /host/path:/container/path`的形式逐条追加。
-> - 容器启动后，须在容器内手动安装CANN toolkit和ops包。请向用户询问CANN包的路径或安装命令，或参考[📥 下载安装CANN包](../docs/quick_start.md#cann-install)章节。
+> - 容器启动后，须在容器内手动安装CANN toolkit和ops包。请向用户询问CANN包的路径或安装命令，或参考[📥 下载安装CANN包](../docs/zh/quick_start.md#cann-install)章节。
 
-## 🐍 Python环境
+## 🐍 Python环境<a name="python-env"></a>
 
 容器内预置了以下conda环境：
 
@@ -192,7 +192,7 @@ docker run -itd --name ascendc_container ascendc:ubuntu24.04
 
 默认激活环境为`py312`。
 
-## ⚙️ 配置说明
+## ⚙️ 配置说明<a name="configuration"></a>
 
 ### 镜像源
 

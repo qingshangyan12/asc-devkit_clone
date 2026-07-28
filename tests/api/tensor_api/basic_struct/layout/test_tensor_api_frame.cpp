@@ -1,15 +1,15 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <gtest/gtest.h>
-#include "tensor_api/stub/cce_stub.h"
+#include "c_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Frame_Layout : public testing::Test {
@@ -126,7 +126,17 @@ TEST_F(Tensor_Api_Frame_Layout, BatchFrameLayoutTraitForms)
     auto dnExtLayout = MakeFrameLayout<DNExtLayoutPtn, LayoutTraitDefault<float>>(2, 8, 16);
     auto nzLayoutWithTrait = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(2, 32, 64);
     auto nzLayoutWithDataType = MakeFrameLayout<NZLayoutPtn, float>(2, 32, 64);
+    auto nzLayoutWithCompatTrait = MakeFrameLayout<NZLayoutPtn, LayoutTrait<float, _8>>(2, 32, 64);
     auto znLayoutWithC0 = MakeFrameLayout<ZNLayoutPtn, 8>(2, 32, 64);
+    using NzTraitWithDefault = GetLayoutTrait<decltype(nzLayoutWithTrait)>;
+    using NzTraitWithDataType = GetLayoutTrait<decltype(nzLayoutWithDataType)>;
+    using NzCompatTrait = GetLayoutTrait<decltype(nzLayoutWithCompatTrait)>;
+    static_assert(NzTraitWithDefault::C0_ELEMENT == _8{}, "LayoutTraitDefault<T> should only be used to infer C0.");
+    static_assert(NzTraitWithDataType::C0_ELEMENT == _8{}, "Data type argument should only be used to infer C0.");
+    static_assert(
+        AscendC::Std::is_same_v<NzCompatTrait, LayoutTrait<float, _8>>,
+        "LayoutTrait<T, C0> should remain source-compatible.");
+    static_assert(NzCompatTrait::C0_ELEMENT == _8{}, "LayoutTrait<T, C0> should use C0 as layout trait.");
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape(ndLayout)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(ndLayout)), 128);
@@ -146,6 +156,11 @@ TEST_F(Tensor_Api_Frame_Layout, BatchFrameLayoutTraitForms)
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(nzLayoutWithDataType)), 2048);
     EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(GetShape<1>(nzLayoutWithDataType))), 8);
     EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(GetShape<1>(nzLayoutWithDataType))), 8);
+
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape(nzLayoutWithCompatTrait)), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride(nzLayoutWithCompatTrait)), 2048);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(GetShape<1>(nzLayoutWithCompatTrait))), 8);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(GetShape<1>(nzLayoutWithCompatTrait))), 8);
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape(znLayoutWithC0)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(znLayoutWithC0)), 2048);
@@ -243,7 +258,6 @@ TEST_F(Tensor_Api_Frame_Layout, NDAndDNGroupIntegralConstantTrait)
     EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(GetStride(dnExtLayout))), 8);
 }
 
-
 TEST_F(Tensor_Api_Frame_Layout, ScaleGroupTraitWithTypeAndC0Element)
 {
     using namespace AscendC::Te;
@@ -295,7 +309,7 @@ TEST_F(Tensor_Api_Frame_Layout, OtherGroupDefaultTrait)
     auto nzLayout = MakeFrameLayout<NZLayoutPtn>(32, 64);
     auto znLayout = MakeFrameLayout<ZNLayoutPtn>(32, 64);
     auto zzLayout = MakeFrameLayout<ZZLayoutPtn>(32, 64);
-    auto nnLayout = MakeFrameLayout<NNLayoutPtn, LayoutTrait<fp8_e8m0_t, _2>>(16, 32);
+    auto nnLayout = MakeFrameLayout<NNLayoutPtn, LayoutTrait<AscendC::Std::ignore_t, _2>>(16, 32);
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(nzLayout)), 16);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(nzLayout)), 2);
@@ -348,7 +362,6 @@ TEST_F(Tensor_Api_Frame_Layout, OtherGroupTraitWithType)
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(nnLayout)), 2);
 }
 
-
 TEST_F(Tensor_Api_Frame_Layout, OtherGroupWithDataType)
 {
     using namespace AscendC::Te;
@@ -378,7 +391,6 @@ TEST_F(Tensor_Api_Frame_Layout, OtherGroupWithDataType)
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(nnLayout)), 16);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(nnLayout)), 2);
 }
-
 
 TEST_F(Tensor_Api_Frame_Layout, OtherGroupWithC0Element)
 {

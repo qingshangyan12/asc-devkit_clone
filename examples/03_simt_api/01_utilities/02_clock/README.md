@@ -10,14 +10,14 @@
 
 ## 支持的CANN软件版本
 
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
 ```text
 ├── 02_clock
 │   ├── CMakeLists.txt         // cmake编译文件
-│   ├── clock.asc             // Ascend C算子实现加clock打点的调用样例
+│   ├── clock.asc              // Ascend C算子实现加clock打点的调用样例
 │   └── README.md
 ```
 
@@ -39,8 +39,8 @@
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">gather</td></tr>
   <tr><td align="center"></td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">input</td><td align="center">[100000]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">index</td><td align="center">[8192]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[8192]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">index</td><td align="center">[12288]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[12288]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">simt_gather</td></tr>
   </table>
 
@@ -79,7 +79,7 @@
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -106,5 +106,5 @@
 
   ```text
   simt_gather execute cycle : 3479
-  test pass!
+  [Success] Case accuracy is verification passed.
   ```

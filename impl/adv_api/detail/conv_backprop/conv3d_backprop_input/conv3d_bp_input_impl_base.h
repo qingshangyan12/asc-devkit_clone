@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file conv3d_bp_input_impl_base.h
@@ -16,11 +16,11 @@
 #ifndef CONV3D_BP_INPUT_IMPL_BASE_H
 #define CONV3D_BP_INPUT_IMPL_BASE_H
 
-#include "include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
+#include "../../../../../include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
 #include "conv3d_bp_input_func.h"
 #include "../common/conv3d_bp_util.h"
-#include "kernel_basic_intf.h"
-#include "kernel_utils.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../basic_api/kernel_utils.h"
 
 namespace ConvBackpropApi {
 template <typename Intf, class Config_>
@@ -41,9 +41,9 @@ public:
     DECLARE_SYNC_IMPL(ConvBackpropInputFunc, Config_, ConvBackpropInputFunc, GetTensorC, Intf);
     DECLARE_IMPL(ConvBackpropInputFunc, Config_, ConvBackpropInputFunc, End, Intf);
     struct ContextData : public Config::ContextData {
-         __aicore__ inline ContextData(){};
+        __aicore__ inline ContextData(){};
         DEFINE_STUCT_FIELD(AscendC::TPipe, pipe_);
-        DEFINE_STUCT_FIELD(const TConv3DBackpropInputTiling *__restrict, tiling_);
+        DEFINE_STUCT_FIELD(const TConv3DBackpropInputTiling* __restrict, tiling_);
         DEFINE_STUCT_TEMPLATE_FIELD(AscendC::TQue, c1Ping_, AscendC::TPosition::CO1, 1);
         DEFINE_STUCT_TEMPLATE_FIELD(AscendC::TQue, c1Pong_, AscendC::TPosition::CO1, 1);
         DEFINE_STUCT_TEMPLATE_FIELD(AscendC::TQue, a1Ping_, AscendC::TPosition::A1, 1);
@@ -54,7 +54,7 @@ public:
         DEFINE_STUCT_TEMPLATE_FIELD(AscendC::TBuf, l0bBuf_, AscendC::TPosition::B2);
         DEFINE_STUCT_FIELD(uint8_t, isFirstIter_);
         DEFINE_STUCT_FIELD(uint8_t, needComputeFlag_);
-        DEFINE_STUCT_FIELD(uint8_t, needComputeKFlag_);        
+        DEFINE_STUCT_FIELD(uint8_t, needComputeKFlag_);
         DEFINE_STUCT_FIELD(uint8_t, l0aPingPongFlag_);
         DEFINE_STUCT_FIELD(uint8_t, useL0PingPong_);
         DEFINE_STUCT_FIELD(uint8_t, usingCacheC1Ping_);
@@ -136,6 +136,6 @@ public:
     };
 };
 
-}  // namespace ConvBackpropApi
+} // namespace ConvBackpropApi
 
 #endif

@@ -20,12 +20,15 @@
 #define __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_DUMP_H__
 #endif
 
-#ifndef ASCENDC_SIMD_VF_DEBUG
-#define ASCENDC_SIMD_VF_DEBUG
-#endif
+#include "impl/utils/debug/asc_simd_debug_enable.h"
+#include "impl/utils/sys_macros.h"
 
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
+#endif
+
+#if __NPU_ARCH__ == 3510
+#include "impl/utils/debug/asc_simd_dump_impl.h"
 #endif
 
 namespace __asc_aicore {
@@ -52,6 +55,14 @@ __aicore__ inline void asc_dump(__cc__ T* input, uint32_t desc, uint32_t dump_si
 
 template<typename T>
 __aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_size);
+
+#if defined(__NPU_ARCH__)
+template<typename T>
+__aicore__ inline void asc_dump(__biasbuf__ T* input, uint32_t desc, uint32_t dump_size);
+#endif
+
+template<typename T>
+__aicore__ inline void asc_dump(__fbuf__ T* input, uint32_t desc, uint32_t dump_size);
 }
 
 namespace __asc_simd_vf {

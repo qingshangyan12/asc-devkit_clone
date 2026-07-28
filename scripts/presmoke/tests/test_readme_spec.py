@@ -1,3 +1,16 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 from __future__ import annotations
 
 import tempfile
@@ -80,7 +93,9 @@ cmake --build build -j
 
         self.assertEqual(spec.archs, ["dav-2201", "dav-3510"])
 
-    def test_support_product_section_restricts_arch_even_if_option_table_mentions_more(self) -> None:
+    def test_support_product_section_restricts_arch_even_if_option_table_mentions_more(
+        self,
+    ) -> None:
         text = """# sample
 
 ## 支持的产品
@@ -136,7 +151,9 @@ cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
             ex = root / "x"
             ex.mkdir(parents=True)
             (ex / "README.md").write_text(text, encoding="utf-8")
-            (ex / "CMakeLists.txt").write_text("add_executable(demo main.cpp)", encoding="utf-8")
+            (ex / "CMakeLists.txt").write_text(
+                "add_executable(demo main.cpp)", encoding="utf-8"
+            )
             spec = parse_readme(ex, root)
         self.assertIn("cmake", " ".join(c.raw for c in spec.commands))
         self.assertNotIn("-lfoo", " ".join(c.raw for c in spec.commands))

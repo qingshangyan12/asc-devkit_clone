@@ -16,9 +16,9 @@
 
 ```text
 ├── copy_out_tensor_api
-│   └── scripts
-│       ├── gen_data.py                    // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py               // 真值对比文件
+│   ├── scripts
+│   │   ├── gen_data.py                    // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py               // 真值对比文件
 │   ├── CMakeLists.txt                     // 编译工程文件
 │   ├── data_utils.h                       // 数据读入写出函数
 │   ├── copy_out_tensor_api.asc            // Ascend C样例实现 & 调用样例
@@ -30,15 +30,15 @@
 - 样例功能：
   本样例实现了带Bias的动态Shape多核Matmul功能，通过Copy接口完成L0C到GM或L0C到UB的数据搬运，通过Mmad接口完成矩阵乘加计算。
 
-  1、动态Matmul功能
+  1. 动态Matmul功能
 
   本样例实现了多核Matmul功能。Shape参数（M、N、K、singleCoreM、singleCoreN、singleCoreK）通过`MatmulTiling`结构体在运行时动态传入kernel。`BASE_M`、`BASE_N`、`BASE_K`和`STEP_M`、`STEP_N`、`STEP_K`作为编译期模板参数，决定了L0/L1级buffer的分配大小。
 
-  2、Bias功能
+  2. Bias功能
 
   本样例在Matmul计算的首次迭代中通过Mmad接口将Bias向量加到矩阵乘结果上，Bias为float类型的一维向量，长度为N。
 
-  3、多场景支持
+  3. 多场景支持
 
   通过编译时宏参数`SCENARIO_NUM`选择不同的回写模式：
 
@@ -54,7 +54,7 @@
 
   注：A/B矩阵在所有场景下数据类型均为half，C矩阵和Bias在所有场景下数据类型均为float。
 
-  4、MatmulTiling结构体定义
+  4. MatmulTiling结构体定义
 
   ```cpp
   struct MatmulTiling {
@@ -153,7 +153,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../../docs/quick_start.md#下载-cann-master)**。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../../docs/zh/quick_start.md#下载-cann-master)**。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

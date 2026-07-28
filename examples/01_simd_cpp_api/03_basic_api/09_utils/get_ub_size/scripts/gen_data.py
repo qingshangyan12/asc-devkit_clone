@@ -19,7 +19,11 @@ import numpy as np
 
 def get_range_by_dtype(input_type):
     try:
-        if input_type == np.float16 or input_type == np.float32 or input_type == np.float64:
+        if (
+            input_type == np.float16
+            or input_type == np.float32
+            or input_type == np.float64
+        ):
             return np.finfo(input_type).min, np.finfo(input_type).max
         else:
             return np.iinfo(input_type).min, np.iinfo(input_type).max
@@ -36,7 +40,7 @@ def gen_golden_data(scenarioNum):
     input_type = np.float16
     output_type = np.float16
     min_val, max_val = get_range_by_dtype(input_type)
-    
+
     if scenarioNum == 1:
         # 场景1：GetUBSizeInBytes，shape=[16384]
         total_length = 16384
@@ -46,19 +50,19 @@ def gen_golden_data(scenarioNum):
     else:
         print(f"scenarioNum {scenarioNum} is not supported!")
         return
-    
+
     input_x = np.random.uniform(min_val, max_val, [total_length]).astype(input_type)
     golden = np.abs(input_x)
-    
+
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
-    
+
     input_x.tofile("./input/input_x.bin")
     golden.tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 3))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 3))
     args = parser.parse_args()
     gen_golden_data(args.scenarioNum)

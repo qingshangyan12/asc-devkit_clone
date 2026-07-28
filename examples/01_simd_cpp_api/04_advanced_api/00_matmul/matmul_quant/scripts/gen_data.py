@@ -28,7 +28,7 @@ def gen_golden_data(quant_mode=0):
 
     if quant_mode == 0:  # 0: scalar quant mode
         golden = golden * 0.1
-    elif quant_mode == 1:  # 1: vector quant mode 
+    elif quant_mode == 1:  # 1: vector quant mode
         quant_vector = np.random.uniform(0.1, 2.0, [1, n]).astype(np.float32)
         quant_vector_gm = np.frombuffer(quant_vector, np.int32)
         quant_vector_gm = quant_vector_gm.astype(np.uint64)
@@ -46,14 +46,13 @@ def gen_golden_data(quant_mode=0):
     x1_gm.tofile("./input/x1_gm.bin")
     x2_gm.tofile("./input/x2_gm.bin")
     bias_gm.tofile("./input/bias_gm.bin")
-    if quant_mode == 1:  
+    if quant_mode == 1:
         quant_vector_gm.tofile("./input/quant_vector_gm.bin")
     golden.tofile("./output/golden.bin")
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', type=int, default=0, choices=[0, 1])
+    parser.add_argument("-m", type=int, default=0, choices=[0, 1])
     args = parser.parse_args()
     gen_golden_data(args.m)

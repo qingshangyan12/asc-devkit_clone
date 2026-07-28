@@ -21,14 +21,15 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
 #include "kernel_reg.h"
 #include "kernel_npu_debug.h"
 #include "kernel_operator_mm_base_impl.h"
-#include "kernel_struct_mm.h"
+#include "../../include/basic_api/kernel_struct_mm.h"
 
 namespace AscendC {
+__aicore__ inline void PrintTimeStamp(uint32_t descId);
 
 /* **************************************************************************************************
  * LoadData 2d                                             *
@@ -61,6 +62,9 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
 {
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
     CheckLoadData2dDatatype<T>();
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadData2dGlobal2Local(dst, "LoadData with LoadData2DParams");
@@ -120,12 +124,28 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams)
 {
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
     CheckLoadData2dDatatype<T>();
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadData2dGlobal2Local(dst, "LoadData with LoadData2DParamsV2");
 #endif
     LoadDataImpl(dst, src, loadDataParams);
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams,
+    const Nd2NzParamsV2& nd2nzParams)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    LoadDataImpl(dst, src, loadDataParams, nd2nzParams);
+}
+#endif
 
 /* **************************************************************************************************
  * LoadData 3dv1                                             *
@@ -317,7 +337,8 @@ __aicore__ inline void LoadDataWithTranspose(
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadDataWithTranspose(dst, src, "LoadDataWithTranspose with LoadData2dTransposeParams");
-    ReportNopWarning<uint8_t>(loadDataParams.repeatTimes, "loadDataParams.repeatTimes",
+    ReportNopWarning<uint8_t>(
+        loadDataParams.repeatTimes, "loadDataParams.repeatTimes",
         "LoadDataWithTranspose with LoadData2dTransposeParams");
 #endif
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
@@ -342,7 +363,8 @@ __aicore__ inline void LoadDataWithTranspose(
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadDataWithTranspose(dst, src, "LoadDataWithTranspose with LoadData2dTransposeParamsV2");
-    ReportNopWarning<uint8_t>(loadDataParams.repeatTimes, "loadDataParams.repeatTimes",
+    ReportNopWarning<uint8_t>(
+        loadDataParams.repeatTimes, "loadDataParams.repeatTimes",
         "LoadDataWithTranspose with LoadData2dTransposeParamsV2");
 #endif
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
@@ -609,6 +631,9 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(
     const LocalTensor<T>& dst, const LoadImageToLocalParams& loadDataParams)
 {
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ASCENDC_ASSERT(CheckFuncLoadImageToLocal(dst, loadDataParams, "LoadImageToLocal"), {
         ASCENDC_REPORT_CHECK_ERROR("LoadImageToLocal", KernelFuncType::NONE_MODE);

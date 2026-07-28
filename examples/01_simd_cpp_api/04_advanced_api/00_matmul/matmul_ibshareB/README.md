@@ -1,8 +1,8 @@
-# Matmul IBShareB样例直调样例
+# Matmul IBShareB直调样例
 
 ## 概述
 
-调开启IBShare功能，复用L1 Buffer上相同的A矩阵或者B矩阵数据的样例，本样例为仅B矩阵复用场景。开启功能可以减少数据搬运开销。支持多种场景，通过环境变量选择场景。
+开启IBShare功能，复用L1 Buffer上相同的A矩阵或者B矩阵数据的样例，本样例为仅B矩阵复用场景。开启功能可以减少数据搬运开销。支持多种场景，通过环境变量选择场景。
     <table>
 	 	<tr>
 	 		<td>scenarioNum</td>
@@ -51,10 +51,9 @@
   本样例中：M = 64, N = 256, K = 384。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulIBShareBCustom</td></tr>
-  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
   <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_ibshareb_custom</td></tr>
   </table>
@@ -90,9 +89,9 @@
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
     ```cpp
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, 0, stream>>>(x1, x2, bias, y, workspaceDevice,
                           tilingDevice);       // 方式一：非纯Cube模式，SetDim设置为AIV:AIC组合的核数
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum, 0, stream>>>(x1, x2, bias, y, workspaceDevice,
                           tilingDevice);       // 方式二：纯Cube模式，SetDim设置为AIC的核数                          
     ```
 
@@ -100,7 +99,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

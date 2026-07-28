@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /* !
  * \file pad_tiling.h
@@ -16,7 +16,7 @@
 #ifndef LIB_PAD_PAD_TILING_H
 #define LIB_PAD_PAD_TILING_H
 
-#include "graph/tensor.h"
+#include "../utils/types.h"
 #include "pad_tilingdata.h"
 #include "tiling/platform/platform_ascendc.h"
 #include "kernel_tiling/kernel_tiling.h"
@@ -30,8 +30,8 @@ namespace AscendC {
  * \param [out] maxValue max size of tmp buffer
  * \param [out] minValue min size of tmp buffer
  */
-void GetPadMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue,
-    uint32_t& minValue);
+void GetPadMaxMinTmpSize(
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
  * \brief calculate tiling params for Pad interface
@@ -44,9 +44,11 @@ void GetPadMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uin
  * \param [in] typeSize data type size: sizeof(TYPE)
  * \param [out] tiling Pad tiling
  */
-void PadTilingFunc(const ge::Shape srcShape, const ge::Shape oriSrcShape, const uint32_t stackBufferSize,
+void PadTilingFunc(
+    const AscendC::TensorShape srcShape, const AscendC::TensorShape oriSrcShape, const uint32_t stackBufferSize,
     const uint32_t typeSize, optiling::PadTiling& tiling);
-void PadTilingFunc(const ge::Shape srcShape, const ge::Shape oriSrcShape, const uint32_t stackBufferSize,
+void PadTilingFunc(
+    const AscendC::TensorShape srcShape, const AscendC::TensorShape oriSrcShape, const uint32_t stackBufferSize,
     const uint32_t typeSize, AscendC::tiling::PadTiling& tiling);
 
 /*!
@@ -59,7 +61,8 @@ void PadTilingFunc(const ge::Shape srcShape, const ge::Shape oriSrcShape, const 
  * \param [out] maxValue max size of tmp buffer
  * \param [out] minValue min size of tmp buffer
  */
-void GetUnPadMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape,
+void GetUnPadMaxMinTmpSize(
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape,
     const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -73,9 +76,11 @@ void GetUnPadMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatf
  * \param [in] typeSize data type size: sizeof(TYPE)
  * \param [out] tiling UnPad tiling
  */
-void UnPadTilingFunc(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+void UnPadTilingFunc(
+    const AscendC::TensorShape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
     optiling::UnPadTiling& tiling);
-void UnPadTilingFunc(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+void UnPadTilingFunc(
+    const AscendC::TensorShape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
     AscendC::tiling::UnPadTiling& tiling);
-}
+} // namespace AscendC
 #endif // LIB_PAD_PAD_TILING_H

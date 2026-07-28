@@ -32,7 +32,7 @@
   ```
   C = A * B
   ```
-  其中矩阵B为稠密化后的矩阵，原始B矩阵每4个元素中至少包含2个零元素，通过4选2稠密化策略进行压缩存储，并且B矩阵必须转置，即为[N,K]输入。A、B矩阵数据类型只支持int8_t，index矩阵数据类型为uint8_t
+  其中原始B矩阵shape为[N, K]，每4个元素中至少包含2个零元素，通过4选2稠密化策略压缩为[N, K/2]后输入。B矩阵必须转置存储，即按[N, K]构造并压缩输入。A、B矩阵数据类型只支持int8_t，index矩阵数据类型为uint8_t。
 - 样例规格：
 
 <a name="表1"></a>
@@ -40,15 +40,15 @@
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">📌 表1：样例规格表</span></caption>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">a</td><td align="center">[128, 128]</td><td align="center">int8</td><td align="center">NZ</td></tr>
-  <tr><td align="center">b</td><td align="center">[64, 128]</td><td align="center">int8</td><td align="center">NZ</td></tr>
+  <tr><td align="center">a</td><td align="center">[128, 64]</td><td align="center">int8</td><td align="center">NZ</td></tr>
+  <tr><td align="center">b</td><td align="center">[128, 32]</td><td align="center">int8</td><td align="center">ZN</td></tr>
   <tr><td align="center">idx</td><td align="center">[128, 8]</td><td align="center">uint8</td><td align="center">ZN</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[128, 128]</td><td align="center">int32</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_with_sparse_custom</td></tr>
 </table>
 
 - 样例实现：
-  样例实现流程分为以下步骤：
+  样例实现分为以下阶段：
   - **CopyIn**：将Global Memory上的输入数据搬运到Local Memory L1中，并将索引矩阵加载到L1中，其中Index分形与B矩阵分形必须为Zn分形，即GM上的B矩阵必须为转置，Index离线生成必须为Zn排布
   - **SplitB**：使用LoadDataWithSparse将B矩阵和索引矩阵从L1搬运到L0B与内置索引buffer中
   - **SplitA**：将A矩阵从L1搬运到L0A中
@@ -58,14 +58,14 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+- 配置环境变量
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-  
+
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -91,6 +91,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认） | NPU架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品/Atlas A3 训练系列产品/Atlas A3 推理系列产品 |
 
 - 执行结果
 
@@ -106,10 +107,10 @@
 
 1. **构造稀疏矩阵B**：生成指定形状的稀疏矩阵，每行的每4个元素块中至少包含2个零元素
 2. **稠密化处理**：将稀疏矩阵B通过4选2策略稠密化，生成稠密矩阵dense_B
-3. **索引矩阵生成**: 
+3. **索引矩阵生成**:
    - 生成index_matrix：记录每个块中被选中元素的相对位置（用于NPU计算）
    - 生成index_mask_matrix：记录被选中元素的绝对索引（用于golden计算）
 4. **生成golden数据**：使用稠密化后的矩阵和索引矩阵计算稀疏矩阵乘的真值
-5. **数据格式转换**: 
+5. **数据格式转换**:
    - 将索引矩阵从uint8转换为uint2格式
    - 对输入矩阵进行ND到NZ的分格转置

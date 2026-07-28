@@ -18,8 +18,8 @@
 #ifndef IMPL_REDUCE_REDUCE_MIN_REDUCE_MIN_C310_IMPL_H_
 #define IMPL_REDUCE_REDUCE_MIN_REDUCE_MIN_C310_IMPL_H_
 
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../reduce_common_util_impl.h"
 #include "../reduce_common_util_3510_impl.h"
@@ -83,9 +83,15 @@ __aicore__ inline void ReduceMinRAB64ReuseSourceCompute(
     __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ubuf__ T* tmpAddr, const uint32_t srcShape[])
 {
     if ((srcShape[1] * sizeof(T)) % 32 == 0) {
-        ReduceRAB64ReuseSource<
-            T, Reg::RegTraitNumTwo, Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>,
-            isReuseSource>(dstAddr, srcAddr, tmpAddr, srcShape[1], srcShape[0]);
+        if (srcShape[1] * sizeof(T) <= GetVecLen() / 2) {
+            ReduceRAConcatImpl<
+                T, Reg::RegTraitNumTwo, Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>,
+                isReuseSource>(dstAddr, srcAddr, tmpAddr, srcShape[1], srcShape[0]);
+        } else {
+            ReduceRAB64ReuseSource<
+                T, Reg::RegTraitNumTwo, Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>,
+                isReuseSource>(dstAddr, srcAddr, tmpAddr, srcShape[1], srcShape[0]);
+        }
     } else {
         ReduceRAReuseSourceUnAlignedB64<
             T, Reg::RegTraitNumTwo, Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>>(

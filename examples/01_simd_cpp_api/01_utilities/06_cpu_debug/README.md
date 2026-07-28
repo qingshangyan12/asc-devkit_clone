@@ -27,7 +27,7 @@
   CPU Debug功能支持对CPU执行过程中的运行状态进行调试，主要通过GDB工具实现。GDB调试支持设置断点、查看寄存器和内存状态、单步执行、查看调用栈等常用调试操作。
 
 - 样例介绍：  
-  本样例的Add实现与[Add基础样例](../../00_introduction/01_add/README.md)保持一致，默认使用`float`类型。每个block处理`2048`个数据，流程为`DataCopy`输入到UB、执行`Add`、再将结果`DataCopy`回GM。
+  本样例的Add实现与[Add基础样例](../../00_introduction/01_add/add/README.md)保持一致，默认使用`float`类型。每个block处理`2048`个数据，流程为`DataCopy`输入到UB、执行`Add`、再将结果`DataCopy`回GM。
 
   为了使能CPU Debug，本样例在定义`ASCENDC_CPU_DEBUG`宏时包含`cpu_debug_launch.h`头文件。
 
@@ -43,7 +43,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -62,10 +62,10 @@
 
 - 编译选项说明
 
-  | 选项 | 说明 |
-  |------|------|
-  | `CMAKE_ASC_RUN_MODE` | 指定为`cpu`, 开启CPU域编译 |
-  | `CMAKE_ASC_ARCHITECTURES` | 指定NPU架构版本号，CMake会根据该值配置对应的CPU调试依赖库。<br>`dav-2201` 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，`dav-3510` 对应 Ascend 950PR/Ascend 950DT |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `cpu` | 指定为`cpu`，开启CPU域编译 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`、`dav-3510` | 指定NPU架构版本号，CMake会根据该值配置对应的CPU调试依赖库。`dav-2201`对应Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品，`dav-3510`对应Ascend 950PR/Ascend 950DT |
 
 - 执行结果  
   执行结果如下，说明执行成功。

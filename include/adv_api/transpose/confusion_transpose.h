@@ -1,17 +1,21 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file confusion_transpose.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "confusion_transpose.h cannot be used with compile flag --enable-simt enabled."
+#endif
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -22,7 +26,7 @@
 #define LIB_TRANSPOSE_CONFUSION_TRANSPOSE_H
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../impl/basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../../impl/adv_api/detail/transpose/confusion_transpose/confusion_transpose_common_impl.h"
 
@@ -42,8 +46,9 @@ namespace AscendC {
  * @param [in] tiling Transpose tiling
  */
 template <typename T>
-__aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, TransposeType transposeType, ConfusionTransposeTiling& tiling)
+__aicore__ inline void Transpose(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    TransposeType transposeType, ConfusionTransposeTiling& tiling)
 {
     ConfusionTransposeImpl<T>(dst, src, sharedTmpBuffer, transposeType, tiling);
 }
@@ -60,8 +65,8 @@ __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>
  * @param [in] tiling Transpose tiling
  */
 template <typename T>
-__aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    TransposeType transposeType, ConfusionTransposeTiling& tiling)
+__aicore__ inline void Transpose(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, TransposeType transposeType, ConfusionTransposeTiling& tiling)
 {
     LocalTensor<uint8_t> tmpBuffer;
     bool res = PopStackBuffer<uint8_t, TPosition::LCM>(tmpBuffer);

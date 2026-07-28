@@ -29,10 +29,9 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
   本样例中：M = 128, N = 30720, K = 64。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
-  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_constant_tiling_custom</td></tr>
   </table>
@@ -45,7 +44,7 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
         constexpr int32_t MAX_M = 10000; // custom matmul kernel support max value of M Dim shape
         constexpr int32_t MAX_N = 10000; // custom matmul kernel support max value of N Dim shape
         constexpr int32_t MAX_K = 10000; // custom matmul kernel support max value of K Dim shape
-        constexpr int32_t BASE_M = 128;  // BASEM * BASE_K * sizeof(typeC) <=L0A size
+        constexpr int32_t BASE_M = 128;  // BASEM * BASE_K * sizeof(typeA) <=L0A size
         constexpr int32_t BASE_N = 256;  // BASEN * BASE_K * sizeof(typeB) <=L0B size
         constexpr int32_t BASE_K = 64;   // BASEM * BASE_N * sizeof(typeC) <=L0C size
         constexpr MatmulShapeParams shapeParams = { MAX_M,
@@ -97,7 +96,7 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

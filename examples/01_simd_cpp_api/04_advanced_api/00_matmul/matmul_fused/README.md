@@ -28,7 +28,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例创建MIX模式的Matmul对象，在AIC核实现Matmul计算，中间结果输出至VECIN(Unified Buffer)。AIC核计算完成后，通过Tque的EnQue/DeQue接口控制同步，继续在AIV核对Unified Buffer上的中间结果进行LeakyRelu的计算。
+  本样例创建MIX模式的Matmul对象，在AIC核实现Matmul计算，中间结果输出至VECIN(Unified Buffer)。AIC核计算完成后，通过TQue的EnQue/DeQue接口控制同步，继续在AIV核对Unified Buffer上的中间结果进行LeakyRelu的计算。
 
 - 样例规格：  
   本样例中：M = 1024, N = 640, K = 256
@@ -51,18 +51,19 @@
     - 完成LeakyRelu计算。
 
   - Tiling关键步骤
-    - 设置自定义MatmulConfig参数，将Kernel侧配置的参数如scheduleType等，同步到Tiling侧。
+    - 调用 `MultiCoreMatmulTiling` 设置A/B/C/Bias类型、原始Shape、计算Shape、遍历顺序和固定切分参数。
       ```cpp
-      matmul_tiling::MatmulConfigParams matmulConfigParams(1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT,
-          matmul_tiling::MatrixTraverse::FIRSTM, false);
-      cubeTiling.SetMatmulConfigParams(matmulConfigParams);
+      tilingApi.SetOrgShape(M, N, K);
+      tilingApi.SetShape(M, N, K);
+      tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
+      tilingApi.SetFixSplit(baseM, baseN, -1);
       ```
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

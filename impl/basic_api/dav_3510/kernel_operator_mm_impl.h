@@ -17,11 +17,11 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 
-#include "kernel_utils.h"
-#include "kernel_struct_aipp.h"
-#include "kernel_struct_mm.h"
-#include "kernel_operator_mm_bitmode_intf.h"
-#include "kernel_operator_sys_var_intf.h"
+#include "../kernel_utils.h"
+#include "../../../include/basic_api/kernel_struct_aipp.h"
+#include "../../../include/basic_api/kernel_struct_mm.h"
+#include "../../../include/basic_api/kernel_operator_mm_bitmode_intf.h"
+#include "../../../include/basic_api/kernel_operator_sys_var_intf.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -99,7 +99,10 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
         uint16_t dstStride = loadDataParam.dstGap + 1;
 
         if (loadDataParam.ifTranspose) {
-            load_cbuf_to_cb(dst, src, mStartPosition, kStartPosition, 1, kStep, srcStride, dstStride, 1);
+            for (uint8_t i = 0; i < kStep; i++) {
+                load_cbuf_to_cb(
+                    dst + i * VALUE_512 / sizeof(T) * dstStride, src, mStartPosition, i, 1, 1, srcStride, dstStride, 1);
+            }
         } else {
             load_cbuf_to_cb(dst, src, mStartPosition, kStartPosition, 1, kStep, srcStride, dstStride, 0);
         }
