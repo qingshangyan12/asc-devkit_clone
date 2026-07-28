@@ -9,6 +9,8 @@
  */
 #include "hccl_alloc_ctx_res.h"
 
+#include <mutex>
+
 using namespace mc2_ops_hccl;
 using namespace hcomm::CcuRep;
 
@@ -118,10 +120,18 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
 static HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& ctxTag, uint64_t ctxSize, void** ctx)
 {
     CHK_PTR_NULL(ctx);
+    static std::mutex ccuCtxMutex;
+    std::lock_guard<std::mutex> lock(ccuCtxMutex);
+
     uint64_t cachedSize = 0;
     if (HcclEngineCtxGet(comm, ctxTag.c_str(), COMM_ENGINE_AIV, ctx, &cachedSize) == HCCL_SUCCESS) {
         HCCL_INFO("[GetOrCreateCcuCtx] reuse context success, ctxTag[%s], ctx[%p], cachedSize[%llu]",
             ctxTag.c_str(), *ctx, cachedSize);
+        CHK_PRT_RET(cachedSize < ctxSize,
+            HCCL_ERROR("[GetOrCreateCcuCtx] cached context size is insufficient, ctxTag[%s], cachedSize[%llu], "
+                       "requiredSize[%llu]",
+                ctxTag.c_str(), cachedSize, ctxSize),
+            HCCL_E_PARA);
         return HCCL_SUCCESS;
     }
     CHK_RET(HcclEngineCtxCreate(comm, ctxTag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx));
