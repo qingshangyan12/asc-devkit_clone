@@ -25,9 +25,10 @@ Ascend C接口的头文件在“$\{INSTALL\_DIR\}/include/"目录下。$\{INSTAL
 
 | 定义接口的头文件 | 用途 | 对应的库文件 |
 | --- | --- | --- |
-| c_api/asc_simd.h | 提供SIMD C API对外接口。 | 不涉及 |
-| basic_api/kernel_basic_intf.h | 提供SIMD基础API对外接口。 | 不涉及 |
-| adv_api/kernel_api.h | 提供SIMD高阶API对外接口。 | 不涉及 |
+| c_api/asc_simd.h | 提供 SIMD C API Device 侧对外接口。 | 不涉及 |
+| basic_api/kernel_basic_intf.h | 提供 SIMD 基础 API Device 侧对外接口。 | 不涉及 |
+| adv_api/kernel_api.h | 提供 SIMD 高阶 API Device 侧对外接口。 | 不涉及 |
+| adv_api/tiling_api.h | 提供 SIMD 高阶 API Host 侧对外接口。 | libtiling_api.a |
 
 **表 3**  SIMT API头文件列表
 
@@ -39,6 +40,6 @@ Ascend C接口的头文件在“$\{INSTALL\_DIR\}/include/"目录下。$\{INSTAL
 
 | 定义接口的头文件 | 用途 | 对应的库文件 |
 | --- | --- | --- |
-| basic_api/kernel_basic_intf.h | 提供SIMD基础API对外接口，包含以下矢量计算、矩阵计算对外接口。 | 不涉及 |
-| basic_api/kernel_vec_intf.h | 提供SIMD 基础API矢量计算对外接口。 | 不涉及 |
-| basic_api/kernel_cube_intf.h | 提供SIMD 基础API矩阵计算对外接口。 | 不涉及 |
+| basic_api/kernel_basic_intf.h | 提供 SIMD 基础 API 对外接口，包含以下矢量计算、矩阵计算对外接口。 | 不涉及 |
+| basic_api/kernel_vec_intf.h | 提供 SIMD 基础 API 矢量计算对外接口。 | 不涉及 |
+| basic_api/kernel_cube_intf.h | 提供 SIMD 基础 API 矩阵计算对外接口。 | 不涉及 |
