@@ -1,0 +1,142 @@
+{
+  "schema_version": "1.0",
+  "target_arch": "dav-3510",
+  "purpose": "Static source index for Basic API and C API implementations that share CCE instructions; not an API-substitution guarantee.",
+  "sources": {
+    "basic_reg_priority": "impl/basic_api/reg_compute/dav_3510",
+    "basic_general_low_priority": "impl/basic_api/dav_3510",
+    "c_api": "impl/c_api/instr_impl/npu_arch_3510"
+  },
+  "confidence_values": ["exact", "family", "composite", "candidate"],
+  "mappings": [
+    {
+      "id": "reg-add",
+      "basic_api": {"operations": ["Reg::Add", "AddImpl"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_binary_impl.h"},
+      "c_api": {"operations": ["asc_add"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_add_impl.h"},
+      "shared_cce": ["vadd"], "confidence": "exact", "notes": "Verify dtype, mask and zeroing/merge mode. B64 and carry forms are excluded."
+    },
+    {
+      "id": "reg-sub-mul-div",
+      "basic_api": {"operations": ["Reg::Sub", "Reg::Mul", "Reg::Div"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_binary_impl.h"},
+      "c_api": {"operations": ["asc_sub", "asc_mul", "asc_div"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/{asc_sub,asc_mul,asc_div}_impl.h"},
+      "shared_cce": ["vsub", "vmul", "vdiv"], "confidence": "family", "notes": "Direct normal dtype paths exist; Div special-value paths are composite."
+    },
+    {
+      "id": "reg-min-max",
+      "basic_api": {"operations": ["Reg::Min", "Reg::Max"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_binary_impl.h"},
+      "c_api": {"operations": ["asc_min", "asc_max"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/{asc_min,asc_max}_impl.h"},
+      "shared_cce": ["vmin", "vmax"], "confidence": "exact", "notes": "Check signedness and mask mode."
+    },
+    {
+      "id": "reg-binary-scalar",
+      "basic_api": {"operations": ["Reg::Adds", "Reg::Muls", "Reg::Mins", "Reg::Maxs", "Reg::ShiftLefts", "Reg::ShiftRights"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_binary_scalar_impl.h"},
+      "c_api": {"operations": ["asc_add_scalar", "asc_mul_scalar", "asc_min_scalar", "asc_max_scalar", "asc_shiftleft_scalar", "asc_shiftright_scalar"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl"},
+      "shared_cce": ["vadds", "vmuls", "vmins", "vmaxs", "vshls", "vshrs"], "confidence": "family", "notes": "Scalar width and B64 split handling require overload-level verification."
+    },
+    {
+      "id": "reg-unary",
+      "basic_api": {"operations": ["Reg::Abs", "Reg::Neg", "Reg::Relu", "Reg::Exp", "Reg::Sqrt", "Reg::Ln"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_unary_impl.h"},
+      "c_api": {"operations": ["asc_abs", "asc_neg", "asc_relu", "asc_exp", "asc_sqrt", "asc_ln"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl"},
+      "shared_cce": ["vabs", "vneg", "vrelu", "vexp", "vsqrt", "vln"], "confidence": "family", "notes": "Sqrt/Ln and some dtype paths have subnormal or precision compensation; see appendix B."
+    },
+    {
+      "id": "reg-log-leakyrelu",
+      "basic_api": {"operations": ["Reg::Log", "Reg::Log2", "Reg::Log10", "Reg::LeakyRelu"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_{unary,binary_scalar}_impl.h"},
+      "c_api": {"operations": ["asc_ln", "asc_leakyrelu"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/{asc_ln,asc_leakyrelu}_impl.h"},
+      "shared_cce": ["vln", "vlrelu", "vmuls"], "confidence": "composite", "notes": "Log bases are composed from ln and scale. asc_leakyrelu has a documentation-versus-implementation availability conflict."
+    },
+    {
+      "id": "reg-fused",
+      "basic_api": {"operations": ["Reg::Axpy", "Reg::MulAddDst", "Reg::AbsSub", "Reg::ExpSub", "Reg::MulsCast"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_{vec_ternary_scalar,vec_fused}_impl.h"},
+      "c_api": {"operations": ["asc_axpy", "asc_madd", "asc_abs_sub", "asc_exp_sub", "asc_mul_scalar"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl"},
+      "shared_cce": ["vaxpy", "vmadd", "vabsdif", "vexpdif", "vmulscvt"], "confidence": "family", "notes": "Inspect operand order, accumulator semantics and conversion part mode."
+    },
+    {
+      "id": "reg-logic",
+      "basic_api": {"operations": ["Reg::And", "Reg::Or", "Reg::Xor", "Reg::Not"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_binary_impl.h"},
+      "c_api": {"operations": ["asc_and", "asc_or", "asc_xor", "asc_not"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl"},
+      "shared_cce": ["vand", "vor", "vxor", "vnot"], "confidence": "exact", "notes": "Check bitwise dtype and mask mode."
+    },
+    {
+      "id": "reg-compare",
+      "basic_api": {"operations": ["Reg::Compare", "Reg::Compares"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_binary_impl.h"},
+      "c_api": {"operations": ["asc_eq", "asc_ne", "asc_lt", "asc_le", "asc_gt", "asc_ge", "asc_*_scalar"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl"},
+      "shared_cce": ["vcmp_eq", "vcmp_ne", "vcmp_lt", "vcmp_le", "vcmp_gt", "vcmp_ge", "vcmps_eq", "vcmps_ne", "vcmps_lt", "vcmps_le", "vcmps_gt", "vcmps_ge"], "confidence": "family", "notes": "Mask result layout, scalar form and B64 comparison decomposition must match."
+    },
+    {
+      "id": "reg-select-copy-duplicate",
+      "basic_api": {"operations": ["Reg::Select", "Reg::Copy", "Reg::Duplicate", "Reg::DuplicateScalar"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_{gather_mask,copy,vec_duplicate}_impl.h"},
+      "c_api": {"operations": ["asc_select", "asc_copy", "asc_duplicate", "asc_duplicate_scalar"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl"},
+      "shared_cce": ["vsel", "vselr", "vmov", "vdup", "vbr"], "confidence": "family", "notes": "Duplicate-from-register and scalar broadcast are distinct instruction forms."
+    },
+    {
+      "id": "reg-rearrange",
+      "basic_api": {"operations": ["Reg::Interleave", "Reg::DeInterleave", "Reg::Pack", "Reg::UnPack", "Reg::Squeeze", "Reg::Unsqueeze"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_{vec_duplicate,pack,gather_mask}_impl.h"},
+      "c_api": {"operations": ["asc_intlv", "asc_deintlv", "asc_pack", "asc_unpack_*", "asc_squeeze", "asc_unsqueeze"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl"},
+      "shared_cce": ["vintlv", "vdintlv", "vpack", "vunpack", "vsqz", "vusqz"], "confidence": "family", "notes": "B8/B16/B32 and low/high/quarter variants require exact wrapper selection."
+    },
+    {
+      "id": "reg-reduce",
+      "basic_api": {"operations": ["Reg::ReduceSum", "Reg::ReduceMax", "Reg::ReduceMin", "Reg::ReduceDataBlock*", "Reg::PairReduceSum"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_reduce_impl.h"},
+      "c_api": {"operations": ["asc_reduce_sum", "asc_reduce_max", "asc_reduce_min", "asc_reduce_*_datablock", "asc_pair_reduce_sum"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl"},
+      "shared_cce": ["vcadd", "vcmax", "vcmin", "vcgadd", "vcgmax", "vcgmin", "vcpadd"], "confidence": "family", "notes": "Reduction direction, destination lane and B64 expansion must be checked."
+    },
+    {
+      "id": "reg-arange-histogram",
+      "basic_api": {"operations": ["Reg::Arange", "Reg::Histograms"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_{vec_arange,histograms}_impl.h"},
+      "c_api": {"operations": ["asc_arange", "asc_arange_descend", "asc_frequency_histogram", "asc_cumulative_histogram_*"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl"},
+      "shared_cce": ["vci", "dhistv2", "chistv2"], "confidence": "family", "notes": "Histogram mode and bin initialization are not normalized by this index."
+    },
+    {
+      "id": "reg-cast",
+      "basic_api": {"operations": ["Reg::Cast", "CastImpl"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_binary_impl.h"},
+      "c_api": {"operations": ["asc_<src>2<dst>_<round>[_sat]"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/reg_convert"},
+      "shared_cce": ["vcvt", "vcvt_f162s4", "vcvt_s42bf16", "vcvt_s42f16", "vcvt_s42s16"], "confidence": "composite", "notes": "Round, saturation, part mode and interleave steps are part of the semantics."
+    },
+    {
+      "id": "reg-load-store",
+      "basic_api": {"operations": ["Reg::LoadAlign", "Reg::LoadUnAlign*", "Reg::StoreAlign", "Reg::StoreUnAlign*"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_datacopy_{load,store}_impl.h"},
+      "c_api": {"operations": ["asc_load", "asc_loadalign*", "asc_loadunalign*", "asc_store", "asc_storealign*", "asc_storeunalign*"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_{load,store}"},
+      "shared_cce": ["vld", "vlds", "vlda", "vldas", "vldu", "vldus", "vsldb", "vst", "vsts", "vsta", "vstas", "vstu", "vstus", "vsstb"], "confidence": "family", "notes": "Address alignment, stride, post-update and B64 handling must be audited."
+    },
+    {
+      "id": "reg-gather-scatter",
+      "basic_api": {"operations": ["Reg::Gather", "Reg::GatherB", "Reg::Scatter"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_datacopy_impl.h"},
+      "c_api": {"operations": ["asc_gather", "asc_gather_datablock", "asc_scatter"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/{reg_load,reg_store}/asc_*_impl.h"},
+      "shared_cce": ["vgather2", "vgatherb", "vscatter"], "confidence": "family", "notes": "Index width, base address, mask and B64 interleave differ by overload."
+    },
+    {
+      "id": "reg-mask-address",
+      "basic_api": {"operations": ["Reg::CreateMask", "MaskMov", "MaskInterleave", "MaskDeInterleave", "CreateAddrReg"], "impl": "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_{maskreg,addrreg}_impl.h"},
+      "c_api": {"operations": ["asc_create_mask_b8/b16/b32", "mask-register APIs", "address-register APIs"], "impl": "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl and vector_datamove_impl"},
+      "shared_cce": ["pmov", "pintlv_b8", "pintlv_b16", "pintlv_b32", "pdintlv_b8", "pdintlv_b16", "pdintlv_b32", "vag_b8", "vag_b16", "vag_b32"], "confidence": "family", "notes": "Public C API naming is split across reg headers; mask lifetime and address-unit conversion remain call-site concerns."
+    },
+    {
+      "id": "cube-mmad",
+      "basic_api": {"operations": ["Mmad", "MmadMx"], "impl": "impl/basic_api/dav_3510/kernel_operator_mm_impl.h"},
+      "c_api": {"operations": ["asc_mmad", "asc_mmad_mx"], "impl": "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/{asc_mmad,asc_mmad_mx}_impl.h"},
+      "shared_cce": ["mad", "mad_mx"], "confidence": "family", "notes": "Direct 3510 paths match, but bias/C-matrix, unit flag, GEMV and MX configuration are semantic parameters."
+    },
+    {
+      "id": "cube-l1-l0",
+      "basic_api": {"operations": ["LoadData"], "impl": "impl/basic_api/dav_3510/kernel_operator_mm_impl.h"},
+      "c_api": {"operations": ["asc_copy_l12l0a", "asc_copy_l12l0b", "asc_copy_l12l0b_transpose"], "impl": "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl"},
+      "shared_cce": ["load_cbuf_to_ca", "load_cbuf_to_cb"], "confidence": "family", "notes": "Transpose and layout/stride fields are not a one-to-one parameter mapping."
+    },
+    {
+      "id": "sync",
+      "basic_api": {"operations": ["SetFlag", "WaitFlag", "PipeBarrier"], "impl": "impl/basic_api/dav_3510/kernel_operator_sync_impl.h"},
+      "c_api": {"operations": ["asc_sync_notify", "asc_sync_wait", "asc_sync_pipe"], "impl": "impl/c_api/instr_impl/npu_arch_3510/sync_impl"},
+      "shared_cce": ["set_flag", "wait_flag", "pipe_barrier"], "confidence": "exact", "notes": "Producer/consumer pipe pair and event ID remain mandatory; synchronous data-move APIs add implicit waits."
+    }
+  ],
+  "all_shared_cce_names": ["dhistv2", "pand", "pdintlv_b16", "pdintlv_b32", "pdintlv_b8", "pintlv_b16", "pintlv_b32", "pintlv_b8", "pld", "plds", "plt_b16", "plt_b32", "plt_b8", "pmov", "pnot", "por", "ppack", "psel", "pst", "psts", "pstu", "punpack", "pxor", "vabs", "vabsdif", "vadd", "vaddc", "vaddcs", "vadds", "vand", "vaxpy", "vbr", "vcadd", "vcgadd", "vcgmax", "vcgmin", "vci", "vcmax", "vcmin", "vcmp_eq", "vcmp_ge", "vcmp_gt", "vcmp_le", "vcmp_lt", "vcmp_ne", "vcmps_eq", "vcmps_ge", "vcmps_gt", "vcmps_le", "vcmps_lt", "vcmps_ne", "vcpadd", "vcvt", "vcvt_f162s4", "vcvt_s42bf16", "vcvt_s42f16", "vcvt_s42s16", "vdintlv", "vdiv", "vdup", "vexp", "vexpdif", "vgather2", "vgatherb", "vintlv", "vld", "vlda", "vldas", "vlds", "vldu", "vldus", "vln", "vlrelu", "vmadd", "vmax", "vmaxs", "vmin", "vmins", "vmov", "vmul", "vmull", "vmuls", "vmulscvt", "vneg", "vnot", "vor", "vpack", "vprelu", "vrelu", "vscatter", "vsel", "vselr", "vshl", "vshls", "vshr", "vshrs", "vsldb", "vsqrt", "vsqz", "vsstb", "vst", "vsta", "vstar", "vstas", "vsts", "vstu", "vstur", "vstus", "vsub", "vsubc", "vsubcs", "vtrc", "vunpack", "vusqz", "vxor"],
+  "shared_cce_groups": {
+    "arithmetic_logic": ["vadd", "vsub", "vmul", "vdiv", "vmax", "vmin", "vabs", "vneg", "vrelu", "vexp", "vsqrt", "vln", "vadds", "vmuls", "vmins", "vmaxs", "vand", "vor", "vxor", "vnot"],
+    "compare_select": ["vcmp_eq", "vcmp_ne", "vcmp_lt", "vcmp_le", "vcmp_gt", "vcmp_ge", "vcmps_eq", "vcmps_ne", "vcmps_lt", "vcmps_le", "vcmps_gt", "vcmps_ge", "vsel", "vselr"],
+    "rearrange_reduce": ["vintlv", "vdintlv", "vpack", "vunpack", "vsqz", "vusqz", "vcadd", "vcmax", "vcmin", "vcgadd", "vcgmax", "vcgmin", "vcpadd"],
+    "data_move": ["vld", "vlds", "vlda", "vldas", "vldu", "vldus", "vsldb", "vst", "vsts", "vsta", "vstas", "vstu", "vstus", "vsstb", "vgather2", "vgatherb", "vscatter"],
+    "mask_address": ["pmov", "pintlv_b8", "pintlv_b16", "pintlv_b32", "pdintlv_b8", "pdintlv_b16", "pdintlv_b32", "pand", "por", "pxor", "pnot", "vag_b8", "vag_b16", "vag_b32"],
+    "other_shared": ["vaxpy", "vmadd", "vabsdif", "vexpdif", "vmulscvt", "vbr", "vdup", "vmov", "vci", "dhistv2", "chistv2", "vcvt", "vshl", "vshr", "vshls", "vshrs", "vlrelu", "vprelu", "vmull", "vtrc", "vaddc", "vaddcs", "vsubc", "vsubcs"]
+  }
+}
