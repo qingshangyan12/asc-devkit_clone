@@ -59,22 +59,39 @@ inline uint32_t asc_activemask()
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelActiveMask(uint32_t* dst)
+    __global__ __launch_bounds__(1024) void KernelActiveMask(uint32_t* active_masks, uint64_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        uint32_t result = asc_activemask();
-        dst[idx] = result;
+        if (idx >= total_length) {
+            return;
+        }
+
+        uint32_t lane_id = threadIdx.x % warpSize;
+        uint32_t warp_id = idx / warpSize;
+        uint32_t active_mask = asc_activemask(); // 获取当前Warp中仍然活跃的线程掩码。
+        if (lane_id == 0) {
+            active_masks[warp_id] = active_mask; // 由Lane 0负责写出当前Warp的掩码。
+        }
     }
     ```
 
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelActiveMask(__gm__ uint32_t* dst)
+    __simt_vf__ __launch_bounds__(1024) inline void SimtActiveMask(
+        __gm__ uint32_t* active_masks, uint64_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         // asc_vf_call参数：dim3{1024, 1, 1}
-        uint32_t result = asc_activemask(); // 返回值为0xffffffff
-        dst[idx] = result;
+        if (idx >= total_length) {
+            return;
+        }
+
+        uint32_t lane_id = threadIdx.x % warpSize;
+        uint32_t warp_id = idx / warpSize;
+        uint32_t active_mask = asc_activemask(); // 获取当前Warp中仍然活跃的线程掩码。
+        if (lane_id == 0) {
+            active_masks[warp_id] = active_mask; // 由Lane 0负责写出当前Warp的掩码。
+        }
     }
     ```

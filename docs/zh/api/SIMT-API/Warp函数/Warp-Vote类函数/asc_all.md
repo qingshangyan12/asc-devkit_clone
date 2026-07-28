@@ -63,22 +63,35 @@ inline int32_t asc_all(int32_t predicate)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_asc_all(int32_t* dst)
+    __global__ __launch_bounds__(1024) void KernelAll(const int32_t* input, int32_t* output, uint64_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        int32_t lane_id= idx % 32;
-        dst[idx] = asc_all(lane_id); // 返回值为0
+        if (idx >= total_length) {
+            return;
+        }
+
+        if (!asc_all(input[idx] > 0)) {
+            return; // Warp内存在非正数，所有活跃线程统一退出。
+        }
+        output[idx] = input[idx];
     }
     ```
 
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_asc_all(__gm__ int32_t* dst)
+    __simt_vf__ __launch_bounds__(1024) inline void SimtAll(
+        __gm__ const int32_t* input, __gm__ int32_t* output, uint64_t total_length)
     {
         // asc_vf_call参数：dim3{1024, 1, 1}
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        int32_t lane_id = idx % 32;
-        dst[idx] = asc_all(lane_id); // 返回值为0
+        if (idx >= total_length) {
+            return;
+        }
+
+        if (!asc_all(input[idx] > 0)) {
+            return; // Warp内存在非正数，所有活跃线程统一退出。
+        }
+        output[idx] = input[idx];
     }
     ```
