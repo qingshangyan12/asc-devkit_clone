@@ -110,7 +110,9 @@ __aicore__ inline void CacheWriteThrough(__gm__ T* sourceAddr, uint64_t length)
     GlobalTensor<T> global;
     global.SetGlobalBuffer(start);
     for (uint32_t i = 0; i <= end - start; i += CACHE_LINE_SIZE) {
+        __asm__ __volatile__("");
         DataCacheCleanAndInvalid<T, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(global[i]);
+        __asm__ __volatile__("");
     }
 }
 } // namespace AscendC
