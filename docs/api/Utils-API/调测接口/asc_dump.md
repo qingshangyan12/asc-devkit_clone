@@ -68,35 +68,12 @@ template<typename T>
 __aicore__ inline void asc_dump(__cc__ T* input, uint32_t desc, uint32_t dump_size)
 ```
 
-<!-- npu="950" id7 -->
-以下接口为simd\_vf中所使用的asc\_dump接口，仅支持Ascend 950PR/Ascend 950DT。
-
-```cpp
-// 寄存器上的数据打印
-template <typename T, typename U>
-__simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_size)
-
-// 寄存器上的数据打印
-template <typename T, typename U>
-__simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size)
-
-// UB内存上的数据打印
-template <typename T>
-__simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
-
-// UB内存上的数据打印
-template <typename T>
-__simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
-```
-<!-- end id7 -->
-
 ## 参数说明
 
 **表1** 参数说明
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | T | 输入 | 待dump的数据类型。 |
-| U | 输入 | 待dump的寄存器数据类型。 |
 | input | 输入 | 所需打印的内存块的起始地址。 |
 | desc | 输入 | 自定义信息。uint32_t类型，支持的数据范围是[0, 2^32 - 1]。 |
 | dump_size | 输入 | 所需要打印的元素数量。 |
@@ -125,10 +102,6 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 -   在计算数据量时，若dump的总长度未对齐，需要考虑padding数据的影响。当进行非对齐dump时，如果实际dump的元素长度不满足32字节对齐，系统会自动在其末尾补充一定数量的padding数据（这部分数据并不会打印），以满足对齐要求。
 -   SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过acl.json中的`"simd_printf_fifo_size_per_core"`字段进行配置，配置范围最小为1KB，最大为64MB（可通过[aclInit](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_0022.html)接口调整）。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
 
--   在`simd_vf`场景下，每个AIV核在单次`asc_vf_call`执行期间最多能使用2KB的UB空间；同一次`asc_vf_call`中的所有`simd_vf`的`asc_dump`和`printf`调用共享该预留空间。
--   每次调用`simd_vf`的`asc_dump`时，除实际dump数据外，还会固定占用72字节的管理信息；实际dump数据需要按32字节向上对齐。
--   `simd_vf`调测接口不会检查上述预留空间是否越界。超过限制可能越界写入预留空间，导致打印结果异常，并可能影响算子执行。
-
 ## 调用示例
 
 ```cpp
@@ -136,16 +109,4 @@ __gm__ half* src;
 uint32_t desc = 1;
 uint32_t dump_size = 32;
 asc_dump_gm<half>(src, desc, dump_size);
-```
-
-SIMD VF调用示例：
-
-```cpp
-__simd_vf__ inline void SimdVfDumpReg()
-{
-    AscendC::Reg::RegTensor<float> src_reg;
-    uint32_t desc = 1;
-    uint32_t dump_size = 32;
-    asc_dump<float>(src_reg, desc, dump_size);
-}
 ```
