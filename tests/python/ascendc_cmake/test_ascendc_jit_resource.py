@@ -350,3 +350,12 @@ def test_jit_package_stores_normalized_properties(tmp_path):
     ).format(generator.resolve().as_posix(), expected_root, expected_root, expected_root)
     result = _configure_project(tmp_path / "valid", body)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_jit_bundle_accumulates_dependencies_from_each_package_add():
+    function_source = FUNC_CMAKE.read_text(encoding="utf-8")
+
+    assert (
+        "add_dependencies(${target_package_name}_jit_bundle "
+        "${KERNEL_COMPILE_TARGETS})"
+    ) in function_source

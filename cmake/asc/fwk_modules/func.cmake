@@ -1265,21 +1265,23 @@ function(npu_op_package_add target_package_name)
                   "${JIT_WORK_DIR}"
                   "${ASCEND_CANN_PACKAGE_PATH}"
                   ${CMAKE_SYSTEM_PROCESSOR}-linux
-          DEPENDS ${KERNEL_COMPILE_TARGETS}
           VERBATIM
         )
+        if(NOT TARGET binary)
+          add_custom_target(binary)
+        endif()
+        add_dependencies(binary ${target_package_name}_jit_bundle)
+        adapt_install_path(
+          INPUT_PATH packages/vendors/${current_target_vendor_name}/op_impl/ai_core/jit
+          INPUT_TARGET ${target_package_name}
+          OUTPUT_PATH jit_install_path
+        )
+        install(FILES "${JIT_OUTPUT_SO}"
+                DESTINATION ${jit_install_path})
       endif()
-      if(NOT TARGET binary)
-        add_custom_target(binary)
+      if(KERNEL_COMPILE_TARGETS)
+        add_dependencies(${target_package_name}_jit_bundle ${KERNEL_COMPILE_TARGETS})
       endif()
-      add_dependencies(binary ${target_package_name}_jit_bundle)
-      adapt_install_path(
-        INPUT_PATH packages/vendors/${current_target_vendor_name}/op_impl/ai_core/jit
-        INPUT_TARGET ${target_package_name}
-        OUTPUT_PATH jit_install_path
-      )
-      install(FILES "${JIT_OUTPUT_SO}"
-              DESTINATION ${jit_install_path})
     endif()
 
   endif()
