@@ -3019,3 +3019,4 @@
     -   [SIMT接口精度标准汇总](附录/SIMT接口精度标准汇总.md)
     -   [废弃接口](附录/废弃接口.md)
     -   [接口变更说明](附录/接口变更说明.md)
+    -   [Release Notes](附录/Release_Notes/release_notes.md)
