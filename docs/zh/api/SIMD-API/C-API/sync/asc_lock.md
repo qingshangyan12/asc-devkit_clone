@@ -32,7 +32,34 @@
 
 相对于[asc_sync_notify](asc_sync_notify.md)/[asc_sync_wait](asc_sync_wait.md)同步机制，使用asc_lock/asc_unlock接口有以下优势：
 
-- 内聚性更强，使用时与其它流水线解耦，可以简化反向同步。
+- 内聚性更强，使用时与其它流水线解耦，可以简化反向同步。以PIPE_MTE2与PIPE_V之间同步为例，对比如下：
+
+    ```cpp
+    // asc_sync_notify/asc_sync_wait机制
+    For i=0:100
+        if i > 0:
+            asc_sync_wait(PIPE_V, PIPE_MTE2, EVENT_ID0)
+        endif
+        // MTE2指令
+        asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0)
+        asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0)
+        // PIPE_V指令
+        if i < 99:
+            asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID0)
+        endif
+    endFor
+
+    // asc_lock/asc_unlock机制
+    For i=0:100
+        asc_lock(PIPE_MTE2, 0)
+        // MTE2指令
+        asc_unlock(PIPE_MTE2, 0)
+        asc_lock(PIPE_V, 0)
+        // PIPE_V指令
+        asc_unlock(PIPE_V, 0)
+    endFor
+    ```
+    其中EVENT_ID0为同步ID，取值范围为[0, 7]；mutex_id取值范围为[0, 31]。
 - 可以使用更多的同步信号量。
 
 ## 函数原型
