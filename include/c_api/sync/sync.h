@@ -63,11 +63,11 @@ __aicore__ inline void asc_sync();
 
 #define asc_sync_intra_wait(pipe, sync_id) wait_intra_block((pipe), (sync_id))
 
-#define asc_sync_subblock_wait(pipe, flag_id) wait_flag_dev((flag_id))
+#define asc_sync_subblock_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
 
-#define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((flag_id))
+#define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
 
-#define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((flag_id))
+#define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
 
 enum ascMutexExecuteMode {
     ASC_LOCK_BLOCK = 0,    // Block the execution of the pipeline indicated by pipe (Default).
