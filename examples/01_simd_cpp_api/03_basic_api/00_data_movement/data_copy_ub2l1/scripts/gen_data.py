@@ -32,17 +32,20 @@ def gen_golden_data_simple(scenarioNum=1):
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
-    m = 32
-    n = 32
-    k = 32
+    if scenarioNum == 1:
+        # 场景1：对齐shape 128-128-128
+        m = 128
+        n = 128
+        k = 128
+    else:
+        # 场景2：非对齐shape 120-120-120，对齐后为128-128-128
+        m = 120
+        n = 120
+        k = 120
 
     # 生成ND格式的数据，值域为[-1, 1]的均匀分布
     x1_nd = np.random.uniform(-1, 1, (m, k)).astype(np.float16)
     x2_nd = np.random.uniform(-1, 1, (k, n)).astype(np.float16)
-
-    # 转换为NZ格式
-    x1_nz = nd_to_nz(x1_nd)
-    x2_nz = nd_to_nz(x2_nd)
 
     # 计算golden数据（使用ND格式计算）
     golden = (np.matmul(x1_nd.astype(np.float32), x2_nd.astype(np.float32))).astype(
@@ -50,10 +53,13 @@ def gen_golden_data_simple(scenarioNum=1):
     )
 
     if scenarioNum == 1:
-        # 保存NZ格式的输入数据
+        # 场景1：保存NZ格式的输入数据
+        x1_nz = nd_to_nz(x1_nd)
+        x2_nz = nd_to_nz(x2_nd)
         x1_nz.tofile("./input/input_x.bin")
         x2_nz.tofile("./input/input_y.bin")
     else:
+        # 场景2：保存ND格式的输入数据（非对齐）
         x1_nd.tofile("./input/input_x.bin")
         x2_nd.tofile("./input/input_y.bin")
     golden.tofile("./output/golden.bin")

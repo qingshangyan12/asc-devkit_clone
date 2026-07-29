@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates data movement from UB (Unified Buffer) to L1 (L1 Buffer) using DataCopy in the context of Mmad matrix multiplication. It covers two scenarios: contiguous data copy and on-the-fly ND2NZ data copy.
+This sample demonstrates data movement from UB (Unified Buffer) to L1 (L1 Buffer) using DataCopy in the context of Mmad matrix multiplication. It covers two scenarios: contiguous data copy (aligned shape) and on-the-fly ND2NZ data copy with matrix alignment (non-aligned shape with padding).
 
 ## Supported Products and CANN Software Versions
 
@@ -30,10 +30,10 @@ This sample demonstrates data movement from UB (Unified Buffer) to L1 (L1 Buffer
 - Scenario Description:  
   Two copy scenarios are selected via the compile option `SCENARIO_NUM`:
 
-  | Scenario | SCENARIO_NUM | Copy Interface | Input Data Format | Description |
-  |----------|-------------|----------------|-------------------|-------------|
-  | Contiguous Copy | 1 | `DataCopy(dst, src, DataCopyParams)` | NZ | Data content remains unchanged from UB to L1; input must be pre-converted to NZ format |
-  | On-the-fly ND2NZ Copy | 2 | `DataCopy(ubDst, ubSrc, DataCopyParams)` + `DataCopy(l1Dst, ubNZ, DataCopyParams)` | ND | First perform ND→NZ conversion in UB by copying each C0 column block, then copy contiguously to L1 |
+  | Scenario | SCENARIO_NUM | M-N-K | Copy Interface | Input Data Format | Description |
+  |----------|-------------|-------|----------------|-------------------|-------------|
+  | Contiguous Copy | 1 | 128-128-128 (aligned) | `DataCopy(dst, src, count)` | NZ | Data content remains unchanged from UB to L1; input must be pre-converted to NZ format |
+  | On-the-fly ND2NZ Copy | 2 | 120-120-120 (non-aligned, pads to 128-128-128) | `DataCopyPad` + `DataCopy(dst, src, DataCopyParams)` + `DataCopy(l1Dst, ubNZ, count)` | ND | Uses DataCopyPad to move ND data from GM to UB with width padding, then performs ND→NZ conversion in UB with height padding, finally copies contiguously to L1 |
 
   For API reference, see [UBToL1 Contiguous Data Copy](../../../../../docs/zh/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/DataCopy（UBToL1连续数据搬运）.md) and [UBToL1 On-the-fly ND2NZ Copy](../../../../../docs/zh/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/DataCopy（UBToL1随路转换-ND2NZ搬运）.md).
 
@@ -41,25 +41,33 @@ This sample demonstrates data movement from UB (Unified Buffer) to L1 (L1 Buffer
 
   Scenario 2 does not directly use the `DataCopy(dst, src, Nd2NzParams)` interface. Instead, it performs ND→NZ conversion inside UB first, then copies the result to L1 using the contiguous `DataCopy(l1Dst, ubNZ, count)`. This is because `DataCopy(dst, src, Nd2NzParams)` is implemented via software simulation — the hardware itself does not support this capability. If needed, users are recommended to design their own UB→L1 ND2NZ copy scheme based on their specific requirements.
 
+  Scenario 2 uses a non-aligned shape (M=N=K=120, aligned to 128) and completes matrix alignment (padding) in UB during the ND2NZ conversion. The alignment is handled in two dimensions:
+
+  1. **Width alignment**: The ND data in GM has a row width of 120 (not a multiple of 16), making strided 32-byte block copy in UB impossible. Therefore, the GM→UB stage uses the `DataCopyPad` interface to pad each row to 128 (16-aligned) during copy, ensuring that each row width in UB is 128 and the row stride is 32-byte aligned. The padding value is set to 0.
+
+  2. **Height alignment**: The padded ND data in UB has only 120 rows, while the NZ format requires 128 rows (8 fractal blocks of 16 rows each). Before the ND2NZ conversion, the `Duplicate` interface is used to zero-fill the NZ destination area (128×128), then each column block copies only 120 valid rows, leaving the remaining 8 rows as zero padding.
+
   The data flow and pipeline synchronization for Scenario 2 are as follows:
-  1. GM→UB (MTE2 pipeline): ND data is loaded into the UB source region.
+  1. GM→UB (MTE2 pipeline): Use DataCopyPad to load ND data into the UB source region, completing width padding simultaneously.
   2. `MTE2_V` sync: Wait for GM→UB to complete.
-  3. UB→UB per-column-block copy (V pipeline): Each C0 column block of the ND data is written into the UB temporary region (`tempAddr`, avoiding A/B source data) in NZ layout.
-  4. `V_MTE3` sync: Wait for UB→UB conversion to complete.
-  5. UB→L1 contiguous copy (MTE3 pipeline): NZ data in the UB temporary region is copied to L1.
+  3. UB→UB zero-fill (V pipeline): Use Duplicate to zero-fill the NZ destination area, handling height padding.
+  4. UB→UB per-column-block copy (V pipeline): Each C0 column block of the padded ND data is written into the UB temporary region in NZ layout, copying only valid height rows.
+  5. `V_MTE3` sync: Wait for UB→UB conversion to complete.
+  6. UB→L1 contiguous copy (MTE3 pipeline): NZ data in the UB temporary region is copied to L1.
+  7. `MTE3_V` sync: Wait for matrix A copy to complete before processing matrix B, avoiding read/write conflicts on the shared temp area.
 
 - Sample Specifications:
   <table>
-  <tr><td rowspan="3" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format (Scenario 1 / Scenario 2)</td></tr>
-  <tr><td align="center">x</td><td align="center">[32, 32]</td><td align="center">half</td><td align="center">NZ / ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[32, 32]</td><td align="center">half</td><td align="center">NZ / ND</td></tr>
-  <tr><td rowspan="1" align="center">Output</td><td align="center">z</td><td align="center">[32, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="3" align="center">Input</td><td align="center">name</td><td align="center">shape (Scenario 1 / Scenario 2)</td><td align="center">data type</td><td align="center">format (Scenario 1 / Scenario 2)</td></tr>
+  <tr><td align="center">x</td><td align="center">[128, 128] / [120, 120]</td><td align="center">half</td><td align="center">NZ / ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[128, 128] / [120, 120]</td><td align="center">half</td><td align="center">NZ / ND</td></tr>
+  <tr><td rowspan="1" align="center">Output</td><td align="center">z</td><td align="center">[128, 128] / [120, 120]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Name</td><td colspan="4" align="center">data_copy_ub2l1</td></tr>
   </table>
 
 - Sample Implementation:
-  1. AIV core: Copy data from GM (Global Memory) to UB (Unified Buffer). The data layout in GM differs between the two scenarios: Scenario 1 uses NZ format (column-major between fractals, row-major within fractal, pre-converted by `gen_data.py`); Scenario 2 uses ND format (original row-major, no pre-conversion needed).
-  2. AIV core: Copy data from UB to L1 (L1 Buffer). Scenario 1 uses contiguous copy; Scenario 2 first performs ND→NZ conversion inside UB, then copies to L1 using contiguous copy. After arriving in L1, the data layout is the same for both scenarios, and subsequent computation steps are identical.
+  1. AIV core: Copy data from GM (Global Memory) to UB (Unified Buffer). The data layout in GM differs between the two scenarios: Scenario 1 uses NZ format (column-major between fractals, row-major within fractal, pre-converted by `gen_data.py`); Scenario 2 uses ND format (original row-major, no pre-conversion needed), with width padding completed during copy via DataCopyPad.
+  2. AIV core: Copy data from UB to L1 (L1 Buffer). Scenario 1 uses contiguous copy; Scenario 2 first performs ND→NZ conversion inside UB (including height padding), then copies to L1 using contiguous copy. After arriving in L1, the data layout is the same for both scenarios, and subsequent computation steps are identical.
   3. AIC core: Call the basic API LoadData to move data from L1 to L0A Buffer and L0B Buffer.
   4. AIC core: Call the basic API Mmad for matrix multiplication.
   5. AIC core: Call the basic API Fixpipe to move data from L0C Buffer to GM (Global Memory).
@@ -107,7 +115,7 @@ Execute the following steps in the sample root directory to build and run the sa
   | ------ | ------ | ----------- |
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU run, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: dav-3510 corresponds to Ascend 950PR/950DT |
-  | `SCENARIO_NUM` | `1` (default), `2` | Copy scenario: 1 = contiguous copy (NZ input), 2 = on-the-fly ND2NZ copy (ND input) |
+  | `SCENARIO_NUM` | `1` (default), `2` | Copy scenario: 1 = contiguous copy (NZ input, 128×128 aligned), 2 = on-the-fly ND2NZ copy (ND input, 120×120 non-aligned padded to 128×128) |
 
 - Execution Result
 
