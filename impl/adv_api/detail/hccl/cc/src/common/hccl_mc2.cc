@@ -188,8 +188,8 @@ HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void* opArgs, void*
     return HCCL_SUCCESS;
 }
 
-HcclResult __attribute__((visibility("default")))
-HcclAllocComResourceByTiling(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
+    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     HCCL_RUN_INFO(
         "[MC2_CLIENT_A5_AICPU] enter asc-devkit common HcclAllocComResourceByTiling, "
@@ -300,8 +300,8 @@ HcclAllocComResourceByTiling(HcclComm comm, void* stream, void* mc2Tiling, void*
     return HCCL_SUCCESS;
 }
 
-extern "C" HcclResult __attribute__((visibility("default")))
-HcclAllocComResourceByTilingA5Mc2(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingA5Mc2(
+    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     HCCL_RUN_INFO(
         "[MC2_CLIENT_A5_AICPU] enter asc-devkit explicit A5 MC2 resource allocator, "
