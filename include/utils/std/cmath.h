@@ -24,10 +24,24 @@
 #include "stub_def.h"
 #endif
 
+#include <cstdint>
+
 namespace AscendC {
+#if defined(__NPU_ARCH__) &&                                                                                      \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
+    defined(__ASC_NPU_HOST__)
+[[deprecated("NOTICE ")]]
+__aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2);
+#else
+[[deprecated("NOTICE ")]]
+__aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2);
+#endif
+
 namespace Std {
 template <typename T> __aicore__ inline T sqrt(const T src);
 template <typename T> __aicore__ inline T abs(const T src);
+template <typename T, typename U> __aicore__ inline constexpr auto ceil_div(const T& a, const U& b);
+
 }
 }
 
