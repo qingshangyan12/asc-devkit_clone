@@ -62,24 +62,32 @@ int32_t lanemask_eq()
 
 ## 调用示例
 
+下面示例使用`lanemask_eq`获取当前Lane对应的位掩码，并根据掩码将Warp内偶数Lane和奇数Lane的数据分别重排到输出Warp的前16个位置和后16个位置。
+
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_lanemask_eq(int32_t* dst)
+    __global__ __launch_bounds__(1024) void kernel_lanemask_eq(int32_t* dst, int32_t* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        int32_t lanemask = lanemask_eq();
-        dst[idx] = lanemask;
+        int32_t lane_id = laneid();
+        int32_t warp_base = idx - lane_id;
+        uint32_t self_mask = static_cast<uint32_t>(lanemask_eq());
+        int32_t dst_offset = ((self_mask & 0x55555555U) != 0) ? (lane_id >> 1) : (16 + (lane_id >> 1));
+        dst[warp_base + dst_offset] = src[idx];
     }
     ```
 
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) void kernel_lanemask_eq(__gm__ int32_t* dst)
+    __simt_vf__ __launch_bounds__(1024) void kernel_lanemask_eq(__gm__ int32_t* dst, __gm__ int32_t* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        int32_t lanemask = lanemask_eq();
-        dst[idx] = lanemask;
+        int32_t lane_id = laneid();
+        int32_t warp_base = idx - lane_id;
+        uint32_t self_mask = static_cast<uint32_t>(lanemask_eq());
+        int32_t dst_offset = ((self_mask & 0x55555555U) != 0) ? (lane_id >> 1) : (16 + (lane_id >> 1));
+        dst[warp_base + dst_offset] = src[idx];
     }
     ```
