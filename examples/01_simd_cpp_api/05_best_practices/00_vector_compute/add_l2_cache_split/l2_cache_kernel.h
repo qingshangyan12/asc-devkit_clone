@@ -24,7 +24,8 @@ namespace AddL2Cache {
 constexpr uint32_t vectorCoreCount = 20;
 constexpr uint32_t computeRoundCount = 2;
 
-// The negative example scans the whole 384MiB range. The positive example splits it into L2-sized batches.
+// The negative example scans the whole 384MB range. The positive example derives four 96MB L2 batches
+// from the 100MB effective working-set threshold, so repeated reads stay closer to the first access.
 constexpr uint32_t totalByteSize = 384 * 1024 * 1024;
 constexpr uint32_t L2_TILE_THRESHOLD = 100 * 1024 * 1024;
 constexpr uint32_t l2BatchCount = (totalByteSize + L2_TILE_THRESHOLD - 1) / L2_TILE_THRESHOLD;
@@ -32,10 +33,12 @@ constexpr uint32_t l2BatchSizeBytes = totalByteSize / l2BatchCount;
 constexpr uint32_t totalElementCount = totalByteSize / sizeof(half);
 constexpr uint32_t l2BatchElementCount = l2BatchSizeBytes / sizeof(half);
 
+// Use 32-byte DataBlocks as the core distribution unit so every DataCopy length remains aligned.
 constexpr uint32_t dataBlockSizeBytes = 32;
 constexpr uint32_t elementsPerDataBlock = dataBlockSizeBytes / sizeof(half);
 
 constexpr uint32_t MAX_DATA_COPY_LEN = 16384;
+// SyncAll uses one 32-byte GM slot per Vector core.
 constexpr uint32_t syncInt32ElementsPerCore = dataBlockSizeBytes / sizeof(int32_t);
 constexpr uint32_t logicalGmToUbBytesPerKernel = totalByteSize * computeRoundCount;
 constexpr uint32_t logicalUbToGmBytesPerKernel = logicalGmToUbBytesPerKernel;
@@ -51,6 +54,7 @@ public:
             AscendC::LocalTensor<half>(AscendC::TPosition::VECIN, inputUbOffsetBytes, MAX_DATA_COPY_LEN);
         outputLocal_ =
             AscendC::LocalTensor<half>(AscendC::TPosition::VECOUT, outputUbOffsetBytes, MAX_DATA_COPY_LEN);
+        // The sync tensor is placed after the input/output UB regions to avoid overlap with data tiles.
         syncLocal_ = AscendC::LocalTensor<int32_t>(
             AscendC::TPosition::VECCALC,
             syncUbOffsetBytes,
@@ -59,11 +63,13 @@ public:
 
     __aicore__ inline void ProcessL2Batch(uint32_t l2BatchIdx)
     {
+        // Positive path: only one 96MB L2 batch is active before the next round reuses it.
         ProcessDataRange(static_cast<int64_t>(l2BatchIdx) * l2BatchElementCount, l2BatchElementCount);
     }
 
     __aicore__ inline void ProcessWholeData()
     {
+        // Negative path: one round treats the full 384MB range as a single L2 working set.
         ProcessDataRange(0, totalElementCount);
     }
 
@@ -81,6 +87,8 @@ private:
     {
         const uint32_t coreIdx = AscendC::GetBlockIdx();
         const uint32_t rangeDataBlockNum = rangeElementNum / elementsPerDataBlock;
+        // Distribute aligned DataBlocks evenly. The first cores take one extra block when the division has
+        // a remainder, which keeps each core's GM range contiguous and non-overlapping.
         const uint32_t baseDataBlocksPerCore = rangeDataBlockNum / vectorCoreCount;
         const uint32_t coresWithExtraDataBlock = rangeDataBlockNum % vectorCoreCount;
         const uint32_t extraDataBlockNumBeforeCore =
@@ -97,6 +105,7 @@ private:
 
     __aicore__ inline void ProcessCoreRange(int64_t coreOffsetInData, uint32_t coreElementNum)
     {
+        // UB tiling only fits each core's local buffer. It is not the L2 Cache split granularity.
         const uint32_t ubTileNum = AscendC::Ceil(coreElementNum, MAX_DATA_COPY_LEN);
         for (uint32_t ubTileIdx = 0; ubTileIdx < ubTileNum; ++ubTileIdx) {
             const uint32_t processedElementNum = ubTileIdx * MAX_DATA_COPY_LEN;
@@ -106,6 +115,8 @@ private:
                                                 remainingElementNum;
             const int64_t gmElementOffset = coreOffsetInData + processedElementNum;
 
+            // Reuse one event id for the steady-state single-buffer pipeline: wait for the previous tile's
+            // V->MTE2 dependency, load the current tile, then release Vector compute.
             if (ubTileIdx != 0) {
                 AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
             }
@@ -113,6 +124,7 @@ private:
             AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
+            // Do not overwrite the output UB region until the previous store has consumed it.
             if (ubTileIdx != 0) {
                 AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
             }
@@ -124,6 +136,7 @@ private:
             AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
             AscendC::DataCopy(dataGm_[gmElementOffset], outputLocal_, tileElementNum);
+            // The last tile has no following load or compute stage, so it leaves no outstanding event.
             if (ubTileIdx != ubTileNum - 1) {
                 AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
             }
