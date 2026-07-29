@@ -30,12 +30,21 @@
 
 提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer (UB)，并支持8位/16位/32位数据类型搬运。
 
-只有从GM搬运到UB时可以设置填充值。非32字节对齐场景支持以下两种填充方式：
+本接口支持以下两种数据搬运方式：
 
-- 手动填充：搬运前调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)设置填充值。
-- 自动填充：不调用asc_set_copy_pad_val时，由硬件自动填充dummy假数据。
+- 前n个数据搬运
 
-高维切分搬运采用Normal模式。若`len_burst`指定的单个数据块长度非32字节对齐，则`n_burst`指定的每个数据块都会分别通过上述手动或自动填充方式补齐至32字节对齐。
+    若`size`非32字节对齐，搬运数据会补齐至32字节对齐，支持以下两种填充方式：
+
+    - 手动填充：搬运前调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)配置填充值。
+    - 自动填充：不调用asc_set_copy_pad_val时，由硬件自动填充dummy假数据。
+
+- 高维切分搬运
+
+    高维切分搬运采用Normal模式。若`len_burst`指定的单个数据块长度非32字节对齐，则`n_burst`指定的每个数据块都会分别补齐至32字节对齐。非32字节对齐场景支持以下两种填充方式：
+
+    - 手动填充：搬运前调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)设置填充值。
+    - 自动填充：不调用asc_set_copy_pad_val时，由硬件自动填充dummy假数据。
 
 ## 函数原型
 
@@ -109,6 +118,7 @@ PIPE_MTE2
 - 如果需要执行多条asc_copy_gm2ub_align指令，且asc_copy_gm2ub_align指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_gm2ub_align指令的串行化，防止出现异常数据。
 - 同步计算包含同步等待。
 - left_padding_num、right_padding_num的字节数均不能超过32Bytes。
+- 前n个数据搬运接口的`size`无需32字节对齐。若`size`非32字节对齐，搬运数据会补齐至32字节对齐，目的UB需要预留补齐后的空间。手动填充时，调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)配置填充值；自动填充时，由硬件填充dummy假数据。
 
 ## 调用示例
 
