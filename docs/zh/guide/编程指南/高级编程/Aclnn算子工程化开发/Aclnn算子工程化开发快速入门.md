@@ -52,7 +52,7 @@ source /usr/local/Ascend/cann/set_env.sh
 | 步骤6 | 部署 | — |
 | 步骤7 | 调用算子 | 1分钟 |
 
-### 创建工程
+### 创建工程<a name="create-project"></a>
 
 编写算子原型定义文件`add_custom.json`（建议放在全英文路径下），然后使用msOpGen工具生成工程骨架。JSON中每个输入/输出的`format`和`type`列表长度必须一致，保持一一对应关系。
 
