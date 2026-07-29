@@ -1,0 +1,6 @@
+build/
+input/
+output/
+*.o
+*.bin
+demo
