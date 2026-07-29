@@ -2,7 +2,7 @@
 C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 > [!NOTE]说明
-> 为补充基础API的章节导览、数据通路和通用约束说明，新增了[公共概述](公共概述/README.md)。该目录中的链接均指向C API文档；其中标注“同一CCE指令”的对应关系以[dav-3510 CCE指令索引](../implementation_indexes/dav_3510/README.md)为准。无法建立同一CCE指令对应关系的基础API公共内容及其原因记录在[迁移问题和疑问](公共概述/迁移问题和疑问.md)。
+> [公共概述](公共概述/README.md)补充C API的章节导览、数据通路和通用约束说明。该目录中的链接均指向C API文档；`dav-3510` CCE指令名称级索引见[实现索引](../implementation_indexes/dav_3510/README.md)。
 
 ## 数据结构
 
