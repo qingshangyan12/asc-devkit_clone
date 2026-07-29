@@ -54,24 +54,30 @@ int32_t laneid()
 
 ## 调用示例
 
+下面示例根据Lane ID将每个Warp划分为两个16线程分组，并通过`asc_shfl`将组内首个Lane的数据广播到同组其他Lane。示例中使用[asc_shfl](../Warp-Shfl类函数/asc_shfl.md)，需另外包含"simt_api/device_warp_functions.h"头文件。
+
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_laneid(int32_t* dst)
+    __global__ __launch_bounds__(1024) void kernel_laneid(int32_t* dst, int32_t* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         int32_t lane_id = laneid();
-        dst[idx] = lane_id;
+        int32_t group_leader_lane = (lane_id < 16) ? 0 : 16;
+        int32_t leader_value = asc_shfl(src[idx], group_leader_lane, 32);
+        dst[idx] = leader_value;
     }
     ```
 
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) void kernel_laneid(__gm__ int32_t* dst)
+    __simt_vf__ __launch_bounds__(1024) void kernel_laneid(__gm__ int32_t* dst, __gm__ int32_t* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         int32_t lane_id = laneid();
-        dst[idx] = lane_id;
+        int32_t group_leader_lane = (lane_id < 16) ? 0 : 16;
+        int32_t leader_value = asc_shfl(src[idx], group_leader_lane, 32);
+        dst[idx] = leader_value;
     }
     ```
