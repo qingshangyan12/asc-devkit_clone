@@ -13,9 +13,7 @@ set(CCU_UT_TARGET ascendc_ut_adv_api_hccl_ccu_mc2)
 set(HCCL_CC_DIR ${ASCENDC_DIR}/impl/adv_api/detail/hccl/cc)
 set(HCCL_CC_SRC_DIR ${HCCL_CC_DIR}/src)
 set(HCCL_CC_INCLUDE_DIR ${ASCENDC_DIR}/include/adv_api/hccl/internal)
-set(HCCL_DEV_BASE ${HCCL_CC_DIR})
 set(HCCL_LOCAL_PKG_INC ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc)
-set(HCCL_ST_DIR ${ASCENDC_DIR}/tests/api/adv_api/hccl/cc/st/algorithm/utils/src)
 set(HCCL_ST_PROXY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stub/hccl_proxy)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
@@ -121,10 +119,10 @@ add_executable(${CCU_UT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/comm_domain.cc
     # Cann host bridge stub
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/cann_host_bridge_stub.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/exception_defination_stub.cc
     # Source under test (minimal impl dependencies)
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
-    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/exception/exception_defination.cc
 )
 
 target_include_directories(${CCU_UT_TARGET} PRIVATE
