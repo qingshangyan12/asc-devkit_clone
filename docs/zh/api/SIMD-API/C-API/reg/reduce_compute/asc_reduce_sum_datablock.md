@@ -80,15 +80,15 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void reduce_sum_datablock_vf(__ubuf__ half* srcAddr, __ubuf__ half* dstAddr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void reduce_sum_datablock_vf(__ubuf__ half* src_addr, __ubuf__ half* dst_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half src, dst;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src, srcAddr, one_repeat_size);
+        asc_loadalign_postupdate(src, src_addr, one_repeat_size);
         asc_reduce_sum_datablock(dst, src, mask);
-        asc_storealign_postupdate(dstAddr, dst, one_repeat_size, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
     }
 }
 ```

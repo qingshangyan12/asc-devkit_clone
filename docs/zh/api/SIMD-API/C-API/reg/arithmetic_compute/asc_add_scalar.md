@@ -71,15 +71,15 @@ mask未筛选的元素在输出中置零。
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void add_scalar_vf(__ubuf__ half* srcAddr, __ubuf__ half* dstAddr, int64_t scalar, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void add_scalar_vf(__ubuf__ half* src_addr, __ubuf__ half* dst_addr, half scalar, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half src, dst;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src, srcAddr, one_repeat_size);
+        asc_loadalign_postupdate(src, src_addr, one_repeat_size);
         asc_add_scalar(dst, src, scalar, mask);
-        asc_storealign_postupdate(dstAddr, dst, one_repeat_size, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
     }
 }
 ```

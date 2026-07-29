@@ -68,17 +68,17 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void add_vf(__ubuf__ half* src0Addr, __ubuf__ half* src1Addr, __ubuf__ half* dstAddr,
+__simd_vf__ inline void add_vf(__ubuf__ half* src0_addr, __ubuf__ half* src1_addr, __ubuf__ half* dst_addr,
                                uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half src0, src1, dst;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src0, src0Addr, one_repeat_size);
-        asc_loadalign_postupdate(src1, src1Addr, one_repeat_size);
+        asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
+        asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
         asc_add(dst, src0, src1, mask);
-        asc_storealign_postupdate(dstAddr, dst, one_repeat_size, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
     }
 }
 
@@ -127,17 +127,17 @@ MTE3:                   |==搬出==|
 所有 tile 使用相同 mutex_id，下一轮的 `asc_lock(PIPE_MTE2)` 必须等待上一轮 `asc_unlock(PIPE_MTE3)` 完成，三阶段严格串行。
 
 ```cpp
-__simd_vf__ inline void add_vf(__ubuf__ half* src0Addr, __ubuf__ half* src1Addr, __ubuf__ half* dstAddr,
+__simd_vf__ inline void add_vf(__ubuf__ half* src0_addr, __ubuf__ half* src1_addr, __ubuf__ half* dst_addr,
                                uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half src0, src1, dst;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src0, src0Addr, one_repeat_size);
-        asc_loadalign_postupdate(src1, src1Addr, one_repeat_size);
+        asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
+        asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
         asc_add(dst, src0, src1, mask);
-        asc_storealign_postupdate(dstAddr, dst, one_repeat_size, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
     }
 }
 

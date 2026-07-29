@@ -76,16 +76,16 @@ __simd_callee__ inline void asc_select(vector_float& dst, vector_float src0, vec
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void select_vf(__ubuf__ half* src0Addr, __ubuf__ half* src1Addr, __ubuf__ half* dstAddr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void select_vf(__ubuf__ half* src0_addr, __ubuf__ half* src1_addr, __ubuf__ half* dst_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half src0, src1, dst;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src0, src0Addr, one_repeat_size);
-        asc_loadalign_postupdate(src1, src1Addr, one_repeat_size);
+        asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
+        asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
         asc_select(dst, src0, src1, mask);
-        asc_storealign_postupdate(dstAddr, dst, one_repeat_size, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
     }
 }
 ```
