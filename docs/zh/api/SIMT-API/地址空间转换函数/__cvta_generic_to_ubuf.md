@@ -70,8 +70,11 @@ SIMT编程场景：
 ```cpp
 __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* dst, uint32_t* src)
 {
-    __ubuf__ uint32_t ptr[1024];
+    __ubuf__ uint32_t ubuf_data[1024];
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    dst[idx] = __cvta_generic_to_ubuf(ptr + threadIdx.x);
+    ubuf_data[threadIdx.x] = src[idx];
+    size_t ubuf_addr = __cvta_generic_to_ubuf(ubuf_data + threadIdx.x);
+    uint32_t* ptr = static_cast<uint32_t*>(__cvta_ubuf_to_generic(ubuf_addr));
+    dst[idx] = ptr[0];
 }
 ```
