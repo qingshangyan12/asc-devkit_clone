@@ -52,7 +52,7 @@ PIPE_S
 
 ## 约束说明
 
-asc_sync_notify和asc_sync_wait必须成对使用。
+- asc_sync_notify和asc_sync_wait必须成对使用。
 
 - 相同源流水、相同目标流水、相同id下，连续使用asc_sync_notify会引发未定义行为。
 
