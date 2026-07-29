@@ -30,13 +30,13 @@
 
 -   静态内存通过数组分配：
 
-    ```
+    ```cpp
     __ubuf__ half staticBuf[1024];
     ```
 
 -   动态内存通过以下方式申请使用：
 
-    ```
+    ```cpp
     extern __ubuf__ half dynamicBuf[]; 
     ```
 
@@ -53,11 +53,19 @@
 
 -   dim3<a name="li1136665405"></a>
 
-    用于指定和获取线程网格（Grid）、线程块（Thread Block）在x、y、z维度上的内置结构体。
+    dim3是内置结构体类型，由3个无符号整数组成，结构体定义为
 
-    dim3由3个无符号整数组成，结构体定义为{dimx, dimy, dimz}，用于指定3个不同维度的大小，三维总数为dimx \* dimy \* dimz。开发者可以通过如下方式创建dim3结构。
-
+    ```cpp
+    struct dim3{
+        unsigned int x, y, z;
+        dim3(unsigned int x, unsigned int y = 1, unsigned int z = 1)
+            :x(x), y(y), z(z) {}
+    };
     ```
+
+    用于指定3个不同维度的大小，三维总数为x \* y \* z。开发者可以通过如下方式创建dim3结构。
+
+    ```cpp
     dim3(x); // 创建一维结构，dimy和dimz为默认值1
     dim3(x, y); // 创建二维结构，dimz为默认值1
     dim3(x, y, z); // 创建三维结构
@@ -70,8 +78,7 @@
 
 -   gridDim<a name="li20760123812911"></a>
 
-    内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。各个维度上线程块关系需满足gridDim.x * gridDim.y * gridDim.z <= 65535。
-
+    内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。
 -   blockDim<a name="li076017381191"></a>
 
     内置全局变量，在核函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构，即启动核函数时配置的dim3结构体实例值。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数。
@@ -94,14 +101,14 @@
 
     -   对于二维线程块，其线程ID为二维结构，其计算公式为：
 
-        ```
+        ```cpp
         thread_id_x = blockIdx.x * blockDim.x + threadIdx.x;
         thread_id_y = blockIdx.y * blockDim.y + threadIdx.y;
         ```
 
     -   对于三维线程块，其线程ID为三维结构，其计算公式为：
 
-        ```
+        ```cpp
         thread_id_x = blockIdx.x * blockDim.x + threadIdx.x;
         thread_id_y = blockIdx.y * blockDim.y + threadIdx.y;
         thread_id_z = blockIdx.z * blockDim.z + threadIdx.z;
@@ -111,7 +118,7 @@
 
 -   warpSize
 
-    运行时变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
+    const int32_t类型变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
 
 ## 内置数据类型<a name="section1835494915576"></a>
 
@@ -151,8 +158,8 @@
 | signed int | int2 | int3 | int4 |
 | 无符号的长整型(64bit) | ulonglong2 | ulonglong3 | ulonglong4 |
 | 有符号的长整型(64bit) | longlong2 | longlong3 | longlong4 |
-| 无符号的长整型(32bit) | ulong2 | ulong3 | ulong4 |
-| 有符号的长整型(32bit) | long2 | long3 | long4 |
+| 无符号的长整型(64bit) | ulong2 | ulong3 | ulong4 |
+| 有符号的长整型(64bit) | long2 | long3 | long4 |
 | 浮点型，1符号位，2指数位，1尾数位 | float4_e2m1x2_t | - | - |
 | 浮点型，1符号位，1指数位，2尾数位 | float4_e1m2x2_t | - | - |
 | 浮点型，1符号位，4指数位，3尾数位 | float8_e4m3x2_t | - | - |
@@ -173,8 +180,8 @@
 | short3、 ushort3、 short4、 ushort4 | 8 | 8 |
 | int2、 uint2 | 8 | 8 |
 | int3、 uint3、 int4、 uint4 | 16 | 16 |
-| long2、 ulong2 | 8 | 8 |
-| long3、 ulong3、 long4、 ulong4 | 16 | 16 |
+| long2、 ulong2 | 16 | 16 |
+| long3、 ulong3、 long4、 ulong4 | 32 | 32 |
 | longlong2、 ulonglong2 | 16 | 16 |
 | longlong3、 ulonglong3、 longlong4、 ulonglong4 | 32 | 32 |
 | float2 | 8 | 8 |
@@ -221,7 +228,7 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 
 运算符使用示例如下所示：
 
-```
+```cpp
 // 加法运算
 res[idx] = x[idx] + y[idx]; 
 
@@ -251,7 +258,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
 
-```
+```cpp
 <<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>
 ```
 
@@ -264,7 +271,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 
 以下示例展示了内核函数的声明与调用方式。
 
-```
+```cpp
 // 声明
 __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length);
 // 调用
@@ -286,12 +293,13 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
   
-    函数标记宏，在核函数上可选配置，用于指定核函数启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动核函数时的dim3线程数保持一致。
-    
-    **表5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
+    函数标记宏，在核函数上可选配置，用于指定核函数启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现寄存器溢出等问题。建议最大线程数与启动核函数时的dim3线程数保持一致。
 
+    **表5**  \_\_launch\_bounds\_\_(N)与每个线程可用的寄存器个数的关系
+    
     <a name="table1715318510594"></a>
-    | Thread的个数(个) | 每个Thread可用寄存器个数(个) |
+
+    | N | 每个线程可用寄存器个数 |
     | --- | --- |
     | 1025~2048 | 16 |
     | 513~1024 | 32 |
@@ -300,7 +308,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
     配置SIMT函数最大线程数为512，每个Thread可用寄存器数为64，示例如下：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
     ```
     \_\_launch\_bounds\_\_\(N\)的参数N需要满足：
@@ -332,6 +340,6 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
     配置SIMT函数单个线程最多可分配的寄存器数量为64，示例如下：
 
-    ```
+    ```cpp
     __global__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
     ```

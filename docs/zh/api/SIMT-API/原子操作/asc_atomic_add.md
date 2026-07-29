@@ -28,39 +28,39 @@
 
 ## 函数原型
 
-```
+```cpp
 inline int32_t asc_atomic_add(int32_t *address, int32_t val)
 ```
 
-```
+```cpp
 inline uint32_t asc_atomic_add(uint32_t *address, uint32_t val)
 ```
 
-```
+```cpp
 inline float asc_atomic_add(float *address, float val)
 ```
 
-```
+```cpp
 inline int64_t asc_atomic_add(int64_t *address, int64_t val)
 ```
 
-```
+```cpp
 inline uint64_t asc_atomic_add(uint64_t *address, uint64_t val)
 ```
 
-```
+```cpp
 inline half asc_atomic_add(half *address, half val)
 ```
 
-```
+```cpp
 inline bfloat16_t asc_atomic_add(bfloat16_t *address, bfloat16_t val)
 ```
 
-```
+```cpp
 inline half2 asc_atomic_add(half2 *address, half2 val)
 ```
 
-```
+```cpp
 inline bfloat16x2_t asc_atomic_add(bfloat16x2_t *address, bfloat16x2_t val)
 ```
 
@@ -86,25 +86,29 @@ inline bfloat16x2_t asc_atomic_add(bfloat16x2_t *address, bfloat16x2_t val)
 
 Unified Buffer或Global Memory上的初始数据。
 
-注意，由于底层硬件约束，half和bfloat16\_t类型的返回值不准确，避免直接使用这些类型的返回值。
+注意，由于底层硬件约束，half和bfloat16\_t类型的返回值不准确，禁止直接使用这些类型的返回值。half2和bfloat16x2\_t类型不受此限制。
 
 ## 约束说明
 
-原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累加顺序敏感场景，结果可能随线程调度变化而不同。
+-   原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累加顺序敏感场景，结果可能随线程调度变化而不同。
+-   本接口的性能受以下因素影响，相关原理请参见[原子操作机制](原子操作简介.md#原子操作机制)。具体性能对比和优化示例请参见[asc_atomic_add接口性能对比样例](../../../../../examples/03_simt_api/02_features/01_api_features/02_atomic_operation/atomic_add_perf)。
+    -   内存空间：Unified Buffer的访问路径比Global Memory短，通常具有更低的访问开销。当使用的数据类型支持Unified Buffer（即int32\_t、uint32\_t、float、half、bfloat16\_t、half2、bfloat16x2\_t）时，建议优先在Unified Buffer中完成原子操作。
+    -   返回值：是否使用返回值可能影响编译器生成的原子加指令。以`int32_t`为例，不使用返回值时可生成性能更优的指令；业务场景允许时，建议不使用返回值。
+    -   地址分布：GM原子操作经过L2 Cache处理，L2 Cache以512B Cache Line为缓存管理单位，每条Cache Line包含4个128B Sector，GM原子操作以128B Sector为处理粒度。目标地址集中在同一个Sector内时，处理效率较低；目标地址分布在更多Sector内时，处理效率较高。因此，建议分散相互独立的原子操作目标地址。
 
 ## 需要包含的头文件
 
 使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_atomic\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_atomic_functions.h"
 ```
 
-```
+```cpp
 #include "simt_api/asc_fp16.h"
 ```
 
-```
+```cpp
 #include "simt_api/asc_bf16.h"
 ```
 
@@ -162,7 +166,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 输出结果示例如下：
 
-```cpp
+```
 status: 0, 2, 0, 1, 3
 error_count: 3 // 表明status中有3个数据是非0的
 ```

@@ -118,8 +118,8 @@
 | right_padding_num | 输入 | 连续搬运数据块右侧需要补充的数据范围，单位为元素个数，right_padding_num的字节数不能超过32。|
 | enable_constant_pad | 输入 | 配置非对齐填充值是否为常量。取值说明如下：  <br>&bull; true：填充值为接口[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)设置的值。 <br>&bull; false：填充值为输入数据的第一个值。 |
 | l2_cache_mode | 输入 | [asc_load_l2_cache_mode](../../enum/asc_load_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
-| src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
-| dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
+| src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br>只搬运1个数据块，即n_burst=1时，可以将此参数设置为0。 |
+| dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br>只搬运1个数据块，即n_burst=1时，可以将此参数设置为0。 |
 
 ## 返回值说明
 
@@ -131,8 +131,7 @@ PIPE_MTE2
 
 ## 约束说明
 
-- src的起始地址要求按照对应数据类型所占字节数对齐。
-- dst的起始地址要求32字节对齐。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
 - 如果需要执行多条asc_copy_gm2ub_align指令，且asc_copy_gm2ub_align指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个asc_copy_gm2ub_align指令的串行化，防止出现异常数据。
 - left_padding_num、right_padding_num的字节数均不能超过32Bytes。
 - 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
@@ -144,6 +143,6 @@ PIPE_MTE2
 asc_set_gm2ub_loop_size(2, 2);
 asc_set_gm2ub_loop1_stride(96, 128);
 asc_set_gm2ub_loop2_stride(192, 288);
-asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 0, 0, false, 0, 48 * sizeof(int8_t), 48 * sizeof(int8_t));
+asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 0, 0, false, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 48 * sizeof(int8_t), 48 * sizeof(int8_t));
 asc_set_gm2ub_loop_size(1, 1);
 ```

@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```c++
+```cpp
 unsigned int ballot(int predicate) const
 ```
 
@@ -46,13 +46,13 @@ unsigned int ballot(int predicate) const
 
 ## 约束说明
 
-无
+仅支持`thread_block_tile`的模板参数`Size`小于等于32的场景，即仅支持单Warp内线程子组。
 
 ## 调用示例
 
 - SIMT编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
@@ -66,7 +66,7 @@ unsigned int ballot(int predicate) const
 
 - SIMD与SIMT混合编程场景：
 
-    ```c++
+    ```cpp
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {

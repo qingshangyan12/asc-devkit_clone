@@ -115,8 +115,8 @@
 | n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[1, 2097151]。 |
 | l2_cache_mode | 输入 | [asc_store_l2_cache_mode](../../enum/asc_store_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
-| dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
-| src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
+| dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br> 只搬运1个数据块，即n_burst=1时，可以将此参数设置为0。 |
+| src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br> 只搬运1个数据块，即n_burst=1时，可以将此参数设置为0。 |
 
 ## 返回值说明
 
@@ -128,8 +128,7 @@ PIPE_MTE3
 
 ## 约束说明
 
-- dst的起始地址要求按照对应数据类型所占字节数对齐。
-- src的起始地址要求32字节对齐。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
 - 如果需要执行多条asc_copy_ub2gm_align指令，且asc_copy_ub2gm_align指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个asc_copy_ub2gm_align指令的串行化，防止出现异常数据。
 - 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
 - 当src_stride不等于len_burst时，src_stride要求32字节对齐。
@@ -146,6 +145,6 @@ uint64_t loop2_dst_stride = 288;
 asc_set_ub2gm_loop_size(loop1_size, loop2_size);
 asc_set_ub2gm_loop1_stride(loop1_src_stride, loop1_dst_stride);
 asc_set_ub2gm_loop2_stride(loop2_src_stride, loop2_dst_stride);
-asc_copy_ub2gm_align(dst, src, 2, 48 * sizeof(int8_t), 0, 48 * sizeof(int8_t), 48 * sizeof(int8_t));
+asc_copy_ub2gm_align(dst, src, 2, 48 * sizeof(int8_t), asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 48 * sizeof(int8_t), 48 * sizeof(int8_t));
 asc_set_ub2gm_loop_size(1, 1);
 ```
