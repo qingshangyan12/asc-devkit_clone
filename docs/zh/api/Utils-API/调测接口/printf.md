@@ -37,19 +37,19 @@
 在算子Kernel侧的实现代码中，需要输出日志信息时，调用printf接口打印相关内容。
 
 > [!CAUTION]注意
->printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置[ASCENDC\_DUMP=0](https://asc.gitcode.com/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.html#内置编译宏开关)的方式关闭打印功能。
+>printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置[ASCENDC\_DUMP=0](../../SIMD-API/基础API/调试接口/关闭ASCENDC_DUMP说明.md)的方式关闭打印功能。
 
 ## 函数原型
 
-```
+```cpp
 template <class... Args>
-__aicore__ static __attribute__((noinline)) void printf( const __gm__ char* fmt, Args&&... args)
+__aicore__ inline void printf( const __gm__ char* fmt, Args&&... args)
 ```
 
 <!-- npu="950" id9 -->
 以下接口为simd\_vf中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
 
-```
+```cpp
 template <class... Args>
 __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 ```
@@ -58,7 +58,7 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 <!-- npu="950" id10 -->
 以下接口为SIMT中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
 
-```
+```cpp
 template <class... Args>
 static __attribute__((noinline)) void printf(const char* fmt, Args&&... args);
 ```

@@ -21,6 +21,26 @@
 
 using namespace mc2_ops_hccl;
 
+namespace {
+const char* GetMc2OpTypeName(HcclCMDType opType)
+{
+    switch (opType) {
+        case HcclCMDType::HCCL_CMD_ALLGATHER:
+            return "AllGather";
+        case HcclCMDType::HCCL_CMD_ALLREDUCE:
+            return "AllReduce";
+        case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
+            return "ReduceScatter";
+        case HcclCMDType::HCCL_CMD_ALLTOALL:
+            return "AllToAll";
+        case HcclCMDType::HCCL_CMD_ALLTOALLV:
+            return "AllToAllV";
+        default:
+            return "Unknown";
+    }
+}
+} // namespace
+
 constexpr uint32_t ALG_CONFIG_SIZE = 128;
 struct HcclOpArgs {
     HcclDataType srcDataType;
@@ -171,6 +191,25 @@ HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void* opArgs, void*
     return HCCL_SUCCESS;
 }
 
+void LogMc2AlgInfo(u32 userRank, const void *ccTilingList[], uint32_t tilingNum,
+    const std::vector<OpParam> &opParamVec)
+{
+    for (uint32_t i = 0U; i < tilingNum; ++i) {
+        const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
+        const OpParam &opParam = opParamVec[i];
+        const HcclDataType srcDataType = static_cast<HcclDataType>(ccTiling->srcDataType);
+        const HcclDataType dstDataType = static_cast<HcclDataType>(ccTiling->dstDataType);
+        const std::string srcDataTypeName = GetDataTypeEnumStr(srcDataType);
+        const std::string dstDataTypeName = GetDataTypeEnumStr(dstDataType);
+        HCCL_RUN_INFO(
+            "[MC2_ALG_INFO] rank[%u], group[%s], opType[%s](%u), algName[%s], "
+            "srcDataType[%s](%u), dstDataType[%s](%u), engine[%u].",
+            userRank, ccTiling->groupName, GetMc2OpTypeName(opParam.opType), static_cast<uint32_t>(opParam.opType),
+            opParam.algName, srcDataTypeName.c_str(), static_cast<uint32_t>(srcDataType), dstDataTypeName.c_str(),
+            static_cast<uint32_t>(dstDataType), static_cast<uint32_t>(opParam.engine));
+    }
+}
+
 // 公共逻辑：构造topoTag/ctxTag并校验ccTiling参数
 HcclResult BuildTagsAndValidate(const void *ccTilingList[], uint32_t tilingNum,
     const char *commName, u32 rankSize, u32 userRank,
@@ -212,6 +251,7 @@ HcclResult AllocComResourceByTilingAicpu(HcclComm comm, void *stream, void *mc2T
     }
 
     CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
+    LogMc2AlgInfo(userRank, ccTilingList, tilingNum, opParamVec);
 
     return HCCL_SUCCESS;
 }
@@ -234,8 +274,10 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
         (void*)resCtx.workSpace, resCtx.workSpaceSize);
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
-    CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx));
+    std::vector<OpParam> opParamVec;
+    CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx, &opParamVec));
     HCCL_INFO("[AllocComResourceByTilingCcu]CcuSelectAlg successfully!");
+    LogMc2AlgInfo(userRank, ccTilingList, tilingNum, opParamVec);
 
     // 申请OpResCtx硬件内存并写入
     std::string tagOpResCtx = ctxTag + "_opResCtx";
@@ -254,8 +296,8 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
     return HCCL_SUCCESS;
 }
 
-HcclResult __attribute__((visibility("default")))
-HcclAllocComResourceByTiling(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
+    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     HCCL_RUN_INFO("[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
         "comm[%p], stream[%p], tiling[%p].", comm, stream, mc2Tiling);
@@ -332,8 +374,8 @@ HcclAllocComResourceByTiling(HcclComm comm, void* stream, void* mc2Tiling, void*
     return HCCL_SUCCESS;
 }
 
-extern "C" HcclResult __attribute__((visibility("default")))
-HcclAllocComResourceByTilingA5Mc2(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingA5Mc2(
+    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     HCCL_RUN_INFO(
         "[MC2_CLIENT_A5_AICPU] enter asc-devkit explicit A5 MC2 resource allocator, "

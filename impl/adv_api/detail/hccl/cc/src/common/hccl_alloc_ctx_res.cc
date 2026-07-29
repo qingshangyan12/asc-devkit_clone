@@ -819,7 +819,7 @@ HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIn
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
 HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
-    void* mc2Tiling, OpResCtx& opResCtx)
+    void* mc2Tiling, OpResCtx& opResCtx, std::vector<OpParam>* selectedOpParams)
 {
     HCCL_INFO("[CcuSelectAlg]start CcuSelectAlg!");
     HCCL_INFO("[CcuSelectAlg]received: workspace[%p], size[%llu]", (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
@@ -886,6 +886,10 @@ HcclResult CcuSelectAlg(
         opParams.push_back(opParam);
         algNames.push_back(algName);
         topoInfos.push_back(std::move(topoInfo));
+    }
+
+    if (selectedOpParams != nullptr) {
+        *selectedOpParams = opParams;
     }
 
     CHK_PRT_RET(opParams.empty(), HCCL_ERROR("[CcuSelectAlg] no primitive selected."), HCCL_E_PARA);
