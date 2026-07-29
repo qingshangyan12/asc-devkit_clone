@@ -1,5 +1,8 @@
 # reg矢量计算
 
+> [!NOTE]说明
+> 参见[矢量计算公共概述](../公共概述/矢量计算概述.md)，了解“UB→寄存器→UB”的Reg编程路径及同一CCE指令的Basic API对应关系。
+
 -   **[寄存器数据类型](reg_data_types/reg_data_types.md)**
 
 -   **[reg数据搬入](reg_load/reg_load.md)**

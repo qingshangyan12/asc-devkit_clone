@@ -1,5 +1,8 @@
 # Memory矢量计算
 
+> [!NOTE]说明
+> 参见[矢量计算公共概述](../公共概述/矢量计算概述.md)，了解UB数组编程模型、掩码/Repeat语义，以及与Reg矢量计算的分工。
+
 - **[asc_abs](asc_abs.md)**
 
 - **[asc_add](asc_add.md)**
