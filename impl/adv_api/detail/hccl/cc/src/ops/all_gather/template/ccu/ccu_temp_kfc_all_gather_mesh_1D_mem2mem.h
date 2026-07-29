@@ -11,11 +11,11 @@
 #define HCCL_CCU_TEMP_KFC_ALL_GATHER_MESH_1D_MEM2MEM_H
 
 #include "utils.h"
-#include "ccu_alg_template_base.h"
+#include "ccu_temp_kfc_mesh_1D_mem2mem_base.h"
 
 namespace mc2_ops_hccl {
 
-class CcuTempKfcAllGatherMesh1DMem2Mem : public CcuAlgTemplateBase {
+class CcuTempKfcAllGatherMesh1DMem2Mem : public CcuTempKfcMesh1DMem2MemBase {
 public:
     explicit CcuTempKfcAllGatherMesh1DMem2Mem(
         const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks);
@@ -31,15 +31,10 @@ public:
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
-    HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& templateDataParams,
         TemplateResource& templateResource) override;
-    u64 GetThreadNum() const override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
-
-private:
-    uint32_t mySubCommRank_{0};
 };
 
 } // namespace mc2_ops_hccl

@@ -464,15 +464,5 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherParallelMesh1DNHRUBX, InsV2AllGatherParallelExecutor, TopoMatchUBX,
     InsTempAllGatherMesh1D, InsTempAllGatherNHR);
-// Non-Mesh1D CCU registrations are kept for later recovery. Do not register them before KFC Mesh1D is verified.
-// #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-// REGISTER_EXECUTOR_BY_TWO_TEMPS(
-//     HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherParallelMesh1DNHR, InsV2AllGatherParallelExecutor,
-//     TopoMatchMultilevel, CcuTempAllGatherMesh1DMem2Mem, CcuTempAllGatherNHR1DMem2Mem);
-//
-// REGISTER_EXECUTOR_BY_TWO_TEMPS(
-//     HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherParallelMesh1DNHRMemUBX, InsV2AllGatherParallelExecutor,
-//     TopoMatchUBX, CcuTempAllGatherMesh1DMem2Mem, CcuTempAllGatherNHR1DMultiJettyMem2Mem);
-// #endif
 } // namespace mc2_ops_hccl
 // 算法注册

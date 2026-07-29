@@ -180,13 +180,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ctx.channelCount = channelCount;
     ctx.rankSize = rankSize;
     ctx.rankId = rankId;
-    ctx.resourceAllocated = false;
-    ctx.moConfig.msInterleave = 0;
-    ctx.moConfig.loopCount = 0;
-    ctx.moConfig.memSlice = 0;
-    ctx.moRes.eventCount = 0;
-    ctx.moRes.bufCount = 0;
-    ctx.enginePool = 0;
+    InitCcuKernelCtxBase(ctx);
 
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(LoadArgs(

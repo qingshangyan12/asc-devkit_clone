@@ -17,15 +17,8 @@ namespace mc2_ops_hccl {
 
 CcuTempKfcAllGatherMesh1DMem2Mem::CcuTempKfcAllGatherMesh1DMem2Mem(
     const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
-    : CcuAlgTemplateBase(param, rankId, subCommRanks)
-{
-    const std::vector<u32>& ranks = subCommRanks[0];
-    templateRankSize_ = ranks.size();
-    auto it = std::find(ranks.begin(), ranks.end(), rankId);
-    if (it != ranks.end()) {
-        mySubCommRank_ = std::distance(ranks.begin(), it);
-    }
-}
+    : CcuTempKfcMesh1DMem2MemBase(param, rankId, subCommRanks)
+{}
 
 CcuTempKfcAllGatherMesh1DMem2Mem::~CcuTempKfcAllGatherMesh1DMem2Mem() {}
 
@@ -99,18 +92,6 @@ u64 CcuTempKfcAllGatherMesh1DMem2Mem::CalcScratchMultiple(BufferType inBuffType,
     (void)inBuffType;
     (void)outBuffType;
     return 0;
-}
-
-u64 CcuTempKfcAllGatherMesh1DMem2Mem::GetThreadNum() const
-{
-    return 1;
-}
-
-HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::GetRes(AlgResourceRequest& resourceRequest) const
-{
-    resourceRequest.slaveThreadNum = 0;
-    resourceRequest.notifyNumOnMainThread = 0;
-    return HCCL_SUCCESS;
 }
 
 } // namespace mc2_ops_hccl

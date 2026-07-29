@@ -103,6 +103,17 @@ struct CcuKernelCtxBase {
     }
 };
 
+inline void InitCcuKernelCtxBase(CcuKernelCtxBase &ctx)
+{
+    ctx.resourceAllocated = false;
+    ctx.moConfig.msInterleave = 0;
+    ctx.moConfig.loopCount = 0;
+    ctx.moConfig.memSlice = 0;
+    ctx.moRes.eventCount = 0;
+    ctx.moRes.bufCount = 0;
+    ctx.enginePool = 0;
+}
+
 std::vector<uint64_t> CalGoSize(uint64_t size);
 std::vector<uint64_t> CalGoSize(uint64_t size, const LoopGroupConfig &config);
 CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res,

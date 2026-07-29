@@ -178,10 +178,8 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext &ctx)
 
     CCU_WHILE(repeatCond == 0)
     {
-        // 等待本轮开始信号
-        CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));
-        // 读取本轮参数
-        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx));
+        CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx)); // 等待本轮开始信号
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) {
             repeatCond = 1;
         }
@@ -189,11 +187,8 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext &ctx)
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
             DispatchKfcSubKernel(param, ctx);
             MissionPostSync(ctx);
-
-            // Set本轮完成信号
             CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
         }
-
         waitAddr += ckeSize;
         recordAddr += ckeSize;
         paramAddr += paramSize;
@@ -210,26 +205,20 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext &ctx)
 
 CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext &ctx)
 {
-    // 算子签名
-    ccu::Variable signature;
+    ccu::Variable signature; // 算子签名
 
-    // 存放《控制repeat循环执行的条件》的寄存器
-    ccu::Variable repeatCond;
+    ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
     repeatCond = 0;
 
     ccu::Variable paramAddr;
     paramAddr = ctx.xnAddr;
 
-    // 存放<每轮算子参数>的寄存器
-    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
+    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE); // 存放<每轮算子参数>的寄存器
 
     CCU_WHILE(repeatCond == 0)
     {
-        // 在context中依次加入8轮指令
-        MissionPreSync(signature, ctx);
-
-        // 读取本轮参数
-        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx));
+        MissionPreSync(signature, ctx); // 在context中依次加入8轮指令
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
 
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) {
             repeatCond = 1;
@@ -259,7 +248,6 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
-    // KfcServerGenCircularQueue(arg, ctx);
     CCU_IF(ctx.missionIndex == 0) {
         CCU_CHK_RET(KfcServerGenCircularQueue(ctx));
     } CCU_ELSE {
