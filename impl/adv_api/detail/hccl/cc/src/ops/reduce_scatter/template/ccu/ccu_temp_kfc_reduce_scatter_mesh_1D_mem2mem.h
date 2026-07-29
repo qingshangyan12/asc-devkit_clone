@@ -32,10 +32,10 @@ public:
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
+    u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& templateDataParams,
         TemplateResource& templateResource) override;
-    u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
 };
 
 } // namespace mc2_ops_hccl
