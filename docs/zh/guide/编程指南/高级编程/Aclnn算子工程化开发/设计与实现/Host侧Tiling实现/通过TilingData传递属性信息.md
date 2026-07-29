@@ -183,7 +183,7 @@ tmpTensor2 = min(x, 0) * negativeSlope
 y = tmpTensor1 + tmpTensor2
 ```
 
-计算完成后再按Kernel基本流程把`yLocal`写回GlobalMemory。示例中的属性值只在`Init`时读取一次，不在Tile循环中重复解析TilingData。
+计算完成后再按Kernel基本流程把`yLocal`写回Global Memory。示例中的属性值只在`Init`时读取一次，不在Tile循环中重复解析TilingData。
 
 如果某个属性只用于Host侧选择TilingKey，例如根据`algorithm`属性选择不同Kernel分支，则可以直接调用`context->SetTilingKey(...)`，不再额外增加TilingData字段。分支组织方法见[多分支策略](../多分支策略.md)。
 
