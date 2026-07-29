@@ -21,9 +21,8 @@
 #include "aicpu_sqe_cache.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
+#include "hcomm_primitives_dl.h"
 #include "hcomm_primitives.h"
-
-u64 GetCurAicpuTimestamp();
 
 namespace {
 mc2_ops_hccl::OpParam* AsOpenOpParam(std::vector<uint8_t>& opParam)
@@ -131,11 +130,6 @@ bool IsMc2BatchModeOp(HcclCMDType opType)
 
 constexpr u64 PHASE_ONE_MAX_TRANSFER_BYTES = 256ULL * 1024ULL * 1024ULL;
 
-u64 ElapsedNs(u64 begin, u64 end)
-{
-    return end >= begin ? end - begin : 0U;
-}
-
 bool SafeMul(u64 lhs, u64 rhs, u64& result)
 {
     if (lhs != 0U && rhs > std::numeric_limits<u64>::max() / lhs) {
@@ -216,6 +210,40 @@ void AddRange(SqeCacheBindingStorage& storage, u64 addr, u64 size, u32 kind, u32
         return;
     }
     storage.ranges.push_back(HcommAicpuSqeCacheRange{addr, size, kind, index});
+}
+
+bool AddAllGatherSymmetricRanges(const mc2_ops_hccl::OpParam& param,
+                                 const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+                                 SqeCacheBindingStorage& storage, u64 outputSpan,
+                                 const char*& reason)
+{
+    if (param.opType != HCCL_CMD_ALLGATHER || !param.supportSymmetricMemory) {
+        return true;
+    }
+    if (param.outputSymWindow == nullptr) {
+        reason = "invalid_symmetric_window";
+        return false;
+    }
+
+    for (u32 peer = 0U; peer < resCtx.topoInfo.userRankSize; ++peer) {
+        if (peer == resCtx.topoInfo.userRank) {
+            continue;
+        }
+        void* remoteOutput = nullptr;
+        const HcclResult outputRet = HcclSymWinGetPeerPointer(
+            param.outputSymWindow, static_cast<size_t>(param.outputOffset), peer, &remoteOutput);
+        if (outputRet != HCCL_SUCCESS || remoteOutput == nullptr) {
+            HCCL_RUN_INFO(
+                "[AICPU_SQE_CACHE_DIAG][UpperBinding] result[bypass] reason[symmetric_peer_address] peer[%u] "
+                "outputRet[%d] remoteOutput[%p]",
+                peer, static_cast<int>(outputRet), remoteOutput);
+            reason = "symmetric_peer_address";
+            return false;
+        }
+        AddRange(
+            storage, reinterpret_cast<u64>(remoteOutput), outputSpan, HCOMM_AICPU_CACHE_RANGE_REMOTE_OUTPUT, peer);
+    }
+    return true;
 }
 
 bool BuildAllToAllVShape(const mc2_ops_hccl::OpParam& param,
@@ -394,6 +422,9 @@ bool BuildSqeCacheBinding(const mc2_ops_hccl::OpParam& param,
             ++channelIndex;
         }
     }
+    if (!AddAllGatherSymmetricRanges(param, resCtx, storage, outputSpan, reason)) {
+        return false;
+    }
 
     storage.param.algName = param.algName;
     storage.param.opType = static_cast<u32>(param.opType);
@@ -462,72 +493,38 @@ template <typename Func>
 HcclResult RunWithAicpuSqeCache(const mc2_ops_hccl::OpParam& param,
                                 const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, Func func)
 {
-    const u64 totalBegin = GetCurAicpuTimestamp();
     SqeCacheBindingStorage storage;
     const char* bypassReason = "unknown";
     const bool cacheEligible = BuildSqeCacheBinding(param, resCtx, storage, bypassReason);
-    const u64 bindingEnd = GetCurAicpuTimestamp();
     if (!cacheEligible) {
         const HcclResult ret = RunWithMc2BatchMode(param, func);
-        const u64 totalEnd = GetCurAicpuTimestamp();
-        HCCL_RUN_INFO(
-            "[AICPU_SQE_CACHE_DIAG][Upper] path[bypass] reason[%s] algName[%s] opType[%u] ret[%d] "
-            "bindingNs[%llu] normalExpandAndLaunchNs[%llu] totalNs[%llu]",
-            bypassReason, param.algName, static_cast<u32>(param.opType), static_cast<int>(ret),
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, bindingEnd)),
-            static_cast<unsigned long long>(ElapsedNs(bindingEnd, totalEnd)),
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, totalEnd)));
+        HCCL_DEBUG(
+            "[AICPU_SQE_CACHE_DIAG][Upper] path[bypass] reason[%s] algName[%s] opType[%u] ret[%d]",
+            bypassReason, param.algName, static_cast<u32>(param.opType), static_cast<int>(ret));
         return ret;
     }
 
-    const u64 batchStartBegin = GetCurAicpuTimestamp();
     HcclResult startRet = static_cast<HcclResult>(HcommBatchModeStart(param.algTag));
-    const u64 batchStartEnd = GetCurAicpuTimestamp();
     if (startRet != HCCL_SUCCESS) {
         HCCL_ERROR("[AicpuSqeCache] batch start failed, algName[%s], ret[%d]", param.algName, startRet);
-        HCCL_RUN_INFO(
-            "[AICPU_SQE_CACHE_DIAG][Upper] path[error] stage[batch_start] algName[%s] opType[%u] ret[%d] "
-            "bindingNs[%llu] batchStartNs[%llu] totalNs[%llu]",
-            param.algName, static_cast<u32>(param.opType), static_cast<int>(startRet),
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, bindingEnd)),
-            static_cast<unsigned long long>(ElapsedNs(batchStartBegin, batchStartEnd)),
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, batchStartEnd)));
         return startRet;
     }
 
     u32 replayed = 0U;
-    const u64 replayBegin = GetCurAicpuTimestamp();
     HcclResult replayRet = static_cast<HcclResult>(HcommAicpuSqeCacheReplay(&storage.param, &replayed));
-    const u64 replayEnd = GetCurAicpuTimestamp();
     if (replayRet != HCCL_SUCCESS) {
         HcommAicpuSqeCacheAbort();
-        const u64 cleanupBegin = GetCurAicpuTimestamp();
         (void)HcommBatchModeEnd(param.algTag);
-        const u64 cleanupEnd = GetCurAicpuTimestamp();
-        HCCL_RUN_INFO(
-            "[AICPU_SQE_CACHE_DIAG][Upper] path[error] stage[replay] algName[%s] opType[%u] ret[%d] "
-            "bindingNs[%llu] batchStartNs[%llu] replayNs[%llu] cleanupBatchEndNs[%llu] totalNs[%llu]",
-            param.algName, static_cast<u32>(param.opType), static_cast<int>(replayRet),
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, bindingEnd)),
-            static_cast<unsigned long long>(ElapsedNs(batchStartBegin, batchStartEnd)),
-            static_cast<unsigned long long>(ElapsedNs(replayBegin, replayEnd)),
-            static_cast<unsigned long long>(ElapsedNs(cleanupBegin, cleanupEnd)),
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, cleanupEnd)));
+        HCCL_ERROR(
+            "[AICPU_SQE_CACHE_DIAG][Upper] path[error] stage[replay] algName[%s] opType[%u] ret[%d]",
+            param.algName, static_cast<u32>(param.opType), static_cast<int>(replayRet));
         return replayRet;
     }
     if (replayed != 0U) {
-        const u64 launchBegin = GetCurAicpuTimestamp();
         HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        const u64 launchEnd = GetCurAicpuTimestamp();
-        HCCL_RUN_INFO(
-            "[AICPU_SQE_CACHE_DIAG][Upper] path[hit] algName[%s] opType[%u] ret[%d] bindingNs[%llu] "
-            "batchStartNs[%llu] replayNs[%llu] batchEndLaunchNs[%llu] totalNs[%llu]",
-            param.algName, static_cast<u32>(param.opType), static_cast<int>(endRet),
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, bindingEnd)),
-            static_cast<unsigned long long>(ElapsedNs(batchStartBegin, batchStartEnd)),
-            static_cast<unsigned long long>(ElapsedNs(replayBegin, replayEnd)),
-            static_cast<unsigned long long>(ElapsedNs(launchBegin, launchEnd)),
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, launchEnd)));
+        HCCL_DEBUG(
+            "[AICPU_SQE_CACHE_DIAG][Upper] path[hit] algName[%s] opType[%u] ret[%d]",
+            param.algName, static_cast<u32>(param.opType), static_cast<int>(endRet));
         if (endRet != HCCL_SUCCESS) {
             HCCL_ERROR("[AicpuSqeCache] replay launch failed, algName[%s], ret[%d]", param.algName, endRet);
             return endRet;
@@ -535,63 +532,37 @@ HcclResult RunWithAicpuSqeCache(const mc2_ops_hccl::OpParam& param,
         return HCCL_SUCCESS;
     }
 
-    const u64 beginCaptureBegin = GetCurAicpuTimestamp();
     const HcclResult beginRet = static_cast<HcclResult>(HcommAicpuSqeCacheBegin(&storage.param));
-    const u64 beginCaptureEnd = GetCurAicpuTimestamp();
     const bool captureStarted = beginRet == HCCL_SUCCESS;
     if (!captureStarted) {
         HCCL_WARNING("[AicpuSqeCache] capture begin failed, continue normal expansion, algName[%s], ret[%d]",
                      param.algName, beginRet);
     }
-    const u64 executorBegin = GetCurAicpuTimestamp();
     const HcclResult execRet = func();
-    const u64 executorEnd = GetCurAicpuTimestamp();
-    const u64 launchBegin = GetCurAicpuTimestamp();
     const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-    const u64 launchEnd = GetCurAicpuTimestamp();
     if (execRet != HCCL_SUCCESS || endRet != HCCL_SUCCESS) {
         HcommAicpuSqeCacheAbort();
         const HcclResult ret = execRet != HCCL_SUCCESS ? execRet : endRet;
-        HCCL_RUN_INFO(
+        HCCL_ERROR(
             "[AICPU_SQE_CACHE_DIAG][Upper] path[miss_error] algName[%s] opType[%u] ret[%d] captureStarted[%u] "
-            "bindingNs[%llu] batchStartNs[%llu] lookupReplayNs[%llu] captureBeginNs[%llu] executorNs[%llu] "
-            "batchEndLaunchNs[%llu] totalNs[%llu]",
+            "execRet[%d] endRet[%d]",
             param.algName, static_cast<u32>(param.opType), static_cast<int>(ret), captureStarted,
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, bindingEnd)),
-            static_cast<unsigned long long>(ElapsedNs(batchStartBegin, batchStartEnd)),
-            static_cast<unsigned long long>(ElapsedNs(replayBegin, replayEnd)),
-            static_cast<unsigned long long>(ElapsedNs(beginCaptureBegin, beginCaptureEnd)),
-            static_cast<unsigned long long>(ElapsedNs(executorBegin, executorEnd)),
-            static_cast<unsigned long long>(ElapsedNs(launchBegin, launchEnd)),
-            static_cast<unsigned long long>(ElapsedNs(totalBegin, launchEnd)));
+            static_cast<int>(execRet), static_cast<int>(endRet));
         return ret;
     }
-    u64 commitNs = 0U;
     HcclResult commitRet = HCCL_SUCCESS;
     if (captureStarted) {
-        const u64 commitBegin = GetCurAicpuTimestamp();
         commitRet = static_cast<HcclResult>(HcommAicpuSqeCacheCommit());
-        const u64 commitEnd = GetCurAicpuTimestamp();
-        commitNs = ElapsedNs(commitBegin, commitEnd);
         if (commitRet != HCCL_SUCCESS) {
             HCCL_WARNING("[AicpuSqeCache] publish failed after successful launch, algName[%s], ret[%d]",
                          param.algName, commitRet);
         }
     }
-    const u64 totalEnd = GetCurAicpuTimestamp();
-    HCCL_RUN_INFO(
+    HCCL_DEBUG(
         "[AICPU_SQE_CACHE_DIAG][Upper] path[miss_expand] algName[%s] opType[%u] ret[%d] captureStarted[%u] "
-        "captureBeginRet[%d] commitRet[%d] bindingNs[%llu] batchStartNs[%llu] lookupReplayNs[%llu] "
-        "captureBeginNs[%llu] executorNs[%llu] batchEndLaunchNs[%llu] commitNs[%llu] totalNs[%llu]",
+        "captureBeginRet[%d] commitRet[%d]",
         param.algName, static_cast<u32>(param.opType), static_cast<int>(HCCL_SUCCESS), captureStarted,
-        static_cast<int>(beginRet), static_cast<int>(commitRet),
-        static_cast<unsigned long long>(ElapsedNs(totalBegin, bindingEnd)),
-        static_cast<unsigned long long>(ElapsedNs(batchStartBegin, batchStartEnd)),
-        static_cast<unsigned long long>(ElapsedNs(replayBegin, replayEnd)),
-        static_cast<unsigned long long>(ElapsedNs(beginCaptureBegin, beginCaptureEnd)),
-        static_cast<unsigned long long>(ElapsedNs(executorBegin, executorEnd)),
-        static_cast<unsigned long long>(ElapsedNs(launchBegin, launchEnd)), static_cast<unsigned long long>(commitNs),
-        static_cast<unsigned long long>(ElapsedNs(totalBegin, totalEnd)));
+        static_cast<int>(beginRet), static_cast<int>(commitRet));
     return HCCL_SUCCESS;
 }
 } // namespace
