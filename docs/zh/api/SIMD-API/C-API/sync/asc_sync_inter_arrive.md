@@ -28,6 +28,8 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品: 支持
 
 头文件路径：`"c_api/sync/sync.h"`。
 
+在分离模式下，AIC（Cube核）与AIV（Vector核）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组间同步指不同group之间的同步，即所有block（所有AIC或所有AIV）之间的同步。
+
 和[asc_sync_inter_wait](asc_sync_inter_wait.md)配合使用（通过flag_id关联），用于组间block的信号同步。通过向核间同步寄存器发送同步信号，标识当前pipeline已到达flag_id对应的同步点。每个flag_id对应一个初始值为0的计数器，执行asc_sync_inter_arrive后flag_id对应的计数器增加1；执行asc_sync_inter_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
 ## 函数原型
@@ -58,6 +60,10 @@ PIPE_S
 
 - 必须保证配套使用asc_sync_inter_arrive和[asc_sync_inter_wait](asc_sync_inter_wait.md)，否则会出现未定义行为。
 - 需要保证每个flag_id的计数器不溢出，否则将引发异常。
+- pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_ALL和PIPE_S。
+- flag_id的值超出取值范围时，会截取最低4位为准。
+- 一个核连续发出的asc_sync_inter_arrive，硬件不保证执行顺序。
+- 使用该接口时，建议开启batchmode模式，使算子独占全部所需核资源，否则在多流并发场景下（≥2条执行流、≥2个算子并发、核数总和超过物理核数）可能导致死锁。
 
 ## 调用示例
 

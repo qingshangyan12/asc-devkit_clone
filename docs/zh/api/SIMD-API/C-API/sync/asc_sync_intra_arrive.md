@@ -28,7 +28,25 @@
 
 头文件路径：`"c_api/sync/sync.h"`。
 
+在分离模式下，AIC（Cube核）与AIV（Vector核）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。block内同步指同一block内block（AIC）与单个subblock（AIV）之间的同步。
+
 block内同步指令，与[asc_sync_intra_wait](asc_sync_intra_wait.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应Vector Core与Cube Core中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他Core对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+
+block内同步场景可细分为两类：
+
+- AIC执行asc_sync_intra_arrive，对应的AIV执行asc_sync_intra_wait。当AIC执行完asc_sync_intra_arrive时，AIV对应sync_id的计数器增加1。若AIV该sync_id的计数器为非0，则解除AIV的阻塞，asc_sync_intra_wait后的指令继续执行，该sync_id的计数器减1。总计AIC 1次调用asc_sync_intra_arrive，单个AIV完成1次asc_sync_intra_wait才算配对使用。
+
+- 1个AIV执行asc_sync_intra_arrive，对应的AIC执行asc_sync_intra_wait。当AIV执行完asc_sync_intra_arrive时，AIC对应sync_id的计数器增加1。若AIC该sync_id的计数器为非0，则解除AIC的阻塞，asc_sync_intra_wait后的指令继续执行，该sync_id的计数器减1。总计单个AIV 1次asc_sync_intra_arrive，对应AIC 1次调用asc_sync_intra_wait才算配对使用。
+
+以图1为例，演示1个AI Core中AIV1与AIC进行同步（AIV1-2发起asc_sync_intra_arrive）。
+
+AIC 1中在执行asc_sync_intra_wait后，此时AIC 1 sync_id=0的计数器为0，后续所有指令全部被阻塞，需要等到1个AIV执行完asc_sync_intra_arrive。
+
+- AIV 1-1不需要执行asc_sync_intra_arrive。
+- AIV 1-2的PIPE_MTE3指令全部执行完毕后，asc_sync_intra_arrive生效。此时调度模块感知1个AIV已执行完asc_sync_intra_arrive，因此将AIC 1 sync_id=0的计数器值增加为1。AIC 1检测到对应的sync_id=0的计数器变为1，则AIC 1核解除阻塞，继续执行后续PIPE_FIX的指令，并且将计数器值减去1。
+
+**图1**  block内同步时序图（AIV进行asc_sync_intra_arrive）
+![](../../../figures/single_ai_core_aic_single_aiv_sync.png "block内同步时序图（AIV进行asc_sync_intra_arrive）")
 
 ## 函数原型
 
@@ -42,7 +60,7 @@ __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id)
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
 | pipe | 输入 | 该指令的执行流水线。 |
-| sync_id | 输入 | 事件标号。|
+| sync_id | 输入 | 事件标号。AIC的取值范围为[0, 31]，AIV的取值范围为[0, 15]。|
 
 ## 返回值说明
 
@@ -64,6 +82,8 @@ PIPE_S
     - ID为16~31的矩阵计算核的asc_sync_intra_arrive指令会被映射到矢量计算核1的0~15的ID。 
 
 - 必须保证配套使用asc_sync_intra_arrive和[asc_sync_intra_wait](asc_sync_intra_wait.md)，否则会出现未定义行为。
+- pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_S，不支持PIPE_ALL。
+- 一个核连续发出的asc_sync_intra_arrive，硬件不保证执行顺序。
 
 ## 调用示例
 
