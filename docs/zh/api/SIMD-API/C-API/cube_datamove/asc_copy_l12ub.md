@@ -48,7 +48,7 @@
 | :--- | :--- | :--- |
 | dst_addr | 输出 | 目的操作数起始地址。 |
 | src_addr | 输入 | 源操作数起始地址。 |
-| sub_blockid | 输入 | 使用的子块ID。 |
+| sub_blockid | 输入 | 目的Vector Core的子块ID。false表示AIV0，true表示AIV1。 |
 | n_burst | 输入 | 待搬运的连续传输数据块个数。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。 |
 | src_gap | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
@@ -66,7 +66,8 @@ PIPE_MTE1
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../通用说明和约束.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
-- 由于此接口实现了Cube核与Vector核间的数据搬运，所以如果核函数调用了该接口，则不能使用__cube__或__vector__的执行空间修饰符，否则会导致执行失败。
+- 该接口仅适用于Mix场景，且仅支持Cube Core与Vector Core比例为1:2的配置。`sub_blockid`仅支持选择AIV0或AIV1。
+- 由于此接口实现了Cube Core与Vector Core间的数据搬运，所以如果核函数调用了该接口，则不能使用`__cube__`或`__vector__`执行空间修饰符，否则会导致执行失败。
 
 ## 调用示例
 
@@ -77,5 +78,6 @@ constexpr uint16_t src_gap = 0;
 constexpr uint16_t dst_gap = 1;
 __cbuf__ half src[256];
 __ubuf__ half dst[256];
+// 当前核函数使用__mix__(1, 2)，false表示将数据搬运到AIV0的UB。
 asc_copy_l12ub(dst, src, false, n_burst, len_burst, src_gap, dst_gap);
 ```

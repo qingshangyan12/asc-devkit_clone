@@ -14,8 +14,8 @@ L1 Buffer/L0C Buffer与Unified Buffer之间的数据搬运提供了灵活的接�
 | Unified Buffer->L1 Buffer | 非对齐数据搬运(无直接C API) | 支持数据非对齐搬运，可以根据开发者的需要自行填充数据。 |
 | L0C Buffer->Unified Buffer | 随路转换与量化(asc_copy_l0c2ub) | 支持多种随路能力的组合，asc_copy_l0c2ub接口内包含了设置寄存器与数据搬运能力。 |
 | L0C Buffer->Unified Buffer | 随路量化激活搬运(asc_copy_l0c2ub) | 支持多种随路能力的组合，asc_copy_l0c2ub接口内包含了设置寄存器与数据搬运能力。 |
-| L1 Buffer->Unified Buffer | 连续数据搬运(asc_copy_ub2l1) | 提供基础的数据搬运能力，数据在传输过程中保持原始格式和内容不变，支持连续数据搬运。 |
-| L1 Buffer->Unified Buffer | 高维切分数据搬运(asc_copy_ub2l1) | 提供基础的数据搬运能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。 |
+| L1 Buffer->Unified Buffer | 连续数据搬运（asc_copy_l12ub） | 提供基础的数据搬运能力，数据在传输过程中保持原始格式和内容不变，支持连续数据搬运。 |
+| L1 Buffer->Unified Buffer | 高维切分数据搬运（asc_copy_l12ub） | 提供基础的数据搬运能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。 |
 
 ## asc_copy_ub2l1（UBToL1连续数据搬运）
 
@@ -169,7 +169,9 @@ asc_copy_l12ub能够实现L1 Buffer到Unified Buffer的连续数据搬运，数�
 
 该接口仅Ascend 950PR/Ascend 950DT支持。
 
-src和dst分别为源操作数和目的操作数；count为连续搬运的元素个数。
+该接口仅适用于AIC:AIV为1:2的Mix场景。`sub_blockid`用于选择目的Vector Core，false表示AIV0，true表示AIV1。
+
+src和dst分别为源操作数和目的操作数；`n_burst`、`len_burst`、`src_gap`和`dst_gap`用于配置连续传输数据块。
 
 ```c++
 __aicore__ inline void asc_copy_l12ub(__ubuf__ void* dst_addr, __cbuf__ void* src_addr, bool sub_blockid, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
@@ -194,7 +196,9 @@ asc_copy_l12ub能够实现L1 Buffer到Unified Buffer的连续数据搬运和非�
 
 该接口仅Ascend 950PR/Ascend 950DT支持。
 
-src和dst分别为源操作数和目的操作数；repeatParams为搬运参数。
+该接口仅适用于AIC:AIV为1:2的Mix场景。`sub_blockid`用于选择目的Vector Core，false表示AIV0，true表示AIV1。
+
+src和dst分别为源操作数和目的操作数；`n_burst`、`len_burst`、`src_gap`和`dst_gap`用于配置高维切分搬运。
 
 ```c++
 __aicore__ inline void asc_copy_l12ub(__ubuf__ void* dst_addr, __cbuf__ void* src_addr, bool sub_blockid, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)

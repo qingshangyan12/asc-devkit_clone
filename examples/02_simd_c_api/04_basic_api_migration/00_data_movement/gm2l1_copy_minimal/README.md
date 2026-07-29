@@ -10,7 +10,7 @@
 GM input --asc_copy_gm2l1--> L1 --asc_copy_l12ub--> UB --asc_copy_ub2gm--> GM output
 ```
 
-核函数采用`__mix__(1, 1)`，每个 group 包含 1 个 AIC 和 1 个 AIV：AIC 负责 GM→L1→UB，AIV 负责 UB→GM。这样既满足`asc_copy_l12ub`不能使用纯`__cube__`或`__vector__`执行空间的约束，也避免多个 AIV 对同一份极简输出产生竞争。
+核函数采用`__mix__(1, 2)`，每个group包含1个AIC和2个AIV。`asc_copy_l12ub`仅支持AIC:AIV为1:2的Mix场景；AIC负责GM->L1 Buffer->UB，并通过`sub_blockid=false`将数据搬运到AIV0的UB。AIV侧使用`asc_get_sub_block_id()`筛选AIV0，仅AIV0等待同步信号并执行UB->GM，AIV1不参与回写，从而避免两个AIV同时等待单次通知或写入同一GM地址。
 
 `dav-3510` 上的 C API 文档将 `asc_copy_l12gm` 标记为不支持，因此本样例不使用直接 L1→GM 回写；经 UB 回写是为了保留 L1 搬入过程并让主机侧能够读取、打印结果。
 
@@ -35,14 +35,15 @@ output (first 8): 0x0001 0x0004 0x0007 0x000a 0x000d 0x0010 0x0013 0x0016
 设备侧的依赖关系为：
 
 ```text
-AIC: PIPE_MTE2 (GM→L1) ──asc_sync_notify/wait──> PIPE_MTE1 (L1→UB)
+AIC: PIPE_MTE2 (GM->L1 Buffer) ──asc_sync_notify/wait──> PIPE_MTE1 (L1 Buffer->AIV0 UB)
                                                         │
                                       asc_sync_block_arrive/wait
                                                         │
-AIV:                                                PIPE_MTE3 (UB→GM)
+AIV0:                                               PIPE_MTE3 (UB->GM)
+AIV1:                                               不参与搬运
 ```
 
-MTE2→MTE1 是同一 AIC 内的流水依赖，使用`asc_sync_notify`和`asc_sync_wait`建立。L1→UB 的 AIC 侧生产与 UB→GM 的 AIV 侧消费属于跨核依赖，使用`asc_sync_block_arrive(PIPE_MTE1, CROSS_CORE_FLAG_ID)`和`asc_sync_block_wait(PIPE_S, CROSS_CORE_FLAG_ID)`交接。不能使用`asc_sync_notify(PIPE_MTE1, PIPE_MTE3, ...)`：该组合会展开为目标不支持的`set_flag`参数组合。最后用`asc_sync_pipe(PIPE_ALL)`收敛异步搬运。
+MTE2->MTE1是同一AIC内的流水依赖，使用`asc_sync_notify`和`asc_sync_wait`建立。L1 Buffer->UB的AIC侧生产与UB->GM的AIV0侧消费属于跨核依赖，使用`asc_sync_block_arrive(PIPE_MTE1, CROSS_CORE_FLAG_ID)`和`asc_sync_block_wait(PIPE_S, CROSS_CORE_FLAG_ID)`交接。不能使用`asc_sync_notify(PIPE_MTE1, PIPE_MTE3, ...)`：该组合会展开为目标不支持的`set_flag`参数组合。最后用`asc_sync_pipe(PIPE_ALL)`收敛异步搬运。
 
 ## API 依据
 
@@ -50,8 +51,9 @@ MTE2→MTE1 是同一 AIC 内的流水依赖，使用`asc_sync_notify`和`asc_sy
 |---|---|---|
 | `asc_init` | [`misc/asc_init.md`](../../../../../docs/zh/api/SIMD-API/C-API/misc/asc_init.md) | 初始化 NPU 状态。 |
 | `asc_copy_gm2l1` | [`cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_3510.md`](../../../../../docs/zh/api/SIMD-API/C-API/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_3510.md) | 1 个连续 burst，16 个 32 B 数据块，无 padding。 |
-| `asc_copy_l12ub` | [`cube_datamove/asc_copy_l12ub.md`](../../../../../docs/zh/api/SIMD-API/C-API/cube_datamove/asc_copy_l12ub.md) | 1 个连续 burst，16 个 DataBlock。该接口不能与 `__cube__` 或 `__vector__` 执行空间修饰符同时使用。 |
+| `asc_copy_l12ub` | [`cube_datamove/asc_copy_l12ub.md`](../../../../../docs/zh/api/SIMD-API/C-API/cube_datamove/asc_copy_l12ub.md) | 在AIC:AIV为1:2的Mix场景中向AIV0搬运1个连续burst，共16个DataBlock。 |
 | `asc_copy_ub2gm` | [`vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md`](../../../../../docs/zh/api/SIMD-API/C-API/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md) | 以 512 B 前 n 个数据搬运形式回写 GM。 |
+| `asc_get_sub_block_id` | [`sys_var/asc_get_sub_block_id.md`](../../../../../docs/zh/api/SIMD-API/C-API/sys_var/asc_get_sub_block_id.md) | 在1:2的Mix场景中筛选AIV0，避免AIV1等待同一同步信号或写入同一输出地址。 |
 | `asc_sync_notify` / `asc_sync_wait` | [`sync`](../../../../../docs/zh/api/SIMD-API/C-API/sync/) | 约束 AIC 内 GM→L1 与 L1→UB 的生产者—消费者关系。 |
 | `asc_sync_block_arrive` / `asc_sync_block_wait` | [`sync`](../../../../../docs/zh/api/SIMD-API/C-API/sync/) | 使用 flag 0 完成 AIC→AIV 的核间交接；flag 的有效范围为 0 至 15。 |
 | `asc_sync_pipe` | [`sync`](../../../../../docs/zh/api/SIMD-API/C-API/sync/) | 收敛两侧的异步搬运。 |
