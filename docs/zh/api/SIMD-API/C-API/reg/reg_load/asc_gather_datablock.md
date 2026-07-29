@@ -113,9 +113,9 @@
         vector_bool mask;
         for (uint16_t i = 0; i < repeat_time; ++i) {
             mask = asc_update_mask_b8(count);
-            asc_loadalign(index, index_addr, one_repeat_size);
+            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
             asc_gather_datablock(dst, src_addr, index, mask);
-            asc_storealign(dst_addr, dst, one_block_size, mask);
+            asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
         }
     }
     ```
@@ -128,9 +128,9 @@
         vector_bool mask;
         for (uint16_t i = 0; i < repeat_time; ++i) {
             mask = asc_update_mask_b8(count);
-            asc_loadalign(index, index_addr, one_repeat_size);
+            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
             asc_gather_datablock(dst, src_addr, index);
-            asc_storealign(dst_addr, dst, one_block_size, mask);
+            asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
         }
     }
     ```
