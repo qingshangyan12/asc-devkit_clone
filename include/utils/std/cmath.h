@@ -41,10 +41,13 @@ namespace Std {
 template <typename T> __aicore__ inline T sqrt(const T src);
 template <typename T> __aicore__ inline T abs(const T src);
 
-/*!
- * \brief Divide a by b and round the result up.
- *
- * \note For signed inputs, callers must ensure a >= 0 and b > 0.
+/*
+ * @ingroup Cmath
+ * @brief Divide a by b and round the result up
+ * @param [in] a dividend
+ * @param [in] b divisor
+ * @return Result of a divided by b, rounded up
+ * @note For signed inputs, callers must ensure a >= 0 and b > 0.
  */
 template <typename T, typename U> __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b);
 
