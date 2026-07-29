@@ -13,15 +13,13 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-__aicore__ inline void wait_flag_dev_subblock_stub(pipe_t pipe, uint8_t flag_id)
+__aicore__ inline void wait_flag_dev_subblock_stub(uint8_t flag_id)
 {
-    EXPECT_EQ(pipe, static_cast<pipe_t>(pipe_t::PIPE_S));
     EXPECT_EQ(flag_id, static_cast<uint8_t>(11));
 }
 
-__aicore__ inline void wait_flag_dev_subblock_mode_stub(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void wait_flag_dev_subblock_mode_stub(int64_t flag_id)
 {
-    EXPECT_EQ(pipe, static_cast<pipe_t>(pipe_t::PIPE_S));
     EXPECT_EQ(flag_id, static_cast<int64_t>(11));
 }
 
@@ -33,7 +31,7 @@ protected:
 
 TEST_F(TEST_ASC_SYNC_SUBBLOCK_WAIT, TEST_ASC_SYNC_SUBBLOCK_WAIT)
 {
-    MOCKER_CPP(wait_flag_dev, void(pipe_t, uint8_t)).times(1).will(invoke(wait_flag_dev_subblock_stub));
+    MOCKER_CPP(wait_flag_dev, void(uint8_t)).times(1).will(invoke(wait_flag_dev_subblock_stub));
 
     pipe_t pipe = static_cast<pipe_t>(pipe_t::PIPE_S);
     uint8_t flag_id = static_cast<uint8_t>(11);
@@ -44,7 +42,7 @@ TEST_F(TEST_ASC_SYNC_SUBBLOCK_WAIT, TEST_ASC_SYNC_SUBBLOCK_WAIT)
 
 TEST_F(TEST_ASC_SYNC_SUBBLOCK_WAIT, TEST_ASC_SYNC_SUBBLOCK_WAIT_MODE)
 {
-    MOCKER_CPP(wait_flag_dev, void(pipe_t, int64_t)).times(1).will(invoke(wait_flag_dev_subblock_mode_stub));
+    MOCKER_CPP(wait_flag_dev, void(int64_t)).times(1).will(invoke(wait_flag_dev_subblock_mode_stub));
 
     pipe_t pipe = static_cast<pipe_t>(pipe_t::PIPE_S);
     int64_t flag_id = static_cast<int64_t>(11);
