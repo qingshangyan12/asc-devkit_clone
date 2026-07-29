@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_load.h"`。
@@ -76,6 +82,7 @@ PIPE_V
 
 - 该接口中的src1不需要32B对齐。
 - 调用该接口之前，需要调用[asc_loadunalign_pre](asc_loadunalign_pre.md)进行非对齐搬入前的初始化。
+- vector_int4x2_t数据类型于CANN 9.1.0或更高版本支持，在CANN 9.0.0以下版本不支持。
 
 ## 调用示例
 

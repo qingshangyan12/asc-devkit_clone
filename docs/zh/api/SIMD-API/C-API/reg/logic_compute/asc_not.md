@@ -24,6 +24,12 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
+## CANN软件版本支持情况
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
@@ -38,7 +44,7 @@ $$
 
 ## 函数原型
 
-```c++
+```cpp
 __simd_callee__ inline void asc_not(vector_bool& dst, vector_bool src, vector_bool mask)
 __simd_callee__ inline void asc_not(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
 __simd_callee__ inline void asc_not(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
