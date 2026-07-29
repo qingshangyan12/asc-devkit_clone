@@ -28,6 +28,8 @@
 
 头文件路径：`"c_api/sync/sync.h"`。
 
+在分离模式下，AIC（Cube核）与AIV（Vector核）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。block内同步指同一block内block（AIC）与单个subblock（AIV）之间的同步。
+
 block内同步指令，与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应矢量计算核与矩阵计算核中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他CORE对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
 ## 函数原型
@@ -42,7 +44,7 @@ __aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id)
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
 | pipe | 输入 | 该指令的执行流水线。 |
-| sync_id | 输入 | 事件标号。|
+| sync_id | 输入 | 事件标号。AIC的取值范围为[0, 31]，AIV的取值范围为[0, 15]。|
 
 ## 返回值说明
 
@@ -64,6 +66,7 @@ PIPE_S
     - ID为16~31的矩阵计算核的asc_sync_intra_arrive指令会被映射到矢量计算核1的0~15的ID。 
 
 - 必须保证配套使用[asc_sync_intra_arrive](asc_sync_intra_arrive.md)和asc_sync_intra_wait，避免计算核一直处于阻塞阶段。
+- pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_S，不支持PIPE_ALL。
 
 ## 调用示例
 

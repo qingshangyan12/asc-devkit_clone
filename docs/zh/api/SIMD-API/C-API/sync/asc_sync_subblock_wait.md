@@ -27,7 +27,11 @@
 
 ## 功能说明
 
-核间同步寄存器同步指令，每个flag_id均分配有计数器，执行asc_sync_subblock_arrive后计数器将递增；执行asc_sync_subblock_wait时如果对应的计数器数值为0则阻塞；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+头文件路径：`"c_api/sync/sync.h"`。
+
+在分离模式下，AIC（Cube核）与AIV（Vector核）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组内subblock间同步指同一group内不同subblock（AIV）之间的同步。
+
+核间同步指令，每个flag_id均分配有计数器，执行asc_sync_subblock_arrive后计数器将递增；执行asc_sync_subblock_wait时如果对应的计数器数值为0则阻塞；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
 ## 函数原型
 
@@ -58,6 +62,8 @@ PIPE_S
 - 必须保证相同的ID在同一时间仅被一条流水线等待。
 
 - 必须保证配套使用[asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)和asc_sync_subblock_wait，避免计算核一直处于阻塞阶段。
+- pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_ALL和PIPE_S。
+- flag_id的值超出取值范围时，会截取最低4位为准。
 
 ## 调用示例
 
