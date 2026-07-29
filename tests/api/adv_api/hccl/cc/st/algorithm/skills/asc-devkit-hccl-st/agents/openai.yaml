@@ -1,0 +1,4 @@
+interface:
+  display_name: "asc-devkit HCCL ST"
+  short_description: "开发、扩展并运行asc-devkit中的HCCL算法ST与Checker"
+  default_prompt: "Use $asc-devkit-hccl-st to add or debug an asc-devkit HCCL algorithm ST case and run the relevant regression."
