@@ -292,7 +292,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_dcci](cache_ctrl/asc_dcci.md) | 用于刷新Cache，保证Cache的一致性。 |
 |  [asc_dci](cache_ctrl/asc_dci.md) | 数据缓存失效，使整个数据缓存无效化。|
 | [asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md) | 获取ICache的Preload的状态。 |
-| [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在DDR地址预加载数据到对应的cacheline中。 |
+| [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在GM地址预加载数据到对应的cacheline中。 |
 
 ## 原子操作
 
@@ -507,4 +507,3 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_unsqueeze](reg/data_compress/asc_unsqueeze.md) | 根据mask进行解压缩，将生成的数据输出到dst。 |
 | [asc_update_mask](reg/reg_data_types/asc_update_mask.md) | 根据value大小生成对应的掩码寄存器中的值。 |
 | [asc_xor](reg/logic_compute/asc_xor.md) | 根据mask对输入的src0、src1按元素异或（^）进行操作，将结果写入dst。 |
-
