@@ -28,7 +28,7 @@
 
 头文件路径：`"c_api/sync/sync.h"`。
 
-用于同步AI Core内部异步流水的指令，用于释放由asc_lock指令申请的缓存。直到当前流水的前序指令执行完成后，根据mutex_id释放对应Mutex。
+用于同步AI Core内部异步流水的指令，直到当前流水的前序指令执行完成后，根据mutex_id释放对应Mutex。
 
 相对于[asc_sync_notify](asc_sync_notify.md)/[asc_sync_wait](asc_sync_wait.md)同步机制，使用asc_lock/asc_unlock接口有以下优势：
 
@@ -52,7 +52,7 @@ __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const ascMutexE
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
 | pipe | 输入 | 该指令的执行流水线。 |
-| mutex_id | 输入 | buffer标号。取值范围[0, 31]。|
+| mutex_id | 输入 | mutex标号。取值范围[0, 31]。|
 | mode | 输入 | 可选参数，用于指定是否阻塞流水线，默认值为ASC_LOCK_BLOCK。<br>&bull; ASC_LOCK_BLOCK：该指令等待pipe所对应的流水线中所有前置指令完成后执行。<br>&bull; ASC_LOCK_NON_BLOCK：该指令等待pipe所对应的流水线中所有前置指令完成且相同mutex_id的所有asc_unlock指令执行完成后执行。 |
 
 ## 返回值说明
@@ -74,7 +74,7 @@ PIPE_S
 ```cpp
 //buffer标号为1
 uint8_t mutex_id = 1;
-//等待PIPE_S中所有前置指令完成后释放标号为1的缓存
+//等待PIPE_S中所有前置指令完成后释放标号为1的Mutex
 asc_lock(PIPE_S, mutex_id);
 asc_unlock(PIPE_S, mutex_id); 
 ```
