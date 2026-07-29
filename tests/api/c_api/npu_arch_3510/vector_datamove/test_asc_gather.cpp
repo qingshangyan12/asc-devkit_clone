@@ -71,6 +71,8 @@
         GlobalMockObject::verify();                                                                       \
     }
 
+TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, int8_t, vector_int16_t, uint16_t);
+TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, uint8_t, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, int16_t, vector_int16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, uint16_t, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, int32_t, vector_int32_t, uint32_t);
