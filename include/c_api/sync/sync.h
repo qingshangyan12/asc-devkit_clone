@@ -53,30 +53,47 @@ __aicore__ inline void asc_sync();
 
 #define asc_sync_subblock_wait(pipe, flag_id) wait_flag_dev((flag_id))
 
-#define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((flag_id))
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint8_t flag_id);
 
-#define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((flag_id))
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id);
+
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint8_t flag_id);
+
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id);
+
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id);
+
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id);
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-#define asc_sync_intra_arrive(pipe, sync_id) set_intra_block((pipe), (sync_id))
+__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint8_t sync_id);
 
-#define asc_sync_intra_wait(pipe, sync_id) wait_intra_block((pipe), (sync_id))
+__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id);
 
-#define asc_sync_subblock_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint8_t sync_id);
 
-#define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id);
 
-#define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint8_t flag_id);
 
-enum ascMutexExecuteMode {
-    ASC_LOCK_BLOCK = 0,    // Block the execution of the pipeline indicated by pipe (Default).
-    ASC_LOCK_NON_BLOCK = 1 // Won't block execution of the pipeline.
-};
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id);
 
-#define asc_lock(pipe, mutex_id, ...) asc_lock_impl((pipe), (mutex_id), (ASC_LOCK_BLOCK, ##__VA_ARGS__))
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id);
 
-#define asc_unlock(pipe, mutex_id, ...) asc_unlock_impl((pipe), (mutex_id), (ASC_LOCK_BLOCK, ##__VA_ARGS__))
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id);
+
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint8_t flag_id);
+
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id);
+
+__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id);
+
+__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode);
+
+__aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id);
+
+__aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode);
 
 #endif
 
