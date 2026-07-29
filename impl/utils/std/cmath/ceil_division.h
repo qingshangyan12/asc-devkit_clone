@@ -75,7 +75,7 @@ using make_unsigned_t = typename integer_traits<T>::unsigned_type;
  * \note For signed inputs, callers must ensure a >= 0 and b > 0.
  */
 template <typename T, typename U>
-__aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
+__host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 {
     static_assert(is_integral_v<T>, "AscendC::Std::div_ceil: T must be an integral type");
     static_assert(is_integral_v<U>, "AscendC::Std::div_ceil: U must be an integral type");
