@@ -28,7 +28,7 @@
 
 头文件路径：`"c_api/cache_ctrl/cache_ctrl.h"`。
 
-从指令所在DDR地址预加载数据到对应的cacheline中。
+从指令所在GM地址预加载数据到对应的cacheline中。
 
 开发者手动调用该接口，能够从指令所在GM地址预加载指令到ICache中。
 
@@ -43,7 +43,7 @@ __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | addr | 输入 | 预加载数据的地址。 |
-| prefetch_len | 输入 | 预加载数据的长度，单位为2K Byte，取值需满足 preFetchLen < ICache大小 / 2K。其中，AIC和AIV的ICache大小分别为32KB和16KB。 |
+| prefetch_len | 输入 | 预加载数据的长度，单位为2K Byte，取值需满足 $\text{prefetch\_len} < \dfrac{\text{ICache大小}}{2K}$。其中，AIC和AIV的ICache大小分别为32KB和16KB。 |
 
 ## 返回值说明
 
@@ -55,7 +55,7 @@ PIPE_S
 
 ## 约束说明
 
-- prefetch_len参数单位为2K Byte，取值需满足 preFetchLen < ICache大小 / 2K。其中，AIC和AIV的ICache大小分别为32KB和16KB。
+- prefetch_len参数单位为2K Byte，取值需满足 $\text{prefetch\_len} < \dfrac{\text{ICache大小}}{2K}$。其中，AIC和AIV的ICache大小分别为32KB和16KB。
 
 ## 调用示例
 

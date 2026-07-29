@@ -66,8 +66,8 @@ PIPE_S
 uint64_t config = *(__gm__ uint64_t*)ffts_addr;
 asc_set_ffts_base_addr(config);
 int64_t flag_id = 1;
-asc_sync_block_arrive(PIPE_S, flag_id);
-asc_sync_block_wait(PIPE_S, flag_id);  
+asc_sync_block_arrive(PIPE_V, flag_id);
+asc_sync_block_wait(PIPE_V, flag_id);  
 ```
 
 <!-- npu="950" id10 -->
@@ -75,7 +75,7 @@ asc_sync_block_wait(PIPE_S, flag_id);
 ```cpp
 // 在Ascend 950PR/Ascend 950DT产品上，无需进行核间同步基地址ffts_addr的设置
 int64_t flag_id = 1;
-asc_sync_block_arrive(PIPE_S, flag_id);
-asc_sync_block_wait(PIPE_S, flag_id);  
+asc_sync_block_arrive(PIPE_V, flag_id);
+asc_sync_block_wait(PIPE_V, flag_id);  
 ```
 <!-- end id10 -->

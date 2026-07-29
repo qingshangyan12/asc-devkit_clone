@@ -28,7 +28,12 @@
 
 头文件路径：`"c_api/sync/sync.h"`。
 
-用于AI Core内部异步通道同步的指令，用于释放由asc_lock指令申请的缓存。直到当前流水的前序指令执行完成后，根据mutex_id释放对应Mutex。
+用于同步AI Core内部异步流水的指令，用于释放由asc_lock指令申请的缓存。直到当前流水的前序指令执行完成后，根据mutex_id释放对应Mutex。
+
+相对于[asc_sync_notify](asc_sync_notify.md)/[asc_sync_wait](asc_sync_wait.md)同步机制，使用asc_lock/asc_unlock接口有以下优势：
+
+- 内聚性更强，使用时与其它流水线解耦，可以简化反向同步。
+- 可以使用更多的同步信号量。
 
 ## 函数原型
 
@@ -62,7 +67,7 @@ PIPE_S
 
 - 必须与asc_lock搭配使用，且需要使用相同的mutex_id与mode。此外，asc_unlock必须始终插在对应的asc_lock指令之后，否则会出现未定义的硬件行为。
 - 具有相同mutex_id的asc_lock与asc_unlock组合，无论pipe与mode是否相同，均不得在编程顺序中嵌套，否则硬件行为将不可预测。
-- 对于程序顺序中连续出现的，具有相同pipe与mutex_id的指令对，后一个asc_lock将不再阻塞流水线运行，若需实现同一流水线的依赖关系，则必须使用指令asc_sync_pipe。
+- 对于程序顺序中连续出现的，具有相同pipe与mutex_id的指令对，后一个asc_lock将不再阻塞流水线运行，若需实现同一流水线的依赖关系，则必须使用指令[asc_sync_pipe](asc_sync_pipe.md)。
 
 ## 调用示例
 
