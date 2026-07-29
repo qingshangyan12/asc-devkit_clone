@@ -77,8 +77,8 @@ using make_unsigned_t = typename integer_traits<T>::unsigned_type;
 template <typename T, typename U>
 __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 {
-    static_assert(is_integral_v<T>, "AscendC::Std::div_ceil: T must be an integral type");
-    static_assert(is_integral_v<U>, "AscendC::Std::div_ceil: U must be an integral type");
+    static_assert(is_integral_v<T>, "AscendC::Std::ceil_div: T must be an integral type");
+    static_assert(is_integral_v<U>, "AscendC::Std::ceil_div: U must be an integral type");
 
     using Prom = decltype(T{} / U{});
     using UProm = make_unsigned_t<Prom>;
@@ -89,7 +89,7 @@ __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
     // When _Prom is signed, (a + b - 1) / b is safe because:
     // a <= INT_MAX, b <= INT_MAX, INT_MAX + INT_MAX fits in unsigned
     if constexpr (is_signed_impl_v<Prom>) {
-        return (a1 + b1 - 1) / b1;
+        return static_cast<Prom>((a1 + b1 - 1) / b1);
     } else {
         // When _Prom is unsigned, a could be near UINT_MAX, so (a + b - 1) could overflow/wrap.
         // Use min-based branchless form: min(a, 1 + (a - 1) / b) avoids overflow risk.
