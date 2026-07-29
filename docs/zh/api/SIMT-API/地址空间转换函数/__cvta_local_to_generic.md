@@ -66,12 +66,12 @@ SIMD与SIMT混合编程场景不支持使用该接口。
 SIMT编程场景：
 
 ```cpp
-__global__ __launch_bounds__(1024) void kernel___cvta_local_to_generic(uint32_t* dst, uint32_t* src)
+__global__ __launch_bounds__(1024) void kernel__cvta_local_to_generic(uint32_t* dst, uint32_t* src)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    uint32_t data_ptr[]={10,11};
-    size_t addr = __cvta_generic_to_local(data_ptr);
-    void* ptr = __cvta_local_to_generic(addr);
-    dst[idx] = *(uint32_t*)ptr;
+    uint32_t local_data[2] = {src[idx], src[idx] + 1};
+    size_t local_addr = __cvta_generic_to_local(local_data + 1);
+    uint32_t* ptr = static_cast<uint32_t*>(__cvta_local_to_generic(local_addr));
+    dst[idx] = ptr[0];
 }
 ```
