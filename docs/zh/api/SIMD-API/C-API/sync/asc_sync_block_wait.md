@@ -60,6 +60,6 @@ PIPE_S
 
 ```cpp
 int64_t flag_id = 1;
-asc_sync_block_arrive(PIPE_S, flag_id);
-asc_sync_block_wait(PIPE_S, flag_id);  
+asc_sync_block_arrive(PIPE_V, flag_id);
+asc_sync_block_wait(PIPE_V, flag_id);  
 ```

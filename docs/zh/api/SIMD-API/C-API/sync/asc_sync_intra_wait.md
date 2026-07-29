@@ -26,7 +26,9 @@
 
 ## 功能说明
 
-block内同步指令，与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应VECCORE与CUBECORE中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他CORE对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+头文件路径：`"c_api/sync/sync.h"`。
+
+block内同步指令，与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应矢量计算核与矩阵计算核中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他CORE对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
 ## 函数原型
 
@@ -56,10 +58,10 @@ PIPE_S
 - 需要保证相同的ID只会被一个流水线控制。
 - 每个ID对应一个4位计数器，特定CORE的同步ID计数器可通过其他CORE发起的asc_sync_intra_arrive递增；也可通过本身发起的asc_sync_intra_wait递减。 
 - 三个CORE的ID映射规则如下：
-    - ID为0~15的VECCORE0的asc_sync_intra_arrive指令会被映射到CUBECORE的0~15的ID。 
-    - ID为0~15的VECCORE1的asc_sync_intra_arrive指令会被映射到CUBECORE的16~31的ID。 
-    - ID为0~15的CUBECORE的asc_sync_intra_arrive指令会被映射到VECCORE0的0~15的ID。 
-    - ID为16~31的CUBECORE的asc_sync_intra_arrive指令会被映射到VECCORE1的0~15的ID。 
+    - ID为0~15的矢量计算核0的asc_sync_intra_arrive指令会被映射到矩阵计算核的0~15的ID。 
+    - ID为0~15的矢量计算核1的asc_sync_intra_arrive指令会被映射到矩阵计算核的16~31的ID。 
+    - ID为0~15的矩阵计算核的asc_sync_intra_arrive指令会被映射到矢量计算核0的0~15的ID。 
+    - ID为16~31的矩阵计算核的asc_sync_intra_arrive指令会被映射到矢量计算核1的0~15的ID。 
 
 - 必须保证配套使用[asc_sync_intra_arrive](asc_sync_intra_arrive.md)和asc_sync_intra_wait，避免计算核一直处于阻塞阶段。
 
@@ -68,6 +70,6 @@ PIPE_S
 ```cpp
 //设置同步指令事件标号为1
 uint64_t sync_id = 1;
-asc_sync_intra_arrive(PIPE_S, sync_id);
-asc_sync_intra_wait(PIPE_S, sync_id);  
+asc_sync_intra_arrive(PIPE_V, sync_id);
+asc_sync_intra_wait(PIPE_V, sync_id);  
 ```

@@ -28,7 +28,12 @@
 
 该接口用于AI Core内部异步流水线之间的同步，可按需阻塞指定流水线的执行。
 
-对应基础API Lock，根据mutex_id获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到当前流水的前序指令中对应mutex_id的Mutex被asc_unlock释放。
+根据mutex_id获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到当前流水的前序指令中对应mutex_id的Mutex被asc_unlock释放。
+
+相对于[asc_sync_notify](asc_sync_notify.md)/[asc_sync_wait](asc_sync_wait.md)同步机制，使用asc_lock/asc_unlock接口有以下优势：
+
+- 内聚性更强，使用时与其它流水线解耦，可以简化反向同步。
+- 可以使用更多的同步信号量。
 
 ## 函数原型
 
