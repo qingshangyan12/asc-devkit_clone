@@ -43,11 +43,21 @@ function encodeRepositoryPath(path) {
 export function rewriteRepositoryLinks(html, sourceFile, repoRoot) {
   if (!sourceFile || !repoRoot) return html
 
-  return html.replace(HREF_RE, (original, attribute, quote, href) => {
+  const codeBlocks = []
+  html = html.replace(/<(code|pre)\b[^>]*>[\s\S]*?<\/\1>/gi, (m) => {
+    codeBlocks.push(m)
+    return `\x00CB${codeBlocks.length - 1}\x00`
+  })
+
+  html = html.replace(HREF_RE, (original, attribute, quote, href) => {
     const rewrittenHref = rewriteRepositoryHref(href, sourceFile, repoRoot)
     if (rewrittenHref === href) return original
     return `${attribute}${quote}${rewrittenHref}${quote}`
   })
+
+  html = html.replace(/\x00CB(\d+)\x00/g, (_, i) => codeBlocks[+i])
+
+  return html
 }
 
 export function rewriteRepositoryHref(href, sourceFile, repoRoot) {

@@ -104,6 +104,22 @@ test('supports root files, hidden directories, and encoded path segments', () =>
   )
 })
 
+test('does not rewrite links inside code or pre blocks', () => {
+  const html = [
+    '<a href="../../../include/api.h">link</a>',
+    '<pre><code>// see <a href="../../../include/api.h">api.h</a> here</code></pre>',
+    '<code>href="../../../include/api.h"</code>',
+  ].join('')
+
+  const result = rewriteRepositoryLinks(html, zhSource, repoRoot)
+
+  assert.ok(result.includes('https://gitcode.com/cann/asc-devkit/blob/master/include/api.h'))
+  assert.equal(
+    (result.match(/href="\.\.\/\.\.\/\.\.\/include\/api\.h"/g) || []).length,
+    2,
+  )
+})
+
 test('does not rewrite documentation, image, external, missing, or src links', () => {
   const html = [
     '<a href="./other.md">Chinese documentation</a>',
