@@ -69,6 +69,10 @@ SIMT编程场景：
 __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_global(uint32_t* dst, uint32_t* src)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    dst[idx] = __cvta_generic_to_global(src + idx);
+    size_t gm_addr = __cvta_generic_to_global(src + idx);
+    uint32_t* ptr = static_cast<uint32_t*>(__cvta_global_to_generic(gm_addr));
+    dst[idx] = ptr[0];
 }
 ```
+
+该示例先将Global Memory指针转换为地址值，用于手动保存或传递地址；需要重新访问数据时，可通过`__cvta_global_to_generic`将该地址值转换回指针。与`(__gm__ X_T*)x`这类强制转换不同，本接口返回可保存或传递的数值地址，强制转换仅改变指针类型或地址空间限定，用于直接按该指针访问。若只是按原指针读写Global Memory数据，直接使用原始指针即可，无需调用本接口。SIMD与SIMT混合编程中通常通过`__gm__`限定指针指向Global Memory，且本接口不支持在该场景下使用。

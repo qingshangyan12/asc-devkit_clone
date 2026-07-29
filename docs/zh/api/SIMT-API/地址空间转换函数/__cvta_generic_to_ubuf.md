@@ -70,8 +70,13 @@ SIMT编程场景：
 ```cpp
 __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* dst, uint32_t* src)
 {
-    __ubuf__ uint32_t ptr[1024];
+    __ubuf__ uint32_t ubuf_data[1024];
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    dst[idx] = __cvta_generic_to_ubuf(ptr + threadIdx.x);
+    ubuf_data[threadIdx.x] = src[idx];
+    size_t ubuf_addr = __cvta_generic_to_ubuf(ubuf_data + threadIdx.x);
+    uint32_t* ptr = static_cast<uint32_t*>(__cvta_ubuf_to_generic(ubuf_addr));
+    dst[idx] = ptr[0];
 }
 ```
+
+该示例先将Unified Buffer指针转换为地址值，用于手动保存或传递地址；需要重新访问数据时，可通过`__cvta_ubuf_to_generic`将该地址值转换回指针。若只是按原指针读写Unified Buffer数据，直接使用原始指针即可，无需调用本接口。SIMD与SIMT混合编程中通常通过`__ubuf__`限定指针指向Unified Buffer，且本接口不支持在该场景下使用。

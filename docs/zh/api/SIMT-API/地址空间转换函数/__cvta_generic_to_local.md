@@ -69,8 +69,12 @@ SIMT编程场景：
 ```cpp
 __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_local(uint32_t* dst, uint32_t* src)
 {
-    uint32_t ptr[1024];
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    dst[idx] = __cvta_generic_to_local(ptr + idx);
+    uint32_t local_data[2] = {src[idx], src[idx] + 1};
+    size_t local_addr = __cvta_generic_to_local(local_data + 1);
+    uint32_t* ptr = static_cast<uint32_t*>(__cvta_local_to_generic(local_addr));
+    dst[idx] = ptr[0];
 }
 ```
+
+该示例先将线程私有栈空间指针转换为地址值，用于手动保存或传递地址；需要重新访问数据时，可通过`__cvta_local_to_generic`将该地址值转换回指针。若只是按原指针读写栈空间数据，直接使用原始指针即可，无需调用本接口。SIMD与SIMT混合编程场景不支持使用该接口。

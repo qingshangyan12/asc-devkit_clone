@@ -68,11 +68,13 @@ SIMT编程场景：
 ```cpp
 __global__ __launch_bounds__(1024) void kernel__cvta_ubuf_to_generic(uint32_t* dst, uint32_t* src)
 {
-    __ubuf__ uint32_t data_ptr[1024];
+    __ubuf__ uint32_t ubuf_data[1024];
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    data_ptr[threadIdx.x] = src[idx];
-    size_t addr = __cvta_generic_to_ubuf(data_ptr + threadIdx.x);
-    void* ptr = __cvta_ubuf_to_generic(addr);
-    dst[idx] = *(uint32_t*)ptr;
+    ubuf_data[threadIdx.x] = src[idx];
+    size_t ubuf_addr = __cvta_generic_to_ubuf(ubuf_data + threadIdx.x);
+    uint32_t* ptr = static_cast<uint32_t*>(__cvta_ubuf_to_generic(ubuf_addr));
+    dst[idx] = ptr[0];
 }
 ```
+
+该示例中，`ubuf_addr`为通过`__cvta_generic_to_ubuf`得到的Unified Buffer地址值，`__cvta_ubuf_to_generic`将该地址值恢复为可访问的指针。该接口适用于地址值已经被保存、传递或计算后，需要重新按指针访问Unified Buffer的场景。若已有可直接访问的Unified Buffer指针，则无需先转为地址值再转回指针。
