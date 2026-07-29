@@ -142,7 +142,9 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     for (uint32_t i = 0; i < MAX_CC_TILING_NUM; i++) {
         tilingInner->offset[i] = 0;
     }
-    if ((impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
+    const char* useCcuKfc = std::getenv("USE_CCU_KFC");
+    if (useCcuKfc != nullptr && std::string(useCcuKfc) == "1" &&
+        (impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
          impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) &&
         (impl_.commEngine_ == 5 || impl_.commEngine_ == 6)) {
         tilingInner->version = INIT_TILING_CCU_NEW_VERSION;
