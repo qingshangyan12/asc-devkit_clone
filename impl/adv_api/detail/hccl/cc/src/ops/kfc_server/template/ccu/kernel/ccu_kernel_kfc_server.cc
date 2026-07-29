@@ -220,7 +220,9 @@ CcuResult LoadFuncParamFromMemory(
 
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, KfcServerContext &ctx)
 {
-    CCU_IF (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+    ccu::Variable opType;
+    opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
+    CCU_IF (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER)) {
         CcuKfcAllGatherMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
             param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5],
@@ -228,7 +230,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, KfcServerCont
             ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
         return;
     }
-    CCU_IF (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+    CCU_IF (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) {
         CcuReduceScatterMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
             param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels,
