@@ -63,16 +63,16 @@ mask未筛选的元素在输出中置零。
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void axpy_vf(__ubuf__ half* src0Addr, __ubuf__ half* dstAddr, int64_t scalar, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void axpy_vf(__ubuf__ half* src0_addr, __ubuf__ half* dst_addr, half scalar, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half src0, dst;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src0, src0Addr, one_repeat_size);
-        asc_loadalign(dst, dstAddr);
+        asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
+        asc_loadalign(dst, dst_addr);
         asc_axpy(dst, src0, scalar, mask);
-        asc_storealign_postupdate(dstAddr, dst, one_repeat_size, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
     }
 }
 ```

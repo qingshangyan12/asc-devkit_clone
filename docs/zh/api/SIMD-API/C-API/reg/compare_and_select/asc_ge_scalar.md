@@ -71,16 +71,16 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_float src, fl
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void ge_scalar_vf(__ubuf__ uint8_t* dstAddr, __ubuf__ half* srcAddr, int64_t scalar, uint32_t count, uint16_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+__simd_vf__ inline void ge_scalar_vf(__ubuf__ uint8_t* dst_addr, __ubuf__ half* src_addr, half scalar, uint32_t count, uint16_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
 {
     vector_half src;
     vector_bool dst;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src, srcAddr, one_repeat_size);
+        asc_loadalign_postupdate(src, src_addr, one_repeat_size);
         asc_ge_scalar(dst, src, scalar, mask);
-        asc_storealign_postupdate(dstAddr, dst, one_block_size);
+        asc_storealign_postupdate(dst_addr, dst, one_block_size);
     }
 }
 ```

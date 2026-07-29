@@ -68,16 +68,16 @@ mask未筛选的元素在输出中置零。
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void int322int64_vf(__ubuf__ int32_t* srcAddr, __ubuf__ int64_t* dstAddr, uint32_t count, uint16_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+__simd_vf__ inline void int322int64_vf(__ubuf__ int32_t* src_addr, __ubuf__ int64_t* dst_addr, uint32_t count, uint16_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
 {
     vector_int32_t src;
     vector_int64_t dst;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b32(count);
-        asc_loadalign_postupdate(src, srcAddr, one_repeat_size);
+        asc_loadalign_postupdate(src, src_addr, one_repeat_size);
         asc_int322int64(dst, src, mask);
-        asc_storealign_pack_postupdate(dstAddr, dst, one_block_size, mask);
+        asc_storealign_pack_postupdate(dst_addr, dst, one_block_size, mask);
     }
 }
 ```
