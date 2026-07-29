@@ -9,7 +9,7 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 
-"""Generate the fixed input used by both examples."""
+"""Generate the fixed 384MiB input used by the no-split and L2-split examples."""
 
 import struct
 from pathlib import Path
@@ -37,7 +37,7 @@ def main():
     total_data_mib = TOTAL_DATA_ELEMENTS * bytes_per_half / 1024 / 1024
     print(
         f"total_data_elements={TOTAL_DATA_ELEMENTS}, "
-        f"total_data={total_data_mib:.0f} MiB"
+        f"total_data={total_data_mib:.0f} MB"
     )
 
 

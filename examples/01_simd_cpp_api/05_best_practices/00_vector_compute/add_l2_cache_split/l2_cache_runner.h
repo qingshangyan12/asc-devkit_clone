@@ -75,20 +75,24 @@ inline bool RunKernel(
 }
 
 inline int32_t RunSample(
-    int32_t argc, char* argv[], const char* caseName, const char* outputPath, KernelLauncher launchKernel)
+    int32_t argc, char* argv[], const char* caseName, const char* outputPath, KernelLauncher launchKernel,
+    bool enableL2Split)
 {
     constexpr uint32_t bytesPerMiB = 1024 * 1024;
     if (argc != 1) {
         std::fprintf(stderr, "Usage: %s\n", argv[0]);
         return 1;
     }
+    const uint32_t activeWorkingSetBytes = enableL2Split ? l2BatchSizeBytes : totalByteSize;
+    const uint32_t activeBatchCount = enableL2Split ? l2BatchCount : 1U;
     std::printf(
-        "case=%s, total_data_elements=%u, total_data=%u MiB, "
-        "l2_working_set_threshold=%u MiB, l2_batch=%u MiB, logical_gm_to_ub=%u MiB, "
-        "vector_cores=%u, l2_batches=%u, compute_rounds=%u\n",
+        "case=%s, total_data_elements=%u, total_data=%u MB, "
+        "l2_split=%s, l2_working_set_threshold=%u MB, active_working_set=%u MB, "
+        "logical_gm_to_ub=%u MB, vector_cores=%u, l2_batches=%u, compute_rounds=%u\n",
         caseName, totalElementCount, totalByteSize / bytesPerMiB,
-        L2_TILE_THRESHOLD / bytesPerMiB, l2BatchSizeBytes / bytesPerMiB,
-        logicalGmToUbBytesPerKernel / bytesPerMiB, vectorCoreCount, l2BatchCount, computeRoundCount);
+        enableL2Split ? "enabled" : "disabled", L2_TILE_THRESHOLD / bytesPerMiB,
+        activeWorkingSetBytes / bytesPerMiB, logicalGmToUbBytesPerKernel / bytesPerMiB,
+        vectorCoreCount, activeBatchCount, computeRoundCount);
 
     aclInit(nullptr);
     constexpr int32_t deviceId = 0;
