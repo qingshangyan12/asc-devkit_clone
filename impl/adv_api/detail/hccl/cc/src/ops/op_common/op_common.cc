@@ -1023,7 +1023,6 @@ HcclResult HcclGetThread(
     }
 
     if (UNLIKELY(HcclCheckLogLevel(DLOG_DEBUG))) {
-        HCCL_DEBUG("[HcclGetThread] slaveThreadNum[%u]", resRequest.slaveThreadNum);
         for (u32 i = 0; i < resRequest.slaveThreadNum + 1; i++) {
             HCCL_DEBUG("[HcclGetThread] threads[%u]=[%llu]", i, resCtxHost->threads[i]);
         }
@@ -1424,7 +1423,6 @@ HcclResult HcclGetCcuKernel(
     // rankSize获取指定算子的dataCount
     u32 userRankSize{0};
     CHK_RET(HcclGetRankSize(comm, &userRankSize));
-    // hcclDfxOpInfo.dataCount = GetHcclDfxOpInfoDataCount(param, userRankSize);
     hcclDfxOpInfo.root = param.root;
     hcclDfxOpInfo.engine = param.engine;
     s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
@@ -1713,11 +1711,6 @@ HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
 HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 {
     (void)comm;
-    /*
-    // 第一步：当前只给AICPU使用
-    HcclOpExpansionMode finalMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;
-    HCCL_DEBUG("[DecideHcclOpExpansionMode] configOpExpansionMode: AI_CPU");
-    */
     HcclOpExpansionMode finalMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED;
     HCCL_DEBUG("[DecideHcclOpExpansionMode] configOpExpansionMode: CCU_SCHED");
 

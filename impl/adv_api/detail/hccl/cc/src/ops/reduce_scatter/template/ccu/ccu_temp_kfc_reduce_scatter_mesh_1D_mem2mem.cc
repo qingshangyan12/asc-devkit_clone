@@ -36,7 +36,7 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
     resourceRequest.ccuKernelNum.push_back(1);
 
     CcuKernelInfo kernelInfo;
-    strcpy(kernelInfo.kernelFuncName, "CcuKernelKfcReduceScatterMesh1DMem2Mem");
+    strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcReduceScatterMesh1DMem2Mem");
 
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));

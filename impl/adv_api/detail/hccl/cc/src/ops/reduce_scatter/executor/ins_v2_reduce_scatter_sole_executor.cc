@@ -259,28 +259,6 @@ REGISTER_EXEC_V2(
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuKfcReduceScatterMesh1DMem2Mem, InsV2ReduceScatterSoleExecutor,
     TopoMatch1D, CcuTempKfcReduceScatterMesh1DMem2Mem);
-#if 0
-// Legacy direct-launch CCU registrations are retained for reference. Old-flow calls are routed by opbase to
-// IndvHcclWrapper and do not enter this KFC-only mc2_client path; these templates also use removed hcomm APIs.
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterMesh1DMem2Mem, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
-    CcuTempReduceScatterMesh1DMem2Mem);
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterMesh1D, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
-    CcuTempReduceScatterMesh1D);
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterNHR1DMem2Mem, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
-    CcuTempReduceScatterNHR1DMem2Mem);
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterMeshMem2Mem1D2Die, InsV2ReduceScatterSoleExecutor,
-    TopoMatch1D, CcuTempReduceScatterMeshMem2Mem1D2Die);
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterMesh2Die, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
-    CcuTempReduceScatterMesh2Die);
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterNhr1DMem2MemMultiJetty, InsV2ReduceScatterSoleExecutor,
-    TopoMatch1D, CcuTempReduceScatterNhrMultiJettyMem2Mem1D);
-#endif
 #endif
 
 } // namespace mc2_ops_hccl

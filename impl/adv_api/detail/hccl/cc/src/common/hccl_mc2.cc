@@ -342,74 +342,80 @@ HcclAllocComResourceByTilingA5Mc2(HcclComm comm, void* stream, void* mc2Tiling, 
     return HcclAllocComResourceByTiling(comm, stream, mc2Tiling, opResCtx);
 }
 
-CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
+namespace {
+CcuResult CopyOpResCtxToHost(void* opResCtx, OpResCtx& opResHost)
 {
-    CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
-    CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
-
-    // HcclEngineCtxCreate 申请的均为 device 显存（参考 hccl_alloc_ctx_res.cc 中
-    // "申请硬件内存"+aclrtMemcpy(ACL_MEMCPY_HOST_TO_DEVICE) 的写入流程），下面三层指针
-    //   *opResCtx (OpResCtx)
-    //   OpResCtx.algInfo[i].opParam -> OpParam
-    //   OpParam.resCtx              -> 序列化字节流
-    // 全部位于 device，host 侧不能直接解引用，需逐层 D2H 拷到本地。
     HCCL_INFO("[CcuKernelLaunch]Obtain OpResCtx.");
-    OpResCtx opResHost{};
     aclError aclRet = aclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx),
                                   ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(aclRet != ACL_SUCCESS,
-        HCCL_ERROR("[%s] aclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].",
-            __func__, aclRet, opResCtx, sizeof(OpResCtx)),
+        HCCL_ERROR("[CcuKernelLaunch] aclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].",
+            aclRet, opResCtx, sizeof(OpResCtx)),
         CCU_E_INTERNAL);
-    const auto *opRes = &opResHost;
-    CHK_PRT_RET(opRes->algInfo[0].opParam == 0U,
-        HCCL_ERROR("invalid ccu op resource ctx, opParam[%llu].", opRes->algInfo[0].opParam),
+    CHK_PRT_RET(opResHost.algInfo[0].opParam == 0U,
+        HCCL_ERROR("invalid ccu op resource ctx, opParam[%llu].", opResHost.algInfo[0].opParam),
         CCU_E_PARA);
-    CHK_PRT_RET(opRes->workSpace == 0U || opRes->workSpaceSize == 0U,
+    CHK_PRT_RET(opResHost.workSpace == 0U || opResHost.workSpaceSize == 0U,
         HCCL_ERROR("invalid ccu op resource ctx, workSpace[%llu], workSpaceSize[%llu].",
-            opRes->workSpace, opRes->workSpaceSize),
+            opResHost.workSpace, opResHost.workSpaceSize),
         CCU_E_PARA);
+    return CCU_SUCCESS;
+}
 
+CcuResult CopyOpParamToHost(const OpResCtx& opResHost, OpParam& opParamHost)
+{
     HCCL_INFO("[CcuKernelLaunch]Obtain OpParam.");
-    void *opParamDev = reinterpret_cast<void *>(opRes->algInfo[0].opParam);
-    OpParam opParamHost{};
-    aclRet = aclrtMemcpy(&opParamHost, sizeof(OpParam), opParamDev, sizeof(OpParam),
-                         ACL_MEMCPY_DEVICE_TO_HOST);
+    void* opParamDev = reinterpret_cast<void*>(opResHost.algInfo[0].opParam);
+    aclError aclRet = aclrtMemcpy(
+        &opParamHost, sizeof(OpParam), opParamDev, sizeof(OpParam), ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(aclRet != ACL_SUCCESS,
-        HCCL_ERROR("[%s] aclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].",
-            __func__, aclRet, opParamDev, sizeof(OpParam)),
+        HCCL_ERROR("[CcuKernelLaunch] aclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].",
+            aclRet, opParamDev, sizeof(OpParam)),
         CCU_E_INTERNAL);
-    const auto *ctx = &opParamHost;
-    CHK_PRT_RET(ctx->resCtx == nullptr || ctx->ctxSize == 0U,
+    CHK_PRT_RET(opParamHost.resCtx == nullptr || opParamHost.ctxSize == 0U,
         HCCL_ERROR("invalid ccu op resource ctx, resCtx[%p], ctxSize[%llu].",
-            ctx->resCtx, ctx->ctxSize),
+            opParamHost.resCtx, opParamHost.ctxSize),
         CCU_E_PARA);
+    return CCU_SUCCESS;
+}
 
+CcuResult LoadResourceCtx(const OpParam& opParamHost, AlgResourceCtxSerializable& resourceCtx)
+{
     HCCL_INFO("[CcuKernelLaunch]Obtain resCtx.");
-    auto *resCtx = static_cast<char *>(ctx->resCtx);
-    std::vector<char> seq(ctx->ctxSize);
+    auto* resCtx = static_cast<char*>(opParamHost.resCtx);
+    std::vector<char> seq(opParamHost.ctxSize);
     HCCL_INFO("[CcuKernelLaunch]Start aclrtMemcpy D2H.");
-    aclRet = aclrtMemcpy(seq.data(), ctx->ctxSize, resCtx, ctx->ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
+    aclError aclRet = aclrtMemcpy(
+        seq.data(), opParamHost.ctxSize, resCtx, opParamHost.ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(aclRet != ACL_SUCCESS,
         HCCL_ERROR("[CcuKernelLaunch] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].",
-            aclRet, seq.data(), resCtx, ctx->ctxSize),
+            aclRet, seq.data(), resCtx, opParamHost.ctxSize),
         CCU_E_INTERNAL);
-    AlgResourceCtxSerializable resourceCtx;
     HCCL_INFO("[CcuKernelLaunch]Start resourceCtx DeSerialize.");
     resourceCtx.DeSerialize(seq);
+    return CCU_SUCCESS;
+}
 
+CcuResult GetLaunchHandles(
+    const AlgResourceCtxSerializable& resourceCtx, ThreadHandle& threadHandle, CcuKernelHandle& kernelHandle)
+{
     CHK_PRT_RET(resourceCtx.threads.empty(), HCCL_ERROR("empty ccu threads"), CCU_E_PARA);
     CHK_PRT_RET(resourceCtx.ccuKernels.empty(), HCCL_ERROR("empty ccu kernels"), CCU_E_PARA);
 
-    ThreadHandle threadHandle = resourceCtx.threads[0];
+    threadHandle = resourceCtx.threads[0];
     CHK_PRT_RET(threadHandle == 0, HCCL_ERROR("invalid threadHandle"), CCU_E_PARA);
 
     // HcclGetCcuKernel 已根据 isKfc 过滤，isKfc=true 时 ccuKernels[0] 即为 CcuKfcServerKernel
-    CcuKernelHandle kernelHandle = resourceCtx.ccuKernels[0];
+    kernelHandle = resourceCtx.ccuKernels[0];
     CHK_PRT_RET(kernelHandle == 0, HCCL_ERROR("invalid kernelHandle"), CCU_E_PARA);
     CHK_PRT_RET(resourceCtx.kfcServerArgSize != 0U && resourceCtx.kfcServerArgs.empty(),
         HCCL_ERROR("invalid kfcServerArgs, kfcServerArgSize[%u].", resourceCtx.kfcServerArgSize), CCU_E_PTR);
+    return CCU_SUCCESS;
+}
 
+void LogKernelLaunchArgs(
+    const AlgResourceCtxSerializable& resourceCtx, ThreadHandle threadHandle, CcuKernelHandle kernelHandle)
+{
     if (resourceCtx.kfcServerArgs.size() >= 6U) {
         HCCL_INFO("[CcuKernelLaunch] HcommCcuKernelLaunch args: "
                   "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], "
@@ -432,6 +438,37 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
                   resourceCtx.kfcServerArgSize,
                   resourceCtx.kfcServerArgs.size());
     }
+}
+} // namespace
+
+CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
+{
+    CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
+    CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
+
+    // HcclEngineCtxCreate分配的OpResCtx、OpParam和序列化资源均位于device，需逐层拷贝到host。
+    OpResCtx opResHost{};
+    CcuResult ret = CopyOpResCtxToHost(opResCtx, opResHost);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    OpParam opParamHost{};
+    ret = CopyOpParamToHost(opResHost, opParamHost);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    AlgResourceCtxSerializable resourceCtx;
+    ret = LoadResourceCtx(opParamHost, resourceCtx);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    ThreadHandle threadHandle = 0;
+    CcuKernelHandle kernelHandle = 0;
+    ret = GetLaunchHandles(resourceCtx, threadHandle, kernelHandle);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    LogKernelLaunchArgs(resourceCtx, threadHandle, kernelHandle);
     HCCL_INFO("[CcuKernelLaunch]Start HcommCcuKernelLaunch.");
     const void *kfcArgs = resourceCtx.kfcServerArgs.empty() ? nullptr :
         static_cast<const void *>(resourceCtx.kfcServerArgs.data());
