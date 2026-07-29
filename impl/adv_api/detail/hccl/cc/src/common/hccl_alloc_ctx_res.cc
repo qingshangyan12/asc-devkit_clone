@@ -378,6 +378,7 @@ HcclResult PrepareParamForAllGather(
     }
 
     param.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.reduceType = HcclReduceOp::HCCL_REDUCE_SUM;
     param.DataDes.dataType = static_cast<HcclDataType>(ccTiling->srcDataType);
     param.DataDes.count = 0;
 
