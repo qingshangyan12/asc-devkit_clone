@@ -220,7 +220,7 @@ CcuResult LoadFuncParamFromMemory(
 
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, KfcServerContext &ctx)
 {
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+    CCU_IF (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         CcuKfcAllGatherMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
             param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5],
@@ -228,9 +228,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, KfcServerCont
             ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
         return;
     }
-
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        // The AIV ReduceScatter M2M protocol uses XN1/2/3/4/7/8; keep the server's six launch args unchanged.
+    CCU_IF (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
         CcuReduceScatterMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
             param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels,
