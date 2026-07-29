@@ -233,6 +233,21 @@ HcclResult AllocComResourceByTilingAicpu(HcclComm comm, void *stream, void *mc2T
 
     CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
 
+    for (uint32_t i = 0U; i < tilingNum; ++i) {
+        const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
+        const OpParam& opParam = opParamVec[i];
+        const HcclDataType srcDataType = static_cast<HcclDataType>(ccTiling->srcDataType);
+        const HcclDataType dstDataType = static_cast<HcclDataType>(ccTiling->dstDataType);
+        const std::string srcDataTypeName = GetDataTypeEnumStr(srcDataType);
+        const std::string dstDataTypeName = GetDataTypeEnumStr(dstDataType);
+        HCCL_RUN_INFO(
+            "[MC2_ALG_INFO] rank[%u], group[%s], opType[%s](%u), algName[%s], "
+            "srcDataType[%s](%u), dstDataType[%s](%u), engine[%u].",
+            userRank, ccTiling->groupName, GetMc2OpTypeName(opParam.opType), static_cast<uint32_t>(opParam.opType),
+            opParam.algName, srcDataTypeName.c_str(), static_cast<uint32_t>(srcDataType), dstDataTypeName.c_str(),
+            static_cast<uint32_t>(dstDataType), static_cast<uint32_t>(opParam.engine));
+    }
+
     return HCCL_SUCCESS;
 }
 
@@ -346,21 +361,6 @@ HcclAllocComResourceByTiling(HcclComm comm, void* stream, void* mc2Tiling, void*
 
     // 记录退出日志和性能统计信息
     CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
-
-    for (uint32_t i = 0U; i < tilingNum; ++i) {
-        const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
-        const OpParam& opParam = opParamVec[i];
-        const HcclDataType srcDataType = static_cast<HcclDataType>(ccTiling->srcDataType);
-        const HcclDataType dstDataType = static_cast<HcclDataType>(ccTiling->dstDataType);
-        const std::string srcDataTypeName = GetDataTypeEnumStr(srcDataType);
-        const std::string dstDataTypeName = GetDataTypeEnumStr(dstDataType);
-        HCCL_RUN_INFO(
-            "[MC2_ALG_INFO] rank[%u], group[%s], opType[%s](%u), algName[%s], "
-            "srcDataType[%s](%u), dstDataType[%s](%u), engine[%u].",
-            userRank, ccTiling->groupName, GetMc2OpTypeName(opParam.opType), static_cast<uint32_t>(opParam.opType),
-            opParam.algName, srcDataTypeName.c_str(), static_cast<uint32_t>(srcDataType), dstDataTypeName.c_str(),
-            static_cast<uint32_t>(dstDataType), static_cast<uint32_t>(opParam.engine));
-    }
 
     HCCL_INFO("End to run execute HcclAllocComResourceByTiling");
 
