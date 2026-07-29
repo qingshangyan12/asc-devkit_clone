@@ -526,7 +526,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
                     }
                     AscendC::PRINTF(
                             "ApiClient Wait msg[%d] commitcke is 0x%llx, waitcke is 0x%llx",
-                            i, *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->ckeOffset + 8i*),  *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->ckeOffset + i*8 + 64*8));
+                            i, *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->ckeOffset + i*8),  *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->ckeOffset + i*8 + 64*8));
                     AscendC::PRINTF("ApiClient Wait Msg[%d] end print ", i);
                 }
                 ascendc_assert(tmp == 0, "Assert, EXIT!!!\n");
