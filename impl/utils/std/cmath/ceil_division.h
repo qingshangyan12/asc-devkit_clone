@@ -80,7 +80,7 @@ __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
     static_assert(is_integral_v<T>, "AscendC::Std::div_ceil: T must be an integral type");
     static_assert(is_integral_v<U>, "AscendC::Std::div_ceil: U must be an integral type");
 
-    using Prom  = decltype(T{} / U{});
+    using Prom = decltype(T{} / U{});
     using UProm = make_unsigned_t<Prom>;
 
     auto a1 = static_cast<UProm>(a);
