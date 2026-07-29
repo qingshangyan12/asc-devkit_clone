@@ -530,7 +530,6 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
                     AscendC::PRINTF("ApiClient Wait Msg[%d] end print ", i);
                 }
                 ascendc_assert(tmp == 0, "Assert, EXIT!!!\n");
-                }
             }
         }
         if (tmp != 0) {
