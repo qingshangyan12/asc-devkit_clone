@@ -31,6 +31,8 @@ set(ASCENDC_TEST_HEADER_FILES
     ../common
     matmul/utils
     ${ASCENDC_DIR}
+    # experimental/ mirrors the main tree; needed until BesselI0 is promoted into include/adv_api
+    ${ASCENDC_DIR}/experimental/include
     ${ASCENDC_DIR}/include
     ${ASCENDC_DIR}/include/adv_api
     ${ASCENDC_DIR}/include/basic_api
@@ -291,6 +293,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     math/sincos/test_operator_sincos.cpp
     math/isfinite/test_operator_isfinite.cpp
     math/atanh/test_operator_atan_c310.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../experimental/tests/api/adv_api/math/bessel_i0/test_operator_bessel_i0.cpp
     math/cos/test_operator_cos_c310.cpp
     math/cumsum/test_operator_cumsum.cpp
     math/erf/test_operator_erf.cpp
