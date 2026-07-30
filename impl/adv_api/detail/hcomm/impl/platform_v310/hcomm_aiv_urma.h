@@ -278,16 +278,18 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(const LocalTens
 __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
     ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t wqeCnt)
 {
-    __gm__ uint32_t* sqTailAddr = reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.tailAddr);
-    uint32_t curTail = static_cast<uint32_t>(ld_dev(sqTailAddr, 0));
+    __gm__ uint32_t* cqTailAddr = reinterpret_cast<__gm__ uint32_t*>(cqCtx.contextInfo.ubJfc.tailAddr);
+    uint32_t cqTail = static_cast<uint32_t>(ld_dev(cqTailAddr, 0));
     constexpr uint32_t POLL_CQ_THRESHOLD = 10;
     constexpr uint32_t NUM_CQE_PER_POLL_CQ = 100;
     uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
-    if ((wqeCnt + POLL_CQ_THRESHOLD) % cqDepth == curTail % cqDepth) {
-        uint32_t idx = (curTail + NUM_CQE_PER_POLL_CQ) > wqeCnt ? wqeCnt : curTail + NUM_CQE_PER_POLL_CQ;
+    if ((wqeCnt + POLL_CQ_THRESHOLD) % cqDepth == cqTail % cqDepth) {
+        __gm__ uint64_t* headAddr = reinterpret_cast<__gm__ uint64_t*>(sqCtx.contextInfo.ubJfs.headAddr);
+        uint32_t cqeCnt = static_cast<uint32_t>(static_cast<uint64_t>(ld_dev(headAddr, 0)) >> 32);
+        uint32_t idx = (cqTail + NUM_CQE_PER_POLL_CQ) > cqeCnt ? cqeCnt : cqTail + NUM_CQE_PER_POLL_CQ;
         KERNEL_LOG(
-            KERNEL_INFO, "Hcomm URMA SQ overflow wqeCnt=%u curTail=%u idx=%u cqDepth=%u \n", wqeCnt, curTail, idx,
-            cqDepth);
+            KERNEL_INFO, "Hcomm URMA SQ overflow wqeCnt=%u cqeCnt=%u cqTail=%u idx=%u cqDepth=%u \n", wqeCnt,
+            cqeCnt, cqTail, idx, cqDepth);
         (void)PollCq(channel, idx);
     }
 }
@@ -310,13 +312,16 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
 
     auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     __gm__ uint64_t* headAddr = reinterpret_cast<__gm__ uint64_t*>(sqCtx.contextInfo.ubJfs.headAddr);
-    // headAddr stores curHead in the low 32 bits and wqeCnt in the high 32 bits.
+    // headAddr stores curHead in the low 32 bits and cqeCnt in the high 32 bits.
     uint64_t headVal = static_cast<uint64_t>(ld_dev(headAddr, 0));
     uint32_t curHead = static_cast<uint32_t>(headVal & 0xFFFFFFFFU);
-    uint32_t wqeCnt = static_cast<uint32_t>(headVal >> 32);
+    uint32_t cqeCnt = static_cast<uint32_t>(headVal >> 32);
+    __gm__ uint32_t* sqTailAddr = reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.tailAddr);
+    // sqTailAddr is repurposed to store the total number of submitted requests.
+    uint32_t wqeCnt = static_cast<uint32_t>(ld_dev(sqTailAddr, 0));
     KERNEL_LOG(
-        KERNEL_INFO, "Hcomm URMA PostSend resolved remoteIdx=%d curHead=%u wqeCnt=%u sqDepth=%u \n", remoteIdx, curHead,
-        wqeCnt, sqCtx.contextInfo.ubJfs.sqDepth);
+        KERNEL_INFO, "Hcomm URMA PostSend resolved remoteIdx=%d curHead=%u wqeCnt=%u cqeCnt=%u sqDepth=%u \n",
+        remoteIdx, curHead, wqeCnt, cqeCnt, sqCtx.contextInfo.ubJfs.sqDepth);
 
     // poll cq if send queue is full
     auto cqCtx = channelEntity->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
@@ -354,12 +359,14 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     SyncAction<HardEvent::MTE3_S>();
 
     if constexpr (config.cqe != 0) {
-        wqeCnt++;
+        cqeCnt++;
     }
+    wqeCnt++;
     curHead += wqeBbCnt;
-    // Pack curHead into the low 32 bits and wqeCnt into the high 32 bits, then write in one shot.
-    headVal = static_cast<uint64_t>(curHead) | (static_cast<uint64_t>(wqeCnt) << 32);
+    // Pack curHead into the low 32 bits and cqeCnt into the high 32 bits, then write in one shot.
+    headVal = static_cast<uint64_t>(curHead) | (static_cast<uint64_t>(cqeCnt) << 32);
     st_dev(headVal, headAddr, 0);
+    st_dev(wqeCnt, sqTailAddr, 0);
 
     if constexpr (commit) {
         st_dev(curHead, reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.dbVa), 0);
@@ -426,10 +433,6 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
     // ring CQ doorbell
     st_dev(curTail & 0xFFFFFFU, (__gm__ uint32_t*)cqCtx.contextInfo.ubJfc.dbVa, 0);
 
-    // update WQ tail
-    auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-    __gm__ uint32_t* sqTailAddr = reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.tailAddr);
-    st_dev(curTail, sqTailAddr, 0);
     return HCOMM_SUCCESS;
 }
 
@@ -503,11 +506,11 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Drain(ChannelHandle 
     __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
     auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     __gm__ uint64_t* headAddr = reinterpret_cast<__gm__ uint64_t*>(sqCtx.contextInfo.ubJfs.headAddr);
-    // wqeCnt is stored in the high 32 bits of headAddr.
+    // cqeCnt is stored in the high 32 bits of headAddr.
     uint64_t headVal = static_cast<uint64_t>(ld_dev(headAddr, 0));
-    uint32_t wqeCnt = static_cast<uint32_t>(headVal >> 32);
+    uint32_t cqeCnt = static_cast<uint32_t>(headVal >> 32);
 
-    uint32_t ret = PollCq(channel, wqeCnt);
+    uint32_t ret = PollCq(channel, cqeCnt);
     if (ret != HCOMM_SUCCESS) {
         KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA Drain by channel failed channel=%lu pollRet=%u \n", channel, ret);
         return HCOMM_FAILED;
