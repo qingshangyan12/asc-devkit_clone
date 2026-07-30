@@ -4,7 +4,7 @@
 
 This example migrates scenario 4 of the Basic API `04_memory_management/tensor_allocation` example to the Ascend C C API. The original `dav-3510` scenario defines `AddVF` as `__simd_vf__`, invokes it through `asc_vf_call`, and performs RegTensor load, addition, and store in that VF function.
 
-The migration preserves the calculation, data type, and input formula: elementwise addition `z = x + y` of two float32 ND vectors with 1024 elements. C API address-space-qualified UB arrays replace LocalTensor/LocalMemAllocator, while `asc_load`, `asc_add`, and `asc_store` replace `Reg::LoadAlign`, `Reg::Add`, and `Reg::StoreAlign`.
+The migration preserves the calculation, data type, and input formula: elementwise addition `z = x + y` of two float32 ND vectors with 1024 elements. C API address-space-qualified UB arrays replace LocalTensor/LocalMemAllocator, while `asc_loadalign`, `asc_add`, and `asc_storealign` replace `Reg::LoadAlign`, `Reg::Add`, and `Reg::StoreAlign`.
 
 This example supports only Ascend 950PR/Ascend 950DT (`dav-3510`) and provides no CPU debug mode.
 
@@ -45,19 +45,21 @@ The generator retains the deterministic Basic API formulas: `x[i] = (i % 100) * 
 | Basic API scenario 4 | C API implementation | Description |
 | --- | --- | --- |
 | `LocalMemAllocator<Hardware::UB>` + `LocalTensor` | `__ubuf__ float x_ub/y_ub/z_ub[1024]` | C API allocates UB with arrays. |
-| GM-to-UB `DataCopy` | `asc_copy_gm2ub_sync` | The synchronous call completes the wait before UB is read. |
+| GM-to-UB `DataCopy` | `asc_copy_gm2ub` | The asynchronous transfer is followed by `asc_sync_notify/asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0)`. |
 | `asc_vf_call<AddVF>` | Direct `__simd_vf__` call to `AddVfCapi` | C API does not use the Basic API VF-call wrapper. |
-| `Reg::LoadAlign` | `asc_load` | Loads one float VL into `vector_float`. |
+| `Reg::LoadAlign` | `asc_loadalign` | The UB base and each VL offset are 32-byte aligned; one float VL is loaded in NORM mode. |
 | `Reg::Add` | `asc_add` | Performs addition with `asc_create_mask_b32(PAT_ALL)`. |
-| `Reg::StoreAlign` | `asc_store` | Stores one float VL back to UB. |
-| UB-to-GM `DataCopy` | `asc_copy_ub2gm_sync` | The synchronous call completes output writeback. |
+| `Reg::StoreAlign` | `asc_storealign` | Stores one float VL to an aligned UB address with the b32 full mask. |
+| UB-to-GM `DataCopy` | `asc_copy_ub2gm` | `asc_sync_notify/asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0)` protects the dependency, and `asc_sync_pipe(PIPE_MTE3)` completes writeback. |
 
 On `dav-3510`, `asc_get_vf_len()` is 256 bytes; a float32 VL therefore has 64 elements. 1024 is divisible by 64, so the VF function has 16 full-mask iterations. This matches the original calculation based on `GetVecLen() / sizeof(float)`.
 
 ```text
-GM x/y --asc_copy_gm2ub_sync--> UB x/y
-UB x/y --asc_load--> vector_float --asc_add--> vector_float --asc_store--> UB z
-UB z --asc_copy_ub2gm_sync--> GM z
+GM x/y --asc_copy_gm2ub(PIPE_MTE2)--> UB x/y
+      --asc_sync_notify/wait(MTE2->V)-->
+UB x/y --asc_loadalign--> vector_float --asc_add--> vector_float --asc_storealign--> UB z
+      --asc_sync_notify/wait(V->MTE3)-->
+UB z --asc_copy_ub2gm(PIPE_MTE3)--> GM z --asc_sync_pipe(PIPE_MTE3)
 ```
 
 The host reads `input/x.bin` and `input/y.bin`, allocates host/device memory and a stream, launches `vf_add<<<1, 0, stream>>>`, then writes `output/output.bin`. ACL calls and file I/O are checked, and the common cleanup label releases every allocated resource.

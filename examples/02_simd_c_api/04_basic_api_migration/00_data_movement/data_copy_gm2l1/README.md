@@ -44,7 +44,7 @@
 
 `SCENARIO_NUM`由CMake作为编译期宏传入；Kernel使用`if constexpr`选择对应场景。切换场景后，需要重新编译。
 
-设备侧搬运和计算均使用Ascend C C API异步接口，通过`asc_sync_notify`和`asc_sync_wait`建立`MTE2→MTE1→M→FIX`的必要依赖。场景4在MTE2完成Bias ND2NZ后，通过`asc_copy_l12bt`将Bias送至BTable，再由`asc_mmad`的`c_matrix_source`使用；场景5还使用`MTE2→FIX`保证量化参数就绪，并在量化参数从L1 Buffer搬运到Fixpipe Buffer后通过`asc_sync_pipe(PIPE_FIX)`等待该搬运完成。核函数结束时调用`asc_sync_pipe(PIPE_ALL)`，确保全部流水完成。
+设备侧搬运和计算均使用Ascend C C API异步接口，通过`asc_sync_notify`和`asc_sync_wait`建立`MTE2→MTE1→M→FIX`的必要依赖。场景4在MTE2完成Bias ND2NZ后，通过`asc_copy_l12bt`将Bias送至BTable，再由`asc_mmad`的`c_matrix_source`使用；场景5还使用`MTE2→FIX`保证量化参数就绪，并在量化参数从L1 Buffer搬运到Fixpipe Buffer后通过`asc_sync_pipe(PIPE_FIX)`等待该搬运完成。所有场景的最后一条异步操作均为L0C到GM的Fixpipe搬运，因此核函数结束时仅调用`asc_sync_pipe(PIPE_FIX)`等待最终写回，不阻塞无关流水。
 
 **场景1：输入格式Nz，输入数据类型half**
 

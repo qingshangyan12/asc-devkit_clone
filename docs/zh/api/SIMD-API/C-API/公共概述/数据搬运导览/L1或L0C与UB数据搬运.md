@@ -10,8 +10,6 @@ L1 Buffer/L0C Buffer与Unified Buffer之间的数据搬运提供了灵活的接�
 |----------|------|------|
 | Unified Buffer->L1 Buffer | 连续数据搬运(asc_copy_ub2l1) | 提供基础的数据搬运能力，数据在传输过程中保持原始格式和内容不变，支持连续数据搬运。 |
 | Unified Buffer->L1 Buffer | 高维切分数据搬运(asc_copy_ub2l1) | 提供基础的数据搬运能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。 |
-| Unified Buffer->L1 Buffer | 随路转换-[ND2NZ](../矩阵计算概述.md)搬运(无直接C API) | 支持在数据搬运时进行[ND](../矩阵计算概述.md)到[NZ](../矩阵计算概述.md)格式的转换。 |
-| Unified Buffer->L1 Buffer | 非对齐数据搬运(无直接C API) | 支持数据非对齐搬运，可以根据开发者的需要自行填充数据。 |
 | L0C Buffer->Unified Buffer | 随路转换与量化(asc_copy_l0c2ub) | 支持多种随路能力的组合，asc_copy_l0c2ub接口内包含了设置寄存器与数据搬运能力。 |
 | L0C Buffer->Unified Buffer | 随路量化激活搬运(asc_copy_l0c2ub) | 支持多种随路能力的组合，asc_copy_l0c2ub接口内包含了设置寄存器与数据搬运能力。 |
 | L1 Buffer->Unified Buffer | 连续数据搬运（asc_copy_l12ub） | 提供基础的数据搬运能力，数据在传输过程中保持原始格式和内容不变，支持连续数据搬运。 |
@@ -56,42 +54,6 @@ src和dst分别为源操作数和目的操作数；repeatParams为搬运参数�
 ```c++
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
 ```
-
-## 无直接C API（UBToL1随路转换-ND2NZ搬运）
-
-该接口主要实现将数据从Unified Buffer搬运至L1 Buffer，并支持在数据搬运时进行[ND](../矩阵计算概述.md)到[NZ](../矩阵计算概述.md)格式的转换。
-
-接口详情请参见[无直接C API](../../vector_datamove/asc_copy_ub2l1.md)。
-
-具体支持的数据通路为（以C API地址空间限定符表示）：
-
-- Unified Buffer -> L1 Buffer
-    - UB -> C1
-
-搬运的数据用于[矩阵计算](../矩阵计算概述.md)，接口具体介绍请参考：[该搬运能力](../../vector_datamove/asc_copy_ub2l1.md)。
-
-src和dst分别为源操作数和目的操作数；intriParams为ND2NZ搬运配置参数。
-
-> [!NOTE]说明
-> dav-3510当前未提供该搬运模式的直接C API。
-
-## 无直接C API（UBToL1非对齐数据搬运）
-
-该接口主要实现将数据从Unified Buffer搬运至L1 Buffer，并支持在数据搬运时提供非对齐数据搬运功能，可以根据开发者的需要自行填充数据。
-
-接口详情请参见[无直接C API](../../vector_datamove/asc_copy_ub2l1.md)。
-
-具体支持的数据通路为（以C API地址空间限定符表示）：
-
-- Unified Buffer -> L1 Buffer
-    - UB -> C1
-
-搬运的数据用于[矩阵计算](../矩阵计算概述.md)，接口具体介绍请参考：[该搬运能力](../../vector_datamove/asc_copy_ub2l1.md)。
-
-src和dst分别为源操作数和目的操作数；dataCopyParams和nd2nzParams为搬运参数。
-
-> [!NOTE]说明
-> dav-3510当前未提供该搬运模式的直接C API。
 
 <!-- npu="310p" id1 -->
 ## asc_copy_l0c2ub（L0CToUB随路量化激活搬运）

@@ -15,9 +15,6 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 | GM->UB | 高维切分数据搬运(`asc_copy_gm2ub`) | 提供基础的数据搬运能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。 |
 | UB->GM | 高维切分数据搬运(`asc_copy_ub2gm`) | 提供基础的数据搬运能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。 |
 | GM->UB | 切片数据搬运(`asc_ndim_copy_gm2ub`) | 支持数据的切片搬运，提取多维数据的子集进行搬运。 |
-| UB->GM | 切片数据搬运 | 当前C API未提供该方向的直接切片搬运接口。 |
-| GM->UB | 随路转换ND2NZ搬运(无直接C API) | 该接口为软仿接口，支持在从Global Memory到Unified Buffer的数据搬运过程中进行ND到NZ格式的转换。 |
-| UB->GM | 随路转换NZ2ND搬运(无直接C API) | 该接口为软仿接口，支持在从Unified Buffer到Global Memory的数据搬运过程中进行NZ到ND格式的转换。 |
 | GM->UB | 多维数据搬运NDDMA(`asc_ndim_copy_gm2ub`) | 多维数据搬运接口，可自由配置搬入的维度信息以及对应的Stride。 |
 | GM->UB | 非对齐数据搬运(`asc_copy_gm2ub_align`) | 支持数据的非对齐搬运，搬运到UB时可以自行填充数据。 |
 | UB->GM | 非对齐数据搬运(`asc_copy_ub2gm_align`) | 支持数据的非对齐搬运。 |
@@ -86,17 +83,12 @@ src和dst分别为源操作数和目的操作数；repeatParams为asc_copy_gm2ub
 
 ## asc_ndim_copy_gm2ub（GM与UB切片数据搬运）<a name="ZH-CN_TOPIC_0000002568770166"></a>
 
-该接口为软仿接口，从易用性角度出发进行设计，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。
+该接口基于NDDMA搬运指令，支持数据的切片搬运，提取多维数据的子集进行搬运。
 
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
-- Unified Buffer -> Global Memory
-    - VECOUT -> GM
-    <!-- npu="310p" id3 -->
-    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
-    <!-- end id3 -->
 
 搬运的数据用于[矢量计算](../../vector_compute/Memory矢量计算.md)，具体的接口请参考：[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)。
 
@@ -107,56 +99,6 @@ src和dst分别为源操作数和目的操作数；dstSliceInfo和srcSliceInfo�
     ```c++
     __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t ndim, __ubuf__ uint32_t* loop_size, __ubuf__ uint64_t* loop_src_stride, __ubuf__ uint32_t* loop_dst_stride)
     ```
-
-- Unified Buffer -> Global Memory
-
-    ```c++
-    __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t ndim, __ubuf__ uint32_t* loop_size, __ubuf__ uint64_t* loop_src_stride, __ubuf__ uint32_t* loop_dst_stride)
-    ```
-
-## 无直接C API（GM -> UB随路转换ND2NZ搬运）<a name="ZH-CN_TOPIC_0000002349187356"></a>
-
-该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer的数据搬运过程中进行ND到NZ格式的转换。
-
-具体支持的数据通路为（以C API地址空间限定符表示）：
-
-- Global Memory -> Unified Buffer
-    - GM -> VECIN
-
-搬运的数据用于[矢量计算](../../vector_compute/Memory矢量计算.md)，具体的接口请参考：[无直接C API](../../vector_datamove/矢量数据搬运.md)。
-
-src和dst分别为源操作数和目的操作数；intriParams为`asc_copy_gm2l1_nd2nz`的维度与stride参数类型的搬运参数，配置ND到NZ格式转换信息。
-
-- 不支持enableSmallC0模式
-
-    > [!NOTE]说明
-    > dav-3510当前未提供该随路格式转换的直接C API。
-
-<!-- npu="950" id4 -->
-- 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
-
-    > [!NOTE]说明
-    > dav-3510当前未提供该随路格式转换的直接C API。
-<!-- end id4 -->
-
-## 无直接C API（UB -> GM随路转换NZ2ND搬运）<a name="ZH-CN_TOPIC_0000002391805265"></a>
-
-该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer到Global Memory的数据搬运过程中进行NZ到ND格式的转换。
-
-具体支持的数据通路为（以C API地址空间限定符表示）：
-
-- Unified Buffer -> Global Memory
-    - VECOUT -> GM
-    <!-- npu="310p" id5 -->
-    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
-    <!-- end id5 -->
-
-搬运的数据用于[矢量计算](../../vector_compute/Memory矢量计算.md)，具体的接口请参考：[无直接C API](../../vector_datamove/矢量数据搬运.md)。
-
-src和dst分别为源操作数和目的操作数；intriParams为对应搬运接口的维度与stride参数类型的搬运参数，配置NZ到ND格式转换信息。
-
-> [!NOTE]说明
-> dav-3510当前未提供该随路格式转换的直接C API。
 
 ## asc_ndim_copy_gm2ub（GM -> UB多维数据搬运NDDMA）<a name="ZH-CN_TOPIC_0000002544407954"></a>
 

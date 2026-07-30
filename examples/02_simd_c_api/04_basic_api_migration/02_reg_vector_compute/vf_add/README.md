@@ -4,7 +4,7 @@
 
 本样例将基础 API `04_memory_management/tensor_allocation` 的场景4迁移为 Ascend C C API 实现。原场景在 `dav-3510` 上定义 `__simd_vf__` 的 `AddVF`，通过 `asc_vf_call` 调用，并在 VF 函数中完成 RegTensor 的加载、加法和搬出。
 
-迁移后仍保持相同的计算、数据类型和输入公式：对两个长度为1024的 float32 ND 向量执行逐元素加法 `z = x + y`。C API 使用带地址空间限定符的 UB 数组代替 LocalTensor/LocalMemAllocator，使用 `asc_load`、`asc_add`、`asc_store` 代替 `Reg::LoadAlign`、`Reg::Add`、`Reg::StoreAlign`。
+迁移后仍保持相同的计算、数据类型和输入公式：对两个长度为1024的 float32 ND 向量执行逐元素加法 `z = x + y`。C API 使用带地址空间限定符的 UB 数组代替 LocalTensor/LocalMemAllocator，使用 `asc_loadalign`、`asc_add`、`asc_storealign` 代替 `Reg::LoadAlign`、`Reg::Add`、`Reg::StoreAlign`。
 
 本样例仅支持 Ascend 950PR/Ascend 950DT（`dav-3510`），不提供 CPU 域调试模式。
 
@@ -47,21 +47,23 @@
 | 基础 API 场景4 | C API 实现 | 说明 |
 | --- | --- | --- |
 | `LocalMemAllocator<Hardware::UB>` + `LocalTensor` | `__ubuf__ float x_ub/y_ub/z_ub[1024]` | C API通过数组申请UB内存。 |
-| `DataCopy(GM→UB)` | `asc_copy_gm2ub_sync` | 同步接口在读取UB前完成等待。 |
+| `DataCopy(GM→UB)` | `asc_copy_gm2ub` | 普通异步搬运；通过`asc_sync_notify/asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0)`显式约束Reg计算。 |
 | `asc_vf_call<AddVF>` | 直接调用`__simd_vf__`函数`AddVfCapi` | C API不使用基础 API 的 VF 调用封装。 |
-| `Reg::LoadAlign` | `asc_load` | 每次读取一个 float VL到`vector_float`。 |
+| `Reg::LoadAlign` | `asc_loadalign` | 输入数组及每轮VL偏移均满足32字节对齐，每次按NORM模式读取一个float VL。 |
 | `Reg::Add` | `asc_add` | 使用`asc_create_mask_b32(PAT_ALL)`执行逐元素加法。 |
-| `Reg::StoreAlign` | `asc_store` | 每次将一个 float VL写回UB。 |
-| `DataCopy(UB→GM)` | `asc_copy_ub2gm_sync` | 同步接口在核函数结束前完成写回。 |
+| `Reg::StoreAlign` | `asc_storealign` | 使用b32全掩码，每次按NORM模式将一个float VL写回对齐的UB地址。 |
+| `DataCopy(UB→GM)` | `asc_copy_ub2gm` | 通过`asc_sync_notify/asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0)`等待Reg计算，再用`asc_sync_pipe(PIPE_MTE3)`等待写回完成。 |
 
 在 `dav-3510` 上，`asc_get_vf_len()`返回256字节，因此 float32 的一个VL为64个元素。1024能被64整除，VF函数循环16次，所有循环均使用全掩码；这与原样例按 `GetVecLen() / sizeof(float)` 计算单次处理元素数的逻辑一致。
 
 设备侧调用顺序如下：
 
 ```text
-GM x/y --asc_copy_gm2ub_sync--> UB x/y
-UB x/y --asc_load--> vector_float --asc_add--> vector_float --asc_store--> UB z
-UB z --asc_copy_ub2gm_sync--> GM z
+GM x/y --asc_copy_gm2ub(PIPE_MTE2)--> UB x/y
+      --asc_sync_notify/wait(MTE2->V)-->
+UB x/y --asc_loadalign--> vector_float --asc_add--> vector_float --asc_storealign--> UB z
+      --asc_sync_notify/wait(V->MTE3)-->
+UB z --asc_copy_ub2gm(PIPE_MTE3)--> GM z --asc_sync_pipe(PIPE_MTE3)
 ```
 
 主机侧读取 `input/x.bin`、`input/y.bin`，申请Device/Host内存和Stream，启动一个 `vf_add<<<1, 0, stream>>>` 核函数，随后将输出写入 `output/output.bin`。所有 ACL 返回值和文件读写均会检查；失败路径使用统一清理标签释放已申请资源。

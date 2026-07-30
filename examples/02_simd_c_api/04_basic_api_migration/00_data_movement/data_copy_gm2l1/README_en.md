@@ -44,7 +44,7 @@ Use the `SCENARIO_NUM` build parameter to select an input scenario. The meaning 
 
 `SCENARIO_NUM` is passed by CMake as a compile-time macro. The kernel selects the corresponding scenario with `if constexpr`. After changing the scenario, recompile the project.
 
-All device-side movement and compute use asynchronous Ascend C C API calls. `asc_sync_notify` and `asc_sync_wait` establish the required `MTE2→MTE1→M→FIX` dependencies. In scenario 4, after MTE2 completes the Bias ND2NZ transfer, `asc_copy_l12bt` moves Bias to BTable and `asc_mmad` consumes it through `c_matrix_source`. Scenario 5 also uses `MTE2→FIX` to make the quantization parameters ready, then uses `asc_sync_pipe(PIPE_FIX)` after the L1 Buffer-to-Fixpipe Buffer transfer. `asc_sync_pipe(PIPE_ALL)` is called at the end of the kernel to ensure that all pipelines complete.
+All device-side movement and compute use asynchronous Ascend C C API calls. `asc_sync_notify` and `asc_sync_wait` establish the required `MTE2→MTE1→M→FIX` dependencies. In scenario 4, after MTE2 completes the Bias ND2NZ transfer, `asc_copy_l12bt` moves Bias to BTable and `asc_mmad` consumes it through `c_matrix_source`. Scenario 5 also uses `MTE2→FIX` to make the quantization parameters ready, then uses `asc_sync_pipe(PIPE_FIX)` after the L1 Buffer-to-Fixpipe Buffer transfer. In every scenario, the last asynchronous operation is the L0C-to-GM Fixpipe transfer, so the kernel waits only for `PIPE_FIX` before returning.
 
 **Scenario 1: Nz input, half input type**
 

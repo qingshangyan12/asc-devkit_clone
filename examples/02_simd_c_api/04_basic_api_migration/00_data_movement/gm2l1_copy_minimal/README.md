@@ -43,7 +43,7 @@ AIV0:                                               PIPE_MTE3 (UB->GM)
 AIV1:                                               不参与搬运
 ```
 
-MTE2->MTE1是同一AIC内的流水依赖，使用`asc_sync_notify`和`asc_sync_wait`建立。L1 Buffer->UB的AIC侧生产与UB->GM的AIV0侧消费属于跨核依赖，使用`asc_sync_block_arrive(PIPE_MTE1, CROSS_CORE_FLAG_ID)`和`asc_sync_block_wait(PIPE_S, CROSS_CORE_FLAG_ID)`交接。不能使用`asc_sync_notify(PIPE_MTE1, PIPE_MTE3, ...)`：该组合会展开为目标不支持的`set_flag`参数组合。最后用`asc_sync_pipe(PIPE_ALL)`收敛异步搬运。
+MTE2->MTE1是同一AIC内的流水依赖，使用`asc_sync_notify`和`asc_sync_wait`建立。L1 Buffer->UB的AIC侧生产与UB->GM的AIV0侧消费属于跨核依赖，使用`asc_sync_block_arrive(PIPE_MTE1, CROSS_CORE_FLAG_ID)`和`asc_sync_block_wait(PIPE_S, CROSS_CORE_FLAG_ID)`交接。不能使用`asc_sync_notify(PIPE_MTE1, PIPE_MTE3, ...)`：该组合会展开为目标不支持的`set_flag`参数组合。最终GM写回只由AIV0的MTE3流水发起，因此在AIV0分支内使用`asc_sync_pipe(PIPE_MTE3)`等待写回完成，不阻塞无关流水。
 
 ## API 依据
 
@@ -56,7 +56,7 @@ MTE2->MTE1是同一AIC内的流水依赖，使用`asc_sync_notify`和`asc_sync_w
 | `asc_get_sub_block_id` | [`sys_var/asc_get_sub_block_id.md`](../../../../../docs/zh/api/SIMD-API/C-API/sys_var/asc_get_sub_block_id.md) | 在1:2的Mix场景中筛选AIV0，避免AIV1等待同一同步信号或写入同一输出地址。 |
 | `asc_sync_notify` / `asc_sync_wait` | [`sync`](../../../../../docs/zh/api/SIMD-API/C-API/sync/) | 约束 AIC 内 GM→L1 与 L1→UB 的生产者—消费者关系。 |
 | `asc_sync_block_arrive` / `asc_sync_block_wait` | [`sync`](../../../../../docs/zh/api/SIMD-API/C-API/sync/) | 使用 flag 0 完成 AIC→AIV 的核间交接；flag 的有效范围为 0 至 15。 |
-| `asc_sync_pipe` | [`sync`](../../../../../docs/zh/api/SIMD-API/C-API/sync/) | 收敛两侧的异步搬运。 |
+| `asc_sync_pipe` | [`sync`](../../../../../docs/zh/api/SIMD-API/C-API/sync/) | AIV0仅等待最终的MTE3流水写回完成。 |
 
 ## 编译和执行
 
