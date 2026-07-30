@@ -928,6 +928,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_sub(__ubuf__ bfloa
     return atomicSub(address, val);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_sub(__ubuf__ bfloat16_t* address, bfloat16_t val)
+{
+    return asc_atomic_add(address, -val);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_exch(__ubuf__ bfloat16x2_t* address, bfloat16x2_t val)
 {
     return atomicExch(address, val);
@@ -959,6 +964,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_cas(
     __ubuf__ bfloat16x2_t* address, bfloat16x2_t compare, bfloat16x2_t val)
 {
     return atomicCAS(address, compare, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_sub(__gm__ bfloat16_t* address, bfloat16_t val)
+{
+    return asc_atomic_add(address, -val);
 }
 #endif
 
@@ -1073,6 +1083,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_add(bfloat16x2_t* 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t* address, bfloat16x2_t val)
 {
     return __atomic_sub(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_sub(bfloat16_t* address, bfloat16_t val)
+{
+    return asc_atomic_add(address, -val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_exch(bfloat16x2_t* address, bfloat16x2_t val)
