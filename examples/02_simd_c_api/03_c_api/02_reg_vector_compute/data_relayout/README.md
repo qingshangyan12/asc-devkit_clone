@@ -1,7 +1,7 @@
-﻿# data_relayout样例
+# data_relayout样例
 
 ## 概述
-本样例基于C API编程接口实现数据重排功能，主要调用[asc_intlv](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_rearrange/asc_intlv.md)/[asc_pack](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_compress/asc_pack_deprecated.md)接口，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+本样例基于C API编程接口实现数据重排功能，主要调用[asc_intlv](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_rearrange/asc_intlv.md)/[asc_pack_to_low](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_compress/asc_pack_to_low.md)接口，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
     | SCENARIO_NUM | 重排场景 |
     | --- | --- |
     | 1 | Interleave（将两个uint16_t向量交织） |
@@ -63,7 +63,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">pack_custom</td></tr>
     </table>
   - 样例实现：
-    pack_vf函数内调用asc_pack接口提取低16位。
+    pack_vf函数内调用asc_pack_to_low接口提取低16位。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数。
 

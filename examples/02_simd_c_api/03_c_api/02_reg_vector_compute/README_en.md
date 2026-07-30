@@ -1,4 +1,4 @@
-﻿# Vector Compute API Examples
+# Vector Compute API Examples
 
 ## Overview
 
@@ -12,7 +12,7 @@ This directory contains examples for multiple APIs related to vector computation
 | [arange](./arange) | This example implements the Arange operation based on the C API programming interface, primarily calling the asc_arange API, generating increasing/decreasing index sequences starting from a scalar value |
 | [cast](./cast) | This example implements the Cast operation based on the C API programming interface, primarily calling the asc_half2int32_rd/asc_float2int16_rna_sat API for data type conversion (narrowing/widening) |
 | [compare](./compare) | This example implements data comparison functionality across multiple scenarios using the asc_gt and asc_gt_scalar APIs based on the C API programming interface |
-| [data_relayout](./data_relayout) | This example implements data relayout functionality based on the C API programming interface, supporting Interleave (asc_intlv) and Pack (asc_pack) scenarios |
+| [data_relayout](./data_relayout) | This example implements data relayout functionality based on the C API programming interface, supporting Interleave (asc_intlv) and Pack (asc_pack_to_low) scenarios |
 | [div](./div) | This example implements the Div operation based on the C API programming interface, primarily calling the asc_div interface |
 | [duplicate](./duplicate) | This example implements the Duplicate operation (scalar fill mode) based on the C API programming interface, primarily calling the asc_duplicate_scalar API, copying a scalar value multiple times and filling it into a vector |
 | [gather](./gather) | This example implements the functionality of collecting elements from a vector data register by index based on the C API programming interface, primarily calling the asc_gather API |

@@ -1,7 +1,7 @@
-﻿# data_relayout Example
+# data_relayout Example
 
 ## Overview
-This example implements data relayout functionality based on the C API programming interface, primarily calling the [asc_intlv](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_rearrange/asc_intlv.md)/[asc_pack](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_compress/asc_pack_deprecated.md) API, supporting multiple scenarios. Select a scenario through the CMake build parameter `SCENARIO_NUM`.
+This example implements data relayout functionality based on the C API programming interface, primarily calling the [asc_intlv](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_rearrange/asc_intlv.md)/[asc_pack_to_low](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_compress/asc_pack_to_low.md) API, supporting multiple scenarios. Select a scenario through the CMake build parameter `SCENARIO_NUM`.
     | SCENARIO_NUM | Relayout Scenario |
     | --- | --- |
     | 1 | Interleave (interleave two uint16_t vectors) |
@@ -63,7 +63,7 @@ This example implements data relayout functionality based on the C API programmi
     <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="3" align="center">pack_custom</td></tr>
     </table>
   - Example implementation:
-    The pack_vf function calls the asc_pack API to extract the lower 16 bits.
+    The pack_vf function calls the asc_pack_to_low API to extract the lower 16 bits.
     - Invocation implementation
       Uses the kernel invocation syntax `<<<>>>` to call the kernel function.
 
