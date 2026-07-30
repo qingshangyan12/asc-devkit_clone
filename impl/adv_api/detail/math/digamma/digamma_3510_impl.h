@@ -197,6 +197,10 @@ __simd_vf__ inline void DigammaImpl(__ubuf__ float* dstUb, __ubuf__ float* srcUb
         DigammaPositive(resultReg, srcReg, fullMask);
         DigammaSelect(dstReg, resultReg, tmpCal3, mask0);
 
+        // Spill the accumulated non-negative and special-value results to dstUb. The negative path does not depend on
+        // dstReg, so its physical register can be released until the final result merge.
+        Reg::StoreAlign(dstUb + i * sregLower, dstReg, mask);
+
         DigammaGenCompareMask<CMPMODE::LT>(mask0, srcReg, 0.0f, fullMask);
         // Inline DigammaNegative and its one-shot positive/reflection subcomputations.
         {
@@ -251,6 +255,7 @@ __simd_vf__ inline void DigammaImpl(__ubuf__ float* dstUb, __ubuf__ float* srcUb
             Reg::Muls(tmpReg4, tmpReg4, DIGAMMA_PI, fullMask);
             Reg::Add(resultReg, resultReg, tmpReg4, fullMask);
         }
+        Reg::LoadAlign(dstReg, dstUb + i * sregLower);
         DigammaSelect(dstReg, resultReg, tmpCal3, mask0);
         Reg::StoreAlign(dstUb + i * sregLower, dstReg, mask);
     }
