@@ -53,7 +53,15 @@ inline half2 asc_atomic_sub(half2 *address, half2 val)
 ```
 
 ```cpp
+inline half asc_atomic_sub(half *address, half val)
+```
+
+```cpp
 inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t *address, bfloat16x2_t val)
+```
+
+```cpp
+inline bfloat16_t asc_atomic_sub(bfloat16_t *address, bfloat16_t val)
 ```
 
 ## 参数说明
@@ -71,12 +79,14 @@ inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t *address, bfloat16x2_t val)
 
 | 参数数据类型 | 支持的内存空间 |
 | --- | --- |
-| int32_t、uint32_t、float、half2、bfloat16x2_t | Unified Buffer、Global Memory |
+| int32_t、uint32_t、float、half、bfloat16_t、half2、bfloat16x2_t | Unified Buffer、Global Memory |
 | int64_t、uint64_t | Global Memory |
 
 ## 返回值说明
 
 Unified Buffer或Global Memory上的初始数据。
+
+注意，由于底层硬件约束，half和bfloat16\_t类型的返回值不准确，禁止直接使用这些类型的返回值。half2和bfloat16x2\_t类型不受此限制。
 
 ## 约束说明
 
@@ -84,7 +94,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 需要包含的头文件
 
-使用除half2、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_atomic\_functions.h"头文件，使用half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_atomic\_functions.h"头文件，使用half、half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16\_t、bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
 ```cpp
 #include "simt_api/device_atomic_functions.h"
