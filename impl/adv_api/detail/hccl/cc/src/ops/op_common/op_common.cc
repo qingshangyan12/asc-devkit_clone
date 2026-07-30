@@ -1755,9 +1755,9 @@ HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
 
 HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 {
-    (void)comm;
-    HcclOpExpansionMode finalMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED;
-    HCCL_DEBUG("[DecideHcclOpExpansionMode] configOpExpansionMode: CCU_SCHED");
+    HcclOpExpansionMode finalMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_INVALID;
+    CHK_RET(DecideHcclOpExpansionMode(comm, finalMode));
+    HCCL_DEBUG("[HcclGetOpExpansionMode] finalMode: %d", finalMode);
 
     // 第二步：应用选择的模式到param
     HcclResult ret = ApplyOpExpansionMode(param, finalMode);
