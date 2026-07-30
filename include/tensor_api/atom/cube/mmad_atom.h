@@ -24,7 +24,7 @@
 #ifndef INCLUDE_TENSOR_API_ATOM_CUBE_MMAD_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_CUBE_MMAD_ATOM_H
 
-#include "impl/tensor_api/atom/mmad_atom_impl.h"
+#include "utils/base/sys_macros.h"
 
 namespace AscendC {
 namespace Te {
@@ -36,13 +36,25 @@ template <typename... Args>
 struct MmadAtom;
 
 template <typename MmadOperation>
-struct MmadAtom<MmadOperation>;
+struct MmadAtom<MmadOperation> : MmadAtom<MmadTraits<MmadOperation>> {};
 
 template <typename MmadOperation, typename... Args>
-struct MmadAtom<MmadTraits<MmadOperation, Args...>>;
+struct MmadAtom<MmadTraits<MmadOperation, Args...>> : MmadTraits<MmadOperation, Args...> {
+    using MmadTraitType = MmadTraits<MmadOperation, Args...>;
+    using TraitType = typename MmadTraitType::TraitType;
+    static constexpr const TraitType defaultTrait = MmadTraitType::defaultTrait;
+
+    template <const TraitType& traits = defaultTrait, typename... Params>
+    __aicore__ inline void Call(const Params&... params) const;
+
+    template <typename... TraitsArgs>
+    __aicore__ inline auto with(TraitsArgs&&... args) const;
+};
 
 } // namespace Te
 } // namespace AscendC
+
+#include "impl/tensor_api/atom/mmad_atom_impl.h"
 
 #endif // INCLUDE_TENSOR_API_ATOM_CUBE_MMAD_ATOM_H
 

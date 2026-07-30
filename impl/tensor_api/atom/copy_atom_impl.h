@@ -22,6 +22,7 @@
 #ifndef IMPL_TENSOR_API_ATOM_COPY_ATOM_IMPL_H
 #define IMPL_TENSOR_API_ATOM_COPY_ATOM_IMPL_H
 
+#include "tensor_api/atom/cube/copy_atom.h"
 #include "impl/tensor_api/atom/cube/copy_gm2l1.h"
 
 #include "impl/tensor_api/atom/cube/copy_l0c2gm.h"
@@ -46,30 +47,19 @@ namespace AscendC {
 namespace Te {
 
 template <typename... Args>
-struct CopyAtom;
-
-template <typename CopyOperation>
-struct CopyAtom<CopyOperation> : CopyAtom<CopyTraits<CopyOperation>> {};
+template <const typename CopyAtom<CopyTraits<Args...>>::TraitType& traits, typename... Params>
+__aicore__ inline void CopyAtom<CopyTraits<Args...>>::Call(const Params&... params) const
+{
+    CopyTraitType::template CopyUnpack<traits>(params...);
+}
 
 template <typename... Args>
-struct CopyAtom<CopyTraits<Args...>> : CopyTraits<Args...> {
-    using CopyTraitType = CopyTraits<Args...>;
-    using TraitType = typename CopyTraitType::TraitType;
-    static constexpr const TraitType defaultTrait = CopyTraitType::defaultTrait;
-
-    template <const TraitType& traits = defaultTrait, typename... Params>
-    __aicore__ inline void Call(const Params&... params) const
-    {
-        CopyTraitType::template CopyUnpack<traits>(params...);
-    }
-
-    template <typename... TraitsArgs>
-    __aicore__ inline auto with(TraitsArgs&&... args) const
-    {
-        auto traits = CopyTraitType::with(static_cast<TraitsArgs&&>(args)...);
-        return CopyAtom<decltype(traits)>{traits};
-    }
-};
+template <typename... TraitsArgs>
+__aicore__ inline auto CopyAtom<CopyTraits<Args...>>::with(TraitsArgs&&... args) const
+{
+    auto traits = CopyTraitType::with(static_cast<TraitsArgs&&>(args)...);
+    return CopyAtom<decltype(traits)>{traits};
+}
 
 } // namespace Te
 } // namespace AscendC
