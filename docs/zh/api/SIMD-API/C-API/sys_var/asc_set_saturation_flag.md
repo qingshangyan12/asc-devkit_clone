@@ -38,7 +38,7 @@ __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mo
 
 ## 参数说明
 
-表1参数说明
+表1 参数说明
 
 |参数名|输入/输出|描述|
 | :------ | :---  | :------------ |
@@ -51,7 +51,7 @@ __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mo
 | :-------     | :---- |
 |CTRL[48]      |用于控制half浮点数计算饱和模式 <br>- 1'b0：饱和模式，INF输出会被饱和为±MAX，NAN输出会被饱和为0；<br>- 1'b1：非饱和模式，INF/NAN保持原输出。|
 |CTRL[50]      |用于控制fp8浮点数精度转换饱和模式 <br>- 1'b0：饱和模式；<br>- 1'b1：非饱和模式。|
-|CTRL[53]      |用于控制整数计算饱和模式 <br>- 1'b0：截断模式，溢出值按目标数据类型位数截断，保留低位，舍弃高位；<br>- 1'b1：饱和模式，溢出值饱和到±MAX。|
+|CTRL[53]      |用于控制整数计算饱和模式 <br>- 1'b0：截断模式，溢出值按目标数据类型位数截断，保留低位，舍弃高位；<br>- 1'b1：饱和模式，溢出值饱和到±MAX。<br>**注意：INT模式的极性与FLOAT/FLOAT8/CAST模式相反，1表示饱和、0表示截断。**|
 |CTRL[59]      |用于控制浮点数转整数或整数转整数时的精度转换饱和模式 <br>- 1'b0：饱和模式，溢出值饱和到±MAX；<br>- 1'b1：截断模式，溢出值按照目标数据类型位数截断，保留低位，舍弃高位。|
 
 ## 返回值说明
@@ -64,7 +64,7 @@ PIPE_S
 
 ## 约束说明
 
-- 对于FLOAT、FLOAT8、CAST模式，`enable_sat`为`true`时将对应比特位置0（饱和），为`false`时置1（非饱和/截断）。
+- 对于FLOAT、FLOAT8、CAST模式，由于CTRL寄存器中对应比特位0表示饱和模式、1表示非饱和模式，因此`enable_sat`为`true`时将对应比特位置0（饱和），为`false`时置1（非饱和/截断）。
 - 对于INT模式，`enable_sat`为`true`时将对应比特位置1（饱和），为`false`时置0（截断）。
 
 ## 调用示例
