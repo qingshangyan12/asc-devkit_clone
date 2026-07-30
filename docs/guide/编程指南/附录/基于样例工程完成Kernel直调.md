@@ -236,7 +236,7 @@ AddKernelInvocationNeo
 <tr id="row158188167811"><td class="cellrowborder" valign="top" width="24.67%" headers="mcps1.2.3.1.1 "><p id="p151562145914"><a name="p151562145914"></a><a name="p151562145914"></a>ascendc_library</p>
 </td>
 <td class="cellrowborder" valign="top" width="75.33%" headers="mcps1.2.3.1.2 "><p id="p83571846498"><a name="p83571846498"></a><a name="p83571846498"></a>使用指定的核函数源文件向项目（project）添加库。语法格式如下：</p>
-<pre class="screen" id="screen894213141527"><a name="screen894213141527"></a><a name="screen894213141527"></a>ascendc_library(&lt;target_name&gt; [STATIC | SHARED]
+<br><br><a name="screen894213141527"></a><a name="screen894213141527"></a>ascendc_library(&lt;target_name&gt; [STATIC | SHARED]
             [&lt;source&gt;...]) </pre>
 <p id="p211019713522"><a name="p211019713522"></a><a name="p211019713522"></a>其中&lt;target_name&gt;表示库文件的名字，该库文件会根据命令里列出的源文件来建立。STATIC、SHARED的作用是指定生成的库文件的类型。STATIC库是目标文件的归档文件，在连接其它目标的时候使用。SHARED库会被动态连接（动态连接库），在运行时会被加载。&lt;source&gt;表示核函数源文件。</p>
 </td>
