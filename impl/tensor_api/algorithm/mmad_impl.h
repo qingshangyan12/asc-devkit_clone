@@ -22,7 +22,7 @@
 #ifndef IMPL_TENSOR_API_ALGORITHM_MMAD_IMPL_H
 #define IMPL_TENSOR_API_ALGORITHM_MMAD_IMPL_H
 
-#include "impl/tensor_api/atom/mmad_atom_impl.h"
+#include "tensor_api/atom/cube/mmad_atom.h"
 
 namespace AscendC {
 namespace Te {

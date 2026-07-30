@@ -53,8 +53,7 @@ __aicore__ inline BaseTensor<EngineType, LayoutType>::BaseTensor()
 {}
 
 template <typename EngineType, typename LayoutType>
-__aicore__ inline BaseTensor<EngineType, LayoutType>::BaseTensor(
-    const EngineType& engine, const LayoutType& layout)
+__aicore__ inline BaseTensor<EngineType, LayoutType>::BaseTensor(const EngineType& engine, const LayoutType& layout)
     : rep(layout, engine)
 {}
 
