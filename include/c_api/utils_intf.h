@@ -12,5 +12,6 @@
 #define INCLUDE_C_API_C_API_UTILS_INTF_H
 
 #include "c_api/utils/union.h"
+#include "c_api/utils/enum.h"
 
 #endif

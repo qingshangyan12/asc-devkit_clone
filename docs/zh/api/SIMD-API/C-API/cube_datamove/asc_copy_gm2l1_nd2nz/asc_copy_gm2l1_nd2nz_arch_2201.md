@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 将数据从Global Memory (GM)搬运到Level 1 cache (L1)，支持在数据搬运时进行ND格式到NZ格式的转换。
 
 ## 函数原型
@@ -116,8 +114,7 @@ PIPE_MTE2
 
 ## 约束说明
 
-- src的起始地址要求按照对应数据类型所占字节数对齐。
-- dst的起始地址要求32字节对齐。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
 - 如果需要执行多条asc_copy_gm2l1_nd2nz指令，且asc_copy_gm2l1_nd2nz指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_gm2l1_nd2nz指令的串行化，防止出现异常数据。
 
 ## 调用示例
@@ -126,7 +123,6 @@ PIPE_MTE2
 //total_length指参与搬运的数据总长度。
 constexpr uint64_t total_length = 128;
 __cbuf__ int8_t dst[total_length];
-__gm__ int8_t src[total_length];
 // 传输nd矩阵的数目
 constexpr uint16_t nd_num = 2;
 // nd矩阵的行数
@@ -143,5 +139,6 @@ constexpr uint16_t dst_nz_c0_stride = 11;
 constexpr uint16_t dst_nz_n_stride = 2;
 // dst中第x个nd矩阵的起点和第x+1个nd矩阵的起点的偏移
 constexpr uint16_t dst_nz_matrix_stride = 96;
+// src表示源操作数的起始地址
 asc_copy_gm2l1_nd2nz(dst, src, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride, dst_nz_matrix_stride);
 ```

@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-提供时间戳打点功能，用于在算子Kernel代码中标记关键执行点。调用后会打印如下信息：
+SIMD场景下，提供时间戳打点功能，用于在算子Kernel代码中标记关键执行点。调用后会打印如下信息：
 
 -   descId：用户自定义标识符，用于区分不同打点位置。
 -   rsv：保留值，默认为0，无需关注。
@@ -45,7 +45,7 @@ descId is 11, rsv is 0, timeStamp is 815603975350485, pcPtr is 19792358553124, e
 ## 函数原型
 
 ```
-__aicore__ inline void asc_time_stamp(uint32_t desc_id)
+__aicore__ static __attribute__((noinline)) void asc_time_stamp(uint32_t desc_id)
 ```
 
 ## 参数说明

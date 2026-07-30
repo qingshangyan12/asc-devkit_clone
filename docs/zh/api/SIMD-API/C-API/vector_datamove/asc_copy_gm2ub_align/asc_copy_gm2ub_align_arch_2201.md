@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_datamove/vector_datamove.h"`。
-
 提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer (UB)，并支持8位/16位/32位数据类型搬运。
 
 ## 函数原型
@@ -98,8 +96,7 @@ PIPE_MTE2
 
 ## 约束说明
 
-- src的起始地址要求按照对应数据类型所占字节数对齐。
-- dst的起始地址要求32字节对齐。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
 - 如果需要执行多条asc_copy_gm2ub_align指令，且asc_copy_gm2ub_align指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_gm2ub_align指令的串行化，防止出现异常数据。
 - 同步计算包含同步等待。
 - left_padding_num、right_padding_num的字节数均不能超过32Bytes。

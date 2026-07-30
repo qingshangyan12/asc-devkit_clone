@@ -51,15 +51,15 @@ Ascend C提供DeepNorm Tiling API，方便用户获取DeepNorm kernel计算时�
 ## 函数原型
 
 ```
-bool GetDeepNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, uint32_t& maxValue, uint32_t& minValue)
+bool GetDeepNormMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, optiling::DeepNormTiling& tiling)
+bool GetDeepNormTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, optiling::DeepNormTiling& tiling)
 ```
 
 ```
-bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, AscendC::tiling::DeepNormTiling& tiling)
+bool GetDeepNormTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, AscendC::tiling::DeepNormTiling& tiling)
 ```
 
 ## 参数说明
@@ -68,7 +68,7 @@ bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrc
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入的shape信息。 |
+| srcShape | 输入 | 输入的shape信息，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 是否复用源操作数输入的空间，与DeepNorm接口一致。 |
 | isBasicBlock | 输入 | srcShape是否符合基本块定义：尾轴H的长度为64的倍数（不超过2040）， B*S为8的倍数。 |
@@ -79,8 +79,8 @@ bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrc
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入的shape信息[B, S, H]。 |
-| originSrcShape | 输入 | 32B对齐前的输入shape信息[B, S, originH]。originH的长度应该在(0, H]的范围内。如果isBasicBlock置为true，originH必须与H一致。 |
+| srcShape | 输入 | 输入的shape信息[B, S, H]，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。 |
+| originSrcShape | 输入 | 32B对齐前的输入shape信息[B, S, originH]，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。originH的长度应该在(0, H]的范围内。如果isBasicBlock置为true，originH必须与H一致。 |
 | stackBufferSize | 输入 | 临时空间的buffer大小，单位为Byte。通过GetDeepNormMaxMinTmpSize获取最大最小临时空间大小，开发者基于此范围选择合适的空间大小作为stackBufferByteSize传入。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 是否复用源操作数输入的空间，与DeepNorm接口一致。 |
@@ -120,15 +120,15 @@ bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrc
     {
         TilingData tiling;
         uint32_t totalLength = context->GetInputTensor(0)->GetShapeSize();
-        context->SetBlockDim(NUM_BLOCKS);
+        context->SetSimdNumBlocks(NUM_BLOCKS);
         tiling.set_totalLength(totalLength);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
         ...
         std::vector<int64_t> shapeVec = {2, 16, 64};
         std::vector<int64_t> oriShapeVec = {2, 16, 64};
-        ge::Shape srcShape(shapeVec);
-        ge::Shape originSrcShape(oriShapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
+        AscendC::TensorShape originSrcShape(oriShapeVec);
 
         // 本样例中仅作为样例说明，通过GetDeepNormMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         uint32_t minValue = 0;

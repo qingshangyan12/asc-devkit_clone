@@ -26,13 +26,11 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
-
 根据mask对源操作数src、value进行按元素做乘加操作，将结果写入目的操作数dst。
 计算公式如下：
 
 $$
-dst_i = src_i * value + dst_i
+dst_i = src_i \times value + dst_i
 $$
 
 ## 函数原型
@@ -44,6 +42,7 @@ __simd_callee__ inline void asc_axpy(vector_float& dst, vector_float src, float 
 
 ## 参数说明
 
+**表 1** 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
@@ -63,7 +62,7 @@ PIPE_V
 
 ## 约束说明
 
-无
+mask未筛选的元素在输出中置零。
 
 ## 调用示例
 

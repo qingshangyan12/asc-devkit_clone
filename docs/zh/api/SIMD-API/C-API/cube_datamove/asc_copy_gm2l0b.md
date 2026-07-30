@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 将矩阵数据从Global Memory搬运到L0B Buffer。
 
 ## 函数原型
@@ -79,7 +77,7 @@ PIPE_MTE2
 
 ## 约束说明
 
-无
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../通用说明和约束.md#存储单元说明)。
 
 ## 调用示例
 
@@ -91,7 +89,7 @@ constexpr uint8_t repeat = 2;
 //输入的搬运步长为0字节，输出的搬运步长为1024字节
 constexpr uint16_t src_stride = 0;
 constexpr uint16_t dst_gap = 1;
-__gm__ half src[256];
+// src表示源操作数的起始地址
 __cb__ half dst[256];
 asc_copy_gm2l0b(dst, src, base_idx, repeat, src_stride, dst_gap);
 ```

@@ -19,6 +19,7 @@
 #include "load_kernel.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_host_bridge.h"
+#include "hcomm_primitives_dl.h"
 
 #include <vector>
 #include <memory>
@@ -481,7 +482,6 @@ HcclResult PrepareTopoInfoForOp(HcclComm comm, OpParam& opParam, std::unique_ptr
     opParam.hcclComm = comm;
     CHK_RET(HcclGetOpExpansionMode(comm, opParam));
     CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
-    CHK_RET(CheckAsymmetricTopoSupport(opParam.opType, topoInfo.get()));
     return HCCL_SUCCESS;
 }
 
@@ -659,6 +659,11 @@ HcclResult GetOpParamResCtx(
         executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
 
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
+    resCtxHost->isHcommBatchTransferOnThreadSupported = HcommIsSupportHcommBatchTransferOnThread();
+    HCCL_DEBUG(
+        "[MC2_BATCH_TRANSFER][HostSupport] opType[%u], algName[%s], supported[%d].",
+        static_cast<uint32_t>(opParam.opType), algName.c_str(),
+        static_cast<int>(resCtxHost->isHcommBatchTransferOnThreadSupported));
     bool isResourceReused = false;
 
     ThreadHandle cpuTsThread{0};
@@ -668,6 +673,7 @@ HcclResult GetOpParamResCtx(
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    opParam.cacheValid = isResourceReused;
     opParam.resCtx = *resCtxOut;
     return HCCL_SUCCESS;
 }

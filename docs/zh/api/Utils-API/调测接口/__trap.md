@@ -30,12 +30,12 @@
 
 ## 功能说明
 
-在SIMT VF实现代码中调用此接口会中断算子的运行，适用于Kernel侧异常场景的调试。
+在SIMT代码中调用此接口会中断算子的运行，适用于Kernel侧异常场景的调试。
 
 ## 函数原型
 
-```
-__simt_callee__ inline void __trap()
+```cpp
+inline void __trap()
 ```
 
 ## 参数说明
@@ -54,20 +54,34 @@ __simt_callee__ inline void __trap()
 
 使用该接口需要包含"utils/debug/asc\_assert.h"头文件。
 
-```
+```cpp
 #include "utils/debug/asc_assert.h"
 ```
 
 ## 调用示例
 
-```
-__simt_vf__ __launch_bounds__(1024) inline void SimtKernel(__gm__ bool* dst, __gm__ float* x)
-{
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    if (isnan(x[idx])) {
-        __trap();
-    }
-    dst[idx] = x[idx];
-}
-```
+-   SIMT编程场景：
 
+    ```cpp
+    __global__ __launch_bounds__(1024) inline void SimtKernel(float* dst, float* x)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (isnan(x[idx])) {
+            __trap();
+        }
+        dst[idx] = x[idx];
+    }
+    ```
+
+-   SIMD与SIMT混合编程场景：
+
+    ```cpp
+    __simt_vf__ __launch_bounds__(1024) inline void SimtKernel(__gm__ float* dst, __gm__ float* x)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (isnan(x[idx])) {
+            __trap();
+        }
+        dst[idx] = x[idx];
+    }
+    ```

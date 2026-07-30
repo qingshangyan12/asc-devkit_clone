@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 将数据从L1 Buffer搬运到Global Memory。
 
 ## 函数原型
@@ -65,8 +63,7 @@ PIPE_MTE1
 
 ## 约束说明
 
-- src的起始地址要求按照对应数据类型所占字节数对齐。
-- dst的起始地址要求32字节对齐。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../通用说明和约束.md#存储单元说明)。
 - 如果需要执行多条asc_copy_l12gm指令，且asc_copy_l12gm指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_l12gm指令的串行化，防止出现异常数据。
 
 ## 调用示例
@@ -81,6 +78,6 @@ constexpr uint16_t src_gap = 0;
 //相邻迭代间，目标操作数前一个分形与后一个分形起始地址的间隔为64个字节
 constexpr uint16_t dst_gap = 1;
 __cbuf__ half src[256];
-__gm__ half dst[256];
+// dst表示目的操作数的起始地址
 asc_copy_l12gm(dst, src, n_burst, len_burst, src_gap, dst_gap);
 ```

@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
-
 矢量src的逐个元素与标量value比较大小，接着按照对应的比特位将最大值存入dst中。计算公式如下：
 
 $$
@@ -49,6 +47,7 @@ __simd_callee__ inline void asc_max_scalar(vector_bfloat16_t& dst, vector_bfloat
   ```
 ## 参数说明
 
+**表 1** 参数说明
 | 参数名       | 输入/输出 | 描述               |
 | --------- | ----- | ---------------- |
 | dst       | 输出    | 目的操作数（矢量数据寄存器）。            |
@@ -68,7 +67,8 @@ PIPE_V
 
 ## 约束说明
 
-无
+- 输入`src`为-0、`value`为+0的情况下，输出`dst`为 +0。
+- mask未筛选的元素在输出中置零。
 
 ## 调用示例
 

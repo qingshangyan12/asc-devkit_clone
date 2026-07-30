@@ -5,7 +5,7 @@ Ascend C提供一组SoftMax Tiling API，方便用户获取SoftMax kernel计算�
 获取Tiling参数主要分为如下两步：
 
 1.  获取SoftMax接口计算所需最小和最大临时空间大小，注意该步骤不是必须的，只是作为一个参考，供合理分配计算空间。
-2.  获取输入SoftMax kernel侧接口所需tiling参数，需要传入输入shape、剩余的可供softmax接口计算的空间大小和计算的数据类型大小。
+2.  获取输入SoftMax kernel侧接口所需tiling参数，需要传入[AscendC::TensorShape](../../数据结构/TensorShape.md)类型的输入shape、剩余的可供softmax接口计算的空间大小和计算的数据类型大小。
 
     SoftMax Tiling结构体的定义如下，开发者无需关注该tiling结构的具体信息，只需要传递到kernel侧，传入SoftMax高阶API接口，直接进行使用即可。
 
@@ -65,13 +65,13 @@ Ascend C提供一组SoftMax Tiling API，方便用户获取SoftMax kernel计算�
     {
         TilingData tiling;
         uint32_t totalLength = context->GetInputTensor(0)->GetShapeSize();
-        context->SetBlockDim(NUM_BLOCKS);
+        context->SetSimdNumBlocks(NUM_BLOCKS);
         tiling.set_totalLength(totalLength);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
         ...
         std::vector<int64_t> shapeVec = {320,64};
-        ge::Shape srcShape(shapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
         // 本样例中仅作为样例说明，通过GetSoftMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         const uint32_t localWorkSpaceSize = AscendC::GetSoftMaxMinTmpSize(srcShape, sizeof(half), false);
         // 获取SoftMax Tiling参数

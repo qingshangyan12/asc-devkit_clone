@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 将矩阵数据从Global Memory搬运到L1 Buffer中，支持以下两种搬运模式：
 - **填充模式**：搬运过程中可以对数据进行填充或移除填充值。
 - **2D搬运模式**：支持2D矩阵数据搬运，支持压缩能力。（NPU_ARCH 220x版本不支持.）
@@ -135,6 +133,8 @@ PIPE_MTE2
 
 ## 约束说明
 
+各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
+
 ### 填充模式约束
 
 - 对于插入padding值的场景：
@@ -148,7 +148,6 @@ PIPE_MTE2
 
 ### 2D搬运模式约束
 
-- dst、src的起始地址需要32字节对齐。
 - 为了兼容性，需要设置m_step为1。
 
 ## 调用示例
@@ -163,7 +162,7 @@ constexpr uint8_t pad_func_mode = 0;
 //输入输出数据中两个相邻连续数据块之间的距离为0
 constexpr uint64_t src_stride = 0;
 constexpr uint32_t dst_stride = 0;
-__gm__ half src[256];
+// src表示源操作数的起始地址
 __cbuf__ half dst[256];
 asc_copy_gm2l1(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
 ```

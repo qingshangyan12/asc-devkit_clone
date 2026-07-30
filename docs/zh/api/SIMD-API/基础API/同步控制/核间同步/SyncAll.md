@@ -145,8 +145,8 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| gmWorkspace | 输入 | gmWorkspace为用户定义的全局空间，作为所有核共用的缓存，用于保存每个核的状态标记，类型为GlobalTensor，支持的数据类型为int32_t。GlobalTensor数据结构的定义请参考[GlobalTensor](../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。<br>所需空间大小和使用注意项参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
-| ubWorkspace | 输入 | ubWorkspace为用户定义的局部空间，每个核单独自用，用于标记当前核的状态。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT，支持的数据类型为int32_t。<br>所需空间大小参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
+| gmWorkspace | 输入 | gmWorkspace为用户定义的全局空间，作为所有核共用的缓存，用于保存每个核的状态标记，类型为GlobalTensor，支持的数据类型为int32_t。GlobalTensor数据结构的定义请参考[GlobalTensor](../../数据结构/GlobalTensor/GlobalTensor.md)。<br>所需空间大小和使用注意项参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
+| ubWorkspace | 输入 | ubWorkspace为用户定义的局部空间，每个核单独自用，用于标记当前核的状态。<br>类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT，支持的数据类型为int32_t。<br>所需空间大小参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
 | usedCores | 输入 | 指定多少个核之间的同步，传入数值不能超过算子调用时指定的逻辑numBlocks。此参数为默认参数，不传此参数表示全核软同步。<br>仅在软同步接口中支持，硬同步接口不支持该参数。 |
 
 ## 返回值说明<a name="section91032023123812"></a>
@@ -178,7 +178,7 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
         - ≥2个并发算子使用了核间同步功能。
 
         具体而言，在多流场景下，某条流的核间同步算子虽分配到n个物理核，但可能仅有n-m个核先被调度执行，而其余m个核因被其他流的核间同步算子抢占而尚未启动。先启动的n-m个核执行到核间同步时等待剩余m核完成，而剩余m核因被其他流的核间同步算子占用而无法释放，形成死锁。
-        Kernel直调场景下通过[\_\_schedmode\_\_\(mode\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)限定符来设置batchmode模式；工程化算子开发场景下，通过TilingContext的SetScheduleMode接口来设置batchmode模式，具体请参考[《基础数据结构和接口》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/basicdataapi/atlasopapi_07_00001.html)。
+        Kernel直调场景下通过[\_\_schedmode\_\_\(mode\)](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)限定符来设置batchmode模式；工程化算子开发场景下，通过TilingContext的SetScheduleMode接口来设置batchmode模式，具体请参考[《基础数据结构和接口》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/basicdataapi/atlasopapi_07_00001.html)。
     - SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为[11-14]。
 
 - 硬件同步接口和软件同步接口公共约束：使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
@@ -199,4 +199,4 @@ AscendC::DataCopy(workGlobal[blockIdx * perBlockSize], dstLocal, perBlockSize);
 AscendC::SyncAll(syncGlobal, workLocal);
 ```
 
-完整样例请参考[SyncAll样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/sync_all)。
+完整样例请参考[SyncAll样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/sync_all)。

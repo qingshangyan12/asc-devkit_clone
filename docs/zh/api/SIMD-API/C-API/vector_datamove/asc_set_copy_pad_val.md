@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_datamove/vector_datamove.h"`。
-
 和asc_copy_gm2ub_align或asc_copy_ub2gm_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。
 
 <!-- npu="950" id10 -->
@@ -72,7 +70,10 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-// 源操作数非对齐，需要填补数据
+// src是外部输入的int8_t类型的GM地址。
+__ubuf__ int8_t dst[128];
+
 asc_set_copy_pad_val(0);
-asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 0, 0, true, 0, 0, 0);
+// 在搬运过程中，每个数据块左右两侧各补充8个int8_t的数据，补充的数据值为0。
+asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 8, 8, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 48 * sizeof(int8_t), 64 * sizeof(int8_t));
 ```

@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
-
 Reg计算宏函数内不同流水线之间的同步指令。该同步指令指定源流水线和目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。
 读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令执行，则需要插入同步指令。写写场景同理。
 
@@ -41,12 +39,12 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 ## 参数说明
 
-表1参数说明
+**表1** 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | mem_type | 输入 | 同步流水线的类型，类型为MEM_TYPE，取值范围见表2 mem_type取值说明。 |
 
-表2 mem_type取值说明（源流水线/目的流水线表示的含义见表3 Reg计算流水线说明）
+**表2** mem_type取值说明（源流水线/目的流水线表示的含义见表3 Reg计算流水线说明）
 | 值  | 源流水线 | 目的流水线 |
 | ------ | -------- | -------- |
 | VV_ALL | VEC_ALL | VEC_ALL |
@@ -66,13 +64,13 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 | LD_ST | SCALAR_LOAD | SCALAR_STORE |
 | ST_ST | SCALAR_STORE | SCALAR_STORE |
 
-表3 Reg计算流水线说明
+**表3** Reg计算流水线说明
 | 流水线 | 含义 |
 | ------ | -------- |
 | VEC_STORE | SIMD_VF函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，例如[asc_store](../reg_store/asc_store.md)。 |
 | VEC_LOAD | SIMD_VF函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，例如[asc_load](../reg_load/asc_load.md)。 |
-| SCALAR_STORE | SIMD_VF函数内标量写UB流水线。<br>对应标量写入UB的指令，例如[asc_duplicate_scalar](../data_fill/asc_duplicate_scalar.md)。 |
-| SCALAR_LOAD | SIMD_VF函数内标量读UB流水线。<br>对应UB读取标量的指令。 |
+| SCALAR_STORE | SIMD_VF函数内标量写UB流水线。 |
+| SCALAR_LOAD | SIMD_VF函数内标量读UB流水线。 |
 | VEC_ALL | SIMD_VF函数内所有矢量读写UB流水线。 |
 | SCALAR_ALL | SIMD_VF函数内所有标量读写UB流水线。 |
 
@@ -80,13 +78,13 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 无
 
-## 流水类型
-
-PIPE_S
-
 ## 约束说明
 
-无
+- 读写依赖的场景下，如果读指令和写指令使用的寄存器相同，会触发寄存器保序，指令将会按照代码顺序执行，无需额外插入同步指令。
+- 冗余的同步指令会导致性能下降，可以通过外提出循环或者循环切分避免多次调用同步指令。
+- 当UB数据存在依赖时，才需要插入同步，判断是否有依赖取决于指令读写的内存是否有重叠。部分搬运指令读写内存的模式如下：
+    - [asc_gather](../reg_load/asc_gather.md)/[asc_scatter](../reg_store/asc_scatter.md)/[asc_gather_datablock](../reg_load/asc_gather_datablock.md)等指令取决于index地址偏移；
+    - [asc_loadalign_brc_ele](../reg_load/asc_loadalign_brc_elem.md)单条指令读32B数据后将第一个元素进行广播；
 
 ## 调用示例
 

@@ -384,13 +384,31 @@ the superkernel cannot be integrated with the operator.",
                 AscendCLogLevel.LOG_INFO,
             )
 
+    def _safe_int_conversion(value, default=-1):
+        if value is None:
+            return default
+        clean_value = str(value).strip()
+        try:
+            return int(clean_value)
+        except (ValueError, TypeError):
+            return default
+
     aicore_num = get_context().get_addition("_op_aicore_num")
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
+    has_platform_info = False
     if aicore_num is not None and vectorcore_num is not None:
         js["platformInfo"] = {
             "cubeCoreCnt": int(aicore_num),
             "vectorCoreCnt": int(vectorcore_num),
         }
+        has_platform_info = True
+    deterministic_level = _safe_int_conversion(
+        get_current_build_config("deterministic_level")
+    )
+    if deterministic_level != -1:
+        if not has_platform_info:
+            js["platformInfo"] = {}
+        js["platformInfo"]["deterministicLevel"] = int(deterministic_level)
 
     # set tilingdata of mc2 operator when online static compile
     if (
@@ -650,7 +668,6 @@ def _gen_set_workspace_codes(
         source += "    if (ffts_addr != nullptr) {\n"
         source += "        set_ffts_base_addr((uint64_t)ffts_addr);\n"
         source += "    }\n"
-        source += add_time_stamp_codes("TIME_STAMP_WRAP_FFTS_ADDR")
 
     # restart enable begin position
     if global_var_storage.get_variable("ascendc_enable_aicore_exception_restart"):
@@ -661,7 +678,6 @@ def _gen_set_workspace_codes(
         source += f"#ifdef {MIX_CORE_MACRO} \n"
         source += "    if constexpr (g_coreType == AscendC::AIC) {\n"
         source += "        matmul::clearWorkspace(workspace);\n"
-        source += add_time_stamp_codes("TIME_STAMP_WRAP_CLEAR_WK_SPAC", 2)
         source += "    }\n"
         source += "#endif\n"
     return source
@@ -830,7 +846,6 @@ def gen_kernel_fun(
         source += gen_init_dump_code()
         # set mc2 context
         source += _gen_set_mc2_ctx_param(opinfo)
-        source += add_time_stamp_codes("TIME_STAMP_WRAP_MC2_CTX")
         # implicit add aicore exception restart begin position
         # set workspace
         source += _gen_set_workspace_codes(

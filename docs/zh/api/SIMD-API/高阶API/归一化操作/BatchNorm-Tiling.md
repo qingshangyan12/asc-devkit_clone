@@ -43,15 +43,15 @@ BatchNorm Tiling API用于获取BatchNorm kernel计算时所需的Tiling参数�
 ## 函数原型
 
 ```
-bool GetBatchNormMaxMinTmpSize(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,uint32_t& minValue, const bool isBasicBlock = false)
+bool GetBatchNormMaxMinTmpSize(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,uint32_t& minValue, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
+bool GetBatchNormNDTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
+bool GetBatchNormNDTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
 ```
 
 ## 参数说明
@@ -60,8 +60,8 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入数据inputX的shape信息[B, S, H]，S*H需要32B对齐。 |
-| originSrcShape | 输入 | 输入数据inputX的originshape信息[originB, originS, originH]。 |
+| srcShape | 输入 | 输入数据inputX的shape信息[B, S, H]，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)，S*H需要32B对齐。 |
+| originSrcShape | 输入 | 输入数据inputX的originshape信息[originB, originS, originH]，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 中间变量是否能够复用输入内存。该参数预留，传入默认值false即可。 |
 | maxValue | 输出 | BatchNorm接口能完成计算所需的最大临时空间大小，超出max的空间不会被该接口使用。在min-max范围内，预留/申请空间越大，接口计算性能越好。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。maxValue为0表示计算不需要临时空间。<br>maxValue仅作为参考值，有可能大于Unified Buffer剩余空间的大小，该场景下，开发者需要根据Unified Buffer剩余空间的大小来选取合适的临时空间大小。 |
@@ -72,8 +72,8 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入数据inputX的shape信息[B, S, H]，S*H需要32B对齐。 |
-| originSrcShape | 输入 | 输入数据inputX的originshape信息[originB, originS, originH]。 |
+| srcShape | 输入 | 输入数据inputX的shape信息[B, S, H]，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)，S*H需要32B对齐。 |
+| originSrcShape | 输入 | 输入数据inputX的originshape信息[originB, originS, originH]，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。 |
 | stackBufferByteSize | 输入 | 可供BatchNorm接口使用的空间大小，单位Byte。 |
 | typeSize | 输入 | 输入数据类型的字节大小。 |
 | isReuseSource | 输入 | 中间变量是否能够复用输入内存。该参数预留，传入默认值false即可。 |
@@ -118,14 +118,14 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
     {
         TilingData tiling;
         uint32_t totalLength = context->GetInputTensor(0)->GetShapeSize();
-        context->SetBlockDim(NUM_BLOCKS);
+        context->SetSimdNumBlocks(NUM_BLOCKS);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
         ...
         std::vector<int64_t> shapeVec = {16, 16, 16};   //{b,s,h}
         std::vector<int64_t> originShapeVec = {15, 16, 16}; //{originB,originS,originH}
-        ge::Shape srcShape(shapeVec);
-        ge::Shape originSrcShape(originShapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
+        AscendC::TensorShape originSrcShape(originShapeVec);
         uint32_t minSize = 0;
         uint32_t maxSize = 0;
         // 本样例中仅作为样例说明，通过GetBatchNormMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小

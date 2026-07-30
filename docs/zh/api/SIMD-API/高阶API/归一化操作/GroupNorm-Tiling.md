@@ -53,15 +53,15 @@ GroupNorm Tiling API用于获取GroupNorm kernel计算时所需的Tiling参数�
 ## 函数原型
 
 ```
-void GetGroupNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, uint32_t& maxValue, uint32_t& minValue)
+void GetGroupNormMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, optiling::GroupNormTiling& tiling)
+void GetGroupNormNDTilingInfo(const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, optiling::GroupNormTiling& tiling)
 ```
 
 ```
-void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, AscendC::tiling::GroupNormTiling& tiling)
+void GetGroupNormNDTilingInfo(const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, AscendC::tiling::GroupNormTiling& tiling)
 ```
 
 ## 参数说明
@@ -70,7 +70,7 @@ void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBuf
 
 | 接口 | 输入/输出 | 功能 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入数据inputX的shape信息[N, C, H, W]。 |
+| srcShape | 输入 | 输入数据inputX的shape信息[N, C, H, W]，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。 |
 | typeSize | 输入 | 输入数据inputX的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 中间变量是否能够复用输入内存。 |
 | groupNum | 输入 | 在C维度上的分组数。 |
@@ -81,7 +81,7 @@ void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBuf
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入数据inputX的shape信息[N, C, H, W]。 |
+| srcShape | 输入 | 输入数据inputX的shape信息[N, C, H, W]，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。 |
 | stackBufferSize | 输入 | 可供GroupNorm接口使用的空间大小，单位Byte。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 是否可以复用inputX的内存空间。 |
@@ -126,12 +126,12 @@ void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBuf
     {
         TilingData tiling;
         uint32_t totalLength = context->GetInputTensor(0)->GetShapeSize();
-        context->SetBlockDim(NUM_BLOCKS);
+        context->SetSimdNumBlocks(NUM_BLOCKS);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
         ...
         std::vector<int64_t> shapeVec = {2, 16, 8, 8}; // {n, c, h, w}
-        ge::Shape srcShape(shapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
         uint32_t groupNum = 4;
         uint32_t minSize = 0;
         uint32_t maxSize = 0;

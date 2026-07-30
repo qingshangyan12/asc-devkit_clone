@@ -23,17 +23,14 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
- 
 ## 功能说明
-
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
 根据mask的比特位值，从源操作数src0，src1中选择元素，得到目的操作数dst。选择的规则为：当mask的比特位为1时，从src0中选取对应位置的数；当mask的比特位为0时，从src1中选取对应位置的数。
 
 计算公式如下：
 
 $$
-dst_i = (mask_i == 1) ? src0_i : src1_i
+dst_i = (mask_i == 1)\ ?\ src0_i : src1_i
 $$
 
 ## 函数原型
@@ -56,6 +53,7 @@ __simd_callee__ inline void asc_select(vector_float& dst, vector_float src0, vec
 
 ## 参数说明
 
+**表 1** 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（掩码寄存器或矢量数据寄存器）。 |
@@ -75,7 +73,7 @@ PIPE_V
 
 ## 约束说明
 
-无
+通过mask参数控制的未选中的元素保持源操作数的值而非清零。
 
 ## 调用示例
 

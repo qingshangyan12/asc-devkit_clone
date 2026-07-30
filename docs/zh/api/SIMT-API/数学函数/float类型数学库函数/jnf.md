@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline float jnf(int n, float x)
 ```
 
@@ -53,7 +53,6 @@ inline float jnf(int n, float x)
 
 ## 约束说明
 
--   使用本接口时，配置的线程数不应超过256，否则有栈溢出风险。
 -   n的最大取值为128。
 <!-- npu="950" id7 -->
 -   针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了expf，由于expf不支持Subnormal场景，在极少数场景下内部计算的expf结果为Subnormal数据，导致本接口最终结果为0。
@@ -63,7 +62,7 @@ inline float jnf(int n, float x)
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -71,7 +70,7 @@ inline float jnf(int n, float x)
 
 - SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(256) void compute_jnf(float *result, const int *n, const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -84,7 +83,7 @@ inline float jnf(int n, float x)
 
 - SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(256) inline void compute_jnf_vf(__gm__ float *result, __gm__ const int *n, __gm__ const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;

@@ -15,15 +15,15 @@ SIMT编程方式下，bank冲突为更细粒度的subbank冲突，主要有以�
 - **写写冲突**：多个写操作同时访问同一个bank group的相同编号subbank。
 - **读读冲突**：多个读操作同时访问同一个bank group的相同编号subbank。
 
-详细的UB地址低位交织规则以及冲突场景可参考[bank_conflict样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict)。
+详细的UB地址低位交织规则以及冲突场景可参考[bank_conflict样例](../../../../../../examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict)。
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
-【样例介绍】以[矩阵转置](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)为例，输入矩阵shape为1024×1024，数据类型为`float`。样例采用32×32的tile。当前基础配置中，Thread Block数量固定为硬件vector core数，每个Thread Block启动1024个线程，循环处理多个32×32 tile。全局访存合并版本先用UB暂存tile，使GM读写尽量保持连续；在此基础上，避免UB Bank冲突版本通过给UB tile增加padding，调整转置读阶段的UB行跨度，减少同一个Warp内线程集中访问相同subbank资源。
+【样例介绍】以[矩阵转置](../../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)为例，输入矩阵shape为1024×1024，数据类型为`float`。样例采用32×32的tile。当前基础配置中，Thread Block数量固定为硬件vector core数，每个Thread Block启动1024个线程，循环处理多个32×32 tile。全局访存合并版本先用UB暂存tile，使GM读写尽量保持连续；在此基础上，避免UB Bank冲突版本通过给UB tile增加padding，调整转置读阶段的UB行跨度，减少同一个Warp内线程集中访问相同subbank资源。
 
 【反例】矩阵转置使用UB做中转，转置读阶段产生较严重bank冲突。
 
-```
+```cpp
 constexpr int TILE_DIM = 32;
 
 __global__ __launch_bounds__(THREADS_PER_BLOCK) void transpose_ub_kernel(float* output, const float* input,
@@ -55,7 +55,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void transpose_ub_kernel(float* 
 
 【正例】为UB tile增加padding，打散列方向访问的bank分布。
 
-```
+```cpp
 constexpr int TILE_DIM = 32;
 
 constexpr int TILE_PAD = 2;

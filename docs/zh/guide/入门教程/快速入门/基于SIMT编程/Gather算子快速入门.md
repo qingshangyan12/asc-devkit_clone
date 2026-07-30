@@ -2,7 +2,7 @@
 
 本入门示例基于Ascend C SIMT实现一维Gather算子，带你快速上手实践，涵盖Device端核函数实现、Host端调用以及编译运行的完整流程，帮助开发者建立整体认知。
 
-开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请见[Gather](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d)。
+开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请见[Gather](../../../../../../examples/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d)。
 
 - **Gather算子功能介绍**：
 
@@ -94,7 +94,7 @@
 
     CMake配置文件示例：
 
-    ```
+    ```cmake
     cmake_minimum_required(VERSION 3.16)
     # find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
     find_package(ASC REQUIRED)
@@ -114,7 +114,7 @@
 
     编译并执行：
 
-    ```
+    ```bash
     mkdir -p build && cd build;
     cmake ..;make -j;
     ./demo

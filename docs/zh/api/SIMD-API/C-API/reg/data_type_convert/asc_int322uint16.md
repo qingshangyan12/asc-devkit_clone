@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_convert.h"`。
-
 将vector_int32_t类型转换成vector_uint16_t类型，写入目的操作数的上半部分或下半部分，并支持不同的饱和模式。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
@@ -45,14 +43,19 @@
 ## 函数原型
 
 ```cpp
+// 非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_int322uint16(vector_uint16_t& dst, vector_int32_t src, vector_bool mask)
+// 饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_int322uint16_sat(vector_uint16_t& dst, vector_int32_t src, vector_bool mask)
+// 非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_int322uint16_v2(vector_uint16_t& dst, vector_int32_t src, vector_bool mask)
+// 饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_int322uint16_sat_v2(vector_uint16_t& dst, vector_int32_t src, vector_bool mask)
 ```
 
 ## 参数说明
 
+**表 1** 参数说明
 | 参数名       | 输入/输出 | 描述               |
 | --------- | ----- | ---------------- |
 | dst       | 输出    | 目的操作数（矢量数据寄存器）。            |
@@ -71,7 +74,7 @@ PIPE_V
 
 ## 约束说明
 
-- 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
+mask未筛选的元素在输出中置零。
 
 ## 调用示例
 

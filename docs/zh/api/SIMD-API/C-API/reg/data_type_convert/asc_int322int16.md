@@ -1,4 +1,5 @@
 # asc_int322int16
+
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
@@ -25,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_convert.h"`。
-
 将int32_t类型转化为int16_t类型，支持饱和/非饱和模式。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
@@ -48,6 +47,7 @@ __simd_callee__ inline void asc_int322int16_sat_v2(vector_int16_t& dst, vector_i
 
 ## 参数说明
 
+**表 1** 参数说明
 | 参数名    | 输入/输出 | 描述                |
 | :------ | :----- | :----------------- |
 | dst    | 输出    | 目的操作数（矢量数据寄存器）。            |
@@ -66,7 +66,7 @@ PIPE_V
 
 ## 约束说明
 
-无
+mask未筛选的元素在输出中置零。
 
 ## 调用示例
 

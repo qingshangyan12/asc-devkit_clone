@@ -15,7 +15,7 @@
 
 - isSetMask参数情况：
 
-    - 模板参数有isSetMask，支持[接口外设置Mask](../SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/接口外设置Mask.md)。
+    - 模板参数有isSetMask，支持[接口外设置Mask](../SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码.md#接口外设置Mask)。
 
     - 模板参数无isSetMask，不支持接口外设置Mask。
 
@@ -29,7 +29,7 @@
 
     - **接口不支持Mask或者无需设置Mask**。
 
-更多Mask信息可参考[基于全局掩码复用的计算性能优化](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/算子实践参考/SIMD算子性能优化/矢量计算/基于全局掩码复用的计算性能优化.md)。
+更多Mask信息可参考[基于全局掩码复用的计算性能优化](../../guide/算子实践参考/SIMD算子性能优化/矢量计算/基于全局掩码复用的计算性能优化.md)。
 
 注：表中的`-`表示不存在该类型接口。
 

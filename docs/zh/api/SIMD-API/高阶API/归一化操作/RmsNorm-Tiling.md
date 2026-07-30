@@ -37,15 +37,15 @@ Ascend C提供RmsNorm Tiling API，方便用户获取RmsNorm kernel计算时所�
 ## 函数原型
 
 ```
-bool GetRmsNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false)
+bool GetRmsNormMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+bool GetRmsNormTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+bool GetRmsNormTilingInfo(const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ## 参数说明
@@ -54,7 +54,7 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入的shape信息。 |
+| srcShape | 输入 | 输入的shape信息，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | maxValue | 输出 | RmsNorm接口能完成计算所需的最大临时空间大小，超出该值的空间不会被该接口使用。在最小临时空间-最大临时空间范围内，随着临时空间增大，kernel侧接口计算性能会有一定程度的优化提升。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。最大空间大小为0表示计算不需要临时空间。<br>maxValue仅作为参考值，有可能大于Unified Buffer剩余空间的大小，该场景下，开发者需要根据Unified Buffer剩余空间的大小来选取合适的临时空间大小。 |
 | minValue | 输出 | RmsNorm接口能完成计算所需最小临时空间大小。为保证功能正确，接口计算时预留/申请的临时空间不能小于该数值。最小空间大小为0表示计算不需要临时空间。 |
@@ -64,8 +64,8 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| srcShape | 输入 | 输入的tensor的shape信息，这里是H轴向上32B对齐后的shape。需要保证srcShape的B/S和originSrcShape的B/S一致。 |
-| originSrcShape | 输入 | 输入的原始shape信息。 |
+| srcShape | 输入 | 输入的tensor的shape信息，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)，这里是H轴向上32B对齐后的shape。需要保证srcShape的B/S和originSrcShape的B/S一致。 |
+| originSrcShape | 输入 | 输入的原始shape信息，参数类型为[AscendC::TensorShape](../数据结构/TensorShape.md)。 |
 | stackBufferByteSize | 输入 | 剩余的可供RmsNorm接口计算的空间大小，单位为Byte。通过GetRmsNormMaxMinTmpSize获取最大最小临时空间大小，开发者基于此范围选择合适的空间大小作为stackBufferByteSize传入。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | tiling | 输出 | RmsNorm计算所需Tiling信息。 |
@@ -104,15 +104,15 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
     {
         RmsNormCustomTilingData tiling;
         uint32_t totalLength = context->GetInputTensor(0)->GetShapeSize();
-        context->SetBlockDim(NUM_BLOCKS);
+        context->SetSimdNumBlocks(NUM_BLOCKS);
         tiling.set_totalLength(totalLength);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
         ...
         std::vector<int64_t> shapeVec = {2, 16, 64};
-        ge::Shape srcShape(shapeVec);
+        AscendC::TensorShape srcShape(shapeVec);
         std::vector<int64_t> oriShapeVec = {2, 16, 64};
-        ge::Shape oriSrcShape(oriShapeVec);
+        AscendC::TensorShape oriSrcShape(oriShapeVec);
         // 本样例中仅作为样例说明，通过GetRmsNormMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         uint32_t minValue = 0;
         uint32_t maxValue = 0;

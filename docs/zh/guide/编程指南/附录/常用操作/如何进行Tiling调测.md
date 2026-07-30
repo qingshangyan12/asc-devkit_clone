@@ -5,13 +5,13 @@
 以下是具体步骤：
 
 1.  参考工程化算子开发的开发步骤，完成算子实现，并通过**算子包编译**或**算子动态库编译**获取对应的Tiling动态库文件。
-    -   算子包编译：Tiling实现对应的动态库为算子包部署目录下的liboptiling.so。具体路径可参考[算子包部署](../../高级编程/Aclnn算子工程化开发/算子包编译/算子包部署.md)。
-    -   动态库编译：Tiling实现集成在算子动态库libcust\_opapi.so中。具体路径可参考[算子动态库和静态库编译](../../高级编程/Aclnn算子工程化开发/算子动态库和静态库编译.md)。
+    -   算子包编译：Tiling实现对应的动态库为算子包部署目录下的liboptiling.so。具体路径可参考[算子包部署](../../高级编程/Aclnn算子工程化开发/编译与部署/基本流程.md#operator-package-deployment)。
+    -   动态库编译：Tiling实现集成在算子动态库libcust\_opapi.so中。具体路径可参考[算子动态库和静态库编译](../../高级编程/Aclnn算子工程化开发/编译与部署/算子动态库和静态库编译.md)。
 
 2.  编写测试代码。
 
     -   使用ContextBuilder配置输入输出Tensor的形状、数据类型、格式及平台信息等，构建TilingContext。
-    -   通过OpTilingRegistry的[LoadTilingLibrary](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/Utils-API/Tiling调测/OpTilingRegistry/LoadTilingLibrary.md)接口加载Tiling动态库；使用[GetTilingFunc](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/Utils-API/Tiling调测/OpTilingRegistry/GetTilingFunc.md)接口获取Tiling函数指针。
+    -   通过OpTilingRegistry的[LoadTilingLibrary](../../../../api/Utils-API/Tiling调测/OpTilingRegistry/LoadTilingLibrary.md)接口加载Tiling动态库；使用[GetTilingFunc](../../../../api/Utils-API/Tiling调测/OpTilingRegistry/GetTilingFunc.md)接口获取Tiling函数指针。
     -   执行Tiling函数，验证其正确性。
 
     ```

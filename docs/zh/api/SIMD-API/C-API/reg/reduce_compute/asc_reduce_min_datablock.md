@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
-
 根据mask将每个DataBlock(32B)中的最小值依次保存在dst中的最低位。
 
 ## 函数原型
@@ -43,6 +41,7 @@ __simd_callee__ inline void asc_reduce_min_datablock(vector_float& dst, vector_f
 
 ## 参数说明
 
+**表 1** 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
@@ -61,7 +60,10 @@ PIPE_V
 
 ## 约束说明
 
-无
+- 在比较中，遵循min(-0, +0) = -0。
+- 找到源操作数中每个DataBlock内的最小值，连续写入到目的操作数，目的操作数中的其它元素置0。
+- 未被mask选中的元素被视为最大值（浮点数为+inf），如果一个DataBlock中所有元素都未被mask选中，+inf将被填充到目的操作数的指定位置。
+- 仅输出最值，不输出index下标。
 
 ## 调用示例
 
