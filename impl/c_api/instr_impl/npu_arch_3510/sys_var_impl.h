@@ -35,6 +35,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sub_block_id_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sub_block_num_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sys_virtual_base_impl.h"
+#include "utils/base/sys_enums.h"
 
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
              "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
@@ -96,5 +97,63 @@ __aicore__ inline int64_t asc_get_phy_stack_base() { return asc_get_phy_stack_ba
 __aicore__ inline int64_t asc_get_status() { return asc_get_status_impl(); }
 
 __aicore__ inline int64_t asc_get_sys_virtual_base() { return asc_get_sys_virtual_base_impl(); }
+
+struct SaturationCtrlInfo {
+    int8_t sprBit;
+    bool invertLogic;
+};
+
+__aicore__ inline SaturationCtrlInfo get_saturation_ctrl_info(asc_saturation_mode mode)
+{
+    switch (mode) {
+        case asc_saturation_mode::FLOAT:
+            return {48, false}; // 0 => sat, 1 => no sat
+        case asc_saturation_mode::FLOAT8:
+            return {50, false}; // 0 => sat, 1 => no sat
+        case asc_saturation_mode::INT:
+            return {53, true};  // 0 => truncation, 1 => saturation
+        default:                // asc_saturation_mode::CAST
+            return {59, false}; // 0 => saturation, 1 => truncation
+    }
+}
+
+__aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat)
+{
+    SaturationCtrlInfo info = get_saturation_ctrl_info(saturation_mode);
+    int64_t ctrlValue = get_ctrl();
+    uint64_t value;
+    if (info.invertLogic) {
+        value = enable_sat ? sbitset1(ctrlValue, info.sprBit) : sbitset0(ctrlValue, info.sprBit);
+    } else {
+        value = enable_sat ? sbitset0(ctrlValue, info.sprBit) : sbitset1(ctrlValue, info.sprBit);
+    }
+    set_ctrl(value);
+}
+
+__aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode)
+{
+    SaturationCtrlInfo info = get_saturation_ctrl_info(saturation_mode);
+    int64_t value = (get_ctrl() >> info.sprBit) & 1;
+    if (info.invertLogic) {
+        return value != 0;
+    }
+    return value == 0;
+}
+
+__aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy)
+{
+    int64_t ctrlValue = get_ctrl();
+    if (strategy == asc_override_strategy::USE_API) {
+        set_ctrl(sbitset0(ctrlValue, 60));
+    } else {
+        set_ctrl(sbitset1(ctrlValue, 60));
+    }
+}
+
+__aicore__ inline asc_override_strategy asc_get_saturation_strategy()
+{
+    int64_t value = (get_ctrl() >> 60) & 1;
+    return value == 0 ? asc_override_strategy::USE_API : asc_override_strategy::USE_GLOBAL;
+}
 
 #endif

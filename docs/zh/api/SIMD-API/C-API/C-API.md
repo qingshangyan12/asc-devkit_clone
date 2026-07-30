@@ -281,6 +281,10 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |  [asc_set_l0c2gm_relu_alpha](sys_var/asc_set_l0c2gm_relu_alpha.md) | 设置RELU_ALPHA寄存器的值。 |
 | [asc_set_l0c2gm_channel_para](sys_var/asc_set_l0c2gm_channel_para.md) | 对通道步长参数的专用寄存器的比特位进行设置。 |
 | [asc_set_l3d_rpt_b](sys_var/asc_set_l3d_rpt_b.md) | 用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运的repeat参数。|
+| [asc_set_saturation_flag](sys_var/asc_set_saturation_flag.md) | 设置指定计算类型的饱和标志。 |
+| [asc_get_saturation_flag](sys_var/asc_get_saturation_flag.md) | 获取指定计算类型的饱和标志。 |
+| [asc_set_saturation_strategy](sys_var/asc_set_saturation_strategy.md) | 设置饱和模式的覆盖策略。 |
+| [asc_get_saturation_strategy](sys_var/asc_get_saturation_strategy.md) | 获取饱和模式的覆盖策略。 |
 
 ## 缓存控制
 
@@ -293,6 +297,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |  [asc_dci](cache_ctrl/asc_dci.md) | 数据缓存失效，使整个数据缓存无效化。|
 | [asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md) | 获取ICache的Preload的状态。 |
 | [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在DDR地址预加载数据到对应的cacheline中。 |
+| [asc_set_scalar_cache_mode](cache_ctrl/asc_set_scalar_cache_mode.md) | 设置标量单元的Scalar Cache模式。 |
+| [asc_get_scalar_cache_mode](cache_ctrl/asc_get_scalar_cache_mode.md) | 获取标量单元的Scalar Cache模式。 |
 
 ## 原子操作
 
