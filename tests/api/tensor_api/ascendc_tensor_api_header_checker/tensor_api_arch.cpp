@@ -11,8 +11,10 @@
 #ifndef VERIFY_SINGLE_HEADER
 #include "include/tensor_api/tensor.h"
 #else
+#include "include/tensor_api/arch/cube/copy_trait.h"
 #include "include/tensor_api/arch/cube/mmad_op.h"
 #include "include/tensor_api/arch/cube/copy_op.h"
+#include "include/tensor_api/arch/vector/copy_trait.h"
 #include "include/tensor_api/arch/vector/copy_op.h"
 #endif
 
@@ -38,9 +40,24 @@ static void test_host_tensor_api_arch_cube_copy_op()
     using AscendC::Te::CopyL12UB;
 }
 
+static void test_host_tensor_api_arch_cube_copy_trait()
+{
+    using AscendC::Te::CopyGM2L1TraitDefault;
+    using AscendC::Te::CopyL0C2GMTraitDefault;
+    using AscendC::Te::CopyL0C2UBTrait;
+    using AscendC::Te::CopyL12BTTraitDefault;
+    using AscendC::Te::CopyL12L0ATraitDefault;
+    using AscendC::Te::CopyL12L0BTraitDefault;
+}
+
 static void test_host_tensor_api_arch_vector_copy_op()
 {
     using AscendC::Te::CopyGM2UB;
     using AscendC::Te::CopyUB2GM;
     using AscendC::Te::CopyUB2L1;
+}
+
+static void test_host_tensor_api_arch_vector_copy_trait()
+{
+    using AscendC::Te::CopyUB2GMTraitDefault;
 }
