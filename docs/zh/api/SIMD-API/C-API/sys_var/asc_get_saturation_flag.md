@@ -38,6 +38,8 @@ __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mo
 
 ## 参数说明
 
+表1 参数说明
+
 |参数名|输入/输出|描述|
 | :------ | :---  | :------------ |
 |saturation_mode   |输入   |饱和模式类型，取值为`asc_saturation_mode::FLOAT`、`asc_saturation_mode::FLOAT8`、`asc_saturation_mode::INT`、`asc_saturation_mode::CAST`。|

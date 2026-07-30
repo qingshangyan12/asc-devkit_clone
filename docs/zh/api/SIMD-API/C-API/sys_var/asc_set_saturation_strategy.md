@@ -38,7 +38,7 @@ __aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strateg
 
 ## 参数说明
 
-表1参数说明
+表1 参数说明
 
 |参数名|输入/输出|描述|
 | :------ | :---  | :------------ |
