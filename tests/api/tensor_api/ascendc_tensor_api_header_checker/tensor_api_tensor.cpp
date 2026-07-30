@@ -40,7 +40,10 @@ static void test_tensor_api_tensor_layout()
 static void test_tensor_api_tensor_layout_pattern()
 {
     using AscendC::Te::DNExtLayoutPtn;
+    using AscendC::Te::NC1HWC0LayoutPtn;
+    using AscendC::Te::NCHWLayoutPtn;
     using AscendC::Te::NDExtLayoutPtn;
+    using AscendC::Te::NHWCLayoutPtn;
     using AscendC::Te::NZLayoutPtn;
     using AscendC::Te::ZNLayoutPtn;
 }
