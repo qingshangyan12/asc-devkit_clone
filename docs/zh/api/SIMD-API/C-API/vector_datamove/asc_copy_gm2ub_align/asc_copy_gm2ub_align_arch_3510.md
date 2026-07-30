@@ -136,7 +136,7 @@
 | :--- | :--- | :--- |
 | dst | 输出 | 目的操作数在UB的起始地址。需要32字节对齐。 |
 | src | 输入 | 源操作数在GM的起始地址。需要1字节对齐。 |
-| size | 输入 | 搬运数据大小，单位为字节。 |
+| size | 输入 | 搬运数据大小，单位为字节。取值范围：[0, 2097151]。 |
 | n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[0, 4095]。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[0, 2097151]。 |
 | left_padding_num | 输入 | 连续搬运数据块左侧需要补充的元素个数。该参数对应的填充数据大小不能超过32字节。Compact模式下需要设置为0。 |
@@ -158,6 +158,7 @@ PIPE_MTE2
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
 - 当`n_burst`、`len_burst`中任意一个值为0时，该接口被视为NOP（空操作）。
+- 当`size`值为0时，该接口被视为NOP（空操作）。
 - 如果需要执行多条asc_copy_gm2ub_align指令，且asc_copy_gm2ub_align指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个asc_copy_gm2ub_align指令的串行化，防止出现异常数据。
 - 当`left_padding_num`或`right_padding_num`非0时，`enable_constant_pad`不生效，必须在搬运前调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)配置填充值。`left_padding_num`、`right_padding_num`对应的填充数据大小均不能超过32字节。
 - 前n个数据搬运接口：若`size`非32字节对齐，搬运数据会补齐至32字节对齐，目的UB需要预留补齐后的空间。手动填充时，调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)配置填充值；自动填充时，由硬件填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。

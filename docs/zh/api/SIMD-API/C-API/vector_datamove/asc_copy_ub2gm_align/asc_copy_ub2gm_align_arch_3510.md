@@ -128,7 +128,7 @@
 | :--- | :--- | :--- |
 | dst | 输出 | 目的操作数在GM的起始地址。需要32字节对齐。 |
 | src | 输入 | 源操作数在UB的起始地址。需要1字节对齐。 |
-| size | 输入 | 搬运数据大小，单位为字节。 |
+| size | 输入 | 搬运数据大小，单位为字节。取值范围：[0, 2097151]。 |
 | n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[0, 4095]。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[0, 2097151]。 |
 | l2_cache_mode | 输入 | [asc_store_l2_cache_mode](../../enum/asc_store_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
@@ -147,6 +147,7 @@ PIPE_MTE3
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
 - 当`n_burst`、`len_burst`中任意一个值为0时，该接口被视为NOP（空操作）。
+- 当`size`值为0时，该接口被视为NOP（空操作）。
 - 如果需要执行多条asc_copy_ub2gm_align指令，且asc_copy_ub2gm_align指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个asc_copy_ub2gm_align指令的串行化，防止出现异常数据。
 - 前n个数据搬运接口的`size`无需32字节对齐。若`size`非32字节对齐，硬件会自动补充dummy假数据至32字节对齐。dummy假数据的值为数据块的第一个元素的值。写入GM时会丢弃补充的dummy假数据。
 - src_stride不能设置为0。如需将同一个源数据块Broadcast到GM的多个连续位置，请使用loop功能，具体请参考[关键特性说明](#关键特性说明)。
