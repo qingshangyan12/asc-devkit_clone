@@ -3,6 +3,7 @@
 .clangd.local
 /build/
 /build_ut/
+/test_atomic_sub/build/
 build_out
 output
 __pycache__/
