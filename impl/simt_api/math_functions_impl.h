@@ -110,27 +110,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x) { return logf(x) / lo
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_sqrtf_precise_impl(float x)
 {
-    /*
-     * bool p;
-     * p = (b < 1);
-     * if (p)
-     *     b = b*16777216.0f;  // x = x*2**24, get rid of subnormal
-     * float x = errrsqrt(b);  // rsqrt
-     * float x1 = x*x;
-     * float x2 = 1-b*x1;
-     * //float x3 = x2*x*0.5;
-     * x = x + x2*x*0.5;
-     * x1 = x*b;
-     * float err = b - x1*x1;
-     * x2 = x*0.5f;
-     * x2 = x2*err + x1;
-     * if (p)
-     *     x2 = x2*0.000244140625f; //x2 = x2 * 2**(-12), 返回input是subnormal的值
-     * if (std::isinf(b) || b==0)
-     *     x2 = b;
-     * return x2;
-     */
-
     constexpr float scaleUp = 16777216.0f;       // 2^24
     constexpr float scaleDown = 0.000244140625f; // 2^-12
     constexpr float half = 0.5f;
@@ -2992,7 +2971,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int umin(const unsigned int x, co
     return min(x, y);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return __fdividef(x, y); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return x / y; }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int signbit(float x) { return signbitf(x); }
 
