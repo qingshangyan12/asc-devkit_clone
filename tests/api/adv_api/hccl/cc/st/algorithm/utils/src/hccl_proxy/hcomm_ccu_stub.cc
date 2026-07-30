@@ -9,7 +9,9 @@
  */
 
 #include "ccu_kernel.h"
+#include "ccu_condition_v1.h"
 #include "ccu_rep_loopcall_v1.h"
+#include "ccu_repeat_v1.h"
 #include <vector>
 #include <string>
 
@@ -317,10 +319,6 @@ LoopBlock::LoopBlock(CcuRepContext* context, std::string label)
 {}
 
 LoopBlock::~LoopBlock() {}
-
-CcuVirRes::CcuVirRes(CcuRepContext* context) : phyRes(nullptr), context(context) {}
-
-uint16_t CcuVirRes::Id() const { return 0; }
 
 LocalNotify::LocalNotify(CcuRepContext* context) : CcuVirRes(context) {}
 
