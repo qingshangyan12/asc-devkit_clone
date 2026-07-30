@@ -21,6 +21,7 @@
 #define INCLUDE_ADV_API_HCOMM_HCOMM_H
 
 #include "kernel_basic_intf.h"
+#include "../hccl/hccl_common.h"
 #include "hcomm_common.h"
 #include "../../../impl/adv_api/detail/hcomm/impl/hcomm_impl_def.h"
 
@@ -82,6 +83,29 @@ public:
         bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const& config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t WriteNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+
+    /*!
+     * @class Hcomm
+     * @brief The task launching interface of the write-with-reduce point-to-point communication operator.
+     *        The source data is reduced into the destination data on the remote side.
+     * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
+     * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
+     * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
+     * @tparam config: URMA WQE control config, only used by URMA. Default: strongly ordered + fence + CQE enabled.
+     * @param [in] channel: The handle of the communication channel.
+     * @param [out] dst: The remote destination address of the reduction.
+     * @param [in] src: The local source address of the reduction.
+     * @param [in] count: The number of elements to reduce.
+     * @param [in] dataType: The element data type.
+     * @param [in] reduceOp: The reduction operation.
+     * @return 0 indicates success and -1 indicates failure.
+     * @note Only the UBC_CTP/URMA path supports this interface.
+     */
+    template <
+        bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const& config = URMA_DEFAULT_CFG>
+    __aicore__ inline int32_t WriteReduceNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t count,
+        HcclDataType dataType, HcclReduceOp reduceOp);
 
     /*!
      * @class Hcomm
