@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 该接口用于将矩阵计算的结果从L0C Buffer搬运至Unified Buffer（UB）中，并且在搬运过程中支持与其它接口组合使用，配置多种随路能力。
 
 下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为Cast，其余为随路scalar/tensor量化模式。
@@ -41,8 +39,8 @@ quant_pre_mode量化模式参数支持的枚举值如下：
 - NoQuant：不开启量化功能
 - DEQF16：int32_t量化成half， scalar量化
 - VDEQF16：int32_t量化成half，tensor量化
-- REQ4:int32_t量化成int4b_t，scalar量化
-- VREQ4:int32_t量化成int4b_t，tensor量化
+- REQ4：int32_t量化成int4b_t，scalar量化
+- VREQ4：int32_t量化成int4b_t，tensor量化
 - REQ8：int32_t量化成int8_t/uint8_t，scalar量化
 - VREQ8：int32_t量化成int8_t/uint8_t，tensor量化
 - QS322BF16_PRE：int32_t量化成bfloat16_t，scalar量化
