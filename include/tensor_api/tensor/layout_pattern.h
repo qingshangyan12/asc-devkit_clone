@@ -31,6 +31,9 @@ struct NDExtLayoutPtn;
 struct DNExtLayoutPtn;
 struct NZLayoutPtn;
 struct ZNLayoutPtn;
+struct NCHWLayoutPtn;
+struct NHWCLayoutPtn;
+struct NC1HWC0LayoutPtn;
 
 } // namespace Te
 } // namespace AscendC
