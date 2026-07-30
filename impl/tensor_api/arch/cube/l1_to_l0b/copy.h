@@ -27,12 +27,6 @@
 namespace AscendC {
 namespace Te {
 
-constexpr CopyL12L0BTrait DEFAULT_COPY_L1_TO_L0B_TRAIT;
-
-struct CopyL12L0BTraitDefault {
-    using TraitType = CopyL12L0BTrait;
-    static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0B_TRAIT;
-};
 
 using CopyL12L0BModeSet = TupleMap<
     Std::tuple<Std::tuple<_1, _0>, CopyMode::NORMAL>,

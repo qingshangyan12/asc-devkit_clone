@@ -50,6 +50,11 @@ struct MmadTrait {
     bool disableGemv = true;
     MmadType mmadType = MmadType::NORMAL; 
 };
+constexpr MmadTrait DEFAULT_MMAD_TRAIT;
+struct MmadTraitDefault {
+    using TraitType = MmadTrait;
+    static constexpr const TraitType value = DEFAULT_MMAD_TRAIT;
+};
 
 struct MmadParams {
     __aicore__ constexpr MmadParams() {};
@@ -100,7 +105,117 @@ struct Img2ColParams {
     T padValue = 0;
 };
 
-} // namespace Te 
+struct CopyGM2L1Trait {};
+constexpr CopyGM2L1Trait DEFAULT_COPY_GM_TO_L1_TRAIT;
+struct CopyGM2L1TraitDefault {
+    using TraitType = CopyGM2L1Trait;
+    static constexpr const TraitType value = DEFAULT_COPY_GM_TO_L1_TRAIT;
+};
+
+struct CopyL12UBTrait {};
+constexpr CopyL12UBTrait DEFAULT_COPY_L1_TO_UB_TRAIT;
+struct CopyL12UBTraitDefault {
+    using TraitType = CopyL12UBTrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L1_TO_UB_TRAIT;
+};
+
+struct CopyL12L0ATrait {};
+constexpr CopyL12L0ATrait DEFAULT_COPY_L1_TO_L0A_TRAIT;
+struct CopyL12L0ATraitDefault {
+    using TraitType = CopyL12L0ATrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0A_TRAIT;
+};
+
+struct CopyL12L0BTrait {};
+constexpr CopyL12L0BTrait DEFAULT_COPY_L1_TO_L0B_TRAIT;
+struct CopyL12L0BTraitDefault {
+    using TraitType = CopyL12L0BTrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0B_TRAIT;
+};
+
+struct CopyL12L0ScaleATrait {};
+constexpr CopyL12L0ScaleATrait DEFAULT_COPY_L1_TO_L0SCALEA_TRAIT;
+struct CopyL12L0ScaleATraitDefault {
+    using TraitType = CopyL12L0ScaleATrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0SCALEA_TRAIT;
+};
+
+struct CopyL12L0ScaleBTrait {};
+constexpr CopyL12L0ScaleBTrait DEFAULT_COPY_L1_TO_L0SCALEB_TRAIT;
+struct CopyL12L0ScaleBTraitDefault {
+    using TraitType = CopyL12L0ScaleBTrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0SCALEB_TRAIT;
+};
+
+struct CopyL12FBTrait {};
+constexpr CopyL12FBTrait DEFAULT_COPY_L1_FB_TRAIT;
+struct CopyL12FBTraitDefault {
+    using TraitType = CopyL12FBTrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L1_FB_TRAIT;
+};
+
+struct CopyL12BTTrait {};
+constexpr CopyL12BTTrait DEFAULT_COPY_L1_BT_TRAIT;
+struct CopyL12BTTraitDefault {
+    using TraitType = CopyL12BTTrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L1_BT_TRAIT;
+};
+
+struct CopyL0C2GMTrait {
+    __aicore__ constexpr CopyL0C2GMTrait() {}
+
+    __aicore__ constexpr CopyL0C2GMTrait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn) :
+        roundMode(roundModeIn), enableRelu(enableReluIn), enableChannelSplit(enableChannelSplitIn)
+    {}
+
+    RoundMode roundMode = RoundMode::DEFAULT;
+    bool enableRelu = false;
+    bool enableChannelSplit = false;
+};
+constexpr CopyL0C2GMTrait DEFAULT_COPY_L0C2GM_TRAIT = CopyL0C2GMTrait{};
+struct CopyL0C2GMTraitDefault {
+    using TraitType = CopyL0C2GMTrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L0C2GM_TRAIT;
+};
+
+struct CopyL0C2UBTrait {
+    __aicore__ constexpr CopyL0C2UBTrait() {}
+
+    __aicore__ constexpr CopyL0C2UBTrait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn,
+                                         DualDstMode dualDstCtlIn) :
+        roundMode(roundModeIn), enableRelu(enableReluIn), enableChannelSplit(enableChannelSplitIn),
+        dualDstCtl(dualDstCtlIn)
+    {}
+
+    RoundMode roundMode = RoundMode::DEFAULT;
+    bool enableRelu = false;
+    bool enableChannelSplit = false;
+    DualDstMode dualDstCtl = DUAL_DST_DISABLE;
+};
+constexpr CopyL0C2UBTrait DEFAULT_COPY_L0C2UB_TRAIT = CopyL0C2UBTrait{};
+struct CopyL0C2UBTraitDefault {
+    using TraitType = CopyL0C2UBTrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L0C2UB_TRAIT;
+};
+
+struct CopyL0C2L1Trait {
+    __aicore__ constexpr CopyL0C2L1Trait() {}
+
+    __aicore__ constexpr CopyL0C2L1Trait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn)
+        : roundMode(roundModeIn), enableRelu(enableReluIn), enableChannelSplit(enableChannelSplitIn)
+    {}
+
+    RoundMode roundMode = RoundMode::DEFAULT;
+    bool enableRelu = false;
+    bool enableChannelSplit = false;
+};
+constexpr CopyL0C2L1Trait DEFAULT_COPY_L0C2L1_TRAIT = CopyL0C2L1Trait{};
+struct CopyL0C2L1TraitDefault {
+    using TraitType = CopyL0C2L1Trait;
+    static constexpr const TraitType value = DEFAULT_COPY_L0C2L1_TRAIT;
+};
+
+} // namespace Te
 } // namespace AscendC
 
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H

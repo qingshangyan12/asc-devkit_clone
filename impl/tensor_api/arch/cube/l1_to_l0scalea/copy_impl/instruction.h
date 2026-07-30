@@ -29,7 +29,6 @@
 namespace AscendC {
 namespace Te {
 
-struct CopyL12L0ScaleATrait {};
 
 class LoadCbufToL0MxScaleA3510 {
 public:

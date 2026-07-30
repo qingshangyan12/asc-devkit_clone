@@ -27,12 +27,6 @@
 namespace AscendC {
 namespace Te {
 
-constexpr CopyL12L0ScaleBTrait DEFAULT_COPY_L1_TO_L0SCALEB_TRAIT;
-
-struct CopyL12L0ScaleBTraitDefault {
-    using TraitType = CopyL12L0ScaleBTrait;
-    static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0SCALEB_TRAIT;
-};
 
 struct CopyL12L0ScaleB {
 public:

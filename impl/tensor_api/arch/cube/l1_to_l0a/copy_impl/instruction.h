@@ -29,7 +29,6 @@
 namespace AscendC {
 namespace Te {
 
-struct CopyL12L0ATrait {};
 
 constexpr Img2ColParams<int16_t> DEFAULT_IMG2COL_PARAMS{};
 

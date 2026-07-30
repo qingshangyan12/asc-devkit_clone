@@ -29,7 +29,6 @@
 namespace AscendC {
 namespace Te {
 
-struct CopyL12UBTrait {};
 
 class CopyCbufToUbufInstr {
 public:
