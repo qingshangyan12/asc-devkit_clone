@@ -75,19 +75,92 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fabsf(float x) { return __fabsf(x); 
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmaf(float x, float y, float z) { return __fma(x, y, z); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expf(float x) { return __expf(x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expf(float x)
+{
+#ifdef __ASC_FTZ__
+    return __expf(x);
+#else
+    constexpr float subnormalBoundary = 1.17549435e-38f;
+
+    float y = __expf(x);
+    if (y >= 0.0f && y < subnormalBoundary) {
+        float halfY = __expf(x * 0.5f);
+        return halfY * halfY;
+    }
+    return y;
+#endif
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
 {
-    if (x > 0.0f && x < 1.17549435e-38f) { // 1.17549435e-38f: subnormal floating-point number boundary
-        return __logf(expf(23.0f) * x) - 23.0f;
+#ifdef __ASC_FTZ__
+    return __logf(x);
+#else
+    constexpr float subnormalBoundary = 1.17549435e-38f;
+
+    if (x > 0.0f && x < subnormalBoundary) {
+        constexpr float scaleUp = 8388608.0f;                 // 2^23
+        constexpr float compensation = -15.9423851528787421f; // -ln(2^23)
+        return __logf(x * scaleUp) + compensation;
     }
     return __logf(x);
+#endif
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x) { return logf(x) / logf(2.0f); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x) { return __sqrtf(x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_sqrtf_precise_impl(float x)
+{
+    constexpr float scaleUp = 16777216.0f;       // 2^24
+    constexpr float scaleDown = 0.000244140625f; // 2^-12
+    constexpr float half = 0.5f;
+
+    if (x == 0.0f || x == ASCRT_INF_F) {
+        return x;
+    }
+
+    bool scaled = x < 1.0f;
+    float b = scaled ? x * scaleUp : x;
+
+    float sqrtB = __sqrtf(b);
+    float inv = 1.0f / sqrtB;
+
+    float err0 = fmaf(-(b * inv), inv, 1.0f);
+    inv = fmaf(err0, inv * half, inv);
+
+    float y = inv * b;
+    float err1 = fmaf(-y, y, b);
+    y = fmaf(inv * half, err1, y);
+
+    return scaled ? y * scaleDown : y;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x)
+{
+#if defined(__ASC_FTZ__) && !defined(__ASC_PREC_SQRT__)
+    return __sqrtf(x);
+#elif !defined(__ASC_FTZ__) && defined(__ASC_PREC_SQRT__)
+    return __asc_sqrtf_precise_impl(x);
+#else
+    constexpr float subnormalBoundary = 1.17549435e-38f;
+    float absX = fabsf(x);
+    bool isSubnormal = absX > 0.0f && absX < subnormalBoundary;
+
+#if defined(__ASC_FTZ__) && defined(__ASC_PREC_SQRT__)
+    if (isSubnormal && x > 0.0f) {
+        x = 0.0f;
+    }
+    return __asc_sqrtf_precise_impl(x);
+#else
+    constexpr float scaleUp = 16777216.0f;       // 2^24
+    constexpr float scaleDown = 0.000244140625f; // 2^-12
+    if (isSubnormal && x > 0.0f) {
+        return __sqrtf(x * scaleUp) * scaleDown;
+    }
+    return __sqrtf(x);
+#endif
+#endif
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rsqrtf(float x) { return 1.0f / sqrtf(x); }
 
