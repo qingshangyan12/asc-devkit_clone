@@ -15,9 +15,10 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_SIMD_DUMP_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_SIMD_DUMP_IMPL_H
 
+#include "impl/utils/sys_macros.h"
+
 #ifndef ASCENDC_CPU_DEBUG
 
-#include "impl/utils/sys_macros.h"
 #include "impl/utils/debug/asc_debug_utils.h"
 
 namespace __asc_simd_vf {
@@ -163,6 +164,48 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
     enable_asc_diagnostics();
     asc_dump_impl<DumpTensorPosition::UB, T>(input, desc, dump_size);
 #endif
+}
+} // namespace __asc_simd_vf
+
+#else
+
+#include <cassert>
+
+namespace __asc_simd_vf {
+template <typename T, typename U>
+__simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_size)
+{
+    (void)input;
+    (void)desc;
+    (void)dump_size;
+    assert(false && "asc_dump_reg is not supported in cpu mode.");
+}
+
+template <typename T>
+__simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    (void)input;
+    (void)desc;
+    (void)dump_size;
+    assert(false && "asc_dump_ubuf is not supported in cpu mode.");
+}
+
+template <typename T, typename U>
+__simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size)
+{
+    (void)input;
+    (void)desc;
+    (void)dump_size;
+    assert(false && "asc_dump is not supported in cpu mode.");
+}
+
+template <typename T>
+__simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    (void)input;
+    (void)desc;
+    (void)dump_size;
+    assert(false && "asc_dump is not supported in cpu mode.");
 }
 } // namespace __asc_simd_vf
 
