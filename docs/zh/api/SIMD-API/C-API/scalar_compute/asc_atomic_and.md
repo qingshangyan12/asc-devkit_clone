@@ -30,7 +30,9 @@
 
 读取address指向的GM地址上的旧值（old_value），将旧值与输入标量值val进行按位与运算，结果（new_value）写回GM地址，返回该地址修改前的值（old_value）。
 
-$$new\_value = old\_value\ \&\ val$$
+$$
+new\_value = old\_value\ \&\ val
+$$
 
 ## 函数原型
 

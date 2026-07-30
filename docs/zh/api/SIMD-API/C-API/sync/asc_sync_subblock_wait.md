@@ -27,9 +27,7 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
-
-在分离模式下，AIC（Cube核）与AIV（Vector核）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组内subblock间同步指同一group内不同subblock（AIV）之间的同步。
+在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组内subblock间同步指同一group内不同subblock（AIV）之间的同步。
 
 核间同步指令，每个flag_id均分配有计数器，执行asc_sync_subblock_arrive后计数器将递增；执行asc_sync_subblock_wait时如果对应的计数器数值为0则阻塞；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 

@@ -26,9 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
-
-在分离模式下，AIC（Cube核）与AIV（Vector核）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。block内同步指同一block内block（AIC）与单个subblock（AIV）之间的同步。
+在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。block内同步指同一block内block（AIC）与单个subblock（AIV）之间的同步。
 
 block内同步指令，与[asc_sync_intra_wait](asc_sync_intra_wait.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应Vector Core与Cube Core中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他Core对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
@@ -76,10 +74,10 @@ PIPE_S
 - 需要保证相同的ID只会被一个流水线控制。
 - 每个ID对应一个计数器，特定CORE的同步ID计数器可通过其他CORE发起的asc_sync_intra_arrive递增；也可通过本身发起的asc_sync_intra_wait递减。 
 - 三个CORE的ID映射规则如下：
-    - ID为0~15的矢量计算核0的asc_sync_intra_arrive指令会被映射到矩阵计算核的0~15的ID。 
-    - ID为0~15的矢量计算核1的asc_sync_intra_arrive指令会被映射到矩阵计算核的16~31的ID。 
-    - ID为0~15的矩阵计算核的asc_sync_intra_arrive指令会被映射到矢量计算核0的0~15的ID。 
-    - ID为16~31的矩阵计算核的asc_sync_intra_arrive指令会被映射到矢量计算核1的0~15的ID。 
+    - ID为0~15的Vector Core 0的asc_sync_intra_arrive指令会被映射到Cube Core的0~15的ID。 
+    - ID为0~15的Vector Core 1的asc_sync_intra_arrive指令会被映射到Cube Core的16~31的ID。 
+    - ID为0~15的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 0的0~15的ID。 
+    - ID为16~31的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 1的0~15的ID。 
 
 - 必须保证配套使用asc_sync_intra_arrive和[asc_sync_intra_wait](asc_sync_intra_wait.md)，否则会出现未定义行为。
 - pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_S，不支持PIPE_ALL。
