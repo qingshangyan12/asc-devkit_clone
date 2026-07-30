@@ -22,7 +22,6 @@
 #ifndef IMPL_TENSOR_API_ATOM_MMAD_ATOM_IMPL_H
 #define IMPL_TENSOR_API_ATOM_MMAD_ATOM_IMPL_H
 
-#include "tensor_api/atom/cube/mmad_atom.h"
 #include "impl/tensor_api/atom/cube/mmad.h"
 #include "impl/tensor_api/atom/mmad_traits_impl.h"
 

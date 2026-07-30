@@ -57,7 +57,4 @@ static void test_host_tensor_api_arch_vector_copy_op()
     using AscendC::Te::CopyUB2L1;
 }
 
-static void test_host_tensor_api_arch_vector_copy_trait()
-{
-    using AscendC::Te::CopyUB2GMTraitDefault;
-}
+static void test_host_tensor_api_arch_vector_copy_trait() { using AscendC::Te::CopyUB2GMTraitDefault; }

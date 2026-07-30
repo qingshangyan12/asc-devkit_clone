@@ -22,7 +22,6 @@
 #ifndef IMPL_TENSOR_API_ATOM_COPY_ATOM_IMPL_H
 #define IMPL_TENSOR_API_ATOM_COPY_ATOM_IMPL_H
 
-#include "tensor_api/atom/cube/copy_atom.h"
 #include "impl/tensor_api/atom/cube/copy_gm2l1.h"
 
 #include "impl/tensor_api/atom/cube/copy_l0c2gm.h"
