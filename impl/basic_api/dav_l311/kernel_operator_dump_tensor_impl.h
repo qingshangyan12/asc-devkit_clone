@@ -204,6 +204,8 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
                 static_cast<uint64_t>(QuantMode_t::NoQuant), static_cast<uint8_t>(false), false, false,
                 static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true, false, false,
                 false);
+        } else {
+            ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "float is not supported"); });
         }
     }
     PipeBarrier<PIPE_ALL>();
