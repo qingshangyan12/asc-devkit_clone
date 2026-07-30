@@ -1,0 +1,24 @@
+testcases:
+- dir_name: gatherb1911_custom
+  file_basename: gatherb1911_custom_operator
+  soc_version: [ascend910D1]
+  kernel_name: gatherb1911_custom_kernel
+  core_type: VectorCore
+  core_num: 1
+  params:
+  - name: src
+    shape: [16320]
+    cpp_dtype: float
+    param_type: input
+    data_path: src.bin
+  - name: offset
+    shape: [2040]
+    cpp_dtype: uint32_t
+    param_type: input
+    data_path: offset.bin
+  - name: dst
+    shape: [16320]
+    cpp_dtype: float
+    param_type: output
+    data_path: output.bin
+    golden_path: golden.bin
