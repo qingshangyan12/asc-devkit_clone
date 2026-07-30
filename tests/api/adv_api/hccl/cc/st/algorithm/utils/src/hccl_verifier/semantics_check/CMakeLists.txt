@@ -22,4 +22,6 @@ target_sources(hccl-verifier PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/send_recv_semantics_checker.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/scatter_semantics_checker.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/batchsendrecv_semantics_checker.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_all_to_all_v_semantics_checker.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_all_to_all_v_mc2_checker.cc
 )
