@@ -75,9 +75,9 @@ static TopoMeta BuildTopoMeta(uint32_t rankSize)
 struct Mc2TilingTestData {
     uint32_t version;
     uint32_t cnt;
-    uint32_t offset[Hccl::MC2_MAX_OP_NUM];
+    uint32_t offset[MAX_OP_NUM];
     Mc2ServerCfg serverCfg;
-    Mc2CcTilingInner ccTiling[Hccl::MC2_MAX_OP_NUM];
+    Mc2CcTilingInner ccTiling[MAX_OP_NUM];
 };
 
 static Mc2TilingTestData BuildMc2Tiling(
@@ -89,7 +89,8 @@ static Mc2TilingTestData BuildMc2Tiling(
                                                                                       INIT_TILING_VERSION;
     tiling.cnt = tilingNum;
     uint32_t baseOffset = offsetof(Mc2TilingTestData, ccTiling);
-    for (uint32_t i = 0; i < Hccl::MC2_MAX_OP_NUM; ++i) {
+    constexpr uint32_t ACTUAL_MAX_OP_NUM = 8; // 使用明确常量，避免命名空间污染
+    for (uint32_t i = 0; i < ACTUAL_MAX_OP_NUM; ++i) {
         tiling.offset[i] = baseOffset + i * sizeof(Mc2CcTilingInner);
     }
     for (uint32_t i = 0; i < tilingNum; ++i) {

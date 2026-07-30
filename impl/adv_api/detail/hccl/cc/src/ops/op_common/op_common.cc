@@ -836,16 +836,24 @@ HcclResult HcclGetAlgRes(
             aicpuRet, size, *resCtxSequence);
         CHK_RET(aicpuRet);
     } else if (param.engine == COMM_ENGINE_CCU) {
-        HCCL_INFO(
-            "[asc][AlgoResource][HcclGetAlgRes] before GetAlgResCcu, opType[%d], algTag[%s].", param.opType,
-            param.algTag);
-        HcclResult ccuRet =
-            GetAlgResCcu(comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size);
-        HCCL_INFO(
-            "[asc][AlgoResource][HcclGetAlgRes] after GetAlgResCcu, ret[%d], ctxSize[%llu], "
-            "resCtxSequence[%p].",
-            ccuRet, size, *resCtxSequence);
-        CHK_RET(ccuRet);
+        if (std::string(param.algName).find("Ins") == 0) {
+            bool increCreateChannelFlag = false;
+            HcclResult aicpuRet = GetAlgResAICPU(
+                comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size,
+                increCreateChannelFlag);
+            CHK_RET(aicpuRet);
+        } else {
+            HCCL_INFO(
+                "[asc][AlgoResource][HcclGetAlgRes] before GetAlgResCcu, opType[%d], algTag[%s].", param.opType,
+                param.algTag);
+            HcclResult ccuRet =
+                GetAlgResCcu(comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size);
+            HCCL_INFO(
+                "[asc][AlgoResource][HcclGetAlgRes] after GetAlgResCcu, ret[%d], ctxSize[%llu], "
+                "resCtxSequence[%p].",
+                ccuRet, size, *resCtxSequence);
+            CHK_RET(ccuRet);
+        }
     } else {
         HCCL_ERROR("fail to get engine.", HCCL_E_PARA);
     }
@@ -1756,11 +1764,8 @@ HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
 HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 {
     (void)comm;
-    const char* useCcuKfc = std::getenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
-    const HcclOpExpansionMode finalMode = (useCcuKfc != nullptr && std::strcmp(useCcuKfc, "1") == 0) ?
-                                              HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED :
-                                              HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;
-    HCCL_DEBUG("[HcclGetOpExpansionMode] finalMode: %d", finalMode);
+    HcclOpExpansionMode finalMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED;
+    HCCL_DEBUG("[DecideHcclOpExpansionMode] configOpExpansionMode: CCU_SCHED");
 
     // 第二步：应用选择的模式到param
     HcclResult ret = ApplyOpExpansionMode(param, finalMode);

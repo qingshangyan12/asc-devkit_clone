@@ -77,4 +77,6 @@ bool HcommIsExportThreadSupported()
     fprintf(stderr, "[HcclWrapper-STUB] HcommIsExportThreadSupported stub called\n");
     return true;
 }
+
+bool HcommIsExportThreadSupported() { return true; }
 }

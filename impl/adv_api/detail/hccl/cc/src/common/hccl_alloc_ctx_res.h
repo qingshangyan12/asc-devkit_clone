@@ -43,6 +43,7 @@ constexpr uint32_t MC2_TILING_VERSION = 2U;
 constexpr uint32_t MAX_HCOM_NUM = 3U;
 
 constexpr uint32_t INIT_TILING_VERSION = 100U;
+constexpr uint32_t MAX_OP_NUM = 8U;
 constexpr uint32_t INIT_TILING_CCU_NEW_VERSION = 101U;
 constexpr uint32_t MAX_CC_TILING_NUM = 8U;
 
@@ -98,14 +99,14 @@ struct OpResCtx {
     AlgInfo algInfo[MAX_CC_TILING_NUM];
 
     // for ccu
-    uint64_t xnAddr;                    // xn寄存器起始地址
-    uint64_t ckeAddr;                   // cke寄存器起始地址
-    uint64_t sprAddr;                   // spr寄存器起始地址
-    uint64_t res[Hccl::MC2_MAX_OP_NUM]; // MS地址，预留
-    uint64_t resCtx;                    // 资源地址，用于资源下发时的处理
-    uint32_t opType[Hccl::MC2_MAX_OP_NUM];
-    uint32_t algorithmType[Hccl::MC2_MAX_OP_NUM];
-    bool isKfc[Hccl::MC2_MAX_OP_NUM]; // 用于标记是否走kfcServer
+    uint64_t xnAddr;          // xn寄存器起始地址
+    uint64_t ckeAddr;         // cke寄存器起始地址
+    uint64_t sprAddr;         // spr寄存器起始地址
+    uint64_t res[MAX_OP_NUM]; // MS地址，预留
+    uint64_t resCtx;          // 资源地址，用于资源下发时的处理
+    uint32_t opType[MAX_OP_NUM];
+    uint32_t algorithmType[MAX_OP_NUM];
+    bool isKfc[MAX_OP_NUM]; // 用于标记是否走kfcServer
 };
 
 enum AlgorithmType {

@@ -222,7 +222,7 @@ HcclResult AllocComResourceByTilingAicpu(
     HcclComm comm, void* stream, void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, const char* commName,
     u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag)
 {
-    std::string topoTag[Hccl::MC2_MAX_OP_NUM];
+    std::string topoTag[MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
 
     std::vector<OpParam> opParamVec(tilingNum);
@@ -257,7 +257,7 @@ HcclResult AllocComResourceByTilingCcu(
     u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag)
 {
     HCCL_INFO("[AllocComResourceByTilingCcu]start AllocComResourceByTilingCcu!");
-    std::string topoTag[Hccl::MC2_MAX_OP_NUM];
+    std::string topoTag[MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
     HCCL_INFO("[AllocComResourceByTilingCcu]BuildTagsAndValidate successfully!");
 
@@ -294,18 +294,20 @@ HcclResult AllocComResourceByTilingCcu(
     return HCCL_SUCCESS;
 }
 
-namespace {
-HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
+    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     HCCL_RUN_INFO(
         "[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
         "comm[%p], stream[%p], tiling[%p].",
         comm, stream, mc2Tiling);
+    HCCL_INFO("Start to run execute HcclAllocComResourceByTiling");
     // 记录开始时间，用于性能统计
     HcclUs startut = TIME_NOW();
     // 获取设备类型
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
+    HCCL_INFO("[HcclAllocComResourceByTiling]hrtGetDeviceType successfully!");
 
     // 检查设备类型是否支持新流程，950或910_95支持新流程，其他设备走老流程
     if (deviceType != DevType::DEV_TYPE_950) {
@@ -316,29 +318,36 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
     // 初始化环境变量配置，解析HCCL相关的环境变量
     // 包括算子展开模式、确定性计算、通信方式、日志开关等配置
     CHK_RET(InitEnvConfig());
+    HCCL_INFO("[HcclAllocComResourceByTiling]InitEnvConfig successfully!");
 
     // 检查输入参数的合法性（comm、sendBuf、recvBuf、stream不能为空）
     CHK_RET(CheckInputParam(comm, mc2Tiling, stream));
+    HCCL_INFO("[HcclAllocComResourceByTiling]CheckInputParam successfully!");
 
     // 获取通信域中的rank数量
     u32 rankSize = INVALID_VALUE_RANKSIZE;
     CHK_RET(HcclGetRankSize(comm, &rankSize));
+    HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetRankSize successfully!");
 
     // 获取当前rank的ID
     u32 userRank = INVALID_VALUE_RANKID;
     CHK_RET(HcclGetRankId(comm, &userRank));
+    HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetRankId successfully!");
 
     // 获取通信域名称
     char commName[COMM_INDENTIFIER_MAX_LENGTH];
     CHK_RET(HcclGetCommName(comm, commName));
+    HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetCommName successfully!");
 
-    const void* ccTilingList[Hccl::MC2_MAX_OP_NUM];
+    const void* ccTilingList[MAX_OP_NUM];
     uint32_t tilingNum;
     CHK_RET(HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum));
+    HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetTilingList successfully!");
 
     // 校验commengine
     uint8_t commEngine;
     CHK_RET(ObtainCommEngine(ccTilingList, tilingNum, commEngine));
+    HCCL_INFO("[HcclAllocComResourceByTiling]ObtainCommEngine successfully!");
 
     // 根据commEngine类型分发到对应的资源分配流程
     std::string ctxTag;
@@ -355,9 +364,13 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
         HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, commEngine);
         return HCCL_E_NOT_SUPPORT;
     }
+    HCCL_INFO("[HcclAllocComResourceByTiling]AllocComResourceByTilingCcu successfully!");
 
     // 记录退出日志和性能统计信息
     CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
+
+    HCCL_INFO("End to run execute HcclAllocComResourceByTiling");
+
     return HCCL_SUCCESS;
 }
 } // namespace
@@ -376,6 +389,145 @@ extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourc
         "comm[%p], stream[%p], tiling[%p].",
         comm, stream, mc2Tiling);
     return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+}
+
+namespace {
+CcuResult CopyOpResCtxToHost(void* opResCtx, OpResCtx& opResHost)
+{
+    HCCL_INFO("[CcuKernelLaunch]Obtain OpResCtx.");
+    aclError aclRet = aclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), ACL_MEMCPY_DEVICE_TO_HOST);
+    CHK_PRT_RET(
+        aclRet != ACL_SUCCESS,
+        HCCL_ERROR(
+            "[CcuKernelLaunch] aclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].", aclRet, opResCtx,
+            sizeof(OpResCtx)),
+        CCU_E_INTERNAL);
+    CHK_PRT_RET(
+        opResHost.algInfo[0].opParam == 0U,
+        HCCL_ERROR("invalid ccu op resource ctx, opParam[%llu].", opResHost.algInfo[0].opParam), CCU_E_PARA);
+    CHK_PRT_RET(
+        opResHost.workSpace == 0U || opResHost.workSpaceSize == 0U,
+        HCCL_ERROR(
+            "invalid ccu op resource ctx, workSpace[%llu], workSpaceSize[%llu].", opResHost.workSpace,
+            opResHost.workSpaceSize),
+        CCU_E_PARA);
+    return CCU_SUCCESS;
+}
+
+CcuResult CopyOpParamToHost(const OpResCtx& opResHost, OpParam& opParamHost)
+{
+    HCCL_INFO("[CcuKernelLaunch]Obtain OpParam.");
+    void* opParamDev = reinterpret_cast<void*>(opResHost.algInfo[0].opParam);
+    aclError aclRet =
+        aclrtMemcpy(&opParamHost, sizeof(OpParam), opParamDev, sizeof(OpParam), ACL_MEMCPY_DEVICE_TO_HOST);
+    CHK_PRT_RET(
+        aclRet != ACL_SUCCESS,
+        HCCL_ERROR(
+            "[CcuKernelLaunch] aclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].", aclRet, opParamDev,
+            sizeof(OpParam)),
+        CCU_E_INTERNAL);
+    CHK_PRT_RET(
+        opParamHost.resCtx == nullptr || opParamHost.ctxSize == 0U,
+        HCCL_ERROR("invalid ccu op resource ctx, resCtx[%p], ctxSize[%llu].", opParamHost.resCtx, opParamHost.ctxSize),
+        CCU_E_PARA);
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadResourceCtx(const OpParam& opParamHost, AlgResourceCtxSerializable& resourceCtx)
+{
+    HCCL_INFO("[CcuKernelLaunch]Obtain resCtx.");
+    auto* resCtx = static_cast<char*>(opParamHost.resCtx);
+    std::vector<char> seq(opParamHost.ctxSize);
+    HCCL_INFO("[CcuKernelLaunch]Start aclrtMemcpy D2H.");
+    aclError aclRet =
+        aclrtMemcpy(seq.data(), opParamHost.ctxSize, resCtx, opParamHost.ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
+    CHK_PRT_RET(
+        aclRet != ACL_SUCCESS,
+        HCCL_ERROR(
+            "[CcuKernelLaunch] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet, seq.data(),
+            resCtx, opParamHost.ctxSize),
+        CCU_E_INTERNAL);
+    HCCL_INFO("[CcuKernelLaunch]Start resourceCtx DeSerialize.");
+    resourceCtx.DeSerialize(seq);
+    return CCU_SUCCESS;
+}
+
+CcuResult GetLaunchHandles(
+    const AlgResourceCtxSerializable& resourceCtx, ThreadHandle& threadHandle, CcuKernelHandle& kernelHandle)
+{
+    CHK_PRT_RET(resourceCtx.threads.empty(), HCCL_ERROR("empty ccu threads"), CCU_E_PARA);
+    CHK_PRT_RET(resourceCtx.ccuKernels.empty(), HCCL_ERROR("empty ccu kernels"), CCU_E_PARA);
+
+    threadHandle = resourceCtx.threads[0];
+    CHK_PRT_RET(threadHandle == 0, HCCL_ERROR("invalid threadHandle"), CCU_E_PARA);
+
+    // HcclGetCcuKernel 已根据 isKfc 过滤，isKfc=true 时 ccuKernels[0] 即为 CcuKfcServerKernel
+    kernelHandle = resourceCtx.ccuKernels[0];
+    CHK_PRT_RET(kernelHandle == 0, HCCL_ERROR("invalid kernelHandle"), CCU_E_PARA);
+    CHK_PRT_RET(
+        resourceCtx.kfcServerArgSize != 0U && resourceCtx.kfcServerArgs.empty(),
+        HCCL_ERROR("invalid kfcServerArgs, kfcServerArgSize[%u].", resourceCtx.kfcServerArgSize), CCU_E_PTR);
+    return CCU_SUCCESS;
+}
+
+void LogKernelLaunchArgs(
+    const AlgResourceCtxSerializable& resourceCtx, ThreadHandle threadHandle, CcuKernelHandle kernelHandle)
+{
+    if (resourceCtx.kfcServerArgs.size() >= 6U) {
+        HCCL_INFO(
+            "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
+            "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], "
+            "xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], missionNum[%llu], "
+            "missionIndex[%llu], token[%llu]",
+            static_cast<unsigned long long>(threadHandle), static_cast<unsigned long long>(kernelHandle),
+            resourceCtx.kfcServerArgSize, static_cast<unsigned long long>(resourceCtx.kfcServerArgs[0]),
+            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[1]),
+            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[2]),
+            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[3]),
+            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[4]),
+            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[5]));
+    } else {
+        HCCL_INFO(
+            "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
+            "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], kfcServerArgsSize[%zu]",
+            static_cast<unsigned long long>(threadHandle), static_cast<unsigned long long>(kernelHandle),
+            resourceCtx.kfcServerArgSize, resourceCtx.kfcServerArgs.size());
+    }
+}
+} // namespace
+
+CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
+{
+    CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
+    CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
+
+    // HcclEngineCtxCreate分配的OpResCtx、OpParam和序列化资源均位于device，需逐层拷贝到host。
+    OpResCtx opResHost{};
+    CcuResult ret = CopyOpResCtxToHost(opResCtx, opResHost);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    OpParam opParamHost{};
+    ret = CopyOpParamToHost(opResHost, opParamHost);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    AlgResourceCtxSerializable resourceCtx;
+    ret = LoadResourceCtx(opParamHost, resourceCtx);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    ThreadHandle threadHandle = 0;
+    CcuKernelHandle kernelHandle = 0;
+    ret = GetLaunchHandles(resourceCtx, threadHandle, kernelHandle);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    LogKernelLaunchArgs(resourceCtx, threadHandle, kernelHandle);
+    HCCL_INFO("[CcuKernelLaunch]Start HcommCcuKernelLaunch.");
+    const void* kfcArgs =
+        resourceCtx.kfcServerArgs.empty() ? nullptr : static_cast<const void*>(resourceCtx.kfcServerArgs.data());
+    return HcommCcuKernelLaunch(threadHandle, kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
 }
 
 namespace {
