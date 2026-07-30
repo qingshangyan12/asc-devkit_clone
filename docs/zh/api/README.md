@@ -1220,6 +1220,7 @@
             -   [asc_set_l13d_size](SIMD-API/C-API/cube_datamove/asc_set_l13d_size.md)
         -   [矩阵计算](SIMD-API/C-API/cube_compute/矩阵计算.md)
             -   [asc_enable_hf32](SIMD-API/C-API/cube_compute/asc_enable_hf32.md)
+            -   [asc_set_hf32_round_mode](SIMD-API/C-API/cube_compute/asc_set_hf32_round_mode.md)
             -   [asc_enable_hf32_trans](SIMD-API/C-API/cube_compute/asc_enable_hf32_trans.md)
             -   [asc_enable_hif8](SIMD-API/C-API/cube_compute/asc_enable_hif8.md)
             -   [asc_enable_fp8](SIMD-API/C-API/cube_compute/asc_enable_fp8.md)
