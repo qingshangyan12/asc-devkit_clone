@@ -179,7 +179,28 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
 
         具体而言，在多流场景下，某条流的核间同步算子虽分配到n个物理核，但可能仅有n-m个核先被调度执行，而其余m个核因被其他流的核间同步算子抢占而尚未启动。先启动的n-m个核执行到核间同步时等待剩余m核完成，而剩余m核因被其他流的核间同步算子占用而无法释放，形成死锁。
         Kernel直调场景下通过[\_\_schedmode\_\_\(mode\)](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)限定符来设置batchmode模式；工程化算子开发场景下，通过TilingContext的SetScheduleMode接口来设置batchmode模式，具体请参考[《基础数据结构和接口》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/basicdataapi/atlasopapi_07_00001.html)。
-    - SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为[11-14]。
+    - SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)进行核间同步控制，因此开发者同时使用CrossCoreSetFlag（或CrossCoreWaitFlag）和SyncAll硬件同步接口时，需注意避免以下[flagId](CrossCoreSetFlag(ISASI).md#flagId取值范围说明)冲突：
+
+        **表3**  SyncAll硬件同步接口flagId占用情况
+
+        | SyncAll 使用场景 | 占用 flagId | 占用计算核 |
+        | :--- | :--- | :--- |
+        | isAIVOnly=true（纯Vector全核同步） | 14 | AIV |
+        | isAIVOnly=false（Mix全核同步） | 11、12、13 | AIC：11、12、13 / AIV：12、13 |
+
+        <!-- npu="950" id28 -->
+        仅Ascend 950PR/Ascend 950DT，在Mix全核同步的 `MIX_CORE_AIC_RATION≠1` 时（即 `__mix__(1, 2)` 对应的默认场景），除上述flagId外，AIC额外占用以下flagId用于与AIV1通信：
+
+        > 说明：`MIX_CORE_AIC_RATION` 是由核函数修饰符 `__mix__(a, b)` 设定的编译期常量，表示每个 AI Core 内 AIC 与 AIV 的数量关系。当核函数使用 `__mix__(1, 1)` 修饰时，`MIX_CORE_AIC_RATION=1`（松耦合模式，1 个 AIC + 1 个 AIV）；当使用 `__mix__(1, 2)` 修饰时，`MIX_CORE_AIC_RATION=2`（默认值，1 个 AIC + 2 个 AIV）。后者需要额外占用 flagId，详见下表。
+
+        **表4**  SyncAll硬件同步接口flagId额外占用情况（`MIX_CORE_AIC_RATION≠1` 时，仅Ascend 950PR/Ascend 950DT）
+
+        | SyncAll 使用场景 | 额外占用 flagId | 占用计算核 |
+        | :--- | :--- | :--- |
+        | isAIVOnly=false（Mix全核同步，`MIX_CORE_AIC_RATION≠1` 时） | 28、29 | AIC：28、29 |
+
+        > 说明：28 = 12 + 16（对应AIV1视角的flagId=12），29 = 13 + 16（对应AIV1视角的flagId=13）。硬件上AIV1的flagId在AIC侧会自动偏移+16。
+        <!-- end id28 -->
 
 - 硬件同步接口和软件同步接口公共约束：使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 

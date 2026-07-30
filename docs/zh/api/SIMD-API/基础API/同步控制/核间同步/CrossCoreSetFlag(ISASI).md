@@ -109,6 +109,8 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     - AIC发起的flagId 16-31的CrossCoreSetFlag操作对应AIV1 CrossCoreWaitFlag中flagId 0-15的操作。
 <!-- end id13 -->
 
+此外，当与Matmul高阶API或SyncAll接口同时使用时，开发者自行使用的flagId还需注意避免与这些接口内部已占用的flagId冲突，详见[约束说明](#flagId冲突说明)中的flagId占用情况。
+
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
@@ -128,9 +130,30 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
         | 2 | \_\_mix\_\_(1, 1)、\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1、KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
         | 4 | \_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
 
-- 接口使用模式0、1、2，需要避免flagId使用冲突：
+- 接口使用模式0、1、2，需要避免flagId使用冲突：<a name="flagId冲突说明"></a>
     - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
-    - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagId冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
+    - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，因此开发者同时使用CrossCoreSetFlag（或CrossCoreWaitFlag）和SyncAll硬件同步接口时，需注意避免以下flagId冲突：
+
+        **表4**  SyncAll硬件同步接口flagId占用情况
+
+        | SyncAll 使用场景 | 占用 flagId | 占用计算核 |
+        | :--- | :--- | :--- |
+        | isAIVOnly=true（纯Vector全核同步） | 14 | AIV |
+        | isAIVOnly=false（Mix全核同步） | 11、12、13 | AIC：11、12、13 / AIV：12、13 |
+
+        <!-- npu="950" id15 -->
+        仅Ascend 950PR/Ascend 950DT，在Mix全核同步的 `MIX_CORE_AIC_RATION≠1` 时（即 `__mix__(1, 2)` 对应的默认场景），除上述flagId外，AIC额外占用以下flagId用于与AIV1通信：
+
+        > 说明：`MIX_CORE_AIC_RATION` 是由核函数修饰符 `__mix__(a, b)` 设定的编译期常量，表示每个 AI Core 内 AIC 与 AIV 的数量关系。当核函数使用 `__mix__(1, 1)` 修饰时，`MIX_CORE_AIC_RATION=1`（松耦合模式，1 个 AIC + 1 个 AIV）；当使用 `__mix__(1, 2)` 修饰时，`MIX_CORE_AIC_RATION=2`（默认值，1 个 AIC + 2 个 AIV）。后者需要额外占用 flagId，详见下表。
+
+        **表5**  SyncAll硬件同步接口flagId额外占用情况（`MIX_CORE_AIC_RATION≠1` 时，仅Ascend 950PR/Ascend 950DT）
+
+        | SyncAll 使用场景 | 额外占用 flagId | 占用计算核 |
+        | :--- | :--- | :--- |
+        | isAIVOnly=false（Mix全核同步，`MIX_CORE_AIC_RATION≠1` 时） | 28、29 | AIC：28、29 |
+
+        > 说明：28 = 12 + 16（对应AIV1视角的flagId=12），29 = 13 + 16（对应AIV1视角的flagId=13）。硬件上AIV1的flagId在AIC侧会自动偏移+16。
+        <!-- end id15 -->
 - 用户需要确保配套使用CrossCoreSetFlag和CrossCoreWaitFlag，否则会出现未定义行为。
 - 核间同步的模式为模式0、1、2时，模板参数pipe不支持设置为PIPE\_ALL，PIPE\_S。
 <!-- npu="950" id14 -->
