@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 将数据从GM搬运到L0A Buffer。
 
 ## 函数原型
@@ -85,6 +83,6 @@ PIPE_MTE2
 ## 调用示例
 ```cpp
 __ca__ half dst[256];
-__gm__ half src[256];
+// src表示源操作数的起始地址
 asc_copy_gm2l0a(dst, src, 0, 1, 64, 64);
 ```
