@@ -93,19 +93,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
 {
-#ifdef __ASC_FTZ__
-    return __logf(x);
-#else
-    constexpr float subnormalBoundary = 1.17549435e-38f;
-
-    if (x > 0.0f && x < subnormalBoundary) {
-        constexpr float scaleUp = 8388608.0f;                 // 2^23
-        constexpr float compensation = -15.9423851528787421f; // -ln(2^23)
-        return __logf(x * scaleUp) + compensation;
+    if (x > 0.0f && x < 1.17549435e-38f) { // 1.17549435e-38f: subnormal floating-point number boundary
+        return __logf(expf(23.0f) * x) - 23.0f;
     }
     return __logf(x);
-#endif
 }
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x) { return logf(x) / logf(2.0f); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_sqrtf_precise_impl(float x)
