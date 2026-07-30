@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <algorithm>
+#include <map>
 
 #include "hccl/base.h"
 #include "exception_util.h"
