@@ -2,7 +2,7 @@
 
 【优先级】：高
 
-【描述】在部分产品上，L2 Cache读写混合带宽和GM带宽处于不同量级，例如理论或典型带宽约为7TB/s和1.6TB/s。上述数据仅用于说明访问层级之间的带宽差异，不表示所有产品或实际算子的可达带宽。实际性能还受到芯片型号、访存模式、并发流量和工具统计口径等因素影响。
+【描述】在部分产品上，L2 Cache读写混合带宽和GM带宽处于不同量级，例如L2 Cache理论或典型带宽约为7TB/s，GM带宽约为1.6TB/s。上述数据仅用于说明访问层级之间的带宽差异，不表示所有产品或实际算子的可达带宽。实际性能还受到芯片型号、访存模式、并发流量和工具统计口径等因素影响。
 
 当算子需要多次访问同一批数据时，关键是重复访问发生时目标数据是否仍驻留在L2 Cache中。L2 Cache由同一阶段内并发工作的多个核共同使用，容量压力应按所有核在该阶段覆盖的GM地址范围合计评估，而不是只看单个核的数据量。如果首次访问后，继续访问的新数据量超过L2 Cache有效容量，早先进入L2 Cache的数据可能在同一轮扫描过程中就被后续数据替换；再次访问早先地址时就可能出现Cache Miss，需要从GM重新取数，数据搬入可能成为性能瓶颈。
 
@@ -81,7 +81,7 @@ data 384MB  | 96MB        | 96MB        | 96MB        | 96MB        |
 
 L2 Cache切分正例将跨轮复用的工作集限制在96MB。单个Batch内，20个核合计覆盖的数据量不超过100MB阈值，每个核只处理约4.8MB。先在`data[B0]`上完成第1轮和第2轮，再依次处理B1至B3。同一批两轮访问之间没有插入其他超过L2 Cache有效容量的大数据范围，因此第2轮更有机会直接命中第1轮刚写回的L2 Cache数据。
 
-## GM到L2 Cache的数据量
+## GM到L2 Cache的数据量口径
 
 每轮读取并写回整份384MB数据。两轮计算的逻辑搬运量为：
 
@@ -93,11 +93,13 @@ L2 Cache切分正例将跨轮复用的工作集限制在96MB。单个Batch内，
 
 `DataCopy`从GM地址读取数据时会经过L2 Cache，因此Profile中的逻辑GM->UB读量约为768MB。但是，逻辑GM->UB读量不等于实际从主存储器搬入L2 Cache的数据量：L2 Cache命中时直接从L2 Cache读取，只有Cache Miss才需要从主存储器取数并填充L2 Cache。
 
-仅考虑MTE2读取，在冷Cache、忽略Cache Line粒度和其他系统流量的理想分析中，首轮读取的384MB需要从主存储器取数。不切分反例在第1轮内由20个核共同完整扫描384MB范围，早期地址可能在同一轮后续搬运中被替换；第2轮再次访问这些地址时，更可能再次从主存储器读取，实际GM->L2读量可接近768MB。L2切分正例在每个96MB L2 Batch写回后立即开始同一批的第2轮，因此实际GM->L2读量可接近384MB。实际数值取决于命中率、替换策略和同期流量，应通过L2 Cache命中率及主存储器读计数共同确认。
+下文的768MB和384MB是仅考虑MTE2读取路径的理想读侧估算值，表示GM->UB读取发生Cache Miss时，从主存储器取数并填充到L2 Cache的数据量。该口径不包含UB->GM写回的MTE3写流量，也不包含写回策略可能引入的额外主存储器读流量。本文不对写回路径采用write-through或write-allocate策略作硬件判断；如果具体产品或配置在写回时存在write-allocate、read-for-ownership等行为，由此产生的GM读量应作为写侧副作用单独统计，不计入以下MTE2读侧理想值。
+
+仅考虑MTE2读取，在冷Cache、忽略Cache Line粒度和其他系统流量的理想分析中，首轮读取的384MB需要从主存储器取数。不切分反例在第1轮内由20个核共同完整扫描384MB范围，早期地址可能在同一轮后续搬运中被替换；第2轮再次访问这些地址时，更可能再次从主存储器读取，MTE2读触发的实际GM->L2填充量可接近768MB。L2切分正例在每个96MB L2 Batch写回后立即开始同一批的第2轮，因此MTE2读触发的实际GM->L2填充量可接近384MB。实际数值取决于命中率、替换策略和同期流量，应通过L2 Cache命中率、主存储器读写计数以及MTE2/MTE3搬运指标共同确认。
 
 ## 公共处理逻辑
 
-两种实现都使用同一份`data` Buffer，并将结果写回搬入时的同一GM地址。差异在于传给公共处理函数的连续数据范围不同：反例传入完整384MB范围，正例传入单个96MB L2 Batch范围。代码展示实际样例采用的32字节DataBlock分核公式以及尾块长度计算方式；为突出数据通路，仅省略了流水同步代码。
+两种实现都使用同一份`data` Buffer，并将结果写回搬入时的同一GM地址。差异在于传给公共处理函数的连续数据范围不同：反例传入完整384MB范围，正例传入单个96MB L2 Batch范围。代码展示实际样例采用的32字节DataBlock分核公式以及尾块长度计算方式；为突出数据通路，仅省略了MTE2、Vector、MTE3之间的核内流水同步代码。
 
 ```cpp
 __aicore__ inline void ProcessWholeData()
@@ -145,7 +147,7 @@ __aicore__ inline void ProcessCoreRange(int64_t coreOffsetInData, uint32_t coreE
 }
 ```
 
-对于不切分反例的384MB整体范围，前12个核各处理629146个DataBlock，其余8个核各处理629145个DataBlock，单核数据量约19.2MB，20个核合计覆盖完整`data[0, 384MB)`范围且互不重叠。对于正例的单个96MB L2 Batch，前8个核各处理157287个DataBlock，其余12个核各处理157286个DataBlock，单核数据量约4.8MB，20个核合计覆盖完整L2 Batch且互不重叠。每个DataBlock包含16个`half`元素，因此所有`DataCopy`长度均满足32字节对齐要求。完整流水同步实现以配套样例为准。
+对于不切分反例的384MB整体范围，前12个核各处理629146个DataBlock，其余8个核各处理629145个DataBlock，单核数据量约19.2MB，20个核合计覆盖完整`data[0, 384MB)`范围且互不重叠。对于正例的单个96MB L2 Batch，前8个核各处理157287个DataBlock，其余12个核各处理157286个DataBlock，单核数据量约4.8MB，20个核合计覆盖完整L2 Batch且互不重叠。每个DataBlock包含16个`half`元素，因此所有`DataCopy`长度均满足32字节对齐要求。完整核内流水同步实现以配套样例为准；阶段之间的核间同步由配套样例的`KernelAdd::SyncAllCores`直接调用公开API`AscendC::SyncAll()`完成，不是额外封装的自定义同步函数。
 
 ## 反例：不做L2 Cache切分
 
@@ -154,7 +156,7 @@ __aicore__ inline void ProcessCoreRange(int64_t coreOffsetInData, uint32_t coreE
 ```cpp
 for (uint32_t roundIdx = 0; roundIdx < COMPUTE_ROUND_NUM; ++roundIdx) {
     ProcessWholeData();
-    AscendC::SyncAll(syncGm, syncLocal, VECTOR_CORE_NUM);
+    AscendC::SyncAll();
 }
 ```
 
@@ -176,7 +178,7 @@ R0从起始地址范围扫描到384MB末尾的过程中，后续核搬入的新�
 for (uint32_t l2BatchIdx = 0; l2BatchIdx < L2_BATCH_NUM; ++l2BatchIdx) {
     for (uint32_t roundIdx = 0; roundIdx < COMPUTE_ROUND_NUM; ++roundIdx) {
         ProcessL2Batch(l2BatchIdx);
-        AscendC::SyncAll(syncGm, syncLocal, VECTOR_CORE_NUM);
+        AscendC::SyncAll();
     }
 }
 ```
@@ -223,7 +225,7 @@ B0的全核合计工作集为96MB，不超过100MB阈值；B0在两次访问之�
 
 3. **与UB Tiling的关系**：L2 Cache级分批控制跨轮复用的工作集，最内层UB Tiling解决Unified Buffer容量问题。即使单个核一次只搬运一个UB Tile，20个核在同一阶段连续扫描的总地址范围仍可能填满并替换L2 Cache。
 
-4. **核间同步**：所有核共同处理同一个数据阶段时，需要在进入下一阶段前完成核间同步。配套样例使用`AscendC::SyncAll`，并为每个核申请32字节GM同步空间。不要使用仅保证单核流水顺序的`PipeBarrier`替代核间同步。
+4. **核间同步**：所有核共同处理同一个数据阶段时，需要在进入下一阶段前完成核间同步。配套样例使用硬件同步接口`AscendC::SyncAll()`，不需要额外GM同步工作空间。不要使用仅保证单核流水顺序的`PipeBarrier`替代核间同步。
 
 5. **CacheMode配合**：对于只访问一次的数据，可以评估使用`SetL2CacheHint(CACHE_MODE_DISABLE)`避免占用L2 Cache。具体支持范围和约束请参考[设置合理的L2 CacheMode](./设置合理的L2-CacheMode.md)。
 
