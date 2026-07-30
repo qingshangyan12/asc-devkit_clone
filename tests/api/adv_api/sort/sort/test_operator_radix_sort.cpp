@@ -192,7 +192,7 @@ INSTANTIATE_TEST_CASE_P(
             4, 4, 1024, 1024, testRadixSort<int32_t, int32_t, AscendC::SortType::RADIX_SORT, true, false, false, 2>},
         SortTestParams{
             1, 4, 512, 512, testRadixSort<int8_t, uint32_t, AscendC::SortType::RADIX_SORT, false, false, false, 2>}
-#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)) //用例超出kirinx90 9030 ub size
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)) // 用例超出kirinx90 9030 ub size
         ,
         SortTestParams{
             8, 4, 1024, 1024, testRadixSort<int64_t, uint32_t, AscendC::SortType::RADIX_SORT, true, false, true, 0>},

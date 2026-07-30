@@ -140,7 +140,7 @@ INSTANTIATE_TEST_CASE_P(
         antiquantParams{2048, 64, 81920, testAntiQuant<int8_t, half>},
         antiquantParams{5888, 256, 81920, testAntiQuant<int8_t, half>},
         antiquantParams{12288, 96, 81920, testAntiQuant<int8_t, half>}
-#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))  //bf16数据类型 kirinx90 9030不支持
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))  // bf16数据类型 kirinx90 9030不支持
         ,
         antiquantParams{2048, 64, 1024, testAntiQuant<int8_t, bfloat16_t>},
         antiquantParams{2048, 64, 81920, testAntiQuant<int8_t, bfloat16_t>},
