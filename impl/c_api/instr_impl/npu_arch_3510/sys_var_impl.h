@@ -113,7 +113,7 @@ __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mo
             sprBit = 53; // 0 => truncation, 1 => saturation
             invertLogic = true;
             break;
-        default: // asc_saturation_mode::CAST
+        default:         // asc_saturation_mode::CAST
             sprBit = 59; // 0 => saturation, 1 => truncation
             break;
     }
