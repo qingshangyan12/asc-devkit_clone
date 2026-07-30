@@ -222,7 +222,7 @@ HcclResult AllocComResourceByTilingAicpu(
     HcclComm comm, void* stream, void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, const char* commName,
     u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag)
 {
-    std::string topoTag[MAX_OP_NUM];
+    std::string topoTag[Hccl::MC2_MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
 
     std::vector<OpParam> opParamVec(tilingNum);
@@ -257,7 +257,7 @@ HcclResult AllocComResourceByTilingCcu(
     u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag)
 {
     HCCL_INFO("[AllocComResourceByTilingCcu]start AllocComResourceByTilingCcu!");
-    std::string topoTag[MAX_OP_NUM];
+    std::string topoTag[Hccl::MC2_MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
     HCCL_INFO("[AllocComResourceByTilingCcu]BuildTagsAndValidate successfully!");
 
@@ -339,7 +339,7 @@ HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     CHK_RET(HcclGetCommName(comm, commName));
     HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetCommName successfully!");
 
-    const void* ccTilingList[MAX_OP_NUM];
+    const void* ccTilingList[Hccl::MC2_MAX_OP_NUM];
     uint32_t tilingNum;
     CHK_RET(HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum));
     HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetTilingList successfully!");
