@@ -581,7 +581,7 @@
             -   [CountLeadingZero](SIMD-API/基础API/标量计算/CountLeadingZero.md)
             -   [CountBitsCntSameAsSignBit](SIMD-API/基础API/标量计算/CountBitsCntSameAsSignBit.md)
             -   [GetSFFValue](SIMD-API/基础API/标量计算/GetSFFValue.md)
-            -   [CeilDivision](SIMD-API/基础API/标量计算/CeilDivision.md)
+            -   [ceil\_div](SIMD-API/基础API/标量计算/CeilDivision.md)
             -   [Cast（float转half/int32\_t）](SIMD-API/基础API/标量计算/Cast（float转half-int32_t）.md)
             -   [Cast（float转bfloat16\_t）](SIMD-API/基础API/标量计算/Cast（float转bfloat16_t）.md)
             -   [Cast（多类型转float）](SIMD-API/基础API/标量计算/Cast（多类型转float）.md)
