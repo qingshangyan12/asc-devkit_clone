@@ -1,4 +1,4 @@
-﻿# muls样例
+# muls样例
 
 ## 概述
 本样例基于C API编程接口实现Muls运算，主要调用[asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_mul_scalar.md)接口。
@@ -24,7 +24,7 @@
 
 ## 样例描述
 - 样例功能：  
-  对向量做标量乘法，向量元素个数为256，输入数据类型为float，输出数据类型为half，标量值为2.0。
+  对向量做标量乘法，向量元素个数为256，数据类型为float，标量值为2.0。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -36,7 +36,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">muls_custom</td></tr>
   </table>
 - 样例实现：  
-  muls_vf函数内调用asc_mul_scalar接口进行计算，结果写回UB。输入为float类型，输出通过asc_float2half转换为half类型
+  muls_vf函数内调用asc_mul_scalar接口进行计算，结果写回UB。
 - 调用实现  
   使用内核调用符<<<>>>调用核函数。
 
