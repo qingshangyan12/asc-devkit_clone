@@ -14,6 +14,7 @@
 #include "tensor_api/tensor/layout.h"
 #include "tensor_api/tensor/layout_pattern.h"
 #include "tensor_api/tensor/pointer.h"
+#include "tensor_api/tensor/tensor_base.h"
 #include "tensor_api/tensor/tensor.h"
 #endif
 
@@ -46,4 +47,8 @@ static void test_tensor_api_tensor_layout_pattern()
 
 static void test_tensor_api_tensor_pointer() { using AscendC::Te::MakeMemPtr; }
 
-static void test_tensor_api_tensor_tensor() { using AscendC::Te::MakeTensor; }
+static void test_tensor_api_tensor_tensor()
+{
+    using AscendC::Te::BaseTensor;
+    using AscendC::Te::MakeTensor;
+}

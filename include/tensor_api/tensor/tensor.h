@@ -25,6 +25,7 @@
 #define INCLUDE_TENSOR_API_TENSOR_TENSOR_H
 
 #include "impl/tensor_api/tensor/tuple_impl.h"
+#include "tensor_api/tensor/tensor_base.h"
 #include "impl/tensor_api/tensor/tensor_impl.h"
 
 // tensor construction
