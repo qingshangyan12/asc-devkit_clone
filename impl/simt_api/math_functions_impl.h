@@ -99,7 +99,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
     constexpr float subnormalBoundary = 1.17549435e-38f;
 
     if (x > 0.0f && x < subnormalBoundary) {
-        constexpr float scaleUp = 8388608.0f; // 2^23
+        constexpr float scaleUp = 8388608.0f;                 // 2^23
         constexpr float compensation = -15.9423851528787421f; // -ln(2^23)
         return __logf(x * scaleUp) + compensation;
     }
