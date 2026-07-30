@@ -130,7 +130,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_sqrtf_precise_impl(floa
      *     x2 = b;
      * return x2;
      */
-     
+
     constexpr float scaleUp = 16777216.0f;       // 2^24
     constexpr float scaleDown = 0.000244140625f; // 2^-12
     constexpr float half = 0.5f;
@@ -2992,7 +2992,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int umin(const unsigned int x, co
     return min(x, y);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return __fdividef(x, y) }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return __fdividef(x, y); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int signbit(float x) { return signbitf(x); }
 
