@@ -20,6 +20,8 @@
 #ifndef INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 #define INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 
+#include "tensor_api/arch/cube/copy_trait.h"
+
 namespace AscendC {
 namespace Te {
 
