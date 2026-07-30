@@ -26,9 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
-
-在分离模式下，AIC（Cube核）与AIV（Vector核）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组间同步指不同group之间的同步，即所有block（所有AIC或所有AIV）之间的同步。
+在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组间同步指不同group之间的同步，即所有block（所有AIC或所有AIV）之间的同步。
 
 和[asc_sync_inter_wait](asc_sync_inter_wait.md)配合使用（通过flag_id关联），用于组间block的信号同步。通过向核间同步寄存器发送同步信号，标识当前pipeline已到达flag_id对应的同步点。每个flag_id对应一个初始值为0的计数器，执行asc_sync_inter_arrive后flag_id对应的计数器增加1；执行asc_sync_inter_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
@@ -67,33 +65,8 @@ PIPE_S
 
 ## 调用示例
 
-<!-- npu="A3,910b" id5 -->
-- 以下示例支持如下产品型号：
-  <!-- npu="A3" id6 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id6 -->
-  <!-- npu="910b" id7 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id7 -->
-  ```cpp
-  // Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr
-  uint64_t config = *(__gm__ uint64_t*)ffts_addr;
-  asc_set_ffts_base_addr(config);
-  int64_t flag_id = 1;
-  asc_sync_inter_arrive(PIPE_V, flag_id);
-  asc_sync_inter_wait(PIPE_V, flag_id);  
-  ```
-<!-- end id5 -->
-
-<!-- npu="950" id12 -->
-- 以下示例支持如下产品型号：
-  <!-- npu="950" id8 -->
-  - Ascend 950PR/Ascend 950DT
-  <!-- end id8 -->
-  ```cpp
-  // 在Ascend 950PR/Ascend 950DT产品上，无需进行核间同步基地址ffts_addr的设置
-  int64_t flag_id = 1;
-  asc_sync_inter_arrive(PIPE_V, flag_id);
-  asc_sync_inter_wait(PIPE_V, flag_id);  
-  ```
-<!-- end id12 -->
+```cpp
+int64_t flag_id = 1;
+asc_sync_inter_arrive(PIPE_V, flag_id);
+asc_sync_inter_wait(PIPE_V, flag_id);  
+```

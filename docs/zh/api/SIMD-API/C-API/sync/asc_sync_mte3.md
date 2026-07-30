@@ -1,4 +1,4 @@
-W# asc_sync_mte3
+# asc_sync_mte3
 
 ## 产品支持情况
 
@@ -25,8 +25,6 @@ W# asc_sync_mte3
 <!-- end id7 -->
 
 ## 功能说明
-
-头文件路径：`"c_api/sync/sync.h"`。
 
 针对PIPE_MTE3流水线执行同步操作。其作用是保证PIPE_MTE3流水线中前序指令（如UB到GM的数据搬运）全部完成后，PIPE_MTE2与PIPE_V流水线的后续指令才能开始执行。
 

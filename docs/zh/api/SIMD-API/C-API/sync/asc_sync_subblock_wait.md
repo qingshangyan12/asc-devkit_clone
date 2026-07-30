@@ -27,17 +27,15 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
-
-在分离模式下，AIC（Cube核）与AIV（Vector核）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组内subblock间同步指同一group内不同subblock（AIV）之间的同步。
+在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组内subblock间同步指同一group内不同subblock（AIV）之间的同步。
 
 核间同步指令，每个flag_id均分配有计数器，执行asc_sync_subblock_arrive后计数器将递增；执行asc_sync_subblock_wait时如果对应的计数器数值为0则阻塞；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
 ## 函数原型
 
 ```cpp
-    __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint8_t flag_id)
-    __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint8_t flag_id)
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id)
 ```
 
 ## 参数说明
@@ -67,33 +65,8 @@ PIPE_S
 
 ## 调用示例
 
-<!-- npu="A3,910b" id9 -->
-- 以下示例支持如下产品型号：
-  <!-- npu="A3" id10 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id10 -->
-  <!-- npu="910b" id12 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id12 -->
-  ```cpp
-  // Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr
-  uint64_t config = *(__gm__ uint64_t*)ffts_addr;
-  asc_set_ffts_base_addr(config);
-  int64_t flag_id = 1;
-  asc_sync_subblock_arrive(PIPE_V, flag_id);
-  asc_sync_subblock_wait(PIPE_V, flag_id);  
-  ```
-<!-- end id9 -->
-
-<!-- npu="950" id11 -->
-- 以下示例支持如下产品型号：
-  <!-- npu="950" id8 -->
-  - Ascend 950PR/Ascend 950DT
-  <!-- end id8 -->
-  ```cpp
-  // 在Ascend 950PR/Ascend 950DT产品上，无需进行核间同步基地址ffts_addr的设置
-  int64_t flag_id = 1;
-  asc_sync_subblock_arrive(PIPE_V, flag_id);
-  asc_sync_subblock_wait(PIPE_V, flag_id);  
-  ```
-<!-- end id11 -->
+```cpp
+int64_t flag_id = 1;
+asc_sync_subblock_arrive(PIPE_V, flag_id);
+asc_sync_subblock_wait(PIPE_V, flag_id);  
+```
