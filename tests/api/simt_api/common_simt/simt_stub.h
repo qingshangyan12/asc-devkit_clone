@@ -27,6 +27,20 @@
 
 #define __launch_bounds__(x)
 
+inline half operator-(half val)
+{
+    half ret;
+    ret.val = val.val ^ static_cast<uint16_t>(Fp16BasicParam::K_FP16_SIGN_MASK);
+    return ret;
+}
+
+inline bfloat16_t operator-(bfloat16_t val)
+{
+    bfloat16_t ret;
+    ret.val = val.val ^ static_cast<uint16_t>(1u << bfloat16::BF16_SIGN_INDEX);
+    return ret;
+}
+
 namespace {
 constexpr int16_t HALF_MAX_EXP = 31;
 const float HALF_SUBNORMAL_THRESHOLD = std::pow(2, -14);
