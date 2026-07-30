@@ -167,7 +167,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x)
     bool isSubnormal = absX > 0.0f && absX < subnormalBoundary;
 
 #if defined(__ASC_FTZ__) && defined(__ASC_PREC_SQRT__)
-    if (isSubnormal) {
+    if (isSubnormal && x > 0.0f) {
         x = 0.0f;
     }
     return __asc_sqrtf_precise_impl(x);
