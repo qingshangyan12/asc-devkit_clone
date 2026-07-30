@@ -247,7 +247,7 @@ __aicore__ static __attribute__((noinline)) void printf_impl_assert(__gm__ const
 }
 
 template <typename... Args>
-static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(
+__aicore__ static __attribute__((noinline)) void printf_impl_assert_msg(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
     const __gm__ char* fmt, Args&&... args)
 {
@@ -269,15 +269,15 @@ static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(
 }
 #else
 template <class... Args>
-__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl(__gm__ const char* fmt, Args&&... args)
 {}
 
 template <class... Args>
-__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
 {}
 
 template <typename... Args>
-inline __aicore__ void printf_impl_assert_msg(
+__aicore__ static __attribute__((noinline)) void printf_impl_assert_msg(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
     const __gm__ char* fmt, Args&&... args)
 {}
@@ -308,7 +308,7 @@ __aicore__ static __attribute__((noinline)) void printf_impl_assert(__gm__ const
 }
 
 template <typename... Args>
-static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(
+__aicore__ static __attribute__((noinline)) void printf_impl_assert_msg(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
     const __gm__ char* fmt, Args&&... args)
 {
