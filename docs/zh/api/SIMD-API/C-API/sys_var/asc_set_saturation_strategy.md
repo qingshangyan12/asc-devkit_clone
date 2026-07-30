@@ -38,11 +38,11 @@ __aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strateg
 
 ## 参数说明
 
-表1参数说明
+表1 参数说明
 
 |参数名|输入/输出|描述|
 | :------ | :---  | :------------ |
-|strategy   |输入   |覆盖策略，取值为`asc_override_strategy::USE_API`或`asc_override_strategy::USE_GLOBAL`。|
+|[strategy](../enum/asc_override_strategy.md)   |输入   |覆盖策略，取值为`asc_override_strategy::USE_API`或`asc_override_strategy::USE_GLOBAL`。默认值为`asc_override_strategy::USE_GLOBAL`。|
 
 ## 返回值说明
 

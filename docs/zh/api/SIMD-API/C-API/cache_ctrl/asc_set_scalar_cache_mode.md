@@ -48,13 +48,13 @@ __aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode cache_m
 
 |参数名|输入/输出|描述|
 | :------ | :---  | :------------ |
-|cache_mode   |输入   |读通道缓存管理策略。取值参考[asc_load_l2_cache_mode](../enum/asc_load_l2_cache_mode.md)。注意：`NOTALLOC_CLEAN`和`NOTALLOC_DROP`不被支持，传入这两个值时接口不执行任何操作。|
+|cache_mode   |输入   |读通道缓存管理策略。取值参考[asc_load_l2_cache_mode](../enum/asc_load_l2_cache_mode.md)。默认值为`asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM`。注意：`NOTALLOC_CLEAN`和`NOTALLOC_DROP`不被支持，传入这两个值时接口不执行任何操作。|
 
 表2 写通道参数说明（asc_store_l2_cache_mode）
 
 |参数名|输入/输出|描述|
 | :------ | :---  | :------------ |
-|cache_mode   |输入   |写通道缓存管理策略。取值参考[asc_store_l2_cache_mode](../enum/asc_store_l2_cache_mode.md)。|
+|cache_mode   |输入   |写通道缓存管理策略。取值参考[asc_store_l2_cache_mode](../enum/asc_store_l2_cache_mode.md)。默认值为`asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM`。|
 
 ## 返回值说明
 

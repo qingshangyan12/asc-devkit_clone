@@ -54,4 +54,6 @@ PIPE_S
 
 ## 调用示例
 
-无
+```cpp
+asc_override_strategy strategy = asc_get_saturation_strategy();
+```

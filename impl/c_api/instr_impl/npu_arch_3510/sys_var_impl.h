@@ -98,56 +98,43 @@ __aicore__ inline int64_t asc_get_status() { return asc_get_status_impl(); }
 
 __aicore__ inline int64_t asc_get_sys_virtual_base() { return asc_get_sys_virtual_base_impl(); }
 
+struct SaturationCtrlInfo {
+    int8_t sprBit;
+    bool invertLogic;
+};
+
+__aicore__ inline SaturationCtrlInfo get_saturation_ctrl_info(asc_saturation_mode mode)
+{
+    switch (mode) {
+        case asc_saturation_mode::FLOAT:
+            return {48, false}; // 0 => sat, 1 => no sat
+        case asc_saturation_mode::FLOAT8:
+            return {50, false}; // 0 => sat, 1 => no sat
+        case asc_saturation_mode::INT:
+            return {53, true};  // 0 => truncation, 1 => saturation
+        default:                // asc_saturation_mode::CAST
+            return {59, false}; // 0 => saturation, 1 => truncation
+    }
+}
+
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat)
 {
-    int8_t sprBit = 0;
-    bool invertLogic = false;
-    switch (saturation_mode) {
-        case asc_saturation_mode::FLOAT:
-            sprBit = 48; // 0 => sat, 1 => no sat
-            break;
-        case asc_saturation_mode::FLOAT8:
-            sprBit = 50; // 0 => sat, 1 => no sat
-            break;
-        case asc_saturation_mode::INT:
-            sprBit = 53; // 0 => truncation, 1 => saturation
-            invertLogic = true;
-            break;
-        default:         // asc_saturation_mode::CAST
-            sprBit = 59; // 0 => saturation, 1 => truncation
-            break;
-    }
+    SaturationCtrlInfo info = get_saturation_ctrl_info(saturation_mode);
     int64_t ctrlValue = get_ctrl();
     uint64_t value;
-    if (invertLogic) {
-        value = enable_sat ? sbitset1(ctrlValue, sprBit) : sbitset0(ctrlValue, sprBit);
+    if (info.invertLogic) {
+        value = enable_sat ? sbitset1(ctrlValue, info.sprBit) : sbitset0(ctrlValue, info.sprBit);
     } else {
-        value = enable_sat ? sbitset0(ctrlValue, sprBit) : sbitset1(ctrlValue, sprBit);
+        value = enable_sat ? sbitset0(ctrlValue, info.sprBit) : sbitset1(ctrlValue, info.sprBit);
     }
     set_ctrl(value);
 }
 
 __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode)
 {
-    int8_t sprBit = 0;
-    bool invertLogic = false;
-    switch (saturation_mode) {
-        case asc_saturation_mode::FLOAT:
-            sprBit = 48;
-            break;
-        case asc_saturation_mode::FLOAT8:
-            sprBit = 50;
-            break;
-        case asc_saturation_mode::INT:
-            sprBit = 53;
-            invertLogic = true;
-            break;
-        default: // asc_saturation_mode::CAST
-            sprBit = 59;
-            break;
-    }
-    int64_t value = (get_ctrl() >> sprBit) & 1;
-    if (invertLogic) {
+    SaturationCtrlInfo info = get_saturation_ctrl_info(saturation_mode);
+    int64_t value = (get_ctrl() >> info.sprBit) & 1;
+    if (info.invertLogic) {
         return value != 0;
     }
     return value == 0;
