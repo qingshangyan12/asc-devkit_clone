@@ -38,27 +38,18 @@ constexpr uint32_t dataBlockSizeBytes = 32;
 constexpr uint32_t elementsPerDataBlock = dataBlockSizeBytes / sizeof(half);
 
 constexpr uint32_t MAX_DATA_COPY_LEN = 16384;
-// SyncAll uses one 32-byte GM slot per Vector core.
-constexpr uint32_t syncInt32ElementsPerCore = dataBlockSizeBytes / sizeof(int32_t);
 constexpr uint32_t logicalGmToUbBytesPerKernel = totalByteSize * computeRoundCount;
 constexpr uint32_t logicalUbToGmBytesPerKernel = logicalGmToUbBytesPerKernel;
 
 class KernelAdd {
 public:
-    __aicore__ inline void Init(__gm__ uint8_t* data, __gm__ uint8_t* sync)
+    __aicore__ inline void Init(__gm__ uint8_t* data)
     {
         dataGm_.SetGlobalBuffer(reinterpret_cast<__gm__ half*>(data), totalElementCount);
-        syncGm_.SetGlobalBuffer(
-            reinterpret_cast<__gm__ int32_t*>(sync), vectorCoreCount * syncInt32ElementsPerCore);
         inputLocal_ =
             AscendC::LocalTensor<half>(AscendC::TPosition::VECIN, inputUbOffsetBytes, MAX_DATA_COPY_LEN);
         outputLocal_ =
             AscendC::LocalTensor<half>(AscendC::TPosition::VECOUT, outputUbOffsetBytes, MAX_DATA_COPY_LEN);
-        // The sync tensor is placed after the input/output UB regions to avoid overlap with data tiles.
-        syncLocal_ = AscendC::LocalTensor<int32_t>(
-            AscendC::TPosition::VECCALC,
-            syncUbOffsetBytes,
-            vectorCoreCount * syncInt32ElementsPerCore);
     }
 
     __aicore__ inline void ProcessL2Batch(uint32_t l2BatchIdx)
@@ -75,13 +66,12 @@ public:
 
     __aicore__ inline void SyncAllCores()
     {
-        AscendC::SyncAll(syncGm_, syncLocal_, vectorCoreCount);
+        AscendC::SyncAll();
     }
 
 private:
     static constexpr uint32_t inputUbOffsetBytes = 0;
     static constexpr uint32_t outputUbOffsetBytes = MAX_DATA_COPY_LEN * sizeof(half);
-    static constexpr uint32_t syncUbOffsetBytes = outputUbOffsetBytes + MAX_DATA_COPY_LEN * sizeof(half);
 
     __aicore__ inline void ProcessDataRange(int64_t rangeOffsetInData, uint32_t rangeElementNum)
     {
@@ -145,10 +135,8 @@ private:
 
 private:
     AscendC::GlobalTensor<half> dataGm_;
-    AscendC::GlobalTensor<int32_t> syncGm_;
     AscendC::LocalTensor<half> inputLocal_;
     AscendC::LocalTensor<half> outputLocal_;
-    AscendC::LocalTensor<int32_t> syncLocal_;
 };
 
 } // namespace AddL2Cache

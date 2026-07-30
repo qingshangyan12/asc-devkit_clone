@@ -26,24 +26,20 @@
 
 namespace AddL2Cache {
 
-using KernelLauncher = void (*)(aclrtStream, uint8_t*, uint8_t*);
+using KernelLauncher = void (*)(aclrtStream, uint8_t*);
 
 inline bool RunKernel(
     const char* caseName, const char* outputPath, KernelLauncher launchKernel, aclrtStream stream)
 {
     constexpr size_t dataSizeBytes = static_cast<size_t>(totalElementCount) * sizeof(uint16_t);
-    constexpr size_t syncSizeBytes =
-        static_cast<size_t>(vectorCoreCount) * syncInt32ElementsPerCore * sizeof(int32_t);
 
     uint8_t* inputHost = nullptr;
     uint8_t* outputHost = nullptr;
     uint8_t* dataDevice = nullptr;
-    uint8_t* syncDevice = nullptr;
 
     aclrtMallocHost(reinterpret_cast<void**>(&inputHost), dataSizeBytes);
     aclrtMallocHost(reinterpret_cast<void**>(&outputHost), dataSizeBytes);
     aclrtMalloc(reinterpret_cast<void**>(&dataDevice), dataSizeBytes, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&syncDevice), syncSizeBytes, ACL_MEM_MALLOC_NORMAL_ONLY);
 
     size_t fileSize = 0;
     bool success = ReadFile("./input/input.bin", fileSize, inputHost, dataSizeBytes) && fileSize == dataSizeBytes;
@@ -57,8 +53,7 @@ inline bool RunKernel(
     }
     if (success) {
         aclrtMemcpy(dataDevice, dataSizeBytes, inputHost, dataSizeBytes, ACL_MEMCPY_HOST_TO_DEVICE);
-        aclrtMemset(syncDevice, syncSizeBytes, 0, syncSizeBytes);
-        launchKernel(stream, dataDevice, syncDevice);
+        launchKernel(stream, dataDevice);
         aclrtSynchronizeStream(stream);
         aclrtMemcpy(outputHost, dataSizeBytes, dataDevice, dataSizeBytes, ACL_MEMCPY_DEVICE_TO_HOST);
         success = WriteFile(outputPath, outputHost, dataSizeBytes);
@@ -67,7 +62,6 @@ inline bool RunKernel(
         std::printf("%s output: %s\n", caseName, outputPath);
     }
 
-    aclrtFree(syncDevice);
     aclrtFree(dataDevice);
     aclrtFreeHost(outputHost);
     aclrtFreeHost(inputHost);

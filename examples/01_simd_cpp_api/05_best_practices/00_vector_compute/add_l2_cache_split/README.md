@@ -90,7 +90,7 @@ Batch B3: Round 0 -> Round 1
 
 ### 多核同步
 
-反例每处理完一轮完整384MB数据后调用软件`AscendC::SyncAll`。正例每个L2 Batch与Round组合结束后调用`AscendC::SyncAll`，确保所有核完成当前阶段的UB->GM搬运后，再进入下一阶段。同步GM空间按每核32字节申请并初始化为0。
+反例每处理完一轮完整384MB数据后调用硬件`AscendC::SyncAll()`。正例每个L2 Batch与Round组合结束后调用`AscendC::SyncAll()`，确保所有核完成当前阶段的UB->GM搬运后，再进入下一阶段。硬件同步不需要额外的GM同步工作空间。
 
 ## 测试用例
 

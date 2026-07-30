@@ -88,7 +88,7 @@ The negative implementation processes the complete 384MB range in each round, an
 
 ### Inter-Core Synchronization
 
-The negative implementation calls software `AscendC::SyncAll` after each full 384MB round. The positive implementation calls `AscendC::SyncAll` after each L2-batch/round stage, ensuring that all cores finish the current UB-to-GM stores before the next stage begins. The GM synchronization workspace uses 32 bytes per core and is initialized to zero.
+The negative implementation calls hardware `AscendC::SyncAll()` after each full 384MB round. The positive implementation calls `AscendC::SyncAll()` after each L2-batch/round stage, ensuring that all cores finish the current UB-to-GM stores before the next stage begins. Hardware synchronization does not need an extra GM synchronization workspace.
 
 ## Test Cases
 
