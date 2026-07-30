@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_COPY_ATOM_H
 #endif
 
 /*!
@@ -24,7 +24,7 @@
 #ifndef INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
 
-#include "impl/tensor_api/atom/copy_atom_impl.h"
+#include "utils/base/sys_macros.h"
 
 namespace AscendC {
 namespace Te {
@@ -36,17 +36,29 @@ template <typename... Args>
 struct CopyAtom;
 
 template <typename CopyOperation>
-struct CopyAtom<CopyOperation>;
+struct CopyAtom<CopyOperation> : CopyAtom<CopyTraits<CopyOperation>> {};
 
 template <typename... Args>
-struct CopyAtom<CopyTraits<Args...>>;
+struct CopyAtom<CopyTraits<Args...>> : CopyTraits<Args...> {
+    using CopyTraitType = CopyTraits<Args...>;
+    using TraitType = typename CopyTraitType::TraitType;
+    static constexpr const TraitType defaultTrait = CopyTraitType::defaultTrait;
+
+    template <const TraitType& traits = defaultTrait, typename... Params>
+    __aicore__ inline void Call(const Params&... params) const;
+
+    template <typename... TraitsArgs>
+    __aicore__ inline auto with(TraitsArgs&&... args) const;
+};
 
 } // namespace Te
 } // namespace AscendC
 
+#include "impl/tensor_api/atom/copy_atom_impl.h"
+
 #endif // INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_COPY_ATOM_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_COPY_ATOM_H
 #endif

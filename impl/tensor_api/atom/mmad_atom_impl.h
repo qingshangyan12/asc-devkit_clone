@@ -28,31 +28,20 @@
 namespace AscendC {
 namespace Te {
 
-template <typename... Args>
-struct MmadAtom;
-
-template <typename MmadOperation>
-struct MmadAtom<MmadOperation> : MmadAtom<MmadTraits<MmadOperation>> {};
+template <typename MmadOperation, typename... Args>
+template <const typename MmadAtom<MmadTraits<MmadOperation, Args...>>::TraitType& traits, typename... Params>
+__aicore__ inline void MmadAtom<MmadTraits<MmadOperation, Args...>>::Call(const Params&... params) const
+{
+    MmadTraitType::template MmadUnpack<traits>(params...);
+}
 
 template <typename MmadOperation, typename... Args>
-struct MmadAtom<MmadTraits<MmadOperation, Args...>> : MmadTraits<MmadOperation, Args...> {
-    using MmadTraitType = MmadTraits<MmadOperation, Args...>;
-    using TraitType = typename MmadTraitType::TraitType;
-    static constexpr const TraitType defaultTrait = MmadTraitType::defaultTrait;
-
-    template <const TraitType& traits = defaultTrait, typename... Params>
-    __aicore__ inline void Call(const Params&... params) const
-    {
-        MmadTraitType::template MmadUnpack<traits>(params...);
-    }
-
-    template <typename... TraitsArgs>
-    __aicore__ inline auto with(TraitsArgs&&... args) const
-    {
-        auto traits = MmadTraitType::with(static_cast<TraitsArgs&&>(args)...);
-        return MmadAtom<decltype(traits)>{traits};
-    }
-};
+template <typename... TraitsArgs>
+__aicore__ inline auto MmadAtom<MmadTraits<MmadOperation, Args...>>::with(TraitsArgs&&... args) const
+{
+    auto traits = MmadTraitType::with(static_cast<TraitsArgs&&>(args)...);
+    return MmadAtom<decltype(traits)>{traits};
+}
 
 } // namespace Te
 } // namespace AscendC

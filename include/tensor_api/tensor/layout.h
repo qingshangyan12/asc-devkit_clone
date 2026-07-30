@@ -24,6 +24,7 @@
 #ifndef INCLUDE_TENSOR_API_TENSOR_LAYOUT_H
 #define INCLUDE_TENSOR_API_TENSOR_LAYOUT_H
 
+#include "tensor_api/tensor/layout_pattern.h"
 #include "impl/tensor_api/tensor/layout_impl.h"
 
 namespace AscendC {

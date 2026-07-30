@@ -22,7 +22,7 @@
 #ifndef IMPL_TENSOR_API_ALGORITHM_COPY_IMPL_H
 #define IMPL_TENSOR_API_ALGORITHM_COPY_IMPL_H
 
-#include "impl/tensor_api/atom/copy_atom_impl.h"
+#include "tensor_api/atom/cube/copy_atom.h"
 #include "impl/tensor_api/algorithm/experiment/transform_impl.h"
 
 namespace AscendC {

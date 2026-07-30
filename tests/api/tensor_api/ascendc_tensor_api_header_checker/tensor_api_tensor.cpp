@@ -12,7 +12,9 @@
 #include "tensor_api/tensor.h"
 #else
 #include "tensor_api/tensor/layout.h"
+#include "tensor_api/tensor/layout_pattern.h"
 #include "tensor_api/tensor/pointer.h"
+#include "tensor_api/tensor/tensor_base.h"
 #include "tensor_api/tensor/tensor.h"
 #endif
 
@@ -35,6 +37,21 @@ static void test_tensor_api_tensor_layout()
     using AscendC::Te::Slice;
 }
 
+static void test_tensor_api_tensor_layout_pattern()
+{
+    using AscendC::Te::DNExtLayoutPtn;
+    using AscendC::Te::NC1HWC0LayoutPtn;
+    using AscendC::Te::NCHWLayoutPtn;
+    using AscendC::Te::NDExtLayoutPtn;
+    using AscendC::Te::NHWCLayoutPtn;
+    using AscendC::Te::NZLayoutPtn;
+    using AscendC::Te::ZNLayoutPtn;
+}
+
 static void test_tensor_api_tensor_pointer() { using AscendC::Te::MakeMemPtr; }
 
-static void test_tensor_api_tensor_tensor() { using AscendC::Te::MakeTensor; }
+static void test_tensor_api_tensor_tensor()
+{
+    using AscendC::Te::BaseTensor;
+    using AscendC::Te::MakeTensor;
+}
