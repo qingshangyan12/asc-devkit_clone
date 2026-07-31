@@ -68,11 +68,7 @@ public:
 
     uint32_t GetSqHead() const { return channel_.sqHead; }
 
-    void CompleteCurrentSq()
-    {
-        channel_.cqTail = channel_.cqHead;
-        channel_.sqTail = channel_.cqHead;
-    }
+    void CompleteCurrentSq() { channel_.cqTail = channel_.cqHead; }
 
 private:
     void InitBuffer(

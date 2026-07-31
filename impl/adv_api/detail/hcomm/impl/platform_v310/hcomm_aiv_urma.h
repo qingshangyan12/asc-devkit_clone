@@ -276,18 +276,20 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(const LocalTens
 }
 
 __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
-    ChannelHandle channel, const CqContext& cqCtx, uint32_t wqeCnt)
+    ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead, uint32_t cqeCnt)
 {
     __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
-    uint32_t curTail = channelEntity->sqTail;
+    uint32_t cqTail = channelEntity->cqTail;
     constexpr uint32_t POLL_CQ_THRESHOLD = 10;
     constexpr uint32_t NUM_CQE_PER_POLL_CQ = 100;
     uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
-    if ((wqeCnt + POLL_CQ_THRESHOLD) % cqDepth == curTail % cqDepth) {
-        uint32_t idx = (curTail + NUM_CQE_PER_POLL_CQ) > wqeCnt ? wqeCnt : curTail + NUM_CQE_PER_POLL_CQ;
+    uint32_t sqDepth = sqCtx.contextInfo.ubJfs.sqDepth;
+    if ((cqeCnt + POLL_CQ_THRESHOLD) % cqDepth == cqTail % cqDepth ||
+        (sqHead % sqDepth) + POLL_CQ_THRESHOLD >= sqDepth) {
+        uint32_t idx = (cqTail + NUM_CQE_PER_POLL_CQ) > cqeCnt ? cqeCnt : cqTail + NUM_CQE_PER_POLL_CQ;
         KERNEL_LOG(
-            KERNEL_INFO, "Hcomm URMA SQ overflow wqeCnt=%u curTail=%u idx=%u cqDepth=%u \n", wqeCnt, curTail, idx,
-            cqDepth);
+            KERNEL_INFO, "Hcomm URMA queue overflow sqHead=%u cqeCnt=%u cqTail=%u idx=%u sqDepth=%u cqDepth=%u \n",
+            sqHead, cqeCnt, cqTail, idx, sqDepth, cqDepth);
         (void)PollCq(channel, idx);
     }
 }
@@ -310,15 +312,16 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
 
     auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     uint32_t curHead = channelEntity->sqHead;
-    // Temporary implementation: use cqHead as the WQE counter, will be refined later
-    uint32_t wqeCnt = channelEntity->cqHead;
+    // sqTail stores all submitted requests; cqHead stores requests that generate CQEs.
+    uint32_t wqeCnt = channelEntity->sqTail;
+    uint32_t cqeCnt = channelEntity->cqHead;
     KERNEL_LOG(
         KERNEL_INFO, "Hcomm URMA PostSend resolved remoteIdx=%d curHead=%u wqeCnt=%u sqDepth=%u \n", remoteIdx, curHead,
         wqeCnt, sqCtx.contextInfo.ubJfs.sqDepth);
 
-    // poll cq if send queue is full
+    // poll CQ if CQ or SQ is nearly full
     auto cqCtx = channelEntity->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-    PollCqWhenSqOverflow(channel, cqCtx, wqeCnt);
+    PollCqWhenSqOverflow(channel, sqCtx, cqCtx, curHead, cqeCnt);
 
     // write SQE
     __ubuf__ HcommUrmaSqeCtx* sqeCtx = (__ubuf__ HcommUrmaSqeCtx*)wqeItem_.GetPhyAddr();
@@ -351,9 +354,13 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / sizeof(uint32_t));
     SyncAction<HardEvent::MTE3_S>();
 
+    if constexpr (config.cqe != 0) {
+        cqeCnt++;
+        channelEntity->cqHead = cqeCnt;
+    }
     wqeCnt++;
     curHead += wqeBbCnt;
-    channelEntity->cqHead = wqeCnt;
+    channelEntity->sqTail = wqeCnt;
     channelEntity->sqHead = curHead;
 
     if constexpr (commit) {
@@ -420,8 +427,6 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
     // ring CQ doorbell
     st_dev(curTail & 0xFFFFFFU, (__gm__ uint32_t*)cqCtx.contextInfo.ubJfc.dbVa, 0);
 
-    // update WQ tail
-    channelEntity->sqTail = curTail;
     return HCOMM_SUCCESS;
 }
 
@@ -492,8 +497,6 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Drain(ChannelHandle 
 {
     (void)pipe;
     __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
-
-    // Temporary implementation: use cqHead as the WQE counter, will be refined later
     uint32_t ret = PollCq(channel, channelEntity->cqHead);
     if (ret != HCOMM_SUCCESS) {
         KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA Drain by channel failed channel=%lu pollRet=%u \n", channel, ret);
