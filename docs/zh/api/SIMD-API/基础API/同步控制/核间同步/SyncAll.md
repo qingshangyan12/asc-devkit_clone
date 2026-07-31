@@ -167,7 +167,7 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
 
 - 硬件同步接口约束：
     - 使用硬同步接口时，需根据场景使用合适的核函数修饰符：
-        - 在纯Vector算子，需使用\_\_mix\_\_\(0, 1\)修饰核函数，而不是使用\_\_vector\_\_，具体原因请参考[CrossCoreSetFlag约束说明](CrossCoreSetFlag(ISASI).md#约束说明)中的Kernel类型配置说明。
+        - 在纯Vector算子，需使用\_\_mix\_\_\(0, 1\)修饰核函数，而不是使用\_\_vector\_\_，具体原因请参考[CrossCoreSetFlag约束说明](CrossCoreSetFlag_ISASI.md#约束说明)中的Kernel类型配置说明。
         - 对于Mix（包含Cube和Vector计算）算子，需使用\_\_mix\_\_\(1, 1\)或\_\_mix\_\_\(1, 2\)修饰核函数。
     - 对于纯Vector算子，模板参数isAIVOnly必须设置为true，否则会导致程序卡死。
     - 对于Mix（包含Cube和Vector计算）算子，模板参数isAIVOnly设置为true，会导致接口实际只能完成Vector全核同步与预期同步行为不符。

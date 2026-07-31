@@ -56,7 +56,7 @@
 | 数据填充 | [Brcb](../SIMD-API/基础API/Memory矢量计算/数据填充/Brcb.md) | - | &bull; 无isSetMask。<br>&bull; 接口不支持Mask。 |
 | 数据填充 | [Duplicate](../SIMD-API/基础API/Memory矢量计算/数据填充/Duplicate.md) | &bull; 无isSetMask。<br>&bull; 接口内已设置Mask。 | &bull; 有isSetMask。<br>&bull; 接口内通过模板参数控制。 |
 | 数据填充 | [CreateVecIndex](../SIMD-API/基础API/Memory矢量计算/数据填充/CreateVecIndex.md) | &bull; 无isSetMask。<br>&bull; 接口不支持Mask。 | &bull; 无isSetMask。<br>&bull; 接口不支持Mask。 |
-| 排序组合（ISASI） | [Sort32](../SIMD-API/基础API/Memory矢量计算/sort_and_merge_ISASI/Sort32.md)、[MrgSort](../SIMD-API/基础API/Memory矢量计算/sort_and_merge_ISASI/MrgSort.md) | - | &bull; 无isSetMask。<br>&bull; 接口不支持Mask。 |
+| sort_and_merge_ISASI | [Sort32](../SIMD-API/基础API/Memory矢量计算/sort_and_merge_ISASI/Sort32.md)、[MrgSort](../SIMD-API/基础API/Memory矢量计算/sort_and_merge_ISASI/MrgSort.md) | - | &bull; 无isSetMask。<br>&bull; 接口不支持Mask。 |
 | 离散与聚合 | [Gather](../SIMD-API/基础API/Memory矢量计算/离散与聚合/Gather.md)、[Gatherb](../SIMD-API/基础API/Memory矢量计算/离散与聚合/Gatherb_ISASI.md) | &bull; 无isSetMask。<br>&bull; 接口不支持Mask。 | &bull; 无isSetMask。<br>&bull; 接口不支持Mask。 |
 | 掩码操作 | [SetMaskCount](../SIMD-API/基础API/Memory矢量计算/掩码操作/SetMaskCount.md)、[SetMaskNorm](../SIMD-API/基础API/Memory矢量计算/掩码操作/SetMaskNorm.md)、[SetVectorMask](../SIMD-API/基础API/Memory矢量计算/掩码操作/SetVectorMask.md)、[ResetMask](../SIMD-API/基础API/Memory矢量计算/掩码操作/ResetMask.md) | - | - |
 
