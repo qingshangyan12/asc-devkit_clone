@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
 
-对CTRL寄存器（控制寄存器）的特定比特位做重置。由模板参数\[startBit, endBit\]指定的比特位重置为默认值，默认值参考[表 常用CTRL寄存器比特位说明](SetCtrlSpr(ISASI).md#tab-950)。
+对CTRL寄存器（控制寄存器）的特定比特位做重置。由模板参数\[startBit, endBit\]指定的比特位重置为默认值，默认值参考[表 常用CTRL寄存器比特位说明](SetCtrlSpr_ISASI.md#tab-950)。
 
 $\text{CTRL}[\,\text{startBit} : \text{endBit}\,] \leftarrow \text{defaultCtrl}[\,\text{startBit} : \text{endBit}\,]$
 
@@ -58,7 +58,7 @@ __aicore__ static inline void ResetCtrlSpr()
 
 ## 约束说明
 
-仅支持CTRL[8:6]、CTRL[10:9]、CTRL[48]、CTRL[50]、CTRL[53]、CTRL[59]、CTRL[60]比特位，各比特位的说明请参考[SetCtrlSpr(ISASI)参数说明](./SetCtrlSpr(ISASI).md#参数说明)。
+仅支持CTRL[8:6]、CTRL[10:9]、CTRL[48]、CTRL[50]、CTRL[53]、CTRL[59]、CTRL[60]比特位，各比特位的说明请参考[SetCtrlSpr(ISASI)参数说明](./SetCtrlSpr_ISASI.md#参数说明)。
 
 ## 调用示例
 

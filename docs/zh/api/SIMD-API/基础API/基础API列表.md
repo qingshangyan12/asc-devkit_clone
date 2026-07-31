@@ -323,8 +323,8 @@
 | --- | --- |
 | [连续对齐搬入](Reg矢量计算/Reg数据搬入/LoadAlign_continuous.md) | Reg矢量计算数据搬运接口，适用于从UB连续对齐搬入RegTensor。单搬入模式下，可以将数据从UB搬运到一个目的寄存器，双搬入模式下，可以将数据从UB搬运到两个目的寄存器。 |
 | [连续对齐搬出](Reg矢量计算/Reg数据搬出/StoreAlign_continuous.md) | Reg矢量计算数据搬运接口，适用于从RegTensor连续对齐搬出到UB。 |
-| [非连续对齐搬入](Reg矢量计算/Reg数据搬入/非LoadAlign_continuous.md) | Reg矢量计算数据搬运接口，适用于从UB非连续对齐搬入RegTensor（以DataBlock为单位）。 |
-| [非连续对齐搬出](Reg矢量计算/Reg数据搬出/非StoreAlign_continuous.md) | Reg矢量计算数据搬运接口，适用于从RegTensor非连续对齐搬出到UB（以DataBlock为单位）。 |
+| [非连续对齐搬入](Reg矢量计算/Reg数据搬入/LoadAlign_noncontinuous.md) | Reg矢量计算数据搬运接口，适用于从UB非连续对齐搬入RegTensor（以DataBlock为单位）。 |
+| [非连续对齐搬出](Reg矢量计算/Reg数据搬出/StoreAlign_noncontinuous.md) | Reg矢量计算数据搬运接口，适用于从RegTensor非连续对齐搬出到UB（以DataBlock为单位）。 |
 | [连续非对齐搬入](Reg矢量计算/Reg数据搬入/LoadUnAlign_continuous.md) | Reg矢量计算数据搬运接口，适用于从UB非32B对齐地址起始连续搬入RegTensor。 |
 | [连续非对齐搬出](Reg矢量计算/Reg数据搬出/StoreUnAlign_continuous.md) | Reg矢量计算数据搬运接口，适用于从RegTensor连续非对齐搬出到UB。 |
 | [MaskReg搬入](Reg矢量计算/Reg数据搬入/LoadAlign_MaskReg.md) | Reg矢量计算数据搬运接口，适用于从UB或RegTensor搬入MaskReg。 |

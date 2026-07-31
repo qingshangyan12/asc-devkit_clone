@@ -131,7 +131,7 @@ Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、hal
 
 **连续搬运**
 
-针对连续搬运场景，推荐使用[DataCopy（L1ToGM连续数据搬运）](DataCopy（L1ToGM连续数据搬运）.md#ZH-CN_TOPIC_0000002563687928)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
+针对连续搬运场景，推荐使用[DataCopy（L1ToGM连续数据搬运）](DataCopy_L1ToGM_continuous.md#ZH-CN_TOPIC_0000002563687928)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
 
 以half数据类型为例，源操作数的shape为1 \* 128。
 

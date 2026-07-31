@@ -39,7 +39,7 @@ for (int h = 0; h < dnNum; h++) {
 - 在上述源自DN矩阵的每一组数据中，再以每行元素为一组数据，每一组数据的起始地址为dst\_block\_addr。
 - src\_ele\_addr为NZ矩阵一列的每个元素的地址，dst\_ele\_addr为DN矩阵一行的每个元素的地址，二者为一一对应关系，对应完成NZ2DN格式转换。
 
-以下参数为NZ2DN用户可配置参数，含义取值范围参见[Fixpipe搬运参数（FixpipeParamsArch3510）](../矩阵计算的搬出/Fixpipe（L0C到GM数据搬运）.md#参数说明)：
+以下参数为NZ2DN用户可配置参数，含义取值范围参见[Fixpipe搬运参数（FixpipeParamsArch3510）](../矩阵计算的搬出/Fixpipe_L0CToGM.md#参数说明)：
 
 - dnNum表示需要做NZ2DN转化的矩阵个数。
 - mSize与nSize分别表示矩阵m方向和n方向上的维度。

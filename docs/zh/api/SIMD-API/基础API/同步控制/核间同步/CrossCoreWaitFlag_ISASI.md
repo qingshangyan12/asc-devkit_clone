@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
-在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag功能说明](CrossCoreSetFlag(ISASI).md#section618mcpsimp)。
+在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag功能说明](CrossCoreSetFlag_ISASI.md#section618mcpsimp)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
 
-获取原子操作开启位与原子操作类型的值，详细说明见[表1](SetStoreAtomicConfig(ISASI).md#table622mcpsimp)。
+获取原子操作开启位与原子操作类型的值，详细说明见[表1](SetStoreAtomicConfig_ISASI.md#table622mcpsimp)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
