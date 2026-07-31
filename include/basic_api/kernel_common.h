@@ -30,9 +30,10 @@
 #include "../../impl/basic_api/kernel_log.h"
 #include "../../impl/basic_api/kernel_reg.h"
 #include "../../impl/basic_api/kernel_process_lock.h"
-#include "kernel_struct_aipp.h"
 #include "../../impl/basic_api/kernel_utils.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
+#include "kernel_struct_aipp.h"
+#include "kernel_struct_waipp.h"
 #include "kernel_operator_swap_mem_intf.h"
 #include "kernel_operator_sys_var_intf.h"
 
@@ -235,6 +236,14 @@ __aicore__ inline void SetAippFunctions(
     SetAippFunctionsImpl<PrimT<T>, U>(
         const_cast<__gm__ PrimT<T>*>(src0.GetPhyAddr()), const_cast<__gm__ PrimT<T>*>(src1.GetPhyAddr()), format,
         config);
+#endif // (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002)
+}
+
+template <typename T>
+__aicore__ inline void SetWaippFunctions(WaippParams<T> &params)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+    SetWaippFunctionsImpl<T>(params);
 #endif // (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002)
 }
 } // namespace AscendC

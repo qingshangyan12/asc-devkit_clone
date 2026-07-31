@@ -127,6 +127,7 @@ install(CODE "file(CREATE_LINK ../basic_api/kernel_operator_vec_vconv_intf.h \${
 install(CODE "file(CREATE_LINK ../basic_api/kernel_operator_vec_vpadding_intf.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_operator_vec_vpadding_intf.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_prof_trace_intf.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_prof_trace_intf.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_aipp.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_struct_aipp.h SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_waipp.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_struct_waipp.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_binary.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_struct_binary.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_brcb.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_struct_brcb.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_conv2d.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_struct_conv2d.h SYMBOLIC)" COMPONENT asc-devkit)

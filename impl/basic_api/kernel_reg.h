@@ -23,6 +23,7 @@
 
 #include "kernel_utils.h"
 #include "../../include/basic_api/kernel_struct_aipp.h"
+#include "../../include/basic_api/kernel_struct_waipp.h"
 
 namespace AscendC {
 constexpr uint64_t MASK_PLACEHOLDER = 0;
@@ -715,6 +716,12 @@ __aicore__ inline void SetAippFunctionsImpl(__gm__ T* src0, AippInputFormat form
     SetAippFunctionsImpl(src0, reinterpret_cast<__gm__ T*>(0), format, config);
 }
 #endif // (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002)
+
+template <typename T>
+__aicore__ inline void SetWaippFunctionsImpl(WaippParams<T> &params)
+{
+    return;
+}
 
 } // namespace AscendC
 #endif // ASCENDC_KERNEL_REG_IMPL_H
