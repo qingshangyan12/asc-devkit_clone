@@ -12,7 +12,6 @@ import { defineConfig } from 'vitepress'
 import { existsSync, readFileSync, copyFileSync, cpSync, readdirSync } from 'node:fs'
 import { relative, resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
-import { execSync } from 'node:child_process'
 import { pagefindPlugin } from 'vitepress-plugin-pagefind'
 import {
   installRepositoryLinkRewrite,
@@ -61,6 +60,10 @@ function getOriginalSourceFile(relativePath) {
   }
   return resolve(repoRoot, 'docs', 'zh', normalizedPath)
 }
+
+const distDir = resolve(docsRoot, '.vitepress', 'dist')
+const pagefindTitleScript = resolve(import.meta.dirname, 'build-pagefind-title-index.mjs')
+const pagefindIndexingCommand = `npx pagefind --site "${distDir}" --exclude-selectors "div.aside, a.header-anchor" --force-language zh && node "${pagefindTitleScript}" "${distDir}"`
 
 function removeSelfRefItems(items) {
   return items.map(item => {
@@ -696,18 +699,8 @@ function balanceDivTags(html) {
 
   transformHtml(code) {
     code = code.replace(/href="\/\/pagefind/g, 'href="/pagefind')
-    code = code.replace(/<body\b/, '<body data-pagefind-body')
+    code = code.replace('<article class="markdown-body">', '<article class="markdown-body" data-pagefind-body>')
     return code
-  },
-
-  async buildEnd(siteConfig) {
-    const distDir = resolve(docsRoot, '.vitepress', 'dist')
-    const scriptPath = resolve(import.meta.dirname, 'build-cjk-index.mjs')
-    try {
-      execSync(`node "${scriptPath}" "${distDir}"`, { stdio: 'inherit' })
-    } catch (e) {
-      console.warn('[cjk-index] Failed to build CJK search index:', e.message)
-    }
   },
 
   vite: {
@@ -732,6 +725,7 @@ function balanceDivTags(html) {
       emptyText: '未找到结果',
       heading: '共: {{searchResult}} 条结果',
       forceLanguage: 'zh',
+      indexingCommand: pagefindIndexingCommand,
     }), {
       name: 'copy-figures-to-dist',
       closeBundle() {
