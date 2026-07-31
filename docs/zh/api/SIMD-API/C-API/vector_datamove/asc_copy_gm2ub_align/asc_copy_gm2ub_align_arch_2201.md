@@ -35,14 +35,14 @@
     若搬运数据长度非32字节对齐，搬运数据会补齐至32字节对齐，支持以下两种填充方式：
 
     - 手动填充：搬运前调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)配置填充值。
-    - 自动填充：不调用asc_set_copy_pad_val时，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。
+    - 自动填充：不调用`asc_set_copy_pad_val`时，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。
 
 - 高维切分搬运
 
     高维切分搬运采用Normal模式。若`len_burst`指定的单个数据块长度非32字节对齐，则`n_burst`指定的每个数据块都会分别补齐至32字节对齐。非32字节对齐场景支持以下两种填充方式：
 
-    - 手动填充：搬运前调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)设置填充值。
-    - 自动填充：不调用asc_set_copy_pad_val时，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。
+    - 手动填充：搬运前调用`asc_set_copy_pad_val`设置填充值。
+    - 自动填充：不调用`asc_set_copy_pad_val`时，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。
 
 ## 函数原型
 
@@ -115,7 +115,7 @@ PIPE_MTE2
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
 - 当`n_burst`、`len_burst`中任意一个值为0时，该接口被视为NOP（空操作）。
 - 当`size`值为0时，该接口被视为NOP（空操作）。
-- 如果需要执行多条asc_copy_gm2ub_align指令，且asc_copy_gm2ub_align指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_gm2ub_align指令的串行化，防止出现异常数据。
+- 如果需要执行多条`asc_copy_gm2ub_align`指令，且`asc_copy_gm2ub_align`指令的目的地址存在重叠，需要插入同步指令，保证多个`asc_copy_gm2ub_align`指令的串行化，防止出现异常数据。
 - 同步计算包含同步等待。
 - `left_padding_num`、`right_padding_num`对应的填充数据大小均不能超过32字节。
 
