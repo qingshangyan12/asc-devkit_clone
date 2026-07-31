@@ -2,7 +2,7 @@
 C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 > [!NOTE]说明
-> [公共概述](公共概述/README.md)补充C API的章节导览、数据通路和通用约束说明。该目录中的链接均指向C API文档；`dav-3510` CCE指令名称级索引见[实现索引](../implementation_indexes/dav_3510/README.md)。
+> 概览文档已按功能分类分布在对应目录中。总入口包括[数据搬运导览](数据搬运导览.md)、[矢量计算概述](矢量计算概述.md)、[矩阵计算概述](cube_compute/矩阵计算概述.md)、[同步、原子与缓存概述](同步原子缓存概述.md)和[特殊寄存器访问概览](sys_var/特殊寄存器访问概览.md)。`dav-3510` CCE指令名称级索引见[实现索引](../implementation_indexes/dav_3510/README.md)。
 
 ## 数据结构
 
