@@ -45,13 +45,11 @@ __aicore__ inline void asc_sync();
 
 #define asc_sync_subblock_arrive(pipe, flag_id) asc_sync_subblock_arrive_impl((pipe), (flag_id))
 
-#define asc_sync_inter_arrive(pipe, flag_id) asc_sync_inter_arrive_impl((pipe), (flag_id))
+__aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id);
 
-#define asc_sync_data_barrier(arg) asc_sync_data_barrier_impl((arg))
+__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
-#define asc_sync_subblock_wait(pipe, flag_id) wait_flag_dev((flag_id))
 
 __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint8_t flag_id);
 

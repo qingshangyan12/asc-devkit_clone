@@ -21,12 +21,23 @@ protected:
     void TearDown() {}
 };
 
-TEST_F(TEST_ASC_SYNC_SUBBLOCK_WAIT, TEST_ASC_SYNC_SUBBLOCK_WAIT_MODE)
+TEST_F(TEST_ASC_SYNC_SUBBLOCK_WAIT, TEST_ASC_SYNC_SUBBLOCK_WAIT_INT64)
 {
     MOCKER_CPP(wait_flag_dev, void(int64_t)).times(1).will(invoke(wait_flag_dev_subblock_stub));
 
     pipe_t pipe = static_cast<pipe_t>(pipe_t::PIPE_S);
     int64_t flag_id = static_cast<int64_t>(11);
+
+    asc_sync_subblock_wait(pipe, flag_id);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TEST_ASC_SYNC_SUBBLOCK_WAIT, TEST_ASC_SYNC_SUBBLOCK_WAIT_INT8)
+{
+    MOCKER_CPP(wait_flag_dev, void(int64_t)).times(1).will(invoke(wait_flag_dev_subblock_stub));
+
+    pipe_t pipe = static_cast<pipe_t>(pipe_t::PIPE_S);
+    int64_t flag_id = static_cast<int8_t>(11);
 
     asc_sync_subblock_wait(pipe, flag_id);
     GlobalMockObject::verify();
