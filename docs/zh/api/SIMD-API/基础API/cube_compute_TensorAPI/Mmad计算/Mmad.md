@@ -215,17 +215,17 @@ MX Mmad支持如下左矩阵A、右矩阵B、结果矩阵C的数据类型组合�
 | `fp8_e5m2_t` | `fp8_e4m3fn_t` | `float` |
 | `fp8_e5m2_t` | `fp8_e5m2_t` | `float` |
 
-MX Mmad通常需要在调用`Mmad`前完成左矩阵缩放数据ScaleA和右矩阵缩放数据ScaleB的搬运。ScaleA搬运可参考[L1到L0ScaleA数据搬运](../矩阵计算的搬入/Copy（L1到L0ScaleA数据搬运）.md)，ScaleB搬运可参考[L1到L0ScaleB数据搬运](../矩阵计算的搬入/Copy（L1到L0ScaleB数据搬运）.md)。矩阵缩放数据不作为`Mmad`函数参数传入，而是通过`Copy`接口提前搬运到L0ScaleA Buffer和L0ScaleB Buffer。
+MX Mmad通常需要在调用`Mmad`前完成左矩阵缩放数据ScaleA和右矩阵缩放数据ScaleB的搬运。ScaleA搬运可参考[L1到L0ScaleA数据搬运](../../矩阵计算（TensorAPI）/矩阵计算的搬入/Copy（L1到L0ScaleA数据搬运）.md)，ScaleB搬运可参考[L1到L0ScaleB数据搬运](../../矩阵计算（TensorAPI）/矩阵计算的搬入/Copy（L1到L0ScaleB数据搬运）.md)。矩阵缩放数据不作为`Mmad`函数参数传入，而是通过`Copy`接口提前搬运到L0ScaleA Buffer和L0ScaleB Buffer。
 
 ## 相关接口
 
-- [UnitFlag](../Mmad计算关键特性说明/UnitFlag.md)
-- [GEMV](../Mmad计算关键特性说明/GEMV.md)
-- [HF32](../Mmad计算关键特性说明/HF32.md)
-- [L1到L0ScaleA数据搬运](../矩阵计算的搬入/Copy（L1到L0ScaleA数据搬运）.md)
-- [L1到L0ScaleB数据搬运](../矩阵计算的搬入/Copy（L1到L0ScaleB数据搬运）.md)
-- [L0C到GM数据搬运](../矩阵计算的搬出/Copy（L0C到GM数据搬运）.md)
-- [L0C到UB数据搬运](../矩阵计算的搬出/Copy（L0C到UB数据搬运）.md)
+- [UnitFlag](../../矩阵计算（TensorAPI）/Mmad计算关键特性说明/UnitFlag.md)
+- [GEMV](../../矩阵计算（TensorAPI）/Mmad计算关键特性说明/GEMV.md)
+- [HF32](../../矩阵计算（TensorAPI）/Mmad计算关键特性说明/HF32.md)
+- [L1到L0ScaleA数据搬运](../../矩阵计算（TensorAPI）/矩阵计算的搬入/Copy（L1到L0ScaleA数据搬运）.md)
+- [L1到L0ScaleB数据搬运](../../矩阵计算（TensorAPI）/矩阵计算的搬入/Copy（L1到L0ScaleB数据搬运）.md)
+- [L0C到GM数据搬运](../../矩阵计算（TensorAPI）/矩阵计算的搬出/Copy（L0C到GM数据搬运）.md)
+- [L0C到UB数据搬运](../../矩阵计算（TensorAPI）/矩阵计算的搬出/Copy（L0C到UB数据搬运）.md)
 
 ## 调用示例
 

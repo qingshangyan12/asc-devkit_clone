@@ -10,7 +10,7 @@
 
 -   **[operator\[\]](operator.md)**  
 
--   **[operator\(\)](operator_call.md).md)**  
+-   **[operator\(\)](operator().md).md)**  
 
 -   **[SetSize](SetSize.md)**  
 
