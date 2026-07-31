@@ -16,6 +16,7 @@ ascendc compile v220
 import os
 import stat
 import subprocess
+import hashlib
 from tbe.common.buildcfg import get_current_build_config
 from .global_storage import global_var_storage
 from .ascendc_common_utility import (
@@ -466,9 +467,22 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
         param.tiling_info.tiling_data_file_path,
     )
     compile_cmd += [f"-D{TILING_KEY_MACRO}={param.tiling_key}UL"]
-    compile_cmd += [
-        f"-D{param.compile_info.origin_func_name}={param.compile_info.origin_func_name}_{param.tiling_key}_tilingkey"
-    ]
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        tiling_data_hash_src = param.tiling_info.tiling_data
+        if isinstance(tiling_data_hash_src, str):
+            tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
+        elif not tiling_data_hash_src:
+            tiling_data_hash_src = param.tiling_info.file_content.encode("utf-8")
+        tiling_data_hash = hashlib.md5(tiling_data_hash_src).hexdigest()[:8]
+        compile_cmd += [
+            f"-D{param.compile_info.origin_func_name}="
+            f"{param.compile_info.origin_func_name}_{tiling_data_hash}_{param.tiling_key}_tilingkey"
+        ]
+    else:
+        compile_cmd += [
+            f"-D{param.compile_info.origin_func_name}="
+            f"{param.compile_info.origin_func_name}_{param.tiling_key}_tilingkey"
+        ]
     if param.code_channel == CORE_TYPE_MIX or (
         param.compile_info.hard_sync
         and param.compile_info.code_channel in [CORE_TYPE_VEC, CORE_TYPE_CUBE]
