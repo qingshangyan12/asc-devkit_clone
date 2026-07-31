@@ -67,5 +67,5 @@ PIPE_S
 ```cpp
 // dst为外部输入的int32_t类型的GM内存，此示例的初始值为10
 asc_dcci_entire_all();            // 手动同步
-int32_t old = asc_atomic_min(&dst, 3);  // 计算后dst = min(10, 3) = 3，old = 10，即进行asc_atomic_min操作前dst的值。
+int32_t old = asc_atomic_min(dst, 3);  // 计算后dst = min(10, 3) = 3，old = 10，即进行asc_atomic_min操作前dst的值。
 ```

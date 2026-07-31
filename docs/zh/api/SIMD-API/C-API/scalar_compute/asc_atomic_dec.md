@@ -61,5 +61,5 @@ PIPE_S
 ```cpp
 // counter为外部输入的uint32_t类型的GM内存，此示例的初始值为5
 asc_dcci_entire_all();            // 手动同步
-uint32_t old = asc_atomic_dec(&counter, 9);  // 计算后counter = 4, old = 5
+uint32_t old = asc_atomic_dec(counter, 9);  // 计算后counter = 4, old = 5
 ```
