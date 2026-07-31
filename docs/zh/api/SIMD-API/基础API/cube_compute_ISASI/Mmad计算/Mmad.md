@@ -70,7 +70,9 @@ Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专
 
 Mmad接口实现昇腾NPU矩阵乘计算能力，其数学表达式为：
 
-$$C = A \times B + C$$
+$$
+C = A \times B + C
+$$
 
 <!-- npu="950" id19 -->
 针对Ascend 950PR/Ascend 950DT：
