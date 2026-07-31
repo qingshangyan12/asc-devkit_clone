@@ -10,7 +10,7 @@
 
 -   **[GetValue](GetValue.md)**  
 
--   **[operator\(\)](../LocalTensor/operator().md)**  
+-   **[operator\(\)](../LocalTensor/operator_call.md)**  
 
 -   **[SetValue](SetValue.md)**  
 
