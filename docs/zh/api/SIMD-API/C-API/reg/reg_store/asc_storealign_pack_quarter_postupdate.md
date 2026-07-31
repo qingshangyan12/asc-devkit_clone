@@ -38,6 +38,8 @@ __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ floa
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst_align32b | 输入/输出 | 目的操作数（矢量）的起始地址，接口调用后自动更新。 |

@@ -57,7 +57,7 @@ __simd_callee__ inline void asc_float2int32_rz_sat(vector_int32_t& dst, vector_f
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |

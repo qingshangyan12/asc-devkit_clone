@@ -41,7 +41,7 @@ __simd_callee__ inline void asc_uint82half_v2(vector_half& dst, vector_uint8_t s
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |

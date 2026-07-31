@@ -70,6 +70,8 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_float& dst0,
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名 | 输入/输出 | 说明 |
 | :--- | :--- | :--- |
 | dst0 | 输出 | 第一个目的向量寄存器。 |
@@ -82,6 +84,8 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_float& dst0,
 ## 数据类型<a name="data-type"></a>
 
 `asc_loadalign_deintlv_postupdate`支持的数据类型如下表所示。
+
+**表2** 数据类型
 
 | 源数据类型`src` | 目的寄存器类型`dst0/dst1` |
 | :--- | :--- |

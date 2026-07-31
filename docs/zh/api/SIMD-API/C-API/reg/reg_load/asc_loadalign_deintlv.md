@@ -109,6 +109,8 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名 | 输入/输出 | 说明 |
 | :--- | :--- | :--- |
 | dst0 | 输出 | 第一个目的向量寄存器。 |
@@ -121,6 +123,8 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 ## 数据类型<a name="data-type"></a>
 
 `asc_loadalign_deintlv`支持的数据类型如下表所示。三类寻址接口均支持表中所列数据类型。
+
+**表2** 数据类型
 
 | 源数据类型`src` | 目的寄存器类型`dst0/dst1` |
 | :--- | :--- |

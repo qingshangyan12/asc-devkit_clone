@@ -41,7 +41,7 @@ __simd_callee__ inline void asc_uint82uint16_v2(vector_uint16_t& dst, vector_uin
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |

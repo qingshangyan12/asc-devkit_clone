@@ -41,7 +41,7 @@ __simd_callee__ inline void asc_madd(vector_float& dst, vector_float src0, vecto
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- | 

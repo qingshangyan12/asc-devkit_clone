@@ -39,7 +39,7 @@ __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float 
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -64,7 +64,7 @@ __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float 
 
 ## 调用示例
 
-```c++
+```cpp
 vector_half dst;
 vector_half src;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);

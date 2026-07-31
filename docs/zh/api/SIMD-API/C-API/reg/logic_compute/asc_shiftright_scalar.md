@@ -54,7 +54,7 @@ __simd_callee__ inline void asc_shiftright_scalar(vector_uint32_t& dst, vector_u
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |

@@ -45,6 +45,8 @@ __simd_callee__ inline void asc_e1m2x22bfloat16_v4(vector_bfloat16_t& dst, vecto
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名    | 输入/输出 | 描述                |
 | :------ | :----- | :----------------- |
 | dst    | 输出    | 目的操作数（矢量数据寄存器）。            |

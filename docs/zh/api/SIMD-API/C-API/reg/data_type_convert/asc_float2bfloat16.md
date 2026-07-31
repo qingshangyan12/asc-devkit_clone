@@ -79,7 +79,7 @@ __simd_callee__ inline void asc_float2bfloat16_rz_sat_v2(vector_bfloat16_t& dst,
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
