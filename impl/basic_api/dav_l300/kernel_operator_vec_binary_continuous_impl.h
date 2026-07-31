@@ -301,7 +301,7 @@ __aicore__ inline void ShiftLeftImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__
         SupportType<
             Tuple<T, U>, Tuple<int32_t, int32_t>, Tuple<uint32_t, int32_t>, Tuple<int16_t, int16_t>,
             Tuple<uint16_t, int16_t>, Tuple<int8_t, int8_t>, Tuple<uint8_t, int8_t>>(),
-        "Failed to check dtype in ShiftRight, current api support dtype combination is  "
+        "Failed to check dtype in ShiftLeft, current api support dtype combination is  "
         "src0: int32_t, src1: int32_t; src0: uint32_t, src1: int32_t; src0: int16_t, "
         "src1: int16_t; src0: uint16_t, src1: int16_t; "
         "src0: int8_t, src1: int8_t; src0: uint8_t, src1: int8_t.");
