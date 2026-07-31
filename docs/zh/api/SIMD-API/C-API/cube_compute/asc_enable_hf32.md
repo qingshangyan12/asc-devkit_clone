@@ -71,6 +71,25 @@ $$
 
 开启HF32模式后，L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32格式，舍入模式由[asc_set_hf32_round_mode](asc_set_hf32_round_mode.md)接口配置，中间计算使用HF32格式，最终的运算结果仍以FP32格式输出，以保证后续处理的兼容性。
 
+<!-- npu="A3,910b" id12 -->
+针对如下产品型号：
+
+<!-- npu="A3" id13 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id13 -->
+
+<!-- npu="910b" id14 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id14 -->
+
+舍入模式使用[asc_enable_hf32_trans](./asc_enable_hf32_trans.md)接口配置。
+
+<!-- end id12 -->
+
+<!-- npu="950" id15 -->
+针对Ascend 950PR/Ascend 950DT，舍入模式使用[asc_set_hf32_round_mode](asc_set_hf32_round_mode.md)接口配置。
+<!-- end id15 -->
+
 FP32与HF32格式的精度对比如下图所示：
 
 <!-- npu="A3,910b" id10 -->
