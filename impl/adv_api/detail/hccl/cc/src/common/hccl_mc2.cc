@@ -294,8 +294,8 @@ HcclResult AllocComResourceByTilingCcu(
     return HCCL_SUCCESS;
 }
 
-namespace {
-HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
+    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     HCCL_RUN_INFO(
         "[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
@@ -360,13 +360,6 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
     CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
     return HCCL_SUCCESS;
 }
-} // namespace
-
-HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
-    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
-{
-    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
-}
 
 extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingA5Mc2(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
@@ -375,7 +368,7 @@ extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourc
         "[MC2_CLIENT_A5_AICPU] enter asc-devkit explicit A5 MC2 resource allocator, "
         "comm[%p], stream[%p], tiling[%p].",
         comm, stream, mc2Tiling);
-    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+    return HcclAllocComResourceByTiling(comm, stream, mc2Tiling, opResCtx);
 }
 
 namespace {
