@@ -460,7 +460,7 @@
             -   [关键特性说明](SIMD-API/基础API/Reg矢量计算/关键特性说明/关键特性说明.md)
             -   [Reg数据搬入](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/Reg数据搬入.md)
                 -   [连续对齐搬入（LoadAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadAlign_continuous.md)
-                -   [非连续对齐搬入（LoadAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/非LoadAlign_continuous.md)
+                -   [非连续对齐搬入（LoadAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadAlign_noncontinuous.md)
                 -   [连续非对齐搬入（LoadUnAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadUnAlign_continuous.md)
                 -   [MaskReg搬入（LoadAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadAlign_MaskReg.md)
                 -   [MaskReg搬入（MaskGenWithRegTensor）](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/MaskGenWithRegTensor_MaskReg.md)
@@ -471,7 +471,7 @@
 
             -   [Reg数据搬出](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/Reg数据搬出.md)
                 -   [连续对齐搬出（StoreAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_continuous.md)
-                -   [非连续对齐搬出（StoreAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/非StoreAlign_continuous.md)
+                -   [非连续对齐搬出（StoreAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_noncontinuous.md)
                 -   [连续非对齐搬出（StoreUnAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreUnAlign_continuous.md)
                 -   [MaskReg搬出（StoreAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_MaskReg.md)
                 -   [MaskReg非对齐搬出（StoreUnAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreUnAlign_MaskReg.md)

@@ -58,7 +58,7 @@ CTRL寄存器对应比特位上的值。
 
 - startBit和endBit的取值范围为[0, 63]。
 - startBit小于等于endBit。
-- 各比特位的说明请参考[SetCtrlSpr(ISASI)参数说明](./SetCtrlSpr(ISASI).md#参数说明)。
+- 各比特位的说明请参考[SetCtrlSpr(ISASI)参数说明](./SetCtrlSpr_ISASI.md#参数说明)。
 
 ## 调用示例
 
