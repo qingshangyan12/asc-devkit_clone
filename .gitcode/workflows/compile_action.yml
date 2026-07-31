@@ -75,6 +75,10 @@ jobs:
             break
           done
       -
+        name: ddd
+        run: |
+          echo ${{ steps.compile.outputs.api-check }}
+      -
         name: api-check
         identifier: api-check
         uses: cann/.gitcode/actions/api-check@master
