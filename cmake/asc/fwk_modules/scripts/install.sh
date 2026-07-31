@@ -366,12 +366,6 @@ else
         exit 1
     fi
     targetdir="${ASCEND_OPP_PATH}"
-    if [ -n "${ASCEND_CUSTOM_OPP_PATH}" ]; then
-        log "[WARNING] ASCEND_CUSTOM_OPP_PATH is a runtime search path and does not control the installation destination. \
-        The package will be installed to ${targetdir}."
-        log "[WARNING] Operators in ASCEND_CUSTOM_OPP_PATH take precedence over operators installed in the default path. \
-        To give this package higher priority, use --install-path=<path> and source the generated set_env.bash."
-    fi
 fi
 
 if [ ! -d $targetdir ];then
