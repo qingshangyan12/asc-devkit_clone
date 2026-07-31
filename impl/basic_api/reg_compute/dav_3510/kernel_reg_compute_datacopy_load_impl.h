@@ -342,10 +342,20 @@ __simd_callee__ inline void LoadImpl(U& dstReg, __ubuf__ T* srcAddr)
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), "Load only support type b8/b16/b32/b64 on current device");
-    static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only support RegTraitNumOne on current device!");
+    static_assert(
+        CheckRegTrait<U, RegTraitNumOne>() || CheckRegTrait<U, RegTraitNumTwo>(),
+        "RegTensor only support RegTraitNumOne or RegTraitNumTwo on current device!");
     UnalignRegForLoad ureg;
     DataCopyUnAlignPreImpl<T>(ureg, srcAddr);
-    DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr);
+    if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
+        DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr);
+    } else {
+        static_assert(
+            SupportType<ActualT, complex32>() || SupportBytes<ActualT, 8>(),
+            "RegTraitNumTwo only support type complex32/b64 on current device!");
+        constexpr uint32_t count = VECTOR_REG_WIDTH / sizeof(T);
+        DataCopyUnAlignImpl<T, PostLiteral::POST_MODE_UPDATE, U>(dstReg, ureg, srcAddr, count);
+    }
 }
 
 // vlda/vldu
