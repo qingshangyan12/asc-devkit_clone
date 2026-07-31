@@ -131,31 +131,10 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 <a id="flagId冲突说明"></a>
 
-- 以下接口内部也会占用flagId，开发者使用CrossCoreWaitFlag时需注意避免flagId使用冲突：
-    - Matmul高阶API内部实现中使用了CrossCoreSetFlag和CrossCoreWaitFlag进行核间同步控制，其占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
+- 以下接口内部实现中使用了CrossCoreSetFlag和CrossCoreWaitFlag会占用一部分flagId，开发者同时使用CrossCoreSetFlag/CrossCoreWaitFlag与以下接口时，需注意避免flagId使用冲突：
 
-    - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag和CrossCoreWaitFlag进行核间同步控制，因此开发者同时使用CrossCoreSetFlag（或CrossCoreWaitFlag）和SyncAll硬件同步接口时，需注意避免以下flagId冲突：
-        <!-- npu="950" id19 -->
-        - 针对Ascend 950PR/Ascend 950DT，SyncAll硬件同步接口的flagId占用情况如表4所示：
-
-            **表4**  SyncAll硬件同步接口flagId占用情况
-
-            | SyncAll 使用场景 | 占用flagId汇总 | 各计算核flagId占用情况 |
-            | :--- | :--- | :--- |
-            | isAIVOnly=true | 14 | AIV：14 |
-            | isAIVOnly=false（核函数使用`__mix__(1, 1)`修饰时） | 11、12、13 | AIC：11、12、13；AIV：12、13 |
-            | isAIVOnly=false（核函数使用`__mix__(1, 2)`修饰时） | 11、12、13、28、29 | AIC：11、12、13、28、29；AIV：12、13 |
-        <!-- end id19 -->
-        <!-- npu="A3,910b" id20 -->
-        - 针对[NPU架构版本2201](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)，SyncAll硬件同步接口的flagId占用情况如表5所示：
-
-            **表5**  SyncAll硬件同步接口flagId占用情况
-
-            | SyncAll 使用场景 | 占用flagId汇总 | 各计算核flagId占用情况 |
-            | :--- | :--- | :--- |
-            | isAIVOnly=true | 14 | AIV：14 |
-            | isAIVOnly=false | 11、12、13 | AIC：11、12、13；AIV：12、13 |
-        <!-- end id20 -->
+    - Matmul高阶API占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
+    - SyncAll硬件同步接口占用的flagId情况请参考[flagId占用情况](SyncAll.md#syncall_flagId冲突说明)。
 
 - flagId相关的约束：
     - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取最低位4bit为准。
@@ -181,7 +160,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 ## 调用示例<a id="section837496171220"></a>
 
-**表6**  样例描述
+**表4**  样例描述
 
 | SCENARIO_NUM取值 | 业务场景 | 使用的同步模式 |
 | --- | --- | --- |
