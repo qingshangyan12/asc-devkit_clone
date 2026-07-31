@@ -11,10 +11,6 @@
 #include "topo_match_1d.h"
 #include "ins_temp_all_reduce_mesh_1D_one_shot.h"
 
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-#include "ccu_temp_kfc_all_reduce_mesh_1D_mem2mem.h"
-#endif
-
 namespace mc2_ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
@@ -111,12 +107,6 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     }
     return HCCL_SUCCESS;
 }
-
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceMesh1DMem2Mem, InsV2AllReduceSoleExecutor, TopoMatch1D,
-    CcuTempKfcAllReduceMesh1DMem2Mem);
-#endif
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceMesh1DOneShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
