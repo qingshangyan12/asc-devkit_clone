@@ -172,7 +172,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
           **Memory Transfer and Computation Flow**:
 
           - **LocalTensor Creation**: Use [LocalMemAllocator](../../../../../docs/zh/api/SIMD-API/基础API/资源管理/LocalMemAllocator/LocalMemAllocator简介.md) (on-chip memory allocator that automatically allocates in application order, avoiding manual address offset maintenance) to create [LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md) (on-chip memory tensor) for each on-chip cache. The temporary space for A and B matrices in L1 is allocated by the same L1 allocator in application order to avoid manual L1 address offset maintenance
-          - **GM → L1**: Use [DataCopy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_DN2NZ.md) to transfer A and B matrices from GM to L1, completing ND to Nz format conversion (Cube computation unit requires Nz fractal layout, so ND format must be converted to Nz format during transfer)
+          - **GM → L1**: Use [DataCopy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_ND2NZ.md) to transfer A and B matrices from GM to L1, completing ND to Nz format conversion (Cube computation unit requires Nz fractal layout, so ND format must be converted to Nz format during transfer)
           - **L1 → L0A/L0B**: Use [LoadData](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_2D.md) to transfer data to L0A and L0B. B matrix requires transpose (Nz→Zn)
           - **L0A/L0B → L0C**: Use [Mmad](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算/Mmad.md) (matrix multiply-accumulate instruction) to execute matrix multiply-add, accumulating all data blocks along the K axis
           - **L0C → GM**: Use [Fixpipe](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬出/Fixpipe_L0CToGM.md) to transfer results out to GM, completing Nz to ND format conversion and float32 to half type conversion
@@ -326,7 +326,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
 
   The following structures are all passed using curly braces `{}`. The meaning of each field is as follows (field order is consistent with API documentation; actual struct declaration may have different field order):
 
-  **[AscendC::Nd2NzParams](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_DN2NZ.md)** — Used by the `DataCopy` interface to describe ND→Nz format conversion parameters:
+  **[AscendC::Nd2NzParams](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_ND2NZ.md)** — Used by the `DataCopy` interface to describe ND→Nz format conversion parameters:
   ```cpp
   struct Nd2NzParams {
       int32_t  ndNum;              // Number of ND matrices to transfer, [0, 4095]
@@ -483,7 +483,7 @@ The following table details each step of the Cube core and Vector core operation
 | Stage | Data Flow/Behavior | Implementation Purpose/Reason |
 |:---|:---|:---|
 | Initialization | Use [LocalMemAllocator](../../../../../docs/zh/api/SIMD-API/基础API/资源管理/LocalMemAllocator/LocalMemAllocator简介.md) to allocate [LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md) for on-chip caches such as L1, L0A/L0B, L0C | Automatically allocate on-chip memory in application order, avoiding manual address offset maintenance |
-| GM → L1 | [DataCopy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_DN2NZ.md) transfers A/B matrices from GM to L1, simultaneously completing ND→Nz format conversion | Cube computation unit requires Nz fractal layout format, so ND format must be converted to Nz format during transfer to avoid additional conversion overhead |
+| GM → L1 | [DataCopy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_ND2NZ.md) transfers A/B matrices from GM to L1, simultaneously completing ND→Nz format conversion | Cube computation unit requires Nz fractal layout format, so ND format must be converted to Nz format during transfer to avoid additional conversion overhead |
 | L1 → L0A/L0B | [LoadData](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_2D.md) transfers A matrix from L1 to L0A (Nz→Zz/Nz), B matrix from L1 to L0B (Nz→Zn transpose) | B matrix requires transpose because the Mmad instruction requires B matrix to be input in Zn (transposed Nz) format |
 | L0A/L0B → L0C | [Mmad](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算/Mmad.md) executes matrix multiply-add, accumulating all data blocks along the K direction | Completes A×B matrix multiplication computation, K-direction block accumulation ensures correctness |
 | Intra-core Synchronization | [SetFlag](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md)/[WaitFlag](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) ensures data transfer completes before starting the next operation | Avoids LoadData reading data that has not finished transferring, avoids Mmad reading data that has not finished loading |

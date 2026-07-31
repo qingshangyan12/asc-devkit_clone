@@ -172,7 +172,7 @@
           **内存搬运与计算流程**：
 
           - **LocalTensor创建**：使用[LocalMemAllocator](../../../../../docs/zh/api/SIMD-API/基础API/资源管理/LocalMemAllocator/LocalMemAllocator简介.md)（片上内存分配器，按申请顺序自动分配，避免手动维护地址偏移）为各片上缓存创建[LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md)（片上内存张量）。其中A、B矩阵在L1中的临时空间由同一个L1 allocator按申请顺序分配，避免手动维护L1地址偏移
-          - **GM → L1**：使用[DataCopy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_DN2NZ.md)将A、B矩阵从GM搬运到L1，完成ND到Nz格式转换（Cube计算单元要求Nz分形排布，因此需在搬运时将ND格式转为Nz格式）
+          - **GM → L1**：使用[DataCopy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_ND2NZ.md)将A、B矩阵从GM搬运到L1，完成ND到Nz格式转换（Cube计算单元要求Nz分形排布，因此需在搬运时将ND格式转为Nz格式）
           - **L1 → L0A/L0B**：使用[LoadData](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_2D.md)将数据搬运到L0A和L0B，B矩阵需要转置（Nz→Zn）
           - **L0A/L0B → L0C**：使用[Mmad](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算/Mmad.md)（矩阵乘累加指令）执行矩阵乘加，累加K轴方向的所有数据块
           - **L0C → GM**：使用[Fixpipe](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬出/Fixpipe_L0CToGM.md)将结果搬出到GM，完成Nz到ND格式转换和float32到half类型转换
@@ -326,7 +326,7 @@
 
   以下结构体均以花括号`{}`方式传参，各字段含义如下（字段顺序与API文档保持一致，实际struct声明中部分字段顺序可能不同）：
 
-  **[AscendC::Nd2NzParams](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_DN2NZ.md)** — `DataCopy`接口使用，描述ND→Nz格式转换参数：
+  **[AscendC::Nd2NzParams](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_ND2NZ.md)** — `DataCopy`接口使用，描述ND→Nz格式转换参数：
   ```cpp
   struct Nd2NzParams {
       int32_t  ndNum;              // 传输ND矩阵的数目，[0, 4095]
@@ -483,7 +483,7 @@
 | 阶段 | 数据流动/行为 | 实现目的/原因 |
 |:---|:---|:---|
 | 初始化 | 使用[LocalMemAllocator](../../../../../docs/zh/api/SIMD-API/基础API/资源管理/LocalMemAllocator/LocalMemAllocator简介.md)分配L1、L0A/L0B、L0C等片上缓存的[LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md) | 按申请顺序自动分配片上内存，避免手动维护地址偏移 |
-| GM → L1 | [DataCopy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_DN2NZ.md)将A/B矩阵从GM搬入L1，同时完成ND→Nz格式转换 | Cube计算单元要求Nz分形排布格式，因此在搬运时必须将ND格式转为Nz格式，避免额外转换开销 |
+| GM → L1 | [DataCopy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_ND2NZ.md)将A/B矩阵从GM搬入L1，同时完成ND→Nz格式转换 | Cube计算单元要求Nz分形排布格式，因此在搬运时必须将ND格式转为Nz格式，避免额外转换开销 |
 | L1 → L0A/L0B | [LoadData](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_2D.md)将A矩阵从L1搬入L0A（Nz→Zz/Nz），B矩阵从L1搬入L0B（Nz→Zn转置） | B矩阵需要转置是因为Mmad指令要求B矩阵以Zn（转置Nz）格式输入 |
 | L0A/L0B → L0C | [Mmad](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算/Mmad.md)执行矩阵乘加，在K方向累加所有数据块 | 完成A×B的矩阵乘计算，K方向分块累加确保正确性 |
 | 核内同步 | [SetFlag](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md)/[WaitFlag](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md)确保数据搬运完成后再开始下一步操作 | 避免LoadData读取尚未搬运完成的数据，避免Mmad读取尚未加载完成的数据 |
