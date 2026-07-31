@@ -17,8 +17,8 @@ import { useLocalStorage, useMagicKeys } from '@vueuse/core'
 
 import { searchConfig as _searchConfig } from 'virtual:pagefind'
 import LogoPagefind from './LogoPagefind.vue'
+import { initializePagefindSearch, searchPagefind } from './pagefind-search.mjs'
 import type { SearchConfig } from './type'
-import { formatPagefindResult } from './search'
 import { formatShowDate } from './utils'
 
 if (typeof window !== 'undefined' && !window.__pagefind__) {
@@ -31,201 +31,6 @@ if (typeof window !== 'undefined' && !window.__pagefind__) {
 
 const searchResult = ref<{ route: string; meta: Record<string, any>; score: number }[]>([])
 const searchConfig: SearchConfig = _searchConfig
-
-type SubIndexEntry = [string, string, string, [number, string][]]
-let subIndex: SubIndexEntry[] | null = null
-let subIndexLoading = false
-let subIndexLoaded = false
-
-function loadSubIndex() {
-  if (subIndexLoaded || subIndexLoading) return
-  subIndexLoading = true
-  fetch('/search-cjk-index.json')
-    .then(r => r.json())
-    .then((data: SubIndexEntry[]) => {
-      subIndex = data
-      subIndexLoaded = true
-    })
-    .catch(() => {
-      subIndex = null
-      subIndexLoaded = true
-    })
-    .finally(() => {
-      subIndexLoading = false
-    })
-}
-
-const CJK_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/
-
-function generateSubPhrases(phrase: string): string[] {
-  const result: string[] = []
-  for (let len = phrase.length; len >= 2; len--) {
-    for (let i = 0; i <= phrase.length - len; i++) {
-      result.push(phrase.substring(i, i + len))
-    }
-  }
-  return result
-}
-
-function findLongestMatch(subPhrases: string[], content: string): { longestLen: number; totalLen: number } {
-  let longestLen = 0
-  let totalLen = 0
-  const matched = new Set<number>()
-  for (const sp of subPhrases) {
-    if (content.includes(sp)) {
-      const len = sp.length
-      if (!matched.has(len)) {
-        matched.add(len)
-        totalLen += len
-      }
-      if (len > longestLen) {
-        longestLen = len
-      }
-    }
-  }
-  return { longestLen, totalLen }
-}
-
-function findBestPosition(query: string, subPhrases: string[], title: string, headings: [number, string][], text: string): number {
-  const POSITION_BONUS: Record<number, number> = { 1: 600, 2: 500, 3: 400, 4: 300, 5: 200, 6: 100 }
-
-  if (title === query) return POSITION_BONUS[1] + 50
-  if (title.includes(query)) return POSITION_BONUS[1]
-
-  for (const [level, headingText] of headings) {
-    if (headingText === query) return (POSITION_BONUS[level] || 0) + 50
-    for (const sp of subPhrases) {
-      if (headingText.includes(sp)) {
-        return POSITION_BONUS[level] || 0
-      }
-    }
-  }
-
-  if (text.includes(query)) return 0
-
-  for (const sp of subPhrases) {
-    if (text.includes(sp)) return 0
-  }
-
-  return 0
-}
-
-interface SubSearchResult {
-  route: string
-  meta: Record<string, any>
-  score: number
-}
-
-function searchSubIndex(query: string): SubSearchResult[] {
-  if (!subIndex || !query) return []
-
-  const cjkPhrases = query.match(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]{2,}/g) || []
-  const englishParts = query.replace(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g, ' ').trim().split(/\s+/).filter((s: string) => s.length >= 2)
-
-  if (cjkPhrases.length === 0 && englishParts.length === 0) return []
-
-  const allSubPhrases: string[][] = cjkPhrases.map(p => generateSubPhrases(p))
-
-  const results: SubSearchResult[] = []
-
-  for (const [url, title, text, headings] of subIndex) {
-    let pageScore = 0
-    let allMatch = true
-    let bestMatchPhrase = ''
-
-    if (cjkPhrases.length > 0) {
-      for (let pi = 0; pi < cjkPhrases.length; pi++) {
-        const phrase = cjkPhrases[pi]
-        const subs = allSubPhrases[pi]
-        const titleMatch = findLongestMatch(subs, title)
-        const textMatch = findLongestMatch(subs, text)
-        const bestLongest = Math.max(titleMatch.longestLen, textMatch.longestLen)
-        const bestTotal = titleMatch.totalLen + textMatch.totalLen
-
-        if (bestLongest === 0) {
-          allMatch = false
-          break
-        }
-
-        const phraseScore = bestLongest * 10000 + bestTotal * 100
-        if (phraseScore > pageScore || pageScore === 0) {
-          pageScore = phraseScore
-        }
-        if (bestLongest === phrase.length && !bestMatchPhrase) {
-          bestMatchPhrase = phrase
-        }
-      }
-    }
-
-    if (!allMatch) continue
-
-    if (englishParts.length > 0) {
-      let engAllMatch = true
-      let engLongest = 0
-      let engTotal = 0
-      for (const ep of englishParts) {
-        const inTitle = title.includes(ep)
-        const inText = text.includes(ep)
-        if (!inTitle && !inText) {
-          engAllMatch = false
-          break
-        }
-        engLongest = Math.max(engLongest, ep.length)
-        engTotal += ep.length
-      }
-      if (!engAllMatch) continue
-
-      const engScore = engLongest * 10000 + engTotal * 100
-      if (engScore > pageScore || (cjkPhrases.length === 0 && pageScore === 0)) {
-        pageScore = engScore
-      }
-      if (!bestMatchPhrase && englishParts.length > 0) {
-        bestMatchPhrase = englishParts[0]
-      }
-    }
-
-    let positionBonus = 0
-    if (cjkPhrases.length > 0) {
-      for (let pi = 0; pi < cjkPhrases.length; pi++) {
-        const pos = findBestPosition(cjkPhrases[pi], allSubPhrases[pi], title, headings, text)
-        if (pos > positionBonus) positionBonus = pos
-      }
-    }
-    if (englishParts.length > 0) {
-      for (const ep of englishParts) {
-        const pos = findBestPosition(ep, [ep], title, headings, text)
-        if (pos > positionBonus) positionBonus = pos
-      }
-    }
-
-    const finalScore = pageScore + positionBonus
-    const excerpt = extractExcerpt(text, bestMatchPhrase || query, 60)
-
-    results.push({
-      route: url,
-      meta: {
-        title: title || url,
-        description: excerpt,
-      },
-      score: finalScore,
-    })
-  }
-
-  results.sort((a, b) => b.score - a.score)
-  return results.slice(0, 20)
-}
-
-function extractExcerpt(text: string, phrase: string, contextLen: number): string {
-  const idx = text.indexOf(phrase)
-  if (idx === -1) return text.substring(0, contextLen * 2) + '...'
-  const start = Math.max(0, idx - contextLen)
-  const end = Math.min(text.length, idx + phrase.length + contextLen)
-  let excerpt = ''
-  if (start > 0) excerpt += '...'
-  excerpt += text.substring(start, end)
-  if (end < text.length) excerpt += '...'
-  return excerpt
-}
 
 const { localeIndex, site, lang } = useData()
 
@@ -308,88 +113,53 @@ function inlineSearch() {
 }
 
 const searchDelayTime = computed(() => finalSearchConfig.value?.delay ?? 300)
+let activeSearchRequest = 0
+let pagefindInitialization: Promise<any> | null = null
+
+function getPagefind() {
+  if (!pagefindInitialization) {
+    pagefindInitialization = initializePagefindSearch(window.__pagefind__).catch((error: unknown) => {
+      pagefindInitialization = null
+      throw error
+    })
+  }
+  return pagefindInitialization
+}
 
 watch(
   () => searchWords.value,
   async () => {
+    const request = ++activeSearchRequest
     if (!searchWords.value) {
       searchResult.value = []
       searching.value = false
       return
     }
-    if (!window?.__pagefind__?.search) {
-      inlineSearch()
-      searching.value = false
-      return
-    }
 
     searching.value = true
-
     const searchText
       = typeof finalSearchConfig.value.customSearchQuery === 'function'
         ? finalSearchConfig.value.customSearchQuery(searchWords.value)
         : searchWords.value
 
     try {
-      const pagefindSearchResult: any = await window?.__pagefind__
-        ?.debouncedSearch?.(searchText, {}, searchDelayTime.value)
-
-      if (pagefindSearchResult === null) {
+      await new Promise(resolve => setTimeout(resolve, searchDelayTime.value))
+      if (request !== activeSearchRequest) return
+      if (!window?.__pagefind__?.search) {
+        inlineSearch()
         return
       }
-      const pagefindResults = await Promise.all(
-        pagefindSearchResult.results.slice(0, 30).map((v: any) => v.data())
-      )
-      const formattedResults = pagefindResults
-        .map((r) => {
-          const results = formatPagefindResult(r, finalSearchConfig.value.pageResultCount || 1)
-          return results.map((result) => {
-            result.route = result.route.startsWith(site.value.base)
-              ? result.route
-              : withBase(result.route)
-            return result
-          })
-        })
-        .flat()
-        .filter((v) => {
-          return ignorePublish.value || v.meta.publish !== false
-        })
 
-      const subResults = searchSubIndex(searchWords.value)
-      const subResultMap = new Map<string, SubSearchResult>()
-      for (const r of subResults) {
-        subResultMap.set(normalizeRoute(r.route), r)
-      }
-
-      const allResults: { route: string; meta: Record<string, any>; score: number }[] = []
-      const seen = new Set<string>()
-
-      for (const sr of subResults) {
-        const nr = normalizeRoute(sr.route)
-        if (seen.has(nr)) continue
-        seen.add(nr)
-
-        const pfMatch = formattedResults.find(r => normalizeRoute(r.route) === nr)
-        if (pfMatch) {
-          allResults.push({ route: pfMatch.route, meta: pfMatch.meta, score: sr.score })
-        } else {
-          allResults.push({
-            route: sr.route.startsWith(site.value.base) ? sr.route : withBase(sr.route),
-            meta: sr.meta,
-            score: sr.score,
-          })
-        }
-      }
-
-      for (const pf of formattedResults) {
-        const nr = normalizeRoute(pf.route)
-        if (seen.has(nr)) continue
-        seen.add(nr)
-        allResults.push({ route: pf.route, meta: pf.meta, score: 1 })
-      }
-
-      allResults.sort((a, b) => b.score - a.score)
-
+      const pagefind = await getPagefind()
+      const rankedResults = await searchPagefind(pagefind, String(searchText).normalize('NFKC').trim())
+      if (request !== activeSearchRequest) return
+      const allResults = rankedResults
+        .map(result => ({
+          route: result.route.startsWith(site.value.base) ? result.route : withBase(result.route),
+          meta: result.meta,
+          score: result.score,
+        }))
+        .filter(result => ignorePublish.value || result.meta.publish !== false)
       if (finalSearchConfig.value.sort) {
         allResults.sort(finalSearchConfig.value.sort)
       }
@@ -397,15 +167,12 @@ watch(
         finalSearchConfig.value.filter ?? (() => true)
       )
     }
-    finally {
-      searching.value = false
+    catch {
+      if (request === activeSearchRequest) searchResult.value = []
     }
-
-    nextTick(() => {
-      document.querySelectorAll('div[aria-disabled="true"]').forEach((v) => {
-        v.setAttribute('aria-disabled', 'false')
-      })
-    })
+    finally {
+      if (request === activeSearchRequest) searching.value = false
+    }
   }
 )
 
@@ -419,7 +186,6 @@ watch(
   (newValue) => {
     if (newValue) {
       document.body.style.overflow = 'hidden'
-      loadSubIndex()
       nextTick(() => {
         document
           .querySelector('div[command-dialog-mask]')
@@ -446,10 +212,10 @@ const showSearchResult = computed(() => {
 
 const router = useRouter()
 const route = useRoute()
-function handleSelect(target: any) {
+function handleSelect(target: string) {
   hideSearchModal()
-  if (route.path !== target.value) {
-    router.go(target.value)
+  if (route.path !== target) {
+    router.go(target)
   }
 }
 
@@ -485,19 +251,10 @@ function stripExt(url: string) {
   return url.replace(/\.html?$/, '')
 }
 
-function normalizeRoute(url: string) {
-  let r = url.split('#')[0].split('?')[0]
-  r = r.replace(/\.html?$/, '')
-  r = r.replace(/\/index$/, '/')
-  r = r.replace(/\/$/, '')
-  if (!r.startsWith('/')) r = '/' + r
-  return r
-}
-
-function breadcrumb(url: string) {
+function breadcrumb(url: string): string[] {
   const pathPart = url.split('#')[0]
   const segments = stripExt(pathPart).replace(/\/$/, '').split('/').filter(Boolean).map(decodeURIComponent)
-  if (segments.length <= 1) return ''
+  if (segments.length <= 1) return []
   const topLevels = ['api', 'guide', 'zh', 'en']
   let start = topLevels.includes(segments[0]) ? 1 : 0
   return segments.slice(start)
@@ -507,7 +264,6 @@ function dirLabel(url: string) {
   return breadcrumb(url).join(' > ')
 }
 
-const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount || 1)
 </script>
 
 <template>
@@ -566,8 +322,8 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
               </Command.Empty>
               <Command.Group v-else :heading="headingText">
                 <Command.Item
-                  v-for="item in showSearchResult" :key="item.route" :data-value="item.route"
-                  @select="handleSelect"
+                  v-for="item in showSearchResult" :key="item.route" :data-route="item.route"
+                  :data-value="`${searchWords} ${item.meta.title}`" @select="handleSelect(item.route)"
                 >
                   <div class="link">
                     <div v-if="dirLabel(item.route)" class="breadcrumb-row">{{ dirLabel(item.route) }}</div>
