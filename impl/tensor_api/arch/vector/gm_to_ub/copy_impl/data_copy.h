@@ -34,7 +34,7 @@ class CopyGmToUbufAlignV2Common {
 protected:
     template <typename T, typename U>
     __aicore__ inline static void EmitCopy(const T& dst, const U& src, uint16_t blockCount, uint32_t blockLen,
-                                           int64_t srcStride, int64_t dstStride)
+                                           int64_t srcStride, int64_t dstStride, const CopyGM2UBParams& params)
     {
         using SrcType = typename U::elementType;
         using DstType = typename T::elementType;
@@ -48,11 +48,10 @@ protected:
             dstStride = dstStride >> 1;
         }
 
-        constexpr uint8_t leftPaddingCnt = 0;
-        constexpr uint8_t rightPaddingCnt = 0;
         auto cacheMode = static_cast<asc_load_l2_cache_mode>(src.Engine().GetCacheMode());
-        CopyGmToUbufAlignV2Instr::DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, srcStride,
-                                           dstStride, cacheMode);
+        CopyGmToUbufAlignV2Instr::DataCopy(dst, src, blockCount, blockLen, params.leftPaddingCount,
+                                           params.rightPaddingCount, params.enableConstantPad, cacheMode, srcStride,
+                                           dstStride);
     }
 };
 
