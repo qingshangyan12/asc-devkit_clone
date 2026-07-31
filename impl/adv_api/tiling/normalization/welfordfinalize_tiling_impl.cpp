@@ -28,6 +28,8 @@ void GetWelfordFinalizeMaxMinTmpSize(
     const auto npuArch = platform->GetCurNpuArch();
     if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102 || npuArch == NpuArch::DAV_5162) {
         const uint32_t srcK = shapeDims.back();
+        const uint32_t vecLenB32 = platform->GetVecRegLen() / sizeof(float);
+        const uint32_t alignLen = vecLenB32 * 2;
         // next is to get the max 2^k
         uint32_t reduceK = srcK;
         reduceK |= reduceK >> 1;
@@ -36,7 +38,7 @@ void GetWelfordFinalizeMaxMinTmpSize(
         reduceK |= reduceK >> 8;
         reduceK |= reduceK >> 16;
         reduceK = (reduceK + 1) >> 1;
-        uint32_t reduceTmpSize = (reduceK / 64 + 128 - 1) / 128 * 128; // align to 128 element
+        uint32_t reduceTmpSize = (reduceK / vecLenB32 + alignLen - 1) / alignLen * alignLen;
         minValue = (srcK + reduceTmpSize) * sizeof(float);
         maxValue = minValue;
         return;
