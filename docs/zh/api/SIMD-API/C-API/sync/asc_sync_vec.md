@@ -26,12 +26,15 @@
 
 ## 功能说明
 
+**无入参函数原型`asc_sync_vec()`接口已废弃，请使用[asc_sync](./asc_sync.md)执行针对所有流水线的同步操作。**
+
 针对PIPE_V流水线执行同步操作。
 
 ## 函数原型
 
 ```cpp
 __aicore__ inline void asc_sync_vec(int id)
+__aicore__ inline void asc_sync_vec()
 ```
 
 ## 参数说明
