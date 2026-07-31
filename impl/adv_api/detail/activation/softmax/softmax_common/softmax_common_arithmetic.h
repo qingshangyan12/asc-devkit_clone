@@ -313,7 +313,7 @@ __aicore__ inline void TransDivToMulImpl(
     const uint32_t originalSrcM, const uint32_t srcK, const uint32_t srcReduceK)
 {
     const uint32_t curReduceSize = originalSrcM * srcReduceK;
-    Duplicate(tmpbuffer, (float)1.0, curReduceSize);
+    Duplicate(tmpbuffer, 1.0f, curReduceSize);
     PipeBarrier<PIPE_V>();
     Div(tmpbuffer, tmpbuffer, src, curReduceSize);
     PipeBarrier<PIPE_V>();

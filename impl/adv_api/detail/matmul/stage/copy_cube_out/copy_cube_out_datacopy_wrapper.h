@@ -374,7 +374,7 @@ private:
             int32_t dstMulsOffset = dstOffset;
             for (int32_t j = 0; j < highBlocks; ++j) {
                 Muls<DstT, false>(
-                    trans[dstMulsOffset], localBuf[srcOffset], (DstT)1.0, mask, MAX_REPEAT_TIMES, intriParams);
+                    trans[dstMulsOffset], localBuf[srcOffset], (DstT)1.0f, mask, MAX_REPEAT_TIMES, intriParams);
                 srcOffset += srcStride;
                 dstMulsOffset += dstStride;
             }
@@ -383,11 +383,11 @@ private:
                     for (int32_t j = 0; j < highTail; j++) {
                         Muls<DstT, false>(
                             trans[dstMulsOffset + j * dstOffsetStride], localBuf[srcOffset + j * srcOffsetStride],
-                            (DstT)1.0, mask, 1, intriParams);
+                            (DstT)1.0f, mask, 1, intriParams);
                     }
                 } else {
                     Muls<DstT, false>(
-                        trans[dstMulsOffset], localBuf[srcOffset], (DstT)1.0, mask, highTail, intriParams);
+                        trans[dstMulsOffset], localBuf[srcOffset], (DstT)1.0f, mask, highTail, intriParams);
                 }
                 if constexpr (sizeof(DstT) == B32_BYTE_SIZE) {
                     srcOffset += highTail * GetBlockCount();

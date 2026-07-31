@@ -138,7 +138,7 @@ __aicore__ inline void DeepNormOutputBasicBlockByBrcb(
 
     // copy to expected output: tmpTensorC
     SetVectorMask<float, MaskMode::COUNTER>(0, tiling.bshCurLength);
-    Adds<float, false>(params.tempTensorC, params.tempTensorA, 0.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(params.tempTensorC, params.tempTensorA, 0.0f, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 }
 } // namespace DeepNormAPI

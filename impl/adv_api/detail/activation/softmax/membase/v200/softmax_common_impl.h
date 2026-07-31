@@ -243,7 +243,7 @@ __aicore__ inline void BroadCastNDImpl(
     uint8_t repeat = DivCeil(originalSrcM, DEFAULT_REPEAT_STRIDE);
     for (uint8_t i = 0; i < repeat; i++) {
         Muls<float, false>(
-            dst[i * B16_BYTE_SIZE * FLOAT_REPEAT_SIZE], src[i * DEFAULT_REPEAT_STRIDE], 1.0, MASK_PLACEHOLDER,
+            dst[i * B16_BYTE_SIZE * FLOAT_REPEAT_SIZE], src[i * DEFAULT_REPEAT_STRIDE], 1.0f, MASK_PLACEHOLDER,
             B16_BYTE_SIZE, {1, 0, DEFAULT_REPEAT_STRIDE, 0});
     }
     PipeBarrier<PIPE_V>();

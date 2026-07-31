@@ -113,7 +113,7 @@ __aicore__ inline void GetExpInputInTmp(const LocalTensor<T>& src, const ExpPara
         unaryParams.srcRepStride = HALF_REPEAT_STRIDE;
         Cast<float, half, false>(params.tempTensorFloorX, src, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1, unaryParams);
     } else { // FP32: copy
-        Adds<float, false>(params.tempTensorFloorX, src, 0.0, MASK_PLACEHOLDER, 1, unaryParams);
+        Adds<float, false>(params.tempTensorFloorX, src, 0.0f, MASK_PLACEHOLDER, 1, unaryParams);
     }
     PipeBarrier<PIPE_V>();
 }
@@ -163,11 +163,11 @@ __aicore__ inline void ExpHighPrecisionExec(const ExpParams<float>& params, uint
     SetVectorMask<float, MaskMode::COUNTER>(0, maskLength);
 
     // copy FP32 FloorX to tempTensorFloorXPow:        FloorXPow = DecimalX
-    Adds<float, false>(params.tempTensorFloorXPow, params.tempTensorFloorX, 0.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(params.tempTensorFloorXPow, params.tempTensorFloorX, 0.0f, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 
     // + x      Res = DecimalX
-    Adds<float, false>(params.tempTensorRes[offset], params.tempTensorFloorX, 0.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(params.tempTensorRes[offset], params.tempTensorFloorX, 0.0f, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 
     // + 1      Res = 1 + DecimalX
