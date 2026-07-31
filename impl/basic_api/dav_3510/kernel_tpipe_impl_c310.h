@@ -317,9 +317,7 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num, uint32_t len)
             KERNEL_LOG(KERNEL_ERROR, "buffer size is %d, limits is %d", this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN);
         });
         ASCENDC_ASSERT(
-            (Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::L1)] <=
-             this->g_tpipeImpl.tscmBufferPtr_),
-            {
+            (Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::L1)] <= this->g_tpipeImpl.tscmBufferPtr_), {
                 KERNEL_LOG(
                     KERNEL_ERROR, "tscm addr is %d, limits is %d", this->g_tpipeImpl.tscmBufferPtr_,
                     Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::L1)]);
@@ -467,10 +465,7 @@ __aicore__ inline void TPipe::ReleaseEventID(TEventID id)
     return ::AscendC::ReleaseEventID<evt>(id);
 }
 
-__aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
-{
-    return ::AscendC::Internal::FetchEventIDImpl(evt);
-}
+__aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt) { return ::AscendC::Internal::FetchEventIDImpl(evt); }
 
 template <HardEvent evt>
 __aicore__ inline TEventID TPipe::FetchEventID()
@@ -1005,12 +1000,11 @@ __aicore__ inline bool TPipe::TscmInitBuffer(T& que, uint8_t num, uint32_t len)
         ptr->usertag = -1;
         curPoolAddr += len;
     }
-    ASCENDC_ASSERT(
-        (Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(pool)] <= this->g_tpipeImpl.tscmBufferPtr_), {
-            KERNEL_LOG(
-                KERNEL_ERROR, "tscm addr %d overlapped with maxAddr %d", this->g_tpipeImpl.tscmBufferPtr_,
-                Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(pool)]);
-        });
+    ASCENDC_ASSERT((Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(pool)] <= this->g_tpipeImpl.tscmBufferPtr_), {
+        KERNEL_LOG(
+            KERNEL_ERROR, "tscm addr %d overlapped with maxAddr %d", this->g_tpipeImpl.tscmBufferPtr_,
+            Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(pool)]);
+    });
     this->g_tpipeImpl.curBufSize_ += num;
     ASCENDC_ASSERT((this->g_tpipeImpl.curBufSize_ <= QBUF_MAX_LEN), {
         KERNEL_LOG(
