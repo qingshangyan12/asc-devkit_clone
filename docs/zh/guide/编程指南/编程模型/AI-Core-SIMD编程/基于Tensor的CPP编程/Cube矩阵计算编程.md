@@ -513,7 +513,7 @@ auto globalTensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(gmPtr), glob
 auto l1Tensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(l1Ptr), l1Layout);
 ```
 
-扩展Tensor提供了`operator[]`元素访问、`operator_call.md)`子Tensor提取和`Slice()`切片提取等布局调整接口，大幅简化多维数据的操作流程。相较于基础Tensor需要手动计算偏移地址、步长参数和搬运长度，扩展Tensor的接口可自动推导这些底层参数，开发者只需关注数据逻辑即可。这种抽象封装方式不仅降低了编程复杂度，也减少了参数配置错误的风险，让开发者能将精力集中于算子性能优化与算法实现，显著提升开发效率。
+扩展Tensor提供了`operator[]`元素访问、`operator()`子Tensor提取和`Slice()`切片提取等布局调整接口，大幅简化多维数据的操作流程。相较于基础Tensor需要手动计算偏移地址、步长参数和搬运长度，扩展Tensor的接口可自动推导这些底层参数，开发者只需关注数据逻辑即可。这种抽象封装方式不仅降低了编程复杂度，也减少了参数配置错误的风险，让开发者能将精力集中于算子性能优化与算法实现，显著提升开发效率。
 
 ```cpp
 // Construct tensor for Global Memory

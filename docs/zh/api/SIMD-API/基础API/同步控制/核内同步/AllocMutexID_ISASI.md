@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/kernel_common.h"`。
 
-从框架获取并占用一个MutexID，与[ReleaseMutexID](ReleaseMutexID_ISASI.md).md)配合使用，管理MutexID的获取和释放。获取的MutexID可以传入[Mutex::Lock](Lock.md)/[Mutex::Unlock](Unlock.md)接口使用，此时Mutex::Lock/Unlock可以与TQue等其他接口配合使用。
+从框架获取并占用一个MutexID，与[ReleaseMutexID](ReleaseMutexID_ISASI.md)配合使用，管理MutexID的获取和释放。获取的MutexID可以传入[Mutex::Lock](Lock.md)/[Mutex::Unlock](Unlock.md)接口使用，此时Mutex::Lock/Unlock可以与TQue等其他接口配合使用。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

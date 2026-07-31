@@ -1,4 +1,4 @@
-# GetReduceRepeatSumSpr_ISASI.md)
+# GetReduceRepeatSumSpr_ISASI
 
 ## 产品支持情况
 

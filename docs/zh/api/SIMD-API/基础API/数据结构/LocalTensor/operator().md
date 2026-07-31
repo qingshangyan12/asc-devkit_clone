@@ -32,7 +32,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline __inout_pipe__(S) __ubuf__ PrimType& operator_call.md)(const uint32_t offset) const
+__aicore__ inline __inout_pipe__(S) __ubuf__ PrimType& operator()(const uint32_t offset) const
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -76,7 +76,7 @@ using PrimType = PrimT<T>;
 ## 调用示例<a name="section17531157161314"></a>
 
 ```cpp
-// operator_call.md)使用方法,用于左值，相当于Setvalue接口，用于右值，相当于Getvalue接口
+// operator()使用方法,用于左值，相当于Setvalue接口，用于右值，相当于Getvalue接口
 // 输入数据(inputLocal): [100 100 100 ... 100]
 inputLocal(2) = 200;
 // 输出数据(inputLocal): [100 100 200 ... 100]

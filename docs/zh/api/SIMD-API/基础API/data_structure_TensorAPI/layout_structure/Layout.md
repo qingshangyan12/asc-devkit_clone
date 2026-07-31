@@ -62,7 +62,7 @@ struct Layout : private Std::tuple<T, U>
     __aicore__ inline constexpr decltype(auto) Stride() const
 
     template <typename S>
-    __aicore__ inline constexpr auto operator_call.md)(const S& coord) const
+    __aicore__ inline constexpr auto operator()(const S& coord) const
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) Rank() const
@@ -200,7 +200,7 @@ struct Layout : private Std::tuple<T, U>
 
 ---
 
-### operator_call.md)
+### operator()
 
 - 功能说明
 
@@ -212,7 +212,7 @@ struct Layout : private Std::tuple<T, U>
 
   ```cpp
   template <typename S>
-  __aicore__ inline constexpr auto operator_call.md)(const S& coord) const
+  __aicore__ inline constexpr auto operator()(const S& coord) const
   ```
 
 - 参数说明

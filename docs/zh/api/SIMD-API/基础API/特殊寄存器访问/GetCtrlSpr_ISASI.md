@@ -1,4 +1,4 @@
-# GetCtrlSpr_ISASI.md)
+# GetCtrlSpr_ISASI
 
 ## 产品支持情况
 

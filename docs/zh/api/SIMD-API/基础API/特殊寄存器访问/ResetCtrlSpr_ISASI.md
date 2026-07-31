@@ -1,4 +1,4 @@
-# ResetCtrlSpr_ISASI.md)
+# ResetCtrlSpr_ISASI
 
 ## 产品支持情况
 

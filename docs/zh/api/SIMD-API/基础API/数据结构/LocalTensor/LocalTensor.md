@@ -10,7 +10,7 @@
 
 -   **[operator\[\]](operator.md)**  
 
--   **[operator\(\)](operator().md).md)**  
+-   **[operator\(\)](operator().md)**  
 
 -   **[SetSize](SetSize.md)**  
 

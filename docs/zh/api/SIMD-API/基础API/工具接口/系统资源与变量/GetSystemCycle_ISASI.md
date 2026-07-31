@@ -1,4 +1,4 @@
-# GetSystemCycle_ISASI.md)
+# GetSystemCycle_ISASI
 
 ## 产品支持情况
 

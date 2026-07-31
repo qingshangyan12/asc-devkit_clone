@@ -72,16 +72,16 @@ struct BaseTensor<TensorAttribute<EngineType, LayoutType>> {
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const;
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator_call.md)(const Coord& coord);
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord);
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator_call.md)(const Coord& coord) const;
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const;
 
     template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator_call.md)(const Coord0& c0, const Coord1& c1, const Coords&... cs);
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
 
     template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator_call.md)(const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
 
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info);
@@ -299,7 +299,7 @@ Tensor相关类型本身为类型定义，不直接返回值。
 
 ---
 
-### operator_call.md)
+### operator()
 
 - 功能说明
 
@@ -309,16 +309,16 @@ Tensor相关类型本身为类型定义，不直接返回值。
 
   ```cpp
   template <typename Coord>
-  __aicore__ inline constexpr decltype(auto) operator_call.md)(const Coord& coord)
+  __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord)
 
   template <typename Coord>
-  __aicore__ inline constexpr decltype(auto) operator_call.md)(const Coord& coord) const
+  __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const
 
   template <typename Coord0, typename Coord1, typename... Coords>
-  __aicore__ inline constexpr decltype(auto) operator_call.md)(const Coord0& c0, const Coord1& c1, const Coords&... cs)
+  __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs)
 
   template <typename Coord0, typename Coord1, typename... Coords>
-  __aicore__ inline constexpr decltype(auto) operator_call.md)(const Coord0& c0, const Coord1& c1, const Coords&... cs) const
+  __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const
   ```
 
 - 参数说明
