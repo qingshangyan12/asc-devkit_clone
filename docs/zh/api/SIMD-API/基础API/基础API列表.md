@@ -628,3 +628,5 @@
 | [ResetCtrlSpr(ISASI)](特殊寄存器访问/ResetCtrlSpr(ISASI).md) | 重置CTRL寄存器（控制寄存器）的特定比特位。 |
 | [GetSaturationFlag(ISASI)](特殊寄存器访问/GetSaturationFlag(ISASI).md) | 获取计算/精度转换时饱和模式的开启状态。 |
 | [SetSaturationFlag(ISASI)](特殊寄存器访问/SetSaturationFlag(ISASI).md) | 设置饱和开关的标志位，以控制计算/精度转换时饱和模式的开启与关闭。 |
+| [GetScalarCacheMode](特殊寄存器访问/GetScalarCacheMode.md) | 获取L2 Cache在读或写场景下的缓存模式。 |
+| [SetScalarCacheMode](特殊寄存器访问/SetScalarCacheMode.md) | 设置L2 Cache在读或写场景下的缓存模式。 |
