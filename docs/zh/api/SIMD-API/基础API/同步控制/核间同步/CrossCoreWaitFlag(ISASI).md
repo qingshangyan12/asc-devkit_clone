@@ -1,6 +1,6 @@
-# CrossCoreWaitFlag\(ISASI\)<a name="ZH-CN_TOPIC_0000001787470374"></a>
+# CrossCoreWaitFlag\(ISASI\)<a id="ZH-CN_TOPIC_0000001787470374"></a>
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况<a id="section1550532418810"></a>
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -24,20 +24,20 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明<a id="section618mcpsimp"></a>
 
 头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag功能说明](CrossCoreSetFlag(ISASI).md#section618mcpsimp)。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型<a id="section620mcpsimp"></a>
 
 ```cpp
 template <uint8_t modeId = 0, pipe_t pipe = PIPE_S>
 __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明<a id="section622mcpsimp"></a>
 
 ### 模板参数及输入参数说明
 
@@ -68,7 +68,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 | --- | --- | --- |
 | flagId | 输入 | 核间同步的标记。不同产品对flagId的取值范围说明请参见[flagId取值范围说明](#flagId取值范围说明)。 |
 
-### modeId支持的取值说明<a name="modeId支持的取值说明"></a>
+### modeId支持的取值说明<a id="modeId支持的取值说明"></a>
 
 不同产品对同步模式的支持情况如下：
 <!-- npu="950" id12 -->
@@ -84,7 +84,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     <!-- end id15 -->
 <!-- end id13 -->
 
-### pipe支持的流水类型说明<a name="pipe支持的流水类型说明"></a>
+### pipe支持的流水类型说明<a id="pipe支持的流水类型说明"></a>
 
 - 核间同步的模式为模式0、1、2时，
     - 支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX。
@@ -95,7 +95,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     - 不支持的流水类型为PIPE_ALL。
 <!-- end id16 -->
 
-### flagId取值范围说明<a name="flagId取值范围说明"></a>
+### flagId取值范围说明<a id="flagId取值范围说明"></a>
 
 - 核间同步的模式为模式0、1、2时，支持的取值范围为0-15。
 <!-- npu="950" id17 -->
@@ -108,17 +108,17 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 此外，当与Matmul高阶API或SyncAll接口同时使用时，开发者自行使用的flagId还需注意避免与这些接口内部已占用的flagId冲突，详见[约束说明](#flagId冲突说明)中的flagId占用情况。
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明<a id="section640mcpsimp"></a>
 
 无
 
-## 约束说明<a name="section633mcpsimp"></a>
+## 约束说明<a id="section633mcpsimp"></a>
 
 - 由于当Kernel类型为KERNEL_TYPE_AIC_ONLY或KERNEL_TYPE_AIV_ONLY时，硬件不会开启调度模块，也就无法正常进行核间同步，因此不同的同步模式配置[Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)或[函数修饰符](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#section1074418132518)的情况如下：
     - 在纯Vector/Cube场景下（模式0或模式1），建议设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0，其它支持的Kernel类型请参考表3。
     - 对于Vector和Cube混合场景（模式2和模式4），需根据AI Core中AIC和AIV的比例灵活配置Kernel类型，不同模式支持的函数修饰符和Kernel类型请参照表3。
 
-        **表3**  模式与支持的Kernel类型配置<a name="table3"></a>
+        **表3**  模式与支持的Kernel类型配置<a id="table3"></a>
 
         | 模式 | 支持的函数修饰符 | 支持的Kernel类型配置 |
         | --- | --- | --- |
@@ -129,31 +129,33 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 - CrossCoreWaitFlag必须与[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)接口配合使用，避免计算核一直处于阻塞阶段。
 
-- 接口使用模式0、1、2，需要避免flagId使用冲突：<a name="flagId冲突说明"></a>
-    - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
+<a id="flagId冲突说明"></a>
 
-    - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，因此开发者同时使用CrossCoreSetFlag（或CrossCoreWaitFlag）和SyncAll硬件同步接口时，需注意避免以下flagId冲突：
+- 以下接口内部也会占用flagId，开发者使用CrossCoreWaitFlag时需注意避免flagId使用冲突：
+    - Matmul高阶API内部实现中使用了CrossCoreSetFlag和CrossCoreWaitFlag进行核间同步控制，其占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
 
-        **表5**  SyncAll硬件同步接口flagId占用情况
-
-        | SyncAll 使用场景 | 占用 flagId | 占用计算核 |
-        | :--- | :--- | :--- |
-        | isAIVOnly=true（纯Vector全核同步） | 14 | AIV |
-        | isAIVOnly=false（Mix全核同步） | 11、12、13 | AIC：11、12、13 / AIV：12、13 |
-
+    - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag和CrossCoreWaitFlag进行核间同步控制，因此开发者同时使用CrossCoreSetFlag（或CrossCoreWaitFlag）和SyncAll硬件同步接口时，需注意避免以下flagId冲突：
         <!-- npu="950" id19 -->
-        仅Ascend 950PR/Ascend 950DT，在Mix全核同步的 `MIX_CORE_AIC_RATION≠1` 时（即 `__mix__(1, 2)` 对应的默认场景），除上述flagId外，AIC额外占用以下flagId用于与AIV1通信：
+        - 针对Ascend 950PR/Ascend 950DT，SyncAll硬件同步接口的flagId占用情况如表4所示：
 
-        > 说明：`MIX_CORE_AIC_RATION` 是由核函数修饰符 `__mix__(a, b)` 设定的编译期常量，表示每个 AI Core 内 AIC 与 AIV 的数量关系。当核函数使用 `__mix__(1, 1)` 修饰时，`MIX_CORE_AIC_RATION=1`（松耦合模式，1 个 AIC + 1 个 AIV）；当使用 `__mix__(1, 2)` 修饰时，`MIX_CORE_AIC_RATION=2`（默认值，1 个 AIC + 2 个 AIV）。后者需要额外占用 flagId，详见下表。
+            **表4**  SyncAll硬件同步接口flagId占用情况
 
-        **表6**  SyncAll硬件同步接口flagId额外占用情况（`MIX_CORE_AIC_RATION≠1` 时，仅Ascend 950PR/Ascend 950DT）
-
-        | SyncAll 使用场景 | 额外占用 flagId | 占用计算核 |
-        | :--- | :--- | :--- |
-        | isAIVOnly=false（Mix全核同步，`MIX_CORE_AIC_RATION≠1` 时） | 28、29 | AIC：28、29 |
-
-        > 说明：28 = 12 + 16（对应AIV1视角的flagId=12），29 = 13 + 16（对应AIV1视角的flagId=13）。硬件上AIV1的flagId在AIC侧会自动偏移+16。
+            | SyncAll 使用场景 | 占用flagId汇总 | 各计算核flagId占用情况 |
+            | :--- | :--- | :--- |
+            | isAIVOnly=true | 14 | AIV：14 |
+            | isAIVOnly=false（核函数使用`__mix__(1, 1)`修饰时） | 11、12、13 | AIC：11、12、13；AIV：12、13 |
+            | isAIVOnly=false（核函数使用`__mix__(1, 2)`修饰时） | 11、12、13、28、29 | AIC：11、12、13、28、29；AIV：12、13 |
         <!-- end id19 -->
+        <!-- npu="A3,910b" id20 -->
+        - 针对[NPU架构版本2201](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)，SyncAll硬件同步接口的flagId占用情况如表5所示：
+
+            **表5**  SyncAll硬件同步接口flagId占用情况
+
+            | SyncAll 使用场景 | 占用flagId汇总 | 各计算核flagId占用情况 |
+            | :--- | :--- | :--- |
+            | isAIVOnly=true | 14 | AIV：14 |
+            | isAIVOnly=false | 11、12、13 | AIC：11、12、13；AIV：12、13 |
+        <!-- end id20 -->
 
 - flagId相关的约束：
     - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取最低位4bit为准。
@@ -177,9 +179,9 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
     Kernel直调场景下通过[\_\_schedmode\_\_\(mode\)](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)限定符来设置batchmode模式；工程化算子开发场景下，通过TilingContext的SetScheduleMode接口来设置batchmode模式，具体请参考[《基础数据结构和接口》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/basicdataapi/atlasopapi_07_00001.html)。
 
-## 调用示例<a name="section837496171220"></a>
+## 调用示例<a id="section837496171220"></a>
 
-**表4**  样例描述
+**表6**  样例描述
 
 | SCENARIO_NUM取值 | 业务场景 | 使用的同步模式 |
 | --- | --- | --- |
