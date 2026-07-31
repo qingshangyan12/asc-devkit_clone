@@ -26,7 +26,7 @@
 #include "../kernel_check.h"
 #endif
 
-#pragma begin_pipe(V)
+
 namespace AscendC {
 template <typename T, typename U>
 constexpr __aicore__ inline void CheckMulCastSupportType()
@@ -151,7 +151,6 @@ __aicore__ inline void MulCastCalc(
         (__ubuf__ SrcPrimType*)src1Local.GetPhyAddr(), calCount);
 }
 } // namespace AscendC
-#pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_MULCAST_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_MULCAST_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
