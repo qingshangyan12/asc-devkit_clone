@@ -311,7 +311,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 | bfloat16_t | bfloat16_t | float |
 | int4b_t | int4b_t | int32_t |
 
-针对Ascend 950PR/DT产品：
+针对Ascend 950PR/Ascend 950DT产品：
 （类似分表，含fp8/hifloat8等特有类型）
 
 | 左矩阵A | 右矩阵B | 偏置Bias | 结果矩阵C |
