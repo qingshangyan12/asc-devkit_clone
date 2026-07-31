@@ -71,7 +71,6 @@ public:
     void CompleteCurrentSq()
     {
         channel_.cqTail = channel_.cqHead;
-        channel_.sqTail = channel_.cqHead;
     }
 
 private:
