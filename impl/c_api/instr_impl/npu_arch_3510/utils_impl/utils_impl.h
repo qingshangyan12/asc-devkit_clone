@@ -45,8 +45,8 @@ union asc_gm2ub_loop_stride_config {
     };
 };
 
-#ifndef ULL
-#define ULL unsigned long long
-#endif
+// #ifndef ULL
+// #define ULL unsigned long long
+// #endif
 
 #endif
