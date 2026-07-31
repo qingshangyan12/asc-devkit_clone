@@ -32,7 +32,7 @@
 
 - 前n个数据搬运
 
-    若`size`非32字节对齐，搬出时会在读取UB数据时自动补充dummy假数据，将搬运数据补齐至32字节对齐。写入GM时会丢弃补充的dummy假数据。
+    若搬运数据长度非32字节对齐，搬出时会在读取UB数据时自动补充dummy假数据，将搬运数据补齐至32字节对齐。写入GM时会丢弃补充的dummy假数据。
 
 - 高维切分搬运
 
@@ -126,8 +126,8 @@
 **表1**  参数说明
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| dst | 输出 | 目的操作数在GM的起始地址。需要32字节对齐。 |
-| src | 输入 | 源操作数在UB的起始地址。需要1字节对齐。 |
+| dst | 输出 | 目的GM的起始地址。需要1字节对齐。 |
+| src | 输入 | 源UB的起始地址。需要32字节对齐。 |
 | size | 输入 | 搬运数据大小，单位为字节。取值范围：[0, 2097151]。 |
 | n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[0, 4095]。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[0, 2097151]。 |
@@ -150,14 +150,14 @@ PIPE_MTE3
 - 当`size`值为0时，该接口被视为NOP（空操作）。
 - 如果需要执行多条asc_copy_ub2gm_align指令，且asc_copy_ub2gm_align指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个asc_copy_ub2gm_align指令的串行化，防止出现异常数据。
 - 前n个数据搬运接口的`size`无需32字节对齐。若`size`非32字节对齐，硬件会自动补充dummy假数据至32字节对齐。dummy假数据的值为数据块的第一个元素的值。写入GM时会丢弃补充的dummy假数据。
-- src_stride不能设置为0。如需将同一个源数据块Broadcast到GM的多个连续位置，请使用loop功能，具体请参考[关键特性说明](#关键特性说明)。
+- src_stride = 0时可能会出现**硬件未定义行为**，如需将同一个源数据块Broadcast到GM的多个连续位置，建议使用loop功能，具体请参考[关键特性说明](#关键特性说明)。
 - 当src_stride不等于len_burst时，src_stride要求32字节对齐。
 
 ## 关键特性说明
 
 ### Broadcast场景
 
-使用高维切分搬运接口时，不能通过将`src_stride`设置为0实现Broadcast。可将`n_burst`设置为1，并通过[asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md)、[asc_set_ub2gm_loop1_stride](../asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](../asc_set_ub2gm_loop2_stride.md)配置循环搬运：
+使用高维切分搬运接口时，不建议通过将`src_stride`设置为0实现Broadcast。可通过loop功能实现Broadcast，将`n_burst`设置为1，并通过[asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md)、[asc_set_ub2gm_loop1_stride](../asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](../asc_set_ub2gm_loop2_stride.md)配置循环搬运：
 
 - 将`loop1_size`设置为Broadcast次数，将`loop2_size`设置为1。
 - 将`loop1_src_stride`设置为0，使每次内层循环读取同一个UB源数据块。
