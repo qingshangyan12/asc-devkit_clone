@@ -25,7 +25,11 @@
 #include "../../utils/common_types.h"
 
 namespace AscendC {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5162))
+const int32_t DEFAULT_BLK_NUM = 1;
+#else
 const int32_t DEFAULT_BLK_NUM = 8;
+#endif
 const int32_t POWER_MASK_NUM = 8;
 const int32_t HALF_FACTOR = 2;
 const int32_t DOUBLE_FACTOR = 2;

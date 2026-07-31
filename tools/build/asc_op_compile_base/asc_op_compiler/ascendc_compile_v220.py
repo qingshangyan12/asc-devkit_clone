@@ -303,6 +303,7 @@ def _gen_compile_cmd_v516(
 
     for option in compile_option_tuple.compile_options:
         compile_cmd += [option]
+    # fix: need dav-516r2
     compile_cmd += [
         src_file,
         "--cce-aicore-arch=dav-l510",

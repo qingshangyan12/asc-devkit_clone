@@ -598,7 +598,7 @@ class CommonUtility:
         elif CommonUtility.is_m510():
             chip_version = "510r2"
         elif CommonUtility.is_v516():
-            chip_version = "l510"
+            chip_version = "l510" # fix: need 516r2
         return chip_version
 
     @staticmethod
