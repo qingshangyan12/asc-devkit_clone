@@ -252,7 +252,7 @@ __aicore__ inline void TPipeBase::AuxShareBufStart(
 {
     uint8_t hardU8 = static_cast<uint8_t>(hard);
     if (unlikely(g_tpipeImpl.shareBufPool_.start[pos] == -1)) { // The address has not been initialized.
-        // Record the maximum allocated address.
+                                                                // Record the maximum allocated address.
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
         g_tpipeImpl.shareBufPool_.start[pos] = this->g_tpipeImpl.bufPool_[hardU8].maxAddr;
 #else
