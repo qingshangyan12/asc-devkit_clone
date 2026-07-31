@@ -38,7 +38,7 @@ struct integral_constant
     using value_type = Tp;
     using type = integral_constant;
     inline constexpr operator value_type() const noexcept;
-    inline constexpr value_type operator()() const noexcept;
+    inline constexpr value_type operator_call.md)() const noexcept;
 };
 
 template <size_t v>

@@ -1,4 +1,4 @@
-# GetReduceRepeatMaxMinSpr(ISASI)
+# GetReduceRepeatMaxMinSpr_ISASI.md)
 
 ## 产品支持情况
 

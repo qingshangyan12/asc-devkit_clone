@@ -136,7 +136,7 @@ struct Layout : private Std::tuple<ShapeType, StrideType> {
     __aicore__ inline constexpr decltype(auto) GetStride() const {}
     
     template <typename CoordType>
-    __aicore__ inline constexpr auto operator()(const CoordType& coord) const {}
+    __aicore__ inline constexpr auto operator_call.md)(const CoordType& coord) const {}
 }
 ```
 

@@ -24,7 +24,7 @@ public:
     PrimType* GetPhyAddr(const uint32_t offset) const;
     PrimType* GetPhyAddr() const;
     __inout_pipe__(S) PrimType GetValue(const uint32_t offset) const;
-    __inout_pipe__(S) PrimType& operator()(const uint32_t offset) const;
+    __inout_pipe__(S) PrimType& operator_call.md)(const uint32_t offset) const;
     template <typename CAST_T> __aicore__ inline LocalTensor<CAST_T> ReinterpretCast() const;
     template <typename T1> __inout_pipe__(S) void SetValue(const uint32_t index, const T1 value) const;
     LocalTensor operator[](const uint32_t offset) const;
@@ -36,7 +36,7 @@ public:
     __aicore__ inline uint64_t GetPhyAddr() const;
     __aicore__ inline uint64_t GetPhyAddr(const uint32_t offset) const;
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint32_t index) const;
-    __aicore__ inline __inout_pipe__(S) __ubuf__ PrimType& operator()(const uint32_t offset) const;
+    __aicore__ inline __inout_pipe__(S) __ubuf__ PrimType& operator_call.md)(const uint32_t offset) const;
     template <typename CAST_T> __aicore__ inline LocalTensor<CAST_T> ReinterpretCast() const;
     template <typename T1> __aicore__ inline __inout_pipe__(S)
         void SetValue(const uint32_t index, const T1 value) const;

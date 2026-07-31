@@ -77,8 +77,8 @@
 | 比较与选择 | Compare（结果存入寄存器） | AIV | PIPE_V |
 | 比较与选择 | Compares | AIV | PIPE_V |
 | 比较与选择 | Compares（灵活标量位置） | AIV | PIPE_V |
-| 比较与选择 | GetCmpMask(ISASI) | AIV | PIPE_V |
-| 比较与选择 | SetCmpMask(ISASI) | AIV | PIPE_V |
+| 比较与选择 | GetCmpMask_ISASI.md) | AIV | PIPE_V |
+| 比较与选择 | SetCmpMask_ISASI.md) | AIV | PIPE_V |
 | 比较与选择 | Select | AIV | PIPE_V |
 | 比较与选择 | Select（灵活标量位置） | AIV | PIPE_V |
 | 比较与选择 | GatherMask | AIV | PIPE_V |
@@ -194,8 +194,8 @@
 | SetAtomicMin | PIPE_S |
 | SetAtomicType | PIPE_S |
 | DisableDmaAtomic | PIPE_S |
-| GetStoreAtomicConfig(ISASI) | PIPE_S |
-| SetStoreAtomicConfig(ISASI) | PIPE_S |
+| GetStoreAtomicConfig_ISASI.md) | PIPE_S |
+| SetStoreAtomicConfig_ISASI.md) | PIPE_S |
 | AtomicAdd | PIPE_S |
 | AtomicMax | PIPE_S |
 | AtomicMin | PIPE_S |
@@ -227,10 +227,10 @@
 
 | API接口名称 | 流水类型 |
 | --- | --- |
-| ReadGmByPassDCache(ISASI) | PIPE_S |
-| WriteGmByPassDCache(ISASI) | PIPE_S |
+| ReadGmByPassDCache_ISASI.md) | PIPE_S |
+| WriteGmByPassDCache_ISASI.md) | PIPE_S |
 | DataCachePreload | PIPE_S |
 | DataCacheCleanAndInvalid | PIPE_S |
-| ICachePreLoad(ISASI) | PIPE_S |
-| GetICachePreloadStatus(ISASI) | PIPE_S |
+| ICachePreLoad_ISASI.md) | PIPE_S |
+| GetICachePreloadStatus_ISASI.md) | PIPE_S |
 

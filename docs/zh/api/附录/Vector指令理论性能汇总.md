@@ -130,7 +130,7 @@
 | Min | int16_t | 128 |
 | Min | int32_t | 64 |
 | Min | float | 64 |
-| BilinearInterpolation(ISASI) | half | 软仿指令，不涉及理论并行度 |
+| BilinearInterpolation_ISASI.md) | half | 软仿指令，不涉及理论并行度 |
 | Adds | half | 128 |
 | Adds | int16_t | 128 |
 | Adds | int32_t | 64 |
@@ -211,8 +211,8 @@
 | Compares | int32_t | int32_t | uint8_t | 64 |
 | Select | half | half | uint8_t | 128 |
 | Select | float | float | uint8_t | 64 |
-| GetCmpMask(ISASI) | - | - | - | 1 |
-| SetCmpMask(ISASI) | - | - | - | 1 |
+| GetCmpMask_ISASI.md) | - | - | - | 1 |
+| SetCmpMask_ISASI.md) | - | - | - | 1 |
 | GatherMask | half | uint16_t | half | 64 |
 | GatherMask | bfloat16_t | uint16_t | bfloat16_t | 64 |
 | GatherMask | uint16_t | uint16_t | uint16_t | 64 |

@@ -185,7 +185,7 @@ l12l0Params.ifTranspose = false;
 AscendC::LoadData(l0a_buffer, l1_buffer, l12l0Params);
 ```
 
-搬运到L0B Buffer采用同样的`LoadData`接口实现，接口参数及实现功能同L12L0A，可参考[矩阵计算的搬入](../../../../../api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵计算的搬入.md)查看更多内容。
+搬运到L0B Buffer采用同样的`LoadData`接口实现，接口参数及实现功能同L12L0A，可参考[矩阵计算的搬入](../../../../../api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/矩阵计算的搬入.md)查看更多内容。
 
 当输入A矩阵（GM）是转置排布（K×M）时，搬入到L1 Buffer后为（K×M）排布的Nz分形。要使L0A Buffer存放（M×K）的矩阵，需要在L1 Buffer到L0A Buffer的搬运过程中进行转置。针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，可使用`LoadDataWithTranspose`接口，调用示例如下。
 
@@ -296,11 +296,11 @@ uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
 AscendC::SetFixpipePreQuantFlag(deqScalar);
 ```
 
-详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算（ISASI）.md)。
+详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/基础API/cube_compute_ISASI/cube_compute_ISASI.md)。
 
 ### 矩阵计算
 
-[Mmad](../../../../../api/SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md)是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品L0A Buffer分形为Nz。
+[Mmad](../../../../../api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算/Mmad.md)是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品L0A Buffer分形为Nz。
 
 ![NPU架构版本3510 `Mmad`计算](../../../../figures/Ascend950PR-Ascend950DT-asc_mmad计算.png)
 
@@ -513,7 +513,7 @@ auto globalTensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(gmPtr), glob
 auto l1Tensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(l1Ptr), l1Layout);
 ```
 
-扩展Tensor提供了`operator[]`元素访问、`operator()`子Tensor提取和`Slice()`切片提取等布局调整接口，大幅简化多维数据的操作流程。相较于基础Tensor需要手动计算偏移地址、步长参数和搬运长度，扩展Tensor的接口可自动推导这些底层参数，开发者只需关注数据逻辑即可。这种抽象封装方式不仅降低了编程复杂度，也减少了参数配置错误的风险，让开发者能将精力集中于算子性能优化与算法实现，显著提升开发效率。
+扩展Tensor提供了`operator[]`元素访问、`operator_call.md)`子Tensor提取和`Slice()`切片提取等布局调整接口，大幅简化多维数据的操作流程。相较于基础Tensor需要手动计算偏移地址、步长参数和搬运长度，扩展Tensor的接口可自动推导这些底层参数，开发者只需关注数据逻辑即可。这种抽象封装方式不仅降低了编程复杂度，也减少了参数配置错误的风险，让开发者能将精力集中于算子性能优化与算法实现，显著提升开发效率。
 
 ```cpp
 // Construct tensor for Global Memory

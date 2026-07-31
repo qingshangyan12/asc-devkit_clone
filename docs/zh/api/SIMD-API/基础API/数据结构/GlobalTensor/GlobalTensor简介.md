@@ -20,7 +20,7 @@ public:
     // 获取GlobalTensor的相应偏移位置的值
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint64_t offset) const; 
     // 获取某个索引位置的元素的引用
-    __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset) const;
+    __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator_call.md)(const uint64_t offset) const;
     // 设置GlobalTensor相应偏移位置的值
     __aicore__ inline void SetValue(const uint64_t offset, PrimType value);
     // 获取GlobalTensor的元素个数
