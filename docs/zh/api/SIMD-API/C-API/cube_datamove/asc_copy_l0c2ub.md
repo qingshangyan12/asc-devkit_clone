@@ -30,7 +30,7 @@
 
 下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为Cast，其余为随路scalar/tensor量化模式。
 
-**图1** asc_copy_l0c2ub随路功能组合<a id="zh-cn_topic_0000002542828493_fig542810249163"></a>  
+**图1** asc_copy_l0c2ub随路功能组合
 
 ![](../../../figures/C_API_L0C2UB_Function_Combination_950.png)
 
