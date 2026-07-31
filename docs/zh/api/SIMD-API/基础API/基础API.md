@@ -8,7 +8,7 @@
 
 - **[数据搬运导览](数据搬运导览/数据搬运导览.md)**  
 
-- **[矩阵计算（ISASI）](cube_compute_ISASI/cube_compute_ISASI.md)**
+- **[cube_compute_ISASI](cube_compute_ISASI/cube_compute_ISASI.md)**
 
 - **[矩阵计算（Tensor API）](cube_compute_TensorAPI/cube_compute_TensorAPI.md)**
 
