@@ -50,7 +50,8 @@
 #define ASCENDC_SHAPE(dimValue, ...) \
     dimValue, (const uint32_t[]) { __VA_ARGS__ }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
 #define SetBitOn(flag, bit) ((flag) = ((flag) | ((uint64_t)(1) << (bit))))
 
 #define GetBit(flag, bit) (((flag) >> (bit)) & (1))
@@ -371,7 +372,8 @@ struct SknlKernelMap {
 
 #define ENABLE_DETERMINISTIC() ENABLE_FEATURE_FOR_COMPILE(deterministic, 1)
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
 #define KERNEL_TASK_TYPE(key, value)
 #define KERNEL_TASK_TYPE_DEFAULT(value)
 #else
@@ -393,7 +395,8 @@ struct SknlKernelMap {
 #define SIMT_ONE_CORE_DUMP_SIZE (2048 * 2048)
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
 #ifndef INT4X2_T_STRUCT
 #define INT4X2_T_STRUCT
 struct int4x2_t {
