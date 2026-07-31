@@ -1,0 +1,492 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+const CJK_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/
+const CJK_PHRASE_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]{2,}/g
+const RESULTS_PER_VARIANT = 80
+const MAX_CANDIDATES = 240
+const initializedPagefindInstances = new WeakSet()
+
+function normalizeCase(value) {
+  return String(value || '').normalize('NFKC').replace(/\s+/g, ' ').trim()
+}
+
+function normalize(value) {
+  return normalizeCase(value).toLocaleLowerCase()
+}
+
+function compactEnglish(value) {
+  return normalize(value).replace(/[^a-z0-9]+/g, '')
+}
+
+function normalizeRoute(url) {
+  let route = String(url || '').split('#')[0].split('?')[0]
+  try {
+    route = decodeURIComponent(route)
+  }
+  catch {}
+  route = route.replace(/\.html?$/, '').replace(/\/index$/, '/')
+  return route || '/'
+}
+
+function getLeadingIdentifier(value) {
+  return normalize(value).match(/^[a-z_][a-z0-9_]*/)?.[0] || ''
+}
+
+function isDirectoryLandingPage(url, title) {
+  const segments = normalizeRoute(url).split('/').filter(Boolean)
+  if (segments.length < 2) return false
+  return normalize(segments.at(-1)) === normalize(segments.at(-2))
+    && normalize(segments.at(-1)) === normalize(title)
+}
+
+function isSingleEditMatch(left, right) {
+  if (left === right) return true
+  if (Math.abs(left.length - right.length) > 1) return false
+
+  if (left.length === right.length) {
+    const differences = []
+    for (let index = 0; index < left.length; index++) {
+      if (left[index] !== right[index]) differences.push(index)
+      if (differences.length > 2) return false
+    }
+    if (differences.length === 1) return true
+    return differences.length === 2
+      && differences[1] === differences[0] + 1
+      && left[differences[0]] === right[differences[1]]
+      && left[differences[1]] === right[differences[0]]
+  }
+
+  const [shorter, longer] = left.length < right.length ? [left, right] : [right, left]
+  let shortIndex = 0
+  let longIndex = 0
+  let skipped = false
+  while (shortIndex < shorter.length && longIndex < longer.length) {
+    if (shorter[shortIndex] === longer[longIndex]) {
+      shortIndex++
+      longIndex++
+      continue
+    }
+    if (skipped) return false
+    skipped = true
+    longIndex++
+  }
+  return true
+}
+
+function singleEditVariants(value) {
+  const variants = new Set()
+  for (let index = 0; index < value.length; index++) {
+    variants.add(value.slice(0, index) + value.slice(index + 1))
+    if (index + 1 < value.length) {
+      variants.add(value.slice(0, index) + value[index + 1] + value[index] + value.slice(index + 2))
+    }
+  }
+  variants.delete(value)
+  return [...variants].filter(variant => variant.length >= 4)
+}
+
+function generateSubPhrases(phrase) {
+  const result = []
+  for (let length = phrase.length; length >= 2; length--) {
+    for (let index = 0; index <= phrase.length - length; index++) {
+      result.push(phrase.slice(index, index + length))
+    }
+  }
+  return result
+}
+
+function cjkAlias(value) {
+  return `cjk${[...value].map(character => character.codePointAt(0).toString(16)).join('')}x`
+}
+
+function findLongestMatch(subPhrases, content) {
+  let longestLength = 0
+  let totalLength = 0
+  const matchedLengths = new Set()
+  for (const phrase of subPhrases) {
+    if (!content.includes(phrase)) continue
+    if (!matchedLengths.has(phrase.length)) {
+      matchedLengths.add(phrase.length)
+      totalLength += phrase.length
+    }
+    longestLength = Math.max(longestLength, phrase.length)
+  }
+  return { longestLength, totalLength }
+}
+
+function routeMatchBonus(url, cjkPhrases) {
+  const segments = normalizeRoute(url).split('/')
+  const bigrams = cjkPhrases.flatMap((phrase) => {
+    const values = []
+    for (let index = 0; index < phrase.length - 1; index++) values.push(phrase.slice(index, index + 2))
+    return values
+  })
+  if (bigrams.length === 0) return 0
+  const bestMatch = segments.reduce((best, segment) => {
+    return Math.max(best, bigrams.filter(bigram => segment.includes(bigram)).length)
+  }, 0)
+  const coverage = bestMatch / bigrams.length
+  return bestMatch >= 2 && coverage >= 0.6 ? Math.round(80000 * coverage) : 0
+}
+
+function compactCjkRouteBonus(url, cjkPhrases) {
+  if (cjkPhrases.length === 0) return 0
+  const segments = normalizeRoute(url).split('/').map(segment => segment.replace(/[^\u3400-\u9fff\uf900-\ufaff]+/g, ''))
+  return cjkPhrases.some(phrase => segments.includes(phrase)) ? 60000 : 0
+}
+
+function createQueryPlan(query) {
+  const caseQuery = normalizeCase(query)
+  const normalizedQuery = normalize(query)
+  const compactQuery = compactEnglish(query)
+  const cjkPhrases = caseQuery.match(CJK_PHRASE_REGEX) || []
+  const englishParts = normalizedQuery
+    .replace(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g, ' ')
+    .match(/[a-z0-9]+/g)
+    ?.filter(part => part.length >= 2) || []
+  return {
+    query: String(query),
+    caseQuery,
+    normalizedQuery,
+    compactQuery,
+    cjkPhrases,
+    englishParts,
+    cjkSubPhrases: cjkPhrases.map(generateSubPhrases),
+    dataTypeIntent: /^[a-z_][a-z0-9_]*_t$/i.test(caseQuery),
+    macroIntent: /^__[a-z0-9_]+__$/i.test(caseQuery),
+  }
+}
+
+function addVariant(variants, query, weight) {
+  const value = normalizeCase(query)
+  if (value.length < 2) return
+  const existing = variants.get(value)
+  if (!existing || weight > existing.weight) variants.set(value, { query: value, weight })
+}
+
+function primaryVariants(plan) {
+  const variants = new Map()
+  addVariant(variants, plan.query, 2)
+  addVariant(variants, plan.caseQuery, 2)
+  addVariant(variants, `"${plan.caseQuery}"`, 2.4)
+
+  const separated = plan.caseQuery.replace(/[_:<>()[\]{}\-]+/g, ' ').replace(/\s+/g, ' ').trim()
+  addVariant(variants, separated, 1.7)
+  if (plan.englishParts.length > 0) {
+    addVariant(variants, plan.englishParts.join(' '), 1.6)
+    addVariant(variants, `"${plan.englishParts.join(' ')}"`, 2.1)
+    addVariant(variants, plan.englishParts.join('_'), 1.5)
+    addVariant(variants, plan.compactQuery, 1.4)
+    for (const part of plan.englishParts) addVariant(variants, part, 0.8)
+  }
+  for (const phrase of plan.cjkPhrases) {
+    addVariant(variants, phrase, 1.4)
+    addVariant(variants, `"${phrase}"`, 2)
+  }
+  if (plan.dataTypeIntent) {
+    addVariant(variants, `${plan.caseQuery} data type`, 1.8)
+    addVariant(variants, `${plan.caseQuery} 数据类型`, 1.8)
+  }
+  if (plan.macroIntent) {
+    const identifier = plan.caseQuery.replace(/^__|__$/g, '')
+    addVariant(variants, `${identifier} builtin`, 1.8)
+    addVariant(variants, `${identifier} keyword`, 1.8)
+    addVariant(variants, `${identifier} 关键字`, 1.8)
+  }
+  return [...variants.values()]
+}
+
+function titleVariants(plan, variants) {
+  const titleQueries = new Map(variants.map(variant => [variant.query, variant]))
+  for (const phrase of plan.cjkPhrases) {
+    addVariant(titleQueries, cjkAlias(phrase), 3)
+    for (let index = 0; index < phrase.length - 1; index++) {
+      addVariant(titleQueries, cjkAlias(phrase.slice(index, index + 2)), 1.5)
+    }
+  }
+  return [...titleQueries.values()]
+}
+
+async function collectCandidates(pagefind, variants, candidates = new Map(), source = 'content') {
+  const responses = await Promise.all(variants.map(async (variant) => {
+    try {
+      return { variant, response: await pagefind.search(variant.query) }
+    }
+    catch {
+      return { variant, response: null }
+    }
+  }))
+
+  for (const { variant, response } of responses) {
+    const results = response?.results?.slice(0, RESULTS_PER_VARIANT) || []
+    for (let rank = 0; rank < results.length; rank++) {
+      const result = results[rank]
+      const key = `${source}:${result.id || `${variant.query}:${rank}`}`
+      const sourceWeight = source === 'title' ? 1.3 : 1
+      const reciprocalRank = sourceWeight * variant.weight / (60 + rank + 1)
+      const existing = candidates.get(key)
+      if (existing) {
+        existing.retrievalScore += reciprocalRank
+        existing.bestEngineScore = Math.max(existing.bestEngineScore, Number(result.score) || 0)
+        existing.bestRank = Math.min(existing.bestRank, rank)
+      }
+      else {
+        candidates.set(key, {
+          result,
+          retrievalScore: reciprocalRank,
+          bestEngineScore: Number(result.score) || 0,
+          bestRank: rank,
+          data: null,
+        })
+      }
+    }
+  }
+  return candidates
+}
+
+async function materializeCandidates(candidates) {
+  const selected = [...candidates.values()]
+    .sort((left, right) => right.retrievalScore - left.retrievalScore
+      || right.bestEngineScore - left.bestEngineScore)
+    .slice(0, MAX_CANDIDATES)
+  await Promise.all(selected.map(async (candidate) => {
+    if (!candidate.data) {
+      try {
+        candidate.data = await candidate.result.data()
+      }
+      catch {
+        candidate.data = {}
+      }
+    }
+  }))
+  return selected
+}
+
+function candidateFields(candidate) {
+  const data = candidate.data || {}
+  const title = String(data.meta?.title || '').replace(/___PAGEFIND_ANCHOR___\S*/g, '').trim()
+  const route = data.url || data.raw_url || ''
+  const headings = (data.anchors || []).map(anchor => String(anchor.text || '').trim()).filter(Boolean)
+  const text = [title, data.content, data.raw_content, data.excerpt, ...headings, normalizeRoute(route)]
+    .filter(Boolean)
+    .join(' ')
+  return { data, title, route, headings, text }
+}
+
+function scoreCandidate(candidate, plan) {
+  const { data, title, route, headings, text } = candidateFields(candidate)
+  const normalizedTitle = normalize(title)
+  const caseTitle = normalizeCase(title)
+  const normalizedText = normalize(text)
+  const normalizedHeadings = headings.map(normalize)
+  const compactTitle = compactEnglish(title)
+  const leadingIdentifier = getLeadingIdentifier(title)
+  const pureEnglishTitle = !CJK_REGEX.test(title)
+  const routeDepth = normalizeRoute(route).split('/').filter(Boolean).length
+  const retrievalTieScore = candidate.retrievalScore * 5000
+    + Math.log1p(candidate.bestEngineScore) * 1000
+    + Math.max(0, 80 - candidate.bestRank) * 30
+  let mixedEnglishTitleParts = 0
+  if (plan.cjkPhrases.length > 0 && plan.englishParts.length > 0 && pureEnglishTitle) {
+    let joinedParts = ''
+    for (const part of plan.englishParts) {
+      joinedParts += part
+      if (compactTitle === joinedParts) mixedEnglishTitleParts++
+    }
+  }
+  const mixedPrimaryTitle = mixedEnglishTitleParts > 0
+
+  let pageScore = candidate.retrievalScore * 100000
+    + Math.log1p(candidate.bestEngineScore) * 1000
+  let coverage = plan.cjkPhrases.length > 0 ? 1 : 0
+  let cjkScore = 0
+
+  for (let index = 0; index < plan.cjkPhrases.length; index++) {
+    const phrase = plan.cjkPhrases[index]
+    const matches = findLongestMatch(plan.cjkSubPhrases[index], normalizedText)
+    if (matches.longestLength === 0) {
+      if (!mixedPrimaryTitle) return null
+      coverage = Math.min(coverage, 0.75)
+      continue
+    }
+    const phraseCoverage = matches.longestLength / phrase.length
+    coverage = Math.min(coverage, phraseCoverage)
+    cjkScore = Math.max(cjkScore, matches.longestLength * 10000 + matches.totalLength * 100)
+    if (normalizedTitle === normalize(phrase)) cjkScore = Math.max(cjkScore, 1000000 + phrase.length * 100)
+    else if (normalizedTitle.includes(normalize(phrase))) cjkScore = Math.max(cjkScore, 900000 + phrase.length * 100)
+  }
+  if (plan.cjkPhrases.length > 0 && coverage < 0.5) return null
+  pageScore = Math.max(pageScore, cjkScore)
+
+  const typoTitleMatch = plan.cjkPhrases.length === 0
+    && plan.englishParts.length === 1
+    && plan.compactQuery.length >= 5
+    && (isSingleEditMatch(plan.compactQuery, compactTitle)
+      || (leadingIdentifier.length >= 5 && isSingleEditMatch(plan.compactQuery, leadingIdentifier)))
+  let englishMatched = true
+  for (const part of plan.englishParts) {
+    if (!normalizedText.includes(part)) {
+      englishMatched = false
+      break
+    }
+  }
+  if (plan.englishParts.length > 0 && !englishMatched && !typoTitleMatch) return null
+  if (plan.cjkPhrases.length === 0 && plan.englishParts.length > 0) {
+    coverage = englishMatched ? 1 : (plan.compactQuery.length - 1) / plan.compactQuery.length
+  }
+
+  if (plan.cjkPhrases.length === 0 && plan.englishParts.length > 0) {
+    let englishScore = Math.max(...plan.englishParts.map(part => part.length * 10000), 0)
+      + plan.englishParts.reduce((sum, part) => sum + part.length, 0) * 100
+    const titleSignalsAllowed = !plan.macroIntent
+    const titleExact = titleSignalsAllowed && plan.compactQuery.length >= 2 && compactTitle === plan.compactQuery
+    const titlePrefix = titleSignalsAllowed && plan.compactQuery.length >= 2 && compactTitle.startsWith(plan.compactQuery)
+    const titleContains = titleSignalsAllowed && plan.compactQuery.length >= 2 && compactTitle.includes(plan.compactQuery)
+    const identifierExact = titleSignalsAllowed && leadingIdentifier && leadingIdentifier === plan.compactQuery
+    const dataTypeDefinition = plan.dataTypeIntent && /数据类型|data\s*types?/i.test(title)
+    const builtinDataTypeDefinition = plan.dataTypeIntent && /内置数据类型|built-?in\s+data\s*types?/i.test(title)
+    const exactIdentifierCount = plan.macroIntent
+      ? normalizedText.split(plan.normalizedQuery).length - 1
+      : 0
+    const macroDefinition = plan.macroIntent && /builtin|关键字|macros?|宏/i.test(title)
+    const builtinKeywordDefinition = plan.macroIntent && /builtin.*关键字|关键字.*builtin/i.test(title)
+    if (exactIdentifierCount > 0) englishScore = Math.max(englishScore, 600000 + exactIdentifierCount * 10000)
+    if (typoTitleMatch) englishScore = Math.max(englishScore, 700000 + plan.compactQuery.length * 100)
+    if (titleContains && plan.englishParts.length === 1) {
+      englishScore = Math.max(englishScore, 800000 + plan.compactQuery.length * 100)
+    }
+    if (titlePrefix) englishScore = Math.max(englishScore, 900000 + plan.compactQuery.length * 100)
+    if (dataTypeDefinition) englishScore = Math.max(englishScore, 2200000 + plan.compactQuery.length * 100)
+    if (macroDefinition) englishScore = Math.max(englishScore, 950000 + plan.compactQuery.length * 100)
+    if (identifierExact) englishScore = Math.max(englishScore, 1100000 + plan.compactQuery.length * 100)
+    if (titleExact) englishScore = Math.max(englishScore, 1200000 + plan.compactQuery.length * 100)
+    if (builtinDataTypeDefinition) englishScore = Math.max(englishScore, 2300000 + plan.compactQuery.length * 100)
+    if (builtinKeywordDefinition) englishScore = Math.max(englishScore, 1250000 + plan.compactQuery.length * 100)
+    if (titleExact && pureEnglishTitle) {
+      englishScore = Math.max(englishScore, 1400000 + plan.compactQuery.length * 100)
+    }
+    if (titlePrefix && pureEnglishTitle) {
+      englishScore = Math.max(englishScore, 1050000 + plan.compactQuery.length * 100)
+    }
+    if (typoTitleMatch && pureEnglishTitle) {
+      englishScore = Math.max(englishScore, 850000 + plan.compactQuery.length * 100)
+    }
+    pageScore = Math.max(pageScore, englishScore)
+  }
+
+  const normalizedExactTitle = normalizedTitle === plan.normalizedQuery
+  const caseExactTitle = caseTitle === plan.caseQuery
+  const titlePartCount = plan.cjkPhrases.length + plan.englishParts.length
+  const titlePartMatches = plan.cjkPhrases.filter(phrase => normalizedTitle.includes(normalize(phrase))).length
+    + plan.englishParts.filter(part => normalizedTitle.includes(part)).length
+  const titlePartCoverage = titlePartCount > 0 ? titlePartMatches / titlePartCount : 0
+  const allEnglishPartsInTitle = plan.englishParts.length >= 2
+    && plan.englishParts.every(part => normalizedTitle.includes(part))
+  const mixedEnglishExact = plan.cjkPhrases.length > 0
+    && plan.englishParts.length >= 2
+    && compactTitle === plan.compactQuery
+    && !CJK_REGEX.test(title)
+
+  if (plan.cjkPhrases.length > 0 && plan.englishParts.length > 0) {
+    if (titlePartCoverage === 1) pageScore += 150000
+    else if (plan.cjkPhrases.length >= 2) pageScore += Math.round(150000 * titlePartCoverage)
+    if (mixedPrimaryTitle) {
+      pageScore = Math.max(pageScore, 1700000 + mixedEnglishTitleParts * 10000)
+    }
+    if (allEnglishPartsInTitle) pageScore += 200000
+  }
+  if (plan.cjkPhrases.length === 0 && plan.englishParts.length >= 2
+    && normalizedHeadings.some(heading => heading === plan.normalizedQuery)) {
+    pageScore = Math.max(pageScore, 1300000 + plan.normalizedQuery.length * 100)
+  }
+  if (normalizedExactTitle || mixedEnglishExact) {
+    pageScore = Math.max(pageScore, 2000000 + plan.normalizedQuery.length * 100)
+  }
+  if (caseExactTitle) pageScore = Math.max(pageScore, 2100000 + plan.caseQuery.length * 100)
+
+  const directoryBonus = isDirectoryLandingPage(route, title)
+    && (normalizedExactTitle || typoTitleMatch || mixedPrimaryTitle || compactTitle.startsWith(plan.compactQuery))
+    ? 20000
+    : 0
+  const canonicalRouteBonus = (normalizedExactTitle || mixedPrimaryTitle || compactTitle.startsWith(plan.compactQuery))
+    ? Math.max(0, 12000 - normalizeRoute(route).length * 30 - routeDepth * 100)
+    : 0
+  const wrappedEnglishPhrasePenalty = plan.cjkPhrases.length === 0
+    && plan.englishParts.length >= 2
+    && compactTitle.includes(plan.compactQuery)
+    && compactTitle !== plan.compactQuery
+    ? 5000
+    : 0
+  const score = pageScore + retrievalTieScore + directoryBonus + canonicalRouteBonus
+    + routeMatchBonus(route, plan.cjkPhrases)
+    + compactCjkRouteBonus(route, plan.cjkPhrases)
+    + Math.round(coverage * 20000)
+    + (plan.macroIntent ? normalizedText.split(plan.normalizedQuery).length * 5000 : 0)
+    - wrappedEnglishPhrasePenalty
+  return {
+    route,
+    title: title || route,
+    description: data.excerpt || '',
+    meta: {
+      ...(data.meta || {}),
+      title: title || route,
+      description: data.excerpt || '',
+    },
+    score,
+  }
+}
+
+function rankCandidates(candidates, plan) {
+  const resultsByRoute = new Map()
+  for (const candidate of candidates) {
+    const result = scoreCandidate(candidate, plan)
+    if (!result) continue
+    const route = normalizeRoute(result.route)
+    if (!route) continue
+    const existing = resultsByRoute.get(route)
+    if (!existing || result.score > existing.score) resultsByRoute.set(route, result)
+  }
+  const ranked = [...resultsByRoute.values()]
+  ranked.sort((left, right) => right.score - left.score)
+  return ranked.slice(0, 20)
+}
+
+export async function searchPagefind(pagefind, query) {
+  const plan = createQueryPlan(query)
+  const variants = primaryVariants(plan)
+  const candidateMap = await collectCandidates(pagefind, variants)
+  await collectCandidates(pagefind, titleVariants(plan, []), candidateMap, 'title-alias')
+  let candidates = await materializeCandidates(candidateMap)
+  let ranked = rankCandidates(candidates, plan)
+
+  const canTryTypoVariants = plan.cjkPhrases.length === 0
+    && plan.englishParts.length === 1
+    && plan.compactQuery.length >= 5
+    && plan.compactQuery.length <= 24
+  const hasNearTitle = ranked.some(result => isSingleEditMatch(plan.compactQuery, compactEnglish(result.title)))
+  if (canTryTypoVariants && !hasNearTitle) {
+    const variants = singleEditVariants(plan.compactQuery).map(queryVariant => ({
+      query: queryVariant,
+      weight: 0.7,
+    }))
+    await collectCandidates(pagefind, variants, candidateMap)
+    candidates = await materializeCandidates(candidateMap)
+    ranked = rankCandidates(candidates, plan)
+  }
+  return ranked
+}
+
+export async function initializePagefindSearch(pagefind) {
+  if (initializedPagefindInstances.has(pagefind)) return pagefind
+  await pagefind.mergeIndex('/pagefind-titles/', { indexWeight: 2 })
+  initializedPagefindInstances.add(pagefind)
+  return pagefind
+}
