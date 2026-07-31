@@ -336,12 +336,19 @@ class TestCompileOp(unittest.TestCase):
                 )
             kernel = generate.call_args.kwargs["kernels"][0]
             self.assertEqual(
-                set(kernel), {"kernel_name", "static_inputs", "patches", "recipes"}
+                set(kernel), {"kernel_name", "static_inputs", "recipes"}
             )
             self.assertEqual(kernel["kernel_name"], "actual_7")
             self.assertEqual(kernel["static_inputs"][0]["parameter_index"], 5)
             self.assertEqual(kernel["static_inputs"][0]["byte_size"], 32)
-            normal = kernel["recipes"]["normal"]
+            self.assertEqual(
+                kernel["static_inputs"][0]["patches"],
+                [{
+                    "file": "resources/include/Add_x_tiling_data.h",
+                    "token": "@@STATIC_VALUE_tiling_data@@",
+                }],
+            )
+            normal = kernel["recipes"]["command"]["normal"]
             self.assertEqual(normal["artifact"], "artifacts/actual_7.o")
             self.assertEqual(len(normal["commands"]), 2)
             self.assertEqual(
@@ -362,6 +369,36 @@ class TestCompileOp(unittest.TestCase):
             serialized = json.dumps(kernel)
             for forbidden in ("macros", "build", "static_targets", "actions"):
                 self.assertNotIn(forbidden, serialized)
+
+    def test_factors_reused_bisheng_option_prefixes(self):
+        kernels = []
+        for symbol in ("kernel_7", "kernel_9"):
+            kernels.append({
+                "kernel_name": symbol,
+                "recipes": {"command": {"normal": {
+                    "commands": [[
+                        "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                        "-c", "-O3", "-I${env:ASCEND_HOME_PATH}/include",
+                        "${resource:resources/src/kernel.cpp}",
+                        f"-DENTRY={symbol}", "-o",
+                        f"${{output:artifacts/{symbol}.o}}",
+                    ]],
+                    "artifact": f"artifacts/{symbol}.o",
+                }}},
+            })
+
+        options = compile_op_module._factor_reused_compile_options(kernels)
+
+        self.assertEqual(
+            options,
+            {"compile_0": [
+                "-c", "-O3", "-I${env:ASCEND_HOME_PATH}/include",
+            ]},
+        )
+        for kernel in kernels:
+            command = kernel["recipes"]["command"]["normal"]["commands"][0]
+            self.assertEqual(command[1], "${options:compile_0}")
+            self.assertEqual(command[2], "${resource:resources/src/kernel.cpp}")
 
     def test_emit_static_compile_resources_publishes_fresh_root_closure(self):
         with TemporaryDirectory() as root:
@@ -435,7 +472,7 @@ class TestCompileOp(unittest.TestCase):
             manifest_path = os.path.join(published, "manifest.json")
             with open(manifest_path, "r", encoding="utf-8") as file_obj:
                 manifest = json.load(file_obj)
-            self.assertEqual(manifest["schema_version"], "4.0")
+            self.assertEqual(manifest["schema_version"], "5.0")
             self.assertEqual(manifest["resource_id"], "add")
             serialized = json.dumps(manifest)
             self.assertNotIn(source_root, serialized)
@@ -530,8 +567,9 @@ class TestCompileOp(unittest.TestCase):
             kernel = generate.call_args.kwargs["kernels"][0]
             self.assertEqual(kernel["kernel_name"], "Add_x_7")
             self.assertEqual(generate.call_args.kwargs["kernel_base"], "Add_x")
-            commands = kernel["recipes"]["super_kernel"]["commands"]
-            self.assertEqual(commands[:2], kernel["recipes"]["normal"]["commands"])
+            command_recipes = kernel["recipes"]["command"]
+            commands = command_recipes["super_kernel"]["commands"]
+            self.assertEqual(commands[:2], command_recipes["normal"]["commands"])
             self.assertEqual(
                 [command[0] for command in commands[2:]],
                 [
@@ -548,7 +586,7 @@ class TestCompileOp(unittest.TestCase):
             self.assertIn("${context:block_dim}", json.dumps(commands))
             self.assertNotIn("${launch.block_dim}", json.dumps(commands))
             self.assertEqual(
-                kernel["recipes"]["super_kernel"]["artifact"],
+                command_recipes["super_kernel"]["artifact"],
                 "artifacts/Add_x_7.static_with_sk.o",
             )
             self.assertNotIn("_relocatable", json.dumps(kernel))

@@ -430,8 +430,8 @@ def _resource_reference_path(value, context):
     return logical_path
 
 
-def _validate_static_input(static_input, context):
-    allowed = {"name", "required", "parameter_index", "byte_size"}
+def _validate_static_input(static_input, context, resource_paths):
+    allowed = {"name", "required", "parameter_index", "byte_size", "patches"}
     unknown = set(static_input) - allowed
     if unknown:
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
@@ -451,31 +451,48 @@ def _validate_static_input(static_input, context):
         raise ValueError(f"{context}.byte_size must be a positive integer")
     if byte_size > _MAX_STATIC_INPUT_BYTES:
         raise ValueError(f"{context}.byte_size is outside the supported range")
+    patches = static_input.get("patches", [])
+    if "patches" in static_input and (
+        not isinstance(patches, list) or not patches
+    ):
+        raise ValueError(f"{context}.patches must be a non-empty array when present")
+    for index, patch in enumerate(patches):
+        if not isinstance(patch, dict):
+            raise ValueError(f"{context}.patches[{index}] must be an object")
+        _validate_patch(patch, f"{context}.patches[{index}]", resource_paths)
 
 
-def _validate_patch(patch, context, input_names, resource_paths):
-    allowed = {"file", "token", "value", "format"}
+def _validate_patch(patch, context, resource_paths):
+    allowed = {"file", "token", "format"}
     unknown = set(patch) - allowed
     if unknown:
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
-    if set(patch) - {"format"} != {"file", "token", "value"}:
-        raise ValueError(f"{context} must contain file, token, and value")
+    if set(patch) - {"format"} != {"file", "token"}:
+        raise ValueError(f"{context} must contain file and token")
     file_path = _resource_reference_path(patch["file"], f"{context}.file")
     if file_path not in resource_paths:
         raise ValueError(f"{context}.file references missing resource: {file_path}")
     if not isinstance(patch["token"], str) or not patch["token"]:
         raise ValueError(f"{context}.token must be a non-empty string")
-    if patch["value"] not in input_names:
-        raise ValueError(
-            f"{context}.value references unknown static input: {patch['value']}"
-        )
     if patch.get("format", "cpp_uint8_array") not in {
         "cpp_uint8_array", "raw_text", "hex"
     }:
         raise ValueError(f"{context}.format is unsupported")
 
 
-def _validate_argument(argument, context, resource_paths):
+def _resource_path_exists(logical_path, resource_paths):
+    if logical_path in resource_paths:
+        return True
+    prefix = logical_path.rstrip("/") + "/"
+    return any(path.startswith(prefix) for path in resource_paths)
+
+
+def _option_reference(argument):
+    match = re.fullmatch(r"\$\{options:([A-Za-z0-9_.-]+)\}", argument)
+    return match.group(1) if match else None
+
+
+def _validate_argument(argument, context, resource_paths, *, allow_block_dim=False):
     if not isinstance(argument, str) or not argument:
         raise ValueError(f"{context} must be a non-empty string")
     legacy = re.search(r"\$\{(?:resource|artifact)\.", argument)
@@ -500,21 +517,60 @@ def _validate_argument(argument, context, resource_paths):
                 )
             if namespace == "resource":
                 logical_path = _resource_reference_path(path, context)
-                if logical_path not in resource_paths:
+                if not _resource_path_exists(logical_path, resource_paths):
                     raise ValueError(
                         f"{context} references missing resource: {logical_path}"
                     )
-        elif not (namespace == "context" and path == "block_dim"):
+        elif namespace == "context" and path == "block_dim":
+            if not allow_block_dim:
+                raise ValueError(f"{context} uses block_dim outside super_kernel")
+        else:
             raise ValueError(f"{context} has unsupported placeholder namespace")
         scrubbed = scrubbed.replace(match.group(0), "PLACEHOLDER")
     if "${" in scrubbed or _contains_literal_absolute_path(scrubbed):
         raise ValueError(f"{context} contains a non-portable path or placeholder")
 
 
-def _validate_recipe(recipe, context, kernel_name, input_names, resource_paths):
+def _expand_and_validate_arguments(
+    arguments, context, resource_paths, options, used_options, *, allow_empty=False,
+    allow_block_dim=False,
+):
+    if not isinstance(arguments, list) or (not allow_empty and not arguments):
+        qualifier = "an array" if allow_empty else "a non-empty array"
+        raise ValueError(f"{context} must be {qualifier}")
+    expanded = []
+    for index, argument in enumerate(arguments):
+        argument_context = f"{context}[{index}]"
+        if not isinstance(argument, str) or not argument:
+            raise ValueError(f"{argument_context} must be a non-empty string")
+        key = _option_reference(argument)
+        if key is not None:
+            if key not in options:
+                raise ValueError(f"{argument_context} references unknown options key {key}")
+            used_options.add(key)
+            expanded.extend(options[key])
+            continue
+        if "${options:" in argument:
+            raise ValueError(
+                f"{argument_context} must use ${{options:key}} as a complete array element"
+            )
+        expanded.append(argument)
+    if len(expanded) > _MAX_ARGS:
+        raise ValueError(f"{context} exceeds the expanded argument limit")
+    for index, argument in enumerate(expanded):
+        _validate_argument(
+            argument, f"{context}[expanded:{index}]", resource_paths,
+            allow_block_dim=allow_block_dim,
+        )
+    return expanded
+
+
+def _validate_command_recipe(
+    recipe, context, resource_paths, options, used_options, *, super_kernel=False
+):
     if not isinstance(recipe, dict):
         raise ValueError(f"{context} must be an object")
-    unknown = set(recipe) - {"commands", "artifact", "patches"}
+    unknown = set(recipe) - {"commands", "artifact"}
     if unknown:
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
     commands = recipe.get("commands")
@@ -534,48 +590,73 @@ def _validate_recipe(recipe, context, kernel_name, input_names, resource_paths):
                 f"{context}.commands[{command_index}] must be a bounded "
                 "non-empty argv array"
             )
+        if _option_reference(command[0]) is not None:
+            raise ValueError(f"{context}.commands[{command_index}] executable cannot be an options reference")
+        expanded = _expand_and_validate_arguments(
+            command, f"{context}.commands[{command_index}]", resource_paths,
+            options, used_options, allow_block_dim=super_kernel,
+        )
         expect_linker_path = False
-        for argv_index, argument in enumerate(command):
+        for argv_index, argument in enumerate(expanded):
             if expect_linker_path and _contains_compound_absolute_path(
                 argument, allow_uri=False
             ):
                 raise ValueError(
-                    f"{context}.commands[{command_index}][{argv_index}] "
+                    f"{context}.commands[{command_index}][expanded:{argv_index}] "
                     f"contains a non-portable absolute path: {argument}"
                 )
-            _validate_argument(
-                argument,
-                f"{context}.commands[{command_index}][{argv_index}]",
-                resource_paths,
-            )
             expect_linker_path = argument == "-R"
     artifact = recipe.get("artifact")
-    if isinstance(artifact, str):
-        _relative_path(artifact, f"{context}.artifact")
-    elif isinstance(artifact, dict):
-        unknown = set(artifact) - {"file", "entry"}
-        if unknown or "file" not in artifact:
-            raise ValueError(f"{context}.artifact has invalid fields")
-        _relative_path(artifact["file"], f"{context}.artifact.file")
-        entry = artifact.get("entry", kernel_name)
-        if not isinstance(entry, str) or not entry:
-            raise ValueError(f"{context}.artifact.entry must be a non-empty string")
-    else:
-        raise ValueError(f"{context}.artifact must be a path or object")
-    if "patches" in recipe and (
-        not isinstance(recipe["patches"], list) or not recipe["patches"]
-    ):
-        raise ValueError(f"{context}.patches must be a non-empty array when present")
-    for index, patch in enumerate(recipe.get("patches", [])):
-        if not isinstance(patch, dict):
-            raise ValueError(f"{context}.patches[{index}] must be an object")
-        _validate_patch(
-            patch, f"{context}.patches[{index}]", input_names, resource_paths
-        )
+    if not isinstance(artifact, str) or not artifact:
+        raise ValueError(f"{context}.artifact must be a non-empty path string")
+    _relative_path(artifact, f"{context}.artifact")
 
 
-def _normalize_and_validate_kernel(kernel, context, resource_paths):
-    allowed = {"kernel_name", "static_inputs", "patches", "recipes"}
+def _validate_options(options, resource_paths):
+    if options is None:
+        return {}
+    if not isinstance(options, dict) or not options:
+        raise ValueError("options must be a non-empty object when present")
+    normalized = copy.deepcopy(options)
+    for key, values in normalized.items():
+        if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+", key):
+            raise ValueError(f"options key is not portable: {key}")
+        if not isinstance(values, list) or not values:
+            raise ValueError(f"options.{key} must be a non-empty array")
+        for index, value in enumerate(values):
+            if not isinstance(value, str) or not value:
+                raise ValueError(f"options.{key}[{index}] must be a non-empty string")
+            if "${options:" in value:
+                raise ValueError(f"options.{key} cannot reference another options key")
+            _validate_argument(value, f"options.{key}[{index}]", resource_paths)
+    return normalized
+
+
+def _validate_aclrtc_backend(backend, context, resource_paths, options, used_options):
+    if not isinstance(backend, dict):
+        raise ValueError(f"{context} must be an object")
+    unknown = set(backend) - {"entry_file", "compile_options", "link_options"}
+    if unknown:
+        raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
+    entry_file = _resource_reference_path(backend.get("entry_file", ""), f"{context}.entry_file")
+    if entry_file not in resource_paths:
+        raise ValueError(f"{context}.entry_file references missing resource: {entry_file}")
+    compile_options = _expand_and_validate_arguments(
+        backend.get("compile_options"), f"{context}.compile_options",
+        resource_paths, options, used_options,
+    )
+    link_options = _expand_and_validate_arguments(
+        backend.get("link_options"), f"{context}.link_options",
+        resource_paths, options, used_options, allow_empty=True,
+    )
+    if len(compile_options) + len(link_options) > _MAX_ARGS:
+        raise ValueError(f"{context} exceeds the combined ACLRTC option limit")
+
+
+def _normalize_and_validate_kernel(
+    kernel, context, resource_paths, options, used_options
+):
+    allowed = {"kernel_name", "static_inputs", "recipes"}
     unknown = set(kernel) - allowed
     if unknown:
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
@@ -595,50 +676,47 @@ def _normalize_and_validate_kernel(kernel, context, resource_paths):
         if not isinstance(static_input, dict):
             raise ValueError(f"{context}.static_inputs[{index}] must be an object")
         _validate_static_input(
-            static_input, f"{context}.static_inputs[{index}]"
+            static_input, f"{context}.static_inputs[{index}]", resource_paths
         )
         if static_input["name"] in input_names:
             raise ValueError(
                 f"{context} has duplicate static input {static_input['name']}"
             )
         input_names.add(static_input["name"])
-    patches = kernel.get("patches", [])
-    if "patches" in kernel and (
-        not isinstance(patches, list) or not patches
-    ):
-        raise ValueError(f"{context}.patches must be a non-empty array when present")
-    for index, patch in enumerate(patches):
-        if not isinstance(patch, dict):
-            raise ValueError(f"{context}.patches[{index}] must be an object")
-        _validate_patch(
-            patch, f"{context}.patches[{index}]", input_names, resource_paths
-        )
     recipes = kernel.get("recipes")
     if not isinstance(recipes, dict) or not recipes:
         raise ValueError(f"{context}.recipes must be a non-empty object")
-    unknown_recipes = set(recipes) - {"normal", "super_kernel"}
+    unknown_recipes = set(recipes) - {"command", "aclrtc"}
     if unknown_recipes:
         raise ValueError(f"{context}.recipes has unknown recipes: {sorted(unknown_recipes)}")
-    for name, recipe in recipes.items():
-        _validate_recipe(
-            recipe, f"{context}.recipes.{name}", kernel["kernel_name"],
-            input_names, resource_paths,
+    if len(recipes) != 1:
+        raise ValueError(f"{context}.recipes must select exactly one of command or aclrtc")
+    if "command" in recipes:
+        command = recipes["command"]
+        if not isinstance(command, dict) or not command:
+            raise ValueError(f"{context}.recipes.command must be a non-empty object")
+        unknown_commands = set(command) - {"normal", "super_kernel"}
+        if unknown_commands:
+            raise ValueError(
+                f"{context}.recipes.command has unknown recipes: {sorted(unknown_commands)}"
+            )
+        for name, recipe in command.items():
+            _validate_command_recipe(
+                recipe, f"{context}.recipes.command.{name}", resource_paths,
+                options, used_options, super_kernel=name == "super_kernel",
+            )
+    else:
+        _validate_aclrtc_backend(
+            recipes["aclrtc"], f"{context}.recipes.aclrtc", resource_paths,
+            options, used_options,
         )
     normalized = copy.deepcopy(kernel)
     for static_input in normalized.get("static_inputs", []):
         if static_input.get("required") is True:
             static_input.pop("required")
-    for patch in normalized.get("patches", []):
-        if patch.get("format") == "cpp_uint8_array":
-            patch.pop("format")
-    for recipe in normalized["recipes"].values():
-        for patch in recipe.get("patches", []):
+        for patch in static_input.get("patches", []):
             if patch.get("format") == "cpp_uint8_array":
                 patch.pop("format")
-        artifact = recipe.get("artifact")
-        if isinstance(artifact, dict):
-            if artifact.get("entry") == kernel["kernel_name"]:
-                artifact.pop("entry")
     return normalized
 
 
@@ -665,6 +743,7 @@ def generate_static_compile_resources(
     output_root,
     kernel_base,
     resource_id,
+    options=None,
     resources,
     kernels,
 ):
@@ -709,13 +788,16 @@ def generate_static_compile_resources(
             os.makedirs(os.path.dirname(destination), exist_ok=True)
             shutil.copyfile(source, destination)
 
+        normalized_options = _validate_options(options, seen_paths)
+        used_options = set()
         seen_kernels = set()
         normalized_kernels = []
         for index, kernel in enumerate(kernels):
             if not isinstance(kernel, dict):
                 raise ValueError(f"kernels[{index}] must be an object")
             normalized = _normalize_and_validate_kernel(
-                kernel, f"kernels[{index}]", seen_paths
+                kernel, f"kernels[{index}]", seen_paths,
+                normalized_options, used_options,
             )
             if normalized["kernel_name"] in seen_kernels:
                 raise ValueError(
@@ -724,11 +806,17 @@ def generate_static_compile_resources(
             seen_kernels.add(normalized["kernel_name"])
             normalized_kernels.append(normalized)
 
+        unused_options = set(normalized_options) - used_options
+        if unused_options:
+            raise ValueError(f"unused options keys: {sorted(unused_options)}")
+
         manifest = {
-            "schema_version": "4.0",
+            "schema_version": "5.0",
             "resource_id": resource_id,
             "kernels": normalized_kernels,
         }
+        if normalized_options:
+            manifest["options"] = normalized_options
         manifest_path = os.path.join(stage_dir, "manifest.json")
         with open(manifest_path, "w", encoding="utf-8") as file_obj:
             json.dump(manifest, file_obj, indent=2, sort_keys=True)

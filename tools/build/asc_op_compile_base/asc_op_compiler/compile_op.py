@@ -1833,6 +1833,47 @@ def _static_normal_recipe(compile_argv, relocatable, artifact, ascend_home):
     }
 
 
+def _factor_reused_compile_options(kernels):
+    """Factor repeated Bisheng option prefixes without moving source operands."""
+    candidates = []
+    counts = {}
+    for kernel in kernels:
+        command_backend = kernel.get("recipes", {}).get("command", {})
+        for recipe in command_backend.values():
+            for command in recipe.get("commands", []):
+                if not command or not command[0].endswith("/bisheng"):
+                    continue
+                end = 1
+                while end < len(command):
+                    argument = command[end]
+                    if (
+                        "${resource:" in argument
+                        or "${output:" in argument
+                        or "${context:" in argument
+                        or argument == "-o"
+                    ):
+                        break
+                    end += 1
+                prefix = tuple(command[1:end])
+                if len(prefix) < 2:
+                    continue
+                candidates.append((command, end, prefix))
+                counts[prefix] = counts.get(prefix, 0) + 1
+
+    option_keys = {}
+    options = {}
+    for command, end, prefix in candidates:
+        if counts[prefix] < 2:
+            continue
+        key = option_keys.get(prefix)
+        if key is None:
+            key = f"compile_{len(option_keys)}"
+            option_keys[prefix] = key
+            options[key] = list(prefix)
+        command[1:end] = ["${options:" + key + "}"]
+    return options
+
+
 def _static_super_kernel_recipe(
     normal_recipe, normal_relocatable, sk_symbol, sk_argv, bind_argv,
     output_prefix, ascend_home,
@@ -2151,16 +2192,15 @@ def _emit_static_compile_resources(
                             "name": "tiling_data",
                             "parameter_index": workspace_idx + 1,
                             "byte_size": tiling_sizes[symbol],
+                            "patches": [
+                                {
+                                    "file": tiling_logical,
+                                    "token": "@@STATIC_VALUE_tiling_data@@",
+                                }
+                            ],
                         }
                     ],
-                    "patches": [
-                        {
-                            "file": tiling_logical,
-                            "token": "@@STATIC_VALUE_tiling_data@@",
-                            "value": "tiling_data",
-                        }
-                    ],
-                    "recipes": recipes,
+                    "recipes": {"command": recipes},
                 }
             )
         if compile_info.tiling_and_dfx_utils_file and os.path.isfile(
@@ -2174,10 +2214,12 @@ def _emit_static_compile_resources(
                 }
             )
         resources = _deduplicate_static_resources(resources)
+        shared_options = _factor_reused_compile_options(kernels)
         result = generate_static_compile_resources(
             output_root=kernel_meta_dir,
             kernel_base=runtime_kernel_base,
             resource_id=_static_resource_id(op_info.op_type),
+            options=shared_options or None,
             resources=resources,
             kernels=kernels,
         )
