@@ -324,24 +324,7 @@ HcclResult HcclAllocOpResCtx(
     CHK_RET(AllocOpParamMemory(comm, ctxTag, opParamVec, initTiling, ccTilingList, resCtx));
     CHK_RET(AllocWorkspaceMemory(comm, ctxTag, ccTiling, resCtx));
     CHK_RET(FillRankInfo(comm, resCtx));
-    for (uint32_t i = 0U; i < opParamVec.size(); ++i) {
-        HCCL_RUN_INFO(
-            "[MC2_AICPU_TRACE][ResCtx] index[%u], offset[%llu], opParamAddr[0x%llx], opParamResCtx[%p], "
-            "opParamCtxSize[%llu], opParamIsKfc[%d], resCtxIsKfc[%d].",
-            i, static_cast<unsigned long long>(resCtx.algInfo[i].offset),
-            static_cast<unsigned long long>(resCtx.algInfo[i].opParam), opParamVec[i].resCtx,
-            static_cast<unsigned long long>(opParamVec[i].ctxSize), static_cast<int>(opParamVec[i].isKfc),
-            static_cast<int>(resCtx.isKfc[i]));
-    }
-    HCCL_RUN_INFO(
-        "[MC2_AICPU_TRACE][ResCtx] ctxTag[%s], initVersion[%u], workspace[0x%llx], workspaceSize[%llu], "
-        "rankId[%llu], rankSize[%llu].",
-        ctxTag.c_str(), initTiling->version, static_cast<unsigned long long>(resCtx.workSpace),
-        static_cast<unsigned long long>(resCtx.workSpaceSize), static_cast<unsigned long long>(resCtx.rankId),
-        static_cast<unsigned long long>(resCtx.rankSize));
-    CHK_RET(AllocAndCopyOpResCtx(comm, ctxTag, ccTiling, resCtx, opResCtxPtr));
-    HCCL_RUN_INFO("[MC2_AICPU_TRACE][ResCtx] deviceOpResCtx[%p].", *opResCtxPtr);
-    return HCCL_SUCCESS;
+    return AllocAndCopyOpResCtx(comm, ctxTag, ccTiling, resCtx, opResCtxPtr);
 }
 
 // AllToAll适配AllToAllV
@@ -807,14 +790,6 @@ HcclResult GetOpParamResCtx(
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
     opParam.cacheValid = isResourceReused;
     opParam.resCtx = *resCtxOut;
-    HCCL_RUN_INFO(
-        "[MC2_AICPU_TRACE][AlgRes] opType[%u], algName[%s], engine[%u], cpuTsThread[0x%llx], "
-        "exportedAicpuTsThread[0x%llx], resourceReused[%d], resCtx[%p], ctxSize[%llu], threads[%zu], "
-        "channels[%zu], mainThreadNotifyNum[%u].",
-        static_cast<uint32_t>(opParam.opType), algName.c_str(), static_cast<uint32_t>(opParam.engine),
-        static_cast<unsigned long long>(cpuTsThread), static_cast<unsigned long long>(exportedAicpuTsThread),
-        static_cast<int>(isResourceReused), opParam.resCtx, static_cast<unsigned long long>(opParam.ctxSize),
-        resCtxHost->threads.size(), resCtxHost->channels.size(), resCtxHost->notifyNumOnMainThread);
     return HCCL_SUCCESS;
 }
 

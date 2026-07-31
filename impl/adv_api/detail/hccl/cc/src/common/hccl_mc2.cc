@@ -225,37 +225,13 @@ HcclResult AllocComResourceByTilingAicpu(
     std::string topoTag[Hccl::MC2_MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
 
-    const auto* initTiling = static_cast<const Mc2InitTilingInner*>(mc2Tiling);
-    HCCL_RUN_INFO(
-        "[MC2_AICPU_TRACE][Init] ctxTag[%s], initVersion[%u], tilingNum[%u], mc2HcommCnt[%u], "
-        "sizeof(OpParam)[%zu], sizeof(OpResCtx)[%zu].",
-        ctxTag.c_str(), initTiling->version, tilingNum, initTiling->mc2HcommCnt, sizeof(OpParam), sizeof(OpResCtx));
-
     std::vector<OpParam> opParamVec(tilingNum);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
-        const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
-        HCCL_RUN_INFO(
-            "[MC2_AICPU_TRACE][Tiling] index[%u], offset[%u], ccTiling[%p], opType[%u], tilingVersion[%u], "
-            "commEngine[%u], srcDataType[%u], dstDataType[%u], reduceType[%u], algConfig[%s].",
-            i, initTiling->offset[i], ccTiling, ccTiling->opType, ccTiling->version, ccTiling->commEngine,
-            ccTiling->srcDataType, ccTiling->dstDataType, ccTiling->reduceType, ccTiling->algConfig);
         CHK_RET(
-            GetOpParam(comm, stream, topoTag[i], ccTiling, opParamVec[i]));
-        const OpParam& opParam = opParamVec[i];
-        HCCL_RUN_INFO(
-            "[MC2_AICPU_TRACE][OpParam] index[%u], opType[%u], algName[%s], algTag[%s], opExecuteConfig[%u], "
-            "engine[%u], isKfc[%d], dataType[%u], outputType[%u], reduceType[%u], count[%llu], resCtx[%p], "
-            "ctxSize[%llu], inputPtr[%p], outputPtr[%p].",
-            i, static_cast<uint32_t>(opParam.opType), opParam.algName, opParam.algTag,
-            static_cast<uint32_t>(opParam.opExecuteConfig), static_cast<uint32_t>(opParam.engine),
-            static_cast<int>(opParam.isKfc), static_cast<uint32_t>(opParam.DataDes.dataType),
-            static_cast<uint32_t>(opParam.DataDes.outputType), static_cast<uint32_t>(opParam.reduceType),
-            static_cast<unsigned long long>(opParam.DataDes.count), opParam.resCtx,
-            static_cast<unsigned long long>(opParam.ctxSize), opParam.inputPtr, opParam.outputPtr);
+            GetOpParam(comm, stream, topoTag[i], static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]));
     }
 
     CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
-    HCCL_RUN_INFO("[MC2_AICPU_TRACE][Done] ctxTag[%s], opResCtx[%p].", ctxTag.c_str(), *opResCtx);
 
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
