@@ -61,6 +61,14 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/aicpu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/ccu/kernel
+
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/selector
@@ -157,6 +165,10 @@ if(PRODUCT_SIDE STREQUAL "device")
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/selector/all_reduce_auto_selector.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_one_shot.cc
 
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/registry/alg_v2_template_register.cc
     )
