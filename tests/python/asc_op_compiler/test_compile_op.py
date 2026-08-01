@@ -1051,6 +1051,29 @@ class TestCompileOp(unittest.TestCase):
                 cfg.current()["tir.op_debug_config"] = ["oom"]
                 gen_meta_info_section(compile_info, op_info)
 
+    def test_gen_bin_id_meta_section(self):
+        compile_info = CompileInfo()
+        compile_info.kernel_name = "AddCustom_ab1b6750d7f510985325b603cb06dc8b"
+        compile_info.tiling_key_list = ["1", "2"]
+        digest = "000102030405060708090a0b0c0d0e0f" \
+                 "101112131415161718191a1b1c1d1e1f"
+        recorder = OpCompileManifestRecorder()
+        recorder.reset()
+        recorder.bin_id = digest
+        global_var_storage.set_variable("ascendc_meta_info", "")
+
+        gen_bin_id_meta_section(compile_info)
+
+        section = global_var_storage.get_variable("ascendc_meta_info")
+        self.assertIn("struct AddCustom_ab1b6750d7f510985325b603cb06dc8b_BinaryMetaBinIdV1", section)
+        self.assertEqual(section.count("{{31, sizeof("), 2)
+        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_1", section)
+        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_2", section)
+        self.assertIn("BinaryMetaBinIdV1) - sizeof(BaseTlv)}, 1", section)
+        self.assertIn("0x00, 0x01, 0x02", section)
+        self.assertIn("0x1d, 0x1e, 0x1f", section)
+        recorder.reset()
+
     def test_gen_kernel_fun(self):
         SetCurrentSocInfo("Ascend910B1")
         cce_file = os.path.join(

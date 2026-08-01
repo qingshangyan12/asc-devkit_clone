@@ -176,7 +176,9 @@ inline void InitTilingData() {}
                 self.assertEqual(set(kernel["commands"][0]), {"type", "mode", "options", "output"})
                 self.assertEqual({command["mode"] for command in kernel["commands"]},
                                  {"normal", "sk"})
-                self.assertEqual([command["type"] for command in kernel["commands"]].count("ld"), 3)
+                self.assertEqual([command["type"] for command in kernel["commands"]].count("ld"), 2)
+                self.assertTrue(all("-r" in command["options"]
+                                    for command in kernel["commands"] if command["type"] == "ld"))
                 self.assertTrue(all(
                     "-I${source_dir}" in command["options"]
                     for command in kernel["commands"] if command["type"] == "bisheng"))

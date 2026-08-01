@@ -328,7 +328,9 @@ class OpCompileManifestRecorder:
 
         result = []
         for stage, tokens, output, mode in commands:
-            if not tokens or not output:
+            # LINKRELOCATE finalizes the aggregate object containing every tiling key.
+            # A per-key replay recipe must end at its relocatable FATBIN output.
+            if not tokens or not output or stage == "linkrelocate":
                 continue
             output_index = self._output_index(tokens)
             options = [
