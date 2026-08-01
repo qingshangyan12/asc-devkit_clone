@@ -26,30 +26,32 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-class CopyUbufToCbufInstr {
+class copy_ubuf_to_cbuf_instr {
 public:
     template <typename T, typename U, typename... Params>
-    __aicore__ inline static void DataCopy(const T& dst, const U& src, const Params&... params)
-    { CopyUbufToCbuf(dst.Data().Get(), src.Data().Get(), params...); }
+    __aicore__ inline static void data_copy(const T& dst, const U& src, const Params&... params)
+    {
+        copy_ubuf_to_cbuf(dst.data().get(), src.data().get(), params...);
+    }
 
     template <typename T>
-    __aicore__ inline static void CopyUbufToCbuf(__cbuf__ T* dst, __ubuf__ T* src, const uint16_t blockCount,
-                                                 const uint16_t blockLen, const uint16_t srcStride,
-                                                 const uint16_t dstStride)
+    __aicore__ inline static void copy_ubuf_to_cbuf(__cbuf__ T* dst, __ubuf__ T* src, const uint16_t block_count,
+                                                    const uint16_t block_len, const uint16_t src_stride,
+                                                    const uint16_t dst_stride)
     {
         if ASCEND_IS_AIC {
             return;
         }
 
-        asc_copy_ub2l1((__cbuf__ void*)dst, (__ubuf__ void*)src, blockCount, blockLen, srcStride, dstStride);
+        asc_copy_ub2l1((__cbuf__ void*)dst, (__ubuf__ void*)src, block_count, block_len, src_stride, dst_stride);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_INSTRUCTION_H
 
