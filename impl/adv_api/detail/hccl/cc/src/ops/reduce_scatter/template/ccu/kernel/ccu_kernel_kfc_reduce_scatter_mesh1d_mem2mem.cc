@@ -307,7 +307,8 @@ static CcuResult ReduceLoopGroup(
     ccu::Variable offsetCfg;
 
     if (expansionNum != 1) {
-        ccu::Variable tmp = GetExpansionParam(expansionNum);
+        ccu::Variable tmp;
+        tmp = GetExpansionParam(expansionNum);
         dst.token = dst.token + tmp;
     }
 
