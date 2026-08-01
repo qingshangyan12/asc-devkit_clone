@@ -24,8 +24,8 @@
 
 #include "impl/tensor_api/utils/extra_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename... Pairs>
 class TupleMap {
@@ -157,8 +157,8 @@ public:
     using Delete = typename DeleteImpl<Key, Pairs...>::type;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_UTILS_MAP_IMPL_H
 

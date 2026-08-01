@@ -26,31 +26,32 @@
 #include "impl/tensor_api/arch/vector/gm_to_ub/copy.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename Traits>
-struct CopyTraits<CopyGM2UB, Traits> : public CopyTraits<CopyGM2UB, Traits, CopyGM2UBWith, Traits> {};
+struct copy_traits<copy_gm_to_ub, Traits> :
+    public copy_traits<copy_gm_to_ub, Traits, copy_gm_to_ub_with, Traits> {};
 
 template <>
-struct CopyTraits<CopyGM2UB> : public CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault> {};
+struct copy_traits<copy_gm_to_ub> : public copy_traits<copy_gm_to_ub, copy_gm_to_ub_trait_default> {};
 
 template <typename TraitStruct>
-struct CopyTraits<CopyGM2UBWith, TraitStruct> {
+struct copy_traits<copy_gm_to_ub_with, TraitStruct> {
     using TraitType = typename TraitStruct::TraitType;
     static constexpr const TraitType defaultTrait = TraitStruct::value;
 
     template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void CopyUnpack(const Args&... args) const
+    __aicore__ inline void copy_unpack(const Args&... args) const
     {
-        CopyGM2UBWith::Copy<TraitType, trait, Args...>(args..., params);
+        copy_gm_to_ub_with::template copy<TraitType, trait, Args...>(args..., params);
     }
 
-    CopyGM2UBParams params{};
+    copy_gm_to_ub_params params{};
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ATOM_VECTOR_COPY_GM2UB_H
 

@@ -27,13 +27,13 @@
 #include "impl/tensor_api/arch/cube/l1_to_l0b/copy_impl/nz2zn.h"
 #include "impl/tensor_api/arch/cube/l1_to_l0b/copy_impl/nz2znb8b4.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class CopyL12L0BIgnore {
 public:
-    template <const CopyL12L0BTrait& trait, typename ...Args>
-    __aicore__ inline void static Run(const Args&... args) {
+    template <const copy_l1_to_l0b_trait& trait, typename ...Args>
+    __aicore__ inline void static run(const Args&... args) {
         static_assert(Std::is_same_v<Args..., void>, "CopyL12L0BIgnore should not be called");
     }
 };
@@ -61,8 +61,8 @@ struct CopyL12L0BRouting<Version, ZNLayoutPtn, NZLayoutPtn, CopyMode::TRANS_B8B4
     using type = LoadDataL12L0BNZ2ZNB8B4;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0B_ROUTING_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

@@ -24,8 +24,8 @@
 
 #include "impl/tensor_api/tensor/layout_frame.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename RowStride, typename ColumnStride>
 struct InferFlatLayoutPatternImpl {
@@ -247,12 +247,12 @@ struct InferLayoutTrait<
         Stride<Stride<StrideRow0, StrideRow1>, Stride<StrideColumn0, StrideColumn1>>> {};
 
 template <typename T, typename U>
-struct GetLayoutInfo<Layout<T, U, Std::ignore_t>> {
+struct get_layout_info<layout_type<T, U, Std::ignore_t>> {
     using type = Std::tuple<typename InferLayoutPattern<T, U>::type, typename InferLayoutTrait<T, U>::type>;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_TENSOR_LAYOUT_INFER_H
 

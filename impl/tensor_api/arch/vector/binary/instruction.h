@@ -26,14 +26,14 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 namespace Inst {
 
 class Add {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_add(dst, src0, src1, mask);
         }
@@ -43,7 +43,7 @@ public:
 class Madd {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_madd(dst, src0, src1, mask);
         }
@@ -53,7 +53,7 @@ public:
 class Sub {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_sub(dst, src0, src1, mask);
         }
@@ -63,7 +63,7 @@ public:
 class And {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_and(dst, src0, src1, mask);
         }
@@ -73,7 +73,7 @@ public:
 class Select {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_select(dst, src0, src1, mask);
         }
@@ -83,7 +83,7 @@ public:
 class AbsSub {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_abs_sub(dst, src0, src1, mask);
         }
@@ -93,7 +93,7 @@ public:
 class Min {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_min(dst, src0, src1, mask);
         }
@@ -103,7 +103,7 @@ public:
 class Max {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_max(dst, src0, src1, mask);
         }
@@ -113,7 +113,7 @@ public:
 class Or {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_or(dst, src0, src1, mask);
         }
@@ -123,7 +123,7 @@ public:
 class Mul {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_mul(dst, src0, src1, mask);
         }
@@ -133,7 +133,7 @@ public:
 class ExpSubEven {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_exp_sub(dst, src0, src1, mask);
         }
@@ -143,7 +143,7 @@ public:
 class ExpSubOdd {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_exp_sub_v2(dst, src0, src1, mask);
         }
@@ -153,7 +153,7 @@ public:
 class ShiftLeft {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_shiftleft(dst, src0, src1, mask);
         }
@@ -163,7 +163,7 @@ public:
 class ShiftRight {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_shiftright(dst, src0, src1, mask);
         }
@@ -173,7 +173,7 @@ public:
 class Div {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_div(dst, src0, src1, mask);
         }
@@ -183,7 +183,7 @@ public:
 class Xor {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_xor(dst, src0, src1, mask);
         }
@@ -193,7 +193,7 @@ public:
 class Prelu {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_prelu(dst, src0, src1, mask);
         }

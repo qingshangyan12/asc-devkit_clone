@@ -23,12 +23,12 @@
 
 #include "impl/tensor_api/tensor/pointer_pattern.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // INCLUDE_TENSOR_API_TENSOR_POINTER_H
 

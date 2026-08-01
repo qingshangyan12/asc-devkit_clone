@@ -24,45 +24,45 @@
 
 #include "impl/tensor_api/arch/cube/l1_to_fb/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyL12FBTrait DEFAULT_COPY_L1_FB_TRAIT;
+constexpr copy_l1_to_fb_trait DEFAULT_COPY_L1_FB_TRAIT;
 
-struct CopyL12FBTraitDefault {
-    using TraitType = CopyL12FBTrait;
+struct copy_l1_to_fb_trait_default {
+    using TraitType = copy_l1_to_fb_trait;
     static constexpr const TraitType value = DEFAULT_COPY_L1_FB_TRAIT;
 };
 
-struct CopyL12FB {
+struct copy_l1_to_fb {
 public:
     template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIC {
-            DataCopyImpl<traits, Args...>(args...);
+            data_copy_impl<traits, Args...>(args...);
         }
     }
 
 private:
-    template <const CopyL12FBTrait& trait = DEFAULT_COPY_L1_FB_TRAIT, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
+    template <const copy_l1_to_fb_trait& trait = DEFAULT_COPY_L1_FB_TRAIT, typename T, typename U>
+    __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
     {
         using DstPos = GetMemLocation<T>;
         using SrcPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<DstPos, Location::FIXBUF>, "CopyL12FB requires destination on FIXBUF");
-        static_assert(Std::is_same_v<SrcPos, Location::L1>, "CopyL12FB requires source on L1");
+        static_assert(Std::is_same_v<DstPos, Location::FIXBUF>, "copy_l1_to_fb requires destination on FIXBUF");
+        static_assert(Std::is_same_v<SrcPos, Location::L1>, "copy_l1_to_fb requires source on L1");
         using DstLayout = typename T::layoutType;
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
         using CopyL12FBImpl = typename CopyL12FBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL12FBImpl::template Run<trait, T, U>(dst, src);
+        CopyL12FBImpl::template run<trait, T, U>(dst, src);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_COPY_H
 

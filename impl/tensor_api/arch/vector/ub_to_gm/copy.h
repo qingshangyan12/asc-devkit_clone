@@ -24,29 +24,29 @@
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 #include "impl/tensor_api/arch/vector/ub_to_gm/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyUB2GMTrait DEFAULT_COPY_UB_TO_GM_TRAIT;
+constexpr copy_ub_to_gm_trait DEFAULT_COPY_UB_TO_GM_TRAIT;
 
-struct CopyUB2GMTraitDefault {
-    using TraitType = CopyUB2GMTrait;
+struct copy_ub_to_gm_trait_default {
+    using TraitType = copy_ub_to_gm_trait;
     static constexpr const TraitType value = DEFAULT_COPY_UB_TO_GM_TRAIT;
 };
 
-struct CopyUB2GM {
+struct copy_ub_to_gm {
 public:
     template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIV {
-            DataCopyImpl<traits, Args...>(args...);
+            data_copy_impl<traits, Args...>(args...);
         }
     }
 
 private:
-    template <const CopyUB2GMTrait& trait = DEFAULT_COPY_UB_TO_GM_TRAIT, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
+    template <const copy_ub_to_gm_trait& trait = DEFAULT_COPY_UB_TO_GM_TRAIT, typename T, typename U>
+    __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
     {
         using dstTPos = GetMemLocation<T>;
         using srcTPos = GetMemLocation<U>;
@@ -56,12 +56,12 @@ private:
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
         using CopyUB2GMImpl =
             typename CopyUB2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyUB2GMImpl::template Run<trait, T, U>(dst, src);
+        CopyUB2GMImpl::template run<trait, T, U>(dst, src);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_COPY_H
 

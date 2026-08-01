@@ -26,11 +26,11 @@
 #include "impl/tensor_api/tensor/layout_size.h"
 #include "impl/tensor_api/tensor/tuple_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
+__aicore__ inline constexpr auto crd2idx(const T& coord, const U& shape, const S& stride);
 
 // struct layout
 template <typename... Shapes>
@@ -46,22 +46,22 @@ template <typename... Coords>
 using Coord = Std::tuple<Coords...>;
 
 template <typename T, typename U, typename Info = Std::ignore_t>
-struct Layout : private Std::tuple<T, U>
+struct layout_type : private Std::tuple<T, U>
 {
 public:
     static constexpr auto depth = NestingDepthV<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
 
-    __aicore__ inline constexpr Layout(const T& shape  = {}, const U& stride = {})
+    __aicore__ inline constexpr layout_type(const T& shape  = {}, const U& stride = {})
         : Std::tuple<T, U>(shape, stride)
     {
         static_assert(Std::is_tuple_v<T> && Std::is_tuple_v<U>, "Shape or Stride is not tuple!");
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Capacity() const
+    __aicore__ inline constexpr decltype(auto) capacity() const
     {
-        return GetCapacity(Shape<I...>(), Stride<I...>());
+        return get_capacity(shape<I...>(), stride<I...>());
     }
 
     __aicore__ inline constexpr decltype(auto) layout()
@@ -75,103 +75,175 @@ public:
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Shape()
+    __aicore__ inline constexpr decltype(auto) shape()
     {
-        return GetValue<0, I...>(static_cast<Std::tuple<T, U>&>(*this));
+        return get_value<0, I...>(static_cast<Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Shape() const
+    __aicore__ inline constexpr decltype(auto) shape() const
     {
-        return GetValue<0, I...>(static_cast<const Std::tuple<T, U>&>(*this));
+        return get_value<0, I...>(static_cast<const Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Stride()
+    __aicore__ inline constexpr decltype(auto) stride()
     {
-        return GetValue<1, I...>(static_cast<Std::tuple<T, U>&>(*this));
+        return get_value<1, I...>(static_cast<Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Stride() const
+    __aicore__ inline constexpr decltype(auto) stride() const
     {
-        return GetValue<1, I...>(static_cast<const Std::tuple<T, U>&>(*this));
+        return get_value<1, I...>(static_cast<const Std::tuple<T, U>&>(*this));
     }
 
     template <typename S>
     __aicore__ inline constexpr auto operator()(const S& coord) const
     {
-        return Crd2Idx(coord, Shape(), Stride());
+        return crd2idx(coord, shape(), stride());
+    }
+
+    template <size_t... I>
+    __aicore__ inline constexpr decltype(auto) get_rank() const
+    {
+        static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "The dimensions of the Shape and Stride are not the same.");
+        return asc::te::get_rank<I...>(shape());
+    }
+
+    template <size_t... I>
+    __aicore__ inline constexpr decltype(auto) size() const
+    {
+        return tuple_size<I...>(shape());
+    }
+
+    template <size_t... I>
+    __aicore__ inline constexpr decltype(auto) get()
+    {
+        return asc::te::get<I...>(static_cast<Std::tuple<T, U>&>(*this));
+    }
+
+    template <size_t... I>
+    __aicore__ inline constexpr decltype(auto) get() const
+    {
+        return asc::te::get<I...>(static_cast<const Std::tuple<T, U>&>(*this));
+    }
+
+    template <size_t... I>
+    __aicore__ inline constexpr decltype(auto) Capacity() const
+    {
+        return capacity<I...>();
+    }
+
+    template <size_t... I>
+    __aicore__ inline constexpr decltype(auto) Shape()
+    {
+        return shape<I...>();
+    }
+
+    template <size_t... I>
+    __aicore__ inline constexpr decltype(auto) Shape() const
+    {
+        return shape<I...>();
+    }
+
+    template <size_t... I>
+    __aicore__ inline constexpr decltype(auto) Stride()
+    {
+        return stride<I...>();
+    }
+
+    template <size_t... I>
+    __aicore__ inline constexpr decltype(auto) Stride() const
+    {
+        return stride<I...>();
     }
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) Rank() const
     {
-        static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "The dimensions of the Shape and Stride are not the same.");
-        return GetRank<I...>(Shape());
+        return get_rank<I...>();
     }
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) Size() const
     {
-        return TupleSize<I...>(Shape());
+        return size<I...>();
     }
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) Get()
     {
-        return Te::Get<I...>(static_cast<Std::tuple<T, U>&>(*this));
+        return get<I...>();
     }
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) Get() const
     {
-        return Te::Get<I...>(static_cast<const Std::tuple<T, U>&>(*this));
+        return get<I...>();
     }
 private:
     using tag = Info;
 };
 
+template <typename T, typename U, typename Info = Std::ignore_t>
+using layout = layout_type<T, U, Info>;
+
+template <typename T, typename U, typename Info = Std::ignore_t>
+using Layout = layout_type<T, U, Info>;
+
 template <typename T>
-struct GetLayoutInfo {
+struct get_layout_info {
     using type = Std::tuple<Std::ignore_t, Std::ignore_t>;
 };
 
 template <typename T, typename U, typename LayoutPattern, typename TraitType>
-struct GetLayoutInfo<Layout<T, U, Std::tuple<LayoutPattern, TraitType>>> {
+struct get_layout_info<layout_type<T, U, Std::tuple<LayoutPattern, TraitType>>> {
     using type = Std::tuple<LayoutPattern, TraitType>;
 };
 
 template <typename T>
-using GetLayoutInfoT = typename GetLayoutInfo<T>::type;
+using GetLayoutInfo = get_layout_info<T>;
 
 template <typename T>
-struct GetPattern {
+using GetLayoutInfoT = typename get_layout_info<T>::type;
+
+template <typename T>
+struct get_pattern {
     using type = typename Std::tuple_element<0, GetLayoutInfoT<T>>::type;
 };
 
 template <typename T>
-struct GetTraitType {
+struct get_trait_type {
     using type = typename Std::tuple_element<1, GetLayoutInfoT<T>>::type;
 };
 
 template <typename T>
-using GetLayoutTrait = typename GetTraitType<Std::remove_cvref_t<T>>::type;
+using GetPattern = get_pattern<T>;
 
 template <typename T>
-using GetLayoutPattern = typename GetPattern<Std::remove_cvref_t<T>>::type;
+using GetTraitType = get_trait_type<T>;
 
 template <typename T>
-struct IsLayout : Std::false_type {};
+using GetLayoutTrait = typename get_trait_type<Std::remove_cvref_t<T>>::type;
+
+template <typename T>
+using GetLayoutPattern = typename get_pattern<Std::remove_cvref_t<T>>::type;
+
+template <typename T>
+struct is_layout : Std::false_type {};
 
 template <typename T, typename U, typename S>
-struct IsLayout<Layout<T, U, S>> : Std::true_type {};
+struct is_layout<layout_type<T, U, S>> : Std::true_type {};
 
 template <typename T>
-constexpr bool IsLayoutV = IsLayout<Std::remove_cvref_t<T>>::value;
+using IsLayout = is_layout<T>;
 
-} // namespace Te
-} // namespace AscendC
+template <typename T>
+constexpr bool IsLayoutV = is_layout<Std::remove_cvref_t<T>>::value;
+
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_TENSOR_LAYOUT_DEFINITION_H
 

@@ -26,14 +26,14 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 namespace Inst {
 
 class AddScalar {
 public:
     template <typename T, typename U, typename V>
-    __simd_callee__ inline static void Run(T& dst, U src, V value, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, U src, V value, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_add_scalar(dst, src, value, mask);
         }
@@ -43,7 +43,7 @@ public:
 class MulScalar {
 public:
     template <typename T, typename U, typename V>
-    __simd_callee__ inline static void Run(T& dst, U src, V value, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, U src, V value, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_mul_scalar(dst, src, value, mask);
         }
@@ -53,7 +53,7 @@ public:
 class MaxScalar {
 public:
     template <typename T, typename U, typename V>
-    __simd_callee__ inline static void Run(T& dst, U src, V value, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, U src, V value, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_max_scalar(dst, src, value, mask);
         }
@@ -63,7 +63,7 @@ public:
 class MinScalar {
 public:
     template <typename T, typename U, typename V>
-    __simd_callee__ inline static void Run(T& dst, U src, V value, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, U src, V value, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_min_scalar(dst, src, value, mask);
         }
@@ -73,7 +73,7 @@ public:
 class ShiftLeftScalar {
 public:
     template <typename T, typename U, typename V>
-    __simd_callee__ inline static void Run(T& dst, U src, V value, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, U src, V value, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_shiftleft_scalar(dst, src, value, mask);
         }
@@ -83,7 +83,7 @@ public:
 class ShiftRightScalar {
 public:
     template <typename T, typename U, typename V>
-    __simd_callee__ inline static void Run(T& dst, U src, V value, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, U src, V value, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_shiftright_scalar(dst, src, value, mask);
         }
@@ -93,7 +93,7 @@ public:
 class MulsEven {
 public:
     template <typename T, typename U, typename V>
-    __simd_callee__ inline static void Run(T& dst, U src, V value, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, U src, V value, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_muls(dst, src, value, mask);
         }
@@ -103,7 +103,7 @@ public:
 class MulsOdd {
 public:
     template <typename T, typename U, typename V>
-    __simd_callee__ inline static void Run(T& dst, U src, V value, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, U src, V value, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_muls_v2(dst, src, value, mask);
         }

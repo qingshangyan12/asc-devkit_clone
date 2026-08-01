@@ -27,20 +27,20 @@
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
 #include "impl/tensor_api/arch/cube/l0c_to_l1/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyL0C2L1Trait DEFAULT_COPY_L0C2L1_TRAIT = CopyL0C2L1Trait{};
-struct CopyL0C2L1TraitDefault {
-    using TraitType = CopyL0C2L1Trait;
+constexpr copy_l0c_to_l1_trait DEFAULT_COPY_L0C2L1_TRAIT = copy_l0c_to_l1_trait{};
+struct copy_l0c_to_l1_trait_default {
+    using TraitType = copy_l0c_to_l1_trait;
     static constexpr const TraitType value = DEFAULT_COPY_L0C2L1_TRAIT;
 };
 
 struct CopyL0C2L1Base {
 public:
-    template <const CopyL0C2L1Trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(
-        const T& dst, const U& src, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U>
+    __aicore__ inline static void data_copy_impl(
+        const T& dst, const U& src, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
@@ -51,12 +51,12 @@ public:
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
 
         using CopyL0C2L1Impl = typename CopyL0C2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2L1Impl::template Run<trait>(dst, src, params);
+        CopyL0C2L1Impl::template run<trait>(dst, src, params);
     }
 
-    template <const CopyL0C2L1Trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U, typename S>
-    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type DataCopyImpl(
-        const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U, typename S>
+    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type data_copy_impl(
+        const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
@@ -67,12 +67,12 @@ public:
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
 
         using CopyL0C2L1Impl = typename CopyL0C2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2L1Impl::template Run<trait>(dst, src, quant, params);
+        CopyL0C2L1Impl::template run<trait>(dst, src, quant, params);
     }
 
-    template <const CopyL0C2L1Trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U, typename S>
-    __aicore__ inline static typename Std::enable_if<IsAttrTensorV<S>, void>::type DataCopyImpl(
-        const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U, typename S>
+    __aicore__ inline static typename Std::enable_if<IsAttrTensorV<S>, void>::type data_copy_impl(
+        const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
@@ -83,36 +83,36 @@ public:
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
 
         using CopyL0C2L1Impl = typename CopyL0C2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2L1Impl::template Run<trait>(dst, src, quant, params);
+        CopyL0C2L1Impl::template run<trait>(dst, src, quant, params);
     }
 };
 
-struct CopyL0C2L1 : public CopyL0C2L1Base {
+struct copy_l0c_to_l1 : public CopyL0C2L1Base {
 public:
     template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIV {
             return;
         }
-        DataCopyImpl<trait>(args...);
+        data_copy_impl<trait>(args...);
     }
 };
 
-struct CopyL0C2L1With : public CopyL0C2L1Base {
+struct copy_l0c_to_l1_with : public CopyL0C2L1Base {
 public:
     template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIV {
             return;
         }
-        DataCopyImpl<trait>(args...);
+        data_copy_impl<trait>(args...);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_L1_COPY_H
 

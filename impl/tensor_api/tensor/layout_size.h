@@ -24,8 +24,8 @@
 
 #include "impl/tensor_api/utils/utils_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename T>
 struct nesting_depth {
@@ -45,8 +45,8 @@ struct nesting_depth<Std::tuple<Args...>> {
 template <typename T>
 constexpr size_t NestingDepthV = nesting_depth<Std::remove_cvref_t<T>>::value;
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_TENSOR_LAYOUT_SIZE_H
 

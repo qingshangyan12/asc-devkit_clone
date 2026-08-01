@@ -25,27 +25,27 @@
 #include "impl/tensor_api/arch/vector/binary_scalar/instruction.h"
 #include "impl/tensor_api/arch/vector/utils/mask_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template<typename CalcFunc, typename TraitType>
 class BinaryScalarVF {
 public:
     template<typename DstRegType, typename SrcRegType, typename T, typename U, typename S>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, S value, uint32_t dataSize)
+    __simd_vf__ inline static void run(__ubuf__ T* dst, __ubuf__ U* src, S value, uint32_t data_size)
     {
-        constexpr uint32_t oneRepSize = static_cast<uint32_t>(asc_get_vf_len() / sizeof(T));
-        uint16_t repeat = static_cast<uint16_t>((dataSize + oneRepSize - 1) / oneRepSize);
+        constexpr uint32_t one_rep_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(T));
+        uint16_t repeat = static_cast<uint16_t>((data_size + one_rep_size - 1) / one_rep_size);
 
         vector_bool vmask;
         SrcRegType reg_src;
         DstRegType reg_dst;
 
         for (uint16_t i = 0; i < repeat; ++i) {
-            vmask = Inst::UpdateMask::template Run<uint32_t>(dataSize);
-            asc_loadalign(reg_src, src + i * oneRepSize);
-            CalcFunc::template Run(reg_dst, reg_src, value, vmask);
-            asc_storealign(dst + i * oneRepSize, reg_dst, vmask);
+            vmask = Inst::UpdateMask::template run<uint32_t>(data_size);
+            asc_loadalign(reg_src, src + i * one_rep_size);
+            CalcFunc::template run(reg_dst, reg_src, value, vmask);
+            asc_storealign(dst + i * one_rep_size, reg_dst, vmask);
         }
     }
 };
@@ -54,17 +54,17 @@ template<typename CalcFunc, typename TraitType>
 class Transform2BinaryScalarVF {
 public:
     template<typename T, typename U, typename V>
-    __aicore__ inline static void Run(const T& dst, const U& src, const V& value)
+    __aicore__ inline static void run(const T& dst, const U& src, const V& value)
     {
  		using dstType = GetAttributeElementType<typename T::elementType*>;
  		using srcType = GetAttributeElementType<typename U::elementType*>;
         using SrcRegType = typename VectorTypeTransform::template Get<srcType>;
         using DstRegType = typename VectorTypeTransform::template Get<dstType>;
 
-        uint32_t dataSize = dst.Size();
+        uint32_t data_size = dst.size();
 
-        BinaryScalarVF<CalcFunc, TraitType>::template Run<DstRegType, SrcRegType, dstType, srcType>(
-                                                        dst.Data().Get(), src.Data().Get(), value, dataSize);
+        BinaryScalarVF<CalcFunc, TraitType>::template run<DstRegType, SrcRegType, dstType, srcType>(
+                                                        dst.data().get(), src.data().get(), value, data_size);
     }
 };
 

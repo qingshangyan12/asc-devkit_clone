@@ -26,33 +26,33 @@
 #include "impl/tensor_api/arch/vector/utils/copy_utils.h"
 #include "impl/tensor_api/arch/vector/ub_to_ub/copy_impl/instruction.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyUB2UBTrait {};
+struct copy_ub_to_ub_trait {};
 
 class CopyUbufToUbufAlignV2Common {
 protected:
     template <typename T, typename U>
-    __aicore__ inline static void EmitCopy(
-        const T& dst, const U& src, uint16_t blockCount, uint32_t blockLen, int64_t srcStride, int64_t dstStride)
+    __aicore__ inline static void emit_copy(
+        const T& dst, const U& src, uint16_t block_count, uint32_t block_len, int64_t src_stride, int64_t dst_stride)
     {
         using SrcType = typename U::elementType;
         using DstType = typename T::elementType;
 
-        AdjustB4CopyParams<SrcType, DstType>(blockLen, srcStride, dstStride);
+        adjust_b4_copy_params<SrcType, DstType>(block_len, src_stride, dst_stride);
 
         // Convert from bytes to 32B units for asc_copy_ub2ub
-        uint16_t blockLenIn32B = static_cast<uint16_t>(blockLen >> 5);
-        uint16_t srcStrideIn32B = static_cast<uint16_t>(srcStride >> 5);
-        uint16_t dstStrideIn32B = static_cast<uint16_t>(dstStride >> 5);
+        uint16_t block_len_in32_b = static_cast<uint16_t>(block_len >> 5);
+        uint16_t src_stride_in32_b = static_cast<uint16_t>(src_stride >> 5);
+        uint16_t dst_stride_in32_b = static_cast<uint16_t>(dst_stride >> 5);
 
-        CopyUbufToUbufInstr::DataCopy(dst, src, blockCount, blockLenIn32B, srcStrideIn32B, dstStrideIn32B);
+        CopyUbufToUbufInstr::data_copy(dst, src, block_count, block_len_in32_b, src_stride_in32_b, dst_stride_in32_b);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_IMPL_DATA_COPY_H
 

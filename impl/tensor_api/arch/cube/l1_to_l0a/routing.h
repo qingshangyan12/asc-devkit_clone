@@ -29,13 +29,13 @@
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/img2col.h"
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/img2col3d.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class CopyL12L0AIgnore {
 public:
-    template <const CopyL12L0ATrait& trait, typename ...Args>
-    __aicore__ inline void static Run(const Args&... args) {
+    template <const copy_l1_to_l0a_trait& trait, typename ...Args>
+    __aicore__ inline void static run(const Args&... args) {
         static_assert(Std::is_same_v<Args..., void>, "CopyL12L0AIgnore should not be called");
     }
 };
@@ -64,7 +64,7 @@ struct CopyL12L0ARouting<Version, NZLayoutPtn, ZNLayoutPtn, CopyMode::TRANS_B8B4
 };
 
 // Img2Col: L1(NC1HWC0) -> L0A(NZ) for conv feature maps. Dispatched when src carries the
-// NC1HWC0LayoutPtn tag and params is bound via CopyL12L0A.with(Img2ColParams).
+// NC1HWC0LayoutPtn tag and params is bound via copy_l1_to_l0a.with(Img2ColParams).
 template <uint32_t Version>
 struct CopyL12L0ARouting<Version, NZLayoutPtn, NC1HWC0LayoutPtn, CopyMode::NORMAL> {
     using type = LoadDataL12L0AImg2Col;
@@ -78,8 +78,8 @@ struct CopyL12L0ARouting<Version, NZLayoutPtn, NDC1HWC0LayoutPtn, CopyMode::NORM
     using type = LoadDataL12L0AImg2Col3D;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0A_ROUTING_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

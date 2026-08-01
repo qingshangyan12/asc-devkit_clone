@@ -25,8 +25,8 @@
 #include "impl/tensor_api/atom/copy_atom_impl.h"
 #include "impl/tensor_api/algorithm/transform_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename QuantParam>
 constexpr bool IsQuantScalarV =
@@ -36,33 +36,64 @@ template <typename QuantParam>
 constexpr bool IsCopyQuantParamV = IsQuantScalarV<QuantParam> || IsAttrTensorV<QuantParam>;
 
 template <typename AtomType, typename DstTensor, typename SrcTensor>
-__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
+__aicore__ inline void copy(const copy_atom<AtomType>& atom_copy, const DstTensor& dst, const SrcTensor& src)
 {
-    atomCopy.Call(dst, src);
+    atom_copy.call(dst, src);
 }
 
 template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
     Std::enable_if_t<IsCopyQuantParamV<QuantParam>, int> = 0>
-__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
+__aicore__ inline void copy(const copy_atom<AtomType>& atom_copy, const DstTensor& dst, const SrcTensor& src,
     const QuantParam& quant)
 {
-    atomCopy.Call(dst, src, quant);
+    atom_copy.call(dst, src, quant);
 }
 
 template <typename CopyOperationType>
-__aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation)
+__aicore__ inline constexpr auto make_copy(const CopyOperationType& copy_operation)
 {
-    return CopyAtom<CopyTraits<CopyOperationType>>{};
+    return copy_atom<copy_traits<CopyOperationType>>{};
 }
 
 template <typename CopyOperationType, typename CopyTraitType>
-__aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
+__aicore__ inline constexpr auto make_copy(const CopyOperationType& copy_operation, const CopyTraitType& copy_trait)
 {
-    return CopyAtom<CopyTraits<CopyOperationType, CopyTraitType>>{};
+    return copy_atom<copy_traits<CopyOperationType, CopyTraitType>>{};
 }
 
 }
 }
+
+
+// PascalCase compatibility wrappers
+namespace asc {
+namespace te {
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const copy_atom<AtomType>& atom_copy, const DstTensor& dst, const SrcTensor& src)
+{
+    copy(atom_copy, dst, src);
+}
+
+template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
+    Std::enable_if_t<IsCopyQuantParamV<QuantParam>, int> = 0>
+__aicore__ inline void Copy(const copy_atom<AtomType>& atom_copy, const DstTensor& dst, const SrcTensor& src, const QuantParam& quant)
+{
+    copy(atom_copy, dst, src, quant);
+}
+
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copy_operation)
+{
+    return make_copy(copy_operation);
+}
+
+template <typename CopyOperationType, typename CopyTraitType>
+__aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copy_operation, const CopyTraitType& copy_trait)
+{
+    return make_copy(copy_operation, copy_trait);
+}
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ALGORITHM_COPY_IMPL_H
 
