@@ -403,6 +403,20 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_ReduceScatterCcuPath)
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuReduceScatterMeshMem2Mem1D));
 }
 
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AllReduceCcuPath)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    void* opResCtx = nullptr;
+    HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
+    EXPECT_EQ(ret, HCCL_SUCCESS);
+    ASSERT_NE(opResCtx, nullptr);
+    OpResCtx* ctx = static_cast<OpResCtx*>(opResCtx);
+    EXPECT_NE(ctx->res[0], 0U);
+    EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE));
+    EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAllReduceMeshMem2Mem1D));
+}
+
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuPath)
 {
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
