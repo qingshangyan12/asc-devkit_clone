@@ -11,6 +11,7 @@
 #include "ccu_kernel_alg_base.h"
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
+#include "../../../../all_reduce/template/ccu/kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
@@ -31,6 +32,12 @@ const uint32_t HBM_PARAM_IDX_5 = 5;
 const uint32_t HBM_PARAM_IDX_6 = 6;
 const uint32_t HBM_PARAM_IDX_7 = 7;
 const uint32_t HBM_PARAM_IDX_8 = 8;
+const uint32_t HBM_PARAM_IDX_9 = 9;
+const uint32_t HBM_PARAM_IDX_10 = 10;
+const uint32_t HBM_PARAM_IDX_11 = 11;
+const uint32_t HBM_PARAM_IDX_12 = 12;
+const uint32_t HBM_PARAM_IDX_13 = 13;
+const uint32_t HBM_PARAM_IDX_14 = 14;
 
 const uint32_t SINGLE_DIE = 1;
 const uint32_t DOUBLE_DIE = 2;
@@ -131,6 +138,23 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+    }
+    CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLREDUCE))
+    {
+        // FillCachedArgs order: [0]inputAddr [1]outputAddr [2]token [3]scratchAddr
+        //   [4]currentRankSliceInputOffset [5]currentRankSliceOutputOffset
+        //   [6]normalSliceSize [7]lastSliceSize [8]mySliceSize [9]sliceOffset
+        //   [10]isInputOutputEqual [11]goSize0 [12]goSize1 [13]goSize2 [14]goSize3
+        //   [15]inBuffBaseOff [16]outBuffBaseOff [17]hcclBuffBaseOff
+        // HBM param[0] = control word; token (cachedArgs[2]) skipped, uses ctx.token;
+        // remaining cachedArgs[N>=3] map to param[N] (offset by 1 for control word, minus 1 for skipped token = net 0)
+        CcuKfcAllReduceMesh1DMem2MemKernel(
+            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
+            param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
+            param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10],
+            param[HBM_PARAM_IDX_11], param[HBM_PARAM_IDX_12], param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14],
+            ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
+            ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
     }
 }
 
