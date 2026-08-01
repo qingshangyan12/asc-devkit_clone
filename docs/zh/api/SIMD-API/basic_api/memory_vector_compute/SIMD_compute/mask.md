@@ -51,11 +51,14 @@ Mask操作的使用方式如下：
 
 **表3**  Mask操作的使用方式
 
-|配置方式|工作模式|前n个数据计算API|高维切分计算API|
-|:---|:---|:---|:---|
-|[接口内设置Mask](#接口内设置Mask)|[Normal模式](#mask-mode)|isSetMask模板参数设置为true，通过接口入参传入mask，根据使用场景配置dataBlockStride、repeatStride参数。|isSetMask模板参数设置为true，通过接口入参传入mask，根据使用场景配置dataBlockStride、repeatStride参数。repeatTime传入固定值即可，建议统一设置为1，该值不生效。|
-|[接口内设置Mask](#接口内设置Mask)|[Counter模式](#mask-mode)|不涉及。|isSetMask模板参数设置为true，通过接口入参传入mask，根据使用场景配置dataBlockStride、repeatStride参数。repeatTime传入固定值即可，建议统一设置为1，该值不生效。|
-|[接口外设置Mask](#接口外设置Mask)|[Normal模式](#mask-mode)|isSetMask模板参数设置为false，调用[SetVectorMask](../mask_operations/SetVectorMask.md)设置Mask，之后调用前n个数据计算API；接口入参中的count建议设置成1。|调用[SetVectorMask](../mask_operations/SetVectorMask.md)设置Mask，之后调用高维切分计算API。<br>&bull; isSetMask模板参数设置为false，接口入参中的mask参数不生效；根据使用场景配置dataBlockStride、repeatStride参数。repeatTime传入固定值即可，建议统一设置为1，该值不生效。|
+|配置方式|工作模式|前n个数据计算API|高维切分计算API| 
+ |:---|:---|:---|:---| 
+ |[接口内设置Mask](#接口内设置Mask)|[Normal模式](#mask-mode)|不涉及。|isSetMask模板参数设置为true，通过接口入参传入mask，根据使用场景配置dataBlockStride、repeatStride、repeatTime参数。| 
+ |[接口内设置Mask](#接口内设置Mask)|[Counter模式](#mask-mode)|isSetMask模板参数设置为true，通过接口入参传入mask。|isSetMask模板参数设置为true，通过接口入参传入Mask。<br>根据使用场景配置dataBlockStride、repeatStride参数。repeatTime传入固定值即可，建议统一设置为1，该值不生效。| 
+ |[接口外设置Mask](#接口外设置Mask)|[Normal模式](#mask-mode)|不涉及。|调用[SetVectorMask](../mask_operations/SetVectorMask.md)设置Mask，之后调用高维切分计算API。<br>&bull; isSetMask模板参数设置为false，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。<br>&bull;根据使用场景配置repeatTime、dataBlockStride、repeatStride参数。| 
+ |[接口外设置Mask](#接口外设置Mask)|[Counter模式](#mask-mode)|isSetMask模板参数设置为false，调用[SetVectorMask](../mask_operations/SetVectorMask.md)设置Mask，之后调用前n个数据计算API；接口入参中的count建议设置成1。|调用[SetVectorMask](../mask_operations/SetVectorMask.md)设置Mask，之后调用高维切分计算API。<br>&bull; isSetMask模板参数设置为false；接口入参中的mask值设置为`MASK_PLACEHOLDER`，用于占位，无实际含义。<br>&bull;根据使用场景配置dataBlockStride、repeatStride参数。repeatTime传入固定值即可，建议统一设置为1，该值不生效。|
+
+用户需根据接口使用场景和参数配置正确选择掩码配置方式，如[图2 两种配置方式代码对比](#图2-两种配置方式代码对比)所示：
 
 **图2**  两种配置方式代码对比  
 ![](../../../../figures/two_config_comparison.png)<a id="图2-两种配置方式代码对比"></a>
@@ -278,7 +281,8 @@ Mask操作的使用方式如下：
 
 |参数名称|输入/输出|含义|
 |:---|:---|:---|
-|count|输入|参与计算的元素个数。<br>在Counter模式下，当isSetMask = false，count会被转换成掩码表示。前count位设置为1，表示前count个元素参与计算。<br>接口提供两种模式的mask参数：<br>&bull;逐bit模式：输入为mask数组mask[]，直接设置mask寄存器的值，输入的mask数组长度大于等于2，其中有效的位数与操作数的类型有关：<br>当操作数为16位时，一次迭代中有128个元素参与计算，需要使用两个uint64\_t类型的数据进行设置，数组有效长度为2，maskLow∈[0, 2<sup>64</sup>-1]， maskHigh∈[0, 2<sup>64</sup>-1]；<br>当操作数为32位时，一次迭代有64个数参与计算，仅需一个uint64\_t的数据即可，数组有效长度为1，maskLow∈[0, 2<sup>64</sup>-1]， maskHigh = 0；<br>当操作数为64位时，一次迭代有32个元素参与计算，数组长度为1，mask[0]的有效位数为32，maskLow∈[0, 2<sup>32</sup>-1]，maskHigh = 0。<br>例如，mask=[8, 2]，8和2分别表示低位的64bit和高位的64bit，8=0b1000，表示仅第4个元素参与计算；2=0b0010表示第66（64+2）个元素参与计算。<br>&bull;连续模式：输入为uint64\_t的值mask，表示mask寄存器从低位开始连续多少位被设置为1，表示前面连续的多少个元素参与计算。取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。<br>当操作数为16位时，mask∈[0, 128]；<br>当操作数为32位时，mask∈[0, 64]；<br>当操作数为64位时，mask∈[0, 32]。<br>注：连续模式下，mask超出范围按照对应数据类型下mask最大值计算；mask = 0表示指令不会执行计算操作，该接口将被视为NOP（空操作）；若设成了负值可能产生未定义行为。|
+|count|输入|参与计算的元素个数。<br>在Counter模式下，当isSetMask = false，count会被转换成掩码表示。前count位设置为1，表示前count个元素参与计算，其余元素被屏蔽。| 
+ |mask[]/mask|输入|mask存储在一个128bit的寄存器中，在掩码Normal模式下从低位到高位按位控制参与计算的元素，bit位的值为1表示参与计算，0表示不参与，最多可以控制128个元素是否参与计算，有效位数与参与计算的数据类型有关。<br>接口提供两种方式设置掩码Normal模式下的mask，控制每次迭代内参与计算的元素。<br>&bull;逐bit模式：输入为uint64\_t类型的数组mask[]，直接设置mask寄存器的值，输入的mask数组长度大于等于2，其中有效的位数与操作数的类型有关：<br>当操作数为16位时，一次迭代中有128个元素参与计算，需要使用两个uint64\_t类型的数据进行设置，数组有效长度为2，maskLow∈[0, 2<sup>64</sup>-1]， maskHigh∈[0, 2<sup>64</sup>-1]；<br>当操作数为32位时，一次迭代有64个数参与计算，仅需一个uint64\_t的数据即可，数组有效长度为1，maskLow∈[0, 2<sup>64</sup>-1]， maskHigh = 0；<br>当操作数为64位时，一次迭代有32个元素参与计算，数组长度为1，mask[0]的有效位数为32，maskLow∈[0, 2<sup>32</sup>-1]，maskHigh = 0。<br>例如，mask=[8, 2]，8和2分别表示低位的64bit和高位的64bit，8=0b1000，表示仅第4个元素参与计算；2=0b0010表示第66（64+2）个元素参与计算。<br>&bull;连续模式：输入为uint64\_t的值mask，表示mask寄存器从低位开始连续多少位被设置为1，表示前面连续的多少个元素参与计算。取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。<br>当操作数为16位时，mask∈[0, 128]；<br>当操作数为32位时，mask∈[0, 64]；<br>当操作数为64位时，mask∈[0, 32]。<br>注：连续模式下，mask超出范围按照对应数据类型下mask最大值计算；mask = 0表示指令不会执行计算操作，该接口将被视为NOP（空操作）；若设成了负值可能产生未定义行为。|
 
 > [!CAUTION]注意
 >
