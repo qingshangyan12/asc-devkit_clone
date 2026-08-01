@@ -463,6 +463,7 @@ __aicore__ inline void SetAippFunctionsImpl9(AippInputFormat format, AippParams<
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
     aippConfig9 |= (static_cast<uint64_t>(config.flipParams.isHorizontalFlip) & 0x1) << 25;
     aippConfig9 |= (static_cast<uint64_t>(config.flipParams.isVerticalFlip) & 0x1) << 26;
+    aippConfig9 |= ((static_cast<uint64_t>(format) & 0x1f) >> 5) << 35;
     aippConfig9 |= (static_cast<uint64_t>(config.concatMode) & 0x3) << 42;
     aippConfig9 |= (static_cast<uint64_t>(config.channelTransformMode) & 0x7) << 46;
 #endif
