@@ -36,8 +36,10 @@ public:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
-        uint16_t kStartPt = 0;
-        uint16_t mStartPt = 0;
+        // Window start offsets come from params (default 0). Non-zero values let an M tile start
+        // mid-row (mStartPt = woutStart) or a K chunk start inside a C0 block (kStartPt).
+        uint16_t kStartPt = params.kStartPt;
+        uint16_t mStartPt = params.mStartPt;
 
         // src L1 NC1HWC0 (N, C1, H, W, C0): l1H/l1W are the feature-map dims, channelSize = C1*C0.
         uint16_t l1H = Get<2>(srcLayout.Shape());
