@@ -104,6 +104,13 @@ inline void InitTilingData() {}
 /opt/ascend/bin/ld.lld -r {temp}/sk_key1.o {temp}/sk_key2.o {temp}/sk_bind.o -o {temp}/sk.o
 """.format(wrapper=wrapper, sk_wrapper=sk_wrapper, sk_bind=sk_bind,
            header=tiling_header, temp=temp_dir))
+            with open(compile_log, "r") as log_file:
+                compile_commands = log_file.read()
+            compile_commands = compile_commands.replace(
+                "-c {}".format(wrapper),
+                "-c {} -I{}/build_out/op_kernel/AddCustom/dynamic/../ascendc/common".format(
+                    wrapper, temp_dir))
+            self._write(compile_log, compile_commands)
 
             compile_info = self._compile_info(source, wrapper, compile_log)
             recorder = OpCompileManifestRecorder()
@@ -117,14 +124,18 @@ inline void InitTilingData() {}
                 SimpleNamespace(gen_kernel_func_file=sk_wrapper, kernel_name=compile_info.kernel_name),
                 "super_kernel")
             recorder.record_sk_bind(sk_bind, compile_info.kernel_name)
+            final_normal_body = normal_body + "// final DFX section\n"
+            self._write(wrapper, final_normal_body)
             recorder.write(compile_info, self._tiling_info(), 4)
 
             manifest_name = "AddCustom_ab1b6750d7f510985325b603cb06dc8b_manifest.json"
             with open(os.path.join(temp_dir, manifest_name), "r") as manifest_file:
                 manifest = json.load(manifest_file)
-            self.assertEqual(set(manifest), {"schema_version", "binId", "soc_version", "kernels"})
+            self.assertEqual(
+                set(manifest), {"schema_version", "binId", "soc_version", "source_file", "kernels"})
             self.assertEqual(manifest["schema_version"], "4.0")
             self.assertTrue(manifest["soc_version"])
+            self.assertEqual(manifest["source_file"], "add_custom.cpp")
             self.assertRegex(manifest["binId"], r"^[0-9a-f]{64}$")
             self.assertEqual([item["kernel_name"] for item in manifest["kernels"]], [
                 "AddCustom_ab1b6750d7f510985325b603cb06dc8b_1",
@@ -133,7 +144,8 @@ inline void InitTilingData() {}
 
             resources = os.path.join(temp_dir, "resources")
             with open(os.path.join(resources, "AddCustom_ab1b6750d7f510985325b603cb06dc8b_kernel.cpp")) as wrapper_file:
-                self.assertEqual(wrapper_file.read(), normal_body)
+                self.assertEqual(
+                    wrapper_file.read(), final_normal_body.replace(source, os.path.basename(source)))
             merged_name = "AddCustom_ab1b6750d7f510985325b603cb06dc8b_tiling_data.h"
             with open(os.path.join(resources, merged_name)) as header_file:
                 merged = header_file.read()
@@ -152,14 +164,25 @@ inline void InitTilingData() {}
                 self.assertEqual(static_input["byte_size"], expected_size)
                 self.assertEqual(static_input["file"], "resources/" + merged_name)
                 self.assertEqual(static_input["template"], STATIC_TILING_TOKEN)
-                self.assertEqual({item["mode"] for item in kernel["files"]},
-                                 {"normal", "sk", "common"})
+                self.assertEqual(set(kernel), {"kernel_name", "constants_info", "files", "commands"})
+                self.assertTrue(all(set(item) == {"file_name", "file_path"}
+                                    for item in kernel["files"]))
+                self.assertEqual(
+                    {item["file_path"] for item in kernel["files"]},
+                    {"/manifests/AddCustom_ab1b6750d7f510985325b603cb06dc8b/resources/{}".format(
+                        item["file_name"]) for item in kernel["files"]})
                 self.assertTrue(any(item["file_name"].endswith("_sk_bind.cpp")
                                     for item in kernel["files"]))
                 self.assertEqual(set(kernel["commands"][0]), {"type", "mode", "options", "output"})
                 self.assertEqual({command["mode"] for command in kernel["commands"]},
                                  {"normal", "sk"})
                 self.assertEqual([command["type"] for command in kernel["commands"]].count("ld"), 3)
+                self.assertTrue(all(
+                    "-I${source_dir}" in command["options"]
+                    for command in kernel["commands"] if command["type"] == "bisheng"))
+                self.assertFalse(any(
+                    "build_out" in value or "/ascendc/common" in value
+                    for command in kernel["commands"] for value in command["options"]))
                 self.assertTrue(any(value.startswith("${resource:resources/")
                                     for command in kernel["commands"]
                                     for value in command["options"]))
@@ -196,6 +219,9 @@ inline void InitTilingData() {}
                 commands = json.load(manifest_file)["kernels"][0]["commands"]
             self.assertEqual([command["type"] for command in commands],
                              ["bisheng", "bisheng", "ld"])
+            self.assertTrue(all(
+                "-I${source_dir}" in command["options"]
+                for command in commands if command["type"] == "bisheng"))
             self.assertIn("${output:artifacts/Matmul_0123456789abcdef_1.o}",
                           commands[-1]["output"])
 

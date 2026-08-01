@@ -5179,8 +5179,10 @@ class TilingDataShort {};
 
             with open(os.path.join(temp_dir, "AddCustom_deadbeef_manifest.json"), 'r') as fd:
                 manifest = json.load(fd)
-            self.assertEqual(set(manifest), {"schema_version", "binId", "soc_version", "kernels"})
+            self.assertEqual(
+                set(manifest), {"schema_version", "binId", "soc_version", "source_file", "kernels"})
             self.assertEqual(manifest["schema_version"], "4.0")
+            self.assertEqual(manifest["source_file"], "add_custom.cpp")
             self.assertEqual(len(manifest["binId"]), 64)
             kernel = manifest["kernels"][0]
             self.assertEqual(kernel["kernel_name"], "AddCustom_deadbeef_1")
@@ -5192,11 +5194,18 @@ class TilingDataShort {};
                 "file": "resources/AddCustom_deadbeef_tiling_data.h",
                 "template": "@@STATIC_VALUE_tiling_data@@",
             })
+            self.assertNotIn("artifacts", kernel)
+            self.assertEqual(
+                {item["file_path"] for item in kernel["files"]},
+                {"/manifests/AddCustom_deadbeef/resources/{}".format(item["file_name"])
+                 for item in kernel["files"]})
+            self.assertTrue(all("mode" not in item for item in kernel["files"]))
             normal_commands = kernel["commands"]
             self.assertEqual([command["type"] for command in normal_commands], ["bisheng"])
             self.assertEqual(normal_commands[0]["mode"], "normal")
             self.assertIn("${resource:resources/AddCustom_deadbeef_kernel.cpp}",
                           normal_commands[0]["options"])
+            self.assertIn("-I${source_dir}", normal_commands[0]["options"])
             static_header = os.path.join(temp_dir, *static_input["file"].split('/'))
             with open(static_header, 'r') as fd:
                 header = fd.read()
@@ -5204,7 +5213,7 @@ class TilingDataShort {};
             self.assertIn("#elif TILING_KEY_VAR == 2UL", header)
             self.assertIn("@@STATIC_VALUE_tiling_data@@", header)
             with open(os.path.join(temp_dir, "resources", "AddCustom_deadbeef_kernel.cpp")) as fd:
-                self.assertEqual(fd.read(), '#include "{}"\nnormal wrapper\n'.format(source_file))
+                self.assertEqual(fd.read(), '#include "add_custom.cpp"\nnormal wrapper\n')
 
 
 if __name__ == "__main__":

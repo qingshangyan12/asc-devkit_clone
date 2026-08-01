@@ -26,6 +26,7 @@ STATIC_TILING_TOKEN = "@@STATIC_VALUE_tiling_data@@"
 LOG_STAGE_PATTERN = re.compile(r"^// Stage: CompileStage\.([A-Z_]+)$")
 RECIPE_STAGES = {"COMPILE", "FATBIN", "LINKRELOCATE"}
 TILING_KEY_PATTERN = re.compile(r"^-DTILING_KEY_VAR=([^U]+)UL$")
+SOURCE_DIR_OPTION = "-I${source_dir}"
 
 
 class OpCompileManifestRecorder:
@@ -126,6 +127,7 @@ class OpCompileManifestRecorder:
         try:
             if not self.bin_id or "normal" not in self._resource_modes() or not self.tiling_header:
                 raise RuntimeError("binId, normal wrapper, or tiling header is missing")
+            self._sync_resource_files()
             entries = self._tiling_entries(compile_info, tiling_info)
             if not entries:
                 raise RuntimeError("no tiling-key structure information is available")
@@ -134,8 +136,7 @@ class OpCompileManifestRecorder:
             files = self._manifest_files()
             kernels = []
             for tiling_key, tiling_struct, byte_size in entries:
-                recipe_commands, artifacts = self._recipe_commands(
-                    tiling_key, commands.get(tiling_key, []))
+                recipe_commands = self._recipe_commands(tiling_key, commands.get(tiling_key, []))
                 if not recipe_commands:
                     raise RuntimeError("no real compile command found for tiling key {}".format(tiling_key))
                 kernel_name = "{}_{}".format(self.op_name, tiling_key)
@@ -150,15 +151,12 @@ class OpCompileManifestRecorder:
                     }],
                     "files": files,
                     "commands": recipe_commands,
-                    "artifacts": [
-                        {"mode": mode, "file": path, "entry": kernel_name}
-                        for mode, path in artifacts
-                    ],
                 })
             manifest = {
                 "schema_version": SCHEMA_VERSION,
                 "binId": self.bin_id,
                 "soc_version": self.soc_version,
+                "source_file": os.path.basename(self.source_file),
                 "kernels": kernels,
             }
             with open(self.manifest_path, "w") as output:
@@ -309,7 +307,7 @@ class OpCompileManifestRecorder:
 
     def _recipe_commands(self, tiling_key, commands):
         if not commands:
-            return [], []
+            return []
         final_by_mode = {}
         for _, _, output, mode in commands:
             if output:
@@ -336,16 +334,19 @@ class OpCompileManifestRecorder:
             options = [
                 self._normalize_command_token(token, output_markers)
                 for index, token in enumerate(tokens[1:], start=1)
-                if index not in (output_index - 1, output_index)
+                if index not in (output_index - 1, output_index) and
+                not self._is_nonportable_common_include(token)
             ]
+            command_type = self._command_type(tokens[0], stage)
+            if command_type == "bisheng" and SOURCE_DIR_OPTION not in options:
+                options.insert(0, SOURCE_DIR_OPTION)
             result.append({
-                "type": self._command_type(tokens[0], stage),
+                "type": command_type,
                 "mode": mode,
                 "options": options,
                 "output": self._normalize_command_token(output, output_markers),
             })
-        artifacts = [(mode, artifact_files[mode]) for mode in ("normal", "sk") if mode in artifact_files]
-        return result, artifacts
+        return result
 
     def _normalize_command_token(self, token, output_markers):
         normalized = os.path.normpath(token) if token.startswith("/") else token
@@ -373,6 +374,22 @@ class OpCompileManifestRecorder:
             if ascend_root in token:
                 token = token.replace(ascend_root, "${env:ASCEND_HOME_PATH}")
         return token
+
+    def _is_nonportable_common_include(self, token):
+        """Drop build-workspace ascendc/common paths from replayable recipes."""
+        if not token.startswith("-I") or len(token) == 2:
+            return False
+        include_path = os.path.normpath(token[2:])
+        if not os.path.isabs(include_path) or not include_path.endswith(
+                os.path.join("ascendc", "common")):
+            return False
+        for ascend_root in self.command_ascend_roots:
+            try:
+                if os.path.commonpath([include_path, ascend_root]) == ascend_root:
+                    return False
+            except ValueError:
+                continue
+        return True
 
     @staticmethod
     def _command_tiling_key(tokens):
@@ -420,11 +437,35 @@ class OpCompileManifestRecorder:
 
     def _record_resource_file(self, source_file, resource_file, mode):
         source = os.path.normpath(source_file)
+        self.resource_sources[source] = (resource_file, mode)
+        self._copy_resource_file(source, resource_file)
+
+    def _sync_resource_files(self):
+        """Copy generated sources after compilation has finished mutating them."""
+        for source, (resource_file, _) in self.resource_sources.items():
+            self._copy_resource_file(source, resource_file)
+
+    def _copy_resource_file(self, source, resource_file):
         destination = os.path.join(self.kernel_meta_dir, resource_file)
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         shutil.copyfile(source, destination)
+        if resource_file.endswith("_kernel.cpp"):
+            self._rewrite_source_include(destination)
         os.chmod(destination, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
-        self.resource_sources[source] = (resource_file, mode)
+
+    def _rewrite_source_include(self, destination):
+        with open(destination, "r") as source:
+            content = source.read()
+        include_pattern = re.compile(
+            r'^([ \t]*#[ \t]*include[ \t]*)[<"]{}[>"]([ \t]*)$'.format(
+                re.escape(self.source_file)),
+            re.MULTILINE)
+        rewritten = include_pattern.sub(
+            lambda match: '{}"{}"{}'.format(
+                match.group(1), os.path.basename(self.source_file), match.group(2)), content)
+        if rewritten != content:
+            with open(destination, "w") as output:
+                output.write(rewritten)
 
     def _resource_modes(self):
         return {details[1] for details in self.resource_sources.values()}
@@ -433,17 +474,15 @@ class OpCompileManifestRecorder:
         files = [
             {
                 "file_name": os.path.basename(resource_file),
-                "file_path": resource_file,
-                "mode": mode,
+                "file_path": "/manifests/{}/{}".format(self.op_name, resource_file),
             }
-            for resource_file, mode in self.resource_sources.values()
+            for resource_file, _ in self.resource_sources.values()
         ]
         files.append({
             "file_name": os.path.basename(self.merged_tiling_file),
-            "file_path": self.merged_tiling_file,
-            "mode": "common",
+            "file_path": "/manifests/{}/{}".format(self.op_name, self.merged_tiling_file),
         })
-        return sorted(files, key=lambda item: (item["mode"], item["file_path"]))
+        return sorted(files, key=lambda item: item["file_name"])
 
     @staticmethod
     def _normalize_identity_options(options):
