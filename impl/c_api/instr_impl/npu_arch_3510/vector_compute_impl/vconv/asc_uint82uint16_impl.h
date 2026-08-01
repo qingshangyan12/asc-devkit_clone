@@ -41,7 +41,7 @@ __simd_callee__ inline void asc_uint82uint16_v2_impl(vector_uint16_t& dst, vecto
 
 __simd_callee__ inline void asc_uint82uint16_impl(
     vector_uint16_t& dst, vector_uint8_t src, vector_bool mask,
-    std::integral_constant<asc_position, asc_position::EVEN> pos)
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtii_u82u16_x(src, mask, (ULL)0);
@@ -50,7 +50,7 @@ __simd_callee__ inline void asc_uint82uint16_impl(
 
 __simd_callee__ inline void asc_uint82uint16_impl(
     vector_uint16_t& dst, vector_uint8_t src, vector_bool mask,
-    std::integral_constant<asc_position, asc_position::ODD> pos)
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtii_u82u16_x(src, mask, (ULL)1);

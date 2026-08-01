@@ -55,7 +55,7 @@ __simd_callee__ inline void asc_int162uint8_sat_v2_impl(vector_uint8_t& dst, vec
 
 __simd_callee__ inline void asc_int162uint8_impl(
     vector_uint8_t& dst, vector_int16_t src, vector_bool mask,
-    std::integral_constant<asc_position, asc_position::EVEN> pos)
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtii_s162u8_x(src, mask, (ULL)0, (ULL)0);
@@ -64,7 +64,7 @@ __simd_callee__ inline void asc_int162uint8_impl(
 
 __simd_callee__ inline void asc_int162uint8_impl(
     vector_uint8_t& dst, vector_int16_t src, vector_bool mask,
-    std::integral_constant<asc_position, asc_position::ODD> pos)
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtii_s162u8_x(src, mask, (ULL)0, (ULL)1);
@@ -73,19 +73,19 @@ __simd_callee__ inline void asc_int162uint8_impl(
 
 __simd_callee__ inline void asc_int162uint8_sat_impl(
     vector_uint8_t& dst, vector_int16_t src, vector_bool mask,
-    std::integral_constant<asc_position, asc_position::EVEN> pos)
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_s162u8_x(src, mask, (ULL)0, (ULL)0);
+        dst = __builtin_cce_vcvtii_s162u8_x(src, mask, (ULL)1, (ULL)0);
     }
 }
 
 __simd_callee__ inline void asc_int162uint8_sat_impl(
     vector_uint8_t& dst, vector_int16_t src, vector_bool mask,
-    std::integral_constant<asc_position, asc_position::ODD> pos)
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_s162u8_x(src, mask, (ULL)0, (ULL)1);
+        dst = __builtin_cce_vcvtii_s162u8_x(src, mask, (ULL)1, (ULL)1);
     }
 }
 

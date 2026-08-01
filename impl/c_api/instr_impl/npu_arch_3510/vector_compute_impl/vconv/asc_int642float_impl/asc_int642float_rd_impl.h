@@ -41,7 +41,7 @@ __simd_callee__ inline void asc_int642float_rd_v2_impl(vector_float& dst, vector
 
 __simd_callee__ inline void asc_int642float_rd_impl(
     vector_float& dst, vector_int64_t src, vector_bool mask,
-    std::integral_constant<asc_position, asc_position::EVEN> pos)
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtif_s642f32_x(src, mask, (ULL)2, (ULL)0);
@@ -50,7 +50,7 @@ __simd_callee__ inline void asc_int642float_rd_impl(
 
 __simd_callee__ inline void asc_int642float_rd_impl(
     vector_float& dst, vector_int64_t src, vector_bool mask,
-    std::integral_constant<asc_position, asc_position::ODD> pos)
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtif_s642f32_x(src, mask, (ULL)2, (ULL)1);

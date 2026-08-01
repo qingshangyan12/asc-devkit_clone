@@ -55,7 +55,8 @@ __simd_callee__ inline void asc_e5m22float_v4_impl(vector_float& dst, vector_fp8
 
 __simd_callee__ inline void asc_e5m22float_impl(
     vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask,
-    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
+        src_quarter_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtff_f8e5m22f32_x(src, mask, (ULL)0);
@@ -64,7 +65,8 @@ __simd_callee__ inline void asc_e5m22float_impl(
 
 __simd_callee__ inline void asc_e5m22float_impl(
     vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask,
-    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> quarter)
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER>
+        src_quarter_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtff_f8e5m22f32_x(src, mask, (ULL)1);
@@ -73,7 +75,8 @@ __simd_callee__ inline void asc_e5m22float_impl(
 
 __simd_callee__ inline void asc_e5m22float_impl(
     vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask,
-    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> quarter)
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER>
+        src_quarter_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtff_f8e5m22f32_x(src, mask, (ULL)2);
@@ -82,7 +85,8 @@ __simd_callee__ inline void asc_e5m22float_impl(
 
 __simd_callee__ inline void asc_e5m22float_impl(
     vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask,
-    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> quarter)
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
+        src_quarter_pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtff_f8e5m22f32_x(src, mask, (ULL)3);
