@@ -344,7 +344,6 @@ def normalize_static_command(kind, argv, ascend_home, command_index):
             )
         value = argument.replace("${resource.", "${resource:")
         value = value.replace("${artifact.", "${output:")
-        value = value.replace("${launch.block_dim}", "${context:block_dim}")
         separate_linker_path = argv_index > 0 and argv[argv_index - 1] == "-R"
         if separate_linker_path:
             portable_path, _ = _normalize_cann_path_list(
@@ -550,87 +549,6 @@ def _validate_argument(argument, context, resource_paths, *, allow_block_dim=Fal
         raise ValueError(f"{context} contains a non-portable path or placeholder")
 
 
-def _expand_and_validate_arguments(
-    arguments, context, resource_paths, options, used_options, *, allow_empty=False,
-    allow_block_dim=False,
-):
-    if not isinstance(arguments, list) or (not allow_empty and not arguments):
-        qualifier = "an array" if allow_empty else "a non-empty array"
-        raise ValueError(f"{context} must be {qualifier}")
-    expanded = []
-    for index, argument in enumerate(arguments):
-        argument_context = f"{context}[{index}]"
-        if not isinstance(argument, str) or not argument:
-            raise ValueError(f"{argument_context} must be a non-empty string")
-        key = _option_reference(argument)
-        if key is not None:
-            if key not in options:
-                raise ValueError(f"{argument_context} references unknown options key {key}")
-            used_options.add(key)
-            expanded.extend(options[key])
-            continue
-        if "${options:" in argument:
-            raise ValueError(
-                f"{argument_context} must use ${{options:key}} as a complete array element"
-            )
-        expanded.append(argument)
-    if len(expanded) > _MAX_ARGS:
-        raise ValueError(f"{context} exceeds the expanded argument limit")
-    for index, argument in enumerate(expanded):
-        _validate_argument(
-            argument, f"{context}[expanded:{index}]", resource_paths,
-            allow_block_dim=allow_block_dim,
-        )
-    return expanded
-
-
-def _validate_command_recipe(
-    recipe, context, resource_paths, options, used_options, *, super_kernel=False
-):
-    if not isinstance(recipe, dict):
-        raise ValueError(f"{context} must be an object")
-    unknown = set(recipe) - {"commands", "artifact"}
-    if unknown:
-        raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
-    commands = recipe.get("commands")
-    if (
-        not isinstance(commands, list)
-        or not commands
-        or len(commands) > _MAX_COMMANDS
-    ):
-        raise ValueError(f"{context}.commands must be a bounded non-empty array")
-    for command_index, command in enumerate(commands):
-        if (
-            not isinstance(command, list)
-            or not command
-            or len(command) > _MAX_ARGS
-        ):
-            raise ValueError(
-                f"{context}.commands[{command_index}] must be a bounded "
-                "non-empty argv array"
-            )
-        if _option_reference(command[0]) is not None:
-            raise ValueError(f"{context}.commands[{command_index}] executable cannot be an options reference")
-        expanded = _expand_and_validate_arguments(
-            command, f"{context}.commands[{command_index}]", resource_paths,
-            options, used_options, allow_block_dim=super_kernel,
-        )
-        expect_linker_path = False
-        for argv_index, argument in enumerate(expanded):
-            if expect_linker_path and _contains_compound_absolute_path(
-                argument, allow_uri=False
-            ):
-                raise ValueError(
-                    f"{context}.commands[{command_index}][expanded:{argv_index}] "
-                    f"contains a non-portable absolute path: {argument}"
-                )
-            expect_linker_path = argument == "-R"
-    artifact = recipe.get("artifact")
-    if not isinstance(artifact, str) or not artifact:
-        raise ValueError(f"{context}.artifact must be a non-empty path string")
-    _relative_path(artifact, f"{context}.artifact")
-
-
 def _validate_options(options, resource_paths):
     if options is None:
         return {}
@@ -649,87 +567,6 @@ def _validate_options(options, resource_paths):
                 raise ValueError(f"options.{key} cannot reference another options key")
             _validate_argument(value, f"options.{key}[{index}]", resource_paths)
     return normalized
-
-
-def _validate_aclrtc_backend(backend, context, resource_paths, options, used_options):
-    if not isinstance(backend, dict):
-        raise ValueError(f"{context} must be an object")
-    unknown = set(backend) - {"entry_file", "compile_options", "link_options"}
-    if unknown:
-        raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
-    entry_file = _resource_reference_path(backend.get("entry_file", ""), f"{context}.entry_file")
-    if entry_file not in resource_paths:
-        raise ValueError(f"{context}.entry_file references missing resource: {entry_file}")
-    compile_options = _expand_and_validate_arguments(
-        backend.get("compile_options"), f"{context}.compile_options",
-        resource_paths, options, used_options,
-    )
-    link_options = _expand_and_validate_arguments(
-        backend.get("link_options"), f"{context}.link_options",
-        resource_paths, options, used_options, allow_empty=True,
-    )
-    if len(compile_options) + len(link_options) > _MAX_ARGS:
-        raise ValueError(f"{context} exceeds the combined ACLRTC option limit")
-
-
-def _legacy_recipes_to_commands(recipes, context):
-    """Temporary compile_op bridge; emitted manifests are v6-only."""
-    if not isinstance(recipes, dict) or len(recipes) != 1:
-        raise ValueError(f"{context}.recipes must select exactly one backend")
-    if "aclrtc" in recipes:
-        backend = recipes["aclrtc"]
-        return [{
-            "type": "aclrt",
-            "input": backend.get("entry_file"),
-            "options": list(backend.get("compile_options", []))
-            + list(backend.get("link_options", [])),
-        }]
-    if "command" not in recipes or not isinstance(recipes["command"], dict):
-        raise ValueError(f"{context}.recipes has unsupported backend")
-    commands = []
-    for recipe_name, mode in (("normal", None), ("super_kernel", ["sk"])):
-        recipe = recipes["command"].get(recipe_name)
-        if recipe is None:
-            continue
-        artifact = recipe.get("artifact")
-        legacy_commands = recipe.get("commands")
-        if not isinstance(legacy_commands, list) or not legacy_commands:
-            raise ValueError(
-                f"{context}.recipes.command.{recipe_name}.commands must be a bounded non-empty array"
-            )
-        for index, argv in enumerate(legacy_commands):
-            if not isinstance(argv, list) or not argv:
-                raise ValueError(
-                    f"{context}.recipes.command.{recipe_name}.commands[{index}] must be a non-empty argv array"
-                )
-            command_type = _PROGRAM_TO_COMMAND_TYPE.get(argv[0])
-            legacy_options = list(argv[1:])
-            if command_type is None:
-                # Old generator callers used argv[0] as data in validation-only
-                # fixtures. Keep it visible to v6 validation during the temporary
-                # compile_op bridge; published compile_op commands use the strict map.
-                command_type = "bisheng"
-                legacy_options = list(argv)
-            command = {"type": command_type, "options": legacy_options}
-            if mode is not None:
-                command["mode"] = mode
-                command["options"] = [
-                    "${runtime_options:kernel_compile}"
-                    if value == "-D__SUPER_KERNEL_STATIC_BLOCK_NUM__=${context:block_dim}"
-                    else value
-                    for value in command["options"]
-                ]
-            if index + 1 == len(legacy_commands):
-                command["output"] = artifact
-                output_reference = "${output:" + str(artifact) + "}"
-                command["options"] = [
-                    "${command:output}" if value == output_reference else value
-                    for value in command["options"]
-                ]
-            commands.append(command)
-    if not commands:
-        raise ValueError(f"{context}.recipes.command has no commands")
-    return commands
 
 
 def _validate_v6_command(command, context, resource_paths, options, used_options):
@@ -817,7 +654,7 @@ def _validate_v6_command(command, context, resource_paths, options, used_options
 def _normalize_and_validate_kernel(
     kernel, context, resource_paths, options, used_options
 ):
-    allowed = {"kernel_name", "static_inputs", "commands", "recipes"}
+    allowed = {"kernel_name", "static_inputs", "commands"}
     unknown = set(kernel) - allowed
     if unknown:
         raise ValueError(f"{context} has unknown fields: {sorted(unknown)}")
@@ -845,12 +682,6 @@ def _normalize_and_validate_kernel(
             )
         input_names.add(static_input["name"])
     normalized = copy.deepcopy(kernel)
-    if "commands" in normalized and "recipes" in normalized:
-        raise ValueError(f"{context} cannot contain both commands and recipes")
-    if "recipes" in normalized:
-        normalized["commands"] = _legacy_recipes_to_commands(
-            normalized.pop("recipes"), context
-        )
     commands = normalized.get("commands")
     if not isinstance(commands, list) or not commands or len(commands) > _MAX_COMMANDS:
         raise ValueError(f"{context}.commands must be a bounded non-empty array")
@@ -875,43 +706,6 @@ def _normalize_and_validate_kernel(
             if patch.get("format") == "cpp_uint8_array":
                 patch.pop("format")
     return normalized
-
-    recipes = kernel.get("recipes")
-    if not isinstance(recipes, dict) or not recipes:
-        raise ValueError(f"{context}.recipes must be a non-empty object")
-    unknown_recipes = set(recipes) - {"command", "aclrtc"}
-    if unknown_recipes:
-        raise ValueError(f"{context}.recipes has unknown recipes: {sorted(unknown_recipes)}")
-    if len(recipes) != 1:
-        raise ValueError(f"{context}.recipes must select exactly one of command or aclrtc")
-    if "command" in recipes:
-        command = recipes["command"]
-        if not isinstance(command, dict) or not command:
-            raise ValueError(f"{context}.recipes.command must be a non-empty object")
-        unknown_commands = set(command) - {"normal", "super_kernel"}
-        if unknown_commands:
-            raise ValueError(
-                f"{context}.recipes.command has unknown recipes: {sorted(unknown_commands)}"
-            )
-        for name, recipe in command.items():
-            _validate_command_recipe(
-                recipe, f"{context}.recipes.command.{name}", resource_paths,
-                options, used_options, super_kernel=name == "super_kernel",
-            )
-    else:
-        _validate_aclrtc_backend(
-            recipes["aclrtc"], f"{context}.recipes.aclrtc", resource_paths,
-            options, used_options,
-        )
-    normalized = copy.deepcopy(kernel)
-    for static_input in normalized.get("static_inputs", []):
-        if static_input.get("required") is True:
-            static_input.pop("required")
-        for patch in static_input.get("patches", []):
-            if patch.get("format") == "cpp_uint8_array":
-                patch.pop("format")
-    return normalized
-
 
 def _publish_directory(stage_dir, target_dir):
     backup_dir = target_dir + ".previous"

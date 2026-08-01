@@ -130,7 +130,7 @@ from .static_compile_resource_generator import (
     collect_kernel_symbols,
     collect_local_include_files,
     generate_static_compile_resources,
-    normalize_static_command,
+    normalize_static_command_object,
     portable_wrapper_text,
     resolve_symbol_tiling_sizes,
     static_tiling_template_text,
@@ -1847,23 +1847,28 @@ def _static_runtime_kernel_symbol(symbol, compile_base, runtime_base):
     )
 
 
-def _static_normal_recipe(compile_argv, relocatable, artifact, ascend_home):
-    return {
-        "commands": [
-            normalize_static_command("compile", compile_argv, ascend_home, 0),
-            normalize_static_command(
-                "link",
-                [
-                    "-m", "aicorelinux", "-Ttext=0",
-                    "${output:" + relocatable + "}", "-static", "-o",
-                    "${output:" + artifact + "}", "-q",
-                ],
-                ascend_home,
-                1,
-            ),
+def _static_normal_commands(compile_argv, relocatable, artifact, ascend_home):
+    compile_command = normalize_static_command_object(
+        "compile", compile_argv, ascend_home, 0
+    )
+    link_command = normalize_static_command_object(
+        "link",
+        [
+            "-m", "aicorelinux", "-Ttext=0",
+            "${output:" + relocatable + "}", "-static", "-o",
+            "${output:" + artifact + "}", "-q",
         ],
-        "artifact": artifact,
-    }
+        ascend_home,
+        1,
+    )
+    link_command["output"] = artifact
+    link_command["options"] = [
+        "${command:output}"
+        if option == "${output:" + artifact + "}"
+        else option
+        for option in link_command["options"]
+    ]
+    return [compile_command, link_command]
 
 
 def _factor_reused_compile_options(kernels):
@@ -1871,31 +1876,30 @@ def _factor_reused_compile_options(kernels):
     candidates = []
     counts = {}
     for kernel in kernels:
-        command_backend = kernel.get("recipes", {}).get("command", {})
-        for recipe in command_backend.values():
-            for command in recipe.get("commands", []):
-                if not command or not command[0].endswith("/bisheng"):
-                    continue
-                end = 1
-                while end < len(command):
-                    argument = command[end]
-                    if (
-                        "${resource:" in argument
-                        or "${output:" in argument
-                        or "${context:" in argument
-                        or argument == "-o"
-                    ):
-                        break
-                    end += 1
-                prefix = tuple(command[1:end])
-                if len(prefix) < 2:
-                    continue
-                candidates.append((command, end, prefix))
-                counts[prefix] = counts.get(prefix, 0) + 1
+        for command in kernel.get("commands", []):
+            if command.get("type") != "bisheng":
+                continue
+            arguments = command.get("options", [])
+            end = 0
+            while end < len(arguments):
+                argument = arguments[end]
+                if (
+                    "${resource:" in argument
+                    or "${output:" in argument
+                    or "${runtime_options:" in argument
+                    or argument == "-o"
+                ):
+                    break
+                end += 1
+            prefix = tuple(arguments[:end])
+            if len(prefix) < 2:
+                continue
+            candidates.append((arguments, end, prefix))
+            counts[prefix] = counts.get(prefix, 0) + 1
 
     option_keys = {}
     options = {}
-    for command, end, prefix in candidates:
+    for arguments, end, prefix in candidates:
         if counts[prefix] < 2:
             continue
         key = option_keys.get(prefix)
@@ -1903,12 +1907,12 @@ def _factor_reused_compile_options(kernels):
             key = f"compile_{len(option_keys)}"
             option_keys[prefix] = key
             options[key] = list(prefix)
-        command[1:end] = ["${options:" + key + "}"]
+        arguments[:end] = ["${options:" + key + "}"]
     return options
 
 
-def _static_super_kernel_recipe(
-    normal_recipe, normal_relocatable, sk_symbol, sk_argv, bind_argv,
+def _static_super_kernel_commands(
+    normal_commands, normal_relocatable, sk_symbol, sk_argv, bind_argv,
     output_prefix, ascend_home,
 ):
     sk_output = output_prefix + ".sk.o"
@@ -1917,7 +1921,9 @@ def _static_super_kernel_recipe(
     bind_output = output_prefix + ".sk_bind.o"
     merged_output = output_prefix + ".sk_merged.o"
     final_output = output_prefix + ".static_with_sk.o"
-    commands = [list(command) for command in normal_recipe["commands"]]
+    commands = copy.deepcopy(normal_commands)
+    for command in commands:
+        command["mode"] = ["standard", "sk"]
     specifications = [("compile", sk_argv)]
     specifications.extend(
         (
@@ -1961,10 +1967,19 @@ def _static_super_kernel_recipe(
         ]
     )
     for kind, argv in specifications:
-        commands.append(
-            normalize_static_command(kind, argv, ascend_home, len(commands))
+        command = normalize_static_command_object(
+            kind, argv, ascend_home, len(commands)
         )
-    return {"commands": commands, "artifact": final_output}
+        command["mode"] = ["sk"]
+        commands.append(command)
+    commands[-1]["output"] = final_output
+    commands[-1]["options"] = [
+        "${command:output}"
+        if option == "${output:" + final_output + "}"
+        else option
+        for option in commands[-1]["options"]
+    ]
+    return commands
 
 
 def _deduplicate_static_resources(resources):
@@ -2165,10 +2180,9 @@ def _emit_static_compile_resources(
                 "${resource:" + tiling_logical + "}",
                 "${output:" + relocatable_logical + "}",
             )
-            normal_recipe = _static_normal_recipe(
+            commands = _static_normal_commands(
                 argv, relocatable_logical, output_logical, ascend_home
             )
-            recipes = {"normal": normal_recipe}
             if symbol in sk_pairs:
                 sk_symbol, cap_bitmap = sk_pairs[symbol]
                 output_prefix = "artifacts/" + re.sub(
@@ -2199,7 +2213,7 @@ def _emit_static_compile_resources(
                     "${resource:" + sk_wrapper_logical + "}",
                     "${resource:" + tiling_logical + "}",
                     "${output:" + sk_output + "}",
-                    ["-D__SUPER_KERNEL_STATIC_BLOCK_NUM__=${context:block_dim}"],
+                    ["${runtime_options:kernel_compile}"],
                 )
                 bind_output = output_prefix + ".sk_bind.o"
                 bind_argv = _static_resource_bind_argv(
@@ -2208,8 +2222,8 @@ def _emit_static_compile_resources(
                     "${output:" + bind_output + "}",
                     architecture,
                 )
-                recipes["super_kernel"] = _static_super_kernel_recipe(
-                    normal_recipe=normal_recipe,
+                commands = _static_super_kernel_commands(
+                    normal_commands=commands,
                     normal_relocatable=relocatable_logical,
                     sk_symbol=sk_symbol,
                     sk_argv=sk_argv,
@@ -2233,7 +2247,7 @@ def _emit_static_compile_resources(
                             ],
                         }
                     ],
-                    "recipes": {"command": recipes},
+                    "commands": commands,
                 }
             )
         if compile_info.tiling_and_dfx_utils_file and os.path.isfile(
