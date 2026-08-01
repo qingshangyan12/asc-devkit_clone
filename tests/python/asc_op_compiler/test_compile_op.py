@@ -336,32 +336,68 @@ class TestCompileOp(unittest.TestCase):
                 )
             kernel = generate.call_args.kwargs["kernels"][0]
             self.assertEqual(
-                set(kernel), {"kernel_name", "static_inputs", "patches", "recipes"}
+                set(kernel), {"kernel_name", "static_inputs", "commands"}
             )
             self.assertEqual(kernel["kernel_name"], "actual_7")
             self.assertEqual(kernel["static_inputs"][0]["parameter_index"], 5)
             self.assertEqual(kernel["static_inputs"][0]["byte_size"], 32)
-            normal = kernel["recipes"]["normal"]
-            self.assertEqual(normal["artifact"], "artifacts/actual_7.o")
-            self.assertEqual(len(normal["commands"]), 2)
             self.assertEqual(
-                normal["commands"][0][0],
-                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                kernel["static_inputs"][0]["patches"],
+                [{
+                    "file": "resources/include/Add_x_tiling_data.h",
+                    "token": "@@STATIC_VALUE_tiling_data@@",
+                }],
             )
-            self.assertEqual(normal["commands"][0].count("-DDTYPE_X=half"), 1)
-            self.assertEqual(normal["commands"][0].count("-DFORMAT_X=FORMAT_ND"), 1)
+            commands = kernel["commands"]
+            self.assertEqual([command["type"] for command in commands], ["bisheng", "ld.lld"])
+            self.assertNotIn("mode", commands[0])
+            self.assertEqual(commands[0]["options"].count("-DDTYPE_X=half"), 1)
+            self.assertEqual(commands[0]["options"].count("-DFORMAT_X=FORMAT_ND"), 1)
             self.assertEqual(
-                normal["commands"][1],
-                [
-                    "${env:ASCEND_HOME_PATH}/bin/ld.lld", "-m", "aicorelinux",
+                commands[1],
+                {
+                    "type": "ld.lld",
+                    "output": "artifacts/actual_7.o",
+                    "options": [
+                    "-m", "aicorelinux",
                     "-Ttext=0", "${output:intermediates/actual_7.rel.o}",
-                    "-static", "-o", "${output:artifacts/actual_7.o}", "-q",
-                ],
+                    "-static", "-o", "${command:output}", "-q",
+                    ],
+                },
             )
             self.assertEqual(generate.call_args.kwargs["resource_id"], "add")
             serialized = json.dumps(kernel)
             for forbidden in ("macros", "build", "static_targets", "actions"):
                 self.assertNotIn(forbidden, serialized)
+
+    def test_factors_reused_bisheng_option_prefixes(self):
+        kernels = []
+        for symbol in ("kernel_7", "kernel_9"):
+            kernels.append({
+                "kernel_name": symbol,
+                "commands": [{
+                    "type": "bisheng",
+                    "options": [
+                        "-c", "-O3", "-I${env:ASCEND_HOME_PATH}/include",
+                        "${resource:resources/src/kernel.cpp}",
+                        f"-DENTRY={symbol}", "-o",
+                        f"${{output:artifacts/{symbol}.o}}",
+                    ],
+                }],
+            })
+
+        options = compile_op_module._factor_reused_compile_options(kernels)
+
+        self.assertEqual(
+            options,
+            {"compile_0": [
+                "-c", "-O3", "-I${env:ASCEND_HOME_PATH}/include",
+            ]},
+        )
+        for kernel in kernels:
+            options = kernel["commands"][0]["options"]
+            self.assertEqual(options[0], "${options:compile_0}")
+            self.assertEqual(options[1], "${resource:resources/src/kernel.cpp}")
 
     def test_emit_static_compile_resources_publishes_fresh_root_closure(self):
         with TemporaryDirectory() as root:
@@ -435,7 +471,7 @@ class TestCompileOp(unittest.TestCase):
             manifest_path = os.path.join(published, "manifest.json")
             with open(manifest_path, "r", encoding="utf-8") as file_obj:
                 manifest = json.load(file_obj)
-            self.assertEqual(manifest["schema_version"], "4.0")
+            self.assertEqual(manifest["schema_version"], "6.0")
             self.assertEqual(manifest["resource_id"], "add")
             serialized = json.dumps(manifest)
             self.assertNotIn(source_root, serialized)
@@ -460,7 +496,7 @@ class TestCompileOp(unittest.TestCase):
             ) as file_obj:
                 self.assertIn("@@STATIC_VALUE_tiling_data@@", file_obj.read())
 
-    def test_emit_static_compile_resources_flattens_self_contained_sk_recipe(self):
+    def test_emit_static_compile_resources_emits_standard_and_sk_modes(self):
         with TemporaryDirectory() as root:
             paths = {
                 name: os.path.join(root, name)
@@ -530,27 +566,42 @@ class TestCompileOp(unittest.TestCase):
             kernel = generate.call_args.kwargs["kernels"][0]
             self.assertEqual(kernel["kernel_name"], "Add_x_7")
             self.assertEqual(generate.call_args.kwargs["kernel_base"], "Add_x")
-            commands = kernel["recipes"]["super_kernel"]["commands"]
-            self.assertEqual(commands[:2], kernel["recipes"]["normal"]["commands"])
+            commands = kernel["commands"]
+            standard = [
+                command for command in commands
+                if "standard" in command.get("mode", ["standard"])
+            ]
+            super_kernel = [
+                command for command in commands
+                if "sk" in command.get("mode", ["standard"])
+            ]
+            self.assertEqual(standard, commands[:2])
+            self.assertEqual(super_kernel, commands)
             self.assertEqual(
-                [command[0] for command in commands[2:]],
+                [command["mode"] for command in commands[:2]],
+                [["standard", "sk"], ["standard", "sk"]],
+            )
+            self.assertTrue(all(command["mode"] == ["sk"] for command in commands[2:]))
+            self.assertEqual(
+                [command["type"] for command in commands[2:]],
                 [
-                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
-                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
-                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
-                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
-                    "${env:ASCEND_HOME_PATH}/bin/llvm-ar",
-                    "${env:ASCEND_HOME_PATH}/bin/bisheng",
-                    "${env:ASCEND_HOME_PATH}/bin/ld.lld",
-                    "${env:ASCEND_HOME_PATH}/bin/ld.lld",
+                    "bisheng", "llvm-objcopy", "llvm-objcopy", "llvm-objcopy",
+                    "llvm-ar", "bisheng", "ld.lld", "ld.lld",
                 ],
             )
-            self.assertIn("${context:block_dim}", json.dumps(commands))
+            sk_compile_options = commands[2]["options"]
+            slot = "${runtime_options:kernel_compile}"
+            self.assertEqual(
+                sk_compile_options.index(slot),
+                sk_compile_options.index("-DCONST_TILING") + 1,
+            )
+            self.assertNotIn("${context:block_dim}", json.dumps(commands))
             self.assertNotIn("${launch.block_dim}", json.dumps(commands))
             self.assertEqual(
-                kernel["recipes"]["super_kernel"]["artifact"],
+                commands[-1]["output"],
                 "artifacts/Add_x_7.static_with_sk.o",
             )
+            self.assertIn("${command:output}", commands[-1]["options"])
             self.assertNotIn("_relocatable", json.dumps(kernel))
             self.assertEqual(generate.call_args.kwargs["resource_id"], "leaky_relu_custom")
             resource_paths = [
