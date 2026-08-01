@@ -24,6 +24,11 @@ namespace asc {
 namespace te {
 
 template <typename DataType>
+__simd_callee__ inline reg_tensor<bool> ones();
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> ones()
 {
     static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t) ||
@@ -39,6 +44,8 @@ __simd_callee__ inline reg_tensor<bool> ones()
     }
     return result;
 }
+
+#endif
 
 } // namespace te
 } // namespace asc
