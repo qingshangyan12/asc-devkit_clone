@@ -208,10 +208,69 @@ AscendC::Hccl::Wait：等待完成计数达到预期值，确保 AllReduce 输�
 - 数据类型和 reduce op：沿用源 template 支持范围，64 位类型及 PROD 使用 AICPU reduce 同步分支。
 - 多层网络、纯 CLOS、非全连接 Mesh1DClos、CCU、AIV 和 DPU 不在本次迁移范围内。
 
-## 7. 验证建议
+## 7. 日志判定方法
+
+建议先按以下关键字过滤一次运行日志：
+
+```text
+MC2_AR_TRACE
+MC2_ALG_INFO
+InsAllReduceMesh1DTwoShot
+InsV2AllReduceSoleExecutor
+```
+
+一次成功的本地 AICPU TwoShot 运行，关键日志应按以下阶段出现：
+
+```text
+[MC2_ALG_INFO] ... opType[ALLREDUCE], algName[InsAllReduceMesh1DTwoShot]
+[MC2_AR_TRACE][AICPU_API] AllReduce enter ...
+[MC2_AR_TRACE][AICPU_PREPARE] type[ALLREDUCE] ... commit[1]
+[MC2_AR_TRACE][DISPATCH] local V2 executor hit ... algName[InsAllReduceMesh1DTwoShot]
+[MC2_AR_TRACE][EXECUTOR] Orchestrate start ...
+[MC2_AR_TRACE][EXECUTOR] OrchestrateLoop start ...
+[MC2_AR_TRACE][TWOSHOT] KernelRun start ...
+[MC2_AR_TRACE][TWOSHOT] ReduceScatter start ...
+[MC2_AR_TRACE][TWOSHOT] ReduceScatter end.
+[MC2_AR_TRACE][TWOSHOT] AllGather start.
+[MC2_AR_TRACE][TWOSHOT] AllGather end.
+[MC2_AR_TRACE][TWOSHOT] KernelRun end.
+[MC2_AR_TRACE][EXECUTOR] OrchestrateLoop end ...
+[MC2_AR_TRACE][DISPATCH] local V2 executor end ...
+```
+
+各节点含义如下：
+
+- `[MC2_ALG_INFO]`：Host 资源创建阶段最终保存的算法名；必须是 `InsAllReduceMesh1DTwoShot`。
+- `[AICPU_API]`：融合算子的 AICore Kernel 确实调用了 `Hccl::AllReduce`。
+- `[AICPU_PREPARE]`：AllReduce 消息已写入共享消息区；`commit[1]` 表示该调用直接提交，`commit[0]` 需要后续 `Commit`。
+- `[DISPATCH] local V2 executor hit`：Device 侧命中本地 `CollAlgExecRegistryV2`，不是外部 CANN Bridge。
+- `[EXECUTOR]`：TwoShot executor 已恢复资源并开始编排；可同时检查 `count`、`rankSize` 和 `loopTimes`。
+- `[TWOSHOT]`：标准模板已实际执行，且 ReduceScatter、AllGather 两阶段都完成。
+
+异常定位建议：
+
+1. 只有 `[MC2_ALG_INFO]`，没有 `[AICPU_API]`：资源创建成功，但融合 Kernel 没有调用 AllReduce，或运行日志不包含 AICore/KERNEL_LOG。
+2. 有 `[AICPU_API]`，没有 `[AICPU_PREPARE]`：Prepare 参数校验失败、消息区不可用或日志级别不足。
+3. 有 `[AICPU_PREPARE]`，没有 `[DISPATCH]`：消息未被 KFC/AICPU server 消费，重点检查 commit、消息序号和 server 轮询日志。
+4. `[MC2_ALG_INFO]` 的算法名不是 `InsAllReduceMesh1DTwoShot`：资源阶段 selector 或强制算法配置未命中标准 TwoShot。
+5. 有 `[DISPATCH]`，没有 `[TWOSHOT]`：executor 命中但 template 未进入，重点检查 executor 编排、线程资源和 device 构建产物。
+6. 只有 `[TWOSHOT] ReduceScatter start`，没有对应 end：重点检查 channel、线程同步或 Send/Recv 操作失败。
+7. 有完整 `[TWOSHOT]` 链路但结果错误：重点检查输入输出地址、运行时 `count`、rank 列表、切片信息和 Reduce 操作。
+
+当前新增的 `[MC2_AR_TRACE]` 日志位置包括：
+
+- `common/hccl_aicpu_impl.h`：AICPU API 和 Prepare。
+- `impl/platform_v310/hccl_ccu_v0.h`：CCU API。
+- `cc/src/ops/all_reduce/selector/all_reduce_auto_selector.cc`：selector 输入和匹配结果。
+- `cc/src/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc`：executor 编排和 loop。
+- `cc/src/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot.cc`：TwoShot 两阶段。
+- `cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_open_kernel_executor.cc`：本地 V2 executor 分发。
+
+## 8. 验证建议
 
 1. Host 和 device 两侧分别构建，确认 `mc2_client` 与 `mc2_server` 均包含 `InsAllReduceMesh1DTwoShot` 注册。
-2. 在单层 Mesh1D 环境执行 mc2 AllReduce，检查日志中的 `[MC2_ALG_INFO]` 算法名为 `InsAllReduceMesh1DTwoShot`。
-3. 覆盖 count 小于 rank 数、不能被 rank 数整除、超过单轮 HCCL buffer 容量三类数据量。
-4. 覆盖 FP16/FP32 SUM，以及 INT64 或 PROD 的 AICPU reduce 同步分支。
-5. 校验 in-place 和 out-of-place 场景的结果与基准 AllReduce 一致。
+2. 在单层 Mesh1D 环境执行 mc2 AllReduce，按本节顺序检查 `[MC2_AR_TRACE]` 日志。
+3. 检查日志中的 `[MC2_ALG_INFO]` 算法名为 `InsAllReduceMesh1DTwoShot`。
+4. 覆盖 count 小于 rank 数、不能被 rank 数整除、超过单轮 HCCL buffer 容量三类数据量。
+5. 覆盖 FP16/FP32 SUM，以及 INT64 或 PROD 的 AICPU reduce 同步分支。
+6. 校验 in-place 和 out-of-place 场景的结果与基准 AllReduce 一致。

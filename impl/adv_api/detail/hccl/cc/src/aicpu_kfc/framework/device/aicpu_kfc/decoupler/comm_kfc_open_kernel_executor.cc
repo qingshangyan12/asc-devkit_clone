@@ -240,10 +240,15 @@ HcclResult LaunchOpenOpParamDataImpl(
     auto executor =
         mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
     CHK_SMART_PTR_NULL(executor);
+    HCCL_RUN_INFO(
+        "[MC2_AR_TRACE][DISPATCH] local V2 executor hit opType[%u], algName[%s], rank[%u], count[%llu].",
+        static_cast<u32>(param->opType), param->algName, resCtx.topoInfo.userRank,
+        static_cast<unsigned long long>(param->DataDes.count));
 
     CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
     HcclResult ret = RunWithMc2BatchMode(*param, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
+    HCCL_RUN_INFO("[MC2_AR_TRACE][DISPATCH] local V2 executor end algName[%s].", param->algName);
 
     return HCCL_SUCCESS;
 }

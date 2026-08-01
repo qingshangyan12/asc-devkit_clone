@@ -274,6 +274,11 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
     if constexpr (commit) {
         SetCommitTurnCntToGm(curMsgPosition_[queId], param.repeat * GetStepCntsPerRepeatByHandle(handleId), handleId);
     }
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "[MC2_AR_TRACE][AICPU_PREPARE] type[%d], handle[%d], msgPos[%u], count[%llu], commit[%d].",
+        static_cast<int32_t>(param.commType.prepareType), handleId, curMsgPosition_[queId], param.count,
+        static_cast<int>(commit));
     ++(curMsgPosition_[queId]);
     ASCENDC_HCCL_API_ASSERT(
         curMsgPosition_[queId] < HCCL_MSG_CNT, {  return INVALID_HANDLE_ID; },
@@ -327,6 +332,10 @@ template <bool commit>
 __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::AllReduce(
     GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t count, HcclDataType dataType, HcclReduceOp op, uint8_t repeat)
 {
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "[MC2_AR_TRACE][AICPU_API] AllReduce enter count[%llu], dataType[%d], reduceOp[%d], repeat[%u], commit[%d].",
+        count, static_cast<int32_t>(dataType), static_cast<int32_t>(op), repeat, static_cast<int>(commit));
     ASCENDC_HCCL_API_ASSERT(
         op >= HCCL_REDUCE_SUM && op < HCCL_REDUCE_RESERVED, { return INVALID_HANDLE_ID; },
         "Call AllReduce failed, param HcclReduceOp is %d, invalid.", static_cast<int32_t>(op));

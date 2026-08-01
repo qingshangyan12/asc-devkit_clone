@@ -19,7 +19,11 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
 {
     (void)opParam;
     (void)configAlgMap;
-    HCCL_DEBUG("[AllReduceAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
+    HCCL_INFO(
+        "[MC2_AR_TRACE][SELECTOR] start levelNum[%u], level0Topo[%u], level0MeshType[%u], rankSize[%u], "
+        "dataType[%u], reduceOp[%u].",
+        topoInfo->topoLevelNums, static_cast<u32>(topoInfo->level0Topo), static_cast<u32>(topoInfo->level0MeshType),
+        topoInfo->userRankSize, static_cast<u32>(opParam.DataDes.dataType), static_cast<u32>(opParam.reduceType));
 
     if (topoInfo->topoLevelNums != 1) {
         HCCL_WARNING(
@@ -39,7 +43,7 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
         return SelectorStatus::NOT_MATCH;
     }
 
-    HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+    HCCL_RUN_INFO("[MC2_AR_TRACE][SELECTOR] matched algName[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
 

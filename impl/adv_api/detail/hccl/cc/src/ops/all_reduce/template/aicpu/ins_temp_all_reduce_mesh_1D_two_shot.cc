@@ -81,7 +81,10 @@ void InsTempAllReduceMesh1DTwoShot::GetNotifyIdxSubToMain(std::vector<u32>& noti
 HcclResult InsTempAllReduceMesh1DTwoShot::KernelRun(
     const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
-    HCCL_INFO("[InsTempAllReduceMesh1DTwoShot] KernelRun Start.");
+    HCCL_RUN_INFO(
+        "[MC2_AR_TRACE][TWOSHOT] KernelRun start rank[%u], rankSize[%u], count[%llu], dataType[%u], reduceOp[%u].",
+        myRank_, templateRankSize_, static_cast<unsigned long long>(tempAlgParams.count),
+        static_cast<u32>(param.DataDes.dataType), static_cast<u32>(param.reduceType));
 
     threadNum_ = templateResource.threads.size();
     CHK_PRT_RET(
@@ -127,13 +130,15 @@ HcclResult InsTempAllReduceMesh1DTwoShot::KernelRun(
             sliceInfoList_.size(), templateRankSize_),
         HcclResult::HCCL_E_INTERNAL);
 
-    // TwoShot算法，第一步ReduceScatter
+    HCCL_RUN_INFO("[MC2_AR_TRACE][TWOSHOT] ReduceScatter start count[%llu].", static_cast<unsigned long long>(count_));
     CHK_RET(RunReduceScatter(param, tempAlgParams, templateResource.channels, templateResource.threads));
 
-    // TwoShot算法，第二步AllGather
+    HCCL_RUN_INFO("[MC2_AR_TRACE][TWOSHOT] ReduceScatter end.");
+    HCCL_RUN_INFO("[MC2_AR_TRACE][TWOSHOT] AllGather start.");
     CHK_RET(RunAllGather(tempAlgParams, templateResource.channels, templateResource.threads));
+    HCCL_RUN_INFO("[MC2_AR_TRACE][TWOSHOT] AllGather end.");
 
-    HCCL_INFO("[InsTempAllReduceMesh1DTwoShot] KernelRun finished.");
+    HCCL_RUN_INFO("[MC2_AR_TRACE][TWOSHOT] KernelRun end.");
 
     return HcclResult::HCCL_SUCCESS;
 }

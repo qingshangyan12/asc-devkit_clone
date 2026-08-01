@@ -44,7 +44,12 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate Start.");
+    HCCL_RUN_INFO(
+        "[MC2_AR_TRACE][EXECUTOR] Orchestrate start algName[%s], rank[%u], rankSize[%u], count[%llu], "
+        "dataType[%u], engine[%u].",
+        param.algName, resCtx.topoInfo.userRank, resCtx.topoInfo.userRankSize,
+        static_cast<unsigned long long>(param.DataDes.count), static_cast<u32>(param.DataDes.dataType),
+        static_cast<u32>(param.engine));
     // maxTmpMemSize_设定为cclIn的大小，op中将申请的HcclBuff全给了cclIn
     maxTmpMemSize_ = resCtx.cclMem.size;
     // 给channels_和threads_赋值
@@ -77,7 +82,7 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] Start");
+    HCCL_RUN_INFO("[MC2_AR_TRACE][EXECUTOR] OrchestrateLoop start algName[%s].", param.algName);
     // 准备资源
     TemplateResource templateAlgRes;
     if (param.engine == COMM_ENGINE_CCU) {
@@ -170,7 +175,9 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     }
 #endif
 
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] End.");
+    HCCL_RUN_INFO(
+        "[MC2_AR_TRACE][EXECUTOR] OrchestrateLoop end algName[%s], loopTimes[%llu], processedCount[%llu].",
+        param.algName, static_cast<unsigned long long>(loopTimes), static_cast<unsigned long long>(processedDataCount));
     return HCCL_SUCCESS;
 }
 

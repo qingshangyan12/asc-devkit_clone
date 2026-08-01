@@ -24,6 +24,10 @@ template <bool commit>
 __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::AllReduce(
     GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t count, HcclDataType dataType, HcclReduceOp op, uint8_t repeat)
 {
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "[MC2_AR_TRACE][CCU_API] AllReduce enter count[%llu], dataType[%d], reduceOp[%d], repeat[%u], commit[%d].",
+        count, static_cast<int32_t>(dataType), static_cast<int32_t>(op), repeat, static_cast<int>(commit));
     ASCENDC_HCCL_API_ASSERT(
         op >= HCCL_REDUCE_SUM && op < HCCL_REDUCE_RESERVED, { return INVALID_HANDLE_ID; },
         "Call AllReduce failed, param HcclReduceOp is %d, invalid.", static_cast<int32_t>(op));
