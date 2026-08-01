@@ -10,9 +10,14 @@
 
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue'
-import { useRoute } from 'vitepress'
+import { useData, useRoute } from 'vitepress'
+import {
+  isApiRouteUnsupported,
+} from '../../../scripts/api-support.mjs'
+import { selectedFilter } from './filter-state.js'
 
 const route = useRoute()
+const { theme } = useData()
 const isApiPage = ref(false)
 
 const filterOptions = [
@@ -27,8 +32,6 @@ const filterOptions = [
   { value: '9030', label: 'Kirin 9030' },
 ]
 
-const selectedFilter = ref('all')
-
 function loadSavedFilter() {
   try {
     const saved = localStorage.getItem('cann-filter-selection')
@@ -36,6 +39,34 @@ function loadSavedFilter() {
       selectedFilter.value = saved
     }
   } catch {}
+}
+
+function applyPageSupportFilter(content) {
+  content.querySelectorAll('.api-page-support-hidden').forEach(el => {
+    el.classList.remove('api-page-support-hidden')
+  })
+
+  const unsupported = isApiRouteUnsupported(
+    theme.value.apiUnsupportedIndex,
+    route.path,
+    selectedFilter.value
+  )
+  if (!unsupported) return
+
+  const supportHeading = Array.from(content.querySelectorAll('h2')).find(
+    heading => heading.id === '产品支持情况' ||
+      heading.textContent.replace(/\u200b/g, '').trim() === '产品支持情况'
+  )
+  if (!supportHeading) return
+
+  let section = supportHeading.nextElementSibling
+  while (section && section.tagName !== 'H2') {
+    section = section.nextElementSibling
+  }
+  while (section) {
+    section.classList.add('api-page-support-hidden')
+    section = section.nextElementSibling
+  }
 }
 
 function applyFilter() {
@@ -69,6 +100,8 @@ function applyFilter() {
       tr.style.display = anyVisible ? '' : 'none'
     })
   }
+
+  applyPageSupportFilter(content)
 }
 
 function onFilterChange() {
