@@ -30,6 +30,67 @@ static_tiling_template_text = MODULE.static_tiling_template_text
 
 
 class TestStaticCompileResourceGenerator(unittest.TestCase):
+    def test_generates_unified_v6_command_manifest(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.cpp")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+            result = generate_static_compile_resources(
+                output_root=root,
+                kernel_base="Kernel_x",
+                resource_id="kernel",
+                options={"common": ["-O2"]},
+                resources=[{"source": source, "path": "resources/kernel.cpp"}],
+                kernels=[{
+                    "kernel_name": "kernel_0",
+                    "commands": [{
+                        "type": "bisheng",
+                        "output": "artifacts/kernel.o",
+                        "options": [
+                            "${options:common}",
+                            "${resource:resources/kernel.cpp}",
+                            "-o", "${command:output}",
+                        ],
+                    }],
+                }],
+            )
+            with open(os.path.join(result, "manifest.json"), encoding="utf-8") as file_obj:
+                manifest = json.load(file_obj)
+            self.assertEqual(manifest["schema_version"], "6.0")
+            kernel = manifest["kernels"][0]
+            self.assertEqual(set(kernel), {"kernel_name", "commands"})
+            self.assertEqual(kernel["commands"][0]["type"], "bisheng")
+            self.assertNotIn("mode", kernel["commands"][0])
+            self.assertEqual(kernel["commands"][0]["output"], "artifacts/kernel.o")
+            self.assertIn("${command:output}", kernel["commands"][0]["options"])
+
+    def test_generates_standard_aclrt_command(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = os.path.join(root, "kernel.asc")
+            with open(source, "w", encoding="utf-8") as file_obj:
+                file_obj.write("source\n")
+            result = generate_static_compile_resources(
+                output_root=root,
+                kernel_base="Kernel_x",
+                resource_id="kernel",
+                resources=[{"source": source, "path": "resources/kernel.asc"}],
+                kernels=[{
+                    "kernel_name": "kernel_0",
+                    "commands": [{
+                        "type": "aclrt",
+                        "input": "resources/kernel.asc",
+                        "options": ["--npu-arch=dav-2201"],
+                    }],
+                }],
+            )
+            with open(os.path.join(result, "manifest.json"), encoding="utf-8") as file_obj:
+                command = json.load(file_obj)["kernels"][0]["commands"][0]
+            self.assertEqual(command, {
+                "type": "aclrt",
+                "input": "resources/kernel.asc",
+                "options": ["--npu-arch=dav-2201"],
+            })
+
     def test_collects_recursive_local_quoted_include_files(self):
         with tempfile.TemporaryDirectory() as root:
             os.makedirs(os.path.join(root, "detail"))
@@ -684,7 +745,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 ["add_7", "add_9"], ["7", "9"], {"7": True, "9": 32}, 64
             )
 
-    def test_generates_minimal_direct_v5_manifest_with_shared_options(self):
+    def test_generates_minimal_direct_v6_manifest_with_shared_options(self):
         with tempfile.TemporaryDirectory() as root:
             source = os.path.join(root, "kernel.cpp")
             with open(source, "w", encoding="utf-8") as file_obj:
@@ -750,14 +811,14 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 set(manifest),
                 {"schema_version", "resource_id", "options", "kernels"},
             )
-            self.assertEqual(manifest["schema_version"], "5.0")
+            self.assertEqual(manifest["schema_version"], "6.0")
             self.assertEqual(manifest["resource_id"], "add_custom")
             self.assertEqual(
                 manifest["options"], {"common_compile": ["-DDTYPE_X=half"]}
             )
             kernel = manifest["kernels"][0]
             self.assertEqual(
-                set(kernel), {"kernel_name", "static_inputs", "recipes"}
+                set(kernel), {"kernel_name", "static_inputs", "commands"}
             )
             self.assertEqual(kernel["kernel_name"], "add_custom_0")
             self.assertEqual(kernel["static_inputs"][0]["parameter_index"], 4)
@@ -770,10 +831,13 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 set(kernel["static_inputs"][0]["patches"][0]),
                 {"file", "token"},
             )
-            self.assertEqual(set(kernel["recipes"]), {"command"})
+            self.assertEqual(kernel["commands"][0]["type"], "bisheng")
             self.assertEqual(
-                set(kernel["recipes"]["command"]["normal"]),
-                {"commands", "artifact"},
+                kernel["commands"][0]["output"],
+                "artifacts/add_custom_0.o",
+            )
+            self.assertIn(
+                "${command:output}", kernel["commands"][0]["options"]
             )
             copied = os.path.join(result, "resources/src/kernel.cpp")
             self.assertTrue(os.path.isfile(copied))
@@ -801,8 +865,12 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             with open(os.path.join(result, "manifest.json"), encoding="utf-8") as file_obj:
                 manifest = json.load(file_obj)
             self.assertEqual(
-                manifest["kernels"][0]["recipes"]["aclrtc"]["compile_options"],
-                ["${options:arch}", "-O2"],
+                manifest["kernels"][0]["commands"][0],
+                {
+                    "type": "aclrt",
+                    "input": "resources/src/kernel.cpp",
+                    "options": ["${options:arch}", "-O2"],
+                },
             )
 
     def test_rejects_invalid_or_unused_shared_options(self):
@@ -896,7 +964,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 "file": "artifacts/kernel.o",
                 "format": "elf",
             }
-            with self.assertRaisesRegex(ValueError, "artifact must be a non-empty path string"):
+            with self.assertRaisesRegex(ValueError, "output must be a non-empty string"):
                 generate_static_compile_resources(
                     output_root=root, kernel_base="Kernel_x", resource_id="kernel",
                     resources=[{"source": source, "path": "resources/src/kernel.cpp"}],
@@ -1007,7 +1075,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "commands.*bounded non-empty"):
                 generate(commands=[["tool"]] * 65)
             self.assertTrue(os.path.isdir(generate(commands=[["arg"] * 256])))
-            with self.assertRaisesRegex(ValueError, "bounded non-empty argv"):
+            with self.assertRaisesRegex(ValueError, "options must be a bounded array"):
                 generate(commands=[["arg"] * 257])
             with self.assertRaisesRegex(ValueError, "patches.*non-empty"):
                 generate(patches_marker="input")
