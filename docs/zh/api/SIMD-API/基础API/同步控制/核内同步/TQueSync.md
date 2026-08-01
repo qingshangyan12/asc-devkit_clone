@@ -1,4 +1,4 @@
-# SetFlag/WaitFlag<a name="ZH-CN_TOPIC_0000001944599897"></a>
+# TQueSync<a name="ZH-CN_TOPIC_0000001973155037"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -28,30 +28,41 @@
 
 头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
-同一核内不同流水线之间的同步指令，具有数据依赖的不同流水指令之间需要插入此同步。
+TQueSync类用于核内多流水间的同步。TQueSync类的模板参数用于指定源流水和目标流水，目的流水等待源流水，从而解决多流水间的数据访问依赖。TQueSync类的成员函数SetFlag/WaitFlag接口用于完成具体的同步操作，同一核内不同流水线之间的同步指令，具有数据依赖的不同流水指令之间需要插入此同步。其功能说明如下：
 
 - SetFlag：当前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。
 - WaitFlag：当执行到该指令时，如果发现对应标志位为0，该队列的后续指令将一直被阻塞；如果发现对应标志位为1，则将对应标志位设置为0，同时后续指令开始执行。
 
 > [!NOTE]说明
-> 此接口与[SetFlag/WaitFlag(ISASI)](SetFlag_WaitFlag_ISASI.md)接口也能实现相同的功能。二者的区别在于，TQueSync类接口可以保证跨硬件版本兼容，而[SetFlag/WaitFlag(ISASI)](SetFlag_WaitFlag_ISASI.md)中的接口标注为ISASI类别，不能保证跨硬件版本兼容。
+> 此接口与[SetFlag/WaitFlag(ISASI)](SetFlag-WaitFlag(ISASI).md)接口也能实现相同的功能。二者的区别在于，TQueSync类接口可以保证跨硬件版本兼容，而[SetFlag/WaitFlag(ISASI)](SetFlag-WaitFlag(ISASI).md)中的接口标注为ISASI类别，不能保证跨硬件版本兼容。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void SetFlag(TEventID id)
-__aicore__ inline void WaitFlag(TEventID id)
+template<pipe_t src, pipe_t dst>
+class TQueSync {
+public:
+    __aicore__ inline void SetFlag(TEventID id);
+    __aicore__ inline void WaitFlag(TEventID id);
+};
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  参数说明
+**表1**  类模板参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| src | 输入 | 源流水。支持的流水参考[硬件流水类型](核内同步能力概述.md#硬件流水类型)。 |
+| dst | 输入 | 目的流水。支持的流水参考[硬件流水类型](核内同步能力概述.md#硬件流水类型)。 |
+
+**表2**  成员函数参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | id | 输入 | 事件ID，由用户自己指定，推荐通过[AllocEventID](../../资源管理/TPipe/AllocEventID.md)或者[FetchEventID](../../资源管理/TPipe/FetchEventID.md)来获取。定义如下：<br>`using TEventID = int8_t;`<br>不同产品对id的取值范围说明请参见[id取值范围说明](#id取值范围说明)。 |
 
-### id取值范围说明
+### id取值范围说明<a name="id取值范围说明"></a>
 
 <!-- npu="950" id8 -->
 - Ascend 950PR/Ascend 950DT，取值范围是0-7。
