@@ -226,12 +226,11 @@ static CcuResult PairwiseLocalReduce(
 
 static CcuResult CreateReduceLoop(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
-    constexpr uint32_t LOOP_NUM_16 = 16;
-    AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, LOOP_NUM_16);
-
     if (ctx.IsLoopEntityRegistered("reduceScatterLocalReduce")) {
         return CCU_SUCCESS;
     }
+    constexpr uint32_t LOOP_NUM_16 = 16;
+    AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, LOOP_NUM_16);
     ctx.CreateLoopEntity("reduceScatterLocalReduce");
     auto& loops = ctx.loopMap["reduceScatterLocalReduce"];
 
@@ -518,6 +517,8 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
     return CCU_SUCCESS;
 }
 
+static bool s_reduceScatterKernelExecuted = false;
+
 CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable normalSliceSize, ccu::Variable lastSliceSize,
@@ -526,6 +527,10 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
 {
+    if (s_reduceScatterKernelExecuted) {
+        return CCU_SUCCESS;
+    }
+    s_reduceScatterKernelExecuted = true;
     KfcReduceScatterMesh1DMem2MemContext ctx;
     ctx.channels = channels;
     ctx.channelCount = channelCount;
