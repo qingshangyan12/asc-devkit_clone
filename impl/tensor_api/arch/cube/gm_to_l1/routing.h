@@ -40,15 +40,15 @@
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/scaleb_dn2nn.h"
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/scaleb_nn2nn.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class CopyGM2L1Ignore {
 public:
-    template <const CopyGM2L1Trait& trait, typename T, typename U>
-    __aicore__ inline static void Run(const T& dst, const U& src)
+    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    __aicore__ inline static void run(const T& dst, const U& src)
     {
-        static_assert(!Std::is_same_v<T, T>, "CopyGM2L1: unsupported layout pattern combination.");
+        static_assert(!Std::is_same_v<T, T>, "copy_gm_to_l1: unsupported layout pattern combination.");
     }
 };
 
@@ -167,8 +167,8 @@ struct CopyGM2L1Routing<Version, NDC1HWC0LayoutPtn, NCDHWLayoutPtn> {
     using type = CopyGmToCbufNCDHW2NDC1HWC0;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_ROUTING_H
 

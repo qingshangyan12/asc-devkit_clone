@@ -38,17 +38,17 @@ __aicore__ inline void TestTransformBinary(
     constexpr uint64_t srcStride = 0;
     constexpr uint32_t dstStride = 0;
 
-    auto gmPtrX = MakeMemPtr<Location::GM>(x);
-    auto gmPtrY = MakeMemPtr<Location::GM>(y);
-    auto gmPtrZ = MakeMemPtr<Location::GM>(z);
+    auto gmPtrX = make_mem_ptr<Location::GM>(x);
+    auto gmPtrY = make_mem_ptr<Location::GM>(y);
+    auto gmPtrZ = make_mem_ptr<Location::GM>(z);
 
-    auto xGm = MakeTensor(gmPtrX, MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto yGm = MakeTensor(gmPtrY, MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto zGm = MakeTensor(gmPtrZ, MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto xGm = make_tensor(gmPtrX, make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto yGm = make_tensor(gmPtrY, make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto zGm = make_tensor(gmPtrZ, make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
 
-    auto xLocal = MakeTensor(MakeMemPtr(xUB), MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto yLocal = MakeTensor(MakeMemPtr(yUB), MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto zLocal = MakeTensor(MakeMemPtr(zUB), MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto xLocal = make_tensor(make_mem_ptr(xUB), make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto yLocal = make_tensor(make_mem_ptr(yUB), make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto zLocal = make_tensor(make_mem_ptr(zUB), make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
 
     asc_copy_gm2ub_align(
         xLocal.Data().Get(), xGm.Data().Get(), BLK_NUM, burstLength, 0, 0, true, loadCacheMode, srcStride, dstStride);
@@ -58,7 +58,7 @@ __aicore__ inline void TestTransformBinary(
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-    Transform<Func>(zLocal, xLocal, yLocal);
+    transform<Func>(zLocal, xLocal, yLocal);
 
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);

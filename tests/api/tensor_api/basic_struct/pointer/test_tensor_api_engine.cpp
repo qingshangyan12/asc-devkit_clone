@@ -25,7 +25,7 @@ TEST_F(Tensor_Api_Engine, TestViewEngineBeginAndOffset)
     using namespace AscendC::Te;
 
     __gm__ float data[4] = {1, 2, 3, 4};
-    auto ptr = MakeMemPtr<Location::GM>(data);
+    auto ptr = make_mem_ptr<Location::GM>(data);
 
     ViewEngine<decltype(ptr)> engine(ptr);
     EXPECT_EQ(engine.Begin(), ptr);
@@ -37,6 +37,6 @@ TEST_F(Tensor_Api_Engine, TestConstViewEngine)
 {
     using namespace AscendC::Te;
 
-    ConstViewEngine<decltype(MakeMemPtr<Location::GM>((__gm__ float*)nullptr))> constEngine;
+    ConstViewEngine<decltype(make_mem_ptr<Location::GM>((__gm__ float*)nullptr))> constEngine;
     EXPECT_EQ(constEngine.Begin().Get(), nullptr);
 }

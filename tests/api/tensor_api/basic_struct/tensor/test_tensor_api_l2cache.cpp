@@ -52,9 +52,9 @@ TEST_F(Tensor_Api_Tensor_CacheMode, SetL2CacheHint)
 
     constexpr uint32_t TILE_LENGTH = 8;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
-    auto ptr = MakeMemPtr<Location::GM>(data);
-    auto tensor = MakeTensor(ptr, MakeShape(_2{}, _2{}, _2{}),
-                             MakeStride(_4{}, _2{}, _1{}));
+    auto ptr = make_mem_ptr<Location::GM>(data);
+    auto tensor = make_tensor(ptr, make_shape(_2{}, _2{}, _2{}),
+                             make_stride(_4{}, _2{}, _1{}));
 
     tensor.SetL2CacheHint(CacheMode::CACHE_MODE_DISABLE);
     EXPECT_EQ(tensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
@@ -77,10 +77,10 @@ TEST_F(Tensor_Api_Tensor_CacheMode, SliceCoordTensorCanSetL2CacheHint)
     constexpr uint32_t n = 16;
     __gm__ float gmData[m * n] = {0};
 
-    auto layout = MakeFrameLayout<NDLayoutPtn>(m, n);
-    auto gmTensor = MakeTensor(MakeMemPtr(gmData), layout);
+    auto layout = make_frame_layout<NDLayoutPtn>(m, n);
+    auto gmTensor = make_tensor(make_mem_ptr(gmData), layout);
 
-    auto coordTensor = gmTensor(MakeCoord(2, 4));
+    auto coordTensor = gmTensor(make_coord(2, 4));
 
     static_assert(IsTensorApiGlobalTensorV<decltype(coordTensor)>);
 
@@ -101,10 +101,10 @@ TEST_F(Tensor_Api_Tensor_CacheMode, SliceTensorCanSetL2CacheHint)
     constexpr uint32_t n = 16;
     __gm__ float gmData[m * n] = {0};
 
-    auto layout = MakeFrameLayout<NDLayoutPtn>(m, n);
-    auto gmTensor = MakeTensor(MakeMemPtr(gmData), layout);
+    auto layout = make_frame_layout<NDLayoutPtn>(m, n);
+    auto gmTensor = make_tensor(make_mem_ptr(gmData), layout);
 
-    auto sliceTensor = gmTensor.Slice(MakeCoord(2, 4), MakeShape(4, 8));
+    auto sliceTensor = gmTensor.Slice(make_coord(2, 4), make_shape(4, 8));
 
     static_assert(IsTensorApiGlobalTensorV<decltype(sliceTensor)>);
 
@@ -125,18 +125,18 @@ TEST_F(Tensor_Api_Tensor_CacheMode, SliceTensorInheritsCacheMode)
     constexpr uint32_t n = 16;
     __gm__ float gmData[m * n] = {0};
 
-    auto layout = MakeFrameLayout<NDLayoutPtn>(m, n);
-    auto gmTensor = MakeTensor(MakeMemPtr(gmData), layout);
+    auto layout = make_frame_layout<NDLayoutPtn>(m, n);
+    auto gmTensor = make_tensor(make_mem_ptr(gmData), layout);
 
     gmTensor.SetL2CacheHint(CacheMode::CACHE_MODE_DISABLE);
     EXPECT_EQ(gmTensor.Engine().GetCacheMode(),
               static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
 
-    auto coordTensor = gmTensor(MakeCoord(2, 4));
+    auto coordTensor = gmTensor(make_coord(2, 4));
     EXPECT_EQ(coordTensor.Engine().GetCacheMode(),
               static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
 
-    auto sliceTensor = gmTensor.Slice(MakeCoord(2, 4), MakeShape(4, 8));
+    auto sliceTensor = gmTensor.Slice(make_coord(2, 4), make_shape(4, 8));
     EXPECT_EQ(sliceTensor.Engine().GetCacheMode(),
               static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
 
@@ -156,16 +156,16 @@ TEST_F(Tensor_Api_Tensor_CacheMode, SliceTensorStillGlobalTensor)
     constexpr uint32_t n = 16;
     __gm__ float gmData[m * n] = {0};
 
-    auto layout = MakeFrameLayout<NDLayoutPtn>(m, n);
-    auto gmTensor = MakeTensor(MakeMemPtr(gmData), layout);
+    auto layout = make_frame_layout<NDLayoutPtn>(m, n);
+    auto gmTensor = make_tensor(make_mem_ptr(gmData), layout);
 
     static_assert(IsTensorApiGlobalTensorV<decltype(gmTensor)>);
 
-    auto coordTensor = gmTensor(MakeCoord(2, 4));
+    auto coordTensor = gmTensor(make_coord(2, 4));
     static_assert(IsTensorApiGlobalTensorV<decltype(coordTensor)>);
     static_assert(!IsTensorApiLocalTensorV<decltype(coordTensor)>);
 
-    auto sliceTensor = gmTensor.Slice(MakeCoord(2, 4), MakeShape(4, 8));
+    auto sliceTensor = gmTensor.Slice(make_coord(2, 4), make_shape(4, 8));
     static_assert(IsTensorApiGlobalTensorV<decltype(sliceTensor)>);
     static_assert(!IsTensorApiLocalTensorV<decltype(sliceTensor)>);
 

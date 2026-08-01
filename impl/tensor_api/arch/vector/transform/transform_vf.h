@@ -24,8 +24,8 @@
 
 #include "impl/tensor_api/arch/vector/transform/transform_vf_set.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template<typename CalcFunc, typename TraitType>
 class Transform2VF {
@@ -38,9 +38,9 @@ private:
 
 public:
     template<typename... Args>
-    __aicore__ inline static void Run(const Args&... args) {
+    __aicore__ inline static void run(const Args&... args) {
         using func = Find<CalcFunc>;
-        func::Run(args...);
+        func::run(args...);
     }
 };
 

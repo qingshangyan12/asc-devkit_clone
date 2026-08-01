@@ -42,11 +42,11 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}, Trait{});
+    auto atom = make_copy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
     CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename DstTensor, typename SrcTensor>
@@ -56,7 +56,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 
     auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
-    Copy(atom, dst, src);
+    copy(atom, dst, src);
 }
 
 } // namespace
@@ -70,8 +70,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12FBRoutesToCubeArchCopy)
     __cbuf__ uint64_t src[m * n] = {0};
     __fbuf__ uint64_t dst[m * n] = {0};
 
-    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
-    auto fbTensor = MakeTensorAt<Location::FIXBUF>(dst, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, make_frame_layout<NDExtLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
+    auto fbTensor = MakeTensorAt<Location::FIXBUF>(dst, make_frame_layout<NDExtLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
 
     RunCopyCallPaths<CopyL12FB, CopyL12FBTraitDefault>(fbTensor, l1Tensor);
     RunCopyWithPaths<CopyL12FB, CopyL12FBTraitDefault>(fbTensor, l1Tensor);
@@ -88,8 +88,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12FBNDLayoutRoutesToCubeArchCopy)
     __cbuf__ uint64_t src[m * n] = {0};
     __fbuf__ uint64_t dst[m * n] = {0};
 
-    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
-    auto fbTensor = MakeTensorAt<Location::FIXBUF>(dst, MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, make_frame_layout<NDLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
+    auto fbTensor = MakeTensorAt<Location::FIXBUF>(dst, make_frame_layout<NDLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
 
     RunCopyCallPaths<CopyL12FB, CopyL12FBTraitDefault>(fbTensor, l1Tensor);
     RunCopyWithPaths<CopyL12FB, CopyL12FBTraitDefault>(fbTensor, l1Tensor);
@@ -139,13 +139,13 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
     __##SRC_PREFIX##__ DTYPE srcData[SRC_SIZE1 * SRC_SIZE2 * sizeof(DTYPE)]; \
     __##DST_PREFIX##__ DTYPE dstData[DST_SIZE1 * DST_SIZE2 * sizeof(DTYPE)]; \
     \
-    auto srcIterator = MakeMemPtr<Location::SRC_LOCATION>(srcData); \
-    auto srcLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(SRC_LAYOUT), LayoutTraitDefault<DTYPE>>(SRC_SIZE1, SRC_SIZE2); \
-    auto srcTensor = MakeTensor(srcIterator, srcLayout); \
+    auto srcIterator = make_mem_ptr<Location::SRC_LOCATION>(srcData); \
+    auto srcLayout = make_frame_layout<MAKE_LAYOUT_TYPE(SRC_LAYOUT), LayoutTraitDefault<DTYPE>>(SRC_SIZE1, SRC_SIZE2); \
+    auto srcTensor = make_tensor(srcIterator, srcLayout); \
     \
-    auto dstIterator = MakeMemPtr<Location::DST_LOCATION>(dstData); \
-    auto dstLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(DST_LAYOUT), LayoutTraitDefault<DTYPE>>(DST_SIZE1, DST_SIZE2); \
-    auto dstTensor = MakeTensor(dstIterator, dstLayout);
+    auto dstIterator = make_mem_ptr<Location::DST_LOCATION>(dstData); \
+    auto dstLayout = make_frame_layout<MAKE_LAYOUT_TYPE(DST_LAYOUT), LayoutTraitDefault<DTYPE>>(DST_SIZE1, DST_SIZE2); \
+    auto dstTensor = make_tensor(dstIterator, dstLayout);
 
 // L1 to FP ND2ND test case
 #define DATA_COPY_TEST_L12FB_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
@@ -156,7 +156,7 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
             .times(1) \
             .will(invoke(&copy_cbuf_to_fbuf_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, ND, fbuf, FIXBUF, ND) \
-        Copy(CopyAtom<CopyTraits<CopyL12FB, CopyL12FBTraitDefault>>{}, dstTensor, srcTensor);\
+        copy(CopyAtom<CopyTraits<CopyL12FB, CopyL12FBTraitDefault>>{}, dstTensor, srcTensor);\
         GlobalMockObject::verify(); \
     }
 

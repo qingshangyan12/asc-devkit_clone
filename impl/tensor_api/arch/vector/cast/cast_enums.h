@@ -22,8 +22,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_ENUMS_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_ENUMS_H
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 namespace CastRoundMode {
 struct RD {};
@@ -55,8 +55,8 @@ struct CastTraitDefault {
     using indexPos = Std::ignore_t;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_ENUMS_H
 

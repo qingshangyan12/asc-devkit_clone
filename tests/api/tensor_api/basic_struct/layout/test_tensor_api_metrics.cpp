@@ -24,24 +24,24 @@ TEST_F(Tensor_Api_Layout_Metrics, TetsLayoutMetrics)
 {
     using namespace AscendC::Te;
 
-    auto layout = MakeLayout(MakeShape(3, 4), MakeStride(7, 1));
+    auto layout = make_layout(make_shape(3, 4), make_stride(7, 1));
 
-    EXPECT_EQ(Rank(layout), 2);
-    EXPECT_EQ(Size(layout), 12);
-    EXPECT_EQ(Capacity(layout), 21);
-    EXPECT_EQ(Coshape(layout), 18);
-    EXPECT_EQ(Cosize(layout), 18);
+    EXPECT_EQ(rank(layout), 2);
+    EXPECT_EQ(size(layout), 12);
+    EXPECT_EQ(capacity(layout), 21);
+    EXPECT_EQ(coshape(layout), 18);
+    EXPECT_EQ(cosize(layout), 18);
 }
 
 TEST_F(Tensor_Api_Layout_Metrics, TestCrd2Idx)
 {
     using namespace AscendC::Te;
 
-    auto shape = MakeShape(MakeShape(2, 3), MakeShape(4, 5));
-    auto stride = MakeStride(MakeStride(1, 8), MakeStride(2, 24));
-    auto layout = MakeLayout(shape, stride);
-    auto coord = MakeCoord(MakeCoord(1, 2), MakeCoord(3, 4));
+    auto shape = make_shape(make_shape(2, 3), make_shape(4, 5));
+    auto stride = make_stride(make_stride(1, 8), make_stride(2, 24));
+    auto layout = make_layout(shape, stride);
+    auto coord = make_coord(make_coord(1, 2), make_coord(3, 4));
 
-    EXPECT_EQ(Crd2Idx(coord, shape, stride), layout(coord));
+    EXPECT_EQ(crd2idx(coord, shape, stride), layout(coord));
     EXPECT_EQ(layout(coord), 119);
 }

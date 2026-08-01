@@ -25,8 +25,8 @@
 
 #include "impl/tensor_api/tensor/layout_pattern.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 using LayoutFormatSet = TupleMap<
     Std::tuple<NZLayoutPtn, MakeNzFrameLayout>,
@@ -48,16 +48,25 @@ using LayoutFormatSet = TupleMap<
     Std::tuple<NDC1HWC0LayoutPtn, MakeNDC1HWC0FrameLayout>>;
 
 template <typename T, typename C0>
-struct LayoutTrait {
+struct layout_trait {
     static constexpr auto C0_ELEMENT = C0{};
 };
 
 template <typename T = uint16_t, typename C0 = Std::Int<C0_ELEMENT<T>>>
-struct LayoutTraitDefault : LayoutTrait<T, C0> {};
+struct layout_trait_default : layout_trait<T, C0> {};
 
-struct LayoutTraitScale : LayoutTraitDefault<fp8_e8m0_t, Std::Int<MX_SCALE_K0 / sizeof(fp8_e8m0_t)>> {};
+struct layout_trait_scale : layout_trait_default<fp8_e8m0_t, Std::Int<MX_SCALE_K0 / sizeof(fp8_e8m0_t)>> {};
 
-struct LayoutTraitFP4 : LayoutTraitDefault<fp4x2_e2m1_t, Std::Int<C0_ELEMENT<fp4x2_e2m1_t>>> {};
+struct layout_trait_fp4 : layout_trait_default<fp4x2_e2m1_t, Std::Int<C0_ELEMENT<fp4x2_e2m1_t>>> {};
+
+template <typename T, typename C0>
+using LayoutTrait = layout_trait<T, C0>;
+
+template <typename T = uint16_t, typename C0 = Std::Int<C0_ELEMENT<T>>>
+using LayoutTraitDefault = layout_trait_default<T, C0>;
+
+using LayoutTraitScale = layout_trait_scale;
+using LayoutTraitFP4 = layout_trait_fp4;
 
 using FormatTraitSet = TupleMap<
     Std::tuple<NZLayoutPtn, LayoutTraitDefault<>>,
@@ -79,16 +88,19 @@ using FormatTraitSet = TupleMap<
     Std::tuple<NDC1HWC0LayoutPtn, LayoutTrait<Std::ignore_t, _1>>>;
     
 template <typename T, typename = void>
-struct IsFrameLayoutTrait : Std::false_type {};
+struct is_frame_layout_trait : Std::false_type {};
 
 template <typename T>
-struct IsFrameLayoutTrait<T, void_t<decltype(T::C0_ELEMENT)>> : Std::true_type {};
+struct is_frame_layout_trait<T, void_t<decltype(T::C0_ELEMENT)>> : Std::true_type {};
+
+template <typename T, typename Enable = void>
+using IsFrameLayoutTrait = is_frame_layout_trait<T, Enable>;
 
 template <typename T>
-constexpr bool IsFrameLayoutTraitV = IsFrameLayoutTrait<T>::value;
+constexpr bool IsFrameLayoutTraitV = is_frame_layout_trait<T>::value;
 
 template <typename LayoutPattern, typename TraitType>
-struct TraitConversion {
+struct trait_conversion {
 private:
     using RawTrait = Std::remove_cvref_t<TraitType>;
 
@@ -123,34 +135,40 @@ public:
     using type = Converted;
 };
 
-// ===== Multi-batch frame layout: MakeFrameLayout<Ptn>(batch0, ..., batchN, row, col) =====
+template <typename LayoutPattern, typename TraitType>
+using TraitConversion = trait_conversion<LayoutPattern, TraitType>;
+
+// ===== Multi-batch frame layout: make_frame_layout<Ptn>(batch0, ..., batchN, row, col) =====
 
 // SupportsRowColMake: true when the pattern's Make accepts a bare (row, column) pair, i.e. it is one
 // of the matrix layouts that also offer the (batch, row, column) form. The conv feature-map patterns
 // (NCHW/NHWC/NC1HWC0/NCDHW/NDC1HWC0) take fixed positional dimensions and have no 2-arg Make, so they
 // never take the multi-batch path below.
 template <typename Maker, typename Trait, typename = void>
-struct SupportsRowColMake : Std::false_type {};
+struct supports_row_col_make : Std::false_type {};
 
 template <typename Maker, typename Trait>
-struct SupportsRowColMake<
-    Maker, Trait, void_t<decltype(Maker::template Make<Trait>(Std::declval<int>(), Std::declval<int>()))>>
+struct supports_row_col_make<
+    Maker, Trait, void_t<decltype(Maker::template make<Trait>(Std::declval<int>(), Std::declval<int>()))>>
     : Std::true_type {};
 
+template <typename Maker, typename Trait, typename Enable = void>
+using SupportsRowColMake = supports_row_col_make<Maker, Trait, Enable>;
+
 template <typename Maker, typename Trait>
-constexpr bool SupportsRowColMakeV = SupportsRowColMake<Maker, Trait>::value;
+constexpr bool SupportsRowColMakeV = supports_row_col_make<Maker, Trait>::value;
 
 // BatchStrideAt: stride of batch axis I, given the batch extents tuple and the base layout capacity.
 // Batch axes are flat and row-major over the base block, so the stride of an axis is the product of
 // all batch extents to its right times the base capacity:
 //   stride[n-1] = capacity, stride[n-2] = batch[n-1]*capacity, ...
 template <size_t I, size_t BatchNum, typename BatchTuple, typename Capacity>
-__aicore__ inline constexpr auto BatchStrideAt(const BatchTuple& batches, const Capacity& capacity)
+__aicore__ inline constexpr auto batch_stride_at(const BatchTuple& batches, const Capacity& capacity)
 {
     if constexpr (I + 1 >= BatchNum) {
         return capacity;
     } else {
-        return Get<I + 1>(batches) * BatchStrideAt<I + 1, BatchNum, BatchTuple, Capacity>(batches, capacity);
+        return get<I + 1>(batches) * batch_stride_at<I + 1, BatchNum, BatchTuple, Capacity>(batches, capacity);
     }
 }
 
@@ -159,64 +177,109 @@ __aicore__ inline constexpr auto BatchStrideAt(const BatchTuple& batches, const 
 //   (batch0, batch1, ((row0, row1), (col0, col1)))
 // so rank is batchNum + 1 (not a chain of nested single-batch layouts).
 template <typename LayoutPattern, typename Trait, typename BatchTuple, typename BaseLayout, size_t... BatchIs>
-__aicore__ inline constexpr auto MakeFlatBatchLayout(
+__aicore__ inline constexpr auto make_flat_batch_layout(
     const BatchTuple& batches, const BaseLayout& base, Std::index_sequence<BatchIs...>)
 {
     constexpr size_t batchNum = sizeof...(BatchIs);
-    auto capacity = base.Capacity();
-    return MakePatternLayout<LayoutPattern, Trait>(
-        MakeShape(Get<BatchIs>(batches)..., base.Shape()),
-        MakeStride(BatchStrideAt<BatchIs, batchNum, BatchTuple, decltype(capacity)>(batches, capacity)...,
-                   base.Stride()));
+    auto capacity = base.capacity();
+    return make_pattern_layout<LayoutPattern, Trait>(
+        make_shape(get<BatchIs>(batches)..., base.shape()),
+        make_stride(batch_stride_at<BatchIs, batchNum, BatchTuple, decltype(capacity)>(batches, capacity)...,
+                   base.stride()));
 }
 
 // Peels the trailing (row, column) off the argument pack, builds the 2D base layout from them, then
 // lays the leading arguments out as flat batch axes.
 template <typename LayoutPattern, typename Trait, typename Maker, typename ArgsTuple, size_t... BatchIs>
-__aicore__ inline constexpr auto MakeMultiBatchFrameLayoutImpl(
+__aicore__ inline constexpr auto make_multi_batch_frame_layout_impl(
     const ArgsTuple& args, Std::index_sequence<BatchIs...>)
 {
     constexpr size_t argNum = Std::tuple_size_v<ArgsTuple>;
-    auto base = Maker::template Make<Trait>(Get<argNum - 2>(args), Get<argNum - 1>(args));
-    auto batches = Std::make_tuple(Get<BatchIs>(args)...);
-    return MakeFlatBatchLayout<LayoutPattern, Trait>(batches, base, Std::index_sequence<BatchIs...>{});
+    auto base = Maker::template make<Trait>(get<argNum - 2>(args), get<argNum - 1>(args));
+    auto batches = Std::make_tuple(get<BatchIs>(args)...);
+    return make_flat_batch_layout<LayoutPattern, Trait>(batches, base, Std::index_sequence<BatchIs...>{});
 }
 
 template <typename LayoutPattern, typename Trait, typename Maker, typename... Args>
-__aicore__ inline constexpr auto MakeMultiBatchFrameLayout(const Args&... args)
+__aicore__ inline constexpr auto make_multi_batch_frame_layout(const Args&... args)
 {
-    return MakeMultiBatchFrameLayoutImpl<LayoutPattern, Trait, Maker>(
+    return make_multi_batch_frame_layout_impl<LayoutPattern, Trait, Maker>(
         Std::make_tuple(args...), Std::make_index_sequence<sizeof...(Args) - 2>{});
 }
 
 template <typename LayoutPattern, typename TraitType = Std::ignore_t, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
+__aicore__ inline constexpr decltype(auto) make_frame_layout(const Args&... args) {
     using Trait = typename TraitConversion<LayoutPattern, TraitType>::type;
     using LayoutMaker = typename LayoutFormatSet::template Get<LayoutPattern>;
     static_assert(!Std::is_same_v<LayoutMaker, Std::ignore_t>, "Unsupported layout pattern.");
     // 2 args = (row, col) and 3 args = (batch, row, col) are handled by the pattern's own Make. Four
     // or more args on a row/col-style pattern means multiple batch axes: (batch0, ..., batchN, row, col).
     if constexpr (sizeof...(Args) > 3 && SupportsRowColMakeV<LayoutMaker, Trait>) {
-        return MakeMultiBatchFrameLayout<LayoutPattern, Trait, LayoutMaker>(args...);
+        return make_multi_batch_frame_layout<LayoutPattern, Trait, LayoutMaker>(args...);
     } else {
-        return LayoutMaker::template Make<Trait>(args...);
+        return LayoutMaker::template make<Trait>(args...);
     }
 }
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
-    return MakeFrameLayout<LayoutPattern, Std::Int<C0Element>>(args...);
+__aicore__ inline constexpr decltype(auto) make_frame_layout(const Args&... args) {
+    return make_frame_layout<LayoutPattern, Std::Int<C0Element>>(args...);
 }
 
 template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>>
-struct FrameLayoutFormat {
+struct frame_layout_format {
     template <typename... Args>
     __aicore__ inline constexpr decltype(auto) operator()(const Args&... args) {
-        return MakeFrameLayout<LayoutPattern, TraitType>(args...);
+        return make_frame_layout<LayoutPattern, TraitType>(args...);
     }
 };
-} // namespace Te
-} // namespace AscendC
+
+template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>>
+using FrameLayoutFormat = frame_layout_format<LayoutPattern, TraitType>;
+} // namespace te
+} // namespace asc
+
+
+// PascalCase compatibility wrappers
+namespace asc {
+namespace te {
+template <size_t I, size_t BatchNum, typename BatchTuple, typename Capacity>
+__aicore__ inline constexpr auto BatchStrideAt(const BatchTuple& batches, const Capacity& capacity)
+{
+    return batch_stride_at<I, BatchNum>(batches, capacity);
+}
+
+template <typename LayoutPattern, typename Trait, typename BatchTuple, typename BaseLayout, size_t... BatchIs>
+__aicore__ inline constexpr auto MakeFlatBatchLayout(const BatchTuple& batches, const BaseLayout& base, Std::index_sequence<BatchIs...> arg2)
+{
+    return make_flat_batch_layout<LayoutPattern, Trait, BatchIs...>(batches, base, arg2);
+}
+
+template <typename LayoutPattern, typename Trait, typename Maker, typename ArgsTuple, size_t... BatchIs>
+__aicore__ inline constexpr auto MakeMultiBatchFrameLayoutImpl(const ArgsTuple& args, Std::index_sequence<BatchIs...> arg1)
+{
+    return make_multi_batch_frame_layout_impl<LayoutPattern, Trait, Maker, BatchIs...>(args, arg1);
+}
+
+template <typename LayoutPattern, typename Trait, typename Maker, typename... Args>
+__aicore__ inline constexpr auto MakeMultiBatchFrameLayout(const Args&... args)
+{
+    return make_multi_batch_frame_layout<LayoutPattern, Trait, Maker>(args...);
+}
+
+template <typename LayoutPattern, typename TraitType = Std::ignore_t, typename... Args>
+__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
+{
+    return make_frame_layout<LayoutPattern, TraitType>(args...);
+}
+
+template <typename LayoutPattern, size_t C0Element, typename... Args>
+__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
+{
+    return make_frame_layout<LayoutPattern, C0Element>(args...);
+}
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_TENSOR_LAYOUT_FRAME_H
 

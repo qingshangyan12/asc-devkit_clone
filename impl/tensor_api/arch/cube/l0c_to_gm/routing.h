@@ -28,13 +28,13 @@
 #include "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/nz2ncdhw.h"
 #include "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/nz2nhwc.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class CopyL0C2GMIgnore {
 public:
-    template <const CopyL0C2GMTrait& trait, typename... Args>
-    __aicore__ inline static void Run(const Args&... args)
+    template <const copy_l0c_to_gm_trait& trait, typename... Args>
+    __aicore__ inline static void run(const Args&... args)
     { 
         static_assert(Std::is_same_v<Args..., void>, "CopyL0C2GMIgnore should not be called"); 
     }
@@ -86,8 +86,8 @@ template <uint32_t Version>
 struct CopyL0C2GMRouting<Version, NCDHWLayoutPtn, NZLayoutPtn> {
     using type = DataCopyL0C2GMNZ2NCDHW;
 };
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_GM_ROUTING_H
 

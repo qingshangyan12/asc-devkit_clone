@@ -39,20 +39,20 @@ __aicore__ inline void TestTransformDual(
     constexpr uint64_t srcStride = 0;
     constexpr uint32_t dstStride = 0;
 
-    auto gmPtrX = MakeMemPtr<Location::GM>(x);
-    auto gmPtrY = MakeMemPtr<Location::GM>(y);
-    auto gmPtrZ0 = MakeMemPtr<Location::GM>(z0);
-    auto gmPtrZ1 = MakeMemPtr<Location::GM>(z1);
+    auto gmPtrX = make_mem_ptr<Location::GM>(x);
+    auto gmPtrY = make_mem_ptr<Location::GM>(y);
+    auto gmPtrZ0 = make_mem_ptr<Location::GM>(z0);
+    auto gmPtrZ1 = make_mem_ptr<Location::GM>(z1);
 
-    auto xGm = MakeTensor(gmPtrX, MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto yGm = MakeTensor(gmPtrY, MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto z0Gm = MakeTensor(gmPtrZ0, MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto z1Gm = MakeTensor(gmPtrZ1, MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto xGm = make_tensor(gmPtrX, make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto yGm = make_tensor(gmPtrY, make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto z0Gm = make_tensor(gmPtrZ0, make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto z1Gm = make_tensor(gmPtrZ1, make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
 
-    auto xLocal = MakeTensor(MakeMemPtr(xUB), MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto yLocal = MakeTensor(MakeMemPtr(yUB), MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto z0Local = MakeTensor(MakeMemPtr(z0UB), MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto z1Local = MakeTensor(MakeMemPtr(z1UB), MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto xLocal = make_tensor(make_mem_ptr(xUB), make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto yLocal = make_tensor(make_mem_ptr(yUB), make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto z0Local = make_tensor(make_mem_ptr(z0UB), make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto z1Local = make_tensor(make_mem_ptr(z1UB), make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
 
     asc_copy_gm2ub_align(
         xLocal.Data().Get(), xGm.Data().Get(), BLK_NUM, burstLength, 0, 0, true, loadCacheMode, srcStride, dstStride);
@@ -62,7 +62,7 @@ __aicore__ inline void TestTransformDual(
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-    Transform<Func>(z0Local, z1Local, xLocal, yLocal);
+    transform<Func>(z0Local, z1Local, xLocal, yLocal);
 
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);

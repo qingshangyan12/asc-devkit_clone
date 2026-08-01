@@ -24,15 +24,15 @@
 
 #include "impl/tensor_api/tensor/layout_definition.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename... Ts>
 struct HasZeroIntegralConstant : Std::bool_constant<
     (... || Std::is_same_v<Std::remove_cvref_t<Ts>, Std::Int<0>>)> {};
 
 template <typename T, typename... Ts>
-__aicore__ inline constexpr Shape<T, Ts...> MakeShape(const T& t, const Ts&... ts)
+__aicore__ inline constexpr Shape<T, Ts...> make_shape(const T& t, const Ts&... ts)
 {
     static_assert(!HasZeroIntegralConstant<T, Ts...>::value,
         "MakeShape does not accept Int<0> arguments.");
@@ -40,25 +40,25 @@ __aicore__ inline constexpr Shape<T, Ts...> MakeShape(const T& t, const Ts&... t
 }
 
 template <typename T, typename... Ts>
-__aicore__ inline constexpr Stride<T, Ts...> MakeStride(const T& t, const Ts&... ts)
+__aicore__ inline constexpr Stride<T, Ts...> make_stride(const T& t, const Ts&... ts)
 {
     return {t, ts...};
 }
 
 template <typename T, typename... Ts>
-__aicore__ inline constexpr Tile<T, Ts...> MakeTile(const T& t, const Ts&... ts)
+__aicore__ inline constexpr Tile<T, Ts...> make_tile(const T& t, const Ts&... ts)
 {
     return {t, ts...};
 }
 
 template <typename T, typename... Ts>
-__aicore__ inline constexpr Coord<T, Ts...> MakeCoord(const T& t, const Ts&... ts)
+__aicore__ inline constexpr Coord<T, Ts...> make_coord(const T& t, const Ts&... ts)
 {
     return {t, ts...};
 }
 
 template <typename T, typename U>
-__aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride)
+__aicore__ inline constexpr auto make_layout(const T& shape, const U& stride)
 {
     static_assert(Std::is_tuple_v<T> && Std::is_tuple_v<U>, "Shape or Stride is not tuple!");
     static_assert(NestingDepthV<T> == NestingDepthV<U> && Std::tuple_size_v<T> == Std::tuple_size_v<U>,
@@ -88,19 +88,19 @@ struct StrideColElem {
 };
 
 template <typename Row, typename Col, size_t... Is>
-__aicore__ inline constexpr auto BuildStrideRowImpl(const Row& row, const Col& col,
+__aicore__ inline constexpr auto build_stride_row_impl(const Row& row, const Col& col,
     Std::index_sequence<Is...>) {
-    return MakeStride(StrideRowElem<Is, Row, Col>::value(row, col)...);
+    return make_stride(StrideRowElem<Is, Row, Col>::value(row, col)...);
 }
 
 template <typename Row, typename Col, size_t... Is>
-__aicore__ inline constexpr auto BuildStrideColImpl(const Row& row, const Col& col,
+__aicore__ inline constexpr auto build_stride_col_impl(const Row& row, const Col& col,
     Std::index_sequence<Is...>) {
-    return MakeStride(StrideColElem<Is, Row, Col>::value(row, col)...);
+    return make_stride(StrideColElem<Is, Row, Col>::value(row, col)...);
 }
 
 template <typename ShapeType>
-__aicore__ inline constexpr auto ComputeStride(const ShapeType& shape) {
+__aicore__ inline constexpr auto compute_stride(const ShapeType& shape) {
     static_assert(Std::is_tuple_v<ShapeType> && Std::tuple_size_v<ShapeType> == 2,
         "ShapeType must be tuple of two tuples");
     const auto& row = Std::get<0>(shape);
@@ -111,9 +111,9 @@ __aicore__ inline constexpr auto ComputeStride(const ShapeType& shape) {
     constexpr size_t N = Std::tuple_size_v<Std::remove_cvref_t<decltype(row)>>;
     using Row = Std::remove_cvref_t<decltype(row)>;
     using Col = Std::remove_cvref_t<decltype(col)>;
-    auto stride0 = BuildStrideRowImpl(row, col, Std::make_index_sequence<N>{});
-    auto stride1 = BuildStrideColImpl(row, col, Std::make_index_sequence<N>{});
-    return MakeStride(stride0, stride1);
+    auto stride0 = build_stride_row_impl(row, col, Std::make_index_sequence<N>{});
+    auto stride1 = build_stride_col_impl(row, col, Std::make_index_sequence<N>{});
+    return make_stride(stride0, stride1);
 }
 
 // shape = (x1, x2, x3, ..., xn) -> stride = (x2*x3*...*xn, ..., x_{n-1}*xn, xn, 1)
@@ -131,55 +131,55 @@ struct FlatStrideElem {
 };
 
 template <typename ShapeType, size_t... Is>
-__aicore__ inline constexpr auto BuildFlatStrideImpl(const ShapeType& shape,
+__aicore__ inline constexpr auto build_flat_stride_impl(const ShapeType& shape,
     Std::index_sequence<Is...>) {
-    return MakeStride(FlatStrideElem<Is, ShapeType>::value(shape)...);
+    return make_stride(FlatStrideElem<Is, ShapeType>::value(shape)...);
 }
 
 template <typename ShapeType>
-__aicore__ inline constexpr auto ComputeFlatStride(const ShapeType& shape) {
+__aicore__ inline constexpr auto compute_flat_stride(const ShapeType& shape) {
     static_assert(Std::is_tuple_v<ShapeType>, "ShapeType must be tuple");
     constexpr size_t N = Std::tuple_size_v<ShapeType>;
-    return BuildFlatStrideImpl(shape, Std::make_index_sequence<N>{});
+    return build_flat_stride_impl(shape, Std::make_index_sequence<N>{});
 }
 
 template <typename ShapeType>
-__aicore__ inline constexpr auto MakeLayout(const ShapeType& shape) {
+__aicore__ inline constexpr auto make_layout(const ShapeType& shape) {
     static_assert(Std::is_tuple_v<ShapeType>, "ShapeType is not tuple!");
     using ElemT = Std::remove_cvref_t<decltype(Std::get<0>(shape))>;
     if constexpr (Std::is_tuple_v<ElemT>) {
-        return MakeLayout(shape, ComputeStride(shape));
+        return make_layout(shape, compute_stride(shape));
     } else {
-        return MakeLayout(shape, ComputeFlatStride(shape));
+        return make_layout(shape, compute_flat_stride(shape));
     }
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetShape(const LayoutType& layout)
+__aicore__ inline constexpr auto get_shape(const LayoutType& layout)
 {
-    return layout.template Shape<Is...>();
+    return layout.template shape<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetShape(LayoutType& layout)
+__aicore__ inline constexpr auto get_shape(LayoutType& layout)
 {
-    return layout.template Shape<Is...>();
+    return layout.template shape<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetStride(const LayoutType& layout)
+__aicore__ inline constexpr auto get_stride(const LayoutType& layout)
 {
-    return layout.template Stride<Is...>();
+    return layout.template stride<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetStride(LayoutType& layout)
+__aicore__ inline constexpr auto get_stride(LayoutType& layout)
 {
-    return layout.template Stride<Is...>();
+    return layout.template stride<Is...>();
 }
 
 struct CoshapeSum {
@@ -194,74 +194,205 @@ struct CoshapeCompute {
     __aicore__ inline constexpr auto operator()(const T& shape, const U& stride) const {
         if constexpr (Std::is_tuple_v<T> && Std::is_tuple_v<U>) {
             static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "Mismatched ranks");
-            return TransformApply(shape, stride, CoshapeCompute{}, CoshapeSum{});
+            return transform_apply(shape, stride, CoshapeCompute{}, CoshapeSum{});
         } else {
-            auto m1Shape = shape - _1{};
-            auto absStride = stride < 0 ? -stride : stride;
-            return m1Shape * absStride;
+            auto m1_shape = shape - _1{};
+            auto abs_stride = stride < 0 ? -stride : stride;
+            return m1_shape * abs_stride;
         }
     }
 };
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Coshape(const LayoutType& layout)
+__aicore__ inline constexpr auto coshape(const LayoutType& layout)
 {
-    auto shape = GetShape<Is...>(layout);
-    auto stride = GetStride<Is...>(layout);
+    auto shape = get_shape<Is...>(layout);
+    auto stride = get_stride<Is...>(layout);
     auto coCoord = CoshapeCompute{}(shape, stride);
     return coCoord + _1{};
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto cosize(const LayoutType& layout)
+{
+    return tuple_size(coshape<Is...>(layout));
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto rank(const LayoutType& layout)
+{
+    return layout.template get_rank<Is...>();
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto select(const LayoutType& layout)
+{
+    return make_layout(select_tuple<Is...>(layout.shape()), select_tuple<Is...>(layout.stride()));
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto get(const LayoutType& layout)
+{
+    return make_layout(get_tuple<Is...>(layout.shape()), get_tuple<Is...>(layout.stride()));
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto size(const LayoutType& layout)
+{
+    return layout.template size<Is...>();
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto capacity(const LayoutType& layout)
+{
+    return layout.template capacity<Is...>();
+}
+
+template <typename Tensor, typename Coord, typename Info>
+__aicore__ inline constexpr decltype(auto) slice(Tensor&& tensor, const Coord& coord, const Info& info) {
+    return static_cast<Tensor&&>(tensor).slice(coord, info);
+}
+
+} // namespace te
+} // namespace asc
+
+
+// PascalCase compatibility wrappers
+namespace asc {
+namespace te {
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride)
+{
+    return make_layout(shape, stride);
+}
+
+template <typename Row, typename Col, size_t... Is>
+__aicore__ inline constexpr auto BuildStrideRowImpl(const Row& row, const Col& col, Std::index_sequence<Is...> arg2)
+{
+    return build_stride_row_impl<Is...>(row, col, arg2);
+}
+
+template <typename Row, typename Col, size_t... Is>
+__aicore__ inline constexpr auto BuildStrideColImpl(const Row& row, const Col& col, Std::index_sequence<Is...> arg2)
+{
+    return build_stride_col_impl<Is...>(row, col, arg2);
+}
+
+template <typename ShapeType>
+__aicore__ inline constexpr auto ComputeStride(const ShapeType& shape)
+{
+    return compute_stride(shape);
+}
+
+template <typename ShapeType, size_t... Is>
+__aicore__ inline constexpr auto BuildFlatStrideImpl(const ShapeType& shape, Std::index_sequence<Is...> arg1)
+{
+    return build_flat_stride_impl<Is...>(shape, arg1);
+}
+
+template <typename ShapeType>
+__aicore__ inline constexpr auto ComputeFlatStride(const ShapeType& shape)
+{
+    return compute_flat_stride(shape);
+}
+
+template <typename ShapeType>
+__aicore__ inline constexpr auto MakeLayout(const ShapeType& shape)
+{
+    return make_layout(shape);
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto GetShape(const LayoutType& layout)
+{
+    return get_shape<Is...>(layout);
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto GetShape(LayoutType& layout)
+{
+    return get_shape<Is...>(layout);
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto GetStride(const LayoutType& layout)
+{
+    return get_stride<Is...>(layout);
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto GetStride(LayoutType& layout)
+{
+    return get_stride<Is...>(layout);
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto Coshape(const LayoutType& layout)
+{
+    return coshape<Is...>(layout);
+}
+
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
 __aicore__ inline constexpr auto Cosize(const LayoutType& layout)
 {
-    return TupleSize(Coshape<Is...>(layout));
+    return cosize<Is...>(layout);
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
 __aicore__ inline constexpr auto Rank(const LayoutType& layout)
 {
-    return layout.template Rank<Is...>();
+    return rank<Is...>(layout);
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
 __aicore__ inline constexpr auto Select(const LayoutType& layout)
 {
-    return MakeLayout(SelectTuple<Is...>(layout.Shape()), SelectTuple<Is...>(layout.Stride()));
+    return select<Is...>(layout);
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
 __aicore__ inline constexpr auto Get(const LayoutType& layout)
 {
-    return MakeLayout(GetTuple<Is...>(layout.Shape()), GetTuple<Is...>(layout.Stride()));
+    return get<Is...>(layout);
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
 __aicore__ inline constexpr auto Size(const LayoutType& layout)
 {
-    return layout.template Size<Is...>();
+    return size<Is...>(layout);
 }
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
 __aicore__ inline constexpr auto Capacity(const LayoutType& layout)
 {
-    return layout.template Capacity<Is...>();
+    return capacity<Is...>(layout);
 }
 
 template <typename Tensor, typename Coord, typename Info>
-__aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info) {
-    return static_cast<Tensor&&>(tensor).Slice(coord, info);
+__aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info)
+{
+    return slice(tensor, coord, info);
 }
-
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_TENSOR_LAYOUT_METHOD_H
 

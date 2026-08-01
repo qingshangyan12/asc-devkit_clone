@@ -48,11 +48,11 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}, Trait{});
+    auto atom = make_copy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
     CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename DstTensor, typename SrcTensor>
@@ -62,7 +62,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 
     auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
-    Copy(atom, dst, src);
+    copy(atom, dst, src);
 }
 
 } // namespace
@@ -76,8 +76,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyGM2L1RoutesToCubeArchCopy)
     __gm__ float src[m * n] = {0};
     __cbuf__ float dst[m * n] = {0};
 
-    auto gmTensor = MakeTensorAt<Location::GM>(src, MakeFrameLayout<NDExtLayoutPtn>(m, n));
-    auto l1Tensor = MakeTensorAt<Location::L1>(dst, MakeFrameLayout<NDExtLayoutPtn>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(src, make_frame_layout<NDExtLayoutPtn>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(dst, make_frame_layout<NDExtLayoutPtn>(m, n));
 
     RunCopyCallPaths<CopyGM2L1, CopyGM2L1TraitDefault>(l1Tensor, gmTensor);
     RunCopyWithPaths<CopyGM2L1, CopyGM2L1TraitDefault>(l1Tensor, gmTensor);
@@ -213,10 +213,10 @@ private:
     TEST_F(TensorApiGm2L1, TEST_GM2L1_CONCAT_(CopyGm2L1Operation, name, type, counter))                                \
     {                                                                                                                  \
         using T = type;                                                                                                \
-        auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmALayout);                      \
-        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1ALayout);                \
-        auto l1ATensorGolden = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);    \
-        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                                \
+        auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmALayout);                      \
+        auto l1ATensor = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1ALayout);                \
+        auto l1ATensorGolden = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);    \
+        auto atomCopy = make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                                \
         InitializeData<T>();                                                                                           \
         atomCopy.Call(l1ATensor, gmA);                                                                                 \
         DataCopyGm2L1Sim(l1ATensorGolden, gmA);                                                                        \
@@ -226,10 +226,10 @@ private:
     TEST_F(TensorApiGm2L1, TEST_GM2L1_CONCAT_(CopyGm2L1OperationWithCoord, name, type, counter))                       \
     {                                                                                                                  \
         using T = type;                                                                                                \
-        auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmALayout);                      \
-        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1ALayout);                \
-        auto l1ATensorGolden = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);    \
-        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                                \
+        auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmALayout);                      \
+        auto l1ATensor = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1ALayout);                \
+        auto l1ATensorGolden = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);    \
+        auto atomCopy = make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                                \
         InitializeData<T>();                                                                                           \
         auto coord = makeCoord;                                                                                        \
         DataCopyGm2L1Sim(l1ATensorGolden, gmA, coord);                                                                 \
@@ -244,7 +244,7 @@ private:
     template <typename T>                                                                                              \
     constexpr auto Make##NAME = [](auto row, auto col) {                                                               \
         constexpr size_t C0 = IsB4Type<T> ? 64 : 32 / sizeof(T);                                                       \
-        return MakeFrameLayout<NAME##LayoutPtn, Int<C0>>(row, col);                                                   \
+        return make_frame_layout<NAME##LayoutPtn, Int<C0>>(row, col);                                                   \
     };
 
 MAKE_LAYOUT_FUNC(NDExt)
@@ -258,7 +258,7 @@ MAKE_LAYOUT_FUNC(ZN)
 #define MAKE_LAYOUT_FUNC(NAME)                                                                                         \
     template <typename T>                                                                                              \
     constexpr auto Make##NAME =                                                                                        \
-        [](auto row, auto col) { return MakeFrameLayout<NAME##LayoutPtn, _2>(row, col); };
+        [](auto row, auto col) { return make_frame_layout<NAME##LayoutPtn, _2>(row, col); };
 
 MAKE_LAYOUT_FUNC(ZZ)
 MAKE_LAYOUT_FUNC(NN)
@@ -269,7 +269,7 @@ MAKE_LAYOUT_FUNC(ScaleBDN)
 #undef MAKE_LAYOUT_FUNC
 
 // ============================ Batch (multi-matrix) gm->l1 copy ============================
-// Batched frame layouts are built with the official three-arg MakeFrameLayout<Ptn, Trait>(B, M, K)
+// Batched frame layouts are built with the official three-arg make_frame_layout<Ptn, Trait>(B, M, K)
 // (see commit d2d3dc8): Shape = (B, frameShape), Stride = (M * K, frameStride). Only BMK-contiguous
 // layouts are supported, so M/K must be alignment-friendly (M%16==0, K%c0==0) to make the per-batch
 // stride M*K equal to one aligned NZ/ZN matrix's footprint in L1.
@@ -277,7 +277,7 @@ MAKE_LAYOUT_FUNC(ScaleBDN)
     template <typename T>                                                                                             \
     constexpr auto MakeBatch##NAME = [](auto batch, auto row, auto col) {                                            \
         constexpr size_t C0 = IsB4Type<T> ? 64 : 32 / sizeof(T);                                                      \
-        return MakeFrameLayout<NAME##LayoutPtn, Int<C0>>(batch, row, col);                                            \
+        return make_frame_layout<NAME##LayoutPtn, Int<C0>>(batch, row, col);                                            \
     };
 
 MAKE_BATCH_LAYOUT_FUNC(NDExt)
@@ -297,16 +297,16 @@ MAKE_BATCH_LAYOUT_FUNC(ZN)
         const int64_t kMatStride = static_cast<int64_t>(M) * (K);                                                     \
         auto gmBatched = MakeBatch##gmPtn<T>(kBatch, (M), (K));                                                       \
         auto l1Batched = MakeBatch##l1Ptn<T>(kBatch, (M), (K));                                                       \
-        auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmBatched);                     \
-        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Batched);               \
-        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                               \
+        auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmBatched);                     \
+        auto l1ATensor = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Batched);               \
+        auto atomCopy = make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                               \
         InitializeData<T>();                                                                                          \
         atomCopy.Call(l1ATensor, gmA);                                                                                \
         for (int b = 0; b < kBatch; ++b) {                                                                            \
-            auto gmB = MakeTensor(                                                                                    \
-                MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kMatStride), Make##gmPtn<T>((M), (K)));   \
-            auto l1G = MakeTensor(                                                                                    \
-                MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + b * kMatStride),                        \
+            auto gmB = make_tensor(                                                                                    \
+                make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kMatStride), Make##gmPtn<T>((M), (K)));   \
+            auto l1G = make_tensor(                                                                                    \
+                make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + b * kMatStride),                        \
                 Make##l1Ptn<T>((M), (K)));                                                                            \
             DataCopyGm2L1Sim(l1G, gmB);                                                                               \
         }                                                                                                             \
@@ -316,13 +316,13 @@ MAKE_BATCH_LAYOUT_FUNC(ZN)
             PrintCaptureData();                                                                                       \
             for (int b = 0; b < kBatch; ++b) {                                                                       \
                 std::cout << "==== batch " << b << " ====" << std::endl;                                             \
-                auto gmB = MakeTensor(                                                                                \
-                    MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kMatStride),                          \
+                auto gmB = make_tensor(                                                                                \
+                    make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kMatStride),                          \
                     Make##gmPtn<T>((M), (K)));                                                                        \
-                auto l1B = MakeTensor(                                                                                \
-                    MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf) + b * kMatStride), Make##l1Ptn<T>((M), (K)));\
-                auto l1G = MakeTensor(                                                                                \
-                    MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + b * kMatStride),                    \
+                auto l1B = make_tensor(                                                                                \
+                    make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf) + b * kMatStride), Make##l1Ptn<T>((M), (K)));\
+                auto l1G = make_tensor(                                                                                \
+                    make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + b * kMatStride),                    \
                     Make##l1Ptn<T>((M), (K)));                                                                        \
                 PrintTensor(gmB);                                                                                    \
                 PrintTensor(l1B);                                                                                    \
@@ -362,7 +362,7 @@ TEST_GM2L1_BATCH(half, Zn2Zn, ZN, ZN, 3, 32, 64)
 template <typename T, size_t C0>
 auto MakeNc1hwc0(int n, int c1, int h, int w)
 {
-    return MakeFrameLayout<NC1HWC0LayoutPtn>(n, c1, h, w, static_cast<int>(C0));
+    return make_frame_layout<NC1HWC0LayoutPtn>(n, c1, h, w, static_cast<int>(C0));
 }
 
 // NC1HWC0 gm->l1 copy, W fully loaded: C1 bursts of H*W*C0, golden per-C1 block.
@@ -374,16 +374,16 @@ auto MakeNc1hwc0(int n, int c1, int h, int w)
         const int kBlockElems = (H) * (W) * C0; /* per-C1 block = H*W*C0 */                                           \
         auto gmNc1hwc0 = MakeNc1hwc0<T, C0>((N), (C1), (H), (W));                                                     \
         auto l1Nc1hwc0 = MakeNc1hwc0<T, C0>((N), (C1), (H), (W));                                                     \
-        auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmNc1hwc0);                     \
-        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Nc1hwc0);               \
-        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                               \
+        auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmNc1hwc0);                     \
+        auto l1ATensor = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Nc1hwc0);               \
+        auto atomCopy = make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                               \
         InitializeData<T>();                                                                                          \
         atomCopy.Call(l1ATensor, gmA);                                                                                \
         for (int b = 0; b < (N) * (C1); ++b) {                                                                        \
-            auto gmB = MakeTensor(                                                                                    \
-                MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kBlockElems), MakeND<T>(1, kBlockElems)); \
-            auto l1G = MakeTensor(                                                                                    \
-                MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + b * kBlockElems),                       \
+            auto gmB = make_tensor(                                                                                    \
+                make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kBlockElems), MakeND<T>(1, kBlockElems)); \
+            auto l1G = make_tensor(                                                                                    \
+                make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + b * kBlockElems),                       \
                 MakeND<T>(1, kBlockElems));                                                                           \
             DataCopyGm2L1Sim(l1G, gmB);                                                                               \
         }                                                                                                             \
@@ -405,17 +405,17 @@ TEST_GM2L1_NC1HWC0(uint32_t, 1, 2, 4, 4)
         const int kDstRow = (loadW) * C0;                                                                           \
         auto gmFull = MakeNc1hwc0<T, C0>((N), (C1), (H), (srcW));                                                   \
         auto l1Nc1hwc0 = MakeNc1hwc0<T, C0>((N), (C1), (H), (loadW));                                               \
-        auto gmFullT = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmFull);                  \
-        auto gmA = gmFullT.Slice(MakeCoord(0, 0, 0, 0, 0), MakeShape((N), (C1), (H), (loadW), C0));                 \
-        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Nc1hwc0);             \
-        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                             \
+        auto gmFullT = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmFull);                  \
+        auto gmA = gmFullT.Slice(make_coord(0, 0, 0, 0, 0), make_shape((N), (C1), (H), (loadW), C0));                 \
+        auto l1ATensor = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Nc1hwc0);             \
+        auto atomCopy = make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                             \
         InitializeData<T>();                                                                                        \
         atomCopy.Call(l1ATensor, gmA);                                                                              \
         for (int b = 0; b < (N) * (C1) * (H); ++b) {                                                                \
-            auto gmB = MakeTensor(                                                                                  \
-                MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kSrcRow), MakeND<T>(1, kDstRow));       \
-            auto l1G = MakeTensor(                                                                                  \
-                MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + b * kDstRow), MakeND<T>(1, kDstRow)); \
+            auto gmB = make_tensor(                                                                                  \
+                make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kSrcRow), MakeND<T>(1, kDstRow));       \
+            auto l1G = make_tensor(                                                                                  \
+                make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + b * kDstRow), MakeND<T>(1, kDstRow)); \
             DataCopyGm2L1Sim(l1G, gmB);                                                                             \
         }                                                                                                           \
         EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));                                             \
@@ -528,78 +528,78 @@ TEST_GM2L1(uint64_t, ND2ND1DimInt, MakeNDExt<T>(17, Std::Int<1>()), MakeNDExt<T>
 TEST_GM2L1(uint64_t, ND2ND1DimInt, MakeNDExt<T>(17, Std::Int<1>()), MakeNDExt<T>(19, Std::Int<1>()))
 
 // non continuous case, the dst col stride of ND layout needs to be aligned with C0_SIZE(32B)
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 64), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 16), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 8), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 50), MakeNDExt<T>(19, 32), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 26), MakeNDExt<T>(19, 64), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 64), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 26), MakeNDExt<T>(19, 64), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), MakeCoord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 64), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 16), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 8), make_coord(10, 10))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 50), MakeNDExt<T>(19, 32), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), make_coord(10, 10))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 26), MakeNDExt<T>(19, 64), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), make_coord(10, 10))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 64), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 40), MakeNDExt<T>(19, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 26), MakeNDExt<T>(19, 64), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(33, 25), MakeNDExt<T>(19, 32), make_coord(16, 16))
 
 // Additional ND2ND test cases with various shapes and coords
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(16, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(16, 32), MakeCoord(1, 0))
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(16, 32), MakeCoord(0, 16))
-TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(16, 16), MakeNDExt<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(16, 16), MakeNDExt<T>(16, 16), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(65, 66), MakeNDExt<T>(64, 64), MakeCoord(1, 2))
-TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(65, 65), MakeNDExt<T>(64, 64), MakeCoord(1, 1))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 33), MakeNDExt<T>(32, 32), MakeCoord(1, 1))
-TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(17, 17), MakeNDExt<T>(16, 16), MakeCoord(1, 1))
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(100, 100), MakeNDExt<T>(64, 64), MakeCoord(18, 18))
-TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(50, 50), MakeNDExt<T>(32, 32), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint64_t, ND2ND, MakeNDExt<T>(17, 16), MakeNDExt<T>(16, 16), MakeCoord(1, 0))
-TEST_GM2L1_COORD(uint64_t, ND2ND, MakeNDExt<T>(16, 17), MakeNDExt<T>(16, 16), MakeCoord(0, 1))
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(8, 64), MakeNDExt<T>(8, 32), MakeCoord(0, 16))
-TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(64, 8), MakeNDExt<T>(32, 8), MakeCoord(16, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(16, 64), MakeCoord(8, 8))
-TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(16, 16), MakeCoord(8, 8))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(16, 16), MakeCoord(8, 8))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(48, 48), MakeNDExt<T>(32, 32), MakeCoord(8, 8))
-TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(24, 24), MakeNDExt<T>(16, 16), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 32), MakeNDExt<T>(16, 32), MakeCoord(8, 0))
-TEST_GM2L1_COORD(int8_t, ND2ND, MakeNDExt<T>(33, 32), MakeNDExt<T>(16, 32), MakeCoord(8, 0))
-TEST_GM2L1_COORD(int16_t, ND2ND, MakeNDExt<T>(32, 33), MakeNDExt<T>(32, 16), MakeCoord(0, 8))
-TEST_GM2L1_COORD(int32_t, ND2ND, MakeNDExt<T>(40, 40), MakeNDExt<T>(32, 32), MakeCoord(4, 4))
-TEST_GM2L1_COORD(int64_t, ND2ND, MakeNDExt<T>(20, 20), MakeNDExt<T>(16, 16), MakeCoord(2, 2))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(16, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(16, 32), make_coord(1, 0))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(16, 32), make_coord(0, 16))
+TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(16, 16), MakeNDExt<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(16, 16), MakeNDExt<T>(16, 16), make_coord(8, 8))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(65, 66), MakeNDExt<T>(64, 64), make_coord(1, 2))
+TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(65, 65), MakeNDExt<T>(64, 64), make_coord(1, 1))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 33), MakeNDExt<T>(32, 32), make_coord(1, 1))
+TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(17, 17), MakeNDExt<T>(16, 16), make_coord(1, 1))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(100, 100), MakeNDExt<T>(64, 64), make_coord(18, 18))
+TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(50, 50), MakeNDExt<T>(32, 32), make_coord(10, 10))
+TEST_GM2L1_COORD(uint64_t, ND2ND, MakeNDExt<T>(17, 16), MakeNDExt<T>(16, 16), make_coord(1, 0))
+TEST_GM2L1_COORD(uint64_t, ND2ND, MakeNDExt<T>(16, 17), MakeNDExt<T>(16, 16), make_coord(0, 1))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(8, 64), MakeNDExt<T>(8, 32), make_coord(0, 16))
+TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(64, 8), MakeNDExt<T>(32, 8), make_coord(16, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(16, 64), make_coord(8, 8))
+TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(16, 16), make_coord(8, 8))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(16, 16), make_coord(8, 8))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(48, 48), MakeNDExt<T>(32, 32), make_coord(8, 8))
+TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(24, 24), MakeNDExt<T>(16, 16), make_coord(4, 4))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(33, 32), MakeNDExt<T>(16, 32), make_coord(8, 0))
+TEST_GM2L1_COORD(int8_t, ND2ND, MakeNDExt<T>(33, 32), MakeNDExt<T>(16, 32), make_coord(8, 0))
+TEST_GM2L1_COORD(int16_t, ND2ND, MakeNDExt<T>(32, 33), MakeNDExt<T>(32, 16), make_coord(0, 8))
+TEST_GM2L1_COORD(int32_t, ND2ND, MakeNDExt<T>(40, 40), MakeNDExt<T>(32, 32), make_coord(4, 4))
+TEST_GM2L1_COORD(int64_t, ND2ND, MakeNDExt<T>(20, 20), MakeNDExt<T>(16, 16), make_coord(2, 2))
 
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(15, 15), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(15, 15), MakeCoord(1, 0))
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(15, 15), MakeCoord(0, 16))
-TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(16, 16), MakeNDExt<T>(15, 15), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(16, 16), MakeNDExt<T>(15, 7), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(65, 66), MakeNDExt<T>(15, 14), MakeCoord(2, 2))
-TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(65, 65), MakeNDExt<T>(15, 15), MakeCoord(1, 1))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 33), MakeNDExt<T>(15, 15), MakeCoord(1, 1))
-TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(17, 17), MakeNDExt<T>(15, 15), MakeCoord(1, 1))
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(100, 100), MakeNDExt<T>(15, 15), MakeCoord(18, 18))
-TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(50, 50), MakeNDExt<T>(15, 15), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint64_t, ND2ND, MakeNDExt<T>(17, 16), MakeNDExt<T>(15, 15), MakeCoord(1, 0))
-TEST_GM2L1_COORD(uint64_t, ND2ND, MakeNDExt<T>(16, 17), MakeNDExt<T>(15, 15), MakeCoord(0, 1))
-TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(8, 64), MakeNDExt<T>(15, 15), MakeCoord(0, 16))
-TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(64, 8), MakeNDExt<T>(15, 7), MakeCoord(16, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(16, 16), MakeCoord(8, 8))
-TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(15, 15), MakeCoord(8, 8))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(15, 15), MakeCoord(8, 8))
-TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(48, 48), MakeNDExt<T>(15, 15), MakeCoord(8, 8))
-TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(24, 24), MakeNDExt<T>(15, 15), MakeCoord(4, 4))
-TEST_GM2L1_COORD(int8_t, ND2ND, MakeNDExt<T>(33, 32), MakeNDExt<T>(15, 15), MakeCoord(8, 0))
-TEST_GM2L1_COORD(int16_t, ND2ND, MakeNDExt<T>(32, 33), MakeNDExt<T>(15, 15), MakeCoord(0, 8))
-TEST_GM2L1_COORD(int32_t, ND2ND, MakeNDExt<T>(40, 40), MakeNDExt<T>(15, 15), MakeCoord(4, 4))
-TEST_GM2L1_COORD(int64_t, ND2ND, MakeNDExt<T>(20, 20), MakeNDExt<T>(15, 15), MakeCoord(2, 2))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(15, 15), make_coord(0, 0))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(15, 15), make_coord(1, 0))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(17, 32), MakeNDExt<T>(15, 15), make_coord(0, 16))
+TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(16, 16), MakeNDExt<T>(15, 15), make_coord(0, 0))
+TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(16, 16), MakeNDExt<T>(15, 7), make_coord(8, 8))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(65, 66), MakeNDExt<T>(15, 14), make_coord(2, 2))
+TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(65, 65), MakeNDExt<T>(15, 15), make_coord(1, 1))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(33, 33), MakeNDExt<T>(15, 15), make_coord(1, 1))
+TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(17, 17), MakeNDExt<T>(15, 15), make_coord(1, 1))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(100, 100), MakeNDExt<T>(15, 15), make_coord(18, 18))
+TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(50, 50), MakeNDExt<T>(15, 15), make_coord(10, 10))
+TEST_GM2L1_COORD(uint64_t, ND2ND, MakeNDExt<T>(17, 16), MakeNDExt<T>(15, 15), make_coord(1, 0))
+TEST_GM2L1_COORD(uint64_t, ND2ND, MakeNDExt<T>(16, 17), MakeNDExt<T>(15, 15), make_coord(0, 1))
+TEST_GM2L1_COORD(half, ND2ND, MakeNDExt<T>(8, 64), MakeNDExt<T>(15, 15), make_coord(0, 16))
+TEST_GM2L1_COORD(float, ND2ND, MakeNDExt<T>(64, 8), MakeNDExt<T>(15, 7), make_coord(16, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(16, 16), make_coord(8, 8))
+TEST_GM2L1_COORD(uint8_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(15, 15), make_coord(8, 8))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(32, 32), MakeNDExt<T>(15, 15), make_coord(8, 8))
+TEST_GM2L1_COORD(uint16_t, ND2ND, MakeNDExt<T>(48, 48), MakeNDExt<T>(15, 15), make_coord(8, 8))
+TEST_GM2L1_COORD(uint32_t, ND2ND, MakeNDExt<T>(24, 24), MakeNDExt<T>(15, 15), make_coord(4, 4))
+TEST_GM2L1_COORD(int8_t, ND2ND, MakeNDExt<T>(33, 32), MakeNDExt<T>(15, 15), make_coord(8, 0))
+TEST_GM2L1_COORD(int16_t, ND2ND, MakeNDExt<T>(32, 33), MakeNDExt<T>(15, 15), make_coord(0, 8))
+TEST_GM2L1_COORD(int32_t, ND2ND, MakeNDExt<T>(40, 40), MakeNDExt<T>(15, 15), make_coord(4, 4))
+TEST_GM2L1_COORD(int64_t, ND2ND, MakeNDExt<T>(20, 20), MakeNDExt<T>(15, 15), make_coord(2, 2))
 
 // ND2Nz
 // constraint: fp4 col(include make coord col) % 2 must be 0
@@ -643,69 +643,69 @@ TEST_GM2L1(uint8_t, NDLayout2Nz, MakeND<T>(18, 9), MakeNZ<T>(19, 10))
 TEST_GM2L1(uint16_t, NDLayout2Nz, MakeND<T>(18, 9), MakeNZ<T>(19, 10))
 TEST_GM2L1(uint32_t, NDLayout2Nz, MakeND<T>(18, 9), MakeNZ<T>(19, 10))
 
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(33, 26), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(33, 26), MakeNZ<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(33, 26), MakeNZ<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(10, 10))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(33, 26), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(33, 26), MakeNZ<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(33, 26), MakeNZ<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(18, 18), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(18, 18), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(18, 18), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(28, 28), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(28, 28), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(28, 28), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(38, 38), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(38, 38), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(38, 38), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(69, 70), make_coord(10, 10))
 
 // Additional ND2Nz test cases with various shapes and coords
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, ND2Nz, MakeNDExt<T>(20, 20), MakeNZ<T>(18, 18), MakeCoord(2, 2))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e5m2_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(half, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(bfloat16_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(int8_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int16_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int32_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(68, 68), MakeNZ<T>(64, 64), MakeCoord(2, 2))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(34, 34), MakeNZ<T>(32, 32), MakeCoord(1, 2))
-TEST_GM2L1_COORD(half, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(float, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(48, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, ND2Nz, MakeNDExt<T>(24, 24), MakeNZ<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e5m2_t, ND2Nz, MakeNDExt<T>(20, 20), MakeNZ<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(hifloat8_t, ND2Nz, MakeNDExt<T>(40, 40), MakeNZ<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(bfloat16_t, ND2Nz, MakeNDExt<T>(36, 36), MakeNZ<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(int8_t, ND2Nz, MakeNDExt<T>(28, 28), MakeNZ<T>(28, 28), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int16_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int32_t, ND2Nz, MakeNDExt<T>(24, 24), MakeNZ<T>(24, 24), MakeCoord(8, 8))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(8, 8))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, ND2Nz, MakeNDExt<T>(20, 20), MakeNZ<T>(18, 18), make_coord(2, 2))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e5m2_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(half, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(half, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(bfloat16_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(int8_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int16_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int32_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(68, 68), MakeNZ<T>(64, 64), make_coord(2, 2))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, ND2Nz, MakeNDExt<T>(34, 34), MakeNZ<T>(32, 32), make_coord(1, 2))
+TEST_GM2L1_COORD(half, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(half, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(float, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(48, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, ND2Nz, MakeNDExt<T>(24, 24), MakeNZ<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e5m2_t, ND2Nz, MakeNDExt<T>(20, 20), MakeNZ<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(hifloat8_t, ND2Nz, MakeNDExt<T>(40, 40), MakeNZ<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(bfloat16_t, ND2Nz, MakeNDExt<T>(36, 36), MakeNZ<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(int8_t, ND2Nz, MakeNDExt<T>(28, 28), MakeNZ<T>(28, 28), make_coord(8, 8))
+TEST_GM2L1_COORD(int16_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(8, 8))
+TEST_GM2L1_COORD(int32_t, ND2Nz, MakeNDExt<T>(24, 24), MakeNZ<T>(24, 24), make_coord(8, 8))
 
 // ND2Zn
 // test various data types, b8 to b32
@@ -751,55 +751,55 @@ TEST_GM2L1(uint8_t, NDLayout2Zn, MakeND<T>(18, 9), MakeZN<T>(19, 10))
 TEST_GM2L1(uint16_t, NDLayout2Zn, MakeND<T>(18, 9), MakeZN<T>(19, 10))
 TEST_GM2L1(uint32_t, NDLayout2Zn, MakeND<T>(18, 9), MakeZN<T>(19, 10))
 
-TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(18, 17), MakeZN<T>(39, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(10, 10))
+TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(18, 17), MakeZN<T>(39, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(18, 18), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(18, 18), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(18, 18), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(28, 28), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(28, 28), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(28, 28), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(38, 38), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(38, 38), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(38, 38), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(69, 70), make_coord(10, 10))
 
 // Additional ND2Zn test cases with various shapes and coords
-TEST_GM2L1_COORD(fp8_e4m3fn_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e5m2_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(bfloat16_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(int8_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int16_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int32_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(48, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, ND2Zn, MakeNDExt<T>(24, 24), MakeZN<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e5m2_t, ND2Zn, MakeNDExt<T>(20, 20), MakeZN<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(hifloat8_t, ND2Zn, MakeNDExt<T>(40, 40), MakeZN<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(bfloat16_t, ND2Zn, MakeNDExt<T>(36, 36), MakeZN<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(int8_t, ND2Zn, MakeNDExt<T>(28, 28), MakeZN<T>(28, 28), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int16_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int32_t, ND2Zn, MakeNDExt<T>(24, 24), MakeZN<T>(24, 24), MakeCoord(8, 8))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e5m2_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(bfloat16_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(int8_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int16_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int32_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(half, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(float, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(48, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, ND2Zn, MakeNDExt<T>(24, 24), MakeZN<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e5m2_t, ND2Zn, MakeNDExt<T>(20, 20), MakeZN<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(hifloat8_t, ND2Zn, MakeNDExt<T>(40, 40), MakeZN<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(bfloat16_t, ND2Zn, MakeNDExt<T>(36, 36), MakeZN<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(int8_t, ND2Zn, MakeNDExt<T>(28, 28), MakeZN<T>(28, 28), make_coord(8, 8))
+TEST_GM2L1_COORD(int16_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(8, 8))
+TEST_GM2L1_COORD(int32_t, ND2Zn, MakeNDExt<T>(24, 24), MakeZN<T>(24, 24), make_coord(8, 8))
 
 // DN2Nz
 // test various data types, b8 to b32
@@ -844,55 +844,55 @@ TEST_GM2L1(uint8_t, DNLayout2Nz, MakeDN<T>(18, 9), MakeNZ<T>(19, 10))
 TEST_GM2L1(uint16_t, DNLayout2Nz, MakeDN<T>(18, 9), MakeNZ<T>(19, 10))
 TEST_GM2L1(uint32_t, DNLayout2Nz, MakeDN<T>(18, 9), MakeNZ<T>(19, 10))
 
-TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(18, 17), MakeNZ<T>(39, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(10, 10))
+TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(18, 17), MakeNZ<T>(39, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(33, 25), MakeNZ<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(18, 18), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(18, 18), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(18, 18), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(28, 28), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(28, 28), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(28, 28), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(38, 38), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(38, 38), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(38, 38), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(69, 70), make_coord(10, 10))
 
 // Additional DN2Nz test cases with various shapes and coords
-TEST_GM2L1_COORD(fp8_e4m3fn_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e5m2_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(bfloat16_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(int8_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int16_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int32_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(48, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, DN2Nz, MakeDNExt<T>(24, 24), MakeNZ<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e5m2_t, DN2Nz, MakeDNExt<T>(20, 20), MakeNZ<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(hifloat8_t, DN2Nz, MakeDNExt<T>(40, 40), MakeNZ<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(bfloat16_t, DN2Nz, MakeDNExt<T>(36, 36), MakeNZ<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(int8_t, DN2Nz, MakeDNExt<T>(28, 28), MakeNZ<T>(28, 28), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int16_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int32_t, DN2Nz, MakeDNExt<T>(24, 24), MakeNZ<T>(24, 24), MakeCoord(8, 8))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e5m2_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(bfloat16_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(int8_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int16_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int32_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(64, 64), MakeNZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(half, DN2Nz, MakeDNExt<T>(64, 64), MakeNZ<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(float, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, DN2Nz, MakeDNExt<T>(64, 64), MakeNZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, DN2Nz, MakeDNExt<T>(48, 48), MakeNZ<T>(48, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, DN2Nz, MakeDNExt<T>(24, 24), MakeNZ<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e5m2_t, DN2Nz, MakeDNExt<T>(20, 20), MakeNZ<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(hifloat8_t, DN2Nz, MakeDNExt<T>(40, 40), MakeNZ<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(bfloat16_t, DN2Nz, MakeDNExt<T>(36, 36), MakeNZ<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(int8_t, DN2Nz, MakeDNExt<T>(28, 28), MakeNZ<T>(28, 28), make_coord(8, 8))
+TEST_GM2L1_COORD(int16_t, DN2Nz, MakeDNExt<T>(32, 32), MakeNZ<T>(32, 32), make_coord(8, 8))
+TEST_GM2L1_COORD(int32_t, DN2Nz, MakeDNExt<T>(24, 24), MakeNZ<T>(24, 24), make_coord(8, 8))
 
 // DN2Zn
 // constraint: fp4 row(include make coord row) % 2 must be 0
@@ -939,62 +939,62 @@ TEST_GM2L1(uint8_t, DNLayout2Zn, MakeDN<T>(18, 9), MakeZN<T>(19, 10))
 TEST_GM2L1(uint16_t, DNLayout2Zn, MakeDN<T>(18, 9), MakeZN<T>(19, 10))
 TEST_GM2L1(uint32_t, DNLayout2Zn, MakeDN<T>(18, 9), MakeZN<T>(19, 10))
 
-TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(18, 17), MakeZN<T>(40, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(34, 25), MakeZN<T>(20, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(34, 25), MakeZN<T>(20, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(18, 17), MakeZN<T>(39, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(10, 10))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(18, 17), MakeZN<T>(40, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(34, 25), MakeZN<T>(20, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(34, 25), MakeZN<T>(20, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(18, 17), MakeZN<T>(39, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(33, 25), MakeZN<T>(19, 18), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(18, 18), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(18, 18), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(18, 18), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(28, 28), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(28, 28), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(28, 28), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(38, 38), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(38, 38), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(38, 38), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(69, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(69, 70), make_coord(10, 10))
 
 // Additional DN2Zn test cases with various shapes and coords
-TEST_GM2L1_COORD(fp4x2_e1m2_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e5m2_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(bfloat16_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(int8_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int16_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int32_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(68, 68), MakeZN<T>(64, 64), MakeCoord(2, 2))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(34, 34), MakeZN<T>(32, 32), MakeCoord(2, 1))
-TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(48, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, DN2Zn, MakeDNExt<T>(24, 24), MakeZN<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e5m2_t, DN2Zn, MakeDNExt<T>(20, 20), MakeZN<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(hifloat8_t, DN2Zn, MakeDNExt<T>(40, 40), MakeZN<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(bfloat16_t, DN2Zn, MakeDNExt<T>(36, 36), MakeZN<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(int8_t, DN2Zn, MakeDNExt<T>(28, 28), MakeZN<T>(28, 28), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int16_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int32_t, DN2Zn, MakeDNExt<T>(24, 24), MakeZN<T>(24, 24), MakeCoord(8, 8))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e5m2_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(bfloat16_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(int8_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int16_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int32_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(68, 68), MakeZN<T>(64, 64), make_coord(2, 2))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, DN2Zn, MakeDNExt<T>(34, 34), MakeZN<T>(32, 32), make_coord(2, 1))
+TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(64, 64), MakeZN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(half, DN2Zn, MakeDNExt<T>(64, 64), MakeZN<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(float, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, DN2Zn, MakeDNExt<T>(64, 64), MakeZN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, DN2Zn, MakeDNExt<T>(48, 48), MakeZN<T>(48, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, DN2Zn, MakeDNExt<T>(24, 24), MakeZN<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e5m2_t, DN2Zn, MakeDNExt<T>(20, 20), MakeZN<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(hifloat8_t, DN2Zn, MakeDNExt<T>(40, 40), MakeZN<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(bfloat16_t, DN2Zn, MakeDNExt<T>(36, 36), MakeZN<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(int8_t, DN2Zn, MakeDNExt<T>(28, 28), MakeZN<T>(28, 28), make_coord(8, 8))
+TEST_GM2L1_COORD(int16_t, DN2Zn, MakeDNExt<T>(32, 32), MakeZN<T>(32, 32), make_coord(8, 8))
+TEST_GM2L1_COORD(int32_t, DN2Zn, MakeDNExt<T>(24, 24), MakeZN<T>(24, 24), make_coord(8, 8))
 
 // Nz2Nz
 // constraint: make coord row % 16 = 0, col % 32B = 0
@@ -1047,73 +1047,73 @@ TEST_GM2L1(uint8_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70))
 TEST_GM2L1(uint16_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70))
 TEST_GM2L1(uint32_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70))
 
-TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(18, 17), MakeNZ<T>(39, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(33, 50), MakeNZ<T>(19, 36), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(33, 50), MakeNZ<T>(19, 36), MakeCoord(16, 0))
-TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(16, 0))
-TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(16, 8))
-TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), MakeCoord(16, 4))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(16, 0))
-TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(16, 0))
-TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(18, 18), MakeNZ<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(16, 0))
-TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(16, 0))
-TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(69, 70), MakeCoord(16, 8))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(16, 32))
-TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(16, 32))
-TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(38, 38), MakeNZ<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70), MakeCoord(16, 16))
+TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(18, 17), MakeNZ<T>(39, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(33, 50), MakeNZ<T>(19, 36), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(33, 50), MakeNZ<T>(19, 36), make_coord(16, 0))
+TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), make_coord(16, 0))
+TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), make_coord(16, 8))
+TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(33, 25), MakeNZ<T>(19, 18), make_coord(16, 4))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(18, 18), MakeNZ<T>(69, 70), make_coord(16, 0))
+TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(18, 18), MakeNZ<T>(69, 70), make_coord(16, 0))
+TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(18, 18), MakeNZ<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(18, 18), MakeNZ<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(69, 70), make_coord(16, 0))
+TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(69, 70), make_coord(16, 0))
+TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(69, 70), make_coord(16, 8))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(38, 38), MakeNZ<T>(69, 70), make_coord(16, 32))
+TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(38, 38), MakeNZ<T>(69, 70), make_coord(16, 32))
+TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(38, 38), MakeNZ<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(38, 38), MakeNZ<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(69, 70), make_coord(16, 16))
 
 // Additional Nz2Nz test cases with various shapes and coords
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e5m2_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(bfloat16_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int8_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int16_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int32_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int64_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(64, 64), MakeNZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(48, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, Nz2Nz, MakeNZ<T>(24, 24), MakeNZ<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e5m2_t, Nz2Nz, MakeNZ<T>(20, 20), MakeNZ<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(hifloat8_t, Nz2Nz, MakeNZ<T>(40, 40), MakeNZ<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(bfloat16_t, Nz2Nz, MakeNZ<T>(36, 36), MakeNZ<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(28, 28), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int8_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(28, 28), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int16_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int32_t, Nz2Nz, MakeNZ<T>(24, 24), MakeNZ<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int64_t, Nz2Nz, MakeNZ<T>(20, 20), MakeNZ<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(20, 20), MakeNZ<T>(20, 20), MakeCoord(4, 4))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e5m2_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(bfloat16_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int8_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int16_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int32_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int64_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(16, 16), MakeNZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(64, 64), MakeNZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(half, Nz2Nz, MakeNZ<T>(64, 64), MakeNZ<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(float, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(64, 64), MakeNZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, Nz2Nz, MakeNZ<T>(64, 64), MakeNZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, Nz2Nz, MakeNZ<T>(48, 48), MakeNZ<T>(48, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, Nz2Nz, MakeNZ<T>(24, 24), MakeNZ<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e5m2_t, Nz2Nz, MakeNZ<T>(20, 20), MakeNZ<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(hifloat8_t, Nz2Nz, MakeNZ<T>(40, 40), MakeNZ<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(bfloat16_t, Nz2Nz, MakeNZ<T>(36, 36), MakeNZ<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(28, 28), make_coord(8, 8))
+TEST_GM2L1_COORD(int8_t, Nz2Nz, MakeNZ<T>(28, 28), MakeNZ<T>(28, 28), make_coord(8, 8))
+TEST_GM2L1_COORD(int16_t, Nz2Nz, MakeNZ<T>(32, 32), MakeNZ<T>(32, 32), make_coord(8, 8))
+TEST_GM2L1_COORD(int32_t, Nz2Nz, MakeNZ<T>(24, 24), MakeNZ<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(int64_t, Nz2Nz, MakeNZ<T>(20, 20), MakeNZ<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(uint64_t, Nz2Nz, MakeNZ<T>(20, 20), MakeNZ<T>(20, 20), make_coord(4, 4))
 
 // Zn2Zn
 // constraint: make coord col % 16 = 0, row % 32B = 0
@@ -1166,73 +1166,73 @@ TEST_GM2L1(uint8_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70))
 TEST_GM2L1(uint16_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70))
 TEST_GM2L1(uint32_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70))
 
-TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(18, 17), MakeZN<T>(39, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(33, 26), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(33, 26), MakeZN<T>(19, 18), MakeCoord(0, 16))
-TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 16))
-TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(16, 16))
-TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(8, 16))
-TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), MakeCoord(4, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(0, 16))
-TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(0, 16))
-TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(18, 18), MakeZN<T>(69, 70), MakeCoord(8, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(0, 16))
-TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(0, 16))
-TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(69, 70), MakeCoord(8, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(0, 16))
-TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(0, 16))
-TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(38, 38), MakeZN<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(16, 16))
-TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70), MakeCoord(16, 16))
+TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(18, 17), MakeZN<T>(39, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(33, 26), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(33, 26), MakeZN<T>(19, 18), make_coord(0, 16))
+TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 16))
+TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), make_coord(16, 16))
+TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), make_coord(8, 16))
+TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), make_coord(0, 0))
+TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(33, 25), MakeZN<T>(19, 18), make_coord(4, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(18, 18), MakeZN<T>(69, 70), make_coord(0, 16))
+TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(18, 18), MakeZN<T>(69, 70), make_coord(0, 16))
+TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(18, 18), MakeZN<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(18, 18), MakeZN<T>(69, 70), make_coord(8, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(69, 70), make_coord(0, 16))
+TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(69, 70), make_coord(0, 16))
+TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(69, 70), make_coord(8, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(38, 38), MakeZN<T>(69, 70), make_coord(0, 16))
+TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(38, 38), MakeZN<T>(69, 70), make_coord(0, 16))
+TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(38, 38), MakeZN<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(38, 38), MakeZN<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70), make_coord(16, 16))
+TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(69, 70), make_coord(16, 16))
 
 // Additional Zn2Zn test cases with various shapes and coords
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp4x2_e2m1_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e5m2_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(hifloat8_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(bfloat16_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int8_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int16_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int32_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(int64_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(64, 64), MakeZN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(48, 48), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e4m3fn_t, Zn2Zn, MakeZN<T>(24, 24), MakeZN<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e5m2_t, Zn2Zn, MakeZN<T>(20, 20), MakeZN<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(hifloat8_t, Zn2Zn, MakeZN<T>(40, 40), MakeZN<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(bfloat16_t, Zn2Zn, MakeZN<T>(36, 36), MakeZN<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(28, 28), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int8_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(28, 28), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int16_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int32_t, Zn2Zn, MakeZN<T>(24, 24), MakeZN<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(int64_t, Zn2Zn, MakeZN<T>(20, 20), MakeZN<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(20, 20), MakeZN<T>(20, 20), MakeCoord(4, 4))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp4x2_e2m1_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e5m2_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(hifloat8_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(bfloat16_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int8_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int16_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int32_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(int64_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(16, 16), MakeZN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(64, 64), MakeZN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(half, Zn2Zn, MakeZN<T>(64, 64), MakeZN<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(float, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(64, 64), MakeZN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(uint8_t, Zn2Zn, MakeZN<T>(64, 64), MakeZN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(uint16_t, Zn2Zn, MakeZN<T>(48, 48), MakeZN<T>(48, 48), make_coord(0, 0))
+TEST_GM2L1_COORD(uint32_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e4m3fn_t, Zn2Zn, MakeZN<T>(24, 24), MakeZN<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e5m2_t, Zn2Zn, MakeZN<T>(20, 20), MakeZN<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(hifloat8_t, Zn2Zn, MakeZN<T>(40, 40), MakeZN<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(bfloat16_t, Zn2Zn, MakeZN<T>(36, 36), MakeZN<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(fp4x2_e1m2_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(28, 28), make_coord(8, 8))
+TEST_GM2L1_COORD(int8_t, Zn2Zn, MakeZN<T>(28, 28), MakeZN<T>(28, 28), make_coord(8, 8))
+TEST_GM2L1_COORD(int16_t, Zn2Zn, MakeZN<T>(32, 32), MakeZN<T>(32, 32), make_coord(8, 8))
+TEST_GM2L1_COORD(int32_t, Zn2Zn, MakeZN<T>(24, 24), MakeZN<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(int64_t, Zn2Zn, MakeZN<T>(20, 20), MakeZN<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(uint64_t, Zn2Zn, MakeZN<T>(20, 20), MakeZN<T>(20, 20), make_coord(4, 4))
 
 // ScaleA
 // constraint: scaleA col direction, col(include coord col) % 2 must be 0
@@ -1242,28 +1242,28 @@ TEST_GM2L1(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 34), MakeZZ<T>(40, 36))
 TEST_GM2L1(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(32, 32), MakeZZ<T>(32, 32))
 TEST_GM2L1(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(2, 8), MakeZZ<T>(4, 12))
 
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 34), MakeZZ<T>(26, 26), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 34), MakeZZ<T>(26, 26), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 34), MakeZZ<T>(40, 36), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 34), MakeZZ<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(18, 34), MakeZZ<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(18, 18), MakeZZ<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(32, 32), MakeZZ<T>(32, 32), MakeCoord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 34), MakeZZ<T>(26, 26), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 34), MakeZZ<T>(26, 26), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 34), MakeZZ<T>(40, 36), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 34), MakeZZ<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(18, 34), MakeZZ<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(18, 18), MakeZZ<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(32, 32), MakeZZ<T>(32, 32), make_coord(10, 10))
 
 // Additional ScaleAND2Zz test cases with various shapes and coords
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(16, 16), MakeZZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(16, 16), MakeZZ<T>(16, 16), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(32, 32), MakeZZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(32, 32), MakeZZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(64, 64), MakeZZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(64, 64), MakeZZ<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(48, 48), MakeZZ<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(24, 24), MakeZZ<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(40, 40), MakeZZ<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 36), MakeZZ<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(20, 20), MakeZZ<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(68, 68), MakeZZ<T>(64, 64), MakeCoord(2, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(34, 34), MakeZZ<T>(32, 32), MakeCoord(1, 1))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(16, 16), MakeZZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(16, 16), MakeZZ<T>(16, 16), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(32, 32), MakeZZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(32, 32), MakeZZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(64, 64), MakeZZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(64, 64), MakeZZ<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(48, 48), MakeZZ<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(24, 24), MakeZZ<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(40, 40), MakeZZ<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(36, 36), MakeZZ<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(20, 20), MakeZZ<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(68, 68), MakeZZ<T>(64, 64), make_coord(2, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAND2Zz, MakeScaleAND<T>(34, 34), MakeZZ<T>(32, 32), make_coord(1, 1))
 
 TEST_GM2L1(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(18, 34), MakeZZ<T>(19, 36))
 TEST_GM2L1(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(18, 34), MakeZZ<T>(40, 70))
@@ -1271,28 +1271,28 @@ TEST_GM2L1(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 34), MakeZZ<T>(40, 36))
 TEST_GM2L1(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(32, 32), MakeZZ<T>(32, 32))
 TEST_GM2L1(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(2, 8), MakeZZ<T>(4, 12))
 
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 34), MakeZZ<T>(26, 26), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 34), MakeZZ<T>(26, 26), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 34), MakeZZ<T>(40, 36), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 34), MakeZZ<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(18, 34), MakeZZ<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(18, 18), MakeZZ<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(32, 32), MakeZZ<T>(32, 32), MakeCoord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 34), MakeZZ<T>(26, 26), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 34), MakeZZ<T>(26, 26), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 34), MakeZZ<T>(40, 36), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 34), MakeZZ<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(18, 34), MakeZZ<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(18, 18), MakeZZ<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(32, 32), MakeZZ<T>(32, 32), make_coord(10, 10))
 
 // Additional ScaleADN2Zz test cases with various shapes and coords
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(16, 16), MakeZZ<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(16, 16), MakeZZ<T>(16, 16), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(32, 32), MakeZZ<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(32, 32), MakeZZ<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(64, 64), MakeZZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(64, 64), MakeZZ<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(48, 48), MakeZZ<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(24, 24), MakeZZ<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(40, 40), MakeZZ<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 36), MakeZZ<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(20, 20), MakeZZ<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(68, 68), MakeZZ<T>(64, 64), MakeCoord(2, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(34, 34), MakeZZ<T>(32, 32), MakeCoord(1, 1))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(16, 16), MakeZZ<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(16, 16), MakeZZ<T>(16, 16), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(32, 32), MakeZZ<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(32, 32), MakeZZ<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(64, 64), MakeZZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(64, 64), MakeZZ<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(48, 48), MakeZZ<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(24, 24), MakeZZ<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(40, 40), MakeZZ<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(36, 36), MakeZZ<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(20, 20), MakeZZ<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(68, 68), MakeZZ<T>(64, 64), make_coord(2, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleADN2Zz, MakeScaleADN<T>(34, 34), MakeZZ<T>(32, 32), make_coord(1, 1))
 
 TEST_GM2L1(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(18, 34), MakeZZ<T>(19, 36))
 TEST_GM2L1(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(18, 34), MakeZZ<T>(40, 70))
@@ -1300,22 +1300,22 @@ TEST_GM2L1(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 34), MakeZZ<T>(40, 36))
 TEST_GM2L1(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(32, 32), MakeZZ<T>(32, 32))
 TEST_GM2L1(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(2, 8), MakeZZ<T>(4, 12))
 
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 34), MakeZZ<T>(26, 26), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 34), MakeZZ<T>(26, 26), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 34), MakeZZ<T>(40, 36), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 34), MakeZZ<T>(70, 70), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(18, 34), MakeZZ<T>(70, 70), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(18, 18), MakeZZ<T>(70, 70), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(32, 32), MakeZZ<T>(32, 32), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(64, 64), MakeZZ<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(64, 64), MakeZZ<T>(64, 64), MakeCoord(32, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(48, 48), MakeZZ<T>(48, 48), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(24, 24), MakeZZ<T>(24, 24), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(40, 40), MakeZZ<T>(40, 40), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 36), MakeZZ<T>(36, 36), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(20, 20), MakeZZ<T>(20, 20), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(68, 68), MakeZZ<T>(64, 64), MakeCoord(16, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(34, 34), MakeZZ<T>(32, 32), MakeCoord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 34), MakeZZ<T>(26, 26), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 34), MakeZZ<T>(26, 26), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 34), MakeZZ<T>(40, 36), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 34), MakeZZ<T>(70, 70), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(18, 34), MakeZZ<T>(70, 70), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(18, 18), MakeZZ<T>(70, 70), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(32, 32), MakeZZ<T>(32, 32), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(64, 64), MakeZZ<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(64, 64), MakeZZ<T>(64, 64), make_coord(32, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(48, 48), MakeZZ<T>(48, 48), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(24, 24), MakeZZ<T>(24, 24), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(40, 40), MakeZZ<T>(40, 40), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(36, 36), MakeZZ<T>(36, 36), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(20, 20), MakeZZ<T>(20, 20), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(68, 68), MakeZZ<T>(64, 64), make_coord(16, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleAZz2Zz, MakeZZ<T>(34, 34), MakeZZ<T>(32, 32), make_coord(16, 2))
 
 // ScaleB
 // constraint: scaleB row direction, row(include coord row) % 2 must be 0
@@ -1325,27 +1325,27 @@ TEST_GM2L1(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 33), MakeNN<T>(40, 35))
 TEST_GM2L1(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(32, 32), MakeNN<T>(32, 32))
 TEST_GM2L1(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(2, 8), MakeNN<T>(4, 12))
 
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 33), MakeNN<T>(26, 25), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 33), MakeNN<T>(26, 25), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 33), MakeNN<T>(40, 35), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 33), MakeNN<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(18, 33), MakeNN<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(32, 32), MakeNN<T>(32, 32), MakeCoord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 33), MakeNN<T>(26, 25), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 33), MakeNN<T>(26, 25), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 33), MakeNN<T>(40, 35), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 33), MakeNN<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(18, 33), MakeNN<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(32, 32), MakeNN<T>(32, 32), make_coord(10, 10))
 
 // Additional ScaleBND2Nn test cases with various shapes and coords
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(16, 16), MakeNN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(16, 16), MakeNN<T>(16, 16), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(32, 32), MakeNN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(32, 32), MakeNN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(64, 64), MakeNN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(64, 64), MakeNN<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(48, 48), MakeNN<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(24, 24), MakeNN<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(40, 40), MakeNN<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 36), MakeNN<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(20, 20), MakeNN<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(68, 68), MakeNN<T>(64, 64), MakeCoord(2, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(34, 34), MakeNN<T>(32, 32), MakeCoord(1, 1))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(16, 16), MakeNN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(16, 16), MakeNN<T>(16, 16), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(32, 32), MakeNN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(32, 32), MakeNN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(64, 64), MakeNN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(64, 64), MakeNN<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(48, 48), MakeNN<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(24, 24), MakeNN<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(40, 40), MakeNN<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(36, 36), MakeNN<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(20, 20), MakeNN<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(68, 68), MakeNN<T>(64, 64), make_coord(2, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBND2Nn, MakeScaleBND<T>(34, 34), MakeNN<T>(32, 32), make_coord(1, 1))
 
 TEST_GM2L1(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(18, 34), MakeNN<T>(20, 36))
 TEST_GM2L1(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(18, 34), MakeNN<T>(40, 70))
@@ -1353,27 +1353,27 @@ TEST_GM2L1(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 33), MakeNN<T>(40, 35))
 TEST_GM2L1(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(32, 32), MakeNN<T>(32, 32))
 TEST_GM2L1(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(2, 8), MakeNN<T>(4, 12))
 
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 33), MakeNN<T>(26, 25), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 33), MakeNN<T>(26, 25), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 33), MakeNN<T>(40, 35), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 33), MakeNN<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(18, 33), MakeNN<T>(70, 70), MakeCoord(10, 10))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(32, 32), MakeNN<T>(32, 32), MakeCoord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 33), MakeNN<T>(26, 25), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 33), MakeNN<T>(26, 25), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 33), MakeNN<T>(40, 35), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 33), MakeNN<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(18, 33), MakeNN<T>(70, 70), make_coord(10, 10))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(32, 32), MakeNN<T>(32, 32), make_coord(10, 10))
 
 // Additional ScaleBDN2Nn test cases with various shapes and coords
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(16, 16), MakeNN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(16, 16), MakeNN<T>(16, 16), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(32, 32), MakeNN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(32, 32), MakeNN<T>(32, 32), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(64, 64), MakeNN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(64, 64), MakeNN<T>(64, 64), MakeCoord(32, 32))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(48, 48), MakeNN<T>(48, 48), MakeCoord(16, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(24, 24), MakeNN<T>(24, 24), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(40, 40), MakeNN<T>(40, 40), MakeCoord(8, 8))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 36), MakeNN<T>(36, 36), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(20, 20), MakeNN<T>(20, 20), MakeCoord(4, 4))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(68, 68), MakeNN<T>(64, 64), MakeCoord(2, 2))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(34, 34), MakeNN<T>(32, 32), MakeCoord(1, 1))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(16, 16), MakeNN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(16, 16), MakeNN<T>(16, 16), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(32, 32), MakeNN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(32, 32), MakeNN<T>(32, 32), make_coord(16, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(64, 64), MakeNN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(64, 64), MakeNN<T>(64, 64), make_coord(32, 32))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(48, 48), MakeNN<T>(48, 48), make_coord(16, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(24, 24), MakeNN<T>(24, 24), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(40, 40), MakeNN<T>(40, 40), make_coord(8, 8))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(36, 36), MakeNN<T>(36, 36), make_coord(4, 4))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(20, 20), MakeNN<T>(20, 20), make_coord(4, 4))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(68, 68), MakeNN<T>(64, 64), make_coord(2, 2))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBDN2Nn, MakeScaleBDN<T>(34, 34), MakeNN<T>(32, 32), make_coord(1, 1))
 
 TEST_GM2L1(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(18, 34), MakeNN<T>(20, 36))
 TEST_GM2L1(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(18, 34), MakeNN<T>(40, 70))
@@ -1381,27 +1381,27 @@ TEST_GM2L1(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 33), MakeNN<T>(40, 35))
 TEST_GM2L1(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(32, 32), MakeNN<T>(32, 32))
 TEST_GM2L1(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(2, 8), MakeNN<T>(4, 12))
 
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 33), MakeNN<T>(26, 25), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 33), MakeNN<T>(26, 25), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 33), MakeNN<T>(40, 35), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 33), MakeNN<T>(70, 70), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(18, 33), MakeNN<T>(70, 70), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(32, 32), MakeNN<T>(32, 32), MakeCoord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 33), MakeNN<T>(26, 25), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 33), MakeNN<T>(26, 25), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 33), MakeNN<T>(40, 35), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 33), MakeNN<T>(70, 70), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(18, 33), MakeNN<T>(70, 70), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(32, 32), MakeNN<T>(32, 32), make_coord(2, 16))
 
 // Additional ScaleBNnNn test cases with various shapes and coords
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(16, 16), MakeNN<T>(16, 16), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(16, 16), MakeNN<T>(16, 16), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(32, 32), MakeNN<T>(32, 32), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(32, 32), MakeNN<T>(32, 32), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(64, 64), MakeNN<T>(64, 64), MakeCoord(0, 0))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(64, 64), MakeNN<T>(64, 64), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(48, 48), MakeNN<T>(48, 48), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(24, 24), MakeNN<T>(24, 24), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(40, 40), MakeNN<T>(40, 40), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 36), MakeNN<T>(36, 36), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(20, 20), MakeNN<T>(20, 20), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(68, 68), MakeNN<T>(64, 64), MakeCoord(2, 16))
-TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(34, 34), MakeNN<T>(32, 32), MakeCoord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(16, 16), MakeNN<T>(16, 16), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(16, 16), MakeNN<T>(16, 16), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(32, 32), MakeNN<T>(32, 32), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(32, 32), MakeNN<T>(32, 32), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(64, 64), MakeNN<T>(64, 64), make_coord(0, 0))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(64, 64), MakeNN<T>(64, 64), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(48, 48), MakeNN<T>(48, 48), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(24, 24), MakeNN<T>(24, 24), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(40, 40), MakeNN<T>(40, 40), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(36, 36), MakeNN<T>(36, 36), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(20, 20), MakeNN<T>(20, 20), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(68, 68), MakeNN<T>(64, 64), make_coord(2, 16))
+TEST_GM2L1_COORD(fp8_e8m0_t, ScaleBNnNn, MakeNN<T>(34, 34), MakeNN<T>(32, 32), make_coord(2, 16))
 
 template <typename Info1, typename Info2, size_t dim, typename Layout>
 auto GetSimLayoutElement(const Layout& layout)
@@ -1410,10 +1410,10 @@ auto GetSimLayoutElement(const Layout& layout)
         if constexpr (dim == 0) {
             return 1U;
         } else {
-            return GetElement<Info1, Info2>(layout);
+            return get_element<Info1, Info2>(layout);
         }
     } else {
-        return GetElement<Info1, Info2, dim>(layout);
+        return get_element<Info1, Info2, dim>(layout);
     }
 }
 
@@ -1456,7 +1456,7 @@ void PrintTensor(const T& src)
         for (int i = 0; i < M1; i++) {
             std::cout << i << ":\t";
             for (int j = 0; j < N1; j++) {
-                auto dataAddr = &(src[MakeCoord(i, j)]);
+                auto dataAddr = &(src[make_coord(i, j)]);
                 if constexpr (sizeof(srcType) == 1) {
                     std::cout << static_cast<uint32_t>(*(reinterpret_cast<uint8_t*>(dataAddr))) << "\t";
                 } else if constexpr (Std::is_same_v<srcType, half>) {
@@ -1472,7 +1472,7 @@ void PrintTensor(const T& src)
         for (int i = 0; i < M1; i++) {
             std::cout << i << ":\t";
             for (int j = 0; j < N1; j++) {
-                auto dataAddr = &(src[MakeCoord(i, j)]);
+                auto dataAddr = &(src[make_coord(i, j)]);
                 if constexpr (sizeof(srcType) == 1) {
                     std::cout << static_cast<uint32_t>(*(reinterpret_cast<uint8_t*>(dataAddr))) << "\t";
                 } else if constexpr (Std::is_same_v<srcType, half>) {
@@ -1490,7 +1490,7 @@ void PrintTensor(const T& src)
                 for (int j0 = 0; j0 < N1; j0++) {
                     uint32_t block_id = j0 * M1 + i0;
                     for (int j1 = 0; j1 < N0; j1++) {
-                        auto dataAddr = &(src[MakeCoord(MakeCoord(i1, i0), MakeCoord(j1, j0))]);
+                        auto dataAddr = &(src[make_coord(make_coord(i1, i0), make_coord(j1, j0))]);
                         if constexpr (sizeof(srcType) == 1) {
                             std::cout << static_cast<uint32_t>(*(reinterpret_cast<uint8_t*>(dataAddr))) << "\t";
                         } else if constexpr (Std::is_same_v<srcType, half>) {
@@ -1645,10 +1645,10 @@ void SimND2Nz(const T& dst, const U& src)
                                      << srcSM1;
     }
     uint32_t c0Elements = C0_ELEMENT<srcType>;
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
     uint32_t srcColNAlignC0 = ((N + c0Elements - 1) / c0Elements) * c0Elements;
     for (uint32_t n1 = 0; n1 < N1; n1++) {
         for (uint32_t m1 = 0; m1 < M1; m1++) {
@@ -1688,10 +1688,10 @@ void SimND2Zn(const T& dst, const U& src)
     auto srcRowStride = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
 
     uint32_t c0Elements = C0_SIZE<srcType> / sizeof(srcType);
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
     uint32_t srcRowNAlignC0 = ((M + c0Elements - 1) / c0Elements) * c0Elements;
     for (uint32_t m1 = 0; m1 < M1; m1++) {
@@ -1732,10 +1732,10 @@ void SimDN2Nz(const T& dst, const U& src)
     auto srcColStride = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
 
     uint32_t c0Elements = C0_SIZE<srcType> / sizeof(srcType);
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
     for (uint32_t n1 = 0; n1 < N1; n1++) {
         for (uint32_t m1 = 0; m1 < M1; m1++) {
             for (uint32_t m0 = 0; m0 < M0; m0++) {
@@ -1778,10 +1778,10 @@ void SimDN2Zn(const T& dst, const U& src)
     }
 
     uint32_t c0Elements = C0_SIZE<srcType> / sizeof(srcType);
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
     for (uint32_t m1 = 0; m1 < M1; m1++) {
         for (uint32_t n1 = 0; n1 < N1; n1++) {
@@ -1814,22 +1814,22 @@ void SimNz2Nz(const T& dst, const U& src)
     static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto srcM1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto srcN1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
-    auto srcSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
+    auto srcM1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+    auto srcN1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto srcSM1 = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+    auto srcSN1 = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    auto srcSM0 = get_element<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
+    auto srcSN0 = get_element<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
-    auto dstSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
-    auto dstSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
-    auto dstSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(dstLayout);
-    auto dstSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(dstLayout);
+    auto dstSM1 = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
+    auto dstSN1 = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
+    auto dstSM0 = get_element<AttrInfo::Stride, AttrInfo::Row, 0>(dstLayout);
+    auto dstSN0 = get_element<AttrInfo::Stride, AttrInfo::Column, 0>(dstLayout);
 
     for (uint32_t n1 = 0; n1 < N1; n1++) {
         for (uint32_t m1 = 0; m1 < M1; m1++) {
@@ -1858,22 +1858,22 @@ void SimZn2Zn(const T& dst, const U& src)
     static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto srcM1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto srcN1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
-    auto srcSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
+    auto srcM1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+    auto srcN1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto srcSM1 = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+    auto srcSN1 = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    auto srcSM0 = get_element<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
+    auto srcSN0 = get_element<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
-    auto dstSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
-    auto dstSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
-    auto dstSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(dstLayout);
-    auto dstSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(dstLayout);
+    auto dstSM1 = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
+    auto dstSN1 = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
+    auto dstSM0 = get_element<AttrInfo::Stride, AttrInfo::Row, 0>(dstLayout);
+    auto dstSN0 = get_element<AttrInfo::Stride, AttrInfo::Column, 0>(dstLayout);
 
     for (uint32_t m1 = 0; m1 < M1; m1++) {
         for (uint32_t n1 = 0; n1 < N1; n1++) {
@@ -1902,15 +1902,15 @@ void SimScaleAND2Zz(const T& dst, const U& src)
     static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto M = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto N = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto M = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+    auto N = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
 
-    auto srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+    auto srcRowStride = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcRowNAlignC0 = ((M + c0Elements - 1) / c0Elements) * c0Elements;
@@ -1945,17 +1945,17 @@ void SimScaleADN2Zz(const T& dst, const U& src)
     static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto M = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto SN = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
-    auto BN = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto M = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+    auto SN = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
+    auto BN = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
     auto N = SN * BN;
 
-    auto srcBColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    auto srcBColStride = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcRowNAlignC0 = ((M + c0Elements - 1) / c0Elements) * c0Elements;
@@ -1990,17 +1990,17 @@ void SimScaleAZz2Zz(const T& dst, const U& src)
     static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto srcM1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto srcN1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
-    auto srcSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
+    auto srcM1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+    auto srcN1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto srcSM1 = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+    auto srcSN1 = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    auto srcSM0 = get_element<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
+    auto srcSN0 = get_element<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
     for (uint32_t m1 = 0; m1 < M1; m1++) {
         for (uint32_t n1 = 0; n1 < N1; n1++) {
@@ -2029,17 +2029,17 @@ void SimScaleBND2Nn(const T& dst, const U& src)
     static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto SM = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
-    auto BM = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto SN = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
-    auto BN = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    auto SM = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
+    auto BM = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+    auto SN = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
+    auto BN = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto srcSM1 = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+    auto srcSN1 = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcColNAlignC0 = ((SN * BN + c0Elements - 1) / c0Elements) * c0Elements;
@@ -2076,17 +2076,17 @@ void SimScaleBDN2Nn(const T& dst, const U& src)
     static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    uint32_t SM = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
-    uint32_t BM = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    uint32_t SN = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
-    uint32_t BN = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    uint32_t srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    uint32_t srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    uint32_t SM = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
+    uint32_t BM = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+    uint32_t SN = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
+    uint32_t BN = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    uint32_t srcSM1 = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+    uint32_t srcSN1 = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcColNAlignC0 = ((SN * BN + c0Elements - 1) / c0Elements) * c0Elements;
@@ -2123,19 +2123,19 @@ void SimScaleBNn2Nn(const T& dst, const U& src)
     static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    uint32_t SM = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
-    uint32_t BM = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    uint32_t SN = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
-    uint32_t BN = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    uint32_t srcSM = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
-    uint32_t srcSN = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
-    uint32_t srcBM = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    uint32_t srcBN = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    uint32_t SM = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
+    uint32_t BM = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+    uint32_t SN = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
+    uint32_t BN = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    uint32_t srcSM = get_element<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
+    uint32_t srcSN = get_element<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
+    uint32_t srcBM = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+    uint32_t srcBN = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
+    uint32_t N0 = get_element<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
+    uint32_t M1 = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+    uint32_t N1 = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcColNAlignC0 = ((SN * BN + c0Elements - 1) / c0Elements) * c0Elements;
@@ -2575,19 +2575,19 @@ CAPTURE_GM_TO_L1_IMPL(uint32_t);
     using L1Trait = GetLayoutTrait<decltype(l1BaseLayout)>;                                                          \
     using GmPattern = GetLayoutPattern<decltype(gmBaseLayout)>;                                                       \
     using L1Pattern = GetLayoutPattern<decltype(l1BaseLayout)>;                                                       \
-    auto gmBatchLayout = MakeBatchPatternLayout<GmPattern, GmTrait>(B, gmBaseLayout);                                 \
-    auto l1BatchLayout = MakeBatchPatternLayout<L1Pattern, L1Trait>(B, l1BaseLayout);                                 \
-    auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmBatchLayout);                     \
-    auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1BatchLayout);               \
+    auto gmBatchLayout = make_batch_pattern_layout<GmPattern, GmTrait>(B, gmBaseLayout);                                 \
+    auto l1BatchLayout = make_batch_pattern_layout<L1Pattern, L1Trait>(B, l1BaseLayout);                                 \
+    auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmBatchLayout);                     \
+    auto l1ATensor = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1BatchLayout);               \
     InitializeData<T>();                                                                                              \
-    MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1ATensor, gmA);                                              \
-    auto srcBatchStride = Get<0>(gmBatchLayout.Stride());                                                             \
-    auto dstBatchStride = Get<0>(l1BatchLayout.Stride());                                                             \
+    make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1ATensor, gmA);                                              \
+    auto srcBatchStride = get<0>(gmBatchLayout.Stride());                                                             \
+    auto dstBatchStride = get<0>(l1BatchLayout.Stride());                                                             \
     for (uint32_t batchIdx = 0; batchIdx < B; ++batchIdx) {                                                           \
-        auto gmSingle = MakeTensor(                                                                                   \
-            MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm) + batchIdx * srcBatchStride), gmBaseLayout);        \
-        auto l1GoldenSingle = MakeTensor(                                                                             \
-            MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + batchIdx * dstBatchStride), l1BaseLayout);  \
+        auto gmSingle = make_tensor(                                                                                   \
+            make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm) + batchIdx * srcBatchStride), gmBaseLayout);        \
+        auto l1GoldenSingle = make_tensor(                                                                             \
+            make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + batchIdx * dstBatchStride), l1BaseLayout);  \
         DataCopyGm2L1Sim(l1GoldenSingle, gmSingle);                                                                   \
     }                                                                                                                 \
     bool result = std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden);                                                  \
@@ -2607,21 +2607,21 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleAND2Zz_RoutesToSingleDn2Nz)
     auto l1BaseLayout = MakeZZ<T>(M, N);
     using GmTrait = GetLayoutTrait<decltype(gmBaseLayout)>;
     using L1Trait = GetLayoutTrait<decltype(l1BaseLayout)>;
-    auto gmBatchLayout = MakeBatchPatternLayout<ScaleANDLayoutPtn, GmTrait>(B, gmBaseLayout);
-    auto l1BatchLayout = MakeBatchPatternLayout<ZZLayoutPtn, L1Trait>(B, l1BaseLayout);
-    auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmBatchLayout);
-    auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1BatchLayout);
+    auto gmBatchLayout = make_batch_pattern_layout<ScaleANDLayoutPtn, GmTrait>(B, gmBaseLayout);
+    auto l1BatchLayout = make_batch_pattern_layout<ZZLayoutPtn, L1Trait>(B, l1BaseLayout);
+    auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmBatchLayout);
+    auto l1ATensor = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1BatchLayout);
 
     InitializeData<T>();
-    MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1ATensor, gmA);
+    make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1ATensor, gmA);
 
-    auto srcBatchStride = Get<0>(gmBatchLayout.Stride());
-    auto dstBatchStride = Get<0>(l1BatchLayout.Stride());
+    auto srcBatchStride = get<0>(gmBatchLayout.Stride());
+    auto dstBatchStride = get<0>(l1BatchLayout.Stride());
     for (uint32_t batchIdx = 0; batchIdx < B; ++batchIdx) {
-        auto gmSingle = MakeTensor(
-            MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm) + batchIdx * srcBatchStride), gmBaseLayout);
-        auto l1GoldenSingle = MakeTensor(
-            MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + batchIdx * dstBatchStride), l1BaseLayout);
+        auto gmSingle = make_tensor(
+            make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm) + batchIdx * srcBatchStride), gmBaseLayout);
+        auto l1GoldenSingle = make_tensor(
+            make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden) + batchIdx * dstBatchStride), l1BaseLayout);
         DataCopyGm2L1Sim(l1GoldenSingle, gmSingle);
     }
     bool result = std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden);
@@ -2634,10 +2634,10 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleAND2Zz_RoutesToSingleDn2Nz)
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);
     const auto& dn2nz = gGm2L1DN2NzCaptures.back();
     const auto& nzPara = gGm2L1NzParaCaptures.back();
-    auto expectedLoop3DstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(l1BaseLayout) * sizeof(T) /
+    auto expectedLoop3DstStride = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(l1BaseLayout) * sizeof(T) /
         C0_SIZE<>;
     auto expectedLoop4DstStride = dstBatchStride * sizeof(T) / C0_SIZE<>;
-    auto expectedLoop1SrcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedLoop1SrcStride = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T);
     auto expectedLoop4SrcStride = srcBatchStride * sizeof(T);
     EXPECT_EQ(nzPara.ndNum, B);
     EXPECT_EQ(nzPara.loop2DstStride, 1);
@@ -2660,18 +2660,18 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleADN2Zz_RoutesToSingleNd2Nz)
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);
     const auto& nd2nz = gGm2L1ND2NzCaptures.back();
     const auto& nzPara = gGm2L1NzParaCaptures.back();
-    auto expectedLoop3DstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(l1BaseLayout) * sizeof(T) /
+    auto expectedLoop3DstStride = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(l1BaseLayout) * sizeof(T) /
         C0_SIZE<>;
     auto expectedLoop4DstStride = dstBatchStride * sizeof(T) / C0_SIZE<>;
-    auto expectedLoop1SrcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedLoop1SrcStride = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T);
     auto expectedLoop4SrcStride = srcBatchStride * sizeof(T);
     EXPECT_EQ(nzPara.ndNum, B);
     EXPECT_EQ(nzPara.loop2DstStride, 1);
     EXPECT_EQ(nzPara.loop3DstStride, expectedLoop3DstStride);
     EXPECT_EQ(nzPara.loop4DstStride, expectedLoop4DstStride);
     EXPECT_EQ(nd2nz.loop1SrcStride, expectedLoop1SrcStride);
-    EXPECT_EQ(nd2nz.nValue, (GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout)));
-    EXPECT_EQ(nd2nz.dValue, (GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout)));
+    EXPECT_EQ(nd2nz.nValue, (get_element<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout)));
+    EXPECT_EQ(nd2nz.dValue, (get_element<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout)));
     EXPECT_EQ(nd2nz.loop4SrcStride, expectedLoop4SrcStride);
     EXPECT_FALSE(nd2nz.enableSmallC0);
 }
@@ -2686,18 +2686,18 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleBND2Nn_RoutesToSingleNd2Nz)
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);
     const auto& nd2nz = gGm2L1ND2NzCaptures.back();
     const auto& nzPara = gGm2L1NzParaCaptures.back();
-    auto expectedLoop3DstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(l1BaseLayout) * sizeof(T) /
+    auto expectedLoop3DstStride = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(l1BaseLayout) * sizeof(T) /
         C0_SIZE<>;
     auto expectedLoop4DstStride = dstBatchStride * sizeof(T) / C0_SIZE<>;
-    auto expectedLoop1SrcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedLoop1SrcStride = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T);
     auto expectedLoop4SrcStride = srcBatchStride * sizeof(T);
     EXPECT_EQ(nzPara.ndNum, B);
     EXPECT_EQ(nzPara.loop2DstStride, 1);
     EXPECT_EQ(nzPara.loop3DstStride, expectedLoop3DstStride);
     EXPECT_EQ(nzPara.loop4DstStride, expectedLoop4DstStride);
     EXPECT_EQ(nd2nz.loop1SrcStride, expectedLoop1SrcStride);
-    EXPECT_EQ(nd2nz.nValue, (GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout)));
-    EXPECT_EQ(nd2nz.dValue, (GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout)));
+    EXPECT_EQ(nd2nz.nValue, (get_element<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout)));
+    EXPECT_EQ(nd2nz.dValue, (get_element<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout)));
     EXPECT_EQ(nd2nz.loop4SrcStride, expectedLoop4SrcStride);
     EXPECT_FALSE(nd2nz.enableSmallC0);
 }
@@ -2712,18 +2712,18 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleBDN2Nn_RoutesToSingleDn2Nz)
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);
     const auto& dn2nz = gGm2L1DN2NzCaptures.back();
     const auto& nzPara = gGm2L1NzParaCaptures.back();
-    auto expectedLoop3DstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(l1BaseLayout) * sizeof(T) /
+    auto expectedLoop3DstStride = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(l1BaseLayout) * sizeof(T) /
         C0_SIZE<>;
     auto expectedLoop4DstStride = dstBatchStride * sizeof(T) / C0_SIZE<>;
-    auto expectedLoop1SrcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedLoop1SrcStride = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T);
     auto expectedLoop4SrcStride = srcBatchStride * sizeof(T);
     EXPECT_EQ(nzPara.ndNum, B);
     EXPECT_EQ(nzPara.loop2DstStride, 1);
     EXPECT_EQ(nzPara.loop3DstStride, expectedLoop3DstStride);
     EXPECT_EQ(nzPara.loop4DstStride, expectedLoop4DstStride);
     EXPECT_EQ(dn2nz.loop1SrcStride, expectedLoop1SrcStride);
-    EXPECT_EQ(dn2nz.nValue, (GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout) >> 1));
-    EXPECT_EQ(dn2nz.dValue, (GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout)));
+    EXPECT_EQ(dn2nz.nValue, (get_element<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout) >> 1));
+    EXPECT_EQ(dn2nz.dValue, (get_element<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout)));
     EXPECT_EQ(dn2nz.loop4SrcStride, expectedLoop4SrcStride);
     EXPECT_FALSE(dn2nz.enableSmallC0);
 }
@@ -2736,12 +2736,12 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleAZz2Zz_ContinuousRoutesToPerBatchAlig
 
     ASSERT_EQ(gGm2L1AlignV2Captures.size(), B);
     const auto& alignV2 = gGm2L1AlignV2Captures.back();
-    auto baseBlockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout);
-    auto baseBlockLen = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T) *
-        GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(gmBaseLayout) *
-        GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(gmBaseLayout);
-    auto expectedSrcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T);
-    auto expectedDstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(l1BaseLayout) * sizeof(T);
+    auto baseBlockCount = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout);
+    auto baseBlockLen = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T) *
+        get_element<AttrInfo::Shape, AttrInfo::Row, 0>(gmBaseLayout) *
+        get_element<AttrInfo::Stride, AttrInfo::Row, 0>(gmBaseLayout);
+    auto expectedSrcStride = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedDstStride = get_element<AttrInfo::Stride, AttrInfo::Row, 1>(l1BaseLayout) * sizeof(T);
     EXPECT_EQ(alignV2.blockCount, baseBlockCount);
     EXPECT_EQ(alignV2.blockLen, baseBlockLen);
     EXPECT_EQ(alignV2.srcStride, expectedSrcStride);
@@ -2756,10 +2756,10 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleAZz2Zz_NonContinuousDstFallsBackToPer
 
     ASSERT_EQ(gGm2L1AlignV2Captures.size(), B);
     const auto& alignV2 = gGm2L1AlignV2Captures.back();
-    auto baseBlockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout);
-    auto baseBlockLen = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T) *
-        GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(gmBaseLayout) *
-        GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(gmBaseLayout);
+    auto baseBlockCount = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout);
+    auto baseBlockLen = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T) *
+        get_element<AttrInfo::Shape, AttrInfo::Row, 0>(gmBaseLayout) *
+        get_element<AttrInfo::Stride, AttrInfo::Row, 0>(gmBaseLayout);
     EXPECT_EQ(alignV2.blockCount, baseBlockCount);
     EXPECT_EQ(alignV2.blockLen, baseBlockLen);
 }
@@ -2772,12 +2772,12 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleBNn2Nn_ContinuousRoutesToPerBatchAlig
 
     ASSERT_EQ(gGm2L1AlignV2Captures.size(), B);
     const auto& alignV2 = gGm2L1AlignV2Captures.back();
-    auto baseBlockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout);
-    auto baseBlockLen = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T) *
-        GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(gmBaseLayout) *
-        GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(gmBaseLayout);
-    auto expectedSrcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T);
-    auto expectedDstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(l1BaseLayout) * sizeof(T);
+    auto baseBlockCount = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout);
+    auto baseBlockLen = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T) *
+        get_element<AttrInfo::Shape, AttrInfo::Column, 0>(gmBaseLayout) *
+        get_element<AttrInfo::Stride, AttrInfo::Column, 0>(gmBaseLayout);
+    auto expectedSrcStride = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedDstStride = get_element<AttrInfo::Stride, AttrInfo::Column, 1>(l1BaseLayout) * sizeof(T);
     EXPECT_EQ(alignV2.blockCount, baseBlockCount);
     EXPECT_EQ(alignV2.blockLen, baseBlockLen);
     EXPECT_EQ(alignV2.srcStride, expectedSrcStride);
@@ -2792,10 +2792,10 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleBNn2Nn_NonContinuousDstFallsBackToPer
 
     ASSERT_EQ(gGm2L1AlignV2Captures.size(), B);
     const auto& alignV2 = gGm2L1AlignV2Captures.back();
-    auto baseBlockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout);
-    auto baseBlockLen = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T) *
-        GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(gmBaseLayout) *
-        GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(gmBaseLayout);
+    auto baseBlockCount = get_element<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout);
+    auto baseBlockLen = get_element<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T) *
+        get_element<AttrInfo::Shape, AttrInfo::Column, 0>(gmBaseLayout) *
+        get_element<AttrInfo::Stride, AttrInfo::Column, 0>(gmBaseLayout);
     EXPECT_EQ(alignV2.blockCount, baseBlockCount);
     EXPECT_EQ(alignV2.blockLen, baseBlockLen);
 }
@@ -2830,10 +2830,10 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ND2ND_Compact_FoldsToSingleBlock)
     constexpr uint32_t B = 4;
     constexpr uint32_t M = 8;
     constexpr uint32_t N = 16;
-    auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), MakeBatchNDExt<T>(B, M, N));
-    auto l1A = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), MakeBatchNDExt<T>(B, M, N));
+    auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), MakeBatchNDExt<T>(B, M, N));
+    auto l1A = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), MakeBatchNDExt<T>(B, M, N));
 
-    MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
+    make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
 
     constexpr uint32_t expectBlockLen = M * N * sizeof(T);
     constexpr uint64_t expectStride = static_cast<uint64_t>(M) * N * sizeof(T);
@@ -2846,10 +2846,10 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ND2ND_Compact_HalfType)
     constexpr uint32_t B = 2;
     constexpr uint32_t M = 16;
     constexpr uint32_t N = 32;
-    auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), MakeBatchNDExt<T>(B, M, N));
-    auto l1A = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), MakeBatchNDExt<T>(B, M, N));
+    auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), MakeBatchNDExt<T>(B, M, N));
+    auto l1A = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), MakeBatchNDExt<T>(B, M, N));
 
-    MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
+    make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
 
     constexpr uint32_t expectBlockLen = M * N * sizeof(T);
     constexpr uint64_t expectStride = static_cast<uint64_t>(M) * N * sizeof(T);
@@ -2870,15 +2870,15 @@ TEST_F(TensorApiGm2L1, CopyGm2L1NHWC2NC1HWC0)
     constexpr uint32_t C = 32;
     constexpr uint32_t C1 = C / C0; // 2
 
-    auto gmNhwc = MakeFrameLayout<NHWCLayoutPtn>(
+    auto gmNhwc = make_frame_layout<NHWCLayoutPtn>(
         static_cast<int32_t>(N), static_cast<int32_t>(H), static_cast<int32_t>(W), static_cast<int32_t>(C));
-    auto l1Nc1hwc0 = MakeFrameLayout<NC1HWC0LayoutPtn>(
+    auto l1Nc1hwc0 = make_frame_layout<NC1HWC0LayoutPtn>(
         static_cast<int32_t>(N), static_cast<int32_t>(C1), static_cast<int32_t>(H), static_cast<int32_t>(W),
         static_cast<int32_t>(C0));
-    auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmNhwc);
-    auto l1A = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Nc1hwc0);
+    auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmNhwc);
+    auto l1A = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Nc1hwc0);
 
-    MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
+    make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
 
     ASSERT_EQ(gGm2L1ND2NzCaptures.size(), 1);
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);
@@ -2910,15 +2910,15 @@ TEST_F(TensorApiGm2L1, CopyGm2L1NCHW2NC1HWC0)
     constexpr uint32_t C = 32;
     constexpr uint32_t C1 = C / C0; // 2
 
-    auto gmNchw = MakeFrameLayout<NCHWLayoutPtn>(
+    auto gmNchw = make_frame_layout<NCHWLayoutPtn>(
         static_cast<int32_t>(N), static_cast<int32_t>(C), static_cast<int32_t>(H), static_cast<int32_t>(W));
-    auto l1Nc1hwc0 = MakeFrameLayout<NC1HWC0LayoutPtn>(
+    auto l1Nc1hwc0 = make_frame_layout<NC1HWC0LayoutPtn>(
         static_cast<int32_t>(N), static_cast<int32_t>(C1), static_cast<int32_t>(H), static_cast<int32_t>(W),
         static_cast<int32_t>(C0));
-    auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmNchw);
-    auto l1A = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Nc1hwc0);
+    auto gmA = make_tensor(make_mem_ptr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmNchw);
+    auto l1A = make_tensor(make_mem_ptr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1Nc1hwc0);
 
-    MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
+    make_copy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
 
     ASSERT_EQ(gGm2L1DN2NzCaptures.size(), 1);
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);

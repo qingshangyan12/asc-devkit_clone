@@ -24,38 +24,38 @@
 
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class CopyMatrixCcToL1Instr {
 public:
     template <QuantMode_t quantPre, typename T, typename U, typename... Params>
-    __aicore__ inline static void DataCopy(const T& dst, const U& src, const Params&... params)
+    __aicore__ inline static void data_copy(const T& dst, const U& src, const Params&... params)
     {
-        CopyMatrixCcToL1<quantPre>(dst.Data().Get(), src.Data().Get(), params...);
+        copy_matrix_cc_to_l1<quantPre>(dst.data().get(), src.data().get(), params...);
     }
 
 private:
     // This path only emits straight NZ output, so nz2nd_en is always false.
     template <QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline static void CopyMatrixCcToL1(
-        __cbuf__ T* dst, __cc__ U* src, uint32_t nSize, uint32_t mSize, uint32_t srcStride, uint32_t dstStride,
-        bool reluEn, uint8_t unitFlag, bool isChannelSplit)
+    __aicore__ inline static void copy_matrix_cc_to_l1(
+        __cbuf__ T* dst, __cc__ U* src, uint32_t n_size, uint32_t m_size, uint32_t src_stride, uint32_t dst_stride,
+        bool relu_en, uint8_t unit_flag, bool is_channel_split)
     {
         if ASCEND_IS_AIV {
             return;
         }
 
         asc_copy_l0c2l1(
-            dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,
-            static_cast<uint16_t>(srcStride), 0, unitFlag, static_cast<uint64_t>(quantPre),
-            static_cast<uint8_t>(reluEn), isChannelSplit, false, static_cast<uint64_t>(QuantMode_post::NoConv), 0,
+            dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
+            static_cast<uint16_t>(src_stride), 0, unit_flag, static_cast<uint64_t>(quantPre),
+            static_cast<uint8_t>(relu_en), is_channel_split, false, static_cast<uint64_t>(QuantMode_post::NoConv), 0,
             false, 0, 0, false);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_L1_COPY_IMPL_INSTRUCTION_H
 

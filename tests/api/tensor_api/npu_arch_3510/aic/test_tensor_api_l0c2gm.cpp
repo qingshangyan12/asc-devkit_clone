@@ -89,11 +89,11 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}, Trait{});
+    auto atom = make_copy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
     CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename Param, typename DstTensor, typename SrcTensor>
@@ -101,14 +101,14 @@ void RunCopyWithParamPaths(const DstTensor& dst, const SrcTensor& src, const Par
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}).with(param);
+    auto atom = make_copy(CopyOp{}).with(param);
     atom.Call(dst, src);
 
     auto copiedAtom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param);
     copiedAtom.Call(dst, src);
 
-    Copy(copiedAtom, dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
+    copy(copiedAtom, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
 }
 
 uint64_t gExpectedLoop3Para = 0;
@@ -142,9 +142,9 @@ void RunL0C2GMBatchNoQuant(uint32_t expectedDstStride, bool nz2ndEn, bool nz2dnE
     __gm__ float dst[kDstBatch * kMatrixSize] = {0};
 
     auto srcTensor = MakeTensorAt<Location::L0C>(
-        src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kSrcBatch, kM, kN));
+        src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kSrcBatch, kM, kN));
     auto dstTensor = MakeTensorAt<Location::GM>(
-        dst, MakeFrameLayout<DstLayoutPtn, LayoutTraitDefault<float>>(kDstBatch, kM, kN));
+        dst, make_frame_layout<DstLayoutPtn, LayoutTraitDefault<float>>(kDstBatch, kM, kN));
 
     n_size_global = kN;
     m_size_global = kM;
@@ -163,7 +163,7 @@ void RunL0C2GMBatchNoQuant(uint32_t expectedDstStride, bool nz2ndEn, bool nz2dnE
         MOCKER_CPP(set_channel_para, void(uint64_t)).times(1).will(invoke(SetChannelParaStub));
     }
 
-    auto atom = MakeCopy(CopyL0C2GM{}, CopyL0C2GMTraitDefault{});
+    auto atom = make_copy(CopyL0C2GM{}, CopyL0C2GMTraitDefault{});
     atom.Call(dstTensor, srcTensor);
 
     GlobalMockObject::verify();
@@ -185,9 +185,9 @@ void RunL0C2GMBatchNZ2NZNoQuant()
     __gm__ float dst[kDstBatch * kMatrixSize] = {0};
 
     auto srcTensor = MakeTensorAt<Location::L0C>(
-        src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kSrcBatch, kM, kN));
+        src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kSrcBatch, kM, kN));
     auto dstTensor = MakeTensorAt<Location::GM>(
-        dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kDstBatch, kM, kN));
+        dst, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kDstBatch, kM, kN));
 
     n_size_global = kSrcBatch * kN;
     m_size_global = kM;
@@ -201,7 +201,7 @@ void RunL0C2GMBatchNZ2NZNoQuant()
 
     MOCKER(set_loop3_para, void(uint64_t)).times(1).will(invoke(SetLoop3ParaStub));
 
-    auto atom = MakeCopy(CopyL0C2GM{}, CopyL0C2GMTraitDefault{});
+    auto atom = make_copy(CopyL0C2GM{}, CopyL0C2GMTraitDefault{});
     atom.Call(dstTensor, srcTensor);
 
     GlobalMockObject::verify();
@@ -218,8 +218,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2ND)
     __cc__ float src[m * n] = {0};
     __gm__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto gmTensor = MakeTensorAt<Location::GM>(dst, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(dst, make_frame_layout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
@@ -236,8 +236,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NDLayout)
     __cc__ float src[m * n] = {0};
     __gm__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto gmTensor = MakeTensorAt<Location::GM>(dst, MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(dst, make_frame_layout<NDLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
@@ -254,8 +254,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2DN)
     __cc__ float src[m * n] = {0};
     __gm__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto gmTensor = MakeTensorAt<Location::GM>(dst, MakeFrameLayout<DNExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(dst, make_frame_layout<DNExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
@@ -272,8 +272,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2DNLayout)
     __cc__ float src[m * n] = {0};
     __gm__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto gmTensor = MakeTensorAt<Location::GM>(dst, MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(dst, make_frame_layout<DNLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
@@ -290,8 +290,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NZNoChannelSplit)
     __cc__ float src[m * n] = {0};
     __gm__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto gmTensor = MakeTensorAt<Location::GM>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(dst, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
@@ -309,8 +309,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NZWithChannelSplit)
     __cc__ float src[m * n] = {0};
     __gm__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
-    auto gmTensor = MakeTensorAt<Location::GM>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(dst, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitCustom>(gmTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitCustom>(gmTensor, l0cTensor, FixpipeParams{});
@@ -360,9 +360,9 @@ public:
         l0cAddr = reinterpret_cast<__cc__ L0cT*>(0);
         constexpr uint32_t base = 0;
         quant_pre_global = static_cast<uint64_t>(QUANT_MODE);
-        auto l0cIterator = MakeMemPtr<Location::L0C>(l0cAddr);
-        auto l0cMatrixLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<L0cT, _16>>(mLength_, nLength_);
-        auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);
+        auto l0cIterator = make_mem_ptr<Location::L0C>(l0cAddr);
+        auto l0cMatrixLayout = make_frame_layout<NZLayoutPtn, LayoutTraitDefault<L0cT, _16>>(mLength_, nLength_);
+        auto l0cTensor = make_tensor(l0cIterator, l0cMatrixLayout);
         if constexpr (C_TYPE::format == CubeFormat::ND) {
             if constexpr (HAS_COORD) {
                 n_size_global = n - base;
@@ -406,34 +406,34 @@ public:
 
         if constexpr (QUANT_MODE == QuantMode_t::NoQuant || QUANT_MODE == QuantMode_t::F322F16) {
             if constexpr (HAS_COORD) {
-                auto gmTensorTile = Slice(gmTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
+                auto gmTensorTile = slice(gmTensor, make_coord(base, base), make_shape(m - base, n - base));
                 gm_addr_global = gmTensorTile.Data().Get();
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor);
+                copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor);
             } else {
                 gm_addr_global = gmC_;
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor);
+                copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor);
             }
         } else if constexpr (IS_TENSOR) {
-            auto qIterator = MakeMemPtr<Location::L1>(qAddr);
-            auto qMatrixLayout = MakeFrameLayout<NDExtLayoutPtn>(1, nLength_);
-            auto qTensor = MakeTensor(qIterator, qMatrixLayout);
+            auto qIterator = make_mem_ptr<Location::L1>(qAddr);
+            auto qMatrixLayout = make_frame_layout<NDExtLayoutPtn>(1, nLength_);
+            auto qTensor = make_tensor(qIterator, qMatrixLayout);
             if constexpr (HAS_COORD) {
-                auto gmTensorTile = Slice(gmTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
+                auto gmTensorTile = slice(gmTensor, make_coord(base, base), make_shape(m - base, n - base));
                 gm_addr_global = gmTensorTile.Data().Get();
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, qTensor);
+                copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, qTensor);
             } else {
                 gm_addr_global = gmC_;
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, qTensor);
+                copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, qTensor);
             }
         } else {
             uint64_t quant = 1;
             if constexpr (HAS_COORD) {
-                auto gmTensorTile = Slice(gmTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
+                auto gmTensorTile = slice(gmTensor, make_coord(base, base), make_shape(m - base, n - base));
                 gm_addr_global = gmTensorTile.Data().Get();
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, quant);
+                copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, quant);
             } else {
                 gm_addr_global = gmC_;
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, quant);
+                copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, quant);
             }
         }
     }
@@ -449,20 +449,20 @@ private:
 
     __aicore__ inline constexpr auto MakeGMTensor()
     {
-        auto gmIterator = MakeMemPtr<Location::GM>(gmC_);
+        auto gmIterator = make_mem_ptr<Location::GM>(gmC_);
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
             using CastT = std::conditional_t<sizeof(DstT) == 4, half, DstT>;
-            auto gmMatrixLayout = MakeFrameLayout<typename C_TYPE::LayoutPtn, LayoutTraitDefault<CastT>>(mLength_,
+            auto gmMatrixLayout = make_frame_layout<typename C_TYPE::LayoutPtn, LayoutTraitDefault<CastT>>(mLength_,
                                                                                                          nLength_);
-            auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
+            auto gmTensor = make_tensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         } else if constexpr (C_TYPE::format == CubeFormat::DN) {
-            auto gmMatrixLayout = MakeFrameLayout<typename C_TYPE::LayoutPtn>(mLength_, nLength_);
-            auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
+            auto gmMatrixLayout = make_frame_layout<typename C_TYPE::LayoutPtn>(mLength_, nLength_);
+            auto gmTensor = make_tensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         } else {
-            auto gmMatrixLayout = MakeFrameLayout<typename C_TYPE::LayoutPtn>(mLength_, nLength_);
-            auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
+            auto gmMatrixLayout = make_frame_layout<typename C_TYPE::LayoutPtn>(mLength_, nLength_);
+            auto gmTensor = make_tensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         }
     }
@@ -560,9 +560,9 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NC1HWC0)
     __gm__ float dst[m * n] = {0};
 
     auto l0cTensor =
-        MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+        MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
     auto gmTensor = MakeTensorAt<Location::GM>(
-        dst, MakeFrameLayout<NC1HWC0LayoutPtn>(
+        dst, make_frame_layout<NC1HWC0LayoutPtn>(
                  1, static_cast<int>(C1), static_cast<int>(H), static_cast<int>(W), static_cast<int>(C0)));
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
@@ -585,9 +585,9 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NHWC)
     __gm__ float dst[m * n] = {0};
 
     auto l0cTensor =
-        MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+        MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
     auto gmTensor = MakeTensorAt<Location::GM>(
-        dst, MakeFrameLayout<NHWCLayoutPtn, LayoutTraitDefault<float>>(
+        dst, make_frame_layout<NHWCLayoutPtn, LayoutTraitDefault<float>>(
                  1, static_cast<int>(H), static_cast<int>(W), static_cast<int>(C)));
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
@@ -611,9 +611,9 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NCHW)
     __gm__ float dst[m * n] = {0};
 
     auto l0cTensor =
-        MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+        MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
     auto gmTensor = MakeTensorAt<Location::GM>(
-        dst, MakeFrameLayout<NCHWLayoutPtn, LayoutTraitDefault<float>>(
+        dst, make_frame_layout<NCHWLayoutPtn, LayoutTraitDefault<float>>(
                  1, static_cast<int>(C), static_cast<int>(H), static_cast<int>(W)));
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);

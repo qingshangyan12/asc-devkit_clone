@@ -33,16 +33,16 @@ protected:
         uint8_t c2Buf[256 * 256 * sizeof(DST_TYPE)] = {0};                                                         \
                                                                                                                     \
         auto a2Addr = reinterpret_cast<__ca__ SRC_TYPE*>(a2Buf);                                                   \
-        auto l0aTensor = MakeTensor(MakeMemPtr<Location::L0A>(a2Addr),                                             \
-                                    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(M, K));            \
+        auto l0aTensor = make_tensor(make_mem_ptr<Location::L0A>(a2Addr),                                             \
+                                    make_frame_layout<NZLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(M, K));            \
                                                                                                                     \
         auto b2Addr = reinterpret_cast<__cb__ SRC_TYPE*>(b2Buf);                                                   \
-        auto l0bTensor = MakeTensor(MakeMemPtr<Location::L0B>(b2Addr),                                             \
-                                    MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(K, N));            \
+        auto l0bTensor = make_tensor(make_mem_ptr<Location::L0B>(b2Addr),                                             \
+                                    make_frame_layout<ZNLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(K, N));            \
                                                                                                                     \
         auto c2Addr = reinterpret_cast<__cc__ DST_TYPE*>(c2Buf);                                                   \
-        auto l0cTensor = MakeTensor(MakeMemPtr<Location::L0C>(c2Addr),                                             \
-                                    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(M, N));                    \
+        auto l0cTensor = make_tensor(make_mem_ptr<Location::L0C>(c2Addr),                                             \
+                                    make_frame_layout<NZLayoutPtn, LayoutTraitDefault<>>(M, N));                    \
                                                                                                                     \
         MmadParams para;                                                                                            \
         para.m = M;                                                                                                 \
@@ -51,10 +51,10 @@ protected:
         para.unitFlag = 0;                                                                                          \
         para.cmatrixInitVal = true;                                                                                 \
                                                                                                                     \
-        auto mmadAtom = MakeMmad(MmadOperation{}, MmadTraitDefault{}).with(para);                                 \
-        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor);                                                          \
-        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor);                                                          \
-        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor);                                                          \
+        auto mmadAtom = make_mmad(MmadOperation{}, MmadTraitDefault{}).with(para);                                 \
+        mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor);                                                          \
+        mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor);                                                          \
+        mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor);                                                          \
         EXPECT_EQ(c2Addr[0], static_cast<DST_TYPE>(0));                                                            \
     }
 

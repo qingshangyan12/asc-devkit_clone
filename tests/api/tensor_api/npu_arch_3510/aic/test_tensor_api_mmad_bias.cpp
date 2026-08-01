@@ -35,20 +35,20 @@ using namespace AscendC::Te;
         uint8_t biasBuf[256 * 256 * sizeof(BIAS_TYPE)] = {0};                                                     \
                                                                                                                    \
         auto a2Addr = reinterpret_cast<__ca__ SRC_TYPE*>(a2Buf);                                                  \
-        auto l0aTensor = MakeTensor(MakeMemPtr<Location::L0A>(a2Addr),                                            \
-                                    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(M, K));           \
+        auto l0aTensor = make_tensor(make_mem_ptr<Location::L0A>(a2Addr),                                            \
+                                    make_frame_layout<NZLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(M, K));           \
                                                                                                                    \
         auto b2Addr = reinterpret_cast<__cb__ SRC_TYPE*>(b2Buf);                                                  \
-        auto l0bTensor = MakeTensor(MakeMemPtr<Location::L0B>(b2Addr),                                            \
-                                    MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(K, N));           \
+        auto l0bTensor = make_tensor(make_mem_ptr<Location::L0B>(b2Addr),                                            \
+                                    make_frame_layout<ZNLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(K, N));           \
                                                                                                                    \
         auto c2Addr = reinterpret_cast<__cc__ DST_TYPE*>(c2Buf);                                                  \
-        auto l0cTensor = MakeTensor(MakeMemPtr<Location::L0C>(c2Addr),                                            \
-                                    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(M, N));                   \
+        auto l0cTensor = make_tensor(make_mem_ptr<Location::L0C>(c2Addr),                                            \
+                                    make_frame_layout<NZLayoutPtn, LayoutTraitDefault<>>(M, N));                   \
                                                                                                                    \
         auto biasAddr = reinterpret_cast<__biasbuf__ BIAS_TYPE*>(biasBuf);                                        \
-        auto biasTensor = MakeTensor(MakeMemPtr<Location::BIAS>(biasAddr),                                        \
-                                     MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<BIAS_TYPE>>(M, N));         \
+        auto biasTensor = make_tensor(make_mem_ptr<Location::BIAS>(biasAddr),                                        \
+                                     make_frame_layout<NDLayoutPtn, LayoutTraitDefault<BIAS_TYPE>>(M, N));         \
                                                                                                                    \
         MmadParams para;                                                                                           \
         para.m = M;                                                                                                \
@@ -57,10 +57,10 @@ using namespace AscendC::Te;
         para.unitFlag = 0;                                                                                         \
         para.cmatrixInitVal = false;                                                                              \
                                                                                                                    \
-        auto mmadAtom = MakeMmad(MmadOperation{}, MmadTraitDefault{}).with(para);                                 \
-        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
-        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
-        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
+        auto mmadAtom = make_mmad(MmadOperation{}, MmadTraitDefault{}).with(para);                                 \
+        mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
+        mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
+        mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
         EXPECT_EQ(c2Addr[0], static_cast<DST_TYPE>(0));                                                           \
     }
 
@@ -73,20 +73,20 @@ using namespace AscendC::Te;
         uint8_t biasBuf[256 * 256 * sizeof(BIAS_TYPE)] = {0};                                                     \
                                                                                                                    \
         auto a2Addr = reinterpret_cast<__ca__ SRC_TYPE*>(a2Buf);                                                  \
-        auto l0aTensor = MakeTensor(MakeMemPtr<Location::L0A>(a2Addr),                                            \
-                                    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(M, K));           \
+        auto l0aTensor = make_tensor(make_mem_ptr<Location::L0A>(a2Addr),                                            \
+                                    make_frame_layout<NZLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(M, K));           \
                                                                                                                    \
         auto b2Addr = reinterpret_cast<__cb__ SRC_TYPE*>(b2Buf);                                                  \
-        auto l0bTensor = MakeTensor(MakeMemPtr<Location::L0B>(b2Addr),                                            \
-                                    MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(K, N));           \
+        auto l0bTensor = make_tensor(make_mem_ptr<Location::L0B>(b2Addr),                                            \
+                                    make_frame_layout<ZNLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(K, N));           \
                                                                                                                    \
         auto c2Addr = reinterpret_cast<__cc__ DST_TYPE*>(c2Buf);                                                  \
-        auto l0cTensor = MakeTensor(MakeMemPtr<Location::L0C>(c2Addr),                                            \
-                                    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(M, N));                   \
+        auto l0cTensor = make_tensor(make_mem_ptr<Location::L0C>(c2Addr),                                            \
+                                    make_frame_layout<NZLayoutPtn, LayoutTraitDefault<>>(M, N));                   \
                                                                                                                    \
         auto biasAddr = reinterpret_cast<__cc__ BIAS_TYPE*>(biasBuf);                                             \
-        auto biasTensor = MakeTensor(MakeMemPtr<Location::L0C>(biasAddr),                                         \
-                                     MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(M, N));                  \
+        auto biasTensor = make_tensor(make_mem_ptr<Location::L0C>(biasAddr),                                         \
+                                     make_frame_layout<NZLayoutPtn, LayoutTraitDefault<>>(M, N));                  \
                                                                                                                    \
         MmadParams para;                                                                                           \
         para.m = M;                                                                                                \
@@ -95,9 +95,9 @@ using namespace AscendC::Te;
         para.unitFlag = 0;                                                                                         \
         para.cmatrixInitVal = false;                                                                              \
                                                                                                                    \
-        auto mmadAtom = MakeMmad(MmadOperation{}, MmadTraitDefault{}).with(para);                                 \
-        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
-        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
+        auto mmadAtom = make_mmad(MmadOperation{}, MmadTraitDefault{}).with(para);                                 \
+        mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
+        mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
         EXPECT_EQ(c2Addr[0], static_cast<DST_TYPE>(0));                                                           \
     }
 

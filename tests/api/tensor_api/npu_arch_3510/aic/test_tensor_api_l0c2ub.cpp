@@ -93,11 +93,11 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}, Trait{});
+    auto atom = make_copy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
     CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename Param, typename DstTensor, typename SrcTensor>
@@ -105,14 +105,14 @@ void RunCopyWithParamPaths(const DstTensor& dst, const SrcTensor& src, const Par
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}).with(param);
+    auto atom = make_copy(CopyOp{}).with(param);
     atom.Call(dst, src);
 
     auto copiedAtom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param);
     copiedAtom.Call(dst, src);
 
-    Copy(copiedAtom, dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
+    copy(copiedAtom, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
 }
 
 uint64_t gExpectedLoop3Para = 0;
@@ -146,9 +146,9 @@ void RunL0C2UBBatchNoQuant(uint32_t expectedDstStride, bool nz2ndEn, bool nz2dnE
     __ubuf__ float dst[kDstBatch * kMatrixSize] = {0};
 
     auto srcTensor = MakeTensorAt<Location::L0C>(
-        src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kSrcBatch, kM, kN));
+        src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kSrcBatch, kM, kN));
     auto dstTensor = MakeTensorAt<Location::UB>(
-        dst, MakeFrameLayout<DstLayoutPtn, LayoutTraitDefault<float>>(kDstBatch, kM, kN));
+        dst, make_frame_layout<DstLayoutPtn, LayoutTraitDefault<float>>(kDstBatch, kM, kN));
 
     n_size_global = kN;
     m_size_global = kM;
@@ -168,7 +168,7 @@ void RunL0C2UBBatchNoQuant(uint32_t expectedDstStride, bool nz2ndEn, bool nz2dnE
         MOCKER_CPP(set_channel_para, void(uint64_t)).times(1).will(invoke(SetChannelParaStub));
     }
 
-    auto atom = MakeCopy(CopyL0C2UB{}, CopyL0C2UBTraitDefault{});
+    auto atom = make_copy(CopyL0C2UB{}, CopyL0C2UBTraitDefault{});
     atom.Call(dstTensor, srcTensor);
 
     GlobalMockObject::verify();
@@ -191,9 +191,9 @@ void RunL0C2UBBatchNZ2NZNoQuant()
     __ubuf__ float dst[kDstBatch * kMatrixSize] = {0};
 
     auto srcTensor = MakeTensorAt<Location::L0C>(
-        src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kSrcBatch, kM, kN));
+        src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kSrcBatch, kM, kN));
     auto dstTensor = MakeTensorAt<Location::UB>(
-        dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kDstBatch, kM, kN));
+        dst, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kDstBatch, kM, kN));
 
     n_size_global = kSrcBatch * kN;
     m_size_global = kM;
@@ -208,7 +208,7 @@ void RunL0C2UBBatchNZ2NZNoQuant()
 
     MOCKER(set_loop3_para, void(uint64_t)).times(1).will(invoke(SetLoop3ParaStub));
 
-    auto atom = MakeCopy(CopyL0C2UB{}, CopyL0C2UBTraitDefault{});
+    auto atom = make_copy(CopyL0C2UB{}, CopyL0C2UBTraitDefault{});
     atom.Call(dstTensor, srcTensor);
 
     GlobalMockObject::verify();
@@ -226,8 +226,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2ND)
     __cc__ float src[m * n] = {0};
     __ubuf__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor, FixpipeParams{});
@@ -244,8 +244,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2NDLayout)
     __cc__ float src[m * n] = {0};
     __ubuf__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<NDLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor, FixpipeParams{});
@@ -263,8 +263,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2DN)
     __cc__ float src[m * n] = {0};
     __ubuf__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<DNExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<DNExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor, FixpipeParams{});
@@ -281,8 +281,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2DNLayout)
     __cc__ float src[m * n] = {0};
     __ubuf__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<DNLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor, FixpipeParams{});
@@ -299,8 +299,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2NZNoChannelSplit)
     __cc__ float src[m * n] = {0};
     __ubuf__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
 
     RunCopyCallPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor, FixpipeParams{});
@@ -318,8 +318,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2NZWithChannelSplit)
     __cc__ float src[m * n] = {0};
     __ubuf__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL0C2UB, CopyL0C2UBTraitCustom>(ubTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2UB, CopyL0C2UBTraitCustom>(ubTensor, l0cTensor, FixpipeParams{});
@@ -369,35 +369,35 @@ public:
         l0cAddr_ = reinterpret_cast<__cc__ L0cT*>(0);
         constexpr uint32_t base = 0;
 
-        auto l0cIterator = MakeMemPtr<Location::L0C>(l0cAddr_);
-        auto l0cMatrixLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<L0cT, _16>>(mLength_, nLength_);
-        auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);
+        auto l0cIterator = make_mem_ptr<Location::L0C>(l0cAddr_);
+        auto l0cMatrixLayout = make_frame_layout<NZLayoutPtn, LayoutTraitDefault<L0cT, _16>>(mLength_, nLength_);
+        auto l0cTensor = make_tensor(l0cIterator, l0cMatrixLayout);
         auto ubTensor = MakeUBTensor();
 
         if constexpr (QUANT_MODE == QuantMode_t::NoQuant || QUANT_MODE == QuantMode_t::F322F16) {
             if constexpr (HAS_COORD) {
-                auto ubTensorTile = Slice(ubTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor);
+                auto ubTensorTile = slice(ubTensor, make_coord(base, base), make_shape(m - base, n - base));
+                copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor);
             } else {
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor);
+                copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor);
             }
         } else if constexpr (IS_TENSOR) {
-            auto qIterator = MakeMemPtr<Location::L1>(qAddr_);
-            auto qMatrixLayout = MakeFrameLayout<NDExtLayoutPtn>(1, nLength_);
-            auto qTensor = MakeTensor(qIterator, qMatrixLayout);
+            auto qIterator = make_mem_ptr<Location::L1>(qAddr_);
+            auto qMatrixLayout = make_frame_layout<NDExtLayoutPtn>(1, nLength_);
+            auto qTensor = make_tensor(qIterator, qMatrixLayout);
             if constexpr (HAS_COORD) {
-                auto ubTensorTile = Slice(ubTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, qTensor);
+                auto ubTensorTile = slice(ubTensor, make_coord(base, base), make_shape(m - base, n - base));
+                copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, qTensor);
             } else {
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, qTensor);
+                copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, qTensor);
             }
         } else {
             uint64_t quant = 1;
             if constexpr (HAS_COORD) {
-                auto ubTensorTile = Slice(ubTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, quant);
+                auto ubTensorTile = slice(ubTensor, make_coord(base, base), make_shape(m - base, n - base));
+                copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, quant);
             } else {
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, quant);
+                copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, quant);
             }
         }
     }
@@ -412,15 +412,15 @@ private:
 
     __aicore__ inline constexpr auto MakeUBTensor()
     {
-        auto ubIterator = MakeMemPtr<Location::UB>(ubC_);
+        auto ubIterator = make_mem_ptr<Location::UB>(ubC_);
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
             using CastT = std::conditional_t<sizeof(DstT) == 4, half, DstT>;
-            auto ubMatrixLayout = MakeFrameLayout<typename C_TYPE::LayoutPtn, LayoutTraitDefault<CastT>>(mLength_,
+            auto ubMatrixLayout = make_frame_layout<typename C_TYPE::LayoutPtn, LayoutTraitDefault<CastT>>(mLength_,
                                                                                                          nLength_);
-            return MakeTensor(ubIterator, ubMatrixLayout);
+            return make_tensor(ubIterator, ubMatrixLayout);
         } else {
-            auto ubMatrixLayout = MakeFrameLayout<typename C_TYPE::LayoutPtn>(mLength_, nLength_);
-            return MakeTensor(ubIterator, ubMatrixLayout);
+            auto ubMatrixLayout = make_frame_layout<typename C_TYPE::LayoutPtn>(mLength_, nLength_);
+            return make_tensor(ubIterator, ubMatrixLayout);
         }
     }
 };

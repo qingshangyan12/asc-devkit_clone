@@ -23,14 +23,17 @@
 #define IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
 
 #include "impl/tensor_api/tensor/pointer_adaptor_impl.h"
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename PtrPattern, typename Pointer>
-struct HardwareMemPtr : IterAdaptor<Pointer, HardwareMemPtr<PtrPattern, Pointer>> {
-    using IterAdaptor<Pointer, HardwareMemPtr<PtrPattern, Pointer>>::IterAdaptor;
+struct hardware_mem_ptr : iter_adaptor<Pointer, hardware_mem_ptr<PtrPattern, Pointer>> {
+    using iter_adaptor<Pointer, hardware_mem_ptr<PtrPattern, Pointer>>::iter_adaptor;
     using ptrPattern = PtrPattern;
 };
+
+template <typename PtrPattern, typename Pointer>
+using HardwareMemPtr = hardware_mem_ptr<PtrPattern, Pointer>;
 
 template <typename T>
 using GetMemLocation = typename T::iterator::ptrPattern;
@@ -65,12 +68,24 @@ template <typename T>
 struct IsMemPtrIterator<T, void_t<decltype(*Std::declval<T&>())>> : Std::true_type {}; 
 
 template <typename PtrPattern, typename Iterator> 
-__aicore__ inline auto MakeLocationMemPtr(Iterator iter) 
+__aicore__ inline auto make_location_mem_ptr(Iterator iter) 
 { 
     return HardwareMemPtr<PtrPattern, Iterator>{iter}; 
 } 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
+
+
+// PascalCase compatibility wrappers
+namespace asc {
+namespace te {
+template <typename PtrPattern, typename Iterator>
+__aicore__ inline auto MakeLocationMemPtr(Iterator iter)
+{
+    return make_location_mem_ptr<PtrPattern>(iter);
+}
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
 

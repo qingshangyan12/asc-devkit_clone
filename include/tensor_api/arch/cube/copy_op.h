@@ -21,26 +21,86 @@
 #ifndef INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 #define INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyGM2L1;
-struct CopyL12UB;
-struct CopyL12L0B;
-struct CopyL12L0A;
-struct CopyL12L0ScaleA;
-struct CopyL12L0ScaleB;
-struct CopyL12FB;
-struct CopyL12BT;
-struct CopyL0C2GM;
-struct CopyL0C2GMWith;
-struct CopyL0C2UB;
-struct CopyL0C2UBWith;
-struct CopyL0C2L1;
-struct CopyL0C2L1With;
+struct copy_gm_to_l1;
+struct copy_l1_to_ub;
+struct copy_l1_to_l0b;
+struct copy_l1_to_l0a;
+struct copy_l1_to_l0_scale_a;
+struct copy_l1_to_l0_scale_b;
+struct copy_l1_to_fb;
+struct copy_l1_to_bt;
+struct copy_l0c_to_gm;
+struct copy_l0c_to_gm_with;
+struct copy_l0c_to_ub;
+struct copy_l0c_to_ub_with;
+struct copy_l0c_to_l1;
+struct copy_l0c_to_l1_with;
 
-} // namespace Te
-} // namespace AscendC
+struct copy_gm_to_l1_trait;
+struct copy_gm_to_l1_trait_default;
+struct copy_l1_to_ub_trait;
+struct copy_l1_to_ub_trait_default;
+struct copy_l1_to_l0a_trait;
+struct copy_l1_to_l0a_trait_default;
+struct copy_l1_to_l0b_trait;
+struct copy_l1_to_l0b_trait_default;
+struct copy_l1_to_l0_scale_a_trait;
+struct copy_l1_to_l0_scale_a_trait_default;
+struct copy_l1_to_l0_scale_b_trait;
+struct copy_l1_to_l0_scale_b_trait_default;
+struct copy_l1_to_fb_trait;
+struct copy_l1_to_fb_trait_default;
+struct copy_l1_to_bt_trait;
+struct copy_l1_to_bt_trait_default;
+struct copy_l0c_to_gm_trait;
+struct copy_l0c_to_gm_trait_default;
+struct copy_l0c_to_ub_trait;
+struct copy_l0c_to_ub_trait_default;
+struct copy_l0c_to_l1_trait;
+struct copy_l0c_to_l1_trait_default;
+
+using CopyGM2L1 = copy_gm_to_l1;
+using CopyL12UB = copy_l1_to_ub;
+using CopyL12L0B = copy_l1_to_l0b;
+using CopyL12L0A = copy_l1_to_l0a;
+using CopyL12L0ScaleA = copy_l1_to_l0_scale_a;
+using CopyL12L0ScaleB = copy_l1_to_l0_scale_b;
+using CopyL12FB = copy_l1_to_fb;
+using CopyL12BT = copy_l1_to_bt;
+using CopyL0C2GM = copy_l0c_to_gm;
+using CopyL0C2GMWith = copy_l0c_to_gm_with;
+using CopyL0C2UB = copy_l0c_to_ub;
+using CopyL0C2UBWith = copy_l0c_to_ub_with;
+using CopyL0C2L1 = copy_l0c_to_l1;
+using CopyL0C2L1With = copy_l0c_to_l1_with;
+using CopyGM2L1Trait = copy_gm_to_l1_trait;
+using CopyGM2L1TraitDefault = copy_gm_to_l1_trait_default;
+using CopyL12UBTrait = copy_l1_to_ub_trait;
+using CopyL12UBTraitDefault = copy_l1_to_ub_trait_default;
+using CopyL12L0ATrait = copy_l1_to_l0a_trait;
+using CopyL12L0ATraitDefault = copy_l1_to_l0a_trait_default;
+using CopyL12L0BTrait = copy_l1_to_l0b_trait;
+using CopyL12L0BTraitDefault = copy_l1_to_l0b_trait_default;
+using CopyL12L0ScaleATrait = copy_l1_to_l0_scale_a_trait;
+using CopyL12L0ScaleATraitDefault = copy_l1_to_l0_scale_a_trait_default;
+using CopyL12L0ScaleBTrait = copy_l1_to_l0_scale_b_trait;
+using CopyL12L0ScaleBTraitDefault = copy_l1_to_l0_scale_b_trait_default;
+using CopyL12FBTrait = copy_l1_to_fb_trait;
+using CopyL12FBTraitDefault = copy_l1_to_fb_trait_default;
+using CopyL12BTTrait = copy_l1_to_bt_trait;
+using CopyL12BTTraitDefault = copy_l1_to_bt_trait_default;
+using CopyL0C2GMTrait = copy_l0c_to_gm_trait;
+using CopyL0C2GMTraitDefault = copy_l0c_to_gm_trait_default;
+using CopyL0C2UBTrait = copy_l0c_to_ub_trait;
+using CopyL0C2UBTraitDefault = copy_l0c_to_ub_trait_default;
+using CopyL0C2L1Trait = copy_l0c_to_l1_trait;
+using CopyL0C2L1TraitDefault = copy_l0c_to_l1_trait_default;
+
+} // namespace te
+} // namespace asc
 
 #endif // INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 

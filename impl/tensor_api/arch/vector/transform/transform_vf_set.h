@@ -30,8 +30,8 @@
 #include "impl/tensor_api/arch/vector/unary/unary_vf.h"
 #include "impl/tensor_api/utils/map_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template<typename CalcFunc, typename TraitType>
 struct Transform2VFSet {

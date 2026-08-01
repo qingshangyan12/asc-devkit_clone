@@ -37,14 +37,14 @@ __aicore__ inline void TestTransformAxpy(__gm__ T* z, __gm__ T* x, S value, __ub
     constexpr uint64_t srcStride = 0;
     constexpr uint32_t dstStride = 0;
 
-    auto gmPtrX = MakeMemPtr<Location::GM>(x);
-    auto gmPtrZ = MakeMemPtr<Location::GM>(z);
+    auto gmPtrX = make_mem_ptr<Location::GM>(x);
+    auto gmPtrZ = make_mem_ptr<Location::GM>(z);
 
-    auto xGm = MakeTensor(gmPtrX, MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto zGm = MakeTensor(gmPtrZ, MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto xGm = make_tensor(gmPtrX, make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto zGm = make_tensor(gmPtrZ, make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
 
-    auto xLocal = MakeTensor(MakeMemPtr(xUB), MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
-    auto zLocal = MakeTensor(MakeMemPtr(zUB), MakeFrameLayout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto xLocal = make_tensor(make_mem_ptr(xUB), make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
+    auto zLocal = make_tensor(make_mem_ptr(zUB), make_frame_layout<NDLayoutPtn>(_1{}, AscendC::Std::Int<TILE_LENGTH>{}));
 
     asc_copy_gm2ub_align(
         xLocal.Data().Get(), xGm.Data().Get(), BLK_NUM, burstLength, 0, 0, true, loadCacheMode, srcStride, dstStride);
@@ -52,7 +52,7 @@ __aicore__ inline void TestTransformAxpy(__gm__ T* z, __gm__ T* x, S value, __ub
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-    Transform<Func>(zLocal, xLocal, value);
+    transform<Func>(zLocal, xLocal, value);
 
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);

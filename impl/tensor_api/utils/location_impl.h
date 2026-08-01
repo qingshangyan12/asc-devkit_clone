@@ -24,8 +24,8 @@
 
 #include "impl/tensor_api/utils/map_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 #define TENSOR_API_QUAL_LOC_PAIRS(Q) \
     Q(_gm__     , GM    ) \
@@ -94,8 +94,8 @@ using GetAttributeLocation = typename LocationTypeCombo::locationType2Location::
 template <typename T>
 using GetAttributeElementType = typename LocationTypeCombo::locationType2Type::template Get<T>;
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_UTILS_LOCATION_IMPL_H
 

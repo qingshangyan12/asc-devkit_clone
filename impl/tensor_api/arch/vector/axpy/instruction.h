@@ -26,14 +26,14 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 namespace Inst {
 
 class Axpy {
 public:
     template <typename T, typename U, typename V>
-    __simd_callee__ inline static void Run(T& dst, U src, V value, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, U src, V value, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_axpy(dst, src, value, mask);
         }

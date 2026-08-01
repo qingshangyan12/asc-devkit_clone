@@ -25,7 +25,7 @@ TEST_F(Tensor_Api_Layout_Struct, TestMakeLayoutFromShapeAndStride)
 {
     using namespace AscendC::Te;
 
-    auto layout = MakeLayout(MakeShape(2, 3, 4), MakeStride(12, 4, 1));
+    auto layout = make_layout(make_shape(2, 3, 4), make_stride(12, 4, 1));
 
     EXPECT_EQ(AscendC::Std::get<0>(layout.Shape()), 2);
     EXPECT_EQ(AscendC::Std::get<1>(layout.Shape()), 3);
@@ -40,7 +40,7 @@ TEST_F(Tensor_Api_Layout_Struct, TestMakeLayoutFromFlatShape)
 {
     using namespace AscendC::Te;
 
-    auto layout = MakeLayout(MakeShape(2, 3, 4));
+    auto layout = make_layout(make_shape(2, 3, 4));
 
     EXPECT_EQ(AscendC::Std::get<0>(layout.Stride()), 12);
     EXPECT_EQ(AscendC::Std::get<1>(layout.Stride()), 4);
@@ -52,8 +52,8 @@ TEST_F(Tensor_Api_Layout_Struct, TestMakeLayoutFromNestedShape)
 {
     using namespace AscendC::Te;
 
-    auto shape = MakeShape(MakeShape(2, 3), MakeShape(4, 5));
-    auto layout = MakeLayout(shape);
+    auto shape = make_shape(make_shape(2, 3), make_shape(4, 5));
+    auto layout = make_layout(shape);
 
     auto rowStride = AscendC::Std::get<0>(layout.Stride());
     auto colStride = AscendC::Std::get<1>(layout.Stride());
@@ -68,99 +68,99 @@ TEST_F(Tensor_Api_Layout_Struct, TestGetLayoutPatternFromMakeLayoutFractal)
 {
     using namespace AscendC::Te;
 
-    auto nzLayout = MakeLayout(
-        MakeShape(MakeShape(_16{}, _2{}),
-            MakeShape(_16{}, _3{})),
-        MakeStride(MakeStride(_16{}, _256{}),
-            MakeStride(_1{}, _512{})));
-    auto znLayout = MakeLayout(
-        MakeShape(MakeShape(_16{}, _2{}),
-            MakeShape(_16{}, _3{})),
-        MakeStride(MakeStride(_1{}, _512{}),
-            MakeStride(_16{}, _256{})));
-    auto zzLayout = MakeLayout(
-        MakeShape(MakeShape(_16{}, _2{}),
-            MakeShape(_16{}, _3{})),
-        MakeStride(MakeStride(_16{}, _512{}),
-            MakeStride(_1{}, _256{})));
-    auto nnLayout = MakeLayout(
-        MakeShape(MakeShape(_2{}, _4{}),
-            MakeShape(_16{}, _3{})),
-        MakeStride(MakeStride(_1{}, _32{}),
-            MakeStride(_2{}, _128{})));
-    auto ndExtLayout = MakeLayout(
-        MakeShape(MakeShape(_1{}, _4{}),
-            MakeShape(_1{}, _5{})),
-        MakeStride(MakeStride(_0{}, _5{}),
-            MakeStride(_0{}, _1{})));
-    auto dnExtLayout = MakeLayout(
-        MakeShape(MakeShape(_1{}, _4{}),
-            MakeShape(_1{}, _5{})),
-        MakeStride(MakeStride(_0{}, _1{}),
-            MakeStride(_0{}, _4{})));
-    auto ndLayout = MakeLayout(MakeShape(_4{}, _5{}),
-        MakeStride(_5{}, _1{}));
-    auto dnLayout = MakeLayout(MakeShape(_4{}, _5{}),
-        MakeStride(_1{}, _4{}));
-    auto batchedNzLayout = MakeLayout(
-        MakeShape(_2{}, MakeShape(MakeShape(_16{}, _2{}),
-            MakeShape(_16{}, _3{}))),
-        MakeStride(AscendC::Std::Int<1536>{}, MakeStride(MakeStride(_16{}, _256{}),
-            MakeStride(_1{}, _512{}))));
-    auto batchedZnLayout = MakeLayout(
-        MakeShape(_2{}, MakeShape(MakeShape(_16{}, _2{}),
-            MakeShape(_16{}, _3{}))),
-        MakeStride(AscendC::Std::Int<1536>{}, MakeStride(MakeStride(_1{}, _512{}),
-            MakeStride(_16{}, _256{}))));
-    auto batchedZzLayout = MakeLayout(
-        MakeShape(_2{}, MakeShape(MakeShape(_16{}, _2{}),
-            MakeShape(_16{}, _3{}))),
-        MakeStride(AscendC::Std::Int<1536>{}, MakeStride(MakeStride(_16{}, _512{}),
-            MakeStride(_1{}, _256{}))));
-    auto batchedNnLayout = MakeLayout(
-        MakeShape(_2{}, MakeShape(MakeShape(_2{}, _4{}),
-            MakeShape(_16{}, _3{}))),
-        MakeStride(AscendC::Std::Int<384>{}, MakeStride(MakeStride(_1{}, _32{}),
-            MakeStride(_2{}, _128{}))));
-    auto batchedNdExtLayout = MakeLayout(
-        MakeShape(_2{}, MakeShape(MakeShape(_1{}, _4{}),
-            MakeShape(_1{}, _5{}))),
-        MakeStride(AscendC::Std::Int<20>{}, MakeStride(MakeStride(_0{}, _5{}),
-            MakeStride(_0{}, _1{}))));
-    auto batchedDnExtLayout = MakeLayout(
-        MakeShape(_2{}, MakeShape(MakeShape(_1{}, _4{}),
-            MakeShape(_1{}, _5{}))),
-        MakeStride(AscendC::Std::Int<20>{}, MakeStride(MakeStride(_0{}, _1{}),
-            MakeStride(_0{}, _4{}))));
-    auto batchedNdLayout = MakeLayout(
-        MakeShape(_2{}, MakeShape(_4{}, _5{})),
-        MakeStride(AscendC::Std::Int<20>{}, MakeStride(_5{}, _1{})));
-    auto batchedDnLayout = MakeLayout(
-        MakeShape(_2{}, MakeShape(_4{}, _5{})),
-        MakeStride(AscendC::Std::Int<20>{}, MakeStride(_1{}, _4{})));
-    auto batchNdUnContinuousLayout = MakeLayout(
-        MakeShape(_3{}, MakeShape(_4{}, _5{})),
-        MakeStride(_5{}, MakeStride(AscendC::Std::Int<15>{}, _1{})));
-    auto batchDnUnContinuousLayout = MakeLayout(
-        MakeShape(_3{}, MakeShape(_4{}, _5{})),
-        MakeStride(_4{}, MakeStride(_1{}, AscendC::Std::Int<12>{})));
-    auto invalidFlatLayout = MakeLayout(MakeShape(_4{}, _5{}),
-        MakeStride(_4{}, _5{}));
-    auto invalidFractalLayout = MakeLayout(
-        MakeShape(MakeShape(_4{}, _5{}),
-            MakeShape(_8{}, _9{})),
-        MakeStride(MakeStride(_2{}, _3{}),
-            MakeStride(_4{}, _5{})));
-    auto invalidScaleADNLayout = MakeLayout(
-        MakeShape(MakeShape(_1{}, _4{}),
-            MakeShape(_1{}, _5{})),
-        MakeStride(MakeStride(_0{}, _2{}),
-            MakeStride(_1{}, _8{})));
-    auto invalidBatchedFractalLayout = MakeLayout(
-        MakeShape(_2{}, MakeShape(MakeShape(_4{}, _5{}),
-            MakeShape(_8{}, _9{}))),
-        MakeStride(AscendC::Std::Int<180>{}, MakeStride(MakeStride(_2{}, _3{}),
-            MakeStride(_4{}, _5{}))));
+    auto nzLayout = make_layout(
+        make_shape(make_shape(_16{}, _2{}),
+            make_shape(_16{}, _3{})),
+        make_stride(make_stride(_16{}, _256{}),
+            make_stride(_1{}, _512{})));
+    auto znLayout = make_layout(
+        make_shape(make_shape(_16{}, _2{}),
+            make_shape(_16{}, _3{})),
+        make_stride(make_stride(_1{}, _512{}),
+            make_stride(_16{}, _256{})));
+    auto zzLayout = make_layout(
+        make_shape(make_shape(_16{}, _2{}),
+            make_shape(_16{}, _3{})),
+        make_stride(make_stride(_16{}, _512{}),
+            make_stride(_1{}, _256{})));
+    auto nnLayout = make_layout(
+        make_shape(make_shape(_2{}, _4{}),
+            make_shape(_16{}, _3{})),
+        make_stride(make_stride(_1{}, _32{}),
+            make_stride(_2{}, _128{})));
+    auto ndExtLayout = make_layout(
+        make_shape(make_shape(_1{}, _4{}),
+            make_shape(_1{}, _5{})),
+        make_stride(make_stride(_0{}, _5{}),
+            make_stride(_0{}, _1{})));
+    auto dnExtLayout = make_layout(
+        make_shape(make_shape(_1{}, _4{}),
+            make_shape(_1{}, _5{})),
+        make_stride(make_stride(_0{}, _1{}),
+            make_stride(_0{}, _4{})));
+    auto ndLayout = make_layout(make_shape(_4{}, _5{}),
+        make_stride(_5{}, _1{}));
+    auto dnLayout = make_layout(make_shape(_4{}, _5{}),
+        make_stride(_1{}, _4{}));
+    auto batchedNzLayout = make_layout(
+        make_shape(_2{}, make_shape(make_shape(_16{}, _2{}),
+            make_shape(_16{}, _3{}))),
+        make_stride(AscendC::Std::Int<1536>{}, make_stride(make_stride(_16{}, _256{}),
+            make_stride(_1{}, _512{}))));
+    auto batchedZnLayout = make_layout(
+        make_shape(_2{}, make_shape(make_shape(_16{}, _2{}),
+            make_shape(_16{}, _3{}))),
+        make_stride(AscendC::Std::Int<1536>{}, make_stride(make_stride(_1{}, _512{}),
+            make_stride(_16{}, _256{}))));
+    auto batchedZzLayout = make_layout(
+        make_shape(_2{}, make_shape(make_shape(_16{}, _2{}),
+            make_shape(_16{}, _3{}))),
+        make_stride(AscendC::Std::Int<1536>{}, make_stride(make_stride(_16{}, _512{}),
+            make_stride(_1{}, _256{}))));
+    auto batchedNnLayout = make_layout(
+        make_shape(_2{}, make_shape(make_shape(_2{}, _4{}),
+            make_shape(_16{}, _3{}))),
+        make_stride(AscendC::Std::Int<384>{}, make_stride(make_stride(_1{}, _32{}),
+            make_stride(_2{}, _128{}))));
+    auto batchedNdExtLayout = make_layout(
+        make_shape(_2{}, make_shape(make_shape(_1{}, _4{}),
+            make_shape(_1{}, _5{}))),
+        make_stride(AscendC::Std::Int<20>{}, make_stride(make_stride(_0{}, _5{}),
+            make_stride(_0{}, _1{}))));
+    auto batchedDnExtLayout = make_layout(
+        make_shape(_2{}, make_shape(make_shape(_1{}, _4{}),
+            make_shape(_1{}, _5{}))),
+        make_stride(AscendC::Std::Int<20>{}, make_stride(make_stride(_0{}, _1{}),
+            make_stride(_0{}, _4{}))));
+    auto batchedNdLayout = make_layout(
+        make_shape(_2{}, make_shape(_4{}, _5{})),
+        make_stride(AscendC::Std::Int<20>{}, make_stride(_5{}, _1{})));
+    auto batchedDnLayout = make_layout(
+        make_shape(_2{}, make_shape(_4{}, _5{})),
+        make_stride(AscendC::Std::Int<20>{}, make_stride(_1{}, _4{})));
+    auto batchNdUnContinuousLayout = make_layout(
+        make_shape(_3{}, make_shape(_4{}, _5{})),
+        make_stride(_5{}, make_stride(AscendC::Std::Int<15>{}, _1{})));
+    auto batchDnUnContinuousLayout = make_layout(
+        make_shape(_3{}, make_shape(_4{}, _5{})),
+        make_stride(_4{}, make_stride(_1{}, AscendC::Std::Int<12>{})));
+    auto invalidFlatLayout = make_layout(make_shape(_4{}, _5{}),
+        make_stride(_4{}, _5{}));
+    auto invalidFractalLayout = make_layout(
+        make_shape(make_shape(_4{}, _5{}),
+            make_shape(_8{}, _9{})),
+        make_stride(make_stride(_2{}, _3{}),
+            make_stride(_4{}, _5{})));
+    auto invalidScaleADNLayout = make_layout(
+        make_shape(make_shape(_1{}, _4{}),
+            make_shape(_1{}, _5{})),
+        make_stride(make_stride(_0{}, _2{}),
+            make_stride(_1{}, _8{})));
+    auto invalidBatchedFractalLayout = make_layout(
+        make_shape(_2{}, make_shape(make_shape(_4{}, _5{}),
+            make_shape(_8{}, _9{}))),
+        make_stride(AscendC::Std::Int<180>{}, make_stride(make_stride(_2{}, _3{}),
+            make_stride(_4{}, _5{}))));
 
     static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(nzLayout)>, NZLayoutPtn>);
     static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(znLayout)>, ZNLayoutPtn>);
@@ -191,9 +191,9 @@ TEST_F(Tensor_Api_Layout_Struct, TestRemoveBatchDimFromThreeDimLayout)
 {
     using namespace AscendC::Te;
 
-    auto layout = MakePatternLayout<NDLayoutPtn, LayoutTraitDefault<>>(
-        MakeShape(2, MakeShape(8, 16)), MakeStride(128, MakeStride(16, 1)));
-    auto noBatchLayout = RemoveBatchDim(layout);
+    auto layout = make_pattern_layout<NDLayoutPtn, LayoutTraitDefault<>>(
+        make_shape(2, make_shape(8, 16)), make_stride(128, make_stride(16, 1)));
+    auto noBatchLayout = remove_batch_dim(layout);
 
     static_assert(decltype(noBatchLayout)::depth == TWO_DIM_DATA);
     static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(noBatchLayout)>, NDLayoutPtn>);
@@ -207,10 +207,10 @@ TEST_F(Tensor_Api_Layout_Struct, TestRemoveBatchDimFromFiveDimLayout)
 {
     using namespace AscendC::Te;
 
-    auto layout = MakePatternLayout<NZLayoutPtn, LayoutTraitDefault<>>(
-        MakeShape(2, MakeShape(MakeShape(16, 2), MakeShape(16, 4))),
-        MakeStride(2048, MakeStride(MakeStride(16, 256), MakeStride(1, 512))));
-    auto noBatchLayout = RemoveBatchDim(layout);
+    auto layout = make_pattern_layout<NZLayoutPtn, LayoutTraitDefault<>>(
+        make_shape(2, make_shape(make_shape(16, 2), make_shape(16, 4))),
+        make_stride(2048, make_stride(make_stride(16, 256), make_stride(1, 512))));
+    auto noBatchLayout = remove_batch_dim(layout);
     auto shape = noBatchLayout.Shape();
     auto stride = noBatchLayout.Stride();
 
@@ -230,10 +230,10 @@ TEST_F(Tensor_Api_Layout_Struct, TestMakeTuple)
 {
     using namespace AscendC::Te;
 
-    auto shape = MakeShape(2, 3, 4);
-    auto stride = MakeStride(12, 4, 1);
-    auto tile = MakeTile(8, 16);
-    auto coord = MakeCoord(1, 2, 3);
+    auto shape = make_shape(2, 3, 4);
+    auto stride = make_stride(12, 4, 1);
+    auto tile = make_tile(8, 16);
+    auto coord = make_coord(1, 2, 3);
 
     EXPECT_EQ(AscendC::Std::get<0>(shape), 2);
     EXPECT_EQ(AscendC::Std::get<1>(shape), 3);
@@ -255,9 +255,9 @@ TEST_F(Tensor_Api_Layout_Struct, TestMakeIntTuple)
 {
     using namespace AscendC::Te;
 
-    auto shape = MakeShape(_4{}, _5{});
-    auto stride = MakeStride(_5{}, _1{});
-    auto coord = MakeCoord(_1{}, _3{});
+    auto shape = make_shape(_4{}, _5{});
+    auto stride = make_stride(_5{}, _1{});
+    auto coord = make_coord(_1{}, _3{});
 
     EXPECT_EQ(AscendC::Std::get<0>(shape).value, 4);
     EXPECT_EQ(AscendC::Std::get<1>(shape).value, 5);

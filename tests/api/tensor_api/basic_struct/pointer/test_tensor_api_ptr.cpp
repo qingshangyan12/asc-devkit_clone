@@ -33,14 +33,14 @@ TEST_F(Tensor_Api_Pointer, TestMakeMemPtr)
     __biasbuf__ float biasData[4] = {0};
     __fbuf__ float fixbufData[4] = {0};
 
-    auto gmPtr = MakeMemPtr<Location::GM>(gmData);
-    auto ubPtr = MakeMemPtr<Location::UB>(ubData);
-    auto l1Ptr = MakeMemPtr<Location::L1>(l1Data);
-    auto l0aPtr = MakeMemPtr<Location::L0A>(l0aData);
-    auto l0bPtr = MakeMemPtr<Location::L0B>(l0bData);
-    auto l0cPtr = MakeMemPtr<Location::L0C>(l0cData);
-    auto biasPtr = MakeMemPtr<Location::BIAS>(biasData);
-    auto fixbufPtr = MakeMemPtr<Location::FIXBUF>(fixbufData);
+    auto gmPtr = make_mem_ptr<Location::GM>(gmData);
+    auto ubPtr = make_mem_ptr<Location::UB>(ubData);
+    auto l1Ptr = make_mem_ptr<Location::L1>(l1Data);
+    auto l0aPtr = make_mem_ptr<Location::L0A>(l0aData);
+    auto l0bPtr = make_mem_ptr<Location::L0B>(l0bData);
+    auto l0cPtr = make_mem_ptr<Location::L0C>(l0cData);
+    auto biasPtr = make_mem_ptr<Location::BIAS>(biasData);
+    auto fixbufPtr = make_mem_ptr<Location::FIXBUF>(fixbufData);
 
     EXPECT_EQ(gmPtr.Get(), gmData);
     EXPECT_EQ(ubPtr.Get(), ubData);
@@ -57,7 +57,7 @@ TEST_F(Tensor_Api_Pointer, TestPointerAdaptor)
     using namespace AscendC::Te;
 
     __gm__ float data[4] = {1, 2, 3, 4};
-    auto ptr = MakeMemPtr<Location::GM>(data);
+    auto ptr = make_mem_ptr<Location::GM>(data);
 
     EXPECT_EQ(*ptr, 1);
     EXPECT_EQ(ptr[2], 3);
@@ -75,7 +75,7 @@ TEST_F(Tensor_Api_Pointer, TestPointerOperators)
     using namespace AscendC::Te;
 
     __gm__ float data[4] = {0};
-    auto ptr = MakeMemPtr<Location::GM>(data);
+    auto ptr = make_mem_ptr<Location::GM>(data);
     auto next = ptr + 1;
     auto far = ptr + 3;
 

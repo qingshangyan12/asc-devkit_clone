@@ -45,11 +45,11 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}, Trait{});
+    auto atom = make_copy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
     CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename Param, typename DstTensor, typename SrcTensor>
@@ -57,14 +57,14 @@ void RunCopyWithParamPaths(const DstTensor& dst, const SrcTensor& src, const Par
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}).with(param);
+    auto atom = make_copy(CopyOp{}).with(param);
     atom.Call(dst, src);
 
     auto copyAtom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param);
     copyAtom.Call(dst, src);
 
-    Copy(copyAtom, dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
+    copy(copyAtom, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
 }
 
 } // namespace
@@ -78,8 +78,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2L1NZ2NZFloat)
     __cc__ float src[m * n] = {0};
     __cbuf__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, float>(m, n));
-    auto l1Tensor = MakeTensorAt<Location::L1>(dst, MakeFrameLayout<NZLayoutPtn, float>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, float>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(dst, make_frame_layout<NZLayoutPtn, float>(m, n));
 
     RunCopyCallPaths<CopyL0C2L1, CopyL0C2L1TraitDefault>(l1Tensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2L1, CopyL0C2L1TraitDefault>(l1Tensor, l0cTensor, FixpipeParams{});
@@ -96,8 +96,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2L1NZ2NZInt32)
     __cc__ int32_t src[m * n] = {0};
     __cbuf__ int32_t dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, int32_t>(m, n));
-    auto l1Tensor = MakeTensorAt<Location::L1>(dst, MakeFrameLayout<NZLayoutPtn, int32_t>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, int32_t>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(dst, make_frame_layout<NZLayoutPtn, int32_t>(m, n));
 
     RunCopyCallPaths<CopyL0C2L1, CopyL0C2L1TraitDefault>(l1Tensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2L1, CopyL0C2L1TraitDefault>(l1Tensor, l0cTensor, FixpipeParams{});
@@ -114,8 +114,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2L1NZ2NZF322F16)
     __cc__ float src[m * n] = {0};
     __cbuf__ half dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, float>(m, n));
-    auto l1Tensor = MakeTensorAt<Location::L1>(dst, MakeFrameLayout<NZLayoutPtn, half>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, float>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(dst, make_frame_layout<NZLayoutPtn, half>(m, n));
 
     RunCopyCallPaths<CopyL0C2L1, CopyL0C2L1TraitDefault>(l1Tensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2L1, CopyL0C2L1TraitDefault>(l1Tensor, l0cTensor, FixpipeParams{});
@@ -132,8 +132,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2L1NZ2NZWithChannelSplit)
     __cc__ float src[m * n] = {0};
     __cbuf__ float dst[m * n] = {0};
 
-    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, float>(m, n));
-    auto l1Tensor = MakeTensorAt<Location::L1>(dst, MakeFrameLayout<NZLayoutPtn, float>(m, n));
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, make_frame_layout<NZLayoutPtn, float>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(dst, make_frame_layout<NZLayoutPtn, float>(m, n));
 
     RunCopyCallPaths<CopyL0C2L1, CopyL0C2L1TraitCustom>(l1Tensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2L1, CopyL0C2L1TraitCustom>(l1Tensor, l0cTensor, FixpipeParams{});

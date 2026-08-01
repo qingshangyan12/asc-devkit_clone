@@ -42,11 +42,11 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}, Trait{});
+    auto atom = make_copy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
     CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename DstTensor, typename SrcTensor>
@@ -56,7 +56,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 
     auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
-    Copy(atom, dst, src);
+    copy(atom, dst, src);
 }
 
 __ca__ float* gBatchDstBase = nullptr;
@@ -77,8 +77,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ARoutesToCubeArchCopy)
     __cbuf__ float src[m * n] = {0};
     __ca__ float dst[m * n] = {0};
 
-    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
-    auto l0aTensor = MakeTensorAt<Location::L0A>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l0aTensor = MakeTensorAt<Location::L0A>(dst, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL12L0A, CopyL12L0ATraitDefault>(l0aTensor, l1Tensor);
     RunCopyWithPaths<CopyL12L0A, CopyL12L0ATraitDefault>(l0aTensor, l1Tensor);
@@ -165,7 +165,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchNz2Nz)
     __cbuf__ float src[batch * m * n] = {0};
     __ca__ float dst[batch * m * n] = {0};
 
-    auto batchLayout = MakeFrameLayout<NZLayoutPtn, float>(batch, m, n);
+    auto batchLayout = make_frame_layout<NZLayoutPtn, float>(batch, m, n);
     auto l1Tensor = MakeTensorAt<Location::L1>(src, batchLayout);
     auto l0aTensor = MakeTensorAt<Location::L0A>(dst, batchLayout);
 
@@ -178,7 +178,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchNz2Nz)
         .times(1)
         .will(invoke(&load_cbuf_to_ca_batch_stub<float, 2, 8, 2, 2>));
 
-    Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
+    copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
 
     EXPECT_EQ(gBatchCallIndex, 1);
     mockcpp::GlobalMockObject::verify();
@@ -195,8 +195,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2Nz)
     __cbuf__ float src[batch * m * n] = {0};
     __ca__ float dst[batch * m * n] = {0};
 
-    auto srcBatchLayout = MakeFrameLayout<ZNLayoutPtn, float>(batch, m, n);
-    auto dstBatchLayout = MakeFrameLayout<NZLayoutPtn, float>(batch, m, n);
+    auto srcBatchLayout = make_frame_layout<ZNLayoutPtn, float>(batch, m, n);
+    auto dstBatchLayout = make_frame_layout<NZLayoutPtn, float>(batch, m, n);
     auto l1Tensor = MakeTensorAt<Location::L1>(src, srcBatchLayout);
     auto l0aTensor = MakeTensorAt<Location::L0A>(dst, dstBatchLayout);
 
@@ -209,7 +209,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2Nz)
         .times(batch)
         .will(invoke(&load_cbuf_to_ca_batch_offset_stub<float, 2, 4, 2, 2, batchStride, true>));
 
-    Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
+    copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
 
     EXPECT_EQ(gBatchCallIndex, batch);
     mockcpp::GlobalMockObject::verify();
@@ -229,8 +229,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2NzB8B4)
     __cbuf__ fp4x2_e1m2_t src[batch * srcBatchStride];
     __ca__ fp4x2_e1m2_t dst[batch * dstBatchStride];
 
-    auto srcBatchLayout = MakeFrameLayout<ZNLayoutPtn, LayoutTraitFP4>(batch, m, n);
-    auto dstBatchLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitFP4>(batch, m, n);
+    auto srcBatchLayout = make_frame_layout<ZNLayoutPtn, LayoutTraitFP4>(batch, m, n);
+    auto dstBatchLayout = make_frame_layout<NZLayoutPtn, LayoutTraitFP4>(batch, m, n);
     auto l1Tensor = MakeTensorAt<Location::L1>(src, srcBatchLayout);
     auto l0aTensor = MakeTensorAt<Location::L0A>(dst, dstBatchLayout);
 
@@ -244,7 +244,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2NzB8B4)
         .will(invoke(&load_cbuf_to_ca_batch_b4_split_stub<fp4x2_e1m2_t, 4, 1, 8, 1, srcBatchStride,
             dstBatchStride, dstSplitStride, splitNum>));
 
-    Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
+    copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
 
     EXPECT_EQ(gBatchB4CallIndex, batch * splitNum);
     mockcpp::GlobalMockObject::verify();
@@ -256,21 +256,21 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2NzB8B4)
 TEST_F(Tensor_Api_Cube_Copy_3510, TestLoadData_##TYPE##M##N##SRC_FORMAT##DST_FORMAT##SRC_POS##DST_POS##SRC_TAG##DST_TAG##TRANSPOSE) { \
     using namespace AscendC::Te; \
     __##DST_TAG##__ TYPE dst[M * N] = {0}; \
-    auto dstIterator = MakeMemPtr<Location::DST_POS>(dst); \
-    auto dstMatrixLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(DST_FORMAT), LayoutTraitDefault<TYPE>>(M, N); \
-    auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout); \
+    auto dstIterator = make_mem_ptr<Location::DST_POS>(dst); \
+    auto dstMatrixLayout = make_frame_layout<MAKE_LAYOUT_TYPE(DST_FORMAT), LayoutTraitDefault<TYPE>>(M, N); \
+    auto dstTensor = make_tensor(dstIterator, dstMatrixLayout); \
  \
     __##SRC_TAG##__ TYPE src[M * N] = {0}; \
-    auto srcIterator = MakeMemPtr<Location::SRC_POS>(src); \
-    auto srcMatrixLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(SRC_FORMAT), LayoutTraitDefault<TYPE>>(M, N); \
-    auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout); \
+    auto srcIterator = make_mem_ptr<Location::SRC_POS>(src); \
+    auto srcMatrixLayout = make_frame_layout<MAKE_LAYOUT_TYPE(SRC_FORMAT), LayoutTraitDefault<TYPE>>(M, N); \
+    auto srcTensor = make_tensor(srcIterator, srcMatrixLayout); \
  \
     constexpr int M_STEP = (sizeof(TYPE) == 1 && TRANSPOSE) ? 2 : 1; \
     constexpr int K_STEP = (sizeof(TYPE) == 4 && TRANSPOSE) ? 2 : 1; \
     MOCKER_CPP(load_cbuf_to_##DST_TAG, void(__##DST_TAG##__ TYPE*, __cbuf__ TYPE*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool)) \
         .times(1) \
         .will(invoke(&load_cbuf_to_##DST_TAG##_stub<TRANSPOSE, TYPE, M_STEP, K_STEP>)); \
-    Copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
+    copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
  \
     mockcpp::GlobalMockObject::verify(); \
 }
@@ -279,16 +279,16 @@ TEST_F(Tensor_Api_Cube_Copy_3510, TestLoadData_##TYPE##M##N##SRC_FORMAT##DST_FOR
 TEST_F(Tensor_Api_Cube_Copy_3510, TestLoadData_##TYPE##M##N##SRC_FORMAT##DST_FORMAT##SRC_POS##DST_POS##SRC_TAG##DST_TAG##TRANSPOSE) { \
     using namespace AscendC::Te; \
     __##DST_TAG##__ TYPE dst[M * N]; \
-    auto dstIterator = MakeMemPtr<Location::DST_POS>(dst); \
-    auto dstMatrixLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(DST_FORMAT), LayoutTraitFP4>(M, N); \
-    auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout); \
+    auto dstIterator = make_mem_ptr<Location::DST_POS>(dst); \
+    auto dstMatrixLayout = make_frame_layout<MAKE_LAYOUT_TYPE(DST_FORMAT), LayoutTraitFP4>(M, N); \
+    auto dstTensor = make_tensor(dstIterator, dstMatrixLayout); \
  \
     __##SRC_TAG##__ TYPE src[M * N]; \
-    auto srcIterator = MakeMemPtr<Location::SRC_POS>(src); \
-    auto srcMatrixLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(SRC_FORMAT), LayoutTraitFP4>(M, N); \
-    auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout); \
+    auto srcIterator = make_mem_ptr<Location::SRC_POS>(src); \
+    auto srcMatrixLayout = make_frame_layout<MAKE_LAYOUT_TYPE(SRC_FORMAT), LayoutTraitFP4>(M, N); \
+    auto srcTensor = make_tensor(srcIterator, srcMatrixLayout); \
  \
-    Copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
+    copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
  \
     mockcpp::GlobalMockObject::verify(); \
 }
@@ -329,7 +329,7 @@ template <typename T, size_t C0>
 auto MakeNc1hwc0Layout(int n, int c1, int h, int w)
 {
     using namespace AscendC::Te;
-    return MakeFrameLayout<NC1HWC0LayoutPtn>(n, c1, h, w, static_cast<int>(C0));
+    return make_frame_layout<NC1HWC0LayoutPtn>(n, c1, h, w, static_cast<int>(C0));
 }
 } // namespace
 
@@ -355,8 +355,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0AImg2Col)
     __cbuf__ int16_t src[N * C1 * H * W * C0] = {0};
     __ca__ int16_t dst[mAlign * kAlign] = {0};
 
-    auto srcTensor = MakeTensor(MakeMemPtr<Location::L1>(src), MakeNc1hwc0Layout<int16_t, C0>(N, C1, H, W));
-    auto l0aTensor = MakeTensorAt<Location::L0A>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<int16_t>>(M, K));
+    auto srcTensor = make_tensor(make_mem_ptr<Location::L1>(src), MakeNc1hwc0Layout<int16_t, C0>(N, C1, H, W));
+    auto l0aTensor = MakeTensorAt<Location::L0A>(dst, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<int16_t>>(M, K));
 
     // dst NZ ceil-aligned M/K, now provided by the caller via Img2ColParams.
     Img2ColParams<int16_t> params;
@@ -368,8 +368,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0AImg2Col)
     params.strideH = 1;
     params.padList[0] = params.padList[1] = params.padList[2] = params.padList[3] = 1;
 
-    auto atom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
-    Copy(atom.with(params), l0aTensor, srcTensor);
+    auto atom = make_copy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
+    copy(atom.with(params), l0aTensor, srcTensor);
 
     EXPECT_EQ(dst[0], 0);
 }

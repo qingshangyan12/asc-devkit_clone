@@ -25,14 +25,14 @@
 #include "impl/tensor_api/arch/cube/mmad/mmad_impl/mmad.h"
 #include "impl/tensor_api/arch/cube/mmad/mmad_impl/mmad_with_bias.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class MmadIgnore
 {
 public:
-    template <const MmadTrait& trait, typename ...Args>
-    __aicore__ inline static void Run(const Args&... args)
+    template <const mmad_trait& trait, typename ...Args>
+    __aicore__ inline static void run(const Args&... args)
     {
         static_assert(Std::is_same_v<Args..., void>, "MmadIgnore should not be called");
     }
@@ -61,8 +61,8 @@ struct MmadRouting<Version, NZLayoutPtn, NZLayoutPtn, ZNLayoutPtn, Location::BIA
 {
     using type = MmadWithBias;
 };
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_MMAD_ROUTING_H
 

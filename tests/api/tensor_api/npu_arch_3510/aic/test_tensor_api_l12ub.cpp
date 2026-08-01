@@ -41,11 +41,11 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}, Trait{});
+    auto atom = make_copy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
     CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename DstTensor, typename SrcTensor>
@@ -55,7 +55,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 
     auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
-    Copy(atom, dst, src);
+    copy(atom, dst, src);
 }
 
 } // namespace
@@ -69,8 +69,8 @@ TEST_F(Tensor_Api_Vector_Copy_3510, CopyL12UBND2ND)
     __cbuf__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, make_frame_layout<NDExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<NDExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
 
     RunCopyCallPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);
     RunCopyWithPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);
@@ -87,8 +87,8 @@ TEST_F(Tensor_Api_Vector_Copy_3510, CopyL12UBNDLayout2NDLayout)
     __cbuf__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, make_frame_layout<NDLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<NDLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
 
     RunCopyCallPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);
     RunCopyWithPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);
@@ -106,8 +106,8 @@ TEST_F(Tensor_Api_Vector_Copy_3510, CopyL12UBDN2DN)
     __cbuf__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<DNExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<DNExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, make_frame_layout<DNExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<DNExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
 
     RunCopyCallPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);
     RunCopyWithPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);
@@ -124,8 +124,8 @@ TEST_F(Tensor_Api_Vector_Copy_3510, CopyL12UBDNLayout2DNLayout)
     __cbuf__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, make_frame_layout<DNLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<DNLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
 
     RunCopyCallPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);
     RunCopyWithPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);
@@ -143,8 +143,8 @@ TEST_F(Tensor_Api_Vector_Copy_3510, CopyL12UBNZ2NZ)
     __cbuf__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
-    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, make_frame_layout<NZLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
 
     RunCopyCallPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);
     RunCopyWithPaths<CopyL12UB, CopyL12UBTraitDefault>(ubTensor, l1Tensor);

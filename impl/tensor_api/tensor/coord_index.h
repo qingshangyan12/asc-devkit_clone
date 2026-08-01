@@ -24,52 +24,52 @@
 
 #include "impl/tensor_api/tensor/layout_definition.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
+__aicore__ inline constexpr auto crd2idx(const T& coord, const U& shape, const S& stride);
 
 template <typename T, typename U, typename S, size_t... Is>
-__aicore__ inline constexpr auto Crd2IdxTTT(const T& coord, const U& shape, const S& stride,
+__aicore__ inline constexpr auto crd2idx_ttt(const T& coord, const U& shape, const S& stride,
     Std::index_sequence<Is...>)
 {
-    return (... + Crd2Idx(Std::get<Is>(coord), Std::get<Is>(shape), Std::get<Is>(stride)));
+    return (... + crd2idx(Std::get<Is>(coord), Std::get<Is>(shape), Std::get<Is>(stride)));
 }
 
 template <typename T, typename U, typename S, size_t I0, size_t... Is>
-__aicore__ inline constexpr auto Crd2IdxITT(const T& coord, const U& shape, const S& stride,
+__aicore__ inline constexpr auto crd2idx_itt(const T& coord, const U& shape, const S& stride,
     Std::index_sequence<I0,Is...>)
 {
     if constexpr (sizeof...(Is) == 0) {  // Avoid recursion and mod on single/last iter
-        return Crd2Idx(coord, Std::get<I0>(shape), Std::get<I0>(stride));
+        return crd2idx(coord, Std::get<I0>(shape), Std::get<I0>(stride));
     } else if constexpr (Std::is_constant<0, T>::value) {
-        return Crd2Idx(_0{}, Std::get<I0>(shape), Std::get<I0>(stride)) +
-            (_0{} + ... + Crd2Idx(_0{}, Std::get<Is>(shape), Std::get<Is>(stride)));
+        return crd2idx(_0{}, Std::get<I0>(shape), Std::get<I0>(stride)) +
+            (_0{} + ... + crd2idx(_0{}, Std::get<Is>(shape), Std::get<Is>(stride)));
     } else { // General case
         auto prod = Product{}(Std::get<I0>(shape));
         auto div = coord / prod;
         auto mod = coord % prod;
-        return Crd2Idx(mod, Std::get<I0>(shape), Std::get<I0>(stride)) +
-            Crd2IdxITT(div, shape, stride, Std::index_sequence<Is...>{});
+        return crd2idx(mod, Std::get<I0>(shape), Std::get<I0>(stride)) +
+            crd2idx_itt(div, shape, stride, Std::index_sequence<Is...>{});
     }
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride)
+__aicore__ inline constexpr auto crd2idx(const T& coord, const U& shape, const S& stride)
 {
     if constexpr (Std::is_tuple_v<T>) {
         if constexpr (Std::is_tuple_v<U>) { // tuple tuple tuple
             static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "Shape and Coord Mismatched Ranks");
             static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<S>, "Stride and Coord Mismatched Ranks");
-            return Crd2IdxTTT(coord, shape, stride, tuple_sequence<T>{});
+            return crd2idx_ttt(coord, shape, stride, tuple_sequence<T>{});
         } else { // tuple "int" "int"
             static_assert(sizeof(T) == 0, "Invalid parameters, U is not tuple!");
         }
     } else {
         if constexpr (Std::is_tuple_v<U>) { // "int" tuple tuple
             static_assert(Std::tuple_size_v<U> == Std::tuple_size_v<S>, "Shape and Stride Mismatched Ranks");
-            return Crd2IdxITT(coord, shape, stride, tuple_sequence<U>{});
+            return crd2idx_itt(coord, shape, stride, tuple_sequence<U>{});
         } else { // "int" "int" "int"
             return coord * stride;
         }
@@ -78,13 +78,44 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S
 
 template <typename T, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout)
+__aicore__ inline constexpr auto crd2idx(const T& coord, const LayoutType& layout)
 {
-    return Crd2Idx(coord, layout.Shape(), layout.Stride());
+    return crd2idx(coord, layout.shape(), layout.stride());
 }
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
+
+
+// PascalCase compatibility wrappers
+namespace asc {
+namespace te {
+template <typename T, typename U, typename S, size_t... Is>
+__aicore__ inline constexpr auto Crd2IdxTTT(const T& coord, const U& shape, const S& stride, Std::index_sequence<Is...> arg3)
+{
+    return crd2idx_ttt<Is...>(coord, shape, stride, arg3);
+}
+
+template <typename T, typename U, typename S, size_t I0, size_t... Is>
+__aicore__ inline constexpr auto Crd2IdxITT(const T& coord, const U& shape, const S& stride, Std::index_sequence<I0,Is...> arg3)
+{
+    return crd2idx_itt<I0, Is...>(coord, shape, stride, arg3);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride)
+{
+    return crd2idx(coord, shape, stride);
+}
+
+template <typename T, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout)
+{
+    return crd2idx(coord, layout);
+}
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_TENSOR_COORD_INDEX_H
 

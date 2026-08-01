@@ -25,16 +25,16 @@ TEST_F(Tensor_Api_Layout_Get, TestGetLayoutSlices)
 {
     using namespace AscendC::Te;
 
-    auto layout = MakeLayout(MakeShape(10, 20, 30), MakeStride(600, 30, 1));
+    auto layout = make_layout(make_shape(10, 20, 30), make_stride(600, 30, 1));
 
-    auto all = Get(layout);
-    auto dim1 = Get<1>(layout);
-    auto dim2 = Get<2>(MakeShape(10, 20, 30));
+    auto all = get(layout);
+    auto dim1 = get<1>(layout);
+    auto dim2 = get<2>(make_shape(10, 20, 30));
 
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape(all)), 10);
-    EXPECT_EQ(AscendC::Std::get<2>(GetStride(all)), 1);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape(dim1)), 20);
-    EXPECT_EQ(AscendC::Std::get<0>(GetStride(dim1)), 30);
+    EXPECT_EQ(AscendC::Std::get<0>(get_shape(all)), 10);
+    EXPECT_EQ(AscendC::Std::get<2>(get_stride(all)), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(get_shape(dim1)), 20);
+    EXPECT_EQ(AscendC::Std::get<0>(get_stride(dim1)), 30);
     EXPECT_EQ(dim2, 30);
 }
 
@@ -42,11 +42,11 @@ TEST_F(Tensor_Api_Layout_Get, TestGetStaticLayouts)
 {
     using namespace AscendC::Te;
 
-    auto layout = MakeLayout(MakeShape(MakeShape(_2{}, _3{}), MakeShape(_4{}, _5{})),
-                             MakeStride(MakeStride(_1{}, _8{}), MakeStride(_2{}, _24{})));
+    auto layout = make_layout(make_shape(make_shape(_2{}, _3{}), make_shape(_4{}, _5{})),
+                             make_stride(make_stride(_1{}, _8{}), make_stride(_2{}, _24{})));
 
-    auto inner = Get<1, 0>(layout);
+    auto inner = get<1, 0>(layout);
 
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape(inner)), 4);
-    EXPECT_EQ(AscendC::Std::get<0>(GetStride(inner)), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(get_shape(inner)), 4);
+    EXPECT_EQ(AscendC::Std::get<0>(get_stride(inner)), 2);
 }

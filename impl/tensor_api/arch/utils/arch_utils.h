@@ -26,8 +26,8 @@
 #include "impl/tensor_api/arch/utils/check_format.h"
 #include "impl/tensor_api/arch/utils/is_format.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define SCALAR_QUANT_MODE QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8,\
@@ -67,60 +67,102 @@ template <QuantMode_t quantPre>
 using IsDirectQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
 
 template <typename info1, typename info2, size_t dim, typename T>
-__aicore__ inline constexpr decltype(auto) GetElement(const T& layout) {
+__aicore__ inline constexpr decltype(auto) get_element(const T& layout) {
     constexpr size_t shapeOrStride = (Std::is_same_v<info1, AttrInfo::Shape> ? 0 : 1);
     constexpr size_t rowOrColumn = (Std::is_same_v<info2, AttrInfo::Row> ? 0 : 1);
-    return layout.template Get<shapeOrStride, rowOrColumn, dim>();
+    return layout.template get<shapeOrStride, rowOrColumn, dim>();
 }
 
 template <typename info1, typename info2, typename T>
-__aicore__ inline constexpr decltype(auto) GetElement(const T& layout) {
+__aicore__ inline constexpr decltype(auto) get_element(const T& layout) {
     constexpr size_t shapeOrStride = (Std::is_same_v<info1, AttrInfo::Shape> ? 0 : 1);
     constexpr size_t rowOrColumn = (Std::is_same_v<info2, AttrInfo::Row> ? 0 : 1);
-    return layout.template Get<shapeOrStride, rowOrColumn>();
+    return layout.template get<shapeOrStride, rowOrColumn>();
+}
+
+template <typename LayoutType>
+__aicore__ inline static constexpr uint32_t get_total_column_shape(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == 2) {
+        return get<1>(layout.shape());
+    } else {
+        return get<1, 0>(layout.shape()) * get<1, 1>(layout.shape());
+    }
+}
+
+template <typename LayoutType>
+__aicore__ inline static constexpr uint32_t get_total_row_shape(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == 2) {
+        return get<0>(layout.shape());
+    } else {
+        return get<0, 0>(layout.shape()) * get<0, 1>(layout.shape());
+    }
+}
+
+template <typename LayoutType>
+__aicore__ inline static constexpr decltype(auto) get_row_stride(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == 2) {
+        return get<0>(layout.stride());
+    } else {
+        return get<0, 1>(layout.stride());
+    }
+}
+
+template <typename LayoutType>
+__aicore__ inline static constexpr decltype(auto) get_column_stride(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == 2) {
+        return get<1>(layout.stride());
+    } else {
+        return get<1, 1>(layout.stride());
+    }
+}
+} // namespace te
+} // namespace asc
+
+
+// PascalCase compatibility wrappers
+namespace asc {
+namespace te {
+template <typename info1, typename info2, size_t dim, typename T>
+__aicore__ inline constexpr decltype(auto) GetElement(const T& layout)
+{
+    return get_element<info1, info2, dim>(layout);
+}
+
+template <typename info1, typename info2, typename T>
+__aicore__ inline constexpr decltype(auto) GetElement(const T& layout)
+{
+    return get_element<info1, info2>(layout);
 }
 
 template <typename LayoutType>
 __aicore__ inline static constexpr uint32_t GetTotalColumnShape(const LayoutType& layout)
 {
-    if constexpr (LayoutType::depth == 2) {
-        return Get<1>(layout.Shape());
-    } else {
-        return Get<1, 0>(layout.Shape()) * Get<1, 1>(layout.Shape());
-    }
+    return get_total_column_shape(layout);
 }
 
 template <typename LayoutType>
 __aicore__ inline static constexpr uint32_t GetTotalRowShape(const LayoutType& layout)
 {
-    if constexpr (LayoutType::depth == 2) {
-        return Get<0>(layout.Shape());
-    } else {
-        return Get<0, 0>(layout.Shape()) * Get<0, 1>(layout.Shape());
-    }
+    return get_total_row_shape(layout);
 }
 
 template <typename LayoutType>
 __aicore__ inline static constexpr decltype(auto) GetRowStride(const LayoutType& layout)
 {
-    if constexpr (LayoutType::depth == 2) {
-        return GetElement<AttrInfo::Stride, AttrInfo::Row>(layout);
-    } else {
-        return GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(layout);
-    }
+    return get_row_stride(layout);
 }
 
 template <typename LayoutType>
 __aicore__ inline static constexpr decltype(auto) GetColumnStride(const LayoutType& layout)
 {
-    if constexpr (LayoutType::depth == 2) {
-        return GetElement<AttrInfo::Stride, AttrInfo::Column>(layout);
-    } else {
-        return GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(layout);
-    }
+    return get_column_stride(layout);
 }
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_UTILS_ARCH_UTILS_H
 
