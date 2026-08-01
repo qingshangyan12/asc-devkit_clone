@@ -12,6 +12,11 @@
 #error "reg_store.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
+
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_STORE_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_STORE_H
 
@@ -1252,4 +1257,9 @@ __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
 __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
     __ubuf__ float*& dst_align32b, vector_float src, int32_t offset, vector_bool mask);
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
 #endif
