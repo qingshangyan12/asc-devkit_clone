@@ -2194,7 +2194,7 @@ def _compile_single_tiling(tiling_key, compile_info, tiling_info, compile_option
             tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
         elif not tiling_data_hash_src:
             tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
-        tiling_data_hash = hashlib.md5(tiling_data_hash_src).hexdigest()[:8]
+        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
         compile_cmd += [
             f"-D{compile_info.origin_func_name}="
             f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_key}_tilingkey"
@@ -2237,6 +2237,17 @@ def _compile_ascendc_cce(
         compile_cmd += [
             f"-Dauto_gen_{compile_info.origin_func_name}_kernel={compile_info.get_kernel_func_name()}"
         ]
+        if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+            tiling_data_hash_src = tiling_info.tiling_data
+            if isinstance(tiling_data_hash_src, str):
+                tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
+            elif not tiling_data_hash_src:
+                tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
+            tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
+            compile_cmd += [
+                f"-D{compile_info.origin_func_name}="
+                f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_info.tiling_key}_tilingkey"
+            ]
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
         new_sources += DFXSectionGenerator().generate_dfx_section(
             str(tiling_info.tiling_key),
@@ -2432,7 +2443,7 @@ def _get_compile_cmd_and_section_content(
             tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
         elif not tiling_data_hash_src:
             tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
-        tiling_data_hash = hashlib.md5(tiling_data_hash_src).hexdigest()[:8]
+        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
         compile_cmd += [
             f"-D{compile_info.origin_func_name}="
             f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_key}_tilingkey"
@@ -3305,7 +3316,7 @@ def _compile_single_tiling_regbase(param: SingleTilingKeyCompileParams):
             tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
         elif not tiling_data_hash_src:
             tiling_data_hash_src = param.tiling_info.file_content.encode("utf-8")
-        tiling_data_hash = hashlib.md5(tiling_data_hash_src).hexdigest()[:8]
+        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
         compile_cmd += [
             f"-D{param.compile_info.origin_func_name}="
             f"{param.compile_info.origin_func_name}_{tiling_data_hash}_{param.tiling_key}_tilingkey"
@@ -3390,6 +3401,17 @@ def _call_bisheng_regbase(
         compile_cmd += [
             f"-Dauto_gen_{compile_info.origin_func_name}_kernel={compile_info.get_kernel_func_name()}"
         ]
+        if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+            tiling_data_hash_src = tiling_info.tiling_data
+            if isinstance(tiling_data_hash_src, str):
+                tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
+            elif not tiling_data_hash_src:
+                tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
+            tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
+            compile_cmd += [
+                f"-D{compile_info.origin_func_name}="
+                f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_info.tiling_key}_tilingkey"
+            ]
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
         new_sources += DFXSectionGenerator().generate_dfx_section(
             str(tiling_info.tiling_key),

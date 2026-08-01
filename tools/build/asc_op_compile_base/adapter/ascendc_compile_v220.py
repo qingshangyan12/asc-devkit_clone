@@ -473,7 +473,7 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
             tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
         elif not tiling_data_hash_src:
             tiling_data_hash_src = param.tiling_info.file_content.encode("utf-8")
-        tiling_data_hash = hashlib.md5(tiling_data_hash_src).hexdigest()[:8]
+        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
         compile_cmd += [
             f"-D{param.compile_info.origin_func_name}="
             f"{param.compile_info.origin_func_name}_{tiling_data_hash}_{param.tiling_key}_tilingkey"
@@ -557,6 +557,17 @@ def get_compile_cmd_for_kernel_name(
     compile_cmd = [
         f"-Dauto_gen_{compile_info.origin_func_name}_kernel={current_kernel_name}"
     ]
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        tiling_data_hash_src = tiling_info.tiling_data
+        if isinstance(tiling_data_hash_src, str):
+            tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
+        elif not tiling_data_hash_src:
+            tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
+        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
+        compile_cmd += [
+            f"-D{compile_info.origin_func_name}="
+            f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_info.tiling_key}_tilingkey"
+        ]
     if code_channel == CORE_TYPE_MIX:
         compile_cmd += [f"-D{MIX_CORE_MACRO}={1}"]
     if CommonUtility.is_c310() or CommonUtility.is_m510():
