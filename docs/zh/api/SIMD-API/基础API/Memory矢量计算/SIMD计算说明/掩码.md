@@ -20,12 +20,19 @@ Mask（掩码）是Ascend C中用于控制数据元素是否参与计算的标�
 
 **图1**  掩码机制说明  
 ![](../../../../figures/mask_mechanism.png)<a id="图1-掩码机制说明"></a>
-
-<!-- npu="950" id1 -->
+<!-- npu="A3,910b" id1 -->
 > [!NOTE]说明
 >
-> 该掩码处理能力在Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品上为硬件原生支持能力；在Ascend 950PR/Ascend 950DT上为保证兼容性进行了软仿实现，其硬件底层提供的能力与Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品存在一定差异。
+> 在Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品上，Mask为硬件原生支持能力。<br>
+> 调用Tensor前n个数据计算接口时，接口内部会将Mask设置为Counter模式，并在计算完成后恢复为系统默认的Normal模式。
 <!-- end id1 -->
+
+<!-- npu="950" id2 -->
+> [!NOTE]说明
+>
+> 在Ascend 950PR/Ascend 950DT上，Mask为保证兼容性采用软仿实现，其硬件底层提供的能力与Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品存在一定差异。<br>
+> 推荐使用Tensor前n个数据计算接口，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容。Tensor前n个数据计算接口内部不会将Mask模式切换为Normal模式。若调用该接口前已通过[SetMaskCount](../掩码操作/SetMaskCount.md)设置为Counter模式，接口调用后仍为Counter模式；后续计算需要使用Normal模式时，需手动调用[SetMaskNorm](../掩码操作/SetMaskNorm.md)进行设置。
+<!-- end id2 -->
 
 ### 掩码配置方式
 
@@ -75,7 +82,7 @@ Mask操作的使用方式如下：
 
 - **前n个数据计算**
 
-    采用[Counter模式](#mask-mode)进行前n个数据计算，接口内部会先调用SetMaskCount，然后根据接口参数count调用SetVectorMask，再进行计算，计算完成后调用ResetMask、SetMaskNorm恢复系统默认Normal模式。
+    采用[Counter模式](#mask-mode)进行前n个数据计算，通过接口参数count指定参与计算的元素个数，接口内部会自动完成计算所需的Mask处理。不同产品的Mask模式恢复行为存在差异，具体请参考[概述](#概述)中的说明。
 
     调用示例：
 
