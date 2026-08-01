@@ -25,13 +25,13 @@
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/tensor/layout_method.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 constexpr uint32_t MAIN_LOOP_N_SIZE = 512;
 constexpr uint32_t CBURST_NUM = MAIN_LOOP_N_SIZE / BLOCK_CUBE;
 
-constexpr FixpipeParams DEFAULT_FIXPIPE_PARAMS = FixpipeParams{};
+constexpr fixpipe_params DEFAULT_FIXPIPE_PARAMS = fixpipe_params{};
 
 template <typename TensorType>
 inline constexpr bool IsL0COutSrcBatchLayoutV = TensorType::layoutType::depth == FIVE_DIM_DATA;
@@ -65,191 +65,192 @@ inline constexpr bool IsL0COutBatchNZ2NZV =
     DstTensorType::layoutType::depth == FIVE_DIM_DATA && SrcTensorType::layoutType::depth == FIVE_DIM_DATA;
 
 template <typename T, typename LayoutType>
-__aicore__ inline static constexpr uint32_t GetL0COutNDStride(const LayoutType& layout)
+__aicore__ inline static constexpr uint32_t get_l0c_out_nd_stride(const LayoutType& layout)
 {
     if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
-        return GetElement<AttrInfo::Stride, AttrInfo::Row>(layout);
+        return get_element<AttrInfo::Stride, AttrInfo::Row>(layout);
     } else {
-        return GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(layout);
+        return get_element<AttrInfo::Stride, AttrInfo::Row, 1>(layout);
     }
 }
 
 template <typename T, typename LayoutType>
-__aicore__ inline static constexpr uint32_t GetL0COutDNStride(const LayoutType& layout)
+__aicore__ inline static constexpr uint32_t get_l0c_out_dn_stride(const LayoutType& layout)
 {
     if constexpr (IsSatisfiedPtnFormatV<T, DNLayoutPtn>) {
-        return GetElement<AttrInfo::Stride, AttrInfo::Column>(layout);
+        return get_element<AttrInfo::Stride, AttrInfo::Column>(layout);
     } else {
-        return GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(layout);
+        return get_element<AttrInfo::Stride, AttrInfo::Column, 1>(layout);
     }
 }
 
-struct L0COutCopyParams {
-    uint32_t nSize;
-    uint32_t mSize;
-    uint32_t srcStride;
-    uint32_t dstStride;
+struct l0c_out_copy_params {
+    uint32_t n_size;
+    uint32_t m_size;
+    uint32_t src_stride;
+    uint32_t dst_stride;
 };
 
 template <typename T, typename U, typename DstLayout, typename SrcLayout>
-__aicore__ inline static constexpr L0COutCopyParams MakeL0COutCopyParams(
-    const DstLayout& dstLayout, const SrcLayout& srcLayout)
+__aicore__ inline static constexpr l0c_out_copy_params make_l0c_out_copy_params(
+    const DstLayout& dst_layout, const SrcLayout& src_layout)
 {
     if constexpr (IsL0COutNC1HWC0V<T>) {
         // dst NC1HWC0 (N, C1, H, W, C0), N == 1: nSize = Cout = C1*C0, mSize = Ho*Wo = H*W.
         // dstStride is the C1-axis stride (= H*W*C0), i.e. the C0-block step without the NZ 16-row
         // alignment padding. src is the non-batch NZ, so srcStride follows the plain NZ path.
-        auto dstShape = dstLayout.Shape();
+        auto dst_shape = dst_layout.shape();
         return {
-            static_cast<uint32_t>(Get<1>(dstShape) * Get<4>(dstShape)),
-            static_cast<uint32_t>(Get<2>(dstShape) * Get<3>(dstShape)),
-            static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED),
-            static_cast<uint32_t>(Get<1>(dstLayout.Stride()))};
+            static_cast<uint32_t>(get<1>(dst_shape) * get<4>(dst_shape)),
+            static_cast<uint32_t>(get<2>(dst_shape) * get<3>(dst_shape)),
+            static_cast<uint32_t>(get_element<AttrInfo::Stride, AttrInfo::Column, 1>(src_layout) / FRACTAL_FIXED),
+            static_cast<uint32_t>(get<1>(dst_layout.stride()))};
     } else if constexpr (IsL0COutBatchNZ2NZV<T, U>) {
-        auto srcNoBatchLayout = RemoveBatchDim(srcLayout);
-        auto dstNoBatchLayout = RemoveBatchDim(dstLayout);
+        auto src_no_batch_layout = remove_batch_dim(src_layout);
+        auto dst_no_batch_layout = remove_batch_dim(dst_layout);
         return {
-            static_cast<uint32_t>(Std::min(Get<0>(srcLayout.Shape()) * GetTotalColumnShape(srcNoBatchLayout),
-                                           Get<0>(dstLayout.Shape()) * GetTotalColumnShape(dstNoBatchLayout))),
-            static_cast<uint32_t>(Std::min(GetTotalRowShape(srcNoBatchLayout), GetTotalRowShape(dstNoBatchLayout))),
-            static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcNoBatchLayout) /
+            static_cast<uint32_t>(Std::min(get<0>(src_layout.shape()) * get_total_column_shape(src_no_batch_layout),
+                                           get<0>(dst_layout.shape()) * get_total_column_shape(dst_no_batch_layout))),
+            static_cast<uint32_t>(
+                Std::min(get_total_row_shape(src_no_batch_layout), get_total_row_shape(dst_no_batch_layout))),
+            static_cast<uint32_t>(get_element<AttrInfo::Stride, AttrInfo::Column, 1>(src_no_batch_layout) /
                                   FRACTAL_FIXED),
-            static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstNoBatchLayout))
+            static_cast<uint32_t>(get_element<AttrInfo::Stride, AttrInfo::Column, 1>(dst_no_batch_layout))
         };
     } else {
-        const uint32_t nSize =
-            static_cast<uint32_t>(Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout)));
-        const uint32_t mSize =
-            static_cast<uint32_t>(Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout)));
-        const uint32_t srcStride =
-            static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED);
+        const uint32_t n_size =
+            static_cast<uint32_t>(Std::min(get_total_column_shape(src_layout), get_total_column_shape(dst_layout)));
+        const uint32_t m_size =
+            static_cast<uint32_t>(Std::min(get_total_row_shape(src_layout), get_total_row_shape(dst_layout)));
+        const uint32_t src_stride =
+            static_cast<uint32_t>(get_element<AttrInfo::Stride, AttrInfo::Column, 1>(src_layout) / FRACTAL_FIXED);
 
         if constexpr (IsL0COutNDFormatV<T>) {
-            return {nSize, mSize, srcStride, GetL0COutNDStride<T>(dstLayout)};
+            return {n_size, m_size, src_stride, get_l0c_out_nd_stride<T>(dst_layout)};
         } else if constexpr (IsL0COutDNFormatV<T>) {
-            return {nSize, mSize, srcStride, GetL0COutDNStride<T>(dstLayout)};
+            return {n_size, m_size, src_stride, get_l0c_out_dn_stride<T>(dst_layout)};
         } else {
-            return {nSize, mSize, srcStride,
-                    static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout))};
+            return {n_size, m_size, src_stride,
+                    static_cast<uint32_t>(get_element<AttrInfo::Stride, AttrInfo::Column, 1>(dst_layout))};
         }
     }
 }
 
-template <RoundMode roundMode, typename dstType, typename srcType>
-__aicore__ inline constexpr QuantMode_t GetVectorQuantMode()
+template <round_mode mode, typename DstType, typename SrcType>
+__aicore__ inline constexpr QuantMode_t get_vector_quant_mode()
 {
-    if constexpr (IsOneOfAttrV<srcType, int32_t> && IsOneOfAttrV<dstType, half>) {
+    if constexpr (IsOneOfAttrV<SrcType, int32_t> && IsOneOfAttrV<DstType, half>) {
         return QuantMode_t::VDEQF16;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, uint8_t, int8_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, uint8_t, int8_t>) {
         return QuantMode_t::VQF322B8_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, int32_t> && IsOneOfAttrV<dstType, uint8_t, int8_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, int32_t> && IsOneOfAttrV<DstType, uint8_t, int8_t>) {
         return QuantMode_t::VREQ8;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, fp8_e4m3fn_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, fp8_e4m3fn_t>) {
         return QuantMode_t::VQF322FP8_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, hifloat8_t>) {
-        if constexpr (roundMode == RoundMode::HYBRID) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, hifloat8_t>) {
+        if constexpr (mode == round_mode::hybrid) {
             return QuantMode_t::VQF322HIF8_PRE_HYBRID;
         } else {
             return QuantMode_t::VQF322HIF8_PRE;
         }
-    } else if constexpr (IsOneOfAttrV<srcType, int32_t> && IsOneOfAttrV<dstType, bfloat16_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, int32_t> && IsOneOfAttrV<DstType, bfloat16_t>) {
         return QuantMode_t::VQS322BF16_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, half>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, half>) {
         return QuantMode_t::VQF322F16_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, bfloat16_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, bfloat16_t>) {
         return QuantMode_t::VQF322BF16_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, float>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, float>) {
         return QuantMode_t::VQF322F32_PRE;
     }
 }
 
-template <RoundMode roundMode, typename dstType, typename srcType>
-__aicore__ inline constexpr QuantMode_t GetScalarQuantMode()
+template <round_mode mode, typename DstType, typename SrcType>
+__aicore__ inline constexpr QuantMode_t get_scalar_quant_mode()
 {
-    if constexpr (IsOneOfAttrV<srcType, int32_t> && IsOneOfAttrV<dstType, half>) {
+    if constexpr (IsOneOfAttrV<SrcType, int32_t> && IsOneOfAttrV<DstType, half>) {
         return QuantMode_t::DEQF16;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, uint8_t, int8_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, uint8_t, int8_t>) {
         return QuantMode_t::QF322B8_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, int32_t> && IsOneOfAttrV<dstType, uint8_t, int8_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, int32_t> && IsOneOfAttrV<DstType, uint8_t, int8_t>) {
         return QuantMode_t::REQ8;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, fp8_e4m3fn_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, fp8_e4m3fn_t>) {
         return QuantMode_t::QF322FP8_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, hifloat8_t>) {
-        if constexpr (roundMode == RoundMode::HYBRID) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, hifloat8_t>) {
+        if constexpr (mode == round_mode::hybrid) {
             return QuantMode_t::QF322HIF8_PRE_HYBRID;
         } else {
             return QuantMode_t::QF322HIF8_PRE;
         }
-    } else if constexpr (IsOneOfAttrV<srcType, int32_t> && IsOneOfAttrV<dstType, bfloat16_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, int32_t> && IsOneOfAttrV<DstType, bfloat16_t>) {
         return QuantMode_t::QS322BF16_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, half>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, half>) {
         return QuantMode_t::QF322F16_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, bfloat16_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, bfloat16_t>) {
         return QuantMode_t::QF322BF16_PRE;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, float>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, float>) {
         return QuantMode_t::QF322F32_PRE;
     }
 }
 
-template <RoundMode roundMode, typename dstType, typename srcType>
-__aicore__ inline constexpr QuantMode_t GetCastQuantMode()
+template <round_mode mode, typename DstType, typename SrcType>
+__aicore__ inline constexpr QuantMode_t get_cast_quant_mode()
 {
-    if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, half>) {
+    if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, half>) {
         return QuantMode_t::F322F16;
-    } else if constexpr (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, bfloat16_t>) {
+    } else if constexpr (IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, bfloat16_t>) {
         return QuantMode_t::F322BF16;
     } else {
         return QuantMode_t::NoQuant;
     }
 }
 
-template <RoundMode roundMode, typename T, typename U, typename S = void>
-__aicore__ inline constexpr QuantMode_t GetQuantMode()
+template <round_mode mode, typename T, typename U, typename S = void>
+__aicore__ inline constexpr QuantMode_t get_quant_mode()
 {
-    using srcType = typename U::elementType;
-    using dstType = typename T::elementType;
-    constexpr bool isTensor = IsAttrTensorV<S>;
-    constexpr bool isScalar = Std::is_same_v<S, uint64_t>;
+    using SrcType = typename U::elementType;
+    using DstType = typename T::elementType;
+    constexpr bool is_tensor = IsAttrTensorV<S>;
+    constexpr bool is_scalar = Std::is_same_v<S, uint64_t>;
 
-    if constexpr (roundMode == RoundMode::HYBRID) {
-        static_assert((IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, hifloat8_t>),
-                      "Only when L0CType is float and output Type is hifloat8_t support RoundMode::HYBRID in Fixpipe");
+    if constexpr (mode == round_mode::hybrid) {
+        static_assert((IsOneOfAttrV<SrcType, float> && IsOneOfAttrV<DstType, hifloat8_t>),
+                      "Only when L0CType is float and output Type is hifloat8_t support round_mode::hybrid in Fixpipe");
     }
-    if constexpr (isTensor) {
-        return GetVectorQuantMode<roundMode, dstType, srcType>();
-    } else if constexpr (isScalar) {
-        return GetScalarQuantMode<roundMode, dstType, srcType>();
+    if constexpr (is_tensor) {
+        return get_vector_quant_mode<mode, DstType, SrcType>();
+    } else if constexpr (is_scalar) {
+        return get_scalar_quant_mode<mode, DstType, SrcType>();
     } else {
-        return GetCastQuantMode<roundMode, dstType, srcType>();
+        return get_cast_quant_mode<mode, DstType, SrcType>();
     }
 }
 
 
 class SetRegisterInstr {
 public:
-    __aicore__ inline static void SetRegister(uint64_t quant, uint32_t ndNum, uint32_t dstNDStride,
-                                              uint32_t srcNDStride)
+    __aicore__ inline static void set_register(uint64_t quant, uint32_t nd_num, uint32_t dst_n_d_stride,
+                                              uint32_t src_n_d_stride)
     {
-        SetQuantPre(quant);
-        SetLoop3Para<uint64_t>(ndNum, dstNDStride, srcNDStride);
+        set_quant_pre(quant);
+        set_loop3_para<uint64_t>(nd_num, dst_n_d_stride, src_n_d_stride);
     }
 
-    __aicore__ inline static void SetRegister(uint64_t quant, uint32_t dnNum, uint32_t dstDNStride,
-                                              uint32_t srcNZMatrixStride, uint32_t srcNZC0Stride)
+    __aicore__ inline static void set_register(uint64_t quant, uint32_t dn_num, uint32_t dst_d_n_stride,
+                                              uint32_t src_n_z_matrix_stride, uint32_t src_n_z_c0_stride)
     {
-        SetQuantPre(quant);
-        SetLoop3Para<uint64_t>(dnNum, dstDNStride, srcNZMatrixStride);
-        SetChannelPara<uint64_t>(srcNZC0Stride);
+        set_quant_pre(quant);
+        set_loop3_para<uint64_t>(dn_num, dst_d_n_stride, src_n_z_matrix_stride);
+        set_channel_para<uint64_t>(src_n_z_c0_stride);
     }
 
-    __aicore__ inline static void SetRegister(uint32_t ndNum, uint32_t dstNDStride, uint32_t srcNDStride)
-    { SetLoop3Para<uint64_t>(ndNum, dstNDStride, srcNDStride); }
+    __aicore__ inline static void set_register(uint32_t nd_num, uint32_t dst_n_d_stride, uint32_t src_n_d_stride)
+    { set_loop3_para<uint64_t>(nd_num, dst_n_d_stride, src_n_d_stride); }
 
-    __aicore__ inline static void SetRegister(uint32_t dnNum, uint32_t dstDNStride, uint32_t srcNZMatrixStride,
-                                              uint32_t srcNZC0Stride)
+    __aicore__ inline static void set_register(uint32_t dn_num, uint32_t dst_d_n_stride, uint32_t src_n_z_matrix_stride,
+                                              uint32_t src_n_z_c0_stride)
     {
-        SetLoop3Para<uint64_t>(dnNum, dstDNStride, srcNZMatrixStride);
-        SetChannelPara<uint64_t>(srcNZC0Stride);
+        set_loop3_para<uint64_t>(dn_num, dst_d_n_stride, src_n_z_matrix_stride);
+        set_channel_para<uint64_t>(src_n_z_c0_stride);
     }
 
 private:
@@ -257,7 +258,7 @@ private:
     static constexpr uint32_t SHIFT_LOOP3_SRC_MATRIX = 16;
     static constexpr uint32_t SHIFT_CHANNEL_C0_STRIDE = 48;
 
-    __aicore__ inline static void SetQuantPre(uint64_t quant)
+    __aicore__ inline static void set_quant_pre(uint64_t quant)
     {
         if ASCEND_IS_AIV {
             return;
@@ -267,46 +268,46 @@ private:
     }
 
     template <typename T>
-    __aicore__ inline static void SetLoop3Para(uint32_t num, uint32_t dstStride, uint32_t srcStride)
+    __aicore__ inline static void set_loop3_para(uint32_t num, uint32_t dst_stride, uint32_t src_stride)
     {
-        asc_set_l0c2gm_nz2nd(static_cast<T>(num), static_cast<T>(srcStride), static_cast<T>(dstStride));
+        asc_set_l0c2gm_nz2nd(static_cast<T>(num), static_cast<T>(src_stride), static_cast<T>(dst_stride));
     }
 
     template <typename T>
-    __aicore__ inline static void SetChannelPara(uint32_t srcNZC0Stride)
+    __aicore__ inline static void set_channel_para(uint32_t src_n_z_c0_stride)
     {
         if ASCEND_IS_AIV {
             return;
         }
 
-        T channelPara = 0;
-        channelPara |= static_cast<T>(srcNZC0Stride) << SHIFT_CHANNEL_C0_STRIDE;
-        asc_set_l0c2gm_channel_para(channelPara);
+        T channel_para = 0;
+        channel_para |= static_cast<T>(src_n_z_c0_stride) << SHIFT_CHANNEL_C0_STRIDE;
+        asc_set_l0c2gm_channel_para(channel_para);
     }
 };
 
-__aicore__ inline auto AllocFbTempBuf(const uint16_t& /* calNSize */)
+__aicore__ inline auto alloc_fb_temp_buf(const uint16_t& /* cal_n_size */)
 {
     if ASCEND_IS_AIV {
         return 0UL;
     }
-    uint64_t deqTensorTempBuf = 0;
-    deqTensorTempBuf = reinterpret_cast<uint64_t>(asc_get_phy_buf_addr(0));
-    return deqTensorTempBuf;
+    uint64_t deq_tensor_temp_buf = 0;
+    deq_tensor_temp_buf = reinterpret_cast<uint64_t>(asc_get_phy_buf_addr(0));
+    return deq_tensor_temp_buf;
 }
 
 template <typename T>
-__aicore__ inline void SetFpc(const __fbuf__ T* deqTensorTempBuf)
+__aicore__ inline void set_fpc(const __fbuf__ T* deq_tensor_temp_buf)
 {
     if ASCEND_IS_AIV {
         return;
     }
    
-    uint64_t deqTensorAddr = (reinterpret_cast<uint64_t>(deqTensorTempBuf) >> 7) << 8;
-    asc_set_l0c_copy_prequant(deqTensorAddr);
+    uint64_t deq_tensor_addr = (reinterpret_cast<uint64_t>(deq_tensor_temp_buf) >> 7) << 8;
+    asc_set_l0c_copy_prequant(deq_tensor_addr);
 }
 
-__aicore__ inline void InsertSync()
+__aicore__ inline void insert_sync()
 {
     if ASCEND_IS_AIV {
         return;
@@ -317,60 +318,60 @@ __aicore__ inline void InsertSync()
 
 
 template <typename T, typename U>
-__aicore__ inline static void EmitSetRegister(const U& srcLayout, uint32_t batchNum, uint32_t dstBatchStride,
-                                              uint32_t srcBatchStride)
+__aicore__ inline static void emit_set_register(const U& src_layout, uint32_t batch_num, uint32_t dst_batch_stride,
+                                              uint32_t src_batch_stride)
 {
     if constexpr (IsL0COutNDFormatV<T>) {
-        SetRegisterInstr::SetRegister(batchNum, dstBatchStride, srcBatchStride);
+        SetRegisterInstr::set_register(batch_num, dst_batch_stride, src_batch_stride);
     } else {
-        SetRegisterInstr::SetRegister(batchNum, dstBatchStride, srcBatchStride,
-                                      GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout));
+        SetRegisterInstr::set_register(batch_num, dst_batch_stride, src_batch_stride,
+                                      get_element<AttrInfo::Stride, AttrInfo::Column, 0>(src_layout));
     }
 }
 
 template <typename T, typename U>
-__aicore__ inline static void EmitSetRegister(
-    const U& srcLayout, uint64_t quant, uint32_t batchNum, uint32_t dstBatchStride, uint32_t srcBatchStride)
+__aicore__ inline static void emit_set_register(
+    const U& src_layout, uint64_t quant, uint32_t batch_num, uint32_t dst_batch_stride, uint32_t src_batch_stride)
 {
     if constexpr (IsL0COutNDFormatV<T>) {
-        SetRegisterInstr::SetRegister(quant, batchNum, dstBatchStride, srcBatchStride);
+        SetRegisterInstr::set_register(quant, batch_num, dst_batch_stride, src_batch_stride);
     } else {
-        SetRegisterInstr::SetRegister(quant, batchNum, dstBatchStride, srcBatchStride,
-                                      GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout));
+        SetRegisterInstr::set_register(quant, batch_num, dst_batch_stride, src_batch_stride,
+                                      get_element<AttrInfo::Stride, AttrInfo::Column, 0>(src_layout));
     }
 }
 
 template <typename T, typename U>
-__aicore__ inline static void SetRegisterImpl(const T& dst, const U& src)
+__aicore__ inline static void set_register_impl(const T& dst, const U& src)
 {
     if constexpr (IsL0COutNDFormatV<T> || IsL0COutDNFormatV<T>) {
         if constexpr (IsL0COutSrcBatchLayoutV<U>) {
-            auto srcLayout = src.Layout();
-            auto dstLayout = dst.Layout();
-            EmitSetRegister<T>(Get<1>(srcLayout), Get<0>(srcLayout.Shape()), Get<0>(dstLayout.Stride()),
-                               Get<0>(srcLayout.Stride()) / FRACTAL_FIXED);
+            auto src_layout = src.layout();
+            auto dst_layout = dst.layout();
+            emit_set_register<T>(get<1>(src_layout), get<0>(src_layout.shape()), get<0>(dst_layout.stride()),
+                               get<0>(src_layout.stride()) / FRACTAL_FIXED);
         } else {
-            EmitSetRegister<T>(src.Layout(), 1, 0, 0);
+            emit_set_register<T>(src.layout(), 1, 0, 0);
         }
     } else {
-        SetRegisterInstr::SetRegister(1, 0, 0);
+        SetRegisterInstr::set_register(1, 0, 0);
     }
 }
 
 template <typename T, typename U>
-__aicore__ inline static void SetRegisterImpl(const T& dst, const U& src, uint64_t quant)
+__aicore__ inline static void set_register_impl(const T& dst, const U& src, uint64_t quant)
 {
     if constexpr (IsL0COutNDFormatV<T> || IsL0COutDNFormatV<T>) {
         if constexpr (IsL0COutSrcBatchLayoutV<U>) {
-            auto srcLayout = src.Layout();
-            auto dstLayout = dst.Layout();
-            EmitSetRegister<T>(Get<1>(srcLayout), quant, Get<0>(srcLayout.Shape()), Get<0>(dstLayout.Stride()),
-                               Get<0>(srcLayout.Stride()) / FRACTAL_FIXED);
+            auto src_layout = src.layout();
+            auto dst_layout = dst.layout();
+            emit_set_register<T>(get<1>(src_layout), quant, get<0>(src_layout.shape()), get<0>(dst_layout.stride()),
+                               get<0>(src_layout.stride()) / FRACTAL_FIXED);
         } else {
-            EmitSetRegister<T>(src.Layout(), quant, 1, 0, 0);
+            emit_set_register<T>(src.layout(), quant, 1, 0, 0);
         }
     } else {
-        SetRegisterInstr::SetRegister(quant, 1, 0, 0);
+        SetRegisterInstr::set_register(quant, 1, 0, 0);
     }
 }
 
@@ -378,20 +379,115 @@ __aicore__ inline static void SetRegisterImpl(const T& dst, const U& src, uint64
 // quant copy. Returns whether the quant tensor is batched so the caller can use the result for
 // `if constexpr` dispatch without recomputing it.
 template <typename T, typename U, typename V>
-__aicore__ inline static constexpr bool CheckVectorQuantBatchConsistency()
+__aicore__ inline static constexpr bool check_vector_quant_batch_consistency()
 {
-    constexpr bool srcBatched = IsL0COutSrcBatchLayoutV<U>;
-    constexpr bool dstBatched = IsL0COutBatchedLayoutV<T>;
-    constexpr bool quantBatched = IsL0COutBatchedLayoutV<V>;
-    static_assert(srcBatched == dstBatched,
+    constexpr bool src_batched = IsL0COutSrcBatchLayoutV<U>;
+    constexpr bool dst_batched = IsL0COutBatchedLayoutV<T>;
+    constexpr bool quant_batched = IsL0COutBatchedLayoutV<V>;
+    static_assert(src_batched == dst_batched,
         "src and dst tensors must both carry a batch axis or both omit it.");
-    static_assert(!quantBatched || srcBatched,
+    static_assert(!quant_batched || src_batched,
         "Vector quant with batched quant tensor requires batched src and dst tensors as well.");
-    return quantBatched;
+    return quant_batched;
 }
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
+
+
+// PascalCase compatibility wrappers
+namespace asc {
+namespace te {
+template <typename T, typename LayoutType>
+__aicore__ inline static constexpr uint32_t GetL0COutNDStride(const LayoutType& layout)
+{
+    return get_l0c_out_nd_stride<T>(layout);
+}
+
+template <typename T, typename LayoutType>
+__aicore__ inline static constexpr uint32_t GetL0COutDNStride(const LayoutType& layout)
+{
+    return get_l0c_out_dn_stride<T>(layout);
+}
+
+template <typename T, typename U, typename DstLayout, typename SrcLayout>
+__aicore__ inline static constexpr l0c_out_copy_params MakeL0COutCopyParams(
+    const DstLayout& dst_layout, const SrcLayout& src_layout)
+{
+    return make_l0c_out_copy_params<T, U>(dst_layout, src_layout);
+}
+
+template <round_mode mode, typename DstType, typename SrcType>
+__aicore__ inline constexpr QuantMode_t GetVectorQuantMode()
+{
+    return get_vector_quant_mode<mode, DstType, SrcType>();
+}
+
+template <round_mode mode, typename DstType, typename SrcType>
+__aicore__ inline constexpr QuantMode_t GetScalarQuantMode()
+{
+    return get_scalar_quant_mode<mode, DstType, SrcType>();
+}
+
+template <round_mode mode, typename DstType, typename SrcType>
+__aicore__ inline constexpr QuantMode_t GetCastQuantMode()
+{
+    return get_cast_quant_mode<mode, DstType, SrcType>();
+}
+
+template <round_mode mode, typename T, typename U, typename S = void>
+__aicore__ inline constexpr QuantMode_t GetQuantMode()
+{
+    return get_quant_mode<mode, T, U, S>();
+}
+
+template <typename T, typename U, typename V>
+__aicore__ inline static constexpr bool CheckVectorQuantBatchConsistency()
+{
+    return check_vector_quant_batch_consistency<T, U, V>();
+}
+
+__aicore__ inline auto AllocFbTempBuf(const uint16_t& cal_n_size)
+{
+    return alloc_fb_temp_buf(cal_n_size);
+}
+
+template <typename T>
+__aicore__ inline void SetFpc(const __fbuf__ T* deq_tensor_temp_buf)
+{
+    set_fpc(deq_tensor_temp_buf);
+}
+
+__aicore__ inline void InsertSync()
+{
+    insert_sync();
+}
+
+template <typename T, typename U>
+__aicore__ inline static void EmitSetRegister(const U& src_layout, uint32_t batch_num, uint32_t dst_batch_stride, uint32_t src_batch_stride)
+{
+    emit_set_register<T>(src_layout, batch_num, dst_batch_stride, src_batch_stride);
+}
+
+template <typename T, typename U>
+__aicore__ inline static void EmitSetRegister(const U& src_layout, uint64_t quant, uint32_t batch_num, uint32_t dst_batch_stride, uint32_t src_batch_stride)
+{
+    emit_set_register<T>(src_layout, quant, batch_num, dst_batch_stride, src_batch_stride);
+}
+
+template <typename T, typename U>
+__aicore__ inline static void SetRegisterImpl(const T& dst, const U& src)
+{
+    set_register_impl(dst, src);
+}
+
+template <typename T, typename U>
+__aicore__ inline static void SetRegisterImpl(const T& dst, const U& src, uint64_t quant)
+{
+    set_register_impl(dst, src, quant);
+}
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_UTILS_L0C2OUT_UTILS_H
 

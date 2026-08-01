@@ -24,17 +24,29 @@
 
 #include "impl/tensor_api/arch/vector/transform/transform_vf.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
+template<typename CalcFunc, typename TraitType = Std::ignore_t, typename... Args>
+__aicore__ inline void transform(const Args&... args)
+{
+    Transform2VF<CalcFunc, TraitType>::template run(args...);
+}
+
+}
+}
+
+
+// PascalCase compatibility wrappers
+namespace asc {
+namespace te {
 template<typename CalcFunc, typename TraitType = Std::ignore_t, typename... Args>
 __aicore__ inline void Transform(const Args&... args)
 {
-    Transform2VF<CalcFunc, TraitType>::template Run(args...);
+    transform<CalcFunc, TraitType>(args...);
 }
-
-}
-}
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ALGORITHM_TRANSFORM_IMPL_H
 

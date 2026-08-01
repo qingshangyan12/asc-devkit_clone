@@ -26,14 +26,14 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 namespace Inst {
 
 class CreateMask {
 public:
     template <typename T, typename PatType>
-    __simd_callee__ inline static vector_bool Run()
+    __simd_callee__ inline static vector_bool run()
     {
         if constexpr (sizeof(T) == sizeof(uint32_t)) {
             return asc_create_mask_b32(PatType());
@@ -50,7 +50,7 @@ public:
 class UpdateMask {
 public:
     template <typename T, typename U>
-    __simd_callee__ inline static vector_bool Run(U& value)
+    __simd_callee__ inline static vector_bool run(U& value)
     {
         if constexpr (sizeof(T) == sizeof(uint32_t)) {
             return asc_update_mask_b32(value);

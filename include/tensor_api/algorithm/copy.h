@@ -23,44 +23,44 @@
 
 #include "impl/tensor_api/algorithm/copy_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 /**
- * @brief Perform a copy operation with a preconstructed CopyAtom.
- * @param atomCopy : Copy atom object that determines the copy behavior.
+ * @brief Perform a copy operation with a preconstructed copy_atom.
+ * @param atom_copy : Copy atom object that determines the copy behavior.
  * @param dst : Destination tensor.
  * @param src : Source tensor.
  */
 template <typename AtomType, typename DstTensor, typename SrcTensor>
-__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src);
+__aicore__ inline void copy(const copy_atom<AtomType>& atom_copy, const DstTensor& dst, const SrcTensor& src);
 
 /**
- * @brief Perform a copy operation with a preconstructed CopyAtom and a quantization parameter.
- * @param atomCopy : Copy atom object that determines the copy behavior.
+ * @brief Perform a copy operation with a preconstructed copy_atom and a quantization parameter.
+ * @param atom_copy : Copy atom object that determines the copy behavior.
  * @param dst : Destination tensor.
  * @param src : Source tensor.
  * @param quant : Quantization parameter, which can be a scalar or a Tensor API tensor.
  */
 template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
     Std::enable_if_t<IsCopyQuantParamV<QuantParam>, int> Enable>
-__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
+__aicore__ inline void copy(const copy_atom<AtomType>& atom_copy, const DstTensor& dst, const SrcTensor& src,
     const QuantParam& quant);
 
 /**
- * @brief Construct a CopyAtom from the copy operation object.
- * @param copyOperation : Copy operation object.
+ * @brief Construct a copy_atom from the copy operation object.
+ * @param copy_operation : Copy operation object.
  */
 template <typename CopyOperationType>
-__aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation);
+__aicore__ inline constexpr auto make_copy(const CopyOperationType& copy_operation);
 
 /**
- * @brief Construct a CopyAtom from the copy operation object and trait object.
- * @param copyOperation : Copy operation object.
- * @param copyTrait : Copy trait object.
+ * @brief Construct a copy_atom from the copy operation object and trait object.
+ * @param copy_operation : Copy operation object.
+ * @param copy_trait : Copy trait object.
  */
 template <typename CopyOperationType, typename CopyTraitType>
-__aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation, const CopyTraitType& copyTrait);
+__aicore__ inline constexpr auto make_copy(const CopyOperationType& copy_operation, const CopyTraitType& copy_trait);
 
 }
 }

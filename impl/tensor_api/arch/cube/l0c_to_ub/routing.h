@@ -25,13 +25,13 @@
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
 #include "impl/tensor_api/arch/cube/l0c_to_ub/copy_impl/data_copy.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class CopyL0C2UBIgnore {
 public:
-    template <const CopyL0C2UBTrait& trait, typename... Args>
-    __aicore__ inline static void Run(const Args&... args)
+    template <const copy_l0c_to_ub_trait& trait, typename... Args>
+    __aicore__ inline static void run(const Args&... args)
     { 
         static_assert(Std::is_same_v<Args..., void>, "CopyL0C2UBIgnore should not be called"); 
     }
@@ -64,8 +64,8 @@ struct CopyL0C2UBRouting<Version, NZLayoutPtn, NZLayoutPtn> {
     using type = DataCopyL0C2UB;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_ROUTING_H
 

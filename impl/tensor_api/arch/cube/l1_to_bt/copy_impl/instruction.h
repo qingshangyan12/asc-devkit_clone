@@ -26,34 +26,34 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyL12BTTrait {};
+struct copy_l1_to_bt_trait {};
 
 class CopyL12BTInstr {
 public:
     template <typename T, typename U, typename... Params>
-    __aicore__ inline static void DataCopy(const T& dst, const U& src, const Params&... params)
+    __aicore__ inline static void data_copy(const T& dst, const U& src, const Params&... params)
     {
-        CopyL12BT(reinterpret_cast<uint64_t>(dst.Data().Get()), src.Data().Get(), params...);
+        copy_l12_bt(reinterpret_cast<uint64_t>(dst.data().get()), src.data().get(), params...);
     }
 
 private:
     template <typename T>
-    __aicore__ inline static void CopyL12BT(uint64_t dst, __cbuf__ T* src, bool convControl, uint16_t blockCount,
-        uint16_t blockLen, uint16_t srcStride, uint16_t dstStride)
+    __aicore__ inline static void copy_l12_bt(uint64_t dst, __cbuf__ T* src, bool conv_control, uint16_t block_count,
+        uint16_t block_len, uint16_t src_stride, uint16_t dst_stride)
     {
         if ASCEND_IS_AIV {
             return;
         }
 
-        asc_copy_l12bt(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
+        asc_copy_l12bt(dst, src, conv_control, block_count, block_len, src_stride, dst_stride);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_BT_COPY_IMPL_INSTRUCTION_H
 

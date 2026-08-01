@@ -27,20 +27,20 @@
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
 #include "impl/tensor_api/arch/cube/l0c_to_gm/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyL0C2GMTrait DEFAULT_COPY_L0C2GM_TRAIT = CopyL0C2GMTrait{};
-struct CopyL0C2GMTraitDefault {
-    using TraitType = CopyL0C2GMTrait;
+constexpr copy_l0c_to_gm_trait DEFAULT_COPY_L0C2GM_TRAIT = copy_l0c_to_gm_trait{};
+struct copy_l0c_to_gm_trait_default {
+    using TraitType = copy_l0c_to_gm_trait;
     static constexpr const TraitType value = DEFAULT_COPY_L0C2GM_TRAIT;
 };
 
 struct CopyL0C2GMBase {
 public:
-    template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src,
-                                               const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    template <const copy_l0c_to_gm_trait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U>
+    __aicore__ inline static void data_copy_impl(const T& dst, const U& src,
+                                               const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
@@ -51,12 +51,12 @@ public:
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
 
         using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2GMImpl::template Run<trait>(dst, src, params);
+        CopyL0C2GMImpl::template run<trait>(dst, src, params);
     }
 
-    template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>
+    template <const copy_l0c_to_gm_trait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>
     __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type
-    DataCopyImpl(const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    data_copy_impl(const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
@@ -67,12 +67,12 @@ public:
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
 
         using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2GMImpl::template Run<trait>(dst, src, quant, params);
+        CopyL0C2GMImpl::template run<trait>(dst, src, quant, params);
     }
 
-    template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>
+    template <const copy_l0c_to_gm_trait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>
     __aicore__ inline static typename Std::enable_if<IsAttrTensorV<S>, void>::type
-    DataCopyImpl(const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    data_copy_impl(const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
@@ -83,36 +83,36 @@ public:
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
 
         using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2GMImpl::template Run<trait>(dst, src, quant, params);
+        CopyL0C2GMImpl::template run<trait>(dst, src, quant, params);
     }
 };
 
-struct CopyL0C2GM : public CopyL0C2GMBase {
+struct copy_l0c_to_gm : public CopyL0C2GMBase {
 public:
     template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIV {
             return;
         }
-        DataCopyImpl<trait>(args...);
+        data_copy_impl<trait>(args...);
     }
 };
 
-struct CopyL0C2GMWith : public CopyL0C2GMBase {
+struct copy_l0c_to_gm_with : public CopyL0C2GMBase {
 public:
     template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIV {
             return;
         }
-        DataCopyImpl<trait>(args...);
+        data_copy_impl<trait>(args...);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_GM_COPY_H
 

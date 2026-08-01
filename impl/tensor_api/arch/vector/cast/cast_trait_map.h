@@ -24,8 +24,8 @@
 
 #include "impl/tensor_api/arch/vector/cast/instruction.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 // From instruction/bfloat16_float.h
 using CastSub_bfloat16_t_to_float = TupleMap<
@@ -729,8 +729,8 @@ ASCENDC_CAST_SUB_MAP(int4x2_t, int16_t)
 #undef ASCENDC_CAST_SUB_MAP
 #undef ASCENDC_CAST_SUB_MAP_NAME
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_TRAIT_MAP_H
 

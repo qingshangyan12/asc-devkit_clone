@@ -26,13 +26,13 @@
 #include "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/nz2nz.h"
 #include "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/zn2zn.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class CopyUB2L1Ignore {
 public:
-    template <const CopyUB2L1Trait& trait, typename ...Args>
-    __aicore__ inline static void Run(const Args&... args) {
+    template <const copy_ub_to_l1_trait& trait, typename ...Args>
+    __aicore__ inline static void run(const Args&... args) {
         static_assert(Std::is_same_v<Args..., void>, "CopyUB2L1Ignore should not be called");
     }
 };
@@ -72,8 +72,8 @@ struct CopyUB2L1Routing<Version, ZNLayoutPtn, ZNLayoutPtn> {
     using type = CopyUbufToCbufZN;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_ROUTING_H
 

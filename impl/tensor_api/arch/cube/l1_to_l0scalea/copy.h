@@ -24,29 +24,29 @@
 
 #include "impl/tensor_api/arch/cube/l1_to_l0scalea/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyL12L0ScaleATrait DEFAULT_COPY_L1_TO_L0SCALEA_TRAIT;
+constexpr copy_l1_to_l0_scale_a_trait DEFAULT_COPY_L1_TO_L0SCALEA_TRAIT;
 
-struct CopyL12L0ScaleATraitDefault {
-    using TraitType = CopyL12L0ScaleATrait;
+struct copy_l1_to_l0_scale_a_trait_default {
+    using TraitType = copy_l1_to_l0_scale_a_trait;
     static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0SCALEA_TRAIT;
 };
 
-struct CopyL12L0ScaleA {
+struct copy_l1_to_l0_scale_a {
 public:
     template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args& ...args)
+    __aicore__ inline static void copy(const Args& ...args)
     {
         if ASCEND_IS_AIC {
-            LoadData<traits, Args...>(args...);
+            load_data<traits, Args...>(args...);
         }
     }
 
 private:
-    template <const CopyL12L0ScaleATrait& trait = DEFAULT_COPY_L1_TO_L0SCALEA_TRAIT, typename T, typename U>
-    __aicore__ inline static void LoadData(const T& dst, const U& src)
+    template <const copy_l1_to_l0_scale_a_trait& trait = DEFAULT_COPY_L1_TO_L0SCALEA_TRAIT, typename T, typename U>
+    __aicore__ inline static void load_data(const T& dst, const U& src)
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
@@ -58,12 +58,12 @@ private:
         using SrcPattern = GetLayoutPattern<SrcLayout>;
         using CopyL12L0ScaleAImpl = typename CopyL12L0ScaleARouting<CURRENT_ARCH_VERSION, DstPattern,
             SrcPattern>::type;
-        CopyL12L0ScaleAImpl::template Run<trait, T, U>(dst, src);
+        CopyL12L0ScaleAImpl::template run<trait, T, U>(dst, src);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0SCALEA_COPY_H
 

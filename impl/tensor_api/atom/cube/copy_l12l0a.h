@@ -25,53 +25,59 @@
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename Traits>
-struct CopyTraits<CopyL12L0A, Traits> : public CopyTraits<CopyL12L0A, Traits, CopyL12L0AWith, Traits> {
-    using BaseType = CopyTraits<CopyL12L0A, Traits, CopyL12L0AWith, Traits>;
+struct copy_traits<copy_l1_to_l0a, Traits> : public copy_traits<copy_l1_to_l0a, Traits, CopyL12L0AWith, Traits> {
+    using BaseType = copy_traits<copy_l1_to_l0a, Traits, CopyL12L0AWith, Traits>;
     using TraitType = typename BaseType::TraitType;
     using BaseType::with;
 
     template <typename PadT>
     __aicore__ inline constexpr auto with(const Img2ColParams<PadT>& params) const
     {
-        return CopyTraits<CopyL12L0AWith, Traits, PadT>{params};
+        return copy_traits<CopyL12L0AWith, Traits, PadT>{normalize_img2col_params(params)};
+    }
+
+    template <typename PadT>
+    __aicore__ inline constexpr auto with(const img2col_params<PadT>& params) const
+    {
+        return copy_traits<CopyL12L0AWith, Traits, PadT>{params};
     }
 };
 
 template <>
-struct CopyTraits<CopyL12L0A> : public CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault> {};
+struct copy_traits<copy_l1_to_l0a> : public copy_traits<copy_l1_to_l0a, copy_l1_to_l0a_trait_default> {};
 
 template <typename TraitStruct, typename PadT>
-struct CopyTraits<CopyL12L0AWith, TraitStruct, PadT> {
+struct copy_traits<CopyL12L0AWith, TraitStruct, PadT> {
     using TraitType = typename TraitStruct::TraitType;
     static constexpr const TraitType defaultTrait = TraitStruct::value;
 
     template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void CopyUnpack(const Args&... args) const
+    __aicore__ inline void copy_unpack(const Args&... args) const
     {
-        CopyL12L0AWith::Copy<TraitType, trait, Args...>(args..., params);
+        CopyL12L0AWith::copy<TraitType, trait, Args...>(args..., params);
     }
-    Img2ColParams<PadT> params;
+    img2col_params<PadT> params;
 };
 
 template <typename TraitStruct>
-struct CopyTraits<CopyL12L0AWith, TraitStruct> {
+struct copy_traits<CopyL12L0AWith, TraitStruct> {
     using TraitType = typename TraitStruct::TraitType;
     static constexpr const TraitType defaultTrait = TraitStruct::value;
 
     template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void CopyUnpack(const Args&... args) const
+    __aicore__ inline void copy_unpack(const Args&... args) const
     {
-        CopyL12L0AWith::Copy<TraitType, trait, Args...>(args..., params);
+        CopyL12L0AWith::copy<TraitType, trait, Args...>(args..., params);
     }
-    Img2ColParams<int16_t> params{};
+    img2col_params<int16_t> params{};
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ATOM_CUBE_COPY_L12L0A_H
 

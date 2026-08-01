@@ -26,8 +26,8 @@
 #include "impl/tensor_api/arch/vector/cast/instruction.h"
 #include "impl/tensor_api/arch/vector/utils/mask_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 struct CastWidthSrcEqDst {};   // 1:1: float<->int32, half<->int16
 struct CastWidthDst2xSrc {};   // 1:2: half->float, int16->int32
@@ -43,15 +43,15 @@ template<>
 class CastVFLoop<CastWidthSrcEqDst> {
 public:
     template<typename CalcFunc, typename T, typename U, typename DstRegType, typename SrcRegType>
-    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t oneRepSize,
-        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
+    __simd_callee__ inline static void run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t one_rep_size,
+        uint32_t data_size, DstRegType& dst_reg, SrcRegType& src_reg, vector_bool& dst_mask, vector_bool full_mask)
     {
         for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<uint32_t>(dataSize);
+            dst_mask = Inst::UpdateMask::template run<uint32_t>(data_size);
 
-            asc_loadalign(srcReg, src + i * oneRepSize);
-            CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign(dst + i * oneRepSize, dstReg, dstMask);
+            asc_loadalign(src_reg, src + i * one_rep_size);
+            CalcFunc::template run(dst_reg, src_reg, full_mask);
+            asc_storealign(dst + i * one_rep_size, dst_reg, dst_mask);
         }
     }
 };
@@ -61,15 +61,15 @@ template<>
 class CastVFLoop<CastWidthDst2xSrc> {
 public:
     template<typename CalcFunc, typename T, typename U,  typename DstRegType, typename SrcRegType>
-    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t oneRepSize,
-        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
+    __simd_callee__ inline static void run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t one_rep_size,
+        uint32_t data_size, DstRegType& dst_reg, SrcRegType& src_reg, vector_bool& dst_mask, vector_bool full_mask)
     {
         for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<uint32_t>(dataSize);
+            dst_mask = Inst::UpdateMask::template run<uint32_t>(data_size);
 
-            asc_loadalign_unpack_postupdate(srcReg, src, oneRepSize);
-            CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign(dst + i * oneRepSize, dstReg, dstMask);
+            asc_loadalign_unpack_postupdate(src_reg, src, one_rep_size);
+            CalcFunc::template run(dst_reg, src_reg, full_mask);
+            asc_storealign(dst + i * one_rep_size, dst_reg, dst_mask);
         }
     }
 };
@@ -79,17 +79,17 @@ template<>
 class CastVFLoop<CastWidthSrc2xDst> {
 public:
     template<typename CalcFunc, typename T, typename U,  typename DstRegType, typename SrcRegType>
-    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t oneRepSize,
-        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
+    __simd_callee__ inline static void run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t one_rep_size,
+        uint32_t data_size, DstRegType& dst_reg, SrcRegType& src_reg, vector_bool& dst_mask, vector_bool full_mask)
     {
-        auto dstCur = reinterpret_cast<__ubuf__ U*>(dst);
+        auto dst_cur = reinterpret_cast<__ubuf__ U*>(dst);
         for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<uint32_t>(dataSize);
+            dst_mask = Inst::UpdateMask::template run<uint32_t>(data_size);
 
-            asc_loadalign(srcReg, src + i * oneRepSize);
-            CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign_pack_postupdate(dstCur, *reinterpret_cast<SrcRegType*>(&dstReg), oneRepSize / 2,
-                dstMask);
+            asc_loadalign(src_reg, src + i * one_rep_size);
+            CalcFunc::template run(dst_reg, src_reg, full_mask);
+            asc_storealign_pack_postupdate(dst_cur, *reinterpret_cast<SrcRegType*>(&dst_reg), one_rep_size / 2,
+                dst_mask);
         }
     }
 };
@@ -99,15 +99,15 @@ template<>
 class CastVFLoop<CastWidthDst4xSrc> {
 public:
     template<typename CalcFunc, typename T, typename U, typename DstRegType, typename SrcRegType>
-    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t oneRepSize,
-        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
+    __simd_callee__ inline static void run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t one_rep_size,
+        uint32_t data_size, DstRegType& dst_reg, SrcRegType& src_reg, vector_bool& dst_mask, vector_bool full_mask)
     {
         for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<uint32_t>(dataSize);
+            dst_mask = Inst::UpdateMask::template run<uint32_t>(data_size);
 
-            asc_loadalign_unpack_postupdate_v2(srcReg, src, oneRepSize);
-            CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign(dst + i * oneRepSize, dstReg, dstMask);
+            asc_loadalign_unpack_postupdate_v2(src_reg, src, one_rep_size);
+            CalcFunc::template run(dst_reg, src_reg, full_mask);
+            asc_storealign(dst + i * one_rep_size, dst_reg, dst_mask);
         }
     }
 };
@@ -117,17 +117,17 @@ template<>
 class CastVFLoop<CastWidthSrc4xDst> {
 public:
     template<typename CalcFunc, typename T, typename U, typename DstRegType, typename SrcRegType>
-    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t oneRepSize,
-        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
+    __simd_callee__ inline static void run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint32_t one_rep_size,
+        uint32_t data_size, DstRegType& dst_reg, SrcRegType& src_reg, vector_bool& dst_mask, vector_bool full_mask)
     {
-        auto dstCur = reinterpret_cast<__ubuf__ U*>(dst);
+        auto dst_cur = reinterpret_cast<__ubuf__ U*>(dst);
         for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<uint32_t>(dataSize);
+            dst_mask = Inst::UpdateMask::template run<uint32_t>(data_size);
 
-            asc_loadalign(srcReg, src + i * oneRepSize);
-            CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign_pack_postupdate_v2(dstCur, *reinterpret_cast<SrcRegType*>(&dstReg), oneRepSize / 4,
-                dstMask);
+            asc_loadalign(src_reg, src + i * one_rep_size);
+            CalcFunc::template run(dst_reg, src_reg, full_mask);
+            asc_storealign_pack_postupdate_v2(dst_cur, *reinterpret_cast<SrcRegType*>(&dst_reg), one_rep_size / 4,
+                dst_mask);
         }
     }
 };
@@ -137,19 +137,19 @@ template<typename CalcFunc, typename TraitType, typename WidthCategory>
 class CastVF {
 public:
     template<typename DstRegType, typename SrcRegType, typename T, typename U>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, const uint32_t dataSize)
+    __simd_vf__ inline static void run(__ubuf__ T* dst, __ubuf__ U* src, const uint32_t data_size)
     {
         using greaterType = Std::conditional_t<(sizeof(T) > sizeof(U)), T, U>;
-        constexpr uint32_t oneRepSize = static_cast<uint32_t>(asc_get_vf_len() / sizeof(greaterType));
-        uint16_t repeat = static_cast<uint16_t>((dataSize + oneRepSize - 1) / oneRepSize);
+        constexpr uint32_t one_rep_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(greaterType));
+        uint16_t repeat = static_cast<uint16_t>((data_size + one_rep_size - 1) / one_rep_size);
 
         DstRegType dstReg;
         SrcRegType srcReg;
 
         vector_bool dstMask;
-        vector_bool fullMask = Inst::CreateMask::template Run<uint32_t, decltype(PAT_ALL)>();
-        CastVFLoop<WidthCategory>::template Run<CalcFunc, T, U>(
-            dst, src, repeat, oneRepSize, dataSize, dstReg, srcReg, dstMask, fullMask);
+        vector_bool fullMask = Inst::CreateMask::template run<uint32_t, decltype(PAT_ALL)>();
+        CastVFLoop<WidthCategory>::template run<CalcFunc, T, U>(
+            dst, src, repeat, one_rep_size, data_size, dstReg, srcReg, dstMask, fullMask);
     }
 };
 
@@ -158,14 +158,14 @@ template<typename CalcFunc, typename TraitType>
 class Transform2CastVF {
 public:
     template<typename T, typename U>
-    __aicore__ inline static void Run(const T& dst, const U& src)
+    __aicore__ inline static void run(const T& dst, const U& src)
     {
         using dstType = GetAttributeElementType<typename T::elementType*>;
         using srcType = GetAttributeElementType<typename U::elementType*>;
         using DstRegType = typename VectorTypeTransform::template Get<dstType>;
         using SrcRegType = typename VectorTypeTransform::template Get<srcType>;
 
-        const uint32_t dstSize = dst.Size();
+        const uint32_t dst_size = dst.size();
 
         constexpr bool src_eq_dst = (sizeof(dstType) == sizeof(srcType));     // 1:1: float<->int32, half<->int16
         constexpr bool dst_2x_src = (sizeof(dstType) == 2 * sizeof(srcType)); // 1:2: half->float, int16->int32
@@ -179,8 +179,8 @@ public:
                             Std::conditional_t<src_2x_dst, CastWidthSrc2xDst,
                             Std::conditional_t<dst_4x_src, CastWidthDst4xSrc, CastWidthSrc4xDst>>>>;
 
-        CastVF<CalcFunc, TraitType, WidthCategory>::template Run<DstRegType, SrcRegType>(
-            dst.Data().Get(), src.Data().Get(), dstSize);
+        CastVF<CalcFunc, TraitType, WidthCategory>::template run<DstRegType, SrcRegType>(
+            dst.data().get(), src.data().get(), dst_size);
     }
 };
 
@@ -202,7 +202,7 @@ template<typename CalcFunc, typename TraitType>
 class Transform2CastInstMatch {
 public:
     template <typename T, typename U>
-    __aicore__ inline static void Run(const T& dst, const U& src)
+    __aicore__ inline static void run(const T& dst, const U& src)
     {
         using srcType = GetAttributeElementType<typename U::elementType*>;
         using dstType = GetAttributeElementType<typename T::elementType*>;
@@ -219,7 +219,7 @@ public:
         using func = CastTrait2CastFunc::template Lookup<srcType, dstType, roundMode, satMode, indexPos>;
         static_assert(!Std::is_same_v<func, Std::ignore_t>,
             "Unsupported cast trait: no matching entry found in CastTrait2CastFunc.");
-        Transform2CastVF<func, Std::ignore_t>::template Run(dst, src);
+        Transform2CastVF<func, Std::ignore_t>::template run(dst, src);
     }
 };
 }

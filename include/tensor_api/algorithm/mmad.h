@@ -23,23 +23,23 @@
 
 #include "impl/tensor_api/algorithm/mmad_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 /**
- * @brief Perform matrix multiplication with a preconstructed MmadAtom.
- * @param atomMmad : Matrix multiplication atom object.
+ * @brief Perform matrix multiplication with a preconstructed mmad_atom.
+ * @param atom_mmad : Matrix multiplication atom object.
  * @param dst : Destination tensor.
  * @param fm : Left input tensor.
  * @param filter : Right input tensor.
  */
 template <typename AtomType, typename DstTensor, typename FmTensor, typename FilterTensor>
-__aicore__ inline void Mmad(
-    const MmadAtom<AtomType>& atomMmad, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter);
+__aicore__ inline void mmad(
+    const mmad_atom<AtomType>& atom_mmad, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter);
 
 /**
- * @brief Perform matrix multiplication with a preconstructed MmadAtom and a bias tensor.
- * @param atomMmad : Matrix multiplication atom object.
+ * @brief Perform matrix multiplication with a preconstructed mmad_atom and a bias tensor.
+ * @param atom_mmad : Matrix multiplication atom object.
  * @param dst : Destination tensor.
  * @param fm : Left input tensor.
  * @param filter : Right input tensor.
@@ -47,24 +47,24 @@ __aicore__ inline void Mmad(
  */
 template <typename AtomType, typename DstTensor, typename FmTensor, typename FilterTensor, typename BiasTensor,
     Std::enable_if_t<IsAttrTensorV<BiasTensor>, int> Enable>
-__aicore__ inline void Mmad(
-    const MmadAtom<AtomType>& atomMmad, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter,
+__aicore__ inline void mmad(
+    const mmad_atom<AtomType>& atom_mmad, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter,
     const BiasTensor& bias);
 
 /**
- * @brief Construct a MmadAtom from the matrix multiplication operation object.
- * @param mmadOperation : Matrix multiplication operation object.
+ * @brief Construct a mmad_atom from the matrix multiplication operation object.
+ * @param mmad_operation : Matrix multiplication operation object.
  */
 template <typename MmadOperationType>
-__aicore__ inline constexpr auto MakeMmad(const MmadOperationType& mmadOperation);
+__aicore__ inline constexpr auto make_mmad(const MmadOperationType& mmad_operation);
 
 /**
- * @brief Construct a MmadAtom from the matrix multiplication operation object and trait object.
- * @param mmadOperation : Matrix multiplication operation object.
- * @param mmadTrait : Matrix multiplication trait object.
+ * @brief Construct a mmad_atom from the matrix multiplication operation object and trait object.
+ * @param mmad_operation : Matrix multiplication operation object.
+ * @param trait_config : Matrix multiplication trait object.
  */
 template <typename MmadOperationType, typename MmadTraitType>
-__aicore__ inline constexpr auto MakeMmad(const MmadOperationType& mmadOperation, const MmadTraitType& mmadTrait);
+__aicore__ inline constexpr auto make_mmad(const MmadOperationType& mmad_operation, const MmadTraitType& trait_config);
 
 }
 }

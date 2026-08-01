@@ -26,14 +26,14 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 namespace Inst {
 
 class Not {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_not(dst, src, mask);
         }
@@ -43,7 +43,7 @@ public:
 class Ln {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_ln(dst, src, mask);
         }
@@ -53,7 +53,7 @@ public:
 class Abs {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_abs(dst, src, mask);
         }
@@ -63,7 +63,7 @@ public:
 class Sqrt {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_sqrt(dst, src, mask);
         }
@@ -73,7 +73,7 @@ public:
 class Exp {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_exp(dst, src, mask);
         }

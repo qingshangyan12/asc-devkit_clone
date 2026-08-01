@@ -24,38 +24,50 @@
 
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/instruction.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 // Shared GM->L1 batch dispatch for the four copy ops (ND2Nz/DN2Nz/ND2Zn/DN2Zn). The op-specific
 // single-matrix parameter extraction lives in CopyOp::EmitCopy; this routine handles the parts that
 // are identical across ops: depth-based batch detection, stripping the leading B axis, and reading
-// the per-batch counts/strides. CopyOp must provide static CheckTemplate<trait,T,U>() and
-// EmitCopy(dst, src, srcLayout, dstLayout, matrixNum, srcMatrixStride, dstMatrixStride).
+// the per-batch counts/strides. CopyOp must provide static check_template<trait,T,U>() and
+// emit_copy(dst, src, srcLayout, dstLayout, matrixNum, srcMatrixStride, dstMatrixStride).
 //   - Non-batch (depth 2/4): pass the full layouts, matrixNum=1, strides=0.
-//   - Batch (depth 3/5): strip B with RemoveBatchDim (keeps pattern/trait), matrixNum/strides from
+//   - Batch (depth 3/5): strip B with remove_batch_dim (keeps pattern/trait), matrixNum/strides from
 //     the B axis. The GM stride comes straight from the layout, so both bmk-contiguous and
 //     mbk-non-contiguous memory are covered.
-template <const CopyGM2L1Trait& trait, typename CopyOp, typename T, typename U>
-__aicore__ inline void RunGmToL1Batched(const T& dst, const U& src)
+template <const copy_gm_to_l1_trait& trait, typename CopyOp, typename T, typename U>
+__aicore__ inline void run_gm_to_l1_batched(const T& dst, const U& src)
 {
-    CopyOp::template CheckTemplate<trait, T, U>();
-    constexpr auto srcDepth = NestingDepthV<decltype(src.Layout().Shape())>;
+    CopyOp::template check_template<trait, T, U>();
+    constexpr auto srcDepth = NestingDepthV<decltype(src.layout().shape())>;
     if constexpr (srcDepth == THREE_DIM_DATA || srcDepth == FIVE_DIM_DATA) {
-        auto srcLayout = src.Layout();
-        auto dstLayout = dst.Layout();
-        uint16_t matrixNum = Get<0>(srcLayout.Shape());
-        uint64_t srcMatrixStride = Get<0>(srcLayout.Stride());
-        uint32_t dstMatrixStride = Get<0>(dstLayout.Stride());
-        CopyOp::EmitCopy(dst, src, RemoveBatchDim(srcLayout), RemoveBatchDim(dstLayout), matrixNum,
+        auto srcLayout = src.layout();
+        auto dstLayout = dst.layout();
+        uint16_t matrixNum = get<0>(srcLayout.shape());
+        uint64_t srcMatrixStride = get<0>(srcLayout.stride());
+        uint32_t dstMatrixStride = get<0>(dstLayout.stride());
+        CopyOp::emit_copy(dst, src, remove_batch_dim(srcLayout), remove_batch_dim(dstLayout), matrixNum,
                          srcMatrixStride, dstMatrixStride);
     } else {
-        CopyOp::EmitCopy(dst, src, src.Layout(), dst.Layout(), 1, 0, 0);
+        CopyOp::emit_copy(dst, src, src.layout(), dst.layout(), 1, 0, 0);
     }
 }
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
+
+
+// PascalCase compatibility wrappers
+namespace asc {
+namespace te {
+template <const copy_gm_to_l1_trait& trait, typename CopyOp, typename T, typename U>
+__aicore__ inline void RunGmToL1Batched(const T& dst, const U& src)
+{
+    run_gm_to_l1_batched<trait, CopyOp>(dst, src);
+}
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_IMPL_COPY_COMMON_H
 

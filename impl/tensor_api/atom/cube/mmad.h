@@ -24,30 +24,30 @@
 #include "impl/tensor_api/atom/mmad_traits_impl.h"
 #include "impl/tensor_api/arch/cube/mmad/mmad.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct MmadOpWith : public MmadOperation {};
+struct MmadOpWith : public mmad_operation {};
 
 template <typename MmadTraitsType>
-struct MmadTraits<MmadOpWith, MmadTraitsType>
+struct mmad_traits<MmadOpWith, MmadTraitsType>
 {
     using TraitType = typename MmadTraitsType::TraitType;
     static constexpr const TraitType defaultTrait = MmadTraitsType::value;
 
     template <const TraitType& traits = defaultTrait, typename... Args>
-    __aicore__ inline void MmadUnpack(const Args& ...args) const {
-      MmadOpWith::Mmad<TraitType, traits, Args...>(args..., params);
+    __aicore__ inline void mmad_unpack(const Args& ...args) const {
+      MmadOpWith::mmad<TraitType, traits, Args...>(args..., params);
     }
 
-    MmadParams params;
+    mmad_params params;
 };
 
 template <typename MmadTraitsType>
-struct MmadTraits<MmadOperation, MmadTraitsType> : public MmadTraits<MmadOperation, MmadTraitsType, MmadOpWith, MmadTraitsType> {};
+struct mmad_traits<mmad_operation, MmadTraitsType> : public mmad_traits<mmad_operation, MmadTraitsType, MmadOpWith, MmadTraitsType> {};
 
 template <>
-struct MmadTraits<MmadOperation> : public MmadTraits<MmadOperation, MmadTraitDefault> {};
+struct mmad_traits<mmad_operation> : public mmad_traits<mmad_operation, mmad_trait_default> {};
 
 }
 }

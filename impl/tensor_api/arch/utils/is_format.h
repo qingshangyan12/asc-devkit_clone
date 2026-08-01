@@ -26,8 +26,8 @@
 #include "impl/tensor_api/tensor/pointer_pattern.h"
 #include "impl/tensor_api/tensor/tensor_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename T, bool IsTuple>
 struct ToTupleImpl;
@@ -133,8 +133,8 @@ struct IsSatisfiedPtnFormat {
 
 template <typename TensorType, typename TargetLayoutPtn>
 inline constexpr bool IsSatisfiedPtnFormatV = IsSatisfiedPtnFormat<TensorType, TargetLayoutPtn>::value;
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_UTILS_IS_FORMAT_H
 

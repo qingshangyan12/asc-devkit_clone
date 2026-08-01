@@ -26,14 +26,14 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 namespace Inst {
 
 class Mull{
 public:
     template<typename T>
-    __simd_callee__ inline static void Run(T& dst0, T& dst1, T src0, T src1, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst0, T& dst1, T src0, T src1, vector_bool mask) {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_mull(dst0, dst1, src0, src1, mask);
         }

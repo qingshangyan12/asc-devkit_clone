@@ -25,23 +25,23 @@
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 #include "impl/tensor_api/arch/vector/gm_to_ub/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyGM2UBTrait DEFAULT_COPY_GM_TO_UB_TRAIT = CopyGM2UBTrait{};
+constexpr copy_gm_to_ub_trait DEFAULT_COPY_GM_TO_UB_TRAIT = copy_gm_to_ub_trait{};
 
-struct CopyGM2UBTraitDefault {
-    using TraitType = CopyGM2UBTrait;
+struct copy_gm_to_ub_trait_default {
+    using TraitType = copy_gm_to_ub_trait;
     static constexpr const TraitType value = DEFAULT_COPY_GM_TO_UB_TRAIT;
 };
 
-constexpr CopyGM2UBParams DEFAULT_COPY_GM_TO_UB_PARAMS{};
+constexpr copy_gm_to_ub_params DEFAULT_COPY_GM_TO_UB_PARAMS{};
 
-struct CopyGM2UBBase {
+struct copy_gm_to_ub_base {
 public:
-    template <const CopyGM2UBTrait& trait = DEFAULT_COPY_GM_TO_UB_TRAIT, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src,
-                                               const CopyGM2UBParams& params = DEFAULT_COPY_GM_TO_UB_PARAMS)
+    template <const copy_gm_to_ub_trait& trait = DEFAULT_COPY_GM_TO_UB_TRAIT, typename T, typename U>
+    __aicore__ inline static void data_copy_impl(
+        const T& dst, const U& src, const copy_gm_to_ub_params& params = DEFAULT_COPY_GM_TO_UB_PARAMS)
     {
         using dstTPos = GetMemLocation<T>;
         using srcTPos = GetMemLocation<U>;
@@ -50,34 +50,34 @@ public:
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
         using CopyGM2UBImpl = typename CopyGM2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyGM2UBImpl::template Run<trait, T, U>(dst, src, params);
+        CopyGM2UBImpl::template run<trait, T, U>(dst, src, params);
     }
 };
 
-struct CopyGM2UB : public CopyGM2UBBase {
+struct copy_gm_to_ub : public copy_gm_to_ub_base {
 public:
     template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIV {
-            DataCopyImpl<traits>(args...);
+            data_copy_impl<traits>(args...);
         }
     }
 };
 
-struct CopyGM2UBWith : public CopyGM2UBBase {
+struct copy_gm_to_ub_with : public copy_gm_to_ub_base {
 public:
     template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIV {
-            DataCopyImpl<traits>(args...);
+            data_copy_impl<traits>(args...);
         }
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H
 
