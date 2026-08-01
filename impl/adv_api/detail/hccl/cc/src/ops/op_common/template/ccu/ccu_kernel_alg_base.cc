@@ -9,6 +9,7 @@
  */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_utils.h"
+#include <memory>
 
 namespace mc2_ops_hccl {
 
@@ -21,10 +22,24 @@ std::vector<uint64_t> CalGoSize(uint64_t size)
     return CalGoSize(size, config);
 }
 
+static bool s_globalResourceAllocated = false;
+static LoopGroupConfig s_globalMoConfig;
+static std::unique_ptr<LoopGroupResource> s_globalMoRes = nullptr;
+
 CcuResult AllocGoResource(
     LoopGroupConfig& config, LoopGroupResource& res, bool& allocated, uint32_t parallelDim, uint32_t msPerLoop)
 {
     if (allocated) {
+        return CCU_SUCCESS;
+    }
+
+    if (s_globalResourceAllocated && s_globalMoRes != nullptr) {
+        config = s_globalMoConfig;
+        res.completedEvent = std::move(s_globalMoRes->completedEvent);
+        res.ccuBuf = std::move(s_globalMoRes->ccuBuf);
+        res.eventCount = s_globalMoRes->eventCount;
+        res.bufCount = s_globalMoRes->bufCount;
+        allocated = true;
         return CCU_SUCCESS;
     }
 
@@ -38,6 +53,13 @@ CcuResult AllocGoResource(
     res.bufCount = config.loopCount * config.msInterleave;
     res.ccuBuf = ccu::Array<ccu::CcuBuffer>(res.bufCount);
 
+    s_globalMoConfig = config;
+    s_globalMoRes = std::make_unique<LoopGroupResource>();
+    s_globalMoRes->completedEvent = std::move(res.completedEvent);
+    s_globalMoRes->ccuBuf = std::move(res.ccuBuf);
+    s_globalMoRes->eventCount = res.eventCount;
+    s_globalMoRes->bufCount = res.bufCount;
+    s_globalResourceAllocated = true;
     allocated = true;
     return CCU_SUCCESS;
 }
