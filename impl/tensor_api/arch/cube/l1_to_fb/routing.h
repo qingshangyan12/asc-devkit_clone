@@ -24,35 +24,35 @@
 
 #include "impl/tensor_api/arch/cube/l1_to_fb/copy_impl/nd2nd.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-class CopyL12FBIgnore {
+class copy_l1_to_fb_ignore {
 public:
-    template <const CopyL12FBTrait& trait, typename... Args>
-    __aicore__ inline static void Run(const Args&... args)
+    template <const copy_l1_to_fb_trait& trait, typename... Args>
+    __aicore__ inline static void run(const Args&... args)
     {
-        static_assert(Std::is_same_v<Args..., void>, "CopyL12FBIgnore should not be called");
+        static_assert(Std::is_same_v<Args..., void>, "copy_l1_to_fb_ignore should not be called");
     }
 };
 
 template <uint32_t Version, typename DstLayoutPtn, typename SrcLayoutPtn>
-struct CopyL12FBRouting {
-    using type = CopyL12FBIgnore;
+struct copy_l1_to_fb_routing {
+    using type = copy_l1_to_fb_ignore;
 };
 
 template <uint32_t Version>
-struct CopyL12FBRouting<Version, NDExtLayoutPtn, NDExtLayoutPtn> {
-    using type = CopyL12FBND;
+struct copy_l1_to_fb_routing<Version, NDExtLayoutPtn, NDExtLayoutPtn> {
+    using type = copy_l1_to_fbnd;
 };
 
 template <uint32_t Version>
-struct CopyL12FBRouting<Version, NDLayoutPtn, NDLayoutPtn> {
-    using type = CopyL12FBND;
+struct copy_l1_to_fb_routing<Version, NDLayoutPtn, NDLayoutPtn> {
+    using type = copy_l1_to_fbnd;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_ROUTING_H
 

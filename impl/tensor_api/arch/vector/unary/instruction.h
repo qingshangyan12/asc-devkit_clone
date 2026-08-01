@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
@@ -16,9 +16,9 @@
 #endif
 
 /*!
-* \file instruction.h
-* \brief
-*/
+ * \file instruction.h
+ * \brief
+ */
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_UNARY_INSTRUCTION_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_UNARY_INSTRUCTION_H
 
@@ -26,60 +26,73 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
-namespace Inst {
+namespace asc {
+namespace te {
+namespace inst {
 
-class Not {
+class bitwise_not {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask)
+    {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_not(dst, src, mask);
         }
     }
 };
 
-class Ln {
+class ln {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask)
+    {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_ln(dst, src, mask);
         }
     }
 };
 
-class Abs {
+class abs {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask)
+    {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_abs(dst, src, mask);
         }
     }
 };
 
-class Sqrt {
+class sqrt {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask)
+    {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_sqrt(dst, src, mask);
         }
     }
 };
 
-class Exp {
+class exp {
 public:
     template <typename T>
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask)
+    {
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_exp(dst, src, mask);
         }
     }
 };
-}}}
+
+using Not = bitwise_not;
+using Ln = ln;
+using Abs = abs;
+using Sqrt = sqrt;
+using Exp = exp;
+} // namespace inst
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UNARY_INSTRUCTION_H
 

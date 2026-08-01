@@ -28,66 +28,66 @@
 #include "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/nz2ncdhw.h"
 #include "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/nz2nhwc.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-class CopyL0C2GMIgnore {
+class copy_l0c_to_gm_ignore {
 public:
-    template <const CopyL0C2GMTrait& trait, typename... Args>
-    __aicore__ inline static void Run(const Args&... args)
-    { 
-        static_assert(Std::is_same_v<Args..., void>, "CopyL0C2GMIgnore should not be called"); 
+    template <const copy_l0c_to_gm_trait& trait, typename... Args>
+    __aicore__ inline static void run(const Args&... args)
+    {
+        static_assert(Std::is_same_v<Args..., void>, "copy_l0c_to_gm_ignore should not be called");
     }
 };
 
 template <uint32_t Version, typename DstLayoutPtn, typename SrcLayoutPtn>
-struct CopyL0C2GMRouting {
-    using type = CopyL0C2GMIgnore;
+struct copy_l0c_to_gm_routing {
+    using type = copy_l0c_to_gm_ignore;
 };
 
 template <uint32_t Version>
-struct CopyL0C2GMRouting<Version, NDExtLayoutPtn, NZLayoutPtn> {
-    using type = DataCopyL0C2GM;
+struct copy_l0c_to_gm_routing<Version, NDExtLayoutPtn, NZLayoutPtn> {
+    using type = data_copy_l0c_to_gm;
 };
 template <uint32_t Version>
-struct CopyL0C2GMRouting<Version, DNExtLayoutPtn, NZLayoutPtn> {
-    using type = DataCopyL0C2GM;
+struct copy_l0c_to_gm_routing<Version, DNExtLayoutPtn, NZLayoutPtn> {
+    using type = data_copy_l0c_to_gm;
 };
 template <uint32_t Version>
-struct CopyL0C2GMRouting<Version, NDLayoutPtn, NZLayoutPtn> {
-    using type = DataCopyL0C2GM;
+struct copy_l0c_to_gm_routing<Version, NDLayoutPtn, NZLayoutPtn> {
+    using type = data_copy_l0c_to_gm;
 };
 template <uint32_t Version>
-struct CopyL0C2GMRouting<Version, DNLayoutPtn, NZLayoutPtn> {
-    using type = DataCopyL0C2GM;
+struct copy_l0c_to_gm_routing<Version, DNLayoutPtn, NZLayoutPtn> {
+    using type = data_copy_l0c_to_gm;
 };
 
 template <uint32_t Version>
-struct CopyL0C2GMRouting<Version, NZLayoutPtn, NZLayoutPtn> {
-    using type = DataCopyL0C2GM;
+struct copy_l0c_to_gm_routing<Version, NZLayoutPtn, NZLayoutPtn> {
+    using type = data_copy_l0c_to_gm;
 };
 
 template <uint32_t Version>
-struct CopyL0C2GMRouting<Version, NC1HWC0LayoutPtn, NZLayoutPtn> {
-    using type = DataCopyL0C2GM;
+struct copy_l0c_to_gm_routing<Version, NC1HWC0LayoutPtn, NZLayoutPtn> {
+    using type = data_copy_l0c_to_gm;
 };
 
 template <uint32_t Version>
-struct CopyL0C2GMRouting<Version, NHWCLayoutPtn, NZLayoutPtn> {
-    using type = DataCopyL0C2GMNZ2NHWC;
+struct copy_l0c_to_gm_routing<Version, NHWCLayoutPtn, NZLayoutPtn> {
+    using type = data_copy_l0c_to_gm_nz_to_nhwc;
 };
 
 template <uint32_t Version>
-struct CopyL0C2GMRouting<Version, NCHWLayoutPtn, NZLayoutPtn> {
-    using type = DataCopyL0C2GMNZ2NCHW;
+struct copy_l0c_to_gm_routing<Version, NCHWLayoutPtn, NZLayoutPtn> {
+    using type = data_copy_l0c_to_gm_nz_to_nchw;
 };
 
 template <uint32_t Version>
-struct CopyL0C2GMRouting<Version, NCDHWLayoutPtn, NZLayoutPtn> {
-    using type = DataCopyL0C2GMNZ2NCDHW;
+struct copy_l0c_to_gm_routing<Version, NCDHWLayoutPtn, NZLayoutPtn> {
+    using type = data_copy_l0c_to_gm_nz_to_ncdhw;
 };
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_GM_ROUTING_H
 

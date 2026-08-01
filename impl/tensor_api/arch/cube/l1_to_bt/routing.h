@@ -24,35 +24,35 @@
 
 #include "impl/tensor_api/arch/cube/l1_to_bt/copy_impl/nd2nd.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-class CopyL12BTIgnore {
+class copy_l1_to_bt_ignore {
 public:
-    template <const CopyL12BTTrait& trait, typename... Args>
-    __aicore__ inline static void Run(const Args&... args)
+    template <const copy_l1_to_bt_trait& trait, typename... Args>
+    __aicore__ inline static void run(const Args&... args)
     {
-        static_assert(Std::is_same_v<Args..., void>, "CopyL12BTIgnore should not be called");
+        static_assert(Std::is_same_v<Args..., void>, "copy_l1_to_bt_ignore should not be called");
     }
 };
 
 template <uint32_t Version, typename DstLayoutPtn, typename SrcLayoutPtn>
-struct CopyL12BTRouting {
-    using type = CopyL12BTIgnore;
+struct copy_l1_to_bt_routing {
+    using type = copy_l1_to_bt_ignore;
 };
 
 template <uint32_t Version>
-struct CopyL12BTRouting<Version, NDExtLayoutPtn, NDExtLayoutPtn> {
-    using type = CopyL12BTND;
+struct copy_l1_to_bt_routing<Version, NDExtLayoutPtn, NDExtLayoutPtn> {
+    using type = copy_l1_to_btnd;
 };
 
 template <uint32_t Version>
-struct CopyL12BTRouting<Version, NDLayoutPtn, NDLayoutPtn> {
-    using type = CopyL12BTND;
+struct copy_l1_to_bt_routing<Version, NDLayoutPtn, NDLayoutPtn> {
+    using type = copy_l1_to_btnd;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_BT_ROUTING_H
 
