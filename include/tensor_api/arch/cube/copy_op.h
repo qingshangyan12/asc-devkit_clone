@@ -21,26 +21,49 @@
 #ifndef INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 #define INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyGM2L1;
-struct CopyL12UB;
-struct CopyL12L0B;
-struct CopyL12L0A;
-struct CopyL12L0ScaleA;
-struct CopyL12L0ScaleB;
-struct CopyL12FB;
-struct CopyL12BT;
-struct CopyL0C2GM;
-struct CopyL0C2GMWith;
-struct CopyL0C2UB;
-struct CopyL0C2UBWith;
-struct CopyL0C2L1;
-struct CopyL0C2L1With;
+struct copy_gm_to_l1;
+struct copy_l1_to_ub;
+struct copy_l1_to_l0b;
+struct copy_l1_to_l0a;
+struct copy_l1_to_l0scalea;
+struct copy_l1_to_l0scaleb;
+struct copy_l1_to_fb;
+struct copy_l1_to_bt;
+struct copy_l0c_to_gm;
+struct copy_l0c_to_gm_with;
+struct copy_l0c_to_ub;
+struct copy_l0c_to_ub_with;
+struct copy_l0c_to_l1;
+struct copy_l0c_to_l1_with;
 
-} // namespace Te
-} // namespace AscendC
+struct copy_gm_to_l1_trait;
+struct copy_gm_to_l1_trait_default;
+struct copy_l1_to_ub_trait;
+struct copy_l1_to_ub_trait_default;
+struct copy_l1_to_l0a_trait;
+struct copy_l1_to_l0a_trait_default;
+struct copy_l1_to_l0b_trait;
+struct copy_l1_to_l0b_trait_default;
+struct copy_l1_to_l0scalea_trait;
+struct copy_l1_to_l0scalea_trait_default;
+struct copy_l1_to_l0scaleb_trait;
+struct copy_l1_to_l0scaleb_trait_default;
+struct copy_l1_to_fb_trait;
+struct copy_l1_to_fb_trait_default;
+struct copy_l1_to_bt_trait;
+struct copy_l1_to_bt_trait_default;
+struct copy_l0c_to_gm_trait;
+struct copy_l0c_to_gm_trait_default;
+struct copy_l0c_to_ub_trait;
+struct copy_l0c_to_ub_trait_default;
+struct copy_l0c_to_l1_trait;
+struct copy_l0c_to_l1_trait_default;
+
+} // namespace te
+} // namespace asc
 
 #endif // INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 
