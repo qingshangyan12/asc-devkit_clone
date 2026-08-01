@@ -1051,55 +1051,6 @@ class TestCompileOp(unittest.TestCase):
                 cfg.current()["tir.op_debug_config"] = ["oom"]
                 gen_meta_info_section(compile_info, op_info)
 
-    def test_gen_tiling_param_meta_section(self):
-        compile_info = CompileInfo()
-        compile_info.kernel_name = "AddCustom_ab1b6750d7f510985325b603cb06dc8b"
-        compile_info.tiling_key_list = ["1", "2"]
-        compile_info.tiling_key_struct_map = {"1": "AddCustomTilingData"}
-
-        tiling_info = TilingInfo()
-        tiling_info.static_shape_flag = False
-        tiling_info.tiling_key_data_size = {"2": 64}
-        DFXSectionGenerator().param_to_index = {"tiling": 4}
-        global_var_storage.set_variable("ascendc_meta_info", "")
-
-        gen_tiling_param_meta_section(compile_info, tiling_info)
-        section = global_var_storage.get_variable("ascendc_meta_info")
-        self.assertIn("B_TYPE_TILING_PARAM_INFO", section)
-        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_1", section)
-        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_2", section)
-        self.assertIn("sizeof(BinaryMetaTilingParam) - sizeof(BaseTlv)}, 1, 4, 32,", section)
-        self.assertIn("1, 4, 32, sizeof(AddCustomTilingData)", section)
-        self.assertIn("1, 4, 32, 64", section)
-        self.assertEqual(section.count("BinaryMetaTilingParam"), 4)
-
-        tiling_info.static_shape_flag = True
-        global_var_storage.set_variable("ascendc_meta_info", "unchanged")
-        gen_tiling_param_meta_section(compile_info, tiling_info)
-        self.assertEqual(global_var_storage.get_variable("ascendc_meta_info"), "unchanged")
-
-    def test_gen_bin_id_meta_section(self):
-        compile_info = CompileInfo()
-        compile_info.kernel_name = "AddCustom_ab1b6750d7f510985325b603cb06dc8b"
-        compile_info.tiling_key_list = ["1", "2"]
-        digest = "000102030405060708090a0b0c0d0e0f" \
-                 "101112131415161718191a1b1c1d1e1f"
-        recorder = OpCompileManifestRecorder()
-        recorder.reset()
-        recorder.manifest["binary"]["bin_id"] = digest
-        global_var_storage.set_variable("ascendc_meta_info", "")
-
-        gen_bin_id_meta_section(compile_info)
-
-        section = global_var_storage.get_variable("ascendc_meta_info")
-        self.assertEqual(section.count("BinaryMetaBinId"), 4)
-        self.assertEqual(section.count("B_TYPE_BIN_ID_INFO"), 2)
-        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_1", section)
-        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_2", section)
-        self.assertIn("sizeof(BinaryMetaBinId) - sizeof(BaseTlv)}, 1", section)
-        self.assertIn("0x00, 0x01, 0x02", section)
-        self.assertIn("0x1d, 0x1e, 0x1f", section)
-
     def test_gen_kernel_fun(self):
         SetCurrentSocInfo("Ascend910B1")
         cce_file = os.path.join(
@@ -5174,6 +5125,86 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         compile_info.super_kernel_info = {"other_option": "value"}
         result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
         self.assertEqual(result, 0)
+
+
+class TestJitResourceManifest(unittest.TestCase):
+    def test_generate_manifest_v4_from_real_compile_commands(self):
+        with TemporaryDirectory() as temp_dir:
+            source_file = os.path.join(temp_dir, "add_custom.cpp")
+            wrapper_source = os.path.join(temp_dir, "AddCustom_deadbeef_kernel.cpp")
+            tiling_source = os.path.join(temp_dir, "AddCustom_deadbeef_tiling_data.h")
+            compile_log = os.path.join(temp_dir, "compile.log")
+            with open(source_file, 'w') as fd:
+                fd.write("source\n")
+            with open(wrapper_source, 'w') as fd:
+                fd.write('#include "{}"\nnormal wrapper\n'.format(source_file))
+            with open(tiling_source, 'w') as fd:
+                fd.write("""#ifndef __TILINGDATA_HEADER__
+#define __TILINGDATA_HEADER__
+class TilingData {};
+class TilingDataShort {};
+#ifdef ASCENDC_TIME_STAMP_ON
+#define GET_TILING_DATA(a, b) dynamic
+#endif
+#endif // __TILINGDATA_HEADER__
+""")
+            with open(compile_log, 'w') as fd:
+                for key in ("1", "2"):
+                    fd.write("// Stage: CompileStage.COMPILE\n")
+                    fd.write("/opt/cann/bin/bisheng -c {} -include {} -DTILING_KEY_VAR={}UL -o {}/out_{}.o\n".format(
+                        wrapper_source, tiling_source, key, temp_dir, key))
+
+            op_info = Mock(op_type="AddCustom", kernel_name="AddCustom_deadbeef")
+            recorder = OpCompileManifestRecorder()
+            recorder.start(op_info, "add_custom", source_file, temp_dir)
+            recorder.set_tiling_header(tiling_source)
+            compile_info = CompileInfo()
+            compile_info.kernel_name = "AddCustom_deadbeef"
+            compile_info.src_file = source_file
+            compile_info.gen_kernel_func_file = wrapper_source
+            compile_info.compile_log_path = compile_log
+            compile_info.tiling_key_list = ["1", "2"]
+            compile_info.tiling_key_struct_map = {
+                "1": "TilingData", "2": "TilingDataShort"}
+            compile_info.tiling_struct_size_map = {
+                "TilingData": 96, "TilingDataShort": 8}
+            tiling_info = TilingInfo()
+            tiling_info.tiling_key_struct_map = compile_info.tiling_key_struct_map
+            tiling_info.tiling_key_data_size = {"1": 96, "2": 8}
+            options = Mock(compile_options=["-O3"], mllvm_options=[])
+            recorder.prepare_binary_identity(compile_info, options)
+            recorder.record_wrapper_body(compile_info)
+            with mock.patch.dict(os.environ, {"ASCEND_HOME_PATH": "/opt/cann"}):
+                recorder.write(compile_info, tiling_info, 4)
+
+            with open(os.path.join(temp_dir, "AddCustom_deadbeef_manifest.json"), 'r') as fd:
+                manifest = json.load(fd)
+            self.assertEqual(set(manifest), {"schema_version", "binId", "soc_version", "kernels"})
+            self.assertEqual(manifest["schema_version"], "4.0")
+            self.assertEqual(len(manifest["binId"]), 64)
+            kernel = manifest["kernels"][0]
+            self.assertEqual(kernel["kernel_name"], "AddCustom_deadbeef_1")
+            static_input = kernel["constants_info"][0]
+            self.assertEqual(static_input, {
+                "name": "TilingData",
+                "parameter_index": 4,
+                "byte_size": 96,
+                "file": "resources/AddCustom_deadbeef_tiling_data.h",
+                "template": "@@STATIC_VALUE_tiling_data@@",
+            })
+            normal_commands = kernel["commands"]
+            self.assertEqual([command["type"] for command in normal_commands], ["bisheng"])
+            self.assertEqual(normal_commands[0]["mode"], "normal")
+            self.assertIn("${resource:resources/AddCustom_deadbeef_kernel.cpp}",
+                          normal_commands[0]["options"])
+            static_header = os.path.join(temp_dir, *static_input["file"].split('/'))
+            with open(static_header, 'r') as fd:
+                header = fd.read()
+            self.assertIn("#define TILING_DATA_LENGTH 96", header)
+            self.assertIn("#elif TILING_KEY_VAR == 2UL", header)
+            self.assertIn("@@STATIC_VALUE_tiling_data@@", header)
+            with open(os.path.join(temp_dir, "resources", "AddCustom_deadbeef_kernel.cpp")) as fd:
+                self.assertEqual(fd.read(), '#include "{}"\nnormal wrapper\n'.format(source_file))
 
 
 if __name__ == "__main__":

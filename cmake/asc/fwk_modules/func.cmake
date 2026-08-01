@@ -1263,8 +1263,6 @@ function(npu_op_package_add target_package_name)
                   "${JIT_COLLECTION_ROOT}"
                   "${JIT_OUTPUT_SO}"
                   "${JIT_WORK_DIR}"
-                  "${ASCEND_CANN_PACKAGE_PATH}"
-                  ${CMAKE_SYSTEM_PROCESSOR}-linux
           VERBATIM
         )
         if(NOT TARGET binary)

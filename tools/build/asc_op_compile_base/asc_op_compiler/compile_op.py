@@ -529,67 +529,6 @@ def gen_meta_info_section(compile_info, op_info):
     global_var_storage.set_variable("ascendc_meta_info", section_var)
 
 
-def _get_tiling_size_expression(compile_info: CompileInfo, tiling_info: TilingInfo, tiling_key: str):
-    tiling_struct_map = getattr(compile_info, "tiling_key_struct_map", {}) or {}
-    tiling_struct = tiling_struct_map.get(tiling_key)
-    if tiling_struct is None:
-        tiling_struct = (getattr(tiling_info, "tiling_key_struct_map", {}) or {}).get(tiling_key)
-    if tiling_struct:
-        return "sizeof({})".format(tiling_struct)
-
-    tiling_size = (getattr(tiling_info, "tiling_key_data_size", {}) or {}).get(
-        tiling_key, getattr(tiling_info, "default_tiling_size", 0))
-    if not isinstance(tiling_size, int) or tiling_size <= 0 or tiling_size > 0xFFFFFFFF:
-        return None
-    return str(tiling_size)
-
-
-def gen_tiling_param_meta_section(compile_info: CompileInfo, tiling_info: TilingInfo):
-    if tiling_info.static_shape_flag:
-        return
-
-    tiling_param_index = getattr(DFXSectionGenerator(), "param_to_index", {}).get("tiling")
-    if tiling_param_index is None:
-        return
-
-    section_var = global_var_storage.get_variable("ascendc_meta_info")
-    for tiling_key_value in compile_info.tiling_key_list:
-        tiling_key = str(tiling_key_value)
-        tiling_size = _get_tiling_size_expression(compile_info, tiling_info, tiling_key)
-        if tiling_size is None:
-            continue
-        variable_name = "{}_tiling_param_{}_section".format(compile_info.kernel_name, tiling_key)
-        runtime_kernel_name = "{}_{}".format(compile_info.kernel_name, tiling_key)
-        section_var += "\n#if {} == {}UL\n".format(TILING_KEY_MACRO, tiling_key)
-        section_var += "static const struct BinaryMetaTilingParam {} __attribute__ ".format(variable_name)
-        section_var += "((used, section (\".ascend.meta.{}\"))) = ".format(runtime_kernel_name)
-        section_var += "{{B_TYPE_TILING_PARAM_INFO, "
-        section_var += "sizeof(BinaryMetaTilingParam) - sizeof(BaseTlv)}, "
-        section_var += "1, {}, {}, {}}};\n".format(
-            tiling_param_index, tiling_param_index * 8, tiling_size)
-        section_var += "#endif\n"
-    global_var_storage.set_variable("ascendc_meta_info", section_var)
-
-
-def gen_bin_id_meta_section(compile_info: CompileInfo):
-    bin_id = OpCompileManifestRecorder().get_bin_id()
-    if len(bin_id) != 64 or re.fullmatch(r"[0-9a-f]{64}", bin_id) is None:
-        return
-    digest = ["0x{}".format(bin_id[index:index + 2]) for index in range(0, len(bin_id), 2)]
-    section_var = global_var_storage.get_variable("ascendc_meta_info")
-    for tiling_key_value in compile_info.tiling_key_list:
-        tiling_key = str(tiling_key_value)
-        variable_name = "{}_bin_id_{}_section".format(compile_info.kernel_name, tiling_key)
-        runtime_kernel_name = "{}_{}".format(compile_info.kernel_name, tiling_key)
-        section_var += "\n#if {} == {}UL\n".format(TILING_KEY_MACRO, tiling_key)
-        section_var += "static const struct BinaryMetaBinId {} __attribute__ ".format(variable_name)
-        section_var += "((used, section (\".ascend.meta.{}\"))) = ".format(runtime_kernel_name)
-        section_var += "{{B_TYPE_BIN_ID_INFO, sizeof(BinaryMetaBinId) - sizeof(BaseTlv)}, 1, "
-        section_var += "{{{}}}}};\n".format(", ".join(digest))
-        section_var += "#endif\n"
-    global_var_storage.set_variable("ascendc_meta_info", section_var)
-
-
 def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
                     tiling_info: TilingInfo, compile_option_tuple):
     compile_options = compile_option_tuple.compile_options
@@ -907,6 +846,8 @@ def _get_tiling_struct_size(compile_info):
             tiling_struct_size_map[tiling_struct] = dec_data
             max_tiling_size = max(max_tiling_size, dec_data)
 
+    compile_info.tiling_struct_size_map = tiling_struct_size_map
+
     # The sk sub operator failed to rm tiling section because llvm-objcopy could not correctly process the ar obj.
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True and \
                                         compile_info.is_super_kernel_compile is False:
@@ -1061,8 +1002,6 @@ def gen_op_stub_kernel_func(compile_info: CompileInfo, op_info: OpInfo, compile_
         gen_meta_info_section(compile_info, op_info)
     workspace_idx = gen_kernel_fun(compile_info, compile_info.origin_func_name, op_info, tiling_info,
         compile_option_tuple)
-    gen_tiling_param_meta_section(compile_info, tiling_info)
-    gen_bin_id_meta_section(compile_info)
     OpCompileManifestRecorder().record_wrapper_body(compile_info, wrapper_role)
 
     msg_info = "<{}> <{}> generate kernel stub end".format(compile_info.op_type, compile_info.tiling_key_list)
@@ -1121,10 +1060,6 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
     # get tiling struct and size in .asendc.tiling section and generate meta_info.o when using REGISTER_NONE_TILING
     if global_var_storage.get_variable("ascendc_tiling_no_register"):
         tiling_key_struct_size_map = _get_tiling_struct_without_register_size(compile_info)
-        OpCompileManifestRecorder().record_tiling_struct_info(
-            tiling_key_struct_size_map, source="_get_tiling_struct_without_register_size",
-            tiling_key_list=compile_info.tiling_key_list,
-            tiling_key_group_map=compile_info.tiling_key_group_map)
         gen_tiling_struct_size_and_dfx_section_file(compile_info, tiling_info, tiling_key_struct_size_map)
         chip_version = CommonUtility.get_chip_version()
         if CommonUtility.is_c310() or CommonUtility.is_v220():
@@ -1235,6 +1170,7 @@ def compile_sk_bind(compile_info: CompileInfo, compile_info_origin: CompileInfo,
             ofd.write(source)
     except Exception as err:
         raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("gen sk bind file failed, reason is:", err))
+    OpCompileManifestRecorder().record_sk_bind(sk_bind_src_file, compile_info.kernel_name)
 
     arch = None
     if CommonUtility.is_c310():
@@ -1260,37 +1196,6 @@ def compile_sk_bind(compile_info: CompileInfo, compile_info_origin: CompileInfo,
     return sk_bind_dst_file
 
 
-def record_super_kernel_sub_combine_without_compile(super_compile_info: CompileInfo,
-                                                    normal_compile_info: CompileInfo,
-                                                    super_compile_options: CompileOptionTuple,
-                                                    normal_compile_options: CompileOptionTuple,
-                                                    op_info: OpInfo, tiling_info: TilingInfo,
-                                                    infered_info_from_ifile: InferChannelParamsFromIFile,
-                                                    distinct_tag: str, kernel_meta_dir: str):
-    try:
-        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
-        global_ascendc_kernel_feature_manager.init_available_and_enable_features()
-        super_compile_info.raw_tiling_key_kernel_type = copy.deepcopy(
-            super_compile_info.tiling_key_kernel_type)
-        handle_sk_codegen_options(super_compile_info, infered_info_from_ifile)
-        workspace_idx = gen_op_stub_kernel_func(
-            super_compile_info, op_info, super_compile_options, tiling_info,
-            distinct_tag, kernel_meta_dir, "super_kernel")
-        handle_compile_options(
-            super_compile_info, super_compile_options, tiling_info, workspace_idx)
-        OpCompileManifestRecorder().record_super_kernel_sub_combine(
-            super_compile_info, normal_compile_info,
-            super_compile_options, normal_compile_options, None)
-    except Exception as err:
-        CommonUtility.print_compile_log(
-            op_info.kernel_name,
-            "record-only super kernel resource generation failed, reason is: {}".format(err),
-            AscendCLogLevel.LOG_WARNING)
-    finally:
-        global_var_storage.set_variable("ascendc_enable_super_kernel", False)
-        global_ascendc_kernel_feature_manager.init_available_and_enable_features()
-
-
 def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_option_tuple,
                            infered_info_from_ifile: InferChannelParamsFromIFile, extend_options: dict):
     value_depend_dict = extend_options.get("valueDepend")
@@ -1298,9 +1203,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     manifest_recorder = OpCompileManifestRecorder()
     manifest_recorder.start(op_info, origin_func_name, cce_file, kernel_meta_dir)
     distinct_tag = CommonUtility.get_distinct_filename_tag()
-    compile_log_path = None
-    if global_var_storage.get_variable("ascendc_compile_debug_config"):
-        compile_log_path = os.path.join(kernel_meta_dir, op_info.kernel_name + distinct_tag + '.log')
+    compile_log_path = os.path.join(kernel_meta_dir, op_info.kernel_name + distinct_tag + '.log')
 
     input_gen_placehoder = check_if_gen_placehoder(op_info, True)
     output_gen_placehoder = check_if_gen_placehoder(op_info, False)
@@ -1322,16 +1225,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     file_name_tag = distinct_tag + "_tiling_data.h"
     tiling_data_file_path = os.path.join(kernel_meta_dir, op_info.kernel_name + file_name_tag)
     tiling_info.save_file(tiling_data_file_path)
-    manifest_recorder.record_tiling_struct(tiling_data_file_path)
-    tiling_key_struct_map_from_tiling = getattr(tiling_info, "tiling_key_struct_map", {})
-    default_tiling_struct_from_tiling = getattr(tiling_info, "default_tiling_struct", "")
-    if tiling_key_struct_map_from_tiling or default_tiling_struct_from_tiling:
-        manifest_recorder.record_tiling_struct_info(
-            tiling_key_struct_map_from_tiling,
-            default_tiling_struct_from_tiling,
-            "generate_dynamic_tiling_struct_file",
-            tiling_key_list=getattr(tiling_info, "tiling_key_list", None),
-            tiling_key_group_map=infered_info_from_ifile.tiling_key_group_map)
+    manifest_recorder.set_tiling_header(tiling_data_file_path)
     global_var_storage.set_variable("ascendc_is_static_op", tiling_info.static_shape_flag)
     # replace tiling key when tiling_key is set in compile params
     tiling_key_list = infered_info_from_ifile.tiling_key_list
@@ -1390,12 +1284,6 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     compile_info.tiling_key_kernel_type = infered_info_from_ifile.tiling_key_kernel_type
     compile_info.no_set_kernel_type = infered_info_from_ifile.no_set_kernel_type
     compile_info.default_kernel_type = infered_info_from_ifile.default_kernel_type
-    if compile_info.no_set_kernel_type is False:
-        manifest_recorder.record_kernel_type_info(
-            compile_info.tiling_key_kernel_type,
-            compile_info.default_kernel_type,
-            tiling_key_list=compile_info.tiling_key_list,
-            tiling_key_group_map=compile_info.tiling_key_group_map)
     compile_info.dump_info = {'dump_type': '', 'dump_size': 1024}
 
     # generate tiling struct size, dfx section
@@ -1410,15 +1298,6 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     compile_info.tiling_key_struct_map = infered_info_from_ifile.tiling_key_struct_map
     compile_info.register_tiling_struct = infered_info_from_ifile.register_tiling_struct
     compile_info.tpl_tiling_struct = infered_info_from_ifile.tpl_tiling_struct
-    default_tiling_struct_from_compile_info = getattr(infered_info_from_ifile, "default_tiling_struct", "")
-    if compile_info.tiling_key_struct_map or default_tiling_struct_from_compile_info:
-        manifest_recorder.record_tiling_struct_info(
-            compile_info.tiling_key_struct_map,
-            default_tiling_struct_from_compile_info,
-            "compile_info.tiling_key_struct_map",
-            tiling_key_list=compile_info.tiling_key_list,
-            tiling_key_group_map=compile_info.tiling_key_group_map)
-
     manifest_recorder.prepare_binary_identity(compile_info, compile_option_tuple)
 
     compile_info_origin = CompileInfo()
@@ -1432,11 +1311,9 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         global_var_storage.set_variable("ascendc_sk_double_compile", True)
         compile_info_origin = copy.deepcopy(compile_info)
         compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
-        manifest_recorder.enable_super_kernel_sub_combine()
     elif record_super_kernel_only:
         compile_info_origin = copy.deepcopy(compile_info)
         compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
-        manifest_recorder.enable_super_kernel_sub_combine(record_only=True)
 
     # dump ktype handle 
     compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
@@ -1475,10 +1352,6 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
 
         # compile_sk_bind
         sk_bind_dst_file = compile_sk_bind(compile_info, compile_info_origin, compile_option_tuple, kernel_meta_dir)
-        manifest_recorder.record_super_kernel_sub_combine(
-            compile_info, compile_info_origin, compile_option_tuple, compile_option_tuple_origin,
-            os.path.join(kernel_meta_dir, "sk_bind.cpp"))
-
         # link norm.o and sk.o and sk_bind.o
         link_sk_norm_combine(compile_info.dst_file, compile_info_origin.dst_file, sk_bind_dst_file,
             compile_info.compile_log_path)
@@ -1490,11 +1363,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     # generate opinfo json
     _json_post_process(compile_info, op_info, tiling_info, input_gen_placehoder, \
                        output_gen_placehoder, compile_log_path)
-    if record_super_kernel_only:
-        record_super_kernel_sub_combine_without_compile(
-            compile_info_origin, compile_info, compile_option_tuple_origin,
-            compile_option_tuple, op_info, tiling_info, infered_info_from_ifile,
-            distinct_tag, kernel_meta_dir)
+    resource_compile_info = compile_info_origin if is_super_kernel_sub_combine else compile_info
+    manifest_recorder.write(resource_compile_info, tiling_info, workspace_idx + 1)
     if not global_var_storage.get_variable("ascendc_compile_debug_config"):
         tiling_info.remove_file()
         CommonUtility.remove_temp_file(compile_info.gen_kernel_func_file)
@@ -1503,10 +1373,6 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         "compile Ascend C operator {} success".format(op_info.op_type), AscendCLogLevel.LOG_INFO)
     msg_info = "<{}> <{}> compile op end".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
-    if is_super_kernel_sub_combine:
-        manifest_recorder.write(compile_info_origin, tiling_info, compile_option_tuple_origin)
-    else:
-        manifest_recorder.write(compile_info, tiling_info, compile_option_tuple)
 
 
 def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_options: list = None,
