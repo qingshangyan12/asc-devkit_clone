@@ -208,10 +208,227 @@ AscendC::Hccl::Wait：等待完成计数达到预期值，确保 AllReduce 输�
 - 数据类型和 reduce op：沿用源 template 支持范围，64 位类型及 PROD 使用 AICPU reduce 同步分支。
 - 多层网络、纯 CLOS、非全连接 Mesh1DClos、CCU、AIV 和 DPU 不在本次迁移范围内。
 
-## 7. 验证建议
+## 7. 基于现有日志验证调用链
+
+本节只使用当前代码已有日志，不要求新增专用日志。建议同时收集 Host 和 AICPU device 日志，并至少开启 INFO 级别；部分 selector、batch mode 和切片日志使用 DEBUG 级别，需要进一步定位时再开启 DEBUG。
+
+建议先使用以下关键字过滤日志：
+
+```text
+MC2_ALG_INFO
+AllReduceAutoSelector
+InsAllReduceMesh1DTwoShot
+InsV2AllReduceSoleExecutor
+CollAlgExecRegistryV2::GetAlgExec
+MC2_OPEN_DIAG
+MC2_BATCH
+```
+
+### 7.1 Host 侧算法选择
+
+首先检查 selector 是否选择标准 TwoShot：
+
+```text
+[AllReduceAutoSelector][SelectAicpuAlgo] Algo match [InsAllReduceMesh1DTwoShot]
+```
+
+该日志说明当前拓扑满足单层 Mesh1D，或者满足 Mesh 链路全连接的单层 PCIE mixed Mesh1DClos。若未出现，检查是否存在以下拒绝日志：
+
+```text
+[AllReduceAutoSelector] InsAllReduceMesh1DTwoShot only supports a single network level, actual[...]
+[AllReduceAutoSelector] topology[...] does not match Mesh1D TwoShot.
+```
+
+随后检查本地 V2 registry 是否能够获取对应 executor：
+
+```text
+[asc][AlgoExecute][CollAlgExecRegistryV2::GetAlgExec] hit, opType[...], algName[InsAllReduceMesh1DTwoShot], executor[...]
+```
+
+不能出现以下日志：
+
+```text
+[asc][AlgoExecute][CollAlgExecRegistryV2::GetAlgExec] miss, opType[...], algName[InsAllReduceMesh1DTwoShot]
+Fail to find executor for algName[InsAllReduceMesh1DTwoShot]
+```
+
+### 7.2 Host 侧资源计算
+
+检查标准 TwoShot template 的资源计算日志：
+
+```text
+[InsTempAllReduceMesh1DTwoShot] Ccl Buffer multiple is [2].
+[InsTempAllReduceMesh1DTwoShot] Calculate resource finished.resource request: threadNum[...], main thread notifyNum[...], channelNum[...]
+```
+
+应满足：
+
+- `threadNum` 等于通信域 rank 数。
+- `main thread notifyNum` 等于 `rankSize - 1`。
+- `channelNum` 能覆盖所有远端 rank，不能为 0。
+- scratch multiple 必须为 2。
+
+资源创建完成后检查最终保存的算法摘要：
+
+```text
+[MC2_ALG_INFO] rank[...], group[...], opType[ALLREDUCE](...), algName[InsAllReduceMesh1DTwoShot], srcDataType[...], dstDataType[...], engine[...]
+```
+
+该日志是 Host 资源阶段最重要的确认点。需要同时确认：
+
+- `opType` 是 `ALLREDUCE`。
+- `algName` 是 `InsAllReduceMesh1DTwoShot`。
+- `engine` 是预期的 AICPU TS 引擎。
+- 数据类型与测试输入一致。
+
+### 7.3 Device 侧消息和运行参数恢复
+
+Host 资源阶段的 `DataDes.count` 为 0，真实 count 来自 AICore 写入的通信消息。检查以下日志：
+
+```text
+[MC2_OPEN_DIAG][FormatMsg] ... msgOpType ..., msgReduceType ..., msgDataCnt ..., msgDataType ..., msgRepeatCnt ...
+[MC2_OPEN_DIAG][FormatBase] baseOpType ..., baseAlgName[InsAllReduceMesh1DTwoShot], ... baseCount 0 ...
+[MC2_OPEN_DIAG][FormatRun] runOpType ..., runAlgName[InsAllReduceMesh1DTwoShot], ... runCount ..., runDataType ..., ...
+```
+
+重点确认：
+
+- `msgOpType`/`runOpType` 对应 `HCCL_CMD_ALLREDUCE`。
+- `msgReduceType` 与 SUM、PROD 等测试配置一致。
+- `msgDataCnt` 和 `runCount` 等于 Kernel 实际传入的 count，且运行阶段不能为 0。
+- `msgDataType` 和 `runDataType` 与测试数据类型一致。
+- `baseAlgName` 和 `runAlgName` 均为 `InsAllReduceMesh1DTwoShot`。
+- `runInputPtr`、`runOutputPtr` 非空，且与预期 in-place/out-of-place 场景一致。
+
+随后检查 open-kernel 的加载和启动日志：
+
+```text
+[MC2_OPEN_DIAG][Load] ... opType ..., algName[InsAllReduceMesh1DTwoShot], ...
+[MC2_OPEN_DIAG][LaunchOpenOpParamDataImpl] ... opType ..., algName[InsAllReduceMesh1DTwoShot]
+[MC2_OPEN_DIAG][Launch] opType ..., algName[InsAllReduceMesh1DTwoShot], inputPtr ..., outputPtr ..., ... userRank ..., userRankSize ..., threadNum ..., cclMemAddr ..., cclMemSize ...
+[MC2_OPEN_DIAG][Launch][Else] count ..., dataType ..., outputType ..., strideCount ...
+```
+
+其中 `threadNum` 应等于 rank 数，`cclMemAddr` 应非空，`cclMemSize` 应足以满足 2 倍 scratch 要求。
+
+### 7.4 Device 侧本地 executor 分发
+
+当前 AllReduce 已从 CANN Bridge 分发中移除，应由本地 `CollAlgExecRegistryV2` 获取 executor。检查 device 日志中再次出现：
+
+```text
+[asc][AlgoExecute][CollAlgExecRegistryV2::GetAlgExec] hit, opType[...], algName[InsAllReduceMesh1DTwoShot], executor[...]
+```
+
+同时不应出现 AllReduce 的以下日志：
+
+```text
+[CannBridge] dispatch failed ... opType=ALLREDUCE ...
+[CannBridge] GetAlgExec returned null ... algName[InsAllReduceMesh1DTwoShot]
+```
+
+若开启 DEBUG，可通过以下日志确认 batch mode 包裹了本地 executor：
+
+```text
+[MC2_BATCH][Start] opType[...], algName[InsAllReduceMesh1DTwoShot], algTag[...]
+[MC2_BATCH][End] opType[...], algName[InsAllReduceMesh1DTwoShot], algTag[...], execRet[0], endRet[0]
+```
+
+### 7.5 Executor 编排和大数据循环
+
+检查 executor 已进入编排：
+
+```text
+[InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate Start.
+[InsV2AllReduceSoleExecutor][OrchestrateLoop] Start
+```
+
+随后检查单轮容量计算：
+
+```text
+[InsV2AllReduceSoleExecutor]maxTmpMemSize_ [...]
+[InsV2AllReduceSoleExecutor][OrchestrateOpbase] maxDataCountPerLoop[...], maxDataSizePerLoop[...], transportBoundDataSize[...], templateScratchMultiplier[2]
+```
+
+重点确认：
+
+- `templateScratchMultiplier` 为 2。
+- `maxDataCountPerLoop` 和 `maxDataSizePerLoop` 大于 0。
+- 大数据测试时应出现多组递增的 loop 日志。
+
+每轮已有以下日志：
+
+```text
+[InsV2AllReduceSoleExecutor] loop [...] ... sliceSize [...]
+[InsV2AllReduceSoleExecutor] loop [...] ... inBuffBaseOff [...], ... outBuffBaseOff [...]
+```
+
+大数据循环场景中，`inBuffBaseOff` 和 `outBuffBaseOff` 应逐轮递增，最后必须出现：
+
+```text
+[InsV2AllReduceSoleExecutor][OrchestrateLoop] End.
+```
+
+### 7.6 标准 TwoShot template 执行
+
+每个 executor loop 都应出现一组：
+
+```text
+[InsTempAllReduceMesh1DTwoShot] KernelRun Start.
+[InsTempAllReduceMesh1DTwoShot] KernelRun finished.
+```
+
+这两个日志同时出现，说明该轮标准 TwoShot 已依次完成 `RunReduceScatter` 和 `RunAllGather`。当前代码没有分别打印 ReduceScatter/AllGather 成功日志，因此不能仅凭现有日志区分两个阶段；若中途失败，应结合以下错误日志定位：
+
+```text
+[InsTempAllReduceMesh1DTwoShot][ScatterData] LocalCopy failed.
+[InsTempAllReduceMesh1DTwoShot][ScatterData] Recv failed.
+[InsTempAllReduceMesh1DTwoShot][ScatterData] Send failed.
+[InsTempAllReduceMesh1DTwoShot][ScatterData] SendRecv failed.
+[InsTempAllReduceMesh1DTwoShot][ReduceData] LocalReduce failed
+```
+
+开启 DEBUG 后还可检查切片结果：
+
+```text
+[InsTempAllReduceMesh1DTwoShot] SliceInfo: offset[...] size[...] count[...]
+```
+
+切片验证重点：
+
+- slice 数量等于 rank 数。
+- 所有 slice 的 count 总和等于本轮 count。
+- count 小于 rank 数时允许尾部 slice 的 count/size 为 0。
+- count 不能被 rank 数整除时，最后一个有效 slice 可以小于前面的 slice。
+
+### 7.7 Server 完成和结果可用
+
+检查 server 在 executor 返回后记录成功，并完成回写：
+
+```text
+[MC2_OPEN_DIAG][LoopAfterKernel] ... ret 0
+[MC2_OPEN_DIAG][LoopAfterPost] ... ret 0
+[MC2_OPEN_DIAG][LoopEnd] ...
+```
+
+`LoopAfterKernel ret 0` 表示算法执行成功，`LoopAfterPost ret 0` 表示完成计数已回写，AICore 侧 `Wait` 才能正常结束并安全使用输出。
+
+### 7.8 日志断点定位
+
+1. 没有 `[MC2_ALG_INFO]`：Host 资源创建未完成，先检查 tiling、通信域初始化和 selector。
+2. selector 匹配但 registry `miss`：`mc2_client` 未编入或未注册 AllReduce executor。
+3. Host 完整但没有 `FormatMsg`：AICore 未发送 AllReduce 消息，或消息未被 KFC/AICPU server 消费。
+4. `FormatBase` 正确但 `FormatRun` 的 count/type 错误：检查 AICore `Hccl::AllReduce` 入参和消息格式化。
+5. device registry `miss`：`mc2_server` 未编入标准 TwoShot executor/template，或 device 算法名不一致。
+6. 有 `Orchestrate Start` 但没有 `KernelRun Start`：检查 channel/thread 资源恢复和单轮容量计算。
+7. 有 `KernelRun Start` 但没有 `KernelRun finished`：根据 ScatterData/ReduceData 错误定位通信、同步或归约失败。
+8. 有 `KernelRun finished` 但 `LoopAfterKernel ret` 非 0：检查 executor 收尾或 batch mode 结束失败。
+9. `LoopAfterKernel ret 0` 但没有 `LoopAfterPost ret 0`：检查完成计数回写和 AICore/server 同步。
+10. 全部日志完整但结果错误：检查输入输出地址、count、data type、reduce op、切片结果，并用基准 AllReduce 比对每个 rank 输出。
+
+## 8. 功能验证建议
 
 1. Host 和 device 两侧分别构建，确认 `mc2_client` 与 `mc2_server` 均包含 `InsAllReduceMesh1DTwoShot` 注册。
-2. 在单层 Mesh1D 环境执行 mc2 AllReduce，检查日志中的 `[MC2_ALG_INFO]` 算法名为 `InsAllReduceMesh1DTwoShot`。
+2. 在单层 Mesh1D 环境执行 mc2 AllReduce，按第 7 节顺序核对现有日志。
 3. 覆盖 count 小于 rank 数、不能被 rank 数整除、超过单轮 HCCL buffer 容量三类数据量。
 4. 覆盖 FP16/FP32 SUM，以及 INT64 或 PROD 的 AICPU reduce 同步分支。
 5. 校验 in-place 和 out-of-place 场景的结果与基准 AllReduce 一致。
