@@ -24,57 +24,57 @@
 
 #include "impl/tensor_api/arch/cube/mmad/mmad_impl/instruction.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class MmadWithBias {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline static void Run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
+    template <const mmad_trait& trait, typename T, typename U, typename S, typename V, typename Params>
+    __aicore__ inline static void run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
     {
-        MmadImpl<trait, T, U, S, V>(dst, fm, filter, bias, params);
+        mmad_impl<trait, T, U, S, V>(dst, fm, filter, bias, params);
     }
 
 private:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
-    __aicore__ inline static constexpr void CheckTemplateForNormal()
+    template <const mmad_trait& trait, typename T, typename U, typename S, typename V>
+    __aicore__ inline static constexpr void check_template_for_normal()
     {
-        CheckLayoutPattern<T, U, S, V>();
-        CheckDataType::CheckMmadBiasDataType<T, U, S, V>();
+        check_layout_pattern<T, U, S, V>();
+        CheckDataType::check_mmad_bias_data_type<T, U, S, V>();
     }
 
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
-    __aicore__ inline static constexpr void CheckTemplateForMx()
+    template <const mmad_trait& trait, typename T, typename U, typename S, typename V>
+    __aicore__ inline static constexpr void check_template_for_mx()
     {
-        CheckLayoutPattern<T, U, S, V>();
-        CheckDataType::CheckMxMmadBiasDataType<T, U, S, V>();
+        check_layout_pattern<T, U, S, V>();
+        CheckDataType::check_mx_mmad_bias_data_type<T, U, S, V>();
     }
 
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline static void MmadImpl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
+    template <const mmad_trait& trait, typename T, typename U, typename S, typename V, typename Params>
+    __aicore__ inline static void mmad_impl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
     {
-        if constexpr (trait.mmadType == MmadType::NORMAL) {
-            CheckTemplateForNormal<trait, T, U, S, V>();
-        } else if constexpr (trait.mmadType == MmadType::MX) {
-            CheckTemplateForMx<trait, T, U, S, V>();
+        if constexpr (trait.mmad_type == MmadType::NORMAL) {
+            check_template_for_normal<trait, T, U, S, V>();
+        } else if constexpr (trait.mmad_type == MmadType::MX) {
+            check_template_for_mx<trait, T, U, S, V>();
         }
 
-        bool cmatrixSource = false;
+        bool cmatrix_source = false;
         if constexpr (Std::is_same_v<GetMemLocation<V>, Location::BIAS>) {
-            cmatrixSource = true;
+            cmatrix_source = true;
         }
 
-        if constexpr (trait.mmadType == MmadType::NORMAL) {
-            MmadBiasInstr::Mmad(dst, fm, filter, bias, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, cmatrixSource,
-                                false);
-        } else if constexpr (trait.mmadType == MmadType::MX) {
-            MmadMxBiasInstr::Mmad(dst, fm, filter, bias, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, cmatrixSource,
-                                 false);
+        if constexpr (trait.mmad_type == MmadType::NORMAL) {
+            MmadBiasInstr::mmad(dst, fm, filter, bias, params.m, params.k, params.n, params.unit_flag,
+                                trait.disable_gemv, cmatrix_source, false);
+        } else if constexpr (trait.mmad_type == MmadType::MX) {
+            MmadMxBiasInstr::mmad(dst, fm, filter, bias, params.m, params.k, params.n, params.unit_flag,
+                                  trait.disable_gemv, cmatrix_source, false);
         }
     }
 };
 
-}} // namespace Te AscendC
+}} // namespace asc::te
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_IMPL_MMAD_WITH_BIAS_H
 

@@ -26,29 +26,29 @@
 #include "impl/tensor_api/arch/cube/l0c_to_gm/copy.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename TraitStruct>
-struct CopyTraits<CopyL0C2GMWith, TraitStruct> {
+struct copy_traits<copy_l0c_to_gm_with, TraitStruct> {
     using TraitType = typename TraitStruct::TraitType;
     static constexpr const TraitType defaultTrait = TraitStruct::value;
 
     template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void CopyUnpack(const Args&... args) const
-    { CopyL0C2GMWith::Copy<TraitType, trait, Args...>(args..., params); }
-    FixpipeParams params;
+    __aicore__ inline void copy_unpack(const Args&... args) const
+    { copy_l0c_to_gm_with::copy<TraitType, trait, Args...>(args..., params); }
+    fixpipe_params params;
 };
 
 template <typename Traits>
-struct CopyTraits<CopyL0C2GM, Traits> : public CopyTraits<CopyL0C2GM, Traits, CopyL0C2GMWith, Traits> {
+struct copy_traits<copy_l0c_to_gm, Traits> : public copy_traits<copy_l0c_to_gm, Traits, copy_l0c_to_gm_with, Traits> {
 };
 
 template <>
-struct CopyTraits<CopyL0C2GM> : public CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault> {};
+struct copy_traits<copy_l0c_to_gm> : public copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default> {};
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ATOM_CUBE_COPY_L0C2GM_H
 

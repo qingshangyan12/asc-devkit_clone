@@ -24,48 +24,48 @@
 
 #include "impl/tensor_api/arch/cube/mmad/mmad_impl/instruction.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class Mmad {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline static void Run(const T& dst, const U& fm, const S& filter, const Params& params)
+    template <const mmad_trait& trait, typename T, typename U, typename S, typename Params>
+    __aicore__ inline static void run(const T& dst, const U& fm, const S& filter, const Params& params)
     {
-        MmadImpl<trait, T, U, S>(dst, fm, filter, params);
+        mmad_impl<trait, T, U, S>(dst, fm, filter, params);
     }
 
 private:
-    template <const MmadTrait& trait, typename T, typename U, typename S>
-    __aicore__ inline static constexpr void CheckTemplateForNormal()
+    template <const mmad_trait& trait, typename T, typename U, typename S>
+    __aicore__ inline static constexpr void check_template_for_normal()
     {
-        CheckLayoutPattern<T, U, S>();
-        CheckDataType::CheckMmadDataType<T, U, S>();
+        check_layout_pattern<T, U, S>();
+        CheckDataType::check_mmad_data_type<T, U, S>();
     }
 
-    template <const MmadTrait& trait, typename T, typename U, typename S>
-    __aicore__ inline static constexpr void CheckTemplateForMx()
+    template <const mmad_trait& trait, typename T, typename U, typename S>
+    __aicore__ inline static constexpr void check_template_for_mx()
     {
-        CheckLayoutPattern<T, U, S>();
-        CheckDataType::CheckMxMmadDataType<T, U, S>();
+        check_layout_pattern<T, U, S>();
+        CheckDataType::check_mx_mmad_data_type<T, U, S>();
     }
 
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline static void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
+    template <const mmad_trait& trait, typename T, typename U, typename S, typename Params>
+    __aicore__ inline static void mmad_impl(const T& dst, const U& fm, const S& filter, const Params& params)
     {
-        if constexpr (trait.mmadType == MmadType::NORMAL) {
-            CheckTemplateForNormal<trait, T, U, S>();
-            MmadInstr::Mmad(dst, fm, filter, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, trait.cmatrixSource,
-                            params.cmatrixInitVal);
-        } else if constexpr (trait.mmadType == MmadType::MX) {
-            CheckTemplateForMx<trait, T, U, S>();
-            MmadMxInstr::Mmad(dst, fm, filter, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, trait.cmatrixSource,
-                              params.cmatrixInitVal);
+        if constexpr (trait.mmad_type == MmadType::NORMAL) {
+            check_template_for_normal<trait, T, U, S>();
+            MmadInstr::mmad(dst, fm, filter, params.m, params.k, params.n, params.unit_flag, trait.disable_gemv,
+                            trait.cmatrix_source, params.cmatrix_init_val);
+        } else if constexpr (trait.mmad_type == MmadType::MX) {
+            check_template_for_mx<trait, T, U, S>();
+            MmadMxInstr::mmad(dst, fm, filter, params.m, params.k, params.n, params.unit_flag, trait.disable_gemv,
+                              trait.cmatrix_source, params.cmatrix_init_val);
         }
     }
 };
 
-}} // namespace Te AscendC
+}} // namespace asc::te
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_IMPL_MMAD_H
 

@@ -24,13 +24,13 @@
 
 #include "impl/tensor_api/arch/cube/l1_to_l0a/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyL12L0ATrait DEFAULT_COPY_L1_TO_L0A_TRAIT;
+constexpr copy_l1_to_l0a_trait DEFAULT_COPY_L1_TO_L0A_TRAIT;
 
-struct CopyL12L0ATraitDefault {
-    using TraitType = CopyL12L0ATrait;
+struct copy_l1_to_l0a_trait_default {
+    using TraitType = copy_l1_to_l0a_trait;
     static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0A_TRAIT;
 };
 
@@ -43,9 +43,9 @@ using CopyL12L0AModeSet = TupleMap<
 struct CopyL12L0ABase {
 public:
     template <
-        const CopyL12L0ATrait& trait = DEFAULT_COPY_L1_TO_L0A_TRAIT, typename T, typename U, typename PadT = int16_t>
-    __aicore__ inline static void LoadDataImpl(
-        const T& dst, const U& src, const Img2ColParams<PadT>& params = DEFAULT_IMG2COL_PARAMS)
+        const copy_l1_to_l0a_trait& trait = DEFAULT_COPY_L1_TO_L0A_TRAIT, typename T, typename U, typename PadT = int16_t>
+    __aicore__ inline static void load_data_impl(
+        const T& dst, const U& src, const img2col_params<PadT>& params = DEFAULT_IMG2COL_PARAMS)
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
@@ -63,27 +63,27 @@ public:
             // 2D or 3D implementation by SrcPattern.
             using CopyL12L0AImpl =
                 typename CopyL12L0ARouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyMode::NORMAL>::type;
-            CopyL12L0AImpl::template Run<trait, T, U, PadT>(dst, src, params);
+            CopyL12L0AImpl::template run<trait, T, U, PadT>(dst, src, params);
         } else {
-            constexpr auto isB8B4Type = sizeof(typename T::elementType) == 1;
-            constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>;
+            constexpr auto is_b8_b4_type = sizeof(typename T::elementType) == 1;
+            constexpr auto no_trans = Std::is_same_v<DstPattern, SrcPattern>;
             using CopyL12L0AMode =
-                typename CopyL12L0AModeSet::template Get<Std::tuple<Std::Int<noTrans>, Std::Int<isB8B4Type>>>;
+                typename CopyL12L0AModeSet::template Get<Std::tuple<Std::Int<no_trans>, Std::Int<is_b8_b4_type>>>;
             static_assert(!Std::is_same_v<CopyL12L0AMode, Std::ignore_t>, "Unsupported CopyL12L0AMode.");
             using CopyL12L0AImpl =
                 typename CopyL12L0ARouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyL12L0AMode>::type;
-            CopyL12L0AImpl::template Run<trait, T, U>(dst, src);
+            CopyL12L0AImpl::template run<trait, T, U>(dst, src);
         }
     }
 };
 
-struct CopyL12L0A : public CopyL12L0ABase {
+struct copy_l1_to_l0a : public CopyL12L0ABase {
 public:
     template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIC {
-            LoadDataImpl<trait>(args...);
+            load_data_impl<trait>(args...);
         }
     }
 };
@@ -91,10 +91,10 @@ public:
 struct CopyL12L0AWith : public CopyL12L0ABase {
 public:
     template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIC {
-            LoadDataImpl<trait>(args...);
+            load_data_impl<trait>(args...);
         }
     }
 };

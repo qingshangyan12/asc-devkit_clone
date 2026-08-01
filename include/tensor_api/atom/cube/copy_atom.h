@@ -23,23 +23,29 @@
 
 #include "impl/tensor_api/atom/copy_atom_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename CopyOperation, typename... CopyOpArgs>
-struct CopyTraits;
+struct copy_traits;
 
 template <typename... Args>
-struct CopyAtom;
+struct copy_atom;
 
 template <typename CopyOperation>
-struct CopyAtom<CopyOperation>;
+struct copy_atom<CopyOperation>;
 
 template <typename... Args>
-struct CopyAtom<CopyTraits<Args...>>;
+struct copy_atom<copy_traits<Args...>>;
 
-} // namespace Te
-} // namespace AscendC
+template <typename CopyOperation, typename... CopyOpArgs>
+using CopyTraits = copy_traits<CopyOperation, CopyOpArgs...>;
+
+template <typename... Args>
+using CopyAtom = copy_atom<Args...>;
+
+} // namespace te
+} // namespace asc
 
 #endif // INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
 

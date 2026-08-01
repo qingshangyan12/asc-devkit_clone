@@ -25,13 +25,13 @@
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/arch/utils/is_format.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class CheckDataType {
 public:
     template <typename T, typename U, typename S>
-    __aicore__ inline static constexpr void CheckMxMmadDataType()
+    __aicore__ inline static constexpr void check_mx_mmad_data_type()
     {
         using dstDataType = typename T::elementType;
         using fmDataType = typename U::elementType;
@@ -54,7 +54,7 @@ public:
     }
 
     template <typename T, typename U, typename S, typename V>
-    __aicore__ inline static constexpr void CheckMxMmadBiasDataType()
+    __aicore__ inline static constexpr void check_mx_mmad_bias_data_type()
     {
         using dstDataType = typename T::elementType;
         using biasDataType = typename V::elementType;
@@ -93,7 +93,7 @@ public:
     }
 
     template <typename T, typename U, typename S>
-    __aicore__ inline static constexpr void CheckMmadDataType()
+    __aicore__ inline static constexpr void check_mmad_data_type()
     {
         using dstDataType = typename T::elementType;
         using fmDataType = typename U::elementType;
@@ -117,7 +117,7 @@ public:
     }
 
     template <typename T, typename U, typename S, typename V>
-    __aicore__ inline static constexpr void CheckMmadBiasDataType()
+    __aicore__ inline static constexpr void check_mmad_bias_data_type()
     {
         using dstDataType = typename T::elementType;
         using fmDataType = typename U::elementType;
@@ -159,7 +159,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckGm2L1DataType()
+    __aicore__ inline static constexpr void check_gm2_l1_data_type()
     {
         using dstDataType = typename T::elementType;
         using srcDataType = typename U::elementType;
@@ -180,7 +180,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckGm2L1Fp4DataType()
+    __aicore__ inline static constexpr void check_gm2_l1_fp4_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -203,7 +203,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckGm2L1ScaleDataType()
+    __aicore__ inline static constexpr void check_gm2_l1_scale_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -216,7 +216,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckGm2L1AlignV2NDDataType()
+    __aicore__ inline static constexpr void check_gm2_l1_align_v2_nd_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -240,7 +240,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckGm2UBDataType()
+    __aicore__ inline static constexpr void check_gm2_ub_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -264,7 +264,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckUB2UBDataType()
+    __aicore__ inline static constexpr void check_ub2_ub_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -288,7 +288,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckUB2GMDataType()
+    __aicore__ inline static constexpr void check_ub2_gm_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -312,7 +312,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckUB2L1DataType()
+    __aicore__ inline static constexpr void check_ub2_l1_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -336,7 +336,7 @@ public:
     }
 
     template <typename U>
-    __aicore__ inline static constexpr void CheckGm2L1ND2NDSrcOneDim()
+    __aicore__ inline static constexpr void check_gm2_l1_nd2_nd_src_one_dim()
     {
         using ShapeRow1 = typename GetNDimType<U, AttrInfo::Shape, AttrInfo::Row, 1>::type;
         using ShapeCol1 = typename GetNDimType<U, AttrInfo::Shape, AttrInfo::Column, 1>::type;
@@ -346,7 +346,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckL12BtDataType()
+    __aicore__ inline static constexpr void check_l12_bt_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -362,7 +362,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckL12FbDataType()
+    __aicore__ inline static constexpr void check_l12_fb_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -375,7 +375,7 @@ public:
     }
 
     template <QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline static constexpr void CheckL0C2GmDataType()
+    __aicore__ inline static constexpr void check_l0_c2_gm_data_type()
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
@@ -394,7 +394,7 @@ public:
     }
 
     template <QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline static constexpr void CheckL0C2L1DataType()
+    __aicore__ inline static constexpr void check_l0_c2_l1_data_type()
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
@@ -413,7 +413,7 @@ public:
     }
 
     template <QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline static constexpr void CheckL0C2UbDataType()
+    __aicore__ inline static constexpr void check_l0_c2_ub_data_type()
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
@@ -432,7 +432,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckL12L0ADataType()
+    __aicore__ inline static constexpr void check_l12_l0_a_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -455,7 +455,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckL12L0ScaleADataType()
+    __aicore__ inline static constexpr void check_l12_l0_scale_a_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -468,7 +468,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckL12L0BDataType()
+    __aicore__ inline static constexpr void check_l12_l0_b_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -491,7 +491,7 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckL12L0ScaleBDataType()
+    __aicore__ inline static constexpr void check_l12_l0_scale_b_data_type()
     {
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
@@ -504,8 +504,8 @@ public:
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_UTILS_CHECK_DATA_TYPE_H
 

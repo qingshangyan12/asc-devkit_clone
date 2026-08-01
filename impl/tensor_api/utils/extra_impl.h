@@ -33,8 +33,8 @@
 #include "utils/std/cmath.h"
 #include "int_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 template <typename... Ts>
 using void_t = void;
 
@@ -67,8 +67,8 @@ template <typename T>
 struct IterVal<T,void_t<typename T::valueType>> {
     using type = typename T::valueType;
 };
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_UTILS_EXTRA_IMPL_H
 

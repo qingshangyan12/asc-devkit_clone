@@ -26,8 +26,8 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 namespace Inst {
 
 struct Cast {};
@@ -36,7 +36,7 @@ struct Cast {};
 class CLASS_NAME {                                                                                                   \
 public:                                                                                                              \
     template <typename T>                                                                                            \
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask)                                         \
+    __simd_callee__ inline static void run(T& dst, T src, vector_bool mask)                                         \
     {                                                                                                                \
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
             FUNC_NAME(dst, src, mask);                                                                               \
@@ -53,7 +53,7 @@ public:                                                                         
 class CLASS_NAME {                                                                                                   \
 public:                                                                                                              \
     template <typename T, typename U>                                                                                            \
-    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
+    __simd_callee__ inline static void run(T& dst, U src, vector_bool mask)                                         \
     {                                                                                                                \
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
             FUNC_NAME(dst, src, mask);                                                                               \

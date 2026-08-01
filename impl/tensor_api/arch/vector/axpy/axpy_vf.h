@@ -25,28 +25,28 @@
 #include "impl/tensor_api/arch/vector/axpy/instruction.h"
 #include "impl/tensor_api/arch/vector/utils/mask_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template<typename CalcFunc, typename TraitType>
 class AxpyVF {
 public:
     template<typename DstRegType, typename SrcRegType, typename T, typename U, typename S>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, S value, uint32_t dataSize)
+    __simd_vf__ inline static void run(__ubuf__ T* dst, __ubuf__ U* src, S value, uint32_t data_size)
     {
-        constexpr uint32_t oneRepSize = static_cast<uint32_t>(asc_get_vf_len() / sizeof(T));
-        uint16_t repeat = static_cast<uint16_t>((dataSize + oneRepSize - 1) / oneRepSize);
+        constexpr uint32_t one_rep_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(T));
+        uint16_t repeat = static_cast<uint16_t>((data_size + one_rep_size - 1) / one_rep_size);
 
         vector_bool vmask;
         DstRegType reg_dst;
         SrcRegType reg_src;
 
         for (uint16_t i = 0; i < repeat; ++i) {
-            vmask = Inst::UpdateMask::template Run<uint32_t>(dataSize);
-            asc_loadalign(reg_src, src + i * oneRepSize);
-            asc_loadalign(reg_dst, dst + i * oneRepSize);
-            CalcFunc::template Run(reg_dst, reg_src, value, vmask);
-            asc_storealign(dst + i * oneRepSize, reg_dst, vmask);
+            vmask = Inst::UpdateMask::template run<uint32_t>(data_size);
+            asc_loadalign(reg_src, src + i * one_rep_size);
+            asc_loadalign(reg_dst, dst + i * one_rep_size);
+            CalcFunc::template run(reg_dst, reg_src, value, vmask);
+            asc_storealign(dst + i * one_rep_size, reg_dst, vmask);
         }
     }
 };
@@ -55,16 +55,16 @@ template<typename CalcFunc, typename TraitType>
 class Transform2AxpyVF {
 public:
     template<typename T, typename U, typename S>
-    __aicore__ inline static void Run(const T& dst, const U& src, const S& value)
+    __aicore__ inline static void run(const T& dst, const U& src, const S& value)
     {
   		using srcType = GetAttributeElementType<typename U::elementType*>;
   		using dstType = GetAttributeElementType<typename T::elementType*>;
         using SrcRegType = typename VectorTypeTransform::template Get<srcType>;
         using DstRegType = typename VectorTypeTransform::template Get<dstType>;
 
-        const uint32_t dataSize = dst.Size();
+        const uint32_t data_size = dst.size();
 
-        AxpyVF<CalcFunc, TraitType>::template Run<DstRegType, SrcRegType>(dst.Data().Get(), src.Data().Get(), value, dataSize);
+        AxpyVF<CalcFunc, TraitType>::template run<DstRegType, SrcRegType>(dst.data().get(), src.data().get(), value, data_size);
     }
 };
 

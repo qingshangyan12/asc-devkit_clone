@@ -23,33 +23,33 @@
 
 #include "impl/tensor_api/arch/cube/mmad/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr MmadTrait DEFAULT_MMAD_TRAIT;
+constexpr mmad_trait DEFAULT_MMAD_TRAIT;
 
-constexpr MmadParams defaultMmadParams = {0, 0, 0, 0, true};
+constexpr mmad_params default_mmad_params = {0, 0, 0, 0, true};
 
-constexpr MmadParams defaultMmadWithBiasParams = {0, 0, 0, 0, false};
+constexpr mmad_params default_mmad_with_bias_params = {0, 0, 0, 0, false};
 
-struct MmadTraitDefault {
-    using TraitType = MmadTrait;
+struct mmad_trait_default {
+    using TraitType = mmad_trait;
     static constexpr const TraitType value = DEFAULT_MMAD_TRAIT;
 };
 
-struct MmadOperation {
+struct mmad_operation {
 public:
     template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Mmad(const Args& ...args)
+    __aicore__ inline static void mmad(const Args& ...args)
     {
         if ASCEND_IS_AIC {
-            MmadImpl<traits, Args...>(args...);
+            mmad_impl<traits, Args...>(args...);
         }
     }
 
 private:
-    template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename Params>
-    __aicore__ inline static void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
+    template <const mmad_trait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename Params>
+    __aicore__ inline static void mmad_impl(const T& dst, const U& fm, const S& filter, const Params& params)
     {
         using dstPos = GetMemLocation<T>;
         using fmPos = GetMemLocation<U>;
@@ -65,11 +65,11 @@ private:
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
         using MmadImpl = typename MmadRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn,
                                                    Location::INVALID>::type;
-        MmadImpl::template Run<trait>(dst, fm, filter, params);
+        MmadImpl::template run<trait>(dst, fm, filter, params);
     }
 
-    template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline static void MmadImpl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
+    template <const mmad_trait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V, typename Params>
+    __aicore__ inline static void mmad_impl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
     {
         using dstPos = GetMemLocation<T>;
         using fmPos = GetMemLocation<U>;
@@ -88,7 +88,7 @@ private:
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
         using MmadImpl = typename MmadRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn,
                                                    biasPos>::type;
-        MmadImpl::template Run<trait>(dst, fm, filter, bias, params);
+        MmadImpl::template run<trait>(dst, fm, filter, bias, params);
     }
 };
 

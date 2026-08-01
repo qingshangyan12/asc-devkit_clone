@@ -25,13 +25,13 @@
 
 #include "impl/tensor_api/arch/cube/l1_to_l0scalea/copy_impl/scalea.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 class CopyL12L0ScaleAIgnore {
 public:
-    template <const CopyL12L0ScaleATrait& trait, typename ...Args>
-    __aicore__ inline void static Run(const Args&... args) {
+    template <const copy_l1_to_l0_scale_a_trait& trait, typename ...Args>
+    __aicore__ inline void static run(const Args&... args) {
         static_assert(Std::is_same_v<Args..., void>, "CopyL12L0ScaleAIgnore should not be called");
     }
 };
@@ -47,8 +47,8 @@ struct CopyL12L0ScaleARouting<Version, ZZLayoutPtn, ZZLayoutPtn>
     using type = LoadDataL12L0MxScaleA3510;
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0SCALEA_ROUTING_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

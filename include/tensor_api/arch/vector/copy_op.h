@@ -21,17 +21,40 @@
 #ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
 #define INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyGM2UB;
-struct CopyGM2UBWith;
-struct CopyUB2L1;
-struct CopyUB2GM;
-struct CopyUB2UB;
+struct copy_gm_to_ub;
+struct copy_gm_to_ub_with;
+struct copy_ub_to_l1;
+struct copy_ub_to_gm;
+struct copy_ub_to_ub;
 
-} // namespace Te
-} // namespace AscendC
+struct copy_gm_to_ub_trait;
+struct copy_gm_to_ub_trait_default;
+struct copy_ub_to_l1_trait;
+struct copy_ub_to_l1_trait_default;
+struct copy_ub_to_gm_trait;
+struct copy_ub_to_gm_trait_default;
+struct copy_ub_to_ub_trait;
+struct copy_ub_to_ub_trait_default;
+
+using CopyGM2UB = copy_gm_to_ub;
+using CopyGM2UBWith = copy_gm_to_ub_with;
+using CopyUB2L1 = copy_ub_to_l1;
+using CopyUB2GM = copy_ub_to_gm;
+using CopyUB2UB = copy_ub_to_ub;
+using CopyGM2UBTrait = copy_gm_to_ub_trait;
+using CopyGM2UBTraitDefault = copy_gm_to_ub_trait_default;
+using CopyUB2L1Trait = copy_ub_to_l1_trait;
+using CopyUB2L1TraitDefault = copy_ub_to_l1_trait_default;
+using CopyUB2GMTrait = copy_ub_to_gm_trait;
+using CopyUB2GMTraitDefault = copy_ub_to_gm_trait_default;
+using CopyUB2UBTrait = copy_ub_to_ub_trait;
+using CopyUB2UBTraitDefault = copy_ub_to_ub_trait_default;
+
+} // namespace te
+} // namespace asc
 
 #endif // INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
 

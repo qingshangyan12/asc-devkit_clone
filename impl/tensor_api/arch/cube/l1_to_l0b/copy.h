@@ -24,13 +24,13 @@
 
 #include "impl/tensor_api/arch/cube/l1_to_l0b/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyL12L0BTrait DEFAULT_COPY_L1_TO_L0B_TRAIT;
+constexpr copy_l1_to_l0b_trait DEFAULT_COPY_L1_TO_L0B_TRAIT;
 
-struct CopyL12L0BTraitDefault {
-    using TraitType = CopyL12L0BTrait;
+struct copy_l1_to_l0b_trait_default {
+    using TraitType = copy_l1_to_l0b_trait;
     static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0B_TRAIT;
 };
 
@@ -40,19 +40,19 @@ using CopyL12L0BModeSet = TupleMap<
     Std::tuple<Std::tuple<_0, _0>, CopyMode::TRANS>,
     Std::tuple<Std::tuple<_0, _1>, CopyMode::TRANS_B8B4>>;
 
-struct CopyL12L0B {
+struct copy_l1_to_l0b {
 public:
     template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args& ...args)
+    __aicore__ inline static void copy(const Args& ...args)
     {
         if ASCEND_IS_AIC {
-            LoadData<traits, Args...>(args...);
+            load_data<traits, Args...>(args...);
         }
     }
 
 private:
-    template<const CopyL12L0BTrait& trait = DEFAULT_COPY_L1_TO_L0B_TRAIT, typename T, typename U>
-    __aicore__ inline static void LoadData(const T& dst, const U& src)
+    template<const copy_l1_to_l0b_trait& trait = DEFAULT_COPY_L1_TO_L0B_TRAIT, typename T, typename U>
+    __aicore__ inline static void load_data(const T& dst, const U& src)
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
@@ -64,12 +64,12 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
         using SrcPattern = GetLayoutPattern<SrcLayout>;
-        constexpr auto isB8B4Type = sizeof(typename T::elementType) == 1;
-        constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>;
-        using CopyL12L0BMode = typename CopyL12L0BModeSet::template Get<Std::tuple<Std::Int<noTrans>, Std::Int<isB8B4Type>>>;
+        constexpr auto is_b8_b4_type = sizeof(typename T::elementType) == 1;
+        constexpr auto no_trans = Std::is_same_v<DstPattern, SrcPattern>;
+        using CopyL12L0BMode = typename CopyL12L0BModeSet::template Get<Std::tuple<Std::Int<no_trans>, Std::Int<is_b8_b4_type>>>;
         static_assert(!Std::is_same_v<CopyL12L0BMode, Std::ignore_t>, "Unsupported CopyL12L0BMode.");
         using CopyL12L0BImpl = typename CopyL12L0BRouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyL12L0BMode>::type;
-        CopyL12L0BImpl::template Run<trait, T, U>(dst, src);
+        CopyL12L0BImpl::template run<trait, T, U>(dst, src);
     }
 };
 

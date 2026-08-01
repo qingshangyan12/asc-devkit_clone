@@ -25,8 +25,8 @@
 #include "impl/tensor_api/utils/extra_impl.h"
 #include "impl/tensor_api/utils/map_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 using Std::Int;
 using _0 = Std::Int<0>;
 using _1 = Std::Int<1>;
@@ -51,10 +51,11 @@ using _2048 = Std::Int<2048>;
 using _4096 = Std::Int<4096>;
 
 // Squeeze pattern mark: positions marked with `_` are kept (only `_1` marks a squeeze).
-struct KeepMark {
-    __aicore__ inline constexpr KeepMark() = default;
+struct keep_mark {
+    __aicore__ inline constexpr keep_mark() = default;
 };
-inline constexpr KeepMark _{};
+using KeepMark = keep_mark;
+inline constexpr keep_mark _{};
 
 constexpr size_t TWO_DIM_DATA = 2;
 constexpr size_t THREE_DIM_DATA = 3;
@@ -65,10 +66,12 @@ constexpr size_t MX_SCALE_K0 = 2;
 constexpr uint32_t BLOCK_CUBE = 16;
 constexpr uint64_t HIFLOAT8_MMAD_CTRL_MASK = 0x200000000000ULL;
 
-struct ArchVersion {
+struct arch_version {
     static constexpr uint32_t V3510 = 3510;
     static constexpr uint32_t V2201 = 2201;
 };
+
+using ArchVersion = arch_version;
 
 struct GetArchVersion {
     __aicore__ inline constexpr uint32_t operator()() const {
@@ -83,36 +86,55 @@ struct GetArchVersion {
 constexpr uint32_t CURRENT_ARCH_VERSION = GetArchVersion{}();
 
 namespace CopyMode {
-    struct NORMAL {};
-    struct TRANS {};
-    struct TRANS_B8B4 {};
+    struct normal {};
+    struct trans {};
+    struct trans_b8b4 {};
+    using NORMAL = normal;
+    using TRANS = trans;
+    using TRANS_B8B4 = trans_b8b4;
 };
 
+namespace copy_mode = CopyMode;
+
 namespace Location {
-    struct INVALID {};
-    struct GM {};
-    struct UB {};
-    struct L1 {};
-    struct L0A {};
-    struct L0B {};
-    struct L0ScaleA {};
-    struct L0ScaleB {};
-    struct L0C {};
-    struct BIAS {};
-    struct FIXBUF {};
-    struct SSBUF {};
+    struct invalid {};
+    struct gm {};
+    struct ub {};
+    struct l1 {};
+    struct l0a {};
+    struct l0b {};
+    struct l0_scale_a {};
+    struct l0_scale_b {};
+    struct l0c {};
+    struct bias {};
+    struct fixbuf {};
+    struct ssbuf {};
+    using INVALID = invalid;
+    using GM = gm;
+    using UB = ub;
+    using L1 = l1;
+    using L0A = l0a;
+    using L0B = l0b;
+    using L0ScaleA = l0_scale_a;
+    using L0ScaleB = l0_scale_b;
+    using L0C = l0c;
+    using BIAS = bias;
+    using FIXBUF = fixbuf;
+    using SSBUF = ssbuf;
 }
+
+namespace location = Location;
 
 template <typename T>
 struct IsHardware {
 private:
     template <typename Tp, typename... Tps>
-    __aicore__ inline static constexpr bool IsUnqualifiedAnyOf() {
+    __aicore__ inline static constexpr bool is_unqualified_any_of() {
         return (... || Std::is_same_v<Std::remove_cvref_t<Tp>, Tps>);
     }
 
 public:
-    static constexpr bool value = IsUnqualifiedAnyOf<T,
+    static constexpr bool value = is_unqualified_any_of<T,
         Location::INVALID, Location::GM, Location::UB, Location::L1,
         Location::L0A, Location::L0B, Location::L0ScaleA, Location::L0ScaleB,
         Location::L0C, Location::BIAS, Location::FIXBUF, Location::SSBUF>();
@@ -125,7 +147,7 @@ template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
 
 template <typename T>
-struct locationAttr {
+struct location_attr {
     using gmAttr =          __gm__      T*;
     using cbufAttr =        __cbuf__    T*;
     using caAttr =          __ca__      T*;
@@ -144,6 +166,9 @@ struct locationAttr {
     Std::tuple<Location::L0ScaleB, noneAttr>, Std::tuple<Location::L0C, ccAttr>, Std::tuple<Location::UB, ubufAttr>, 
     Std::tuple<Location::BIAS, biasbufAttr>, Std::tuple<Location::FIXBUF, fbufAttr>>;
 };
+
+template <typename T>
+using locationAttr = location_attr<T>;
 
 template <typename A, typename ProcessedTuple>
 struct AllElementsSameAsA;
@@ -228,8 +253,8 @@ using VectorTypeTransform = TupleMap<
 #endif
     >;
 #endif
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 
