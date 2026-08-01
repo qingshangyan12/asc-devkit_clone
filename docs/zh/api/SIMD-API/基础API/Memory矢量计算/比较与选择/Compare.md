@@ -224,17 +224,17 @@
 <!-- end id10 -->
 
 - 使用整个tensor参与计算的运算符重载功能，src0和src1需满足256字节对齐；
-<!-- npu="A3,910b,950" id15 -->
+<!-- npu="A3,910b,950" id32 -->
 - 针对如下型号：
-    <!-- npu="A3" id16 -->
+    <!-- npu="A3" id33 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id16 -->
-    <!-- npu="910b" id17 -->
+    <!-- end id33 -->
+    <!-- npu="910b" id34 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    <!-- end id17 -->
+    <!-- end id34 -->
 
   使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。未对齐部分元素不参与计算，仅完整对齐块有效。
-<!-- end id15 -->
+<!-- end id32 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
