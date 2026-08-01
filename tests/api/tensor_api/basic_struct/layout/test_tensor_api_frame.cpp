@@ -126,16 +126,16 @@ TEST_F(Tensor_Api_Frame_Layout, BatchFrameLayoutTraitForms)
     auto dnExtLayout = MakeFrameLayout<DNExtLayoutPtn, LayoutTraitDefault<float>>(2, 8, 16);
     auto nzLayoutWithTrait = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(2, 32, 64);
     auto nzLayoutWithDataType = MakeFrameLayout<NZLayoutPtn, float>(2, 32, 64);
-    auto nzLayoutWithCompatTrait = MakeFrameLayout<NZLayoutPtn, LayoutTrait<float, _8>>(2, 32, 64);
+    auto nzLayoutWithCompatTrait = MakeFrameLayout<NZLayoutPtn, layout_trait<float, _8>>(2, 32, 64);
     auto znLayoutWithC0 = MakeFrameLayout<ZNLayoutPtn, 8>(2, 32, 64);
-    using NzTraitWithDefault = GetLayoutTrait<decltype(nzLayoutWithTrait)>;
-    using NzTraitWithDataType = GetLayoutTrait<decltype(nzLayoutWithDataType)>;
-    using NzCompatTrait = GetLayoutTrait<decltype(nzLayoutWithCompatTrait)>;
+    using NzTraitWithDefault = get_layout_trait<decltype(nzLayoutWithTrait)>;
+    using NzTraitWithDataType = get_layout_trait<decltype(nzLayoutWithDataType)>;
+    using NzCompatTrait = get_layout_trait<decltype(nzLayoutWithCompatTrait)>;
     static_assert(NzTraitWithDefault::C0_ELEMENT == _8{}, "LayoutTraitDefault<T> should only be used to infer C0.");
     static_assert(NzTraitWithDataType::C0_ELEMENT == _8{}, "Data type argument should only be used to infer C0.");
-    static_assert(AscendC::Std::is_same_v<NzCompatTrait, LayoutTrait<float, _8>>,
-        "LayoutTrait<T, C0> should remain source-compatible.");
-    static_assert(NzCompatTrait::C0_ELEMENT == _8{}, "LayoutTrait<T, C0> should use C0 as layout trait.");
+    static_assert(AscendC::Std::is_same_v<NzCompatTrait, layout_trait<float, _8>>,
+        "layout_trait<T, C0> should remain source-compatible.");
+    static_assert(NzCompatTrait::C0_ELEMENT == _8{}, "layout_trait<T, C0> should use C0 as layout trait.");
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape(ndLayout)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(ndLayout)), 128);
@@ -309,7 +309,7 @@ TEST_F(Tensor_Api_Frame_Layout, OtherGroupDefaultTrait)
     auto nzLayout = MakeFrameLayout<NZLayoutPtn>(32, 64);
     auto znLayout = MakeFrameLayout<ZNLayoutPtn>(32, 64);
     auto zzLayout = MakeFrameLayout<ZZLayoutPtn>(32, 64);
-    auto nnLayout = MakeFrameLayout<NNLayoutPtn, LayoutTrait<AscendC::Std::ignore_t, _2>>(16, 32);
+    auto nnLayout = MakeFrameLayout<NNLayoutPtn, layout_trait<AscendC::Std::ignore_t, _2>>(16, 32);
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(nzLayout)), 16);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(nzLayout)), 2);

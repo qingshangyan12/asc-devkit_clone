@@ -45,8 +45,8 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = MakeCopy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
-    CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy_atom<copy_traits<CopyOp, Trait>>{}.Call(dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename DstTensor, typename SrcTensor>
@@ -54,7 +54,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
+    auto atom = copy_atom<copy_traits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
     Copy(atom, dst, src);
 }
@@ -178,7 +178,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchNz2Nz)
         .times(1)
         .will(invoke(&load_cbuf_to_ca_batch_stub<float, 2, 8, 2, 2>));
 
-    Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
+    Copy(copy_atom<copy_traits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
 
     EXPECT_EQ(gBatchCallIndex, 1);
     mockcpp::GlobalMockObject::verify();
@@ -209,7 +209,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2Nz)
         .times(batch)
         .will(invoke(&load_cbuf_to_ca_batch_offset_stub<float, 2, 4, 2, 2, batchStride, true>));
 
-    Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
+    Copy(copy_atom<copy_traits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
 
     EXPECT_EQ(gBatchCallIndex, batch);
     mockcpp::GlobalMockObject::verify();
@@ -229,8 +229,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2NzB8B4)
     __cbuf__ fp4x2_e1m2_t src[batch * srcBatchStride];
     __ca__ fp4x2_e1m2_t dst[batch * dstBatchStride];
 
-    auto srcBatchLayout = MakeFrameLayout<ZNLayoutPtn, LayoutTraitFP4>(batch, m, n);
-    auto dstBatchLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitFP4>(batch, m, n);
+    auto srcBatchLayout = MakeFrameLayout<ZNLayoutPtn, layout_trait_fp4>(batch, m, n);
+    auto dstBatchLayout = MakeFrameLayout<NZLayoutPtn, layout_trait_fp4>(batch, m, n);
     auto l1Tensor = MakeTensorAt<Location::L1>(src, srcBatchLayout);
     auto l0aTensor = MakeTensorAt<Location::L0A>(dst, dstBatchLayout);
 
@@ -244,7 +244,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2NzB8B4)
         .will(invoke(&load_cbuf_to_ca_batch_b4_split_stub<fp4x2_e1m2_t, 4, 1, 8, 1, srcBatchStride,
             dstBatchStride, dstSplitStride, splitNum>));
 
-    Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
+    Copy(copy_atom<copy_traits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
 
     EXPECT_EQ(gBatchB4CallIndex, batch * splitNum);
     mockcpp::GlobalMockObject::verify();
@@ -270,7 +270,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, TestLoadData_##TYPE##M##N##SRC_FORMAT##DST_FOR
     MOCKER_CPP(load_cbuf_to_##DST_TAG, void(__##DST_TAG##__ TYPE*, __cbuf__ TYPE*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool)) \
         .times(1) \
         .will(invoke(&load_cbuf_to_##DST_TAG##_stub<TRANSPOSE, TYPE, M_STEP, K_STEP>)); \
-    Copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
+    Copy(copy_atom<copy_traits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
  \
     mockcpp::GlobalMockObject::verify(); \
 }
@@ -280,15 +280,15 @@ TEST_F(Tensor_Api_Cube_Copy_3510, TestLoadData_##TYPE##M##N##SRC_FORMAT##DST_FOR
     using namespace AscendC::Te; \
     __##DST_TAG##__ TYPE dst[M * N]; \
     auto dstIterator = MakeMemPtr<Location::DST_POS>(dst); \
-    auto dstMatrixLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(DST_FORMAT), LayoutTraitFP4>(M, N); \
+    auto dstMatrixLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(DST_FORMAT), layout_trait_fp4>(M, N); \
     auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout); \
  \
     __##SRC_TAG##__ TYPE src[M * N]; \
     auto srcIterator = MakeMemPtr<Location::SRC_POS>(src); \
-    auto srcMatrixLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(SRC_FORMAT), LayoutTraitFP4>(M, N); \
+    auto srcMatrixLayout = MakeFrameLayout<MAKE_LAYOUT_TYPE(SRC_FORMAT), layout_trait_fp4>(M, N); \
     auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout); \
  \
-    Copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
+    Copy(copy_atom<copy_traits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
  \
     mockcpp::GlobalMockObject::verify(); \
 }

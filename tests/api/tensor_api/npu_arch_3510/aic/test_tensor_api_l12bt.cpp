@@ -45,8 +45,8 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = MakeCopy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
-    CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy_atom<copy_traits<CopyOp, Trait>>{}.Call(dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename DstTensor, typename SrcTensor>
@@ -54,7 +54,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
+    auto atom = copy_atom<copy_traits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
     Copy(atom, dst, src);
 }
@@ -187,7 +187,7 @@ __aicore__ inline void copy_cbuf_to_bt_two_type_stub(uint64_t dst, __cbuf__ SRC_
             .times(1) \
             .will(invoke(&copy_cbuf_to_bt_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, ND, biasbuf, BIAS, ND) \
-        Copy(CopyAtom<CopyTraits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);\
+        Copy(copy_atom<copy_traits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);\
         GlobalMockObject::verify(); \
     }
 
@@ -203,7 +203,7 @@ DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 1, 64, 1, 64)
             .times(1) \
             .will(invoke(&copy_cbuf_to_bt_two_type_stub<SRC_DTYPE, DST_DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR_TWO_TYPE(SRC_DTYPE, SRC_SIZE1, SRC_SIZE2, DST_DTYPE, DST_SIZE1, DST_SIZE2, cbuf, L1, ND, biasbuf, BIAS, ND) \
-        Copy(CopyAtom<CopyTraits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);\
+        Copy(copy_atom<copy_traits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);\
         GlobalMockObject::verify(); \
     }
 
@@ -213,7 +213,7 @@ DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(half, 1, 64, float, 1, 64)
 // =========================================================================
 // Batch ND2ND (l1_to_bt)
 //
-// Layout (B, (M, N)) constructed via MakeBatchPatternLayout always emits
+// Layout (B, (M, N)) constructed via make_batch_pattern_layout always emits
 // sB == M*N. The implementation only keeps the batched branch:
 //   convControl = 0 (same-type) or 1 (half->float)
 //   blockCount  = B
@@ -255,7 +255,7 @@ __aicore__ inline void copy_cbuf_to_bt_batch_compact_stub(uint64_t dst, __cbuf__
             static_cast<uint32_t>(B), static_cast<uint32_t>(M), static_cast<uint32_t>(N));                             \
         auto srcTensor = MakeTensor(MakeMemPtr<Location::L1>(srcData), srcLayout);                                     \
         auto dstTensor = MakeTensor(MakeMemPtr<Location::BIAS>(dstData), dstLayout);                                   \
-        Copy(CopyAtom<CopyTraits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);                          \
+        Copy(copy_atom<copy_traits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);                          \
         GlobalMockObject::verify();                                                                                    \
     }
 
@@ -292,7 +292,7 @@ __aicore__ inline void copy_cbuf_to_bt_batch_compact_half2float_stub(uint64_t ds
             static_cast<uint32_t>(B), static_cast<uint32_t>(M), static_cast<uint32_t>(N));                             \
         auto srcTensor = MakeTensor(MakeMemPtr<Location::L1>(srcData), srcLayout);                                     \
         auto dstTensor = MakeTensor(MakeMemPtr<Location::BIAS>(dstData), dstLayout);                                   \
-        Copy(CopyAtom<CopyTraits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);                          \
+        Copy(copy_atom<copy_traits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);                          \
         GlobalMockObject::verify();                                                                                    \
     }
 

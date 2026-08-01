@@ -26,7 +26,7 @@ template <typename T>
 struct IsTensorApiGlobalTensor : AscendC::Std::false_type {};
 
 template <typename Engine, typename Layout>
-struct IsTensorApiGlobalTensor<AscendC::GlobalTensor<AscendC::TensorAttribute<Engine, Layout>>>
+struct IsTensorApiGlobalTensor<asc::te::global_tensor<Engine, Layout>>
     : AscendC::Std::true_type {};
 
 template <typename T>
@@ -37,7 +37,7 @@ template <typename T>
 struct IsTensorApiLocalTensor : AscendC::Std::false_type {};
 
 template <typename Engine, typename Layout>
-struct IsTensorApiLocalTensor<AscendC::LocalTensor<AscendC::TensorAttribute<Engine, Layout>>>
+struct IsTensorApiLocalTensor<asc::te::local_tensor<Engine, Layout>>
     : AscendC::Std::true_type {};
 
 template <typename T>
@@ -99,7 +99,7 @@ TEST_F(Tensor_Api_Tensor_Struct, MakeTensorReturnsGlobalTensorForGM)
 
     static_assert(IsTensorApiGlobalTensorV<decltype(tensor)>);
     static_assert(!IsTensorApiLocalTensorV<decltype(tensor)>);
-    static_assert(IsAttrTensorV<decltype(tensor)>);
+    static_assert(is_attr_tensor_v<decltype(tensor)>);
 
     ExpectTensorBasicAbility(tensor, m * n);
     EXPECT_EQ(AscendC::Std::get<0>(tensor.Shape()), m);
@@ -182,16 +182,16 @@ TEST_F(Tensor_Api_Tensor_Struct, FormatTraitsSupportGlobalLocalAndCvRefTensor)
     auto gmTensor = MakeTensor(MakeMemPtr(gmData), layout);
     auto ubTensor = MakeTensor(MakeMemPtr<Location::UB>(ubData), layout);
 
-    static_assert(IsSatisfiedPtnFormatV<decltype(gmTensor), NDExtLayoutPtn>);
-    static_assert(IsSatisfiedPtnFormatV<const decltype(gmTensor)&, NDExtLayoutPtn>);
-    static_assert(IsSatisfiedPtnFormatV<decltype(ubTensor), NDExtLayoutPtn>);
-    static_assert(IsSatisfiedPtnFormatV<const decltype(ubTensor)&, NDExtLayoutPtn>);
+    static_assert(is_satisfied_ptn_format_v<decltype(gmTensor), NDExtLayoutPtn>);
+    static_assert(is_satisfied_ptn_format_v<const decltype(gmTensor)&, NDExtLayoutPtn>);
+    static_assert(is_satisfied_ptn_format_v<decltype(ubTensor), NDExtLayoutPtn>);
+    static_assert(is_satisfied_ptn_format_v<const decltype(ubTensor)&, NDExtLayoutPtn>);
 
-    using GmShapeRow0 = typename GetNDimType<const decltype(gmTensor)&, AttrInfo::Shape, AttrInfo::Row, 0>::type;
-    using GmShapeCol0 = typename GetNDimType<const decltype(gmTensor)&, AttrInfo::Shape, AttrInfo::Column, 0>::type;
-    using UbStrideRow0 = typename GetNDimType<const decltype(ubTensor)&, AttrInfo::Stride, AttrInfo::Row, 0>::type;
-    using UbStrideCol0 = typename GetNDimType<const decltype(ubTensor)&, AttrInfo::Stride, AttrInfo::Column, 0>::type;
-    using UbStrideCol1 = typename GetNDimType<const decltype(ubTensor)&, AttrInfo::Stride, AttrInfo::Column, 1>::type;
+    using GmShapeRow0 = typename get_n_dim_type<const decltype(gmTensor)&, attr_info::shape, attr_info::row, 0>::type;
+    using GmShapeCol0 = typename get_n_dim_type<const decltype(gmTensor)&, attr_info::shape, attr_info::column, 0>::type;
+    using UbStrideRow0 = typename get_n_dim_type<const decltype(ubTensor)&, attr_info::stride, attr_info::row, 0>::type;
+    using UbStrideCol0 = typename get_n_dim_type<const decltype(ubTensor)&, attr_info::stride, attr_info::column, 0>::type;
+    using UbStrideCol1 = typename get_n_dim_type<const decltype(ubTensor)&, attr_info::stride, attr_info::column, 1>::type;
 
     static_assert(AscendC::Std::is_same_v<GmShapeRow0, _1>);
     static_assert(AscendC::Std::is_same_v<GmShapeCol0, _1>);

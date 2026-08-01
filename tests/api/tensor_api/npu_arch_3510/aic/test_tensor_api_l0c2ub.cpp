@@ -96,8 +96,8 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = MakeCopy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
-    CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy_atom<copy_traits<CopyOp, Trait>>{}.Call(dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename Param, typename DstTensor, typename SrcTensor>
@@ -108,11 +108,11 @@ void RunCopyWithParamPaths(const DstTensor& dst, const SrcTensor& src, const Par
     auto atom = MakeCopy(CopyOp{}).with(param);
     atom.Call(dst, src);
 
-    auto copiedAtom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param);
+    auto copiedAtom = copy_atom<copy_traits<CopyOp, Trait>>{}.with(param);
     copiedAtom.Call(dst, src);
 
     Copy(copiedAtom, dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}.with(param), dst, src);
 }
 
 uint64_t gExpectedLoop3Para = 0;
@@ -377,9 +377,9 @@ public:
         if constexpr (QUANT_MODE == QuantMode_t::NoQuant || QUANT_MODE == QuantMode_t::F322F16) {
             if constexpr (HAS_COORD) {
                 auto ubTensorTile = Slice(ubTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor);
+                Copy(copy_atom<copy_traits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor);
             } else {
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor);
+                Copy(copy_atom<copy_traits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor);
             }
         } else if constexpr (IS_TENSOR) {
             auto qIterator = MakeMemPtr<Location::L1>(qAddr_);
@@ -387,17 +387,17 @@ public:
             auto qTensor = MakeTensor(qIterator, qMatrixLayout);
             if constexpr (HAS_COORD) {
                 auto ubTensorTile = Slice(ubTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, qTensor);
+                Copy(copy_atom<copy_traits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, qTensor);
             } else {
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, qTensor);
+                Copy(copy_atom<copy_traits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, qTensor);
             }
         } else {
             uint64_t quant = 1;
             if constexpr (HAS_COORD) {
                 auto ubTensorTile = Slice(ubTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, quant);
+                Copy(copy_atom<copy_traits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, quant);
             } else {
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, quant);
+                Copy(copy_atom<copy_traits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, quant);
             }
         }
     }

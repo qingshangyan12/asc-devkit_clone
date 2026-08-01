@@ -45,8 +45,8 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = MakeCopy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
-    CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy_atom<copy_traits<CopyOp, Trait>>{}.Call(dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename DstTensor, typename SrcTensor>
@@ -54,7 +54,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
+    auto atom = copy_atom<copy_traits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
     Copy(atom, dst, src);
 }
@@ -156,7 +156,7 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
             .times(1) \
             .will(invoke(&copy_cbuf_to_fbuf_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, ND, fbuf, FIXBUF, ND) \
-        Copy(CopyAtom<CopyTraits<CopyL12FB, CopyL12FBTraitDefault>>{}, dstTensor, srcTensor);\
+        Copy(copy_atom<copy_traits<CopyL12FB, CopyL12FBTraitDefault>>{}, dstTensor, srcTensor);\
         GlobalMockObject::verify(); \
     }
 

@@ -92,8 +92,8 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = MakeCopy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
-    CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy_atom<copy_traits<CopyOp, Trait>>{}.Call(dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename Param, typename DstTensor, typename SrcTensor>
@@ -104,11 +104,11 @@ void RunCopyWithParamPaths(const DstTensor& dst, const SrcTensor& src, const Par
     auto atom = MakeCopy(CopyOp{}).with(param);
     atom.Call(dst, src);
 
-    auto copiedAtom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param);
+    auto copiedAtom = copy_atom<copy_traits<CopyOp, Trait>>{}.with(param);
     copiedAtom.Call(dst, src);
 
     Copy(copiedAtom, dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}.with(param), dst, src);
 }
 
 uint64_t gExpectedLoop3Para = 0;
@@ -408,10 +408,10 @@ public:
             if constexpr (HAS_COORD) {
                 auto gmTensorTile = Slice(gmTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
                 gm_addr_global = gmTensorTile.Data().Get();
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor);
+                Copy(copy_atom<copy_traits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor);
             } else {
                 gm_addr_global = gmC_;
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor);
+                Copy(copy_atom<copy_traits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor);
             }
         } else if constexpr (IS_TENSOR) {
             auto qIterator = MakeMemPtr<Location::L1>(qAddr);
@@ -420,20 +420,20 @@ public:
             if constexpr (HAS_COORD) {
                 auto gmTensorTile = Slice(gmTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
                 gm_addr_global = gmTensorTile.Data().Get();
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, qTensor);
+                Copy(copy_atom<copy_traits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, qTensor);
             } else {
                 gm_addr_global = gmC_;
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, qTensor);
+                Copy(copy_atom<copy_traits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, qTensor);
             }
         } else {
             uint64_t quant = 1;
             if constexpr (HAS_COORD) {
                 auto gmTensorTile = Slice(gmTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
                 gm_addr_global = gmTensorTile.Data().Get();
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, quant);
+                Copy(copy_atom<copy_traits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, quant);
             } else {
                 gm_addr_global = gmC_;
-                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, quant);
+                Copy(copy_atom<copy_traits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, quant);
             }
         }
     }

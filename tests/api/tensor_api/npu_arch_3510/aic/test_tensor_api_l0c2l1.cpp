@@ -48,8 +48,8 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = MakeCopy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
-    CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy_atom<copy_traits<CopyOp, Trait>>{}.Call(dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename Param, typename DstTensor, typename SrcTensor>
@@ -60,11 +60,11 @@ void RunCopyWithParamPaths(const DstTensor& dst, const SrcTensor& src, const Par
     auto atom = MakeCopy(CopyOp{}).with(param);
     atom.Call(dst, src);
 
-    auto copyAtom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param);
+    auto copyAtom = copy_atom<copy_traits<CopyOp, Trait>>{}.with(param);
     copyAtom.Call(dst, src);
 
     Copy(copyAtom, dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}.with(param), dst, src);
 }
 
 } // namespace

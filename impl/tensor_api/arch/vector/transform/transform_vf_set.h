@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
@@ -16,9 +16,9 @@
 #endif
 
 /*!
-* \file transform_vf_set.h
-* \brief Set definitions for instruction-to-wrapper mapping
-*/
+ * \file transform_vf_set.h
+ * \brief Set definitions for instruction-to-wrapper mapping
+ */
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_VF_SET_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_VF_SET_H
 
@@ -30,31 +30,33 @@
 #include "impl/tensor_api/arch/vector/unary/unary_vf.h"
 #include "impl/tensor_api/utils/map_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-template<typename CalcFunc, typename TraitType>
-struct Transform2VFSet {
-    using binarySet = Std::tuple<Inst::Add, Inst::Sub, Inst::Madd, Inst::And, Inst::Select, Inst::AbsSub, Inst::Min, Inst::Max,
-        Inst::Or, Inst::Mul, Inst::ExpSubEven, Inst::ExpSubOdd, Inst::ShiftLeft, Inst::ShiftRight, Inst::Div, Inst::Xor, Inst::Prelu>;
-    using castSet = Std::tuple<Inst::Cast, Inst::Ceil, Inst::Rint, Inst::Round, Inst::Trunc>;
-    using binaryScalarSet = Std::tuple<Inst::MulScalar, Inst::AddScalar, Inst::MaxScalar, Inst::MinScalar,
-        Inst::ShiftLeftScalar, Inst::ShiftRightScalar, Inst::MulsEven, Inst::MulsOdd>;
-    using unarySet = Std::tuple<Inst::Not, Inst::Ln, Inst::Abs, Inst::Sqrt, Inst::Exp>;
-    using axpySet = Std::tuple<Inst::Axpy>;
-    using dualSet = Std::tuple<Inst::Mull>;
+template <typename CalcFunc, typename TraitType>
+struct transform2_vf_set {
+    using binary_set =
+        Std::tuple<inst::add, inst::sub, inst::madd, inst::bitwise_and, inst::select, inst::abs_sub, inst::min,
+                   inst::max, inst::bitwise_or, inst::mul, inst::exp_sub_even, inst::exp_sub_odd, inst::shift_left,
+                   inst::shift_right, inst::div, inst::bitwise_xor, inst::prelu>;
+    using cast_set = Std::tuple<inst::cast, inst::Ceil, inst::Rint, inst::Round, inst::Trunc>;
+    using binary_scalar_set =
+        Std::tuple<inst::mul_scalar, inst::add_scalar, inst::max_scalar, inst::min_scalar, inst::shift_left_scalar,
+                   inst::shift_right_scalar, inst::muls_even, inst::muls_odd>;
+    using unary_set = Std::tuple<inst::bitwise_not, inst::ln, inst::abs, inst::sqrt, inst::exp>;
+    using axpy_set = Std::tuple<inst::axpy>;
+    using dual_set = Std::tuple<inst::mull>;
 
-    using transformSet = TupleMap<
-        Std::tuple<binarySet, Transform2BinaryVF<CalcFunc, TraitType>>,
-        Std::tuple<castSet, Transform2CastInstMatch<CalcFunc, TraitType>>,
-        Std::tuple<binaryScalarSet, Transform2BinaryScalarVF<CalcFunc, TraitType>>,
-        Std::tuple<unarySet, Transform2UnaryVF<CalcFunc, TraitType>>,
-        Std::tuple<axpySet, Transform2AxpyVF<CalcFunc, TraitType>>,
-        Std::tuple<dualSet, Transform2DualVF<CalcFunc, TraitType>>>;
+    using transform_set = tuple_map<Std::tuple<binary_set, transform2_binary_vf<CalcFunc, TraitType>>,
+                                  Std::tuple<cast_set, transform2_cast_inst_match<CalcFunc, TraitType>>,
+                                  Std::tuple<binary_scalar_set, transform2_binary_scalar_vf<CalcFunc, TraitType>>,
+                                  Std::tuple<unary_set, transform2_unary_vf<CalcFunc, TraitType>>,
+                                  Std::tuple<axpy_set, transform2_axpy_vf<CalcFunc, TraitType>>,
+                                  Std::tuple<dual_set, transform2_dual_vf<CalcFunc, TraitType>>>;
 };
 
-}
-}
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_VF_SET_H
 

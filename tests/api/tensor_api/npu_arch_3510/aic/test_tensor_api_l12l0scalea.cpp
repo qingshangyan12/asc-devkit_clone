@@ -42,8 +42,8 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = MakeCopy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
-    CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy_atom<copy_traits<CopyOp, Trait>>{}.Call(dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename DstTensor, typename SrcTensor>
@@ -51,7 +51,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
+    auto atom = copy_atom<copy_traits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
     Copy(atom, dst, src);
 }
@@ -62,7 +62,7 @@ __cbuf__ void* gExpectedMxSrc = nullptr;
 // Batched scale L1->L0 now copies one matrix per batch in a loop (see commit "scale batch layout"),
 // so the instruction fires once per batch with the single-matrix step values, and the dst/src
 // addresses advance by the batch layout's per-batch stride each call. With the compact
-// MakeBatchPatternLayout below, that stride is the single-matrix Capacity (ZZ m=16,n=32,c0=2 -> 512),
+// make_batch_pattern_layout below, that stride is the single-matrix Capacity (ZZ m=16,n=32,c0=2 -> 512),
 // applied equally to dst and src. Single-matrix mStep(xStep)=ceil(m/16)=1, yStep=ceil(n/2)=16.
 constexpr uint32_t kScaleABatch = 3;
 constexpr uint32_t kScaleAM = 16;
@@ -117,8 +117,8 @@ TEST_F(Tensor_Api_Cube_Copy_L12L0ScaleA_3510, CopyL12L0ScaleABatch)
     __ca__ fp8_e8m0_t dst[batch * m * n] = {0};
 
     auto baseLayout = MakeFrameLayout<ZZLayoutPtn, AscendC::Std::Int<2>>(m, n);
-    using LayoutTraitType = GetLayoutTrait<decltype(baseLayout)>;
-    auto batchLayout = MakeBatchPatternLayout<ZZLayoutPtn, LayoutTraitType>(batch, baseLayout);
+    using LayoutTraitType = get_layout_trait<decltype(baseLayout)>;
+    auto batchLayout = make_batch_pattern_layout<ZZLayoutPtn, LayoutTraitType>(batch, baseLayout);
     auto l1Tensor = MakeTensor(MakeMemPtr<Location::L1>(src), batchLayout);
     auto dstPtr = MakeMemPtr<Location::L0ScaleA, fp8_e8m0_t>((reinterpret_cast<uint64_t>(dst)) / 16);
     auto l0aTensor = MakeTensor(dstPtr, batchLayout);
@@ -132,7 +132,7 @@ TEST_F(Tensor_Api_Cube_Copy_L12L0ScaleA_3510, CopyL12L0ScaleABatch)
         .times(batch)
         .will(invoke(&load_cbuf_to_ca_mx_batch_stub));
 
-    Copy(CopyAtom<CopyTraits<CopyL12L0ScaleA, CopyL12L0ScaleATraitDefault>>{}, l0aTensor, l1Tensor);
+    Copy(copy_atom<copy_traits<CopyL12L0ScaleA, CopyL12L0ScaleATraitDefault>>{}, l0aTensor, l1Tensor);
 
     EXPECT_EQ(gScaleACallIdx, batch);
     mockcpp::GlobalMockObject::verify();

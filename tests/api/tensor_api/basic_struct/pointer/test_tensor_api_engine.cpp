@@ -37,6 +37,6 @@ TEST_F(Tensor_Api_Engine, TestConstViewEngine)
 {
     using namespace AscendC::Te;
 
-    ConstViewEngine<decltype(MakeMemPtr<Location::GM>((__gm__ float*)nullptr))> constEngine;
+    const_view_engine<decltype(MakeMemPtr<Location::GM>((__gm__ float*)nullptr))> constEngine;
     EXPECT_EQ(constEngine.Begin().Get(), nullptr);
 }

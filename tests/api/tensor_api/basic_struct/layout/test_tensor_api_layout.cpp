@@ -193,7 +193,7 @@ TEST_F(Tensor_Api_Layout_Struct, TestRemoveBatchDimFromThreeDimLayout)
 
     auto layout = MakePatternLayout<NDLayoutPtn, LayoutTraitDefault<>>(
         MakeShape(2, MakeShape(8, 16)), MakeStride(128, MakeStride(16, 1)));
-    auto noBatchLayout = RemoveBatchDim(layout);
+    auto noBatchLayout = remove_batch_dim(layout);
 
     static_assert(decltype(noBatchLayout)::depth == TWO_DIM_DATA);
     static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(noBatchLayout)>, NDLayoutPtn>);
@@ -210,7 +210,7 @@ TEST_F(Tensor_Api_Layout_Struct, TestRemoveBatchDimFromFiveDimLayout)
     auto layout = MakePatternLayout<NZLayoutPtn, LayoutTraitDefault<>>(
         MakeShape(2, MakeShape(MakeShape(16, 2), MakeShape(16, 4))),
         MakeStride(2048, MakeStride(MakeStride(16, 256), MakeStride(1, 512))));
-    auto noBatchLayout = RemoveBatchDim(layout);
+    auto noBatchLayout = remove_batch_dim(layout);
     auto shape = noBatchLayout.Shape();
     auto stride = noBatchLayout.Stride();
 
@@ -232,7 +232,7 @@ TEST_F(Tensor_Api_Layout_Struct, TestMakeTuple)
 
     auto shape = MakeShape(2, 3, 4);
     auto stride = MakeStride(12, 4, 1);
-    auto tile = MakeTile(8, 16);
+    auto tile = make_tile(8, 16);
     auto coord = MakeCoord(1, 2, 3);
 
     EXPECT_EQ(AscendC::Std::get<0>(shape), 2);

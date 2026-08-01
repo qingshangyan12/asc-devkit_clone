@@ -51,8 +51,8 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = MakeCopy(CopyOp{}, Trait{});
     atom.Call(dst, src);
 
-    CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src);
+    copy_atom<copy_traits<CopyOp, Trait>>{}.Call(dst, src);
+    Copy(copy_atom<copy_traits<CopyOp, Trait>>{}, dst, src);
 }
 
 template <typename CopyOp, typename Trait, typename DstTensor, typename SrcTensor>
@@ -60,7 +60,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
+    auto atom = copy_atom<copy_traits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
     Copy(atom, dst, src);
 }
@@ -243,7 +243,7 @@ private:
 #define MAKE_LAYOUT_FUNC(NAME)                                                                                         \
     template <typename T>                                                                                              \
     constexpr auto Make##NAME = [](auto row, auto col) {                                                               \
-        constexpr size_t C0 = IsB4Type<T> ? 64 : 32 / sizeof(T);                                                       \
+        constexpr size_t C0 = is_b4_type<T> ? 64 : 32 / sizeof(T);                                                       \
         return MakeFrameLayout<NAME##LayoutPtn, Int<C0>>(row, col);                                                   \
     };
 
@@ -276,7 +276,7 @@ MAKE_LAYOUT_FUNC(ScaleBDN)
 #define MAKE_BATCH_LAYOUT_FUNC(NAME)                                                                                   \
     template <typename T>                                                                                             \
     constexpr auto MakeBatch##NAME = [](auto batch, auto row, auto col) {                                            \
-        constexpr size_t C0 = IsB4Type<T> ? 64 : 32 / sizeof(T);                                                      \
+        constexpr size_t C0 = is_b4_type<T> ? 64 : 32 / sizeof(T);                                                      \
         return MakeFrameLayout<NAME##LayoutPtn, Int<C0>>(batch, row, col);                                            \
     };
 
@@ -370,7 +370,7 @@ auto MakeNc1hwc0(int n, int c1, int h, int w)
     TEST_F(TensorApiGm2L1, TEST_GM2L1_CONCAT_(CopyGm2L1NC1HWC0, ND2ND, type, counter))                                \
     {                                                                                                                 \
         using T = type;                                                                                               \
-        constexpr size_t C0 = IsB4Type<T> ? 64 : 32 / sizeof(T);                                                      \
+        constexpr size_t C0 = is_b4_type<T> ? 64 : 32 / sizeof(T);                                                      \
         const int kBlockElems = (H) * (W) * C0; /* per-C1 block = H*W*C0 */                                           \
         auto gmNc1hwc0 = MakeNc1hwc0<T, C0>((N), (C1), (H), (W));                                                     \
         auto l1Nc1hwc0 = MakeNc1hwc0<T, C0>((N), (C1), (H), (W));                                                     \
@@ -400,7 +400,7 @@ TEST_GM2L1_NC1HWC0(uint32_t, 1, 2, 4, 4)
     TEST_F(TensorApiGm2L1, TEST_GM2L1_CONCAT_(CopyGm2L1NC1HWC0PartW, ND2ND, type, counter))                         \
     {                                                                                                               \
         using T = type;                                                                                             \
-        constexpr size_t C0 = IsB4Type<T> ? 64 : 32 / sizeof(T);                                                    \
+        constexpr size_t C0 = is_b4_type<T> ? 64 : 32 / sizeof(T);                                                    \
         const int kSrcRow = (srcW) * C0;                                                                            \
         const int kDstRow = (loadW) * C0;                                                                           \
         auto gmFull = MakeNc1hwc0<T, C0>((N), (C1), (H), (srcW));                                                   \
@@ -1410,10 +1410,10 @@ auto GetSimLayoutElement(const Layout& layout)
         if constexpr (dim == 0) {
             return 1U;
         } else {
-            return GetElement<Info1, Info2>(layout);
+            return get_element<Info1, Info2>(layout);
         }
     } else {
-        return GetElement<Info1, Info2, dim>(layout);
+        return get_element<Info1, Info2, dim>(layout);
     }
 }
 
@@ -1421,13 +1421,13 @@ auto GetSimLayoutElement(const Layout& layout)
 template <typename T>
 void PrintTensor(const T& src)
 {
-    using LayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using srcType = typename T::elementType;
+    using LayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using srcType = typename T::element_type;
     auto srcLayout = src.Layout();
-    uint32_t M0 = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
-    uint32_t N0 = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
-    uint32_t M1 = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    uint32_t N1 = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    uint32_t M0 = GetSimLayoutElement<attr_info::shape, attr_info::row, 0>(srcLayout);
+    uint32_t N0 = GetSimLayoutElement<attr_info::shape, attr_info::column, 0>(srcLayout);
+    uint32_t M1 = GetSimLayoutElement<attr_info::shape, attr_info::row, 1>(srcLayout);
+    uint32_t N1 = GetSimLayoutElement<attr_info::shape, attr_info::column, 1>(srcLayout);
     if constexpr (Std::is_same_v<srcType, fp8_e8m0_t> && Std::is_same_v<LayoutPtn, ScaleANDLayoutPtn>) {
         std::cout << "ScaleAND";
     } else if constexpr (Std::is_same_v<srcType, fp8_e8m0_t> && Std::is_same_v<LayoutPtn, ScaleADNLayoutPtn>) {
@@ -1451,7 +1451,7 @@ void PrintTensor(const T& src)
     } else {
         std::cout << "UnknownLayout";
     }
-    if constexpr (T::layoutType::depth == 2) {
+    if constexpr (T::layout_type::depth == 2) {
         std::cout << " Layout Result (2D) (" << M1 << ", " << N1 << "): " << std::endl;
         for (int i = 0; i < M1; i++) {
             std::cout << i << ":\t";
@@ -1567,24 +1567,24 @@ inline void PrintTypeHierarchy(const Args&... args)
 template <typename T, typename U>
 void SimND2ND(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, NDExtLayoutPtn> || Std::is_same_v<DstLayoutPtn, NDLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, NDExtLayoutPtn> || Std::is_same_v<SrcLayoutPtn, NDLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    uint32_t M = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    uint32_t N = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    uint32_t M = GetSimLayoutElement<attr_info::shape, attr_info::row, 1>(srcLayout);
+    uint32_t N = GetSimLayoutElement<attr_info::shape, attr_info::column, 1>(srcLayout);
 
-    auto srcRowStride = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcColStride = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-    auto dstRowStride = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
+    auto srcRowStride = GetSimLayoutElement<attr_info::stride, attr_info::row, 1>(srcLayout);
+    auto srcColStride = GetSimLayoutElement<attr_info::stride, attr_info::column, 1>(srcLayout);
+    auto dstRowStride = GetSimLayoutElement<attr_info::stride, attr_info::row, 1>(dstLayout);
 
     uint32_t c0Elements = C0_SIZE<srcType> / sizeof(srcType);
-    uint32_t M1 = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M1 = GetSimLayoutElement<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = GetSimLayoutElement<attr_info::shape, attr_info::column, 1>(dstLayout);
 
     uint32_t dataLen = M * N;
     uint32_t alignN = (dataLen + c0Elements - 1) / c0Elements * c0Elements;
@@ -1626,29 +1626,29 @@ void SimND2ND(const T& dst, const U& src)
 template <typename T, typename U>
 void SimND2Nz(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, NZLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, NDExtLayoutPtn> || Std::is_same_v<SrcLayoutPtn, NDLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto M = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto N = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM1 = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcSN1 = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    auto M = GetSimLayoutElement<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto N = GetSimLayoutElement<attr_info::shape, attr_info::column, 1>(srcLayout);
+    auto srcSM1 = GetSimLayoutElement<attr_info::stride, attr_info::row, 1>(srcLayout);
+    auto srcSN1 = GetSimLayoutElement<attr_info::stride, attr_info::column, 1>(srcLayout);
 
-    if (IsB4Type<srcType>) {
+    if (is_b4_type<srcType>) {
         EXPECT_TRUE(N % 2 == 0) << "For b4 type, col shape must be even for ND format, but got N: " << N;
         EXPECT_TRUE(srcSM1 % 2 == 0) << "For b4 type, col stride must be even for ND format, but got srcSM1: "
                                      << srcSM1;
     }
     uint32_t c0Elements = C0_ELEMENT<srcType>;
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
     uint32_t srcColNAlignC0 = ((N + c0Elements - 1) / c0Elements) * c0Elements;
     for (uint32_t n1 = 0; n1 < N1; n1++) {
         for (uint32_t m1 = 0; m1 < M1; m1++) {
@@ -1673,25 +1673,25 @@ void SimND2Nz(const T& dst, const U& src)
 template <typename T, typename U>
 void SimND2Zn(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, ZNLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, NDExtLayoutPtn> || Std::is_same_v<SrcLayoutPtn, NDLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto M = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto N = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto M = GetSimLayoutElement<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto N = GetSimLayoutElement<attr_info::shape, attr_info::column, 1>(srcLayout);
 
-    auto srcColStride = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-    auto srcRowStride = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+    auto srcColStride = GetSimLayoutElement<attr_info::stride, attr_info::column, 1>(srcLayout);
+    auto srcRowStride = GetSimLayoutElement<attr_info::stride, attr_info::row, 1>(srcLayout);
 
     uint32_t c0Elements = C0_SIZE<srcType> / sizeof(srcType);
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
     uint32_t srcRowNAlignC0 = ((M + c0Elements - 1) / c0Elements) * c0Elements;
     for (uint32_t m1 = 0; m1 < M1; m1++) {
@@ -1717,25 +1717,25 @@ void SimND2Zn(const T& dst, const U& src)
 template <typename T, typename U>
 void SimDN2Nz(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, NZLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, DNExtLayoutPtn> || Std::is_same_v<SrcLayoutPtn, DNLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(!IsB4Type<srcType>, "DN2NZ does not support b4 type");
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(!is_b4_type<srcType>, "DN2NZ does not support b4 type");
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto M = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto N = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto M = GetSimLayoutElement<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto N = GetSimLayoutElement<attr_info::shape, attr_info::column, 1>(srcLayout);
 
-    auto srcColStride = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    auto srcColStride = GetSimLayoutElement<attr_info::stride, attr_info::column, 1>(srcLayout);
 
     uint32_t c0Elements = C0_SIZE<srcType> / sizeof(srcType);
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
     for (uint32_t n1 = 0; n1 < N1; n1++) {
         for (uint32_t m1 = 0; m1 < M1; m1++) {
             for (uint32_t m0 = 0; m0 < M0; m0++) {
@@ -1759,29 +1759,29 @@ void SimDN2Nz(const T& dst, const U& src)
 template <typename T, typename U>
 void SimDN2Zn(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, ZNLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, DNExtLayoutPtn> || Std::is_same_v<SrcLayoutPtn, DNLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto M = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto N = GetSimLayoutElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto M = GetSimLayoutElement<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto N = GetSimLayoutElement<attr_info::shape, attr_info::column, 1>(srcLayout);
 
-    auto srcColStride = GetSimLayoutElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-    if (IsB4Type<srcType>) {
+    auto srcColStride = GetSimLayoutElement<attr_info::stride, attr_info::column, 1>(srcLayout);
+    if (is_b4_type<srcType>) {
         EXPECT_TRUE(M % 2 == 0) << "For b4 type, col shape must be even for ND format, but got M: " << M;
         EXPECT_TRUE(srcColStride % 2 == 0)
             << "For b4 type, col stride must be even for ND format, but got srcColStride: " << srcColStride;
     }
 
     uint32_t c0Elements = C0_SIZE<srcType> / sizeof(srcType);
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
     for (uint32_t m1 = 0; m1 < M1; m1++) {
         for (uint32_t n1 = 0; n1 < N1; n1++) {
@@ -1806,30 +1806,30 @@ void SimDN2Zn(const T& dst, const U& src)
 template <typename T, typename U>
 void SimNz2Nz(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, NZLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, NZLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto srcM1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto srcN1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
-    auto srcSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
+    auto srcM1 = get_element<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto srcN1 = get_element<attr_info::shape, attr_info::column, 1>(srcLayout);
+    auto srcSM1 = get_element<attr_info::stride, attr_info::row, 1>(srcLayout);
+    auto srcSN1 = get_element<attr_info::stride, attr_info::column, 1>(srcLayout);
+    auto srcSM0 = get_element<attr_info::stride, attr_info::row, 0>(srcLayout);
+    auto srcSN0 = get_element<attr_info::stride, attr_info::column, 0>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
-    auto dstSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
-    auto dstSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
-    auto dstSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(dstLayout);
-    auto dstSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(dstLayout);
+    auto dstSM1 = get_element<attr_info::stride, attr_info::row, 1>(dstLayout);
+    auto dstSN1 = get_element<attr_info::stride, attr_info::column, 1>(dstLayout);
+    auto dstSM0 = get_element<attr_info::stride, attr_info::row, 0>(dstLayout);
+    auto dstSN0 = get_element<attr_info::stride, attr_info::column, 0>(dstLayout);
 
     for (uint32_t n1 = 0; n1 < N1; n1++) {
         for (uint32_t m1 = 0; m1 < M1; m1++) {
@@ -1850,30 +1850,30 @@ void SimNz2Nz(const T& dst, const U& src)
 template <typename T, typename U>
 void SimZn2Zn(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, ZNLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, ZNLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto srcM1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto srcN1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
-    auto srcSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
+    auto srcM1 = get_element<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto srcN1 = get_element<attr_info::shape, attr_info::column, 1>(srcLayout);
+    auto srcSM1 = get_element<attr_info::stride, attr_info::row, 1>(srcLayout);
+    auto srcSN1 = get_element<attr_info::stride, attr_info::column, 1>(srcLayout);
+    auto srcSM0 = get_element<attr_info::stride, attr_info::row, 0>(srcLayout);
+    auto srcSN0 = get_element<attr_info::stride, attr_info::column, 0>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
-    auto dstSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
-    auto dstSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
-    auto dstSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(dstLayout);
-    auto dstSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(dstLayout);
+    auto dstSM1 = get_element<attr_info::stride, attr_info::row, 1>(dstLayout);
+    auto dstSN1 = get_element<attr_info::stride, attr_info::column, 1>(dstLayout);
+    auto dstSM0 = get_element<attr_info::stride, attr_info::row, 0>(dstLayout);
+    auto dstSN0 = get_element<attr_info::stride, attr_info::column, 0>(dstLayout);
 
     for (uint32_t m1 = 0; m1 < M1; m1++) {
         for (uint32_t n1 = 0; n1 < N1; n1++) {
@@ -1894,23 +1894,23 @@ void SimZn2Zn(const T& dst, const U& src)
 template <typename T, typename U>
 void SimScaleAND2Zz(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, ZZLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, ScaleANDLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto M = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto N = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto M = get_element<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto N = get_element<attr_info::shape, attr_info::column, 1>(srcLayout);
 
-    auto srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+    auto srcRowStride = get_element<attr_info::stride, attr_info::row, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcRowNAlignC0 = ((M + c0Elements - 1) / c0Elements) * c0Elements;
@@ -1937,25 +1937,25 @@ void SimScaleAND2Zz(const T& dst, const U& src)
 template <typename T, typename U>
 void SimScaleADN2Zz(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, ZZLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, ScaleADNLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto M = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto SN = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
-    auto BN = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+    auto M = get_element<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto SN = get_element<attr_info::shape, attr_info::column, 0>(srcLayout);
+    auto BN = get_element<attr_info::shape, attr_info::column, 1>(srcLayout);
     auto N = SN * BN;
 
-    auto srcBColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    auto srcBColStride = get_element<attr_info::stride, attr_info::column, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcRowNAlignC0 = ((M + c0Elements - 1) / c0Elements) * c0Elements;
@@ -1982,25 +1982,25 @@ void SimScaleADN2Zz(const T& dst, const U& src)
 template <typename T, typename U>
 void SimScaleAZz2Zz(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, ZZLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, ZZLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto srcM1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto srcN1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM0 = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
-    auto srcSN0 = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
+    auto srcM1 = get_element<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto srcN1 = get_element<attr_info::shape, attr_info::column, 1>(srcLayout);
+    auto srcSM1 = get_element<attr_info::stride, attr_info::row, 1>(srcLayout);
+    auto srcSN1 = get_element<attr_info::stride, attr_info::column, 1>(srcLayout);
+    auto srcSM0 = get_element<attr_info::stride, attr_info::row, 0>(srcLayout);
+    auto srcSN0 = get_element<attr_info::stride, attr_info::column, 0>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
     for (uint32_t m1 = 0; m1 < M1; m1++) {
         for (uint32_t n1 = 0; n1 < N1; n1++) {
@@ -2021,25 +2021,25 @@ void SimScaleAZz2Zz(const T& dst, const U& src)
 template <typename T, typename U>
 void SimScaleBND2Nn(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, NNLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, ScaleBNDLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    auto SM = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
-    auto BM = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    auto SN = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
-    auto BN = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    auto srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    auto srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    auto SM = get_element<attr_info::shape, attr_info::row, 0>(srcLayout);
+    auto BM = get_element<attr_info::shape, attr_info::row, 1>(srcLayout);
+    auto SN = get_element<attr_info::shape, attr_info::column, 0>(srcLayout);
+    auto BN = get_element<attr_info::shape, attr_info::column, 1>(srcLayout);
+    auto srcSM1 = get_element<attr_info::stride, attr_info::row, 1>(srcLayout);
+    auto srcSN1 = get_element<attr_info::stride, attr_info::column, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcColNAlignC0 = ((SN * BN + c0Elements - 1) / c0Elements) * c0Elements;
@@ -2068,25 +2068,25 @@ void SimScaleBND2Nn(const T& dst, const U& src)
 template <typename T, typename U>
 void SimScaleBDN2Nn(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, NNLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, ScaleBDNLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    uint32_t SM = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
-    uint32_t BM = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    uint32_t SN = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
-    uint32_t BN = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    uint32_t srcSM1 = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    uint32_t srcSN1 = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    uint32_t SM = get_element<attr_info::shape, attr_info::row, 0>(srcLayout);
+    uint32_t BM = get_element<attr_info::shape, attr_info::row, 1>(srcLayout);
+    uint32_t SN = get_element<attr_info::shape, attr_info::column, 0>(srcLayout);
+    uint32_t BN = get_element<attr_info::shape, attr_info::column, 1>(srcLayout);
+    uint32_t srcSM1 = get_element<attr_info::stride, attr_info::row, 1>(srcLayout);
+    uint32_t srcSN1 = get_element<attr_info::stride, attr_info::column, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcColNAlignC0 = ((SN * BN + c0Elements - 1) / c0Elements) * c0Elements;
@@ -2115,27 +2115,27 @@ void SimScaleBDN2Nn(const T& dst, const U& src)
 template <typename T, typename U>
 void SimScaleBNn2Nn(const T& dst, const U& src)
 {
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
     static_assert(Std::is_same_v<DstLayoutPtn, NNLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, NNLayoutPtn>);
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
-    uint32_t SM = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout);
-    uint32_t BM = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-    uint32_t SN = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout);
-    uint32_t BN = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-    uint32_t srcSM = GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(srcLayout);
-    uint32_t srcSN = GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout);
-    uint32_t srcBM = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-    uint32_t srcBN = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+    uint32_t SM = get_element<attr_info::shape, attr_info::row, 0>(srcLayout);
+    uint32_t BM = get_element<attr_info::shape, attr_info::row, 1>(srcLayout);
+    uint32_t SN = get_element<attr_info::shape, attr_info::column, 0>(srcLayout);
+    uint32_t BN = get_element<attr_info::shape, attr_info::column, 1>(srcLayout);
+    uint32_t srcSM = get_element<attr_info::stride, attr_info::row, 0>(srcLayout);
+    uint32_t srcSN = get_element<attr_info::stride, attr_info::column, 0>(srcLayout);
+    uint32_t srcBM = get_element<attr_info::stride, attr_info::row, 1>(srcLayout);
+    uint32_t srcBN = get_element<attr_info::stride, attr_info::column, 1>(srcLayout);
 
-    uint32_t M0 = GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout);
-    uint32_t N0 = GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout);
-    uint32_t M1 = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-    uint32_t N1 = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+    uint32_t M0 = get_element<attr_info::shape, attr_info::row, 0>(dstLayout);
+    uint32_t N0 = get_element<attr_info::shape, attr_info::column, 0>(dstLayout);
+    uint32_t M1 = get_element<attr_info::shape, attr_info::row, 1>(dstLayout);
+    uint32_t N1 = get_element<attr_info::shape, attr_info::column, 1>(dstLayout);
 
     uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
     uint32_t srcColNAlignC0 = ((SN * BN + c0Elements - 1) / c0Elements) * c0Elements;
@@ -2163,10 +2163,10 @@ void SimScaleBNn2Nn(const T& dst, const U& src)
 template <typename T, typename U>
 void DataCopyGm2L1Sim(const T& dst, const U& src)
 {
-    using srcType = typename U::elementType;
-    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
-    using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-    using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+    using srcType = typename U::element_type;
+    static_assert(std::is_same_v<srcType, typename T::element_type>, "src and dst element types must be the same");
+    using DstLayoutPtn = GetLayoutPattern<typename T::layout_type>;
+    using SrcLayoutPtn = GetLayoutPattern<typename U::layout_type>;
 
     if constexpr ((Std::is_same_v<DstLayoutPtn, NDExtLayoutPtn> || Std::is_same_v<DstLayoutPtn, NDLayoutPtn>) &&
                   (Std::is_same_v<SrcLayoutPtn, NDExtLayoutPtn> || Std::is_same_v<SrcLayoutPtn, NDLayoutPtn>)) {
@@ -2571,12 +2571,12 @@ CAPTURE_GM_TO_L1_IMPL(uint32_t);
     constexpr uint32_t B = batch;                                                                                     \
     auto gmBaseLayout = (gmBaseLayoutExpr);                                                                           \
     auto l1BaseLayout = (l1BaseLayoutExpr);                                                                           \
-    using GmTrait = GetLayoutTrait<decltype(gmBaseLayout)>;                                                          \
-    using L1Trait = GetLayoutTrait<decltype(l1BaseLayout)>;                                                          \
+    using GmTrait = get_layout_trait<decltype(gmBaseLayout)>;                                                          \
+    using L1Trait = get_layout_trait<decltype(l1BaseLayout)>;                                                          \
     using GmPattern = GetLayoutPattern<decltype(gmBaseLayout)>;                                                       \
     using L1Pattern = GetLayoutPattern<decltype(l1BaseLayout)>;                                                       \
-    auto gmBatchLayout = MakeBatchPatternLayout<GmPattern, GmTrait>(B, gmBaseLayout);                                 \
-    auto l1BatchLayout = MakeBatchPatternLayout<L1Pattern, L1Trait>(B, l1BaseLayout);                                 \
+    auto gmBatchLayout = make_batch_pattern_layout<GmPattern, GmTrait>(B, gmBaseLayout);                                 \
+    auto l1BatchLayout = make_batch_pattern_layout<L1Pattern, L1Trait>(B, l1BaseLayout);                                 \
     auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmBatchLayout);                     \
     auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1BatchLayout);               \
     InitializeData<T>();                                                                                              \
@@ -2605,10 +2605,10 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleAND2Zz_RoutesToSingleDn2Nz)
     constexpr uint32_t N = 4;
     auto gmBaseLayout = MakeScaleAND<T>(M, N);
     auto l1BaseLayout = MakeZZ<T>(M, N);
-    using GmTrait = GetLayoutTrait<decltype(gmBaseLayout)>;
-    using L1Trait = GetLayoutTrait<decltype(l1BaseLayout)>;
-    auto gmBatchLayout = MakeBatchPatternLayout<ScaleANDLayoutPtn, GmTrait>(B, gmBaseLayout);
-    auto l1BatchLayout = MakeBatchPatternLayout<ZZLayoutPtn, L1Trait>(B, l1BaseLayout);
+    using GmTrait = get_layout_trait<decltype(gmBaseLayout)>;
+    using L1Trait = get_layout_trait<decltype(l1BaseLayout)>;
+    auto gmBatchLayout = make_batch_pattern_layout<ScaleANDLayoutPtn, GmTrait>(B, gmBaseLayout);
+    auto l1BatchLayout = make_batch_pattern_layout<ZZLayoutPtn, L1Trait>(B, l1BaseLayout);
     auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmBatchLayout);
     auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1BatchLayout);
 
@@ -2634,10 +2634,10 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleAND2Zz_RoutesToSingleDn2Nz)
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);
     const auto& dn2nz = gGm2L1DN2NzCaptures.back();
     const auto& nzPara = gGm2L1NzParaCaptures.back();
-    auto expectedLoop3DstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(l1BaseLayout) * sizeof(T) /
+    auto expectedLoop3DstStride = get_element<attr_info::stride, attr_info::row, 1>(l1BaseLayout) * sizeof(T) /
         C0_SIZE<>;
     auto expectedLoop4DstStride = dstBatchStride * sizeof(T) / C0_SIZE<>;
-    auto expectedLoop1SrcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedLoop1SrcStride = get_element<attr_info::stride, attr_info::row, 1>(gmBaseLayout) * sizeof(T);
     auto expectedLoop4SrcStride = srcBatchStride * sizeof(T);
     EXPECT_EQ(nzPara.ndNum, B);
     EXPECT_EQ(nzPara.loop2DstStride, 1);
@@ -2660,18 +2660,18 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleADN2Zz_RoutesToSingleNd2Nz)
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);
     const auto& nd2nz = gGm2L1ND2NzCaptures.back();
     const auto& nzPara = gGm2L1NzParaCaptures.back();
-    auto expectedLoop3DstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(l1BaseLayout) * sizeof(T) /
+    auto expectedLoop3DstStride = get_element<attr_info::stride, attr_info::row, 1>(l1BaseLayout) * sizeof(T) /
         C0_SIZE<>;
     auto expectedLoop4DstStride = dstBatchStride * sizeof(T) / C0_SIZE<>;
-    auto expectedLoop1SrcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedLoop1SrcStride = get_element<attr_info::stride, attr_info::column, 1>(gmBaseLayout) * sizeof(T);
     auto expectedLoop4SrcStride = srcBatchStride * sizeof(T);
     EXPECT_EQ(nzPara.ndNum, B);
     EXPECT_EQ(nzPara.loop2DstStride, 1);
     EXPECT_EQ(nzPara.loop3DstStride, expectedLoop3DstStride);
     EXPECT_EQ(nzPara.loop4DstStride, expectedLoop4DstStride);
     EXPECT_EQ(nd2nz.loop1SrcStride, expectedLoop1SrcStride);
-    EXPECT_EQ(nd2nz.nValue, (GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout)));
-    EXPECT_EQ(nd2nz.dValue, (GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout)));
+    EXPECT_EQ(nd2nz.nValue, (get_element<attr_info::shape, attr_info::column, 1>(gmBaseLayout)));
+    EXPECT_EQ(nd2nz.dValue, (get_element<attr_info::shape, attr_info::row, 1>(gmBaseLayout)));
     EXPECT_EQ(nd2nz.loop4SrcStride, expectedLoop4SrcStride);
     EXPECT_FALSE(nd2nz.enableSmallC0);
 }
@@ -2686,18 +2686,18 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleBND2Nn_RoutesToSingleNd2Nz)
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);
     const auto& nd2nz = gGm2L1ND2NzCaptures.back();
     const auto& nzPara = gGm2L1NzParaCaptures.back();
-    auto expectedLoop3DstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(l1BaseLayout) * sizeof(T) /
+    auto expectedLoop3DstStride = get_element<attr_info::stride, attr_info::column, 1>(l1BaseLayout) * sizeof(T) /
         C0_SIZE<>;
     auto expectedLoop4DstStride = dstBatchStride * sizeof(T) / C0_SIZE<>;
-    auto expectedLoop1SrcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedLoop1SrcStride = get_element<attr_info::stride, attr_info::row, 1>(gmBaseLayout) * sizeof(T);
     auto expectedLoop4SrcStride = srcBatchStride * sizeof(T);
     EXPECT_EQ(nzPara.ndNum, B);
     EXPECT_EQ(nzPara.loop2DstStride, 1);
     EXPECT_EQ(nzPara.loop3DstStride, expectedLoop3DstStride);
     EXPECT_EQ(nzPara.loop4DstStride, expectedLoop4DstStride);
     EXPECT_EQ(nd2nz.loop1SrcStride, expectedLoop1SrcStride);
-    EXPECT_EQ(nd2nz.nValue, (GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout)));
-    EXPECT_EQ(nd2nz.dValue, (GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout)));
+    EXPECT_EQ(nd2nz.nValue, (get_element<attr_info::shape, attr_info::row, 1>(gmBaseLayout)));
+    EXPECT_EQ(nd2nz.dValue, (get_element<attr_info::shape, attr_info::column, 1>(gmBaseLayout)));
     EXPECT_EQ(nd2nz.loop4SrcStride, expectedLoop4SrcStride);
     EXPECT_FALSE(nd2nz.enableSmallC0);
 }
@@ -2712,18 +2712,18 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleBDN2Nn_RoutesToSingleDn2Nz)
     ASSERT_EQ(gGm2L1NzParaCaptures.size(), 1);
     const auto& dn2nz = gGm2L1DN2NzCaptures.back();
     const auto& nzPara = gGm2L1NzParaCaptures.back();
-    auto expectedLoop3DstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(l1BaseLayout) * sizeof(T) /
+    auto expectedLoop3DstStride = get_element<attr_info::stride, attr_info::column, 1>(l1BaseLayout) * sizeof(T) /
         C0_SIZE<>;
     auto expectedLoop4DstStride = dstBatchStride * sizeof(T) / C0_SIZE<>;
-    auto expectedLoop1SrcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedLoop1SrcStride = get_element<attr_info::stride, attr_info::column, 1>(gmBaseLayout) * sizeof(T);
     auto expectedLoop4SrcStride = srcBatchStride * sizeof(T);
     EXPECT_EQ(nzPara.ndNum, B);
     EXPECT_EQ(nzPara.loop2DstStride, 1);
     EXPECT_EQ(nzPara.loop3DstStride, expectedLoop3DstStride);
     EXPECT_EQ(nzPara.loop4DstStride, expectedLoop4DstStride);
     EXPECT_EQ(dn2nz.loop1SrcStride, expectedLoop1SrcStride);
-    EXPECT_EQ(dn2nz.nValue, (GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout) >> 1));
-    EXPECT_EQ(dn2nz.dValue, (GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout)));
+    EXPECT_EQ(dn2nz.nValue, (get_element<attr_info::shape, attr_info::row, 1>(gmBaseLayout) >> 1));
+    EXPECT_EQ(dn2nz.dValue, (get_element<attr_info::shape, attr_info::column, 1>(gmBaseLayout)));
     EXPECT_EQ(dn2nz.loop4SrcStride, expectedLoop4SrcStride);
     EXPECT_FALSE(dn2nz.enableSmallC0);
 }
@@ -2736,12 +2736,12 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleAZz2Zz_ContinuousRoutesToPerBatchAlig
 
     ASSERT_EQ(gGm2L1AlignV2Captures.size(), B);
     const auto& alignV2 = gGm2L1AlignV2Captures.back();
-    auto baseBlockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout);
-    auto baseBlockLen = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T) *
-        GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(gmBaseLayout) *
-        GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(gmBaseLayout);
-    auto expectedSrcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T);
-    auto expectedDstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(l1BaseLayout) * sizeof(T);
+    auto baseBlockCount = get_element<attr_info::shape, attr_info::row, 1>(gmBaseLayout);
+    auto baseBlockLen = get_element<attr_info::shape, attr_info::column, 1>(gmBaseLayout) * sizeof(T) *
+        get_element<attr_info::shape, attr_info::row, 0>(gmBaseLayout) *
+        get_element<attr_info::stride, attr_info::row, 0>(gmBaseLayout);
+    auto expectedSrcStride = get_element<attr_info::stride, attr_info::row, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedDstStride = get_element<attr_info::stride, attr_info::row, 1>(l1BaseLayout) * sizeof(T);
     EXPECT_EQ(alignV2.blockCount, baseBlockCount);
     EXPECT_EQ(alignV2.blockLen, baseBlockLen);
     EXPECT_EQ(alignV2.srcStride, expectedSrcStride);
@@ -2756,10 +2756,10 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleAZz2Zz_NonContinuousDstFallsBackToPer
 
     ASSERT_EQ(gGm2L1AlignV2Captures.size(), B);
     const auto& alignV2 = gGm2L1AlignV2Captures.back();
-    auto baseBlockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout);
-    auto baseBlockLen = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T) *
-        GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(gmBaseLayout) *
-        GetElement<AttrInfo::Stride, AttrInfo::Row, 0>(gmBaseLayout);
+    auto baseBlockCount = get_element<attr_info::shape, attr_info::row, 1>(gmBaseLayout);
+    auto baseBlockLen = get_element<attr_info::shape, attr_info::column, 1>(gmBaseLayout) * sizeof(T) *
+        get_element<attr_info::shape, attr_info::row, 0>(gmBaseLayout) *
+        get_element<attr_info::stride, attr_info::row, 0>(gmBaseLayout);
     EXPECT_EQ(alignV2.blockCount, baseBlockCount);
     EXPECT_EQ(alignV2.blockLen, baseBlockLen);
 }
@@ -2772,12 +2772,12 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleBNn2Nn_ContinuousRoutesToPerBatchAlig
 
     ASSERT_EQ(gGm2L1AlignV2Captures.size(), B);
     const auto& alignV2 = gGm2L1AlignV2Captures.back();
-    auto baseBlockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout);
-    auto baseBlockLen = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T) *
-        GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(gmBaseLayout) *
-        GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(gmBaseLayout);
-    auto expectedSrcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(gmBaseLayout) * sizeof(T);
-    auto expectedDstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(l1BaseLayout) * sizeof(T);
+    auto baseBlockCount = get_element<attr_info::shape, attr_info::column, 1>(gmBaseLayout);
+    auto baseBlockLen = get_element<attr_info::shape, attr_info::row, 1>(gmBaseLayout) * sizeof(T) *
+        get_element<attr_info::shape, attr_info::column, 0>(gmBaseLayout) *
+        get_element<attr_info::stride, attr_info::column, 0>(gmBaseLayout);
+    auto expectedSrcStride = get_element<attr_info::stride, attr_info::column, 1>(gmBaseLayout) * sizeof(T);
+    auto expectedDstStride = get_element<attr_info::stride, attr_info::column, 1>(l1BaseLayout) * sizeof(T);
     EXPECT_EQ(alignV2.blockCount, baseBlockCount);
     EXPECT_EQ(alignV2.blockLen, baseBlockLen);
     EXPECT_EQ(alignV2.srcStride, expectedSrcStride);
@@ -2792,10 +2792,10 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleBNn2Nn_NonContinuousDstFallsBackToPer
 
     ASSERT_EQ(gGm2L1AlignV2Captures.size(), B);
     const auto& alignV2 = gGm2L1AlignV2Captures.back();
-    auto baseBlockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(gmBaseLayout);
-    auto baseBlockLen = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(gmBaseLayout) * sizeof(T) *
-        GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(gmBaseLayout) *
-        GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(gmBaseLayout);
+    auto baseBlockCount = get_element<attr_info::shape, attr_info::column, 1>(gmBaseLayout);
+    auto baseBlockLen = get_element<attr_info::shape, attr_info::row, 1>(gmBaseLayout) * sizeof(T) *
+        get_element<attr_info::shape, attr_info::column, 0>(gmBaseLayout) *
+        get_element<attr_info::stride, attr_info::column, 0>(gmBaseLayout);
     EXPECT_EQ(alignV2.blockCount, baseBlockCount);
     EXPECT_EQ(alignV2.blockLen, baseBlockLen);
 }
@@ -2809,7 +2809,7 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ScaleBNn2Nn_NonContinuousDstFallsBackToPer
 //   blockLen   = M*N*sizeof(T)
 //   srcStride  = sB*sizeof(T)
 //   dstStride  = sB*sizeof(T)
-// MakeBatchPatternLayout always emits sB == M*N, so srcStride == dstStride
+// make_batch_pattern_layout always emits sB == M*N, so srcStride == dstStride
 // == M*N*sizeof(T).
 // (MakeBatchNDExt is provided by the file-scope MAKE_BATCH_LAYOUT_FUNC macro above.)
 // =========================================================================
