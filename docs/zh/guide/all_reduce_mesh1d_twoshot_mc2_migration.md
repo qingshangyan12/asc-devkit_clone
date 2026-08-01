@@ -115,8 +115,13 @@ Mc2CcTilingConfig / Mc2CcTiling：生成并保存 mc2 初始化参数和 AllRedu
             -> InsV2AllReduceSoleExecutor::CalcAlgHierarchyInfo：通过 `TopoMatch1D` 计算 0 级通信域和 rank 信息。
             -> InsV2AllReduceSoleExecutor::CalcRes：创建标准 TwoShot template 并发起资源计算。
               -> InsTempAllReduceMesh1DTwoShot::CalcRes：计算线程、notify 和 Mesh1D channel 资源需求。
-            -> GetAlgResAICPU：根据 `AlgResourceRequest` 申请 AICPU 算法资源，并将资源上下文保存到 device。。
-        -> HcclAllocOpResCtx：保存基础 `OpParam` 和序列化资源上下文，生成 mc2 `OpResCtx`。
+            -> GetAlgResAICPU：根据 `AlgResourceRequest` 申请 AICPU 算法资源，并将资源上下文保存到 device。
+                -> HcclAllocAlgResourceAICPU
+                    -> HcclGetHcclBuffer
+                    -> HcclGetThread
+                    -> HcclGetChannel
+                -> HcclMemcpyCtxHostToDevice
+      -> HcclAllocOpResCtx：保存基础 `OpParam` 和序列化资源上下文，生成 mc2 `OpResCtx`。
 ```
 
 资源阶段主要完成以下工作：
