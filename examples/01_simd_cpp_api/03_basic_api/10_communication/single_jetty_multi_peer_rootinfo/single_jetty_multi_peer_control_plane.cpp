@@ -533,9 +533,9 @@ HcclResult GetRemoteMemByTag(
 
 HcclResult RunTransfer(HcclComm comm, ChannelHandle channel, uint8_t* localAddr, uint8_t* localNotifyAddr,
     uint64_t remoteMemBytes, uint64_t len, uint32_t dataType, uint32_t reduceOp, uint64_t* cycleAddr,
-    std::vector<uint64_t>* writeReduceCycles, aclrtStream stream)
+    uint64_t* totalCycles, aclrtStream stream)
 {
-    if (cycleAddr == nullptr || writeReduceCycles == nullptr) {
+    if (cycleAddr == nullptr || totalCycles == nullptr) {
         return HCCL_E_PTR;
     }
 
@@ -545,10 +545,8 @@ HcclResult RunTransfer(HcclComm comm, ChannelHandle channel, uint8_t* localAddr,
     run_hcomm_single_jetty_multi_peer(channel, localAddr, remoteAddr, remoteNotifyAddr, len, cycleAddr, dataType,
         reduceOp, WARMUP_TIMES, MEASURE_TIMES, stream);
     ACLCHECK(aclrtSynchronizeStream(stream));
-    writeReduceCycles->resize(MEASURE_TIMES);
-    const uint64_t cycleBytes = MEASURE_TIMES * sizeof(uint64_t);
     ACLCHECK(aclrtMemcpy(
-        writeReduceCycles->data(), cycleBytes, cycleAddr, cycleBytes, ACL_MEMCPY_DEVICE_TO_HOST));
+        totalCycles, sizeof(*totalCycles), cycleAddr, sizeof(*totalCycles), ACL_MEMCPY_DEVICE_TO_HOST));
     return WaitForNotifyValue(localNotifyAddr, NOTIFY_VALUE);
 }
 
@@ -580,7 +578,7 @@ HcclResult RunSample(uint32_t rankSize, uint32_t rank, uint32_t device, uint64_t
 
     const uint64_t alignedBytes = (bytes + NOTIFY_BYTES - 1) / NOTIFY_BYTES * NOTIFY_BYTES;
     const uint64_t remoteMemBytes = alignedBytes + NOTIFY_BYTES;
-    const uint64_t cycleBytes = MEASURE_TIMES * sizeof(uint64_t);
+    const uint64_t cycleBytes = sizeof(uint64_t);
     const uint64_t commBufferBytes = alignedBytes + remoteMemBytes + cycleBytes;
     void* commBufferAddr = nullptr;
     ACLCHECK(aclrtMalloc(&commBufferAddr, commBufferBytes, ACL_MEM_MALLOC_HUGE_FIRST));
@@ -602,9 +600,9 @@ HcclResult RunSample(uint32_t rankSize, uint32_t rank, uint32_t device, uint64_t
     const uint32_t peer = 1 - rank;
     ChannelHandle channel = 0;
     HCCLCHECK(AcquirePeerChannel(comm, rank, peer, &recvMemHandle, 1, &channel));
-    std::vector<uint64_t> writeReduceCycles;
+    uint64_t totalCycles = 0;
     HCCLCHECK(RunTransfer(comm, channel, sendAddr, recvNotifyAddr, remoteMemBytes, bytes, dataType.value,
-        reduceOp.value, cycleAddr, &writeReduceCycles, stream));
+        reduceOp.value, cycleAddr, &totalCycles, stream));
 
     uint32_t expected = 0;
     HCCLCHECK(CalculateExpectedValue(testValues.initial, testValues.send[peer], WARMUP_TIMES + MEASURE_TIMES,
@@ -612,19 +610,7 @@ HcclResult RunSample(uint32_t rankSize, uint32_t rank, uint32_t device, uint64_t
     const std::string caseName = std::string(reduceOp.name) + " + " + dataType.name;
     HCCLCHECK(VerifyDeviceBuffer(recvAddr, bytes, dataType, expected, caseName.c_str()));
 
-    std::sort(writeReduceCycles.begin(), writeReduceCycles.end());
-    uint64_t totalCycles = 0;
-    for (uint64_t cycles : writeReduceCycles) {
-        totalCycles += cycles;
-    }
-    const uint64_t minCycles = writeReduceCycles.front();
-    const std::size_t medianIndex = writeReduceCycles.size() / 2;
-    double medianCycles = static_cast<double>(writeReduceCycles[medianIndex]);
-    if (writeReduceCycles.size() % 2 == 0) {
-        medianCycles =
-            (static_cast<double>(writeReduceCycles[medianIndex - 1]) + writeReduceCycles[medianIndex]) / 2.0;
-    }
-    const double averageCycles = static_cast<double>(totalCycles) / writeReduceCycles.size();
+    const double averageCycles = static_cast<double>(totalCycles) / MEASURE_TIMES;
 
     HCCLCHECK(HcclCommDestroy(comm));
     ACLCHECK(aclrtFree(commBufferAddr));
@@ -632,10 +618,10 @@ HcclResult RunSample(uint32_t rankSize, uint32_t rank, uint32_t device, uint64_t
     ACLCHECK(aclrtResetDevice(static_cast<int32_t>(device)));
     ACLCHECK(aclFinalize());
 
-    std::printf("rank %u pass, peer %u, case %s, bytes %llu, WriteReduceNbi<false> cycles: min %llu, median %.2f, "
+    std::printf("rank %u pass, peer %u, case %s, bytes %llu, WriteReduceNbi<false> cycles: total %llu, "
                 "average %.2f.\n",
         rank, peer, caseName.c_str(), static_cast<unsigned long long>(bytes),
-        static_cast<unsigned long long>(minCycles), medianCycles, averageCycles);
+        static_cast<unsigned long long>(totalCycles), averageCycles);
     return HCCL_SUCCESS;
 }
 
