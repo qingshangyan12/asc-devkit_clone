@@ -31,3 +31,24 @@ template <pipe_t pipe>
 static __aicore__ inline void Unlock(MutexID id);
 };
 ```
+
+## 连续Vector操作与MTE3同步
+
+<!-- npu="950" id1 -->
+- 针对NPU架构3510，PIPE\_V之间的同步由硬件保证，连续Vector操作之间无需插入`PipeBarrier<PIPE_V>`。当PIPE\_MTE3依赖多个Vector操作完成时，仍需使用Mutex完成PIPE\_V与PIPE\_MTE3之间的跨流水同步。推荐将多个Vector操作放在同一组PIPE\_V的`Lock`和`Unlock`之间，再使用相同MutexID锁定PIPE\_MTE3，示例如下：
+
+    ```cpp
+    AscendC::Mutex::Lock<PIPE_V>(mutexId);
+    Vector1();
+    Vector2();
+    AscendC::Mutex::Unlock<PIPE_V>(mutexId);
+
+    AscendC::Mutex::Lock<PIPE_MTE3>(mutexId);
+    AscendC::DataCopyPad(...);
+    AscendC::Mutex::Unlock<PIPE_MTE3>(mutexId);
+    ```
+
+- 将多个Vector操作拆分到PIPE\_V上使用相同MutexID的多组`Lock`和`Unlock`中，不会增强同步效果。相同MutexID、相同流水的第二次`Lock`不会阻塞该流水，不能用来替代`PipeBarrier`。在NPU架构3510上无需使用该方式同步连续Vector操作，建议合并为一组`Lock`和`Unlock`，以减少冗余指令。
+
+- 完整样例请参考[Mutex跨流水同步写法验证样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex_issue)。
+<!-- end id1 -->

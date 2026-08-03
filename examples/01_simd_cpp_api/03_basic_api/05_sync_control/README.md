@@ -12,6 +12,7 @@
 |----------|----------| --- |
 | [data_sync_barrier](./data_sync_barrier) |  基于DataSyncBarrier实现标量流水GM访问写序同步 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [mutex](./mutex) |  本样例演示Mutex::Lock、Mutex::Unlock、AllocMutexID和ReleaseMutexID核内流水线同步接口的使用方法 | Ascend 950PR/Ascend 950DT |
+| [mutex_issue](./mutex_issue) |  验证连续Vector操作与MTE3搬出之间的Mutex同步写法 | Ascend 950PR/Ascend 950DT |
 
 ### 核间同步
 

@@ -12,6 +12,7 @@ This sample collection introduces multiple API samples related to synchronizatio
 |----------|----------| --- |
 | [data_sync_barrier](./data_sync_barrier) |  Implements scalar pipeline GM access write ordering synchronization using DataSyncBarrier | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
 | [mutex](./mutex) |  Demonstrates the usage of Mutex::Lock, Mutex::Unlock, AllocMutexID, and ReleaseMutexID intra-core pipeline synchronization interfaces | Ascend 950PR/Ascend 950DT |
+| [mutex_issue](./mutex_issue) |  Validates Mutex patterns between consecutive Vector operations and an MTE3 copy | Ascend 950PR/Ascend 950DT |
 
 ### Inter-core Synchronization
 
