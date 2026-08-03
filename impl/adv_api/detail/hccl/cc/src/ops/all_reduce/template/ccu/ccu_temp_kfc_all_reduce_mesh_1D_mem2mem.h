@@ -17,6 +17,8 @@ namespace mc2_ops_hccl {
 
 class CcuTempKfcAllReduceMesh1DMem2Mem : public CcuTempKfcMesh1DMem2MemBase {
 public:
+    CcuTempKfcAllReduceMesh1DMem2Mem() = default;
+
     explicit CcuTempKfcAllReduceMesh1DMem2Mem(
         const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks);
 
