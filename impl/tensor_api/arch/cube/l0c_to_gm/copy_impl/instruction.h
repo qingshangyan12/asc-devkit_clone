@@ -33,6 +33,14 @@ public:
     __aicore__ inline static void DataCopy(const T& dst, const U& src, const Params&... params)
     { CopyMatrixCcToGm<quantPre>(dst.Data().Get(), src.Data().Get(), params...); }
 
+    template <QuantMode_t quantPre, typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void DataCopyRegion(
+        const T& dst, const U& src, const Offset& dstOffset, const Params&... params)
+    {
+        auto dstData = dst.Data() + dstOffset;
+        CopyMatrixCcToGm<quantPre>(dstData.Get(), src.Data().Get(), params...);
+    }
+
 private:
     template <QuantMode_t quantPre, typename T, typename U>
     __aicore__ inline static void CopyMatrixCcToGm(__gm__ T* dst, __cc__ U* src, uint32_t nSize, uint32_t mSize,

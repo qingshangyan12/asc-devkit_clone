@@ -68,6 +68,30 @@ public:
             dst, src, dnNum, loop2DstStride, loop3DstStride, loop4DstStride, loop1SrcStride, cacheMode, nValue, dValue,
             loop4SrcStride, false);
     }
+
+    template <const CopyGM2L1Trait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void RunRegion(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using type = typename U::elementType;
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        uint16_t dnNum = Get<2>(regionShape);
+        uint16_t nValue = Get<3>(regionShape);
+        uint32_t dValue = Get<1>(regionShape);
+        uint64_t loop1SrcStride = static_cast<uint64_t>(Get<1>(src.Layout().Stride())) * sizeof(type);
+        uint64_t loop4SrcStride = static_cast<uint64_t>(Get<2>(src.Layout().Stride())) * sizeof(type);
+        uint16_t loop4DstStride = Get<3>(dst.Layout().Shape());
+        uint16_t loop3DstStride = Get<2>(dst.Layout().Shape()) * Get<3>(dst.Layout().Shape());
+        if constexpr (IsB4Type<type>) {
+            dValue >>= 1;
+            loop4SrcStride >>= 1;
+            loop1SrcStride >>= 1;
+        }
+        CopyGmToCbufMultiDn2nzInstr::DataCopyRegion(dst, src, srcOffset, dnNum, 1,
+            loop3DstStride, loop4DstStride, loop1SrcStride, src.Engine().GetCacheMode(), nValue,
+            dValue, loop4SrcStride, false);
+    }
 };
 
 } // namespace Te

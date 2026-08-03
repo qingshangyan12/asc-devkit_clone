@@ -72,16 +72,15 @@ __aicore__ inline decltype(auto) MakeSlicePatternLayout(const LayoutType& layout
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape>
-__aicore__ inline decltype(auto) MakeSameShapeSliceLayout(
+__aicore__ inline decltype(auto) MakeSameShapeSliceShape(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     auto coordLayout = MakeCoordLayout(coord, layout);
-    auto realShape = TransformTupleApply(coordLayout.Shape(), sliceShape, MinOp{});
-    return MakeSlicePatternLayout(layout, realShape);
+    return TransformTupleApply(coordLayout.Shape(), sliceShape, MinOp{});
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape>
-__aicore__ inline decltype(auto) MakeFourDimSliceLayout(
+__aicore__ inline decltype(auto) MakeFourDimSliceShape(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     static_assert(NestingDepthV<SliceShape> == TWO_DIM_DATA,
@@ -94,12 +93,11 @@ __aicore__ inline decltype(auto) MakeFourDimSliceLayout(
 
     auto realRow = Std::min(srcRow, Get<0>(sliceShape));
     auto realCol = Std::min(srcCol, Get<1>(sliceShape));
-    return MakeSlicePatternLayout(layout, MakeFractalShape(MakeShape(realRow, realCol),
-        MakeShape(innerRow, innerCol)));
+    return MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol));
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape>
-__aicore__ inline decltype(auto) MakeFiveDimSliceLayout(
+__aicore__ inline decltype(auto) MakeFiveDimSliceShape(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     static_assert(NestingDepthV<SliceShape> == THREE_DIM_DATA,
@@ -115,11 +113,12 @@ __aicore__ inline decltype(auto) MakeFiveDimSliceLayout(
     auto realRow = Std::min(srcRow, Get<1, 0>(sliceShape));
     auto realCol = Std::min(srcCol, Get<1, 1>(sliceShape));
     auto fractalShape = MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol));
-    return MakeSlicePatternLayout(layout, MakeShape(realBatch, fractalShape));
+    return MakeShape(realBatch, fractalShape);
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!IsLayoutV<SliceShape>, int> = 0>
-__aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape) 
+__aicore__ inline decltype(auto) MakeSliceShape(
+    const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     static_assert(IsLayoutV<LayoutType>, "LayoutType must be Layout");
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<SliceShape>>, "SliceShape must be a tuple");
@@ -131,17 +130,24 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const Layou
         Std::tuple_size_v<OriginShape> == Std::tuple_size_v<SliceShapeType>;
 
     if constexpr (isSameShape) {
-        return MakeSameShapeSliceLayout(coord, layout, sliceShape);
+        return MakeSameShapeSliceShape(coord, layout, sliceShape);
     } else if constexpr (originShapeDepth == FOUR_DIM_DATA && sliceShapeDepth == TWO_DIM_DATA) {
-        return MakeFourDimSliceLayout(coord, layout, sliceShape);
+        return MakeFourDimSliceShape(coord, layout, sliceShape);
     } else if constexpr (originShapeDepth == FIVE_DIM_DATA && sliceShapeDepth == THREE_DIM_DATA) {
-        return MakeFiveDimSliceLayout(coord, layout, sliceShape);
+        return MakeFiveDimSliceShape(coord, layout, sliceShape);
     } else {
         static_assert(isSameShape || (originShapeDepth == FOUR_DIM_DATA && sliceShapeDepth == TWO_DIM_DATA) ||
             (originShapeDepth == FIVE_DIM_DATA && sliceShapeDepth == THREE_DIM_DATA),
             "SliceShape must be same structure as Layout shape, or logical Two Dim Shape for Four Dim Layout, "
             "or logical Three Dim Shape for Five Dim Layout.");
     }
+}
+
+template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!IsLayoutV<SliceShape>, int> = 0>
+__aicore__ inline decltype(auto) MakeSliceLayout(
+    const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
+{
+    return MakeSlicePatternLayout(layout, MakeSliceShape(coord, layout, sliceShape));
 }
 
 template <typename Coord, typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<IsLayoutV<DstLayoutType>, int> = 0>

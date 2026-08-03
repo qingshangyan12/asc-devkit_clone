@@ -55,6 +55,23 @@ public:
         }
     }
 
+    template <typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void DataCopyRegion(
+        const T& dst, const U& src, const Offset& srcOffset, const Params&... params)
+    {
+        using srcType = typename U::elementType;
+        auto srcData = src.Data() + srcOffset;
+        if constexpr (sizeof(srcType) == sizeof(int8_t)) {
+            CopyGmToCbufAlignV2((__cbuf__ uint8_t*)(dst.Data().Get()), (__gm__ uint8_t*)(srcData.Get()), params...);
+        } else if constexpr (sizeof(srcType) == sizeof(half)) {
+            CopyGmToCbufAlignV2((__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(srcData.Get()), params...);
+        } else if constexpr (sizeof(srcType) == sizeof(float)) {
+            CopyGmToCbufAlignV2((__cbuf__ float*)(dst.Data().Get()), (__gm__ float*)(srcData.Get()), params...);
+        } else if constexpr (sizeof(srcType) == sizeof(uint64_t)) {
+            CopyGmToCbufAlignV2((__cbuf__ uint32_t*)(dst.Data().Get()), (__gm__ uint32_t*)(srcData.Get()), params...);
+        }
+    }
+
     template <typename T>
     __aicore__ inline static void
     CopyGmToCbufAlignV2(__cbuf__ T* dst, __gm__ T* src, uint32_t blockCount, uint32_t blockLen, uint8_t leftPaddingCnt,
@@ -82,6 +99,21 @@ public:
             CopyGmToCbufMultiNd2nz((__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(src.Data().Get()), params...);
         } else if constexpr (sizeof(srcType) == sizeof(float)) {
             CopyGmToCbufMultiNd2nz((__cbuf__ float*)(dst.Data().Get()), (__gm__ float*)(src.Data().Get()), params...);
+        }
+    }
+
+    template <typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void DataCopyRegion(
+        const T& dst, const U& src, const Offset& srcOffset, const Params&... params)
+    {
+        using srcType = typename U::elementType;
+        auto srcData = src.Data() + srcOffset;
+        if constexpr (sizeof(srcType) == sizeof(int8_t)) {
+            CopyGmToCbufMultiNd2nz((__cbuf__ uint8_t*)(dst.Data().Get()), (__gm__ uint8_t*)(srcData.Get()), params...);
+        } else if constexpr (sizeof(srcType) == sizeof(half)) {
+            CopyGmToCbufMultiNd2nz((__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(srcData.Get()), params...);
+        } else if constexpr (sizeof(srcType) == sizeof(float)) {
+            CopyGmToCbufMultiNd2nz((__cbuf__ float*)(dst.Data().Get()), (__gm__ float*)(srcData.Get()), params...);
         }
     }
 
@@ -117,6 +149,22 @@ public:
             CopyGmToCbufMultiDn2nz((__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(src.Data().Get()), params...);
         } else if constexpr (sizeof(srcType) == sizeof(float)) {
             CopyGmToCbufMultiDn2nz((__cbuf__ float*)(dst.Data().Get()), (__gm__ float*)(src.Data().Get()), params...);
+        }
+    }
+
+    template <typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void DataCopyRegion(
+        const T& dst, const U& src, const Offset& srcOffset, const Params&... params)
+    {
+        using srcType = typename U::elementType;
+        auto srcData = src.Data() + srcOffset;
+        if constexpr (sizeof(srcType) == sizeof(int8_t)) {
+            CopyGmToCbufMultiDn2nz((__cbuf__ uint8_t*)(dst.Data().Get()), (__gm__ uint8_t*)(srcData.Get()),
+                params...);
+        } else if constexpr (sizeof(srcType) == sizeof(half)) {
+            CopyGmToCbufMultiDn2nz((__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(srcData.Get()), params...);
+        } else if constexpr (sizeof(srcType) == sizeof(float)) {
+            CopyGmToCbufMultiDn2nz((__cbuf__ float*)(dst.Data().Get()), (__gm__ float*)(srcData.Get()), params...);
         }
     }
 

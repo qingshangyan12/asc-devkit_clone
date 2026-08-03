@@ -35,6 +35,57 @@ public:
         DataCopyImpl<trait>(dst, src);
     }
 
+    template <const CopyGM2L1Trait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void RunRegion(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+        using type = typename U::elementType;
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        constexpr auto depth = U::layoutType::depth;
+        uint32_t srcShapeColB;
+        uint32_t srcShapeColS;
+        uint32_t srcShapeRowB;
+        uint32_t srcStrideColB;
+        uint32_t srcStrideColS;
+        uint32_t dstStrideColB;
+        if constexpr (U::layoutType::depth == FIVE_DIM_DATA) {
+            srcShapeColB = Get<1, 1, 1>(regionShape);
+            srcShapeColS = Get<1, 1, 0>(regionShape);
+            srcShapeRowB = Get<1, 0, 1>(regionShape);
+            srcStrideColB = Get<1, 1, 1>(src.Layout().Stride());
+            srcStrideColS = Get<1, 1, 0>(src.Layout().Stride());
+            dstStrideColB = Get<1, 1, 1>(dst.Layout().Stride());
+        } else {
+            srcShapeColB = Get<1, 1>(regionShape);
+            srcShapeColS = Get<1, 0>(regionShape);
+            srcShapeRowB = Get<0, 1>(regionShape);
+            srcStrideColB = Get<1, 1>(src.Layout().Stride());
+            srcStrideColS = Get<1, 0>(src.Layout().Stride());
+            dstStrideColB = Get<1, 1>(dst.Layout().Stride());
+        }
+        uint32_t blockLen = srcShapeRowB * sizeof(type) * srcShapeColS * srcStrideColS;
+        uint64_t srcStride = srcStrideColB * sizeof(type);
+        uint32_t dstStride = dstStrideColB * sizeof(type);
+        uint32_t batchNum = GetBatchShapeFromShape(regionShape);
+        uint64_t srcBatchStride = 0;
+        if constexpr (depth == FIVE_DIM_DATA) {
+            srcBatchStride = Get<0>(src.Layout().Stride());
+        }
+        for (uint32_t i = 0; i < batchNum; ++i) {
+            if constexpr (U::layoutType::depth == FIVE_DIM_DATA) {
+                auto dstBatch = MakeSingleBatchSubTensor(dst, i);
+                CopyGmToCbufAlignV2Base::DataCopyRegion(dstBatch, src,
+                    srcOffset + i * srcBatchStride, srcShapeColB, blockLen, 0, 0,
+                    src.Engine().GetCacheMode(), srcStride, dstStride);
+            } else {
+                CopyGmToCbufAlignV2Base::DataCopyRegion(dst, src, srcOffset, srcShapeColB,
+                    blockLen, 0, 0, src.Engine().GetCacheMode(), srcStride, dstStride);
+            }
+        }
+    }
+
 private:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
