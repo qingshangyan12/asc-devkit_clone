@@ -41,7 +41,7 @@ __aicore__ inline GroupBarrier(GM_ADDR groupWorkspace, uint32_t arriveSizeIn, ui
 
 **表1**  模板参数说明
 
-<a name="table884518212555"></a>
+<a name="hccl-template-params"></a>
 <table><thead align="left"><tr id="row1584512213553"><th class="cellrowborder" valign="top" width="17.119999999999997%" id="mcps1.2.3.1.1"><p id="p158869811398"><a name="p158869811398"></a><a name="p158869811398"></a>数据类型</p>
 </th>
 <th class="cellrowborder" valign="top" width="82.88%" id="mcps1.2.3.1.2"><p id="p158864823917"><a name="p158864823917"></a><a name="p158864823917"></a>说明</p>
