@@ -72,6 +72,43 @@ public:
             }
         }
     }
+
+    template <const CopyGM2L1Trait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void RunRegion(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using type = typename U::elementType;
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        auto dstLayout = dst.Layout();
+        uint32_t c1 = Get<1>(dstLayout.Shape());
+        uint32_t rowElems = Get<2>(dstLayout.Stride());
+        uint64_t srcStride = Get<1>(src.Layout().Stride()) * sizeof(type);
+        uint32_t dstStride = Get<1>(dstLayout.Stride()) * sizeof(type);
+        if constexpr (IsB4Type<type>) {
+            srcStride >>= 1;
+            dstStride >>= 1;
+        }
+        if (Get<2>(src.Layout().Stride()) == rowElems) {
+            uint32_t blockLen = Get<1>(dstLayout.Stride()) * sizeof(type);
+            if constexpr (IsB4Type<type>) {
+                blockLen >>= 1;
+            }
+            CopyGmToCbufAlignV2Base::DataCopyRegion(dst, src, srcOffset, c1, blockLen, 0, 0,
+                src.Engine().GetCacheMode(), srcStride, dstStride);
+        } else {
+            uint32_t blockLen = rowElems * sizeof(type);
+            if constexpr (IsB4Type<type>) {
+                blockLen >>= 1;
+            }
+            for (uint32_t i = 0; i < Get<2>(regionShape); ++i) {
+                auto dstH = dst(MakeCoord(0, 0, i, 0, 0));
+                auto rowOffset = srcOffset + i * Get<2>(src.Layout().Stride());
+                CopyGmToCbufAlignV2Base::DataCopyRegion(dstH, src, rowOffset, c1, blockLen, 0, 0,
+                    src.Engine().GetCacheMode(), srcStride, dstStride);
+            }
+        }
+    }
 };
 
 } // namespace Te

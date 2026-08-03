@@ -61,6 +61,21 @@ private:
         using CopyL12UBImpl = typename CopyL12UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL12UBImpl::template Run<trait, T, U>(dst, src);
     }
+
+    template <const CopyL12UBTrait& trait = DEFAULT_COPY_L1_TO_UB_TRAIT, typename T, typename U,
+        typename Coord, typename Shape>
+    __aicore__ inline static void DataCopyImpl(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using DstPos = GetMemLocation<T>;
+        using SrcPos = GetMemLocation<U>;
+        static_assert(Std::is_same_v<DstPos, Location::UB>, "CopyL12UB requires destination on UB");
+        static_assert(Std::is_same_v<SrcPos, Location::L1>, "CopyL12UB requires source on L1");
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL12UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        Impl::template RunRegion<trait, T, U>(dst, src, coord, shape);
+    }
 };
 
 } // namespace Te

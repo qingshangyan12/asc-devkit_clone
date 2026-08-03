@@ -35,6 +35,27 @@ public:
         RunGmToL1Batched<trait, CopyGmToCbufAlignV2NZ, T, U>(dst, src);
     }
 
+    template <const CopyGM2L1Trait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void RunRegion(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+        using type = typename U::elementType;
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        auto blockCount = GetBatchShapeFromShape(regionShape) *
+            Std::ceil_division(GetTotalColumnShapeFromShape(regionShape), C0_ELEMENT<type>);
+        auto blockLen = GetTotalRowShapeFromShape(regionShape) * C0_SIZE<>;
+        auto srcStride = GetMatrixElement<AttrInfo::Stride, AttrInfo::Column, 1>(src.Layout()) * sizeof(type);
+        auto dstStride = GetMatrixElement<AttrInfo::Stride, AttrInfo::Column, 1>(dst.Layout()) * sizeof(type);
+        if constexpr (IsB4Type<type>) {
+            srcStride >>= 1;
+            dstStride >>= 1;
+        }
+        CopyGmToCbufAlignV2Base::DataCopyRegion(dst, src, srcOffset, blockCount, blockLen, 0, 0,
+            src.Engine().GetCacheMode(), srcStride, dstStride);
+    }
+
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
