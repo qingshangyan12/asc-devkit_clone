@@ -18,6 +18,7 @@ std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, PrepareParamForReduceScatter},
     {HcclCMDType::HCCL_CMD_ALLTOALL, PrepareParamForAlltoAll},
     {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
+    {HcclCMDType::HCCL_CMD_HALF_ALLTOALLV, PrepareParamForHalfAlltoAllV},
 };
 
 CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine)
@@ -519,6 +520,36 @@ HcclResult PrepareParamForAlltoAllV(
     HCCL_INFO("opType %u", static_cast<uint32_t>(param.opType));
     HCCL_INFO("all2AllVDataDes.sendType %u", static_cast<uint32_t>(param.all2AllVDataDes.sendType));
     HCCL_INFO("all2AllVDataDes.recvType %u", static_cast<uint32_t>(param.all2AllVDataDes.recvType));
+    return HCCL_SUCCESS;
+}
+
+HcclResult PrepareParamForHalfAlltoAllV(
+    HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param)
+{
+    HCCL_INFO("PrepareParamForHalfAlltoAllV, ccTiling[%p]", ccTiling);
+    u32 userRankSize;
+    CHK_RET(HcclGetRankSize(comm, &userRankSize));
+
+    HcclResult ret = PrepareOpsCommParam(tag, param);
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR("failed to fill OpsCommParam");
+    }
+
+    // AlltoAllvWrite carries sendOffsets/sendSizes as byte arrays in HBM, addressed through wParamExt on the
+    // AI core side. Only the vector staging area has to be reserved here.
+    u64 varMemSize = ALL_TO_ALL_V_VECTOR_NUM * userRankSize * sizeof(u64);
+    param.varMemSize = varMemSize;
+    param.opType = HcclCMDType::HCCL_CMD_HALF_ALLTOALLV;
+    // AlltoAllvWrite works on raw bytes: the AI core side pins both send and recv types to int8.
+    param.all2AllVDataDes.sendType = HcclDataType::HCCL_DATA_TYPE_INT8;
+    param.all2AllVDataDes.recvType = HcclDataType::HCCL_DATA_TYPE_INT8;
+    param.all2AllVDataDes.sendCounts = nullptr;
+    param.all2AllVDataDes.recvCounts = nullptr;
+    param.all2AllVDataDes.sdispls = nullptr;
+    param.all2AllVDataDes.rdispls = nullptr;
+
+    CHK_RET(PrintOpsCommParam(param));
+    HCCL_INFO("Execute PrepareParamForHalfAlltoAllV success, varMemSize %lu", param.varMemSize);
     return HCCL_SUCCESS;
 }
 
