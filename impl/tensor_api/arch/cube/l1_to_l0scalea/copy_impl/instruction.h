@@ -39,6 +39,14 @@ public:
         LoadCbufToMxScaleA(mxDstAddr, src.Data().Get(), params...);
     }
 
+    template <typename U, typename DstOffset, typename SrcOffset, typename... Params>
+    __aicore__ inline static void LoadDataRegion(
+        const uint64_t& mxDstAddr, const U& src, const DstOffset& dstOffset, const SrcOffset& srcOffset, const Params&... params)
+    {
+        auto srcData = src.Data() + srcOffset;
+        LoadCbufToMxScaleA(mxDstAddr, srcData.Get(), params...);
+    }
+
 private:
     template <typename T>
     __aicore__ inline static void LoadCbufToMxScaleA(uint64_t mxDstAddr, __cbuf__ T* src, uint16_t mStartPosition,
