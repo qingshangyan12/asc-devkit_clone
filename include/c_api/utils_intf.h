@@ -11,6 +11,9 @@
 #ifndef INCLUDE_C_API_C_API_UTILS_INTF_H
 #define INCLUDE_C_API_C_API_UTILS_INTF_H
 
+[[deprecated(__FILE__
+             " is deprecated, please use defs/def.h instead!")]] typedef void using_deprecated_header_h;
+
 #include "c_api/utils/union.h"
 #include "c_api/utils/enum.h"
 
