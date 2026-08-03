@@ -52,16 +52,19 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     dataType_ = param.DataDes.dataType;
     dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
     if (dataCount_ > UINT64_MAX / dataTypeSize_) {
-        HCCL_ERROR("[InsV2AllReduceSoleExecutor] dataCount[%llu] * dataTypeSize_[%llu] > UINT64_MAX",
-            dataCount_, dataTypeSize_);
+        HCCL_ERROR(
+            "[InsV2AllReduceSoleExecutor] dataCount[%llu] * dataTypeSize_[%llu] > UINT64_MAX", dataCount_,
+            dataTypeSize_);
         return HCCL_E_INTERNAL;
     }
     dataSize_ = dataCount_ * dataTypeSize_;
 
     HcclResult ret = OrchestrateLoop(param, resCtx);
-    CHK_PRT_RET(ret != HCCL_SUCCESS,
-        HCCL_ERROR("[InsV2AllReduceSoleExecutor] errNo[0x%016llx] AllReduce executor kernel run failed",
-            HCCL_ERROR_CODE(ret)), ret);
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[InsV2AllReduceSoleExecutor] errNo[0x%016llx] AllReduce executor kernel run failed", HCCL_ERROR_CODE(ret)),
+        ret);
     return HCCL_SUCCESS;
 }
 
@@ -104,16 +107,16 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     u64 transportBoundDataSize = UB_MAX_DATA_SIZE;
     HCCL_INFO("[InsV2AllReduceSoleExecutor] maxTmpMemSize_ [%u]", maxTmpMemSize_);
     if (templateScratchMultiplier != 0) {
-        u64 scratchBoundDataSize = maxTmpMemSize_ / templateScratchMultiplier / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
+        u64 scratchBoundDataSize =
+            maxTmpMemSize_ / templateScratchMultiplier / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
         maxDataSizePerLoop = std::min(transportBoundDataSize, scratchBoundDataSize);
     } else {
         maxDataSizePerLoop = transportBoundDataSize;
     }
-    CHK_PRT_RET(dataTypeSize_ == 0,
-        HCCL_ERROR("[InsV2AllReduceSoleExecutor] dataTypeSize_ is 0"), HCCL_E_INTERNAL);
+    CHK_PRT_RET(dataTypeSize_ == 0, HCCL_ERROR("[InsV2AllReduceSoleExecutor] dataTypeSize_ is 0"), HCCL_E_INTERNAL);
     u64 maxDataCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
-    CHK_PRT_RET(maxDataCountPerLoop == 0,
-        HCCL_ERROR("[InsV2AllReduceSoleExecutor] maxDataCountPerLoop is 0"), HCCL_E_INTERNAL);
+    CHK_PRT_RET(
+        maxDataCountPerLoop == 0, HCCL_ERROR("[InsV2AllReduceSoleExecutor] maxDataCountPerLoop is 0"), HCCL_E_INTERNAL);
     u64 loopTimes = dataCount_ / maxDataCountPerLoop + static_cast<u64>(dataCount_ % maxDataCountPerLoop != 0);
     u64 processedDataCount = 0;
     for (u64 loop = 0; loop < loopTimes; loop++) {
