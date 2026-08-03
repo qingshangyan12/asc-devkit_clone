@@ -25,6 +25,7 @@
 
 #include "hcomm_aiv_urma_def.h"
 
+#include "../../../hccl/common/hccl_base.h"
 #include "../../common/hcomm_inner_def.h"
 #include "../../common/hcomm_utils.h"
 
@@ -285,9 +286,8 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
     uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
     if ((wqeCnt + POLL_CQ_THRESHOLD) % cqDepth == curTail % cqDepth) {
         uint32_t idx = (curTail + NUM_CQE_PER_POLL_CQ) > wqeCnt ? wqeCnt : curTail + NUM_CQE_PER_POLL_CQ;
-        KERNEL_LOG(
-            KERNEL_INFO, "Hcomm URMA SQ overflow wqeCnt=%u curTail=%u idx=%u cqDepth=%u \n", wqeCnt, curTail, idx,
-            cqDepth);
+        ASCENDC_HCCL_API_ASSERT(false, {}, "Hcomm URMA SQ overflow wqeCnt=%u curTail=%u idx=%u cqDepth=%u \n",
+            wqeCnt, curTail, idx, cqDepth);
         (void)PollCq(channel, idx);
     }
 }
@@ -314,9 +314,9 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     uint64_t headVal = static_cast<uint64_t>(ld_dev(headAddr, 0));
     uint32_t curHead = static_cast<uint32_t>(headVal & 0xFFFFFFFFU);
     uint32_t wqeCnt = static_cast<uint32_t>(headVal >> 32);
-    KERNEL_LOG(
-        KERNEL_INFO, "Hcomm URMA PostSend resolved remoteIdx=%d curHead=%u wqeCnt=%u sqDepth=%u \n", remoteIdx, curHead,
-        wqeCnt, sqCtx.contextInfo.ubJfs.sqDepth);
+    ASCENDC_HCCL_API_ASSERT(false, {},
+        "Hcomm URMA PostSend resolved remoteIdx=%d curHead=%u wqeCnt=%u sqDepth=%u \n", remoteIdx, curHead, wqeCnt,
+        sqCtx.contextInfo.ubJfs.sqDepth);
 
     // poll cq if send queue is full
     auto cqCtx = channelEntity->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
@@ -362,7 +362,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     if constexpr (commit) {
         st_dev(curHead, reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.dbVa), 0);
     }
-    HcommUrmaDumpWqeCtx(sqeCtx, sizeof(T));
+    ASCENDC_HCCL_API_ASSERT(false, { HcommUrmaDumpWqeCtx(sqeCtx, sizeof(T)); }, "Hcomm URMA dump WQE context.");
     return HCOMM_SUCCESS;
 }
 
@@ -380,8 +380,8 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
     uint32_t cqeSize = cqCtx.contextInfo.ubJfc.cqeSize;
     uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
     __ubuf__ HcommUrmaJfcCqeCtx* cqeUb = (__ubuf__ HcommUrmaJfcCqeCtx*)cqeItem_.GetPhyAddr();
-    KERNEL_LOG(
-        KERNEL_INFO, "Hcomm URMA PollCq enter expectIdx=%u curTail=%u cqDepth=%u \n", expectIdx, curTail, cqDepth);
+    ASCENDC_HCCL_API_ASSERT(false, {}, "Hcomm URMA PollCq enter expectIdx=%u curTail=%u cqDepth=%u \n", expectIdx,
+        curTail, cqDepth);
 #if defined(UT_TEST)
     curTail = expectIdx;
 #else
@@ -402,7 +402,7 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
         }
         if (times >= HCOMM_URMA_MAX_RETRY_TIMES) {
             KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA Poll CQ timeout curTail=%u expectIdx=%u \n", curTail, expectIdx);
-            HcommUrmaDumpCqeCtx(cqeUb);
+            ASCENDC_HCCL_API_ASSERT(false, { HcommUrmaDumpCqeCtx(cqeUb); }, "Hcomm URMA dump CQE context.");
             return 0xFFU;
         }
         // check CQE status
@@ -411,7 +411,7 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
         constexpr uint8_t statusShift = 8;
         if (status != 0 || subStatus != 0) {
             KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA CQE failed status=%u subStatus=%u \n", status, subStatus);
-            HcommUrmaDumpCqeCtx(cqeUb);
+            ASCENDC_HCCL_API_ASSERT(false, { HcommUrmaDumpCqeCtx(cqeUb); }, "Hcomm URMA dump CQE context.");
             return (status << statusShift) | subStatus;
         }
         curTail++;
