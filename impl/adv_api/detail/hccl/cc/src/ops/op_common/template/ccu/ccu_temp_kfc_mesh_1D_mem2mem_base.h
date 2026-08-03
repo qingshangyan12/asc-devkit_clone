@@ -43,6 +43,44 @@ public:
     u64 GetThreadNum() const override { return 1; }
 
 protected:
+    HcclResult SelectChannelsOnSingleDie(HcclComm comm, std::vector<HcclChannelDesc>& channels) const
+    {
+        if (channels.empty()) {
+            return templateRankSize_ == 1 ? HCCL_SUCCESS : HCCL_E_UNAVAIL;
+        }
+
+        uint32_t targetDieId = 0;
+        CHK_RET(GetChannelDieId(comm, myRank_, channels.front(), targetDieId));
+        std::vector<HcclChannelDesc> selectedChannels;
+        selectedChannels.reserve(templateRankSize_ - 1);
+        for (u32 remoteRank : subCommRanks_[0]) {
+            if (remoteRank == myRank_) {
+                continue;
+            }
+            bool found = false;
+            for (const HcclChannelDesc& channel : channels) {
+                if (channel.remoteRank != remoteRank) {
+                    continue;
+                }
+                uint32_t dieId = 0;
+                CHK_RET(GetChannelDieId(comm, myRank_, channel, dieId));
+                if (dieId == targetDieId) {
+                    selectedChannels.push_back(channel);
+                    found = true;
+                    break;
+                }
+            }
+            CHK_PRT_RET(!found,
+                HCCL_WARNING("[SelectChannelsOnSingleDie] no channel from rank[%u] to rank[%u] on die[%u].",
+                    myRank_, remoteRank, targetDieId),
+                HCCL_E_UNAVAIL);
+        }
+        HCCL_INFO("[SelectChannelsOnSingleDie] select [%zu] channels on die[%u] from [%zu] candidates.",
+            selectedChannels.size(), targetDieId, channels.size());
+        channels.swap(selectedChannels);
+        return HCCL_SUCCESS;
+    }
+
     uint32_t mySubCommRank_{0};
 };
 

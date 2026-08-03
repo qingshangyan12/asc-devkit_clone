@@ -33,6 +33,7 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
 
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
+    CHK_RET(SelectChannelsOnSingleDie(comm, channelDescs));
 
     // CcuKernelKfcServer replaces this placeholder before registration and reuses these Mesh1D channels.
     kernelInfo.channels = channelDescs;

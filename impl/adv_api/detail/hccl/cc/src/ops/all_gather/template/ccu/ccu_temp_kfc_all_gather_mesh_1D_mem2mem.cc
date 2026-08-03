@@ -45,6 +45,7 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::CalcRes(
             }
         }
     }
+    CHK_RET(SelectChannelsOnSingleDie(comm, channelDescs));
 
     // CcuKernelKfcServer replaces this placeholder before registration and reuses these channels.
     kernelInfo.channels = channelDescs;

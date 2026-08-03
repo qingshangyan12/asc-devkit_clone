@@ -82,8 +82,14 @@ void MissionPostSync(KfcServerContext& ctx) { (void)ctx; }
 
 CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnStartSig, KfcServerContext& ctx)
 {
-    (void)ctx;
-    CCU_CHK_RET(ccu::Load(hbmSigAddr, turnStartSig));
+    const uint32_t getDieId = 1;
+    // 单Die场景：等待HBM中的信号
+    CCU_WHILE(turnStartSig != 1)
+    {
+        CCU_CHK_RET(ccu::Load(hbmSigAddr, turnStartSig)); // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
+    }
+    turnStartSig = 0;                                  // reset Xn
+    CCU_CHK_RET(ccu::Store(hbmSigAddr, turnStartSig)); // reset HBM
     return CCU_SUCCESS;
 }
 
@@ -164,32 +170,26 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 
     CCU_WHILE(repeatCond == 0)
     {
-        // 由外层loop轮询开始信号，避免在LoopGroup中嵌套基于Variable的loop。
-        CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));
-        CCU_IF(turnStartSig == 1)
+        CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
+        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
+        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
-            turnStartSig = 0;
-            CCU_CHK_RET(ccu::Store(waitAddr, turnStartSig));
-            CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
-            CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
-            CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
-            {
-                MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-                DispatchKfcSubKernel(param, ctx);
-                MissionPostSync(ctx);
-                CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
-            }
-            waitAddr += ckeSize;
-            recordAddr += ckeSize;
-            paramAddr += paramSize;
-            queueIdx += one;
-            CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))
-            {
-                waitAddr = ctx.waitAddr;
-                recordAddr = ctx.recordAddr;
-                paramAddr = ctx.xnAddr;
-                queueIdx = 0;
-            }
+            MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
+            DispatchKfcSubKernel(param, ctx);
+            MissionPostSync(ctx);
+            CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
+        }
+        waitAddr += ckeSize;
+        recordAddr += ckeSize;
+        paramAddr += paramSize;
+        queueIdx += one;
+        CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))
+        {
+            waitAddr = ctx.waitAddr;
+            recordAddr = ctx.recordAddr;
+            paramAddr = ctx.xnAddr;
+            queueIdx = 0;
         }
     }
     return CCU_SUCCESS;
