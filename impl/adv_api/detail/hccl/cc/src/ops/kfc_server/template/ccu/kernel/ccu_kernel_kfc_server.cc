@@ -124,21 +124,21 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
 {
     ccu::Variable opType;
     opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
-    CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
-    {
-        CcuKfcAllGatherMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-            ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
-    }
-    CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER))
-    {
-        CcuReduceScatterMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
-            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
-            ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
-    }
+    // CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
+    // {
+    //     CcuKfcAllGatherMesh1DMem2MemKernel(
+    //         param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
+    //         param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
+    //         ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+    // }
+    // CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER))
+    // {
+    //     CcuReduceScatterMesh1DMem2MemKernel(
+    //         param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
+    //         param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
+    //         static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
+    //         ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+    // }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLREDUCE))
     {
         // FillCachedArgs order: [0]inputAddr [1]outputAddr [2]token [3]scratchAddr
@@ -149,12 +149,12 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
         // HBM param[0] = control word; token (cachedArgs[2]) skipped, uses ctx.token;
         // remaining cachedArgs[N>=3] map to param[N] (offset by 1 for control word, minus 1 for skipped token = net 0)
         CcuKfcAllReduceMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
-            param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
-            param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10],
-            param[HBM_PARAM_IDX_11], param[HBM_PARAM_IDX_12], param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14],
-            ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
-            ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
+            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
+            param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], param[HBM_PARAM_IDX_12],
+            param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14], ctx.arg->channels, ctx.arg->channelCount,
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
+            ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
     }
 }
 
@@ -261,7 +261,7 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
     CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
-    CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
+    // CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }

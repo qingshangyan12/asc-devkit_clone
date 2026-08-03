@@ -28,8 +28,7 @@ void InheritKfcServerKernelArg(
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isReduceScatter =
         srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
-    const bool isAllReduce =
-        srcName == "CcuAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
+    const bool isAllReduce = srcName == "CcuAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
     if (isAllGather || isReduceScatter || isAllReduce) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;

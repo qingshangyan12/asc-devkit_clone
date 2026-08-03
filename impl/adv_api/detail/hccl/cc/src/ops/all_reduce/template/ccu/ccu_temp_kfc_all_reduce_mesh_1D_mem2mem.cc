@@ -39,7 +39,8 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::CalcSlice(const u64 dataSize, RankS
     u64 unitAllignSize = DataTypeSizeGet(dataType_);
     u64 chunkSize = RoundUp(dataSize, (templateRankSize_ * unitAllignSize)) * unitAllignSize;
     HCCL_INFO(
-        "[CcuTempKfcAllReduceMesh1DMem2Mem] chunkSize[%llu], dataSize[%llu], templateRankSize_[%u], unitAllignSize[%llu]",
+        "[CcuTempKfcAllReduceMesh1DMem2Mem] chunkSize[%llu], dataSize[%llu], templateRankSize_[%u], "
+        "unitAllignSize[%llu]",
         chunkSize, dataSize, templateRankSize_, unitAllignSize);
     u64 accumOff = 0;
     for (u32 rankIdx = 0; rankIdx < templateRankSize_; rankIdx++) {
@@ -52,8 +53,8 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::CalcSlice(const u64 dataSize, RankS
     CHK_PRT_RET(
         (sliceInfoVec[templateRankSize_ - 1][0].offset + sliceInfoVec[templateRankSize_ - 1][0].size != dataSize),
         HCCL_ERROR(
-            "[CcuTempKfcAllReduceMesh1DMem2Mem] chunkSize:[%llu], Rank:[%d], SliceInfo calculation error!",
-            chunkSize, myRank_),
+            "[CcuTempKfcAllReduceMesh1DMem2Mem] chunkSize:[%llu], Rank:[%d], SliceInfo calculation error!", chunkSize,
+            myRank_),
         HcclResult::HCCL_E_INTERNAL);
     return HcclResult::HCCL_SUCCESS;
 }
@@ -120,15 +121,16 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::KernelRun(
     config.loopCount = CCU_M2M_LOCAL_COPY_LOOP_COUNT;
     config.memSlice = CCU_MS_SIZE;
     const std::vector<uint64_t> goSize = (mySubCommRank_ != templateRankSize_ - 1) ?
-        CalGoSize(normalSliceSize, config) : CalGoSize(lastSliceSize, config);
+                                             CalGoSize(normalSliceSize, config) :
+                                             CalGoSize(lastSliceSize, config);
 
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
     CHK_RET(FillCachedArgs(
         submitInfo, inputAddr, outputAddr, token, scratchAddr, currentRankSliceInputOffset,
-        currentRankSliceOutputOffset, normalSliceSize, lastSliceSize, mySliceSize, sliceOffset,
-        isInputOutputEqual, goSize[0], goSize[1], goSize[2], goSize[3],
-        buffInfo_.inBuffBaseOff, buffInfo_.outBuffBaseOff, buffInfo_.hcclBuffBaseOff));
+        currentRankSliceOutputOffset, normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual,
+        goSize[0], goSize[1], goSize[2], goSize[3], buffInfo_.inBuffBaseOff, buffInfo_.outBuffBaseOff,
+        buffInfo_.hcclBuffBaseOff));
     templateResource.submitInfos.push_back(submitInfo);
 
     return HcclResult::HCCL_SUCCESS;
