@@ -87,13 +87,13 @@ inline void InitTilingData() {}
             self._write(sk_bind, "void sk_bind() {}\n")
             self._write(tiling_header, self._tiling_header())
             self._write(compile_log, """// Stage: CompileStage.COMPILE
-/opt/ascend/bin/bisheng -c {wrapper} -include {header} -DTILING_KEY_VAR=1UL -o {temp}/key1.o
+/opt/ascend/bin/bisheng -c {wrapper} -I/opt/ascend/include -I/opt/ascend/impl -I/opt/ascend/include -include {header} -DTILING_KEY_VAR=1UL -o {temp}/key1.o
 // Stage: CompileStage.COMPILE
-/opt/ascend/bin/bisheng -c {wrapper} -include {header} -DTILING_KEY_VAR=2UL -o {temp}/key2.o
+/opt/ascend/bin/bisheng -c {wrapper} -I/opt/ascend/include -I/opt/ascend/impl -I/opt/ascend/include -include {header} -DTILING_KEY_VAR=2UL -o {temp}/key2.o
 // Stage: CompileStage.COMPILE
-/opt/ascend/bin/bisheng -c {sk_wrapper} -include {header} -DTILING_KEY_VAR=1UL -o {temp}/sk_key1.o
+/opt/ascend/bin/bisheng -c {sk_wrapper} -I/opt/ascend/include -I/opt/ascend/impl -I/opt/ascend/include -include {header} -DTILING_KEY_VAR=1UL -o {temp}/sk_key1.o
 // Stage: CompileStage.COMPILE
-/opt/ascend/bin/bisheng -c {sk_wrapper} -include {header} -DTILING_KEY_VAR=2UL -o {temp}/sk_key2.o
+/opt/ascend/bin/bisheng -c {sk_wrapper} -I/opt/ascend/include -I/opt/ascend/impl -I/opt/ascend/include -include {header} -DTILING_KEY_VAR=2UL -o {temp}/sk_key2.o
 // Stage: CompileStage.COMPILE
 /opt/ascend/bin/bisheng -c {sk_bind} -DTILING_KEY_VAR=0 -o {temp}/sk_bind.o
 // Stage: CompileStage.FATBIN
@@ -132,15 +132,29 @@ inline void InitTilingData() {}
             with open(os.path.join(temp_dir, manifest_name), "r") as manifest_file:
                 manifest = json.load(manifest_file)
             self.assertEqual(
-                set(manifest), {"schema_version", "binId", "soc_version", "source_file", "kernels"})
+                set(manifest),
+                {"schema_version", "binId", "soc_version", "source_file", "options", "files", "kernels"})
             self.assertEqual(manifest["schema_version"], "4.0")
             self.assertTrue(manifest["soc_version"])
             self.assertEqual(manifest["source_file"], "add_custom.cpp")
             self.assertRegex(manifest["binId"], r"^[0-9a-f]{64}$")
+            self.assertEqual(manifest["options"], {"common_include": [
+                "-I${env:ASCEND_HOME_PATH}/include",
+                "-I${env:ASCEND_HOME_PATH}/impl",
+                "-I${env:ASCEND_HOME_PATH}/include",
+            ]})
             self.assertEqual([item["kernel_name"] for item in manifest["kernels"]], [
                 "AddCustom_ab1b6750d7f510985325b603cb06dc8b_1",
                 "AddCustom_ab1b6750d7f510985325b603cb06dc8b_2",
             ])
+            self.assertTrue(all(set(item) == {"file_name", "file_path"}
+                                for item in manifest["files"]))
+            self.assertEqual(
+                {item["file_path"] for item in manifest["files"]},
+                {"/manifests/AddCustom_ab1b6750d7f510985325b603cb06dc8b/resources/{}".format(
+                    item["file_name"]) for item in manifest["files"]})
+            self.assertTrue(any(item["file_name"].endswith("_sk_bind.cpp")
+                                for item in manifest["files"]))
 
             resources = os.path.join(temp_dir, "resources")
             with open(os.path.join(resources, "AddCustom_ab1b6750d7f510985325b603cb06dc8b_kernel.cpp")) as wrapper_file:
@@ -162,17 +176,9 @@ inline void InitTilingData() {}
                 self.assertEqual(static_input["name"], expected_struct)
                 self.assertEqual(static_input["parameter_index"], 4)
                 self.assertEqual(static_input["byte_size"], expected_size)
-                self.assertEqual(static_input["file"], "resources/" + merged_name)
+                self.assertEqual(static_input["file"], merged_name)
                 self.assertEqual(static_input["template"], STATIC_TILING_TOKEN)
-                self.assertEqual(set(kernel), {"kernel_name", "constants_info", "files", "commands"})
-                self.assertTrue(all(set(item) == {"file_name", "file_path"}
-                                    for item in kernel["files"]))
-                self.assertEqual(
-                    {item["file_path"] for item in kernel["files"]},
-                    {"/manifests/AddCustom_ab1b6750d7f510985325b603cb06dc8b/resources/{}".format(
-                        item["file_name"]) for item in kernel["files"]})
-                self.assertTrue(any(item["file_name"].endswith("_sk_bind.cpp")
-                                    for item in kernel["files"]))
+                self.assertEqual(set(kernel), {"kernel_name", "constants_info", "commands"})
                 self.assertEqual(set(kernel["commands"][0]), {"type", "mode", "options", "output"})
                 self.assertEqual({command["mode"] for command in kernel["commands"]},
                                  {"normal", "sk"})
@@ -188,6 +194,12 @@ inline void InitTilingData() {}
                 self.assertTrue(any(value.startswith("${resource:resources/")
                                     for command in kernel["commands"]
                                     for value in command["options"]))
+                self.assertTrue(any(
+                    "${options:common_include}" in command["options"]
+                    for command in kernel["commands"] if command["type"] == "bisheng"))
+                self.assertFalse(any(
+                    value.startswith("-I${env:ASCEND_HOME_PATH}")
+                    for command in kernel["commands"] for value in command["options"]))
 
     def test_keeps_real_mixed_core_compile_and_link_chain(self):
         with TemporaryDirectory() as temp_dir:

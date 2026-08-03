@@ -27,6 +27,8 @@ LOG_STAGE_PATTERN = re.compile(r"^// Stage: CompileStage\.([A-Z_]+)$")
 RECIPE_STAGES = {"COMPILE", "FATBIN", "LINKRELOCATE"}
 TILING_KEY_PATTERN = re.compile(r"^-DTILING_KEY_VAR=([^U]+)UL$")
 SOURCE_DIR_OPTION = "-I${source_dir}"
+COMMON_INCLUDE_PREFIX = "-I${env:ASCEND_HOME_PATH}"
+COMMON_INCLUDE_MARKER = "${options:common_include}"
 
 
 class OpCompileManifestRecorder:
@@ -146,17 +148,19 @@ class OpCompileManifestRecorder:
                         "name": tiling_struct,
                         "parameter_index": int(tiling_parameter_index),
                         "byte_size": byte_size,
-                        "file": self.merged_tiling_file,
+                        "file": os.path.basename(self.merged_tiling_file),
                         "template": STATIC_TILING_TOKEN,
                     }],
-                    "files": files,
                     "commands": recipe_commands,
                 })
+            common_includes = self._extract_common_includes(kernels)
             manifest = {
                 "schema_version": SCHEMA_VERSION,
                 "binId": self.bin_id,
                 "soc_version": self.soc_version,
                 "source_file": os.path.basename(self.source_file),
+                "options": {"common_include": common_includes},
+                "files": files,
                 "kernels": kernels,
             }
             with open(self.manifest_path, "w") as output:
@@ -392,6 +396,39 @@ class OpCompileManifestRecorder:
             except ValueError:
                 continue
         return True
+
+    @staticmethod
+    def _extract_common_includes(kernels):
+        common_includes = None
+        for kernel in kernels:
+            for command in kernel["commands"]:
+                includes = [
+                    option for option in command["options"]
+                    if option.startswith(COMMON_INCLUDE_PREFIX)
+                ]
+                if not includes:
+                    continue
+                if common_includes is None:
+                    common_includes = includes
+                elif includes != common_includes:
+                    raise RuntimeError("commands contain inconsistent common include options")
+
+        if common_includes is None:
+            return []
+
+        for kernel in kernels:
+            for command in kernel["commands"]:
+                options = command["options"]
+                first = next((index for index, option in enumerate(options)
+                              if option.startswith(COMMON_INCLUDE_PREFIX)), None)
+                if first is None:
+                    continue
+                command["options"] = [
+                    option for option in options
+                    if not option.startswith(COMMON_INCLUDE_PREFIX)
+                ]
+                command["options"].insert(first, COMMON_INCLUDE_MARKER)
+        return common_includes
 
     @staticmethod
     def _command_tiling_key(tokens):

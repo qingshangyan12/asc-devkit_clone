@@ -5174,7 +5174,7 @@ class TilingDataShort {};
             with open(compile_log, 'w') as fd:
                 for key in ("1", "2"):
                     fd.write("// Stage: CompileStage.COMPILE\n")
-                    fd.write("/opt/cann/bin/bisheng -c {} -include {} -DTILING_KEY_VAR={}UL -o {}/out_{}.o\n".format(
+                    fd.write("/opt/cann/bin/bisheng -c {} -I/opt/cann/include -include {} -DTILING_KEY_VAR={}UL -o {}/out_{}.o\n".format(
                         wrapper_source, tiling_source, key, temp_dir, key))
 
             op_info = Mock(op_type="AddCustom", kernel_name="AddCustom_deadbeef")
@@ -5203,10 +5203,13 @@ class TilingDataShort {};
             with open(os.path.join(temp_dir, "AddCustom_deadbeef_manifest.json"), 'r') as fd:
                 manifest = json.load(fd)
             self.assertEqual(
-                set(manifest), {"schema_version", "binId", "soc_version", "source_file", "kernels"})
+                set(manifest),
+                {"schema_version", "binId", "soc_version", "source_file", "options", "files", "kernels"})
             self.assertEqual(manifest["schema_version"], "4.0")
             self.assertEqual(manifest["source_file"], "add_custom.cpp")
             self.assertEqual(len(manifest["binId"]), 64)
+            self.assertEqual(manifest["options"], {
+                "common_include": ["-I${env:ASCEND_HOME_PATH}/include"]})
             kernel = manifest["kernels"][0]
             self.assertEqual(kernel["kernel_name"], "AddCustom_deadbeef_1")
             static_input = kernel["constants_info"][0]
@@ -5214,22 +5217,25 @@ class TilingDataShort {};
                 "name": "TilingData",
                 "parameter_index": 4,
                 "byte_size": 96,
-                "file": "resources/AddCustom_deadbeef_tiling_data.h",
+                "file": "AddCustom_deadbeef_tiling_data.h",
                 "template": "@@STATIC_VALUE_tiling_data@@",
             })
             self.assertNotIn("artifacts", kernel)
             self.assertEqual(
-                {item["file_path"] for item in kernel["files"]},
+                {item["file_path"] for item in manifest["files"]},
                 {"/manifests/AddCustom_deadbeef/resources/{}".format(item["file_name"])
-                 for item in kernel["files"]})
-            self.assertTrue(all("mode" not in item for item in kernel["files"]))
+                 for item in manifest["files"]})
+            self.assertTrue(all("mode" not in item for item in manifest["files"]))
             normal_commands = kernel["commands"]
             self.assertEqual([command["type"] for command in normal_commands], ["bisheng"])
             self.assertEqual(normal_commands[0]["mode"], "normal")
             self.assertIn("${resource:resources/AddCustom_deadbeef_kernel.cpp}",
                           normal_commands[0]["options"])
             self.assertIn("-I${source_dir}", normal_commands[0]["options"])
-            static_header = os.path.join(temp_dir, *static_input["file"].split('/'))
+            self.assertIn("${options:common_include}", normal_commands[0]["options"])
+            self.assertFalse(any(option.startswith("-I${env:ASCEND_HOME_PATH}")
+                                 for option in normal_commands[0]["options"]))
+            static_header = os.path.join(temp_dir, "resources", static_input["file"])
             with open(static_header, 'r') as fd:
                 header = fd.read()
             self.assertIn("#define TILING_DATA_LENGTH 96", header)
