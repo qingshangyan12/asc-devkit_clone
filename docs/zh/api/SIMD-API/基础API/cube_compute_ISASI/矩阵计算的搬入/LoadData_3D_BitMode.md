@@ -57,7 +57,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
-| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；<br>&nbsp;&nbsp;&bull; B2：ZN格式；<br>&nbsp;&nbsp;&bull; A1/B1：无格式要求，一般情况下为NZ格式。 |
+| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; L0A Buffer（A2）：ZZ格式/NZ格式；<br>&nbsp;&nbsp;&bull; L0B Buffer（B2）：ZN格式；<br>&nbsp;&nbsp;&bull; L1 Buffer（A1/B1）：无格式要求，一般情况下为NZ格式。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为：<br>&nbsp;&nbsp;&bull; Load3DBitModeParam，具体参考[表3](#table106611666584)。<br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 

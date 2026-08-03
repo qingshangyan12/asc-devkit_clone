@@ -87,13 +87,13 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 - <a name="li1975762118172"></a>搬运模式的配置示例
     - Normal模式
 
-        blockLen为48，每个连续传输数据块包含48字节；srcStride为0，因为源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，因为目的操作数的逻辑位置为L1 Buffer，dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间无间隔，注意数据块包含leftPadding/rightPadding数据。
+        blockLen为48，每个连续传输数据块包含48字节；srcStride为0，因为源操作数的存储位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，因为目的操作数的存储位置为L1 Buffer（A1），dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间无间隔，注意数据块包含leftPadding/rightPadding数据。
 
         blockLen + leftPadding + rightPadding满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，每个连续传输数据块都会在右侧填充16字节。目的操作数的总长度为192字节。
 
     - Compact模式
 
-        blockLen为48，每个连续传输数据块包含48字节；srcStride为0，因为源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，因为目的操作数的逻辑位置为L1 Buffer，dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间紧密排列，不会填充数据。
+        blockLen为48，每个连续传输数据块包含48字节；srcStride为0，因为源操作数的存储位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，因为目的操作数的存储位置为L1 Buffer（A1），dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间紧密排列，不会填充数据。
 
         **Compact模式下leftPadding、rightPadding均不生效**，有效数据紧密排列后，统一在整块数据末尾补齐至32字节对齐。此处示例中，blockLen \* blockCount = 48 \* 3 = 144字节，在整块数据末尾补齐16字节满足32字节对齐，目的操作数的总长度为160字节。
 
