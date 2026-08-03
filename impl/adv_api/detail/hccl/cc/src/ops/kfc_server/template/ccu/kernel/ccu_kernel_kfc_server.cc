@@ -113,25 +113,25 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
     return CCU_SUCCESS;
 }
 
-static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
+static CcuResult DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
-    ccu::Variable opType;
-    opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
-    CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
-    {
-        CcuKfcAllGatherMesh1DMem2MemKernel(
+    // opType is fixed in CcuKernelArgKfcServer when the kernel is registered. Select the sub-kernel while building
+    // the CCU representation so an op-specific KFC kernel does not carry the resources and instructions of all ops.
+    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+        return CcuKfcAllGatherMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
             ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
     }
-    CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER))
-    {
-        CcuReduceScatterMesh1DMem2MemKernel(
+    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+        return CcuReduceScatterMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
     }
+    HCCL_ERROR("[DispatchKfcSubKernel] unsupported opType[%u]", static_cast<uint32_t>(ctx.arg->opParam.opType));
+    return CcuResult::CCU_E_NOT_SUPPORT;
 }
 
 CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
@@ -176,7 +176,7 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-            DispatchKfcSubKernel(param, ctx);
+            CCU_CHK_RET(DispatchKfcSubKernel(param, ctx));
             MissionPostSync(ctx);
             CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
         }
@@ -213,7 +213,7 @@ CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
 
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
-        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) { DispatchKfcSubKernel(param, ctx); }
+        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) { CCU_CHK_RET(DispatchKfcSubKernel(param, ctx)); }
         MissionPostSync(ctx);
     }
     return CCU_SUCCESS;
