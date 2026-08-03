@@ -47,7 +47,7 @@ AI处理器的型号请通过如下方式获取：
 <!-- end id6 -->
 
 <!-- npu="950" id7 -->
--   针对Ascend 950PR/Ascend 950DT，在安装AI处理器的服务器执行**npu-smi info -t board -i **_id_命令进行查询，获取**Chip Name**和**NPU Name**信息，实际配置值为Chip Name\_NPU Name。例如**Chip Name**取值为Ascendxxx，**NPU Name**取值为1234，实际配置值为Ascend_xxx_1234。
+-   针对Ascend 950PR/Ascend 950DT，在安装AI处理器的服务器执行**npu-smi info -t board -i **_id_命令进行查询，获取**Chip Name**和**NPU Name**信息，实际配置值为Chip Name\_NPU Name。例如**Chip Name**取值为Ascendxxx，**NPU Name**取值为1234，实际配置值为Ascendxxx_1234。
 
     其中，id为设备id，通过**npu-smi info -l**命令查出的NPU ID即为设备id。
 <!-- end id7 -->
