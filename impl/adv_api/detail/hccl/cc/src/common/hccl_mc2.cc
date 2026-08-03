@@ -18,6 +18,8 @@
 #include "ccu_assist_pub.h"
 #include "hccl_ccu_res.h"
 #include "adapter_acl.h"
+#include <cstdlib>
+#include <cstring>
 
 using namespace mc2_ops_hccl;
 
@@ -294,8 +296,14 @@ HcclResult AllocComResourceByTilingCcu(
     return HCCL_SUCCESS;
 }
 
-HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
-    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+namespace {
+bool IsUseCcuKfcEnabled()
+{
+    const char* useCcuKfc = std::getenv("USE_CCU_KFC");
+    return useCcuKfc != nullptr && std::strcmp(useCcuKfc, "1") == 0;
+}
+
+HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     HCCL_RUN_INFO(
         "[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
@@ -336,23 +344,29 @@ HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     uint32_t tilingNum;
     CHK_RET(HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum));
 
-    // 校验commengine
     uint8_t commEngine;
     CHK_RET(ObtainCommEngine(ccTilingList, tilingNum, commEngine));
 
-    // 根据commEngine类型分发到对应的资源分配流程
     std::string ctxTag;
     if (commEngine == static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) {
-        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == AICPU_TS!");
+        HCCL_INFO("[HcclAllocComResourceByTiling] commEngine is AICPU_TS, use AICPU flow.");
         CHK_RET(AllocComResourceByTilingAicpu(
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
-        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_SCHED!");
+        if (!IsUseCcuKfcEnabled()) {
+            HCCL_ERROR(
+                "[HcclAllocComResourceByTiling] commEngine is CCU_SCHED, but USE_CCU_KFC is not set to 1. "
+                "CCU KFC flow is disabled.");
+            return HCCL_E_NOT_SUPPORT;
+        }
+        HCCL_INFO(
+            "[HcclAllocComResourceByTiling] USE_CCU_KFC is enabled and commEngine is CCU_SCHED, "
+            "use CCU KFC flow.");
         CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum));
         CHK_RET(AllocComResourceByTilingCcu(
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else {
-        HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, commEngine);
+        HCCL_ERROR("[HcclAllocComResourceByTiling] unsupported commEngine[%u].", commEngine);
         return HCCL_E_NOT_SUPPORT;
     }
 
@@ -360,15 +374,12 @@ HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
     return HCCL_SUCCESS;
 }
+} // namespace
 
-extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingA5Mc2(
+HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
-    HCCL_RUN_INFO(
-        "[MC2_CLIENT_A5_AICPU] enter asc-devkit explicit A5 MC2 resource allocator, "
-        "comm[%p], stream[%p], tiling[%p].",
-        comm, stream, mc2Tiling);
-    return HcclAllocComResourceByTiling(comm, stream, mc2Tiling, opResCtx);
+    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
 }
 
 namespace {

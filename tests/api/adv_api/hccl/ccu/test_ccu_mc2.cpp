@@ -44,6 +44,7 @@ static void StubCleanup()
     g_stubRankId = 0;
     g_stubDeviceType = DevType::DEV_TYPE_950;
     unsetenv("HCCL_OP_EXPANSION_MODE");
+    unsetenv("USE_CCU_KFC");
 }
 
 static void SetCommEngineEnv(uint8_t commEngine)
@@ -57,6 +58,11 @@ static void SetCommEngineEnv(uint8_t commEngine)
     } else {
         unsetenv("HCCL_OP_EXPANSION_MODE");
     }
+}
+
+static void EnableCcuKfc()
+{
+    setenv("USE_CCU_KFC", "1", 1);
 }
 
 static TopoMeta BuildTopoMeta(uint32_t rankSize)
@@ -85,8 +91,11 @@ static Mc2TilingTestData BuildMc2Tiling(
 {
     SetCommEngineEnv(commEngine);
     Mc2TilingTestData tiling{};
-    tiling.version = commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED) ? INIT_TILING_CCU_NEW_VERSION :
-                                                                                      INIT_TILING_VERSION;
+    const char* useCcuKfc = std::getenv("USE_CCU_KFC");
+    const bool useCcuKfcEnabled = useCcuKfc != nullptr && std::strcmp(useCcuKfc, "1") == 0;
+    tiling.version = useCcuKfcEnabled && commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED) ?
+                         INIT_TILING_CCU_NEW_VERSION :
+                         INIT_TILING_VERSION;
     tiling.cnt = tilingNum;
     uint32_t baseOffset = offsetof(Mc2TilingTestData, ccTiling);
     for (uint32_t i = 0; i < Hccl::MC2_MAX_OP_NUM; ++i) {
@@ -173,6 +182,7 @@ TEST_F(CcuMc2TestSuite, AllocCcuOpResCtx_ReuseExistingMemory)
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather)
 {
+    EnableCcuKfc();
     SetCommEngineEnv(COMM_ENGINE_CCU);
 
     OpResCtx resCtx{};
@@ -191,6 +201,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather)
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterKfcMesh1DMem2Mem)
 {
+    EnableCcuKfc();
     SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
 
     OpResCtx resCtx{};
@@ -212,6 +223,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterKfcMesh1DMem2Mem)
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterRejectsInt8)
 {
+    EnableCcuKfc();
     SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
 
     OpResCtx resCtx{};
@@ -229,6 +241,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterRejectsInt8)
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterRejects64BitTypes)
 {
+    EnableCcuKfc();
     SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
     const std::vector<uint8_t> unsupportedTypes = {HCCL_DATA_TYPE_INT64, HCCL_DATA_TYPE_UINT64, HCCL_DATA_TYPE_FP64};
 
@@ -249,6 +262,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterRejects64BitTypes)
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterRejectsProd)
 {
+    EnableCcuKfc();
     SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
 
     OpResCtx resCtx{};
@@ -372,6 +386,7 @@ TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
 {
+    setenv("USE_CCU_KFC", "1", 1);
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
     void* opResCtx = nullptr;
@@ -391,6 +406,7 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_ReduceScatterCcuPath)
 {
+    setenv("USE_CCU_KFC", "1", 1);
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
     void* opResCtx = nullptr;
@@ -413,11 +429,31 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuPath)
     ASSERT_NE(opResCtx, nullptr);
 }
 
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_UseCcuKfcWithAicpuStillUsesLegacyPath)
+{
+    EnableCcuKfc();
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, COMM_ENGINE_AICPU, opTypes, nullptr);
+    void* opResCtx = nullptr;
+    HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
+    EXPECT_EQ(ret, HCCL_SUCCESS);
+    ASSERT_NE(opResCtx, nullptr);
+}
+
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_MixedOpsRejected)
 {
+    setenv("USE_CCU_KFC", "1", 1);
     uint32_t opTypes[] = {
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)};
     Mc2TilingTestData tiling = BuildMc2Tiling(2, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    void* opResCtx = nullptr;
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_NOT_SUPPORT);
+}
+
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPathRequiresUseCcuKfc)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
     void* opResCtx = nullptr;
     EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_NOT_SUPPORT);
 }
@@ -469,6 +505,7 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_UnsupportedEngine)
 
 TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
 {
+    EnableCcuKfc();
     SetCommEngineEnv(COMM_ENGINE_CCU);
 
     // 动态获取CCL buffer地址
@@ -543,6 +580,7 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
 
 TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
 {
+    EnableCcuKfc();
     SetCommEngineEnv(COMM_ENGINE_CCU);
 
     // 动态获取CCL buffer地址
