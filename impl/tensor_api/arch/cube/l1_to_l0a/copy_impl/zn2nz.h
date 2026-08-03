@@ -43,6 +43,26 @@ public:
         }
     }
 
+    template <const CopyL12L0ATrait& trait, typename T, typename U, typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+        auto srcShape = MakeSliceShape(coordSrc, src.Layout(), shape);
+        auto regionShape = srcShape;
+        auto dstOffset = dst.Layout()(coordDst);
+        auto srcOffset = src.Layout()(coordSrc);
+        using DstType = typename T::elementType;
+        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
+        auto mStep = GetTotalColumnShapeFromShape(regionShape) / FRACTAL_FIXED;
+        auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dst.Layout()) *
+            GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dst.Layout()) / C0_ELEMENT<DstType>;
+        auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(src.Layout()) / STRIDE_UNIT;
+        auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dst.Layout()) / STRIDE_UNIT;
+        LoadCbufToCa::LoadDataRegion<true>(
+            dst, src, dstOffset, srcOffset, 0, 0, mStep, kStep, srcStride, dstStride);
+    }
+
 private:
     template <const CopyL12L0ATrait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()

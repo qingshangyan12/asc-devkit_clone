@@ -376,8 +376,8 @@ public:
 
         if constexpr (QUANT_MODE == QuantMode_t::NoQuant || QUANT_MODE == QuantMode_t::F322F16) {
             if constexpr (HAS_COORD) {
-                auto ubTensorTile = Slice(ubTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor);
+                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor,
+                    MakeCoord(base, base), ZeroCoord, MakeShape(m - base, n - base));
             } else {
                 Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor);
             }
@@ -386,16 +386,16 @@ public:
             auto qMatrixLayout = MakeFrameLayout<NDExtLayoutPtn>(1, nLength_);
             auto qTensor = MakeTensor(qIterator, qMatrixLayout);
             if constexpr (HAS_COORD) {
-                auto ubTensorTile = Slice(ubTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, qTensor);
+                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, qTensor,
+                    MakeCoord(base, base), ZeroCoord, MakeShape(m - base, n - base));
             } else {
                 Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, qTensor);
             }
         } else {
             uint64_t quant = 1;
             if constexpr (HAS_COORD) {
-                auto ubTensorTile = Slice(ubTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
-                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensorTile, l0cTensor, quant);
+                Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, quant,
+                    MakeCoord(base, base), ZeroCoord, MakeShape(m - base, n - base));
             } else {
                 Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, quant);
             }
