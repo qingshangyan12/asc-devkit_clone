@@ -65,20 +65,20 @@
 | 参数名 | 描述 |
 | --- | --- |
 | sync | 迭代获取C矩阵分片的过程分为同步和异步两种模式。通过该参数设置同步或者异步模式：同步模式设置为true；异步模式设置为false。默认为同步模式。具体模式的介绍和使用方法请参考[GetTensorC](GetTensorC.md)。 |
-| T | 用户申请的L0C Buffer（CO1）内存上LocalTensor的数据类型，即矩阵乘输出的C矩阵的数据类型。当前支持的数据类型为float、int32_t。 |
+| T | 用户申请的CO1内存上LocalTensor的数据类型，即矩阵乘输出的C矩阵的数据类型。当前支持的数据类型为float、int32_t。 |
 
 **表2**  接口内部管理L0C Buffer（CO1）的函数参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| enPartialSum | 输入 | 是否将矩阵乘的结果累加于现有的L0C Buffer（CO1）数据，默认值为false。在L0C累加时，只支持C矩阵规格为singleCoreM==baseM && singleCoreN==baseN。<!-- npu="310b" id11 --><br><br>针对Atlas 200I/500 A2 推理产品，该参数仅支持配置为false。<!-- end id11 --> |
+| enPartialSum | 输入 | 是否将矩阵乘的结果累加于现有的CO1数据，默认值为false。在L0C累加时，只支持C矩阵规格为singleCoreM==baseM && singleCoreN==baseN。<!-- npu="310b" id11 --><br><br>针对Atlas 200I/500 A2 推理产品，该参数仅支持配置为false。<!-- end id11 --> |
 
 **表3**  用户自主管理L0C Buffer（CO1）的函数参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| enPartialSum | 输入 | 是否将矩阵乘的结果累加于现有的L0C Buffer（CO1）数据。在L0C累加时，只支持C矩阵规格为singleCoreM==baseM && singleCoreN==baseN。 |
-| localCmatrix | 输出 | 由用户申请的L0C Buffer（CO1）上的LocalTensor内存，用于存放矩阵乘的计算结果。 |
+| enPartialSum | 输入 | 是否将矩阵乘的结果累加于现有的CO1数据。在L0C累加时，只支持C矩阵规格为singleCoreM==baseM && singleCoreN==baseN。 |
+| localCmatrix | 输出 | 由用户申请的CO1上的LocalTensor内存，用于存放矩阵乘的计算结果。 |
 
 ## 返回值说明
 
