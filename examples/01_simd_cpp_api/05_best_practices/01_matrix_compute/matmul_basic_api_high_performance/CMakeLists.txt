@@ -12,14 +12,18 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
-set(SCENARIO_NUM 1 CACHE STRING "Scenario number to compile (1-2)")
+set(SCENARIO_NUM 0 CACHE STRING "Case number to compile (0-7)")
+
+if(NOT SCENARIO_NUM MATCHES "^[0-7]$")
+    message(FATAL_ERROR "Unsupported SCENARIO_NUM=${SCENARIO_NUM}, only 0-7 are supported")
+endif()
 
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    mmad.asc
+    mmad_case${SCENARIO_NUM}.asc
 )
 
 if(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
