@@ -272,7 +272,13 @@ inline std::string GenBlockStr()
 
 #else
 
+#if defined(ASCENDC_DEBUG) && defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)) && \
+    !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
+#define KERNEL_LOG(level, format, ...) __asc_aicore::PRINTF(format, ##__VA_ARGS__)
+#else
 #define KERNEL_LOG(level, format, ...)
+#endif
 #if !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
 
 #define ASCENDC_ASSERT(cond, behavior)

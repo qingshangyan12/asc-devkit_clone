@@ -362,7 +362,9 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     if constexpr (commit) {
         st_dev(curHead, reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.dbVa), 0);
     }
+#if defined(ASCENDC_DEBUG)
     HcommUrmaDumpWqeCtx(sqeCtx, sizeof(T));
+#endif
     return HCOMM_SUCCESS;
 }
 
@@ -402,7 +404,9 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
         }
         if (times >= HCOMM_URMA_MAX_RETRY_TIMES) {
             KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA Poll CQ timeout curTail=%u expectIdx=%u \n", curTail, expectIdx);
+#if defined(ASCENDC_DEBUG)
             HcommUrmaDumpCqeCtx(cqeUb);
+#endif
             return 0xFFU;
         }
         // check CQE status
@@ -411,7 +415,9 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
         constexpr uint8_t statusShift = 8;
         if (status != 0 || subStatus != 0) {
             KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA CQE failed status=%u subStatus=%u \n", status, subStatus);
+#if defined(ASCENDC_DEBUG)
             HcommUrmaDumpCqeCtx(cqeUb);
+#endif
             return (status << statusShift) | subStatus;
         }
         curTail++;
