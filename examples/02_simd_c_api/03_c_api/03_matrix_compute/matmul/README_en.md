@@ -18,7 +18,7 @@ The data generation and verification scripts use only the Python standard librar
 
 | Product | CANN Version |
 |---------|--------------|
-| Ascend 950PR / Ascend 950DT | 9.0.0 to 9.1.0 |
+| Ascend 950PR / Ascend 950DT | >= 9.1.0 |
 
 ## Build and Run
 

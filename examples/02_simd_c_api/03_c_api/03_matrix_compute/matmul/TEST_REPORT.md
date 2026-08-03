@@ -11,7 +11,8 @@ MatMul C API 样例在 Ascend 950 实机上完成从空构建目录编译及三�
 | 测试日期 | 2026-08-03 |
 | 硬件 | Ascend 950 |
 | 架构 | `dav-3510` |
-| CANN | 9.0.0 beta2 |
+| CANN | 9.1.0 |
+| Driver | 25.7.rc1 |
 | Kernel | 单 Cube Core，FP32 `asc_mmad`，BiasTable 累加偏置 |
 
 ## 规格
@@ -43,7 +44,11 @@ MatMul C API 样例在 Ascend 950 实机上完成从空构建目录编译及三�
 
 ## 性能说明
 
-任务书未设置性能门槛。样例 `demo` 的单次端到端耗时分别为 6.02 s、6.00 s 和 6.20 s；该数据包含 ACL 初始化、H2D/D2H 和文件 I/O，不作为纯 Kernel 性能指标。
+任务书未设置性能门槛。CANN 9.1.0 `msprof` 实测 `matmul_custom` Kernel 单次执行耗时为 **6.760 us**（1 个 AI Core 任务）。
+
+独立进程端到端耗时中，首次冷启动 `random` 为 24.538 s，随后 `ones`、`zero_bias` 分别为 6.025 s、6.208 s；再次执行 `random` 为 7.411 s。端到端数据包含 ACL 初始化/反初始化、H2D/D2H 和文件 I/O，不作为纯 Kernel 性能指标。
+
+本次 CANN 9.1.0 验证使用仓库标准入口头 `c_api/asc_simd.h`，不再使用为 CANN 9.0 beta2 设置的头文件 include guard 兼容处理。
 
 ## 复现命令
 
@@ -64,4 +69,3 @@ done
 - 设计文档 PR：<https://gitcode.com/cann/cann-ops-competitions/pull/933>
 - 设计评审 Issue：<https://gitcode.com/cann/asc-devkit/issues/1397>
 - 易用性 Issue：<https://gitcode.com/cann/asc-devkit/issues/1398>
-

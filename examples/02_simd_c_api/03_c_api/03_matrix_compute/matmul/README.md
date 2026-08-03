@@ -37,7 +37,7 @@ GM(ND) -> L1(Nz) -> L0A/L0B -> Cube Mmad(+BiasTable) -> L0C -> GM(ND)
 
 | 产品 | CANN 版本 |
 |------|-----------|
-| Ascend 950PR / Ascend 950DT | 9.0.0 ~ 9.1.0 |
+| Ascend 950PR / Ascend 950DT | >= 9.1.0 |
 
 ## 目录结构
 
@@ -47,7 +47,6 @@ matmul/
 ├── README.md
 ├── README_en.md
 ├── TEST_REPORT.md
-├── asc_simd_override.h
 ├── data_utils.h
 ├── matmul.asc
 └── scripts/
