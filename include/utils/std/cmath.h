@@ -21,10 +21,9 @@
 #define AICORE_UTILS_STD_CMATH_H
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#include <cstdint>
 #include "stub_def.h"
 #endif
-
-#include <cstdint>
 
 namespace AscendC {
 #if defined(__NPU_ARCH__) &&                                                                                      \
