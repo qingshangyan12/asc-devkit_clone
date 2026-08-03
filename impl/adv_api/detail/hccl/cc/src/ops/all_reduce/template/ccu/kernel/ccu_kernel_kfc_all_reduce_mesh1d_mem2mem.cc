@@ -92,11 +92,11 @@ static CcuResult InitResource(KfcAllReduceMesh1DMem2MemContext& ctx)
 }
 
 static CcuResult LoadArgs(
-    KfcAllReduceMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr,
-    ccu::Variable tokenInfo, ccu::Variable scratchAddr, ccu::Variable currentRankSliceInputOffset,
-    ccu::Variable currentRankSliceOutputOffset, ccu::Variable normalSliceSize, ccu::Variable lastSliceSize,
-    ccu::Variable mySliceSize, ccu::Variable sliceOffset, ccu::Variable isInputOutputEqual,
-    ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3)
+    KfcAllReduceMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+    ccu::Variable scratchAddr, ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
+    ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable mySliceSize, ccu::Variable sliceOffset,
+    ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
+    ccu::Variable goSize3)
 {
     ctx.input[ctx.rankId] = inputAddr;
     ctx.output[ctx.rankId] = outputAddr;
@@ -186,24 +186,25 @@ static CcuResult CreateReduceLoop(
         var.loopScratch[index].resize(size);
         uint32_t bufBase = index * ctx.moConfig.msInterleave;
         ccu::Event e = ctx.moRes.completedEvent[index];
-        loops.body[index].reset(new ccu::Func(
-            [&ctx, index, bufBase, e, size, &var, dataType, outputDataType, opType]() {
-                for (uint32_t i = 0; i < size; i++) {
-                    if (i == ctx.rankId) {
-                        ccu::LocalCopy(ctx.moRes.ccuBuf[bufBase + i], var.loopSrc[index], var.loopLen[index], e, 1 << i);
-                    } else {
-                        ccu::LocalCopy(
-                            ctx.moRes.ccuBuf[bufBase + i], var.loopScratch[index][i], var.loopLen[index], e, 1 << i);
-                    }
+        loops.body[index].reset(new ccu::Func([&ctx, index, bufBase, e, size, &var, dataType, outputDataType,
+                                               opType]() {
+            for (uint32_t i = 0; i < size; i++) {
+                if (i == ctx.rankId) {
+                    ccu::LocalCopy(ctx.moRes.ccuBuf[bufBase + i], var.loopSrc[index], var.loopLen[index], e, 1 << i);
+                } else {
+                    ccu::LocalCopy(
+                        ctx.moRes.ccuBuf[bufBase + i], var.loopScratch[index][i], var.loopLen[index], e, 1 << i);
                 }
-                ccu::EventWait(e, (1 << size) - 1);
-                if (size > 1) {
-                    ccu::LocalReduce(&ctx.moRes.ccuBuf[bufBase], size, dataType, outputDataType, opType, var.loopLen[index], e, 1);
-                    ccu::EventWait(e, 1);
-                }
-                ccu::LocalCopy(var.loopDst[index], ctx.moRes.ccuBuf[bufBase], var.loopLenExp[index], e, 1);
+            }
+            ccu::EventWait(e, (1 << size) - 1);
+            if (size > 1) {
+                ccu::LocalReduce(
+                    &ctx.moRes.ccuBuf[bufBase], size, dataType, outputDataType, opType, var.loopLen[index], e, 1);
                 ccu::EventWait(e, 1);
-            }));
+            }
+            ccu::LocalCopy(var.loopDst[index], ctx.moRes.ccuBuf[bufBase], var.loopLenExp[index], e, 1);
+            ccu::EventWait(e, 1);
+        }));
         loops.loops[index].reset(new ccu::Loop(loops.loopParam[index], *loops.body[index]));
     }
     return CCU_SUCCESS;
@@ -379,12 +380,14 @@ static CcuResult ReduceRmtToLoc(
                 ccu::LocalAddr src;
                 src.addr = ctx.reduceScatterSrc[rankIdx].addr;
                 src.token = ctx.reduceScatterSrc[rankIdx].token;
-                ccu::LocalCopy(ctx.reduceScatterDst[rankIdx], src, ctx.sliceSize, ctx.events[eventIdx],
+                ccu::LocalCopy(
+                    ctx.reduceScatterDst[rankIdx], src, ctx.sliceSize, ctx.events[eventIdx],
                     1 << (rankIdx % BIT_NUM_PER_CKE));
             }
         } else {
-            ccu::Read(ctx.channels[channelIdx], ctx.reduceScatterDst[rankIdx], ctx.reduceScatterSrc[rankIdx],
-                ctx.sliceSize, ctx.events[eventIdx], 1 << (rankIdx % BIT_NUM_PER_CKE));
+            ccu::Read(
+                ctx.channels[channelIdx], ctx.reduceScatterDst[rankIdx], ctx.reduceScatterSrc[rankIdx], ctx.sliceSize,
+                ctx.events[eventIdx], 1 << (rankIdx % BIT_NUM_PER_CKE));
             channelIdx++;
         }
     }
@@ -421,7 +424,8 @@ static CcuResult BcastLocToRmt(
         ctx.remoteDstMem.addr = dstAddr[rmtId];
         ctx.remoteDstMem.addr += ctx.sliceOffset;
         ctx.remoteDstMem.token = ctx.token[rmtId];
-        ccu::Write(ctx.channels[channelIdx], ctx.remoteDstMem, ctx.srcMem, ctx.sliceSize, ctx.events[eventIdx],
+        ccu::Write(
+            ctx.channels[channelIdx], ctx.remoteDstMem, ctx.srcMem, ctx.sliceSize, ctx.events[eventIdx],
             1 << (rmtId % BIT_NUM_PER_CKE));
         channelIdx++;
     }
@@ -451,10 +455,9 @@ static CcuResult DoRepeatAllReduce(KfcAllReduceMesh1DMem2MemContext& ctx)
 CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratchAddr,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
-    ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable mySliceSize,
-    ccu::Variable sliceOffset, ccu::Variable isInputOutputEqual,
-    ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
+    ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable mySliceSize, ccu::Variable sliceOffset,
+    ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
+    ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
 {
     KfcAllReduceMesh1DMem2MemContext ctx;
@@ -472,15 +475,13 @@ CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
 
     HCCL_INFO("[CcuKfcAllReduceMesh1DMem2Mem] AllReduceMeshMem2Mem1D run");
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, scratchAddr, currentRankSliceInputOffset,
-        currentRankSliceOutputOffset, normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual,
-        goSize0, goSize1, goSize2, goSize3));
+    CCU_CHK_RET(LoadArgs(
+        ctx, inputAddr, outputAddr, tokenInfo, scratchAddr, currentRankSliceInputOffset, currentRankSliceOutputOffset,
+        normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual, goSize0, goSize1, goSize2,
+        goSize3));
     CCU_CHK_RET(PreSync(ctx));
 
-    CCU_IF(ctx.mySliceSize != 0)
-    {
-        CCU_CHK_RET(DoRepeatAllReduce(ctx));
-    }
+    CCU_IF(ctx.mySliceSize != 0) { CCU_CHK_RET(DoRepeatAllReduce(ctx)); }
 
     CCU_CHK_RET(PostSync(ctx));
     HCCL_INFO("[CcuKfcAllReduceMesh1DMem2Mem] AllReduceMeshMem2Mem1D end");
