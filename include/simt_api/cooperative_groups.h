@@ -97,11 +97,13 @@ struct alignas(details::multi_warp_scratch::communication_size) block_tile_memor
 
 class _coalesced_group_data_access;
 class thread_block;
+class grid_group;
 
 enum class group_type : unsigned int {
     thread_block_type,
     tiled_group_type,
     coalesced_group_type,
+    grid_group_type,
 };
 
 class thread_group {
@@ -124,6 +126,7 @@ protected:
     } _tiled_info;
 
     friend class thread_block;
+    friend class grid_group;
 
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group(group_type type);
 };
@@ -188,6 +191,27 @@ private:
 };
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block this_thread_block();
+
+class grid_group : public thread_group {
+    friend __SIMT_DEVICE_FUNCTIONS_DECL__ inline grid_group this_grid();
+
+public:
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool is_valid() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sync() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long thread_rank();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long block_rank();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long num_threads();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long size();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long num_blocks();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static dim3 dim_blocks();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static dim3 group_dim();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static dim3 block_index();
+
+private:
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline grid_group();
+};
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline grid_group this_grid();
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__) || defined(ASCENDC_CPU_DEBUG)
 template <unsigned int MaxBlockSize>
