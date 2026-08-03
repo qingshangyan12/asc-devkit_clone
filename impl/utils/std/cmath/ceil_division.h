@@ -116,6 +116,9 @@ ASCENDC_HOST_AICORE inline constexpr auto ceil_div(const T& a, const U& b)
 template <typename T, typename U>
 ASCENDC_HOST_AICORE inline constexpr auto ceil_div(const T& a, const U& b)
 {
+    if (b == 0) {
+        return 0;
+    }
     return ceil_div_generic(a, b);
 }
 #endif
