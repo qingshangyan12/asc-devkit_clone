@@ -62,6 +62,23 @@ private:
             typename CopyGM2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyGM2L1Impl::template Run<trait, T, U>(dst, src);
     }
+
+    template <const CopyGM2L1Trait& trait = DEFAULT_COPY_GM_TO_L1_TRAIT, typename T, typename U,
+        typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void DataCopyImpl(
+        const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape)
+    {
+        using DstPos = GetMemLocation<T>;
+        using SrcPos = GetMemLocation<U>;
+        static_assert(Std::is_same_v<DstPos, Location::L1>, "CopyGM2L1 requires destination on L1");
+        static_assert(Std::is_same_v<SrcPos, Location::GM>, "CopyGM2L1 requires source on GM");
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyGM2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        auto resolvedCoordDst = ResolveCopyCoord(dst.Layout(), shape, coordDst);
+        auto resolvedCoordSrc = ResolveCopyCoord(src.Layout(), shape, coordSrc);
+        Impl::template Run<trait, T, U>(dst, src, resolvedCoordDst, resolvedCoordSrc, shape);
+    }
 };
 
 } // namespace Te

@@ -54,6 +54,19 @@ public:
         CopyL0C2GMImpl::template Run<trait>(dst, src, params);
     }
 
+    template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U,
+        typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape,
+        const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        auto resolvedCoordDst = ResolveCopyCoord(dst.Layout(), shape, coordDst);
+        auto resolvedCoordSrc = ResolveCopyCoord(src.Layout(), shape, coordSrc);
+        Impl::template Run<trait>(dst, src, resolvedCoordDst, resolvedCoordSrc, shape, params);
+    }
+
     template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>
     __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type
     DataCopyImpl(const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
@@ -68,6 +81,34 @@ public:
 
         using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL0C2GMImpl::template Run<trait>(dst, src, quant, params);
+    }
+
+    template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S,
+        typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static typename Std::enable_if<IsAttrTensorV<S>, void>::type DataCopyImpl(
+        const T& dst, const U& src, const S& quant, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape,
+        const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        auto resolvedCoordDst = ResolveCopyCoord(dst.Layout(), shape, coordDst);
+        auto resolvedCoordSrc = ResolveCopyCoord(src.Layout(), shape, coordSrc);
+        Impl::template Run<trait>(dst, src, quant, resolvedCoordDst, resolvedCoordSrc, shape, params);
+    }
+
+    template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S,
+        typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type DataCopyImpl(
+        const T& dst, const U& src, const S& quant, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape,
+        const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        auto resolvedCoordDst = ResolveCopyCoord(dst.Layout(), shape, coordDst);
+        auto resolvedCoordSrc = ResolveCopyCoord(src.Layout(), shape, coordSrc);
+        Impl::template Run<trait>(dst, src, quant, resolvedCoordDst, resolvedCoordSrc, shape, params);
     }
 
     template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>

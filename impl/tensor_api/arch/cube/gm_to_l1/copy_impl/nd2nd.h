@@ -42,6 +42,45 @@ public:
         }
     }
 
+    template <const CopyGM2L1Trait& trait, typename T, typename U, typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+
+        using type = typename U::elementType;
+        auto srcShape = MakeSliceShape(coordSrc, src.Layout(), shape);
+        auto regionShape = srcShape;
+        auto dstOffset = dst.Layout()(coordDst);
+        auto srcOffset = src.Layout()(coordSrc);
+        uint32_t srcShapeRows = GetTotalRowShapeFromShape(regionShape);
+        uint32_t srcShapeColumns = GetTotalColumnShapeFromShape(regionShape);
+        uint32_t srcStrideRows = GetMatrixElement<AttrInfo::Stride, AttrInfo::Row, 1>(src.Layout());
+        uint32_t dstShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dst.Layout());
+        uint32_t dstStrideRows = GetMatrixElement<AttrInfo::Stride, AttrInfo::Row, 1>(dst.Layout());
+
+        uint32_t blockCount = srcShapeRows;
+        uint32_t blockLen = srcShapeColumns * sizeof(type);
+        uint64_t srcStride = srcStrideRows * sizeof(type);
+        uint32_t dstStride = dstStrideRows * sizeof(type);
+        if ((srcShapeRows == 1) || (srcShapeColumns == 1) ||
+            (srcStrideRows == srcShapeColumns && dstStrideRows == dstShapeColumns &&
+                srcStrideRows == dstStrideRows)) {
+            blockCount = 1;
+            blockLen = srcShapeRows * srcShapeColumns * sizeof(type);
+            srcStride = 0;
+            dstStride = blockLen;
+        }
+        if constexpr (IsB4Type<type>) {
+            blockLen >>= 1;
+            srcStride >>= 1;
+            dstStride >>= 1;
+        }
+        uint8_t cacheMode = src.Engine().GetCacheMode();
+        CopyGmToCbufAlignV2Base::DataCopyRegion(
+            dst, src, dstOffset, srcOffset, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
+    }
+
 private:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()

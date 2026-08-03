@@ -88,6 +88,12 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyGM2L1RoutesToCubeArchCopy)
 using namespace AscendC::Te;
 using namespace AscendC;
 
+using CopyCoord3D = decltype(MakeCoord(0, 0, 0));
+using CopyCoord4D = decltype(MakeCoord(0, 0, 0, 0));
+using CopyShape4D = decltype(MakeShape(1, 1, 1, 1));
+static_assert(IsCopyCoordShapeCompatibleV<CopyCoord4D, CopyShape4D>);
+static_assert(!IsCopyCoordShapeCompatibleV<CopyCoord3D, CopyShape4D>);
+
 constexpr bool gDebugPrint = false; // Set to true to enable debug printing of captured data
 
 // Mock implementations for data copy about gm2l1 functions
@@ -268,6 +274,34 @@ MAKE_LAYOUT_FUNC(ScaleBND)
 MAKE_LAYOUT_FUNC(ScaleBDN)
 #undef MAKE_LAYOUT_FUNC
 
+TEST_F(TensorApiGm2L1, CopyGm2L1RegionScaleFractalRoutes)
+{
+    using T = fp8_e8m0_t;
+    auto gmScaleA = MakeTensor(
+        MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), MakeZZ<T>(32, 32));
+    auto l1ScaleA = MakeTensor(
+        MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), MakeZZ<T>(32, 32));
+    auto gmScaleB = MakeTensor(
+        MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), MakeNN<T>(32, 32));
+    auto l1ScaleB = MakeTensor(
+        MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), MakeNN<T>(32, 32));
+    auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
+
+    auto logicalCoord = MakeCoord(0, 0);
+    auto logicalShape = MakeShape(16, 16);
+    static_assert(decltype(gmScaleA)::layoutType::depth == FOUR_DIM_DATA);
+    static_assert(NestingDepthV<decltype(logicalCoord)> == TWO_DIM_DATA);
+    static_assert(IsSameStructureV<decltype(logicalCoord), decltype(logicalShape)>);
+    Copy(atomCopy, l1ScaleA, gmScaleA, ZeroCoord, logicalCoord, logicalShape);
+    Copy(atomCopy, l1ScaleB, gmScaleB, ZeroCoord, logicalCoord, logicalShape);
+
+    auto physicalCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0));
+    auto physicalShape = gmScaleA.Shape();
+    static_assert(NestingDepthV<decltype(physicalCoord)> == FOUR_DIM_DATA);
+    static_assert(IsSameStructureV<decltype(physicalCoord), decltype(physicalShape)>);
+    Copy(atomCopy, l1ScaleA, gmScaleA, ZeroCoord, physicalCoord, physicalShape);
+}
+
 // ============================ Batch (multi-matrix) gm->l1 copy ============================
 // Batched frame layouts are built with the official three-arg MakeFrameLayout<Ptn, Trait>(B, M, K)
 // (see commit d2d3dc8): Shape = (B, frameShape), Stride = (M * K, frameStride). Only BMK-contiguous
@@ -302,6 +336,12 @@ MAKE_BATCH_LAYOUT_FUNC(ZN)
         auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                               \
         InitializeData<T>();                                                                                          \
         atomCopy.Call(l1ATensor, gmA);                                                                                \
+        auto logicalBatchCoord = MakeCoord(0, MakeCoord(0, 0));                                                       \
+        auto logicalBatchShape = MakeShape(kBatch, MakeShape((M), (K)));                                              \
+        static_assert(decltype(gmA)::layoutType::depth == FIVE_DIM_DATA);                                             \
+        static_assert(NestingDepthV<decltype(logicalBatchCoord)> == THREE_DIM_DATA);                                  \
+        static_assert(IsSameStructureV<decltype(logicalBatchCoord), decltype(logicalBatchShape)>);                    \
+        Copy(atomCopy, l1ATensor, gmA, ZeroCoord, logicalBatchCoord, logicalBatchShape);                              \
         for (int b = 0; b < kBatch; ++b) {                                                                            \
             auto gmB = MakeTensor(                                                                                    \
                 MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kMatStride), Make##gmPtn<T>((M), (K)));   \
@@ -379,6 +419,8 @@ auto MakeNc1hwc0(int n, int c1, int h, int w)
         auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                               \
         InitializeData<T>();                                                                                          \
         atomCopy.Call(l1ATensor, gmA);                                                                                \
+        Copy(atomCopy, l1ATensor, gmA, ZeroCoord, MakeCoord(0, 0, 0, 0, 0),                                                     \
+            MakeShape((N), (C1), (H), (W), C0));                                                                      \
         for (int b = 0; b < (N) * (C1); ++b) {                                                                        \
             auto gmB = MakeTensor(                                                                                    \
                 MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm) + b * kBlockElems), MakeND<T>(1, kBlockElems)); \
@@ -2894,6 +2936,9 @@ TEST_F(TensorApiGm2L1, CopyGm2L1NHWC2NC1HWC0)
     EXPECT_EQ(nzPara.loop3DstStride, H * W); // dstH * dstW
     EXPECT_EQ(nzPara.loop4DstStride, W);     // dstW
     EXPECT_FALSE(nd2nz.enableSmallC0);
+
+    Copy(MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}), l1A, gmA,
+        ZeroCoord, MakeCoord(0, 0, 0, 0), MakeShape(N, H, W, C));
 }
 
 // GM(NCHW) -> L1(NC1HWC0) via the dn2nz DMA path (NCHW is the HW<->C transpose of NHWC). Verifies
@@ -2934,6 +2979,9 @@ TEST_F(TensorApiGm2L1, CopyGm2L1NCHW2NC1HWC0)
     EXPECT_EQ(nzPara.loop3DstStride, H * W); // dstH * dstW
     EXPECT_EQ(nzPara.loop4DstStride, W);     // dstW
     EXPECT_FALSE(dn2nz.enableSmallC0);
+
+    Copy(MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}), l1A, gmA,
+        ZeroCoord, MakeCoord(0, 0, 0, 0), MakeShape(N, C, H, W));
 }
 
 // GM(NCDHW) -> L1(NDC1HWC0): conv3D adds a depth axis D; each depth slice is one NCHW->NC1HWC0

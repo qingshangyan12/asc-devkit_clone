@@ -35,6 +35,15 @@ public:
         CopyMatrixCcToL1<quantPre>(dst.Data().Get(), src.Data().Get(), params...);
     }
 
+    template <QuantMode_t quantPre, typename T, typename U, typename DstOffset, typename SrcOffset, typename... Params>
+    __aicore__ inline static void DataCopyRegion(
+        const T& dst, const U& src, const DstOffset& dstOffset, const SrcOffset& srcOffset, const Params&... params)
+    {
+        auto dstData = dst.Data() + dstOffset;
+        auto srcData = src.Data() + srcOffset;
+        CopyMatrixCcToL1<quantPre>(dstData.Get(), srcData.Get(), params...);
+    }
+
 private:
     // This path only emits straight NZ output, so nz2nd_en is always false.
     template <QuantMode_t quantPre, typename T, typename U>
