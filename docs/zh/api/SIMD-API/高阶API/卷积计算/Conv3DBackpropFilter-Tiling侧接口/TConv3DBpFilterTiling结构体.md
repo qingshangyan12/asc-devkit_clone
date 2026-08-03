@@ -1,12 +1,12 @@
 # TConv3DBpFilterTiling结构体
 
-TConv3DBpFilterTiling结构体包含Conv3dBackpropFilter算子规格信息及Tiling切分算法的相关参数，被传递给Conv3dBackpropFilter Kernel侧，用于数据切分、数据搬运和计算等。TConv3DBpFilterTiling结构体的参数说明见[表1](#table1563162142915)。
+TConv3DBpFilterTiling结构体包含Conv3dBackpropFilter算子规格信息及Tiling切分算法的相关参数，被传递给Conv3dBackpropFilter Kernel侧，用于数据切分、数据搬运和计算等。TConv3DBpFilterTiling结构体的参数说明见[表1](#tcubetiling-struct)。
 
 用户通过调用[GetTiling](GetTiling-128.md)接口获取TConv3DBpFilterTiling结构体，具体流程请参考[使用说明](Conv3DBackpropFilter-Tiling使用说明.md)。当前暂不支持用户自定义配置TConv3DBpFilterTiling结构体中的参数。
 
 **表1**  TConv3DBpFilterTiling结构说明
 
-<a name="table1563162142915"></a>
+<a name="tcubetiling-struct"></a>
 | 参数名称 | 说明 |
 | --- | --- |
 | batch | 输入GradOutput的Batch，单位元素。 |
