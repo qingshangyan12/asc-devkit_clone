@@ -31,7 +31,8 @@ SelectorStatus AllReduceAutoSelector::SelectCcuScheduleAlgo(
 
     CHK_PRT_RET(
         opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD,
-        HCCL_WARNING("[AllReduceAutoSelector] ReduceOp[%d] is not supported yet for ccu schedule mode.", opParam.reduceType),
+        HCCL_WARNING(
+            "[AllReduceAutoSelector] ReduceOp[%d] is not supported yet for ccu schedule mode.", opParam.reduceType),
         SelectorStatus::NOT_MATCH);
 
     if (Is64BitDataType(opParam.DataDes.dataType)) {
@@ -42,7 +43,8 @@ SelectorStatus AllReduceAutoSelector::SelectCcuScheduleAlgo(
     u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
     u64 dataSize = opParam.DataDes.count * perDataSize;
 
-    CHK_PRT_RET(IsInputOutputOverlap(opParam) == true,
+    CHK_PRT_RET(
+        IsInputOutputOverlap(opParam) == true,
         HCCL_WARNING("[Algo][AllReduceAutoSelector] ccu_sched does not support inplace allreduce."),
         SelectorStatus::NOT_MATCH);
 
@@ -57,8 +59,10 @@ SelectorStatus AllReduceAutoSelector::SelectCcuScheduleLevel0AlgoMesh1D(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName,
     const u64 dataSize) const
 {
-    CHK_PRT_RET(opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT8,
-        HCCL_DEBUG("[AllReduceAutoSelector] dataType[%d] is not supported yet for ccu schedule mode with ms reduce.",
+    CHK_PRT_RET(
+        opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT8,
+        HCCL_DEBUG(
+            "[AllReduceAutoSelector] dataType[%d] is not supported yet for ccu schedule mode with ms reduce.",
             opParam.DataDes.dataType),
         SelectorStatus::NOT_MATCH);
 
