@@ -20,7 +20,7 @@
 #include "impl/utils/sys_macros.h"
 namespace __asc_aicore {
 template <typename T>
-constexpr __aicore__ inline uint64_t get_scalar_bitcode_value(T scalarValue)
+__aicore__ inline uint64_t get_scalar_bitcode_value(T scalarValue)
 {
     union ScalarBitcode {
         __aicore__ ScalarBitcode() {}
@@ -33,7 +33,7 @@ constexpr __aicore__ inline uint64_t get_scalar_bitcode_value(T scalarValue)
 }
 
 template <typename T, typename U>
-constexpr __aicore__ inline U get_scalar_bitcode_value(T scalarValue)
+__aicore__ inline U get_scalar_bitcode_value(T scalarValue)
 {
     union ScalarBitcode {
         __aicore__ ScalarBitcode() {}
@@ -350,7 +350,7 @@ __aicore__ inline float bf16_to_fp32(const bfloat16_t& bVal)
 } // namespace __fp_conv
 
 template <typename T>
-__aicore__ constexpr inline float cast_type(const T& bVal)
+__aicore__ inline float cast_type(const T& bVal)
 {
     uint8_t uiNum = 0;
     uint32_t result = 0;
@@ -383,7 +383,7 @@ __aicore__ constexpr inline float cast_type(const T& bVal)
 }
 
 template <typename T>
-__aicore__ constexpr inline float to_float(const T& bVal)
+__aicore__ inline float to_float(const T& bVal)
 {
     return cast_type<T>(bVal);
 }
