@@ -41,6 +41,14 @@ public:
         LoadCbufToCaImpl<transpose>(dst.Data().Get(), src.Data().Get(), params...);
     }
 
+    template <bool transpose, typename T, typename U, typename DstOffset, typename SrcOffset, typename... Params>
+    __aicore__ inline static void LoadDataRegion(
+        const T& dst, const U& src, const DstOffset& dstOffset, const SrcOffset& srcOffset, const Params&... params)
+    {
+        auto srcData = src.Data() + srcOffset;
+        LoadCbufToCaImpl<transpose>((dst.Data() + dstOffset).Get(), srcData.Get(), params...);
+    }
+
 private:
     template <bool transpose, typename T>
     __aicore__ inline static void LoadCbufToCaImpl(__ca__ T* dst, __cbuf__ T* src, uint16_t mStartPosition,
@@ -100,6 +108,14 @@ public:
     __aicore__ inline static void LoadData(const T& dst, const U& src, const Params&... params)
     {
         LoadCbufToCaImg2ColImpl(dst.Data().Get(), src.Data().Get(), params...);
+    }
+
+    template <typename T, typename U, typename DstOffset, typename SrcOffset, typename... Params>
+    __aicore__ inline static void LoadDataRegion(
+        const T& dst, const U& src, const DstOffset& dstOffset, const SrcOffset& srcOffset, const Params&... params)
+    {
+        auto srcData = src.Data() + srcOffset;
+        LoadCbufToCaImg2ColImpl((dst.Data() + dstOffset).Get(), srcData.Get(), params...);
     }
 
 private:

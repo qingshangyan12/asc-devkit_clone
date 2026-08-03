@@ -59,6 +59,23 @@ private:
         using CopyL12FBImpl = typename CopyL12FBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL12FBImpl::template Run<trait, T, U>(dst, src);
     }
+
+    template <const CopyL12FBTrait& trait = DEFAULT_COPY_L1_FB_TRAIT, typename T, typename U,
+        typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void DataCopyImpl(
+        const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape)
+    {
+        using DstPos = GetMemLocation<T>;
+        using SrcPos = GetMemLocation<U>;
+        static_assert(Std::is_same_v<DstPos, Location::FIXBUF>, "CopyL12FB requires destination on FIXBUF");
+        static_assert(Std::is_same_v<SrcPos, Location::L1>, "CopyL12FB requires source on L1");
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL12FBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        auto resolvedCoordDst = ResolveCopyCoord(dst.Layout(), shape, coordDst);
+        auto resolvedCoordSrc = ResolveCopyCoord(src.Layout(), shape, coordSrc);
+        Impl::template Run<trait, T, U>(dst, src, resolvedCoordDst, resolvedCoordSrc, shape);
+    }
 };
 
 } // namespace Te

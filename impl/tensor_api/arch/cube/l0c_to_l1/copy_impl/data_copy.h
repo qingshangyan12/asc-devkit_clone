@@ -54,6 +54,21 @@ public:
         }
     }
 
+    template <const CopyL0C2L1Trait& trait, QuantMode_t quantPre, typename T, typename U,
+        typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void DataCopyRegion(
+        const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape, const FixpipeParams& params)
+    {
+        auto dstShape = MakeSliceShape(coordDst, dst.Layout(), shape);
+        auto regionShape = dstShape;
+        auto dstOffset = dst.Layout()(coordDst);
+        auto srcOffset = src.Layout()(coordSrc);
+        auto copyParams = MakeL0COutCopyParamsRegion<T, U>(dst.Layout(), src.Layout(), regionShape);
+        CopyMatrixCcToL1Instr::DataCopyRegion<quantPre, T, U>(dst, src, dstOffset, srcOffset, copyParams.nSize,
+            copyParams.mSize, copyParams.srcStride, copyParams.dstStride, trait.enableRelu, params.unitFlag,
+            trait.enableChannelSplit);
+    }
+
 private:
     template <
         const CopyL0C2L1Trait& trait, QuantMode_t quantPre, typename T, typename U, typename DstLayout,
@@ -85,6 +100,31 @@ public:
             EmitDataCopy<trait, quantPre>(dst, src, quant, Get<1>(dst.Layout()), Get<1>(src.Layout()), params);
         } else {
             EmitDataCopy<trait, quantPre>(dst, src, quant, dst.Layout(), src.Layout(), params);
+        }
+    }
+
+    template <const CopyL0C2L1Trait& trait, QuantMode_t quantPre, typename T, typename U, typename V,
+        typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void DataCopyRegion(const T& dst, const U& src, const V& quant,
+        const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape, const FixpipeParams& params)
+    {
+        auto dstShape = MakeSliceShape(coordDst, dst.Layout(), shape);
+        auto regionShape = dstShape;
+        auto baseDstOffset = dst.Layout()(coordDst);
+        auto srcOffset = src.Layout()(coordSrc);
+        auto copyParams = MakeL0COutCopyParamsRegion<T, U>(dst.Layout(), src.Layout(), regionShape);
+        uint16_t nIterNum = Std::ceil_division(copyParams.nSize, MAIN_LOOP_N_SIZE);
+        for (uint16_t i = 0; i < nIterNum; ++i) {
+            uint32_t nOffset = i * MAIN_LOOP_N_SIZE;
+            uint32_t calNSize = Std::min(copyParams.nSize - nOffset, MAIN_LOOP_N_SIZE);
+            CopyL12Fb(quant, calNSize, i);
+            InsertSync();
+            auto srcCoord = MakeSrcCoord<U>(i * CBURST_NUM);
+            auto dstCoord = MakeDstCoord<T>(nOffset);
+            auto dstOffset = baseDstOffset + dst.Layout()(dstCoord);
+            CopyMatrixCcToL1Instr::DataCopyRegion<quantPre>(dst, src(srcCoord), dstOffset, srcOffset, calNSize,
+                copyParams.mSize, copyParams.srcStride, copyParams.dstStride, trait.enableRelu,
+                params.unitFlag, trait.enableChannelSplit);
         }
     }
 
@@ -239,12 +279,31 @@ public:
         DataCopyL0C2L1NoVectorQuant::DataCopyImpl<trait, quantPre, T, U>(dst, src, params);
     }
 
+    template <const CopyL0C2L1Trait& trait, typename T, typename U, typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void Run(const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape,
+        const FixpipeParams& params)
+    {
+        constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U>();
+        CheckDataType::CheckL0C2L1DataType<quantPre, T, U>();
+        SetRegisterImpl<T, U>(dst, src);
+        DataCopyL0C2L1NoVectorQuant::DataCopyRegion<trait, quantPre>(dst, src, coordDst, coordSrc, shape, params);
+    }
+
     template <const CopyL0C2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src, uint64_t quant, const FixpipeParams& params)
     {
         constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U, uint64_t>();
         SetRegisterImpl<T, U>(dst, src, quant);
         DataCopyL0C2L1NoVectorQuant::DataCopyImpl<trait, quantPre, T, U>(dst, src, params);
+    }
+
+    template <const CopyL0C2L1Trait& trait, typename T, typename U, typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void Run(const T& dst, const U& src, uint64_t quant, const CoordDst& coordDst, const CoordSrc& coordSrc,
+        const Shape& shape, const FixpipeParams& params)
+    {
+        constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U, uint64_t>();
+        SetRegisterImpl<T, U>(dst, src, quant);
+        DataCopyL0C2L1NoVectorQuant::DataCopyRegion<trait, quantPre>(dst, src, coordDst, coordSrc, shape, params);
     }
 
     template <const CopyL0C2L1Trait& trait, typename T, typename U, typename V>
@@ -271,6 +330,31 @@ public:
         } else {
             SetRegisterImpl<T, U>(dst, src);
             DataCopyL0C2L1VectorQuant::DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant, params);
+        }
+    }
+
+    template <const CopyL0C2L1Trait& trait, typename T, typename U, typename V, typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void Run(const T& dst, const U& src, const V& quant, const CoordDst& coordDst, const CoordSrc& coordSrc,
+        const Shape& shape, const FixpipeParams& params)
+    {
+        constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U, V>();
+        constexpr bool quantBatched = CheckVectorQuantBatchConsistency<T, U, V>();
+        if constexpr (quantBatched) {
+            auto dstShape = MakeSliceShape(coordDst, dst.Layout(), shape);
+            uint32_t batchSize = GetBatchShapeFromShape(dstShape);
+            for (uint32_t b = 0; b < batchSize; ++b) {
+                auto subSrc = MakeSingleBatchSubTensor(src, b);
+                auto subQuant = MakeSingleBatchSubTensor(quant, b);
+                auto batchCoord = MakeCoord(Get<0>(coordDst) + b, Get<1>(coordDst));
+                auto batchShape = MakeShape(1, Get<1>(shape));
+                SetRegisterImpl<T, decltype(subSrc)>(dst, subSrc);
+                DataCopyL0C2L1VectorQuant::DataCopyRegion<trait, quantPre>(
+                    dst, subSrc, subQuant, batchCoord, coordSrc, batchShape, params);
+            }
+        } else {
+            SetRegisterImpl<T, U>(dst, src);
+            DataCopyL0C2L1VectorQuant::DataCopyRegion<trait, quantPre>(
+                dst, src, quant, coordDst, coordSrc, shape, params);
         }
     }
 };

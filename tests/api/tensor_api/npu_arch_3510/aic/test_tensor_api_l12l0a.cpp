@@ -268,9 +268,11 @@ TEST_F(Tensor_Api_Cube_Copy_3510, TestLoadData_##TYPE##M##N##SRC_FORMAT##DST_FOR
     constexpr int M_STEP = (sizeof(TYPE) == 1 && TRANSPOSE) ? 2 : 1; \
     constexpr int K_STEP = (sizeof(TYPE) == 4 && TRANSPOSE) ? 2 : 1; \
     MOCKER_CPP(load_cbuf_to_##DST_TAG, void(__##DST_TAG##__ TYPE*, __cbuf__ TYPE*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool)) \
-        .times(1) \
+        .times(2) \
         .will(invoke(&load_cbuf_to_##DST_TAG##_stub<TRANSPOSE, TYPE, M_STEP, K_STEP>)); \
     Copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
+    Copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor, \
+        ZeroCoord, MakeCoord(0, 0), MakeShape(M, N)); \
  \
     mockcpp::GlobalMockObject::verify(); \
 }
@@ -289,6 +291,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, TestLoadData_##TYPE##M##N##SRC_FORMAT##DST_FOR
     auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout); \
  \
     Copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor); \
+    Copy(CopyAtom<CopyTraits<CopyL12##DST_POS, CopyL12##DST_POS##TraitDefault>>{}, dstTensor, srcTensor, \
+        ZeroCoord, MakeCoord(0, 0), MakeShape(M, N)); \
  \
     mockcpp::GlobalMockObject::verify(); \
 }
@@ -370,6 +374,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0AImg2Col)
 
     auto atom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
     Copy(atom.with(params), l0aTensor, srcTensor);
+    Copy(atom.with(params), l0aTensor, srcTensor, ZeroCoord, MakeCoord(0, 0, 0, 0, 0),
+        MakeShape(N, C1, H, W, C0));
 
     EXPECT_EQ(dst[0], 0);
 }

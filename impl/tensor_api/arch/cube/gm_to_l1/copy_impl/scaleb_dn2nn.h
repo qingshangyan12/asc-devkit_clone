@@ -35,6 +35,33 @@ public:
         RunGmToL1Batched<trait, CopyGmToCbufScaleBDN2Nn, T, U>(dst, src);
     }
 
+    template <const CopyGM2L1Trait& trait, typename T, typename U, typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+        using type = typename U::elementType;
+        auto srcShape = MakeSliceShape(coordSrc, src.Layout(), shape);
+        auto regionShape = srcShape;
+        auto dstOffset = dst.Layout()(coordDst);
+        auto srcOffset = src.Layout()(coordSrc);
+        uint16_t matrixNum = GetBatchShapeFromShape(regionShape);
+        uint16_t nValue = GetTotalRowShapeFromShape(regionShape) >> 1;
+        uint32_t dValue = GetTotalColumnShapeFromShape(regionShape);
+        uint32_t srcColStride = GetMatrixElement<AttrInfo::Stride, AttrInfo::Column, 1>(src.Layout());
+        uint16_t dstStride = GetMatrixElement<AttrInfo::Stride, AttrInfo::Column, 1>(dst.Layout()) *
+            sizeof(type) / C0_SIZE<>;
+        uint64_t srcMatrixStride = 0;
+        uint16_t dstMatrixStride = 0;
+        if constexpr (U::layoutType::depth == THREE_DIM_DATA) {
+            srcMatrixStride = Get<0>(src.Layout().Stride()) * sizeof(type);
+            dstMatrixStride = Get<0>(dst.Layout().Stride()) * sizeof(type) / C0_SIZE<>;
+        }
+        CopyGmToCbufMultiDn2nzInstr::DataCopyRegion(dst, src, dstOffset, srcOffset, matrixNum, 1, dstStride,
+            dstMatrixStride, srcColStride * sizeof(type), src.Engine().GetCacheMode(), nValue,
+            dValue, srcMatrixStride, false);
+    }
+
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
