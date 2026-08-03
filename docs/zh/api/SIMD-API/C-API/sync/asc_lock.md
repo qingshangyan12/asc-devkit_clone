@@ -130,7 +130,7 @@ __aicore__ inline void add_kernel(__gm__ half* x_gm, __gm__ half* y_gm, __gm__ h
     asc_unlock(PIPE_MTE2, mutex_id);
 
     // 2. PIPE_V流水线：矢量计算
-    // BLOCK模式下（默认），asc_lock阻塞PIPE_V执行，直到程序顺序中之前所有相同mutex_id的asc_unlock执行完成
+    // BLOCK模式下（默认），asc_lock阻塞PIPE_V执行，所有前序所有相同mutex_id的asc_unlock执行完成
     asc_lock(PIPE_V, mutex_id);
     uint32_t count = 256;
     add_vf(x_local, y_local, z_local, count, 128, 2);
