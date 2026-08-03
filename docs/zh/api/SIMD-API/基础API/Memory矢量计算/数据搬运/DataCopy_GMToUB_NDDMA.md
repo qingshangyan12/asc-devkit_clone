@@ -40,14 +40,18 @@
 - Global Memory -> Unified Buffer，支持多维度搬运
 
     ```cpp
-    template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
+    namespace AscendC {
+        template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
+        __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params);
+    } // namespace AscendC
     ```
 
 - NDDMA Cache刷新，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新NDDMA Cache缓存保证为最新状态。
 
     ```cpp
-    __aicore__ inline void NdDmaDci()
+    namespace AscendC {
+        __aicore__ inline void NdDmaDci();
+    } // namespace AscendC
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -58,7 +62,7 @@
 | :--- | :--- |
 | T | 源操作数或者目的操作数的数据类型。 |
 | dim | 搬运的数据维度，数据类型为uint8_t，支持的维度为[1, 5]。 |
-| config | 搬运配置选项，NdDmaConfig类型，定义如下，具体参数说明请参考[表3](#table_nddma_3)。<br><pre>struct NdDmaConfig {<br>    static constexpr uint16_t unsetPad = 0xffff;<br>    bool isNearestValueMode = false;<br>    uint16_t loopLpSize = unsetPad; // Left padding size of all dimensions, must be less than 256.<br>    uint16_t loopRpSize = unsetPad; // Right padding size of all dimensions, must be less than 256.<br>    bool ascOptimize = false;       // used for Ascend C optimization on special scenario.<br>};</pre> |
+| config | 搬运配置选项，类型为NdDmaConfig，具体参数说明请参考[表3](#table_nddma_3)。 |
 
 **表2**  参数说明
 
@@ -66,7 +70,7 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor简介.md)。 |
 | src | 输入 | 源操作数，类型为[GlobalTensor](../../数据结构/GlobalTensor/GlobalTensor简介.md)。 |
-| params | 输入 | 搬运参数NdDmaParams类型，定义如下，具体参数说明请参考[表4](#table_nddma_4)。<br><pre>template &lt;typename T, uint8_t dim&gt;<br>struct NdDmaParams  {<br>    NdDmaLoopInfo&lt;dim&gt; loopInfo;<br>    T constantValue;  // 若有左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>};</pre><br>NdDmaLoopInfo类型，定义如下，具体参数说明请参考[表5](#table_nddma_5)。<br><pre>template &lt;uint8_t dim&gt;<br>struct NdDmaLoopInfo  {<br>    uint64_t loopSrcStride[dim] = {0}; // src stride info per loop.<br>    uint32_t loopDstStride[dim] = {0}; // dst stride info per loop.<br>    uint32_t loopSize[dim] = {0}; // Loop size per loop.<br>    uint8_t loopLpSize[dim] = {0}; // Left padding size per loop.<br>    uint8_t loopRpSize[dim] = {0}; // Right padding size per loop.<br>};<br>// 注意：dim的有效范围为[1,5]。</pre> |
+| params | 输入 | 搬运参数，类型为NdDmaParams，具体参数说明请参考[表4](#table_nddma_4)。其中的loopInfo成员类型为NdDmaLoopInfo，具体参数说明请参考[表5](#table_nddma_5)。 |
 
 **表3**  NdDmaConfig结构体参数定义<a name="table_nddma_3"></a>
 

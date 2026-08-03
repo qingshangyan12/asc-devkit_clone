@@ -46,17 +46,21 @@
 - 不支持enableSmallC0模式
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
+    namespace AscendC {
+        template <typename T>
+        __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams);
+    } // namespace AscendC
     ```
 
 <!-- npu="950" id1 -->
 - 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    // 该函数原型仅支持Ascend 950PR/Ascend 950DT
-    template <typename T, bool enableSmallC0 = false>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
+    namespace AscendC {
+        // 该函数原型仅支持Ascend 950PR/Ascend 950DT
+        template <typename T, bool enableSmallC0 = false>
+        __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams);
+    } // namespace AscendC
     ```
 <!-- end id1 -->
 
@@ -75,7 +79,7 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor简介.md)。 |
 | src | 输入 | 源操作数，类型为[GlobalTensor](../../数据结构/GlobalTensor/GlobalTensor简介.md)。 |
-| intriParams | 输入 | 搬运参数，类型为Nd2NzParam，具体参数请参考[表3](#table_nd2nz_3)。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为Nd2NzParams，具体参数请参考[表3](#table_nd2nz_3)。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3**  Nd2NzParams结构体参数定义<a name="table_nd2nz_3"></a>
 
@@ -158,7 +162,7 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 intriParams参数解析请参考[图1](#fig128961542184620)。
 
 ```cpp
-// dstLocal为half类型的Unified Buffer上的LocalTensor，srcGlobal为half类型的GlobalTensor。
+// dstLocal为half类型的Unified Buffer上的AscendC::LocalTensor，srcGlobal为half类型的AscendC::GlobalTensor。
 AscendC::Nd2NzParams intriParams{1, 32, 32, 0, 32, 32, 1, 0};
 // Global Memory -> Local Memory
 AscendC::DataCopy(dstLocal, srcGlobal, intriParams);

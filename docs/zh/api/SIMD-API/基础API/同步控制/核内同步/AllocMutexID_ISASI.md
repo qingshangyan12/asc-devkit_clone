@@ -33,7 +33,9 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline MutexID AllocMutexID()
+namespace AscendC {
+    __aicore__ inline MutexID AllocMutexID();
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -45,7 +47,9 @@ __aicore__ inline MutexID AllocMutexID()
 返回MutexID，其类型定义如下，每个ID表示一个Mutex锁。
 
 ```cpp
-using MutexID = uint8_t;
+namespace AscendC {
+    using MutexID = uint8_t;
+} // namespace AscendC
 ```
 
 ## 约束说明<a name="section633mcpsimp"></a>

@@ -41,8 +41,10 @@
 ## 函数原型<a name="section1792117555586"></a>
 
 ```cpp
-template <typename T>
-__aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams)
+namespace AscendC {
+    template <typename T>
+    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams);
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section14983445508"></a>
@@ -143,7 +145,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 intriParams参数解析请参考[图1](#fig15851251122815)。
 
 ```cpp
-// srcLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
+// srcLocal为half类型的AscendC::LocalTensor，dstGlobal为half类型的AscendC::GlobalTensor。
 AscendC::Nz2NdParamsFull intriParams{1, 32, 32, 1, 32, 32, 1};
 // Local Memory -> Global Memory
 AscendC::DataCopy(dstGlobal, srcLocal, intriParams);

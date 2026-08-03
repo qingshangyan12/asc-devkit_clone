@@ -43,8 +43,10 @@ $$
 ## 函数原型<a name="section1171112415119"></a>
 
 ```cpp
-template <typename T>
-__aicore__ inline T AtomicCas(__gm__ T *address, T value1, T value2)
+namespace AscendC {
+    template <typename T>
+    __aicore__ inline T AtomicCas(__gm__ T *address, T value1, T value2);
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section086962912112"></a>
@@ -84,7 +86,7 @@ AscendC::LocalTensor<uint32_t> yLocal = ubAllocator.Alloc<uint32_t>(DATA_SIZE);
 AscendC::GlobalTensor<uint32_t> yGlobal;
 yGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint32_t*>(y), DATA_SIZE);
 
-// AtomicCas：三个核分别对GM首个元素原子比较交换。
+// AscendC::AtomicCas：三个核分别对GM首个元素原子比较交换。
 uint32_t expected = 1;
 uint32_t newValue = 2;
 AscendC::AtomicCas(reinterpret_cast<__gm__ uint32_t*>(y), expected, newValue);

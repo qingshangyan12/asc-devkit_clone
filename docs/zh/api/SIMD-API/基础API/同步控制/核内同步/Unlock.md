@@ -36,8 +36,13 @@
 ## 函数原型<a name="section1568410468104"></a>
 
 ```cpp
-template <pipe_t pipe>
-static __aicore__ inline void Unlock(MutexID id)
+namespace AscendC {
+    class Mutex {
+    public:
+        template <pipe_t pipe>
+        static __aicore__ inline void Unlock(MutexID id);
+    };
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section74061251191017"></a>
@@ -46,7 +51,7 @@ static __aicore__ inline void Unlock(MutexID id)
 
 | 参数名 | 描述 |
 | --- | --- |
-| pipe | 模板参数，表示流水类别。支持的流水类型为PIPE_S/PIPE_M/PIPE_V/PIPE_MTE1/PIPE_MTE2/PIPE_MTE3/PIPE_FIX。 |
+| pipe | 模板参数，表示流水类别。支持PIPE_S、PIPE_M、PIPE_V、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，各流水类型的含义请参考[硬件流水类型](核内同步能力概述.md#zh-cn_topic_0000002542725361_section1272612276459)。 |
 
 **表 2**  参数说明
 

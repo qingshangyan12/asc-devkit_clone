@@ -39,8 +39,10 @@ $$
 ## 函数原型<a name="section1171112415119"></a>
 
 ```cpp
-template <typename T>
-__aicore__ inline T AtomicAdd(__gm__ T *address, T value)
+namespace AscendC {
+    template <typename T>
+    __aicore__ inline T AtomicAdd(__gm__ T *address, T value);
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section086962912112"></a>
@@ -80,7 +82,7 @@ AscendC::LocalTensor<uint32_t> yLocal = ubAllocator.Alloc<uint32_t>(DATA_SIZE);
 AscendC::GlobalTensor<uint32_t> yGlobal;
 yGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint32_t*>(y), DATA_SIZE);
 
-// AtomicAdd：三个核分别对GM首个元素原子加1。
+// AscendC::AtomicAdd：三个核分别对GM首个元素原子加1。
 uint32_t value = 1;
 AscendC::AtomicAdd(reinterpret_cast<__gm__ uint32_t*>(y), value);
 

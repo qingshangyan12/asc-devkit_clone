@@ -45,8 +45,10 @@
 ## 函数原型<a name="section1954364615315"></a>
 
 ```cpp
-template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+namespace AscendC {
+    template <typename T>
+    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -113,7 +115,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 ## 调用示例<a name="section122101199486"></a>
 
 ```cpp
-// srcLocal、dstLocal为half类型的LocalTensor。
+// srcLocal、dstLocal为half类型的AscendC::LocalTensor。
 // 使用传入count参数的搬运接口，完成连续搬运。
 AscendC::DataCopy(dstLocal, srcLocal, 512);
 ```

@@ -48,10 +48,12 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <HardEvent event>
-__aicore__ inline void SetFlag(int32_t eventID)
-template <HardEvent event>
-__aicore__ inline void WaitFlag(int32_t eventID)
+namespace AscendC {
+    template <HardEvent event>
+    __aicore__ inline void SetFlag(int32_t eventID);
+    template <HardEvent event>
+    __aicore__ inline void WaitFlag(int32_t eventID);
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -60,7 +62,7 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| event | 输入 | 模板参数。<br>同步事件，数据类型为HardEvent。同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。HardEvent用来表示对应的同步事件。HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。由于硬件架构版本代际间的差异，不同硬件架构上的事件存在差异。 |
+| event | 输入 | 模板参数。<br>同步事件，数据类型为HardEvent。同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。HardEvent用来表示对应的同步事件。HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。流水类型及含义请参考[硬件流水类型](核内同步能力概述.md#zh-cn_topic_0000002542725361_section1272612276459)。由于硬件架构版本代际间的差异，不同硬件架构上的事件存在差异。 |
 | eventID | 输入 | 事件ID。数据类型为int32_t类型。eventID的取值范围与产品型号有关，具体请参考[约束说明](#section633mcpsimp)。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
@@ -97,26 +99,26 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 - 相同流水、相同eventID下，连续使用SetFlag会引发未定义行为，此时再执行PipeBarrier<PIPE\_ALL\>会出现卡死现象：
 
     ```cpp
-    SetFlag<M_MTE1>(0);  // 第一次SetFlag
-    SetFlag<M_MTE1>(0);  // 第二次SetFlag（相同流水、相同eventID连续使用，引发未定义行为）
+    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第一次调用AscendC::SetFlag
+    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第二次调用AscendC::SetFlag（相同流水、相同eventID连续使用，引发未定义行为）
     ...
-    PipeBarrier<PIPE_ALL>();  // 触发卡死
+    AscendC::PipeBarrier<PIPE_ALL>();  // 触发卡死
     ...
-    WaitFlag<M_MTE1>(0);
-    WaitFlag<M_MTE1>(0);
+    AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(0);
+    AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(0);
     ```
 
 ## 调用示例<a name="section837496171220"></a>
 
 ```cpp
-    AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
-    AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
+AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
+AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
     
-    // 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后“Maxs和Mins（PIPE_V）读src0Local”。
-    // 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步。
-    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+// 循环内依赖：先“AscendC::DataCopy(PIPE_MTE2)写src0Local”，后“AscendC::Maxs和AscendC::Mins（PIPE_V）读src0Local”。
+// 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步。
+AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-    AscendC::Maxs(tmpTensor1, src0Local, inputVal, tileLength);
-    AscendC::Mins(tmpTensor2, src0Local, inputVal, tileLength);
+AscendC::Maxs(tmpTensor1, src0Local, inputVal, tileLength);
+AscendC::Mins(tmpTensor2, src0Local, inputVal, tileLength);
 ```

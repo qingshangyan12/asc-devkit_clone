@@ -42,8 +42,10 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <pipe_t pipe>
-__aicore__ inline void PipeBarrier()
+namespace AscendC {
+    template <pipe_t pipe>
+    __aicore__ inline void PipeBarrier();
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

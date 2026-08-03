@@ -78,8 +78,10 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
     <!-- end id6 -->
 
     ```cpp
-    template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
-    __aicore__ inline void SetNextTaskStart()
+    namespace AscendC {
+        template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
+        __aicore__ inline void SetNextTaskStart();
+    } // namespace AscendC
     ```
 <!-- end id10 -->
 
@@ -99,8 +101,10 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
     <!-- end id9 -->
 
     ```cpp
-    template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3, bool FORCE = false>
-    __aicore__ inline void SetNextTaskStart()
+    namespace AscendC {
+        template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3, bool FORCE = false>
+        __aicore__ inline void SetNextTaskStart();
+    } // namespace AscendC
     ```
 <!-- end id11 -->
 

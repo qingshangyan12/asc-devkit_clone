@@ -35,8 +35,10 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <bool isAIVOnly = true>
-__aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx, int32_t eventID)
+namespace AscendC {
+    template <bool isAIVOnly = true>
+    __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx, int32_t eventID);
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

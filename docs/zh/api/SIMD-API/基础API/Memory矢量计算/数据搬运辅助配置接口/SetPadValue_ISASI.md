@@ -39,8 +39,10 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T, TPosition pos = TPosition::MAX>
-__aicore__ inline void SetPadValue(T paddingValue)
+namespace AscendC {
+    template <typename T, TPosition pos = TPosition::MAX>
+    __aicore__ inline void SetPadValue(T paddingValue);
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -83,10 +85,10 @@ __aicore__ inline void SetPadValue(T paddingValue)
 ## 调用示例<a name="section1227835243314"></a>
 
 ```cpp
-// 场景1：使用SetPadValue进行自定义填充。
-// DataCopyExtParams参数：blockCount=1, blockLen=20*sizeof(half), srcStride=0, dstStride=0, rsv=0。
-// DataCopyPadExtParams参数：isPad=false, leftPadding=0, rightPadding=12。
-// SetPadValue设置填充值为1，配合isPad=false使用。
+// 场景1：使用AscendC::SetPadValue进行自定义填充。
+// AscendC::DataCopyExtParams参数：blockCount=1, blockLen=20*sizeof(half), srcStride=0, dstStride=0, rsv=0。
+// AscendC::DataCopyPadExtParams参数：isPad=false, leftPadding=0, rightPadding=12。
+// AscendC::SetPadValue设置填充值为1，配合isPad=false使用。
 AscendC::DataCopyExtParams copyParams{1, srcCols * sizeof(T), 0, 0, 0};
 AscendC::DataCopyPadExtParams<T> padParams;
 padParams.isPad = false;

@@ -33,7 +33,9 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atomicOp)
+namespace AscendC {
+    __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atomicOp);
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

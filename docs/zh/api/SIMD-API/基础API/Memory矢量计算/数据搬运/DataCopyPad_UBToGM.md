@@ -70,8 +70,10 @@
 - 不支持配置设置数据搬运模式mode
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
+    namespace AscendC {
+        template <typename T>
+        __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams);
+    } // namespace AscendC
     ```
 
 <!-- npu="950" id15 -->
@@ -79,9 +81,11 @@
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    // 该函数原型仅支持Ascend 950PR/Ascend 950DT
-    template <typename T, PaddingMode mode = PaddingMode::Normal>
-    __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
+    namespace AscendC {
+        // 该函数原型仅支持Ascend 950PR/Ascend 950DT
+        template <typename T, PaddingMode mode = PaddingMode::Normal>
+        __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams);
+    } // namespace AscendC
     ```
 
 <!-- end id15 -->
@@ -93,7 +97,7 @@
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 操作数的数据类型。各产品支持的数据类型请参考[数据类型](#section4219135304818)。 |
-| mode | 配置数据搬运模式。PaddingMode类型，定义如下：<br><pre>enum class PaddingMode : uint8_t {<br>    Normal = 0,  // 默认模式，与原有数据搬运格式保持一致，每次数据搬运都会补齐至32字节对齐<br>    Compact,     // 紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐<br>};</pre> |
+| mode | 配置数据搬运模式，类型为PaddingMode。支持Normal（默认模式，每次数据搬运都会补齐至32字节对齐）和Compact（紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐）。 |
 
 **表2**  接口参数说明
 

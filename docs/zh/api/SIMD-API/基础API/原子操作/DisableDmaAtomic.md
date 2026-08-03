@@ -33,7 +33,9 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void DisableDmaAtomic()
+namespace AscendC {
+    __aicore__ inline void DisableDmaAtomic();
+} // namespace AscendC
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

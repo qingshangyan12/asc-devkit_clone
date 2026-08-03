@@ -113,23 +113,29 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 - 软同步
 
     ```cpp
-    template <bool isAIVOnly = true>
-    __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0)
+    namespace AscendC {
+        template <bool isAIVOnly = true>
+        __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0);
+    } // namespace AscendC
     ```
 
 - 硬同步
     - 不支持config指定流水
 
         ```cpp
-        template <bool isAIVOnly = true>
-        __aicore__ inline void SyncAll()
+        namespace AscendC {
+            template <bool isAIVOnly = true>
+            __aicore__ inline void SyncAll();
+        } // namespace AscendC
         ```
 
     - 支持config指定流水
 
         ```cpp
-        template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
-        __aicore__ inline void SyncAll()
+        namespace AscendC {
+            template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
+            __aicore__ inline void SyncAll();
+        } // namespace AscendC
         ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -139,7 +145,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 | 参数名 | 描述 |
 | --- | --- |
 | isAIVOnly | 控制SyncAll作用于纯Vector算子或Mix（包含Cube和Vector计算）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：Mix（包含Cube和Vector计算）算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
-| config | **该配置仅当isAIVOnly=True时有效。**<br><pre>struct SyncAllConfig {&#x000A;    pipe_t triggerPipe;&#x000A;    pipe_t waitPipe;&#x000A;};&#x000A;&#x000A;// 默认使用全部流水来进行触发和等待行为。<br>constexpr SyncAllConfig DEFAULT_SYNC_ALL_CONFIG = {PIPE_ALL, PIPE_ALL};</pre><br>控制SyncAll函数的行为，在多个AI Core之间进行流水同步时，指定哪些流水（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个流水用于“发送触发信号”。仅支持MTE2、MTE3、PIPE_ALL。<br>&bull; **waitPipe**：指定哪个流水用于“接收等待信号”。仅支持MTE2、MTE3、PIPE_ALL。<br><pre>// 多个AIV进行计算&#x000A;Compute();&#x000A;// 多个AIV将计算结果搬出到GM&#x000A;CopyToGM();&#x000A;// 等待所有数据拷贝到GM后，进行累加&#x000A;constexpr AscendC::SyncAllConfig CustomConfig = {PIPE_MTE3, PIPE_ALL};&#x000A;AscendC::SyncAll&lt;true, CustomConfig&gt;();&#x000A;for (int i = 0; i &lt; blockNum; i++) {&#x000A;    if (i != blockIdx) {&#x000A;        CopyFromGm();&#x000A;        Accumulate();&#x000A;    }&#x000A;}&#x000A;// 累加后的数据写回&#x000A;CopyToGm();</pre> |
+| config | **该配置仅当isAIVOnly=True时有效。**<br>控制SyncAll函数的行为，类型为SyncAllConfig。在多个AI Core之间进行流水同步时，指定哪些流水用于触发和等待。默认值为DEFAULT_SYNC_ALL_CONFIG，即触发流水和等待流水均为PIPE_ALL。<br>&bull; **triggerPipe**：指定哪个流水用于发送触发信号，仅支持PIPE_MTE2、PIPE_MTE3、PIPE_ALL。<br>&bull; **waitPipe**：指定哪个流水用于接收等待信号，仅支持PIPE_MTE2、PIPE_MTE3、PIPE_ALL。 |
 
 **表2**  参数说明
 
@@ -148,6 +154,27 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 | gmWorkspace | 输入 | gmWorkspace为用户定义的全局空间，作为所有核共用的缓存，用于保存每个核的状态标记，类型为GlobalTensor，支持的数据类型为int32_t。GlobalTensor数据结构的定义请参考[GlobalTensor](../../数据结构/GlobalTensor/GlobalTensor.md)。<br>所需空间大小和使用注意项参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
 | ubWorkspace | 输入 | ubWorkspace为用户定义的局部空间，每个核单独自用，用于标记当前核的状态。<br>类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT，支持的数据类型为int32_t。<br>所需空间大小参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
 | usedCores | 输入 | 指定多少个核之间的同步，传入数值不能超过算子调用时指定的逻辑numBlocks。此参数为默认参数，不传此参数表示全核软同步。<br>仅在软同步接口中支持，硬同步接口不支持该参数。 |
+
+config配置示例：
+
+```cpp
+// 多个AIV进行计算并将结果搬出到GM。
+Compute();
+CopyToGM();
+
+// 等待所有数据搬运到GM后进行累加。
+static constexpr AscendC::SyncAllConfig CUSTOM_CONFIG = {PIPE_MTE3, PIPE_ALL};
+AscendC::SyncAll<true, CUSTOM_CONFIG>();
+for (int32_t i = 0; i < blockNum; i++) {
+    if (i != blockIdx) {
+        CopyFromGm();
+        Accumulate();
+    }
+}
+
+// 将累加结果写回GM。
+CopyToGm();
+```
 
 ## 返回值说明<a id="section91032023123812"></a>
 
@@ -210,12 +237,12 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
 本示例实现功能为使用8个核进行数据处理，每个核均是处理32个float类型数据，对该数据乘2后再与其他核上进行同样乘2的数据进行相加，中间结果保存到workGm，因此多个核之间需要进行数据同步。此样例中，使用软同步，入口函数传入的syncGm里的值都已经在host侧初始化为0。若以下用例改成使用硬同步，则不需要传入syncGm，并且不需要使用workQueue。
 
 ```cpp
-// syncGlobal为用户定义的全局空间，作为所有核共用的缓存，类型为GlobalTensor；workLocal为用户定义的局部空间，每个核单独自用，类型为LocalTensor。
+// syncGlobal为用户定义的全局空间，作为所有核共用的缓存，类型为AscendC::GlobalTensor；workLocal为用户定义的局部空间，每个核单独自用，类型为AscendC::LocalTensor。
 int srcDataSize = 256; // 参与计算的元素个数。
 int32_t blockNum = AscendC::GetBlockNum(); // 获取核总数。
 int32_t blockIdx = AscendC::GetBlockIdx(); // 获取当前工作的核ID。
 uint32_t perBlockSize = srcDataSize / blockNum; // 每个核平分处理相同个数。
-// 当前工作核计算后的数据先保存到外部工作空间，workGlobal为GlobalTensor，dstLocal为LocalTensor。
+// 当前工作核计算后的数据先保存到外部工作空间，workGlobal为AscendC::GlobalTensor，dstLocal为AscendC::LocalTensor。
 AscendC::DataCopy(workGlobal[blockIdx * perBlockSize], dstLocal, perBlockSize);
 // 等待所有核都完成计算。
 AscendC::SyncAll(syncGlobal, workLocal);
