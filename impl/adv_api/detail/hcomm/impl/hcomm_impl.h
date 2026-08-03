@@ -81,7 +81,8 @@ template <typename T, bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const
 __aicore__ inline int32_t Hcomm<commProtocol>::AtomicCAS(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR fetchAddr, T compareVal, T swapVal)
 {
-    return impl_.template AtomicCAS<T, commit, commitPipe, reqPipe, config>(channel, dst, fetchAddr, compareVal, swapVal);
+    return impl_.template AtomicCAS<T, commit, commitPipe, reqPipe, config>(
+        channel, dst, fetchAddr, compareVal, swapVal);
 }
 
 template <CommProtocol commProtocol>
@@ -96,6 +97,20 @@ template <pipe_t pipe>
 __aicore__ inline int32_t Hcomm<commProtocol>::Drain(ChannelHandle channel)
 {
     return impl_.template Drain<pipe>(channel);
+}
+
+template <CommProtocol commProtocol>
+__aicore__ inline int32_t Hcomm<commProtocol>::Lock(ChannelHandle channel)
+{
+    static_assert(commProtocol == COMM_PROTOCOL_UBC_CTP, "Lock only supports COMM_PROTOCOL_UBC_CTP");
+    return impl_.Lock(channel);
+}
+
+template <CommProtocol commProtocol>
+__aicore__ inline int32_t Hcomm<commProtocol>::Unlock(ChannelHandle channel)
+{
+    static_assert(commProtocol == COMM_PROTOCOL_UBC_CTP, "Unlock only supports COMM_PROTOCOL_UBC_CTP");
+    return impl_.Unlock(channel);
 }
 } // namespace AscendC
 
