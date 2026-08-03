@@ -350,7 +350,7 @@ static CcuResult ReduceRmtToLoc(
     ccu::Variable scratchOffset;
     if (srcAddr.size() != ctx.channelCount + 1) {
         HCCL_ERROR("[ReduceRmtToLoc] srcAddr.size[%zu] != channels_ size[%zu] +1", srcAddr.size(), ctx.channelCount);
-        return CCU_SUCCESS;
+        return CCU_E_INTERNAL;
     }
 
     ctx.localDstMem.addr = dstAddr;
@@ -405,7 +405,7 @@ static CcuResult BcastLocToRmt(
 {
     if (dstAddr.size() != ctx.channelCount + 1) {
         HCCL_ERROR("[BcastLocToRmt] dstAddr.size[%zu] != channels_ size[%zu] + 1", dstAddr.size(), ctx.channelCount);
-        return CCU_SUCCESS;
+        return CCU_E_INTERNAL;
     }
     ctx.srcMem.addr = srcAddr;
     ctx.srcMem.addr += ctx.sliceOffset;
