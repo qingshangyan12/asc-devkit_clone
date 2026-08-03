@@ -2778,6 +2778,7 @@
             -   [abs](Utils-API/CPP标准库/数学函数/abs1.md)
             -   [sqrt](Utils-API/CPP标准库/数学函数/sqrt1.md)
             -   [ceil\_div](Utils-API/CPP标准库/数学函数/ceil_div.md)
+            -   [CeilDivision（废弃）](Utils-API/CPP标准库/数学函数/CeilDivision.md)
 
         -   [容器函数](Utils-API/CPP标准库/容器函数/容器函数.md)
             -   [tuple](Utils-API/CPP标准库/容器函数/tuple.md)
