@@ -50,10 +50,8 @@
 ## 函数原型<a id="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    template <uint8_t modeId, pipe_t pipe>
-    __aicore__ inline void CrossCoreSetFlag(uint16_t flagId);
-} // namespace AscendC
+template <uint8_t modeId, pipe_t pipe>
+__aicore__ inline void CrossCoreSetFlag(uint16_t flagId);
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -181,9 +179,9 @@ AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
 // UB到GM搬运启用原子累加。
 AscendC::SetAtomicAdd<float>();
-// AscendC::DataCopy属于PIPE_MTE3流水操作。
+// DataCopy属于PIPE_MTE3流水操作。
 AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
-// 当本AIV完成前置PIPE_MTE3(AscendC::DataCopy)流水操作后，通知其他AIV核，本AIV已经完成。
+// 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成。
 AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
 // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
 AscendC::CrossCoreWaitFlag(0);

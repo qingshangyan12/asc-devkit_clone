@@ -36,13 +36,8 @@
 ## 函数原型<a name="section1568410468104"></a>
 
 ```cpp
-namespace AscendC {
-    class Mutex {
-    public:
-        template <pipe_t pipe>
-        static __aicore__ inline void Lock(MutexID id);
-    };
-} // namespace AscendC
+template <pipe_t pipe>
+static __aicore__ inline void Lock(MutexID id);
 ```
 
 ## 参数说明<a name="section74061251191017"></a>
@@ -71,11 +66,11 @@ namespace AscendC {
 - 对于同一个MutexID，必须先执行Lock，然后才能执行Unlock，且指定的pipe需要相同。如果Lock和Unlock没有按照这种"成对出现"的顺序排列，硬件行为将不可预测。以下是常见的错误用法与正确用法示例：
 
     ```cpp
-    // 错误写法 1：先调用AscendC::Mutex::Unlock，再调用AscendC::Mutex::Lock，顺序颠倒。
+    // 错误写法 1：先调用Mutex::Unlock，再调用Mutex::Lock，顺序颠倒。
     AscendC::Mutex::Unlock<PIPE_V>(0);
     AscendC::Mutex::Lock<PIPE_V>(0);
     
-    // 错误写法 2：连续两次调用AscendC::Mutex::Lock后，再连续两次调用AscendC::Mutex::Unlock，未遵循成对使用原则。
+    // 错误写法 2：连续两次调用Mutex::Lock后，再连续两次调用Mutex::Unlock，未遵循成对使用原则。
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Mutex::Unlock<PIPE_V>(0);
@@ -84,7 +79,7 @@ namespace AscendC {
 
     
     
-    // 正确写法：AscendC::Mutex::Lock和AscendC::Mutex::Unlock严格成对出现。
+    // 正确写法：Mutex::Lock和Mutex::Unlock严格成对出现。
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Mutex::Unlock<PIPE_V>(0);
     AscendC::Mutex::Lock<PIPE_V>(0);
@@ -94,7 +89,7 @@ namespace AscendC {
 - 使用相同MutexID、相同流水的两组Lock/UnLock指令时，第二次Lock不会再阻塞流水，这种情况建议使用[PipeBarrier](PipeBarrier_ISASI.md)接口。以下是错误用法与正确用法的示例：
 
     ```cpp
-    // 错误写法：第二次调用AscendC::Mutex::Lock已不再阻塞，起不到同步效果。
+    // 错误写法：第二次调用Mutex::Lock已不再阻塞，起不到同步效果。
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
     AscendC::Mutex::Unlock<PIPE_V>(0);
@@ -103,7 +98,7 @@ namespace AscendC {
     AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
     AscendC::Mutex::Unlock<PIPE_V>(0);
     
-    // 正确写法：使用AscendC::PipeBarrier进行单流水内同步。
+    // 正确写法：使用PipeBarrier进行单流水内同步。
     AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
     AscendC::PipeBarrier<PIPE_V>();
     AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
@@ -112,15 +107,15 @@ namespace AscendC {
 ## 调用示例<a name="section123275308128"></a>
 
 ```cpp
-// 申请两个 AscendC::MutexID，供双缓冲流水交替复用。
+// 申请两个 MutexID，供双缓冲流水交替复用。
 uint8_t mutexId0 = AscendC::AllocMutexID();
 uint8_t mutexId1 = AscendC::AllocMutexID();
 
-// 交替使用两个 AscendC::MutexID，保证 MTE2、V、MTE3 三段流水按顺序串联。
+// 交替使用两个 MutexID，保证 MTE2、V、MTE3 三段流水按顺序串联。
 for (int32_t i = 0; i < loopCount; i++) {
     uint8_t mutexId = (i % 2 == 0) ? mutexId0 : mutexId1;
 
-    // 锁住 MTE2 流水，保证当前 tile 的搬入按该 AscendC::MutexID 顺序执行。
+    // 锁住 MTE2 流水，保证当前 tile 的搬入按该 MutexID 顺序执行。
     AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);
     AscendC::DataCopy(xLocal, src0Global[TILE_LENGTH * progress], TILE_LENGTH);
     AscendC::DataCopy(yLocal, src1Global[TILE_LENGTH * progress], TILE_LENGTH);
@@ -140,7 +135,7 @@ for (int32_t i = 0; i < loopCount; i++) {
     AscendC::Mutex::Unlock<PIPE_MTE3>(mutexId);
 }
 
-// 释放本次样例申请的两个 AscendC::MutexID。
+// 释放本次样例申请的两个 MutexID。
 AscendC::ReleaseMutexID(mutexId0);
 AscendC::ReleaseMutexID(mutexId1);
 ```

@@ -33,9 +33,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    __aicore__ inline MutexID AllocMutexID();
-} // namespace AscendC
+__aicore__ inline MutexID AllocMutexID();
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

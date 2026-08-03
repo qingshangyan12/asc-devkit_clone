@@ -33,10 +33,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    template <typename T>
-    __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const T cacheOffset);
-} // namespace AscendC
+template <typename T>
+__aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const T cacheOffset);
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

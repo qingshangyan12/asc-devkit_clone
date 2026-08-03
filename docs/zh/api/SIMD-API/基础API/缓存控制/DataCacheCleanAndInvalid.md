@@ -64,23 +64,19 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
 - 配置dcciDst的原型
 
   ```cpp
-  namespace AscendC {
-      // 支持通过配置dcciDst确保DCache与GM存储的一致性。
-      template <typename T, CacheLine entireType, DcciDst dcciDst>
-      __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
-      // 支持通过配置dcciDst确保DCache与Local Memory存储的一致性。
-      template <typename T, CacheLine entireType, DcciDst dcciDst>
-      __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
-  } // namespace AscendC
+  // 支持通过配置dcciDst确保DCache与GM存储的一致性。
+  template <typename T, CacheLine entireType, DcciDst dcciDst>
+  __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
+  // 支持通过配置dcciDst确保DCache与Local Memory存储的一致性。
+  template <typename T, CacheLine entireType, DcciDst dcciDst>
+  __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
   ```
 
 - 不支持配置dcciDst，仅支持保证DCache与GM的一致性。
 
     ```cpp
-    namespace AscendC {
-        template <typename T, CacheLine entireType>
-        __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
-    } // namespace AscendC
+    template <typename T, CacheLine entireType>
+    __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
     ```
 
 <!-- npu="310p" id14 -->
@@ -124,7 +120,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
     for( int i = 0; i < 8; i++) {
         global.SetValue(i, AscendC::GetBlockIdx());
     }
-    // 由于首地址64B对齐，调用AscendC::DataCacheCleanAndInvalid指令后，会立刻刷新前8个数。
+    // 由于首地址64B对齐，调用DataCacheCleanAndInvalid指令后，会立刻刷新前8个数。
     AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global);
     ```
 
@@ -139,7 +135,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
     }
     // 由于首地址非64B对齐，调用1条指令，只会刷新起始地址至64B字节对齐的部分，即前4个数。
     AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global);
-    // 需要再次调用AscendC::DataCacheCleanAndInvalid指令，刷新后4个数。
+    // 需要再次调用DataCacheCleanAndInvalid指令，刷新后4个数。
     AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global[4]);
     ```
 
@@ -151,7 +147,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
     global.SetGlobalBuffer((__gm__ uint64_t*)mmAddr_);
     global.SetValue(AscendC::GetBlockIdx(), AscendC::GetBlockIdx());
     // 算子中多核操作虽然不在同一个地址，但在同一个Cache Line，会出现数据的随机覆盖，和通用CPU的行为不同。
-    // 调用AscendC::DataCacheCleanAndInvalid指令后，由于多核操作的时间不一致，最终结果存在随机性，后执行的核会覆盖前面核的结果。
+    // 调用DataCacheCleanAndInvalid指令后，由于多核操作的时间不一致，最终结果存在随机性，后执行的核会覆盖前面核的结果。
     AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global);
     ```
 

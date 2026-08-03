@@ -33,10 +33,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    template <AtomicDtype type, AtomicOp op>
-    __aicore__ inline void SetStoreAtomicConfig();
-} // namespace AscendC
+template <AtomicDtype type, AtomicOp op>
+__aicore__ inline void SetStoreAtomicConfig();
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

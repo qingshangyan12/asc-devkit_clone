@@ -45,19 +45,15 @@
 - Global Memory -> Unified Buffer
 
     ```cpp
-    namespace AscendC {
-        template <typename T>
-        __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1);
-    } // namespace AscendC
+    template <typename T>
+    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1);
     ```
 
 - Unified Buffer -> Global Memory
 
     ```cpp
-    namespace AscendC {
-        template <typename T>
-        __aicore__ inline void DataCopy(const GlobalTensor<T> &dst, const LocalTensor<T> &src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1);
-    } // namespace AscendC
+    template <typename T>
+    __aicore__ inline void DataCopy(const GlobalTensor<T> &dst, const LocalTensor<T> &src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1);
     ```
 
 > [!NOTE]说明 

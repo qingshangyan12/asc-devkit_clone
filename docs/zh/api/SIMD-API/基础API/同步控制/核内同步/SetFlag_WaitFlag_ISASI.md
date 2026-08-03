@@ -48,12 +48,10 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    template <HardEvent event>
-    __aicore__ inline void SetFlag(int32_t eventID);
-    template <HardEvent event>
-    __aicore__ inline void WaitFlag(int32_t eventID);
-} // namespace AscendC
+template <HardEvent event>
+__aicore__ inline void SetFlag(int32_t eventID);
+template <HardEvent event>
+__aicore__ inline void WaitFlag(int32_t eventID);
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -99,8 +97,8 @@ namespace AscendC {
 - 相同流水、相同eventID下，连续使用SetFlag会引发未定义行为，此时再执行PipeBarrier<PIPE\_ALL\>会出现卡死现象：
 
     ```cpp
-    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第一次调用AscendC::SetFlag
-    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第二次调用AscendC::SetFlag（相同流水、相同eventID连续使用，引发未定义行为）
+    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第一次调用SetFlag
+    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第二次调用SetFlag（相同流水、相同eventID连续使用，引发未定义行为）
     ...
     AscendC::PipeBarrier<PIPE_ALL>();  // 触发卡死
     ...
@@ -114,7 +112,7 @@ namespace AscendC {
 AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
 AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
     
-// 循环内依赖：先“AscendC::DataCopy(PIPE_MTE2)写src0Local”，后“AscendC::Maxs和AscendC::Mins（PIPE_V）读src0Local”。
+// 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后“Maxs和Mins（PIPE_V）读src0Local”。
 // 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步。
 AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);

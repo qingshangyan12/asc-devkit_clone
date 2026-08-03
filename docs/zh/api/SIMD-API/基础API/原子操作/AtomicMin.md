@@ -39,10 +39,8 @@ $$
 ## 函数原型<a name="section1171112415119"></a>
 
 ```cpp
-namespace AscendC {
-    template <typename T>
-    __aicore__ inline T AtomicMin(__gm__ T *address, T value);
-} // namespace AscendC
+template <typename T>
+__aicore__ inline T AtomicMin(__gm__ T *address, T value);
 ```
 
 ## 参数说明<a name="section086962912112"></a>
@@ -82,7 +80,7 @@ AscendC::LocalTensor<uint32_t> yLocal = ubAllocator.Alloc<uint32_t>(DATA_SIZE);
 AscendC::GlobalTensor<uint32_t> yGlobal;
 yGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint32_t*>(y), DATA_SIZE);
 
-// AscendC::AtomicMin：三个核分别对GM首个元素原子取最小值。
+// AtomicMin：三个核分别对GM首个元素原子取最小值。
 uint32_t value = 1;
 AscendC::AtomicMin(reinterpret_cast<__gm__ uint32_t*>(y), value);
 

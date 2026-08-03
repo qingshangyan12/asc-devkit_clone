@@ -35,9 +35,7 @@ WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDeter
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
-} // namespace AscendC
+__aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

@@ -33,9 +33,7 @@ GetICachePreloadStatus为调试接口，在ICachePreLoad后调用，用于获取
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    __aicore__ inline int64_t GetICachePreloadStatus();
-} // namespace AscendC
+__aicore__ inline int64_t GetICachePreloadStatus();
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

@@ -40,9 +40,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
-} // namespace AscendC
+__aicore__ inline void ResetLoopModePara(DataCopyMVType type);
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

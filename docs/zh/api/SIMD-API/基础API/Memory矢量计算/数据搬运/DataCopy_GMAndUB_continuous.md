@@ -51,19 +51,15 @@
 - Global Memory -> Unified Buffer
 
     ```cpp
-    namespace AscendC {
-        template <typename T>
-        __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count);
-    } // namespace AscendC
+    template <typename T>
+    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count);
     ```
 
 - Unified Buffer -> Global Memory
 
     ```cpp
-    namespace AscendC {
-        template <typename T>
-        __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
-    } // namespace AscendC
+    template <typename T>
+    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -152,7 +148,7 @@
 - Global Memory -> Unified Buffer
 
     ```cpp
-    // srcLocal为half类型的AscendC::LocalTensor，srcGlobal为half类型的AscendC::GlobalTensor。
+    // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor。
     // 使用传入count参数的搬运接口，完成连续搬运。
     AscendC::DataCopy(srcLocal, srcGlobal, 512);
     ```
@@ -167,7 +163,7 @@
 - Unified Buffer -> Global Memory
 
     ```cpp
-    // dstLocal为half类型的AscendC::LocalTensor，dstGlobal为half类型的AscendC::GlobalTensor。
+    // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
     // 使用传入count参数的搬运接口，完成连续搬运。
     AscendC::DataCopy(dstGlobal, dstLocal, 512);
     ```

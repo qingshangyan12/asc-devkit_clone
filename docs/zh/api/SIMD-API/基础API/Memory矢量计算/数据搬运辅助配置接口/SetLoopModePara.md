@@ -40,9 +40,7 @@ DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mo
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type);
-} // namespace AscendC
+__aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type);
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -99,7 +97,7 @@ namespace AscendC {
 - SetLoopModePara使能loop mode，Compact模式
 
     ```cpp
-    // 场景4：使用AscendC::SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
+    // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
     // Compact模式：每次内层循环搬运80B后填充16B使其96字节对齐。
     // padding值设为-1。
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
@@ -114,7 +112,7 @@ namespace AscendC {
 - SetLoopModePara使能loop mode，Normal模式
 
     ```cpp
-    // 场景5：使用AscendC::SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
+    // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
     // Normal模式：每个block搬运40B后填充24B使其64字节对齐。
     // padding值设为-1。
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};

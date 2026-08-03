@@ -33,9 +33,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    __aicore__ inline void NdDmaDci();
-} // namespace AscendC
+__aicore__ inline void NdDmaDci();
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -58,8 +56,8 @@ namespace AscendC {
 
 ```cpp
 // T：搬运数据的类型
-// xGm：保存AscendC::DataCopy搬入数据
-// xLocal：保存AscendC::DataCopy搬出数据
+// xGm：保存DataCopy搬入数据
+// xLocal：保存DataCopy搬出数据
 
 // 2D Padding场景
 // xGmShape：[2, 8]，搬运8列2行数据，左Padding 3，上Padding 1，右Padding 5，下Padding 1，xLocalShape：[4, 16]

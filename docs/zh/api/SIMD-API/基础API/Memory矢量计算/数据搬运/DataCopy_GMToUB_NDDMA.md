@@ -40,18 +40,14 @@
 - Global Memory -> Unified Buffer，支持多维度搬运
 
     ```cpp
-    namespace AscendC {
-        template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
-        __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params);
-    } // namespace AscendC
+    template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
+    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params);
     ```
 
 - NDDMA Cache刷新，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新NDDMA Cache缓存保证为最新状态。
 
     ```cpp
-    namespace AscendC {
-        __aicore__ inline void NdDmaDci();
-    } // namespace AscendC
+    __aicore__ inline void NdDmaDci();
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

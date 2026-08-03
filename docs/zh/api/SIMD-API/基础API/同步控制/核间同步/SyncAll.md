@@ -113,29 +113,23 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 - 软同步
 
     ```cpp
-    namespace AscendC {
-        template <bool isAIVOnly = true>
-        __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0);
-    } // namespace AscendC
+    template <bool isAIVOnly = true>
+    __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0);
     ```
 
 - 硬同步
     - 不支持config指定流水
 
         ```cpp
-        namespace AscendC {
-            template <bool isAIVOnly = true>
-            __aicore__ inline void SyncAll();
-        } // namespace AscendC
+        template <bool isAIVOnly = true>
+        __aicore__ inline void SyncAll();
         ```
 
     - 支持config指定流水
 
         ```cpp
-        namespace AscendC {
-            template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
-            __aicore__ inline void SyncAll();
-        } // namespace AscendC
+        template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
+        __aicore__ inline void SyncAll();
         ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -237,12 +231,12 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
 本示例实现功能为使用8个核进行数据处理，每个核均是处理32个float类型数据，对该数据乘2后再与其他核上进行同样乘2的数据进行相加，中间结果保存到workGm，因此多个核之间需要进行数据同步。此样例中，使用软同步，入口函数传入的syncGm里的值都已经在host侧初始化为0。若以下用例改成使用硬同步，则不需要传入syncGm，并且不需要使用workQueue。
 
 ```cpp
-// syncGlobal为用户定义的全局空间，作为所有核共用的缓存，类型为AscendC::GlobalTensor；workLocal为用户定义的局部空间，每个核单独自用，类型为AscendC::LocalTensor。
+// syncGlobal为用户定义的全局空间，作为所有核共用的缓存，类型为GlobalTensor；workLocal为用户定义的局部空间，每个核单独自用，类型为LocalTensor。
 int srcDataSize = 256; // 参与计算的元素个数。
 int32_t blockNum = AscendC::GetBlockNum(); // 获取核总数。
 int32_t blockIdx = AscendC::GetBlockIdx(); // 获取当前工作的核ID。
 uint32_t perBlockSize = srcDataSize / blockNum; // 每个核平分处理相同个数。
-// 当前工作核计算后的数据先保存到外部工作空间，workGlobal为AscendC::GlobalTensor，dstLocal为AscendC::LocalTensor。
+// 当前工作核计算后的数据先保存到外部工作空间，workGlobal为GlobalTensor，dstLocal为LocalTensor。
 AscendC::DataCopy(workGlobal[blockIdx * perBlockSize], dstLocal, perBlockSize);
 // 等待所有核都完成计算。
 AscendC::SyncAll(syncGlobal, workLocal);

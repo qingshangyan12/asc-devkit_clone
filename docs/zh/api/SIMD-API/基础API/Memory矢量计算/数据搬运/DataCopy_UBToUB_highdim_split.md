@@ -47,10 +47,8 @@
 ## 函数原型<a name="section1954364615315"></a>
 
 ```cpp
-namespace AscendC {
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
-} // namespace AscendC
+template <typename T>
+__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -187,11 +185,11 @@ namespace AscendC {
 - 场景1：连续搬运——将源数据中128个half元素连续搬运至目的操作数（对应[图1](#zh-cn_topic_0000002535088926_fig4621152141711)）
 
     ```cpp
-    // srcLocal、dstLocal为half类型的AscendC::LocalTensor。
+    // srcLocal、dstLocal为half类型的LocalTensor。
     // 使用传入count参数的搬运接口，完成连续搬运。
     AscendC::DataCopy(dstLocal, srcLocal, 128);
     
-    // 使用传入AscendC::DataCopyParams参数的搬运接口，实现相同的连续搬运效果。
+    // 使用传入DataCopyParams参数的搬运接口，实现相同的连续搬运效果。
     // blockCount = 1：连续数据块个数为1
     // blockLen = 8：一个数据块长度为8个DataBlock（128个half元素 ÷ (32B/2B) = 8）。
     // srcGap = 0, dstGap = 0：无间隔，连续搬运。
@@ -206,7 +204,7 @@ namespace AscendC {
 - 场景2：非连续搬运——从源数据中搬运2个数据块，每个数据块3个DataBlock，源间隔1个DataBlock、目的间隔2个DataBlock（对应[图2](#zh-cn_topic_0000002535088926_fig422819202304)）
 
     ```cpp
-    // srcLocal、dstLocal为half类型的AscendC::LocalTensor。
+    // srcLocal、dstLocal为half类型的LocalTensor。
     // 源数据shape为[1, 112]，共112个half元素（7个DataBlock）。
     // 目的数据接收非连续排列的2个数据块，共6个DataBlock（96个half元素）。
     // blockCount = 2：搬运2个数据块

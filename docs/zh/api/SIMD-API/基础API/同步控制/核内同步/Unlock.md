@@ -36,13 +36,8 @@
 ## 函数原型<a name="section1568410468104"></a>
 
 ```cpp
-namespace AscendC {
-    class Mutex {
-    public:
-        template <pipe_t pipe>
-        static __aicore__ inline void Unlock(MutexID id);
-    };
-} // namespace AscendC
+template <pipe_t pipe>
+static __aicore__ inline void Unlock(MutexID id);
 ```
 
 ## 参数说明<a name="section74061251191017"></a>

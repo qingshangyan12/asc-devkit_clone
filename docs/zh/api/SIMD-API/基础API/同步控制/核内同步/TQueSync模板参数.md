@@ -33,14 +33,12 @@ TQueSync类的模板参数用于指定源流水和目标流水，目的流水等
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-namespace AscendC {
-    template<pipe_t src, pipe_t dst>
-    class TQueSync {
-    public:
-        __aicore__ inline void SetFlag(TEventID id);
-        __aicore__ inline void WaitFlag(TEventID id);
-    };
-} // namespace AscendC
+template<pipe_t src, pipe_t dst>
+class TQueSync {
+public:
+    __aicore__ inline void SetFlag(TEventID id);
+    __aicore__ inline void WaitFlag(TEventID id);
+};
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

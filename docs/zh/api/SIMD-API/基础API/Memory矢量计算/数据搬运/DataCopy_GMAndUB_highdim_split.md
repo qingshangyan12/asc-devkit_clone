@@ -55,19 +55,15 @@
 - Global Memory -> Unified Buffer
 
     ```cpp
-    namespace AscendC {
-        template <typename T>
-        __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams);
-    } // namespace AscendC
+    template <typename T>
+    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams);
     ```
 
 - Unified Buffer -> Global Memory
 
     ```cpp
-    namespace AscendC {
-        template <typename T>
-        __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
-    } // namespace AscendC
+    template <typename T>
+    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -234,8 +230,8 @@
 - Global Memory -> Unified Buffer
 
     ```cpp
-    // srcLocal为half类型的AscendC::LocalTensor，srcGlobal为half类型的AscendC::GlobalTensor。
-    // 使用传入AscendC::DataCopyParams参数的搬运接口，支持连续和非连续搬运。
+    // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor。
+    // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运。
     AscendC::DataCopyParams intriParams;
     intriParams.blockCount = 1; // 连续数据块个数为1。
     intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素。
@@ -254,8 +250,8 @@
 - Unified Buffer -> Global Memory
 
     ```cpp
-    // dstLocal为half类型的AscendC::LocalTensor，dstGlobal为half类型的AscendC::GlobalTensor。
-    // 使用传入AscendC::DataCopyParams参数的搬运接口，支持连续和非连续搬运。
+    // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
+    // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运。
     AscendC::DataCopyParams intriParams;
     intriParams.blockCount = 1; // 连续数据块个数为1。
     intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素。
