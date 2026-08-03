@@ -29,7 +29,7 @@
 
 获取LocalTensor指定索引的数值。
 
-**该接口仅在LocalTensor的TPosition为VECIN/VECCALC/VECOUT时支持。**
+**该接口仅在LocalTensor支持的存储位置为UB(VECIN/VECCALC/VECOUT)时支持。**
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

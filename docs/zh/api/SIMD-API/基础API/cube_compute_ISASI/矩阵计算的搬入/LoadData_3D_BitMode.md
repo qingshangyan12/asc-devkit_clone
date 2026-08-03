@@ -57,7 +57,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
-| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；<br>&nbsp;&nbsp;&bull; B2：ZN格式；<br>&nbsp;&nbsp;&bull; A1/B1：无格式要求，一般情况下为NZ格式。 |
+| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; L0A Buffer(A2)：ZZ格式/NZ格式；<br>&nbsp;&nbsp;&bull; L0B Buffer(B2)：ZN格式；<br>&nbsp;&nbsp;&bull; L1 Buffer(A1/B1)：无格式要求，一般情况下为NZ格式。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为：<br>&nbsp;&nbsp;&bull; Load3DBitModeParam，具体参考[表3](#table106611666584)。<br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
@@ -110,7 +110,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 | dilationH | 卷积核height膨胀系数，取值范围：dilationH∈[1, 255]。<br>（与[LoadData（卷积数据搬运）](LoadData_3D.md)中的dilationFilterH含义相同）。<br>该参数是位域结构体的第六低位参数，占用8bit，可以使用Load3DBitModeParam类对象的SetDilationFilterH()函数设置其值，使用GetDilationFilterH()函数获取其值。 |
 | filterW | 是否在filterW的基础上将卷积核width增加256个元素。true，增加；false，不增加。<br>（与[LoadData（卷积数据搬运）](LoadData_3D.md)中的filterSizeW含义相同）。<br>该参数是位域结构体的第七低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetFilterSizeW()函数设置其值，使用GetFilterSizeW()函数获取其值。 |
 | filterH | 是否在filterH的基础上将卷积核height增加256个元素。true，增加；false，不增加。<br>（与[LoadData（卷积数据搬运）](LoadData_3D.md)中的filterSizeH含义相同）。<br>该参数是位域结构体的第八低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetFilterSizeH()函数设置其值，使用GetFilterSizeH()函数获取其值。 |
-| transpose | 是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为bool，仅在目的TPosition为A2，且源操作数为half类型时有效。默认为false。<br>&nbsp;&nbsp;&bull; true：启用<br>&nbsp;&nbsp;&bull; false：不启用<br>（与[LoadData（卷积数据搬运）](LoadData_3D.md)中的enTranspose含义相同）。<br>该参数是位域结构体的第九低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetTranspose()函数设置其值，使用GetTranspose()函数获取其值。 |
+| transpose | 是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为bool，仅在目的存储位置为L0A Buffer(A2)，且源操作数为half类型时有效。默认为false。<br>&nbsp;&nbsp;&bull; true：启用<br>&nbsp;&nbsp;&bull; false：不启用<br>（与[LoadData（卷积数据搬运）](LoadData_3D.md)中的enTranspose含义相同）。<br>该参数是位域结构体的第九低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetTranspose()函数设置其值，使用GetTranspose()函数获取其值。 |
 | fmatrixCtrl | 表示LoadData3DV2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，当前只支持设置为false，默认值为false。<br>&nbsp;&nbsp;&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&nbsp;&nbsp;&bull; false：从左矩阵中获取FeatureMap的属性描述。<br>（与[LoadData（卷积数据搬运）](LoadData_3D.md)中的fMatrixCtrl含义相同）。<br>该参数是位域结构体的第十低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetFmatrixCtrl()函数设置其值，使用GetFmatrixCtrl()函数获取其值。 |
 | sizeChannel | 源操作数的通道数，取值范围：sizeChannel∈[1, 63]。<br>sizeChannel的取值要求为：对于uint32_t/int32_t/float，sizeChannel可取值为4，N\*8，N\*8+4；对于half/bfloat16，sizeChannel可取值为4，8，N\*16，N\*16+4，N\*16+8；对于int8_t/uint8_t，sizeChannel可取值为4，8，16，32\*N，N\*32+4，N\*32+8，N\*32+16；对于int4b_t，sizeChannel可取值为8，16，32，N \* 64，N\*64+8，N\*64+16，N\*64+32。N为正整数。<br>（与[LoadData（卷积数据搬运）](LoadData_3D.md)中的channelSize含义相同）。<br>该参数是位域结构体的最高位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetChannelSize()函数设置其值，使用GetChannelSize()函数获取其值。 |
 

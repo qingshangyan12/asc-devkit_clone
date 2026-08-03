@@ -49,7 +49,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     | dstTensor      | 输出  | 目的操作数。    |
     | srcTensor      |  输入  |源操作数。   |
     | scalarValue   | 输入  |scalar标量。支持的数据类型为half/float。scalar操作数的类型需要和srcTensor保持一致。      |
-    | sharedTmpBuffer   | 输入  | 临时缓存。类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。由于该接口的内部实现需要额外的临时空间来存储计算过程中的中间变量。临时空间需要开发者通过sharedTmpBuffer入参传入。      |
+    | sharedTmpBuffer   | 输入  | 临时缓存。类型为LocalTensor，支持的存储位置为UB(VECIN/VECCALC/VECOUT)。由于该接口的内部实现需要额外的临时空间来存储计算过程中的中间变量。临时空间需要开发者通过sharedTmpBuffer入参传入。      |
     | calCount   | 输入 | 参与计算的元素个数。     | 
 - Tiling侧
 

@@ -16,7 +16,7 @@ int32_t SetCType(TPosition pos, CubeFormat type, DataType dataType)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| pos | 输入 | C矩阵所在的buffer位置，可设置为：TPosition::GM, TPosition::VECIN。 |
+| pos | 输入 | C矩阵支持的存储位置为：GM, UB(VECIN)。 |
 | type | 输入 | C矩阵的数据格式，可设置为：CubeFormat::ND，CubeFormat::NZ, CubeFormat::ND_ALIGN。 |
 | dataType | 输入 | C矩阵的数据类型，可设置为：DataType::DT_FLOAT、DataType::DT_FLOAT16、DataType::DT_BFLOAT16、DataType::DT_INT8、DataType::DT_INT32、DataType::DT_FLOAT8_E4M3FN、DataType::DT_HIFLOAT8。 |
 

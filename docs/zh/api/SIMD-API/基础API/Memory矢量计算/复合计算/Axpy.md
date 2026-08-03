@@ -78,8 +78,8 @@ $$
 
 | 参数名称     | 输入/输出 | 说明 |
 | :----------- | :-------- | :--- |
-| dst          | 输出      | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src          | 输入      | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dst          | 输出      | 目的操作数。<br>类型为LocalTensor，支持的存储位置为UB(VECIN/VECCALC/VECOUT)。 |
+| src          | 输入      | 源操作数。<br>类型为LocalTensor，支持的存储位置为UB(VECIN/VECCALC/VECOUT)。 |
 | scalarValue  | 输入      | 源操作数，scalar标量。scalarValue的数据类型需要和src保持一致。 |
 | count        | 输入      | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
 | mask/mask[]  | 输入      | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../SIMD计算说明/掩码.md) |

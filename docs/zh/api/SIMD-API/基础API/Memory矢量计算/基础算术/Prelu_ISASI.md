@@ -51,8 +51,8 @@ __aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 
 | 参数名 | 输入/输出 | 描述 |
 | ---- | ---- | ---- |
-| dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN、VECCALC、VECOUT。<br>地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md)。 |
-| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN、VECCALC、VECOUT。<br>地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md)。 |
+| dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的存储位置为UB(VECIN、VECCALC、VECOUT)。<br>地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md)。 |
+| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的存储位置为UB(VECIN、VECCALC、VECOUT)。<br>地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md)。 |
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
 
 ## 数据类型
