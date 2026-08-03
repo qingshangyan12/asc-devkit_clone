@@ -1376,8 +1376,10 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
             } else {
                 CHK_RET(ret);
             }
-            // KFC Server当前仅启动missionIndex 0，保持与原有固定注册die 0的行为一致。
-            if (strcmp(kernelInfo.kernelFuncName, "CcuKernelKfcServer") != 0) {
+            if (strcmp(kernelInfo.kernelFuncName, "CcuKernelKfcServer") == 0) {
+                // A5动态CCU资源接口会拒绝已禁用的die 0，KFC Server改用已启用的die 1。
+                kernelInfo.dieId = 1;
+            } else {
                 // 从首条channel获取dieId，作为kernel所属dieId保存（同一kernel的所有channel在同一die上）
                 EndpointDesc localEndpoint = kernelChannelRequest[0].localEndpoint;
                 using DieIdType = uint32_t;
