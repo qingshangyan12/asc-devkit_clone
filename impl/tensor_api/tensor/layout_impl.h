@@ -72,16 +72,15 @@ __aicore__ inline decltype(auto) MakeSlicePatternLayout(const LayoutType& layout
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape>
-__aicore__ inline decltype(auto) MakeSameShapeSliceLayout(
+__aicore__ inline decltype(auto) MakeSameShapeSliceShape(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     auto coordLayout = MakeCoordLayout(coord, layout);
-    auto realShape = TransformTupleApply(coordLayout.Shape(), sliceShape, MinOp{});
-    return MakeSlicePatternLayout(layout, realShape);
+    return TransformTupleApply(coordLayout.Shape(), sliceShape, MinOp{});
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape>
-__aicore__ inline decltype(auto) MakeFourDimSliceLayout(
+__aicore__ inline decltype(auto) MakeFourDimSliceShape(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     static_assert(NestingDepthV<SliceShape> == TWO_DIM_DATA,
@@ -94,18 +93,17 @@ __aicore__ inline decltype(auto) MakeFourDimSliceLayout(
 
     auto realRow = Std::min(srcRow, Get<0>(sliceShape));
     auto realCol = Std::min(srcCol, Get<1>(sliceShape));
-    return MakeSlicePatternLayout(layout, MakeFractalShape(MakeShape(realRow, realCol),
-        MakeShape(innerRow, innerCol)));
+    return MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol));
 }
 
 // Slice for the flat multi-batch layouts produced by MakeFrameLayout(batch0, ..., batchN, row, col):
 //   layout shape (batch0, ..., batchN-1, ((row0, row1), (col0, col1)))   -- batchNum + 1 elements
 //   slice shape  (batch0, ..., batchN-1, (x, y))                        -- logical row/col for the block
 // Every batch axis is clamped elementwise like the same-shape path, and the trailing logical (x, y) is
-// refractalized against the layout's inner row/col, mirroring MakeFiveDimSliceLayout (which is exactly
-// the batchNum == 1 case of this routine).
+// refractalized against the layout's inner row/col. The batchNum == 1 case covers the classic
+// five-dimensional layout and three-dimensional slice shape.
 template <typename Coord, typename LayoutType, typename SliceShape, size_t... BatchIs>
-__aicore__ inline decltype(auto) MakeFlatBatchSliceLayoutImpl(
+__aicore__ inline decltype(auto) MakeFlatBatchSliceShapeImpl(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape, Std::index_sequence<BatchIs...>)
 {
     constexpr size_t blockIdx = sizeof...(BatchIs); // last element: the fractal block / logical (x, y)
@@ -118,24 +116,23 @@ __aicore__ inline decltype(auto) MakeFlatBatchSliceLayoutImpl(
         innerCol * Get<blockIdx, 1, 1>(layout.Shape()) - Get<blockIdx, 1>(coord), Get<blockIdx, 1>(sliceShape));
     auto fractalShape = MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol));
 
-    return MakeSlicePatternLayout(
-        layout,
-        MakeShape(
-            Std::min(Get<BatchIs>(layout.Shape()) - Get<BatchIs>(coord), Get<BatchIs>(sliceShape))...,
-            fractalShape));
+    return MakeShape(
+        Std::min(Get<BatchIs>(layout.Shape()) - Get<BatchIs>(coord), Get<BatchIs>(sliceShape))...,
+        fractalShape);
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape>
-__aicore__ inline decltype(auto) MakeFlatBatchSliceLayout(
+__aicore__ inline decltype(auto) MakeFlatBatchSliceShape(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     constexpr size_t batchNum = Std::tuple_size_v<Std::remove_cvref_t<decltype(layout.Shape())>> - 1;
-    return MakeFlatBatchSliceLayoutImpl(
+    return MakeFlatBatchSliceShapeImpl(
         coord, layout, sliceShape, Std::make_index_sequence<batchNum>{});
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!IsLayoutV<SliceShape>, int> = 0>
-__aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
+__aicore__ inline decltype(auto) MakeSliceShape(
+    const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     static_assert(IsLayoutV<LayoutType>, "LayoutType must be Layout");
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<SliceShape>>, "SliceShape must be a tuple");
@@ -154,17 +151,24 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const Layou
         originShapeDepth == batchNum + FOUR_DIM_DATA && sliceShapeDepth == batchNum + TWO_DIM_DATA;
 
     if constexpr (isSameShape) {
-        return MakeSameShapeSliceLayout(coord, layout, sliceShape);
+        return MakeSameShapeSliceShape(coord, layout, sliceShape);
     } else if constexpr (originShapeDepth == FOUR_DIM_DATA && sliceShapeDepth == TWO_DIM_DATA) {
-        return MakeFourDimSliceLayout(coord, layout, sliceShape);
+        return MakeFourDimSliceShape(coord, layout, sliceShape);
     } else if constexpr (isFlatBatch) {
-        return MakeFlatBatchSliceLayout(coord, layout, sliceShape);
+        return MakeFlatBatchSliceShape(coord, layout, sliceShape);
     } else {
         static_assert(isSameShape || (originShapeDepth == FOUR_DIM_DATA && sliceShapeDepth == TWO_DIM_DATA) ||
             isFlatBatch,
             "SliceShape must be same structure as Layout shape, or logical Two Dim Shape for Four Dim Layout, "
             "or (batch0, ..., batchN, logical Two Dim Shape) for a flat multi-batch Layout.");
     }
+}
+
+template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!IsLayoutV<SliceShape>, int> = 0>
+__aicore__ inline decltype(auto) MakeSliceLayout(
+    const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
+{
+    return MakeSlicePatternLayout(layout, MakeSliceShape(coord, layout, sliceShape));
 }
 
 template <typename Coord, typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<IsLayoutV<DstLayoutType>, int> = 0>

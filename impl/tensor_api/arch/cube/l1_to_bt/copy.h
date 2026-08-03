@@ -59,6 +59,17 @@ private:
         using CopyL12BTImpl = typename CopyL12BTRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL12BTImpl::template Run<trait, T, U>(dst, src);
     }
+
+    template <const CopyL12BTTrait& trait = DEFAULT_COPY_L1_BT_TRAIT, typename T, typename U,
+        typename Coord, typename Shape>
+    __aicore__ inline static void DataCopyImpl(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL12BTRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        Impl::template Run<trait, T, U>(dst, src, coord, shape);
+    }
 };
 
 } // namespace Te

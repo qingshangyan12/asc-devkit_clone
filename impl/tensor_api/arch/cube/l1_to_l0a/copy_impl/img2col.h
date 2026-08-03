@@ -52,6 +52,25 @@ public:
             params.filterW, params.filterH, params.dilationFilterW, params.dilationFilterH, params.filterSizeW,
             params.filterSizeH, params.transpose, params.fMatrixCtrl, channelSize);
     }
+
+    template <const CopyL12L0ATrait& trait, typename DstTensor, typename SrcTensor, typename Coord,
+        typename Shape, typename PadT>
+    __aicore__ inline static void Run(const DstTensor& dst, const SrcTensor& src, const Coord& coord,
+        const Shape& shape, const Img2ColParams<PadT>& params)
+    {
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        uint16_t l1H = Get<2>(regionShape);
+        uint16_t l1W = Get<3>(regionShape);
+        uint16_t channelSize = Get<1>(regionShape) * Get<4>(regionShape);
+        LoadCbufToCaImg2Col::SetFMatrix(l1H, l1W, params.padList);
+        LoadCbufToCaImg2Col::SetPadding(params.padValue);
+        LoadCbufToCaImg2Col::SetRepeat(static_cast<uint16_t>(Std::ceil_division(params.mExtension, FRACTAL_FIXED)));
+        LoadCbufToCaImg2Col::LoadDataRegion(dst, src, srcOffset, params.kExtension, params.mExtension, 0, 0,
+            params.strideW, params.strideH, params.filterW, params.filterH, params.dilationFilterW,
+            params.dilationFilterH, params.filterSizeW, params.filterSizeH, params.transpose,
+            params.fMatrixCtrl, channelSize);
+    }
 };
 
 } // namespace Te

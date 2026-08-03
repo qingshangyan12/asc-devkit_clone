@@ -60,6 +60,23 @@ private:
             SrcPattern>::type;
         CopyL12L0ScaleAImpl::template Run<trait, T, U>(dst, src);
     }
+
+    template <const CopyL12L0ScaleATrait& trait = DEFAULT_COPY_L1_TO_L0SCALEA_TRAIT, typename T, typename U,
+        typename Coord, typename Shape>
+    __aicore__ inline static void LoadData(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using dstPos = GetMemLocation<T>;
+        using srcPos = GetMemLocation<U>;
+        static_assert(Std::is_same_v<dstPos, Location::L0ScaleA>,
+            "When Copy tensor from L1 to L0ScaleA, dst tensor must on L0ScaleA");
+        static_assert(Std::is_same_v<srcPos, Location::L1>,
+            "When Copy tensor from L1 to L0ScaleA, src tensor must on L1");
+        using DstPattern = GetLayoutPattern<typename T::layoutType>;
+        using SrcPattern = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL12L0ScaleARouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
+        Impl::template Run<trait, T, U>(dst, src, coord, shape);
+    }
 };
 
 } // namespace Te

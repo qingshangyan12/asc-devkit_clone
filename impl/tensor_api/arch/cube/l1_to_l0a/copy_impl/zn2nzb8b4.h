@@ -43,6 +43,34 @@ public:
         }
     }
 
+    template <const CopyL12L0ATrait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        using DstType = typename T::elementType;
+        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
+        auto srcRowSize = GetTotalRowShapeFromShape(regionShape);
+        auto dstRowSize = GetTotalRowShapeFromShape(dst.Layout().Shape());
+        auto m1 = srcRowSize - dstRowSize;
+        auto mStep = GetTotalColumnShapeFromShape(dst.Layout().Shape()) / FRACTAL_FIXED;
+        auto kStep = Std::ceil_division(srcRowSize, C0_ELEMENT<DstType>);
+        auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(src.Layout()) / STRIDE_UNIT;
+        auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dst.Layout()) / STRIDE_UNIT;
+        if (m1 < FRACTAL_FIXED) {
+            LoadCbufToCa::LoadDataRegion<true>(
+                dst, src, srcOffset, 0, 0, mStep, kStep, srcStride, dstStride);
+        } else if constexpr (IsB4Type<DstType>) {
+            LoadDataRegionSplit<M_STEP_MIN_VAL_B4>(
+                dst, src, srcOffset, mStep, kStep, srcStride, dstStride);
+        } else {
+            LoadDataRegionSplit<M_STEP_MIN_VAL_B8>(
+                dst, src, srcOffset, mStep, kStep, srcStride, dstStride);
+        }
+    }
+
 private:
     static constexpr uint8_t M_STEP_MIN_VAL_B4 = 4;
     static constexpr uint8_t M_STEP_MIN_VAL_B8 = 2;
@@ -64,6 +92,18 @@ private:
             auto sliceDst = dst(MakeCoord(MakeCoord(0, 0), MakeCoord(0, idx)));
             LoadCbufToCa::LoadData<true>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             mStartPosition += mStepMinVal;
+        }
+    }
+
+    template <uint8_t mStepMinVal, typename T, typename U, typename Offset>
+    __aicore__ inline static void LoadDataRegionSplit(const T& dst, const U& src, const Offset& srcOffset,
+        uint8_t mStep, uint8_t kStep, int16_t srcStride, uint16_t dstStride)
+    {
+        uint16_t mLoop = mStep / mStepMinVal;
+        for (uint16_t idx = 0; idx < mLoop; ++idx) {
+            auto subDst = dst(MakeCoord(MakeCoord(0, 0), MakeCoord(0, idx)));
+            LoadCbufToCa::LoadDataRegion<true>(subDst, src, srcOffset, idx * mStepMinVal, 0,
+                mStepMinVal, kStep, srcStride, dstStride);
         }
     }
 

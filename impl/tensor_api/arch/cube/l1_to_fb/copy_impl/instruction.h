@@ -39,6 +39,14 @@ public:
         CopyL12FB(dst.Data().Get(), src.Data().Get(), params...);
     }
 
+    template <typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void DataCopyRegion(
+        const T& dst, const U& src, const Offset& srcOffset, const Params&... params)
+    {
+        auto srcData = src.Data() + srcOffset;
+        CopyL12FB(dst.Data().Get(), srcData.Get(), params...);
+    }
+
 private:
     template <typename T>
     __aicore__ inline static void CopyL12FB(__fbuf__ T* dst, __cbuf__ T* src, uint16_t blockCount,

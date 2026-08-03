@@ -53,6 +53,24 @@ public:
         CopyMatrixCcToGmInstr::DataCopy<quantPre, T, U>(
             dst, src, nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit, true, false);
     }
+
+    template <const CopyL0C2GMTrait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void Run(const T& dst, const U& src, const Coord& coord,
+        const Shape& shape, const FixpipeParams& params)
+    {
+        constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U>();
+        CheckDataType::CheckL0C2GmDataType<quantPre, T, U>();
+        SetRegisterImpl<T, U>(dst, src);
+        auto regionShape = MakeSliceShape(coord, dst.Layout(), shape);
+        auto dstOffset = dst.Layout()(coord);
+        uint32_t nSize = Get<3>(regionShape);
+        uint32_t mSize = Get<1>(regionShape) * Get<2>(regionShape);
+        uint32_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(src.Layout()) / FRACTAL_FIXED;
+        uint32_t dstStride = Get<2>(dst.Layout().Stride());
+        CopyMatrixCcToGmInstr::DataCopyRegion<quantPre>(dst, src, dstOffset, nSize, mSize, srcStride,
+            dstStride, dst.Engine().GetCacheMode(), trait.enableRelu, params.unitFlag,
+            trait.enableChannelSplit, true, false);
+    }
 };
 
 } // namespace Te

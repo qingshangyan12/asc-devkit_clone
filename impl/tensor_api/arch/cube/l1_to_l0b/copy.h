@@ -71,6 +71,19 @@ private:
         using CopyL12L0BImpl = typename CopyL12L0BRouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyL12L0BMode>::type;
         CopyL12L0BImpl::template Run<trait, T, U>(dst, src);
     }
+
+    template<const CopyL12L0BTrait& trait = DEFAULT_COPY_L1_TO_L0B_TRAIT, typename T, typename U,
+        typename Coord, typename Shape>
+    __aicore__ inline static void LoadData(const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using DstPattern = GetLayoutPattern<typename T::layoutType>;
+        using SrcPattern = GetLayoutPattern<typename U::layoutType>;
+        constexpr auto isB8B4Type = sizeof(typename T::elementType) == 1;
+        constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>;
+        using Mode = typename CopyL12L0BModeSet::template Get<Std::tuple<Std::Int<noTrans>, Std::Int<isB8B4Type>>>;
+        using Impl = typename CopyL12L0BRouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern, Mode>::type;
+        Impl::template Run<trait, T, U>(dst, src, coord, shape);
+    }
 };
 
 }

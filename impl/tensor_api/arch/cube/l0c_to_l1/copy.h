@@ -54,6 +54,17 @@ public:
         CopyL0C2L1Impl::template Run<trait>(dst, src, params);
     }
 
+    template <const CopyL0C2L1Trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U,
+        typename Coord, typename Shape>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const Coord& coord,
+        const Shape& shape, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL0C2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        Impl::template Run<trait>(dst, src, coord, shape, params);
+    }
+
     template <const CopyL0C2L1Trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U, typename S>
     __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type DataCopyImpl(
         const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
@@ -70,6 +81,18 @@ public:
         CopyL0C2L1Impl::template Run<trait>(dst, src, quant, params);
     }
 
+    template <const CopyL0C2L1Trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U, typename S,
+        typename Coord, typename Shape>
+    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type DataCopyImpl(
+        const T& dst, const U& src, const S& quant, const Coord& coord, const Shape& shape,
+        const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL0C2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        Impl::template Run<trait>(dst, src, quant, coord, shape, params);
+    }
+
     template <const CopyL0C2L1Trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U, typename S>
     __aicore__ inline static typename Std::enable_if<IsAttrTensorV<S>, void>::type DataCopyImpl(
         const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
@@ -84,6 +107,18 @@ public:
 
         using CopyL0C2L1Impl = typename CopyL0C2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL0C2L1Impl::template Run<trait>(dst, src, quant, params);
+    }
+
+    template <const CopyL0C2L1Trait& trait = DEFAULT_COPY_L0C2L1_TRAIT, typename T, typename U, typename S,
+        typename Coord, typename Shape>
+    __aicore__ inline static typename Std::enable_if<IsAttrTensorV<S>, void>::type DataCopyImpl(
+        const T& dst, const U& src, const S& quant, const Coord& coord, const Shape& shape,
+        const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using Impl = typename CopyL0C2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        Impl::template Run<trait>(dst, src, quant, coord, shape, params);
     }
 };
 

@@ -39,6 +39,14 @@ public:
         LoadCbufToCbImpl<transpose>(dst.Data().Get(), src.Data().Get(), params...);
     }
 
+    template <bool transpose, typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void LoadDataRegion(
+        const T& dst, const U& src, const Offset& srcOffset, const Params&... params)
+    {
+        auto srcData = src.Data() + srcOffset;
+        LoadCbufToCbImpl<transpose>(dst.Data().Get(), srcData.Get(), params...);
+    }
+
 private:
     template <bool transpose, typename T>
     __aicore__ inline static void LoadCbufToCbImpl(__cb__ T* dst, __cbuf__ T* src, uint16_t mStartPosition,

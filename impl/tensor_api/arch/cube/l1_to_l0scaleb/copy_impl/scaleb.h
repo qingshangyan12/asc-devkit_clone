@@ -43,6 +43,22 @@ public:
         }
     }
 
+    template <const CopyL12L0ScaleBTrait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+        auto srcOffset = src.Layout()(coord);
+        auto dstLayout = dst.Layout();
+        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+        auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+        auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(src.Layout()) >> 5;
+        auto dstStride = kStep;
+        uint64_t mxDstAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.Data().Get()));
+        LoadCbufToL0MxScaleB3510::LoadDataRegion(
+            mxDstAddr, src, srcOffset, 0, 0, mStep, kStep, srcStride, dstStride);
+    }
+
 private:
     template <const CopyL12L0ScaleBTrait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()

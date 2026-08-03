@@ -36,6 +36,32 @@ public:
         Execute<trait>(dst, src);
     }
 
+    template <const CopyL12UBTrait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using srcType = typename U::elementType;
+        using dstType = typename T::elementType;
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        uint16_t blockCount = GetTotalRowShapeFromShape(regionShape);
+        auto columns = GetTotalColumnShapeFromShape(regionShape);
+        uint32_t blockLen = Std::ceil_division(columns, C0_ELEMENT<srcType>);
+        uint32_t srcRowStride;
+        uint32_t dstRowStride;
+        if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row>(src.Layout());
+            dstRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row>(dst.Layout());
+        } else {
+            srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(src.Layout());
+            dstRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dst.Layout());
+        }
+        int64_t srcStride = Std::ceil_division(srcRowStride - columns, C0_ELEMENT<srcType>);
+        int64_t dstStride = Std::ceil_division(dstRowStride - columns, C0_ELEMENT<dstType>);
+        CopyCbufToUbufInstr::DataCopyRegion(
+            dst, src, srcOffset, blockCount, blockLen, srcStride, dstStride);
+    }
+
 private:
     template <const CopyL12UBTrait& trait, typename T, typename U>
     __aicore__ inline static void Execute(const T& dst, const U& src)
@@ -76,6 +102,32 @@ public:
         Execute<trait>(dst, src);
     }
 
+    template <const CopyL12UBTrait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using srcType = typename U::elementType;
+        using dstType = typename T::elementType;
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        auto rows = GetTotalRowShapeFromShape(regionShape);
+        uint16_t blockCount = GetTotalColumnShapeFromShape(regionShape);
+        uint32_t blockLen = Std::ceil_division(rows, C0_ELEMENT<srcType>);
+        uint32_t srcColumnStride;
+        uint32_t dstColumnStride;
+        if constexpr (IsSatisfiedPtnFormatV<U, DNLayoutPtn>) {
+            srcColumnStride = GetElement<AttrInfo::Stride, AttrInfo::Column>(src.Layout());
+            dstColumnStride = GetElement<AttrInfo::Stride, AttrInfo::Column>(dst.Layout());
+        } else {
+            srcColumnStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(src.Layout());
+            dstColumnStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dst.Layout());
+        }
+        int64_t srcStride = Std::ceil_division(srcColumnStride - rows, C0_ELEMENT<srcType>);
+        int64_t dstStride = Std::ceil_division(dstColumnStride - rows, C0_ELEMENT<dstType>);
+        CopyCbufToUbufInstr::DataCopyRegion(
+            dst, src, srcOffset, blockCount, blockLen, srcStride, dstStride);
+    }
+
 private:
     template <const CopyL12UBTrait& trait, typename T, typename U>
     __aicore__ inline static void Execute(const T& dst, const U& src)
@@ -114,6 +166,24 @@ public:
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
         Execute<trait>(dst, src);
+    }
+
+    template <const CopyL12UBTrait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using srcType = typename U::elementType;
+        using dstType = typename T::elementType;
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        uint16_t blockCount = Get<1, 1>(regionShape);
+        uint32_t blockLen = GetTotalRowShapeFromShape(regionShape);
+        int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(src.Layout()) /
+            C0_ELEMENT<srcType> - blockLen;
+        int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dst.Layout()) /
+            C0_ELEMENT<dstType> - blockLen;
+        CopyCbufToUbufInstr::DataCopyRegion(
+            dst, src, srcOffset, blockCount, blockLen, srcStride, dstStride);
     }
 
 private:
