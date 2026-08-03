@@ -182,7 +182,7 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
 <a id="syncall_flagId冲突说明"></a>
     - SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag_ISASI.md)和[CrossCoreWaitFlag](CrossCoreWaitFlag_ISASI.md)进行核间同步控制，因此开发者同时使用CrossCoreSetFlag（或CrossCoreWaitFlag）和SyncAll硬件同步接口时，需注意避免以下[flagId](CrossCoreSetFlag_ISASI.md#flagId取值范围说明)冲突：
         <!-- npu="950" id28 -->
-        - 针对Ascend 950PR/Ascend 950DT，SyncAll硬件同步接口的flagId占用情况如表3所示：
+        - 针对[NPU架构版本3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)，SyncAll硬件同步接口的flagId占用情况如表3所示：
 
             **表3**  SyncAll硬件同步接口flagId占用情况
 
