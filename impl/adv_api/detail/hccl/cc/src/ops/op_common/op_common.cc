@@ -1376,14 +1376,17 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
             } else {
                 CHK_RET(ret);
             }
-            // 从首条channel获取dieId，作为kernel所属dieId保存（同一kernel的所有channel在同一die上）
-            EndpointDesc localEndpoint = kernelChannelRequest[0].localEndpoint;
-            using DieIdType = uint32_t;
-            const uint32_t dieIdTypeSize = sizeof(DieIdType);
-            DieIdType dieId = 0;
-            CHK_RET(HcclRankGraphGetEndpointInfo(comm, userRank, &localEndpoint,
-                ENDPOINT_ATTR_DIE_ID, dieIdTypeSize, static_cast<void*>(&dieId)));
-            kernelInfo.dieId = dieId;
+            // KFC Server当前仅启动missionIndex 0，保持与原有固定注册die 0的行为一致。
+            if (strcmp(kernelInfo.kernelFuncName, "CcuKernelKfcServer") != 0) {
+                // 从首条channel获取dieId，作为kernel所属dieId保存（同一kernel的所有channel在同一die上）
+                EndpointDesc localEndpoint = kernelChannelRequest[0].localEndpoint;
+                using DieIdType = uint32_t;
+                const uint32_t dieIdTypeSize = sizeof(DieIdType);
+                DieIdType dieId = 0;
+                CHK_RET(HcclRankGraphGetEndpointInfo(comm, userRank, &localEndpoint,
+                    ENDPOINT_ATTR_DIE_ID, dieIdTypeSize, static_cast<void*>(&dieId)));
+                kernelInfo.dieId = dieId;
+            }
         }
         auto* kernelArgBase = static_cast<CcuKernelArgBase*>(kernelInfo.kernelArg);
         if (!kernelArgBase) {
