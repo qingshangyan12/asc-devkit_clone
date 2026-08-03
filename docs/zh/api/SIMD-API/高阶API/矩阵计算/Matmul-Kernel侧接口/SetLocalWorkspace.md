@@ -30,12 +30,12 @@
 
 ## 功能说明
 
-对于某些场景Matmul内部需要额外占用VECCALC空间，如果用户希望在算子中复用这个额外占用的VECCALC空间，则该空间需要用户预留，并申请好LocalTensor，将其起始物理地址传入给Matmul。具体需要申请的VECCALC临时空间大小由tiling接口[MatmulGetTmpBufSize](../获取Matmul计算所需空间/MatmulGetTmpBufSize.md)给出，满足以下几个条件之一就需要使用该接口传入UB临时空间：
+对于某些场景Matmul内部需要额外占用UB（VECCALC）空间，如果用户希望在算子中复用这个额外占用的UB（VECCALC）空间，则该空间需要用户预留，并申请好LocalTensor，将其起始物理地址传入给Matmul。具体需要申请的UB（VECCALC）临时空间大小由tiling接口[MatmulGetTmpBufSize](../获取Matmul计算所需空间/MatmulGetTmpBufSize.md)给出，满足以下几个条件之一就需要使用该接口传入UB临时空间：
 
 -   C矩阵Position为TPosition::GM；
 -   C矩阵CubeFormat为CubeFormat::ND；
 -   A矩阵或者B矩阵CubeFormat为CubeFormat::ND；
--   存在Bias且Bias的Position不是VECCALC。
+-   存在Bias且Bias的存储位置不是UB（VECCALC）。
 
 请在[Iterate](Iterate.md)或者[IterateAll](IterateAll.md)之前调用该接口。
 
@@ -51,7 +51,7 @@ __aicore__ inline void SetLocalWorkspace(const LocalTensor<uint8_t>& tmpBuffer)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| tmpBuffer | 输入 | 临时空间，由用户申请并管理，TPosition为VECCALC。 |
+| tmpBuffer | 输入 | 临时空间，由用户申请并管理，支持的存储位置为UB（VECCALC）。 |
 
 ## 返回值说明
 

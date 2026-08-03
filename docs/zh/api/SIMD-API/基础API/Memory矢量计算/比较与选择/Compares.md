@@ -90,8 +90,8 @@
 
 | 参数名称 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>dst用于存储比较结果，将dst中uint8_t类型的数据按照bit位展开，由左至右依次表征对应位置的src0和src1Scalar的比较结果，如果比较后的结果为真，则对应比特位为1，否则为0。<br> |
-| src0 | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，支持的存储位置为UB（VECIN/VECCALC/VECOUT）。<br>LocalTensor的起始地址需要32字节对齐。<br>dst用于存储比较结果，将dst中uint8_t类型的数据按照bit位展开，由左至右依次表征对应位置的src0和src1Scalar的比较结果，如果比较后的结果为真，则对应比特位为1，否则为0。<br> |
+| src0 | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)，支持的存储位置为UB（VECIN/VECCALC/VECOUT）。<br>LocalTensor的起始地址需要32字节对齐。 |
 | src1Scalar | 输入 | 源操作数，Scalar标量。数据类型和src0保持一致。 |
 | cmpMode | 输入 | CMPMODE类型，表示比较模式，包括EQ，NE，GE，LE，GT，LT。<br>&bull; LT：src0小于（less than）src1Scalar <br>&bull; GT：src0大于（greater than）src1Scalar <br>&bull; GE：src0大于或等于（greater than or equal to）src1Scalar <br>&bull; EQ：src0等于（equal to）src1Scalar <br>&bull; NE：src0不等于（not equal to）src1Scalar <br>&bull; LE：src0小于或等于（less than or equal to）src1Scalar<br> |
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码.md)。 |

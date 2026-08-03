@@ -14,7 +14,7 @@ void SetOutputType(const ConvCommonApi::TPosition pos, const ConvCommonApi::Conv
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| pos | 输入 | Output在内存上的[位置](../../../通用说明和约束.md#table07372185712)。当前仅支持TPosition::CO1。 |
+| pos | 输入 | Output在内存上的[位置](../../../通用说明和约束.md#table07372185712)。当前支持的存储位置仅为L0C Buffer（CO1）。 |
 | format | 输入 | Output的数据格式。当前仅支持ConvFormat::NDC1HWC0。 |
 | dtype | 输入 | Output的数据类型。当前仅支持ConvDtype::FLOAT16、ConvDtype::BF16。 |
 
@@ -24,7 +24,7 @@ void SetOutputType(const ConvCommonApi::TPosition pos, const ConvCommonApi::Conv
 
 ## 约束说明
 
-在调用GetTiling接口前，本接口可选调用。若未调用本接口，默认Bias为pos=TPosition::CO1，format=ConvFormat::NDC1HWC0，dtype=ConvDtype::FLOAT16。
+在调用GetTiling接口前，本接口可选调用。若未调用本接口，默认Bias的存储位置为L0C Buffer（CO1），format=ConvFormat::NDC1HWC0，dtype=ConvDtype::FLOAT16。
 
 ## 调用示例
 

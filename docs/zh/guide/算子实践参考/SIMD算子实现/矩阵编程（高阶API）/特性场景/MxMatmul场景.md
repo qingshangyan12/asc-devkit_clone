@@ -209,15 +209,15 @@ Kernel侧的关键步骤介绍如下：
 <a name="zh-cn_topic_0000002270097206_table14759942142014"></a>
 | 参数 | 说明 |
 | --- | --- |
-| POSITION | 左右矩阵的内存逻辑位置。<!-- npu="950" id2 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM<br><br>B矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM<!-- end id2 --><br><br>注意：A、B矩阵设置为TPosition::TSCM时，对应的Format仅支持CubeFormat::NZ。 |
-| SCALE_POSITION | 量化系数矩阵的内存逻辑位置。<!-- npu="950" id3 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM<br><br>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM<!-- end id3 --><br><br>注意：scaleA、scaleB矩阵设置为TPosition::TSCM时，对应的SCALE_FORMAT参数仅支持CubeFormat::NZ。 |
+| POSITION | POSITION参数类型为TPosition。配置时，GM使用TPosition::GM，其他存储位置使用括号内逻辑位置对应的TPosition枚举。左右矩阵支持的存储位置为：<!-- npu="950" id2 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵支持的存储位置为GM、UB（VECOUT）、L1 Buffer（TSCM）<br><br>B矩阵支持的存储位置为GM、UB（VECOUT）、L1 Buffer（TSCM）<!-- end id2 --><br><br>注意：A、B矩阵的POSITION参数配置为TPosition::TSCM时，对应的Format仅支持CubeFormat::NZ。 |
+| SCALE_POSITION | SCALE_POSITION参数类型为TPosition。配置时，GM使用TPosition::GM，其他存储位置使用括号内逻辑位置对应的TPosition枚举。量化系数矩阵支持的存储位置为：<!-- npu="950" id3 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵支持的存储位置为GM、UB（VECOUT）、L1 Buffer（TSCM）<br><br>scaleB矩阵支持的存储位置为GM、UB（VECOUT）、L1 Buffer（TSCM）<!-- end id3 --><br><br>注意：scaleA、scaleB矩阵的SCALE_POSITION参数配置为TPosition::TSCM时，对应的SCALE_FORMAT参数仅支持CubeFormat::NZ。 |
 | FORMAT | 数据的物理排布格式。<!-- npu="950" id4 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR<br><br>B矩阵可设置为CubeFormat::ND，CubeFormat::NZ<!-- end id4 --><br><br>注意：NZ排布格式，A/B的排布格式请参考[数据格式](../基础知识.md#zh-cn_topic_0000001622194138_section1453415011)。 |
 | TYPE | 数据类型。<!-- npu="950" id5 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t<br><br>B矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t<!-- end id5 --><br><br>注意：具体数据类型组合关系请参考[MxMatmul支持数据类型](#zh-cn_topic_0000002270097206_table5383144710452)。 |
 | ISTRANS | 是否开启A、B矩阵转置的功能。默认值为false。参数支持的取值如下：<br><br>true：开启矩阵转置的功能，开启后，分别通过SetTensorA和SetTensorB中的isTransposeA、isTransposeB参数设置A、B矩阵是否转置。若设置A、B矩阵转置，Matmul会认为A矩阵形状为[K, M]，B矩阵形状为[N, K]。<br><br>false：不开启矩阵转置的功能，通过SetTensorA和SetTensorB不能设置A、B矩阵的转置情况。Matmul会认为A矩阵形状为[M, K]，B矩阵形状为[K, N]。 |
-| SRCPOS | A/B矩阵的POSITION参数配置为TPosition::TSCM时，要设置TSCM中矩阵数据的来源的内存逻辑位置，默认为TPosition::GM。<!-- npu="950" id6 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为TPosition::GM，TPosition::VECOUT<br><br>B矩阵可设置为TPosition::GM，TPosition::VECOUT<!-- end id6 --> |
+| SRCPOS | SRCPOS参数类型为TPosition。A/B矩阵的POSITION参数配置为TPosition::TSCM时，需要通过本参数设置L1 Buffer（TSCM）中矩阵数据来源的存储位置，默认值为TPosition::GM。配置时，GM使用TPosition::GM，其他存储位置使用括号内逻辑位置对应的TPosition枚举。<!-- npu="950" id6 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵数据来源支持的存储位置为GM、UB（VECOUT）<br><br>B矩阵数据来源支持的存储位置为GM、UB（VECOUT）<!-- end id6 --> |
 | SCALE_FORMAT | 量化系数矩阵的物理排布格式，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig107863142019)。默认值为FORMAT参数的取值。<!-- npu="950" id7 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR<br><br>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ<!-- end id7 --><br><br>注意：<br><br>NZ排布格式请参考[NZ](../../../../技术附录/概念原理和术语/神经网络和算子/数据排布格式.md#li19960204116136)。MxMatmul场景，scaleA、scaleB的数据类型为fp8_e8m0_t，分形大小H0=16，W0=2。<br><br>在Scale矩阵为ND格式的场景中，当通过SetTensorScaleA接口设置scaleA矩阵转置时，scaleA内存排布格式必须按照(K/64, M，2)排布，通过SetTensorScaleB接口设置scaleB矩阵不转置时，scaleB内存排布格式必须按照(K/64，N， 2)排布，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig76682054103416)。 |
 | SCALE_ISTRANS | 是否开启scaleA、scaleB矩阵转置的功能。默认值为ISTRANS参数的取值。参数支持的取值如下：<br><br>true：开启矩阵转置的功能。开启后，分别通过SetTensorScaleA和SetTensorScaleB中的isTransposeScaleA、isTransposeScaleB参数设置scaleA、scaleB矩阵是否转置。在Scale矩阵为ND格式的场景中，若设置scaleA、scaleB矩阵转置，Matmul会认为scaleA矩阵形状为[Ceil(K/64), M, 2]，scaleB矩阵形状为[N, Ceil(K/64), 2]。<br><br>false：不开启矩阵转置的功能。通过SetTensorScaleA和SetTensorScaleB不能设置scaleA、scaleB矩阵的转置情况。Matmul会认为scaleA矩阵形状为[M, Ceil(K/64), 2]，scaleB矩阵形状为[Ceil(K/64), N, 2]。 |
-| SCALE_SRCPOS | scaleA、scaleB矩阵的SCALE_POSITION参数设置为TPosition::TSCM时，需要通过本参数设置TSCM中矩阵数据来源的内存逻辑位置，默认值为SRCPOS参数的取值。<!-- npu="950" id8 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT<br><br>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT<!-- end id8 --> |
+| SCALE_SRCPOS | SCALE_SRCPOS参数类型为TPosition。scaleA、scaleB矩阵的SCALE_POSITION参数配置为TPosition::TSCM时，需要通过本参数设置L1 Buffer（TSCM）中矩阵数据来源的存储位置，默认值为SRCPOS参数的取值。配置时，GM使用TPosition::GM，其他存储位置使用括号内逻辑位置对应的TPosition枚举。<!-- npu="950" id8 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵数据来源支持的存储位置为GM、UB（VECOUT）<br><br>scaleB矩阵数据来源支持的存储位置为GM、UB（VECOUT）<!-- end id8 --> |
 
 ## 约束说明
 
@@ -225,7 +225,7 @@ Kernel侧的关键步骤介绍如下：
 
 -   在MxMatmul场景中，如果A与B矩阵的位置同时为GM，对singleKIn没有特殊限制，在这种情况下，若scaleA和scaleB的K方向大小（即Ceil\(singleKIn, 32\)）为奇数，用户需自行在scaleA和scaleB的K方向补0至偶数。例如，当singleKIn为30时，Ceil\(singleKIn, 32\)为1，用户需要自行在scaleA和scaleB的K方向补0，使K方向为偶数。对于其它A、B矩阵逻辑位置的组合情况，即A与B矩阵的位置不同时为GM，singleKIn以32个元素向上对齐后的数值必须是32的偶数倍。
 -   在MxMatmul场景中，当输入数据类型为fp4x2\_e2m1\_t/fp4x2\_e1m2\_t时，内轴必须为偶数。
--   在MxMatmul场景中，通过将A矩阵和scaleA矩阵的数据格式设置为VECTOR，来开启[GEMV模式](矩阵向量乘.md)。在此模式下，A和scaleA矩阵仅支持内存逻辑位置为GM，并且均不支持转置。
+-   在MxMatmul场景中，通过将A矩阵和scaleA矩阵的数据格式设置为VECTOR，来开启[GEMV模式](矩阵向量乘.md)。在此模式下，A和scaleA矩阵支持的存储位置仅为GM，并且均不支持转置。
 -   A矩阵、B矩阵为UB输入时，矩阵的内轴需要向上32字节对齐，例如，A矩阵的形状为\(M, K\)时，将K对齐到32字节；A矩阵的形状为\(K, M\)时，将M对齐到32字节。
 -   scaleA矩阵、scaleB矩阵为UB输入时，矩阵的内轴需要向上32字节对齐，例如，scaleA矩阵的形状为\(M, K/32\)时，将K/32对齐到32字节；scaleA矩阵的形状为\(K/32, M\)时，将M对齐到32字节。
 -   当scaleA和scaleB矩阵以ND格式输入时，高阶API在内部实现格式转换时，需要占用UB临时空间。开发者需使用[SetLocalWorkspace](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetLocalWorkspace.md)接口配置临时空间，临时空间大小（单位字节）的计算公式如下。
