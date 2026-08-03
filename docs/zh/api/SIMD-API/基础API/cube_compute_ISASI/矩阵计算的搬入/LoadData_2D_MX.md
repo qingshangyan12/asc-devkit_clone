@@ -74,7 +74,7 @@ __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>&
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
-| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；对应的分形大小为16 \* (32字节 / sizeof(T))。<br>&nbsp;&nbsp;&bull; B2：ZN格式；对应的分形大小为 (32字节 / sizeof(T))  \* 16。 <br>支持的物理存储位置为L0A Buffer（TPosition: A2）/L0B Buffer（TPosition: B2）。<br>**注：L0A_MX Buffer和L0B_MX Buffer的地址和L0A/L0B的地址是固定比例关系，接口中会自行按照L0A/L0B的地址进行推导，用户无需配置。** |
+| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; L0A Buffer(A2)：ZZ格式/NZ格式；对应的分形大小为16 \* (32字节 / sizeof(T))。<br>&nbsp;&nbsp;&bull; L0B Buffer(B2)：ZN格式；对应的分形大小为 (32字节 / sizeof(T))  \* 16。 <br>支持的存储位置为L0A Buffer(A2)/L0B Buffer(B2)。<br>**注：L0A_MX Buffer和L0B_MX Buffer的地址和L0A/L0B的地址是固定比例关系，接口中会自行按照L0A/L0B的地址进行推导，用户无需配置。** |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。  <br>支持的物理存储位置为L1 Buffer（TPosition: A1/B1）。 |
 | srcMx | 输入 | 源操作数，类型为LocalTensor，仅支持fp8_e8m0_t类型。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2。具体参考表[LoadData（2D矩阵搬运V2）](LoadData_2D_V2.md)中的LoadData2DParamsV2结构体内参数说明。 <br>**本结构体用于控制左右矩阵数据的搬运。**  <br>|

@@ -118,11 +118,11 @@ TQueBind&lt;TPosition::VECOUT, TPosition::C1, 1&gt;</pre>
 
 下面通过两个具体的示例展示了矢量编程场景下TQueBind的使用方法：
 
--   如下的编程范式示例，图中的两个队列分别绑定的是GM VECIN和VECOUT GM。
+-   如下的编程范式示例，图中的两个队列分别绑定的是GM与UB(VECIN)、UB(VECOUT)与GM。
 
     ![](../../../../figures/图3-流水线并行示意图.png)
 
--   如果不需要进行Vector计算，比如仅需要做格式随路转换等场景，可对上述流程进行优化，对VECIN和VECOUT进行绑定，绑定的效果可以实现输入输出使用相同buffer，实现double buffer。
+-   如果不需要进行Vector计算，比如仅需要做格式随路转换等场景，可对上述流程进行优化，对UB(VECIN/VECOUT)进行绑定，绑定的效果可以实现输入输出使用相同buffer，实现double buffer。
 
     ![](../../../../figures/图3-流水线并行示意图-41.png)
 
