@@ -479,7 +479,7 @@
 | [CountLeadingZero](标量计算/CountLeadingZero.md) | 统计uint64_t类型数值的二进制表示中前导0的个数（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。 |
 | [CountBitsCntSameAsSignBit](标量计算/CountBitsCntSameAsSignBit.md) | 统计int64_t类型数值的二进制表示中，从最高数值位开始与符号位相同的连续比特位的个数。 |
 | [GetSFFValue](标量计算/GetSFFValue.md) | 查找uint64_t类型数值的二进制表示中从最低有效位开始的首个指定比特值（0或1）的位置，如果没找到则返回-1。 |
-| [ceil\_div](标量计算/CeilDivision.md) | 计算两个整型数a和b相除后向上取整的结果。 |
+| [ceil\_div](标量计算/ceil_div.md) | 计算两个整型数a和b相除后向上取整的结果。 |
 | [Cast（float转half/int32_t）](标量计算/Cast_float_to_half_int32.md) | 对标量的数据类型进行转换。 |
 | [Cast（float转bfloat16_t）](标量计算/Cast_float_to_bfloat16.md) | float类型标量数据转换成bfloat16_t类型标量数据。 |
 | [Cast（多类型转float）](标量计算/Cast_multi_type_to_float.md) | 该接口将输入数据转换为float类型。 |
