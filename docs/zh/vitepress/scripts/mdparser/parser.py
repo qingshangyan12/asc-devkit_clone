@@ -121,7 +121,7 @@ _HTML_BLOCK_SPECIAL_RE = (
 )
 
 _HTML_ATTRIBUTE_NAME = r"[A-Za-z_:][A-Za-z0-9_.:-]*"
-_HTML_ATTRIBUTE_VALUE = r'''(?:[^\s"'=<>`]+|'[^']*'|"[^"]*")'''
+_HTML_ATTRIBUTE_VALUE = r"""(?:[^\s"'=<>`]+|'[^']*'|"[^"]*")"""
 _HTML_ATTRIBUTE = (
     rf"(?:[ \t]+{_HTML_ATTRIBUTE_NAME}"
     rf"(?:[ \t]*=[ \t]*{_HTML_ATTRIBUTE_VALUE})?)"

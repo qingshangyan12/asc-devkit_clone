@@ -9,7 +9,7 @@
 -->
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useData, useRoute } from 'vitepress'
 import {
   isApiRouteUnsupported,
@@ -109,22 +109,25 @@ function onFilterChange() {
   applyFilter()
 }
 
+let filterTimer = null
+
 onMounted(async () => {
   loadSavedFilter()
-  if (route.path.startsWith('/api/')) {
-    isApiPage.value = true
-  }
+  isApiPage.value = route.path.startsWith('/api/')
   await nextTick()
-  setTimeout(applyFilter, 100)
+  filterTimer = setTimeout(applyFilter, 100)
 })
 
 watch(() => route.path, async (path) => {
   isApiPage.value = path.startsWith('/api/')
   if (isApiPage.value) {
     await nextTick()
-    setTimeout(applyFilter, 200)
+    clearTimeout(filterTimer)
+    filterTimer = setTimeout(applyFilter, 200)
   }
-}, { immediate: true })
+})
+
+onUnmounted(() => clearTimeout(filterTimer))
 </script>
 
 <template>
