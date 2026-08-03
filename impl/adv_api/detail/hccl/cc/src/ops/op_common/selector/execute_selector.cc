@@ -33,22 +33,6 @@ HcclResult ExecuteSelector::Run(OpParam &opParam, TopoInfoWithNetLayerDetails* t
 
     std::map<u32, AutoSelectorBase *> selectors = SelectorRegistry::Global()->GetAllSelectors();
 
-    if (opParam.isMc2) {
-        auto iter = selectors.find(18);
-        if (iter == selectors.end()) {
-            HCCL_ERROR("[Algo][Selector] CCU selector is not registried.");
-            return HcclResult::HCCL_E_NOT_SUPPORT;
-        }
-        if(iter->second->Select(opParam, topoInfo, selectAlgName) == SelectorStatus::MATCH) {
-            HCCL_INFO("[asc][AlgoSelect][ExecuteSelector::Run] mc2 matched, priority[%u], algName[%s], "
-                "opExecuteConfig[%d], engine[%d].", iter->first, selectAlgName.c_str(), opParam.opExecuteConfig,
-                opParam.engine);
-            return HcclResult::HCCL_SUCCESS;
-        }
-        HCCL_ERROR("[Algo][Selector] CCU selector can not match for optype[%d].", opParam.opType);
-        return HcclResult::HCCL_E_NOT_SUPPORT;
-    }
-
     selectors = SelectorRegistry::Global()->GetSelectorsByOpType(opParam.opType);
     HCCL_INFO("[asc][AlgoSelect][ExecuteSelector::Run] selectorNum[%zu] for opType[%d].", selectors.size(),
         opParam.opType);
