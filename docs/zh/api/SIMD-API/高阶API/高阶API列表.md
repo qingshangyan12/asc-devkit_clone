@@ -35,6 +35,7 @@
 | [IsFinite](数学计算/IsFinite接口/IsFinite.md) | 按元素判断输入的浮点数是否非NAN、非±INF。 |
 | [Lgamma](数学计算/Lgamma接口/Lgamma.md) | 按元素计算x的gamma函数的绝对值并求自然对数。 |
 | [Log](数学计算/Log接口/Log-79.md) | 按元素以e、2、10为底做对数运算。 |
+| [Ndtri](数学计算/Ndtri接口/Ndtri.md) | 按元素计算标准正态分布累积分布函数的反函数。 |
 | [Power](数学计算/Power接口/Power.md) | 实现按元素做幂运算功能。 |
 | [Round](数学计算/Round接口/Round.md) | 将输入的元素四舍五入到最接近的整数。 |
 | [Sign](数学计算/Sign接口/Sign.md) | 按元素执行Sign操作，Sign是指返回输入数据的符号。 |
