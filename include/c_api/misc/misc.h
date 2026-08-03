@@ -17,17 +17,14 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
 #endif
 
+[[deprecated(__FILE__
+             " is deprecated, please use utils/sys_init.h instead!")]] typedef void using_deprecated_header_h;
+
 #ifndef INCLUDE_C_API_MISC_H
 #define INCLUDE_C_API_MISC_H
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-#include "impl/c_api/instr_impl/npu_arch_2201/misc_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/instr_impl/npu_arch_3510/misc_impl.h"
-#endif
-
-__aicore__ inline void asc_init();
+#include "c_api/utils/sys_init.h"
 
 #endif
 
