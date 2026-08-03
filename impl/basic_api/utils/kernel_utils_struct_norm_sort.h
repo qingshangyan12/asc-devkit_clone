@@ -219,7 +219,7 @@ struct AscendDequantParams {
 };
 
 template <typename T>
-constexpr __aicore__ inline uint64_t GetScalarBitcodeValue(T scalarValue)
+__aicore__ inline uint64_t GetScalarBitcodeValue(T scalarValue)
 {
     union ScalarBitcode {
         __aicore__ ScalarBitcode() {}
@@ -232,7 +232,7 @@ constexpr __aicore__ inline uint64_t GetScalarBitcodeValue(T scalarValue)
 }
 
 template <typename T, typename U>
-constexpr __aicore__ inline U GetScalarBitcodeValue(T scalarValue)
+__aicore__ inline U GetScalarBitcodeValue(T scalarValue)
 {
     union ScalarBitcode {
         __aicore__ ScalarBitcode() {}
