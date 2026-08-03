@@ -571,6 +571,9 @@ auto_gen_{super_operator.kernel_name}_kernel_{arch}(void) {{\n"
         super_kernel_file += indent_code_func(
             f"//begin func call of sub operator {sub_operator.kernel_name}\n"
         )
+        super_kernel_file += indent_code_func(
+            sub_operator.get_notify_before_call_block(arch)
+        )
 
         # generate switch case func of dynamic
         super_kernel_file += gen_switch_case_call_block_of_dynamic_op(
@@ -1241,6 +1244,9 @@ auto_gen_{super_operator.kernel_name}_kernel(void) {{\n'
     ):
         super_kernel_file += indent_code_func(
             f"//begin func call of sub operator {sub_operator.kernel_name}\n"
+        )
+        super_kernel_file += indent_code_func(
+            sub_operator.get_notify_before_call_block()
         )
 
         # generatre switch case func of dynamic
