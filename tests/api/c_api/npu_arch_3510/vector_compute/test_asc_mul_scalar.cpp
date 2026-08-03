@@ -9,7 +9,9 @@
  */
 
 #include "tests/api/c_api/npu_arch_3510/utils/test_binary_scalar_instr_utils.h"
-// ==========asc_mul_scalar(int16_t/uint16_t/half/int32_t/uint32_t/float)==========
+// ==========asc_mul_scalar(int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float)==========
+TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(VMULS, asc_mul_scalar, vmuls, vector_int8_t, int8_t);
+TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(VMULS, asc_mul_scalar, vmuls, vector_uint8_t, uint8_t);
 TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(VMULS, asc_mul_scalar, vmuls, vector_int16_t, int16_t);
 TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(VMULS, asc_mul_scalar, vmuls, vector_uint16_t, uint16_t);
 TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(VMULS, asc_mul_scalar, vmuls, vector_half, half);
