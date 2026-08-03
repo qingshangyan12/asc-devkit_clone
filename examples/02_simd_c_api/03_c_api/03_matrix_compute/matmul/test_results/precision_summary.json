@@ -1,0 +1,71 @@
+{
+  "test_date": "2026-08-03",
+  "hardware": "Ascend950PR",
+  "npu_id": 0,
+  "npu_health": "OK",
+  "npu_smi_version": "25.7.rc1",
+  "architecture": "dav-3510",
+  "compiler_runtime": "CANN 9.0.0-beta.2",
+  "compiler": "Bisheng clang 15.0.5",
+  "header_source": "asc-devkit master",
+  "header_source_commit": "fb822b36d87163e1f46121b269b419f93f1a5b28",
+  "dtype": "float32",
+  "src0_shape": [30, 40],
+  "src1_shape": [40, 70],
+  "weight_shape": [1, 70],
+  "dst_shape": [30, 70],
+  "precision_standard": {
+    "rtol": 0.0009765625,
+    "atol": 0.0000152587890625,
+    "required_matched_ratio": 0.99,
+    "max_abs_error_rule": "max(1e-2, 32 ULP)"
+  },
+  "cases": [
+    {
+      "name": "uniform",
+      "seed": 20260803,
+      "matched_ratio": 1.0,
+      "max_abs_error": 0.01171875,
+      "effective_max_abs_error_limit": 0.25,
+      "passed": true
+    },
+    {
+      "name": "normal",
+      "seed": 20260804,
+      "matched_ratio": 1.0,
+      "max_abs_error": 0.0048828125,
+      "effective_max_abs_error_limit": 0.0625,
+      "passed": true
+    },
+    {
+      "name": "boundary",
+      "seed": 20260805,
+      "matched_ratio": 1.0,
+      "max_abs_error": 0.0005092620849609375,
+      "effective_max_abs_error_limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "bias_only",
+      "seed": 20260806,
+      "matched_ratio": 1.0,
+      "max_abs_error": 0.0,
+      "effective_max_abs_error_limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "zeros",
+      "seed": 20260807,
+      "matched_ratio": 1.0,
+      "max_abs_error": 0.0,
+      "effective_max_abs_error_limit": 0.01,
+      "passed": true
+    }
+  ],
+  "all_passed": true,
+  "notes": [
+    "The installed CANN 9.0.0-beta.2 headers do not expose the standard matrix C APIs used by this sample.",
+    "The successful build used the current asc-devkit master headers with the installed compiler/runtime.",
+    "A clean CANN 9.1.0 rebuild is recommended before formal submission."
+  ]
+}
