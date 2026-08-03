@@ -46,6 +46,8 @@ matmul/
 ├── CMakeLists.txt
 ├── README.md
 ├── README_en.md
+├── TEST_REPORT.md
+├── asc_simd_override.h
 ├── data_utils.h
 ├── matmul.asc
 └── scripts/
@@ -86,3 +88,5 @@ matmul/
 数据生成和验证脚本仅使用 Python 标准库，无需安装 NumPy。
 
 可通过 `python3 ../scripts/gen_data.py --case ones` 或 `--case zero_bias` 生成其他用例；每次生成后依次运行 `./demo` 和验证脚本。
+
+完整的 Ascend 950 实机测试环境、精度数据、耗时说明和复现命令见 [TEST_REPORT.md](TEST_REPORT.md)。

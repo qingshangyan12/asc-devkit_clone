@@ -33,3 +33,5 @@ python3 ../scripts/verify_result.py output/output.bin output/golden.bin
 ```
 
 Add `-DCMAKE_ASC_RUN_MODE=sim` to the CMake command to use NPU simulation. A successful precision check prints `test pass!`.
+
+See [TEST_REPORT.md](TEST_REPORT.md) for the complete Ascend 950 test environment, precision data, end-to-end timing notes, and reproduction commands.
