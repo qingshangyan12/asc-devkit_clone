@@ -46,10 +46,8 @@ public:
     __aicore__ inline void Init(__gm__ uint8_t* data)
     {
         dataGm_.SetGlobalBuffer(reinterpret_cast<__gm__ half*>(data), totalElementCount);
-        inputLocal_ =
-            AscendC::LocalTensor<half>(AscendC::TPosition::VECIN, inputUbOffsetBytes, MAX_DATA_COPY_LEN);
-        outputLocal_ =
-            AscendC::LocalTensor<half>(AscendC::TPosition::VECOUT, outputUbOffsetBytes, MAX_DATA_COPY_LEN);
+        inputLocal_ = AscendC::LocalTensor<half>(AscendC::TPosition::VECIN, inputUbOffsetBytes, MAX_DATA_COPY_LEN);
+        outputLocal_ = AscendC::LocalTensor<half>(AscendC::TPosition::VECOUT, outputUbOffsetBytes, MAX_DATA_COPY_LEN);
     }
 
     __aicore__ inline void ProcessL2Batch(uint32_t l2BatchIdx)
@@ -64,10 +62,7 @@ public:
         ProcessDataRange(0, totalElementCount);
     }
 
-    __aicore__ inline void SyncAllCores()
-    {
-        AscendC::SyncAll();
-    }
+    __aicore__ inline void SyncAllCores() { AscendC::SyncAll(); }
 
 private:
     static constexpr uint32_t inputUbOffsetBytes = 0;
@@ -83,10 +78,8 @@ private:
         const uint32_t coresWithExtraDataBlock = rangeDataBlockNum % vectorCoreCount;
         const uint32_t extraDataBlockNumBeforeCore =
             coreIdx < coresWithExtraDataBlock ? coreIdx : coresWithExtraDataBlock;
-        const uint32_t coreDataBlockNum =
-            baseDataBlocksPerCore + (coreIdx < coresWithExtraDataBlock ? 1U : 0U);
-        const uint32_t coreDataBlockOffset =
-            coreIdx * baseDataBlocksPerCore + extraDataBlockNumBeforeCore;
+        const uint32_t coreDataBlockNum = baseDataBlocksPerCore + (coreIdx < coresWithExtraDataBlock ? 1U : 0U);
+        const uint32_t coreDataBlockOffset = coreIdx * baseDataBlocksPerCore + extraDataBlockNumBeforeCore;
         const uint32_t coreElementNum = coreDataBlockNum * elementsPerDataBlock;
         const int64_t coreOffsetInData =
             rangeOffsetInData + static_cast<int64_t>(coreDataBlockOffset) * elementsPerDataBlock;
@@ -100,9 +93,8 @@ private:
         for (uint32_t ubTileIdx = 0; ubTileIdx < ubTileNum; ++ubTileIdx) {
             const uint32_t processedElementNum = ubTileIdx * MAX_DATA_COPY_LEN;
             const uint32_t remainingElementNum = coreElementNum - processedElementNum;
-            const uint32_t tileElementNum = remainingElementNum > MAX_DATA_COPY_LEN ?
-                                                MAX_DATA_COPY_LEN :
-                                                remainingElementNum;
+            const uint32_t tileElementNum =
+                remainingElementNum > MAX_DATA_COPY_LEN ? MAX_DATA_COPY_LEN : remainingElementNum;
             const int64_t gmElementOffset = coreOffsetInData + processedElementNum;
 
             // Reuse one event id for the steady-state single-buffer pipeline: wait for the previous tile's

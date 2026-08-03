@@ -29,15 +29,16 @@ def main():
         offset = 0
         while offset < TOTAL_DATA_ELEMENTS:
             count = min(CHUNK_ELEMENTS, TOTAL_DATA_ELEMENTS - offset)
-            input_values = [float(((offset + index) % 32) - 16) for index in range(count)]
+            input_values = [
+                float(((offset + index) % 32) - 16) for index in range(count)
+            ]
             input_file.write(struct.pack(f"<{count}e", *input_values))
             offset += count
 
     bytes_per_half = 2
     total_data_mib = TOTAL_DATA_ELEMENTS * bytes_per_half / 1024 / 1024
     print(
-        f"total_data_elements={TOTAL_DATA_ELEMENTS}, "
-        f"total_data={total_data_mib:.0f} MB"
+        f"total_data_elements={TOTAL_DATA_ELEMENTS}, total_data={total_data_mib:.0f} MB"
     )
 
 

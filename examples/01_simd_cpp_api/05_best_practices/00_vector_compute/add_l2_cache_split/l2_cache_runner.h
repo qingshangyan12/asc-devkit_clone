@@ -28,8 +28,7 @@ namespace AddL2Cache {
 
 using KernelLauncher = void (*)(aclrtStream, uint8_t*);
 
-inline bool RunKernel(
-    const char* caseName, const char* outputPath, KernelLauncher launchKernel, aclrtStream stream)
+inline bool RunKernel(const char* caseName, const char* outputPath, KernelLauncher launchKernel, aclrtStream stream)
 {
     constexpr size_t dataSizeBytes = static_cast<size_t>(totalElementCount) * sizeof(uint16_t);
 
@@ -44,8 +43,7 @@ inline bool RunKernel(
     size_t fileSize = 0;
     bool success = ReadFile("./input/input.bin", fileSize, inputHost, dataSizeBytes) && fileSize == dataSizeBytes;
     if (!success) {
-        std::fprintf(
-            stderr, "[ERROR] invalid input file (expected %zu bytes, got %zu)\n", dataSizeBytes, fileSize);
+        std::fprintf(stderr, "[ERROR] invalid input file (expected %zu bytes, got %zu)\n", dataSizeBytes, fileSize);
     }
     if (success && mkdir("./output", 0755) != 0 && errno != EEXIST) {
         std::fprintf(stderr, "[ERROR] failed to create output directory: %s\n", std::strerror(errno));
@@ -83,9 +81,8 @@ inline int32_t RunSample(
         "case=%s, total_data_elements=%u, total_data=%u MB, "
         "l2_split=%s, l2_working_set_threshold=%u MB, active_working_set=%u MB, "
         "logical_gm_to_ub=%u MB, vector_cores=%u, l2_batches=%u, compute_rounds=%u\n",
-        caseName, totalElementCount, totalByteSize / bytesPerMiB,
-        enableL2Split ? "enabled" : "disabled", L2_TILE_THRESHOLD / bytesPerMiB,
-        activeWorkingSetBytes / bytesPerMiB, logicalGmToUbBytesPerKernel / bytesPerMiB,
+        caseName, totalElementCount, totalByteSize / bytesPerMiB, enableL2Split ? "enabled" : "disabled",
+        L2_TILE_THRESHOLD / bytesPerMiB, activeWorkingSetBytes / bytesPerMiB, logicalGmToUbBytesPerKernel / bytesPerMiB,
         vectorCoreCount, activeBatchCount, computeRoundCount);
 
     aclInit(nullptr);
