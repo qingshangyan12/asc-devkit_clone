@@ -177,7 +177,7 @@
 -   SplitNMatmulPolicy：
     -   只支持C矩阵输出到Unified Buffer。
     -   baseN必须满足是16的倍数。
-    -   [Tiling参数](../Matmul-Tiling类/TCubeTiling结构体.md#table1563162142915)必须满足：singleCoreM = baseM，singleCoreN = baseN，singleCoreK = baseK。
+    -   [Tiling参数](../Matmul-Tiling类/TCubeTiling结构体.md#tcubetiling-struct)必须满足：singleCoreM = baseM，singleCoreN = baseN，singleCoreK = baseK。
     -   A矩阵、B矩阵类型信息MatmulType中的参数[IBSHARE](Matmul使用说明.md)必须为true。
 
 ## 调用示例
