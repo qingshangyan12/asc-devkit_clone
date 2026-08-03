@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_IMPL_DATA_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/arch/vector/utils/copy_utils.h"
 #include "impl/tensor_api/arch/vector/gm_to_ub/copy_impl/instruction.h"
 
 namespace AscendC {
@@ -39,14 +40,7 @@ protected:
         using SrcType = typename U::elementType;
         using DstType = typename T::elementType;
 
-        if constexpr (IsB4Type<SrcType>) {
-            blockLen = blockLen >> 1;
-            srcStride = srcStride >> 1;
-        }
-
-        if constexpr (IsB4Type<DstType>) {
-            dstStride = dstStride >> 1;
-        }
+        AdjustB4CopyParams<SrcType, DstType>(blockLen, srcStride, dstStride);
 
         auto cacheMode = static_cast<asc_load_l2_cache_mode>(src.Engine().GetCacheMode());
         CopyGmToUbufAlignV2Instr::DataCopy(dst, src, blockCount, blockLen, params.leftPaddingCount,
