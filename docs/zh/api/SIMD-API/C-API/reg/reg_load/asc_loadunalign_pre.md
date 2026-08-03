@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_load.h"`。
-
 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](asc_loadunalign.md)接口使用。
 
 - asc_loadunalign_pre（不带addr_reg入参）：配合asc_loadunalign（不带addr_reg入参）接口或asc_loadunalign_postupdate（不带addr_reg入参）使用。
@@ -77,13 +75,15 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名       | 输入/输出 | 描述               |
 | --------- | ----- | ---------------- |
 | dst       | 输出    | 非对齐寄存器，用于保存非对齐数据，长度32B。            |
 | src | 输入    | 源操作数（矢量）的起始地址。            |
 | offset | 输入    | 地址寄存器，存储地址偏移量。       |
 
-非对齐寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+非对齐寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

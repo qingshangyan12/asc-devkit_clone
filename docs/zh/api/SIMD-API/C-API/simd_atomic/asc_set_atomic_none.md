@@ -26,13 +26,11 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/atomic/atomic.h"`。
-
 清空原子操作的状态。一般和[asc_set_atomic_add](asc_set_atomic_add.md)，[asc_set_atomic_max](asc_set_atomic_max.md)，[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续功能。
 
 ## 函数原型
 
-```c++
+```cpp
 __aicore__ inline void asc_set_atomic_none()
 ```
 
@@ -53,7 +51,7 @@ PIPE_S
 
 ## 调用示例
 
-```c++
+```cpp
 //total_length指参与搬运的数据总长度。dst是外部输入的int16_t类型的GM内存。
 constexpr uint32_t total_length = 256;
 __ubuf__ int16_t src0[total_length];

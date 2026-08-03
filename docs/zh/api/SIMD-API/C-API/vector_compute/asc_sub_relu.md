@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_compute/vector_compute.h"`。
-
 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。计算公式如下：
 
 $$
@@ -71,6 +69,8 @@ $$
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名 | 输入/输出 | 描述 |
 | :----| :-----| :-----|
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
@@ -110,7 +110,7 @@ __ubuf__ half dst[total_length];
 asc_sub_relu(dst, src0, src1, total_length);
 ```
 
-```c++
+```cpp
 // 目的操作数和源操作数的数据类型不一致（s162s8）
 // total_length指参与计算的数据长度
 constexpr uint64_t total_length = 256;

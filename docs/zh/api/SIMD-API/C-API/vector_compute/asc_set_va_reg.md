@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_compute/vector_compute.h"`。
-
 用于设置transpose的16个DataBlock地址，将操作数地址序列与地址寄存器关联，接口要求前8个和后8个地址序列与地址寄存器分别关联。
 
 ## 函数原型
@@ -44,6 +42,8 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_arra
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |

@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sys_var/sys_var.h"`。
-
 获取当前AI处理器架构版本号。
 
 ## 函数原型
@@ -37,6 +35,8 @@ __aicore__ inline void asc_get_arch_ver(uint32_t& core_version)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |

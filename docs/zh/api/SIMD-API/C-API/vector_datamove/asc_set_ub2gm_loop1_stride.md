@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_datamove/vector_datamove.h"`。
-
 将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，通过调用该接口设置内层循环中源操作数在相邻迭代间的数据块间隔，以及目的操作数在相邻迭代间的数据块间隔。
 
 以源操作数搬运场景为例，如下图所示。
@@ -41,6 +39,8 @@ __aicore__ inline void asc_set_ub2gm_loop1_stride(uint64_t loop1_src_stride, uin
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |

@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
-
 将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。
 
 本接口会将有效数据大小保存至AR寄存器，搬出时配合[asc_storeunalign_postupdate](../reg_store/asc_storeunalign_postupdate.md)接口使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_squeeze_status](../../sys_var/asc_get_squeeze_status.md)接口获取。
@@ -52,13 +50,15 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_float& dst, vector_fl
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名       | 输入/输出 | 描述                |
 | --------- | ----- | ----------------- |
 | dst       | 输出    | 目的操作数（矢量数据寄存器）。 |
 | src       | 输入    | 源操作数（矢量数据寄存器）。 |
 | mask      | 输入    | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

@@ -26,25 +26,25 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/scalar_compute/scalar_compute.h"`。
-
 对Global Memory中address指向的元素执行原子比较赋值操作，如果address上的数值等于指定数值compare，则对address赋值为指定数值val，否则address的数值不变。
 
 ## 函数原型
 
 ```cpp
-__aicore__ inline float asc_atomic_cas(__gm__ float *address, float compare, float val)
-
-__aicore__ inline int32_t asc_atomic_cas(__gm__ int32_t *address, int32_t compare, int32_t val)
+__aicore__ inline int32_t  asc_atomic_cas(__gm__ int32_t  *address, int32_t  compare, int32_t  val)
 
 __aicore__ inline uint32_t asc_atomic_cas(__gm__ uint32_t *address, uint32_t compare, uint32_t val)
 
-__aicore__ inline int64_t asc_atomic_cas(__gm__ int64_t *address, int64_t compare, int64_t val)
+__aicore__ inline float    asc_atomic_cas(__gm__ float    *address, float    compare, float    val)
+
+__aicore__ inline int64_t  asc_atomic_cas(__gm__ int64_t  *address, int64_t  compare, int64_t  val)
 
 __aicore__ inline uint64_t asc_atomic_cas(__gm__ uint64_t *address, uint64_t compare, uint64_t val)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |

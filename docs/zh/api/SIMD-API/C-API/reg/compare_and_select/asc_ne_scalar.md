@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
-
 `src` 中的每个元素逐个与标量 `value` 比较是否不相等，如果 `src_i != value`，则输出结果 `dst` 对应比特位为1，否则为0，每个元素的比较结果占一个bit。`dst` 为掩码寄存器，按掩码 `mask` 指示参与计算的元素。
 
 $$
@@ -49,7 +47,7 @@ __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t sr
 ```
 ## 参数说明
 
-**表 1** 参数说明
+**表1** 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（掩码寄存器）。 |

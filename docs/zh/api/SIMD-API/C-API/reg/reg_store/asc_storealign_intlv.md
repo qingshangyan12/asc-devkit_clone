@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_store.h"`。
-
 从矢量数据寄存器交错搬出到UB的接口，忽略mask，将src0、src1中的元素交错存储于dst中，存储长度为VL*2。支持数据类型为b8、b16、b32。
 
 ## 函数原型
@@ -89,6 +87,8 @@
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst_align32b | 输出 | 目的操作数（矢量）的起始地址。 |
@@ -96,7 +96,7 @@
 | src1 | 输入 | 源操作数1（矢量数据寄存器）。 |
 | offset | 输入 | 偏移量。 |
 
-矢量数据寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

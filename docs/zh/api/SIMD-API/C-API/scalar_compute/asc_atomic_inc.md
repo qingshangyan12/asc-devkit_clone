@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/scalar_compute/scalar_compute.h"`。
-
 对Global Memory中address指向的计数器执行原子递增操作，如果address上的数值大于等于指定数值val，则对address赋值为0，否则将address上数值加1。
 
 ## 函数原型
@@ -39,6 +37,8 @@ __aicore__ inline uint64_t asc_atomic_inc(__gm__ uint64_t *address, uint64_t val
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |

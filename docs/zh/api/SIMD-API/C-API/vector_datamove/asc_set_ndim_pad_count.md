@@ -26,17 +26,17 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_datamove/vector_datamove.h"`。
-
 用于设置[asc_ndim_copy_gm2ub](./asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。
 
 ## 函数原型
 
-```c++
+```cpp
 __aicore__ inline void asc_set_ndim_pad_count(asc_ndim_pad_count_config& config)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -56,7 +56,7 @@ PIPE_S
 
 ## 调用示例
 
-```c++
+```cpp
 asc_ndim_pad_count_config config;  // config默认初始值为0。
 asc_set_ndim_pad_count(config); 
 ```

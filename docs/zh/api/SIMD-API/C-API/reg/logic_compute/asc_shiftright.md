@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
-
 根据掩码mask对输入数据src0，按照src1对应元素进行右移操作，完成后将结果写入dst中。根据源操作数的数据类型，右移操作分为以下两种情况：
     
 - **数据类型为无符号类型：执行逻辑右移。**
@@ -54,7 +52,7 @@ __simd_callee__ inline void asc_shiftright(vector_uint32_t& dst, vector_uint32_t
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -63,7 +61,7 @@ __simd_callee__ inline void asc_shiftright(vector_uint32_t& dst, vector_uint32_t
 | src1 | 输入 | 源操作数（矢量数据寄存器）。|
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

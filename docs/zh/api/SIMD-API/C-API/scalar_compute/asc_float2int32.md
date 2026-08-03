@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/scalar_compute/scalar_compute.h"`。
-
 将float类型转化为int32_t类型，并支持多种舍入模式。
 
 舍入模式：
@@ -50,6 +48,8 @@ __aicore__ inline int32_t asc_float2int32_ru(float value)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :------ | :----- | :----------------- |

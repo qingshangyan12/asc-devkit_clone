@@ -26,21 +26,21 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/atomic/atomic.h"`。
-
-设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型支持int8_t、int16_t、int32_t、bfloat16_t、half、float。
+设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到GM的数据传输开启原子累加。累加的数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。
+开启原子累加后，后续执行搬运操作从Unified Buffer/L0C Buffer/L1 Buffer到GM时，GM中原始数据将与新搬运数据进行逐元素累加，累加结果写回GM。
 <!-- npu="950" id8 -->
-特别地，针对Ascend 950PR/Ascend 950DT，不支持L1 Buffer到Global Memory的通路。
+特别地，针对Ascend 950PR/Ascend 950DT，不支持L1 Buffer到GM的通路。
 <!-- end id8 -->
 
 ## 函数原型
 
-```c++
+```cpp
 __aicore__ inline void asc_set_atomic_add_int8()
 __aicore__ inline void asc_set_atomic_add_int16()
-__aicore__ inline void asc_set_atomic_add_int()
-__aicore__ inline void asc_set_atomic_add_bfloat()
+__aicore__ inline void asc_set_atomic_add_int32()
 __aicore__ inline void asc_set_atomic_add_float16()
+__aicore__ inline void asc_set_atomic_add_bfloat()
+__aicore__ inline void asc_set_atomic_add_int()
 __aicore__ inline void asc_set_atomic_add_float()
 ```
 
@@ -58,14 +58,14 @@ PIPE_S
 ## 约束说明
 
 - 使用完成后，建议清空原子操作的状态（详见[asc_set_atomic_none](./asc_set_atomic_none.md)），以免影响后续相关指令功能。
-- 该指令执行前不会对GM的数据做清零操作，开发者需在需要时手动添加清零操作。
+- 该指令执行前不会对GM的数据做清零操作，开发者可以在需要时手动添加清零操作。
 <!-- npu="950" id9 -->
-- Ascend 950PR/Ascend 950DT，不支持L1 Buffer到Global Memory的通路。
+- Ascend 950PR/Ascend 950DT，不支持L1 Buffer到GM的通路。
 <!-- end id9 -->
 
 ## 调用示例
 
-```c++
+```cpp
 //total_length指参与搬运的数据总长度。dst是外部输入的int8_t类型的GM内存。
 constexpr uint32_t total_length = 256;
 __ubuf__ int8_t src0[total_length];

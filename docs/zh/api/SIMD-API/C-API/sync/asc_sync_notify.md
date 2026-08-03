@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
-
 设置同步标志，通知目标流水线。
 
 ## 函数原型
@@ -38,11 +36,13 @@ __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | pipe | 输入 | 源流水线类型。需传入编译期常量。 |
 | tpipe | 输入 | 目标流水线类型。需传入编译期常量。 |
-| id | 输入 | 同步ID。 |
+| id | 输入 | 同步ID。取值范围为[0, 7]。 |
 
 ## 返回值说明
 
@@ -54,7 +54,9 @@ PIPE_S
 
 ## 约束说明
 
-无
+- asc_sync_notify和asc_sync_wait必须成对使用。
+
+- 相同源流水、相同目标流水、相同id下，连续使用asc_sync_notify会引发未定义行为。
 
 ## 调用示例
 

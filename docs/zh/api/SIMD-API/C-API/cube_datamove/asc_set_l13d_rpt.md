@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 用于设置Load3Dv2接口的repeat参数。
 
 ## 函数原型
@@ -37,6 +35,8 @@ __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |

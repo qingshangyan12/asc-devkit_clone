@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sys_var/sys_var.h"`。
-
 基于偏移量offset获取片上实际物理地址。
 
 ## 函数原型
@@ -37,6 +35,8 @@ __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 |参数名|输入/输出|描述|
 | :------ | :--- | :------------ |

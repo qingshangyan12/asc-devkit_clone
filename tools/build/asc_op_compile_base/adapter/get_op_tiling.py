@@ -204,8 +204,7 @@ def load_build_in_lib():
         # ascend c static load builtin opmaster ct so fail
         LogUtil.print_compile_log(
             "",
-            f"An AttributeError occurred: {e}, \
-            when load tiling so {builtin_optiling_ctlib_path}",
+            f"An AttributeError occurred: {e}, when load tiling so {builtin_optiling_ctlib_path}",
             AscendCLogLevel.LOG_ERROR,
         )
         return False
@@ -228,8 +227,8 @@ def load_build_in_lib():
         # ascend c static load builtin opmaster rt so fail, undefined symbol, then use 1.0 way
         LogUtil.print_compile_log(
             "",
-            f"An AttributeError occurred: {e}, \
-            when load tiling so {builtin_optiling_rtlib_path}/{builtin_optiling_lib_path2}",
+            f"An AttributeError occurred: {e}, when load tiling so "
+            f"{builtin_optiling_rtlib_path} or {builtin_optiling_lib_path2}",
             AscendCLogLevel.LOG_ERROR,
         )
         return False
@@ -260,8 +259,7 @@ def load_lib():
             # Custom op tiling lib may not exists
             LogUtil.print_compile_log(
                 "",
-                f"An OSError occurred: {e}, \
-                when load tiling so {custom_opp_so_path}",
+                f"An OSError occurred: {e}, when load tiling so {custom_opp_so_path}",
                 AscendCLogLevel.LOG_ERROR,
             )
             pass
@@ -1397,22 +1395,17 @@ def _get_tiling_data_with_time_stamp(class_name):
         class_body += (
             f"    {class_name} tiling_data;                                    \\\n"
         )
-        class_body += (
-            f"    InitTilingData<{class_name}>(tiling_arg, &tiling_data);      \\\n"
-        )
-        class_body += _add_time_stamp_codes("TIME_STAMP_TILING_DATA")
+        class_body += f"    InitTilingData<{class_name}>(tiling_arg, &tiling_data);\n"
     class_body += "#define GET_TILING_DATA_WITH_STRUCT(tiling_struct, tiling_data, tiling_arg)  \\\n"
     class_body += "    REGISTER_TILINGDATA_SIZE(tiling_struct, __COUNTER__);                    \\\n"
     class_body += "    tiling_struct tiling_data;                                               \\\n"
-    class_body += "    InitTilingData<tiling_struct>(tiling_arg, &tiling_data);                 \\\n"
-    class_body += _add_time_stamp_codes("TIME_STAMP_TILING_DATA_STRUCT")
+    class_body += "    InitTilingData<tiling_struct>(tiling_arg, &tiling_data);\n"
 
     class_body += "#define GET_TILING_DATA_MEMBER(tiling_type, member, var, tiling)            \\\n"
     class_body += "    REGISTER_TILINGDATA_SIZE(tiling_type, __COUNTER__);                     \\\n"
     class_body += "    decltype(((tiling_type *)0)->member) var;                               \\\n"
     class_body += "    size_t offset##var = (size_t)(&((tiling_type*)0)->member);              \\\n"
-    class_body += "    InitTilingData<decltype(((tiling_type *)0)->member)>(tiling + offset##var, &var);\\\n"
-    class_body += _add_time_stamp_codes("TIME_STAMP_TILING_DATA_MEMBER")
+    class_body += "    InitTilingData<decltype(((tiling_type *)0)->member)>(tiling + offset##var, &var);\n"
 
     class_body += "#else\n"
 

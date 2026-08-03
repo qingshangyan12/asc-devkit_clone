@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 将矩阵数据从Global Memory搬运到L1 Buffer中，支持以下两种搬运模式：
 - **填充模式**：搬运过程中可以对数据进行填充或移除填充值。
 - **2D搬运模式**：支持2D矩阵数据搬运，支持压缩能力。（NPU_ARCH 220x版本不支持.）
@@ -90,6 +88,8 @@
 
 ### 填充模式参数
 
+**表1** 填充模式参数
+
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
@@ -102,7 +102,7 @@
 
 ### 2D搬运模式参数
 
-**表1**  参数说明
+**表2** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -114,9 +114,9 @@
 | m_step | 输入 | M方向上的步长。 |
 | k_step | 输入 | K方向上的步长。 |
 | decomp_mode | 输入 | 设置不同的压缩模式。 |
-| l2_cache_ctl | 输入 | 配置数据在L2 Cache中的管理策略。取值说明请参见[表2](#table2)。 |
+| l2_cache_ctl | 输入 | 配置数据在L2 Cache中的管理策略。取值说明请参见[表3](#table3)。 |
 
-**表2**  l2_cache_ctl取值说明 <a id="table2"></a>
+**表3** l2_cache_ctl取值说明 <a id="table3"></a>
 
 | 取值 | 模式 | 含义 |
 |------|------|------|
@@ -164,7 +164,7 @@ constexpr uint8_t pad_func_mode = 0;
 //输入输出数据中两个相邻连续数据块之间的距离为0
 constexpr uint64_t src_stride = 0;
 constexpr uint32_t dst_stride = 0;
-__gm__ half src[256];
+// src表示源操作数的起始地址
 __cbuf__ half dst[256];
 asc_copy_gm2l1(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
 ```

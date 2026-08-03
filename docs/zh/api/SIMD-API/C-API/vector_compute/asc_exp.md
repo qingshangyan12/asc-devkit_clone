@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_compute/vector_compute.h"`。
-
 按元素取自然指数，计算公式如下。
 $$
 dst_i = e^{src_i}
@@ -56,6 +54,8 @@ __aicore__ inline void asc_exp_sync(__ubuf__ float* dst, __ubuf__ float* src, ui
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |

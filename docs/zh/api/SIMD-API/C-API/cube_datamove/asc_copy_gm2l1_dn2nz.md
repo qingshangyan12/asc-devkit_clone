@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 将矩阵数据从Global Memory搬运到L1 Buffer，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。若D未对齐C0的大小，将会在L1 Buffer的最内层维度填充0值。GM中的数据以DN类型存储；L1中的数据以NZ形式存储。
 
 DN->NZ的搬运形式如下图：
@@ -72,7 +70,7 @@ DN->NZ的搬运形式如下图：
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -85,7 +83,7 @@ DN->NZ的搬运形式如下图：
 | loop4_src_stride | 输入 | 搬运过程中最外层循环相邻迭代源操作数的数据块间的间隔，单位为字节。 |
 | smallc0_en | 输入 | SmallC0模式开关：  <br>&bull; true：C0_SIZE会被pad至32个字节。 <br>&bull; false：C0_SIZE会被pad为4个channel。 |
 
-**表2**  l2_cache_ctl取值说明 <a id="table2"></a>
+**表2** l2_cache_ctl取值说明 <a id="table2"></a>
 
 | 取值 | 模式 | 含义 |
 |------|------|------|
@@ -122,7 +120,7 @@ constexpr uint32_t d_value = 3;
 constexpr uint64_t loop4_src_stride = 2;
 //每一个C0数据块都会被pad至32个字节
 constexpr bool smallc0_en = true;
-__gm__ half src[256];
+// src表示源操作数的起始地址
 __cbuf__ half dst[256];
 asc_copy_gm2l1_dn2nz(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 ```

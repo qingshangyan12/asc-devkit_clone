@@ -28,8 +28,6 @@
 
 **该接口已废弃。原子加操作请使用[asc_atomic_add](../scalar_compute/asc_atomic_add.md)实现。**
 
-头文件路径：`"c_api/atomic/atomic.h"`。
-
 设置原子操作启用位与原子操作类型的值。
 
 ## 函数原型
@@ -39,6 +37,8 @@ __aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |

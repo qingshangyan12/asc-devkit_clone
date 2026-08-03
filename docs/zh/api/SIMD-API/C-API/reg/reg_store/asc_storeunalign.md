@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_store.h"`。
-
 reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。
 
 该接口使用uint32_t作为存储偏移量，不改变源操作数在UB上的地址，每次循环的调用都需要用户手动更新目的操作数在UB上的地址。
@@ -56,6 +54,8 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ int4b_t* dst, vector_store
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
@@ -63,7 +63,7 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ int4b_t* dst, vector_store
 | src1 | 输入 | 源操作数（矢量数据寄存器）。 |
 | count | 输入 | 存储搬运的个数。 |
 
-矢量数据寄存器和非对齐寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和非对齐寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

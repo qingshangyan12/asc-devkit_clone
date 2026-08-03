@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sys_var/sys_var.h"`。
-
 对通道步长参数的专用寄存器的比特位进行设置。需要配合接口[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)使用。
 仅当调用接口时开启NZ2DN模式时，此功能才有效。
 
@@ -39,13 +37,13 @@ __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config)
 
 ## 参数说明
 
-表1参数说明
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | config | 输入 | 设置的寄存器值。常用通道步长寄存器比特位说明参考表2。 |
 
-表2 常用通道步长寄存器比特位说明
+**表2** 常用通道步长寄存器比特位说明
 
 |CHANNEL_PARA比特位    |功能|
 | :-------     | :---- |

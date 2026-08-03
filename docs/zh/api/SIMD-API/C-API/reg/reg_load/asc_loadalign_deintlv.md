@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_load.h"`。
-
 `asc_loadalign_deintlv`用于从UB中读取以32B对齐地址为起始位置的连续`2 x VL`长度数据。数据按元素类型宽度进行解释，在Load过程中完成解交织后，分别写入两个目的矢量数据寄存器。
 
 以`float`数据类型、Ascend 950PR/Ascend 950DT产品为例，若`VL = 256B`，则单次操作覆盖64个`float`元素。调用`asc_loadalign_deintlv`后，数据从UB到Reg的排布如下图所示。
@@ -111,6 +109,8 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名 | 输入/输出 | 说明 |
 | :--- | :--- | :--- |
 | dst0 | 输出 | 第一个目的向量寄存器。 |
@@ -118,11 +118,13 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 | src | 输入 | 源数据在UB中的起始地址。对于不同寻址接口，`src`分别表示基址或参与地址计算的基地址。 |
 | offset | 输入 | 地址偏移量。对于标量偏移寻址接口，单位为元素个数；对于地址寄存器偏移寻址接口，表示地址寄存器。 |
 
-寄存器类型的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+寄存器类型的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 数据类型<a name="data-type"></a>
 
 `asc_loadalign_deintlv`支持的数据类型如下表所示。三类寻址接口均支持表中所列数据类型。
+
+**表2** 数据类型
 
 | 源数据类型`src` | 目的寄存器类型`dst0/dst1` |
 | :--- | :--- |

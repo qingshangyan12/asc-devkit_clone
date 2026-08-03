@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 将矩阵数据从Global Memory搬运到L1 Buffer中，并支持不同类型的pad模式。
 
 ## 函数原型
@@ -152,6 +150,8 @@
 
 ### 普通搬运模式参数
 
+**表1** 普通搬运模式参数
+
 | 参数名       | 输入/输出 | 描述                                                              |
 |:----------|:------|:----------------------------------------------------------------|
 | dst       | 输出    | 目的操作数（矢量）的起始地址。                                                 |
@@ -163,6 +163,8 @@
 | dst_gap   | 输入    | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
 
 ### 2D搬运模式参数
+
+**表2** 2D搬运模式参数
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -193,7 +195,6 @@ PIPE_MTE2
 //total_length指参与搬运的数据总长度。
 constexpr uint64_t total_length = 128;
 __cbuf__ half dst[total_length];
-__gm__ half src[total_length];
 // 连续搬运的数据块数量
 constexpr uint16_t n_burst = 1;
 // 连续搬运的数据块长度，此处为512个half元素
@@ -202,6 +203,7 @@ constexpr uint16_t len_burst = 512 * sizeof(half) / 32;
 constexpr uint16_t src_gap = 0;
 // 目的操作数连续排布
 constexpr uint16_t dst_gap = 0;
+// src表示源操作数的起始地址
 asc_copy_gm2l1((__cbuf__ void*)dst, (__gm__ void*)src, n_burst, len_burst, src_gap, dst_gap);
 
 // 2D数据搬运模式
@@ -212,7 +214,7 @@ constexpr uint8_t repeat = 2;
 //输入的搬运步长为0字节，输出的搬运步长为1024字节
 constexpr uint16_t src_stride = 0;
 constexpr uint16_t dst_gap = 1;
-__gm__ half src[256];
+// src表示源操作数的输入地址。
 __cbuf__ half dst[256];
 asc_copy_gm2l1(dst, src, base_idx, repeat, src_stride, dst_gap);
 ```

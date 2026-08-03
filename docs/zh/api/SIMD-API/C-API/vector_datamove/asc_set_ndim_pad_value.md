@@ -26,13 +26,11 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_datamove/vector_datamove.h"`。
-
 当[asc_ndim_copy_gm2ub](./asc_ndim_copy_gm2ub.md)接口的padding_mode参数为true时，该值将设置为Padding的填充固定值。fp8_e8m0_t，fp8_e5m2_t，fp8_e4m3fn_t类型的数据需转换成int8_t类型后再调用本接口。
 
 ## 函数原型
 
-```c++
+```cpp
 __aicore__ inline void asc_set_ndim_pad_value(int8_t pad_value)
 __aicore__ inline void asc_set_ndim_pad_value(uint8_t pad_value)
 __aicore__ inline void asc_set_ndim_pad_value(int16_t pad_value)
@@ -45,6 +43,8 @@ __aicore__ inline void asc_set_ndim_pad_value(float pad_value)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -64,7 +64,7 @@ PIPE_S
 
 ## 调用示例
 
-```c++
+```cpp
 half pad_value = 2.0;
 asc_set_ndim_pad_value(pad_value); 
 ```

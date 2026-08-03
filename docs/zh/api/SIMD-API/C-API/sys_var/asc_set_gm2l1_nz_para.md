@@ -26,11 +26,11 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sys_var/sys_var.h"`。
-
 对MTE2_NZ_PARA寄存器中的值进行设置，可以在调用[asc_copy_gm2l1_dn2nz](../cube_datamove/asc_copy_gm2l1_dn2nz.md)和[asc_copy_gm2l1_nd2nz](../cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)前设置相关参数。
 
 MTE2_NZ_PARA是一个64bit的寄存器，其中各bit含义如下：
+
+**表1** MTE2_NZ_PARA寄存器比特位说明
 
 | bit范围 |        含义         |
 |:------|:-----------------:|
@@ -46,6 +46,8 @@ __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config)
 ```
 
 ## 参数说明
+
+**表2** 参数说明
 
 |参数名|输入/输出| 描述        |
 | :------ | :---  |:----------|

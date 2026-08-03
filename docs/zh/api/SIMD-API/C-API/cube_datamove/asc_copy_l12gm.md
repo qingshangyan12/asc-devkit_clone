@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
-
 将数据从L1 Buffer搬运到Global Memory。
 
 ## 函数原型
@@ -45,6 +43,8 @@
 
 ## 参数说明
 
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述                                                              |
 | :--- |:------|:----------------------------------------------------------------|
@@ -80,6 +80,6 @@ constexpr uint16_t src_gap = 0;
 //相邻迭代间，目标操作数前一个分形与后一个分形起始地址的间隔为64个字节
 constexpr uint16_t dst_gap = 1;
 __cbuf__ half src[256];
-__gm__ half dst[256];
+// dst表示目的操作数的起始地址
 asc_copy_l12gm(dst, src, n_burst, len_burst, src_gap, dst_gap);
 ```

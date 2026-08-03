@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cache_ctrl/cache_ctrl.h"`。
-
 在AI Core内部，Scalar单元和DMA单元都可能对Global Memory进行访问。
 
 ![](../figures/dcci.png "DataCache内存层次示意图") \\
@@ -64,6 +62,8 @@ Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../sys_var/as
    ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |

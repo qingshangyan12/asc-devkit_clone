@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_load.h"`。
-
 数据搬运接口，适用于从UB非32B对齐地址起始连续搬入。
 
 - asc_loadunalign_postupdate（不带addr_reg入参）：配合asc_loadunalign_pre（不带addr_reg入参）接口使用。
@@ -74,6 +72,8 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int4x2_t& dst, vec
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）。 |
@@ -83,7 +83,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int4x2_t& dst, vec
 | count | 输入 | 搬运元素个数。 |
 | inc | 输入 | 在多次循环中，多次调用该接口时，每次搬运完成后，下次搬运的offset在自增前会更新为offset + inc。建议设置为0。|
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

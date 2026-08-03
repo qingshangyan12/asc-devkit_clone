@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_compute/vector_compute.h"`。
-
 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。
 
 asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，也就是asc_bitsort指令的输出，队列的结构Region Proposal如下所示：
@@ -56,6 +54,8 @@ asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，
     ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |

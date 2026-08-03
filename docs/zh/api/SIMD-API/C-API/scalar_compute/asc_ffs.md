@@ -26,17 +26,17 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/scalar_compute/scalar_compute.h"`。
-
 FindFirstSet接口，输入数据的二进制表示中从最低位向最高位查找第一个值为1的位，并返回其位置，如果没找到则返回-1。
 
 ## 函数原型
 
-```c++
+```cpp
 __aicore__ inline int64_t asc_ffs(uint64_t value)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 |参数名|输入/输出|描述|
 |------------|------------|-----------|
@@ -56,7 +56,7 @@ PIPE_S
 
 ## 调用示例
 
-```c++
+```cpp
 uint64_t value = 10;
 int64_t ret = asc_ffs(value);
 ```

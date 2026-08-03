@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_compute/vector_compute.h"`。
-
 执行矢量除法运算。计算公式如下：
 
 $$
@@ -62,6 +60,8 @@ __aicore__ inline void asc_div_sync(__ubuf__ float* dst, __ubuf__ float* src0, _
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |

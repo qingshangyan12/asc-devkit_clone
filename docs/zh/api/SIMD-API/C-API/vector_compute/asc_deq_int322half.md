@@ -27,8 +27,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_compute/vector_compute.h"`。
-
 对输入的int32_t类型的数据按元素做量化并转换为half类型。计算公式如下：
 $$
 dst_i = Cast(src_i * scale)
@@ -56,6 +54,8 @@ $$
     ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -91,3 +91,4 @@ __ubuf__ half dst[total_length];
 asc_set_deq_scale(2.0);
 …… // 数据搬运及同步操作
 asc_deq_int322half(dst, src, total_length);
+```

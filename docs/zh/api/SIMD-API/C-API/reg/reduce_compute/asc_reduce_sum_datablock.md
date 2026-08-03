@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
-
 将每个DataBlock（32B）中参与计算的元素相加，并将最终的计算结果依次保存在dst的最低位。
 
 ## 函数原型
@@ -43,7 +41,7 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector
 
 ## 参数说明
 
-**表 1** 参数说明
+**表1** 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |

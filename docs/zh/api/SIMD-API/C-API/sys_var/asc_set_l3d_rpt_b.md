@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sys_var/sys_var.h"`。
-
 用于设置接口[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_3510.md)、[asc_copy_l12l0b](../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_3510.md)的2D格式搬运的repeat参数。
 
 ## 函数原型
@@ -38,13 +36,13 @@ __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config)
 
 ## 参数说明
 
-表1参数说明
+**表1** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | config | 输入 | 用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运repeat参数。比特位说明参考表2。 |
 
-表2 常用重复控制寄存器比特位说明
+**表2** 常用重复控制寄存器比特位说明
 
 |L3D_RPT_B比特位    |功能|
 | :-------     | :---- |

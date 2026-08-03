@@ -26,9 +26,13 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/scalar_compute/scalar_compute.h"`。
-
 对Global Memory中的数据与指定数据执行原子与操作，即将val按位与到address指向的数据元素上。
+
+读取address指向的GM地址上的旧值（old_value），将旧值与输入标量值val进行按位与运算，结果（new_value）写回GM地址，返回该地址修改前的值（old_value）。
+
+$$
+new\_value = old\_value\ \&\ val
+$$
 
 ## 函数原型
 
@@ -43,6 +47,8 @@ __aicore__ inline uint64_t asc_atomic_and(__gm__ uint64_t *address, uint64_t val
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |

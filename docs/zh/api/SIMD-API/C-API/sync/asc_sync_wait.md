@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
-
 等待特定的同步标志，阻塞当前流水线直到条件满足。
 
 ## 函数原型
@@ -37,6 +35,8 @@ __aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
@@ -54,7 +54,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+asc_sync_notify和asc_sync_wait必须成对使用。
 
 ## 调用示例
 

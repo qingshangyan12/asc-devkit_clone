@@ -26,9 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cache_ctrl/cache_ctrl.h"`。
-
-从源地址所在的特定GM地址预加载数据到Data Cache中。
+从源地址所在的特定GM地址预加载数据到Data Cache中，每次调用只能预加载一个Cache Line大小的数据。
 
 ## 函数原型
 
@@ -37,6 +35,8 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 |参数名|输入/输出|描述|
 |------------|------------|-----------|

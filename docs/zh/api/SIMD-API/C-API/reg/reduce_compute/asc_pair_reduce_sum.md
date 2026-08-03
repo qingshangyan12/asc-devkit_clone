@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/reg_compute/reg_vector.h"`。
-
 将传入的源操作数src中每两个相邻数值相加，并将相加的结果连续保存在目的操作数dst中的低半部分。以half数据类型为例，相加示意图如下：
 
 ![asc_pair_reduce_sum示意图](../../../../figures/reg_pair_reduce_elem.png)
@@ -41,7 +39,7 @@ __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float 
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -49,7 +47,7 @@ __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float 
 | src | 输入 | 源操作数（矢量数据寄存器）。|
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算，不参与计算的元素相加时被当作0处理。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -66,7 +64,7 @@ __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float 
 
 ## 调用示例
 
-```c++
+```cpp
 vector_half dst;
 vector_half src;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);

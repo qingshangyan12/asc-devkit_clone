@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
+在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组内block和subblock间同步指同一group内block（AIC）与subblock（AIV）之间的同步。
 
 和[asc_sync_block_arrive](asc_sync_block_arrive.md)配合使用（通过flag_id关联），用于等待所有同步对象到达flag_id对应的同步点。如果flag_id所对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
@@ -38,6 +38,8 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
@@ -57,11 +59,13 @@ PIPE_S
 - flag_id的取值范围为0至15，每个flag_id的计数器范围为0至15。
 - 必须保证每个flag_id的四位计数器不溢出，否则将引发异常。
 - 必须保证相同的flag_id在同一时间仅被一条流水线使用。
+- pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_ALL和PIPE_S。
+- flag_id的值超出取值范围时，会截取最低4位为准。
 
 ## 调用示例
 
 ```cpp
 int64_t flag_id = 1;
-asc_sync_block_arrive(PIPE_S, flag_id);
-asc_sync_block_wait(PIPE_S, flag_id);  
+asc_sync_block_arrive(PIPE_V, flag_id);
+asc_sync_block_wait(PIPE_V, flag_id);  
 ```

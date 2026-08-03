@@ -26,17 +26,17 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/scalar_compute/scalar_compute.h"`。
-
 获取一个uint64_t类型数字的二进制表示中从最低有效位开始的第一个0出现的位置，如果没找到则返回-1。
 
 ## 函数原型
 
-```c++
+```cpp
 __aicore__ inline int64_t asc_ffz(uint64_t value)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 |参数名|输入/输出|描述|
 | :------ | :--- | :------------ |
@@ -56,7 +56,7 @@ PIPE_S
 
 ## 调用示例
 
-```c++
+```cpp
 uint64_t value = 33;
 // 输出数据count_first_zero为1
 int64_t count_first_zero = asc_ffz(value);

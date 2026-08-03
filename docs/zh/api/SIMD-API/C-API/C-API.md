@@ -3,6 +3,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 ## 数据结构
 
+**表1** 数据结构列表
+
 |结构名|说明|
 |-----------------------|-----------------------|
 | [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | Load3Dv2接口的repeat参数。 |
@@ -14,6 +16,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 ## 矢量计算
 
 矢量计算类API，单独使用时可以引入vector_compute.h，此类API列表如下：
+
+**表2** 矢量计算API列表
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -123,6 +127,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 数据搬运类API，单独使用时可以引入vector_datamove.h和cube_datamove.h，此类API列表如下：
 
+**表3** 数据搬运API列表
+
 | API名称                                                                                                                       |   说明   |
 |-----------------------------------------------------------------------------------------------------------------------------|-----------|
 | [asc_copy_gm2l0a](cube_datamove/asc_copy_gm2l0a.md)                                                                         | 将GM中的数据搬运到L0A中。 |
@@ -181,6 +187,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 标量操作类API，单独使用时可以引入scalar_compute.h，此类API列表如下：
 
+**表4** 标量操作API列表
+
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_clz](scalar_compute/asc_clz.md)| 计算参数前导零的数量（二进制从最高位到第一个1共有多少个0）。 |
@@ -209,11 +217,14 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 矩阵计算类API，单独使用时可以引入cube_compute.h，此类API列表如下：
 
+**表5** 矩阵计算API列表
+
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_set_mmad_direction_m](cube_compute/asc_set_mmad_direction_m.md)| 设置mmad计算时优先通过M/N中的M方向生成结果，然后通过N方向产生结果，M为矩阵的行，N为矩阵的列。 |
 | [asc_set_mmad_direction_n](cube_compute/asc_set_mmad_direction_n.md)| 设置mmad计算时优先通过M/N中的N方向生成结果，然后通过M方向产生结果，M为矩阵的行，N为矩阵的列。 |
-| [asc_enable_hf32_trans](cube_compute/asc_enable_hf32_trans.md)| 设置HF32模式取整方式，需要先使用asc_enable_hf32开启HF32取整模式。 |
+| [asc_set_hf32_round_mode](cube_compute/asc_set_hf32_round_mode.md)| 设置HF32模式舍入方式。使用该接口前需要先使用asc_enable_hf32开启HF32模式。 |
+| [asc_enable_hf32_trans](cube_compute/asc_enable_hf32_trans.md)| 设置HF32模式舍入方式。使用该接口前需要先使用asc_enable_hf32开启HF32模式。 |
 |  [asc_enable_hif8](cube_compute/asc_enable_hif8.md) | 用于设置Mmad计算开启HiF8模式，开启该模式后L0A Buffer/L0B Buffer中的8bit数据将在参与矩阵乘法运算前被转化为hifloat8_t类型数据。  |
 |  [asc_enable_fp8](cube_compute/asc_enable_fp8.md) | 用于设置Mmad计算开启FP8模式，开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。  |
 | [asc_mmad](cube_compute/asc_mmad.md) | 完成矩阵乘加操作。 |
@@ -229,6 +240,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 同步控制类API，单独使用时可以引入sync.h，此类API列表如下：
 
+**表6** 同步控制API列表
+
 |   API名称   |   说明   |
 |----------|-----------|
 |  [asc_unlock](sync/asc_unlock.md)| 释放缓存。 |
@@ -237,7 +250,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sync_wait](sync/asc_sync_wait.md)| 等待同步标志。 |
 | [asc_sync_pipe](sync/asc_sync_pipe.md)| 等待指定流水线操作完成。 |
 | [asc_sync](sync/asc_sync.md)| 等待所有流水线操作完成。 |
-| [asc_sync_vec](sync/asc_sync_vec.md)| 同步所有流水线。 |
+| [asc_sync_vec](sync/asc_sync_vec.md)| 等待PIPE_V流水完成。 |
 | [asc_sync_mte3](sync/asc_sync_mte3.md)| 等待PIPE_MTE3流水完成。 |
 | [asc_sync_mte2](sync/asc_sync_mte2.md)| 等待PIPE_MTE2流水完成。 |
 | [asc_sync_data_barrier](sync/asc_sync_data_barrier.md) | 用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。 |
@@ -253,6 +266,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 ## 系统变量
 
 系统变量类API，单独使用时可以引入sys_var.h，此类API列表如下：
+
+**表7** 系统变量API列表
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -286,36 +301,43 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 缓存控制类API，单独使用时可以引入cache_ctrl.h，此类API列表如下：
 
+**表8** 缓存控制API列表
+
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_datacache_preload](cache_ctrl/asc_datacache_preload.md)| 从源地址所在的特定GM地址预加载数据到Data Cache中。 |
 | [asc_dcci](cache_ctrl/asc_dcci.md) | 用于刷新Cache，保证Cache的一致性。 |
 |  [asc_dci](cache_ctrl/asc_dci.md) | 数据缓存失效，使整个数据缓存无效化。|
 | [asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md) | 获取ICache的Preload的状态。 |
-| [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在DDR地址预加载数据到对应的cacheline中。 |
+| [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在GM地址预加载数据到对应的cacheline中。 |
 
 ## 原子操作
 
 原子操作类API，单独使用时可以引入atomic.h，此类API列表如下：
+
+**表9** 原子操作API列表
 
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_set_atomic_add_bfloat](simd_atomic/asc_set_atomic_add.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为bfloat16_t。 |
 | [asc_set_atomic_add_float](simd_atomic/asc_set_atomic_add.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为float。 |
 | [asc_set_atomic_add_float16](simd_atomic/asc_set_atomic_add.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为half。 |
-| [asc_set_atomic_add_int](simd_atomic/asc_set_atomic_add.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。 |
+| [asc_set_atomic_add_int32](simd_atomic/asc_set_atomic_add.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。 |
+| [asc_set_atomic_add_int（废弃）](simd_atomic/asc_set_atomic_add_int_deprecated.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。 |
 | [asc_set_atomic_add_int8](simd_atomic/asc_set_atomic_add.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int8_t。 |
 | [asc_set_atomic_add_int16](simd_atomic/asc_set_atomic_add.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int16_t。 |
 | [asc_set_atomic_max_bfloat](simd_atomic/asc_set_atomic_max.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的bfloat16_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。 |
 | [asc_set_atomic_max_float](simd_atomic/asc_set_atomic_max.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的float数据与GM中已有数据进行逐元素比较，并将最大值写入GM。 |
 | [asc_set_atomic_max_float16](simd_atomic/asc_set_atomic_max.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的half数据与GM中已有数据进行逐元素比较，并将最大值写入GM。 |
-| [asc_set_atomic_max_int](simd_atomic/asc_set_atomic_max.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。 |
+| [asc_set_atomic_max_int32](simd_atomic/asc_set_atomic_max.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。 |
+| [asc_set_atomic_max_int（废弃）](simd_atomic/asc_set_atomic_max_int_deprecated.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。 |
 | [asc_set_atomic_max_int8](simd_atomic/asc_set_atomic_max.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int8_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。 |
 | [asc_set_atomic_max_int16](simd_atomic/asc_set_atomic_max.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int16_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。 |
 | [asc_set_atomic_min_bfloat](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的bfloat16_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_atomic_min_float](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的float数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_atomic_min_float16](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的half数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
-| [asc_set_atomic_min_int](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
+| [asc_set_atomic_min_int32](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
+| [asc_set_atomic_min_int（废弃）](simd_atomic/asc_set_atomic_min_int_deprecated.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_atomic_min_int8](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int8_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_atomic_min_int16](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int16_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_store_atomic_config_v1](simd_atomic/asc_set_store_atomic_config_v1.md)| 设置原子操作启用位与原子操作类型的值，适用于Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。 |
@@ -324,6 +346,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_atomic_none](simd_atomic/asc_set_atomic_none.md) | 清空原子操作的状态。 |
 
 ## 其他操作
+
+**表10** 其他操作API列表
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -334,6 +358,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 ## Reg数据搬运
 
 Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表如下：
+
+**表11** Reg数据搬运API列表
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -377,6 +403,8 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 ## Reg矢量计算
 
 Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列表如下：
+
+**表12** Reg矢量计算API列表
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -516,7 +544,10 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 
 ## 枚举类型
 
+**表13** 枚举类型列表
+
 |枚举类名|说明|
 |-----------------------|-----------------------|
 | [asc_load_l2_cache_mode](enum/asc_load_l2_cache_mode.md) | 表示数据从GM搬运到UB时的L2 cache策略。 |
 | [asc_store_l2_cache_mode](enum/asc_store_l2_cache_mode.md) | 表示数据从UB搬运到GM时的L2 cache策略。 |
+| [asc_hf32_round_mode](enum/asc_hf32_round_mode.md) | 表示Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略。 |

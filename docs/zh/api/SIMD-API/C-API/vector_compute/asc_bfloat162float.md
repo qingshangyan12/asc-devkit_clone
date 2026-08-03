@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_compute/vector_compute.h"`。
-
 将bfloat16_t类型数据转为float，无舍入模式。
 
 ## 函数原型
@@ -46,6 +44,8 @@ __aicore__ inline void asc_bfloat162float_sync(__ubuf__ float* dst, __ubuf__ bfl
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |

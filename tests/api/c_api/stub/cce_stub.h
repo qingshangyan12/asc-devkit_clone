@@ -15,26 +15,6 @@
 #ifndef ULL
 #define ULL unsigned long long
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
-using vector_uint8_t = uint8_t;
-using vector_uint16_t = uint8_t;
-using vector_uint32_t = uint8_t;
-using vector_uint64_t = uint8_t;
-using vector_int8_t = uint8_t;
-using vector_int16_t = uint8_t;
-using vector_int32_t = uint8_t;
-using vector_int64_t = uint8_t;
-using vector_bfloat16_t = uint8_t;
-using vector_half = uint8_t;
-using vector_float = uint8_t;
-using vector_hifloat8_t = uint8_t;
-using vector_fp8_e4m3fn_t = uint8_t;
-using vector_fp8_e5m2_t = uint8_t;
-using vector_fp8_e8m0_t = uint8_t;
-using vector_int4x2_t = uint8_t;
-using vector_fp4x2_e2m1_t = uint8_t;
-using vector_fp4x2_e1m2_t = uint8_t;
-#endif
 
 static bool is_mock_copy_matrix_cc_to_gm = false;
 static uint16_t n_size_global = 0;
@@ -138,6 +118,13 @@ void vcgadd(vector_s32& dst, vector_s16 src, vector_bool pg, int32_t mode);
 // ==========copy_matrix_cc_to_cbuf (25 params)===========
 inline void copy_matrix_cc_to_cbuf(
     __cbuf__ half* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
+    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
+    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+    bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{}
+inline void copy_matrix_cc_to_cbuf(
+    __cbuf__ bfloat16_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,

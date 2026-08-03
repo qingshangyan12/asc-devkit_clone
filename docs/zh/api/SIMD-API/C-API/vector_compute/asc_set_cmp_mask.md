@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/vector_compute/vector_compute.h"`。
-
 为[asc_select](asc_select.md)操作设置作用于选择的Mask掩码。
 
 ## 函数原型
@@ -37,6 +35,8 @@ __aicore__ inline void asc_set_cmp_mask(__ubuf__ void* sel_mask)
 ```
 
 ## 参数说明
+
+**表1** 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |

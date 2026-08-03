@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/cube_compute/cube_compute.h"`。
-
 完成矩阵乘加操作，传入的左矩阵A为稠密矩阵，右矩阵B为稀疏矩阵。对于矩阵A，在asc_mmad_sparse计算时完成稠密化；对于矩阵B，在计算执行前的输入数据准备时自行完成稠密化（按照下文中介绍的稠密算法进行稠密化），所以输入本接口的矩阵A为稠密矩阵。稠密矩阵A需要通过[asc_copy_l12l0b_sparse](../cube_datamove/asc_copy_l12l0b_sparse.md)载入，同时加载索引矩阵，索引矩阵在矩阵B稠密化的过程中生成，再用于矩阵A的稠密化。
 
 ## 函数原型
@@ -44,6 +42,8 @@ __aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a,
 
 
 ## 参数说明
+
+**表1** 参数说明
 
 | 参数名       | 输入/输出 | 描述               |
 | --------- | ----- | ---------------- |
@@ -77,6 +77,8 @@ PIPE_M
 <br>&bull;第一个索引用于指示前3个元素中第1个非零元素的相对位置。
 <br>&bull;第二个索引用于指示第2个非零元素在后3个元素中的相对位置。
 <br>具体可参考下表。其中，“-”表示算法不关心该位置上的值，因为其会被过滤。
+**表2** 稠密算法说明
+
 <table border="1" style="border-collapse: collapse; width: 100%; text-align: center;">
   <!-- 第1行：不合并 -->
   <tr>
