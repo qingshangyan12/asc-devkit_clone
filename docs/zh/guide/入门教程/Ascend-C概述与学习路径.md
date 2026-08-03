@@ -22,7 +22,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 
 > 💡 如何选择多级API，可参考 [Ascend C多级API选择指南](../../asc_how_to_choose_api.md)。
 
-> [!NOTE] 说明
+> [!NOTE]说明
 > Ascend C支持在如下AI处理器型号上使用：
 > <!-- npu="950" id2 -->
 > - Ascend 950PR/Ascend 950DT
