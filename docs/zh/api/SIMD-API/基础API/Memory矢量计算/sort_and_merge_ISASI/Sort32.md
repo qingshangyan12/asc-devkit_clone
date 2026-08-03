@@ -60,9 +60,9 @@ __aicore__ inline void Sort32(const LocalTensor<T>& dst, const LocalTensor<T>& s
 
 | 参数名称 | 输入/输出 | 说明 |
 |---|---|---|
-| dst | 输出 | 目的操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT<br> LocalTensor的起始地址需要32字节对齐。 |
-| src0 | 输入 | 源操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT<br> LocalTensor的起始地址需要32字节对齐。 |
-| src1 | 输入 | 源操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT<br> LocalTensor的起始地址需要32字节对齐。<br> **注：src1的数据类型固定为uint32_t。** |
+| dst | 输出 | 目的操作数。<br> 类型为LocalTensor，支持的存储位置为UB（VECIN/VECCALC/VECOUT）<br> LocalTensor的起始地址需要32字节对齐。 |
+| src0 | 输入 | 源操作数。<br> 类型为LocalTensor，支持的存储位置为UB（VECIN/VECCALC/VECOUT）<br> LocalTensor的起始地址需要32字节对齐。 |
+| src1 | 输入 | 源操作数。<br> 类型为LocalTensor，支持的存储位置为UB（VECIN/VECCALC/VECOUT）<br> LocalTensor的起始地址需要32字节对齐。<br> **注：src1的数据类型固定为uint32_t。** |
 | repeatTime | 输入 | 重复迭代次数。每次迭代完成32个元素的排序，下次迭代src0跳过128字节空间，src1跳过128字节空间，dst跳过256字节空间。每次迭代输入src0要求128字节对齐，src1要求128字节对齐，输出dst要求256字节对齐。repeatTime∈[0, 255]。 |
 
 ## 数据类型

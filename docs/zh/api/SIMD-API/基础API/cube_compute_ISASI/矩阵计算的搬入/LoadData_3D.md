@@ -175,7 +175,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | 参数名称 | 含义 |
 | ---------- | ------ |
 | channelSize | 源操作数的通道数，取值范围：channelSize∈[0, 65535]。<br>对于half，channelSize除16的余数应当为0，4或8。<br>对于int8_t和uint8_t，channelSize除32的余数应当为0，4，8或16。<br>对于int4b_t，channelSize为8，16，32，N\*64，N\*64+8，N\*64+16，N\*64+32，N为正整数。 |
-| enTranspose | 是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为bool，仅在目的TPosition为A2，且源操作数为half类型时有效。默认为false。<br>&nbsp;&nbsp;&bull; true：启用；<br>&nbsp;&nbsp;&bull; false：不启用。 |
+| enTranspose | 是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为bool，仅在目的存储位置为L0A Buffer（A2），且源操作数为half类型时有效。默认为false。<br>&nbsp;&nbsp;&bull; true：启用；<br>&nbsp;&nbsp;&bull; false：不启用。 |
 | enSmallK | 是否开启small k特性，每个分形矩阵大小为16\*4，支持数据类型为bool，默认为false。<br>**注：当前产品形态，该特性已不再支持。** |
 | filterSizeW | 是否在filterW的基础上将卷积核width增加256个元素。true，增加；false，不增加。 |
 | filterSizeH | 是否在filterH的基础上将卷积核height增加256个元素。true，增加；false，不增加。 |
@@ -206,20 +206,20 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 <!-- npu="A3" id24 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：
-    - TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
-    - TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
+    - 存储位置为L1 Buffer（A1）或L0A Buffer（A2）时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
+    - 存储位置为L1 Buffer（B1）或L0B Buffer（B2）时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id24 -->
 
 <!-- npu="910b" id25 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：
-    - TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
-    - TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
+    - 存储位置为L1 Buffer（A1）或L0A Buffer（A2）时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
+    - 存储位置为L1 Buffer（B1）或L0B Buffer（B2）时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id25 -->
 
 <!-- npu="310b" id26 -->
 - Atlas 200I/500 A2 推理产品：
-    - TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
-    - TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
+    - 存储位置为L1 Buffer（A1）或L0A Buffer（A2）时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
+    - 存储位置为L1 Buffer（B1）或L0B Buffer（B2）时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id26 -->
 
 <!-- npu="310p" id27 -->
@@ -228,8 +228,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 <!-- npu="x90" id28 -->
 - Kirin X90产品：
-    - TPosition为A1/A2时，支持数据类型为：int8_t、half。
-    - TPosition为B1/B2时，支持数据类型为：int8_t、half。
+    - 存储位置为L1 Buffer（A1）或L0A Buffer（A2）时，支持数据类型为：int8_t、half。
+    - 存储位置为L1 Buffer（B1）或L0B Buffer（B2）时，支持数据类型为：int8_t、half。
 <!-- end id28 -->
 <!-- end id22 -->
 
