@@ -4,7 +4,7 @@ TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递�
 
 **表1**  TCubeTiling结构说明
 
-<a name="tcubetiling-struct"></a>
+<a id="tcubetiling-struct"></a>
 | 参数名称 | 数据类型 | 说明 |
 | --- | --- | --- |
 | usedCoreNum | int | 使用的AI处理器核数，请根据实际情况设置。取值范围为：[1, AI处理器最大核数]。该参数与shape相关参数的关系为：usedCoreNum = (M / singleCoreM) * (N / singleCoreN)。 |

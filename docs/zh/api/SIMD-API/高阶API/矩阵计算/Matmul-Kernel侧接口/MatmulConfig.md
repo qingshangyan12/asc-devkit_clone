@@ -19,7 +19,7 @@
 
 **表2**  MatmulConfig参数说明
 
-<a name="matmulconfig-params"></a>
+<a id="matmulconfig-params"></a>
 | 参数 | 说明 | 支持模板：Norm, MDL, SpecialMDL, IBShare, BasicBlock, SpecialBasicBlock |
 | --- | --- | --- |
 | doNorm | 开启Norm模板。参数取值如下：<br>true：开启Norm模板。false：不开启Norm模板。<br><br>不指定模板的情况默认开启Norm模板。<!-- npu="9030" id1 --><br><br>Kirin 9030不支持此参数。<!-- end id1 --> | Norm |
