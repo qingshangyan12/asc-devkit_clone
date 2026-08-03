@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
@@ -30,8 +30,7 @@ namespace te {
 class load_data_l1_to_l0a_nz2nz {
 public:
     template <const copy_l1_to_l0a_trait& trait, typename T, typename U>
-    __aicore__ inline static void run(const T& dst, const U& src)
-    {
+    __aicore__ inline static void run(const T& dst, const U& src) {
         check_template<trait, T, U>();
         if constexpr (T::layout_type::depth == FIVE_DIM_DATA) {
             batch_load_data_impl<trait, T, U>(dst, src);
@@ -39,9 +38,27 @@ public:
             load_data_impl<trait, T, U>(dst, src);
         } else {
             static_assert(T::layout_type::depth == FOUR_DIM_DATA || T::layout_type::depth == FIVE_DIM_DATA,
-                          "load_data_l1_to_l0a_nz2nz only supports the plain fractal layout "
-                          "((row0,row1),(col0,col1)) or the batch layout (B,((row0,row1),(col0,col1))).");
+                "load_data_l1_to_l0a_nz2nz only supports the plain fractal layout "
+                "((row0,row1),(col0,col1)) or the batch layout (batch_value,((row0,row1),(col0,col1))).");
         }
+    }
+
+    template <const copy_l1_to_l0a_trait& trait, typename T, typename U, typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape)
+    {
+        check_template<trait, T, U>();
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        auto dst_layout = dst.layout();
+        using dst_type = typename T::element_type;
+        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
+        auto m_step = get_element<attr_info::shape, attr_info::row, 1>(dst_layout);
+        auto k_step = get_element<attr_info::shape, attr_info::column, 1>(dst_layout);
+        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) / STRIDE_UNIT;
+        auto dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / STRIDE_UNIT;
+        load_l1_to_l0a_instr::load_data_region<false>(
+            dst, src, dst_offset, src_offset, 0, 0, m_step, k_step, src_stride, dst_stride);
     }
 
 private:
@@ -66,8 +83,8 @@ private:
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
         auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / STRIDE_UNIT;
         auto dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / STRIDE_UNIT;
-        load_l1_to_l0a_instr::load_data<false>(dst.data().get(), src.data().get(), m_start_position,
-                                                 k_start_position, m_step, k_step, src_stride, dst_stride);
+        load_l1_to_l0a_instr::load_data_tensor<false>(
+            dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     }
 
     template <const copy_l1_to_l0a_trait& trait, typename T, typename U>
@@ -81,14 +98,14 @@ private:
         uint16_t m_start_position = 0;
         uint16_t k_start_position = 0;
         auto m_step = get_element<attr_info::shape, attr_info::row, 1>(dst_no_batch_layout);
-        auto k_step =
-            get<0>(dst_layout.shape()) * get_element<attr_info::shape, attr_info::column, 1>(dst_no_batch_layout);
+        auto k_step = get<0>(dst_layout.shape()) *
+                     get_element<attr_info::shape, attr_info::column, 1>(dst_no_batch_layout);
         // Nz -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
         auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_no_batch_layout) / STRIDE_UNIT;
         auto dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_no_batch_layout) / STRIDE_UNIT;
-        load_l1_to_l0a_instr::load_data<false>(dst.data().get(), src.data().get(), m_start_position,
-                                                 k_start_position, m_step, k_step, src_stride, dst_stride);
+        load_l1_to_l0a_instr::load_data_tensor<false>(
+            dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     }
 };
 } // namespace te

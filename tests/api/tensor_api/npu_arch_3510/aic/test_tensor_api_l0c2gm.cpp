@@ -1,7 +1,7 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
+* CANN Open Software License Agreement version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
 * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -16,35 +16,34 @@
 #define GM_ADDR __gm__ uint8_t*
 
 enum class cube_format {
-    ND = 0,
-    NZ,
-    DN,
+    nd = 0,
+    nz,
+    dn,
 };
 
-template <cube_format format>
+template <cube_format format_value>
 struct default_c_layout_ptn;
 
 template <>
-struct default_c_layout_ptn<cube_format::ND> {
+struct default_c_layout_ptn<cube_format::nd> {
     using type = asc::te::nd_ext_layout_ptn;
 };
 
 template <>
-struct default_c_layout_ptn<cube_format::NZ> {
+struct default_c_layout_ptn<cube_format::nz> {
     using type = asc::te::nz_layout_ptn;
 };
 
 template <>
-struct default_c_layout_ptn<cube_format::DN> {
+struct default_c_layout_ptn<cube_format::dn> {
     using type = asc::te::dn_ext_layout_ptn;
 };
 
-template <cube_format format_value, typename element_type,
-          typename layout_pattern_type = typename default_c_layout_ptn<format_value>::type>
+template <cube_format format_value, typename TYPE, typename LAYOUT_PATTERN = typename default_c_layout_ptn<format_value>::type>
 struct input_info {
     constexpr static cube_format format = format_value;
-    using data_type = element_type;
-    using layout_pattern = layout_pattern_type;
+    using T = TYPE;
+    using layout_pattern = LAYOUT_PATTERN;
 };
 
 
@@ -125,7 +124,7 @@ void set_channel_para_stub(uint64_t config)
     EXPECT_EQ(g_expected_channel_para, config);
 }
 
-template <typename dst_layout_pattern>
+template <typename dst_layout_ptn>
 void run_l0c_to_gm_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en, bool nz_todn_en, bool expect_channel_para)
 {
     using namespace asc::te;
@@ -145,7 +144,7 @@ void run_l0c_to_gm_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en,
     auto src_tensor = make_tensor_at<location::l0c>(
         src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(k_src_batch, k_m, k_n));
     auto dst_tensor = make_tensor_at<location::gm>(
-        dst, make_frame_layout<dst_layout_pattern, layout_trait_default<float>>(k_dst_batch, k_m, k_n));
+        dst, make_frame_layout<dst_layout_ptn, layout_trait_default<float>>(k_dst_batch, k_m, k_n));
 
     n_size_global = k_n;
     m_size_global = k_m;
@@ -345,10 +344,10 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_batch_nz_to_nz)
 }
 
 
-template <class l0c_data_type, class c_data_type, QuantMode_t quant_mode_value, bool is_tensor_value, bool has_coord>
+template <class L0C_TYPE, class C_TYPE, QuantMode_t quant_mode_value, bool is_tensor, bool has_coord>
 class test_case {
-    using dst_type = typename c_data_type::data_type;
-    using l0c_t = typename l0c_data_type::data_type;
+    using dst_type = typename C_TYPE::T;
+    using l0c_t = typename L0C_TYPE::T;
 
 public:
     __aicore__ inline test_case() {}
@@ -364,7 +363,7 @@ public:
         auto l0c_iterator = make_mem_ptr<location::l0c>(l0c_addr);
         auto l0c_matrix_layout = make_frame_layout<nz_layout_ptn, layout_trait_default<l0c_t, _16>>(m_length_, n_length_);
         auto l0c_tensor = make_tensor(l0c_iterator, l0c_matrix_layout);
-        if constexpr (c_data_type::format == cube_format::ND) {
+        if constexpr (C_TYPE::format == cube_format::nd) {
             if constexpr (has_coord) {
                 n_size_global = n - base;
                 m_size_global = m - base;
@@ -376,7 +375,7 @@ public:
             src_stride_global = C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
             NZ2ND_en_global = true;
             NZ2DN_en_global = false;
-        } else if constexpr (c_data_type::format == cube_format::NZ) {
+        } else if constexpr (C_TYPE::format == cube_format::nz) {
             if constexpr (has_coord) {
                 n_size_global = AscendC::Std::ceil_align(n - base, FRACTAL_FIXED);
                 m_size_global =  AscendC::Std::ceil_align(m - base, C0_SIZE<uint16_t> / sizeof(uint16_t));
@@ -407,21 +406,25 @@ public:
 
         if constexpr (quant_mode_value == QuantMode_t::NoQuant || quant_mode_value == QuantMode_t::F322F16) {
             if constexpr (has_coord) {
-                auto gm_tensor_tile = slice(gm_tensor, make_coord(base, base), make_shape(m - base, n - base));
-                gm_addr_global = gm_tensor_tile.data().get();
-                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor_tile, l0c_tensor);
+                auto coord = make_coord(base, base);
+                auto shape = make_shape(m - base, n - base);
+                gm_addr_global = (gm_tensor.data() + gm_tensor.layout()(coord)).get();
+                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{},
+                    gm_tensor, l0c_tensor, coord, zero_coord, shape);
             } else {
                 gm_addr_global = gm_c_;
                 copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor, l0c_tensor);
             }
-        } else if constexpr (is_tensor_value) {
+        } else if constexpr (is_tensor) {
             auto q_iterator = make_mem_ptr<location::l1>(q_addr);
             auto q_matrix_layout = make_frame_layout<nd_ext_layout_ptn>(1, n_length_);
             auto q_tensor = make_tensor(q_iterator, q_matrix_layout);
             if constexpr (has_coord) {
-                auto gm_tensor_tile = slice(gm_tensor, make_coord(base, base), make_shape(m - base, n - base));
-                gm_addr_global = gm_tensor_tile.data().get();
-                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor_tile, l0c_tensor, q_tensor);
+                auto coord = make_coord(base, base);
+                auto shape = make_shape(m - base, n - base);
+                gm_addr_global = (gm_tensor.data() + gm_tensor.layout()(coord)).get();
+                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{},
+                    gm_tensor, l0c_tensor, q_tensor, coord, zero_coord, shape);
             } else {
                 gm_addr_global = gm_c_;
                 copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor, l0c_tensor, q_tensor);
@@ -429,9 +432,11 @@ public:
         } else {
             uint64_t quant = 1;
             if constexpr (has_coord) {
-                auto gm_tensor_tile = slice(gm_tensor, make_coord(base, base), make_shape(m - base, n - base));
-                gm_addr_global = gm_tensor_tile.data().get();
-                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor_tile, l0c_tensor, quant);
+                auto coord = make_coord(base, base);
+                auto shape = make_shape(m - base, n - base);
+                gm_addr_global = (gm_tensor.data() + gm_tensor.layout()(coord)).get();
+                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{},
+                    gm_tensor, l0c_tensor, quant, coord, zero_coord, shape);
             } else {
                 gm_addr_global = gm_c_;
                 copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor, l0c_tensor, quant);
@@ -451,18 +456,18 @@ private:
     __aicore__ inline constexpr auto make_gm_tensor()
     {
         auto gm_iterator = make_mem_ptr<location::gm>(gm_c_);
-        if constexpr (c_data_type::format == cube_format::NZ) {
+        if constexpr (C_TYPE::format == cube_format::nz) {
             using cast_t = std::conditional_t<sizeof(dst_type) == 4, half, dst_type>;
-            auto gm_matrix_layout = make_frame_layout<typename c_data_type::layout_pattern, layout_trait_default<cast_t>>(m_length_,
+            auto gm_matrix_layout = make_frame_layout<typename C_TYPE::layout_pattern, layout_trait_default<cast_t>>(m_length_,
                                                                                                          n_length_);
             auto gm_tensor = make_tensor(gm_iterator, gm_matrix_layout);
             return gm_tensor;
-        } else if constexpr (c_data_type::format == cube_format::DN) {
-            auto gm_matrix_layout = make_frame_layout<typename c_data_type::layout_pattern>(m_length_, n_length_);
+        } else if constexpr (C_TYPE::format == cube_format::dn) {
+            auto gm_matrix_layout = make_frame_layout<typename C_TYPE::layout_pattern>(m_length_, n_length_);
             auto gm_tensor = make_tensor(gm_iterator, gm_matrix_layout);
             return gm_tensor;
         } else {
-            auto gm_matrix_layout = make_frame_layout<typename c_data_type::layout_pattern>(m_length_, n_length_);
+            auto gm_matrix_layout = make_frame_layout<typename C_TYPE::layout_pattern>(m_length_, n_length_);
             auto gm_tensor = make_tensor(gm_iterator, gm_matrix_layout);
             return gm_tensor;
         }
@@ -470,7 +475,7 @@ private:
 
 };
 
-template <class l0c_data_type, class c_data_type, QuantMode_t quant_mode_value, bool is_tensor_value, bool has_coord>
+template <class L0C_TYPE, class C_TYPE, QuantMode_t quant_mode_value, bool is_tensor, bool has_coord>
 __aicore__ inline void test_l0c_to_gm(GM_ADDR c_gm, int32_t m, int32_t n, int32_t used_core_num)
 {
     // cube core cases, ignore vector core
@@ -478,8 +483,8 @@ __aicore__ inline void test_l0c_to_gm(GM_ADDR c_gm, int32_t m, int32_t n, int32_
         return;
     }
 
-    using l0c_t = typename l0c_data_type::data_type;
-    using c_t = typename c_data_type::data_type;
+    using l0c_t = typename L0C_TYPE::T;
+    using c_t = typename C_TYPE::T;
 
     if (block_idx >= used_core_num) {
         return;
@@ -487,68 +492,65 @@ __aicore__ inline void test_l0c_to_gm(GM_ADDR c_gm, int32_t m, int32_t n, int32_
 
     auto gm_c = reinterpret_cast<__gm__ c_t *>(c_gm);
 
-    test_case<l0c_data_type, c_data_type, quant_mode_value, is_tensor_value, has_coord> ins;
+    test_case<L0C_TYPE, C_TYPE, quant_mode_value, is_tensor, has_coord> ins;
     ins.test_run(m, n, gm_c);
 }
 
-#define TEST_L0C_TO_GM_CONCAT_IMPL_(name, line) name##line
-#define TEST_L0C_TO_GM_CONCAT_(name, line) TEST_L0C_TO_GM_CONCAT_IMPL_(name, line)
-
-#define KERNEL_TENSOR_API_L0C2GM_E2E(core_num, m_value, n_value, c_format, l0c_data_type, c_data_type, quant_mode_value, is_tensor_value, has_coord) \
-    TEST_F(tensor_api_cube_copy_3510, TEST_L0C_TO_GM_CONCAT_(kernel_tensor_api_l0c_to_gm_case_, __LINE__)) \
+#define KERNEL_TENSOR_API_L0C2GM_E2E(core_num, m_value, n_value, c_format, l0c_data_type, c_data_type, quant_mode_value, is_tensor, has_coord) \
+    TEST_F(tensor_api_cube_copy_3510, kernel_tensor_api_l0c2gm_##core_num##_##m_value##_##n_value##_##c_format##_##l0c_data_type##_##c_data_type##_##quant_mode_value##_##is_tensor##_##has_coord) \
     { \
         uint8_t c_gm[m_value * n_value * sizeof(c_data_type)] = {0}; \
-        typedef input_info<cube_format::NZ, l0c_data_type> l0c_type; \
+        typedef input_info<cube_format::nz, l0c_data_type> l0c_type; \
         typedef input_info<cube_format::c_format, c_data_type> c_type; \
-        test_l0c_to_gm<l0c_type, c_type, QuantMode_t::quant_mode_value, is_tensor_value, has_coord>(c_gm, m_value, n_value, core_num); \
+        test_l0c_to_gm<l0c_type, c_type, QuantMode_t::quant_mode_value, is_tensor, has_coord>(c_gm, m_value, n_value, core_num); \
         for (uint32_t i = 0; i < m_value * n_value; i++) { \
             EXPECT_EQ(c_gm[i], 0x00); \
         } \
     }
 
-#define KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(core_num, m_value, n_value, c_format, c_layout_pattern, l0c_data_type, c_data_type, quant_mode_value,    \
-                                            is_tensor_value, has_coord)                                                    \
-    TEST_F(tensor_api_cube_copy_3510, TEST_L0C_TO_GM_CONCAT_(kernel_tensor_api_l0c_to_gm_layout_case_, __LINE__)) \
+#define KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(core_num, m_value, n_value, c_format, c_layout_ptn, l0c_data_type, c_data_type, quant_mode_value,    \
+                                            is_tensor, has_coord)                                                    \
+    TEST_F(tensor_api_cube_copy_3510, kernel_tensor_api_l0c2gm_##core_num##_##m_value##_##n_value##_##c_format##_##c_layout_ptn##_##l0c_data_type##_##c_data_type##_##quant_mode_value##_##is_tensor##_##has_coord) \
     {                                                                                                                \
         uint8_t c_gm[m_value * n_value * sizeof(c_data_type)] = {0};                                                                  \
-        typedef input_info<cube_format::NZ, l0c_data_type> l0c_type;                                                        \
-        typedef input_info<cube_format::c_format, c_data_type, c_layout_pattern> c_type;                                         \
-        test_l0c_to_gm<l0c_type, c_type, QuantMode_t::quant_mode_value, is_tensor_value, has_coord>(c_gm, m_value, n_value, core_num);               \
+        typedef input_info<cube_format::nz, l0c_data_type> l0c_type;                                                        \
+        typedef input_info<cube_format::c_format, c_data_type, c_layout_ptn> c_type;                                         \
+        test_l0c_to_gm<l0c_type, c_type, QuantMode_t::quant_mode_value, is_tensor, has_coord>(c_gm, m_value, n_value, core_num);               \
         for (uint32_t i = 0; i < m_value * n_value; i++) {                                                                       \
             EXPECT_EQ(c_gm[i], 0x00);                                                                                 \
         }                                                                                                            \
     }
 
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, ND, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, NZ, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, DN, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, ND, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, ND, float, float, NoQuant, false, true)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, NZ, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, NZ, float, float, NoQuant, false, true)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, ND, float, half, F322F16, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, ND, float, half, F322F16, false, true)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, ND, float, half, VQF322F16_PRE, true, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, ND, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, NZ, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, NZ, int32_t, int8_t, VREQ8, true, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, DN, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, DN, int32_t, int8_t, VREQ8, true, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, nd, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, nz, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, dn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, nd, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, nd, float, float, NoQuant, false, true)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, nz, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, nz, float, float, NoQuant, false, true)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, nd, float, half, F322F16, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, nd, float, half, F322F16, false, true)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 16, 16, nd, float, half, VQF322F16_PRE, true, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, nd, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, nz, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, nz, int32_t, int8_t, VREQ8, true, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, dn, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E(1, 128, 64, dn, int32_t, int8_t, VREQ8, true, false)
 
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, ND, nd_layout_ptn, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, ND, nd_layout_ptn, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, ND, nd_layout_ptn, float, float, NoQuant, false, true)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, ND, nd_layout_ptn, float, half, F322F16, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, ND, nd_layout_ptn, float, half, F322F16, false, true)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, ND, nd_layout_ptn, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, DN, dn_layout_ptn, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, DN, dn_layout_ptn, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, DN, dn_layout_ptn, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, ND, nd_layout_ptn, int32_t, half, VDEQF16, true, false)
-KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, DN, dn_layout_ptn, int32_t, half, VDEQF16, true, false)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, nd, nd_layout_ptn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, nd, nd_layout_ptn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, nd, nd_layout_ptn, float, float, NoQuant, false, true)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, nd, nd_layout_ptn, float, half, F322F16, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, nd, nd_layout_ptn, float, half, F322F16, false, true)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, nd, nd_layout_ptn, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, dn, dn_layout_ptn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, dn, dn_layout_ptn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, dn, dn_layout_ptn, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, nd, nd_layout_ptn, int32_t, half, VDEQF16, true, false)
+KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, dn, dn_layout_ptn, int32_t, half, VDEQF16, true, false)
 
-// L0C(NZ) -> GM(NC1HWC0), n_value=1, no-quant. dst NC1HWC0 built with the nc1hwc0_layout_ptn tag so routing
-// dispatches to data_copy_l0c_to_gm (NC1HWC0<-NZ). src NZ (m_value=Ho*Wo, n_value=Cout=c1*c0_value); the stub is empty so
+// l0c(nz) -> gm(NC1HWC0), n_value=1, no-quant. dst NC1HWC0 built with the nc1hwc0_layout_ptn tag so routing
+// dispatches to data_copy_l0c_to_gm (NC1HWC0<-nz). src nz (m_value=Ho*Wo, n_value=Cout=c1*c0_value); the stub is empty so
 // this exercises routing/param derivation.
 TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nc1_hwc0)
 {
@@ -575,7 +577,7 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nc1_hwc0)
     EXPECT_EQ(dst[0], 0);
 }
 
-// L0C(NZ) -> GM(NHWC), no quant. NZ (m_value=height*width, n_value=channel) unfolded to NHWC (1, height, width, channel) via the nz2nd path.
+// l0c(nz) -> gm(NHWC), no quant. nz (m_value=height*width, n_value=channel) unfolded to NHWC (1, height, width, channel) via the nz2nd path.
 TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nhwc)
 {
     using namespace asc::te;
@@ -600,7 +602,7 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nhwc)
     EXPECT_EQ(dst[0], 0);
 }
 
-// L0C(NZ) -> GM(NCHW), no quant. NZ (m_value=height*width, n_value=channel) unfolded to NCHW (1, channel, height, width) via the nz2dn path
+// l0c(nz) -> gm(NCHW), no quant. nz (m_value=height*width, n_value=channel) unfolded to NCHW (1, channel, height, width) via the nz2dn path
 // (NCHW is the HW<->channel transpose of NHWC).
 TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nchw)
 {
@@ -626,18 +628,18 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nchw)
     EXPECT_EQ(dst[0], 0);
 }
 
-// L0C(NZ) -> GM(NCDHW) via nz2dn (conv3d output, no quant). Output depth Do is treated as 1, so this
-// is NZ->NCHW with a 5D dst: n_size=channel, m_size=depth*height*width (=height*width when depth==1), dst_stride=Stride[1]. Drives the
-// full copy path against the empty cce stub to verify it routes to DataCopyL0C2GMNZ2NCDHW.
+// l0c(nz) -> gm(NCDHW) via nz2dn (conv3d output, no quant). Output depth Do is treated as 1, so this
+// is nz->NCHW with a 5D dst: n_size=channel, m_size=D*height*width (=height*width when D==1), dst_stride=stride[1]. Drives the
+// full copy path against the empty cce stub to verify it routes to data_copy_l0c_to_gm_nz2ncdhw.
 TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_ncdhw)
 {
     using namespace asc::te;
 
-    constexpr uint32_t depth = 1; // output depth treated as 1
+    constexpr uint32_t D = 1; // output depth treated as 1
     constexpr uint32_t height = 8;
     constexpr uint32_t width = 8;
     constexpr uint32_t channel = 16;
-    constexpr uint32_t m = depth * height * width; // 64
+    constexpr uint32_t m = D * height * width; // 64
     constexpr uint32_t n = channel;         // 16
     __cc__ float src[m * n] = {0};
     __gm__ float dst[m * n] = {0};
@@ -646,7 +648,7 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_ncdhw)
         make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto gm_tensor = make_tensor_at<location::gm>(
         dst, make_frame_layout<ncdhw_layout_ptn, layout_trait_default<float>>(
-                 1, static_cast<int>(channel), static_cast<int>(depth), static_cast<int>(height), static_cast<int>(width)));
+                 1, static_cast<int>(channel), static_cast<int>(D), static_cast<int>(height), static_cast<int>(width)));
 
     run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
     run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});

@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -35,6 +35,13 @@ public:
         run_gm_to_l1_batched<trait, copy_gm_to_l1_dn2zn, T, U>(dst, src);
     }
 
+    template <const copy_gm_to_l1_trait& trait, typename T, typename U, typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape)
+    {
+        run_gm_to_l1_batched<trait, copy_gm_to_l1_dn2zn, T, U>(dst, src, coord_dst, coord_src, shape);
+    }
+
     template <const copy_gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
@@ -45,10 +52,10 @@ public:
     // Extracts single-matrix parameters from the (batch-stripped) src/dst layouts and emits the
     // instruction. dn_num/src_dn_matrix_stride/dst_nz_matrix_stride carry the batch dimension (1/0/0 when
     // there is no batch). The src/dst pattern is read from the original tensor type U/T.
-    template <typename T, typename U, typename SrcLayout, typename DstLayout>
-    __aicore__ inline static void emit_copy(const T& dst, const U& src, const SrcLayout& src_layout,
-                                            const DstLayout& dst_layout, uint16_t dn_num, uint64_t src_dn_matrix_stride,
-                                            uint32_t dst_nz_matrix_stride)
+    template <typename T, typename U, typename src_layout_type, typename dst_layout_type>
+    __aicore__ inline static void emit_copy(const T& dst, const U& src, const src_layout_type& src_layout,
+                                           const dst_layout_type& dst_layout, uint16_t dn_num,
+                                           uint64_t src_dn_matrix_stride, uint32_t dst_nz_matrix_stride)
     {
         using type = typename U::element_type;
 
@@ -86,9 +93,31 @@ public:
 
         uint8_t cache_mode = src.engine().get_cache_mode();
 
-        copy_gm_to_l1_multi_nd2nz_instr::data_copy(dst.data().get(), src.data().get(), dn_num, loop2_dst_stride, loop3_dst_stride,
-                                                     loop4_dst_stride, loop1_src_stride, cache_mode, n_value, d_value,
-                                                     loop4_src_stride, false);
+        copy_gm_to_l1_multi_nd2nz_instr::data_copy_tensor(dst, src, dn_num, loop2_dst_stride, loop3_dst_stride, loop4_dst_stride,
+                                              loop1_src_stride, cache_mode, n_value, d_value, loop4_src_stride, false);
+    }
+
+    template <typename T, typename U, typename shape_type, typename dst_offset_type, typename src_offset_type>
+    __aicore__ inline static void emit_copy(const T& dst, const U& src, const shape_type& shape, uint16_t dn_num,
+        uint64_t src_dn_matrix_stride, uint32_t dst_nz_matrix_stride, const dst_offset_type& dst_offset,
+        const src_offset_type& src_offset)
+    {
+        using type = typename U::element_type;
+        uint16_t n_value = get_total_column_shape_from_shape(shape);
+        uint32_t d_value = get_total_row_shape_from_shape(shape);
+        uint32_t src_col_stride = get_matrix_element<attr_info::stride, attr_info::column, 1>(src.layout());
+        uint16_t loop3_dst_stride = get_matrix_element<attr_info::stride, attr_info::row, 1>(dst.layout()) /
+            C0_ELEMENT<type>;
+        if constexpr (is_b4_type<type>) {
+            d_value >>= 1;
+            src_col_stride >>= 1;
+            src_dn_matrix_stride >>= 1;
+        }
+        uint64_t loop1_src_stride = src_col_stride * sizeof(type);
+        uint64_t loop4_src_stride = src_dn_matrix_stride * sizeof(type);
+        uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / C0_ELEMENT<type>);
+        copy_gm_to_l1_multi_nd2nz_instr::data_copy_region(dst, src, dst_offset, src_offset, dn_num, 1, loop3_dst_stride,
+            loop4_dst_stride, loop1_src_stride, src.engine().get_cache_mode(), n_value, d_value, loop4_src_stride, false);
     }
 };
 

@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
@@ -30,8 +30,7 @@ namespace te {
 class load_data_l1_to_l0b_microscale {
 public:
     template <const copy_l1_to_l0scaleb_trait& trait, typename T, typename U>
-    __aicore__ inline static void run(const T& dst, const U& src)
-    {
+    __aicore__ inline static void run(const T& dst, const U& src) {
         check_template<trait, T, U>();
         if constexpr (T::layout_type::depth == FIVE_DIM_DATA) {
             batch_load_data_impl<trait, T, U>(dst, src);
@@ -39,9 +38,27 @@ public:
             load_data_impl<trait, T, U>(dst, src);
         } else {
             static_assert(T::layout_type::depth == FOUR_DIM_DATA || T::layout_type::depth == FIVE_DIM_DATA,
-                          "load_data_l1_to_l0b_microscale only supports the plain fractal layout "
-                          "((row0,row1),(col0,col1)) or the batch layout (B,((row0,row1),(col0,col1))).");
+                "load_data_l1_to_l0b_microscale only supports the plain fractal layout "
+                "((row0,row1),(col0,col1)) or the batch layout (batch_value,((row0,row1),(col0,col1))).");
         }
+    }
+
+    template <const copy_l1_to_l0scaleb_trait& trait, typename T, typename U, typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape)
+    {
+        check_template<trait, T, U>();
+        auto dst_shape = make_slice_shape(coord_dst, dst.layout(), shape);
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        auto m_step = get_element<attr_info::shape, attr_info::column, 1>(src_shape);
+        auto k_step = get_element<attr_info::shape, attr_info::row, 1>(src_shape);
+        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) >> 5;
+        auto dst_stride = k_step;
+        uint64_t mx_dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>((dst.data() + dst_offset).get()));
+        load_l1_to_l0b_scale_instr::load_data_region(
+            mx_dst_addr, src, _0{}, src_offset, 0, 0, m_step, k_step, src_stride, dst_stride);
     }
 
 private:
@@ -52,9 +69,9 @@ private:
         check_layout_pattern<T, U>();
     }
 
-    template <typename DstT, typename SrcT, typename DstLayoutT, typename SrcLayoutT>
-    __aicore__ inline static void load_data_fractal(const DstT& dst, const SrcT& src, const DstLayoutT& dst_layout,
-                                                    const SrcLayoutT& src_layout)
+    template <typename dst_type, typename SrcT, typename DstLayoutT, typename SrcLayoutT>
+    __aicore__ inline static void load_data_fractal(const dst_type& dst, const SrcT& src,
+        const DstLayoutT& dst_layout, const SrcLayoutT& src_layout)
     {
         uint16_t m_start_position = 0;
         uint16_t k_start_position = 0;
@@ -63,8 +80,8 @@ private:
         auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) >> 5;
         auto dst_stride = k_step;
         uint64_t mx_dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.data().get()));
-        load_l1_to_l0b_scale_instr::load_data(mx_dst_addr, src.data().get(), m_start_position, k_start_position,
-                                                 m_step, k_step, src_stride, dst_stride);
+        load_l1_to_l0b_scale_instr::load_data_tensor(mx_dst_addr, src, m_start_position, k_start_position, m_step, k_step,
+            src_stride, dst_stride);
     }
 
     template <const copy_l1_to_l0scaleb_trait& trait, typename T, typename U>
@@ -80,9 +97,10 @@ private:
         auto src_no_batch_layout = remove_batch_dim(src.layout());
         auto batch_num = get<0>(dst.layout().shape());
         for (uint32_t i = 0; i < batch_num; ++i) {
-            load_data_fractal(dst(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))),
-                              src(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))), dst_no_batch_layout,
-                              src_no_batch_layout);
+            load_data_fractal(
+                dst(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))),
+                src(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))),
+                dst_no_batch_layout, src_no_batch_layout);
         }
     }
 };

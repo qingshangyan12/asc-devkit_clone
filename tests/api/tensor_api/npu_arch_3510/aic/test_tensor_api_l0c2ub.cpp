@@ -1,7 +1,7 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
+* CANN Open Software License Agreement version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
 * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -15,35 +15,34 @@
 #include <type_traits>
 
 enum class cube_format {
-    ND = 0,
-    NZ,
-    DN,
+    nd = 0,
+    nz,
+    dn,
 };
 
-template <cube_format format>
+template <cube_format format_value>
 struct default_c_layout_ptn;
 
 template <>
-struct default_c_layout_ptn<cube_format::ND> {
+struct default_c_layout_ptn<cube_format::nd> {
     using type = asc::te::nd_ext_layout_ptn;
 };
 
 template <>
-struct default_c_layout_ptn<cube_format::NZ> {
+struct default_c_layout_ptn<cube_format::nz> {
     using type = asc::te::nz_layout_ptn;
 };
 
 template <>
-struct default_c_layout_ptn<cube_format::DN> {
+struct default_c_layout_ptn<cube_format::dn> {
     using type = asc::te::dn_ext_layout_ptn;
 };
 
-template <cube_format format_value, typename element_type,
-          typename layout_pattern_type = typename default_c_layout_ptn<format_value>::type>
+template <cube_format format_value, typename TYPE, typename LAYOUT_PATTERN = typename default_c_layout_ptn<format_value>::type>
 struct input_info {
     constexpr static cube_format format = format_value;
-    using data_type = element_type;
-    using layout_pattern = layout_pattern_type;
+    using T = TYPE;
+    using layout_pattern = LAYOUT_PATTERN;
 };
 
 using namespace asc::te;
@@ -74,7 +73,7 @@ namespace {
 using namespace asc::te;
 constexpr bool enable_relu = false;
 constexpr bool enable_channel_split = true;
-constexpr dual_dst_mode dual_dst_ctl = disable;
+constexpr dual_dst_mode dual_dst_ctl = dual_dst_mode::disable;
 constexpr copy_l0c_to_ub_trait l0c_toub_trait = {round_mode::default_round, enable_relu, enable_channel_split, dual_dst_ctl};
 
 struct copy_l0c_to_ub_trait_custom {
@@ -129,7 +128,7 @@ void set_channel_para_stub(uint64_t config)
     EXPECT_EQ(g_expected_channel_para, config);
 }
 
-template <typename dst_layout_pattern>
+template <typename dst_layout_ptn>
 void run_l0c_to_ub_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en, bool nz_todn_en, bool expect_channel_para)
 {
     using namespace asc::te;
@@ -149,7 +148,7 @@ void run_l0c_to_ub_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en,
     auto src_tensor = make_tensor_at<location::l0c>(
         src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(k_src_batch, k_m, k_n));
     auto dst_tensor = make_tensor_at<location::ub>(
-        dst, make_frame_layout<dst_layout_pattern, layout_trait_default<float>>(k_dst_batch, k_m, k_n));
+        dst, make_frame_layout<dst_layout_ptn, layout_trait_default<float>>(k_dst_batch, k_m, k_n));
 
     n_size_global = k_n;
     m_size_global = k_m;
@@ -353,10 +352,10 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_ub_batch_nz_to_nz)
     run_l0c_to_ub_batch_nz_to_nz_no_quant();
 }
 
-template <class l0c_data_type, class c_data_type, QuantMode_t quant_mode_value, bool is_tensor_value, bool has_coord>
+template <class L0C_TYPE, class C_TYPE, QuantMode_t quant_mode_value, bool is_tensor, bool has_coord>
 class l0c_to_ub_test_case {
-    using dst_type = typename c_data_type::data_type;
-    using l0c_t = typename l0c_data_type::data_type;
+    using dst_type = typename C_TYPE::T;
+    using l0c_t = typename L0C_TYPE::T;
 
 public:
     __aicore__ inline l0c_to_ub_test_case() {}
@@ -377,26 +376,26 @@ public:
 
         if constexpr (quant_mode_value == QuantMode_t::NoQuant || quant_mode_value == QuantMode_t::F322F16) {
             if constexpr (has_coord) {
-                auto ub_tensor_tile = slice(ub_tensor, make_coord(base, base), make_shape(m - base, n - base));
-                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor_tile, l0c_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor,
+                    make_coord(base, base), zero_coord, make_shape(m - base, n - base));
             } else {
                 copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor);
             }
-        } else if constexpr (is_tensor_value) {
+        } else if constexpr (is_tensor) {
             auto q_iterator = make_mem_ptr<location::l1>(q_addr_);
             auto q_matrix_layout = make_frame_layout<nd_ext_layout_ptn>(1, n_length_);
             auto q_tensor = make_tensor(q_iterator, q_matrix_layout);
             if constexpr (has_coord) {
-                auto ub_tensor_tile = slice(ub_tensor, make_coord(base, base), make_shape(m - base, n - base));
-                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor_tile, l0c_tensor, q_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor, q_tensor,
+                    make_coord(base, base), zero_coord, make_shape(m - base, n - base));
             } else {
                 copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor, q_tensor);
             }
         } else {
             uint64_t quant = 1;
             if constexpr (has_coord) {
-                auto ub_tensor_tile = slice(ub_tensor, make_coord(base, base), make_shape(m - base, n - base));
-                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor_tile, l0c_tensor, quant);
+                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor, quant,
+                    make_coord(base, base), zero_coord, make_shape(m - base, n - base));
             } else {
                 copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor, quant);
             }
@@ -414,26 +413,26 @@ private:
     __aicore__ inline constexpr auto make_ub_tensor()
     {
         auto ub_iterator = make_mem_ptr<location::ub>(ub_c_);
-        if constexpr (c_data_type::format == cube_format::NZ) {
+        if constexpr (C_TYPE::format == cube_format::nz) {
             using cast_t = std::conditional_t<sizeof(dst_type) == 4, half, dst_type>;
-            auto ub_matrix_layout = make_frame_layout<typename c_data_type::layout_pattern, layout_trait_default<cast_t>>(m_length_,
+            auto ub_matrix_layout = make_frame_layout<typename C_TYPE::layout_pattern, layout_trait_default<cast_t>>(m_length_,
                                                                                                          n_length_);
             return make_tensor(ub_iterator, ub_matrix_layout);
         } else {
-            auto ub_matrix_layout = make_frame_layout<typename c_data_type::layout_pattern>(m_length_, n_length_);
+            auto ub_matrix_layout = make_frame_layout<typename C_TYPE::layout_pattern>(m_length_, n_length_);
             return make_tensor(ub_iterator, ub_matrix_layout);
         }
     }
 };
 
-template <class l0c_data_type, class c_data_type, QuantMode_t quant_mode_value, bool is_tensor_value, bool has_coord>
+template <class L0C_TYPE, class C_TYPE, QuantMode_t quant_mode_value, bool is_tensor, bool has_coord>
 __aicore__ inline void test_l0c_to_ub(uint8_t* c_ub, int32_t m, int32_t n, int32_t used_core_num)
 {
     if (g_coreType == AscendC::AIV) {
         return;
     }
 
-    using c_t = typename c_data_type::data_type;
+    using c_t = typename C_TYPE::T;
 
     if (block_idx >= used_core_num) {
         return;
@@ -441,62 +440,59 @@ __aicore__ inline void test_l0c_to_ub(uint8_t* c_ub, int32_t m, int32_t n, int32
 
     auto ub_c = reinterpret_cast<__ubuf__ c_t*>(c_ub);
 
-    l0c_to_ub_test_case<l0c_data_type, c_data_type, quant_mode_value, is_tensor_value, has_coord> ins;
+    l0c_to_ub_test_case<L0C_TYPE, C_TYPE, quant_mode_value, is_tensor, has_coord> ins;
     ins.test_run(m, n, ub_c);
 }
 
-#define TEST_L0C_TO_UB_CONCAT_IMPL_(name, line) name##line
-#define TEST_L0C_TO_UB_CONCAT_(name, line) TEST_L0C_TO_UB_CONCAT_IMPL_(name, line)
-
-#define KERNEL_TENSOR_API_L0C2UB_E2E(core_num, m_value, n_value, c_format, l0c_data_type, c_data_type, quant_mode_value, is_tensor_value, has_coord) \
-    TEST_F(tensor_api_cube_copy_3510, TEST_L0C_TO_UB_CONCAT_(kernel_tensor_api_l0c_to_ub_case_, __LINE__)) \
+#define KERNEL_TENSOR_API_L0C2UB_E2E(core_num, m_value, n_value, c_format, l0c_data_type, c_data_type, quant_mode_value, is_tensor, has_coord) \
+    TEST_F(tensor_api_cube_copy_3510, kernel_tensor_api_l0c2ub_##core_num##_##m_value##_##n_value##_##c_format##_##l0c_data_type##_##c_data_type##_##quant_mode_value##_##is_tensor##_##has_coord) \
     { \
         uint8_t c_ub[m_value * n_value * sizeof(c_data_type)] = {0}; \
-        typedef input_info<cube_format::NZ, l0c_data_type> l0c_type; \
+        typedef input_info<cube_format::nz, l0c_data_type> l0c_type; \
         typedef input_info<cube_format::c_format, c_data_type> c_type; \
-        test_l0c_to_ub<l0c_type, c_type, QuantMode_t::quant_mode_value, is_tensor_value, has_coord>(c_ub, m_value, n_value, core_num); \
+        test_l0c_to_ub<l0c_type, c_type, QuantMode_t::quant_mode_value, is_tensor, has_coord>(c_ub, m_value, n_value, core_num); \
         for (uint32_t i = 0; i < m_value * n_value; i++) { \
             EXPECT_EQ(c_ub[i], 0x00); \
         } \
     }
 
-#define KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(core_num, m_value, n_value, c_format, c_layout_pattern, l0c_data_type, c_data_type, quant_mode_value,    \
-                                            is_tensor_value, has_coord)                                                    \
-    TEST_F(tensor_api_cube_copy_3510, TEST_L0C_TO_UB_CONCAT_(kernel_tensor_api_l0c_to_ub_layout_case_, __LINE__)) \
+#define KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(core_num, m_value, n_value, c_format, c_layout_ptn, l0c_data_type, c_data_type, quant_mode_value,    \
+                                            is_tensor, has_coord)                                                    \
+    TEST_F(tensor_api_cube_copy_3510, kernel_tensor_api_l0c2ub_##core_num##_##m_value##_##n_value##_##c_format##_##c_layout_ptn##_##l0c_data_type##_##c_data_type##_##quant_mode_value##_##is_tensor##_##has_coord) \
     {                                                                                                                \
         uint8_t c_ub[m_value * n_value * sizeof(c_data_type)] = {0};                                                                  \
-        typedef input_info<cube_format::NZ, l0c_data_type> l0c_type;                                                        \
-        typedef input_info<cube_format::c_format, c_data_type, c_layout_pattern> c_type;                                         \
-        test_l0c_to_ub<l0c_type, c_type, QuantMode_t::quant_mode_value, is_tensor_value, has_coord>(c_ub, m_value, n_value, core_num);               \
+        typedef input_info<cube_format::nz, l0c_data_type> l0c_type;                                                        \
+        typedef input_info<cube_format::c_format, c_data_type, c_layout_ptn> c_type;                                         \
+        test_l0c_to_ub<l0c_type, c_type, QuantMode_t::quant_mode_value, is_tensor, has_coord>(c_ub, m_value, n_value, core_num);               \
         for (uint32_t i = 0; i < m_value * n_value; i++) {                                                                       \
             EXPECT_EQ(c_ub[i], 0x00);                                                                                 \
         }                                                                                                            \
     }
 
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, ND, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, NZ, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, DN, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, ND, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, ND, float, float, NoQuant, false, true)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, NZ, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, NZ, float, float, NoQuant, false, true)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, ND, float, half, F322F16, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, ND, float, half, F322F16, false, true)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, ND, float, half, VQF322F16_PRE, true, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, ND, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, NZ, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, NZ, int32_t, int8_t, VREQ8, true, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, DN, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, DN, int32_t, int8_t, VREQ8, true, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, nd, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, nz, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, dn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, nd, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, nd, float, float, NoQuant, false, true)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, nz, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, nz, float, float, NoQuant, false, true)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, nd, float, half, F322F16, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, nd, float, half, F322F16, false, true)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 16, 16, nd, float, half, VQF322F16_PRE, true, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, nd, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, nz, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, nz, int32_t, int8_t, VREQ8, true, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, dn, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E(1, 128, 64, dn, int32_t, int8_t, VREQ8, true, false)
 
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, ND, nd_layout_ptn, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, ND, nd_layout_ptn, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, ND, nd_layout_ptn, float, float, NoQuant, false, true)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, ND, nd_layout_ptn, float, half, F322F16, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, ND, nd_layout_ptn, float, half, F322F16, false, true)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, ND, nd_layout_ptn, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, DN, dn_layout_ptn, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, DN, dn_layout_ptn, float, float, NoQuant, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, DN, dn_layout_ptn, int32_t, int8_t, REQ8, false, false)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, ND, nd_layout_ptn, int32_t, half, VDEQF16, true, false)
-KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, DN, dn_layout_ptn, int32_t, half, VDEQF16, true, false)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, nd, nd_layout_ptn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, nd, nd_layout_ptn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, nd, nd_layout_ptn, float, float, NoQuant, false, true)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, nd, nd_layout_ptn, float, half, F322F16, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, nd, nd_layout_ptn, float, half, F322F16, false, true)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, nd, nd_layout_ptn, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, dn, dn_layout_ptn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, dn, dn_layout_ptn, float, float, NoQuant, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 128, 64, dn, dn_layout_ptn, int32_t, int8_t, REQ8, false, false)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, nd, nd_layout_ptn, int32_t, half, VDEQF16, true, false)
+KERNEL_TENSOR_API_L0C2UB_E2E_LAYOUT(1, 16, 16, dn, dn_layout_ptn, int32_t, half, VDEQF16, true, false)
