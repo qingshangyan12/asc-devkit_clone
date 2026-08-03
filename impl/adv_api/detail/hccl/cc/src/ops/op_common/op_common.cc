@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <future>
 #include <map>
+#include <numeric>
 #include <string>
 #include <memory>
 #include <cstdlib> // 包含getenv函数
