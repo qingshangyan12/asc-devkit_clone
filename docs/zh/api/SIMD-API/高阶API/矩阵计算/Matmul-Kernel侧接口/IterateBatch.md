@@ -175,7 +175,7 @@
 
 ## 调用示例
 
--   纯cube模式的函数调用示例请参考[调用示例](SetBatchNum.md#section1665082013318)。
+-   纯cube模式的函数调用示例请参考[调用示例](SetBatchNum.md#调用示例)。
 -   该示例完成aGM、bGM矩阵乘，结果保存到cGm上，其中aGM、bGM、cGM数据的layout格式均为NORMAL，左矩阵每次计算batchA个MK数据，右矩阵每次计算batchB个KN数据。
 
     ```
