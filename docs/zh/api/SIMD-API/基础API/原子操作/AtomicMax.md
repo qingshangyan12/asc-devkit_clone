@@ -40,7 +40,7 @@ $$
 
 ```cpp
 template <typename T>
-__aicore__ inline T AtomicMax(__gm__ T *address, T value);
+__aicore__ inline T AtomicMax(__gm__ T *address, T value)
 ```
 
 ## 参数说明<a name="section086962912112"></a>

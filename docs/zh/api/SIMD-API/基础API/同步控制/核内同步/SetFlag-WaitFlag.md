@@ -39,8 +39,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void SetFlag(TEventID id);
-__aicore__ inline void WaitFlag(TEventID id);
+__aicore__ inline void SetFlag(TEventID id)
+__aicore__ inline void WaitFlag(TEventID id)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

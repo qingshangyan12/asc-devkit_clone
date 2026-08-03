@@ -43,7 +43,7 @@
 
 ```cpp
 template <pipe_t pipe>
-__aicore__ inline void PipeBarrier();
+__aicore__ inline void PipeBarrier()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

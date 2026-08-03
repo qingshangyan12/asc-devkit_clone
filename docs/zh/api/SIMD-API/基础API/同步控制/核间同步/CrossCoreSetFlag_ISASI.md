@@ -51,7 +51,7 @@
 
 ```cpp
 template <uint8_t modeId, pipe_t pipe>
-__aicore__ inline void CrossCoreSetFlag(uint16_t flagId);
+__aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>

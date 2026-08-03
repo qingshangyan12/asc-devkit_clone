@@ -34,7 +34,7 @@
 
 ```cpp
 template <MemDsbT arg0>
-__aicore__ inline void DataSyncBarrier();
+__aicore__ inline void DataSyncBarrier()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

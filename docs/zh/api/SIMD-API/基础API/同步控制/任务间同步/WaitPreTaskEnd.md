@@ -52,7 +52,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 
 ```cpp
 template<bool FORCE = false>
-__aicore__ inline void WaitPreTaskEnd();
+__aicore__ inline void WaitPreTaskEnd()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

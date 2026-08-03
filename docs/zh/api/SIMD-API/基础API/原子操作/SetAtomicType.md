@@ -34,7 +34,7 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void SetAtomicType();
+__aicore__ inline void SetAtomicType()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

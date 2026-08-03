@@ -34,7 +34,7 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void SetAtomicMax();
+__aicore__ inline void SetAtomicMax()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

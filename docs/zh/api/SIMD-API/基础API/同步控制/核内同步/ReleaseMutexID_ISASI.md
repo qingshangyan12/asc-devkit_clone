@@ -33,7 +33,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void ReleaseMutexID(MutexID id);
+__aicore__ inline void ReleaseMutexID(MutexID id)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

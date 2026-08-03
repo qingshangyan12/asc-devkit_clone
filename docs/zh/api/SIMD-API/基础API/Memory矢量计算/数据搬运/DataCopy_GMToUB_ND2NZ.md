@@ -47,7 +47,7 @@
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams);
+    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
     ```
 
 <!-- npu="950" id1 -->
@@ -56,7 +56,7 @@
     ```cpp
     // 该函数原型仅支持Ascend 950PR/Ascend 950DT
     template <typename T, bool enableSmallC0 = false>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams);
+    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
     ```
 <!-- end id1 -->
 

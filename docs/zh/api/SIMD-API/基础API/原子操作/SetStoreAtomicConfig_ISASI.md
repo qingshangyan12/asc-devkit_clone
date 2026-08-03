@@ -34,7 +34,7 @@
 
 ```cpp
 template <AtomicDtype type, AtomicOp op>
-__aicore__ inline void SetStoreAtomicConfig();
+__aicore__ inline void SetStoreAtomicConfig()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

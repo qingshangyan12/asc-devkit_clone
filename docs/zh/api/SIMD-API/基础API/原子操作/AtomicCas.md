@@ -44,7 +44,7 @@ $$
 
 ```cpp
 template <typename T>
-__aicore__ inline T AtomicCas(__gm__ T *address, T value1, T value2);
+__aicore__ inline T AtomicCas(__gm__ T *address, T value1, T value2)
 ```
 
 ## 参数说明<a name="section086962912112"></a>

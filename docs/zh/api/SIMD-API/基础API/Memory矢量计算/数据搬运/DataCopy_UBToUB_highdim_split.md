@@ -48,7 +48,7 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
+__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

@@ -34,7 +34,7 @@
 
 ```cpp
 template <uint8_t modeId = 0, pipe_t pipe = PIPE_S>
-__aicore__ inline void CrossCoreWaitFlag(uint16_t flagId);
+__aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>

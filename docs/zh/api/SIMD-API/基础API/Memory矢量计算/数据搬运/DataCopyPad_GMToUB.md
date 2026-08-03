@@ -82,7 +82,7 @@
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams);
+    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
     ```
 
 <!-- npu="950" id17 -->
@@ -92,7 +92,7 @@
     ```cpp
     // 该函数原型仅支持Ascend 950PR/Ascend 950DT
     template <typename T, PaddingMode mode = PaddingMode::Normal>
-    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams);
+    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
     ```
 
 <!-- end id17 -->

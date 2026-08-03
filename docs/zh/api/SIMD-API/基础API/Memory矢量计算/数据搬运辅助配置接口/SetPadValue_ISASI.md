@@ -40,7 +40,7 @@
 
 ```cpp
 template <typename T, TPosition pos = TPosition::MAX>
-__aicore__ inline void SetPadValue(T paddingValue);
+__aicore__ inline void SetPadValue(T paddingValue)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

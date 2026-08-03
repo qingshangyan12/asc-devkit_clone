@@ -40,7 +40,7 @@ DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mo
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type);
+__aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

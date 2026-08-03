@@ -37,7 +37,7 @@
 
 ```cpp
 template <pipe_t pipe>
-static __aicore__ inline void Lock(MutexID id);
+static __aicore__ inline void Lock(MutexID id)
 ```
 
 ## 参数说明<a name="section74061251191017"></a>

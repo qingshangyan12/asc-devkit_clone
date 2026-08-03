@@ -33,7 +33,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void ICachePreLoad(const int64_t preFetchLen);
+__aicore__ inline void ICachePreLoad(const int64_t preFetchLen)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

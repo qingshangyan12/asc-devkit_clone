@@ -114,7 +114,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
     ```cpp
     template <bool isAIVOnly = true>
-    __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0);
+    __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0)
     ```
 
 - 硬同步
@@ -122,14 +122,14 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
         ```cpp
         template <bool isAIVOnly = true>
-        __aicore__ inline void SyncAll();
+        __aicore__ inline void SyncAll()
         ```
 
     - 支持config指定流水
 
         ```cpp
         template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
-        __aicore__ inline void SyncAll();
+        __aicore__ inline void SyncAll()
         ```
 
 ## 参数说明<a id="section622mcpsimp"></a>

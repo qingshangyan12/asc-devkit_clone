@@ -52,14 +52,14 @@
 
     ```cpp
     template <typename T, bool isSetMask = true>
-    __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams);
+    __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
     ```
 
 - mask连续模式 
 
     ```cpp
     template <typename T, bool isSetMask = true>
-    __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams);
+    __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
     ```
 
 ## 参数说明<a name="zh-cn_topic_0000002567699435_section16128134420472"></a>

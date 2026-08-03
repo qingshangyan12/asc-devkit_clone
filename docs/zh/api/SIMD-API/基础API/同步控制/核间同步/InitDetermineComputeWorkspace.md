@@ -33,7 +33,7 @@ InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
+__aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

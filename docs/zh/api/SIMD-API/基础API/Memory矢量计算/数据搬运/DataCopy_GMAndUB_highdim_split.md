@@ -56,14 +56,14 @@
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams);
+    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams)
     ```
 
 - Unified Buffer -> Global Memory
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
+    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

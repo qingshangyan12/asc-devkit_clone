@@ -49,9 +49,9 @@
 
 ```cpp
 template <HardEvent event>
-__aicore__ inline void SetFlag(int32_t eventID);
+__aicore__ inline void SetFlag(int32_t eventID)
 template <HardEvent event>
-__aicore__ inline void WaitFlag(int32_t eventID);
+__aicore__ inline void WaitFlag(int32_t eventID)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
