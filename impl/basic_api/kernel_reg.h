@@ -207,7 +207,7 @@ __aicore__ inline void SetCastOverflowModeImpl()
 template <typename T>
 __aicore__ inline void SetAippFunctionsImpl0(__gm__ T* src0)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     Internal::g_aippSrc0 = reinterpret_cast<uint64_t>(src0) & 0xffffffffffff;
 #else
     uint64_t aippConfig0 = reinterpret_cast<uint64_t>(src0) & 0xffffffffffff;
@@ -219,7 +219,7 @@ __aicore__ inline void SetAippFunctionsImpl0(__gm__ T* src0)
 template <typename T, typename U>
 __aicore__ inline void SetAippFunctionsImpl1(__gm__ T* src1, AippParams<U>& config)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     Internal::g_aippSrc1 = reinterpret_cast<uint64_t>(src1) & 0xffffffffffff;
     if (config.cscParams.isEnableCsc) {
         Internal::g_aippSrc1 |= static_cast<uint64_t>(1) << AIPP_OFFSET_CSC_ENABLE;
@@ -463,7 +463,7 @@ __aicore__ inline void SetAippFunctionsImpl9(AippInputFormat format, AippParams<
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
     aippConfig9 |= (static_cast<uint64_t>(config.flipParams.isHorizontalFlip) & 0x1) << 25;
     aippConfig9 |= (static_cast<uint64_t>(config.flipParams.isVerticalFlip) & 0x1) << 26;
-    aippConfig9 |= ((static_cast<uint64_t>(format) & 0x1f) >> 5) << 35;
+    aippConfig9 |= ((static_cast<uint64_t>(format) & 0x3f) >> 5) << 35;
     aippConfig9 |= (static_cast<uint64_t>(config.concatMode) & 0x3) << 42;
     aippConfig9 |= (static_cast<uint64_t>(config.channelTransformMode) & 0x7) << 46;
 #endif
@@ -655,10 +655,13 @@ __aicore__ inline void SetAippFunctionsImpl(
         return;
     }
 #endif // __NPU_ARCH__ == 2201
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     static_assert(SupportType<T, uint8_t>(), "Input type T only supports uint8_t on current device.");
     static_assert(
         SupportType<U, uint8_t, int8_t, half>(), "Input type T only supports uint8_t, int8_t, half on current device.");
+#else  defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5162))
+    static_assert(
+        SupportType<U, int16_t, uint8_t, int8_t, half>(), "Input type T only supports uint8_t, int8_t, half on current device.");
 #endif
 #if __NPU_ARCH__ == 3002
     SetAippFunctionsImpl0<T>(src0);
