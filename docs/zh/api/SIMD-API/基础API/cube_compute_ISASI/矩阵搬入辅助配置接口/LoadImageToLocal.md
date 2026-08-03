@@ -79,7 +79,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 - 当通过[SetAippFunctions](SetAippFunctions.md)配置padding模式为块填充模式或者镜像块填充模式时，因为padding的数据来自于抠出的图片，左右padding的长度（leftPadSize、rightPadSize）必须小于或等于抠图的水平长度（horizSize），上下padding的长度（topPadSize、botPadSize）必须小于或等于抠图的垂直的长度（vertSize）。
 - 支持的物理存储位置为：L1 Buffer（TPosition: A1/B1）。
     <!-- npu="950" id13 -->
-    - 特别针对Ascend 950PR/Ascend 950DT，支持物理存储位置为：VECIN、VECCALC、VECOUT。
+    - 特别针对Ascend 950PR/Ascend 950DT，支持的物理存储位置为UB（TPosition为VECIN、VECCALC、VECOUT）。
     <!-- end id13 -->
 
 ## 调用示例<a name="section22811728184217"></a>

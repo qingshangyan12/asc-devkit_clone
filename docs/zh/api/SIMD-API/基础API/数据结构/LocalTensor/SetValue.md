@@ -29,7 +29,7 @@
 
 设置LocalTensor中的某个值。
 
-**该接口仅在LocalTensor的TPosition为VECIN/VECCALC/VECOUT时支持。**
+**该接口仅在LocalTensor的存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）时支持。**
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

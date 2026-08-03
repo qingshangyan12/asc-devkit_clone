@@ -75,8 +75,8 @@ $dst_i = \operatorname{Min}(scalar, src_i)$
 
 | 参数名称 | 类型 | 说明 |
 | ---- | ---- | ---- |
-| dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md)。 |
-| src0/src1 | 输入 | 灵活标量位置接口中源操作数。<br>&bull; 类型为LocalTensor：可作矢量操作数或标量单点元素，TPosition支持VECIN/VECCALC/VECOUT。地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md)。 <br>&bull; 类型为标量。 |
+| dst | 输出 | 目的操作数。<br>类型为LocalTensor，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br>地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md)。 |
+| src0/src1 | 输入 | 灵活标量位置接口中源操作数。<br>&bull; 类型为LocalTensor：可作矢量操作数或标量单点元素，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md)。 <br>&bull; 类型为标量。 |
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](../SIMD计算说明/高维切分.md)。 |

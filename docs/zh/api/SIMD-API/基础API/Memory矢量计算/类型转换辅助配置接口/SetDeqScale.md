@@ -80,7 +80,7 @@
 | scale | 输入 | scale量化参数。<br>AddDeqRelu、Cast、CastDequant的s322fp16场景下数据类型为half。<br>CastDequant（isVecDeq=false）场景设置下数据类型为float。 |
 | offset | 输入 | offset量化参数，int16_t类型，只有前9位有效。<br>用于CastDequant（isVecDeq=false）的场景，设置offset。 |
 | signMode | 输入 | bool类型，表示量化结果是否带符号。<br>用于CastDequant（isVecDeq=false）的场景，设置signMode。 |
-| vdeq | 输入 | 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>用于CastDequant（isVecDeq=true）的场景，输入量化tensor，大小为128Byte。 |
+| vdeq | 输入 | 类型为LocalTensor，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br>用于CastDequant（isVecDeq=true）的场景，输入量化tensor，大小为128Byte。 |
 | vdeqInfo | 输入 | [VdeqInfo](#table4)类型，用于CastDequant（isVecDeq=true）的场景，结构体内包含量化tensor中的16组量化参数，接口会读取结构体内的参数，填充到vdeq。 |
 
 **表4**  VdeqInfo结构体内参数说明<a id="table4"></a>

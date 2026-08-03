@@ -101,8 +101,8 @@ dst和src使用[TensorTrait](../../辅助数据结构/TensorTrait/TensorTrait.md
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。 |
-| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。<br>源操作数的数据类型需要与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。<br>类型为LocalTensor，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。 |
+| src | 输入 | 源操作数。<br>类型为LocalTensor，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。<br>源操作数的数据类型需要与目的操作数保持一致。 |
 | scalarValue | 输入 | 右移的位数，数据类型需要与目的操作数中的元素数据类型保持一致。具体取值说明请参考下面的[scalarValue取值说明](#scalarvalue取值说明)。 |
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
 | mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码.md)。 |

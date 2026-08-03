@@ -49,7 +49,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     | dstTensor | Output | Destination operand. |
     | srcTensor | Input | Source operand. |
     | scalarValue | Input | Scalar value. Supported data types are half/float. Scalar operand type needs to match srcTensor. |
-    | sharedTmpBuffer | Input | Temporary buffer. Type is LocalTensor, supported TPosition is VECIN/VECCALC/VECOUT. Since the internal implementation of this interface needs extra temporary space to store intermediate variables during computation. Temporary space needs to be passed by developer through sharedTmpBuffer parameter. |
+    | sharedTmpBuffer | Input | Temporary buffer. Type is LocalTensor, physical storage is UB (TPosition is VECIN/VECCALC/VECOUT). Since the internal implementation of this interface needs extra temporary space to store intermediate variables during computation. Temporary space needs to be passed by developer through sharedTmpBuffer parameter. |
     | calCount | Input | Number of elements participating in computation. |
 - Tiling Side
 

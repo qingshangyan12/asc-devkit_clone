@@ -46,7 +46,7 @@ __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | biasGlobal | 输入 | Bias矩阵。类型为[GlobalTensor](../../../基础API/数据结构/GlobalTensor/GlobalTensor.md)。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。<br><br>A矩阵、B矩阵、Bias支持的数据类型组合可参考[Matmul输入输出数据类型的组合说明](Matmul使用说明.md#table1996113269499)；在MxMatmul场景，A矩阵、B矩阵、Bias支持的数据类型组合可参考[MatmulTypeWithScale参数说明](../../../../../guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md#zh-cn_topic_0000002270097206_table14759942142014)。 |
-| inputBias | 输入 | Bias矩阵。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为TSCM/VECOUT。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。<br><br>A矩阵、B矩阵、Bias支持的数据类型组合可参考[Matmul输入输出数据类型的组合说明](Matmul使用说明.md#table1996113269499)；在MxMatmul场景，A矩阵、B矩阵、Bias支持的数据类型组合可参考[MatmulTypeWithScale参数说明](../../../../../guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md#zh-cn_topic_0000002270097206_table14759942142014)。 |
+| inputBias | 输入 | Bias矩阵。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor/LocalTensor.md)，支持的物理存储位置为L1 Buffer（TPosition为TSCM）或UB（TPosition为VECOUT）。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。<br><br>A矩阵、B矩阵、Bias支持的数据类型组合可参考[Matmul输入输出数据类型的组合说明](Matmul使用说明.md#table1996113269499)；在MxMatmul场景，A矩阵、B矩阵、Bias支持的数据类型组合可参考[MatmulTypeWithScale参数说明](../../../../../guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md#zh-cn_topic_0000002270097206_table14759942142014)。 |
 
 ## 返回值说明
 
@@ -57,7 +57,7 @@ __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
 -   在Matmul Tiling计算中，必须配置TCubeTiling结构中的[isBias](../Matmul-Tiling类/TCubeTiling结构体.md#p2051215216314)参数为1，即启用Bias后，才能调用本接口设置Bias矩阵。
 -   传入的Bias地址空间大小需要保证不小于singleN。
 <!-- npu="950" id13 -->
--   对于Ascend 950PR/Ascend 950DT，Bias矩阵的内存逻辑位置为TSCM且数据类型为float或int32\_t时，Bias矩阵的LocalTensor空间必须64字节对齐。
+-   对于Ascend 950PR/Ascend 950DT，Bias矩阵的物理存储位置为L1 Buffer（TPosition为TSCM）且数据类型为float或int32\_t时，Bias矩阵的LocalTensor空间必须64字节对齐。
 <!-- end id13 -->
 -   支持的数据类型<a id="li12616155731720"></a>
 
