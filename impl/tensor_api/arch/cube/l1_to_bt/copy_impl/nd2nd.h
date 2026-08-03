@@ -42,6 +42,37 @@ public:
         }
     }
 
+    template <const CopyL12BTTrait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void RunRegion(
+        const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+        auto regionShape = MakeSliceShape(coord, src.Layout(), shape);
+        auto srcOffset = src.Layout()(coord);
+        uint32_t srcCol;
+        uint16_t blockCount;
+        if constexpr (U::layoutType::depth == TWO_DIM_DATA) {
+            blockCount = Get<0>(regionShape);
+            srcCol = Get<1>(regionShape);
+        } else {
+            blockCount = Get<0, 1>(regionShape);
+            srcCol = Get<1, 1>(regionShape);
+        }
+        auto srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(src.Layout());
+        auto dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dst.Layout());
+        using srcType = typename U::elementType;
+        using dstType = typename T::elementType;
+        bool convControl = IsOneOfAttrV<srcType, half> && IsOneOfAttrV<dstType, float>;
+        uint16_t blockLen = Std::ceil_division(srcCol, C0_ELEMENT<srcType>);
+        if constexpr (IsOneOfAttrV<srcType, float, int32_t>) {
+            blockLen = Std::ceil_align(blockLen, 2);
+        }
+        uint16_t srcStride = (srcRow - srcCol) / C0_ELEMENT<srcType>;
+        uint16_t dstStride = Std::ceil_align((dstRow - srcCol) / C0_ELEMENT<dstType>, 2);
+        CopyL12BTInstr::DataCopyRegion(
+            dst, src, srcOffset, convControl, blockCount, blockLen, srcStride, dstStride);
+    }
+
 private:
     template <const CopyL12BTTrait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()

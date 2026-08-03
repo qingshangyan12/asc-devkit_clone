@@ -35,6 +35,10 @@ constexpr bool IsQuantScalarV =
 template <typename QuantParam>
 constexpr bool IsCopyQuantParamV = IsQuantScalarV<QuantParam> || IsAttrTensorV<QuantParam>;
 
+template <typename Coord, typename Shape>
+constexpr bool IsCopyRegionParamV = Std::is_tuple_v<Std::remove_cvref_t<Coord>> &&
+    Std::is_tuple_v<Std::remove_cvref_t<Shape>>;
+
 template <typename AtomType, typename DstTensor, typename SrcTensor>
 __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
 {
@@ -47,6 +51,23 @@ __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor&
     const QuantParam& quant)
 {
     atomCopy.Call(dst, src, quant);
+}
+
+template <typename AtomType, typename DstTensor, typename SrcTensor, typename Coord, typename Shape,
+    Std::enable_if_t<IsCopyRegionParamV<Coord, Shape>, int> = 0>
+__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
+    const Coord& coord, const Shape& shape)
+{
+    atomCopy.Call(dst, src, coord, shape);
+}
+
+template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam, typename Coord,
+    typename Shape,
+    Std::enable_if_t<IsCopyQuantParamV<QuantParam> && IsCopyRegionParamV<Coord, Shape>, int> = 0>
+__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
+    const QuantParam& quant, const Coord& coord, const Shape& shape)
+{
+    atomCopy.Call(dst, src, quant, coord, shape);
 }
 
 template <typename CopyOperationType>

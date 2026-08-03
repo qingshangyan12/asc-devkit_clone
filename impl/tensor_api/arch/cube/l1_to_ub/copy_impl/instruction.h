@@ -39,6 +39,14 @@ public:
         CopyCbufToUbuf(dst.Data().Get(), src.Data().Get(), params...);
     }
 
+    template <typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void DataCopyRegion(
+        const T& dst, const U& src, const Offset& srcOffset, const Params&... params)
+    {
+        auto srcData = src.Data() + srcOffset;
+        CopyCbufToUbuf(dst.Data().Get(), srcData.Get(), params...);
+    }
+
 private:
     template <typename T>
     __aicore__ inline static void CopyCbufToUbuf(__ubuf__ T* dst, __cbuf__ T* src, const uint16_t blockCount,

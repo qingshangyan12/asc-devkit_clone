@@ -39,6 +39,14 @@ public:
         CopyL12BT(reinterpret_cast<uint64_t>(dst.Data().Get()), src.Data().Get(), params...);
     }
 
+    template <typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void DataCopyRegion(
+        const T& dst, const U& src, const Offset& srcOffset, const Params&... params)
+    {
+        auto srcData = src.Data() + srcOffset;
+        CopyL12BT(reinterpret_cast<uint64_t>(dst.Data().Get()), srcData.Get(), params...);
+    }
+
 private:
     template <typename T>
     __aicore__ inline static void CopyL12BT(uint64_t dst, __cbuf__ T* src, bool convControl, uint16_t blockCount,
