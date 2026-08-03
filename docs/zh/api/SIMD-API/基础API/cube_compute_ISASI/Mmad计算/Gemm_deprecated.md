@@ -52,14 +52,14 @@
 
 | 参数名称 | 类型 | 说明 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br><!-- npu="910" id8 -->Atlas 训练系列产品，支持的TPosition为：CO1，CO2<!-- end id8 --><br><!-- npu="310p" id9 -->Atlas 推理系列产品AI Core，支持的TPosition为：CO1，CO2<!-- end id9 --> |
-| src0 | 输入 | 源操作数，TPosition为A1。 |
-| src1 | 输入 | 源操作数，TPosition为B1。 |
+| dst | 输出 | 目的操作数。<br><br><!-- npu="910" id8 -->Atlas 训练系列产品，支持的存储位置为：L0C Buffer(CO1)、UB(CO2)<!-- end id8 --><br><!-- npu="310p" id9 -->Atlas 推理系列产品AI Core，支持的存储位置为：L0C Buffer(CO1)、UB(CO2)<!-- end id9 --> |
+| src0 | 输入 | 源操作数，支持的存储位置为L1 Buffer(A1)。 |
+| src1 | 输入 | 源操作数，支持的存储位置为L1 Buffer(B1)。 |
 | m | 输入 | 左矩阵Src0Local有效Height，范围：[1, 4096]。<br>注意：m可以不是16的倍数。 |
 | k | 输入 | 左矩阵Src0Local有效Width、右矩阵Src1Local有效Height。<br>&bull;当输入张量Src0Local的数据类型为float时，范围：[1, 8192]<br>&bull;当输入张量Src0Local的数据类型为half时，范围：[1, 16384]<br>&bull;当输入张量Src0Local的数据类型为int8_t时，范围：[1, 32768]<br><br>注意：k可以不是16的倍数。 |
 | n | 输入 | 右矩阵Src1Local有效Width，范围：[1, 4096]。<br>注意：n可以不是16的倍数。 |
 | tiling | 输入 | 切分规则，类型为GemmTiling，结构体具体定义为：<br><br><pre>struct GemmTiling {<br>    const uint32_t blockSize = 16;<br>    LoopMode loopMode = LoopMode::MODE_NM;<br>    uint32_t mNum = 0;<br>    uint32_t nNum = 0;<br>    uint32_t kNum = 0;<br>    uint32_t roundM = 0;<br>    uint32_t roundN = 0;<br>    uint32_t roundK = 0;<br>    uint32_t c0Size = 32;<br>    uint32_t dtypeSize = 1;<br>    uint32_t mBlockNum = 0;<br>    uint32_t nBlockNum = 0;<br>    uint32_t kBlockNum = 0;<br>    uint32_t mIterNum = 0;<br>    uint32_t nIterNum = 0;<br>    uint32_t kIterNum = 0;<br>    uint32_t mTileBlock = 0;<br>    uint32_t nTileBlock = 0;<br>    uint32_t kTileBlock = 0;<br>    uint32_t kTailBlock = 0;<br>    uint32_t mTailBlock = 0;<br>    uint32_t nTailBlock = 0;<br>    bool kHasTail = false;<br>    bool mHasTail = false;<br>    bool nHasTail = false;<br>    bool kHasTailEle = false;<br>    uint32_t kTailEle = 0;<br>};<br></pre><br>参数说明请参考[表3](#table3)。 |
-| partialsum | 输入 | 当dst参数所在的TPosition为CO2时，通过该参数控制计算结果是否搬出。<br>&bull;取值0：搬出计算结果；<br>&bull;取值1：不搬出计算结果，可以进行后续计算。 |
+| partialsum | 输入 | 当dst参数所在的存储位置为UB(CO2)时，通过该参数控制计算结果是否搬出。<br>&bull;取值0：搬出计算结果；<br>&bull;取值1：不搬出计算结果，可以进行后续计算。 |
 | initValue | 输入 | 表示dst是否需要初始化。<br>&bull;取值0：dst需要初始化，dst初始矩阵保存有之前结果，新计算结果会累加前一次Gemm计算结果。<br>&bull;取值1：dst不需要初始化，dst初始矩阵中数据无意义，计算结果直接覆盖dst中的数据。 |
 
 **表2** src0、src1和dst的数据类型组合

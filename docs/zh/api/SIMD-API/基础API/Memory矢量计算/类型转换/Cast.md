@@ -74,8 +74,8 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | ------ | --------- | ---- |
-| dst    |  输出     | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。|
+| dst    |  输出     | 目的操作数。<br>类型为LocalTensor，支持的存储位置为UB(VECIN/VECCALC/VECOUT)。 |
+| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的存储位置为UB(VECIN/VECCALC/VECOUT)。|
 | roundMode | 输入 | 精度转换处理模式，类型是RoundMode。<br>RoundMode为枚举类型，用以控制精度转换处理模式，可参考[精度转换规则](../../数据结构/precision_conversion.md)。RoundMode取值说明请参考[RoundMode取值说明](#roundmode取值说明)。 |
 | count | 输入 | 参与计算的元素个数。<br>**注：参数取值范围和操作数的数据类型有关，数据类型不同，能够处理的元素个数最大值不同，最大处理的数据量不能超过UB大小限制。** |
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>注意：数据类型转换的mask会按照输入和输出类型中sizeof(dtype)较大的来筛选。<br>设置详见[掩码操作](../SIMD计算说明/掩码.md)。 |

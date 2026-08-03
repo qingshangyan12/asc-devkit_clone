@@ -41,7 +41,7 @@ __aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTens
 
 | 参数名称 | 输入/输出 | 含义 |
 | ------ | ------ | ------ |
-| dst | 输出 | 目的操作数，类型为LocalTensor，支持的TPosition为A1/B1/B2。<br>LocalTensor的起始地址需要保证：<br>&nbsp;&nbsp;&bull; TPosition为A1/B1时，32字节对齐。<br>&nbsp;&nbsp;&bull; TPosition为B2时，512B对齐。 |
+| dst | 输出 | 目的操作数，类型为LocalTensor，支持的存储位置为L1 Buffer(A1/B1)或L0B Buffer(B2)。<br>LocalTensor的起始地址需要保证：<br>&nbsp;&nbsp;&bull; 存储位置为L1 Buffer(A1/B1)时，32字节对齐。<br>&nbsp;&nbsp;&bull; 存储位置为L0B Buffer(B2)时，512B对齐。 |
 | src | 输入 | 源操作数，类型为GlobalTensor。数据类型需要与dst保持一致。 |
 
 ## 数据类型
