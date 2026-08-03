@@ -31,7 +31,7 @@
 是否开启HF32对Mmad计算理论性能的影响见下表：
 
 <!-- npu="A3,910b" id8 -->
-**表1** HF32对Mmad计算理论性能的影响（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123815311"></a>  
+**表1** HF32对Mmad计算理论性能的影响（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123815311"></a>
 
 | 接口 | 左矩阵A | 右矩阵B | $cube_m$ | $cube_n$ | $cube_k$ | $k_0$ |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -40,7 +40,7 @@
 <!-- end id8 -->
 
 <!-- npu="950" id9 -->
-**表2** HF32对Mmad计算理论性能的影响（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123815915"></a>  
+**表2** HF32对Mmad计算理论性能的影响（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123815915"></a>
 
 | 接口 | 左矩阵A | 右矩阵B | $cube_m$ | $cube_n$ | $cube_k$ | $k_0$ |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -69,7 +69,7 @@ $$
 - $k_0$：L0 Buffer上最小分型K方向大小。
 - $\Delta t$：头开销cycle数。
 
-开启HF32模式后，L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32格式，舍入模式由[asc_enable_hf32_trans](asc_enable_hf32_trans.md)接口配置，中间计算使用HF32格式，最终的运算结果仍以FP32格式输出，以保证后续处理的兼容性。
+开启HF32模式后，L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32格式，舍入模式使用[asc_set_hf32_round_mode](asc_set_hf32_round_mode.md)接口配置，中间计算使用HF32格式，最终的运算结果仍以FP32格式输出，以保证后续处理的兼容性。
 
 FP32与HF32格式的精度对比如下图所示：
 
