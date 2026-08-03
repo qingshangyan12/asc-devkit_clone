@@ -35,6 +35,13 @@ public:
         RunGmToL1Batched<trait, CopyGmToCbufMultiND2Nz, T, U>(dst, src);
     }
 
+    template <const CopyGM2L1Trait& trait, typename T, typename U, typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape)
+    {
+        RunGmToL1Batched<trait, CopyGmToCbufMultiND2Nz, T, U>(dst, src, coordDst, coordSrc, shape);
+    }
+
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
@@ -87,6 +94,30 @@ public:
 
         CopyGmToCbufMultiNd2nzInstr::DataCopy(dst, src, ndNum, loop2DstStride, loop3DstStride, loop4DstStride,
                                               loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, false);
+    }
+
+    template <typename T, typename U, typename Shape, typename DstOffset, typename SrcOffset>
+    __aicore__ inline static void EmitCopy(const T& dst, const U& src, const Shape& shape, uint16_t ndNum,
+        uint64_t srcNdMatrixStride, uint32_t dstNzMatrixStride, const DstOffset& dstOffset,
+        const SrcOffset& srcOffset)
+    {
+        using type = typename U::elementType;
+        uint16_t nValue = GetTotalRowShapeFromShape(shape);
+        uint32_t dValue = GetTotalColumnShapeFromShape(shape);
+        uint32_t srcRowStride = GetMatrixElement<AttrInfo::Stride, AttrInfo::Row, 1>(src.Layout());
+        auto dstColumnStride = GetMatrixElement<AttrInfo::Stride, AttrInfo::Column, 1>(dst.Layout());
+        if constexpr (IsB4Type<type>) {
+            dValue >>= 1;
+            srcRowStride >>= 1;
+            srcNdMatrixStride >>= 1;
+        }
+        uint64_t loop1SrcStride = srcRowStride * sizeof(type);
+        uint64_t loop4SrcStride = srcNdMatrixStride * sizeof(type);
+        uint16_t loop3DstStride = dstColumnStride / C0_ELEMENT<type>;
+        uint16_t loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride / C0_ELEMENT<type>);
+        uint8_t cacheMode = src.Engine().GetCacheMode();
+        CopyGmToCbufMultiNd2nzInstr::DataCopyRegion(dst, src, dstOffset, srcOffset, ndNum, 1,
+            loop3DstStride, loop4DstStride, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, false);
     }
 };
 

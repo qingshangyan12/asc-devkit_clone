@@ -35,6 +35,13 @@ public:
         RunGmToL1Batched<trait, CopyGmToCbufMultiDN2Nz, T, U>(dst, src);
     }
 
+    template <const CopyGM2L1Trait& trait, typename T, typename U, typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape)
+    {
+        RunGmToL1Batched<trait, CopyGmToCbufMultiDN2Nz, T, U>(dst, src, coordDst, coordSrc, shape);
+    }
+
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
@@ -85,6 +92,24 @@ public:
 
         CopyGmToCbufMultiDn2nzInstr::DataCopy(dst, src, dnNum, loop2DstStride, loop3DstStride, loop4DstStride,
                                               loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, false);
+    }
+
+    template <typename T, typename U, typename Shape, typename DstOffset, typename SrcOffset>
+    __aicore__ inline static void EmitCopy(const T& dst, const U& src, const Shape& shape, uint16_t dnNum,
+        uint64_t srcDnMatrixStride, uint32_t dstNzMatrixStride, const DstOffset& dstOffset,
+        const SrcOffset& srcOffset)
+    {
+        using type = typename U::elementType;
+        uint16_t nValue = GetTotalRowShapeFromShape(shape);
+        uint32_t dValue = GetTotalColumnShapeFromShape(shape);
+        uint32_t srcColStride = GetMatrixElement<AttrInfo::Stride, AttrInfo::Column, 1>(src.Layout());
+        uint16_t loop3DstStride = GetMatrixElement<AttrInfo::Stride, AttrInfo::Column, 1>(dst.Layout()) /
+            C0_ELEMENT<type>;
+        uint64_t loop1SrcStride = srcColStride * sizeof(type);
+        uint64_t loop4SrcStride = srcDnMatrixStride * sizeof(type);
+        uint16_t loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride / C0_ELEMENT<type>);
+        CopyGmToCbufMultiDn2nzInstr::DataCopyRegion(dst, src, dstOffset, srcOffset, dnNum, 1, loop3DstStride,
+            loop4DstStride, loop1SrcStride, src.Engine().GetCacheMode(), nValue, dValue, loop4SrcStride, false);
     }
 };
 

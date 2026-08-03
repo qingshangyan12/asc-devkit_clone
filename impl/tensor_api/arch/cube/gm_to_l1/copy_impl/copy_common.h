@@ -54,6 +54,27 @@ __aicore__ inline void RunGmToL1Batched(const T& dst, const U& src)
     }
 }
 
+template <const CopyGM2L1Trait& trait, typename CopyOp, typename T, typename U, typename CoordDst,
+    typename CoordSrc, typename Shape>
+__aicore__ inline void RunGmToL1Batched(
+    const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape)
+{
+    CopyOp::template CheckTemplate<trait, T, U>();
+    auto regionShape = MakeSliceShape(coordSrc, src.Layout(), shape);
+    auto dstOffset = dst.Layout()(coordDst);
+    auto srcOffset = src.Layout()(coordSrc);
+    uint16_t matrixNum = GetBatchShapeFromShape(regionShape);
+    uint64_t srcMatrixStride = 0;
+    uint32_t dstMatrixStride = 0;
+    constexpr auto srcDepth = NestingDepthV<decltype(src.Layout().Shape())>;
+    if constexpr (srcDepth == THREE_DIM_DATA || srcDepth == FIVE_DIM_DATA) {
+        srcMatrixStride = Get<0>(src.Layout().Stride());
+        dstMatrixStride = Get<0>(dst.Layout().Stride());
+    }
+    // Region EmitCopy receives matrix strides in element units and performs instruction-specific conversion.
+    CopyOp::EmitCopy(dst, src, regionShape, matrixNum, srcMatrixStride, dstMatrixStride, dstOffset, srcOffset);
+}
+
 } // namespace Te
 } // namespace AscendC
 

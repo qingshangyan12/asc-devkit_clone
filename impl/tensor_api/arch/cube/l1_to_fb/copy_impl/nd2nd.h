@@ -35,6 +35,37 @@ public:
         DataCopyImpl<trait, T, U>(dst, src);
     }
 
+    template <const CopyL12FBTrait& trait, typename T, typename U, typename CoordDst, typename CoordSrc, typename Shape>
+    __aicore__ inline static void Run(
+        const T& dst, const U& src, const CoordDst& coordDst, const CoordSrc& coordSrc, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+        using srcType = typename U::elementType;
+        using dstType = typename T::elementType;
+        constexpr uint32_t ADDR_ALIGN = 128;
+        constexpr uint16_t BURST_UNIT = 64;
+        auto srcShape = MakeSliceShape(coordSrc, src.Layout(), shape);
+        auto regionShape = srcShape;
+        auto dstOffset = dst.Layout()(coordDst);
+        auto srcOffset = src.Layout()(coordSrc);
+        uint16_t srcCol = GetTotalColumnShapeFromShape(regionShape);
+        uint16_t blockCount = GetTotalRowShapeFromShape(regionShape);
+        uint16_t srcRow;
+        uint16_t dstRow;
+        if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(src.Layout());
+            dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(dst.Layout());
+        } else {
+            srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(src.Layout());
+            dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dst.Layout());
+        }
+        uint16_t blockLen = Std::ceil_align(srcCol * sizeof(srcType), ADDR_ALIGN) / BURST_UNIT;
+        uint16_t srcStride = Std::ceil_division(srcRow * sizeof(srcType), C0_SIZE<>);
+        uint16_t dstStride = Std::ceil_align(dstRow * sizeof(dstType), ADDR_ALIGN) / BURST_UNIT;
+        CopyL12FBInstr::DataCopyRegion(
+            dst, src, dstOffset, srcOffset, blockCount, blockLen, srcStride, dstStride);
+    }
+
 private:
     template <const CopyL12FBTrait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()

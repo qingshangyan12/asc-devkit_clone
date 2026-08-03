@@ -135,6 +135,26 @@ __aicore__ inline static constexpr L0COutCopyParams MakeL0COutCopyParams(
     }
 }
 
+template <typename T, typename U, typename DstLayout, typename SrcLayout, typename DstShape>
+__aicore__ inline static constexpr L0COutCopyParams MakeL0COutCopyParamsRegion(
+    const DstLayout& dstLayout, const SrcLayout& srcLayout, const DstShape& dstShape)
+{
+    const uint32_t nSize = static_cast<uint32_t>(
+        Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShapeFromShape(dstShape)));
+    const uint32_t mSize = static_cast<uint32_t>(
+        Std::min(GetTotalRowShape(srcLayout), GetTotalRowShapeFromShape(dstShape)));
+    const uint32_t srcStride = static_cast<uint32_t>(
+        GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED);
+    if constexpr (IsL0COutNDFormatV<T>) {
+        return {nSize, mSize, srcStride, GetL0COutNDStride<T>(dstLayout)};
+    } else if constexpr (IsL0COutDNFormatV<T>) {
+        return {nSize, mSize, srcStride, GetL0COutDNStride<T>(dstLayout)};
+    } else {
+        return {nSize, mSize, srcStride,
+            static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout))};
+    }
+}
+
 template <RoundMode roundMode, typename dstType, typename srcType>
 __aicore__ inline constexpr QuantMode_t GetVectorQuantMode()
 {
