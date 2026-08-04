@@ -16,9 +16,7 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COOPERATIVE_GROUPS_H__
 #endif
 
-#include "simt_api/common_functions.h"
-#include "simt_api/device_functions.h"
-#include "simt_api/device_types.h"
+#include "simt_api/asc_simt.h"
 #include "simt_api/asc_fp16.h"
 #include "simt_api/asc_bf16.h"
 #include "utils/debug/asc_assert.h"

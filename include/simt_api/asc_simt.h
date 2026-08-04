@@ -20,6 +20,10 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_SIMT_H__
 #endif
 
+#if defined(ASCENDC_CPU_DEBUG)
+#include "simt_stub.h"
+#endif
+
 #include "simt_api/common_functions.h"
 #include "simt_api/math_functions.h"
 #include "simt_api/device_functions.h"
