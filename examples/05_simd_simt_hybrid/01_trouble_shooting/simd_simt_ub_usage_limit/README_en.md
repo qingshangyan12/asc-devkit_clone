@@ -2,289 +2,587 @@
 
 ## Overview
 
-This sample starts with a simplified element-wise operator whose static UB access crosses into dynamic UB. Four positive cases then explain usable static UB limits under different VF configurations, dynamic UB, and UB usage in hybrid programming.
+This sample uses an output accuracy issue caused by a UB out-of-bounds access in SIMD and SIMT hybrid programming to demonstrate how UB capacity, memory layout, and actual access ranges can be used to locate and fix the invalid UB access. It then uses multiple Cases to explain UB limits under different VF configurations, the layout relationship between static and dynamic UB, and the runtime and accuracy results of out-of-bounds accesses to different UB regions.
 
-The compile option `SCENARIO_NUM` selects the Case. Each build compiles and runs exactly one Case, with no shared kernel, dynamic UB, output buffer, or runtime state between Cases. Case 0 intentionally causes a precision failure; Cases 1 through 4 are independent positive or boundary-study scenarios.
+## Supported Products
 
-| Case | Scenario | What It Verifies | Execution |
-| --- | --- | --- | --- |
-| Case 0 | Static UB overwrites dynamic UB | An out-of-bounds write corrupts operator input and causes a precision failure | `SCENARIO_NUM=0` |
-| Case 1 | MainScalar static UB without a VF | Basic static UB usage when no VF is called | `SCENARIO_NUM=1` |
-| Case 2 | Usable static UB limit study | Effects of a SIMD VF and the compiler option on the usable static UB limit | `SCENARIO_NUM=2` |
-| Case 3 | Dynamic UB with a SIMT VF | Configured dynamic UB must cover the actual access range | `SCENARIO_NUM=3` |
-| Case 4 | UB shared by MainScalar, SIMD VF, and SIMT VF | Accumulated static UB and the single global dynamic UB allocation | `SCENARIO_NUM=4` |
+- Ascend 950PR/Ascend 950DT
 
-## Supported Products and CANN Versions
+## Supported CANN Versions
 
-| Product | CANN Version |
-| --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+- \>= CANN 9.1.0
 
-## Case 0: Precision Failure Caused by a Static UB Out-of-Bounds Write
-
-Case 0 models an incorrect static-array index in an operator. The kernel allocates 4 KB of static UB and correctly configures 8 KB of dynamic UB for two 4 KB buffers:
+## Directory Structure
 
 ```text
-Low address
-|-- static_ub 4 KB, valid indices [0, 1023]
-|-- input     4 KB, start of dynamic UB
-`-- output    4 KB
-High address
-
-Configured dynamic UB: 8 KB
+|-- simd_simt_ub_usage_limit
+    |-- CMakeLists.txt         // Example build script
+    |-- ub_usage_limit_common.h// Common declarations and helper functions
+    |-- case0_ub_out_of_bounds.asc       // Case 0 implementation
+    |-- case1_ub_limit.asc     // Case 1 implementation
+    |-- case2_ub_layout.asc    // Case 2 implementation
+    |-- case3_out_of_bounds_result.asc   // Case 3 implementation
+    |-- figures                // Figures referenced by the README files
+    |-- README.md              // Chinese documentation
+    `-- README_en.md           // English documentation
 ```
 
-A SIMT VF first initializes `input`. MainScalar then writes four bytes beyond the static array through a runtime index and a volatile UB pointer:
+## Example Description
+
+This sample contains four Cases covering UB out-of-bounds troubleshooting, capacity boundaries, and memory layout.
+
+**Case description**:
+
+| Case | Scenario | Main Content |
+| --- | --- | --- |
+| Case 0 | Output accuracy troubleshooting | Present the output accuracy issue, locate the cause by checking execution status, calculation logic, and access ranges, and verify the fix |
+| Case 1 | Usable UB limits in different VF scenarios | Determine usable UB limits under different VF-call, reserved-UB, and Data Cache configurations |
+| Case 2 | Static and Dynamic UB Layout Across Execution Locations | Explain the static and dynamic UB layout relationship across execution locations |
+| Case 3 | Static UB array writes out of bounds into different regions | Explain runtime and accuracy results when writes go beyond the allocated memory range into following UB regions |
+
+**Example specifications**:
+
+<table>
+<tr><td align="center">Example Type (OpType)</td><td colspan="3" align="center">SimdSimtUbUsageLimit</td></tr>
+<tr><td rowspan="2" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+<tr><td align="center">input</td><td align="center">[10240]/[12800]/[1024]</td><td align="center">uint32_t</td></tr>
+<tr><td align="center">Example Output</td><td align="center">output</td><td align="center">[10240]/[12800]/[1024]</td><td align="center">uint32_t</td></tr>
+<tr><td rowspan="4" align="center">Kernel Name</td><td align="center">Case 0</td><td colspan="2" align="center"><code>static_ub_out_of_bounds_kernel</code> / <code>static_ub_bias_offset_fixed_kernel</code></td></tr>
+<tr><td align="center">Case 1</td><td colspan="2" align="center"><code>ub_limit_main_scalar_kernel</code> / <code>ub_limit_simd_vf_kernel</code> / <code>ub_limit_simt_vf_kernel</code> / <code>ub_limit_simd_simt_vf_kernel</code></td></tr>
+<tr><td align="center">Case 2</td><td colspan="2" align="center"><code>ub_layout_kernel</code></td></tr>
+<tr><td align="center">Case 3</td><td colspan="2" align="center"><code>ub_out_of_bounds_result_kernel</code></td></tr>
+</table>
+
+Case 0 can use `[10240]` or `[12800]` input and output. Case 3 uses `[1024]` input and output. Cases 1 and 2 verify UB capacity and layout and do not perform GM input/output data checks.
+
+## Example Implementation
+
+The Cases follow an issue presentation and fix, UB-limit determination, memory-layout explanation, and out-of-bounds result analysis sequence.
+
+### Case 0: Output Accuracy Troubleshooting
+
+**Objective**:
+
+Present an issue in a data calibration flow where the kernel reports no runtime error but fails output accuracy verification. Locate the cause by checking execution status, calculation logic, and actual access ranges.
+
+**Core implementation**:
+
+Case 0 implements a simplified calibration calculation for input data. The `input` is the data to be calibrated. The kernel generates the calibration value `bias` from the lower 8 bits of `input` and adds it to the original input to obtain the calibrated output data `output`. The final calculation is:
+
+```text
+bias[i] = input[i] & 0xff
+output[i] = input[i] + bias[i]
+```
+
+The kernel splits the input into 10 KB data tiles and divides static UB into four UB tiles to store `input` and `bias` during calibration. For each data tile, the SIMT VF calculates the storage position in static UB based on the data tile ID and moves `input` from GM. The kernel then generates the corresponding `bias`. Finally, the SIMT VF reads `input` and `bias`, generates `output`, and writes it back to GM.
+
+The static UB tiles and data layout in Case 0 are shown below:
+
+![Case 0 static UB tiles and data layout](./figures/case0_static_ub_layout_en.png "Case 0 static UB tiles and data layout")
+
+In this Case, `tile_id` indicates the data tile currently processed by the kernel. The key code is as follows:
 
 ```cpp
-uint32_t faulty_index = 1024;
-__ubuf__ volatile uint32_t* static_data = static_ub;
-static_data[faulty_index] = 0xDEADBEEF;
+// In the SIMT scenario, 216 KB of static UB is available after subtracting
+// 8 KB of reserved UB and 32 KB of Data Cache from the 256 KB UB.
+constexpr uint32_t UB_BYTES = 216 * 1024;
+constexpr uint32_t UB_WORDS = UB_BYTES / sizeof(uint32_t);
+constexpr uint32_t UB_TILE_COUNT = 4;
+constexpr uint32_t UB_TILE_WORDS = UB_WORDS / UB_TILE_COUNT;
+constexpr uint32_t DATA_TILE_WORDS = 2560; // Each data tile has 2560 uint32_t elements, that is, 10 KB.
+constexpr uint32_t BIAS_OFFSET = DATA_TILE_WORDS;
+
+__aicore__ inline uint32_t calc_bias_base_words(uint32_t ub_tile_id)
+{
+    return ub_tile_id * UB_TILE_WORDS + BIAS_OFFSET;
+}
+
+__aicore__ inline void generate_bias_values(__ubuf__ uint32_t* static_ub, uint32_t ub_tile_id)
+{
+    const uint32_t tile_base_words = ub_tile_id * UB_TILE_WORDS;
+    const uint32_t bias_base_words = calc_bias_base_words(ub_tile_id);
+    for (uint32_t index = 0; index < DATA_TILE_WORDS; ++index) {
+        const uint32_t input = static_ub[tile_base_words + index];
+        static_ub[bias_base_words + index] = input & 0xff;
+    }
+}
+
+__global__ __vector__ void static_ub_out_of_bounds_kernel(
+    __gm__ const uint32_t* input, __gm__ uint32_t* output, uint32_t input_words)
+{
+    __ubuf__ uint32_t static_ub[UB_WORDS];
+    uint8_t mutex_id = 0;
+
+    const uint32_t input_tile_count = input_words / DATA_TILE_WORDS;
+    for (uint32_t tile_id = 0; tile_id < input_tile_count; ++tile_id) {
+        asc_lock(PIPE_V, mutex_id);
+        asc_vf_call<simt_prepare_input_ub>(dim3(THREAD_COUNT), input, static_ub, tile_id);
+        asc_unlock(PIPE_V, mutex_id);
+
+        asc_lock(PIPE_S, mutex_id);
+        generate_bias_values(static_ub, tile_id);
+        asc_unlock(PIPE_S, mutex_id);
+
+        ...
+    }
+}
 ```
 
-The runtime index models an operator index-calculation error, while `volatile` prevents the intentional fault write from being eliminated by the compiler. The write overwrites `input[0]` at the start of dynamic UB. A second SIMT VF computes `output[index] = input[index] + 1`. The first output changes from the Golden value `0xC0000001` to `0xDEADBEF0`, while the remaining output stays correct.
+**Execution result**:
 
-Build and run Case 0 with:
-
-```bash
-cmake -S . -B build_case0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=0
-cmake --build build_case0 -j
-./build_case0/ub_usage_limit
-```
-
-Expected output:
+When the input size is 40 KB, the kernel processes four data tiles and prints the following information:
 
 ```text
-[Case0] static_bytes=4096, dynamic_bytes=8192, overflow_bytes=4
-[Case0] golden_first=0xc0000001, actual_first=0xdeadbef0
-[Case0] mismatch_count=1
-[Case0] precision_check=FAILED (fault reproduced)
+test pass!
 ```
 
-This demonstrates that correct total UB allocation does not prevent a single static-array out-of-bounds access from corrupting adjacent dynamic data and causing a silent precision failure.
-
-## Positive Cases
-
-### Case 1: Static UB Without a VF
-
-`NoVfStaticUbKernel` calls neither a SIMD VF nor a SIMT VF. MainScalar declares and accesses a 4 KB static UB array, and the kernel launch configures zero bytes of dynamic UB. The Host verifies the first and last elements.
-
-#### Result
-
-The 4 KB static UB was read and written correctly with zero dynamic UB:
+When the input size is 50 KB, the kernel processes five data tiles and output accuracy verification fails:
 
 ```text
-Case 1 (no VF static UB): PASSED
+[Failed] Case accuracy verification failed!
 ```
 
-This case uses 4096 bytes of static UB only to demonstrate basic MainScalar static UB usage. Case 2 owns the usable static UB limit study.
+**Troubleshooting**:
 
-### Case 2: Usable Static UB Limit With and Without a SIMD VF
+The following troubleshooting process focuses on the accuracy issue that occurs with a 50 KB input size. Accuracy issues are usually located in the following order: execution status, calculation logic, and memory corruption.
 
-Case 2 compares the usable static UB limit of the current kernel under three compile-time configurations: no SIMD VF call, a SIMD VF call with default compilation, and a SIMD VF call with the VF stack reservation disabled. The `static_ub` size is adjusted until the listed value passes and adding four bytes causes kernel launch to fail. This case configures no dynamic UB, so its conclusions apply only to static UB usage.
+1. Check whether the kernel executes normally. Configure the log file path and set whether logs are printed to stdout as needed. Then check the log files for typical kernel launch, synchronization, or AICore execution errors such as `Ascend Error`, `EZ9999`, `vector core exception`, and `ASSERT`. The log path must point to an existing directory. For log environment variables, see the [Ascend log example](../../../01_simd_cpp_api/01_utilities/09_log/README.md).
 
-The probe size, the presence of the SIMD VF call, and the compiler option are compile-time choices, so each comparison requires a separate build with `SCENARIO_NUM=2`.
+    ```bash
+    export ASCEND_PROCESS_LOG_PATH=./log       # Set the log path.
+    export ASCEND_SLOG_PRINT_TO_STDOUT=0       # Control whether logs are printed to stdout.
+    ./ub_usage_limit 12800                     # Run the scenario with a 50 KB input size.
+    ```
 
-The kernel declares a configurable static UB array and a 32-byte result array. `UB_BOUNDARY_STATIC_BYTES` must be a multiple of four bytes.
+    After execution, log files are generated under `./log`. In this scenario, the log files do not show kernel launch, synchronization, or AICore execution errors, so the accuracy issue shown above is not directly caused by kernel execution failure. The next step is to check why the output data does not match the expected result.
 
-Without a SIMD VF:
+2. Check the calculation logic inside the kernel. First check whether the Host-side Golden formula matches the kernel output formula. The Host initializes input by global element index and calculates Golden as `input + (input & 0xff)`, which matches the calibration calculation in the kernel:
 
-```bash
-cmake -S . -B build_boundary_no_vf \
-  -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
-  -DSCENARIO_NUM=2 \
-  -DUB_BOUNDARY_NO_SIMD_VF=ON \
-  -DUB_BOUNDARY_STATIC_BYTES=262112
-cmake --build build_boundary_no_vf -j
-./build_boundary_no_vf/ub_usage_limit
+    ```cpp
+    input[gm_base + index] = INPUT_BASE_VALUE + gm_base + index;
+    uint32_t expected = input + (input & 0xff);
+    ```
+
+    Then check how the kernel generates `bias` and writes the final output. The kernel writes `bias` as `input & 0xff`. In the final output stage, it reads `input` from GM again and writes `input + bias` back to GM:
+
+    ```cpp
+    static_ub[bias_base_words + index] = input & 0xff;
+    const uint32_t bias = static_ub[tile_base + BIAS_OFFSET + index];
+    output[gm_base + index] = input + bias;
+    ```
+
+    The Host-side Golden and the kernel calculation intent are consistent, and no obvious issue is found in the input data or calculation flow. If the output is still incorrect, the next step is to check whether memory has been overwritten and data has been corrupted.
+
+3. Print intermediate calculation variables. The previous checks show that the kernel formula itself is consistent, but the output is still incorrect. Therefore, temporary prints can be added at intermediate calculation positions to observe related runtime variables and calculation results.
+
+    For example, add the following print before calculating the `bias` access position. `bias_base_words` indicates the start element index of the `bias` region calculated from the current `tile_id`:
+
+    ```cpp
+    const uint32_t bias_base_words = calc_bias_base_words(tile_id);
+    printf("tile_id=%u, bias_base_words=%u\n", tile_id, bias_base_words);
+    ```
+
+    Printed values are as follows:
+
+    ```text
+    tile_id=4, bias_base_words=57856
+    ```
+
+    The printed values show that when the kernel reaches `tile_id = 4`, the current implementation still directly uses the data tile ID to calculate the `bias` access position. The first four data tiles use the four UB tiles respectively, so the issue is not exposed. When the input size reaches 50 KB, the fifth data tile should map the data tile ID back to UB tile 0, but the current implementation continues to calculate based on UB tile 4. The converted target start byte offset is:
+
+    ```text
+    Target start byte offset = bias_base_words * 4 B = 57856 * 4 B = 231424 B = 226 KB
+    ```
+
+    After the target start byte offset is obtained, compare it with the UB layout in this Case to determine the actual access range corresponding to 226 KB.
+
+4. Confirm the actual access range from the UB layout. Case 0 uses 216 KB of static UB and configures zero dynamic UB. By default, the remaining space contains an 8 KB reserved region and 32 KB of Data Cache. Data Cache is SIMT-specific, caches GM data accessed by SIMT threads, and ranges from 32 KB to 128 KB.
+
+    ![Case 0 actual UB access range](./figures/case0_access_range_en.png "Case 0 actual UB access range")
+
+    The Data Cache size is `min(256 KB - 216 KB - 0 KB - 8 KB, 128 KB) = 32 KB`, so it starts at `256 KB - 32 KB = 224 KB`. The 226 KB byte offset calculated above is outside the declared 216 KB static UB array and enters the Data Cache range. This access may corrupt data cached for SIMT GM access. When the later SIMT VF continues to read GM input and calculate output, an accuracy error may appear.
+
+**Solution**:
+
+- Map the data tile ID `tile_id` to a UB tile ID before accessing static UB to avoid accessing a nonexistent UB tile with the data tile ID.
+
+    ```cpp
+    const uint32_t ub_tile_id = calc_ub_tile_id(tile_id);
+    generate_bias_values(static_ub, ub_tile_id);
+    ```
+
+- After the `tile_id` mapping is fixed, the intermediate access is inside the declared static UB range and output accuracy verification passes:
+
+    ```text
+    [Case0] mode=fixed
+    test pass!
+    ```
+
+**Conclusion**:
+
+When a UB out-of-bounds access occurs, it may not cause a kernel launch or runtime error, and the logs may not contain explicit exception information. If the out-of-bounds access reaches the Data Cache region, it can corrupt data cached for SIMT GM access and appear as an accuracy error. Therefore, when locating an accuracy issue caused by UB out-of-bounds access, check not only the log result but also the calculation logic and the actual access range calculated from runtime parameters.
+
+Case 0 shows that a UB out-of-bounds access may appear as an accuracy failure. Mixed programming involves different execution locations such as MainScalar, SIMD VFs, and SIMT VFs. UB is used both for static or dynamic memory allocated at these locations and for data communication between VFs and MainScalar. To help developers avoid out-of-bounds UB access, Cases 1 through 3 explain UB limits under different VF configurations, the layout relationship between static and dynamic UB, and the results of out-of-bounds writes into different regions.
+
+### Case 1: Usable UB Limits in Different VF Scenarios
+
+**Objective**:
+
+Determine the maximum usable UB limits under different VF-call and reserved-UB configurations.
+
+**Core implementation**:
+
+This Case covers four paths: no VF call, SIMD VF only, SIMT VF only, and both SIMD VF and SIMT VF. When a VF is called, it verifies the maximum usable UB limit under the default configuration, with the VF reserve disabled, and with all reserved UB disabled.
+
+Each Vector Core has 256 KB of UB. When a VF is called, the default configuration reserves 8 KB of UB (6 KB for the VF reserve and 2 KB for Ascend C APIs). A scenario without a VF call is not calculated with this reservation. `--cce-disable-vf-stack-reserved-ubuf` disables the 6 KB VF reserve, and `--cce-disable-asc-reserved-ubuf` disables the 2 KB Ascend C API reserve. According to the [SIMT memory hierarchy](../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMT编程/内存层级.md#共享内存大小的限制), Data Cache is SIMT-specific, caches GM data accessed by SIMT threads, and ranges from 32 KB to 128 KB. When the hybrid programming scenario contains a SIMT VF, part of UB must be allocated as Data Cache. Therefore, the maximum space available to static and dynamic UB is obtained by reserving at least 32 KB for Data Cache. The actual Data Cache size is calculated from the remaining UB space after subtracting static memory, dynamic memory, and reserved UB.
+
+| Scenario | VF Call | Data Cache Constraint | Usable UB in Default Configuration (8 KB Reserved) | Usable UB with VF Reserve Disabled (2 KB Reserved) | Usable UB with All Reserved UB Disabled (0 KB Reserved) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 1 | No VF call | None | Max. 256 KB | - | - |
+| 2 | SIMD VF only | None | Max. 248 KB | Max. 254 KB | Max. 256 KB |
+| 3 | SIMT VF only | At least 32 KB | Max. 216 KB | Max. 222 KB | Max. 224 KB |
+| 4 | Both SIMD VF and SIMT VF | At least 32 KB | Max. 216 KB | Max. 222 KB | Max. 224 KB |
+
+CMake passes the reserved-UB and Data Cache space selected by the VF-call path and reserved-UB configuration. The Ascend C code calculates the maximum usable UB size from the UB total size, reserved UB, and Data Cache space, and then declares a static UB array named `static_ub` with that size. Different paths use separate kernels and write `static_ub` from MainScalar, a SIMD VF, a SIMT VF, or both SIMD VF and SIMT VF. The kernel accesses the tail element of `static_ub` and writes it to one GM location so that the limit position participates in the current kernel access. The Host determines whether the current UB size exceeds the limit based on the kernel launch/synchronization result and error information:
+
+```cpp
+// CASE1_VF_RESERVED_BYTES: 0 or 6KB; CASE1_ASC_RESERVED_BYTES: 0 or 2KB;
+// CASE1_DATA_CACHE_BYTES: 0 or 32KB; CASE1_EXTRA_BYTES is 4B when checking the over-limit result.
+constexpr uint32_t UB_BYTES = UB_TOTAL_BYTES - CASE1_VF_RESERVED_BYTES -
+                              CASE1_ASC_RESERVED_BYTES - CASE1_DATA_CACHE_BYTES +
+                              CASE1_EXTRA_BYTES;
+constexpr uint32_t UB_WORDS = UB_BYTES / sizeof(uint32_t);
+
+// Scenario 1: no VF call.
+__global__ __vector__ void ub_limit_main_scalar_kernel(__gm__ uint32_t* output)
+{
+    __ubuf__ uint32_t static_ub[UB_WORDS];
+    ...
+    output[0] = static_ub[UB_WORDS - 1];
+}
+
+// Scenario 2: SIMD VF only.
+__global__ __vector__ void ub_limit_simd_vf_kernel(__gm__ uint32_t* output)
+{
+    __ubuf__ uint32_t static_ub[UB_WORDS];
+    ...
+    asc_vf_call<simd_fill_static_ub>(static_ub, UB_WORDS);
+    ...
+    output[0] = static_ub[UB_WORDS - 1];
+}
+
+// Scenario 3: SIMT VF only.
+__global__ __vector__ void ub_limit_simt_vf_kernel(__gm__ uint32_t* output)
+{
+    __ubuf__ uint32_t static_ub[UB_WORDS];
+    ...
+    asc_vf_call<simt_fill_static_ub>(dim3(THREAD_COUNT), static_ub, UB_WORDS, FILL_VALUE_BASE);
+    ...
+    output[0] = static_ub[UB_WORDS - 1];
+}
+
+// Scenario 4: both SIMD VF and SIMT VF.
+__global__ __vector__ void ub_limit_simd_simt_vf_kernel(__gm__ uint32_t* output)
+{
+    __ubuf__ uint32_t static_ub[UB_WORDS];
+    ...
+    asc_vf_call<simd_fill_static_ub>(static_ub, UB_WORDS);
+    asc_vf_call<simt_fill_static_ub>(dim3(THREAD_COUNT), static_ub, UB_WORDS, FILL_VALUE_BASE);
+    ...
+    output[0] = static_ub[UB_WORDS - 1];
+}
 ```
 
-With a SIMD VF and default compilation:
+**Execution result**:
 
-```bash
-cmake -S . -B build_boundary_simd \
-  -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
-  -DSCENARIO_NUM=2 \
-  -DUB_BOUNDARY_STATIC_BYTES=253920
-cmake --build build_boundary_simd -j
-./build_boundary_simd/ub_usage_limit
-```
+This Case first allocates `static_ub` at the theoretical usable UB limit of the current scenario to confirm that the kernel can launch and run successfully. It then increases the `static_ub` allocation by 4 bytes, that is, by one more `uint32_t` element, to observe the runtime result after exceeding the UB limit. In this case, compilation still succeeds, but kernel launch fails and the error indicates that the shared memory size exceeds the limit.
 
-With a SIMD VF and the reservation disabled:
+| Scenario | VF Call | Result at Limit | Result After Adding 4 B Beyond the Limit |
+| --- | --- | --- | --- |
+| 1 | No VF call | Passed | Kernel launch failed |
+| 2 | SIMD VF only | All configurations passed | Kernel launch failed for all configurations |
+| 3 | SIMT VF only | All configurations passed | Kernel launch failed for all configurations |
+| 4 | Both SIMD VF and SIMT VF | All configurations passed | Kernel launch failed for all configurations |
 
-```bash
-cmake -S . -B build_boundary_flag \
-  -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
-  -DSCENARIO_NUM=2 \
-  -DUB_BOUNDARY_DISABLE_RESERVED=ON \
-  -DUB_BOUNDARY_STATIC_BYTES=260064
-cmake --build build_boundary_flag -j
-./build_boundary_flag/ub_usage_limit
-```
-
-#### Result
-
-Results on a real `dav-3510` NPU with CANN 9.2.0:
-
-The table lists both the largest `static_ub` size that runs successfully for each configuration and the failure observed after adding one `uint32_t` (4 B):
-
-| Configuration | `static_ub` Size | Result |
-| --- | ---: | --- |
-| No SIMD VF | 262112 B | Passed; 256 KB including the 32-byte result array |
-| No SIMD VF | 262116 B | Kernel launch failed |
-| SIMD VF, default | 253920 B | Passed |
-| SIMD VF, default | 253924 B | Kernel launch failed |
-| SIMD VF, reservation disabled | 260064 B | Passed |
-| SIMD VF, reservation disabled | 260068 B | Kernel launch failed |
-
-These results establish the usable limit of the `static_ub` array in the current kernel layout. `static_ub` is not the only static UB object in the kernel: the fixed 32-byte result array is also static UB and must be included in the total static UB usage. Each row therefore follows `total static UB = usable static_ub limit + 32-byte result array`:
-
-| Configuration | Usable `static_ub` Limit | Total Static UB Including the 32-byte Result Array |
-| --- | --- | --- |
-| No SIMD VF | 262112 B | 262144 B (256 KB) |
-| SIMD VF, default | 253920 B | 253952 B (248 KB) |
-| SIMD VF, reservation disabled | 260064 B | 260096 B |
-
-All three upper limits were verified at four-byte granularity: the listed value passed and adding four bytes failed. Because this case configures no dynamic UB, these results do not directly establish the limit for a combined static-and-dynamic UB layout.
-
-Key output from the three passing configurations:
+When the limit configuration runs successfully, the output is as follows:
 
 ```text
-# No SIMD VF, 262112-byte static array
-[Case2] mode=without SIMD VF, static_bytes=262112
-[Case2] launch_ret=0, sync_ret=0, result=PASSED
-
-# SIMD VF with default compilation, 253920-byte static array
-[Case2] mode=with SIMD VF, static_bytes=253920
-[Case2] launch_ret=0, sync_ret=0, result=PASSED
-
-# SIMD VF with the reservation disabled, 260064-byte static array
-[Case2] mode=with SIMD VF, static_bytes=260064
-[Case2] launch_ret=0, sync_ret=0, result=PASSED
+[Case1] result=PASSED
 ```
 
-Key output when the corresponding boundaries are exceeded:
+After increasing the `static_ub` allocation from the theoretical usable UB limit of the current scenario to "theoretical usable UB limit + 4 B", kernel launch fails and prints the following error:
 
 ```text
-# No SIMD VF, 262116-byte static array
-[Case2] mode=without SIMD VF, static_bytes=262116
-[Case2] launch_ret=107000, sync_ret=107000, result=FAILED
-
-# SIMD VF with default compilation, 253924-byte static array
-[Case2] mode=with SIMD VF, static_bytes=253924
-[Case2] launch_ret=107000, sync_ret=107000, result=FAILED
-
-# SIMD VF with the reservation disabled, 260068-byte static array
-[Case2] mode=with SIMD VF, static_bytes=260068
-[Case2] launch_ret=107000, sync_ret=107000, result=FAILED
-```
-
-The option changes the usable boundary, but it does not imply that a kernel calling a SIMD VF can use the entire 256 KB. Compiler-generated UB usage and the VF implementation still matter. When the reservation is disabled, confirm that the VF does not spill registers into that region.
-
-### Case 3: Dynamic UB with a SIMT VF
-
-Case 3 verifies the dynamic UB limit when a SIMT VF is present. The kernel has a 32-byte static result array, so the calculated limit is `216 KB - 32 B = 221152 B`. `CASE3_DYNAMIC_BYTES` controls the configured size. SIMT threads fill the complete dynamic region, and the Host verifies its first and last words.
-
-#### Result
-
-The calculated limit passes:
-
-```text
-[Case3] max_dynamic_bytes=221152, configured_dynamic_bytes=221152
-Case 3 (SIMT VF dynamic UB): PASSED
-```
-
-Adding one word fails at kernel launch:
-
-```text
-[Case3] max_dynamic_bytes=221152, configured_dynamic_bytes=221156
+[Host] kernel error: ... the sum of dynamic shared memory and kernel shared memory exceeds the maximum limit.
 [ERROR] [Bisheng] Launch kernel failure! ret 107000
-Case 3 (SIMT VF dynamic UB): FAILED
 ```
 
-The measured dynamic UB upper limit for this kernel is therefore 221152 bytes.
+**Conclusion**:
 
-### Case 4: Shared Static and Dynamic UB Capacity
+In SIMD and SIMT hybrid programming, whether a VF is called, whether a SIMT VF is included, and whether reserved UB is disabled affect the usable UB limit. When a VF is called, the default configuration subtracts the 6 KB VF reserve and the 2 KB Ascend C API reserve. After the corresponding reserved space is disabled by compiler options, the usable UB limit is recalculated with the released space. When a SIMT VF is included, UB space must also be reserved for Data Cache. In actual development, determine the usable UB limit of the current kernel based on these factors.
 
-Case 4 declares static UB separately in MainScalar, a SIMD VF, and a SIMT VF. MainScalar uses a 1 KB `main_static_ub` array and three 32-byte result arrays named `simt_result`, `simd_result`, and `result`, for a total of 1120 bytes. The SIMD VF declares 2 KB and the SIMT VF declares 4 KB. Static UB declarations at different execution positions occupy separate space and accumulate in the current kernel. Each position accesses the end of its static array so that the compiler cannot eliminate the declared storage. In the SIMT VF, the thread responsible for the last element reads and reports that value itself, avoiding an unsynchronized cross-thread dependency. The total is 7264 bytes, giving a calculated dynamic limit of `216 KB - 7264 B = 213920 B`.
+> **Note:** After [--cce-disable-vf-stack-reserved-ubuf](../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#ZH-CN_TOPIC_0000002462746461) is used, the reserved 6 KB SIMD VF stack space can be used as normal UB space, but the compiler can no longer use this space to cache register spill data. Developers need to ensure that register spills do not occur. After [--cce-disable-asc-reserved-ubuf](../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#ZH-CN_TOPIC_0000002462746461) is used, the 2 KB UB space originally reserved for [selected Ascend C APIs](../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md#section_reserved_ubuf_api) can be used as normal UB space, but these APIs become unavailable and cause a compilation error when called. See the [3510 architecture specification](../../../../docs/zh/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510.md#compile-options-description) for the restrictions of both options.
 
-Dynamic UB is different: `CASE4_DYNAMIC_BYTES` configures its size once when the kernel is launched. To access the same dynamic UB from MainScalar, the SIMD VF, and the SIMT VF, all three execution contexts declare and reference the same external symbol, `shared_dynamic_ub`; an `extern` declaration does not allocate another region. The A-to-B-to-C handoff verifies that this external object is shared, while an additional access to the last configured word verifies the full dynamic range.
+### Case 2: Static and Dynamic UB Layout Across Execution Locations
 
-Case 4 therefore verifies two rules: static UB from different execution positions must be accumulated, while the three contexts share the launch-configured dynamic UB when they reference the same `extern __ubuf__` symbol. External dynamic UB symbols with different names are outside this sharing pattern and must not be assumed to have the same starting address.
+**Objective**:
 
-#### Result
+Explain that static UB declarations in MainScalar, a SIMD VF, and a SIMT VF jointly occupy the current kernel's static memory region and must be counted together. Also explain that the three differently named dynamic UB declarations have the same start address and share the region configured at kernel launch.
 
-The calculated limit passes:
+**Core implementation**:
+
+Case 2 declares static UB separately in MainScalar, a SIMD VF, and a SIMT VF. According to the [SIMD and SIMT hybrid programming memory hierarchy](../../../../docs/zh/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/内存层级.md#ub划分), static memory can be allocated in MainScalar, SIMD VF, and SIMT VF in mixed programming, and dynamic memory follows static memory. For the actual static UB layout, see that document. MainScalar declares a 1 KB `main_static_ub` array, the SIMD VF declares 2 KB, and the SIMT VF declares 4 KB. In this Case, all three declarations satisfy the default requirements, so the static memory region occupies 7168 bytes.
+
+MainScalar, the SIMD VF, and the SIMT VF each access their static UB array so that these static UB declarations participate in the current kernel layout. The following code shows the static and dynamic UB declarations in MainScalar, the SIMD VF, and the SIMT VF:
+
+```cpp
+// MainScalar
+extern __ubuf__ uint32_t main_dynamic_ub[];
+__ubuf__ uint32_t main_static_ub[MAIN_STATIC_WORDS];
+// SIMD VF
+extern __ubuf__ uint32_t simd_dynamic_ub[];
+__ubuf__ uint32_t simd_static_ub[SIMD_STATIC_WORDS];
+// SIMT VF
+extern __ubuf__ uint32_t simt_dynamic_ub[];
+__ubuf__ uint32_t simt_static_ub[SIMT_STATIC_WORDS];
+```
+
+MainScalar, the SIMD VF, and the SIMT VF convert the start addresses of their static and dynamic UB arrays to integers and write them back to GM for the Host to print and compare. The printed addresses belong to the AICore UB address space and are used only for the layout comparison in this Case.
+
+**Execution result**:
+
+The static UB start addresses in MainScalar, the SIMD VF, and the SIMT VF are `0x0`, `0x400`, and `0xc00`, respectively. The static memory region occupies 7168 bytes, which is `0x1c00` in hexadecimal. Dynamic UB follows static memory, so its start address is `0x1c00`. The result is as follows:
 
 ```text
-[Case4] static_total_bytes=7264, max_dynamic_bytes=213920, configured_dynamic_bytes=213920
-Case 4 usage: static_total_bytes=7264, dynamic_bytes=213920, dynamic_handoff=PASSED
-Case 4 (mixed UB): PASSED
+[Case2] static_total_bytes=7168
+[Case2] main_static_ub=0x0, simd_static_ub=0x400, simt_static_ub=0xc00
+[Case2] main_dynamic_ub=0x1c00, simd_dynamic_ub=0x1c00, simt_dynamic_ub=0x1c00
+[Case2] result=PASSED
 ```
 
-Adding one word fails at kernel launch:
+In this Case, the three static UB start addresses accumulate according to the declaration sizes. The dynamic UB start address is `0x1c00` in all three locations, matching the address corresponding to the static memory region in this Case.
+
+**Conclusion**:
+
+Static UB declarations in MainScalar, the SIMD VF, and the SIMT VF jointly occupy the current kernel's static memory region and must be counted together. Dynamic UB follows static memory. The three dynamic arrays have different names but the same start address and share the region configured at kernel launch. For more UB layout information, see [SIMD and SIMT hybrid programming memory hierarchy](../../../../docs/zh/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/内存层级.md#ub划分).
+
+### Case 3: Static UB Array Writes Out of Bounds Into Different Regions
+
+**Objective**:
+
+Starting from a static UB array, access its valid range, unoccupied ordinary UB space, reserved space, and Data Cache. Determine whether each access is out of bounds and whether it causes a runtime error or an accuracy error.
+
+**Core implementation**:
+
+This Case uses a simplified data calibration calculation, whose output formula is `input + (input & 0xff)`. The kernel first runs the calculation so that the GM input enters Data Cache. It then writes to the target UB region using the runtime index passed from the Host. Finally, it runs the same calculation again. The Host uses the kernel launch/synchronization result and the second calculation output to determine whether the access causes a runtime error or an accuracy error.
+
+Case 3 does not add compiler options that disable reserved UB, declares a 4 KB static UB array named `static_ub`, and configures zero dynamic UB. In this configuration, Data Cache reaches its 128 KB maximum and occupies the high-address half of UB. According to the [3510 architecture specification](../../../../docs/zh/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510.md#compile-options-description) and [SIMT memory hierarchy](../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMT编程/内存层级.md), an 8 KB reserved region is placed before Data Cache. The resulting layout is:
 
 ```text
-[Case4] static_total_bytes=7264, max_dynamic_bytes=213920, configured_dynamic_bytes=213924
-[ERROR] [Bisheng] Launch kernel failure! ret 107000
-Case 4 (mixed UB): FAILED
+Data Cache size = min(256 KB - 4 KB - 0 KB - 8 KB, 128 KB) = 128 KB
+Data Cache start = 256 KB - 128 KB = 128 KB
+Reserved-region start = 128 KB - 8 KB = 120 KB
+Unoccupied ordinary UB space size = 120 KB - 4 KB = 116 KB
 ```
 
-The measured dynamic UB upper limit after subtracting 7264 bytes of static UB is therefore 213920 bytes.
+Only the first 4 KB is valid for the static array. The sample defines an access offset for each of five target regions. The Host converts the byte offset to an index and passes it to the kernel:
 
-## Capacity Rules
+![Case 3 UB layout and access positions](./figures/case3_ub_layout_en.png "Case 3 UB layout and access positions")
 
-With a SIMT VF in the default compilation mode, the 256 KB UB contains static memory, dynamic memory, an 8 KB reserved region, and Data Cache:
+| Target Region | Offset From the Static Array Start |
+| --- | ---: |
+| Last `uint32_t` element inside static UB | 4092 B |
+| Middle of unoccupied ordinary UB space | 63488 B |
+| Middle of the 6 KB VF reserved range | 125952 B |
+| Middle of the 2 KB Ascend C API reserved range | 130048 B |
+| Start of Data Cache | 131072 B |
+
+The kernel writes to the selected target region by using the runtime index. The key code is as follows:
+
+```cpp
+__ubuf__ uint32_t static_ub[1024];
+__ubuf__ volatile uint32_t* static_ub_ptr = static_ub;
+static_ub_ptr[access_index] = 0xDEADBEEF;
+```
+
+**Execution result**:
+
+The results for the five access configurations are as follows:
+
+| Target Region | Launch/Sync | Accuracy | Result Description |
+| --- | --- | --- | --- |
+| Valid static UB | Succeeded | Passed | Valid access |
+| Unoccupied ordinary UB space | Succeeded | Passed | Out of bounds, but no visible failure in this run |
+| 6 KB VF reserved range | Succeeded | Passed | Out of bounds, but no visible failure in this run |
+| 2 KB Ascend C API reserved range | Succeeded | Passed | Out of bounds, but no visible failure in this run |
+| Data Cache | Succeeded | Failed | Cached data was corrupted without a runtime error |
+
+When accessing the valid static UB range, unoccupied ordinary UB space, the 6 KB VF reserved range, and the 2 KB Ascend C API reserved range, no accuracy error is observed, and the log prints the following information:
 
 ```text
-Data Cache = min(256 KB - static UB - dynamic UB - 8 KB, 128 KB)
-static UB + dynamic UB <= 216 KB
-actual dynamic UB access range <= configured dynamic UB size
+test pass!
 ```
 
-The static total includes declarations in MainScalar, SIMD VFs, and SIMT VFs. Both the total capacity rule and the direct dynamic access boundary must hold.
+When accessing Data Cache, an accuracy error is observed, and the log prints the following information:
+
+```text
+[Failed] Case accuracy verification failed!
+```
+
+**Analysis**:
+
+Passing the accuracy check only means that no accuracy error is observed in this run. It does not mean that regions after the allocated static UB can be accessed out of bounds. The [SIMT memory hierarchy](../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMT编程/内存层级.md#共享内存大小的限制) states that an access beyond an allocated static or dynamic UB range may not immediately cause an allocation failure, but it can corrupt Data Cache and lead to unstable results or accuracy errors. The table only shows the observed results of different UB out-of-bounds locations in this run and must not be used as evidence that an out-of-bounds access is valid or that the target region is unused.
+
+**Conclusion**:
+
+UB out-of-bounds access to unoccupied ordinary UB space or reserved space is undefined behavior and may show no visible failure in this run, while out-of-bounds access to Data Cache may appear as an accuracy error.
 
 ## Build and Run
 
+Run the following steps in the sample root directory to build and execute the sample.
+
+- Configure environment variables.
+
+    Configure the environment according to the [CANN development kit installation method](../../../../docs/zh/quick_start.md#prepare&install).
+
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
+
+  > **Note**: `${install_path}` is the CANN package installation directory. If no installation directory is specified, the default path is `/usr/local/Ascend`.
+
+- Build and run the sample.
+
+    ```bash
+    SCENARIO_NUM=1                              # Select a Case: 0, 1, 2, or 3
+    mkdir -p build && cd build                  # Create and enter the build directory
+    cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
+      -DSCENARIO_NUM=${SCENARIO_NUM} ..         # Configure; append Case-specific options as needed
+    make -j                                     # Build the project
+    ./ub_usage_limit                            # Run the sample
+    ```
+
+**Build options**:
+
+Use a separate build directory for each scenario so that cached CMake options from a previous build do not affect the current scenario. In this sample, the default configuration means that no compiler options are added to disable reserved UB. The sample uses separate Ascend C files for different Cases. Except for `SCENARIO_NUM`, the other options switch comparison scenarios inside a single Case. For Case 1, select the scenario with `CASE1_VF_MODE` and `CASE1_RESERVED_MODE`; CMake passes the corresponding reserved-UB and Data Cache space, and the Ascend C code calculates the UB size.
+
+| Option | Valid Value | Description |
+| --- | --- | --- |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. This sample supports only dav-3510 (Ascend 950PR/Ascend 950DT) |
+| `SCENARIO_NUM` | `0`-`3` | Case number. The default value is `1`. CMake compiles only the Ascend C file of the selected Case |
+| `CASE0_ENABLE_FIX` | `ON`, `OFF` | Whether Case 0 accesses static UB with the mapped UB tile ID. The default is `OFF` |
+| `CASE1_VF_MODE` | `none`, `simd`, `simt`, `both` | VF-call path for Case 1. The default is `simd` |
+| `CASE1_RESERVED_MODE` | `default`, `disable_vf`, `disable_all` | Reserved-UB mode for Case 1. The default is `default`. `disable_vf` adds the compiler option `--cce-disable-vf-stack-reserved-ubuf`; `disable_all` adds both `--cce-disable-vf-stack-reserved-ubuf` and `--cce-disable-asc-reserved-ubuf` |
+| `CASE1_OVER_LIMIT` | `ON`, `OFF` | Whether Case 1 allocates 4 B more than the usable UB limit. The default is `OFF` |
+| `CASE3_ACCESS_REGION` | `0`-`4` | Case 3 target. Default: `0`. `0`: static UB; `1`: unoccupied ordinary UB space; `2`: 6 KB VF reserve; `3`: 2 KB Ascend C API reserve; `4`: Data Cache |
+
+Case 0 runs the issue scenario with a 50 KB input size:
+
 ```bash
-source ${install_path}/cann/set_env.sh
-cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=<0-4>
-cmake --build build -j
-./build/ub_usage_limit
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=0 -DCASE0_ENABLE_FIX=OFF ..
+make -j
+./ub_usage_limit 12800
 ```
 
-`${install_path}` is the CANN development kit installation directory. This sample requires CANN 9.2.0 or later and supports only the `dav-3510` architecture.
+When a smaller input is specified, only four data tiles are processed, so the issue corresponding to `tile_id = 4` is not triggered:
 
-For example, with `SCENARIO_NUM=4`, the expected output is:
-
-```text
-[Case4] static_total_bytes=7264, max_dynamic_bytes=213920, configured_dynamic_bytes=213920
-Case 4 usage: static_total_bytes=7264, dynamic_bytes=213920, dynamic_handoff=PASSED
-Case 4 (mixed UB): PASSED
+```bash
+./ub_usage_limit 10240
 ```
 
-Case-specific build options:
+Add `CASE0_ENABLE_FIX=ON` to access static UB with the mapped UB tile ID and build the fixed scenario:
 
-| Option | Default | Description |
+```bash
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=0 -DCASE0_ENABLE_FIX=ON ..
+make -j
+./ub_usage_limit 12800
+```
+
+The Case 1 compiler-option combinations are listed below:
+
+| VF Call | Reserved-UB Configuration | Additional CMake Options |
 | --- | --- | --- |
-| `UB_BOUNDARY_STATIC_BYTES` | `253920` | Static UB array size for Case 2, in bytes |
-| `UB_BOUNDARY_NO_SIMD_VF` | `OFF` | Uses MainScalar instead of a SIMD VF to fill static UB |
-| `UB_BOUNDARY_DISABLE_RESERVED` | `OFF` | Passes `--cce-disable-vf-stack-reserved-ubuf` |
-| `CASE3_DYNAMIC_BYTES` | `221152` | Dynamic UB size configured and accessed by Case 3, in bytes |
-| `CASE4_DYNAMIC_BYTES` | `213920` | Dynamic UB size configured and accessed by Case 4, in bytes |
+| No VF call | Default configuration | `-DCASE1_VF_MODE=none` |
+| SIMD VF only | Default configuration | `-DCASE1_VF_MODE=simd -DCASE1_RESERVED_MODE=default` |
+| SIMD VF only | VF reservation disabled | `-DCASE1_VF_MODE=simd -DCASE1_RESERVED_MODE=disable_vf` |
+| SIMD VF only | All reserved UB disabled | `-DCASE1_VF_MODE=simd -DCASE1_RESERVED_MODE=disable_all` |
+| SIMT VF only | Default configuration | `-DCASE1_VF_MODE=simt -DCASE1_RESERVED_MODE=default` |
+| SIMT VF only | VF reservation disabled | `-DCASE1_VF_MODE=simt -DCASE1_RESERVED_MODE=disable_vf` |
+| SIMT VF only | All reserved UB disabled | `-DCASE1_VF_MODE=simt -DCASE1_RESERVED_MODE=disable_all` |
+| Both SIMD VF and SIMT VF | Default configuration | `-DCASE1_VF_MODE=both -DCASE1_RESERVED_MODE=default` |
+| Both SIMD VF and SIMT VF | VF reservation disabled | `-DCASE1_VF_MODE=both -DCASE1_RESERVED_MODE=disable_vf` |
+| Both SIMD VF and SIMT VF | All reserved UB disabled | `-DCASE1_VF_MODE=both -DCASE1_RESERVED_MODE=disable_all` |
 
-General build option:
+For example, to build and run Case 1 when calling both a SIMD VF and a SIMT VF with all reserved UB disabled, use the following commands:
 
-| Option | Default | Description |
-| --- | --- | --- |
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture for Ascend 950PR/Ascend 950DT |
-| `SCENARIO_NUM` | `1` | Case number to compile and run; valid values are `0` through `4` |
+```bash
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
+  -DSCENARIO_NUM=1 \
+  -DCASE1_VF_MODE=both \
+  -DCASE1_RESERVED_MODE=disable_all ..
+make -j
+./ub_usage_limit
+```
 
-## Troubleshooting Procedure
+**Execution result examples**:
 
-1. Calculate the actual dynamic UB access range from each pointer offset and maximum index.
-2. Compare that range with the dynamic UB byte count in the kernel launch.
-3. Count every static UB declaration in MainScalar, SIMD VFs, and SIMT VFs.
-4. When a SIMT VF is present, keep static plus dynamic UB within 216 KB.
-5. Check both `aclrtGetLastError` after launch and `aclrtSynchronizeStream`.
-6. Fix every access outside the configured range even when no runtime error is reported.
+The following examples show execution results for each Case.
+
+- For the issue scenario of Case 0, the following information is displayed after execution:
+
+    ```text
+    [Case0] mode=baseline
+    [Failed] Case accuracy verification failed!
+    ```
+
+    For the fixed scenario, the following information is displayed after successful execution:
+
+    ```text
+    [Case0] mode=fixed
+    test pass!
+    ```
+
+- For Case 1, the run succeeds within the theoretical UB limit, and the log prints the following information:
+
+    ```text
+    [Case1] result=PASSED
+    ```
+
+    After Case 1 allocates one more `uint32_t` element than the theoretical UB limit, kernel launch fails and the log prints the following information:
+
+    ```text
+    [Host] kernel error: ... the sum of dynamic shared memory and kernel shared memory exceeds the maximum limit.
+    [ERROR] [Bisheng] Launch kernel failure! ret 107000
+    ```
+
+- For Case 2, the following information is displayed after execution:
+
+    ```text
+    [Case2] static_total_bytes=7168
+    [Case2] main_static_ub=0x0, simd_static_ub=0x400, simt_static_ub=0xc00
+    [Case2] main_dynamic_ub=0x1c00, simd_dynamic_ub=0x1c00, simt_dynamic_ub=0x1c00
+    [Case2] result=PASSED
+    ```
+
+- When Case 3 accesses the valid static UB range, unallocated normal UB range, 6 KB VF reserved range, and 2 KB Ascend C API reserved range, no accuracy error is observed, and the log prints the following information:
+
+    ```text
+    [Case3] region=static_ub
+    test pass!
+
+    [Case3] region=unallocated_ub
+    test pass!
+
+    [Case3] region=vf_reserved
+    test pass!
+
+    [Case3] region=asc_reserved
+    test pass!
+    ```
+
+    When Case 3 accesses Data Cache, an accuracy error is observed, and the log prints the following information:
+
+    ```text
+    [Case3] region=data_cache
+    [Failed] Case accuracy verification failed!
+    ```
