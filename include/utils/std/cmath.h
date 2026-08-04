@@ -48,7 +48,7 @@ template <typename T> __aicore__ inline T abs(const T src);
  * @return Result of a divided by b, rounded up
  * @note For signed inputs, callers must ensure a >= 0 and b > 0.
  */
-template <typename T, typename U> ASCENDC_HOST_AICORE inline constexpr auto ceil_div(const T& a, const U& b);
+template <typename T, typename U> __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b);
 
 }
 }
