@@ -3731,7 +3731,6 @@ __simd_callee__ inline void asc_mul(vector_float& dst, vector_float src0, vector
 }
 
 // ==========asc_mul_scalar(int16_t/uint16_t/half/int32_t/uint32_t/float)==========
-
 __simd_callee__ inline void asc_mul_scalar(vector_int16_t& dst, vector_int16_t src, int16_t value, vector_bool mask)
 {
     asc_mul_scalar_impl(dst, src, value, mask);

@@ -65,7 +65,6 @@ __simd_callee__ inline void asc_mul_scalar_impl(vector_half& dst, vector_half sr
         vmuls(dst, src, value, mask, MODE_ZEROING);
     }
 }
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
