@@ -6,7 +6,7 @@
 
 样例包含两个Case：
 
-- Case 1：在栈空间中使用大数组导致栈溢出，优化场景将线程只读的大数组迁移到UB；若确需保留在线程栈中，也可通过配置文件扩大栈空间。
+- Case 1：在栈空间中使用大数组导致栈溢出，可通过配置文件扩大栈空间，但更推荐使用UB存储大量临时数据。
 - Case 2：使用递归函数时，递归层数过大导致栈溢出，需控制递归层数或使用迭代算法替代递归算法。
 
 ## 支持的产品
@@ -23,7 +23,7 @@
 ├── stack_overflow
 │   ├── CMakeLists.txt          // 样例构建脚本
 │   ├── stack_overflow.asc      // SIMT栈溢出展现和优化样例
-│   ├── acl.json                // 可选的aclInit配置文件，用于演示自定义SIMT栈大小
+│   ├── acl.json                // aclInit配置文件，用于配置SIMT栈大小
 │   ├── README_en.md
 │   └── README.md
 ```
@@ -36,7 +36,7 @@
 
 | Case   | 核心问题        | 对应核函数                                                                   | 解决方案          |
 |--------|-------------|-------------------------------------------------------------------------|---------------|
-| Case 1 | 在栈空间中存储过大数据 | simt_stack_overflow/simt_stack_overflow_optimized                    | 将线程只读大数组迁移到UB |
+| Case 1 | 在栈空间中存储过大数据 | simt_stack_overflow                                                     | 通过配置文件增加栈空间大小 |
 | Case 2 | 递归函数调用深度过大  | simt_recursive_stack_overflow/simt_recursive_stack_overflow_optimized | 使用迭代算法替代递归算法  |
 
 > **栈溢出问题说明**
@@ -50,7 +50,7 @@
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
 <tr><td align="center">input</td><td align="center">[2048]</td><td align="center">int32_t</td></tr>
 <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[2048]</td><td align="center">float</td></tr>
-<tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">simt_stack_overflow/simt_stack_overflow_optimized/simt_recursive_stack_overflow/simt_recursive_stack_overflow_optimized</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">simt_stack_overflow/simt_recursive_stack_overflow/simt_recursive_stack_overflow_optimized</td></tr>
 </table>
 
 ## 样例实现
@@ -59,27 +59,30 @@
 
 ---
 
-### Case 1：局部大数组栈溢出及UB优化
+### Case 1：局部大数组栈溢出及配置栈大小
 
-**样例目标**：展现在栈空间中使用大数组导致的SIMT栈溢出问题，并通过将线程只读的大数组迁移到UB验证修复。
+**样例目标**：展现在栈空间中使用大数组导致的SIMT栈溢出问题，并通过配置更大的SIMT栈空间验证修复。
 
 **核心实现**：使用Kernel函数`simt_stack_overflow`，在每个线程的栈上分配大数组`float local_buffer[320]`，单线程数组占用`320 * 4B = 1280B`。
 
 ```cpp
 __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t total_length)
 {
+    uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= total_length) {
+        return;
+    }
     float local_buffer[BUFFER_SIZE];
+
     for (uint32_t i = 0; i < BUFFER_SIZE; i++) {
         local_buffer[i] = i + 1;
     }
 
-    for (uint32_t idx = threadIdx.x; idx < total_length; idx += blockDim.x) {
-        float sum = 1.0f;
-        for (uint32_t i = 0; i < input[idx]; i++) {
-            sum *= local_buffer[i];
-        }
-        output[idx] = sum;
+    float sum = 1.0f;
+    for (uint32_t i = 0; i < input[idx]; i++) {
+        sum *= local_buffer[i];
     }
+    output[idx] = sum;
 }
 ```
 
@@ -116,7 +119,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
 - 为了验证栈溢出，在编译选项中添加`--cce-res-usage`，获取编译器计算的栈空间使用情况，重新编译，有如下编译日志：
 
     ```text
-    [BISHENG] Function properties for _Z19simt_stack_overflowPiPfj_simt_entry: Stack size: 1280 bytes, Used register number: 19
+    [BISHENG] Function properties for _Z19simt_stack_overflowPiPfj_simt_entry: Stack size: 1280 bytes, Used register number: 16
     ```
 
     日志中的`Stack size: 1280 bytes`，表示核函数变量所需栈空间为`1280B`，默认情况下SIMT栈空间大小为`1152B`，所以确认出现栈溢出。
@@ -127,31 +130,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
 
 **解决方案**：
 
-- 方案1：对于所有线程内容相同且只读的大数组，可迁移到动态UB。优化Kernel由线程协作初始化1280B共享数组，经`asc_syncthreads()`确保写入完成后再读取，避免每个线程分别占用1280B栈空间。`SCENARIO_NUM=2`实际编译并运行以下修复代码：
-
-    ```cpp
-    __global__ void simt_stack_overflow_optimized(int32_t* input, float* output, uint32_t total_length)
-    {
-        extern __ubuf__ float shared_buffer[];
-        for (uint32_t i = threadIdx.x; i < BUFFER_SIZE; i += blockDim.x) {
-            shared_buffer[i] = i + 1;
-        }
-        asc_syncthreads();
-
-        for (uint32_t idx = threadIdx.x; idx < total_length; idx += blockDim.x) {
-            float sum = 1.0f;
-            for (uint32_t i = 0; i < input[idx]; i++) {
-                sum *= shared_buffer[i];
-            }
-            output[idx] = sum;
-        }
-    }
-    ```
-
-    Host启动该Kernel时配置`320 * sizeof(float) = 1280B`动态UB，运行后输出`test pass!`。
-
-    使用`--cce-res-usage`编译时，优化Kernel显示`Stack size: 0 bytes`，表明大数组已不再占用线程栈。
-
+- 方案1：对于大数组的变量若适合放入UB空间，可迁移到UB空间，减少栈的占用，并且可以在线程间共享。
 - 方案2：若确需在栈空间存储大量临时数据，可通过增大SIMT栈空间，以满足Kernel的栈空间需求，从而解决栈溢出问题。
 
    可通过`aclInit("acl.json")`接口中的`simt_stack_size`字段配置SIMT栈空间大小，代码示例如下：
@@ -172,7 +151,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
     更多配置细节可参考[aclInit](https://hiascend.com/document/redirect/CannCommunityruntimeapiaclinit)接口中的“SIMT算子栈空间大小配置示例”章节，其中SIMT算子每个线程的栈空间大小配置字段为`simt_stack_size`。
 
     > [!NOTE]注意
-    > SIMT栈空间默认大小为1152B。本样例将SIMT的每个线程栈空间配置为1280B，每个Thread Block最大线程数为2048，本样例测试环境可并发执行Thread Block的最大物理核数为72个，因此相比默认配置额外占用的GM空间为`(1280B - 1152B) * 2048 * 72 = 18MB`。本样例的`SCENARIO_NUM=2`不使用该配置，而是运行UB优化Kernel。
+    > SIMT栈空间默认大小为1152B。本样例将SIMT的每个线程栈空间配置为1280B，每个Thread Block最大线程数为2048，本样例测试环境可并发执行Thread Block的最大物理核数为72个，因此相比默认配置额外占用的GM空间为`(1280B - 1152B) * 2048 * 72 = 18MB`。
 
 **结论**：
 
@@ -196,9 +175,11 @@ __aicore__ float recursive_stack_stage(int32_t value)
 
 __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uint32_t total_length)
 {
-    for (uint32_t idx = threadIdx.x; idx < total_length; idx += blockDim.x) {
-        output[idx] = recursive_stack_stage(input[idx]);
+    uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= total_length) {
+        return;
     }
+    output[idx] = recursive_stack_stage(input[idx]);
 }
 ```
 
@@ -275,9 +256,11 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
 
     __global__ void simt_recursive_stack_overflow_optimized(int32_t* input, float* output, uint32_t total_length)
     {
-        for (uint32_t idx = threadIdx.x; idx < total_length; idx += blockDim.x) {
-            output[idx] = recursive_stack_stage_optimized(input[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= total_length) {
+            return;
         }
+        output[idx] = recursive_stack_stage_optimized(input[idx]);
     }
     ```
 
@@ -331,7 +314,7 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
 | 选项                        | 可选值        | 说明                                                                   |
 |---------------------------|------------|----------------------------------------------------------------------|
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT）                      |
-| `SCENARIO_NUM`            | `1-4`      | 样例场景编号，默认值为1。1：Case 1的大数组栈溢出场景，2：Case 1的UB优化场景，3：Case 2的递归溢出场景，4：Case 2的迭代优化场景 |
+| `SCENARIO_NUM`            | `1-4`      | 样例场景编号，默认值为1。1：Case 1的溢出场景，2：Case 1的优化场景，3：Case 2的溢出场景，4：Case 2的优化场景 |
 
 **执行结果示例**：
 
@@ -347,7 +330,7 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
     The extend info: errcode:(356) errorStr: VEC SIMT DVG stack overflows, which may be caused by too many conditional branches or too manay nested loops. subErrType: 0x4.
     ```
 
-- Case 1的UB优化场景和Case 2的迭代优化场景，运行成功后输出如下信息：
+- Case 1和Case 2的优化验证场景，运行成功后输出如下信息：
 
     ```text
     test pass!
