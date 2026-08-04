@@ -98,6 +98,106 @@ __simd_callee__ inline void asc_duplicate_scalar_impl(vector_float& dst, float v
     }
 }
 
+// vdup with mode
+template <typename ModeT>
+__simd_callee__ inline void
+asc_duplicate_scalar_impl(vector_uint8_t& dst, uint8_t value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        vdup(dst, value, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void
+asc_duplicate_scalar_impl(vector_int8_t& dst, int8_t value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        vdup(dst, value, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void
+asc_duplicate_scalar_impl(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        float8_e4m3_t* value_tmp = reinterpret_cast<float8_e4m3_t*>(&value);
+        vdup(dst, *value_tmp, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void
+asc_duplicate_scalar_impl(vector_fp8_e5m2_t& dst, fp8_e5m2_t value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        float8_e5m2_t* value_tmp = reinterpret_cast<float8_e5m2_t*>(&value);
+        vdup(dst, *value_tmp, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void
+asc_duplicate_scalar_impl(vector_uint16_t& dst, uint16_t value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        vdup(dst, value, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void
+asc_duplicate_scalar_impl(vector_int16_t& dst, int16_t value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        vdup(dst, value, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void asc_duplicate_scalar_impl(vector_half& dst, half value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        vdup(dst, value, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void
+asc_duplicate_scalar_impl(vector_bfloat16_t& dst, bfloat16_t value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        vdup(dst, value, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void
+asc_duplicate_scalar_impl(vector_uint32_t& dst, uint32_t value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        vdup(dst, value, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void
+asc_duplicate_scalar_impl(vector_int32_t& dst, int32_t value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        vdup(dst, value, mask, mode);
+    }
+}
+
+template <typename ModeT>
+__simd_callee__ inline void asc_duplicate_scalar_impl(vector_float& dst, float value, vector_bool mask, ModeT mode)
+{
+    if ASC_IS_AIV {
+        vdup(dst, value, mask, mode);
+    }
+}
+
 // vbr
 __simd_callee__ inline void asc_duplicate_scalar_impl(vector_uint8_t& dst, uint8_t value)
 {
