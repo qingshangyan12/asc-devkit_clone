@@ -155,7 +155,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | src0BlockStride | 用于设置src0同一迭代不同DataBlock间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[dataBlockStride](../SIMD_compute/high_dim_split.md)。 |
 | repeatTimes | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTimes表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../SIMD_compute/high_dim_split.md)。 |
 | src0RepeatStride | 用于设置src0相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD_compute/high_dim_split.md)。 |
-| src1RepeatStride | 用于设置src1相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD_compute/high_dim_split.md)。 |
+| src1RepeatStride | 用于设置src1相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD_compute/high_dim_split.md)。<!-- npu="310p" id26 --><br><br>Atlas 推理系列产品AI Core，该参数仅区分0和非0：配置为0时按0生效；配置为非0时，效果与配置为1相同。<!-- end id26 --> |
 
 ## 数据类型
 
