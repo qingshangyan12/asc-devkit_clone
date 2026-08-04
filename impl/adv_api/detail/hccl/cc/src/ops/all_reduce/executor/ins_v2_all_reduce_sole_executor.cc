@@ -44,7 +44,7 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate Start.");
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate Start111.");
     // maxTmpMemSize_设定为cclIn的大小，op中将申请的HcclBuff全给了cclIn
     maxTmpMemSize_ = resCtx.cclMem.size;
     // 给channels_和threads_赋值
