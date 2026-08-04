@@ -30,7 +30,8 @@ struct BlockVFBufInfo {
     uint8_t flag = 0; // 0: normal, nonzero: overflow
     uint8_t finish = 0;
     uint16_t blockIdx = 0;
-    uint16_t resv2 = 0;
+    uint8_t assert = 0; // 0: normal, 1: assert raised, 2: debug data drained
+    uint8_t resv2 = 0;
     uint32_t readLen = 0;
     uint8_t buffer[ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE];
 };
