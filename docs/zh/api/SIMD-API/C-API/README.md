@@ -8,6 +8,16 @@ C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，�
 
 详细内容请参考[C语言编程概述](../../../guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md)。
 
+## 章节概览
+
+- [数据搬运导览](数据搬运导览.md)
+- [矢量计算概述](矢量计算概述.md)
+- [矢量子分类概览](矢量子分类概览.md)
+- [矩阵计算概述](cube_compute/矩阵计算概述.md)
+- [矩阵子分类与关键特性概览](cube_compute/矩阵子分类与关键特性概览.md)
+- [同步、原子与缓存概述](同步原子缓存概述.md)
+- [特殊寄存器访问概览](sys_var/特殊寄存器访问概览.md)
+
 ## 需要包含的头文件
 
 > [!NOTE]说明 
@@ -45,7 +55,7 @@ NPU内部有不同的计算单元，在计算时往往需要把计算数据搬�
 - PIPE_MTE1：搬运操作。包括从L1 Buffer到L0A Buffer或L0B Buffer，从L1 Buffer到UB的搬运操作和L0A Buffer或L0B Buffer的初始化操作。
 - PIPE_MTE2：搬运操作。包括从GM到L1 Buffer、从GM到L0A Buffer或L0B Buffer、从GM到UB的搬运操作和L1 Buffer的初始化操作。
 - PIPE_MTE3：搬运操作。包括从UB到GM、从UB到L1 Buffer的操作和从UB到UB的搬运操作。
-- PIPE_FIX：Fixpipe流水线。
+- PIPE_FIX：矩阵搬出通路。
 - PIPE_ALL：所有流水线。
 
 可通过[同步控制](sync/同步控制.md)类API控制同一流水线内的运行顺序和不同流水线间的执行顺序。
