@@ -186,6 +186,33 @@ tiling_path: {tiling_path}",
 
 def load_build_in_lib():
     LogUtil.print_compile_log("", "load build in tiling lib.", AscendCLogLevel.LOG_INFO)
+    # 1. load env tiling so
+    tiling_so = os.environ.get("ASCEND_OPP_TILING_SO_PATH")
+    if tiling_so is not None:
+        if not isinstance(tiling_so, str) or not os.path.exists(tiling_so):
+            LogUtil.print_compile_log(
+                "",
+                f"ASCEND_OPP_TILING_SO_PATH {tiling_so} invalid",
+                AscendCLogLevel.LOG_ERROR,
+            )
+            return False
+        tiling_so_path = Path(tiling_so)
+        try:
+            ctlib_opp_tiling = ctypes.CDLL(tiling_so_path)
+            tiling_so_path_str = str(tiling_so_path)
+            ctlib_opp_tiling.TbeLoadSoAndSaveToRegistry(
+                tiling_so_path_str.encode("utf_8")
+            )
+        except AttributeError as e:
+            # ascend c static load builtin opmaster ct so fail
+            LogUtil.print_compile_log(
+                "",
+                f"An AttributeError occurred: {e}, when load tiling so {builtin_optiling_ctlib_path}",
+                AscendCLogLevel.LOG_ERROR,
+            )
+            return False
+        return True
+
     # 2. loat built-in tiling so in op_host dir
     load_op_host_tiling_lib()
     opp_path = Path(os.environ.get(_ASCEND_OPP_PATH_ENV, _ASCEND_OPP_PATH_DEFAULT))

@@ -184,9 +184,36 @@ tiling_path: {tiling_path}",
 
 def load_build_in_lib():
     LogUtil.print_compile_log("", "load build in tiling lib.", AscendCLogLevel.LOG_INFO)
+    # 1. load env tiling so
+    tiling_so = os.environ.get("ASCEND_OPP_TILING_SO_PATH")
+    if tiling_so is not None:
+        if not isinstance(tiling_so, str) or not os.path.exists(tiling_so):
+            LogUtil.print_compile_log(
+                "",
+                f"ASCEND_OPP_TILING_SO_PATH {tiling_so} invalid",
+                AscendCLogLevel.LOG_ERROR,
+            )
+            return False
+        tiling_so_path = Path(tiling_so)
+        try:
+            ctlib_opp_tiling = ctypes.CDLL(tiling_so_path)
+            tiling_so_path_str = str(tiling_so_path)
+            ctlib_opp_tiling.TbeLoadSoAndSaveToRegistry(
+                tiling_so_path_str.encode("utf_8")
+            )
+        except AttributeError as e:
+            # ascend c static load builtin opmaster ct so fail
+            LogUtil.print_compile_log(
+                "",
+                f"An AttributeError occurred: {e}, when load tiling so {builtin_optiling_ctlib_path}",
+                AscendCLogLevel.LOG_ERROR,
+            )
+            return False
+        return True
+
     # 2. loat built-in tiling so in op_host dir
     load_op_host_tiling_lib()
-    opp_path = Path(os.environ.get(_ASCEND_OPP_PATH_ENV, _ASCEND_OPP_PATH_DEFAULT))
+    
 
     builtin_optiling_lib_path2 = opp_path.joinpath(so_arch_path2)
     parent_dir = Path(os.path.dirname(builtin_optiling_lib_path2))
@@ -1481,12 +1508,13 @@ p_tilingdata",
     class_body += "    copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t *)tilingdata_in_ub, \
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, 0, 0, 0);\n"
     class_body += get_tilingdata_preload()
-    class_body += "#elif __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3003\n"
+    class_body += "#elif __NPU_ARCH__ == 3103\n"
     class_body += (
         "    copy_gm_to_ubuf(((__ubuf__ void *)tilingdata_in_ub), (__gm__ void *)p_tilingdata, 0, 1, \
 len_burst, 0, 0);\n"
     )
-    class_body += "#elif __NPU_ARCH__ == 3113\n"
+    class_body += "#elif __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
+__NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
     class_body += "    copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t *)tilingdata_in_ub, \
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, 0, 0);\n"
 
@@ -1508,7 +1536,13 @@ len_burst, 0, 0);\n"
         "all_bytes", "__ubuf__", "(__ubuf__ uint8_t *)tilingdata_in_ub"
     )
     class_body += "#else\n"
+    class_body += "#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
+__NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
+    class_body += "    constexpr uint64_t bytes_align64 = (all_bytes + 63) / 64 * 64 + 8;\n"
+    class_body += "    copy_data_align64((uint8_t*)tilingdata, (__ubuf__ uint8_t *)tilingdata_in_ub, bytes_align64);\n"
+    class_body += "#else\n"
     class_body += "    copy_data_align64((uint8_t*)tilingdata, (__ubuf__ uint8_t *)tilingdata_in_ub, all_bytes);\n"
+    class_body += "#endif\n"
     class_body += "#endif\n"
     class_body += "#endif // __ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__ \n"
     class_body += "#endif\n"
