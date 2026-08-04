@@ -23,6 +23,8 @@
 #define IMPL_TENSOR_API_TENSOR_TENSOR_IMPL_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/utils/npu_debug_assert.h"
+#include "impl/tensor_api/utils/npu_debug_check.h"
 #include "impl/tensor_api/tensor/layout_impl.h"
 #include "impl/tensor_api/tensor/engine_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
@@ -125,6 +127,7 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info)
     {
+        TENSOR_API_DEBUG_CHECK(debug_check_slice_args, Layout(), coord, info);
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);
@@ -133,6 +136,7 @@ struct BaseTensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const
     {
+        TENSOR_API_DEBUG_CHECK(debug_check_slice_args, Layout(), coord, info);
         auto sliceEngine = Engine() + Layout()(coord);
         auto coordLayout = MakeSliceLayout(coord, Layout(), info);
         return MakeSubTensor(sliceEngine, coordLayout);
@@ -189,6 +193,7 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
 {
     static_assert(
         IsHardwareMemPtrV<Iterator>, "MakeTensor expects the first argument to be a memory pointer or iterator");
+    TENSOR_API_DEBUG_CHECK(debug_check_make_tensor_shape, args...);
     return MakeTensorBuilder<Iterator>{}(iter, args...);
 }
 
