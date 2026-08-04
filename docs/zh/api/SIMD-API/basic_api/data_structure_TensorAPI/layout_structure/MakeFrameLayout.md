@@ -68,7 +68,7 @@ auto nc1hwc0Layout = MakeFrameLayout<NC1HWC0LayoutPtn>(n, c1, h, w, c0);
 
 LayoutTrait用于指定C0维度基数。MakeFrameLayout支持以下四种传递方式：
 
-1. **LayoutTraitDefault<T>**：根据数据类型T自动计算C0。T仅参与C0推导，不作为LayoutTrait中的数据类型信息保存。
+1. **`LayoutTraitDefault<T>`**：根据数据类型T自动计算C0。T仅参与C0推导，不作为LayoutTrait中的数据类型信息保存。
 
    ```cpp
    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n)
