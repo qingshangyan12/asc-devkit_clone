@@ -152,7 +152,7 @@ __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm
   AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, 256);
 }
 ```
-> 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，与物理位置的映射参考文件[逻辑位置和物理存储的映射](../../../../../api/SIMD-API/通用说明和约束.md)。
+> 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，与物理位置的映射参考文件[逻辑位置和物理存储的映射](../../../../../api/SIMD-API/general_description_and_constraints.md)。
 
 相比基础Tensor，[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入Layout描述并将其作为Tensor的核心属性，开发者可在Tensor创建时直接关联Shape与Stride信息，简化多维数据的布局管理。通过`MakeTensor`，开发者可灵活指定内存地址和Layout布局，更便捷地描述ND、NZ等典型数据排布。
 
@@ -167,7 +167,7 @@ auto ubTensor = AscendC::Te::MakeTensor(ubPointer, AscendC::Te::MakeLayout(Ascen
 
 #### AIV内部存储之Register File
 
-[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C++ Tensor编程通过定义RegTensor方式进行寄存器编程。详见[Reg矢量计算编程](./Reg矢量计算编程.md)。
+[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C++ Tensor编程通过定义RegTensor方式进行寄存器编程。详见[Reg矢量计算编程](./reg_vector_compute编程.md)。
 
 > 📌 寄存器可编程能力从[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入。
 
@@ -271,13 +271,13 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 以下图为例，AIC（AI Cube，主要用于Cube计算）需要依赖于AIV（AI Vector，负责Vector计算）的ReduceSum计算结果。由于整体矢量较大，必须拆分为多个部分，由每个AIV分别完成部分计算。每个AIV将其部分计算结果通过原子累加写入GM。AIC需要读取的必须是所有AIV均完成累加后的最终结果。
 
-![核间同步业务场景示例](../../../../figures/核间同步业务场景示例.png)
+![核间同步业务场景示例](../../../../figures/inter_core_sync业务场景示例.png)
 
 从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算，AIV核负责Vector计算。AIC/AIV按group进行划分。一个group内细分block及subblock，block与subblock比例为1:N（N>=1），block表示多少个“主核”，subblock表示一个“主核”带多少个“从核”。
 
 ![block和subblock之间关系](../../../../figures/block和subblock之间关系.png)
 
-算子按计算特征可划分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和CV融合算子（矩阵与矢量混合计算）。算子类型决定了其核间同步方式与group配置模式的选择。针对不同算子场景，C++ Tensor编程通过[CrossCoreSetFlag](../../../../../api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag_ISASI.md)和[CrossCoreWaitFlag](../../../../../api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag_ISASI.md)两个接口组合实现核间同步，以满足多样化的算子开发需求。
+算子按计算特征可划分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和CV融合算子（矩阵与矢量混合计算）。算子类型决定了其核间同步方式与group配置模式的选择。针对不同算子场景，C++ Tensor编程通过[CrossCoreSetFlag](../../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md)和[CrossCoreWaitFlag](../../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md)两个接口组合实现核间同步，以满足多样化的算子开发需求。
 
 | 核间同步类型 | 场景说明 | 实现代码示例 |
 |---|---|---|
@@ -301,7 +301,7 @@ Vector矢量计算主要包含基础算术、归约计算、数据类型转换�
 
 在[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)上，Vector矢量计算的数据来自于UB（要求32B对齐），C++ Tensor编程在Vector计算单元上提供了通过LocalTensor直接操作计算的接口能力。此类直接操作UB的编程方式称为Memory矢量计算编程。
 
-以Add计算为例，当开发者需要计算4096长度的向量加法，可通过`Add(dstTensor, src0Tensor, src1Tensor, count)`接口直接进行计算。更多内容请参考[Memory矢量计算编程](./Memory矢量计算编程.md)。
+以Add计算为例，当开发者需要计算4096长度的向量加法，可通过`Add(dstTensor, src0Tensor, src1Tensor, count)`接口直接进行计算。更多内容请参考[Memory矢量计算编程](./memory_vector_compute编程.md)。
 
 ```cpp
 // Define Vector operator, marked with __vector__ to execute on Device, suitable for operators with only Vector computation
@@ -319,13 +319,13 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 }
 ```
 
-[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新一代架构，引入寄存器可编程能力，在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「GM → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从UB加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
+[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新一代架构，引入寄存器可编程能力，在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「GM → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从UB加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./reg_vector_compute编程.md)中有关Reg矢量计算编程的描述。
 
 > 📌 寄存器可编程能力从[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入。
 
 ### Cube矩阵计算
 
-Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cube矩阵计算编程.md)。
+Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cubecube_compute编程.md)。
 
 以Matmul矩阵乘计算为例，开发者通过操作Cube矩阵计算能力可以完成如下图所示的c = a * b + bias的计算。
 - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
@@ -388,8 +388,8 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 ## 编程约束和限制
 
 - 同步事件由开发者使用`SetFlag/WaitFlag(ISASI)`和`PipeBarrier(ISASI)`手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
-- Kernel入口处需要开发者手动调用[InitSocState](../../../../../api/SIMD-API/基础API/工具接口/系统初始化/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
-- Kernel结束前需要开发者手动调用[PipeBarrier<PIPE_ALL>()](../../../../../api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier_ISASI.md)。
+- Kernel入口处需要开发者手动调用[InitSocState](../../../../../api/SIMD-API/basic_api/tool_interface/system_init/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
+- Kernel结束前需要开发者手动调用[PipeBarrier<PIPE_ALL>()](../../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md)。
 - 部分API内部通过软仿真实现，需占用Ascend C预留的UB空间，开发者使用时需关注目标API是否依赖该预留空间（针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，Select等API内部使用了8KB的预留UB空间，用于存储中间数据；针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，Exp等API内部使用了2KB的预留UB空间，用于指令兼容或存储中间数据）。若开启--cce-disable-asc-reserved-ubuf编译选项，在对应产品版本下调用相关API会触发编译期报错。具体API范围见[使用预留UB空间的API列表](#section_reserved_ubuf_api)。
 - 同时另外一些软仿实现接口内部会占用系统分配的事件ID，如果开发者手动调用`SetFlag/WaitFlag(ISASI)`插入自定义事件ID时会跟接口内部的事件ID产生冲突，所以用户自定义事件ID时，只能支持部分API。具体支持的API列表见[支持的API范围](#section2633193623711)。
 

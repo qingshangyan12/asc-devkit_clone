@@ -85,7 +85,7 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 
 针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，L0A Buffer使用此格式（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)使用Nz格式）。该格式采用大Z（外部行主序）+ 小z（内部行主序）。
 
-![Zz格式(以half类型为例)](../../../../figures/Zz格式-以half类型为例.png)
+![Zz格式(以half类型为例)](../../../../figures/Zz格式-以half_type为例.png)
 
 在矩阵乘法中，A矩阵逐行读取数据。Zz格式的行主序特性使同一行元素物理地址连续，与计算访问模式匹配，便于Cube单元左侧通道通过DMA连续读取，避免跨步访问，提升数据搬运效率。
 
@@ -93,7 +93,7 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 
 Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩阵数据直接为Zn格式，则在GM和L1 Buffer上存储该格式。该格式采用大Z(外部行主序) + 小n(内部列主序)。
 
-![Zn格式(以half类型为例)](../../../../figures/Zn格式-以half类型为例.png)
+![Zn格式(以half类型为例)](../../../../figures/Zn格式-以half_type为例.png)
 
 矩阵乘法需读取B矩阵列向量。普通行主序存储导致列数据在内存中地址不连续。Zn格式在分形内部按列存储，使列数据在L0B中紧凑排列，便于Cube单元右侧通道线性读取完整列向量，避免跨步访问。
 
@@ -185,7 +185,7 @@ l12l0Params.ifTranspose = false;
 AscendC::LoadData(l0a_buffer, l1_buffer, l12l0Params);
 ```
 
-搬运到L0B Buffer采用同样的`LoadData`接口实现，接口参数及实现功能同L12L0A，可参考[矩阵计算的搬入](../../../../../api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/矩阵计算的搬入.md)查看更多内容。
+搬运到L0B Buffer采用同样的`LoadData`接口实现，接口参数及实现功能同L12L0A，可参考[矩阵计算的搬入](../../../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/cube_compute_load.md)查看更多内容。
 
 当输入A矩阵（GM）是转置排布（K×M）时，搬入到L1 Buffer后为（K×M）排布的Nz分形。要使L0A Buffer存放（M×K）的矩阵，需要在L1 Buffer到L0A Buffer的搬运过程中进行转置。针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，可使用`LoadDataWithTranspose`接口，调用示例如下。
 
@@ -296,11 +296,11 @@ uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
 AscendC::SetFixpipePreQuantFlag(deqScalar);
 ```
 
-详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/基础API/cube_compute_ISASI/cube_compute_ISASI.md)。
+详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_ISASI.md)。
 
 ### 矩阵计算
 
-[Mmad](../../../../../api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算/Mmad.md)是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品L0A Buffer分形为Nz。
+[Mmad](../../../../../api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md)是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品L0A Buffer分形为Nz。
 
 ![NPU架构版本3510 `Mmad`计算](../../../../figures/Ascend950PR-Ascend950DT-asc_mmad计算.png)
 
@@ -354,7 +354,7 @@ AscendC::Mmad(c_matrix, a_matrix, b_matrix, mmadParams);
 
 AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行方式运行，读写同一存储资源时可能存在数据依赖关系。因此，Cube计算需通过流水同步接口确保正确执行。Cube矩阵计算主要包含四步：数据搬入（Global Memory → L1 Buffer）、数据加载（L1 Buffer → L0A/B Buffer）、矩阵计算（L0A/B Buffer → L0C Buffer）、数据搬出（L0C Buffer → Global Memory）。四个步骤分别对应PIPE_MTE2、PIPE_MTE1、PIPE_M、PIPE_FIX流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
 
-当开发者进行一个矩阵乘法计算时（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品），可通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这四个步骤的同步。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品可使用`SetFlag`&`WaitFlag`实现相同同步效果，详见[同步机制](../基于Tensor的CPP编程/CPPTensor编程概述.md#同步机制)。
+当开发者进行一个矩阵乘法计算时（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品），可通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这四个步骤的同步。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品可使用`SetFlag`&`WaitFlag`实现相同同步效果，详见[同步机制](../基于Tensor的CPP编程/CPPTensor编程overview.md#同步机制)。
 
 以下示例中，Kernel入参`x`、`y`、`z`的指针类型与对应`GlobalTensor`的模板类型一致，因此调用`SetGlobalBuffer`时可省略显式类型转换。若实参指针类型与`GlobalTensor`的模板类型不一致，需要先将其显式转换为对应的`__gm__ PrimType*`类型。
 

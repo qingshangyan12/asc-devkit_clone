@@ -216,7 +216,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 }
 ```
 
-> 以上代码展示了[Kernel侧算子实现](./设计与实现/Kernel侧算子实现.md)的基本模式。
+> 以上代码展示了[Kernel侧算子实现](./设计与实现/Kernel_side算子实现.md)的基本模式。
 
 ### 修改Tiling与Host侧实现
 
@@ -267,9 +267,9 @@ static ge::graphStatus TilingFunc(gert::TilingContext *context)
 } // namespace optiling
 ```
 
-保留文件末尾自动生成的`namespace ge`（InferShape/InferDataType）和`namespace ops`（[算子原型注册](./设计与实现/算子原型定义.md)）代码不变。
+保留文件末尾自动生成的`namespace ge`（InferShape/InferDataType）和`namespace ops`（[算子原型注册](./设计与实现/算子原type定义.md)）代码不变。
 
-> 以上代码展示了[Host侧Tiling实现](./设计与实现/Host侧Tiling实现.md)中Tiling函数和TilingData数据结构的基本写法。
+> 以上代码展示了[Host侧Tiling实现](./设计与实现/Host_sideTiling实现.md)中Tiling函数和TilingData数据结构的基本写法。
 
 ### 编译
 
@@ -528,8 +528,8 @@ test pass
 如果输出`test failed`、ACL Error或动态库`not found`类错误，请检查：
 1. CANN环境变量是否已加载（`source /usr/local/Ascend/cann/set_env.sh`）。
 2. 算子是否已按照[部署](#部署)步骤正确部署。
-3. Kernel侧和Host侧代码是否按[Kernel代码](#修改Kernel侧代码)、[Host代码](#修改Tiling与Host侧实现)正确修改。
+3. Kernel侧和Host侧代码是否按[Kernel代码](#修改Kernel_side代码)、[Host代码](#修改Tiling与Host_side实现)正确修改。
 
 ## 下一步指引
 
-恭喜您完成了第一个算子的端到端开发！接下来建议按[概述](./概述.md)里的路径继续学习。
+恭喜您完成了第一个算子的端到端开发！接下来建议按[概述](./overview.md)里的路径继续学习。

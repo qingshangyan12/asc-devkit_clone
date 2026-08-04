@@ -52,7 +52,7 @@
 
 ## 分析主要瓶颈点<a name="section10759361232"></a>
 
-当前案例基于Tiling全量常量化进一步优化，Tiling全量常量化请参考[Matmul高阶API开启Tiling全量常量化](Matmul高阶API使能Tiling全量常量化.md)案例。优化前的Profiling数据如下，C列的aic\_time是867us，K列的aic\_mte2\_time是861.9us，MTE2占比为99%，MTE2数据搬运是当前算子性能的瓶颈。
+当前案例基于Tiling全量常量化进一步优化，Tiling全量常量化请参考[Matmul高阶API开启Tiling全量常量化](Matmulhigh_level_api使能Tiling全量常量化.md)案例。优化前的Profiling数据如下，C列的aic\_time是867us，K列的aic\_mte2\_time是861.9us，MTE2占比为99%，MTE2数据搬运是当前算子性能的瓶颈。
 
 ![](../../../figures/zh-cn_image_0000002410305297.png)
 

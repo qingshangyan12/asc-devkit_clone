@@ -6,11 +6,11 @@
 
 ## 目录
 
-1. [架构代际概述](#架构代际概述)
+1. [架构代际概述](#架构代际overview)
 2. [统一维护原则](#统一维护原则)
 3. [统一芯片调用名](#统一芯片调用名)
 4. [完整映射表](#完整映射表)
-5. [统一数据类型视图](#统一数据类型视图)
+5. [统一数据类型视图](#统一数据_classtype视图)
 6. [条件编译边界](#条件编译边界)
 7. [Ascend950 DAV_3510 相关能力](#ascend950-dav_3510-相关能力)
 8. [API 兼容性检查清单](#api-兼容性检查清单)
@@ -91,7 +91,7 @@
 
 ### 通用基础 dtype
 
-本节依据仓内 [`docs/zh/api/context/内置数据类型.md`](../../../../docs/zh/api/SIMD-API/基础API/数据结构/内置数据类型.md) 维护 AscendC 内置 dtype 事实。脚本消费入口仍是 [`npu-arch-facts.json`](npu-arch-facts.json)，不要解析 Markdown 表格。
+本节依据仓内 [`docs/zh/api/context/builtin_data_types.md`](../../../../docs/zh/api/SIMD-API/basic_api/data_structures/builtin_data_types.md) 维护 AscendC 内置 dtype 事实。脚本消费入口仍是 [`npu-arch-facts.json`](npu-arch-facts.json)，不要解析 Markdown 表格。
 
 下表是各 skill 在未遇到特定 API 约束时，应优先复用的通用基础 dtype 视图。这里的“可直接初始化”只表示通用 UT 模板可以安全构造样例数据，不表示任意 API 都支持该类型。
 

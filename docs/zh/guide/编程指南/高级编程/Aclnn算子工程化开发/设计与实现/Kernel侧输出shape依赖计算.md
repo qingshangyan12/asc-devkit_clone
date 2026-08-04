@@ -14,7 +14,7 @@ this->Output("y")
     .OutputShapeDependOnCompute();
 ```
 
-算子有多个输出时，只在实际依赖计算的输出上增加该标记。输入输出声明方法见[算子原型定义](./算子原型定义.md)。
+算子有多个输出时，只在实际依赖计算的输出上增加该标记。输入输出声明方法见[算子原型定义](./算子原type定义.md)。
 
 ## Kernel入口增加shape输出参数
 
@@ -130,6 +130,6 @@ shapeGlobal.SetValue(13, 32);
 
 ## 相关文档
 
-- [Kernel侧算子实现](./Kernel侧算子实现.md)：Kernel入口格式和参数顺序。
-- [算子原型定义](./算子原型定义.md)：输入输出声明和shape推导关系。
-- [OutputShapeDependOnCompute](../../../../../api/Utils-API/原型注册与管理/OpParamDef/OutputShapeDependOnCompute.md)：接口定义和工程版本约束。
+- [Kernel侧算子实现](./Kernel_side算子实现.md)：Kernel入口格式和参数顺序。
+- [算子原型定义](./算子原type定义.md)：输入输出声明和shape推导关系。
+- [OutputShapeDependOnCompute](../../../../../api/Utils-API/prototype_register_management/OpParamDef/OutputShapeDependOnCompute.md)：接口定义和工程版本约束。

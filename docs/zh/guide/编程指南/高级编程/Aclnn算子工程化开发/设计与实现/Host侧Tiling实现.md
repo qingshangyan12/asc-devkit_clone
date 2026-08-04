@@ -47,7 +47,7 @@ AscendC推荐使用**标准C++语法**定义Tiling结构体。这种方式便于
 
 workspace是设备侧Global Memory上的临时内存，用于为Kernel计算提供辅助存储，例如保存中间结果、作为Ascend C API的临时缓存，或为Kernel提供临时空间。Host侧Tiling函数只负责计算并设置所需的workspace大小，不直接使用这块内存。单算子API执行场景下，开发者通过第一段接口获取workspace大小，并申请对应大小的Global Memory；入图场景下，框架会根据Host侧Tiling设置的大小自动申请。申请完成后，Kernel可以通过入口参数`workspace`访问这块内存。
 
-Host侧需要设置的workspace内存分为系统workspace和用户workspace两部分，具体设置方法请参考[如何使用workspace](../../../附录/常用操作/如何使用workspace.md)。
+Host侧需要设置的workspace内存分为系统workspace和用户workspace两部分，具体设置方法请参考[如何使用workspace](../../../appendix/常用操作/如何使用workspace.md)。
 
 ### TilingKey（可选）
 
@@ -138,7 +138,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
 4. 将workspace大小设置为0。
 5. 返回`ge::GRAPH_SUCCESS`。
 
-标准C++结构体方式下，Host侧通过`GetTilingData<T>()`获取结构体指针并直接写字段，框架负责后续数据传递。Kernel侧读取方式会在[Kernel侧算子实现](./Kernel侧算子实现.md)中说明。
+标准C++结构体方式下，Host侧通过`GetTilingData<T>()`获取结构体指针并直接写字段，框架负责后续数据传递。Kernel侧读取方式会在[Kernel侧算子实现](./Kernel_side算子实现.md)中说明。
 
 ### 关联算子原型
 
@@ -153,7 +153,7 @@ this->AICore()
 >
 > 一个算子只能注册一个Host侧Tiling函数。如果不同AI处理器需要采用不同的Tiling配置，应在同一个Tiling函数中区分AI处理器并设置相应参数，不能按AI处理器分别注册多个Tiling函数。
 
-`SetTiling`建立算子原型和Host侧Tiling函数之间的调用关系。本文只说明`TilingFunc`内部如何准备Kernel运行参数，完整原型配置见[算子原型定义](./算子原型定义.md)。
+`SetTiling`建立算子原型和Host侧Tiling函数之间的调用关系。本文只说明`TilingFunc`内部如何准备Kernel运行参数，完整原型配置见[算子原型定义](./算子原type定义.md)。
 
 ## 使用约束<a id="tilingdata-constraints"></a>
 
@@ -228,8 +228,8 @@ REGISTER_TILING_DEFAULT(AddCustomTiling);
 
 ## 相关文档
 
-- [算子原型定义](./算子原型定义.md)：了解如何通过`AICore().SetTiling(...)`把Tiling函数关联到算子原型。
+- [算子原型定义](./算子原type定义.md)：了解如何通过`AICore().SetTiling(...)`把Tiling函数关联到算子原型。
 - [通过TilingData传递属性信息](./通过TilingData传递属性信息.md)：了解如何读取算子属性，并通过TilingData传递到Kernel侧。
-- [使用高阶API时配套的Tiling实现](./使用高阶API时配套的Tiling实现.md)：了解使用高阶API时如何计算并传递配套Tiling参数。
-- [Kernel侧算子实现](./Kernel侧算子实现.md)：了解Kernel侧如何读取`TilingData`并使用Host侧设置的运行参数。
+- [使用高阶API时配套的Tiling实现](./使用high_level_api时配套的Tiling实现.md)：了解使用高阶API时如何计算并传递配套Tiling参数。
+- [Kernel侧算子实现](./Kernel_side算子实现.md)：了解Kernel侧如何读取`TilingData`并使用Host侧设置的运行参数。
 - [多分支策略](./多分支策略.md)：了解如何通过`TilingKey`选择不同Kernel实现分支。

@@ -21,7 +21,7 @@
 -   针对同一个迭代中的数据，可以通过**mask**参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。
 
     **图3**  通过**mask**参数进行掩码操作示意图（以float数据类型为例）<a name="zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_fig7630131541814"></a>  
-    ![](../../../../figures/通过mask参数进行掩码操作示意图（以float数据类型为例）.png "通过mask参数进行掩码操作示意图（以float数据类型为例）")
+    ![](../../../../figures/通过mask参数进行mask_operations示意图（以float数据_classtype为例）.png "通过mask参数进行掩码操作示意图（以float数据类型为例）")
 
 -   矢量计算单元还支持带间隔的向量计算，通过**dataBlockStride**（单次迭代内不同datablock间地址步长）和**repeatStride**（相邻迭代间相同datablock的地址步长）来进行配置。
     -   **dataBlockStride**

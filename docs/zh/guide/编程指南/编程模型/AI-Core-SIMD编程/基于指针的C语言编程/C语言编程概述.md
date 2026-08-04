@@ -116,7 +116,7 @@ __global__ __vector__ void add_custom(...) {
 
 #### AIV内部存储之Register File
 
-[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C语言编程通过直接定义寄存器变量方式进行寄存器编程。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中，有关寄存器类型等描述。
+[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C语言编程通过直接定义寄存器变量方式进行寄存器编程。可参考[Reg矢量计算编程](./reg_vector_compute编程.md)中，有关寄存器类型等描述。
 
 
 #### AIC内部存储L1 Buffer & L0 Buffer
@@ -320,7 +320,7 @@ Vector矢量计算主要包含基础算术、归约计算、数据类型转换�
 
 在[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)上，Vector矢量计算的数据来自于Unified Buffer（要求32B对齐），C语言编程在Vector计算单元上提供了通过UB指针直接操作计算的接口能力。此类直接操作UB的编程方式称为Memory矢量计算编程。
 
-以Add计算为例，当开发者需要计算4096长度的向量加法，可以通过`asc_add(dst, src0, src1, count)`的接口直接进行计算。更多内容可参考[Memory矢量计算编程](./Memory矢量计算编程.md)中有关Memory矢量计算编程的描述。
+以Add计算为例，当开发者需要计算4096长度的向量加法，可以通过`asc_add(dst, src0, src1, count)`的接口直接进行计算。更多内容可参考[Memory矢量计算编程](./memory_vector_compute编程.md)中有关Memory矢量计算编程的描述。
 
 ```c
 // Define Vector operator, marked with __vector__ to execute on Device Vector core, suitable for operators with only Vector computation
@@ -338,11 +338,11 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ```
 
-以上为传统架构的矢量计算编程方式；[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新增寄存器能力，编程模式有所变化：在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
+以上为传统架构的矢量计算编程方式；[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新增寄存器能力，编程模式有所变化：在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./reg_vector_compute编程.md)中有关Reg矢量计算编程的描述。
 
 ### Cube矩阵计算
 
-除矢量计算外，Cube单元专门实现矩阵运算，对应矩阵类算子的开发，Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cube矩阵计算编程.md)。
+除矢量计算外，Cube单元专门实现矩阵运算，对应矩阵类算子的开发，Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cubecube_compute编程.md)。
 
 以Matmul矩阵乘计算为例，开发者通过操作Cube矩阵计算能力可以完成如下图所示的`c = a * b + bias`的能力。
 - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
@@ -399,4 +399,4 @@ __global__ __mix__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 
 ## 总结
 
-本章从技术定位出发，依次讲解了C语言编程的核函数规范、内存层级、内外核同步机制以及三类算子开发范式。作为底层硬件编程接口，该路径可充分挖掘NPU算力。如需深入实践，可参考以下专项文档：[Memory矢量计算编程](./Memory矢量计算编程.md)、[Cube矩阵计算编程](./Cube矩阵计算编程.md)和[Reg矢量计算编程](./Reg矢量计算编程.md)。
+本章从技术定位出发，依次讲解了C语言编程的核函数规范、内存层级、内外核同步机制以及三类算子开发范式。作为底层硬件编程接口，该路径可充分挖掘NPU算力。如需深入实践，可参考以下专项文档：[Memory矢量计算编程](./memory_vector_compute编程.md)、[Cube矩阵计算编程](./Cubecube_compute编程.md)和[Reg矢量计算编程](./reg_vector_compute编程.md)。

@@ -1,6 +1,6 @@
 # 如何进行Tiling调测<a name="ZH-CN_TOPIC_0000002305497828"></a>
 
-在[工程化算子开发](../../高级编程/Aclnn算子工程化开发/概述.md)过程中，开发者需实现Tiling函数，该函数原型是固定的，接受TilingContext作为输入。框架负责构造TilingContext并调用Tiling函数。若需单独进行Tiling调测，开发者可通过OpTilingRegistry加载编译后的Tiling动态库，获取Tiling函数的指针并进行调用，调用时Tiling函数的TilingContext入参使用ContextBuilder构建。
+在[工程化算子开发](../../高级编程/Aclnn算子工程化开发/overview.md)过程中，开发者需实现Tiling函数，该函数原型是固定的，接受TilingContext作为输入。框架负责构造TilingContext并调用Tiling函数。若需单独进行Tiling调测，开发者可通过OpTilingRegistry加载编译后的Tiling动态库，获取Tiling函数的指针并进行调用，调用时Tiling函数的TilingContext入参使用ContextBuilder构建。
 
 以下是具体步骤：
 
@@ -11,7 +11,7 @@
 2.  编写测试代码。
 
     -   使用ContextBuilder配置输入输出Tensor的形状、数据类型、格式及平台信息等，构建TilingContext。
-    -   通过OpTilingRegistry的[LoadTilingLibrary](../../../../api/Utils-API/Tiling调测/OpTilingRegistry/LoadTilingLibrary.md)接口加载Tiling动态库；使用[GetTilingFunc](../../../../api/Utils-API/Tiling调测/OpTilingRegistry/GetTilingFunc.md)接口获取Tiling函数指针。
+    -   通过OpTilingRegistry的[LoadTilingLibrary](../../../../api/Utils-API/Tiling_tuning/OpTilingRegistry/LoadTilingLibrary.md)接口加载Tiling动态库；使用[GetTilingFunc](../../../../api/Utils-API/Tiling_tuning/OpTilingRegistry/GetTilingFunc.md)接口获取Tiling函数指针。
     -   执行Tiling函数，验证其正确性。
 
     ```

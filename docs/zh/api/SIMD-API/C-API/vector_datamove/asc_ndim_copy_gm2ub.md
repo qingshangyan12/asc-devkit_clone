@@ -47,19 +47,19 @@
 以下以2维的例子，介绍几个典型使用场景。
 
 - 2D Padding场景，使用固定值填充方式
-![ ](../figures/asc_ndim_copy_gm2ub典型使用场景：2D_Padding场景，使用固定值填充方式.png)
+![ ](../figures/asc_ndim_copy_gm2ub典type使用场景：2D_Padding场景，使用固定值填充方式.png)
 
 - 2D Padding场景，使用最近值填充方式
-![ ](../figures/asc_ndim_copy_gm2ub典型使用场景：2D_Padding场景，使用最近值填充方式.png)
+![ ](../figures/asc_ndim_copy_gm2ub典type使用场景：2D_Padding场景，使用最近值填充方式.png)
 
 - 2D Transpose场景
-![ ](../figures/asc_ndim_copy_gm2ub典型使用场景：2D_Transpose场景.png)
+![ ](../figures/asc_ndim_copy_gm2ub典type使用场景：2D_Transpose场景.png)
 
 - 2D Slice场景
-![ ](../figures/asc_ndim_copy_gm2ub典型使用场景：2D_Slice场景.png)
+![ ](../figures/asc_ndim_copy_gm2ub典type使用场景：2D_Slice场景.png)
 
 - 2D BroadCast场景
-![ ](../figures/asc_ndim_copy_gm2ub典型使用场景：2D_BroadCast场景.png)
+![ ](../figures/asc_ndim_copy_gm2ub典type使用场景：2D_BroadCast场景.png)
 
 ## 函数原型
 
@@ -127,7 +127,7 @@ PIPE_MTE2
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 - 如果需要执行多条asc_ndim_copy_gm2ub指令，且asc_ndim_copy_gm2ub指令的目的地址存在重叠，需要插入同步指令，保证多个asc_ndim_copy_gm2ub指令的串行化，防止出现异常数据。
 - 一条指令所能获取的所有数据的地址范围宽度不能超过40位（1TB），即：源操作数的i维大小为（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_src_stride，目的操作数的i维大小为：（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_dst_stride，所有的维度的大小加起来不超过2^40位。
 - 当每维的loopi_dst_stride为升序序列，则不同循环间的地址空间不能交织或重叠。
@@ -135,7 +135,7 @@ PIPE_MTE2
 ## 调用示例
 
 2D Padding场景，使用固定值填充方式
-![ ](../figures/asc_ndim_copy_gm2ub典型使用场景：2D_Padding场景，使用固定值填充方式.png)
+![ ](../figures/asc_ndim_copy_gm2ub典type使用场景：2D_Padding场景，使用固定值填充方式.png)
 
 ```cpp
 // total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。

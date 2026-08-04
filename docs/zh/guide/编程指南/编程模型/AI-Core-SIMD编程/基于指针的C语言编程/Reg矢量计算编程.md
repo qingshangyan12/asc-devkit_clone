@@ -2,7 +2,7 @@
 
 > 📌 **提示**：Reg矢量编程仅在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)进行SIMD矢量计算编程时支持。
 
-本文介绍如何在Ascend C中使用语言扩展C API进行寄存器级**矢量计算编程**，该能力面向已经熟悉[Ascend C编程模型](../../编程模型概述.md)的开发者。这种基于硬件寄存器的编程方式称为Reg矢量计算编程。
+本文介绍如何在Ascend C中使用语言扩展C API进行寄存器级**矢量计算编程**，该能力面向已经熟悉[Ascend C编程模型](../../programming_modeloverview.md)的开发者。这种基于硬件寄存器的编程方式称为Reg矢量计算编程。
 
 ## 为什么需要Reg矢量编程<a name="section_part1"></a>
 
@@ -89,7 +89,7 @@ AIV的内存层级如下：
 
 **图3** Regbase编程总体结构
 
-![](../../../../figures/Regbase编程模型总体结构.png "Regbase编程模型总体结构")
+![](../../../../figures/Regbaseprogramming_model总体结构.png "Regbase编程模型总体结构")
 
 ### VF函数与执行域
 

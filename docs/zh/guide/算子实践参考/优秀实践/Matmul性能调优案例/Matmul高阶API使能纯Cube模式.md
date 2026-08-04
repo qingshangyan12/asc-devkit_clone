@@ -73,7 +73,7 @@ Tiling参数如下：
 
 ## 设计优化方案<a name="section81265422311"></a>
 
-默认MIX模式下，用户在AIV侧发起消息，通过消息通信框架中转消息后，在AIC侧执行Matmul计算。基于这样的流程，用户使用Matmul高阶API编写算子代码时，可以使用[REGIST\_MATMUL\_OBJ](../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/REGIST_MATMUL_OBJ.md)宏，无需区分AIV和AIC，但也因这套消息处理机制导致产生了额外的性能开销，如[图1默认MIX模式的Matmul流程示意图](#fig0672118378)所示。
+默认MIX模式下，用户在AIV侧发起消息，通过消息通信框架中转消息后，在AIC侧执行Matmul计算。基于这样的流程，用户使用Matmul高阶API编写算子代码时，可以使用[REGIST\_MATMUL\_OBJ](../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/REGIST_MATMUL_OBJ.md)宏，无需区分AIV和AIC，但也因这套消息处理机制导致产生了额外的性能开销，如[图1默认MIX模式的Matmul流程示意图](#fig0672118378)所示。
 
 实现默认MIX模式的具体步骤如下：
 
@@ -98,7 +98,7 @@ Tiling参数如下：
     cubeTiling.SetDim(numBlocks);
     ```
 
-3.  调用核函数，参考[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
+3.  调用核函数，参考[核函数定义和调用](../../../编程指南/programming_model/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
 
     ```
     matmul_custom_do(ascendcPlatform->GetCoreNumAic(), stream, x1, x2, bias, y, workspaceDevice, tilingDevice); // MIX模式下，启动时，按照AIV和AIC组合启动，numBlocks用于设置启动多少个AI Core。
@@ -133,7 +133,7 @@ Matmul API开启纯Cube模式的完整样例请参考[纯Cube模式的Matmul样�
     cubeTiling.SetDim(numBlocks);
     ```
 
-3.  调用核函数，参考[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
+3.  调用核函数，参考[核函数定义和调用](../../../编程指南/programming_model/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
 
     ```
     matmul_custom_do(ascendcPlatform->GetCoreNumAic(), stream, x1, x2, bias, y, workspaceDevice, tilingDevice); // 仅包含Cube计算的算子，numBlocks用于设置启动多少个AIC。

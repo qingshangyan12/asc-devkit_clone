@@ -114,7 +114,7 @@ PIPE_MTE2
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 当`n_burst`、`len_burst`中任意一个值为0时，该接口被视为NOP（空操作）。
 - 当`size`值为0时，该接口被视为NOP（空操作）。
 - 如果需要执行多条`asc_copy_gm2ub_align`指令，且`asc_copy_gm2ub_align`指令的目的地址存在重叠，需要插入同步指令，保证多个`asc_copy_gm2ub_align`指令的串行化，防止出现异常数据。

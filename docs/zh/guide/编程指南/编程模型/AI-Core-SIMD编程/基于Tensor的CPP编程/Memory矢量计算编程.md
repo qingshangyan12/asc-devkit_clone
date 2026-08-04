@@ -46,7 +46,7 @@ GM与UB之间的数据搬运提供了多样化的接口，支持丰富的数据�
 
 **连续搬运**: 如果开发者需要将一块连续的`Global Memory`搬运到UB时，只需指定搬运数据元素个数即可。例如srcGlobal数据（shape为256，数据类型为half），需搬入到UB中，通过`DataCopy`直接调用：
 
-![连续数据搬运](../../../../figures/连续数据搬运.png)
+![连续数据搬运](../../../../figures/连续data_move.png)
 
 ```cpp
 AscendC::DataCopy(dstLocal, srcGlobal, 256);
@@ -109,7 +109,7 @@ AscendC::DataCopyPad(dstLocal, srcGlobal, copyParams, padParams);
 Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
 以Add接口为例，两种计算模式的调用方式示意图如下。其中连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
 
-![Memory矢量计算模式示意图](../../../../figures/Memory矢量计算模式示意图.png)
+![Memory矢量计算模式示意图](../../../../figures/memory_vector_compute模式示意图.png)
 
 ### 高维切分计算
 
@@ -147,8 +147,8 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 
 | 场景 | repeatStride取值 | 数据读取特点 | 适用场景 |
 |------|------------------|-------------|--------|
-| 连续计算 | 8 | 每轮迭代读取连续8个dataBlock，完成所有输入数据的计算 | ![repeatStride连续计算场景](../../../../figures/repeat_stride连续计算场景.png) |
-| 非连续计算 | >8 (如10) | 相邻迭代间存在dataBlock间隔，地址不连续 | ![repeatStride非连续计算场景](../../../../figures/repeat_stride非连续计算场景.png) |
+| 连续计算 | 8 | 每轮迭代读取连续8个dataBlock，完成所有输入数据的计算 | ![repeatStride连续计算场景](../../../../figures/repeat_stridecontinuous_compute场景.png) |
+| 非连续计算 | >8 (如10) | 相邻迭代间存在dataBlock间隔，地址不连续 | ![repeatStride非连续计算场景](../../../../figures/repeat_stride非continuous_compute场景.png) |
 | 反复计算 | 0 | 对首个连续8个dataBlock反复读取和计算 | ![repeatStride反复计算场景](../../../../figures/repeat_stride反复计算场景.png) |
 | 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | ![repeatStride部分重复计算](../../../../figures/repeat_stride部分重复计算.png) |
 
@@ -176,7 +176,7 @@ AscendC::Add(dstLocal, src0Local, src1Local, mask, repeatTime, { dstBlockStride,
 
 针对同一个迭代中的数据，可以通过mask参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。
 
-![掩码操作示意图](../../../../figures/掩码操作示意图.png)
+![掩码操作示意图](../../../../figures/mask_operations示意图.png)
 
 每一位掩码对应数据中的一个元素的位置，通过有效位和无效位标记，实现对数据操作的精细化开关控制。
 掩码由固定位宽的数值表示：有效位（通常为1）：对应元素正常参与计算。无效位（通常为0）：对应元素被屏蔽，不执行操作。
@@ -217,7 +217,7 @@ Normal计算模式下，MASK寄存器作为每个Repeat的掩码使用，通过S
 
 连续模式下，mask指定单次迭代内参与计算的前n个连续元素，超范围按对应数据类型mask最大值计算，mask为0视为NOP（空操作），负值产生未定义行为。例如对shape为256、数据类型为half的src数据（需2次迭代、每次128个元素），设置mask = 100时，第1次迭代计算0, 99、第2次迭代计算128, 227范围的元素，其余元素不参与计算。
 
-![单次迭代内连续计算](../../../../figures/单次迭代内连续计算.png)
+![单次迭代内连续计算](../../../../figures/单次迭代内continuous_compute.png)
 
 ```cpp
 AscendC::LocalTensor<half> dstLocal;
@@ -267,7 +267,7 @@ AscendC::Add(dstLocal, src0Local, src1Local, 4096);
 
 AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）采用异步并行方式运行，当不同单元读写同一存储资源时，易产生数据依赖问题。因此，Memory矢量计算需通过流水同步接口协调执行顺序，确保计算流程正确。Memory矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → UB）、计算（UB）、数据搬出（UB → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
 
-当开发者进行一个矢量加法计算时（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品），可通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这三个步骤的同步。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品可使用`SetFlag`&`WaitFlag`实现相同同步效果，详见[同步机制](../基于Tensor的CPP编程/CPPTensor编程概述.md#同步机制)。
+当开发者进行一个矢量加法计算时（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品），可通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这三个步骤的同步。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品可使用`SetFlag`&`WaitFlag`实现相同同步效果，详见[同步机制](../基于Tensor的CPP编程/CPPTensor编程overview.md#同步机制)。
 
 ```cpp
 __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)

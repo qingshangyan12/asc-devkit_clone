@@ -90,7 +90,7 @@ AddKernelInvocationNeo
 3.  CPU侧运行验证。完成算子核函数CPU侧运行验证的步骤如下：
 
     **图1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>  
-    ![](../../figures/CPU侧运行验证步骤.png "CPU侧运行验证步骤")
+    ![](../../figures/CPU_side运行验证步骤.png "CPU侧运行验证步骤")
 
     ```
         // 使用GmAlloc分配共享内存，并进行数据初始化
@@ -115,7 +115,7 @@ AddKernelInvocationNeo
 4.  NPU侧运行验证。完成算子核函数NPU侧运行验证的步骤如下：
 
     **图2**  NPU侧运行验证步骤<a name="fig558132018817"></a>  
-    ![](../../figures/NPU侧运行验证步骤.png "NPU侧运行验证步骤")
+    ![](../../figures/NPU_side运行验证步骤.png "NPU侧运行验证步骤")
 
     ```
         // 初始化
@@ -164,12 +164,12 @@ AddKernelInvocationNeo
     ```
 
     >[!NOTE]说明 
-    >针对<<<\>\>\>调用方式在[核函数](../编程模型/AI-Core-SIMD编程/核函数.md)章节已有说明，这里仅对ACLRT\_LAUNCH\_KERNEL调用接口的使用方法介绍如下：
+    >针对<<<\>\>\>调用方式在[核函数](../programming_model/AI-Core-SIMD编程/核函数.md)章节已有说明，这里仅对ACLRT\_LAUNCH\_KERNEL调用接口的使用方法介绍如下：
     >```
     >ACLRT_LAUNCH_KERNEL(kernel_name)(numBlocks, stream, argument list);
     >```
     >- kernel\_name：算子核函数的名称。
-    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](../../../api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)来获取block\_idx。
+    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)来获取block\_idx。
     >- stream，类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在Device上执行。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
     >- argument list：参数列表，与核函数的参数列表保持一致。
 

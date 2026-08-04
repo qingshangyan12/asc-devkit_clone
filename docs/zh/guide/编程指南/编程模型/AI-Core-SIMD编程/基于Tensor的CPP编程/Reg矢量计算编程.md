@@ -1,8 +1,8 @@
 # Reg矢量计算编程<a name="ZH-CN_TOPIC_0000002509863892"></a>
 
-本文介绍如何使用基础API（C++模板接口）编写Reg矢量计算代码。基础API与[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/Reg矢量计算编程.md)描述的是同一套Reg矢量硬件能力，功能语义一致，主要区别在于API命名、类型表达和可配置参数的表达方式。
+本文介绍如何使用基础API（C++模板接口）编写Reg矢量计算代码。基础API与[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/reg_vector_compute编程.md)描述的是同一套Reg矢量硬件能力，功能语义一致，主要区别在于API命名、类型表达和可配置参数的表达方式。
 
-Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同步、Hardware Loop、VF融合等与API接口命名无关的内容，请参见[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/Reg矢量计算编程.md)。本文只说明基础API的接口定位、模板参数、数据类型体系、API分类和典型调用方式。
+Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同步、Hardware Loop、VF融合等与API接口命名无关的内容，请参见[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/reg_vector_compute编程.md)。本文只说明基础API的接口定位、模板参数、数据类型体系、API分类和典型调用方式。
 
 ## 基础API定位<a name="section_part1"></a>
 
@@ -120,7 +120,7 @@ AscendC::Reg::Add<T, AscendC::Reg::MaskMergeMode::MERGING>(dstReg, src0Reg, src1
 | 搬入非对齐寄存器 | `UnalignRegForLoad` | 连续非对齐搬入的临时缓存 |
 | 搬出非对齐寄存器 | `UnalignRegForStore` | 连续非对齐搬出的临时缓存 |
 
-`RegTensor`和`MaskReg`等寄存器对象只能作为整体使用，不能按C++数组方式访问其中某个元素。相关硬件含义、宽度、mask bit对应关系请参考[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/Reg矢量计算编程.md)中“寄存器类型与申请”章节。
+`RegTensor`和`MaskReg`等寄存器对象只能作为整体使用，不能按C++数组方式访问其中某个元素。相关硬件含义、宽度、mask bit对应关系请参考[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/reg_vector_compute编程.md)中“寄存器类型与申请”章节。
 
 ### 与LocalTensor衔接
 
@@ -149,7 +149,7 @@ __aicore__ inline void Compute()
 
 #### Mask创建
 
-[`CreateMask`](../../../../../api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于创建固定模式的`MaskReg`，[`UpdateMask`](../../../../../api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于根据剩余元素数生成尾块mask。
+[`CreateMask`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md)用于创建固定模式的`MaskReg`，[`UpdateMask`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md)用于根据剩余元素数生成尾块mask。
 
 ```cpp
 AscendC::Reg::MaskReg fullMask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
@@ -161,7 +161,7 @@ AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(remainCount);
 
 #### 地址寄存器创建
 
-[`CreateAddrReg`](../../../../../api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/AddrReg.md)用于创建保存UB偏移量的`AddrReg`，最多支持四层循环跳转。
+[`CreateAddrReg`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/register_data_types/AddrReg.md)用于创建保存UB偏移量的`AddrReg`，最多支持四层循环跳转。
 
 ```cpp
 AscendC::Reg::AddrReg aReg;
@@ -193,7 +193,7 @@ AscendC::Reg::Store(dstAddr, dstReg, count);
 
 #### 对齐搬运
 
-[`LoadAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadAlign_continuous.md) / [`StoreAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_continuous.md)适用于UB地址满足对齐要求的连续搬入/搬出，是Reg矢量编程中最常见的搬运接口。在搬运时可以按照内置的功能随路进行数据排布等操作，具体功能以对应API章节为准。
+[`LoadAlign`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous.md) / [`StoreAlign`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_continuous.md)适用于UB地址满足对齐要求的连续搬入/搬出，是Reg矢量编程中最常见的搬运接口。在搬运时可以按照内置的功能随路进行数据排布等操作，具体功能以对应API章节为准。
 
 ```cpp
 AscendC::Reg::LoadAlign(srcReg, srcAddr);
@@ -202,7 +202,7 @@ AscendC::Reg::StoreAlign(dstAddr, dstReg, mask);
 
 #### 非对齐搬运
 
-连续非对齐搬入由[`LoadUnAlignPre`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadUnAlign_continuous.md)和[`LoadUnAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadUnAlign_continuous.md)组合使用；连续非对齐搬出由[`StoreUnAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreUnAlign_continuous.md)和[`StoreUnAlignPost`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreUnAlign_continuous.md)组合使用。
+连续非对齐搬入由[`LoadUnAlignPre`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadUnAlign_continuous.md)和[`LoadUnAlign`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadUnAlign_continuous.md)组合使用；连续非对齐搬出由[`StoreUnAlign`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreUnAlign_continuous.md)和[`StoreUnAlignPost`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreUnAlign_continuous.md)组合使用。
 
 ```cpp
 AscendC::Reg::UnalignRegForLoad loadUreg;
@@ -247,7 +247,7 @@ AscendC::Reg::Select(dstReg, src0Reg, src1Reg, cmpMaskReg, mask);
 
 ### 同步控制类
 
-基础API使用[`LocalMemBar`](../../../../../api/SIMD-API/基础API/Reg矢量计算/同步控制/LocalMemBar.md)表达VF内部对UB访问流水线的同步约束。
+基础API使用[`LocalMemBar`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/sync_control/LocalMemBar.md)表达VF内部对UB访问流水线的同步约束。
 
 ```cpp
 AscendC::Reg::Store(dstAddr, dstReg);
@@ -256,7 +256,7 @@ AscendC::Reg::LocalMemBar<AscendC::Reg::MemType::VEC_STORE,
 AscendC::Reg::Load(srcReg, dstAddr);
 ```
 
-何时需要同步与API命名无关，判断规则请参考[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/Reg矢量计算编程.md)中的“流水线同步”章节。
+何时需要同步与API命名无关，判断规则请参考[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/reg_vector_compute编程.md)中的“流水线同步”章节。
 
 ## 编程示例<a name="section_part6"></a>
 

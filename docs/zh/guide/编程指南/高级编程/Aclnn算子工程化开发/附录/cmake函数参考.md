@@ -286,5 +286,5 @@ npu_op_code_gen(
 ## 相关文档
 
 - [算子工程编译拓展](../编译与部署/基本流程.md#advanced-build-organization) — 完整的CMakeLists.txt编写方法与编译命令说明。
-- [算子原型定义](../设计与实现/算子原型定义.md) — Kernel实现文件名与OpType的转换规则。
-- [如何使用workspace](../../../附录/常用操作/如何使用workspace.md) — Tiling函数中workspace的设置方法。
+- [算子原型定义](../设计与实现/算子原type定义.md) — Kernel实现文件名与OpType的转换规则。
+- [如何使用workspace](../../../appendix/常用操作/如何使用workspace.md) — Tiling函数中workspace的设置方法。

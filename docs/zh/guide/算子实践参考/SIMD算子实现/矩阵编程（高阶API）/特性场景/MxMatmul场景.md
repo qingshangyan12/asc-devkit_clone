@@ -84,7 +84,7 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
 2.  **设置A、B、C、Bias的内存逻辑位置、格式、数据类型以及是否转置的信息，设置scaleA、scaleB的内存逻辑位置、格式以及是否转置的信息。**
 
-    调用[SetScaleAType](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling类/SetScaleAType.md)、[SetScaleBType](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling类/SetScaleBType.md)接口，设置scaleA、scaleB的内存逻辑位置、格式以及是否转置。
+    调用[SetScaleAType](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Tiling/SetScaleAType.md)、[SetScaleBType](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Tiling/SetScaleBType.md)接口，设置scaleA、scaleB的内存逻辑位置、格式以及是否转置。
 
     ```
     cubeTiling.SetAType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT8_E5M2, false);
@@ -97,7 +97,7 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
 3.  **设置MxMatmul场景**。
 
-    调用[SetMadType](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling类/SetMadType.md)接口，设置Tiling计算逻辑为MxMatmul场景。
+    调用[SetMadType](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Tiling/SetMadType.md)接口，设置Tiling计算逻辑为MxMatmul场景。
 
     ```
     cubetiling.SetMadType(MatrixMadType::MXMODE);
@@ -149,7 +149,7 @@ Kernel侧的关键步骤介绍如下：
     AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> mm;
     ```
 
-    创建对象时需要传入A、scaleA、B、scaleB、C、Bias的参数类型信息， A、scaleA、B、scaleB类型信息通过[MatmulTypeWithScale](#zh-cn_topic_0000002270097206_table14759942142014)来定义，C、Bias类型信息通过[MatmulType](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul使用说明.md)来定义，包括：内存逻辑位置、数据格式、数据类型、转置信息。同时，通过模板参数[MatmulPolicy](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulPolicy.md)传入[MatmulWithScalePolicy](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulPolicy.md)表明开启MxMatmul场景。
+    创建对象时需要传入A、scaleA、B、scaleB、C、Bias的参数类型信息， A、scaleA、B、scaleB类型信息通过[MatmulTypeWithScale](#zh-cn_topic_0000002270097206_table14759942142014)来定义，C、Bias类型信息通过[MatmulType](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/Matmul_usage.md)来定义，包括：内存逻辑位置、数据格式、数据类型、转置信息。同时，通过模板参数[MatmulPolicy](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/MatmulPolicy.md)传入[MatmulWithScalePolicy](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/MatmulPolicy.md)表明开启MxMatmul场景。
 
     ```
     template <TPosition POSITION, TPosition SCALE_POSITION, CubeFormat FORMAT, typename TYPE, bool ISTRANS = false, TPosition SRCPOS = TPosition::GM, CubeFormat SCALE_FORMAT = FORMAT, bool SCALE_ISTRANS = ISTRANS, TPosition SCALE_SRCPOS = SRCPOS>
@@ -169,7 +169,7 @@ Kernel侧的关键步骤介绍如下：
 
 3.  **设置左矩阵A、右矩阵B、左量化系数矩阵scaleA、右量化系数矩阵scaleB、Bias。**
 
-    通过[SetTensorScaleA](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorScaleA.md)、[SetTensorScaleB](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorScaleB.md)设置左量化系数矩阵scaleA、右量化系数矩阵scaleB。
+    通过[SetTensorScaleA](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/SetTensorScaleA.md)、[SetTensorScaleB](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/SetTensorScaleB.md)设置左量化系数矩阵scaleA、右量化系数矩阵scaleB。
 
     ```
     mm.SetTensorA(gm_a, isTransposeA);    // 设置左矩阵A
@@ -180,7 +180,7 @@ Kernel侧的关键步骤介绍如下：
     ```
 
 4.  **完成矩阵乘操作。**
-    -   调用[Iterate](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
+    -   调用[Iterate](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
 
         ```
         while (mm.Iterate()) {
@@ -188,7 +188,7 @@ Kernel侧的关键步骤介绍如下：
         }
         ```
 
-    -   调用[IterateAll](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/IterateAll.md)完成单核上所有数据的计算。[IterateAll](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/IterateAll.md)方式，无需循环迭代，使用比较简单。
+    -   调用[IterateAll](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/IterateAll.md)完成单核上所有数据的计算。[IterateAll](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/IterateAll.md)方式，无需循环迭代，使用比较简单。
 
         ```
         mm.IterateAll(gm_c);
@@ -215,20 +215,20 @@ Kernel侧的关键步骤介绍如下：
 | TYPE | 数据类型。<!-- npu="950" id5 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t<br><br>B矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t<!-- end id5 --><br><br>注意：具体数据类型组合关系请参考[MxMatmul支持数据类型](#zh-cn_topic_0000002270097206_table5383144710452)。 |
 | ISTRANS | 是否开启A、B矩阵转置的功能。默认值为false。参数支持的取值如下：<br><br>true：开启矩阵转置的功能，开启后，分别通过SetTensorA和SetTensorB中的isTransposeA、isTransposeB参数设置A、B矩阵是否转置。若设置A、B矩阵转置，Matmul会认为A矩阵形状为[K, M]，B矩阵形状为[N, K]。<br><br>false：不开启矩阵转置的功能，通过SetTensorA和SetTensorB不能设置A、B矩阵的转置情况。Matmul会认为A矩阵形状为[M, K]，B矩阵形状为[K, N]。 |
 | SRCPOS | A/B矩阵的POSITION参数配置为TPosition::TSCM时，要设置TSCM中矩阵数据的来源的内存逻辑位置，默认为TPosition::GM。<!-- npu="950" id6 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为TPosition::GM，TPosition::VECOUT<br><br>B矩阵可设置为TPosition::GM，TPosition::VECOUT<!-- end id6 --> |
-| SCALE_FORMAT | 量化系数矩阵的物理排布格式，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig107863142019)。默认值为FORMAT参数的取值。<!-- npu="950" id7 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR<br><br>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ<!-- end id7 --><br><br>注意：<br><br>NZ排布格式请参考[NZ](../../../../技术附录/概念原理和术语/神经网络和算子/数据排布格式.md#li19960204116136)。MxMatmul场景，scaleA、scaleB的数据类型为fp8_e8m0_t，分形大小H0=16，W0=2。<br><br>在Scale矩阵为ND格式的场景中，当通过SetTensorScaleA接口设置scaleA矩阵转置时，scaleA内存排布格式必须按照(K/64, M，2)排布，通过SetTensorScaleB接口设置scaleB矩阵不转置时，scaleB内存排布格式必须按照(K/64，N， 2)排布，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig76682054103416)。 |
+| SCALE_FORMAT | 量化系数矩阵的物理排布格式，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig107863142019)。默认值为FORMAT参数的取值。<!-- npu="950" id7 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR<br><br>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ<!-- end id7 --><br><br>注意：<br><br>NZ排布格式请参考[NZ](../../../../技术appendix/概念原理和术语/神经网络和算子/数据排布格式.md#li19960204116136)。MxMatmul场景，scaleA、scaleB的数据类型为fp8_e8m0_t，分形大小H0=16，W0=2。<br><br>在Scale矩阵为ND格式的场景中，当通过SetTensorScaleA接口设置scaleA矩阵转置时，scaleA内存排布格式必须按照(K/64, M，2)排布，通过SetTensorScaleB接口设置scaleB矩阵不转置时，scaleB内存排布格式必须按照(K/64，N， 2)排布，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig76682054103416)。 |
 | SCALE_ISTRANS | 是否开启scaleA、scaleB矩阵转置的功能。默认值为ISTRANS参数的取值。参数支持的取值如下：<br><br>true：开启矩阵转置的功能。开启后，分别通过SetTensorScaleA和SetTensorScaleB中的isTransposeScaleA、isTransposeScaleB参数设置scaleA、scaleB矩阵是否转置。在Scale矩阵为ND格式的场景中，若设置scaleA、scaleB矩阵转置，Matmul会认为scaleA矩阵形状为[Ceil(K/64), M, 2]，scaleB矩阵形状为[N, Ceil(K/64), 2]。<br><br>false：不开启矩阵转置的功能。通过SetTensorScaleA和SetTensorScaleB不能设置scaleA、scaleB矩阵的转置情况。Matmul会认为scaleA矩阵形状为[M, Ceil(K/64), 2]，scaleB矩阵形状为[Ceil(K/64), N, 2]。 |
 | SCALE_SRCPOS | scaleA、scaleB矩阵的SCALE_POSITION参数设置为TPosition::TSCM时，需要通过本参数设置TSCM中矩阵数据来源的内存逻辑位置，默认值为SRCPOS参数的取值。<!-- npu="950" id8 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT<br><br>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT<!-- end id8 --> |
 
 ## 约束说明
 
--   MxMatmul场景仅支持[Norm模板](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)和[MDL模板](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)。
+-   MxMatmul场景仅支持[Norm模板](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/MatmulConfig.md)和[MDL模板](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/MatmulConfig.md)。
 
 -   在MxMatmul场景中，如果A与B矩阵的位置同时为GM，对singleKIn没有特殊限制，在这种情况下，若scaleA和scaleB的K方向大小（即Ceil\(singleKIn, 32\)）为奇数，用户需自行在scaleA和scaleB的K方向补0至偶数。例如，当singleKIn为30时，Ceil\(singleKIn, 32\)为1，用户需要自行在scaleA和scaleB的K方向补0，使K方向为偶数。对于其它A、B矩阵逻辑位置的组合情况，即A与B矩阵的位置不同时为GM，singleKIn以32个元素向上对齐后的数值必须是32的偶数倍。
 -   在MxMatmul场景中，当输入数据类型为fp4x2\_e2m1\_t/fp4x2\_e1m2\_t时，内轴必须为偶数。
 -   在MxMatmul场景中，通过将A矩阵和scaleA矩阵的数据格式设置为VECTOR，来开启[GEMV模式](矩阵向量乘.md)。在此模式下，A和scaleA矩阵仅支持内存逻辑位置为GM，并且均不支持转置。
 -   A矩阵、B矩阵为UB输入时，矩阵的内轴需要向上32字节对齐，例如，A矩阵的形状为\(M, K\)时，将K对齐到32字节；A矩阵的形状为\(K, M\)时，将M对齐到32字节。
 -   scaleA矩阵、scaleB矩阵为UB输入时，矩阵的内轴需要向上32字节对齐，例如，scaleA矩阵的形状为\(M, K/32\)时，将K/32对齐到32字节；scaleA矩阵的形状为\(K/32, M\)时，将M对齐到32字节。
--   当scaleA和scaleB矩阵以ND格式输入时，高阶API在内部实现格式转换时，需要占用UB临时空间。开发者需使用[SetLocalWorkspace](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetLocalWorkspace.md)接口配置临时空间，临时空间大小（单位字节）的计算公式如下。
+-   当scaleA和scaleB矩阵以ND格式输入时，高阶API在内部实现格式转换时，需要占用UB临时空间。开发者需使用[SetLocalWorkspace](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul-Kernel_side_interface/SetLocalWorkspace.md)接口配置临时空间，临时空间大小（单位字节）的计算公式如下。
 
     ```
     int32_t scaleATmpBuf = 0;

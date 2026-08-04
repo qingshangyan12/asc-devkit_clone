@@ -145,12 +145,12 @@ PIPE_MTE3
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 当`n_burst`、`len_burst`中任意一个值为0时，该接口被视为NOP（空操作）。
 - 当`size`值为0时，该接口被视为NOP（空操作）。
 - 如果需要执行多条`asc_copy_ub2gm_align`指令，且`asc_copy_ub2gm_align`指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个`asc_copy_ub2gm_align`指令的串行化，防止出现异常数据。
 - 前n个数据搬运接口的`size`无需32字节对齐。若`size`非32字节对齐，硬件会自动补充dummy假数据至32字节对齐。dummy假数据的值为数据块的第一个元素的值。写入GM时会丢弃补充的dummy假数据。
-- 当`src_stride`设置为0时，可能会出现**硬件未定义行为**。如需将同一个源数据块Broadcast到GM的多个连续位置，建议使用loop功能，具体请参考[关键特性说明](#关键特性说明)。
+- 当`src_stride`设置为0时，可能会出现**硬件未定义行为**。如需将同一个源数据块Broadcast到GM的多个连续位置，建议使用loop功能，具体请参考[关键特性说明](#key_features)。
 - 当`src_stride`不等于`len_burst`时，`src_stride`要求32字节对齐。
 
 ## 关键特性说明

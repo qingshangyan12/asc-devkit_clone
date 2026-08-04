@@ -2,7 +2,7 @@
 
 本文属于扩展内容，介绍算子属性参与Kernel计算时所需的数据传递方法。算子属性在Host侧保存，Kernel不能直接读取。属性需要参与Kernel计算时，Host侧Tiling函数先读取属性值，再把Kernel真正需要的数据写入TilingData，由框架传到Kernel侧。
 
-本文以LeakyReluCustom的`negative_slope`属性为例，介绍如何通过TilingData将属性从Host侧传递至Kernel侧，包括在算子原型中声明属性、在Host侧读取属性并写入TilingData，以及在Kernel侧从TilingData中读取并使用该属性。TilingData的基础定义和写入方法见[基本流程](./Host侧Tiling实现.md)。
+本文以LeakyReluCustom的`negative_slope`属性为例，介绍如何通过TilingData将属性从Host侧传递至Kernel侧，包括在算子原型中声明属性、在Host侧读取属性并写入TilingData，以及在Kernel侧从TilingData中读取并使用该属性。TilingData的基础定义和写入方法见[基本流程](./Host_sideTiling实现.md)。
 
 ## 属性传递流程
 
@@ -37,7 +37,7 @@ this->Attr("negative_slope")
     .Float(0.0f);
 ```
 
-`OPTIONAL`表示调用算子时可以不显式传入该属性；未传入时，使用`Float(0.0f)`设置的默认值。属性在原型中的声明位置和基础用法见[算子原型定义](./算子原型定义.md)；`AttrType`以及`Bool`、`Float`、`Int`等属性类型接口的参数和默认值约束见[OpAttrDef](../../../../../api/Utils-API/原型注册与管理/OpAttrDef/OpAttrDef-272.md)。
+`OPTIONAL`表示调用算子时可以不显式传入该属性；未传入时，使用`Float(0.0f)`设置的默认值。属性在原型中的声明位置和基础用法见[算子原型定义](./算子原type定义.md)；`AttrType`以及`Bool`、`Float`、`Int`等属性类型接口的参数和默认值约束见[OpAttrDef](../../../../../api/Utils-API/prototype_register_management/OpAttrDef/OpAttrDef-272.md)。
 
 ## 在TilingData中增加字段
 
@@ -189,7 +189,7 @@ y = tmpTensor1 + tmpTensor2
 
 ## 相关文档
 
-- [算子原型定义](./算子原型定义.md)：声明属性及默认值。
-- [Host侧Tiling实现](./Host侧Tiling实现.md)：定义和写入TilingData。
-- [Kernel侧算子实现](./Kernel侧算子实现.md)：注册、解析并使用TilingData。
+- [算子原型定义](./算子原type定义.md)：声明属性及默认值。
+- [Host侧Tiling实现](./Host_sideTiling实现.md)：定义和写入TilingData。
+- [Kernel侧算子实现](./Kernel_side算子实现.md)：注册、解析并使用TilingData。
 - [多分支策略](./多分支策略.md)：使用属性选择TilingKey或Kernel模板分支。

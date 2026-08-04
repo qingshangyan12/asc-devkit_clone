@@ -118,7 +118,7 @@ PIPE_MTE1
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 本接口不支持2D格式搬运的转置场景，若要实现请参考[asc_copy_l12l0b_trans](../asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md)。
 
 ## 3D数据格式说明

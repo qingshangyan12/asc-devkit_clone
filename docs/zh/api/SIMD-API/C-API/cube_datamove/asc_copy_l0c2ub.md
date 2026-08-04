@@ -61,8 +61,8 @@ quant_pre_mode量化模式参数支持的枚举值如下：
 - VQF322HIF8_PRE：float量化成hifloat8_t(Half to Away Round)，tensor量化
 - QF322HIF8_PRE_HYBRID：float量化成hifloat8_t(Hybrid Round)，scalar量化
 - VQF322HIF8_PRE_HYBRID：float量化成hifloat8_t(Hybrid Round)，tensor量化
-- QF322F32_PRE：float量化成float，scalar量化，精度可以达到双千分之一，无法达到双万分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../高阶API/量化操作/AscendDequant.md)高阶API。
-- VQF322F32_PRE：float量化成float，tensor量化，精度可以达到双千分之一，无法达到双万分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../高阶API/量化操作/AscendDequant.md)高阶API。
+- QF322F32_PRE：float量化成float，scalar量化，精度可以达到双千分之一，无法达到双万分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../high_level_api/quantization/AscendDequant.md)高阶API。
+- VQF322F32_PRE：float量化成float，tensor量化，精度可以达到双千分之一，无法达到双万分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../high_level_api/quantization/AscendDequant.md)高阶API。
 
 ## 函数原型
 
@@ -283,7 +283,7 @@ PIPE_FIX
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 
 ## 调用示例
 
