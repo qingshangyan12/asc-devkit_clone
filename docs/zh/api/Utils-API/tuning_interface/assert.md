@@ -80,6 +80,10 @@ assert(expr)
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
       <!-- end id12 -->
 <!-- end id13 -->
+<!-- npu="950" id14 -->
+-   在`simd_vf`场景下，每个AIV核在单次`asc_vf_call`执行期间使用2KB的预留Unified Buffer（UB）空间作为FIFO临时缓冲区；同一次`asc_vf_call`中的所有`simd_vf`的`printf`、`asc_dump`以及`assert`失败信息共享该缓冲区。
+-   同一次`asc_vf_call`中，`printf`、`asc_dump`以及`assert`失败信息产生的累计调测数据可以超过2KB。当前FIFO缓冲区剩余空间不足以容纳下一条完整编码数据时，SIMD VF会等待AI Core将已有数据搬运至GM FIFO；搬运完成后，清零UB读写位置并继续写入。`assert`失败信息中的每条完整编码数据必须能放入该缓冲区，否则该条数据不会打印。
+<!-- end id14 -->
 
 ## 需要包含的头文件
 
