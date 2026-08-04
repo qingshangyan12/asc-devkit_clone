@@ -49,6 +49,14 @@ __simd_callee__ inline void asc_duplicate_scalar_impl(vector_fp8_e5m2_t& dst, fp
     }
 }
 
+__simd_callee__ inline void asc_duplicate_scalar_impl(vector_fp8_e8m0_t& dst, fp8_e8m0_t value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        float8_e8m0_t* value_tmp = reinterpret_cast<float8_e8m0_t*>(&value);
+        vdup(dst, *value_tmp, mask, MODE_ZEROING);
+    }
+}
+
 __simd_callee__ inline void asc_duplicate_scalar_impl(vector_uint16_t& dst, uint16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -129,6 +137,15 @@ asc_duplicate_scalar_merge_impl(vector_fp8_e5m2_t& dst, fp8_e5m2_t value, vector
 {
     if ASC_IS_AIV {
         float8_e5m2_t* value_tmp = reinterpret_cast<float8_e5m2_t*>(&value);
+        vdup(dst, *value_tmp, mask, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void
+asc_duplicate_scalar_merge_impl(vector_fp8_e8m0_t& dst, fp8_e8m0_t value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        float8_e8m0_t* value_tmp = reinterpret_cast<float8_e8m0_t*>(&value);
         vdup(dst, *value_tmp, mask, MODE_MERGING);
     }
 }

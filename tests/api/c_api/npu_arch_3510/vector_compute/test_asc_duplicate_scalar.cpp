@@ -22,7 +22,10 @@
     };                                                                                                             \
                                                                                                                    \
     namespace {                                                                                                    \
-    void cce_name##_##data_type##_Stub(vector_##data_type& dst, data_type src0, vector_bool mask, Literal mode) {} \
+    void cce_name##_##data_type##_Stub(vector_##data_type& dst, data_type src0, vector_bool mask, Literal mode)    \
+    {                                                                                                             \
+        EXPECT_EQ(mode, MODE_ZEROING);                                                                            \
+    }                                                                                                             \
     }                                                                                                              \
                                                                                                                    \
     TEST_F(TestVectorCompute##class_name####data_type##CApi, c_api_name##_##data_type##_Succ)                      \
@@ -43,6 +46,7 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, ui
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int8_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fp8_e4m3fn_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fp8_e5m2_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fp8_e8m0_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, uint16_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int16_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, half);
@@ -85,6 +89,7 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_mer
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, int8_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, fp8_e4m3fn_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, fp8_e5m2_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, fp8_e8m0_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, uint16_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, int16_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, half);
