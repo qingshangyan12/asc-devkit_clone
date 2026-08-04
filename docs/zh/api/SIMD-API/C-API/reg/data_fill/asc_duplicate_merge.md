@@ -58,18 +58,13 @@ __simd_callee__ inline void asc_duplicate_merge(vector_float& dst, vector_float 
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
-## 数据类型
-
-`dst`和`src`支持的数据类型为：`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
-
 ## 返回值说明
 
 无
 
 ## 约束说明
 
-- `dst`和`src`的数据类型必须保持一致。
-- `dst`中未被mask筛选的位置保持原值。
+无
 
 ## 调用示例
 
