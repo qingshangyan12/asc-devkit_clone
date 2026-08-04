@@ -17,7 +17,7 @@
 
 #include <cstdint>
 
-#include "graph/tensor.h"
+#include "../utils/types.h"
 namespace AscendC {
 /*!
  * \brief This interface is used to obtain the maximum and minimum temporary space reserved or applied.
@@ -30,7 +30,11 @@ namespace AscendC {
  * \param [out] minValue, minimum temporary space required
  */
 void GetTanMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+>>>>>>> upstream/master
     uint32_t& minValue);
 
 /*!
@@ -45,4 +49,8 @@ void GetTanMaxMinTmpSize(
  */
 void GetTanTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf);
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_TAN_TILING_H
+=======
+#endif // LIB_MATH_TAN_TILING_H
+>>>>>>> upstream/master

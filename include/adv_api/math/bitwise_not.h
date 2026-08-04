@@ -13,6 +13,13 @@
  * \brief
  */
 
+<<<<<<< HEAD
+=======
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "bitwise_not.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
+>>>>>>> upstream/master
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_BITWISE_NOT_H__

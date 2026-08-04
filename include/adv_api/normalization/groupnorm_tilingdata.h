@@ -51,4 +51,8 @@ TILING_DATA_FIELD_DEF(float, factor);
 TILING_DATA_FIELD_DEF(bool, smallShape);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // LIB_NORMALIZATION_GROUPNORM_TILINGDATA_H
+=======
+#endif // LIB_NORMALIZATION_GROUPNORM_TILINGDATA_H
+>>>>>>> upstream/master

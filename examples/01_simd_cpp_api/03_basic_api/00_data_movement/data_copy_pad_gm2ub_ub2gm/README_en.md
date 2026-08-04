@@ -114,7 +114,11 @@ This example selects different scenarios through the build parameter `SCENARIO_N
 Run the following steps in the root directory of this example to build and run it.
 
 - Configure environment variables
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

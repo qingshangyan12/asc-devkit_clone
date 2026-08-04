@@ -180,4 +180,8 @@ u32 CalRankSize(const TopoMeta& topoMeta)
     return rankNum;
 }
 
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

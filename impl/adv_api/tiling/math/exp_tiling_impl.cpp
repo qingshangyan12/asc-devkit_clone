@@ -12,9 +12,14 @@
  * \file exp_tiling_impl.cpp
  * \brief
  */
+#include "adv_api/utils/types.h"
 #include <cstdint>
+<<<<<<< HEAD
 #include "../../../../include/adv_api/math/exp_tiling.h"
 #include "graph/tensor.h"
+=======
+#include "adv_api/math/exp_tiling.h"
+>>>>>>> upstream/master
 
 namespace AscendC {
 namespace {
@@ -59,7 +64,7 @@ void GetExpTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCou
 }
 
 bool GetExpMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     const uint32_t inputSize = srcShape.GetShapeSize();

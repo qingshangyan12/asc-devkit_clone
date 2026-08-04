@@ -24,20 +24,37 @@ ERROR_TOL = 1e-4
 def verify_result(output, golden):
     output = np.fromfile(output, dtype=np.float16).reshape(-1)
     golden = np.fromfile(golden, dtype=np.float16).reshape(-1)
+<<<<<<< HEAD
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=RELATIVE_TOL,
                                            atol=ABSOLUTE_TOL,
                                            equal_nan=True)
+=======
+    different_element_results = np.isclose(
+        output, golden, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True
+    )
+>>>>>>> upstream/master
     different_element_indexes = np.where(different_element_results == False)[0]
     for index in range(len(different_element_indexes)):
         real_index = different_element_indexes[index]
         golden_data = golden[real_index]
         output_data = output[real_index]
         print(
+<<<<<<< HEAD
             "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f" %
             (real_index, golden_data, output_data,
             abs(output_data - golden_data) / golden_data))
+=======
+            "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f"
+            % (
+                real_index,
+                golden_data,
+                output_data,
+                abs(output_data - golden_data) / golden_data,
+            )
+        )
+>>>>>>> upstream/master
         if index == 100:
             break
     print("golden_data : ", golden)
@@ -47,7 +64,11 @@ def verify_result(output, golden):
     return error_ratio <= ERROR_TOL
 
 
+<<<<<<< HEAD
 if __name__ == '__main__':
+=======
+if __name__ == "__main__":
+>>>>>>> upstream/master
     try:
         res = verify_result(sys.argv[1], sys.argv[2])
         if not res:

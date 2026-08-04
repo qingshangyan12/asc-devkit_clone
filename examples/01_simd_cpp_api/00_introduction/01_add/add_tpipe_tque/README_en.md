@@ -66,7 +66,11 @@ This sample implements the Add vector addition operation based on the memory and
 
 Execute the following steps in the root directory of this sample to compile and run the sample.
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development toolkit package on the current environment.
+=======
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development toolkit package on the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

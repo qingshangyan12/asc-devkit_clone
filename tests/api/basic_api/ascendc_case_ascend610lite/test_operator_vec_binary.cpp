@@ -387,4 +387,8 @@ UNSUPPORT_MAP(Max, max, uint8_t, int8_t, uint16_t, uint32_t);
 UNSUPPORT_MAP(Min, min, uint8_t, int8_t, uint16_t, uint32_t);
 UNSUPPORT_MAP(Div, div, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t);
 UNSUPPORT_MAP(Or, or, uint8_t, int8_t, uint32_t, int32_t, half, float);
+<<<<<<< HEAD
 UNSUPPORT_MAP(And, and, uint8_t, int8_t, uint32_t, int32_t, half, float);
+=======
+UNSUPPORT_MAP(And, and, uint8_t, int8_t, uint32_t, int32_t, half, float);
+>>>>>>> upstream/master

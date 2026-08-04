@@ -31,7 +31,11 @@ The example supports switching between different scenarios through compilation p
 This example switches between different scenarios through the compilation parameter `SCENARIO_NUM`:
 
 **Scenario 1: Compare**
+<<<<<<< HEAD
 - Description: Element-wise comparison of `src0Local` and `src1Local` tensor sizes
+=======
+- Description: Element-wise comparison of the values in `src0Local` and `src1Local`
+>>>>>>> upstream/master
 - Input: src0Local=[1, 256], src1Local=[1, 256]
 - Input data type: float
 - Output: dstLocal=[1, 32]
@@ -43,7 +47,11 @@ This example switches between different scenarios through the compilation parame
 - Parameters: cmpMode=AscendC::CMPMODE::LT, srcDataSize=256
 
 **Scenario 2: Compare (Result Stored in Register)**
+<<<<<<< HEAD
 - Description: Element-wise comparison of `src0Local` and `src1Local` tensor sizes, storing results in the cmpMask register
+=======
+- Description: Element-wise comparison of the values in `src0Local` and `src1Local`, storing the results in the cmpMask register
+>>>>>>> upstream/master
 - Input: src0Local=[1, 64], src1Local=[1, 64] 
 - Input data type: float
 - Output: [1, 32] 
@@ -62,6 +70,10 @@ This example switches between different scenarios through the compilation parame
 - Input data type: float
 - Output: dstLocal=[1, 32]
 - Output data type: uint8_t
+<<<<<<< HEAD
+=======
+- Data type: float
+>>>>>>> upstream/master
 - Implementation:
     ```cpp
     AscendC::Compares(dstLocal, src0Local, src1Scalar, cmpMode, srcDataSize);
@@ -85,7 +97,11 @@ This example switches between different scenarios through the compilation parame
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables  
+<<<<<<< HEAD
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

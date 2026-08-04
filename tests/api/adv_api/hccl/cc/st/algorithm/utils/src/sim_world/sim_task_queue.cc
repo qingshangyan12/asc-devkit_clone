@@ -33,4 +33,8 @@ void SimTaskQueue::AppendTask(NpuPos npuPos, SimStream* stream, std::shared_ptr<
 
 AllRankTaskQueues& SimTaskQueue::GetAllRankTaskQueues() { return allRankTask_; }
 
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

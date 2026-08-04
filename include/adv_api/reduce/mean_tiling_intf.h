@@ -20,4 +20,8 @@ namespace AscendC {
 [[deprecated(__FILE__ " is deprecated, please use mean_tiling.h instead!")]] typedef void MeanTilingDeprecatedHeader;
 using LibMeanTilingInterface = MeanTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_REDUCE_MEAN_TILING_INTF
+=======
+#endif // LIB_REDUCE_MEAN_TILING_INTF
+>>>>>>> upstream/master

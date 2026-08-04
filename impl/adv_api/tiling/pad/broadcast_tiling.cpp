@@ -13,10 +13,17 @@
  * \brief
  */
 
+<<<<<<< HEAD
 #include "../../../../include/adv_api/pad/broadcast_tiling.h"
 #include "../../detail/host_log.h"
 #include "graph/tensor.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
+=======
+#include "adv_api/utils/types.h"
+#include "adv_api/pad/broadcast_tiling.h"
+#include "../../detail/host_log.h"
+#include "utils/tiling/platform/platform_ascendc.h"
+>>>>>>> upstream/master
 namespace AscendC {
 namespace {
 constexpr uint32_t ONE_BLK_SIZE = 32;
@@ -26,7 +33,8 @@ constexpr uint32_t CAST_DIM_TWO = 2;
 constexpr uint32_t CAST_TYPE_TWO = 2;
 constexpr uint32_t CAST_TYPE_FOUR = 4;
 
-uint32_t GetCastTempBuffer(const ge::Shape& srcShape, const ge::Shape& dstShape, uint32_t& typeSize)
+uint32_t GetCastTempBuffer(
+    const AscendC::TensorShape& srcShape, const AscendC::TensorShape& dstShape, uint32_t& typeSize)
 {
     uint32_t castTempBuffer = 0;
     if (typeSize == sizeof(int8_t)) {
@@ -41,7 +49,8 @@ uint32_t GetCastTempBuffer(const ge::Shape& srcShape, const ge::Shape& dstShape,
 }
 
 void GetBroadCastMaxMinTmpSize220(
-    const ge::Shape& srcShape, const ge::Shape& dstShape, uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
+    const AscendC::TensorShape& srcShape, const AscendC::TensorShape& dstShape, uint32_t typeSize, uint32_t& maxValue,
+    uint32_t& minValue)
 {
     uint32_t castTempBuffer = GetCastTempBuffer(srcShape, dstShape, typeSize);
     const uint32_t oneBlockElementNum = ONE_BLK_SIZE / typeSize;
@@ -73,8 +82,8 @@ void GetBroadCastMaxMinTmpSize220(
 }
 
 void CheckBroadCastParams(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const ge::Shape& dstShape,
-    uint32_t typeSize, const bool isReuseSource, const char* funcName)
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape,
+    const AscendC::TensorShape& dstShape, uint32_t typeSize, const bool isReuseSource, const char* funcName)
 {
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     if (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_2002) {
@@ -99,8 +108,9 @@ void CheckBroadCastParams(
 } // namespace
 
 void GetBroadCastMaxMinTmpSize(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const ge::Shape& dstShape,
-    uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape,
+    const AscendC::TensorShape& dstShape, uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 {
     CheckBroadCastParams(ascendcPlatform, srcShape, dstShape, typeSize, isReuseSource, "GetBroadCastMaxMinTmpSize");
 

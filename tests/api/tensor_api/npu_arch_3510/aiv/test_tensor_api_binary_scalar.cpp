@@ -9,7 +9,11 @@
  */
 
 #include <gtest/gtest.h>
+<<<<<<< HEAD
 #include "tensor_api/stub/cce_stub.h"
+=======
+#include "c_api/stub/cce_stub.h"
+>>>>>>> upstream/master
 #include "tensor_api/tensor.h"
 
 class Tensor_Api_Vector_BinaryScalar_3510 : public testing::Test {

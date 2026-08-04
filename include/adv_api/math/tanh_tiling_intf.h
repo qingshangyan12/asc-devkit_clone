@@ -21,4 +21,8 @@ namespace AscendC {
 typedef void TanhTilingDeprecatedHeader;
 using LibTanhTilingInterface = TanhTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_TANH_TILING_INTF_H
+=======
+#endif // LIB_MATH_TANH_TILING_INTF_H
+>>>>>>> upstream/master

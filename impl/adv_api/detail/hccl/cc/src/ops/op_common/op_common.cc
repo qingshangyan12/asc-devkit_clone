@@ -37,6 +37,7 @@
 #include "op_common.h"
 #include "dpu/kernel_launch.h"
 #include "hcomm_host_profiling_dl.h"
+#include "hcomm_primitives_dl.h"
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
@@ -86,6 +87,7 @@ namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0; // host主流wait aicpu流的notify idx
+<<<<<<< HEAD
 
 // 检查非对称拓扑支持情况
 // 仅 AllGather, AllReduce, ReduceScatter 支持跨框非对称拓扑，其他算子拦截
@@ -107,6 +109,8 @@ HcclResult CheckAsymmetricTopoSupport(HcclCMDType opType, const TopoInfoWithNetL
     }
     return HCCL_SUCCESS;
 }
+=======
+>>>>>>> upstream/master
 
 HcclResult Selector(
     HcclComm comm, OpParam& param, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName)
@@ -119,9 +123,6 @@ HcclResult Selector(
     CHK_RET(HcclGetOpExpansionMode(comm, param));
     // 获取基础拓扑
     CHK_RET(HcclCalcTopoInfo(comm, param, topoInfo));
-
-    // 检查非对称拓扑支持情况，非对称场景仅 AllGather/AllReduce/ReduceScatter 可用
-    CHK_RET(CheckAsymmetricTopoSupport(param.opType, topoInfo.get()));
 
     // 算法选择，选择完后顺便param.algTag设置了，资源的保存是以算子+算法为单位
     std::shared_ptr<ExecuteSelector> collAlgSelector = std::make_shared<ExecuteSelector>(ExecuteSelector());
@@ -349,6 +350,10 @@ HcclResult HcclExecOp(
 
     // 资源结构体
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
+    resCtxHost->isHcommBatchTransferOnThreadSupported = HcommIsSupportHcommBatchTransferOnThread();
+    HCCL_DEBUG(
+        "[MC2_BATCH_TRANSFER][HostSupport] opType[%u], algName[%s], supported[%d].", static_cast<u32>(param.opType),
+        algName.c_str(), static_cast<int>(resCtxHost->isHcommBatchTransferOnThreadSupported));
     // 资源序列化结果
     void* resCtxSequence = nullptr;
     bool isResourceReused = false;

@@ -223,4 +223,8 @@ using KernelCreator = std::function<std::unique_ptr<hcomm::CcuKernel>(const CcuK
 
 } // namespace hcomm
 
+<<<<<<< HEAD
 #endif // HCOMM_CCU_KERNEL_H
+=======
+#endif // HCOMM_CCU_KERNEL_H
+>>>>>>> upstream/master

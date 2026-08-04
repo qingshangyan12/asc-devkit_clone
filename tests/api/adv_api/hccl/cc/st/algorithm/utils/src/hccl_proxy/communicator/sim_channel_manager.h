@@ -37,4 +37,8 @@ private:
 };
 
 }; // namespace HcclSim
+<<<<<<< HEAD
 #endif // SIM_CHANNEL_MANAGER_H
+=======
+#endif // SIM_CHANNEL_MANAGER_H
+>>>>>>> upstream/master

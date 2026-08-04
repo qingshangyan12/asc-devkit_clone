@@ -10,4 +10,8 @@
 
 #include "hccl/hcom.h"
 
+<<<<<<< HEAD
 HcclWorkflowMode GetWorkflowMode() { return HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE; }
+=======
+HcclWorkflowMode GetWorkflowMode() { return HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE; }
+>>>>>>> upstream/master

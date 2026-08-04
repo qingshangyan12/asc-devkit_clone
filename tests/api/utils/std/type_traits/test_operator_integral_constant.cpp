@@ -222,6 +222,7 @@ TEST(IntegralConstantTest, RuntimeUsage)
     }
     EXPECT_EQ(sum, 6); // 0+1+2+3=6
 }
+<<<<<<< HEAD
 
 TEST(IntegralConstantTest, IntNamedBinaryFunctions)
 {
@@ -255,3 +256,5 @@ TEST(IntegralConstantTest, IntNamedBinaryFunctions)
     EXPECT_EQ(ceil_align(Int<10>{}, 4U), 12U);
     EXPECT_EQ(ceil_align(10U, Int<4>{}), 12U);
 }
+=======
+>>>>>>> upstream/master

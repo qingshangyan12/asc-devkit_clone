@@ -21,6 +21,11 @@ protected:
 
 namespace {
 void pipe_barrier_Stub(pipe_t pipe) {}
+<<<<<<< HEAD
+=======
+
+void pipe_barrier_v_Stub(pipe_t pipe) { EXPECT_EQ(pipe_t::PIPE_V, pipe); }
+>>>>>>> upstream/master
 } // namespace
 
 TEST_F(TestSyncVec, c_api_asc_sync_vec_Succ)
@@ -30,6 +35,16 @@ TEST_F(TestSyncVec, c_api_asc_sync_vec_Succ)
     GlobalMockObject::verify();
 }
 
+<<<<<<< HEAD
+=======
+TEST_F(TestSyncVec, c_api_asc_sync_vec_new_Succ)
+{
+    MOCKER_CPP(pipe_barrier, void(pipe_t)).times(1).will(invoke(pipe_barrier_v_Stub));
+    asc_sync_vec(0);
+    GlobalMockObject::verify();
+}
+
+>>>>>>> upstream/master
 class TestSyncMte2 : public testing::Test {
 protected:
     void SetUp() {}

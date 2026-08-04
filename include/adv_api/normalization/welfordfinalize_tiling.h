@@ -16,7 +16,11 @@
 #define LIB_NORMALIZATION_WELFORDFINALIZE_TILING_H
 #include <cstdint>
 
+<<<<<<< HEAD
 #include "graph/tensor.h"
+=======
+#include "../utils/types.h"
+>>>>>>> upstream/master
 namespace AscendC {
 /*!
  * \brief calculate max and min tmp buffer size for WelfordFinalize interface.
@@ -27,7 +31,11 @@ namespace AscendC {
  * \param [out] minValue: min size required for tmp buffer
  */
 void GetWelfordFinalizeMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+>>>>>>> upstream/master
     uint32_t& minValue);
 } // namespace AscendC
 #endif // LIB_NORMALIZATION_WELFORDFINALIZE_TILING_H

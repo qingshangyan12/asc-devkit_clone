@@ -31,7 +31,11 @@
     {                                                                                            \
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                      \
         vector_store_unalign src;                                                                \
+<<<<<<< HEAD
         iter_reg offset;                                                                         \
+=======
+        addr_reg offset;                                                                         \
+>>>>>>> upstream/master
                                                                                                  \
         MOCKER_CPP(cce_name, void(vector_store_unalign, __ubuf__ data_type*&, int32_t, Literal)) \
             .times(1)                                                                            \
@@ -58,7 +62,11 @@
     {                                                                                                                  \
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                            \
         vector_store_unalign src;                                                                                      \
+<<<<<<< HEAD
         iter_reg offset;                                                                                               \
+=======
+        addr_reg offset;                                                                                               \
+>>>>>>> upstream/master
                                                                                                                        \
         MOCKER_CPP(cce_name, void(vector_store_unalign, __ubuf__ uint8_t*&, int32_t, Literal))                         \
             .times(1)                                                                                                  \
@@ -86,7 +94,11 @@
     {                                                                                                  \
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                            \
         vector_store_unalign src;                                                                      \
+<<<<<<< HEAD
         iter_reg offset;                                                                               \
+=======
+        addr_reg offset;                                                                               \
+>>>>>>> upstream/master
                                                                                                        \
         MOCKER_CPP(cce_name, void(vector_store_unalign, __ubuf__ float4_e1m2x2_t*&, int32_t, Literal)) \
             .times(1)                                                                                  \

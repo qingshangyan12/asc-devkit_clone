@@ -47,4 +47,8 @@ TILING_DATA_FIELD_DEF(uint16_t, vreducehalfValMask6);
 TILING_DATA_FIELD_DEF(uint16_t, vreducehalfValMask7);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // LIB_SORT_TOPK_TILINGDATA_H
+=======
+#endif // LIB_SORT_TOPK_TILINGDATA_H
+>>>>>>> upstream/master

@@ -491,4 +491,8 @@ static void test_host_broadcast()
 
 static void test_host_reduce_xor_sum() { using AscendC::ReduceXorSum; }
 
+<<<<<<< HEAD
 static void test_host_cumsum() { using AscendC::CumSum; }
+=======
+static void test_host_cumsum() { using AscendC::CumSum; }
+>>>>>>> upstream/master

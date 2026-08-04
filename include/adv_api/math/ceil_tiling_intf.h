@@ -23,4 +23,8 @@ namespace AscendC {
 typedef void CeilTilingDeprecatedHeader;
 using LibCeilTilingInterface = CeilTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_CEIL_TILING_INTF_H
+=======
+#endif // LIB_MATH_CEIL_TILING_INTF_H
+>>>>>>> upstream/master

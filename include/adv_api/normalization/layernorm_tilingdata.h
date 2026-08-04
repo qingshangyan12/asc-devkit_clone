@@ -76,4 +76,8 @@ TILING_DATA_FIELD_DEF(uint32_t, aCurLength);
 TILING_DATA_FIELD_DEF(float, rValueBack);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // LIB_NORMALIZATION_LAYERNORM_TILINGDATA_H
+=======
+#endif // LIB_NORMALIZATION_LAYERNORM_TILINGDATA_H
+>>>>>>> upstream/master

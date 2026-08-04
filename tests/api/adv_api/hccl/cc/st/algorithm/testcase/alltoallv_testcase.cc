@@ -762,4 +762,8 @@ TEST_F(ST_ALLTOALLV_TEST, st_alltoallv_28)
     RunAlltoAllVMeshTest(topoMeta, rankSize, dataType, sendCountMatrix);
 }
 
+<<<<<<< HEAD
 } // namespace checker
+=======
+} // namespace checker
+>>>>>>> upstream/master

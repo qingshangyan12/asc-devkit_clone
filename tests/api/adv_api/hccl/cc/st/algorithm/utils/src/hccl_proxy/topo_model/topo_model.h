@@ -90,4 +90,8 @@ private:
 
 }; // namespace HcclSim
 
+<<<<<<< HEAD
 #endif // SIM_TOPO_MODEL_H
+=======
+#endif // SIM_TOPO_MODEL_H
+>>>>>>> upstream/master

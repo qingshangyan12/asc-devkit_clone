@@ -28,7 +28,11 @@ This example demonstrates data transfer practices from Global Memory to UB and f
 
 ## Example Description
 
+<<<<<<< HEAD
 The input for this example is a half-type 2D matrix in ND format. The aligned scenario input shape is [12288, 12288], and the unaligned scenario input shape is [12287, 12287]. The destination storage location is selected through the build option `COPY_DST`, and different transfer scenarios are selected through `SCENARIO_NUM`.
+=======
+The input for this example is a half-type 2D matrix in ND format. The aligned scenario input shape is [12288, 12288], and the unaligned scenario input shape is [12288, 12287]. The destination storage location is selected through the build option `COPY_DST`, and different transfer scenarios are selected through `SCENARIO_NUM`.
+>>>>>>> upstream/master
 
 - `COPY_DST=UB`: Uses AIV cores to perform GM to UB transfer. Kernel name is `kernel_data_copy_pad_gm2ub`
 - `COPY_DST=L1`: Uses AIC cores to perform GM to L1 transfer. Kernel name is `kernel_data_copy_gm2l1`
@@ -212,7 +216,11 @@ In the unaligned scenario of this example, the full tile transfer volume for GM 
 
 ### Optimization Point 3: Repeated Transfer and L2Cache Reuse
 
+<<<<<<< HEAD
 **Implementation**: The repeated transfer scenario performs multiple rounds of GM reads on the same data scale, using `msprof --ai-core=on --aic-metrics=L2Cache` to collect L2Cache read hit and miss allocate data.
+=======
+**Implementation**: The repeated transfer scenario performs multiple rounds of GM reads on the same data scale, using `msopprof --ai-core=on --aic-metrics=L2Cache` to collect L2Cache read hit and miss allocate data.
+>>>>>>> upstream/master
 
 For full-block repeated transfer, `RepeatCopy(0, n, 4)` means `nStart=0`, `nCount=N`, `repeatTimes=4`, with each round reading the same data block along the full N direction. A2/A3 has an L2Cache size of 192MB, and 950PR has an L2Cache size of 128MB. In this example, a single `M * N` matrix is approximately 301.99MB. During full-block repeated transfer, the single-round working set exceeds L2Cache capacity, making write eviction likely and resulting in low L2Cache hit rates.
 
@@ -398,7 +406,11 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
 
 
   ```bash
@@ -424,7 +436,11 @@ Run the following steps in the root directory of this example to build and run t
   Example:
 
   ```bash
+<<<<<<< HEAD
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..
+=======
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..
+>>>>>>> upstream/master
   make -j
   ```
 
@@ -441,6 +457,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Performance collection
 
+<<<<<<< HEAD
   Use the `msprof` tool to obtain detailed performance data:
 
   ```bash
@@ -460,10 +477,38 @@ Run the following steps in the root directory of this example to build and run t
       ├── op_summary_*.csv
       └── README.txt
   ```
+=======
+  Use the `msOpProf` tool to obtain detailed performance data:
+
+  ```bash
+  msopprof ./demo
+  msopprof --ai-core=on --aic-metrics=L2Cache ./demo    # Use for L2Cache related scenarios
+  ```
+
+    - Performance data description  
+      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+
+      ```bash
+      ├──dump                       # Raw performance data, no user attention needed
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle ratio
+      ├──L2Cache.csv                # L2 Cache hit rate, affects MTE2, suggests reasonable data transfer logic to increase hit rate
+      ├──Memory.csv                 # UB, L1 and main memory read/write bandwidth rate
+      ├──MemoryL0.csv               # L0A, L0B, and L0C read/write bandwidth rate
+      ├──MemoryUB.csv               # Vector and Scalar to UB read/write bandwidth rate
+      ├──OpBasicInfo.csv            # Operator basic information
+      ├──PipeUtilization.csv        # Computation unit and transfer unit time and ratio
+      ├──ResourceConflictRatio.csv  # Bank group, bank conflict and resource conflict ratio on UB in all instructions
+      └──visualize_data.bin         # MindStudio Insight presentation file
+      ```
+>>>>>>> upstream/master
 
   View the specific performance analysis results:
 
   ```bash
   # View Task Duration and various data
+<<<<<<< HEAD
   cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+=======
+  cat ./OPPROF_*/PipeUtilization.csv
+>>>>>>> upstream/master
   ```

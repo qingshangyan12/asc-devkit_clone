@@ -20,8 +20,13 @@
 | 产品 | CANN软件版本 |
 |------|-------------|
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+<<<<<<< HEAD
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+=======
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.1.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.1.0 |
+>>>>>>> upstream/master
 
 ## 目录结构介绍
 
@@ -119,7 +124,11 @@ opt_model = torch.compile(model, fullgraph=True, backend=npu_backend, dynamic=Fa
 
 - 配置环境变量
 
+<<<<<<< HEAD
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+=======
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
+>>>>>>> upstream/master
 
   ```bash
   source ${install_path}/cann/set_env.sh

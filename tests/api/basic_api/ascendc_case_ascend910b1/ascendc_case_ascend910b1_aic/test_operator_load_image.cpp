@@ -237,4 +237,8 @@ KERNEL_LOAD_IMAGE(
 // --test_XRGB8888_U8
 KERNEL_LOAD_IMAGE(
     uint8_t, int8_t, int8_t, int32_t, int8_t, 32, 32, 0, 0, 32, 32, 0, 0, 0, 0, XRGB8888_U8, 0, 0, 0, false, false,
+<<<<<<< HEAD
     false, 1, 1, 1, 32, 32);
+=======
+    false, 1, 1, 1, 32, 32);
+>>>>>>> upstream/master

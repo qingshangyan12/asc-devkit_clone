@@ -9,7 +9,7 @@
  */
 #ifndef LIB_NORMALIZATION_DEEPNORM_TILING_H
 #define LIB_NORMALIZATION_DEEPNORM_TILING_H
-#include "graph/tensor.h"
+#include "../utils/types.h"
 #include "deepnorm_tilingdata.h"
 #include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {
@@ -27,7 +27,11 @@ namespace AscendC {
  *         If src shape is illegal for basic block, it will return false.
  */
 bool GetDeepNormMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock,
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock,
+>>>>>>> upstream/master
     uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -46,6 +50,7 @@ bool GetDeepNormMaxMinTmpSize(
  *         input stackBufferSize is not big enough, it will return false.
  */
 bool GetDeepNormTilingInfo(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
     const bool isReuseSource, const bool isBasicBlock, optiling::DeepNormTiling& tiling);
 bool GetDeepNormTilingInfo(
@@ -53,3 +58,13 @@ bool GetDeepNormTilingInfo(
     const bool isReuseSource, const bool isBasicBlock, AscendC::tiling::DeepNormTiling& tiling);
 } // namespace AscendC
 #endif // LIB_NORMALIZATION_DEEPNORM_TILING_H
+=======
+    const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferSize,
+    const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, optiling::DeepNormTiling& tiling);
+bool GetDeepNormTilingInfo(
+    const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferSize,
+    const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock,
+    AscendC::tiling::DeepNormTiling& tiling);
+} // namespace AscendC
+#endif // LIB_NORMALIZATION_DEEPNORM_TILING_H
+>>>>>>> upstream/master

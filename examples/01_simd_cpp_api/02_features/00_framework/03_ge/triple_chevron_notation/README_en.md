@@ -21,8 +21,13 @@ The figure above shows the complete integration pipeline from left to right. The
 | Product | CANN Version |
 |---------|-------------|
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+<<<<<<< HEAD
 | Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+=======
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.1.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.1.0 |
+>>>>>>> upstream/master
 
 ## Directory Structure
 
@@ -82,7 +87,11 @@ const auto runRet = session.RunGraph(GRAPH_ID, inputs, outputs);
 
 - Configure environment variables
 
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
 
   ```bash
   source ${install_path}/cann/set_env.sh

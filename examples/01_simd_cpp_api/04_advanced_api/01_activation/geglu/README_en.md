@@ -1,5 +1,9 @@
 # GeGLU Example
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 ## Overview
 
 This example uses the GeGLU high-level API in a GLU (Gated Linear Unit) gated activation function scenario to implement GLU variant activation computation. GeGLU uses GELU as the activation function, with the computation pattern `dst = src0 * GELU(src1)`. This example uses float data type with an input tensor of 1024 elements to complete Geglu example computation.
@@ -75,7 +79,11 @@ This example uses the GeGLU high-level API in a GLU (Gated Linear Unit) gated ac
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

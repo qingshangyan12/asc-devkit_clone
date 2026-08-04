@@ -14,7 +14,11 @@
  */
 
 #include "../../detail/host_log.h"
+<<<<<<< HEAD
 #include "../../../../include/adv_api/conv/conv3d/conv3d_tiling_base.h"
+=======
+#include "adv_api/conv/conv3d/conv3d_tiling_base.h"
+>>>>>>> upstream/master
 
 namespace Conv3dTilingApi {
 

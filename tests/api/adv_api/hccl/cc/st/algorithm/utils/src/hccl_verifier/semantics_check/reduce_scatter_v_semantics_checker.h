@@ -20,4 +20,8 @@ HcclResult TaskCheckReduceScatterVSemantics(
     std::map<RankId, RankMemorySemantics>& allRankMemSemantics, HcclReduceOp reduceType, VDataDesTag& vDataDes);
 }
 
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

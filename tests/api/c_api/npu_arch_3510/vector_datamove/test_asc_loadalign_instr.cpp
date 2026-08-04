@@ -174,4 +174,8 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignDeintlv, asc_loadalign_dei
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignDeintlv, asc_loadalign_deintlv, vlds, vector_uint32_t, uint32_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignDeintlv, asc_loadalign_deintlv, vlds, vector_float, float);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR_INT4(
+<<<<<<< HEAD
     LoadAlignDeintlv, asc_loadalign_deintlv, vlds, vector_int4x2_t, int4b_t);
+=======
+    LoadAlignDeintlv, asc_loadalign_deintlv, vlds, vector_int4x2_t, int4b_t);
+>>>>>>> upstream/master

@@ -370,4 +370,8 @@ UNSUPPORT_MAP(Sqrt, sqrt, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t,
 UNSUPPORT_MAP(Rsqrt, rsqrt, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t, bfloat16_t);
 UNSUPPORT_MAP(Abs, abs, uint8_t, uint16_t, uint32_t, uint64_t, int64_t, bfloat16_t);
 UNSUPPORT_MAP(Not, not, uint64_t, int64_t, bfloat16_t);
+<<<<<<< HEAD
 UNSUPPORT_MAP(Relu, relu, uint8_t, int8_t, uint16_t, int16_t, uint32_t, uint64_t, int64_t, bfloat16_t);
+=======
+UNSUPPORT_MAP(Relu, relu, uint8_t, int8_t, uint16_t, int16_t, uint32_t, uint64_t, int64_t, bfloat16_t);
+>>>>>>> upstream/master

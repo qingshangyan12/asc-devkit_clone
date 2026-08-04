@@ -274,4 +274,8 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR(
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR(
     LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_float, float);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR_INT4(
+<<<<<<< HEAD
     LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_int4x2_t, int4b_t);
+=======
+    LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_int4x2_t, int4b_t);
+>>>>>>> upstream/master

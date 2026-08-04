@@ -91,4 +91,8 @@ TILING_DATA_FIELD_DEF(uint32_t, resvered3);
 END_TILING_DATA_DEF;
 REGISTER_TILING_DATA_CLASS(TConv3DApiTilingOpApi, TConv3DApiTiling);
 } // namespace optiling
+<<<<<<< HEAD
 #endif // ADV_API_CONV_CONV3D_CONV3D_TILINGDATA_H
+=======
+#endif // ADV_API_CONV_CONV3D_CONV3D_TILINGDATA_H
+>>>>>>> upstream/master

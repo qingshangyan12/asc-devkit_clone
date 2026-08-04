@@ -77,4 +77,8 @@ uint32_t SimHcclThread::GetNotifyIdByIndex(uint32_t notifyIndex) const
     return notifys_[notifyIndex]->GetNotifyId();
 }
 
+<<<<<<< HEAD
 }; // namespace HcclSim
+=======
+}; // namespace HcclSim
+>>>>>>> upstream/master

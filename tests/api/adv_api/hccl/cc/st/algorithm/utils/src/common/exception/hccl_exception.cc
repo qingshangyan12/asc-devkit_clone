@@ -44,4 +44,8 @@ HcclException::HcclException(const ExceptionType& exceptionType, const std::stri
 }
 
 std::vector<std::string> HcclException::GetBackTraceStrings() const { return backtraceStrings; }
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

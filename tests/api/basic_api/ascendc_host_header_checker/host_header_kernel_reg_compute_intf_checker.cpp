@@ -204,4 +204,8 @@ static void test_host_kernel_reg_compute_vec_fused_intf()
     using AscendC::Reg::MulsCast;
 }
 
+<<<<<<< HEAD
 static void test_host_kernel_reg_compute_histograms_intf() { using AscendC::Reg::Histograms; }
+=======
+static void test_host_kernel_reg_compute_histograms_intf() { using AscendC::Reg::Histograms; }
+>>>>>>> upstream/master

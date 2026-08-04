@@ -52,4 +52,8 @@ TEST_F(DataCopyL12BTTestSuite, testCaseDataCopyL12BT)
     MOCKER(raise).stubs().will(returnValue(static_cast<int>(0)));
     DataCopyL12BTImpl(
         (uint64_t)dstGm.GetPhyAddr(), (__cbuf__ uint16_t*)srcGm.GetPhyAddr(), static_cast<uint16_t>(0), params);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

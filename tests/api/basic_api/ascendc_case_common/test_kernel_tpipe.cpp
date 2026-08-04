@@ -522,12 +522,21 @@ INSTANTIATE_TEST_CASE_P(
             {M, F_0}, 0, {TBufState::FREE, TBufState::FREE, TBufState::FREE, TBufState::FREE}, {0, -1, -1, -1}},
         BufferOperateParams{
             {M, F_0, M}, 1, {TBufState::FREE, TBufState::OCCUPIED, TBufState::FREE, TBufState::FREE}, {0, -1, -1, -1}},
+<<<<<<< HEAD
         BufferOperateParams{
             {M, F_0, M, M},
             2,
             {TBufState::FREE, TBufState::OCCUPIED, TBufState::OCCUPIED, TBufState::FREE},
             {0, -1, -1, -1}},
         BufferOperateParams{
+=======
+        BufferOperateParams{
+            {M, F_0, M, M},
+            2,
+            {TBufState::FREE, TBufState::OCCUPIED, TBufState::OCCUPIED, TBufState::FREE},
+            {0, -1, -1, -1}},
+        BufferOperateParams{
+>>>>>>> upstream/master
             {M, M, M, F_1},
             2,
             {TBufState::OCCUPIED, TBufState::FREE, TBufState::OCCUPIED, TBufState::FREE},

@@ -16,7 +16,11 @@
 #define LIB_NORMALIZATION_LAYERNORM_TILING_H
 #include <cstdint>
 
+<<<<<<< HEAD
 #include "graph/tensor.h"
+=======
+#include "../utils/types.h"
+>>>>>>> upstream/master
 #include "layernorm_tilingdata.h"
 #include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {
@@ -29,13 +33,22 @@ namespace AscendC {
  * \param [out] minValue: min size required for tmp buffer
  */
 void GetLayerNormMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+>>>>>>> upstream/master
     uint32_t& minValue);
 
 [[deprecated("GetLayerNormNDTillingInfo is deprecated, please use GetLayerNormNDTilingInfo instead!")]]
 void GetLayerNormNDTillingInfo(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     optiling::LayerNormTiling& tilling);
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+    const bool isReuseSource, optiling::LayerNormTiling& tilling);
+>>>>>>> upstream/master
 
 /*!
  * \brief get tiling for LayerNorm interface.
@@ -46,11 +59,19 @@ void GetLayerNormNDTillingInfo(
  * \param [out] tiling: LayerNormSeparateTiling
  */
 void GetLayerNormNDTilingInfo(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     optiling::LayerNormTiling& tiling);
 void GetLayerNormNDTilingInfo(
     const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     AscendC::tiling::LayerNormTiling& tiling);
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+    const bool isReuseSource, optiling::LayerNormTiling& tiling);
+void GetLayerNormNDTilingInfo(
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+    const bool isReuseSource, AscendC::tiling::LayerNormTiling& tiling);
+>>>>>>> upstream/master
 
 /*!
  * \brief calculate max and min tmp buffer size for WelfordUpdate interface.
@@ -63,7 +84,11 @@ void GetLayerNormNDTilingInfo(
  * \param [out] minValue: min size required for tmp buffer
  */
 void GetWelfordUpdateMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSizeT, const uint32_t typeSizeU, const bool isReuseSource,
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSizeT, const uint32_t typeSizeU, const bool isReuseSource,
+>>>>>>> upstream/master
     const bool isInplace, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -77,7 +102,11 @@ void GetWelfordUpdateMaxMinTmpSize(
  * \param [out] minValue: min size required for tmp buffer
  */
 void GetLayerNormMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd,
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd,
+>>>>>>> upstream/master
     const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -90,11 +119,19 @@ void GetLayerNormMaxMinTmpSize(
  * \param [out] tiling: LayerNormSeparateTiling
  */
 void GetLayerNormNDTilingInfo(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     const bool isComputeRstd, optiling::LayerNormSeparateTiling& tiling);
 void GetLayerNormNDTilingInfo(
     const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     const bool isComputeRstd, AscendC::tiling::LayerNormSeparateTiling& tiling);
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+    const bool isReuseSource, const bool isComputeRstd, optiling::LayerNormSeparateTiling& tiling);
+void GetLayerNormNDTilingInfo(
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+    const bool isReuseSource, const bool isComputeRstd, AscendC::tiling::LayerNormSeparateTiling& tiling);
+>>>>>>> upstream/master
 
 } // namespace AscendC
 #endif // LIB_NORMALIZATION_LAYERNORM_TILING_H

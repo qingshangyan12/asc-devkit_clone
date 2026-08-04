@@ -13,7 +13,11 @@ This example uses C_API interfaces to implement the Add operator example, based 
 ```
 ├── c_api_sync_add
 │   ├── CMakeLists.txt         // cmake build file
+<<<<<<< HEAD
 |   └── c_api_add.asc          // operator implementation & invocation example
+=======
+│   └── c_api_add.asc          // operator implementation & invocation example
+>>>>>>> upstream/master
 ```
 
 ## Operator Description
@@ -59,7 +63,11 @@ This example uses C_API interfaces to implement the Add operator example, based 
 
 Execute the following steps in the root directory of this example to compile and execute the operator.
 - Configure Environment Variables  
+<<<<<<< HEAD
   Please select the corresponding command to configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+=======
+  Please select the corresponding command to configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+>>>>>>> upstream/master
   - Default path, CANN software package installed by root user
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
@@ -85,4 +93,8 @@ Execute the following steps in the root directory of this example to compile and
   The execution result is as follows, indicating that the accuracy comparison is successful.
   ```bash
   [Success] Case accuracy is verification passed.
+<<<<<<< HEAD
   ```
+=======
+  ```
+>>>>>>> upstream/master

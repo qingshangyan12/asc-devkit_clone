@@ -96,4 +96,8 @@ END_TILING_DATA_DEF;
 
 REGISTER_TILING_DATA_CLASS(Conv3DBackpropInputTilingDataOpApi, Conv3DBackpropInputTilingData)
 } // namespace optiling
+<<<<<<< HEAD
 #endif // CONV3D_BP_INPUT_TILINGDATA_H
+=======
+#endif // CONV3D_BP_INPUT_TILINGDATA_H
+>>>>>>> upstream/master

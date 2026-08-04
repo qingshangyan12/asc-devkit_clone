@@ -67,4 +67,8 @@ private:
 };
 
 } // namespace HcclSim
+<<<<<<< HEAD
 #endif // SIM_MEM_LAYOUT_H
+=======
+#endif // SIM_MEM_LAYOUT_H
+>>>>>>> upstream/master

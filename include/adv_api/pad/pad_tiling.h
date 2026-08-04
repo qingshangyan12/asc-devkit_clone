@@ -16,7 +16,7 @@
 #ifndef LIB_PAD_PAD_TILING_H
 #define LIB_PAD_PAD_TILING_H
 
-#include "graph/tensor.h"
+#include "../utils/types.h"
 #include "pad_tilingdata.h"
 #include "tiling/platform/platform_ascendc.h"
 #include "kernel_tiling/kernel_tiling.h"
@@ -30,7 +30,12 @@ namespace AscendC {
  * \param [out] maxValue max size of tmp buffer
  * \param [out] minValue min size of tmp buffer
  */
+<<<<<<< HEAD
 void GetPadMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue);
+=======
+void GetPadMaxMinTmpSize(
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue);
+>>>>>>> upstream/master
 
 /*!
  * \brief calculate tiling params for Pad interface
@@ -44,11 +49,19 @@ void GetPadMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uin
  * \param [out] tiling Pad tiling
  */
 void PadTilingFunc(
+<<<<<<< HEAD
     const ge::Shape srcShape, const ge::Shape oriSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
     optiling::PadTiling& tiling);
 void PadTilingFunc(
     const ge::Shape srcShape, const ge::Shape oriSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
     AscendC::tiling::PadTiling& tiling);
+=======
+    const AscendC::TensorShape srcShape, const AscendC::TensorShape oriSrcShape, const uint32_t stackBufferSize,
+    const uint32_t typeSize, optiling::PadTiling& tiling);
+void PadTilingFunc(
+    const AscendC::TensorShape srcShape, const AscendC::TensorShape oriSrcShape, const uint32_t stackBufferSize,
+    const uint32_t typeSize, AscendC::tiling::PadTiling& tiling);
+>>>>>>> upstream/master
 
 /*!
  * \brief calculate max and min tmp buffer size for UnPad interface.
@@ -61,8 +74,13 @@ void PadTilingFunc(
  * \param [out] minValue min size of tmp buffer
  */
 void GetUnPadMaxMinTmpSize(
+<<<<<<< HEAD
     const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize,
     uint32_t& maxValue, uint32_t& minValue);
+=======
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape,
+    const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue);
+>>>>>>> upstream/master
 
 /*!
  * \brief calculate tiling params for UnPad interface
@@ -76,9 +94,16 @@ void GetUnPadMaxMinTmpSize(
  * \param [out] tiling UnPad tiling
  */
 void UnPadTilingFunc(
+<<<<<<< HEAD
     const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, optiling::UnPadTiling& tiling);
 void UnPadTilingFunc(
     const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+=======
+    const AscendC::TensorShape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+    optiling::UnPadTiling& tiling);
+void UnPadTilingFunc(
+    const AscendC::TensorShape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+>>>>>>> upstream/master
     AscendC::tiling::UnPadTiling& tiling);
 } // namespace AscendC
 #endif // LIB_PAD_PAD_TILING_H

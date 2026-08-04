@@ -13,6 +13,13 @@
  * \brief
  */
 
+<<<<<<< HEAD
+=======
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_operator_asinh_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
+>>>>>>> upstream/master
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_ASINH_INTF_H__

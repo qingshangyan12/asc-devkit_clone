@@ -102,4 +102,8 @@
     }
 
 TEST_VECTOR_COMPUTE_VCPADD_INSTR(Vcpadd, asc_pair_reduce_sum, vcpadd, half);
+<<<<<<< HEAD
 TEST_VECTOR_COMPUTE_VCPADD_INSTR(Vcpadd, asc_pair_reduce_sum, vcpadd, float);
+=======
+TEST_VECTOR_COMPUTE_VCPADD_INSTR(Vcpadd, asc_pair_reduce_sum, vcpadd, float);
+>>>>>>> upstream/master

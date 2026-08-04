@@ -15,4 +15,8 @@ namespace AscendC {
     ConfusionTransposeTilingDeprecatedHeader;
 using LibConfusionTransposeTilingInterface = ConfusionTransposeTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_TRANSPOSE_CONFUSION_TRANSPOSE_TILING_INTF_H
+=======
+#endif // LIB_TRANSPOSE_CONFUSION_TRANSPOSE_TILING_INTF_H
+>>>>>>> upstream/master

@@ -14,4 +14,8 @@ namespace AscendC {
 [[deprecated(__FILE__ " is deprecated, please use pad_tiling.h instead!")]] typedef void PadTilingDeprecatedHeader;
 using LibPadTilingInterface = PadTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_TILING_PAD_TILING_INTF_H
+=======
+#endif // LIB_TILING_PAD_TILING_INTF_H
+>>>>>>> upstream/master

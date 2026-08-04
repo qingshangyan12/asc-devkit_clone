@@ -32,4 +32,8 @@ target_compile_options(demo PRIVATE
 
 target_include_directories(demo PRIVATE
     $ENV{ASCEND_HOME_PATH}/include
+<<<<<<< HEAD
 )
+=======
+)
+>>>>>>> upstream/master

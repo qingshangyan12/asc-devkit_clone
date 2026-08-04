@@ -47,4 +47,8 @@ private:
     void OpCustomGenDestryFunc(std::ofstream& outfile) const;
 };
 } // namespace ops
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

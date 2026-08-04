@@ -48,4 +48,8 @@ private:
 }; // class SimHcclThread
 
 }; // namespace HcclSim
+<<<<<<< HEAD
 #endif // SIM_COMMUNICATOR_H
+=======
+#endif // SIM_COMMUNICATOR_H
+>>>>>>> upstream/master

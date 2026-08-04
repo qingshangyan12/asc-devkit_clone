@@ -6,11 +6,11 @@ The Ascend C documentation system consists of five core documents. Developers ca
 
 | Document | Content | Directory |
 |----------|---------|-----------|
-| Getting Started Tutorial | Ascend C overview, environment setup, quick-start hands-on (HelloWorld, first operator) | `docs/guide/入门教程` |
-| Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/guide/编程指南` |
-| API Reference Manual | Interface parameters, constraints, examples, API associations | `docs/api/` |
-| Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/guide/算子实践参考/` |
-| Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/guide/跨代迁移兼容性指南/` |
+| Getting Started Tutorial | Ascend C overview, environment setup, quick-start hands-on (HelloWorld, first operator) | `docs/zh/guide/入门教程` |
+| Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/zh/guide/编程指南` |
+| API Reference Manual | Interface parameters, constraints, examples, API associations | `docs/zh/api/` |
+| Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/zh/guide/算子实践参考/` |
+| Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/zh/guide/跨代迁移兼容性指南/` |
 
 Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the Getting Started Tutorial; developers with prior experience should read the Ascend C Programming Guide.
 
@@ -319,7 +319,7 @@ For Atlas A2/A3 series products:
 | half | half | float | float |
 | ... | ... | ... | ... |
 
-For Ascend 950PR/DT products:
+For Ascend 950PR/Ascend 950DT products:
 (Similar tables, including fp8/hifloat8 and other unique types)
 ```
 
@@ -356,7 +356,7 @@ For Ascend 950PR/DT products:
 **Format**: Two layers. Single-parameter constraints are described inline in the parameter table (e.g., alignment, value range); multi-parameter constraints and multi-interface combination constraints in a separate "Constraints" paragraph.
 
 **Requirements**:
-- **Location constraints** must specify TPosition enum value, with parenthetical explanation of physical location
+- **Location constraints** must prioritize the physical storage location, followed by the TPosition enum value in parentheses
 - **NOP constraints** must specify avoidance scenarios and performance impact
 - **Fractal granularity** must specify minimum computation block size and invalid data layout rules
 - **Synchronization constraints** must provide explicit threshold formula and code snippet
@@ -441,7 +441,7 @@ void mad(__cc__ float *c, __ca__ half *a, __cb__ half *b,
     uint16_t m, uint16_t k, uint16_t n, uint8_t unitFlag,
     bool kDirectionAlign, bool cmatrixSource, bool cmatrixInitVal);
 
-For Ascend 950PR/DT:
+For Ascend 950PR/Ascend 950DT:
 void mad(__cc__ float *c, __ca__ half *a, __cb__ half *b,
     uint16_t m, uint16_t k, uint16_t n, uint8_t unit_Flag_ctrl,
     bool gemv_ctrl, bool BTbuf_ctrl, bool zero_Cmatrix_ctrl);

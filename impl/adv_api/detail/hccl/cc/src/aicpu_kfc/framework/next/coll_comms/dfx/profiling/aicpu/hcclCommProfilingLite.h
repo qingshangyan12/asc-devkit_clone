@@ -17,21 +17,26 @@ namespace hccl {
 
 class HcclCommProfilingLite {
 public:
-    // 构造函数
     HcclCommProfilingLite(Hccl::DevId deviceId, Hccl::MirrorTaskManagerLite* mirrorTaskManagerLite);
+<<<<<<< HEAD
 
     // 上报所有任务
+=======
+    HcclResult Init();
+>>>>>>> upstream/master
     void ReportAllTasks();
-
-    // 更新Profiling统计
     void UpdateProfStat();
+<<<<<<< HEAD
 
     // 获取MirrorTaskManager
+=======
+>>>>>>> upstream/master
     Hccl::MirrorTaskManagerLite* GetMirrorTaskManagerLite() const;
 
 private:
-    std::unique_ptr<Hccl::MirrorTaskManagerLite> mirrorTaskManagerLite_;
+    Hccl::MirrorTaskManagerLite* mirrorTaskManagerLite_;
     std::unique_ptr<Hccl::ProfilingReporterLite> profilingReporterLite_;
+    bool initializedFlag_{false};
 };
 } // namespace hccl
 

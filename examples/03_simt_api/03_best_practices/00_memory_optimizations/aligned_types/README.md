@@ -10,7 +10,7 @@
 
 ## 支持的 CANN 软件版本
 
-  - \> CANN 9.0.0
+  - \>= CANN 9.1.0
 
 ## 目录结构
 
@@ -42,7 +42,7 @@
 
   `alignas`的几条限制：
 
-  - **只能放大，不能缩小**：`alignas(N)`中的`N`必须≥类型的默认`alignof`，即所有字段`alignof`的最大值，否则编译器会忽略或报错。
+  - **只能放大，不能缩小**：`alignas(N)`中的`N`必须大于等于类型的默认`alignof`，即所有字段`alignof`的最大值，否则编译器会忽略或报错。
   - **取值必须是2的幂**：`alignas(N)`中的`N`必须是2的幂。
   - **会同步抬升sizeof**：`sizeof`必须是`alignof`的整数倍，所以放大`alignof`时，`sizeof`会向上进位。
 
@@ -166,7 +166,7 @@
 ## 编译运行
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -199,13 +199,13 @@
 
 ## 性能数据获取
 
-  使用 `msprof` 工具获取单个组件上的性能数据：
+  使用 `msOpProf` 工具获取单个组件上的性能数据：
 
   ```bash
-  msprof op ./demo   # 分析样例的性能
+  msopprof ./demo   # 分析样例的性能
   ```
 
-  命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+  命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：
 
   ```text
   ├──dump                       # 原始的性能数据，用户无需关注

@@ -115,4 +115,8 @@ private:
         int64_t backpropPadUp, int64_t backpropPadDown, int64_t backpropPadLeft, int64_t backpropPadRight);
 };
 } // namespace ConvBackpropApi
+<<<<<<< HEAD
 #endif // CONV3D_BP_INPUT_TILING_BASE_H
+=======
+#endif // CONV3D_BP_INPUT_TILING_BASE_H
+>>>>>>> upstream/master

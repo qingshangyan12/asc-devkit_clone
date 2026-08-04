@@ -38,7 +38,10 @@ add_executable(demo
 target_compile_definitions(demo PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
 )
+<<<<<<< HEAD
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
+=======
+>>>>>>> upstream/master

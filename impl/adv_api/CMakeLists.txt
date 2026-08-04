@@ -26,27 +26,8 @@ endif()
 
 add_subdirectory(tiling)
 
-if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
-  include(ExternalProject)
-  ExternalProject_Add(device_tiling
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake/device
-    BINARY_DIR ${CMAKE_BINARY_DIR}/device_build
-    CONFIGURE_COMMAND ${CMAKE_COMMAND}
-    -G ${CMAKE_GENERATOR}
-    -DCANN_3RD_LIB_PATH=${CANN_3RD_LIB_PATH}
-    -DBUILD_OPEN_PROJECT=${BUILD_OPEN_PROJECT}
-    -DINSTALL_LIBRARY_DIR=${INSTALL_LIBRARY_DIR}/lib64/device
-    -DASCEND_CANN_PACKAGE_PATH=${ASCEND_CANN_PACKAGE_PATH}
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-    -DSYS_VERSION=${SYS_VERSION}
-    -DCMAKE_C_COMPILER=${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-gcc
-    -DCMAKE_CXX_COMPILER=${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-g++
-    -DPRODUCT_SIDE=device
-    -DCUSTOM_SIGN_SCRIPT=${CUSTOM_SIGN_SCRIPT}
-    -DENABLE_SIGN=${ENABLE_SIGN}
-    -DVERSION_INFO=${VERSION_INFO}
-    <SOURCE_DIR>
-    BUILD_ALWAYS 1)
+if (BUILD_OPEN_PROJECT)
+  add_cann_device_project(asc-devkit)
 endif()
 
 
@@ -64,7 +45,13 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail
     ${INSTALL_OPTIONAL} COMPONENT asc-devkit FILES_MATCHING
     PATTERN "*.h"
-    PATTERN "CMakeLists.txt" EXCLUDE)
+    PATTERN "CMakeLists.txt" EXCLUDE
+    PATTERN "hccl_inner_dl.h" EXCLUDE
+    PATTERN "hccl_rank_graph_dl.h" EXCLUDE
+    PATTERN "hccl_res_dl.h" EXCLUDE
+    PATTERN "hcomm_dlsym.h" EXCLUDE
+    PATTERN "hcomm_host_profiling_dl.h" EXCLUDE
+    REGEX "common/adapter_error_manager_pub\\.h$" EXCLUDE)
 
   # copy tiling to asc impl
   install(
@@ -78,6 +65,14 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
   install(
     DIRECTORY ${ASCENDC_INCLUDE_DIR}/adv_api/
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
+    ${INSTALL_OPTIONAL} COMPONENT asc-devkit
+    REGEX "hccl/internal" EXCLUDE)
+
+  install(
+    FILES
+      ${ASCENDC_INCLUDE_DIR}/adv_api/hccl/internal/hccl_msg.h
+      ${ASCENDC_INCLUDE_DIR}/adv_api/hccl/internal/hccl_tiling_msg.h
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/hccl/internal
     ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
 
   # generate softlink
@@ -99,10 +94,11 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
       @ONLY
   )
   install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/utils_headers.cmake COMPONENT asc-devkit)
-endif()  
+endif()
 
 if (BUILD_OPEN_PROJECT)
     add_subdirectory(detail/hccl/cc)
+    include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)

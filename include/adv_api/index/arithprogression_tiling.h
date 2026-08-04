@@ -29,4 +29,8 @@ void GetArithProgressionMaxMinTmpSize(uint32_t& maxValue, uint32_t& minValue);
 void GetArangeMaxMinTmpSize(uint32_t& maxValue, uint32_t& minValue);
 } // namespace AscendC
 
+<<<<<<< HEAD
 #endif // LIB_TILING_ARITHPROGRESSION_TILING_H
+=======
+#endif // LIB_TILING_ARITHPROGRESSION_TILING_H
+>>>>>>> upstream/master

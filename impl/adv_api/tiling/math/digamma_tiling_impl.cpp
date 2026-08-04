@@ -12,8 +12,14 @@
  * \file digamma_tiling_impl.cpp
  * \brief
  */
+<<<<<<< HEAD
 #include "../../../../include/adv_api/math/digamma_tiling.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
+=======
+#include "adv_api/utils/types.h"
+#include "adv_api/math/digamma_tiling.h"
+#include "utils/tiling/platform/platform_ascendc.h"
+>>>>>>> upstream/master
 #include "../../detail/host_log.h"
 
 namespace AscendC {
@@ -70,7 +76,7 @@ void GetDigammaTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNod
 }
 
 void GetDigammaMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     const uint32_t inputSize = srcShape.GetShapeSize();

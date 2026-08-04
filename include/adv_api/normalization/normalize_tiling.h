@@ -16,7 +16,11 @@
 #define LIB_NORMALIZATION_NORMALIZE_TILING_H
 #include <cstdint>
 
+<<<<<<< HEAD
 #include "graph/tensor.h"
+=======
+#include "../utils/types.h"
+>>>>>>> upstream/master
 namespace AscendC {
 /*!
  * \brief calculate max and min tmp buffer size for Normalize interface.
@@ -31,7 +35,11 @@ namespace AscendC {
  * \return flag for whether the tmp buffer size is calculated successfully
  */
 void GetNormalizeMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource,
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource,
+>>>>>>> upstream/master
     const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue);
 } // namespace AscendC
 #endif // LIB_NORMALIZATION_NORMALIZE_TILING_H

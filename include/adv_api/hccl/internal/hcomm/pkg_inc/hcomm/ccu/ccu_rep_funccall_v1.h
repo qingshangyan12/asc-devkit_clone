@@ -53,4 +53,8 @@ private:
 
 }; // namespace CcuRep
 }; // namespace hcomm
+<<<<<<< HEAD
 #endif // _CCU_REPRESENTATION_FUNC_CALL_H
+=======
+#endif // _CCU_REPRESENTATION_FUNC_CALL_H
+>>>>>>> upstream/master

@@ -53,4 +53,8 @@ TEST_VECTOR_COMPUTE_VCVT_INSTR_4(
 TEST_VECTOR_COMPUTE_VCVT_INSTR_4(
     Bfloat162e1m2x2_rz_v2, asc_bfloat162e1m2x2_rz_v3, vcvt, vector_f4e1m2x2, vector_bfloat16_t, 18);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_4(
+<<<<<<< HEAD
     Bfloat162e1m2x2_rz_v3, asc_bfloat162e1m2x2_rz_v4, vcvt, vector_f4e1m2x2, vector_bfloat16_t, 19);
+=======
+    Bfloat162e1m2x2_rz_v3, asc_bfloat162e1m2x2_rz_v4, vcvt, vector_f4e1m2x2, vector_bfloat16_t, 19);
+>>>>>>> upstream/master

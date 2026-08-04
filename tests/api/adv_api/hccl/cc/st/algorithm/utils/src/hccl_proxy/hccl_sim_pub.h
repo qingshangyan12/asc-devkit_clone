@@ -35,4 +35,8 @@ enum class StreamType {
 };
 
 constexpr uint32_t ROOTINFO_INDENTIFIER_MAX_LENGTH = 128;
+<<<<<<< HEAD
 #endif // SIM_SIM_PUBLIC_H
+=======
+#endif // SIM_SIM_PUBLIC_H
+>>>>>>> upstream/master

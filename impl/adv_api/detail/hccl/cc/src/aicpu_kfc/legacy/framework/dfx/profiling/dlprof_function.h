@@ -7,6 +7,10 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 #ifndef HCCL_DL_PROF_FUNCTION_H
 #define HCCL_DL_PROF_FUNCTION_H
 
@@ -27,7 +31,12 @@ public:
     std::function<int32_t(uint32_t, const MsprofApi*)> dlMsprofReportApi{};
     std::function<int32_t(uint32_t, const VOID_PTR, uint32_t)> dlMsprofReportCompactInfo{};
     std::function<int32_t(uint32_t, const VOID_PTR, uint32_t)> dlMsprofReportAdditionalInfo{};
+<<<<<<< HEAD
     std::function<uint64_t(const char*, uint32_t)> dlMsprofStr2Id{};
+=======
+    std::function<int32_t(uint32_t, const VOID_PTR, uint32_t)> dlMsprofReportBatchAdditionalInfo{};
+    std::function<uint64_t(const char *, uint32_t)> dlMsprofStr2Id{};
+>>>>>>> upstream/master
     std::function<uint64_t(void)> dlMsprofSysCycleTime{};
 
 private:

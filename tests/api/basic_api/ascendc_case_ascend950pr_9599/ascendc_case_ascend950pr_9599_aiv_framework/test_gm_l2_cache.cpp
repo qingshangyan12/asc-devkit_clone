@@ -88,10 +88,17 @@ DATA_COPY_L2_CACHE_UB_TEST(int8_t, CACHE_MODE_DISABLE)
             .stubs()                                                                                                   \
             .with(any(), any(), any(), spy(actualMode));                                                               \
         MOCKER(DataCopyPadUB2GMImpl, void (*)(T*, T*, const DataCopyExtParams&, const uint8_t))                        \
+<<<<<<< HEAD
             .stubs()                                                                                                   \
             .with(any(), any(), any(), spy(actualMode));                                                               \
         MOCKER(DataCopyPadGm2UBImpl, void (*)(T*, T*, const DataCopyParams&, const DataCopyPadParams&, const uint8_t)) \
             .stubs()                                                                                                   \
+=======
+            .stubs()                                                                                                   \
+            .with(any(), any(), any(), spy(actualMode));                                                               \
+        MOCKER(DataCopyPadGm2UBImpl, void (*)(T*, T*, const DataCopyParams&, const DataCopyPadParams&, const uint8_t)) \
+            .stubs()                                                                                                   \
+>>>>>>> upstream/master
             .with(any(), any(), any(), any(), spy(actualMode));                                                        \
         MOCKER(                                                                                                        \
             DataCopyPadGm2UBImpl,                                                                                      \
@@ -112,13 +119,57 @@ DATA_COPY_L2_CACHE_UB_TEST(int8_t, CACHE_MODE_DISABLE)
         DataCopyPadParams padParam;                                                                                    \
         DataCopyExtParams extParam;                                                                                    \
         DataCopyPadExtParams<T> padExtParam;                                                                           \
+<<<<<<< HEAD
+                                                                                                                       \
+        DataCopyPad(inputLocal, globalTensor, param, padParam);                                                        \
+=======
                                                                                                                        \
         DataCopyPad(inputLocal, globalTensor, param, padParam);                                                        \
         EXPECT_EQ(expectedMode, actualMode);                                                                           \
                                                                                                                        \
         actualMode = 99;                                                                                               \
         DataCopyPad(globalTensor, inputLocal, extParam);                                                               \
+>>>>>>> upstream/master
         EXPECT_EQ(expectedMode, actualMode);                                                                           \
+                                                                                                                       \
+        actualMode = 99;                                                                                               \
+        DataCopyPad(globalTensor, inputLocal, extParam);                                                               \
+        EXPECT_EQ(expectedMode, actualMode);                                                                           \
+    }
+
+DATA_COPY_L2_CACHE_UB_PAD_TEST(int32_t, CACHE_MODE_NORMAL)
+DATA_COPY_L2_CACHE_UB_PAD_TEST(int16_t, CACHE_MODE_DISABLE)
+
+#define DATA_COPY_L2_CACHE_UB_NDDMA_TEST(dataType, cacheMode)                                                         \
+    TEST_F(DataCopyL2CacheTestSuite, testCaseUbNDDMA##dataType##cacheMode)                                            \
+    {                                                                                                                 \
+        using T = dataType;                                                                                           \
+        uint8_t srcGm[1024]{0};                                                                                       \
+        uint32_t dataSize = 1024 / sizeof(T);                                                                         \
+                                                                                                                      \
+        CacheMode mode = CacheMode::cacheMode;                                                                        \
+        const uint8_t expectedMode = GetCacheModeValue(mode);                                                         \
+        uint8_t actualMode = 99;                                                                                      \
+        MOCKER(                                                                                                       \
+            nddma_out_to_ub_b8, void (*)(                                                                             \
+                                    void*, void*, uint8_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint8_t, \
+                                    uint8_t, bool, uint8_t))                                                          \
+            .stubs()                                                                                                  \
+            .with(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), spy(actualMode));      \
+        TPipe tpipe;                                                                                                  \
+                                                                                                                      \
+        GlobalTensor<T> globalTensor;                                                                                 \
+        globalTensor.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(srcGm), dataSize);                                   \
+        globalTensor.SetL2CacheHint(mode);                                                                            \
+                                                                                                                      \
+        TBuf<TPosition::VECIN> tbuf1;                                                                                 \
+        tpipe.InitBuffer(tbuf1, dataSize * sizeof(T));                                                                \
+        LocalTensor<T> inputLocal = tbuf1.Get<T>();                                                                   \
+                                                                                                                      \
+        MultiCopyParams<T, 2> params;                                                                                 \
+                                                                                                                      \
+        DataCopy(inputLocal, globalTensor, params);                                                                   \
+        EXPECT_EQ(expectedMode, actualMode);                                                                          \
     }
 
 DATA_COPY_L2_CACHE_UB_PAD_TEST(int32_t, CACHE_MODE_NORMAL)

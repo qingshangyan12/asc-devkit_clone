@@ -39,4 +39,8 @@ TILING_DATA_FIELD_DEF(uint32_t, param16);
 TILING_DATA_FIELD_DEF(uint32_t, param17);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // LIB_TRANSPOSE_CONFUSION_TRANSPOSE_TILINGDATA_H
+=======
+#endif // LIB_TRANSPOSE_CONFUSION_TRANSPOSE_TILINGDATA_H
+>>>>>>> upstream/master

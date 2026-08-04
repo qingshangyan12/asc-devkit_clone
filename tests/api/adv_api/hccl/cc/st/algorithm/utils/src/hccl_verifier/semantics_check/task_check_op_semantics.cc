@@ -740,4 +740,8 @@ HcclResult TaskCheckOpSemantics::Execute()
     }
     return HcclResult::HCCL_SUCCESS;
 }
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

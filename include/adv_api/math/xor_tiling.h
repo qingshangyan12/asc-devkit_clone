@@ -16,7 +16,7 @@
 #define LIB_MATH_XOR_TILING
 
 #include <cstdint>
-#include "graph/tensor.h"
+#include "../utils/types.h"
 
 namespace AscendC {
 /*!
@@ -42,8 +42,16 @@ void GetXorTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCou
  * \param [out] minValue, minimum temporary space required
  */
 void GetXorMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue);
 } // namespace AscendC
 
 #endif // LIB_MATH_XOR_TILING
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue);
+} // namespace AscendC
+
+#endif // LIB_MATH_XOR_TILING
+>>>>>>> upstream/master

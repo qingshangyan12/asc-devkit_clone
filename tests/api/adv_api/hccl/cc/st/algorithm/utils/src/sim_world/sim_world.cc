@@ -74,4 +74,8 @@ SimNpu& SimWorld::GetSimNpuByRankId(RankId rankId)
 NpuPos SimWorld::GetNpuPosByRankId(RankId rankId) { return commDomain_.GetNpuPosByRankId(rankId); }
 
 TopoMeta SimWorld::GetTopoMetaInfo() { return topoMeta_; }
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

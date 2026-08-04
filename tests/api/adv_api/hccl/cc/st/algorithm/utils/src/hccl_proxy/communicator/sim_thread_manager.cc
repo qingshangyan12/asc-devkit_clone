@@ -76,4 +76,8 @@ HcclResult SimThreadMgr::CommGetNotifyNumInThread(ThreadHandle thread, uint32_t*
     return HCCL_SUCCESS;
 }
 
+<<<<<<< HEAD
 }; // namespace HcclSim
+=======
+}; // namespace HcclSim
+>>>>>>> upstream/master

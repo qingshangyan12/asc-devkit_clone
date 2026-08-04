@@ -251,4 +251,8 @@ TEST_P(WelfordFinalizeTestSuite, WelfordFinalizeTestCase)
         EXPECT_EQ(outMeanGm[i], 0x00);
         EXPECT_EQ(outVarGm[i], 0x00);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

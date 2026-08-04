@@ -138,4 +138,8 @@ TEST_F(TEST_COPY_GM_TO_L0B, TEST_COPY_GM_TO_L0B_SYNC_INT4B_T)
 
     asc_copy_gm2l0b_sync(dst, src, base_idx, repeat, src_stride, dst_gap);
     GlobalMockObject::verify();
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

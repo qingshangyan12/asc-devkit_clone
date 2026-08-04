@@ -16,4 +16,8 @@ namespace AscendC {
 using LibTopKTilingInterface = TopKDeprecatedHeader;
 } // namespace AscendC
 
+<<<<<<< HEAD
 #endif // LIB_SORT_TOPK_TILING_INTF_H
+=======
+#endif // LIB_SORT_TOPK_TILING_INTF_H
+>>>>>>> upstream/master

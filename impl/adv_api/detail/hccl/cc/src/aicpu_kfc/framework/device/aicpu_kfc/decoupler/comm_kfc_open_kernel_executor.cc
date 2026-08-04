@@ -14,8 +14,10 @@
 
 #include "log.h"
 #include "alg_param.h"
+#include "alg_data_trans_wrapper.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
+#include "hcomm_primitives.h"
 
 namespace {
 mc2_ops_hccl::OpParam* AsOpenOpParam(std::vector<uint8_t>& opParam)
@@ -114,9 +116,66 @@ HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam& param, const mc2_ops_hc
     }
     return ret;
 }
+<<<<<<< HEAD
 } // namespace
 
 HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
+=======
+
+bool IsMc2BatchModeOp(HcclCMDType opType)
+{
+    return opType == HCCL_CMD_ALLREDUCE || opType == HCCL_CMD_ALLGATHER || opType == HCCL_CMD_REDUCE_SCATTER ||
+           opType == HCCL_CMD_ALLTOALLV || opType == HCCL_CMD_ALLTOALL;
+}
+
+template <typename Func>
+HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
+{
+    if (!IsMc2BatchModeOp(param.opType)) {
+        return func();
+    }
+
+    HCCL_DEBUG(
+        "[MC2_BATCH][Start] opType[%u], algName[%s], algTag[%s].", static_cast<u32>(param.opType), param.algName,
+        param.algTag);
+    HcclResult startRet = static_cast<HcclResult>(HcommBatchModeStart(param.algTag));
+    CHK_PRT_RET(
+        startRet != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[MC2_BATCH][Start] failed, ret[%d], opType[%u], algName[%s], algTag[%s].", static_cast<int>(startRet),
+            static_cast<u32>(param.opType), param.algName, param.algTag),
+        startRet);
+
+    HcclResult execRet = func();
+    HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+    HCCL_DEBUG(
+        "[MC2_BATCH][End] opType[%u], algName[%s], algTag[%s], execRet[%d], endRet[%d].",
+        static_cast<u32>(param.opType), param.algName, param.algTag, static_cast<int>(execRet),
+        static_cast<int>(endRet));
+
+    if (execRet != HCCL_SUCCESS) {
+        if (endRet != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "[MC2_BATCH][Cleanup] executor failed, execRet[%d], and batch end failed, endRet[%d], "
+                "opType[%u], algName[%s], algTag[%s].",
+                static_cast<int>(execRet), static_cast<int>(endRet), static_cast<u32>(param.opType), param.algName,
+                param.algTag);
+        }
+        return execRet;
+    }
+    CHK_PRT_RET(
+        endRet != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[MC2_BATCH][End] failed, ret[%d], opType[%u], algName[%s], algTag[%s].", static_cast<int>(endRet),
+            static_cast<u32>(param.opType), param.algName, param.algTag),
+        endRet);
+    return HCCL_SUCCESS;
+}
+} // namespace
+
+HcclResult LaunchOpenOpParamDataImpl(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+>>>>>>> upstream/master
 {
     auto* param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);
@@ -125,11 +184,14 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
         "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
         __FILE__, __LINE__, opParam.size(), sizeof(mc2_ops_hccl::OpParam), offsetof(mc2_ops_hccl::OpParam, varMemSize),
         static_cast<unsigned long long>(param->varMemSize), static_cast<u32>(param->opType), param->algName);
+<<<<<<< HEAD
     mc2_ops_hccl::AlgResourceCtxSerializable resCtx;
 
     char* ctx = static_cast<char*>(param->resCtx);
     std::vector<char> seq(ctx, ctx + param->ctxSize);
     resCtx.DeSerialize(seq);
+=======
+>>>>>>> upstream/master
     HCCL_INFO(
         "[MC2_OPEN_DIAG][Launch] opType %u, algName[%s], inputPtr %p, outputPtr %p, resCtx %p, ctxSize %llu, stream %p."
         "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.",
@@ -179,7 +241,12 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
         (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
          param->opType == HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
+<<<<<<< HEAD
         HcclResult cannRet = mc2_ops_hccl::LaunchViaCann(*param, resCtx);
+=======
+        HcclResult cannRet =
+            RunWithMc2BatchMode(*param, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
+>>>>>>> upstream/master
         CHK_PRT_RET(
             cannRet != HCCL_SUCCESS,
             HCCL_ERROR(
@@ -193,7 +260,8 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
         mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
     CHK_SMART_PTR_NULL(executor);
 
-    HcclResult ret = executor->Orchestrate(*param, resCtx);
+    CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
+    HcclResult ret = RunWithMc2BatchMode(*param, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
 
     return HCCL_SUCCESS;

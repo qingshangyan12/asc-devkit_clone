@@ -22,7 +22,7 @@ np.random.seed(9)
 def gen_golden_data(scenario=1):
     """
     根据场景编号生成输入数据和Golden数据
-    
+
     Args:
         scenario: 场景编号
             1 - AddRelu: half -> half 加法与ReLU激活
@@ -56,12 +56,19 @@ def gen_golden_data(scenario=1):
     input1.tofile("./input/input1.bin")
     golden.tofile("./output/golden.bin")
 
-    print(f"Generated data for scenario {scenario}: input0 shape={input0.shape}, dtype={input0.dtype}")
+    print(
+        f"Generated data for scenario {scenario}: input0 shape={input0.shape}, dtype={input0.dtype}"
+    )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2],
-                        help='Scenario number: 1=AddRelu, 2=Axpy')
+    parser.add_argument(
+        "-scenarioNum",
+        type=int,
+        default=1,
+        choices=[1, 2],
+        help="Scenario number: 1=AddRelu, 2=Axpy",
+    )
     args = parser.parse_args()
     gen_golden_data(args.scenarioNum)

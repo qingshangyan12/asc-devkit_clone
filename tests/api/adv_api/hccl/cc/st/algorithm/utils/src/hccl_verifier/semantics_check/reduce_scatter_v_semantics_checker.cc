@@ -95,4 +95,8 @@ HcclResult TaskCheckReduceScatterVSemantics(
     return HcclResult::HCCL_SUCCESS;
 }
 
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

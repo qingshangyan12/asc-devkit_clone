@@ -27,14 +27,21 @@ public:
     u32 DevSize() const;
 
 public:
+<<<<<<< HEAD
     TaskInfoQueue* GetQueue(u32 devId, u32 streamId) const;
     std::shared_ptr<TaskInfo> GetTaskInfo(u32 devId, u32 streamId, u32 taskId) const;
+=======
+    TaskInfoQueue            *GetQueue(u32 devId, u32 streamId) const;
+    TaskInfo* GetTaskInfo(u32 devId, u32 streamId, u32 taskId) const;
+>>>>>>> upstream/master
 
     TaskInfoQueue& CreateQueue(u32 devId, u32 streamId, QueueType type);
     void DestroyQueue(u32 devId, u32 streamId);
 
     TaskInfoQueueMap::iterator Begin(u32 devId);
     TaskInfoQueueMap::iterator End(u32 devId);
+
+    HcclResult FindTaskInfo(u32 devId, u32 streamId, u32 taskId, TaskInfo*& curTask) const;
 
 private:
     static GlobalMirrorTasks ins_;

@@ -18,9 +18,15 @@ import argparse
 # ---- kernel 常量 (与 bank_conflict_ub.asc / config.h 对齐) ----
 TOTAL_LENGTH = 4096
 REPEAT_TIMES_FOR_INSTR_EXCUTE = 1000
+<<<<<<< HEAD
 ITEMS_PER_ITER = 64                       # 256 bytes / sizeof(float) = 64 elements per repeat
 REPEAT_TIMES = TOTAL_LENGTH // ITEMS_PER_ITER  # 64
 DATABLOCK_FLOATS = 8                      # 32 bytes / sizeof(float) = 8 floats per DataBlock
+=======
+ITEMS_PER_ITER = 64  # 256 bytes / sizeof(float) = 64 elements per repeat
+REPEAT_TIMES = TOTAL_LENGTH // ITEMS_PER_ITER  # 64
+DATABLOCK_FLOATS = 8  # 32 bytes / sizeof(float) = 8 floats per DataBlock
+>>>>>>> upstream/master
 NUM_BLOCKS_PER_REPEAT = ITEMS_PER_ITER // DATABLOCK_FLOATS  # 8
 
 # ---- BinaryRepeatParams: (dstBlkStride, src0BlkStride, src1BlkStride, dstRepStride, src0RepStride, src1RepStride) ----
@@ -49,7 +55,13 @@ def _build_src0_pattern(x_data, scenario_num):
         for k in range(NUM_BLOCKS_PER_REPEAT):
             src_idx = r * src0RepS * DATABLOCK_FLOATS + k * src0BlkS * DATABLOCK_FLOATS
             dst_start = r * ITEMS_PER_ITER + k * DATABLOCK_FLOATS
+<<<<<<< HEAD
             src0[dst_start:dst_start + DATABLOCK_FLOATS] = x_data[src_idx:src_idx + DATABLOCK_FLOATS]
+=======
+            src0[dst_start : dst_start + DATABLOCK_FLOATS] = x_data[
+                src_idx : src_idx + DATABLOCK_FLOATS
+            ]
+>>>>>>> upstream/master
     return src0
 
 
@@ -87,12 +99,32 @@ def gen_golden_data(scenario_num):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     parser = argparse.ArgumentParser(description="Generate test data for bank_conflict_ub")
     parser.add_argument("--scenario", "-s", type=int, default=None,
                         help="scenario number (1-8), overrides SCENARIO_NUM env")
     args = parser.parse_args()
 
     scenario_num = args.scenario if args.scenario is not None else int(os.environ.get("SCENARIO_NUM", "1"))
+=======
+    parser = argparse.ArgumentParser(
+        description="Generate test data for bank_conflict_ub"
+    )
+    parser.add_argument(
+        "--scenario",
+        "-s",
+        type=int,
+        default=None,
+        help="scenario number (1-8), overrides SCENARIO_NUM env",
+    )
+    args = parser.parse_args()
+
+    scenario_num = (
+        args.scenario
+        if args.scenario is not None
+        else int(os.environ.get("SCENARIO_NUM", "1"))
+    )
+>>>>>>> upstream/master
     if scenario_num not in STRIDE_CONFIGS:
         print(f"[ERROR] Invalid scenario_num={scenario_num}. Valid range: 1-8")
         exit(1)

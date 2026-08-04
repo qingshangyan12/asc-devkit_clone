@@ -12,14 +12,19 @@
  * \file sincos_tiling_impl.cpp
  * \brief
  */
+#include "adv_api/utils/types.h"
 #include <vector>
 #include <set>
 #include <cstdint>
+<<<<<<< HEAD
 #include "../../../../include/adv_api/math/sincos_tiling.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
+=======
+#include "adv_api/math/sincos_tiling.h"
+#include "utils/tiling/platform/platform_ascendc.h"
+>>>>>>> upstream/master
 #include "../../detail/host_log.h"
 #include "../../detail/api_check/host_apicheck.h"
-#include "graph/tensor.h"
 
 namespace AscendC {
 namespace {
@@ -32,8 +37,8 @@ static constexpr const char SINCOS_GET_MAX_MIN[] = "GetSinCosMaxMinTmpSize";
 static constexpr const char SINCOS_GET_TMP_BUFFER[] = "GetSinCosTmpBufferFactorSize";
 } // namespace
 void GetSinCosMaxMinTmpSize(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize,
-    const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape,
+    const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 {
     constexpr uint32_t alignSize = 32;
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<SINCOS_GET_MAX_MIN>(srcShape.GetShapeSize(), typeSize);

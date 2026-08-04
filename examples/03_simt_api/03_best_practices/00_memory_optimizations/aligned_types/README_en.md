@@ -10,7 +10,11 @@
 
 ## Supported CANN Software Version
 
+<<<<<<< HEAD
   - \> CANN 9.0.0
+=======
+  - \>= CANN 9.1.0
+>>>>>>> upstream/master
 
 ## Directory Structure
 
@@ -42,7 +46,11 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
   Restrictions of `alignas`:
 
+<<<<<<< HEAD
   - **Can only increase, not decrease**: The `N` in `alignas(N)` must be >= the default `alignof` of the type, that is, the maximum `alignof` of all fields; otherwise the compiler will ignore it or report an error.
+=======
+  - **Can only increase, not decrease**: The `N` in `alignas(N)` must be greater than or equal to the default `alignof` of the type, that is, the maximum `alignof` of all fields; otherwise the compiler will ignore it or report an error.
+>>>>>>> upstream/master
   - **Must be a power of 2**: The `N` in `alignas(N)` must be a power of 2.
   - **Also increases sizeof**: `sizeof` must be a multiple of `alignof`, so when increasing `alignof`, `sizeof` rounds up.
 
@@ -166,7 +174,11 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 ## Build and Run
 
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -199,10 +211,17 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
 ## Performance Data Collection
 
+<<<<<<< HEAD
   Use the `msprof` tool to collect performance data on a single component:
 
   ```bash
   msprof op ./demo   # Analyze example performance
+=======
+  Use the `msOpProf` tool to collect performance data on a single component:
+
+  ```bash
+  msopprof ./demo   # Analyze example performance
+>>>>>>> upstream/master
   ```
 
   After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:

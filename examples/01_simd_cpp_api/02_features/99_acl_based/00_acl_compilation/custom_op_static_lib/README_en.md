@@ -26,13 +26,21 @@ This example uses `AddCustom` to demonstrate how to compile, package, and link a
 
 In this example, the `op` directory is responsible for compiling and packaging the custom operator static library. The generated static library path is `./build/customize-install/lib/lib${package_name}.a`. The `app` directory imports the static library via `find_package(${package_name})`, compiles `main.cpp` to generate `execute_add_op`, calls `aclnnAddCustom`, and verifies the results.
 
+<<<<<<< HEAD
 For the AddCustom operator description and related information, refer to [Operator Description](../custom_op/README.md).
+=======
+For the AddCustom operator description and related information, refer to [Operator Description](../custom_op/README_en.md).
+>>>>>>> upstream/master
 
 ## Build and Run
 
 - Configure environment variables
 
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment. Ensure that `ASCEND_HOME_PATH` points to the CANN installation root path so that header file and library paths take effect.
+=======
+  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment. Ensure that `ASCEND_HOME_PATH` points to the CANN installation root path so that header file and library paths take effect.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -44,7 +52,12 @@ For the AddCustom operator description and related information, refer to [Operat
   Run the following steps in the root directory of this example.
 
   ```bash
+<<<<<<< HEAD
   mkdir -p build; cd build
+=======
+  mkdir -p build && cd build
+  python3 ../app/scripts/gen_data.py
+>>>>>>> upstream/master
   cmake .. && make -j
   ./execute_add_op
   ```

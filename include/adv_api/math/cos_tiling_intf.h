@@ -21,4 +21,8 @@ namespace AscendC {
 typedef void CosTilingDeprecatedHeader;
 using LibCosTilingInterface = CosTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_COS_TILING_INTF_H
+=======
+#endif // LIB_MATH_COS_TILING_INTF_H
+>>>>>>> upstream/master

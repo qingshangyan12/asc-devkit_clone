@@ -21,4 +21,8 @@ HcclResult TaskCheckAllGatherVSemantics(
 
 }
 
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

@@ -16,7 +16,7 @@
 #define LIB_MATH_ERFC_TILING_H
 #include <cstdint>
 
-#include "graph/tensor.h"
+#include "../utils/types.h"
 namespace AscendC {
 /*!
  * \brief The calculation of the Erfc interface requires the developer to reserve or apply for temporary space.
@@ -28,7 +28,11 @@ namespace AscendC {
  * \param [out] extraBuf, the size of the extra temporary space
  */
 void GetErfcMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+>>>>>>> upstream/master
     uint32_t& minValue);
 
 /*!

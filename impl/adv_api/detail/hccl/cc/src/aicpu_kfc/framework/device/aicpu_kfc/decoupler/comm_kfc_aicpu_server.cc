@@ -26,7 +26,6 @@
 #include "coll_comm_aicpu_mgr.h"
 #include "stream_lite.h"
 #include "thread.h"
-#include "aicpu_ts_thread.h"
 
 using namespace HcclApi;
 namespace {
@@ -82,6 +81,7 @@ HcclResult IsDevice950(bool& isDevice950)
     return HCCL_SUCCESS;
 }
 
+<<<<<<< HEAD
 HcclResult GetMainThreadFromOpParam(const std::vector<uint8_t>& baseOpParam, ThreadHandle& mainThread)
 {
     CHK_PRT_RET(
@@ -110,6 +110,11 @@ HcclResult GetMainThreadFromOpParam(const std::vector<uint8_t>& baseOpParam, Thr
 HcclResult GetNextThreadAndStream(const ServerExecCtx& execCtx, hccl::Thread*& thread, Hccl::StreamLite*& streamLite)
 {
     CHK_PRT_RET(
+=======
+HcclResult GetNextThreadAndStream(const ServerExecCtx& execCtx, hccl::Thread*& thread, Hccl::StreamLite*& streamLite)
+{
+    CHK_PRT_RET(
+>>>>>>> upstream/master
         execCtx.mainThread == 0U,
         HCCL_ERROR(
             "Invalid main thread for commName[%s], opParamKey %#llx.", execCtx.commName.c_str(), execCtx.opParamKey),
@@ -253,12 +258,31 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
         CHK_PRT_RET(
             commName.empty(), HCCL_ERROR("Group %u: empty comm name for opParamKey %#llx.", groupIdx_, opParamKey),
             HCCL_E_PARA);
+<<<<<<< HEAD
+=======
+        CHK_PRT_RET(
+            baseOpParam.size() < sizeof(mc2_ops_hccl::OpParam),
+            HCCL_ERROR(
+                "Group %u: base op param size %zu is smaller than OpParam size %zu for opParamKey %#llx.", groupIdx_,
+                baseOpParam.size(), sizeof(mc2_ops_hccl::OpParam), opParamKey),
+            HCCL_E_PARA);
+        const auto* baseParam = reinterpret_cast<const mc2_ops_hccl::OpParam*>(baseOpParam.data());
+        CHK_PTR_NULL(baseParam);
+
+        mc2_open::OpenResCtxHolder resCtxHolder{};
+        CHK_RET(mc2_open::AcquireOpenResCtx(opParamKey, *baseParam, resCtxHolder));
+        CHK_PRT_RET(
+            resCtxHolder == nullptr,
+            HCCL_ERROR("Group %u: failed to acquire open resource ctx for opParamKey %#llx.", groupIdx_, opParamKey),
+            HCCL_E_INTERNAL);
+>>>>>>> upstream/master
 
         ServerExecCtx execCtx{};
         execCtx.offset = algInfo.offset;
         execCtx.opParamKey = opParamKey;
         execCtx.commName = commName;
         execCtx.baseOpParam = std::move(baseOpParam);
+        execCtx.resCtxHolder = std::move(resCtxHolder);
 
         bool isDevice950 = false;
         CHK_RET(IsDevice950(isDevice950));
@@ -272,12 +296,16 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
                 HCCL_E_PARA);
             CollCommAicpu* collCommAicpu = commMgr->GetCollCommAicpu();
             CHK_PTR_NULL(collCommAicpu);
-            ThreadHandle mainThread = 0U;
-            CHK_RET(GetMainThreadFromOpParam(execCtx.baseOpParam, mainThread));
+            CHK_PRT_RET(
+                execCtx.resCtxHolder->threads.empty() || execCtx.resCtxHolder->threads[0] == 0U,
+                HCCL_ERROR(
+                    "Group %u: invalid open op resource ctx threads, thread num %zu, opParamKey %#llx.", groupIdx_,
+                    execCtx.resCtxHolder->threads.size(), opParamKey),
+                HCCL_E_PARA);
             execCtx.resourceType = ServerExecResourceType::NEXT_AICPU;
             execCtx.commMgr = commMgr;
             execCtx.collCommAicpu = collCommAicpu;
-            execCtx.mainThread = mainThread;
+            execCtx.mainThread = execCtx.resCtxHolder->threads[0];
         } else {
 #ifdef MC2_SERVER_ONLY
             HCCL_ERROR(
@@ -521,10 +549,15 @@ HcclResult CommKfcAicpuServer::FormatOpParamFromMsg(
     return FormatOpenOpParamDataFromMsg(execCtx.baseOpParam, msg, extMsg, rankNum_, repeatIdx, stream, opParam);
 }
 
+<<<<<<< HEAD
 HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(std::vector<uint8_t>& opParam)
+=======
+HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+>>>>>>> upstream/master
 {
     LogOpenOpParamBrief("KernelServerBegin", opParam);
-    HcclResult ret = LaunchOpenOpParamData(opParam);
+    HcclResult ret = LaunchOpenOpParamData(opParam, resCtx);
     HCCL_INFO("[MC2_OPEN_DIAG][KernelServerEnd] ret %u, opParamSize %zu.", ret, opParam.size());
     return ret;
 }
@@ -541,6 +574,10 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     CHK_PRT_RET(
         execCtx == nullptr, HCCL_ERROR("Group %u: exec ctx %#llx is not added by host.", groupIdx_, opParamKey),
         HCCL_E_PARA);
+    CHK_PRT_RET(
+        execCtx->resCtxHolder == nullptr,
+        HCCL_ERROR("Group %u: open resource ctx is not cached for opParamKey %#llx.", groupIdx_, opParamKey),
+        HCCL_E_INTERNAL);
 
     const HcclHandle handle = msg.addMsg.v1Msg.selfHandleID;
     CHK_PRT_RET(handle < 0, HCCL_ERROR("Group %u: invalid handle id %d.", groupIdx_, handle), HCCL_E_INTERNAL);
@@ -612,7 +649,11 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
+<<<<<<< HEAD
         ret = LaunchOpenAicpuKernelServer(runParam);
+=======
+        ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+>>>>>>> upstream/master
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,

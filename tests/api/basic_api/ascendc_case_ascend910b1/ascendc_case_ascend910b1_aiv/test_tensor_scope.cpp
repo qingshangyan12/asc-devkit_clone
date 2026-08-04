@@ -9,12 +9,14 @@
  */
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
-#include <fstream>
-#include <iostream>
+#include <atomic>
 #include "kernel_operator.h"
 
 using namespace AscendC;
+
 namespace {
+std::atomic<uint64_t> g_raiseCount{0};
+
 /******************************** 双目指令 ********************************/
 template <typename T>
 using BinaryOpPtr = void (*)(
@@ -1015,7 +1017,15 @@ void BilinearInterpolationBitmaskOpTest(std::vector<TPosition>& tensorPos)
         sharedTmpBuffer);
 }
 
+<<<<<<< HEAD
 int32_t RaiseStub(int32_t i) { return 0; }
+=======
+int32_t RaiseStub(int32_t i)
+{
+    g_raiseCount++;
+    return 0;
+}
+>>>>>>> upstream/master
 } // namespace
 
 class TensorScopeTest : public testing::Test {
@@ -1051,330 +1061,555 @@ INSTANTIATE_TEST_CASE_P(
             "Add",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Add>,
             "Add",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Add>,
             "Add",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Sub
         ElemwiseOpTestParams{
             BinaryOpTest<float, Sub>,
             "Sub",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Sub>,
             "Sub",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Sub>,
             "Sub",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Mul
         ElemwiseOpTestParams{
             BinaryOpTest<float, Mul>,
             "Mul",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Mul>,
             "Mul",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Mul>,
             "Mul",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Div
         ElemwiseOpTestParams{
             BinaryOpTest<float, Div>,
             "Div",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Div>,
             "Div",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Div>,
             "Div",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Max
         ElemwiseOpTestParams{
             BinaryOpTest<float, Max>,
             "Max",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Max>,
             "Max",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Max>,
             "Max",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Min
         ElemwiseOpTestParams{
             BinaryOpTest<float, Min>,
             "Min",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Min>,
             "Min",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Min>,
             "Min",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // And
         ElemwiseOpTestParams{
             BinaryOpTest<float, And>,
             "And",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, And>,
             "And",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, And>,
             "And",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Or
         ElemwiseOpTestParams{
             BinaryOpTest<float, Or>,
             "Or",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Or>,
             "Or",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, Or>,
             "Or",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // AddRelu
         ElemwiseOpTestParams{
             BinaryOpTest<float, AddRelu>,
             "AddRelu",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, AddRelu>,
             "AddRelu",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, AddRelu>,
             "AddRelu",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // FusedMulAdd
         ElemwiseOpTestParams{
             BinaryOpTest<float, FusedMulAdd>,
             "FusedMulAdd",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, FusedMulAdd>,
             "FusedMulAdd",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, FusedMulAdd>,
             "FusedMulAdd",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // SubRelu
         ElemwiseOpTestParams{
             BinaryOpTest<float, SubRelu>,
             "SubRelu",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, SubRelu>,
             "SubRelu",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, SubRelu>,
             "SubRelu",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // FusedMulAddRelu
         ElemwiseOpTestParams{
             BinaryOpTest<float, FusedMulAddRelu>,
             "FusedMulAddRelu",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, FusedMulAddRelu>,
             "FusedMulAddRelu",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, FusedMulAddRelu>,
             "FusedMulAddRelu",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // MulAddRelu
         ElemwiseOpTestParams{
             BinaryOpTest<float, MulAddRelu>,
             "MulAddRelu",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "src1",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, MulAddRelu>,
             "MulAddRelu",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOpTest<float, MulAddRelu>,
             "MulAddRelu",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // MulAddDst
         ElemwiseOpTestParams{
             BinaryOp2TypeTest<float, half, MulAddDst>,
             "MulAddDst",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOp2TypeTest<float, half, MulAddDst>,
             "MulAddDst",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOp2TypeTest<float, half, MulAddDst>,
             "MulAddDst",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // AddDeqRelu
         ElemwiseOpTestParams{
             BinaryOp2TypeTest<half, int32_t, AddDeqRelu>,
             "AddDeqRelu",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOp2TypeTest<half, int32_t, AddDeqRelu>,
             "AddDeqRelu",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryOp2TypeTest<half, int32_t, AddDeqRelu>,
             "AddDeqRelu",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src0",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         //*********************************************************** 单目指令(7条)
         //***********************************************************
         // Relu
@@ -1383,13 +1618,19 @@ INSTANTIATE_TEST_CASE_P(
             "Relu",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             UnaryOpTest<float, Relu>,
             "Relu",
             {TPosition::A1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
         // Exp
@@ -1407,66 +1648,155 @@ INSTANTIATE_TEST_CASE_P(
             UnaryOpTest<float, Abs>, "Abs", {TPosition::VECIN, TPosition::A1}, "src", "A1", "VECIN / VECOUT / VECCALC"},
         ElemwiseOpTestParams{
             UnaryOpTest<float, Abs>, "Abs", {TPosition::A1, TPosition::VECIN}, "dst", "A1", "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+        // Exp
+        ElemwiseOpTestParams{
+            UnaryOpTest<float, Exp>,
+            "Exp",
+            {TPosition::VECIN, TPosition::A1},
+            "src",
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+        ElemwiseOpTestParams{
+            UnaryOpTest<float, Exp>,
+            "Exp",
+            {TPosition::A1, TPosition::VECIN},
+            "dst",
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+        // Ln
+        ElemwiseOpTestParams{
+            UnaryOpTest<float, Ln>,
+            "Ln",
+            {TPosition::VECIN, TPosition::A1},
+            "src",
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+        ElemwiseOpTestParams{
+            UnaryOpTest<float, Ln>,
+            "Ln",
+            {TPosition::A1, TPosition::VECIN},
+            "dst",
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+        // Abs
+        ElemwiseOpTestParams{
+            UnaryOpTest<float, Abs>,
+            "Abs",
+            {TPosition::VECIN, TPosition::A1},
+            "src",
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+        ElemwiseOpTestParams{
+            UnaryOpTest<float, Abs>,
+            "Abs",
+            {TPosition::A1, TPosition::VECIN},
+            "dst",
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Reciprocal
         ElemwiseOpTestParams{
             UnaryOpTest<float, Reciprocal>,
             "Reciprocal",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             UnaryOpTest<float, Reciprocal>,
             "Reciprocal",
             {TPosition::A1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Rsqrt
         ElemwiseOpTestParams{
             UnaryOpTest<float, Rsqrt>,
             "Rsqrt",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             UnaryOpTest<float, Rsqrt>,
             "Rsqrt",
             {TPosition::A1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Sqrt
         ElemwiseOpTestParams{
             UnaryOpTest<float, Sqrt>,
             "Sqrt",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             UnaryOpTest<float, Sqrt>,
             "Sqrt",
             {TPosition::A1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Not
         ElemwiseOpTestParams{
             UnaryOpTest<uint16_t, Not>,
             "Not",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             UnaryOpTest<uint16_t, Not>,
             "Not",
             {TPosition::A1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         //*********************************************************** 双目标量指令(7条)
         //***********************************************************
         // Adds
@@ -1475,105 +1805,175 @@ INSTANTIATE_TEST_CASE_P(
             "Adds",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryScalarOpTest<float, Adds<float, true>>,
             "Adds",
             {TPosition::B1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "B1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(B1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Muls
         ElemwiseOpTestParams{
             BinaryScalarOpTest<float, Muls<float, true>>,
             "Muls",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryScalarOpTest<float, Muls<float, true>>,
             "Muls",
             {TPosition::B1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "B1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(B1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Maxs
         ElemwiseOpTestParams{
             BinaryScalarOpTest<float, Maxs<float, true>>,
             "Maxs",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryScalarOpTest<float, Maxs<float, true>>,
             "Maxs",
             {TPosition::B1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "B1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(B1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // Mins
         ElemwiseOpTestParams{
             BinaryScalarOpTest<float, Mins<float, true>>,
             "Mins",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryScalarOpTest<float, Mins<float, true>>,
             "Mins",
             {TPosition::B1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "B1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(B1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // ShiftLeft
         ElemwiseOpTestParams{
             BinaryScalarOpTest<uint32_t, ShiftLeft<uint32_t, true>>,
             "ShiftLeft",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryScalarOpTest<uint32_t, ShiftLeft<uint32_t, true>>,
             "ShiftLeft",
             {TPosition::B1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "B1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(B1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // ShiftRight
         ElemwiseOpTestParams{
             BinaryScalarOpTest<uint32_t, ShiftRight<uint32_t, true>>,
             "ShiftRight",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryScalarOpTest<uint32_t, ShiftRight<uint32_t, true>>,
             "ShiftRight",
             {TPosition::B1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "B1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(B1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // LeakyRelu
         ElemwiseOpTestParams{
             BinaryScalarOpTest<half, LeakyRelu<half, true>>,
             "LeakyRelu",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BinaryScalarOpTest<half, LeakyRelu<half, true>>,
             "LeakyRelu",
             {TPosition::B1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "B1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(B1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         //*********************************************************** Brcb指令(1条)
         //***********************************************************
         // Brcb
@@ -1582,15 +1982,25 @@ INSTANTIATE_TEST_CASE_P(
             "Brcb",
             {TPosition::VECIN, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BrcbOpTest<uint16_t, Brcb>,
             "Brcb",
             {TPosition::A1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         //*********************************************************** Duplicate指令(1条)
         //***********************************************************
         // Duplicate
@@ -1599,8 +2009,13 @@ INSTANTIATE_TEST_CASE_P(
             "Duplicate",
             {TPosition::A1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         //*********************************************************** Cast指令(1条)
         //***********************************************************
         // Cast
@@ -1609,42 +2024,68 @@ INSTANTIATE_TEST_CASE_P(
             "Cast",
             {TPosition::A1, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // DataCopy
         ElemwiseOpTestParams{
             DataCopyOpTest1<float>,
             "DataCopy from GlobalTensor to LocalTensor with DataCopyParams",
             {TPosition::C2},
             "dst",
+<<<<<<< HEAD
             "C2",
             "A1 / B1 / C1 / VECIN"},
+=======
+            "BiasTable Buffer(C2)",
+            "L1 Buffer(A1/B1/C1)/UB(VECIN)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest2<float>,
             "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams",
             {TPosition::C2},
             "dst",
+<<<<<<< HEAD
             "C2",
             "A1 / B1 / VECIN"},
+=======
+            "BiasTable Buffer(C2)",
+            "L1 Buffer(A1/B1)/UB(VECIN)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest3<float>,
             "DataCopy from LocalTensor to GlobalTensor with DataCopyParams",
             {TPosition::C2},
             "src",
+<<<<<<< HEAD
             "C2",
             "A1 / B1 / VECOUT"},
+=======
+            "BiasTable Buffer(C2)",
+            "L1 Buffer(A1/B1)/UB(VECOUT)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest4<float, DataCopy>,
             "DataCopy from LocalTensor to LocalTensor with Nd2NzParams",
             {TPosition::VECIN, TPosition::A1},
             "dst",
+<<<<<<< HEAD
             "VECIN",
             "TSCM"},
+=======
+            "UB(VECIN)",
+            "L1 Buffer(TSCM)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest4<float, DataCopy>,
             "DataCopy from LocalTensor to LocalTensor with Nd2NzParams",
             {TPosition::TSCM, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECCALC / VECOUT"},
         ElemwiseOpTestParams{
@@ -1654,11 +2095,23 @@ INSTANTIATE_TEST_CASE_P(
             "dst",
             "TSCM",
             "C2 / C2PIPE2GM"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECCALC/VECOUT)"},
+        ElemwiseOpTestParams{
+            DataCopyOpTest5<float, float, DataCopy>,
+            "DataCopy from LocalTensor(L1 Buffer(A1/B1/C1)) to LocalTensor with DataCopyParams",
+            {TPosition::TSCM, TPosition::C1},
+            "dst",
+            "L1 Buffer(TSCM)",
+            "BiasTable Buffer(C2)/Fixpipe Buffer(C2PIPE2GM)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest5<float, float, DataCopy>,
             "DataCopy from LocalTensor to LocalTensor with DataCopyParams",
             {TPosition::TSCM, TPosition::C2},
             "src",
+<<<<<<< HEAD
             "C2",
             "VECIN / VECCALC / VECOUT / A1 / B1 / C1"},
         ElemwiseOpTestParams{
@@ -1668,48 +2121,92 @@ INSTANTIATE_TEST_CASE_P(
             "dst",
             "C2",
             "VECCALC / VECOUT / TSCM"},
+=======
+            "BiasTable Buffer(C2)",
+            "UB(VECIN/VECCALC/VECOUT)/L1 Buffer(A1/B1/C1)"},
+        ElemwiseOpTestParams{
+            DataCopyOpTest5<float, float, DataCopy>,
+            "DataCopy from LocalTensor(UB(VECIN/VECCALC/VECOUT)) to LocalTensor with DataCopyParams",
+            {TPosition::C2, TPosition::VECIN},
+            "dst",
+            "BiasTable Buffer(C2)",
+            "UB(VECCALC/VECOUT)/L1 Buffer(TSCM)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest5<float, uint16_t, DataCopy>,
             "DataCopy from LocalTensor to LocalTensor with T / U",
             {TPosition::B2, TPosition::C1},
             "dst",
+<<<<<<< HEAD
             "B2",
             "C2"},
+=======
+            "L0B Buffer(B2)",
+            "BiasTable Buffer(C2)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest5<float, uint16_t, DataCopy>,
             "DataCopy from LocalTensor to LocalTensor with T / U",
             {TPosition::C2, TPosition::B2},
             "src",
+<<<<<<< HEAD
             "B2",
             "C1"},
+=======
+            "L0B Buffer(B2)",
+            "L1 Buffer(C1)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest6<float, DataCopy>,
             "DataCopy with SliceInfo",
             {TPosition::C2},
             "dst",
+<<<<<<< HEAD
             "C2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "BiasTable Buffer(C2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest7<float, DataCopy>,
             "DataCopy with SliceInfo",
             {TPosition::C2},
             "src",
+<<<<<<< HEAD
             "C2",
             "VECIN / VECOUT / VECCALC"},
         ElemwiseOpTestParams{
             DataCopyOpTest8<float, DataCopy>, "DataCopy with Nz2NdParamsFull", {TPosition::C2}, "src", "C2", "VECOUT"},
+=======
+            "BiasTable Buffer(C2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+        ElemwiseOpTestParams{
+            DataCopyOpTest8<float, DataCopy>,
+            "DataCopy with Nz2NdParamsFull",
+            {TPosition::C2},
+            "src",
+            "BiasTable Buffer(C2)",
+            "UB(VECOUT)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest9<float, DataCopy>,
             "DataCopy from GlobalTensor to LocalTensor with DataCopyEnhancedParams",
             {TPosition::C2},
             "dst",
+<<<<<<< HEAD
             "C2",
             "A1 / B1 / VECIN"},
+=======
+            "BiasTable Buffer(C2)",
+            "L1 Buffer(A1/B1)/UB(VECIN)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest10<float, DataCopy>,
             "DataCopy from LocalTensor to GlobalTensor with DataCopyEnhancedParams",
             {TPosition::C2},
             "src",
+<<<<<<< HEAD
             "C2",
             "A1 / B1 / VECOUT"},
         ElemwiseOpTestParams{
@@ -1733,68 +2230,134 @@ INSTANTIATE_TEST_CASE_P(
             "dst",
             "C2",
             "CO2"},
+=======
+            "BiasTable Buffer(C2)",
+            "L1 Buffer(A1/B1)/UB(VECOUT)"},
+        ElemwiseOpTestParams{
+            DataCopyOpTest11<float, DataCopy>,
+            "DataCopy from LocalTensor(UB(VECIN/VECCALC/VECOUT)) to LocalTensor with DataCopyEnhancedParams",
+            {TPosition::C2, TPosition::VECIN},
+            "dst",
+            "BiasTable Buffer(C2)",
+            "UB(VECCALC/VECOUT)/L1 Buffer(A1/B1/TSCM)"},
+        ElemwiseOpTestParams{
+            DataCopyOpTest11<float, DataCopy>,
+            "DataCopy from LocalTensor(L1 Buffer(A1/B1)) to LocalTensor with DataCopyEnhancedParams",
+            {TPosition::C2, TPosition::A1},
+            "dst",
+            "BiasTable Buffer(C2)",
+            "L0C Buffer(CO1)"},
+        ElemwiseOpTestParams{
+            DataCopyOpTest11<float, DataCopy>,
+            "DataCopy from LocalTensor(L0C Buffer(CO1)) to LocalTensor with DataCopyEnhancedParams",
+            {TPosition::C2, TPosition::CO1},
+            "dst",
+            "BiasTable Buffer(C2)",
+            "UB(CO2)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest11<float, DataCopy>,
             "DataCopy from LocalTensor to LocalTensor with DataCopyEnhancedParams",
             {TPosition::C2, TPosition::CO2},
             "src",
+<<<<<<< HEAD
             "CO2",
             "VECIN"},
+=======
+            "GM(CO2)",
+            "UB(VECIN)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest12<int8_t, float, DataCopy<int8_t, float>>,
             "DataCopy from LocalTensor to LocalTensor with DataCopyCO12DstParams",
             {TPosition::A1, TPosition::CO2},
             "src",
+<<<<<<< HEAD
             "CO2",
             "CO1"},
+=======
+            "GM(CO2)",
+            "L0C Buffer(CO1)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest12<int8_t, float, DataCopy<int8_t, float>>,
             "DataCopy from LocalTensor to LocalTensor with DataCopyCO12DstParams",
             {TPosition::C2, TPosition::CO1},
             "dst",
+<<<<<<< HEAD
             "C2",
             "A1"},
+=======
+            "BiasTable Buffer(C2)",
+            "L1 Buffer(A1)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest12<int8_t, float, DataCopy<int8_t, float>>,
             "DataCopy from LocalTensor to LocalTensor with DataCopyCO12DstParams",
             {TPosition::C2, TPosition::CO1},
             "dst",
+<<<<<<< HEAD
             "C2",
             "A1"},
+=======
+            "BiasTable Buffer(C2)",
+            "L1 Buffer(A1)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyOpTest13<int8_t, float, DataCopy<int8_t, float>>,
             "DataCopy from LocalTensor to GlobalTensor with DataCopyCO12DstParams",
             {TPosition::CO2},
             "src",
+<<<<<<< HEAD
             "CO2",
             "CO1"},
+=======
+            "GM(CO2)",
+            "L0C Buffer(CO1)"},
+>>>>>>> upstream/master
         // DataCopyPad
         ElemwiseOpTestParams{
             DataCopyPadOpTest1<float, DataCopyPad>,
             "DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams",
             {TPosition::CO2},
             "dst",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyPadOpTest2<float, DataCopyPad>,
             "DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams",
             {TPosition::CO2},
             "src",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyPadOpTest3<float, DataCopyPad>,
             "DataCopyPad with Nd2NzParams",
             {TPosition::A1, TPosition::CO2},
             "src",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyPadOpTest3<float, DataCopyPad>,
             "DataCopyPad with Nd2NzParams",
             {TPosition::CO2, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "CO2",
             "TSCM"},
         ElemwiseOpTestParams{
@@ -1804,111 +2367,193 @@ INSTANTIATE_TEST_CASE_P(
             "dst",
             "CO2",
             "VECIN / VECOUT"},
+=======
+            "GM(CO2)",
+            "L1 Buffer(TSCM)"},
+        ElemwiseOpTestParams{
+            DataCopyPadOpTest4<float, DataCopyPad>,
+            "DataCopyPad from GM to UB(VECIN/VECOUT)",
+            {TPosition::CO2},
+            "dst",
+            "GM(CO2)",
+            "UB(VECIN/VECOUT)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyPadOpTest5<float, DataCopyPad>,
             "DataCopyPad with Nd2NzParams",
             {TPosition::CO2, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "CO2",
             "TSCM"},
+=======
+            "GM(CO2)",
+            "L1 Buffer(TSCM)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             DataCopyPadOpTest5<float, DataCopyPad>,
             "DataCopyPad with Nd2NzParams",
             {TPosition::TSCM, TPosition::A1},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT)"},
+>>>>>>> upstream/master
         // Copy
         ElemwiseOpTestParams{
             CopyOpTest1<float, Copy>,
             "Copy",
             {TPosition::VECIN, TPosition::CO2},
             "src",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             CopyOpTest1<float, Copy>,
             "Copy",
             {TPosition::CO2, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             CopyOpTest2<float, Copy>,
             "Copy",
             {TPosition::VECIN, TPosition::CO2},
             "src",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             CopyOpTest2<float, Copy>,
             "Copy",
             {TPosition::CO2, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         // BilinearInterpolation
         ElemwiseOpTestParams{
             BilinearInterpolationOpTest<half, BilinearInterpolation>,
             "BilinearInterpolation",
             {TPosition::CO2, TPosition::VECIN, TPosition::VECIN, TPosition::VECIN},
             "dstLocal",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BilinearInterpolationOpTest<half, BilinearInterpolation>,
             "BilinearInterpolation",
             {TPosition::VECIN, TPosition::CO2, TPosition::VECIN, TPosition::VECIN},
             "src0Local",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BilinearInterpolationOpTest<half, BilinearInterpolation>,
             "BilinearInterpolation",
             {TPosition::VECIN, TPosition::VECIN, TPosition::CO2, TPosition::VECIN},
             "src0OffsetLocal",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BilinearInterpolationOpTest<half, BilinearInterpolation>,
             "BilinearInterpolation",
             {TPosition::VECIN, TPosition::VECIN, TPosition::VECIN, TPosition::CO2},
             "src1Local",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BilinearInterpolationBitmaskOpTest<half, BilinearInterpolation>,
             "BilinearInterpolation",
             {TPosition::CO2, TPosition::VECIN, TPosition::VECIN, TPosition::VECIN},
             "dstLocal",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BilinearInterpolationBitmaskOpTest<half, BilinearInterpolation>,
             "BilinearInterpolation",
             {TPosition::VECIN, TPosition::CO2, TPosition::VECIN, TPosition::VECIN},
             "src0Local",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BilinearInterpolationBitmaskOpTest<half, BilinearInterpolation>,
             "BilinearInterpolation",
             {TPosition::VECIN, TPosition::VECIN, TPosition::CO2, TPosition::VECIN},
             "src0OffsetLocal",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         ElemwiseOpTestParams{
             BilinearInterpolationBitmaskOpTest<half, BilinearInterpolation>,
             "BilinearInterpolation",
             {TPosition::VECIN, TPosition::VECIN, TPosition::VECIN, TPosition::CO2},
             "src1Local",
+<<<<<<< HEAD
             "CO2",
             "VECIN / VECOUT / VECCALC"}
+=======
+            "GM(CO2)",
+            "UB(VECIN/VECOUT/VECCALC)"}
+>>>>>>> upstream/master
 
         ));
 
 TEST_P(ElemwiseOpTestsuite, ElemwiseOpTestCase)
 {
+<<<<<<< HEAD
     static int32_t count = 0;
     MOCKER(raise, int32_t(*)(int32_t)).stubs().will(invoke(RaiseStub));
     auto param = GetParam();
@@ -1934,4 +2579,12 @@ TEST_P(ElemwiseOpTestsuite, ElemwiseOpTestCase)
     EXPECT_TRUE(resultString.find(goldenStr) != std::string::npos);
     EXPECT_EQ(remove(fileName.c_str()), 0);
     count++;
+=======
+    auto param = GetParam();
+    SCOPED_TRACE(param.funcName + "." + param.illegalTensorPos);
+    MOCKER(raise, int32_t(*)(int32_t)).stubs().will(invoke(RaiseStub));
+    const uint64_t startCount = g_raiseCount.load();
+    param.func(param.tensorPos);
+    EXPECT_GT(g_raiseCount.load() - startCount, 0);
+>>>>>>> upstream/master
 }

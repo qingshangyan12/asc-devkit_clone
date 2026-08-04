@@ -478,4 +478,8 @@ bool GraphRevampBilateralSemantics::IsReadWriteWithSameRank(RankId peerRank, Tas
     return false;
 }
 
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

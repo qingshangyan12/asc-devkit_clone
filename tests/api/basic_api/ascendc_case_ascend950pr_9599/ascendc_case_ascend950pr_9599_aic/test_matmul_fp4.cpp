@@ -1078,4 +1078,8 @@ KERNEL_MATMUL_NONMX(
 KERNEL_MATMUL_NONMX(
     TEST_KERNEL_MATMUL, 1, 16, 32, 32, GM, GM, GM, GM, ND, ND, ND, ND, fp8_e4m3fn_t, fp8_e5m2_t, float, float, 1, false)
 KERNEL_MATMUL_NONMX(
+<<<<<<< HEAD
     TEST_KERNEL_MATMUL, 1, 16, 32, 32, GM, GM, GM, GM, ND, ND, ND, ND, hifloat8_t, hifloat8_t, float, float, 1, false)
+=======
+    TEST_KERNEL_MATMUL, 1, 16, 32, 32, GM, GM, GM, GM, ND, ND, ND, ND, hifloat8_t, hifloat8_t, float, float, 1, false)
+>>>>>>> upstream/master

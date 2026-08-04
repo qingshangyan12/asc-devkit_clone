@@ -81,4 +81,8 @@ int32_t pv_read_va_register(PVEnv* p_env, int32_t va_index, uint64_t* val0, uint
 int32_t pv_write_va_register(PVEnv* p_env, int32_t va_index, uint64_t* val0, uint64_t* val1) { return 0; }
 
 int32_t pv_read_smask_tbl(const PVEnv* p_env, int64_t addr, void* buffer, int32_t len) { return 0; }
+<<<<<<< HEAD
 int32_t pv_write_smask_tbl(const PVEnv* p_env, int64_t addr, const void* buffer, int32_t len) { return 0; }
+=======
+int32_t pv_write_smask_tbl(const PVEnv* p_env, int64_t addr, const void* buffer, int32_t len) { return 0; }
+>>>>>>> upstream/master

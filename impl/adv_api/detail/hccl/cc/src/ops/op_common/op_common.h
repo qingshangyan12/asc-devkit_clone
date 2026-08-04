@@ -98,6 +98,7 @@ HcclResult CheckDataType(const HcclDataType dataType, bool needReduce);
 std::string GetSupportDataType(bool needReduce);
 
 HcclResult SetCommEngine(OpParam& param);
+<<<<<<< HEAD
 
 void CompReqChannelWithExistChannel(
     const std::vector<std::vector<ChannelInfo>>& existChannels, AlgResourceRequest& resRequest);
@@ -115,8 +116,25 @@ HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName);
 HcclResult SaveMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle thread, u32 notifyNum);
 
 HcclResult GetMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle& thread, u32& notifyNum);
+=======
 
-HcclResult CheckAsymmetricTopoSupport(HcclCMDType opType, const TopoInfoWithNetLayerDetails* topoInfo);
+void CompReqChannelWithExistChannel(
+    const std::vector<std::vector<ChannelInfo>>& existChannels, AlgResourceRequest& resRequest);
+
+HcclResult HcclMemcpyCtxHostToDevice(
+    HcclComm comm, const OpParam& param, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence,
+    uint64_t& ctxSize);
+
+HcclResult SingleRankProc(const OpParam& param);
+
+HcclResult HcclCheckTag(const char* tag);
+
+HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName);
+
+HcclResult SaveMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle thread, u32 notifyNum);
+>>>>>>> upstream/master
+
+HcclResult GetMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle& thread, u32& notifyNum);
 
 HcclResult Selector(
     HcclComm comm, OpParam& param, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName);

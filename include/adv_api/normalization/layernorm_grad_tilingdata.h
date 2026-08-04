@@ -51,4 +51,8 @@ TILING_DATA_FIELD_DEF(uint32_t, lastDimValueBack);
 TILING_DATA_FIELD_DEF(uint32_t, lastDimValueBackMulTwo);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // LIB_NORMALIZATION_LAYERNORM_GRAD_TILINGDATA_H
+=======
+#endif // LIB_NORMALIZATION_LAYERNORM_GRAD_TILINGDATA_H
+>>>>>>> upstream/master

@@ -9,7 +9,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "tensor_api/stub/cce_stub.h"
+#include "c_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 #include <mockcpp/mockcpp.hpp>
 
@@ -168,7 +168,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchNz2Nz)
         load_cbuf_to_ca,
         void(__ca__ float*, __cbuf__ float*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool))
         .times(1)
-        .will(invoke(&load_cbuf_to_ca_batch_stub<float, 8, 2, 8, 8>));
+        .will(invoke(&load_cbuf_to_ca_batch_stub<float, 2, 8, 2, 2>));
 
     Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
 
@@ -226,6 +226,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2NzB8B4)
     auto dstBatchLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitFP4>(batch, m, n);
     auto l1Tensor = MakeTensorAt<Location::L1>(src, srcBatchLayout);
     auto l0aTensor = MakeTensorAt<Location::L0A>(dst, dstBatchLayout);
+<<<<<<< HEAD
 
     gBatchB4DstBase = dst;
     gBatchB4SrcBase = src;
@@ -241,6 +242,23 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchZn2NzB8B4)
 
     Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
 
+=======
+
+    gBatchB4DstBase = dst;
+    gBatchB4SrcBase = src;
+    gBatchB4CallIndex = 0;
+
+    MOCKER_CPP(
+        load_cbuf_to_ca_s4, void(
+                                __ca__ fp4x2_e1m2_t*, __cbuf__ fp4x2_e1m2_t*, uint16_t, uint16_t, uint8_t, uint8_t,
+                                int16_t, uint16_t, bool))
+        .times(batch * splitNum)
+        .will(invoke(&load_cbuf_to_ca_batch_b4_split_stub<
+                     fp4x2_e1m2_t, 4, 1, 8, 1, srcBatchStride, dstBatchStride, dstSplitStride, splitNum>));
+
+    Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
+
+>>>>>>> upstream/master
     EXPECT_EQ(gBatchB4CallIndex, batch * splitNum);
     mockcpp::GlobalMockObject::verify();
 }
@@ -324,3 +342,104 @@ TEST_TENSOR_API_LOAD_DATA(int8_t, 32, 32, ZN, NZ, L1, L0A, cbuf, ca, true);
 TEST_TENSOR_API_LOAD_DATA(uint8_t, 32, 32, ZN, NZ, L1, L0A, cbuf, ca, true);
 TEST_TENSOR_API_LOAD_DATA(int16_t, 16, 16, ZN, NZ, L1, L0A, cbuf, ca, true);
 TEST_TENSOR_API_LOAD_DATA(uint16_t, 16, 16, ZN, NZ, L1, L0A, cbuf, ca, true);
+
+// ================= img2col (L1 NC1HWC0 -> L0A NZ) =================
+// The img2col instruction has 17 params, above mockcpp's API-hook arity limit, so this drives the
+// full copy path against the empty cce stub and checks it routes/compiles without a crash. The dst
+// NZ M/K (conv-unfolded, ceil-aligned) and the src NC1HWC0 axes exercise LoadDataL12L0AImg2Col::Run.
+namespace {
+template <typename T, size_t C0>
+auto MakeNc1hwc0Layout(int n, int c1, int h, int w)
+{
+    using namespace AscendC::Te;
+    return MakeFrameLayout<NC1HWC0LayoutPtn>(n, c1, h, w, static_cast<int>(C0));
+}
+} // namespace
+
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0AImg2Col)
+{
+    using namespace AscendC::Te;
+
+    // src NC1HWC0: N=1, C1=2, H=5, W=5, C0=16 -> channelSize = C1*C0 = 32.
+    constexpr int N = 1;
+    constexpr int C1 = 2;
+    constexpr int H = 5;
+    constexpr int W = 5;
+    constexpr int C0 = 16;
+
+    // filter 3x3, stride 1, pad 1, dilation 1 -> Ho = Wo = 5, M = 25, K = 3*3*32 = 288.
+    constexpr int filterH = 3;
+    constexpr int filterW = 3;
+    constexpr int M = 25;
+    constexpr int K = filterH * filterW * C1 * C0; // 288
+    constexpr int mAlign = 32;                     // ceil(25, 16) * 16
+    constexpr int kAlign = 288;                    // already a multiple of C0
+
+    __cbuf__ int16_t src[N * C1 * H * W * C0] = {0};
+    __ca__ int16_t dst[mAlign * kAlign] = {0};
+
+    auto srcTensor = MakeTensor(MakeMemPtr<Location::L1>(src), MakeNc1hwc0Layout<int16_t, C0>(N, C1, H, W));
+    auto l0aTensor = MakeTensorAt<Location::L0A>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<int16_t>>(M, K));
+
+    // dst NZ ceil-aligned M/K, now provided by the caller via Img2ColParams.
+    Img2ColParams<int16_t> params;
+    params.mExtension = static_cast<uint16_t>(mAlign);
+    params.kExtension = static_cast<uint16_t>(kAlign);
+    params.filterW = filterW;
+    params.filterH = filterH;
+    params.strideW = 1;
+    params.strideH = 1;
+    params.padList[0] = params.padList[1] = params.padList[2] = params.padList[3] = 1;
+
+    auto atom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
+    Copy(atom.with(params), l0aTensor, srcTensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+// conv3D img2col (L1 NDC1HWC0 -> L0A NZ). The depth axis D is merged with C1 into the channel
+// dimension (channelSize = D*C1*C0), so the caller passes the whole NDC1HWC0 tensor (no per-depth
+// slicing). Routes to LoadDataL12L0AImg2Col3D. Drives the full path against the empty cce stub to
+// verify it routes/compiles.
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0AImg2Col3D)
+{
+    using namespace AscendC::Te;
+
+    // src NDC1HWC0: N=1, D=4, C1=2, H=5, W=5, C0=16 -> merged channelSize = D*C1*C0 = 128.
+    constexpr int N = 1;
+    constexpr int D = 4;
+    constexpr int C1 = 2;
+    constexpr int H = 5;
+    constexpr int W = 5;
+    constexpr int C0 = 16;
+
+    // filter 3x3, stride 1, pad 1 -> Ho = Wo = 5, M = 25, K = 3*3*(D*C1*C0) = 3*3*128 = 1152.
+    constexpr int filterH = 3;
+    constexpr int filterW = 3;
+    constexpr int M = 25;
+    constexpr int K = filterH * filterW * D * C1 * C0; // 1152
+    constexpr int mAlign = 32;
+    constexpr int kAlign = 1152;
+
+    __cbuf__ int16_t src[N * D * C1 * H * W * C0] = {0};
+    __ca__ int16_t dst[mAlign * kAlign] = {0};
+
+    auto srcTensor = MakeTensor(
+        MakeMemPtr<Location::L1>(src), MakeFrameLayout<NDC1HWC0LayoutPtn>(N, D, C1, H, W, static_cast<int>(C0)));
+    auto l0aTensor = MakeTensorAt<Location::L0A>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<int16_t>>(M, K));
+
+    Img2ColParams<int16_t> params;
+    params.mExtension = static_cast<uint16_t>(mAlign);
+    params.kExtension = static_cast<uint16_t>(kAlign);
+    params.filterW = filterW;
+    params.filterH = filterH;
+    params.strideW = 1;
+    params.strideH = 1;
+    params.padList[0] = params.padList[1] = params.padList[2] = params.padList[3] = 1;
+
+    auto atom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
+    // Whole NDC1HWC0 tensor: D and C1 are merged into the channel axis inside the img2col.
+    Copy(atom.with(params), l0aTensor, srcTensor);
+
+    EXPECT_EQ(dst[0], 0);
+}

@@ -22,4 +22,8 @@ namespace AscendC {
 using LibXorInterface = XorDeprecatedHeader;
 } // namespace AscendC
 
+<<<<<<< HEAD
 #endif // LIB_MATH_XOR_TILING_INTF
+=======
+#endif // LIB_MATH_XOR_TILING_INTF
+>>>>>>> upstream/master

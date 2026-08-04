@@ -11,6 +11,7 @@
 #include <sstream>
 #include <memory>
 #include "alg_param.h"
+#include "alg_data_trans_wrapper.h"
 #include "executor_base.h"
 #include "coll_alg_exec_registry.h"
 #include "coll_alg_v2_exec_registry.h"
@@ -218,6 +219,7 @@ private:
             return &result.first->second;
         }
     }
+<<<<<<< HEAD
 
     mutable std::shared_timed_mutex mapMutex_;
     std::unordered_map<std::string, CommDomainCache> commCaches_;
@@ -227,6 +229,17 @@ private:
 thread_local CommDomainCacheManager g_cacheManager;
 } // namespace
 
+=======
+
+    mutable std::shared_timed_mutex mapMutex_;
+    std::unordered_map<std::string, CommDomainCache> commCaches_;
+};
+
+// 全局缓存管理器实例
+thread_local CommDomainCacheManager g_cacheManager;
+} // namespace
+
+>>>>>>> upstream/master
 extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKernel(OpParam* param)
 {
     if (param == nullptr) {
@@ -314,6 +327,12 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         }
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR("failed to restore optype [%d] data and counts.", param->opType);
+            return 1;
+        }
+        if (InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported) != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "failed to initialize HcommBatchTransferOnThread support, tag is %s, supported is %d.", param->algTag,
+                static_cast<int>(resCtx.isHcommBatchTransferOnThreadSupported));
             return 1;
         }
         // 获取Device测主thread

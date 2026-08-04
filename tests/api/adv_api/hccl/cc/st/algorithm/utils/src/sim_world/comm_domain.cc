@@ -44,4 +44,8 @@ void CommDomain::Init(const TopoMeta& topoMeta)
 }
 
 void CommDomain::Clear() { rankId2Pos_.clear(); }
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

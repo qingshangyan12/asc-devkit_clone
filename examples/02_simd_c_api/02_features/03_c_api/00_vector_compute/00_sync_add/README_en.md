@@ -8,7 +8,11 @@ This example demonstrates the Add operator using C_API interfaces, implemented b
 ```
 ├── 00_sync_add
 │   ├── CMakeLists.txt         // CMake build file
+<<<<<<< HEAD
 |   └── c_api_add.asc          // Operator implementation & invocation example
+=======
+│   └── c_api_add.asc          // Operator implementation & invocation example
+>>>>>>> upstream/master
 ```
 
 ## Operator Description
@@ -52,7 +56,11 @@ This example demonstrates the Add operator using C_API interfaces, implemented b
 ## Build and Run
 Run the following steps in the root directory of this example to build and execute the operator.
 - Configure Environment Variables
+<<<<<<< HEAD
   Select the corresponding command to configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Select the corresponding command to configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   - Default path, root user installs the CANN package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

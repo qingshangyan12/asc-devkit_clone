@@ -1,17 +1,22 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file kernel_struct_gather.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_struct_gather.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_GATHER_H__
@@ -33,8 +38,7 @@ struct GatherRepeatParams {
     __aicore__ GatherRepeatParams() {}
 
     __aicore__ GatherRepeatParams(const uint8_t dstBlkStrideIn, const uint8_t dstRepStrideIn)
-        : dstBlkStride(dstBlkStrideIn),
-          dstRepStride(dstRepStrideIn)
+        : dstBlkStride(dstBlkStrideIn), dstRepStride(dstRepStrideIn)
     {}
 
     uint32_t blockNumber = DEFAULT_BLK_NUM;
@@ -48,10 +52,7 @@ struct GatherRepeatParams {
     bool strideSizeMode = false;
 };
 
-enum class GatherMaskMode : uint8_t {
-    VERSION_V1 = 0,
-    VERSION_V2 = 1
-};
+enum class GatherMaskMode : uint8_t { VERSION_V1 = 0, VERSION_V2 = 1 };
 
 #if (__NPU_ARCH__ == 2201)
 const GatherMaskMode defaultGahterMaskMode = GatherMaskMode::VERSION_V2;
@@ -64,8 +65,9 @@ const GatherMaskMode defaultGatherMaskMode = GatherMaskMode::VERSION_V1;
 struct GatherMaskParams {
     __aicore__ GatherMaskParams() {}
 
-    __aicore__ GatherMaskParams(const uint8_t src0BlockStrideIn, const uint16_t repeatTimesIn,
-        const uint16_t src0RepeatStrideIn, const uint8_t src1RepeatStrideIn)
+    __aicore__ GatherMaskParams(
+        const uint8_t src0BlockStrideIn, const uint16_t repeatTimesIn, const uint16_t src0RepeatStrideIn,
+        const uint8_t src1RepeatStrideIn)
         : src0BlockStride(src0BlockStrideIn),
           repeatTimes(repeatTimesIn),
           src0RepeatStride(src0RepeatStrideIn),

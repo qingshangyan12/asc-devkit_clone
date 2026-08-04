@@ -20,4 +20,8 @@ TEST_VECTOR_COMPUTE_VCVT_INSTR_4(
     Uint322uint8_sat_v3, asc_uint322uint8_sat_v3, vcvt, vector_uint8_t, vector_uint32_t, 5);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_4(Uint322uint8_v4, asc_uint322uint8_v4, vcvt, vector_uint8_t, vector_uint32_t, 6);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_4(
+<<<<<<< HEAD
     Uint322uint8_sat_v4, asc_uint322uint8_sat_v4, vcvt, vector_uint8_t, vector_uint32_t, 7);
+=======
+    Uint322uint8_sat_v4, asc_uint322uint8_sat_v4, vcvt, vector_uint8_t, vector_uint32_t, 7);
+>>>>>>> upstream/master

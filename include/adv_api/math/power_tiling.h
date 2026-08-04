@@ -16,7 +16,11 @@
 #define LIB_MATH_POWER_TILING_H
 #include <cstdint>
 
+<<<<<<< HEAD
 #include "graph/tensor.h"
+=======
+#include "../utils/types.h"
+>>>>>>> upstream/master
 namespace AscendC {
 /*
  * @ingroup GetPowerMaxMinTmpSize for V220
@@ -31,8 +35,13 @@ namespace AscendC {
  * @param [out] minValue: min temporary local space size
  */
 void GetPowerMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape1, const ge::Shape& srcShape2, const bool typeIsInt, const uint32_t typeSize,
     const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+=======
+    const AscendC::TensorShape& srcShape1, const AscendC::TensorShape& srcShape2, const bool typeIsInt,
+    const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+>>>>>>> upstream/master
 
 /*
  * @ingroup GetPowerTmpBufferFactorSize for V220

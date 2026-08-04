@@ -15,7 +15,11 @@ This example uses vector addition to demonstrate performance tuning methods for 
 
 ## Supported CANN Software Version
 
+<<<<<<< HEAD
 - \> CANN 9.0.0
+=======
+- \>= CANN 9.1.0
+>>>>>>> upstream/master
 
 ## Directory Structure
 
@@ -107,7 +111,11 @@ __global__ void add(T* x, T* y, T* z, uint64_t size)
 - End-to-end latency: **86.478 us**
 - Write cache hit rate: **49.3%**
 - Read/write bandwidth: **7.77(GB/s) | 6.24(GB/s)**
+<<<<<<< HEAD
 - Performance analysis: The Add operator performs simple X+Y=Z. When writing back results, the hit rate is below 50%, indicating that write cache miss rate exceeds 50%, triggering additional memory read-back (RMW) operations, classified as write misses. The typical cause is data misalignment or small data types preventing Warp from filling completely.
+=======
+- Performance analysis: The Add operator performs simple X+Y=Z. When writing back results, the hit rate is below 50%, indicating that write cache miss rate exceeds 50%, triggering additional memory read-back (RMW) operations, classified as write misses. The typical cause is data misalignment or small data type bit width preventing Warp from filling completely.
+>>>>>>> upstream/master
 
 **Performance Optimization Recommendation**:
 > **Introduce half2 type**
@@ -169,7 +177,11 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 **Principle Description**:  
 In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 bytes.
 
+<<<<<<< HEAD
 - Case 1 (scalar half): Incomplete cache line causes RMW write amplification  
+=======
+- Case 1 (scalar half): Unable to fill entire cache line causes RMW write amplification  
+>>>>>>> upstream/master
   Using scalar half (2B). When a single Warp (32 threads) issues instructions simultaneously, the total width concatenated spatially is:  
   $$
   32 * 2B = 64B
@@ -195,7 +207,11 @@ In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 by
 
 | Optimization Method | Core Principle              | Applicable Scenarios                                                                                                                                                                                                                                                                                                                                               |
 |:-----|:------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+<<<<<<< HEAD
 | Short vector  | Underlying instructions support computing two data elements at once | 1. half/bfloat16_t type elements performing [basic operations](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符), more short vector types see [complete type list](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMT编程简介/扩展语法/内置数据类型-139.md#短向量类型) |
+=======
+| Short vector  | Underlying instructions support computing two data elements at once | 1. half/bfloat16_t type elements performing [basic operations](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符), more short vector types see [complete type list](../../../../../docs/zh/api/SIMT-API/SIMT编程简介/扩展语法/内置数据类型-139.md#短向量类型) |
+>>>>>>> upstream/master
 
 ---
 
@@ -203,7 +219,11 @@ In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 by
 
 Run the following steps in the root directory of this example to build and execute the example.
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -228,7 +248,11 @@ Run the following steps in the root directory of this example to build and execu
   Example:
 
   ```bash
+<<<<<<< HEAD
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # NPU simulation mode
+=======
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+>>>>>>> upstream/master
   ```
 
   > **Notice:** Before switching build modes, clean the cmake cache by running `rm CMakeCache.txt` in the build directory and then re-run cmake.
@@ -250,10 +274,17 @@ Run the following steps in the root directory of this example to build and execu
 
 ## Performance Data Collection
 
+<<<<<<< HEAD
 Use the `msprof` tool to collect performance data on a single component:
 
 ```bash
 msprof op ./demo   # Analyze case performance
+=======
+Use the `msOpProf` tool to collect performance data on a single component:
+
+```bash
+msopprof ./demo   # Analyze case performance
+>>>>>>> upstream/master
 ```
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:

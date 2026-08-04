@@ -7,6 +7,13 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+<<<<<<< HEAD
+=======
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "transdata.h cannot be used with compile flag --enable-simt enabled."
+#endif
+>>>>>>> upstream/master
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__

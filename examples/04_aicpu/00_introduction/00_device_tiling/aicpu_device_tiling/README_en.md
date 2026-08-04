@@ -21,7 +21,11 @@ This sample demonstrates tiling offload computation using AI CPU operators.
 │   ├── kernel_args.h                      // Tiling struct header file
 │   ├── main.asc                           // AI CPU and AI Core operator calls
 │   ├── aicpu_tiling.aicpu                 // AI CPU operator implementation
+<<<<<<< HEAD
 │   └── README.md                           // Sample documentation
+=======
+│   └── README.md                          // Sample documentation
+>>>>>>> upstream/master
 ```
 
 ## Sample Description
@@ -32,7 +36,11 @@ This sample demonstrates tiling offload computation using AI CPU operators.
 Follow these steps in the sample root directory.
 
 - Configure environment variables  
+<<<<<<< HEAD
   Configure environment variables according to the CANN development kit package [installation method](../../../../../docs/quick_start.md#prepare&install).
+=======
+  Configure environment variables according to the CANN development kit package [installation method](../../../../../docs/zh/quick_start.md#prepare&install).
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -65,4 +73,8 @@ Follow these steps in the sample root directory.
   Hello World: int mode 2 len 4 m 10.
   Hello World: int mode 2 len 4 m 10.
   Hello World: int mode 2 len 4 m 10.
+<<<<<<< HEAD
   ```
+=======
+  ```
+>>>>>>> upstream/master

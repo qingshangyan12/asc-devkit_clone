@@ -21,4 +21,8 @@ namespace AscendC {
 typedef void AxpyTilingDeprecatedHeader;
 using LibAxpyTilingInterface = AxpyTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_AXPY_TILING_INTF_H
+=======
+#endif // LIB_MATH_AXPY_TILING_INTF_H
+>>>>>>> upstream/master

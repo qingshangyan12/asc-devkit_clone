@@ -192,4 +192,8 @@ HcclResult SimNpu::GetSlice(uint64_t addr, uint64_t dataCount, const HcclDataTyp
 
     return HcclResult::HCCL_SUCCESS;
 }
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

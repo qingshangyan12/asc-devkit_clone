@@ -1,5 +1,9 @@
 # SIMD与SIMT混合编程样例介绍
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 ## 概述
 
 SIMD与SIMT混合编程适用于同一个Kernel中同时需要向量化计算能力和线程级灵活控制的场景。通常可使用SIMD完成规则向量计算，使用SIMT处理离散访存、分支判断、线程映射和细粒度数据搬运等逻辑，从而在保留表达灵活性的同时提升规则计算效率。
@@ -66,7 +70,11 @@ SIMD与SIMT混合编程场景的常用性能优化路径如下：
 | 样例名 | 样例描述 |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | simd_simt_matrix_transpose | 以矩阵转置为例介绍UB中转和全局访存合并优化方法。样例链接：[simd_simt_matrix_transpose](./02_best_practices/simd_simt_matrix_transpose)。 |
+<<<<<<< HEAD
 | simd_simt_high_performance | 以FloorMod计算为例，对比SIMT直接访问GM、SIMD RegBase计算、SIMT访问UB以及连续线程映射等实现方式。样例链接：[simd_simt_high_performance](./02_best_practices/simd_simt_high_performance)。 |
+=======
+| simd_simt_high_performance | 以FloorMod计算为例，对比SIMT直接访问GM、SIMD Reg矢量计算、SIMT访问UB以及连续线程映射等实现方式。样例链接：[simd_simt_high_performance](./02_best_practices/simd_simt_high_performance)。 |
+>>>>>>> upstream/master
 | simd_simt_grid_dim_config | 以Gather计算为例介绍线程块数量配置和VF函数调用优化思路。样例链接：[simd_simt_grid_dim_config](./02_best_practices/simd_simt_grid_dim_config)。 |
 | simd_simt_integer_fast_div | 以固定除数整数除法为例，展示使用乘法和移位替代普通除法的优化方式。样例链接：[simd_simt_integer_fast_div](./02_best_practices/simd_simt_integer_fast_div)。 |
 

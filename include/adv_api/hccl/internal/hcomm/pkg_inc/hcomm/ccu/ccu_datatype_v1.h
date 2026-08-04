@@ -156,4 +156,8 @@ public:
 
 }; // namespace CcuRep
 }; // namespace hcomm
+<<<<<<< HEAD
 #endif // HCOMM_CCU_DATATYPE_H
+=======
+#endif // HCOMM_CCU_DATATYPE_H
+>>>>>>> upstream/master

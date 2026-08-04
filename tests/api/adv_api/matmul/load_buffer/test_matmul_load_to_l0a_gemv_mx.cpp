@@ -109,4 +109,8 @@ TEST_F(TestMxMatmulLoadToL0aGemv, MxMatmulLoadL1ToL0aGemvFp4Case)
 
     mm2.Load(l0a, l1a, 0, 0, M, K, 0, 0, false, l1aMx, M * K / MX_K_FACTOR, 0, 0);
 }
+<<<<<<< HEAD
 } // namespace
+=======
+} // namespace
+>>>>>>> upstream/master

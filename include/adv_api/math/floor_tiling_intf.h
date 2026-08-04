@@ -22,4 +22,8 @@ namespace AscendC {
 typedef void FloorTilingDeprecatedHeader;
 using LibFloorTilingInterface = FloorTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_FLOOR_TILING_INTF_H
+=======
+#endif // LIB_MATH_FLOOR_TILING_INTF_H
+>>>>>>> upstream/master

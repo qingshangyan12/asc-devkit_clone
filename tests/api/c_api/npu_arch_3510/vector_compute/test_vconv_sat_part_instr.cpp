@@ -35,4 +35,8 @@ TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz, asc_float2bfloat16_rz, vcvt, vector_bf
 TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz_sat, asc_float2bfloat16_rz_sat, vcvt, vector_bfloat16_t, vector_float, 17);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz_v2, asc_float2bfloat16_rz_v2, vcvt, vector_bfloat16_t, vector_float, 18);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_1(
+<<<<<<< HEAD
     Vcvt_rz_sat_v2, asc_float2bfloat16_rz_sat_v2, vcvt, vector_bfloat16_t, vector_float, 19);
+=======
+    Vcvt_rz_sat_v2, asc_float2bfloat16_rz_sat_v2, vcvt, vector_bfloat16_t, vector_float, 19);
+>>>>>>> upstream/master

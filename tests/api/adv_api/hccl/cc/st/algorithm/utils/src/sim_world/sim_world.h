@@ -40,4 +40,8 @@ private:
     std::map<PodId, std::map<SerId, std::map<PhyId, SimNpu>>> simNpus_;
 };
 } // namespace HcclSim
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

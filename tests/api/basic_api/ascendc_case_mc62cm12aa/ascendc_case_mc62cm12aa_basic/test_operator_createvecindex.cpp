@@ -117,4 +117,8 @@ TEST_P(CreateVecIndexTestsuite, testCreateVecIndex)
         EXPECT_EQ(dstGm[i], 0x00);
     }
     delete[] dstGm;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

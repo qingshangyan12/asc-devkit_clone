@@ -12,6 +12,7 @@
 """
 CCE configuration constants
 """
+
 from __future__ import absolute_import as _abs
 
 import threading
@@ -23,6 +24,7 @@ class OUTPUT_PATH_CLASS(object):
     """
     cce output path
     """
+
     output_path = "kernel_meta"
 
 
@@ -31,6 +33,7 @@ class GM_NAME_MAP_CLASS(object):
     """
     get gm_name map
     """
+
     gm_name_map = {}
 
 
@@ -45,6 +48,7 @@ class conv_buffer_ex(object):
     """
     conv buffer
     """
+
     offsetPad = None
 
 
@@ -88,4 +92,3 @@ ASCEND_910BVEC = ASCEND_910B + _VEC_ENGINE
 ASCEND_910CAIC = ASCEND_910C + _AIC_ENGINE
 ASCEND_910CVEC = ASCEND_910C + _VEC_ENGINE
 ASCEND_SD_AIC = "SD3403" + _AIC_ENGINE
-

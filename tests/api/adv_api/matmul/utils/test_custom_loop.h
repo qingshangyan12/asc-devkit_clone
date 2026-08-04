@@ -119,4 +119,8 @@ public:
 };
 
 } // namespace TestCustomModules
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

@@ -650,4 +650,8 @@ static opbuild::Status AclnnFallBackGeneratorBuilder(std::vector<std::string>& o
 
 static void GeneratorAclnnFallBack(void) __attribute__((constructor));
 void GeneratorAclnnFallBack(void) { GeneratorFactory::AddBuilder("fallback", AclnnFallBackGeneratorBuilder); }
+<<<<<<< HEAD
 } // namespace ops
+=======
+} // namespace ops
+>>>>>>> upstream/master

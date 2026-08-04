@@ -18,7 +18,11 @@ This sample implements a one-dimensional Gather operator in a simple scenario (w
 ├── gather_1d
 │   ├── CMakeLists.txt         # CMake build file
 │   ├── gather_1d.asc          # Sample for one-dimensional gather using SIMT
+<<<<<<< HEAD
 |   └── README.md
+=======
+│   └── README.md
+>>>>>>> upstream/master
 ```
 
 ## Operator Description
@@ -58,7 +62,11 @@ This sample implements a one-dimensional Gather operator in a simple scenario (w
 Execute the following steps in the root directory of this sample to build and run the operator.
 
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure the environment variables according to the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+=======
+  Configure the environment variables according to the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

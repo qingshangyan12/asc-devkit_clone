@@ -94,4 +94,8 @@ TEST_F(IsIntegralTest, CheckNonIntegralTypes)
     EXPECT_EQ(AscendC::Std::is_integral<const volatile float>::value, false);
     EXPECT_EQ(
         AscendC::Std::is_integral<const volatile float>::value, AscendC::Std::is_integral_v<const volatile float>);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

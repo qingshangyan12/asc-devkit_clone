@@ -7,6 +7,10 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 #ifndef HCCL_AICPU_COMMUNICATOR_IMPL_LITE_H_
 #define HCCL_AICPU_COMMUNICATOR_IMPL_LITE_H_
 
@@ -42,6 +46,7 @@ public:
     int LoadWithOpBasedMode(HcclKernelParamLite* kernelParam);
     int UpdateComm(HcclKernelParamLite* kernelParam);
 
+<<<<<<< HEAD
     HostDeviceSyncNotifyLiteMgr* GetHostDeviceSyncNotifyLiteMgr() override;
     StreamLiteMgr* GetStreamLiteMgr() override;
     QueueNotifyLiteMgr* GetQueueNotifyLiteMgr() override;
@@ -50,6 +55,16 @@ public:
     ConnectedLinkMgr* GetConnectedLinkMgr() override;
     DevId GetDevPhyId() override;
     u32 GetExecTimeOut() override;
+=======
+    HostDeviceSyncNotifyLiteMgr *GetHostDeviceSyncNotifyLiteMgr() override;
+    StreamLiteMgr               *GetStreamLiteMgr() override;
+    QueueNotifyLiteMgr          *GetQueueNotifyLiteMgr() override;
+    Cnt1tonNotifyLiteMgr        *GetCnt1tonNotifyLiteMgr() override;
+    CntNto1NotifyLiteMgr        *GetCntNto1NotifyLiteMgr() override;
+    ConnectedLinkMgr            *GetConnectedLinkMgr() override;
+    DevId                        GetDevPhyId() override;
+    u32                          GetExecTimeOut() override;
+>>>>>>> upstream/master
 
     MemTransportLiteMgr* GetTransportLiteMgr() override { return transportLiteMgr.get(); }
 
@@ -72,7 +87,19 @@ public:
 
     u64 GetCounterAddr() override { return opCounterAddr; }
 
+<<<<<<< HEAD
     MirrorTaskManagerLite* GetMirrorTaskMgrLite() override { return mirrorTaskMgrLite.get(); }
+=======
+    MirrorTaskManagerLite *GetMirrorTaskMgrLite() override
+    {
+        return mirrorTaskMgrLite.get();
+    }
+
+    string GetId() const
+    {
+        return commId;
+    }
+>>>>>>> upstream/master
 
     string GetId() const { return commId; }
 
@@ -88,7 +115,19 @@ public:
 
     bool IsCommReady() const { return isCommReady; }
 
+<<<<<<< HEAD
     void SetNeedClean(bool flag) { needClean = flag; }
+=======
+    void SetNeedClean(bool flag)
+    {
+        needClean = flag;
+    }
+
+    bool IsNeedClean() const
+    {
+        return needClean;
+    }
+>>>>>>> upstream/master
 
     bool IsNeedClean() const { return needClean; }
 
@@ -119,13 +158,17 @@ public:
 
     void SetErrorReported() { isErrorReported_ = true; }
 
+<<<<<<< HEAD
     void ResetErrorReported() { isErrorReported_ = false; }
+=======
+    void ResetErrorReported() {
+        isErrorReported_ = false;
+    }
+>>>>>>> upstream/master
 
     void UnfoldOp(HcclKernelParamLite* kernelParam);
     void RegisterRtsqCallback();
-#ifdef CCL_KERNEL_AICPU
-    void RegisterProfCallBack();
-#endif
+
     void CheckOpExecStatus() const;
     bool CheckNeedUpdateRes(HcclKernelParamLite* kernelParam);
     void UpdateCommParam(HcclKernelParamLite* kernelParam);
@@ -151,8 +194,14 @@ private:
     std::unique_ptr<ProfilingReporterLite> profilingReporterLite =
         std::make_unique<ProfilingReporterLite>(mirrorTaskMgrLite.get(), &ProfilingHandlerLite::GetInstance());
 
+<<<<<<< HEAD
     std::unique_ptr<MemTransportLiteMgr> transportLiteMgr =
         std::make_unique<MemTransportLiteMgr>(mirrorTaskMgrLite.get());
+=======
+    HcclResult InitProfilingReporterLite();
+
+    std::unique_ptr<MemTransportLiteMgr> transportLiteMgr = std::make_unique<MemTransportLiteMgr>( mirrorTaskMgrLite.get());
+>>>>>>> upstream/master
 
     std::unique_ptr<HostDeviceSyncNotifyLiteMgr> hostDeviceSyncNotifyLiteMgr =
         std::make_unique<HostDeviceSyncNotifyLiteMgr>();

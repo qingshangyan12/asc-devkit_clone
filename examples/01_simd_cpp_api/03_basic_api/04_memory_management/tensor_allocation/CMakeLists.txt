@@ -23,7 +23,11 @@ add_executable(demo
 )
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+<<<<<<< HEAD
   	 
+=======
+
+>>>>>>> upstream/master
 if(NOT DEFINED SCENARIO_NUM)
     message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1/2/3/4")
 endif()
@@ -41,4 +45,8 @@ target_compile_definitions(demo PRIVATE
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+<<<<<<< HEAD
 )
+=======
+)
+>>>>>>> upstream/master

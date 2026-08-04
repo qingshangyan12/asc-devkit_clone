@@ -22,4 +22,8 @@ typedef void SignTilingDeprecatedHeader;
 using LibSignTilingInterface = SignTilingDeprecatedHeader;
 } // namespace AscendC
 
+<<<<<<< HEAD
 #endif // LIB_MATH_SIGN_TILING_INTF_H
+=======
+#endif // LIB_MATH_SIGN_TILING_INTF_H
+>>>>>>> upstream/master

@@ -17,7 +17,11 @@ Figure 1: Code structure and call relationship
 
 ## Supported CANN Software Version
 
+<<<<<<< HEAD
 - \> CANN 9.0.0
+=======
+- \>= CANN 9.1.0
+>>>>>>> upstream/master
 
 ## Directory Structure
 
@@ -44,9 +48,15 @@ Use the `-lib` option to compile the `.asc` mixed file into a static library (.a
 bisheng -lib kernel.asc -o libkernel.a --npu-arch=dav-3510 --enable-simt
 ```
 
+<<<<<<< HEAD
 Where `--npu-arch` specifies the AI processor architecture at compile time. This example only supports `dav-3510`. For the architecture version corresponding to each product model, refer to the [correspondence table](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114). `--enable-simt` is used to specify SIMT compilation mode.
 
 For more bisheng compilation options and usage, refer to [AI-Core Operator Compilation Basic Usage](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md).
+=======
+Where `--npu-arch` specifies the AI processor architecture at compile time. This example only supports `dav-3510`. For the architecture version corresponding to each product model, refer to the [correspondence table](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch). `--enable-simt` is used to specify SIMT compilation mode.
+
+For more bisheng compilation options and usage, refer to [AI-Core Operator Compilation Basic Usage](../../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md).
+>>>>>>> upstream/master
 
 ### CMake Compilation
 
@@ -62,7 +72,11 @@ add_library(kernel STATIC
 
 Run the following steps in the root directory of this example to build and execute the example.
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
 
   ```bash
   source ${install_path}/cann/set_env.sh

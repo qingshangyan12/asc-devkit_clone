@@ -9,7 +9,11 @@ This example demonstrates how to use the `printf()` interface in SIMT programmin
 - Ascend 950PR/Ascend 950DT
 
 ## Supported CANN Software Version
+<<<<<<< HEAD
 - \> CANN 9.0.0
+=======
+- \>= CANN 9.1.0
+>>>>>>> upstream/master
 
 ## Directory Structure
 
@@ -45,7 +49,11 @@ This example demonstrates how to use the `printf()` interface in SIMT programmin
 Run the following steps in the root directory of this example to build and execute the operator.
 
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

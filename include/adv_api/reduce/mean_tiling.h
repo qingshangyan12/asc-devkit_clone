@@ -44,4 +44,8 @@ void GetMeanMaxMinTmpSize(
 void GetMeanTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuffer);
 
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_REDUCE_MEAN_TILING
+=======
+#endif // LIB_REDUCE_MEAN_TILING
+>>>>>>> upstream/master

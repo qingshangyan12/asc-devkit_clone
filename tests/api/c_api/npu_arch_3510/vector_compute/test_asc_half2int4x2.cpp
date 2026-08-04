@@ -68,4 +68,8 @@ TEST_VECTOR_COMPUTE_VCVT_INSTR_1(
     vcvt_ru_sat_v3, asc_half2int4x2_ru_sat_v3, vcvt_f162s4, vector_int4x2_t, vector_half, 45);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_1(vcvt_ru_v4, asc_half2int4x2_ru_v4, vcvt_f162s4, vector_int4x2_t, vector_half, 46);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_1(
+<<<<<<< HEAD
     vcvt_ru_sat_v4, asc_half2int4x2_ru_sat_v4, vcvt_f162s4, vector_int4x2_t, vector_half, 47);
+=======
+    vcvt_ru_sat_v4, asc_half2int4x2_ru_sat_v4, vcvt_f162s4, vector_int4x2_t, vector_half, 47);
+>>>>>>> upstream/master

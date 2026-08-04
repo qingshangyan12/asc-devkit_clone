@@ -390,4 +390,8 @@ TEST_F(VecUnaryTestSuite, VecUnaryTestSuite_Abs_tensortrait)
     MainVecUnaryTest<TensorTrait<half>, OpType::Abs>(
         src0Gm, outputGm, inputParams.stackSize, inputParams.dataSize, inputParams.maskCounter, inputParams.maskBitHigh,
         inputParams.maskBitLow, inputParams.repeatTimes, inputParams.repeatParams);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

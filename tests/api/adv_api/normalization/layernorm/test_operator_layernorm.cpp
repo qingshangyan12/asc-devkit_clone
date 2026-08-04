@@ -225,4 +225,8 @@ TEST_P(layernormTestSuite, LayernormTestCase)
     for (int32_t i = 0; i < bshLength * typeSize; i++) {
         EXPECT_EQ(outputGm[i], 0x00);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

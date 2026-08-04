@@ -97,4 +97,8 @@ TEST_F(TEST_VEC_SET_VEC_MASK, VecMaskTestSuite_MaskSetter_Reset)
     MainSetVectorMaskCalcDemo<int32_t, false, false>(
         srcGm, outputGm, static_cast<int32_t>(1), 512, maskLen, maskLow, maskHigh);
     SetMaskNorm();
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

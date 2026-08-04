@@ -21,4 +21,8 @@ namespace AscendC {
 typedef void SinhTilingDeprecatedHeader;
 using LibSinhTilingInterface = SinhTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_SINH_TILING_INTF_H
+=======
+#endif // LIB_MATH_SINH_TILING_INTF_H
+>>>>>>> upstream/master

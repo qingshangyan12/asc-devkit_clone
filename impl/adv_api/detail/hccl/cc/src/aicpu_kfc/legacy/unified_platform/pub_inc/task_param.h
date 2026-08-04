@@ -25,19 +25,32 @@ MAKE_ENUM(DmaOp, HCCL_DMA_READ, HCCL_DMA_WRITE, HCCL_DMA_NOTIFY_WAIT)
 
 MAKE_ENUM(AlgType, NOT_SPECIFIED, RING, MULTI_RING, MESH, RECURSIVE_HD, BINARY_HD, PAIR_WISE, INVALID_VAL)
 
+<<<<<<< HEAD
 MAKE_ENUM(
     TaskParamType, TASK_SDMA, TASK_RDMA, TASK_REDUCE_INLINE, TASK_REDUCE_TBE, TASK_NOTIFY_RECORD, TASK_NOTIFY_WAIT,
     TASK_SEND_NOTIFY, TASK_SEND_PAYLOAD, TASK_WRITE_WITH_NOTIFY, TASK_WRITE_REDUCE_WITH_NOTIFY, TASK_CCU,
     TASK_AICPU_KERNEL, TASK_AICPU_REDUCE, TASK_AIV, TASK_UB_INLINE_WRITE, TASK_UB_REDUCE_INLINE, TASK_UB)
+=======
+MAKE_ENUM(TaskParamType, TASK_SDMA, TASK_RDMA, TASK_REDUCE_INLINE, TASK_REDUCE_TBE, TASK_NOTIFY_RECORD, TASK_NOTIFY_WAIT,
+    TASK_SEND_NOTIFY, TASK_SEND_PAYLOAD, TASK_WRITE_WITH_NOTIFY, TASK_WRITE_REDUCE_WITH_NOTIFY, TASK_CCU, TASK_AICPU_KERNEL, TASK_AICPU_REDUCE, TASK_AIV, TASK_UB_INLINE_WRITE, TASK_UB_REDUCE_INLINE, TASK_UB,
+    TASK_DPU_KERNEL, TASK_DPU_THREAD_FENCE, TASK_DPU_CHANNEL_FENCE, TASK_DPU_INLINE_WRITE, TASK_DPU_NOTIFY_WAIT, TASK_DPU_WRITE_WITH_NOTIFY)
+>>>>>>> upstream/master
 
 MAKE_ENUM(DfxLinkType, ONCHIP, HCCS, PCIE, ROCE, SIO, HCCS_SW, STANDARD_ROCE, UB, UBoE, RESERVED)
 
 MAKE_ENUM(CcuProfilinType, CCU_TASK_PROFILING, CCU_WAITCKE_PROFILING, CCU_LOOPGROUP_PROFILING, CCU_MAP_PROFILING)
 
+<<<<<<< HEAD
 constexpr uint16_t CCU_MAX_CHANNEL_NUM = 16;               // 最多16条link
 constexpr uint16_t INVALID_CKE_ID = 0xFFFF;                // CKE ID非法值
 constexpr uint16_t INVALID_VALUE_CHANNELID = 0xFFFF;       // channel id非法值
 constexpr u64 INVALID_VALUE_NOTIFYID = 0xFFFFFFFFFFFFFFFF; // NOTIFY id非法值
+=======
+constexpr uint16_t  CCU_MAX_CHANNEL_NUM     = 16;     // 最多16条link
+constexpr uint16_t  INVALID_CKE_ID          = 0xFFFF; // CKE ID非法值
+constexpr uint16_t  INVALID_VALUE_CHANNELID = 0xFFFF; // channel id非法值
+constexpr u64       INVALID_VALUE_NOTIFYID  = 0xFFFFFFFFFFFFFFFF; // NOTIFY id非法值
+>>>>>>> upstream/master
 
 struct CcuProfilingInfo {
     std::string name;  // CCU任务名或微码名
@@ -53,6 +66,7 @@ struct CcuProfilingInfo {
     uint32_t mask;
     uint16_t channelId[CCU_MAX_CHANNEL_NUM];    // LoopGroup所包含的搬运指令使用的ChannelId
     uint32_t remoteRankId[CCU_MAX_CHANNEL_NUM]; // LoopGroup所包含的搬运指令的对端
+<<<<<<< HEAD
 
     CcuProfilingInfo()
         : name(""),
@@ -67,11 +81,17 @@ struct CcuProfilingInfo {
           ckeId(0),
           mask(0)
     {
+=======
+    uint64_t channelHandle[CCU_MAX_CHANNEL_NUM]; // channelhandle句柄
+
+    CcuProfilingInfo() : name(""), type(0), dieId(0), missionId(0), instrId(0), reduceOpType(0), inputDataType(0), outputDataType(0), dataSize(0), ckeId(0), mask(0) {
+>>>>>>> upstream/master
         (void)memset_s(channelId, sizeof(channelId), INVALID_VALUE_CHANNELID, sizeof(channelId));
         (void)memset_s(remoteRankId, sizeof(remoteRankId), INVALID_RANKID, sizeof(remoteRankId));
+        (void)memset_s(channelHandle, sizeof(channelHandle), 0xFF, sizeof(channelHandle));
     }
 };
-
+constexpr u32  ADD_LEN = 128;
 struct ParaDMA {
     const void* src;
     const void* dst;
@@ -79,9 +99,17 @@ struct ParaDMA {
     u64 notifyID;
     u32 notifyValue;
     DfxLinkType linkType;
+<<<<<<< HEAD
     DmaOp dmaOp;
     Eid locEid{};
     Eid rmtEid{};
+=======
+    DmaOp       dmaOp;
+    Eid         locEid{};
+    Eid         rmtEid{};
+    char        locAddr[ADD_LEN]{};
+    char        rmtAddr[ADD_LEN]{};
+>>>>>>> upstream/master
 };
 
 struct ParaReduce {
@@ -93,8 +121,13 @@ struct ParaReduce {
     DfxLinkType linkType;
     HcclReduceOp reduceOp{HcclReduceOp::HCCL_REDUCE_RESERVED};
     HcclDataType dataType{HcclDataType::HCCL_DATA_TYPE_RESERVED};
+<<<<<<< HEAD
     Eid locEid{};
     Eid rmtEid{};
+=======
+    Eid         locEid{};
+	Eid         rmtEid{};
+>>>>>>> upstream/master
 };
 
 struct ParaNotify {
@@ -129,9 +162,17 @@ struct ParaAiv {
 
 struct TaskParam {
     TaskParamType taskType;
+<<<<<<< HEAD
     u64 beginTime;
     u64 endTime;
     bool isMaster{false};
+=======
+    u64           beginTime;
+    u64           endTime;
+    u64           aicpuTaskId{0};
+    uint16_t      npuDevId{0};
+    bool          isMaster{false};
+>>>>>>> upstream/master
     union {
         ParaDMA DMA;       // taskType = SDMA/RDMA使用, 包括rtRDMASend写notify
         ParaReduce Reduce; // taskType = inline/CCE Reduce使用

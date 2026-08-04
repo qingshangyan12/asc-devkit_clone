@@ -111,4 +111,8 @@ TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(
 TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(
     CopyUB2GMALIGNInt64, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, int64_t);
 TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(
+<<<<<<< HEAD
     CopyUB2GMALIGNUint64, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, uint64_t);
+=======
+    CopyUB2GMALIGNUint64, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, uint64_t);
+>>>>>>> upstream/master

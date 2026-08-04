@@ -60,7 +60,11 @@ Both cases use the same data transfer flow: first transfer the data assigned to 
 The shared data transfer and SIMT invocation flow for both cases is as follows:
 
 ```cpp
+<<<<<<< HEAD
 asc_copy_gm2ub_align(input_buf, input + block_offset, 1, blk_length, 0, 0, false, 0, 0, 0);
+=======
+asc_copy_gm2ub_align(input_buf, input + block_offset, 1, blk_length, 0, 0, false, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
+>>>>>>> upstream/master
 
 if ASC_IS_AIV {
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
@@ -78,7 +82,11 @@ if ASC_IS_AIV {
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
 }
 
+<<<<<<< HEAD
 asc_copy_ub2gm_align(output + block_offset, output_buf, 1, blk_length, 0, 0, 0);
+=======
+asc_copy_ub2gm_align(output + block_offset, output_buf, 1, blk_length, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
+>>>>>>> upstream/master
 ```
 
 ### Performance Metric Description
@@ -96,6 +104,11 @@ asc_copy_ub2gm_align(output + block_offset, output_buf, 1, blk_length, 0, 0, 0);
 | aiv_mte3_time(μs) | mte3-type instruction latency, primarily corresponding to UB-to-GM transfers. |
 | aiv_mte3_ratio | Ratio of mte3-type instruction cycles to total cycles. |
 
+<<<<<<< HEAD
+=======
+Except for Task Duration, all other metrics are averages across all Thread Blocks.
+
+>>>>>>> upstream/master
 ### Case 0: Standard Division Version
 
 **Example Objective**: Implement basic integer division functionality as a latency comparison baseline for the fast division version.
@@ -116,12 +129,21 @@ uint32_t result = value / divisor;
 
 | Case | Implementation | Data Volume | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 |:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+<<<<<<< HEAD
 | Case 0 | Standard division | 8388608 | 110.167 | 109.110 | 40.685 | 0.373 | 10.701 | 0.098 | 36.229 | 0.332 | 18.678 | 0.171 |
 
 **Performance Data Analysis**:
 
 - Case 0's `Task Duration` is 110.167μs, serving as the comparison baseline for the fast division version.
 - Case 0's `aiv_time` is 109.110μs, of which `aiv_vec_time` is 40.685μs, serving as the baseline for AI Vector Core execution time and computation instruction latency in the standard division version.
+=======
+| Case 0 | Standard division | 8388608 | 117.229 | 1.277 | 0.497 | 0.390 | 0.128 | 0.099 | 0.423 | 0.331 | 0.222 | 0.174 |
+
+**Performance Data Analysis**:
+
+- Case 0's `Task Duration` is 117.229μs, serving as the comparison baseline for the fast division version.
+- Case 0's `aiv_time` is 1.277μs, of which `aiv_vec_time` is 0.497μs, serving as the baseline for AI Vector Core execution time and computation instruction latency in the standard division version.
+>>>>>>> upstream/master
 
 ---
 
@@ -168,8 +190,13 @@ In this example, based on the above division conversion approach, the SIMD part 
 The `calc_magic_shift()` function computes `magic` and `shift` for fast division:
 
 ```cpp
+<<<<<<< HEAD
 int64_t pos = BIT_64_LEN - CountLeadingZero(divisor);
 int64_t cnt1 = GetBitCount1(divisor);
+=======
+int64_t pos = BIT_64_LEN - count_leading_zero(divisor);
+int64_t cnt1 = get_bit_count1(divisor);
+>>>>>>> upstream/master
 uint32_t shift = (cnt1 == 1) ? (pos - 1) : pos;
 uint32_t magic = (1l << BIT_32_LEN) * ((1l << shift) - divisor) / divisor + 1;
 ```
@@ -185,6 +212,7 @@ uint32_t result = (value + q) >> shift;
 
 | Case | Implementation | Data Volume | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 |:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+<<<<<<< HEAD
 | Case 1 | Fast division | 8388608 | 98.235 | 97.350 | 22.497 | 0.231 | 12.707 | 0.131 | 40.026 | 0.411 | 19.513 | 0.200 |
 
 **Performance Data Analysis**:
@@ -192,6 +220,15 @@ uint32_t result = (value + q) >> shift;
 - Compared with the standard division version in Case 0, Case 1's `Task Duration` decreases from 110.167μs to 98.235μs, and `aiv_time` decreases from 109.110μs to 97.350μs, with overall execution latency reduced.
 - `aiv_vec_time` decreases from 40.685μs to 22.497μs, indicating that after replacing standard division with multiplication and shift, computation instruction latency is significantly reduced.
 - `aiv_scalar_time` increases from 10.701μs in Case 0 to 12.707μs, which is related to the additional scalar operations for computing `magic` and `shift` in the fast division scenario. However, the overall `Task Duration` still decreases, indicating that the benefits from fast division can cover this overhead.
+=======
+| Case 1 | Fast division | 8388608 | 103.889 | 1.068 | 0.270 | 0.254 | 0.142 | 0.132 | 0.425 | 0.398 | 0.221 | 0.208 |
+
+**Performance Data Analysis**:
+
+- Compared with the standard division version in Case 0, Case 1's `Task Duration` decreases from 117.229μs to 103.889μs, and `aiv_time` decreases from 1.277μs to 1.068μs, with overall execution latency reduced.
+- `aiv_vec_time` decreases from 0.497μs to 0.270μs, indicating that after replacing standard division with multiplication and shift, computation instruction latency is significantly reduced.
+- `aiv_scalar_time` increases from 0.128μs in Case 0 to 0.142μs, which is related to the additional scalar operations for computing `magic` and `shift` in the fast division scenario. However, the overall `Task Duration` still decreases, indicating that the benefits from fast division can cover this overhead.
+>>>>>>> upstream/master
 
 ---
 
@@ -201,6 +238,7 @@ uint32_t result = (value + q) >> shift;
 
 **Overall Optimization Effect**:
 
+<<<<<<< HEAD
 - Through the fast division optimization from Case 0 to Case 1, the example `Task Duration` decreases from 110.167μs to 98.235μs, a latency reduction of approximately 10.8%.
 - Case 1 achieves approximately 1.12x performance improvement relative to Case 0, indicating that in fixed-divisor scenarios, using multiplication and shift to replace standard division can reduce end-to-end latency.
 
@@ -208,13 +246,26 @@ uint32_t result = (value + q) >> shift;
 |:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Case 0 | Standard division | 110.167 | 109.110 | 40.685 | 0.373 | 10.701 | 0.098 | 36.229 | 0.332 | 18.678 | 0.171 |
 | Case 1 | Fast division | 98.235 | 97.350 | 22.497 | 0.231 | 12.707 | 0.131 | 40.026 | 0.411 | 19.513 | 0.200 |
+=======
+- Through the fast division optimization from Case 0 to Case 1, the example `Task Duration` decreases from 117.229μs to 103.889μs, a latency reduction of approximately 11.4%.
+- Case 1 achieves approximately 1.13x performance improvement relative to Case 0, indicating that in fixed-divisor scenarios, using multiplication and shift to replace standard division can reduce end-to-end latency.
+
+| Case | Implementation | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Case 0 | Standard division | 117.229 | 1.277 | 0.497 | 0.390 | 0.128 | 0.099 | 0.423 | 0.331 | 0.222 | 0.174 |
+| Case 1 | Fast division | 103.889 | 1.068 | 0.270 | 0.254 | 0.142 | 0.132 | 0.425 | 0.398 | 0.221 | 0.208 |
+>>>>>>> upstream/master
 
 ### Optimization Key Points Summary
 
 | Optimization Method | Core Principle | Example Demonstration |
 |:---|:---|:---|
 | Fixed divisor precomputation | When the divisor is fixed during kernel function execution, `magic` and `shift` can be computed in advance, and SIMT threads reuse these results for fast division. | Case 1 calls `calc_magic_shift()` in the kernel function, and SIMT threads no longer directly execute `/`. |
+<<<<<<< HEAD
 | Multiplication and shift replacing standard division | Standard integer division instructions have high overhead. Using multiplication and shift operations reduces per-element computation overhead. | Case 1 reduces `Task Duration` from 110.167μs to 98.235μs compared to Case 0. |
+=======
+| Multiplication and shift replacing standard division | Standard integer division instructions have high overhead. Using multiplication and shift operations reduces per-element computation overhead. | Case 1 reduces `Task Duration` from 117.229μs to 103.889μs compared to Case 0. |
+>>>>>>> upstream/master
 
 ## Build and Run
 
@@ -235,7 +286,11 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -269,6 +324,7 @@ Run the following steps in the root directory of this example to build and run t
 
 ### Performance Analysis
 
+<<<<<<< HEAD
 Use the `msprof` tool to obtain detailed performance data.
 
 ```bash
@@ -287,10 +343,45 @@ PROF_xxxx_XXXXXX
     ├── xx_*.csv
     └── README.txt
 ```
+=======
+### Introduction to the msOpProf Tool
+
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
+
+- On-device performance collection
+
+    On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+
+    Use the `msOpProf` tool to obtain detailed performance data.
+
+    ```bash
+    msopprof ./integer_div   # Analyze performance
+    ```
+
+    - Performance data description  
+      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+
+      ```bash
+      ├──dump                       # Raw performance data; users do not need to inspect it
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+      ├──OpBasicInfo.csv            # Basic operator information
+      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+      └──visualize_data.bin         # MindStudio Insight presentation file
+      ```
+>>>>>>> upstream/master
 
 View the specific performance analysis results:
 
 ```bash
 # View Task Duration and various metrics
+<<<<<<< HEAD
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+=======
+cat ./OPPROF_*/PipeUtilization.csv
+>>>>>>> upstream/master
 ```

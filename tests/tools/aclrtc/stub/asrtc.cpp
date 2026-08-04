@@ -33,4 +33,8 @@ asrtcResult bishengGetLoweredName(asrtcProgram prog, const char* nameExpression,
 
 asrtcResult asrtcGetProgramLogSize(asrtcProgram prog, size_t* logSizeRet) { return ASRTC_SUCCESS; }
 
+<<<<<<< HEAD
 asrtcResult asrtcGetProgramLog(asrtcProgram prog, char* log) { return ASRTC_SUCCESS; }
+=======
+asrtcResult asrtcGetProgramLog(asrtcProgram prog, char* log) { return ASRTC_SUCCESS; }
+>>>>>>> upstream/master

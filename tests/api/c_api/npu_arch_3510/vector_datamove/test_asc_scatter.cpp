@@ -23,22 +23,39 @@
                                                                                                                     \
     namespace {                                                                                                     \
     void cce_name##_##data_type##_Stub(                                                                             \
+<<<<<<< HEAD
         vector_##data_type& dst, __ubuf__ data_type* src, vector_##index_data_type index, vector_bool mask)         \
+=======
+        vector_##data_type& src, __ubuf__ data_type* dst, vector_##index_data_type index, vector_bool mask)         \
+>>>>>>> upstream/master
     {}                                                                                                              \
     }                                                                                                               \
                                                                                                                     \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)                    \
     {                                                                                                               \
+<<<<<<< HEAD
         vector_##data_type dst;                                                                                     \
         __ubuf__ data_type* src = reinterpret_cast<__ubuf__ data_type*>(0);                                         \
+=======
+        vector_##data_type src;                                                                                     \
+        __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                         \
+>>>>>>> upstream/master
         vector_##index_data_type index;                                                                             \
         vector_bool mask;                                                                                           \
                                                                                                                     \
         MOCKER_CPP(cce_name, void(vector_##data_type&, __ubuf__ data_type*, vector_##index_data_type, vector_bool)) \
+<<<<<<< HEAD
             .times(1)                                                                                               \
             .will(invoke(cce_name##_##data_type##_Stub));                                                           \
                                                                                                                     \
         c_api_name(dst, src, index, mask);                                                                          \
+=======
+            .times(2)                                                                                               \
+            .will(invoke(cce_name##_##data_type##_Stub));                                                           \
+                                                                                                                    \
+        c_api_name(dst, src, index, mask);                                                                          \
+        c_api_name(src, dst, index, mask);                                                                          \
+>>>>>>> upstream/master
         GlobalMockObject::verify();                                                                                 \
     }
 

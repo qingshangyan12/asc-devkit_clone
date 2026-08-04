@@ -1,9 +1,10 @@
-# Example Execution Verification
+# Ascend C Examples
 
-After developers implement custom operators using Ascend C API, they can verify operator functionality through single-operator invocation. This repository provides some operator implementations and their invocation examples, as shown below.
+This directory provides usage examples for different Ascend C programming modes, covering basic invocation, debugging tools, features, API libraries, performance practices, and other content.
 
 ## Example List
 
+<<<<<<< HEAD
 |  Directory Name                                                   |  Function Description                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | [01_simd_cpp_api](./01_simd_cpp_api) | SIMD API examples based on Ascend C, introducing SIMD API usage through <<<>>> direct invocation implementation |
@@ -17,6 +18,21 @@ After developers implement custom operators using Ascend C API, they can verify 
 Developers need to modify the --npu-arch build option in the CMakeLists.txt file under the specific example directory according to the actual execution environment. Refer to the correspondence in the table below to modify the npu-arch parameter value for the environment.
 
 | Product Model |  npu-arch Parameter |
+=======
+| Directory Name | Description |
+| --- | --- |
+| [01_simd_cpp_api](./01_simd_cpp_api) | Ascend C C++ API examples, covering getting started, tools, features, API libraries, best practices, and compatibility references |
+| [02_simd_c_api](./02_simd_c_api) | Ascend C C API examples, covering basic invocation, tool capabilities, and API features |
+| [03_simt_api](./03_simt_api) | Ascend C SIMT programming examples, covering getting started, debugging tools, core features, and practice references |
+| [04_aicpu](./04_aicpu) | Ascend C AICPU programming examples, covering getting started and features |
+| [05_simd_simt_hybrid](./05_simd_simt_hybrid) | Ascend C SIMD and SIMT hybrid programming examples, covering getting started and high-performance optimization examples |
+
+## npu-arch Build Option Description
+
+Developers need to modify the `--npu-arch` build option in the `CMakeLists.txt` file under the specific example directory according to the actual execution environment. The correspondence between product models and `npu-arch` parameters is as follows.
+
+| Product Model | npu-arch Parameter |
+>>>>>>> upstream/master
 | ---- | ---- |
 | Ascend 950PR/Ascend 950DT | --npu-arch=dav-3510 |
 | Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products | --npu-arch=dav-2201 |

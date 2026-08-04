@@ -156,7 +156,11 @@ When reproducing anomaly scenarios, modify the code in `ms_sanitizer.asc` accord
 Run the following steps in the root directory of this example to build and run the example.
 
 - Configure environment variables
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

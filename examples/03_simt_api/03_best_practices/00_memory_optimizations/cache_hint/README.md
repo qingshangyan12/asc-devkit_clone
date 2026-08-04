@@ -10,7 +10,7 @@
 
 ## 支持的CANN软件版本
 
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -205,7 +205,7 @@ asc_stcg(&output[idx], y);
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -239,10 +239,10 @@ asc_stcg(&output[idx], y);
 
 ## 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
-msprof op ./data_cache_hint   # 分析case的性能
+msopprof ./data_cache_hint   # 分析case的性能
 ```
 
 命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：

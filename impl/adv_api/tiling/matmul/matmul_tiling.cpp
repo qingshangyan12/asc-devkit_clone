@@ -13,7 +13,11 @@
  * \brief
  */
 
+<<<<<<< HEAD
 #include "../../../../include/adv_api/matmul/matmul_tiling.h"
+=======
+#include "adv_api/matmul/matmul_tiling.h"
+>>>>>>> upstream/master
 
 #include <iostream>
 #include <map>

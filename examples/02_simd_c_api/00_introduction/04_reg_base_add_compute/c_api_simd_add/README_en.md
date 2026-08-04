@@ -13,7 +13,11 @@ This sample implements the Add operator using the C_API interface. It is based o
 ```
 ├── c_api_simd_add
 │   ├── CMakeLists.txt          // Build project file
+<<<<<<< HEAD
 │   ├── c_api_add.asc          // Ascend C operator implementation and invocation sample
+=======
+│   ├── c_api_add.asc           // Ascend C operator implementation and invocation sample
+>>>>>>> upstream/master
 │   └── README.md
 ```
 
@@ -66,7 +70,11 @@ This sample implements the Add operator using the C_API interface. It is based o
 Execute the following steps in the sample root directory to build and run the operator.
 
 - Configure Environment Variables
+<<<<<<< HEAD
   Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development toolkit on your current environment.
+=======
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development toolkit on your current environment.
+>>>>>>> upstream/master
   - Default path, CANN package installed by root user
 
     ```bash
@@ -98,4 +106,8 @@ Execute the following steps in the sample root directory to build and run the op
 
   ```bash
   [Success] Case accuracy is verification passed.
+<<<<<<< HEAD
   ```
+=======
+  ```
+>>>>>>> upstream/master

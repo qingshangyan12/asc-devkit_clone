@@ -21,8 +21,13 @@ This example introduces batched matrix multiplication with float data type input
 │   │   └── verify_result.py        // Script for verifying whether output data matches ground truth data
 │   ├── CMakeLists.txt              // Build project file
 │   ├── data_utils.h                // Data read/write functions
+<<<<<<< HEAD
 │   ├── batch_matmul.asc              // Ascend C example implementation & invocation example
 │   └── README.md                     // Example documentation
+=======
+│   ├── batch_matmul.asc            // Ascend C example implementation & invocation example
+│   └── README.md                   // Example documentation
+>>>>>>> upstream/master
 ```
 
 ## Example Description
@@ -107,6 +112,7 @@ nd2nzA1Params.dstNzMatrixStride = aSizeAlignL0;
 
 ### L1 -> L0A / L0B Transfer and Matrix Multiplication Mmad Loop B Times
 
+<<<<<<< HEAD
 For loop B times, transferring A and B matrices for each batch from L1 -> L0A / L0B each time. The Mmad instruction computes one pair of A and B matrix multiplication results each time.
 
 ```cpp
@@ -129,6 +135,30 @@ AscendC::Mmad(c1Local[batchIndex * CeilAlign(m, cubeShape[0]) * CeilAlign(n, cub
               a2Local, b2Local, mmadParams);
 ```
 
+=======
+For loop B times, transferring A and B matrices for each batch from L1 -> L0A / L0B each time. The Mmad instruction computes one pair of A and B matrix multiplication results each time. Then storing them at corresponding positions in L0C. After the loop completes, the full results on L0C are transferred out to GM.
+
+```cpp
+for (int32_t batchIndex = 0; batchIndex < B; batchIndex++) {
+    SplitA(a1Local[batchIndex * aSizeAlignL0], a2Local);
+    SplitBTranspose(b1Local[batchIndex * bSizeAlignL0], b2Local);
+    AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+
+    AscendC::MmadParams params;
+    params.m = m;
+    params.n = n;
+    params.k = k;
+    AscendC::Mmad(
+        co1Local[batchIndex * CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])], a2Local, b2Local,
+        params);
+
+    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
+}
+```
+
+>>>>>>> upstream/master
 ### Matrix Batch Transfer Out
 
 The L0C -> GM path calls the Fixpipe transfer interface. By configuring `fixpipeParams.ndNum = B`, B pairs of C matrices are transferred out at once. Note that the C matrices in L0C are aligned, while the C matrices transferred to GM have the original unaligned shape.
@@ -162,7 +192,11 @@ Users can obtain the memory sizes of L1, L0A, L0B, L0C storage spaces on the har
 Run the following steps in the root directory of this example to build and run the operator.
 
 - Configure environment variables  
+<<<<<<< HEAD
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

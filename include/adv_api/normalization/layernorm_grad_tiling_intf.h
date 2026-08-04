@@ -20,4 +20,8 @@ namespace AscendC {
 typedef void LayernormGradTilingDeprecatedHeader;
 using LibLayernormGradTilingInterface = LayernormGradTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_NORMALIZATION_LAYERNORM_GRAD_TILING_INTF_H
+=======
+#endif // LIB_NORMALIZATION_LAYERNORM_GRAD_TILING_INTF_H
+>>>>>>> upstream/master

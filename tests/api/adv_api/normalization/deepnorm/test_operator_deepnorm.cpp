@@ -295,4 +295,8 @@ TEST_P(DeepNormTestsuite, DeepNormOpTestCase)
 
     param.calFunc(
         inputXGm, inputGxGm, gammGm, betaGm, outputGm, outputMeanGm, outputVarianceGm, bLength, sLength, hLength);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

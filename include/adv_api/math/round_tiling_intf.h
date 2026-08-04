@@ -21,4 +21,8 @@ namespace AscendC {
 using LIB_MATH_ROUND = using_deprecated_header_h;
 using LibMathRoundTilingInterface = using_deprecated_header_h;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_ROUND_INTF
+=======
+#endif // LIB_MATH_ROUND_INTF
+>>>>>>> upstream/master

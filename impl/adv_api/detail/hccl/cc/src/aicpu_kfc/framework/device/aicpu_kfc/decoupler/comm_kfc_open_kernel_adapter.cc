@@ -18,7 +18,12 @@
 #include "log.h"
 #include "alg_param.h"
 
+<<<<<<< HEAD
 extern HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam);
+=======
+extern HcclResult LaunchOpenOpParamDataImpl(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
+>>>>>>> upstream/master
 
 namespace {
 u64 GetDataTypeSize(HcclDataType dataType)
@@ -272,11 +277,15 @@ HcclResult FormatOpenOpParamDataFromMsg(
     return HCCL_SUCCESS;
 }
 
+<<<<<<< HEAD
 HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam)
+=======
+HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+>>>>>>> upstream/master
 {
     if (opParam.empty()) {
         HCCL_ERROR("Op param is empty.");
         return HCCL_E_PARA;
     }
-    return LaunchOpenOpParamDataImpl(opParam);
+    return LaunchOpenOpParamDataImpl(opParam, resCtx);
 }

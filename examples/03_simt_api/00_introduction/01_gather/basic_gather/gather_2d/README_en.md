@@ -18,7 +18,11 @@ This sample implements a simple scenario (fixed shape) 2D Gather operator using 
 ├── gather_2d
 │   ├── CMakeLists.txt            # cmake build file
 │   ├── gather_2d.asc             # SIMT implementation of 2D gather call sample
+<<<<<<< HEAD
 |   └── README.md
+=======
+│   └── README.md
+>>>>>>> upstream/master
 ```
 
 ## Operator Description
@@ -57,7 +61,11 @@ This sample implements a simple scenario (fixed shape) 2D Gather operator using 
 Execute the following steps in the root directory of this sample to compile and run the operator.
 
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure the environment variables according to the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+=======
+  Configure the environment variables according to the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -84,4 +92,8 @@ Execute the following steps in the root directory of this sample to compile and 
 
   ```text
   [Success] Case accuracy is verification passed.
+<<<<<<< HEAD
   ```
+=======
+  ```
+>>>>>>> upstream/master

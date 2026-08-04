@@ -9,7 +9,11 @@ This example introduces the InsertHashTable operator, demonstrating a large-scal
 - Ascend 950PR/Ascend 950DT
 
 ## Supported CANN Software Version
+<<<<<<< HEAD
 - \> CANN 9.0.0
+=======
+- \>= CANN 9.1.0
+>>>>>>> upstream/master
 
 ## Directory Structure
 
@@ -45,7 +49,11 @@ The hash table insertion process involves multiple pieces of information, such a
 
 `Bucket` is the target memory structure that actually stores key-value pairs in the hash table. Here, `key` stores the key, `value` stores the corresponding value, `state` is used to synchronize key write status, and `flag` is used to control bucket write permission.
 
+<<<<<<< HEAD
 ```C++
+=======
+```cpp
+>>>>>>> upstream/master
 struct Bucket {
     int64_t key;            // Key
     uint32_t state;         // Key value write status flag
@@ -56,7 +64,11 @@ struct Bucket {
 
 `KeyValueData` is used to encapsulate the data of key-value pairs to be inserted, including input keys, input values, value dimension, and the number of key-value pairs.
 
+<<<<<<< HEAD
 ```C++
+=======
+```cpp
+>>>>>>> upstream/master
 struct KeyValueData {
     int64_t* keys;       // Input keys
     float* values;       // Input values
@@ -70,7 +82,11 @@ struct KeyValueData {
 
 `HashTableContext` stores the parameters of the hash table itself, including the hash table base address, capacity, and bucket size. Its interfaces are used to compute bucket addresses and find and occupy target buckets. When writing values, the `insert` function reads the corresponding input values through the `KeyValueData` parameter.
 
+<<<<<<< HEAD
 ```C++
+=======
+```cpp
+>>>>>>> upstream/master
 struct HashTableContext {
     uint8_t* table_addr;     // Hash table base address
     uint32_t capacity;       // Hash table capacity
@@ -89,11 +105,19 @@ SIMT can efficiently process large amounts of data through concurrent execution 
 
 ### Multi-thread Write Conflict Problem
 
+<<<<<<< HEAD
 When multiple threads operate on the same memory block, resource conflicts are inevitable. When two threads inserting keys produce a hash collision, multiple threads attempt to write data to the same position in the bucket array, so it is necessary to ensure that only one thread can obtain write permission to the bucket. In the implementation, a flag bit "flag" is added to the Bucket struct to mark the current bucket's write permission. Threads obtain bucket write permission by modifying the flag through the atomic instruction [`asc_atomic_cas()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/原子操作/asc_atomic_cas.md).
 
 ### Inter-core Data Synchronization Problem
 
 When a hash collision occurs, a thread needs to determine whether the key stored in the current bucket is the same as the key to be inserted. This requires the current thread to read data written by other threads and ensure data integrity. In the implementation, a flag bit "state" is added to the Bucket struct to identify the write status of the key value. After writing the key, the write thread sets the state flag to 1, and calls the [`asc_threadfence()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md) interface between the two operations to ensure that when state is set to 1, the key write operation has already completed. In the read thread, a while loop polls the state value until state is set to 1, and then reads the key value.
+=======
+When multiple threads operate on the same memory block, resource conflicts are inevitable. When two threads inserting keys produce a hash collision, multiple threads attempt to write data to the same position in the bucket array, so it is necessary to ensure that only one thread can obtain write permission to the bucket. In the implementation, a flag bit "flag" is added to the Bucket struct to mark the current bucket's write permission. Threads obtain bucket write permission by modifying the flag through the atomic instruction [`asc_atomic_cas()`](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_cas.md).
+
+### Inter-core Data Synchronization Problem
+
+When a hash collision occurs, a thread needs to determine whether the key stored in the current bucket is the same as the key to be inserted. This requires the current thread to read data written by other threads and ensure data integrity. In the implementation, a flag bit "state" is added to the Bucket struct to identify the write status of the key value. After writing the key, the write thread sets the state flag to 1, and calls the [`asc_threadfence()`](../../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md) interface between the two operations to ensure that when state is set to 1, the key write operation has already completed. In the read thread, a while loop polls the state value until state is set to 1, and then reads the key value.
+>>>>>>> upstream/master
 
 ## Operator Description
 
@@ -124,7 +148,11 @@ When a hash collision occurs, a thread needs to determine whether the key stored
 
 Run the following steps in the root directory of this example to build and execute the operator.
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

@@ -20,7 +20,11 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
 ├── 09_log
 │   ├── CMakeLists.txt         // CMake build file
 │   ├── log.asc                // SIMT Kernel example code
+<<<<<<< HEAD
 |   └── README.md
+=======
+│   └── README.md
+>>>>>>> upstream/master
 ```
 
 ## Example Description  
@@ -72,7 +76,11 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
 Run the following steps in the root directory of this example to build and execute the operator.
 
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

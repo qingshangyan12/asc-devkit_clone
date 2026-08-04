@@ -119,4 +119,8 @@ HcclResult SimChannel::ResExchange(std::shared_ptr<SimChannel> reverseChannel)
     return HCCL_SUCCESS;
 }
 
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

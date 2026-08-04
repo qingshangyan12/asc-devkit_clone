@@ -65,6 +65,10 @@ extern "C" int32_t AscendGetFuncFromBinary(void* const binHandle, const char* ke
 extern "C" int32_t AscendLaunchKernelWithHostArgs(
     void* funcHandle, uint32_t numBlocks, void* stream, void* hostArgs, size_t argsSize, uint32_t ubufDynamicSize);
 extern "C" uint32_t AscendCFunctionGetMetaInfoKtype(const rtFuncHandle funcHandle, unsigned int* kernelType);
+<<<<<<< HEAD
+=======
+extern "C" uint32_t AscendCFunctionGetMetaInfoCrossCoreType(const rtFuncHandle funcHandle, unsigned int* crossType);
+>>>>>>> upstream/master
 extern "C" uint32_t AscendCFunctionGetMetaInfoCoreRation(
     const rtFuncHandle funcHandle, unsigned short* aicRation, unsigned short* aivRation);
 extern "C" uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle);

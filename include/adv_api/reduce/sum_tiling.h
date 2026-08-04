@@ -29,4 +29,8 @@ namespace AscendC {
 void GetSumMaxMinTmpSize(
     const uint32_t n, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxSize, uint32_t& minSize);
 } // namespace AscendC
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

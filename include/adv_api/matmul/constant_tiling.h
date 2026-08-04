@@ -169,4 +169,8 @@ __aicore__ constexpr MatmulApiStaticTiling GetMatmulApiTiling(const MatmulConfig
     return tiling;
 }
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATMUL_CONSTANT_TILING_H
+=======
+#endif // LIB_MATMUL_CONSTANT_TILING_H
+>>>>>>> upstream/master

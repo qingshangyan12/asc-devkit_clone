@@ -13,7 +13,7 @@ set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
+    "help" "cov" "cache" "pkg" "pkg-type" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -24,14 +24,15 @@ USER_ID=$(id -u)
 CPU_NUM=$(($(cat /proc/cpuinfo | grep "^processor" | wc -l)))
 THREAD_NUM=32
 BUILD_TYPE="Release"
+PACKAGE_TYPE="run"
+PACKAGE_TYPE_SET="false"
 ENABLE_BUILD_DEVICE=ON
 USE_CXX11_ABI=0
 CMAKE_TOOLCHAIN_FILE_VAL=""
 CHANGED_FILES=""
 CI_MODE=FALSE
 ENABLE_SIGN="false"
-VERSION_INFO="8.5.0"
-CUSTOM_SIGN_SCRIPT="${CURRENT_DIR}/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py"
+CUSTOM_SIGN_SCRIPT=""
 
 dotted_line="----------------------------------------------------------------"
 
@@ -48,14 +49,20 @@ usage() {
       package)
         echo "Package Build Options:"
         echo $dotted_line
-        echo "    --pkg                Compile run package"
+        echo "    --pkg                Compile package"
+        echo "    --pkg-type=<TYPE>    Specify package type (TYPE options: run/rpm/deb/all or comma-separated values, eg: deb,rpm), Default: run"
+        echo "                         all builds run, rpm and deb packages"
         echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
-        echo "    -j                   Compile thread nums, default is 16, eg: -j 8"
+        echo "    -j                   Compile thread nums, default is 32, eg: -j 8"
         echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
         echo "    --asan               Enable ASAN (address Sanitizer)"
         echo $dotted_line
         echo "Examples:"
         echo "    bash build.sh --pkg -j 8"
+        echo "    bash build.sh --pkg --pkg-type=rpm -j 8"
+        echo "    bash build.sh --pkg --pkg-type=deb -j 8"
+        echo "    bash build.sh --pkg --pkg-type=deb,rpm -j 8"
+        echo "    bash build.sh --pkg --pkg-type=all -j 8"
         echo "    bash build.sh --pkg --asan -j 32"
         return
         ;;
@@ -64,7 +71,7 @@ usage() {
         echo $dotted_line
         echo "    -t, --test           Build and run all unit tests"
         echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
-        echo "    -j                   Compile thread nums, default is 16, eg: -j 8"
+        echo "    -j                   Compile thread nums, default is 32, eg: -j 8"
         echo "    --adv_test            Build and run the adv part of unit tests"
         echo "    --adv_test_two        Build and run the adv_test_two part of unit tests"
         echo "    --arm_test            Build and run the arm part of unit tests"
@@ -100,7 +107,7 @@ usage() {
   echo "    The following are all supported arguments:"
   echo $dotted_line
   echo "    -h, --help           Display help information"
-  echo "    -j                   Compile thread nums, default is 16, eg: -j 8"
+  echo "    -j                   Compile thread nums, default is 32, eg: -j 8"
   echo "    -t, --test           Build and run all unit tests"
   echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
   echo "    --adv_test            Build and run the adv part of unit tests"
@@ -111,10 +118,13 @@ usage() {
   echo "    --basic_test_three    Build and run the basic_three part of unit tests"
   echo "    --basic_test_four     Build and run the basic_four part of unit tests"
   echo "    --basic_test_five     Build and run the basic_five part of unit tests"
-  echo "    --pkg                Compile run package"
+  echo "    --pkg                Compile package"
+  echo "    --pkg-type=<TYPE>    Specify package type (TYPE options: run/rpm/deb/all or comma-separated values, eg: deb,rpm), Default: run"
+  echo "                         all builds run, rpm and deb packages"
   echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
   echo "    --cov                Enable code coverage for unit tests"
   echo "    --asan               Enable ASAN (address Sanitizer)"
+  echo "    --cache              Use compiler launcher cache program, eg: --cache ccache"
   echo "    --make_clean         Clean build artifacts"
   echo "    --build-type=<TYPE>"
   echo "                         Specify build type (TYPE options: Release/Debug), Default:Release"
@@ -175,6 +185,11 @@ check_option_validity() {
 
   if [[ "$arg" =~ ^-[^-] ]]; then
     if [[ $arg =~ ^-j[0-9]+$ ]]; then
+      local jobs="${arg#-j}"
+      if [[ "$jobs" -le 0 ]]; then
+        log "[ERROR] -j only support positive integers."
+        return 1
+      fi
       return 0
     fi
 
@@ -191,6 +206,16 @@ check_option_validity() {
     fi
   fi
   return 0
+}
+
+require_option_value() {
+  local opt_name="$1"
+  local opt_value="$2"
+
+  if [[ -z "$opt_value" || "$opt_value" == -* ]]; then
+    log "[ERROR] ${opt_name} requires a value."
+    exit 1
+  fi
 }
 
 check_help_combinations() {
@@ -288,7 +313,7 @@ check_param_with_help() {
 }
 
 check_param_j() {
-  if [[ ! $THREAD_NUM =~ ^-?[0-9]+$ ]]; then
+  if [[ ! $THREAD_NUM =~ ^[0-9]+$ || "$THREAD_NUM" -le 0 ]]; then
    log "[ERROR] -j only support positive integers."
    exit 1
   fi
@@ -331,6 +356,27 @@ check_param_test_build_type() {
   fi
 }
 
+check_param_pkg_type() {
+  case "${PACKAGE_TYPE}" in
+    run|rpm|deb|all)
+      ;;
+    deb,rpm|rpm,deb)
+      PACKAGE_TYPE="deb,rpm"
+      ;;
+    *)
+      log "[ERROR] --pkg-type must be run, rpm, deb, all or the combination deb,rpm."
+      exit 1
+      ;;
+  esac
+}
+
+check_param_pkg_type_usage() {
+  if [[ "$PACKAGE_TYPE_SET" == "true" && "$PKG" != "true" ]]; then
+    log "[ERROR] --pkg-type must be used with --pkg."
+    exit 1
+  fi
+}
+
 check_param_cov() {
   if [[ "$COV" == "true" && "$TEST" != "all" ]]; then
     log "[ERROR] --cov must be used with test(-t, --test)."
@@ -346,8 +392,22 @@ set_options() {
       usage
       exit 0
       ;;
-    --ccache)
+    --cache=*)
+      CCACHE_PROGRAM="${1#*=}"
+      require_option_value "${1%%=*}" "${CCACHE_PROGRAM}"
+      if ! command -v "${CCACHE_PROGRAM}" >/dev/null 2>&1; then
+        log "[ERROR] cache program not found: ${CCACHE_PROGRAM}"
+        exit 1
+      fi
+      shift
+      ;;
+    --cache)
+      require_option_value "$1" "$2"
       CCACHE_PROGRAM="$2"
+      if ! command -v "${CCACHE_PROGRAM}" >/dev/null 2>&1; then
+        log "[ERROR] cache program not found: ${CCACHE_PROGRAM}"
+        exit 1
+      fi
       shift 2
       ;;
     -p=*|--cann_path=*)
@@ -416,6 +476,19 @@ set_options() {
       check_param_test_pkg
       shift
       ;;
+    --pkg-type=*)
+      PACKAGE_TYPE="${1#*=}"
+      PACKAGE_TYPE_SET="true"
+      check_param_pkg_type
+      shift
+      ;;
+    --pkg-type)
+      require_option_value "$1" "$2"
+      PACKAGE_TYPE="$2"
+      PACKAGE_TYPE_SET="true"
+      check_param_pkg_type
+      shift 2
+      ;;
     --extra-cmake-args=*)
       local cmake_args="${1#*=}"
       parse_cmake_extra_args "${cmake_args}"
@@ -435,22 +508,24 @@ set_options() {
       clean
       exit 0
       ;;
-    -j*)
-      THREAD_NUM="${1#-j}"
+    -j)
+      require_option_value "$1" "$2"
+      THREAD_NUM="$2"
       check_param_j
-      shift
+      shift 2
       ;;
     -j=*)
       THREAD_NUM="${1#*=}"
       check_param_j
       shift
       ;;
-    -j)
-      THREAD_NUM="$2"
+    -j*)
+      THREAD_NUM="${1#-j}"
       check_param_j
-      shift 2
+      shift
       ;;
     -f)
+      require_option_value "$1" "$2"
       CHANGED_FILES="$2"
       CI_MODE=TRUE
       shift 2
@@ -459,6 +534,12 @@ set_options() {
       CHANGED_FILES="${1#*=}"
       CI_MODE=TRUE
       shift
+      ;;
+    --changed_file)
+      require_option_value "$1" "$2"
+      CHANGED_FILES="$2"
+      CI_MODE=TRUE
+      shift 2
       ;;
     --build-type=*)
       BUILD_TYPE="${1#*=}"
@@ -541,10 +622,49 @@ function build()
 }
 
 function build_package(){
-  CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=OFF -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_BUILD_DEVICE=${ENABLE_BUILD_DEVICE}"
+  CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=OFF -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_BUILD_DEVICE=${ENABLE_BUILD_DEVICE} -DPACKAGE_TYPE=${PACKAGE_TYPE}"
   cmake_config
   build package
-  cp ${BUILD_DIR}/_CPack_Packages/makeself_staging/*.run ${OUTPUT_DIR}
+  collect_package_artifacts
+}
+
+function collect_package_artifacts()
+{
+  local package_types="${PACKAGE_TYPE}"
+  local package_ext=""
+  local copied=false
+  local found=false
+  local pkg_file=""
+
+  if [ "${package_types}" == "all" ]; then
+    package_types="run,rpm,deb"
+  fi
+
+  for package_ext in ${package_types//,/ }; do
+    found=false
+    while IFS= read -r pkg_file; do
+      if [ -f "${pkg_file}" ]; then
+        if [ "$(realpath "${pkg_file}")" = "$(realpath -m "${OUTPUT_DIR}/$(basename "${pkg_file}")")" ]; then
+          copied=true
+          found=true
+          continue
+        fi
+        cp -f "${pkg_file}" "${OUTPUT_DIR}/"
+        copied=true
+        found=true
+      fi
+    done < <(find "${BUILD_DIR}" "${OUTPUT_DIR}" -type f -name "*.${package_ext}" 2>/dev/null)
+
+    if [ "${found}" != "true" ]; then
+      log "[ERROR] No ${package_ext} package was found after build."
+      exit 1
+    fi
+  done
+
+  if [ "${copied}" != "true" ]; then
+    log "[ERROR] No ${package_types} package was found after build."
+    exit 1
+  fi
 }
 
 function build_test() {
@@ -594,12 +714,17 @@ function build_test_part() {
 }
 
 set_ci_mode() {
+  if [[ -z "$CHANGED_FILES" ]]; then
+    log "[INFO] CI mode: no changed files, skip all (no compile and test, no package)."
+    exit 200
+  fi
+
   if [[ "$CHANGED_FILES" != /* ]]; then
     CHANGED_FILES=${CURRENT_DIR}/$CHANGED_FILES
   fi
   log "[INFO] CI mode: changed file path is $CHANGED_FILES"
   log "[INFO] CI mode: context in changed file: "
-  cat $CHANGED_FILES
+  cat "$CHANGED_FILES"
 
   if [[ -n "$CHANGED_FILES" ]]; then
     log "[INFO] CI mode: processing changed files for CI mode."
@@ -629,10 +754,14 @@ set_ci_mode() {
 main() {
   check_param_with_help "$@"
   set_options "$@"
+  check_param_pkg_type_usage
 
   set_env
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DASCEND_CANN_PACKAGE_PATH=${ASCEND_CANN_PACKAGE_PATH}"
+  if [ -n "${CCACHE_PROGRAM}" ];then
+    CUSTOM_OPTION="${CUSTOM_OPTION} -DCMAKE_C_COMPILER_LAUNCHER=${CCACHE_PROGRAM} -DCMAKE_CXX_COMPILER_LAUNCHER=${CCACHE_PROGRAM}"
+  fi
 
   if [ -n "${TEST}" ];then
     CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=ON -DTEST_MOD=all"
@@ -676,7 +805,7 @@ main() {
   elif [ -n "$TEST_PART" ]; then
     build_test_part
   elif [ -n "${PKG}" ]; then
-    CUSTOM_OPTION="${CUSTOM_OPTION} -DCUSTOM_SIGN_SCRIPT=${CUSTOM_SIGN_SCRIPT} -DENABLE_SIGN=${ENABLE_SIGN} -DVERSION_INFO=${VERSION_INFO} -DPACKAGE_OPEN_PROJECT=ON"
+    CUSTOM_OPTION="${CUSTOM_OPTION} -DCUSTOM_SIGN_SCRIPT=${CUSTOM_SIGN_SCRIPT} -DENABLE_SIGN=${ENABLE_SIGN} -DPACKAGE_OPEN_PROJECT=ON"
     build_package
   else
     cmake_config

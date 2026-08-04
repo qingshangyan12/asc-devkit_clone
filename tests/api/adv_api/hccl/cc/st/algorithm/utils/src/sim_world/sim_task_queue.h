@@ -37,4 +37,8 @@ private:
     AllRankTaskQueues allRankTask_;
 };
 } // namespace HcclSim
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

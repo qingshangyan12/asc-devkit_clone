@@ -7,12 +7,15 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 #ifndef __COLL_COMM_AICPU_H__
 #define __COLL_COMM_AICPU_H__
 
 #include "common.h"
 #include "aicpu_init_param.h"
-#include "topo_matcher.h"
 #include "hcomm_primitives.h"
 #include "transport_pub.h"
 #include "thread.h"
@@ -33,13 +36,23 @@
 #include "hccl/hccl_types.h"
 
 using namespace hccl;
+
 class CollCommAicpu {
 public:
+<<<<<<< HEAD
     HcclResult InitAicpuIndOp(CommAicpuParam* commAicpuParam);
     HcclResult InitThreads(ThreadMgrAicpuParam* param);
     HcclResult AllocChannelResource(HcclChannelUrmaRes* commParam);
     HcclResult NotifyFree(NotifyMgrAicpuParam* param);
     HcclResult NotifyAlloc(NotifyMgrAicpuParam* param);
+=======
+    ~CollCommAicpu();
+    HcclResult InitAicpuIndOp(CommAicpuParam *commAicpuParam);
+    HcclResult InitThreads(ThreadMgrAicpuParam *param);
+    HcclResult AllocChannelResource(HcclChannelUrmaRes *commParam);
+    HcclResult NotifyFree(NotifyMgrAicpuParam *param);
+    HcclResult NotifyAlloc(NotifyMgrAicpuParam *param);
+>>>>>>> upstream/master
     const std::vector<std::shared_ptr<Thread>>& GetAllThread() { return threads_; };
     const HcclTopoInfo& GetTopoInfo() { return topoInfo_; }
     const std::string& GetIdentifier() { return identifier_; }
@@ -50,6 +63,7 @@ public:
     HcclResult SendErrorMessageReportToHost(Hccl::ErrorMessageReport& errMsgInfo);
     HcclResult RegisterProfCallBack();
     HcclCommDfxLite* GetHcclCommDfxLite() { return &dfx_; };
+    ReadWriteLockBase& GetThreadMutex() { return threadMutex_; }
 
     // h2d - d2h通道信息交互
     HcclResult BackGroundGetCmd(Hccl::KfcCommand& cmd);
@@ -64,9 +78,20 @@ public:
     HcclResult Clean();
     HcclResult Resume(HcclChannelUrmaRes* commParam);
 
+    HcclResult CheckIndOpExecStatus(bool timeout);
+
 private:
+<<<<<<< HEAD
     HcclResult InitUrmaChannel(HcclChannelUrmaRes* commParam);
     HcclResult ParsePackData(std::vector<char>& data, ChannelHandle& handle);
+=======
+    // 初始化
+    void InitIndopEnv(CommAicpuParam *commAicpuParam);
+    HcclResult InitHDCommunicate(CommAicpuParam *commAicpuParam);
+
+    HcclResult InitUrmaChannel(HcclChannelUrmaRes *commParam);
+    HcclResult ParsePackData(std::vector<char> &data, ChannelHandle &handle);
+>>>>>>> upstream/master
     HcclResult RegisterChannelAddDfxTaskInfo(ChannelHandle channel);
     HcclResult RegisterThreadAddDfxTaskInfo(ThreadHandle thread);
     void InitBackGroundThread();
@@ -81,6 +106,7 @@ private:
     std::string identifier_;
     HcclCommStatus commStatus_{HcclCommStatus::HCCL_COMM_STATUS_INVALID};
     HcclTopoInfo topoInfo_;
+    ReadWriteLockBase threadMutex_;
     std::vector<std::shared_ptr<Thread>> threads_;
     std::vector<std::unique_ptr<LocalNotify>> notifys_;
     // A5 独立算子

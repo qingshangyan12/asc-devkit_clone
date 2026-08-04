@@ -376,4 +376,8 @@ KERNEL_E2E(TEST_KERNEL_MATMUL, 1, 32, 64, 64, GM, GM, GM, GM, NZ, NZ, NZ, ND, in
 KERNEL_E2E(
     TEST_KERNEL_MATMUL, 1, 64, 64, 64, GM, GM, GM, GM, NZ, NZ, NZ, ND, int4b_t, int4b_t, int32_t, int32_t, 0, 1, 0)
 KERNEL_E2E(
+<<<<<<< HEAD
     TEST_KERNEL_MATMUL, 1, 32, 64, 64, GM, GM, GM, GM, NZ, NZ, NZ, ND, int8_t, int4b_t, int32_t, int32_t, 0, 1, 0)
+=======
+    TEST_KERNEL_MATMUL, 1, 32, 64, 64, GM, GM, GM, GM, NZ, NZ, NZ, ND, int8_t, int4b_t, int32_t, int32_t, 0, 1, 0)
+>>>>>>> upstream/master

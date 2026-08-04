@@ -41,4 +41,8 @@ TILING_DATA_FIELD_DEF(uint32_t, resForGammaTmpTensorPos);
 TILING_DATA_FIELD_DEF(uint32_t, reserved);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // LIB_NORMALIZATION_LAYERNORM_GRAD_BETA_TILINGDATA_H
+=======
+#endif // LIB_NORMALIZATION_LAYERNORM_GRAD_BETA_TILINGDATA_H
+>>>>>>> upstream/master

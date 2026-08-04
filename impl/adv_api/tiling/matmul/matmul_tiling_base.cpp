@@ -12,7 +12,11 @@
  * \file matmul_tiling_base.cpp
  * \brief
  */
+<<<<<<< HEAD
 #include "../../../../include/adv_api/matmul/matmul_tiling_base.h"
+=======
+#include "adv_api/matmul/matmul_tiling_base.h"
+>>>>>>> upstream/master
 
 #include <iostream>
 #include <algorithm>

@@ -121,4 +121,8 @@ using StreamMngFunc = uint32_t (*)(MngActionType action_type, MngResourceHandle 
 class StreamMngFuncRegister {
     StreamMngFuncRegister(const StreamMngFuncType func_type, StreamMngFunc const manage_func) {}
 };
+<<<<<<< HEAD
 } // namespace ge
+=======
+} // namespace ge
+>>>>>>> upstream/master

@@ -607,4 +607,8 @@ void TopoModel::Create910DLinks(uint32_t srcRank, uint32_t dstRank)
         allLinkMap_[rankPair][NetLayerL0].push_back(link);
     }
 }
+<<<<<<< HEAD
 }; // namespace HcclSim
+=======
+}; // namespace HcclSim
+>>>>>>> upstream/master

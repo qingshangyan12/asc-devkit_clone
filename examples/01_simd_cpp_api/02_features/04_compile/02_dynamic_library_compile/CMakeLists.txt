@@ -42,4 +42,8 @@ target_include_directories(demo PRIVATE
 
 target_link_libraries(demo PRIVATE
     add_kernel
+<<<<<<< HEAD
 )
+=======
+)
+>>>>>>> upstream/master

@@ -24,4 +24,8 @@ const Status OPBUILD_FAILED = 0xFFFFFFFF;
 const Status OPBUILD_SUCCESS = 0;
 
 } // namespace opbuild
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

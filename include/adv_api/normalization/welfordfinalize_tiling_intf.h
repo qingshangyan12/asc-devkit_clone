@@ -20,4 +20,8 @@ namespace AscendC {
 typedef void using_deprecated_header_h;
 using LibWelfordFinalizeTilingInterface = using_deprecated_header_h;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_NORMALIZATION_WELFORDFINALIZE_TILING_INTF_H
+=======
+#endif // LIB_NORMALIZATION_WELFORDFINALIZE_TILING_INTF_H
+>>>>>>> upstream/master

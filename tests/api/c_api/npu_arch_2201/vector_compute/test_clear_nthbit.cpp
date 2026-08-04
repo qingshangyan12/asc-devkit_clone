@@ -44,4 +44,8 @@ TEST_F(TestVectorComputeClearNthbit, clear_nthbit_Succ)
 
     EXPECT_EQ(expected, result);
     GlobalMockObject::verify();
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

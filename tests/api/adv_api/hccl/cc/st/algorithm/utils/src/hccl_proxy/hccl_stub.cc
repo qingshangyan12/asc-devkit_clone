@@ -29,6 +29,7 @@
 #include "hcomm_diag.h"
 #include "hccl_comm.h"
 #include "hccl_res_expt.h"
+#include "hcomm_primitives_dl.h"
 
 using namespace mc2_ops_hccl;
 using namespace HcclSim;
@@ -828,6 +829,25 @@ int32_t HcommBatchModeEnd(const char* batchTag)
     HCCL_WARNING("[%s] not support.", __func__);
     return HCCL_SUCCESS;
 }
+
+<<<<<<< HEAD
+int32_t HcommAcquireComm(const char* commId) { return 0; }
+
+int32_t HcommReleaseComm(const char* commId) { return 0; }
+=======
+bool HcommIsSupportHcommBatchTransferOnThread(void) { return false; }
+
+int32_t HcclHcommBatchTransferOnThread(
+    ThreadHandle thread, ChannelHandle channel, const HcclHcommBatchTransferDesc* transferDescs,
+    uint32_t transferDescNum)
+{
+    (void)thread;
+    (void)channel;
+    (void)transferDescs;
+    (void)transferDescNum;
+    return HCCL_E_NOT_SUPPORT;
+}
+>>>>>>> upstream/master
 
 int32_t HcommAcquireComm(const char* commId) { return 0; }
 

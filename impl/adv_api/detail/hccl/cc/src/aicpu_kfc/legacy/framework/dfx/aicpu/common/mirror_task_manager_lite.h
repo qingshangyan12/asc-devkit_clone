@@ -19,26 +19,43 @@
 #include "task_info.h"
 
 namespace Hccl {
+
+struct StreamQueueEntry {
+    std::unique_ptr<CircularQueue<std::unique_ptr<TaskInfo>>> queue;
+    u32 capacity = 0;
+    u32 taskNum = 0;
+};
+
+// NOTE: This class is designed for AICPU single-threaded environments.
+// All methods (AddTaskInfo, SetCurrDfxOpInfo, etc.) are NOT thread-safe.
+// If used in a multi-threaded environment, external synchronization is required.
 class MirrorTaskManagerLite {
 public:
     MirrorTaskManagerLite();
 
     void RegFullyCallBack(std::function<void()> callBack);
-    void RegFullyCallBack(std::function<void(const std::string&, u32)> callBack);
-    void AddTaskInfo(std::shared_ptr<TaskInfo> taskInfo);
-    void SetCurrDfxOpInfo(std::shared_ptr<DfxOpInfo> dfxOpInfo);
+    void RegGetRemoteRankCallBack(std::function<u32(u64)> callBack);
+    HcclResult AddTaskInfo(u32 streamId, u32 taskId, const Hccl::TaskParam &taskParam, u64 handle);
+    void AddTaskInfo(std::unique_ptr<TaskInfo> &&taskInfo);
+    HcclResult SetCurrDfxOpInfo(std::shared_ptr<DfxOpInfo> dfxOpInfo);
 
     std::shared_ptr<DfxOpInfo> GetCurrDfxOpInfo() const;
+<<<<<<< HEAD
     std::shared_ptr<TaskInfo> GetTaskInfo(u32 streamId, u32 taskId) const;
     TaskInfoQueue* GetQueue(u32 streamId) const;
+=======
+    TaskInfo* GetTaskInfo(u32 streamId, u32 taskId) const;
+    TaskInfoQueue             *GetQueue(u32 streamId) const;
+>>>>>>> upstream/master
 
 public:
-    TaskInfoQueueMap::iterator Begin();
-    TaskInfoQueueMap::iterator End();
+    std::unordered_map<u32, StreamQueueEntry>::iterator Begin();
+    std::unordered_map<u32, StreamQueueEntry>::iterator End();
 
     ~MirrorTaskManagerLite();
 
 private:
+<<<<<<< HEAD
     bool isStaticGraphMode_{false};
     OpMode opMode_;
     TaskInfoQueueMap queueMap_;
@@ -49,6 +66,12 @@ private:
 
 private:
     bool IsStaticGraphMode(const CollOperator& collOperator) const;
+=======
+    std::unordered_map<u32, StreamQueueEntry> streamQueues_;
+    std::shared_ptr<DfxOpInfo>     currDfxOpInfo_;
+    std::function<void()>          fullyCallBack_;
+    std::function<u32(u64)> getRemoteRankCallback_;
+>>>>>>> upstream/master
 };
 
 } // namespace Hccl

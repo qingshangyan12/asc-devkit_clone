@@ -25,4 +25,8 @@ private:
     std::map<RankId, NpuPos> rankId2Pos_;
 };
 } // namespace HcclSim
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

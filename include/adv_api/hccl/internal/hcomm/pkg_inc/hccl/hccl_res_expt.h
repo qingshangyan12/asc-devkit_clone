@@ -91,4 +91,8 @@ extern int32_t HcclTaskUnRegister(HcclComm comm, const char* msgTag);
 #ifdef __cplusplus
 }
 #endif // __cplusplus
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

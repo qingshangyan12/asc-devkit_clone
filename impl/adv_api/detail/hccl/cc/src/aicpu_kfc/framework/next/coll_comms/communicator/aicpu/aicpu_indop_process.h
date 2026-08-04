@@ -7,6 +7,10 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 #ifndef __AICPU_INDOP_PROCESS_H__
 #define __AICPU_INDOP_PROCESS_H__
 
@@ -26,15 +30,27 @@ public:
     static HcclResult AicpuIndOpCommInit(CommAicpuParam* commAicpuParam);
     static HcclResult AicpuDfxOpInfoInit(HcclDfxOpInfo* aicpuDfxInfo, const std::string& commTag);
 
+<<<<<<< HEAD
     static HcclResult AcquireAicpuCommMgr(const std::string& group, CollCommAicpuMgr** aicpuCommMgrPtr);
     static CollCommAicpuMgr* AicpuGetCommMgrbyGroup(const std::string& group);
     static void AicpuReleaseCommMgrbyGroup(const std::string& group);
+=======
+    static HcclResult AcquireAicpuCommMgr(const std::string &group, CollCommAicpuMgr **aicpuCommMgrPtr);
+    static CollCommAicpuMgr *AicpuGetCommMgrbyGroup(const std::string &group);
+    static void AicpuReleaseCommMgrbyGroup(const std::string &group);
+    static CollCommAicpuMgr *AicpuGetComm(const std::string &group);
+>>>>>>> upstream/master
     static ReadWriteLockBase& AicpuGetCommMutex();
     static HcclResult AicpuGetCommAll(std::vector<std::pair<std::string, CollCommAicpuMgr*>>& aicpuCommInfo);
     static HcclResult AicpuDestroyCommbyGroup(const std::string& group);
 
+<<<<<<< HEAD
     static HcclResult ProfilingReportDeviceOp(const std::string& group);
     static HcclResult ReportAllTasks(const std::string& group);
     static HcclResult UpdateTask(const std::string& group);
+=======
+    static HcclResult ProfilingReportDeviceOp();
+    static HcclResult UpdateTask(const std::string &group);
+>>>>>>> upstream/master
 };
 #endif // __AICPU_INDOP_PROCESS_H__

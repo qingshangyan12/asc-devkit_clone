@@ -22,5 +22,8 @@ void __sync_workitems() { AscendC::Simt::Sync(); }
 
 void __threadfence() {}
 void __threadfence_block() {}
+<<<<<<< HEAD
+=======
 #endif
+>>>>>>> upstream/master
 #endif

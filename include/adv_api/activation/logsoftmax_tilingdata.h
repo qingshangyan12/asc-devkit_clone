@@ -37,4 +37,8 @@ TILING_DATA_FIELD_DEF(uint32_t, tailSplitSize);
 TILING_DATA_FIELD_DEF(uint32_t, tailReduceSize);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // __ASCENDC_TIKCFW_TILING_LOGSOFTMAX_TILINGDATA_H__
+=======
+#endif // __ASCENDC_TIKCFW_TILING_LOGSOFTMAX_TILINGDATA_H__
+>>>>>>> upstream/master

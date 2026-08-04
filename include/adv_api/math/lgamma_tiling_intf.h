@@ -23,4 +23,8 @@ typedef void LgammaTilingDeprecatedHeader;
 using LibLgammaTilingInterface = LgammaTilingDeprecatedHeader;
 } // namespace AscendC
 
+<<<<<<< HEAD
 #endif // LIB_MATH_LGAMMA_TILING_INTF_H
+=======
+#endif // LIB_MATH_LGAMMA_TILING_INTF_H
+>>>>>>> upstream/master

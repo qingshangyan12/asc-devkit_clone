@@ -192,4 +192,8 @@ uint32_t TaskStubLocalWaitFrom::GetWaitQid() const { return waitQid; }
 
 uint32_t TaskStubLocalWaitFrom::GetTopicId() const { return topicId; }
 
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

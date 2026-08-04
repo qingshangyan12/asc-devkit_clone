@@ -15,7 +15,11 @@ LYCHEE_VERSION="${LYCHEE_VERSION:-0.23.0}"
 MARKDOWN_LINK_CHECK_FULL="${MARKDOWN_LINK_CHECK_FULL:-0}"
 MARKDOWN_LINK_CHECK_DRY_RUN="${MARKDOWN_LINK_CHECK_DRY_RUN:-0}"
 MARKDOWN_LINK_CHECK_VERBOSE="${MARKDOWN_LINK_CHECK_VERBOSE:-0}"
+<<<<<<< HEAD
 MARKDOWN_LINK_CHECK_ONLINE="${MARKDOWN_LINK_CHECK_ONLINE:-0}"
+=======
+MARKDOWN_LINK_CHECK_ONLINE="${MARKDOWN_LINK_CHECK_ONLINE:-1}"
+>>>>>>> upstream/master
 MARKDOWN_LINK_CHECK_START=$SECONDS
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
@@ -35,7 +39,11 @@ By default, checks changed Markdown files and Markdown files that link to them.
 Set MARKDOWN_LINK_CHECK_FULL=1 or pass --full to scan tracked Markdown files in the repository.
 Set MARKDOWN_LINK_CHECK_DRY_RUN=1 to print the computed scan set only.
 Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
+<<<<<<< HEAD
 Set MARKDOWN_LINK_CHECK_ONLINE=1 to check remote HTTP(S) links; remote links are skipped by default.
+=======
+Set MARKDOWN_LINK_CHECK_ONLINE=0 to skip remote HTTP(S) links.
+>>>>>>> upstream/master
 Set MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL, MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL, or
 MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
 EOF
@@ -63,7 +71,11 @@ download_lychee_archive() {
     if [ -n "${MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL:-}" ]; then
         archive_url="$MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL"
     else
+<<<<<<< HEAD
         archive_url="https://gh.llkk.cc/https://github.com/lycheeverse/lychee/releases/download/lychee-v{version}/lychee-{target}.tar.gz"
+=======
+        archive_url="https://cann-3rd.obs.cn-north-4.myhuaweicloud.com/lychee-v{version}/lychee-{target}.tar.gz"
+>>>>>>> upstream/master
     fi
     version_placeholder="{version}"
     target_placeholder="{target}"
@@ -195,8 +207,12 @@ SCAN_SET_FILE=$(mktemp)
 LYCHEE_OUTPUT_FILE=$(mktemp)
 FILTERED_OUTPUT_FILE=$(mktemp)
 CROSS_LINK_OUTPUT_FILE=$(mktemp)
+<<<<<<< HEAD
 GITCODE_LINK_OUTPUT_FILE=$(mktemp)
 trap 'rm -f "$SCAN_SET_FILE" "$LYCHEE_OUTPUT_FILE" "$FILTERED_OUTPUT_FILE" "$CROSS_LINK_OUTPUT_FILE" "$GITCODE_LINK_OUTPUT_FILE"' EXIT
+=======
+trap 'rm -f "$SCAN_SET_FILE" "$LYCHEE_OUTPUT_FILE" "$FILTERED_OUTPUT_FILE" "$CROSS_LINK_OUTPUT_FILE"' EXIT
+>>>>>>> upstream/master
 
 PY_ARGS=("$REPO_ROOT" "$SCAN_SET_FILE")
 if [ "${#INPUT_FILES[@]}" -gt 0 ]; then
@@ -712,13 +728,20 @@ import posixpath
 import re
 import sys
 from pathlib import Path
+<<<<<<< HEAD
 from urllib.parse import unquote
+=======
+from urllib.parse import unquote, urlparse
+>>>>>>> upstream/master
 
 repo_root = Path(sys.argv[1])
 scan_set_file = Path(sys.argv[2])
 output_file = Path(sys.argv[3])
 duration = sys.argv[4]
+<<<<<<< HEAD
 repo_url = "https://gitcode.com/cann/asc-devkit"
+=======
+>>>>>>> upstream/master
 
 reference_pattern = re.compile(r"(?m)^(\s*\[[^\]]+\]:\s*)(\S+)")
 html_href_pattern = re.compile(r"""(?i)(\bhref\s*=\s*["'])([^"']+)(["'])""")
@@ -758,11 +781,19 @@ def markdown_inline_link_targets(text):
 
 
 def source_area(path):
+<<<<<<< HEAD
     if path.startswith("docs/api/"):
         return "api"
     if path.startswith("docs/guide/"):
         return "guide"
     if path.startswith("examples/"):
+=======
+    if path == "docs/zh/api" or path.startswith("docs/zh/api/"):
+        return "api"
+    if path == "docs/zh/guide" or path.startswith("docs/zh/guide/"):
+        return "guide"
+    if path == "examples" or path.startswith("examples/"):
+>>>>>>> upstream/master
         return "examples"
     return None
 
@@ -800,9 +831,63 @@ def normalize_target(source_file, target):
     return normalized, suffix
 
 
+<<<<<<< HEAD
 def gitcode_url(target_path, suffix):
     view = "tree" if (repo_root / target_path).is_dir() else "blob"
     return f"{repo_url}/{view}/master/{target_path}{suffix}"
+=======
+def normalize_gitcode_content_target(target):
+    parsed = urlparse(target.strip().strip("<>").strip("\"'"))
+    if parsed.scheme not in ("http", "https") or parsed.netloc != "gitcode.com":
+        return None
+
+    parts = [unquote(part) for part in parsed.path.split("/") if part]
+    if len(parts) < 5 or parts[:2] != ["cann", "asc-devkit"] or parts[3] != "master":
+        return None
+    if parts[2] not in ("blob", "tree", "raw"):
+        return None
+
+    target_path = posixpath.normpath("/".join(parts[4:]))
+    target = repo_root / target_path
+    if parts[2] == "tree" and not target.is_dir():
+        return None
+    if parts[2] in ("blob", "raw") and not target.is_file():
+        return None
+    suffix = (f"?{parsed.query}" if parsed.query else "") + (
+        f"#{parsed.fragment}" if parsed.fragment else ""
+    )
+    return target_path, suffix
+
+
+def readme_language(path):
+    name = posixpath.basename(path).lower()
+    if name == "readme_en.md":
+        return "en"
+    if name == "readme.md":
+        return "zh"
+    return None
+
+
+def readme_language_error(source, target_path, suffix):
+    source_language = readme_language(source)
+    if source_language is None or not target_path.startswith("examples/"):
+        return None
+
+    target = repo_root / target_path
+    if target.is_dir():
+        return None
+    target_language = readme_language(target_path)
+    if target_language is None or target_language == source_language:
+        if source_language == "en" and "#" in suffix and re.search(r"[\u4e00-\u9fff]", suffix):
+            return "English README links must use an English anchor"
+        return None
+
+    expected = posixpath.join(
+        posixpath.dirname(target_path),
+        "README_en.md" if source_language == "en" else "README.md",
+    )
+    return f"README language must match the source language: {target_path} -> {expected}{suffix}"
+>>>>>>> upstream/master
 
 
 def file_url(target_path, suffix):
@@ -849,8 +934,11 @@ for raw_line in scan_set_file.read_text(encoding="utf-8").splitlines():
 errors = []
 for source in scan_files:
     source_kind = source_area(source)
+<<<<<<< HEAD
     if source_kind is None:
         continue
+=======
+>>>>>>> upstream/master
 
     source_path = repo_root / source
     try:
@@ -870,10 +958,40 @@ for source in scan_files:
 
         for target in iter_links(strip_inline_code(line)):
             normalized = normalize_target(source, target)
+<<<<<<< HEAD
+=======
+            is_gitcode_target = False
+            if normalized is None:
+                normalized = normalize_gitcode_content_target(target)
+                is_gitcode_target = normalized is not None
+>>>>>>> upstream/master
             if normalized is None:
                 continue
 
             target_path, suffix = normalized
+<<<<<<< HEAD
+=======
+            target_kind = source_area(target_path)
+            if is_gitcode_target:
+                relative_target = posixpath.relpath(target_path, posixpath.dirname(source))
+                errors.append(
+                    f"{source}:{line_number}: links to same-repository content must use a relative path: "
+                    f"{target} -> {relative_target}{suffix}"
+                )
+                continue
+            if source_kind is None:
+                continue
+            if source_kind == target_kind == "examples":
+                language_error = readme_language_error(source, target_path, suffix)
+                if language_error is not None:
+                    errors.append(f"{source}:{line_number}: {language_error}: {target}")
+                    continue
+            if {source_kind, target_kind} == {"api", "guide"}:
+                continue
+            if target_kind == "examples" and source_kind in ("api", "guide"):
+                continue
+
+>>>>>>> upstream/master
             if (repo_root / target_path).is_dir():
                 if source_kind == "examples":
                     if "#" in suffix:
@@ -888,6 +1006,7 @@ for source in scan_files:
                     )
                 continue
 
+<<<<<<< HEAD
             target_kind = source_area(target_path)
             if target_kind is None or target_kind == source_kind:
                 continue
@@ -897,6 +1016,8 @@ for source in scan_files:
                 f"{target} -> {gitcode_url(target_path, suffix)}"
             )
 
+=======
+>>>>>>> upstream/master
 with output_file.open("w", encoding="utf-8") as handle:
     if errors:
         handle.write(
@@ -912,6 +1033,7 @@ CROSS_LINK_RC=$?
 set -e
 
 set +e
+<<<<<<< HEAD
 python3 - "$REPO_ROOT" "$SCAN_SET_FILE" "$GITCODE_LINK_OUTPUT_FILE" "$(markdown_check_duration)" <<'PY'
 import os
 import posixpath
@@ -1170,6 +1292,8 @@ PY
 GITCODE_LINK_RC=$?
 set -e
 
+=======
+>>>>>>> upstream/master
 LYCHEE_BIN=$(find_lychee)
 LYCHEE_ARGS=(--no-progress --config "$CONFIG_FILE")
 if [ "$MARKDOWN_LINK_CHECK_ONLINE" != "1" ]; then
@@ -1291,6 +1415,7 @@ if [ "$CROSS_LINK_RC" -ne 0 ]; then
     cat "$CROSS_LINK_OUTPUT_FILE"
     FINAL_RC=1
 fi
+<<<<<<< HEAD
 if [ "$GITCODE_LINK_RC" -ne 0 ]; then
     if [ "$FINAL_RC" -ne 0 ]; then
         printf '\n'
@@ -1298,6 +1423,8 @@ if [ "$GITCODE_LINK_RC" -ne 0 ]; then
     cat "$GITCODE_LINK_OUTPUT_FILE"
     FINAL_RC=1
 fi
+=======
+>>>>>>> upstream/master
 if [ -s "$FILTERED_OUTPUT_FILE" ]; then
     if [ "$FINAL_RC" -ne 0 ]; then
         printf '\n'

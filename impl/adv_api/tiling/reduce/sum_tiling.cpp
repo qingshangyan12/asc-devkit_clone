@@ -12,7 +12,11 @@
  * \file sum_tiling.cpp
  * \brief
  */
+<<<<<<< HEAD
 #include "../../../../include/adv_api/reduce/sum_tiling.h"
+=======
+#include "adv_api/reduce/sum_tiling.h"
+>>>>>>> upstream/master
 #include "../../detail/host_log.h"
 
 namespace AscendC {

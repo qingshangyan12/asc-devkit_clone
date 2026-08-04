@@ -9,16 +9,26 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+<<<<<<< HEAD
 #warning                                                                                                               \
+=======
+#warning \
+>>>>>>> upstream/master
     "impl/tensor_api/arch/vector/dual/instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
 /*!
+<<<<<<< HEAD
 * \file instruction.h
 * \brief
 */
+=======
+ * \file instruction.h
+ * \brief
+ */
+>>>>>>> upstream/master
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_DUAL_INSTRUCTION_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_DUAL_INSTRUCTION_H
 
@@ -30,20 +40,38 @@ namespace AscendC {
 namespace Te {
 namespace Inst {
 
+<<<<<<< HEAD
 class Mull{
 public:
     template<typename T>
     __simd_callee__ inline static void Run(T& dst0, T& dst1, T src0, T src1, vector_bool mask) {
+=======
+class Mull {
+public:
+    template <typename T>
+    __simd_callee__ inline static void Run(T& dst0, T& dst1, T src0, T src1, vector_bool mask)
+    {
+>>>>>>> upstream/master
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             asc_mull(dst0, dst1, src0, src1, mask);
         }
     }
 };
+<<<<<<< HEAD
 }}} 
+=======
+} // namespace Inst
+} // namespace Te
+} // namespace AscendC
+>>>>>>> upstream/master
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_DUAL_INSTRUCTION_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

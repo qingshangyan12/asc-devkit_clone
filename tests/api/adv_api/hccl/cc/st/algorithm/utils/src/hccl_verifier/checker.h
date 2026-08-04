@@ -31,4 +31,8 @@ private:
     bool closeRankMemCheck_ = false;
 };
 } // namespace HcclSim
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

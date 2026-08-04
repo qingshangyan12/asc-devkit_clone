@@ -21,4 +21,8 @@ namespace AscendC {
 typedef void ExpTilingDeprecatedHeader;
 using LibExpTilingInterface = ExpTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_EXP_TILING_INTF_H
+=======
+#endif // LIB_MATH_EXP_TILING_INTF_H
+>>>>>>> upstream/master

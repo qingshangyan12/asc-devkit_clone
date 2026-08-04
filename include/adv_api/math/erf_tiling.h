@@ -16,7 +16,7 @@
 #define LIB_MATH_ERF_TILING_H
 #include <cstdint>
 
-#include "graph/tensor.h"
+#include "../utils/types.h"
 namespace AscendC {
 /*!
  * \brief The calculation of the Erf interface requires the developer to reserve or apply for temporary space.
@@ -40,7 +40,11 @@ void GetErfTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCou
  * \param [out] minValue, minimum temporary space required
  */
 void GetErfMaxMinTmpSize(
+<<<<<<< HEAD
     const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+=======
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+>>>>>>> upstream/master
     uint32_t& minValue);
 } // namespace AscendC
 #endif // LIB_MATH_ERF_TILING_H

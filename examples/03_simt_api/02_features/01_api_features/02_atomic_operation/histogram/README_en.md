@@ -2,7 +2,11 @@
 
 ## Overview
 
+<<<<<<< HEAD
 This example demonstrates how to use the Ascend C SIMT [`asc_atomic_add()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/原子操作/asc_atomic_add.md) interface to efficiently count the frequency of each byte value in an input byte sequence. The function illustration is shown below:<br>
+=======
+This example demonstrates how to use the Ascend C SIMT [`asc_atomic_add()`](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md) interface to efficiently count the frequency of each byte value in an input byte sequence. The function illustration is shown below:<br>
+>>>>>>> upstream/master
 <img src="figures/introduction.png" alt="intro" style="width: 50%; height: auto;">
 
 ## Supported Products
@@ -11,7 +15,11 @@ This example demonstrates how to use the Ascend C SIMT [`asc_atomic_add()`](http
 
 ## Supported CANN Software Version
 
+<<<<<<< HEAD
 - \> CANN 9.0.0
+=======
+- \>= CANN 9.1.0
+>>>>>>> upstream/master
 
 ## Directory Structure
 
@@ -72,7 +80,11 @@ The flow diagram is as follows: The figure below uses Block0 as an example. Bloc
 ## Build and Run
 Run the following steps in the root directory of this example to build and execute the example.
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
 
   ```bash
   source ${install_path}/cann/set_env.sh

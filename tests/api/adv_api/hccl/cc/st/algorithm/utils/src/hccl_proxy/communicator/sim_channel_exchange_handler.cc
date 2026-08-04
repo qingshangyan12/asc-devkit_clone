@@ -47,4 +47,8 @@ std::shared_ptr<SimChannel> SimChannelExchangeHandler::GetChannel(
     return channelMap_[key][srcRank][dstRank][channelIdx];
 }
 
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

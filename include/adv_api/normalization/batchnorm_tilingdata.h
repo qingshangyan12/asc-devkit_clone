@@ -36,4 +36,8 @@ TILING_DATA_FIELD_DEF(uint32_t, shCurLengthBlockNum);
 TILING_DATA_FIELD_DEF(uint32_t, castHalfOutRepStride);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // LIB_NORMALIZATION_BATCHNORM_TILINGDATA_H
+=======
+#endif // LIB_NORMALIZATION_BATCHNORM_TILINGDATA_H
+>>>>>>> upstream/master

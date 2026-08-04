@@ -24,4 +24,8 @@ public:
 };
 
 } // namespace HcclSim
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

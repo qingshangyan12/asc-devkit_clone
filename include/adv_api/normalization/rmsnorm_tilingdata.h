@@ -28,4 +28,8 @@ TILING_DATA_FIELD_DEF(uint32_t, tailBshLength);
 TILING_DATA_FIELD_DEF(uint32_t, tailBsLength);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // LIB_NORMALIZATION_RMSNORM_TILINGDATA_H
+=======
+#endif // LIB_NORMALIZATION_RMSNORM_TILINGDATA_H
+>>>>>>> upstream/master

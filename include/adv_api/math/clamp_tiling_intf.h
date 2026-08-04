@@ -22,4 +22,8 @@ namespace AscendC {
 typedef void ClampTilingDeprecatedHeader;
 using LibClampTilingInterface = ClampTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_CLAMP_TILING_INTF_H
+=======
+#endif // LIB_MATH_CLAMP_TILING_INTF_H
+>>>>>>> upstream/master

@@ -81,6 +81,7 @@ public:
 
     virtual ~Queue() = default;
 
+<<<<<<< HEAD
     virtual void Append(const T& value) = 0;
     virtual void Traverse(std::function<void(const T&)> action) = 0;
     virtual size_t Size() const = 0;
@@ -92,6 +93,39 @@ public:
     virtual std::shared_ptr<Iterator> Tail() = 0;
     virtual std::shared_ptr<Iterator> End() = 0;
     virtual void PopFront() { THROW<InternalException>(StringFormat("Queue<T>::PopFront () is not supported")); }
+=======
+    virtual void                      Append(T &&value)                                = 0;
+    virtual T&                        GetAndUpdate()                                  = 0; // 返回当前元� 并更新index
+    virtual void                      Traverse(std::function<void(const T &)> action) = 0;
+    virtual size_t                    Size() const                                    = 0;
+    virtual bool                      IsEmpty() const                                 = 0;
+    virtual bool                      IsFull() const                                  = 0;
+    virtual size_t                    Capacity() const                                = 0;
+    virtual std::shared_ptr<Iterator> Find(std::function<bool(const T &)> cond)       = 0;
+    virtual std::shared_ptr<Iterator> Begin()                                         = 0;
+    virtual std::shared_ptr<Iterator> Tail()                                          = 0;
+    virtual std::shared_ptr<Iterator> End()                                           = 0;
+    virtual void                      PopFront()
+    {
+        THROW<InternalException>(StringFormat("Queue<T>::PopFront () is not supported"));
+    }
+>>>>>>> upstream/master
+};
+
+template <typename T> class QueueWithSize : public Queue<T> {
+protected:
+    size_t size_ = 0;
+
+public:
+    size_t Size() const override
+    {
+        return size_;
+    }
+
+    bool IsEmpty() const override
+    {
+        return size_ == 0;
+    }
 };
 
 } // namespace Hccl

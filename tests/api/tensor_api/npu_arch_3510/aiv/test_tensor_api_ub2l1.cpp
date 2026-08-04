@@ -9,7 +9,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "tensor_api/stub/cce_stub.h"
+#include "c_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Vector_Copy_3510 : public testing::Test {
@@ -101,6 +101,24 @@ TEST_F(Tensor_Api_Vector_Copy_3510, CopyUB2L1NZ2NZ)
 
     auto ubTensor = MakeTensorAt<Location::UB>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
     auto l1Tensor = MakeTensorAt<Location::L1>(dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+
+    RunCopyCallPaths<CopyUB2L1, CopyUB2L1TraitDefault>(l1Tensor, ubTensor);
+    RunCopyWithPaths<CopyUB2L1, CopyUB2L1TraitDefault>(l1Tensor, ubTensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+TEST_F(Tensor_Api_Vector_Copy_3510, CopyUB2L1ZN2ZN)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t m = 64;
+    constexpr uint32_t n = 64;
+    __ubuf__ int8_t src[m * n] = {0};
+    __cbuf__ int8_t dst[m * n] = {0};
+
+    auto ubTensor = MakeTensorAt<Location::UB>(src, MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(dst, MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
 
     RunCopyCallPaths<CopyUB2L1, CopyUB2L1TraitDefault>(l1Tensor, ubTensor);
     RunCopyWithPaths<CopyUB2L1, CopyUB2L1TraitDefault>(l1Tensor, ubTensor);

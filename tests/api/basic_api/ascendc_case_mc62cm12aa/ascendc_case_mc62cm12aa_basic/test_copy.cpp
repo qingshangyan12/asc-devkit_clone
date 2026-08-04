@@ -262,4 +262,8 @@ TEST_P(KernelCopyCounterTestSuite, KernelCopyCounterTestCase)
     }
     delete[] inputGm;
     delete[] outputGm;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

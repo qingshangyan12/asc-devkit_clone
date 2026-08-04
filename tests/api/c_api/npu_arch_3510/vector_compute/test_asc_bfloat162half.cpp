@@ -28,4 +28,8 @@ TEST_VECTOR_COMPUTE_VCVT_INSTR_4(
 
 TEST_VECTOR_COMPUTE_VCVT_INSTR_4(Bfloat162half_rz, asc_bfloat162half_rz, vcvt, vector_half, vector_bfloat16_t, 8);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_4(
+<<<<<<< HEAD
     Bfloat162half_rz_sat, asc_bfloat162half_rz_sat, vcvt, vector_half, vector_bfloat16_t, 9);
+=======
+    Bfloat162half_rz_sat, asc_bfloat162half_rz_sat, vcvt, vector_half, vector_bfloat16_t, 9);
+>>>>>>> upstream/master

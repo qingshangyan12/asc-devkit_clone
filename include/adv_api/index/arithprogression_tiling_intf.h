@@ -22,4 +22,8 @@ typedef void ArithProgressionTilingDeprecatedHeader;
 using LibArithProgressionTilingInterface = ArithProgressionTilingDeprecatedHeader;
 } // namespace AscendC
 
+<<<<<<< HEAD
 #endif // LIB_TILING_ARITHPROGRESSION_TILING_INTF_H
+=======
+#endif // LIB_TILING_ARITHPROGRESSION_TILING_INTF_H
+>>>>>>> upstream/master

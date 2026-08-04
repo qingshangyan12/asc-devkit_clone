@@ -174,4 +174,8 @@ void Checker::PrintTask(const AllRankTaskQueues& allRankTaskQueues)
         }
     }
 }
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

@@ -19,4 +19,8 @@ namespace AscendC {
 [[deprecated(__FILE__ " is deprecated, please use sum_tiling.h instead!")]] typedef void SumTilingDeprecatedHeader;
 using LibSumTilingInterface = SumTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

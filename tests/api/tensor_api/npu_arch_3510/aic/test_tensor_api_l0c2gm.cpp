@@ -9,7 +9,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "tensor_api/stub/cce_stub.h"
+#include "c_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 #include <mockcpp/mockcpp.hpp>
 
@@ -542,3 +542,110 @@ KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, DN, DNLayoutPtn, float, float, N
 KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, DN, DNLayoutPtn, int32_t, int8_t, REQ8, false, false)
 KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, ND, NDLayoutPtn, int32_t, half, VDEQF16, true, false)
 KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, DN, DNLayoutPtn, int32_t, half, VDEQF16, true, false)
+
+// L0C(NZ) -> GM(NC1HWC0), N=1, no-quant. dst NC1HWC0 built with the NC1HWC0LayoutPtn tag so routing
+// dispatches to DataCopyL0C2GM (NC1HWC0<-NZ). src NZ (M=Ho*Wo, N=Cout=C1*C0); the stub is empty so
+// this exercises routing/param derivation.
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NC1HWC0)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t C1 = 2;
+    constexpr uint32_t H = 4;
+    constexpr uint32_t W = 4;
+    constexpr uint32_t C0 = 16;
+    constexpr uint32_t m = H * W;   // Ho*Wo = 16
+    constexpr uint32_t n = C1 * C0; // Cout  = 32
+    __cc__ float src[m * n] = {0};
+    __gm__ float dst[m * n] = {0};
+
+    auto l0cTensor =
+        MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(
+        dst, MakeFrameLayout<NC1HWC0LayoutPtn>(
+                 1, static_cast<int>(C1), static_cast<int>(H), static_cast<int>(W), static_cast<int>(C0)));
+
+    RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
+    RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+// L0C(NZ) -> GM(NHWC), no quant. NZ (M=H*W, N=C) unfolded to NHWC (1, H, W, C) via the nz2nd path.
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NHWC)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t H = 8;
+    constexpr uint32_t W = 8;
+    constexpr uint32_t C = 16;
+    constexpr uint32_t m = H * W; // 64
+    constexpr uint32_t n = C;     // 16
+    __cc__ float src[m * n] = {0};
+    __gm__ float dst[m * n] = {0};
+
+    auto l0cTensor =
+        MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(
+        dst, MakeFrameLayout<NHWCLayoutPtn, LayoutTraitDefault<float>>(
+                 1, static_cast<int>(H), static_cast<int>(W), static_cast<int>(C)));
+
+    RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
+    RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+// L0C(NZ) -> GM(NCHW), no quant. NZ (M=H*W, N=C) unfolded to NCHW (1, C, H, W) via the nz2dn path
+// (NCHW is the HW<->C transpose of NHWC).
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NCHW)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t H = 8;
+    constexpr uint32_t W = 8;
+    constexpr uint32_t C = 16;
+    constexpr uint32_t m = H * W; // 64
+    constexpr uint32_t n = C;     // 16
+    __cc__ float src[m * n] = {0};
+    __gm__ float dst[m * n] = {0};
+
+    auto l0cTensor =
+        MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(
+        dst, MakeFrameLayout<NCHWLayoutPtn, LayoutTraitDefault<float>>(
+                 1, static_cast<int>(C), static_cast<int>(H), static_cast<int>(W)));
+
+    RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
+    RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+// L0C(NZ) -> GM(NCDHW) via nz2dn (conv3D output, no quant). Output depth Do is treated as 1, so this
+// is NZ->NCHW with a 5D dst: nSize=C, mSize=D*H*W (=H*W when D==1), dstStride=Stride[1]. Drives the
+// full copy path against the empty cce stub to verify it routes to DataCopyL0C2GMNZ2NCDHW.
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NCDHW)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t D = 1; // output depth treated as 1
+    constexpr uint32_t H = 8;
+    constexpr uint32_t W = 8;
+    constexpr uint32_t C = 16;
+    constexpr uint32_t m = D * H * W; // 64
+    constexpr uint32_t n = C;         // 16
+    __cc__ float src[m * n] = {0};
+    __gm__ float dst[m * n] = {0};
+
+    auto l0cTensor =
+        MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(
+        dst, MakeFrameLayout<NCDHWLayoutPtn, LayoutTraitDefault<float>>(
+                 1, static_cast<int>(C), static_cast<int>(D), static_cast<int>(H), static_cast<int>(W)));
+
+    RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
+    RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
+
+    EXPECT_EQ(dst[0], 0);
+}

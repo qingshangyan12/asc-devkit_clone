@@ -109,6 +109,7 @@ public:
 };
 
 #ifdef ASCENDC_TIME_STAMP_ON
+<<<<<<< HEAD
 #define GET_TILING_DATA(tiling_data, tiling_arg) \
     const TilingData tiling_data;                \
     AscendC::PrintTimeStamp(static_cast<uint32_t>(AscendC::TimeStampId::TIME_STAMP_TILING_DATA));
@@ -121,6 +122,15 @@ public:
     const tiling_type point##var;                                \
     auto& var = point##var.member;                               \
     AscendC::PrintTimeStamp(static_cast<uint32_t>(AscendC::TimeStampId::TIME_STAMP_TILING_DATA_MEMBER));
+=======
+#define GET_TILING_DATA(tiling_data, tiling_arg) const TilingData tiling_data;
+
+#define GET_TILING_DATA_WITH_STRUCT(tiling_struct, tiling_data, tiling_arg) const tiling_struct tiling_data;
+
+#define GET_TILING_DATA_MEMBER(tiling_type, member, var, tiling) \
+    const tiling_type point##var;                                \
+    auto& var = point##var.member;
+>>>>>>> upstream/master
 
 #else
 #define GET_TILING_DATA(tiling_data, tiling_arg) const TilingData tiling_data;

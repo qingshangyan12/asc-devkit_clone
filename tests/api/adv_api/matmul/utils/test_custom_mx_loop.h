@@ -74,4 +74,8 @@ public:
     __aicore__ inline int32_t GetStepInnerIdx() const { return 0; }
 };
 } // namespace TestCustomModules
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

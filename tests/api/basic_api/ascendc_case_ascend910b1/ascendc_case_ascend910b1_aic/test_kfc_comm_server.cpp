@@ -63,4 +63,8 @@ TEST_P(TestKfcServerSuite, TestKfcServerConstruct)
     KFC_Enum funID = KFC_Enum::MMFUN_INIT;
     uint16_t instID = 0x1234;
     uint32_t KfcMsgFlag = KfcMsgMakeFlag(funID, instID);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

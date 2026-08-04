@@ -7,6 +7,10 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 #ifndef HCCLV2_AICPU_UTILS_H
 #define HCCLV2_AICPU_UTILS_H
 #include <string>
@@ -50,7 +54,12 @@ public:
     ~AicpuUtils() = default;
     static AicpuUtils& GetInstance();
 
+<<<<<<< HEAD
     void CreateSingleInstance(void* args) const;
+=======
+    void CreateSingleInstance(void *args) const;
+    HcclResult Init() const;
+>>>>>>> upstream/master
 
     HcclResult WaitCommFree(CommunicatorImplLite* communicatorImplLite, const char* funcName) const;
 

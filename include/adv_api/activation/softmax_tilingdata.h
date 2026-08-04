@@ -37,4 +37,8 @@ TILING_DATA_FIELD_DEF(uint32_t, tailSplitSize);
 TILING_DATA_FIELD_DEF(uint32_t, tailReduceSize);
 END_TILING_DATA_DEF;
 } // namespace optiling
+<<<<<<< HEAD
 #endif // LIB_SOFTMAX_SOFTMAX_TILINGDATA_H
+=======
+#endif // LIB_SOFTMAX_SOFTMAX_TILINGDATA_H
+>>>>>>> upstream/master

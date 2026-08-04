@@ -1,5 +1,9 @@
 # SinCosCompute Performance Tuning Example
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 ## Overview
 
 This example uses sincos computation to demonstrate thread configuration optimization strategies in the Ascend C SIMT programming model. The example includes 1 baseline version and 1 optimized version. In the baseline version, `__launch_bounds__` is not set, and the compiler allocates resources based on the default value of 1024 (that is, 1024 threads per Block), causing register spill. The optimized version configures `__launch_bounds__(512)` to inform the compiler that the maximum number of threads per Block is 512, allowing the compiler to fully utilize hardware resources during compilation and avoid register spill, demonstrating the tuning path of optimizing performance through proper thread count configuration in the SIMT programming model.
@@ -228,7 +232,11 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 Run the following steps in the root directory of this example to build and execute the example.
 
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -259,11 +267,19 @@ Run the following steps in the root directory of this example to build and execu
 
 ## Performance Analysis
 
+<<<<<<< HEAD
 Use the `msprof` tool to collect detailed performance data:
 
 ```bash
 msprof op ./sincos_compute 1024   # Analyze baseline case performance
 msprof op ./sincos_compute 512    # Analyze optimized case performance
+=======
+Use the `msOpProf` tool to collect detailed performance data:
+
+```bash
+msopprof ./sincos_compute 1024   # Analyze baseline case performance
+msopprof ./sincos_compute 512    # Analyze optimized case performance
+>>>>>>> upstream/master
 ```
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:

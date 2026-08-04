@@ -42,4 +42,8 @@ ASCENDC_TPL_SEL(          // 2 * 1 * 2 *1 = 4个tiling key
     ASCENDC_TPL_ARGS_SEL( // 2 * 1 * 2 *1 = 4个tiling key
         ASCENDC_TPL_DTYPE_SEL(X, _TILIG_FP32), ASCENDC_TPL_FORMAT_SEL(Y, _TILIG_ND, _TILIG_NZ),
         ASCENDC_TPL_UINT_SEL(Z, ASCENDC_TPL_UI_LIST, 4, 6), ASCENDC_TPL_BOOL_SEL(S, 0, 1)), );
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

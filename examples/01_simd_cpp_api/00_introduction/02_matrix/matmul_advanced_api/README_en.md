@@ -21,7 +21,11 @@ This sample uses the Matmul high-level API to implement matrix multiplication.
 │   │   └── verify_result.py    // Golden value comparison file
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read and write functions
+<<<<<<< HEAD
 │   ├── matmul_advanced_api.asc  // Ascend C sample implementation & invocation sample
+=======
+│   ├── matmul_advanced_api.asc // Ascend C sample implementation & invocation sample
+>>>>>>> upstream/master
 │   └── README.md               // Sample documentation
 ```
 
@@ -87,7 +91,11 @@ This sample uses the Matmul high-level API to implement matrix multiplication.
 
 Execute the following steps in the root directory of this sample to build and run the sample.
 - Configure Environment Variables
+<<<<<<< HEAD
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development toolkit on the current environment.
+=======
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development toolkit on the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -125,4 +133,8 @@ Execute the following steps in the root directory of this sample to build and ru
   The following execution result indicates successful precision comparison.
   ```bash
   test pass!
+<<<<<<< HEAD
   ```
+=======
+  ```
+>>>>>>> upstream/master

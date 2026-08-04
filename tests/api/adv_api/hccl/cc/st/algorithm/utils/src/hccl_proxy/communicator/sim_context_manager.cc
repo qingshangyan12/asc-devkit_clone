@@ -107,4 +107,8 @@ HcclResult SimContextMgr::DestroyCommEngineCtx(const HcclMem* engineCtx)
     return HCCL_SUCCESS;
 }
 
+<<<<<<< HEAD
 } // namespace HcclSim
+=======
+} // namespace HcclSim
+>>>>>>> upstream/master

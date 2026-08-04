@@ -368,4 +368,8 @@ HcclResult HcclCcuKernelLaunch(
 
 #ifdef __cplusplus
 }
+<<<<<<< HEAD
 #endif // __cplusplus
+=======
+#endif // __cplusplus
+>>>>>>> upstream/master

@@ -43,7 +43,11 @@ This example uses the `aclopExecuteV2` interface to execute the single-operator 
 
 - Configure environment variables
 
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -55,7 +59,12 @@ This example uses the `aclopExecuteV2` interface to execute the single-operator 
   Run the following steps in the root directory of this example.
 
   ```bash
+<<<<<<< HEAD
   mkdir -p build; cd build
+=======
+  mkdir -p build && cd build
+  python3 ../scripts/gen_data.py
+>>>>>>> upstream/master
   # Use the ATC model conversion tool to generate the single-operator offline model
   atc --singleop=../add_custom.json --output=. --soc_version=${soc_version}
   cmake .. && make -j

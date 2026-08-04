@@ -54,4 +54,8 @@ private:
     std::vector<SimNotify> notifys_;
 };
 } // namespace HcclSim
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

@@ -216,4 +216,8 @@ int32_t AscendcCodeHidden::WriteInt(T data)
     return SUCCESS;
 }
 
+<<<<<<< HEAD
 } // namespace CodeHidden
+=======
+} // namespace CodeHidden
+>>>>>>> upstream/master

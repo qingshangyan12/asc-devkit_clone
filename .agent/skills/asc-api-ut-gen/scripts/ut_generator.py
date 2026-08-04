@@ -48,7 +48,9 @@ SKILL_DIR = SCRIPT_DIR.parent
 SKILLS_DIR = SKILL_DIR.parent
 REPO_ROOT = SKILL_DIR.parents[2]
 NPU_ARCH_FACTS_PATH = SKILLS_DIR / "asc-npu-arch" / "references" / "npu-arch-facts.json"
-GENERATION_CONSTRAINTS_PATH = SKILL_DIR / "references" / "foundations" / "generation-constraints.json"
+GENERATION_CONSTRAINTS_PATH = (
+    SKILL_DIR / "references" / "foundations" / "generation-constraints.json"
+)
 REFERENCE_CONSTRAINT_FILES = {
     "npu_arch_facts": str(NPU_ARCH_FACTS_PATH),
     "generation_constraints": str(GENERATION_CONSTRAINTS_PATH),
@@ -86,7 +88,9 @@ def get_npu_arch_facts() -> Dict[str, Any]:
 
 def get_generation_constraints() -> Dict[str, Any]:
     """Return UT generation constraints from the structured reference."""
-    return _load_reference_json_safe("generation_constraints", GENERATION_CONSTRAINTS_PATH)
+    return _load_reference_json_safe(
+        "generation_constraints", GENERATION_CONSTRAINTS_PATH
+    )
 
 
 def ensure_reference_constraints_loaded() -> None:
@@ -143,7 +147,8 @@ AIV_GENERIC_BINARY_APIS = frozenset(
     name.lower() for name in AIV_GENERATION_FACTS.get("generic_binary_apis", [])
 )
 AIV_GENERIC_SCALAR_TENSOR_DISPATCH_APIS = frozenset(
-    name.lower() for name in AIV_GENERATION_FACTS.get("generic_scalar_tensor_dispatch_apis", [])
+    name.lower()
+    for name in AIV_GENERATION_FACTS.get("generic_scalar_tensor_dispatch_apis", [])
 )
 AIV_EXPLICIT_TEMPLATES = frozenset(AIV_GENERATION_FACTS.get("explicit_templates", []))
 AIC_GENERIC_MMAD_LIKE_APIS = frozenset(
@@ -207,17 +212,19 @@ GENERATOR_DTYPE_MAP = dict(
 @dataclass
 class TestCase:
     """测试用例配置"""
-    name: str                          # 测试用例名称
-    data_size: int = 256               # 数据大小
-    dtype: str = "half"                # 数据类型
-    input_count: int = 1               # 输入数量
-    has_mask: bool = False             # 是否有 mask
+
+    name: str  # 测试用例名称
+    data_size: int = 256  # 数据大小
+    dtype: str = "half"  # 数据类型
+    input_count: int = 1  # 输入数量
+    has_mask: bool = False  # 是否有 mask
     additional_params: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class UTConfig:
     """UT 生成配置"""
+
     api_type: ApiType
     api_name: str
     chip: ChipArch
@@ -230,6 +237,7 @@ class UTConfig:
 @dataclass(frozen=True)
 class AdvApiProfile:
     """Executable high-level API UT profile backed by an existing source UT."""
+
     source: str
     output: str
 
@@ -254,7 +262,9 @@ def _load_adv_profile_entry(api_name: str, raw_profile: Any) -> AdvApiProfile:
     return AdvApiProfile(source=source, output=output)
 
 
-def get_adv_api_profile(api_name: str, kernel_params: Dict[str, Any]) -> Optional[AdvApiProfile]:
+def get_adv_api_profile(
+    api_name: str, kernel_params: Dict[str, Any]
+) -> Optional[AdvApiProfile]:
     """Return an executable high-level API profile explicitly supplied by this run."""
     kernel_params = kernel_params or {}
     profile = kernel_params.get("adv_profile", {})
@@ -263,7 +273,9 @@ def get_adv_api_profile(api_name: str, kernel_params: Dict[str, Any]) -> Optiona
     return _load_adv_profile_entry(normalize_adv_api_name(api_name), profile)
 
 
-def get_adv_profile_output_path(api_name: str, kernel_params: Dict[str, Any]) -> Optional[str]:
+def get_adv_profile_output_path(
+    api_name: str, kernel_params: Dict[str, Any]
+) -> Optional[str]:
     """Return the output path for an explicitly supplied high-level API profile."""
     profile = get_adv_api_profile(api_name, kernel_params)
     return profile.output if profile is not None else None
@@ -277,11 +289,17 @@ def normalize_generated_cpp(code: str) -> str:
     header_match = re.match(r"\A/\*\*.*?\*/\n*", normalized, re.DOTALL)
     header = header_match.group(0) if header_match else ""
     if "Copyright (c)" in header and "Huawei Technologies Co., Ltd." in header:
-        normalized = TEMPLATES['copyright'] + "\n" + normalized[header_match.end():]
+        normalized = TEMPLATES["copyright"] + "\n" + normalized[header_match.end() :]
     return normalized
 
 
+<<<<<<< HEAD
 def render_gtest_values_instantiation(api_name: str, api_name_upper: str, test_params: List[str]) -> str:
+=======
+def render_gtest_values_instantiation(
+    api_name: str, api_name_upper: str, test_params: List[str]
+) -> str:
+>>>>>>> upstream/master
     """Render gtest value instantiation in the repository clang-format style."""
     testsuite = f"{api_name}Testsuite"
     if len(test_params) == 1:
@@ -307,7 +325,11 @@ TEMPLATES = {
     # -------------------------------------------------------------------------
     # 版权声明
     # -------------------------------------------------------------------------
+<<<<<<< HEAD
     'copyright': '''/**
+=======
+    "copyright": """/**
+>>>>>>> upstream/master
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -316,12 +338,16 @@ TEMPLATES = {
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+<<<<<<< HEAD
 ''',
 
+=======
+""",
+>>>>>>> upstream/master
     # -------------------------------------------------------------------------
     # AIV (Vector 核心) API 模板
     # -------------------------------------------------------------------------
-    'aiv_basic': '''${COPYRIGHT}
+    "aiv_basic": """${COPYRIGHT}
 #include <gtest/gtest.h>
 #include <vector>
 #include "kernel_operator.h"
@@ -342,9 +368,14 @@ ${TEST_CLASS}
 ${INSTANTIATION}
 
 ${TEST_CASE}
+<<<<<<< HEAD
 ''',
 
     'aiv_kernel_class': '''template <${TEMPLATE_PARAMS}>
+=======
+""",
+    "aiv_kernel_class": """template <${TEMPLATE_PARAMS}>
+>>>>>>> upstream/master
 class Kernel${API_NAME} {
 public:
     __aicore__ inline Kernel${API_NAME}() {}
@@ -409,17 +440,27 @@ private:
     GlobalTensor<T> src0Global;
     GlobalTensor<Src1T> src1Global;
     uint32_t dataSize;
+<<<<<<< HEAD
 };''',
 
     'aiv_main_function': '''template <typename T, typename Src1T = T>
+=======
+};""",
+    "aiv_main_function": """template <typename T, typename Src1T = T>
+>>>>>>> upstream/master
 __aicore__ inline void main_${API_NAME}(uint8_t* dstGm, uint8_t* src0Gm, uint8_t* src1Gm, uint32_t dataSize)
 {
     Kernel${API_NAME}<T, Src1T> op;
     op.Init(dstGm, src0Gm, src1Gm, dataSize);
     op.Process();
+<<<<<<< HEAD
 }''',
 
     'aiv_init_function': '''template <typename T, typename Src1T = T>
+=======
+}""",
+    "aiv_init_function": """template <typename T, typename Src1T = T>
+>>>>>>> upstream/master
 void Init${API_NAME}Inputs(uint8_t* src0Gm, uint8_t* src1Gm, uint32_t dataSize)
 {
     T* src0 = reinterpret_cast<T*>(src0Gm);
@@ -428,13 +469,19 @@ void Init${API_NAME}Inputs(uint8_t* src0Gm, uint8_t* src1Gm, uint32_t dataSize)
         src0[i] = static_cast<T>(i % 256);
         src1[i] = static_cast<Src1T>((i + 1) % 256);
     }
+<<<<<<< HEAD
 }''',
 
     'aiv_param_struct': '''struct ${API_NAME}TestParams {
+=======
+}""",
+    "aiv_param_struct": """struct ${API_NAME}TestParams {
+>>>>>>> upstream/master
     uint32_t data_size;
     uint32_t data_bit_size;
     void (*cal_func)(uint8_t*, uint8_t*, uint8_t*, uint32_t);
     void (*init_func)(uint8_t*, uint8_t*, uint32_t);
+<<<<<<< HEAD
 };''',
 
     'aiv_test_class': (
@@ -449,6 +496,19 @@ protected:
     'aiv_instantiation': '''${INSTANTIATION}''',
 
     'aiv_test_case': '''TEST_P(${API_NAME}Testsuite, ${API_NAME}TestCase)
+=======
+};""",
+    "aiv_test_class": (
+        """class ${API_NAME}Testsuite : public testing::Test, """
+        """public testing::WithParamInterface<${API_NAME}TestParams> {
+protected:
+    void SetUp() { AscendC::SetGCoreType(2); }
+    void TearDown() { AscendC::SetGCoreType(0); }
+};"""
+    ),
+    "aiv_instantiation": """${INSTANTIATION}""",
+    "aiv_test_case": """TEST_P(${API_NAME}Testsuite, ${API_NAME}TestCase)
+>>>>>>> upstream/master
 {
     auto param = GetParam();
 
@@ -468,9 +528,14 @@ protected:
         // TODO: 添加实际验证逻辑
         // EXPECT_NEAR(...);
     }
+<<<<<<< HEAD
 }''',
 
     'aiv_scalar_tensor_dispatch_basic': '''${COPYRIGHT}
+=======
+}""",
+    "aiv_scalar_tensor_dispatch_basic": """${COPYRIGHT}
+>>>>>>> upstream/master
 #include <gtest/gtest.h>
 #include <vector>
 #include "kernel_operator.h"
@@ -489,9 +554,14 @@ ${TEST_CLASS}
 ${INSTANTIATION}
 
 ${TEST_CASE}
+<<<<<<< HEAD
 ''',
 
     'aiv_scalar_tensor_dispatch_kernel_class': '''template <typename T>
+=======
+""",
+    "aiv_scalar_tensor_dispatch_kernel_class": """template <typename T>
+>>>>>>> upstream/master
 class Kernel${API_NAME} {
 public:
     __aicore__ inline void Init(__gm__ uint8_t* srcGm, __gm__ uint8_t* dstGm, uint32_t dataSize)
@@ -553,14 +623,20 @@ private:
     GlobalTensor<T> srcGlobal;
     GlobalTensor<T> dstGlobal;
     uint32_t dataSize;
+<<<<<<< HEAD
 };''',
 
     'aiv_scalar_tensor_dispatch_main_function': '''template <typename T>
+=======
+};""",
+    "aiv_scalar_tensor_dispatch_main_function": """template <typename T>
+>>>>>>> upstream/master
 __aicore__ inline void main_${API_NAME}(uint8_t* srcGm, uint8_t* dstGm, uint32_t dataSize)
 {
     Kernel${API_NAME}<T> op;
     op.Init(srcGm, dstGm, dataSize);
     op.Process();
+<<<<<<< HEAD
 }''',
 
     'aiv_scalar_tensor_dispatch_param_struct': '''struct ${API_NAME}TestParams {
@@ -581,6 +657,24 @@ protected:
     'aiv_scalar_tensor_dispatch_instantiation': '''${INSTANTIATION}''',
 
     'aiv_scalar_tensor_dispatch_test_case': '''TEST_P(${API_NAME}Testsuite, ${API_NAME}TestCase)
+=======
+}""",
+    "aiv_scalar_tensor_dispatch_param_struct": """struct ${API_NAME}TestParams {
+    uint32_t data_size;
+    uint32_t data_bit_size;
+    void (*cal_func)(uint8_t*, uint8_t*, uint32_t);
+};""",
+    "aiv_scalar_tensor_dispatch_test_class": (
+        """class ${API_NAME}Testsuite : public testing::Test, """
+        """public testing::WithParamInterface<${API_NAME}TestParams> {
+protected:
+    void SetUp() { AscendC::SetGCoreType(2); }
+    void TearDown() { AscendC::SetGCoreType(0); }
+};"""
+    ),
+    "aiv_scalar_tensor_dispatch_instantiation": """${INSTANTIATION}""",
+    "aiv_scalar_tensor_dispatch_test_case": """TEST_P(${API_NAME}Testsuite, ${API_NAME}TestCase)
+>>>>>>> upstream/master
 {
     auto param = GetParam();
 
@@ -590,12 +684,16 @@ protected:
     param.cal_func(srcGm.data(), dstGm.data(), param.data_size);
 
     EXPECT_EQ(dstGm[0], 0x00);
+<<<<<<< HEAD
 }''',
 
+=======
+}""",
+>>>>>>> upstream/master
     # -------------------------------------------------------------------------
     # AIC (Cube 核心) API 模板
     # -------------------------------------------------------------------------
-    'aic_basic': '''${COPYRIGHT}
+    "aic_basic": """${COPYRIGHT}
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
 
@@ -607,9 +705,14 @@ ${KERNEL_CLASS}
 ${TEST_CLASS}
 
 ${TEST_CASE}
+<<<<<<< HEAD
 ''',
 
     'aic_kernel_class': '''template <typename Src0T, typename Src1T, typename DstT, typename L1OutT>
+=======
+""",
+    "aic_kernel_class": """template <typename Src0T, typename Src1T, typename DstT, typename L1OutT>
+>>>>>>> upstream/master
 class Kernel${API_NAME} {
 public:
     __aicore__ inline Kernel${API_NAME}() {}
@@ -676,9 +779,14 @@ private:
     GlobalTensor<Src1T> bGM;
     GlobalTensor<DstT> cGM;
     uint16_t m, k, n;
+<<<<<<< HEAD
 };''',
 
     'aic_test_class': '''class TEST_${API_NAME_UPPER} : public testing::Test {
+=======
+};""",
+    "aic_test_class": """class TEST_${API_NAME_UPPER} : public testing::Test {
+>>>>>>> upstream/master
 protected:
     void SetUp() { g_coreType = AscendC::AIC_TYPE; }
     void TearDown()
@@ -686,9 +794,14 @@ protected:
         AscendC::CheckSyncState();
         g_coreType = AscendC::MIX_TYPE;
     }
+<<<<<<< HEAD
 };''',
 
     'aic_test_case': '''TEST_F(TEST_${API_NAME_UPPER}, ${API_NAME}_Basic)
+=======
+};""",
+    "aic_test_case": """TEST_F(TEST_${API_NAME_UPPER}, ${API_NAME}_Basic)
+>>>>>>> upstream/master
 {
     uint16_t m = ${M_SIZE};
     uint16_t n = ${N_SIZE};
@@ -722,12 +835,16 @@ protected:
         // TODO: 添加实际验证逻辑
         ${DST_TYPE} val = reinterpret_cast<${DST_TYPE}*>(c)[i];
     }
+<<<<<<< HEAD
 }''',
 
+=======
+}""",
+>>>>>>> upstream/master
     # -------------------------------------------------------------------------
     # C API 模板
     # -------------------------------------------------------------------------
-    'c_api_basic': '''${COPYRIGHT}
+    "c_api_basic": """${COPYRIGHT}
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
@@ -738,9 +855,8 @@ ${TEST_CLASS}
 ${STUB_FUNCTION}
 
 ${TEST_CASE}
-''',
-
-    'c_api_test_class': '''
+""",
+    "c_api_test_class": """
 class Test${API_NAME}CAPI : public testing::Test {
 protected:
     void SetUp() {
@@ -750,9 +866,8 @@ protected:
         g_coreType = C_API_AIV_TYPE;
     }
 };
-''',
-
-    'c_api_stub_function': '''
+""",
+    "c_api_stub_function": """
 namespace {
 void ${API_NAME}_Stub(vector_uint8_t& dst, vector_uint8_t src0,
                        vector_uint8_t src1, vector_bool mask, Literal literal) {
@@ -760,9 +875,8 @@ void ${API_NAME}_Stub(vector_uint8_t& dst, vector_uint8_t src0,
     EXPECT_TRUE(true);
 }
 }
-''',
-
-    'c_api_test_case': '''
+""",
+    "c_api_test_case": """
 TEST_F(Test${API_NAME}CAPI, ${API_NAME}_Succ) {
     vector_uint8_t dst;
     vector_uint8_t src0;
@@ -776,12 +890,11 @@ TEST_F(Test${API_NAME}CAPI, ${API_NAME}_Succ) {
     ${API_NAME}(dst, src0, src1, mask);
     GlobalMockObject::verify();
 }
-''',
-
+""",
     # -------------------------------------------------------------------------
     # 高阶 API 模板
     # -------------------------------------------------------------------------
-    'adv_basic': '''${COPYRIGHT}
+    "adv_basic": """${COPYRIGHT}
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
 
@@ -797,9 +910,8 @@ ${TEST_CLASS}
 ${INSTANTIATION}
 
 ${TEST_CASE}
-''',
-
-    'adv_kernel_class': '''
+""",
+    "adv_kernel_class": """
 template <typename T1, typename T2>
 class Kernel${API_NAME} {
 public:
@@ -854,34 +966,30 @@ private:
     GlobalTensor<T2> dstGlobal;
     uint32_t height, width;
 };
-''',
-
-    'adv_param_struct': '''
+""",
+    "adv_param_struct": """
 struct ${API_NAME}TestParams {
     uint32_t typeSize;
     uint32_t height;
     uint32_t width;
     void (*cal_func)(uint8_t*, uint8_t*, uint32_t, uint32_t);
 };
-''',
-
-    'adv_test_class': '''
+""",
+    "adv_test_class": """
 class ${API_NAME}Testsuite : public testing::Test,
                               public testing::WithParamInterface<${API_NAME}TestParams> {
 protected:
     void SetUp() { AscendC::SetGCoreType(2); }
     void TearDown() { AscendC::SetGCoreType(0); }
 };
-''',
-
-    'adv_instantiation': '''
+""",
+    "adv_instantiation": """
 INSTANTIATE_TEST_CASE_P(TEST_${API_NAME_UPPER}, ${API_NAME}Testsuite,
     ::testing::Values(
         ${TEST_PARAMS}
     ));
-''',
-
-    'adv_test_case': '''
+""",
+    "adv_test_case": """
 TEST_P(${API_NAME}Testsuite, ${API_NAME}TestCase) {
     auto param = GetParam();
 
@@ -902,12 +1010,11 @@ TEST_P(${API_NAME}Testsuite, ${API_NAME}TestCase) {
     // 验证结果
     // TODO: 添加实际验证逻辑
 }
-''',
-
+""",
     # -------------------------------------------------------------------------
     # SIMT API 模板
     # -------------------------------------------------------------------------
-    'simt_basic': '''${COPYRIGHT}
+    "simt_basic": """${COPYRIGHT}
 #include <gtest/gtest.h>
 #include <type_traits>
 #include <cmath>
@@ -922,9 +1029,8 @@ ${KERNEL_CLASS}
 ${TEST_CLASS}
 
 ${TEST_CASE}
-''',
-
-    'simt_kernel_class': '''
+""",
+    "simt_kernel_class": """
 template <typename T>
 class Kernel${API_NAME} {
 public:
@@ -936,18 +1042,16 @@ public:
         // TODO: 实现 SIMT 计算
     }
 };
-''',
-
-    'simt_test_class': '''
+""",
+    "simt_test_class": """
 class ${API_NAME}Testsuite : public testing::Test,
                               public testing::WithParamInterface<int> {
 protected:
     void SetUp() {}
     void TearDown() {}
 };
-''',
-
-    'simt_test_case': '''
+""",
+    "simt_test_case": """
 TEST_P(${API_NAME}Testsuite, ${API_NAME}TestCase) {
     int mode = GetParam();
     int fpByteSize = 4;
@@ -969,12 +1073,11 @@ TEST_P(${API_NAME}Testsuite, ${API_NAME}TestCase) {
     // 验证结果
     // TODO: 添加验证逻辑
 }
-''',
-
+""",
     # -------------------------------------------------------------------------
     # Register Compute API 模板
     # -------------------------------------------------------------------------
-    'reg_basic': '''${COPYRIGHT}
+    "reg_basic": """${COPYRIGHT}
 #include <gtest/gtest.h>
 #include <type_traits>
 #include "kernel_operator.h"
@@ -987,9 +1090,8 @@ ${KERNEL_CLASS}
 ${TEST_CLASS}
 
 ${TEST_CASE}
-''',
-
-    'reg_kernel_class': '''
+""",
+    "reg_kernel_class": """
 template <typename T, typename Src1T, int32_t mD>
 class Kernel${API_NAME} {
 public:
@@ -1025,17 +1127,15 @@ private:
     uint32_t nums;
     uint32_t vecMask;
 };
-''',
-
-    'reg_test_class': '''
+""",
+    "reg_test_class": """
 class TEST_${API_NAME_UPPER} : public testing::Test {
 protected:
     void SetUp() { AscendC::SetGCoreType(2); }
     void TearDown() { AscendC::SetGCoreType(0); }
 };
-''',
-
-    'reg_test_case': '''
+""",
+    "reg_test_case": """
 TEST_F(TEST_${API_NAME_UPPER}, ${API_NAME}_Basic) {
     constexpr int32_t dataSize = 256;
 
@@ -1057,13 +1157,14 @@ TEST_F(TEST_${API_NAME_UPPER}, ${API_NAME}_Basic) {
     // 验证结果
     // TODO: 添加验证逻辑
 }
-''',
+""",
 }
 
 
 # =============================================================================
 # UT 生成器类
 # =============================================================================
+
 
 class UTGenerator:
     """UT 代码生成器基类 - 使用模板系统"""
@@ -1150,7 +1251,9 @@ class AIVUTGenerator(UTGenerator):
         )
 
     def _validate_binary_cases(self) -> None:
-        non_binary_cases = [tc.name for tc in self.config.test_cases if tc.input_count != 2]
+        non_binary_cases = [
+            tc.name for tc in self.config.test_cases if tc.input_count != 2
+        ]
         if non_binary_cases:
             raise ValueError(
                 "binary AIV template requires input_count=2 for every test case; "
@@ -1158,7 +1261,9 @@ class AIVUTGenerator(UTGenerator):
             )
 
     def _validate_scalar_tensor_dispatch_cases(self) -> None:
-        invalid_cases = [tc.name for tc in self.config.test_cases if tc.input_count != 1]
+        invalid_cases = [
+            tc.name for tc in self.config.test_cases if tc.input_count != 1
+        ]
         if invalid_cases:
             raise ValueError(
                 "scalar_tensor_dispatch AIV template requires input_count=1 for every test case; "
@@ -1168,11 +1273,11 @@ class AIVUTGenerator(UTGenerator):
     def _generate_binary(self) -> str:
         self._validate_binary_cases()
         variables = {
-            'COPYRIGHT': TEMPLATES['copyright'],
-            'API_NAME': self.config.api_name,
-            'API_NAME_UPPER': self.config.api_name.upper(),
-            'TEMPLATE_PARAMS': 'typename T, typename Src1T',
-            'API_CALL': f'{self.config.api_name}(dstLocal, src0Local, src1Local, dataSize);',
+            "COPYRIGHT": TEMPLATES["copyright"],
+            "API_NAME": self.config.api_name,
+            "API_NAME_UPPER": self.config.api_name.upper(),
+            "TEMPLATE_PARAMS": "typename T, typename Src1T",
+            "API_CALL": f"{self.config.api_name}(dstLocal, src0Local, src1Local, dataSize);",
         }
 
         # 生成测试参数
@@ -1185,7 +1290,11 @@ class AIVUTGenerator(UTGenerator):
                 f"{self.config.api_name}TestParams{{{tc.data_size}, "
                 f"{dtype_info['size']}, {func_name}, {init_func_name}}}"
             )
+<<<<<<< HEAD
         variables['INSTANTIATION'] = render_gtest_values_instantiation(
+=======
+        variables["INSTANTIATION"] = render_gtest_values_instantiation(
+>>>>>>> upstream/master
             self.config.api_name,
             self.config.api_name.upper(),
             test_params,
@@ -1193,27 +1302,30 @@ class AIVUTGenerator(UTGenerator):
 
         # 渲染各部分
         parts = [
-            self.render('aiv_basic', {
-                **variables,
-                'KERNEL_CLASS': self.render('aiv_kernel_class', variables),
-                'MAIN_FUNCTION': self.render('aiv_main_function', variables),
-                'INIT_FUNCTION': self.render('aiv_init_function', variables),
-                'PARAM_STRUCT': self.render('aiv_param_struct', variables),
-                'TEST_CLASS': self.render('aiv_test_class', variables),
-                'INSTANTIATION': self.render('aiv_instantiation', variables),
-                'TEST_CASE': self.render('aiv_test_case', variables),
-            })
+            self.render(
+                "aiv_basic",
+                {
+                    **variables,
+                    "KERNEL_CLASS": self.render("aiv_kernel_class", variables),
+                    "MAIN_FUNCTION": self.render("aiv_main_function", variables),
+                    "INIT_FUNCTION": self.render("aiv_init_function", variables),
+                    "PARAM_STRUCT": self.render("aiv_param_struct", variables),
+                    "TEST_CLASS": self.render("aiv_test_class", variables),
+                    "INSTANTIATION": self.render("aiv_instantiation", variables),
+                    "TEST_CASE": self.render("aiv_test_case", variables),
+                },
+            )
         ]
-        return '\n'.join(parts)
+        return "\n".join(parts)
 
     def _generate_scalar_tensor_dispatch(self) -> str:
         self._validate_scalar_tensor_dispatch_cases()
         variables = {
-            'COPYRIGHT': TEMPLATES['copyright'],
-            'API_NAME': self.config.api_name,
-            'API_NAME_UPPER': self.config.api_name.upper(),
-            'RAW_API_CALL': f'{self.config.api_name}(dstLocal, scalarValue, dataSize);',
-            'TENSOR_API_CALL': f'{self.config.api_name}(dstLocal, srcLocal, dataSize);',
+            "COPYRIGHT": TEMPLATES["copyright"],
+            "API_NAME": self.config.api_name,
+            "API_NAME_UPPER": self.config.api_name.upper(),
+            "RAW_API_CALL": f"{self.config.api_name}(dstLocal, scalarValue, dataSize);",
+            "TENSOR_API_CALL": f"{self.config.api_name}(dstLocal, srcLocal, dataSize);",
         }
 
         test_params = []
@@ -1227,21 +1339,43 @@ class AIVUTGenerator(UTGenerator):
                 f"{self.config.api_name}TestParams{{{tc.data_size}, "
                 f"{dtype_info['size']}, {func_name}}}"
             )
+<<<<<<< HEAD
         variables['INSTANTIATION'] = render_gtest_values_instantiation(
+=======
+        variables["INSTANTIATION"] = render_gtest_values_instantiation(
+>>>>>>> upstream/master
             self.config.api_name,
             self.config.api_name.upper(),
             test_params,
         )
 
-        return self.render('aiv_scalar_tensor_dispatch_basic', {
-            **variables,
-            'KERNEL_CLASS': self.render('aiv_scalar_tensor_dispatch_kernel_class', variables),
-            'MAIN_FUNCTION': self.render('aiv_scalar_tensor_dispatch_main_function', variables),
-            'PARAM_STRUCT': self.render('aiv_scalar_tensor_dispatch_param_struct', variables),
-            'TEST_CLASS': self.render('aiv_scalar_tensor_dispatch_test_class', variables),
-            'INSTANTIATION': self.render('aiv_scalar_tensor_dispatch_instantiation', variables),
-            'TEST_CASE': self.render('aiv_scalar_tensor_dispatch_test_case', variables),
-        }).rstrip() + '\n'
+        return (
+            self.render(
+                "aiv_scalar_tensor_dispatch_basic",
+                {
+                    **variables,
+                    "KERNEL_CLASS": self.render(
+                        "aiv_scalar_tensor_dispatch_kernel_class", variables
+                    ),
+                    "MAIN_FUNCTION": self.render(
+                        "aiv_scalar_tensor_dispatch_main_function", variables
+                    ),
+                    "PARAM_STRUCT": self.render(
+                        "aiv_scalar_tensor_dispatch_param_struct", variables
+                    ),
+                    "TEST_CLASS": self.render(
+                        "aiv_scalar_tensor_dispatch_test_class", variables
+                    ),
+                    "INSTANTIATION": self.render(
+                        "aiv_scalar_tensor_dispatch_instantiation", variables
+                    ),
+                    "TEST_CASE": self.render(
+                        "aiv_scalar_tensor_dispatch_test_case", variables
+                    ),
+                },
+            ).rstrip()
+            + "\n"
+        )
 
 
 class AICUTGenerator(UTGenerator):
@@ -1253,33 +1387,36 @@ class AICUTGenerator(UTGenerator):
             raise ValueError(f"unsupported AIC template kind: {template_kind}")
 
         kernel_params = self.config.kernel_params
-        m = kernel_params.get('m', 16)
-        k = kernel_params.get('k', 64)
-        n = kernel_params.get('n', 16)
+        m = kernel_params.get("m", 16)
+        k = kernel_params.get("k", 64)
+        n = kernel_params.get("n", 16)
 
         variables = {
-            'COPYRIGHT': TEMPLATES['copyright'],
-            'API_NAME': self.config.api_name,
-            'API_NAME_UPPER': self.config.api_name.upper(),
-            'API_CALL': f'Mmad(co1Local, a1Local, b1Local, {{m, k, n}}, {{1, 1, 1}});',
-            'M_SIZE': str(m),
-            'N_SIZE': str(n),
-            'K_SIZE': str(k),
-            'SRC0_TYPE': 'half',
-            'SRC1_TYPE': 'half',
-            'DST_TYPE': 'float',
-            'L1OUT_TYPE': 'float',
+            "COPYRIGHT": TEMPLATES["copyright"],
+            "API_NAME": self.config.api_name,
+            "API_NAME_UPPER": self.config.api_name.upper(),
+            "API_CALL": "Mmad(co1Local, a1Local, b1Local, {m, k, n}, {1, 1, 1});",
+            "M_SIZE": str(m),
+            "N_SIZE": str(n),
+            "K_SIZE": str(k),
+            "SRC0_TYPE": "half",
+            "SRC1_TYPE": "half",
+            "DST_TYPE": "float",
+            "L1OUT_TYPE": "float",
         }
 
         parts = [
-            self.render('aic_basic', {
-                **variables,
-                'KERNEL_CLASS': self.render('aic_kernel_class', variables),
-                'TEST_CLASS': self.render('aic_test_class', variables),
-                'TEST_CASE': self.render('aic_test_case', variables),
-            })
+            self.render(
+                "aic_basic",
+                {
+                    **variables,
+                    "KERNEL_CLASS": self.render("aic_kernel_class", variables),
+                    "TEST_CLASS": self.render("aic_test_class", variables),
+                    "TEST_CASE": self.render("aic_test_case", variables),
+                },
+            )
         ]
-        return '\n'.join(parts)
+        return "\n".join(parts)
 
     def _get_template_kind(self) -> str:
         explicit_template = self.config.kernel_params.get("aic_template")

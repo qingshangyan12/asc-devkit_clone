@@ -16,8 +16,13 @@
 #include <cstdint>
 #include "conv3d_tiling_algorithm.h"
 #include "../../detail/host_log.h"
+<<<<<<< HEAD
 #include "../../../../include/adv_api/conv/conv3d/conv3d_tiling_base.h"
 #include "../../../../include/adv_api/conv/conv3d/conv3d_tiling.h"
+=======
+#include "adv_api/conv/conv3d/conv3d_tiling_base.h"
+#include "adv_api/conv/conv3d/conv3d_tiling.h"
+>>>>>>> upstream/master
 
 namespace Conv3dTilingApi {
 int64_t Conv3dTiling::GetTiling(optiling::TConv3DApiTiling& tiling)

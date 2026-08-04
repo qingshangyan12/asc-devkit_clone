@@ -9,7 +9,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "tensor_api/stub/cce_stub.h"
+#include "c_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Frame_Layout : public testing::Test {
@@ -126,7 +126,17 @@ TEST_F(Tensor_Api_Frame_Layout, BatchFrameLayoutTraitForms)
     auto dnExtLayout = MakeFrameLayout<DNExtLayoutPtn, LayoutTraitDefault<float>>(2, 8, 16);
     auto nzLayoutWithTrait = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(2, 32, 64);
     auto nzLayoutWithDataType = MakeFrameLayout<NZLayoutPtn, float>(2, 32, 64);
+    auto nzLayoutWithCompatTrait = MakeFrameLayout<NZLayoutPtn, LayoutTrait<float, _8>>(2, 32, 64);
     auto znLayoutWithC0 = MakeFrameLayout<ZNLayoutPtn, 8>(2, 32, 64);
+    using NzTraitWithDefault = GetLayoutTrait<decltype(nzLayoutWithTrait)>;
+    using NzTraitWithDataType = GetLayoutTrait<decltype(nzLayoutWithDataType)>;
+    using NzCompatTrait = GetLayoutTrait<decltype(nzLayoutWithCompatTrait)>;
+    static_assert(NzTraitWithDefault::C0_ELEMENT == _8{}, "LayoutTraitDefault<T> should only be used to infer C0.");
+    static_assert(NzTraitWithDataType::C0_ELEMENT == _8{}, "Data type argument should only be used to infer C0.");
+    static_assert(
+        AscendC::Std::is_same_v<NzCompatTrait, LayoutTrait<float, _8>>,
+        "LayoutTrait<T, C0> should remain source-compatible.");
+    static_assert(NzCompatTrait::C0_ELEMENT == _8{}, "LayoutTrait<T, C0> should use C0 as layout trait.");
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape(ndLayout)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(ndLayout)), 128);
@@ -146,6 +156,11 @@ TEST_F(Tensor_Api_Frame_Layout, BatchFrameLayoutTraitForms)
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(nzLayoutWithDataType)), 2048);
     EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(GetShape<1>(nzLayoutWithDataType))), 8);
     EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(GetShape<1>(nzLayoutWithDataType))), 8);
+
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape(nzLayoutWithCompatTrait)), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride(nzLayoutWithCompatTrait)), 2048);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(GetShape<1>(nzLayoutWithCompatTrait))), 8);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(GetShape<1>(nzLayoutWithCompatTrait))), 8);
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape(znLayoutWithC0)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(znLayoutWithC0)), 2048);
@@ -294,7 +309,7 @@ TEST_F(Tensor_Api_Frame_Layout, OtherGroupDefaultTrait)
     auto nzLayout = MakeFrameLayout<NZLayoutPtn>(32, 64);
     auto znLayout = MakeFrameLayout<ZNLayoutPtn>(32, 64);
     auto zzLayout = MakeFrameLayout<ZZLayoutPtn>(32, 64);
-    auto nnLayout = MakeFrameLayout<NNLayoutPtn, LayoutTrait<fp8_e8m0_t, _2>>(16, 32);
+    auto nnLayout = MakeFrameLayout<NNLayoutPtn, LayoutTrait<AscendC::Std::ignore_t, _2>>(16, 32);
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(nzLayout)), 16);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(nzLayout)), 2);
@@ -505,4 +520,82 @@ TEST_F(Tensor_Api_Frame_Layout, ScaleAndZzNnBatchFrameLayout)
     EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(GetShape<1>(zz))), 2);
     EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(GetShape<1>(zz))), 2);
     EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(GetShape<1>(zz))), 32);
+}
+
+TEST_F(Tensor_Api_Frame_Layout, ConvFeatureMapLayouts)
+{
+    using namespace AscendC::Te;
+
+    // NCHW(N,C,H,W): row-major contiguous stride (C*H*W, H*W, W, 1).
+    auto nchw = MakeFrameLayout<NCHWLayoutPtn>(2, 3, 4, 5);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape(nchw)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape(nchw)), 3);
+    EXPECT_EQ(AscendC::Std::get<2>(GetShape(nchw)), 4);
+    EXPECT_EQ(AscendC::Std::get<3>(GetShape(nchw)), 5);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride(nchw)), 60);
+    EXPECT_EQ(AscendC::Std::get<1>(GetStride(nchw)), 20);
+    EXPECT_EQ(AscendC::Std::get<2>(GetStride(nchw)), 5);
+    EXPECT_EQ(AscendC::Std::get<3>(GetStride(nchw)), 1);
+    static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(nchw)>, NCHWLayoutPtn>);
+
+    // NHWC(N,H,W,C): row-major contiguous stride (H*W*C, W*C, C, 1).
+    auto nhwc = MakeFrameLayout<NHWCLayoutPtn>(2, 4, 5, 3);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape(nhwc)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape(nhwc)), 4);
+    EXPECT_EQ(AscendC::Std::get<2>(GetShape(nhwc)), 5);
+    EXPECT_EQ(AscendC::Std::get<3>(GetShape(nhwc)), 3);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride(nhwc)), 60);
+    EXPECT_EQ(AscendC::Std::get<1>(GetStride(nhwc)), 15);
+    EXPECT_EQ(AscendC::Std::get<2>(GetStride(nhwc)), 3);
+    EXPECT_EQ(AscendC::Std::get<3>(GetStride(nhwc)), 1);
+    static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(nhwc)>, NHWCLayoutPtn>);
+
+    // NC1HWC0(N,C1,H,W,C0): C0 supplied by caller, row-major contiguous stride.
+    auto nc1hwc0 = MakeFrameLayout<NC1HWC0LayoutPtn>(2, 3, 4, 5, 16);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape(nc1hwc0)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape(nc1hwc0)), 3);
+    EXPECT_EQ(AscendC::Std::get<2>(GetShape(nc1hwc0)), 4);
+    EXPECT_EQ(AscendC::Std::get<3>(GetShape(nc1hwc0)), 5);
+    EXPECT_EQ(AscendC::Std::get<4>(GetShape(nc1hwc0)), 16);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride(nc1hwc0)), 960);
+    EXPECT_EQ(AscendC::Std::get<1>(GetStride(nc1hwc0)), 320);
+    EXPECT_EQ(AscendC::Std::get<2>(GetStride(nc1hwc0)), 80);
+    EXPECT_EQ(AscendC::Std::get<3>(GetStride(nc1hwc0)), 16);
+    EXPECT_EQ(AscendC::Std::get<4>(GetStride(nc1hwc0)), 1);
+    static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(nc1hwc0)>, NC1HWC0LayoutPtn>);
+}
+
+TEST_F(Tensor_Api_Frame_Layout, Conv3DFeatureMapLayouts)
+{
+    using namespace AscendC::Te;
+
+    // NCDHW(N,C,D,H,W): row-major contiguous stride (C*D*H*W, D*H*W, H*W, W, 1).
+    auto ncdhw = MakeFrameLayout<NCDHWLayoutPtn>(2, 3, 4, 5, 6);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape(ncdhw)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape(ncdhw)), 3);
+    EXPECT_EQ(AscendC::Std::get<2>(GetShape(ncdhw)), 4);
+    EXPECT_EQ(AscendC::Std::get<3>(GetShape(ncdhw)), 5);
+    EXPECT_EQ(AscendC::Std::get<4>(GetShape(ncdhw)), 6);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride(ncdhw)), 360); // 3*4*5*6
+    EXPECT_EQ(AscendC::Std::get<1>(GetStride(ncdhw)), 120); // 4*5*6
+    EXPECT_EQ(AscendC::Std::get<2>(GetStride(ncdhw)), 30);  // 5*6
+    EXPECT_EQ(AscendC::Std::get<3>(GetStride(ncdhw)), 6);   // 6
+    EXPECT_EQ(AscendC::Std::get<4>(GetStride(ncdhw)), 1);
+    static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(ncdhw)>, NCDHWLayoutPtn>);
+
+    // NDC1HWC0(N,D,C1,H,W,C0): C0 supplied by caller, row-major contiguous stride.
+    auto ndc1hwc0 = MakeFrameLayout<NDC1HWC0LayoutPtn>(2, 4, 3, 5, 6, 16);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape(ndc1hwc0)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape(ndc1hwc0)), 4);
+    EXPECT_EQ(AscendC::Std::get<2>(GetShape(ndc1hwc0)), 3);
+    EXPECT_EQ(AscendC::Std::get<3>(GetShape(ndc1hwc0)), 5);
+    EXPECT_EQ(AscendC::Std::get<4>(GetShape(ndc1hwc0)), 6);
+    EXPECT_EQ(AscendC::Std::get<5>(GetShape(ndc1hwc0)), 16);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride(ndc1hwc0)), 5760); // 4*3*5*6*16
+    EXPECT_EQ(AscendC::Std::get<1>(GetStride(ndc1hwc0)), 1440); // 3*5*6*16
+    EXPECT_EQ(AscendC::Std::get<2>(GetStride(ndc1hwc0)), 480);  // 5*6*16
+    EXPECT_EQ(AscendC::Std::get<3>(GetStride(ndc1hwc0)), 96);   // 6*16
+    EXPECT_EQ(AscendC::Std::get<4>(GetStride(ndc1hwc0)), 16);   // 16
+    EXPECT_EQ(AscendC::Std::get<5>(GetStride(ndc1hwc0)), 1);
+    static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(ndc1hwc0)>, NDC1HWC0LayoutPtn>);
 }

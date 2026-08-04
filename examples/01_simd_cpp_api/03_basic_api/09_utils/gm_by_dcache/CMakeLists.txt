@@ -24,4 +24,8 @@ add_executable(demo
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+<<<<<<< HEAD
 )
+=======
+)
+>>>>>>> upstream/master

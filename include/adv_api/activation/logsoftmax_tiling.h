@@ -15,7 +15,7 @@
 
 #ifndef LIB_ACTIVATION_LOGSOFTMAX_TILING_H
 #define LIB_ACTIVATION_LOGSOFTMAX_TILING_H
-#include "graph/tensor.h"
+#include "../utils/types.h"
 #include "logsoftmax_tilingdata.h"
 #include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {
@@ -27,7 +27,8 @@ namespace AscendC {
  * @param [in] isReuseSource : whether to reuse the src Tensor
  * @return min temporary local space size
  */
-uint32_t GetLogSoftMaxMaxTmpSize(const ge::Shape srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
+uint32_t GetLogSoftMaxMaxTmpSize(
+    const AscendC::TensorShape srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
 /*
  * @ingroup GetLogSoftMaxMinTmpSize
  * @brief get logsoftmax api calculate need min temporary local space size
@@ -36,7 +37,8 @@ uint32_t GetLogSoftMaxMaxTmpSize(const ge::Shape srcShape, const uint32_t dataTy
  * @param [in] isReuseSource : whether to reuse the src Tensor
  * @return min temporary local space size
  */
-uint32_t GetLogSoftMaxMinTmpSize(const ge::Shape srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
+uint32_t GetLogSoftMaxMinTmpSize(
+    const AscendC::TensorShape srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
 /*
  * @ingroup LogSoftMaxTilingFunc
  * @brief calculate LogSoftMax api need tiling
@@ -46,6 +48,7 @@ uint32_t GetLogSoftMaxMinTmpSize(const ge::Shape srcShape, const uint32_t dataTy
  * @param [out] logsoftmaxTiling : LogSoftMax api tiling
  */
 void LogSoftMaxTilingFunc(
+<<<<<<< HEAD
     const ge::Shape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
     optiling::LogSoftMaxTiling& softmaxTiling);
 
@@ -54,3 +57,13 @@ void LogSoftMaxTilingFunc(
     AscendC::tiling::LogSoftMaxTiling& softmaxTiling);
 } // namespace AscendC
 #endif // LIB_ACTIVATION_LOGSOFTMAX_TILING_H
+=======
+    const AscendC::TensorShape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+    optiling::LogSoftMaxTiling& softmaxTiling);
+
+void LogSoftMaxTilingFunc(
+    const AscendC::TensorShape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+    AscendC::tiling::LogSoftMaxTiling& softmaxTiling);
+} // namespace AscendC
+#endif // LIB_ACTIVATION_LOGSOFTMAX_TILING_H
+>>>>>>> upstream/master

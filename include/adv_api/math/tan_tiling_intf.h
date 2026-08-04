@@ -22,4 +22,8 @@ namespace AscendC {
 typedef void TanTilingDeprecatedHeader;
 using LibTanTilingInterface = TanTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_MATH_TAN_TILING_INTF_H
+=======
+#endif // LIB_MATH_TAN_TILING_INTF_H
+>>>>>>> upstream/master

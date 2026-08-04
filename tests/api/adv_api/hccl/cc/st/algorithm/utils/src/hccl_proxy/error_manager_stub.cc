@@ -27,4 +27,8 @@ int32_t ReportPredefinedErrMsg(
 {
     return 0;
 }
+<<<<<<< HEAD
 } // namespace error_message
+=======
+} // namespace error_message
+>>>>>>> upstream/master

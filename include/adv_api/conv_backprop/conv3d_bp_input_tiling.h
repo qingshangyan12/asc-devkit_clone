@@ -79,4 +79,8 @@ private:
     bool InferShape();
 };
 } // namespace ConvBackpropApi
+<<<<<<< HEAD
 #endif // CONV3D_BP_INPUT_TILING_H
+=======
+#endif // CONV3D_BP_INPUT_TILING_H
+>>>>>>> upstream/master

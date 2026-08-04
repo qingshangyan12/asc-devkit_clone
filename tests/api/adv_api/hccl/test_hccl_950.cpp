@@ -365,4 +365,8 @@ TEST_F(HcclSuiteAIC, ReduceScatter_CcuReduceScatterMeshMem2Mem1D)
     EXPECT_EQ(hccl.Wait(handleId), HCCL_SUCCESS);
 }
 
+<<<<<<< HEAD
 } // namespace
+=======
+} // namespace
+>>>>>>> upstream/master

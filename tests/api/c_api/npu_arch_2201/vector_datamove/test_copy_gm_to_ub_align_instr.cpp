@@ -112,4 +112,8 @@ TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN_INSTR(
 TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN_INSTR(
     CopyGM2UBALIGNBINT32, asc_copy_gm2ub_align, copy_gm_to_ubuf_align_b32, int32_t, int32_t);
 TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN_INSTR(
+<<<<<<< HEAD
     CopyGM2UBALIGNBUINT32, asc_copy_gm2ub_align, copy_gm_to_ubuf_align_b32, uint32_t, uint32_t);
+=======
+    CopyGM2UBALIGNBUINT32, asc_copy_gm2ub_align, copy_gm_to_ubuf_align_b32, uint32_t, uint32_t);
+>>>>>>> upstream/master

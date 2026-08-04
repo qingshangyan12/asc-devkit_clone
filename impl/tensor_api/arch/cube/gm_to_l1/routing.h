@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/routing.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -27,6 +27,10 @@
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nd2nd.h"
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nd2nz.h"
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nd2zn.h"
+#include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nc1hwc02nc1hwc0.h"
+#include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nchw2nc1hwc0.h"
+#include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/ncdhw2ndc1hwc0.h"
+#include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nhwc2nc1hwc0.h"
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nz2nz.h"
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/zn2zn.h"
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/scalea_nd2zz.h"
@@ -41,10 +45,10 @@ namespace Te {
 
 class CopyGM2L1Ignore {
 public:
-    template <const CopyGM2L1Trait& trait, typename... Args>
-    __aicore__ inline static void Run(const Args&... args)
+    template <const CopyGM2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
     {
-        static_assert(Std::is_same_v<Args..., void>, "CopyGM2L1Ignore should not be called");
+        static_assert(!Std::is_same_v<T, T>, "CopyGM2L1: unsupported layout pattern combination.");
     }
 };
 
@@ -141,6 +145,26 @@ struct CopyGM2L1Routing<Version, NNLayoutPtn, ScaleBDNLayoutPtn> {
 template <uint32_t Version>
 struct CopyGM2L1Routing<Version, NNLayoutPtn, NNLayoutPtn> {
     using type = CopyGmToCbufScaleBNn2Nn;
+};
+
+template <uint32_t Version>
+struct CopyGM2L1Routing<Version, NC1HWC0LayoutPtn, NC1HWC0LayoutPtn> {
+    using type = CopyGmToCbufNC1HWC02NC1HWC0;
+};
+
+template <uint32_t Version>
+struct CopyGM2L1Routing<Version, NC1HWC0LayoutPtn, NHWCLayoutPtn> {
+    using type = CopyGmToCbufNHWC2NC1HWC0;
+};
+
+template <uint32_t Version>
+struct CopyGM2L1Routing<Version, NC1HWC0LayoutPtn, NCHWLayoutPtn> {
+    using type = CopyGmToCbufNCHW2NC1HWC0;
+};
+
+template <uint32_t Version>
+struct CopyGM2L1Routing<Version, NDC1HWC0LayoutPtn, NCDHWLayoutPtn> {
+    using type = CopyGmToCbufNCDHW2NDC1HWC0;
 };
 
 } // namespace Te

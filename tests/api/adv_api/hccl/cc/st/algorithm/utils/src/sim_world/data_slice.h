@@ -44,4 +44,8 @@ private:
     uint64_t size_;
 };
 } // namespace HcclSim
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

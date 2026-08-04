@@ -9,11 +9,12 @@
  */
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
-#include <fstream>
-#include <iostream>
 #include "kernel_operator.h"
 
 using namespace AscendC;
+
+extern "C" uint64_t GetDlogErrorCountForTest();
+
 namespace {
 /******************************** 双目指令 ********************************/
 template <typename T>
@@ -137,41 +138,67 @@ INSTANTIATE_TEST_CASE_P(
             "Scatter",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "dstOffset",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         OpTestParams{
             ScatterOpTest<float, Scatter>,
             "Scatter",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         OpTestParams{
             ScatterOpTest<float, Scatter>,
             "Scatter",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         OpTestParams{
             ScatterOp2Test<float, Scatter>,
             "Scatter",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "dstOffset",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         OpTestParams{
             ScatterOp2Test<float, Scatter>,
             "Scatter",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"},
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
+>>>>>>> upstream/master
         OpTestParams{
             ScatterOp2Test<float, Scatter>,
             "Scatter",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
+<<<<<<< HEAD
             "A1",
             "VECIN / VECOUT / VECCALC"}));
 
@@ -204,4 +231,18 @@ TEST_P(VectorOpTestsuite, VectorOpTestCase)
     EXPECT_TRUE(resultString.find(goldenStr) != std::string::npos);
     EXPECT_EQ(remove(fileName.c_str()), 0);
     count++;
+=======
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"}));
+
+TEST_P(VectorOpTestsuite, VectorOpTestCase)
+{
+    MOCKER(raise, int32_t(*)(int32_t)).stubs().will(invoke(RaiseStub));
+    auto param = GetParam();
+    SCOPED_TRACE(param.funcName + "." + param.illegalTensorPos);
+    const uint64_t startCount = GetDlogErrorCountForTest();
+    param.func(param.tensorPos);
+    const uint64_t dlogErrorCount = GetDlogErrorCountForTest() - startCount;
+    EXPECT_EQ(dlogErrorCount, 1);
+>>>>>>> upstream/master
 }

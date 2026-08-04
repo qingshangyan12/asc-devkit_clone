@@ -2,7 +2,11 @@
 
 ## Overview
 
+<<<<<<< HEAD
 This example uses Add computation to demonstrate the compilation, execution, result verification, and performance data collection flow of Ascend C programs in CAmodel simulation mode. Users can obtain simulation performance data through `msprof op simulator` to analyze performance bottlenecks and improve performance analysis efficiency.
+=======
+This example uses Add computation to demonstrate the compilation, execution, result verification, and performance data collection flow of Ascend C programs in CAmodel simulation mode. Users can obtain simulation performance data through `msopprof simulator` to analyze performance bottlenecks and improve performance analysis efficiency.
+>>>>>>> upstream/master
 
 ## Supported Products
 
@@ -51,7 +55,11 @@ This example uses Add computation to demonstrate the compilation, execution, res
 Run the following steps in the root directory of this example to build and execute the program.
 
 - Configure Environment Variables  
+<<<<<<< HEAD
   Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+=======
+  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+>>>>>>> upstream/master
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -66,7 +74,11 @@ Run the following steps in the root directory of this example to build and execu
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j
   python3 ../scripts/gen_data.py
+<<<<<<< HEAD
   msprof op simulator --soc-version=<soc_version> ./demo
+=======
+  msopprof simulator --soc-version=<soc_version> ./demo
+>>>>>>> upstream/master
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin
   ```
 
@@ -87,10 +99,17 @@ Run the following steps in the root directory of this example to build and execu
 
 ## Simulation Tuning
 
+<<<<<<< HEAD
 Based on `./demo`, use `msprof op simulator` for simulation performance analysis to generate visualized instruction pipeline diagrams and other information. The command is as follows:
 
 ```bash
 msprof op simulator --soc-version=<soc_version> ./demo
+=======
+Based on `./demo`, use `msopprof simulator` for simulation performance analysis to generate visualized instruction pipeline diagrams and other information. The command is as follows:
+
+```bash
+msopprof simulator --soc-version=<soc_version> ./demo
+>>>>>>> upstream/master
 ```
 
 > Obtain the AI processor model `<soc_version>` through the following method:
@@ -114,4 +133,8 @@ After execution, view the instruction pipeline diagram through the following met
 
 - **MindStudio Insight**: Open `visualize_data.bin` for visual presentation.
 
+<<<<<<< HEAD
   For more details, refer to the msProf tool usage: [MindStudio Tool Tuning (msProf) Quick Start](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md).
+=======
+  For more details, refer to the msOpProf tool usage: [MindStudio Tool Tuning (msOpProf) Quick Start](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md).
+>>>>>>> upstream/master

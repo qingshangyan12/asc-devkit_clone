@@ -64,4 +64,8 @@ private:
 };
 
 } // namespace CodeHidden
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

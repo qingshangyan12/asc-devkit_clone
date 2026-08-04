@@ -29,4 +29,8 @@ private:
     uint32_t streamId_;
 };
 } // namespace HcclSim
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

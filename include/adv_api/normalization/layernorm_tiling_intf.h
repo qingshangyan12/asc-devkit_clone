@@ -20,4 +20,8 @@ namespace AscendC {
 typedef void LayernormTilingDeprecatedHeader;
 using LibLayernormTilingInterface = LayernormTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_NORMALIZATION_LAYERNORM_TILING_INTF_H
+=======
+#endif // LIB_NORMALIZATION_LAYERNORM_TILING_INTF_H
+>>>>>>> upstream/master

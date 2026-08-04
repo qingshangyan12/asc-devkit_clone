@@ -115,6 +115,7 @@ __inline__ __attribute__((always_inline)) __aicore__ void InitTilingData(
 }
 
 #ifdef ASCENDC_TIME_STAMP_ON
+<<<<<<< HEAD
 #define GET_TILING_DATA(tiling_data, tiling_arg)                 \
     TilingDataUnalign tiling_data;                               \
     InitTilingData<TilingDataUnalign>(tiling_arg, &tiling_data); \
@@ -130,6 +131,20 @@ __inline__ __attribute__((always_inline)) __aicore__ void InitTilingData(
     size_t offset##var = (size_t)(&((tiling_type*)0)->member);                       \
     InitTilingData<decltype(((tiling_type*)0)->member)>(tiling + offset##var, &var); \
     AscendC::PrintTimeStamp(static_cast<uint32_t>(AscendC::TimeStampId::TIME_STAMP_TILING_DATA_MEMBER));
+=======
+#define GET_TILING_DATA(tiling_data, tiling_arg) \
+    TilingDataUnalign tiling_data;               \
+    InitTilingData<TilingDataUnalign>(tiling_arg, &tiling_data);
+
+#define GET_TILING_DATA_WITH_STRUCT(tiling_struct, tiling_data, tiling_arg) \
+    tiling_struct tiling_data;                                              \
+    InitTilingData<tiling_struct>(tiling_arg, &tiling_data);
+
+#define GET_TILING_DATA_MEMBER(tiling_type, member, var, tiling) \
+    decltype(((tiling_type*)0)->member) var;                     \
+    size_t offset##var = (size_t)(&((tiling_type*)0)->member);   \
+    InitTilingData<decltype(((tiling_type*)0)->member)>(tiling + offset##var, &var);
+>>>>>>> upstream/master
 
 #else
 #define GET_TILING_DATA(tiling_data, tiling_arg) \

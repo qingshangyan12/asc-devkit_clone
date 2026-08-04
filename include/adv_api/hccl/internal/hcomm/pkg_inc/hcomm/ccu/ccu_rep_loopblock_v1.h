@@ -39,4 +39,8 @@ private:
 
 }; // namespace CcuRep
 }; // namespace hcomm
+<<<<<<< HEAD
 #endif // HCOMM_CCU_REPRESENTATION_LOOP_BLOCK_H
+=======
+#endif // HCOMM_CCU_REPRESENTATION_LOOP_BLOCK_H
+>>>>>>> upstream/master

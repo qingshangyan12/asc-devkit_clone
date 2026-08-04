@@ -371,4 +371,8 @@ TEST_F(ST_ALLTOALL_TEST, st_alltoall_10)
     RunAlltoAllMeshTest(topoMeta, rankSize, dataType, dataCount);
 }
 
+<<<<<<< HEAD
 } // namespace checker
+=======
+} // namespace checker
+>>>>>>> upstream/master

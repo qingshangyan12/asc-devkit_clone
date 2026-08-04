@@ -21,4 +21,8 @@ namespace AscendC {
 typedef void BroadcastTilingDeprecatedHeader;
 using LibBroadcastTilingInterface = BroadcastTilingDeprecatedHeader;
 } // namespace AscendC
+<<<<<<< HEAD
 #endif // LIB_PAD_BROADCAST_TILING_INTF_H
+=======
+#endif // LIB_PAD_BROADCAST_TILING_INTF_H
+>>>>>>> upstream/master
