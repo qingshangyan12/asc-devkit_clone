@@ -50,8 +50,13 @@ enum class DataFormat : uint8_t {
 };
 #endif // ASCC_ENUM_DATAFORMAT
 
-#if __NPU_ARCH__ == 5102
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
 #define CANN_ASC_ENABLE_FIX_SHIFT
+#endif
+
+#if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+#define CANN_ASC_ENABLE_POST_PROC_BUF
 #endif
 
 struct DataCopyParams {
@@ -78,6 +83,9 @@ struct DataCopyParams {
     };
 #ifdef CANN_ASC_ENABLE_FIX_SHIFT
     uint8_t fixShiftVal = 0;
+#endif
+#ifdef CANN_ASC_ENABLE_POST_PROC_BUF
+    uint8_t postProcBufBlock = 0;
 #endif
 };
 
@@ -194,7 +202,8 @@ struct DataCopyPadParams {
 struct DataCopyExtParams {
     __aicore__ DataCopyExtParams() {}
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     __aicore__ DataCopyExtParams(
         const uint16_t count, const uint32_t len, const int64_t srcStrideIn, const int64_t dstStrideIn,
         const uint32_t rsvIn)
@@ -208,7 +217,8 @@ struct DataCopyExtParams {
 
     uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
     uint32_t blockLen = 0;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     int64_t srcStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
     int64_t dstStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
 #else
@@ -220,7 +230,8 @@ struct DataCopyExtParams {
 
 template <typename T>
 struct DataCopyPadExtParams {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     using TYPE = typename GetPadValueType<T>::Type;
     __aicore__ DataCopyPadExtParams()
     {
