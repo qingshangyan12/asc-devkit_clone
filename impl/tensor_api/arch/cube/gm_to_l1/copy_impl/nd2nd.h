@@ -32,6 +32,9 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        if constexpr (U::layoutType::depth == THREE_DIM_DATA || U::layoutType::depth == FIVE_DIM_DATA) {
+            TENSOR_API_DEBUG_CHECK(debug_check_batch_count, Get<0>(src.Layout().Shape()), "CopyGM2L1 ND2ND path");
+        }
         // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
         // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
         constexpr auto gmDepth = NestingDepthV<decltype(src.Layout().Shape())>;

@@ -55,6 +55,7 @@ private:
         auto srcLayout = src.Layout();
 
         uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, blockCount, "src row shape size", "CopyGM2UB ZN path");
         uint32_t blockLen =
             GetTotalColumnShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout) * sizeof(SrcType);
         int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) * sizeof(SrcType);

@@ -61,6 +61,8 @@ private:
         uint16_t kStartPosition = 0;
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_step, mStep, "mStep", "CopyL12L0A NZ2NZ path");
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_step, kStep, "kStep", "CopyL12L0A NZ2NZ path");
         // Nz -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / STRIDE_UNIT;
@@ -81,6 +83,8 @@ private:
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstNoBatchLayout);
         auto kStep = Get<0>(dstLayout.Shape()) * 
                      GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout);
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_step, mStep, "mStep", "CopyL12L0A batch NZ2NZ path");
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_step, kStep, "kStep", "CopyL12L0A batch NZ2NZ path");
         // Nz -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcNoBatchLayout) / STRIDE_UNIT;

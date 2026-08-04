@@ -72,6 +72,7 @@ private:
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, blockCount, "src row shape size", "CopyL12BT");
         if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
             dstCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(dstLayout);
             dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout);
@@ -120,12 +121,18 @@ private:
         auto dstLayout = dst.Layout();
 
         uint16_t batchSize = Get<0>(srcLayout.Shape());
+        TENSOR_API_DEBUG_CHECK(debug_check_batch_match, batchSize, Get<0>(dstLayout.Shape()), "CopyL12BT batch path");
+        TENSOR_API_DEBUG_CHECK(debug_check_batch_count, batchSize, "CopyL12BT batch path");
         uint32_t srcBatchStride = Get<0>(srcLayout.Stride());
         uint32_t dstBatchStride = Get<0>(dstLayout.Stride());
 
         // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
         // would read the batch axis as row/column.
         auto srcInner = Te::Get<1>(srcLayout);
+        TENSOR_API_DEBUG_CHECK(
+            debug_check_l12bt_column_bytes, static_cast<uint64_t>(GetTotalColumnShape(srcInner)) * sizeof(srcType),
+            static_cast<uint64_t>(GetTotalColumnShape(Te::Get<1>(dstLayout))) * sizeof(dstType),
+            "CopyL12BT batch path");
 
         uint32_t srcShapeRows;
         uint32_t srcShapeColumns;

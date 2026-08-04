@@ -32,6 +32,10 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        if constexpr (U::layoutType::depth == THREE_DIM_DATA || U::layoutType::depth == FIVE_DIM_DATA) {
+            TENSOR_API_DEBUG_CHECK(
+                debug_check_batch_count, Get<0>(src.Layout().Shape()), "CopyGM2L1 ScaleB DN2NN path");
+        }
         RunGmToL1Batched<trait, CopyGmToCbufScaleBDN2Nn, T, U>(dst, src);
     }
 

@@ -57,6 +57,14 @@ public:
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
         using SrcPattern = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.Layout(), "dst", "CopyL12L0A");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, src.Layout(), "src", "CopyL12L0A");
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "CopyL12L0A");
+        if constexpr (
+            Std::is_same_v<DstPattern, NZLayoutPtn> && Std::is_same_v<SrcPattern, NC1HWC0LayoutPtn> &&
+            !IsB4Type<typename T::elementType>) {
+            TENSOR_API_DEBUG_CHECK(debug_check_img2col_coord<typename T::elementType>, params, "CopyL12L0A");
+        }
         if constexpr (Std::is_same_v<SrcPattern, NC1HWC0LayoutPtn> ||
                       Std::is_same_v<SrcPattern, NDC1HWC0LayoutPtn>) {
             // conv2D (NC1HWC0) and conv3D (NDC1HWC0) both take the img2col path; routing picks the
@@ -65,6 +73,13 @@ public:
                 typename CopyL12L0ARouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyMode::NORMAL>::type;
             CopyL12L0AImpl::template Run<trait, T, U, PadT>(dst, src, params);
         } else {
+            if constexpr (DstLayout::depth == FIVE_DIM_DATA && SrcLayout::depth == FIVE_DIM_DATA) {
+                TENSOR_API_DEBUG_CHECK(
+                    debug_check_batch_match, Get<0>(src.Layout().Shape()), Get<0>(dst.Layout().Shape()), "CopyL12L0A");
+                TENSOR_API_DEBUG_CHECK(
+                    debug_check_l0_batch_stride, Get<0>(src.Layout().Stride()), RemoveBatchDim(src.Layout()).Capacity(),
+                    Get<0>(dst.Layout().Stride()), RemoveBatchDim(dst.Layout()).Capacity(), "CopyL12L0A");
+            }
             constexpr auto isB8B4Type = sizeof(typename T::elementType) == 1;
             constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>;
             using CopyL12L0AMode =

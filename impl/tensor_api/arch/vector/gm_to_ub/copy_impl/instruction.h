@@ -62,6 +62,11 @@ private:
         if ASCEND_IS_AIC {
             return;
         }
+        TENSOR_API_DEBUG_CHECK(
+            debug_check_block_limit, blockCount, DEBUG_BLOCK_COUNT_MAX, "blockCount", "CopyGM2UB instruction");
+        TENSOR_API_DEBUG_CHECK(
+            debug_check_block_limit, blockLen, DEBUG_GM_UB_BLOCK_LEN_MAX, "blockLen", "CopyGM2UB instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_gm2ub_stride, dstStride, blockLen, blockCount, "CopyGM2UB instruction");
 
         asc_copy_gm2ub_align(dst, src, blockCount, blockLen, leftPaddingCount, rightPaddingCount, enableConstantPad,
                              cacheMode, srcStride, dstStride);

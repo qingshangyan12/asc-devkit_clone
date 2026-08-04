@@ -56,6 +56,9 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.Layout(), "dst", "CopyL12BT");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, src.Layout(), "src", "CopyL12BT");
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "CopyL12BT");
         using CopyL12BTImpl = typename CopyL12BTRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL12BTImpl::template Run<trait, T, U>(dst, src);
     }

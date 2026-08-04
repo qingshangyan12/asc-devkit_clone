@@ -64,6 +64,16 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
         using SrcPattern = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.Layout(), "dst", "CopyL12L0B");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, src.Layout(), "src", "CopyL12L0B");
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "CopyL12L0B");
+        if constexpr (DstLayout::depth == FIVE_DIM_DATA && SrcLayout::depth == FIVE_DIM_DATA) {
+            TENSOR_API_DEBUG_CHECK(
+                debug_check_batch_match, Get<0>(src.Layout().Shape()), Get<0>(dst.Layout().Shape()), "CopyL12L0B");
+            TENSOR_API_DEBUG_CHECK(
+                debug_check_l0_batch_stride, Get<0>(src.Layout().Stride()), RemoveBatchDim(src.Layout()).Capacity(),
+                Get<0>(dst.Layout().Stride()), RemoveBatchDim(dst.Layout()).Capacity(), "CopyL12L0B");
+        }
         constexpr auto isB8B4Type = sizeof(typename T::elementType) == 1;
         constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>;
         using CopyL12L0BMode = typename CopyL12L0BModeSet::template Get<Std::tuple<Std::Int<noTrans>, Std::Int<isB8B4Type>>>;
