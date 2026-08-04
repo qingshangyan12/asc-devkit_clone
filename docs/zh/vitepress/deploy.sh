@@ -273,7 +273,7 @@ server {
         add_header Cache-Control "no-cache, no-store, must-revalidate" always;
     }
 
-    # VitePress assets 文件名包含内容哈希，可以长期缓存。
+    # VitePress assets文件名包含内容哈希，可以长期缓存。
     location ^~ /assets/ {
         try_files \$uri @previous_assets;
         add_header Cache-Control "public, max-age=31536000, immutable" always;
