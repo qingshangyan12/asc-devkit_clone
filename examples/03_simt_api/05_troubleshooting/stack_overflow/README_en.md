@@ -6,7 +6,7 @@ This example uses SIMT stack overflow caused by defining large array variables i
 
 This example contains two cases:
 
-- Case 1: A large array in stack space causes stack overflow. The optimized scenario moves the thread-shared read-only array to UB. If the array must remain on the thread stack, the stack can also be enlarged through a configuration file.
+- Case 1: A large array in stack space causes stack overflow. You can increase the stack space through a configuration file, but using UB to store a large amount of temporary data is recommended.
 - Case 2: When recursive functions are used, an excessively large recursion depth causes stack overflow. You need to control the recursion depth or use an iterative algorithm instead of a recursive algorithm.
 
 ## Supported Products
@@ -23,7 +23,7 @@ This example contains two cases:
 ├── stack_overflow
 │   ├── CMakeLists.txt          // Example build script
 │   ├── stack_overflow.asc      // SIMT stack overflow reproduction and optimization example
-│   ├── acl.json                // Optional aclInit configuration demonstrating a custom SIMT stack size
+│   ├── acl.json                // aclInit configuration file used to configure the SIMT stack size
 │   ├── README_en.md
 │   └── README.md
 ```
@@ -36,7 +36,7 @@ This example contains two typical stack overflow scenarios, and reproduces and o
 
 | Case   | Core Issue                              | Corresponding Kernel                                                      | Solution                                             |
 |--------|-----------------------------------------|---------------------------------------------------------------------------|------------------------------------------------------|
-| Case 1 | Storing excessively large data on stack | simt_stack_overflow/simt_stack_overflow_optimized                         | Move the thread-shared read-only array to UB          |
+| Case 1 | Storing excessively large data on stack | simt_stack_overflow                                                       | Increase the stack size through a configuration file |
 | Case 2 | Excessive recursive function call depth | simt_recursive_stack_overflow/simt_recursive_stack_overflow_optimized     | Use an iterative algorithm instead of recursion      |
 
 > **Stack overflow issue description**
@@ -50,7 +50,7 @@ This example contains two typical stack overflow scenarios, and reproduces and o
 <tr><td rowspan="2" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
 <tr><td align="center">input</td><td align="center">[2048]</td><td align="center">int32_t</td></tr>
 <tr><td rowspan="1" align="center">Example Output</td><td align="center">output</td><td align="center">[2048]</td><td align="center">float</td></tr>
-<tr><td rowspan="1" align="center">Kernel Name</td><td colspan="3" align="center">simt_stack_overflow/simt_stack_overflow_optimized/simt_recursive_stack_overflow/simt_recursive_stack_overflow_optimized</td></tr>
+<tr><td rowspan="1" align="center">Kernel Name</td><td colspan="3" align="center">simt_stack_overflow/simt_recursive_stack_overflow/simt_recursive_stack_overflow_optimized</td></tr>
 </table>
 
 ## Example Implementation
@@ -59,27 +59,30 @@ This section analyzes two types of SIMT stack overflow issues: large local array
 
 ---
 
-### Case 1: Large Local Array Stack Overflow and UB Optimization
+### Case 1: Large Local Array Stack Overflow and Stack Size Configuration
 
-**Example goal**: Reproduce SIMT stack overflow caused by using a large array in stack space, and verify the fix by moving the thread-shared read-only array to UB.
+**Example goal**: Reproduce SIMT stack overflow caused by using a large array in stack space, and verify the fix by configuring a larger SIMT stack space.
 
 **Core implementation**: Use the kernel function `simt_stack_overflow` to allocate the large array `float local_buffer[320]` on the stack of each thread. The array occupies `320 * 4B = 1280B` per thread.
 
 ```cpp
 __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t total_length)
 {
+    uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= total_length) {
+        return;
+    }
     float local_buffer[BUFFER_SIZE];
+
     for (uint32_t i = 0; i < BUFFER_SIZE; i++) {
         local_buffer[i] = i + 1;
     }
 
-    for (uint32_t idx = threadIdx.x; idx < total_length; idx += blockDim.x) {
-        float sum = 1.0f;
-        for (uint32_t i = 0; i < input[idx]; i++) {
-            sum *= local_buffer[i];
-        }
-        output[idx] = sum;
+    float sum = 1.0f;
+    for (uint32_t i = 0; i < input[idx]; i++) {
+        sum *= local_buffer[i];
     }
+    output[idx] = sum;
 }
 ```
 
@@ -116,7 +119,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
 - To verify stack overflow, add `--cce-res-usage` to the compile options to obtain the stack space usage calculated by the compiler. Recompile the example. The following compile log is displayed:
 
     ```text
-    [BISHENG] Function properties for _Z19simt_stack_overflowPiPfj_simt_entry: Stack size: 1280 bytes, Used register number: 19
+    [BISHENG] Function properties for _Z19simt_stack_overflowPiPfj_simt_entry: Stack size: 1280 bytes, Used register number: 16
     ```
 
     `Stack size: 1280 bytes` in the log indicates that the stack space required by the kernel variables is `1280B`. The default SIMT stack space is `1152B`, confirming that stack overflow occurs.
@@ -127,31 +130,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
 
 **Solution**:
 
-- Solution 1: If every thread reads the same array contents, move the array to dynamic UB. The optimized kernel initializes the 1280-byte shared array cooperatively and calls `asc_syncthreads()` before reading it, avoiding a separate 1280-byte stack allocation per thread. `SCENARIO_NUM=2` builds and runs the following fixed implementation:
-
-    ```cpp
-    __global__ void simt_stack_overflow_optimized(int32_t* input, float* output, uint32_t total_length)
-    {
-        extern __ubuf__ float shared_buffer[];
-        for (uint32_t i = threadIdx.x; i < BUFFER_SIZE; i += blockDim.x) {
-            shared_buffer[i] = i + 1;
-        }
-        asc_syncthreads();
-
-        for (uint32_t idx = threadIdx.x; idx < total_length; idx += blockDim.x) {
-            float sum = 1.0f;
-            for (uint32_t i = 0; i < input[idx]; i++) {
-                sum *= shared_buffer[i];
-            }
-            output[idx] = sum;
-        }
-    }
-    ```
-
-    The Host configures `320 * sizeof(float) = 1280B` of dynamic UB when launching this kernel. A successful run prints `test pass!`.
-
-    When built with `--cce-res-usage`, the optimized kernel reports `Stack size: 0 bytes`, confirming that the array no longer occupies the thread stack.
-
+- Solution 1: If a large array variable is suitable for UB space, move it to UB to reduce stack usage and allow sharing between threads.
 - Solution 2: If a large amount of temporary data must be stored in stack space, increase the SIMT stack space to meet the stack space requirement of the kernel and resolve the stack overflow issue.
 
    You can configure the SIMT stack size through the `simt_stack_size` field in the `aclInit("acl.json")` API. The following is a code example:
@@ -172,7 +151,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
     For more configuration details, see the "SIMT operator stack space size configuration example" section in the [aclInit](https://hiascend.com/document/redirect/CannCommunityruntimeapiaclinit) API. The stack space size configuration field is `simt_stack_size`, and `simt_stack_size` specifies the stack space size of each thread of the SIMT operator.
 
     > [!NOTE]Note
-    > The default SIMT stack space is 1152B. If each SIMT thread is configured with 1280B, with 32 threads per warp, 64 warps per AIV core, and 72 cores, the total GM space is `1280B * 32 * 64 * 72 = 180MB`. `SCENARIO_NUM=2` in this example does not use this configuration; it runs the UB-optimized kernel.
+    > The default SIMT stack space is 1152B. In this example, the stack space of each SIMT thread is configured to 1280, namely 1280B. The maximum number of threads per warp is 32, the maximum number of warps per AIV core is 64, and the total number of cores is 72. Therefore, the total GM space occupied is `1280B * 32 * 64 * 72 = 180MB`.
 
 **Conclusion**:
 
@@ -196,9 +175,11 @@ __aicore__ float recursive_stack_stage(int32_t value)
 
 __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uint32_t total_length)
 {
-    for (uint32_t idx = threadIdx.x; idx < total_length; idx += blockDim.x) {
-        output[idx] = recursive_stack_stage(input[idx]);
+    uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= total_length) {
+        return;
     }
+    output[idx] = recursive_stack_stage(input[idx]);
 }
 ```
 
@@ -275,9 +256,11 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
 
     __global__ void simt_recursive_stack_overflow_optimized(int32_t* input, float* output, uint32_t total_length)
     {
-        for (uint32_t idx = threadIdx.x; idx < total_length; idx += blockDim.x) {
-            output[idx] = recursive_stack_stage_optimized(input[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= total_length) {
+            return;
         }
+        output[idx] = recursive_stack_stage_optimized(input[idx]);
     }
     ```
 
@@ -331,7 +314,7 @@ Run the following steps in the root directory of this example to build and execu
 | Option                    | Valid Value | Description |
 |---------------------------|-------------|-------------|
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`  | NPU architecture. This example supports only dav-3510 (Ascend 950PR/Ascend 950DT) |
-| `SCENARIO_NUM`            | `1-4`       | Example scenario number. The default value is 1. 1: large-array stack overflow in Case 1; 2: UB optimization in Case 1; 3: recursive overflow in Case 2; 4: iterative optimization in Case 2 |
+| `SCENARIO_NUM`            | `1-4`       | Example scenario number. The default value is 1. 1: overflow scenario of Case 1; 2: optimized scenario of Case 1; 3: overflow scenario of Case 2; 4: optimized scenario of Case 2 |
 
 **Execution result example**:
 
@@ -347,7 +330,7 @@ Run the following steps in the root directory of this example to build and execu
     The extend info: errcode:(356) errorStr: VEC SIMT DVG stack overflows, which may be caused by too many conditional branches or too manay nested loops. subErrType: 0x4.
     ```
 
-- For the UB optimization in Case 1 and the iterative optimization in Case 2, the following information is displayed after successful execution:
+- For the optimization verification scenarios of Case 1 and Case 2, the following information is displayed after successful execution:
 
     ```text
     test pass!
