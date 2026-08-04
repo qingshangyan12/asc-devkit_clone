@@ -277,7 +277,7 @@
                 -   [随路量化](SIMD-API/basic_api/cube_compute_TensorAPI/cube_store_key_features/quant_pre.md)
                 -   [随路Relu](SIMD-API/basic_api/cube_compute_TensorAPI/cube_store_key_features/relu_pre.md)
         -   [Memory矢量计算](SIMD-API/basic_api/memory_vector_compute/memory_vector_compute.md)
-            -   [Vector逻辑架构](SIMD-API/basic_api/memory_vector_compute/Vector_logical_arch/vector_logical_arch.md)
+            -   [Vector逻辑架构](SIMD-API/basic_api/memory_vector_compute/Vector_logical_arch/Vector_logical_arch.md)
             -   [SIMD计算说明](SIMD-API/basic_api/memory_vector_compute/SIMD_compute/SIMD_compute.md)
                 -   [概述](SIMD-API/basic_api/memory_vector_compute/SIMD_compute/overview.md)
                 -   [连续计算](SIMD-API/basic_api/memory_vector_compute/SIMD_compute/continuous_compute.md)

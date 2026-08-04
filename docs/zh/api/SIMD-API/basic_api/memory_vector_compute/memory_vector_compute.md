@@ -1,6 +1,6 @@
 # Memory矢量计算<a name="ZH-CN_TOPIC_0000001376097986"></a>
 
--   **[Vector逻辑架构](Vector_logical_arch/vector_logical_arch.md)**
+-   **[Vector逻辑架构](Vector_logical_arch/Vector_logical_arch.md)**
 
 -   **[SIMD计算说明](SIMD_compute/SIMD_compute.md)**
 
