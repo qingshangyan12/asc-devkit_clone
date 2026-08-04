@@ -15,8 +15,19 @@
 #ifndef IMPL_STD_CEIL_DIVISION_H
 #define IMPL_STD_CEIL_DIVISION_H
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CEIL_DIVISION_H__
+#endif
+
+#include "impl/basic_api/kernel_log.h"
 #include "utils/std/algorithm.h"
 #include "utils/std/type_traits.h"
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CEIL_DIVISION_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CEIL_DIVISION_H__
+#endif
 
 namespace AscendC {
 namespace Std {
@@ -75,7 +86,7 @@ using make_unsigned_t = typename integer_traits<T>::unsigned_type;
  * \note For signed inputs, callers must ensure a >= 0 and b > 0.
  */
 template <typename T, typename U>
-ASCENDC_HOST_AICORE inline constexpr auto ceil_div_generic(const T& a, const U& b)
+__host__ __aicore__ inline constexpr auto ceil_div_generic(const T& a, const U& b)
 {
     static_assert(is_integral_v<T>, "AscendC::Std::ceil_div: T must be an integral type");
     static_assert(is_integral_v<U>, "AscendC::Std::ceil_div: U must be an integral type");
@@ -101,11 +112,9 @@ ASCENDC_HOST_AICORE inline constexpr auto ceil_div_generic(const T& a, const U& 
         ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
     defined(__ASC_NPU_HOST__)
 template <typename T, typename U>
-ASCENDC_HOST_AICORE inline constexpr auto ceil_div(const T& a, const U& b)
+__host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 {
-    if (b == 0) {
-        return 0;
-    }
+    ASCENDC_DEBUG_ASSERT((b != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "AscendC::Std::ceil_div: b cannot be 0"));
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 || !defined(SPLIT_CORE_VEC)
     return ceil_div_generic(a, b);
 #else
@@ -114,11 +123,9 @@ ASCENDC_HOST_AICORE inline constexpr auto ceil_div(const T& a, const U& b)
 }
 #else
 template <typename T, typename U>
-ASCENDC_HOST_AICORE inline constexpr auto ceil_div(const T& a, const U& b)
+__host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 {
-    if (b == 0) {
-        return 0;
-    }
+    ASCENDC_DEBUG_ASSERT((b != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "AscendC::Std::ceil_div: b cannot be 0"));
     return ceil_div_generic(a, b);
 }
 #endif
