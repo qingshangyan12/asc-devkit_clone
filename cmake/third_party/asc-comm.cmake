@@ -43,6 +43,12 @@ set(ASC_COMM_DETAIL_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/src/aicore/hcomm/detail)
 if(NOT EXISTS ${ASC_COMM_PUBLIC_HEADER_DIR})
     message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public hcomm headers: ${ASC_COMM_PUBLIC_HEADER_DIR}")
 endif()
+
+set(ASC_COMM_AICPU_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/pod_only/include/aicpu/hcomm)
+if(NOT EXISTS ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR})
+    message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public aicpu headers: ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR}")
+endif()
+
 install(DIRECTORY ${ASC_COMM_PUBLIC_HEADER_DIR}/
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/hcomm
     COMPONENT asc-devkit
@@ -50,6 +56,11 @@ install(DIRECTORY ${ASC_COMM_PUBLIC_HEADER_DIR}/
 )
 install(DIRECTORY ${ASC_COMM_DETAIL_HEADER_DIR}/
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail/hcomm
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
+install(DIRECTORY ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/asc_comm/aicpu/hcomm
     COMPONENT asc-devkit
     FILES_MATCHING PATTERN "*.h"
 )
