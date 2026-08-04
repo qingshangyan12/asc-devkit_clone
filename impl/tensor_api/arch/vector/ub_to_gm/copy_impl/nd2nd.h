@@ -55,6 +55,7 @@ private:
         auto srcLayout = src.Layout();
 
         uint16_t blockCount = GetTotalRowShape(srcLayout);
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, blockCount, "src row shape size", "CopyUB2GM ND path");
         uint32_t blockLen =
             Std::min(GetTotalColumnShape(srcLayout) * sizeof(SrcType),
                      GetTotalColumnShape(dstLayout) * sizeof(DstType));

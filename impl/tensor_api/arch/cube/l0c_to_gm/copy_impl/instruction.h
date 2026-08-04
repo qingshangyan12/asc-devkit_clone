@@ -43,6 +43,11 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, nSize, "nSize", "CopyL0C2GM instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_n, nSize, isChannelSplit, nz2ndEn, nz2dnEn, "CopyL0C2GM");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_m, mSize, nz2ndEn, "CopyL0C2GM instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, srcStride, dstStride, "CopyL0C2GM instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_unit_flag, unitFlag, "CopyL0C2GM instruction");
 
         asc_copy_l0c2gm(dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,
                         static_cast<uint16_t>(srcStride), cacheMode, 0, unitFlag, static_cast<uint64_t>(quantPre),

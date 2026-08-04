@@ -43,6 +43,8 @@ public:
         if ASCEND_IS_AIC {
             return;
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, blockCount, "blockCount", "CopyUB2L1 instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_block_len, blockLen, DEBUG_BLOCK_LEN_MAX, "CopyUB2L1 instruction");
 
         asc_copy_ub2l1((__cbuf__ void*)dst, (__ubuf__ void*)src, blockCount, blockLen, srcStride, dstStride);
     }
