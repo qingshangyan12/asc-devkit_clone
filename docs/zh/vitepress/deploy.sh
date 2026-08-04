@@ -197,7 +197,9 @@ build_docs() {
 # ============================================================
 deploy_nginx() {
     DIST_DIR="$SCRIPT_DIR/docs/.vitepress/dist"
-    NGINX_ROOT="/usr/share/nginx/html/ascendc-docs"
+    NGINX_RELEASES_ROOT="/usr/share/nginx/html/ascendc-docs-releases"
+    NGINX_CURRENT="/usr/share/nginx/html/ascendc-docs-current"
+    NGINX_PREVIOUS="/usr/share/nginx/html/ascendc-docs-previous"
     NGINX_CONF="/etc/nginx/conf.d/ascendc-docs.conf"
 
     log "=== Nginx 部署模式 ==="
@@ -215,12 +217,33 @@ deploy_nginx() {
         esac
     fi
 
-    # 拷贝构建产物
-    log "拷贝构建产物到 $NGINX_ROOT"
-    mkdir -p "$NGINX_ROOT"
-    rm -rf "$NGINX_ROOT"/*
-    cp -r "$DIST_DIR"/* "$NGINX_ROOT/"
-    log "文件拷贝完成, 共 $(find "$NGINX_ROOT" -type f | wc -l) 个文件"
+    # 先完成整个release，再原子切换服务目录，避免部署期间出现半成品站点。
+    RELEASE_ID="$(date '+%Y%m%d%H%M%S')-$$"
+    RELEASE_DIR="$NGINX_RELEASES_ROOT/$RELEASE_ID"
+    NEXT_LINK="${NGINX_CURRENT}.next"
+    PREVIOUS_NEXT_LINK="${NGINX_PREVIOUS}.next"
+
+    log "拷贝构建产物到 $RELEASE_DIR"
+    mkdir -p "$NGINX_RELEASES_ROOT"
+    mkdir "$RELEASE_DIR"
+    cp -a "$DIST_DIR"/. "$RELEASE_DIR"/
+
+    if [ -e "$NEXT_LINK" ] || [ -L "$NEXT_LINK" ] || \
+       [ -e "$PREVIOUS_NEXT_LINK" ] || [ -L "$PREVIOUS_NEXT_LINK" ]; then
+        err "临时发布链接已存在，请检查 $NEXT_LINK 和 $PREVIOUS_NEXT_LINK"
+        exit 1
+    fi
+
+    # 保留发布前的完整版本，为旧页面请求的哈希资源提供回退。
+    if [ -L "$NGINX_CURRENT" ]; then
+        CURRENT_RELEASE="$(readlink -f "$NGINX_CURRENT")"
+        ln -s "$CURRENT_RELEASE" "$PREVIOUS_NEXT_LINK"
+        mv -Tf "$PREVIOUS_NEXT_LINK" "$NGINX_PREVIOUS"
+    fi
+
+    ln -s "$RELEASE_DIR" "$NEXT_LINK"
+    mv -Tf "$NEXT_LINK" "$NGINX_CURRENT"
+    log "文件发布完成, 共 $(find "$RELEASE_DIR" -type f | wc -l) 个文件"
 
     # 生成 Nginx 配置
     log "生成 Nginx 配置: $NGINX_CONF"
@@ -229,7 +252,7 @@ deploy_nginx() {
 server {
     listen       ${NGINX_PORT};
     server_name  _;
-    root         ${NGINX_ROOT};
+    root         ${NGINX_CURRENT};
     index        index.html;
 
     charset utf-8;
@@ -238,15 +261,46 @@ server {
     access_log  /var/log/nginx/ascendc-docs-access.log;
     error_log   /var/log/nginx/ascendc-docs-error.log;
 
-    # MPA 路由支持 - VitePress 多页应用需要精确匹配 .html
+    # HTML 和扩展名省略路由必须重新验证，避免客户端拿到旧路由表。
     location / {
         try_files \$uri \$uri.html \$uri/ \$uri/index.html =404;
+        add_header Cache-Control "no-cache, must-revalidate" always;
     }
 
-    # 静态资源缓存
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-        expires 30d;
-        add_header Cache-Control "public, immutable";
+    # VitePress 在页面模块加载失败时会重新请求该文件，禁止缓存旧版本。
+    location = /hashmap.json {
+        try_files \$uri =404;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+    }
+
+    # VitePress assets 文件名包含内容哈希，可以长期缓存。
+    location ^~ /assets/ {
+        try_files \$uri @previous_assets;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+    }
+
+    location @previous_assets {
+        root ${NGINX_PREVIOUS};
+        try_files \$uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+    }
+
+    # Pagefind 索引路径不含构建哈希，必须跟随当前release更新。
+    location ^~ /pagefind/ {
+        try_files \$uri =404;
+        add_header Cache-Control "no-cache, must-revalidate" always;
+    }
+
+    # 非哈希媒体资源使用有限时长缓存。
+    location ~* \.(png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        try_files \$uri =404;
+        add_header Cache-Control "public, max-age=2592000" always;
+    }
+
+    error_page 404 /404.html;
+    location = /404.html {
+        internal;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
     }
 
     # 禁止访问隐藏文件
@@ -271,6 +325,16 @@ NGINX_EOF
     # 启动/重载 Nginx
     systemctl enable nginx 2>/dev/null || true
     systemctl restart nginx 2>/dev/null || service nginx restart 2>/dev/null || nginx -s reload
+
+    # 当前和上一release已由符号链接保留，其余版本可以安全清理。
+    CURRENT_RELEASE="$(readlink -f "$NGINX_CURRENT")"
+    PREVIOUS_RELEASE="$(readlink -f "$NGINX_PREVIOUS" 2>/dev/null || true)"
+    for candidate in "$NGINX_RELEASES_ROOT"/*; do
+        [ -d "$candidate" ] || continue
+        if [ "$candidate" != "$CURRENT_RELEASE" ] && [ "$candidate" != "$PREVIOUS_RELEASE" ]; then
+            rm -rf -- "$candidate"
+        fi
+    done
 
     # 检查服务状态
     sleep 1
