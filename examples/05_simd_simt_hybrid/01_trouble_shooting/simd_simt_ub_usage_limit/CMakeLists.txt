@@ -17,48 +17,49 @@ project(kernel_samples LANGUAGES ASC CXX)
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
 
-set(SCENARIO_NUM "1" CACHE STRING "Case number to build (0-4)")
-if(NOT SCENARIO_NUM MATCHES "^[0-4]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be one of 0, 1, 2, 3, 4.")
+set(SCENARIO_NUM "3" CACHE STRING "Scenario number (0-11)")
+if(NOT SCENARIO_NUM MATCHES "^([0-9]|1[01])$")
+    message(FATAL_ERROR "SCENARIO_NUM must be one of 0-11.")
 endif()
 
-set(UB_BOUNDARY_STATIC_BYTES "253920" CACHE STRING "Static UB array size used by the Case 2 limit study")
-option(UB_BOUNDARY_NO_SIMD_VF "Fill static UB directly in MainScalar without calling a SIMD VF" OFF)
-option(UB_BOUNDARY_DISABLE_RESERVED "Disable the VF stack reserved UB region" OFF)
-set(CASE3_DYNAMIC_BYTES "221152" CACHE STRING "Dynamic UB size used by Case 3")
-set(CASE4_DYNAMIC_BYTES "213920" CACHE STRING "Dynamic UB size used by Case 4")
+set(CASE_SOURCE "")
+if(SCENARIO_NUM MATCHES "^[0-1]$")
+    set(CASE_SOURCE case0_ub_out_of_bounds.asc)
+elseif(SCENARIO_NUM MATCHES "^[2-5]$")
+    set(CASE_SOURCE case1_ub_limit.asc)
+elseif(SCENARIO_NUM STREQUAL "6")
+    set(CASE_SOURCE case2_ub_layout.asc)
+elseif(SCENARIO_NUM MATCHES "^([7-9]|1[01])$")
+    set(CASE_SOURCE case3_out_of_bounds_result.asc)
+endif()
+
+option(CASE1_OVER_LIMIT "Add 4 bytes to the Case 1 UB limit to observe the failure result" OFF)
 
 add_executable(ub_usage_limit
-    ub_usage_limit.asc
+    ${CASE_SOURCE}
 )
 
 target_compile_options(ub_usage_limit PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
-target_compile_definitions(ub_usage_limit PRIVATE SCENARIO_NUM=${SCENARIO_NUM})
+target_compile_definitions(ub_usage_limit PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
 
 target_link_libraries(ub_usage_limit PRIVATE
     m
 )
 
-if(SCENARIO_NUM STREQUAL "2")
-    target_compile_definitions(ub_usage_limit PRIVATE
-        UB_BOUNDARY_STATIC_BYTES=${UB_BOUNDARY_STATIC_BYTES}
-    )
-    if(UB_BOUNDARY_NO_SIMD_VF)
-        target_compile_definitions(ub_usage_limit PRIVATE UB_BOUNDARY_NO_SIMD_VF=1)
-    endif()
-    if(UB_BOUNDARY_DISABLE_RESERVED)
-        target_compile_options(ub_usage_limit PRIVATE
-            $<$<COMPILE_LANGUAGE:ASC>:--cce-disable-vf-stack-reserved-ubuf>
-        )
-    endif()
-elseif(UB_BOUNDARY_NO_SIMD_VF OR UB_BOUNDARY_DISABLE_RESERVED)
-    message(WARNING "UB boundary options are ignored unless SCENARIO_NUM=2")
+string(FIND "${CMAKE_ASC_FLAGS}" "--cce-disable-vf-stack-reserved-ubuf" CASE1_DISABLE_VF_RESERVED_POS)
+string(FIND "${CMAKE_ASC_FLAGS}" "--cce-disable-asc-reserved-ubuf" CASE1_DISABLE_ASC_RESERVED_POS)
+if(NOT CASE1_DISABLE_VF_RESERVED_POS EQUAL -1)
+    target_compile_definitions(ub_usage_limit PRIVATE CASE1_DISABLE_VF_RESERVED=1)
 endif()
-
-if(SCENARIO_NUM STREQUAL "3")
-    target_compile_definitions(ub_usage_limit PRIVATE CASE3_DYNAMIC_BYTES=${CASE3_DYNAMIC_BYTES})
-elseif(SCENARIO_NUM STREQUAL "4")
-    target_compile_definitions(ub_usage_limit PRIVATE CASE4_DYNAMIC_BYTES=${CASE4_DYNAMIC_BYTES})
+if(NOT CASE1_DISABLE_ASC_RESERVED_POS EQUAL -1)
+    target_compile_definitions(ub_usage_limit PRIVATE CASE1_DISABLE_ASC_RESERVED=1)
+endif()
+if(CASE1_OVER_LIMIT)
+    target_compile_definitions(ub_usage_limit PRIVATE
+        CASE1_OVER_LIMIT=1
+    )
 endif()
