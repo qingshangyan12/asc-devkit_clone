@@ -51,9 +51,9 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, ui
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, float);
 
-#define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(class_name, c_api_name, cce_name, data_type)            \
+#define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(class_name, c_api_name, cce_name, data_type)              \
                                                                                                                    \
-    class TestVectorCompute##class_name####data_type##MergingCApi : public testing::Test {                         \
+    class TestVectorCompute##class_name####data_type##MergeCApi : public testing::Test {                           \
     protected:                                                                                                     \
         void SetUp() {}                                                                                            \
         void TearDown() {}                                                                                         \
@@ -67,7 +67,7 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fl
     }                                                                                                              \
     }                                                                                                              \
                                                                                                                    \
-    TEST_F(TestVectorCompute##class_name####data_type##MergingCApi, c_api_name##_##data_type##_MergingSucc)        \
+    TEST_F(TestVectorCompute##class_name####data_type##MergeCApi, c_api_name##_##data_type##_MergeSucc)            \
     {                                                                                                              \
         vector_##data_type dst;                                                                                    \
         data_type value;                                                                                           \
@@ -77,21 +77,21 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fl
             .times(1)                                                                                              \
             .will(invoke(cce_name##_merging_##data_type##_Stub));                                                  \
                                                                                                                    \
-        c_api_name(dst, value, mask, MODE_MERGING);                                                                \
+        c_api_name(dst, value, mask);                                                                              \
         GlobalMockObject::verify();                                                                                \
     }
 
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, uint8_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, int8_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, fp8_e4m3fn_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, fp8_e5m2_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, uint16_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, int16_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, half);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, bfloat16_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, uint32_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, int32_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGING_INSTR(Vdups, asc_duplicate_scalar, vdup, float);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, uint8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, int8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, fp8_e4m3fn_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, fp8_e5m2_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, uint16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, int16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, half);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, bfloat16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, uint32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, int32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, float);
 
 #define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(class_name, c_api_name, cce_name, data_type) \
                                                                                                     \
