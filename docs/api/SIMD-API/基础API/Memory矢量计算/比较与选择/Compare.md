@@ -127,7 +127,7 @@
 <!-- end id5 -->
 
 <!-- npu="310p" id6 -->
-- 针对Atlas 推理系列产品AI Core，保留参数，设置无效。
+- 针对Atlas 推理系列产品 AI Core，保留参数，设置无效。
 <!-- end id6 -->
 
 <!-- npu="910" id7 -->
@@ -138,7 +138,7 @@
 
 <!-- npu="950" id8 -->
 - 针对Ascend 950PR/Ascend 950DT
-    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。其中，int8\_t/uint8\_t/int64\_t/uint64\_t/double数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
     - U支持的数据类型为：int8_t、uint8_t。
 <!-- end id8 -->
 
@@ -183,16 +183,16 @@
 - dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
 
 - 使用整个tensor参与计算的运算符重载功能，src0和src1需满足256字节对齐。
-<!-- npu="A3" id32 -->
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。未对齐部分元素不参与计算，仅完整对齐块有效。
-<!-- end id32 -->
-<!-- npu="910b" id33 -->
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。未对齐部分元素不参与计算，仅完整对齐块有效。
-<!-- end id33 -->
 
-<!-- npu="950" id14 -->
-- 针对Ascend 950PR/Ascend 950DT，int8\_t/uint8\_t/int64\_t/uint64\_t/double数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
-<!-- end id14 -->
+<!-- npu="A3,910b" id32 -->
+- 针对如下型号，使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。未对齐部分元素不参与计算，仅完整对齐块有效。
+  <!-- npu="A3" id33 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id33 -->
+  <!-- npu="910b" id34 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id34 -->
+<!-- end id32 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
