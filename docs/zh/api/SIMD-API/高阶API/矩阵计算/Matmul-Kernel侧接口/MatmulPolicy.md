@@ -156,10 +156,10 @@
 
 ## 约束说明
 
--   TrianUpperMatmulPolicy当前只支持[Norm模板](MatmulConfig.md#p159827389308)和[MDL模板](MatmulConfig.md#p109823386305)。
--   TrianLowerMatmulPolicy当前只支持[Norm模板](MatmulConfig.md#p159827389308)和[MDL模板](MatmulConfig.md#p109823386305)。
+-   TrianUpperMatmulPolicy当前只支持[Norm模板](MatmulConfig.md#template-features)和[MDL模板](MatmulConfig.md#template-features)。
+-   TrianLowerMatmulPolicy当前只支持[Norm模板](MatmulConfig.md#template-features)和[MDL模板](MatmulConfig.md#template-features)。
 -   NBuffer33MatmulPolicy：
-    -   当前只支持[MDL模板](MatmulConfig.md#p109823386305)。
+    -   当前只支持[MDL模板](MatmulConfig.md#template-features)。
     -   A矩阵、B矩阵的内存逻辑位置只支持TPosition::GM。
     -   暂不支持MIX模式（包含矩阵计算和矢量计算），仅支持纯Cube模式（只有矩阵计算）。
     -   只支持通过[IterateAll](IterateAll.md)接口获取Matmul的计算结果C矩阵。

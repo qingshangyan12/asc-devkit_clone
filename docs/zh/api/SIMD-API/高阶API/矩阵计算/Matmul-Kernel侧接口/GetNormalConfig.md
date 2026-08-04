@@ -30,7 +30,7 @@
 
 ## 功能说明
 
-用于配置Norm模板的参数，获取自定义Norm模板。Norm模板的介绍请参考[表模板特性](MatmulConfig.md#table6981133810309)。
+用于配置Norm模板的参数，获取自定义Norm模板。Norm模板的介绍请参考[表模板特性](MatmulConfig.md#template-features)。
 
 ## 函数原型
 
