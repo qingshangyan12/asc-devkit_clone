@@ -30,7 +30,7 @@
 
 ## 功能说明
 
-用于配置BasicBlock模板的参数，获取自定义BasicBlock模板。BasicBlock模板的介绍请参考[表模板特性](MatmulConfig.md#table6981133810309)。
+用于配置BasicBlock模板的参数，获取自定义BasicBlock模板。BasicBlock模板的介绍请参考[表模板特性](MatmulConfig.md#template-features)。
 
 使用该接口时可以优先考虑使用模板常量化。相比BasicBlock模板仅实现baseM、baseN、baseK常量化，模板常量化可以在此基础上实现singleCoreM、singleCoreN、singleCoreK、baseM、baseN、baseK的常量化，模板常量化的具体使用方式请参考[Matmul Tiling常量化](GetMatmulApiTiling.md#功能说明)。
 
