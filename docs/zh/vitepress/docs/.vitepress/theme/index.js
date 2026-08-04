@@ -21,8 +21,23 @@ import './code-copy.js'
 export default {
   extends: DefaultTheme,
   Layout,
-  enhanceApp({ app }) {
+  async enhanceApp({ app, siteData }) {
     app.component('BackToTop', BackToTop)
     app.component('SidebarResizer', SidebarResizer)
+
+    if (typeof window !== 'undefined') {
+      try {
+        const { default: sidebar } = await import('virtual:asc-sidebar-data')
+        siteData.value = {
+          ...siteData.value,
+          themeConfig: {
+            ...siteData.value.themeConfig,
+            sidebar,
+          },
+        }
+      } catch (error) {
+        console.error('Failed to load sidebar data:', error)
+      }
+    }
   }
 }

@@ -52,7 +52,7 @@ function createRecord(route, rawTitle) {
     url: route,
     content: [...new Set([title, ...segments, ...cjkAliases([title, ...segments])])].join(' '),
     language: 'zh',
-    meta: { title },
+    meta: { title, ascSearchSource: 'title-route' },
   }
 }
 
