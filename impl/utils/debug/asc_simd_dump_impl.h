@@ -101,10 +101,7 @@ __simd_callee__ inline uint32_t reserve_dump_tlv(__ubuf__ BlockVFBufInfo* block_
         return 0;
     }
     if (write_len + tlv_len > block_info->length) {
-        wait_vf_debug_buffer_drained(block_info);
-        block_info->writeLen = 0;
-        block_info->readLen = 0;
-        block_info->pidx = 0;
+        wait_vf_debug_buffer_drained_and_reset(block_info);
     }
     return reserve_debug_tlv(block_info, tlv_len) ? tlv_len : 0;
 }
@@ -131,7 +128,6 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_s
 
     block_info->magic = ASCENDC_SIMD_VF_MAGIC_NUMBER;
     block_info->writeLen += tlv_len;
-    block_info->pidx += 1;
 #endif
 }
 
