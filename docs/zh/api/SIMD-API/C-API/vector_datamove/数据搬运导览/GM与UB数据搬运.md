@@ -2,7 +2,7 @@
 
 ## 总体说明<a name="ZH-CN_TOPIC_0000002543422566"></a>
 
-Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景（见[表1](#zh-cn_topic_0000002565937657_table12546123753110)）。为实现高效的向量（Vector）计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算；计算完成后，再将结果从UB搬回GM，完成数据闭环。开发者能够通过灵活配置结构体参数，精确控制数据块数量、每个地址长度及地址间隔等关键属性，实现连续和非连续数据搬运（高维切分数据搬运），充分释放硬件的数据搬运与计算协同能力，显著提升向量算子的执行效率与整体性能。
+Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景（见[表1](#zh-cn_topic_0000002565937657_table12546123753110)）。为实现高效的向量（Vector）计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算；计算完成后，再将结果从UB搬回GM，完成数据闭环。开发者能够通过灵活配置C API的显式标量参数，精确控制数据块数量、每个数据块长度及地址间隔等关键属性，实现连续和非连续数据搬运（高维切分数据搬运），充分释放硬件的数据搬运与计算协同能力，显著提升向量算子的执行效率与整体性能。
 
 **表 1**  GM与UB数据搬运接口概述
 
@@ -26,16 +26,11 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
 - Unified Buffer -> Global Memory
-    - VECOUT -> GM
-    <!-- npu="310p" id1 -->
-    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
-    <!-- end id1 -->
 
 搬运的数据用于[矢量计算](../../vector_compute/Memory矢量计算.md)，具体的接口请参考：[asc_copy_gm2ub / asc_copy_ub2gm](../矢量数据搬运.md)。
 
-src和dst分别为源操作数和目的操作数；count为连续搬运的元素个数。
+src和dst分别为源操作数和目的操作数；size为连续搬运的字节数。
 
 - Global Memory -> Unified Buffer
 
@@ -58,27 +53,22 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
 - Unified Buffer -> Global Memory
-    - VECOUT -> GM
-    <!-- npu="310p" id2 -->
-    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
-    <!-- end id2 -->
 
 搬运的数据用于[矢量计算](../../vector_compute/Memory矢量计算.md)，具体的接口请参考：[asc_copy_gm2ub / asc_copy_ub2gm](../矢量数据搬运.md)。
 
-src和dst分别为源操作数和目的操作数；repeatParams为asc_copy_gm2ub / asc_copy_ub2gmParams类型的搬运参数，通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。
+src和dst分别为源操作数和目的操作数；n_burst、len_burst、src_gap和dst_gap分别配置数据块个数、每个数据块长度、源地址间隔和目的地址间隔。
 
 - Global Memory -> Unified Buffer
 
     ```c++
-    __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
     ```
 
 - Unified Buffer -> Global Memory
 
     ```c++
-    __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
     ```
 
 ## asc_ndim_copy_gm2ub（GM与UB切片数据搬运）<a name="ZH-CN_TOPIC_0000002568770166"></a>
@@ -88,16 +78,15 @@ src和dst分别为源操作数和目的操作数；repeatParams为asc_copy_gm2ub
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
 
 搬运的数据用于[矢量计算](../../vector_compute/Memory矢量计算.md)，具体的接口请参考：[asc_ndim_copy_gm2ub](../asc_ndim_copy_gm2ub.md)。
 
-src和dst分别为源操作数和目的操作数；dstSliceInfo和srcSliceInfo分别为目的和源操作数的切片信息，类型为SliceInfo；dimValue为操作数维度信息。
+src和dst分别为源操作数和目的操作数；loop0_size至loop4_size配置各维搬运大小，loop0_lp_count和loop0_rp_count配置最内层左右填充数，padding_mode和cache_mode分别配置填充与L2 Cache策略。
 
 - Global Memory -> Unified Buffer
 
     ```c++
-    __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t ndim, __ubuf__ uint32_t* loop_size, __ubuf__ uint64_t* loop_src_stride, __ubuf__ uint32_t* loop_dst_stride)
+    __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
     ```
 
 ## asc_ndim_copy_gm2ub（GM -> UB多维数据搬运NDDMA）<a name="ZH-CN_TOPIC_0000002544407954"></a>
@@ -107,58 +96,52 @@ src和dst分别为源操作数和目的操作数；dstSliceInfo和srcSliceInfo�
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
 
 搬运的数据用于[矢量计算](../../vector_compute/Memory矢量计算.md)，具体的接口请参考：[asc_ndim_copy_gm2ub](../asc_ndim_copy_gm2ub.md)。
 
-src和dst分别为源操作数和目的操作数；params为NdDmaParams类型的搬运参数，配置多维度搬运信息。
+src和dst分别为源操作数和目的操作数；loop0_size至loop4_size、loop0_lp_count、loop0_rp_count、padding_mode和cache_mode直接配置多维搬运、填充和L2 Cache策略。
 
 - Global Memory -> Unified Buffer，支持多维度搬运
 
     ```c++
-    __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t ndim, __ubuf__ uint32_t* loop_size, __ubuf__ uint64_t* loop_src_stride, __ubuf__ uint32_t* loop_dst_stride)
+    __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
     ```
 
-- NDDMA Cache刷新
+- NDDMA L2 Cache策略配置
 
     ```c++
-    __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t ndim, __ubuf__ uint32_t* loop_size, __ubuf__ uint64_t* loop_src_stride, __ubuf__ uint32_t* loop_dst_stride)
+    __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
     ```
 
 ## asc_copy_gm2ub_align（GM -> UB非对齐数据搬运）<a name="ZH-CN_TOPIC_0000001894460401"></a>
 
-该接口提供将数据从Global Memory非对齐搬运至Unified Buffer的功能，可以根据开发者的需要自行填充数据。当每个搬运的数据块长度（blockLen）非32字节对齐时，每一个数据块都需要填充数据至32字节对齐。
+该接口提供将数据从Global Memory非对齐搬运至Unified Buffer的功能，可以根据开发者的需要自行填充数据。当`len_burst`指定的每个搬运数据块长度非32字节对齐时，每一个数据块都需要填充数据至32字节对齐。
 
-<!-- npu="950" id6 -->
+<!-- npu="950" id1 -->
 特别地，针对Ascend 950PR/Ascend 950DT，支持Compact模式，该模式支持单个数据块非32字节对齐，将所有数据块合并成一个连续数据块，在该数据块右侧填充数据至32字节对齐。
-<!-- end id6 -->
+<!-- end id1 -->
 
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
-    - GM -> VECOUT
-    <!-- npu="950" id7 -->
-    - GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）
-    <!-- end id7 -->
 
 搬运的数据用于[矢量计算](../../vector_compute/Memory矢量计算.md)，具体的接口请参考：[asc_copy_gm2ub_align](../asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)。
 
-src和dst分别为源操作数和目的操作数；dataCopyParams为asc_copy_gm2ub_alignExtParams类型的搬运参数；填充参数为asc_copy_gm2ub_alignExtParams类型的填充控制参数。
+src和dst分别为源操作数和目的操作数；size配置连续搬运大小。高维接口通过n_burst、len_burst、左右填充数、填充开关、L2 Cache模式以及源和目的Stride等显式参数配置搬运。
 
-- 不支持配置设置数据搬运模式mode
-
-    ```c++
-    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-    ```
-
-<!-- npu="950" id8 -->
-- 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
+- 连续非对齐搬运
 
     ```c++
-    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
     ```
-<!-- end id8 -->
+
+<!-- npu="950" id2 -->
+- 高维非对齐搬运（仅Ascend 950PR/Ascend 950DT支持）
+
+    ```c++
+    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+    ```
+<!-- end id2 -->
 
 ## asc_copy_ub2gm_align（UB -> GM非对齐数据搬运）<a name="ZH-CN_TOPIC_0000001894460502"></a>
 
@@ -169,23 +152,21 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为asc_copy_gm2
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - Unified Buffer -> Global Memory
-    - VECIN -> GM
-    - VECOUT -> GM
 
 搬运的数据用于[矢量计算](../../vector_compute/Memory矢量计算.md)，具体的接口请参考：[asc_copy_ub2gm_align](../asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)。
 
-src和dst分别为源操作数和目的操作数；dataCopyParams为asc_copy_ub2gm_alignExtParams类型的搬运参数。
+src和dst分别为源操作数和目的操作数；size配置连续搬运大小。高维接口通过n_burst、len_burst、l2_cache_mode、dst_stride和src_stride等显式参数配置搬运。
 
-- 不支持配置设置数据搬运模式mode
-
-    ```c++
-    __aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
-    ```
-
-<!-- npu="950" id9 -->
-- 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
+- 连续非对齐搬运
 
     ```c++
-    __aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_ub2gm_align(__gm__ int8_t* dst, __ubuf__ int8_t* src, uint32_t size)
     ```
-<!-- end id9 -->
+
+<!-- npu="950" id3 -->
+- 高维非对齐搬运（仅Ascend 950PR/Ascend 950DT支持）
+
+    ```c++
+    __aicore__ inline void asc_copy_ub2gm_align(__gm__ int8_t* dst, __ubuf__ int8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+    ```
+<!-- end id3 -->

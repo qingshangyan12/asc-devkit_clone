@@ -24,14 +24,13 @@ asc_copy_ub2l1能够实现Unified Buffer到L1 Buffer的连续数据搬运，数�
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - Unified Buffer -> L1 Buffer
-    - UB -> C1
 
 搬运的数据用于[矩阵计算](../../cube_compute/矩阵计算概述.md)，接口具体介绍请参考：[asc_copy_ub2l1](../../vector_datamove/asc_copy_ub2l1.md)。
 
-src和dst分别为源操作数和目的操作数；count为连续搬运的元素个数。
+src和dst分别为源操作数和目的操作数；size为连续搬运的字节数。
 
 ```c++
-__aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+__aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size)
 ```
 
 ## asc_copy_ub2l1（UBToL1高维切分数据搬运）
@@ -45,17 +44,16 @@ asc_copy_ub2l1能够实现Unified Buffer到L1 Buffer的连续数据搬运和非�
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - Unified Buffer -> L1 Buffer
-    - UB -> C1
 
 搬运的数据用于[矩阵计算](../../cube_compute/矩阵计算概述.md)，接口具体介绍请参考：[asc_copy_ub2l1](../../vector_datamove/asc_copy_ub2l1.md)。
 
-src和dst分别为源操作数和目的操作数；repeatParams为搬运参数。
+src和dst分别为源操作数和目的操作数；n_burst、len_burst、src_gap和dst_gap直接配置高维切分搬运。
 
 ```c++
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
 ```
 
-<!-- npu="310p" id1 -->
+<!-- npu="950" id1 -->
 ## asc_copy_l0c2ub（L0CToUB随路量化激活搬运）
 
 该接口主要实现将数据从L0C Buffer搬运至Unified Buffer，并支持多种随路能力的组合，接口内包含了设置寄存器与数据搬运能力。
@@ -65,55 +63,25 @@ __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, ui
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - L0C Buffer -> Unified Buffer
-    - CO1 -> UB
-
-搬运的数据为[矩阵计算](../../cube_compute/矩阵计算概述.md)的结果，接口具体介绍请参考：[asc_copy_l0c2ub](../asc_copy_l0c2ub.md)。
-
-该接口仅Atlas 推理系列产品AI Core支持。
-
-src和dst分别为源操作数和目的操作数；intriParams和enhancedParams为搬运参数。
-
-- 源操作数和目的操作数类型一致
-
-    ```c++
-    __aicore__ inline void asc_copy_l0c2ub(__ubuf__ void* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint16_t dst_stride, uint16_t src_stride)
-    ```
-
-- 源操作数和目的操作数类型不一致
-
-    ```c++
-    __aicore__ inline void asc_copy_l0c2ub(__ubuf__ void* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint16_t dst_stride, uint16_t src_stride)
-    ```
-<!-- end id1 -->
-
-## asc_copy_l0c2ub（L0CToUB随路量化激活搬运）
-
-该接口主要实现将数据从L0C Buffer搬运至Unified Buffer，并支持多种随路能力的组合，接口内包含了设置寄存器与数据搬运能力。
-
-接口详情请参见[asc_copy_l0c2ub](../asc_copy_l0c2ub.md)。
-
-具体支持的数据通路为（以C API地址空间限定符表示）：
-
-- L0C Buffer -> Unified Buffer
-    - CO1 -> UB
 
 搬运的数据为[矩阵计算](../../cube_compute/矩阵计算概述.md)的结果，以Ascend 950PR/Ascend 950DT为例，接口示例如下：
 
 注意，不同产品型号的接口原型可能不同，具体介绍请参考：[asc_copy_l0c2ub](../asc_copy_l0c2ub.md)。
 
-src和dst分别为源操作数和目的操作数；intriParams为搬运参数，cbufWorkspace为开启tensor量化时所需的量化参数。
+src和dst分别为源操作数和目的操作数；n_size、m_size、Stride、量化、激活和格式转换参数直接配置矩阵搬出；tensor量化参数通过相应的标量参数配置。
 
 - 不开启随路[tensor量化](../../cube_compute/矩阵计算概述.md)功能：
 
     ```c++
-    __aicore__ inline void asc_copy_l0c2ub(__ubuf__ void* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint16_t dst_stride, uint16_t src_stride)
+    __aicore__ inline void asc_copy_l0c2ub(__ubuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn)
     ```
 
 - 开启随路[tensor量化](../../cube_compute/矩阵计算概述.md)功能：
 
     ```c++
-    __aicore__ inline void asc_copy_l0c2ub(__ubuf__ void* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint16_t dst_stride, uint16_t src_stride)
+    __aicore__ inline void asc_copy_l0c2ub(__ubuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn)
     ```
+<!-- end id1 -->
 
 <!-- npu="950" id2 -->
 ## asc_copy_l12ub（L1ToUB连续数据搬运）
@@ -125,7 +93,6 @@ asc_copy_l12ub能够实现L1 Buffer到Unified Buffer的连续数据搬运，数�
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - L1 Buffer -> Unified Buffer
-    - C1 -> UB
 
 搬运的数据用于[矩阵计算](../../cube_compute/矩阵计算概述.md)，接口具体介绍请参考：[asc_copy_l12ub](../asc_copy_l12ub.md)。
 
@@ -152,7 +119,6 @@ asc_copy_l12ub能够实现L1 Buffer到Unified Buffer的连续数据搬运和非�
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - L1 Buffer -> Unified Buffer
-    - C1 -> UB
 
 搬运的数据用于[矩阵计算](../../cube_compute/矩阵计算概述.md)，接口具体介绍请参考：[asc_copy_l12ub](../asc_copy_l12ub.md)。
 

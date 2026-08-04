@@ -9,14 +9,13 @@ asc_copy_l12bt能够实现L1 Buffer至BiasTable Buffer的连续数据搬运，�
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - L1 Buffer -> BiasTable Buffer
-    - C1 -> C2
 
 搬运的数据用于矩阵计算，接口具体介绍请参考：[asc_copy_l12bt](../asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)。
 
-src和dst分别为源操作数和目的操作数；count为连续搬运的元素个数。
+src和dst分别为源操作数和目的操作数；size为连续搬运的字节数。
 
 ```c++
-__aicore__ inline void asc_copy_l12bt(__bt__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
 ```
 
 ## asc_copy_l12bt（L1ToBiasTable Buffer高维切分数据搬运）<a name="ZH-CN_TOPIC_0000002543262936"></a>
@@ -30,20 +29,19 @@ asc_copy_l12bt能够实现L1 Buffer至BiasTable Buffer的连续数据搬运和�
 具体支持的数据通路为（以C API地址空间限定符表示）：
 
 - L1 Buffer -> BiasTable Buffer
-    - C1 -> C2
 
 搬运的数据用于矩阵计算，接口具体介绍请参考：[asc_copy_l12bt](../asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)。
 
-src和dst分别为源操作数和目的操作数；repeatParams为搬运参数。
+src和dst分别为源操作数和目的操作数；conv_control、n_burst、len_burst、source_gap和dst_gap直接配置数据转换与高维切分搬运。
 
 - 连续或非连续搬运场景（高维切分）
 
     ```c++
-    __aicore__ inline void asc_copy_l12bt(__bt__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
     ```
 
 - 连续或非连续搬运场景，支持源操作数和目的操作数数据类型不一致
 
     ```c++
-    __aicore__ inline void asc_copy_l12bt(__bt__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
     ```
