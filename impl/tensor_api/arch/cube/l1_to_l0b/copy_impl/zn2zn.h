@@ -62,6 +62,18 @@ private:
         uint16_t kStartPosition = 0;
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+        TENSOR_API_DEBUG_ASSERT(
+            (mStep <= 255),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check mStep in CopyL12L0B ZN2ZN path, mStep must be no greater than 255; current value is "
+                "%lld.",
+                static_cast<long long>(mStep)));
+        TENSOR_API_DEBUG_ASSERT(
+            (kStep <= 255),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check kStep in CopyL12L0B ZN2ZN path, kStep must be no greater than 255; current value is "
+                "%lld.",
+                static_cast<long long>(kStep)));
         // Zn -> Zn
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / STRIDE_UNIT;
@@ -81,6 +93,18 @@ private:
         uint16_t kStartPosition = 0;
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout);
         auto kStep = Get<0>(dstLayout.Shape()) * GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstNoBatchLayout);
+        TENSOR_API_DEBUG_ASSERT(
+            (mStep <= 255), TENSOR_API_LOG_INTERNAL(
+                                "Failed to check mStep in CopyL12L0B batch ZN2ZN path, mStep must be no greater than "
+                                "255; current value "
+                                "is %lld.",
+                                static_cast<long long>(mStep)));
+        TENSOR_API_DEBUG_ASSERT(
+            (kStep <= 255), TENSOR_API_LOG_INTERNAL(
+                                "Failed to check kStep in CopyL12L0B batch ZN2ZN path, kStep must be no greater than "
+                                "255; current value "
+                                "is %lld.",
+                                static_cast<long long>(kStep)));
         // Zn -> Zn
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcNoBatchLayout) / STRIDE_UNIT;

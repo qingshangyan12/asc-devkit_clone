@@ -56,6 +56,24 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, dst.Layout(), "dst", "CopyGM2L1"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, dst.Layout(), "dst", "CopyGM2L1"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, src.Layout(), "src", "CopyGM2L1"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, src.Layout(), "src", "CopyGM2L1"));
+        TENSOR_API_DEBUG_ASSERT(
+            (dst.Size() >= src.Size()), TENSOR_API_REPORT_INTERNAL(report_copy_size_error, src, dst, "CopyGM2L1"));
         using CopyGM2L1Impl = typename CopyGM2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyGM2L1Impl::template Run<trait, T, U>(dst, src);
     }

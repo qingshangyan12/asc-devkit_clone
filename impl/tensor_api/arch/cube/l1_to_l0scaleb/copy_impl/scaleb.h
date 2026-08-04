@@ -61,6 +61,18 @@ private:
         uint16_t kStartPosition = 0;
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+        TENSOR_API_DEBUG_ASSERT(
+            (mStep <= 255),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check mStep in CopyL12L0ScaleB path, mStep must be no greater than 255; current value is "
+                "%lld.",
+                static_cast<long long>(mStep)));
+        TENSOR_API_DEBUG_ASSERT(
+            (kStep <= 255),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check kStep in CopyL12L0ScaleB path, kStep must be no greater than 255; current value is "
+                "%lld.",
+                static_cast<long long>(kStep)));
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) >> 5;
         auto dstStride = kStep;
         uint64_t mxDstAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.Data().Get()));

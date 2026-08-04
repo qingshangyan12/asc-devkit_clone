@@ -61,6 +61,18 @@ private:
         } else {
             dstRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         }
+        TENSOR_API_DEBUG_ASSERT(
+            (srcRowStride >= GetTotalColumnShape(srcLayout)),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check src row stride in CopyL12UB ND path, src row stride must be no less than the src "
+                "column shape size; current srcRowStride is %u, srcColumnShape is %lld.",
+                static_cast<unsigned int>(srcRowStride), static_cast<long long>(GetTotalColumnShape(srcLayout))));
+        TENSOR_API_DEBUG_ASSERT(
+            (dstRowStride >= GetTotalColumnShape(srcLayout)),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check dst row stride in CopyL12UB ND path, dst row stride must be no less than the src "
+                "column shape size; current dstRowStride is %u, srcColumnShape is %lld.",
+                static_cast<unsigned int>(dstRowStride), static_cast<long long>(GetTotalColumnShape(srcLayout))));
         int64_t srcStride = Std::ceil_division(srcRowStride - GetTotalColumnShape(srcLayout), C0_ELEMENT<srcType>);
         int64_t dstStride = Std::ceil_division(dstRowStride - GetTotalColumnShape(srcLayout), C0_ELEMENT<dstType>);
 
@@ -101,6 +113,18 @@ private:
         } else {
             dstColumnStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
         }
+        TENSOR_API_DEBUG_ASSERT(
+            (srcColumnStride >= GetTotalRowShape(srcLayout)),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check src column stride in CopyL12UB DN path, src column stride must be no less than the "
+                "src row shape size; current srcColumnStride is %u, srcRowShape is %lld.",
+                static_cast<unsigned int>(srcColumnStride), static_cast<long long>(GetTotalRowShape(srcLayout))));
+        TENSOR_API_DEBUG_ASSERT(
+            (dstColumnStride >= GetTotalRowShape(srcLayout)),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check dst column stride in CopyL12UB DN path, dst column stride must be no less than the "
+                "src row shape size; current dstColumnStride is %u, srcRowShape is %lld.",
+                static_cast<unsigned int>(dstColumnStride), static_cast<long long>(GetTotalRowShape(srcLayout))));
         int64_t srcStride = Std::ceil_division(srcColumnStride - GetTotalRowShape(srcLayout), C0_ELEMENT<srcType>);
         int64_t dstStride = Std::ceil_division(dstColumnStride - GetTotalRowShape(srcLayout), C0_ELEMENT<dstType>);
 
@@ -128,6 +152,22 @@ private:
 
         uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
         uint32_t blockLen = GetTotalRowShape(srcLayout);
+        TENSOR_API_DEBUG_ASSERT(
+            (GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<srcType> >= blockLen),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check src column stride in CopyL12UB NZ path, src column stride in C0 blocks must be no "
+                "less than blockLen; current srcColumnStrideInC0Blocks is %lld, blockLen is %u.",
+                static_cast<long long>(
+                    GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<srcType>),
+                static_cast<unsigned int>(blockLen)));
+        TENSOR_API_DEBUG_ASSERT(
+            (GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / C0_ELEMENT<dstType> >= blockLen),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check dst column stride in CopyL12UB NZ path, dst column stride in C0 blocks must be no "
+                "less than blockLen; current dstColumnStrideInC0Blocks is %lld, blockLen is %u.",
+                static_cast<long long>(
+                    GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / C0_ELEMENT<dstType>),
+                static_cast<unsigned int>(blockLen)));
         int64_t srcStride =
             GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<srcType> - blockLen;
         int64_t dstStride =

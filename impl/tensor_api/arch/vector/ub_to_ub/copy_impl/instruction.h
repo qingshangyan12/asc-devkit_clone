@@ -59,6 +59,12 @@ private:
         if ASCEND_IS_AIC {
             return;
         }
+        TENSOR_API_DEBUG_ASSERT(
+            (blockCount >= 1 && blockCount <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check blockCount in CopyUB2UB instruction, blockCount must be in range [1, 4095]. Current "
+                "blockCount is %u.",
+                static_cast<unsigned int>(blockCount)));
 
         asc_copy_ub2ub(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
