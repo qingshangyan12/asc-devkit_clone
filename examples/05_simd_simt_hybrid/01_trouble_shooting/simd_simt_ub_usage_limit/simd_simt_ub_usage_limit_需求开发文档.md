@@ -14,7 +14,7 @@ SIMD&SIMT 混合编程中，MainScalar、SIMD VF 和 SIMT VF 会共同使用单�
 
 1. 使用 `SCENARIO_NUM=0~4` 在编译期选择一个独立 Case；每次构建只编译和运行当前场景，默认选择 Case 1。
 2. 样例采用 `__global__ __vector__` mixed kernel，由 MainScalar 按场景调用 SIMD VF 或 1024 线程的 SIMT VF；Host 通过 launch 参数配置动态 UB。
-3. 静态 UB 在 MainScalar、SIMD VF 和 SIMT VF 中分别声明并累计占用；动态 UB 由 Host 在 kernel 启动时统一配置，三个执行位置通过同一个 `extern __ubuf__` 符号引用同一块空间。
+3. 静态 UB 在 MainScalar、SIMD VF 和 SIMT VF 中分别声明并累计占用；动态 UB 由 Host 在 kernel 启动时统一配置，三个执行位置分别声明不同名称的动态 UB 数组，并验证这些数组的首地址相同、对应同一块空间。
 4. Case 0复现越界故障，Case 1~4分别提供正确用法和容量边界对照；Host 校验输出，并打印实际容量、首尾数据、精度结果或启动错误码。
 
 **Case 0：复现静态 UB 越界导致的精度问题**
@@ -25,9 +25,14 @@ SIMD&SIMT 混合编程中，MainScalar、SIMD VF 和 SIMT VF 会共同使用单�
 4. **执行结果**：故障按预期复现，关键输出如下：
 
 ```text
+# static_bytes：MainScalar静态数组大小；dynamic_bytes：Host配置的两段动态UB总大小
+# overflow_bytes：静态数组实际访问超出自身边界的字节数
 [Case0] static_bytes=4096, dynamic_bytes=8192, overflow_bytes=4
+# golden_first：output[0]正确值；actual_first：input[0]被踩后计算得到的实际值
 [Case0] golden_first=0xc0000001, actual_first=0xdeadbef0
+# mismatch_count：与Golden不一致的输出元素数量
 [Case0] mismatch_count=1
+# FAILED (fault reproduced)：精度校验失败，但表示预期的越界故障已成功复现
 [Case0] precision_check=FAILED (fault reproduced)
 ```
 
@@ -41,6 +46,7 @@ SIMD&SIMT 混合编程中，MainScalar、SIMD VF 和 SIMT VF 会共同使用单�
 4. **执行结果**：4KB 静态 UB 首尾数据校验正确，关键输出如下：
 
 ```text
+# PASSED：4KB静态UB首尾值正确；本Case不调用VF，动态UB配置为0
 Case 1 (no VF static UB): PASSED
 ```
 
@@ -54,6 +60,9 @@ Case 1 (no VF static UB): PASSED
 4. **执行结果**：三种场景的最大静态数组配置运行通过，超过对应边界 4B 后启动失败，关键输出如下：
 
 ```text
+# static_bytes：可配置static_ub数组大小，不包含固定的32B静态结果区
+# launch_ret/sync_ret：0表示启动/同步成功；107000表示UB资源超限导致kernel启动失败
+# result：PASSED表示边界内首尾校验通过；FAILED是增加4B后的预期超限结果
 # 不调用 SIMD VF
 [Case2] static_bytes=262112, launch_ret=0, sync_ret=0, result=PASSED
 [Case2] static_bytes=262116, launch_ret=107000, sync_ret=107000, result=FAILED
@@ -77,13 +86,18 @@ Case 1 (no VF static UB): PASSED
 4. **执行结果**：最大合法配置运行通过，增加 4B 后启动失败，关键输出如下：
 
 ```text
+# max_dynamic_bytes：扣除32B静态结果区后的动态UB理论上限
+# configured_dynamic_bytes：本次kernel launch实际配置的动态UB大小
 # CASE3_DYNAMIC_BYTES=221152
 [Case3] max_dynamic_bytes=221152, configured_dynamic_bytes=221152
+# PASSED：SIMT VF写满动态区且首尾数据校验正确
 Case 3 (SIMT VF dynamic UB): PASSED
 
 # CASE3_DYNAMIC_BYTES=221156
 [Case3] max_dynamic_bytes=221152, configured_dynamic_bytes=221156
+# ret 107000：配置值超过上限4B，kernel启动失败
 [ERROR] [Bisheng] Launch kernel failure! ret 107000
+# FAILED：预期的容量超限结果
 Case 3 (SIMT VF dynamic UB): FAILED
 ```
 
@@ -92,23 +106,30 @@ Case 3 (SIMT VF dynamic UB): FAILED
 **Case 4：验证混合编程中的 UB共用关系**
 
 1. **目标**：展示 MainScalar、SIMD VF 和 SIMT VF 混合执行时静态 UB 与动态 UB 的共同使用关系。
-2. **实现方法**：三者分别申请并访问静态数组，静态 UB 总量为 `7264B`；SIMT VF由负责静态数组末元素的线程自行读取并回传该值；Host 只配置一块动态 UB，MainScalar、SIMD VF、SIMT VF 分别声明并直接使用同一个外部符号 `shared_dynamic_ub`，依次读取和改写同一动态 UB 对象，同时访问动态区末元素验证完整范围。
-3. **预期结果**：动态 UB 配置为 `213920B` 时数据交接和首尾校验通过，并输出 `dynamic_handoff=PASSED`；增加 4B 至 `213924B` 时 kernel 启动失败并返回 `107000`。
+2. **实现方法**：三者分别申请并访问静态数组，静态 UB 总量为 `7264B`；SIMT VF由负责静态数组末元素的线程自行读取并回传该值；Host 只配置一块动态 UB，MainScalar、SIMD VF、SIMT VF分别声明`main_dynamic_ub`、`simd_dynamic_ub`、`simt_dynamic_ub`，通过各自数组的首元素完成A→B→C交接，并分别读取动态区末元素。
+3. **预期结果**：动态 UB 配置为 `213920B` 时，三处不同名称数组的首元素交接和末元素校验通过，证明它们首地址相同，并输出 `dynamic_handoff=PASSED`；增加 4B 至 `213924B` 时 kernel 启动失败并返回 `107000`。
 4. **执行结果**：最大合法配置运行通过，增加 4B 后启动失败，关键输出如下：
 
 ```text
+# static_total_bytes：MainScalar、SIMD VF、SIMT VF的静态UB累计值
+# max_dynamic_bytes：216KB用户UB扣除全部静态UB后的动态UB上限
+# configured_dynamic_bytes：本次kernel launch实际配置的动态UB大小
 # CASE4_DYNAMIC_BYTES=213920
 [Case4] static_total_bytes=7264, max_dynamic_bytes=213920, configured_dynamic_bytes=213920
+# dynamic_handoff：三处通过各自声明的动态UB数组完成A→B→C交接，验证数组首地址相同
 Case 4 usage: static_total_bytes=7264, dynamic_bytes=213920, dynamic_handoff=PASSED
+# PASSED：静态UB累计值、动态UB边界、首尾访问和数据交接均正确
 Case 4 (mixed UB): PASSED
 
 # CASE4_DYNAMIC_BYTES=213924
 [Case4] static_total_bytes=7264, max_dynamic_bytes=213920, configured_dynamic_bytes=213924
+# ret 107000：配置值超过上限4B，kernel启动失败
 [ERROR] [Bisheng] Launch kernel failure! ret 107000
+# FAILED：预期的容量超限结果
 Case 4 (mixed UB): FAILED
 ```
 
-**结论**：不同执行位置声明的静态 UB 需要累加并从同一用户 UB 容量中扣除；三个执行位置引用同一个 `extern __ubuf__` 符号时，共享 Host 在 kernel 启动时配置的同一块动态 UB。不同名称的外部动态 UB 符号不能假定首地址相同。
+**结论**：不同执行位置声明的静态 UB 需要累加并从同一用户 UB 容量中扣除；MainScalar、SIMD VF、SIMT VF在不同位置分别声明动态 UB 数组时，这些数组的首地址相同，共同对应 Host 在 kernel 启动时配置的动态 UB 空间。
 
 ## 出口标准
 

@@ -247,16 +247,20 @@ Case 4分别在MainScalar、SIMD VF和SIMT VF中声明静态UB。MainScalar包�
 动态UB上限 = 216KB - 7264B = 213920B
 ```
 
-动态UB的情况不同。空间大小只由kernel启动时的`CASE4_DYNAMIC_BYTES`配置一次。为了让MainScalar、SIMD VF和SIMT VF访问同一块动态UB，三个执行位置需要声明并引用同一个外部符号`shared_dynamic_ub`；`extern`声明本身不分配新的空间：
+动态UB的情况不同。空间大小只由kernel启动时的`CASE4_DYNAMIC_BYTES`配置一次。MainScalar、SIMD VF和SIMT VF分别在各自代码位置声明不同名称的外部动态UB数组：
 
 ```cpp
-// MainScalar、SIMD VF和SIMT VF中分别出现同一条声明
-extern __ubuf__ uint32_t shared_dynamic_ub[];
+// MainScalar
+extern __ubuf__ uint32_t main_dynamic_ub[];
+// SIMD VF
+extern __ubuf__ uint32_t simd_dynamic_ub[];
+// SIMT VF
+extern __ubuf__ uint32_t simt_dynamic_ub[];
 ```
 
-MainScalar通过`shared_dynamic_ub`写入A，SIMD VF通过同一符号读取A后写入B，SIMT VF继续读取B后写入C，最后由MainScalar读取C；同时MainScalar写入动态UB最后一个word并在交接后校验。该过程验证同一个外部动态UB对象可以跨三个执行位置共享，也确保实际访问到动态区末尾。
+MainScalar通过`main_dynamic_ub[0]`写入A，SIMD VF通过`simd_dynamic_ub[0]`读取A后写入B，SIMT VF通过`simt_dynamic_ub[0]`读取B后写入C，最后由MainScalar再次通过`main_dynamic_ub[0]`读取C。MainScalar还写入动态UB最后一个word，SIMD VF和SIMT VF分别通过各自数组读取并回传该值。三处使用不同数组名仍能完成首元素数据交接并读到相同末元素，验证这些动态UB数组的首地址相同，并覆盖同一段由Host配置的动态UB空间。
 
-因此，Case 4验证的两条规则是：不同执行位置的静态UB需要累加统计；三个执行位置引用同一个`extern __ubuf__`符号时，共享kernel启动时配置的同一块动态UB。不同名称的外部动态UB符号不属于本Case的共享用法，不能据此认为它们的首地址相同。
+因此，Case 4验证的两条规则是：不同执行位置的静态UB需要累加统计；MainScalar、SIMD VF和SIMT VF在不同位置分别声明动态UB数组时，这些数组的首地址相同，共同对应Host在kernel启动时配置的动态UB空间。
 
 #### 执行结果
 
