@@ -65,6 +65,16 @@ if(NOT EXISTS ${ASC_COMM_INCLUDE_DIR})
     message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing include dir: ${ASC_COMM_INCLUDE_DIR}")
 endif()
 
+set(ASC_COMM_AICPU_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/pod_only/include/aicpu/hcomm)
+if(NOT EXISTS ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR})
+    message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public aicpu headers: ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR}")
+endif()
+
+set(ASC_COMM_AICPU_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/pod_only/include/aicpu/hcomm)
+if(NOT EXISTS ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR})
+    message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public aicpu headers: ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR}")
+endif()
+
 # 将 src 下代码（hcomm 除外）统一打包到 asc/impl/comm_api/
 install(DIRECTORY ${ASC_COMM_SRC_DIR}/
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/comm_api
@@ -102,6 +112,7 @@ install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTA
 install(CODE "file(CREATE_LINK ../../adv_api/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/comm_api/aicore/hcomm SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../adv_api/detail/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/aicore/hcomm SYMBOLIC)" COMPONENT asc-devkit)
 
+<<<<<<< HEAD
 # 构建 asc-comm CCU 组件动态库，并将库和公开头文件打包进 asc-devkit run 包。
 set(ASC_COMM_CCU_CMAKE_DIR ${ASC_COMM_SOURCE_PATH}/src/ccu)
 if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
@@ -133,3 +144,16 @@ if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
 else()
     message(STATUS "[ThirdPartyLib][asc-comm] Missing CCU cmake dir: ${ASC_COMM_CCU_CMAKE_DIR}, skip CCU so build")
 endif()
+
+install(DIRECTORY ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/asc_comm/aicpu/hcomm
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
+=======
+install(DIRECTORY ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/asc_comm/aicpu/hcomm
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
+>>>>>>> 1c49ee06e (test asc-comm aicpu)
