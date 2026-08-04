@@ -49,7 +49,7 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|----------|------|
-| type | 输入 | 数据搬运模式，类型为DataCopyMVType，支持的枚举值请参考[SetLoopModePara的表3](SetLoopModePara.md#table1166074612214)。 |
+| type | 输入 | 数据搬运模式。DataCopyMVType为枚举类型，定义如下，具体参数说明请参考<a href="SetLoopModePara.md#table1166074612214">表3</a>。<pre class="screen" codetype="Cpp">enum class DataCopyMVType : uint8_t {<br>    UB_TO_OUT = 0,<br>    OUT_TO_UB = 1,<br>};</pre> |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

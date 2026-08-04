@@ -34,7 +34,7 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void SetAtomicMin()
+__aicore__ inline void SetAtomicMin() 
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

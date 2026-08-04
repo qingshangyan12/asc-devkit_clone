@@ -45,9 +45,7 @@ __aicore__ inline MutexID AllocMutexID()
 返回MutexID，其类型定义如下，每个ID表示一个Mutex锁。
 
 ```cpp
-namespace AscendC {
-    using MutexID = uint8_t;
-} // namespace AscendC
+using MutexID = uint8_t;
 ```
 
 ## 约束说明<a name="section633mcpsimp"></a>

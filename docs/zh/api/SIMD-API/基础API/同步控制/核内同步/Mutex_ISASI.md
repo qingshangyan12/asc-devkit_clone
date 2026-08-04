@@ -24,13 +24,10 @@ Mutex用于核内异步流水指令之间的同步控制，其功能类似于传
 Mutex类定义如下：
 
 ```cpp
-namespace AscendC {
 class Mutex {
-public:
-    template <pipe_t pipe>
-    static __aicore__ inline void Lock(MutexID id);
-    template <pipe_t pipe>
-    static __aicore__ inline void Unlock(MutexID id);
+template <pipe_t pipe>
+static __aicore__ inline void Lock(MutexID id);
+template <pipe_t pipe>
+static __aicore__ inline void Unlock(MutexID id);
 };
-} // namespace AscendC
 ```
