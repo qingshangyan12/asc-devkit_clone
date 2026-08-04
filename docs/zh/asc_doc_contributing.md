@@ -501,7 +501,7 @@ extern "C" __global__ __aicore__ void mmad_custom(GM_ADDR x, GM_ADDR y, GM_ADDR 
 |---------|-------------|---------|
 | [MmadWithSparse](api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadWithSparse.md) | 支持4选2结构化稀疏矩阵乘 | 权重矩阵已剪枝为稀疏格式时选用 |
 | [MXMmad](MXMmad.md) | 支持MX格式（微缩放）矩阵乘 | 使用MX混合精度训练时选用 |
-| [Iterate](api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Iterate.md) + [GetTensorC](api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/GetTensorC.md) | Matmul高阶API的循环迭代模式 | 不需要精细控制L0A/L0B排布时，优先用高阶API |
+| [Iterate](api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Iterate.md) + [GetTensorC](api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetTensorC.md) | Matmul高阶API的循环迭代模式 | 不需要精细控制L0A/L0B排布时，优先用高阶API |
 | Mmad带bias原型 | 支持偏置矩阵初始化C | 需要C+=A×B+Bias场景选用，比cmatrixSource配置更简单 |
 | Mmad不带bias + cmatrixSource | 通过参数配置C初始值来源 | 需要C初始值来自BT Buffer但不需要Bias时选用 |
 | Mmad + MmadBitModeParams | 位域联合体参数，单入参传递 | 追求极致性能、需要细粒度bit位操作时选用 |
