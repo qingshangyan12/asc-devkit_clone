@@ -17,7 +17,7 @@
     - **Device端核函数编程接口**
         - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)修饰符声明。
         - 数据分块（Tiling）：使用内置关键字 [block_idx](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)确定每个Block负责处理的数据。
-        - 数据搬入：通过[C API接口](../../../编程指南/语言扩展层/SIMD语言扩展层C-API.md) `asc_copy_gm2ub`或[C++接口](../../../编程指南/类库API/编程接口概述.md) `AscendC::DataCopy`完成。
+        - 数据搬入：通过[C API接口](../../../编程指南/语言扩展层/SIMD语言扩展层c_api.md) `asc_copy_gm2ub`或[C++接口](../../../编程指南/类库API/编程接口概述.md) `AscendC::DataCopy`完成。
         - 数据计算：通过C API接口`asc_add`或C++接口`AscendC::Add`完成。
         - 数据搬出：通过C API接口`asc_copy_ub2gm`或C++接口`AscendC::DataCopy`完成。
     - **Host端运行时接口**
