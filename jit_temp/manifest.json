@@ -1,0 +1,154 @@
+{
+  "schema_version": "7.0",
+  "soc_version": "Ascend910B",
+  "bin_id": "xxxxxxxxxxxxxxx",
+  "resource": "add_custom.cpp",
+  "resource_path": "resources",
+  "common_compile": [
+    "-c",
+    "-O3",
+    "-x",
+    "cce",
+    "-std=c++17",
+    "-I${env:ASCEND_HOME_PATH}/include",
+    "-I",
+    "${resource:include}",
+    "-DHIGH_PERFORMANCE=1",
+    "-DDETERMINISTIC_MODE=1",
+    "--cce-auto-sync",
+    "-mllvm",
+    "-api-deps-filter",
+    "--cce-disable-kernel-global-attr-check",
+    "-DASCENDC_TPL_KERNEL",
+    "-DONE_CORE_DUMP_SIZE=1024",
+    "-DL2_CACHE_HINT",
+    "-DCONST_TILING",
+    "--cce-aicore-only",
+    "-mllvm",
+    "-cce-aicore-stack-size=0x8000",
+    "-mllvm",
+    "-cce-aicore-function-stack-size=0x8000",
+    "-mllvm",
+    "-cce-aicore-record-overflow=false",
+    "-mllvm",
+    "-cce-aicore-addr-transform",
+    "-mllvm",
+    "-cce-aicore-dcci-insert-for-scalar=false",
+    "-include",
+    "${resource:include/add_custom_tiling_data.h}"
+  ],
+  "kernels": [
+    {
+      "kernel_name": "add_custom_xxxxx",
+      "static_inputs": [
+        {
+          "name": "tiling_data",
+          "parameter_index": 4,
+          "byte_size": 8,
+          "file": "include/add_custom_tiling_data.h",
+          "token": "${static_input:tiling_data}"
+        }
+      ],
+      "link_option": [
+        "-m",
+        "aicorelinux",
+        "-r",
+        "-Ttext=0",
+        "-q",
+        "-x"
+      ],
+      "objects": [
+        {
+          "obj_name": "my_basic",
+          "obj_type": "basic",
+          "commands": [
+            {
+              "type": "compile",
+              "stage": 0,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                "${common_compile}",
+                "${resource:src/add_custom_kernel.cpp}",
+                "--cce-aicore-arch=dav-c220-cube",
+                "-o",
+                "${intermediates:add_custom.aic.o}"
+              ]
+            },
+            {
+              "type": "compile",
+              "stage": 0,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                "${common_compile}",
+                "${resource:src/add_custom_kernel.cpp}",
+                "--cce-aicore-arch=dav-c220-vec",
+                "-o",
+                "${intermediates:add_custom.aiv.o}"
+              ]
+            }
+          ],
+          "outputs": [
+            "intermediates/add_custom.aic.o",
+            "intermediates/add_custom.aiv.o"
+          ]
+        },
+        {
+          "obj_name": "my_super_kernel",
+          "obj_type": "sk",
+          "commands": [
+            {
+              "type": "compile",
+              "stage": 0,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                "${common_compile}",
+                "-D__ASCENDC_ENABLE_SUPER_KERNEL__",
+                "-Dadd_custom=add_custom_static_sk",
+                "${resource:src/add_custom_kernel.cpp}",
+                "--cce-aicore-arch=dav-c220-vec",
+                "-o",
+                "${intermediates:add_custom.sk.o}"
+              ]
+            },
+            {
+              "type": "objcopy",
+              "stage": 1,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                "--redefine-sym=add_custom_static_sk=add_custom_static_sk_split1",
+                "${intermediates:add_custom.sk.o}",
+                "${intermediates:add_custom.sk_split1.o}"
+              ]
+            },
+            {
+              "type": "objcopy",
+              "stage": 1,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                "--redefine-sym=add_custom_static_sk=add_custom_static_sk_split2",
+                "${intermediates:add_custom.sk.o}",
+                "${intermediates:add_custom.sk_split2.o}"
+              ]
+            },
+            {
+              "type": "objcopy",
+              "stage": 1,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                "--redefine-sym=add_custom_static_sk=add_custom_static_sk_split3",
+                "${intermediates:add_custom.sk.o}",
+                "${intermediates:add_custom.sk_split3.o}"
+              ]
+            }
+          ],
+          "outputs": [
+            "intermediates/add_custom.sk.o",
+            "intermediates/add_custom.sk_split1.o",
+            "intermediates/add_custom.sk_split2.o",
+            "intermediates/add_custom.sk_split3.o"
+          ]
+        }
+      ]
+    }
+  ]
+}
