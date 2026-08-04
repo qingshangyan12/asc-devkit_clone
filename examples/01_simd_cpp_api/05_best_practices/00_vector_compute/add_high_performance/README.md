@@ -1,6 +1,6 @@
 # Add性能调优样例
 
-## 概述
+## overview
 
 本样例以加法为例，介绍基于静态Tensor方式编程的性能调优方法。整个调优过程分为七个步骤（case 0-6），逐步展示从标量运算到向量运算、从单核到多核、从基础实现到深度优化的完整调优路径。
 
@@ -144,12 +144,12 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 - 端到端性能：6909.6μs，相比Case 0提升 **99.4%**
 - 标量指令耗时：从1233742.494μs降至231.166μs，大幅减少了标量指令
 - 向量指令耗时：761.65μs，占比11%
-- 数据搬运耗时：6208.762μs，占比87.3%，搬运流水串行提升
+- data_move耗时：6208.762μs，占比87.3%，搬运流水串行提升
 
 **原理说明**：
 - 向量指令单次可处理多个数据元素（本例中单次处理 4096*2 个half元素）
 - 向量单元的并行计算能力远超标量单元
-- 但数据搬运成为瓶颈，说明计算速度已经快于数据供给，单核时数据搬运的请求量不足，导致带宽未用满
+- 但data_move成为瓶颈，说明计算速度已经快于数据供给，单核时data_move的请求量不足，导致带宽未用满
 
 **性能优化建议**：
 > 💡 **使用向量指令替代标量循环**
@@ -159,7 +159,7 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 > 💡 **不建议用户仅使用单核**
 
 **下一步优化方向**：
-- 数据搬运（MTE2）占比87.3%，成为主要瓶颈
+- data_move（MTE2）占比87.3%，成为主要瓶颈
 - 需要通过多核并行和增大搬运粒度来提升带宽利用率
 
 ---
@@ -199,12 +199,12 @@ if (blockIdxM < remainderM) {
 
 **优化效果分析**：
 - 端到端任务耗时为306.58μs，相比Case 1耗时减少 **95.5%**
-- 数据搬运MTE2耗时为215.485μs，占比72.5%
+- data_moveMTE2耗时为215.485μs，占比72.5%
 
 **原理说明**：
 - 48个AIV Core并行处理，理论上可获得48倍加速
 - 实际加速低于理论值的原因：
-  - 数据搬运仍是瓶颈（mte2占比72.5%）
+  - data_move仍是瓶颈（mte2占比72.5%）
 - 均匀切分确保各核负载均衡，避免出现部分核空闲、部分核繁忙的负载不均问题
 
 - 本样例选择 `M` 方向切48份（`splitM=48, splitN=1`），而不是 `M` 切8、`N` 切6，核心目的是保持每个核处理的数据在GM上连续，从而在分块循环中用单条 `DataCopy` 搬运 `dataCopyLen`
@@ -224,7 +224,7 @@ if (blockIdxM < remainderM) {
 - 可通过增大单次搬运数据量提升带宽利用率
 ---
 
-### Case 3: 多核均匀切分 + 大块数据搬运
+### Case 3: 多核均匀切分 + 大块data_move
 
 **实现方式**：参考 `KernelAdd::Process()` 函数实现
 
@@ -253,10 +253,10 @@ if (blockIdxM < remainderM) {
 - 但数据量受限于UB空间大小（本例UB需容纳x、y、z三份数据）
 
 **性能优化建议**：
-> 💡 **增大单次数据搬运量，减少搬运次数**
+> 💡 **增大单次data_move量，减少搬运次数**
 > 
 > 1. 在UB空间允许的范围内，尽量增大`dataCopyLen`
-> 2. 使用连续的大块数据搬运，避免频繁的小数据块搬运
+> 2. 使用连续的大块data_move，避免频繁的小数据块搬运
 > 3. 需平衡UB空间使用和搬运效率
 
 
@@ -270,7 +270,7 @@ if (blockIdxM < remainderM) {
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBuffer()` 函数实现
 
-采用双缓冲（Double Buffer）技术，实现数据搬运与计算的流水线并行，隐藏内存访问延迟。
+采用双缓冲（Double Buffer）技术，实现data_move与计算的流水线并行，隐藏内存访问延迟。
 
 **关键代码**：
 ```cpp
@@ -286,7 +286,7 @@ static constexpr uint32_t zAddrPong = yAddrPong + MAX_DATA_COPY_LEN * sizeof(hal
 for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
     int32_t eventID = (loopIdx % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
     AscendC::LocalTensor<half> &xLocal = (loopIdx % 2 == 0 ? xPing : xPong);
-    // ... 数据搬运和计算，使用对应的eventID同步
+    // ... data_move和计算，使用对应的eventID同步
     AscendC::Add(zLocal, xLocal, yLocal, curLen);
 }
 ```
@@ -332,11 +332,11 @@ UB内存分配（双缓冲）：
 **优化效果分析**：
 - 端到端性能：264.02μs，相比Case 3耗时减少 **1.7%**
 - MTE2耗时从184.369μs增至250.528μs（+35.9%），MTE3耗时从57.354μs增至84.988μs（+48.2%），此时从串行的纯读带宽变成混合读写带宽，因此耗时增加，用户需更多关注端到端耗时的减少
-- 由于开启了双缓冲，在流水中搬运和计算并行执行，隐藏了数据搬运时间并降低Vector指令的等待时间
+- 由于开启了双缓冲，在流水中搬运和计算并行执行，隐藏了data_move时间并降低Vector指令的等待时间
 
 **原理说明**：
 - **Ping-Pong机制**：
-  - Ping缓冲区进行计算时，Pong缓冲区进行数据搬运
+  - Ping缓冲区进行计算时，Pong缓冲区进行data_move
   - 交替执行，实现计算与搬运的流水线并行，如下图所示  
     <img src="figures/DoubleBuffer.png" width="50%">
 
@@ -516,7 +516,7 @@ $$
 
 可以看到 Case 6 的 aiv_vec_time 为 6.954 μs，已经很接近 Atlas A2训练系列48核场景下的理论耗时。
 
-Case 0-3 未开启双缓冲，数据搬运串行执行，使用读带宽衡量性能。从 Case 4 开始开启双缓冲，此时 mte2 利用率较高，读写行为并行发生，因此读写混合带宽按总读写数据量除以 $T_{mte2}$ 进行估算。其中，读带宽的计算公式为：
+Case 0-3 未开启双缓冲，data_move串行执行，使用读带宽衡量性能。从 Case 4 开始开启双缓冲，此时 mte2 利用率较高，读写行为并行发生，因此读写混合带宽按总读写数据量除以 $T_{mte2}$ 进行估算。其中，读带宽的计算公式为：
 $$
 BW_{read} = \frac{D_{read}}{T_{mte2}}
 $$
@@ -571,7 +571,7 @@ $$
 
 Ascend 950系列未达到理论vector耗时峰值的原因如下：
 
-- 该理论值仅统计“纯Vector计算”时间，不包含数据搬运、事件同步、流水线调度等开销；而实测Case 5中 `aiv_vec_time=10.997μs`、Task Duration为 `182.04μs`，`aiv_mte2_ratio`高达98.3%，受限于带宽限制，说明端到端瓶颈不在纯计算本身。
+- 该理论值仅统计“纯Vector计算”时间，不包含data_move、事件同步、流水线调度等开销；而实测Case 5中 `aiv_vec_time=10.997μs`、Task Duration为 `182.04μs`，`aiv_mte2_ratio`高达98.3%，受限于带宽限制，说明端到端瓶颈不在纯计算本身。
 - Ascend 950系列 RegBase的主要收益来自“减少冗余Load/Store、寄存器复用、提升无依赖并发指令比例”。当前Add样例核心计算基本是单条Add，计算链较短、可融合/可双发空间有限，难以充分释放RegBase的优势。
 
 ### 优化要点总结
@@ -622,7 +622,7 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
   cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行（使用编译时指定的case）
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU 调试 或 NPU 仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
@@ -656,7 +656,7 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
 
 该接口提供CPU域/NPU域调试场景下的格式化输出功能。
 
-在算子kernel侧实现代码中需要输出日志信息的地方调用[printf](../../../../../docs/zh/api/Utils-API/调测接口/printf.md)接口打印相关内容。
+在算子kernel侧实现代码中需要输出日志信息的地方调用[printf](../../../../../docs/zh/api/Utils-API/tuning_interface/printf.md)接口打印相关内容。
 
 示例如下：
 
@@ -668,9 +668,9 @@ AscendC::printf("add blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型的信息），比如打印当前行号等。
+基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md)的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型的信息），比如打印当前行号等。
 
-在算子kernel侧实现代码中需要打印Tensor数据的地方调用[DumpTensor](../../../../../docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口打印相关内容。样例如下：
+在算子kernel侧实现代码中需要打印Tensor数据的地方调用[DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md)接口打印相关内容。样例如下：
 
 ```cpp
 // 向量计算: z = x + y
@@ -700,7 +700,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

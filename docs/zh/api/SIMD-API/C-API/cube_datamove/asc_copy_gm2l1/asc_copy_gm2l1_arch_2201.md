@@ -53,7 +53,7 @@
     __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
     ```
 
-- 普通搬运模式（高维切分）
+- 普通搬运模式（high_dim_split）
 
     ```cpp
     // 不进行pad操作
@@ -113,7 +113,7 @@
     ```cpp
     // 2D搬运bfloat16_t类型矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
-    // 2D搬运half类型矩阵数据
+    // 2D搬运half_type矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
     // 2D搬运float类型矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
@@ -132,7 +132,7 @@
     ```cpp
     // 2D搬运bfloat16_t类型矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
-    // 2D搬运half类型矩阵数据（同步）
+    // 2D搬运half_type矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
     // 2D搬运float类型矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
@@ -185,13 +185,13 @@ PIPE_MTE2
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 如果需要执行多条asc_copy_gm2l1指令，且asc_copy_gm2l1指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_gm2l1指令的串行化，防止出现异常数据。
 
 ## 调用示例
 
 ```cpp
-// 普通数据搬运模式
+// 普通data_move模式
 //total_length指参与搬运的数据总长度。
 constexpr uint64_t total_length = 128;
 __cbuf__ half dst[total_length];
@@ -206,7 +206,7 @@ constexpr uint16_t dst_gap = 0;
 // src表示源操作数的起始地址
 asc_copy_gm2l1((__cbuf__ void*)dst, (__gm__ void*)src, n_burst, len_burst, src_gap, dst_gap);
 
-// 2D数据搬运模式
+// 2Ddata_move模式
 //搬运的起始分块为1
 constexpr uint16_t base_idx = 1;
 //搬运的迭代次数为2

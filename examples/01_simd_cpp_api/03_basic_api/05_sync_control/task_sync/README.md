@@ -1,6 +1,6 @@
-# 任务间同步样例
+# inter_task_sync样例
 
-## 概述
+## overview
 
 本样例基于WaitPreTaskEnd和SetNextTaskStart两个接口实现Superkernel的子kernel并行。
 - WaitPreTaskEnd在子kernel第一条搬运指令前调用，使得调用前的指令可以与前序其他子kernel并行执行；

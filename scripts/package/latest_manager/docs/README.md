@@ -1,6 +1,6 @@
 # latest_manager模块说明
 
-## 总体说明
+## overall_description
 
 latest_manager用于解决多版本latest目录下版本兼容性问题。
 

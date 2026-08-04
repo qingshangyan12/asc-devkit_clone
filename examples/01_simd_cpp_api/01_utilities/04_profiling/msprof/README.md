@@ -1,6 +1,6 @@
 # 基于Add的msProf profiling样例说明
 
-## 概述
+## overview
 
 本样例以Add计算为载体，演示通过`msopprof`采集上板性能数据的方法。样例在Host侧直接构造输入数据和golden数据，执行Ascend C核函数后在进程内完成结果校验，不依赖额外的数据生成或校验脚本。
 
@@ -50,7 +50,7 @@ msOpProf工具是单算子性能分析工具，包含`msopprof`和`msopprof simu
   ```bash
   ├── dump                       # 原始性能数据
   ├── ArithmeticUtilization.csv  # cube/vector指令cycle占比
-  ├── L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+  ├── L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
   ├── Memory.csv                 # UB、L1和主存储器读写带宽速率
   ├── MemoryL0.csv               # L0A、L0B和L0C读写带宽速率
   ├── MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

@@ -1,8 +1,8 @@
-# 高阶API迁移指导<a name="ZH-CN_TOPIC_0000002503588125"></a>
+# high_level_api迁移指导<a name="ZH-CN_TOPIC_0000002503588125"></a>
 
-Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)与[NPU架构版本2201](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，部分API进行了扩展。当前3510架构不支持卷积计算类高阶API。
+Ascend Chigh_level_api基本兼容[NPU架构版本3510](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)与[NPU架构版本2201](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，部分API进行了扩展。当前3510架构不支持convolution_compute类high_level_api。
 
-## Matmul类高阶API<a name="section6925172655117"></a>
+## Matmul类high_level_api<a name="section6925172655117"></a>
 
 -   支持的数据类型有变化。
 
@@ -101,14 +101,14 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
     </tbody>
     </table>
 
--   不支持4:2稀疏特性。具体兼容方案请参考[4：2结构化稀疏功能](基础API迁移指导.md#li69092585134)。
+-   不支持4:2稀疏特性。具体兼容方案请参考[4：2结构化稀疏功能](basic_api迁移指导.md#li69092585134)。
 
-## 其它高阶API<a name="section14195124865717"></a>
+## 其它high_level_api<a name="section14195124865717"></a>
 
-**表2**  数学计算
+**表2**  math_compute
 
 <a name="table1011733113422"></a>
-<table><thead align="left"><tr id="row3118531154217"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p0118031104211"><a name="p0118031104211"></a><a name="p0118031104211"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row3118531154217"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p0118031104211"><a name="p0118031104211"></a><a name="p0118031104211"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p8118143124210"><a name="p8118143124210"></a><a name="p8118143124210"></a>兼容说明</p>
 </th>
@@ -118,7 +118,7 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 <p id="p950434551915"><a name="p950434551915"></a><a name="p950434551915"></a></p>
 </td>
 <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p15508125252615"><a name="p15508125252615"></a><a name="p15508125252615"></a>兼容2201架构。</p>
-<p id="p550845202613"><a name="p550845202613"></a><a name="p550845202613"></a>扩展支持算法配置，通过模板参数配置API使用的算法，从而提供高精度、高性能的算法选择。</p>
+<p id="p550845202613"><a name="p550845202613"></a><a name="p550845202613"></a>扩展支持algorithms配置，通过模板参数配置API使用的algorithms，从而提供高精度、高性能的algorithms选择。</p>
 </td>
 </tr>
 <tr id="row16667103375216"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1935705813247"><a name="p1935705813247"></a><a name="p1935705813247"></a>Sinh、Cosh、Tan、Trunc、Frac、Erf、Erfc、Atanh、Asinh、</p>
@@ -142,10 +142,10 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 </tbody>
 </table>
 
-**表3**  激活函数
+**表3**  activation_functions
 
 <a name="table192231726173811"></a>
-<table><thead align="left"><tr id="row1422362623814"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p1041413536446"><a name="p1041413536446"></a><a name="p1041413536446"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row1422362623814"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p1041413536446"><a name="p1041413536446"></a><a name="p1041413536446"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p9414175314412"><a name="p9414175314412"></a><a name="p9414175314412"></a>兼容说明</p>
 </th>
@@ -162,7 +162,7 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 **表4**  数据归一化
 
 <a name="table1488319115396"></a>
-<table><thead align="left"><tr id="row138831103911"><th class="cellrowborder" valign="top" width="49.980000000000004%" id="mcps1.2.3.1.1"><p id="p8665135824416"><a name="p8665135824416"></a><a name="p8665135824416"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row138831103911"><th class="cellrowborder" valign="top" width="49.980000000000004%" id="mcps1.2.3.1.1"><p id="p8665135824416"><a name="p8665135824416"></a><a name="p8665135824416"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="50.019999999999996%" id="mcps1.2.3.1.2"><p id="p1466513582447"><a name="p1466513582447"></a><a name="p1466513582447"></a>兼容说明</p>
 </th>
@@ -188,16 +188,16 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 <tr id="row2090423941218"><td class="cellrowborder" valign="top" width="49.980000000000004%" headers="mcps1.2.3.1.1 "><p id="p49051539141214"><a name="p49051539141214"></a><a name="p49051539141214"></a>WelfordFinalize</p>
 </td>
 <td class="cellrowborder" valign="top" width="50.019999999999996%" headers="mcps1.2.3.1.2 "><p id="p107681713273"><a name="p107681713273"></a><a name="p107681713273"></a>兼容2201架构。</p>
-<p id="p37631712716"><a name="p37631712716"></a><a name="p37631712716"></a>扩展支持算法配置，通过模板参数指定在计算方差时是否使用修正系数。</p>
+<p id="p37631712716"><a name="p37631712716"></a><a name="p37631712716"></a>扩展支持algorithms配置，通过模板参数指定在计算方差时是否使用修正系数。</p>
 </td>
 </tr>
 </tbody>
 </table>
 
-**表5**  量化操作
+**表5**  quantization
 
 <a name="table432310426394"></a>
-<table><thead align="left"><tr id="row18324164212392"><th class="cellrowborder" valign="top" width="33.95%" id="mcps1.2.3.1.1"><p id="p1247120164516"><a name="p1247120164516"></a><a name="p1247120164516"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row18324164212392"><th class="cellrowborder" valign="top" width="33.95%" id="mcps1.2.3.1.1"><p id="p1247120164516"><a name="p1247120164516"></a><a name="p1247120164516"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="66.05%" id="mcps1.2.3.1.2"><p id="p1247130184515"><a name="p1247130184515"></a><a name="p1247130184515"></a>兼容说明</p>
 </th>
@@ -223,17 +223,17 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 </td>
 <td class="cellrowborder" valign="top" width="66.05%" headers="mcps1.2.3.1.2 "><p id="p568413356278"><a name="p568413356278"></a><a name="p568413356278"></a>兼容2201架构。</p>
 <p id="p4684435112711"><a name="p4684435112711"></a><a name="p4684435112711"></a>扩展支持PRE_TOKEN量化、PRE_GROUP量化。</p>
-<p id="p268443516276"><a name="p268443516276"></a><a name="p268443516276"></a>扩展支持从int8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t类型到half、bfloat16_t、float、half类型的伪量化。</p>
+<p id="p268443516276"><a name="p268443516276"></a><a name="p268443516276"></a>扩展支持从int8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t类型到half、bfloat16_t、float、half_type的伪量化。</p>
 <p id="p9684153518276"><a name="p9684153518276"></a><a name="p9684153518276"></a>扩展支持从fp4x2_e1m2_t、fp4x2_e2m1_t类型到half、bfloat16_t类型的伪量化。</p>
 </td>
 </tr>
 </tbody>
 </table>
 
-**表6**  归约操作
+**表6**  reduction_operations
 
 <a name="table17561457193915"></a>
-<table><thead align="left"><tr id="row8756357163920"><th class="cellrowborder" valign="top" width="60.709999999999994%" id="mcps1.2.3.1.1"><p id="p102601213455"><a name="p102601213455"></a><a name="p102601213455"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row8756357163920"><th class="cellrowborder" valign="top" width="60.709999999999994%" id="mcps1.2.3.1.1"><p id="p102601213455"><a name="p102601213455"></a><a name="p102601213455"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="39.290000000000006%" id="mcps1.2.3.1.2"><p id="p726010113457"><a name="p726010113457"></a><a name="p726010113457"></a>兼容说明</p>
 </th>
@@ -259,10 +259,10 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 </tbody>
 </table>
 
-**表7**  排序操作
+**表7**  sort_operations
 
 <a name="table4855685408"></a>
-<table><thead align="left"><tr id="row78561987407"><th class="cellrowborder" valign="top" width="50.33%" id="mcps1.2.3.1.1"><p id="p18599528455"><a name="p18599528455"></a><a name="p18599528455"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row78561987407"><th class="cellrowborder" valign="top" width="50.33%" id="mcps1.2.3.1.1"><p id="p18599528455"><a name="p18599528455"></a><a name="p18599528455"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="49.669999999999995%" id="mcps1.2.3.1.2"><p id="p115995284510"><a name="p115995284510"></a><a name="p115995284510"></a>兼容说明</p>
 </th>
@@ -276,22 +276,22 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 <tr id="row1685613814404"><td class="cellrowborder" valign="top" width="50.33%" headers="mcps1.2.3.1.1 "><p id="p188564818400"><a name="p188564818400"></a><a name="p188564818400"></a>TopK</p>
 </td>
 <td class="cellrowborder" valign="top" width="49.669999999999995%" headers="mcps1.2.3.1.2 "><p id="p159901844132918"><a name="p159901844132918"></a><a name="p159901844132918"></a>兼容2201架构。</p>
-<p id="p2990544112919"><a name="p2990544112919"></a><a name="p2990544112919"></a>使用RADIX_SELECT算法时，扩展支持uint8_t、int8_t、uint16_t、int16_t、uint32_t、int32_t、bfloat16_t、uint64_t、int64_t数据类型。</p>
+<p id="p2990544112919"><a name="p2990544112919"></a><a name="p2990544112919"></a>使用RADIX_SELECTalgorithms时，扩展支持uint8_t、int8_t、uint16_t、int16_t、uint32_t、int32_t、bfloat16_t、uint64_t、int64_t数据类型。</p>
 </td>
 </tr>
 <tr id="row13201552343"><td class="cellrowborder" valign="top" width="50.33%" headers="mcps1.2.3.1.1 "><p id="p232075219413"><a name="p232075219413"></a><a name="p232075219413"></a>Sort</p>
 </td>
 <td class="cellrowborder" valign="top" width="49.669999999999995%" headers="mcps1.2.3.1.2 "><p id="p1561748172917"><a name="p1561748172917"></a><a name="p1561748172917"></a>兼容2201架构。</p>
-<p id="p261144822913"><a name="p261144822913"></a><a name="p261144822913"></a>扩展支持算法配置，通过模板参数指定排序算法以及降序升序排序。</p>
+<p id="p261144822913"><a name="p261144822913"></a><a name="p261144822913"></a>扩展支持algorithms配置，通过模板参数指定排序algorithms以及降序升序排序。</p>
 </td>
 </tr>
 </tbody>
 </table>
 
-**表8**  索引计算
+**表8**  index_compute
 
 <a name="table748063194016"></a>
-<table><thead align="left"><tr id="row8480531134011"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p1944815184518"><a name="p1944815184518"></a><a name="p1944815184518"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row8480531134011"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p1944815184518"><a name="p1944815184518"></a><a name="p1944815184518"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p1244845124510"><a name="p1244845124510"></a><a name="p1244845124510"></a>兼容说明</p>
 </th>
@@ -306,10 +306,10 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 </tbody>
 </table>
 
-**表9**  数据过滤
+**表9**  data_filter
 
 <a name="table1937505494013"></a>
-<table><thead align="left"><tr id="row03769549406"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p182236817450"><a name="p182236817450"></a><a name="p182236817450"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row03769549406"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p182236817450"><a name="p182236817450"></a><a name="p182236817450"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p422388174510"><a name="p422388174510"></a><a name="p422388174510"></a>兼容说明</p>
 </th>
@@ -329,10 +329,10 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 </tbody>
 </table>
 
-**表10**  张量变换
+**表10**  tensor_transform
 
 <a name="table68071919174115"></a>
-<table><thead align="left"><tr id="row1880713195411"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p2655161904519"><a name="p2655161904519"></a><a name="p2655161904519"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row1880713195411"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p2655161904519"><a name="p2655161904519"></a><a name="p2655161904519"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p14655719124519"><a name="p14655719124519"></a><a name="p14655719124519"></a>兼容说明</p>
 </th>
@@ -341,7 +341,7 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 <tbody><tr id="row118071194413"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p230212473585"><a name="p230212473585"></a><a name="p230212473585"></a>Transpose</p>
 </td>
 <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p183391064304"><a name="p183391064304"></a><a name="p183391064304"></a>兼容2201架构。</p>
-<div class="p" id="p9339126143016"><a name="p9339126143016"></a><a name="p9339126143016"></a>新增支持数据排布转换场景：<a name="ul19819193610813"></a><a name="ul19819193610813"></a><ul id="ul19819193610813"><li>二维转置或者三维的后两位转置。</li><li>三维中的第一维和第二维互换。</li><li>三维中的第一维和第三维互换。</li><li>使用交织指令对二维ND2NZ转置。</li></ul>
+<div class="p" id="p9339126143016"><a name="p9339126143016"></a><a name="p9339126143016"></a>新增支持data_layout_conversion场景：<a name="ul19819193610813"></a><a name="ul19819193610813"></a><ul id="ul19819193610813"><li>二维转置或者三维的后两位转置。</li><li>三维中的第一维和第二维互换。</li><li>三维中的第一维和第三维互换。</li><li>使用交织指令对二维ND2NZ转置。</li></ul>
 </div>
 </td>
 </tr>
@@ -369,7 +369,7 @@ Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言�
 **表11**  Hccl
 
 <a name="table12265143614414"></a>
-<table><thead align="left"><tr id="row1126583611410"><th class="cellrowborder" valign="top" width="43.35%" id="mcps1.2.3.1.1"><p id="p16138821104518"><a name="p16138821104518"></a><a name="p16138821104518"></a>AscendC高阶API</p>
+<table><thead align="left"><tr id="row1126583611410"><th class="cellrowborder" valign="top" width="43.35%" id="mcps1.2.3.1.1"><p id="p16138821104518"><a name="p16138821104518"></a><a name="p16138821104518"></a>AscendChigh_level_api</p>
 </th>
 <th class="cellrowborder" valign="top" width="56.65%" id="mcps1.2.3.1.2"><p id="p61381215456"><a name="p61381215456"></a><a name="p61381215456"></a>兼容说明</p>
 </th>

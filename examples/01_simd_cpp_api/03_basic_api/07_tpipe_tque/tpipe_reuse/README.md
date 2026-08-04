@@ -1,8 +1,8 @@
 # TPipe复用样例
 
-## 概述
+## overview
 
-本样例基于TPipe构造函数和TPipe::Destroy接口，实现重复申请释放TPipe。
+本样例基于TPipe_constructor和TPipe::Destroy接口，实现重复申请释放TPipe。
 
 > **注意：** 本样例仅适用于基于TPipe和TQue的编程模式。
 

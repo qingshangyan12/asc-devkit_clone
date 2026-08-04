@@ -1,4 +1,4 @@
-# Matmul高阶API开启L2 Cache切分<a name="ZH-CN_TOPIC_0000002341067578"></a>
+# Matmulhigh_level_api开启L2 Cache切分<a name="ZH-CN_TOPIC_0000002341067578"></a>
 
 ## 案例介绍<a name="section5590915836"></a>
 
@@ -48,11 +48,11 @@
 
 ## 获取性能数据<a name="section443613301436"></a>
 
-使用msOpProf工具获取[算子仿真流水图](../../性能分析/获取性能数据.md#section17259539153513)和[上板Profiling](../../性能分析/获取性能数据.md#section17953123893415)数据。因为L2 Cache切分功能主要利用带宽更大的L2 Cache，减少MTE2数据搬运开销，所以重点分析MTE2的流水。
+使用msOpProf工具获取[算子仿真流水图](../../性能分析/获取性能数据.md#section17259539153513)和[上板Profiling](../../性能分析/获取性能数据.md#section17953123893415)数据。因为L2 Cache切分功能主要利用带宽更大的L2 Cache，减少MTE2data_move开销，所以重点分析MTE2的流水。
 
 ## 分析主要瓶颈点<a name="section10759361232"></a>
 
-当前案例基于Tiling全量常量化进一步优化，Tiling全量常量化请参考[Matmul高阶API开启Tiling全量常量化](Matmul高阶API使能Tiling全量常量化.md)案例。优化前的Profiling数据如下，C列的aic\_time是867us，K列的aic\_mte2\_time是861.9us，MTE2占比为99%，MTE2数据搬运是当前算子性能的瓶颈。
+当前案例基于Tiling全量常量化进一步优化，Tiling全量常量化请参考[Matmulhigh_level_api开启Tiling全量常量化](Matmulhigh_level_api使能Tiling全量常量化.md)案例。优化前的Profiling数据如下，C列的aic\_time是867us，K列的aic\_mte2\_time是861.9us，MTE2占比为99%，MTE2data_move是当前算子性能的瓶颈。
 
 ![](../../../figures/zh-cn_image_0000002410305297.png)
 

@@ -1,8 +1,8 @@
 # DeepNorm样例
 
-## 概述
+## overview
 
-本样例在深层神经网络训练场景下，介绍了调用Ascend C提供的DeepNorm高阶API实现DeepNorm归一化。该API在执行层LayerNorm归一化时，可以通过扩大残差连接（α系数）来提高Transformer深层网络的训练稳定性。
+本样例在深层神经网络训练场景下，介绍了调用Ascend C提供的DeepNormhigh_level_api实现DeepNorm归一化。该API在执行层LayerNorm归一化时，可以通过扩大残差连接（α系数）来提高Transformer深层网络的训练稳定性。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -56,7 +56,7 @@
   - Kernel实现
 
     计算逻辑是：  
-    使用DeepNorm高阶API接口完成deepnorm计算得到最终结果，再搬出到外部存储上，所用API可详细参考DeepNorm。
+    使用DeepNormhigh_level_api接口完成deepnorm计算得到最终结果，再搬出到外部存储上，所用API可详细参考DeepNorm。
     
   - Tiling实现
 

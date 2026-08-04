@@ -1,13 +1,13 @@
 # SIMT BuiltIn关键字<a name="ZH-CN_TOPIC_0000002477663934"></a>
 
-## 函数执行空间限定符<a name="section204112391232"></a>
+## function_execution_space_qualifier<a name="section204112391232"></a>
 
-函数执行空间限定符（Function Execution Space Qualifier）指示函数是在Host侧执行还是在Device侧执行，以及能被调用的空间范围。
+function_execution_space_qualifier（Function Execution Space Qualifier）指示函数是在Host侧执行还是在Device侧执行，以及能被调用的空间范围。
 
-**表1**  函数执行空间限定符概览
+**表1**  function_execution_space_qualifieroverview
 
 <a name="table121121062614"></a>
-| 函数执行空间限定符 | 执行空间（Host） | 执行空间（Device） | 允许调用函数空间（Host） | 允许调用函数空间（Device） |
+| function_execution_space_qualifier | 执行空间（Host） | 执行空间（Device） | 允许调用函数空间（Host） | 允许调用函数空间（Device） |
 | --- | --- | --- | --- | --- |
 | \_\_host\_\_，无限定符 | √ | x | √ | x |
 | \_\_aicore\_\_ | x | √ | x | √ |
@@ -24,9 +24,9 @@
 
 \_\_host\_\_修饰的函数只能在Host侧被调用和执行。
 
-## 内存空间限定符<a name="section20787845172517"></a>
+## memory_space_qualifier<a name="section20787845172517"></a>
 
-使用内存空间限定符\_\_ubuf\_\_来表示动、静态内存，静态内存的大小在编译期是确定的，动态内存的大小在核函数执行时确定。
+使用memory_space_qualifier\_\_ubuf\_\_来表示动、静态内存，静态内存的大小在编译期是确定的，动态内存的大小在核函数执行时确定。
 
 -   静态内存通过数组分配：
 
@@ -40,7 +40,7 @@
     extern __ubuf__ half dynamicBuf[]; 
     ```
 
-    动态内存的实际内存大小需要在核函数启动时配置，具体内容请参考[核函数配置](#section97005415463)。
+    动态内存的实际内存大小需要在核函数启动时配置，具体内容请参考[kernel_function_config](#section97005415463)。
 
 ## 内置常量<a name="section784531219338"></a>
 
@@ -71,10 +71,10 @@
     dim3(x, y, z); // 创建三维结构
     ```
 
-## 内置变量<a name="section13165113520577"></a>
+## builtin_variables<a name="section13165113520577"></a>
 
 
-当前提供了以下仅在Device上可用的dim3结构的内置变量：
+当前提供了以下仅在Device上可用的dim3结构的builtin_variables：
 
 -   gridDim<a name="li20760123812911"></a>
 
@@ -114,13 +114,13 @@
         thread_id_z = blockIdx.z * blockDim.z + threadIdx.z;
         ```
 
-当前提供了以下仅在Device上可用的int类型的内置变量：
+当前提供了以下仅在Device上可用的int类型的builtin_variables：
 
 -   warpSize
 
     const int32_t类型变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
 
-## 内置数据类型<a name="section1835494915576"></a>
+## builtin_data_types<a name="section1835494915576"></a>
 
 目前提供了一系列适用于Device侧的数据类型，包括标量和短向量。短向量是由多个元素组成的简单向量。
 
@@ -254,7 +254,7 @@ if (x[idx] || y[idx]) {
 res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 ```
 
-## 核函数配置<a name="section97005415463"></a>
+## kernel_function_config<a name="section97005415463"></a>
 
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
 
@@ -266,7 +266,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 
 -   blocks\_per\_grid：dim3类型，用于指定网格（Grid）的维度与规模。blocks\_per\_grid.x \* blocks\_per\_grid.y \* blocks\_per\_grid.z等于启动的线程块总数，不能超过65535。
 -   threads\_per\_block：dim3类型，用于指定每个线程块（Thread Block）的维度与规模。threads\_per\_block.x \* threads\_per\_block.y \* threads\_per\_block.z等于每个线程块包含的线程数，需要小于等于\_\_launch\_bounds\_\_配置。
--   dyn\_ubuf\_size：size\_t类型，用于指定每个线程块动态分配的共享内存大小，单位为字节。这部分内存供数组使用，具体用法请参考[共享内存](../编程模型/AI-Core-SIMT编程/内存层级.md#共享内存)中的“动态申请”方式。
+-   dyn\_ubuf\_size：size\_t类型，用于指定每个线程块动态分配的共享内存大小，单位为字节。这部分内存供数组使用，具体用法请参考[共享内存](../programming_model/AI-Core-SIMT编程/内存层级.md#共享内存)中的“动态申请”方式。
 -   stream：aclrtStream类型，指定关联的流，用于维护异步操作的执行顺序。
 
 以下示例展示了内核函数的声明与调用方式。
@@ -289,7 +289,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 -   \_\_launch\_bounds\_\_或\_\_maxnreg\_\_只能在\_\_global\_\_函数中使用。
 -   同一函数不能同时配置\_\_launch\_bounds\_\_和\_\_maxnreg\_\_。
 
-在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程驻留在AI处理器上。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
+在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程驻留在AI处理器上。因此，编译器会采用启发式algorithms，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
   

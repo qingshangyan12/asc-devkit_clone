@@ -1,8 +1,8 @@
 # Fmod样例
 
-## 概述
+## overview
 
-本样例基于Fmod高阶API实现按元素浮点数取余的功能。
+本样例基于Fmodhigh_level_api实现按元素浮点数取余的功能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -59,11 +59,11 @@
 
   - Kernel实现
 
-    使用Fmod高阶API计算取余运算，可选择使用临时buffer和指定计算元素个数
+    使用Fmodhigh_level_api计算取余运算，可选择使用临时buffer和指定计算元素个数
 
   - Tiling实现
 
-    Host侧通过GetFmodMaxMinTmpSize获取Fmod接口计算所需的最大和最小临时空间。
+    Host侧通过GetFmodMaxMinTmpSize获取Fmod_interface计算所需的最大和最小临时空间。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

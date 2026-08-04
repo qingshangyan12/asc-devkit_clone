@@ -1,6 +1,6 @@
 # Ascend C算子接入GE样例
 
-## 概述
+## overview
 
 本样例以AddCustom算子为例，介绍如何把Ascend C `<<<>>>`核函数调用接入GE（Graph Engine，图引擎）原生图执行链路。
 

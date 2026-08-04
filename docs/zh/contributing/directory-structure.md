@@ -28,8 +28,8 @@ asc-devkit/
 
 | include/ | impl/ | 说明 |
 |----------|-------|------|
-| `include/basic_api/` | `impl/basic_api/` | 基础API（kernel operator接口与结构体） |
-| `include/adv_api/` | `impl/adv_api/` | 高阶API（数学库、归一化、矩阵乘等） |
+| `include/basic_api/` | `impl/basic_api/` | basic_api（kernel operator接口与结构体） |
+| `include/adv_api/` | `impl/adv_api/` | high_level_api（数学库、归一化、矩阵乘等） |
 | `include/c_api/` | `impl/c_api/` | C API（指令层封装） |
 | `include/simt_api/` | `impl/simt_api/` | SIMT API |
 | `include/tensor_api/` | `impl/tensor_api/` | Tensor API |
@@ -63,7 +63,7 @@ asc-devkit/
 | `_tiling_impl.cpp` | Tiling宿主侧实现 | `impl/adv_api/tiling/` |
 | `_tiling.cpp` | Tiling实现（无 `_impl` 后缀的变体） | `impl/adv_api/tiling/` |
 | `_struct_*.h` | 类型/结构体定义 | `include/` |
-| `_common_impl.h` | 通用算法实现 | `impl/adv_api/detail/` |
+| `_common_impl.h` | 通用algorithms实现 | `impl/adv_api/detail/` |
 | `_check.h` | 参数校验逻辑 | `impl/adv_api/detail/api_check/` |
 | `_config.h` | 配置参数定义 | `include/` 或 `impl/` |
 | `_utils.h` | 工具函数 | `include/` 或 `impl/` |
@@ -89,8 +89,8 @@ exp_check_common.h
 
 | API类型 | 头文件 | 实现文件 | 示例 |
 |---------|--------|---------|------|
-| 基础API | `kernel_<name>_intf.h` | 分发层：`kernel_<name>_intf_impl.h`；架构实现：`dav_<arch>/kernel_<name>_impl.h` | `kernel_operator_vec_binary_intf.h` |
-| 高阶API | `<name>.h` | `<name>_common_impl.h` | `axpy.h` / `axpy_common_impl.h` |
+| basic_api | `kernel_<name>_intf.h` | 分发层：`kernel_<name>_intf_impl.h`；架构实现：`dav_<arch>/kernel_<name>_impl.h` | `kernel_operator_vec_binary_intf.h` |
+| high_level_api | `<name>.h` | `<name>_common_impl.h` | `axpy.h` / `axpy_common_impl.h` |
 | C API | `<category>.h` | `asc_<api>_impl.h` | `vector_compute.h` / `asc_add_impl.h` |
 | Tiling | `<name>_tiling.h` | `<name>_tiling_impl.cpp` | `axpy_tiling.h` |
 
@@ -100,7 +100,7 @@ exp_check_common.h
 
 ### 命名格式
 
-基础API的架构特定实现放在 `impl/basic_api/dav_<code>/` 目录下，格式为 `dav_`+架构代码。高阶API的架构特定实现位于 `impl/adv_api/detail/<category>/<api>/<api>_<arch>_impl.h`，由公开头文件通过 `#if __NPU_ARCH__` 分发。C API使用 `npu_arch_<NNNN>/` 前缀目录，详见上文C API映射表。
+basic_api的架构特定实现放在 `impl/basic_api/dav_<code>/` 目录下，格式为 `dav_`+架构代码。high_level_api的架构特定实现位于 `impl/adv_api/detail/<category>/<api>/<api>_<arch>_impl.h`，由公开头文件通过 `#if __NPU_ARCH__` 分发。C API使用 `npu_arch_<NNNN>/` 前缀目录，详见上文C API映射表。
 
 ### 架构代码映射（示例）
 
@@ -133,7 +133,7 @@ exp_check_common.h
 impl/adv_api/
 ├── CMakeLists.txt
 ├── detail/                   # 核心实现
-│   ├── activation/           # 激活函数
+│   ├── activation/           # activation_functions
 │   ├── api_check/            # 参数校验
 │   │   ├── host_apicheck.h
 │   │   ├── kernel_api_check.h
@@ -162,7 +162,7 @@ impl/adv_api/
 
 新增一个完整的API时，按以下清单创建和修改文件：
 
-### 高阶API清单
+### high_level_api清单
 
 ```text
 □ include/adv_api/<category>/<api>.h
@@ -172,7 +172,7 @@ impl/adv_api/
     Tiling接口声明（如API需要临时空间）
 
 □ impl/adv_api/detail/<category>/<api>/<api>_common_impl.h和/或<api>_<arch>_impl.h
-    核心算法实现（通用实现用_common_impl.h，架构专用实现用<api>_<arch>_impl.h）
+    核心algorithms实现（通用实现用_common_impl.h，架构专用实现用<api>_<arch>_impl.h）
 
 □ impl/adv_api/detail/api_check/kernel_check/<category>/<api>/<api>_check.h
     参数校验逻辑（CHECK_FUNC_HIGHLEVEL_API依赖）
@@ -205,10 +205,10 @@ impl/adv_api/
     在对应product type的GLOB中添加测试文件
 
 □ tests/api/adv_api/api_host_check/api_host_check.cpp
-    在高阶API host checker聚合文件中加入公开头 `#include`（聚合编译检查）
+    在high_level_api host checker聚合文件中加入公开头 `#include`（聚合编译检查）
 ```
 
-### 基础API清单
+### basic_api清单
 
 ```text
 □ include/basic_api/kernel_operator_<name>_intf.h
@@ -265,14 +265,14 @@ examples/
 │   ├── 00_introduction/    # 入门示例
 │   ├── 01_utilities/       # 工具使用（printf、assert等）
 │   ├── 02_features/        # 高级特性
-│   ├── 03_basic_api/       # 基础API示例
+│   ├── 03_basic_api/       # basic_api示例
 │   │   └── 00_data_movement/
 │   │       └── copy_ub2ub/ # UB到UB拷贝示例
 │   │           ├── CMakeLists.txt
 │   │           ├── copy.asc         # Kernel源码（.asc后缀）
 │   │           ├── data_utils.h     # 测试数据工具
 │   │           └── README.md
-│   ├── 04_advanced_api/    # 高阶API示例
+│   ├── 04_advanced_api/    # high_level_api示例
 │   ├── 05_best_practices/  # 最佳实践
 │   └── 06_compatibility_guide/  # 兼容性指南
 ├── 02_simd_c_api/          # SIMD C API示例

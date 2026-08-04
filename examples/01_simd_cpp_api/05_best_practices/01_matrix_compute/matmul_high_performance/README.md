@@ -1,9 +1,9 @@
 # Matmul最佳实践样例
 
 
-## 概述
+## overview
 
-本样例基于Matmul 高阶API实现矩阵乘法运算，通过9个递进式的优化case展示从基础实现到高性能优化的完整调优路径，包括单核基础版本、Tiling优化、多核并行切分、MDL模式、L1Cache/L2Cache优化、常量Tiling、UnitFlag优化等多种优化手段。
+本样例基于Matmul high_level_api实现矩阵乘法运算，通过9个递进式的优化case展示从基础实现到高性能优化的完整调优路径，包括单核基础版本、Tiling优化、多核并行切分、MDL模式、L1Cache/L2Cache优化、常量Tiling、UnitFlag优化等多种优化手段。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -59,7 +59,7 @@
 
 #### 1. Tiling机制特点
 
-- `MatmulKernel`和`MatmulKernelL2Cache`使用`TCubeTiling`类型，需要从GM内存拷贝完整的Tiling数据结构，Tiling参数在运行时由Scalar单元计算
+- `MatmulKernel`和`MatmulKernelL2Cache`使用`TCubeTiling`类型，需要从GM内存拷贝完整的Tilingdata_structures，Tiling参数在运行时由Scalar单元计算
 - `MatmulKernelMdlL2CacheConstant`使用自定义的`MatmulProblemShape`结构体，仅包含shape信息（M, N, K, singleCoreM等），Tiling参数已在编译期通过`CONSTANT_CFG`计算完成，运行时无需Scalar计算
 
 #### 2. Process方法计算流程特点
@@ -75,10 +75,10 @@
 | aicore_time(μs) | AI Core的平均执行时间 |
 | aic_mac_time(μs) | Cube计算单元的执行时间 |
 | aic_mac_ratio | Cube计算单元的时间占比，反映计算单元利用率 |
-| aic_scalar_time(μs) | Scalar标量计算单元的执行时间 |
-| aic_scalar_ratio | Scalar标量计算单元的时间占比 |
+| aic_scalar_time(μs) | Scalarscalar_compute单元的执行时间 |
+| aic_scalar_ratio | Scalarscalar_compute单元的时间占比 |
 | aic_mte1_time(μs) | MTE1（L1到L0A/L0B搬运）的执行时间 |
-| aic_mte1_ratio | MTE1的时间占比，反映L1到L0的数据搬运压力 |
+| aic_mte1_ratio | MTE1的时间占比，反映L1到L0的data_move压力 |
 | aic_mte2_time(μs) | MTE2（GM到L1搬运）的执行时间 |
 | aic_mte2_ratio | MTE2的时间占比，反映GM到L1的数据加载压力 |
 | aic_fixpipe_time(μs) | FixPipe（L0C到GM搬运）的执行时间 |
@@ -140,7 +140,7 @@ tilingApi.SetFixSplit(128, 256, 64);
 
 **分析**：
 - 相比Case 0，Task Duration从759363.98μs降低到249467.08μs，降低了**509896.90μs**，性能提升**3.04**倍
-- MTE2数据搬运耗时从582515.828μs降低到195613.432μs，降低**66.42%**
+- MTE2data_move耗时从582515.828μs降低到195613.432μs，降低**66.42%**
 - 后续优化方向：引入多核并行计算，充分利用多核资源提升整体吞吐量
 
 ### Case 2: 多核切分 2x12 (MULTI_CORE_SPLIT_2_12)
@@ -206,7 +206,7 @@ SetL1(tilingData);
 **分析**：
 - 相比Case 2，Task Duration从12541.22μs降低到12283.84μs，降低了 2.05%。
 - aic_mte2_time从10177.798μs降低到8616.671μs，降低**15.33%**，降幅**1561.127μs**
-- 后续优化方向：当前aicore耗时仍主要为MTE2，后续将启用L1多块缓存功能，隐藏数据搬运延迟，提升MTE2流水线效率
+- 后续优化方向：当前aicore耗时仍主要为MTE2，后续将启用L1多块缓存功能，隐藏data_move延迟，提升MTE2流水线效率
 
 ### Case 4: 多核使用MDL模板 (MULTI_CORE_MDL)
 
@@ -319,7 +319,7 @@ for (int i = 0; i < 2; i++) {
 - **启用L2Cache优化**：
   - L2Cache特点：L2Cache是AI Core共享的外部缓存，L2Cache的纯读带宽约为GM的3到4倍，在搬入或搬出相同数据量的情况下，访问L2Cache内的数据比GM更快
   - 缓存命中优化：若数据无法命中L2Cache，导致需要访问GM进行读写，带宽利用效率较低，导致MTE2可能成为样例整个运行过程中的性能瓶颈
-  - **分块计算适配L2Cache**：当前L2Cache大小为**192MB**，矩阵计算所需数据总量为**384MB**(A矩阵128MB + B矩阵128MB + C矩阵128MB)，由于L2Cache容量小于矩阵计算数据总量，因此可以将A矩阵在M轴切分成2份，其中区域1与B矩阵完成完整运算，区域2再与B矩阵完成完整运算，通过切分提高L2cache的命中率
+  - **分块计算适配L2Cache**：当前L2Cache大小为**192MB**，cube_compute所需数据总量为**384MB**(A矩阵128MB + B矩阵128MB + C矩阵128MB)，由于L2Cache容量小于cube_compute数据总量，因此可以将A矩阵在M轴切分成2份，其中区域1与B矩阵完成完整运算，区域2再与B矩阵完成完整运算，通过切分提高L2cache的命中率
 
 分块计算适配L2Cache示意图：
 
@@ -402,7 +402,7 @@ mmCFG.enUnitFlag = true;
 
 **优化手段**：
 - **启用UnitFlag优化**：
-  - 优化计算与搬运的并行度：未开启UnitFlag功能时，AIC核的MMAD计算指令和FIXPIPE数据搬运指令是指令级别的同步，FIXPIPE指令需要等MMAD指令执行完才进行结果搬出，MMAD和FIXPIPE之间流水串行；开启UnitFlag功能后，MMAD和FIXPIPE是**512B大小的细粒度同步**，在一条MMAD指令执行过程中，每当完成一个512B数据结果的计算，FIXPIPE立即搬出该512B的数据，从而实现Cube计算单元和FIXPIPE搬运单元流水并行
+  - 优化计算与搬运的并行度：未开启UnitFlag功能时，AIC核的MMAD计算指令和FIXPIPEdata_move指令是指令级别的同步，FIXPIPE指令需要等MMAD指令执行完才进行结果搬出，MMAD和FIXPIPE之间流水串行；开启UnitFlag功能后，MMAD和FIXPIPE是**512B大小的细粒度同步**，在一条MMAD指令执行过程中，每当完成一个512B数据结果的计算，FIXPIPE立即搬出该512B的数据，从而实现Cube计算单元和FIXPIPE搬运单元流水并行
 
 UnitFlag功能示意图：
 
@@ -516,7 +516,7 @@ $$=\frac{256 \times 1024 \times 1024B}{1.6 \times 10^{12}B/s} +\frac{8 \times 10
 
 Case 8 MTE2耗时误差：
 $$MTE2耗时误差 = \frac{{1900.322\mu s} - {1832.1\mu s}}{{1832.1\mu s}} = 3.72\%$$
-相比于Atlas A2训练系列芯片，Ascend 950PR芯片升级，数据搬运更为高效
+相比于Atlas A2训练系列芯片，Ascend 950PR芯片升级，data_move更为高效
 
 ## 调优建议
 
@@ -548,7 +548,7 @@ $$MTE2耗时误差 = \frac{{1900.322\mu s} - {1832.1\mu s}}{{1832.1\mu s}} = 3.7
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
@@ -593,7 +593,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

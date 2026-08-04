@@ -1,6 +1,6 @@
 # muls样例
 
-## 概述
+## overview
 本样例基于Reg编程接口实现Muls运算，主要调用Muls接口。
 - Adds/Maxs/Mins/LeakyRelu接口皆可参考该样例
 

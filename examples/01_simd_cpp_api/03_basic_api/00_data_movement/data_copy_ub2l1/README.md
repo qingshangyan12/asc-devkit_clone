@@ -1,8 +1,8 @@
 # DataCopy ub2l1样例
 
-## 概述
+## overview
 
-本样例在Mmad矩阵乘场景下，基于DataCopy实现UB（Unified Buffer）到L1（L1 Buffer）的数据搬运，覆盖连续搬运和随路ND2NZ搬运两种场景。
+本样例在Mmad矩阵乘场景下，基于DataCopy实现UB（Unified Buffer）到L1（L1 Buffer）的data_move，覆盖连续搬运和随路ND2NZ搬运两种场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -35,7 +35,7 @@
   | 连续搬运 | 1 | `DataCopy(dst, src, DataCopyParams)` | NZ | UB→L1 数据内容不变，输入需预先转为NZ格式 |
   | 随路ND2NZ搬运 | 2 | `DataCopy(ubDst, ubSrc, DataCopyParams)` + `DataCopy(l1Dst, ubNZ, DataCopyParams)` | ND | 先在UB内逐C0列块搬运完成ND→NZ转换，再连续搬运至L1 |
 
-  接口资料参考[UBToL1连续数据搬运](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_UBToL1_continuous.md)和[UBToL1随路转换-ND2NZ搬运](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_UBToL1_ND2NZ.md)。
+  接口资料参考[UBToL1连续data_move](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_continuous.md)和[UBToL1随路转换-ND2NZ搬运](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_ND2NZ.md)。
 
 - 关于场景2实现方案的说明：
   
@@ -60,9 +60,9 @@
 - 样例实现：
   1. AIV核：将数据从GM（Global Memory）搬运到UB（Unified Buffer）。两种场景下GM中的数据排布不同：场景1为NZ格式（分形间列主序、分形内行主序，由 `gen_data.py` 预转换）；场景2为ND格式（原始行主序，无需预转换）。
   2. AIV核：将数据从UB搬运到L1（L1 Buffer）。场景1使用连续搬运；场景2先在UB内完成ND→NZ转换，再用连续搬运搬至L1。两种场景到达L1后的数据排布相同，后续计算流程完全一致。
-  3. AIC核：调用基础API LoadData将数据从L1搬运到L0A Buffer与L0B Buffer。
-  4. AIC核：调用基础API Mmad进行矩阵乘计算。
-  5. AIC核：调用基础API Fixpipe将数据从L0C Buffer搬运到GM（Global Memory）。
+  3. AIC核：调用basic_api LoadData将数据从L1搬运到L0A Buffer与L0B Buffer。
+  4. AIC核：调用basic_api Mmad进行矩阵乘计算。
+  5. AIC核：调用basic_api Fixpipe将数据从L0C Buffer搬运到GM（Global Memory）。
 
 - 调用实现  
   使用内核调用符<<<>>>调用核函数，核函数声明为 `__mix__(1, 2)` 混合核（1个AIC + 2个AIV）。

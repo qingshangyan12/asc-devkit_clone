@@ -19,7 +19,7 @@ set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 
 # 场景参数（通过命令行传入）
 # SCENARIO_NUM: 场景编号
-#   1 - half：half类型的向量处理，基线场景
+#   1 - half：half_type的向量处理，基线场景
 #   2 - half2：half2类型的向量处理，提高数据计算效率（与场景1同样数据规模）
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-2)")
 if(NOT SCENARIO_NUM MATCHES "^[1-2]$")

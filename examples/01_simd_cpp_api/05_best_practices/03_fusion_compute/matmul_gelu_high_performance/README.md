@@ -1,8 +1,8 @@
 # Matmul Gelu最佳实践样例
 
-## 概述
+## overview
 
-本样例基于静态Tensor编程范式，展示了Cube-Vector（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过Fixpipe将结果输出到GM或UB，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
+本样例基于静态Tensor编程范式，展示了Cube-Vector（CV）融合的实现方法，将Matmul矩阵乘法与GELUactivation_functions融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过Fixpipe将结果输出到GM或UB，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmulbasic_api最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -99,7 +99,7 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 
 ### 中级性能优化
 
-本样例的Matmul部分采用与[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
+本样例的Matmul部分采用与[Matmulbasic_api最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
 
 #### Matmul优化手段
 
@@ -118,7 +118,7 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 
 #### GELU计算实现
 
-**A2/A3架构**：使用MemBase方式（向量基础API + PipeBarrier），无需额外中间缓冲区，直接复用输出缓冲区：
+**A2/A3架构**：使用MemBase方式（向量basic_api + PipeBarrier），无需额外中间缓冲区，直接复用输出缓冲区：
 
 ```cpp
 __aicore__ inline void GeluMemBaseCompute(
@@ -209,7 +209,7 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 ### 高阶极限打磨
 
-在高阶极限打磨阶段，CV融合层面提供两种数据通路：Scenario 1通过GM中转实现CV融合（所有架构支持），Scenario 2通过Fixpipe直通UB实现CV融合（仅Ascend 950PR支持），省去GM中转的读写开销。
+在高阶极限打磨阶段，CV融合层面提供两种data_path：Scenario 1通过GM中转实现CV融合（所有架构支持），Scenario 2通过Fixpipe直通UB实现CV融合（仅Ascend 950PR支持），省去GM中转的读写开销。
 Matmul和Gelu相关高阶极限打磨手段请参考下方列表。
 
 #### Matmul优化手段
@@ -429,7 +429,7 @@ AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + loca
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
@@ -476,7 +476,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32_t数据类型的信息），比如打印当前行号等。
+基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md)的内容。同时支持打印自定义的附加信息（仅支持uint32_t数据类型的信息），比如打印当前行号等。
 
 在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
 
@@ -486,7 +486,7 @@ AscendC::Div(yLocal, xLocal, yLocal, n);
 AscendC::DumpTensor(yLocal, 1, 16);
 ```
 
-> **注意：** [DumpTensor](../../../../../docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
+> **注意：** [DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md)接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
 
 ## 性能调试
 
@@ -508,7 +508,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

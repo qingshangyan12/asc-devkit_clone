@@ -27,7 +27,7 @@
 
 ## 功能说明
 
-reg数据搬运接口，适用于从UB搬入MaskReg。开启post mode，每调用一次接口更新源操作数在UB上的地址。
+regdata_move接口，适用于从UB搬入MaskReg。开启post mode，每调用一次接口更新源操作数在UB上的地址。
 
 ## 函数原型
 
@@ -55,9 +55,9 @@ reg数据搬运接口，适用于从UB搬入MaskReg。开启post mode，每调�
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（掩码寄存器）。 |
+| dst | 输出 | 目的操作数（mask寄存器）。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| offset | 输入 | 数据搬运的偏移量。 |
+| offset | 输入 | data_move的偏移量。 |
 
 ## 返回值说明
 
@@ -78,7 +78,7 @@ PIPE_V
 constexpr uint64_t total_length = 256;
 vector_bool dst = asc_create_mask_b16(PAT_ALL);
 __ubuf__ uint32_t src[total_length];
-//数据搬运的偏移量为64
+//data_move的偏移量为64
 int32_t offset = 64;
 asc_loadalign_postupdate(dst, src, offset);
 ```

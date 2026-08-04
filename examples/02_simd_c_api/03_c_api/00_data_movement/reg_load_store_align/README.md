@@ -1,8 +1,8 @@
 # reg_load_store_align样例
 
-## 概述
+## overview
 
-本样例展示使用Ascend C C API的Reg矢量计算接口，在Unified Buffer（UB）与矢量数据寄存器之间进行对齐数据读写，并通过多个场景演示不同的寻址和数据分布方式。
+本样例展示使用Ascend C C API的reg_vector_compute接口，在Unified Buffer（UB）与矢量数据寄存器之间进行对齐数据读写，并通过多个场景演示不同的寻址和数据分布方式。
 
 ## 支持的产品及CANN软件版本
 

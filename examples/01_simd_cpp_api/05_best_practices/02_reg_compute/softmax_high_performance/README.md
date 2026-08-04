@@ -1,6 +1,6 @@
 # Softmax 性能调优样例
 
-## 概述
+## overview
 
 本样例以单核Softmax为例，展示从MemBase到RegBase、从基础循环到使用循环融合、循环展开等优化手段的完整性能调优路径，包含Case 0-5共六个逐步优化的版本。
 
@@ -12,7 +12,7 @@
 - Case 4 → Case 5：主尾块模式 + 外层循环展开 + ExpSub融合指令
 
 **前置阅读**：开始阅读前，建议对以下背景知识有初步了解，为后续各Case的优化策略提供理论支持：
-- **[Reg矢量计算编程](../../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/Reg矢量计算编程.md)**：
+- **[reg_vector_compute编程](../../../../../docs/zh/guide/编程指南/programming_model/AI-Core-SIMD编程/基于Tensor的CPP编程/reg_vector_compute编程.md)**：
 - **[指令双发优化](../../../../../docs/zh/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/指令双发优化.md)**：
 - **[VF融合优化](../../../../../docs/zh/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF融合优化.md)**：
 - **[VF循环优化](../../../../../docs/zh/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化.md)**：
@@ -61,7 +61,7 @@ $$
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">softmax_custom</td></tr>
 </table>
 
-## 版本概览
+## 版本overview
 
 **表1 各版本性能及优化项说明表**
 | 版本 | API类型 | 特点 | 性能 (折算后Vector指令开销) |
@@ -81,7 +81,7 @@ $$
 | aiv_vec_ratio | vector类型指令在端到端耗时中比率。 |
 
 **说明**：
-1. 本例针对单核Softmax内VF性能优化详解，当前不考虑多核切分、数据搬运、DoubleBuffer等因素影响。
+1. 本例针对单核Softmax内VF性能优化详解，当前不考虑多核切分、data_move、DoubleBuffer等因素影响。
 2. Vector指令开销通过aiv_total_cycles及aiv_vec_ratio相乘折算得到。
 
 ## 优化策略分析
@@ -92,11 +92,11 @@ $$
 
 ### Case 0: MemBase基础版本
 
-**实现方式**：使用Ascend C基础API Memory矢量计算接口，在128行的for循环内依次完成ReduceMax、Duplicate、Sub、Exp、ReduceSum、Duplicate、Div全部7步操作。
+**实现方式**：使用Ascend Cbasic_api memory_vector_compute接口，在128行的for循环内依次完成ReduceMax、Duplicate、Sub、Exp、ReduceSum、Duplicate、Div全部7步操作。
 
 **理论分析 — 为什么MemBase矢量计算接口慢**：
 
-Case 0使用Memory矢量计算API，其计算过程中API通过封装Vector Function调用Reg矢量接口完成计算并实现代际兼容。每条指令的语义是"从UB读源操作数进入寄存器 → 在执行单元计算 → 将寄存器中的数据写回UB目的操作数"的完整流程。这意味着：
+Case 0使用memory_vector_computeAPI，其计算过程中API通过封装Vector Function调用Reg矢量接口完成计算并实现代际兼容。每条指令的语义是"从UB读源操作数进入寄存器 → 在执行单元计算 → 将寄存器中的数据写回UB目的操作数"的完整流程。这意味着：
 
 1. **每步中间结果必须写回UB**：ReduceMax的结果写入UB后，Duplicate需要从UB重新读出；Duplicate写入UB后，Sub需要从UB重新读出……以此类推。中间结果在UB上反复读写，性能较差。
 2. **冗余的同步及指令**：由于数据会反复搬入搬出寄存器，缺少寄存器级别的数据复用，并且Vector Function间存在数据依赖，无法使能双发等能力。
@@ -202,9 +202,9 @@ AscendC::Reg::ExpSub(expReg, srcReg, maxReg, mask);
 
 **3. UpdateMask vs 主尾块**：
 
-UpdateMask模式在每次内层循环迭代中调用 `UpdateMask` 更新掩码，虽然满足Hardware Loop（无if/else），但每次调用仍产生标量计算开销。主尾块模式将数据切分为"主块（全Mask）"和"尾块（部分Mask）"分别处理，主块循环内无需任何掩码更新操作，完全消除UpdateMask的累加开销。
+UpdateMask模式在每次内层循环迭代中调用 `UpdateMask` 更新mask，虽然满足Hardware Loop（无if/else），但每次调用仍产生scalar_compute开销。主尾块模式将数据切分为"主块（全Mask）"和"尾块（部分Mask）"分别处理，主块循环内无需任何mask更新操作，完全消除UpdateMask的累加开销。
 
-使用 `UpdateMask` 在每次内层循环中自动更新掩码，代码简洁：
+使用 `UpdateMask` 在每次内层循环中自动更新mask，代码简洁：
 ```cpp
 uint32_t count = rDim;
 for (uint16_t j = 0; j < repeatTimes; j++) {
@@ -224,7 +224,7 @@ for (uint16_t j = 0; j < repeatTimes; j++) {
 
 **理论分析 — 外层展开如何提升指令双发**：
 
-Case 2的执行模式为：行0的Load→Max→ReduceMax→Load→ExpSub→Store 全部执行完，再执行行1。此时执行队列中仅有一行（行i）的指令序列，而行i内部存在明显的依赖链：
+Case 2的execution_mode为：行0的Load→Max→ReduceMax→Load→ExpSub→Store 全部执行完，再执行行1。此时执行队列中仅有一行（行i）的指令序列，而行i内部存在明显的依赖链：
 
 ```
 Load(src_i) → Max(max_i, src_i) → ... → ReduceMax(max_i) → ... → Load(src_i) → ExpSub(...) → Store
@@ -275,7 +275,7 @@ for (uint16_t i = 0; i < halfA; i++) {
 
 ### Case 2/3 → Case 4/5: 主尾块模式
 
-**优化动机**：UpdateMask虽然有掩码自动更新特性，但每次调用UpdateMask仍引入标量计算（更新计数值、生成掩码）。主尾块模式下，主块128行的全部内层循环全部使用编译期创建的 `CreateMask<ALL>()`（全Mask），完全消除UpdateMask的累加开销，循环内**无需任何条件判断或掩码更新**。当前shape下 `rDim=128`，每个float占4B，`VL=256B` 对应64元素，恰好整除 `128 / 64 = 2`，尾块为0，主尾块模式达到收益上限。
+**优化动机**：UpdateMask虽然有mask自动更新特性，但每次调用UpdateMask仍引入scalar_compute（更新计数值、生成mask）。主尾块模式下，主块128行的全部内层循环全部使用编译期创建的 `CreateMask<ALL>()`（全Mask），完全消除UpdateMask的累加开销，循环内**无需任何条件判断或mask更新**。当前shape下 `rDim=128`，每个float占4B，`VL=256B` 对应64元素，恰好整除 `128 / 64 = 2`，尾块为0，主尾块模式达到收益上限。
 
 **关键代码变化**：
 ```cpp
@@ -328,7 +328,7 @@ Case 5同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
 | MemBase→RegBase | 寄存器级计算减少UB↔寄存器往返和VF启动开销 | Case 0→Case 1 |
 | ExpSub融合指令 | 单条指令替代Sub+Exp，减少延迟 | Case 1→Case 2 |
 | 循环融合 | 共享Load/Store，消除冗余搬运和同步 | Case 1→Case 2 |
-| UpdateMask | 自动更新掩码，简洁尾块处理 | Case 2, Case 3 |
+| UpdateMask | 自动更新mask，简洁尾块处理 | Case 2, Case 3 |
 | 主尾块模式 | 主块全Mask无更新开销，尾块独立处理 | Case 4, Case 5 |
 | 外层循环展开 | 多套寄存器组交错执行，提升指令双发 | Case 2→Case 3, Case 4→Case 5 |
 

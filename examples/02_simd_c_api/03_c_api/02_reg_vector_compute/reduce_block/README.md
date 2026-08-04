@@ -1,6 +1,6 @@
 ﻿# reduce_block样例
 
-## 概述
+## overview
 本样例基于C API编程接口实现ReduceDataBlock运算，主要调用[asc_reduce_sum_datablock](../../../../../docs/zh/api/SIMD-API/C-API/reg/reduce_compute/asc_reduce_sum_datablock.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
@@ -39,7 +39,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">reduce_block_custom</td></tr>
   </table>
 - 样例实现：  
-   reduce_block_vf函数内调用asc_reduce_sum_datablock接口进行归约计算：
+   reduce_block_vf函数内调用asc_reduce_sum_datablock接口进行reduction_compute：
    - 使用asc_loadalign加载数据到寄存器
    - 使用asc_reduce_sum_datablock对每个DataBlock(32B)内的元素求和
    - 结果采用交织布局存储在矢量数据寄存器dst中，每个repeat的前8个位置为有效结果

@@ -6,9 +6,9 @@
 
 | 规范写法 | 错误写法 | 含义 |
 |----------|----------|------|
-| L0A Buffer | L0A | AI Core内部物理存储单元，存储矩阵计算左矩阵，对应TPosition::A2 |
-| L0B Buffer | L0B | AI Core内部物理存储单元，存储矩阵计算右矩阵，对应TPosition::B2 |
-| L0C Buffer | L0C | AI Core内部物理存储单元，存储矩阵计算结果，对应TPosition::CO1 |
+| L0A Buffer | L0A | AI Core内部物理存储单元，存储cube_compute左矩阵，对应TPosition::A2 |
+| L0B Buffer | L0B | AI Core内部物理存储单元，存储cube_compute右矩阵，对应TPosition::B2 |
+| L0C Buffer | L0C | AI Core内部物理存储单元，存储cube_compute结果，对应TPosition::CO1 |
 | L1 Buffer | L1（指代物理缓冲区时） | AI Core内部物理存储单元，缓存矩阵输入数据，对应TPosition::A1/B1 |
 | Unified Buffer | — | AI Core内部存储单元，用于矢量计算，对应TPosition::VECIN/VECOUT/VECCALC |
 | UB | — | Unified Buffer的缩写，两者均可使用 |
@@ -27,8 +27,8 @@
 | TPosition::C1 | L1 Buffer / Unified Buffer | 存放Bias偏置数据 |
 | TPosition::C2 | BiasTable Buffer / L0C Buffer | 存放小块Bias数据 |
 | TPosition::C2PIPE2GM | Fixpipe Buffer | 存放量化参数 |
-| TPosition::CO1 | L0C Buffer | 存放小块矩阵计算结果 |
-| TPosition::CO2 | Global Memory / Unified Buffer | 存放矩阵计算结果 |
+| TPosition::CO1 | L0C Buffer | 存放小块cube_compute结果 |
+| TPosition::CO2 | Global Memory / Unified Buffer | 存放cube_compute结果 |
 | TPosition::VECIN | Unified Buffer | 矢量计算输入 |
 | TPosition::VECCALC | Unified Buffer | 矢量计算临时变量 |
 | TPosition::VECOUT | Unified Buffer | 矢量计算输出 |
@@ -46,18 +46,18 @@
 | BlockID | — | 以0为起始的AI Core逻辑编号 |
 | Core | — | 拥有独立Scalar计算单元的计算核 |
 | Core ID | — | AI Core核的物理编号 |
-| Cube | — | AI Core上的矩阵计算单元 |
-| Cube Core | — | 矩阵计算核（Scalar + 矩阵单元 + 搬运单元） |
+| Cube | — | AI Core上的cube_compute_unit |
+| Cube Core | — | cube_compute核（Scalar + 矩阵单元 + 搬运单元） |
 | Vector | — | AI Core上的矢量计算单元 |
 | Vector Core | — | 矢量计算核（Scalar + 矢量单元 + 搬运单元） |
-| Scalar | — | 标量计算单元，负责指令发射与标量运算 |
+| Scalar | — | scalar_compute单元，负责指令发射与标量运算 |
 | DCache | Data Cache | 数据缓存 |
 | ICache | Instruction Cache | 指令缓存 |
 | DMA | Direct Memory Access | 直接内存访问单元 |
 | GM | Global Memory | 设备端主内存 |
-| MTE1 | Memory Transfer Engine 1 | L1→L0A/L0B数据搬运 |
-| MTE2 | Memory Transfer Engine 2 | GM→L1/L0A/L0B/UB数据搬运 |
-| MTE3 | Memory Transfer Engine 3 | UB→GM/L1数据搬运 |
+| MTE1 | Memory Transfer Engine 1 | L1→L0A/L0Bdata_move |
+| MTE2 | Memory Transfer Engine 2 | GM→L1/L0A/L0B/UBdata_move |
+| MTE3 | Memory Transfer Engine 3 | UB→GM/L1data_move |
 | NPU | Neural-Network Processing Unit | 神经网络处理器单元 |
 | OP | Operator | 算子 |
 | SIMD | Single Instruction, Multiple Data | 单指令多数据 |
@@ -85,8 +85,8 @@
 | TilingData | 切分相关参数（块大小、循环次数等） |
 | TilingKey | 区分Kernel不同版本特例实现 |
 | TilingFunc | Host侧计算Tiling的默认函数 |
-| RegTensor | 矢量数据寄存器，Reg矢量计算基本单元 |
-| MaskReg | 256位掩码寄存器 |
+| RegTensor | 矢量数据寄存器，reg_vector_compute基本单元 |
+| MaskReg | 256位mask寄存器 |
 | AddrReg | 地址寄存器（存储地址偏移量） |
 | Warp | 包含32个线程的线程集合 |
 | Lane | Warp中的单个线程 |
@@ -120,7 +120,7 @@
 | Ascend 950PR | ascend 950PR |
 | Ascend 950DT | ascend 950DT |
 
-## 七、数据通路写法
+## 七、data_path写法
 
 | 规范写法 | 错误写法 |
 |----------|----------|
@@ -128,7 +128,7 @@
 | UB->GM | UB → GM |
 | L0C Buffer->GM | L0C->GM |
 
-注：数据通路使用 `->` 表示方向，不使用 `→`。
+注：data_path使用 `->` 表示方向，不使用 `→`。
 
 ## 八、其他术语
 
@@ -140,9 +140,9 @@
 | Global Memory/GM | 设备端主内存，AI Core外部存储 |
 | GlobalTensor | 存放Global Memory全局数据的Tensor |
 | LocalTensor | 存放AI Core中Local Memory本地数据的Tensor |
-| Tensor | 张量，N维数据结构 |
+| Tensor | 张量，N维data_structures |
 | InferShape | 算子shape推导，仅在GE图模式时使用 |
-| Fixpipe | 将矩阵计算结果从L0C Buffer搬运到GM或L1 Buffer的单元 |
+| Fixpipe | 将cube_compute结果从L0C Buffer搬运到GM或L1 Buffer的单元 |
 | Workspace | 预分配的临时使用的Global Memory内存 |
 | Preload | 预先将指令或数据加载到缓存中 |
 | Reduce | 减维操作 |

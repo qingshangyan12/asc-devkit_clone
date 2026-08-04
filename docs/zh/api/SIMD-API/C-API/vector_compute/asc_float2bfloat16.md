@@ -36,7 +36,7 @@
 
 ## 函数原型
 
-- 前n个数据连续计算
+- 前n个数据continuous_compute
     ```cpp
     // RINT舍入模式
     __aicore__ inline void asc_float2bfloat16_rn(__ubuf__ bfloat16_t* dst, __ubuf__ float* src, uint32_t count)
@@ -50,7 +50,7 @@
     __aicore__ inline void asc_float2bfloat16_rz(__ubuf__ bfloat16_t* dst, __ubuf__ float* src, uint32_t count)
     ```
 
-- 高维切分计算
+- high_dim_split计算
 
     ```cpp
     // RINT舍入模式
@@ -105,7 +105,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 
 ## 调用示例

@@ -26,16 +26,16 @@
 
 ## 功能说明
 
-将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。
+将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放cube_compute中的Bias。
 
 ## 函数原型
 
-- 前n个数据搬运
+- 前n个data_move
     ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
     ```
 
-- 高维切分搬运
+- high_dim_split搬运
     ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
     ```
@@ -70,9 +70,9 @@ PIPE_MTE1
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../通用说明和约束.md#通用地址重叠约束)。
-- 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
+- 当采用前n个data_move接口时，搬运数据大小要求32字节对齐。
 
 ## 调用示例
 

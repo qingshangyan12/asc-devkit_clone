@@ -19,9 +19,9 @@ project(kernel_samples LANGUAGES ASC CXX)
 
 # 场景参数（通过命令行传入）
 # SCENARIO_NUM: 场景编号
-#   1 - 输入[1, 20]，输出[1, 32]，half类型，使用SetPadValue填充
+#   1 - 输入[1, 20]，输出[1, 32]，half_type，使用SetPadValue填充
 #   2 - 输入[32, 59]，输出[32, 64]，float类型，rightPadding，不使用SetPadValue
-#   3 - 输入[3, 24]，输出[1, 80]，half类型，Compact模式
+#   3 - 输入[3, 24]，输出[1, 80]，half_type，Compact模式
 #   4 - 输入[1, 320]，输出[1, 576]，int8类型，SetLoopModePara loop mode（Compact模式）
 #   5 - 输入[1, 320]，输出[1, 576]，int8类型，SetLoopModePara loop mode（Normal模式）
 #   6 - 输入[2, 4, 3, 128, 126]五维，搬运[2, 2, 2, 64, 126]，int8类型，SetLoopModePara loop mode（Normal模式）

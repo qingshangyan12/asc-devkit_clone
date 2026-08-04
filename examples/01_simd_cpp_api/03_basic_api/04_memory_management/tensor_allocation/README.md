@@ -1,6 +1,6 @@
 # tensor_allocation样例
 
-## 概述
+## overview
 
 本样例介绍GlobalTensor、LocalTensor、RegTensor的申请与使用方式。
 
@@ -49,7 +49,7 @@
   </tr>
   <tr>
     <td align="center">3</td>
-    <td align="center">使用LocalTensor构造函数创建LocalTensor</td>
+    <td align="center">使用LocalTensor_constructor创建LocalTensor</td>
     <td>使用难度高，开发者完全手动控制内存布局，需要精确计算避免地址冲突，也需要手动设置硬件事件同步</td>
   </tr>
   <tr>
@@ -111,7 +111,7 @@
     
     **场景3（Process3）：使用地址偏移手动管理**
     - 手动计算各tensor在UB中的起始地址偏移
-    - 通过LocalTensor构造函数指定`TPosition`和起始地址
+    - 通过LocalTensor_constructor指定`TPosition`和起始地址
     - 完全手动控制内存布局，需要开发者精确计算地址避免冲突
     - 需要手动调用`SetFlag/WaitFlag`进行硬件事件同步
 

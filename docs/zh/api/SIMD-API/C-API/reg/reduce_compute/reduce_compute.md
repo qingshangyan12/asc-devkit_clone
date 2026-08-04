@@ -1,4 +1,4 @@
-# 归约计算
+# reduction_compute
 
 -   **[asc_pair_reduce_sum](asc_pair_reduce_sum.md)**
 

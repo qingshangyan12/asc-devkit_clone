@@ -1,7 +1,7 @@
 # load_data_l12l0样例
 
 
-## 概述
+## overview
 
 本样例展示B4 / B8 / B16 / B32输入数据类型下，A / B矩阵从GM到L1、L1到L0、矩阵乘和结果搬出的完整流程。
 
@@ -741,7 +741,7 @@ loadDataParams.l1W = CeilAlign(m, fractalShape[0]);
 // img2col的结果矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho * wo = loadDataParams.l1H * loadDataParams.l1w
 // img2col的结果矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
 loadDataParams.channelSize = CeilAlign(k, fractalShape[1]);
-// 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
+// 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half_type，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
 loadDataParams.kExtension = CeilAlign(k, fractalShape[1]);
 // 该指令在目的操作数height维度的传输长度，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t，应为16的倍数；覆盖的情况则无倍数要求。
 loadDataParams.mExtension = CeilAlign(m, fractalShape[0]);
@@ -890,7 +890,7 @@ loadDataParams.l1W = CeilAlign(k, fractalShape[0]);
 // img2col的结果矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho * wo = loadDataParams.l1H * loadDataParams.l1w
 // img2col的结果矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
 loadDataParams.channelSize = CeilAlign(m, fractalShape[1]);
-// 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
+// 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half_type，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
 loadDataParams.kExtension = CeilAlign(m, fractalShape[1]);
 // 该指令在目的操作数height维度的传输长度，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t，应为16的倍数；覆盖的情况则无倍数要求。
 loadDataParams.mExtension = CeilAlign(k, fractalShape[1] * fractalNum);
@@ -940,7 +940,7 @@ loadDataParams.l1W = CeilAlign(k, fractalShape[0]);
 // img2col的结果矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho * wo = loadDataParams.l1H * loadDataParams.l1w
 // img2col的结果矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
 loadDataParams.channelSize = CeilAlign(m, fractalShape[1]);
-// 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
+// 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half_type，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
 loadDataParams.kExtension = CeilAlign(m, fractalShape[1]);
 // 该指令在目的操作数height维度的传输长度，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t/int4_t，应为16的倍数；覆盖的情况则无倍数要求。
 loadDataParams.mExtension = CeilAlign(k, fractalShape[1] * fractalNum);
@@ -1229,15 +1229,15 @@ for (int i = 0; i < CeilDivision(k, fractalShape[0]); ++i) {
 `Mmad`指令的`MmadParams`结构体的成员，各个成员变量的具体含义这里不再赘述。
 
 需要注意的是当`Mmad`指令执行时，
-矩阵计算单元会从L0A/L0B连续读入多个分形参与矩阵乘计算，读入分形的数量根据`MmadParams`结构体的成员变量m、n、k的取值以及`Mmad`指令对L0A/L0B上A矩阵和B矩阵各个轴的对齐要求来计算的。由于`Mmad`指令，即A矩阵分形为[16, 32]、B矩阵分形为[32, 16]来连续读入分形的，也就是说矩阵计算单元从L0A/L0B连续读入的分形总数目分别为：CeilDivision(m, 16) * CeilDivision(k, 32)、CeilDivision(k, 32) * CeilDivision(n, 16)。
+cube_compute_unit会从L0A/L0B连续读入多个分形参与矩阵乘计算，读入分形的数量根据`MmadParams`结构体的成员变量m、n、k的取值以及`Mmad`指令对L0A/L0B上A矩阵和B矩阵各个轴的对齐要求来计算的。由于`Mmad`指令，即A矩阵分形为[16, 32]、B矩阵分形为[32, 16]来连续读入分形的，也就是说cube_compute_unit从L0A/L0B连续读入的分形总数目分别为：CeilDivision(m, 16) * CeilDivision(k, 32)、CeilDivision(k, 32) * CeilDivision(n, 16)。
 
-因此当L0A/L0B上对A矩阵和B矩阵在各个轴的实际对齐要求与`Mmad`指令默认的对齐要求不一致时，就可能导致连续读入分形时，错误读入完全由无效数据填充的分形而忽略了包含有效数据的分形。
+因此当L0A/L0B上对A矩阵和B矩阵在各个轴的实际对齐要求与`Mmad`指令默认的对齐要求不一致时，就可能导致连续读入分形时，错误读入完全由无效data_padding的分形而忽略了包含有效数据的分形。
 
 如下图22所示，以场景5为例，输入数据类型为int8_t，A转置输入、B矩阵不转置输入。由前文内容可知：L0A在m轴和k轴分别向16 * 2、32对齐，L0B在k轴和n轴分别向32、16 * 2对齐，而`Mmad`指令默认在m、k、n三个轴的对齐要求分别是向16、32、16对齐，假设n=70时，按照L0上的对齐要求nAlignL0 = CeilAlign(70, 16 * 2) = 96，按照`Mmad`指令默认的对齐要求，nAlignL0 = CeilAlign(70, 16) = 80，此时n轴实际对齐要求与`Mmad`指令默认的对齐要求不一致。m轴同理。
 
 以B矩阵n轴为例，如图22左边子图所示，如果设置mmadParams.n = n = 70，就会导致读入编号为5的分形，同时没能将包含有效数据的编号为10的分形。
 
-如图22右边子图所示，如果设置mmadParams.n = CeilAlign(n, fractalShape[0] * fractalNum) = 96，此时会读入全部分形，虽然矩阵计算结果中包含了无效数据参与计算的结果，但是在`Fixpipe`指令搬出数据时通过设置fixpipeParams.nSize = n来保证无效数据参与计算的结果不会被搬出。m轴参数配置同理。
+如图22右边子图所示，如果设置mmadParams.n = CeilAlign(n, fractalShape[0] * fractalNum) = 96，此时会读入全部分形，虽然cube_compute结果中包含了无效数据参与计算的结果，但是在`Fixpipe`指令搬出数据时通过设置fixpipeParams.nSize = n来保证无效数据参与计算的结果不会被搬出。m轴参数配置同理。
 
 <div align="center">
   <img src="figures/B_B8_read_invalid_data.png" width="900"><br>
@@ -1248,7 +1248,7 @@ for (int i = 0; i < CeilDivision(k, fractalShape[0]); ++i) {
 
 根据矩阵乘法的计算公式可知，k轴作为A、B矩阵公共的维度，此时如果像上述场景那样设置mmadParams.k = CeilAlign(k, fractalShape[1] * fractalNum) = CeilAlign(70, 16) = 80，会导致C矩阵中每个元素的数值都受到多读入的无效数据的影响，并且也不能通过设置fixpipeParams的参数来保证无效数据参与计算的结果不会被搬出。
 
-如下图23所示，mmadParams.kDirectionAlign仅在输入数据类型为float时生效。当A矩阵转置时，该参数需要设置为真，此时L0A上A矩阵在k方向向16对齐，矩阵计算单元从L0A读取数据会跳过填充的无效数据，其余场景下该参数取默认值为假，此时L0A上A矩阵在k方向向8对齐。
+如下图23所示，mmadParams.kDirectionAlign仅在输入数据类型为float时生效。当A矩阵转置时，该参数需要设置为真，此时L0A上A矩阵在k方向向16对齐，cube_compute_unit从L0A读取数据会跳过填充的无效数据，其余场景下该参数取默认值为假，此时L0A上A矩阵在k方向向8对齐。
 
 <div align="center">
   <img src="figures/Mmad_FP32_A_trans_kDirectionAlign.png" width="900"><br>
@@ -1317,7 +1317,7 @@ fixpipeParams.dstNdStride = 0;
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
   使用NPU仿真 模式时，添加`-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 

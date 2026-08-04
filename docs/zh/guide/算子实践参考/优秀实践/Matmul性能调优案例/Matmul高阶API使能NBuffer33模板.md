@@ -1,8 +1,8 @@
-# Matmul高阶API开启NBuffer33模板<a name="ZH-CN_TOPIC_0000002327075450"></a>
+# Matmulhigh_level_api开启NBuffer33模板<a name="ZH-CN_TOPIC_0000002327075450"></a>
 
 ## 案例介绍<a name="section17413194624510"></a>
 
-本案例呈现了在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，开启NBuffer33模板对算子性能的提升效果。NBuffer33模板的实现为单核计算的A矩阵切分为3x3个基本块，该3x3个A矩阵的基本块全载和保持在L1 Buffer中，每次与3x1个B矩阵的基本块计算矩阵乘，同时DoubleBuffer并行搬入下次计算所需的3x1个B矩阵基本块，直到singleCoreN方向的矩阵乘计算完成。针对MTE2 Bound场景，通过NBuffer33算法的切分数据方式，错开搬运流水，减少单次搬运的数据量，平衡MTE2和FixPipe的数据流量，让两者带宽均匀分布。NBuffer33模板的详细介绍请参考[MatmulPolicy](../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulPolicy.md)。
+本案例呈现了在矩阵乘算子场景中，使用Matmulhigh_level_api进行矩阵乘法计算，开启NBuffer33模板对算子性能的提升效果。NBuffer33模板的实现为单核计算的A矩阵切分为3x3个基本块，该3x3个A矩阵的基本块全载和保持在L1 Buffer中，每次与3x1个B矩阵的基本块计算矩阵乘，同时DoubleBuffer并行搬入下次计算所需的3x1个B矩阵基本块，直到singleCoreN方向的矩阵乘计算完成。针对MTE2 Bound场景，通过NBuffer33algorithms的切分数据方式，错开搬运流水，减少单次搬运的数据量，平衡MTE2和FixPipe的数据流量，让两者带宽均匀分布。NBuffer33模板的详细介绍请参考[MatmulPolicy](../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/MatmulPolicy.md)。
 
 -   开启NBuffer33模板的适用场景
 
@@ -11,7 +11,7 @@
 -   开启NBuffer33模板的约束条件
     -   仅支持MatmulConfig为MDL模板。
     -   A矩阵、B矩阵的内存逻辑位置只支持TPosition::GM。
-    -   仅支持纯Cube模式（只有矩阵计算），暂不支持MIX模式（包含矩阵计算和矢量计算）。
+    -   仅支持纯Cube模式（只有cube_compute），暂不支持MIX模式（包含cube_compute和矢量计算）。
     -   仅支持通过IterateAll接口获取Matmul的计算结果C矩阵。
     -   stepM、stepKa、stepKb小于等于3，且满足：stepKa=stepKb=Ceil\(singleCoreK/baseK\)。
     -   A矩阵全载的基本块大小与B矩阵载入的基本块大小之和不超过L1 Buffer的大小。
@@ -52,7 +52,7 @@
 </tbody>
 </table>
 
-当前案例使用的AI处理器共24个核，算子中开启高阶API Matmul的纯Cube模式，使用MDL模板，Tiling参数如下：
+当前案例使用的AI处理器共24个核，算子中开启high_level_api Matmul的纯Cube模式，使用MDL模板，Tiling参数如下：
 
 -   原始shape：M=256, N=512, K=192。
 -   单核shape：singleCoreM=256，singleCoreN=256，singleCoreK=192。
@@ -77,7 +77,7 @@
 
 -   Tiling实现
 
-    调用GetTiling接口获取TCubeTiling结构体前，开启NBuffer33模式。
+    调用GetTiling接口获取TCubeTiling_struct前，开启NBuffer33模式。
 
     ```
     matmul_tiling::MatmulConfigParams matmulConfigParams(1, false,

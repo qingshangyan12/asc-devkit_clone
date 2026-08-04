@@ -1,5 +1,5 @@
 # PyTorch样例介绍
-## 概述
+## overview
 本目录介绍Ascend C自定义算子接入PyTorch框架的不同模式。
 - 接入PyTorch Eager模式
     - 算子通过pybind11注册接入到PyTorch

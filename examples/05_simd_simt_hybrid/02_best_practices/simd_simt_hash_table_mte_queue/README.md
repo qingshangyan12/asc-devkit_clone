@@ -1,8 +1,8 @@
 # SIMD与SIMT混合编程HashTable MTE队列优化样例
 
-## 概述
+## overview
 
-本样例比较HashTable`insert_or_assign`的两种value写入路径：SIMT Warp直接写value，以及单kernel内使用MTE任务队列写value。样例实现一个固定容量的C++风格HashTable，仅用于展示本次优化路径，保留本次对比需要的语义和数据结构。
+本样例比较HashTable`insert_or_assign`的两种value写入路径：SIMT Warp直接写value，以及单kernel内使用MTE任务队列写value。样例实现一个固定容量的C++风格HashTable，仅用于展示本次优化路径，保留本次对比需要的语义和data_structures。
 
 **优化路径**：
 

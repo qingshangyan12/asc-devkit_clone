@@ -6,7 +6,7 @@
 
 ## 目录
 
-1. [架构代际概述](#架构代际概述)
+1. [架构代际overview](#架构代际overview)
 2. [统一维护原则](#统一维护原则)
 3. [统一芯片调用名](#统一芯片调用名)
 4. [完整映射表](#完整映射表)
@@ -17,7 +17,7 @@
 
 ---
 
-## 架构代际概述
+## 架构代际overview
 
 ### 核心概念
 
@@ -91,7 +91,7 @@
 
 ### 通用基础 dtype
 
-本节依据仓内 [`docs/zh/api/context/内置数据类型.md`](../../../../docs/zh/api/SIMD-API/基础API/数据结构/内置数据类型.md) 维护 AscendC 内置 dtype 事实。脚本消费入口仍是 [`npu-arch-facts.json`](npu-arch-facts.json)，不要解析 Markdown 表格。
+本节依据仓内 [`docs/zh/api/context/builtin_data_types.md`](../../../../docs/zh/api/SIMD-API/basic_api/data_structures/builtin_data_types.md) 维护 AscendC 内置 dtype 事实。脚本消费入口仍是 [`npu-arch-facts.json`](npu-arch-facts.json)，不要解析 Markdown 表格。
 
 下表是各 skill 在未遇到特定 API 约束时，应优先复用的通用基础 dtype 视图。这里的“可直接初始化”只表示通用 UT 模板可以安全构造样例数据，不表示任意 API 都支持该类型。
 
@@ -149,7 +149,7 @@
 
 ### 产品支持范围
 
-内置数据类型文档中的产品支持表给出以下 dtype 范围。本节只记录“产品到 dtype 集合”的事实矩阵，不展开低精度格式语义；具体格式说明见 [DAV_3510 扩展低精度 dtype](#dav_3510-扩展低精度-dtype)。未列出的芯片或产品系列不要按名称自行扩大 dtype 支持，必须回查目标 API 文档、声明、impl 和已有 UT。
+builtin_data_types文档中的产品支持表给出以下 dtype 范围。本节只记录“产品到 dtype 集合”的事实矩阵，不展开低精度格式语义；具体格式说明见 [DAV_3510 扩展低精度 dtype](#dav_3510-扩展低精度-dtype)。未列出的芯片或产品系列不要按名称自行扩大 dtype 支持，必须回查目标 API 文档、声明、impl 和已有 UT。
 
 | 产品范围 | 文档声明的支持 dtype |
 |---------|----------------------|
@@ -191,7 +191,7 @@
 | 能力 | 说明 | API 生成关注点 |
 |-----|------|---------------|
 | Regbase 编程 | 直接操作寄存器的编程能力 | 只有文档和现有接口明确支持时才生成相关分支 |
-| SIMT 编程 | 线程级并行编程模型 | 关注 `include/simt_api`、`impl/simt_api`、UT 和目标芯片约束 |
+| SIMT 编程 | 线程级并行programming_model | 关注 `include/simt_api`、`impl/simt_api`、UT 和目标芯片约束 |
 | 低精度格式 | FP4、FP8、HiFloat8、INT4 等 dtype 能力 | 先按 [DAV_3510 扩展低精度 dtype](#dav_3510-扩展低精度-dtype) 确认格式，再检查类型定义、转换 API、精度边界和 UT 数据 |
 
 注意事项：

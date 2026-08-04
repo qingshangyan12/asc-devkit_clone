@@ -1,13 +1,13 @@
 # CtrlSpr样例
 
-## 概述
+## overview
 
 本样例基于 `SetCtrlSpr`、`GetCtrlSpr`、`ResetCtrlSpr` 接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能，并通过浮点数计算验证非饱和模式是否正确。
 
 本样例演示了设置、读取和重置CTRL[48]、CTRL[60]比特位，验证非饱和模式下INF是否保持原值，同时通过GetCtrlSpr读取CTRL[48]设置后和reset后的值进行验证：
 - CTRL[60]用于控制饱和模式的全局生效方式。设置为1时，使能全局设置饱和。
 - CTRL[48]用于控制浮点数计算和浮点数精度转换时的饱和模式，仅在CTRL[60]使能时生效。
-  - 设置为0时（饱和模式）：INF输出会被饱和为±MAX（half类型为65504），NaN输出会被饱和为0。
+  - 设置为0时（饱和模式）：INF输出会被饱和为±MAX（half_type为65504），NaN输出会被饱和为0。
   - 设置为1时（非饱和模式）：INF/NaN保持原输出。
 - 使用完寄存器后，用ResetCtrlSpr接口将寄存器设置回默认值，防止后续计算受影响。
 
@@ -36,7 +36,7 @@
   验证CTRL寄存器非饱和模式操作的完整流程及其功能效果：
   1. SetCtrlSpr：设置 `CTRL[60]=1` 使能全局生效，设置 `CTRL[48]=1` 选择非饱和模式（INF/NaN保持原输出）
   2. GetCtrlSpr：读取 `CTRL[48]` 设置后的值，存入 `ctrlLocal` 前4位
-  3. Adds：执行half类型浮点数加法计算，输入包含INF值，存入 `dstLocal`，用于验证非饱和模式下INF是否保持原值
+  3. Adds：执行half_type浮点数加法计算，输入包含INF值，存入 `dstLocal`，用于验证非饱和模式下INF是否保持原值
   4. ResetCtrlSpr：重置 `CTRL[48]`、`CTRL[60]` 为默认值
   5. GetCtrlSpr：读取 `CTRL[48]` 重置后的值，存入 `ctrlLocal` 后4个元素
 

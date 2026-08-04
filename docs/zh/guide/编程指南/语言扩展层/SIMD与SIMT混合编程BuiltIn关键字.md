@@ -1,8 +1,8 @@
 # SIMD&SIMT BuiltIn关键字<a name="ZH-CN_TOPIC_0000002593949295"></a>
 
-## 函数执行空间限定符<a name="section1074418132518"></a>
+## function_execution_space_qualifier<a name="section1074418132518"></a>
 
-SIMD与SIMT混合编程使用的函数执行空间限定符与SIMD编程一致，详细说明请参见[SIMD BuiltIn关键字的函数执行空间限定符](SIMD-BuiltIn关键字.md#section1074418132518)。
+SIMD与SIMT混合编程使用的function_execution_space_qualifier与SIMD编程一致，详细说明请参见[SIMD BuiltIn关键字的function_execution_space_qualifier](SIMD-BuiltIn关键字.md#section1074418132518)。
 
 ## VF函数执行限定符
 
@@ -26,7 +26,7 @@ SIMT VF函数定义中的关键修饰符说明如下：
 | \_\_gm\_\_ | 内存空间修饰符，标识内存空间为GM。 |
 | \_\_ubuf\_\_ | 内存空间修饰符，标识内存空间为UB。 |
 
-只支持在核函数或\_\_aicore\_\_函数中调用SIMT VF函数，调用接口为[asc\_vf\_call](../../../api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md#asc_vf_call调用)，示例如下：
+只支持在核函数或\_\_aicore\_\_函数中调用SIMT VF函数，调用接口为[asc\_vf\_call](../../../api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config.md#asc_vf_call调用)，示例如下：
 
 ```cpp
 asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
@@ -34,13 +34,13 @@ asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
 
 SIMT VF函数有以下约束：
 
--   入参仅支持Ascend C的[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
+-   入参仅支持Ascend C的[builtin_data_types](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
 -   函数返回类型必须是void。
 -   SIMT VF内只能调用\_\_simt\_callee\_\_函数或\_\_callee\_\_函数。
 
 ### \_\_simt\_callee\_\_
 
-\_\_simt\_callee\_\_子函数是SIMT VF函数内部调用的辅助函数，函数内部可以使用SIMT内置变量。定义示例如下：
+\_\_simt\_callee\_\_子函数是SIMT VF函数内部调用的辅助函数，函数内部可以使用SIMTbuiltin_variables。定义示例如下：
 
 ```cpp
 __simt_callee__ uint32_t simt_helper(__gm__ uint32_t* gm_param, __ubuf__ float* ubuf_param, uint64_t scalar_param, ...);
@@ -54,8 +54,8 @@ uint32_t result = simt_helper(arg1, arg2, ...);
 
 该函数有以下约束：
 
--   入参仅支持Ascend C的[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
--   函数返回值只能是Ascend C的[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
+-   入参仅支持Ascend C的[builtin_data_types](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
+-   函数返回值只能是Ascend C的[builtin_data_types](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
 -   函数内只能调用\_\_simt\_callee\_\_函数或\_\_callee\_\_函数。
 
 ### \_\_simd\_vf\_\_与\_\_simd\_callee\_\_
@@ -66,7 +66,7 @@ uint32_t result = simt_helper(arg1, arg2, ...);
 
 SIMD与SIMT混合编程使用的地址空间限定符与SIMD编程一致，详细说明请参见[SIMD BuiltIn关键字的地址空间限定符](SIMD-BuiltIn关键字.md#section1624210295308)。
 
-## 核函数配置
+## kernel_function_config
 
 ### 核函数定义
 
@@ -84,12 +84,12 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 核函数定义有以下几个约束：
 
 -   返回值类型必须是void；
--   入参支持指针类型（需使用\_\_gm\_\_修饰）和Ascend C内置数据类型；
+-   入参支持指针类型（需使用\_\_gm\_\_修饰）和Ascend Cbuiltin_data_types；
 -   指针参数必须是指向Global Memory上的内存地址，使用\_\_gm\_\_修饰。
 
 ### \_\_launch\_bounds\_\_\(N\)
 
-在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程和线程块驻留在AI处理器上，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
+在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程和线程块驻留在AI处理器上，从而提升性能。因此，编译器会采用启发式algorithms，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
 \_\_launch\_bounds\_\_\(N\)：函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定SIMT VF启动的最大线程数，参数N的取值范围为1到2048。若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。
 
@@ -106,7 +106,7 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 
 ### <<<\>\>\>调用
 
-SIMD与SIMT混合编程是在SIMD编程模型的核函数执行流程基础上引入SIMT VF（Vector Function）子任务。核函数仍按SIMD编程方式在Host侧通过<<<...\>\>\>启动，语法如下：
+SIMD与SIMT混合编程是在SIMDprogramming_model的核函数执行流程基础上引入SIMT VF（Vector Function）子任务。核函数仍按SIMD编程方式在Host侧通过<<<...\>\>\>启动，语法如下：
 
 ```cpp
 kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
@@ -168,13 +168,13 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 ### SIMD VF的asc\_vf\_call调用
 
 使用`asc_vf_call`接口调用SIMD VF入口函数启动VF子任务，详细接口说明参见
-[asc\_vf\_call接口说明](../../../api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md)。
+[asc\_vf\_call接口说明](../../../api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md)。
 
 ### SIMT VF与SIMD VF的调用差异
 
 SIMT VF与SIMD VF均通过`asc_vf_call`接口在核函数或`__aicore__`函数中启动VF子任务，但二者面向的并行执行模型不同：SIMT VF以线程为基本执行单元，实现线程级并行；SIMD VF基于矢量寄存器对连续数据实现数据级并行。执行模型的差异进一步决定了二者在调用形式上存在差异，具体如下表所示：
 
-| 对比项 | SIMT VF调用 | SIMD VF调用 |
+| 对比项 | SIMT vf_call | SIMD vf_call |
 | --- | --- | --- |
 | VF入口函数标识 | 使用__simt_vf__修饰。 | 使用__simd_vf__修饰。 |
 | 调用形式 | asc_vf_call<simt_func>(dim3(threadNums), arg1, arg2, ...) | asc_vf_call<simd_func>(arg1, arg2, ...) |
@@ -182,9 +182,9 @@ SIMT VF与SIMD VF均通过`asc_vf_call`接口在核函数或`__aicore__`函数�
 | 指针入参 | 支持指向GM或UB的指针，需按实际内存空间使用__gm__或__ubuf__修饰。 | 指针入参需使用__ubuf__地址空间限定符修饰，不能直接访问GM内存。 |
 | 典型用途 | 处理复杂控制流、离散访存、线程级索引映射等不规则片段。 | 处理连续规整的向量计算片段。 |
 
-## 内置变量<a name="zh-cn_topic_0000002571575581_section13165113520576"></a>
+## builtin_variables<a name="zh-cn_topic_0000002571575581_section13165113520576"></a>
 
-当前提供了以下仅在SIMT VF内可用的内置变量：  
+当前提供了以下仅在SIMT VF内可用的builtin_variables：  
 -   gridDim<a name="zh-cn_topic_0000002571575581_li20760123812911"></a>
 
     内置全局变量，只能在SIMT VF函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。gridDim.x <= 65535；gridDim.y、gridDim.z必须为1。
@@ -199,7 +199,7 @@ SIMT VF与SIMD VF均通过`asc_vf_call`接口在核函数或`__aicore__`函数�
 
 -   threadIdx
 
-    内置全局变量，只能在SIMT VF函数中使用，用于获取当前线程在线程块内部的索引。threadIdx.x，threadIdx.y，threadIdx.z分别表示当前线程在3个维度的索引，threadIdx.x的范围为\[0, blockDim.x\)，threadIdx.y的范围为\[0, blockDim.y\)，threadIdx.z的范围为\[0, blockDim.z\)。线程块内线程的索引计算方式如下：
+    内置全局变量，只能在SIMT VF函数中使用，用于获取当前线程在线程块内部的索引。threadIdx.x，threadIdx.y，threadIdx.z分别表示当前线程在3个维度的索引，threadIdx.x的范围为\[0, blockDim.x\)，threadIdx.y的范围为\[0, blockDim.y\)，threadIdx.z的范围为\[0, blockDim.z\)。线程块内线程的index_compute方式如下：
 
     -   对于一维线程块，线程块内线程的索引为threadIdx.x。
     -   对于二维线程块，线程块内线程的索引为\(threadIdx.x + threadIdx.y \* blockDim.x\)。
@@ -209,13 +209,13 @@ SIMT VF与SIMD VF均通过`asc_vf_call`接口在核函数或`__aicore__`函数�
 
     运行时变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
 
-SIMD核函数层级的内置变量参见[SIMD核函数层内置变量](./SIMD-BuiltIn关键字.md#内置变量)。
+SIMD核函数层级的builtin_variables参见[SIMD核函数层builtin_variables](./SIMD-BuiltIn关键字.md#builtin_variables)。
 
-### 不同层级的内置变量使用限制
+### 不同层级的builtin_variables使用限制
 
-Host侧<<<...\>\>\>调用配置的是外层核函数的逻辑核数；SIMT VF内部的线程架构类内置变量描述的是SIMT VF子任务的线程层次。两类概念所属层级不同，不能混用，下表列出了SIMD核函数层级和SIMT VF线程层级中常见概念的差异。
+Host侧<<<...\>\>\>调用配置的是外层核函数的逻辑核数；SIMT VF内部的线程架构类builtin_variables描述的是SIMT VF子任务的线程层次。两类概念所属层级不同，不能混用，下表列出了SIMD核函数层级和SIMT VF线程层级中常见概念的差异。
 
-| 内置变量或方法 | 所属层级 | 使用位置 | 含义 |
+| builtin_variables或方法 | 所属层级 | 使用位置 | 含义 |
 | --- | --- | --- | --- |
 | `AscendC::GetBlockNum()` | SIMD核函数层级 | 核函数或`__aicore__`函数，SIMT VF内部不可见 | 获取Host侧<<<...\>\>\>调用配置的核函数逻辑核数，即`block_num`。 |
 | `AscendC::GetBlockIdx()` | SIMD核函数层级 | 核函数或`__aicore__`函数，SIMT VF内部不可见 | 获取当前执行核函数的逻辑核索引。 |
@@ -226,12 +226,12 @@ Host侧<<<...\>\>\>调用配置的是外层核函数的逻辑核数；SIMT VF内
 
 使用时需注意：
 
--   SIMD侧核函数不能使用SIMT VF线程层级相关内置变量，SIMT VF也无法感知SIMD核函数层级的逻辑核编号或逻辑核数量。
+-   SIMD侧核函数不能使用SIMT VF线程层级相关builtin_variables，SIMT VF也无法感知SIMD核函数层级的逻辑核编号或逻辑核数量。
 -   如果SIMT VF需要使用外层SIMD流程中的逻辑核编号或逻辑核数量，建议在核函数或`__aicore__`函数中通过`AscendC::GetBlockIdx()`、`AscendC::GetBlockNum()`获取对应值后，以普通参数传入SIMT VF。
 
-## 内置数据类型<a name="zh-cn_topic_0000002571575581_section1880403364916"></a><a name="cn_topic_0000002571575581_section1880403364916"></a>
+## builtin_data_types<a name="zh-cn_topic_0000002571575581_section1880403364916"></a><a name="cn_topic_0000002571575581_section1880403364916"></a>
 
-SIMD与SIMT混合编程使用的内置数据类型与SIMT编程一致，详细说明请参见[SIMT BuiltIn关键字的内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)。
+SIMD与SIMT混合编程使用的builtin_data_types与SIMT编程一致，详细说明请参见[SIMT BuiltIn关键字的builtin_data_types](SIMT-BuiltIn关键字.md#section1835494915576)。
 
 ## 运算符<a name="zh-cn_topic_0000002571575581_section186787252339"></a>
 

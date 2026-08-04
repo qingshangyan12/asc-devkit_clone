@@ -1,7 +1,7 @@
 # ld_st_reg_unalign样例
 
-## 概述
-本样例基于Reg编程接口实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+## overview
+本样例基于Reg编程接口实现UB(Unified Buffer)对RegTensor(reg_vector_compute基本单元)的非对齐data_move操作，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
     <table>
 	 	<tr>
         <td>SCENARIO_NUM</td>
@@ -9,7 +9,7 @@
 	 	</tr>
 	 	<tr>
 	 		<td>1</td>
-	 		<td>单核非对齐数据搬运：使用LoadUnAlign和StoreUnAlign进行非对齐地址的数据搬运</td>
+	 		<td>单核非对齐data_move：使用LoadUnAlign和StoreUnAlign进行非对齐地址的data_move</td>
 	 	</tr>
 	 	<tr>
 	 		<td>2</td>
@@ -37,7 +37,7 @@
 
 ## 样例描述
 
-### 场景1：单核地址非对齐数据搬运
+### 场景1：单核地址非对齐data_move
 - 样例功能：  
   输入shape为[1, 1024]的float类型矩阵，在源操作数和目的操作数地址均非32B对齐的情况下，搬运128个数据。
 - 样例规格：
@@ -129,7 +129,7 @@
   | ----------------| -----------------------------| ---------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=单核地址非对齐数据搬运，2=多核地址非对齐、数据量非对齐数据搬运 |
+  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=单核地址非对齐data_move，2=多核地址非对齐、数据量非对齐data_move |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

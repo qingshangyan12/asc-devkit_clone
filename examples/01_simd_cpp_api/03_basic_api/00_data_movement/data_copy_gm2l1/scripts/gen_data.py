@@ -24,7 +24,7 @@ def extract_relu_params(relu_pre):
     relu_pre = int(relu_pre)
     relu_alpha_bits = (
         relu_pre >> 13
-    ) & 0xFFFFF  # 提取M2的20位[31:13]，0xFFFFF是20位掩码
+    ) & 0xFFFFF  # 提取M2的20位[31:13]，0xFFFFF是20位mask
     sign_bit = (relu_alpha_bits >> 18) & 0x1
     exponent = (relu_alpha_bits >> 10) & 0xFF
     mantissa = relu_alpha_bits & 0x3FF
@@ -48,12 +48,12 @@ def extract_quant_params(quant_pre):
     quant_pre = int(quant_pre)
     quant_alpha_bits = (
         quant_pre >> 13
-    ) & 0xFFFFF  # 提取M1的20位[31:13]，0xFFFFF是20位掩码
+    ) & 0xFFFFF  # 提取M1的20位[31:13]，0xFFFFF是20位mask
     mode_control_bit = (
         quant_pre >> 36
-    ) & 0x1  # 提取mode_ctrl bit的一位[36]，0x1是1位掩码
-    offset = (quant_pre >> 37) & 0x1FF  # 提取offset的9位[45:37]，0x1FF是9位掩码
-    sign = (quant_pre >> 46) & 0x1  # 提取sign的一位[46]，0x1是1位掩码
+    ) & 0x1  # 提取mode_ctrl bit的一位[36]，0x1是1位mask
+    offset = (quant_pre >> 37) & 0x1FF  # 提取offset的9位[45:37]，0x1FF是9位mask
+    sign = (quant_pre >> 46) & 0x1  # 提取sign的一位[46]，0x1是1位mask
     n = (quant_pre >> 32) & 0xF
     # 解析M1为(1,8,10)格式的浮点数
     sign_bit = (quant_alpha_bits >> 18) & 0x1

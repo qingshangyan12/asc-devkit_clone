@@ -43,7 +43,7 @@
     __aicore__ inline void asc_gather(__ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint32_t count)
     ```
 
-- 高维切分计算
+- high_dim_split计算
 
     ```cpp
     __aicore__ inline void asc_gather(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
@@ -93,7 +93,7 @@ PIPE_V
 - src_offset里的偏移量取值应保证src元素类型位宽对齐。
 - src加上src_offset偏移后的地址不能超出Unified Buffer (UB)大小数据的范围。
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 
 ## 调用示例
 
@@ -103,7 +103,7 @@ __ubuf__ half src[total_length];
 __ubuf__ uint32_t src_offset[total_length];
 __ubuf__ half dst[total_length];
 asc_gather(dst, src, src_offset, total_length);
-// src [1, 2, 3, ..., 126, 127, 128]，128个half类型数据
+// src [1, 2, 3, ..., 126, 127, 128]，128个half_type数据
 // src_offset [254, 252, 250, ..., 4, 2, 0]，对应src中每个元素的偏移量，基于src的起始基地址，单位为Bytes
 // dst [128, 127, 126, ..., 3, 2, 1]
 ```

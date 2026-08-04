@@ -11,16 +11,16 @@
 
 本项目支持三种类型的API开发，每类API都有专门的贡献指南：
 
-### 1. 高阶API
+### 1. high_level_api
 
-高阶API基于单核对常见算法进行抽象和封装，实现了一些常用的计算算法，旨在提高编程开发效率。高阶API一般通过调用多种基础API实现。高阶API包括数学计算、矩阵计算、激活函数等API。
+high_level_api基于单核对常见algorithms进行抽象和封装，实现了一些常用的计算algorithms，旨在提高编程开发效率。high_level_api一般通过调用多种basic_api实现。high_level_api包括math_compute、cube_compute、activation_functions等API。
 
-- **适用场景**：常见算法的抽象和封装，提高算子开发效率
+- **适用场景**：常见algorithms的抽象和封装，提高算子开发效率
 - **贡献指南**：[docs/asc_adv_api_contributing.md](./docs/zh/asc_adv_api_contributing.md)
 
-### 2. 基础API
+### 2. basic_api
 
-基础API实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。
+basic_api实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。
 
 - **适用场景**：使用C++语言编程风格的场景
 - **贡献指南**：[docs/asc_basic_api_contributing.md](./docs/zh/asc_basic_api_contributing.md)

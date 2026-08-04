@@ -1,6 +1,6 @@
 # regbase 基础 API (Register-based Basic API) UT 生成指南
 
-## 1. API 概述
+## 1. API overview
 
 regbase 基础 API 是 AscendC 中基于 register 的基础接口，提供底层硬件操作能力，仅支持特定架构。
 
@@ -28,7 +28,7 @@ regbase 基础 API 是 AscendC 中基于 register 的基础接口，提供底层
 |---------|---------|
 | 寄存器操作 | `RegAdd`, `RegMul`, `RegSub` |
 | 内存操作 | `RegLoad`, `RegStore` |
-| 索引操作 | `CreIndex`, `Arange` |
+| index_operations | `CreIndex`, `Arange` |
 
 ---
 

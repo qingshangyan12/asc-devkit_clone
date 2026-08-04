@@ -22,8 +22,8 @@ np.random.seed(9)
 def gen_golden_data(scenarioNum=1):
     """
     根据场景编号生成输入数据和Golden数据
-    场景1：ReduceRepeat<MAX>，输入half类型[1, 1024]，输出[1, 8]，每个repeat内求最大值（不返回索引）
-    场景2：ReduceRepeat<MIN>，输入half类型[1, 1024]，输出[1, 16]，每个repeat内求最小值及索引
+    场景1：ReduceRepeat<MAX>，输入half_type[1, 1024]，输出[1, 8]，每个repeat内求最大值（不返回索引）
+    场景2：ReduceRepeat<MIN>，输入half_type[1, 1024]，输出[1, 16]，每个repeat内求最小值及索引
     场景3：ReduceRepeat<SUM>，输入float类型[1, 2048]，输出[1, 32]，每个repeat内求和
     场景4：ReduceRepeat<SUM>非对齐场景，输入float类型[13, 57]，输出[1, 13]，对每行非对齐数据求和
     """

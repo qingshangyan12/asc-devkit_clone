@@ -90,8 +90,8 @@ PIPE_MTE1
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../通用说明和约束.md#存储单元说明)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - 若dst和value的数据类型不相同，则需要根据dst的数据类型对value的值进行转换，具体请参考调用示例。
 
 ## 调用示例
@@ -114,5 +114,5 @@ half value1 = 1;  // 不用做二进制转换，直接填1即可
 config.repeat = 1;
 config.blk_num = total_length * sizeof(half) / 512;
 config.dst_gap = 0;
-asc_fill_l0a(dst1, value1, config);    // 将dst1中256个half类型的元素初始化为1
+asc_fill_l0a(dst1, value1, config);    // 将dst1中256个half_type的元素初始化为1
 ```

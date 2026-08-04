@@ -1,8 +1,8 @@
 # ReduceComputation样例
 
-## 概述
+## overview
 
-本样例基于ReduceMax/ReduceMin/ReduceSum接口实现归约计算，支持以下6种场景（scenario）：
+本样例基于ReduceMax/ReduceMin/ReduceSum_interface实现reduction_compute，支持以下6种场景（scenario）：
     <table>
  	  	 	<tr>
  	  	 		<td>scenarioNum</td>
@@ -16,7 +16,7 @@
  	  	 	</tr>
  	  	 	<tr>
  	  	 		<td>2</td>
- 	  	 		<td>ReduceMax高维切分计算</td>
+ 	  	 		<td>ReduceMaxhigh_dim_split计算</td>
           <td>从所有输入数据中找出最大值及最大值对应的索引位置，使用mask控制每次迭代内参与计算的元素</td>
  	  	 	</tr>
         <tr>
@@ -26,7 +26,7 @@
  	  	 	</tr>
         <tr>
  	  	 		<td>4</td>
- 	  	 		<td>ReduceMin高维切分计算</td>
+ 	  	 		<td>ReduceMinhigh_dim_split计算</td>
           <td>从所有输入数据中找出最小值及最小值对应的索引位置，使用mask控制每次迭代内参与计算的元素</td>
  	  	 	</tr>
         <tr>
@@ -36,7 +36,7 @@
  	  	 	</tr>
         <tr>
  	  	 		<td>6</td>
- 	  	 		<td>ReduceSum高维切分计算</td>
+ 	  	 		<td>ReduceSumhigh_dim_split计算</td>
           <td>对所有输入数据求和，使用mask控制每次迭代内参与计算的元素</td>
  	  	 	</tr>
  	  	 </table>
@@ -65,7 +65,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例基于ReduceMax/ReduceMin/ReduceSum接口实现归约计算，包含前n个数据计算接口和tensor高维切分计算接口。接口资料参考[ReduceMax](../../../../../docs/zh/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)/[ReduceMin](../../../../../docs/zh/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)/[ReduceSum](../../../../../docs/zh/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)。
+  本样例基于ReduceMax/ReduceMin/ReduceSum_interface实现reduction_compute，包含前n个数据计算接口和tensorhigh_dim_split计算接口。接口资料参考[ReduceMax](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMax.md)/[ReduceMin](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMin.md)/[ReduceSum](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum.md)。
 
 - 样例规格：  
   不同场景的输入输出规格如下表所示：
@@ -93,7 +93,7 @@
   </tr>
   <tr>
     <td align="center">2</td>
-    <td align="center">ReduceMax高维切分计算</td>
+    <td align="center">ReduceMaxhigh_dim_split计算</td>
     <td align="center">x</td>
     <td align="center">[1, 512]</td>
     <td align="center">half</td>
@@ -113,7 +113,7 @@
   </tr>
   <tr>
     <td align="center">4</td>
-    <td align="center">ReduceMin高维切分计算</td>
+    <td align="center">ReduceMinhigh_dim_split计算</td>
     <td align="center">x</td>
     <td align="center">[1, 512]</td>
     <td align="center">half</td>
@@ -133,7 +133,7 @@
   </tr>
   <tr>
     <td align="center">6</td>
-    <td align="center">ReduceSum高维切分计算</td>
+    <td align="center">ReduceSumhigh_dim_split计算</td>
     <td align="center">x</td>
     <td align="center">[8320]</td>
     <td align="center">half</td>
@@ -146,9 +146,9 @@
 - 样例实现：
 
   - Kernel实现
-    - 调用DataCopy基础API将数据从GM（Global Memory）搬运到UB（Unified Buffer），并将归约计算后的数据搬出到GM（Global Memory）。
-    - 调用ReduceMax/ReduceMin/ReduceSum接口完成归约计算。
-    - 在ReduceSum前n个数据计算场景，调用[GetReduceRepeatSumSpr](../../../../../docs/zh/api/SIMD-API/基础API/Memory矢量计算/归约计算辅助配置接口/GetReduceRepeatSumSpr_ISASI.md)获取计算结果。
+    - 调用DataCopybasic_api将数据从GM（Global Memory）搬运到UB（Unified Buffer），并将reduction_compute后的数据搬出到GM（Global Memory）。
+    - 调用ReduceMax/ReduceMin/ReduceSum_interface完成reduction_compute。
+    - 在ReduceSum前n个数据计算场景，调用[GetReduceRepeatSumSpr](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatSumSpr_ISASI.md)获取计算结果。
 
 - 调用实现  
   使用内核调用符`<<<>>>`调用核函数。
@@ -173,7 +173,7 @@
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM                     # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
@@ -192,7 +192,7 @@
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6`　　　　　| 场景编号：1=ReduceMax前n数据计算，2=ReduceMax高维切分计算，3=ReduceMin前n数据计算，4=ReduceMin高维切分计算，5=ReduceSum前n数据计算，6=ReduceSum高维切分计算 |
+  | `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6`　　　　　| 场景编号：1=ReduceMax前n数据计算，2=ReduceMaxhigh_dim_split计算，3=ReduceMin前n数据计算，4=ReduceMinhigh_dim_split计算，5=ReduceSum前n数据计算，6=ReduceSumhigh_dim_split计算 |
 
 - 执行结果
 

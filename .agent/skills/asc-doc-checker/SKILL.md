@@ -70,9 +70,9 @@ description: |
 - [ ] 所有图片统一存放在 `docs/zh/api/figures/` 目录下，引用时根据不同文档位置计算相对路径
 - [ ] 所有图片的文件名必须是英文小写加下划线（如：atomic_operation_pipelined_data_movement_diagram.png、atomic_operation_3.png）
 - [ ] 如果有图注（没有图注的话就忽略），图注（如"图 1"、"图 2"）必须写在图片上方，格式为 `**图 n**  图片标题`（注意 `**图 n**` 和标题之间是两个空格）
-  **正确示例（在 `docs/zh/api/SIMD-API/基础API/原子操作/原子操作概述.md` 中引用）：**
+  **正确示例（在 `docs/zh/api/SIMD-API/basic_api/atomic_operations/atomic_operations_overview.md` 中引用）：**
   ```
-  **图 1**  数据搬运随路原子累加效果示意图
+  **图 1**  data_move随路原子累加效果示意图
   ![](../../../figures/atomic_operation_pipelined_data_movement_diagram.png)
   ```
   **错误示例：**
@@ -222,7 +222,7 @@ description: |
 - [ ] 约束说明
 - [ ] 调用示例
 
-注：概述类索引文件除外，单个 API 文档应包含上述章节。
+注：overview类索引文件除外，单个 API 文档应包含上述章节。
 
 ### 11. 术语规范
 检查文档中是否使用了非标准术语，遇到可疑短语（与术语类似的缩写/简写）应提出警示。
@@ -250,7 +250,7 @@ description: |
 - ✅ Ascend 950PR / ❌ ascend 950PR
 - ✅ Ascend 950DT / ❌ ascend 950DT
 
-**数据通路写法**：
+**data_path写法**：
 - ✅ VECOUT->GM / ✅ UB->GM
 - ❌ VECOUT → GM（使用 `->` 而非 `→`）
 
@@ -267,7 +267,7 @@ description: |
 - [ ] 单个反引号包裹路径
 
 ### 14. 已变更接口检查
-- [ ] 先读取 `docs/zh/api/附录/接口变更说明.md`，从其中的接口变更表格获取最新的旧→新接口名映射关系。
+- [ ] 先读取 `docs/zh/api/appendix/interface_change_description.md`，从其中的接口变更表格获取最新的旧→新接口名映射关系。
 - [ ] 依据读取到的最新映射关系，检查文档中是否出现已废弃的旧接口名（代码块和调用示例中的也需要检查）。
 - [ ] 如果发现旧接口名，应提示用户替换为新接口名，报告中明确指出具体位置、旧名称和推荐的新名称。
 

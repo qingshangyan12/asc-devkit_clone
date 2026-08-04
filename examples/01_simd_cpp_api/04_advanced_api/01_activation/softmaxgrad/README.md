@@ -1,6 +1,6 @@
 # SoftmaxGrad样例
 
-## 概述
+## overview
 
 本样例在神经网络反向传播场景下，基于 `SoftmaxGrad` 或 `SoftmaxGradFront` 高阶 API 实现 softmax 梯度计算。
 

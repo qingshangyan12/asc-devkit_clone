@@ -1,8 +1,8 @@
 # LayerNormV2样例
 
-## 概述
+## overview
 
-本样例基于Kernel直调样例工程，介绍了在一个核函数中连续调用LayerNorm和Normalize高阶API，实现对输入tensor按行做归一化计算，并对比两种API的输出结果。
+本样例基于Kernel直调样例工程，介绍了在一个核函数中连续调用LayerNorm和Normalizehigh_level_api，实现对输入tensor按行做归一化计算，并对比两种API的输出结果。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -27,7 +27,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例在一个核函数中依次调用LayerNorm和Normalize高阶API，两者配合使用实现完整的归一化计算。LayerNorm计算均值mean和标准差倒数rstd，然后根据rstd计算方差var，公式：
+  本样例在一个核函数中依次调用LayerNorm和Normalizehigh_level_api，两者配合使用实现完整的归一化计算。LayerNorm计算均值mean和标准差倒数rstd，然后根据rstd计算方差var，公式：
   $$
   var = 1/(rstd*rstd) - \epsilon
   $$
@@ -57,7 +57,7 @@
   </table>
 
 - 样例实现：  
-  本样例使用 **AR格式**（shape为[A, R]），在一个核函数中依次调用LayerNorm和Normalize高阶API进行归一化计算。A为批处理轴，R为归一化轴。详细说明请参考 LayerNorm API文档和Normalize API文档。
+  本样例使用 **AR格式**（shape为[A, R]），在一个核函数中依次调用LayerNorm和Normalizehigh_level_api进行归一化计算。A为批处理轴，R为归一化轴。详细说明请参考 LayerNorm API文档和Normalize API文档。
 
   - Kernel实现
 

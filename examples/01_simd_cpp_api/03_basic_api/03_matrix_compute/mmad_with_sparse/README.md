@@ -1,8 +1,8 @@
 # mmad_with_sparse样例
 
-## 概述
+## overview
 
-本样例介绍基础API MmadWithSparse调用样例。
+本样例介绍basic_api MmadWithSparse调用样例。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -27,7 +27,7 @@
 ## 样例描述
 
 - 样例功能：
-  本样例中实现的是[m, n, k]固定为[128, 128, 64]的稀疏矩阵乘，使用Ascend C基础API MmadWithSparse接口实现。4选2 sparseMatmul是一种特殊的矩阵乘，要求一个连续的4个权重或激活值的组中，最多只有2个值为非零，其余2个强制为零，数学表达式为：
+  本样例中实现的是[m, n, k]固定为[128, 128, 64]的稀疏矩阵乘，使用Ascend Cbasic_api MmadWithSparse接口实现。4选2 sparseMatmul是一种特殊的矩阵乘，要求一个连续的4个权重或激活值的组中，最多只有2个值为非零，其余2个强制为零，数学表达式为：
 
   ```
   C = A * B
@@ -49,7 +49,7 @@
 
 - 样例实现：
   样例实现分为以下阶段：
-  - **CopyIn**：将Global Memory上的输入数据搬运到Local Memory L1中，并将索引矩阵加载到L1中，其中Index分形与B矩阵分形必须为Zn分形，即GM上的B矩阵必须为转置，Index离线生成必须为Zn排布
+  - **CopyIn**：将Global Memory上的输入data_move到Local Memory L1中，并将索引矩阵加载到L1中，其中Index分形与B矩阵分形必须为Zn分形，即GM上的B矩阵必须为转置，Index离线生成必须为Zn排布
   - **SplitB**：使用LoadDataWithSparse将B矩阵和索引矩阵从L1搬运到L0B与内置索引buffer中
   - **SplitA**：将A矩阵从L1搬运到L0A中
   - **Compute**：使用MmadWithSparse完成稀疏矩阵乘运算，计算结果存储在Local Memory L0C中
@@ -74,7 +74,7 @@
   cmake ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
@@ -110,7 +110,7 @@
 3. **索引矩阵生成**:
    - 生成index_matrix：记录每个块中被选中元素的相对位置（用于NPU计算）
    - 生成index_mask_matrix：记录被选中元素的绝对索引（用于golden计算）
-4. **生成golden数据**：使用稠密化后的矩阵和索引矩阵计算稀疏矩阵乘的真值
+4. **生成golden数据**：使用稠密化后的矩阵和索引cube_compute稀疏矩阵乘的真值
 5. **数据格式转换**:
    - 将索引矩阵从uint8转换为uint2格式
    - 对输入矩阵进行ND到NZ的分格转置

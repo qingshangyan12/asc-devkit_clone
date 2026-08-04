@@ -1,6 +1,6 @@
 # muls样例
 
-## 概述
+## overview
 本样例基于C API编程接口实现Muls运算，主要调用[asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_mul_scalar.md)接口。
 - asc_add_scalar/asc_max_scalar/asc_min_scalar接口皆可参考该样例
 

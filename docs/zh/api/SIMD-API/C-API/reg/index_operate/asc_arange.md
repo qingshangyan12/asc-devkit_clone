@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-以传入的value为起始值，生成递增/递减的索引，并将生成的索引保存在dst中。算法逻辑表示如下：
+以传入的value为起始值，生成递增/递减的索引，并将生成的索引保存在dst中。algorithms逻辑表示如下：
 ```cpp
 // 递增
 {value, value + 1, value + 2, ... value + VL_T - 2, value + VL_T - 1}

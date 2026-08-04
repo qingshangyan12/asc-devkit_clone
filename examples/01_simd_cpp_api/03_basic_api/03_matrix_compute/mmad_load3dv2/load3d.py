@@ -298,7 +298,7 @@ def move_to_l0a(
     en_transpose: bool,
 ) -> np.ndarray:
     """
-    数据搬运到L0A
+    data_move到L0A
 
     Args:
         dst: 目标数组
@@ -359,7 +359,7 @@ def move_to_l0b(
     en_transpose: bool,
 ) -> np.ndarray:
     """
-    数据搬运到L0B
+    data_move到L0B
 
     Args:
         dst: 目标数组

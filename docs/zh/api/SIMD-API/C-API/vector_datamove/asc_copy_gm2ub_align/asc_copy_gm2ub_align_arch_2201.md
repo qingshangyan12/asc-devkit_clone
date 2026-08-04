@@ -28,25 +28,25 @@
 
 提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer (UB)，并支持8位/16位/32位数据类型搬运。
 
-本接口支持以下两种数据搬运方式：
+本接口支持以下两种data_move方式：
 
-- 前n个数据搬运
+- 前n个data_move
 
     若搬运数据长度非32字节对齐，搬运数据会补齐至32字节对齐，支持以下两种填充方式：
 
     - 手动填充：搬运前调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)配置填充值。
     - 自动填充：不调用`asc_set_copy_pad_val`时，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。
 
-- 高维切分搬运
+- high_dim_split搬运
 
-    高维切分搬运采用Normal模式。若`len_burst`指定的单个数据块长度非32字节对齐，则`n_burst`指定的每个数据块都会分别补齐至32字节对齐。非32字节对齐场景支持以下两种填充方式：
+    high_dim_split搬运采用Normal模式。若`len_burst`指定的单个数据块长度非32字节对齐，则`n_burst`指定的每个数据块都会分别补齐至32字节对齐。非32字节对齐场景支持以下两种填充方式：
 
     - 手动填充：搬运前调用`asc_set_copy_pad_val`设置填充值。
     - 自动填充：不调用`asc_set_copy_pad_val`时，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。
 
 ## 函数原型
 
-- 前n个数据搬运
+- 前n个data_move
 
     ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
@@ -60,7 +60,7 @@
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ float* dst, __gm__ float* src, uint32_t size)
     ```
 
-- 高维切分搬运
+- high_dim_split搬运
 
     ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -114,7 +114,7 @@ PIPE_MTE2
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 当`n_burst`、`len_burst`中任意一个值为0时，该接口被视为NOP（空操作）。
 - 当`size`值为0时，该接口被视为NOP（空操作）。
 - 如果需要执行多条`asc_copy_gm2ub_align`指令，且`asc_copy_gm2ub_align`指令的目的地址存在重叠，需要插入同步指令，保证多个`asc_copy_gm2ub_align`指令的串行化，防止出现异常数据。

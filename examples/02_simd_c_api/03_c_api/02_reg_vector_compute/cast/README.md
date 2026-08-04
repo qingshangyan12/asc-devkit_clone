@@ -1,9 +1,9 @@
 ﻿# cast样例
 
-## 概述
-本样例基于C API编程接口实现Cast运算，主要调用[asc_half2int32_rd](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_type_convert/asc_half2int32.md)/asc_float2int16_rna_sat接口实现数据类型转换。  
-本样例支持两种数据类型转换场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
-  | SCENARIO_NUM | 数据类型转换 |
+## overview
+本样例基于C API编程接口实现Cast运算，主要调用[asc_half2int32_rd](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_type_convert/asc_half2int32.md)/asc_float2int16_rna_sat接口实现data_type_conversion。  
+本样例支持两种data_type_conversion场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+  | SCENARIO_NUM | data_type_conversion |
   | --- | --- |
   | 1 | 数据类型位宽小转大，以half转int32_t为例 |
   | 2 | 数据类型位宽大转小，以float转int16_t为例 |
@@ -28,10 +28,10 @@
 ```
 
 ## 样例描述
-本样例对输入向量做数据类型转换。当输入输出的数据类型的位宽不同时，asc_half2int32_rd/asc_float2int16_rna_sat接口会间隔地读取或写入，所以本样例在数据搬入或搬出时会使用相应的压缩或解压缩模式，asc_loadalign/asc_storealign接口的使用仅供参考，具体说明如下：
+本样例对输入向量做data_type_conversion。当输入输出的数据类型的位宽不同时，asc_half2int32_rd/asc_float2int16_rna_sat接口会间隔地读取或写入，所以本样例在数据搬入或搬出时会使用相应的压缩或解压缩模式，asc_loadalign/asc_storealign接口的使用仅供参考，具体说明如下：
 
 **场景1：数据类型位宽小转大**
-- 样例功能：将half类型的数据转换成int32_t类型的数据。
+- 样例功能：将half_type的数据转换成int32_t类型的数据。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -44,7 +44,7 @@
 - 样例实现：  
   cast_vf函数内从half到int32_t的asc_half2int32_rd接口每次处理64个数据，具体流程和示意图如下：
   - 搬入：调用asc_loadalign_unpack接口，使用解压缩模式，搬入数据至2\*N位置，同时2\*N+1位置置0
-  - 计算：调用asc_half2int32_rd接口，输入输出位宽比为1:2，所以从矢量数据寄存器x的2\*N位置读取数据，类型转换后依次写入至矢量数据寄存器y
+  - 计算：调用asc_half2int32_rd接口，输入输出位宽比为1:2，所以从矢量数据寄存器x的2\*N位置读取数据，type_conversion后依次写入至矢量数据寄存器y
   - 搬出：调用asc_storealign接口，常规搬出
   - 调用实现：使用内核调用符<<<>>>调用核函数。  
   <img src="figures/cast1.png">
@@ -63,7 +63,7 @@
 - 样例实现：  
   cast_vf函数内从float到int16_t的asc_float2int16_rna_sat接口每次处理64个数据，具体流程和示意图如下：
   - 搬入：调用asc_loadalign接口，常规搬入
-  - 计算：调用asc_float2int16_rna_sat接口，输入输出位宽比为2:1，所以从矢量数据寄存器x依次读取数据，类型转换后依次写入至矢量数据寄存器y的2\*N位置，同时2\*N+1位置置0
+  - 计算：调用asc_float2int16_rna_sat接口，输入输出位宽比为2:1，所以从矢量数据寄存器x依次读取数据，type_conversion后依次写入至矢量数据寄存器y的2\*N位置，同时2\*N+1位置置0
   - 搬出：调用asc_storealign_pack接口，采用压缩模式，仅搬出2\*N位置的数据
   - 调用实现：使用内核调用符<<<>>>调用核函数。  
   <img src="figures/cast2.png">

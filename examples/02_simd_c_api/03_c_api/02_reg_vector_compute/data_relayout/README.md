@@ -1,7 +1,7 @@
 # data_relayout样例
 
-## 概述
-本样例基于C API编程接口实现数据重排功能，主要调用[asc_intlv](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_rearrange/asc_intlv.md)/[asc_pack_to_low](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_compress/asc_pack_to_low.md)接口，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+## overview
+本样例基于C API编程接口实现data_reorder功能，主要调用[asc_intlv](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_rearrange/asc_intlv.md)/[asc_pack_to_low](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_compress/asc_pack_to_low.md)接口，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
     | SCENARIO_NUM | 重排场景 |
     | --- | --- |
     | 1 | Interleave（将两个uint16_t向量交织） |
@@ -27,7 +27,7 @@
 
 ## 样例描述
 - 样例功能：
-  演示数据重排类接口（Interleave/Pack）的用法，支持Interleave和Pack两种场景。
+  演示data_reorder类接口（Interleave/Pack）的用法，支持Interleave和Pack两种场景。
 
   **场景1：Interleave模式**
   - 两个uint16_t向量（各128个元素）交织，输出两个uint16_t向量

@@ -1,7 +1,7 @@
 # SIMD与SIMT混合编程实现gather和adds计算
 
 
-## 概述
+## overview
 本样例基于SIMD和SIMT混合编程模式实现gather和adds计算，以SIMT编程方式实现离散内存访问操作gather，以SIMD编程方式实现连续内存访问操作adds。
 
 

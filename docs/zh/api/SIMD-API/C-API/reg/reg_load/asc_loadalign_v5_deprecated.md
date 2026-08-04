@@ -28,7 +28,7 @@
 
 **该接口已废弃，请使用[asc_loadalign_postupdate](asc_loadalign_postupdate.md)实现此功能。**
 
-对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口使用repeat stride模式。
+对齐data_move接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口使用repeat stride模式。
 
 ## 函数原型
 
@@ -81,9 +81,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_int4x2_t& dst, __ubu
 | src | 输入    | 源操作数（矢量）的起始地址。            |
 | block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
 | repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| mask | 输入 | 源操作数mask（mask寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和mask寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

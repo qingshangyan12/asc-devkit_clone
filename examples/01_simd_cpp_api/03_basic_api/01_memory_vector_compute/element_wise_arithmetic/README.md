@@ -1,8 +1,8 @@
 # ElementWiseArithmetic类样例
 
-## 概述
+## overview
 
-本样例基于LeakyRelu展示了基础算术类接口的使用方法。
+本样例基于LeakyRelu展示了basic_arithmetic类接口的使用方法。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -51,9 +51,9 @@
 - 样例实现：  
   本样例中实现的是固定shape为[4, 128]的LeakyRelu样例。
   - Kernel实现  
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
     - 调用LeakyRelu接口，对输入Tensor执行Leaky Relu操作
-    - 调用DataCopy基础API，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）
+    - 调用DataCopybasic_api，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -78,7 +78,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;             # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

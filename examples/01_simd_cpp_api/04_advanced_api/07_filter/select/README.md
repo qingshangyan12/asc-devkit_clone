@@ -1,8 +1,8 @@
 # Select样例
 
-## 概述
+## overview
 
-本样例基于Select高阶API实现条件选择功能，根据掩码mask从向量源操作数src0和标量源操作数src1中选择对应位置的元素输出。当mask值为1时选择标量源操作数src1的值，当mask值为0时选择向量源操作数src0对应位置的元素。
+本样例基于Selecthigh_level_api实现条件选择功能，根据maskmask从向量源操作数src0和标量源操作数src1中选择对应位置的元素输出。当mask值为1时选择标量源操作数src1的值，当mask值为0时选择向量源操作数src0对应位置的元素。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -27,7 +27,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例根据掩码mask相应位置的值，从源操作数src0和源操作数src1Scalar中选取元素得到dstTensor。当mask值为1时选择src1Scalar，当mask值为0时选择src0对应位置的元素。
+  本样例根据maskmask相应位置的值，从源操作数src0和源操作数src1Scalar中选取元素得到dstTensor。当mask值为1时选择src1Scalar，当mask值为0时选择src0对应位置的元素。
   
 - 样例规格：
   <table>
@@ -52,7 +52,7 @@
     本样例中实现的是固定shape输入src0[2, 32]、mask[2, 32]，输出dst[2, 32]的SelectCustom样例。src1Scalar为固定值1.234，数据类型为float。
 
   - Kernel实现:  
-    计算逻辑是：输入数据需要先搬运进片上存储，然后使用Select高阶API接口完成计算，再将结果搬出。
+    计算逻辑是：输入数据需要先搬运进片上存储，然后使用Selecthigh_level_api接口完成计算，再将结果搬出。
 
   - Tiling实现:  
     该样例的tiling实现流程如下：使用GetSelectMaxMinTmpSize接口计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度确定所需tiling参数，并将scalar类型的源操作数包含在tiling中传递到kernel侧。

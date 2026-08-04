@@ -1,6 +1,6 @@
 # Mmad MX样例
 
-## 概述
+## overview
 
 本样例介绍了输入为ND格式，A、B矩阵为FP4（fp4x2_e1m2_t、fp4x2_e2m1_t）和FP8（fp8_e4m3fn_t、fp8_e5m2_t）数据类型，量化系数矩阵scaleA、scaleB为fp8_e8m0_t数据类型，左矩阵和左量化系数矩阵不转置、右矩阵和右量化系数矩阵转置共 4 种带有量化功能的矩阵乘（简称：MX矩阵乘法）。
 
@@ -26,7 +26,7 @@
 
 ## 样例描述
 
-一次完整的MX矩阵乘法涉及的数据搬运过程包括：GM -> L1、L1 -> L0A / L0AMX / L0B / L0BMX、L1 -> BT（BiasTable Buffer）、L0C -> GM，其中不同存储单元的数据排布格式，如下表1所示：
+一次完整的MX矩阵乘法涉及的data_move过程包括：GM -> L1、L1 -> L0A / L0AMX / L0B / L0BMX、L1 -> BT（BiasTable Buffer）、L0C -> GM，其中不同存储单元的数据排布格式，如下表1所示：
 
 <a name="表1"></a>
 <table border="2" align="center">
@@ -99,7 +99,7 @@ MX矩阵乘法计算公式：$$ C = (ScaleA ⊗ A) x (ScaleB ⊗ B) + Bias $$
     <td>fp8_e8m0_t</td>
     <td>float</td>
     <td>float</td>
-    <td>带Bias，矩阵计算时不传入biasTensor，C矩阵的初始值来源于C2（BiasTable Buffer），<br>从C2的起始位置0开始读取</td>
+    <td>带Bias，cube_compute时不传入biasTensor，C矩阵的初始值来源于C2（BiasTable Buffer），<br>从C2的起始位置0开始读取</td>
   </tr>
   <tr>
     <td>3</td>
@@ -119,7 +119,7 @@ MX矩阵乘法计算公式：$$ C = (ScaleA ⊗ A) x (ScaleB ⊗ B) + Bias $$
     <td>fp8_e8m0_t</td>
     <td>float</td>
     <td>float</td>
-    <td>带Bias，矩阵计算时传入biasTensor，C矩阵初始值来源于传入的biasTensor，<br>从传入biasTensor的起始位置开始读取</td>
+    <td>带Bias，cube_compute时传入biasTensor，C矩阵初始值来源于传入的biasTensor，<br>从传入biasTensor的起始位置开始读取</td>
   </tr>
 </table>
 
@@ -190,7 +190,7 @@ MX矩阵乘法计算公式：$$ C = (ScaleA ⊗ A) x (ScaleB ⊗ B) + Bias $$
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

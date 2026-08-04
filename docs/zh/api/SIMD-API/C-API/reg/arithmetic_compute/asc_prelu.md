@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-该接口用于实现PReLU（Parametric ReLU）激活函数：源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。计算公式如下：
+该接口用于实现PReLU（Parametric ReLU）activation_functions：源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。计算公式如下：
 
 $$
 dst_i = (src0_i > 0) ? src0_i : src0_i * src1_i
@@ -48,9 +48,9 @@ __simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vect
 | dst | 输出 | 目的操作数（矢量数据寄存器）。|
 | src0 | 输入 | 源操作数（矢量数据寄存器）。|
 | src1 | 输入 | 源操作数（矢量数据寄存器）。|
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| mask | 输入 | 源操作数mask（mask寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和mask寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

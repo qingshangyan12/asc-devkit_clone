@@ -1,6 +1,6 @@
 # scatter_st_reg样例
 
-## 概述
+## overview
 本样例基于Reg编程接口实现离散数据搬出功能（按元素分散到UB(Unified Buffer)），使用Scatter接口。
 
 ## 本样例支持的产品及CANN软件版本

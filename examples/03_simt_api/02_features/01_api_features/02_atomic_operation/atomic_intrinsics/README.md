@@ -1,8 +1,8 @@
-# 原子操作接口使用样例
+# atomic_operations接口使用样例
 
-## 概述
+## overview
 
-本样例展示了Ascend C SIMT原子操作接口的用法。
+本样例展示了Ascend C SIMTatomic_operations接口的用法。
 
 ## 支持的产品
 
@@ -22,12 +22,12 @@
 
 ## 样例描述
 
-- 样例功能：在核函数中调用Ascend C SIMT提供的原子操作接口，对`output_data`数组的11个元素分别执行加法、减法、交换、比较交换、自增、自减、按位与、按位或、按位异或等原子操作，结果分别存放在`output_data`数组的11个元素中。
+- 样例功能：在核函数中调用Ascend C SIMT提供的atomic_operations接口，对`output_data`数组的11个元素分别执行加法、减法、交换、比较交换、自增、自减、按位与、按位或、按位异或等atomic_operations，结果分别存放在`output_data`数组的11个元素中。
 
 - 计算过程：
 
   - 核函数启动`64`个线程块，每块`256`个线程，共`16384`个线程
-  - 每个线程按全局线程号`tid`，对长度为`11`的`output_data`数组各元素执行一次原子操作
+  - 每个线程按全局线程号`tid`，对长度为`11`的`output_data`数组各元素执行一次atomic_operations
   - Host侧在核函数执行完毕后，将结果拷回并与CPU参考实现逐项比对
 
 - 样例规格：
@@ -42,7 +42,7 @@
 
 ## 样例实现
 
-核函数`atomic_intrinsics_kernel`中，每个线程对`output_data`数组的11个元素各执行一次原子操作，不同索引的元素对应不同的原子操作，对应关系如下表所示：
+核函数`atomic_intrinsics_kernel`中，每个线程对`output_data`数组的11个元素各执行一次atomic_operations，不同索引的元素对应不同的atomic_operations，对应关系如下表所示：
 
 | 数组索引 | 接口 |
 | :--: | :-- |
@@ -106,7 +106,7 @@ __global__ void atomic_intrinsics_kernel(int* output_data)
   | ------------------------- | ---------- | ---------------------------------------------------------- |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
 
-  执行结果如下，说明原子操作校验成功。
+  执行结果如下，说明atomic_operations校验成功。
 
   ```text
   Atomic Intrinsics Example starting...

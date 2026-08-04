@@ -78,7 +78,7 @@ The Getting Started Tutorial is the **zero-to-one entry point** for developers n
 |--------------------|---------------------------------------|-----------------|
 | `入门教程/` | Programming Model / Overview | Overview & learning path |
 | `环境准备.md` | Compilation & Execution | Quick environment setup; detailed compilation instructions link to Programming Guide |
-| `快速入门/异构系统与编程模型.md` | Programming Model / Heterogeneous System + Programming Model / Overview | Entry-level concepts + SIMD/SIMT selection; in-depth links to Programming Guide |
+| `快速入门/异构系统与programming_model.md` | Programming Model / Heterogeneous System + Programming Model / Overview | Entry-level concepts + SIMD/SIMT selection; in-depth links to Programming Guide |
 | `快速入门/基于SIMD编程/` | Programming Model / AI-Core-SIMD | HelloWorld + Add operator quick start |
 | `快速入门/基于SIMT编程/` | Programming Model / AI-Core-SIMT | HelloWorld + Gather operator quick start |
 

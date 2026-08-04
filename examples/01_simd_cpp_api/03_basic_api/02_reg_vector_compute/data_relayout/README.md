@@ -1,7 +1,7 @@
 # data_relayout样例
 
-## 概述
-本样例基于Reg编程接口实现数据重排功能，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+## overview
+本样例基于Reg编程接口实现data_reorder功能，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
     <table>
  	  	 	<tr>
         <td>SCENARIO_NUM</td>
@@ -36,7 +36,7 @@
 
 ## 样例描述
 - 样例功能：
-  演示数据重排类接口（Interleave/Pack）的用法，支持Interleave和Pack两种场景。
+  演示data_reorder类接口（Interleave/Pack）的用法，支持Interleave和Pack两种场景。
 
   **场景1：Interleave模式**
   - 两个uint16_t向量（各128个元素）交织，输出两个uint16_t向量

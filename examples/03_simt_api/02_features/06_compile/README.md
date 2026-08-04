@@ -1,6 +1,6 @@
 # Compile样例介绍
 
-## 概述
+## overview
 
 基于Ascend C SIMT的编译样例，展示SIMT编程的各类编译模式。
 

@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的尾块场景。
+reg计算data_move接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的尾块场景。
 
 需要先调用下列接口之一后，再调用本接口。
 - [asc_storeunalign](asc_storeunalign.md)接口。
@@ -151,7 +151,7 @@ PIPE_V
 
 - 该接口中的dst不需要32B对齐，但数据类型为T的dst需要sizeof(T) Byte对齐。
 - 调用本接口之前，需要调用[asc_storeunalign](asc_storeunalign.md)接口，或者[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)接口，且本接口与前序接口的非对齐寄存器要保持一致。
-- 需要保证目的操作数的地址加上offset对应的偏移地址，结果等于数据搬运的结束地址，具体见调用示例。
+- 需要保证目的操作数的地址加上offset对应的偏移地址，结果等于data_move的结束地址，具体见调用示例。
 
 ## 调用示例
 

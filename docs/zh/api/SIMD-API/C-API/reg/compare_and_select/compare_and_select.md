@@ -1,4 +1,4 @@
-# 比较与选择
+# compare_and_select
 
 -   **[asc_eq](asc_eq.md)**
 

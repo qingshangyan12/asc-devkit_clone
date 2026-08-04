@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-用于设置Mmad计算开启FP32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据在参与Mmad计算之前不做舍入处理。
+用于设置mmad_compute开启FP32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据在参与mmad_compute之前不做舍入处理。
 
 ## 函数原型
 

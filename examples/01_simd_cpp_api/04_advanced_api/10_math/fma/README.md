@@ -1,8 +1,8 @@
 # Fma样例
 
-## 概述
+## overview
 
-本样例基于Fma高阶API实现按元素计算两个输入相乘后与第三个输入相加的功能。
+本样例基于Fmahigh_level_api实现按元素计算两个输入相乘后与第三个输入相加的功能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -56,11 +56,11 @@
 
   - Kernel实现
 
-    使用Fma高阶API计算 src0 * src1 + src2，可选择使用临时buffer
+    使用Fmahigh_level_api计算 src0 * src1 + src2，可选择使用临时buffer
 
   - Tiling实现
 
-    Host侧通过GetFmaMaxMinTmpSize获取Fma接口计算所需的最大和最小临时空间。
+    Host侧通过GetFmaMaxMinTmpSize获取Fma_interface计算所需的最大和最小临时空间。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

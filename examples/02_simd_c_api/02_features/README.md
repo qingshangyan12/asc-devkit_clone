@@ -1,6 +1,6 @@
 # Features样例介绍
  
-## 概述
+## overview
  
 基于Ascend C特性样例，介绍了Framework、C_API等特性编写算子样例的实现方法。
  

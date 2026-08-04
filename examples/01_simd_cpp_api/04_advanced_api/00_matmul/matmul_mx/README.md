@@ -1,6 +1,6 @@
 # Mx Matmul直调样例
 
-## 概述
+## overview
 
 在MXFP4/MXFP8数据格式下的带有量化系数的矩阵乘法，即MxMatmul样例。计算公式为：C = (scaleA ⊗ A) * (scaleB ⊗ B) + Bias。“⊗”表示广播乘法。  
 当K整除32向上取整的值为奇数时，scaleK的取值需要在该值的基础上向上对齐为偶数，scaleA和scaleB矩阵也要做对应的扩展。
@@ -96,7 +96,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;             # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

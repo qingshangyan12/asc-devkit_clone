@@ -1,8 +1,8 @@
 # AICPU样例介绍
 
-## 概述
+## overview
 
-本样例介绍了使用AI CPU算子进行Tiling下沉计算的实现方法。
+本样例介绍了使用AI CPU算子进行Tiling_sink计算的实现方法。
 
 ## 样例列表
 

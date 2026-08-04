@@ -137,7 +137,7 @@ def gen_golden_data(scenarioNum=1):
         golden = golden.reshape(1, dst_cols)
 
     elif scenarioNum == 6:
-        # 场景6：五维数据搬运 [2, 4, 3, 128, 126]int8 -> [512, 128]int8
+        # 场景6：五维data_move [2, 4, 3, 128, 126]int8 -> [512, 128]int8
         # 搬运 [2, 2, 2, 64, 126]，补2个0 -> [2, 2, 2, 64, 128]
         # Normal mode，loop mode
 

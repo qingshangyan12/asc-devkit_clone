@@ -1,7 +1,7 @@
-# 矩阵乘法中LoadDataWithStride数据搬运示例
+# 矩阵乘法中LoadDataWithStridedata_move示例
 
 
-## 概述
+## overview
 
 本样例介绍LoadDataWithStride指令在矩阵乘法中的使用场景和方法。配合SetLoadDataRepeatWithStride可以将二维的A、B矩阵从L1搬运到L0A/L0B，其中 A 和 B 分别表示矩阵乘法的左右输入矩阵。
 
@@ -46,7 +46,7 @@ LoadDataWithStride指令对于二维矩阵的转置能力和支持的数据类�
 | 5 | float | 不转置 | 不转置 |
 | 6 | float | 转置 | 不转置 |
 
-### 使用LoadDataWithStride完成矩阵计算所需2D格式数据的搬运
+### 使用LoadDataWithStride完成cube_compute所需2D格式数据的搬运
 
 LoadDataWithStride本质上是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。
 根据`LoadDataWithStride`指令完成img2col的过程，可知当N=1, filterW/H=1, padding=0, strideW/H=1, dilation=1时，可用于2D矩阵搬运，示意图如下所示：
@@ -59,17 +59,17 @@ LoadDataWithStride本质上是用于将NC1HWC0格式的Feature Map完成Image to
 以左矩阵为例，如下代码所示：此时l1W = CeilAlign(m, BLOCK_CUBE)，对应对应L1上左矩阵的M，channelSize = CeilAlign(k, c0Size)对应对应L1上左矩阵的K。
 
 ```cpp
-// LoadData3DParamsV2: 描述L1到L0的数据搬运参数（2D数据搬运）
+// LoadData3DParamsV2: 描述L1到L0的data_move参数（2Ddata_move）
 AscendC::LoadData3DParamsV2<T> loadDataParams;
-loadDataParams.l1H = 1;                               // 源操作数height，2D数据搬运固定为1
+loadDataParams.l1H = 1;                               // 源操作数height，2Ddata_move固定为1
 loadDataParams.l1W = CeilAlign(m, BLOCK_CUBE);        // 源操作数width，对应矩阵M
 loadDataParams.channelSize = CeilAlign(k, c0Size);    // 通道数，对应矩阵K
 loadDataParams.kExtension = CeilAlign(k, c0Size);     // 目的操作数width维度传输长度（K方向）
 loadDataParams.mExtension = CeilAlign(m, BLOCK_CUBE); // 目的操作数height维度传输长度（M方向）
-loadDataParams.strideW = 1;                           // 卷积核W方向滑动步长，2D数据搬运固定为1
-loadDataParams.strideH = 1;                           // 卷积核H方向滑动步长，2D数据搬运固定为1
-loadDataParams.filterW = 1;                           // 卷积核width，2D数据搬运固定为1
-loadDataParams.filterH = 1;                           // 卷积核height，2D数据搬运固定为1
+loadDataParams.strideW = 1;                           // 卷积核W方向滑动步长，2Ddata_move固定为1
+loadDataParams.strideH = 1;                           // 卷积核H方向滑动步长，2Ddata_move固定为1
+loadDataParams.filterW = 1;                           // 卷积核width，2Ddata_move固定为1
+loadDataParams.filterH = 1;                           // 卷积核height，2Ddata_move固定为1
 loadDataParams.dilationFilterW = 1;                   // 卷积核W方向膨胀系数
 loadDataParams.dilationFilterH = 1;                   // 卷积核H方向膨胀系数
 loadDataParams.filterSizeW = false;                   // 是否扩展filterW（true时+256）
@@ -106,7 +106,7 @@ AscendC::LoadDataWithStride(a2Local, a1Local, loadDataParams);
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

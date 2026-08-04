@@ -1,6 +1,6 @@
 # Basic Compile 样例
 
-## 概述
+## overview
 
 本样例基于Add算子，演示了Host侧.cpp文件调用Host + Device混合.asc文件（含Kernel定义与<<<>>>内核调用）的基本编译流程。其中.asc文件的<<<>>>调用函数通过extern暴露给纯Host侧的.cpp。代码结构与调用关系如图 1 所示：
 

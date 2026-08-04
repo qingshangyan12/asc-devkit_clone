@@ -45,7 +45,7 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 核函数定义有以下几个约束：
 
 -   返回值类型必须是void；
--   入参支持指针类型（需使用\_\_gm\_\_修饰）和Ascend C内置数据类型；
+-   入参支持指针类型（需使用\_\_gm\_\_修饰）和Ascend Cbuiltin_data_types；
 -   指针参数必须是指向Global Memory上的内存地址，使用\_\_gm\_\_修饰。
 
 核函数的调用是通过<<<...\>\>\>核函数调用符在Host侧调用，语法如下：
@@ -65,7 +65,7 @@ kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 
 ## SIMT VF函数<a name="zh-cn_topic_0000002571578013_section1780955884616"></a>
 
-SIMT VF函数用于实现线程级并行计算任务，处理不规则访问和复杂控制逻辑，函数内可使用SIMT内置变量：threadIdx、blockIdx、blockDim、gridDim。函数定义示例如下：
+SIMT VF函数用于实现线程级并行计算任务，处理不规则访问和复杂控制逻辑，函数内可使用SIMTbuiltin_variables：threadIdx、blockIdx、blockDim、gridDim。函数定义示例如下：
 
 ```
 __simt_vf__ __launch_bounds__(MAX_THREAD_COUNT) inline void function_name(
@@ -85,7 +85,7 @@ SIMT VF函数定义中的关键修饰符说明如下：
 | `__gm__` | 内存空间修饰符，标识内存空间为GM |
 | `__ubuf__` | 内存空间修饰符，标识内存空间为UB |
 
-通过SIMT的[asc\_vf\_call](../../../../../api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md#asc-vf-call)接口在核函数或\_\_aicore\_\_函数中调用，调用示例如下：
+通过SIMT的[asc\_vf\_call](../../../../../api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config.md#asc-vf-call)接口在核函数或\_\_aicore\_\_函数中调用，调用示例如下：
 
 ```cpp
 uint32_t thread_num = 1024;
@@ -97,14 +97,14 @@ asc_vf_call<function_name>(dim3(thread_num), arg1, arg2, ...);
 
 SIMT VF函数有以下约束：
 
--   入参仅支持Ascend C的[内置数据类型](../../../语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
+-   入参仅支持Ascend C的[builtin_data_types](../../../语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
 -   不支持将核函数中局部变量的地址或引用传递给VF函数。
 -   函数返回类型必须是void。
 -   SIMT VF内只能调用\_\_simt\_callee\_\_函数或\_\_callee\_\_函数。
 
 ## \_\_simt\_callee\_\_子函数<a name="zh-cn_topic_0000002571578013_section4680126514"></a>
 
-\_\_simt\_callee\_\_子函数是SIMT VF函数内部调用的辅助函数，函数内部可以使用SIMT内置变量。定义示例如下：
+\_\_simt\_callee\_\_子函数是SIMT VF函数内部调用的辅助函数，函数内部可以使用SIMTbuiltin_variables。定义示例如下：
 
 ```
 __simt_callee__ return_type function_name(__gm__ type* gm_param, __ubuf__ type* ubuf_param, type scalar_param, ...);
@@ -118,6 +118,6 @@ return_type result = function_name(arg1, arg2, ...);
 
 该函数有以下约束：
 
--   入参仅支持Ascend C的[内置数据类型](../../../语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）和指针类型。
--   函数返回值只能是Ascend C的[内置数据类型](../../../语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
+-   入参仅支持Ascend C的[builtin_data_types](../../../语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）和指针类型。
+-   函数返回值只能是Ascend C的[builtin_data_types](../../../语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
 -   函数内只能调用\_\_simt\_callee\_\_函数或\_\_callee\_\_函数。

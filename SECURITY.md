@@ -29,7 +29,7 @@
 ## 漏洞机制说明
 [漏洞管理](https://gitcode.com/cann/community/blob/master/security/security.md)
 
-## 附录
+## appendix
 
 ### A-文件（夹）各场景权限管控推荐最大值
 

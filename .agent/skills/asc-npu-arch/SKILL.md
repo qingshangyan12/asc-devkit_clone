@@ -16,7 +16,7 @@ description: Ascend NPU 架构知识技能。触发：当用户需要确认芯�
 - 其他 AscendC skill 只保留场景特有的限制或约束，不再并行维护完整的芯片类型表、通用数据类型枚举和 dtype 大小表。
 - 当其他 skill 需要说明芯片范围、架构映射、低精度格式、通用基础 dtype 或 dtype 大小时，应显式引用本 skill 或 `references/npu-arch-guide.md`。
 
-## 架构代际概述
+## 架构代际overview
 
 | 概念 | 说明 |
 |-----|------|
@@ -55,7 +55,7 @@ description: Ascend NPU 架构知识技能。触发：当用户需要确认芯�
 
 ### 通用基础 dtype
 
-本节依据仓内 `docs/zh/api/context/内置数据类型.md` 维护 AscendC 内置 dtype 事实。脚本消费入口是 [`references/npu-arch-facts.json`](references/npu-arch-facts.json)，不要解析 Markdown 表格。
+本节依据仓内 `docs/zh/api/context/builtin_data_types.md` 维护 AscendC 内置 dtype 事实。脚本消费入口是 [`references/npu-arch-facts.json`](references/npu-arch-facts.json)，不要解析 Markdown 表格。
 
 下表是各 skill 在未遇到特定 API 约束时，应优先复用的通用基础 dtype 视图。这里的“可直接初始化”只表示通用 UT 模板可以安全构造样例数据，不表示任意 API 都支持该类型。
 
@@ -85,8 +85,8 @@ description: Ascend NPU 架构知识技能。触发：当用户需要确认芯�
 | 能力 | 说明 | API 生成关注点 |
 |-----|------|---------------|
 | Regbase 编程 | 直接操作寄存器的编程能力 | 仅在文档或已有代码明确支持时生成相关 API 分支 |
-| SIMT 编程 | 线程级并行编程模型 | 检查 `include/simt_api`、`impl/simt_api` 和目标芯片范围 |
-| 低精度格式 | FP8、FP4、INT4 等数据格式 | 检查 dtype 声明、类型转换和 UT 覆盖范围 |
+| SIMT 编程 | 线程级并行programming_model | 检查 `include/simt_api`、`impl/simt_api` 和目标芯片范围 |
+| 低精度格式 | FP8、FP4、INT4 等数据格式 | 检查 dtype 声明、type_conversion和 UT 覆盖范围 |
 
 ## API 生成使用规则
 

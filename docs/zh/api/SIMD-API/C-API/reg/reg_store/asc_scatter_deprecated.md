@@ -55,9 +55,9 @@ __simd_callee__ inline void asc_scatter(vector_float& src, __ubuf__ float* dst, 
 | src   | 输入 | 源操作数（矢量数据寄存器）。                                                           |
 | dst   | 输出 | 目的操作数（矢量）的起始地址。                                                          |
 | index | 输入 | 数据索引（矢量数据寄存器）。                                                          |
-| mask  | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
+| mask  | 输入 | 源操作数mask（mask寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
 
-掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+mask寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -76,7 +76,7 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-// dst为外部输入的指向UB内存空间的half类型的指针。
+// dst为外部输入的指向UB内存空间的half_type的指针。
 vector_half src;
 vector_uint16_t index;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);

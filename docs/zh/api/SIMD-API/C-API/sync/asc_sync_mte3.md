@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-针对PIPE_MTE3流水线执行同步操作。其作用是保证PIPE_MTE3流水线中前序指令（如UB到GM的数据搬运）全部完成后，PIPE_MTE2与PIPE_V流水线的后续指令才能开始执行。
+针对PIPE_MTE3流水线执行同步操作。其作用是保证PIPE_MTE3流水线中前序指令（如UB到GM的data_move）全部完成后，PIPE_MTE2与PIPE_V流水线的后续指令才能开始执行。
 
 ## 函数原型
 
@@ -76,6 +76,6 @@ asc_sync();
 
 asc_copy_ub2gm(dst_gm, dst, total_length * sizeof(float));
 
-// 同步操作：数据搬运操作（UB到GM，PIPE_MTE3流水）完成后才能启动后续操作。
+// 同步操作：data_move操作（UB到GM，PIPE_MTE3流水）完成后才能启动后续操作。
 asc_sync_mte3(0);
 ```

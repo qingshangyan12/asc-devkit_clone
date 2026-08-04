@@ -1,8 +1,8 @@
 # Sort样例
 
-## 概述
+## overview
 
-本样例在排序场景下，基于Sort高阶API对输入Tensor按照数值大小进行降序排序，同时保留原始索引信息。支持float类型数值和uint32_t类型索引的联合排序。
+本样例在排序场景下，基于Sorthigh_level_api对输入Tensor按照数值大小进行降序排序，同时保留原始索引信息。支持float类型数值和uint32_t类型索引的联合排序。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -51,7 +51,7 @@
     本样例中实现的是固定shape为输入srcLocalValue[1, 128]，[1, 128]，输出dstLocalValue[1, 128]，dstLocalIndex[1, 128]的Sort样例。
 
   - Kernel实现:  
-    计算逻辑是：输入数据需要先搬运进片上存储，然后使用Sort高阶API接口完成排序计算，再将结果搬出。
+    计算逻辑是：输入数据需要先搬运进片上存储，然后使用Sorthigh_level_api接口完成排序计算，再将结果搬出。
 
   - Tiling实现:  
     该样例的tiling实现流程如下：使用GetSortMaxMinTmpSize接口计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度确定所需tiling参数。

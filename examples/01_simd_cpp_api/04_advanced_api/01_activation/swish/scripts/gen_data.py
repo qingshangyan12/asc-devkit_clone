@@ -19,12 +19,12 @@ import numpy as np
 
 
 def swish(x, beta):
-    """Swish激活函数: y = x / (1 + exp(-beta * x))"""
+    """Swishactivation_functions: y = x / (1 + exp(-beta * x))"""
     return x / (1 + np.exp(-beta * x))
 
 
 def silu(x):
-    """Silu激活函数: y = x / (1 + exp(-x)), 即beta=1的Swish"""
+    """Siluactivation_functions: y = x / (1 + exp(-x)), 即beta=1的Swish"""
     return x / (1 + np.exp(-x))
 
 

@@ -1,8 +1,8 @@
 # 自定义算子tiling下沉图模式调用样例
 
-## 概述
+## overview
 
-本样例基于示例自定义算子工程，介绍了PyTorch图模式下调用自定义算子，并通过使能Tiling下沉到device侧执行，优化调度性能。
+本样例基于示例自定义算子工程，介绍了PyTorch图模式下调用自定义算子，并通过使能Tiling_sink到device侧执行，优化调度性能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -16,7 +16,7 @@
 
 ```
 ├── tiling_sink_programming
-│   ├── test_add_custom_tiling_sink.py   // PyTorch图模式下Tiling下沉调用测试脚本
+│   ├── test_add_custom_tiling_sink.py   // PyTorch图模式下Tiling_sink调用测试脚本
 │   └── README.md                        // 样例说明文档
 ```
 

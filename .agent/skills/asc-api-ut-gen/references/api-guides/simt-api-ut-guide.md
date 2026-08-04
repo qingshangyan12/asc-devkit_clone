@@ -1,8 +1,8 @@
 # SIMT API UT 生成指南
 
-## 1. API 概述
+## 1. API overview
 
-SIMT (Single Instruction Multiple Threads) API 是 AscendC 提供的 SIMT 编程模型接口，提供类似 CUDA 的线程级编程能力。
+SIMT (Single Instruction Multiple Threads) API 是 AscendC 提供的 SIMT programming_model接口，提供类似 CUDA 的线程级编程能力。
 
 ### 1.1 目录位置
 
@@ -27,7 +27,7 @@ SIMT (Single Instruction Multiple Threads) API 是 AscendC 提供的 SIMT 编程
 | API 类别 | 典型 API |
 |---------|---------|
 | 向量运算 | `vector_add`, `vector_mul` |
-| 归约操作 | `block_reduce`, `warp_reduce` |
+| reduction_operations | `block_reduce`, `warp_reduce` |
 | 同步操作 | `syncthreads`, `syncwarp` |
 | 内存操作 | `shared_memory_load`, `shared_memory_store` |
 
@@ -35,7 +35,7 @@ SIMT (Single Instruction Multiple Threads) API 是 AscendC 提供的 SIMT 编程
 
 ## 2. API 特点
 
-### 2.1 SIMT 编程模型
+### 2.1 SIMT programming_model
 
 SIMT API 提供类似 CUDA 的编程范式：
 
@@ -72,7 +72,7 @@ __device__ inline void simt_function(...) {
 
 | 特性 | SIMT API | membase API | regbase API |
 |------|---------|-------------|-------------|
-| 编程模型 | 线程级 | 向量级 | 寄存器级 |
+| programming_model | 线程级 | 向量级 | 寄存器级 |
 | 架构支持 | 仅 3510 | 所有架构 | 仅 3510 |
 | 并行方式 | SIMT | SIMD | SIMD |
 | 抽象层级 | 较低 | 较高 | 较低 |
@@ -122,7 +122,7 @@ extern "C" __global__ __aicore__ void kernel_simt_function(...) {
 
 ### 3.5 自动生成边界
 
-SIMT API 的函数族差异很大：有直接 host 侧断言的数学函数，也有依赖 thread/block
+SIMT API 的函数族差异很大：有直接 host 侧断言的math_functions，也有依赖 thread/block
 语义、同步和共享内存的设备函数。某个 family 的可执行模板在真实 UT 中验证前，
 通用生成器不得输出带 `TODO` 的 kernel、调用或校验骨架。
 

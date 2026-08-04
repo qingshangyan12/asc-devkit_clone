@@ -1,6 +1,6 @@
-# AI CPU算子Tiling下沉样例介绍
+# AI CPU算子Tiling_sink样例介绍
 
-## 概述
+## overview
 
 本样例介绍使用AI CPU算子进行tiling下沉计算。
 

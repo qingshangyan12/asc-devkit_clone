@@ -1,10 +1,10 @@
 # BitwiseAnd样例
 
-## 概述
+## overview
 
-本样例基于BitwiseAnd高阶API实现逐比特对两个输入进行与操作。
+本样例基于BitwiseAndhigh_level_api实现逐比特对两个输入进行与操作。
 
-> **接口提示：** 除本样例使用的 `BitwiseAnd` 接口外，Ascend C 还提供了以下逐比特运算高阶API接口：
+> **接口提示：** 除本样例使用的 `BitwiseAnd` 接口外，Ascend C 还提供了以下逐比特运算high_level_api接口：
 >
 > - **BitwiseNot**：逐比特非运算。
 > - **BitwiseOr**：逐比特或运算。
@@ -57,7 +57,7 @@
 
   - Kernel实现
 
-    使用BitwiseAnd高阶API接口完成逐比特与操作计算，然后将最终结果搬出到外部存储上。
+    使用BitwiseAndhigh_level_api接口完成逐比特与操作计算，然后将最终结果搬出到外部存储上。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

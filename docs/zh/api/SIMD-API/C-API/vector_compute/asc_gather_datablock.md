@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-- 高维切分计算
+- high_dim_split计算
 
   ```cpp
   __aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
@@ -69,7 +69,7 @@ PIPE_V
 - src_offset取值应保证src元素类型位宽对齐。
 - src加上src_offset偏移后的地址不能超出Unified Buffer (UB)大小数据的范围。
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 
 ## 调用示例
 

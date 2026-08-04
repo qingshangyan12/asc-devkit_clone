@@ -2,20 +2,20 @@
 
 ## 功能介绍<a name="zh-cn_topic_0000002299608693_section310824820358"></a>
 
-AIC和AIV独立运行机制，又称双主模式。在[分离模式](../../../../编程指南/高级编程/硬件实现/基本架构.md#li188191010204418)下，区别于MIX模式（包含矩阵计算和矢量计算）通过消息机制驱动AIC运行，双主模式为AIC和AIV独立运行代码，不依赖消息驱动，开启双主模式能够提高Matmul计算性能。默认情况下，双主模式不开启，需要通过MatmulConfig中的enableMixDualMaster参数开启。
+AIC和AIV独立运行机制，又称双主模式。在[分离模式](../../../../编程指南/高级编程/硬件实现/基本架构.md#li188191010204418)下，区别于MIX模式（包含cube_compute和矢量计算）通过消息机制驱动AIC运行，双主模式为AIC和AIV独立运行代码，不依赖消息驱动，开启双主模式能够提高Matmul计算性能。默认情况下，双主模式不开启，需要通过MatmulConfig中的enableMixDualMaster参数开启。
 
 ## 使用场景<a name="zh-cn_topic_0000002299608693_section118051016163613"></a>
 
-算子中的矩阵计算和矢量计算相关代码独立运行，不依赖消息驱动时，可以开启双主模式，以提高Matmul计算性能。
+算子中的cube_compute和矢量计算相关代码独立运行，不依赖消息驱动时，可以开启双主模式，以提高Matmul计算性能。
 
 ## 约束说明<a name="zh-cn_topic_0000002299608693_section14160134220363"></a>
 
--   该功能仅支持[Norm模板](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)和[MDL模板](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)。
+-   该功能仅支持[Norm模板](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/MatmulConfig.md)和[MDL模板](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/MatmulConfig.md)。
 -   算子核函数的类型为MIX，同时AIC核数 : AIV核数为1:1。
--   算子核函数的类型为MIX，同时AIC核数 : AIV核数为1:2，且A矩阵和B矩阵同时开启[IBSHARE](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul使用说明.md)参数。
+-   算子核函数的类型为MIX，同时AIC核数 : AIV核数为1:2，且A矩阵和B矩阵同时开启[IBSHARE](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/Matmul_usage.md)参数。
 -   同一算子中所有Matmul对象的该参数取值必须保持一致。
 -   A、B、Bias矩阵只支持从Global Memory输入。
--   获取矩阵计算结果只支持调用[IterateAll](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/IterateAll.md)接口输出到[GlobalTensor](../../../../../api/SIMD-API/基础API/数据结构/GlobalTensor/GlobalTensor.md)，即计算结果放置于Global Memory的地址，不能调用[GetTensorC](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/GetTensorC.md)等接口获取结果。
+-   获取cube_compute结果只支持调用[IterateAll](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/IterateAll.md)接口输出到[GlobalTensor](../../../../../api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor.md)，即计算结果放置于Global Memory的地址，不能调用[GetTensorC](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/GetTensorC.md)等接口获取结果。
 
 ## 调用示例<a name="zh-cn_topic_0000002299608693_section15486294368"></a>
 

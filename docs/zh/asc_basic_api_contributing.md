@@ -1,15 +1,15 @@
-# 基础API贡献指南
+# basic_api贡献指南
 
-## 概述
+## overview
 
-基础API是Ascend C编程框架中的指令级API层，直接封装昇腾AI处理器的硬件指令，采用C++语言风格的函数接口。基础API是高阶API的构建基础，开发者可以通过组合基础API实现复杂的算法逻辑。
+basic_api是Ascend C编程框架中的指令级API层，直接封装昇腾AI处理器的硬件指令，采用C++语言风格的函数接口。basic_api是high_level_api的构建基础，开发者可以通过组合basic_api实现复杂的algorithms逻辑。
 
-**基础API的核心特点：**
+**basic_api的核心特点：**
 
 - **指令级封装**：每个API对应一条或多条硬件指令
 - **LocalTensor抽象**：使用`LocalTensor<T>`类型操作内存
 - **模板化设计**：支持多种数据类型（half、float、int16_t、int32_t等）
-- **双层接口**：高维切分计算（精细控制）和 前n个数据计算（简化调用）
+- **双层接口**：high_dim_split计算（精细控制）和 前n个数据计算（简化调用）
 - **架构适配**：通过架构宏定义支持不同NPU架构
 
 ---
@@ -25,7 +25,7 @@
 ### API设计
 
 - 定义函数原型（使用LocalTensor）
-- 设计高维切分计算和前n个数据计算接口
+- 设计high_dim_split计算和前n个数据计算接口
 - 确定参数规范（mask、repeat、stride等）
 
 ### 实现开发
@@ -50,9 +50,9 @@
 
 ## API介绍
 
-### 高维切分计算 vs 前n个数据计算接口
+### high_dim_split计算 vs 前n个数据计算接口
 
-#### 高维切分计算（精细控制）
+#### high_dim_split计算（精细控制）
 
 ```cpp
 // 需要手动设置mask和repeat参数
@@ -97,21 +97,21 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 ```text
 asc-devkit/
 ├── include/
-│   └── basic_api/                    # 基础API头文件
+│   └── basic_api/                    # basic_api头文件
 │       ├── kernel_operator_common_intf.h        # 通用接口
 │       ├── kernel_operator_vec_binary_intf.h    # 矢量二元运算
 │       ├── kernel_operator_vec_unary_intf.h     # 矢量一元运算
-│       ├── kernel_operator_data_copy_intf.h     # 数据搬运
+│       ├── kernel_operator_data_copy_intf.h     # data_move
 │       ├── kernel_operator_fixpipe_intf.h       # Fixpipe
 │       ├── kernel_operator_mm_intf.h            # 矩阵乘法
 │       ├── kernel_operator_scalar_intf.h        # 标量运算
-│       ├── kernel_operator_sys_var_intf.h       # 系统变量
-│       ├── kernel_operator_atomic_intf.h        # 原子操作
+│       ├── kernel_operator_sys_var_intf.h       # system_variables
+│       ├── kernel_operator_atomic_intf.h        # atomic_operations
 │       ├── kernel_tensor.h                      # Tensor定义
 │       └── kernel_struct_*.h                    # 参数结构体
 │
 ├── impl/
-│   └── basic_api/                    # 基础API实现
+│   └── basic_api/                    # basic_api实现
 │       ├── dav_m200/                 # NPU ARCH 200x 架构
 │       │   ├── kernel_operator_vec_binary_impl.h
 │       │   └── ...
@@ -122,7 +122,7 @@ asc-devkit/
 │
 ├── tests/
 │   └── api/
-│       └── basic_api/                # 基础API测试
+│       └── basic_api/                # basic_api测试
 │           ├── tikcpp_case_common/
 │           │   └── test_operator_axpy.cpp
 │           ├── tikcpp_case_ascend910/
@@ -133,7 +133,7 @@ asc-devkit/
 └── docs/
     └── api/
         └── context/
-            └── ...              # 基础API文档
+            └── ...              # basic_api文档
 ```
 
 ### 文件命名规范
@@ -152,11 +152,11 @@ asc-devkit/
 | vec_binary | 矢量二元运算 | Add, Sub, Mul, Div, Max, Min |
 | vec_unary | 矢量一元运算 | Relu, Exp, Cast, Abs |
 | vec_reduce | 矢量归约 | Sum, Max, Mean |
-| data_copy | 数据搬运 | DataCopy, LoadData |
+| data_copy | data_move | DataCopy, LoadData |
 | fixpipe | 流水线控制 | Fixpipe |
 | mm | 矩阵乘法 | Mmad, Conv2D |
 | scalar | 标量运算 | ToFloat |
-| atomic | 原子操作 | AtomicAdd, AtomicCAS |
+| atomic | atomic_operations | AtomicAdd, AtomicCAS |
 
 ---
 
@@ -176,7 +176,7 @@ asc-devkit/
 
 namespace AscendC {
 
-// Add - 高维切分计算
+// Add - high_dim_split计算
 template <typename T, bool isSetMask = true>
 __aicore__ inline void Add(const LocalTensor<T>& dst,
                            const LocalTensor<T>& src0,
@@ -227,7 +227,7 @@ __aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
     }
 }
 
-// Add实现 - 高维切分计算
+// Add实现 - high_dim_split计算
 template <typename T, bool isSetMask = true>
 __aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
                                __ubuf__ T* src1, const uint64_t mask[],
@@ -266,7 +266,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
     AddImpl<T>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(), count);
 }
 
-// 高维切分计算接口封装
+// high_dim_split计算接口封装
 template <typename T, bool isSetMask = true>
 __aicore__ inline void Add(const LocalTensor<T>& dst,
                            const LocalTensor<T>& src0,
@@ -287,7 +287,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 
 ---
 
-## 开发示例：实现Axpy 基础API
+## 开发示例：实现Axpy basic_api
 
 ### API需求分析
 
@@ -299,7 +299,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 
 ### 查看现有API结构
 
-基础API使用`LocalTensor<T>`作为参数，前n个数据计算接口仅需count参数：
+basic_api使用`LocalTensor<T>`作为参数，前n个数据计算接口仅需count参数：
 
 ```cpp
 // 参考现有Add接口

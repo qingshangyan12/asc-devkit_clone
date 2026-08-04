@@ -1,6 +1,6 @@
 # Cast样例
 
-## 概述
+## overview
 
 本样例基于Cast实现源操作数和目的操作数Tensor的数据类型及精度转换。本样例实现half到int32_t、half到int4b_t两种场景下的转换。
 
@@ -55,9 +55,9 @@
   本样例中实现的是固定shape为输入x[1, 512]，输出y[1, 512]的CastCustom样例，支持half到int32_t和half到int4b_t两种转换场景。
 
   - Kernel实现  
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
-    - 调用Cast接口，进行数据类型转换（half转int32_t或half转int4b_t）
-    - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
+    - 调用Cast接口，进行data_type_conversion（half转int32_t或half转int4b_t）
+    - 调用DataCopybasic_api，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -83,7 +83,7 @@
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM  # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

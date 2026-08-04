@@ -1,8 +1,8 @@
 # Gelu类样例
 
-## 概述
+## overview
 
-本样例在激活函数场景下，基于Gelu高阶API对输入Tensor按元素做GELU（Gaussian Error Linear Unit）计算。本样例使用float数据类型，输入Tensor元素个数为32，完成Gelu样例计算。
+本样例在activation_functions场景下，基于Geluhigh_level_api对输入Tensor按元素做GELU（Gaussian Error Linear Unit）计算。本样例使用float数据类型，输入Tensor元素个数为32，完成Gelu样例计算。
 
 > **进阶接口提示：** 除本样例使用的 `Gelu` 接口外，Ascend C 还提供了以下进阶 GELU 接口，调用方式与 `Gelu` 一致，只需替换函数名即可切换：
 > - **FasterGelu**：GELU 的加速版本，适用于对性能要求更高的场景。将 `gelu.asc` 中 `AscendC::Gelu` 替换为 `AscendC::FasterGelu`。

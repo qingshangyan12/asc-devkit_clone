@@ -1,5 +1,5 @@
 # Matmul常量化样例
-## 概述
+## overview
 Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分或全部Tiling参数由变量转化为常数值，在样例执行时将使用常量化的Tiling参数。
 
 ## 本样例支持的产品及CANN软件版本
@@ -88,7 +88,7 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
         ```
 
   - Tiling关键步骤
-      - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数，由于常量化Tiling，在Tiling中只需要实现分核的操作即可。用户可以通过多核Tiling接口，获取最优的多核切分策略。其他Tiling信息在Kernel侧通过常量化推导，Kernel侧不再需要运行时Tiling信息。
+      - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling_struct中的相关参数，由于常量化Tiling，在Tiling中只需要实现分核的操作即可。用户可以通过多核Tiling接口，获取最优的多核切分策略。其他Tiling信息在Kernel侧通过常量化推导，Kernel侧不再需要运行时Tiling信息。
 
 - 调用实现  
   使用内核调用符<<<>>>调用核函数。
@@ -111,7 +111,7 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py    # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

@@ -1,7 +1,7 @@
 # ND2NZ Bank 冲突调优样例
 
 
-## 概述
+## overview
 
 本样例以 `8192 × 8192` half ND 矩阵到全局紧凑 NZ 布局的转换为例，介绍UB 上向量写阶段的 bank 冲突如何产生、如何规避。整个调优过程分为两个步骤（case 1-2），通过调整 `dstNzC0Stride` 这一个参数对比性能。
 
@@ -533,7 +533,7 @@ $$
   cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行（使用编译时指定的case）
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU 调试 或 NPU 仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim`：
@@ -579,7 +579,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

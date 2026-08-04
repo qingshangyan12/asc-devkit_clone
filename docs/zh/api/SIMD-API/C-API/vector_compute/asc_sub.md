@@ -43,7 +43,7 @@ $$
   __aicore__ inline void asc_sub(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
   ```
 
-- 高维切分计算
+- high_dim_split计算
 
   ```cpp
   __aicore__ inline void asc_sub(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, 
@@ -97,7 +97,7 @@ PIPE_V
 ## 约束说明
 
 - dst、src0、src1的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 
 ## 调用示例
 

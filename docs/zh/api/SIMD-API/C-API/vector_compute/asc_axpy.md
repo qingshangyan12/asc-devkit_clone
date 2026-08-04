@@ -42,7 +42,7 @@ $$
   __aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
   ```
 
-- 高维切分计算
+- high_dim_split计算
 
   ```cpp
   __aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -67,7 +67,7 @@ $$
 | dst       | 输出    | 目的操作数（矢量）的起始地址。            |
 | src | 输入    | 源操作数（矢量）的起始地址。            |
 | value | 输入    | 源操作数（标量）。       |
-| count     | 输入    | 参与连续计算的元素个数。      |
+| count     | 输入    | 参与continuous_compute的元素个数。      |
 | repeat |输入| 迭代次数。 |
 | dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src_block_stride |输入| 源操作数单次迭代内不同DataBlock间地址步长。 |
@@ -85,7 +85,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 
 ## 调用示例

@@ -27,7 +27,7 @@
 
 ## 功能说明
 
-将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](./asc_set_deq_scale.md)接口设置量化参数。
+将int16_ttype_conversion为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](./asc_set_deq_scale.md)接口设置量化参数。
 
 - asc_deq_int162b8_h：将数据存放在每个DataBlock的高半块。
 - asc_deq_int162b8_l：将数据存放在每个DataBlock的低半块。
@@ -52,7 +52,7 @@ $$
     __aicore__ inline void asc_deq_int162b8_l(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count)
     ```
 
-- 高维切分计算
+- high_dim_split计算
 
     ```cpp
     __aicore__ inline void asc_deq_int162b8_h(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
@@ -96,7 +96,7 @@ PIPE_V
 ## 约束说明
 
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 
 ## 调用示例
 

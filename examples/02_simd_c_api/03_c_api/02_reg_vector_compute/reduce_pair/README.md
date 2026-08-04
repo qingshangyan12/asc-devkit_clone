@@ -1,6 +1,6 @@
 ﻿# reduce_pair样例
 
-## 概述
+## overview
 本样例基于C API编程接口实现PairReduceElem运算，主要调用[asc_pair_reduce_sum](../../../../../docs/zh/api/SIMD-API/C-API/reg/reduce_compute/asc_pair_reduce_sum.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
@@ -37,7 +37,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">reduce_pair_custom</td></tr>
   </table>
 - 样例实现：
-   reduce_pair_vf函数内调用asc_pair_reduce_sum接口进行归约计算：
+   reduce_pair_vf函数内调用asc_pair_reduce_sum接口进行reduction_compute：
    - 使用asc_loadalign加载数据到寄存器
    - 使用asc_pair_reduce_sum对相邻奇偶元素对求和
    - 使用asc_storealign将结果写回UB

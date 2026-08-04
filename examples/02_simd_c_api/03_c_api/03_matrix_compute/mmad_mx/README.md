@@ -1,6 +1,6 @@
 # Mmad MX 样例
 
-## 概述
+## overview
 
 本样例演示如何使用C API实现带量化功能的MX矩阵乘法。A、B矩阵使用FP4或FP8数据类型，量化系数矩阵ScaleA、ScaleB使用fp8_e8m0_t数据类型；A和ScaleA不转置，B和ScaleB转置。
 
@@ -36,7 +36,7 @@ $$ C = (ScaleA \otimes A) \times (ScaleB \otimes B) + Bias $$
 
 A、ScaleA、B、ScaleB、Bias、C矩阵的shape分别为[M, K]、[M, ScaleK]、[K, N]、[ScaleK, N]、[N]和[M, N]，其中`ScaleK = CeilAlign(CeilDiv(K, 32), 2)`。本样例使用[M, N, K] = [40, 50, 70]。
 
-一次完整计算包含以下数据搬运和计算阶段：
+一次完整计算包含以下data_move和计算阶段：
 
 1. 使用`asc_copy_gm2l1_nd2nz`将A、B和Bias从GM搬运到L1，使用`asc_copy_gm2l1_dn2nz`搬运ScaleA、ScaleB；
 2. 场景3使用`asc_fill_l1`将FP8数据在K轴上的额外补齐区域清零；
@@ -116,7 +116,7 @@ A、ScaleA、B、ScaleB、Bias、C矩阵的shape分别为[M, K]、[M, ScaleK]、
     <td>fp8_e8m0_t</td>
     <td>float</td>
     <td>float</td>
-    <td>带Bias，矩阵计算时不传入biasTensor，C矩阵的初始值来源于C2（BiasTable Buffer），<br>从C2的起始位置0开始读取</td>
+    <td>带Bias，cube_compute时不传入biasTensor，C矩阵的初始值来源于C2（BiasTable Buffer），<br>从C2的起始位置0开始读取</td>
   </tr>
   <tr>
     <td>3</td>
@@ -180,7 +180,7 @@ FP4和FP8数据在K轴上的存储宽度不同，GM到L1搬运后的补齐范围
 | `asc_mmad_mx`使用的K轴长度 | 128 | 128 |
 | 是否需要额外清零 | 不需要 | 需要将K轴的`[96, 128)`区域清零 |
 
-场景3中，GM到L1完成`K = 70`的数据搬运及其32字节粒度补齐后，L1中已初始化的K轴范围到96元素边界，而`asc_mmad_mx`会按照128个元素进行计算。样例分别对A和B调用`asc_fill_l1`，从K轴偏移96处开始，为每个对齐行写入一个32字节的全0数据块，从而清除`[96, 128)`区域。
+场景3中，GM到L1完成`K = 70`的data_move及其32字节粒度补齐后，L1中已初始化的K轴范围到96元素边界，而`asc_mmad_mx`会按照128个元素进行计算。样例分别对A和B调用`asc_fill_l1`，从K轴偏移96处开始，为每个对齐行写入一个32字节的全0数据块，从而清除`[96, 128)`区域。
 
 `asc_fill_l1`的目的地址按`uint16_t`寻址，起始偏移通过`AlignHeight * (CeilAlign(PACKED_K, 32) / 2)`计算。对于FP8场景，A和B的`AlignHeight`分别为`M_ALIGN = 48`和`N_ALIGN = 64`，所以起始偏移分别为2304和3072个`uint16_t`元素。两次清零的`repeat`分别设置为48和64，`blk_num = 1`、`dst_gap = 0`，连续覆盖每个对齐行对应的一个32字节数据块。清零完成后调用`asc_sync_pipe(PIPE_MTE1)`，确保写L1操作结束后再执行L1到L0A/L0B的搬运。
 

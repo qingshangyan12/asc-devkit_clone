@@ -1,4 +1,4 @@
-# 复合计算
+# composite_compute
 
 -   **[asc_abs_sub](asc_abs_sub.md)**
 

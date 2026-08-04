@@ -1,8 +1,8 @@
 # Dequant样例
 
-## 概述
+## overview
 
-本样例基于[AscendDequant](../../../../../docs/zh/api/SIMD-API/高阶API/量化操作/AscendDequant.md)高阶API实现反量化计算，用于将量化后的低精度数据恢复为高精度数据。样例展示了PER_CHANNEL场景（按通道量化）下，将int32_t类型输入数据乘以scale缩放因子，转换为float类型输出的过程。在950系列上兼容AscendDequant接口的前提下，推荐优先使用[Dequantize](../../../../../docs/zh/api/SIMD-API/高阶API/量化操作/Dequantize.md)接口，该接口可通过统一的结构体配置，适配各类量化场景。
+本样例基于[AscendDequant](../../../../../docs/zh/api/SIMD-API/high_level_api/quantization/AscendDequant.md)high_level_api实现反量化计算，用于将量化后的低精度数据恢复为高精度数据。样例展示了PER_CHANNEL场景（按通道量化）下，将int32_t类型输入数据乘以scale缩放因子，转换为float类型输出的过程。在950系列上兼容AscendDequant接口的前提下，推荐优先使用[Dequantize](../../../../../docs/zh/api/SIMD-API/high_level_api/quantization/Dequantize.md)接口，该接口可通过统一的结构体配置，适配各类量化场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -52,7 +52,7 @@
    本样例中实现的是固定shape输入为inputGm[128, 32], scaleGm[1，32]，输出为outputGm[128, 32]。按元素做反量化计算，将int32_t数据类型反量化为float等数据类型。
 
   - Kernel实现  
-    计算逻辑是： 本样例将输入数据搬运进片上存储，然后使用AscendDequant（A2/A3）或Dequantize（950系列）高阶API接口完成反量化计算，得到最终结果，再搬出外部存储上。
+    计算逻辑是： 本样例将输入data_move进片上存储，然后使用AscendDequant（A2/A3）或Dequantize（950系列）high_level_api接口完成反量化计算，得到最终结果，再搬出外部存储上。
 
   - Tiling实现  
     DequantCustom样例的tiling实现流程如下：首先获取AscendDequant或Dequantize接口能完成计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度dataLength确定所需tiling参数。

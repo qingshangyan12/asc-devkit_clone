@@ -1,7 +1,7 @@
 # pattern_transformation 兼容性样例
 
 
-## 概述
+## overview
 
 本样例基于基础的mmad样例，演示了 L1 Buffer -> L0A Buffer 通路的分形转换逻辑，通过编译时宏 `__NPU_ARCH__` 隔离不同硬件实现。
 
@@ -52,15 +52,15 @@
 
 ## 样例实现
 
-***图1 L0A不复用场景概览***
+***图1 L0A不复用场景overview***
 
 ![L0A不复用场景](./figures/普通兼容场景.png)
 
-图1 展示了 L0A 不复用场景下两种芯片的 L1→L0A 数据搬运差异：
+图1 展示了 L0A 不复用场景下两种芯片的 L1→L0A data_move差异：
 - Atlas A2/A3 系列：L0A 为 Zz 分形，需通过 LoadData（2D矩阵搬运） 完成 Nz→Zz 分形转换。
 - Ascend 950PR/Ascend 950DT：L0A 为 Nz 分形，与 L1 一致，无需分形转换，LoadData（2D矩阵搬运） 参数更简洁。
 
-***图2 L0A复用场景概览***
+***图2 L0A复用场景overview***
 
 ![L0A切分兼容场景](./figures/L0A切分兼容场景.png)
 

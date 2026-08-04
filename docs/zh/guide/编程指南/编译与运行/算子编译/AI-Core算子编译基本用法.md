@@ -114,9 +114,9 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | -O | 否 | 用于指定编译器的优化级别，当前支持-O3，-O2，-O0。 |
 | --run-mode=sim | 否 | sim模式：链接时用户添加仿真模式对应的实现库，实现代码在仿真模式下运行，可以查看仿真相关日志，方便用户性能调试。 |
 | --enable-simt | 否 | SIMT编程场景，指定SIMT方式编译。 |
-| --cce-disable-asc-reserved-ubuf | 否 | 禁用Ascend C接口使用预留UB空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。使用预留UB空间的API列表参考：[使用预留UB空间的API](../../编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md#使用预留ub空间的api范围)。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。 |
+| --cce-disable-asc-reserved-ubuf | 否 | 禁用Ascend C接口使用预留UB空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。使用预留UB空间的api_list参考：[使用预留UB空间的API](../../programming_model/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md#使用预留ub空间的api范围)。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。 |
 | --cce-disable-vf-stack-reserved-ubuf | 否 | 禁用SIMD VF栈预留的UB空间。开启后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用。针对 [NPU架构版本2201](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，此编译选项无实际效果；针对 [NPU架构版本3510](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，此编译选项生效，当用户使用此编译选项后，编译器将无法使用预留的UB空间进行寄存器溢出的缓存，需要用户保证寄存器不溢出。 |
-| --cce-auto-sync | 否 | 开启毕昇编译器自动同步。AI Core内部的执行单元是异步并行的，Tensor的读写可能存在数据依赖，开启后可由毕昇编译器自动插入部分同步。详细内容请参考[关键特性说明](../../../../api/SIMD-API/基础API/同步控制/核内同步/关键特性说明.md)。 |
+| --cce-auto-sync | 否 | 开启毕昇编译器自动同步。AI Core内部的执行单元是异步并行的，Tensor的读写可能存在数据依赖，开启后可由毕昇编译器自动插入部分同步。详细内容请参考[key_features](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/key_features.md)。 |
 | --cce-auto-sync-log=&lt;file&gt; | 否 | 输出毕昇编译器自动同步插入信息到&lt;file&gt;文件中。 |
 
 更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
@@ -229,7 +229,7 @@ add_executable(demo
 | CMAKE_ASC_COMPILER_AR | 静态库归档工具，默认使用系统ar工具。设置后，静态库的归档命令将使用该工具替代默认ar。 |
 | CMAKE_ASC_COMPILER_LINKER | 链接驱动，默认使用bisheng编译器作为链接驱动，仅在有明确替换需求时设置。 |
 | CMAKE_ASC_ENABLE_SIMT | 是否启用SIMT编译模式，设置为ON时在编译命令中自动注入--enable-simt选项，默认为OFF。 |
-| CMAKE_INSTALL_PREFIX | 为CMake的内置变量，用于指定CMake执行install命令时，安装的路径前缀。|
+| CMAKE_INSTALL_PREFIX | 为CMake的builtin_variables，用于指定CMake执行install命令时，安装的路径前缀。|
 
 >[!CAUTION]注意
 > 在CMake工程中，影响Ascend C语言初始化、编译器探测和编译规则生成的变量，
@@ -262,18 +262,18 @@ add_executable(demo
  <!-- end id8 -->
 
  <!-- npu="950" id11 -->
- -   **ENABLE\_CV\_COMM\_VIA\_SSBUF** 用于控制是否使用SSBuffer以及UB到L1 Buffer的硬通道，在涉及CV通信（AIC和AIV）或使用数据搬运API时需关注此选项。开启该选项可以提高相关API的性能或拓展使用更多功能。默认开关关闭；设置为true后，表示开关打开。示例如下：
+ -   **ENABLE\_CV\_COMM\_VIA\_SSBUF** 用于控制是否使用SSBuffer以及UB到L1 Buffer的硬通道，在涉及CV通信（AIC和AIV）或使用data_moveAPI时需关注此选项。开启该选项可以提高相关API的性能或拓展使用更多功能。默认开关关闭；设置为true后，表示开关打开。示例如下：
      ```shell
      bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DENABLE_CV_COMM_VIA_SSBUF=true
      ```
      仅在Ascend 950PR/Ascend 950DT支持该选项。
      -   从其它硬件平台移植到此平台的算子，开关默认关闭以保持兼容性。
-     -   在该平台新开发的算子，以下场景需要打开：使用矩阵计算Matmul高阶API，且使用SetTensorScaleA等接口，这些接口属于Ascend 950PR/Ascend 950DT新增的功能，其内部实现使用了SSBuffer；使用DataCopy接口从UB拷贝数据到L1 Buffer。
+     -   在该平台新开发的算子，以下场景需要打开：使用cube_computeMatmulhigh_level_api，且使用SetTensorScaleA等接口，这些接口属于Ascend 950PR/Ascend 950DT新增的功能，其内部实现使用了SSBuffer；使用DataCopy接口从UB拷贝数据到L1 Buffer。
  <!-- end id11 -->
 
  <!-- npu="950" id12 -->
  -   **NO\_OVERLAP\_IN\_MULTI\_REPEAT**
-  该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。
+  该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用basic_api的high_dim_split计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。
  <!-- end id12 -->
 
 
@@ -292,11 +292,11 @@ add_executable(demo
 | liberror_manager.so | CANN错误信息管理库。 |
 | libascendcl.so | acl相关接口库。 |
 
-### 高阶API常用链接库
-在使用高阶API时，必须链接以下库，因为这些库是高阶API功能所依赖的。在其他场景下，可以根据具体需求选择是否链接这些库。
+### high_level_api常用链接库
+在使用high_level_api时，必须链接以下库，因为这些库是high_level_api功能所依赖的。在其他场景下，可以根据具体需求选择是否链接这些库。
 |链接库名称|作用描述|使用场景|动态库路径|
 |--|--|--|--|
-|libtiling_api.a|Tiling函数相关库。|使用高阶API相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
-|libregister.so|Tiling函数相关库。|使用高阶API相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
-|libgraph_base.so|基础数据结构和接口库。|调用ge::Shape，ge::DataType等基础结构体时需要链接。|${ASCEND_HOME_PATH}/lib64|
+|libtiling_api.a|Tiling函数相关库。|使用high_level_api相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
+|libregister.so|Tiling函数相关库。|使用high_level_api相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
+|libgraph_base.so|基础data_structures和接口库。|调用ge::Shape，ge::DataType等基础结构体时需要链接。|${ASCEND_HOME_PATH}/lib64|
 |libplatform.so|硬件平台信息库。|使用PlatformAscendC相关硬件平台信息接口时需要链接。|${ASCEND_HOME_PATH}/lib64|

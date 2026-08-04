@@ -1,6 +1,6 @@
 # BestPractices样例介绍
 
-## 概述
+## overview
 
 基于Ascend C SIMT的算子开发实践，展示SIMT特性在实际算子开发中的运用。
 

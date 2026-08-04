@@ -1,6 +1,6 @@
 # Mmad GEMV样例
 
-## 概述
+## overview
 
 本样例介绍了GEMV（M=1）模式下的矩阵乘法。
 
@@ -28,9 +28,9 @@
 
 ## 样例描述
 
-GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N)的右矩阵B进行矩阵乘运算的场景。当M=1时，自动开启GEMV模式，仅在Ascend 950PR/Ascend 950DT上支持通过设置`mmadParams.disableGemv = true`关闭。本样例中通过编译参数`DISABLE_GEMV`选择是否关闭GEMV模式，0 代表开启GEMV，1 代表关闭。
+GEMV模式是指mmad_compute中M=1，形状为(1, K)的左矩阵A与形状为(K, N)的右矩阵B进行矩阵乘运算的场景。当M=1时，自动开启GEMV模式，仅在Ascend 950PR/Ascend 950DT上支持通过设置`mmadParams.disableGemv = true`关闭。本样例中通过编译参数`DISABLE_GEMV`选择是否关闭GEMV模式，0 代表开启GEMV，1 代表关闭。
 
-以M=1，K=256，N=32，左右矩阵数据类型为half为具体示例，说明GEMV模式、非GEMV模式下Mmad计算的过程。
+以M=1，K=256，N=32，左右矩阵数据类型为half为具体示例，说明GEMV模式、非GEMV模式下mmad_compute的过程。
 
 - GEMV模式
 
@@ -39,7 +39,7 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
   <img src="figures/开启gemv.png" width="600">
   </p>
   <p align="center">
-  图1：GEMV模式，Mmad计算示意图
+  图1：GEMV模式，mmad_compute示意图
   </p>
 
 - 非GEMV模式
@@ -49,12 +49,12 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
   <img src="figures/关闭gemv.png" width="600">
   </p>
   <p align="center">
-  图2：非GEMV模式，Mmad计算示意图
+  图2：非GEMV模式，mmad_compute示意图
   </p>
 
 ## 约束说明
 
-- 在Mmad计算中，若要开启GEMV模式，参数`mmadParams.m`必须等于1。
+- 在mmad_compute中，若要开启GEMV模式，参数`mmadParams.m`必须等于1。
 - GEMV场景下，左矩阵A在L1搬运到L0A时不支持转置。
 
 ## 编译运行
@@ -76,7 +76,7 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DDISABLE_GEMV=0 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 

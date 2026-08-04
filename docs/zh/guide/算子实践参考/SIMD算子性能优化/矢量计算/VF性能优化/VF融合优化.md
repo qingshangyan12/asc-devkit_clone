@@ -2,7 +2,7 @@
 
 【优先级】高
 
-【描述】VF融合是将代码中多个VF函数融合成一个VF函数，有效提升性能。VF融合特性是优化特性，VF自动融合会借助Loop Fuse算法，将VF转换成Loop形态，然后将控制流等价（Control-Flow-Equivalent）的VF进行融合，最后将VF进行还原。编译器首先会做融合前的合法性检查，判断两个VF是否等价，Main侧中间代码是否能在VF内执行以及融合后是否可产生正收益（不会引起传参寄存器溢出、VF代码不会过大）等，如果满足VF融合条件，编译器会自动执行VF融合优化，为保证融合后的VF执行逻辑与语义与融合前一致，会在原来两个VF之间保守地插入同步指令，编译器还会尝试外提、合并融合后的VF中的指令，对VF代码进行优化。融合策略是能融尽融，用户按照符合融合的合法性检查的模式进行编码，可以增加VF融合的机会。
+【描述】VF融合是将代码中多个VF函数融合成一个VF函数，有效提升性能。VF融合特性是优化特性，VF自动融合会借助Loop Fusealgorithms，将VF转换成Loop形态，然后将控制流等价（Control-Flow-Equivalent）的VF进行融合，最后将VF进行还原。编译器首先会做融合前的合法性检查，判断两个VF是否等价，Main侧中间代码是否能在VF内执行以及融合后是否可产生正收益（不会引起传参寄存器溢出、VF代码不会过大）等，如果满足VF融合条件，编译器会自动执行VF融合优化，为保证融合后的VF执行逻辑与语义与融合前一致，会在原来两个VF之间保守地插入同步指令，编译器还会尝试外提、合并融合后的VF中的指令，对VF代码进行优化。融合策略是能融尽融，用户按照符合融合的合法性检查的模式进行编码，可以增加VF融合的机会。
 
 > [!NOTE] 说明
 >
@@ -103,14 +103,14 @@ VF融合优化可分为三个阶段：VF浅度融合、VF深度融合和VF内自
     };
     ```
 
-2.  使用基础API连续计算模式：基础API实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。基础API根据对数据操作方法的不同，可以分为两大类：
+2.  使用basic_apicontinuous_compute模式：basic_api实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。basic_api根据对数据操作方法的不同，可以分为两大类：
 
-    -   连续计算API：支持Tensor前n个数据计算。针对源操作数的连续n个数据进行计算并连续写入目的操作数，解决一维tensor的连续计算问题。
-    -   高维切分API：支持Repeat和Stride。功能灵活的计算API，提供与Builtin API完全对等的编程能力，充分发挥硬件优势，支持对每个操作数的DataBlock Stride，Repeat Stride，Mask等参数的操作。
+    -   continuous_computeAPI：支持Tensor前n个数据计算。针对源操作数的连续n个数据进行计算并连续写入目的操作数，解决一维tensor的continuous_compute问题。
+    -   high_dim_splitAPI：支持Repeat和Stride。功能灵活的计算API，提供与Builtin API完全对等的编程能力，充分发挥硬件优势，支持对每个操作数的DataBlock Stride，Repeat Stride，Mask等参数的操作。
 
-    在VF融合优化中，推荐使用基础API的连续计算模式编写算子，可以充分发挥出VF融合优化的能力，与高维切分API相比，连续计算API使得编译器能更好地分析VF融合优化，更加容易满足VF融合优化的条件，使用基础API的连续计算模式能写出性能更优的算子。
+    在VF融合优化中，推荐使用basic_api的continuous_compute模式编写算子，可以充分发挥出VF融合优化的能力，与high_dim_splitAPI相比，continuous_computeAPI使得编译器能更好地分析VF融合优化，更加容易满足VF融合优化的条件，使用basic_api的continuous_compute模式能写出性能更优的算子。
 
-    【反例】使用基础API的高维切分模式编写算子，编译器在分析VF融合时受复杂的计算逻辑影响，无法对Add和Mul接口进行VF融合优化。
+    【反例】使用basic_api的high_dim_split模式编写算子，编译器在分析VF融合时受复杂的计算逻辑影响，无法对Add和Mul接口进行VF融合优化。
 
     ```cpp
     template<typename T>
@@ -130,7 +130,7 @@ VF融合优化可分为三个阶段：VF浅度融合、VF深度融合和VF内自
     };
     ```
 
-    【正例】使用基础API的连续计算模式，编译器分析Add和Mul函数后符合VF融合要求，将Add和Mul融合成一个VF函数。
+    【正例】使用basic_api的continuous_compute模式，编译器分析Add和Mul函数后符合VF融合要求，将Add和Mul融合成一个VF函数。
 
     ```cpp
     template<typename T>

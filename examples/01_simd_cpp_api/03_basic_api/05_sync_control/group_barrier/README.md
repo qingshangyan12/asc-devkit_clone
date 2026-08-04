@@ -1,6 +1,6 @@
 # GroupBarrier样例
 
-## 概述
+## overview
 
 本样例实现了两组存在依赖关系的AIV之间的正确同步，A组AIV计算完成后，B组AIV依赖该A组AIV的计算结果进行后续的计算，称A组为Arrive组，B组为Wait组。
 

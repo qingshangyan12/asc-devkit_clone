@@ -1,10 +1,10 @@
 # IsFinite样例
 
-## 概述
+## overview
 
-本样例基于IsFinite高阶API实现按元素判断输入的浮点数是否非NAN、非INF的功能，输出结果为浮点数或者布尔值。
+本样例基于IsFinitehigh_level_api实现按元素判断输入的浮点数是否非NAN、非INF的功能，输出结果为浮点数或者布尔值。
 
-> **接口提示：** 除本样例使用的 `IsFinite` 接口外，Ascend C 还提供了以下判断相关高阶API接口，如需调用替换接口名即可：
+> **接口提示：** 除本样例使用的 `IsFinite` 接口外，Ascend C 还提供了以下判断相关high_level_api接口，如需调用替换接口名即可：
 >
 > - **IsInf**：判断输入是否为无穷大。
 > - **IsNaN**：判断输入是否为非数值。
@@ -68,7 +68,7 @@
   本样例中实现的是固定shape为输入x[1, 1024]，输出y[1, 1024]的isfinite_custom样例。
 
   - Kernel实现  
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用IsFinite高阶API接口完成isfinite计算，得到最终结果，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用IsFinitehigh_level_api接口完成isfinite计算，得到最终结果，再搬出到外部存储上。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

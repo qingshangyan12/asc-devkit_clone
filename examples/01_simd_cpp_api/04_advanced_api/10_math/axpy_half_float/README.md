@@ -1,8 +1,8 @@
 # Axpy样例
 
-## 概述
+## overview
 
-本样例基于Axpy高阶API实现源操作数src中每个元素与标量求积后和目的操作数dst中的对应元素相加的功能。Axpy接口的源操作数和目的操作数的数据类型只能取三种组合：(half, half)、(float, float)、(half, float)。本样例中输入tensor和标量的数据类型为half，输出tensor数据类型为float。
+本样例基于Axpyhigh_level_api实现源操作数src中每个元素与标量求积后和目的操作数dst中的对应元素相加的功能。Axpy_interface的源操作数和目的操作数的数据类型只能取三种组合：(half, half)、(float, float)、(half, float)。本样例中输入tensor和标量的数据类型为half，输出tensor数据类型为float。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -50,11 +50,11 @@
   本样例中实现的是固定shape为输入x[4, 128], 输出out[4, 128]的Axpy样例。
   - Kernel实现
 
-    首先使用Duplicate接口将输出tensor初始化为0，然后使用Axpy接口完成x乘以标量scalar再加上out中的原始值，得到最终结果，再搬出到外部存储上。
+    首先使用Duplicate接口将输出tensor初始化为0，然后使用Axpy_interface完成x乘以标量scalar再加上out中的原始值，得到最终结果，再搬出到外部存储上。
 
   - Tiling实现
 
-    Host侧通过GetAxpyMaxMinTmpSize获取Axpy接口计算所需的最大和最小临时空间。
+    Host侧通过GetAxpyMaxMinTmpSize获取Axpy_interface计算所需的最大和最小临时空间。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -79,7 +79,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

@@ -1,6 +1,6 @@
 # 自定义算子工程多 Vendor 并行编译、打包和部署样例
 
-## 概述
+## overview
 
 本样例展示如何在一个顶层 CMake 工程中，使用 `ExternalProject_Add` 并行编译两个独立自定义算子工程：
 

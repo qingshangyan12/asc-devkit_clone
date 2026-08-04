@@ -1,6 +1,6 @@
 # reduce样例
 
-## 概述
+## overview
 本样例基于Reg编程接口实现Reduce运算，主要调用Reduce接口（SUM模式）。
 - Reduce接口支持SUM/MAX/MIN归约模式，本样例以SUM模式为例
 
@@ -33,7 +33,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce</td></tr>
   </table>
 - 样例实现：
-   ReduceSumVF函数内调用Reduce接口进行归约计算：
+   ReduceSumVF函数内调用Reduce接口进行reduction_compute：
    - 使用LoadAlign加载数据到寄存器
    - 使用Reduce(ReduceType::SUM)对单个repeat内所有元素求和
    - 使用Add累加多个repeat的局部和

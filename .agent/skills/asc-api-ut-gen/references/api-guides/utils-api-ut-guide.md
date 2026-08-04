@@ -1,8 +1,8 @@
 # 工具类 API (Utils API) UT 生成指南
 
-## 1. API 概述
+## 1. API overview
 
-工具类 API (Utils API) 是 AscendC 提供的辅助工具接口，包括内存管理、对齐检查、类型判断等辅助功能。
+工具类 API (Utils API) 是 AscendC 提供的辅助tool_interface，包括内存管理、对齐检查、类型判断等辅助功能。
 
 ### 1.1 目录位置
 

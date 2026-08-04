@@ -1,6 +1,6 @@
 # Batch Matmul直调样例
 
-## 概述
+## overview
 
 批量处理Matmul计算的样例。
 
@@ -29,9 +29,9 @@
 ## 样例描述
 
 - 样例功能：  
-  调用Matmul高阶API，实现批量处理3组Matmul计算，每组对BSNGD格式的A、B矩阵分别做矩阵乘和加bias偏置。
+  调用Matmulhigh_level_api，实现批量处理3组Matmul计算，每组对BSNGD格式的A、B矩阵分别做矩阵乘和加bias偏置。
 
-  BSNGD格式具体可参考[IterateBatch](../../../../../docs/zh/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/IterateBatch.md)中对该数据排布的介绍。
+  BSNGD格式具体可参考[IterateBatch](../../../../../docs/zh/api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/IterateBatch.md)中对该数据排布的介绍。
 
 - 样例规格：   
   <table>
@@ -82,7 +82,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;             # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

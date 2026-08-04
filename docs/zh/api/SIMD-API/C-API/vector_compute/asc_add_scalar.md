@@ -43,7 +43,7 @@ __aicore__ inline void asc_add_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* s
 __aicore__ inline void asc_add_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
 ```
 
-- 高维切分计算
+- high_dim_split计算
 
 ```cpp
 __aicore__ inline void asc_add_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat, 
@@ -79,7 +79,7 @@ __aicore__ inline void asc_add_scalar_sync(__ubuf__ float* dst, __ubuf__ float* 
 | src_block_stride |输入| 源操作数单次迭代内不同DataBlock间地址步长。 |
 | dst_repeat_stride |输入| 目的操作数相邻迭代间相同DataBlock的地址步长。 |
 | src_repeat_stride |输入| 源操作数相邻迭代间相同DataBlock的地址步长。 |
-| count     | 输入    | 参与连续计算的元素个数。      |
+| count     | 输入    | 参与continuous_compute的元素个数。      |
 
 ## 返回值说明
 
@@ -91,7 +91,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 
 ## 调用示例

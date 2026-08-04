@@ -1,8 +1,8 @@
 # Power样例
 
-## 概述
+## overview
 
-本样例基于Power高阶API实现按元素做幂运算功能，支持三种功能：指数和底数分别为张量对张量、张量对标量、标量对张量的幂运算。
+本样例基于Powerhigh_level_api实现按元素做幂运算功能，支持三种功能：指数和底数分别为张量对张量、张量对标量、标量对张量的幂运算。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -69,11 +69,11 @@
 
   - Kernel实现
 
-    使用Power高阶API进行幂运算，支持张量对张量、张量对标量、标量对张量三种模式
+    使用Powerhigh_level_api进行幂运算，支持张量对张量、张量对标量、标量对张量三种模式
 
   - Tiling实现
 
-    Host侧通过GetPowerMaxMinTmpSize获取Power接口计算所需的最大和最小临时空间。
+    Host侧通过GetPowerMaxMinTmpSize获取Power_interface计算所需的最大和最小临时空间。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

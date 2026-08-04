@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将half类型转化为int8_t类型，并支持多种舍入模式。
+将half_type转化为int8_t类型，并支持多种舍入模式。
 
 - RINT舍入模式：四舍六入五成双舍入
 - ROUND舍入模式：四舍五入舍入
@@ -53,7 +53,7 @@
     __aicore__ inline void asc_half2int8_rz(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
   ```
 
-- 高维切分计算
+- high_dim_split计算
   
   ```cpp
     // 不指定舍入模式
@@ -95,7 +95,7 @@
 | :------ | :----- | :----------------- |
 | dst    | 输出    | 目的操作数（矢量）的起始地址。            |
 | src    | 输入    | 源操作数（矢量）的起始地址。             |
-| count  | 输入    | 参与连续计算的元素个数。      |
+| count  | 输入    | 参与continuous_compute的元素个数。      |
 | repeat |输入 | 迭代次数。 |
 | dst_block_stride |输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src_block_stride |输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
@@ -112,7 +112,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 
 ## 调用示例

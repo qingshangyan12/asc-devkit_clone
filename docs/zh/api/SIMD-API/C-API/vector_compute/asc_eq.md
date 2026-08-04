@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-- 高维切分计算
+- high_dim_split计算
   ```cpp
   // 比较结果存入寄存器
   __aicore__ inline void asc_eq(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
@@ -79,7 +79,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst、src0、src1的起始地址需要32字节对齐。
 - dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
 - 使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。
@@ -101,7 +101,7 @@ uint8_t src1_block_stride = 1;
 uint8_t dst_repeat_stride = 8;
 uint8_t src0_repeat_stride = 8;
 uint8_t src1_repeat_stride = 8;
-//…… 数据搬运及同步操作
+//…… data_move及同步操作
 
 // 结果存入寄存器，通过寄存器获取比较结果
 asc_eq(src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);

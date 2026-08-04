@@ -2,10 +2,10 @@
 
 ## 三种API类型对比
 
-| 维度 | 基础API (basic_api) | 高阶API (adv_api) | C API (c_api) |
+| 维度 | basic_api (basic_api) | high_level_api (adv_api) | C API (c_api) |
 |------|---------------------|-------------------|---------------|
 | 函数命名 | 大驼峰：`Add`、`Mul` | 大驼峰：`Exp`、`Axpy` | `asc_` 前缀+ snake_case：`asc_add` |
-| 抽象层级 | 直接映射硬件指令 | 封装基础API实现算法 | 直接映射硬件指令 |
+| 抽象层级 | 直接映射硬件指令 | 封装basic_api实现algorithms | 直接映射硬件指令 |
 | 参数风格 | `LocalTensor<T>&` | `LocalTensor<T>&` + `sharedTmpBuffer` | `__ubuf__ T*` 指针 |
 | 文档风格 | `@ingroup` / `@brief` | `\brief` / `\param` / `\note` | 简洁注释 |
 | 公开入口 | `kernel_operator.h` | `kernel_api.h` | `asc_simd.h` |
@@ -37,7 +37,7 @@ void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTenso
 支持三种数据流模式：
 
 1. **连续模式**：固定count参数
-2. **高维切分模式**：repeat + block_stride + repeat_stride参数
+2. **high_dim_split模式**：repeat + block_stride + repeat_stride参数
 3. **同步模式**：视API类型和实际需求，C API使用 `_sync` 后缀，部分C++ API使用 `Sync` 后缀
 
 ### 参数命名一致性
@@ -60,15 +60,15 @@ void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTenso
 
 ### 类型参数
 
-- 高阶API：`T` 为dst类型，`U` 为src类型
-- 基础API：`T` 为数据类型
+- high_level_api：`T` 为dst类型，`U` 为src类型
+- basic_api：`T` 为数据类型
 
 ```cpp
-// 高阶API — T=dst, U=src
+// high_level_api — T=dst, U=src
 template <typename T, typename U, bool isReuseSource = false>
 __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, ...);
 
-// 基础API — T统一
+// basic_api — T统一
 template <typename T>
 __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0, ...);
 ```
@@ -90,7 +90,7 @@ __aicore__ inline void Axpy(...);
 bool isReuseSource = false
 ```
 
-### 算法参数
+### algorithms参数
 
 使用明确的类型和有意义的名字：
 
@@ -171,9 +171,9 @@ ASCENDC_HOST_ASSERT(inputSize > 0, return, "Input Shape size must be greater tha
 
 ## 公共头文件注册
 
-### 高阶API注册
+### high_level_api注册
 
-新增高阶API后，需要在以下文件中添加include：
+新增high_level_api后，需要在以下文件中添加include：
 
 **`include/adv_api/kernel_api.h`：**
 
@@ -189,9 +189,9 @@ ASCENDC_HOST_ASSERT(inputSize > 0, return, "Input Shape size must be greater tha
 #include "math/axpy_tiling.h"
 ```
 
-### 基础API注册
+### basic_api注册
 
-新增基础API在对应的总入口中注册，例如 `kernel_operator.h`。
+新增basic_api在对应的总入口中注册，例如 `kernel_operator.h`。
 
 ### 架构守卫
 
@@ -211,14 +211,14 @@ ASCENDC_HOST_ASSERT(inputSize > 0, return, "Input Shape size must be greater tha
 ### 实现头文件(`impl/`)
 
 - 包含 `#pragma message` 警告
-- 高阶API的架构分发由公开头文件通过 `#if __NPU_ARCH__` 选择对应impl文件（如 `axpy_3510_impl.h` 或 `axpy_common_impl.h`）；基础API的分发由 `*_intf_impl.h` 头文件完成
-- 包含具体算法逻辑
+- high_level_api的架构分发由公开头文件通过 `#if __NPU_ARCH__` 选择对应impl文件（如 `axpy_3510_impl.h` 或 `axpy_common_impl.h`）；basic_api的分发由 `*_intf_impl.h` 头文件完成
+- 包含具体algorithms逻辑
 
 ---
 
 ## 接口实现模式
 
-### 高阶API实现模板
+### high_level_api实现模板
 
 ```cpp
 // include/adv_api/<category>/<api>.h
@@ -240,11 +240,11 @@ __aicore__ inline void ApiNameImpl(const LocalTensor<T>& dstTensor,
 }
 ```
 
-### 算法函数与Intrinsics分离
+### algorithms函数与Intrinsics分离
 
-复杂的API将对外接口、算法拆解、底层Intrinsics分离：
+复杂的API将对外接口、algorithms拆解、底层Intrinsics分离：
 
 - `ApiName(...)` — 对外接口（public header）
-- `ApiNameImpl(...)` — 算法参数拆解（impl header）
+- `ApiNameImpl(...)` — algorithms参数拆解（impl header）
 - `ApiNameSub(...)` — 分块循环逻辑（impl header）
 - `ApiNameIntrinsicsImpl(...)` — 底层指令调用（impl header）

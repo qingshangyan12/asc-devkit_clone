@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-- 高维切分计算
+- high_dim_split计算
     ```cpp
     __aicore__ inline void asc_le_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     __aicore__ inline void asc_le_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -67,7 +67,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 - dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
 - 当结果输出到目的地址中时，mask参数不生效。
@@ -85,7 +85,7 @@ uint8_t dst_block_stride = 1;
 uint8_t src_block_stride = 1;
 uint8_t dst_repeat_stride = 8;
 uint8_t src_repeat_stride = 8;
-…… // 数据搬运及同步操作
+…… // data_move及同步操作
 asc_le_scalar(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 …… // 同步操作
 ```

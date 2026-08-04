@@ -1,7 +1,7 @@
 
 # Batch Matmul样例
 
-## 概述
+## overview
 
 本样例介绍在输入为float数据类型并且左、右矩阵均不转置的场景下，带batch的矩阵乘法，其中GM -> L1通路采用DataCopy（Nd2NzParams）批量搬运，L0C -> GM、L0C -> L1通路采用Fixpipe批量搬运，L1 -> L0A / L0B搬运和Mmad矩阵乘循环执行batch次。
 
@@ -98,7 +98,7 @@ nd2nzA1Params.srcDValue = k;
 
 // ND转换到NZ格式后，源操作数中的一行会转换为目的操作数的多行。
 // 该参数表示，目的NZ矩阵中，来自源操作数同一行的多行数据相邻行起始地址间的偏移，单位：C0_SIZE（32B）。
-// 数据搬运到L1时会进行对齐
+// data_move到L1时会进行对齐
 nd2nzA1Params.dstNzC0Stride = CeilAlign(m, cubeShape[0]);
 // 目的NZ矩阵中，Z型矩阵相邻行起始地址之间的偏移。单位：C0_SIZE（32B）。
 nd2nzA1Params.dstNzNStride = 1;
@@ -177,7 +177,7 @@ fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCMAKE_ASC_RUN_MODE=npu ..;make -j;    # 编译工程
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 

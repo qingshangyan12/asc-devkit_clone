@@ -1,6 +1,6 @@
 # Gather样例介绍
 
-## 概述
+## overview
 
 基于Ascend C SIMT编程的基础样例，包含简化场景和泛化场景的Gather算子，展示基于SIMT编程的算子开发接口、开发流程等。
 

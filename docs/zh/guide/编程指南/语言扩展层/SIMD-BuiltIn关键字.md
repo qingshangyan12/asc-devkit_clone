@@ -46,10 +46,10 @@
 
 -   <a name="li19530175294118"></a>**ASCEND\_IS\_AIV、ASCEND\_IS\_AIC**
 
-    ASCEND\_IS\_AIV和ASCEND\_IS\_AIC是通过C++宏实现的条件判断语句，用于在\_\_aicore\_\_修饰的函数中实现代码的条件编译。基于分离模式（AIC核和AIV核分离）开发融合算子时，算子逻辑中同时涉及AIV核和AIC核的处理逻辑，并需要进行核间同步，此时需要通过ASCEND\_IS\_AIV/ ASCEND\_IS\_AIC进行AIV和AIC核代码的隔离。
+    ASCEND\_IS\_AIV和ASCEND\_IS\_AIC是通过C++宏实现的条件判断语句，用于在\_\_aicore\_\_修饰的函数中实现代码的条件编译。基于分离模式（AIC核和AIV核分离）开发融合算子时，算子逻辑中同时涉及AIV核和AIC核的处理逻辑，并需要进行inter_core_sync，此时需要通过ASCEND\_IS\_AIV/ ASCEND\_IS\_AIC进行AIV和AIC核代码的隔离。
 
     >[!NOTE]说明
-    >当使用高阶API Matmul时，其内部已通过REGIST\_MATMUL\_OBJ宏方式实现了AIV与AIC核代码的隔离，用户无需再使用该宏进行处理。
+    >当使用high_level_api Matmul时，其内部已通过REGIST\_MATMUL\_OBJ宏方式实现了AIV与AIC核代码的隔离，用户无需再使用该宏进行处理。
 
     以MatmulNzCustom算子为例，该算子在分离模式下需要分别在AIV核和AIC核上实现不同的逻辑。具体而言，AIV核负责将矩阵数据搬入Unified Buffer，完成数据的重排（将矩阵数据转换为NZ格式），并将其写入Global Memory。而AIC核则直接从Global Memory读取已经重排好的NZ格式数据，并执行矩阵乘法（Matmul）计算。由于AIV核和AIC核的代码逻辑不同，需要通过ASCEND\_IS\_AIV和ASCEND\_IS\_AIC宏进行代码隔离，确保在编译时分别生成适用于AIV核和AIC核的代码。
 
@@ -96,12 +96,12 @@
 
     ASCENDC\_CUBE\_ONLY是通过C++宏实现的条件判断语句，用于在\_\_aicore\_\_修饰的函数中实现代码的条件编译。
 
-    基于分离模式开发非融合算子时，在只有矩阵计算的算子场景下，可以通过设置ASCENDC\_CUBE\_ONLY，开启纯Cube模式完成Matmul计算，减少消息通信的性能开销，提升算子性能。
+    基于分离模式开发非融合算子时，在只有cube_compute的算子场景下，可以通过设置ASCENDC\_CUBE\_ONLY，开启纯Cube模式完成Matmul计算，减少消息通信的性能开销，提升算子性能。
 
     >[!CAUTION]注意
     >ASCENDC\_CUBE\_ONLY宏必须在\#include "lib/matmul\_intf.h"之前设置。
 
-    以matmul\_custom算子为例，高阶API Matmul默认使用MIX模式，即用户从AIV侧发起消息，通过消息通信框架中转消息后，在AIC侧执行Matmul计算。这套消息处理机制会带来额外的Scalar性能开销。相较于MIX模式，纯Cube模式可以直接跳过消息通信框架，完成Matmul计算，提升算子性能。
+    以matmul\_custom算子为例，high_level_api Matmul默认使用MIX模式，即用户从AIV侧发起消息，通过消息通信框架中转消息后，在AIC侧执行Matmul计算。这套消息处理机制会带来额外的Scalar性能开销。相较于MIX模式，纯Cube模式可以直接跳过消息通信框架，完成Matmul计算，提升算子性能。
 
     示例伪码如下：
 
@@ -116,9 +116,9 @@
     AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
     ```
 
-## 函数执行空间限定符<a name="section1074418132518"></a>
+## function_execution_space_qualifier<a name="section1074418132518"></a>
 
-函数执行空间限定符（Function Execution Space Qualifier）指示函数是在Host侧执行还是在Device侧执行，以及它是否可从Host侧或Device侧调用。
+function_execution_space_qualifier（Function Execution Space Qualifier）指示函数是在Host侧执行还是在Device侧执行，以及它是否可从Host侧或Device侧调用。
 
 -   **\_\_global\_\_**
 
@@ -126,7 +126,7 @@
 
     -   一个\_\_global\_\_函数必须返回void类型，并且不能是class的成员函数。
     -   主机侧调用\_\_global\_\_函数必须使用<<<\>\>\>异构调用语法。
-    -   \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在device侧已经执行完成，如果需要同步，需要使用Runtime同步接口显式同步，如**aclrtSynchronizeStream**接口。
+    -   \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在device侧已经执行完成，如果需要同步，需要使用Runtimesync_interface显式同步，如**aclrtSynchronizeStream**接口。
 
 -   **\_\_aicore\_\_**
 
@@ -154,7 +154,7 @@
     -   只能被Host侧函数调用
     -   \_\_global\_\_ 和\_\_host\_\_不能一起使用
 
-    \_\_host\_\_限定符是可选项，无函数执行空间限定符定义的函数，默认是host函数。
+    \_\_host\_\_限定符是可选项，无function_execution_space_qualifier定义的函数，默认是host函数。
 
     ```
     __aicore__ int f() {}
@@ -174,13 +174,13 @@
 
 -   **\_\_aicpu\_\_**
 
-    AI CPU函数执行空间限定符\_\_aicpu\_\_用于指示函数是否为AI CPU Kernel函数，它具有如下属性：
+    AI CPUfunction_execution_space_qualifier\_\_aicpu\_\_用于指示函数是否为AI CPU Kernel函数，它具有如下属性：
 
     -   在Device侧执行且只能被Host侧函数调用，因此必须与\_\_global\_\_同时声明。
     -   一个\_\_global\_\_ \_\_aicpu\_\_函数不能是void返回类型，并且入参只能是一个指针。
     -   一个\_\_global\_\_ \_\_aicpu\_\_函数不能在.asc文件中进行定义，只能声明，且需要使用extern。
     -   Host侧调用\_\_global\_\_ \_\_aicpu\_\_函数时必须使用<<<\>\>\>异构调用语法，输入的函数入参在入参指针的基础上需要输入从指针中读取的数据大小。
-    -   \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在Device侧已经执行完成，如果需要同步，需要使用Runtime同步接口显式同步，如**aclrtSynchronizeStream**接口
+    -   \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在Device侧已经执行完成，如果需要同步，需要使用Runtimesync_interface显式同步，如**aclrtSynchronizeStream**接口
 
     ```
     // Define a AI CPU kernel function in AI CPU device file
@@ -240,7 +240,7 @@
 
     ![](../../figures/batchmode资料.png)
 
-    在多流并发场景，多算子并行执行时，若执行总核数超过最大物理核数，且多个算子逻辑使用SyncALL等核间同步接口时，建议设置mode为1，防止多个算子之间互相等待空闲核调度，导致死锁。默认值mode为0。
+    在多流并发场景，多算子并行执行时，若执行总核数超过最大物理核数，且多个算子逻辑使用SyncALL等核间sync_interface时，建议设置mode为1，防止多个算子之间互相等待空闲核调度，导致死锁。默认值mode为0。
 
     ```
      __schedmode__(1) __global__ __mix__(1, 2) void OP1() // OP1使用了SyncAll接口，且存在多流并发的可能，需要设置batch mode（mode 1）
@@ -262,7 +262,7 @@
 
 -   \_\_simd\_vf\_\_
 
-    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](../../../api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md)调用SIMD VF入口函数，启动VF子任务。
+    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](../../../api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md)调用SIMD VF入口函数，启动VF子任务。
 
     ```
     __simd_vf__ inline void KernelAdd(__ubuf__ float* x, __ubuf__ float* y, __ubuf__ float* z)
@@ -436,25 +436,25 @@ __ubuf__ int * __gm__ ptr;
 | constexpr uint64_t ASC_L0C_SIZE | 取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。 | 表示当前AI处理器架构下L0C Buffer的容量，可用于编译期获取L0C资源大小。 |
 | constexpr uint64_t ASC_BT_SIZE | 取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。 | 表示当前AI处理器架构下BiasTable Buffer的容量，可用于编译期获取BiasTable资源大小。 |
 
-## 内置变量<a name="section199434523343"></a>
+## builtin_variables<a name="section199434523343"></a>
 
 | 变量名 | 相关API | 功能 |
 |-------|---------|------|
-| block_num | GetBlockNum | 当前任务配置的核数，用于代码内部的多核逻辑控制等。内置变量block_num的值与通过相关API GetBlockNum获取的值保持一致。 |
-| block_idx | GetBlockIdx | 当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。注意，内置变量block_idx的值与通过相关API GetBlockIdx获取的值在部分场景下并不一致，具体说明及场景示例请参考下文描述。 |
-通常，建议用户使用内置变量对应的API获取所需值，不建议用户直接使用内置变量。因为内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
+| block_num | GetBlockNum | 当前任务配置的核数，用于代码内部的多核逻辑控制等。builtin_variablesblock_num的值与通过相关API GetBlockNum获取的值保持一致。 |
+| block_idx | GetBlockIdx | 当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。注意，builtin_variablesblock_idx的值与通过相关API GetBlockIdx获取的值在部分场景下并不一致，具体说明及场景示例请参考下文描述。 |
+通常，建议用户使用builtin_variables对应的API获取所需值，不建议用户直接使用builtin_variables。因为builtin_variables反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，builtin_variables的值与实际语义可能不符。
 
-在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。
+在Mix场景（使用`__mix__`function_execution_space_qualifier）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用builtin_variables。
 
 **示例：**
 
-例如，在任务配置的核数为3（block_num = 3）的场景下，当使用`__mix__(1, 2)`作为函数执行空间限定符时，任务会启动3个Cube Core和6个Vector Core，内置变量block_idx在6个Vector Core上的取值分别为：0、0、1、1、2、2，即位于同一核上的两个Vector Core取值相同，而GetBlockIdx API获取的值分别为：0、1、2、3、4、5，两者并不相同。在3个Cube Core上两者的取值相同，均为：0、1、2。
+例如，在任务配置的核数为3（block_num = 3）的场景下，当使用`__mix__(1, 2)`作为function_execution_space_qualifier时，任务会启动3个Cube Core和6个Vector Core，builtin_variablesblock_idx在6个Vector Core上的取值分别为：0、0、1、1、2、2，即位于同一核上的两个Vector Core取值相同，而GetBlockIdx API获取的值分别为：0、1、2、3、4、5，两者并不相同。在3个Cube Core上两者的取值相同，均为：0、1、2。
 
 <!-- npu="310p" id7 -->
 例如，在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
 <!-- end id7 -->
 
-## 核函数配置<a name="section97005415463"></a>
+## kernel_function_config<a name="section97005415463"></a>
 
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
 
@@ -463,18 +463,18 @@ __ubuf__ int * __gm__ ptr;
 ```
 
 其中：
--   numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中使用内置变量[block_idx](../语言扩展层/SIMD-BuiltIn关键字.md#内置变量)获取；
+-   numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中使用builtin_variables[block_idx](../语言扩展层/SIMD-BuiltIn关键字.md#builtin_variables)获取；
 
     >[!NOTE]说明 
     >numBlocks是逻辑核的概念，取值范围为\[1,65535\]。为了充分利用硬件资源，一般设置为物理核的核数或其倍数。
     >- 对于耦合模式和分离模式，numBlocks在运行时的意义和设置规则有一些区别，具体说明如下：
-    >    - 耦合模式：由于其Vector、Cube单元是集成在一起的，numBlocks用于设置启动多个AI Core核实例执行，不区分Vector、Cube。AI Core的核数可以通过[GetCoreNumAiv](../../../api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAiv.md)或者[GetCoreNumAic](../../../api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAic.md)获取。
+    >    - 耦合模式：由于其Vector、Cube单元是集成在一起的，numBlocks用于设置启动多个AI Core核实例执行，不区分Vector、Cube。AI Core的核数可以通过[GetCoreNumAiv](../../../api/Utils-API/platform_info/PlatformAscendC/GetCoreNumAiv.md)或者[GetCoreNumAic](../../../api/Utils-API/platform_info/PlatformAscendC/GetCoreNumAic.md)获取。
     >    - 分离模式
     >        - 针对仅包含Vector计算的算子，numBlocks用于设置启动多少个Vector（AIV）实例执行，比如某款AI处理器上有40个Vector核，建议设置为40。
     >        - 针对仅包含Cube计算的算子，numBlocks用于设置启动多少个Cube（AIC）实例执行，比如某款AI处理器上有20个Cube核，建议设置为20。
     >        - 针对Vector/Cube融合计算的算子，启动时，按照AIV和AIC组合启动，numBlocks用于设置启动多少个组合执行，比如某款AI处理器上有40个Vector核和20个Cube核，一个组合是2个Vector核和1个Cube核，建议设置为20，此时会启动20个组合，即40个Vector核和20个Cube核。**注意：该场景下，设置的numBlocks逻辑核的核数不能超过物理核（2个Vector核和1个Cube核组合为1个物理核）的核数。**
-    >        - AIC/AIV的核数分别通过[GetCoreNumAic](../../../api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAic.md)和[GetCoreNumAiv](../../../api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAiv.md)接口获取。
-    >- 如果开发者使用了Device资源限制特性，那么算子设置的numBlocks不应超过[PlatformAscendC](../../../api/Utils-API/平台信息获取/PlatformAscendC/PlatformAscendC.md)提供核数的API（GetCoreNum/GetCoreNumAic/GetCoreNumAiv等）返回的核数。例如，使用aclrtSetStreamResLimit设置Stream级别的Vector核数为8，那么GetCoreNumAiv接口返回值为8，针对Vector算子设置的numBlocks不应超过8，否则会抢占其他Stream的资源，导致资源限制失效。
+    >        - AIC/AIV的核数分别通过[GetCoreNumAic](../../../api/Utils-API/platform_info/PlatformAscendC/GetCoreNumAic.md)和[GetCoreNumAiv](../../../api/Utils-API/platform_info/PlatformAscendC/GetCoreNumAiv.md)接口获取。
+    >- 如果开发者使用了Device资源限制特性，那么算子设置的numBlocks不应超过[PlatformAscendC](../../../api/Utils-API/platform_info/PlatformAscendC/PlatformAscendC.md)提供核数的API（GetCoreNum/GetCoreNumAic/GetCoreNumAiv等）返回的核数。例如，使用aclrtSetStreamResLimit设置Stream级别的Vector核数为8，那么GetCoreNumAiv接口返回值为8，针对Vector算子设置的numBlocks不应超过8，否则会抢占其他Stream的资源，导致资源限制失效。
 
 -   dynUBufSize：Dynamic Unified Buffer Size，是配置UB动态内存分配的空间的大小（仅限UB，不包括L1等），单位为Byte，默认设置为0；
 -   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。

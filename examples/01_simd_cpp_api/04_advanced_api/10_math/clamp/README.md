@@ -1,8 +1,8 @@
 # Clamp样例
 
-## 概述
+## overview
 
-本样例基于Clamp高阶API实现将输入中除nan值以外的数截断到区间[min, max]的功能。
+本样例基于Clamphigh_level_api实现将输入中除nan值以外的数截断到区间[min, max]的功能。
 当min大于max时，将除nan值外所有值替换为max。min和max均可以为标量或张量。  
 
 ## 本样例支持的产品及CANN软件版本
@@ -75,7 +75,7 @@
 
   - Kernel实现
 
-    使用Clamp高阶API接口完成Clamp计算，得到最终结果，再搬出到外部存储上。
+    使用Clamphigh_level_api接口完成Clamp计算，得到最终结果，再搬出到外部存储上。
 
   - 调用实现
 

@@ -1,6 +1,6 @@
 ﻿# reduce样例
 
-## 概述
+## overview
 本样例基于C API编程接口实现Reduce运算，主要调用[asc_reduce_sum](../../../../../docs/zh/api/SIMD-API/C-API/reg/reduce_compute/asc_reduce_sum.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
@@ -34,7 +34,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">reduce_custom</td></tr>
   </table>
 - 样例实现：
-   reduce_sum_vf函数内调用asc_reduce_sum接口进行归约计算：
+   reduce_sum_vf函数内调用asc_reduce_sum接口进行reduction_compute：
    - 使用asc_loadalign加载数据到寄存器
    - 使用asc_reduce_sum对单个repeat内所有元素求和
    - 使用asc_add累加多个repeat的局部和

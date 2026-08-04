@@ -1,6 +1,6 @@
 # SimdVF Printf接口功能说明
 
-## 概述
+## overview
 
 本样例介绍simd_vf侧printf接口使用方法。核函数使用固定输入（不依赖外部数据），通过`printf`接口在vector函数中打印调试信息及计算结果。
 
@@ -43,7 +43,7 @@
 
 - 调用实现
 
-  在`__global__ __vector__`核函数内使用`asc_vf_call<FuncName>()`调用simd_vf函数。核函数使用固定输入值，不依赖外部数据或host侧数据搬运。Add演示中，AICore侧将固定数据写入静态UB `LocalTensor`，调用`AscendC::Add`生成结果，再将UB地址传给simd_vf函数打印。
+  在`__global__ __vector__`核函数内使用`asc_vf_call<FuncName>()`调用simd_vf函数。核函数使用固定输入值，不依赖外部数据或host侧data_move。Add演示中，AICore侧将固定数据写入静态UB `LocalTensor`，调用`AscendC::Add`生成结果，再将UB地址传给simd_vf函数打印。
 
 ## 编译运行
 

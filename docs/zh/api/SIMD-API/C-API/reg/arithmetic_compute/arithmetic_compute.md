@@ -1,4 +1,4 @@
-# 基础算术
+# basic_arithmetic
 
 -   **[asc_abs](asc_abs.md)**
 

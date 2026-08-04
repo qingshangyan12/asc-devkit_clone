@@ -1,8 +1,8 @@
 # Softmax样例
 
-## 概述
+## overview
 
-本样例在激活函数场景下，基于SoftMax高阶API对输入Tensor按行做SoftMax计算，并使用AdjustSoftMaxRes对计算结果做后处理。SoftMax将输入tensor[m, n]按行执行reducemax、sub、exp、reducesum、div等步骤，得到归一化概率分布，常用于注意力机制和分类任务的输出层。
+本样例在activation_functions场景下，基于SoftMaxhigh_level_api对输入Tensor按行做SoftMax计算，并使用AdjustSoftMaxRes对计算结果做后处理。SoftMax将输入tensor[m, n]按行执行reducemax、sub、exp、reducesum、div等步骤，得到归一化概率分布，常用于注意力机制和分类任务的输出层。
 
 > **接口提示：** 除本样例使用的 `SoftMax` 接口外，Ascend C 还提供了 `SimpleSoftMax` 接口，使用预计算的sum和max数据对输入Tensor做SoftMax计算，内部无reduce过程。将 `softmax.asc` 中 `AscendC::SoftMax` 替换为 `AscendC::SimpleSoftMax` 即可切换。
 
@@ -32,7 +32,7 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
 
 - 样例功能：
 
-  本样例对输入 Tensor 按行做 SoftMax 计算，并使用 AdjustSoftMaxRes 对计算结果做后处理。当输入的 max 中存在指定的值（0xFF7FFFFF，即 float 类型的最大有限值）时，调整输出中对应位置的数据为自定义的值（0.0，即浮点数零）。该机制常用于注意力掩码（attention mask）场景，将无效位置的 softmax 输出置零。
+  本样例对输入 Tensor 按行做 SoftMax 计算，并使用 AdjustSoftMaxRes 对计算结果做后处理。当输入的 max 中存在指定的值（0xFF7FFFFF，即 float 类型的最大有限值）时，调整输出中对应位置的数据为自定义的值（0.0，即浮点数零）。该机制常用于注意力mask（attention mask）场景，将无效位置的 softmax 输出置零。
 
 - 样例规格：
 
@@ -61,7 +61,7 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
     核心计算步骤：将输入数据搬入后，调用 `AscendC::SoftMax` 完成 SoftMax 计算，再调用 `AscendC::AdjustSoftMaxRes` 对结果做后处理，最后将结果搬出。
 
   - Tiling实现  
-    softmax样例的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用GetSoftMaxMinTmpSize获取API所需临时缓冲区大小，再调用SoftMax高阶API的tiling函数获取API所需tiling参数，尾核计算所需的高阶API的tiling由kernel侧自行计算。
+    softmax样例的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用GetSoftMaxMinTmpSize获取API所需临时缓冲区大小，再调用SoftMaxhigh_level_api的tiling函数获取API所需tiling参数，尾核计算所需的high_level_api的tiling由kernel侧自行计算。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

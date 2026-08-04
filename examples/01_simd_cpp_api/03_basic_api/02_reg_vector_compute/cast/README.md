@@ -1,12 +1,12 @@
 # cast样例
 
-## 概述
-本样例基于Reg编程接口实现Cast运算，主要调用Cast接口实现数据类型转换。  
-本样例支持两种数据类型转换场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+## overview
+本样例基于Reg编程接口实现Cast运算，主要调用Cast接口实现data_type_conversion。  
+本样例支持两种data_type_conversion场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
   <table>
     <tr>
       <td>SCENARIO_NUM</td>
-        <td>数据类型转换</td>
+        <td>data_type_conversion</td>
     </tr>
     <tr>
       <td>1</td>
@@ -37,10 +37,10 @@
 ```
 
 ## 样例描述
-本样例对输入向量做数据类型转换。当输入输出的数据类型的位宽不同时，Cast接口会间隔地读取或写入，所以本样例在数据搬入或搬出时会使用相应的压缩或解压缩模式，LoadAlign/StoreAlign接口的使用仅供参考，具体说明如下：
+本样例对输入向量做data_type_conversion。当输入输出的数据类型的位宽不同时，Cast接口会间隔地读取或写入，所以本样例在数据搬入或搬出时会使用相应的压缩或解压缩模式，LoadAlign/StoreAlign接口的使用仅供参考，具体说明如下：
 
 **场景1：数据类型位宽小转大**
-- 样例功能：将half类型的数据转换成int32_t类型的数据。
+- 样例功能：将half_type的数据转换成int32_t类型的数据。
 - 参数说明：
   - layoutMode = RegLayout::ZERO: Cast接口从xReg索引2\*N+0的位置读取数据，用于配合LoadAlign接口将输入数据依次搬入xReg的2\*N位置
   - satMode = SatMode::NO_SAT：本场景介绍浮点数转整数的非饱和模式，输入数据超过输出数据类型最值时，结果被截断为输出数据类型的宽度。例如输入half值为4294967297.0，对应整数4294967297（0x100000001），则取低32位，输出int32_t值为1
@@ -57,7 +57,7 @@
 - 样例实现：  
   从half到int32_t的Cast接口每次处理64个数据，具体流程和示意图如下：
   - 搬入：调用LoadAlign接口，使用解压缩模式，搬入数据至2\*N位置，同时2\*N+1位置置0
-  - 计算：调用Cast接口，输入输出位宽比为1:2，所以从xReg的2\*N位置读取数据，类型转换后依次写入至yReg
+  - 计算：调用Cast接口，输入输出位宽比为1:2，所以从xReg的2\*N位置读取数据，type_conversion后依次写入至yReg
   - 搬出：调用StoreAlign接口，常规搬出
   - 调用实现：使用内核调用符<<<>>>调用核函数。  
   <img src="figures/reg_cast_1.png">
@@ -80,7 +80,7 @@
 - 样例实现：  
   从float到int16_t的Cast接口每次处理64个数据，具体流程和示意图如下：
   - 搬入：调用LoadAlign接口，常规搬入
-  - 计算：调用Cast接口，输入输出位宽比为2:1，所以从xReg依次读取数据，类型转换后依次写入至yReg的2\*N位置，同时2\*N+1位置置0
+  - 计算：调用Cast接口，输入输出位宽比为2:1，所以从xReg依次读取数据，type_conversion后依次写入至yReg的2\*N位置，同时2\*N+1位置置0
   - 搬出：调用StoreAlign接口，采用压缩模式，仅搬出2\*N位置的数据
   - 调用实现：使用内核调用符<<<>>>调用核函数。  
   <img src="figures/reg_cast_2.png">

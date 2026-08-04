@@ -1,8 +1,8 @@
 # list_tensor_desc_input样例
 
-## 概述
+## overview
 
-本样例基于静态Tensor编程模型实现AddN样例，采用ListTensorDesc结构处理动态输入参数，结合静态内存分配与事件同步机制实现数据搬运与计算任务的协同调度。
+本样例基于静态Tensorprogramming_model实现AddN样例，采用ListTensorDesc结构处理动态输入参数，结合静态内存分配与事件同步机制实现data_move与计算任务的协同调度。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -25,9 +25,9 @@
 
 - 样例功能
 
-  本样例以Add计算为例展示静态Tensor编程模型中ListTensorDesc动态输入参数的使用方法，适用于以下场景：
+  本样例以Add计算为例展示静态Tensorprogramming_model中ListTensorDesc动态输入参数的使用方法，适用于以下场景：
   1. 多输入参数动态处理：支持模型中多个输入张量的动态组合运算（如多分支网络结构）。
-  2. 内存流水线优化：通过静态双缓冲与事件同步机制实现数据搬运与计算的流水线并行，降低内存访问延迟。
+  2. 内存流水线优化：通过静态双缓冲与事件同步机制实现data_move与计算的流水线并行，降低内存访问延迟。
   3. 多核并行计算：适配AI处理器的多核架构，支持大规模张量运算的高效分发。
 
 - 样例规格
@@ -45,7 +45,7 @@
 
   - Kernel实现
 
-    动态输入特性是指，核函数的入参采用ListTensorDesc的结构存储输入数据信息。构造ListTensorDesc数据结构，示例如下。
+    动态输入特性是指，核函数的入参采用ListTensorDesc的结构存储输入数据信息。构造ListTensorDescdata_structures，示例如下。
     ```cpp
     constexpr uint32_t SHAPE_DIM = 2;
     struct TensorDesc {
@@ -61,7 +61,7 @@
       uintptr_t dataPtr[TENSOR_DESC_NUM];
     } inputDesc;
     ```
-    将申请分配的Tensor入参组合成ListTensorDesc的数据结构，示例如下。
+    将申请分配的Tensor入参组合成ListTensorDesc的data_structures，示例如下。
     ```cpp
     inputDesc = {(1 + (1 + SHAPE_DIM) * TENSOR_DESC_NUM) * sizeof(uint64_t),
                 {xDesc, yDesc},

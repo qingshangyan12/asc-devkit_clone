@@ -1,9 +1,9 @@
 # LoadData(L1->L0) 性能测试样例
 
-## 概述
+## overview
 
-本样例用于 LoadData 相关接口的性能测试，覆盖矩阵 A/B 从 L1 搬运到 L0A/L0B 的数据搬运路径。
-本样例为无业务测试，不包含矩阵计算指令。
+本样例用于 LoadData 相关接口的性能测试，覆盖矩阵 A/B 从 L1 搬运到 L0A/L0B 的data_move路径。
+本样例为无业务测试，不包含cube_compute指令。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -43,8 +43,8 @@
 | 2 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（2D矩阵搬运） 从 L1 加载到 L0B | 128 | 28 |
 | 3 | bfloat16 | A矩阵 | L1 -> L0A（转置） | LoadDataWithTranspose 从 L1 加载到 L0A（转置） | 256 | 28 |
 | 4 | bfloat16 | B矩阵 | L1 -> L0B（转置） | LoadDataWithTranspose 从 L1 加载到 L0B（转置） | 128 | 28 |
-| 5 | bfloat16 | A矩阵 | L1 -> L0A | LoadData（卷积数据搬运）v2 从 L1 加载到 L0A | 32-256 | 50 |
-| 6 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（卷积数据搬运）v2 从 L1 加载到 L0B | 28.4-128 | 50 |
+| 5 | bfloat16 | A矩阵 | L1 -> L0A | LoadData（卷积data_move）v2 从 L1 加载到 L0A | 32-256 | 50 |
+| 6 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（卷积data_move）v2 从 L1 加载到 L0B | 28.4-128 | 50 |
 | 7 | int8_t | B矩阵 | L1 -> L0B | LoadDataWithSparse 从 L1 加载到 L0B（稀疏加载） | 128 | 30 |
 | 8 | float | Bias | L1 -> BiasTable Buffer | 从 L1 加载到 BiasTable Buffer | 32 | 20 |
 | 9 | uint64_t | FixPipe | L1 -> Fixpipe Buffer | 从 L1 加载到 Fixpipe Buffer | 32 | 20 |
@@ -57,8 +57,8 @@
 | 12 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（2D矩阵搬运V2） 从 L1 加载到 L0B | 256 | 30 |
 | 13 | fp8_e4m3fn | A矩阵 + ScaleA | L1 -> L0A + L0A_MX | LoadData（MX矩阵搬运） 从 L1 加载到 L0A 和 L0A_MX（带 scale） | 256/32 | 30 |
 | 14 | fp8_e4m3fn | B矩阵 + ScaleB | L1 -> L0B + L0B_MX | LoadData（MX矩阵搬运） 从 L1 加载到 L0B 和 L0B_MX（带 scale） | 256/32 | 30 |
-| 15 | bfloat16 | A矩阵 | L1 -> L0A | LoadData（卷积数据搬运）v2 从 L1 加载到 L0A | 32-256 | 50 |
-| 16 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（卷积数据搬运）v2 从 L1 加载到 L0B | 32-256 | 50 |
+| 15 | bfloat16 | A矩阵 | L1 -> L0A | LoadData（卷积data_move）v2 从 L1 加载到 L0A | 32-256 | 50 |
+| 16 | bfloat16 | B矩阵 | L1 -> L0B | LoadData（卷积data_move）v2 从 L1 加载到 L0B | 32-256 | 50 |
 | 17 | bfloat16 | B矩阵 | L1 -> L0B（转置） | LoadDataWithTranspose 从 L1 加载到 L0B（转置） | 256 | 28 |
 | 18 | float | Bias | L1 -> BiasTable Buffer | 从 L1 加载到 BiasTable Buffer | 32 | 20 |
 | 19 | uint64_t | FixPipe | L1 -> Fixpipe Buffer | 从 L1 加载到 Fixpipe Buffer | 32 | 26 |
@@ -128,7 +128,7 @@ msopprof ./demo 1 128 128 128
   ```bash
   ├── dump                       # 原始性能数据
   ├── ArithmeticUtilization.csv  # cube/vector指令cycle占比
-  ├── L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+  ├── L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
   ├── Memory.csv                 # UB、L1和主存储器读写带宽速率
   ├── MemoryL0.csv               # L0A、L0B和L0C读写带宽速率
   ├── MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
@@ -199,7 +199,7 @@ CSV 中的计算列如下：
 | 列名 | 计算方式 | 说明 |
 |------|----------|------|
 | `Cycle` | `Time(us) * Frequency(MHz)` | 根据平台主频折算的 Cycle 数 |
-| `Bandwidth(GB/s)` | `DataSize(bytes) / Time(us) / 1e3` | 数据搬运带宽 |
+| `Bandwidth(GB/s)` | `DataSize(bytes) / Time(us) / 1e3` | data_move带宽 |
 
 ### 性能指标计算方法
 
@@ -225,9 +225,9 @@ Cycle = 0.021111 * 1800 = 38.00 cycles
 Cycle = 0.030000 * 1650 = 49.50 cycles
 ```
 
-#### 数据搬运量计算
+#### data_move量计算
 
-`perf.sh` 按场景选择数据搬运量，作为带宽计算的 `DataSize(bytes)`：
+`perf.sh` 按场景选择data_move量，作为带宽计算的 `DataSize(bytes)`：
 
 | 场景 | 数据量计算 | 数据类型大小 |
 |------|------------|--------------|

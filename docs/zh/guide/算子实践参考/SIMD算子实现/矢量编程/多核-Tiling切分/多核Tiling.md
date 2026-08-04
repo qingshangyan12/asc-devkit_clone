@@ -63,7 +63,7 @@
 -   核函数名称：tiling\_strategy\_custom
 -   使用的主要接口：
     -   DataCopy：数据搬移接口
-    -   Add：矢量基础算术接口
+    -   Add：矢量basic_arithmetic接口
     -   EnQue、DeQue等接口：Queue队列管理接口
 
 -   算子实现文件名称：tiling\_strategy.asc
@@ -80,7 +80,7 @@
 -   tileNum：每个核需要计算的数据块个数；
 -   tileLength：每个核内每个数据块的长度。
 
-根据确定的Tiling参数，使用C++语法定义TilingData结构体，代码如下。
+根据确定的Tiling参数，使用C++语法定义TilingData_struct，代码如下。
 
 ```
 struct AddCustomTilingData {
@@ -134,7 +134,7 @@ Kernel侧算子实现仍遵循[矢量算子核函数实现流程](../基础矢�
 
     由于本样例中将数据分配到了多个核上进行处理，每个核处理不同的数据，因此不同核要处理的数据在Global Memory上的地址不同，在初始化函数Init中，需要获取单核所需处理的输入输出在Global Memory上的内存偏移地址，并将该偏移地址设置到GlobalTensor中。
 
-    以获取输入x在Global Memory上的内存偏移地址为例，数据整体长度TOTAL\_LENGTH为8 \* 2048，平均分配到8个核上运行，每个核上处理的数据长度blockLength为2048，调用[GetBlockIdx](../../../../../api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)接口获取当前核的index，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的[SetGlobalBuffer](../../../../../api/SIMD-API/基础API/数据结构/GlobalTensor/SetGlobalBuffer.md)接口设定该核上Global Memory的起始地址以及长度，具体示意图请参考[图3](#zh-cn_topic_0000002236197677_fig398721711313)。代码如下所示：
+    以获取输入x在Global Memory上的内存偏移地址为例，数据整体长度TOTAL\_LENGTH为8 \* 2048，平均分配到8个核上运行，每个核上处理的数据长度blockLength为2048，调用[GetBlockIdx](../../../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)接口获取当前核的index，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的[SetGlobalBuffer](../../../../../api/SIMD-API/basic_api/data_structures/GlobalTensor/SetGlobalBuffer.md)接口设定该核上Global Memory的起始地址以及长度，具体示意图请参考[图3](#zh-cn_topic_0000002236197677_fig398721711313)。代码如下所示：
 
     ```
     xGm.SetGlobalBuffer((__gm__ half *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
@@ -150,7 +150,7 @@ Kernel侧算子实现仍遵循[矢量算子核函数实现流程](../基础矢�
     **图4**  单核数据切分示意图<a name="zh-cn_topic_0000002236197677_fig1319211154719"></a>  
     ![](../../../../figures/单核数据切分示意图-39.png "单核数据切分示意图-39")
 
-    与[基础矢量算子](../基础矢量算子.md)相比，在通过Pipe内存管理对象为输入输出Queue分配内存时，需使用单核内每个数据块的长度tileLength作为分配内存的长度。比如，为输入x的Queue分配内存，可以通过如下代码段实现，Pipe为inQueueX分配了一块大小为tileLength \* sizeof\(half\)个字节的内存块，每个内存块能容纳tileLength（128）个half类型数据。
+    与[基础矢量算子](../基础矢量算子.md)相比，在通过Pipe内存管理对象为输入输出Queue分配内存时，需使用单核内每个数据块的长度tileLength作为分配内存的长度。比如，为输入x的Queue分配内存，可以通过如下代码段实现，Pipe为inQueueX分配了一块大小为tileLength \* sizeof\(half\)个字节的内存块，每个内存块能容纳tileLength（128）个half_type数据。
 
     ```
     pipe->InitBuffer(inQueueX, 1, this->tileLength * sizeof(half))

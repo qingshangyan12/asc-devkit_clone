@@ -1,6 +1,6 @@
 # Interleave/DeInterleave样例
 
-## 概述
+## overview
 
 本样例基于Interleave和DeInterleave接口实现元素交织和解交织功能。Interleave将两个源操作数的元素交织存入两个结果操作数，DeInterleave将两个源操作数的元素解交织存入两个结果操作数。样例支持通过编译参数切换不同场景，便于开发者理解这两个接口的使用方法和实现差异。
 

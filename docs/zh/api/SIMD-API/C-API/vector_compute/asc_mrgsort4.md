@@ -81,7 +81,7 @@ PIPE_V
 
 - 当repeat=1时，表示进行一次迭代，可自由设置element_length_..., if_exhausted_suspension, valid_bit参数。
 - 当repeat>1时，表示进行多次迭代，必须满足以下条件：包含四条源队列，四个源队列的长度一致且在内存中连续存储，valid_bit的值为15，if_exhausted_suspension的值为false。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 
 ## 调用示例

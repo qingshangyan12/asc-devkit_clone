@@ -20,11 +20,11 @@
 |------|----------|-------------------|
 | 入口目录 | `include/adv_api/` | `include/basic_api/` |
 | 实现目录 | `impl/adv_api/detail/`、`impl/adv_api/tiling/` | `impl/basic_api/dav_*`、`impl/basic_api/reg_compute/` |
-| 抽象层级 | 算子级或子算子级封装，包含 shape、tiling、workspace、策略参数 | 单个基础指令或基础数据搬运/计算原语 |
+| 抽象层级 | 算子级或子算子级封装，包含 shape、tiling、workspace、策略参数 | 单个基础指令或基础data_move/计算原语 |
 | 典型调用 | `Softmax(...)`、`Quantize<config>(...)`、`TopK<...>(...)`、`Matmul` wrapper | `Add(...)`、`Mul(...)`、`DataCopy(...)`、`Mmad(...)` |
-| UT 关注点 | API 合约、shape 边界、策略组合、workspace/tiling、结果语义 | overload、mask/repeat/stride、LocalTensor/GlobalTensor 数据通路 |
+| UT 关注点 | API 合约、shape 边界、策略组合、workspace/tiling、结果语义 | overload、mask/repeat/stride、LocalTensor/GlobalTensor data_path |
 
-简单的 `Add`、`Sub`、`Mul`、`Div` 属于 membase/basic API，不应作为高阶 API 典型示例。`include/adv_api/math/` 下的数学函数属于高阶 API 时，通常会有对应的 tiling、参数结构、workspace 或算法分支；不能按“数学计算”这个名字直接归类。
+简单的 `Add`、`Sub`、`Mul`、`Div` 属于 membase/basic API，不应作为高阶 API 典型示例。`include/adv_api/math/` 下的math_functions属于高阶 API 时，通常会有对应的 tiling、参数结构、workspace 或algorithms分支；不能按“math_compute”这个名字直接归类。
 
 ### 1.3 典型 API 示例
 

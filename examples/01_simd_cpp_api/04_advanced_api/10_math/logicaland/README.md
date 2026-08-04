@@ -1,10 +1,10 @@
 # LogicalAnd样例
 
-## 概述
+## overview
 
-本样例基于LogicalAnd高阶API实现按元素进行与操作，当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
+本样例基于LogicalAndhigh_level_api实现按元素进行与操作，当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
 
-> **接口提示：** 除本样例使用的 `LogicalAnd` 接口外，Ascend C 还提供了以下逻辑运算高阶API接口：
+> **接口提示：** 除本样例使用的 `LogicalAnd` 接口外，Ascend C 还提供了以下逻辑运算high_level_api接口：
 >
 > - **LogicalAnds**：逻辑与运算（标量版本）。
 > - **LogicalNot**：逻辑非运算。
@@ -58,7 +58,7 @@
 
   - Kernel实现
 
-    使用LogicalAnd高阶API接口完成按元素与操作的计算。
+    使用LogicalAndhigh_level_api接口完成按元素与操作的计算。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

@@ -1,11 +1,11 @@
 # Ascend C算子接入PyTorch图模式样例
 
-## 概述
+## overview
 
 本样例以AddCustom算子为例，介绍Ascend C算子如何通过TorchAir接入PyTorch图模式。用户在模型中调用 `torch.ops.ascendc_ops.ascendc_add` 后，`torch.compile` 负责捕获该调用，TorchAir负责将其转换为GE `AddCustom`节点，最终由GE执行入口启动Ascend C kernel。
 
 > **什么是TorchAir图模式接入？** <br>
-> TorchAir承担PyTorch图到GE图的转换工作。关于PyTorch侧接口如何进入TorchAir/GE图执行链路，可参考[TorchAir图模式接入概述](https://www.hiascend.com/document/detail/zh/Pytorch/2600/modthirdparty/torchairuseguide/docs/zh/custom_op_graph/overview.md)。
+> TorchAir承担PyTorch图到GE图的转换工作。关于PyTorch侧接口如何进入TorchAir/GE图执行链路，可参考[TorchAir图模式接入overview](https://www.hiascend.com/document/detail/zh/Pytorch/2600/modthirdparty/torchairuseguide/docs/zh/custom_op_graph/overview.md)。
 
 **核心链路**：
 

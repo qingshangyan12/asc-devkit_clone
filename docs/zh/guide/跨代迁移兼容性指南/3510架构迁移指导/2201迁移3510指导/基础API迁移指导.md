@@ -1,6 +1,6 @@
-# 基础API迁移指导<a name="ZH-CN_TOPIC_0000002470508258"></a>
+# basic_api迁移指导<a name="ZH-CN_TOPIC_0000002470508258"></a>
 
-本节针对[NPU架构版本3510](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)的芯片变更对基础API兼容性产生的影响进行说明，并提供基础API的兼容性适配方案。
+本节针对[NPU架构版本3510](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)的芯片变更对basic_api兼容性产生的影响进行说明，并提供basic_api的兼容性适配方案。
 
 ## 矢量计算<a name="section7364115741514"></a>
 
@@ -13,7 +13,7 @@
     **表1**  涉及Subnormal的API和config参数说明
 
     <a name="table288510533427"></a>
-    <table><thead align="left"><tr id="row388575318425"><th class="cellrowborder" align="center" valign="top" width="27%" id="mcps1.2.3.1.1"><p id="p12885175314420"><a name="p12885175314420"></a><a name="p12885175314420"></a>Ascend C基础API</p>
+    <table><thead align="left"><tr id="row388575318425"><th class="cellrowborder" align="center" valign="top" width="27%" id="mcps1.2.3.1.1"><p id="p12885175314420"><a name="p12885175314420"></a><a name="p12885175314420"></a>Ascend Cbasic_api</p>
     </th>
     <th class="cellrowborder" align="center" valign="top" width="73%" id="mcps1.2.3.1.2"><p id="p1288585311428"><a name="p1288585311428"></a><a name="p1288585311428"></a>兼容说明</p>
     </th>
@@ -61,7 +61,7 @@
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-        // 调用Ln基础API，传入模板参数
+        // 调用Lnbasic_api，传入模板参数
         AscendC::Ln<half, CONFIG>(dstLocal, srcLocal, DATA_COUNT);
 
         AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
@@ -72,7 +72,7 @@
     }
     ```
 
-## 数据搬运<a name="section7530159122210"></a>
+## data_move<a name="section7530159122210"></a>
 
 -   **DataCopy接口不支持L1 Buffer-\>GM通路。**
 
@@ -122,7 +122,7 @@
         }
         ```
 
-    5.  进行Mmad矩阵计算，结果输出到L0C Buffer。
+    5.  进行Mmadcube_compute，结果输出到L0C Buffer。
 
         ```
         __aicore__ inline void Compute(
@@ -147,12 +147,12 @@
 
 -   **不支持SetLoadDataBoundary接口。**
 
-    **说明**：3510架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置LoadData（卷积数据搬运）时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
+    **说明**：3510架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置LoadData（卷积data_move）时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
 
     **兼容方案**：
 
     -   [NPU架构版本2201](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)的接口参数boundaryValue设置为0时与3510架构版本等价。
-    -   如果需要在L1 Buffer上循环读取操作数，需要将对应的LoadData（卷积数据搬运）接口手动拆分成多条指令，手动绕回。具体代码可参考[SetLoadDataBoundary兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)。
+    -   如果需要在L1 Buffer上循环读取操作数，需要将对应的LoadData（卷积data_move）接口手动拆分成多条指令，手动绕回。具体代码可参考[SetLoadDataBoundary兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)。
 
     ![](../../../figures/1_zn.png)
 
@@ -232,7 +232,7 @@
             }
         ```
 
-    5.  矩阵计算。
+    5.  cube_compute。
 
         ```
         __aicore__ inline void Compute(AscendC::LocalTensor<T>& a2, AscendC::LocalTensor<U>& b2,
@@ -256,13 +256,13 @@
         }
         ```
 
-## 矩阵计算<a name="section17560113713122"></a>
+## cube_compute<a name="section17560113713122"></a>
 
 -   **Cube计算单元删除int4b\_t数据类型。**
 
-    **说明**：相较于2201架构版本，3510架构版本的Cube计算单元不支持int4b\_t。相关的基础API有LoadData、Mmad和LoadDataWithTranspose，这些接口不再支持int4b\_t。
+    **说明**：相较于2201架构版本，3510架构版本的Cube计算单元不支持int4b\_t。相关的basic_api有LoadData、Mmad和LoadDataWithTranspose，这些接口不再支持int4b\_t。
 
-    **兼容方案**：算子侧通过编写CV融合算子在Vector Core进行int4b\_t到int8\_t的Cast转换，再通过UB搬运到L1后进行Mmad计算。具体代码可参考[int4数据类型下Matmul兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/matmul_s4)。图层面可以在该算子前增加Cast节点进行int4b\_t到int8\_t的转换。
+    **兼容方案**：算子侧通过编写CV融合算子在Vector Core进行int4b\_t到int8\_t的Cast转换，再通过UB搬运到L1后进行mmad_compute。具体代码可参考[int4数据类型下Matmul兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/matmul_s4)。图层面可以在该算子前增加Cast节点进行int4b\_t到int8\_t的转换。
 
     1.  在Vector Core进行int4b\_t到int8\_t的Cast转换，转换后的数据保存到新的GM空间中。
 
@@ -295,7 +295,7 @@
         }
         ```
 
-    2.  进行int8\_t数据类型的矩阵计算。
+    2.  进行int8\_t数据类型的cube_compute。
 
         ```
         __aicore__ inline void RunMatmul()
@@ -344,7 +344,7 @@
 
     **兼容方案**：非L0A Buffer切分的场景兼容2201版本，L0A Buffer切分的场景需要根据新的分形重新适配。具体代码可参考[pattern_transformation兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/pattern_transformation)。
 
-    在2201架构中，矩阵计算要求左矩阵为ZZ分形（3510中为NZ），右矩阵为ZN分形，由于L1 Buffer的数据分形为NZ，所以2201架构下将左矩阵从L1 Buffer搬运到L0A Buffer需要额外做NZ分形到ZZ分形的转换，3510架构下则不用转换分形。
+    在2201架构中，cube_compute要求左矩阵为ZZ分形（3510中为NZ），右矩阵为ZN分形，由于L1 Buffer的数据分形为NZ，所以2201架构下将左矩阵从L1 Buffer搬运到L0A Buffer需要额外做NZ分形到ZZ分形的转换，3510架构下则不用转换分形。
 
     ![](../../../figures/4_zn.png)
 
@@ -386,7 +386,7 @@
 
     **说明**：LoadDataWithSparse用于将存储在L1 Buffer中的512B稠密权重矩阵搬运到L0B buffer，并同时读取128B的索引矩阵以实现稠密矩阵的稀疏化。由于3510架构版本不支持结构化稀疏功能，因此LoadDataWithSparse在此版本中并不适用。另一方面，MmadWithSparse负责执行矩阵乘加操作，其中右矩阵B为稠密矩阵，需要通过调用LoadDataWithSparse进行载入。由于3510架构不支持LoadDataWithSparse，因此MmadWithSparse也无法在3510架构版本中使用。
 
-    **兼容方案**：在算子侧可以不调用LoadDatawithSparse进行矩阵稠密转稀疏操作，然后使用Mmad进行正常的稠密矩阵计算。稀疏矩阵相关算法可参考MmadWithSparse中的介绍。
+    **兼容方案**：在算子侧可以不调用LoadDatawithSparse进行矩阵稠密转稀疏操作，然后使用Mmad进行正常的稠密cube_compute。稀疏矩阵相关algorithms可参考MmadWithSparse中的介绍。
 
 -   **3510架构版本删除GM-\>L0A Buffer/L0B Buffer通路**
 
@@ -421,9 +421,9 @@
 
     **说明**：Fill接口将特定存储位置的LocalTensor初始化为某一具体数值，不支持直接初始化L0A Buffer、L0B Buffer。
 
-    **兼容方案**：先通过Fill接口初始化L1 Buffer，再通过LoadData接口将L1 Buffer上的数据搬运到L0A Buffer、L0B Buffer。具体代码可参考[Fill兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)。
+    **兼容方案**：先通过Fill接口初始化L1 Buffer，再通过LoadData接口将L1 Buffer上的data_move到L0A Buffer、L0B Buffer。具体代码可参考[Fill兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)。
 
-    以GM-\>L1 Buffer-\>L0A Buffer的数据通路为例：
+    以GM-\>L1 Buffer-\>L0A Buffer的data_path为例：
 
     1.  初始化L1 Buffer。
 
@@ -434,7 +434,7 @@
         }
         ```
 
-    2.  调用LoadData接口将L1 Buffer上的数据搬运到L0A Buffer。
+    2.  调用LoadData接口将L1 Buffer上的data_move到L0A Buffer。
 
         ```
         __aicore__ inline void Load2DA1ToA2(AscendC::LocalTensor<T>& a1Local, AscendC::LocalTensor<T>& a2Local)
@@ -445,13 +445,13 @@
         }
         ```
 
-## 系统变量访问<a name="section34615332215"></a>
+## system_variable_access<a name="section34615332215"></a>
 
 -   **不支持CheckLocalMemoryIA，3510架构版本相关寄存器删除。**
 
     **说明**：CheckLocalMemoryIA监视设定范围内的UB读写行为，如果监视到有设定范围的读写行为则会出现EXCEPTION报错，未监视到设定范围的读写行为则不会报错。
 
-    **兼容方案**：该接口为调测接口，对功能无影响。
+    **兼容方案**：该接口为tuning_interface，对功能无影响。
 
 ## 调测API<a name="section12611957102116"></a>
 
@@ -459,4 +459,4 @@
 
     **说明**：因芯片删除L1 Buffer-\>GM通路，不支持L1 Buffer-\>GM的功能。
 
-    **兼容方案**：该接口为调测接口，对功能无影响。
+    **兼容方案**：该接口为tuning_interface，对功能无影响。

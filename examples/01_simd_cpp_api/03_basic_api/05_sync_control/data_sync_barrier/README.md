@@ -1,6 +1,6 @@
 # DataSyncBarrier样例
 
-## 概述
+## overview
 
 本样例介绍DataSyncBarrier的调用，该接口功能：阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束。
 

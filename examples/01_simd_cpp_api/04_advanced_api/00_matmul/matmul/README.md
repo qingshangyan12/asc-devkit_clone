@@ -1,5 +1,5 @@
-# 高阶API 基础Matmul样例
-## 概述
+# high_level_api 基础Matmul样例
+## overview
 调用Matmul API实现matmul样例。对输入的A、B矩阵做矩阵乘和加bias偏置的计算，计算公式为：C = A * B + Bias。
 
 ## 本样例支持的产品及CANN软件版本
@@ -47,7 +47,7 @@
       - 结束矩阵乘操作。
 
   - Tiling关键步骤
-      - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
+      - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling_struct中的相关参数。
       - 获取Tiling参数的流程如下：
         - 创建一个Tiling对象。
         - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等。
@@ -74,7 +74,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py    # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

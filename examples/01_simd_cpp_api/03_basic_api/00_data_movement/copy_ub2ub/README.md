@@ -1,8 +1,8 @@
 # Copy接口样例
 
-## 概述
+## overview
 
-本样例基于Copy接口实现UB（Unified Buffer）内部数据搬运功能，适用于需要在VECIN、VECCALC、VECOUT等不同TPosition之间搬运数据的场景。样例支持通过编译参数切换不同场景，便于开发者理解Copy接口的使用方法。
+本样例基于Copy接口实现UB（Unified Buffer）内部data_move功能，适用于需要在VECIN、VECCALC、VECOUT等不同TPosition之间搬运数据的场景。样例支持通过编译参数切换不同场景，便于开发者理解Copy接口的使用方法。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -32,22 +32,22 @@
 <table border="2">
 <caption>表1：场景配置对照表</caption>
 <tr><th>scenarioNum</th><th>输入Shape</th><th>输出Shape</th><th>计算模式</th><th>说明</th></tr>
-<tr><td>1</td><td>[1, 512]</td><td>[1, 512]</td><td>tensor高维切分计算</td><td>源操作数和目的操作数空间一样大</td></tr>
-<tr><td>2</td><td>[18, 64]</td><td>[18, 8]</td><td>tensor高维切分计算</td><td>源操作数和目的操作数空间不同</td></tr>
+<tr><td>1</td><td>[1, 512]</td><td>[1, 512]</td><td>tensorhigh_dim_split计算</td><td>源操作数和目的操作数空间一样大</td></tr>
+<tr><td>2</td><td>[18, 64]</td><td>[18, 8]</td><td>tensorhigh_dim_split计算</td><td>源操作数和目的操作数空间不同</td></tr>
 <tr><td>3</td><td>[18, 64]</td><td>[18, 8]</td><td>Counter模式</td><td>源操作数和目的操作数空间不同</td></tr>
 </table>
 
 ### 场景参数说明
 
-**tensor高维切分计算**：通过mask参数控制每次迭代内参与计算的元素个数，每个DataBlock大小为32B，包含8个元素（int32类型下）。通过repeatTime参数控制迭代次数，stride参数控制源操作数和目的操作数的地址步长。
+**tensorhigh_dim_split计算**：通过mask参数控制每次迭代内参与计算的元素个数，每个DataBlock大小为32B，包含8个元素（int32类型下）。通过repeatTime参数控制迭代次数，stride参数控制源操作数和目的操作数的地址步长。
 
 **Counter模式**：mask参数表示每次Repeat处理的元素个数，参与计算的元素个数为repeatTime * mask。通过SetMaskCount设置计算模式，通过SetVectorMask设置mask。
 
 **stride参数**：{dstStride, srcStride, dstRepeatSize, srcRepeatSize}控制源操作数和目的操作数在同一迭代内和相邻迭代间的地址步长。
 
-- **场景1**：tensor高维切分计算，mask=64，repeatTime=8，stride={1, 1, 8, 8}。源操作数和目的操作数空间一样大，每次迭代处理64个元素，迭代8次，共搬运512个元素。
+- **场景1**：tensorhigh_dim_split计算，mask=64，repeatTime=8，stride={1, 1, 8, 8}。源操作数和目的操作数空间一样大，每次迭代处理64个元素，迭代8次，共搬运512个元素。
 
-- **场景2**：tensor高维切分计算，mask=8，repeatTime=18，stride={1, 1, 1, 8}。从[18, 64]搬运[18, 8]，srcRepeatSize=8表示源操作数每次Repeat跳过64个元素（跳到下一行），dstRepeatSize=1表示目的操作数紧凑排列，共搬运144个元素。
+- **场景2**：tensorhigh_dim_split计算，mask=8，repeatTime=18，stride={1, 1, 1, 8}。从[18, 64]搬运[18, 8]，srcRepeatSize=8表示源操作数每次Repeat跳过64个元素（跳到下一行），dstRepeatSize=1表示目的操作数紧凑排列，共搬运144个元素。
 
 - **场景3**：Counter模式，mask=144，repeatTime=1，stride={1, 8, 8, 8}。从[18, 64]搬运[18, 8]，srcStride=8表示源操作数每个DataBlock地址步长为8（取每一行的前8个元素），共搬运144个元素。
 
@@ -85,9 +85,9 @@
 
 - 样例实现
   - Kernel实现
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
-    - 调用Copy接口，将数据从UB（Unified Buffer）搬运到UB（Unified Buffer），支持tensor高维切分计算和Counter模式两种计算模式
-    - 调用DataCopy基础API，将数据从UB（Unified Buffer）搬运到GM（Global Memory）
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
+    - 调用Copy接口，将数据从UB（Unified Buffer）搬运到UB（Unified Buffer），支持tensorhigh_dim_split计算和Counter模式两种计算模式
+    - 调用DataCopybasic_api，将数据从UB（Unified Buffer）搬运到GM（Global Memory）
 
 - 调用实现  
   使用内核调用符<<<>>>调用核函数。

@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-为[asc_select](asc_select.md)操作设置作用于选择的Mask掩码。
+为[asc_select](asc_select.md)操作设置作用于选择的Maskmask。
 
 ## 函数原型
 
@@ -40,7 +40,7 @@ __aicore__ inline void asc_set_cmp_mask(__ubuf__ void* sel_mask)
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
-|sel_mask|输入|用于选择的Mask掩码的起始地址。|
+|sel_mask|输入|用于选择的Maskmask的起始地址。|
 
 ## 返回值说明
 

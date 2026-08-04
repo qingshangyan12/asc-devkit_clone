@@ -85,7 +85,7 @@ __mix__(1,2) __global__ __aicore__ void hello_world(GM_ADDR m, GM_ADDR TilingPtr
             }
         }
     }
-    // 上面是1个核等待AI CPU tiling计算完成，这里进行核间同步
+    // 上面是1个核等待AI CPU tiling计算完成，这里进行inter_core_sync
     AscendC::SyncAll<false>();
     // 根据tiling参数值选择不同模板
     if (ti->type ==0 && ti->mode == 1 && ti->len == 2) {

@@ -1,6 +1,6 @@
 # 基于Tensor API实现的静态Matmul算子样例
 
-## 概述
+## overview
 
 本样例基于静态Tensor API编程范式实现多核矩阵乘计算，使用Tensor API的高层次抽象接口完成矩阵搬运、切片和乘加流程。
 
@@ -60,10 +60,10 @@
        - GM张量：NDExtLayoutPtn布局（ND格式扩展）
        - L1/L0张量：NZLayoutPtn/ZNLayoutPtn布局（适配cube计算单元）
 
-    2. **数据搬运接口**：使用Copy + CopyAtom抽象
-       - CopyGM2L1：GM到L1的数据搬运，自动处理ND→NZ格式转换
-       - CopyL12L0A/B：L1到L0A/L0B的数据搬运
-       - CopyL0C2GM：L0C到GM的数据搬运，自动处理NZ→ND格式转换
+    2. **data_move接口**：使用Copy + CopyAtom抽象
+       - CopyGM2L1：GM到L1的data_move，自动处理ND→NZ格式转换
+       - CopyL12L0A/B：L1到L0A/L0B的data_move
+       - CopyL0C2GM：L0C到GM的data_move，自动处理NZ→ND格式转换
 
     3. **矩阵乘接口**：使用Mmad + MmadAtom抽象
        - 自动管理累加控制（cmatrixInitVal参数）
@@ -83,7 +83,7 @@
 |------|------------|
 | 内存管理 | 使用数组方式分配内存，自动管理偏移 |
 | 张量表示 | 使用张量对象直接描述GM、L1、L0数据 |
-| 数据搬运 | 使用Copy完成跨层搬运 |
+| data_move | 使用Copy完成跨层搬运 |
 | 格式转换 | 依赖布局模式自动完成 NZ / ZN 转换 |
 | 分核逻辑 | 使用Slice获取当前核处理的数据块 |
 | 计算接口 | 使用Mmad完成矩阵乘加 |
@@ -108,7 +108,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。

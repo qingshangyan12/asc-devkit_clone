@@ -516,7 +516,7 @@ def main():
             npu_arch = NPU_ARCH_MAP[chip]
             write_line(f"  - {chip.value}: impl={arch_dir}, NPU_ARCH={npu_arch}")
 
-        write_line("\n=== 文档内置数据类型 ===")
+        write_line("\n=== 文档builtin_data_types ===")
         for dtype, info in DTYPE_MAP.items():
             init = (
                 "generic-init"

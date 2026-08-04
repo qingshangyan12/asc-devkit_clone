@@ -1,6 +1,6 @@
 # 测试规范
 
-## 测试框架概述
+## 测试框架overview
 
 ### 框架类型
 
@@ -38,7 +38,7 @@ tests/
 ├── main.cpp
 ├── main_global.cpp
 ├── api/
-│   ├── adv_api/                  # 高阶API
+│   ├── adv_api/                  # high_level_api
 │   │   ├── CMakeLists.txt
 │   │   ├── math/
 │   │   │   ├── axpy/
@@ -59,7 +59,7 @@ tests/
 │   │   ├── tiling/
 │   │   │   └── test_tiling.cpp       # 通用Tiling侧UT（另含v310/HCCL/Matmul/Conv等专用文件）
 │   │   └── ...
-│   ├── basic_api/                     # 基础API
+│   ├── basic_api/                     # basic_api
 │   │   ├── ascendc_header_checker/    # Header编译检查（独立project）
 │   │   │   ├── CMakeLists.txt
 │   │   │   └── kernel_*.cpp
@@ -259,7 +259,7 @@ TEST_F(TestTiling, TestAxpyTiling)
 
 ### 目的
 
-验证公开头文件可正常编译。基础API为每个公开头文件生成独立翻译单元，验证其不依赖隐式的include顺序；高阶API将所有公开头集中到聚合文件中编译，验证整体可编译性（不保证每个头独立编译）。
+验证公开头文件可正常编译。basic_api为每个公开头文件生成独立翻译单元，验证其不依赖隐式的include顺序；high_level_api将所有公开头集中到聚合文件中编译，验证整体可编译性（不保证每个头独立编译）。
 
 ### 独立项目
 
@@ -284,8 +284,8 @@ project(HeaderChecker)
 
 Header Checker的接入方式因API类型而异：
 
-- **基础API**：每新增一个公开头文件，在 `tests/api/basic_api/ascendc_header_checker/` 下添加对应的 `<头文件_base_name>.cpp`（如 `kernel_operator_vec_binary_intf.cpp`）。
-- **高阶API**：在 `tests/api/adv_api/api_host_check/api_host_check.cpp` 聚合文件中添加 `#include`。
+- **basic_api**：每新增一个公开头文件，在 `tests/api/basic_api/ascendc_header_checker/` 下添加对应的 `<头文件_base_name>.cpp`（如 `kernel_operator_vec_binary_intf.cpp`）。
+- **high_level_api**：在 `tests/api/adv_api/api_host_check/api_host_check.cpp` 聚合文件中添加 `#include`。
 
 ---
 

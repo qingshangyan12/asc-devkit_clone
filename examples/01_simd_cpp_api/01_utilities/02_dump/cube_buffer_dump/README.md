@@ -1,6 +1,6 @@
 # Cube Buffer DumpTensor接口功能说明
 
-## 概述
+## overview
 
 本样例以Cube编程模式的`QuantMatmulHifp8`计算为背景，通过`DumpTensor`打印HiFloat8矩阵A、Bias和
 scale在L1 Buffer、Bias Table Buffer和Fixpipe Buffer中的数据，展示dav-3510 Cube Buffer的数据打印方法。
@@ -90,12 +90,12 @@ scale在L1 Buffer、Bias Table Buffer和Fixpipe Buffer中的数据，展示dav-3
 fixpipe_value = l1_value & 0x00007fe0ffffe0ff
 ```
 
-该掩码保留位`[7:0]`、`[31:13]`和`[46:37]`，清零位`[12:8]`、`[36:32]`和`[63:47]`。
-`desc=301`的结果应等于`desc=102`的数据与该掩码按位与后的结果。
+该mask保留位`[7:0]`、`[31:13]`和`[46:37]`，清零位`[12:8]`、`[36:32]`和`[63:47]`。
+`desc=301`的结果应等于`desc=102`的数据与该mask按位与后的结果。
 
-相关规则参见[L1与Fixpipe Buffer数据搬运](../../../../../docs/zh/api/SIMD-API/基础API/数据搬运导览/L1与Fixpipe-Buffer数据搬运.md)和
-[随路量化](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵搬出关键特性说明/随路量化.md)。
-其中，随路量化文档的3510量化参数位域表将`[12:0]`标记为无效位；本样例的dav-3510打印结果中
+相关规则参见[L1与Fixpipe Bufferdata_move](../../../../../docs/zh/api/SIMD-API/basic_api/data_move_guide/L1_Fixpipe_data_move.md)和
+[accompanying_quantization](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/accompanying_quantization.md)。
+其中，accompanying_quantization文档的3510量化参数位域表将`[12:0]`标记为无效位；本样例的dav-3510打印结果中
 `[7:0]`保留输入值，仅`[12:8]`清零。该差异仅表示无效位的打印可见值不同，不改变其量化语义。
 
 ## 编译运行

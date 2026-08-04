@@ -1,8 +1,8 @@
 # Fixpipe（L0C搬出）性能测试样例
 
-## 概述
+## overview
 
-本样例用于矩阵计算搬出路径的性能测试，覆盖把Cube计算结果从L0C Buffer搬出到L1 Buffer或Unified Buffer（简称UB）的数据通路。
+本样例用于cube_compute搬出路径的性能测试，覆盖把Cube计算结果从L0C Buffer搬出到L1 Buffer或Unified Buffer（简称UB）的data_path。
 
 本样例为无业务测试，不校验计算结果，只采集Fixpipe搬出耗时。
 
@@ -129,7 +129,7 @@ msopprof build/demo 1 128 64 128
 ```bash
 ├── dump                       # 原始性能数据
 ├── ArithmeticUtilization.csv  # cube/vector指令cycle占比
-├── L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+├── L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
 ├── Memory.csv                 # UB、L1 Buffer和主存储器读写带宽速率
 ├── MemoryL0.csv               # L0A Buffer、L0B Buffer和L0C Buffer读写带宽速率
 ├── MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
@@ -208,7 +208,7 @@ CSV中的计算列如下：
 |------|----------|------|
 | `AIC_FixPipe_Time(us)` | 取自`PipeUtilization.csv`的`aic_fixpipe_time(us)` | Fixpipe搬出耗时 |
 | `Cycle` | `Time(us) * Frequency(MHz)` | 根据平台主频折算的Cycle数 |
-| `Bandwidth(GB/s)` | `DataSize(bytes) / Time(us) / 1e3` | 数据搬运带宽 |
+| `Bandwidth(GB/s)` | `DataSize(bytes) / Time(us) / 1e3` | data_move带宽 |
 
 ### 性能指标计算方法
 
@@ -228,7 +228,7 @@ Cycle = Time(us) * Frequency(MHz)
 Cycle = 0.050000 * 1800 = 90.00 cycles
 ```
 
-#### 数据搬运量计算
+#### data_move量计算
 
 `perf.sh`按场景的目的数据类型计算搬出量，作为带宽计算的`DataSize(bytes)`：
 

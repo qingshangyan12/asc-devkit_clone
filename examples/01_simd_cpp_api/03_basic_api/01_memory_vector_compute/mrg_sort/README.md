@@ -1,6 +1,6 @@
 # MrgSort样例
 
-## 概述
+## overview
 
 本样例在排序场景下，基于Sort32与MrgSort实现多路归并排序功能。首先调用Sort32将数据并行地预处理为多个有序子序列（每32个元素为一组进行降序排序，形成以(score, index)交替结构存储的有序队列）；随后调用MrgSort，将这些子序列合并为一个全局有序的结果。
 
@@ -96,7 +96,7 @@
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j;         # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                                                   # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。

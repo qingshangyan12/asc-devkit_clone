@@ -43,7 +43,7 @@ Within one task, a verified API/overload combination may be reused without repea
 
 1. Resolve `DEVKIT_PATH` and confirm that `${DEVKIT_PATH}/docs/api` exists.
 2. Start from `${DEVKIT_PATH}/docs/zh/api/README.md` to understand the documentation hierarchy.
-3. Use `${DEVKIT_PATH}/docs/zh/api/Ascend-C-API列表.md` to select the correct API family:
+3. Use `${DEVKIT_PATH}/docs/zh/api/Ascend-C-api_list.md` to select the correct API family:
    - SIMD basic API;
    - SIMD high-level API;
    - SIMD C API;

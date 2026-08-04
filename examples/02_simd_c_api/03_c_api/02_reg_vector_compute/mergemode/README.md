@@ -1,6 +1,6 @@
 ﻿# mergemode样例
 
-## 概述
+## overview
 本样例基于C API编程接口验证MERGING模式的行为特性，演示未激活mask位保留矢量数据寄存器dst原值的机制，使用[asc_copy](../../../../../docs/zh/api/SIMD-API/C-API/reg/reg_load/asc_copy.md)接口进行验证。
 
 ## 本样例支持的产品及CANN软件版本
@@ -23,7 +23,7 @@
 
 ## 样例描述
 - 样例功能：  
-  演示使用asc_copy接口在MERGING模式下进行矢量数据寄存器间的数据搬运。mask为1的位置将src数据搬入dst，mask为0的位置保持dst原值。本样例使用PAT_H掩码（高半部分激活），将输入x的高半部分搬入dst_reg，低半部分保持dst_reg（即输入y）的原值。
+  演示使用asc_copy接口在MERGING模式下进行矢量数据寄存器间的data_move。mask为1的位置将src数据搬入dst，mask为0的位置保持dst原值。本样例使用PAT_Hmask（高半部分激活），将输入x的高半部分搬入dst_reg，低半部分保持dst_reg（即输入y）的原值。
 
   - 样例规格：
     <table>
@@ -37,7 +37,7 @@
     </table>
 
   - 样例实现：
-    - copy_merge_vf函数内使用PAT_H掩码创建vmask，激活高半部分元素
+    - copy_merge_vf函数内使用PAT_Hmask创建vmask，激活高半部分元素
     - 调用asc_loadalign分别加载输入x（src）和输入y（dst）到矢量数据寄存器
     - 调用asc_copy将src_reg搬入dst_reg，MERGING模式下激活位被src覆盖，未激活位保留dst原值
     - 调用asc_storealign将结果写回UB

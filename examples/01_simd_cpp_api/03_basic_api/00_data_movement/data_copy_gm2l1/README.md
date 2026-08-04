@@ -1,6 +1,6 @@
 # data_copy_gm2l1样例
 
-## 概述
+## overview
 
 本样例介绍如何使用DataCopy将输入数据从GM（Global Memory）搬出到L1（L1 Buffer），支持多种输入格式（Nz、ND、DN）、Bias矩阵搬入、量化矩阵搬入等功能。
 
@@ -43,7 +43,7 @@
 </table>
 
 **场景1：输入格式Nz，输入数据类型half**
-- 输入：A [128, 128] half类型，Nz格式；B [128, 256] half类型，Nz格式
+- 输入：A [128, 128] half_type，Nz格式；B [128, 256] half_type，Nz格式
 - 输出：C [128, 256] float类型，ND格式
 - 实现：使用 `DataCopyParams` 将NZ格式的输入数据从GM搬运到L1
 - 说明：输入数据为Nz格式，直接搬运到L1，无需格式转换
@@ -52,7 +52,7 @@
 </p>
 
 **场景2：输入格式ND，输入数据类型half**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [128, 256] float类型，ND格式
 - 实现：使用 `Nd2NzParams` 将ND格式的输入数据从GM搬运到L1，自动转换为Nz格式
 - 说明：输入数据为ND格式，在搬运过程中自动转换为Nz格式
@@ -61,7 +61,7 @@
 </p>
 
 **场景3：输入格式DN，输入数据类型half（仅Ascend 950PR/Ascend 950DT支持）**
-- 输入：A [128, 128] half类型，DN格式；B [128, 256] half类型，DN格式
+- 输入：A [128, 128] half_type，DN格式；B [128, 256] half_type，DN格式
 - 输出：C [128, 256] float类型，ND格式
 - 实现：使用 `Dn2NzParams` 将DN格式的输入数据从GM搬运到L1，自动转换为Nz格式
 - 说明：输入数据为DN格式，在搬运过程中自动转换为Nz格式，DN格式仅Ascend 950PR/Ascend 950DT支持
@@ -70,13 +70,13 @@
 </p>
 
 **场景4：输入格式ND，输入数据类型half，使能Bias**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式；Bias [256] float类型
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式；Bias [256] float类型
 - 输出：C [128, 256] float类型，ND格式
 - 实现：使用 `Nd2NzParams` 将输入数据和Bias从GM搬运到L1，执行矩阵乘计算时通过 `Mmad(c, a, b, bias, mmadParams)` 加入Bias
 - 说明：在矩阵乘计算过程中加入Bias，Bias通过C1搬运到C2，然后参与矩阵乘计算
 
 **场景5：输入格式ND，输入数据类型half，使能Vector量化**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式；量化参数 [256] uint64_t类型
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式；量化参数 [256] uint64_t类型
 - 输出：C [128, 256] int8_t类型，ND格式
 - 实现：使用 `Nd2NzParams` 将输入数据从GM搬运到L1，执行矩阵乘计算，量化参数通过 `DataCopy` 从GM搬运到L1，然后使用 `Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, c, quantAlphaTensor, fixpipeParams)` 进行Vector量化输出
 - 说明：矩阵乘计算结果为float类型，通过Vector量化转换为int8_t类型，C矩阵的每一列对应一个量化参数

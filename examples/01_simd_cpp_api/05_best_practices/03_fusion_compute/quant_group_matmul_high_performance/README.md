@@ -1,7 +1,7 @@
 # QuantGroupMatmul最佳实践样例
 
 
-## 概述
+## overview
 
 本样例实现了per-token量化的分组矩阵乘法（QuantGroupMatmul），展示CV融合时Vector bound场景下的性能调优方法。
 
@@ -30,7 +30,7 @@
 ## 样例描述
 
 - 样例功能：  
-  样例实现了分组的per-token量化matmul计算，分组轴为m轴，并对结果进行激活函数Gelu计算。
+  样例实现了分组的per-token量化matmul计算，分组轴为m轴，并对结果进行activation_functionsGelu计算。
 
   QuantGroupMatmul的计算公式为：
 
@@ -163,7 +163,7 @@ Case 0是本样例中的基础场景，采用`__mix__(1, 1)`模式（1个AIC + 1
 
 **① Cube+Vector融合计算**
 
-本样例采用`__mix__`核函数模式，AIC（Cube核）和AIV（Vector核）并行运行在同一个物理核上。AIC执行矩阵乘法，AIV执行反量化+激活+类型转换，两者通过`CrossCoreSetFlag`/`CrossCoreWaitFlag`实现同步：
+本样例采用`__mix__`核函数模式，AIC（Cube核）和AIV（Vector核）并行运行在同一个物理核上。AIC执行矩阵乘法，AIV执行反量化+激活+type_conversion，两者通过`CrossCoreSetFlag`/`CrossCoreWaitFlag`实现同步：
 
 ```cpp
 // AIC执行路径: MMCompute → Iterate循环 → SetFlag(SYNC_AIC_TO_AIV)
@@ -253,7 +253,7 @@ auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE
 
 **⑤ UB Double Buffer**
 
-本样例所有TQue队列均设置`BUFFER_NUM=2`开启double buffer，实现Vector侧数据搬运与计算的流水并行：
+本样例所有TQue队列均设置`BUFFER_NUM=2`开启double buffer，实现Vector侧data_move与计算的流水并行：
 
 ```cpp
 constexpr uint32_t BUFFER_NUM = 2; // UB队列Buffer数, 设为2开启double buffer
@@ -447,7 +447,7 @@ Atlas A2/A3上表现不同：Scenario 2中`aiv_vec_time`为235.872μs，高于`a
   cmake -DCMAKE_ASC_RUN_MODE=npu -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程
   python3 ../scripts/gen_data.py
   ./demo
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

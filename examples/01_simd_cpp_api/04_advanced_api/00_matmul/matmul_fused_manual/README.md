@@ -1,8 +1,8 @@
 # 融合编程matmul_fused_manual样例
 
-## 概述
+## overview
 
-分核AIC、AIV融合编程实现，主要介绍了Matmul高阶API的纯Cube模式，需要调用相关接口实现手动控制AIC、AIV的核间同步。
+分核AIC、AIV融合编程实现，主要介绍了Matmulhigh_level_api的纯Cube模式，需要调用相关接口实现手动控制AIC、AIV的inter_core_sync。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -28,7 +28,7 @@
 ## 样例描述
 
 - 样例功能：
-  本样例在AIC核创建纯Cube模式的Matmul对象，实现Matmul计算，中间结果输出至GM。AIC核计算完成后，通过调用CrossCoreSetFlag和CrossCoreWaitFlag接口手动控制核间同步，继续在AIV核对GM上的中间结果进行LeakyRelu的计算。
+  本样例在AIC核创建纯Cube模式的Matmul对象，实现Matmul计算，中间结果输出至GM。AIC核计算完成后，通过调用CrossCoreSetFlag和CrossCoreWaitFlag接口手动控制inter_core_sync，继续在AIV核对GM上的中间结果进行LeakyRelu的计算。
 
 - 样例规格：
   本样例中：M = 128, N = 128, K = 256
@@ -53,7 +53,7 @@
           #include "lib/matmul_intf.h"
           ```
       - 完成Matmul计算。
-      - 设置核间同步。
+      - 设置inter_core_sync。
         ```cpp
         if ASCEND_IS_AIC {
           AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(3);
@@ -61,7 +61,7 @@
         ```
     - AIV侧具体步骤：
       - 创建LeakyRelu对象并初始化。
-      - 等待核间同步。
+      - 等待inter_core_sync。
         ```cpp
         if ASCEND_IS_AIV {
           AscendC::CrossCoreWaitFlag(3);
@@ -100,7 +100,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;             # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

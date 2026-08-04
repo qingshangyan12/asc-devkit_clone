@@ -30,13 +30,13 @@
 
 ## 函数原型
 
-- 前n个数据搬运
+- 前n个data_move
 
 ```cpp
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
 ```
 
-- 高维切分搬运
+- high_dim_split搬运
 
 ```cpp
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride)
@@ -72,16 +72,16 @@ PIPE_MTE2
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 如果需要执行多条asc_copy_gm2ub指令，且asc_copy_gm2ub指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_gm2ub指令的串行化，防止出现异常数据。
 - 同步计算包含同步等待。
-- 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
+- 当采用前n个data_move接口时，搬运数据大小要求32字节对齐。
 - 当dst_stride不等于len_burst时，dst_stride要求32字节对齐。
 
 ## 调用示例
 
 ```cpp
-//total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。
+//total_length指参与搬运的数据总长度。src是外部输入的half_type的GM内存。
 constexpr uint64_t total_length = 128;
 __ubuf__ half dst[total_length];
 asc_copy_gm2ub(dst, src, total_length * sizeof(half));

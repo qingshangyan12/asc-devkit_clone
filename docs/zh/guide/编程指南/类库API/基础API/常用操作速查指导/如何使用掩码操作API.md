@@ -1,4 +1,4 @@
-# 如何使用掩码操作API<a name="ZH-CN_TOPIC_0000002305974105"></a>
+# 如何使用mask_operationsAPI<a name="ZH-CN_TOPIC_0000002305974105"></a>
 
 Mask用于控制矢量计算中参与计算的元素个数，支持以下工作模式及配置方式：
 
@@ -39,12 +39,12 @@ Mask用于控制矢量计算中参与计算的元素个数，支持以下工作�
 </thead>
 <tbody><tr id="zh-cn_topic_0000002267504584_row9425114710316"><td class="cellrowborder" valign="top" width="14.12%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002267504584_p2425847103118"><a name="zh-cn_topic_0000002267504584_p2425847103118"></a><a name="zh-cn_topic_0000002267504584_p2425847103118"></a>接口传参（默认）</p>
 </td>
-<td class="cellrowborder" valign="top" width="85.88%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002267504584_p1342514712318"><a name="zh-cn_topic_0000002267504584_p1342514712318"></a><a name="zh-cn_topic_0000002267504584_p1342514712318"></a><span>通过矢量计算API的入参直接传递Mask值。矢量计算API的</span>模板参数isSetMask（仅部分API支持）用于控制接口传参还是外部API配置，默认值为true，表示接口传参。<span>Mask对应于高维切分计算API中的mask/mask[]参数或者tensor前n个数据计算API中的calCount参数。</span></p>
+<td class="cellrowborder" valign="top" width="85.88%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002267504584_p1342514712318"><a name="zh-cn_topic_0000002267504584_p1342514712318"></a><a name="zh-cn_topic_0000002267504584_p1342514712318"></a><span>通过矢量计算API的入参直接传递Mask值。矢量计算API的</span>模板参数isSetMask（仅部分API支持）用于控制接口传参还是外部API配置，默认值为true，表示接口传参。<span>Mask对应于high_dim_split计算API中的mask/mask[]参数或者tensor前n个数据计算API中的calCount参数。</span></p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000002267504584_row1425124783112"><td class="cellrowborder" valign="top" width="14.12%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002267504584_p114251471310"><a name="zh-cn_topic_0000002267504584_p114251471310"></a><a name="zh-cn_topic_0000002267504584_p114251471310"></a>外部API配置</p>
 </td>
-<td class="cellrowborder" valign="top" width="85.88%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002267504584_p84251647103119"><a name="zh-cn_topic_0000002267504584_p84251647103119"></a><a name="zh-cn_topic_0000002267504584_p84251647103119"></a><span>调用</span>SetVectorMask<span>接口设置Mask值，矢量计算API的模板参数isSetMask设置为false，接口入参中的Mask参数（对应于高维切分计算API中的mask/mask[]参数或者tensor前n个数据计算API中的calCount参数）</span>不生效。适用于Mask参数相同，多次重复使用的场景，无需在矢量计算API内部反复设置，会有一定的性能优势。</p>
+<td class="cellrowborder" valign="top" width="85.88%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002267504584_p84251647103119"><a name="zh-cn_topic_0000002267504584_p84251647103119"></a><a name="zh-cn_topic_0000002267504584_p84251647103119"></a><span>调用</span>SetVectorMask<span>接口设置Mask值，矢量计算API的模板参数isSetMask设置为false，接口入参中的Mask参数（对应于high_dim_split计算API中的mask/mask[]参数或者tensor前n个数据计算API中的calCount参数）</span>不生效。适用于Mask参数相同，多次重复使用的场景，无需在矢量计算API内部反复设置，会有一定的性能优势。</p>
 </td>
 </tr>
 </tbody>
@@ -61,7 +61,7 @@ Mask操作的使用方式如下：
 </th>
 <th class="cellrowborder" valign="top" width="35.67%" id="mcps1.2.5.1.3"><p id="zh-cn_topic_0000002267504584_p1757923411421"><a name="zh-cn_topic_0000002267504584_p1757923411421"></a><a name="zh-cn_topic_0000002267504584_p1757923411421"></a>前n个数据计算API</p>
 </th>
-<th class="cellrowborder" valign="top" width="47.38%" id="mcps1.2.5.1.4"><p id="zh-cn_topic_0000002267504584_p1257915343423"><a name="zh-cn_topic_0000002267504584_p1257915343423"></a><a name="zh-cn_topic_0000002267504584_p1257915343423"></a>高维切分计算API</p>
+<th class="cellrowborder" valign="top" width="47.38%" id="mcps1.2.5.1.4"><p id="zh-cn_topic_0000002267504584_p1257915343423"><a name="zh-cn_topic_0000002267504584_p1257915343423"></a><a name="zh-cn_topic_0000002267504584_p1257915343423"></a>high_dim_split计算API</p>
 </th>
 </tr>
 </thead>
@@ -87,7 +87,7 @@ Mask操作的使用方式如下：
 </td>
 <td class="cellrowborder" valign="top" width="35.67%" headers="mcps1.2.5.1.3 "><p id="zh-cn_topic_0000002267504584_p1958073434215"><a name="zh-cn_topic_0000002267504584_p1958073434215"></a><a name="zh-cn_topic_0000002267504584_p1958073434215"></a>不涉及。</p>
 </td>
-<td class="cellrowborder" valign="top" width="47.38%" headers="mcps1.2.5.1.4 "><div class="p" id="zh-cn_topic_0000002267504584_p1699153514480"><a name="zh-cn_topic_0000002267504584_p1699153514480"></a><a name="zh-cn_topic_0000002267504584_p1699153514480"></a>调用SetVectorMask</a>设置Mask，之后调用高维切分计算API。<a name="zh-cn_topic_0000002267504584_ul85801834154214"></a><a name="zh-cn_topic_0000002267504584_ul85801834154214"></a><ul id="zh-cn_topic_0000002267504584_ul85801834154214"><li>isSetMask模板参数设置为false，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义。</li><li>根据使用场景配置<span>repeatTime</span>、<span id="zh-cn_topic_0000002267504584_ph1658013347423"><a name="zh-cn_topic_0000002267504584_ph1658013347423"></a><a name="zh-cn_topic_0000002267504584_ph1658013347423"></a>dataBlockStride</span>、<span id="zh-cn_topic_0000002267504584_ph2580133410427"><a name="zh-cn_topic_0000002267504584_ph2580133410427"></a><a name="zh-cn_topic_0000002267504584_ph2580133410427">repeatStride</span>参数。</li></ul>
+<td class="cellrowborder" valign="top" width="47.38%" headers="mcps1.2.5.1.4 "><div class="p" id="zh-cn_topic_0000002267504584_p1699153514480"><a name="zh-cn_topic_0000002267504584_p1699153514480"></a><a name="zh-cn_topic_0000002267504584_p1699153514480"></a>调用SetVectorMask</a>设置Mask，之后调用high_dim_split计算API。<a name="zh-cn_topic_0000002267504584_ul85801834154214"></a><a name="zh-cn_topic_0000002267504584_ul85801834154214"></a><ul id="zh-cn_topic_0000002267504584_ul85801834154214"><li>isSetMask模板参数设置为false，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义。</li><li>根据使用场景配置<span>repeatTime</span>、<span id="zh-cn_topic_0000002267504584_ph1658013347423"><a name="zh-cn_topic_0000002267504584_ph1658013347423"></a><a name="zh-cn_topic_0000002267504584_ph1658013347423"></a>dataBlockStride</span>、<span id="zh-cn_topic_0000002267504584_ph2580133410427"><a name="zh-cn_topic_0000002267504584_ph2580133410427"></a><a name="zh-cn_topic_0000002267504584_ph2580133410427">repeatStride</span>参数。</li></ul>
 </div>
 </td>
 </tr>
@@ -95,7 +95,7 @@ Mask操作的使用方式如下：
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.5.1.2 "><p id="zh-cn_topic_0000002267504584_p15281754124219"><a name="zh-cn_topic_0000002267504584_p15281754124219"></a><a name="zh-cn_topic_0000002267504584_p15281754124219"></a>调用SetVectorMask设置Mask，之后调用前n个数据计算API，isSetMask模板参数设置为false；接口入参中的calCount建议设置成1。</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.5.1.3 "><div class="p" id="zh-cn_topic_0000002267504584_p13580173410556"><a name="zh-cn_topic_0000002267504584_p13580173410556"></a><a name="zh-cn_topic_0000002267504584_p13580173410556"></a>调用SetVectorMask</a>设置Mask，之后调用高维切分计算API。<a name="zh-cn_topic_0000002267504584_ul11581183434214"></a><a name="zh-cn_topic_0000002267504584_ul11581183434214"></a><ul id="zh-cn_topic_0000002267504584_ul11581183434214"><li>isSetMask模板参数设置为false；接口入参中的mask值设置为MASK_PLACEHOLDER，用于占位，无实际含义。</li><li>根据使用场景配置<span id="zh-cn_topic_0000002267504584_ph458183417420"><a name="zh-cn_topic_0000002267504584_ph458183417420"></a><a name="zh-cn_topic_0000002267504584_ph458183417420"></a>dataBlockStride</span>、<span id="zh-cn_topic_0000002267504584_ph105811034164217"><a name="zh-cn_topic_0000002267504584_ph105811034164217"></a><a name="zh-cn_topic_0000002267504584_ph105811034164217">repeatStride</span>参数。<span>repeatTime</span>传入固定值即可，建议统一设置为1，该值不生效。</li></ul>
+<td class="cellrowborder" valign="top" headers="mcps1.2.5.1.3 "><div class="p" id="zh-cn_topic_0000002267504584_p13580173410556"><a name="zh-cn_topic_0000002267504584_p13580173410556"></a><a name="zh-cn_topic_0000002267504584_p13580173410556"></a>调用SetVectorMask</a>设置Mask，之后调用high_dim_split计算API。<a name="zh-cn_topic_0000002267504584_ul11581183434214"></a><a name="zh-cn_topic_0000002267504584_ul11581183434214"></a><ul id="zh-cn_topic_0000002267504584_ul11581183434214"><li>isSetMask模板参数设置为false；接口入参中的mask值设置为MASK_PLACEHOLDER，用于占位，无实际含义。</li><li>根据使用场景配置<span id="zh-cn_topic_0000002267504584_ph458183417420"><a name="zh-cn_topic_0000002267504584_ph458183417420"></a><a name="zh-cn_topic_0000002267504584_ph458183417420"></a>dataBlockStride</span>、<span id="zh-cn_topic_0000002267504584_ph105811034164217"><a name="zh-cn_topic_0000002267504584_ph105811034164217"></a><a name="zh-cn_topic_0000002267504584_ph105811034164217">repeatStride</span>参数。<span>repeatTime</span>传入固定值即可，建议统一设置为1，该值不生效。</li></ul>
 </div>
 </td>
 </tr>
@@ -104,7 +104,7 @@ Mask操作的使用方式如下：
 
 典型场景的使用示例如下：
 
--   场景1：Normal模式 + 外部API配置 + 高维切分计算API
+-   场景1：Normal模式 + 外部API配置 + high_dim_split计算API
 
     ```
     AscendC::LocalTensor<half> dstLocal;
@@ -128,7 +128,7 @@ Mask操作的使用方式如下：
     AscendC::ResetMask();
     ```
 
--   场景2：Counter模式 + 外部API配置 + 高维切分计算API
+-   场景2：Counter模式 + 外部API配置 + high_dim_split计算API
 
     ```
     AscendC::LocalTensor<half> dstLocal;
@@ -168,7 +168,7 @@ Mask操作的使用方式如下：
     ```
 
 >[!NOTE]说明 
->- 前n个数据计算API接口内部会设置工作模式为Counter模式，所以如果前n个数据计算API配合Counter模式使用时，无需手动调用[SetMaskCount](../../../../../api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetMaskCount.md)设置Counter模式。
->- 所有手动使用Counter模式的场景，使用完毕后，需要调用[SetMaskNorm](../../../../../api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetMaskNorm.md)恢复工作模式。
->- 调用[SetVectorMask](../../../../../api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetVectorMask.md)设置Mask，使用完毕后，需要调用[ResetMask](../../../../../api/SIMD-API/基础API/Memory矢量计算/掩码操作/ResetMask.md)恢复Mask值为默认值。
->- 使用高维切分计算API配套Counter模式使用时，比前n个数据计算API增加了可间隔的计算，支持dataBlockStride、repeatStride参数。
+>- 前n个数据计算API接口内部会设置工作模式为Counter模式，所以如果前n个数据计算API配合Counter模式使用时，无需手动调用[SetMaskCount](../../../../../api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetMaskCount.md)设置Counter模式。
+>- 所有手动使用Counter模式的场景，使用完毕后，需要调用[SetMaskNorm](../../../../../api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetMaskNorm.md)恢复工作模式。
+>- 调用[SetVectorMask](../../../../../api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetVectorMask.md)设置Mask，使用完毕后，需要调用[ResetMask](../../../../../api/SIMD-API/basic_api/memory_vector_compute/mask_operations/ResetMask.md)恢复Mask值为默认值。
+>- 使用high_dim_split计算API配套Counter模式使用时，比前n个数据计算API增加了可间隔的计算，支持dataBlockStride、repeatStride参数。

@@ -1,6 +1,6 @@
 # Matrix Transpose性能调优样例
 
-## 概述
+## overview
 
 本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。首先，通过一维连续复制建立GM连续读写的性能基线，并用直接全局内存转置暴露非连续写带来的主要开销；然后，引入UB中转与32×32分块，将非连续GM写转移为UB内转置访问；接着，对比按tile分组启动线程块（Thread Block）与固定线程块数两种配置方式，并结合2048线程配置下的寄存器溢出分析线程数选择；随后，增加UB padding消除转置读阶段的bank冲突；最终，借助双缓冲（Double Buffer）去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
 
@@ -104,7 +104,7 @@ uint32_t index = x_index + width * y_index;              // 61 + 1024 * 66
 
 ### Case 0 / Case 1：一维连续复制基线
 
-**优化目标**：实测当前硬件上纯连续GM读写的数据搬运能力，作为后续转置实现可逼近的性能上限。
+**优化目标**：实测当前硬件上纯连续GM读写的data_move能力，作为后续转置实现可逼近的性能上限。
 
 **核心实现**：将矩阵视为一维数组，按一维线性地址访问input和output，使GM访存保持连续。Case 0每个Thread Block启动2048个线程，Case 1每个Thread Block启动1024个线程。
 
@@ -140,7 +140,7 @@ $$
 T_{theory} = \frac{8.39MB}{1.6TB/s} \approx 5.243μs
 $$
 
-Case 0的Task Duration为6.262μs，对应读写混合带宽约1.34TB/s，达到理论峰值带宽的约83.7%；Case 1的Task Duration为8.649μs，对应读写混合带宽约0.97TB/s，达到理论峰值带宽的约60.6%。在连续读写的搬运场景下，2048线程配置更接近硬件连续搬运上限。未达峰值带宽的主要原因在于：实际耗时除了数据读写本身之外，还包含Task调度和其他计算指令的开销，这些非数据搬运开销摊薄了有效带宽；线程数较少时，单线程迭代次数更多，额外开销占比更高，带宽利用率相对更低。由于后续转置Case在完成坐标交换的同时还会引入UB访问和同步开销，因此Case 0的连续复制耗时可作为矩阵转置优化的性能上限参照。
+Case 0的Task Duration为6.262μs，对应读写混合带宽约1.34TB/s，达到理论峰值带宽的约83.7%；Case 1的Task Duration为8.649μs，对应读写混合带宽约0.97TB/s，达到理论峰值带宽的约60.6%。在连续读写的搬运场景下，2048线程配置更接近硬件连续搬运上限。未达峰值带宽的主要原因在于：实际耗时除了数据读写本身之外，还包含Task调度和其他计算指令的开销，这些非data_move开销摊薄了有效带宽；线程数较少时，单线程迭代次数更多，额外开销占比更高，带宽利用率相对更低。由于后续转置Case在完成坐标交换的同时还会引入UB访问和同步开销，因此Case 0的连续复制耗时可作为矩阵转置优化的性能上限参照。
 
 ---
 
@@ -173,7 +173,7 @@ Case 2在保持GM连续读取的同时，直接将数据写入转置后的输出
 
 **优化目标**：引入UB与分块，将Case 2的非连续全局内存写转换为UB内访问，使全局内存读写均恢复连续；本Case按切分后的tile数量设置Thread Block数，每个Thread Block处理两个32×32的tile。
 
-**核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) 同步后，再按转置方向从UB读取并连续写入GM。
+**核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/sync_and_memory_fence/sync_interface/asc_syncthreads.md) 同步后，再按转置方向从UB读取并连续写入GM。
 
 UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向连续读取至UB；GM写入阶段交换输出tile坐标，使同一个Warp向输出矩阵的一行写入数据。原本非连续的GM写被转移为UB内转置方向读取。
 
@@ -287,7 +287,7 @@ asc_syncthreads();
 - GM到UB阶段与Case 5完全一致。
 - 差异只在UB布局，从32×32改成32×34。
 - 同步后，从UB写入GM与Case 5完全一致。
-- 该版本没有改变算法路径，也没有改变Thread Block和线程切分，只是调整了UB中的物理布局。
+- 该版本没有改变algorithms路径，也没有改变Thread Block和线程切分，只是调整了UB中的物理布局。
 
 下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank冲突是如何产生的，以及Case 5和Case 6理论上的冲突强度差异。
 
@@ -335,7 +335,7 @@ asc_syncthreads();
 
 **分析**：
 
-相对Case 5的23.912μs，padding将Task Duration降至15.152μs，下降约37%。该优化仅调整UB物理布局，不改变GM读写坐标和算法路径，说明转置读阶段的bank冲突是Case 5的主要瓶颈。消除bank冲突后，每轮循环仍保留数据加载后和GM写入后两次同步，后续可进一步降低同步开销。
+相对Case 5的23.912μs，padding将Task Duration降至15.152μs，下降约37%。该优化仅调整UB物理布局，不改变GM读写坐标和algorithms路径，说明转置读阶段的bank冲突是Case 5的主要瓶颈。消除bank冲突后，每轮循环仍保留数据加载后和GM写入后两次同步，后续可进一步降低同步开销。
 
 ---
 

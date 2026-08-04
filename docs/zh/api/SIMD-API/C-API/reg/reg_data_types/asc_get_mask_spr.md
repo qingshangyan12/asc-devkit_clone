@@ -44,7 +44,7 @@ __simd_callee__ inline vector_bool asc_get_mask_spr_b32()
 
 ## 返回值说明
 
-vector_bool，掩码寄存器。
+vector_bool，mask寄存器。
 
 ## 约束说明
 

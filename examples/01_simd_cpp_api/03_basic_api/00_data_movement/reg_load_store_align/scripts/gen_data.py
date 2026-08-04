@@ -19,7 +19,7 @@ import numpy as np
 
 def gen_golden_data(scenario_num):
     input_length = 1024
-    data_type = np.float16  # half类型
+    data_type = np.float16  # half_type
 
     # 生成输入数据：两个[1, 1024]向量
     input_x = np.arange(input_length, dtype=data_type).reshape(1, input_length)

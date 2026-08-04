@@ -52,7 +52,7 @@
     __simd_callee__ inline void asc_deintlv(vector_float& dst0, vector_float& dst1, vector_float src0, vector_float src1)
     ```
 
-- 操作数为掩码寄存器
+- 操作数为mask寄存器
 
     ```cpp
     __simd_callee__ inline void asc_deintlv_b8(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1)
@@ -71,16 +71,16 @@
 | src0 | 输入 | 源操作数（矢量数据寄存器）。 |
 | src1 | 输入 | 源操作数（矢量数据寄存器）。 |
 
-**表2** 参数说明（操作数为掩码寄存器）
+**表2** 参数说明（操作数为mask寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst0 | 输出 | 目的操作数（掩码寄存器）。 |
-| dst1 | 输出 | 目的操作数（掩码寄存器）。 |
-| src0 | 输入 | 源操作数（掩码寄存器）。 |
-| src1 | 输入 | 源操作数（掩码寄存器）。 |
+| dst0 | 输出 | 目的操作数（mask寄存器）。 |
+| dst1 | 输出 | 目的操作数（mask寄存器）。 |
+| src0 | 输入 | 源操作数（mask寄存器）。 |
+| src1 | 输入 | 源操作数（mask寄存器）。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和mask寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -89,8 +89,8 @@
 ## 约束说明
 
 - src0、src1、dst0、dst1的数据类型需要保持一致。
-- src0和src1可以为同一个矢量数据寄存器或掩码寄存器。
-- dst0和dst1不能为同一个矢量数据寄存器或掩码寄存器。
+- src0和src1可以为同一个矢量数据寄存器或mask寄存器。
+- dst0和dst1不能为同一个矢量数据寄存器或mask寄存器。
 - 允许源操作数和目的操作数为同一个矢量数据寄存器，例如asc_deintlv(src0, src1, src0, src1)。
 
 ## 调用示例

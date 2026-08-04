@@ -1,6 +1,6 @@
 # Matmul FP8直调样例
 
-## 概述
+## overview
 
 A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例。
 
@@ -90,7 +90,7 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
   cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;      # 编译工程, 0可选01234， 例如cmake .. -DSCENARIO_NUM=1;make -j;
   python3 ../scripts/gen_data.py -scenarioNum=0  # 生成测试输入数据, 0可选01234， 例如python3 ../scripts/gen_data.py -scenarioNum=1
   ./demo                             # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

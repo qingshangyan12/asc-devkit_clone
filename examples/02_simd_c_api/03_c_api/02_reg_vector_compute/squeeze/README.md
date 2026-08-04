@@ -1,6 +1,6 @@
 ﻿# squeeze样例
 
-## 概述
+## overview
 本样例基于C API编程接口实现Squeeze运算，主要调用[asc_squeeze](../../../../../docs/zh/api/SIMD-API/C-API/reg/compare_and_select/asc_squeeze.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
@@ -34,7 +34,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">squeeze_custom</td></tr>
   </table>
 - 样例实现：  
-  - squeeze_vf函数内调用asc_squeeze接口进行压缩计算，使用PAT_M4掩码，每轮迭代从矢量数据寄存器x中提取索引为4的倍数的元素
+  - squeeze_vf函数内调用asc_squeeze接口进行压缩计算，使用PAT_M4mask，每轮迭代从矢量数据寄存器x中提取索引为4的倍数的元素
   - 调用asc_loadalign加载数据到寄存器，asc_squeeze压缩后通过asc_storealign将结果写回UB
   - 调用实现：使用内核调用符<<<>>>调用核函数。
 

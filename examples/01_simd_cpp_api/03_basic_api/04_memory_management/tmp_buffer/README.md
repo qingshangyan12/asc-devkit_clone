@@ -1,6 +1,6 @@
 # 使用TmpBuf实现VectorAdd样例
 
-## 概述
+## overview
 
 本样例基于TPipe::InitBuffer接口初始化TBuf内存空间，并在计算过程中使用TBuf临时缓冲区进行数据转换，实现了bfloat16_t数据类型的向量加法（Add）样例。
 
@@ -50,7 +50,7 @@
 
     - 调用TPipe::InitBuffer接口，为TQue和TBuf分配内存空间，其中TBuf用于存储临时数据。
 
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
 
     - 调用Cast接口，将bfloat16_t类型数据转换为float类型并存入TBuf临时缓冲区。
 
@@ -58,7 +58,7 @@
 
     - 调用Cast接口，将float类型的计算结果转换为bfloat16_t类型并存入TQue分配的UB（Unified Buffer）空间。
 
-    - 调用DataCopy基础API，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）。
+    - 调用DataCopybasic_api，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）。
 
   - 调用实现
 

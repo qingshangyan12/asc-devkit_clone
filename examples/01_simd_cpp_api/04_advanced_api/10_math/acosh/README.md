@@ -1,10 +1,10 @@
 # Acosh样例
 
-## 概述
+## overview
 
-本样例基于Acosh高阶API计算反双曲余弦函数。
+本样例基于Acoshhigh_level_api计算反双曲余弦函数。
 
-> **涉及样例：** 除本样例使用的 `Acosh` 接口外，Ascend C 还提供了以下三角函数相关高阶API接口，除sincos外实现方式基本一致，如需调用替换接口名即可：
+> **涉及样例：** 除本样例使用的 `Acosh` 接口外，Ascend C 还提供了以下三角函数相关high_level_api接口，除sincos外实现方式基本一致，如需调用替换接口名即可：
 >
 > - **acos**：反余弦函数。
 > - **asin**：反正弦函数。
@@ -57,11 +57,11 @@
 
   - Kernel实现
 
-    使用Acosh高阶API接口完成反双曲余弦计算。
+    使用Acoshhigh_level_api接口完成反双曲余弦计算。
 
   - Tiling实现
 
-    Host侧通过GetAcoshMaxMinTmpSize获取Acosh接口计算所需的最大和最小临时空间。
+    Host侧通过GetAcoshMaxMinTmpSize获取Acosh_interface计算所需的最大和最小临时空间。
 
   - 调用实现
     使用内核调用符<<<>>>调用核函数。

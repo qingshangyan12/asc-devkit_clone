@@ -1,8 +1,8 @@
 # AntiQuant样例
 
-## 概述
+## overview
 
-本样例在模型量化推理场景下，基于[AscendAntiQuant](../../../../../docs/zh/api/SIMD-API/高阶API/量化操作/AscendAntiQuant.md)高阶API实现反量化计算，用于将量化后的低精度数据恢复为高精度数据。样例展示了PER_CHANNEL场景（按通道量化）下，将int8_t类型输入数据与offset偏移量相加后，乘以scale缩放因子，转换为half类型输出结果的过程。在950系列上兼容AscendAntiQuant接口的前提下，推荐优先使用[AntiQuantize](../../../../../docs/zh/api/SIMD-API/高阶API/量化操作/AntiQuantize.md)接口，该接口可通过统一的结构体配置，适配各类量化场景。
+本样例在模型量化推理场景下，基于[AscendAntiQuant](../../../../../docs/zh/api/SIMD-API/high_level_api/quantization/AscendAntiQuant.md)high_level_api实现反量化计算，用于将量化后的低精度数据恢复为高精度数据。样例展示了PER_CHANNEL场景（按通道量化）下，将int8_t类型输入数据与offset偏移量相加后，乘以scale缩放因子，转换为half_type输出结果的过程。在950系列上兼容AscendAntiQuant接口的前提下，推荐优先使用[AntiQuantize](../../../../../docs/zh/api/SIMD-API/high_level_api/quantization/AntiQuantize.md)接口，该接口可通过统一的结构体配置，适配各类量化场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -48,9 +48,9 @@
 <br />
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquant_custom样例。按元素做反量化计算，将int8_t类型数据转换为half类型数据。
+  本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquant_custom样例。按元素做反量化计算，将int8_t类型数据转换为half_type数据。
   - Kernel实现  
-    计算逻辑是： 本样例将输入数据搬运进片上存储，然后使用AscendAntiQuant（A2/A3）或AntiQuantize（950系列）高阶API接口完成反量化计算，得到最终结果，再搬出外部存储上。
+    计算逻辑是： 本样例将输入data_move进片上存储，然后使用AscendAntiQuant（A2/A3）或AntiQuantize（950系列）high_level_api接口完成反量化计算，得到最终结果，再搬出外部存储上。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

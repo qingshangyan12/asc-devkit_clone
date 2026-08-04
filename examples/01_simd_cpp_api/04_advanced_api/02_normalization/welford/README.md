@@ -1,8 +1,8 @@
 # Welford样例
 
-## 概述
+## overview
 
-本样例基于Kernel直调样例工程，介绍了在一个核函数中连续调用WelfordUpdate和WelfordFinalize高阶API，实现完整的Welford在线算法。Welford是一种在线计算均值和方差的方法，可以在单次数据遍历中逐步计算均值和方差，减少访存次数，提高计算性能。
+本样例基于Kernel直调样例工程，介绍了在一个核函数中连续调用WelfordUpdate和WelfordFinalizehigh_level_api，实现完整的Welford在线algorithms。Welford是一种在线计算均值和方差的方法，可以在单次数据遍历中逐步计算均值和方差，减少访存次数，提高计算性能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -27,7 +27,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例在一个核函数中依次调用WelfordUpdate和WelfordFinalize高阶API，实现完整的Welford在线算法。Welford算法优势：
+  本样例在一个核函数中依次调用WelfordUpdate和WelfordFinalizehigh_level_api，实现完整的Welford在线algorithms。Welfordalgorithms优势：
   - 可以在不存储所有样本的情况下，逐步计算所有样本的均值和方差
   - 只需对数据进行一次遍历，减少访存次数，提高计算性能
   - WelfordUpdate：在线更新均值和方差，计算公式为 $M_t = M_{t-1} + (x_t - M_{t-1}) / n$, $S_t = S_{t-1} + (x_t - M_{t-1}) \times (x_t - M_t)$
@@ -59,12 +59,12 @@
     1. WelfordUpdate：对每个数据块计算局部均值和方差
     2. WelfordFinalize：汇总所有块的均值和方差，得到全局均值和方差
 
-  Welford算法公式已在样例功能中描述，详细说明请参考WelfordUpdate API文档和WelfordFinalize API文档。
+  Welfordalgorithms公式已在样例功能中描述，详细说明请参考WelfordUpdate API文档和WelfordFinalize API文档。
 
   - Kernel实现
 
     计算逻辑是：  
-    在一个核函数内部依次调用WelfordUpdate和WelfordFinalize高阶API，实现完整的Welford在线算法，并将计算结果搬出到外部存储上。
+    在一个核函数内部依次调用WelfordUpdate和WelfordFinalizehigh_level_api，实现完整的Welford在线algorithms，并将计算结果搬出到外部存储上。
 
   - Tiling实现
 

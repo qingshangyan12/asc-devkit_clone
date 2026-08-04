@@ -1,7 +1,7 @@
 # MxFP4 Matmul 性能调优样例
 
 
-## 概述
+## overview
 
 本样例以 MxFP4 矩阵乘法为例，介绍基于 Ascend C `Matmul` 高阶 API 的 MxMatmul 性能调优方法。样例包含两个场景（Case 1-2），均采用常量化 tiling，使用模板常量化 `MatmulApiStaticTiling`（静态 tiling）替代 runtime tiling 拷贝与计算。
 
@@ -36,7 +36,7 @@
 
   样例实现的是固定 shape 为 8192×8192 的 MxFP4 矩阵乘法（带 scale 量化系数输入）。
 
-### MxMatmul 简介
+### MxMatmul intro
 
 MxMatmul（Matrix Multiply with Scale）是一种**带量化缩放系数的矩阵乘法**，是 Ascend C Matmul API
  在 MX（Mixed-Precision）量化场景下的扩展能力。与基础 Matmul 相比，MxMatmul 的核心区别在于引入了**scale 输入**。
@@ -276,7 +276,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

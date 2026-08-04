@@ -1,8 +1,8 @@
 # Pad样例
 
-## 概述
+## overview
 
-本样例基于Pad高阶API实现将二维Tensor行数据填充到32B对齐的功能。
+本样例基于Padhigh_level_api实现将二维Tensor行data_padding到32B对齐的功能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -51,7 +51,7 @@
 
   - Kernel实现
 
-    核心计算步骤：将数据从Global Memory搬运到LocalTensor后，调用Pad高阶API接口完成数据填充，再将结果搬回Global Memory。
+    核心计算步骤：将数据从Global Memory搬运到LocalTensor后，调用Padhigh_level_api接口完成data_padding，再将结果搬回Global Memory。
 
   - Tiling实现
 

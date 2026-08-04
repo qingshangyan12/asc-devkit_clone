@@ -1,6 +1,6 @@
 ﻿# gather样例
 
-## 概述
+## overview
 本样例基于C API编程接口实现按索引从矢量数据寄存器收集元素功能，主要调用[asc_gather](../../../../../docs/zh/api/SIMD-API/C-API/reg/reg_load/asc_gather.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
@@ -26,7 +26,7 @@
   演示asc_gather接口（源操作数为寄存器）的用法。asc_gather根据索引从源向量中收集元素：dst[i] = src[index[i]]。
 
   **Gather模式**
-  - 源数据为128个元素的half类型向量，索引为128个元素的uint16_t类型向量，输出为128个元素的half类型向量。
+  - 源数据为128个元素的half_type向量，索引为128个元素的uint16_t类型向量，输出为128个元素的half_type向量。
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>

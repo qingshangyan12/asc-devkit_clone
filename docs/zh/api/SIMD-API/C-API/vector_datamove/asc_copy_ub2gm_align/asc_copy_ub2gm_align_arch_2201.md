@@ -28,19 +28,19 @@
 
 将数据从Unified Buffer (UB)搬运到Global Memory (GM)，支持8位/16位/32位分块拷贝操作。
 
-本接口支持以下两种数据搬运方式，均不支持设置填充值：
+本接口支持以下两种data_move方式，均不支持设置填充值：
 
-- 前n个数据搬运
+- 前n个data_move
 
     若搬运数据长度非32字节对齐，搬出时会在读取UB数据时自动补充dummy假数据，将搬运数据补齐至32字节对齐。dummy假数据的值为数据块的第一个元素的值。写入GM时会丢弃补充的dummy假数据。
 
-- 高维切分搬运
+- high_dim_split搬运
 
-    高维切分搬运采用Normal模式。若`len_burst`指定的单个数据块长度非32字节对齐，则`n_burst`指定的每个数据块在读取UB数据时都会分别补充dummy假数据至32字节对齐。dummy假数据的值为数据块的第一个元素的值。写入GM时会丢弃补充的dummy假数据。
+    high_dim_split搬运采用Normal模式。若`len_burst`指定的单个数据块长度非32字节对齐，则`n_burst`指定的每个数据块在读取UB数据时都会分别补充dummy假数据至32字节对齐。dummy假数据的值为数据块的第一个元素的值。写入GM时会丢弃补充的dummy假数据。
 
 ## 函数原型
 
-- 前n个数据搬运
+- 前n个data_move
 
     ```cpp
     __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint32_t size)
@@ -57,7 +57,7 @@
     __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint32_t size)
     ```
 
-- 高维切分搬运
+- high_dim_split搬运
 
     ```cpp
     __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint16_t n_burst, uint32_t len_burst,uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -117,7 +117,7 @@ PIPE_MTE3
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 当`n_burst`、`len_burst`中任意一个值为0时，该接口被视为NOP（空操作）。
 - 当`size`值为0时，该接口被视为NOP（空操作）。
 - 如果需要执行多条`asc_copy_ub2gm_align`指令，且`asc_copy_ub2gm_align`指令的目的地址存在重叠，需要插入同步指令，保证多个`asc_copy_ub2gm_align`指令的串行化，防止出现异常数据。

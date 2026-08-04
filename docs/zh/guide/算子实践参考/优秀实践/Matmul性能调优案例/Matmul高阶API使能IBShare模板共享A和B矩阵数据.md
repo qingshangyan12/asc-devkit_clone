@@ -1,8 +1,8 @@
-# Matmul高阶API开启IBShare模板共享A和B矩阵数据<a name="ZH-CN_TOPIC_0000002088668238"></a>
+# Matmulhigh_level_api开启IBShare模板共享A和B矩阵数据<a name="ZH-CN_TOPIC_0000002088668238"></a>
 
 ## 案例介绍<a name="section144912211504"></a>
 
-本案例呈现了在融合算子场景中，使用Matmul高阶API进行矩阵乘法计算时，A矩阵和B矩阵同时启用IBShare对性能的提升效果。
+本案例呈现了在融合算子场景中，使用Matmulhigh_level_api进行矩阵乘法计算时，A矩阵和B矩阵同时启用IBShare对性能的提升效果。
 
 该案例的关键优化措施包括：
 

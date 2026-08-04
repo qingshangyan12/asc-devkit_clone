@@ -1,6 +1,6 @@
 # Add样例介绍
 
-## 概述
+## overview
 
 基于Ascend C的Add向量加法样例，介绍静态Tensor和TQue/TPipe两种实现方式。
 

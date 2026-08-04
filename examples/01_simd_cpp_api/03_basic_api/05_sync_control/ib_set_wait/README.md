@@ -1,8 +1,8 @@
-# IBSet与IBWait核间同步样例
+# IBSet与IBWaitinter_core_sync样例
 
-## 概述
+## overview
 
-本样例基于IBSet和IBWait实现核间同步，适用于以下场景：当两个核协同操作同一块全局内存且存在数据依赖时，通过IBSet和IBWait实现核间同步，避免数据读写错误。
+本样例基于IBSet和IBWait实现inter_core_sync，适用于以下场景：当两个核协同操作同一块全局内存且存在数据依赖时，通过IBSet和IBWait实现inter_core_sync，避免数据读写错误。
 
 > **注意：** 本样例仅适用于基于TPipe和TQue的编程模式。
 
@@ -31,7 +31,7 @@
 
 本样例通过两个核协同工作，每个核处理256个half数据，共512个元素。核0负责读取输入x[0:256]和y[0:256]，计算结果写入z[0:256]；核1负责读取核0的输出z[0:256]和输入y[256:512]，计算结果写入z[256:512]。需确保核1在核0完成写操作后才能读取z[0:256]，避免写后读数据依赖问题。
 
-本样例中通过IBSet和IBWait实现核间同步：
+本样例中通过IBSet和IBWait实现inter_core_sync：
 
 - 核0完成z[0:256]的写操作后，通过IBSet设置同步标志位
 - 核1在读取z[0:256]之前，通过IBWait等待核0完成写操作
@@ -40,7 +40,7 @@
 
 <table>
 <caption>表1：样例输入输出规格</caption>
-<tr><td rowspan="1" align="center">样例类型</td><td colspan="5" align="center">核间同步</td></tr>
+<tr><td rowspan="1" align="center">样例类型</td><td colspan="5" align="center">inter_core_sync</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center"></td></tr>
 <tr><td align="center">x</td><td align="center">[512]</td><td align="center">half</td><td align="center">ND</td><td align="center"></td></tr>
 <tr><td align="center">y</td><td align="center">[512]</td><td align="center">half</td><td align="center">ND</td><td align="center"></td></tr>

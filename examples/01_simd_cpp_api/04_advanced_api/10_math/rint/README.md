@@ -1,8 +1,8 @@
 # Rint样例
 
-## 概述
+## overview
 
-本样例基于Rint高阶API实现获取与输入数据最接近整数的功能，若存在两个相同接近的整数，则获取其中的偶数。
+本样例基于Rinthigh_level_api实现获取与输入数据最接近整数的功能，若存在两个相同接近的整数，则获取其中的偶数。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -50,11 +50,11 @@
 
   - Kernel实现
 
-    使用Rint高阶API获取与输入数据最接近的整数，若存在两个相同接近的整数则取偶数
+    使用Rinthigh_level_api获取与输入数据最接近的整数，若存在两个相同接近的整数则取偶数
 
   - Tiling实现
 
-    Host侧通过GetRintMaxMinTmpSize获取Rint接口计算所需的最大和最小临时空间。
+    Host侧通过GetRintMaxMinTmpSize获取Rint_interface计算所需的最大和最小临时空间。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

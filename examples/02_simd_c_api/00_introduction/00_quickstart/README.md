@@ -1,6 +1,6 @@
 # HelloWorld样例介绍
 
-## 概述
+## overview
 
 样例介绍了基于Ascend C的HelloWorld算子的核函数直调方法，分别从NPU测运行核验证算子核函数，展示核函数从调用到执行的整体流程。
 

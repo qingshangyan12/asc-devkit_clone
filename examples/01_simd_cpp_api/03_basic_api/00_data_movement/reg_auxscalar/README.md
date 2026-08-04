@@ -1,6 +1,6 @@
 # auxscalar_reg样例
 
-## 概述
+## overview
 本样例基于Reg编程接口实现AuxScalar方式从UB(Unified Buffer)读取多个标量数据，结合Adds进行向量与标量加法计算。
 
 ## 本样例支持的产品及CANN软件版本
@@ -37,7 +37,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">auxscalar_reg</td></tr>
     </table>
   - 样例实现：
-    AuxScalarAddsVF函数内，通过`scalarAddr[i]`从UB读取第i个标量值，调用`Adds`进行向量加标量计算。
+    AuxScalarAddsVF函数内，通过`scalarAddr[i]`从UB读取第i个标量值，调用`Adds`进行向量加scalar_compute。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
 

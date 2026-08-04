@@ -35,7 +35,7 @@
 
 - 无符号整型：高位填0扩充。例如vector_uint8_t到vector_uint16_t，src中每个uint8_t元素高位补0扩展为uint16_t。
 - 有符号整型：保持符号位扩充。例如vector_int8_t到vector_int16_t，src中每个int8_t元素按符号位扩展为int16_t。
-- bool类型（掩码寄存器）：将每bit展开为2bit，高位填0。
+- bool类型（mask寄存器）：将每bit展开为2bit，高位填0。
 
 矢量数据寄存器unpack流程如图1所示：
 
@@ -43,11 +43,11 @@
 
 ![矢量数据寄存器unpack流程](../../figures/capi_unpack_reg.png)
 
-掩码数据寄存器unpack流程如图2所示：
+mask数据寄存器unpack流程如图2所示：
 
-**图2** 掩码数据寄存器unpack流程
+**图2** mask数据寄存器unpack流程
 
-![掩码数据寄存器unpack流程](../../figures/capi_unpack_mask.png)
+![mask数据寄存器unpack流程](../../figures/capi_unpack_mask.png)
 
 ## 函数原型
 
@@ -66,7 +66,7 @@
     __simd_callee__ inline void asc_unpack_upper(vector_int32_t& dst, vector_int16_t src)
     ```
 
-- 操作数为掩码寄存器
+- 操作数为mask寄存器
 
     ```cpp
     // 解压缩低位
@@ -84,14 +84,14 @@
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 
-**表2** 参数说明（操作数为掩码寄存器）
+**表2** 参数说明（操作数为mask寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（掩码寄存器）。 |
-| src | 输入 | 源操作数（掩码寄存器）。 |
+| dst | 输出 | 目的操作数（mask寄存器）。 |
+| src | 输入 | 源操作数（mask寄存器）。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和mask寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -119,7 +119,7 @@
     }
     ```
 
-- 对掩码寄存器操作
+- 对mask寄存器操作
 
     ```cpp
     __simd_vf__ inline void unpack_vf(__ubuf__ uint8_t* dst_addr, __ubuf__ uint8_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)

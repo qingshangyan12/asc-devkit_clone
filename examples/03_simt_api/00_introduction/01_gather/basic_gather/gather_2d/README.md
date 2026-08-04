@@ -1,6 +1,6 @@
 # SIMT编程模式实现二维Gather算子样例
 
-## 概述
+## overview
 
 样例基于Ascend C SIMT编程方式实现简单场景（固定shape的）二维Gather算子，从输入张量中采集指定的m行数据，展示简化场景离散内存访问类算子的开发方法。
 

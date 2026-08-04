@@ -1,8 +1,8 @@
 # fixpipe_l0c2gm样例
 
-## 概述
+## overview
 
-本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到GM（Global Memory），支持多种输出格式（Nz、ND、DN）、数据类型转换、随路量化、ReLU以及ChannelSplit等功能。这些接口用于将L0C中的矩阵乘计算结果高效地传输到全局内存，并支持各种数据格式转换和预处理能力。
+本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到GM（Global Memory），支持多种输出格式（Nz、ND、DN）、data_type_conversion、accompanying_quantization、ReLU以及ChannelSplit等功能。这些接口用于将L0C中的矩阵乘计算结果高效地传输到全局内存，并支持各种数据格式转换和预处理能力。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -76,7 +76,7 @@
 </table>
 
 **场景1：输出格式Nz，输出数据类型float**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [128, 256] float类型，Nz格式
 - 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_NZ>` 将数据从L0C搬出到GM，输出为Nz格式
 - 说明：L0C数据为Nz格式直接输出到GM的Nz格式，数据保持原格式不变
@@ -85,7 +85,7 @@
 </p>
 
 **场景2：输出格式ND，输出数据类型float**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [128, 256] float类型，ND格式
 - 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>` 指定ROW_MAJOR格式转换
 - 说明：将CO1中的Nz格式数据转换为ND格式输出到GM，ND格式没有Nz格式的对齐要求，输出时需要按实际大小配置参数
@@ -94,7 +94,7 @@
 </p>
 
 **场景3：输出格式DN，输出数据类型float（仅Ascend 950PR/Ascend 950DT支持）**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [256, 128] float类型，DN格式
 - 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_COLUMN_MAJOR>` 指定COLUMN_MAJOR格式转换
 - 说明：将CO1中的Nz格式数据转换为DN格式输出到GM
@@ -103,25 +103,25 @@
 </p>
 
 **场景4：输出格式ND，输出数据类型int8_t，使能Scalar量化**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [128, 256] int8_t类型，ND格式
 - 实现：设置 `fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE`，使用Scalar量化模式
 - 说明：将float类型数据量化为int8_t类型，整个C矩阵使用一个量化参数
 
 **场景5：输出格式ND，输出数据类型int8_t，使能Vector量化**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [128, 256] int8_t类型，ND格式
 - 实现：设置 `fixpipeParams.quantPre = QuantMode_t::VQF322B8_PRE`，使用Vector量化模式，并通过quantAlphaTensor传入每列的量化参数
 - 说明：将float类型数据量化为int8_t类型，C矩阵的每一列对应一个量化参数，使用的量化参数需要从GM拷贝量化参数到L1
 
 **场景6：输出格式ND，输出数据类型float，使能ReLU**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [128, 256] float类型，ND格式
 - 实现：设置 `fixpipeParams.reluEn = true` 开启ReLU功能
 - 说明：在数据从L0C搬出到GM的过程中执行ReLU操作，即将负值置为0
 
 **场景7：输出格式Nz，输出数据类型float，使能ChannelSplit**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [128, 512] float类型，Nz格式（使能通道拆分）
 - 实现：设置 `fixpipeParams.isChannelSplit = true` 开启ChannelSplit功能
 - 说明：在数据从L0C搬出到GM的过程中开启通道拆分功能，即将16x16小z分形矩阵拆分成两个独立的16x8小z分形矩阵输出到GM，Fixpipe接口的输入输出必须均为float类型，且仅支持Nz格式

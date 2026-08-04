@@ -1,6 +1,6 @@
 # Troubleshooting样例介绍
 
-## 概述
+## overview
 
 展示Ascend C SIMT编程中的故障分析与问题定位样例。
 

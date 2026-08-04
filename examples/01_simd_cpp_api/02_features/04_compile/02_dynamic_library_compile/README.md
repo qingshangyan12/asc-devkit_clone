@@ -1,6 +1,6 @@
 # Dynamic Library Compile 样例
 
-## 概述
+## overview
 
 本样例基于Add算子，演示了将Host + Device混合.asc文件（含Kernel定义与<<<>>>内核调用）编译为**动态共享库（.so）**，再由Host侧.cpp链接调用的动态库编译流程。其中.asc文件的<<<>>>调用函数通过extern暴露给纯Host侧的.cpp。代码结构与调用关系如图 1 所示：
 

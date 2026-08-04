@@ -1,8 +1,8 @@
 # membase 基础 API - AIC (Cube 核心) UT 生成指南
 
-## 1. API 概述
+## 1. API overview
 
-AIC (AI Cube) 核心 API 是 membase 基础 API 中的矩阵计算类接口，用于执行矩阵乘法、数据格式转换等操作。
+AIC (AI Cube) 核心 API 是 membase 基础 API 中的cube_compute类接口，用于执行矩阵乘法、数据格式转换等操作。
 
 ### 1.1 目录位置
 
@@ -38,11 +38,11 @@ AIC（AI Cube）核心 API 与 AIV（AI Vector）核心 API 有显著差异：
 
 ### 2.2 AIC 核心说明
 
-AIC (AI Cube) 核心专门用于矩阵计算：
+AIC (AI Cube) 核心专门用于cube_compute：
 
 | 特性 | 说明 |
 |------|------|
-| **核心类型** | 矩阵计算核心 (Cube Core) |
+| **核心类型** | cube_compute核心 (Cube Core) |
 | **设置方法** | `g_coreType = AIC_TYPE` |
 | **数据位置** | L0A, L0B, L0C (CO1), L1 |
 | **Tensor 类型** | `TQue<TPosition::A1/A2/B1/B2/CO1/CO2>` |

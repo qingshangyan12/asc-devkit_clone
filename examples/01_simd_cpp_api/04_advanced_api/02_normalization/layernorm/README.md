@@ -1,8 +1,8 @@
 # LayerNorm样例
 
-## 概述
+## overview
 
-本样例介绍了在一个核函数中连续调用LayerNorm、LayerNormGrad、LayerNormGradBeta三个高阶API实现LayerNorm的完整前向和反向传播。
+本样例介绍了在一个核函数中连续调用LayerNorm、LayerNormGrad、LayerNormGradBeta三个high_level_api实现LayerNorm的完整前向和反向传播。
 
 > **相似接口提示：** Ascend C 还提供了`BatchNorm`、`GroupNorm`，调用方式与 `LayerNorm` 一致。
 
@@ -29,7 +29,7 @@
 ## 样例描述
 
 - 样例功能：  
-  LayerNorm样例，在一个核函数中连续调用LayerNorm、LayerNormGrad、LayerNormGradBeta三个高阶API，完成LayerNorm的完整前向和反向传播计算。该样例在训练场景中可以一次性计算前向输出、输入梯度、参数梯度，提高计算效率。
+  LayerNorm样例，在一个核函数中连续调用LayerNorm、LayerNormGrad、LayerNormGradBeta三个high_level_api，完成LayerNorm的完整前向和反向传播计算。该样例在训练场景中可以一次性计算前向输出、输入梯度、参数梯度，提高计算效率。
 
 - 样例规格：  
   <table border="2" align="center">

@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-用于设置Mmad计算开启FP8模式。该接口会关闭HiF8模式（与[asc_enable_hif8](./asc_enable_hif8.md)相反），开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。
+用于设置mmad_compute开启FP8模式。该接口会关闭HiF8模式（与[asc_enable_hif8](./asc_enable_hif8.md)相反），开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与mmad_compute之前不会被转化为hifloat8_t类型数据。
 
 ## 函数原型
 

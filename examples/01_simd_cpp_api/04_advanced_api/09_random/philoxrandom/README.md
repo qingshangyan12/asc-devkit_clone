@@ -1,8 +1,8 @@
 # PhiloxRandom样例
 
-## 概述
+## overview
 
-本样例基于PhiloxRandom高阶API实现随机数生成功能，支持基于Philox算法生成指定数量的随机数，适用于需要高质量随机数的场景。
+本样例基于PhiloxRandomhigh_level_api实现随机数生成功能，支持基于Philoxalgorithms生成指定数量的随机数，适用于需要高质量随机数的场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -25,7 +25,7 @@
 ## 样例描述
 
 - 样例功能：  
-  基于Philox随机数生成算法，给定随机数种，生成若干的随机数。
+  基于Philox随机数生成algorithms，给定随机数种，生成若干的随机数。
 - 样例规格：  
   <table>
   <caption>表1：样例输入输出规格</caption>
@@ -45,7 +45,7 @@
     计算逻辑包含以下步骤：
     1. 在Local Memory（Unified Buffer）中分配输出空间
     2. 对输出空间进行清零初始化
-    3. 使用PhiloxRandom高阶API生成随机数
+    3. 使用PhiloxRandomhigh_level_api生成随机数
     4. 将生成的随机数从Local Memory搬出到Global Memory
 
   - 调用实现  

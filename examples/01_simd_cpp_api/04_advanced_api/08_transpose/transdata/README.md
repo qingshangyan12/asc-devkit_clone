@@ -1,8 +1,8 @@
 # TransData样例
 
-## 概述
+## overview
 
-本样例基于TransData高阶API实现数据排布格式转换功能，支持将输入数据的排布格式转换为目标排布格式。
+本样例基于TransDatahigh_level_api实现数据排布格式转换功能，支持将输入数据的排布格式转换为目标排布格式。
 
 ## 本样例支持的产品及CANN软件版本
 

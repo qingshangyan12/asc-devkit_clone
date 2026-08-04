@@ -1,3 +1,3 @@
-# 系统变量访问
+# system_variable_access
 
 -   **[asc_clear_ar_spr](asc_clear_ar_spr.md)**

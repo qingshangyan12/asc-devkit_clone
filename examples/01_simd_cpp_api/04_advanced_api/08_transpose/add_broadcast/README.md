@@ -1,6 +1,6 @@
 # AddBroadcast算子直调样例
 
-## 概述
+## overview
 
 本样例介绍Add算子的核函数直调方法，多核&tiling场景下增加输入Broadcast。
 
@@ -82,7 +82,7 @@
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # 默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

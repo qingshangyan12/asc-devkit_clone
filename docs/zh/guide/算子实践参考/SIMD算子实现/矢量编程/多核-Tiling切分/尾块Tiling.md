@@ -1,11 +1,11 @@
 # 尾块Tiling<a name="ZH-CN_TOPIC_0000002500548090"></a>
 
-如下图中的示例，算子的输入shape为（1，2048），支持的数据类型为half类型，输入数据可以对齐到一个datablock的大小（32字节），输入数据为2048 \* 2 / 32 = 128个datablock，因此可以平均分配到每个核上（假设使用8个核），每个核上处理256个数，16个datablock。此时不需要进行尾块处理。
+如下图中的示例，算子的输入shape为（1，2048），支持的数据类型为half_type，输入数据可以对齐到一个datablock的大小（32字节），输入数据为2048 \* 2 / 32 = 128个datablock，因此可以平均分配到每个核上（假设使用8个核），每个核上处理256个数，16个datablock。此时不需要进行尾块处理。
 
 **图1**  shape对齐场景<a name="zh-cn_topic_0000002201157442_fig55115212126"></a>  
 ![](../../../../figures/shape对齐场景.png "shape对齐场景")
 
-针对一些shape，比如算子的输入shape为（1，1904），支持的数据类型为half类型，输入数据可以对齐到一个datablock的大小（32字节），可以平均分配到每个核上（假设使用8个核），每个核上处理238个数，238个数无法均分到datablock上，分满14个datablock后，剩余14个数（28字节），多核切分后需要进行尾块处理。
+针对一些shape，比如算子的输入shape为（1，1904），支持的数据类型为half_type，输入数据可以对齐到一个datablock的大小（32字节），可以平均分配到每个核上（假设使用8个核），每个核上处理238个数，238个数无法均分到datablock上，分满14个datablock后，剩余14个数（28字节），多核切分后需要进行尾块处理。
 
 对于不同shape的输入进行数据切分时，可能会发生Tiling后的数据平均分配到多核上，但每个核内的数据无法均分的情况。针对此种场景，在Tiling参数中增加变量lastTileLength，用来表示最后一个分块，即尾块的大小。因此，在定义算子的Tiling结构体时包含以下四个成员：
 
@@ -56,7 +56,7 @@ Host侧Tiling实现的主要内容为计算以上四个成员变量。步骤如�
     }
     ```
 
-3.  计算tileNum。为了减少数据搬运开销，应尽量使用核内的Unified Buffer空间。基于每个核上的计算量以及可用Unified Buffer空间的大小，计算tileNum。
+3.  计算tileNum。为了减少data_move开销，应尽量使用核内的Unified Buffer空间。基于每个核上的计算量以及可用Unified Buffer空间的大小，计算tileNum。
 
     ```
     tileNum = blockLength / (alignNum * UB_BLOCK_NUM);

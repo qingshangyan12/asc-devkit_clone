@@ -1,11 +1,11 @@
 # SetLoadDataBoundary兼容性样例
 
 
-## 概述
+## overview
 
   本样例实现L1 Buffer边界值的设置，通过编译时宏隔离不同硬件实现。
 
-  Atlas A2/A3系列产品通过`SetLoadDataBoundary`接口设置L1 Buffer的边界值，而Ascend 950PR/950DT新架构不支持该接口，需通过手动拆分LoadData（卷积数据搬运）接口实现数据循环读取的绕回功能。
+  Atlas A2/A3系列产品通过`SetLoadDataBoundary`接口设置L1 Buffer的边界值，而Ascend 950PR/950DT新架构不支持该接口，需通过手动拆分LoadData（卷积data_move）接口实现数据循环读取的绕回功能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -41,9 +41,9 @@
 
 ## 样例实现
    
-- **Atlas A2/A3 训练/推理系列产品**：通过SetLoadDataBoundary接口设置L1 Buffer的边界值为1024字节，当LoadData（卷积数据搬运）接口处理源操作数时，如果源操作数在L1 Buffer上的地址超出设置的边界，则会自动从L1 Buffer的起始地址开始读取数据，实现数据循环读取功能。
+- **Atlas A2/A3 训练/推理系列产品**：通过SetLoadDataBoundary接口设置L1 Buffer的边界值为1024字节，当LoadData（卷积data_move）接口处理源操作数时，如果源操作数在L1 Buffer上的地址超出设置的边界，则会自动从L1 Buffer的起始地址开始读取数据，实现数据循环读取功能。
 
-- **Ascend 950PR/950DT**：新架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。为实现相同的数据循环读取功能，需将LoadData（卷积数据搬运）接口手动拆分成多条指令，通过调整目的操作数的地址偏移量实现手动绕回。
+- **Ascend 950PR/950DT**：新架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。为实现相同的数据循环读取功能，需将LoadData（卷积data_move）接口手动拆分成多条指令，通过调整目的操作数的地址偏移量实现手动绕回。
 
 ## 编译运行
 
@@ -66,7 +66,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                      # 编译工程
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。

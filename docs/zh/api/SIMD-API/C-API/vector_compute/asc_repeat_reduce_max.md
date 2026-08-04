@@ -50,7 +50,7 @@ only_index接口：表示只返回最值索引，返回结果存储顺序为[ind
     __aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
     ```
 
-- 高维切分计算
+- high_dim_split计算
 
     ```cpp
     __aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
@@ -101,7 +101,7 @@ PIPE_V
 ## 约束说明
 
 - 输出中的索引index的数据是按照dst的数据类型进行存储，比如float输出的index数据应该为uint32，则读取时需要将float重新解释为uint32。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst的起始地址，输入类型为half时需要4字节对齐，输入类型为float时需要8字节对齐。
 - src的起始地址需要32字节对齐。
 
@@ -128,5 +128,5 @@ asc_repeat_reduce_max_value_index(dst, src, repeat, dst_repeat_stride, src_block
 ```
 输入数据src：[1, 2, 3, ..., 128, 129, ..., 256]
 输出数据dst：[128, 7.6e-6, 256, 7.6e-6]
-输出说明：half类型7.6e-6的二进制是0x007F，重新解释为uint32后即为最大值索引127
+输出说明：half_type7.6e-6的二进制是0x007F，重新解释为uint32后即为最大值索引127
 ```

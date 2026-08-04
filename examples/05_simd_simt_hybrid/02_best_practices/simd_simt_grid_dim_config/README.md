@@ -1,6 +1,6 @@
 # 线程块数量配置与vf调用优化样例
 
-## 概述
+## overview
 
 本样例以Gather计算为例，介绍Ascend C SIMD与SIMT混合编程场景下的线程块数量配置和vf函数调用优化思路。样例包含4个Case（16个场景），从空壳核函数调度开销到不同数据量下的线程块数量配置优化。
 
@@ -381,7 +381,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

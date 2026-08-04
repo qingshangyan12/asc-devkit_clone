@@ -4,7 +4,7 @@
 
 ---
 
-## 1. 概述
+## 1. overview
 
 LocalTensor 是 AscendC 中用于表示片上内存（Unified Buffer、L1 等）的张量类型。获取 LocalTensor 需要先通过 `TPipe` 或 `TBufPool` 分配内存给 `TQue` 或 `TBuf`，再从中获取。
 
@@ -159,7 +159,7 @@ pipe.InitBuffer(que, newNum, newLen);
 
 **选择原则**：
 - 矢量计算 API（Add, Mul 等）：使用 `VECIN`/`VECOUT`/`VECCALC`
-- 矩阵计算 API（Mmad 等）：使用 `A1`/`B1`/`C1` 等
+- cube_compute API（Mmad 等）：使用 `A1`/`B1`/`C1` 等
 
 ---
 

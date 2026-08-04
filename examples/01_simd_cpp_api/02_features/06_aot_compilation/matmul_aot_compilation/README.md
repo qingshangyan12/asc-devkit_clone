@@ -1,10 +1,10 @@
 # Matmul AOT样例
 
-## 概述
+## overview
 
-本样例在Matmul高阶API实现矩阵乘的基础上，引入 **AOT（Ahead-of-Time）编译优化**：通过在编译阶段将Tiling参数常量化，让编译器对kernel进行更激进的优化（循环展开、死代码消除、常量传播等），从而在运行时根据实际Tiling自动匹配预编译的特化版本，获得性能提升。
+本样例在Matmulhigh_level_api实现矩阵乘的基础上，引入 **AOT（Ahead-of-Time）编译优化**：通过在编译阶段将Tiling参数常量化，让编译器对kernel进行更激进的优化（循环展开、死代码消除、常量传播等），从而在运行时根据实际Tiling自动匹配预编译的特化版本，获得性能提升。
 
-矩阵乘本身使用Matmul高阶API完成 `C = A × B` 的计算，A/B为half类型，C为float类型，规格固定为 `M=512, N=512, K=128`。
+矩阵乘本身使用Matmulhigh_level_api完成 `C = A × B` 的计算，A/B为half_type，C为float类型，规格固定为 `M=512, N=512, K=128`。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -167,7 +167,7 @@ aot::AOTDispatcher<AscendC::tiling::TCubeTiling, MatmulTilingAOTRegistry>::templ
 
 ### 矩阵乘功能（简述）
 
-本样例使用Ascend C Matmul高阶API实现矩阵乘法 `C = A × B`。其中A矩阵形状为 `[M, K]`，B矩阵形状为 `[K, N]`，输出C矩阵形状为 `[M, N]`。Matmul高阶API封装了数据搬运、Cube计算调度、基础流水同步等细节，开发者主要完成矩阵规格配置、tiling生成、输入输出Tensor设置和结果写回。
+本样例使用Ascend C Matmulhigh_level_api实现矩阵乘法 `C = A × B`。其中A矩阵形状为 `[M, K]`，B矩阵形状为 `[K, N]`，输出C矩阵形状为 `[M, N]`。Matmulhigh_level_api封装了data_move、Cube计算调度、基础流水同步等细节，开发者主要完成矩阵规格配置、tiling生成、输入输出Tensor设置和结果写回。
 
 - 样例规格：
   本样例参数 `M = 512, N = 512, K = 128`。输入A、B矩阵均为 `half` 类型、`ND` 格式，输出C矩阵为 `float` 类型、`ND` 格式。输入输出规格如下表所示：
@@ -180,7 +180,7 @@ aot::AOTDispatcher<AscendC::tiling::TCubeTiling, MatmulTilingAOTRegistry>::templ
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 
-  样例为纯Cube矩阵计算场景，固定按2个Cube核生成tiling。在本样例规格下，tiling结果会把 `M = 512` 按2个核均分，每个核处理 `singleCoreM = 256`，`singleCoreN = 512`，`singleCoreKa = singleCoreKb = 128`。
+  样例为纯Cubecube_compute场景，固定按2个Cube核生成tiling。在本样例规格下，tiling结果会把 `M = 512` 按2个核均分，每个核处理 `singleCoreM = 256`，`singleCoreN = 512`，`singleCoreKa = singleCoreKb = 128`。
 
 ### AOT优化效果
 

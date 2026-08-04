@@ -1,6 +1,6 @@
 # gm_by_dcache样例
 
-## 概述
+## overview
 
 本样例介绍经过DCache（Data Cache）从GM地址读取和写入数据。
 
@@ -42,7 +42,7 @@ Scalar单元访问Global Memory，首先会访问每个核内的DataCache，因�
   - Kernel实现
     本样例使用4个核完成计算，每个核处理对应行1024个元素的求和。
 
-    **第一步：每个核分别执行归约计算**
+    **第一步：每个核分别执行reduction_compute**
 
     - 将GM（Global Memory）上的输入数据（对应行1024个元素）搬运到UB（Unified Buffer）上
     - 调用`ReduceRepeat<AscendC::ReduceType::SUM>`接口，每256B数据归约为一个sum元素，结果共16个float
@@ -53,12 +53,12 @@ Scalar单元访问Global Memory，首先会访问每个核内的DataCache，因�
     - 通过Scalar单元写入标志位至GM上的workspace，表示该核的计算已经完成
     - 调用DataCacheCleanAndInvalid接口，将Data Cache中现存的数据立即写出
 
-    **第三步：0核读取标志位，完成最终的归约计算**
+    **第三步：0核读取标志位，完成最终的reduction_compute**
 
     - 除了0核外的其他核return，停止运行
     - 0核调用DataCacheCleanAndInvalid接口，获取最新数据
     - 通过Scalar单元依次读取所有核的标志位，判断其他核是否完成计算
-    - 若其他核的标志位都符合预期，则再次调用`ReduceRepeat<AscendC::ReduceType::SUM>`接口，完成最终的归约计算
+    - 若其他核的标志位都符合预期，则再次调用`ReduceRepeat<AscendC::ReduceType::SUM>`接口，完成最终的reduction_compute
 
   - 调用实现
     使用内核调用符<<<>>>调用核函数，启动4个核并行执行。

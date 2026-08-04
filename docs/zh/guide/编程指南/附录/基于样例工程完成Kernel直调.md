@@ -164,12 +164,12 @@ AddKernelInvocationNeo
     ```
 
     >[!NOTE]说明 
-    >针对<<<\>\>\>调用方式在[核函数](../编程模型/AI-Core-SIMD编程/核函数.md)章节已有说明，这里仅对ACLRT\_LAUNCH\_KERNEL调用接口的使用方法介绍如下：
+    >针对<<<\>\>\>调用方式在[核函数](../programming_model/AI-Core-SIMD编程/核函数.md)章节已有说明，这里仅对ACLRT\_LAUNCH\_KERNEL调用接口的使用方法介绍如下：
     >```
     >ACLRT_LAUNCH_KERNEL(kernel_name)(numBlocks, stream, argument list);
     >```
     >- kernel\_name：算子核函数的名称。
-    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](../../../api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)来获取block\_idx。
+    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)来获取block\_idx。
     >- stream，类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在Device上执行。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
     >- argument list：参数列表，与核函数的参数列表保持一致。
 
@@ -256,7 +256,7 @@ AddKernelInvocationNeo
 <pre class="screen" id="screen5975184113338"><a name="screen5975184113338"></a><a name="screen5975184113338"></a>ascendc_compile_definitions(&lt;target_name&gt; [PRIVATE]
             [&lt;xxx&gt;...]) </pre>
 <p id="p1655714242611"><a name="p1655714242611"></a><a name="p1655714242611"></a><span id="ph12925144843119"><a name="ph12925144843119"></a><a name="ph12925144843119"></a>Ascend C</span>提供的编译宏介绍如下：</p>
-<a name="ul95991737102913"></a><a name="ul95991737102913"></a><ul id="ul95991737102913"><li><a name="li1103101565014"></a>HAVE_WORKSPACE用于表示kernel入口是否包含workspace入参。默认情况下为不包含；增加该编译宏后，表示包含，此时框架会获取kernel入参的倒数第一个参数（未配置<a href="#li6933155615394">HAVE_TILING</a>），或倒数第二个参数（配置HAVE_TILING），自动在kernel侧设置系统workspace，开发者在kernel侧入参处获取的workspace为偏移了系统workspace后的用户workspace。当开发者使用了Matmul Kernel侧接口等需要系统workspace的高阶API时，建议开启此参数，入参排布、系统workspace的设置逻辑与工程化算子开发保持一致，可减少算子实现在不同开发方式间切换带来的修改成本。需要注意的是，host侧开发者仍需要自行申请workspace的空间，系统workspace大小可以通过PlatformAscendCManager的GetLibApiWorkSpaceSize接口获取。HAVE_WORKSPACE的设置样例如下：<pre class="screen" id="screen170874019451"><a name="screen170874019451"></a><a name="screen170874019451"></a>ascendc_compile_definitions(ascendc_kernels_${RUN_MODE} PRIVATE
+<a name="ul95991737102913"></a><a name="ul95991737102913"></a><ul id="ul95991737102913"><li><a name="li1103101565014"></a>HAVE_WORKSPACE用于表示kernel入口是否包含workspace入参。默认情况下为不包含；增加该编译宏后，表示包含，此时框架会获取kernel入参的倒数第一个参数（未配置<a href="#li6933155615394">HAVE_TILING</a>），或倒数第二个参数（配置HAVE_TILING），自动在kernel侧设置系统workspace，开发者在kernel侧入参处获取的workspace为偏移了系统workspace后的用户workspace。当开发者使用了Matmul Kernel侧接口等需要系统workspace的high_level_api时，建议开启此参数，入参排布、系统workspace的设置逻辑与工程化算子开发保持一致，可减少算子实现在不同开发方式间切换带来的修改成本。需要注意的是，host侧开发者仍需要自行申请workspace的空间，系统workspace大小可以通过PlatformAscendCManager的GetLibApiWorkSpaceSize接口获取。HAVE_WORKSPACE的设置样例如下：<pre class="screen" id="screen170874019451"><a name="screen170874019451"></a><a name="screen170874019451"></a>ascendc_compile_definitions(ascendc_kernels_${RUN_MODE} PRIVATE
     HAVE_WORKSPACE
 )</pre>
 </li><li id="li6933155615394"><a name="li6933155615394"></a><a name="li6933155615394"></a>HAVE_TILING用于表示kernel入口是否含有tiling入参。在配置了HAVE_WORKSPACE之后，此编译宏才会生效。默认情况下为不包含，开关关闭；增加该编译宏后，表示包含，此时框架会将kernel入参的最后一个参数当做tiling，将倒数第二个参数当做workspace。框架不会对此tiling入参做任何处理，仅通过该入参来判断workspace参数的位置，使用此编译宏可以和工程化算子开发保持入参一致，减少算子实现在不同开发方式间切换带来的修改成本。设置样例如下：<pre class="screen" id="screen8986115020458"><a name="screen8986115020458"></a><a name="screen8986115020458"></a>ascendc_compile_definitions(ascendc_kernels_${RUN_MODE} PRIVATE
@@ -374,7 +374,7 @@ if __name__ == '__main__':
 
 >[!NOTE]说明 
 >**样例中提供的一键式编译运行脚本并不能适用于所有的算子运行验证场景，使用时请根据实际情况进行修改。**
->- 根据Ascend C算子的算法原理的不同，自行实现输入和真值数据的生成脚本。
+>- 根据Ascend C算子的algorithms原理的不同，自行实现输入和真值数据的生成脚本。
 
 完成上述文件的编写后，可以执行一键式编译运行脚本，编译和运行应用程序。
 

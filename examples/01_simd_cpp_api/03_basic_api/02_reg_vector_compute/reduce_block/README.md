@@ -1,6 +1,6 @@
 # reduce_block样例
 
-## 概述
+## overview
 本样例基于Reg编程接口实现ReduceDataBlock运算，主要调用ReduceDataBlock接口（SUM模式）。
 - ReduceDataBlock接口支持SUM/MAX/MIN归约模式，本样例以SUM模式为例
 
@@ -38,7 +38,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_block</td></tr>
   </table>
 - 样例实现：  
-   ReduceDataBlockSumVF函数内调用ReduceDataBlock接口进行归约计算：
+   ReduceDataBlockSumVF函数内调用ReduceDataBlock接口进行reduction_compute：
    - 使用LoadAlign加载数据到寄存器
    - 使用ReduceDataBlock(ReduceType::SUM)对每个DataBlock(32B)内的元素求和
    - 结果采用交织布局存储在dstReg中，每个repeat的前8个位置为有效结果

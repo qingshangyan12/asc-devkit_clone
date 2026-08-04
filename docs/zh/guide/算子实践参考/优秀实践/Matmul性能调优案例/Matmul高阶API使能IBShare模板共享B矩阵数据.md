@@ -1,16 +1,16 @@
-# Matmul高阶API开启IBShare模板共享B矩阵数据<a name="ZH-CN_TOPIC_0000002340907802"></a>
+# Matmulhigh_level_api开启IBShare模板共享B矩阵数据<a name="ZH-CN_TOPIC_0000002340907802"></a>
 
 ## 案例介绍<a name="section17413194624510"></a>
 
-本案例呈现了在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，B矩阵开启IBShare对算子性能的提升效果。IBShare功能通过共享L1 Buffer上相同的A矩阵或B矩阵数据，减少重复的MTE2数据搬运开销，提升算子性能。该功能支持A矩阵和B矩阵其中一个矩阵开启IBShare，也支持A矩阵和B矩阵同时开启IBShare。
+本案例呈现了在矩阵乘算子场景中，使用Matmulhigh_level_api进行矩阵乘法计算，B矩阵开启IBShare对算子性能的提升效果。IBShare功能通过共享L1 Buffer上相同的A矩阵或B矩阵数据，减少重复的MTE2data_move开销，提升算子性能。该功能支持A矩阵和B矩阵其中一个矩阵开启IBShare，也支持A矩阵和B矩阵同时开启IBShare。
 
 -   开启IBShare的适用场景
 
-    MIX场景（包含矩阵计算和矢量计算）下，多个AIV的A矩阵或B矩阵GM地址相同，且多个AIV复用的A矩阵或B矩阵在L1 Buffer上全载。
+    MIX场景（包含cube_compute和矢量计算）下，多个AIV的A矩阵或B矩阵GM地址相同，且多个AIV复用的A矩阵或B矩阵在L1 Buffer上全载。
 
 -   开启IBShare的约束条件
     -   A矩阵和B矩阵同时开启IBShare的场景，同一算子中其它Matmul对象的A矩阵和B矩阵也必须同时开启IBShare。
-    -   A矩阵和B矩阵同时开启IBShare的场景，获取矩阵计算结果时，只支持调用IterateAll接口，且只支持输出到Global Memory。
+    -   A矩阵和B矩阵同时开启IBShare的场景，获取cube_compute结果时，只支持调用IterateAll接口，且只支持输出到Global Memory。
 
 本案例的算子规格如下：
 
@@ -57,7 +57,7 @@
 
 ## 获取性能数据<a name="section851404010469"></a>
 
-使用msOpProf工具获取[算子仿真流水图](../../性能分析/获取性能数据.md#section17259539153513)和[上板Profiling](../../性能分析/获取性能数据.md#section17953123893415)数据，因为IBShare功能主要是通过共享L1 Buffer上相同的A矩阵或B矩阵数据，减少重复的MTE2数据搬运开销，所以重点分析MTE2的流水情况。
+使用msOpProf工具获取[算子仿真流水图](../../性能分析/获取性能数据.md#section17259539153513)和[上板Profiling](../../性能分析/获取性能数据.md#section17953123893415)数据，因为IBShare功能主要是通过共享L1 Buffer上相同的A矩阵或B矩阵数据，减少重复的MTE2data_move开销，所以重点分析MTE2的流水情况。
 
 ## 分析主要瓶颈点<a name="section221431704714"></a>
 
@@ -98,7 +98,7 @@ Matmul API开启IBShare模板共享B矩阵的完整样例请参考[仅B矩阵开
 
 ## 验证优化方案性能收益<a name="section19022397498"></a>
 
--   优化后的流水图如下，黑框标识的AIV0发起的MTE2搬运流水，与优化前一致。红框标识的AIV1发起的MTE2搬运流水，相较于优化前的A矩阵和B矩阵一共12次MTE2数据搬运，减少到了仅6次A矩阵的MTE2数据搬运，省去了B矩阵的6次MTE2数据搬运开销。
+-   优化后的流水图如下，黑框标识的AIV0发起的MTE2搬运流水，与优化前一致。红框标识的AIV1发起的MTE2搬运流水，相较于优化前的A矩阵和B矩阵一共12次MTE2data_move，减少到了仅6次A矩阵的MTE2data_move，省去了B矩阵的6次MTE2data_move开销。
 
     ![](../../../figures/zh-cn_image_0000002404200417.png)
 
@@ -108,4 +108,4 @@ Matmul API开启IBShare模板共享B矩阵的完整样例请参考[仅B矩阵开
 
 ## 总结<a name="section8281219125011"></a>
 
-MIX场景（包含矩阵计算和矢量计算）下，若多个AIV的A矩阵或B矩阵GM地址相同，且多个AIV复用的A矩阵/B矩阵在L1 Buffer上全载。可以考虑开启IBShare模板，通过共享L1 Buffer上相同的A矩阵或B矩阵数据，减少重复的MTE2数据搬运开销，提升算子性能。
+MIX场景（包含cube_compute和矢量计算）下，若多个AIV的A矩阵或B矩阵GM地址相同，且多个AIV复用的A矩阵/B矩阵在L1 Buffer上全载。可以考虑开启IBShare模板，通过共享L1 Buffer上相同的A矩阵或B矩阵数据，减少重复的MTE2data_move开销，提升算子性能。

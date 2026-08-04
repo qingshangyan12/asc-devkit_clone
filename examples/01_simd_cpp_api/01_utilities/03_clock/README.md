@@ -1,6 +1,6 @@
 # 基于SIMD&SIMT混编的时间戳打点功能实现样例
 
-## 概述
+## overview
 
 本样例基于 Gather 和 Adds 融合计算，演示在 SIMD&SIMT 混合编程场景中使用 `clock()` 接口实现时间戳打点的方法。样例以 SIMT 方式实现离散访存的 Gather，以 SIMD 方式实现连续访存的 Adds，并在 SIMT Gather 阶段前后打点，用于记录执行周期。
 

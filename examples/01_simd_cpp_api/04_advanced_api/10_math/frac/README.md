@@ -1,8 +1,8 @@
 # Frac样例
 
-## 概述
+## overview
 
-本样例基于Frac高阶API实现按元素取小数的功能。
+本样例基于Frachigh_level_api实现按元素取小数的功能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -48,11 +48,11 @@
 
   - Kernel实现
 
-    使用Frac高阶API按元素取小数部分
+    使用Frachigh_level_api按元素取小数部分
 
   - Tiling实现
 
-    Host侧通过GetFracMaxMinTmpSize获取Frac接口计算所需的最大和最小临时空间。
+    Host侧通过GetFracMaxMinTmpSize获取Frac_interface计算所需的最大和最小临时空间。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

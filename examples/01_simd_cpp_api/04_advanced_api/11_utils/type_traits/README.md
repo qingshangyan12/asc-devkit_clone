@@ -1,6 +1,6 @@
-# type_traits类型特性直调样例
-## 概述
-本样例通过Ascend C编程语言实现了type_traits类型特性用例，类型特性接口包括is_void/remove_const/add_const等。使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
+# type_traitstype_traits直调样例
+## overview
+本样例通过Ascend C编程语言实现了type_traitstype_traits用例，type_traits接口包括is_void/remove_const/add_const等。使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -20,7 +20,7 @@
 ```
 
 ## 功能描述
-- type_traits类型特性接口，接口包括is_void/is_integral/is_floating_point/is_array/is_pointer/is_reference/is_const/remove_const/remove_volatile/remove_cv/remove_reference/remove_pointer/add_const/add_volatile/add_cv/add_pointer/add_lvalue_reference/add_rvalue_reference，可用于在程序编译时对类型的判断、增加、删除、转换等处理。
+- type_traitstype_traits接口，接口包括is_void/is_integral/is_floating_point/is_array/is_pointer/is_reference/is_const/remove_const/remove_volatile/remove_cv/remove_reference/remove_pointer/add_const/add_volatile/add_cv/add_pointer/add_lvalue_reference/add_rvalue_reference，可用于在程序编译时对类型的判断、增加、删除、转换等处理。
 
 - 算子实现：  
   - kernel实现  

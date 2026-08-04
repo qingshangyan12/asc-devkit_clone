@@ -1,6 +1,6 @@
 # 单独编译样例
 
-## 概述
+## overview
 
 本样例基于Add算子，演示了将Host + Device混合.asc文件中的Device代码拆分到**多个.asc文件**的单独编译流程。单独编译的代码结构与调用关系如下图1所示，其中 `add_compute.asc` 为**Device侧执行函数**（定义 `add_compute` 函数并通过 extern 暴露供跨文件调用），`add_kernel.asc` 为**Host + Device混合文件**（含Kernel定义、<<<>>>内核调用，通过extern调用add_compute.asc中的Device侧执行函数），`main.cpp` 为纯Host侧代码（通过extern调用add_kernel.asc暴露的 <<<>>> 内核启动函数）。
 

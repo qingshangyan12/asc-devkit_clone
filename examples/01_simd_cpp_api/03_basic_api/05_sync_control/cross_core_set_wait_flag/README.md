@@ -1,10 +1,10 @@
-# CrossCoreSetFlag和CrossCoreWaitFlag核间同步样例
+# CrossCoreSetFlag和CrossCoreWaitFlaginter_core_sync样例
 
-## 概述
-本样例首先介绍核间同步接口CrossCoreSetFlag和CrossCoreWaitFlag支持的三种同步模式(详见下表)，随后分别在纯 Vector 计算场景以及Cube 与 Vector 融合计算场景这两个实际业务中，说明上述三种同步模式的具体使用方法。
+## overview
+本样例首先介绍核间sync_interfaceCrossCoreSetFlag和CrossCoreWaitFlag支持的三种同步模式(详见下表)，随后分别在纯 Vector 计算场景以及Cube 与 Vector 融合计算场景这两个实际业务中，说明上述三种同步模式的具体使用方法。
 <table border="1" align="center">
   <tr bgcolor="lightgray">
-    <td>同步控制模式</td>
+    <td>sync_control模式</td>
     <td align="center">说明</td>
   </tr>
   <tr>
@@ -16,7 +16,7 @@
   </tr>
   <tr>
     <td>mode 1</td>
-    <td>单个AI Core内部，AIV核之间的同步控制。如果两个AIV核都运行了CrossCoreSetFlag，CrossCoreWaitFlag后续的指令才会执行。</td>
+    <td>单个AI Core内部，AIV核之间的sync_control。如果两个AIV核都运行了CrossCoreSetFlag，CrossCoreWaitFlag后续的指令才会执行。</td>
   </tr>
   <tr>
     <td rowspan="2">mode 2</td>
@@ -146,9 +146,9 @@
 
 本样例针对融合算子(配置__mix__(1,2))场景展开，每个AI Core内部有1个AIC和2个AIV。配置逻辑核数numBlocks = 8，对应 8 个 AIC 与 16 个 AIV。如图1所示，整体计算逻辑分为三个核心阶段：精度转换阶段、分块矩阵乘与原子累加阶段、LeakyRelu运算与结果回写阶段。
 #### 1.2 精度转换阶段(模式 2，单个AI Core内部AIC等AIV)
-由于GM上左右矩阵的数据类型为uint8,并不满足mmad指令对输入数据类型的要求，需要先将GM上的数据搬运到AIV中进行精度转换后，才能在AIC中进行分块矩阵乘计算。因此，
+由于GM上左右矩阵的数据类型为uint8,并不满足mmad指令对输入数据类型的要求，需要先将GM上的data_move到AIV中进行精度转换后，才能在AIC中进行分块矩阵乘计算。因此，
 每个AI Core内部，一个AIC 需要等待该AI Core内部其它2 个 AIV 完成数据精度转换后，才能开始分块矩阵乘计算。
-具体来说：将 GM 中左矩阵(A矩阵)数据沿 K 轴切分 8 份，分配至 BlockIdx 为偶数的 AIV 中完成 uint8 到 half 的精度转换；将 GM 中右矩阵(B矩阵)数据沿 K 轴切分 8 份，分配至 BlockIdx 为奇数的 AIV 中完成 uint8 到 half 的精度转换。如图2所示，根据以上描述，需要使用核间同步模式2。
+具体来说：将 GM 中左矩阵(A矩阵)数据沿 K 轴切分 8 份，分配至 BlockIdx 为偶数的 AIV 中完成 uint8 到 half 的精度转换；将 GM 中右矩阵(B矩阵)数据沿 K 轴切分 8 份，分配至 BlockIdx 为奇数的 AIV 中完成 uint8 到 half 的精度转换。如图2所示，根据以上描述，需要使用inter_core_sync模式2。
 上述描述对应的代码段如下：
 
         if (blockIdx % 2 == 0) {
@@ -173,7 +173,7 @@
 </p>
 
 #### 1.3 分块矩阵乘与原子累加阶段(模式 0，AIC全核同步)
-每个 AIC 执行分块矩阵乘计算后，开启原子累加求和机制，将计算结果搬运至同一块 GM 区域，将8个AIC各自分块矩阵乘的结果在GM上进行累加，最终得到完整的C矩阵。为了获取正确的C矩阵，需要等待8个AIC都完成分块矩阵乘计算并且将结果通过FixPipe搬运到GM上。如图3所示，根据以上描述，需要使用核间同步模式0（AIC全核同步）。上述描述对应的代码段如下：
+每个 AIC 执行分块矩阵乘计算后，开启原子累加求和机制，将计算结果搬运至同一块 GM 区域，将8个AIC各自分块矩阵乘的结果在GM上进行累加，最终得到完整的C矩阵。为了获取正确的C矩阵，需要等待8个AIC都完成分块矩阵乘计算并且将结果通过FixPipe搬运到GM上。如图3所示，根据以上描述，需要使用inter_core_sync模式0（AIC全核同步）。上述描述对应的代码段如下：
 $$
 C = \sum_{i=1}^{8} A_i \cdot B_i
 $$
@@ -202,7 +202,7 @@ $$
 
 #### 1.4 LeakyRelu与结果回写阶段(模式 2，2个AIV等AIC)
 每个 AI Core 内部，2 个 AIV 需等待 AIC 完成分块矩阵乘及原子累加操作后，才能对C矩阵分块执行LeakyRelu运算。
-具体来说是对累加得到的C矩阵，沿 M 轴切分 16 份，分配至 16 个 AIV 中分别执行 LeakyRelu 运算。如图4所示，根据以上描述，需要使用核间同步模式2（单个AI Core内部2个AIV等一个AIC）。上述描述对应的代码段如下：
+具体来说是对累加得到的C矩阵，沿 M 轴切分 16 份，分配至 16 个 AIV 中分别执行 LeakyRelu 运算。如图4所示，根据以上描述，需要使用inter_core_sync模式2（单个AI Core内部2个AIV等一个AIC）。上述描述对应的代码段如下：
 
         // 模式2,每一个AICore内部，2个AIV等AIC
         AscendC::CrossCoreWaitFlag(SYNC_AIC_AIV_FLAG);
@@ -238,7 +238,7 @@ $$
 
 (2) 每个AIV对UB上的数据进行矢量计算：通过Muls指令乘以每个核对应的BlockIdx，即为PIPE\_V的流水操作。
 
-(3) 步骤 3 对应代码片段如下，atomicResultGm 用于存储 16 个 AIV 全部搬运完成后的累加结果。通过调用 CrossCoreSetFlag 与 CrossCoreWaitFlag 接口，实现同步控制：确保 16 个 AIV 均完成 PIPE_MTE3 搬运指令后，方可执行 CrossCoreWaitFlag 后续指令
+(3) 步骤 3 对应代码片段如下，atomicResultGm 用于存储 16 个 AIV 全部搬运完成后的累加结果。通过调用 CrossCoreSetFlag 与 CrossCoreWaitFlag 接口，实现sync_control：确保 16 个 AIV 均完成 PIPE_MTE3 搬运指令后，方可执行 CrossCoreWaitFlag 后续指令
 
          // UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值
         AscendC::SetAtomicAdd<float>(); 
@@ -279,10 +279,10 @@ if ASCEND_IS_AIV {
 ```
 (2) GetBlockIdx(获取当前核的index)在AIC和AIV的取值范围不同，其取值与算子设置的逻辑核数和一个AI Core中的AIC与AIV的比例有关。本样例中设置NUM_BLOCKS=8、AIC与AIV的比例为1:2，因此GetBlockIdx在AIC和AIV的取值范围分别为0-7和0-15。
 
-(3) 样例采用静态Tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
+(3) 样例采用静态Tensor编程范式需要手动插入intra_core_sync。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
 
 #### 3.2 纯Vector计算场景
-(1) 在使用 CrossCoreSetFlag 与 CrossCoreWaitFlag 核间同步接口时，即使是纯 Vector 计算场景，核函数也不能使用__vector__ 修饰符。
+(1) 在使用 CrossCoreSetFlag 与 CrossCoreWaitFlag 核间sync_interface时，即使是纯 Vector 计算场景，核函数也不能使用__vector__ 修饰符。
 本样例核函数采用__mix__(1,2) 修饰，但在纯 Vector 场景下，由于仅执行矢量计算，必须通过 ASCEND_IS_AIV 宏确保程序仅在 AIV 核上运行，否则会导致程序卡死。
 ```
 if ASCEND_IS_AIV {
@@ -292,7 +292,7 @@ if ASCEND_IS_AIV {
 ```
  (2) 模式 1 要求参与同步的 2个AIV 必须属于同一个AI Core，否则程序会卡死。本样例中，参与同步的两个AIV的 GetBlockIdx=2、3 同属第 2 个 AI Core(下标从 1 开始)；若将GetBlockIdx改为 3 和 4(分别属于两个不同的AI Core)，程序将卡死。
 
- (3) 样例采用静态Tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
+ (3) 样例采用静态Tensor编程范式需要手动插入intra_core_sync。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
 
 ## 编译运行
 

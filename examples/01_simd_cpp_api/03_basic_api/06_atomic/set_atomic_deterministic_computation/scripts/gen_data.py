@@ -41,7 +41,7 @@ def gen_golden_data():
     # 预期输出数据
     golden = np.array([right[0] + input_gm[0]] * data_size, dtype=output_type)
 
-    # 用于核间同步，在多个核之间共享的gm，gm必须初始为0
+    # 用于inter_core_sync，在多个核之间共享的gm，gm必须初始为0
     input_sync = np.zeros(256, dtype=sync_type)
     # 创建目录
     os.makedirs("input", exist_ok=True)

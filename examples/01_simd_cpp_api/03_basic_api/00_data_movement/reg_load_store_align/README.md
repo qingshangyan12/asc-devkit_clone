@@ -1,7 +1,7 @@
 # ld_st_reg_align样例
 
-## 概述
-本样例基于Reg编程接口实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作，该样例使用LoadAlign，StoreAlign接口，以及POST_MODE_UPDATE、DATA_BLOCK_COPY等模式的使能。本样例支持6种搬运场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+## overview
+本样例基于Reg编程接口实现UB(Unified Buffer)对RegTensor(reg_vector_compute基本单元)的连续和非连续的对齐data_move操作，该样例使用LoadAlign，StoreAlign接口，以及POST_MODE_UPDATE、DATA_BLOCK_COPY等模式的使能。本样例支持6种搬运场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
     <table>
       <tr>
         <td>SCENARIO_NUM</td>
@@ -57,7 +57,7 @@
 - 样例实现：  
   - 基础场景，LoadAlign和StoreAlign采用默认参数配置。
   - 输入1024个元素，输出1021个元素，需要8次迭代。其中最后一次迭代仅计算并搬出125个元素，不足VL。
-  - VF函数for循环内每次迭代用UpdateMask接口更新mask。对于half类型：
+  - VF函数for循环内每次迭代用UpdateMask接口更新mask。对于half_type：
     - 当outputLength>=128时，mask处理128个元素
     - 当outputLength<128时，mask处理outputLength个元素
     - UpdateMask执行完后，outputLength自减mask处理的元素个数。  
@@ -198,7 +198,7 @@
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6` | 场景编号，具体含义见概述 |
+  | `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6` | 场景编号，具体含义见overview |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

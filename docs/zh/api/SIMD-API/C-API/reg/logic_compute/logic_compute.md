@@ -1,4 +1,4 @@
-# 逻辑计算
+# logical_compute
 
 -   **[asc_and](asc_and.md)**
 

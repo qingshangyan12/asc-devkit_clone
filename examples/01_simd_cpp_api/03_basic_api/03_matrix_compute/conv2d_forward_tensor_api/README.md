@@ -1,6 +1,6 @@
 # Conv2D Forward Tensor API 样例
 
-## 概述
+## overview
 
 本样例介绍如何使用Tensor API实现Conv2D Forward计算，展示FeatureMap从Global Memory搬入L1 Buffer、通过`CopyL12L0A`（Img2Col）完成空间展开、使用`Mmad`进行矩阵乘累加，并通过`CopyL0C2GM`将结果搬回Global Memory的完整流程。
 
@@ -34,10 +34,10 @@
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">📌 表1：样例规格</span></caption>
 <tr><td rowspan="1" align="center">参数</td><td align="center">取值</td><td align="center">说明</td></tr>
-<tr><td align="center">FeatureMap</td><td align="center">[N, H, W, C] = [4, 9, 9, 32]</td><td>Global Memory输入为half类型，按场景选择NC1HWC0/NCHW/NHWC排布</td></tr>
-<tr><td align="center">Weight</td><td align="center">[Cout, C, Kh, Kw] = [16, 32, 3, 3]</td><td>Global Memory输入为half类型，按[K, Cout]二维排布展开</td></tr>
+<tr><td align="center">FeatureMap</td><td align="center">[N, H, W, C] = [4, 9, 9, 32]</td><td>Global Memory输入为half_type，按场景选择NC1HWC0/NCHW/NHWC排布</td></tr>
+<tr><td align="center">Weight</td><td align="center">[Cout, C, Kh, Kw] = [16, 32, 3, 3]</td><td>Global Memory输入为half_type，按[K, Cout]二维排布展开</td></tr>
 <tr><td align="center">卷积参数</td><td align="center">stride = [2, 2]，dilation = [2, 2]，padding = [2, 2, 2, 2]，padValue = 1</td><td>padding顺序为[top, bottom, left, right]</td></tr>
-<tr><td align="center">Output</td><td align="center">[N, HOut, WOut, Cout] = [4, 5, 5, 16]</td><td>Global Memory输出为half类型，格式与输入一致</td></tr>
+<tr><td align="center">Output</td><td align="center">[N, HOut, WOut, Cout] = [4, 5, 5, 16]</td><td>Global Memory输出为half_type，格式与输入一致</td></tr>
 </table>
 
 其中，`C1`和`C0`是FeatureMap在L1 Buffer上采用NC1HWC0格式时的通道拆分维度。`C0`表示每个通道块包含的元素个数，本样例中为16；`C1`表示通道块个数。由于`C = 32`，因此`C1 = C / C0 = 2`、`C0 = 16`。
@@ -74,18 +74,18 @@ $$
 </table>
 
 **场景0：NC1HWC0输入输出**
-- 输入：FeatureMap [1, 2, 9, 9, 16] half类型，NC1HWC0格式；Weight [K, Cout] half类型
-- 输出：Output [1, 1, 5, 5, 16] half类型，NC1HWC0格式
+- 输入：FeatureMap [1, 2, 9, 9, 16] half_type，NC1HWC0格式；Weight [K, Cout] half_type
+- 输出：Output [1, 1, 5, 5, 16] half_type，NC1HWC0格式
 - 实现：Global Memory→L1 Buffer使用`CopyGM2L1`直搬NC1HWC0数据，L0C Buffer→Global Memory使用`CopyL0C2GM`直搬
 
 **场景1：NCHW输入输出**
-- 输入：FeatureMap [1, 32, 9, 9] half类型，NCHW格式；Weight [K, Cout] half类型
-- 输出：Output [1, 16, 5, 5] half类型，NCHW格式
+- 输入：FeatureMap [1, 32, 9, 9] half_type，NCHW格式；Weight [K, Cout] half_type
+- 输出：Output [1, 16, 5, 5] half_type，NCHW格式
 - 实现：Global Memory→L1 Buffer使用`CopyGM2L1`将NCHW随路转换为NC1HWC0（dn2nz），L0C Buffer→Global Memory使用`CopyL0C2GM`将NC1HWC0转换为NCHW（nz2dn）
 
 **场景2：NHWC输入输出**
-- 输入：FeatureMap [1, 9, 9, 32] half类型，NHWC格式；Weight [K, Cout] half类型
-- 输出：Output [1, 5, 5, 16] half类型，NHWC格式
+- 输入：FeatureMap [1, 9, 9, 32] half_type，NHWC格式；Weight [K, Cout] half_type
+- 输出：Output [1, 5, 5, 16] half_type，NHWC格式
 - 实现：Global Memory→L1 Buffer使用`CopyGM2L1`将NHWC随路转换为NC1HWC0（nd2nz），L0C Buffer→Global Memory使用`CopyL0C2GM`将NC1HWC0转换为NHWC（nz2nd）
 
 核心流程如下：

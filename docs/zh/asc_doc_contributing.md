@@ -1,18 +1,18 @@
 # Ascend C资料贡献指南
 
-## 概述
+## overview
 
 Ascend C资料体系包含五份核心文档，开发者可以通过提交PR对资料进行改进和贡献：
 
 | 文档 | 内容 | 文档目录 |
 |------|------|---------|
-| 入门教程 | Ascend C概述、环境准备、快速上手（HelloWorld、首个算子） | `docs/zh/guide/入门教程` |
-| 编程指南 | 编程模型、编程范式、编译运行、硬件架构、高级编程 | `docs/zh/guide/编程指南` |
+| 入门教程 | Ascend Coverview、环境准备、快速上手（HelloWorld、首个算子） | `docs/zh/guide/入门教程` |
+| 编程指南 | programming_model、编程范式、编译运行、硬件架构、高级编程 | `docs/zh/guide/编程指南` |
 | API参考手册 | 接口参数、约束、示例、API关联 | `docs/zh/api/` |
 | 算子实践参考 | 算子实现、性能优化、调优案例 | `docs/zh/guide/算子实践参考/` |
 | 跨代迁移兼容性指南 | API兼容策略、架构变更映射、迁移步骤 | `docs/zh/guide/跨代迁移兼容性指南/` |
 
-在阅读本文档前，请确保您已了解昇腾AI处理器硬件架构。零基础开发者推荐先阅读[入门教程](./guide/入门教程/Ascend-C概述与学习路径.md)；已有基础的开发者推荐先阅读[Ascend C编程指南](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)。
+在阅读本文档前，请确保您已了解昇腾AI处理器硬件架构。零基础开发者推荐先阅读[入门教程](./guide/入门教程/Ascend-Coverview与学习路径.md)；已有基础的开发者推荐先阅读[Ascend C编程指南](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)。
 
 ---
 
@@ -52,7 +52,7 @@ Ascend C资料遵循《Ascend C资料设计规范》的三个维度要求：可�
 
 | 规则 | 要求 | 错误示例 | 正确示例 |
 |------|------|---------|---------|
-| 术语分层 | 高层章节用抽象名，低层章节首次出现硬件名时关联高层名 | 概述文档直接写"数据通过UB搬入VEC" | 概述文档写"数据从外部存储搬入片上存储"，低层文档写"数据从Global Memory搬入UB（片上存储）" |
+| 术语分层 | 高层章节用抽象名，低层章节首次出现硬件名时关联高层名 | overview文档直接写"数据通过UB搬入VEC" | overview文档写"数据从外部存储搬入片上存储"，低层文档写"数据从Global Memory搬入UB（片上存储）" |
 | 易混概念区分 | 名称相近的概念必须用对比表区分，不能靠读者自行推断 | 只说"四步法"不区分 Tiling流程和TPipe流水 | 用表格区分：四步法=编程流程，TPipe四步=流水管理范式 |
 | 约束前置醒目 | 硬件约束在概念首次出现时标注，不放在后续章节或仅靠编译报错暴露 | 32B对齐约束只在assert中出现 | 在参数说明前用独立段落标注"约束与限制" |
 | 首次引入加链接 | 提到其他文档负责的内容时，首次出现加链接，后续不重复 | 每次提到DataCopy都加链接 | 仅首次提到DataCopy时加链接到API参考手册 |
@@ -66,21 +66,21 @@ Ascend C资料遵循《Ascend C资料设计规范》的三个维度要求：可�
 
 | 文件类型 | 职责 | 禁止 |
 |---------|------|------|
-| 概述与学习路径 | 全景介绍：Ascend C是什么、学习路径推荐 | 深入技术细节（链接到编程指南） |
+| overview与学习路径 | 全景介绍：Ascend C是什么、学习路径推荐 | 深入技术细节（链接到编程指南） |
 | 环境准备 | 实操步骤：安装、配置、验证环境 | 重复编程指南中的编译运行详解 |
-| 快速入门/异构系统与编程模型 | 入门概念：Host/Device、AI Core、SIMD/SIMT选型 | 深入编程模型原理（链接到编程指南） |
+| 快速入门/异构系统与programming_model | 入门概念：Host/Device、AI Core、SIMD/SIMT选型 | 深入programming_model原理（链接到编程指南） |
 | 快速入门/基于SIMD编程 | 实践：HelloWorld + 首个算子（Add） | 重复编程指南的完整编程范式 |
 | 快速入门/基于SIMT编程 | 实践：HelloWorld + 首个算子（Gather） | 重复编程指南的完整编程范式 |
 
-**目录结构映射**（与编程指南章节对应，不含技术附录）：
+**目录结构映射**（与编程指南章节对应，不含技术appendix）：
 
 | 入门教程目录 | 对应编程指南章节 | 入门教程定位 |
 |-------------|----------------|-------------|
-| 入门教程/ | 编程模型/编程模型概述 | 概述与学习路径 |
+| 入门教程/ | programming_model/programming_modeloverview | overview与学习路径 |
 | 环境准备.md | 编译与运行 | 快速环境搭建，详细编译说明链接到编程指南 |
-| 快速入门/异构系统与编程模型.md | 编程模型/异构系统 + 编程模型/编程模型概述 | 入门级概念+SIMD/SIMT选型，深入链接到编程指南 |
-| 快速入门/基于SIMD编程/ | 编程模型/AI-Core-SIMD编程 | HelloWorld+Add算子快速上手 |
-| 快速入门/基于SIMT编程/ | 编程模型/AI-Core-SIMT编程 | HelloWorld+Gather算子快速上手 |
+| 快速入门/异构系统与programming_model.md | programming_model/异构系统 + programming_model/programming_modeloverview | 入门级概念+SIMD/SIMT选型，深入链接到编程指南 |
+| 快速入门/基于SIMD编程/ | programming_model/AI-Core-SIMD编程 | HelloWorld+Add算子快速上手 |
+| 快速入门/基于SIMT编程/ | programming_model/AI-Core-SIMT编程 | HelloWorld+Gather算子快速上手 |
 
 **链接方向**：
 - 首次提到编程概念深入 → 链接到编程指南对应章节
@@ -95,7 +95,7 @@ Ascend C资料遵循《Ascend C资料设计规范》的三个维度要求：可�
 
 | 文件类型 | 职责 | 禁止 |
 |---------|------|------|
-| 概述/总览文件 | 导航页：列出子主题+一句话概述+链接 | 展开技术细节 |
+| overview/总览文件 | 导航页：列出子主题+一句话overview+链接 | 展开技术细节 |
 | 概念介绍文件 | 定义概念、解释原理、给出约束 | 重复其他文件内容（改为引用） |
 | 操作指南文件 | 代码片段+操作步骤+注意事项 | 重复概念定义（链接到概念文件） |
 
@@ -114,14 +114,14 @@ API参考手册是**接口详情权威源**，每个API页面必须包含以下�
 |------|--------|----------|------|
 | 1 | 产品支持情况 | ✅ 必须 | 页面最顶部，用列表形式列出每个产品系列的支持状态 |
 | 2 | 功能说明 | ✅ 必须 | 头文件路径 + 总述段落 + 数学公式/示意图（3要素必须齐全） |
-| 3 | 矩阵/张量计算说明表 | 条件必须 | 矩阵计算类API必须有，按产品系列分表 |
+| 3 | 矩阵/张量计算说明表 | 条件必须 | cube_compute类API必须有，按产品系列分表 |
 | 4 | 函数原型  | ✅ 必须 | 所有重载原型，每个原型一个代码块 |
 | 5 | 参数说明  | ✅ 必须 | 主参数表 + 嵌套结构体参数表 |
 | 6 | 数据类型  | 条件必须 | 矩阵/向量计算类API必须；工具类/配置类API不需要 |
 | 7 | 返回值说明  | 条件必须 | 有返回值的API必须有 |
 | 8 | 约束说明  | ✅ 必须 | 单参数约束就近说明；多参数/组合约束独立段落描述 |
-| 9 | 关键特性说明 | 条件必须 | 矩阵/向量计算类API如涉及关键硬件特性（HF32、GEMV、UnitFlag等），须有对应特性说明节；简单API可省略 |
-| 10 | 理论性能（附录引用） | 条件推荐 | 不再在API页面内展开cycle计算公式，改为引用附录中的理论性能汇总表 |
+| 9 | key_features | 条件必须 | 矩阵/向量计算类API如涉及关键硬件特性（HF32、GEMV、UnitFlag等），须有对应特性说明节；简单API可省略 |
+| 10 | 理论性能（appendix引用） | 条件推荐 | 不再在API页面内展开cycle计算公式，改为引用appendix中的理论性能汇总表 |
 | 11 | 调用示例  | ✅ 必须 | 代码片段示例 + 链接到样例库（如有对应样例，如果接口没有对应样例可省略链接） |
 | 12 | 关联API | 条件必须 | 同一版本内的互斥API + 功能相近API |
 ---
@@ -176,7 +176,7 @@ C = A × B + Bias
 
 #### 3. 矩阵/张量计算说明表
 
-**适用范围**：矩阵计算类API（Mmad、LoadData、Fixpipe等）必须有此表。非矩阵计算API跳过。
+**适用范围**：cube_compute类API（Mmad、LoadData、Fixpipe等）必须有此表。非cube_computeAPI跳过。
 
 **格式要求**：按产品系列分表，列出参与计算的张量的物理位置、维度、格式。
 
@@ -184,14 +184,14 @@ C = A × B + Bias
 
 ```
 针对Atlas A2/A3系列产品：
-| 矩阵计算 | 物理位置 | 维度 | 输入/输出数据格式 | 数据类型 |
+| cube_compute | 物理位置 | 维度 | 输入/输出数据格式 | 数据类型 |
 |----------|----------|------|------------------|----------|
 | A | L0A Buffer | M x K | Zz | 数据类型 |
 | B | L0B Buffer | K x N | Zn | 数据类型 |
 | C | L0C Buffer | M x N | Nz | 数据类型 |
 
 针对Ascend 950PR/Ascend 950DT产品：
-| 矩阵计算 | 物理位置 | 维度 | 输入/输出数据格式 | 数据类型 |
+| cube_compute | 物理位置 | 维度 | 输入/输出数据格式 | 数据类型 |
 |----------|----------|------|------------------|----------|
 | A | L0A Buffer | M x K | Nz | 数据类型 |
 | B | L0B Buffer | K x N | Zn | 数据类型 |
@@ -394,7 +394,7 @@ Mmad和Fixpipe的unitFlag需同步开启。前n-1条设为2（维持占用），
 
 ---
 
-#### 9. 关键特性说明（条件必须）
+#### 9. key_features（条件必须）
 
 
 **适用范围**：矩阵/向量计算类API如涉及关键硬件特性（如HF32模式、GEMV加速、UnitFlag并行控制等），须有此节。简单API（如配置类、工具类）可省略。
@@ -403,7 +403,7 @@ Mmad和Fixpipe的unitFlag需同步开启。前n-1条设为2（维持占用），
 **样板写法**（以Mmad为例）：
 
 ```
-## 关键特性说明
+## key_features
 
 ### HF32模式
 通过SetHF32Mode/SetHF32TransMode配置HF32（Hybrid Float32）模式，实现float类型矩阵乘以9bit指数共享的方式减少计算量。
@@ -416,10 +416,10 @@ Mmad和Fixpipe的unitFlag需同步开启。前n-1条设为2（维持占用），
 当M=1时，Mmad自动触发GEMV（矩阵向量乘）加速通路，跳过不必要的矩阵加载。
 
 ### UnitFlag并行控制
-控制Mmad和Fixpipe的细粒度流水并行，详见[UnitFlag特性说明](api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算关键特性说明/UnitFlag.md)。
+控制Mmad和Fixpipe的细粒度流水并行，详见[UnitFlag特性说明](api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/UnitFlag.md)。
 
 ### K方向对齐约束
-k方向需满足特定的对齐要求，不同数据类型约束不同，详见[K方向对齐约束](api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算关键特性说明/K-方向对齐约束.md)。
+k方向需满足特定的对齐要求，不同数据类型约束不同，详见[K方向对齐约束](api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/k_direction_alignment_constraint.md)。
 ```
 
 **编写要求**：
@@ -430,24 +430,24 @@ k方向需满足特定的对齐要求，不同数据类型约束不同，详见[
 
 ---
 
-#### 10. 理论性能（附录引用）
+#### 10. 理论性能（appendix引用）
 
-**格式要求**：不在API页面内展开cycle计算公式和并行度参数表，改为引用附录中的理论性能汇总。
+**格式要求**：不在API页面内展开cycle计算公式和并行度参数表，改为引用appendix中的理论性能汇总。
 
 **样板写法**：
 
 ```
 ## 理论性能
 
-本接口的理论性能数据请参考附录：
-- Cube指令理论性能汇总：详见[Cube指令理论性能汇总](api/附录/Cube指令理论性能汇总.md)
-- Vector指令理论性能汇总：详见[Vector指令理论性能汇总](api/附录/Vector指令理论性能汇总.md)
+本接口的理论性能数据请参考appendix：
+- cube_instruction_theoretical_perf_summary：详见[cube_instruction_theoretical_perf_summary](api/appendix/cube_instruction_theoretical_perf_summary.md)
+- vector_instruction_theoretical_perf_summary：详见[vector_instruction_theoretical_perf_summary](api/appendix/vector_instruction_theoretical_perf_summary.md)
 ```
 
 **编写要求**：
-- 理论性能数据统一维护在附录中，API页面不再内联cycle计算公式
-- 引用方式为链接到对应附录页（Cube类API引用Cube附录，Vector类API引用Vector附录）
-- 如API有特殊的性能注意事项（如首指令开销、特定参数下的性能差异），可在引用附录后补充说明
+- 理论性能数据统一维护在appendix中，API页面不再内联cycle计算公式
+- 引用方式为链接到对应appendix页（Cube类API引用Cubeappendix，Vector类API引用Vectorappendix）
+- 如API有特殊的性能注意事项（如首指令开销、特定参数下的性能差异），可在引用appendix后补充说明
 
 ---
 #### 11. 调用示例
@@ -487,7 +487,7 @@ extern "C" __global__ __aicore__ void mmad_custom(GM_ADDR x, GM_ADDR y, GM_ADDR 
 ```
 > **警告**：以下接口与当前接口互斥，不能在同一Tiling策略中同时使用：
 > - **MmadWithSparse**：当启用结构化稀疏（4选2）时使用，与Mmad互斥。
-> - **MXMmad**：MX矩阵计算场景使用，与Mmad互斥。
+> - **MXMmad**：MXcube_compute场景使用，与Mmad互斥。
 
 > **注意**：Mmad的带bias原型和不带bias原型**不互斥**，可根据场景自由选择。
 ```
@@ -499,9 +499,9 @@ extern "C" __global__ __aicore__ void mmad_custom(GM_ADDR x, GM_ADDR y, GM_ADDR 
 ```
 | 相似API | 与当前API区别 | 选择建议 |
 |---------|-------------|---------|
-| [MmadWithSparse](api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算/MmadWithSparse.md) | 支持4选2结构化稀疏矩阵乘 | 权重矩阵已剪枝为稀疏格式时选用 |
+| [MmadWithSparse](api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadWithSparse.md) | 支持4选2结构化稀疏矩阵乘 | 权重矩阵已剪枝为稀疏格式时选用 |
 | [MXMmad](MXMmad.md) | 支持MX格式（微缩放）矩阵乘 | 使用MX混合精度训练时选用 |
-| [Iterate](api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Iterate.md) + [GetTensorC](api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/GetTensorC.md) | Matmul高阶API的循环迭代模式 | 不需要精细控制L0A/L0B排布时，优先用高阶API |
+| [Iterate](api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/Iterate.md) + [GetTensorC](api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/GetTensorC.md) | Matmulhigh_level_api的循环迭代模式 | 不需要精细控制L0A/L0B排布时，优先用high_level_api |
 | Mmad带bias原型 | 支持偏置矩阵初始化C | 需要C+=A×B+Bias场景选用，比cmatrixSource配置更简单 |
 | Mmad不带bias + cmatrixSource | 通过参数配置C初始值来源 | 需要C初始值来自BT Buffer但不需要Bias时选用 |
 | Mmad + MmadBitModeParams | 位域联合体参数，单入参传递 | 追求极致性能、需要细粒度bit位操作时选用 |
@@ -659,7 +659,7 @@ __aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=核函�
 **内容正确性**：
 - [ ] 所有硬件参数值（容量、粒度、范围）与[硬件规格](./guide/编程指南/高级编程/硬件实现/架构规格/架构规格.md)保持一致
 - [ ] "固定值"等绝对性描述已经核实（很多"固定值"实际由配置参数决定）
-- [ ] 数据通路描述与实际路径一致（不与其他文档矛盾）
+- [ ] data_path描述与实际路径一致（不与其他文档矛盾）
 
 **约束完备性**：
 - [ ] 每个API的支持数据类型列表完整
@@ -719,6 +719,6 @@ API参考手册 ──前置概念──→ 编程指南
 - 社区行为准则和CLA协议签署：[cann-community](https://gitcode.com/cann/community)
 - Issue和PR流程：参见[提交Issue/处理Issue任务](https://gitcode.com/cann/community#提交Issue/处理Issue任务)
 - API代码贡献指南：
-  - 高阶API：[asc_adv_api_contributing.md](./asc_adv_api_contributing.md)
-  - 基础API：[asc_basic_api_contributing.md](./asc_basic_api_contributing.md)
+  - high_level_api：[asc_adv_api_contributing.md](./asc_adv_api_contributing.md)
+  - basic_api：[asc_basic_api_contributing.md](./asc_basic_api_contributing.md)
   - C API：[asc_c_api_contributing.md](./asc_c_api_contributing.md)

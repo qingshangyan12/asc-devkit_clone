@@ -34,7 +34,7 @@ def gen_golden_data(scenarioNum):
     """
     生成测试输入数据和真值数据
     Args:
-        scenarioNum: 场景编号(1=ReduceMax前n个数据, 2=ReduceMax高维切分, 3=ReduceMin前n个数据, 4=ReduceMin高维切分, 5=ReduceSum前n个数据, 6=ReduceSum高维切分)
+        scenarioNum: 场景编号(1=ReduceMax前n个数据, 2=ReduceMaxhigh_dim_split, 3=ReduceMin前n个数据, 4=ReduceMinhigh_dim_split, 5=ReduceSum前n个数据, 6=ReduceSumhigh_dim_split)
     """
     input_type = np.float16
     output_type = input_type

@@ -20,7 +20,7 @@ def gen_golden_data(scenarioNum):
     """
     生成测试输入数据和真值数据
     Args:
-        scenarioNum: 场景编号(1=TBufPool内存复用,2=TBufPool资源细分,3=自定义TBufPool)
+        scenarioNum: 场景编号(1=TBufPool内存复用,2=TBufPool资源细分,3=custom_TBufPool)
     """
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -34,7 +34,7 @@ def gen_golden_data(scenarioNum):
         total_size = 4 * 32768
         mask = 16384
     elif scenarioNum == 3:
-        # 场景3：自定义TBufPool，shape=[1, 65536]
+        # 场景3：custom_TBufPool，shape=[1, 65536]
         total_size = 65536
         mask = 32768
     else:

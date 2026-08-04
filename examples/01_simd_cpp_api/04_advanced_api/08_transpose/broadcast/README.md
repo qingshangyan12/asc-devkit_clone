@@ -1,8 +1,8 @@
 # Broadcast样例
 
-## 概述
+## overview
 
-本样例基于Broadcast高阶API实现数据广播功能，支持将输入Tensor按照指定轴扩展到目标shape，适用于数据对齐和维度扩展等场景。
+本样例基于Broadcasthigh_level_api实现数据广播功能，支持将输入Tensor按照指定轴扩展到目标shape，适用于数据对齐和维度扩展等场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -108,7 +108,7 @@
   本样例中实现了两种场景的broadcast样例，分别是[1, 48]到[96, 48]的广播和[96, 1]到[96, 96]的广播。
 
   - Kernel实现  
-    使用Broadcast高阶API接口完成广播，将输入Tensor按照指定轴扩展到目标shape
+    使用Broadcasthigh_level_api接口完成广播，将输入Tensor按照指定轴扩展到目标shape
 
   - Tiling实现  
     broadcast样例的tiling实现流程如下：首先获取input和output的二维shape，然后将其与广播的轴、input/output tensor的维度填充到TilingData中。

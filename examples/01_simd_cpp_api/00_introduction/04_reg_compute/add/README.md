@@ -1,6 +1,6 @@
 # 基于RegBase编程的add样例
 
-## 概述
+## overview
 本样例基于RegBase编程范式实现向量自加计算，计算逻辑为`y = x + x`。样例先将输入数据从GM（Global Memory）搬运到UB（Unified Buffer），再通过VF函数调用RegBase接口完成寄存器级别的Add计算，最后将结果从UB写回GM。
 
 ## 本样例支持的产品及CANN软件版本
@@ -23,7 +23,7 @@
 
 ## 样例描述
 - 样例功能：  
-  本样例基于RegBase编程范式实现向量自加操作。输入`x`为`float`类型二维数据，输出`y`与输入shape一致，每个输出元素满足`y[i] = x[i] + x[i]`。样例采用4核并行处理，输入总长度为`256 * 256`个`float`元素，每个核处理`totalLength / 4`个连续元素，展示GM/UB数据搬运、VF函数调用、RegBase寄存器计算和流水同步的基本流程。
+  本样例基于RegBase编程范式实现向量自加操作。输入`x`为`float`类型二维数据，输出`y`与输入shape一致，每个输出元素满足`y[i] = x[i] + x[i]`。样例采用4核并行处理，输入总长度为`256 * 256`个`float`元素，每个核处理`totalLength / 4`个连续元素，展示GM/UBdata_move、VF函数调用、RegBase寄存器计算和流水同步的基本流程。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>

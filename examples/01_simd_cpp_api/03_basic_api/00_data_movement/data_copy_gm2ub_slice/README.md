@@ -1,6 +1,6 @@
 # DataCopy数据切片搬运样例
 
-## 概述
+## overview
 本样例基于DataCopy实现数据切片搬运，提取多维Tensor数据的子集进行GM（Global Memory）与UB（Unified Buffer）通路之间的搬运。
 ## 本样例支持的产品及CANN软件版本
 
@@ -24,7 +24,7 @@
 
 ## 样例描述
 - 样例功能：  
-  实现了数据切片搬运样例，支持数据的切片搬运，提取二维的源操作数Tensor[3, 87]数据的子集（提取4个数据段：[0, 16:40], [0, 47:71], [2, 16:40]， [2, 47:71]，共96个float32数据）并连续搬运到二维的目的操作数Tensor[2, 48]。接口资料参考[切片数据搬运](../../../../../docs/zh/api/SIMD-API/基础API/Memory矢量计算/数据搬运/DataCopy_GMAndUB_slice.md)。
+  实现了数据切片搬运样例，支持数据的切片搬运，提取二维的源操作数Tensor[3, 87]数据的子集（提取4个数据段：[0, 16:40], [0, 47:71], [2, 16:40]， [2, 47:71]，共96个float32数据）并连续搬运到二维的目的操作数Tensor[2, 48]。接口资料参考[切片data_move](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMAndUB_slice.md)。
 
 - 样例规格：  
  
@@ -39,7 +39,7 @@
   - Kernel实现  
     计算逻辑是：输入数据需要先按切片参数从GM（Global Memory）搬运到UB（Unified Buffer），再搬出到外部GM（Global Memory）上。
     
-    接口详细描述参考Ascend C API DataCopy切片数据搬运。
+    接口详细描述参考Ascend C API DataCopy切片data_move。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -62,7 +62,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                      # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

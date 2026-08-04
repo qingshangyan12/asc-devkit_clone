@@ -1,16 +1,16 @@
 # SIMD与SIMT混合编程高性能优化样例
 
 
-## 概述
+## overview
 
-本样例以FloorMod计算为例，介绍SIMD与SIMT混合编程场景下的性能调优方法。样例展示直接使用SIMT访问GM、使用SIMD Reg矢量计算、使用SIMT访问UB但线程映射不连续，以及调整线程映射使Warp内相邻线程连续访问UB后的性能差异。
+本样例以FloorMod计算为例，介绍SIMD与SIMT混合编程场景下的性能调优方法。样例展示直接使用SIMT访问GM、使用SIMD reg_vector_compute、使用SIMT访问UB但线程映射不连续，以及调整线程映射使Warp内相邻线程连续访问UB后的性能差异。
 
 **优化路径**：
 
 | Case | SCENARIO_NUM | 实现方式 | 说明 |
 |:---|:---:|:---|:---|
 | Case 0 | 0 | SIMT直接访问GM | 数据访问和计算均通过SIMT实现，SIMT线程直接访问GM，作为纯SIMT实现的对照组。 |
-| Case 1 | 1 | SIMD Reg矢量计算 | GM与UB之间的数据搬运通过MTE完成，使用Reg矢量计算实现FloorMod，作为纯SIMD计算的对照组。 |
+| Case 1 | 1 | SIMD reg_vector_compute | GM与UB之间的data_move通过MTE完成，使用reg_vector_compute实现FloorMod，作为纯SIMD计算的对照组。 |
 | Case 2 | 2 | SIMT非连续访问UB | 基于搬运接口将GM连续搬运到UB，SIMT每个线程处理一段连续元素，但Warp内相邻线程访问不连续。 |
 | Case 3 | 3 | SIMT连续访问UB | 基于搬运接口将GM连续搬运到UB，调整SIMT线程映射，使Warp内相邻线程访问连续地址。 |
 
@@ -76,7 +76,7 @@ $$
 |:---|:---|
 | Task Duration(μs) | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。 |
 | aiv_time(μs) | Task 在 AI Vector Core 上的执行时间。 |
-| aiv_vec_time(μs) | vec类型指令耗时。SIMT VF调用中的线程计算也体现在该类统计中。 |
+| aiv_vec_time(μs) | vec类型指令耗时。SIMT vf_call中的线程计算也体现在该类统计中。 |
 | aiv_vec_ratio | vec类型指令cycle数在total cycle数中的占用比。 |
 | aiv_scalar_time(μs) | scalar类型指令耗时。 |
 | aiv_scalar_ratio | scalar类型指令cycle数在total cycle数中的占用比。 |
@@ -91,7 +91,7 @@ $$
 
 **实现方式**：参考 `floor_mod_simt_gm_contiguous()` 函数实现。
 
-该实现不通过MTE2/MTE3做GM与UB之间的数据搬运，而是由SIMT线程直接从GM读取 `x` 和 `y`，计算后直接写回GM。
+该实现不通过MTE2/MTE3做GM与UB之间的data_move，而是由SIMT线程直接从GM读取 `x` 和 `y`，计算后直接写回GM。
 
 **关键代码**：
 
@@ -126,19 +126,19 @@ __simt_vf__ inline void floor_mod_simt_gm_contiguous(
 
 **原理说明**：
 
-SIMT线程直接访问GM时，每个线程在计算过程中都需要从GM读取 `x`、`y`，并将结果写回GM，访问效率低，且数据搬运与计算耦合在同一段SIMT线程中，无法并行搬运和计算流水。
+SIMT线程直接访问GM时，每个线程在计算过程中都需要从GM读取 `x`、`y`，并将结果写回GM，访问效率低，且data_move与计算耦合在同一段SIMT线程中，无法并行搬运和计算流水。
 
-本样例的输入、输出在GM上是连续排布的二维ND数据，适合使用连续块搬运。后续实现中通过 `asc_copy_gm2ub_align` 和 `asc_copy_ub2gm_align` 完成GM->UB和UB->GM搬运，搬运由MTE执行，可以按较大的连续数据块把GM数据搬入UB，再将UB中结果连续写回GM。相比SIMT线程逐元素直接访问GM，这种方式内存访问效率更高，也能并行化数据搬运和计算流水。
+本样例的输入、输出在GM上是连续排布的二维ND数据，适合使用连续块搬运。后续实现中通过 `asc_copy_gm2ub_align` 和 `asc_copy_ub2gm_align` 完成GM->UB和UB->GM搬运，搬运由MTE执行，可以按较大的连续数据块把GM数据搬入UB，再将UB中结果连续写回GM。相比SIMT线程逐元素直接访问GM，这种方式内存访问效率更高，也能并行化data_move和计算流水。
 
 **下一步优化方向**：
 
-当前Case作为纯SIMT直接访问GM的基准Case，用于展示纯SIMT实现样例的性能数据；下一步将引入SIMD实现，使用搬运接口完成GM->UB和UB->GM搬运，并使用Reg矢量计算实现FloorMod，从而展示该实现的性能数据。
+当前Case作为纯SIMT直接访问GM的基准Case，用于展示纯SIMT实现样例的性能数据；下一步将引入SIMD实现，使用搬运接口完成GM->UB和UB->GM搬运，并使用reg_vector_compute实现FloorMod，从而展示该实现的性能数据。
 
-### Case 1：SIMD Reg矢量计算
+### Case 1：SIMD reg_vector_compute
 
 **实现方式**：参考 `floor_mod_simd()` 函数实现。
 
-该实现使用 `asc_copy_gm2ub_align` 和 `asc_copy_ub2gm_align` 完成GM与UB之间的数据搬运，并在SIMD VF函数中通过 `asc_loadalign` 将UB数据加载到向量寄存器，执行 `asc_div`、`asc_mul`、`asc_sub`、`asc_ne`、`asc_select` 等向量指令，最后通过 `asc_storealign` 写回UB。计算过程通过SIMD实现，GM与UB之间的数据搬运通过MTE完成。
+该实现使用 `asc_copy_gm2ub_align` 和 `asc_copy_ub2gm_align` 完成GM与UB之间的data_move，并在SIMD VF函数中通过 `asc_loadalign` 将UB数据加载到向量寄存器，执行 `asc_div`、`asc_mul`、`asc_sub`、`asc_ne`、`asc_select` 等向量指令，最后通过 `asc_storealign` 写回UB。计算过程通过SIMD实现，GM与UB之间的data_move通过MTE完成。
 
 **关键代码**：
 
@@ -198,19 +198,19 @@ __aicore__ inline void process_tiles(
 
 | Case | 实现方式 | 核数 | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 |:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | SIMD Reg矢量计算 | 64 | 525.736 | 515.723 | 509.987 | 0.989 | 2.419 | 0.005 | 217.341 | 0.421 | 62.274 | 0.121 |
+| 1 | SIMD reg_vector_compute | 64 | 525.736 | 515.723 | 509.987 | 0.989 | 2.419 | 0.005 | 217.341 | 0.421 | 62.274 | 0.121 |
 
 **性能数据分析**：
 
 - 相比Case 0，Case 1引入MTE搬运完成GM->UB/UB->GM搬运，`Task Duration` 从 **812.063μs** 降到 **525.736μs**，端到端耗时下降 **35.3%**。
-- `Task Duration` 为 **525.736μs**，其中 `aiv_vec_time` 为 **509.987μs**，`aiv_vec_ratio` 达到 **98.9%**，说明耗时主要集中在Reg矢量计算路径上。
+- `Task Duration` 为 **525.736μs**，其中 `aiv_vec_time` 为 **509.987μs**，`aiv_vec_ratio` 达到 **98.9%**，说明耗时主要集中在reg_vector_compute路径上。
 - `aiv_mte2_ratio` 为 **42.1%**，`aiv_mte3_ratio` 为 **12.1%**，搬运耗时可以与计算过程形成一定重叠；当前主要瓶颈不是GM搬运过程，而是 FloorMod 计算本身的向量指令执行。
 
 **原理说明**：
 
-FloorMod 计算不仅包含取余，还需要根据余数和除数的符号关系做条件修正。使用Reg矢量计算实现时，分支判断不能直接写成普通 `if/else`，需要拆成 `Compare`、`And`、`MaskAnd`、`Select` 等多条向量指令来表达条件逻辑。同时，`asc_div`、`asc_mul`、`asc_sub`、符号判断和最终选择之间存在较长的数据依赖链，且后续指令需要等待前序结果，因此导致 `aiv_vec_ratio` 较高，表现为Vec bound。
+FloorMod 计算不仅包含取余，还需要根据余数和除数的符号关系做条件修正。使用reg_vector_compute实现时，分支判断不能直接写成普通 `if/else`，需要拆成 `Compare`、`And`、`MaskAnd`、`Select` 等多条向量指令来表达条件逻辑。同时，`asc_div`、`asc_mul`、`asc_sub`、符号判断和最终选择之间存在较长的数据依赖链，且后续指令需要等待前序结果，因此导致 `aiv_vec_ratio` 较高，表现为Vec bound。
 
-相比SIMD，SIMT更适合处理这类带分支判断的逐元素计算，可以在线程内部直接使用 `%` 和条件语句完成 FloorMod 修正，减少用向量掩码指令拼接分支逻辑带来的额外计算链路。
+相比SIMD，SIMT更适合处理这类带分支判断的逐元素计算，可以在线程内部直接使用 `%` 和条件语句完成 FloorMod 修正，减少用向量mask指令拼接分支逻辑带来的额外计算链路。
 
 **下一步优化方向**：
 
@@ -360,7 +360,7 @@ __aicore__ inline void process_tiles(
 | Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | 主要瓶颈 |
 |:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|:---|
 | 0 | SIMT直接访问GM | 64 | 812.063 | 785.715 | 0.999 | 0.004 | 0.000 | 0.001 | 0.000 | SIMT直接访问GM |
-| 1 | SIMD Reg矢量计算 | 64 | 525.736 | 509.987 | 0.989 | 217.341 | 0.421 | 62.274 | 0.121 | Vec bound |
+| 1 | SIMD reg_vector_compute | 64 | 525.736 | 509.987 | 0.989 | 217.341 | 0.421 | 62.274 | 0.121 | Vec bound |
 | 2 | SIMT非连续访问UB | 64 | 538.098 | 501.605 | 0.942 | 527.987 | 0.991 | 40.091 | 0.075 | 跨bank行访问UB |
 | 3 | SIMT连续访问UB | 64 | **463.179** | **301.474** | 0.668 | 437.055 | 0.968 | 110.788 | 0.245 | MTE2 bound |
 
@@ -368,8 +368,8 @@ __aicore__ inline void process_tiles(
 
 | 优化手段 | 核心原理 | 样例体现 |
 |:---|:---|:---|
-| 使用SIMD处理连续数据搬运 | SIMT直接访问GM时，访问粒度和缓存路径可能导致带宽利用率低；先通过搬运接口搬入UB，再由SIMT访问UB，可提升访问效率 | Case 3相比Case 0端到端耗时下降43.0% |
-| 使用SIMT处理分支判断 | 对带条件修正的逐元素计算，SIMD Reg矢量计算需要用多条Compare/Select/Mask指令表达分支，依赖链较长；SIMT可在线程内直接表达 `%` 和条件判断，减少向量掩码拼接分支逻辑的开销 | Case 2相比Case 1的 `aiv_vec_time` 下降1.6%；在连续访问后，Case 3相比Case 2的 `aiv_vec_time` 下降39.9% |
+| 使用SIMD处理连续data_move | SIMT直接访问GM时，访问粒度和缓存路径可能导致带宽利用率低；先通过搬运接口搬入UB，再由SIMT访问UB，可提升访问效率 | Case 3相比Case 0端到端耗时下降43.0% |
+| 使用SIMT处理分支判断 | 对带条件修正的逐元素计算，SIMD reg_vector_compute需要用多条Compare/Select/Mask指令表达分支，依赖链较长；SIMT可在线程内直接表达 `%` 和条件判断，减少向量mask拼接分支逻辑的开销 | Case 2相比Case 1的 `aiv_vec_time` 下降1.6%；在连续访问后，Case 3相比Case 2的 `aiv_vec_time` 下降39.9% |
 | 调整线程映射使Warp内连续访问UB | UB按16 bank/8 bank group组织、每bank行32B，硬件每拍每个bank group读/写一行；让同一Warp内相邻线程访问相邻元素、落入同一条32B bank行，可由一次行读取同时服务多个线程，比“单个线程内部连续、相邻线程跨32B行”更高效 | Case 3将 `tid*8+i` 改为 `tid+i*1024` 形态，相比Case 2端到端耗时下降13.9% |
 
 ---
@@ -382,7 +382,7 @@ __aicore__ inline void process_tiles(
 
   在cmake编译时通过 `-DSCENARIO_NUM=N` 指定要编译的Case，各Case说明：
   - `0`: SIMT直接访问GM
-  - `1`: SIMD Reg矢量计算
+  - `1`: SIMD reg_vector_compute
   - `2`: SIMT非连续访问
   - `3`: SIMT连续访问
 
@@ -409,7 +409,7 @@ __aicore__ inline void process_tiles(
   cmake -DCMAKE_ASC_RUN_MODE=npu -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # 编译工程
   python3 ../scripts/gen_data.py
   ./demo
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
@@ -420,7 +420,7 @@ __aicore__ inline void process_tiles(
   |:---|:---|:---|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `0`、`1`、`2`、`3` | Case编号：0=SIMT直接访问GM，1=SIMD Reg矢量计算，2=SIMT非连续访问，3=SIMT连续访问 |
+  | `SCENARIO_NUM` | `0`、`1`、`2`、`3` | Case编号：0=SIMT直接访问GM，1=SIMD reg_vector_compute，2=SIMT非连续访问，3=SIMT连续访问 |
 
 - 执行结果
 
@@ -449,7 +449,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

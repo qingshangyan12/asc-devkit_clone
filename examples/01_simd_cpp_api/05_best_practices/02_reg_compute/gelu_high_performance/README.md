@@ -1,6 +1,6 @@
 # Gelu性能调优样例
 
-## 概述
+## overview
 
 本样例以Gelu计算为例，介绍RegBase的向量性能调优方法，样例展示使能VF融合和循环展开之后的性能收益情况。
 
@@ -171,7 +171,7 @@ $$
 
 **实现方式**：参考 `KernelGelu::GeluCompute()` 函数实现
 
-基准程序使用Ascend C基础API实现Gelu计算，包括Mul、Muls、Add、Exp、Adds、Div等向量指令。
+基准程序使用Ascend Cbasic_api实现Gelu计算，包括Mul、Muls、Add、Exp、Adds、Div等向量指令。
 
 **关键代码**：
 ```cpp
@@ -217,10 +217,10 @@ __aicore__ inline void GeluCompute(
 **优化效果分析**：
 - 端到端耗时：**351.525μs**
 - 向量指令耗时：147.895μs，占比 **42.2%**
-- 数据搬运耗时：320.283μs（读）+ 303.647μs（写），搬运占比超过 **90%**
+- data_move耗时：320.283μs（读）+ 303.647μs（写），搬运占比超过 **90%**
 
 **原理说明**：
-- 计算流程按照公式(3)执行，包含8次向量运算，使用基础API进行向量计算
+- 计算流程按照公式(3)执行，包含8次向量运算，使用basic_api进行向量计算
 - 每次向量计算内部会进行load -> compute -> store操作，每次计算数据均需要在Unified Buffer(UB)和Reg之间交互
 
 **下一步优化方向**：
@@ -257,7 +257,7 @@ __aicore__ inline void GeluCompute(
 
 **MemBase vs RegBase 概念对比**：
 
-| 维度 | MemBase（基础API） | RegBase（VF融合API） |
+| 维度 | MemBase（basic_api） | RegBase（VF融合API） |
 |:---|:---|:---|
 | 编程接口 | Compute API（如 `Mul(yLocal, xLocal, xLocal, n)`） | Reg API（如 `Reg::Mul(yReg, xReg, xReg, mask)`） |
 | 数据驻留 | 每条指令隐式 Load/Store，中间结果写回 UB | 数据显式加载到寄存器后常驻，中间结果暂存寄存器 |
@@ -272,23 +272,23 @@ __aicore__ inline void GeluCompute(
 
 | 关键字/概念 | 含义 | 详细文档 |
 |:---|:---|:---|
-| `__simd_vf__` | VF 函数声明修饰符，表示该函数运行在 VF（Vector Function）执行域 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `__ubuf__` | UB 地址空间限定符，标记指针指向 UB 内存区域 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `RegTensor<T>` | 寄存器级 Tensor 对象，数据驻留在向量寄存器中（区别于驻留 UB 的 `LocalTensor`） | [RegTensor](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md) |
-| `MaskReg` | 向量掩码寄存器，控制每次计算参与运算的元素数量 | [MaskReg](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
-| `LoadAlign` | 连续对齐搬运，将数据从 UB 加载到寄存器 | [连续对齐搬入](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadAlign_continuous.md) |
-| `StoreAlign` | 连续对齐搬运，将数据从寄存器写回 UB | [连续对齐搬出](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_continuous.md) |
-| `asc_vf_call` | VF 函数调用入口，在核函数中调用 VF 函数 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [UpdateMask](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
+| `__simd_vf__` | VF 函数声明修饰符，表示该函数运行在 VF（Vector Function）执行域 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) |
+| `__ubuf__` | UB 地址空间限定符，标记指针指向 UB 内存区域 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) |
+| `RegTensor<T>` | 寄存器级 Tensor 对象，数据驻留在向量寄存器中（区别于驻留 UB 的 `LocalTensor`） | [RegTensor](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/RegTensor.md) |
+| `MaskReg` | 向量mask寄存器，控制每次计算参与运算的元素数量 | [MaskReg](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md) |
+| `LoadAlign` | 连续对齐搬运，将数据从 UB 加载到寄存器 | [连续对齐搬入](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous.md) |
+| `StoreAlign` | 连续对齐搬运，将数据从寄存器写回 UB | [连续对齐搬出](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_continuous.md) |
+| `asc_vf_call` | VF 函数调用入口，在核函数中调用 VF 函数 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) |
+| `UpdateMask` | 根据剩余元素数更新mask寄存器 | [UpdateMask](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md) |
 
 **原理解析**：
 
-RegBase API 提供寄存器级别的向量计算接口，配合 [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) 调用 VF 函数，可实现 VF 融合。VF 融合的核心优势：
-- 在 VF 函数内，数据从 UB 加载到寄存器后，所有中间计算均在寄存器中完成，仅需一次 [LoadAlign](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadAlign_continuous.md) 和一次 [StoreAlign](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_continuous.md)，消除中间结果的 Load/Store 开销
+RegBase API 提供寄存器级别的向量计算接口，配合 [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) 调用 VF 函数，可实现 VF 融合。VF 融合的核心优势：
+- 在 VF 函数内，数据从 UB 加载到寄存器后，所有中间计算均在寄存器中完成，仅需一次 [LoadAlign](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous.md) 和一次 [StoreAlign](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_continuous.md)，消除中间结果的 Load/Store 开销
 - 支持 VF 双发特性，常规计算指令并行度可达 512 bytes/cycle，指令发射效率（IPC）大幅提升
 
 ```
-基础API模式：                    VF融合模式：
+basic_api模式：                    VF融合模式：
 Load → Mul → Store              LoadAlign → Mul
 Load → Mul → Store                   → Mul
 Load → Muls → Store                   → Muls
@@ -308,7 +308,7 @@ Load → Div → Store                    → Div → StoreAlign
 - 移除 `PipeBarrier<PIPE_V>()` 同步，VF 函数内计算无需显式同步
 
 ```cpp
-// Case 0: 基础API，每次计算需Load/Store + PipeBarrier同步
+// Case 0: basic_api，每次计算需Load/Store + PipeBarrier同步
 AscendC::Mul(yLocal, xLocal, xLocal, n);
 AscendC::PipeBarrier<PIPE_V>();
 AscendC::Mul(yLocal, yLocal, xLocal, n);
@@ -370,11 +370,11 @@ asc_vf_call<GeluVfBasic>(xAddr, yAddr, n, loopNum);
 | aiv_mte2_time(μs) | 320.283 | 320.543 | - |
 | aiv_mte3_time(μs) | 303.647 | 314.547 | - |
 
-> 本样例为 MTE2 bound，数据搬运占比超过 90%，因此端到端收益不明显，但向量计算耗时的优化效果显著。
+> 本样例为 MTE2 bound，data_move占比超过 90%，因此端到端收益不明显，但向量计算耗时的优化效果显著。
 
 **本阶段结论**：
 - 通过 VF 融合，向量指令耗时从 147.895μs 降至 66.277μs，减少 **55.2%**，IPC 达到 1.20
-- 当前样例为 MTE2 bound，性能瓶颈仍在数据搬运，VF 计算效率仍有提升空间
+- 当前样例为 MTE2 bound，性能瓶颈仍在data_move，VF 计算效率仍有提升空间
 - VF 函数内 GELU 计算依赖路径较长，循环内指令双发效率未充分发挥，IPC 仅为 1.20，距离理论极限 2.0 仍有差距，需进一步优化指令级并行度
 
 ---
@@ -469,7 +469,7 @@ __simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float
 **终极性能总结**：
 - 在 VF 融合 + 循环展开的组合优化下，向量计算效率已达较优水平
 - 当前 IPC 为 1.25，距离理论极限 2.0 仍有空间，主要受限于 GELU 8 条指令的依赖链长度
-- 本样例为 MTE2 bound（数据搬运占比超过 90%），端到端收益受限于搬运瓶颈
+- 本样例为 MTE2 bound（data_move占比超过 90%），端到端收益受限于搬运瓶颈
 - 进一步提升 IPC 的方向：将过长的 loop 循环切分为多个短循环，在长 latency 指令（如 Exp、Div）结束点进行拆分，使每组依赖链更短，双发效率更高。本样例 loop 循环较短，不适用于该优化项
 
 ---
@@ -486,7 +486,7 @@ __simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float
 | 1 | 启用RegBase API和VF融合能力 | 64 | 8192 | 348.868 | 66.277 | NA | 1.01x | 2.23x |
 | 2 | 启用RegBase API、VF融合和循环展开 | 64 | 8192 | 344.436 | 63.655 | NA | 1.02x | 2.32x |
 
-> **注意：** 该样例为MTE2 bound，性能瓶颈为数据搬运，下述分析主要针对vector耗时计算，方便用户分析使能VF融合和循环展开的性能收益。Case 2相比Case 1，vector耗时减少 **4.6%**。
+> **注意：** 该样例为MTE2 bound，性能瓶颈为data_move，下述分析主要针对vector耗时计算，方便用户分析使能VF融合和循环展开的性能收益。Case 2相比Case 1，vector耗时减少 **4.6%**。
 
 ### 理论性能分析
 
@@ -656,7 +656,7 @@ $$
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_VF_MODE=$CMAKE_VF_MODE;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
@@ -705,7 +705,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

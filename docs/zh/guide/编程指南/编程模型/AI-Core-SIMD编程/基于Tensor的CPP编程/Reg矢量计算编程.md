@@ -1,14 +1,14 @@
-# Reg矢量计算编程<a name="ZH-CN_TOPIC_0000002509863892"></a>
+# reg_vector_compute编程<a name="ZH-CN_TOPIC_0000002509863892"></a>
 
-本文介绍如何使用基础API（C++模板接口）编写Reg矢量计算代码。基础API与[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/Reg矢量计算编程.md)描述的是同一套Reg矢量硬件能力，功能语义一致，主要区别在于API命名、类型表达和可配置参数的表达方式。
+本文介绍如何使用basic_api（C++模板接口）编写reg_vector_compute代码。basic_api与[reg_vector_compute编程（语言扩展C API）](../基于指针的C语言编程/reg_vector_compute编程.md)描述的是同一套Reg矢量硬件能力，功能语义一致，主要区别在于API命名、类型表达和可配置参数的表达方式。
 
-Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同步、Hardware Loop、VF融合等与API接口命名无关的内容，请参见[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/Reg矢量计算编程.md)。本文只说明基础API的接口定位、模板参数、数据类型体系、API分类和典型调用方式。
+Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同步、Hardware Loop、VF融合等与API接口命名无关的内容，请参见[reg_vector_compute编程（语言扩展C API）](../基于指针的C语言编程/reg_vector_compute编程.md)。本文只说明basic_api的接口定位、模板参数、数据类型体系、API分类和典型调用方式。
 
-## 基础API定位<a name="section_part1"></a>
+## basic_api定位<a name="section_part1"></a>
 
-基础API Reg矢量计算接口位于`AscendC::Reg`命名空间，是语言扩展C API的C++模板化封装。基础API并不改变Reg矢量计算的编程模型：仍然需要在`__aicore__`域通过`asc_vf_call`进入`__simd_vf__`函数，并在VF函数内完成`Load` -> `Compute` -> `Store`。
+basic_api reg_vector_compute接口位于`AscendC::Reg`命名空间，是语言扩展C API的C++模板化封装。basic_api并不改变reg_vector_compute的programming_model：仍然需要在`__aicore__`域通过`asc_vf_call`进入`__simd_vf__`函数，并在VF函数内完成`Load` -> `Compute` -> `Store`。
 
-基础API的主要特点如下：
+basic_api的主要特点如下：
 
 - 使用C++类型表达寄存器对象，例如`RegTensor<T>`、`MaskReg`、`AddrReg`、`UnalignRegForLoad`、`UnalignRegForStore` ,对应关系参考[数据对象与寄存器类型](#section_part4)。
 - 使用模板参数表达数据类型、搬运模式、PostUpdate模式等配置。
@@ -18,20 +18,20 @@ Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同
 
 > 📌 **提示**：
 >
-> 1. 基础API和C API功能一致。若需要理解“为什么需要Reg矢量编程”“寄存器与UB/GM的关系”“哪些场景需要同步”等模型性内容，请直接阅读C API版本文档。
+> 1. basic_api和C API功能一致。若需要理解“为什么需要Reg矢量编程”“寄存器与UB/GM的关系”“哪些场景需要同步”等模型性内容，请直接阅读C API版本文档。
 >
 > 2. 搬运接口支持`LocalTensor`参数，在后续版本提供，暂未支持。
 
 ## 与C API的对应关系<a name="section_part2"></a>
 
-基础API与C API的核心差异是表达形式不同。
+basic_api与C API的核心差异是表达形式不同。
 
-| 维度 | 基础API（C++模板） | C API（语言扩展） |
+| 维度 | basic_api（C++模板） | C API（语言扩展） |
 | --- | --- | --- |
 | 命名空间/前缀 | `AscendC::Reg::*` | `asc_*` |
 | 命名风格 | `LoadAlign`、`StoreUnAlignPost` | `asc_loadalign`、`asc_storeunalign_post` |
 | 矢量数据寄存器 | `RegTensor<T>` | `vector_float`、`vector_half`、`vector_int32_t`等 |
-| 掩码寄存器 | `MaskReg` | `vector_bool` |
+| mask寄存器 | `MaskReg` | `vector_bool` |
 | 地址寄存器 | `AddrReg` | `addr_reg` |
 | 非对齐搬入/搬出寄存器 | `UnalignRegForLoad` / `UnalignRegForStore` | `vector_load_unalign` / `vector_store_unalign` |
 | 数据类型选择 | 模板参数`T`，通常可由参数推导 | 类型名或接口后缀，例如`_b8`、`_b16`、`_b32` |
@@ -40,7 +40,7 @@ Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同
 
 常见API映射如下：
 
-| 功能 | 基础API | C API |
+| 功能 | basic_api | C API |
 | --- | --- | --- |
 | 创建全量mask | `CreateMask<T, MaskPattern::ALL>()` | `asc_create_mask_b*()` |
 | 更新尾块mask | `UpdateMask<T>(count)` | `asc_update_mask_b*()` |
@@ -53,7 +53,7 @@ Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同
 
 ## 模板参数体系<a name="section_part3"></a>
 
-基础API把C API中“后缀、枚举、特殊接口名”表达的能力统一收敛到模板参数中。常见模板参数如下。
+basic_api把C API中“后缀、枚举、特殊接口名”表达的能力统一收敛到模板参数中。常见模板参数如下。
 
 | 模板参数 | 作用 | 典型取值/类型 | 常见接口 |
 | --- | --- | --- | --- |
@@ -62,11 +62,11 @@ Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同
 | `LoadDist` | 搬入模式 | `DIST_NORM`、broadcast类取值等 | `LoadAlign` |
 | `StoreDist` | 搬出模式 | 正常搬出、首元素搬出、pack类取值等 | `StoreAlign` |
 | `MaskMergeMode` | mask未选中元素处理方式 | `ZEROING`、`MERGING` | 部分计算接口，例如Add |
-| 计算模式枚举 | 指定算法或计算变体 | 例如`ReduceType`、`PairReduce`等 | 规约、复合计算等 |
+| 计算模式枚举 | 指定algorithms或计算变体 | 例如`ReduceType`、`PairReduce`等 | 规约、composite_compute等 |
 
 ### 数据类型模板参数
 
-基础API使用`RegTensor<T>`表达矢量数据寄存器。`T`决定寄存器内元素解释方式，寄存器宽度仍由硬件VL决定。例如在VL为256B时，`RegTensor<float>`可表示64个`float`元素，`RegTensor<half>`可表示128个`half`元素。
+basic_api使用`RegTensor<T>`表达矢量数据寄存器。`T`决定寄存器内元素解释方式，寄存器宽度仍由硬件VL决定。例如在VL为256B时，`RegTensor<float>`可表示64个`float`元素，`RegTensor<half>`可表示128个`half`元素。
 
 ```cpp
 AscendC::Reg::RegTensor<float> srcReg;
@@ -80,7 +80,7 @@ AscendC::Reg::Add(dstReg, srcReg, srcReg, mask);
 
 ### 搬运模式模板参数
 
-基础API使用`LoadDist`、`StoreDist`、`PostLiteral`等模板参数表达搬运模式。
+basic_api使用`LoadDist`、`StoreDist`、`PostLiteral`等模板参数表达搬运模式。
 
 ```cpp
 // 对齐搬入，使用LoadDist模板参数
@@ -110,17 +110,17 @@ AscendC::Reg::Add<T, AscendC::Reg::MaskMergeMode::MERGING>(dstReg, src0Reg, src1
 
 ## 数据对象与寄存器类型<a name="section_part4"></a>
 
-基础API使用C++类型表达Reg矢量编程中的寄存器资源。
+basic_api使用C++类型表达Reg矢量编程中的寄存器资源。
 
-| 寄存器分类 | 基础API类型 | 用途 |
+| 寄存器分类 | basic_api类型 | 用途 |
 | --- | --- | --- |
 | 矢量数据寄存器 | `RegTensor<T, regTrait>` | 保存VL或多VL长度的矢量数据，是计算接口的主要源/目的操作数 |
-| 掩码寄存器 | `MaskReg` | 控制哪些元素参与计算，也可承载比较、逻辑等结果 |
+| mask寄存器 | `MaskReg` | 控制哪些元素参与计算，也可承载比较、逻辑等结果 |
 | 地址寄存器 | `AddrReg` | 保存UB访问偏移，适合固定stride、多维索引等搬运场景 |
 | 搬入非对齐寄存器 | `UnalignRegForLoad` | 连续非对齐搬入的临时缓存 |
 | 搬出非对齐寄存器 | `UnalignRegForStore` | 连续非对齐搬出的临时缓存 |
 
-`RegTensor`和`MaskReg`等寄存器对象只能作为整体使用，不能按C++数组方式访问其中某个元素。相关硬件含义、宽度、mask bit对应关系请参考[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/Reg矢量计算编程.md)中“寄存器类型与申请”章节。
+`RegTensor`和`MaskReg`等寄存器对象只能作为整体使用，不能按C++数组方式访问其中某个元素。相关硬件含义、宽度、mask bit对应关系请参考[reg_vector_compute编程（语言扩展C API）](../基于指针的C语言编程/reg_vector_compute编程.md)中“寄存器类型与申请”章节。
 
 ### 与LocalTensor衔接
 
@@ -139,7 +139,7 @@ __aicore__ inline void Compute()
 }
 ```
 
-这种写法使基础API能够与`__aicore__`中`LocalTensor`流程衔接。
+这种写法使basic_api能够与`__aicore__`中`LocalTensor`流程衔接。
 
 > 📌 **提示**：使用LocalTensor作为VF函数参数时，不能使用引用LocalTensor &。因为在`__aicore__`和`__simd_vf__`是两个相互隔离的执行域，无法通过跨执行域通过引用访问。
 
@@ -149,7 +149,7 @@ __aicore__ inline void Compute()
 
 #### Mask创建
 
-[`CreateMask`](../../../../../api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于创建固定模式的`MaskReg`，[`UpdateMask`](../../../../../api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于根据剩余元素数生成尾块mask。
+[`CreateMask`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md)用于创建固定模式的`MaskReg`，[`UpdateMask`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md)用于根据剩余元素数生成尾块mask。
 
 ```cpp
 AscendC::Reg::MaskReg fullMask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
@@ -161,7 +161,7 @@ AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(remainCount);
 
 #### 地址寄存器创建
 
-[`CreateAddrReg`](../../../../../api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/AddrReg.md)用于创建保存UB偏移量的`AddrReg`，最多支持四层循环跳转。
+[`CreateAddrReg`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/register_data_types/AddrReg.md)用于创建保存UB偏移量的`AddrReg`，最多支持四层循环跳转。
 
 ```cpp
 AscendC::Reg::AddrReg aReg;
@@ -177,7 +177,7 @@ for(uint16_t i = 0;i < extent1; i++){
 }
 ```
 
-### 数据搬运类
+### data_move类
 
 #### 通用搬运
 
@@ -193,7 +193,7 @@ AscendC::Reg::Store(dstAddr, dstReg, count);
 
 #### 对齐搬运
 
-[`LoadAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadAlign_continuous.md) / [`StoreAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_continuous.md)适用于UB地址满足对齐要求的连续搬入/搬出，是Reg矢量编程中最常见的搬运接口。在搬运时可以按照内置的功能随路进行数据排布等操作，具体功能以对应API章节为准。
+[`LoadAlign`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous.md) / [`StoreAlign`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_continuous.md)适用于UB地址满足对齐要求的连续搬入/搬出，是Reg矢量编程中最常见的搬运接口。在搬运时可以按照内置的功能随路进行数据排布等操作，具体功能以对应API章节为准。
 
 ```cpp
 AscendC::Reg::LoadAlign(srcReg, srcAddr);
@@ -202,7 +202,7 @@ AscendC::Reg::StoreAlign(dstAddr, dstReg, mask);
 
 #### 非对齐搬运
 
-连续非对齐搬入由[`LoadUnAlignPre`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadUnAlign_continuous.md)和[`LoadUnAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/LoadUnAlign_continuous.md)组合使用；连续非对齐搬出由[`StoreUnAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreUnAlign_continuous.md)和[`StoreUnAlignPost`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreUnAlign_continuous.md)组合使用。
+连续非对齐搬入由[`LoadUnAlignPre`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadUnAlign_continuous.md)和[`LoadUnAlign`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadUnAlign_continuous.md)组合使用；连续非对齐搬出由[`StoreUnAlign`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreUnAlign_continuous.md)和[`StoreUnAlignPost`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreUnAlign_continuous.md)组合使用。
 
 ```cpp
 AscendC::Reg::UnalignRegForLoad loadUreg;
@@ -224,7 +224,7 @@ AscendC::Reg::StoreUnAlignPost(dstAddr, storeUreg, 0);
 
 ####  `RegTensor<T>`与`RegTensor<T>`计算
 
-基础算术接口完成寄存器之间的逐元素计算，标量算术接口完成寄存器与标量的逐元素计算。
+basic_arithmetic接口完成寄存器之间的逐元素计算，标量算术接口完成寄存器与标量的逐元素计算。
 
 ```cpp
 AscendC::Reg::Add(dstReg, src0Reg, src1Reg, mask);
@@ -245,9 +245,9 @@ AscendC::Reg::Select(dstReg, src0Reg, src1Reg, cmpMaskReg, mask);
 
 这些接口往往有更多模板参数或限制条件，建议在具体使用时查看对应API页面。
 
-### 同步控制类
+### sync_control类
 
-基础API使用[`LocalMemBar`](../../../../../api/SIMD-API/基础API/Reg矢量计算/同步控制/LocalMemBar.md)表达VF内部对UB访问流水线的同步约束。
+basic_api使用[`LocalMemBar`](../../../../../api/SIMD-API/basic_api/reg_vector_compute/sync_control/LocalMemBar.md)表达VF内部对UB访问流水线的同步约束。
 
 ```cpp
 AscendC::Reg::Store(dstAddr, dstReg);
@@ -256,11 +256,11 @@ AscendC::Reg::LocalMemBar<AscendC::Reg::MemType::VEC_STORE,
 AscendC::Reg::Load(srcReg, dstAddr);
 ```
 
-何时需要同步与API命名无关，判断规则请参考[Reg矢量计算编程（语言扩展C API）](../基于指针的C语言编程/Reg矢量计算编程.md)中的“流水线同步”章节。
+何时需要同步与API命名无关，判断规则请参考[reg_vector_compute编程（语言扩展C API）](../基于指针的C语言编程/reg_vector_compute编程.md)中的“流水线同步”章节。
 
 ## 编程示例<a name="section_part6"></a>
 
-下面示例展示基础API的典型调用方式。外层`__aicore__`函数仍负责`LocalTensor`管理，VF函数内使用Reg基础API完成搬入、计算和搬出。
+下面示例展示basic_api的典型调用方式。外层`__aicore__`函数仍负责`LocalTensor`管理，VF函数内使用Regbasic_api完成搬入、计算和搬出。
 
 ```cpp
 template <typename T>
@@ -337,4 +337,4 @@ for (uint16_t i = 0; i < repeatTimes; ++i) {
 
 ## 小结<a name="section_part7"></a>
 
-基础API与C API描述的是同一套Reg矢量计算能力，两者的编程模型和硬件语义保持一致。基础API的差异主要体现在接口表达方式上：它通过`AscendC::Reg::*`命名空间组织接口，使用C++寄存器类型描述VF内部的数据对象，并通过模板参数承载数据类型、搬运模式、计算模式等配置。与`LocalTensor`衔接时，可以在`__aicore__`函数中直接将`LocalTensor`作为参数传入VF函数，也可以通过`LocalTensor::GetPhyAddr()`取得UB地址后传入VF函数，再在VF函数内部使用Reg搬运接口完成访问。
+basic_api与C API描述的是同一套reg_vector_compute能力，两者的programming_model和硬件语义保持一致。basic_api的差异主要体现在接口表达方式上：它通过`AscendC::Reg::*`命名空间组织接口，使用C++寄存器类型描述VF内部的数据对象，并通过模板参数承载数据类型、搬运模式、计算模式等配置。与`LocalTensor`衔接时，可以在`__aicore__`函数中直接将`LocalTensor`作为参数传入VF函数，也可以通过`LocalTensor::GetPhyAddr()`取得UB地址后传入VF函数，再在VF函数内部使用Reg搬运接口完成访问。

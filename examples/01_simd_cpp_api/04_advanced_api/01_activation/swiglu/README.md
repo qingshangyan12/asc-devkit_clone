@@ -1,8 +1,8 @@
 # SwiGLU样例
 
-## 概述
+## overview
 
-本样例在大语言模型和混合专家(MoE)场景下，基于SwiGLU高阶API对两个输入Tensor按元素做SwiGLU计算。SwiGLU是采用Swish作为激活函数的GLU变体，计算公式为 dst_i = src0_i ⊗ Swish(src1_i)，其中 Swish(x) = x/(1+e^(-βx))。该API常用于LLM中的门控前馈网络(FFN)，支持float/half/bfloat16_t等数据类型。本样例使用float数据类型，输入Tensor元素个数为32，beta值为1，完成SwiGLU激活计算。
+本样例在大语言模型和混合专家(MoE)场景下，基于SwiGLUhigh_level_api对两个输入Tensor按元素做SwiGLU计算。SwiGLU是采用Swish作为activation_functions的GLU变体，计算公式为 dst_i = src0_i ⊗ Swish(src1_i)，其中 Swish(x) = x/(1+e^(-βx))。该API常用于LLM中的门控前馈网络(FFN)，支持float/half/bfloat16_t等数据类型。本样例使用float数据类型，输入Tensor元素个数为32，beta值为1，完成SwiGLU激活计算。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -27,11 +27,11 @@
 ## 样例描述
 
 - 样例功能：  
-  SwiGLU是采用Swish作为激活函数的GLU变体。
+  SwiGLU是采用Swish作为activation_functions的GLU变体。
 
   计算公式如下：
   $$dstTensor_i=(srcTensor0_i)\bigotimes Swish(srcTensor1_i)$$
-  其中Swish激活函数的计算公式如下（β为常量）：
+  其中Swishactivation_functions的计算公式如下（β为常量）：
   $$Swish(x)=x/(1 + e^{(-\beta x)})$$
 
 - 样例规格：  

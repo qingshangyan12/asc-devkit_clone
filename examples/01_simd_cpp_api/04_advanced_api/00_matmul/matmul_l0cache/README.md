@@ -1,6 +1,6 @@
 # Matmul 开启L0缓存功能直调样例
-## 概述
-使能L0缓存特性的Matmul样例，减少MTE1重复搬运。以左矩阵A为例，L0缓存指在数据从A1搬运到A2的MTE1搬运过程，当A1中数据搬运到A2后，该缓存的数据保持在A2中，同时缓存数据依次与B2中不同的数据完成乘加运算。
+## overview
+使能L0缓存特性的Matmul样例，减少MTE1重复搬运。以左矩阵A为例，L0缓存指在数据从A1搬运到A2的MTE1搬运过程，当A1中data_move到A2后，该缓存的数据保持在A2中，同时缓存数据依次与B2中不同的数据完成乘加运算。
 
 L0缓存没有对外开关，由Matmul API内部根据用户配置的shape信息自动推导是否可以开启L0缓存，当前仅支持L0A缓存，使能场景要求如下：
 - 需要配置全部常量化Tiling场景，即singleCoreM/singleCoreN/singleCoreK和baseM/baseN/baseK均需通过常量化接口设置；
@@ -32,7 +32,7 @@ L0缓存没有对外开关，由Matmul API内部根据用户配置的shape信息
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py    # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

@@ -1,6 +1,6 @@
 # Mmad unitFlag特性样例
 
-## 概述
+## overview
 
 本样例介绍了如何在调用Mmad指令时，使用unitFlag功能。
 
@@ -29,7 +29,7 @@
 
 unitFlag用于控制Mmad指令和Fixpipe指令细粒度并行。使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。
 
-本样例中，A矩阵shape为[128, 512]，B矩阵shape为[512, 256]，执行Mmad指令时，沿着K轴进行8次迭代循环，每次迭代K长度为64。输入文件 `x1_gm.bin` 按 `[kRound, M, K/kRound]` 的连续K分块布局存储，便于每次迭代直接读取当前K分块。前7次Mmad仍需继续向L0C累加，unitFlag设置为2；最后1次Mmad累加完成后需允许Fixpipe读取L0C，Mmad和Fixpipe的unitFlag设置为3。每次迭代中Mmad计算时，unitFlag的取值说明如表1所示：
+本样例中，A矩阵shape为[128, 512]，B矩阵shape为[512, 256]，执行Mmad指令时，沿着K轴进行8次迭代循环，每次迭代K长度为64。输入文件 `x1_gm.bin` 按 `[kRound, M, K/kRound]` 的连续K分块布局存储，便于每次迭代直接读取当前K分块。前7次Mmad仍需继续向L0C累加，unitFlag设置为2；最后1次Mmad累加完成后需允许Fixpipe读取L0C，Mmad和Fixpipe的unitFlag设置为3。每次迭代中mmad_compute时，unitFlag的取值说明如表1所示：
 
 <a name="表1"></a>
 <table border="2" align="center">
@@ -81,7 +81,7 @@ unitFlag用于控制Mmad指令和Fixpipe指令细粒度并行。使能该功能�
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DENABLE_UNITFLAG=1 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 

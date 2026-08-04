@@ -38,7 +38,7 @@ __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mo
 
 | 参数名 | 输入/输出 | 描述 |
 |:-------|:----------|:------|
-| hf32_round_mode | 输入 | HF32舍入模式控制入参，[asc_hf32_round_mode](../enum/asc_hf32_round_mode.md)枚举类型，支持如下2种枚举值：<br>&nbsp;&nbsp;&bull; NEAREST_ZERO：FP32将以向零靠近的方式四舍五入为HF32。<br>&nbsp;&nbsp;&bull; NEAREST_EVEN：FP32将以最接近偶数的方式四舍五入为HF32。 |
+| hf32_round_mode | 输入 | HF32舍入模式控制入参，[asc_hf32_round_mode](../enum/asc_hf32_round_mode.md)enum_types，支持如下2种枚举值：<br>&nbsp;&nbsp;&bull; NEAREST_ZERO：FP32将以向零靠近的方式四舍五入为HF32。<br>&nbsp;&nbsp;&bull; NEAREST_EVEN：FP32将以最接近偶数的方式四舍五入为HF32。 |
 
 ## 返回值说明
 

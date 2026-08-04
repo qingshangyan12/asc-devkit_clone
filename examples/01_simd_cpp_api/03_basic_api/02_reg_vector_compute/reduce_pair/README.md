@@ -1,6 +1,6 @@
 # reduce_pair样例
 
-## 概述
+## overview
 本样例基于Reg编程接口实现PairReduceElem运算，主要调用PairReduceElem接口（SUM模式）。
 - PairReduceElem接口对相邻的奇偶元素对进行归约求和，当前仅支持SUM归约模式
 
@@ -37,7 +37,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_pair</td></tr>
   </table>
 - 样例实现：
-   PairReduceSumVF函数内调用PairReduceElem接口进行归约计算：
+   PairReduceSumVF函数内调用PairReduceElem接口进行reduction_compute：
    - 使用LoadAlign加载数据到寄存器
    - 使用PairReduceElem(PairReduce::SUM)对相邻奇偶元素对求和
    - 使用StoreAlign将结果写回UB

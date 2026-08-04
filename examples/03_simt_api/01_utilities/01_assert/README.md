@@ -1,6 +1,6 @@
 # SIMT assert断言功能实现样例
 
-## 概述
+## overview
 
 本样例演示在SIMT编程下使用```assert()```接口实现上板进行功能调试的方法。
 

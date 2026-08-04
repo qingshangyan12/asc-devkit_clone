@@ -1,8 +1,8 @@
 # reg_load_store_mask样例
 
-## 概述
+## overview
 
-本样例演示Ascend C C API中掩码寄存器的加载、存储和使用方式，包含基础搬运和基于掩码寄存器的数据选择两个场景。
+本样例演示Ascend C C API中mask寄存器的加载、存储和使用方式，包含基础搬运和基于mask寄存器的数据选择两个场景。
 
 ## 支持的产品及CANN软件版本
 
@@ -28,7 +28,7 @@ reg_load_store_mask/
 
 ## 场景详细说明
 
-输入数据先由MTE2从GM（Global Memory）搬运至UB（Unified Buffer），入口函数通过`asc_vf_call`调用SIMD VF函数加载或生成掩码寄存器并完成寄存器操作，最后由MTE3将输出从UB搬运至GM；内核末尾通过`asc_sync_pipe(PIPE_ALL)`完成所有流水的收尾同步。
+输入数据先由MTE2从GM（Global Memory）搬运至UB（Unified Buffer），入口函数通过`asc_vf_call`调用SIMD VF函数加载或生成mask寄存器并完成寄存器操作，最后由MTE3将输出从UB搬运至GM；内核末尾通过`asc_sync_pipe(PIPE_ALL)`完成所有流水的收尾同步。
 
 ### 场景1：基础搬运场景
 
@@ -39,13 +39,13 @@ reg_load_store_mask/
 
 实现过程如下：
 
-![场景1掩码寄存器操作示意图](./figures/reg_load_store_mask.png)
+![场景1mask寄存器操作示意图](./figures/reg_load_store_mask.png)
 
-1. 使用`asc_loadalign`将输入前32B数据加载至掩码寄存器。生成的输入中第1和第32个字节为1，其余字节为0，因此掩码寄存器中第1和第249个位置有效。
-2. 使用`asc_duplicate_scalar`根据掩码寄存器，在矢量数据寄存器的指定位置填充数值2，再使用`asc_storealign`写回UB。输出中仅第1和第249个元素为2，其余元素保持为0。
-3. 使用`asc_create_mask_b8(PAT_ALL)`生成全1掩码寄存器，再通过`asc_storealign`将对应的32B 0xFF数据写入UB中第257个至第288个元素。
+1. 使用`asc_loadalign`将输入前32B数据加载至mask寄存器。生成的输入中第1和第32个字节为1，其余字节为0，因此mask寄存器中第1和第249个位置有效。
+2. 使用`asc_duplicate_scalar`根据mask寄存器，在矢量数据寄存器的指定位置填充数值2，再使用`asc_storealign`写回UB。输出中仅第1和第249个元素为2，其余元素保持为0。
+3. 使用`asc_create_mask_b8(PAT_ALL)`生成全1mask寄存器，再通过`asc_storealign`将对应的32B 0xFF数据写入UB中第257个至第288个元素。
 
-### 场景2：复合计算场景
+### 场景2：composite_compute场景
 
 | 数据 | 名称 | 长度 | 数据类型 |
 | --- | --- | --- | --- |
@@ -56,9 +56,9 @@ reg_load_store_mask/
 
 实现过程如下：
 
-1. 将`src0`、`src1`和掩码数据从GM搬运至UB。
-2. SIMD VF函数循环4次，每次使用`asc_loadalign_postupdate`加载64个float元素及对应的32B掩码数据至矢量数据寄存器和掩码寄存器。
-3. 使用`asc_select`按掩码寄存器的比特位选择数据：掩码位为1时选择`src0`中的元素，为0时选择`src1`中的元素。
+1. 将`src0`、`src1`和mask数据从GM搬运至UB。
+2. SIMD VF函数循环4次，每次使用`asc_loadalign_postupdate`加载64个float元素及对应的32Bmask数据至矢量数据寄存器和mask寄存器。
+3. 使用`asc_select`按mask寄存器的比特位选择数据：mask位为1时选择`src0`中的元素，为0时选择`src1`中的元素。
 4. 使用`asc_storealign_postupdate`将每轮的64个float结果连续写回UB，随后由MTE3搬运至GM。
 
 ## 编译与运行
@@ -98,7 +98,7 @@ cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITEC
 
 | 选项 | 可选值 | 说明 |
 | --- | --- | --- |
-| `SCENARIO_NUM` | `1`、`2` | 选择掩码寄存器加载、存储和选择场景。 |
+| `SCENARIO_NUM` | `1`、`2` | 选择mask寄存器加载、存储和选择场景。 |
 | `CMAKE_ASC_RUN_MODE` | `npu`、`sim` | 选择NPU运行或NPU仿真模式。 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | 指定NPU架构，对应Ascend 950PR/Ascend 950DT。 |
 

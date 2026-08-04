@@ -1,7 +1,7 @@
 # Matmul 使用NBuffer33模板策略直调样例
 
-## 概述
-NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效率。
+## overview
+NBuffer33algorithms的Matmul样例，实现搬入搬出带宽平衡从而提升效率。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -28,7 +28,7 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
 
 - 约束条件
   - 仅支持MDL模板。
-  - 仅支持纯Cube模式（只有矩阵计算），暂不支持MIX模式（包含矩阵计算和矢量计算）。
+  - 仅支持纯Cube模式（只有cube_compute），暂不支持MIX模式（包含cube_compute和矢量计算）。
   - 仅支持通过IterateAll接口获取Matmul的计算结果C矩阵。
   - stepM、stepKa、stepKb小于等于3。
   - 用户需要确保A矩阵全载的基本块大小与B矩阵载入的基本块大小之和不超过L1 Buffer大小。
@@ -87,7 +87,7 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py    # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

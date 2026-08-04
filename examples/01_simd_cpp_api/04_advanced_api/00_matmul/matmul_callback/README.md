@@ -1,6 +1,6 @@
 # Matmul 模板参数AscendC::MatmulCallBackFunc直调样例
 
-## 概述
+## overview
 Matmul API模板参数AscendC::MatmulCallBackFunc的自定义使用方式。AscendC::MatmulCallBackFunc用于配置左矩阵从Global Memory拷贝到A1(L1 Buffer)、右矩阵从Global Memory拷贝到B1(L1 Buffer)、计算结果从CO1（L0C Buffer）拷贝到Global Memory的自定义函数，本样例以Global Memory自定义搬运到A1(L1 Buffer)的回调函数为例，介绍该模板参数如何使用。
 
 ## 本样例支持的产品及CANN软件版本
@@ -29,7 +29,7 @@ Matmul API模板参数AscendC::MatmulCallBackFunc的自定义使用方式。Asce
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py    # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

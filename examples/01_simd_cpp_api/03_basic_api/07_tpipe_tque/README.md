@@ -1,8 +1,8 @@
-# TPipe/TQue资源管理类API样例介绍
+# TPipe/TQueresource_management类API样例介绍
 
-## 概述
+## overview
 
-本路径下包含了与TPipe/TQue资源管理相关的多个API样例。每个样例均基于Ascend C的<<<>>>直调方法，展示TPipe、TQue相关接口的使用方式。
+本路径下包含了与TPipe/TQueresource_management相关的多个API样例。每个样例均基于Ascend C的<<<>>>直调方法，展示TPipe、TQue相关接口的使用方式。
 
 ## 样例列表
 

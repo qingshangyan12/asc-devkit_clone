@@ -1,6 +1,6 @@
 # GetTPipePtr样例
 
-## 概述
+## overview
 
 本样例基于GetTPipePtr接口获取全局TPipe指针，并通过该指针进行TPipe相关操作。
 
@@ -115,11 +115,11 @@
 
     - 调用TPipe::InitBuffer接口，为TQue分配内存空间。
 
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
 
     - 调用Add接口，对两个输入tensor执行加法操作。
 
-    - 调用DataCopy基础API，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）。
+    - 调用DataCopybasic_api，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）。
 
   - 调用实现
 

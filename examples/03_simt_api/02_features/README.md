@@ -1,6 +1,6 @@
 # Features样例介绍
 
-## 概述
+## overview
 
 基于Ascend C SIMT特性样例，展示SIMT编程的各类特性。
 

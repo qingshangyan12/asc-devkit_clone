@@ -1,8 +1,8 @@
 # Fill样例
 
-## 概述
+## overview
 
-本样例基于Fill高阶API实现将Global Memory上的数据初始化为指定值，并配合Add接口完成向量加法计算。Fill接口支持在数据搬运前对输出空间进行初始化，常用于workspace地址或输出数据清零场景。
+本样例基于Fillhigh_level_api实现将Global Memory上的数据初始化为指定值，并配合Add接口完成向量加法计算。Fill接口支持在data_move前对输出空间进行初始化，常用于workspace地址或输出数据清零场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -27,7 +27,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例在需要预先初始化Global Memory数据的场景下，基于Fill高阶API实现将Global Memory上的数据初始化为指定值，并配合Add接口完成向量加法计算。
+  本样例在需要预先初始化Global Memory数据的场景下，基于Fillhigh_level_api实现将Global Memory上的数据初始化为指定值，并配合Add接口完成向量加法计算。
 
 - 样例规格：  
   <table>
@@ -46,11 +46,11 @@
   </table>
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入input_x[1, 256]，input_y[1, 256]，输出output_z[1, 256]的fill样例，所用API详细介绍请参考[Fill API文档](../../../../../docs/zh/api/SIMD-API/高阶API/张量变换/Fill-97.md)。
+  本样例中实现的是固定shape为输入input_x[1, 256]，input_y[1, 256]，输出output_z[1, 256]的fill样例，所用API详细介绍请参考[Fill API文档](../../../../../docs/zh/api/SIMD-API/high_level_api/tensor_transform/Fill-97.md)。
 
   - Kernel实现  
     计算逻辑包含以下步骤：
-    1. 使用Fill高阶API将输出Global Memory初始化为当前核的blockIdx值
+    1. 使用Fillhigh_level_api将输出Global Memory初始化为当前核的blockIdx值
     2. 使用Add接口进行向量加法计算
     3. 使用SetAtomicAdd模式将计算结果累加到输出Global Memory
 

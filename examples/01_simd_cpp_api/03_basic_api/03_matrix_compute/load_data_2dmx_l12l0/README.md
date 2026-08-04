@@ -1,8 +1,8 @@
 # load_data_2dmx_l12l0样例
 
-## 概述
+## overview
 
-本样例展示MX量化矩阵乘法中，如何使用基础API `LoadData` 完成L1到L0的数据搬运。
+本样例展示MX量化矩阵乘法中，如何使用basic_api `LoadData` 完成L1到L0的data_move。
 
 样例以FP4 / FP8类型的A / B矩阵和fp8_e8m0_t类型的scaleA / scaleB矩阵为输入，覆盖A / B矩阵转置和不转置输入场景。主要演示：
 
@@ -830,7 +830,7 @@ AscendC::DataCopy(scaleB1LocalB16, scaleBGMB16, dn2nzParams);
 ```
 ### 6. L1到L0（`LoadData`）
 
-本小节介绍A / B矩阵从L1搬运到L0A / L0B、scaleA / scaleB矩阵从L1搬运到L0A_MX / L0B_MX时，如何调用`LoadData`指令，并通过`LoadData2DParamsV2`和`LoadData2DMxParams`两个结构体参数完成数据搬运及格式变换。
+本小节介绍A / B矩阵从L1搬运到L0A / L0B、scaleA / scaleB矩阵从L1搬运到L0A_MX / L0B_MX时，如何调用`LoadData`指令，并通过`LoadData2DParamsV2`和`LoadData2DMxParams`两个结构体参数完成data_move及格式变换。
 
 #### 6.1. `LoadData2DParamsV2`结构体参数说明
 
@@ -1226,7 +1226,7 @@ AscendC::Fixpipe<U, U, AscendC::CFG_ROW_MAJOR>(cGM, c1Local, fixpipeParams);
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 

@@ -1,8 +1,8 @@
 # TopK样例
 
-## 概述
+## overview
 
-本样例在排序场景下，基于TopK高阶API对输入Tensor按照数值大小找出前K个最大值或最小值，同时保留对应的索引信息。支持float类型数值和int32_t类型索引的联合排序。
+本样例在排序场景下，基于TopKhigh_level_api对输入Tensor按照数值大小找出前K个最大值或最小值，同时保留对应的索引信息。支持float类型数值和int32_t类型索引的联合排序。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -52,7 +52,7 @@
     本样例中实现的是固定shape为输入数值张量srcLocalValue[2, 32], 索引张量srcLocalIndex[1, 32], 完成标志srcLocalFinish[1, 32], 输出结果数值dstLocalValue[2, 8], 结果索引dstLocalIndex[2, 8]的topk样例。
 
   - Kernel实现：  
-    计算逻辑是：输入数据需要先搬运进片上存储，使用TopK高阶API接口完成topk计算，再将结果搬出。
+    计算逻辑是：输入数据需要先搬运进片上存储，使用TopKhigh_level_api接口完成topk计算，再将结果搬出。
 
   - Tiling实现：  
     该样例的tiling实现流程如下：使用GetTopKMaxMinTmpSize接口计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度确定所需tiling参数。

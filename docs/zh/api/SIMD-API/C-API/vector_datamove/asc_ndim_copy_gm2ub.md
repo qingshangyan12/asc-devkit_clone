@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-多维数据搬运接口，将数据从Global Memory (GM)搬运到Unified Buffer (UB)。相比于基础数据搬移接口，可以更加自由配置搬入的维度信息。
+多维data_move接口，将数据从Global Memory (GM)搬运到Unified Buffer (UB)。相比于基础数据搬移接口，可以更加自由配置搬入的维度信息。
 本功能最多能处理5个维度，每个维度都可以单独配置Stride，且支持随路Padding功能。相关配置参数有很多，需要通过不同的接口传入。
 
 **表1** Stride配置涉及的所有参数及其传入接口，其中i表示第i维，可取值[0,4]
@@ -127,7 +127,7 @@ PIPE_MTE2
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 - 如果需要执行多条asc_ndim_copy_gm2ub指令，且asc_ndim_copy_gm2ub指令的目的地址存在重叠，需要插入同步指令，保证多个asc_ndim_copy_gm2ub指令的串行化，防止出现异常数据。
 - 一条指令所能获取的所有数据的地址范围宽度不能超过40位（1TB），即：源操作数的i维大小为（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_src_stride，目的操作数的i维大小为：（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_dst_stride，所有的维度的大小加起来不超过2^40位。
 - 当每维的loopi_dst_stride为升序序列，则不同循环间的地址空间不能交织或重叠。
@@ -138,7 +138,7 @@ PIPE_MTE2
 ![ ](../figures/asc_ndim_copy_gm2ub典型使用场景：2D_Padding场景，使用固定值填充方式.png)
 
 ```cpp
-// total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。
+// total_length指参与搬运的数据总长度。src是外部输入的half_type的GM内存。
 constexpr uint64_t total_length = 54;
 __ubuf__ half dst[total_length];
 

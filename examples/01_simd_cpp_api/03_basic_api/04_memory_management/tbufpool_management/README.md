@@ -1,8 +1,8 @@
 # TBufPool内存管理样例
 
-## 概述
+## overview
 
-本样例基于TPipe::InitBufPool和TBufPool::InitBufPool接口实现TBufPool内存资源管理，展示TBufPool资源分配、内存划分、内存复用和自定义TBufPool等使用方式。本样例给出了3种不同的测试场景（scenario）。
+本样例基于TPipe::InitBufPool和TBufPool::InitBufPool接口实现TBufPool内存resource_management，展示TBufPool资源分配、内存划分、内存复用和custom_TBufPool等使用方式。本样例给出了3种不同的测试场景（scenario）。
 
 > **注意：** 本样例仅适用于基于TPipe和TQue的编程模式。
 
@@ -24,8 +24,8 @@
   </tr>
   <tr>
     <td align="center">3</td>
-    <td align="center">自定义TBufPool</td>
-    <td align="center">使用EXTERN_IMPL_BUFPOOL宏辅助用户自定义TBufPool类，实现非连续内存块分配和内存共享</td>
+    <td align="center">custom_TBufPool</td>
+    <td align="center">使用EXTERN_IMPL_BUFPOOL辅助用户custom_TBufPool类，实现非连续内存块分配和内存共享</td>
   </tr>
 </table>
 
@@ -54,7 +54,7 @@
 
 - 样例功能
 
-  本样例展示TBufPool内存资源管理的多种使用方式，包括内存复用、资源细分和自定义TBufPool。
+  本样例展示TBufPool内存resource_management的多种使用方式，包括内存复用、资源细分和custom_TBufPool。
 
 - 样例规格
 
@@ -128,7 +128,7 @@
     </tr>
   </table>
 
-  **场景3：自定义TBufPool**
+  **场景3：custom_TBufPool**
   <table>
     <tr>
       <td align="center">类别</td>
@@ -167,7 +167,7 @@
 
   - Kernel实现
 
-    **内存资源管理（场景差异）**
+    **内存resource_management（场景差异）**
 
     <table>
       <tr>
@@ -187,16 +187,16 @@
       </tr>
       <tr>
         <td align="center">3</td>
-        <td align="center">自定义TBufPool</td>
-        <td align="center">使用EXTERN_IMPL_BUFPOOL宏实现自定义TBufPool类MyBufPool；调用TPipe::InitBufPool为MyBufPool划分内存，通过InitBuffer实现TQue和TBuf的内存分配</td>
+        <td align="center">custom_TBufPool</td>
+        <td align="center">使用EXTERN_IMPL_BUFPOOL实现custom_TBufPool类MyBufPool；调用TPipe::InitBufPool为MyBufPool划分内存，通过InitBuffer实现TQue和TBuf的内存分配</td>
       </tr>
     </table>
 
     **通用计算流程**
 
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
     - 调用Add接口，对两个输入tensor执行加法操作。
-    - 调用DataCopy基础API，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）。
+    - 调用DataCopybasic_api，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）。
 
   - 调用实现
 
@@ -243,7 +243,7 @@
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2`、`3`　　　　　| 场景编号：1=TBufPool内存复用，2=TBufPool资源细分，3=自定义TBufPool |
+  | `SCENARIO_NUM` | `1`、`2`、`3`　　　　　| 场景编号：1=TBufPool内存复用，2=TBufPool资源细分，3=custom_TBufPool |
 
 - 执行结果
 

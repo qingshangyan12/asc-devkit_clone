@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。
+data_move过程中进行accompanying_quantization时，通过调用该接口设置量化流程中的矢量量化参数。
 
 ## 函数原型
 
@@ -40,8 +40,8 @@ __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_p
 |参数名|输入/输出|描述|
 |------------|------------|-----------|
 | relu_pre | 输入     | ReLU操作前矢量的起始地址。|
-| quant_pre | 输入     | 量化操作前矢量的起始地址。|
-| enable_unit_flag | 输入     | 是否启用unit_flag。unit_flag是一种矩阵计算指令和矩阵搬运指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于L0C Buffer累加的场景。|
+| quant_pre | 输入     | quantization前矢量的起始地址。|
+| enable_unit_flag | 输入     | 是否启用unit_flag。unit_flag是一种cube_compute指令和矩阵搬运指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于L0C Buffer累加的场景。|
 ## 返回值说明
 
 无
@@ -61,6 +61,6 @@ PIPE_S
 
 ```cpp
 constexpr uint64_t relu_pre = 0;
-constexpr uint64_t quant_pre = 0x1000;// 假设量化操作有效地址为0x1000
+constexpr uint64_t quant_pre = 0x1000;// 假设quantization有效地址为0x1000
 asc_set_l0c2gm_config(relu_pre, quant_pre, true);
 ```

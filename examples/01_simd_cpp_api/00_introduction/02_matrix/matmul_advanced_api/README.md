@@ -1,8 +1,8 @@
 # Matmul样例
 
-## 概述
+## overview
 
-本样例使用Matmul高阶API实现矩阵乘计算。
+本样例使用Matmulhigh_level_api实现矩阵乘计算。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -28,7 +28,7 @@
 ## 样例描述
 
 - 样例功能：
-  本样例使用Ascend C Matmul高阶API实现矩阵乘法。Matmul高阶API会封装矩阵计算过程中的数据搬运、Cube计算调度、基础流水同步等细节，开发者主要需要完成矩阵规格配置、tiling生成、输入输出Tensor设置和结果写回。
+  本样例使用Ascend C Matmulhigh_level_api实现矩阵乘法。Matmulhigh_level_api会封装cube_compute过程中的data_move、Cube计算调度、基础流水同步等细节，开发者主要需要完成矩阵规格配置、tiling生成、输入输出Tensor设置和结果写回。
 
   矩阵乘法的计算公式如下：
   $$
@@ -47,12 +47,12 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 
-  样例为纯Cube矩阵计算场景，固定按2个Cube核生成tiling。在本样例规格下，tiling结果会把`M = 512`按2个核均分，每个核处理`singleCoreM = 256`、`singleCoreN = 512`、`singleCoreK = 128`。原始K维对应`tiling.Ka = tiling.Kb = 128`。
+  样例为纯Cubecube_compute场景，固定按2个Cube核生成tiling。在本样例规格下，tiling结果会把`M = 512`按2个核均分，每个核处理`singleCoreM = 256`、`singleCoreN = 512`、`singleCoreK = 128`。原始K维对应`tiling.Ka = tiling.Kb = 128`。
 
 - 样例实现：
   - Tiling生成流程
     - 创建`matmul_tiling::MultiCoreMatmulTiling`对象`tilingApi`，用于生成多核Matmul所需的tiling参数。
-    - `SetDim(2)`表示多核Matmul tiling计算时可使用2个Cube核。纯Cube矩阵计算场景下，`GetTiling`会在该核数约束内生成实际使用核数`usedCoreNum`。
+    - `SetDim(2)`表示多核Matmul tiling计算时可使用2个Cube核。纯Cubecube_compute场景下，`GetTiling`会在该核数约束内生成实际使用核数`usedCoreNum`。
     - `SetAType`、`SetBType`、`SetCType`分别设置A、B、C矩阵的数据来源位置、数据格式和数据类型，需要和Kernel侧`MatmulType`模板参数保持一致。
     - `SetOrgShape(M, N, K)`设置原始完整矩阵形状，`SetShape(M, N, K)`设置本次实际参与Matmul计算的`M, N, K方向的大小（单位为元素）`。
     - `EnableBias(false)`表示本样例不带bias。
@@ -60,11 +60,11 @@
     - `GetTiling(tilingData)`生成最终tiling结果。如果返回`-1`表示tiling计算失败，tiling结果不可继续使用。Host侧生成`TCubeTiling`后作为Kernel参数直接传入。
 
   - Kernel侧整体思路
-    - `ASCENDC_CUBE_ONLY`表示当前是纯cube模式（只有矩阵计算）。
+    - `ASCENDC_CUBE_ONLY`表示当前是纯cube模式（只有cube_compute）。
     - `matmul_custom`是一个`__global__ __cube__`核函数，运行在Cube计算单元上。
     - Kernel入参中的`tiling`类型为`AscendC::tiling::TCubeTiling`，由Host侧生成后作为Kernel参数直接传入。Kernel侧通过该参数控制分核、base块大小和Matmul内部buffer使用。
-    - 创建`GlobalTensor`对象`aGlobal`、`bGlobal`、`cGlobal`，分别表示GM中的A、B、C矩阵。`GlobalTensor`只描述GM上的地址和元素个数，真正的数据搬运、L1/L0切分由Matmul高阶API结合tiling完成。
-    - 创建高阶API对象`mm`。`MatmulType`模板参数描述A/B/C矩阵在Kernel侧的位置、格式和数据类型，本样例均为GM、ND格式，A/B为`half`，C为`float`。
+    - 创建`GlobalTensor`对象`aGlobal`、`bGlobal`、`cGlobal`，分别表示GM中的A、B、C矩阵。`GlobalTensor`只描述GM上的地址和元素个数，真正的data_move、L1/L0切分由Matmulhigh_level_api结合tiling完成。
+    - 创建high_level_api对象`mm`。`MatmulType`模板参数描述A/B/C矩阵在Kernel侧的位置、格式和数据类型，本样例均为GM、ND格式，A/B为`half`，C为`float`。
     - Host侧通过`GetLibApiWorkSpaceSize()`获取系统workspace大小，申请`workspaceDevice`后作为Kernel参数`workspace`传入。
     - 通过`REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling)`注册Matmul对象。
     - Host侧以`numBlocks = tiling.usedCoreNum`启动Kernel，启动的Block均参与实际计算。
@@ -102,7 +102,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                      # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

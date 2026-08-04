@@ -1,8 +1,8 @@
-# 基于Tensor API实现的Mmad随路量化样例
+# 基于Tensor API实现的Mmadaccompanying_quantization样例
 
-## 概述
+## overview
 
-本样例基于Tensor API编程方式实现动态Shape矩阵乘法和随路量化计算。矩阵A不转置，矩阵B转置存储，A/B矩阵数据类型为int8，Mmad累加类型为int32，输出矩阵C数据类型为half。量化系数quant以uint64_t格式输入，在Fixpipe阶段对L0C中的int32累加结果进行缩放并写回GM。
+本样例基于Tensor API编程方式实现动态Shape矩阵乘法和accompanying_quantization计算。矩阵A不转置，矩阵B转置存储，A/B矩阵数据类型为int8，Mmad累加类型为int32，输出矩阵C数据类型为half。量化系数quant以uint64_t格式输入，在Fixpipe阶段对L0C中的int32累加结果进行缩放并写回GM。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -29,16 +29,16 @@
 
 - 样例功能：
 
-  本样例实现了多核动态Shape Matmul和随路量化功能。
+  本样例实现了多核动态Shape Matmul和accompanying_quantization功能。
 
   1. 动态Matmul功能
 
      样例在Kernel中通过Tensor API构造GM、L1、L0A、L0B、L0C上的Tensor对象，使用Copy接口完成GM到L1、L1到L0的分块搬运，并通过Mmad接口完成矩阵乘法。矩阵A按ND布局读取，矩阵B按DN布局读取（输入文件中以转置后的[N, K]保存）。Shape参数（M、N、K、singleCoreM、singleCoreN、singleCoreK）通过在运行时传递到Kernel中，baseM、baseN、baseK和stepM、stepN、stepK、ENABLE_UNITFLAG作为编译期模板参数决定L1/L0 Buffer分配大小和分块步进。
 
-  2. Fixpipe随路量化功能/反量化
+  2. Fixpipeaccompanying_quantization功能/反量化
 
-     对于特定输入输出数据类型，Fixpipe支持将计算结果从L0C搬出到GM时，通过配置Fixpipe的量化模式和量化参数，对输出C矩阵元素执行数据量化操作。
-     Fixpipe提供了两种不同粒度的随路量化，即per_tensor和per_channel。
+     对于特定输入输出数据类型，Fixpipe支持将计算结果从L0C搬出到GM时，通过配置Fixpipe的量化模式和量化参数，对输出C矩阵元素执行数据quantization。
+     Fixpipe提供了两种不同粒度的accompanying_quantization，即per_tensor和per_channel。
       1. per_tensor：对整个Tensor进行量化/反量化，Tensor具有唯一的缩放因子。这种方法可以降低模型的存储和计算成本，但会降低模型的精度。
       2. per_channel：对Tensor的每个通道单独进行量化/反量化，同一通道内共享同一缩放因子，通道间缩放因子则各不相同。这种方法可以更好地保留模型的精度，但会增加模型的存储和计算成本。
 
@@ -108,7 +108,7 @@
   cmake ..;make -j;             # 编译工程
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   示例如下：

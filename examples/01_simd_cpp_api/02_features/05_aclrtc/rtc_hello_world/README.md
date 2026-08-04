@@ -1,6 +1,6 @@
 # Aclrtc运行时编译+printf打印样例
 
-## 概述
+## overview
 
 本样例展示了如何使用AscendC的 **Aclrtc（运行时编译）** 模式，在Host侧动态编译核函数源码并执行。核函数为一个简单的`hello_world`函数，通过printf打印输出结果，核函数源码以字符串形式嵌入Host代码中，通过aclrtc API在运行时编译并执行。
 

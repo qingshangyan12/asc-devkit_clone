@@ -1,6 +1,6 @@
 # C API贡献指南
 
-## 概述
+## overview
 
 C API 是Ascend C编程框架中的指令层API，直接对应昇腾AI处理器的硬件指令集。C API采用C语言风格的函数接口，为算子开发提供最接近硬件的编程能力。
 
@@ -37,7 +37,7 @@ C API直接封装硬件指令，需要理解：
 
 - **矢量指令**：VADD、VMUL、VCONV、VREDUCE等
 - **标量指令**：SADD、SMUL等
-- **数据搬运指令**：VMOV、DCOPY等
+- **data_move指令**：VMOV、DCOPY等
 - **控制指令**：SETMASK、PIPEBARRIER等
 
 #### 指令属性
@@ -47,9 +47,9 @@ C API直接封装硬件指令，需要理解：
 - **操作数个数**：一元、二元、三元运算
 - **同步特性**：异步/同步执行
 
-### 编程模型
+### programming_model
 
-C API采用**指针式编程模型**：
+C API采用**指针式programming_model**：
 
 ```cpp
 // C API编程示例
@@ -77,7 +77,7 @@ asc_add(dst, src0, src1, count);
 - 自动处理mask
 - 简单易用
 
-模式2：高维切分计算
+模式2：high_dim_split计算
 
 ```cpp
 asc_add(dst, src0, src1, repeat,
@@ -145,21 +145,21 @@ asc-devkit/
 │   └── c_api/                    # C API头文件
 │       ├── vector_compute/       # 矢量计算
 │       │   └── vector_compute.h
-│       ├── scalar_compute/       # 标量计算
+│       ├── scalar_compute/       # scalar_compute
 │       │   └── scalar_compute.h
-│       ├── vector_datamove/      # 矢量数据搬运
+│       ├── vector_datamove/      # vector_data_move
 │       │   └── vector_datamove.h
 │       ├── cube_compute/         # Cube计算
 │       │   └── cube_compute.h
-│       ├── cube_datamove/        # Cube数据搬运
+│       ├── cube_datamove/        # Cubedata_move
 │       │   └── cube_datamove.h
-│       ├── sync/                 # 同步控制
+│       ├── sync/                 # sync_control
 │       │   └── sync.h
-│       ├── cache_ctrl/           # 缓存控制
+│       ├── cache_ctrl/           # cache_control
 │       │   └── cache_ctrl.h
-│       ├── atomic/               # 原子操作
+│       ├── atomic/               # atomic_operations
 │       │   └── atomic.h
-│       ├── sys_var/              # 系统变量
+│       ├── sys_var/              # system_variables
 │       │   └── sys_var.h
 │       ├── misc/                 # 杂项
 │       │   └── misc.h
@@ -172,7 +172,7 @@ asc-devkit/
 │       │   ├── c_api_union.h
 │       │   └── c_api_utils_intf.h
 │       ├── asc_simd.h            # 总入口
-│       └── c_api_utils_intf.h    # 工具接口
+│       └── c_api_utils_intf.h    # tool_interface
 │
 ├── impl/
 │   └── c_api/                    # C API实现
@@ -224,12 +224,12 @@ asc-devkit/
                 ├── scalar_compute/
                 ├── vector_datamove/
                 ├── general_instruction.md  # 通用说明
-                └── c_api_list.md           # API列表
+                └── c_api_list.md           # api_list
 ```
 
 ### 文件组织原则
 
-1. **按功能分类**：矢量计算、标量计算、数据搬运等
+1. **按功能分类**：矢量计算、scalar_compute、data_move等
 2. **按架构隔离**：不同NPU架构的实现分开组织
 3. **接口与实现分离**：include/存放声明，impl/存放实现
 4. **测试按架构组织**：便于多架构测试和维护

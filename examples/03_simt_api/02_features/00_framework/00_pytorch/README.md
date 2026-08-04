@@ -1,6 +1,6 @@
 # PyTorch样例介绍
 
-## 概述
+## overview
 
 基于Ascend C SIMT的PyTorch框架集成样例，展示如何使用torch.library注册自定义算子。
 

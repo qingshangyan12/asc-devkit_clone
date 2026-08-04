@@ -1,6 +1,6 @@
 # Matmul 反量化场景直调样例
 
-## 概述
+## overview
 输出随路反量化的Matmul样例，支持同一系数的反量化模式和向量的反量化模式。
 
 ## 本样例支持的产品及CANN软件版本
@@ -25,7 +25,7 @@
 
 ## 样例描述
 - 样例功能：  
-  Matmul样例调用Matmul API计算时int8_t类型输入，计算结果以half类型反量化输出，同时支持同一系数的反量化模式与向量的反量化模式。该场景下将C矩阵数据从CO1搬出到Global Memory时，会执行反量化操作，对输出矩阵的所有值采用同一系数或向量进行反量化。
+  Matmul样例调用Matmul API计算时int8_t类型输入，计算结果以half_type反量化输出，同时支持同一系数的反量化模式与向量的反量化模式。该场景下将C矩阵数据从CO1搬出到Global Memory时，会执行反quantization，对输出矩阵的所有值采用同一系数或向量进行反量化。
 
 - 样例规格：  
   本样例中：M = 1024, N = 1024, K = 1024。
@@ -89,7 +89,7 @@
   cmake -DQUANT_MODE=0 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，以使能同一系数的反量化模式为例，默认npu模式
   python3 ../scripts/gen_data.py -m=0   # 生成测试输入数据，以使能同一系数的反量化模式为例
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

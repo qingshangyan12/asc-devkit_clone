@@ -1,13 +1,13 @@
 # SIMT栈溢出场景及优化样例
 
-## 概述
+## overview
 
 本样例以Kernel内定义大数组变量、递归函数调用导致SIMT栈溢出为例，介绍Ascend C SIMT编程方式下栈溢出问题的定位方法和优化思路。
 
 样例包含两个Case：
 
 - Case 1：在栈空间中使用大数组导致栈溢出，可通过配置文件扩大栈空间，但更推荐使用UB存储大量临时数据。
-- Case 2：使用递归函数时，递归层数过大导致栈溢出，需控制递归层数或使用迭代算法替代递归算法。
+- Case 2：使用递归函数时，递归层数过大导致栈溢出，需控制递归层数或使用迭代algorithms替代递归algorithms。
 
 ## 支持的产品
 
@@ -37,7 +37,7 @@
 | Case   | 核心问题        | 对应核函数                                                                   | 解决方案          |
 |--------|-------------|-------------------------------------------------------------------------|---------------|
 | Case 1 | 在栈空间中存储过大数据 | simt_stack_overflow                                                     | 通过配置文件增加栈空间大小 |
-| Case 2 | 递归函数调用深度过大  | simt_recursive_stack_overflow/simt_recursive_stack_overflow_optimized | 使用迭代算法替代递归算法  |
+| Case 2 | 递归函数调用深度过大  | simt_recursive_stack_overflow/simt_recursive_stack_overflow_optimized | 使用迭代algorithms替代递归algorithms  |
 
 > **栈溢出问题说明**
 >
@@ -162,7 +162,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
 
 **样例目标**：展现递归调用导致的SIMT栈溢出，并通过迭代实现验证修复。
 
-**核心实现**：使用递归算法实现阶乘计算。
+**核心实现**：使用递归algorithms实现阶乘计算。
 
 ```cpp
 __aicore__ float recursive_stack_stage(int32_t value)
@@ -240,9 +240,9 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
 
 **解决方案**：
 
-- 方案1：将递归算法改为迭代算法，减少对SIMT分支（Divergence）栈空间和SIMT栈空间的需求。
+- 方案1：将递归algorithms改为迭代algorithms，减少对SIMT分支（Divergence）栈空间和SIMT栈空间的需求。
 
-    使用迭代算法实现阶乘计算，代码如下：
+    使用迭代algorithms实现阶乘计算，代码如下：
 
     ```cpp
     __aicore__ float recursive_stack_stage_optimized(int32_t value)
@@ -273,7 +273,7 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
 
 **结论**：
 
-- 优化递归算法：核函数实现时避免使用递归调用，优先将递归方法改为迭代方法计算，减少栈空间和分支（Divergence）栈空间的占用。
+- 优化递归algorithms：核函数实现时避免使用递归调用，优先将递归方法改为迭代方法计算，减少栈空间和分支（Divergence）栈空间的占用。
 - 增大SIMT分支（Divergence）栈空间和栈空间：配置SIMT分支（Divergence）栈空间大小和栈空间大小会增加对GM的占用，应结合业务规模评估。
 
 ## 优化建议

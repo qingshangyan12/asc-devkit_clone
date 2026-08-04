@@ -1,8 +1,8 @@
 # Subnormal样例
 
-## 概述
+## overview
 
-本样例演示了在Ascend C Reg矢量计算中，Div操作在Subnormal模式开启或关闭情况下的行为差异。通过两种不同的Div精度算法配置（PRECISION_1ULP_FTZ_FALSE和PRECISION_1ULP_FTZ_TRUE），展示是否支持Subnormal浮点数对计算结果的影响。
+本样例演示了在Ascend C reg_vector_compute中，Div操作在Subnormal模式开启或关闭情况下的行为差异。通过两种不同的Div精度algorithms配置（PRECISION_1ULP_FTZ_FALSE和PRECISION_1ULP_FTZ_TRUE），展示是否支持Subnormal浮点数对计算结果的影响。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -26,7 +26,7 @@ subnormal
 
 - 样例功能：
 
-  样例计算float类型数据，分别使用PRECISION_1ULP_FTZ_FALSE和PRECISION_1ULP_FTZ_TRUE配置DivSpecificMode作为Div操作的精度算法参数，执行除法运算。计算公式如下：
+  样例计算float类型数据，分别使用PRECISION_1ULP_FTZ_FALSE和PRECISION_1ULP_FTZ_TRUE配置DivSpecificMode作为Div操作的精度algorithms参数，执行除法运算。计算公式如下：
   $$z_i = \frac{x_i}{y_i}$$
 
 - 样例规格
@@ -55,7 +55,7 @@ subnormal
       - FTZ：将Subnormal数强制置为0的模式。虽然简化了硬件设计和提高性能，但会损失数值精度。
 
   - 多场景说明：
-      - 场景1（SCENARIO_NUM=1）：使用PRECISION_1ULP_FTZ_FALSE作为Div的精度算法参数
+      - 场景1（SCENARIO_NUM=1）：使用PRECISION_1ULP_FTZ_FALSE作为Div的精度algorithms参数
           - 实现函数：SubnormalFTZFalseVF<T>
           - 实现：
             ```cpp
@@ -65,7 +65,7 @@ subnormal
           - 说明：支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp。除法结果为Subnormal数时，保留该值。
           - 应用场景：需要精确处理Subnormal浮点数的科学计算、数值模拟、高精度计算等场景。
 
-      - 场景2（SCENARIO_NUM=2）：使用PRECISION_1ULP_FTZ_TRUE作为Div的精度算法参数
+      - 场景2（SCENARIO_NUM=2）：使用PRECISION_1ULP_FTZ_TRUE作为Div的精度algorithms参数
           - 实现函数：SubnormalFTZTrueVF<T>
           - 实现：
             ```cpp

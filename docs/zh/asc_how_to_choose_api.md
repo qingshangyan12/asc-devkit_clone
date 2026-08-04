@@ -11,7 +11,7 @@ Ascend C的设计目标可概括为 **“高性能、完备性、易编程、可
 
 我们秉持以下核心理念：
 - **没有银弹**：不同场景对性能与开发效率的要求各异，单一接口无法在所有场景下实现最优适配；
-- **渐进式学习**：新手可从易用性接口入手快速验证算法；专家则可向下钻取、精细调优，借助复杂接口充分释放硬件潜能。
+- **渐进式学习**：新手可从易用性接口入手快速验证algorithms；专家则可向下钻取、精细调优，借助复杂接口充分释放硬件潜能。
 
 ## API层级
 
@@ -20,15 +20,15 @@ Ascend C提供三类接口，均支持底层完备编程能力：
 | API层级 | 语言 | 特点 | 目标用户 | 主要用途 |
 |---------|------|------|----------|----------|
 | **Tpipe/Tque框架编程API** | C++ | 基于 **Tensor** 编程<br>通过 Tpipe/Tque 框架统一管理内存与同步 | 算子库开发者 | 借助框架自动管理同步与内存，<br>提升编程易用性 |
-| **基础API** | C++ | 基于 **Tensor** 编程，提供 **C++ 基础完备编程能力**<br>通过 MakeTensor / LocalMemoryAllocator 分配 Tensor，自主管理同步 | 算子库开发者 | 自主管理同步与内存，<br>匹配 C++ Tensor 开发习惯，支撑极致性能 |
+| **basic_api** | C++ | 基于 **Tensor** 编程，提供 **C++ 基础完备编程能力**<br>通过 MakeTensor / LocalMemoryAllocator 分配 Tensor，自主管理同步 | 算子库开发者 | 自主管理同步与内存，<br>匹配 C++ Tensor 开发习惯，支撑极致性能 |
 | **语言扩展层<br>SIMD & SIMT API** | C | 基于 **指针** 编程，提供 **C 基础完备编程能力**<br>通过数组 `[]` 分配内存，自主管理同步 | 算子库开发者 | 自主管理同步与内存，<br>匹配 C 语言开发习惯，支撑极致性能 |
 
 此外，Ascend C提供高阶 API 和算子模板库以进一步提升算子开发效率。
 
 | API层级 | 目标用户 | 主要用途 |
 |---------|----------|----------|
-| **算子模板库 (CATLASS / ATVOSS 等)** | 算法开发人员 | 基于典型算子实现进行自定义扩展，满足特定场景高性能需求 |
-| **高阶API** | 算法开发人员 | 复用通用单核算法，快速完成算法验证 |
+| **算子模板库 (CATLASS / ATVOSS 等)** | algorithms开发人员 | 基于典型算子实现进行自定义扩展，满足特定场景高性能需求 |
+| **high_level_api** | algorithms开发人员 | 复用通用单核algorithms，快速完成algorithms验证 |
 
 ---
 
@@ -47,10 +47,10 @@ graph TD
     B -->|熟悉SIMT，离散类矢量算子| F[**SIMT API**]
     C -->|离散类矢量算子| F
     C -->|偏好**指针编程**| P[**SIMD C API**]
-    C -->|偏好**C++Tensor编程&自主管理同步/内存**| I[**基础API**]
+    C -->|偏好**C++Tensor编程&自主管理同步/内存**| I[**basic_api**]
     C -->|偏好**C++Tensor编程&自动管理同步/内存**| J[**Tpipe/Tque框架编程API**]
 
-    D -->|复用通用算法，泛化性优先| K[**高阶API**]
+    D -->|复用通用algorithms，泛化性优先| K[**high_level_api**]
     D -->|典型算子，特定场景高性能| L[**算子模板库**]
 ```
 
@@ -60,8 +60,8 @@ graph TD
 |----------|----------|------|
 | **离散矢量算子** | SIMT API | 充分发挥 SIMT 在离散场景的优势，同时匹配业界编程习惯 |
 | **基于指针的完备编程能力** | SIMD C API | 匹配 C 语言开发习惯，支撑实现极致性能 |
-| **基于 C++ Tensor 的完备编程能力** | 基础API | 匹配 C++ Tensor 开发习惯，支撑实现极致性能 |
-| **快速算法验证** | 高阶API 或 算子模板库 | 封装了通用算法的良好泛化实现，开发效率高 |
+| **基于 C++ Tensor 的完备编程能力** | basic_api | 匹配 C++ Tensor 开发习惯，支撑实现极致性能 |
+| **快速algorithms验证** | high_level_api 或 算子模板库 | 封装了通用algorithms的良好泛化实现，开发效率高 |
 
 ---
 
@@ -71,8 +71,8 @@ graph TD
 
 **特点**
 - 匹配业界传统 C 语言算子开发习惯，支持数组内存分配、指针计算接口，采用 `asc_xxx` 前缀的 snake_case 命名风格；
-- SIMT API 编程模型遵循业界通用开发习惯，降低学习曲线；
-- SIMD API 提供易用的连续计算接口，可支撑绝大多数算子开发诉求，例如 `asc_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)`；
+- SIMT API programming_model遵循业界通用开发习惯，降低学习曲线；
+- SIMD API 提供易用的continuous_compute接口，可支撑绝大多数算子开发诉求，例如 `asc_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)`；
 - 为提升快速入门用户的易用性，SIMD API 简化同步管理，额外提供带 `_sync` 后缀的同步操作接口，如 `asc_add_sync(...)`；
 - 面向极致性能场景，SIMD API 提供带 `repeat` / `stride` 参数的高级计算接口，支持灵活控制数据布局与计算模式。
 
@@ -80,20 +80,20 @@ graph TD
 - 熟悉传统 C 语言开发习惯的算子开发者；
 - 具备 SIMT 编程经验、希望快速迁移至 NPU 环境的开发者；
 - 需要榨取硬件极致性能的生产环境算子开发；
-- 希望借助带 `sync` 后缀的计算接口快速进行算法验证的开发者。
+- 希望借助带 `sync` 后缀的计算接口快速进行algorithms验证的开发者。
 
 **示例**
 - [SIMD Add 算子示例（带同步计算接口）](../../examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc)
 - [SIMT Gather 算子示例（匹配业界习惯）](../../examples/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d/gather_1d.asc)
-- 更多样例请参考 [examples 目录](../../examples)
+- more_examples请参考 [examples 目录](../../examples)
 
 ---
 
-### 基础API：基于 Tensor 的单指令抽象
+### basic_api：基于 Tensor 的单指令抽象
 
 **特点**
-- 基于 Tensor 与数据类型对 NPU 指令进行抽象，提供 Tensor 编程模型；
-- 提供独立于 `Tque` / `Tpipe` 之外的内存分配与同步接口，支持开发者基于 Tensor 自主管理资源；
+- 基于 Tensor 与数据类型对 NPU 指令进行抽象，提供 Tensor programming_model；
+- 提供独立于 `Tque` / `Tpipe` 之外的内存分配与sync_interface，支持开发者基于 Tensor 自主管理资源；
 - 扩展 Tensor 支持 `Layout` 概念，通过统一的数据布局表达简化计算接口，与业界 Tensor 编程体验保持一致。
 - 框架编程 API：引入 `Tque` / `Tpipe` 框架，借鉴 C++ `Queue` 的设计理念，简化 NPU 的同步与内存管理。
 
@@ -108,15 +108,15 @@ graph TD
 
 ---
 
-### 高阶API：单核公共算法实现
+### high_level_api：单核公共algorithms实现
 
 **特点**
-- 封装通用的单核算法实现，提供良好的泛化性能；
+- 封装通用的单核algorithms实现，提供良好的泛化性能；
 - 在典型网络场景下亦可实现接近极致的性能。
 
 **适用场景**
-- 快速验证算法可行性，对特定场景的极致性能要求不高；
-- 希望复用成熟算法实现、缩短开发周期的场景。
+- 快速验证algorithms可行性，对特定场景的极致性能要求不高；
+- 希望复用成熟algorithms实现、缩短开发周期的场景。
 
 **示例**
 - [Softmax API 示例](../../examples/01_simd_cpp_api/04_advanced_api/01_activation/softmax/softmax.asc)
@@ -141,6 +141,6 @@ graph TD
 
 ## 总结
 
-Ascend C多层级接口设计的核心理念是：让您**始终使用最合适的编程范式，而非被动适应单一抽象**。无论您是追求极致性能的底层专家，还是希望快速验证算法的原型开发者，都能在Ascend C的层级化 API 生态中找到得心应手的工具。
+Ascend C多层级接口设计的核心理念是：让您**始终使用最合适的编程范式，而非被动适应单一抽象**。无论您是追求极致性能的底层专家，还是希望快速验证algorithms的原型开发者，都能在Ascend C的层级化 API 生态中找到得心应手的工具。
 
 立即开始您的算子编程之旅！如有疑问，欢迎参考Ascend C详细文档或社区示例，我们将持续致力于让 NPU 的强大算力对您触手可及、高效易用。

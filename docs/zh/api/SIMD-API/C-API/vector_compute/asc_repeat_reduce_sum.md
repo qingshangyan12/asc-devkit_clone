@@ -28,7 +28,7 @@
 
 对每个Repeat内所有元素求和。
 
-源操作数相加采用二叉树的方式，两两相加。以256个half类型数据求和为例，每个Repeat可以计算128个half类型数据，分成2个Repeat计算；每个Repeat内，通过二叉树的方式，两两相加。
+源操作数相加采用二叉树的方式，两两相加。以256个half_type数据求和为例，每个Repeat可以计算128个half_type数据，分成2个Repeat计算；每个Repeat内，通过二叉树的方式，两两相加。
 
 需要注意的是，两两相加计算过程中，计算结果大于65504时结果保存为65504。例如，源操作数为[60000,60000,-30000,100]，首先60000+60000溢出，结果为65504，然后计算-30000+100=-29900，最后计算65504-29900=35604。
 
@@ -41,7 +41,7 @@
     __aicore__ inline void asc_repeat_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
     ```
 
-- 高维切分计算
+- high_dim_split计算
 
     ```cpp
     __aicore__ inline void asc_repeat_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
@@ -79,7 +79,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst的起始地址，输入类型为half时需要2字节对齐，输入类型为float时需要4字节对齐。
 - src的起始地址需要32字节对齐。
 

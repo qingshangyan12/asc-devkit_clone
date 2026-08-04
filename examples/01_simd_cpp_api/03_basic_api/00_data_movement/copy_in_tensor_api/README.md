@@ -1,6 +1,6 @@
 # 基于Tensor API实现的Copy接口与Matmul带Bias样例
 
-## 概述
+## overview
 
 本样例基于Tensor API编程方式实现带Bias的动态Shape矩阵乘法运算，展示了Copy（GM到L1，L1到L0）的转置和非转置场景和Mmad（矩阵乘加）等Tensor API的使用方法。支持通过编译时参数SCENARIO_NUM选择转置模式和数据类型，Shape参数通过MatmulTiling结构体在运行时动态传入。
 
@@ -29,7 +29,7 @@
 ## 样例描述
 
 - 样例功能：
-  本样例实现了带Bias的动态Shape多核Matmul功能，通过Copy接口完成GM到L1，L1到L0的数据搬运，通过Mmad接口完成矩阵乘加计算。
+  本样例实现了带Bias的动态Shape多核Matmul功能，通过Copy接口完成GM到L1，L1到L0的data_move，通过Mmad接口完成矩阵乘加计算。
 
   1. 动态Matmul功能
 
@@ -170,7 +170,7 @@
   cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程，默认NPU模式
   python3 ../scripts/gen_data.py ${SCENARIO_NUM};                                    # 生成场景0的测试输入数据
   ./demo;                                                                       # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin        # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin        # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。示例如下：

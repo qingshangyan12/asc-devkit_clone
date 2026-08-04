@@ -1,8 +1,8 @@
 # ElementWiseCompoundCompute样例
 
-## 概述
+## overview
 
-本样例展示了复合计算类接口的使用方法。复合计算接口将多个计算操作融合在一条指令中完成，相比分开调用多个基础接口，可有效减少指令数量、降低中间存储开销、提升计算效率。接口资料参考AddRelu/Axpy。
+本样例展示了composite_compute类接口的使用方法。composite_compute接口将多个计算操作融合在一条指令中完成，相比分开调用多个基础接口，可有效减少指令数量、降低中间存储开销、提升计算效率。接口资料参考AddRelu/Axpy。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -60,9 +60,9 @@
 
 - 样例实现：
   - Kernel实现
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
-    - 根据场景调用不同的复合计算接口：场景1调用AddRelu实现向量加法与ReLU激活融合、场景2调用Axpy实现标量乘法与向量加法融合
-    - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
+    - 根据场景调用不同的composite_compute接口：场景1调用AddRelu实现向量加法与ReLU激活融合、场景2调用Axpy实现标量乘法与向量加法融合
+    - 调用DataCopybasic_api，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
 
 - 调用实现  
   使用内核调用符<<<>>>调用核函数。

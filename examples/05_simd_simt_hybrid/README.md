@@ -1,9 +1,9 @@
 # SIMD与SIMT混合编程样例介绍
 
 
-## 概述
+## overview
 
-SIMD与SIMT混合编程适用于同一个Kernel中同时需要向量化计算能力和线程级灵活控制的场景。通常可使用SIMD完成规则向量计算，使用SIMT处理离散访存、分支判断、线程映射和细粒度数据搬运等逻辑，从而在保留表达灵活性的同时提升规则计算效率。
+SIMD与SIMT混合编程适用于同一个Kernel中同时需要向量化计算能力和线程级灵活控制的场景。通常可使用SIMD完成规则向量计算，使用SIMT处理离散访存、分支判断、线程映射和细粒度data_move等逻辑，从而在保留表达灵活性的同时提升规则计算效率。
 
 SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，相关样例主要分布在以下路径：
 
@@ -27,7 +27,7 @@ SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，�
 
 | 样例名 | 样例描述 | 备注说明 |
 | ------------------------------------------------------------ | ---------------------------------------------------- | --- |
-| profiling | 展示如何使用Profiling采集算子执行数据，并分析混合编程中SIMD计算、SIMT VF调用和数据搬运的耗时占比。样例链接：[profiling](../01_simd_cpp_api/01_utilities/04_profiling)。 | - |
+| profiling | 展示如何使用Profiling采集算子执行数据，并分析混合编程中SIMD计算、SIMT vf_call和data_move的耗时占比。样例链接：[profiling](../01_simd_cpp_api/01_utilities/04_profiling)。 | - |
 | sanitizer | 展示如何使用Sanitizer定位内存越界、非法访问等问题，适用于混合编程调试阶段的问题排查。样例链接：[sanitizer](../01_simd_cpp_api/01_utilities/05_sanitizer)。 | - |
 | simulator | 展示如何使用Simulator在仿真模式下进行功能调试和基础性能数据采集。样例链接：[simulator](../01_simd_cpp_api/01_utilities/08_simulator)。 | - |
 | printf（核函数） | 展示如何在SIMD编程样例的核函数入口中使用`AscendC::printf`打印调试信息。样例链接：[printf（核函数）](../01_simd_cpp_api/01_utilities/00_printf/simple_printf)。 | - |
@@ -44,8 +44,8 @@ SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，�
 | 样例名 | 样例描述 | 备注说明 |
 | ------------------------------------------------------------ | ---------------------------------------------------- | --- |
 | memory_access | 展示Global Memory离散访存相关API的使用方法，适用于混合编程中由SIMT处理复杂索引访问的场景。样例链接：[memory_access](../03_simt_api/02_features/01_api_features/00_memory_access)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
-| sync_instruction | 展示同步与内存栅栏接口的使用方法，适用于混合编程中SIMT线程协作和跨阶段数据可见性控制。样例链接：[sync_instruction](../03_simt_api/02_features/01_api_features/01_sync_instruction)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
-| atomic_operation | 展示原子操作接口的使用方法，适用于混合编程中多线程累加、计数或冲突写入处理。样例链接：[atomic_operation](../03_simt_api/02_features/01_api_features/02_atomic_operation)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| sync_instruction | 展示sync_and_memory_fence接口的使用方法，适用于混合编程中SIMT线程协作和跨阶段数据可见性控制。样例链接：[sync_instruction](../03_simt_api/02_features/01_api_features/01_sync_instruction)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| atomic_operation | 展示atomic_operations接口的使用方法，适用于混合编程中多线程累加、计数或冲突写入处理。样例链接：[atomic_operation](../03_simt_api/02_features/01_api_features/02_atomic_operation)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
 | warp_instruction | 展示Warp级数据交换能力，可用于了解Warp内线程协作和数据传递方式。样例链接：[warp_instruction](../03_simt_api/02_features/01_api_features/03_warp_instruction)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
 
 
@@ -67,7 +67,7 @@ SIMD与SIMT混合编程场景的常用性能优化路径如下：
 | 样例名 | 样例描述 |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | simd_simt_matrix_transpose | 以矩阵转置为例介绍UB中转和全局访存合并优化方法。样例链接：[simd_simt_matrix_transpose](./02_best_practices/simd_simt_matrix_transpose)。 |
-| simd_simt_high_performance | 以FloorMod计算为例，对比SIMT直接访问GM、SIMD Reg矢量计算、SIMT访问UB以及连续线程映射等实现方式。样例链接：[simd_simt_high_performance](./02_best_practices/simd_simt_high_performance)。 |
+| simd_simt_high_performance | 以FloorMod计算为例，对比SIMT直接访问GM、SIMD reg_vector_compute、SIMT访问UB以及连续线程映射等实现方式。样例链接：[simd_simt_high_performance](./02_best_practices/simd_simt_high_performance)。 |
 | simd_simt_grid_dim_config | 以Gather计算为例介绍线程块数量配置和VF函数调用优化思路。样例链接：[simd_simt_grid_dim_config](./02_best_practices/simd_simt_grid_dim_config)。 |
 | simd_simt_integer_fast_div | 以固定除数整数除法为例，展示使用乘法和移位替代普通除法的优化方式。样例链接：[simd_simt_integer_fast_div](./02_best_practices/simd_simt_integer_fast_div)。 |
 
@@ -84,7 +84,7 @@ SIMD与SIMT混合编程场景的常用性能优化路径如下：
 
 ## SIMT参考样例转换说明
 
-SIMT编程实现的样例主要展示SIMT Kernel直调写法。混合编程场景可以参考其中的线程映射、访存、同步、原子操作和Warp级协作逻辑，但Kernel入口、Host侧调用配置和CMake编译选项存在差异。将SIMT参考样例用于SIMD与SIMT混合编程时，需重点关注以下差异。
+SIMT编程实现的样例主要展示SIMT Kernel直调写法。混合编程场景可以参考其中的线程映射、访存、同步、atomic_operations和Warp级协作逻辑，但Kernel入口、Host侧调用配置和CMake编译选项存在差异。将SIMT参考样例用于SIMD与SIMT混合编程时，需重点关注以下差异。
 
 ### Kernel定义差异
 
@@ -121,8 +121,8 @@ __global__ __vector__ void gather_custom(
 
 具体差异如下：
 
-- SIMT编程样例中，`__global__` Kernel既是Host侧直接启动的入口，也是线程级逻辑的实现位置，线程索引计算、分支判断、访存和线程协作逻辑通常直接写在该Kernel中。
-- SIMD与SIMT混合编程样例中，入口Kernel与SIMD编程方式一致，通常定义为`__global__ __vector__`，用于编排数据搬运、UB空间申请、SIMD VF调用以及SIMT VF调用。
+- SIMT编程样例中，`__global__` Kernel既是Host侧直接启动的入口，也是线程级逻辑的实现位置，线程index_compute、分支判断、访存和线程协作逻辑通常直接写在该Kernel中。
+- SIMD与SIMT混合编程样例中，入口Kernel与SIMD编程方式一致，通常定义为`__global__ __vector__`，用于编排data_move、UB空间申请、SIMD vf_call以及SIMT vf_call。
 - 转换SIMT参考样例时，通常将原SIMT Kernel中的线程级逻辑迁移到`__simt_vf__`函数中，再由`__global__ __vector__`入口Kernel通过`asc_vf_call`调用。
 
 ### 调用配置差异

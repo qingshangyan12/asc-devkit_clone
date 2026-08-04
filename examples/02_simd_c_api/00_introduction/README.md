@@ -1,6 +1,6 @@
 # Introduction样例介绍
  
-## 概述
+## overview
  
 基于Ascend C的简单的示例，通过Ascend C编程语言实现了自定义算子，分别给出对应的C_API实现。
  

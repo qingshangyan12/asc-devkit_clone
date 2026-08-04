@@ -1,6 +1,6 @@
 # Aclrtc运行时编译+静态Tensor编程Add样例
 
-## 概述
+## overview
 
 本样例展示了如何使用AscendC的 **Aclrtc（运行时编译）** 模式，在Host侧动态编译核函数源码并执行。核函数内部采用 **静态Tensor编程范式**（LocalMemAllocator+SetFlag/WaitFlag事件同步），将核函数源码以字符串形式嵌入Host代码中，通过aclrtc API在运行时编译并执行。
 
@@ -47,7 +47,7 @@
 
 ### Kernel实现
 
-核函数源码以字符串形式嵌入Host代码中，通过LocalMemAllocator接口完成内存管理，通过SetFlag/WaitFlag接口完成事件同步，实现数据搬运、计算和结果搬出的完整流程。
+核函数源码以字符串形式嵌入Host代码中，通过LocalMemAllocator接口完成内存管理，通过SetFlag/WaitFlag接口完成事件同步，实现data_move、计算和结果搬出的完整流程。
 
 ### 调用实现
 

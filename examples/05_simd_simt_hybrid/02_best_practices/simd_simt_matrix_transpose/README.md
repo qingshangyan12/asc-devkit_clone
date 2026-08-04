@@ -1,6 +1,6 @@
 # SIMD与SIMT混合编程Matrix Transpose性能调优样例
 
-## 概述
+## overview
 
 本样例基于SIMT场景下的[matrix_transpose_practice样例](../../../03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)，采用SIMD与SIMT混合编程对自定义transpose算子进行进一步优化，通过混合编程中的MTE搬运与SIMT计算并行，提高矩阵转置性能。为了展示逐步优化过程，本样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，增加UB padding降低bank冲突，最后借助双缓冲（Double Buffer）使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。
 
@@ -185,7 +185,7 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
 Case 2将Thread Block数固定为硬件vector core数。相比Case 1按tile分组启动512个Thread Block的写法，Case 2需要启动和调度的线程块数量更少，Task Duration从23.732μs降低到18.697μs，耗时下降约21.2%。
 
-相比SIMT场景下的matrix_transpose_practice样例，SIMD与SIMT混合编程由MTE流水负责GM与UB之间的数据搬运，SIMT VF只处理UB内转置访问和输出buffer写入，SIMT VF内的处理逻辑更集中。本Case使用2048线程、每轮两个tile的配置，未观察到寄存器溢出；而matrix_transpose_practice样例在同样固定Thread Block数并使用2048线程时，Case 4因寄存器溢出导致Task Duration为27.113μs，改为1024线程后的Case 5为23.912μs。本Case的Task Duration为18.697μs，体现了混合编程在MTE搬运和SIMT线程并行度上的优势。后续版本继续沿用2048线程、每轮两个tile的路径，把优化重点转向UB访问开销。
+相比SIMT场景下的matrix_transpose_practice样例，SIMD与SIMT混合编程由MTE流水负责GM与UB之间的data_move，SIMT VF只处理UB内转置访问和输出buffer写入，SIMT VF内的处理逻辑更集中。本Case使用2048线程、每轮两个tile的配置，未观察到寄存器溢出；而matrix_transpose_practice样例在同样固定Thread Block数并使用2048线程时，Case 4因寄存器溢出导致Task Duration为27.113μs，改为1024线程后的Case 5为23.912μs。本Case的Task Duration为18.697μs，体现了混合编程在MTE搬运和SIMT线程并行度上的优势。后续版本继续沿用2048线程、每轮两个tile的路径，把优化重点转向UB访问开销。
 
 ---
 
@@ -432,7 +432,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
     ```bash
     ├──dump                       # 原始的性能数据，用户无需关注
     ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-    ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+    ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
     ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
     ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
     ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

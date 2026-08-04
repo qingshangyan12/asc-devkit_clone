@@ -79,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument("golden", help="Golden file path")
     args = parser.parse_args()
 
-    # 场景1/2均为half类型
+    # 场景1/2均为half_type
     dtype = np.float16
 
     try:

@@ -26,9 +26,9 @@
 
 ## 功能说明
 
-该接口用于将矩阵计算的结果从L0C Buffer搬运至Unified Buffer（UB）中，并且在搬运过程中支持与其它接口组合使用，配置多种随路能力。
+该接口用于将cube_compute的结果从L0C Buffer搬运至Unified Buffer（UB）中，并且在搬运过程中支持与其它接口组合使用，配置多种随路能力。
 
-下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为Cast，其余为随路scalar/tensor量化模式。
+下图展示了accompanying_quantization、accompanying_relu、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为Cast，其余为随路scalar/tensor量化模式。
 
 **图1** asc_copy_l0c2ub随路功能组合
 
@@ -61,8 +61,8 @@ quant_pre_mode量化模式参数支持的枚举值如下：
 - VQF322HIF8_PRE：float量化成hifloat8_t(Half to Away Round)，tensor量化
 - QF322HIF8_PRE_HYBRID：float量化成hifloat8_t(Hybrid Round)，scalar量化
 - VQF322HIF8_PRE_HYBRID：float量化成hifloat8_t(Hybrid Round)，tensor量化
-- QF322F32_PRE：float量化成float，scalar量化，精度可以达到双千分之一，无法达到双万分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../高阶API/量化操作/AscendDequant.md)高阶API。
-- VQF322F32_PRE：float量化成float，tensor量化，精度可以达到双千分之一，无法达到双万分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../高阶API/量化操作/AscendDequant.md)高阶API。
+- QF322F32_PRE：float量化成float，scalar量化，精度可以达到双千分之一，无法达到双万分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../high_level_api/quantization/AscendDequant.md)high_level_api。
+- VQF322F32_PRE：float量化成float，tensor量化，精度可以达到双千分之一，无法达到双万分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../high_level_api/quantization/AscendDequant.md)high_level_api。
 
 ## 函数原型
 
@@ -283,7 +283,7 @@ PIPE_FIX
 
 ## 约束说明
 
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../通用说明和约束.md#存储单元说明)。
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 
 ## 调用示例
 

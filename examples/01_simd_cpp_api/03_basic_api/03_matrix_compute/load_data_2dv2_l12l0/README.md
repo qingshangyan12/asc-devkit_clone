@@ -1,6 +1,6 @@
 # load_data_2dv2_l12l0样例
 
-## 概述
+## overview
 
 本样例展示如何调用`LoadData`接口并配置`LoadData2DParamsV2`结构体参数（本样例中简称：`Load2Dv2`接口），将A / B矩阵从L1搬运到L0A / L0B。
 
@@ -147,7 +147,7 @@ GM(ND) -> L1(Nz) -> L0A(Nz)/L0B(Zn) -> L0C(Nz) -> GM(ND)
 **`Load2Dv2`转置搬运，for循环调用：场景7**
 
 - 场景7与场景2同为int8_t转置输入。
-- A矩阵采用for循环调用`Load2Dv2`，在写入L0A时跳过m方向尾部脏数据分形，使矩阵计算时没有额外脏数据分形参与。
+- A矩阵采用for循环调用`Load2Dv2`，在写入L0A时跳过m方向尾部脏数据分形，使cube_compute时没有额外脏数据分形参与。
 
 ### 3. 参数说明
 
@@ -453,7 +453,7 @@ for (uint16_t loopIdx = 0; loopIdx < L0ALoopNum; ++loopIdx) {
 
 ##### 5.2.2. B16输入数据类型
 
-B16输入数据类型分形为16 * 16，一个分形即一个方型，L1 -> L0转置时会按照小分形进行转置，调用一次`Load2Dv2`即可完成L1 -> L0A数据搬运及转置。本样例以half为例展示图示。
+B16输入数据类型分形为16 * 16，一个分形即一个方型，L1 -> L0转置时会按照小分形进行转置，调用一次`Load2Dv2`即可完成L1 -> L0Adata_move及转置。本样例以half为例展示图示。
 
 <div align="center">
   <img src="figures/B16_A_l1_l0A_trans_load2dv2.png" width="800"><br>
@@ -570,7 +570,7 @@ AscendC::LoadData(b2Local, b1Local, loadDataParams);
 
 ##### 5.4.2. B16输入数据类型
 
-B16输入数据类型分形为16 * 16，一个分形即一个方型，L1 -> L0转置时会按照小分形进行转置，调用一次`Load2Dv2`即可完成L1 -> L0B数据搬运及转置。本样例以half为例展示图示。
+B16输入数据类型分形为16 * 16，一个分形即一个方型，L1 -> L0转置时会按照小分形进行转置，调用一次`Load2Dv2`即可完成L1 -> L0Bdata_move及转置。本样例以half为例展示图示。
 
 <div align="center">
   <img src="figures/B16_B_l1_l0B_trans_load2dv2.png" width="800"><br>

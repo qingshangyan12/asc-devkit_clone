@@ -29,7 +29,7 @@
 
 在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组间同步指不同group之间的同步，即所有block（所有AIC或所有AIV）之间的同步。
 
-核间同步指令，与[asc_sync_inter_arrive](asc_sync_inter_arrive.md)配合使用（通过flag_id关联），用于组间block的信号同步。
+inter_core_sync指令，与[asc_sync_inter_arrive](asc_sync_inter_arrive.md)配合使用（通过flag_id关联），用于组间block的信号同步。
 
 每个flag_id均分配有计数器，执行asc_sync_inter_arrive后计数器将递增；执行asc_sync_inter_wait时如果对应的计数器数值为0则阻塞；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 

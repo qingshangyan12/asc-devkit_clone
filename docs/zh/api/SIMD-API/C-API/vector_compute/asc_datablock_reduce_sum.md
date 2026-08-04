@@ -28,7 +28,7 @@
 
 对每个DataBlock内所有元素求和。
 
-源操作数相加采用二叉树的方式，两两相加。以128个half类型数据求和为例，每个DataBlock可以计算16个half类型数据，分成8个DataBlock计算；每个DataBlock内，通过二叉树的方式，两两相加。
+源操作数相加采用二叉树的方式，两两相加。以128个half_type数据求和为例，每个DataBlock可以计算16个half_type数据，分成8个DataBlock计算；每个DataBlock内，通过二叉树的方式，两两相加。
 
 需要注意的是，两两相加计算过程中，计算结果大于65504时结果保存为65504。例如，源操作数为[60000,60000,-30000,100]，首先60000+60000溢出，结果为65504，然后计算-30000+100=-29900，最后计算65504-29900=35604。
 
@@ -41,7 +41,7 @@
     __aicore__ inline void asc_datablock_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
     ```
 
-- 高维切分计算
+- high_dim_split计算
 
     ```cpp
     __aicore__ inline void asc_datablock_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
@@ -80,7 +80,7 @@ PIPE_V
 ## 约束说明
 
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 
 
 ## 调用示例
@@ -91,7 +91,7 @@ constexpr uint32_t dst_length = 16;
 __ubuf__ half src[src_length];
 __ubuf__ half dst[dst_length];
 
-// 使用高维切分计算接口，需设置mask
+// 使用high_dim_split计算接口，需设置mask
 asc_set_mask_norm();
 asc_set_vector_mask(0xffffffffffffffff, 0xffffffffffffffff);    // 设置每个迭代内所有元素均参与计算。
 

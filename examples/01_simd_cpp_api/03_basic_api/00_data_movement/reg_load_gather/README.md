@@ -1,7 +1,7 @@
 # reg_load_gather样例
 
-## 概述
-本样例基于Reg编程接口实现将离散数据从UB(Unified Buffer)搬入到RegTensor(Reg矢量计算基本单元)的功能，支持两种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+## overview
+本样例基于Reg编程接口实现将离散数据从UB(Unified Buffer)搬入到RegTensor(reg_vector_compute基本单元)的功能，支持两种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
     <table>
   	 	 	<tr>
         <td>SCENARIO_NUM</td>

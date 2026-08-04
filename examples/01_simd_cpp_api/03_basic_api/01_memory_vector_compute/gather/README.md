@@ -1,6 +1,6 @@
 # Gather类样例
 
-## 概述
+## overview
 
 本样例基于GatherMask、Gather、Gatherb等接口完成多种场景模式下的数据选择功能，包括内置固定模式、用户自定义模式、张量偏移模式、DataBlock偏移模式，实现从源操作数中选取元素写入目的操作数。样例支持通过编译参数切换不同场景，便于开发者理解Gather类接口的使用方法和实现差异。
 
@@ -26,10 +26,10 @@
 ```
 
 ## 场景详细说明
-本样例通过编译参数`SCENARIO_NUM` 来切换不同的掩码生成场景：
+本样例通过编译参数`SCENARIO_NUM` 来切换不同的mask生成场景：
 
 **场景1：内置固定模式**
-- 说明：通过`src1Pattern`选择对应的二进制作为掩码，来获取数据
+- 说明：通过`src1Pattern`选择对应的二进制作为mask，来获取数据
 - 输入：src0Local=[1, 256]
 - 输出：[1, 256]
 - 数据类型：uint32_t
@@ -40,7 +40,7 @@
 - 参数：dstLocal和src0Local采用地址复用，并使用内置固定模式src1Pattern=2进行元素选取，reduceMode=false（Normal模式），mask=0，gatherMaskParams={1, 4, 8, 0}
 
 **场景2：用户自定义模式**
-- 说明：通过用户输入的`src1Local`对应的二进制作为掩码，来获取数据
+- 说明：通过用户输入的`src1Local`对应的二进制作为mask，来获取数据
 - 输入：src0Local=[1, 256], src1Local=[1, 32]
 - 输出：[1, 256]
 - 数据类型：uint32_t

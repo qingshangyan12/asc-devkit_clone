@@ -1,11 +1,11 @@
 # GeGLU类样例
 
-## 概述
+## overview
 
-本样例在GLU（Gated Linear Unit）门控激活函数场景下，基于GeGLU高阶API实现GLU变体的激活计算。GeGLU采用GELU作为激活函数，计算模式为 `dst = src0 * GELU(src1)`。本样例使用float数据类型，输入Tensor元素个数为1024，完成Geglu样例计算。
+本样例在GLU（Gated Linear Unit）门控activation_functions场景下，基于GeGLUhigh_level_api实现GLU变体的激活计算。GeGLU采用GELU作为activation_functions，计算模式为 `dst = src0 * GELU(src1)`。本样例使用float数据类型，输入Tensor元素个数为1024，完成Geglu样例计算。
 
 > **接口提示：** 除本样例使用的 `GeGLU` 接口外，Ascend C 还提供了以下 GLU 变体接口，调用方式与 `GeGLU` 一致，只需替换函数名即可切换：
-> - **ReGlu**：采用 Relu 作为激活函数的 GLU 变体。将 `geglu.asc` 中 `AscendC::GeGLU` 替换为 `AscendC::ReGlu`。
+> - **ReGlu**：采用 Relu 作为activation_functions的 GLU 变体。将 `geglu.asc` 中 `AscendC::GeGLU` 替换为 `AscendC::ReGlu`。
 
 
 ## 本样例支持的产品及CANN软件版本
@@ -33,11 +33,11 @@
 - 样例功能：
   本样例对两个输入Tensor执行GeGLU门控激活计算，将计算结果写入输出Tensor。
 
-  GeGLU是采用GELU作为激活函数的GLU变体。
+  GeGLU是采用GELU作为activation_functions的GLU变体。
 
   计算公式如下：
   $$dstTensor_i = srcTensor0_i \otimes GELU(srcTensor1_i)$$
-  其中GELU激活函数的计算公式如下：
+  其中GELUactivation_functions的计算公式如下：
   $$GELU(x)=0.5 * x * (1 + tanh(\sqrt{\frac{2}{\pi}} * (x + 0.044715 * x^3)))$$
   化简后可得：
   $$GELU(x)=\frac{x}{1 + e^{-1.59576912 * (x + 0.044715 * x^3)}}$$

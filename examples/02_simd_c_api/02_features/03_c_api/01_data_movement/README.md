@@ -1,6 +1,6 @@
 # C-API样例介绍
-## 概述
-本样例展示了使用C_API构建数据搬运（Data Movement）算子样例的编译流程，支持main函数和kernel函数在同一个cpp文件中实现。
+## overview
+本样例展示了使用C_API构建data_move（Data Movement）算子样例的编译流程，支持main函数和kernel函数在同一个cpp文件中实现。
 
 ## 样例列表
 |  目录名称                                                   |  功能描述                                              |

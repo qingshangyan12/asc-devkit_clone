@@ -40,7 +40,7 @@ source /usr/local/Ascend/cann/set_env.sh
 
 ## 快速入门流程
 
-### 步骤概览
+### 步骤overview
 
 | 步骤 | 内容 | 预计时间 |
 |------|------|----------|
@@ -114,7 +114,7 @@ AddCustom
 │   └── CMakeLists.txt
 └── op_kernel                 // Kernel侧实现文件
     ├── add_custom.cpp        // [需修改] 算子代码实现
-    ├── add_custom_tiling.h   // [需修改] Tiling数据结构定义
+    ├── add_custom_tiling.h   // [需修改] Tilingdata_structures定义
     └── CMakeLists.txt
 ```
 
@@ -208,7 +208,7 @@ private:
 extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z,
                                                    GM_ADDR workspace, GM_ADDR tiling)
 {
-    REGISTER_TILING_DEFAULT(AddCustomTilingData);  // 注册TilingData结构体类型
+    REGISTER_TILING_DEFAULT(AddCustomTilingData);  // 注册TilingData_struct类型
     GET_TILING_DATA(tilingData, tiling);           // 反序列化tiling参数为结构体实例
     KernelAdd op;
     op.Init(x, y, z, tilingData.totalLength, tilingData.tileNum);
@@ -220,11 +220,11 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 ### 修改Tiling与Host侧实现
 
-Tiling负责将Host侧的调度信息（如数据总量、分块数）传递给Kernel侧执行。Tiling数据结构定义放在`op_kernel/add_custom_tiling.h`，供Host和Kernel共同引用。
+Tiling负责将Host侧的调度信息（如数据总量、分块数）传递给Kernel侧执行。Tilingdata_structures定义放在`op_kernel/add_custom_tiling.h`，供Host和Kernel共同引用。
 
-#### 修改Tiling数据结构定义
+#### 修改Tilingdata_structures定义
 
-编辑`op_kernel/add_custom_tiling.h`，使用标准C++语法定义TilingData结构体：
+编辑`op_kernel/add_custom_tiling.h`，使用标准C++语法定义TilingData_struct：
 
 ```cpp
 #ifndef ADD_CUSTOM_TILING_H
@@ -269,7 +269,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext *context)
 
 保留文件末尾自动生成的`namespace ge`（InferShape/InferDataType）和`namespace ops`（[算子原型注册](./设计与实现/算子原型定义.md)）代码不变。
 
-> 以上代码展示了[Host侧Tiling实现](./设计与实现/Host侧Tiling实现.md)中Tiling函数和TilingData数据结构的基本写法。
+> 以上代码展示了[Host侧Tiling实现](./设计与实现/Host侧Tiling实现.md)中Tiling函数和TilingDatadata_structures的基本写法。
 
 ### 编译
 
@@ -532,4 +532,4 @@ test pass
 
 ## 下一步指引
 
-恭喜您完成了第一个算子的端到端开发！接下来建议按[概述](./概述.md)里的路径继续学习。
+恭喜您完成了第一个算子的端到端开发！接下来建议按[overview](./overview.md)里的路径继续学习。

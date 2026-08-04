@@ -1,8 +1,8 @@
 # 单边Clamp样例
 
-## 概述
+## overview
 
-本样例基于ClampMin/ClampMax高阶API实现将Tensor单边截断到scalar的功能。  
+本样例基于ClampMin/ClampMaxhigh_level_api实现将Tensor单边截断到scalar的功能。  
 ClampMin将输入Tensor中小于scalar的元素替换为scalar，ClampMax将输入Tensor中大于scalar的元素替换为scalar，通过参数配置选择使用ClampMin或ClampMax功能。
 
 ## 本样例支持的产品及CANN软件版本
@@ -68,7 +68,7 @@ ClampMin将输入Tensor中小于scalar的元素替换为scalar，ClampMax将输�
 
   - Kernel实现
 
-    使用ClampMin/ClampMax高阶API接口完成单边截断计算，通过参数配置选择使用ClampMin或ClampMax功能。
+    使用ClampMin/ClampMaxhigh_level_api接口完成单边截断计算，通过参数配置选择使用ClampMin或ClampMax功能。
 
   - Tiling实现
 

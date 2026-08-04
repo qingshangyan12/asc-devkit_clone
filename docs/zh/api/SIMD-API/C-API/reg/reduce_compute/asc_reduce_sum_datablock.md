@@ -46,9 +46,9 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
+| mask | 输入 | 源操作数mask（mask寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和mask寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -70,11 +70,11 @@ PIPE_V
 
 以二叉树累加的方式计算每个DataBlock内的和。
 
-以half类型的数据求和为例，在每个DataBlock内有16个数，通过二叉树的方式，两两相加，计算过程如下图所示：
+以half_type的数据求和为例，在每个DataBlock内有16个数，通过二叉树的方式，两两相加，计算过程如下图所示：
 
 1. data1和data2相加得到data01，data3和data4相加得到data02，……，data13和data14相加得到data07，data15和data16相加得到data08；
 2. data01和data02相加得到data001，data03和data04相加得到data002，……，data07和data08相加得到data004；
-3. 以此类推，得到目的操作数为1个half类型的数据sum。
+3. 以此类推，得到目的操作数为1个half_type的数据sum。
 
 **图1** asc_reduce_sum_datablock示意图
 ![asc_reduce_sum_datablock示意图](../../../../figures/reg_reduce_datablock_index.png "asc_reduce_sum_datablock示意图")

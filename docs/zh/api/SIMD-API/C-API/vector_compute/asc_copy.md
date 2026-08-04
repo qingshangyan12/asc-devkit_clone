@@ -27,7 +27,7 @@
 
 ## 功能说明
 
-将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。
+将数据从Unified Buffer搬运到Unified Buffer。支持high_dim_split。
 
 ## 函数原型
 
@@ -44,7 +44,7 @@ __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, 
 
 ```
 
-- 高维切分计算
+- high_dim_split计算
 
 ```cpp
 __aicore__ inline void asc_copy(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint8_t repeat,
@@ -98,7 +98,7 @@ PIPE_V
 ## 约束说明
 
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 
 ## 调用示例
 

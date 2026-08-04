@@ -1,8 +1,8 @@
 # Sigmoid样例
 
-## 概述
+## overview
 
-本样例基于Sigmoid高阶API对输入Tensor按元素做逻辑回归Sigmoid计算。该API常用于二分类任务的输出层、门控机制（如LSTM、GRU），将输出映射到(0,1)区间作为概率。本样例使用float数据类型，输入Tensor元素个数为1024，完成Sigmoid激活计算。
+本样例基于Sigmoidhigh_level_api对输入Tensor按元素做逻辑回归Sigmoid计算。该API常用于二分类任务的输出层、门控机制（如LSTM、GRU），将输出映射到(0,1)区间作为概率。本样例使用float数据类型，输入Tensor元素个数为1024，完成Sigmoid激活计算。
 
 ## 本样例支持的产品及CANN软件版本
 

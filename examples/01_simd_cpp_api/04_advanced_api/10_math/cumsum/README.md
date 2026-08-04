@@ -1,8 +1,8 @@
 # CumSum样例
 
-## 概述
+## overview
 
-本样例基于CumSum高阶API实现张量按行或列计算累加和的功能。
+本样例基于CumSumhigh_level_api实现张量按行或列计算累加和的功能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -49,11 +49,11 @@
 
   - Kernel实现
 
-    使用CumSum高阶API接口完成cumsum计算。
+    使用CumSumhigh_level_api接口完成cumsum计算。
 
   - Tiling实现
 
-    Host侧通过GetCumSumMaxMinTmpSize获取CumSum接口计算所需的最大和最小临时空间。
+    Host侧通过GetCumSumMaxMinTmpSize获取CumSum_interface计算所需的最大和最小临时空间。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

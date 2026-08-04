@@ -1,9 +1,9 @@
 # SIMD API
 
--   **[通用说明和约束](通用说明和约束.md)**
+-   **[general_description_and_constraints](general_description_and_constraints.md)**
 
--   **[基础API](基础API/基础API.md)**
+-   **[basic_api](basic_api/basic_api.md)**
 
--   **[高阶API](高阶API/高阶API.md)**
+-   **[high_level_api](high_level_api/high_level_api.md)**
 
 -   **[C API](C-API/C-API.md)**

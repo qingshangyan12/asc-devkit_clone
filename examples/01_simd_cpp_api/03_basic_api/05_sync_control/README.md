@@ -1,29 +1,29 @@
-# 同步控制类API样例介绍
+# sync_control类API样例介绍
 
-## 概述
+## overview
 
-本样例集介绍了与同步控制相关的多个API样例，包括核内同步、核间同步、任务间同步和RegBase同步。
+本样例集介绍了与sync_control相关的多个API样例，包括intra_core_sync、inter_core_sync、inter_task_sync和RegBase同步。
 
 ## 样例列表
 
-### 核内同步
+### intra_core_sync
 
 | 目录名称 | 功能描述 | 支持的产品 |
 |----------|----------| --- |
 | [data_sync_barrier](./data_sync_barrier) |  基于DataSyncBarrier实现标量流水GM访问写序同步 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
-| [mutex](./mutex) |  本样例演示Mutex::Lock、Mutex::Unlock、AllocMutexID和ReleaseMutexID核内流水线同步接口的使用方法 | Ascend 950PR/Ascend 950DT |
+| [mutex](./mutex) |  本样例演示Mutex::Lock、Mutex::Unlock、AllocMutexID和ReleaseMutexID核内流水线sync_interface的使用方法 | Ascend 950PR/Ascend 950DT |
 
-### 核间同步
+### inter_core_sync
 
 | 目录名称 | 功能描述 | 支持的产品 |
 |----------|----------| --- |
-| [cross_core_set_wait_flag](./cross_core_set_wait_flag) |  基于CrossCoreSetFlag和CrossCoreWaitFlag实现核间同步，支持全核同步、单AI Core内AIV同步、AIC与AIV同步三种模式 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [cross_core_set_wait_flag](./cross_core_set_wait_flag) |  基于CrossCoreSetFlag和CrossCoreWaitFlag实现inter_core_sync，支持全核同步、单AI Core内AIV同步、AIC与AIV同步三种模式 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [group_barrier](./group_barrier) |  基于GroupBarrier实现两组存在依赖关系的AIV之间的同步，A组AIV计算完成后，B组AIV依赖该结果进行后续计算 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
-| [ib_set_wait](./ib_set_wait) |  基于IBSet和IBWait实现核间同步，适用于不同核操作同一块全局内存且存在数据依赖问题的场景 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [ib_set_wait](./ib_set_wait) |  基于IBSet和IBWait实现inter_core_sync，适用于不同核操作同一块全局内存且存在数据依赖问题的场景 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [sequential_block_sync](./sequential_block_sync) |  基于InitDetermineComputeWorkspace、WaitPreBlock、NotifyNextBlock三个接口组合实现核间顺序同步，确保多核按blockIdx升序执行 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
-| [sync_all](./sync_all) |  基于SyncAll实现核间同步，适用于不同核操作同一块全局内存且存在读后写、写后读、写后写等数据依赖问题的场景 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [sync_all](./sync_all) |  基于SyncAll实现inter_core_sync，适用于不同核操作同一块全局内存且存在读后写、写后读、写后写等数据依赖问题的场景 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 
-### 任务间同步
+### inter_task_sync
 
 | 目录名称 | 功能描述 | 支持的产品 |
 |----------|----------| --- |

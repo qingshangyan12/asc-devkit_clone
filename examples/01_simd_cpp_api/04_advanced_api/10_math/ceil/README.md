@@ -1,10 +1,10 @@
 # Ceil样例
 
-## 概述
+## overview
 
-本样例基于Ceil高阶API实现获取大于或等于x的最小的整数值的功能，即向正无穷取整。
+本样例基于Ceilhigh_level_api实现获取大于或等于x的最小的整数值的功能，即向正无穷取整。
 
-> **接口提示：** 除本样例使用的 `Ceil` 接口外，Ascend C 还提供了以下取整相关高阶API接口，实现方式一致，如需调用替换接口名即可：
+> **接口提示：** 除本样例使用的 `Ceil` 接口外，Ascend C 还提供了以下取整相关high_level_api接口，实现方式一致，如需调用替换接口名即可：
 >
 > - **Floor**：向负无穷取整。
 > - **Round**：四舍五入取整。
@@ -57,11 +57,11 @@
 
   - Kernel实现
 
-    使用Ceil高阶API接口完成向正无穷取整计算
+    使用Ceilhigh_level_api接口完成向正无穷取整计算
   
   - Tiling实现
 
-    Host侧通过GetCeilMaxMinTmpSize接口获取Ceil接口计算所需的最大和最小临时空间。
+    Host侧通过GetCeilMaxMinTmpSize接口获取Ceil_interface计算所需的最大和最小临时空间。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

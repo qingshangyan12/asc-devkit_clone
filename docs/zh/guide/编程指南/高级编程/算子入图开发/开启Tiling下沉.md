@@ -1,11 +1,11 @@
-# 开启Tiling下沉<a name="ZH-CN_TOPIC_0000002130625528"></a>
+# 开启Tiling_sink<a name="ZH-CN_TOPIC_0000002130625528"></a>
 
-在静态图模式下，可以通过**整图下沉**优化调度性能。将完整的计算图一次性下发至Device侧，后续执行则无需Host参与，由Device自主完成计算，从而减少Host-Device交互开销，提升执行效率。部分算子的Tiling计算依赖运行时输入的具体数值（**Tiling值依赖**），需在执行时动态计算Tiling参数。针对该场景，可采用**Tiling下沉**优化方案：将Tiling计算下沉至Device侧的AI CPU上执行，从而实现计算全程在Device侧高效完成。
+在静态图模式下，可以通过**整图下沉**优化调度性能。将完整的计算图一次性下发至Device侧，后续执行则无需Host参与，由Device自主完成计算，从而减少Host-Device交互开销，提升执行效率。部分算子的Tiling计算依赖运行时输入的具体数值（**Tiling值依赖**），需在执行时动态计算Tiling参数。针对该场景，可采用**Tiling_sink**优化方案：将Tiling计算下沉至Device侧的AI CPU上执行，从而实现计算全程在Device侧高效完成。
 
 >[!NOTE]说明 
->- 基于新版本CANN包（支持Tiling下沉特性）编译生成的Tiling下沉算子，不兼容旧版CANN（不支持Tiling下沉特性）运行环境。
->- 当前仅融合算子（矢量计算和矩阵计算融合）支持进行Tiling下沉。
->- Tiling下沉功能仅支持如下产品型号：
+>- 基于新版本CANN包（支持Tiling_sink特性）编译生成的Tiling_sink算子，不兼容旧版CANN（不支持Tiling_sink特性）运行环境。
+>- 当前仅融合算子（矢量计算和cube_compute融合）支持进行Tiling_sink。
+>- Tiling_sink功能仅支持如下产品型号：
 >    <!-- npu="A3" id1 -->
 >    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 >    <!-- end id1 -->
@@ -16,15 +16,15 @@
 >    - Ascend 950PR/Ascend 950DT，暂不支持
 >    <!-- end id3 -->
 
-自定义算子开启Tiling下沉的步骤如下，完整样例请参考[Tiling下沉算子样例](../../../../../../examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op)。
+自定义算子开启Tiling_sink的步骤如下，完整样例请参考[Tiling_sink算子样例](../../../../../../examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op)。
 
-Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现文件需单独放在一个cpp文件中，示例中为add\_custom\_tiling\_sink\_tiling.cpp。
+Tiling_sink场景下，算子工程的op\_host目录结构如下，Tiling实现文件需单独放在一个cpp文件中，示例中为add\_custom\_tiling\_sink\_tiling.cpp。
 
 ```
 ├── op_host
 │   ├── add_custom_tiling_sink.cpp // 算子原型定义、InferShape、InferDataType实现
 │   ├── add_custom_tiling_sink_tiling.cpp // Tiling函数实现
-│   ├── add_custom_tiling_sink_tiling.h // TilingData结构体定义、Tiling函数声明
+│   ├── add_custom_tiling_sink_tiling.h // TilingData_struct定义、Tiling函数声明
 │   └── CMakeLists.txt
 ```
 
@@ -44,7 +44,7 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
 
 -   算子原型定义、InferShape、InferDataType实现文件add\_custom\_tiling\_sink.cpp，需包含add\_custom\_tiling\_sink\_tiling.h，进行Tiling函数和算子原型定义的关联。
 
-    Tiling下沉仅适用于存在Tiling值依赖（即当InferShape不依赖输入值，仅Tiling计算需要输入值）且算子输入为非Const类型的场景，本示例中的输入y通过ValueDepend配置了非Const类型的Tiling值依赖。
+    Tiling_sink仅适用于存在Tiling值依赖（即当InferShape不依赖输入值，仅Tiling计算需要输入值）且算子输入为非Const类型的场景，本示例中的输入y通过ValueDepend配置了非Const类型的Tiling值依赖。
 
     ```
     #include "add_custom_tiling_sink_tiling.h" // 包含头文件
@@ -84,7 +84,7 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
 
 -   Tiling函数的实现文件add\_custom\_tiling\_sink\_tiling.cpp
 
-    -   Tiling函数中通过判断值依赖InputTensor即输入y的数据指针是否为空指针来确认当前是否处于编译期。Tiling下沉场景，编译期需要为算子分配内存，包括其所需的workspace。为了保证运行时的高效性，编译期应根据算子的执行需求，合理设置所需的workspace最大值，以避免内存不足或浪费。AddCustomTilingSink样例不需要用户workspace，不涉及设置，此处设置为固定值仅作为示例。
+    -   Tiling函数中通过判断值依赖InputTensor即输入y的数据指针是否为空指针来确认当前是否处于编译期。Tiling_sink场景，编译期需要为算子分配内存，包括其所需的workspace。为了保证运行时的高效性，编译期应根据算子的执行需求，合理设置所需的workspace最大值，以避免内存不足或浪费。AddCustomTilingSink样例不需要用户workspace，不涉及设置，此处设置为固定值仅作为示例。
     -   完成下沉Tiling函数注册：包含device\_op\_impl\_registry.h头文件，使用宏DEVICE\_IMPL\_OP\_OPTILING进行注册。
 
     ```
@@ -110,7 +110,7 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
         currentWorkspace[0] = sysWorkspaceSize + DEFAULT_WORKSPACE_SIZE; // 设置运行时workspace大小，此处为系统workspace空间 + 用户workspace空间
         if (context->GetInputTensor(1) != nullptr && context->GetInputTensor(1)->GetData<float>() == nullptr) {
             // 通过判断值依赖InputTensor的Data是否为空指针来确认当前是否处于编译期。
-            // Tiling下沉场景，编译期需要为算子分配内存，包括其所需的workspace。为了保证运行时的高效性，编译期应根据算子的执行需求，合理设置所需的workspace最大值，以避免内存不足或浪费。
+            // Tiling_sink场景，编译期需要为算子分配内存，包括其所需的workspace。为了保证运行时的高效性，编译期应根据算子的执行需求，合理设置所需的workspace最大值，以避免内存不足或浪费。
             currentWorkspace[0] = sysWorkspaceSize + MAX_WORKSPACE_SIZE; // 设置编译期workspace大小，此处为系统workspace空间 + 用户workspace空间最大值
         }
         return ge::GRAPH_SUCCESS;
@@ -121,7 +121,7 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
 
 -   算子核函数实现
 
-    当前Tiling下沉仅支持融合算子，为了模拟融合算子场景，通过[KERNEL\_TASK\_TYPE\_DEFAULT](../../../../api/SIMD-API/基础API/Kernel-Tiling/设置Kernel类型.md)接口强制指定算子在AIC、AIV混合场景运行。
+    当前Tiling_sink仅支持融合算子，为了模拟融合算子场景，通过[KERNEL\_TASK\_TYPE\_DEFAULT](../../../../api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)接口强制指定算子在AIC、AIV混合场景运行。
 
     ```
     extern "C" __global__ __aicore__ void add_custom_tiling_sink(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
@@ -138,7 +138,7 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
     }
     ```
 
--   修改op\_host目录下的编译脚本CMakeLists.txt，添加Tiling下沉编译命令。具体代码如下所示：
+-   修改op\_host目录下的编译脚本CMakeLists.txt，添加Tiling_sink编译命令。具体代码如下所示：
 
     ```
     npu_op_device_tiling_library(cust_opmaster SHARED  # 任务名称，固定为cust_opmaster

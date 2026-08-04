@@ -1,6 +1,6 @@
 # Mmad样例
 
-## 概述
+## overview
 
 本样例以 int8_t 和 bfloat16 两种输入数据类型为例，演示如何通过C API实现矩阵乘法（C = A × B + Bias）。每个场景的流水线函数拆分到独立的头文件中（`mmad_s1.h` / `mmad_s2.h`），主文件 `mmad.asc` 通过 `if constexpr (scenario_num)` 在核函数入口处按场景分发。
 
@@ -30,7 +30,7 @@
 
 ## 样例描述
 
-一次完整的矩阵乘法涉及的数据搬运过程包括：Global Memory -> L1 Buffer、L1 Buffer -> L0A / L0B Buffer、L1 Buffer -> BiasTable Buffer、L0C Buffer -> Global Memory。不同存储单元的数据排布格式如下表所示。
+一次完整的矩阵乘法涉及的data_move过程包括：Global Memory -> L1 Buffer、L1 Buffer -> L0A / L0B Buffer、L1 Buffer -> BiasTable Buffer、L0C Buffer -> Global Memory。不同存储单元的数据排布格式如下表所示。
 
 <a name="表1"></a>
 <table border="2" align="center">
@@ -75,7 +75,7 @@
   <tr>
     <td>Bias在GM/L1上的数据类型</td>
     <td>Bias在BT（BiasTable Buffer）上的数据类型</td>
-    <td>矩阵计算输出到L0C上的数据类型</td>
+    <td>cube_compute输出到L0C上的数据类型</td>
   </tr>
   <tr>
     <td>int32_t</td>
@@ -143,7 +143,7 @@
   2. `asc_copy_l12l0a`：A 从 L1 搬运至 L0A；`asc_copy_l12l0b_trans`：B 从 L1 转置搬运至 L0B；`asc_copy_l12bt`：Bias 从 L1 搬运至 BT；
   3. `asc_mmad`：矩阵乘加，C 矩阵初始值来源于 BT；
   4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：结果从 L0C 搬运至 GM（Nz → ND）；
-- 说明：int8_t类型输入，B矩阵不转置场景下，N轴向2 * 16对齐，填充了全部是无效数据的32 * 16的分形。如下图1所示，如果设置`right_width = N`，就会导致读入编号为3、7的分形，同时又没能将包含有效数据的编号为9、10的分形读入。因此需要设置：`right_width = CeilAlign(N, BLOCK_CUBE * fractalNum)`，此时会读入全部分形，虽然矩阵计算结果中包含了无效数据参与计算的结果，但是在`asc_copy_l0c2gm`指令搬出数据时通过设置`n_size = N`来保证无效数据参与计算的结果不会被搬出。
+- 说明：int8_t类型输入，B矩阵不转置场景下，N轴向2 * 16对齐，填充了全部是无效数据的32 * 16的分形。如下图1所示，如果设置`right_width = N`，就会导致读入编号为3、7的分形，同时又没能将包含有效数据的编号为9、10的分形读入。因此需要设置：`right_width = CeilAlign(N, BLOCK_CUBE * fractalNum)`，此时会读入全部分形，虽然cube_compute结果中包含了无效数据参与计算的结果，但是在`asc_copy_l0c2gm`指令搬出数据时通过设置`n_size = N`来保证无效数据参与计算的结果不会被搬出。
 <p align="center">
   <img src="figures/mmad_s8_L0B_转置.png" width="700">
 </p>
@@ -168,18 +168,18 @@
 下面将介绍如何配置
 `asc_mmad`指令的入参，入参的具体含义这里不再赘述。
 
-需要注意的是，执行`asc_mmad`指令时，矩阵计算单元会从L0A/L0B连续读入多个分形参与矩阵乘计算。读入分形的数量由`left_height`、`n_dim`、`right_width`的取值，以及`asc_mmad`指令对L0A/L0B上A矩阵、B矩阵各轴的对齐要求共同决定。
+需要注意的是，执行`asc_mmad`指令时，cube_compute_unit会从L0A/L0B连续读入多个分形参与矩阵乘计算。读入分形的数量由`left_height`、`n_dim`、`right_width`的取值，以及`asc_mmad`指令对L0A/L0B上A矩阵、B矩阵各轴的对齐要求共同决定。
 
-如图2所示，以b16输入类型为例，`asc_mmad`指令会按照A矩阵分形[16, 16]、B矩阵分形[16, 16]连续读入数据。此时，矩阵计算单元从L0A/L0B读入的分形总数分别为2 x 5 = 10和5 x 3 = 15，写入L0C的分形总数为2 x 3 = 6。
+如图2所示，以b16输入类型为例，`asc_mmad`指令会按照A矩阵分形[16, 16]、B矩阵分形[16, 16]连续读入数据。此时，cube_compute_unit从L0A/L0B读入的分形总数分别为2 x 5 = 10和5 x 3 = 15，写入L0C的分形总数为2 x 3 = 6。
 
 <p align="center">
   <img src="figures/mmad_f16_A5.png" width="900">
 </p>
 <p align="center">
-图2：bfloat16类型，L0A上Nz排布，Mmad数据排布示意图
+图2：bfloat16_type，L0A上Nz排布，Mmad数据排布示意图
 </p>
 
-Mmad计算中包含了补齐的无效数据，需要配合Fixpipe指令在L0C搬出到GM过程中，排除参数Mmad计算过程中填充的无效数据。
+mmad_compute中包含了补齐的无效数据，需要配合Fixpipe指令在L0C搬出到GM过程中，排除参数mmad_compute过程中填充的无效数据。
 
 ## 编译运行
 

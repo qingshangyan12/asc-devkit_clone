@@ -1,8 +1,8 @@
 # Transpose样例
 
-## 概述
+## overview
 
-本样例基于Transpose高阶API实现将数据排布从NZ格式转换为ND格式并进行维度交换的功能。样例中实现了将NZ格式Tensor转换为ND格式Tensor并交换其第1维和第2维的场景。
+本样例基于Transposehigh_level_api实现将数据排布从NZ格式转换为ND格式并进行维度交换的功能。样例中实现了将NZ格式Tensor转换为ND格式Tensor并交换其第1维和第2维的场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -27,7 +27,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例实现的是使用Transpose高阶API将数据排布从NZ转换到ND并交换ND矩阵第1维和第2维的场景。
+  本样例实现的是使用Transposehigh_level_api将数据排布从NZ转换到ND并交换ND矩阵第1维和第2维的场景。
 
 - 样例规格：  
   <table>
@@ -52,7 +52,7 @@
   1轴、2轴转置后的输出shape为[B, S, N, H/N] = [1, 64, 2 ,32]
 
   - Kernel实现  
-    使用Transpose高阶API接口完成Transpose计算，得到最终结果，再搬出到外部存储上。
+    使用Transposehigh_level_api接口完成Transpose计算，得到最终结果，再搬出到外部存储上。
 
   - Tiling实现  
     使用Ascend C提供的GetTransposeTilingInfo接口，获取所需的Tiling参数，并调用GetTransposeMaxMinTmpSize接口获取Transpose接口计算所需的临时空间大小。
@@ -80,7 +80,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

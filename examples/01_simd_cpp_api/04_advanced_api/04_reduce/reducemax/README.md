@@ -1,8 +1,8 @@
 # ReduceMax样例
 
-## 概述
+## overview
 
-本样例在归约场景下，基于ReduceMax高阶API实现对矩阵的每一列求最大值。
+本样例在归约场景下，基于ReduceMaxhigh_level_api实现对矩阵的每一列求最大值。
 
 > **接口提示：** 除本样例使用的 `ReduceMax` 接口外，Ascend C 还提供了以下归约类接口，调用方式与 `ReduceMax` 一致，只需替换函数名即可切换：
 > - **ReduceMin**：求最小值。将 `reducemax.asc` 中 `AscendC::ReduceMax` 替换为 `AscendC::ReduceMin`，`GetReduceMaxMaxMinTmpSize` 替换为 `GetReduceMinMaxMinTmpSize`。
@@ -54,7 +54,7 @@
   本样例将输入[32, 136]矩阵按列求最大值，输出[1，136]。
 
   - Kernel实现:  
-    计算逻辑是：输入数据需要先搬运到片上存储，然后使用ReduceMax高阶API接口完成计算，再将结果搬出。
+    计算逻辑是：输入数据需要先搬运到片上存储，然后使用ReduceMaxhigh_level_api接口完成计算，再将结果搬出。
 
   - Tiling实现:  
     该样例的tiling实现流程如下：使用GetReduceMaxMaxMinTmpSize接口计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度确定所需tiling参数。

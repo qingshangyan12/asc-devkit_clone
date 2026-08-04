@@ -49,19 +49,19 @@
 >        aclrtSetDevice、aclrtResetDevice、aclrtCreateStream、aclrtCreateStreamWithConfig、aclrtDestroyStream、aclrtDestroyStreamForce、aclrtSynchronizeStream、aclrtCreateContext、aclrtDestroyContext。
 
 > [!CAUTION] 注意
-> 在CPU孪生调试模式下，编译器不识别Ascend C提供的[SIMD-BuiltIn关键字](../../语言扩展层/SIMD-BuiltIn关键字.md)及[SIMT-BuiltIn关键字](../../语言扩展层/SIMT-BuiltIn关键字.md)，包括
-> - **函数执行空间限定符**：如`__aicore__`、`__global__`、`__host__`等;
+> 在cpu_twin_debug模式下，编译器不识别Ascend C提供的[SIMD-BuiltIn关键字](../../语言扩展层/SIMD-BuiltIn关键字.md)及[SIMT-BuiltIn关键字](../../语言扩展层/SIMT-BuiltIn关键字.md)，包括
+> - **function_execution_space_qualifier**：如`__aicore__`、`__global__`、`__host__`等;
 > - **函数标记宏**：如`__simd_vf__`、`__simd_callee__`、`__simt_vf__`等；
 > - **地址空间限定符**：如`__gm__` 、`__ubuf__`等。
 >
-> 这些关键字与Device侧执行强相关，在CPU孪生调试模式下无需实际生效，因此系统框架将这些关键字定义为空。
+> 这些关键字与Device侧执行强相关，在cpu_twin_debug模式下无需实际生效，因此系统框架将这些关键字定义为空。
 > 由于这种置空处理，**仅通过BuiltIn关键字区分的函数签名将被视为相同**，会导致重定义编译错误。
 > 
 > 典型问题场景包括：
 > 1. **Device侧函数与Host侧函数同名**
 > 
 > <blockquote>
-> 如下例中，`add`函数仅通过`__aicore__`区分运行域，在CPU孪生调试模式下两个声明将冲突：
+> 如下例中，`add`函数仅通过`__aicore__`区分运行域，在cpu_twin_debug模式下两个声明将冲突：
 > 	<pre><code class="language-asc">__aicore__ inline void add(int x, int y);  // Device侧
 > void add(int x, int y);                    // Host侧（等同于 __host__）</code></pre>
 > </blockquote>
@@ -82,9 +82,9 @@
 
 -   调试单独一个子进程
 
-    启动gdb，示例中的add\_custom\_cpu为CPU域的算子可执行文件，参考[修改并执行一键式编译运行脚本](../../附录/基于样例工程完成Kernel直调.md#section188001652105215)，将一键式编译运行脚本中的run-mode设置成cpu，即可编译生成CPU域的算子可执行文件。
+    启动gdb，示例中的add\_custom\_cpu为CPU域的算子可执行文件，参考[修改并执行一键式编译运行脚本](../../appendix/基于样例工程完成Kernel直调.md#section188001652105215)，将一键式编译运行脚本中的run-mode设置成cpu，即可编译生成CPU域的算子可执行文件。
 
-    gdb启动后，首先设置跟踪子进程，之后再打断点，就会停留在子进程中，但是这种方式只会停留在遇到断点的第一个子进程中，其余子进程和主进程会继续执行直到退出。涉及到核间同步的算子无法使用这种方法进行调试。
+    gdb启动后，首先设置跟踪子进程，之后再打断点，就会停留在子进程中，但是这种方式只会停留在遇到断点的第一个子进程中，其余子进程和主进程会继续执行直到退出。涉及到inter_core_sync的算子无法使用这种方法进行调试。
 
     ```
     gdb --args add_custom_cpu  // 启动gdb，add_custom_cpu为算子可执行文件
@@ -93,7 +93,7 @@
 
 -   调试多个子进程
 
-    如果涉及到核间同步，那么需要能同时调试多个子进程。
+    如果涉及到inter_core_sync，那么需要能同时调试多个子进程。
 
     在gdb启动后，首先设置调试模式为只调试一个进程，挂起其他进程。设置的命令如下：
 

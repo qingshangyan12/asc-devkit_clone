@@ -1,11 +1,11 @@
 # API UT 覆盖率扫描指南
 
-## 1. 概述
+## 1. overview
 
 覆盖率扫描模式用于扫描 `include/` 目录下所有 API 接口定义，检查是否都有对应的 UT 测试看护，并生成覆盖率报告。
 
 **核心能力：**
-- 扫描高阶API、membase基础API、regbase基础API、C API、SIMT API、工具类API 六种类型的接口
+- 扫描high_level_api、membasebasic_api、regbasebasic_api、C API、SIMT API、工具类API 六种类型的接口
 - 识别每个 API 的架构条件编译隔离（`__NPU_ARCH__` 宏）
 - 检测跨架构 UT 覆盖差异（如某架构有接口但无 UT）
 - 过滤 deprecated 接口（不纳入 UT 补充范围）
@@ -78,9 +78,9 @@ flowchart TD
 
 | API 类型 | 提取规则 | 头文件位置 |
 |---------|---------|-----------|
-| **高阶API** | 模板类声明 `template<...> class Name` | `include/adv_api/**/*.h` |
-| **membase基础API** | 函数声明 `void FuncName(...)` | `include/basic_api/kernel_operator_*.h`（排除 `reg_compute/`） |
-| **regbase基础API** | 函数声明 `void FuncName(...)` | `include/basic_api/reg_compute/**/*.h` |
+| **high_level_api** | 模板类声明 `template<...> class Name` | `include/adv_api/**/*.h` |
+| **membasebasic_api** | 函数声明 `void FuncName(...)` | `include/basic_api/kernel_operator_*.h`（排除 `reg_compute/`） |
+| **regbasebasic_api** | 函数声明 `void FuncName(...)` | `include/basic_api/reg_compute/**/*.h` |
 | **C API** | 函数声明 `void asc_name(...)` | `include/c_api/**/*.h` |
 | **SIMT API** | 设备函数 `__device__ ... func(...)` | `include/simt_api/**/*.h` |
 | **工具类API** | 类/函数声明 | `include/utils/**/*.h` |
@@ -284,13 +284,13 @@ ASCENDC_ASSERT((false), "VectorPadding is not supported");
 
 ```
 tests/api/
-├── basic_api/                                    # membase基础API 测试
+├── basic_api/                                    # membasebasic_api 测试
 │   ├── ascendc_case_ascend910b1/
 │   │   ├── ascendc_case_ascend910b1_aic/         # AIC (Cube 核心)
 │   │   └── ascendc_case_ascend910b1_aiv/         # AIV (Vector 核心)
 │   └── ascendc_case_ascend950pr_9599/
 │
-├── adv_api/                                      # 高阶API 测试
+├── adv_api/                                      # high_level_api 测试
 │   ├── activation/
 │   ├── math/
 │   └── normalization/
@@ -299,7 +299,7 @@ tests/api/
 │   ├── npu_arch_2201/    # ascend910b1
 │   └── npu_arch_3510/    # ascend950pr_9599
 │
-├── reg_compute_api/                              # regbase基础API 测试
+├── reg_compute_api/                              # regbasebasic_api 测试
 │   └── ascendc_case_ascend950pr_9599_reg_compute/
 │
 ├── simt_api/                                     # SIMT API 测试
@@ -309,7 +309,7 @@ tests/api/
 ```
 
 **关键注意事项：**
-- regbase基础API 测试位于 `tests/api/reg_compute_api/`（非 basic_api 目录）
+- regbasebasic_api 测试位于 `tests/api/reg_compute_api/`（非 basic_api 目录）
 - SIMT API 当前仅支持 ascend950pr_9599
 
 ---
@@ -319,15 +319,15 @@ tests/api/
 ### 10.1 API 接口扫描
 
 ```
-# Step 1: 扫描高阶API
+# Step 1: 扫描high_level_api
 Glob: {ASC_DEVKIT_PATH}/include/adv_api/**/*.h
 Grep: pattern="template.*class\s+\w+"
 
-# Step 2: 扫描 membase基础API
+# Step 2: 扫描 membasebasic_api
 Glob: {ASC_DEVKIT_PATH}/include/basic_api/kernel_operator_*.h
 Grep: pattern="void\s+\w+\s*\("
 
-# Step 3: 扫描 regbase基础API
+# Step 3: 扫描 regbasebasic_api
 Glob: {ASC_DEVKIT_PATH}/include/basic_api/reg_compute/**/*.h
 
 # Step 4: 扫描 C API
@@ -363,8 +363,8 @@ Grep: pattern="{APIName}" path="tests/api/{arch_dir}/"
 
 | API 类型 | 总 API 数 | 已覆盖 | 未覆盖 | 覆盖率 |
 |---------|----------|-------|-------|-------|
-| 高阶API | 45 | 40 | 5 | 88.9% |
-| membase基础API | 100 | 85 | 15 | 85.0% |
+| high_level_api | 45 | 40 | 5 | 88.9% |
+| membasebasic_api | 100 | 85 | 15 | 85.0% |
 | **总计** | **270** | **220** | **50** | **81.5%** |
 
 ## 按架构分组 - 缺失 UT 列表

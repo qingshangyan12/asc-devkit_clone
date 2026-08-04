@@ -1,6 +1,6 @@
 # reg_sync样例
 
-## 概述
+## overview
 本样例基于Reg编程接口实现UB(Unified Buffer)读或写操作的同步机制，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
     <table>
   	 	<tr>

@@ -28,14 +28,14 @@
 
 **该接口已废弃。其中asc_storealign_pack_postupdate_v2请使用[asc_storealign_pack_quarter_postupdate](asc_storealign_pack_quarter_postupdate.md)实现此功能。**
 
-reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过int32_t传入偏移，同时设置成硬件自动Post Update，用户不用更新偏移或者更新目的操作数的地址。
+reg计算data_move接口，适用于从矢量数据寄存器或mask寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过int32_t传入偏移，同时设置成硬件自动Post Update，用户不用更新偏移或者更新目的操作数的地址。
 
 - 从矢量数据寄存器连续对齐搬出到UB的场景
   - NORM搬出模式：正常模式，搬运VL数据，支持数据类型为b8、b16、b32。
   - FIRST搬出模式：忽略mask，向dst_align32b中搬运src第一个元素，支持数据类型为b8、b16、b32。
   - PACK搬出模式：压缩模式，根据mask将src中有效元素的低半部分bit数据连续存储于dst_align32b中，支持数据类型为b16、b32、b64。
   - PACKV2搬出模式：压缩模式，根据mask将src中有效元素的低8bits数据连续存储于dst_align32b中，支持数据类型为b32。
-- 从掩码寄存器连续对齐搬出到UB的场景
+- 从mask寄存器连续对齐搬出到UB的场景
   - NORM搬出模式：正常模式，搬运VL数据，支持数据类型为u8、u16、u32。
   - PACK搬出模式：压缩模式，将src中元素的低半部分bit数据连续存储于dst中，支持数据类型为u8、u16、u32。
 
@@ -81,7 +81,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   __simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__  uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__  float*& dst_align32b, vector_float src, int32_t offset, vector_bool mask)
   ```
-- 从掩码寄存器连续对齐搬出到UB的场景
+- 从mask寄存器连续对齐搬出到UB的场景
   ```cpp
   // NORM搬出模式
   __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint32_t*& dst, vector_bool src, int32_t offset)
@@ -104,20 +104,20 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   | :----- | :------- | :------- |
   | dst_align32b | 输入/输出 | 目的操作数（矢量）的起始地址。搬运完成后该地址会被硬件自动Post Update。 |
   | src | 输入 | 源操作数（矢量数据寄存器）。 |
-  | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
+  | mask | 输入 | 源操作数mask（mask寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
   | offset | 输入    | 地址偏移量。       |
 
-- 从掩码寄存器连续对齐搬出到UB的场景
+- 从mask寄存器连续对齐搬出到UB的场景
 
   **表2** 参数说明
 
   | 参数名  | 输入/输出 | 描述 |
   | :----- | :------- | :------- |
   | dst | 输入/输出 | 目的操作数（矢量）的起始地址。搬运完成后该地址会被硬件自动Post Update。 |
-  | src | 输入 | 源操作数（掩码寄存器）。 |
+  | src | 输入 | 源操作数（mask寄存器）。 |
   | offset | 输入    | 地址偏移量。       |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和mask寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -141,7 +141,7 @@ PIPE_V
   int32_t offset = 128;
   asc_storealign_postupdate(dst_align32b, src, offset, mask);
   ```
-- 从掩码寄存器连续对齐搬出到UB的场景
+- 从mask寄存器连续对齐搬出到UB的场景
   ```cpp
   __ubuf__ uint32_t*& dst = (__ubuf__ uint32_t*&)asc_get_phy_buf_addr(0);
   vector_bool src;

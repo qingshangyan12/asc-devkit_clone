@@ -41,13 +41,13 @@ AscendC推荐使用**标准C++语法**定义Tiling结构体。这种方式便于
 
 ### numBlocks<a id="numblocks"></a>
 
-`numBlocks`指定Kernel启动的SIMD Block数量，应根据数据规模、切分策略和硬件资源确定。可设置范围还受AI处理器型号、Kernel执行类型和运行时资源约束，更多信息请参考[核函数配置](../../../语言扩展层/SIMD-BuiltIn关键字.md#section97005415463)。
+`numBlocks`指定Kernel启动的SIMD Block数量，应根据数据规模、切分策略和硬件资源确定。可设置范围还受AI处理器型号、Kernel执行类型和运行时资源约束，更多信息请参考[kernel_function_config](../../../语言扩展层/SIMD-BuiltIn关键字.md#section97005415463)。
 
 ### workspace大小
 
 workspace是设备侧Global Memory上的临时内存，用于为Kernel计算提供辅助存储，例如保存中间结果、作为Ascend C API的临时缓存，或为Kernel提供临时空间。Host侧Tiling函数只负责计算并设置所需的workspace大小，不直接使用这块内存。单算子API执行场景下，开发者通过第一段接口获取workspace大小，并申请对应大小的Global Memory；入图场景下，框架会根据Host侧Tiling设置的大小自动申请。申请完成后，Kernel可以通过入口参数`workspace`访问这块内存。
 
-Host侧需要设置的workspace内存分为系统workspace和用户workspace两部分，具体设置方法请参考[如何使用workspace](../../../附录/常用操作/如何使用workspace.md)。
+Host侧需要设置的workspace内存分为系统workspace和用户workspace两部分，具体设置方法请参考[如何使用workspace](../../../appendix/常用操作/如何使用workspace.md)。
 
 ### TilingKey（可选）
 
@@ -61,7 +61,7 @@ AddCustom的Host侧Tiling实现可以按三个步骤理解：
 2. 编写`TilingFunc`，读取shape并写入`TilingData`、`numBlocks`和workspace大小。
 3. 在算子原型中通过`AICore().SetTiling(...)`关联Tiling函数。
 
-### 定义TilingData结构体<a id="define-tilingdata-structure"></a>
+### 定义TilingData_struct<a id="define-tilingdata-structure"></a>
 
 AddCustom样例中的`TilingData`头文件位于：
 
@@ -230,6 +230,6 @@ REGISTER_TILING_DEFAULT(AddCustomTiling);
 
 - [算子原型定义](./算子原型定义.md)：了解如何通过`AICore().SetTiling(...)`把Tiling函数关联到算子原型。
 - [通过TilingData传递属性信息](./通过TilingData传递属性信息.md)：了解如何读取算子属性，并通过TilingData传递到Kernel侧。
-- [使用高阶API时配套的Tiling实现](./使用高阶API时配套的Tiling实现.md)：了解使用高阶API时如何计算并传递配套Tiling参数。
+- [使用high_level_api时配套的Tiling实现](./使用high_level_api时配套的Tiling实现.md)：了解使用high_level_api时如何计算并传递配套Tiling参数。
 - [Kernel侧算子实现](./Kernel侧算子实现.md)：了解Kernel侧如何读取`TilingData`并使用Host侧设置的运行参数。
 - [多分支策略](./多分支策略.md)：了解如何通过`TilingKey`选择不同Kernel实现分支。

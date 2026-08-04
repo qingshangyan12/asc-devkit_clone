@@ -1,7 +1,7 @@
 # GetUBSize样例
 
 
-## 概述
+## overview
 
 本样例展示GetUBSizeInBytes和GetRuntimeUBSize接口使用方法，用于获取用户最大可使用的UB（Unified Buffer）大小（单位为Byte）。本样例给出了2种不同的测试场景（scenario）。
 
@@ -108,9 +108,9 @@
   - Kernel实现
 
     - 调用GetUBSizeInBytes或GetRuntimeUBSize接口获取可使用的UB（Unified Buffer）大小，用于计算tileLength。
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
     - 调用Abs接口，对输入tensor执行取绝对值操作。
-    - 调用DataCopy基础API，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）。
+    - 调用DataCopybasic_api，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）。
 
   - 调用实现
 
@@ -138,7 +138,7 @@
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

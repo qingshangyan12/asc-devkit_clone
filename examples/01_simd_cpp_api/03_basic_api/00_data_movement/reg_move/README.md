@@ -1,7 +1,7 @@
 # move_reg样例
 
-## 概述
-本样例基于Reg编程接口演示验证从RegTensor(Reg矢量计算基本单元)中搬运数据到MaskReg（掩码寄存器），使用MaskGenWithRegTensor接口。支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+## overview
+本样例基于Reg编程接口演示验证从RegTensor(reg_vector_compute基本单元)中搬运数据到MaskReg（mask寄存器），使用MaskGenWithRegTensor接口。支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
   <table>
  	<tr>
         <td>SCENARIO_NUM</td>
@@ -9,11 +9,11 @@
  	</tr>
  	<tr>
  		<td>1</td>
- 		<td>下采样场景：调用MaskGenWithRegTensor从RegTensor提取数据填充到MaskReg</td>
+ 		<td>下采样场景：调用MaskGenWithRegTensor从RegTensor提取data_padding到MaskReg</td>
  	</tr>
  	<tr>
  		<td>2</td>
- 		<td>复合计算场景：调用MaskGenWithRegTensor实现MaskReg的搬入，再作为Select的掩码完成选择计算</td>
+ 		<td>composite_compute场景：调用MaskGenWithRegTensor实现MaskReg的搬入，再作为Select的mask完成选择计算</td>
  	</tr>
  </table>
 
@@ -33,7 +33,7 @@
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── README.md                      // 样例介绍
 │   ├── move_reg_scenario_1.asc        // 场景1：下采样场景的AscendC实现
-│   └── move_reg_scenario_2.asc        // 场景2：复合计算场景的AscendC实现
+│   └── move_reg_scenario_2.asc        // 场景2：composite_compute场景的AscendC实现
 ```
 
 ## 样例描述
@@ -58,7 +58,7 @@
 - 调用实现
   使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
-### 场景2：复合计算场景
+### 场景2：composite_compute场景
 - 样例功能：  
   对根据mask中的比特位，选择对应位置的x或y中的值，当mask的比特位为1时，选取x中对应的元素；当mask的比特位为0时，选取y中对应的元素。
 - 样例规格：
@@ -74,7 +74,7 @@
 
 - 样例实现：  
   1. 调用LoadAlign加载选择操作数x、y到RegTensor
-  2. 调用LoadUnAlignPre/LoadUnAlign加载掩码操作数mask到RegTensor，每次迭代加载2个元素，即8字节64bit数据
+  2. 调用LoadUnAlignPre/LoadUnAlign加载mask_operations数mask到RegTensor，每次迭代加载2个元素，即8字节64bit数据
   3. 调用MaskGenWithRegTensor从mReg的前8字节提取64bit数据，按下采样模式填充到256bit MaskReg：每4个mask bit对应1个src bit，处理示意如图：  
   <img src="figures/move_reg_1.png">
   4. 调用Select接口，根据maskReg逐元素选择xReg或yReg中的元素，写入zReg中，如下图所示  
@@ -121,7 +121,7 @@
   | ---------------------------| -----------------------------| ---------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE`　　　| `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=下采样场景，2=复合计算场景 |
+  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=下采样场景，2=composite_compute场景 |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

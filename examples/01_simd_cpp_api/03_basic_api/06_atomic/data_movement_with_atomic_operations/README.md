@@ -1,8 +1,8 @@
-# DataCopy伴随原子操作样例
+# DataCopy伴随atomic_operations样例
 
-## 概述
+## overview
 
-本样例基于 `SetAtomicAdd` 和 `SetAtomicMax` 原子操作接口，介绍UB本地张量向GM搬运时，原子累加和原子最大值比较的实现流程。需要注意，在调用原子操作接口完成相关操作后，要调用 `DisableDmaAtomic()` 关闭原子模式，防止后续其他计算受影响。
+本样例基于 `SetAtomicAdd` 和 `SetAtomicMax` atomic_operations接口，介绍UB本地张量向GM搬运时，原子累加和原子最大值比较的实现流程。需要注意，在调用atomic_operations接口完成相关操作后，要调用 `DisableDmaAtomic()` 关闭原子模式，防止后续其他计算受影响。
 
 > **接口提示：** 除本样例使用的 `SetAtomicAdd`、`SetAtomicMax` 接口外，Ascend C还提供了 `SetAtomicMin`接口用于配置 VECOUT到GM的传输规则。`SetAtomicMin` 的调用方式与 `SetAtomicMax` 一致，只需替换函数名即可切换。
 
@@ -33,7 +33,7 @@
 
 <table border="2">
 <caption>表1：场景配置对照表</caption>
-<tr><th>scenarioNum</th><th>原子操作接口</th><th>输入Shape</th><th>输出Shape</th><th>数据类型</th><th>说明</th></tr>
+<tr><th>scenarioNum</th><th>atomic_operations接口</th><th>输入Shape</th><th>输出Shape</th><th>数据类型</th><th>说明</th></tr>
 <tr><td>1</td><td>SetAtomicAdd</td><td>[1, 256]（三个核读取相同）</td><td>[1, 256]</td><td>half</td><td>三个核读取相同输入，原子累加操作</td></tr>
 <tr><td>2</td><td>SetAtomicMax</td><td>[1, 256]×3（三个核读取不同）</td><td>[1, 256]</td><td>half</td><td>三个核读取不同输入，原子最大值比较操作</td></tr>
 </table>

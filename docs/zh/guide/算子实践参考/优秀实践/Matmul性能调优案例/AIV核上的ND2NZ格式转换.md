@@ -2,7 +2,7 @@
 
 ## 案例介绍<a name="section17413194624510"></a>
 
-本案例展示了在矩阵乘算子场景中，使用Matmul高阶API进行计算，对内轴（内轴即矩阵的行方向）非256字节对齐的输入矩阵，在AIV核上进行ND2NZ格式转换对算子性能提升的效果。为提升Cube单元的计算效率，ND格式的输入矩阵在执行Cube计算前会先转换为NZ格式，ND格式和NZ格式的具体内容可参考[数据格式](../../SIMD算子实现/矩阵编程（高阶API）/基础知识.md#zh-cn_topic_0000001622194138_section1453415011)。Matmul API内部使用随路ND2NZ指令同时进行格式转换以及数据搬运。但在数据非256字节对齐时，[随路ND2NZ指令](../../../../api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_GMToL1_ND2NZ.md)存在带宽利用率低的问题。因此输入矩阵的内轴非256字节对齐时，在进行Matmul计算前，利用AIV核上Vector计算单元完成ND格式到NZ格式的转换，可以避免随路非对齐数据搬运存在的效率低的问题，从而提升算子性能。
+本案例展示了在矩阵乘算子场景中，使用Matmulhigh_level_api进行计算，对内轴（内轴即矩阵的行方向）非256字节对齐的输入矩阵，在AIV核上进行ND2NZ格式转换对算子性能提升的效果。为提升Cube单元的计算效率，ND格式的输入矩阵在执行Cube计算前会先转换为NZ格式，ND格式和NZ格式的具体内容可参考[数据格式](../../SIMD算子实现/矩阵编程（high_level_api）/基础知识.md#zh-cn_topic_0000001622194138_section1453415011)。Matmul API内部使用随路ND2NZ指令同时进行格式转换以及data_move。但在数据非256字节对齐时，[随路ND2NZ指令](../../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md)存在带宽利用率低的问题。因此输入矩阵的内轴非256字节对齐时，在进行Matmul计算前，利用AIV核上Vector计算单元完成ND格式到NZ格式的转换，可以避免随路非对齐data_move存在的效率低的问题，从而提升算子性能。
 
 -   AIV核上的ND2NZ格式转换的适用场景
 
@@ -44,7 +44,7 @@
 </tbody>
 </table>
 
-当前案例使用的AI处理器共24个核，算子中开启高阶API Matmul的纯Cube模式。使用MDL模板，Tiling参数如下：
+当前案例使用的AI处理器共24个核，算子中开启high_level_api Matmul的纯Cube模式。使用MDL模板，Tiling参数如下：
 
 -   原始shape：M=1024, N= 4095, K=1024。
 -   单核shape：singleCoreM=128，singleCoreN=1408，singleCoreK=1024。
@@ -57,7 +57,7 @@
 
 ## 分析主要瓶颈点<a name="section221431704714"></a>
 
--   优化前的Cube流水图如下，由于使用了随路ND2NZ指令，在MTE2数据搬运过程中进行数据格式的转换，导致MTE2整体占比较高。![](../../../figures/zh-cn_image_0000002409729950.png)
+-   优化前的Cube流水图如下，由于使用了随路ND2NZ指令，在MTE2data_move过程中进行数据格式的转换，导致MTE2整体占比较高。![](../../../figures/zh-cn_image_0000002409729950.png)
 -   优化前的Profiling数据如下，可以看到只使用Cube单元执行计算，aic\_time最大耗时149.04us，其中aic\_mte2\_ratio占比很高。![](../../../figures/zh-cn_image_0000002381161446.png)
 
 ## 设计优化方案<a name="section33901368431"></a>
@@ -151,4 +151,4 @@
 
 ## 总结<a name="section8281219125011"></a>
 
-对于矩阵乘计算中矩阵内轴非256字节对齐的场景，随路ND2NZ指令的带宽利用率低，影响算子性能，通过在AIV核上进行ND2NZ的数据重排，提升算子整体性能。值得注意的是，带宽利用率与数据量有关，如果矩阵数据总量太小，即使是在AIV核上进行的ND2NZ转换也无法明显提升有效带宽，反而会因为引入了多核同步，导致算子端到端的性能劣化。
+对于矩阵乘计算中矩阵内轴非256字节对齐的场景，随路ND2NZ指令的带宽利用率低，影响算子性能，通过在AIV核上进行ND2NZ的data_reorder，提升算子整体性能。值得注意的是，带宽利用率与数据量有关，如果矩阵数据总量太小，即使是在AIV核上进行的ND2NZ转换也无法明显提升有效带宽，反而会因为引入了多核同步，导致算子端到端的性能劣化。

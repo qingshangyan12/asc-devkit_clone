@@ -1,8 +1,8 @@
 # L1到GM搬运兼容性样例
 
-## 概述
+## overview
 
-本样例演示L1数据搬运到GM的端到端流程，通过编译时宏隔离不同硬件实现。
+本样例演示L1data_move到GM的端到端流程，通过编译时宏隔离不同硬件实现。
 
 - Atlas A2/A3 训练/推理系列产品直接使用DataCopy接口进行搬运。
 - Ascend 950PR/950DT新架构不支持直接搬运，通过Mmad矩阵乘法计算输出到L0C Buffer，再从L0C Buffer通过Fixpipe搬运到GM。
@@ -43,7 +43,7 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[64, 128]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">data_copy_l1togm</td></tr>
   </table>
-- 样例实现：调用DataCopy指令实现GM到L1再到GM的数据搬运。
+- 样例实现：调用DataCopy指令实现GM到L1再到GM的data_move。
 
 ### Ascend 950PR/950DT
 

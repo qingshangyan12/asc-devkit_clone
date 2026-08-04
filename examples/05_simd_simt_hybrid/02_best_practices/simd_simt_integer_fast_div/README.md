@@ -1,6 +1,6 @@
 # SIMD与SIMT混合编程实现快速除法算子样例
 
-## 概述
+## overview
 
 本样例以固定除数的整数除法计算为例，介绍SIMD与SIMT混合编程场景下的整数除法优化方法。样例展示SIMT线程内直接使用普通除法，以及通过预计算参数后使用乘法和移位替代普通除法的性能差异。
 
@@ -55,9 +55,9 @@ output[i] = input[i] / divisor
 
 ## 样例实现
 
-两个Case采用相同的数据搬运流程：先将当前线程块负责的数据从GM搬运到UB，SIMT VF在UB上完成除法计算并将结果写入UB，最后将结果从UB写回GM。这样可以避免数据搬运差异影响性能对比，使性能差异主要来自普通除法和快速除法本身。
+两个Case采用相同的data_move流程：先将当前线程块负责的数据从GM搬运到UB，SIMT VF在UB上完成除法计算并将结果写入UB，最后将结果从UB写回GM。这样可以避免data_move差异影响性能对比，使性能差异主要来自普通除法和快速除法本身。
 
-两个Case共用的数据搬运和SIMT调用流程如下：
+两个Case共用的data_move和SIMT调用流程如下：
 
 ```cpp
 asc_copy_gm2ub_align(input_buf, input + block_offset, 1, blk_length, 0, 0, false, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
@@ -87,7 +87,7 @@ asc_copy_ub2gm_align(output + block_offset, output_buf, 1, blk_length, asc_store
 |:---|:---|
 | Task Duration(μs) | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。 |
 | aiv_time(μs) | Task 在 AI Vector Core 上的执行时间。 |
-| aiv_vec_time(μs) | 计算指令耗时。SIMT VF调用中的线程计算也体现在该类统计中。 |
+| aiv_vec_time(μs) | 计算指令耗时。SIMT vf_call中的线程计算也体现在该类统计中。 |
 | aiv_vec_ratio | 计算指令cycle数在total cycle数中的占用比。 |
 | aiv_scalar_time(μs) | scalar类型指令耗时。 |
 | aiv_scalar_ratio | scalar类型指令cycle数在total cycle数中的占用比。 |
@@ -163,7 +163,7 @@ $$
 $$
 
 其中 `magic` 和 `shift` 表示快速除法所需的乘法魔数和移位数。
-本样例中基于上述除法转换思路，在SIMD部分使用Scalar计算单元中的 `clz()`、`bcnt1()` 标量计算接口，获取快速除法所需的 `magic` 和 `shift`，供SIMT线程复用。
+本样例中基于上述除法转换思路，在SIMD部分使用Scalar计算单元中的 `clz()`、`bcnt1()` scalar_compute接口，获取快速除法所需的 `magic` 和 `shift`，供SIMT线程复用。
 
 **关键代码**：
 
@@ -289,7 +289,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

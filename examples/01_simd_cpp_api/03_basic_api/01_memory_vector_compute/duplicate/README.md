@@ -1,8 +1,8 @@
 # Duplicate样例
 
-## 概述
+## overview
 
-本样例在数据填充场景下，基于Duplicate API实现将标量值或立即数复制多次并填充到向量中。Duplicate API支持将单个标量值或立即数复制指定次数，填充到目的Tensor的所有元素中，常用于初始化Tensor、常量填充、掩码生成等场景。
+本样例在data_padding场景下，基于Duplicate API实现将标量值或立即数复制多次并填充到向量中。Duplicate API支持将单个标量值或立即数复制指定次数，填充到目的Tensor的所有元素中，常用于初始化Tensor、常量填充、mask生成等场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -28,7 +28,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例展示了使用Duplicate API实现数据填充功能，将标量值或立即数复制多次并填充到向量中。Duplicate API适用于需要将常量值填充到Tensor的场景，例如Tensor初始化、常量填充、掩码生成等。通过value参数指定要填充的标量值，通过count参数指定填充的元素个数。所用API详细介绍请参考[Duplicate API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0088.html)。
+  本样例展示了使用Duplicate API实现data_padding功能，将标量值或立即数复制多次并填充到向量中。Duplicate API适用于需要将常量值填充到Tensor的场景，例如Tensor初始化、常量填充、mask生成等。通过value参数指定要填充的标量值，通过count参数指定填充的元素个数。所用API详细介绍请参考[Duplicate API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0088.html)。
 
 - 样例规格：  
   <table border="2" align="center">
@@ -44,17 +44,17 @@
   </table>
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入x[1,256]，输出y[1,256]的Duplicate数据填充样例。
+  本样例中实现的是固定shape为输入x[1,256]，输出y[1,256]的Duplicatedata_padding样例。
   
   Duplicate API参数说明：
   - dst：目的操作数，用于存储填充结果
-  - value：要填充的标量值或立即数，本样例中为half类型的常量值18.0
+  - value：要填充的标量值或立即数，本样例中为half_type的常量值18.0
   - count：填充的元素个数，本样例中为256
 
   - Kernel实现  
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
     - 调用Duplicate接口，将标量值填充到输出Tensor的所有元素中
-    - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
+    - 调用DataCopybasic_api，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -79,7 +79,7 @@
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash

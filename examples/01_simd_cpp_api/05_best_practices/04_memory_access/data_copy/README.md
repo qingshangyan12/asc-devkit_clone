@@ -1,9 +1,9 @@
 # DataCopy 最佳实践样例
 
 
-## 概述
+## overview
 
-本样例展示 Global Memory 到 UB、Global Memory 到 L1 的数据搬运实践。样例不包含计算逻辑，重点用于观察 MTE2 搬运行为，以及分块粒度、非对齐数据搬运、L2Cache 复用、同地址访问冲突规避对数据搬运性能的影响，对比 DataCopy/DataCopyPad 在不同搬运模式下的性能表现。
+本样例展示 Global Memory 到 UB、Global Memory 到 L1 的data_move实践。样例不包含计算逻辑，重点用于观察 MTE2 搬运行为，以及分块粒度、非对齐data_move、L2Cache 复用、同地址访问冲突规避对data_move性能的影响，对比 DataCopy/DataCopyPad 在不同搬运模式下的性能表现。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -38,14 +38,14 @@
 
 为便于表格展示，下文将 Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品简称为 Atlas A2/A3 系列，将 Ascend 950PR/Ascend 950DT 简称为 Ascend 950 系列。
 
-本章围绕数据搬运优化中最常见的几个问题展开：先说明性能指标含义，再分别比较分块粒度、非对齐数据、L2Cache 复用和多核同地址访问冲突。每个优化点都包含实现方式、对比方式、性能数据和结论，便于将代码行为和性能变化对应起来。
+本章围绕data_move优化中最常见的几个问题展开：先说明性能指标含义，再分别比较分块粒度、非对齐数据、L2Cache 复用和多核同地址访问冲突。每个优化点都包含实现方式、对比方式、性能数据和结论，便于将代码行为和性能变化对应起来。
 
 ### 核心特性总览
 
 <table>
 <tr><th>优化点</th><th>主要观察对象</th><th>对比方法</th></tr>
 <tr><td>分块粒度</td><td>单次 DataCopy 搬运大小对 MTE2 效率的影响</td><td>保持矩阵规模不变，调整 <code>TILE_M/TILE_N</code></td></tr>
-<tr><td>非对齐数据搬运</td><td>非整除 shape 对搬运开销的影响</td><td>保持分块大小不变，将 <code>N=12288</code> 改为 <code>N=12287</code></td></tr>
+<tr><td>非对齐data_move</td><td>非整除 shape 对搬运开销的影响</td><td>保持分块大小不变，将 <code>N=12288</code> 改为 <code>N=12287</code></td></tr>
 <tr><td>L2Cache 复用</td><td>重复访问相同 GM 数据时的 Cache 收益</td><td>比较整块重复搬运和 N 方向分片后重复搬运</td></tr>
 <tr><td>同地址冲突规避</td><td>多核同时访问相同 GM 地址段的冲突影响</td><td>比较所有核同序访问和按核错开访问</td></tr>
 </table>
@@ -176,7 +176,7 @@ Ascend 950 系列按 GM 带宽约 1.6TB/s 估算，理论耗时约 188.74μs。�
 - GM 到 L1 场景中，增大 `TILE_N` 后，Atlas A2/A3 系列、Ascend 950 系列的端到端性能均提升约 29% 以上，说明减少过小搬运粒度带来的循环与指令开销后，MTE2 搬运效率更高。
 - 实际配置时建议在片上空间允许的前提下优先增大单次搬运大小，同时保持分块不超过 UB/L1 可用缓存。单次搬运字节数越大、`mLoopCount/nLoopCount` 越少，DataCopy 指令数量和循环控制开销越低。
 
-### 优化点2：非对齐数据搬运影响
+### 优化点2：非对齐data_move影响
 
 **实现方式**：非对齐数据场景复用与对齐场景相同的搬运流程，仅改变矩阵 `N` 维，使最后一个搬运块无法按完整列宽覆盖。
 
@@ -455,7 +455,7 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

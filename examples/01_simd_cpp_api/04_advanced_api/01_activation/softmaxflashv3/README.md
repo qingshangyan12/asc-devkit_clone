@@ -1,8 +1,8 @@
 # SoftmaxFlashV3样例
 
-## 概述
+## overview
 
-本样例在大模型训练注意力优化场景下，基于SoftmaxFlashV3高阶API实现softmaxflashv3单算子。该API是SoftmaxFlash增强版本，对应Softmax PASA算法，在V2基础上增加了均值（mean）计算，通过alpha参数进行数值稳定性优化，适用于需要更高数值精度的softmax计算场景。本样例使用half（输入/输出）和float（统计值）数据类型，输入Tensor shape为[8, 2048]，完成SoftmaxFlashV3注意力计算。
+本样例在大模型训练注意力优化场景下，基于SoftmaxFlashV3high_level_api实现softmaxflashv3单算子。该API是SoftmaxFlash增强版本，对应Softmax PASAalgorithms，在V2基础上增加了均值（mean）计算，通过alpha参数进行数值稳定性优化，适用于需要更高数值精度的softmax计算场景。本样例使用half（输入/输出）和float（统计值）数据类型，输入Tensor shape为[8, 2048]，完成SoftmaxFlashV3注意力计算。
 
 ## 本样例支持的产品及CANN软件版本
 

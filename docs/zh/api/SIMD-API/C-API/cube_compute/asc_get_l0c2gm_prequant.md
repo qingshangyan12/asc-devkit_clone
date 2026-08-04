@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-数据搬运过程中进行随路量化时，通过调用该接口获取量化操作前矢量的起始地址。
+data_move过程中进行accompanying_quantization时，通过调用该接口获取quantization前矢量的起始地址。
 
 ## 函数原型
 
@@ -40,7 +40,7 @@ __aicore__ inline uint64_t asc_get_l0c2gm_prequant()
 
 ## 返回值说明
 
-量化操作前矢量的起始地址。
+quantization前矢量的起始地址。
 
 ## 流水类型
 

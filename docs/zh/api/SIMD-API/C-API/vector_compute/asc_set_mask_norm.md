@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-设置Mask模式为Normal模式，该模式为系统默认模式。该模式下，Mask参数可控制高维切分计算过程中单次迭代内参与计算的元素。
+设置Mask模式为Normal模式，该模式为系统默认模式。该模式下，Mask参数可控制high_dim_split计算过程中单次迭代内参与计算的元素。
 
 ## 函数原型
 
@@ -56,13 +56,13 @@ PIPE_S
 asc_set_mask_norm();
 asc_set_vector_mask(0xffffffffffffffff, 0xffffffffffffffff);    // 设置每个迭代内所有元素均参与计算。
 
-// 进行高维切分计算
+// 进行high_dim_split计算
 constexpr uint32_t total_length = 128; //total_length指参与计算的数据总长度
 __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];
 
-uint8_t repeat = 1; // 1个repeat可以处理128个half类型的数据
+uint8_t repeat = 1; // 1个repeat可以处理128个half_type的数据
 uint8_t dst_block_stride = 1;
 uint8_t src0_block_stride = 1;
 uint8_t src1_block_stride = 1;

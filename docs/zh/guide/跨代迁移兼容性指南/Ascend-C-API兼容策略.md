@@ -17,14 +17,14 @@
 </th>
 </tr>
 </thead>
-<tbody><tr id="row171096295916"><td class="cellrowborder" valign="top" width="18.01%" headers="mcps1.2.3.1.1 "><p id="p101091029492"><a name="p101091029492"></a><a name="p101091029492"></a>高阶API</p>
+<tbody><tr id="row171096295916"><td class="cellrowborder" valign="top" width="18.01%" headers="mcps1.2.3.1.1 "><p id="p101091029492"><a name="p101091029492"></a><a name="p101091029492"></a>high_level_api</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.99%" headers="mcps1.2.3.1.2 "><p id="p16109829497"><a name="p16109829497"></a><a name="p16109829497"></a>高阶API在同领域内可保证兼容，特定领域扩展特性不保证兼容。</p>
+<td class="cellrowborder" valign="top" width="81.99%" headers="mcps1.2.3.1.2 "><p id="p16109829497"><a name="p16109829497"></a><a name="p16109829497"></a>high_level_api在同领域内可保证兼容，特定领域扩展特性不保证兼容。</p>
 </td>
 </tr>
-<tr id="row1110915291898"><td class="cellrowborder" valign="top" width="18.01%" headers="mcps1.2.3.1.1 "><p id="p31097291995"><a name="p31097291995"></a><a name="p31097291995"></a>基础API</p>
+<tr id="row1110915291898"><td class="cellrowborder" valign="top" width="18.01%" headers="mcps1.2.3.1.1 "><p id="p31097291995"><a name="p31097291995"></a><a name="p31097291995"></a>basic_api</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.99%" headers="mcps1.2.3.1.2 "><p id="p31097296914"><a name="p31097296914"></a><a name="p31097296914"></a>基础API分为可兼容的基础API和ISASI基础API；兼容的API在所有架构上均能兼容；ISASI API为体系架构相关的API，不保证跨架构版本的兼容性，例如CUBE侧的计算接口LoadData、Mmad等。</p>
+<td class="cellrowborder" valign="top" width="81.99%" headers="mcps1.2.3.1.2 "><p id="p31097296914"><a name="p31097296914"></a><a name="p31097296914"></a>basic_api分为可兼容的basic_api和ISASIbasic_api；兼容的API在所有架构上均能兼容；ISASI API为体系架构相关的API，不保证跨架构版本的兼容性，例如CUBE侧的计算接口LoadData、Mmad等。</p>
 </td>
 </tr>
 <tr id="row81091291898"><td class="cellrowborder" valign="top" width="18.01%" headers="mcps1.2.3.1.1 "><p id="p161091129692"><a name="p161091129692"></a><a name="p161091129692"></a>语言扩展层C API</p>

@@ -1,8 +1,8 @@
-# 标量原子操作样例
+# 标量atomic_operations样例
 
-## 概述
+## overview
 
-本样例基于 `AtomicAdd` 和 `AtomicCas` 接口，介绍在 Global Memory（GM）地址上进行标量原子加和标量原子比较交换的实现流程。原子操作可保证多个核并行访问同一内存地址时的数据一致性，避免数据竞争问题。注意，原子操作涉及标量计算单元，如果与搬运单元（MTE2/MTE3）存在数据依赖，需手动插入同步事件。
+本样例基于 `AtomicAdd` 和 `AtomicCas` 接口，介绍在 Global Memory（GM）地址上进行标量原子加和标量原子比较交换的实现流程。atomic_operations可保证多个核并行访问同一内存地址时的数据一致性，避免数据竞争问题。注意，atomic_operations涉及scalar_compute单元，如果与搬运单元（MTE2/MTE3）存在数据依赖，需手动插入同步事件。
 
 > **接口提示：** 除本样例使用的 `AtomicAdd`、`AtomicCas` 接口外，Ascend C 还提供了 `AtomicExch`、`AtomicMax`、`AtomicMin` 接口，调用方式与 `AtomicAdd` 一致，只需替换函数名即可切换。
 
@@ -37,7 +37,7 @@
 
 <table border="2">
 <caption>表1：场景配置对照表</caption>
-<tr><th>scenarioNum</th><th>原子操作接口</th><th>输出Shape</th><th>数据类型</th><th>说明</th></tr>
+<tr><th>scenarioNum</th><th>atomic_operations接口</th><th>输出Shape</th><th>数据类型</th><th>说明</th></tr>
 <tr><td>1</td><td>AtomicAdd</td><td>[1, 256]</td><td>int32</td><td>三个核并行对GM首个元素进行原子加1操作</td></tr>
 <tr><td>2</td><td>AtomicCas</td><td>[1, 256]</td><td>uint32</td><td>三个核并行对GM首个元素进行原子比较交换（如果值为1则替换为2）</td></tr>
 </table>

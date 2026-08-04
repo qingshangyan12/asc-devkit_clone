@@ -8,7 +8,7 @@
 
 ### 函数命名
 
-**基础API（`basic_api/`）：** 大驼峰（PascalCase）
+**basic_api（`basic_api/`）：** 大驼峰（PascalCase）
 
 ```text
 Add, Sub, Mul, DataCopy, SetVectorMask, PipeBarrier
@@ -20,7 +20,7 @@ Add, Sub, Mul, DataCopy, SetVectorMask, PipeBarrier
 asc_add, asc_axpy, asc_axpy_sync
 ```
 
-**高阶API（`adv_api/`）：** 大驼峰（PascalCase）
+**high_level_api（`adv_api/`）：** 大驼峰（PascalCase）
 
 ```text
 Axpy, Exp, LayerNorm, GroupedMatmul
@@ -85,7 +85,7 @@ T, U, isReuseSource
 
 ### 公开头文件（三层guard体系）
 
-采用内部头哨兵的基础API和高阶API公开头文件使用三层保护：
+采用内部头哨兵的basic_api和high_level_api公开头文件使用三层保护：
 
 ```cpp
 // Layer 1: 内部头文件哨兵（防止递归include）
@@ -123,9 +123,9 @@ T, U, isReuseSource
 
 **命名规则：** `ASCENDC_` +模块路径（斜杠变下划线，全大写） + `_H`
 
-> **注意：** 高阶API头文件（`adv_api/`）部分使用 `LIB_` 或 `ADV_API_` 前缀（如 `LIB_MATH_SIN_H`、`ADV_API_CONV_COMMON_CONV_COMMON_H`），为历史遗留约定。新代码应尽量使用 `ASCENDC_` 前缀。
+> **注意：** high_level_api头文件（`adv_api/`）部分使用 `LIB_` 或 `ADV_API_` 前缀（如 `LIB_MATH_SIN_H`、`ADV_API_CONV_COMMON_CONV_COMMON_H`），为历史遗留约定。新代码应尽量使用 `ASCENDC_` 前缀。
 >
-> **注意：** 部分基础API头文件的Layer 2 guard使用 `MODULE`/`INTERFACE` 而非 `KERNEL`/`INTF`（如 `kernel_operator_vec_binary_intf.h` 的guard为 `ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H`），而Layer 1 undef使用 `KERNEL`/`INTF`。这是历史遗留命名，新代码应统一使用文件名转换后的宏名。
+> **注意：** 部分basic_api头文件的Layer 2 guard使用 `MODULE`/`INTERFACE` 而非 `KERNEL`/`INTF`（如 `kernel_operator_vec_binary_intf.h` 的guard为 `ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H`），而Layer 1 undef使用 `KERNEL`/`INTF`。这是历史遗留命名，新代码应统一使用文件名转换后的宏名。
 
 ### 实现头文件（额外 `#pragma message` 警告）
 
@@ -156,7 +156,7 @@ C API使用独立的哨兵命名空间：
 
 ### 禁止 `#pragma once`
 
-本项目原则上不使用 `#pragma once`，基础API、高阶API和C API的公开头文件使用 `#ifndef` / `#define` / `#endif` 风格。
+本项目原则上不使用 `#pragma once`，basic_api、high_level_api和C API的公开头文件使用 `#ifndef` / `#define` / `#endif` 风格。
 
 ---
 
@@ -223,7 +223,7 @@ C API使用独立的哨兵命名空间：
 
 ### 公共入口头文件
 
-高阶API统一入口文件（如 `kernel_api.h`）直接包含各子头文件，`__NPU_ARCH__` 架构守卫由各子头文件内部管理：
+high_level_api统一入口文件（如 `kernel_api.h`）直接包含各子头文件，`__NPU_ARCH__` 架构守卫由各子头文件内部管理：
 
 ```cpp
 #include "math/axpy.h"
@@ -248,7 +248,7 @@ __aicore__ inline void Add(...);
 | 子命名空间 | 用途 |
 |-----------|------|
 | `AscendC::Std` | 标准库兼容层 |
-| `AscendC::Simt` | SIMT编程模型 |
+| `AscendC::Simt` | SIMTprogramming_model |
 | `AscendC::Te` | Tensor Engine |
 | `AscendC::Reg` | Register Compute |
 
@@ -417,7 +417,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 
 ### `CHECK_FUNC_HIGHLEVEL_API`
 
-高阶API实现函数或接口函数中，在函数体首行调用：
+high_level_api实现函数或接口函数中，在函数体首行调用：
 
 ```cpp
 template <typename T, typename U, bool isReuseSource>
@@ -494,8 +494,8 @@ clang-format -i --style=file <file>
 
 | 风格 | 前缀符号 | 适用场景 | 示例位置 |
 |------|---------|---------|---------|
-| `\brief` / `\param` / `\note` | 反斜杠 `\` | 高阶API公开头文件 | `include/adv_api/math/sin.h` |
-| `@ingroup` / `@brief` | @ 符号 | 基础API公开头文件 | `include/basic_api/kernel_operator_vec_binary_intf.h` |
+| `\brief` / `\param` / `\note` | 反斜杠 `\` | high_level_api公开头文件 | `include/adv_api/math/sin.h` |
+| `@ingroup` / `@brief` | @ 符号 | basic_api公开头文件 | `include/basic_api/kernel_operator_vec_binary_intf.h` |
 | `ingroup` / `brief` | 无前缀 | impl内部头文件 | `impl/basic_api/kernel_operator_common_intf_impl.h` |
 
 ### 文件头注释
@@ -510,9 +510,9 @@ clang-format -i --style=file <file>
 ```
 
 - `\file` 后填文件名
-- `\brief` 可填空（基础API）或写一行功能描述（高阶API）
+- `\brief` 可填空（basic_api）或写一行功能描述（high_level_api）
 
-高阶API可包含公式描述：
+high_level_api可包含公式描述：
 
 ```cpp
 /*!
@@ -524,7 +524,7 @@ clang-format -i --style=file <file>
 
 ### 函数/类注释
 
-**高阶API风格（`\brief` / `\param` / `\note`）**
+**high_level_api风格（`\brief` / `\param` / `\note`）**
 
 ```cpp
 /*!
@@ -552,7 +552,7 @@ clang-format -i --style=file <file>
 - `\param [out]` / `\param [in]` +参数说明
 - `\note` +约束和注意事项
 
-**基础API风格（`@ingroup` / `@brief` +分隔线）**
+**basic_api风格（`@ingroup` / `@brief` +分隔线）**
 
 ```cpp
 /* **************************************************************************************************
@@ -651,7 +651,7 @@ __aicore__ inline __gm__ uint8_t* SetDumpWorkSpacePtr(__gm__ uint8_t* workspace)
 // Please use Fill instead!
 ```
 
-**功能分组线（基础API）**
+**功能分组线（basic_api）**
 
 ```cpp
 /* **************************************************************************************************

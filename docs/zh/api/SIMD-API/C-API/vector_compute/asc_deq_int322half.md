@@ -27,7 +27,7 @@
 
 ## 功能说明
 
-对输入的int32_t类型的数据按元素做量化并转换为half类型。计算公式如下：
+对输入的int32_t类型的数据按元素做量化并转换为half_type。计算公式如下：
 $$
 dst_i = Cast(src_i * scale)
 $$
@@ -41,7 +41,7 @@ $$
     __aicore__ inline void asc_deq_int322half(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t count)
     ```
 
-- 高维切分计算
+- high_dim_split计算
 
     ```cpp
     __aicore__ inline void asc_deq_int322half(__ubuf__ half* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
@@ -80,7 +80,7 @@ PIPE_V
 
 - 需配合[asc_set_deq_scale](./asc_set_deq_scale.md)接口的非向量模式使用，该接口用于设置量化参数。
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 
 ## 调用示例
 
@@ -89,6 +89,6 @@ constexpr uint64_t total_length = 128;    // total_length指参与计算的数�
 __ubuf__ int32_t src[total_length];
 __ubuf__ half dst[total_length];
 asc_set_deq_scale(2.0);
-…… // 数据搬运及同步操作
+…… // data_move及同步操作
 asc_deq_int322half(dst, src, total_length);
 ```

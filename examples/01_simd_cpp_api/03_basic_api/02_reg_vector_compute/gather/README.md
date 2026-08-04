@@ -1,7 +1,7 @@
 # gather样例
 
-## 概述
-本样例基于Reg编程接口实现按索引从RegTensor(Reg矢量计算基本单元)收集元素功能。
+## overview
+本样例基于Reg编程接口实现按索引从RegTensor(reg_vector_compute基本单元)收集元素功能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -25,7 +25,7 @@
   演示Gather接口（源操作数为寄存器）的用法。Gather根据索引从源向量中收集元素：dst[i] = src[index[i]]。
 
   **Gather模式**
-  - 源数据为128个元素的half类型向量，索引为128个元素的uint16_t类型向量，输出为128个元素的half类型向量。
+  - 源数据为128个元素的half_type向量，索引为128个元素的uint16_t类型向量，输出为128个元素的half_type向量。
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>

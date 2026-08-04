@@ -1,10 +1,10 @@
-# 使用高阶API时配套的Tiling实现
+# 使用high_level_api时配套的Tiling实现
 
-本文属于扩展内容，介绍使用高阶API时配套的Host侧Tiling实现。Matmul、Conv等高阶API通常提供配套的Host侧Tiling类，用于根据shape、dtype计算切分参数。开发者需要把配套Tiling类的计算结果传到Kernel侧，并使用同一份数据初始化高阶API对象。
+本文属于扩展内容，介绍使用high_level_api时配套的Host侧Tiling实现。Matmul、Conv等high_level_api通常提供配套的Host侧Tiling类，用于根据shape、dtype计算切分参数。开发者需要把配套Tiling类的计算结果传到Kernel侧，并使用同一份数据初始化high_level_api对象。
 
-本文构造一个简化的aclnn工程化算子MatmulCustom作为示例。该算子只计算`C = A * B`，用于说明`MultiCoreMatmulTiling`和`TCubeTiling`在算子工程中的接入流程，不包含Bias、激活函数或多分支逻辑。
+本文构造一个简化的aclnn工程化算子MatmulCustom作为示例。该算子只计算`C = A * B`，用于说明`MultiCoreMatmulTiling`和`TCubeTiling`在算子工程中的接入流程，不包含Bias、activation_functions或多分支逻辑。
 
-## 高阶API Tiling的数据流
+## high_level_api Tiling的数据流
 
 配套流程如下：
 
@@ -13,14 +13,14 @@ flowchart LR
     A["输入shape、dtype"] --> B["Host侧调用配套Tiling类计算切分参数"]
     B --> C["写入算子TilingData"]
     C --> D["传递到Kernel侧"]
-    D --> E["初始化高阶API对象并计算"]
+    D --> E["初始化high_level_api对象并计算"]
 ```
 
-配套Tiling类负责计算高阶API内部使用的多核切分和核内切分参数，算子TilingData负责把计算结果传到Kernel侧。
+配套Tiling类负责计算high_level_api内部使用的多核切分和核内切分参数，算子TilingData负责把计算结果传到Kernel侧。
 
 ## 定义包含TCubeTiling的TilingData
 
-高阶API的Tiling结构体可以通过标准C++方式或宏定义方式组织。本例为了展示`TILING_DATA_FIELD_DEF_STRUCT`的使用方法，选择宏定义方式嵌套`TCubeTiling`：
+high_level_api的Tiling结构体可以通过标准C++方式或宏定义方式组织。本例为了展示`TILING_DATA_FIELD_DEF_STRUCT`的使用方法，选择宏定义方式嵌套`TCubeTiling`：
 
 ```cpp
 #ifndef MATMUL_CUSTOM_TILING_H
@@ -87,7 +87,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
     matmulTiling.EnableBias(false);
     matmulTiling.SetBufferSpace(-1, -1, -1);
 
-    // 计算Matmul高阶API所需的多核切分和核内切分参数。
+    // 计算Matmulhigh_level_api所需的多核切分和核内切分参数。
     MatmulCustomTilingData tiling;
     if (matmulTiling.GetTiling(tiling.cubeTilingData) == -1) {
         return ge::GRAPH_FAILED;
@@ -105,7 +105,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
     // Kernel启动核数需要与Tiling结果中的实际使用核数一致。
     context->SetSimdNumBlocks(static_cast<uint32_t>(usedCoreNum));
 
-    // 系统workspace供高阶API内部计算使用，并与算子自定义workspace相加。
+    // 系统workspace供high_level_api内部计算使用，并与算子自定义workspace相加。
     size_t userWorkspaceSize = 0;
     size_t systemWorkspaceSize =
         static_cast<size_t>(platform.GetLibApiWorkSpaceSize());
@@ -120,7 +120,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
 
 ### 设置workspace
 
-Matmul高阶API可能需要系统workspace。Host侧通过`GetLibApiWorkSpaceSize()`获取系统workspace大小，并与算子自定义workspace相加：
+Matmulhigh_level_api可能需要系统workspace。Host侧通过`GetLibApiWorkSpaceSize()`获取系统workspace大小，并与算子自定义workspace相加：
 
 ```cpp
 size_t userWorkspaceSize = 0;
@@ -130,9 +130,9 @@ size_t* currentWorkspace = context->GetWorkspaceSizes(1);
 currentWorkspace[0] = systemWorkspaceSize + userWorkspaceSize;
 ```
 
-即使算子没有自定义临时数据，也需要检查高阶API是否使用系统workspace，不能直接把workspace设为0。
+即使算子没有自定义临时数据，也需要检查high_level_api是否使用系统workspace，不能直接把workspace设为0。
 
-系统workspace和用户workspace的通用设置方法请参考[如何使用workspace](../../../附录/常用操作/如何使用workspace.md)。
+系统workspace和用户workspace的通用设置方法请参考[如何使用workspace](../../../appendix/常用操作/如何使用workspace.md)。
 
 ### 校验输入条件
 
@@ -216,4 +216,4 @@ Host侧`SetAType`、`SetBType`和`SetCType`配置的位置、format、dtype，�
 
 - [Host侧Tiling实现](./Host侧Tiling实现.md)：普通TilingData和Tiling函数的基本流程。
 - [Kernel侧算子实现](./Kernel侧算子实现.md)：Kernel入口、TilingData解析和Kernel编程流程。
-- [Matmul-Tiling类](../../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling类/Matmul-Tiling类.md)：配套Tiling类接口说明。
+- [Matmul_Tiling](../../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Tiling/Matmul_Tiling.md)：配套Tiling类接口说明。

@@ -1,5 +1,5 @@
 # Matmul M/N轴方向的流水并行样例
-## 概述
+## overview
 M/N轴方向的流水并行的Matmul样例。该功能的应用场景为输入矩阵的K很小，但M或N很大的场景，即singleCoreK<=baseK，但singleCoreM远大于baseM或singleCoreN远大于baseN。使能M/N方向流水并行功能可能会带来性能收益。
 
 ## 本样例支持的产品及CANN软件版本
@@ -23,7 +23,7 @@ M/N轴方向的流水并行的Matmul样例。该功能的应用场景为输入�
 ```
 ## 样例描述
 - 样例功能：  
-  本样例调用Matmul高阶API对输入的A，B矩阵做矩阵乘和加bias偏置。在定义Matmul对象时，将配置scheduleType等参数的MatmulConfig作为模板参数传入，使能M/N轴方向的流水并行功能。本样例以MDL模板且N方向流水并行为例，对于Norm模板或M方向流水并行功能也可以参考该样例的实现。
+  本样例调用Matmulhigh_level_api对输入的A，B矩阵做矩阵乘和加bias偏置。在定义Matmul对象时，将配置scheduleType等参数的MatmulConfig作为模板参数传入，使能M/N轴方向的流水并行功能。本样例以MDL模板且N方向流水并行为例，对于Norm模板或M方向流水并行功能也可以参考该样例的实现。
 
 - 样例规格：  
   本样例中：M = 128, N = 7680, K = 16
@@ -80,7 +80,7 @@ M/N轴方向的流水并行的Matmul样例。该功能的应用场景为输入�
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py    # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

@@ -1,7 +1,7 @@
 # ld_st_reg_mask样例
 
-## 概述
-本样例基于Reg编程接口实现UB(Unified Buffer)对MaskReg(掩码寄存器)的搬入搬出，以及使用mask进行掩码搬出的操作。支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+## overview
+本样例基于Reg编程接口实现UB(Unified Buffer)对MaskReg(mask寄存器)的搬入搬出，以及使用mask进行mask搬出的操作。支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
     <table>
 	 	<tr>
         <td>SCENARIO_NUM</td>
@@ -13,7 +13,7 @@
 	 	</tr>
 	 	<tr>
 	 		<td>2</td>
-	 		<td>复合计算场景：使用LoadAlign实现MaskReg的搬入，再作为Select的掩码完成选择计算</td>
+	 		<td>composite_compute场景：使用LoadAlign实现MaskReg的搬入，再作为Select的mask完成选择计算</td>
 	 	</tr>
 	 </table>
 
@@ -33,7 +33,7 @@
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── README.md                      // 样例介绍
 │   ├── ld_st_reg_mask_scenario_1.asc  // 场景1：基础搬运场景的AscendC实现
-│   └── ld_st_reg_mask_scenario_2.asc  // 场景2：复合计算场景的AscendC实现
+│   └── ld_st_reg_mask_scenario_2.asc  // 场景2：composite_compute场景的AscendC实现
 ```
 
 ## 样例描述
@@ -56,11 +56,11 @@
 </p>
 
   1. 在CopyVF函数里，调用LoadAlign接口从UB搬运256bit(32*uint8_t)数据到MaskReg，以实现mask的动态设置。本样例中，32个uint8_t数据设置为1,0,...,1，即第一个数和最后一个数为1(b'00000001)，因为芯片每次从低位读取数字，所以这32个数字最终填充到MaskReg中为b'1000...1...000。
-  2. 调用Duplicate接口进行数据填充，MaskReg可以指示计算过程中参与计算的元素，由step1可知MaskReg中第1个bit和第249个bit为1，使用该掩码将只填充RegTensor第1个数和第249个数为2。
+  2. 调用Duplicate接口进行data_padding，MaskReg可以指示计算过程中参与计算的元素，由step1可知MaskReg中第1个bit和第249个bit为1，使用该mask将只填充RegTensor第1个数和第249个数为2。
   3. 使用StoreAlign接口将RegTensor内的结果保存到UB。
   4. 将MaskReg中的bit位全部置为1，通过StoreAlign接口将MaskReg中的数据保存到UB(地址=step3中的保存地址+256B)，实现MaskReg数据存储在UB上的功能。对应32个uint8_t数，每个数的每位比特位都为1，因此每个数的值都是255(0xFF)。
 
-### 场景2：复合计算场景
+### 场景2：composite_compute场景
 - 样例功能：  
   对根据maskReg中的比特位，选择对应位置的xReg或yReg向量中的值，当mask的比特位为1时，选取src0中对应的元素；当mask的比特位为0时，选取src1中对应的元素。
 - 样例规格：
@@ -74,7 +74,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_mask_scenario_2</td></tr>
   </table>
 - 样例实现：  
-   SelectVF函数内，调用LoadAlign接口将掩码数据从UB搬入MaskReg，再传入Select接口进行计算，结果写回UB。
+   SelectVF函数内，调用LoadAlign接口将mask数据从UB搬入MaskReg，再传入Select接口进行计算，结果写回UB。
 
 - 调用实现  
   使用内核调用符<<<>>>调用核函数。
@@ -116,7 +116,7 @@
   | ---------------------------| -----------------------------| ---------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE`　　　| `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=基础搬运场景，2=复合计算场景 |
+  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=基础搬运场景，2=composite_compute场景 |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

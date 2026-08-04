@@ -1,4 +1,4 @@
-# 直方图计算
+# histogram_compute
 
 -   **[asc_cumulative_histogram](asc_cumulative_histogram.md)**
 

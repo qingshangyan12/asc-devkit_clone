@@ -1,8 +1,8 @@
 # SIMT printf功能实现样例
 
-## 概述
+## overview
 
-本样例演示在SIMT编程下使用`printf()`接口实现上板打印进行功能调试的方法。
+本样例演示在SIMT编程下使用`printf()`接口实现onboard_print进行功能调试的方法。
 
 ## 支持的产品
 

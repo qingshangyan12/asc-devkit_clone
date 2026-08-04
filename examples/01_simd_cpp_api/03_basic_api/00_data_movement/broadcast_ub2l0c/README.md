@@ -1,6 +1,6 @@
 # BroadCastVecToMM样例
 
-## 概述
+## overview
 本样例基于BroadCastVecToMM实现数据广播搬运，将位于UB（Unified Buffer）上数据进行广播并搬运到L0C Buffer。
 
 ## 本样例支持的产品及CANN软件版本
@@ -39,9 +39,9 @@
 - 样例实现：
 
   - kernel实现
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer），并将广播后的数据搬出到GM（Global Memory）。
-    - 调用BroadCastVecToMM基础API，将UB（Unified Buffer）上的数据从[1, 16]广播到[16, 16]，并搬运到L0C Buffer。
-    - 调用DataCopy增强数据搬运接口，将广播后的数据从L0C Buffer搬运到UB（Unified Buffer）。
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到UB（Unified Buffer），并将广播后的数据搬出到GM（Global Memory）。
+    - 调用BroadCastVecToMMbasic_api，将UB（Unified Buffer）上的数据从[1, 16]广播到[16, 16]，并搬运到L0C Buffer。
+    - 调用DataCopy增强data_move接口，将广播后的数据从L0C Buffer搬运到UB（Unified Buffer）。
 
   - 调用实现
 
@@ -65,7 +65,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2002 ..;make -j;                      # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

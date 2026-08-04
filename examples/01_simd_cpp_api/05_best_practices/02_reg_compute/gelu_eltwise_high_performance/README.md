@@ -1,7 +1,7 @@
 # Gelu+Element-wise高性能优化样例
 
 
-## 概述
+## overview
 
 本样例以Gelu+Element-wise计算为例（在Gelu后面再引入一系列的Element-wise计算操作，增加计算深度），介绍RegBase的向量性能调优方法，样例展示并行度调整、循环拆分和循环展开之后的性能收益情况。
 
@@ -99,8 +99,8 @@ __simd_vf__ inline static void GeluEltwiseBasic(
     AscendC::Reg::RegTensor<float> xReg, yReg;
 
     for (uint16_t i = 0; i < loopNum; ++i) {
-        // Case 0（scenarioNum == 0）固定使用 VL32 掩码（32 个 float、128 bytes 并行度）；
-        // 非 Case 0 才使用 UpdateMask<float>(n) 按剩余元素数更新掩码
+        // Case 0（scenarioNum == 0）固定使用 VL32 mask（32 个 float、128 bytes 并行度）；
+        // 非 Case 0 才使用 UpdateMask<float>(n) 按剩余元素数更新mask
         mask = AscendC::Reg::CreateMask<float, AscendC::Reg::MaskPattern::VL32>();
         // Gelu计算
         AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
@@ -137,7 +137,7 @@ __simd_vf__ inline static void GeluEltwiseBasic(
 **优化效果分析**：
 - 端到端耗时：**334.437μs**
 - 向量指令耗时：244.299μs，占比 **73.3%**
-- 数据搬运耗时：275.719μs（读）+ 252.305μs（写），搬运占比超过 **80%**
+- data_move耗时：275.719μs（读）+ 252.305μs（写），搬运占比超过 **80%**
 - 总计算cycle数：34582356
 
 **下一步优化方向**：
@@ -322,7 +322,7 @@ __simd_vf__ inline static void GeluEltwiseLoopSplit(
 | 2 | Loop拆分（Gelu + Element-wise） | 64 | 8192 | 324.039 | 97.184 | 1.03x | 2.51x |
 | 3 | Loop拆分 + unroll循环展开 | 64 | 8192 | 324.748 | 94.339 | 1.03x | 2.58x |
 
-> **注意：** 该样例为MTE2 bound，性能瓶颈为数据搬运。端到端耗时变化较小，但向量计算效率显著提升。
+> **注意：** 该样例为MTE2 bound，性能瓶颈为data_move。端到端耗时变化较小，但向量计算效率显著提升。
 
 ### 优化要点总结
 
@@ -563,7 +563,7 @@ $$
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
@@ -611,7 +611,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

@@ -1,6 +1,6 @@
 # GmByPassDCache类样例
 
-## 概述
+## overview
 
 本样例组合调用 `ReadGmByPassDCache` 和 `WriteGmByPassDCache` 接口，实现不经过DCache从GM地址读取和写入数据。本样例会将读取的值加100后写入到输出地址。
 

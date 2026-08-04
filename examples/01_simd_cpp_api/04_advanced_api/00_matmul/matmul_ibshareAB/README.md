@@ -1,8 +1,8 @@
 # Matmul IBShareAB特性样例
 
-## 概述
+## overview
 
-调用Matmul高阶API开启IBShare功能，复用L1 Buffer上相同的A矩阵或者B矩阵数据的样例，本样例为A矩阵和B矩阵同时复用场景。开启功能可以减少数据搬运开销。支持两种场景，通过CMake编译参数 `SCENARIO_NUM` 选择场景。
+调用Matmulhigh_level_api开启IBShare功能，复用L1 Buffer上相同的A矩阵或者B矩阵数据的样例，本样例为A矩阵和B矩阵同时复用场景。开启功能可以减少data_move开销。支持两种场景，通过CMake编译参数 `SCENARIO_NUM` 选择场景。
     <table>
  	<tr>
  		<td>scenarioNum</td>
@@ -43,7 +43,7 @@
 ## 样例描述
 
 - 样例功能：  
-  调用Matmul高阶API时开启A、B矩阵的IBShare功能，计算过程中同一AIC对应的两个AIV在每次迭代时用到的A、B矩阵在L1 Buffer上的数据一致。
+  调用Matmulhigh_level_api时开启A、B矩阵的IBShare功能，计算过程中同一AIC对应的两个AIV在每次迭代时用到的A、B矩阵在L1 Buffer上的数据一致。
 
   A矩阵与B矩阵均使能IBShare时，不对k列进行切分计算；均未使能IBShare时，按照k列进行切分计算。通过对比两种场景的运行时间，可以得出该特性的性能提升。
   使能AB矩阵IBShare场景的数据处理说明图示(A矩阵和B矩阵不切分处理)：![alt text](./figures/matmul_ABshare.png)  
@@ -103,7 +103,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j; # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py                                                # 生成测试输入数据
   ./demo                                                                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin       # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin       # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

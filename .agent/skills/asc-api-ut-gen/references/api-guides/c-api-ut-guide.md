@@ -1,6 +1,6 @@
 # C API UT 生成指南
 
-## 1. API 概述
+## 1. API overview
 
 C API 是 AscendC 提供的 C 风格接口，使用指针和基本数据类型，提供底层硬件操作能力。
 
@@ -18,8 +18,8 @@ C API 是 AscendC 提供的 C 风格接口，使用指针和基本数据类型�
 |---------|---------|
 | 向量计算 | `asc_add`, `asc_mul`, `asc_sub` |
 | 标量操作 | `asc_add_scalar`, `asc_mul_scalar` |
-| 类型转换 | `asc_float2half`, `asc_half2float` |
-| 归约操作 | `asc_datablock_reduce_sum` |
+| type_conversion | `asc_float2half`, `asc_half2float` |
+| reduction_operations | `asc_datablock_reduce_sum` |
 | 矩阵运算 | `asc_mmul` |
 
 ---
@@ -225,7 +225,7 @@ __aicore__ inline void asc_mul(__ubuf__ half* dst, __ubuf__ half* src0,
     __ubuf__ half* src1, uint32_t count);
 ```
 
-### 7.2 类型转换类 API
+### 7.2 type_conversion类 API
 
 ```cpp
 // float 转 half
@@ -237,7 +237,7 @@ __aicore__ inline void asc_half2float(__ubuf__ float* dst, __ubuf__ half* src,
     uint32_t count);
 ```
 
-### 7.3 归约操作类 API
+### 7.3 reduction_operations类 API
 
 ```cpp
 // 数据块归约求和
@@ -269,10 +269,10 @@ __aicore__ inline void asc_datablock_reduce_max(__ubuf__ half* dst, __ubuf__ hal
 
 | 标记 | 说明 | 使用场景 |
 |------|------|---------|
-| `__ubuf__` | Unified Buffer 指针 | 向量计算、数据搬运 |
+| `__ubuf__` | Unified Buffer 指针 | 向量计算、data_move |
 | `__gm__` | Global Memory 指针 | 全局内存访问 |
-| `__cbuf__` | L1 / CBUF 指针 | L1 与 L0/UB/GM 之间的数据搬运、Cube 数据搬运 |
-| `__fbuf__` | FBUF 指针 | `asc_copy_l12fb` 等 FBUF 相关数据搬运 |
+| `__cbuf__` | L1 / CBUF 指针 | L1 与 L0/UB/GM 之间的data_move、Cube data_move |
+| `__fbuf__` | FBUF 指针 | `asc_copy_l12fb` 等 FBUF 相关data_move |
 | `__ca__` | Cube A buffer 指针 | 矩阵乘法左矩阵 |
 | `__cb__` | Cube B buffer 指针 | 矩阵乘法右矩阵 |
 | `__cc__` | Cube C buffer 指针 | 矩阵乘法结果 |
@@ -288,12 +288,12 @@ __ubuf__ half* src0;
 __ubuf__ half* src1;
 asc_add(dst, src0, src1, count);
 
-// L1/CBUF 与 FBUF 数据搬运使用 __cbuf__, __fbuf__
+// L1/CBUF 与 FBUF data_move使用 __cbuf__, __fbuf__
 __cbuf__ void* l1;
 __fbuf__ void* fbuf;
 asc_copy_l12fb(fbuf, l1, size);
 
-// 矩阵计算使用 __ca__, __cb__, __cc__
+// cube_compute使用 __ca__, __cb__, __cc__
 __ca__ half* a;
 __cb__ half* b;
 __cc__ float* c;

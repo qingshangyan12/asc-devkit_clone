@@ -173,7 +173,7 @@ def generate_roofline_with_latency(
     lines.append("  Bandwidth(GB/s) = DataSize / Time(us) / 1e3")
     lines.append("")
     lines.append("图表说明：")
-    lines.append(f"  X轴: Data Size (KB) - 数据搬运量（限制在{l0_max_size_kb}KB内）")
+    lines.append(f"  X轴: Data Size (KB) - data_move量（限制在{l0_max_size_kb}KB内）")
     lines.append("  Y轴: Bandwidth (GB/s) - 实际带宽")
     lines.append("  实线: 理论带宽曲线（考虑延迟）")
     lines.append("  虚线: 峰值带宽上限（无延迟）")
@@ -340,7 +340,7 @@ def generate_roofline_with_latency(
             f"    数据量: {item['data_size_kb']:.2f} KB ({l0_utilization:.1f}% of L0)"
         )
         lines.append(f"    延迟占比: {latency_ratio:.1f}%")
-        lines.append(f"    数据搬运: {transfer_cycles:.1f} cycles")
+        lines.append(f"    data_move: {transfer_cycles:.1f} cycles")
         lines.append(f"    总时间: {latency_cycles + transfer_cycles:.1f} cycles")
 
     lines.append("")

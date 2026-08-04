@@ -1,6 +1,6 @@
 # 自定义算子工程+aclop单算子模型调用样例
 
-## 概述
+## overview
 
 本样例基于示例自定义算子工程，介绍了`aclopExecuteV2`单算子模型的方式执行固定shape算子。
 
@@ -24,7 +24,7 @@
 │   └── README.md               // 样例说明文档
 ```
 
-## 代码实现简介
+## 代码实现intro
 
 完成自定义算子的开发部署后，可以通过单算子模型调用的方式来验证单算子的功能。具体可参考[单算子调用](https://hiascend.com/document/redirect/CannCommunityCppOpcall)中“单算子模式执行”相关章节。
 

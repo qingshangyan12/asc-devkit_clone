@@ -1,6 +1,6 @@
 # MxFP4 Matmul Tensor API 高性能样例
 
-## 概述
+## overview
 
 本样例介绍如何基于 Ascend C Tensor API 和静态 Tensor 编程方式，通过 L1/L0 双缓冲机制、大包搬运、细粒度流水同步等多种优化手段，实现一个高性能的 MxFP4 Matmul kernel。
 
@@ -137,7 +137,7 @@ Total blocks = 4 * 8 = 32
 
 每个核只处理自己负责的 `2048 x 1024` 输出区域。核内按 `baseK=256` 分块在 K 方向循环完成累加。
 
-对应的核索引计算如下：
+对应的核index_compute如下：
 
 ```cpp
 constexpr uint32_t mIter = DivCeil(M, singleCoreM);
@@ -160,13 +160,13 @@ MxMatmul 的输入不是两路，而是四路：A、B、ScaleA、ScaleB。因此
 
 scale 的搬运粒度由 `scaleFactorK=4` 控制，一次搬入 `scaleFactorK * stepK * baseM * baseSK` 的 ScaleA 矩阵数据 和 `scaleFactorK * stepK * baseN * baseSK` 的 ScaleB 矩阵数据，其中`baseSK = baseK / 32`。它的作用是让 ScaleA/ScaleB 在 K 方向相比于 A/B 一次覆盖更大的范围，减少 scale 反复搬运带来的 MTE2 压力。
 
-以 A 矩阵数据搬运为例，`Copy` 一次搬入 `stepK` 个 K 方向 base 块，每个base块为 `baseM * baseK`：
+以 A cube_data_move为例，`Copy` 一次搬入 `stepK` 个 K 方向 base 块，每个base块为 `baseM * baseK`：
 
 ```cpp
 AscendC::Te::Copy(gm2L1Atom, l1TensorAPing, a.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), AscendC::Te::MakeShape(curM, stepCurK)));
 ```
 
-以 ScaleA 矩阵数据搬运为例。`Copy` 一次搬入 `scaleFactorK * stepK` 个 K 方向 base 块，每个base块为 `baseM * baseSK`（其中 `baseSK = align_even(ceil(baseK / 32))`）：
+以 ScaleA cube_data_move为例。`Copy` 一次搬入 `scaleFactorK * stepK` 个 K 方向 base 块，每个base块为 `baseM * baseSK`（其中 `baseSK = align_even(ceil(baseK / 32))`）：
 
 ```cpp
 AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), AscendC::Te::MakeShape(curM, stepCurScaleK)));
@@ -178,13 +178,13 @@ AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBl
 
 当 A/B 和 ScaleA/ScaleB 进入 L0 后，Cube 计算单元就可以按照 MX 语义完成带缩放的矩阵乘累加。
 
-以 A 矩阵数据搬运为例，`Copy` 一次搬入 1 个`baseM * baseK` 大小的 base 块：
+以 A cube_data_move为例，`Copy` 一次搬入 1 个`baseM * baseK` 大小的 base 块：
 
 ```cpp
 AscendC::Te::Copy(l12l0AAtom, l0TensorA, l1ReadBufA.Slice(AscendC::Te::MakeCoord(0, kOffsetInDataChunk * baseK), AscendC::Te::MakeShape(curM, curK)));
 ```
 
-以 ScaleA 矩阵数据搬运为例，`Copy` 一次搬入 1 个`baseM * baseSK` 大小的 base 块：
+以 ScaleA cube_data_move为例，`Copy` 一次搬入 1 个`baseM * baseSK` 大小的 base 块：
 
 ```cpp
 AscendC::Te::Copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.Slice(AscendC::Te::MakeCoord(0, kOffsetInScaleChunk * baseScaleK), AscendC::Te::MakeShape(curM, curScaleK)));
@@ -331,7 +331,7 @@ next LoadData
 本样例的性能优化围绕三件事展开：
 
 - **多核切分**：把 `8192 x 8192` 输出矩阵拆到 32 核并行计算。
-- **大包搬运**：A/B 按多个 K block 搬运，ScaleA/ScaleB 按更大的 K 覆盖范围搬运，降低 MTE2 指令和数据搬运压力。
+- **大包搬运**：A/B 按多个 K block 搬运，ScaleA/ScaleB 按更大的 K 覆盖范围搬运，降低 MTE2 指令和data_move压力。
 - **双缓冲流水**：L1 和 L0 都采用 Ping-Pong，让 MTE2、MTE1、CUBE、FIXPIPE 流水尽量交叠执行。
 
 ## 理论性能对比
@@ -348,7 +348,7 @@ next LoadData
 | `aic_scalar_time(μs)` | Scalar 指令执行时间，反映循环调度、地址计算、参数配置等开销 |
 | `aic_scalar_ratio` | Scalar 时间占比 |
 | `aic_mte1_time(μs)` | MTE1 执行时间，主要对应 L1 到 L0A/L0B 的 `Copy` |
-| `aic_mte1_ratio` | MTE1 时间占比，反映 L1 到 L0 的数据搬运压力 |
+| `aic_mte1_ratio` | MTE1 时间占比，反映 L1 到 L0 的data_move压力 |
 | `aic_mte2_time(μs)` | MTE2 执行时间，主要对应 GM 到 L1 的 `Copy` |
 | `aic_mte2_ratio` | MTE2 时间占比，反映 GM 到 L1 的数据加载压力 |
 | `aic_fixpipe_time(μs)` | L0C->GM 的 `Copy` 执行时间，主要对应 L0C 到 GM 的结果写回 |
@@ -502,7 +502,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

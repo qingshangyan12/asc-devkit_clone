@@ -1,6 +1,6 @@
 # fixpipe_l0c2ub样例
 
-## 概述
+## overview
 
 本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到UB（Unified Buffer），支持多种输出格式（Nz、ND）以及双目标模式（按M维度或N维度拆分）等功能。这些接口用于将L0C中的矩阵乘计算结果高效地传输到统一缓存区，并支持各种数据格式转换和拆分能力。
 
@@ -40,19 +40,19 @@
 </table>
 
 **场景1：输出格式Nz，输出数据类型float**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [128, 256] float类型，Nz格式
 - 实现：使用 `Fixpipe<outputType, l0cType, CFG_NZ_UB>` 将数据从L0C搬出到UB，输出为Nz格式
 - 说明：L0C数据为Nz格式直接输出到UB的Nz格式，数据保持原格式不变
 
 **场景2：输出格式ND，输出数据类型float**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：C [128, 256] float类型，ND格式
 - 实现：使用 `Fixpipe<outputType, l0cType, CFG_ROW_MAJOR_UB>` 指定ROW_MAJOR格式转换
 - 说明：将CO1中的Nz格式数据转换为ND格式输出到UB
 
 **场景3：输出格式ND，输出数据类型float，使能双目标模式，按M维度拆分，同时写入两个子块（SUB BLOCK）的UB中**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：单个子块上C [64, 256] float类型，ND格式（双目标模式，按M维度拆分，每个目标输出64行）
 - 实现：设置 `fixpipeParams.dualDstCtl = 0b01`，按M维度拆分，M必须为2的倍数
 - 说明：使用双目标模式将数据拆分输出到UB，按M维度拆分的两个核各处理一半数据
@@ -61,7 +61,7 @@
 </p>
 
 **场景4：输出格式ND，输出数据类型float，使能双目标模式，按N维度拆分，同时写入两个子块（SUB BLOCK）的UB中**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
+- 输入：A [128, 128] half_type，ND格式；B [128, 256] half_type，ND格式
 - 输出：单个子块上C [128, 128] float类型，ND格式（双目标模式，按N维度拆分，每个目标输出128列）
 - 实现：设置 `fixpipeParams.dualDstCtl = 0b10`，按N维度拆分，N必须为32的倍数
 - 说明：使用双目标模式将数据拆分输出到UB，按N维度拆分的两个核各处理一半数据

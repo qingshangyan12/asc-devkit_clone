@@ -1,8 +1,8 @@
 # Exp样例
 
-## 概述
+## overview
 
-本样例基于Exp高阶API实现自然指数计算功能，支持按元素计算$e^x$。Exp高阶API可以设置泰勒展开项数，取值范围[0，255]，当泰勒展开项数为0时表示不使用泰勒公式进行计算。本样例默认设置泰勒展开项数为10项。
+本样例基于Exphigh_level_api实现自然指数计算功能，支持按元素计算$e^x$。Exphigh_level_api可以设置泰勒展开项数，取值范围[0，255]，当泰勒展开项数为0时表示不使用泰勒公式进行计算。本样例默认设置泰勒展开项数为10项。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -66,11 +66,11 @@
 
   - Kernel实现
 
-    使用Exp高阶API计算自然指数，可选择使用泰勒展开公式和临时buffer提高精度
+    使用Exphigh_level_api计算自然指数，可选择使用泰勒展开公式和临时buffer提高精度
 
   - Tiling实现
 
-    Host侧通过GetExpMaxMinTmpSize获取Exp接口计算所需的最大和最小临时空间。
+    Host侧通过GetExpMaxMinTmpSize获取Exp_interface计算所需的最大和最小临时空间。
 
   - 调用实现
 

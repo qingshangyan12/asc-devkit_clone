@@ -1,6 +1,6 @@
 # Control Flow Optimizations样例介绍
 
-## 概述
+## overview
 
 控制流优化相关样例，通过<<<>>>直调的实现方式，介绍SIMT编程方式下Warp Divergence（分支发散）对性能的影响及优化思路。当前提供了通过Warp协作处理减小分支发散的优化案例。
 

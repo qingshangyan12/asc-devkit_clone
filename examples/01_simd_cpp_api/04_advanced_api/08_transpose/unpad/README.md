@@ -1,8 +1,8 @@
 # UnPad样例
 
-## 概述
+## overview
 
-本样例基于UnPad高阶API实现将二维Tensor行数据去填充的功能。
+本样例基于UnPadhigh_level_api实现将二维Tensor行数据去填充的功能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -49,7 +49,7 @@
 
   - Kernel实现
 
-    使用UnPad高阶API接口完成去填充。
+    使用UnPadhigh_level_api接口完成去填充。
 
   - Tiling实现
 

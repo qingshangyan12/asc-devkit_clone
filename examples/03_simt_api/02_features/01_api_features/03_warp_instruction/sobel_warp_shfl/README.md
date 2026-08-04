@@ -1,8 +1,8 @@
 # SIMT实现Sobel边缘检测样例
 
-## 概述
+## overview
 
-本样例以Sobel边缘检测为例，展示了如何通过Warp shuffle指令复用相邻线程加载的数据来完成 3×3 卷积计算，以及结合[asc_ballot()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Vote类函数/asc_ballot.md)实现边缘像素的紧凑输出。
+本样例以Sobel边缘检测为例，展示了如何通过Warp shuffle指令复用相邻线程加载的数据来完成 3×3 convolution_compute，以及结合[asc_ballot()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_vote_functions/asc_ballot.md)实现边缘像素的紧凑输出。
 
 ## 支持的产品
 
@@ -28,7 +28,7 @@
 
 本样例计算输入灰度图像的边缘幅值，并将满足阈值条件的边缘像素输出到紧凑列表`edge_list`。`edge_list`中每行包含边缘像素的x坐标、y坐标和边缘幅值（`strength`）。
 
-本样例使用 **Sobel 边缘检测算法** 计算边缘幅值。Sobel 是一种常用的图像边缘检测算法，用于根据像素周围的灰度变化计算该像素的边缘幅值。对于图像中坐标为(x, y)的非边界像素，Sobel 使用该像素周围的 3×3 邻域分别计算水平梯度`Gx`和垂直梯度`Gy`：
+本样例使用 **Sobel 边缘检测algorithms** 计算边缘幅值。Sobel 是一种常用的图像边缘检测algorithms，用于根据像素周围的灰度变化计算该像素的边缘幅值。对于图像中坐标为(x, y)的非边界像素，Sobel 使用该像素周围的 3×3 邻域分别计算水平梯度`Gx`和垂直梯度`Gy`：
 
 <p align="center">
   <img src="./figures/sobel.png" width="45%">
@@ -63,7 +63,7 @@ strength = |Gx| + |Gy|
 
 **Warp内相邻像素获取**
 
-在SIMT编程模型中，一个Warp由32个线程组成。本样例需要通过Warp shuffle获取同一行中相邻像素的值，而shuffle只能在同一Warp内的线程间传递数据，因此必须保证同一Warp内所有线程处理图像同一行的连续32个像素，每个线程负责其中一个像素。
+在SIMTprogramming_model中，一个Warp由32个线程组成。本样例需要通过Warp shuffle获取同一行中相邻像素的值，而shuffle只能在同一Warp内的线程间传递数据，因此必须保证同一Warp内所有线程处理图像同一行的连续32个像素，每个线程负责其中一个像素。
 
 为保证同一个Warp内的32个线程始终处理同一行像素，采用如下坐标映射方式：
 
@@ -78,7 +78,7 @@ int y = warp_id / tiles_x;                          // 像素行号：第几行W
 </p>
 
 
-如上图所示，计算Sobel幅值需要获取当前像素周围3×3邻域共9个像素值。而相邻线程计算各自的Sobel幅值时，同样需要其周围3×3邻域的像素值，因此不同线程的3×3邻域存在重叠。利用这一特点，每个线程先从Global Memory读取同一x坐标上的上、中、下三个像素值，分别保存到寄存器变量top、mid和bot，对应当前像素3×3邻域的中间一列；然后通过[asc_shfl_up()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_up.md)和[asc_shfl_down()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_down.md)从相邻线程的寄存器中获取左右两列数据，避免再次从Global Memory读取。
+如上图所示，计算Sobel幅值需要获取当前像素周围3×3邻域共9个像素值。而相邻线程计算各自的Sobel幅值时，同样需要其周围3×3邻域的像素值，因此不同线程的3×3邻域存在重叠。利用这一特点，每个线程先从Global Memory读取同一x坐标上的上、中、下三个像素值，分别保存到寄存器变量top、mid和bot，对应当前像素3×3邻域的中间一列；然后通过[asc_shfl_up()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_up.md)和[asc_shfl_down()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_down.md)从相邻线程的寄存器中获取左右两列数据，避免再次从Global Memory读取。
 
 
 
@@ -114,7 +114,7 @@ int bot_right = (lane_id == 31) ? input[(y + 1) * width + (x + 1)] : shfl_bot_ri
 
 **asc_ballot实现紧凑输出**
 
-紧凑输出需要将满足阈值条件的边缘像素连续写入edge_list。对于同一个Warp，可能只有部分线程的边缘幅值满足阈值条件，如果每个边缘线程都单独执行[asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md)申请输出位置，一个Warp内最多会产生32次原子操作。
+紧凑输出需要将满足阈值条件的边缘像素连续写入edge_list。对于同一个Warp，可能只有部分线程的边缘幅值满足阈值条件，如果每个边缘线程都单独执行[asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md)申请输出位置，一个Warp内最多会产生32次atomic_operations。
 
 本样例使用`asc_ballot()`收集Warp内各线程是否满足阈值条件，并生成edge_mask。edge_mask中第i位为1，表示Warp内的第i号线程的边缘幅值满足阈值条件：
 
@@ -124,10 +124,10 @@ uint32_t edge_mask = asc_ballot(strength >= THRESHOLD);
 
 edge_mask用于完成两个操作：
 
-- 第0号线程通过[__popc(edge_mask)](../../../../../../docs/zh/api/SIMT-API/数学函数/整型数学库函数/__popc.md)统计本Warp内边缘线程数量，并通过一次`asc_atomic_add()`为整个Warp申请连续输出位置。
+- 第0号线程通过[__popc(edge_mask)](../../../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/__popc.md)统计本Warp内边缘线程数量，并通过一次`asc_atomic_add()`为整个Warp申请连续输出位置。
 - 每个边缘线程根据edge_mask计算自己在Warp内的局部偏移，写入edge_list中的对应位置。
 
-第0号线程申请输出位置后，通过[asc_shfl()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl.md)将起始位置广播给Warp内所有线程：
+第0号线程申请输出位置后，通过[asc_shfl()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl.md)将起始位置广播给Warp内所有线程：
 
 ```cpp
 uint32_t warp_base = 0;
@@ -153,9 +153,9 @@ if (edge_mask & lanemask_eq()) {
 }
 ```
 
-其中，`lanemask_eq()`只生成当前线程对应的掩码，用于检测当前线程的边缘幅值是否满足阈值条件；`lanemask_lt()`生成当前线程之前所有线程的掩码，用于统计当前线程之前满足阈值条件的线程数量，即当前边缘线程在本Warp内的紧凑写入偏移。
+其中，`lanemask_eq()`只生成当前线程对应的mask，用于检测当前线程的边缘幅值是否满足阈值条件；`lanemask_lt()`生成当前线程之前所有线程的mask，用于统计当前线程之前满足阈值条件的线程数量，即当前边缘线程在本Warp内的紧凑写入偏移。
 
-相比每个边缘线程独立执行一次`asc_atomic_add()`，该方式将一个Warp内最多32次原子操作压缩为1次原子操作。
+相比每个边缘线程独立执行一次`asc_atomic_add()`，该方式将一个Warp内最多32次atomic_operations压缩为1次atomic_operations。
 
 ## 编译运行
 

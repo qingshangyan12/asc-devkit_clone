@@ -1,8 +1,8 @@
 # data_copy_ub2l1样例
 
-## 概述
+## overview
 
-本样例使用Ascend C C API将矩阵数据从UB（Unified Buffer）搬运到L1（L1 Buffer），随后完成L1 Buffer到L0A Buffer和L0B Buffer的数据搬运、Mmad矩阵乘计算，并通过Fixpipe将L0C Buffer中的计算结果搬运到GM（Global Memory）。本样例适用于Ascend 950PR/Ascend 950DT（`dav-3510`），可在NPU运行模式或NPU仿真模式下执行。
+本样例使用Ascend C C API将矩阵数据从UB（Unified Buffer）搬运到L1（L1 Buffer），随后完成L1 Buffer到L0A Buffer和L0B Buffer的data_move、Mmad矩阵乘计算，并通过Fixpipe将L0C Buffer中的计算结果搬运到GM（Global Memory）。本样例适用于Ascend 950PR/Ascend 950DT（`dav-3510`），可在NPU运行模式或NPU仿真模式下执行。
 
 ## 本样例支持的产品和CANN软件版本
 
@@ -33,7 +33,7 @@
 | SCENARIO_NUM | 输入格式 | 输入数据类型 | 输出数据类型 | UB到L1处理 |
 |---|---|---|---|---|
 | 1 | Nz | half | float | 连续搬运 |
-| 2 | ND | half | float | 先在UB中将数据重排为Nz格式，再连续搬运 |
+| 2 | ND | half | float | 先在UB中将data_reorder为Nz格式，再连续搬运 |
 
 `SCENARIO_NUM`由CMake作为编译期宏传入，核函数通过`if constexpr`选择对应场景。切换场景后，需要重新编译。
 
@@ -47,12 +47,12 @@
 
 - 输入：A [128, 128]，`half`类型，ND格式；B [128, 128]，`half`类型，ND格式
 - 输出：C [128, 128]，`float`类型，ND格式
-- 实现：AIV侧先将A、B从GM搬入UB；在MTE2到V同步后，`copy_ub_nd_to_nz`按C0列块调用`asc_copy_ub2ub`，将ND格式的数据重排为Nz格式的数据。A和B使用独立的UB临时区，避免两次重排和后续UB到L1搬运之间发生读写覆盖。V到MTE3同步完成后，使用`asc_copy_ub2l1`将Nz格式的数据连续搬运到L1
+- 实现：AIV侧先将A、B从GM搬入UB；在MTE2到V同步后，`copy_ub_nd_to_nz`按C0列块调用`asc_copy_ub2ub`，将ND格式的data_reorder为Nz格式的数据。A和B使用独立的UB临时区，避免两次重排和后续UB到L1搬运之间发生读写覆盖。V到MTE3同步完成后，使用`asc_copy_ub2l1`将Nz格式的数据连续搬运到L1
 
 ### 数据流与同步
 
 1. AIV侧调用`asc_copy_gm2ub`，通过MTE2将数据从GM搬运到UB。
-2. 在场景1中，AIV侧通过`asc_sync_notify`和`asc_sync_wait`建立MTE2到MTE3同步后，调用`asc_copy_ub2l1`将Nz格式数据从UB连续搬运到L1。在场景2中，AIV侧先通过`asc_sync_notify`和`asc_sync_wait`建立MTE2到V同步，再调用`copy_ub_nd_to_nz`，由其按C0列块调用`asc_copy_ub2ub`将UB中的ND格式数据重排为Nz格式数据；随后建立V到MTE3同步，并调用`asc_copy_ub2l1`将数据从UB连续搬运到L1。
+2. 在场景1中，AIV侧通过`asc_sync_notify`和`asc_sync_wait`建立MTE2到MTE3同步后，调用`asc_copy_ub2l1`将Nz格式数据从UB连续搬运到L1。在场景2中，AIV侧先通过`asc_sync_notify`和`asc_sync_wait`建立MTE2到V同步，再调用`copy_ub_nd_to_nz`，由其按C0列块调用`asc_copy_ub2ub`将UB中的ND格式data_reorder为Nz格式数据；随后建立V到MTE3同步，并调用`asc_copy_ub2l1`将数据从UB连续搬运到L1。
 3. AIV侧调用`asc_sync_block_arrive`通知AIC侧，AIC侧再通过`asc_sync_block_wait`等待L1数据就绪。
 4. AIC侧调用`asc_copy_l12l0a`和`asc_copy_l12l0b_transpose`，将L1 Buffer中的Nz格式数据分别搬运到L0A Buffer和L0B Buffer；再通过`asc_sync_notify`和`asc_sync_wait`建立MTE1到M同步，调用`asc_mmad`完成矩阵乘计算。
 5. AIC侧通过`asc_sync_notify`和`asc_sync_wait`建立M到FIX同步后，调用`asc_set_l0c2gm_nz2nd`配置Nz格式到ND格式的转换，再通过Fixpipe接口`asc_copy_l0c2gm`将L0C Buffer中的计算结果搬运到GM。

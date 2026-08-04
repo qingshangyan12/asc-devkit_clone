@@ -1,6 +1,6 @@
 # SimdSimtHybrid样例介绍
 
-## 概述
+## overview
 
 本目录提供 Ascend C 基于SIMD和SIMT的混合编程向量计算的入门样例。
 

@@ -46,33 +46,33 @@
 
 - 寄存器的生命周期限定于单个VF内部。
 
-## 掩码寄存器
+## mask寄存器
 
-掩码寄存器的类型为vector_bool，用于矢量计算中筛选参与计算的元素，其位宽为VL/8（即256/8=32字节=256bit）。当搬运掩码寄存器时，ubuf中地址偏移单位为字节。
+mask寄存器的类型为vector_bool，用于矢量计算中筛选参与计算的元素，其位宽为VL/8（即256/8=32字节=256bit）。当搬运mask寄存器时，ubuf中地址偏移单位为字节。
 
 如图1所示，当操作数类型为b8时，每一个element对应1bit mask；当操作数类型为b16时，每一个element对应2bit mask，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit mask，且仅4bit中的最低位是有效的。
 
-**图1**  掩码寄存器
+**图1**  mask寄存器
 
-![掩码寄存器](../../figures/capi_mask.png)
+![mask寄存器](../../figures/capi_mask.png)
 
-掩码寄存器设置支持多种灵活配置方式，可根据实际计算场景选择不同设置方式，以满足不同计算场景的需求。具体设置方式如下表所示：
+mask寄存器设置支持多种灵活配置方式，可根据实际计算场景选择不同设置方式，以满足不同计算场景的需求。具体设置方式如下表所示：
 
-**表2** 掩码寄存器设置方式
+**表2** mask寄存器设置方式
 
 | 编号 | 设置方式 | 涉及接口 | 说明 |
 | :-- | :------------ | :------------ | :------------ |
 | 1 | 调用接口设置 | [asc_create_mask](asc_create_mask.md) | 可以设置参数指定mask的模式，即指定哪些位置的元素参与计算。 |
 | 2 | 调用接口设置 | [asc_update_mask](asc_update_mask.md) |&bull; 在循环外调用时设置固定的mask，mask表示在一次循环计算中前count个元素参与计算，每次以循环计算均使用此mask。<br>&bull; 在循环内调用时，表示计算中前count个元素参与计算，每次循环mask会自动更新。|
-| 3 | 从Unified Buffer搬入 | [asc_loadalign_postupdate](../reg_load/asc_loadalign_postupdate.md) | 将掩码从UB搬入掩码寄存器。 |
-| 4 | 从矢量数据寄存器搬入 | [asc_copy](../reg_load/asc_copy.md) | 从矢量数据寄存器搬运至掩码寄存器。 |
+| 3 | 从Unified Buffer搬入 | [asc_loadalign_postupdate](../reg_load/asc_loadalign_postupdate.md) | 将mask从UB搬入mask寄存器。 |
+| 4 | 从矢量数据寄存器搬入 | [asc_copy](../reg_load/asc_copy.md) | 从矢量数据寄存器搬运至mask寄存器。 |
 
 **注意：**
-掩码寄存器数量上限为8。超出限制上限的寄存器数据会写入预留的8K UB内存中，可能会引起性能劣化。编译器会自动复用生命周期结束的寄存器和预留内存，若两者均可用，优先复用寄存器。
+mask寄存器数量上限为8。超出限制上限的寄存器数据会写入预留的8K UB内存中，可能会引起性能劣化。编译器会自动复用生命周期结束的寄存器和预留内存，若两者均可用，优先复用寄存器。
 
 ## 非对齐寄存器
 
-非对齐寄存器包括vector_load_unalign和vector_store_unalign。这些寄存器作为缓冲区，用于在UB和矢量数据寄存器之间进行连续的非对齐数据搬运，其中非对齐特指数据起始地址未按32字节对齐。在搬运过程中，非对齐数据首先被加载到专用的非对齐寄存器，随后通过相应的搬运接口完成数据的分块读取或写入。
+非对齐寄存器包括vector_load_unalign和vector_store_unalign。这些寄存器作为缓冲区，用于在UB和矢量数据寄存器之间进行连续的非对齐data_move，其中非对齐特指数据起始地址未按32字节对齐。在搬运过程中，非对齐数据首先被加载到专用的非对齐寄存器，随后通过相应的搬运接口完成数据的分块读取或写入。
 
 在读非对齐地址前，应该先通过[asc_loadunalign_pre](../reg_load/asc_loadunalign_pre.md)初始化，然后再调用[asc_loadunalign](../reg_load/asc_loadunalign.md)/[asc_loadunalign_postupdate](../reg_load/asc_loadunalign_postupdate.md)进行搬运。在写非对齐地址时，应该先调用[asc_storeunalign](../reg_store/asc_storeunalign.md)/[asc_storeunalign_postupdate](../reg_store/asc_storeunalign_postupdate.md)，再调用[asc_storeunalign_post](../reg_store/asc_storeunalign_post.md)/[asc_storeunalign_post_postupdate](../reg_store/asc_storeunalign_post_postupdate.md)进行后处理。
 
@@ -107,7 +107,7 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 addr_reg的地址计算公式为：offset = Σ(index_i × stride_i)，其中index_i为第i层循环的迭代变量，stride_i为第i层循环的步长。
 
 **注意：**
-- addr_reg为地址偏移量寄存器，仅支持部分搬运指令使用，请根据Reg数据搬运接口函数原型选择，除了通过addr_reg设置地址偏移，支持用户自行累加地址或通过PostUpdate模式进行地址自增，完整特性参考[reg_load](../reg_load/reg_load.md)和[reg_store](../reg_store/reg_store.md)。通过AddrReg地址偏移进行搬运时，需要满足对应搬运指令的地址对齐约束。
+- addr_reg为地址偏移量寄存器，仅支持部分搬运指令使用，请根据Regdata_move接口函数原型选择，除了通过addr_reg设置地址偏移，支持用户自行累加地址或通过PostUpdate模式进行地址自增，完整特性参考[reg_load](../reg_load/reg_load.md)和[reg_store](../reg_store/reg_store.md)。通过AddrReg地址偏移进行搬运时，需要满足对应搬运指令的地址对齐约束。
 
 - addr_reg的数量上限为8，超过8个可能会导致性能劣化。编译器会自动复用生命周期已经结束的addr_reg寄存器。
 

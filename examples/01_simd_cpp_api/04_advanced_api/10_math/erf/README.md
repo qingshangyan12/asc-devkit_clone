@@ -1,10 +1,10 @@
 # Erf样例
 
-## 概述
+## overview
 
-本样例基于Erf高阶API实现按元素做误差函数计算（也称为高斯误差函数，error function or Gauss error function）。
+本样例基于Erfhigh_level_api实现按元素做误差函数计算（也称为高斯误差函数，error function or Gauss error function）。
 
-> **接口提示：** 除本样例使用的 `Erf` 接口外，Ascend C 还提供了以下误差函数相关高阶API接口，如需调用替换接口名即可：
+> **接口提示：** 除本样例使用的 `Erf` 接口外，Ascend C 还提供了以下误差函数相关high_level_api接口，如需调用替换接口名即可：
 >
 > - **Erfc**：互补误差函数计算。
 
@@ -51,7 +51,7 @@
 
   - Kernel实现
 
-    使用Erf高阶API接口完成误差函数计算。
+    使用Erfhigh_level_api接口完成误差函数计算。
 
   - Tiling实现  
     根据输入长度和所用核数量设置tiling参数totalLength和tileNum。

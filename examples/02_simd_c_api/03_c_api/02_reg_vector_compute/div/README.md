@@ -1,6 +1,6 @@
 ﻿# Div样例
 
-## 概述
+## overview
 
 本样例基于C API编程接口实现Div运算，主要调用[asc_div](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_div.md)接口。
 

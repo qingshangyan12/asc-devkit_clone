@@ -1,0 +1,11 @@
+# cache_control<a name="ZH-CN_TOPIC_0000001917566937"></a>
+
+- **[system_cache_overview](system_cache_overview.md)**  
+
+- **[DataCachePreload](DataCachePreload.md)**  
+
+- **[DataCacheCleanAndInvalid](DataCacheCleanAndInvalid.md)**  
+
+- **[ICachePreLoad\(ISASI\)](ICachePreLoad_ISASI.md)**  
+
+- **[GetICachePreloadStatus\(ISASI\)](GetICachePreloadStatus_ISASI.md)**  

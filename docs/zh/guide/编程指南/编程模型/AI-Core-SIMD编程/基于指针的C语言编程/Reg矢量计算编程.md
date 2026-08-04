@@ -1,12 +1,12 @@
-# Reg矢量计算编程<a name="ZH-CN_TOPIC_0000002600000001"></a>
+# reg_vector_compute编程<a name="ZH-CN_TOPIC_0000002600000001"></a>
 
 > 📌 **提示**：Reg矢量编程仅在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)进行SIMD矢量计算编程时支持。
 
-本文介绍如何在Ascend C中使用语言扩展C API进行寄存器级**矢量计算编程**，该能力面向已经熟悉[Ascend C编程模型](../../编程模型概述.md)的开发者。这种基于硬件寄存器的编程方式称为Reg矢量计算编程。
+本文介绍如何在Ascend C中使用语言扩展C API进行寄存器级**矢量计算编程**，该能力面向已经熟悉[Ascend Cprogramming_model](../../programming_modeloverview.md)的开发者。这种基于硬件寄存器的编程方式称为reg_vector_compute编程。
 
 ## 为什么需要Reg矢量编程<a name="section_part1"></a>
 
-### Memory矢量计算的瓶颈
+### memory_vector_compute的瓶颈
 
 在以往的SIMD矢量编程中，矢量计算单元的源操作数和目的操作数都直接落在LocalMemory（Unified Buffer，以下简称UB）上。每一条矢量计算的执行过程都包含"从UB读 → 在执行单元算 → 写回UB"。当一个算子由多个矢量计算串联组成时（例如`dst = (a + b) * c + d`），每一步的中间结果都必须先写回UB，再被下一条指令重新读出。
 
@@ -18,20 +18,20 @@
 
 这种“每步落地UB”的开销会成为优化的天花板。
 
-### Reg矢量计算的定位
+### reg_vector_compute的定位
 
 为了突破上述Memory矢量编程瓶颈限制，[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)在硬件中新增了一级缓存**SIMD Register File**（以下简称寄存器）这一级存储；Reg矢量编程正是面向这一级寄存器的编程方式。其核心思想是：将一段连续的矢量计算保留在寄存器中完成，仅在进入和退出这段计算时与UB交互一次，中间结果可不再回写UB。
 
-Reg矢量计算与Memory矢量计算的对比如下：
+reg_vector_compute与memory_vector_compute的对比如下：
 
-| 维度 | Memory矢量计算 | Reg矢量计算 |
+| 维度 | memory_vector_compute | reg_vector_compute |
 | --- | --- | --- |
 | 数据位置 | UB | SIMD Registers |
 | 中间结果 | 必须回写UB | 可在寄存器中连续消费 |
 | 使用成本 | 较低 | 较高（需要理解寄存器等相关操作） |
 | 适用目标 | 快速实现、不追求极致性能 | 追求极致性能、可接受更高代码复杂度 |
 
-**在开放寄存器编程的硬件上，同时提供Memory矢量计算接口，保持与前序代际硬件兼容。在Memory矢量计算接口内部实现软件封装的Reg矢量计算。**
+**在开放寄存器编程的硬件上，同时提供memory_vector_compute接口，保持与前序代际硬件兼容。在memory_vector_compute接口内部实现软件封装的reg_vector_compute。**
 
 ### 适用场景
 
@@ -46,11 +46,11 @@ Reg矢量计算与Memory矢量计算的对比如下：
 
 ### SIMD Register File与执行单元
 
-AIV是AI Core内用于矢量计算的核，核内参与Reg矢量计算的硬件单元包括：
+AIV是AI Core内用于矢量计算的核，核内参与reg_vector_compute的硬件单元包括：
 
-- **Reg矢量执行单元**：用于执行Reg矢量计算，从寄存器读取数据，完成计算后将结果写回寄存器。
+- **Reg矢量执行单元**：用于执行reg_vector_compute，从寄存器读取数据，完成计算后将结果写回寄存器。
 - **DMA单元**：用于执行Reg矢量搬运，负责在寄存器和UB之间搬运数据。
-- **Aux Scalar**：处理Reg矢量执行单元和Reg搬运单元所需的标量计算（例如地址计算）。
+- **Aux Scalar**：处理Reg矢量执行单元和Reg搬运单元所需的scalar_compute（例如地址计算）。
 
 Reg矢量执行单元、DMA单元和Aux Scalar虽属于不同的硬件执行单元，但是在实际执行时都归属PIPE_V流水。这一架构带来两个直接结果：
 
@@ -74,26 +74,26 @@ AIV的内存层级如下：
 **寄存器作为整体使用**：寄存器无法按索引或偏移访问其中的某个元素或者bit。根据不同的功能，主要分为五类：
 
 1. **矢量计算寄存器**：参与矢量计算的主要寄存器，单个寄存器宽度定义为Vector Length（以下简称VL），可以通过DMA单元与UB进行数据交换。
-2. **掩码寄存器**：用于控制参与矢量计算的有效元素或者代表单bit元素参与计算等，单个寄存器宽度定义为VL/8，可以通过DMA单元与UB进行数据交换。
+2. **mask寄存器**：用于控制参与矢量计算的有效元素或者代表单bit元素参与计算等，单个寄存器宽度定义为VL/8，可以通过DMA单元与UB进行数据交换。
 3. **地址寄存器**：辅助Reg矢量搬运单元完成矢量计算寄存器和UB数据交换，用于存储UB地址的偏移，单个寄存器宽度为32bis，不能直接与UB进行数据交换。
 4. **搬入非对齐寄存器**：辅助Reg矢量搬运单元将UB数据搬入到矢量计算寄存器，用于临时存储包含源非对齐UB地址数据的，起始对齐UB地址的1个DataBlock长度的数据，单个寄存器宽度为DataBlock，可以通过DMA单元将UB数据搬入非对齐寄存器。
 5. **搬出非对齐寄存器**：辅助Reg矢量搬运单元将矢量计算寄存器数据搬出到UB，用于临时存储包含需写出非对齐UB地址的对应的矢量寄存器的数据，单个寄存器宽度为DataBlock，可以通过DMA单元将搬出非对齐寄存器数据搬出到UB。
 
 
 
-## 编程模型<a name="section_part3"></a>
+## programming_model<a name="section_part3"></a>
 
 ### 总体结构
 
-基于寄存器（Regbase）的编程模型是在Memory矢量编程的`数据搬入` -> `Compute` -> `数据搬出`编程模型基础上扩展为`数据搬入` -> `Load` -> `Compute`  ->`Store` -> `数据搬出`的Reg矢量计算编程模型。
+基于寄存器（Regbase）的programming_model是在Memory矢量编程的`数据搬入` -> `Compute` -> `数据搬出`programming_model基础上扩展为`数据搬入` -> `Load` -> `Compute`  ->`Store` -> `数据搬出`的reg_vector_computeprogramming_model。
 
 **图3** Regbase编程总体结构
 
-![](../../../../figures/Regbase编程模型总体结构.png "Regbase编程模型总体结构")
+![](../../../../figures/Regbaseprogramming_model总体结构.png "Regbaseprogramming_model总体结构")
 
 ### VF函数与执行域
 
-Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store`的执行过程，在实现中定义为Vector Function（以下简称VF函数）。为了区分不同的执行域，将在不同执行域的函数使用不同的函数标签，编译期就限制了API的调用关系：
+reg_vector_computeprogramming_model中`Load` -> `Compute`  ->`Store`的执行过程，在实现中定义为Vector Function（以下简称VF函数）。为了区分不同的执行域，将在不同执行域的函数使用不同的函数标签，编译期就限制了API的调用关系：
 
 | 标签 | 角色 | 调用方 | 可调用对象 |
 | --- | --- | --- | --- |
@@ -101,7 +101,7 @@ Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store`的执行过程，�
 | `__simd_vf__` | VF函数 | `__aicore__`函数通过`asc_vf_call`调用 | `__simd_callee__`修饰的Reg矢量API或者VF内部子函数 |
 | `__simd_callee__` | VF内部子函数 | `__simd_vf__`或其他`__simd_callee__` | `__simd_callee__` |
 
-> 📌 **提示**：在[硬件原理](#section_part2)章节中提到Vector计算单元中存在Aux Scalar单元，在前述[《抽象硬件架构》](../抽象硬件架构.md)文档中看到在AI Core内也存在Scalar计算单元（以下称为Main Scalar），这两个Scalar单元是相互独立的，且能力存在差异。在编程界面上为了区分两者执行域，采用VF函数进行隔离。VF函数内的标量计算执行在Aux Scalar单元；VF函数外的标量计算执行在Main Scalar单元。同理，在VF函数内调用的子函数内的标量计算必须满足Aux Scalar的能力；在VF函数外调用的子函数的标量计算必须符合Main Scalar能力。
+> 📌 **提示**：在[硬件原理](#section_part2)章节中提到Vector计算单元中存在Aux Scalar单元，在前述[《抽象硬件架构》](../抽象硬件架构.md)文档中看到在AI Core内也存在Scalar计算单元（以下称为Main Scalar），这两个Scalar单元是相互独立的，且能力存在差异。在编程界面上为了区分两者执行域，采用VF函数进行隔离。VF函数内的scalar_compute执行在Aux Scalar单元；VF函数外的scalar_compute执行在Main Scalar单元。同理，在VF函数内调用的子函数内的scalar_compute必须满足Aux Scalar的能力；在VF函数外调用的子函数的scalar_compute必须符合Main Scalar能力。
 >
 > 为了区分上述三类函数的不同功能执行域，VF函数使用`__simd_vf__`进行标识，VF函数内子函数采用`__simd_callee__`标识，VF函数外子函数采用`__aicore__`标识。在编译期可以根据不同的函数标识完成执行域校验。
 >
@@ -110,7 +110,7 @@ Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store`的执行过程，�
 这种执行域隔离带来三方面好处：
 
 - **编译期校验**：跨域错误调用（例如在`__aicore__`中直接调用Reg矢量API）会在编译阶段被发现。
-- **职责清晰**：`__aicore__`负责GM数据搬运、地址计算等外层逻辑；`__simd_vf__`专注寄存器级计算。
+- **职责清晰**：`__aicore__`负责GMdata_move、地址计算等外层逻辑；`__simd_vf__`专注寄存器级计算。
 - **优化边界明确**：编译器可以针对VF函数做独立优化（如VF融合），且不影响外层算子结构。
 
 **图4** 函数标签调用关系
@@ -159,7 +159,7 @@ for (i = 0; i < repeat_times; ++i) {
 | 寄存器类型 | 变量类型定义 | [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md) |
 | --- | --- | --- |
 | 矢量数据寄存器 | `vector_*`，例如vector_float | VL = 256B |
-| 掩码寄存器 | `vector_bool` | VL/8 = 32B |
+| mask寄存器 | `vector_bool` | VL/8 = 32B |
 | 地址寄存器 | `addr_reg` | 32bits = 8B |
 | 搬入非对齐寄存器 | `vector_load_unalign` | DataBlock = 32B |
 | 搬出非对齐寄存器 | `vector_store_unalign` | DataBlock = 32B |
@@ -196,9 +196,9 @@ asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 
 
 
-#### 掩码寄存器
+#### mask寄存器
 
-`vector_bool`宽度为`VL/8`。最小对应关系为1bit掩码对应1Byte数据；当数据位宽大于1Byte时，由每个N bytes元素（例如float是4Bytes）对应Nbits位置中的LSB（最低位）bit生效。如下表格中对应矢量数据不同元素宽度时，元素生效索引对应`vector_bool`中bit关系。例如：b32的数据对应`vector_bool`的第0/4/8/12/... bit生效，对应矢量数据寄存器中的b32的第0/1/2/3/..个元素。
+`vector_bool`宽度为`VL/8`。最小对应关系为1bitmask对应1Byte数据；当数据位宽大于1Byte时，由每个N bytes元素（例如float是4Bytes）对应Nbits位置中的LSB（最低位）bit生效。如下表格中对应矢量数据不同元素宽度时，元素生效索引对应`vector_bool`中bit关系。例如：b32的数据对应`vector_bool`的第0/4/8/12/... bit生效，对应矢量数据寄存器中的b32的第0/1/2/3/..个元素。
 
 | RegTensor单元素宽度 | 0th bit | 1st bit | 2nd bit | 3rd bit | 4th bit | 5th bit | 6th bit | 7th bit | 8th bit | 9th bit | 10th bit | 11th bit | 12th bit | ...  |
 | ------------------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | -------- | -------- | -------- | ---- |
@@ -209,7 +209,7 @@ asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 
 
 
-`vector_bool`既可作为计算接口的掩码输入，也可作为bit级元素承载比较类运算的结果和参与移位、逻辑、交织等计算，还可以作为搬入/搬出接口的目的/源参数。
+`vector_bool`既可作为计算接口的mask输入，也可作为bit级元素承载比较类运算的结果和参与移位、逻辑、交织等计算，还可以作为搬入/搬出接口的目的/源参数。
 
 `vector_bool`的创建以及常见的使用方式如下：
 
@@ -313,9 +313,9 @@ asc_load(vreg1, ub_addr);
 
 > 📌 **提示**：在`asc_vf_call`调用VF函数后，外层无需关注PIPE_V的Barrier；VF函数退出时，所有内部Reg矢量指令均已执行完成。
 
-### Reg矢量计算接口
+### reg_vector_compute接口
 
-Reg矢量计算C API（在源码中以`asc_`为前缀，属于语言扩展C API）是一组**直通硬件指令的语言扩展接口**。
+reg_vector_computeC API（在源码中以`asc_`为前缀，属于语言扩展C API）是一组**直通硬件指令的语言扩展接口**。
 
 - 每个C API在编译期基本对应一条硬件指令。
 - 数据类型直接映射为硬件寄存器宽度，例如`vector_float`对应一个VL宽度的矢量寄存器。
@@ -325,9 +325,9 @@ Reg矢量计算C API（在源码中以`asc_`为前缀，属于语言扩展C API�
 
 | 分类     | 典型接口                                                     |
 | -------- | ------------------------------------------------------------ |
-| 数据搬运 | `asc_load*` / `asc_store*`                                   |
+| data_move | `asc_load*` / `asc_store*`                                   |
 | 矢量计算 | `asc_add` / `asc_sub` / `asc_mul` / `asc_div` / `asc_select` / `asc_reduce_*`等 |
-| 同步控制 | `asc_mem_bar`                                                |
+| sync_control | `asc_mem_bar`                                                |
 
 ### 编程示例
 
@@ -375,11 +375,11 @@ Reg矢量编程的关键特性按用途分为三大类：
 
 | 分类 | 特性 |
 | --- | --- |
-| 数据搬运 | 通用搬运、对齐搬运、非对齐搬运、PostUpdate、使用地址寄存器搬运 |
+| data_move | 通用搬运、对齐搬运、非对齐搬运、PostUpdate、使用地址寄存器搬运 |
 | 矢量计算 | 尾块处理、MaskMergeMode |
 | VF函数优化 | VF融合、Hardware Loop、指令双发 |
 
-### 数据搬运
+### data_move
 
 #### 通用搬运
 
@@ -418,7 +418,7 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
 #### 非对齐搬运
 
-非对齐搬运是指UB地址非对齐，但仍需要在UB和矢量数据寄存器之间连续读写数据的场景。在直接与非对齐UB地址进行数据搬运时，硬件性能会急剧下降，为了提升此场景性能，通过`vector_load_unalign` / `vector_store_unalign`作为临时缓存，保存跨对齐边界的数据，通过多轮循环拼接成对齐地址的读写，减少直接访问非对齐UB地址的次数，从而减少非对齐访问的额外开销。
+非对齐搬运是指UB地址非对齐，但仍需要在UB和矢量数据寄存器之间连续读写数据的场景。在直接与非对齐UB地址进行data_move时，硬件性能会急剧下降，为了提升此场景性能，通过`vector_load_unalign` / `vector_store_unalign`作为临时缓存，保存跨对齐边界的数据，通过多轮循环拼接成对齐地址的读写，减少直接访问非对齐UB地址的次数，从而减少非对齐访问的额外开销。
 
 **非对齐搬入**由[`asc_loadunalign_pre`](../../../../../api/SIMD-API/C-API/reg/reg_load/asc_loadunalign_pre.md)和[`asc_loadunalign`](../../../../../api/SIMD-API/C-API/reg/reg_load/asc_loadunalign.md)组合完成：
 例如在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，当想要搬入如下UB地址为48开始的256Bytes数据时:
@@ -512,11 +512,11 @@ for (uint16_t i = 0; i < extent1; ++i) {
 
 ### 矢量计算
 
-Reg矢量计算接口直接操作矢量数据寄存器或掩码寄存器，通常带有mask参数控制有效元素。主要分为三类：
+reg_vector_compute接口直接操作矢量数据寄存器或mask寄存器，通常带有mask参数控制有效元素。主要分为三类：
 
 #### 矢量数据寄存器计算
 
-基础算术接口完成寄存器之间的逐元素计算：
+basic_arithmetic接口完成寄存器之间的逐元素计算：
 
 ```cpp
 vector_float src0_reg;
@@ -549,9 +549,9 @@ asc_adds(dst_reg, src_reg, scalar_value, mask);
 asc_muls(dst_reg, src_reg, scalar_value, mask);
 ```
 
-#### 掩码寄存器计算
+#### mask寄存器计算
 
-逻辑接口可操作矢量数据寄存器或掩码寄存器：
+逻辑接口可操作矢量数据寄存器或mask寄存器：
 
 ```cpp
 vector_bool mask0;
@@ -568,7 +568,7 @@ asc_or(dst_mask, mask0, mask1, mask);
 asc_not(dst_mask, mask0, mask);
 ```
 
-#### 比较与选择
+#### compare_and_select
 
 比较接口输出比较结果，选择接口按mask在两个源操作数之间选择：
 
@@ -654,7 +654,7 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
 #### VF融合
 
-VF融合是Reg矢量计算编程最重要的优化手段。其是将多个计算以及其循环进行合并在1个VF函数内，融合后可以减少VF调用和Hardware Loop启动开销，并消除多个VF之间冗余的Load/Store和同步指令，使中间结果尽量保留在寄存器中连续消费。
+VF融合是reg_vector_compute编程最重要的优化手段。其是将多个计算以及其循环进行合并在1个VF函数内，融合后可以减少vf_call和Hardware Loop启动开销，并消除多个VF之间冗余的Load/Store和同步指令，使中间结果尽量保留在寄存器中连续消费。
 
 VF融合可以分成两个层级：
 
@@ -670,7 +670,7 @@ VF融合可以分成两个层级：
 
 #### 指令双发
 
-指令双发依赖硬件**同时发射和执行多条互不依赖指令**的能力。DMA单元与Reg矢量执行单元在没有数据依赖时可以并行工作，Reg矢量计算单元的部分指令在无依赖时可以并行执行，DMA单元的多次对齐搬入之间、对齐搬入和对齐搬出之间在无地址依赖时可以并行执行；Reg矢量编程的优化目标之一就是为执行队列提供足够多的独立指令，避免长依赖链阻塞硬件并行。
+指令双发依赖硬件**同时发射和执行多条互不依赖指令**的能力。DMA单元与Reg矢量执行单元在没有数据依赖时可以并行工作，reg_vector_compute单元的部分指令在无依赖时可以并行执行，DMA单元的多次对齐搬入之间、对齐搬入和对齐搬出之间在无地址依赖时可以并行执行；Reg矢量编程的优化目标之一就是为执行队列提供足够多的独立指令，避免长依赖链阻塞硬件并行。
 
 如果计算链路过长，也可以适度拆分VF循环、必要时将阶段性结果写回UB，以换取更好的指令调度空间。同时需要控制VF内寄存器数量：一个VF中可同时使用的`vector_*`、`vector_bool`、`vector_load_unalign`、`vector_store_unalign`数量都受硬件规格限制，超出后编译器会插入换入换出和同步指令，反而降低性能。
 
@@ -680,6 +680,6 @@ VF融合可以分成两个层级：
 
 ## 小结<a name="section_part7"></a>
 
-Reg矢量计算编程基于[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新增的SIMD Register File开放的寄存器级编程能力，使开发者直接组织寄存器搬运、计算、掩码控制和同步操作。它以`__aicore__`和`__simd_vf__`两层执行域为基本结构，其中`__aicore__`侧负责整体任务组织、数据切分和VF调用，`__simd_vf__`侧通过五类寄存器及其配套API完成细粒度矢量计算。
+reg_vector_compute编程基于[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新增的SIMD Register File开放的寄存器级编程能力，使开发者直接组织寄存器搬运、计算、mask控制和同步操作。它以`__aicore__`和`__simd_vf__`两层执行域为基本结构，其中`__aicore__`侧负责整体任务组织、数据切分和vf_call，`__simd_vf__`侧通过五类寄存器及其配套API完成细粒度矢量计算。
 
-实际开发时，Reg矢量计算不仅要关注接口本身，还需要结合硬件执行特征开发代码。优先使用对齐搬运，保持循环满足Hardware Loop识别规范，并在寄存器资源允许的范围内进行VF融合，通常可以减少搬运、同步和循环启动开销，从而获得更稳定的性能表现。
+实际开发时，reg_vector_compute不仅要关注接口本身，还需要结合硬件执行特征开发代码。优先使用对齐搬运，保持循环满足Hardware Loop识别规范，并在寄存器资源允许的范围内进行VF融合，通常可以减少搬运、同步和循环启动开销，从而获得更稳定的性能表现。

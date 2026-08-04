@@ -1,6 +1,6 @@
 # ReduceDataBlock类接口多场景示例
 
-## 概述
+## overview
 
 本样例在归约场景下，基于`ReduceDataBlock`实现类接口的多场景归约功能，对输入Tensor的每个DataBlock（32字节）内所有元素进行归约运算（求最大值、最小值或求和）。
 

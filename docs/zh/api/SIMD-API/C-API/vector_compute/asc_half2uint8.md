@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将half类型数据转换为uint8_t类型，支持多种舍入模式：
+将half_type数据转换为uint8_t类型，支持多种舍入模式：
 
 - NONE舍入模式：在转换有精度损失时表示RINT舍入模式，不涉及精度损失时代表不舍入
 - RINT舍入模式：四舍六入五成双舍入
@@ -54,7 +54,7 @@
     __aicore__ inline void asc_half2uint8_rz(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     ```
 
-- 高维切分计算
+- high_dim_split计算
 
     ```cpp
     // NONE舍入模式
@@ -113,7 +113,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 
 ## 调用示例

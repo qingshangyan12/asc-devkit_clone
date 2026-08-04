@@ -1,8 +1,8 @@
-# Matmul高阶API开启多核K轴错峰访问内存<a name="ZH-CN_TOPIC_0000002374905793"></a>
+# Matmulhigh_level_api开启多核K轴错峰访问内存<a name="ZH-CN_TOPIC_0000002374905793"></a>
 
 ## 案例介绍<a name="section579816421564"></a>
 
-本案例呈现在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，开启多核K轴错峰访问Device内存对算子性能的提升效果。在多核并行执行Matmul计算时，如果输入矩阵A或B的内存位置位于GM，并且参与多核计算的矩阵相同，那么将出现多核同时访问相同GM地址的情况，导致地址访问冲突，从而影响算子性能。若开启多核K轴错峰访问Device内存，切分的矩阵K轴方向对应的不同核将尽量从不同的GM起始地址开始访问和搬运数据，缓解地址访问冲突，提升算子性能。
+本案例呈现在矩阵乘算子场景中，使用Matmulhigh_level_api进行矩阵乘法计算，开启多核K轴错峰访问Device内存对算子性能的提升效果。在多核并行执行Matmul计算时，如果输入矩阵A或B的内存位置位于GM，并且参与多核计算的矩阵相同，那么将出现多核同时访问相同GM地址的情况，导致地址访问冲突，从而影响算子性能。若开启多核K轴错峰访问Device内存，切分的矩阵K轴方向对应的不同核将尽量从不同的GM起始地址开始访问和搬运数据，缓解地址访问冲突，提升算子性能。
 
 **图1**  访问地址冲突示意图<a name="fig7682191511128"></a>  
 ![](../../../figures/访问地址冲突示意图.png "访问地址冲突示意图")
@@ -74,7 +74,7 @@ MTE2的搬运效率还可以通过查看其带宽利用率进行验证，如下�
 
 ## 设计优化方案<a name="section33901368431"></a>
 
-开启K轴错峰访问内存：在创建Matmul对象时，将MatmulConfig中的enableKdimReorderLoad参数设置为true。enableKdimReorderLoad参数的详细介绍请参考[MatmulConfig](../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)。
+开启K轴错峰访问内存：在创建Matmul对象时，将MatmulConfig中的enableKdimReorderLoad参数设置为true。enableKdimReorderLoad参数的详细介绍请参考[MatmulConfig](../../../../api/SIMD-API/high_level_api/cube_compute/Matmul_Kernel/MatmulConfig.md)。
 
 开启K轴错峰访问内存的完整样例请参考[K轴错峰加载数据的算子样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_k_reorder_load)。开启该功能的主要步骤如下：
 

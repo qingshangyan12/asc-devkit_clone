@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-数据搬运过程中进行随路量化时，通过调用该接口获取ReLU操作前矢量的起始地址。
+data_move过程中进行accompanying_quantization时，通过调用该接口获取ReLU操作前矢量的起始地址。
 
 ## 函数原型
 

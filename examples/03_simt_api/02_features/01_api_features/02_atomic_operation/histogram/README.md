@@ -1,8 +1,8 @@
 # SIMT编程模式实现Histogram样例
 
-## 概述
+## overview
 
-本样例展示了如何利用 Ascend C 的SIMT的[`asc_atomic_add()`](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md)接口，高效统计输入字节序列中每个字节值的出现频率。功能示意如下图：<br>
+本样例展示了如何利用 Ascend C 的SIMT的[`asc_atomic_add()`](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md)接口，高效统计输入字节序列中每个字节值的出现频率。功能示意如下图：<br>
 <img src="figures/introduction.png" alt="intro" style="width: 50%; height: auto;">
 
 ## 支持的产品
@@ -44,7 +44,7 @@
     * 单线程处理：按grid-stride遍历`uint32`输入，每次解析4个字节并更新所属Warp的局部直方图。
   * 第二阶段Kernel `merge_block_local_histogram`：
     * ThreadBlock数：`256`，每个ThreadBlock负责一个bin（桶），这里的桶代表直方图数组中单个计数单元。
-    * 每个ThreadBlock线程数：为了使用规约算法，采用高于72的第一个2的n次幂即`128`。
+    * 每个ThreadBlock线程数：为了使用规约algorithms，采用高于72的第一个2的n次幂即`128`。
     * 单线程处理：每个线程读取若干份局部直方图中同一个桶的计数并累加，再在ThreadBlock内归约得到最终计数。
   * 结果预期：NPU输出的256个桶计数应与CPU基于同一输入计算得到的结果一致。
 

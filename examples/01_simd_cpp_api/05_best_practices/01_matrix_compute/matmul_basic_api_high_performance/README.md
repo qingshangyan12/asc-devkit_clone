@@ -1,8 +1,8 @@
-# Matmul 基础API最佳实践样例
+# Matmul basic_api最佳实践样例
 
-## 概述
+## overview
 
-本样例基于静态Tensor编程范式，通过 L1/L0 双缓冲机制、大包搬运、细粒度流水同步、UnitFlag、L2Cache等多种优化手段，实现高性能矩阵乘法运算。本样例基于基础API实现，与高阶API版本所使用的优化方法相同，样例目标为基于静态Tensor编程范式展示调优实现细节。
+本样例基于静态Tensor编程范式，通过 L1/L0 双缓冲机制、大包搬运、细粒度流水同步、UnitFlag、L2Cache等多种优化手段，实现高性能矩阵乘法运算。本样例基于basic_api实现，与high_level_api版本所使用的优化方法相同，样例目标为基于静态Tensor编程范式展示调优实现细节。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -57,11 +57,11 @@
 | aic_mac_time(μs) | Cube 计算单元的执行时间 |
 | aic_mac_ratio | Cube 计算单元的时间占比，反映计算单元利用率 |
 | aic_mte1_time(μs) | MTE1（L1 到 L0A/L0B 搬运）的执行时间 |
-| aic_mte1_ratio | MTE1 的时间占比，反映 L1 到 L0 的数据搬运压力 |
-| aic_mte2_time(μs) | MTE2（[GM](../../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（Global Memory） 到 L1 搬运）的执行时间 |
+| aic_mte1_ratio | MTE1 的时间占比，反映 L1 到 L0 的data_move压力 |
+| aic_mte2_time(μs) | MTE2（[GM](../../../../../docs/zh/guide/编程指南/programming_model/AI-Core-SIMD编程/抽象硬件架构.md)（Global Memory） 到 L1 搬运）的执行时间 |
 | aic_mte2_ratio | MTE2 的时间占比，反映 GM 到 L1 的数据加载压力 |
-| aic_fixpipe_time(μs) | [Fixpipe](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬出/Fixpipe_L0CToGM.md)（L0C 到 GM 搬运）的执行时间 |
-| aic_fixpipe_ratio | [Fixpipe](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬出/Fixpipe_L0CToGM.md) 的时间占比，反映结果写回的访存压力 |
+| aic_fixpipe_time(μs) | [Fixpipe](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)（L0C 到 GM 搬运）的执行时间 |
+| aic_fixpipe_ratio | [Fixpipe](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md) 的时间占比，反映结果写回的访存压力 |
 
 
 ### 数据流路径：
@@ -121,12 +121,12 @@ AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES
 
 | 事件类型 | 方向 | 用途 | flag 编号 |
 |---------|------|------|----------|
-| [MTE2_MTE1](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | 正向 | L1 数据就绪通知，DataCopyIn 通知 DataLoad 可读取 | 0/1: A1 Ping/Pong; 2/3: B1 Ping/Pong |
-| [MTE1_MTE2](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | 反向 | L1 缓冲区释放通知，DataLoad 通知 DataCopyIn 可写入 | 同上 |
-| [MTE1_M](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | 正向 | L0 数据就绪通知，DataLoad 通知 Compute 可计算 | mte1DBFlag (0/1 交替) |
-| [M_MTE1](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | 反向 | L0 缓冲区释放通知，Compute 通知 DataLoad 可写入 | mte1DBFlag (0/1 交替) |
+| [MTE2_MTE1](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | 正向 | L1 数据就绪通知，DataCopyIn 通知 DataLoad 可读取 | 0/1: A1 Ping/Pong; 2/3: B1 Ping/Pong |
+| [MTE1_MTE2](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | 反向 | L1 缓冲区释放通知，DataLoad 通知 DataCopyIn 可写入 | 同上 |
+| [MTE1_M](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | 正向 | L0 数据就绪通知，DataLoad 通知 Compute 可计算 | mte1DBFlag (0/1 交替) |
+| [M_MTE1](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | 反向 | L0 缓冲区释放通知，Compute 通知 DataLoad 可写入 | mte1DBFlag (0/1 交替) |
 
-**反向同步需预置**：由于反向同步是"消费方 [SetFlag](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) → 生产方 [WaitFlag](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md)"，首次使用前必须预置 SetFlag，否则首次 WaitFlag 会死锁：
+**反向同步需预置**：由于反向同步是"消费方 [SetFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) → 生产方 [WaitFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md)"，首次使用前必须预置 SetFlag，否则首次 WaitFlag 会死锁：
 
 ```cpp
 // 初始化：预置反向同步 flag，防止首次 WaitFlag 死锁
@@ -189,7 +189,7 @@ nd2nzParams.dValue = baseK * stepKa;  // 大包包含 stepKa 个 baseM * baseK
 
 #### 6. LoadData3D 替代 LoadData2D——减少指令队列占用
 
-在 Atlas A2/A3 架构上，本样例使用 [`LoadData3DParamsV2`](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_3D.md)（即 [LoadData3D](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_3D.md)）替代 [`LoadData2DParams`](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_2D.md)（即 LoadData2D）完成 L1→L0 的数据搬运。这是一个关键的指令队列优化。
+在 Atlas A2/A3 架构上，本样例使用 [`LoadData3DParamsV2`](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_3D.md)（即 [LoadData3D](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_3D.md)）替代 [`LoadData2DParams`](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md)（即 LoadData2D）完成 L1→L0 的data_move。这是一个关键的指令队列优化。
 
 **问题背景**：MTE1 指令队列深度为 32。使用 LoadData2D 时，由于单条 LoadData2D 指令搬运粒度有限，搬运一个 baseM×baseK 的切片需要用 for 循环发射多条 LoadData2D 指令。例如 baseM=128、baseK=64 时，最少需要发射 `baseK/16 = 4` 条 LoadData2D 指令。
 
@@ -235,7 +235,7 @@ class KernelMmad { ... };
 
 #### 8. UnitFlag 优化
 
-开启 UnitFlag 后，[MMAD](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算/Mmad.md) 和 [FIXPIPE](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬出/Fixpipe_L0CToGM.md) 实现细粒度（512B）流水并行，而非指令级同步。每当 Cube 完成一个 512B 数据结果的计算，FIXPIPE 立即搬出该数据，Cube 计算与结果写回流水重叠：
+开启 UnitFlag 后，[MMAD](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md) 和 [FIXPIPE](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md) 实现细粒度（512B）流水并行，而非指令级同步。每当 Cube 完成一个 512B 数据结果的计算，FIXPIPE 立即搬出该数据，Cube 计算与结果写回流水重叠：
 
 ```cpp
 mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // 开启 UnitFlag
@@ -358,7 +358,7 @@ k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad
 
 已达成该芯片 99.7% 的峰值算力。
 
-使能 L2Cache 切分后在 Ascend 950PR 芯片上没有明显效果，原因如下：L2Cache 优化的目标是缓解 MTE2 bound，但当前瓶颈为 Cube 计算而非数据搬运，因此减少 MTE2 耗时无法提升整体性能；此外 L2Cache 切分将计算分为 2 轮调度，引入了额外的 Scalar 开销和调度开销，导致 Scenario 2 的 Task Duration 略高于 Scenario 1。同时，Scenario 2 的 aic_mte2_time（1892.742μs）反而略高于 Scenario 1（1874.267μs），这是因为当样例处于 Cube bound 时，MTE2 流水线被 Cube 计算阻塞，profiler 采集的 aic_mte2_time 包含了流水线等待时间而非纯粹的数据搬运时间，L2Cache 优化虽然减少了实际数据访问延迟，但被 Cube 计算瓶颈掩盖，无法在 MTE2 指标上体现。
+使能 L2Cache 切分后在 Ascend 950PR 芯片上没有明显效果，原因如下：L2Cache 优化的目标是缓解 MTE2 bound，但当前瓶颈为 Cube 计算而非data_move，因此减少 MTE2 耗时无法提升整体性能；此外 L2Cache 切分将计算分为 2 轮调度，引入了额外的 Scalar 开销和调度开销，导致 Scenario 2 的 Task Duration 略高于 Scenario 1。同时，Scenario 2 的 aic_mte2_time（1892.742μs）反而略高于 Scenario 1（1874.267μs），这是因为当样例处于 Cube bound 时，MTE2 流水线被 Cube 计算阻塞，profiler 采集的 aic_mte2_time 包含了流水线等待时间而非纯粹的data_move时间，L2Cache 优化虽然减少了实际数据访问延迟，但被 Cube 计算瓶颈掩盖，无法在 MTE2 指标上体现。
 
 ### 理论性能分析
 
@@ -414,7 +414,7 @@ MTE2 耗时误差：
 
 $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
 
-相比于 Atlas A2 训练系列芯片，Ascend 950PR 芯片数据搬运更为高效，MTE2 带宽利用率更高。
+相比于 Atlas A2 训练系列芯片，Ascend 950PR 芯片data_move更为高效，MTE2 带宽利用率更高。
 
 ## 编译运行
 
@@ -444,7 +444,7 @@ $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
@@ -521,7 +521,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

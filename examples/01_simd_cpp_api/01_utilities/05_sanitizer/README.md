@@ -1,8 +1,8 @@
 # Sanitizer样例介绍
 
-## 概述
+## overview
 
-本样例基于MindStudio工具，演示了msSanitizer调测工具的使用方法。用户可根据异常检测结果，快速定位样例的异常场景。
+本样例基于MindStudio工具，演示了msSanitizer调测工具的使用方法。用户可根据exception_detection结果，快速定位样例的异常场景。
 
 ## 样例列表
 

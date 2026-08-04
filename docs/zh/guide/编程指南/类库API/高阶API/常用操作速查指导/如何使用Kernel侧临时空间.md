@@ -1,6 +1,6 @@
 # 如何使用Kernel侧临时空间<a name="ZH-CN_TOPIC_0000002522740421"></a>
 
-Kernel侧接口的内部实现一般涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。除矩阵计算、HCCL通信类、卷积计算等，对于多数高阶API中临时空间的处理，开发者可以通过Kernel侧接口的入参sharedTmpBuffer传入提前申请的临时空间、通过接口框架申请临时空间两种方式。
+Kernel侧接口的内部实现一般涉及复杂的math_compute，需要额外的临时空间来存储计算过程中的中间变量。除cube_compute、HCCL_communication、convolution_compute等，对于多数high_level_api中临时空间的处理，开发者可以通过Kernel侧接口的入参sharedTmpBuffer传入提前申请的临时空间、通过接口框架申请临时空间两种方式。
 
 -   通过sharedTmpBuffer入参传入，Kernel侧接口使用该传入的Tensor作为临时空间。该方式下，开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
 -   接口框架申请临时空间，开发者无需在Kernel侧申请临时空间，但是需要预留临时空间的大小，即在分配内存空间时，应在可用空间大小中减去需预留的临时空间大小。
@@ -10,7 +10,7 @@ Kernel侧接口的内部实现一般涉及复杂的数学计算，需要额外�
 -   为保证功能正确，预留/申请的临时空间大小不能小于最小临时空间大小；
 -   在最小临时空间-最大临时空间范围内，随着临时空间增大，Kernel侧接口计算性能会有一定程度的优化提升。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。
 
-以下以Asin接口为例，示例使用[AscendC::TensorShape](../../../../../api/SIMD-API/高阶API/数据结构/TensorShape.md)描述输入数据的Tensor形状：
+以下以Asin_interface为例，示例使用[AscendC::TensorShape](../../../../../api/SIMD-API/high_level_api/data_structures/TensorShape.md)描述输入数据的Tensor形状：
 
 ```
 // 算子输入的数据类型T为half，isReuseSource传入默认值false
@@ -36,15 +36,15 @@ AsinCustomTilingData tiling;
 tiling.set_tmpBufferSize(tmpSize); // 将临时空间大小设置为Tiling参数
 ```
 
-另外，多数高阶API中提供了GetxxxTmpBufferFactorSize接口，该接口用于获取maxLiveNodeCnt和extraBuf，maxLiveNodeCnt表示临时空间是单次计算数据量所占空间的多少倍；extraBuf表示Kernel侧接口所需的临时空间大小的字节数。在固定空间大小的情况下，通过maxLiveNodeCnt和extraBuf可以推算算子单次最大计算元素数量。
+另外，多数high_level_api中提供了GetxxxTmpBufferFactorSize接口，该接口用于获取maxLiveNodeCnt和extraBuf，maxLiveNodeCnt表示临时空间是单次计算数据量所占空间的多少倍；extraBuf表示Kernel侧接口所需的临时空间大小的字节数。在固定空间大小的情况下，通过maxLiveNodeCnt和extraBuf可以推算算子单次最大计算元素数量。
 
 推算示例如下：
 
--   算子实现需要调用Mean接口，开发者为其预留currBuff大小的空间（即总可用空间），利用GetMeanTmpBufferFactorSize接口得到maxLiveNodeCnt、extraBuf输出值，可推导算子单次最大计算元素数量为：
+-   算子实现需要调用Mean_interface，开发者为其预留currBuff大小的空间（即总可用空间），利用GetMeanTmpBufferFactorSize接口得到maxLiveNodeCnt、extraBuf输出值，可推导算子单次最大计算元素数量为：
 
     currentShapeSize = \(currBuff - extraBuf\) / maxLiveNodeCnt / typeSize
 
--   算子实现需要调用两个Kernel侧API KernelIntf1、KernelIntf2，利用两个GetXxxTmpBufferFactorSize（其中Xxx为需要调用的两个高阶API）接口的两组输出值\(maxLiveNodeCnt、extraBuf\)以及当前现有的临时空间currBuff，推导单次最大计算元素数量currentShapeSize为：
+-   算子实现需要调用两个Kernel侧API KernelIntf1、KernelIntf2，利用两个GetXxxTmpBufferFactorSize（其中Xxx为需要调用的两个high_level_api）接口的两组输出值\(maxLiveNodeCnt、extraBuf\)以及当前现有的临时空间currBuff，推导单次最大计算元素数量currentShapeSize为：
 
     currentShapeSize1 = \(currBuff - extraBuf1\) / maxLiveNodeCnt1 / typeSize
 
@@ -54,7 +54,7 @@ tiling.set_tmpBufferSize(tmpSize); // 将临时空间大小设置为Tiling参数
 
 注意上文中的currBuff表示接口计算可用的空间，需要去除用户输入输出等空间。
 
-以算子中需要同时调用Asin、Acos接口为例：
+以算子中需要同时调用Asin、Acos_interface为例：
 
 ```
 // 算子输入的数据类型T为half
@@ -81,7 +81,7 @@ uint32_t acosExtraBuf = 0;
 AscendC::GetAsinTmpBufferFactorSize(typeSize, asinMaxLiveNodeCount, asinExtraBuf);
 AscendC::GetAcosTmpBufferFactorSize(typeSize, acosMaxLiveNodeCount, acosExtraBuf);
 // tmp的大小需要减去UB上调用api接口输入和输出占用的大小
-// 该示例中包括Asin接口的输入输出，以及Acos的输入输出，其中Asin接口的输出作为Acos的输入，因此一共需要3份src的空间大小
+// 该示例中包括Asin_interface的输入输出，以及Acos的输入输出，其中Asin_interface的输出作为Acos的输入，因此一共需要3份src的空间大小
 auto tmpSize = tailSize - srcSize * typeSize * 3;
 assert(tmpSize >= asinExtraBuf);
 assert(tmpSize >= acosExtraBuf);

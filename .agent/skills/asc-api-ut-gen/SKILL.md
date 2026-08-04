@@ -1,16 +1,16 @@
 ---
 name: asc-api-ut-gen
-description: AscendC API 单元测试技能。当用户需要为新 API 编写 UT、补充现有 API 测试覆盖、验证 API 分支路径，或根据 build/cov_report 覆盖率报告补齐低覆盖用例时使用。覆盖高阶API、membase基础API、regbase基础API、C API、SIMT API、工具类API 的 UT 生成，包含分支覆盖分析、参数化测试设计和精度验证。
+description: AscendC API 单元测试技能。当用户需要为新 API 编写 UT、补充现有 API 测试覆盖、验证 API 分支路径，或根据 build/cov_report 覆盖率报告补齐低覆盖用例时使用。覆盖high_level_api、membasebasic_api、regbasebasic_api、C API、SIMT API、工具类API 的 UT 生成，包含分支覆盖分析、参数化测试设计和精度验证。
 ---
 
 # API 单元测试技能
 
-## 1. 概述
+## 1. overview
 
 本技能帮助开发者编写 AscendC API 的单元测试（UT），涵盖：
 - 测试框架使用（Google Test + mockcpp）
 - 环境配置与编译执行
-- 高阶API / membase基础API / regbase基础API / C API / SIMT API / 工具类API UT 生成
+- high_level_api / membasebasic_api / regbasebasic_api / C API / SIMT API / 工具类API UT 生成
 - 参数化测试设计与精度验证
 - 基于 `build/cov_report` 覆盖率报告的低覆盖 UT 补齐与回归验证
 
@@ -34,13 +34,13 @@ description: AscendC API 单元测试技能。当用户需要为新 API 编写 U
 
 | API 类别 | 目录位置 | 说明 |
 |---------|---------|------|
-| **高阶API** | `asc-devkit/include/adv_api` | 高级封装 API，提供常用算子的高级接口 |
-| **membase基础API** | `asc-devkit/include/basic_api/`<br>（排除 `reg_compute/` 子目录） | 基于 memory 的基础 API，适用于所有架构 |
-| **regbase基础API** | `asc-devkit/include/basic_api/reg_compute/` | 基于 register 的基础 API，仅支持特定架构 |
+| **high_level_api** | `asc-devkit/include/adv_api` | 高级封装 API，提供常用算子的高级接口 |
+| **membasebasic_api** | `asc-devkit/include/basic_api/`<br>（排除 `reg_compute/` 子目录） | 基于 memory 的基础 API，适用于所有架构 |
+| **regbasebasic_api** | `asc-devkit/include/basic_api/reg_compute/` | 基于 register 的基础 API，仅支持特定架构 |
 | **C API** | `asc-devkit/include/c_api` | C 风格 API，底层硬件操作接口 |
-| **SIMT API** | `asc-devkit/include/simt_api` | SIMT 编程模型 API |
+| **SIMT API** | `asc-devkit/include/simt_api` | SIMT programming_model API |
 
-> **架构限制**：regbase基础API 仅支持 `ascend950pr_9599` (3510)；SIMT API 当前仅支持 `ascend950pr_9599` (3510)。
+> **架构限制**：regbasebasic_api 仅支持 `ascend950pr_9599` (3510)；SIMT API 当前仅支持 `ascend950pr_9599` (3510)。
 >
 > **统一事实来源**：通用芯片调用名、`__NPU_ARCH__` 映射、基础 dtype 视图、dtype 大小和直接初始化限制统一由 [`../asc-npu-arch/SKILL.md`](../asc-npu-arch/SKILL.md) 和 [`../asc-npu-arch/references/npu-arch-guide.md`](../asc-npu-arch/references/npu-arch-guide.md) 维护；本 skill 只保留 UT 场景特有的限制。
 
@@ -82,7 +82,7 @@ flowchart TD
 
 ---
 
-## 3. 工作流程概览
+## 3. 工作流程overview
 
 ```mermaid
 flowchart TD
@@ -157,10 +157,10 @@ flowchart TD
 /asc-api-ut-gen <芯片版本> <API类型> <API名称> [核心类型]
 
 # 示例
-/asc-api-ut-gen ascend910b1 membase Add aiv      # membase基础API AIV 测试
-/asc-api-ut-gen ascend910b1 membase Mmad aic     # membase基础API AIC 测试
-/asc-api-ut-gen ascend950pr_9599 regbase RegAdd  # regbase基础API 测试（仅支持 3510）
-/asc-api-ut-gen ascend910b1 adv Softmax          # 高阶API，需按目标 API 分析并生成专属 UT
+/asc-api-ut-gen ascend910b1 membase Add aiv      # membasebasic_api AIV 测试
+/asc-api-ut-gen ascend910b1 membase Mmad aic     # membasebasic_api AIC 测试
+/asc-api-ut-gen ascend950pr_9599 regbase RegAdd  # regbasebasic_api 测试（仅支持 3510）
+/asc-api-ut-gen ascend910b1 adv Softmax          # high_level_api，需按目标 API 分析并生成专属 UT
 /asc-api-ut-gen ascend950pr_9599 c asc_mmul      # C API 测试
 /asc-api-ut-gen ascend950pr_9599 simt vector_add # SIMT API 测试（仅支持 3510）
 /asc-api-ut-gen ascend910b1 utils check_align    # 工具类API 测试
@@ -301,14 +301,14 @@ cd {ASC_DEVKIT_PATH}/build/tests/api/basic_api
 
 ## 9. UT 检查清单
 
-### 9.1 membase基础API 检查
+### 9.1 membasebasic_api 检查
 
 - [ ] 已从目标架构 impl 文件确认数据类型支持 (SupportType)
 - [ ] 已确认 Tensor 最小大小约束和 32 字节对齐
 - [ ] AIC/AIV 的 SetGCoreType 正确设置
 - [ ] **AIC API: Params 结构体使用成员赋值（非花括号初始化）**
 
-### 9.2 regbase基础API 检查
+### 9.2 regbasebasic_api 检查
 
 - [ ] 已确认目标架构支持（仅 3510）
 - [ ] 已确认数据类型支持

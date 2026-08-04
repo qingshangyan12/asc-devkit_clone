@@ -1,8 +1,8 @@
 # RmsNorm样例
 
-## 概述
+## overview
 
-本样例基于Kernel直调样例工程，介绍了调用RmsNorm高阶API实现rmsnorm单样例，实现对shape大小为[B，S，H]的输入数据的RmsNorm归一化。
+本样例基于Kernel直调样例工程，介绍了调用RmsNormhigh_level_api实现rmsnorm单样例，实现对shape大小为[B，S，H]的输入数据的RmsNorm归一化。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -55,7 +55,7 @@
 
   - Kernel实现  
     计算逻辑是：  
-    输入数据需要先搬运进片上存储，然后使用RmsNorm高阶API接口完成rmsnorm计算，得到最终结果，再搬出到外部存储上。
+    输入数据需要先搬运进片上存储，然后使用RmsNormhigh_level_api接口完成rmsnorm计算，得到最终结果，再搬出到外部存储上。
 
   - Tiling实现
 

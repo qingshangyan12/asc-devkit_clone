@@ -1,6 +1,6 @@
 # compare样例
 
-## 概述
+## overview
 本样例基于Reg编程接口实现Compare、Compares接口完成多场景下的数据比较功能。  
 本样例支持两种比较场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
   <table>

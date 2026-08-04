@@ -1,5 +1,5 @@
 # Printf样例介绍
-## 概述
+## overview
 本样例展示了Ascend C printf接口和simd_vf侧printf接口的基本使用方法。
 
 ## 样例列表

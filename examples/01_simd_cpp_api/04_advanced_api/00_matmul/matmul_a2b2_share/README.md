@@ -1,5 +1,5 @@
 # Matmul开启A2和B2全局管理直调样例
-## 概述
+## overview
 开启 A2(L0A Buffer) 和 B2(L0B Buffer) 全局管理的Matmul样例。该场景中所有Matmul对象共享 A2(L0A Buffer) 和 B2(L0B Buffer)。
 
 ## 本样例支持的产品及CANN软件版本
@@ -29,7 +29,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;             # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output1.bin output/golden1.bin output/output2.bin output/golden2.bin  # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output1.bin output/golden1.bin output/output2.bin output/golden2.bin  # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

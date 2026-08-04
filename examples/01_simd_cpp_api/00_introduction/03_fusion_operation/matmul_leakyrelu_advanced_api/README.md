@@ -1,8 +1,8 @@
 # Matmul和LeakyRelu融合样例
 
-## 概述
+## overview
 
-本样例采用高阶API实现Matmul与LeakyRelu激活函数融合计算，实现矩阵运算单元和向量运算单元的融合计算。
+本样例采用high_level_api实现Matmul与LeakyReluactivation_functions融合计算，实现矩阵运算单元和向量运算单元的融合计算。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -28,7 +28,7 @@
 ## 样例描述
 
 - 样例功能：
-  本样例使用Ascend C Matmul高阶API实现矩阵乘、Bias加法和LeakyRelu激活函数的融合计算。Matmul高阶API封装了矩阵计算过程中的数据搬运、Cube计算调度、基础流水同步等细节，开发者主要需要完成矩阵规格配置、tiling生成、输入Tensor设置、Vector侧融合计算和结果写回。
+  本样例使用Ascend C Matmulhigh_level_api实现矩阵乘、Bias加法和LeakyReluactivation_functions的融合计算。Matmulhigh_level_api封装了cube_compute过程中的data_move、Cube计算调度、基础流水同步等细节，开发者主要需要完成矩阵规格配置、tiling生成、输入Tensor设置、Vector侧融合计算和结果写回。
 
   MatmulLeakyRelu的计算公式如下：
   ```
@@ -66,12 +66,12 @@
     - `matmul_leakyrelu_custom`是一个`__global__ __mix__(1, 2)`核函数，运行时同时包含Cube侧和Vector侧计算逻辑。
     - Kernel入参中的A、B、Bias、C均使用`__gm__ uint8_t*`表示GM上的字节地址，Kernel内部固定A/B为`half`、C/Bias为`float`，并转换为对应的`GlobalTensor`使用。本样例调用`matmul_leakyrelu_custom`时不传模板参数。
     - workspace参数使用`__kfc_workspace__`修饰，表示Host侧申请并传入的系统workspace。Kernel侧注册Matmul对象时，通过`GetSysWorkSpacePtr()`将该workspace传递给`REGIST_MATMUL_OBJ`。
-    - 创建`GlobalTensor`对象`aGlobal`、`bGlobal`、`cGlobal`、`biasGlobal`，分别表示GM中的A、B、C、Bias数据。`GlobalTensor`只描述GM上的地址和元素个数，真正的数据搬运、L1/L0切分由Matmul高阶API结合tiling完成。
+    - 创建`GlobalTensor`对象`aGlobal`、`bGlobal`、`cGlobal`、`biasGlobal`，分别表示GM中的A、B、C、Bias数据。`GlobalTensor`只描述GM上的地址和元素个数，真正的data_move、L1/L0切分由Matmulhigh_level_api结合tiling完成。
     - Kernel侧通过`GetBlockIdx()`获取当前AIV侧逻辑任务编号，并计算当前AIV逻辑核在N方向的分片编号。
     - A矩阵在各个逻辑核上复用起始地址，B矩阵、Bias和C矩阵需要按照AIV逻辑核编号在N方向偏移。
     - 创建`TQue<AscendC::TPosition::VECIN, 1>`管理Matmul输出到Vector侧的中间结果缓存，创建`TQue<AscendC::TPosition::VECOUT, 1>`管理Vector侧LeakyRelu输出缓存，并通过`pipe.InitBuffer`分别为单个`baseM * baseN`输出分块申请片上缓存。
-    - 创建Matmul高阶API对象`matmulObj`。`MatmulType`模板参数描述A/B/C/Bias在Kernel侧的位置、格式和数据类型。
-    - 通过`REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), matmulObj, &tiling)`注册Matmul对象。注册时会把`TPipe`、系统workspace、Matmul对象和对应`TCubeTiling`交给Matmul高阶API内部使用。
+    - 创建Matmulhigh_level_api对象`matmulObj`。`MatmulType`模板参数描述A/B/C/Bias在Kernel侧的位置、格式和数据类型。
+    - 通过`REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), matmulObj, &tiling)`注册Matmul对象。注册时会把`TPipe`、系统workspace、Matmul对象和对应`TCubeTiling`交给Matmulhigh_level_api内部使用。
     - 调用`SetTensorA`、`SetTensorB`、`SetBias`绑定当前逻辑块需要读取的A、B、Bias输入。
 
   - Matmul与LeakyRelu融合流程
@@ -81,7 +81,7 @@
     - `AscendC::LeakyRelu(reluOutLocal, mmOutLocal, static_cast<float>(0.001), tiling.baseM * tiling.baseN)`对当前分块执行逐元素LeakyRelu激活，并将结果写入`reluOutLocal`。
     - `mmOutQueue.EnQue`和`mmOutQueue.DeQue`用于建立Matmul结果写入和后续LeakyRelu读取之间的数据依赖；`reluOutQueue.EnQue`和`reluOutQueue.DeQue`用于建立Vector计算和搬出之间的数据依赖。
     - `AscendC::DataCopy`将激活后的`baseM * baseN`分块搬运到GM输出矩阵C的对应位置。
-    - `matmulObj.End()`通知Matmul对象当前核计算结束，释放Matmul高阶API内部状态。
+    - `matmulObj.End()`通知Matmul对象当前核计算结束，释放Matmulhigh_level_api内部状态。
 
   - 分核和地址偏移说明
     - 第0个AIV逻辑核处理C矩阵第0到63列，第1个AIV逻辑核处理第64到127列。
@@ -97,7 +97,7 @@
 
 - `__mix__(1, 2)`场景下SetDim和kernel启动核数配置说明：
 
-  MIX场景（包含矩阵计算和矢量计算），分离模式下（本样例支持的产品的基本架构为分离模式），Matmul API是从AIV侧发起的，AIV调用`Iterate`时通知AIC做矩阵计算，AIC完成后再通知AIV。因此tiling侧按AIV视角切分任务。
+  MIX场景（包含cube_compute和矢量计算），分离模式下（本样例支持的产品的基本架构为分离模式），Matmul API是从AIV侧发起的，AIV调用`Iterate`时通知AIC做cube_compute，AIC完成后再通知AIV。因此tiling侧按AIV视角切分任务。
 
   本样例中`SetDim(2)`表示tiling侧按照2个AIV逻辑核生成Matmul分核参数；`__mix__(1, 2)`表示每个AI Core组合包含1个AIC和2个AIV；
   
@@ -107,7 +107,7 @@
 
   以下结构体以花括号`{}`方式传参，各字段含义如下：
 
-  **`AscendC::DataCopyParams`** — `DataCopy`接口使用，描述Local Memory到Global Memory的数据搬运参数：
+  **`AscendC::DataCopyParams`** — `DataCopy`接口使用，描述Local Memory到Global Memory的data_move参数：
   ```cpp
   struct DataCopyParams {
       uint16_t blockCount;  // 待搬运的连续传输数据块个数，[1, 4095]
@@ -137,7 +137,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                      # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

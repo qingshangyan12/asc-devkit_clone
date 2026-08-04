@@ -1,6 +1,6 @@
 # 自定义算子工程编译、打包和部署样例
 
-## 概述
+## overview
 
 本样例以简单自定义算子为基础，展示了其编译、打包成自定义算子包，并部署到CANN环境中的流程。
 
@@ -29,13 +29,13 @@
 │   │   ├── CMakeLists.txt           // Host侧编译工程文件
 │   │   ├── add_custom               // Add算子Host实现
 │   │   ├── add_custom_template      // Add模板算子Host实现
-│   │   ├── add_custom_tiling_sink   // Add Tiling下沉算子Host实现
+│   │   ├── add_custom_tiling_sink   // Add Tiling_sink算子Host实现
 │   │   └── leaky_relu_custom        // LeakyRelu算子Host实现
 │   ├── op_kernel                    // Kernel侧算子实现目录
 │   │   ├── CMakeLists.txt           // Kernel侧编译工程文件
 │   │   ├── add_custom               // Add算子Kernel实现
 │   │   ├── add_custom_template      // Add模板算子Kernel实现
-│   │   ├── add_custom_tiling_sink   // Add Tiling下沉算子Kernel实现
+│   │   ├── add_custom_tiling_sink   // Add Tiling_sink算子Kernel实现
 │   │   └── leaky_relu_custom        // LeakyRelu算子Kernel实现
 │   └── README.md                    // 样例说明文档
 ```
@@ -49,8 +49,8 @@ z = x + y
 ```
 
 AddCustomTilingSink、AddCustomTemplate与Add的核函数功能一致。其中，
-  - AddCustomTemplate展示了Tiling模板编程，添加的模板参数包括输入的数据类型、shape等，根据模板参数，简化或统一样例的实现逻辑，开发者可以在模板参数中定义需要的信息，如输入输出的数据类型，其他扩展参数等；
-  - AddCustomTilingSink用于展示Tiling下沉场景，通过`DEVICE_IMPL_OP_OPTILING`将Tiling函数同时注册到host和device上执行。
+  - AddCustomTemplate展示了Tiling_template_programming，添加的模板参数包括输入的数据类型、shape等，根据模板参数，简化或统一样例的实现逻辑，开发者可以在模板参数中定义需要的信息，如输入输出的数据类型，其他扩展参数等；
+  - AddCustomTilingSink用于展示Tiling_sink场景，通过`DEVICE_IMPL_OP_OPTILING`将Tiling函数同时注册到host和device上执行。
 
 LeakyRelu计算公式为：
 
@@ -140,11 +140,11 @@ $$
 
 - AddCustomTilingSink</br>
   - kernel实现：</br>
-    功能与Add一致，kernel通过`KERNEL_TASK_TYPE_DEFAULT`接口将样例强制指定在AIC、AIV混合场景运行，满足Tiling下沉算子条件。将所有的Tiling函数逻辑单独在`add_custom_tiling_sink_tiling.cpp`中实现，并通过`DEVICE_IMPL_OP_OPTILING`接口注册下沉的Tiling函数。</br>
+    功能与Add一致，kernel通过`KERNEL_TASK_TYPE_DEFAULT`接口将样例强制指定在AIC、AIV混合场景运行，满足Tiling_sink算子条件。将所有的Tiling函数逻辑单独在`add_custom_tiling_sink_tiling.cpp`中实现，并通过`DEVICE_IMPL_OP_OPTILING`接口注册下沉的Tiling函数。</br>
 
 - LeakyRelu</br>
   - kernel实现：</br>
-    基于基础API接口组合实现，使用`Maxs`、`Mins`、`Muls`、`Add`完成LeakyRelu计算。</br>
+    基于basic_api接口组合实现，使用`Maxs`、`Mins`、`Muls`、`Add`完成LeakyRelu计算。</br>
 
   - tiling实现：</br>
     TilingData参数设计，`LeakyReluCustomTilingData`参数本质上是和并行数据切分相关的参数，本示例样例使用了3个tiling参数：`totalLength`、`tileNum`、`negativeSlope`。`totalLength`、`tileNum`与Add样例类似，`negativeSlope`表示LeakyRelu的负半轴斜率系数，作为计算参数传递给kernel侧。</br>

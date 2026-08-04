@@ -1,6 +1,6 @@
 # Batch Matmul样例
 
-## 概述
+## overview
 
 本样例采用Tensor API编程范式实现带偏置（Bias）的批量矩阵乘法（Batch Matmul）运算。输入矩阵A、矩阵B与偏置Bias的数据类型统一为half，输出矩阵C数据类型同样为half；矩阵A、矩阵B均不做转置处理，核心计算逻辑定义如下：
 ```text
@@ -125,7 +125,7 @@ for (uint32_t l0CBatchIndex = 0; l0CBatchIndex < l0BatchSize; l0CBatchIndex++) {
 
 ### 矩阵批量搬出
 
-每次完成`L0BatchSize`数量的矩阵乘加计算后，调用Copy接口通过`CopyL0C2GM` `Operation`的数据搬运能力将L0C Buffer上的结果矩阵C搬出到Global Memory。
+每次完成`L0BatchSize`数量的矩阵乘加计算后，调用Copy接口通过`CopyL0C2GM` `Operation`的data_move能力将L0C Buffer上的结果矩阵C搬出到Global Memory。
 ```cpp
 Copy(copyL0C2GMAtom,
      gmC.Slice(MakeCoord(l1batchIndex + l0BatchIndex, MakeCoord(0, 0)),
@@ -155,7 +155,7 @@ Copy(copyL0C2GMAtom,
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                            # 编译工程，默认NPU模式
   python3 ../scripts/gen_data.py                                                  # 生成测试输入数据
   ./demo                                                                          # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin         # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin         # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。

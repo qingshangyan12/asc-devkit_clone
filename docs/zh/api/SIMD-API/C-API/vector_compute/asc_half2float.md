@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将half类型转化为float类型，无舍入模式。
+将half_type转化为float类型，无舍入模式。
 
 ## 函数原型
 
@@ -36,7 +36,7 @@
   //在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
   __aicore__ inline void asc_half2float(__ubuf__ float* dst, __ubuf__ half* src, uint32_t count)
   ```
-- 高维切分计算
+- high_dim_split计算
   
   ```cpp
   //在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
@@ -58,7 +58,7 @@
 | ------ | ----- | ----------------- |
 | dst    | 输出    | 目的操作数（矢量）的起始地址。            |
 | src    | 输入    | 源操作数（矢量）的起始地址。             |
-| count  | 输入    | 参与连续计算的元素个数。      |
+| count  | 输入    | 参与continuous_compute的元素个数。      |
 | repeat |输入    | 迭代次数。 |
 | dst_block_stride |输入    | 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src_block_stride |输入    | 源操作数单次迭代内不同DataBlock间地址步长。 |
@@ -75,7 +75,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 
 ## 调用示例

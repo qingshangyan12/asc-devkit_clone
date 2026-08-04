@@ -1,8 +1,8 @@
-# 通过FP Buffer存放量化参数实现高效随路量化<a name="ZH-CN_TOPIC_0000001947984233"></a>
+# 通过FP Buffer存放量化参数实现高效accompanying_quantization<a name="ZH-CN_TOPIC_0000001947984233"></a>
 
 【优先级】高
 
-【描述】算子实现中对矩阵乘结果进行量化计算时，可将量化参数搬运到Fixpipe Buffer（C2PIPE2GM）上，调用一次Fixpipe接口实现矩阵乘结果的量化计算。相比于将矩阵乘的结果从L0C Buffer（CO1）搬运到GM，再从GM搬运到UB，在UB进行量化计算的过程，数据搬运的次数更少，内存使用效率更高。
+【描述】算子实现中对矩阵乘结果进行量化计算时，可将量化参数搬运到Fixpipe Buffer（C2PIPE2GM）上，调用一次Fixpipe接口实现矩阵乘结果的量化计算。相比于将矩阵乘的结果从L0C Buffer（CO1）搬运到GM，再从GM搬运到UB，在UB进行量化计算的过程，data_move的次数更少，内存使用效率更高。
 
 >[!NOTE]说明 
 >本性能优化手段仅针对Atlas A2 训练系列产品/Atlas A2 推理系列产品生效。
@@ -26,7 +26,7 @@
 
 ```
 ...
-// 该样例仅做示例说明，非完整代码，省略了部分同步控制代码
+// 该样例仅做示例说明，非完整代码，省略了部分sync_control代码
 public:
     __aicore__ inline KernelSample()
     {

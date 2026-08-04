@@ -1,10 +1,10 @@
 # ms_sanitizer样例说明
 
-## 概述
+## overview
 
-msSanitizer是基于昇腾AI处理器的异常检测工具，用于检测Ascend C样例运行过程中的内存访问、内存泄漏、未使用内存、竞争和未初始化访问等异常。本样例以Add计算为载体，展示如何通过msSanitizer工具运行样例并定位异常。
+msSanitizer是基于昇腾AI处理器的exception_detection工具，用于检测Ascend C样例运行过程中的内存访问、内存泄漏、未使用内存、竞争和未初始化访问等异常。本样例以Add计算为载体，展示如何通过msSanitizer工具运行样例并定位异常。
 
-本样例代码为正确实现。用户可以按照“异常场景检测”章节中的说明修改`ms_sanitizer.asc`，重新编译后通过msSanitizer工具体验对应的异常检测能力。
+本样例代码为正确实现。用户可以按照“异常场景检测”章节中的说明修改`ms_sanitizer.asc`，重新编译后通过msSanitizer工具体验对应的exception_detection能力。
 
 请参考[算子开发工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)中的“环境准备”章节，获取详细的安装指南和步骤。
 

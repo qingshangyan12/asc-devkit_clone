@@ -1,6 +1,6 @@
 # select样例
 
-## 概述
+## overview
 本样例基于Reg编程接口实现Select运算，主要调用Select接口。
 
 ## 本样例支持的产品及CANN软件版本

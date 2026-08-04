@@ -19,7 +19,7 @@ project(kernel_samples LANGUAGES ASC CXX)
 
 # 场景参数（通过命令行传入）
 # SCENARIO_NUM: 场景编号
-#   1 - [1, 512]数据搬运，mask连续模式
+#   1 - [1, 512]data_move，mask连续模式
 #   2 - 从[18, 64]搬运[18, 8]数据，mask连续模式
 #   3 - 从[18, 64]搬运[18, 8]数据，counter模式
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1,2,3)")

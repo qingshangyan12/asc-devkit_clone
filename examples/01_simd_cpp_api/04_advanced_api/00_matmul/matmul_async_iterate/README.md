@@ -1,5 +1,5 @@
 # Matmul Iterate异步场景直调样例
-## 概述
+## overview
 异步场景下的Matmul样例，实现方式为调用Iterate和GetTensorC输出到VECIN。  
 异步场景指的是程序执行时，不需要等待某个操作完成就可以执行下一步操作。异步场景可以减少同步等待，提高并行度，开发者对计算性能要求较高时，可以选用该方式。
 
@@ -29,7 +29,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;             # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

@@ -1,8 +1,8 @@
 # CreateVecIndex样例
 
-## 概述
+## overview
 
-本样例在数据填充场景下，基于CreateVecIndex API实现创建指定起始值的向量索引功能，用于生成连续的整数序列。CreateVecIndex API支持从指定起始值开始，创建连续递增的索引向量，常用于需要生成序列索引的场景，例如为数组元素生成下标、创建步长序列等。
+本样例在data_padding场景下，基于CreateVecIndex API实现创建指定起始值的向量索引功能，用于生成连续的整数序列。CreateVecIndex API支持从指定起始值开始，创建连续递增的索引向量，常用于需要生成序列索引的场景，例如为数组元素生成下标、创建步长序列等。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -54,7 +54,7 @@
   - Kernel实现  
     - 调用Duplicate接口，初始化UB（Unified Buffer）缓冲区为0
     - 调用CreateVecIndex接口，生成从0开始的连续索引向量
-    - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运到GM（Global Memory）
+    - 调用DataCopybasic_api，将结果从UB（Unified Buffer）搬运到GM（Global Memory）
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -79,7 +79,7 @@
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash

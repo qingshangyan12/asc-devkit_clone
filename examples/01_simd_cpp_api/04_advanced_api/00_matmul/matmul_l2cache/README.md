@@ -1,5 +1,5 @@
 # Matmul L2 Cache切分功能直调样例
-## 概述
+## overview
 使能L2 Cache切分特性的Matmul样例，提高L2 Cache的利用率。
 
 Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块数据，整体按数据切分的块数，分多次进行计算。每次计算前，第一个核第一次访问Global Memory上的矩阵时，会将切分后的一块矩阵数据加载到L2 Cache，其它核或第一个核后续数据访问都可以命中L2 Cache，以提高样例性能。
@@ -20,7 +20,7 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   ├── l2_cache_optimizer.h    // L2Cache切分算法实现函数
+│   ├── l2_cache_optimizer.h    // L2Cache切分algorithms实现函数
 │   ├── matmul_l2cache.asc      // Ascend C样例实现 & 调用样例
 │   └── README.md               // 样例说明文档
 ```
@@ -68,7 +68,7 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
       ```
 
   - Tiling关键步骤
-    - 本样例采取了常量化Tiling计算，在Kernel侧通过设置一组固定的基本块信息，其他Tiling信息在Kernel侧通过常量化推导，Kernel侧不再需要运行时Tiling信息。基于这组最优的基本块信息，能够适用输入Shape中M，N较大的场景。样例中提供了一种L2Cache切分算法（参考样例L2CacheOptimizer类）。该算法当前在Kernel侧完成计算L2切块份数，也可以自行迁移代码至Host侧计算。
+    - 本样例采取了常量化Tiling计算，在Kernel侧通过设置一组固定的基本块信息，其他Tiling信息在Kernel侧通过常量化推导，Kernel侧不再需要运行时Tiling信息。基于这组最优的基本块信息，能够适用输入Shape中M，N较大的场景。样例中提供了一种L2Cache切分algorithms（参考样例L2CacheOptimizer类）。该algorithms当前在Kernel侧完成计算L2切块份数，也可以自行迁移代码至Host侧计算。
     - L2CacheOptimizer具体计算步骤：
       - 判断是否需要进行L2分块
         ```cpp
@@ -124,7 +124,7 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py    # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

@@ -1,7 +1,7 @@
 # SimdVF Dump接口功能说明
 
 
-## 概述
+## overview
 
 本样例介绍simd_vf侧asc_dump系列接口使用方法，在vector函数中通过`asc_dump_ubuf`、`asc_dump_reg`、`asc_dump`等接口实现UB和寄存器数据的可视化打印。Host侧通过`ReadFile`/`WriteFile`完成二进制数据的读写，核函数从GM读取输入数据，执行Adds计算后将结果写回GM，通过比较输出与真值进行校验。
 
@@ -72,7 +72,7 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认algorithms逻辑正确
   ```
 
 - 编译选项说明

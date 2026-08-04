@@ -10,7 +10,7 @@
 - 每个bank group最多支持两读或者一读一写。
 - bank_number相同代表是同一个bank；bank_group_id相同代表是同一个bank group。
 
-特别的，每个bank（32B宽）分为4个subbank，各8B宽 × 512行深度，**subbank内存结构只有在使用离散与聚合API时需要关注**。
+特别的，每个bank（32B宽）分为4个subbank，各8B宽 × 512行深度，**subbank内存结构只有在使用scatter_gatherAPI时需要关注**。
 ```
 bank内部layout（一行32B）：
 ┌────────┬────────┬────────┬────────┐
@@ -65,7 +65,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 - **写写冲突**：多个写操作同时访问同一个bank group。
 - **读写冲突**：读操作和写操作同时访问同一个bank，或两个读操作和一个写操作同时访问同一个bank group。
 
-**特别的，对于当使用离散与聚合API时，需要注意sub bank冲突规则**：
+**特别的，对于当使用scatter_gatherAPI时，需要注意sub bank冲突规则**：
 - 离散数据属于同subbank的同起始地址，无冲突（硬件合并为一次读）。
 - 离散数据属于同subbank的同depth地址，无冲突，例如下图的data1和data2不发生冲突。
     ```
@@ -98,9 +98,9 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
     └────────┴────────┴────────┴────────┘
     ```
 
-## 测试场景概览
+## 测试场景overview
 
-本文围绕连续对齐搬入/搬出、离散与聚合、非连续对齐搬入/搬出三类API的bank冲突场景展开验证分析。所有场景的输入数据类型为 `float`（离散与聚合场景的index为 `uint32_t`），VF重复执行1000次以放大性能差异。
+本文围绕连续对齐搬入/搬出、scatter_gather、非连续对齐搬入/搬出三类API的bank冲突场景展开验证分析。所有场景的输入数据类型为 `float`（scatter_gather场景的index为 `uint32_t`），VF重复执行1000次以放大性能差异。
 
 > **性能说明**：下表"打点性能"为VF连续执行1000次的总cycles数（使用`GetSystemCycle` 打点），数值越低性能越好。"LDU冲突率"和"STU冲突率"来自 `msopprof --aic-metrics=Default` 采集的 `ResourceConflictRatio` 指标，分别表示向量单元的load单元冲突比例和store单元冲突比例（单位：%）。
 
@@ -119,7 +119,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 | 7 | dst = src0 + src1 | 冲突特征同case6，**对指令进行循环展开** | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 16384 | 1,330,688 | 40.8 | 18.2 | 对比case6，LDU冲突增加，STU冲突减少，性能提升6.3% |
 | 8 | dst = src0 + src1 | 地址同Case6，kernel增加大量计算，使kernel由访存bound变为计算bound | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 16384 | 1,810,355,431 | 0.1 | 0.0 | 计算bound下LDU/STU冲突几乎消失，对比case6，cycles高约1274倍 |
 
-### 离散与聚合场景（Case 9-10）
+### scatter_gather场景（Case 9-10）
 
 **注：subbank冲突属于更低层级的存储冲突，不被LDU/STU冲突率指标捕获**
 
@@ -334,7 +334,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 - 地址配置与 Case 6 完全相同（三个操作数全落在 bank0，BG=0），区别在于 kernel 内部额外增加了 1000 次 `Adds` 计算循环，使 kernel 由访存 bound 变为计算 bound，用于对比分析计算 bound 场景下 LDU/STU 冲突率指标的变化。
 - 实测 LDU 冲突率从 Case 6 的 4.1% 降至 0.1%，STU 冲突率从 23.8% 降至 0.0%，说明计算耗时占比大幅增加后，存储指令等待时间被大量计算指令稀释，bank 冲突几乎不可见。总 cycles 增加约 1274 倍，与额外计算量成正比。
 
-## Case 9：离散与聚合，Gather数据索引连续，跨bank分散
+## Case 9：scatter_gather，Gather数据索引连续，跨bank分散
 
 ### 地址解码
 
@@ -360,7 +360,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 - LDU/STU冲突率指标在此场景下失效，需通过打点性能差异对比诊断。
 
 
-## Case 10：离散与聚合，Gather数据索引交替重复，同subbank冲突
+## Case 10：scatter_gather，Gather数据索引交替重复，同subbank冲突
 
 ### 地址解码
 
@@ -383,7 +383,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### 案例分析
 
 - 地址配置与 Case 9 完全相同，区别在于 index 模式为 0、128 交替重复（每个 repeat 内一半元素通过 index=0 读取，另一半通过 index=128 读取），二者均落在同一 bank 的同一 subbank（sub0），但位于不同 depth 行，离散读取需要在同一 subbank 的不同行间切换，触发 subbank 冲突。
-- 对比Case 9劣化 15.4%，说明 subbank 同地址行冲突对离散与聚合API性能有显著影响。
+- 对比Case 9劣化 15.4%，说明 subbank 同地址行冲突对scatter_gatherAPI性能有显著影响。
 
 
 ## Case 11：一读一写，按行搬运，DataBlock连续排布，无bank冲突
@@ -485,7 +485,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ## 小结
 
 1. Ascend 950PR/Ascend 950DT上二读一写必然存在bank冲突，而在实际场景中，由于采用Regbase架构，UB读写频率降低，bank冲突往往为非瓶颈点。
-7. 使用离散与聚合API时，连续index跨subbank分散可减少冲突
+7. 使用scatter_gatherAPI时，连续index跨subbank分散可减少冲突
 8. 循环展开可以优化bank冲突，可结合以下trace分析。
     | case6流水 | case7流水 |
     | ---   | --- |
@@ -498,7 +498,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
     | case1流水 | case3流水 |
     | ---   | --- |
     | ![case1_trace](./figures/case1_trace.png) | ![rw_conflict](./figures/case3_trace.png) |
-11. 优化建议：使用连续对齐搬入/搬出接口时，可使用循环展开缓解冲突瓶颈，使用非连续对齐搬入/搬出接口时，建议DataBlock落在不同的bank group中，使用离散与聚合接口时，数据分散到不同bank group的不同subbank中。
+11. 优化建议：使用连续对齐搬入/搬出接口时，可使用循环展开缓解冲突瓶颈，使用非连续对齐搬入/搬出接口时，建议DataBlock落在不同的bank group中，使用scatter_gather接口时，数据分散到不同bank group的不同subbank中。
 
 
 ## 目录结构

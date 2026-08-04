@@ -37,7 +37,7 @@ STRIDE_CONFIGS = {
 
 
 def _build_src0_pattern(x_data, scenario_num):
-    """根据 Add 高维切分语义和输入的BinaryRepeatParams，构造一次 Add 调用中 src0 的读取结果。
+    """根据 Add high_dim_split语义和输入的BinaryRepeatParams，构造一次 Add 调用中 src0 的读取结果。
 
     对 repeat r (0..63)、DataBlock k (0..7)：
       src0 起始地址 = x_off + r * src0RepStride * 8 + k * src0BlkStride * 8

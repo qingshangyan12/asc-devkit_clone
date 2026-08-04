@@ -1,1 +1,1 @@
-# 高级AI-Core编程模型
+# 高级AI-Coreprogramming_model

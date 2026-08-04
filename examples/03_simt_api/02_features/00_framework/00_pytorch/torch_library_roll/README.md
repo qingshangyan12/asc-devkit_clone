@@ -1,6 +1,6 @@
 # torch.library注册自定义算子直调样例
 
-## 概述
+## overview
 
 本样例基于Roll算子展示如何使用PyTorch的torch.library机制注册自定义算子。
 ## 支持的产品
@@ -64,7 +64,7 @@
 
   （1）实现Device侧核函数
 
-  `roll_custom`是本样例的核函数，使用Ascend C SIMT编程模型在Device侧实现Roll算子的滚动逻辑。
+  `roll_custom`是本样例的核函数，使用Ascend C SIMTprogramming_model在Device侧实现Roll算子的滚动逻辑。
 
   （2）实现Host侧函数
 

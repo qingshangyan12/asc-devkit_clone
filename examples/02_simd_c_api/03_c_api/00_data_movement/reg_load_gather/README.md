@@ -1,8 +1,8 @@
 # reg_load_gather样例
 
-## 概述
+## overview
 
-本样例使用Ascend C C API的Reg矢量计算接口，将Unified Buffer（UB）中的非连续数据加载到矢量数据寄存器，再写回UB并搬运至GM（Global Memory）。通过CMake参数`SCENARIO_NUM`选择以下场景：
+本样例使用Ascend C C API的reg_vector_compute接口，将Unified Buffer（UB）中的非连续数据加载到矢量数据寄存器，再写回UB并搬运至GM（Global Memory）。通过CMake参数`SCENARIO_NUM`选择以下场景：
 
 | `SCENARIO_NUM` | 离散搬入场景 |
 | --- | --- |

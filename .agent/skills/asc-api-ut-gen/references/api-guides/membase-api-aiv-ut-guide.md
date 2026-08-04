@@ -1,8 +1,8 @@
 # membase 基础 API - AIV (Vector 核心) UT 生成指南
 
-## 1. API 概述
+## 1. API overview
 
-AIV (AI Vector) 核心 API 是 membase 基础 API 中的向量计算类接口，用于执行向量运算、数据搬运、类型转换等操作。
+AIV (AI Vector) 核心 API 是 membase 基础 API 中的向量计算类接口，用于执行向量运算、data_move、type_conversion等操作。
 
 ### 1.1 目录位置
 
@@ -17,9 +17,9 @@ AIV (AI Vector) 核心 API 是 membase 基础 API 中的向量计算类接口，
 | API 类别 | 典型 API | 功能说明 |
 |---------|---------|---------|
 | 向量计算 | `Add`, `Mul`, `Sub`, `Div` | 向量加减乘除 |
-| 数据搬运 | `DataCopy` | 数据搬运 |
-| 类型转换 | `Cast` | 数据类型转换 |
-| 归约操作 | `ReduceMax`, `ReduceMin`, `ReduceSum` | 归约计算 |
+| data_move | `DataCopy` | data_move |
+| type_conversion | `Cast` | data_type_conversion |
+| reduction_operations | `ReduceMax`, `ReduceMin`, `ReduceSum` | reduction_compute |
 | 比较操作 | `Compare` | 向量比较 |
 
 ---
@@ -254,7 +254,7 @@ enum class DataFormat : uint8_t {
 };
 ```
 
-### 6.2 DataCopyMVType - 数据搬运类型
+### 6.2 DataCopyMVType - data_move类型
 
 **定义文件**: `include/basic_api/kernel_struct_data_copy.h`
 

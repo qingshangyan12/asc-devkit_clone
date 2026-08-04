@@ -1,0 +1,9 @@
+# data_move_aux_config<a name="ZH-CN_TOPIC_0000001499154365"></a>
+
+- **[NdDmaDci](NdDmaDci.md)**
+
+- **[SetPadValue(ISASI)](SetPadValue_ISASI.md)**
+
+- **[SetLoopModePara](SetLoopModePara.md)**
+
+- **[ResetLoopModePara](ResetLoopModePara.md)**

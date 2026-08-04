@@ -22,7 +22,7 @@ np.random.seed(9)
 def gen_golden_data(scenarioNum=1):
     """
     根据场景编号生成输入数据和Golden数据
-    场景1：[1, 512]数据搬运，mask连续模式
+    场景1：[1, 512]data_move，mask连续模式
     场景2：从[18, 64]搬运[18, 8]数据，mask连续模式
     场景3：从[18, 64]搬运[18, 8]数据，counter模式
     """

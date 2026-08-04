@@ -112,7 +112,7 @@ $$
 | right_width   | 输入    | 	右矩阵width，取值范围为[0,4095]。      |
 | feat_offset   | 输入    |     保留参数。 |
 | smask_offset  | 输入    |     权重矩阵的偏移位。 |
-| unit_flag     | 输入    | 	unit_flag是一种asc_mmad接口和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于L0C Buffer累加的场景。取值说明如下： <br>&bull; 0：关闭unit_flag；<br>&bull; 1：保留值；<br>&bull; 2：开启unit_flag，硬件执行完指令后，不会关闭unit_flag功能；<br>&bull; 3：开启unit_flag，硬件执行完指令后，会关闭unit_flag功能。<br> 开启该功能时，矩阵计算的unit_flag在最后一个分形设置为3，其余分形计算设置为2即可。     |
+| unit_flag     | 输入    | 	unit_flag是一种asc_mmad接口和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于L0C Buffer累加的场景。取值说明如下： <br>&bull; 0：关闭unit_flag；<br>&bull; 1：保留值；<br>&bull; 2：开启unit_flag，硬件执行完指令后，不会关闭unit_flag功能；<br>&bull; 3：开启unit_flag，硬件执行完指令后，会关闭unit_flag功能。<br> 开启该功能时，cube_compute的unit_flag在最后一个分形设置为3，其余分形计算设置为2即可。     |
 | k_direction_align  | 输入    | 当源操作数和目的操作数为float时，L0A和L0B中的矩阵在right_width方向上按ceil(right_width/16)*16方式都对齐到48，对于right_width=44，L0A/L0B中的所有12个分形都会被读取到Cube中，而对于right_width=36，只有L0A/L0B中的10个分形会被读取到Cube中。 |
 | is_weight_offset  | 输入    | 启用weight matrix offset。|
 | c_matrix_source       | 输入    | 	配置C矩阵初始值是否来源于Bias Table Buffer。取值说明如下：  <br>&bull; true：来源于Bias Table Buffer。 <br>&bull; false：来源于L0C Buffer。 |
@@ -130,7 +130,7 @@ PIPE_M
 ## 约束说明
 
 - 当left_height、right_width、n_dim中的任意一个值为0时，该指令不会被执行。
-- 操作数地址对齐约束请参考[存储单元说明](../通用说明和约束.md#存储单元说明)。
+- 操作数地址对齐约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 
 ## 调用示例
 

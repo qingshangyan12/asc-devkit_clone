@@ -1,8 +1,8 @@
 # SoftmaxFlashV2样例
 
-## 概述
+## overview
 
-本样例在大语言模型注意力机制场景下，基于SoftmaxFlashV2高阶API实现softmaxflashv2单算子。该API是SoftmaxFlash增强版本，对应FlashAttention-2算法，支持update模式（增量计算），常用于大语言模型中的注意力机制计算和长序列分块处理场景。本样例使用float数据类型，输入Tensor shape为[960, 960]，完成SoftmaxFlashV2注意力计算。
+本样例在大语言模型注意力机制场景下，基于SoftmaxFlashV2high_level_api实现softmaxflashv2单算子。该API是SoftmaxFlash增强版本，对应FlashAttention-2algorithms，支持update模式（增量计算），常用于大语言模型中的注意力机制计算和长序列分块处理场景。本样例使用float数据类型，输入Tensor shape为[960, 960]，完成SoftmaxFlashV2注意力计算。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -72,7 +72,7 @@
     核心计算步骤：将输入数据搬入后，调用 `AscendC::SoftmaxFlashV2(xLocal, sumLocal, maxLocal, xLocal, expmaxLocal, sharedTmpBuffer, softmaxTiling)` 完成 SoftmaxFlashV2 计算，再将结果搬出。
 
   - Tiling实现  
-    softmaxflashv2样例的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用SoftmaxFlashV2高阶API的tiling函数获取API所需tiling参数，尾核计算所需的高阶API的tiling由kernel侧自行计算。
+    softmaxflashv2样例的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用SoftmaxFlashV2high_level_api的tiling函数获取API所需tiling参数，尾核计算所需的high_level_api的tiling由kernel侧自行计算。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

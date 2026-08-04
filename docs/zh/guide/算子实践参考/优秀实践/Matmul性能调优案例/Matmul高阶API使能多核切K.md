@@ -1,8 +1,8 @@
-# Matmul高阶API开启多核切K<a name="ZH-CN_TOPIC_0000002353756705"></a>
+# Matmulhigh_level_api开启多核切K<a name="ZH-CN_TOPIC_0000002353756705"></a>
 
 ## 案例介绍<a name="section17413194624510"></a>
 
-本案例呈现了在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，开启多核切K功能对算子性能的提升效果。为了实现算子在多核上并行执行，提升计算效率，需要将矩阵数据进行切分，切分后的数据块被分配到不同的核上处理。通常情况下，切分矩阵数据时仅切分M、N轴，不切分K轴。若M和N较小，切分M和N轴较困难，此时需要考虑K轴切分；开启多核切K功能后，该场景下可以对矩阵的K轴进行切分，从而使算子在多核上并行执行。由于K轴较大，在该场景下不切分K轴通常会导致单核的输入数据量过大，开启K轴切分后，切分策略能够更有效地平衡输出带宽和输入带宽。
+本案例呈现了在矩阵乘算子场景中，使用Matmulhigh_level_api进行矩阵乘法计算，开启多核切K功能对算子性能的提升效果。为了实现算子在多核上并行执行，提升计算效率，需要将矩阵数据进行切分，切分后的数据块被分配到不同的核上处理。通常情况下，切分矩阵数据时仅切分M、N轴，不切分K轴。若M和N较小，切分M和N轴较困难，此时需要考虑K轴切分；开启多核切K功能后，该场景下可以对矩阵的K轴进行切分，从而使算子在多核上并行执行。由于K轴较大，在该场景下不切分K轴通常会导致单核的输入数据量过大，开启K轴切分后，切分策略能够更有效地平衡输出带宽和输入带宽。
 
 -   开启多核切K的适用场景
     -   矩阵的K轴较大，M轴和N轴相比K轴较小，可以在K轴进行切分，使算子并行执行的核数更多。
@@ -49,7 +49,7 @@
 </tbody>
 </table>
 
-当前案例使用的AI处理器共24个核，算子中开启高阶API Matmul的纯Cube模式。Tiling参数如下：
+当前案例使用的AI处理器共24个核，算子中开启high_level_api Matmul的纯Cube模式。Tiling参数如下：
 
 -   原始shape：M=16, N= 16, K=1024。
 -   单核shape：未开启多核切K时，singleCoreM=16，singleCoreN=16，singleCoreK=1024；开启多核切K后，singleCoreM=16，singleCoreN=16，singleCoreK=512。
@@ -76,7 +76,7 @@
 
 -   Tiling实现
 
-    通过GetTiling接口获取TCubeTiling结构体前，调用EnableMultiCoreSplitK接口且入参为true，开启多核切K。
+    通过GetTiling接口获取TCubeTiling_struct前，调用EnableMultiCoreSplitK接口且入参为true，开启多核切K。
 
     ```
     cubeTiling.SetOrgShape(M, N, K);
@@ -119,4 +119,4 @@
 
 ## 总结<a name="section8281219125011"></a>
 
-当算子使用Matmul API完成矩阵计算时，原始矩阵的M和N方向无法进行有效切分，且结果输出到Global Memory时，可以考虑开启多核切K功能，实现多核并行，提升计算效率。
+当算子使用Matmul API完成cube_compute时，原始矩阵的M和N方向无法进行有效切分，且结果输出到Global Memory时，可以考虑开启多核切K功能，实现多核并行，提升计算效率。

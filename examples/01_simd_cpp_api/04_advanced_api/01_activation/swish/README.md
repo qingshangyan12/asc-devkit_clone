@@ -1,8 +1,8 @@
 # Swish样例
 
-## 概述
+## overview
 
-本样例在深度学习模型激活函数场景下，基于Swish/Silu高阶API实现激活函数计算。两个API具有紧密的数学关系：
+本样例在深度学习模型activation_functions场景下，基于Swish/Siluhigh_level_api实现activation_functions计算。两个API具有紧密的数学关系：
 
 - **Swish（默认）**：`y = x / (1 + exp(-beta * x))`，beta为可调节参数，本样例beta=1.702（GELU近似）
 - **Silu**：Swish在beta=1时的特例，`y = x / (1 + exp(-x))`，比ReLU更平滑，梯度不会完全消失
@@ -61,7 +61,7 @@
   本样例中实现的是固定shape为输入src[1, 32]，输出dst[1, 32]的swish_custom样例。
 
   - Kernel实现  
-    核心计算步骤：将输入数据搬入后，调用对应的高阶API完成计算，再将结果搬出。
+    核心计算步骤：将输入数据搬入后，调用对应的high_level_api完成计算，再将结果搬出。
 
     Swish模式调用方式：
     ```cpp

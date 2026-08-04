@@ -1,5 +1,5 @@
 # Dump样例介绍
-## 概述
+## overview
 本样例展示了Ascend C asc_dump系列接口和simd_vf侧asc_dump接口的基本使用方法。
 
 ## 样例列表

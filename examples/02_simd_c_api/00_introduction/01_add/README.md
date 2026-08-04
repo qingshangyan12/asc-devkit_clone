@@ -1,6 +1,6 @@
 # Add样例介绍
 
-## 概述
+## overview
 
 基于Ascend C的Add算子的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。
 

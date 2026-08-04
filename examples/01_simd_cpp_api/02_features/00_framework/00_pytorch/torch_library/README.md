@@ -1,6 +1,6 @@
 # torch.library注册自定义算子直调样例
 
-## 概述
+## overview
 
 本样例基于Add算子展示如何使用PyTorch的torch.library机制注册自定义算子。
 

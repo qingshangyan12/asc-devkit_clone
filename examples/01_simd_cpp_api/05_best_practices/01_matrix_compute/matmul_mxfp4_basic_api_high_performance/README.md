@@ -1,7 +1,7 @@
 # MxFP4 Matmul 基础 API 高性能样例
 
 
-## 概述
+## overview
 
 本样例介绍如何基于 Ascend C 基础 API 和静态 Tensor 编程方式，通过 L1/L0 双缓冲机制、大包搬运、细粒度流水同步等多种优化手段，实现一个高性能的 MxFP4 Matmul kernel。
 
@@ -137,7 +137,7 @@ Total blocks = 4 * 8 = 32
 
 每个核只处理自己负责的 `2048 x 1024` 输出区域。核内按 `baseK=256` 分块在 K 方向循环完成累加。
 
-对应的核索引计算如下：
+对应的核index_compute如下：
 
 ```cpp
 constexpr uint32_t mIter = DivCeil(M, singleCoreM);
@@ -382,7 +382,7 @@ next LoadData
 本样例的性能优化围绕三件事展开：
 
 - **多核切分**：把 `8192 x 8192` 输出矩阵拆到 32 核并行计算。
-- **大包搬运**：A/B 按多个 K block 搬运，scale 按更大的 K 覆盖范围搬运，降低 MTE2 指令和数据搬运压力。
+- **大包搬运**：A/B 按多个 K block 搬运，scale 按更大的 K 覆盖范围搬运，降低 MTE2 指令和data_move压力。
 - **双缓冲流水**：L1 和 L0 都采用 Ping-Pong，让 DataCopyIn、LoadData、Mmad、Fixpipe 尽量交叠执行。
 
 ## 理论性能对比
@@ -398,7 +398,7 @@ next LoadData
 | `aic_scalar_time(μs)` | Scalar 指令执行时间，反映循环调度、地址计算、参数配置等开销 |
 | `aic_scalar_ratio` | Scalar 时间占比 |
 | `aic_mte1_time(μs)` | MTE1 执行时间，主要对应 L1 到 L0A/L0B 的 `LoadData` |
-| `aic_mte1_ratio` | MTE1 时间占比，反映 L1 到 L0 的数据搬运压力 |
+| `aic_mte1_ratio` | MTE1 时间占比，反映 L1 到 L0 的data_move压力 |
 | `aic_mte2_time(μs)` | MTE2 执行时间，主要对应 GM 到 L1 的 `DataCopyIn` |
 | `aic_mte2_ratio` | MTE2 时间占比，反映 GM 到 L1 的数据加载压力 |
 | `aic_fixpipe_time(μs)` | Fixpipe 执行时间，主要对应 L0C 到 GM 的结果写回 |
@@ -553,7 +553,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划data_move逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
       ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率

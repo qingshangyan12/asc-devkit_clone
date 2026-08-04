@@ -1,14 +1,14 @@
 # DataCopy量化激活搬运样例
 
-## 概述
+## overview
 
-本样例基于DataCopy实现数据随路量化激活搬运，将矩阵乘的结果从L0C Buffer搬运到GM（Global Memory），并支持随路NZ2ND、随路量化、relu激活能力组合。本样例给出了6种不同的测试场景（scenario）。
+本样例基于DataCopy实现数据accompanying_quantization激活搬运，将矩阵乘的结果从L0C Buffer搬运到GM（Global Memory），并支持随路NZ2ND、accompanying_quantization、relu激活能力组合。本样例给出了6种不同的测试场景（scenario）。
     <table>
  	  	 	<tr>
  	  	 		<td>scenarioNum</td>
           <td>输出格式</td>
  	  	 		<td>量化模式</td>
-          <td>类型转换</td>
+          <td>type_conversion</td>
           <td>激活模式</td>
  	  	 	</tr>
  	  	 	<tr>
@@ -80,10 +80,10 @@
 ## 样例描述
 
 - 样例功能  
-  将矩阵乘的结果从L0C Buffer搬运到GM（Global Memory），支持以下两种随路量化模式：
+  将矩阵乘的结果从L0C Buffer搬运到GM（Global Memory），支持以下两种accompanying_quantization模式：
   - Scalar量化：使用SetFixpipePreQuantFlag接口设置Scalar量化参数。
   - Vector量化：使用SetFixPipeConfig接口设置Vector量化参数。
-  并支持与随路NZ2ND、relu激活能力组合。接口资料参考随路量化激活搬运。
+  并支持与随路NZ2ND、relu激活能力组合。接口资料参考accompanying_quantization激活搬运。
 
 - 样例规格
 
@@ -157,13 +157,13 @@
 
   - Kernel实现
 
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到A1（L1 Buffer）和B1（L1 Buffer），并做ND到NZ的格式转换。
+    - 调用DataCopybasic_api，将数据从GM（Global Memory）搬运到A1（L1 Buffer）和B1（L1 Buffer），并做ND到NZ的格式转换。
 
     - 调用LoadData接口，将数据从A1（L1 Buffer）和B1（L1 Buffer）搬运到A2（L0A Buffer）和B2(L0B Buffer)。
 
     - 调用Mmad接口，将输入shape[128, 128]的矩阵A和输入shape[128, 256]的矩阵B做矩阵乘法，得到输出shape[128, 256]的结果矩阵。
 
-    - 配置DataCopyCO12DstParams参数用于DataCopy随路量化激活搬运，将Mmad计算出的结果从L0C Buffer搬出到GM（Global Memory）。
+    - 配置DataCopyCO12DstParams参数用于DataCopyaccompanying_quantization激活搬运，将mmad_compute出的结果从L0C Buffer搬出到GM（Global Memory）。
 
   - 调用实现  
     使用内核调用符`<<<>>>`调用核函数。

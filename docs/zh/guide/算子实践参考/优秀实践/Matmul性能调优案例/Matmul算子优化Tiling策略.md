@@ -22,7 +22,7 @@
 由以上Profiling数据，可以看出MTE2耗时占比较大，当前性能瓶颈点在于MTE2流水。
 
 -   Profiling数据的Block Dim可见分核未分满，考虑分核逻辑的优化。设CurrentCore是未优化前分核的Cube核数，MaxCore为最大Cube核数，当开启全部核并行做当前shape数据量的计算时，预估性能收益为MaxCore / CurrentCore的倍数。
--   优化基本块切分，将影响搬运数据的效率，算子搬运的总数据量为搬运的左矩阵和右矩阵数据量之和。在Matmul计算K方向不能全载的场景下，根据矩阵乘法的算法，搬运左矩阵的次数为N / baseN，搬运右矩阵的次数为M / baseM，即搬运总数据量totalCnt = \(N / baseN\) \* M \* K + \(M / baseM\) \* K \* N。预估性能收益为搬运数据量的比值，优化前搬运数据量totalCnt0/优化后搬运数据量totalCnt1，化简后结果为\(1 / baseM0 + 1 / baseN0\) / \(1 / baseM1 + 1 / baseN1\)，其中，baseM0, baseN0为优化前基本块参数，baseM1, baseN1为优化后基本块参数。
+-   优化基本块切分，将影响搬运数据的效率，算子搬运的总数据量为搬运的左矩阵和右矩阵数据量之和。在Matmul计算K方向不能全载的场景下，根据矩阵乘法的algorithms，搬运左矩阵的次数为N / baseN，搬运右矩阵的次数为M / baseM，即搬运总数据量totalCnt = \(N / baseN\) \* M \* K + \(M / baseM\) \* K \* N。预估性能收益为搬运数据量的比值，优化前搬运数据量totalCnt0/优化后搬运数据量totalCnt1，化简后结果为\(1 / baseM0 + 1 / baseN0\) / \(1 / baseM1 + 1 / baseN1\)，其中，baseM0, baseN0为优化前基本块参数，baseM1, baseN1为优化后基本块参数。
 
 -   开启大包搬运后，指令条数变化、地址对齐等因素会影响性能，按照经验预估，对于MTE2为性能瓶颈的场景，会有20%以上的MTE2性能收益。
 

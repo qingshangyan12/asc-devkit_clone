@@ -143,7 +143,7 @@
 | `ELF FILE ${id}` | 表示ELF文件中包含的kernel文件名，`${id}`表示kernel文件序号。<br>kernel文件名的命名规则如下：<br>按`${sec_prefix}_${file_index}_${kernel_type}.o`拼接，其中`${sec_prefix}`为section段名（工具根据`.ascend.kernel`关键字搜索获取），`${file_index}`表示文件编号，`${kernel_type}`表示kernel类型。 | 是 | 不设置`--verbose`，默认打印。 |
 | `KERNEL LEN` | 表示kernel文件的长度。 | 是 | 不设置`--verbose`，默认打印。 |
 | `KERNEL TYPE` | 表示kernel类型，映射关系为`{0: mix, 1: aiv, 2: aic}`。 | 否 | 不设置`--verbose`，默认打印。 |
-| `ASCEND META` | 表示算子执行时核间同步、Cube/Vector核占比（task_ration）等信息。<br>若没有获取到该信息，默认显示`None`。 | 否 | 不设置`--verbose`，默认打印。 |
+| `ASCEND META` | 表示算子执行时inter_core_sync、Cube/Vector核占比（task_ration）等信息。<br>若没有获取到该信息，默认显示`None`。 | 否 | 不设置`--verbose`，默认打印。 |
 | `elf header infos` | 包括ELF Header、Section Headers、Key to Flags、Program Headers、Symbol表等信息。 | 否 | 设置`--verbose`，开启全量打印。 |
 
 ## 使用样例（融合编译工程）<a name="section_fusion_compile_msobjdump"></a>

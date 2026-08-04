@@ -1,6 +1,6 @@
 # Tiling Selector样例介绍
 
-## 概述
+## overview
 
 本目录介绍Ascend C SIMD Tiling Selector特性样例，展示根据输入数据量和AI Core数量计算Tiling参数，并选择核间和核内切分策略的典型流程。
 

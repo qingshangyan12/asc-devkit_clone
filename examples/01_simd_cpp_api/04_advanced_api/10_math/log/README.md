@@ -1,10 +1,10 @@
 # Log样例
 
-## 概述
+## overview
 
-本样例基于Log高阶API实现按元素以e、2、10为底做对数运算的功能。
+本样例基于Loghigh_level_api实现按元素以e、2、10为底做对数运算的功能。
 
-> **接口提示：** 除本样例使用的 `Log` 接口外，Ascend C 还提供了以下对数运算相关高阶API接口：
+> **接口提示：** 除本样例使用的 `Log` 接口外，Ascend C 还提供了以下对数运算相关high_level_api接口：
 >
 > - **Lgamma**：伽马函数的对数计算。
 
@@ -50,7 +50,7 @@
 
   - Kernel实现
 
-    使用Log高阶API接口完成log计算。
+    使用Loghigh_level_api接口完成log计算。
 
   - Tiling实现  
     根据输入长度和所用核数量设置tiling参数totalLength和tileNum。
