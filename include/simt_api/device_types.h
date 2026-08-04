@@ -16,9 +16,6 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_TYPES_H__
 #endif
 
-#if defined(ASCENDC_CPU_DEBUG)
-#include "simt_stub.h"
-#endif
 #include "utils/base/sys_macros.h"
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
