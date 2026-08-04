@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_TENSOR_COORD_INDEX_H
 
 #include "impl/tensor_api/tensor/layout_definition.h"
+#include "impl/tensor_api/utils/npu_debug_check.h"
 
 namespace AscendC {
 namespace Te {
@@ -57,6 +58,7 @@ __aicore__ inline constexpr auto Crd2IdxITT(
 template <typename T, typename U, typename S>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride)
 {
+    TENSOR_API_DEBUG_CHECK(debug_check_coord_shape, shape, coord, "Crd2Idx");
     if constexpr (Std::is_tuple_v<T>) {
         if constexpr (Std::is_tuple_v<U>) { // tuple tuple tuple
             static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "Shape and Coord Mismatched Ranks");
@@ -78,6 +80,7 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S
 template <typename T, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout)
 {
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, layout, coord, "Crd2Idx");
     return Crd2Idx(coord, layout.Shape(), layout.Stride());
 }
 

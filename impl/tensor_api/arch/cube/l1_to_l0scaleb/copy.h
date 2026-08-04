@@ -59,6 +59,9 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
         using SrcPattern = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.Layout(), "dst", "CopyL12L0ScaleB");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, src.Layout(), "src", "CopyL12L0ScaleB");
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "CopyL12L0ScaleB");
         using CopyL12L0ScaleBImpl = typename CopyL12L0ScaleBRouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
         CopyL12L0ScaleBImpl::template Run<trait, T, U>(dst, src);
     }

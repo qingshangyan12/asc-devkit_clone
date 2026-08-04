@@ -45,6 +45,11 @@ public:
         if ASCEND_IS_AIC {
             return;
         }
+        TENSOR_API_DEBUG_CHECK(
+            debug_check_block_limit, blockCount, DEBUG_BLOCK_COUNT_MAX, "blockCount", "CopyUB2GM instruction");
+        TENSOR_API_DEBUG_CHECK(
+            debug_check_block_limit, blockLen, DEBUG_GM_UB_BLOCK_LEN_MAX, "blockLen", "CopyUB2GM instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_ub2gm_stride, srcStride, blockLen, blockCount, "CopyUB2GM instruction");
         asc_copy_ub2gm_align(dst, src, blockCount, blockLen, cacheMode, dstStride, static_cast<uint32_t>(srcStride));
     }
 };
