@@ -180,7 +180,7 @@ endfunction()
 
 function(simple_kernel_compile)
   cmake_parse_arguments(BINCMP ""
-    "OPS_INFO;OUT_DIR;TILING_LIB;OP_TYPE;SRC;COMPUTE_UNIT;JSON_FILE;DYNAMIC_PATH;TARGET_NAME;PACKAGE_NAME;JIT_GENERATOR;JIT_CUSTOM_OP_ROOT;JIT_COLLECTION_ROOT"
+    "OPS_INFO;OUT_DIR;TILING_LIB;OP_TYPE;SRC;COMPUTE_UNIT;JSON_FILE;DYNAMIC_PATH;TARGET_NAME;PACKAGE_NAME;JIT_COLLECTION_ROOT"
     "OPTIONS;CONFIGS" ${ARGN})
   if (NOT DEFINED BINCMP_OUT_DIR)
     set(BINCMP_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/binary)
@@ -205,16 +205,14 @@ function(simple_kernel_compile)
   set(BINCMP_COMPILE_FAIL_FLAG "${CMAKE_CURRENT_BINARY_DIR}/${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}_fail.log")
   set(COMPILE_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile.log")
   set(BINCMP_JIT_ARGS)
-  if(DEFINED BINCMP_JIT_GENERATOR)
+  if(DEFINED BINCMP_JIT_COLLECTION_ROOT)
     list(APPEND BINCMP_JIT_ARGS
-      --jit-resource-generator=${BINCMP_JIT_GENERATOR}
-      --jit-custom-op-root=${BINCMP_JIT_CUSTOM_OP_ROOT}
       --jit-collection-root=${BINCMP_JIT_COLLECTION_ROOT}
     )
   endif()
 
   if (NOT ${ENABLE_CROSS_COMPILE})
-    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT} AND NOT DEFINED BINCMP_JIT_GENERATOR)
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT} AND NOT DEFINED BINCMP_JIT_COLLECTION_ROOT)
       set(COMPILE_CMD
         "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \
             --op-type=${BINCMP_OP_TYPE} \
@@ -276,7 +274,7 @@ function(simple_kernel_compile)
     if (${bincmp_enable_binary_package} AND NOT DEFINED HOST_NATIVE_TILING_LIB)
       message(FATAL_ERROR "Native host libs was not set for cross compile!")
     endif()
-    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT} AND NOT DEFINED BINCMP_JIT_GENERATOR)
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT} AND NOT DEFINED BINCMP_JIT_COLLECTION_ROOT)
       set(COMPILE_CMD
         "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \
             --op-type=${BINCMP_OP_TYPE} \
@@ -445,6 +443,7 @@ function(npu_op_package target_package_name)
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_VENDOR_NAME ${target_package_name})
 
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_CPACK True)
+  set(package_jit_generator "")
   if(DEFINED PACKAGE_CONFIG)
     set(set_install_path False)
     set(enable_pkg True)
@@ -468,6 +467,8 @@ function(npu_op_package target_package_name)
       elseif("${key}" STREQUAL "ENABLE_CPACK")
         set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_CPACK ${value})
         set(enable_pkg ${value})
+      elseif("${key}" STREQUAL "JIT_GENERATOR")
+        set(package_jit_generator "${value}")
       else()
         message(WARNING "${key} is not supported now")
       endif()
@@ -484,6 +485,31 @@ function(npu_op_package target_package_name)
 
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_TYPE "${_upper_target_type}")
   get_property(target_vendor_name GLOBAL PROPERTY _ASC_PKG_${target_package_name}_VENDOR_NAME)
+
+  set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_JIT_PACKAGE FALSE)
+  if(NOT "${package_jit_generator}" STREQUAL "")
+    if(NOT "${_upper_target_type}" STREQUAL "RUN")
+      message(FATAL_ERROR "npu_op_package CONFIG JIT_GENERATOR only supports RUN packages")
+    endif()
+    get_filename_component(generator_path "${package_jit_generator}" ABSOLUTE
+                           BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    if(NOT EXISTS "${generator_path}")
+      message(FATAL_ERROR "JIT resource generator does not exist: ${generator_path}")
+    endif()
+    get_filename_component(generator_path "${generator_path}" REALPATH)
+    if(UNIX)
+      execute_process(COMMAND test -x "${generator_path}"
+                      RESULT_VARIABLE generator_not_executable)
+      if(generator_not_executable)
+        message(FATAL_ERROR "JIT resource generator is not executable: ${generator_path}")
+      endif()
+    endif()
+
+    set(jit_root "${CMAKE_BINARY_DIR}/jit_resources/${target_package_name}")
+    set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_JIT_PACKAGE TRUE)
+    set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_GENERATOR "${generator_path}")
+    set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_ROOT "${jit_root}")
+  endif()
 
   set(POST_PACK_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile_error.log")
   set_property(GLOBAL PROPERTY _ASC_PKG_ERROR_FILE ${POST_PACK_ERROR_LOG})
@@ -693,48 +719,6 @@ function(npu_op_package target_package_name)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
   endif()
-endfunction()
-
-function(npu_op_package_jit target_package_name)
-  cmake_parse_arguments(JIT "" "GENERATOR" "" ${ARGN})
-  if(JIT_UNPARSED_ARGUMENTS)
-    message(FATAL_ERROR "unsupported npu_op_package_jit arguments: ${JIT_UNPARSED_ARGUMENTS}")
-  endif()
-
-  get_property(package_is_set GLOBAL PROPERTY _ASC_PKG_${target_package_name}_TYPE SET)
-  if(NOT package_is_set)
-    message(FATAL_ERROR "${target_package_name} is not specified.")
-  endif()
-  get_property(package_type GLOBAL PROPERTY _ASC_PKG_${target_package_name}_TYPE)
-  if(NOT "${package_type}" STREQUAL "RUN")
-    message(FATAL_ERROR "npu_op_package_jit only supports RUN packages")
-  endif()
-  if(NOT DEFINED JIT_GENERATOR OR "${JIT_GENERATOR}" STREQUAL "")
-    message(FATAL_ERROR "npu_op_package_jit must provide GENERATOR")
-  endif()
-
-  get_filename_component(generator_path "${JIT_GENERATOR}" ABSOLUTE
-                         BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-  if(NOT EXISTS "${generator_path}")
-    message(FATAL_ERROR "JIT resource generator does not exist: ${generator_path}")
-  endif()
-  get_filename_component(generator_path "${generator_path}" REALPATH)
-  if(UNIX)
-    execute_process(COMMAND test -x "${generator_path}"
-                    RESULT_VARIABLE generator_not_executable)
-    if(generator_not_executable)
-      message(FATAL_ERROR "JIT resource generator is not executable: ${generator_path}")
-    endif()
-  endif()
-
-  get_property(vendor_name GLOBAL PROPERTY _ASC_PKG_${target_package_name}_VENDOR_NAME)
-  set(jit_root "${CMAKE_BINARY_DIR}/jit_resources/${target_package_name}")
-  set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_JIT_PACKAGE TRUE)
-  set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_GENERATOR "${generator_path}")
-  set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_COLLECTION_ROOT "${jit_root}/collected")
-  set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_WORK_DIR "${jit_root}/work")
-  set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_OUTPUT_SO
-               "${jit_root}/lib${vendor_name}_compile_resource.so")
 endfunction()
 
 function(npu_op_code_gen)
@@ -1142,34 +1126,46 @@ function(npu_op_package_add target_package_name)
     set(KERNEL_DYNAMIC_PATH ${KERNEL_BINARY_PATH}/binary/dynamic/)
 
     get_property(JIT_ENABLED GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_JIT_PACKAGE)
-    set(JIT_COMPILE_ARGS)
     if(JIT_ENABLED)
       get_property(JIT_GENERATOR GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_GENERATOR)
-      get_property(JIT_COLLECTION_ROOT GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_COLLECTION_ROOT)
-      get_property(JIT_WORK_DIR GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_WORK_DIR)
-      get_property(JIT_OUTPUT_SO GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_OUTPUT_SO)
-      get_filename_component(JIT_CUSTOM_OP_ROOT "${KERNEL_SRC_BASE}/.." REALPATH)
-      if(NOT TARGET ${target_package_name}_jit_prepare)
-        add_custom_target(${target_package_name}_jit_prepare
-          COMMAND ${CMAKE_COMMAND} -E rm -rf "${JIT_COLLECTION_ROOT}"
-          COMMAND ${CMAKE_COMMAND} -E rm -rf "${JIT_WORK_DIR}"
-          COMMAND ${CMAKE_COMMAND} -E rm -f "${JIT_OUTPUT_SO}"
-          COMMAND ${CMAKE_COMMAND} -E make_directory "${JIT_COLLECTION_ROOT}"
-          COMMAND ${CMAKE_COMMAND} -E make_directory "${JIT_WORK_DIR}"
-          VERBATIM
-        )
+      get_property(JIT_ROOT GLOBAL PROPERTY _ASC_PKG_${target_package_name}_JIT_ROOT)
+      if(NOT TARGET ${target_package_name}_jit_bundle)
+        add_custom_target(${target_package_name}_jit_bundle)
+        if(NOT TARGET binary)
+          add_custom_target(binary)
+        endif()
+        add_dependencies(binary ${target_package_name}_jit_bundle)
       endif()
-      list(APPEND JIT_COMPILE_ARGS
-        JIT_GENERATOR "${JIT_GENERATOR}"
-        JIT_CUSTOM_OP_ROOT "${JIT_CUSTOM_OP_ROOT}"
-        JIT_COLLECTION_ROOT "${JIT_COLLECTION_ROOT}"
-      )
     endif()
 
     set(KERNEL_COMPILE_TARGETS "")
     set(KERNEL_COMPILE_TARGET_COUNT 0)
 
     foreach(compute_unit ${ASCEND_COMPUTE_UNIT})
+      set(SOC_KERNEL_COMPILE_TARGETS "")
+      set(JIT_COMPILE_ARGS "")
+      if(JIT_ENABLED)
+        set(JIT_SOC_ROOT "${JIT_ROOT}/${compute_unit}")
+        set(JIT_COLLECTION_ROOT "${JIT_SOC_ROOT}/collected")
+        set(JIT_WORK_DIR "${JIT_SOC_ROOT}/work")
+        set(JIT_OUTPUT_SO "${JIT_SOC_ROOT}/lib${current_target_vendor_name}_compile_database.so")
+        set(JIT_PREPARE_TARGET "${target_package_name}_jit_prepare_${compute_unit}")
+        set(JIT_BUNDLE_TARGET "${target_package_name}_jit_bundle_${compute_unit}")
+        if(NOT TARGET ${JIT_PREPARE_TARGET})
+          add_custom_target(${JIT_PREPARE_TARGET}
+            COMMAND ${CMAKE_COMMAND} -E rm -rf "${JIT_COLLECTION_ROOT}"
+            COMMAND ${CMAKE_COMMAND} -E rm -rf "${JIT_WORK_DIR}"
+            COMMAND ${CMAKE_COMMAND} -E rm -f "${JIT_OUTPUT_SO}"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${JIT_COLLECTION_ROOT}"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${JIT_WORK_DIR}"
+            VERBATIM
+          )
+        endif()
+        list(APPEND JIT_COMPILE_ARGS
+          JIT_COLLECTION_ROOT "${JIT_COLLECTION_ROOT}"
+        )
+      endif()
+
       # generate aic-${compute_unit}-ops-info.json
       add_ops_info_target(TARGET ${_ascendc_kernel_target}_ops_info_gen_${compute_unit}
         OUTPUT ${KERNEL_BINARY_PATH}/tbe/op_info_cfg/ai_core/${compute_unit}/aic-${compute_unit}-ops-info.json
@@ -1206,13 +1202,39 @@ function(npu_op_package_add target_package_name)
                                 ${JIT_COMPILE_ARGS})
 
           if(JIT_ENABLED)
-            add_dependencies(${op_type}_${compute_unit} ${target_package_name}_jit_prepare)
+            add_dependencies(${op_type}_${compute_unit} ${JIT_PREPARE_TARGET})
           endif()
 
+          list(APPEND SOC_KERNEL_COMPILE_TARGETS ${op_type}_${compute_unit})
           list(APPEND KERNEL_COMPILE_TARGETS ${op_type}_${compute_unit})
           math(EXPR KERNEL_COMPILE_TARGET_COUNT "${KERNEL_COMPILE_TARGET_COUNT} + 1")
         endif()
       endforeach()
+
+      if(JIT_ENABLED)
+        if(NOT TARGET ${JIT_BUNDLE_TARGET})
+          add_custom_target(${JIT_BUNDLE_TARGET}
+            COMMAND "${JIT_GENERATOR}"
+                    --build_collected_manifest_bundle
+                    ${target_package_name}_${compute_unit}
+                    "${JIT_COLLECTION_ROOT}"
+                    "${JIT_OUTPUT_SO}"
+                    "${JIT_WORK_DIR}"
+            VERBATIM
+          )
+          adapt_install_path(
+            INPUT_PATH packages/vendors/${current_target_vendor_name}/op_impl/ai_core/tbe/kernel/jit/${compute_unit}
+            INPUT_TARGET ${target_package_name}
+            OUTPUT_PATH jit_install_path
+          )
+          install(FILES "${JIT_OUTPUT_SO}"
+                  DESTINATION ${jit_install_path})
+          add_dependencies(${target_package_name}_jit_bundle ${JIT_BUNDLE_TARGET})
+        endif()
+        if(SOC_KERNEL_COMPILE_TARGETS)
+          add_dependencies(${JIT_BUNDLE_TARGET} ${SOC_KERNEL_COMPILE_TARGETS})
+        endif()
+      endif()
     endforeach()
 
     if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
@@ -1252,34 +1274,6 @@ function(npu_op_package_add target_package_name)
         COMMAND ${CMAKE_COMMAND} -P "${CHECK_SCRIPT}"
         DEPENDS ${KERNEL_COMPILE_TARGETS}
       )
-    endif()
-
-    if(JIT_ENABLED)
-      if(NOT TARGET ${target_package_name}_jit_bundle)
-        add_custom_target(${target_package_name}_jit_bundle
-          COMMAND "${JIT_GENERATOR}"
-                  --build_collected_manifest_bundle
-                  ${target_package_name}
-                  "${JIT_COLLECTION_ROOT}"
-                  "${JIT_OUTPUT_SO}"
-                  "${JIT_WORK_DIR}"
-          VERBATIM
-        )
-        if(NOT TARGET binary)
-          add_custom_target(binary)
-        endif()
-        add_dependencies(binary ${target_package_name}_jit_bundle)
-        adapt_install_path(
-          INPUT_PATH packages/vendors/${current_target_vendor_name}/op_impl/ai_core/jit
-          INPUT_TARGET ${target_package_name}
-          OUTPUT_PATH jit_install_path
-        )
-        install(FILES "${JIT_OUTPUT_SO}"
-                DESTINATION ${jit_install_path})
-      endif()
-      if(KERNEL_COMPILE_TARGETS)
-        add_dependencies(${target_package_name}_jit_bundle ${KERNEL_COMPILE_TARGETS})
-      endif()
     endif()
 
   endif()

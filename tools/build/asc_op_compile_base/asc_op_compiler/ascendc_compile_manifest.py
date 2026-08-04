@@ -29,6 +29,8 @@ TILING_KEY_PATTERN = re.compile(r"^-DTILING_KEY_VAR=([^U]+)UL$")
 SOURCE_DIR_OPTION = "-I${source_dir}"
 COMMON_INCLUDE_PREFIX = "-I${env:ASCEND_HOME_PATH}"
 COMMON_INCLUDE_MARKER = "${options:common_include}"
+RESOURCE_ROOT_MARKER = "${resource}"
+RESOURCE_BASE_DIR = "resources"
 
 
 class OpCompileManifestRecorder:
@@ -135,11 +137,10 @@ class OpCompileManifestRecorder:
                 raise RuntimeError("no tiling-key structure information is available")
             self._write_merged_tiling_header(entries)
             commands = self._commands_by_tiling_key(compile_info.compile_log_path, entries)
-            files = self._manifest_files()
             kernels = []
             for tiling_key, tiling_struct, byte_size in entries:
-                recipe_commands = self._recipe_commands(tiling_key, commands.get(tiling_key, []))
-                if not recipe_commands:
+                recipe_objects = self._recipe_objects(tiling_key, commands.get(tiling_key, []))
+                if not recipe_objects:
                     raise RuntimeError("no real compile command found for tiling key {}".format(tiling_key))
                 kernel_name = "{}_{}".format(self.op_name, tiling_key)
                 kernels.append({
@@ -148,10 +149,11 @@ class OpCompileManifestRecorder:
                         "name": tiling_struct,
                         "parameter_index": int(tiling_parameter_index),
                         "byte_size": byte_size,
-                        "file": os.path.basename(self.merged_tiling_file),
+                        "file": "{}/{}".format(RESOURCE_ROOT_MARKER, self.merged_tiling_file),
                         "template": STATIC_TILING_TOKEN,
                     }],
-                    "commands": recipe_commands,
+                    "objects": recipe_objects,
+                    "link_options": [],
                 })
             common_includes = self._extract_common_includes(kernels)
             manifest = {
@@ -159,8 +161,8 @@ class OpCompileManifestRecorder:
                 "binId": self.bin_id,
                 "soc_version": self.soc_version,
                 "source_file": os.path.basename(self.source_file),
+                "base_dir": RESOURCE_BASE_DIR,
                 "options": {"common_include": common_includes},
-                "files": files,
                 "kernels": kernels,
             }
             with open(self.manifest_path, "w") as output:
@@ -309,60 +311,92 @@ class OpCompileManifestRecorder:
                 produced[os.path.normpath(output)] = projected_outputs
         return grouped
 
-    def _recipe_commands(self, tiling_key, commands):
-        if not commands:
+    def _recipe_objects(self, tiling_key, commands):
+        replay_commands = [
+            command for command in commands
+            if command[1] and command[2] and command[0] != "linkrelocate"
+        ]
+        grouped = {}
+        for command in replay_commands:
+            grouped.setdefault(command[3], []).append(command)
+        modes = [mode for mode in ("normal", "sk") if mode in grouped]
+        if not modes:
             return []
-        final_by_mode = {}
-        for _, _, output, mode in commands:
-            if output:
-                final_by_mode[mode] = os.path.normpath(output)
-        artifact_files = {
-            mode: "artifacts/{}_{}{}.o".format(
+
+        object_names = {
+            mode: "{}_{}{}".format(
                 self.op_name, tiling_key, "_sk" if mode == "sk" else "")
-            for mode in final_by_mode
+            for mode in modes
         }
         output_markers = {}
-        for _, _, output, mode in commands:
-            if output:
-                normalized = os.path.normpath(output)
-                output_markers[normalized] = "${output:intermediates/%s/%s}" % (
-                    mode, os.path.basename(output))
-        for mode, output in final_by_mode.items():
-            output_markers[output] = "${output:%s}" % artifact_files[mode]
+        object_outputs = {}
+        for mode in modes:
+            mode_commands = grouped[mode]
+            for index, (_, _, output, _) in enumerate(mode_commands):
+                if index + 1 == len(mode_commands):
+                    marker = "${output:artifacts/%s.o}" % object_names[mode]
+                    object_outputs[mode] = marker
+                else:
+                    marker = "${output:intermediates/%s/%s}" % (
+                        mode, os.path.basename(output))
+                output_markers[os.path.normpath(output)] = marker
 
         result = []
-        for stage, tokens, output, mode in commands:
-            # LINKRELOCATE finalizes the aggregate object containing every tiling key.
-            # A per-key replay recipe must end at its relocatable FATBIN output.
-            if not tokens or not output or stage == "linkrelocate":
-                continue
-            output_index = self._output_index(tokens)
-            options = [
-                self._normalize_command_token(token, output_markers)
-                for index, token in enumerate(tokens[1:], start=1)
-                if index not in (output_index - 1, output_index) and
-                not self._is_nonportable_common_include(token)
-            ]
-            command_type = self._command_type(tokens[0], stage)
-            if command_type == "bisheng" and SOURCE_DIR_OPTION not in options:
-                options.insert(0, SOURCE_DIR_OPTION)
+        for mode in modes:
+            recipe_commands = []
+            command_stages = self._command_stages(grouped[mode])
+            for (stage, tokens, _, _), command_stage in zip(grouped[mode], command_stages):
+                output_index = self._output_index(tokens)
+                options = [
+                    self._normalize_command_token(token, output_markers)
+                    for index, token in enumerate(tokens[1:], start=1)
+                    if index not in (output_index - 1, output_index) and
+                    not self._is_nonportable_common_include(token)
+                ]
+                command_type = self._command_type(tokens[0], stage)
+                if command_type == "bisheng":
+                    command_type = "compile"
+                    if SOURCE_DIR_OPTION not in options:
+                        options.insert(0, SOURCE_DIR_OPTION)
+                recipe_commands.append({
+                    "type": command_type,
+                    "stage": command_stage,
+                    "options": options,
+                })
             result.append({
-                "type": command_type,
-                "mode": mode,
-                "options": options,
-                "output": self._normalize_command_token(output, output_markers),
+                "objects_name": object_names[mode],
+                "objects_type": "sk" if mode == "sk" else "basic",
+                "commands": recipe_commands,
+                "output": [object_outputs[mode]],
             })
         return result
+
+    @staticmethod
+    def _command_stages(commands):
+        output_stages = {}
+        stages = []
+        for _, tokens, output, _ in commands:
+            dependencies = [
+                output_stages[os.path.normpath(token)]
+                for token in tokens
+                if os.path.normpath(token) in output_stages
+            ]
+            command_stage = max(dependencies) + 1 if dependencies else 0
+            stages.append(command_stage)
+            if output:
+                output_stages[os.path.normpath(output)] = command_stage
+        return stages
 
     def _normalize_command_token(self, token, output_markers):
         normalized = os.path.normpath(token) if token.startswith("/") else token
         if normalized in output_markers:
             return output_markers[normalized]
         replacements = {
-            source: "${resource:%s}" % details[0]
+            source: "{}/{}".format(RESOURCE_ROOT_MARKER, details[0])
             for source, details in self.resource_sources.items()
         }
-        replacements[self.tiling_header] = "${resource:%s}" % self.merged_tiling_file
+        replacements[self.tiling_header] = "{}/{}".format(
+            RESOURCE_ROOT_MARKER, self.merged_tiling_file)
         for source, replacement in replacements.items():
             if normalized == source:
                 return replacement
@@ -401,33 +435,35 @@ class OpCompileManifestRecorder:
     def _extract_common_includes(kernels):
         common_includes = None
         for kernel in kernels:
-            for command in kernel["commands"]:
-                includes = [
-                    option for option in command["options"]
-                    if option.startswith(COMMON_INCLUDE_PREFIX)
-                ]
-                if not includes:
-                    continue
-                if common_includes is None:
-                    common_includes = includes
-                elif includes != common_includes:
-                    raise RuntimeError("commands contain inconsistent common include options")
+            for object_item in kernel["objects"]:
+                for command in object_item["commands"]:
+                    includes = [
+                        option for option in command["options"]
+                        if option.startswith(COMMON_INCLUDE_PREFIX)
+                    ]
+                    if not includes:
+                        continue
+                    if common_includes is None:
+                        common_includes = includes
+                    elif includes != common_includes:
+                        raise RuntimeError("commands contain inconsistent common include options")
 
         if common_includes is None:
             return []
 
         for kernel in kernels:
-            for command in kernel["commands"]:
-                options = command["options"]
-                first = next((index for index, option in enumerate(options)
-                              if option.startswith(COMMON_INCLUDE_PREFIX)), None)
-                if first is None:
-                    continue
-                command["options"] = [
-                    option for option in options
-                    if not option.startswith(COMMON_INCLUDE_PREFIX)
-                ]
-                command["options"].insert(first, COMMON_INCLUDE_MARKER)
+            for object_item in kernel["objects"]:
+                for command in object_item["commands"]:
+                    options = command["options"]
+                    first = next((index for index, option in enumerate(options)
+                                  if option.startswith(COMMON_INCLUDE_PREFIX)), None)
+                    if first is None:
+                        continue
+                    command["options"] = [
+                        option for option in options
+                        if not option.startswith(COMMON_INCLUDE_PREFIX)
+                    ]
+                    command["options"].insert(first, COMMON_INCLUDE_MARKER)
         return common_includes
 
     @staticmethod
@@ -508,20 +544,6 @@ class OpCompileManifestRecorder:
 
     def _resource_modes(self):
         return {details[1] for details in self.resource_sources.values()}
-
-    def _manifest_files(self):
-        files = [
-            {
-                "file_name": os.path.basename(resource_file),
-                "file_path": "/manifests/{}/{}".format(self.op_name, resource_file),
-            }
-            for resource_file, _ in self.resource_sources.values()
-        ]
-        files.append({
-            "file_name": os.path.basename(self.merged_tiling_file),
-            "file_path": "/manifests/{}/{}".format(self.op_name, self.merged_tiling_file),
-        })
-        return sorted(files, key=lambda item: item["file_name"])
 
     @staticmethod
     def _normalize_identity_options(options):

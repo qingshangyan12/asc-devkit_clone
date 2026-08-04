@@ -5204,9 +5204,10 @@ class TilingDataShort {};
                 manifest = json.load(fd)
             self.assertEqual(
                 set(manifest),
-                {"schema_version", "binId", "soc_version", "source_file", "options", "files", "kernels"})
+                {"schema_version", "binId", "soc_version", "source_file", "base_dir", "options", "kernels"})
             self.assertEqual(manifest["schema_version"], "4.0")
             self.assertEqual(manifest["source_file"], "add_custom.cpp")
+            self.assertEqual(manifest["base_dir"], "resources")
             self.assertEqual(len(manifest["binId"]), 64)
             self.assertEqual(manifest["options"], {
                 "common_include": ["-I${env:ASCEND_HOME_PATH}/include"]})
@@ -5217,19 +5218,14 @@ class TilingDataShort {};
                 "name": "TilingData",
                 "parameter_index": 4,
                 "byte_size": 96,
-                "file": "AddCustom_deadbeef_tiling_data.h",
+                "file": "${resource}/resources/AddCustom_deadbeef_tiling_data.h",
                 "template": "@@STATIC_VALUE_tiling_data@@",
             })
             self.assertNotIn("artifacts", kernel)
-            self.assertEqual(
-                {item["file_path"] for item in manifest["files"]},
-                {"/manifests/AddCustom_deadbeef/resources/{}".format(item["file_name"])
-                 for item in manifest["files"]})
-            self.assertTrue(all("mode" not in item for item in manifest["files"]))
             normal_commands = kernel["commands"]
             self.assertEqual([command["type"] for command in normal_commands], ["bisheng"])
             self.assertEqual(normal_commands[0]["mode"], "normal")
-            self.assertIn("${resource:resources/AddCustom_deadbeef_kernel.cpp}",
+            self.assertIn("${resource}/resources/AddCustom_deadbeef_kernel.cpp",
                           normal_commands[0]["options"])
             self.assertIn("-I${source_dir}", normal_commands[0]["options"])
             self.assertIn("${options:common_include}", normal_commands[0]["options"])

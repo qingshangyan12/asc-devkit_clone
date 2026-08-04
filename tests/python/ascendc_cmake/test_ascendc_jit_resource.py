@@ -10,13 +10,11 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+import os
 import subprocess
 from collections import defaultdict
 from pathlib import Path
 from types import SimpleNamespace
-
-import pytest
-
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 FUNC_CMAKE = REPO_ROOT / "cmake/asc/fwk_modules/func.cmake"
@@ -27,70 +25,8 @@ def _write(path, content="{}"):
     path.write_text(content)
 
 
-def test_collects_sorted_recursive_manifests_with_argv(monkeypatch, tmp_path):
-    from ascendc_jit_resource import collect_custom_op_resources
-
-    generator = str(tmp_path / "generator path" / "manifest_generator")
-    custom_op_root = str(tmp_path / "custom op")
-    collection_root = str(tmp_path / "collected resources")
-    working_dir = tmp_path / "AddCustom_ascend910b"
-    manifest1 = working_dir / "kernel_1" / "nested" / "z_manifest.json"
-    manifest0 = working_dir / "kernel_0" / "a_manifest.json"
-    _write(manifest1)
-    _write(manifest0)
-    calls = []
-
-    def fake_run(command, **kwargs):
-        calls.append((command, kwargs))
-
-    monkeypatch.setattr(subprocess, "run", fake_run)
-    collect_custom_op_resources(
-        generator, custom_op_root, collection_root, str(working_dir)
-    )
-
-    assert calls == [
-        ([
-            generator,
-            "--collect_custom_op_resources",
-            custom_op_root,
-            collection_root,
-            str(manifest0),
-            str(manifest1),
-        ], {"check": True})
-    ]
-
-
-def test_collection_requires_at_least_one_manifest(tmp_path):
-    from ascendc_jit_resource import collect_custom_op_resources
-
-    working_dir = tmp_path / "NoManifest_ascend910b"
-    working_dir.mkdir()
-    with pytest.raises(RuntimeError, match="found no manifest"):
-        collect_custom_op_resources(
-            "/tool/manifest_generator", "/custom op", "/collection", str(working_dir)
-        )
-
-
-def test_collection_wraps_generator_failure(monkeypatch, tmp_path):
-    from ascendc_jit_resource import collect_custom_op_resources
-
-    working_dir = tmp_path / "FailedOp_ascend910b"
-    _write(working_dir / "kernel_0" / "failed_manifest.json")
-
-    def fail(command, **kwargs):
-        raise subprocess.CalledProcessError(7, command)
-
-    monkeypatch.setattr(subprocess, "run", fail)
-    with pytest.raises(RuntimeError, match=str(working_dir)):
-        collect_custom_op_resources(
-            "/tool/manifest_generator", "/custom op", "/collection", str(working_dir)
-        )
-
-
 def _compile_args(tmp_path, **jit_options):
     defaults = {
-        "jit_resource_generator": None,
-        "jit_custom_op_root": None,
         "jit_collection_root": None,
     }
     defaults.update(jit_options)
@@ -111,52 +47,21 @@ def _compile_args(tmp_path, **jit_options):
     )
 
 
-def test_compile_kernel_requires_all_jit_options(monkeypatch, tmp_path):
-    from ascendc_compile_kernel import CompileKernel
-
-    monkeypatch.chdir(tmp_path)
-    args = _compile_args(
-        tmp_path,
-        jit_resource_generator="/tool/manifest_generator",
-        jit_custom_op_root="/custom op",
-    )
-    with pytest.raises(ValueError, match="all be provided"):
-        CompileKernel(args)
-
-
-def test_compile_kernel_collection_is_optional(monkeypatch, tmp_path):
+def test_compile_kernel_exports_collection_root_for_compile_op(monkeypatch, tmp_path):
     import ascendc_compile_kernel
 
     monkeypatch.chdir(tmp_path)
-    calls = []
-    monkeypatch.setattr(
-        ascendc_compile_kernel,
-        "collect_custom_op_resources",
-        lambda **kwargs: calls.append(kwargs),
-    )
+    monkeypatch.delenv("ASCENDC_JIT_COLLECTION_ROOT", raising=False)
+    ascendc_compile_kernel.CompileKernel(_compile_args(tmp_path))
+    assert "ASCENDC_JIT_COLLECTION_ROOT" not in os.environ
 
-    disabled = ascendc_compile_kernel.CompileKernel(_compile_args(tmp_path))
-    disabled.collect_jit_resources()
-    assert calls == []
-
-    enabled_args = _compile_args(
-        tmp_path,
-        jit_resource_generator=str(tmp_path / "generator with spaces"),
-        jit_custom_op_root=str(tmp_path / "custom op"),
-        jit_collection_root=str(tmp_path / "collection root"),
-    )
-    enabled = ascendc_compile_kernel.CompileKernel(enabled_args)
-    enabled.collect_jit_resources()
-    assert calls == [{
-        "generator": enabled_args.jit_resource_generator,
-        "custom_op_root": enabled_args.jit_custom_op_root,
-        "collection_root": enabled_args.jit_collection_root,
-        "working_dir": enabled.working_dir,
-    }]
+    collection_root = tmp_path / "collection root"
+    ascendc_compile_kernel.CompileKernel(_compile_args(
+        tmp_path, jit_collection_root=str(collection_root)))
+    assert os.environ["ASCENDC_JIT_COLLECTION_ROOT"] == str(collection_root.resolve())
 
 
-@pytest.mark.parametrize("jit_enabled", [False, True])
-def test_compile_kernel_requests_kernel_meta_for_jit(monkeypatch, tmp_path, jit_enabled):
+def test_compile_kernel_does_not_preserve_kernel_meta_for_external_collection(monkeypatch, tmp_path):
     import ascendc_compile_kernel
 
     monkeypatch.chdir(tmp_path)
@@ -179,17 +84,11 @@ def test_compile_kernel_requests_kernel_meta_for_jit(monkeypatch, tmp_path, jit_
         lambda *args: (defaultdict(set), defaultdict(set), {}, {}, {}),
     )
 
-    jit_options = {}
-    if jit_enabled:
-        jit_options = {
-            "jit_resource_generator": "/tool/manifest_generator",
-            "jit_custom_op_root": "/custom op",
-            "jit_collection_root": "/collection",
-        }
-    kernel = ascendc_compile_kernel.CompileKernel(_compile_args(tmp_path, **jit_options))
+    kernel = ascendc_compile_kernel.CompileKernel(_compile_args(
+        tmp_path, jit_collection_root="/collection"))
     kernel.ascendc_gen_param()
 
-    assert recorded == [{"preserve_kernel_meta": jit_enabled}]
+    assert recorded == [{}]
 
 
 def test_bin_param_preserves_existing_debug_config_when_jit_keeps_kernel_meta(
@@ -279,45 +178,39 @@ def _fake_generator(tmp_path, executable=True):
     return generator
 
 
-def _jit_call(generator, package_type="RUN", package="demo", vendor="customize"):
+def _package_call(generator=None, package_type="RUN", package="demo", vendor="customize"):
+    jit_config = ""
+    if generator is not None:
+        jit_config = '    JIT_GENERATOR "{}"\n'.format(generator.as_posix())
     return (
-        'set_property(GLOBAL PROPERTY _ASC_PKG_{0}_TYPE {1})\n'
-        'set_property(GLOBAL PROPERTY _ASC_PKG_{0}_VENDOR_NAME {2})\n'
-        'npu_op_package_jit({0} GENERATOR "{3}")\n'
-    ).format(package, package_type, vendor, generator.as_posix())
+        "npu_op_package({0}\n"
+        "  TYPE {1}\n"
+        "  CONFIG\n"
+        "    VENDOR_NAME {2}\n"
+        "    ENABLE_CPACK False\n"
+        "{3}"
+        ")\n"
+    ).format(package, package_type, vendor, jit_config)
 
 
-@pytest.mark.parametrize(
-    "name,body,error",
-    [
-        ("unknown", 'npu_op_package_jit(missing GENERATOR "/missing")\n', "not specified"),
-        ("non_run", None, "only supports RUN"),
-        ("missing_generator", (
-            "set_property(GLOBAL PROPERTY _ASC_PKG_demo_TYPE RUN)\n"
-            "set_property(GLOBAL PROPERTY _ASC_PKG_demo_VENDOR_NAME customize)\n"
-            "npu_op_package_jit(demo)\n"
-        ), "must provide GENERATOR"),
-    ],
-)
-def test_jit_package_rejects_invalid_package_contract(tmp_path, name, body, error):
-    if name == "non_run":
-        body = _jit_call(_fake_generator(tmp_path), package_type="SHARED")
-    result = _configure_project(tmp_path / name, body)
+def test_jit_config_rejects_non_run_package(tmp_path):
+    body = _package_call(_fake_generator(tmp_path), package_type="SHARED")
+    result = _configure_project(tmp_path / "non_run", body)
     assert result.returncode != 0
-    assert error in result.stdout + result.stderr
+    assert "only supports RUN" in result.stdout + result.stderr
 
 
 def test_jit_package_rejects_missing_or_non_executable_generator(tmp_path):
     missing = tmp_path / "missing generator"
     missing_result = _configure_project(
-        tmp_path / "missing", _jit_call(missing)
+        tmp_path / "missing", _package_call(missing)
     )
     assert missing_result.returncode != 0
     assert "does not exist" in missing_result.stdout + missing_result.stderr
 
     non_executable = _fake_generator(tmp_path, executable=False)
     non_executable_result = _configure_project(
-        tmp_path / "non executable", _jit_call(non_executable)
+        tmp_path / "non executable", _package_call(non_executable)
     )
     assert non_executable_result.returncode != 0
     assert "not executable" in non_executable_result.stdout + non_executable_result.stderr
@@ -326,36 +219,47 @@ def test_jit_package_rejects_missing_or_non_executable_generator(tmp_path):
 def test_jit_package_stores_normalized_properties(tmp_path):
     generator = _fake_generator(tmp_path)
     expected_root = (tmp_path / "valid" / "build" / "jit_resources" / "demo").as_posix()
-    body = _jit_call(generator) + (
+    body = _package_call(generator) + (
         "get_property(enabled GLOBAL PROPERTY _ASC_PKG_demo_ENABLE_JIT_PACKAGE)\n"
         "get_property(actual_generator GLOBAL PROPERTY _ASC_PKG_demo_JIT_GENERATOR)\n"
-        "get_property(collection GLOBAL PROPERTY _ASC_PKG_demo_JIT_COLLECTION_ROOT)\n"
-        "get_property(work GLOBAL PROPERTY _ASC_PKG_demo_JIT_WORK_DIR)\n"
-        "get_property(output GLOBAL PROPERTY _ASC_PKG_demo_JIT_OUTPUT_SO)\n"
+        "get_property(root GLOBAL PROPERTY _ASC_PKG_demo_JIT_ROOT)\n"
         "if(NOT enabled)\n"
         '  message(FATAL_ERROR "JIT package property was not enabled")\n'
         "endif()\n"
         'if(NOT actual_generator STREQUAL "{}")\n'
         '  message(FATAL_ERROR "unexpected generator: ${{actual_generator}}")\n'
         "endif()\n"
-        'if(NOT collection STREQUAL "{}/collected")\n'
-        '  message(FATAL_ERROR "unexpected collection: ${{collection}}")\n'
+        'if(NOT root STREQUAL "{}")\n'
+        '  message(FATAL_ERROR "unexpected JIT root: ${{root}}")\n'
         "endif()\n"
-        'if(NOT work STREQUAL "{}/work")\n'
-        '  message(FATAL_ERROR "unexpected work: ${{work}}")\n'
-        "endif()\n"
-        'if(NOT output STREQUAL "{}/libcustomize_compile_resource.so")\n'
-        '  message(FATAL_ERROR "unexpected output: ${{output}}")\n'
-        "endif()\n"
-    ).format(generator.resolve().as_posix(), expected_root, expected_root, expected_root)
+    ).format(generator.resolve().as_posix(), expected_root)
     result = _configure_project(tmp_path / "valid", body)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_package_without_jit_generator_keeps_jit_disabled(tmp_path):
+    body = _package_call() + (
+        "get_property(enabled GLOBAL PROPERTY _ASC_PKG_demo_ENABLE_JIT_PACKAGE)\n"
+        "if(enabled)\n"
+        '  message(FATAL_ERROR "JIT package property was unexpectedly enabled")\n'
+        "endif()\n"
+    )
+    result = _configure_project(tmp_path / "disabled", body)
     assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_jit_bundle_accumulates_dependencies_from_each_package_add():
     function_source = FUNC_CMAKE.read_text(encoding="utf-8")
 
+    assert "function(npu_op_package_jit" not in function_source
+    assert 'set(JIT_SOC_ROOT "${JIT_ROOT}/${compute_unit}")' in function_source
+    assert 'lib${current_target_vendor_name}_compile_database.so' in function_source
     assert (
-        "add_dependencies(${target_package_name}_jit_bundle "
-        "${KERNEL_COMPILE_TARGETS})"
+        "op_impl/ai_core/tbe/kernel/jit/${compute_unit}"
+    ) in function_source
+    assert (
+        "add_dependencies(${target_package_name}_jit_bundle ${JIT_BUNDLE_TARGET})"
+    ) in function_source
+    assert (
+        "add_dependencies(${JIT_BUNDLE_TARGET} ${SOC_KERNEL_COMPILE_TARGETS})"
     ) in function_source

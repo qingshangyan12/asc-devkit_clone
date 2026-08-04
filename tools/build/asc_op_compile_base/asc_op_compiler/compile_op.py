@@ -23,6 +23,7 @@ import re
 import shutil
 import sys
 import struct
+import tempfile
 from asc_op_compile_base.common.ccec import CCECInfo
 from asc_op_compile_base.asc_op_compiler.cce_runtime import tvm_callback_cce_postproc
 from asc_op_compile_base.common.buildcfg import get_current_build_config
@@ -70,6 +71,65 @@ DEFAULT_TILING_KEY = '0'
 COMPILE_INFO_KEY = 'compileInfo'
 GEN_PLACE_HOLDER_STR = 'gen_placeholder'
 TILING_KEY_SEARCH_KEYWORD = 'Contents of section'            # used in new tiling to search tiling section lines
+JIT_COLLECTION_ROOT_ENV = "ASCENDC_JIT_COLLECTION_ROOT"
+
+
+def _collect_compile_resources(manifest_recorder):
+    collection_root = os.getenv(JIT_COLLECTION_ROOT_ENV)
+    if not collection_root:
+        return
+
+    unit_name = manifest_recorder.op_name
+    if not unit_name or os.path.basename(unit_name) != unit_name or "\\" in unit_name \
+            or unit_name in (".", ".."):
+        raise RuntimeError("unsafe compile resource unit name: {}".format(unit_name))
+    manifests_root = os.path.join(os.path.realpath(collection_root), "manifests")
+    destination = os.path.join(manifests_root, unit_name)
+    os.makedirs(manifests_root, exist_ok=True)
+    if os.path.exists(destination):
+        raise RuntimeError("duplicate collected manifest identity: {}".format(unit_name))
+
+    temporary = tempfile.mkdtemp(prefix=".{}-".format(unit_name), dir=manifests_root)
+    try:
+        with open(manifest_recorder.manifest_path, "r") as manifest_file:
+            manifest = json.load(manifest_file)
+        expected_manifest = "{}_manifest.json".format(unit_name)
+        if os.path.basename(manifest_recorder.manifest_path) != expected_manifest:
+            raise RuntimeError("manifest name does not match its collected unit")
+
+        base_dir = manifest.get("base_dir", "")
+        components = base_dir.split("/") if isinstance(base_dir, str) else []
+        if not components or any(component in ("", ".", "..") for component in components) \
+                or os.path.isabs(base_dir) or "\\" in base_dir:
+            raise RuntimeError("unsafe manifest base_dir: {}".format(base_dir))
+        resource_source = os.path.join(manifest_recorder.kernel_meta_dir, *components)
+        if os.path.islink(resource_source) or not os.path.isdir(resource_source):
+            raise RuntimeError("manifest base_dir is not a directory: {}".format(resource_source))
+        resource_output = os.path.join(temporary, *components)
+        copied_files = 0
+        for current, directories, files in os.walk(resource_source, followlinks=False):
+            for directory in directories:
+                path = os.path.join(current, directory)
+                if os.path.islink(path):
+                    raise RuntimeError("manifest base_dir contains a symlink: {}".format(path))
+            relative = os.path.relpath(current, resource_source)
+            output_dir = resource_output if relative == "." else os.path.join(resource_output, relative)
+            os.makedirs(output_dir, exist_ok=True)
+            for file_name in files:
+                source = os.path.join(current, file_name)
+                if os.path.islink(source) or not os.path.isfile(source):
+                    raise RuntimeError("manifest resource is not a regular file: {}".format(source))
+                shutil.copy2(source, os.path.join(output_dir, file_name))
+                copied_files += 1
+        if copied_files == 0:
+            raise RuntimeError("manifest base_dir contains no resource files")
+
+        shutil.copy2(manifest_recorder.manifest_path, os.path.join(temporary, expected_manifest))
+        os.rename(temporary, destination)
+    except Exception as error:
+        shutil.rmtree(temporary, ignore_errors=True)
+        raise RuntimeError(
+            "collect compile resources failed for {}: {}".format(unit_name, error)) from error
 
 
 def _infer_name(key, sub_operater_infos, chip_version):
@@ -1390,6 +1450,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
                        output_gen_placehoder, compile_log_path)
     resource_compile_info = compile_info_origin if is_super_kernel_sub_combine else compile_info
     manifest_recorder.write(resource_compile_info, tiling_info, workspace_idx + 1)
+    _collect_compile_resources(manifest_recorder)
     if not global_var_storage.get_variable("ascendc_compile_debug_config"):
         tiling_info.remove_file()
         CommonUtility.remove_temp_file(compile_info.gen_kernel_func_file)
