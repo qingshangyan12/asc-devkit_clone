@@ -1,0 +1,126 @@
+{
+  "schema_version": "7.0",
+  "bin_id": "add_custom",
+  "resource_path": "src/kernel.cpp",
+  "common_compile": [
+      "-O3",
+      "-std=c++17",
+      "-c",
+      "-I${env:ASCEND_HOME_PATH}/include",
+      "-I",
+      "${resource:include}"
+  ],
+  "kernels": [
+    {
+      "kernel_name": "add_custom_xxxxx",
+      "static_inputs": [
+        {
+          "name": "tiling_data",
+          "parameter_index": 4,
+          "byte_size": 8,
+          "file": "include/add_custom_tiling_data.h",
+          "token": "${static_input:tiling_data}"
+        }
+      ],
+      "link_option": [
+        "-m",
+        "aicorelinux",
+        "-r",
+        "-Ttext=0",
+        "-q",
+        "-x"
+      ],
+      "objects": [
+        {
+          "obj_name": "my_basic",
+          "obj_type": "basic",
+          "commands": [
+            {
+              "type": "compile",
+              "stage": 0,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                "${common_compile}",
+                "${resource:src/add_custom_kernel.cpp}",
+                "-o",
+                "${intermediates:add_custom.aic.o}"
+              ]
+            },
+            {
+              "type": "compile",
+              "stage": 0,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                "${common_compile}",
+                "${resource:src/add_custom_kernel.cpp}",
+                "-o",
+                "${intermediates:add_custom.aiv.o}"
+              ]
+            }
+          ],
+          "outputs": [
+            "intermediates/add_custom.aic.o",
+            "intermediates/add_custom.aiv.o"
+          ]
+        },
+        {
+          "obj_name": "my_super_kernel",
+          "obj_type": "sk",
+          "commands": [
+            {
+              "type": "compile",
+              "stage": 0,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/bisheng",
+                "${common_compile}",
+                "-D__ASCENDC_ENABLE_SUPER_KERNEL__",
+                "-Dadd_custom=add_custom_static_sk",
+                "-std=c++17",
+                "-c",
+                "${resource:src/add_custom_kernel.cpp}",
+                "-o",
+                "${intermediates:add_custom.sk.o}"
+              ]
+            },
+            {
+              "type": "objcopy",
+              "stage": 1,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                "--redefine-sym=add_custom_static_sk=add_custom_static_sk_split1",
+                "${intermediates:add_custom.sk.o}",
+                "${intermediates:add_custom.sk_split1.o}"
+              ]
+            },
+            {
+              "type": "objcopy",
+              "stage": 1,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                "--redefine-sym=add_custom_static_sk=add_custom_static_sk_split2",
+                "${intermediates:add_custom.sk.o}",
+                "${intermediates:add_custom.sk_split2.o}"
+              ]
+            },
+            {
+              "type": "objcopy",
+              "stage": 1,
+              "cmd": [
+                "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                "--redefine-sym=add_custom_static_sk=add_custom_static_sk_split3",
+                "${intermediates:add_custom.sk.o}",
+                "${intermediates:add_custom.sk_split3.o}"
+              ]
+            }
+          ],
+          "outputs": [
+            "intermediates/add_custom.sk.o",
+            "intermediates/add_custom.sk_split1.o",
+            "intermediates/add_custom.sk_split2.o",
+            "intermediates/add_custom.sk_split3.o"
+          ]
+        }
+      ]
+    }
+  ]
+}
