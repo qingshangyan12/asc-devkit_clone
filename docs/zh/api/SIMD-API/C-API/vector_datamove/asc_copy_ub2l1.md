@@ -1,3 +1,23 @@
+---
+okf_type: reference.api.cpp
+title: asc_copy_ub2l1
+description: Ascend C C-API asc_copy_ub2l1接口功能说明
+api_class: SIMD-API/C-API
+archs: [3510]
+signatures:
+  - function: asc_copy_ub2l1
+    override_id: asc_copy_ub2l1_busrt
+    header: include/c_api/vector_datamove/vector_datamove.h
+    archs: [3510]
+  - function: asc_copy_ub2l1
+    override_id: asc_copy_ub2l1_size
+    header: include/c_api/vector_datamove/vector_datamove.h
+    archs: [3510]
+  - function: asc_copy_ub2l1_sync
+    override_id: asc_copy_ub2l1_sync
+    header: include/c_api/vector_datamove/vector_datamove.h
+    archs: [3510]
+---
 # asc_copy_ub2l1
 
 ## 产品支持情况
@@ -35,18 +55,36 @@
 ```cpp
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size)
 ```
+---
+header: include/c_api/vector_datamove/vector_datamove.h
+function: asc_copy_ub2l1
+override_id: asc_copy_ub2l1_size
+archs: [3510]
+---
 
 - 高维切分搬运
 
 ```cpp
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
 ```
+---
+header: include/c_api/vector_datamove/vector_datamove.h
+function: asc_copy_ub2l1
+override_id: asc_copy_ub2l1_busrt
+archs: [3510]
+---
 
 - 同步搬运
 
 ```cpp
 __aicore__ inline void asc_copy_ub2l1_sync(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size)
 ```
+---
+header: include/c_api/vector_datamove/vector_datamove.h
+function: asc_copy_ub2l1
+override_id: asc_copy_ub2l1_sync
+archs: [3510]
+---
 
 ## 参数说明
 

@@ -360,10 +360,55 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
 //======asc_ndim_copy_dci=====
 __aicore__ inline void asc_ndim_copy_dci();
 //======asc_copy_ub2l1=======
+
+
+
+
+
+
+
+
+/*
+ * @ingroup asc_copy_ub2l1
+ * @override_id asc_copy_ub2l1_busrt
+ * @archs 3510
+ * @brief copy data to l1 from ub
+ * @param [out] dst, L1 addr
+ * @param [in] src, UB addr
+ * @param [in] n_burst, burst number to copy
+ * @param [in] len_burst, data length each burst
+ * @param [in] src_gap, src gap between each burst
+ * @param [in] dst_gap, dst gap between each burst
+ */
 __aicore__ inline void asc_copy_ub2l1(
     __cbuf__ void* dst, __ubuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+
+/*
+ * @ingroup asc_copy_ub2l1
+ * @override_id asc_copy_ub2l1_size
+ * @archs 3510
+ * @brief copy data to l1 from ub
+ * @param [out] dst, L1 addr
+ * @param [in] src, UB addr
+ * @param [in] size, copy size
+ */
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size);
+
+/*
+ * @ingroup asc_copy_ub2l1
+ * @override_id asc_copy_ub2l1_sync
+ * @archs 3510
+ * @brief copy data to l1 from ub
+ * @param [out] dst, L1 addr
+ * @param [in] src, UB addr
+ * @param [in] size, copy size
+ */
 __aicore__ inline void asc_copy_ub2l1_sync(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size);
+
+
+
+
+
 //======asc_set_gm2ub_pad=======
 [[deprecated("NOTICE: asc_set_gm2ub_pad is deprecated. "
              "Please use asc_set_copy_pad_val instead for pad value setting")]]
