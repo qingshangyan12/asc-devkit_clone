@@ -12,6 +12,7 @@ const CJK_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/
 const CJK_PHRASE_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]{2,}/g
 const RESULTS_PER_VARIANT = 80
 const MAX_CANDIDATES = 240
+const TITLE_INDEX_SOURCE = 'title-route'
 const initializedPagefindInstances = new WeakSet()
 
 function normalizeCase(value) {
@@ -38,6 +39,13 @@ function normalizeRoute(url) {
 
 function getLeadingIdentifier(value) {
   return normalize(value).match(/^[a-z_][a-z0-9_]*/)?.[0] || ''
+}
+
+function identifierMatch(value, query) {
+  const tokens = normalize(value).match(/[a-z_][a-z0-9_]*/g) || []
+  if (tokens.includes(query)) return 'exact'
+  if (query.length >= 4 && tokens.some(token => token.startsWith(query))) return 'prefix'
+  return ''
 }
 
 function isDirectoryLandingPage(url, title) {
@@ -157,6 +165,7 @@ function createQueryPlan(query) {
     caseQuery,
     normalizedQuery,
     compactQuery,
+    identifierIntent: caseQuery.includes('_') && /^[a-z_][a-z0-9_]*$/i.test(caseQuery),
     cjkPhrases,
     englishParts,
     cjkSubPhrases: cjkPhrases.map(generateSubPhrases),
@@ -184,8 +193,10 @@ function primaryVariants(plan) {
     addVariant(variants, plan.englishParts.join(' '), 1.6)
     addVariant(variants, `"${plan.englishParts.join(' ')}"`, 2.1)
     addVariant(variants, plan.englishParts.join('_'), 1.5)
-    addVariant(variants, plan.compactQuery, 1.4)
-    for (const part of plan.englishParts) addVariant(variants, part, 0.8)
+    if (!plan.identifierIntent) {
+      addVariant(variants, plan.compactQuery, 1.4)
+      for (const part of plan.englishParts) addVariant(variants, part, 0.8)
+    }
   }
   for (const phrase of plan.cjkPhrases) {
     addVariant(variants, phrase, 1.4)
@@ -289,6 +300,16 @@ function scoreCandidate(candidate, plan) {
   const normalizedHeadings = headings.map(normalize)
   const compactTitle = compactEnglish(title)
   const leadingIdentifier = getLeadingIdentifier(title)
+  const identifierTitleMatch = plan.identifierIntent
+    ? identifierMatch(title, plan.normalizedQuery)
+    : ''
+  const identifierRouteMatch = plan.identifierIntent
+    ? identifierMatch(normalizeRoute(route), plan.normalizedQuery)
+    : ''
+  const identifierTextMatch = plan.identifierIntent
+    ? identifierMatch(text, plan.normalizedQuery)
+    : ''
+  if (plan.identifierIntent && !identifierTextMatch) return null
   const pureEnglishTitle = !CJK_REGEX.test(title)
   const routeDepth = normalizeRoute(route).split('/').filter(Boolean).length
   const retrievalTieScore = candidate.retrievalScore * 5000
@@ -306,6 +327,14 @@ function scoreCandidate(candidate, plan) {
 
   let pageScore = candidate.retrievalScore * 100000
     + Math.log1p(candidate.bestEngineScore) * 1000
+  if (identifierTextMatch === 'exact') {
+    const canonicalIdentifier = identifierTitleMatch === 'exact' || identifierRouteMatch === 'exact'
+    pageScore = Math.max(pageScore, canonicalIdentifier ? 2600000 : 2300000)
+  }
+  else if (identifierTextMatch === 'prefix') {
+    const canonicalIdentifier = identifierTitleMatch === 'prefix' || identifierRouteMatch === 'prefix'
+    pageScore = Math.max(pageScore, canonicalIdentifier ? 2300000 : 2150000)
+  }
   let coverage = plan.cjkPhrases.length > 0 ? 1 : 0
   let cjkScore = 0
 
@@ -364,12 +393,12 @@ function scoreCandidate(candidate, plan) {
       englishScore = Math.max(englishScore, 800000 + plan.compactQuery.length * 100)
     }
     if (titlePrefix) englishScore = Math.max(englishScore, 900000 + plan.compactQuery.length * 100)
-    if (dataTypeDefinition) englishScore = Math.max(englishScore, 2200000 + plan.compactQuery.length * 100)
-    if (macroDefinition) englishScore = Math.max(englishScore, 950000 + plan.compactQuery.length * 100)
+    if (dataTypeDefinition) englishScore = Math.max(englishScore, 2700000 + plan.compactQuery.length * 100)
+    if (macroDefinition) englishScore = Math.max(englishScore, 2700000 + plan.compactQuery.length * 100)
     if (identifierExact) englishScore = Math.max(englishScore, 1100000 + plan.compactQuery.length * 100)
     if (titleExact) englishScore = Math.max(englishScore, 1200000 + plan.compactQuery.length * 100)
-    if (builtinDataTypeDefinition) englishScore = Math.max(englishScore, 2300000 + plan.compactQuery.length * 100)
-    if (builtinKeywordDefinition) englishScore = Math.max(englishScore, 1250000 + plan.compactQuery.length * 100)
+    if (builtinDataTypeDefinition) englishScore = Math.max(englishScore, 2800000 + plan.compactQuery.length * 100)
+    if (builtinKeywordDefinition) englishScore = Math.max(englishScore, 2800000 + plan.compactQuery.length * 100)
     if (titleExact && pureEnglishTitle) {
       englishScore = Math.max(englishScore, 1400000 + plan.compactQuery.length * 100)
     }
@@ -431,16 +460,31 @@ function scoreCandidate(candidate, plan) {
     + Math.round(coverage * 20000)
     + (plan.macroIntent ? normalizedText.split(plan.normalizedQuery).length * 5000 : 0)
     - wrappedEnglishPhrasePenalty
+  const { ascSearchSource, ...displayMeta } = data.meta || {}
+  const description = ascSearchSource === TITLE_INDEX_SOURCE ? '' : data.excerpt || ''
   return {
     route,
     title: title || route,
-    description: data.excerpt || '',
+    description,
     meta: {
-      ...(data.meta || {}),
+      ...displayMeta,
       title: title || route,
-      description: data.excerpt || '',
+      description,
     },
     score,
+  }
+}
+
+function mergeRouteResult(existing, result) {
+  if (!existing) return result
+  const preferred = result.score > existing.score ? result : existing
+  const fallback = preferred === result ? existing : result
+  const description = preferred.description || fallback.description || ''
+  if (description === preferred.description) return preferred
+  return {
+    ...preferred,
+    description,
+    meta: { ...preferred.meta, description },
   }
 }
 
@@ -451,8 +495,7 @@ function rankCandidates(candidates, plan) {
     if (!result) continue
     const route = normalizeRoute(result.route)
     if (!route) continue
-    const existing = resultsByRoute.get(route)
-    if (!existing || result.score > existing.score) resultsByRoute.set(route, result)
+    resultsByRoute.set(route, mergeRouteResult(resultsByRoute.get(route), result))
   }
   const ranked = [...resultsByRoute.values()]
   ranked.sort((left, right) => right.score - left.score)
