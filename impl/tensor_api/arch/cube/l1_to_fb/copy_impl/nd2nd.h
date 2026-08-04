@@ -71,6 +71,7 @@ private:
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, blockCount, "src row shape size", "CopyL12FB");
         if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
             dstCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(dstLayout);
             dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout);
@@ -79,7 +80,8 @@ private:
             dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         }
 
-        uint16_t blockLen = Std::ceil_align(srcCol * sizeof(srcType), deqTensorAddrAlignValue) / fbufBurstLenUnit;
+        auto blockLen = Std::ceil_align(srcCol * sizeof(srcType), deqTensorAddrAlignValue) / fbufBurstLenUnit;
+        TENSOR_API_DEBUG_CHECK(debug_check_block_len, blockLen, debug_block_len_max, "CopyL12FB");
         uint16_t srcStride = Std::ceil_division(srcRow * sizeof(srcType), C0_SIZE<>);
         uint16_t dstStride = Std::ceil_align(dstRow * sizeof(dstType), deqTensorAddrAlignValue) / fbufBurstLenUnit;
 

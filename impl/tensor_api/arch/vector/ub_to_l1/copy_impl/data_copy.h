@@ -36,6 +36,7 @@ protected:
     __aicore__ inline static void EmitCopy(
         const T& dst, const U& src, uint16_t blockCount, uint32_t blockLen, int64_t srcStride, int64_t dstStride)
     {
+        TENSOR_API_DEBUG_CHECK(debug_check_block_len, blockLen, debug_block_len_max, "CopyUB2L1");
         CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
 };

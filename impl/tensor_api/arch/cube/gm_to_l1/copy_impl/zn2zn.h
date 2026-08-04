@@ -50,9 +50,9 @@ public:
     // share the same per-big-fractal stride. srcNdMatrixStride/dstNzMatrixStride are unused here
     // because that contiguity makes the single srcStride/dstStride describe the whole sequence.
     template <typename T, typename U, typename SrcLayout, typename DstLayout>
-    __aicore__ inline static void EmitCopy(const T& dst, const U& src, const SrcLayout& srcLayout,
-                                           const DstLayout& dstLayout, uint16_t matrixNum,
-                                           uint64_t srcNdMatrixStride, uint32_t dstNzMatrixStride)
+    __aicore__ inline static void EmitCopy(
+        const T& dst, const U& src, const SrcLayout& srcLayout, const DstLayout& dstLayout, uint16_t matrixNum,
+        uint64_t srcNdMatrixStride, uint32_t dstNzMatrixStride)
     {
         using type = typename U::elementType;
 

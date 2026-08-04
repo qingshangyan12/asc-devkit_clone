@@ -72,6 +72,7 @@ private:
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, blockCount, "src row shape size", "CopyL12BT");
         if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
             dstCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(dstLayout);
             dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout);
@@ -88,10 +89,11 @@ private:
             convControl = true;
         }
 
-        uint16_t blockLen = Std::ceil_division(srcCol, C0_ELEMENT<srcType>);
+        auto blockLen = Std::ceil_division(srcCol, C0_ELEMENT<srcType>);
         if constexpr (IsOneOfAttrV<srcType, float, int32_t>) {
             blockLen = Std::ceil_align(blockLen, 2);
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_len, blockLen, debug_block_len_max, "CopyL12BT");
 
         uint16_t srcStride = (srcRow - srcCol) / C0_ELEMENT<srcType>;
         uint16_t dstStride = Std::ceil_align((dstRow - srcCol) / C0_ELEMENT<dstType>, 2);
@@ -120,12 +122,24 @@ private:
         auto dstLayout = dst.Layout();
 
         uint16_t batchSize = Get<0>(srcLayout.Shape());
+        TENSOR_API_DEBUG_CHECK(debug_check_batch_match, batchSize, Get<0>(dstLayout.Shape()), "CopyL12BT batch path");
+        TENSOR_API_DEBUG_CHECK(debug_check_batch_count, batchSize, "CopyL12BT batch path");
         uint32_t srcBatchStride = Get<0>(srcLayout.Stride());
         uint32_t dstBatchStride = Get<0>(dstLayout.Stride());
 
         // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
         // would read the batch axis as row/column.
         auto srcInner = Te::Get<1>(srcLayout);
+        auto dst_inner = Te::Get<1>(dstLayout);
+        uint64_t src_column_bytes = static_cast<uint64_t>(GetTotalColumnShape(srcInner)) * sizeof(srcType);
+        uint64_t dst_column_bytes = static_cast<uint64_t>(GetTotalColumnShape(dst_inner)) * sizeof(dstType);
+        TENSOR_API_DEBUG_ASSERT(
+            (src_column_bytes % debug_data_block_bytes == 0 && dst_column_bytes % debug_data_block_bytes == 0),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check src and dst column byte sizes in CopyL12BT batch path, src and dst column byte "
+                "sizes must be %u-byte aligned; current srcColumnBytes is %llu, dstColumnBytes is %llu.",
+                static_cast<unsigned int>(debug_data_block_bytes), static_cast<unsigned long long>(src_column_bytes),
+                static_cast<unsigned long long>(dst_column_bytes)));
 
         uint32_t srcShapeRows;
         uint32_t srcShapeColumns;
@@ -146,10 +160,11 @@ private:
 
         // batch-strided: B blocks, stride encodes per-matrix end-to-next-start gap.
         uint16_t blockCount = batchSize;
-        uint16_t blockLen = Std::ceil_division(matrixElems, C0_ELEMENT<srcType>);
+        auto blockLen = Std::ceil_division(matrixElems, C0_ELEMENT<srcType>);
         if constexpr (IsOneOfAttrV<srcType, float, int32_t>) {
             blockLen = Std::ceil_align(blockLen, 2);
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_len, blockLen, debug_block_len_max, "CopyL12BT batch path");
         uint16_t srcStride = (srcBatchStride - matrixElems) / C0_ELEMENT<srcType>;
         uint16_t dstStride = Std::ceil_align((dstBatchStride - matrixElems) / C0_ELEMENT<dstType>, 2);
 

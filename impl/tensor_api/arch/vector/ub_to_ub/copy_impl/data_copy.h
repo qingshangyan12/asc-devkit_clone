@@ -49,11 +49,13 @@ protected:
         }
 
         // Convert from bytes to 32B units for asc_copy_ub2ub
-        uint16_t blockLenIn32B = static_cast<uint16_t>(blockLen >> 5);
+        uint32_t block_len_in_32b = blockLen >> 5;
+        TENSOR_API_DEBUG_CHECK(debug_check_block_len, block_len_in_32b, debug_block_len_max, "CopyUB2UB");
         uint16_t srcStrideIn32B = static_cast<uint16_t>(srcStride >> 5);
         uint16_t dstStrideIn32B = static_cast<uint16_t>(dstStride >> 5);
 
-        CopyUbufToUbufInstr::DataCopy(dst, src, blockCount, blockLenIn32B, srcStrideIn32B, dstStrideIn32B);
+        CopyUbufToUbufInstr::DataCopy(
+            dst, src, blockCount, static_cast<uint16_t>(block_len_in_32b), srcStrideIn32B, dstStrideIn32B);
     }
 };
 
