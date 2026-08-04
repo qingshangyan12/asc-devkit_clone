@@ -45,6 +45,10 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, nSize, "nSize", "CopyL0C2L1 instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_m, mSize, false, "CopyL0C2L1 instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, srcStride, dstStride, "CopyL0C2L1 instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_unit_flag, unitFlag, "CopyL0C2L1 instruction");
 
         asc_copy_l0c2l1(
             dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,

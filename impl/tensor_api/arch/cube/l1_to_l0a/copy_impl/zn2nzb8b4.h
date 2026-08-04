@@ -84,11 +84,14 @@ private:
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout) *
                      GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout) / FRACTAL_FIXED;
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_step, kStep, "kStep", "CopyL12L0A ZN2NZ B8/B4 path");
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_m_step, mStep, IsB4Type<DstType>, "CopyL12L0A ZN2NZ B8/B4 path");
         // Zn -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / STRIDE_UNIT;
         if (m1 < FRACTAL_FIXED) {
+            TENSOR_API_DEBUG_CHECK(debug_check_l0_step, mStep, "mStep", "CopyL12L0A ZN2NZ B8/B4 path");
             LoadCbufToCa::LoadData<true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         } else if constexpr (IsB4Type<DstType>) {
             LoadDataImplSplit<M_STEP_MIN_VAL_B4>(

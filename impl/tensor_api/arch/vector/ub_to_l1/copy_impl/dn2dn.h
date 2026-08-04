@@ -55,6 +55,7 @@ private:
         auto srcLayout = src.Layout();
 
         uint16_t blockCount = GetTotalColumnShape(srcLayout);
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, blockCount, "src column shape size", "CopyUB2L1 DN path");
         uint32_t blockLen = Std::ceil_division(GetTotalRowShape(srcLayout), C0_ELEMENT<SrcType>);
         int64_t srcStride = Std::ceil_division(
             GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) - GetTotalRowShape(srcLayout),
