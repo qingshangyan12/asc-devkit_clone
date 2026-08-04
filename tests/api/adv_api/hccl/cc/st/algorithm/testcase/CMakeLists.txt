@@ -12,6 +12,7 @@ set(src_list
     main.cc
     all_gather_aicpu_testcase.cc
     reduce_scatter_aicpu_testcase.cc
+    all_to_all_mesh1d_aicpu_testcase.cc
 )
 
 add_executable(${HCCL_CHECKER_TARGET} ${src_list})
