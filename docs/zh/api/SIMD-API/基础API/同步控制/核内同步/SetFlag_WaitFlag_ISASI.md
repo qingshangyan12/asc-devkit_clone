@@ -60,7 +60,7 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| event | 输入 | 模板参数。<br>同步事件，数据类型为HardEvent。同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。HardEvent用来表示对应的同步事件。HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。流水类型及含义请参考[硬件流水类型](核内同步能力概述.md#zh-cn_topic_0000002542725361_section1272612276459)。由于硬件架构版本代际间的差异，不同硬件架构上的事件存在差异。 |
+| event | 输入 | 模板参数。<br>同步事件，数据类型为HardEvent。<br>同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。<br>HardEvent用来表示对应的同步事件。<br>HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。<br>流水类型及含义请参考[硬件流水类型](核内同步能力概述.md#zh-cn_topic_0000002542725361_section1272612276459)。<br>由于硬件架构版本代际间的差异，不同硬件架构上的事件存在差异。 |
 | eventID | 输入 | 事件ID。数据类型为int32_t类型。eventID的取值范围与产品型号有关，具体请参考[约束说明](#section633mcpsimp)。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
@@ -78,21 +78,22 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 - 在采用[静态Tensor编程范式](../../../../../guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)时，事件的类型和事件ID由开发者自行管理，建议使用事件ID0-5，事件ID6用于系统内部规划（当前未使用），事件ID7用于TPipe编程中的**自动同步**功能，目前暂不建议直接使用事件ID6-7。
 
 - eventID的取值范围如下：
-<!-- npu="950" id10 -->
+
+    <!-- npu="950" id10 -->
     - Ascend 950PR/Ascend 950DT，数据范围为：0-7。
-<!-- end id10 -->
-<!-- npu="A3" id11 -->
+    <!-- end id10 -->
+    <!-- npu="A3" id11 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7。
-<!-- end id11 -->
-<!-- npu="910b" id12 -->
+    <!-- end id11 -->
+    <!-- npu="910b" id12 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7。
-<!-- end id12 -->
-<!-- npu="310p" id13 -->
+    <!-- end id12 -->
+    <!-- npu="310p" id13 -->
     - Atlas 推理系列产品AI Core，数据范围为：0-7。
-<!-- end id13 -->
-<!-- npu="910" id14 -->
+    <!-- end id13 -->
+    <!-- npu="910" id14 -->
     - Atlas 训练系列产品，数据范围为：0-3。
-<!-- end id14 -->
+    <!-- end id14 -->
 
 - 相同流水、相同eventID下，连续使用SetFlag会引发未定义行为，此时再执行PipeBarrier<PIPE\_ALL\>会出现卡死现象：
 
