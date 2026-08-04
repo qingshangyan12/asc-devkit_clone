@@ -27,7 +27,7 @@ struct AscCommServerInfo {
     bool finishFlag{false};
     AscCommServerInfo(u32 groupIdx) : serverIns(groupIdx) { extMsg = std::make_shared<HcclMsgExt>(); }
 };
-static constexpr u32 MAX_RETRY_CNT = 10U;
+static constexpr u32 MAX_RETRY_CNT = 15U;
 
 HcclResult CreateServerList(void* args[], u32 ctxNum, std::vector<AscCommServerInfo>& serverList)
 {
