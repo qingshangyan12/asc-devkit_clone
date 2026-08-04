@@ -52,7 +52,7 @@ for (i = 0; i < ndNum; i++) {
 
 **图1** NZ2ND示意图<a name="zh-cn_topic_0000002547300777_fig862819576334"></a>  
 
-![](../../../../figures/Fixpipe_NZ2ND.png)
+![](../../../../figures/fixpipe_nz2nd.png)
 
 对于该场景，可以通过配置intriParams结构体参数实现上图的效果：
 

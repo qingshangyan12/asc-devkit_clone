@@ -14,4 +14,4 @@
 
 **图1** Int8 Channel Merge示意图<a name="zh-cn_topic_0000002547260781_fig1935632714360"></a>  
 
-![](../../../../figures/Fixpipe_Int8_Channel_Merge.png)
+![](../../../../figures/fixpipe_int8_channel_merge.png)
