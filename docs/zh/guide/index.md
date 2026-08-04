@@ -61,8 +61,8 @@
         -   [SIMD BuiltIn关键字](编程指南/语言扩展层/SIMD-BuiltIn关键字.md)
         -   [SIMT BuiltIn关键字](编程指南/语言扩展层/SIMT-BuiltIn关键字.md)
         -   [SIMD与SIMT混合编程BuiltIn关键字](编程指南/语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md)
-        -   [SIMD语言扩展层C API](编程指南/语言扩展层/SIMD语言扩展层C-API.md)
-        -   [SIMT语言扩展层C API](编程指南/语言扩展层/SIMT语言扩展层C-API.md)
+        -   [SIMD语言扩展层C API](编程指南/语言扩展层/SIMD语言扩展层c_api.md)
+        -   [SIMT语言扩展层C API](编程指南/语言扩展层/SIMT语言扩展层c_api.md)
 
     -   [C++类库API](编程指南/类库API/类库API.md)
         -   [编程接口概述](编程指南/类库API/编程接口概述.md)

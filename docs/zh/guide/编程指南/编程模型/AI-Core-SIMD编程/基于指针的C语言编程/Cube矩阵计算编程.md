@@ -337,4 +337,4 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ## Cube矩阵计算示例
 
-目前完整的矩阵计算工程样例仍在开发，后续版本会持续补充。开发者可查阅API文档了解[Cube接口详细说明](../../../../../api/SIMD-API/c_api.md)。
+目前完整的矩阵计算工程样例仍在开发，后续版本会持续补充。开发者可查阅API文档了解[Cube接口详细说明](../../../../../api/SIMD-API/c_api/c_api.md)。

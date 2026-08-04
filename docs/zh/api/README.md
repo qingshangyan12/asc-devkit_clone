@@ -827,7 +827,7 @@
             -   [SetSaturationFlag\(ISASI\)](SIMD-API/basic_api/special_register_access/SetSaturationFlag_ISASI.md)
 
     -   [C API](SIMD-API/c_api/README.md)
-        -   [API列表](SIMD-API/c_api/C-API.md)
+        -   [API列表](SIMD-API/c_api/c_api.md)
         -   [通用说明和约束](SIMD-API/c_api/general_description_and_constraints.md)
         -   [数据结构](SIMD-API/c_api/struct/data_structures.md)
             -   [asc_fill_value_config](SIMD-API/c_api/struct/asc_fill_value_config.md)
