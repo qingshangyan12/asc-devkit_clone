@@ -357,6 +357,7 @@ __aicore__ inline bool asc_vf_debug_ub2gm()
 {
     __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr_aicore(0);
     for (;;) {
+        uint8_t curAssertFlag = blockInfo->assert;
         uint8_t curFinishFlag = blockInfo->finish;
         uint32_t curReadLen = blockInfo->readLen;
         uint32_t curWriteLen = blockInfo->writeLen;
@@ -382,6 +383,12 @@ __aicore__ inline bool asc_vf_debug_ub2gm()
             }
 
             blockInfo->readLen = curWriteLen;
+            continue;
+        }
+
+        if (curAssertFlag == 1) {
+            blockInfo->assert = 2;
+            break;
         }
 
         if (curFinishFlag == 1) {
