@@ -15,7 +15,7 @@ This example implements the Arange operation based on the C API programming inte
 ```
 ├── arange
 │   ├── scripts
-│   │   │   ├── gen_data.py            // Ground truth data generation script
+│   │   ├── gen_data.py            // Ground truth data generation script
 │   ├── CMakeLists.txt                 // Build configuration file
 │   ├── data_utils.h                   // Data read/write functions
 │   ├── arange.asc                     // Ascend C example implementation & invocation example
