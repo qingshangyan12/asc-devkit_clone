@@ -1131,7 +1131,11 @@ __aicore__ inline void TPipe::ResetPool()
         *buf = 0;
     }
     auto evt = Internal::g_occupyEventPool;
-    for (int32_t i = 0; i < EVENT_NUM; i++, evt++) {
+#if defined(ASCENDC_CPU_DEBUG) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ != 2201) && (__NPU_ARCH__ != 3510))
+    for (int32_t i = 0; i < static_cast<uint8_t>(HardEvent::MAX); i++, evt++) {
+#else
+    for (int32_t i = 0; i < static_cast<uint8_t>(HardEventAic::MAX); i++, evt++) {
+#endif
         *evt = 0;
     }
 #endif
