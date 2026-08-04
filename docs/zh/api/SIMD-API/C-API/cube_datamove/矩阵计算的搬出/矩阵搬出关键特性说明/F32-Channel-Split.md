@@ -1,14 +1,43 @@
-# F32 Channel Split
+# F32 Channel Split<a name="ZH-CN_TOPIC_0000002569070989"></a>
 
-F32 Channel Split用于在矩阵结果搬出时，将`float`类型的16×16分形拆分为两个16×8小分形。
+## 特性说明
 
-该能力由[asc_copy_l0c2gm](../../asc_copy_l0c2gm/asc_copy_l0c2gm.md)对应架构重载中的Channel Split参数控制。2201和3510架构的参数名称、组合能力及约束不同，应从接口汇总页进入对应架构文档核对。
+矩阵计算的搬出过程中对于目标类型为f32，如果开启了Channel Split（通道拆分），硬件就能够将16×16的分形矩阵转换为16×8的小z分形矩阵，此时每个16×16的分形矩阵将被拆分为2个独立的16×8的小z分形矩阵。
 
-## 约束
+对于`asc_copy_l0c2gm`，可以将[接口参数](../../asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)中的`split_en`设置为`true`开启。
 
-- 输入和输出数据类型均为`float`。
-- 输出保持NZ排布，且不能与不兼容的NZ2ND、NZ2DN或unit flag组合使用。
-- 目标为L1 Buffer或UB时是否支持该能力，以对应搬出接口文档为准。
-- N方向有效元素和小分形数量必须满足目标架构的Channel Split约束。
+## 特性约束
 
-完整参数和调用示例参见[asc_copy_l0c2gm](../../asc_copy_l0c2gm/asc_copy_l0c2gm.md)。
+<!-- npu="A3,910b" id1 -->
+- 针对如下产品型号：
+
+    <!-- npu="A3" id2 -->
+    Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id2 -->
+
+    <!-- npu="910b" id3 -->
+    Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id3 -->
+
+    当Fixpipe指令的输入和输出数据类型都为float，NZ输出到GM，并且不开启NZ2ND与unitFlag时，才能够开启Channel Split功能。
+<!-- end id1 -->
+
+<!-- npu="950" id4 -->
+- 针对Ascend 950PR/Ascend 950DT，当Fixpipe指令的输入和输出数据类型都为float,NZ输出到GM，并且不开启NZ2ND、NZ2DN与unitFlag时，才能够开启Channel Split功能。当前搬出到L1 Buffer和UB不支持该功能。
+<!-- end id4 -->
+
+## 使用示例
+
+完整接口参数和调用示例请参考[asc_copy_l0c2gm](../../asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)。
+
+如下图所示，当开启Channel Split功能后，shape为\[64,32\]的源操作数将会被拆分为16个独立的16x8分形矩阵。
+
+**图1** F32 Channel Split示意图（无无效数据）<a name="zh-cn_topic_0000002515660950_fig222295694112"></a>
+
+![](../../../../../figures/Fixpipe_Channel_Split.png)
+
+当开启Channel Split功能后，nSize（源NZ矩阵在N方向上的大小）必须为8的倍数。如下图所示，shape为\[64,24\]的源操作数将会被拆分为3列16x8分形矩阵。
+
+**图2** F32 Channel Split示意图（有无效数据）<a name="zh-cn_topic_0000002515660950_fig5809145844116"></a>
+
+![](../../../../../figures/Fixpipe_Channel_Split_with_dirty.png)
