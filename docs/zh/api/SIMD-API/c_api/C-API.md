@@ -8,10 +8,10 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 | 结构名 | 说明 |
 | ------ | ----------- |
-| [asc_fill_value_config](struct/asc_fill_value_config.md) | fill_value的初始化参数结构体，包含[asc_fill_l0a](cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。 |
-| [asc_l13d_fmatrix_config](struct/asc_l13d_fmatrix_config.md) | 用于设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)3D格式搬运接口的Feature map属性参数。 |
+| [asc_fill_value_config](struct/asc_fill_value_config.md) | fill_value的初始化参数结构体，包含[asc_fill_l0a](cube_data_move/asc_fill_l0a.md)/[asc_fill_l0b](cube_data_move/asc_fill_l0b.md)/[asc_fill_l1](cube_data_move/asc_fill_l1.md)接口需要配置的各种初始化参数。 |
+| [asc_l13d_fmatrix_config](struct/asc_l13d_fmatrix_config.md) | 用于设置[asc_copy_l12l0a](cube_data_move/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_data_move/asc_copy_l12l0b/asc_copy_l12l0b.md)3D格式搬运接口的Feature map属性参数。 |
 | [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | Load3Dv2接口的repeat参数。 |
-| [asc_ndim_pad_count_config](struct/asc_ndim_pad_count_config.md) | 用于[asc_set_ndim_pad_count](vector_datamove/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。 |
+| [asc_ndim_pad_count_config](struct/asc_ndim_pad_count_config.md) | 用于[asc_set_ndim_pad_count](vector_data_move/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](vector_data_move/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。 |
 | [asc_store_atomic_config](struct/asc_store_atomic_config.md) | 原子操作启用位与原子操作类型的值。 |
 
 ## 矢量计算
@@ -132,61 +132,61 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 | API名称 | 说明 |
 | ------ | ----------- |
-| [asc_copy_gm2ub](vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md) | 将数据从Global Memory搬运到Unified Buffer。 |
-| [asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md) | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
-| [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md) | 将数据从Unified Buffer搬运到Global Memory。 |
-| [asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md) | 将数据从Unified Buffer搬运到Global Memory，支持8位/16位/32位分块拷贝操作。 |
-| [asc_copy_ub2l1](vector_datamove/asc_copy_ub2l1.md) | 将数据从Unified Buffer (UB)搬运到L1 Buffer。 |
-| [asc_copy_ub2ub](vector_datamove/asc_copy_ub2ub.md) | 将数据从Unified Buffer搬运到Unified Buffer。 |
-| [asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md) | 多维数据搬运接口，将数据从Global Memory (GM)搬运到Unified Buffer (UB)。 |
-| [asc_set_copy_pad_val](vector_datamove/asc_set_copy_pad_val.md) | 和asc_copy_gm2ub_align或asc_copy_ub2gm_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。 |
-| [asc_set_gm2ub_loop_size](vector_datamove/asc_set_gm2ub_loop_size.md) | 使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)时，设置数据搬运流程中的循环次数。 |
-| [asc_set_gm2ub_loop1_stride](vector_datamove/asc_set_gm2ub_loop1_stride.md) | 使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)时，设置内层循环中相邻迭代数据块间的间隔。 |
-| [asc_set_gm2ub_loop2_stride](vector_datamove/asc_set_gm2ub_loop2_stride.md) | 使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)时，设置外层循环中相邻迭代数据块间的间隔。 |
-| [asc_set_ndim_loop_stride](vector_datamove/asc_set_ndim_loop_stride.md) | 设置[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)在进行多维搬运时每个维度内的源操作数与目的操作数的元素之间的间隔，最多设置5个维度。 |
-| [asc_set_ndim_pad_count](vector_datamove/asc_set_ndim_pad_count.md) | 设置[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)接口各个维度左右侧的Padding元素个数。 |
-| [asc_set_ndim_pad_value](vector_datamove/asc_set_ndim_pad_value.md) | 设置[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)接口Padding的填充固定值。 |
-| [asc_set_ub2gm_loop_size](vector_datamove/asc_set_ub2gm_loop_size.md) | 使用[asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，设置内层循环和外层循环的次数。 |
-| [asc_set_ub2gm_loop1_stride](vector_datamove/asc_set_ub2gm_loop1_stride.md) | 使用[asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，设置内层循环中源操作数在相邻迭代间的数据块间隔，以及目的操作数在相邻迭代间的数据块间隔。 |
-| [asc_set_ub2gm_loop2_stride](vector_datamove/asc_set_ub2gm_loop2_stride.md) | 使用[asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，设置外层循环中源操作数在相邻迭代间的数据块间隔，以及目的操作数在相邻迭代间的数据块间隔。 |
-| [asc_copy_gm2l0a](cube_datamove/asc_copy_gm2l0a.md) | 将GM中的数据搬运到L0A中。 |
-| [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md) | 将GM中的数据搬运到L0B中。 |
-| [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1.md) | 将GM中的数据搬运到L1中。 |
-| [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md) | 将GM中的数据padding后搬运到L1中。 |
-| [asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md) | 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。 |
-| [asc_copy_gm2l1_nd2nz](cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md) | 将GM中的数据搬运到L1中。 |
-| [asc_copy_l0c2gm](cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md) | 将L0C中的数据搬运到GM中。 |
-| [asc_copy_l0c2l1](cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1.md) | 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到L1中。 |
-| [asc_copy_l0c2ub](cube_datamove/asc_copy_l0c2ub.md) | 将L0C中的数据搬运到UB中。 |
-| [asc_copy_l12bt](cube_datamove/asc_copy_l12bt/asc_copy_l12bt.md) | 将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer中。 |
-| [asc_copy_l12fb](cube_datamove/asc_copy_l12fb/asc_copy_l12fb.md) | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
-| [asc_copy_l12gm](cube_datamove/asc_copy_l12gm.md) | 将数据从L1搬运到GM。 |
-| [asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
-| [asc_copy_l12l0a_mx](cube_datamove/asc_copy_l12l0a_mx.md) | 将Mx scale矩阵从L1 Buffer搬运到L0A Buffer。 |
-| [asc_copy_l12l0a_trans](cube_datamove/asc_copy_l12l0a_trans.md) | 该接口实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载。 |
-| [asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |
-| [asc_copy_l12l0b_mx](cube_datamove/asc_copy_l12l0b_mx.md) | 将Mx scale矩阵从L1 Buffer搬运到L0B Buffer。 |
-| [asc_copy_l12l0b_sparse](cube_datamove/asc_copy_l12l0b_sparse.md) | 用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。 |
-| [asc_copy_l12l0b_trans](cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans.md) | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |
-| [asc_copy_l12l0c](cube_datamove/asc_copy_l12l0c.md) | 将矩阵由L1 Buffer搬运到L0C Buffer中。 |
-| [asc_copy_l12ub](cube_datamove/asc_copy_l12ub.md) | 将数据从L1 Buffer搬运到Unified Buffer中。 |
-| [asc_fill_l0a](cube_datamove/asc_fill_l0a.md) | 将L0A Buffer的Local Memory初始化为某一具体数值。 |
-| [asc_fill_l0b](cube_datamove/asc_fill_l0b.md) | 将L0B Buffer的Local Memory初始化为某一具体数值。 |
-| [asc_fill_l1](cube_datamove/asc_fill_l1.md) | 将L1 Buffer的Local Memory初始化为某一具体数值。 |
-| [asc_load_image_to_cbuf](cube_datamove/asc_load_image_to_cbuf.md) | 将图像数据从Global Memory搬运到L1 Buffer。 |
-| [asc_set_gm2l1_loop_size](cube_datamove/asc_set_gm2l1_loop_size.md) | 将数据从GM搬运到L1 Buffer时，设置数据搬运流程中的循环次数。 |
-| [asc_set_gm2l1_loop1_stride](cube_datamove/asc_set_gm2l1_loop1_stride.md) | 将数据从GM搬运到L1 Buffer时，设置内层循环中相邻迭代数据块间的间隔。 |
-| [asc_set_gm2l1_loop2_stride](cube_datamove/asc_set_gm2l1_loop2_stride.md) | 将数据从GM搬运到L1 Buffer时，设置外层循环中相邻迭代数据块间的间隔。 |
-| [asc_set_gm2l1_pad](cube_datamove/asc_set_gm2l1_pad.md) | 将数据从GM非对齐搬运到L1 Buffer时，设置连续搬运数据块左右两侧的填充值。 |
-| [asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md) | DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。 |
-| [asc_set_l0c_copy_prequant](cube_datamove/asc_set_l0c_copy_prequant.md) | 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。 |
-| [asc_set_l0c2gm_lrelu_alpha](cube_datamove/asc_set_l0c2gm_lrelu_alpha.md) | 用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。 |
-| [asc_set_l13d_fmatrix](cube_datamove/asc_set_l13d_fmatrix.md) | 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从左矩阵获取FeatureMap的属性时使用该接口。 |
-| [asc_set_l13d_fmatrix_b](cube_datamove/asc_set_l13d_fmatrix_b.md) | 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从右矩阵获取FeatureMap的属性时使用该接口。 |
-| [asc_set_l13d_padding](cube_datamove/asc_set_l13d_padding.md) | 设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。 |
-| [asc_set_l13d_rpt](cube_datamove/asc_set_l13d_rpt.md) | 用于设置Load3Dv2接口的repeat参数。 |
-| [asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md) | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。 |
-| [asc_set_gm2ub_pad（废弃）](vector_datamove/asc_set_gm2ub_pad_deprecated.md) | 使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)且源操作数非对齐时，设置连续搬运数据块左右两侧需要填补的数据值。 |
+| [asc_copy_gm2ub](vector_data_move/asc_copy_gm2ub/asc_copy_gm2ub.md) | 将数据从Global Memory搬运到Unified Buffer。 |
+| [asc_copy_gm2ub_align](vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md) | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
+| [asc_copy_ub2gm](vector_data_move/asc_copy_ub2gm/asc_copy_ub2gm.md) | 将数据从Unified Buffer搬运到Global Memory。 |
+| [asc_copy_ub2gm_align](vector_data_move/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md) | 将数据从Unified Buffer搬运到Global Memory，支持8位/16位/32位分块拷贝操作。 |
+| [asc_copy_ub2l1](vector_data_move/asc_copy_ub2l1.md) | 将数据从Unified Buffer (UB)搬运到L1 Buffer。 |
+| [asc_copy_ub2ub](vector_data_move/asc_copy_ub2ub.md) | 将数据从Unified Buffer搬运到Unified Buffer。 |
+| [asc_ndim_copy_gm2ub](vector_data_move/asc_ndim_copy_gm2ub.md) | 多维数据搬运接口，将数据从Global Memory (GM)搬运到Unified Buffer (UB)。 |
+| [asc_set_copy_pad_val](vector_data_move/asc_set_copy_pad_val.md) | 和asc_copy_gm2ub_align或asc_copy_ub2gm_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。 |
+| [asc_set_gm2ub_loop_size](vector_data_move/asc_set_gm2ub_loop_size.md) | 使用[asc_copy_gm2ub_align](vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)时，设置数据搬运流程中的循环次数。 |
+| [asc_set_gm2ub_loop1_stride](vector_data_move/asc_set_gm2ub_loop1_stride.md) | 使用[asc_copy_gm2ub_align](vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)时，设置内层循环中相邻迭代数据块间的间隔。 |
+| [asc_set_gm2ub_loop2_stride](vector_data_move/asc_set_gm2ub_loop2_stride.md) | 使用[asc_copy_gm2ub_align](vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)时，设置外层循环中相邻迭代数据块间的间隔。 |
+| [asc_set_ndim_loop_stride](vector_data_move/asc_set_ndim_loop_stride.md) | 设置[asc_ndim_copy_gm2ub](vector_data_move/asc_ndim_copy_gm2ub.md)在进行多维搬运时每个维度内的源操作数与目的操作数的元素之间的间隔，最多设置5个维度。 |
+| [asc_set_ndim_pad_count](vector_data_move/asc_set_ndim_pad_count.md) | 设置[asc_ndim_copy_gm2ub](vector_data_move/asc_ndim_copy_gm2ub.md)接口各个维度左右侧的Padding元素个数。 |
+| [asc_set_ndim_pad_value](vector_data_move/asc_set_ndim_pad_value.md) | 设置[asc_ndim_copy_gm2ub](vector_data_move/asc_ndim_copy_gm2ub.md)接口Padding的填充固定值。 |
+| [asc_set_ub2gm_loop_size](vector_data_move/asc_set_ub2gm_loop_size.md) | 使用[asc_copy_ub2gm_align](vector_data_move/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，设置内层循环和外层循环的次数。 |
+| [asc_set_ub2gm_loop1_stride](vector_data_move/asc_set_ub2gm_loop1_stride.md) | 使用[asc_copy_ub2gm_align](vector_data_move/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，设置内层循环中源操作数在相邻迭代间的数据块间隔，以及目的操作数在相邻迭代间的数据块间隔。 |
+| [asc_set_ub2gm_loop2_stride](vector_data_move/asc_set_ub2gm_loop2_stride.md) | 使用[asc_copy_ub2gm_align](vector_data_move/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，设置外层循环中源操作数在相邻迭代间的数据块间隔，以及目的操作数在相邻迭代间的数据块间隔。 |
+| [asc_copy_gm2l0a](cube_data_move/asc_copy_gm2l0a.md) | 将GM中的数据搬运到L0A中。 |
+| [asc_copy_gm2l0b](cube_data_move/asc_copy_gm2l0b.md) | 将GM中的数据搬运到L0B中。 |
+| [asc_copy_gm2l1](cube_data_move/asc_copy_gm2l1/asc_copy_gm2l1.md) | 将GM中的数据搬运到L1中。 |
+| [asc_copy_gm2l1_align](cube_data_move/asc_copy_gm2l1_align.md) | 将GM中的数据padding后搬运到L1中。 |
+| [asc_copy_gm2l1_dn2nz](cube_data_move/asc_copy_gm2l1_dn2nz.md) | 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。 |
+| [asc_copy_gm2l1_nd2nz](cube_data_move/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md) | 将GM中的数据搬运到L1中。 |
+| [asc_copy_l0c2gm](cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm.md) | 将L0C中的数据搬运到GM中。 |
+| [asc_copy_l0c2l1](cube_data_move/asc_copy_l0c2l1/asc_copy_l0c2l1.md) | 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到L1中。 |
+| [asc_copy_l0c2ub](cube_data_move/asc_copy_l0c2ub.md) | 将L0C中的数据搬运到UB中。 |
+| [asc_copy_l12bt](cube_data_move/asc_copy_l12bt/asc_copy_l12bt.md) | 将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer中。 |
+| [asc_copy_l12fb](cube_data_move/asc_copy_l12fb/asc_copy_l12fb.md) | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
+| [asc_copy_l12gm](cube_data_move/asc_copy_l12gm.md) | 将数据从L1搬运到GM。 |
+| [asc_copy_l12l0a](cube_data_move/asc_copy_l12l0a/asc_copy_l12l0a.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
+| [asc_copy_l12l0a_mx](cube_data_move/asc_copy_l12l0a_mx.md) | 将Mx scale矩阵从L1 Buffer搬运到L0A Buffer。 |
+| [asc_copy_l12l0a_trans](cube_data_move/asc_copy_l12l0a_trans.md) | 该接口实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载。 |
+| [asc_copy_l12l0b](cube_data_move/asc_copy_l12l0b/asc_copy_l12l0b.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |
+| [asc_copy_l12l0b_mx](cube_data_move/asc_copy_l12l0b_mx.md) | 将Mx scale矩阵从L1 Buffer搬运到L0B Buffer。 |
+| [asc_copy_l12l0b_sparse](cube_data_move/asc_copy_l12l0b_sparse.md) | 用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。 |
+| [asc_copy_l12l0b_trans](cube_data_move/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans.md) | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |
+| [asc_copy_l12l0c](cube_data_move/asc_copy_l12l0c.md) | 将矩阵由L1 Buffer搬运到L0C Buffer中。 |
+| [asc_copy_l12ub](cube_data_move/asc_copy_l12ub.md) | 将数据从L1 Buffer搬运到Unified Buffer中。 |
+| [asc_fill_l0a](cube_data_move/asc_fill_l0a.md) | 将L0A Buffer的Local Memory初始化为某一具体数值。 |
+| [asc_fill_l0b](cube_data_move/asc_fill_l0b.md) | 将L0B Buffer的Local Memory初始化为某一具体数值。 |
+| [asc_fill_l1](cube_data_move/asc_fill_l1.md) | 将L1 Buffer的Local Memory初始化为某一具体数值。 |
+| [asc_load_image_to_cbuf](cube_data_move/asc_load_image_to_cbuf.md) | 将图像数据从Global Memory搬运到L1 Buffer。 |
+| [asc_set_gm2l1_loop_size](cube_data_move/asc_set_gm2l1_loop_size.md) | 将数据从GM搬运到L1 Buffer时，设置数据搬运流程中的循环次数。 |
+| [asc_set_gm2l1_loop1_stride](cube_data_move/asc_set_gm2l1_loop1_stride.md) | 将数据从GM搬运到L1 Buffer时，设置内层循环中相邻迭代数据块间的间隔。 |
+| [asc_set_gm2l1_loop2_stride](cube_data_move/asc_set_gm2l1_loop2_stride.md) | 将数据从GM搬运到L1 Buffer时，设置外层循环中相邻迭代数据块间的间隔。 |
+| [asc_set_gm2l1_pad](cube_data_move/asc_set_gm2l1_pad.md) | 将数据从GM非对齐搬运到L1 Buffer时，设置连续搬运数据块左右两侧的填充值。 |
+| [asc_set_l0c_copy_params](cube_data_move/asc_set_l0c_copy_params.md) | DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。 |
+| [asc_set_l0c_copy_prequant](cube_data_move/asc_set_l0c_copy_prequant.md) | 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。 |
+| [asc_set_l0c2gm_lrelu_alpha](cube_data_move/asc_set_l0c2gm_lrelu_alpha.md) | 用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。 |
+| [asc_set_l13d_fmatrix](cube_data_move/asc_set_l13d_fmatrix.md) | 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_data_move/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_data_move/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从左矩阵获取FeatureMap的属性时使用该接口。 |
+| [asc_set_l13d_fmatrix_b](cube_data_move/asc_set_l13d_fmatrix_b.md) | 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_data_move/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_data_move/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从右矩阵获取FeatureMap的属性时使用该接口。 |
+| [asc_set_l13d_padding](cube_data_move/asc_set_l13d_padding.md) | 设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。 |
+| [asc_set_l13d_rpt](cube_data_move/asc_set_l13d_rpt.md) | 用于设置Load3Dv2接口的repeat参数。 |
+| [asc_set_l13d_size](cube_data_move/asc_set_l13d_size.md) | 设置[asc_copy_l12l0a](cube_data_move/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](cube_data_move/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。 |
+| [asc_set_gm2ub_pad（废弃）](vector_data_move/asc_set_gm2ub_pad_deprecated.md) | 使用[asc_copy_gm2ub_align](vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)且源操作数非对齐时，设置连续搬运数据块左右两侧需要填补的数据值。 |
 
 ## 标量操作
 
