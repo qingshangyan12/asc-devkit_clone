@@ -71,6 +71,7 @@ private:
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, blockCount, "src row shape size", "CopyL12FB");
         if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
             dstCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(dstLayout);
             dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout);

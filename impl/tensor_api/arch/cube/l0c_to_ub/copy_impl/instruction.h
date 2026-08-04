@@ -44,6 +44,11 @@ private:
             return;
         }
 
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, nSize, "nSize", "CopyL0C2UB instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_n, nSize, isChannelSplit, nz2ndEn, nz2dnEn, "CopyL0C2UB");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_m, mSize, nz2ndEn, "CopyL0C2UB instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, srcStride, dstStride, "CopyL0C2UB instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_unit_flag, unitFlag, "CopyL0C2UB instruction");
         asc_copy_l0c2ub(dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,
                         static_cast<uint16_t>(srcStride), dualDstCtl, subBlockId, 0, unitFlag,
                         static_cast<uint64_t>(quantPre), static_cast<uint8_t>(reluEn), isChannelSplit, nz2ndEn,
