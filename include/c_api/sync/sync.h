@@ -27,11 +27,11 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sync_impl.h"
 #endif
 
-#define asc_sync_notify(pipe, tpipe, id) asc_sync_notify_impl(pipe, tpipe, id)
+__aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id);
 
-#define asc_sync_wait(pipe, tpipe, id) asc_sync_wait_impl(pipe, tpipe, id)
+__aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id);
 
-#define asc_sync_pipe(pipe) asc_sync_pipe_impl(pipe)
+__aicore__ inline void asc_sync_pipe(pipe_t pipe);
 
 __aicore__ inline void asc_sync_vec();
 
@@ -41,9 +41,9 @@ __aicore__ inline void asc_sync_mte2(int id);
 
 __aicore__ inline void asc_sync();
 
-#define asc_sync_block_arrive(pipe, flag_id) asc_sync_block_arrive_impl((pipe), (flag_id))
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id);
 
-#define asc_sync_subblock_arrive(pipe, flag_id) asc_sync_subblock_arrive_impl((pipe), (flag_id))
+__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id);
 
 __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id);
 

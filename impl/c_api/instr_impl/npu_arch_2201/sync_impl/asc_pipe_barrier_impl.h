@@ -25,7 +25,24 @@
 
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-#define asc_sync_pipe_impl(pipe) pipe_barrier(pipe)
+__aicore__ inline void asc_sync_pipe_impl(pipe_t pipe)
+{
+    if (pipe == pipe_t::PIPE_V) {
+        pipe_barrier(pipe_t::PIPE_V);
+    } else if (pipe == pipe_t::PIPE_M) {
+        pipe_barrier(pipe_t::PIPE_M);
+    } else if (pipe == pipe_t::PIPE_MTE1) {
+        pipe_barrier(pipe_t::PIPE_MTE1);
+    } else if (pipe == pipe_t::PIPE_MTE2) {
+        pipe_barrier(pipe_t::PIPE_MTE2);
+    } else if (pipe == pipe_t::PIPE_MTE3) {
+        pipe_barrier(pipe_t::PIPE_MTE3);
+    } else if (pipe == pipe_t::PIPE_FIX) {
+        pipe_barrier(pipe_t::PIPE_FIX);
+    } else if (pipe == pipe_t::PIPE_ALL) {
+        pipe_barrier(pipe_t::PIPE_ALL);
+    } else {}
+}
 
 __aicore__ inline void asc_sync_vec_impl() { pipe_barrier(pipe_t::PIPE_ALL); }
 
