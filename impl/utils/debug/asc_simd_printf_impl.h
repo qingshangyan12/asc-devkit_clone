@@ -199,10 +199,7 @@ __simd_callee__ inline void scalar_printf_impl(DumpType debug_type, __ubuf__ con
     }
 
     if (write_len + tlv_len > block_info->length) {
-        wait_vf_debug_buffer_drained(block_info);
-        block_info->writeLen = 0;
-        block_info->readLen = 0;
-        block_info->pidx = 0;
+        wait_vf_debug_buffer_drained_and_reset(block_info);
         write_len = 0;
     }
 
@@ -226,6 +223,15 @@ __simd_callee__ inline void printf_impl(__ubuf__ const char* fmt, Args&&... args
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     scalar_printf_impl(DumpType::DUMP_SCALAR, fmt, args...);
+#endif
+}
+
+template <class... Args>
+__simd_callee__ inline void printf_impl_assert(__ubuf__ const char* fmt, Args&&... args)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    enable_asc_assert();
+    scalar_printf_impl(DumpType::DUMP_ASSERT, fmt, args...);
 #endif
 }
 

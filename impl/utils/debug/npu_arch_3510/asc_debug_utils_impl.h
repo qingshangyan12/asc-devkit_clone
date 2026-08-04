@@ -54,6 +54,19 @@ __simd_callee__ inline void wait_vf_debug_buffer_drained(__ubuf__ BlockVFBufInfo
     }
 }
 
+__simd_callee__ inline void reset_vf_debug_buffer(__ubuf__ BlockVFBufInfo* block_info)
+{
+    block_info->writeLen = 0;
+    block_info->readLen = 0;
+    block_info->pidx = 0;
+}
+
+__simd_callee__ inline void wait_vf_debug_buffer_drained_and_reset(__ubuf__ BlockVFBufInfo* block_info)
+{
+    wait_vf_debug_buffer_drained(block_info);
+    reset_vf_debug_buffer(block_info);
+}
+
 template <typename T>
 __simd_callee__ constexpr inline DumpTensorDataType get_dump_datatype_impl();
 
@@ -67,6 +80,13 @@ __simd_callee__ inline void enable_asc_diagnostics()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct AscTlv __asc_debug_meta_section__ __attribute__((used, section(".ascend.meta"))) = {4, 4, 1};
+#endif
+}
+
+__simd_callee__ inline void enable_asc_assert()
+{
+#if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
+    static const struct AscTlv __asc_assert_meta_section__ __attribute__((used, section(".ascend.meta"))) = {4, 4, 5};
 #endif
 }
 
@@ -102,6 +122,17 @@ __simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t ad
         init_debug_buffer(bufInfo, blockIdx);
     }
     return bufInfo;
+}
+
+__simd_callee__ inline void wait_vf_assert_handshake()
+{
+    __ubuf__ BlockVFBufInfo* block_info = get_printf_ubuf_addr(0);
+    wait_vf_debug_buffer_drained(block_info);
+    __ubuf__ volatile BlockVFBufInfo::AssertState* assertFlag = &block_info->assertFlag;
+    *assertFlag = BlockVFBufInfo::AssertState::RAISED;
+    while (*assertFlag != BlockVFBufInfo::AssertState::DRAINED) {
+        __asm__ __volatile__("");
+    }
 }
 
 __simd_callee__ __ubuf__ inline BlockVFBufInfo* init_printf_ubuf_addr(uint16_t blockIdx = 0)
@@ -324,6 +355,7 @@ __aicore__ inline bool asc_vf_debug_ub2gm()
 {
     __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr_aicore(0);
     for (;;) {
+        BlockVFBufInfo::AssertState curAssertFlag = blockInfo->assertFlag;
         uint8_t curFinishFlag = blockInfo->finish;
         uint32_t curReadLen = blockInfo->readLen;
         uint32_t curWriteLen = blockInfo->writeLen;
@@ -349,6 +381,12 @@ __aicore__ inline bool asc_vf_debug_ub2gm()
             }
 
             blockInfo->readLen = curWriteLen;
+            continue;
+        }
+
+        if (curAssertFlag == BlockVFBufInfo::AssertState::RAISED) {
+            blockInfo->assertFlag = BlockVFBufInfo::AssertState::DRAINED;
+            break;
         }
 
         if (curFinishFlag == 1) {
