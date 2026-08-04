@@ -6,4 +6,4 @@
 
 -   **[高阶API](high_level_api/adv_api.md)**
 
--   **[C API](c_api.md/C-API.md)**
+-   **[C API](c_api/C-API.md)**
