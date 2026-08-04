@@ -155,11 +155,11 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | src0BlockStride | 用于设置src0同一迭代不同DataBlock间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 | repeatTimes | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTimes表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
 | src0RepeatStride | 用于设置src0相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD计算说明/高维切分.md)。 |
-| src1RepeatStride | 用于设置src1相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD计算说明/高维切分.md)。<!-- npu="310p" id26 --><br><br>Atlas 推理系列产品AI Core，该参数仅区分0和非0：配置为0时按0生效；配置为非0时，效果与配置为1相同。<!-- end id26 --> |
+| src1RepeatStride | 用于设置src1相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD计算说明/高维切分.md)。<!-- npu="310p" id20 --><br><br>针对 Atlas 推理系列产品AI Core，该参数仅区分0和非0：配置为0时按0生效；配置为非0时，效果与配置为1相同。<!-- end id20 --> |
 
 ## 数据类型
 
-<!-- npu="950" id20 -->
+<!-- npu="950" id21 -->
 
 **表**  Ascend 950PR/Ascend 950DT数据类型组合情况
 
@@ -175,9 +175,9 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | uint32_t | uint32_t | uint32_t |
 | float | uint32_t | float |
 
-<!-- end id20 -->
+<!-- end id21 -->
 
-<!-- npu="A3" id21 -->
+<!-- npu="A3" id22 -->
 
 **表**  Atlas A3 训练系列产品/Atlas A3 推理系列产品数据类型组合情况
 
@@ -191,9 +191,9 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | uint32_t | uint32_t | uint32_t |
 | float | uint32_t | float |
 
-<!-- end id21 -->
+<!-- end id22 -->
 
-<!-- npu="910b" id22 -->
+<!-- npu="910b" id23 -->
 
 **表**  Atlas A2 训练系列产品/Atlas A2 推理系列产品数据类型组合情况
 
@@ -207,9 +207,9 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | uint32_t | uint32_t | uint32_t |
 | float | uint32_t | float |
 
-<!-- end id22 -->
+<!-- end id23 -->
 
-<!-- npu="310b" id23 -->
+<!-- npu="310b" id24 -->
 
 **表**  Atlas 200I/500 A2 推理产品数据类型组合情况
 
@@ -222,9 +222,9 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | uint32_t | uint32_t | uint32_t |
 | float | uint32_t | float |
 
-<!-- end id23 -->
+<!-- end id24 -->
 
-<!-- npu="310p" id24 -->
+<!-- npu="310p" id25 -->
 
 **表**  Atlas 推理系列产品AI Core数据类型组合情况
 
@@ -237,7 +237,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | uint32_t | uint32_t | uint32_t |
 | float | uint32_t | float |
 
-<!-- end id24 -->
+<!-- end id25 -->
 
 ## 返回值说明<a name="section198548421851"></a>
 
@@ -253,11 +253,11 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 - 若调用该接口前为Counter模式，在调用该接口后需要显式设置回Counter模式（接口内部执行结束后会设置为Normal模式）。
 
-<!-- npu="950" id25 -->
+<!-- npu="950" id26 -->
 - 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
   - 内置固定模式占用8KB Unified Buffer临时空间。
   - 用户自定义模式不涉及8KB Unified Buffer临时空间的占用。
-<!-- end id25 -->
+<!-- end id26 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
