@@ -1756,7 +1756,7 @@ HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
 HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 {
     (void)comm;
-    const char* useCcuKfc = std::getenv("USE_CCU_KFC");
+    const char* useCcuKfc = std::getenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
     const HcclOpExpansionMode finalMode = (useCcuKfc != nullptr && std::strcmp(useCcuKfc, "1") == 0) ?
                                               HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED :
                                               HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;
