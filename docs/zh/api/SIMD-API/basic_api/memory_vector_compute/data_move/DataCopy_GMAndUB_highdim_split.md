@@ -1,4 +1,4 @@
-# DataCopy（GM与UB高维切分数据搬运）<a name="ZH-CN_TOPIC_00000023829080211"></a>
+﻿# DataCopy（GM与UB高维切分数据搬运）<a name="ZH-CN_TOPIC_00000023829080211"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -38,7 +38,7 @@
 
 高维切分数据搬运可通过配置数据块个数、单个数据块长度、地址偏移等搬运参数，同时支持非连续和连续的数据搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../aux_data_structures/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -78,9 +78,9 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数。<br>&bull;类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)时，存储位置为Unified Buffer，目的地址需要32字节对齐。<br>&bull;类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor_intro.md)时，存储位置为Global Memory，目的地址需要按照对应数据类型所占字节数对齐。 |
+| dst | 输出 | 目的操作数。<br>&bull;类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor简介.md)时，存储位置为Unified Buffer，目的地址需要32字节对齐。<br>&bull;类型为[GlobalTensor](../../数据结构/GlobalTensor/GlobalTensor简介.md)时，存储位置为Global Memory，目的地址需要按照对应数据类型所占字节数对齐。 |
 | src | 输入 | 源操作数。<br>&bull;类型为GlobalTensor时，存储位置为Global Memory，源地址需要按照对应数据类型所占字节数对齐。<br>&bull;类型为LocalTensor时，存储位置为Unified Buffer，源地址需要32字节对齐。 |
-| repeatParams | 输入 | 搬运参数，DataCopyParams类型，参数说明请参考[表3](#table_highdim_3)。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
+| repeatParams | 输入 | 搬运参数，DataCopyParams类型，参数说明请参考[表3](#table_highdim_3)。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3**  DataCopyParams结构体参数定义<a name="table_highdim_3"></a>
 
@@ -211,7 +211,7 @@
     | srcGap | [0, 65535] |
     | dstGap | [0, 65535] |
 
-- 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的Global Memory地址存在重叠，两条搬运指令之间需要通过调用`PipeBarrier<PIPE_MTE3>()`添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用`PipeBarrier<PIPE_MTE2>()`添加MTE2搬入流水的同步。
+- 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../同步控制/核内同步/PipeBarrier_ISASI.md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的Global Memory地址存在重叠，两条搬运指令之间需要通过调用`PipeBarrier<PIPE_MTE3>()`添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用`PipeBarrier<PIPE_MTE2>()`添加MTE2搬入流水的同步。
 
     ![](../../../../figures/datacopy_address_overlap_sync_diagram.png)
 
@@ -232,7 +232,7 @@
     ```cpp
     // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor。
     // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运。
-    DataCopyParams intriParams;
+    AscendC::DataCopyParams intriParams;
     intriParams.blockCount = 1; // 连续数据块个数为1。
     intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素。
     intriParams.srcGap = 0; // 源操作数做连续搬运。
@@ -252,7 +252,7 @@
     ```cpp
     // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
     // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运。
-    DataCopyParams intriParams;
+    AscendC::DataCopyParams intriParams;
     intriParams.blockCount = 1; // 连续数据块个数为1。
     intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素。
     intriParams.srcGap = 0; // 源操作数做连续搬运。

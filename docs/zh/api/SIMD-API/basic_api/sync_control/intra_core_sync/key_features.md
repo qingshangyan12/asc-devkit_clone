@@ -43,9 +43,9 @@ Ascend C提供了[三层梯度化SIMD编程接口](../../../../../../zh/guide/�
     <!-- end id4 -->
 
     具体接口如下：
-    - 掩码操作接口：[SetVectorMask](../../memory_vector_compute/mask_operations/SetVectorMask.md)、[SetMaskCount](../../memory_vector_compute/mask_operations/SetMaskCount.md)、[SetMaskNorm](../../memory_vector_compute/mask_operations/SetMaskNorm.md)、[ResetMask](../../memory_vector_compute/mask_operations/ResetMask.md)。
-    - 数据搬运随路原子操作接口：[SetAtomicAdd](../../atomic_operations/SetAtomicAdd.md)、[SetAtomicMax](../../atomic_operations/SetAtomicMax_ISASI.md)、[SetAtomicMin](../../atomic_operations/SetAtomicMin_ISASI.md)、[DisableDmaAtomic](../../atomic_operations/DisableDmaAtomic.md)、[SetAtomicType](../../atomic_operations/SetAtomicType.md)。
-    - [调用CTRL寄存器相关的接口](../../../basic_api/special_register_access/special_register_access.md)。
+    - 掩码操作接口：[SetVectorMask](../../Memory矢量计算/掩码操作/SetVectorMask.md)、[SetMaskCount](../../Memory矢量计算/掩码操作/SetMaskCount.md)、[SetMaskNorm](../../Memory矢量计算/掩码操作/SetMaskNorm.md)、[ResetMask](../../Memory矢量计算/掩码操作/ResetMask.md)。
+    - 数据搬运随路原子操作接口：[SetAtomicAdd](../../原子操作/SetAtomicAdd.md)、[SetAtomicMax](../../原子操作/SetAtomicMax_ISASI.md)、[SetAtomicMin](../../原子操作/SetAtomicMin_ISASI.md)、[DisableDmaAtomic](../../原子操作/DisableDmaAtomic.md)、[SetAtomicType](../../原子操作/SetAtomicType.md)。
+    - [调用CTRL寄存器相关的接口](../../../基础API/特殊寄存器访问/特殊寄存器访问.md)。
     <!-- end id2 -->
 
 ## TPipe-TQue框架编程范式自动同步<a id="tpipe-tque-auto-sync"></a>
@@ -133,15 +133,15 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
 开启cce-auto-sync编译选项的自动同步功能需满足以下前提条件方可生效：
 
 - 异构编译直调（<<<>>>调用）、Kernel直调算子工程以及自定义算子开发工程已默认设置`--cce-auto-sync=on`，如果开发者手动设置`--cce-auto-sync=off`，毕昇编译器无法自动插入同步。
-- 属于PIPE\_V、PIPE\_MTE2、PIPE\_MTE3的接口必须操作基础Tensor（包含[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)和[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)）。
+- 属于PIPE\_V、PIPE\_MTE2、PIPE\_MTE3的接口必须操作基础Tensor（包含[LocalTensor](../../数据结构/LocalTensor/LocalTensor.md)和[GlobalTensor](../../数据结构/GlobalTensor/GlobalTensor.md)）。
 - 属于PIPE\_S的接口必须在以下接口集合内：
-    - Tensor标量读写：[LocalTensor::GetValue](../../data_structures/LocalTensor/GetValue.md)、[LocalTensor::SetValue](../../data_structures/LocalTensor/SetValue.md)、[LocalTensor::operator()](../../data_structures/LocalTensor/operator_call.md)、[GlobalTensor::GetValue](../../data_structures/GlobalTensor/GetValue.md)、[GlobalTensor::operator()](../../data_structures/GlobalTensor/operator_call.md)。
-    - Vector归约辅助：[GetReduceRepeatMaxMinSpr](../../memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatMaxMinSpr_ISASI.md)、[GetReduceRepeatSumSpr](../../memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatSumSpr_ISASI.md)。
-    - 排序组合：[GetMrgSortResult](../../memory_vector_compute/sort_and_merge_ISASI/GetMrgSortResult.md)。
+    - Tensor标量读写：[LocalTensor::GetValue](../../数据结构/LocalTensor/GetValue.md)、[LocalTensor::SetValue](../../数据结构/LocalTensor/SetValue.md)、[LocalTensor::operator()](../../数据结构/LocalTensor/operator_call.md)、[GlobalTensor::GetValue](../../数据结构/GlobalTensor/GetValue.md)、[GlobalTensor::operator()](../../数据结构/GlobalTensor/operator_call.md)。
+    - Vector归约辅助：[GetReduceRepeatMaxMinSpr](../../Memory矢量计算/归约计算辅助配置接口/GetReduceRepeatMaxMinSpr_ISASI.md)、[GetReduceRepeatSumSpr](../../Memory矢量计算/归约计算辅助配置接口/GetReduceRepeatSumSpr_ISASI.md)。
+    - 排序组合：[GetMrgSortResult](../../Memory矢量计算/sort_and_merge_ISASI/GetMrgSortResult.md)。
 
     不在以上集合中的PIPE\_S接口，毕昇编译器无法自动插入同步：
     <!-- npu="950" id6 -->
-    例如，针对Ascend 950PR/Ascend 950DT，标量原子操作接口均不在以上接口集合内（包括[AtomicAdd](../../atomic_operations/AtomicAdd.md)、[AtomicCas](../../atomic_operations/AtomicCas.md)、[AtomicExch](../../atomic_operations/AtomicExch.md)、[AtomicMax](../../atomic_operations/AtomicMax.md)、[AtomicMin](../../atomic_operations/AtomicMin.md)），因此这些接口与属于PIPE\_MTE2、PIPE\_MTE3的接口在读写GM时存在数据依赖时，毕昇编译器无法自动插入同步，开发者需根据实际情况手动插入同步。
+    例如，针对Ascend 950PR/Ascend 950DT，标量原子操作接口均不在以上接口集合内（包括[AtomicAdd](../../原子操作/AtomicAdd.md)、[AtomicCas](../../原子操作/AtomicCas.md)、[AtomicExch](../../原子操作/AtomicExch.md)、[AtomicMax](../../原子操作/AtomicMax.md)、[AtomicMin](../../原子操作/AtomicMin.md)），因此这些接口与属于PIPE\_MTE2、PIPE\_MTE3的接口在读写GM时存在数据依赖时，毕昇编译器无法自动插入同步，开发者需根据实际情况手动插入同步。
     <!-- end id6 -->
 
 ### 支持的同步类型
@@ -156,7 +156,7 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
     - 针对[NPU架构3510](../../../../../../zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)，PIPE\_V之间的同步由硬件保证。
     <!-- end id8 -->
 
-    - PIPE\_MTE2/PIPE\_MTE3在搬运地址有重叠的情况下需要开发者插入同步（具体示例请参考[PipeBarrier约束说明](../intra_core_sync/PipeBarrier_ISASI.md)）。
+    - PIPE\_MTE2/PIPE\_MTE3在搬运地址有重叠的情况下需要开发者插入同步（具体示例请参考[PipeBarrier约束说明](../核内同步/PipeBarrier_ISASI.md)）。
 
 - 多流水同步
     - Vector计算单元中，毕昇编译器支持自动插入PIPE\_V与PIPE\_S、PIPE\_MTE2与PIPE\_S、PIPE\_MTE3与PIPE\_S之间的多流水同步（双向）。
@@ -264,7 +264,7 @@ AscendC::Add(zLocal, xLocal, yLocal, blockLength);
 如下的代码文件sync_log_test.h：
 
 ```cpp
-LocalTensor<T> dstLocal;
+AscendC::LocalTensor<T> dstLocal;
 T ave_tmp = 0;
 Vector_OP1(dstLocal, params); 
 ave_tmp = dstLocal.GetValue(0);
@@ -277,18 +277,18 @@ for (int i = 0; i < ave_tmp; ++i) {
 开启自动同步后，同步指令的插入位置如下：
 
 ```cpp
-LocalTensor<T> dstLocal;
+AscendC::LocalTensor<T> dstLocal;
 T ave_tmp = 0;
 Vector_OP1(dstLocal, params); 
-SetFlag<HardEvent::V_S>(EVENT_ID0);
-WaitFlag<HardEvent::V_S>(EVENT_ID0);
+AscendC::SetFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
 ave_tmp = dstLocal.GetValue(0);
-PipeBarrier<PIPE_V>();
-SetFlag<HardEvent::S_V>(EVENT_ID0);
-WaitFlag<HardEvent::S_V>(EVENT_ID0);
+AscendC::PipeBarrier<PIPE_V>();
+AscendC::SetFlag<AscendC::HardEvent::S_V>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::S_V>(EVENT_ID0);
 Vector_OP2(dstLocal, params); 
-SetFlag<HardEvent::V_S>(EVENT_ID0);
-WaitFlag<HardEvent::V_S>(EVENT_ID0);
+AscendC::SetFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
 for (int i = 0; i < ave_tmp; ++i) {
     dstLocal.SetValue(i,0);
 }

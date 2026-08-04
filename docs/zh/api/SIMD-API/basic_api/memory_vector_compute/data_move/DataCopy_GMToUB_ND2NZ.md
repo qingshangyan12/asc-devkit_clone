@@ -1,4 +1,4 @@
-# DataCopy（GMToUB随路转换ND2NZ搬运）<a name="ZH-CN_TOPIC_0000002349187356"></a>
+﻿# DataCopy（GMToUB随路转换ND2NZ搬运）<a name="ZH-CN_TOPIC_0000002349187356"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -36,7 +36,7 @@
 
 该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer的数据搬运过程中进行ND到NZ格式的转换。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../aux_data_structures/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -73,9 +73,9 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)。 |
-| src | 输入 | 源操作数，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor_intro.md)。 |
-| intriParams | 输入 | 搬运参数，类型为Nd2NzParam，具体参数请参考[表3](#table_nd2nz_3)。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../数据结构/LocalTensor/LocalTensor简介.md)。 |
+| src | 输入 | 源操作数，类型为[GlobalTensor](../../数据结构/GlobalTensor/GlobalTensor简介.md)。 |
+| intriParams | 输入 | 搬运参数，类型为Nd2NzParams，具体参数请参考[表3](#table_nd2nz_3)。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3**  Nd2NzParams结构体参数定义<a name="table_nd2nz_3"></a>
 

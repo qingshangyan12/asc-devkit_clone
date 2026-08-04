@@ -1,4 +1,4 @@
-# Lock<a name="ZH-CN_TOPIC_0000002372961532"></a>
+﻿# Lock<a name="ZH-CN_TOPIC_0000002372961532"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>
 
@@ -46,7 +46,7 @@ static __aicore__ inline void Lock(MutexID id)
 
 | 参数名 | 描述 |
 | --- | --- |
-| pipe | 模板参数，表示流水类别。支持的流水类型为PIPE_S/PIPE_M/PIPE_V/PIPE_MTE1/PIPE_MTE2/PIPE_MTE3/PIPE_FIX |
+| pipe | 模板参数，表示流水类别。支持PIPE_S、PIPE_M、PIPE_V、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，各流水类型的含义请参考[硬件流水类型](核内同步能力概述.md#硬件流水类型)。 |
 
 **表 2**  参数说明
 
@@ -66,11 +66,11 @@ static __aicore__ inline void Lock(MutexID id)
 - 对于同一个MutexID，必须先执行Lock，然后才能执行Unlock，且指定的pipe需要相同。如果Lock和Unlock没有按照这种"成对出现"的顺序排列，硬件行为将不可预测。以下是常见的错误用法与正确用法示例：
 
     ```cpp
-    // 错误写法 1：先Unlock再Lock，顺序颠倒。
+    // 错误写法 1：先调用Mutex::Unlock，再调用Mutex::Lock，顺序颠倒。
     AscendC::Mutex::Unlock<PIPE_V>(0);
     AscendC::Mutex::Lock<PIPE_V>(0);
     
-    // 错误写法 2：连续两次Lock后再连续两次Unlock，未遵循成对使用原则。
+    // 错误写法 2：连续两次调用Mutex::Lock后，再连续两次调用Mutex::Unlock，未遵循成对使用原则。
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Mutex::Unlock<PIPE_V>(0);
@@ -79,7 +79,7 @@ static __aicore__ inline void Lock(MutexID id)
 
     
     
-    // 正确写法：Lock和Unlock严格成对出现。
+    // 正确写法：Mutex::Lock和Mutex::Unlock严格成对出现。
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Mutex::Unlock<PIPE_V>(0);
     AscendC::Mutex::Lock<PIPE_V>(0);
@@ -89,7 +89,7 @@ static __aicore__ inline void Lock(MutexID id)
 - 使用相同MutexID、相同流水的两组Lock/UnLock指令时，第二次Lock不会再阻塞流水，这种情况建议使用[PipeBarrier](PipeBarrier_ISASI.md)接口。以下是错误用法与正确用法的示例：
 
     ```cpp
-    // 错误写法：第二次Lock已不再阻塞，起不到同步效果。
+    // 错误写法：第二次调用Mutex::Lock已不再阻塞，起不到同步效果。
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
     AscendC::Mutex::Unlock<PIPE_V>(0);
