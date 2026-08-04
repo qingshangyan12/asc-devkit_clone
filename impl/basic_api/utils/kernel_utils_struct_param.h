@@ -68,7 +68,9 @@ struct ReduceRepeatParams {
         const int32_t srcRepStrideIn)
     {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3510))
+                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3510) || \
+                              (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || \
+                              (__NPU_ARCH__ == 5163))
         bitMask[0] = mask[0];
         bitMask[1] = mask[1];
 #else
