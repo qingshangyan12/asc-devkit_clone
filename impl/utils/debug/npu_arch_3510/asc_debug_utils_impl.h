@@ -18,10 +18,6 @@
 #include "impl/utils/sys_macros.h"
 #include "impl/utils/debug/asc_simd_vf_utils.h"
 
-#if !defined(ASC_VF_WAIT_TIMEOUT)
-#define ASC_VF_WAIT_TIMEOUT 100000000U
-#endif
-
 namespace __asc_simd_vf {
 template <typename T, typename U, typename... Args>
 __simd_callee__ constexpr bool is_same_in_list()
@@ -51,38 +47,11 @@ __simd_callee__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
 
 __simd_callee__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b) { return div_ceil(a, b) * b; }
 
-__simd_callee__ inline bool wait_vf_debug_buffer_drained(__ubuf__ BlockVFBufInfo* block_info, uint32_t write_len)
+__simd_callee__ inline void wait_vf_debug_buffer_drained(__ubuf__ BlockVFBufInfo* block_info)
 {
-    /*
-     * The FIFO producer only reuses the reserved UB block after the host-side
-     * AICore-side consumer has advanced readLen to the producer's writeLen snapshot.
-     *
-     * Direct implementation 1, unbounded for-loop:
-     *   for (;;) {
-     *       if (block_info->readLen == write_len) {
-     *           break;
-     *       }
-     *       __asm__ __volatile__("");
-     *   }
-     *
-     * Direct implementation 2, unbounded while-loop:
-     *   while (block_info->readLen != write_len) {
-     *       __asm__ __volatile__("");
-     *   }
-     *
-     * Both unbounded forms match the FIFO wait semantics, but they cannot be
-     * enabled for SIMD VF: current Bisheng either crashes during jump
-     * optimization or rejects the infinite loop. Keep the compiled code
-     * bounded and treat timeout as "consumer did not drain in time".
-     */
-    uint32_t wait_count = 0;
-    for (; wait_count < ASC_VF_WAIT_TIMEOUT; wait_count++) {
-        if (block_info->readLen == write_len) {
-            break;
-        }
+    while (block_info->readLen != block_info->writeLen) {
         __asm__ __volatile__("");
     }
-    return wait_count < ASC_VF_WAIT_TIMEOUT;
 }
 
 template <typename T>
@@ -116,7 +85,9 @@ __simd_callee__ constexpr inline uint32_t get_vf_debug_reserved_ub_size()
 __simd_callee__ inline uint64_t get_vf_debug_reserved_ub_addr()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    return static_cast<uint64_t>(get_shmem_sz()) - get_vf_debug_reserved_ub_size();
+    // Current Bisheng cannot lower get_shmem_sz in SIMD VF code; dav-3510 has 256 KB total UB.
+    constexpr uint64_t totalUbSize = 256U * 1024U;
+    return totalUbSize - get_vf_debug_reserved_ub_size();
 #else
     return 0;
 #endif
@@ -357,6 +328,7 @@ __aicore__ inline bool asc_vf_debug_ub2gm()
 {
     __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr_aicore(0);
     for (;;) {
+        uint8_t curAssertFlag = blockInfo->assert;
         uint8_t curFinishFlag = blockInfo->finish;
         uint32_t curReadLen = blockInfo->readLen;
         uint32_t curWriteLen = blockInfo->writeLen;
@@ -382,6 +354,12 @@ __aicore__ inline bool asc_vf_debug_ub2gm()
             }
 
             blockInfo->readLen = curWriteLen;
+            continue;
+        }
+
+        if (curAssertFlag == 1) {
+            blockInfo->assert = 2;
+            break;
         }
 
         if (curFinishFlag == 1) {

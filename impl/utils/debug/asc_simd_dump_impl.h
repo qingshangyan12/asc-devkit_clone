@@ -100,10 +100,7 @@ __simd_callee__ inline uint32_t reserve_dump_tlv(__ubuf__ BlockVFBufInfo* block_
         return 0;
     }
     if (write_len + tlv_len > block_info->length) {
-        if (!wait_vf_debug_buffer_drained(block_info, write_len)) {
-            block_info->flag = 1;
-            return 0;
-        }
+        wait_vf_debug_buffer_drained(block_info);
         block_info->writeLen = 0;
         block_info->readLen = 0;
         block_info->pidx = 0;
