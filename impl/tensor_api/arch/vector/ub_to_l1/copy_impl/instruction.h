@@ -45,6 +45,18 @@ public:
         if ASCEND_IS_AIC {
             return;
         }
+        TENSOR_API_DEBUG_ASSERT(
+            (blockCount >= 1 && blockCount <= 4095),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check blockCount in CopyUB2L1 instruction, blockCount must be in range [1, 4095]. Current "
+                "blockCount is %u.",
+                static_cast<unsigned int>(blockCount)));
+        TENSOR_API_DEBUG_ASSERT(
+            (blockLen >= 1 && blockLen <= 65535),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check blockLen in CopyUB2L1 instruction, blockLen must be in range [1, 65535]. Current "
+                "blockLen is %u.",
+                static_cast<unsigned int>(blockLen)));
 
         asc_copy_ub2l1(dst, src, blockCount, blockLen, srcStride, dstStride);
     }

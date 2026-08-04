@@ -62,6 +62,44 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
         using SrcPattern = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, dst.Layout(), "dst", "CopyL12L0B"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, dst.Layout(), "dst", "CopyL12L0B"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, src.Layout(), "src", "CopyL12L0B"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, src.Layout(), "src", "CopyL12L0B"));
+        TENSOR_API_DEBUG_ASSERT(
+            (dst.Size() >= src.Size()), TENSOR_API_REPORT_INTERNAL(report_copy_size_error, src, dst, "CopyL12L0B"));
+        if constexpr (DstLayout::depth == FIVE_DIM_DATA && SrcLayout::depth == FIVE_DIM_DATA) {
+            TENSOR_API_DEBUG_ASSERT(
+                (Get<0>(src.Layout().Shape()) == Get<0>(dst.Layout().Shape())),
+                TENSOR_API_LOG_INTERNAL(
+                    "Failed to check src and dst batch shape sizes in CopyL12L0B, src batch shape size must equal "
+                    "dst batch shape size; current srcBatchShape is %lld, dstBatchShape is %lld.",
+                    static_cast<long long>(Get<0>(src.Layout().Shape())),
+                    static_cast<long long>(Get<0>(dst.Layout().Shape()))));
+            TENSOR_API_DEBUG_ASSERT(
+                (Get<0>(src.Layout().Stride()) == RemoveBatchDim(src.Layout()).Capacity() &&
+                 Get<0>(dst.Layout().Stride()) == RemoveBatchDim(dst.Layout()).Capacity()),
+                TENSOR_API_LOG_INTERNAL(
+                    "Failed to check src and dst batch strides in CopyL12L0B, src batch stride must equal the src "
+                    "matrix capacity, and dst batch stride must equal the dst matrix capacity; current srcBatchStride "
+                    "is %lld, srcMatrixCapacity is %lld, dstBatchStride is %lld, dstMatrixCapacity is %lld.",
+                    static_cast<long long>(Get<0>(src.Layout().Stride())),
+                    static_cast<long long>(RemoveBatchDim(src.Layout()).Capacity()),
+                    static_cast<long long>(Get<0>(dst.Layout().Stride())),
+                    static_cast<long long>(RemoveBatchDim(dst.Layout()).Capacity())));
+        }
         constexpr auto isB8B4Type = sizeof(typename T::elementType) == 1;
         constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>;
         using CopyL12L0BMode =

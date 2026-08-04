@@ -58,6 +58,24 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(dst.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, dst.Layout(), "dst", "CopyL12UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(dst.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, dst.Layout(), "dst", "CopyL12UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_shape_valid(src.Layout().Shape())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::SHAPE>, src.Layout(), "src", "CopyL12UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (is_layout_stride_valid(src.Layout())),
+            TENSOR_API_REPORT_INTERNAL(
+                report_tensor_layout_error<tensor_layout_error_kind::STRIDE>, src.Layout(), "src", "CopyL12UB"));
+        TENSOR_API_DEBUG_ASSERT(
+            (dst.Size() >= src.Size()), TENSOR_API_REPORT_INTERNAL(report_copy_size_error, src, dst, "CopyL12UB"));
         using CopyL12UBImpl = typename CopyL12UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyL12UBImpl::template Run<trait, T, U>(dst, src);
     }
