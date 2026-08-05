@@ -45,11 +45,11 @@ inline float copysignf(float x, float y)
 
 ## 返回值说明
 
--   y\>=0时，返回x的绝对值Abs\(x\)。
--   y<0时，返回x绝对值的相反数，-Abs\(x\)。
--   y=nan时，返回-Abs\(x\)。
--   y=-inf时，返回-Abs\(x\)。
--   y=inf时，返回Abs\(x\)。
+根据y与0的比较结果设置x的正负号，x的绝对值保持不变。
+
+-   当y\>=0时，返回值为Abs\(x\)。y为+0、-0或inf时也遵循此规则。
+-   当y<0时，返回值为-Abs\(x\)。y为-inf时也遵循此规则。
+-   当y为nan时，由于y\>=0和y<0均不成立，返回值为-Abs\(x\)。
 
 ## 约束说明
 
