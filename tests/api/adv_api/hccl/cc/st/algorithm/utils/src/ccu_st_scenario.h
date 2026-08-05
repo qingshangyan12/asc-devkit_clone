@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <vector>
 #include "hccl_types.h"
+#include "hccl_common.h"
 
 namespace HcclSim {
 namespace CcuSt {
@@ -21,8 +22,10 @@ namespace CcuSt {
 struct CcuStScenario {
     uint32_t rankSize = 2;
     HcclDataType dataType = HCCL_DATA_TYPE_FP16;
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
 
     // sizes[sourceRank][destinationRank] = sendSize (bytes)
+    // For AllToAll (equal-length), every row must be identical
     std::vector<std::vector<uint64_t>> sizes;
 
     // negative test controls
