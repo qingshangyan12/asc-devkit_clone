@@ -4,6 +4,8 @@
 
 This example introduces the usage of the ascendc_assert assertion API. If the assertion condition evaluates to false, an error message is printed and program execution is terminated.
 
+For the progressive SIMD VF stress test on Ascend 950PR/Ascend 950DT, see [simd_vf_assert_cases](./simd_vf_assert_cases). It builds and runs 16 isolated cases and automatically verifies their logs and exception behavior.
+
 ## Supported Products and CANN Software Versions
 
 | Product | CANN Software Version |
