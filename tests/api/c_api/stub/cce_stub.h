@@ -702,8 +702,14 @@ typedef std::integral_constant<Pos, Pos::HIGHEST> Highest_Type;
 constexpr Lowest_Type POS_LOWEST = Lowest_Type();
 constexpr Highest_Type POS_HIGHEST = Highest_Type();
 
-// ========== __builtin_cce_vcvt* stubs for CPU mode ==========
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+// ========== __builtin_cce_vexpdif* stubs for CPU mode ==========
+inline vector_f32 __builtin_cce_vexpdif_v128f16f32(vector_f16 src0, vector_f16 src1, vector_bool mask, ULL part)
+{
+    return vector_f32();
+}
+
+// ========== __builtin_cce_vcvt* stubs for CPU mode ==========
 inline vector_f32 __builtin_cce_vcvtff_bf162f32_x(vector_bf16 src, vector_bool mask, ULL arg0) { return vector_f32(); }
 inline vector_f4e1m2x2 __builtin_cce_vcvtff_bf162f4e1m2x2_x(vector_bf16 src, vector_bool mask, ULL arg0, ULL arg1)
 {
