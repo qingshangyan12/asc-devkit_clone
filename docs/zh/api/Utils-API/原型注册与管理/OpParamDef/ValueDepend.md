@@ -54,6 +54,8 @@ this->Input("y")
     .ValueDepend(OPTIONAL, DependScope::TILING);
 ```
 
+ValueDepend用于声明Tiling是否依赖输入y的具体值。配置后，当y的值在Host侧可获取时，系统会在GetWorkspaceSize阶段将该值提供给Tiling，使Tiling能够根据输入值计算Tiling参数和Workspace；未配置ValueDepend时，Tiling只能获取y的Shape、数据类型等描述信息，不能获取具体数据。
+
 其中，ParamType(REQUIRED)表示调用算子时必须提供y；ValueDepend(OPTIONAL)表示y可以是Const输入，也可以是非Const输入。y为Const输入时，系统将其具体数据提供给Tiling；y为非Const输入时，不提供具体数据。
 
 ### 配置前后的接口差异<a name="zh-cn_topic_0000001626329929_section_product_diff"></a>
@@ -71,7 +73,7 @@ aclnnStatus aclnnAddCustomGetWorkspaceSize(
 // 有ValueDepend
 aclnnStatus aclnnAddCustomGetWorkspaceSize(
     const aclTensor *x,
-    const aclFloatArray *y,    // y的具体数据在Host侧已知
+    const aclFloatArray *y,    // 关键差异：调用侧在Host侧提供y的具体数据，供Tiling使用
     const aclTensor *out,
     ...);
 
@@ -82,6 +84,8 @@ aclnnStatus aclnnAddCustomTensorGetWorkspaceSize(
     const aclTensor *out,
     ...);
 ```
+
+`const aclFloatArray *y`是配置ValueDepend后的关键接口变化。调用`aclnnAddCustomGetWorkspaceSize`时，调用侧需要将y的具体值封装为aclFloatArray并在Host侧传入，使Tiling能够读取这些值。此处`const`只表示接口不会修改aclFloatArray，不表示编译期常量。
 
 算子执行接口`aclnnAddCustom`保持不变。升级到配置ValueDepend后重新生成的算子包时，调用侧需要根据输入形式调整`GetWorkspaceSize`接口，并重新编译调用程序。
 
