@@ -4,6 +4,8 @@
 
 本样例介绍ascendc_assert断言接口使用方法，如果assert的条件判断不为真，则会输出错误信息并终止程序执行。
 
+面向Ascend 950PR/Ascend 950DT的SIMD VF递进压力测试参见[simd_vf_assert_cases](./simd_vf_assert_cases)，该目录可一键编译运行16个独立用例并自动校验日志与异常现象。
+
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
