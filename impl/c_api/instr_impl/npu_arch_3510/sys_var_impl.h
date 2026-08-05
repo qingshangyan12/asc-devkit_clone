@@ -48,15 +48,13 @@ __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count() { return asc_get_p
 
 __aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count() { return asc_get_pipe_mte3_idle_slot_count_impl(); }
 
-#if defined(__DAV_VEC__)
 __aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count() { return asc_get_pipe_v_idle_slot_count_impl(); }
-#elif defined(__DAV_CUBE__)
+
 __aicore__ inline uint8_t asc_get_pipe_m_idle_slot_count() { return asc_get_pipe_m_idle_slot_count_impl(); }
 
 __aicore__ inline uint8_t asc_get_pipe_mte1_idle_slot_count() { return asc_get_pipe_mte1_idle_slot_count_impl(); }
 
 __aicore__ inline uint8_t asc_get_pipe_fix_idle_slot_count() { return asc_get_pipe_fix_idle_slot_count_impl(); }
-#endif
 
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
              "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
