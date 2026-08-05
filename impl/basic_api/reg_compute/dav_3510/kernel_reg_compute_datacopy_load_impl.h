@@ -321,14 +321,30 @@ __simd_callee__ inline void DataCopyUnAlignImpl(U& dstReg, UnalignReg& ureg, __u
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         SupportBytes<ActualT, 1, 2, 4, 8>(), "LoadUnAlign only support type b8/b16/b32/b64 on current device");
-    if constexpr (SupportBytes<T, 1>()) {
+    if constexpr (SupportBytes<ActualT, 1>()) {
         vldus((RegTensor<uint8_t>&)dstReg, ureg, (__ubuf__ uint8_t*)srcAddr);
+    } else if constexpr (SupportBytes<ActualT, 8>()) {
+        if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
+            vldus((RegTensor<uint32_t>&)dstReg, ureg, (__ubuf__ uint32_t*)srcAddr);
+        } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
+            RegTensor<uint32_t> tmp1;
+            RegTensor<uint32_t> tmp2;
+            constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(uint32_t);
+            vldus(tmp1, ureg, (__ubuf__ uint32_t*)srcAddr);
+            vldus(tmp2, ureg, (__ubuf__ uint32_t*)srcAddr + one_repeat_num);
+            DeInterleave((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)dstReg.reg[1], tmp1, tmp2);
+        }
     } else {
-        if constexpr (Std::is_same_v<T, bool>) {
+        if constexpr (SupportType<ActualT, complex32>() && (CheckRegTrait<U, RegTraitNumTwo>())) {
+            RegTensor<uint16_t> tmp1;
+            RegTensor<uint16_t> tmp2;
+            constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(uint16_t);
+            vldus(tmp1, ureg, (__ubuf__ uint16_t*)srcAddr);
+            vldus(tmp2, ureg, (__ubuf__ uint16_t*)srcAddr + one_repeat_num);
+            DeInterleave((RegTensor<uint16_t>&)dstReg.reg[0], (RegTensor<uint16_t>&)dstReg.reg[1], tmp1, tmp2);
+        } else if constexpr (Std::is_same_v<T, bool>) {
             vldus((RegTensor<int8_t>&)dstReg, ureg, (__ubuf__ int8_t*)srcAddr);
-        } else if constexpr (SupportBytes<T, 8>()) {
-            vldus((RegTensor<int64_t>&)dstReg, ureg, (__ubuf__ int64_t*)srcAddr);
-        } else if constexpr (SupportBytes<T, 4>()) {
+        } else if constexpr (SupportBytes<ActualT, 4>()) {
             vldus((RegTensor<int32_t>&)dstReg, ureg, (__ubuf__ int32_t*)srcAddr);
         } else {
             vldus(dstReg, ureg, srcAddr);
@@ -347,15 +363,7 @@ __simd_callee__ inline void LoadImpl(U& dstReg, __ubuf__ T* srcAddr)
         "RegTensor only support RegTraitNumOne or RegTraitNumTwo on current device!");
     UnalignRegForLoad ureg;
     DataCopyUnAlignPreImpl<T>(ureg, srcAddr);
-    if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-        DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr);
-    } else {
-        static_assert(
-            SupportType<ActualT, complex32>() || SupportBytes<ActualT, 8>(),
-            "RegTraitNumTwo only support type complex32/b64 on current device!");
-        constexpr uint32_t count = VECTOR_REG_WIDTH / sizeof(T);
-        DataCopyUnAlignImpl<T, PostLiteral::POST_MODE_UPDATE, U>(dstReg, ureg, srcAddr, count);
-    }
+    DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr);
 }
 
 // vlda/vldu
