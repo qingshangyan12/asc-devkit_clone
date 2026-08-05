@@ -8,9 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <gtest/gtest.h>
-#include <type_traits>
 #include <cmath>
+#include <cstring>
+#include <type_traits>
 #include "kernel_operator.h"
+#include "simt_api/asc_simt.h"
 
 using namespace std;
 using namespace AscendC;
@@ -76,4 +78,24 @@ TEST_F(MathComputeTestsuite, HalfComputeTestCompare)
     bool result = Simt::IsNan(x);
     result = Simt::IsInf(x);
     EXPECT_EQ(result, false);
+}
+
+TEST_F(MathComputeTestsuite, CppApiMatchesSyncedMathBoundaryBehavior)
+{
+    EXPECT_FALSE(std::signbit(Simt::CopySign(1.0f, 0.0f)));
+
+    float next = Simt::NextAfter(0.0f, 1.0f);
+    uint32_t nextBits = 0;
+    std::memcpy(&nextBits, &next, sizeof(nextBits));
+    EXPECT_EQ(nextBits, 1U);
+    EXPECT_TRUE(std::isnan(Simt::NextAfter(NAN, 1.0f)));
+
+    EXPECT_TRUE(std::isnan(Simt::Yn(-1, 0.0f)));
+}
+
+TEST_F(MathComputeTestsuite, CppApiMatchesCTypeMathAlgorithms)
+{
+    float values[] = {3.0f, 4.0f, 5.0f, 12.0f, 7.0f};
+    EXPECT_FLOAT_EQ(Simt::Norm(5, values), normf(5, values));
+    EXPECT_FLOAT_EQ(Simt::Yn(8, 2.0f), ynf(8, 2.0f));
 }
