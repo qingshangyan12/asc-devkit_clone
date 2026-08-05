@@ -16,6 +16,7 @@
 #define IMPL_UTILS_DEBUG_NPU_ARCH_3510_ASC_AICORE_DUMP_UTILS_H
 
 #include "impl/utils/debug/asc_debug_utils.h"
+#include "impl/utils/debug/asc_aicore_dump_common.h"
 #include "impl/utils/sys_macros.h"
 
 namespace __asc_aicore {
@@ -215,24 +216,23 @@ __aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src
     if ASCEND_IS_NOT_AIC {
         return 1;
     }
-    constexpr int32_t blockCube = 16;
-    constexpr int32_t defaultOneBlockSize = 256;
-    constexpr int32_t srcBurstLenSizeEle = 16;
-    constexpr uint16_t b32ByteSize = 4;
-
-    uint16_t align = (dumpSize % defaultOneBlockSize == 0) ? 0 : 1;
-    uint16_t countBlks = align + dumpSize / defaultOneBlockSize;
-    uint16_t burstLen =
-        static_cast<uint16_t>(srcBurstLenSizeEle * srcBurstLenSizeEle * sizeof(float) / ASC_ONE_DATABLOCK_SIZE);
-    uint16_t n = countBlks * blockCube;
-    uint16_t m = (burstLen * ASC_ONE_DATABLOCK_SIZE / b32ByteSize) / blockCube;
-    bool nz2ndEn = true;
+    const L0cDumpCopyParams copyParams = get_l0c_dump_copy_params(dumpSize);
+    const uint32_t dstAlignOffset = get_l0c_dump_gm_align_offset(reinterpret_cast<uint64_t>(dst));
+    __gm__ float* alignedDst = reinterpret_cast<__gm__ float*>(reinterpret_cast<uint64_t>(dst) + dstAlignOffset);
 
     copy_matrix_cc_to_gm(
-        (__gm__ float*)dst, (__cc__ float*)src, 0, n, m, m * blockCube, m, 0, 0, 0,
+        alignedDst, (__cc__ float*)src, 0, copyParams.nSize, copyParams.mSize,
+        copyParams.mSize * ASC_L0C_DUMP_BLOCK_SIDE, copyParams.mSize, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), static_cast<uint8_t>(false), false, false,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true, false, false, false);
-    return 0;
+    sync_all();
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(alignedDst));
+    if (dstAlignOffset == 0U) {
+        return 0;
+    }
+    // dst is below alignedDst, so a forward copy safely compacts the overlapping staging range.
+    return mem_copy_gm_to_gm(
+        reinterpret_cast<__gm__ uint8_t*>(dst), reinterpret_cast<__gm__ const uint8_t*>(alignedDst), dumpSize);
 }
 
 template <typename T>

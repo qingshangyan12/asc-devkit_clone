@@ -20,6 +20,7 @@
 #include "impl/utils/common_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
 #include "impl/utils/debug/asc_debug_utils.h"
+#include "impl/utils/debug/asc_aicore_dump_common.h"
 
 #if __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_dump_utils.h"
@@ -117,7 +118,11 @@ __aicore__ inline void asc_dump_impl(
     constexpr uint16_t dataBlockSize = 32;
     uint32_t alignDumpLen = align_up(dump_size * sizeof(T), dataBlockSize);
     uint32_t tlvLen = sizeof(DumpTensorTlv) + alignDumpLen;
-    if (!check_ringbuf_space(blockInfo, tlvLen)) {
+    uint32_t maxResvTlvLen = tlvLen;
+    if constexpr (hardware == AscendC::Hardware::L0C) {
+        maxResvTlvLen = sizeof(DumpTensorTlv) + get_l0c_dump_reservation_bytes(alignDumpLen);
+    }
+    if (!check_ringbuf_space(blockInfo, maxResvTlvLen)) {
         return;
     }
     __gm__ DumpTensorTlv* dumpTlv = reinterpret_cast<__gm__ DumpTensorTlv*>(get_ringbuf_tlv_addr(blockInfo));

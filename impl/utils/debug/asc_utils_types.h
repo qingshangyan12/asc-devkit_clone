@@ -31,6 +31,14 @@ struct AscTlv {
 
 constexpr uint16_t ASC_ONE_DATABLOCK_SIZE = 32;
 
+namespace __asc_aicore {
+__aicore__ constexpr inline bool should_ringbuf_skip_directly(
+    const uint64_t writeOffset, const uint32_t ringBufLen, const uint32_t minTlvLen)
+{
+    return writeOffset > ringBufLen || static_cast<uint64_t>(ringBufLen) - writeOffset < minTlvLen;
+}
+} // namespace __asc_aicore
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_UTILS_TYPES__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_UTILS_TYPES__

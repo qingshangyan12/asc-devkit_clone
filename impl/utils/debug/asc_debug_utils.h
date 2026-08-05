@@ -194,10 +194,11 @@ __aicore__ inline void do_overlow_skip(
     __gm__ DebugBlockWriteInfo* writeInfo, __gm__ uint8_t* ringBufAddr, const uint32_t& ringBufLen,
     const uint32_t& minTlvLen)
 {
-    if (writeInfo->bufOffset + minTlvLen >= ringBufLen) {
+    if (should_ringbuf_skip_directly(writeInfo->bufOffset, ringBufLen, minTlvLen)) {
         ringbuf_skip_directly(writeInfo);
+    } else {
+        ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
     }
-    ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
 }
 
 __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
