@@ -19,12 +19,8 @@ add_executable(math_cpp
         math_cpp.asc
 )
 
-get_filename_component(ASC_DEVKIT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../.." ABSOLUTE)
 target_link_libraries(math_cpp PRIVATE m)
 
 target_compile_options(math_cpp PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:-iquote${ASC_DEVKIT_ROOT}>
-    $<$<COMPILE_LANGUAGE:ASC>:-iquote${ASC_DEVKIT_ROOT}/include>
-    $<$<COMPILE_LANGUAGE:ASC>:-iquote${ASC_DEVKIT_ROOT}/impl>
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
 )
