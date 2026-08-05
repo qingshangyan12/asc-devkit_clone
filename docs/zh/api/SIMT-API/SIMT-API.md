@@ -10,7 +10,7 @@
 
 -   **[原子操作](atomic_operations/atomic_operations.md)**
 
--   **[Warp函数](warp_functions/Warp_functions.md)**
+-   **[Warp函数](Warp_functions/Warp_functions.md)**
 
 -   **[数学函数](math_functions/math_functions.md)**
 

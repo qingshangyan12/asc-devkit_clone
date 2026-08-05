@@ -10,7 +10,7 @@ SIMT API是面向AI处理器的并行计算编程接口，可以实现高效的�
 | --- | --- |
 | [同步与内存栅栏](sync_and_memory_fence/sync_and_memory_fence.md) | 内存管理与同步接口，解决不同核内的线程间可能存在的数据竞争以及线程的同步问题。 |
 | [原子操作](atomic_operations/atomic_operations.md) | 对Unified Buffer或Global Memory上的数据与指定数据执行原子操作的一系列接口。 |
-| [Warp函数](warp_functions/Warp_functions.md) | 对单个Warp内32个线程的数据进行处理的相关操作的一系列API接口。 |
+| [Warp函数](Warp_functions/Warp_functions.md) | 对单个Warp内32个线程的数据进行处理的相关操作的一系列API接口。 |
 | [数学函数](math_functions/math_functions.md) | 用于处理数学运算的函数集合以及不同精度、数据类型的转换函数集合 |
 | [地址空间谓词函数](address_space_predicate_functions/address_space_predicate_functions.md) | 判断输入指针是否为指定空间的地址。 |
 | [地址空间转换函数](address_space_conversion_functions/address_space_conversion_functions.md) | 将指定地址空间的地址值转换为指针，或将输入的指针转换为对应内存空间的地址值的接口。 |
@@ -47,7 +47,7 @@ SIMT API是面向AI处理器的并行计算编程接口，可以实现高效的�
 | --- | --- |
 | [同步与内存栅栏](sync_and_memory_fence/sync_and_memory_fence.md) | `#include "simt_api/device_sync_functions.h"` |
 | [原子操作](atomic_operations/atomic_operations.md) | `#include "simt_api/device_atomic_functions.h"` |
-| [Warp函数](warp_functions/Warp_functions.md) | `#include "simt_api/device_warp_functions.h"` |
+| [Warp函数](Warp_functions/Warp_functions.md) | `#include "simt_api/device_warp_functions.h"` |
 | [数学函数](math_functions/math_functions.md) | 数学函数标准库接口：`#include "simt_api/math_functions.h" `<br><br>数学函数的intrinsic接口：`#include "simt_api/device_functions.h"` |
 | [地址空间谓词函数](address_space_predicate_functions/address_space_predicate_functions.md)<br><br>[地址空间转换函数](address_space_conversion_functions/address_space_conversion_functions.md)<br><br>[访存函数](memory_access_functions/memory_access_functions.md) | `#include "simt_api/device_functions.h"` |
 | [协作组](cooperative_groups/cooperative_groups.md) | `#include "simt_api/cooperative_groups.h"` |

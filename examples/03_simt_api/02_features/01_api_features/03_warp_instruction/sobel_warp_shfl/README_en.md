@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses Sobel edge detection to demonstrate how to reuse data loaded by adjacent threads through Warp shuffle instructions to complete 3x3 convolution computation, and how to implement compact output of edge pixels in combination with [asc_ballot()](../../../../../../docs/zh/api/SIMT-API/warp_functions/Warp_vote_functions/asc_ballot.md).
+This example uses Sobel edge detection to demonstrate how to reuse data loaded by adjacent threads through Warp shuffle instructions to complete 3x3 convolution computation, and how to implement compact output of edge pixels in combination with [asc_ballot()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_vote_functions/asc_ballot.md).
 
 ## Supported Products
 
@@ -78,7 +78,7 @@ int y = warp_id / tiles_x;                          // Pixel row: which Warp row
 </p>
 
 
-As shown in the figure above, computing the Sobel magnitude requires obtaining 9 pixel values from the 3x3 neighborhood around the current pixel. When adjacent threads compute their respective Sobel magnitudes, they also need the pixel values from their 3x3 neighborhoods, so the 3x3 neighborhoods of different threads overlap. Leveraging this characteristic, each thread first reads three pixel values at the same x coordinate (top, middle, bottom) from Global Memory, and saves them to register variables top, mid, and bot, corresponding to the middle column of the current pixel's 3x3 neighborhood. Then, [asc_shfl_up()](../../../../../../docs/zh/api/SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl_up.md) and [asc_shfl_down()](../../../../../../docs/zh/api/SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl_down.md) are used to obtain the left and right column data from adjacent thread registers, avoiding additional reads from Global Memory.
+As shown in the figure above, computing the Sobel magnitude requires obtaining 9 pixel values from the 3x3 neighborhood around the current pixel. When adjacent threads compute their respective Sobel magnitudes, they also need the pixel values from their 3x3 neighborhoods, so the 3x3 neighborhoods of different threads overlap. Leveraging this characteristic, each thread first reads three pixel values at the same x coordinate (top, middle, bottom) from Global Memory, and saves them to register variables top, mid, and bot, corresponding to the middle column of the current pixel's 3x3 neighborhood. Then, [asc_shfl_up()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_up.md) and [asc_shfl_down()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_down.md) are used to obtain the left and right column data from adjacent thread registers, avoiding additional reads from Global Memory.
 
 
 
@@ -127,7 +127,7 @@ edge_mask is used to complete two operations:
 - Thread 0 counts the number of edge threads in this Warp through [__popc(edge_mask)](../../../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/__popc.md), and requests consecutive output positions for the entire Warp through a single `asc_atomic_add()`.
 - Each edge thread computes its local offset within the Warp based on edge_mask and writes to the corresponding position in edge_list.
 
-After thread 0 requests the output position, it broadcasts the base position to all threads in the Warp through [asc_shfl()](../../../../../../docs/zh/api/SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl.md):
+After thread 0 requests the output position, it broadcasts the base position to all threads in the Warp through [asc_shfl()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl.md):
 
 ```cpp
 uint32_t warp_base = 0;

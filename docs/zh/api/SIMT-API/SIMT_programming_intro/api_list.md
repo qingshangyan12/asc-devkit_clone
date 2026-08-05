@@ -39,38 +39,38 @@
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [asc_all](../warp_functions/Warp_vote_functions/asc_all.md) | 判断是否所有活跃线程的输入均不为0。 |
-| [asc_any](../warp_functions/Warp_vote_functions/asc_any.md) | 判断是否有活跃线程的输入不为0。 |
-| [asc_ballot](../warp_functions/Warp_vote_functions/asc_ballot.md) | 判断Warp内每个活跃线程的输入是否不为0。 |
-| [asc_activemask](../warp_functions/Warp_vote_functions/asc_activemask.md) | 查看Warp内所有线程是否为活跃状态。 |
+| [asc_all](../Warp_functions/Warp_vote_functions/asc_all.md) | 判断是否所有活跃线程的输入均不为0。 |
+| [asc_any](../Warp_functions/Warp_vote_functions/asc_any.md) | 判断是否有活跃线程的输入不为0。 |
+| [asc_ballot](../Warp_functions/Warp_vote_functions/asc_ballot.md) | 判断Warp内每个活跃线程的输入是否不为0。 |
+| [asc_activemask](../Warp_functions/Warp_vote_functions/asc_activemask.md) | 查看Warp内所有线程是否为活跃状态。 |
 
 **表5**  Warp Shfl类函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [asc_shfl](../warp_functions/Warp_shfl_functions/asc_shfl.md) | 获取Warp内指定线程srcLane输入的用于交换的var值。 |
-| [asc_shfl_up](../warp_functions/Warp_shfl_functions/asc_shfl_up.md) | 获取Warp内当前线程向前偏移delta（当前线程Lane ID - delta）的线程输入的用于交换的var值。 |
-| [asc_shfl_down](../warp_functions/Warp_shfl_functions/asc_shfl_down.md) | 获取Warp内当前线程向后偏移delta（当前线程Lane ID + delta）的线程输入的用于交换的var值。 |
-| [asc_shfl_xor](../warp_functions/Warp_shfl_functions/asc_shfl_xor.md) | 获取Warp内当前线程Lane ID与输入laneMask做异或操作（Lane ID ^ laneMask）得到的dstLaneId对应线程输入的用于交换的var值。 |
+| [asc_shfl](../Warp_functions/Warp_shfl_functions/asc_shfl.md) | 获取Warp内指定线程srcLane输入的用于交换的var值。 |
+| [asc_shfl_up](../Warp_functions/Warp_shfl_functions/asc_shfl_up.md) | 获取Warp内当前线程向前偏移delta（当前线程Lane ID - delta）的线程输入的用于交换的var值。 |
+| [asc_shfl_down](../Warp_functions/Warp_shfl_functions/asc_shfl_down.md) | 获取Warp内当前线程向后偏移delta（当前线程Lane ID + delta）的线程输入的用于交换的var值。 |
+| [asc_shfl_xor](../Warp_functions/Warp_shfl_functions/asc_shfl_xor.md) | 获取Warp内当前线程Lane ID与输入laneMask做异或操作（Lane ID ^ laneMask）得到的dstLaneId对应线程输入的用于交换的var值。 |
 
 **表6**  Warp Reduce类函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [asc_reduce_add](../warp_functions/Warp_reduce_functions/asc_reduce_add.md) | 对Warp内所有活跃线程输入的val求和。 |
-| [asc_reduce_max](../warp_functions/Warp_reduce_functions/asc_reduce_max.md) | 对Warp内所有活跃线程输入的val求最大值。 |
-| [asc_reduce_min](../warp_functions/Warp_reduce_functions/asc_reduce_min.md) | 对Warp内所有活跃线程输入val求最小值。 |
+| [asc_reduce_add](../Warp_functions/Warp_reduce_functions/asc_reduce_add.md) | 对Warp内所有活跃线程输入的val求和。 |
+| [asc_reduce_max](../Warp_functions/Warp_reduce_functions/asc_reduce_max.md) | 对Warp内所有活跃线程输入的val求最大值。 |
+| [asc_reduce_min](../Warp_functions/Warp_reduce_functions/asc_reduce_min.md) | 对Warp内所有活跃线程输入val求最小值。 |
 
 **表7** Lane ID类函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [laneid](../warp_functions/lane_id_functions/laneid.md) | 获取线程在其线程束内的索引。 |
-| [lanemask_eq](../warp_functions/lane_id_functions/lanemask_eq.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，只有当前线程所在的lane位被置为1，其余位为0。 |
-| [lanemask_le](../warp_functions/lane_id_functions/lanemask_le.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID小于等于当前线程”的线程的对应位设为1，其余位为0。 |
-| [lanemask_lt](../warp_functions/lane_id_functions/lanemask_lt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID严格小于当前线程”的线程的对应位设为1，其余位为0。 |
-| [lanemask_ge](../warp_functions/lane_id_functions/lanemask_ge.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID大于等于当前线程”的线程的对应位设为1，其余位为0。 |
-| [lanemask_gt](../warp_functions/lane_id_functions/lanemask_gt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID严格大于当前线程”的线程的对应位设为1，其余位为0。 |
+| [laneid](../Warp_functions/lane_id_functions/laneid.md) | 获取线程在其线程束内的索引。 |
+| [lanemask_eq](../Warp_functions/lane_id_functions/lanemask_eq.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，只有当前线程所在的lane位被置为1，其余位为0。 |
+| [lanemask_le](../Warp_functions/lane_id_functions/lanemask_le.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID小于等于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_lt](../Warp_functions/lane_id_functions/lanemask_lt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID严格小于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_ge](../Warp_functions/lane_id_functions/lanemask_ge.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID大于等于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_gt](../Warp_functions/lane_id_functions/lanemask_gt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID严格大于当前线程”的线程的对应位设为1，其余位为0。 |
 
 ## 数学函数
 

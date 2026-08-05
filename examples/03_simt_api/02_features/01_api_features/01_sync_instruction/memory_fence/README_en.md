@@ -101,7 +101,7 @@ This example controls build branches through `SCENARIO_NUM`. The 2 scenarios are
 
 Each thread in a single thread block first reads one input element, then obtains the final result through **two-phase reduction sum**:
 
-- **Phase 1 (intra-warp reduction)**: Call the [`asc_reduce_add()`](../../../../../../docs/zh/api/SIMT-API/warp_functions/Warp_reduce_functions/asc_reduce_add.md) interface to perform reduction on all thread values within the current warp, obtaining the sum of data within the warp, and write to shared memory.
+- **Phase 1 (intra-warp reduction)**: Call the [`asc_reduce_add()`](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_add.md) interface to perform reduction on all thread values within the current warp, obtaining the sum of data within the warp, and write to shared memory.
 - **Phase 2 (block-level sequential accumulation)**: After cross-warp synchronization, thread 0 sequentially accumulates the partial sums from each warp to obtain the final result.
 
 Taking 128 elements (4 warps) as an example, the two-phase reduction process is shown in Figure 1:

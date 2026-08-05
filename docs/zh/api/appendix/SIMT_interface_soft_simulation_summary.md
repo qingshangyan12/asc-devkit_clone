@@ -10,38 +10,38 @@
 
 | API名 | API是否软仿 |
 | --- | --- |
-| [laneid](../SIMT-API/warp_functions/lane_id_functions/laneid.md) | 否 |
-| [lanemask_eq](../SIMT-API/warp_functions/lane_id_functions/lanemask_eq.md) | 否 |
-| [lanemask_ge](../SIMT-API/warp_functions/lane_id_functions/lanemask_ge.md) | 否 |
-| [lanemask_gt](../SIMT-API/warp_functions/lane_id_functions/lanemask_gt.md) | 否 |
-| [lanemask_le](../SIMT-API/warp_functions/lane_id_functions/lanemask_le.md) | 否 |
-| [lanemask_lt](../SIMT-API/warp_functions/lane_id_functions/lanemask_lt.md) | 否 |
+| [laneid](../SIMT-API/Warp_functions/lane_id_functions/laneid.md) | 否 |
+| [lanemask_eq](../SIMT-API/Warp_functions/lane_id_functions/lanemask_eq.md) | 否 |
+| [lanemask_ge](../SIMT-API/Warp_functions/lane_id_functions/lanemask_ge.md) | 否 |
+| [lanemask_gt](../SIMT-API/Warp_functions/lane_id_functions/lanemask_gt.md) | 否 |
+| [lanemask_le](../SIMT-API/Warp_functions/lane_id_functions/lanemask_le.md) | 否 |
+| [lanemask_lt](../SIMT-API/Warp_functions/lane_id_functions/lanemask_lt.md) | 否 |
 
 ### Warp Reduce类函数
 
 | API名 | API是否软仿 |
 | --- | --- |
-| [asc_reduce_add](../SIMT-API/warp_functions/Warp_reduce_functions/asc_reduce_add.md) | 否 |
-| [asc_reduce_max](../SIMT-API/warp_functions/Warp_reduce_functions/asc_reduce_max.md) | 否 |
-| [asc_reduce_min](../SIMT-API/warp_functions/Warp_reduce_functions/asc_reduce_min.md) | 否 |
+| [asc_reduce_add](../SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_add.md) | 否 |
+| [asc_reduce_max](../SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_max.md) | 否 |
+| [asc_reduce_min](../SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_min.md) | 否 |
 
 ### Warp Shfl类函数
 
 | API名 | API是否软仿 |
 | --- | --- |
-| [asc_shfl](../SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl.md) | 否 |
-| [asc_shfl_down](../SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl_down.md) | 否 |
-| [asc_shfl_up](../SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl_up.md) | 否 |
-| [asc_shfl_xor](../SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl_xor.md) | 否 |
+| [asc_shfl](../SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl.md) | 否 |
+| [asc_shfl_down](../SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_down.md) | 否 |
+| [asc_shfl_up](../SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_up.md) | 否 |
+| [asc_shfl_xor](../SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_xor.md) | 否 |
 
 ### Warp Vote类函数
 
 | API名 | API是否软仿 |
 | --- | --- |
-| [asc_activemask](../SIMT-API/warp_functions/Warp_vote_functions/asc_activemask.md) | 否 |
-| [asc_all](../SIMT-API/warp_functions/Warp_vote_functions/asc_all.md) | 否 |
-| [asc_any](../SIMT-API/warp_functions/Warp_vote_functions/asc_any.md) | 否 |
-| [asc_ballot](../SIMT-API/warp_functions/Warp_vote_functions/asc_ballot.md) | 否 |
+| [asc_activemask](../SIMT-API/Warp_functions/Warp_vote_functions/asc_activemask.md) | 否 |
+| [asc_all](../SIMT-API/Warp_functions/Warp_vote_functions/asc_all.md) | 否 |
+| [asc_any](../SIMT-API/Warp_functions/Warp_vote_functions/asc_any.md) | 否 |
+| [asc_ballot](../SIMT-API/Warp_functions/Warp_vote_functions/asc_ballot.md) | 否 |
 
 ## 协作组
 
