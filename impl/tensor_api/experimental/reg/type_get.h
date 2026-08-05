@@ -22,13 +22,15 @@
 
 #include "c_api/asc_simd.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 // Keep the primary template incomplete so unsupported element types fail at
 // compile time when reg_tensor<T> requests the corresponding register type.
 template <typename DataType>
 struct type_get;
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 template <>
 struct type_get<bool> {
@@ -89,6 +91,43 @@ template <>
 struct type_get<float> {
     using T = vector_float;
 };
+
+template <>
+struct type_get<hifloat8_t> {
+    using T = vector_hifloat8_t;
+};
+
+template <>
+struct type_get<fp8_e4m3fn_t> {
+    using T = vector_fp8_e4m3fn_t;
+};
+
+template <>
+struct type_get<fp8_e5m2_t> {
+    using T = vector_fp8_e5m2_t;
+};
+
+template <>
+struct type_get<fp8_e8m0_t> {
+    using T = vector_fp8_e8m0_t;
+};
+
+template <>
+struct type_get<int4x2_t> {
+    using T = vector_int4x2_t;
+};
+
+template <>
+struct type_get<fp4x2_e2m1_t> {
+    using T = vector_fp4x2_e2m1_t;
+};
+
+template <>
+struct type_get<fp4x2_e1m2_t> {
+    using T = vector_fp4x2_e1m2_t;
+};
+
+#endif
 
 } // namespace Te
 } // namespace AscendC

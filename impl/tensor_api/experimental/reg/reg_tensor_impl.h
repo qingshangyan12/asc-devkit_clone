@@ -20,8 +20,8 @@
 
 #include "impl/tensor_api/experimental/reg/type_get.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename DataType>
 struct reg_tensor;

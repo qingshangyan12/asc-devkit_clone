@@ -20,8 +20,8 @@
 
 #include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> full_mask()

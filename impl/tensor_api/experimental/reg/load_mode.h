@@ -20,8 +20,8 @@
 
 #include <cstdint>
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 enum class load_sideband_mode : uint8_t {
     direct,
