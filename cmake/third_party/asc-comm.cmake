@@ -37,19 +37,40 @@ else()
     get_filename_component(ASC_COMM_SOURCE_PATH ${ASC_COMM_SOURCE_DIR} REALPATH)
 endif()
 
-# asc-comm 迁出后，devkit 仅把从 asc-comm 迁移来的 hcomm 头按删除前的源码路径打入包。
+# asc-comm 迁出后，hcomm 与 ain 头文件统一打包到 comm_api，adv_api 下为 hcomm 建立软链接。
 set(ASC_COMM_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm)
 set(ASC_COMM_DETAIL_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/src/aicore/hcomm/detail)
 if(NOT EXISTS ${ASC_COMM_PUBLIC_HEADER_DIR})
     message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public hcomm headers: ${ASC_COMM_PUBLIC_HEADER_DIR}")
 endif()
 install(DIRECTORY ${ASC_COMM_PUBLIC_HEADER_DIR}/
-    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/hcomm
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/comm_api/hcomm
     COMPONENT asc-devkit
     FILES_MATCHING PATTERN "*.h"
 )
 install(DIRECTORY ${ASC_COMM_DETAIL_HEADER_DIR}/
-    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail/hcomm
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/detail/hcomm
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
+# adv_api 下建立 hcomm 软链接，指向 comm_api 下的实际内容
+install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/adv_api)" COMPONENT asc-devkit)
+install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../comm_api/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/adv_api/hcomm SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../../comm_api/detail/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail/hcomm SYMBOLIC)" COMPONENT asc-devkit)
+
+set(ASC_COMM_AIN_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicore/ain)
+set(ASC_COMM_AIN_DETAIL_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/src/aicore/ain/detail)
+if(NOT EXISTS ${ASC_COMM_AIN_PUBLIC_HEADER_DIR})
+    message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public ain headers: ${ASC_COMM_AIN_PUBLIC_HEADER_DIR}")
+endif()
+install(DIRECTORY ${ASC_COMM_AIN_PUBLIC_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/comm_api/ain
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
+install(DIRECTORY ${ASC_COMM_AIN_DETAIL_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/detail/ain
     COMPONENT asc-devkit
     FILES_MATCHING PATTERN "*.h"
 )
