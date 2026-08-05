@@ -52,7 +52,9 @@
  *   usage example:
  *       vector_bool mask = asc_create_mask_b8(PAT_VL1);
  */
-#define asc_create_mask_b8 pset_b8
+
+__simd_callee__ inline void asc_create_mask_b8(Pat pat_mode);
+
 #define asc_create_mask_b16 pset_b16
 #define asc_create_mask_b32 pset_b32
 
