@@ -25,14 +25,6 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
-__simd_callee__ inline void asc_create_mask_b8_impl(Pat pat_mode)
-{
-    if ASC_IS_AIV
-    {
-        dispatch_pat_mode(pat_mode);
-    }
-}
-
 __aicore__ inline void dispatch_pat_mode(Pat pat_mode)
 {
     if (pat_mode == PAT_ALL) {
@@ -66,6 +58,14 @@ __aicore__ inline void dispatch_pat_mode(Pat pat_mode)
     } else if(pat_mode == PAT_ALLF) {
         pset_b8(PAT_ALLF);
     } else {}
+}
+
+__simd_callee__ inline void asc_create_mask_b8_impl(Pat pat_mode)
+{
+    if ASC_IS_AIV
+    {
+        dispatch_pat_mode(pat_mode);
+    }
 }
 
 #endif
