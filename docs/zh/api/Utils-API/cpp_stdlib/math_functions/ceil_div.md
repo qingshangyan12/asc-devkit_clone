@@ -60,9 +60,10 @@ __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 ## 约束说明
 
 - T和U必须为整型，支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。
-- 对于有符号输入，调用方需确保a >= 0且b > 0。
+- 当b为0时，结果为0.
+- 对于有符号输入，调用方需确保a >= 0且b > 0；
 <!-- npu="950" id8 -->
-- 针对Ascend 950PR/Ascend 950DT，vector侧使用时该接口返回值为`uint16_t`类型（VF和非VF场景保持一致），调用方需确保向上取整结果在`uint16_t`可表示范围内；该约束源于VF Hardware Loop编码规范，更多规范内容可参考[Hardware Loop编码规范](../../../../guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化.md#section11326136133217)。
+- 针对Ascend 950PR/Ascend 950DT，vector侧使用时，该接口入参仅支持`uint32_t`类型，返回值仅支持`uint16_t`类型（VF和非VF场景保持一致），调用方需确保向上取整结果在`uint16_t`可表示范围内；该约束源于VF Hardware Loop编码规范，更多规范内容可参考[Hardware Loop编码规范](../../../../guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化.md#section11326136133217)。
 <!-- end id8 -->
 
 ## 调用示例
