@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include "alg_param.h"
+#include "cann_bridge_route.h"
 #include "hccl.h"
 
 namespace mc2_ops_hccl {
@@ -21,8 +22,7 @@ namespace mc2_ops_hccl {
 class InsCollAlgBase;
 struct AlgResourceCtxSerializable;
 
-// 判断该 op 是否需要走 CANN 桥接路径(选路/取执行器/资源准备)。
-// 条件: engine 为 AICPU/AICPU_TS 且 opType 为 ALLTOALL/ALLTOALLV/ALLREDUCE。
+// Determine whether selector, executor lookup and resource preparation use the CANN bridge.
 bool UseCannBridge(const OpParam& param);
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName);
