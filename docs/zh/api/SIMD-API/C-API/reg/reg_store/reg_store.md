@@ -12,6 +12,10 @@
 
 - **[asc_scatter](asc_scatter.md)**
 
+- **[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)**
+
+- **[asc_squeeze_and_storeunalign_finalize](asc_squeeze_and_storeunalign_finalize.md)**
+
 - **[asc_scatter](asc_scatter_deprecated.md)**
 
 - **[asc_store](asc_store.md)**
