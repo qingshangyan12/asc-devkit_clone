@@ -113,8 +113,6 @@
 | repeatParams | 输入 | 控制操作数地址步长的参数。[BinaryRepeatParams](../../aux_data_structures/BinaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD_compute/high_dim_split.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD_compute/high_dim_split.md)。 |
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD_compute/continuous_compute.md)。 |
 
-
-
 ### mask/mask[]参数说明
 
 <!-- npu="950" id11 -->
@@ -176,7 +174,7 @@
 <!-- end id22 -->
 
 <!-- npu="310p" id23 -->
-- 针对Atlas 推理系列产品AI Core
+- 针对Atlas 推理系列产品 AI Core
     - T支持的数据类型为：half、float。
     - U支持的数据类型为：int8_t、uint8_t。
 <!-- end id23 -->
@@ -226,12 +224,9 @@
 <!-- end id27 -->
 
 - 使用整个tensor参与计算的运算符重载功能，src0和src1需满足256字节对齐。
-<!-- npu="A3" id32 -->
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。未对齐部分元素不参与计算，仅完整对齐块有效。
+<!-- npu="A3,910b" id32 -->
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。未对齐部分元素不参与计算，仅完整对齐块有效。
 <!-- end id32 -->
-<!-- npu="910b" id33 -->
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。未对齐部分元素不参与计算，仅完整对齐块有效。
-<!-- end id33 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
