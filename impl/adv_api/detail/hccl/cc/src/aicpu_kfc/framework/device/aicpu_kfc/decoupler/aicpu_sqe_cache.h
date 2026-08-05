@@ -49,6 +49,8 @@ typedef struct {
 extern "C" {
 int32_t HcommAicpuSqeCacheReplay(const HcommAicpuSqeCacheParam *param, uint32_t *replayed);
 int32_t HcommAicpuSqeCacheBegin(const HcommAicpuSqeCacheParam *param);
+int32_t HcommAicpuSqeCacheBindThread(uint64_t thread);
+int32_t HcommAicpuSqeCacheFreezeAndUnbind(void);
 int32_t HcommAicpuSqeCacheCommit(void);
 void HcommAicpuSqeCacheAbort(void);
 }

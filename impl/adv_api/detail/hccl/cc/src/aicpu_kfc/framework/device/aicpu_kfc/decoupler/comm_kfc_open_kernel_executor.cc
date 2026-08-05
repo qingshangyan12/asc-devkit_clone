@@ -533,10 +533,25 @@ HcclResult RunWithAicpuSqeCache(const mc2_ops_hccl::OpParam& param,
     }
 
     const HcclResult beginRet = static_cast<HcclResult>(HcommAicpuSqeCacheBegin(&storage.param));
-    const bool captureStarted = beginRet == HCCL_SUCCESS;
+    bool captureStarted = beginRet == HCCL_SUCCESS;
     if (!captureStarted) {
         HCCL_WARNING("[AicpuSqeCache] capture begin failed, continue normal expansion, algName[%s], ret[%d]",
                      param.algName, beginRet);
+    } else {
+        for (const auto thread : resCtx.threads) {
+            const HcclResult bindRet = static_cast<HcclResult>(HcommAicpuSqeCacheBindThread(thread));
+            if (bindRet == HCCL_SUCCESS) {
+                continue;
+            }
+            HCCL_WARNING(
+                "[AICPU_SQE_CACHE_DIAG][Upper] path[miss] stage[bind] result[failed] algName[%s] "
+                "opType[%u] thread[%llu] ret[%d], continue without capture",
+                param.algName, static_cast<u32>(param.opType), static_cast<unsigned long long>(thread),
+                static_cast<int>(bindRet));
+            HcommAicpuSqeCacheAbort();
+            captureStarted = false;
+            break;
+        }
     }
     const HcclResult execRet = func();
     const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
@@ -552,6 +567,15 @@ HcclResult RunWithAicpuSqeCache(const mc2_ops_hccl::OpParam& param,
     }
     HcclResult commitRet = HCCL_SUCCESS;
     if (captureStarted) {
+        const HcclResult freezeRet = static_cast<HcclResult>(HcommAicpuSqeCacheFreezeAndUnbind());
+        if (freezeRet != HCCL_SUCCESS) {
+            HcommAicpuSqeCacheAbort();
+            HCCL_ERROR(
+                "[AICPU_SQE_CACHE_DIAG][Upper] path[miss_error] stage[freeze_and_unbind] algName[%s] "
+                "opType[%u] ret[%d]",
+                param.algName, static_cast<u32>(param.opType), static_cast<int>(freezeRet));
+            return freezeRet;
+        }
         commitRet = static_cast<HcclResult>(HcommAicpuSqeCacheCommit());
         if (commitRet != HCCL_SUCCESS) {
             HCCL_WARNING("[AicpuSqeCache] publish failed after successful launch, algName[%s], ret[%d]",
