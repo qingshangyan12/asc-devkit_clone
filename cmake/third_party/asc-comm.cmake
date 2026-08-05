@@ -53,3 +53,24 @@ install(DIRECTORY ${ASC_COMM_DETAIL_HEADER_DIR}/
     COMPONENT asc-devkit
     FILES_MATCHING PATTERN "*.h"
 )
+# hcomm 同时在 comm_api 下建立软链接，便于 comm_api 路径访问 hcomm 内容
+install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/comm_api)" COMPONENT asc-devkit)
+install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/detail)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../adv_api/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/comm_api/hcomm SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../../adv_api/detail/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/detail/hcomm SYMBOLIC)" COMPONENT asc-devkit)
+
+set(ASC_COMM_AIN_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicore/ain)
+set(ASC_COMM_AIN_DETAIL_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/src/aicore/ain/detail)
+if(NOT EXISTS ${ASC_COMM_AIN_PUBLIC_HEADER_DIR})
+    message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public ain headers: ${ASC_COMM_AIN_PUBLIC_HEADER_DIR}")
+endif()
+install(DIRECTORY ${ASC_COMM_AIN_PUBLIC_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/comm_api/ain
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
+install(DIRECTORY ${ASC_COMM_AIN_DETAIL_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/detail/ain
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
