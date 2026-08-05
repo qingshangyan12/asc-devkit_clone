@@ -218,6 +218,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_transpose_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_transto5hd_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_set_va_reg_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_create_mask_impl.h"
 
 // ==========asc_update_addr_reg(b8/b16/b32)=========
 #define ASC_DEFINE_UPDATE_ADDR_REG_API(bxx)                                                                         \
@@ -278,6 +279,11 @@ ASC_DEFINE_ITER_REG_DEPRECATED_API(b16)
 ASC_DEFINE_ITER_REG_DEPRECATED_API(b8)
 
 #undef ASC_DEFINE_ITER_REG_DEPRECATED_API
+
+__simd_callee__ inline void asc_create_mask_b8(Pat pat_mode)
+{
+    asc_create_mask_b8_impl(pat_mode);
+}
 
 // ==========asc_add(u8/s8/u16/s18/u32/s32)=========
 __simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
