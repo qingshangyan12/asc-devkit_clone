@@ -434,7 +434,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y)
     return remquof(x, y, &quo);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float copysignf(float x, float y) { return (y >= 0) ? fabsf(x) : -fabsf(x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float copysignf(float x, float y)
+{
+    uint32_t xBits = *reinterpret_cast<uint32_t*>(&x);
+    uint32_t yBits = *reinterpret_cast<uint32_t*>(&y);
+    xBits = (xBits & ~ASCRT_NEG_SIGN_BIT_U) | (yBits & ASCRT_NEG_SIGN_BIT_U);
+    return *reinterpret_cast<float*>(&xBits);
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nearbyintf(float x)
 {
@@ -448,6 +454,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nextafterf(float x, float y)
 {
     if (isnan(x) || isnan(y)) {
         return ASCRT_NAN_F;
+    }
+    if (x == y) {
+        return y;
     }
 
     uint32_t* f = reinterpret_cast<uint32_t*>(&x);
@@ -645,7 +654,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanf(float x)
     return z;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanhf(float x) { return 1.0f - (2.0f / (expf(2.0f * x) + 1.0f)); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanhf(float x)
+{
+    if (x == 0.0f) {
+        return x;
+    }
+    return 1.0f - (2.0f / (expf(2.0f * x) + 1.0f));
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanpif(float x) { return tanf(x * ASCRT_PI_F); }
 
@@ -781,7 +796,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
     return atanf(y / x) + d * ASCRT_PI_F;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanhf(float x) { return logf((1.0f + x) / (1.0f - x)) / 2.0f; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanhf(float x)
+{
+    if (x == 0.0f) {
+        return x;
+    }
+    return logf((1.0f + x) / (1.0f - x)) / 2.0f;
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cos_poly(float x)
 {
@@ -1065,7 +1086,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x) { return powf(2.0f, x
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x) { return powf(10.0f, x); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x) { return expf(x) - 1.0f; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x)
+{
+    if (x == 0.0f) {
+        return x;
+    }
+    return expf(x) - 1.0f;
+}
 
 #define __INTERNAL_FREXPF(x, exp)                        \
     do {                                                 \
@@ -1288,7 +1315,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, __gm__ float* a) { ret
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log10f(float x) { return logf(x) / logf(10.0f); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x) { return logf(1.0f + x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
+{
+    if (x == 0.0f) {
+        return x;
+    }
+    return logf(1.0f + x);
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logbf(float x)
 {
@@ -1385,13 +1418,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rcbrtf(float x)
 {
     if (x == 0.0f) {
-        return ASCRT_INF_F;
+        return 1.0f / x;
     }
     if (isnan(x)) {
         return x;
     }
     if (isinf(x)) {
-        return 0.0f;
+        return 1.0f / x;
     }
 
     // get the exponent part of x
@@ -2718,6 +2751,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float j0f(float x)
     if (isnan(x)) {
         return ASCRT_INF_F / ASCRT_INF_F;
     }
+    if (x == 0.0f) {
+        return 1.0f;
+    }
     float f1 = fabsf(x);
     if (f1 > 1e13f && isfinite(f1)) {
         return 0;
@@ -2733,6 +2769,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float j1f(float x)
 {
     if (isnan(x)) {
         return ASCRT_INF_F / ASCRT_INF_F;
+    }
+    if (x == 0.0f) {
+        return x;
     }
     float f1 = fabsf(x);
     if (f1 > 1e13f && isfinite(f1)) {
@@ -2759,7 +2798,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float jnf(int n, float x)
         return ASCRT_INF_F / ASCRT_INF_F;
     }
     if (x == 0) {
-        return 0;
+        return (n & 1) ? x : 0.0f;
     }
     if (isinf(x)) {
         return 0;
