@@ -101,7 +101,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz_sat_v2(vector_int32_t& dst, ve
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void bfloat162int32_vf(__ubuf__ int32_t* dst_addr, __ubuf__ bfloat16_t* src_addr, int32_t src_repeat_size, int32_t dst_block_size, uint16_t repeat_time)
+__simd_vf__ inline void bfloat162int32_vf(__ubuf__ int32_t* dst_addr, __ubuf__ bfloat16_t* src_addr, int32_t src_repeat_size, int32_t dst_repeat_size, uint16_t repeat_time)
 {
     vector_bfloat16_t src;
     vector_int32_t dst;
