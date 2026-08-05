@@ -132,8 +132,7 @@ __simd_callee__ inline void asc_duplicate_merge_impl(vector_fp8_e5m2_t& dst, vec
     }
 }
 
-__simd_callee__ inline void asc_duplicate_merge_impl(
-    vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_merge_impl(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vdup(dst, src, mask, POS_LOWEST, MODE_MERGING);
