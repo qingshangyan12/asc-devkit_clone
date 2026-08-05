@@ -70,13 +70,16 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_float& dst, float 
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void duplicate_scalar_merge_vf(__ubuf__ half* dst_addr, uint32_t count)
+__simd_vf__ inline void duplicate_scalar_merge_vf(__ubuf__ half* dst_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half dst;
-    vector_bool mask = asc_update_mask_b16(count);
+    vector_bool mask;
     half value = 1.0;
-    asc_loadalign(dst, dst_addr);
-    asc_duplicate_scalar_merge(dst, value, mask);
-    asc_storealign(dst_addr, dst, mask);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b16(count);
+        asc_loadalign(dst, dst_addr + i * one_repeat_size);
+        asc_duplicate_scalar_merge(dst, value, mask);
+        asc_storealign(dst_addr + i * one_repeat_size, dst, mask);
+    }
 }
 ```
