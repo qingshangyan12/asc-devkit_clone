@@ -157,6 +157,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | src0RepeatStride | 用于设置src0相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD_compute/high_dim_split.md)。 |
 | src1RepeatStride | 用于设置src1相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD_compute/high_dim_split.md)。 |
 
+
 ## 数据类型
 
 <!-- npu="950" id20 -->
@@ -251,13 +252,19 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 - 采用内置固定模式时，配置src1RepeatStride参数无效。
 
+<!-- npu="310p" id25 -->
+- 对参数 src1RepeatStride 的说明。针对 Atlas 推理系列产品 AI Core，在用户自定义模式下，Normal 模式和 Counter 模式中参数 src1RepeatStride 行为不同：
+<br>&bull; Normal模式：src1RepeatStride 仅区分0和非0：配置为0时，每个迭代复用同一段 gather mask。配置为非0时，表明多次迭代读取的 gather mask 为连续存储，相邻迭代之间的 gather mask 首地址间隔为 32 / sizeof(T) 字节；例如，T 为16位数据类型时该间隔为16字节，T 为32位数据类型时该间隔为8字节。
+<br>&bull; Counter模式：src1RepeatStride 参数失效，多次迭代读取的 gather mask 始终为连续存储。
+<!-- end id25 -->
+
 - 若调用该接口前为Counter模式，在调用该接口后需要显式设置回Counter模式（接口内部执行结束后会设置为Normal模式）。
 
-<!-- npu="950" id25 -->
+<!-- npu="950" id26 -->
 - 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
   - 内置固定模式占用8KB Unified Buffer临时空间。
   - 用户自定义模式不涉及8KB Unified Buffer临时空间的占用。
-<!-- end id25 -->
+<!-- end id26 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
