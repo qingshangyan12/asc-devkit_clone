@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <gtest/gtest.h>
+#include <cmath>
 #include <type_traits>
-// #include <cmath>
 #include "simt_compiler_stub.h"
 #include "kernel_operator.h"
 #include "simt_api/asc_bf16.h"
@@ -162,6 +162,30 @@ TEST_F(FloatComputeTestsuite1, MathIntegerTest)
     y_f = 0.0f;
     res_after = copysignf(x_f, y_f);
     EXPECT_EQ(res_after, 1.0f);
+}
+
+TEST_F(FloatComputeTestsuite1, CApiMathBoundaryBehavior)
+{
+    EXPECT_FALSE(std::signbit(copysignf(1.0f, 0.0f)));
+    EXPECT_TRUE(std::signbit(copysignf(1.0f, -0.0f)));
+
+    EXPECT_FALSE(std::signbit(nextafterf(-0.0f, 0.0f)));
+    EXPECT_TRUE(std::signbit(nextafterf(0.0f, -0.0f)));
+    EXPECT_TRUE(std::signbit(tanhf(-0.0f)));
+    EXPECT_TRUE(std::signbit(atanhf(-0.0f)));
+    EXPECT_TRUE(std::signbit(expm1f(-0.0f)));
+    EXPECT_TRUE(std::signbit(log1pf(-0.0f)));
+    EXPECT_TRUE(std::isinf(rcbrtf(-0.0f)));
+    EXPECT_TRUE(std::signbit(rcbrtf(-0.0f)));
+    EXPECT_EQ(rcbrtf(-INFINITY), -0.0f);
+    EXPECT_TRUE(std::signbit(rcbrtf(-INFINITY)));
+
+    EXPECT_EQ(j0f(-0.0f), 1.0f);
+    EXPECT_EQ(j0f(INFINITY), 0.0f);
+    EXPECT_TRUE(std::signbit(j1f(-0.0f)));
+    EXPECT_TRUE(std::signbit(j1f(-INFINITY)));
+    EXPECT_TRUE(std::signbit(jnf(3, -0.0f)));
+    EXPECT_TRUE(std::signbit(jnf(3, -INFINITY)));
 }
 
 void VerifyFloatNumberMath(float x, float xExpected, float epsilon = 1e-5)
