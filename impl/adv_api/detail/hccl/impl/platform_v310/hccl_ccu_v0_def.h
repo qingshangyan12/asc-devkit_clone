@@ -156,7 +156,7 @@ private:
 
     bool msgQueueIsAvailable_[CCU_MAX_MSG_NUM];
     uint64_t xnData_[CCU_USED_XN_NUM];
-    int commitCntTemp_ = 0;
+    // int commitCntTemp_ = 0;
 };
 } // namespace AscendC
 

@@ -399,8 +399,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
     }
 
-    KERNEL_LOG(
-        KERNEL_INFO,
+    AscendC::PRINTF(
         "ApiClient CcuSendMsg ccuMsg_.xnAddr, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: "
         "0x%llx, Id6: 0x%llx, Id7: 0x%llx, Id8: 0x%llx, Id9: 0x%llx, Id10: 0x%llx, Id11: 0x%llx, Id12: 0x%llx, Id13: "
         "0x%llx, Id14: 0x%llx",
@@ -523,30 +522,30 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     }
 #endif
 
-    if (workingFlag_) {
-        // 隔100次打印一次日志
-        if (commitCntTemp_ % 100 == 0) {
-            for (int i = 0; i < 64; i++) {
-                AscendC::PRINTF("ApiClient Wait Msg[%d] start print ", i);
-                for (int j = 0; j < 64; j++){
-                        AscendC::PRINTF(
-                        "ApiClient Wait XnInfo, Id[%d]: 0x%llx",
-                        j, *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->xnOffset + j*8 + i*64*8));
-                }
-                AscendC::PRINTF(
-                        "ApiClient Wait msg[%d] commitcke is 0x%llx, waitcke is 0x%llx",
-                        i, *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->ckeOffset + i*8),  *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->ckeOffset + i*8 + 64*8));
-                AscendC::PRINTF("ApiClient Wait Msg[%d] end print ", i);
-            }
-        }
-    }
+    // if (workingFlag_) {
+    //     // 隔100次打印一次日志
+    //     if (commitCntTemp_ % 100 == 0) {
+    //         for (int i = 0; i < 64; i++) {
+    //             AscendC::PRINTF("ApiClient Wait Msg[%d] start print ", i);
+    //             for (int j = 0; j < 64; j++){
+    //                     AscendC::PRINTF(
+    //                     "ApiClient Wait XnInfo, Id[%d]: 0x%llx",
+    //                     j, *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->xnOffset + j*8 + i*64*8));
+    //             }
+    //             AscendC::PRINTF(
+    //                     "ApiClient Wait msg[%d] commitcke is 0x%llx, waitcke is 0x%llx",
+    //                     i, *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->ckeOffset + i*8),  *reinterpret_cast<__gm__ uint64_t*>(hcclContext_->ckeOffset + i*8 + 64*8));
+    //             AscendC::PRINTF("ApiClient Wait Msg[%d] end print ", i);
+    //         }
+    //     }
+    // }
 
     msgQueueIsAvailable_[reqId] = true;
     handleFinishCnt_[handleId]++;
     finishNum_++;
     globalCurWaitId_++;
     globalCurWaitId_ %= CCU_MAX_MSG_NUM;
-    commitCntTemp_++;
+    // commitCntTemp_++;
 
     // 补发消息
     // 场景1:同一个handleId需要补发
