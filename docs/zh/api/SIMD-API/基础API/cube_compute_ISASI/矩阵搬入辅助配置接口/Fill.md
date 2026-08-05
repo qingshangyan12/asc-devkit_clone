@@ -23,12 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030：支持
-<!-- end id9 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -87,26 +81,6 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 <!-- npu="A3" id13 -->Atlas A3训练系列产品/Atlas A3推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。<!-- end id13 --><br>
 <!-- npu="310b" id14 -->Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。<!-- end id14 --><br>
 <!-- npu="950" id15 -->Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。<!-- end id15 --><br>
-<!-- npu="x90" id16 -->Kirin X90，支持的数据类型为：int8_t、half。<!-- end id16 --><br>
-<!-- npu="9030" id17 -->Kirin 9030，支持的数据类型为：half。<!-- end id17 -->
-
-## 返回值说明
-
-无
-
-## 约束说明<a name="section633mcpsimp"></a>
-
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 当目的操作数位于L0A Buffer/L0B Buffer时，指令执行占用的流水为PIPE\_MTE1，目的操作数地址需要512Byte对齐。当目的操作数位于L1 Buffer时，指令执行占用的流水为PIPE\_MTE2，目的地址需要32Byte对齐。
-- 当repeatTimes为0或者blockNum为0时，指令不会进行任何操作。
-- 不同的型号在设置InitConstValueParams参数时，支持配置参数的不同。
-    - 仅支持配置迭代次数和初始化值场景下，其他参数配置无效。每次迭代处理固定数据量（512字节），迭代间无间隔。
-    - 支持配置所有参数场景下，支持配置迭代次数、初始化值、每个迭代处理的数据块个数和迭代间间隔。
-    - 特别地，针对如下型号，仅支持配置迭代次数和初始化值。
-        
-        <!-- npu="910" id18 -->
-        - Atlas 训练系列产品。
-        <!-- end id18 -->
         <!-- npu="310p" id19 -->
         - Atlas 推理系列产品AI Core。
         <!-- end id19 -->
