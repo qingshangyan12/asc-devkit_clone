@@ -46,6 +46,7 @@ inline float tanhf(float x)
 
 输入数据的双曲正切值。
 
+-   当x为+0或-0时，分别返回+0或-0。
 -   当x为inf时，返回值为1.0。
 -   当x为-inf时，返回值为-1.0。
 -   当x为nan时，返回值为nan。

@@ -46,9 +46,10 @@ inline float atanhf(float x)
 
 输入数据的反双曲正切值。
 
--   当x为inf时，返回值为nan。
--   当x为-inf时，返回值为nan。
 -   当x为nan时，返回值为nan。
+-   当x为+0或-0时，分别返回+0或-0。
+-   当x为+1或-1时，分别返回inf或-inf。
+-   当x大于1或小于-1时，返回值为nan。
 
 ## 约束说明
 

@@ -46,10 +46,9 @@ inline float rcbrtf(float x)
 
 x的立方根的倒数。
 
--   当x为0时，返回值为inf。
 -   当x为nan时，返回值为nan。
--   当x为inf时，返回值为0。
--   当x为-inf时，返回值为0。
+-   当x为+0或-0时，分别返回inf或-inf。
+-   当x为inf或-inf时，分别返回+0或-0。
 
 ## 约束说明
 
