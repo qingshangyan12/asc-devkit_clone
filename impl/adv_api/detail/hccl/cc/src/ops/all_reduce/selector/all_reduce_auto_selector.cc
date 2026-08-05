@@ -12,8 +12,6 @@
 
 namespace mc2_ops_hccl {
 
-constexpr u64 AR_AICPU_1D_SMALL_DATA_SIZE = 8 * 1024 * 1024;
-
 SelectorStatus AllReduceAutoSelector::SelectKfcMesh1D(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
 {
@@ -53,21 +51,11 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
+    (void)topoInfo;
+    (void)opParam;
     (void)configAlgMap;
-    if (topoInfo->topoLevelNums != 1 || topoInfo->level0Topo != Level0Shape::MESH_1D) {
-        return SelectorStatus::NOT_MATCH;
-    }
-
-    const u64 dataSize = opParam.DataDes.count * DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
-    const bool specialType = Is64BitDataType(opParam.DataDes.dataType) ||
-        opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
-
-    if ((specialType && dataSize <= AR_AICPU_1D_SMALL_DATA_SIZE) ||
-        (!specialType && dataSize <= AR_AICPU_1D_SMALL_DATA_SIZE)) {
-        selectAlgName = "InsAllReduceMesh1DOneShot";
-        return SelectorStatus::MATCH;
-    }
-    return SelectorStatus::NOT_MATCH;
+    selectAlgName = "InsAllReduceMesh1DOneShot";
+    return SelectorStatus::MATCH;
 }
 
 REGISTER_SELECTOR_BY_OPTYPE(HcclCMDType::HCCL_CMD_ALLREDUCE, 18, AllReduceAutoSelector);
