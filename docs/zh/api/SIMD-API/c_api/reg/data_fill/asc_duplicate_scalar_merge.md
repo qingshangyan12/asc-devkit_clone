@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的位置保持原值。
+merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
 
 头文件路径为：`c_api/reg_compute/reg_vector.h`。
 
@@ -53,7 +53,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_float& dst, float 
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输入/输出 | 目的操作数（矢量数据寄存器）。mask未筛选的位置保持dst原值。 |
+| dst | 输入/输出 | 目的操作数（矢量数据寄存器）。merge模式下，未被mask筛选的元素保留原值。 |
 | value | 输入 | 源操作数（标量）。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
 
