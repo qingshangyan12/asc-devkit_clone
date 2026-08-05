@@ -13,10 +13,7 @@
 
 namespace mc2_ops_hccl {
 
-void CompatSymInit(void)
-{
-    HcommDlInit();
-}
+void CompatSymInit(void) { HcommDlInit(); }
 
 __attribute__((constructor)) void InitCompat()
 {

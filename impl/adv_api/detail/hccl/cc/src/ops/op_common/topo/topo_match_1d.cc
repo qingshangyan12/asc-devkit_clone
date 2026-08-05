@@ -36,12 +36,15 @@ HcclResult TopoMatch1D::MatchTopo(
         (topoInfo->userRankSize == 0),
         HCCL_ERROR("[CollAlgFactory] [TopoMatchMesh1D] Rank [%d], rankSize is 0.", myRank_), HcclResult::HCCL_E_PARA);
 
-    for (const auto &netLayerIdx : topoInfo->netLayerDetails.netLayers) {
+    for (const auto& netLayerIdx : topoInfo->netLayerDetails.netLayers) {
         CommTopo topoType;
         HcclRankGraphGetTopoTypeByLayer(comm, netLayerIdx, &topoType);
-        CHK_PRT_RET((topoType != COMM_TOPO_CUSTOM && topoType != CommTopo::COMM_TOPO_CLOS),
-                HCCL_ERROR("[CollAlgFactory] [TopoMatchMesh1D] netLayer [%d], topoType not COMM_TOPO_CUSTOM or COMM_TOPO_CLOS.", netLayerIdx),
-                HcclResult::HCCL_E_PARA);
+        CHK_PRT_RET(
+            (topoType != COMM_TOPO_CUSTOM && topoType != CommTopo::COMM_TOPO_CLOS),
+            HCCL_ERROR(
+                "[CollAlgFactory] [TopoMatchMesh1D] netLayer [%d], topoType not COMM_TOPO_CUSTOM or COMM_TOPO_CLOS.",
+                netLayerIdx),
+            HcclResult::HCCL_E_PARA);
     }
 
     for (uint32_t rankId = 0; rankId < topoInfo->userRankSize; rankId++) {

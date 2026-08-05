@@ -12,13 +12,13 @@
 #define HCCL_HOST_COMM_DL_H
 
 #include "dlsym_common.h"
-#include "hccl_comm.h"   // 原始头文件，包含所有类型和声明
+#include "hccl_comm.h" // 原始头文件，包含所有类型和声明
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    void HcclCommDlInit(void* libHcommHandle);
+void HcclCommDlInit(void* libHcommHandle);
 
 #ifdef __cplusplus
 }

@@ -17,11 +17,12 @@ namespace mc2_ops_hccl {
 
 class KfcServerAutoSelector : public AutoSelectorBase {
 private:
-    SelectorStatus SelectCcuScheduleAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
-                                 const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
-                                 std::string &selectAlgName) const override;
+    SelectorStatus SelectCcuScheduleAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+        const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
+        std::string& selectAlgName) const override;
 };
 
-}
+} // namespace mc2_ops_hccl
 
 #endif

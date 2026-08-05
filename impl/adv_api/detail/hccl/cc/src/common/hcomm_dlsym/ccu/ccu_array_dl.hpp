@@ -30,21 +30,25 @@ namespace ccu {
 
 // 主模板未实现：未特化的资源类型实例化 Array<T> 时编译失败，
 // 当前期次仅 Variable / Event / Buffer 提供底层 CcuBlock*Alloc C 接口。
-template <typename T> struct CcuArrayTraits;
+template <typename T>
+struct CcuArrayTraits;
 
-template <> struct CcuArrayTraits<Variable> {
+template <>
+struct CcuArrayTraits<Variable> {
     using Handle = CcuVariableHandle;
     static CcuResult BlockAlloc(Handle* h, uint32_t n) { return CcuBlockVariableAlloc(h, n); }
     static void SetHandle(Variable& v, Handle h) { v.handle = h; }
 };
 
-template <> struct CcuArrayTraits<Event> {
+template <>
+struct CcuArrayTraits<Event> {
     using Handle = CcuEventHandle;
     static CcuResult BlockAlloc(Handle* h, uint32_t n) { return CcuBlockEventAlloc(h, n); }
     static void SetHandle(Event& e, Handle h) { e.handle = h; }
 };
 
-template <> struct CcuArrayTraits<CcuBuffer> {
+template <>
+struct CcuArrayTraits<CcuBuffer> {
     using Handle = CcuBufferHandle;
     static CcuResult BlockAlloc(Handle* h, uint32_t n) { return CcuBlockBufferAlloc(h, n); }
     static void SetHandle(CcuBuffer& b, Handle h) { b.handle = h; }
@@ -55,7 +59,8 @@ template <> struct CcuArrayTraits<CcuBuffer> {
 template <typename T>
 class Array final {
 public:
-    explicit Array(uint32_t count) : count_(count) {
+    explicit Array(uint32_t count) : count_(count)
+    {
         if (count == 0) {
             return;
         }
@@ -80,7 +85,8 @@ public:
         }
     }
 
-    ~Array() {
+    ~Array()
+    {
         if (elems_ == nullptr) {
             return;
         }
@@ -93,12 +99,14 @@ public:
     Array(const Array&) = delete;
     Array& operator=(const Array&) = delete;
 
-    Array(Array&& other) noexcept : elems_(other.elems_), count_(other.count_) {
+    Array(Array&& other) noexcept : elems_(other.elems_), count_(other.count_)
+    {
         other.elems_ = nullptr;
         other.count_ = 0;
     }
 
-    Array& operator=(Array&& other) noexcept {
+    Array& operator=(Array&& other) noexcept
+    {
         if (this != &other) {
             this->~Array();
             elems_ = other.elems_;

@@ -75,18 +75,18 @@ Mc2CcTilingInner BuildAllToAllVTiling(
 struct Mc2TilingTestData {
     uint32_t version;
     uint32_t cnt;
-    uint32_t offset[MAX_OP_NUM];
+    uint32_t offset[MAX_CC_TILING_NUM];
     Mc2ServerCfg serverCfg;
-    Mc2CcTilingInner ccTiling[MAX_OP_NUM];
+    Mc2CcTilingInner ccTiling[MAX_CC_TILING_NUM];
 };
 
 Mc2TilingTestData BuildMc2Tiling(const std::vector<Mc2CcTilingInner>& tilings)
 {
     Mc2TilingTestData result{};
-    result.version = MC2_TILING_VERSION;
+    result.version = INIT_TILING_CCU_NEW_VERSION;
     result.cnt = tilings.size();
     const uint32_t baseOffset = offsetof(Mc2TilingTestData, ccTiling);
-    for (uint32_t i = 0; i < MAX_OP_NUM; ++i) {
+    for (uint32_t i = 0; i < MAX_CC_TILING_NUM; ++i) {
         result.offset[i] = baseOffset + i * sizeof(Mc2CcTilingInner);
     }
     for (uint32_t i = 0; i < tilings.size(); ++i) {

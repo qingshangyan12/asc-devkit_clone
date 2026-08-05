@@ -130,9 +130,8 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitInner(
     GM_ADDR context, HcclTilingVersion version)
 {
-    ASCENDC_HCCL_API_ASSERT(
-        context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
-    // CCU KFC 支持的集合通信原语走共享队列，并在此启用 CCU 调度。
+    ASCENDC_HCCL_API_ASSERT(context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
+    // 只有 alltoall 且 ccu的会走到这里，并设为true
     if (newCcuFlag_) {
         hcclNewContext_ = (__gm__ HcclApi::OpResCtx*)context;
     } else {
@@ -184,8 +183,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx/n",
         newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId,
-        newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum,
-        xnAddr, ckeAddr, reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt));
+        newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum, xnAddr, ckeAddr,
+        reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt));
 }
 
 template <const auto& config>
@@ -205,7 +204,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         (initTiling != nullptr ? HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION :
                                  HcclTilingVersion::DEPRECATED_TILING_VERSION);
     if (initTiling != nullptr) {
-        const Mc2InitTilingInner *tilingInner = static_cast<const Mc2InitTilingInner *>(initTiling);
+        const Mc2InitTilingInner* tilingInner = static_cast<const Mc2InitTilingInner*>(initTiling);
         if (tilingInner->version == INIT_TILING_CCU_NEW_VERSION) {
             newCcuFlag_ = true;
         }
@@ -321,9 +320,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
 
     ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
     ccuParam_.rankId = newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId;
-    if (!newCcuFlag_) {
-        ccuParam_.scratchAddr = hcclContext_->windowsOut[0];
-    }
+    ccuParam_.scratchAddr = newCcuFlag_ ? hcclNewContext_->res[0] : hcclContext_->windowsOut[0];
 }
 
 template <const auto& config>

@@ -90,16 +90,14 @@ struct HcclDfxOpInfo {
 namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
-constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0;// host主流wait aicpu流的notify idx
+constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0; // host主流wait aicpu流的notify idx
 
 static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
 {
     if (bufferAddr != nullptr) {
-        uint64_t token = hcomm::CcuRep::GetTokenInfo(
-            reinterpret_cast<uint64_t>(bufferAddr),
-            bufferSize);
-        HCCL_INFO("[GetTokenFromBuffInfo] Get token from buffer[%p], size[%llu], token[%llu]",
-            bufferAddr, bufferSize, token);
+        uint64_t token = hcomm::CcuRep::GetTokenInfo(reinterpret_cast<uint64_t>(bufferAddr), bufferSize);
+        HCCL_INFO(
+            "[GetTokenFromBuffInfo] Get token from buffer[%p], size[%llu], token[%llu]", bufferAddr, bufferSize, token);
         return token;
     }
 
@@ -107,15 +105,15 @@ static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
     return 0;
 }
 
-static HcclResult UpdateCcuCtxTokenOnReuse(HcclComm comm, void *ctx, uint64_t ctxSize,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
+static HcclResult UpdateCcuCtxTokenOnReuse(
+    HcclComm comm, void* ctx, uint64_t ctxSize, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
     if (ctxSize == 0) {
         return HCCL_SUCCESS;
     }
 
     // 从旧 ctx 反序列化获取完整数据
-    auto *ctxRaw = static_cast<char *>(ctx);
+    auto* ctxRaw = static_cast<char*>(ctx);
     std::vector<char> seq(ctxRaw, ctxRaw + ctxSize);
     AlgResourceCtxSerializable tempCtx;
     tempCtx.DeSerialize(seq);
@@ -125,12 +123,12 @@ static HcclResult UpdateCcuCtxTokenOnReuse(HcclComm comm, void *ctx, uint64_t ct
     tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
 
     // 从 cclBuffer 获取 token 并更新第6个字段（而非 push_back，保证序列化大小一致）
-    void *cclBufferAddr = nullptr;
+    void* cclBufferAddr = nullptr;
     uint64_t cclBufferSize = 0;
     if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS) {
         uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
         if (tempCtx.kfcServerArgs.size() >= 6U) {
-            tempCtx.kfcServerArgs[5] = token;  // 更新占位符为真实 token
+            tempCtx.kfcServerArgs[5] = token; // 更新占位符为真实 token
             HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated at kfcServerArgs[5]", token);
         }
 
@@ -426,7 +424,8 @@ HcclResult HcclExecOp(
     hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = HOST_WAIT_AICPU_NOTIFYIDX;
     s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
     CHK_PRT_RET(
-        sRet != EOK, HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", __func__, param.algTag, sRet),
+        sRet != EOK,
+        HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", "HcclGetCcuKernel", param.algTag, sRet),
         HCCL_E_MEMORY);
     HcclDfxOpInfo* tempOp = &hcclDfxOpInfo;
 
@@ -789,19 +788,21 @@ HcclResult HcclGetAlgRes(
 
     // kfc算法kernel资源准备 - 仅当isKfc为true时执行
     if (param.isKfc && param.engine == COMM_ENGINE_CCU) {
-        HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] preparing KFC Server kernel for opType[%d], algTag[%s], "
+        HCCL_INFO(
+            "[asc][AlgoResource][HcclGetAlgRes] preparing KFC Server kernel for opType[%d], algTag[%s], "
             "ccuKernelInfos.size()[%zu] before CcuKfcServer CalcRes",
             param.opType, param.algTag, resRequest.ccuKernelInfos.size());
-        std::unique_ptr<InsCollAlgBase> ccuKfcExecutor = CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
+        std::unique_ptr<InsCollAlgBase> ccuKfcExecutor =
+            CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
         HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] generated ccuKfcExecutor!");
         CHK_PRT_RET(
             ccuKfcExecutor.get() == nullptr, HCCL_ERROR("Fail to find ccuKfcExecutor for CcuKfcServer"), HCCL_E_PARA);
         CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest));
-        HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] after CcuKfcServer CalcRes, "
+        HCCL_INFO(
+            "[asc][AlgoResource][HcclGetAlgRes] after CcuKfcServer CalcRes, "
             "ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]",
             resRequest.ccuKernelInfos.size(), resRequest.ccuKernelNum.size());
     }
-
 
     // host侧资源
     if (param.engine == COMM_ENGINE_RESERVED) {
@@ -1023,7 +1024,6 @@ HcclResult HcclGetThread(
     }
 
     if (UNLIKELY(HcclCheckLogLevel(DLOG_DEBUG))) {
-        HCCL_DEBUG("[HcclGetThread] slaveThreadNum[%u]", resRequest.slaveThreadNum);
         for (u32 i = 0; i < resRequest.slaveThreadNum + 1; i++) {
             HCCL_DEBUG("[HcclGetThread] threads[%u]=[%llu]", i, resCtxHost->threads[i]);
         }
@@ -1284,13 +1284,21 @@ HcclResult GetAlgResCcu(
     std::vector<char> seq = resCtxHost->Serialize();
     uint64_t size = seq.size();
 
-    void *ctx = nullptr;
-    CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AIV, size, &ctx));
-    HCCL_INFO("[GetAlgResCCU]HcclEngineCtxCreate successfully!");
-    aclError aclRet = aclrtMemcpy(ctx, size, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
+    void* ctx = nullptr;
+    uint64_t actualSize = size;
+    if (HcclEngineCtxGet(comm, param.algTag, COMM_ENGINE_AIV, &ctx, &actualSize) == HCCL_SUCCESS) {
+        HCCL_INFO(
+            "[GetAlgResCcu]HcclEngineCtxGet success, algTag[%s], ctxAddr[%p], ctxSize[%llu].", param.algTag, ctx,
+            static_cast<unsigned long long>(actualSize));
+    } else {
+        CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AIV, size, &ctx));
+        HCCL_INFO("[GetAlgResCcu]HcclEngineCtxCreate successfully!");
+    }
+    aclError aclRet = aclrtMemcpy(ctx, actualSize, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
     if (aclRet != ACL_SUCCESS) {
-        HCCL_ERROR("[GetAlgResCcu] aclrtMemcpy H2D failed, ret[%d], dst[%p], src[%p], size[%llu].",
-            aclRet, ctx, seq.data(), size);
+        HCCL_ERROR(
+            "[GetAlgResCcu] aclrtMemcpy H2D failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet, ctx, seq.data(),
+            size);
         return HCCL_E_RUNTIME;
     }
     *resCtxSequence = ctx;
@@ -1323,10 +1331,11 @@ HcclResult HcclAllocAlgResourceCcu(
     // 在确保 cclMem 可用的前提下，获取 token 并更新 kfcServerArgs 的第6个字段（占位符）
     uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
     if (resCtxHost->kfcServerArgs.size() >= 6U) {
-        resCtxHost->kfcServerArgs[5] = token;  // 更新占位符为真实 token
+        resCtxHost->kfcServerArgs[5] = token; // 更新占位符为真实 token
         HCCL_INFO("[HcclAllocAlgResourceCcu] token[%llu] updated at kfcServerArgs[5]", token);
     } else {
-        HCCL_WARNING("[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < 6, cannot update token",
+        HCCL_WARNING(
+            "[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < 6, cannot update token",
             resCtxHost->kfcServerArgs.size());
     }
 
@@ -1352,8 +1361,8 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
 
         if (channelNum > 0) {
             // 需要资源回退。返回资源不够
-            auto ret = HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(),
-                channelNum, kernelChannels.data());
+            auto ret =
+                HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(), channelNum, kernelChannels.data());
             if (ret == HCCL_E_UNAVAIL) {
                 HCCL_WARNING("[HcclChannelAcquire] channel unavailable, channel num[%u].", channelNum);
                 return HCCL_E_UNAVAIL;
@@ -1375,8 +1384,128 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
     return HCCL_SUCCESS;
 }
 
+#if MC2_CLIENT_ENABLE_CCU
+namespace {
+HcclResult QueryCcuInsHandle(HcclComm comm, CcuInsHandle& insHandle)
+{
+    uint32_t insNum = 0;
+    CHK_RET(HcclCommQueryCcuIns(comm, &insHandle, &insNum));
+    HCCL_INFO("[HcclGetCcuKernel] HcclCommQueryCcuIns returned insNum[%u]", insNum);
+    CHK_PRT_RET(
+        insNum != 1, HCCL_ERROR("[HcclGetCcuKernel] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
+        HCCL_E_INTERNAL);
+    return HCCL_SUCCESS;
+}
+
+HcclResult ValidateCcuKernelRequest(const AlgResourceRequest& resRequest, u32& totalKernelNum)
+{
+    totalKernelNum = 0;
+    for (auto kernelNum : resRequest.ccuKernelNum) {
+        totalKernelNum += kernelNum;
+    }
+    HCCL_INFO(
+        "[HcclGetCcuKernel] totalKernelNum[%u], ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]", totalKernelNum,
+        resRequest.ccuKernelInfos.size(), resRequest.ccuKernelNum.size());
+    CHK_PRT_RET(
+        totalKernelNum != resRequest.ccuKernelInfos.size(), HCCL_ERROR("[HcclGetCcuKernel]ccuKernel num not match!"),
+        HCCL_E_INTERNAL);
+    CHK_PRT_RET(
+        resRequest.ccuKernelInfos.empty(), HCCL_ERROR("[HcclGetCcuKernel] no kernel to register!"), HCCL_E_INTERNAL);
+    return HCCL_SUCCESS;
+}
+
+HcclResult RegisterCcuDfxOpInfo(HcclComm comm, const OpParam& param)
+{
+    HcclDfxOpInfo hcclDfxOpInfo{};
+    hcclDfxOpInfo.opMode = static_cast<u32>(param.opMode);
+    hcclDfxOpInfo.opType = static_cast<u32>(param.opType);
+    hcclDfxOpInfo.reduceOp = static_cast<u32>(param.reduceType);
+    hcclDfxOpInfo.dataType = GetHcclDfxOpInfoDataType(param);
+
+    u32 userRankSize{0};
+    CHK_RET(HcclGetRankSize(comm, &userRankSize));
+    hcclDfxOpInfo.root = param.root;
+    hcclDfxOpInfo.engine = param.engine;
+    s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
+    CHK_PRT_RET(
+        sRet != EOK, HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", __func__, param.algTag, sRet),
+        HCCL_E_MEMORY);
+
+    CHK_RET(HcclDfxRegOpInfoByCommId(const_cast<char*>(param.commName), static_cast<void*>(&hcclDfxOpInfo)));
+    HCCL_INFO("[HcclGetCcuKernel] RegisterCcuDfxOpInfo success.");
+    return HCCL_SUCCESS;
+}
+
+HcclResult RegisterSingleCcuKernel(
+    CcuInsHandle insHandle, u32 kernelIndex, CcuKernelInfo& kernelInfo, AlgResourceCtxSerializable& resCtxHost)
+{
+    HCCL_INFO("[HcclGetCcuKernel] registering kernel[%u]: kernelFuncName[%s]", kernelIndex, kernelInfo.kernelFuncName);
+    constexpr uint32_t dieId = 0U;
+    const void* kernelArgs[] = {kernelInfo.kernelArg};
+    constexpr uint32_t kernelArgNum = 1U;
+    CcuKernelHandle kernelHandle;
+    CcuResult regRet = HcommCcuKernelRegister(
+        insHandle, dieId, kernelInfo.kernelFuncName, reinterpret_cast<void*>(kernelInfo.kernelFunc), kernelArgs,
+        kernelArgNum, &kernelHandle);
+    if (regRet != CCU_SUCCESS) {
+        HCCL_ERROR(
+            "ccu kernel register failed for kernel[%u][%s]: ccuRet -> %d", kernelIndex, kernelInfo.kernelFuncName,
+            regRet);
+        return ConvertCcuToHccl(regRet);
+    }
+    resCtxHost.ccuKernels[kernelIndex] = kernelHandle;
+    HCCL_INFO(
+        "[HcclGetCcuKernel] kernel[%u][%s] registered successfully, handle[%llu]", kernelIndex,
+        kernelInfo.kernelFuncName, kernelHandle);
+    return HCCL_SUCCESS;
+}
+
+HcclResult RegisterCcuKernelGroup(
+    CcuInsHandle insHandle, u32 currentResGroup, u32 totalKernelNum, AlgResourceRequest& resRequest,
+    AlgResourceCtxSerializable& resCtxHost, u32& maxResGroup)
+{
+    CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
+    if (regStartRet != CCU_SUCCESS) {
+        HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet);
+        return ConvertCcuToHccl(regStartRet);
+    }
+    for (u32 i = 0; i < totalKernelNum; ++i) {
+        CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[i];
+        if (kernelInfo.resGroup > maxResGroup) {
+            maxResGroup = kernelInfo.resGroup;
+        }
+        if (kernelInfo.resGroup == currentResGroup) {
+            CHK_RET(RegisterSingleCcuKernel(insHandle, i, kernelInfo, resCtxHost));
+        }
+    }
+    CcuResult regEndRet = HcommCcuKernelRegisterEnd(insHandle);
+    HCCL_INFO("[HcclGetCcuKernel] HcommCcuKernelRegisterEnd finished!");
+    if (regEndRet != CCU_SUCCESS) {
+        HCCL_ERROR("ccu kernel register end failed: ccuRet -> %d", regEndRet);
+        return ConvertCcuToHccl(regEndRet);
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult RegisterCcuKernels(
+    CcuInsHandle insHandle, u32 totalKernelNum, AlgResourceRequest& resRequest, AlgResourceCtxSerializable& resCtxHost)
+{
+    u32 currentResGroup = 0;
+    u32 maxResGroup = 0;
+    resCtxHost.ccuKernels.resize(totalKernelNum);
+    while (currentResGroup <= maxResGroup) {
+        CHK_RET(
+            RegisterCcuKernelGroup(insHandle, currentResGroup, totalKernelNum, resRequest, resCtxHost, maxResGroup));
+        ++currentResGroup;
+    }
+    return HCCL_SUCCESS;
+}
+} // namespace
+#endif
+
 HcclResult HcclGetCcuKernel(
-    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
+    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
 #if !MC2_CLIENT_ENABLE_CCU
     (void)comm;
@@ -1387,92 +1516,13 @@ HcclResult HcclGetCcuKernel(
     return HCCL_E_NOT_SUPPORT;
 #else
     CcuInsHandle insHandle{0};
-    uint32_t insNum = 0;
-    CHK_RET(HcclCommQueryCcuIns(comm, &insHandle, &insNum));
-    HCCL_INFO("[HcclGetCcuKernel] HcclCommQueryCcuIns returned insNum[%u]", insNum);
-    CHK_PRT_RET(insNum != 1,
-        HCCL_ERROR("[HcclGetCcuKernel] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
-        HCCL_E_INTERNAL);
+    CHK_RET(QueryCcuInsHandle(comm, insHandle));
 
     u32 totalKernelNum = 0;
-    for (auto t : resRequest.ccuKernelNum) {
-        totalKernelNum += t;
-    }
-    HCCL_INFO("[HcclGetCcuKernel] totalKernelNum[%u], ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]",
-        totalKernelNum, resRequest.ccuKernelInfos.size(), resRequest.ccuKernelNum.size());
-    CHK_PRT_RET(totalKernelNum != resRequest.ccuKernelInfos.size(),
-        HCCL_ERROR("[HcclGetCcuKernel]ccuKernel num not match!"),
-        HCCL_E_INTERNAL);
+    CHK_RET(ValidateCcuKernelRequest(resRequest, totalKernelNum));
+    CHK_RET(RegisterCcuDfxOpInfo(comm, param));
+    CHK_RET(RegisterCcuKernels(insHandle, totalKernelNum, resRequest, *resCtxHost));
 
-    CHK_PRT_RET(resRequest.ccuKernelInfos.empty(),
-        HCCL_ERROR("[HcclGetCcuKernel] no kernel to register!"), HCCL_E_INTERNAL);
-
-    // Op注册
-    HcclDfxOpInfo hcclDfxOpInfo{};
-    hcclDfxOpInfo.opMode = static_cast<u32>(param.opMode);
-    hcclDfxOpInfo.opType = static_cast<u32>(param.opType);
-    hcclDfxOpInfo.reduceOp = static_cast<u32>(param.reduceType);
-    hcclDfxOpInfo.dataType = GetHcclDfxOpInfoDataType(param);
-
-    // rankSize获取指定算子的dataCount
-    u32 userRankSize{0};
-    CHK_RET(HcclGetRankSize(comm, &userRankSize));
-    // hcclDfxOpInfo.dataCount = GetHcclDfxOpInfoDataCount(param, userRankSize);
-    hcclDfxOpInfo.root = param.root;
-    hcclDfxOpInfo.engine = param.engine;
-    s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
-    CHK_PRT_RET(
-        sRet != EOK, HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", __func__, param.algTag, sRet),
-        HCCL_E_MEMORY);
-    HcclDfxOpInfo* tempOp = &hcclDfxOpInfo;
-
-    CHK_RET(HcclDfxRegOpInfoByCommId(const_cast<char *>(param.commName), static_cast<void*>(tempOp)));
-    HCCL_INFO("[HcclGetCcuKernel] RegisterCcuDfxOpInfo success.");
-
-    // 按照resgroup进行注册
-    u32 currentResGroup = 0;
-    u32 maxResGroup = 0;
-    resCtxHost->ccuKernels.resize(totalKernelNum);
-
-    while (currentResGroup <= maxResGroup) {
-        CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
-        if (regStartRet != CCU_SUCCESS) {
-            HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet);
-            return ConvertCcuToHccl(regStartRet);
-        }
-        for (u32 i = 0; i < totalKernelNum; i++) {
-            CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[i];
-            if (kernelInfo.resGroup > maxResGroup) {
-                maxResGroup = kernelInfo.resGroup;
-            }
-            if (kernelInfo.resGroup != currentResGroup) {
-                continue;
-            }
-
-            HCCL_INFO("[HcclGetCcuKernel] registering kernel[%u]: kernelFuncName[%s]",
-                i, kernelInfo.kernelFuncName);
-            constexpr uint32_t dieId = 0U;
-            const void *kernelArgs[] = { kernelInfo.kernelArg };
-            constexpr uint32_t kernelArgNum = 1U;
-            CcuKernelHandle kernelHandle;
-            CcuResult regRet = HcommCcuKernelRegister(insHandle, dieId, kernelInfo.kernelFuncName,
-                                                      reinterpret_cast<void*>(kernelInfo.kernelFunc),
-                                                      kernelArgs, kernelArgNum, &kernelHandle);
-            if (regRet != CCU_SUCCESS) {
-                HCCL_ERROR("ccu kernel register failed for kernel[%u][%s]: ccuRet -> %d", i, kernelInfo.kernelFuncName, regRet);
-                return ConvertCcuToHccl(regRet);
-            }
-            resCtxHost->ccuKernels[i] = kernelHandle;
-            HCCL_INFO("[HcclGetCcuKernel] kernel[%u][%s] registered successfully, handle[%llu]", i, kernelInfo.kernelFuncName, kernelHandle);
-        }
-        CcuResult regEndRet = HcommCcuKernelRegisterEnd(insHandle);
-        HCCL_INFO("[HcclGetCcuKernel] HcommCcuKernelRegisterEnd finished!");
-        if (regEndRet != CCU_SUCCESS) {
-            HCCL_ERROR("ccu kernel register end failed: ccuRet -> %d", regEndRet);
-            return ConvertCcuToHccl(regEndRet);
-        }
-        currentResGroup++;
-    }
     resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
     HCCL_INFO("[HcclGetCcuKernel] done, ccuKernels.size()[%zu]", resCtxHost->ccuKernels.size());
     return HCCL_SUCCESS;
@@ -1705,9 +1755,20 @@ HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
 
 HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 {
-    HcclOpExpansionMode finalMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_INVALID;
-    CHK_RET(DecideHcclOpExpansionMode(comm, finalMode));
-    return ApplyOpExpansionMode(param, finalMode);
+    (void)comm;
+    const char* useCcuKfc = std::getenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
+    const HcclOpExpansionMode finalMode = (useCcuKfc != nullptr && std::strcmp(useCcuKfc, "1") == 0) ?
+                                              HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED :
+                                              HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;
+    HCCL_DEBUG("[HcclGetOpExpansionMode] finalMode: %d", finalMode);
+
+    // 第二步：应用选择的模式到param
+    HcclResult ret = ApplyOpExpansionMode(param, finalMode);
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR("ApplyOpExpansionMode failed, ret: %d", ret);
+        return ret;
+    }
+    return HCCL_SUCCESS;
 }
 
 static constexpr uint32_t opExpansionModeCcuSched = 5;
@@ -1855,7 +1916,7 @@ HcclResult LogHcclExit(const std::string& opName, const char* tag, HcclUs startu
 }
 
 // 判断通过最高一个level的网络全部没有device的可达链路，并且有host的可达链路
-HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetails* topoInfo, bool &hostDPUOnly)
+HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetails* topoInfo, bool& hostDPUOnly)
 {
     hostDPUOnly = false;
     HCCL_INFO("Start CheckHostDPUOnly");
@@ -1871,7 +1932,7 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
         return HCCL_SUCCESS;
     }
 
-    uint32_t *netLayers = nullptr;
+    uint32_t* netLayers = nullptr;
     uint32_t netLayerNum = 0;
     CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
     if ((netLayers == nullptr) || (netLayerNum == 0)) {
@@ -1887,7 +1948,7 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
             HCCL_INFO("Skip checking layer[%u], topoLevelNums is [%u]", netLayer, topoInfo->topoLevelNums);
             continue;
         }
-        uint32_t *topoInsts = nullptr;
+        uint32_t* topoInsts = nullptr;
         uint32_t topoInsNum = 0;
         CHK_RET(HcclRankGraphGetTopoInstsByLayer(comm, netLayer, &topoInsts, &topoInsNum));
         if ((topoInsts == nullptr) || (topoInsNum == 0)) {
@@ -1903,7 +1964,7 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
                 HCCL_INFO("Not using hostdpu because topo type is not COMM_TOPO_CLOS");
                 continue;
             }
-            uint32_t *ranks = nullptr;
+            uint32_t* ranks = nullptr;
             uint32_t rankNum = 0;
             CHK_RET(HcclRankGraphGetRanksByTopoInst(comm, netLayer, topoInstId, &ranks, &rankNum));
             // 校验当前rank与其他所有rank连通
@@ -1918,7 +1979,8 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
             for (uint32_t endPointIdx = 0; endPointIdx < endPointNums; endPointIdx++) {
                 EndpointDesc endPointDesc = endPointDescs[endPointIdx];
                 if (endPointDesc.loc.locType == ENDPOINT_LOC_TYPE_DEVICE) {
-                    HCCL_INFO("Not using hostdpu because there is links on device in netLayer[%u] in endPointIdx[%u]",
+                    HCCL_INFO(
+                        "Not using hostdpu because there is links on device in netLayer[%u] in endPointIdx[%u]",
                         netLayer, endPointIdx);
                     return HCCL_SUCCESS;
                 } else if (endPointDesc.loc.locType == ENDPOINT_LOC_TYPE_HOST) {
@@ -1934,4 +1996,4 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
     }
     return HCCL_SUCCESS;
 }
-}  // namespace mc2_ops_hccl
+} // namespace mc2_ops_hccl

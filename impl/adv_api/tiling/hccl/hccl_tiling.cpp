@@ -64,8 +64,9 @@ void PrintMc2CcTiling(const Mc2CcTilingInner& tiling)
 
 uint32_t SetDevType(Mc2InitTilingInner* tilingInner)
 {
-    const char *homePath = std::getenv("ASCEND_HOME_PATH");
-    ASCENDC_HOST_ASSERT((homePath != nullptr && homePath[0] != '\0'), return EXIT_FAILURE, "ASCEND_HOME_PATH is not set or empty.");
+    const char* homePath = std::getenv("ASCEND_HOME_PATH");
+    ASCENDC_HOST_ASSERT(
+        (homePath != nullptr && homePath[0] != '\0'), return EXIT_FAILURE, "ASCEND_HOME_PATH is not set or empty.");
     std::string pathName(homePath);
     pathName += "/lib64/";
     auto getSocVerFunc =
@@ -142,10 +143,10 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     for (uint32_t i = 0; i < MAX_CC_TILING_NUM; i++) {
         tilingInner->offset[i] = 0;
     }
-    if ((impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALL) ||
-        impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALLV) ||
-        impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-        impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)) &&
+    const char* useCcuKfc = std::getenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
+    if (useCcuKfc != nullptr && std::string(useCcuKfc) == "1" &&
+        (impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
+         impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) &&
         (impl_.commEngine_ == 5 || impl_.commEngine_ == 6)) {
         tilingInner->version = INIT_TILING_CCU_NEW_VERSION;
     }
@@ -247,7 +248,6 @@ uint32_t Mc2CcTilingConfig::SetReduceType(uint32_t reduceType, uint8_t dstDataTy
     impl_.dstDataType_ = dstDataType;
     return EXIT_SUCCESS;
 }
-
 
 uint32_t Mc2CcTilingConfig::SetStepSize(uint8_t stepSize)
 {

@@ -13,6 +13,7 @@
 #include "ccu_condition_v1.h"
 #include "ccu_datatype_v1.h"
 #include "ccu_rep_context_v1.h"
+#include "ccu_repeat_v1.h"
 #include "ccu_types.h"
 #include "hccl_ccu_res.h"
 #include <vector>
@@ -245,6 +246,16 @@ CompletedEvent::CompletedEvent(CcuRepContext* context) : CcuVirRes(context) {}
 
 void CompletedEvent::SetMask(uint32_t compeletedMask) {}
 
+Repeat::Repeat(CcuRepContext* context, CcuRelationalOperator<Variable, uint64_t> rel) {}
+
+Repeat::~Repeat() {}
+
+void Repeat::Break() {}
+
+bool Repeat::Check() const { return true; }
+
+void Repeat::Run() {}
+
 Condition::Condition(CcuRepContext* context, CcuRelationalOperator<Variable, uint64_t> rel) {}
 
 Condition::~Condition() {}
@@ -378,27 +389,28 @@ HcclResult HcclCcuKernelLaunch(
     return HCCL_SUCCESS;
 }
 
-HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle *insHandles, uint32_t *insNum) {
+HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle* insHandles, uint32_t* insNum)
+{
     *insHandles = 1;
     *insNum = 1;
     return HCCL_SUCCESS;
 }
 
-CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle) {
-    return CCU_SUCCESS;
-}
+CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle) { return CCU_SUCCESS; }
 
-CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle, uint32_t dieId, const char *kernelFuncName,
-    const void *kernelFunc, const void **kernelArgs, uint32_t argNum, CcuKernelHandle *kernelHandle) {
+CcuResult HcommCcuKernelRegister(
+    CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName, const void* kernelFunc, const void** kernelArgs,
+    uint32_t argNum, CcuKernelHandle* kernelHandle)
+{
     *kernelHandle = RecordCcuKernelRegistrationForTest();
     return CCU_SUCCESS;
 }
 
-CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle) {
-    return CCU_SUCCESS;
-}
+CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle) { return CCU_SUCCESS; }
 
-CcuResult HcommCcuKernelLaunch(ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void *taskArgs, uint32_t argSize) {
+CcuResult HcommCcuKernelLaunch(
+    ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs, uint32_t argSize)
+{
     return CCU_SUCCESS;
 }
 

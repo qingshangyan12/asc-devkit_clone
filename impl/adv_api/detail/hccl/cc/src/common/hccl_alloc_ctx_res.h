@@ -43,7 +43,6 @@ constexpr uint32_t MC2_TILING_VERSION = 2U;
 constexpr uint32_t MAX_HCOM_NUM = 3U;
 
 constexpr uint32_t INIT_TILING_VERSION = 100U;
-constexpr uint32_t MAX_OP_NUM = 8U;
 constexpr uint32_t INIT_TILING_CCU_NEW_VERSION = 101U;
 constexpr uint32_t MAX_CC_TILING_NUM = 8U;
 
@@ -57,7 +56,7 @@ struct Mc2ServerCfg {
 };
 
 struct Mc2InitTilingInner {
-    uint32_t version;   // ccu & alltoall (暂定version 为 原本的version + 1)
+    uint32_t version; // ccu & alltoall (暂定version 为 原本的version + 1)
     uint32_t mc2HcommCnt;
     uint32_t offset[MAX_CC_TILING_NUM];
     uint8_t debugMode;
@@ -99,14 +98,14 @@ struct OpResCtx {
     AlgInfo algInfo[MAX_CC_TILING_NUM];
 
     // for ccu
-    uint64_t xnAddr;  // xn寄存器起始地址
-    uint64_t ckeAddr;  // cke寄存器起始地址
-    uint64_t sprAddr;  // spr寄存器起始地址
-    uint64_t res[MAX_OP_NUM];  // MS地址，预留
-    uint64_t resCtx;  // 资源地址，用于资源下发时的处理
-    uint32_t opType[MAX_OP_NUM];
-    uint32_t algorithmType[MAX_OP_NUM];
-    bool isKfc[MAX_OP_NUM]; // 用于标记是否走kfcServer
+    uint64_t xnAddr;                    // xn寄存器起始地址
+    uint64_t ckeAddr;                   // cke寄存器起始地址
+    uint64_t sprAddr;                   // spr寄存器起始地址
+    uint64_t res[Hccl::MC2_MAX_OP_NUM]; // MS地址，预留
+    uint64_t resCtx;                    // 资源地址，用于资源下发时的处理
+    uint32_t opType[Hccl::MC2_MAX_OP_NUM];
+    uint32_t algorithmType[Hccl::MC2_MAX_OP_NUM];
+    bool isKfc[Hccl::MC2_MAX_OP_NUM]; // 用于标记是否走kfcServer
 };
 
 enum AlgorithmType {
@@ -119,15 +118,14 @@ enum AlgorithmType {
     CcuAllReduceMesh1D = 100,
     CcuAllReduceMeshMem2Mem1D,
     CcuAllReduceMesh2DOneShot,
-    CcuAlltoAllMesh1D = 150,
-    CcuAlltoAllVMesh1D,
-    CcuHalfAll2AllVMesh1D
+    CcuAlltoAllVMesh1D = 150
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
-    {"CcuAlltoAllMesh1D", CcuAlltoAllMesh1D},
-    {"CcuAlltoAllVMesh1D", CcuAlltoAllVMesh1D}
-};
+    {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
+    {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
+    {"CcuKfcReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D},
+    {"CcuAlltoAllVMesh1D", CcuAlltoAllVMesh1D}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
@@ -143,6 +141,8 @@ HcclResult CheckIsReduce(const Mc2CcTilingInner* ccTiling, bool* isReduce);
 HcclResult CheckCommEngine(const void* ccTilingList[], uint32_t tilingNum);
 
 HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint8_t& commEngine);
+
+HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum);
 
 // 构建 opResCtx 基础字段
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx);
@@ -218,6 +218,6 @@ HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIn
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
 HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
-    void* mc2Tiling, OpResCtx& opResCtx, std::vector<OpParam>* selectedOpParams = nullptr);
+    void* mc2Tiling, OpResCtx& opResCtx);
 
 #endif

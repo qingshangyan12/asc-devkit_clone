@@ -12,16 +12,14 @@
 #define HCCL_CCU_KFC_ST_KERNEL_ALG_BASE_SHIM_H
 
 #include "ccu_types.h"
+#include "ccu_task_arg_v1.h"
+#include "hccl_common.h"
 #include "hcomm_primitives.h"
 #include "ccu_primitives_stub.h"
 
 #include <cstdint>
 
 namespace ccu = ::AscendC::ccu;
-
-namespace hcomm {
-class CcuTaskArg {};
-} // namespace hcomm
 
 #define HCCL_INFO(...) ((void)0)
 #define HCCL_DEBUG(...) ((void)0)
@@ -31,15 +29,15 @@ class CcuTaskArg {};
 namespace mc2_ops_hccl {
 
 using u64 = uint64_t;
-using HcclDataType = uint32_t;
-
-enum class HcclCMDType : uint32_t {
-    HCCL_CMD_ALLTOALLV = 8,
-    HCCL_CMD_ALLTOALL = 10
-};
 
 struct OpParam {
+    struct DataDescriptor {
+        HcclDataType dataType{HCCL_DATA_TYPE_FP16};
+        HcclDataType outputType{HCCL_DATA_TYPE_FP16};
+    } DataDes;
+
     HcclCMDType opType{HcclCMDType::HCCL_CMD_ALLTOALLV};
+    HcclReduceOp reduceType{HCCL_REDUCE_SUM};
     bool isMc2{false};
 };
 

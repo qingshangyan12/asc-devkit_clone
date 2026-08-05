@@ -13,10 +13,9 @@
 
 namespace mc2_ops_hccl {
 
-SelectorStatus KfcServerAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
-                                                    const OpParam &opParam,
-                                                    const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
-                                                    std::string &selectAlgName) const
+SelectorStatus KfcServerAutoSelector::SelectCcuScheduleAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
     HCCL_DEBUG("[KfcServerAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
     (void)opParam;
@@ -35,4 +34,4 @@ SelectorStatus KfcServerAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNe
 
 REGISTER_SELECTOR_BY_OPTYPE(HcclCMDType::HCCL_CMD_KFC_SERVER, 18, KfcServerAutoSelector);
 
-}
+} // namespace mc2_ops_hccl

@@ -17,16 +17,14 @@
 #include "kfc_server_config.h"
 
 namespace mc2_ops_hccl {
-
 // 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
-void InheritKfcServerKernelArg(const CcuKernelInfo &srcKernel, CcuKernelInfo &dstKernel, const OpParam &param,
-                               uint32_t rankId, const std::vector<std::vector<u32>> &subCommRanks)
+void InheritKfcServerKernelArg(
+    const CcuKernelInfo& srcKernel, CcuKernelInfo& dstKernel, const OpParam& param, uint32_t rankId,
+    const std::vector<std::vector<u32>>& subCommRanks)
 {
     std::string srcName(srcKernel.kernelFuncName);
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
 
-    // Direct callers configure a single primitive implicitly. MC2 configures all
-    // primitives before CalcRes so the one persistent server can dispatch them.
     KfcServerOpConfig config = g_kfcServerOpConfig;
     if (config.opIds.empty()) {
         AddKfcServerOp(config, param);
@@ -34,19 +32,28 @@ void InheritKfcServerKernelArg(const CcuKernelInfo &srcKernel, CcuKernelInfo &ds
     kfcArg->supportedOpIds = std::move(config.opIds);
     kfcArg->supportedOpParams = std::move(config.opParams);
 
-    if (srcName == "CcuKernelAlltoAllMesh1D") {
-        auto *srcArg = static_cast<CcuKernelArgAlltoAllMesh1D*>(srcKernel.kernelArg);
+    const bool isAllGather =
+        srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+    const bool isReduceScatter =
+        srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    const bool isAllToAllV =
+        srcName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
+    if (isAllToAllV) {
+        const auto* srcArg = static_cast<const CcuKernelArgAlltoAllMesh1D*>(srcKernel.kernelArg);
         kfcArg->rankSize = srcArg->rankSize;
         kfcArg->rankId = srcArg->rankId;
         kfcArg->loadFromMem = srcArg->loadFromMem;
         kfcArg->opParam = srcArg->opParam;
         kfcArg->subCommRanks = srcArg->subCommRanks;
-    } else {
+    } else if (isAllGather || isReduceScatter) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;
         kfcArg->opParam = param;
         kfcArg->subCommRanks = subCommRanks;
+    } else {
+        HCCL_WARNING(
+            "[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
     }
 
     dstKernel.setKernelArg(kfcArg);
@@ -54,9 +61,9 @@ void InheritKfcServerKernelArg(const CcuKernelInfo &srcKernel, CcuKernelInfo &ds
     dstKernel.channels = srcKernel.channels;
 }
 
-CcuTempKfcServer::CcuTempKfcServer(const OpParam& param, const u32 rankId,
-                                   const std::vector<std::vector<u32>> &subCommRanks)
-: CcuAlgTemplateBase(param, rankId, subCommRanks)
+CcuTempKfcServer::CcuTempKfcServer(
+    const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
+    : CcuAlgTemplateBase(param, rankId, subCommRanks)
 {
     tempRankSize_ = subCommRanks[0].size();
     auto it = std::find(subCommRanks[0].begin(), subCommRanks[0].end(), rankId);
@@ -65,46 +72,66 @@ CcuTempKfcServer::CcuTempKfcServer(const OpParam& param, const u32 rankId,
     }
 }
 
-CcuTempKfcServer::~CcuTempKfcServer()
-{
-}
+CcuTempKfcServer::~CcuTempKfcServer() {}
 
-HcclResult CcuTempKfcServer::CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-                                     AlgResourceRequest& resourceRequest)
+HcclResult CcuTempKfcServer::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    AlgResourceRequest& resourceRequest)
 {
     HCCL_INFO("[CcuTempKfcServer::CalcRes start]");
+    if (param.opType != HcclCMDType::HCCL_CMD_ALLGATHER && param.opType != HcclCMDType::HCCL_CMD_REDUCE_SCATTER &&
+        param.opType != HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        HCCL_ERROR("[CcuTempKfcServer::CalcRes] unsupported opType[%u]", static_cast<uint32_t>(param.opType));
+        return HCCL_E_NOT_SUPPORT;
+    }
     // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;
     resourceRequest.slaveThreadNum = 0;
-    HCCL_DEBUG("[CcuTempKfcServer::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
-               resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
+    HCCL_DEBUG(
+        "[CcuTempKfcServer::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
+        resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
 
     // 构建 KfcServer kernelInfo
     CcuKernelInfo kernelInfo;
-    strcpy(kernelInfo.kernelFuncName, "CcuKernelKfcServer");
-    kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuKfcServerKernel);
+    strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcServer");
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuKfcServerKernel);
 
     // 从 ccuKernelInfos 最后一项继承属性到当前 KfcServer kernel，然后替换最后一项
     if (!resourceRequest.ccuKernelInfos.empty()) {
-        HCCL_INFO("[CcuTempKfcServer::CalcRes] inheriting kernelargs from[%s]",
-                   resourceRequest.ccuKernelInfos.back().kernelFuncName);
-        InheritKfcServerKernelArg(resourceRequest.ccuKernelInfos.back(), kernelInfo, param,
-                                  mySubCommRank_, subCommRanks_);
+        const std::string sourceName(resourceRequest.ccuKernelInfos.back().kernelFuncName);
+        const bool isAllGather =
+            sourceName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+        const bool isReduceScatter = sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" &&
+                                     param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+        const bool isAllToAllV =
+            sourceName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
+        if (!isAllGather && !isReduceScatter && !isAllToAllV) {
+            HCCL_ERROR(
+                "[CcuTempKfcServer::CalcRes] unsupported source kernel[%s]",
+                resourceRequest.ccuKernelInfos.back().kernelFuncName);
+            return HCCL_E_NOT_SUPPORT;
+        }
+        HCCL_INFO(
+            "[CcuTempKfcServer::CalcRes] inheriting kernelargs from[%s]",
+            resourceRequest.ccuKernelInfos.back().kernelFuncName);
+        InheritKfcServerKernelArg(
+            resourceRequest.ccuKernelInfos.back(), kernelInfo, param, mySubCommRank_, subCommRanks_);
         resourceRequest.ccuKernelInfos.back() = kernelInfo;
     } else {
-        HCCL_ERROR("[CcuTempKfcServer::CalcRes] no preceding kernel to inherit from, KfcServer requires a source kernel");
+        HCCL_ERROR(
+            "[CcuTempKfcServer::CalcRes] no preceding kernel to inherit from, KfcServer requires a source kernel");
         return HCCL_E_PARA;
     }
 
-    HCCL_DEBUG("[CcuTempKfcServer::CalcRes] dimsize=%llu, ccuKernelInfos.size()=%llu",
-               subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
+    HCCL_DEBUG(
+        "[CcuTempKfcServer::CalcRes] dimsize=%llu, ccuKernelInfos.size()=%llu", subCommRanks_[0].size(),
+        resourceRequest.ccuKernelInfos.size());
 
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult CcuTempKfcServer::KernelRun(const OpParam& param,
-                                       const TemplateDataParams& templateDataParams,
-                                       TemplateResource& templateResource)
+HcclResult CcuTempKfcServer::KernelRun(
+    const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
     // 此处仅用于当CCU-KFC作为通信算子时使用
     uint64_t xnAddr = templateDataParams.ccuKfcArgs[0];
@@ -118,8 +145,8 @@ HcclResult CcuTempKfcServer::KernelRun(const OpParam& param,
     uint64_t missionNum = 1;
     uint64_t missionIndex = 0;
 
-    std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgKfcServer>(
-        xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token);
+    std::unique_ptr<hcomm::CcuTaskArg> taskArg =
+        std::make_unique<CcuTaskArgKfcServer>(xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token);
     void* taskArgPtr = static_cast<void*>(taskArg.get());
 
     HCCL_INFO("[CcuTempKfcServer] KernelRun End.");
@@ -133,4 +160,4 @@ u64 CcuTempKfcServer::CalcScratchMultiple(BufferType inBuffType, BufferType outB
     return 0;
 }
 
-}
+} // namespace mc2_ops_hccl

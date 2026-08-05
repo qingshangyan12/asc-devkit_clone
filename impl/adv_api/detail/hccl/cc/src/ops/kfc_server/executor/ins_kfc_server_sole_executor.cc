@@ -20,13 +20,11 @@ namespace mc2_ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsKfcServerSoleExecutor()
-{
-}
+{}
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
-HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcAlgHierarchyInfo(HcclComm comm,
-    TopoInfoWithNetLayerDetails* topoInfo,
-    AlgHierarchyInfoForAllLevel& algHierarchyInfo)
+HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcAlgHierarchyInfo(
+    HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo)
 {
     AlgTopoMatch topoMatch;
     CHK_RET(topoMatch.MatchTopo(comm, topoInfo, algHierarchyInfo));
@@ -34,17 +32,17 @@ HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcAlgHierar
 }
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
-HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InitCommInfo(const OpParam& param,
-    const TopoInfoWithNetLayerDetails* topoInfo)
+HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InitCommInfo(
+    const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo)
 {
     HCCL_INFO("[InsKfcServerSoleExecutor][InitCommInfo]");
     return HCCL_SUCCESS;
 }
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
-HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(HcclComm comm, const OpParam& param,
-                       const TopoInfoWithNetLayerDetails* topoInfo, const AlgHierarchyInfoForAllLevel& algHierarchyInfo,
-                       AlgResourceRequest& resourceRequest)
+HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     CHK_RET(InitCommInfo(param, topoInfo));
 
@@ -59,7 +57,7 @@ HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(HcclC
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsKfcServerSoleExecutor][Orchestrate] Orchestrate Start");
 
@@ -71,15 +69,18 @@ HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     }
 
     HcclResult ret = OrchestrateLoop(param, resCtx);
-    CHK_PRT_RET(ret != HCCL_SUCCESS,
-        HCCL_ERROR("[InsKfcServerSoleExecutor][Orchestrate]errNo[0x%016llx] KfcServer excutor kernel run failed",
-            HCCL_ERROR_CODE(ret)), ret);
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[InsKfcServerSoleExecutor][Orchestrate]errNo[0x%016llx] KfcServer excutor kernel run failed",
+            HCCL_ERROR_CODE(ret)),
+        ret);
     return HCCL_SUCCESS;
 }
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsKfcServerSoleExecutor][OrchestrateLoop] Start");
     // TemplateResource参数计算
@@ -111,9 +112,9 @@ HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLo
 
 #ifndef AICPU_COMPILE
 #if !defined(HCCL_CANN_COMPAT_850)
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_KFC_SERVER, CcuKfcServer, InsKfcServerSoleExecutor, TopoMatch1D,
-    CcuTempKfcServer);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_KFC_SERVER, CcuKfcServer, InsKfcServerSoleExecutor, TopoMatch1D, CcuTempKfcServer);
 #endif
 #endif
 
-}
+} // namespace mc2_ops_hccl

@@ -13,10 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-DEFINE_WEAK_FUNC(CcuResult, HcommCcuGetMemToken, uint64_t srcVa, uint64_t size, uint64_t *tokenInfo);
+DEFINE_WEAK_FUNC(CcuResult, HcommCcuGetMemToken, uint64_t srcVa, uint64_t size, uint64_t* tokenInfo);
 
 // 初始化
-void CcuResDlInit(void* libHcommHandle) {
-    INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuGetMemToken);
-}
+void CcuResDlInit(void* libHcommHandle) { INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuGetMemToken); }

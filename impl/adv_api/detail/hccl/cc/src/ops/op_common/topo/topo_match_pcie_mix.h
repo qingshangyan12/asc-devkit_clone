@@ -22,6 +22,7 @@ public:
     HcclResult MatchTopo(
         const HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo,
         AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
+
 private:
     HcclResult TopoForLayer0(const HcclComm comm, const uint32_t myRank, AlgHierarchyInfoForAllLevel& algHierarchyInfo);
     HcclResult CheckVecElementAllSame(const uint32_t* instSizeList, uint32_t listSize) const;
@@ -39,5 +40,5 @@ private:
     HcclResult DeduplicateLevelRanks(
         const uint32_t myRank, std::vector<uint32_t>& level0Ranks, std::vector<uint32_t>& level1Ranks) const;
 };
-}  // namespace Hccl
-#endif  // !TOPO_MATCH_PCIE_MIX
+} // namespace mc2_ops_hccl
+#endif // !TOPO_MATCH_PCIE_MIX

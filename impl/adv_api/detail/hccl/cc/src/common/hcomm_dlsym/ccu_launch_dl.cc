@@ -15,14 +15,17 @@
 
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelRegisterStart, CcuInsHandle insHandle);
 
-DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelRegister, CcuInsHandle insHandle, uint32_t dieId,
-    const char *kernelFuncName, const void *kernelFunc, const void **kernelArgs, uint32_t argNum,
-    CcuKernelHandle *kernelHandle);
+DEFINE_WEAK_FUNC(
+    CcuResult, HcommCcuKernelRegister, CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName,
+    const void* kernelFunc, const void** kernelArgs, uint32_t argNum, CcuKernelHandle* kernelHandle);
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelRegisterEnd, CcuInsHandle insHandle);
-DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelLaunch, ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void *taskArgs, uint32_t argSize);
+DEFINE_WEAK_FUNC(
+    CcuResult, HcommCcuKernelLaunch, ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs,
+    uint32_t argSize);
 
 // 初始化
-void CcuLaunchDlInit(void* libHcommHandle) {
+void CcuLaunchDlInit(void* libHcommHandle)
+{
     HCCL_INFO("[HcclWrapper-FPRINTF] CcuLaunchDlInit called, handle=%p\n", libHcommHandle);
 
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegisterStart);

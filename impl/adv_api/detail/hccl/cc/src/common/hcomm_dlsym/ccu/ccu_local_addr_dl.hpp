@@ -22,31 +22,36 @@
 namespace AscendC {
 namespace ccu {
 
-template <typename U> class Array;
+template <typename U>
+class Array;
 
 class LocalAddr final {
 public:
-    LocalAddr() : addr(detail::NoAllocTag{}), token(detail::NoAllocTag{}) {
+    LocalAddr() : addr(detail::NoAllocTag{}), token(detail::NoAllocTag{})
+    {
         CCU_THROW_IF_FAILED(
-            CcuLocalAddrAlloc(&this->handle, &this->addr.handle, &this->token.handle),
-            "CcuLocalAddrAlloc: failed");
+            CcuLocalAddrAlloc(&this->handle, &this->addr.handle, &this->token.handle), "CcuLocalAddrAlloc: failed");
     }
 
-    LocalAddr(const LocalAddr& other) : addr(detail::NoAllocTag{}), token(detail::NoAllocTag{}) {
+    LocalAddr(const LocalAddr& other) : addr(detail::NoAllocTag{}), token(detail::NoAllocTag{})
+    {
         this->handle = other.handle;
         this->addr.handle = other.addr.handle;
         this->token.handle = other.token.handle;
     }
-    LocalAddr(LocalAddr&& other) noexcept : addr(detail::NoAllocTag{}), token(detail::NoAllocTag{}) {
+    LocalAddr(LocalAddr&& other) noexcept : addr(detail::NoAllocTag{}), token(detail::NoAllocTag{})
+    {
         this->handle = other.handle;
         this->addr.handle = other.addr.handle;
         this->token.handle = other.token.handle;
     }
-    void operator=(const LocalAddr& other) {
+    void operator=(const LocalAddr& other)
+    {
         this->addr = other.addr;
         this->token = other.token;
     }
-    void operator=(LocalAddr&& other) {
+    void operator=(LocalAddr&& other)
+    {
         this->handle = other.handle;
         this->addr.handle = other.addr.handle;
         this->token.handle = other.token.handle;
@@ -58,7 +63,8 @@ public:
 
 private:
     explicit LocalAddr(detail::NoAllocTag) : addr(detail::NoAllocTag{}), token(detail::NoAllocTag{}) {}
-    template <typename U> friend class Array;
+    template <typename U>
+    friend class Array;
 };
 
 } // namespace ccu

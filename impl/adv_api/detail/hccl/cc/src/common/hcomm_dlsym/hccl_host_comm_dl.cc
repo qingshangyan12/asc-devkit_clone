@@ -14,6 +14,7 @@
 #include <cstdlib>
 
 // 初始化
-void HcclCommDlInit(void* libHcommHandle) {
+void HcclCommDlInit(void* libHcommHandle)
+{
     // HcclCommGetStatus 已在 op_base.cc 中实现，无需 dl 初始化
 }

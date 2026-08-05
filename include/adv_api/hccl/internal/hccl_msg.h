@@ -31,7 +31,7 @@ constexpr int8_t INVALID_HANDLE_ID = static_cast<int8_t>(-1);
 constexpr int8_t HCCL_MAX_HANDLE_ID = 63;
 constexpr uint8_t HCCL_ALG_MAX_NUM = 8;
 constexpr uint8_t HCCL_ALG_SUPPORT_NUM = 2;
-constexpr uint8_t MAX_OP_NUM = 1;
+constexpr uint8_t HCCL_MSG_MAX_OP_NUM = 1;
 
 enum class HcclTilingVersion : uint8_t {
     DEPRECATED_TILING_VERSION,         // Deprecated tiling version
@@ -220,11 +220,11 @@ struct OpResCtx {
     uint64_t rankSize;
     AlgInfo algInfo[HCCL_ALG_MAX_NUM];
 
-    uint64_t xnAddr;    // Xn寄存器起始地址
-    uint64_t ckeAddr;   // CKE寄存器起始地址
-    uint64_t sprAddr;   // spr寄存器地址，预留
+    uint64_t xnAddr;                   // Xn寄存器起始地址
+    uint64_t ckeAddr;                  // CKE寄存器起始地址
+    uint64_t sprAddr;                  // spr寄存器地址，预留
     uint64_t res[HCCL_API_MAX_OP_NUM]; // MS地址，预留
-    uint64_t resCtx;    //资源地址，用于资源下发时的处理
+    uint64_t resCtx;                   // 资源地址，用于资源下发时的处理
     uint32_t opType[HCCL_API_MAX_OP_NUM];
     uint32_t algorithmType[HCCL_API_MAX_OP_NUM];
 };

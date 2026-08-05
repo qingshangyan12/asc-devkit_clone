@@ -11,14 +11,14 @@ workspace是设备侧Global Memory上的一块内存。workspace内存分为两�
     算子内部需要通过额外的device内存进行数据交换或者缓存的时候才需要分配，根据实际情况自行分配。使用场景如下：
 
     -   需要使用Unified Buffer和L1 Buffer上的空间且空间不够用时，可以将数据暂存至workspace上。
-    -   调用[SyncAll](../../../../api/SIMD-API/基础API/同步控制/核间同步/SyncAll.md)等API接口时，需要workspace作为入参。
+    -   调用[SyncAll](../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/SyncAll.md)等API接口时，需要workspace作为入参。
     -   其他需要使用Global Memory上内存空间的场景。
 
 不同开发方式下，具体的使用方法如下：
 
 -   工程化算子开发方式
 
-    在tiling函数中先通过GetWorkspaceSizes接口获取workspace大小的存放位置，再设置workspace的大小，框架侧会为其申请对应大小的设备侧Global Memory，在对应的算子kernel侧实现时可以使用这块workspace内存。在使用[Matmul Kernel侧接口](../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul-Kernel侧接口.md)等需要系统workspace的高阶API时，设置的workspace空间大小为系统workspace和用户workspace之和。
+    在tiling函数中先通过GetWorkspaceSizes接口获取workspace大小的存放位置，再设置workspace的大小，框架侧会为其申请对应大小的设备侧Global Memory，在对应的算子kernel侧实现时可以使用这块workspace内存。在使用[Matmul Kernel侧接口](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_Kernel.md)等需要系统workspace的高阶API时，设置的workspace空间大小为系统workspace和用户workspace之和。
 
     ```
     // 用户自定义的tiling函数

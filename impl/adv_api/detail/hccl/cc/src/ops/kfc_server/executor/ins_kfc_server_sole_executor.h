@@ -23,17 +23,17 @@ public:
     explicit InsKfcServerSoleExecutor();
     ~InsKfcServerSoleExecutor() override = default;
 
-    HcclResult Orchestrate(const OpParam &param, const AlgResourceCtxSerializable &resCtx) override;
+    HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
 
-    HcclResult CalcRes(HcclComm comm, const OpParam& param,
-                       const TopoInfoWithNetLayerDetails* topoInfo, const AlgHierarchyInfoForAllLevel& algHierarchyInfo,
-                       AlgResourceRequest& resourceRequest) override;
+    HcclResult CalcRes(
+        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+        const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest) override;
 
-    HcclResult CalcAlgHierarchyInfo(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo,
-                                     AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
+    HcclResult CalcAlgHierarchyInfo(
+        HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
 
 protected:
-    HcclResult OrchestrateLoop(const OpParam &param, const AlgResourceCtxSerializable &resCtx);
+    HcclResult OrchestrateLoop(const OpParam& param, const AlgResourceCtxSerializable& resCtx);
     HcclResult InitCommInfo(const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo);
 
     std::vector<std::vector<std::vector<u32>>> algHierarchyInfo_;
@@ -41,6 +41,6 @@ protected:
     std::vector<ThreadHandle> threads_;
 };
 
-}
+} // namespace mc2_ops_hccl
 
 #endif

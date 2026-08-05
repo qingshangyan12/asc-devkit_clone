@@ -22,13 +22,17 @@ public:
     {
         return "Topo Match for combined Algorithm: layer 0 Clos + Mesh, layer 1 Mesh.";
     }
-    HcclResult MatchTopo(const HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo,
-                         AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
+    HcclResult MatchTopo(
+        const HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo,
+        AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
+
 protected:
-    HcclResult TopoForLayer0(const HcclComm comm, uint32_t& layer0Size, const uint32_t myRank,
-                                    AlgHierarchyInfoForAllLevel& algHierarchyInfo) const;
-    HcclResult TopoForLayer1(const HcclComm comm, uint32_t layer0Size, const uint32_t myRank,
-                                    AlgHierarchyInfoForAllLevel& algHierarchyInfo) const override;
+    HcclResult TopoForLayer0(
+        const HcclComm comm, uint32_t& layer0Size, const uint32_t myRank,
+        AlgHierarchyInfoForAllLevel& algHierarchyInfo) const;
+    HcclResult TopoForLayer1(
+        const HcclComm comm, uint32_t layer0Size, const uint32_t myRank,
+        AlgHierarchyInfoForAllLevel& algHierarchyInfo) const override;
 };
-}  // namespace Hccl
-#endif  // !TOPO_MATCH_UBX_MESH_1D
+} // namespace mc2_ops_hccl
+#endif // !TOPO_MATCH_UBX_MESH_1D

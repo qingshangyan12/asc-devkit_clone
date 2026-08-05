@@ -34,7 +34,7 @@
 
 namespace mc2_ops_hccl {
 
-constexpr uint64_t UB_MAX_DATA_SIZE = 256*1024*1024; // Byte, UB协议一次传输的最大size
+constexpr uint64_t UB_MAX_DATA_SIZE = 256 * 1024 * 1024; // Byte, UB协议一次传输的最大size
 
 constexpr u32 MAX_NUM_BLOCKS = 56; // 56-72
 
@@ -125,10 +125,7 @@ enum class OpExecuteConfig {
     CCU_FAIL
 };
 
-enum class OpMode {
-    OFFLOAD = 0,
-    OPBASE = 1
-};
+enum class OpMode { OFFLOAD = 0, OPBASE = 1 };
 
 enum class Level0Shape {
     CLOS = 0,
@@ -295,7 +292,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
 struct CcuKernelArgBase {
     // std::vector<ChannelHandle> channels;
     ChannelHandle channels[CCU_MAX_RANK_SIZE];
-    uint32_t      channelCount;
+    uint32_t channelCount;
 };
 
 // ccu kernel register所需信息
@@ -307,7 +304,7 @@ struct CcuKernelInfo {
     // kernel函数
     void* kernelFunc;
     // KernelArg实例指针
-    void *kernelArg;
+    void* kernelArg;
     // kernel所需channel
     std::vector<HcclChannelDesc> channels;
 
@@ -315,8 +312,9 @@ private:
     std::shared_ptr<CcuKernelArgBase> kernelArgSmartPtr;
 
 public:
-    template<typename T>
-    void setKernelArg(std::shared_ptr<T> arg) {
+    template <typename T>
+    void setKernelArg(std::shared_ptr<T> arg)
+    {
         kernelArgSmartPtr = std::static_pointer_cast<CcuKernelArgBase>(arg);
         kernelArg = static_cast<void*>(arg.get());
     }
@@ -446,7 +444,7 @@ struct AlgResourceCtxSerializable {
     std::vector<CcuKernelHandle> ccuKernels;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
-    std::vector<uint64_t> kfcServerArgs;   // kfc server算子入参
+    std::vector<uint64_t> kfcServerArgs;  // kfc server算子入参
     u32 kfcServerArgSize = 0;             // kfc server算子入参个数
 
     std::vector<char> Serialize()
@@ -613,8 +611,8 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     DevAicpuOpConfig opConfig; // 收编算子配置类变量
     u64 varMemSize{0};
     u8 varData[0];
-    u64 ccuKfcArgs[4];          // 测试，ccu-kfc作为通信算子
-    bool isKfc = false;         // 标记是否使用KFC Server kernel
+    u64 ccuKfcArgs[4];  // 测试，ccu-kfc作为通信算子
+    bool isKfc = false; // 标记是否使用KFC Server kernel
 };
 
 struct AlgDesc {
@@ -689,9 +687,9 @@ struct ResPackGraphMode {
 
 // 图模式内存注册信息
 struct MemRegInfo {
-    char inputBuffTag[MAX_MEM_TAG_LENGTH];    // 输入缓冲区标签
-    char outputBuffTag[MAX_MEM_TAG_LENGTH];   // 输出缓冲区标签
-    std::vector<HcclMemHandle> memHandles;    // 内存句柄列表
+    char inputBuffTag[MAX_MEM_TAG_LENGTH];  // 输入缓冲区标签
+    char outputBuffTag[MAX_MEM_TAG_LENGTH]; // 输出缓冲区标签
+    std::vector<HcclMemHandle> memHandles;  // 内存句柄列表
 };
 
 // AIV模式参数存储结构
@@ -715,5 +713,5 @@ struct OpExchangeInfo {
     char tag[TAG_LENGTH] = {0};
 };
 
-}
+} // namespace mc2_ops_hccl
 #endif

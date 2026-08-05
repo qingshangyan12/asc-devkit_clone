@@ -36,8 +36,9 @@ Result CaptureKfcServerKernel(void *kernelArg)
     argument.channelCount = static_cast<uint32_t>(config.channels.size());
     std::copy(config.channels.begin(), config.channels.end(), argument.channels);
     mc2_ops_hccl::OpParam opParam{};
-    opParam.opType = mc2_ops_hccl::HcclCMDType::HCCL_CMD_ALLTOALLV;
+    opParam.opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
     opParam.isMc2 = true;
+    argument.opParam = opParam;
     argument.supportedOpIds.push_back(config.opId);
     argument.supportedOpParams.push_back(opParam);
 

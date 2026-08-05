@@ -82,7 +82,10 @@ public:
 
     __aicore__ inline uint32_t GetRankId() { return (newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId); }
 
-    __aicore__ inline uint32_t GetRankDim() { return (newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum); }
+    __aicore__ inline uint32_t GetRankDim()
+    {
+        return (newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum);
+    }
 
 private:
     __aicore__ inline void InitWorkingFlag();

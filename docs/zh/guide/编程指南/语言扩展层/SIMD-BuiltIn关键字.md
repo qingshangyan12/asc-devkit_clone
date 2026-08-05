@@ -228,7 +228,7 @@
 
 -   **\_\_mix\_\_\(cube, vec\)**
 
-    标识该核函数同时在Cube核和Vector核上执行。\(cube, vec\)分别表示核函数启动的Cube核和Vector核的配比，支持的配比为\(1, 0\)，\(0, 1\)，\(1, 1\)，\(1, 2\)。针对耦合模式的硬件架构，该修饰符不生效。
+    标识该核函数同时在Cube核和Vector核上执行。\(cube, vec\)分别表示核函数启动的Cube核和Vector核的配比，支持的配比为\(1, 0\)、\(0, 1\)、\(1, 1\)和\(1, 2\)。在该修饰符生效的非耦合架构上，`__mix__(1, 0)`等价于`__cube__`，`__mix__(0, 1)`等价于`__vector__`，可分别使用__cube__和__vector__替代。针对耦合模式的硬件架构，该修饰符不生效。
 
 -   **\_\_schedmode\_\_\(mode\)**
 
@@ -262,7 +262,7 @@
 
 -   \_\_simd\_vf\_\_
 
-    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](../../../api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md)调用SIMD VF入口函数，启动VF子任务。
+    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](../../../api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md)调用SIMD VF入口函数，启动VF子任务。
 
     ```
     __simd_vf__ inline void KernelAdd(__ubuf__ float* x, __ubuf__ float* y, __ubuf__ float* z)
