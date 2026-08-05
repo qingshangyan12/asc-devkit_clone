@@ -282,7 +282,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 | cmatrixInitVal | 是否使能C矩阵默认初始化清零。true=初始化为0，false=不初始化（由cmatrixSource控制）。默认true。 |
 | cmatrixSource | C矩阵初始值是否来源于BT Buffer。true=来源BT，false=不初始化。默认false。**注意**：带bias输入时此参数无效。 |
 | unitFlag | 控制Mmad和Fixpipe细粒度并行。0=不使能，2=使能不复位，3=使能并复位。详见UnitFlag特性说明。 |
-| disableGemv | M=1时是否关闭GEMV模式。**仅950PR/DT支持**。 |
+| disableGemv | M=1时是否关闭GEMV模式。**仅Ascend 950PR/Ascend 950DT支持**。 |
 ```
 
 **编写要求**：
