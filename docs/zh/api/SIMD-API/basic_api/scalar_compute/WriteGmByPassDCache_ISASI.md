@@ -86,13 +86,13 @@ __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
 ## 约束说明<a name="section633mcpsimp"></a>
 
 <!-- npu="A3,910b" id9 -->
-- 针对[NPU架构2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，目标GM地址按128字节取模所得偏移位于`[0, 32)`时，接口可完成写入；偏移位于`[32, 128)`时，目标地址保持原值。该地址范围以128字节为周期重复。设接口调用前后的目标地址数据分别为$\mathrm{GM}_{\mathrm{before}}(addr)$和$\mathrm{GM}_{\mathrm{after}}(addr)$，则：
+- 针对[NPU架构2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，接口是否执行写入取决于目标GM地址在当前128字节对齐区间内的偏移。令$\mathrm{offset} = addr \bmod 128$，当$0 \leq \mathrm{offset} < 32$时，写入生效；当$32 \leq \mathrm{offset} < 128$时，不执行写入，目标地址中的数据保持原值。即仅当目标地址位于每个128字节对齐区间的前32字节时，接口才执行写入。该规则以128字节为周期重复。设接口调用前后的目标地址数据分别为$\mathrm{GM}_{\mathrm{before}}(addr)$和$\mathrm{GM}_{\mathrm{after}}(addr)$，则：
 
   $$
   \mathrm{GM}_{\mathrm{after}}(addr) =
   \begin{cases}
-  value, & addr \bmod 128 < 32 \\
-  \mathrm{GM}_{\mathrm{before}}(addr), & addr \bmod 128 \geq 32
+  value, & 0 \leq \mathrm{offset} < 32 \\
+  \mathrm{GM}_{\mathrm{before}}(addr), & 32 \leq \mathrm{offset} < 128
   \end{cases}
   $$
 <!-- end id9 -->
