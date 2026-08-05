@@ -31,7 +31,19 @@ struct GetIdleSlotCountParams {
 };
 } // namespace
 
-class TestSysVarAscGetPipeIdleSlotCountCApi : public testing::TestWithParam<GetIdleSlotCountParams> {};
+class TestSysVarAscGetPipeIdleSlotCountCApi : public testing::TestWithParam<GetIdleSlotCountParams> {
+protected:
+    void SetUp() override
+    {
+#if defined(__DAV_VEC__)
+        g_coreType = C_API_AIV_TYPE;
+#elif defined(__DAV_CUBE__)
+        g_coreType = C_API_AIC_TYPE;
+#endif
+    }
+
+    void TearDown() override { g_coreType = C_API_AIV_TYPE; }
+};
 
 TEST_P(TestSysVarAscGetPipeIdleSlotCountCApi, GetIdleSlotCountSucc)
 {
@@ -43,6 +55,20 @@ TEST_P(TestSysVarAscGetPipeIdleSlotCountCApi, GetIdleSlotCountSucc)
 
     EXPECT_EQ(EXPECTED_IDLE_SLOT_COUNT, actual);
     GlobalMockObject::verify();
+}
+
+TEST(TestSysVarAscGetPipeIdleSlotCountUnsupportedCore, GetIdleSlotCountReturnsZero)
+{
+#if defined(__DAV_VEC__)
+    g_coreType = C_API_AIV_TYPE;
+    EXPECT_EQ(0, asc_get_pipe_m_idle_slot_count());
+    EXPECT_EQ(0, asc_get_pipe_mte1_idle_slot_count());
+    EXPECT_EQ(0, asc_get_pipe_fix_idle_slot_count());
+#elif defined(__DAV_CUBE__)
+    g_coreType = C_API_AIC_TYPE;
+    EXPECT_EQ(0, asc_get_pipe_v_idle_slot_count());
+#endif
+    g_coreType = C_API_AIV_TYPE;
 }
 
 INSTANTIATE_TEST_SUITE_P(

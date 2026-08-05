@@ -29,18 +29,37 @@ __aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count_impl()
     return static_cast<uint8_t>(get_iqent(PIPE_MTE3));
 }
 
-#if defined(__DAV_VEC__)
-__aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count_impl() { return static_cast<uint8_t>(get_iqent(PIPE_V)); }
-#elif defined(__DAV_CUBE__)
-__aicore__ inline uint8_t asc_get_pipe_m_idle_slot_count_impl() { return static_cast<uint8_t>(get_iqent(PIPE_M)); }
+__aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count_impl()
+{
+    if ASC_IS_AIV {
+        return static_cast<uint8_t>(get_iqent(PIPE_V));
+    }
+    return 0;
+}
+
+__aicore__ inline uint8_t asc_get_pipe_m_idle_slot_count_impl()
+{
+    if ASC_IS_AIC {
+        return static_cast<uint8_t>(get_iqent(PIPE_M));
+    }
+    return 0;
+}
 
 __aicore__ inline uint8_t asc_get_pipe_mte1_idle_slot_count_impl()
 {
-    return static_cast<uint8_t>(get_iqent(PIPE_MTE1));
+    if ASC_IS_AIC {
+        return static_cast<uint8_t>(get_iqent(PIPE_MTE1));
+    }
+    return 0;
 }
 
-__aicore__ inline uint8_t asc_get_pipe_fix_idle_slot_count_impl() { return static_cast<uint8_t>(get_iqent(PIPE_FIX)); }
-#endif
+__aicore__ inline uint8_t asc_get_pipe_fix_idle_slot_count_impl()
+{
+    if ASC_IS_AIC {
+        return static_cast<uint8_t>(get_iqent(PIPE_FIX));
+    }
+    return 0;
+}
 
 #endif
 
