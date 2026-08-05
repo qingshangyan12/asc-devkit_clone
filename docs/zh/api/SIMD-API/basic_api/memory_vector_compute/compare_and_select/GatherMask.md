@@ -155,7 +155,8 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | src0BlockStride | 用于设置src0同一迭代不同DataBlock间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[dataBlockStride](../SIMD_compute/high_dim_split.md)。 |
 | repeatTimes | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTimes表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../SIMD_compute/high_dim_split.md)。 |
 | src0RepeatStride | 用于设置src0相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD_compute/high_dim_split.md)。 |
-| src1RepeatStride | 用于设置src1相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD_compute/high_dim_split.md)。<!-- npu="310p" id20 --><br><br>针对 Atlas 推理系列产品AI Core，该参数仅区分0和非0：配置为0时按0生效；配置为非0时，效果与配置为1相同。<!-- end id20 --> |
+| src1RepeatStride | 用于设置src1相邻迭代间的地址步长（起始地址之间的间隔）。单位为DataBlock。详细说明请参考[repeatStride](../SIMD计算说明/高维切分.md)。<!-- npu="310p" id20 --><br><br>针对Atlas 推理系列产品AI Core，在用户自定义模式下，Normal和Counter中该参数行为不同：<br>&bull; Normal模式：该参数仅区分0和非0：配置为0时，每个迭代复用同一段gather mask。配置为非0时，表明多次迭代读取的gather mask为连续存储，相邻迭代之间的gather mask首地址间隔为32 / sizeof(T)字节；例如，T为16位数据类型时该间隔为16字节，T为32位数据类型时该间隔为8字节。<br>&bull; Counter模式：该参数失效，多次迭代读取的gather mask始终为连续存储。<!-- end id20 --> |
+
 
 ## 数据类型
 
@@ -250,6 +251,8 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
 - 采用内置固定模式时，配置src1RepeatStride参数无效。
+
+- 采用用户自定义模式时，src1RepeatStride仅在normal模式且被配置为0时有效；在其他情况下，均按src1Pattern连续读取处理。
 
 - 若调用该接口前为Counter模式，在调用该接口后需要显式设置回Counter模式（接口内部执行结束后会设置为Normal模式）。
 
