@@ -45,11 +45,11 @@ inline float copysignf(float x, float y)
 
 ## 返回值说明
 
--   y\>=0时，返回x的绝对值Abs\(x\)。
--   y<0时，返回x绝对值的相反数，-Abs\(x\)。
--   y=nan时，返回-Abs\(x\)。
--   y=-inf时，返回-Abs\(x\)。
--   y=inf时，返回Abs\(x\)。
+返回将x的符号位替换为y的符号位后得到的浮点数。除符号位外，x的其他位保持不变。
+
+-   当y为正数、+0、inf或+nan时，返回值为Abs\(x\)。
+-   当y为负数、-0、-inf或-nan时，返回值为-Abs\(x\)。
+-   当x为nan时，返回值为符号位与y相同的nan。
 
 ## 约束说明
 

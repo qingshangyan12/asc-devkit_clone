@@ -352,7 +352,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T TanImpl(T x)
 #if defined(ASCENDC_CPU_DEBUG)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float TanhImpl(float x) { return tanh(x); }
 #else
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float TanhImpl(float x) { return 1.0f - (2.0f / (ExpImpl(2.0f * x) + 1.0f)); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float TanhImpl(float x)
+{
+    if (x == 0.0f) {
+        return x;
+    }
+    return 1.0f - (2.0f / (ExpImpl(2.0f * x) + 1.0f));
+}
 #endif
 
 template <typename T>
@@ -523,7 +529,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 LogImpl(half2 x) { return __log(x); 
 #if defined(ASCENDC_CPU_DEBUG)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float AtanhImpl(float x) { return atanh(x); }
 #else
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float AtanhImpl(float x) { return LogImpl((1.0f + x) / (1.0f - x)) / 2.0f; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float AtanhImpl(float x)
+{
+    if (x == 0.0f) {
+        return x;
+    }
+    return LogImpl((1.0f + x) / (1.0f - x)) / 2.0f;
+}
 #endif
 
 /**
@@ -1062,34 +1074,66 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T Rnorm4dImpl(T a, T b, T c, T d)
  *      If sqrt(a[0]^2 +... + a[n-1]^2) overflows, return INF.
  *      If n is less than 1, return |a[0]|.
  */
+#define __INTERNAL_NORM_IMPL(n, a)                                                      \
+    do {                                                                                \
+        if ((n) <= 0) {                                                                 \
+            return AbsImpl((a)[0]);                                                     \
+        }                                                                               \
+        float m = 0;                                                                    \
+        int remainder = (n) & 3;                                                        \
+        int end = (n) - remainder;                                                      \
+        if ((n) > 3) {                                                                  \
+            for (int i = 0; i < end; i += 4) {                                          \
+                float a0 = (a)[i];                                                      \
+                float a1 = (a)[i + 1];                                                  \
+                float a2 = (a)[i + 2];                                                  \
+                float a3 = (a)[i + 3];                                                  \
+                if (IsInfImpl(a0) || IsInfImpl(a1) || IsInfImpl(a2) || IsInfImpl(a3)) { \
+                    return ConstantsInternal::SIMT_FP32_INF;                            \
+                }                                                                       \
+                m = MaxImpl(m, AbsImpl(a0));                                            \
+                m = MaxImpl(m, AbsImpl(a1));                                            \
+                m = MaxImpl(m, AbsImpl(a2));                                            \
+                m = MaxImpl(m, AbsImpl(a3));                                            \
+            }                                                                           \
+        }                                                                               \
+        if (remainder != 0) {                                                           \
+            for (int i = end; i < (n); i++) {                                           \
+                if (IsInfImpl((a)[i])) {                                                \
+                    return ConstantsInternal::SIMT_FP32_INF;                            \
+                }                                                                       \
+                m = MaxImpl(m, AbsImpl((a)[i]));                                        \
+            }                                                                           \
+        }                                                                               \
+        if (m == 0.0f || IsNanImpl(m)) {                                                \
+            return m;                                                                   \
+        }                                                                               \
+        float sum = 0.0f;                                                               \
+        if ((n) > 3) {                                                                  \
+            for (int i = 0; i < end; i += 4) {                                          \
+                float n0 = (a)[i] / m;                                                  \
+                float n1 = (a)[i + 1] / m;                                              \
+                float n2 = (a)[i + 2] / m;                                              \
+                float n3 = (a)[i + 3] / m;                                              \
+                sum = FmaImpl(n0, n0, sum);                                             \
+                sum = FmaImpl(n1, n1, sum);                                             \
+                sum = FmaImpl(n2, n2, sum);                                             \
+                sum = FmaImpl(n3, n3, sum);                                             \
+            }                                                                           \
+        }                                                                               \
+        if (remainder != 0) {                                                           \
+            for (int i = end; i < (n); i++) {                                           \
+                float ni = (a)[i] / m;                                                  \
+                sum = FmaImpl(ni, ni, sum);                                             \
+            }                                                                           \
+        }                                                                               \
+        return m * SqrtImpl(sum);                                                       \
+    } while (0)
+
 template <typename T1, typename T2>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline T2 NormImpl(T1 n, T2* a)
 {
-    if (n <= 0) {
-        return AbsImpl(a[0]);
-    }
-    float m = 0;
-    int32_t hasNan = 0;
-    for (int i = 0; i < n; i++) {
-        m = MaxImpl(m, AbsImpl(a[i]));
-        if (IsInfImpl(a[i])) {
-            return ConstantsInternal::SIMT_FP32_INF;
-        }
-        if (IsNanImpl(a[i])) {
-            hasNan = 1;
-        }
-    }
-    if (hasNan) {
-        return ConstantsInternal::SIMT_FP32_INF / ConstantsInternal::SIMT_FP32_INF;
-    }
-    if (m == 0.0f || IsNanImpl(m)) {
-        return m;
-    }
-    float sum = 0.0f;
-    for (int i = 0; i < n; i++) {
-        sum = FmaImpl((a[i] / m), (a[i] / m), sum);
-    }
-    return m * SqrtImpl(sum);
+    __INTERNAL_NORM_IMPL(n, a);
 }
 
 /**
@@ -1144,7 +1188,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float Exp2Impl(float x) { return PowImpl(2
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float Exp10Impl(float x) { return PowImpl(10.0f, x); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float Expm1Impl(float x) { return ExpImpl(x) - 1.0f; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float Expm1Impl(float x)
+{
+    if (x == 0.0f) {
+        return x;
+    }
+    return ExpImpl(x) - 1.0f;
+}
 
 #if defined(ASCENDC_CPU_DEBUG)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float Log2Impl(float x) { return log2(x); }
@@ -1158,7 +1208,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float Log10Impl(float x) { return log10(x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float Log10Impl(float x) { return LogImpl(x) / LogImpl(10.0f); }
 #endif
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float Log1pImpl(float x) { return LogImpl(1.0f + x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float Log1pImpl(float x)
+{
+    if (x == 0.0f) {
+        return x;
+    }
+    return LogImpl(1.0f + x);
+}
 
 #if defined(ASCENDC_CPU_DEBUG)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float LogbImpl(float x)
@@ -1302,13 +1358,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T RcbrtImpl(T x)
     static_assert(SupportTypeSimtInternel<T, float>, "Input value type only supports float.");
 
     if (x == 0.0f) {
-        return ConstantsInternal::SIMT_FP32_INF;
+        return 1.0f / x;
     }
     if (IsNanImpl(x)) {
         return x;
     }
     if (IsInfImpl(x)) {
-        return 0.0f;
+        return 1.0f / x;
     }
 
     // get the exponent part of x

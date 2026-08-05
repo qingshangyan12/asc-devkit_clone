@@ -48,8 +48,8 @@ inline float jnf(int n, float x)
 输入数据的n阶第一类贝塞尔函数jn的值。
 
 -   当n<0时，返回值为nan。
--   当x=inf或-inf时，返回值为0。
 -   当x=nan时，返回值为nan。
+-   当x=inf时，返回值为+0。
 
 ## 约束说明
 
