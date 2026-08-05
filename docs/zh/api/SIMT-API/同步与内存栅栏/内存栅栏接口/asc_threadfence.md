@@ -78,24 +78,47 @@ inline void asc_threadfence()
 
 完整样例请参考[MemoryFence样例](../../../../../../examples/03_simt_api/02_features/01_api_features/01_sync_instruction/memory_fence/README.md)。
 
+以下示例中，消费者线程如果读取到`y[0]`为20，则后续读取`x[0]`时不会得到旧值1，因此不会出现`result[0]`为1且`result[1]`为20的结果。第一次写入必须在第二次写入之前可见。
+
 -   SIMT编程场景：
 
-    ```cpp
-    __global__ __launch_bounds__(1024) void KernelThreadFence(float* dst, float* src)
+    ```
+    __global__ __launch_bounds__(1024) void KernelThreadFence(int32_t* x, int32_t* y, int32_t* result)
     {
-        src[0] = src[0] + 1;
-        asc_threadfence(); // asc_threadfence()保证本线程的写操作顺序对全局可见
-        dst[0] = src[0];
+        if (blockIdx.x == 0 && threadIdx.x == 0) {
+            x[0] = 10;
+            asc_threadfence(); // 保证x[0]的写入先于y[0]的写入对全局可见
+            y[0] = 20;
+        }
+
+        if (blockIdx.x == 1 && threadIdx.x == 0) {
+            int32_t b = y[0];
+            asc_threadfence(); // 保证y[0]的读取先于x[0]的读取完成
+            int32_t a = x[0];
+            result[0] = a;
+            result[1] = b;
+        }
     }
     ```
 
 -   SIMD与SIMT混合编程场景：
 
-    ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelThreadFence(__gm__ float* dst, __gm__ float* src)
+    ```
+    __simt_vf__ __launch_bounds__(1024) inline void KernelThreadFence(
+        __gm__ int32_t* x, __gm__ int32_t* y, __gm__ int32_t* result)
     {
-        src[0] = src[0] + 1;
-        asc_threadfence(); // asc_threadfence()保证本线程的写操作顺序对全局可见
-        dst[0] = src[0];
+        if (blockIdx.x == 0 && threadIdx.x == 0) {
+            x[0] = 10;
+            asc_threadfence(); // 保证x[0]的写入先于y[0]的写入对全局可见
+            y[0] = 20;
+        }
+
+        if (blockIdx.x == 1 && threadIdx.x == 0) {
+            int32_t b = y[0];
+            asc_threadfence(); // 保证y[0]的读取先于x[0]的读取完成
+            int32_t a = x[0];
+            result[0] = a;
+            result[1] = b;
+        }
     }
     ```
