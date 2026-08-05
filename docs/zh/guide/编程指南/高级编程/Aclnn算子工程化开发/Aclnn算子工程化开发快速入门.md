@@ -93,7 +93,7 @@ msopgen gen -i add_custom.json -c ai_core-ascendxxyy -lan cpp -out AddCustom
 ```
 
 -   -i：指定算子原型定义文件_add\_custom_.json所在路径，请根据实际情况修改。
--   -c：`ai_core-ascendxxyy`代表算子在AI Core上执行，ascendxxyy为昇腾AI处理器的型号。JSON中的dtype/format列表定义算子支持的数据类型和格式组合。msOpGen会基于这些信息生成对应的Kernel编译配置。
+-   -c：`ai_core-ascendxxyy`代表算子在AI Core上执行，ascendxxyy为昇腾AI处理器的型号，获取方式参考[芯片型号获取](./附录/cmake函数参考.md#npu_op_kernel_options)。JSON中的type/format列表定义算子支持的数据类型和格式组合。msOpGen会基于这些信息生成对应的Kernel编译配置。
 -   -lan：参数cpp代表算子基于Ascend C编程框架，使用C/C++编程语言开发。
 -   -out：生成文件所在路径，可配置为绝对路径或者相对路径，并且工具执行用户对路径具有可读写权限。若不配置，则默认生成在执行命令的当前路径。
 
@@ -300,6 +300,7 @@ customize
 ├── op_api        // 单算子API头文件和动态库（aclnn_*.h、libcust_opapi.so）
 ├── op_impl       // Kernel二进制（.o）和Tiling动态库
 ├── op_proto      // 算子原型动态库
+├── scripts       // 算子包维护脚本
 └── version.info  // 版本信息
 ```
 
