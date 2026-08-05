@@ -53,3 +53,19 @@ install(DIRECTORY ${ASC_COMM_DETAIL_HEADER_DIR}/
     COMPONENT asc-devkit
     FILES_MATCHING PATTERN "*.h"
 )
+
+set(ASC_COMM_AIN_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicore/ain)
+set(ASC_COMM_AIN_DETAIL_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/src/aicore/ain/detail)
+if(NOT EXISTS ${ASC_COMM_AIN_PUBLIC_HEADER_DIR})
+    message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public ain headers: ${ASC_COMM_AIN_PUBLIC_HEADER_DIR}")
+endif()
+install(DIRECTORY ${ASC_COMM_AIN_PUBLIC_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/comm_api/ain
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
+install(DIRECTORY ${ASC_COMM_AIN_DETAIL_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/detail/ain
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
