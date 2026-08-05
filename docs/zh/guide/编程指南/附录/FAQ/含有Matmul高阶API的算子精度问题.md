@@ -219,7 +219,7 @@
         删除LeakyRelu计算后，执行用例，算子结果比对正确，如下所示。
 
         ```
-        -- Installing: $HOME/samples/Precision_Check_Guide/samples-master/operator/MatmulLeakyReluCustomSample/KernelLaunch/MatmulLeakyReluInvocation_cube_vec/out/bin/ascendc_kernels_bbit
+        -- Installing: $HOME/samples/Precision_Check_Guide/samples-9.2.0-beta.1/operator/MatmulLeakyReluCustomSample/KernelLaunch/MatmulLeakyReluInvocation_cube_vec/out/bin/ascendc_kernels_bbit
         8901941eee314bcd64d24ff5f8d21247  output/golden.bin
         8901941eee314bcd64d24ff5f8d21247  output/output.bin
         error ratio: 0.0000, tolerance: 0.0001
@@ -394,7 +394,7 @@
         修改为单核场景后，执行算子：
 
         ```
-        -- Installing: $HOME/samples/Precision_Check_Guide/samples-master/operator/MatmulCustomSample/KernelLaunch/MatmulInvocationNeo-muticore/out/bin/ascendc_kernels_bbit
+        -- Installing: $HOME/samples/Precision_Check_Guide/samples-9.2.0-beta.1/operator/MatmulCustomSample/KernelLaunch/MatmulInvocationNeo-muticore/out/bin/ascendc_kernels_bbit
         efaf4dc1e484bc3778cac65f56244e59  output/golden.bin
         efaf4dc1e484bc3778cac65f56244e59  output/output.bin
         error ratio: 0.0000, tolerance: 0.0001
