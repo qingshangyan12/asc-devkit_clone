@@ -60,64 +60,6 @@ log() {
     echo "[ops_custom] [$cur_date] "$1
 }
 
-update_load_priority() {
-    local config_file="$1"
-    local line_count=0
-    local grep_status=0
-    local priority_line=""
-    local priority_value=""
-    local item=""
-    local existing=""
-    local duplicate=0
-    local new_value=""
-    local -a items=()
-    local -a new_items=("${vendor_name}")
-
-    line_count=$(grep -cE '^[[:space:]]*load_priority[[:space:]]*=' "${config_file}" 2>/dev/null)
-    grep_status=$?
-    if [ "${grep_status}" -gt 1 ]; then
-        log "[ERROR] read ${config_file} failed"
-        return 1
-    fi
-    if [ "${line_count}" -gt 1 ]; then
-        log "[ERROR] multiple load_priority entries found in ${config_file}"
-        return 1
-    fi
-
-    if [ "${line_count}" -eq 1 ]; then
-        priority_line=$(grep -m1 -E '^[[:space:]]*load_priority[[:space:]]*=' "${config_file}")
-        priority_value=${priority_line#*=}
-        IFS=',' read -r -a items <<< "${priority_value}"
-        for item in "${items[@]}"; do
-            item=$(printf '%s' "${item}" | tr -d '[:space:]')
-            [ -z "${item}" ] && continue
-            [ "${item}" = "${vendor_name}" ] && continue
-
-            duplicate=0
-            for existing in "${new_items[@]}"; do
-                if [ "${item}" = "${existing}" ]; then
-                    duplicate=1
-                    break
-                fi
-            done
-            [ "${duplicate}" -eq 0 ] && new_items+=("${item}")
-        done
-    fi
-
-    new_value=$(IFS=,; echo "${new_items[*]}")
-    if [ "${line_count}" -eq 0 ]; then
-        printf 'load_priority=%s\n' "${new_value}" >> "${config_file}"
-    else
-        sed -i -E "0,/^[[:space:]]*load_priority[[:space:]]*=.*/s//load_priority=${new_value}/" "${config_file}"
-    fi
-    if [ $? -ne 0 ] || ! grep -Fxq "load_priority=${new_value}" "${config_file}"; then
-        log "[ERROR] update load_priority in ${config_file} failed"
-        return 1
-    fi
-
-    return 0
-}
-
 resolve_so_paths() {
     local so_name="$1"
     local search_dir=""
@@ -704,20 +646,28 @@ if [ -n "${INSTALL_PATH}" ] && [ -d ${INSTALL_PATH} ]; then
 else
     _ASCEND_CUSTOM_OPP_PATH=${targetdir}/${vendordir}
     config_file=${targetdir}/vendors/config.ini
-    if [ ! -f "${config_file}" ]; then
-        touch "${config_file}"
-        if [ $? -ne 0 ]; then
-            log "[ERROR] create ${config_file} failed"
-            exit 1
-        fi
+    if [ ! -f ${config_file} ]; then
+        touch ${config_file}
         apply_chmod "${config_file}" "640" "${INSTALL_FOR_ALL}"
-        if [ $? -ne 0 ]; then
+        echo "load_priority=$vendor_name" > ${config_file}
+        if [ $? -ne 0 ];then
+            log "[ERROR] echo load_priority failed"
             exit 1
         fi
-    fi
-    update_load_priority "${config_file}"
-    if [ $? -ne 0 ]; then
-        exit 1
+    else
+        found_vendors="$(grep -w "load_priority" "$config_file" | cut --only-delimited -d"=" -f2-)"
+        found_vendor=$(echo $found_vendors | sed "s/\<$vendor_name\>//g" | tr ',' ' ')
+        vendor=$(echo $found_vendor | tr -s ' ' ',')
+        if [ "$vendor" != "" ]; then
+            sed -i "/load_priority=$found_vendors/s@load_priority=$found_vendors@load_priority=$vendor_name,$vendor@g" "$config_file"
+            if [ $? -ne 0 ] || ! grep -Fxq "load_priority=$vendor_name,$vendor" "$config_file"; then
+                log "[ERROR] update load_priority in $config_file failed"
+                exit 1
+            fi
+        elif [ "$found_vendors" != "$vendor_name" ]; then
+            log "[ERROR] load_priority in $config_file is invalid"
+            exit 1
+        fi
     fi
     apply_chmod "${config_file}" "750" "${INSTALL_FOR_ALL}"
     log "[INFO] using requirements: when custom module install finished or before you run the custom module, \
