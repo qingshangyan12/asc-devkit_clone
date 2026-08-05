@@ -61,6 +61,13 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu/kernel
+
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/selector
