@@ -46,6 +46,8 @@ inline float expm1f(float x)
 
 e的x次方减1。
 
+-   当x为+0时，返回值为+0。
+-   当x为-0时，返回值为-0。
 -   当x为inf时，返回值为inf。
 -   当x为-inf时，返回值为-1.0。
 -   当x为nan时，返回值为nan。
