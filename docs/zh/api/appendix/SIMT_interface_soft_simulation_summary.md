@@ -21,27 +21,27 @@
 
 | API名 | API是否软仿 |
 | --- | --- |
-| [asc_reduce_add](../SIMT-API/warp_functions/warp_reduce_functions/asc_reduce_add.md) | 否 |
-| [asc_reduce_max](../SIMT-API/warp_functions/warp_reduce_functions/asc_reduce_max.md) | 否 |
-| [asc_reduce_min](../SIMT-API/warp_functions/warp_reduce_functions/asc_reduce_min.md) | 否 |
+| [asc_reduce_add](../SIMT-API/warp_functions/Warp_reduce_functions/asc_reduce_add.md) | 否 |
+| [asc_reduce_max](../SIMT-API/warp_functions/Warp_reduce_functions/asc_reduce_max.md) | 否 |
+| [asc_reduce_min](../SIMT-API/warp_functions/Warp_reduce_functions/asc_reduce_min.md) | 否 |
 
 ### Warp Shfl类函数
 
 | API名 | API是否软仿 |
 | --- | --- |
-| [asc_shfl](../SIMT-API/warp_functions/warp_shfl_functions/asc_shfl.md) | 否 |
-| [asc_shfl_down](../SIMT-API/warp_functions/warp_shfl_functions/asc_shfl_down.md) | 否 |
-| [asc_shfl_up](../SIMT-API/warp_functions/warp_shfl_functions/asc_shfl_up.md) | 否 |
-| [asc_shfl_xor](../SIMT-API/warp_functions/warp_shfl_functions/asc_shfl_xor.md) | 否 |
+| [asc_shfl](../SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl.md) | 否 |
+| [asc_shfl_down](../SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl_down.md) | 否 |
+| [asc_shfl_up](../SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl_up.md) | 否 |
+| [asc_shfl_xor](../SIMT-API/warp_functions/Warp_shfl_functions/asc_shfl_xor.md) | 否 |
 
 ### Warp Vote类函数
 
 | API名 | API是否软仿 |
 | --- | --- |
-| [asc_activemask](../SIMT-API/warp_functions/warp_vote_functions/asc_activemask.md) | 否 |
-| [asc_all](../SIMT-API/warp_functions/warp_vote_functions/asc_all.md) | 否 |
-| [asc_any](../SIMT-API/warp_functions/warp_vote_functions/asc_any.md) | 否 |
-| [asc_ballot](../SIMT-API/warp_functions/warp_vote_functions/asc_ballot.md) | 否 |
+| [asc_activemask](../SIMT-API/warp_functions/Warp_vote_functions/asc_activemask.md) | 否 |
+| [asc_all](../SIMT-API/warp_functions/Warp_vote_functions/asc_all.md) | 否 |
+| [asc_any](../SIMT-API/warp_functions/Warp_vote_functions/asc_any.md) | 否 |
+| [asc_ballot](../SIMT-API/warp_functions/Warp_vote_functions/asc_ballot.md) | 否 |
 
 ## 协作组
 

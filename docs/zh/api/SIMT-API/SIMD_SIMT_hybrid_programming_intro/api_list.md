@@ -39,27 +39,27 @@
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [asc_all](../warp_functions/warp_vote_functions/asc_all.md) | 判断是否所有活跃线程的输入均不为0。 |
-| [asc_any](../warp_functions/warp_vote_functions/asc_any.md) | 判断是否有活跃线程的输入不为0。 |
-| [asc_ballot](../warp_functions/warp_vote_functions/asc_ballot.md) | 判断Warp内每个活跃线程的输入是否不为0。 |
-| [asc_activemask](../warp_functions/warp_vote_functions/asc_activemask.md) | 查看Warp内所有线程是否为活跃状态。 |
+| [asc_all](../warp_functions/Warp_vote_functions/asc_all.md) | 判断是否所有活跃线程的输入均不为0。 |
+| [asc_any](../warp_functions/Warp_vote_functions/asc_any.md) | 判断是否有活跃线程的输入不为0。 |
+| [asc_ballot](../warp_functions/Warp_vote_functions/asc_ballot.md) | 判断Warp内每个活跃线程的输入是否不为0。 |
+| [asc_activemask](../warp_functions/Warp_vote_functions/asc_activemask.md) | 查看Warp内所有线程是否为活跃状态。 |
 
 **表5**  Warp Shfl类函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [asc_shfl](../warp_functions/warp_shfl_functions/asc_shfl.md) | 获取Warp内指定线程srcLane输入的用于交换的var值。 |
-| [asc_shfl_up](../warp_functions/warp_shfl_functions/asc_shfl_up.md) | 获取Warp内当前线程向前偏移delta（当前线程Lane ID - delta）的线程输入的用于交换的var值。 |
-| [asc_shfl_down](../warp_functions/warp_shfl_functions/asc_shfl_down.md) | 获取Warp内当前线程向后偏移delta（当前线程Lane ID + delta）的线程输入的用于交换的var值。 |
-| [asc_shfl_xor](../warp_functions/warp_shfl_functions/asc_shfl_xor.md) | 获取Warp内当前线程Lane ID与输入laneMask做异或操作（Lane ID ^ laneMask）得到的dstLaneId对应线程输入的用于交换的var值。 |
+| [asc_shfl](../warp_functions/Warp_shfl_functions/asc_shfl.md) | 获取Warp内指定线程srcLane输入的用于交换的var值。 |
+| [asc_shfl_up](../warp_functions/Warp_shfl_functions/asc_shfl_up.md) | 获取Warp内当前线程向前偏移delta（当前线程Lane ID - delta）的线程输入的用于交换的var值。 |
+| [asc_shfl_down](../warp_functions/Warp_shfl_functions/asc_shfl_down.md) | 获取Warp内当前线程向后偏移delta（当前线程Lane ID + delta）的线程输入的用于交换的var值。 |
+| [asc_shfl_xor](../warp_functions/Warp_shfl_functions/asc_shfl_xor.md) | 获取Warp内当前线程Lane ID与输入laneMask做异或操作（Lane ID ^ laneMask）得到的dstLaneId对应线程输入的用于交换的var值。 |
 
 **表6**  Warp Reduce类函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [asc_reduce_add](../warp_functions/warp_reduce_functions/asc_reduce_add.md) | 对Warp内所有活跃线程输入的val求和。 |
-| [asc_reduce_max](../warp_functions/warp_reduce_functions/asc_reduce_max.md) | 对Warp内所有活跃线程输入的val求最大值。 |
-| [asc_reduce_min](../warp_functions/warp_reduce_functions/asc_reduce_min.md) | 对Warp内所有活跃线程输入val求最小值。 |
+| [asc_reduce_add](../warp_functions/Warp_reduce_functions/asc_reduce_add.md) | 对Warp内所有活跃线程输入的val求和。 |
+| [asc_reduce_max](../warp_functions/Warp_reduce_functions/asc_reduce_max.md) | 对Warp内所有活跃线程输入的val求最大值。 |
+| [asc_reduce_min](../warp_functions/Warp_reduce_functions/asc_reduce_min.md) | 对Warp内所有活跃线程输入val求最小值。 |
 
 **表7** Lane ID类函数
 
