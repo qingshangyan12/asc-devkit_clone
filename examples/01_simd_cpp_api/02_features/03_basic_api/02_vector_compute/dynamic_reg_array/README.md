@@ -1,9 +1,10 @@
 # Dynamic Reg Array Index Test
 
-This example tests whether a four-element vector-register array can be selected with a runtime index:
+This example tests whether a four-element native vector-register array can be selected with a runtime index:
 
 ```cpp
-max_array[iter_m % 4] = max(max_array[iter_m % 4], src0);
+uint16_t index = iter_m % 4;
+asc_max(max_array[index], max_array[index], src0, mask);
 ```
 
 The kernel receives the initial `src0` value as a runtime scalar. It performs 16 scalar additions and updates one
