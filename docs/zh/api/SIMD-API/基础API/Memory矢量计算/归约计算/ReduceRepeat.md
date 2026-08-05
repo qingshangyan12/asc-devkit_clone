@@ -23,12 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030：支持
-<!-- end id9 -->
 
 ## 功能说明
 
@@ -106,12 +100,6 @@
 <!-- npu="910" id15 -->
 - Atlas 训练系列产品，支持half。
 <!-- end id15 -->
-<!-- npu="x90" id16 -->
-- Kirin X90，支持half、float。
-<!-- end id16 -->
-<!-- npu="9030" id17 -->
-- Kirin 9030，支持half、float。
-<!-- end id17 -->
 
 <!-- npu="950" id18 -->
 **针对Ascend 950PR/Ascend 950DT：**
@@ -121,13 +109,13 @@
 
     | 目的操作数数据类型T |源操作数数据类型U |
     | --- | --- |
-    | `int32_t` | `int16_t`，`int32_t` | 
+    | `int32_t` | `int16_t`，`int32_t` |
     | `uint32_t` | `uint16_t`，`uint32_t` |
     | `half` | `half` |
     | `float` | `float` |
 <!-- end id18 -->
 
-<!-- npu="A3,910b,910,310p,310b,x90,9030" id19 -->
+<!-- npu="A3,910b,910,310p,310b" id19 -->
 **针对如下型号，目的操作数与源操作数的数据类型需要保持一致。**
 
 <!-- npu="A3" id20 -->
@@ -145,12 +133,6 @@
 <!-- npu="910" id24 -->
 - Atlas 训练系列产品
 <!-- end id24 -->
-<!-- npu="x90" id25 -->
-- Kirin X90
-<!-- end id25 -->
-<!-- npu="9030" id26 -->
-- Kirin 9030
-<!-- end id26 -->
 <!-- end id19 -->
 
 ## 返回值说明
@@ -228,12 +210,6 @@
     <!-- npu="910" id38 -->
     - Atlas 训练系列产品，支持`ORDER_VALUE_INDEX`。
     <!-- end id38 -->
-    <!-- npu="x90" id39 -->
-    - Kirin X90，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。
-    <!-- end id39 -->
-    <!-- npu="9030" id40 -->
-    - Kirin 9030，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。
-    <!-- end id40 -->
 
 ## 关键特性说明
 
@@ -347,17 +323,17 @@
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
     uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
-    
+
     // 根据以上信息，推断出repeatTime为4，dstRepStride为1，srcBlkStride为1，srcRepStride为8
     // 若求最小值及索引，并且需要存储顺序为[value, index]的结果，使用默认order，接口示例为：
     AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8);
-    
+
     // 若求最小值及索引，并且需要存储顺序为[index, value]的结果，接口示例为：
     AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_INDEX_VALUE);
-    
+
     // 若只求最小值，并且需要存储[value]的结果，接口示例为：
     AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_VALUE);
-    
+
     // 若只求索引，并且需要存储[index]的结果，接口示例为：
     AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_INDEX);
     ```
@@ -397,7 +373,7 @@
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
     uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
-    
+
     // 根据以上信息，推断出repeatTime为4，dstRepStride为1，srcBlkStride为1，srcRepStride为8
     AscendC::ReduceRepeat<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8);
     ```

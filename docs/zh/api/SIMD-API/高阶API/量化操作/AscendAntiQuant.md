@@ -21,12 +21,6 @@
 <!-- npu="910" id16 -->
 - Atlas 训练系列产品：不支持
 <!-- end id16 -->
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -96,7 +90,7 @@
 
 ## 实现原理
 
-**图1**  AscendAntiQuant算法框图  
+**图1**  AscendAntiQuant算法框图
 ![](../../../figures/AscendAntiQuant算法框图.png "AscendAntiQuant算法框图")
 
 如上图所示，为AscendAntiQuant的典型场景算法框图，计算过程分为如下几步，均在Vector上进行：
@@ -105,7 +99,7 @@
 2.  计算offset：当offset为向量时做Add计算，当offset为scalar时做Adds计算；
 3.  计算scale：当scale为向量时做Mul计算，当scale为scalar时做Muls计算。
 
-**图2**  isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图  
+**图2**  isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图
 ![](../../../figures/isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图.png "isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图")
 
 在Atlas A2 训练系列产品/Atlas A2 推理系列产品上，当输出为bfloat16时，计算过程分为如下几步：
@@ -117,7 +111,7 @@
 5.  计算scale：当输入的scale为向量时用tmp2做Mul计算，为scalar时做Muls计算；
 6.  dst精度转换：将tmp1转换为bf16类型。
 
-**图3**  AscendAntiQuant PER\_TOKEN/PER\_GROUP算法框图  
+**图3**  AscendAntiQuant PER\_TOKEN/PER\_GROUP算法框图
 ![](../../../figures/AscendAntiQuant-PER_TOKEN-PER_GROUP算法框图.png "AscendAntiQuant-PER_TOKEN-PER_GROUP算法框图")
 
 PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
@@ -365,14 +359,6 @@ struct AscendAntiQuantParam {
     - Atlas 推理系列产品AI Core，支持的数据类型为：half。
     <!-- end id20 -->
 
-    <!-- npu="x90" id3 -->
-    - Kirin X90，支持的数据类型为：half。
-    <!-- end id3 -->
-
-    <!-- npu="9030" id4 -->
-    - Kirin 9030，支持的数据类型为：half。
-    <!-- end id4 -->
-
 -   非PER\_TOKEN/PER\_GROUP b8/float4场景src支持的数据类型<a id="li13336025165520"></a>
 
     <!-- npu="950" id21 -->
@@ -390,14 +376,6 @@ struct AscendAntiQuantParam {
     <!-- npu="310p" id24 -->
     - Atlas 推理系列产品AI Core，支持的数据类型为：int8\_t。
     <!-- end id24 -->
-
-    <!-- npu="x90" id5 -->
-    - Kirin X90，支持的数据类型为：int8\_t。
-    <!-- end id5 -->
-
-    <!-- npu="9030" id6 -->
-    - Kirin 9030，支持的数据类型为：int8\_t。
-    <!-- end id6 -->
 
 -   非PER\_TOKEN/PER\_GROUP b8/float4场景offset支持的数据类型<a id="li5382122225718"></a>
 
@@ -417,14 +395,6 @@ struct AscendAntiQuantParam {
     - Atlas 推理系列产品AI Core，支持的数据类型为：half。
     <!-- end id28 -->
 
-    <!-- npu="x90" id7 -->
-    - Kirin X90，支持的数据类型为：half。
-    <!-- end id7 -->
-
-    <!-- npu="9030" id8 -->
-    - Kirin 9030，支持的数据类型为：half。
-    <!-- end id8 -->
-
 -   非PER\_TOKEN/PER\_GROUP b8/float4场景scale支持的数据类型<a id="li103341450906"></a>
 
     <!-- npu="950" id29 -->
@@ -442,14 +412,6 @@ struct AscendAntiQuantParam {
     <!-- npu="310p" id32 -->
     - Atlas 推理系列产品AI Core，支持的数据类型为：half。
     <!-- end id32 -->
-
-    <!-- npu="x90" id9 -->
-    - Kirin X90，支持的数据类型为：half。
-    <!-- end id9 -->
-
-    <!-- npu="9030" id10 -->
-    - Kirin 9030，支持的数据类型为：half。
-    <!-- end id10 -->
 
 ## 调用示例
 

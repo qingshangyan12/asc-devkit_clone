@@ -21,12 +21,6 @@
 <!-- npu="910" id12 -->
 - Atlas 训练系列产品：不支持
 <!-- end id12 -->
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -79,7 +73,7 @@
 
 以数据类型int32\_t，shape为\[m, n\]的输入srcTensor，数据类型scaleT，shape为\[n\]的输入deqScale和数据类型dstT，shape为\[m, n\]的输出dstTensor为例，描述AscendDequant高阶API内部算法框图，如下图所示。
 
-**图1**  AscendDequant内部算法框图  
+**图1**  AscendDequant内部算法框图
 ![](../../../figures/AscendDequant内部算法框图.png "AscendDequant内部算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
@@ -90,7 +84,7 @@
 
 PER\_TOKEN/PER\_GROUP场景下，输入srcTensor数据类型是int32\_t/float，此时内部算法框图如下所示。
 
-**图2**  AscendDequant PER\_TOKEN/PER\_GROUP内部算法框图  
+**图2**  AscendDequant PER\_TOKEN/PER\_GROUP内部算法框图
 ![](../../../figures/AscendDequant-PER_TOKEN-PER_GROUP内部算法框图.png "AscendDequant-PER_TOKEN-PER_GROUP内部算法框图")
 
 PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
@@ -324,14 +318,6 @@ struct AscendDeQuantParam {
     - Atlas 推理系列产品AI Core，支持的数据类型为：half、float。
     <!-- end id16 -->
 
-    <!-- npu="x90" id3 -->
-    - Kirin X90，支持的数据类型为：half、float。
-    <!-- end id3 -->
-
-    <!-- npu="9030" id4 -->
-    - Kirin 9030，支持的数据类型为：half、float。
-    <!-- end id4 -->
-
 -   非PER\_TOKEN/PER\_GROUP场景deqScale支持的数据类型<a id="li189021550175211"></a>
 
     <!-- npu="950" id17 -->
@@ -349,14 +335,6 @@ struct AscendDeQuantParam {
     <!-- npu="310p" id20 -->
     - Atlas 推理系列产品AI Core，当deqScale为矢量时，支持的数据类型为：uint64\_t、float；当deqScale为标量时，支持的数据类型为float。
     <!-- end id20 -->
-
-    <!-- npu="x90" id5 -->
-    - Kirin X90，当deqScale为矢量时，支持的数据类型为：uint64\_t、float；当deqScale为标量时，支持的数据类型为float。
-    <!-- end id5 -->
-
-    <!-- npu="9030" id6 -->
-    - Kirin 9030，当deqScale为矢量时，支持的数据类型为：uint64\_t、float；当deqScale为标量时，支持的数据类型为float。
-    <!-- end id6 -->
 
 ## 调用示例
 

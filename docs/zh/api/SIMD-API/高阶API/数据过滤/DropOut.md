@@ -21,12 +21,6 @@
 <!-- npu="910" id10 -->
 - Atlas 训练系列产品：不支持
 <!-- end id10 -->
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -74,7 +68,7 @@
 
 以float类型，ND格式，shape为\[srcM, srcN\]的SrcTensor，shape为\[maskM, maskN\]的MaskTensor，比特模式场景为例，描述Dropout高阶API内部算法框图，如下图所示。
 
-**图1**  Dropout算法框图  
+**图1**  Dropout算法框图
 ![](../../../figures/Dropout算法框图.png "Dropout算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
@@ -83,7 +77,7 @@
 2.  Select步骤：根据输入的MaskTensor对SrcTensor做数据选择，被选中的数据位置，保留原始数据，对舍弃的数据位置，设置为0；
 3.  Muls步骤：将输出数据每个元素除以keepProb。
 
-**图2**  Dropout算法框图  
+**图2**  Dropout算法框图
 ![](../../../figures/Dropout算法框图-55.png "Dropout算法框图-55")
 
 计算过程在Vector上进行，循环srcM次，每次对srcN个元素进行如下操作：
@@ -158,14 +152,6 @@ struct DropOutShapeInfo {
     <!-- npu="310p" id14 -->
     Atlas 推理系列产品AI Core，支持的数据类型为：half、float。
     <!-- end id14 -->
-
-    <!-- npu="x90" id3 -->
-    Kirin X90，支持的数据类型为：half、float。
-    <!-- end id3 -->
-
-    <!-- npu="9030" id4 -->
-    Kirin 9030，支持的数据类型为：half、float。
-    <!-- end id4 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
