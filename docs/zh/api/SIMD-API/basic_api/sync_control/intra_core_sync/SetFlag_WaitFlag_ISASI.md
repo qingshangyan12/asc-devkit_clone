@@ -98,10 +98,10 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 - 相同流水、相同eventID下，连续使用SetFlag会引发未定义行为，此时再执行PipeBarrier<PIPE\_ALL\>会出现卡死现象：
 
     ```cpp
-    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第一次调用SetFlag
-    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第二次调用SetFlag（相同流水、相同eventID连续使用，引发未定义行为）
+    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第一次调用SetFlag。
+    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);  // 第二次调用SetFlag（相同流水、相同eventID连续使用，引发未定义行为）。
     ...
-    AscendC::PipeBarrier<PIPE_ALL>();  // 触发卡死
+    AscendC::PipeBarrier<PIPE_ALL>();  // 触发卡死。
     ...
     AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(0);
     AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(0);
