@@ -25,14 +25,30 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-#define asc_lock_impl(pipe, mutex_id, mode)       \
-    do {                                          \
-        if constexpr ((mode) == ASC_LOCK_BLOCK) { \
-            get_buf((pipe), (mutex_id), false);   \
-        } else {                                  \
-            get_buf((pipe), (mutex_id), true);    \
-        }                                         \
-    } while (0)
+__aicore__ inline void asc_lock_impl(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
+{
+    if (mode == ASC_LOCK_BLOCK) {
+        if (pipe == PIPE_S) {
+            get_buf(PIPE_S, static_cast<uint64_t>(mutex_id), false);
+        } else if (pipe == PIPE_V) {
+            get_buf(PIPE_V, static_cast<uint64_t>(mutex_id), false);
+        } else if (pipe == PIPE_MTE2) {
+            get_buf(PIPE_MTE2, static_cast<uint64_t>(mutex_id), false);
+        } else if (pipe == PIPE_MTE3) {
+            get_buf(PIPE_MTE3, static_cast<uint64_t>(mutex_id), false);
+        } else {}
+    } else {
+        if (pipe == PIPE_S) {
+            get_buf(PIPE_S, static_cast<uint64_t>(mutex_id), true);
+        } else if (pipe == PIPE_V) {
+            get_buf(PIPE_V, static_cast<uint64_t>(mutex_id), true);
+        } else if (pipe == PIPE_MTE2) {
+            get_buf(PIPE_MTE2, static_cast<uint64_t>(mutex_id), true);
+        } else if (pipe == PIPE_MTE3) {
+            get_buf(PIPE_MTE3, static_cast<uint64_t>(mutex_id), true);
+        } else {}
+    }
+}
 
 #endif
 
