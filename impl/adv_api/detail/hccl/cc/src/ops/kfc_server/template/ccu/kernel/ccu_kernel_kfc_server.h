@@ -16,6 +16,8 @@
 #include "utils.h"
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
+#include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
+#include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 
 namespace mc2_ops_hccl {
 constexpr uint64_t INVALID_U64 = UINT64_MAX;
@@ -31,6 +33,8 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     bool loadFromMem;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
+    std::vector<uint64_t> supportedOpIds;
+    std::vector<OpParam> supportedOpParams;
 };
 
 // 第一层同步：missionId=0 与missionId>0之间的

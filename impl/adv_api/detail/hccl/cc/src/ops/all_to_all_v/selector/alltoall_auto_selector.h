@@ -16,10 +16,21 @@ namespace mc2_ops_hccl {
 
 class AlltoAllAutoSelector : public AutoSelectorBase {
 private:
+    SelectorStatus SelectCcuScheduleAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+        const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
+        std::string& selectAlgName) const override;
+    SelectorStatus SelectCcuMsAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+        const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
+        std::string& selectAlgName) const override;
     SelectorStatus SelectAicpuAlgo(
         const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
         const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
         std::string& selectAlgName) const override;
+    SelectorStatus SelectCcuMeshAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+        std::string& selectAlgName) const;
 };
 
 } // namespace mc2_ops_hccl
