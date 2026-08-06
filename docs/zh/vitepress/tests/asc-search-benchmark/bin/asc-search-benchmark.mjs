@@ -480,7 +480,16 @@ async function runSearchCase(client, definition) {
     const results = () => Array.from(document.querySelectorAll('[command-item]')).map(element => ({
       route: element.getAttribute('data-route') || element.getAttribute('data-value') || '',
       title: element.querySelector('.headings')?.textContent?.trim() || '',
-      description: element.querySelector('.des')?.textContent?.replace(/\\s+/g, ' ').trim() || ''
+      description: element.querySelector('.des')?.textContent?.replace(/\\s+/g, ' ').trim() || '',
+      highlights: Array.from(element.querySelectorAll('.des mark, .headings mark')).map(mark => {
+        const style = getComputedStyle(mark)
+        return {
+          text: mark.textContent || '',
+          backgroundColor: style.backgroundColor,
+          color: style.color,
+          textDecorationLine: style.textDecorationLine,
+        }
+      })
     })).filter(result => result.route)
 
     setValue('')
@@ -603,6 +612,12 @@ function validateDataset(dataset) {
         || definition.expect.descriptionIncludes.some(value => typeof value !== 'string' || !value))) {
       throw new Error(`Case ${definition.id} expect.descriptionIncludes must be a non-empty string array`)
     }
+    if (definition.expect.highlightIncludes !== undefined
+      && (!Array.isArray(definition.expect.highlightIncludes)
+        || definition.expect.highlightIncludes.length === 0
+        || definition.expect.highlightIncludes.some(value => typeof value !== 'string' || !value))) {
+      throw new Error(`Case ${definition.id} expect.highlightIncludes must be a non-empty string array`)
+    }
     if (definition.expect.sectionHash !== undefined
       && (typeof definition.expect.sectionHash !== 'string' || !definition.expect.sectionHash.startsWith('#'))) {
       throw new Error(`Case ${definition.id} expect.sectionHash must start with #`)
@@ -692,6 +707,25 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
   const descriptionValid = expectedDescriptionIncludes.every(value => normalizedDescription.includes(
     String(value).normalize('NFKC').toLocaleLowerCase()
   ))
+  const expectedHighlightIncludes = definition.expect.highlightIncludes || []
+  const highlightResult = firstRelevantIndex >= 0 ? results[firstRelevantIndex] : results[0]
+  const highlights = highlightResult?.highlights || []
+  const normalizedHighlights = highlights.map(item => String(item.text || '').normalize('NFKC').toLocaleLowerCase())
+  const highlightContentValid = expectedHighlightIncludes.every(value => normalizedHighlights.some(text => text.includes(
+    String(value).normalize('NFKC').toLocaleLowerCase()
+  )))
+  const highlightStyleValid = expectedHighlightIncludes.every((value) => {
+    const expected = String(value).normalize('NFKC').toLocaleLowerCase()
+    return highlights.some((item) => {
+      const text = String(item.text || '').normalize('NFKC').toLocaleLowerCase()
+      const background = String(item.backgroundColor || '').replace(/\s+/g, '').toLocaleLowerCase()
+      return text.includes(expected)
+        && background !== ''
+        && background !== 'transparent'
+        && background !== 'rgba(0,0,0,0)'
+        && item.textDecorationLine === 'none'
+    })
+  })
   const expectedSectionHash = definition.expect.sectionHash || ''
   const sectionResult = firstRelevantIndex >= 0 ? results[firstRelevantIndex] : results[0]
   const sectionRouteValid = !expectedSectionHash || routeHash(sectionResult?.route) === expectedSectionHash
@@ -709,6 +743,7 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
     category: definition.category,
     intent: definition.intent,
     passed: runtimeComplete && resultCountValid && targetFound && descriptionValid
+      && highlightContentValid && highlightStyleValid
       && sectionRouteValid && sectionNavigationValid && invalidResults.length === 0,
     runtimeComplete,
     timedOut: Boolean(observed.timedOut),
@@ -718,6 +753,10 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
     resultCountValid,
     descriptionValid,
     expectedDescriptionIncludes,
+    highlightContentValid,
+    highlightStyleValid,
+    expectedHighlightIncludes,
+    highlights,
     expectedSectionHash,
     sectionRouteValid,
     sectionNavigationValid,
