@@ -156,6 +156,7 @@ add_executable(${HCCL_MC2_CCU_SELECTOR_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
     ${HCCL_MC2_CCU_SELECTOR_DIR}/all_to_all_v_selector_testcase.cpp
     ${HCCL_MC2_CCU_SELECTOR_DIR}/all_to_all_selector_testcase.cpp
+    ${HCCL_MC2_CCU_SELECTOR_DIR}/dag_conflict_testcase.cpp
     ${HCCL_MC2_CCU_SELECTOR_DIR}/stubs.cc
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )
