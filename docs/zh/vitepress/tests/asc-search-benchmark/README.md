@@ -59,6 +59,7 @@ node bin/asc-search-benchmark.mjs \
 [`cases/ascendc.json`](cases/ascendc.json) 包含 154 个版本化用例，覆盖 API 精确名称、大小写同名 API、下划线标识符的空格/连字符写法、不完整标识符前缀、数据类型后缀、中英文组合、中文标题和正文、Unicode 归一化、拼写错误、特殊符号及无结果查询。每个期望 URL 按 3、2、1 三级相关性标注。
 
 用例可通过 `expect.descriptionIncludes` 声明相关结果摘要必须包含的文本，用于看护标识符定义等不能只靠页面排名验证的搜索质量。
+`expect.sectionHash` 用于声明结果应定位到的既有标题锚点；基准会真实点击相关结果，并验证目标标题存在且已经滚动进入可视区域。
 使用 `--enforce` 时，只有聚合指标达到阈值且所有用例的结果数量、目标页面、摘要和链接约束全部通过，命令才会成功。
 
 报告同时输出 JSON 和 Markdown，包含：

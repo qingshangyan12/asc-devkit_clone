@@ -39,6 +39,12 @@ function normalizeRoute(url) {
   return route || '/'
 }
 
+function routeWithSection(route, section) {
+  if (!section) return route
+  const path = String(route || '').split('#')[0]
+  return `${path}#${encodeURIComponent(section)}`
+}
+
 function getLeadingIdentifier(value) {
   return normalize(value).match(/^[a-z_][a-z0-9_]*/)?.[0] || ''
 }
@@ -230,13 +236,13 @@ function titleVariants(plan, variants) {
 
 async function loadIdentifierIndex() {
   if (!identifierIndexPromise) {
-    identifierIndexPromise = fetch('/search-identifiers.json?v=4', { cache: 'no-store' })
+    identifierIndexPromise = fetch('/search-identifiers.json?v=5', { cache: 'no-store' })
       .then((response) => {
         if (!response.ok) throw new Error(`Identifier index request failed with ${response.status}`)
         return response.json()
       })
-      .then(index => Array.isArray(index?.p) && Array.isArray(index?.i) ? index : { p: [], i: [], s: [] })
-      .catch(() => ({ p: [], i: [], s: [] }))
+      .then(index => Array.isArray(index?.p) && Array.isArray(index?.i) ? index : { p: [], i: [], s: [], h: [] })
+      .catch(() => ({ p: [], i: [], s: [], h: [] }))
   }
   return identifierIndexPromise
 }
@@ -278,6 +284,7 @@ async function searchIdentifierIndex(plan) {
   const entries = index.i
   const pages = index.p
   const snippets = Array.isArray(index.s) ? index.s : []
+  const sections = Array.isArray(index.h) ? index.h : []
   const start = lowerBoundIdentifier(entries, query)
   const matches = []
   for (let offset = start; offset < entries.length && matches.length <= MAX_IDENTIFIER_MATCHES; offset++) {
@@ -291,7 +298,7 @@ async function searchIdentifierIndex(plan) {
 
   const resultsByRoute = new Map()
   let exactIdentifier = false
-  for (const [identifier, pageIds, contextIds = []] of selectedMatches) {
+  for (const [identifier, pageIds, contextIds = [], sectionIds = []] of selectedMatches) {
     const exact = identifier === query
     exactIdentifier ||= exact
     const identifierScore = (exact ? 3300000 : 3100000)
@@ -299,12 +306,17 @@ async function searchIdentifierIndex(plan) {
     for (let rank = 0; rank < pageIds.length; rank++) {
       const page = pages[pageIds[rank]]
       if (!page) continue
-      const [route, title, pageDescription = ''] = page
+      const [pageRoute, title, pageDescription = ''] = page
       const contextId = contextIds[rank]
       const sourceDescription = Number.isInteger(contextId) && contextId >= 0
         ? snippets[contextId] || pageDescription
         : pageDescription
       const description = highlightIdentifierExcerpt(sourceDescription, query)
+      const sectionId = sectionIds[rank]
+      const route = routeWithSection(
+        pageRoute,
+        Number.isInteger(sectionId) && sectionId >= 0 ? sections[sectionId] : ''
+      )
       const result = {
         route,
         title: title || route,
@@ -390,10 +402,34 @@ async function materializeCandidates(candidates) {
   return selected
 }
 
+function bestPagefindSectionRoute(data) {
+  const pageRoute = data.url || data.raw_url || ''
+  const subResults = Array.isArray(data.sub_results) ? data.sub_results : []
+  if (subResults.length === 0) return pageRoute
+  const weightedLocations = Array.isArray(data.weighted_locations)
+    ? [...data.weighted_locations].sort((left, right) => right.weight - left.weight || left.location - right.location)
+    : []
+  for (const { location } of weightedLocations) {
+    const matching = subResults.filter((subResult) => {
+      const locations = subResult.locations || []
+      const first = locations[0]
+      if (!Number.isFinite(first)) return false
+      const last = locations.length === 1 ? Number.POSITIVE_INFINITY : locations.at(-1)
+      return first <= location && location <= last
+    })
+    const best = matching.reduce((selected, candidate) => {
+      if (!selected || candidate.locations.length > selected.locations.length) return candidate
+      return selected
+    }, null)
+    if (best?.url) return best.url
+  }
+  return subResults[0]?.url || pageRoute
+}
+
 function candidateFields(candidate) {
   const data = candidate.data || {}
   const title = String(data.meta?.title || '').replace(/___PAGEFIND_ANCHOR___\S*/g, '').trim()
-  const route = data.url || data.raw_url || ''
+  const route = bestPagefindSectionRoute(data)
   const headings = (data.anchors || []).map(anchor => String(anchor.text || '').trim()).filter(Boolean)
   const text = [title, data.content, data.raw_content, data.excerpt, ...headings, normalizeRoute(route)]
     .filter(Boolean)
@@ -575,9 +611,13 @@ function mergeRouteResult(existing, result) {
   const preferred = result.score > existing.score ? result : existing
   const fallback = preferred === result ? existing : result
   const description = preferred.description || fallback.description || ''
-  if (description === preferred.description) return preferred
+  const route = preferred.route.includes('#') || !fallback.route.includes('#')
+    ? preferred.route
+    : fallback.route
+  if (description === preferred.description && route === preferred.route) return preferred
   return {
     ...preferred,
+    route,
     description,
     meta: { ...preferred.meta, description },
   }
