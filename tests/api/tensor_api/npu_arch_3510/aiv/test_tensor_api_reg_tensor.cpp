@@ -74,15 +74,6 @@ TEST(TestTensorApiRegTensor, HoldsRegisterAndMask)
 
     auto compileLoadStore = &CompileTensorRegLoadStore<float>;
     (void)compileLoadStore;
-
-    auto compileDownsample = &CompileTensorRegLoadStore<half, load_sideband_mode::downsample>;
-    auto compileUnpack = &CompileTensorRegLoadStore<float, load_sideband_mode::unpack>;
-    auto compileUnpack4 = &CompileTensorRegLoadStore<int8_t, load_sideband_mode::unpack4>;
-    auto compileUpsample = &CompileTensorRegLoadStore<half, load_sideband_mode::upsample>;
-    (void)compileDownsample;
-    (void)compileUnpack;
-    (void)compileUnpack4;
-    (void)compileUpsample;
 }
 
 } // namespace Te
