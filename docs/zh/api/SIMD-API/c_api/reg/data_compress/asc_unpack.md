@@ -55,25 +55,40 @@
 
     ```cpp
     // 解压缩低位
-    __simd_callee__ inline void asc_unpack_lower(vector_uint16_t& dst, vector_uint8_t src)
-    __simd_callee__ inline void asc_unpack_lower(vector_int16_t& dst, vector_int8_t src)
-    __simd_callee__ inline void asc_unpack_lower(vector_uint32_t& dst, vector_uint16_t src)
-    __simd_callee__ inline void asc_unpack_lower(vector_int32_t& dst, vector_int16_t src)
+    __simd_callee__ inline void asc_unpack_lower(vector_<dst_dtype>& dst,
+                                                 vector_<src_dtype> src)
     // 解压缩高位
-    __simd_callee__ inline void asc_unpack_upper(vector_uint16_t& dst, vector_uint8_t src)
-    __simd_callee__ inline void asc_unpack_upper(vector_int16_t& dst, vector_int8_t src)
-    __simd_callee__ inline void asc_unpack_upper(vector_uint32_t& dst, vector_uint16_t src)
-    __simd_callee__ inline void asc_unpack_upper(vector_int32_t& dst, vector_int16_t src)
+    __simd_callee__ inline void asc_unpack_upper(vector_<dst_dtype>& dst,
+                                                 vector_<src_dtype> src)
     ```
+
+    支持的数据类型组合：
+
+    | src_dtype | dst_dtype |
+    | :--- | :--- |
+    | uint8_t | uint16_t |
+    | int8_t | int16_t |
+    | uint16_t | uint32_t |
+    | int16_t | int32_t |
 
 - 操作数为掩码寄存器
 
     ```cpp
     // 解压缩低位
-    __simd_callee__ inline void asc_unpack_lower(vector_bool& dst, vector_bool src)
+    __simd_callee__ inline void asc_unpack_lower(vector_bool& dst,
+                                                 vector_bool src)
     // 解压缩高位
-    __simd_callee__ inline void asc_unpack_upper(vector_bool& dst, vector_bool src)
+    __simd_callee__ inline void asc_unpack_upper(vector_bool& dst,
+                                                 vector_bool src)
     ```
+
+- 典型示例
+
+```cpp
+// 示例：对uint8_t矢量数据寄存器解压缩到uint16_t矢量数据寄存器
+__simd_callee__ inline void asc_unpack_lower(vector_uint16_t& dst,
+                                             vector_uint8_t src)
+```
 
 ## 参数说明
 
@@ -99,7 +114,25 @@
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src均为矢量数据寄存器或掩码寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- dst与src必须按5种固定dtype配对组合使用：`uint16_t`（dst）配`uint8_t`（src）、`int16_t`（dst）配`int8_t`（src）、`uint32_t`（dst）配`uint16_t`（src）、`int32_t`（dst）配`int16_t`（src）、`vector_bool`（dst）配`vector_bool`（src）；其他dtype组合触发数据类型异常。
+- 参与计算的元素个数由矢量长度（VL）决定：矢量数据寄存器解包模式下src元素数 = VL ÷ sizeof(src dtype)，dst元素数 = VL ÷ sizeof(dst dtype) = src元素数 ÷ 2；本接口取src元素数的一半（低半段或高半段）扩展为宽类型写入dst，dst输出元素数 = src输入元素数 ÷ 2 = VL ÷ sizeof(dst dtype)。掩码寄存器解包模式下src比特数 = VL，dst比特数 = VL，本接口取src一半比特（低半段或高半段）展开为全bit写入dst。
+- 本接口不携带掩码参数，src选定半段的全部有效元素均参与unpack，无清零/合并模式区分，dst全部有效位置均被改写。
+- unpack操作为位宽扩展：src为无符号整型时执行零扩展（高位补0），src为有符号整型时执行符号扩展（高位补符号位），src为`vector_bool`时执行比特位展开（每1 bit扩展为2 bit写入dst对应位置）。无溢出、无NaN/Inf异常上报；仅整型与`vector_bool` dtype参与，浮点dtype不支持。
+- 低半段解包与高半段解包配合可分别解包源寄存器前半段与后半段，两次调用即可将整个源寄存器的窄类型数据全部扩展为宽类型写入两个目的寄存器。
+
+### 低半段解包约束
+
+- 本接口读取src低半段元素（即src起始位置到src元素数 ÷ 2 − 1位置的元素）扩展为宽类型写入dst，src高半段元素不参与本次解包。
+- dst全部有效位置被改写为src低半段元素扩展后的结果，不保留dst调用前的旧值；调用方若需保留dst原值，应在调用前自行暂存。
+
+### 高半段解包约束
+
+- 本接口读取src高半段元素（即src元素数 ÷ 2位置到src元素数 − 1位置的元素）扩展为宽类型写入dst，src低半段元素不参与本次解包。
+- dst全部有效位置被改写为src高半段元素扩展后的结果，不保留dst调用前的旧值；调用方若需保留dst原值，应在调用前自行暂存。
 
 ## 调用示例
 

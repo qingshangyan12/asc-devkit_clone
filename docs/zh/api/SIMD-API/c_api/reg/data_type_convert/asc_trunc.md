@@ -33,9 +33,20 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_trunc(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_trunc(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-__simd_callee__ inline void asc_trunc(vector_float& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_trunc(vector_<dtype>& dst,
+                                      vector_<dtype> src,
+                                      vector_bool mask)
+```
+
+支持的数据类型：half、bfloat16_t、float。
+
+- 典型示例
+
+```cpp
+// 示例：对half矢量数据寄存器执行截断
+__simd_callee__ inline void asc_trunc(vector_half& dst,
+                                      vector_half src,
+                                      vector_bool mask)
 ```
 
 ## 参数说明
@@ -57,6 +68,16 @@ __simd_callee__ inline void asc_trunc(vector_float& dst, vector_float src, vecto
 ## 约束说明
 
 float类型只支持不饱和模式。
+
+
+### 通用约束
+
+- **本接口仅在AIV上生效，非AIV调用直接返回。**
+- dst与src的dtype必须完全一致（half/bfloat16_t/float之一），且必须为浮点类型，传入整数类型或类型不匹配会触发异常。
+- mask为`vector_bool`类型掩码寄存器，需先调用掩码设置接口按待处理元素数初始化后再传入；未初始化的掩码寄存器内容不确定，会导致有效元素位置错误。
+- 掩码为假的位置采用清零模式：dst对应位置写0，不保留src原值也不保留dst原值。
+- 截断方向为向零方向舍入（等价C标准库`trunc`语义）：丢弃小数部分取整，正数向0方向取整，负数向0方向取整，整数值保持不变；NaN输入转为标准NaN，INF输入保留原值，+0/-0保持原符号不变。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
 
 ## 调用示例
 

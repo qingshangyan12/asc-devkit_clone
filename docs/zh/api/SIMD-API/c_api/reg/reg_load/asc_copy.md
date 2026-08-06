@@ -45,30 +45,42 @@
 - 矢量数据寄存器复制到矢量数据寄存器
 
     ```cpp
-    __simd_callee__ inline void asc_copy(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_half& dst, vector_half src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_float& dst, vector_float src, vector_bool mask)
+    __simd_callee__ inline void asc_copy(vector_<dtype>& dst,
+                                         vector_<dtype> src,
+                                         vector_bool mask)
+    ```
+
+    支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+- 矢量数据寄存器复制到掩码寄存器（**part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**）
+
+    ```cpp
+    __simd_callee__ inline void asc_copy(vector_bool& dst,
+                                         vector_uint16_t src,
+                                         int16_t part)
+    __simd_callee__ inline void asc_copy(vector_bool& dst,
+                                         vector_uint32_t src,
+                                         int16_t part)
     ```
 
 - 掩码寄存器复制到掩码寄存器
 
     ```cpp
-    __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src)
+    __simd_callee__ inline void asc_copy(vector_bool& dst,
+                                         vector_bool src,
+                                         vector_bool mask)
+    __simd_callee__ inline void asc_copy(vector_bool& dst,
+                                         vector_bool src)
     ```
 
-- 矢量数据寄存器复制到掩码寄存器（**part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**）
+- 典型示例
 
-    ```cpp
-    __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part)
-    __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part)
-    ```
+```cpp
+// 示例：对half矢量数据寄存器复制到矢量数据寄存器
+__simd_callee__ inline void asc_copy(vector_half& dst,
+                                     vector_half src,
+                                     vector_bool mask)
+```
 
 ## 参数说明
 
@@ -80,21 +92,21 @@
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中保持原值。 |
 
-**表2** 参数说明（掩码寄存器复制到掩码寄存器）
-
-| 参数名 | 输入/输出 | 描述 |
-| --- | --- | --- |
-| dst | 输出 | 目的操作数（掩码寄存器）。 |
-| src | 输入 | 源操作数（掩码寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
-
-**表3** 参数说明（矢量数据寄存器复制到掩码寄存器）
+**表2** 参数说明（矢量数据寄存器复制到掩码寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（掩码寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | part | 输入 | part决定了src中需要搬运的数据块，具体描述请参考[关键特性说明](#关键特性说明)。<br>&bull; 当数据类型为uint16_t，part∈[0, 15]。<br>&bull; 当数据类型为uint32_t，part∈[0, 31]。 |
+
+**表3** 参数说明（掩码寄存器复制到掩码寄存器）
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dst | 输出 | 目的操作数（掩码寄存器）。 |
+| src | 输入 | 源操作数（掩码寄存器）。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -105,10 +117,35 @@
 ## 约束说明
 
 - 针对矢量数据寄存器复制到矢量数据寄存器：dst中未被mask筛选的位置保持原值。
-- 针对掩码寄存器复制到掩码寄存器：带mask的接口dst中未被mask筛选的位置填0。
 - 针对矢量寄存器复制到掩码寄存器：**part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**
     - 当数据类型为uint16_t，part∈[0, 15]；
     - 当数据类型为uint32_t，part∈[0, 31]。
+- 针对掩码寄存器复制到掩码寄存器：带mask的接口dst中未被mask筛选的位置填0。
+
+
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src均为矢量数据寄存器或掩码寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+
+### 带掩码搬运约束
+
+- dst与src的dtype必须完全一致（int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float/bfloat16_t之一，或两者均为`vector_bool`），否则触发异常。
+- 参与搬运的元素个数由矢量长度（VL）决定：矢量数据寄存器搬运中元素个数 = VL ÷ sizeof(dtype)；`vector_bool`掩码寄存器搬运中比特个数 = VL。
+- mask比特位按元素大小步进过滤：矢量数据寄存器搬运中每个元素占用`sizeof(dtype)`个比特位，元素i的有效mask比特位于`i × sizeof(dtype)`位置；`vector_bool`掩码寄存器搬运中每个比特独立对应1个mask比特位。
+- mask比特位为0的位置采用Merging模式：dst对应位置保留dst原值。
+
+### 无掩码搬运约束
+
+- dst与src必须均为`vector_bool`掩码寄存器，dtype不一致触发异常。
+- 不区分有效位置，按全部比特位整体复制；dst的所有比特位被src的对应比特位覆盖。
+
+### 矢量到掩码部分搬运约束
+
+- dst必须为`vector_bool`掩码寄存器，src必须为`vector_uint16_t`或`vector_uint32_t`矢量数据寄存器，dtype组合不符触发异常。
+- `part`取值需落在该源dtype允许的位段编号范围内，超出范围的`part`值会导致提取的掩码比特与预期不符。
+- 提取出的掩码比特按矢量长度（VL）依次填入dst的对应比特位，未填充位置内容不确定，使用前应通过掩码设置接口明确其状态。
 
 ## 关键特性说明
 

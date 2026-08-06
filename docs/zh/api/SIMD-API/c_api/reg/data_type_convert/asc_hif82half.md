@@ -34,9 +34,13 @@
 
 ```cpp
 // 取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
-__simd_callee__ inline void asc_hif82half(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
+__simd_callee__ inline void asc_hif82half(vector_half& dst,
+                                          vector_hifloat8_t src,
+                                          vector_bool mask)
 // 取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
-__simd_callee__ inline void asc_hif82half_v2(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
+__simd_callee__ inline void asc_hif82half_v2(vector_half& dst,
+                                             vector_hifloat8_t src,
+                                             vector_bool mask)
 ```
 
 ## 参数说明
@@ -58,6 +62,24 @@ __simd_callee__ inline void asc_hif82half_v2(vector_half& dst, vector_hifloat8_t
 ## 约束说明
 
 mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+
+
+### 通用约束
+
+- **本接口仅在AIV上生效，非AIV调用直接返回。**
+- src的dtype必须为`hifloat8_t`，dst的dtype必须为`half`，dtype固定不可混用，否则触发异常。
+- mask为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- 掩码比特位按元素大小步进过滤：每个`hifloat8_t`元素占1字节，对应占用1个mask比特位，元素i的有效mask比特位于第i位。
+- 参与计算的元素个数由矢量长度（VL）决定，`hifloat8_t`占1字节，单次处理元素个数 = VL ÷ 1（如VL为256字节时为256个元素）。
+- 掩码为假的位置采用清零模式：dst对应位置写0，不保留src原值也不保留dst原值。
+- `hifloat8_t`与`half`的转换属精度无损的短转长扩展：尾数从3 bit低位补0扩展到10 bit，指数经偏移调整（7 → 15）后写入`half`指数位，不引入舍入误差；输入为±Inf时直接保留为`half`的±Inf，输入为NaN时转为`half`标准NaN，不触发异常。
+- 本接口由接口封装实现类型转换，无对应底层指令名，行为约束以本接口原型参数与短转长扩展语义为准。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为Reg矢量计算寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+
+### 分块位置变体约束
+
+- 本接口提供2个分块位置变体：主原型`asc_hif82half`采用偶数分块位置，仅转换源矢量寄存器中索引为偶数的`hifloat8_t`元素，结果从dst起始位置连续写入，源矢量寄存器中索引为奇数的元素不参与本次转换；`_v2`后缀变体`asc_hif82half_v2`采用奇数分块位置，仅转换源矢量寄存器中索引为奇数的`hifloat8_t`元素，结果同样从dst起始位置连续写入，源矢量寄存器中索引为偶数的元素不参与本次转换。
+- 两个变体的源、目、掩码参数完全一致，仅分块位置不同；同一src上分别调用两个变体可独立取得偶数位与奇数位元素的转换结果，结果可独立并行写入不同目的寄存器，不会相互覆盖。
 
 ## 调用示例
 

@@ -34,9 +34,13 @@
 
 ```cpp
 // 取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162float(vector_float& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162float(vector_float& dst,
+                                            vector_int16_t src,
+                                            vector_bool mask)
 // 取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162float_v2(vector_float& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162float_v2(vector_float& dst,
+                                               vector_int16_t src,
+                                               vector_bool mask)
 ```
 
 ## 参数说明
@@ -58,6 +62,23 @@ __simd_callee__ inline void asc_int162float_v2(vector_float& dst, vector_int16_t
 ## 约束说明
 
 mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+
+
+### 通用约束
+
+- **本接口仅在AIV上生效，非AIV调用直接返回。**
+- src的dtype必须为`int16_t`，dst的dtype必须为`float`，dtype固定不可混用，否则触发异常。
+- mask为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- 掩码为假的位置采用清零模式：dst对应位置写0，不保留src原值也不保留dst原值。
+- `int16_t`与`float`的转换属精度无损的短转长扩展：`int16_t`全部取值范围 [−2^15, 2^15−1] 均可在`float`尾数24 bit（含隐含最高位）中精确表示，转换无舍入、无饱和、无溢出；不触发异常。
+- 本接口由接口封装实现类型转换，无对应底层指令名，行为约束以本接口原型参数与短转长扩展语义为准。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+
+### 分块位置变体约束
+
+- 本接口提供2个分块位置（偶数、奇数），对应接口名后缀`_v2`的变体使用奇数分块位置；不带`_vN`后缀的主原型使用偶数分块位置。
+- 主原型仅转换源矢量寄存器中索引为偶数的`int16_t`元素，`asc_int162float_v2`仅转换索引为奇数的`int16_t`元素，两者配合可完成源矢量寄存器全部元素的转换；单独调用其中一个原型只处理一半元素，另一半元素不参与本次转换。
+- 不同分块位置变体的源、目、掩码参数完全一致，仅分块位置不同；不同分块位置的结果可独立并行写入，不会相互覆盖。
 
 ## 调用示例
 

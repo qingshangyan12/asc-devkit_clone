@@ -36,12 +36,18 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_unsqueeze(vector_int8_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_uint8_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_int16_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_uint16_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_int32_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask)
+__simd_callee__ inline void asc_unsqueeze(vector_<dtype>& dst,
+                                          vector_bool mask)
+```
+
+支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+
+- 典型示例
+
+```cpp
+// 示例：对int8_t矢量数据寄存器执行解压缩
+__simd_callee__ inline void asc_unsqueeze(vector_int8_t& dst,
+                                          vector_bool mask)
 ```
 
 ## 参数说明
@@ -61,7 +67,15 @@ __simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask
 
 ## 约束说明
 
-无
+### 通用约束
+
+- **本接口仅在AIV上生效，非AIV调用直接返回。**
+- dst的dtype必须为`uint8_t`/`int8_t`/`uint16_t`/`int16_t`/`uint32_t`/`int32_t`之一（6种整数dtype），不支持浮点dtype；mask必须为`vector_bool`掩码寄存器，类型不匹配触发数据类型异常。
+- mask为`vector_bool`类型掩码寄存器，需通过配套的掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致前缀计数结果错误。
+- mask比特位按元素大小步进过滤：每个元素占用`sizeof(dst dtype)`个连续比特位，元素`i`的有效mask比特起始于位置`i × sizeof(dst dtype)`。如`uint16_t`（2字节）元素`i`的mask比特位于`i × 2`位置，`int32_t`（4字节）元素`i`的mask比特位于`i × 4`位置。
+- 参与计算的元素个数由矢量长度（VL）决定，元素个数 = VL ÷ sizeof(dst dtype)。一个矢量数据寄存器共256字节，1字节dtype（`uint8_t`/`int8_t`）为256个元素，2字节dtype（`uint16_t`/`int16_t`）为128个元素，4字节dtype（`uint32_t`/`int32_t`）为64个元素。
+- dst写入值为非负整数计数，dtype选`uint8_t`/`uint16_t`/`uint32_t`时计数直接表达；选`int8_t`/`int16_t`/`int32_t`时计数以有符号整数表达，因计数非负，实际占用有符号dtype的非负区间，不会出现负值。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与mask为矢量数据寄存器/掩码寄存器，不涉及UB地址，无UB容量与地址对齐约束。
 
 ## 调用示例
 

@@ -50,25 +50,43 @@
 - 2维偏移
 
     ```cpp
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1)
+    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0,
+                                                           uint32_t offset1)
+    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0,
+                                                            uint32_t offset1)
+    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0,
+                                                            uint32_t offset1)
     ```
 
 - 3维偏移
 
     ```cpp
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2)
+    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0,
+                                                           uint32_t offset1,
+                                                           uint32_t offset2)
+    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0,
+                                                            uint32_t offset1,
+                                                            uint32_t offset2)
+    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0,
+                                                            uint32_t offset1,
+                                                            uint32_t offset2)
     ```
 
 - 4维偏移
 
     ```cpp
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
+    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0,
+                                                           uint32_t offset1,
+                                                           uint32_t offset2,
+                                                           uint32_t offset3)
+    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0,
+                                                            uint32_t offset1,
+                                                            uint32_t offset2,
+                                                            uint32_t offset3)
+    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0,
+                                                            uint32_t offset1,
+                                                            uint32_t offset2,
+                                                            uint32_t offset3)
     ```
 
 ## 参数说明
@@ -94,6 +112,15 @@
 - 不同步长的操作数，建议使用多个addr_reg，避免地址被覆盖。
 - addr_reg的数量上限为8，超过8个可能会导致性能劣化。编译器会自动复用生命周期已经结束的addr_reg寄存器。
 - 由于硬件（HardwareLoop）限制，addr_reg最多支持4层循环。
+
+
+### 通用约束
+
+- **本接口仅在AIV上生效，非AIV调用直接返回。**
+- 本接口需在Vector Function（`__simd_vf__`标记的函数）内调用，非Vector Function内调用不生效。
+- 本接口需在硬件循环（LOOP）上下文中使用：本接口仅把元素偏移量登记到地址寄存器的常数表，实际的地址偏移乘加累加由LOOP迭代时硬件自动触发，单独调用本接口不产生有效地址寄存器值。
+- 传入的offset数量需与配套使用的硬件循环嵌套层数匹配：1个offset对应1层循环，2个offset对应2层嵌套循环，以此类推，最多支持4维嵌套循环。传入offset数量少于循环嵌套层数时，未登记维度的偏移量按0处理；多于循环嵌套层数时，多出的offset不参与地址计算。
+- offset参数单位为元素个数，硬件按目标矢量数据的dtype字节大小换算为字节偏移。dtype必须与循环内矢量搬入搬出接口操作的dtype元素位宽一致，否则地址偏移量按错误的字节大小换算，导致寻址错位，触发异常。
 
 ## 调用示例
 

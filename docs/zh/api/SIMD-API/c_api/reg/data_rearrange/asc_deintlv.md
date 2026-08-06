@@ -37,28 +37,40 @@
 - 操作数为矢量数据寄存器
 
     ```cpp
-    __simd_callee__ inline void asc_deintlv(vector_int8_t& dst0, vector_int8_t& dst1, vector_int8_t src0, vector_int8_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_uint8_t& dst0, vector_uint8_t& dst1, vector_uint8_t src0, vector_uint8_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, vector_hifloat8_t src0, vector_hifloat8_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_int16_t& dst0, vector_int16_t& dst1, vector_int16_t src0, vector_int16_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_uint16_t& dst0, vector_uint16_t& dst1, vector_uint16_t src0, vector_uint16_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_half& dst0, vector_half& dst1, vector_half src0, vector_half src1)
-    __simd_callee__ inline void asc_deintlv(vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0, vector_bfloat16_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1)
-    __simd_callee__ inline void asc_deintlv(vector_float& dst0, vector_float& dst1, vector_float src0, vector_float src1)
+    __simd_callee__ inline void asc_deintlv(vector_<dtype>& dst0,
+                                            vector_<dtype>& dst1,
+                                            vector_<dtype> src0,
+                                            vector_<dtype> src1)
     ```
+
+    支持的数据类型：int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
 - 操作数为掩码寄存器
 
     ```cpp
-    __simd_callee__ inline void asc_deintlv_b8(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1)
-    __simd_callee__ inline void asc_deintlv_b16(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1)
-    __simd_callee__ inline void asc_deintlv_b32(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1)
+    __simd_callee__ inline void asc_deintlv_b8(vector_bool& dst0,
+                                               vector_bool& dst1,
+                                               vector_bool src0,
+                                               vector_bool src1)
+    __simd_callee__ inline void asc_deintlv_b16(vector_bool& dst0,
+                                                vector_bool& dst1,
+                                                vector_bool src0,
+                                                vector_bool src1)
+    __simd_callee__ inline void asc_deintlv_b32(vector_bool& dst0,
+                                                vector_bool& dst1,
+                                                vector_bool src0,
+                                                vector_bool src1)
     ```
+
+- 典型示例
+
+```cpp
+// 示例：对half矢量数据寄存器执行解交织
+__simd_callee__ inline void asc_deintlv(vector_half& dst0,
+                                        vector_half& dst1,
+                                        vector_half src0,
+                                        vector_half src1)
+```
 
 ## 参数说明
 
@@ -92,6 +104,25 @@
 - src0和src1可以为同一个矢量数据寄存器或掩码寄存器。
 - dst0和dst1不能为同一个矢量数据寄存器或掩码寄存器。
 - 允许源操作数和目的操作数为同一个矢量数据寄存器，例如asc_deintlv(src0, src1, src0, src1)。
+
+
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 矢量数据解交织模式下，dst0、dst1、src0、src1四者dtype必须完全一致，否则触发数据类型异常。
+- 本接口不使用掩码寄存器过滤元素，对全部元素执行解交织，dst0、dst1各写入全部有效元素的一半。
+- 同名接口的矢量数据解交织与掩码解交织为参数列表完全不同的功能模式，用户必须按使用场景选择对应重载系列，不可混用。
+
+### 矢量数据解交织约束
+
+- dtype仅支持int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/half/bfloat16_t/float/fp8_e4m3fn_t/fp8_e5m2_t/fp8_e8m0_t/hifloat8_t共13种，其他dtype触发数据类型异常。
+- 解交织为双目的操作：dst0与dst1必须为不同的矢量数据寄存器实例，若两者引用同一寄存器将导致写后读冲突，结果未定义。
+
+### 掩码解交织约束
+
+- 源与目的必须均为掩码寄存器（vector_bool），不可与矢量数据寄存器混用，否则触发数据类型异常。
+- 解交织粒度由变体名决定：asc_deintlv_b8按1字节粒度解交织、asc_deintlv_b16按2字节粒度解交织、asc_deintlv_b32按4字节粒度解交织。不同粒度变体不可混用。
+- 解交织为双目的操作：dst0与dst1必须为不同的掩码寄存器实例，若两者引用同一寄存器将导致写后读冲突，结果未定义。
 
 ## 调用示例
 
