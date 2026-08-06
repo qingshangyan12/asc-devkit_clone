@@ -245,6 +245,17 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[7] = ccuParam_.rankNum * normalSliceSize; // scratchRepeatStride
     xnData_[8] = UINT64_MAX - 1; // repeatNum = 1
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "[ScratchOverflowDiag] CcuPrepareForReduceScatterM2M: count=%llu, dataSize=%llu, sliceSize=%llu, "
+        "rankNum=%u, rankId=%u, scratchAddr=0x%llx, scratchNeed(rankSize*sliceSize)=%llu, "
+        "scratchFixed(MC2_WORKSPACE_SIZE)=%llu, overflow=%s",
+        static_cast<uint64_t>(commParam->count), static_cast<uint64_t>(dataSize), sliceSize,
+        static_cast<uint32_t>(ccuParam_.rankNum), static_cast<uint32_t>(ccuParam_.rankId),
+        static_cast<uint64_t>(ccuParam_.scratchAddr),
+        static_cast<uint64_t>(ccuParam_.rankNum) * sliceSize,
+        static_cast<uint64_t>(16u * 1024u * 1024u), // MC2_WORKSPACE_SIZE
+        (static_cast<uint64_t>(ccuParam_.rankNum) * sliceSize > 16u * 1024u * 1024u) ? "YES" : "NO");
 }
 } // namespace AscendC
 

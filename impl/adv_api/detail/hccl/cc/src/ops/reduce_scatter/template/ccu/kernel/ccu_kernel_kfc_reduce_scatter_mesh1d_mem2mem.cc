@@ -436,6 +436,19 @@ static void InitReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
         scratchOffset += ctx.sliceSize;
         ctx.scratchMem[rankIdx].token = ctx.token[ctx.rankId];
     }
+
+    HCCL_INFO(
+        "[ScratchOverflowDiag] InitReduceScatterAddr: rankSize=%u, rankId=%u, sliceSize=%llu, "
+        "scratchBase=0x%llx, scratchSpan(rankSize*sliceSize)=%llu bytes, "
+        "scratchFixed(MC2_WORKSPACE_SIZE)=%llu bytes, overflow=%s",
+        ctx.rankSize, ctx.rankId, static_cast<uint64_t>(ctx.sliceSize),
+        static_cast<uint64_t>(ctx.scratch[ctx.rankId]),
+        static_cast<uint64_t>(ctx.rankSize) * static_cast<uint64_t>(ctx.sliceSize),
+        static_cast<uint64_t>(16u * 1024u * 1024u),
+        (static_cast<uint64_t>(ctx.rankSize) * static_cast<uint64_t>(ctx.sliceSize) >
+         static_cast<uint64_t>(16u * 1024u * 1024u))
+            ? "YES"
+            : "NO");
 }
 
 static void ResetReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
