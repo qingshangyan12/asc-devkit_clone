@@ -13,11 +13,10 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-template <typename DTYPE>
-__aicore__ inline void set_intra_block_stub(pipe_t pipe, DTYPE sync_id)
+__aicore__ inline void set_intra_block_stub(pipe_t pipe, uint64_t sync_id)
 {
     EXPECT_EQ(pipe, static_cast<pipe_t>(pipe_t::PIPE_S));
-    EXPECT_EQ(sync_id, static_cast<DTYPE>(22));
+    EXPECT_EQ(sync_id, static_cast<uint64_t>(22));
 }
 
 class TEST_ASC_SYNC_INTRA_ARRIVE : public testing::Test {
@@ -30,7 +29,7 @@ protected:
                                                                                                              \
     TEST_F(TEST_ASC_SYNC_INTRA_ARRIVE, TEST_ASC_SYNC_INTRA_ARRIVE_##dtype)                                   \
     {                                                                                                        \
-        MOCKER_CPP(set_intra_block, void(pipe_t, dtype)).times(1).will(invoke(set_intra_block_stub<dtype>)); \
+        MOCKER_CPP(set_intra_block, void(pipe_t, uint64_t)).times(1).will(invoke(set_intra_block_stub));     \
                                                                                                              \
         pipe_t pipe = static_cast<pipe_t>(pipe_t::PIPE_S);                                                   \
         dtype sync_id = static_cast<dtype>(22);                                                              \
