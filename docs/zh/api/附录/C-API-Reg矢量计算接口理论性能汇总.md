@@ -3,12 +3,12 @@
 本节汇总介绍了C-API Reg矢量计算接口的理论性能，本节内容仅针对如下型号生效：
 
 <!-- npu="950" id1 -->
-Ascend 950PR/Ascend 950DT
+- Ascend 950PR/Ascend 950DT：支持（本节内容生效。）
 <!-- end id1 -->
 
 本节汇总的理论性能均为单指令理论性能，软仿实现的接口和数据类型不提供理论性能。
 
-**表1**  基础算术
+**表 1**  基础算术
 
 | 接口 | 源操作数数据类型 | 目的操作数数据类型 | 理论并行度（element/cycle） |
 | -------- | ---------------- | ---------------- | ---------------- |
@@ -42,6 +42,7 @@ Ascend 950PR/Ascend 950DT
 | asc_min_scalar | int16_t | int16_t | 128 |
 | asc_min_scalar | uint16_t | uint16_t | 128 |
 | asc_min_scalar | half | half | 128 |
+| asc_min_scalar | bfloat16_t | bfloat16_t | 128 |
 | asc_min_scalar | int32_t | int32_t | 64 |
 | asc_min_scalar | uint32_t | uint32_t | 64 |
 | asc_min_scalar | float | float | 64 |
@@ -60,7 +61,7 @@ Ascend 950PR/Ascend 950DT
 | asc_relu | int32_t | int32_t | 64 |
 | asc_relu | float | float | 64 |
 
-**表2**  逻辑算术
+**表 2**  逻辑算术
 
 | 接口 | 源操作数数据类型 | 目的操作数数据类型 | 理论并行度（element/cycle） |
 | -------- | ---------------- | ---------------- | ---------------- |
@@ -87,7 +88,7 @@ Ascend 950PR/Ascend 950DT
 | asc_or | uint32_t | uint32_t | 64 |
 | asc_or | float | float | 64 |
 
-**表3**  复合计算
+**表 3**  复合计算
 
 | 接口 | 源操作数数据类型 | 目的操作数数据类型 | 理论并行度（element/cycle） |
 | -------- | ---------------- | ---------------- | ---------------- |
@@ -96,7 +97,7 @@ Ascend 950PR/Ascend 950DT
 | asc_axpy | half | half | 128 |
 | asc_axpy | float | float | 64 |
 
-**表4**  比较与选择
+**表 4**  比较与选择
 
 | 接口 | 源操作数数据类型 | 目的操作数数据类型 | 理论并行度（element/cycle） |
 | -------- | ---------------- | ---------------- | ---------------- |
@@ -186,7 +187,7 @@ Ascend 950PR/Ascend 950DT
 | asc_select | uint32_t | uint32_t | 64 |
 | asc_select | float | float | 64 |
 
-**表5**  类型转换
+**表 5**  类型转换
 
 | 接口 | 源操作数数据类型 | 目的操作数数据类型 | 理论并行度（element/cycle） |
 | -------- | ---------------- | ---------------- | ---------------- |
@@ -195,7 +196,7 @@ Ascend 950PR/Ascend 950DT
 | asc_int322int64 | int32_t | int64_t | 32 |
 | asc_int322uint16 | int32_t | uint16_t | 64 |
 
-**表6**  归约计算
+**表 6**  归约计算
 
 | 接口 | 源操作数数据类型 | 目的操作数数据类型 | 理论并行度（element/cycle） |
 | -------- | ---------------- | ---------------- | ---------------- |
@@ -236,7 +237,7 @@ Ascend 950PR/Ascend 950DT
 | asc_reduce_sum_datablock | uint32_t | uint32_t | 64 |
 | asc_reduce_sum_datablock | float | float | 64 |
 
-**表7**  直方图计算
+**表 7**  直方图计算
 
 | 接口 | 源操作数数据类型 | 目的操作数数据类型 | 理论并行度（element/cycle） |
 | -------- | ---------------- | ---------------- | ---------------- |
