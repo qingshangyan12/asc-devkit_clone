@@ -21,32 +21,32 @@
 #define ASCENDC_MODULE_NAME static_cast<int32_t>(ASCENDCKERNEL)
 
 #if !(defined(UT_TEST) || defined(ST_TEST))
-#define ASCENDLOGE(format, ...)                                                                                \
-    do {                                                                                                       \
-        dlog_error(                                                                                            \
-            ASCENDC_MODULE_NAME, "  %d [%s:%d][%s]" format "\n", mmGetTid(), __FILE__, __LINE__, __FUNCTION__, \
-            ##__VA_ARGS__);                                                                                    \
+#define ASCENDLOGE(format, ...)                                                                  \
+    do {                                                                                         \
+        dlog_error(                                                                              \
+            ASCENDC_MODULE_NAME, "  %d [%s:%d][%s]" format "\n", mmGetTid(), __FILE__, __LINE__, \
+            __FUNCTION__, ##__VA_ARGS__);                                                        \
     } while (0)
 
-#define ASCENDLOGW(format, ...)                                                                                \
-    do {                                                                                                       \
-        dlog_warn(                                                                                             \
-            ASCENDC_MODULE_NAME, "  %d [%s:%d][%s]" format "\n", mmGetTid(), __FILE__, __LINE__, __FUNCTION__, \
-            ##__VA_ARGS__);                                                                                    \
+#define ASCENDLOGW(format, ...)                                                                  \
+    do {                                                                                         \
+        dlog_warn(                                                                               \
+            ASCENDC_MODULE_NAME, "  %d [%s:%d][%s]" format "\n", mmGetTid(), __FILE__, __LINE__, \
+            __FUNCTION__, ##__VA_ARGS__);                                                        \
     } while (0)
 
-#define ASCENDLOGI(format, ...)                                                                                \
-    do {                                                                                                       \
-        dlog_info(                                                                                             \
-            ASCENDC_MODULE_NAME, "  %d [%s:%d][%s]" format "\n", mmGetTid(), __FILE__, __LINE__, __FUNCTION__, \
-            ##__VA_ARGS__);                                                                                    \
+#define ASCENDLOGI(format, ...)                                                                  \
+    do {                                                                                         \
+        dlog_info(                                                                               \
+            ASCENDC_MODULE_NAME, "  %d [%s:%d][%s]" format "\n", mmGetTid(), __FILE__, __LINE__, \
+            __FUNCTION__, ##__VA_ARGS__);                                                        \
     } while (0)
 
-#define ASCENDLOGD(format, ...)                                                                               \
-    do {                                                                                                      \
-        dlog_debug(                                                                                           \
-            ASCENDC_MODULE_NAME, " %d [%s:%d][%s]" format "\n", mmGetTid(), __FILE__, __LINE__, __FUNCTION__, \
-            ##__VA_ARGS__);                                                                                   \
+#define ASCENDLOGD(format, ...)                                                                 \
+    do {                                                                                        \
+        dlog_debug(                                                                             \
+            ASCENDC_MODULE_NAME, " %d [%s:%d][%s]" format "\n", mmGetTid(), __FILE__, __LINE__, \
+            __FUNCTION__, ##__VA_ARGS__);                                                       \
     } while (0)
 #else
 #define ASCENDLOGE
