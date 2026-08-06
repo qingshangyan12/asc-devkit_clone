@@ -111,8 +111,8 @@
     {
         vector_int8_t dst;
         vector_uint32_t index;
-        vector_bool cal_mask = asc_create_mask_b32(PAT_VL7); // PAT_VL7表示前7个DataBlock更新。
-        vector_bool store_mask = asc_create_mask_b8(PAT_ALL);
+        vector_bool cal_mask = asc_create_mask_b32(PAT_VL4); // PAT_VL4表示仅前4个DataBlock更新。
+        vector_bool store_mask = asc_create_mask_b8(PAT_H); // PAT_H表示仅前一半的元素搬出。
         for (uint16_t i = 0; i < repeat_time; ++i) {
             asc_loadalign_postupdate(index, index_addr, index_repeat_size);
             asc_gather_datablock(dst, src_addr, index, cal_mask);

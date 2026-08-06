@@ -127,7 +127,7 @@ $$
         vector_bool carry;
         vector_bool mask;
         for (uint16_t i = 0; i < repeat_time; ++i) {
-            mask = asc_update_mask_b16(count);
+            mask = asc_update_mask_b32(count);
             asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
             asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
             asc_sub(carry, dst, src0, src1, mask);

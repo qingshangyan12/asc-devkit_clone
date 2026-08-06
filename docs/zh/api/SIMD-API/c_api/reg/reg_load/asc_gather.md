@@ -135,7 +135,7 @@
 - 收集UB中的元素
 
     ```cpp
-    __simd_vf__ inline void gather_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, int32_t index_repeat_size, int32_t dst_block_size, uint16_t repeat_time)
+    __simd_vf__ inline void gather_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, int32_t index_repeat_size, int32_t dst_repeat_size, uint16_t repeat_time)
     {
         vector_half dst;
         vector_uint16_t index;
@@ -144,7 +144,7 @@
             mask = asc_update_mask_b16(count);
             asc_loadalign_postupdate(index, index_addr, index_repeat_size);
             asc_gather(dst, src_addr, index, mask);
-            asc_storealign_postupdate(dst_addr, dst, dst_block_size, mask);
+            asc_storealign_postupdate(dst_addr, dst, dst_repeat_size, mask);
         }
     }
     ```
@@ -152,7 +152,7 @@
 - 收集矢量数据寄存器中的元素
 
     ```cpp
-    __simd_vf__ inline void gather_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, int32_t one_repeat_size, int32_t dst_block_size, uint16_t repeat_time)
+    __simd_vf__ inline void gather_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, int32_t one_repeat_size, int32_t dst_repeat_size, uint16_t repeat_time)
     {
         vector_half dst;
         vector_half src;
@@ -163,7 +163,7 @@
             asc_loadalign_postupdate(src, src_addr, one_repeat_size);
             asc_loadalign_postupdate(index, index_addr, one_repeat_size);
             asc_gather(dst, src, index);
-            asc_storealign_postupdate(dst_addr, dst, dst_block_size, mask);
+            asc_storealign_postupdate(dst_addr, dst, dst_repeat_size, mask);
         }
     }
     ```
