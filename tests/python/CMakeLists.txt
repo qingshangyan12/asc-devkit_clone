@@ -70,6 +70,14 @@ run_python_llt_test(
     COVERAGERC_DIR
 )
 
+run_python_llt_test(
+    TARGET ascendc_pyut_cmake_util
+    SRC_FILES_DIR ${ASCENDC_DIR}/cmake/asc/fwk_modules/util/
+    TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/ascendc_cmake_util/
+    PRE_TEST_COMMAND
+    COVERAGERC_DIR
+)
+
 set(OPC_BASE "${CMAKE_CURRENT_SOURCE_DIR}")
 file(MAKE_DIRECTORY ${OPC_BASE}/asc_opc/output)
 file(WRITE ${OPC_BASE}/asc_opc/stub/files/kernel_meta/MatMul_build_res.o "")
@@ -102,7 +110,7 @@ add_custom_target(run_all_tests_and_clean ALL
     COMMAND rm -rf ${ASCENDC_DIR}/out/
     # created by run_python_llt_test
     COMMAND rm -f ${ASCENDC_DIR}/null
-    DEPENDS ascendc_pyut_asc_compile_common ascendc_pyut_asc_op_compiler asc_opc_unittest ascendc_pyut_compile_trace_log ascendc_pyut_aclrt_launch_kernel
+    DEPENDS ascendc_pyut_asc_compile_common ascendc_pyut_asc_op_compiler asc_opc_unittest ascendc_pyut_compile_trace_log ascendc_pyut_aclrt_launch_kernel ascendc_pyut_cmake_util
     COMMENT "clean generated test files"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
