@@ -97,7 +97,43 @@ PIPE_MTE2
 ## 约束说明
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-- 目的操作数不得存在地址重叠。对于存在地址重叠的操作，硬件将不返回任何警告或错误，也无法保证地址重叠数据的正确性。
+- 目的操作数不得存在地址重叠。对于存在地址重叠的操作，无法保证地址重叠数据的正确性。
+
+### 通用约束
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- dst起始地址需32字节对齐（L1 Buffer对齐要求），否则触发异常。
+- src起始地址需1字节对齐（Global Memory对齐要求），不满足触发异常。
+- 如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。
+- L1 Buffer容量上限：L1 Buffer总容量512KB，dst偏移+搬运大小不可越界，否则触发目的地址越界异常。
+- 源端数据占用的内存不可超出Global Memory容量，否则触发源地址越界异常。
+- `len_burst`需满足dtype字节对齐：dtype为`int16_t`/`uint16_t`/`half`/`bfloat16_t`时需为2的倍数，dtype为`int32_t`/`uint32_t`/`float`时需为4的倍数，否则触发异常。
+- n_burst取值范围为[1, 2^21−1]，超出取值范围的值会被截断，导致搬运结果不符合预期。
+- len_burst取值范围为[1, 2^21−1]，超出取值范围的值会被截断，导致搬运结果不符合预期。
+- burst_src_stride取值范围为[0, 2^40−1]，超出取值范围的值会被截断，导致搬运结果不符合预期。
+- burst_dst_stride取值范围为[0, 2^21−1]，超出取值范围的值会被截断，导致搬运结果不符合预期。
+- `data_select_bit`设置为true时，或者左右填充模式（`left_padding_count`和`right_padding_count`任意不为0）时，须先调用asc_set_gm2l1_pad配置填充值。
+
+### Normal填充模式约束
+
+- 当`burst_dst_stride`不等于`len_burst`时，`burst_dst_stride`需32字节对齐，否则触发异常，该约束即使`n_burst`为1仍生效。
+- 填充数据的数据量为32 - `len_burst`%32，单位为字节；填充的值取决于`data_select_bit`设置。若设置`data_select_bit`为false，将padding值设置为每次brust的第一个元素；若设置为true，padding值为asc_set_gm2l1_pad设置的值。
+
+### Compact填充模式约束
+
+- 当`burst_dst_stride`等于`len_burst`时，`n_burst *len_burst`非32字节对齐，则触发Compact填充模式。
+- 填充数据的数据量为32 - `n_burst *len_burst`%32，单位为字节；填充的值取决于`data_select_bit`设置。若设置`data_select_bit`为false，将padding值设置为每次brust的第一个元素；若设置为true，padding值为asc_set_gm2l1_pad设置的值。
+
+### 左右填充模式约束
+
+- `left_padding_count`和`right_padding_count`的取值范围随dtype变化：dtype为`int8_t`、`uint8_t`或`hifloat8_t`时，取值范围为[0, 32]；dtype为`int16_t`、`uint16_t`、`half`或`bfloat16_t`时，取值范围为[0, 16]；dtype为`int32_t`、`uint32_t`或`float`时，取值范围为[0, 8]。超出取值范围会导致搬运填充结果不符合预期。
+- 左右填充模式下，`left_padding_count×sizeof(dtype) +right_padding_count×sizeof(dtype) +len_burst`加上末尾对齐填充后需32字节对齐。
+
+### 循环填充模式约束
+
+- 循环填充模式必须配合asc_set_gm2l1_loop_size、asc_set_gm2l1_loop1_stride、asc_set_gm2l1_loop2_stride使用，通过上述接口配置循环次数和步长。
+- 循环填充模式loop1 dst stride与loop2 dsr stride必须32字节对齐，该约束即使loop size为1仍生效。
+- 循环填充模式不能和左右填充模式同时开启。
 
 ## 调用示例
 

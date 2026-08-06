@@ -204,6 +204,41 @@ PIPE_MTE1
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
 
+### 通用约束
+
+- **本接口仅在AIC上生效，非AIC调用直接返回。**
+- dst起始地址需512字节对齐（L0B Buffer对齐要求），否则会导致搬运异常。
+- src起始地址需32字节对齐（L1 Buffer对齐要求），2D矩阵搬运模式下需32字节对齐；3D格式img2col搬运模式下按channel_size×sizeof(dtype) 对齐（channel_size≥dtype阈值时32字节对齐，channel_size较小时按对应字节数对齐）。不满足触发异常。
+- 如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。
+- L0B Buffer容量上限：L0B Buffer总容量64KB，dst偏移+搬运大小不可越界，否则触发写溢出异常。
+- L1 Buffer容量上限：L1 Buffer总容量512KB，src偏移+源矩阵占用大小不可越界，否则触发异常。
+
+### 2D矩阵搬运模式约束
+
+- m_step或k_step为0时不执行搬运，本接口被视为NOP（空操作）。
+- 2D矩阵搬运模式下不执行转置。如需转置，请使用对应的转置搬运接口。
+- src_stride为有符号数，可为负值；负值表示源端沿K维反向取数。dst_stride不可为负值。
+- 源矩阵在L1 Buffer中的占用不可超过L1 Buffer容量（含地址下溢），目的矩阵在L0B Buffer中的占用不可超过L0B Buffer容量，否则触发地址溢出异常。
+
+### 3D格式img2col搬运模式约束
+
+- 调用本模式前须先通过配套setter接口预先配置Feature Map尺寸、padding填充值、repeat控制与L1 Buffer容量上限等参数，再调用本接口，否则搬运行为未定义。
+- 3D格式搬运到L0B Buffer时会自动进行转置，transpose参数无效，不支持非转置场景。
+- k_extension、m_extension或channel_size为0时不执行搬运，本接口被视为NOP（空操作）。
+- filter_w为0且filter_size_w为false，或filter_h为0且filter_size_h为false时不执行搬运，本接口被视为NOP（空操作）。
+- 调用本模式前，必须通过[asc_set_l3d_rpt_b](../asc_set_l3d_rpt_b.md)设置目的端步长。
+- stride_w不可为0，stride_h不可为0，否则触发异常。
+- channel_size需按dtype对齐基准对齐：b32须为8的倍数或8的倍数加4、b16须为16的倍数或等于4、8、b8须为32的倍数或等于4、8、16，否则触发对齐异常。
+- k_start_pt需按dtype对应分形列数对齐：b32为8的倍数、b16为16的倍数、b8为32的倍数，否则触发对齐异常。
+- m_start_pt取值范围 [0, 32767]，传入>32767的值触发异常。
+- b4 dtype在3D格式img2col搬运模式下不被支持。
+- Feature Map尺寸（含padding）须≥卷积核尺寸（含dilation），即fm_w+pad_l+pad_r≥ (filter_w − 1) ×dilation_filter_w+1，fm_h+pad_t+pad_b≥ (filter_h − 1) ×dilation_filter_h+1，否则触发异常。
+- fm_w×fm_h×channel_size×sizeof(dtype) 不可超过L1 Buffer容量，否则触发L1 Buffer容量溢出异常。
+- 第一个卷积核窗口位置须≤Feature Map尺寸（含padding）− 卷积核尺寸（含dilation），否则触发异常。
+- k_start_pt+k_extension不可超过img2col展开后矩阵的K维总尺寸，m_start_pt+m_extension不可超过M维总尺寸，否则触发异常。
+- stride_w传入>63的值会截断处理（如64→0、65→1）。截断后实际生效值偏小，导致W方向卷积滑动步长小于预期，img2col展开后的矩阵行数增多，与预期Feature Map尺寸不匹配。截断后若值为0会同时触发stride_w不可为0的异常。
+- stride_h传入>63的值会截断处理（如64→0、65→1）。截断后实际生效值偏小，导致H方向卷积滑动步长小于预期，img2col展开后的矩阵行数增多，与预期Feature Map尺寸不匹配。截断后若值为0会同时触发stride_h不可为0的异常。
+
 ## 3D数据格式说明
 
 要求输入的feature map和filter的格式是NC1HWC0，其中C0是最低维度而且C0是固定值为16（对于u8/s8类型为32），C1=C/C0。

@@ -285,6 +285,42 @@ PIPE_FIX
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 
+### 通用约束
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- dst起始地址需32字节对齐（UB对齐要求），否则触发异常。
+- src起始地址需64字节对齐（L0C Buffer对齐要求，`float`/`int32_t`源），否则触发异常。
+- 如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。
+- **UB容量上限**：UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst偏移+搬运大小不可超过实际可用容量，否则触发写溢出异常。
+- **L0C Buffer容量上限**：L0C Buffer总容量256KB，src偏移+搬运大小不可超过L0C Buffer容量，否则触发读溢出异常。
+- 量化与激活模式中的M1/M2/M3/M4 scale参数不可为INF/NaN或非规格化数，否则结果错误。
+- dtype仅支持源为`float`/`int32_t`（L0C Buffer端f16源在本芯片的Cube单元中不支持），dst dtype由重载决定，src与dst dtype组合需与`quant_pre`量化模式匹配，否则触发异常。
+
+### 随路量化激活搬运模式约束
+
+- `n_size`、`m_size`、`loop_dst_stride`需满足按dtype与功能模式（NZ2ND/NZ2DN/split_en等）的对齐约束（详见参数说明），违反约束触发异常。
+- `loop_dst_stride`不可为0（即使对应loop size为0），否则触发异常。
+- `clip_relu_pre`取值需为已定义模式（0/1之一），取值2/3触发异常。
+- `unit_flag_ctl`取值1为保留值，触发异常；取值需为0/2/3之一。
+- `quant_pre`取值需为已定义的合法量化模式，非法取值（含6、7、[17, 20]、[27, 30]、[35, 63] 等）触发异常。
+- `relu_pre`取值需为已定义模式（0/1/2/3/4之一），取值5~7触发异常。
+- `split_en`仅在dst dtype为`float`且`quant_pre`取值为无转换（0）或`float`→`float`量化模式（14/15）时合法，dst dtype非`float`或`quant_pre`取其他值时开启触发异常。
+- `nz2nd_en`与`nz2dn_en`互斥，不可同时开启。
+- `nz2nd_en`或`nz2dn_en`开启时，须先通过配套setter接口预先配置loop3 size（大于0）与loop3 stride等循环参数，再调用本接口，否则触发异常。
+- `nz2dn_en`开启时loop0 src stride不可为0，否则触发异常。
+- `nz2dn_en`开启且loop0 src stride不为1时，`unit_flag_ctl`须为0（关闭unit-flag）。
+- `quant_post`、`relu_post`、`clip_relu_post`、`eltwise_op`、`eltwise_antq_en`、`c0_pad_en`、`dual_dst_ctl`、`sub_blockid`为保留参数，须填0/false，传入非0值硬件行为未定义。
+- `n_size`传入>4095的值会截断处理（如4096→0、4097→1）。截断后实际生效值偏小，导致该维单次迭代搬运元素数不足，多出元素被丢弃且后续维度迭代起始地址错位。参数类型为`uint16_t`（0~2^16−1），截断后若值不满足按dtype的对齐约束仍会触发对齐异常。
+- `clip_relu_pre`传入>3的值会截断处理。截断后实际生效值偏小，导致实际生效的Clip ReLU模式与预期不符，前处理激活行为错误。参数类型为`uint8_t`（0~255），截断后若值为2/3仍会触发保留值非法配置异常。
+- `unit_flag_ctl`传入>3的值会截断处理。截断后实际生效值偏小，导致实际生效的同步机制与预期不符。参数类型为`uint8_t`（0~255），截断后若值为1仍会触发保留值非法配置异常。
+- `quant_pre`传入>63的值会截断处理。截断后实际生效值偏小，导致实际生效的量化模式与预期不符，转换后的数据与预期不一致。参数类型为`uint64_t`（0~2^64−1），截断后若值落在非法取值集合仍会触发异常。
+- `relu_pre`传入>7的值会截断处理。截断后实际生效值偏小，导致实际生效的ReLU模式与预期不符，前处理激活行为错误。参数类型为`uint8_t`（0~255），截断后若值为5~7仍会触发保留值非法配置异常。
+- `dual_dst_ctl`传入>3的值会截断处理。该参数为保留参数，须填0。参数类型为`uint8_t`（0~255），
+- `quant_post`传入>31的值会截断处理。该参数为保留参数，须填0。参数类型为`uint64_t`（0~2^64−1）。
+- `relu_post`传入>7的值会截断处理。该参数为保留参数，须填0。参数类型为`uint8_t`（0~255），
+- `eltwise_op`传入>7的值会截断处理。该参数为保留参数，须填0。参数类型为`uint8_t`（0~255），
+- 开启`quant_pre`、`relu_pre`（scalar/vector模式）、`clip_relu_pre`等随路能力时，须先调用配套setter接口预先配置量化参数、ReLU alpha、Clip ReLU最大值等，再调用本接口，否则硬件读取未配置的参数导致结果错误。
+
 ## 调用示例
 
 ```cpp
