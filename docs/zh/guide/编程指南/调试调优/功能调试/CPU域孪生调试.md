@@ -62,16 +62,16 @@
 > 
 > <blockquote>
 > 如下例中，`add`函数仅通过`__aicore__`区分运行域，在CPU孪生调试模式下两个声明将冲突：
-> 	<pre><code class="language-asc">__aicore__ inline void add(int x, int y);  // Device侧
-> void add(int x, int y);                    // Host侧（等同于 __host__）</code></pre>
+> 	<br><code class="language-asc">__aicore__ inline void add(int x, int y);  // Device侧
+> void add(int x, int y);                    // Host侧（等同于 __host__）</code><br>
 > </blockquote>
 >
 > 2. **参数类型仅有地址空间限定符不同**
 > 
 > <blockquote>
 > 如下例中，两个Device侧函数仅在指针的地址空间限定符上不同：
-> 	<pre><code class="language-asc">__aicore__ inline void process(__gm__ void* data, int size);
-> __aicore__ inline void process(__ubuf__ void* data, int size); </code></pre>
+> 	<br><code class="language-asc">__aicore__ inline void process(__gm__ void* data, int size);
+> __aicore__ inline void process(__ubuf__ void* data, int size); </code><br>
 > </blockquote>
 > 
 > **在孪生调试场景下需特别注意**：请勿定义仅依赖BuiltIn关键字来区分的函数。
