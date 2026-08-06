@@ -284,7 +284,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 | cmatrixInitVal | Whether to enable C matrix default zero initialization. true=init to 0, false=no init (controlled by cmatrixSource). Default: true. |
 | cmatrixSource | Whether C matrix initial value comes from BT Buffer. true=from BT, false=no init. Default: false. **Note**: Ineffective when bias input is present. |
 | unitFlag | Controls fine-grained Mmad/Fixpipe parallelism. 0=disabled, 2=enabled no reset, 3=enabled with reset. See UnitFlag feature description. |
-| disableGemv | Whether to disable GEMV mode when M=1. **Only 950PR/DT**. |
+| disableGemv | Whether to disable GEMV mode when M=1. **Only Ascend 950PR/Ascend 950DT**. |
 ```
 
 **Requirements**:
@@ -419,7 +419,7 @@ Use a table to list functionally similar APIs with selection recommendations.
 
 ```
 | Similar API | Difference | Selection Recommendation |
-|------------|-----------|------------------------|
+|-------------|-----------|------------------------|
 | [MmadWithSparse](MmadWithSparse.md) | Supports 4-out-of-2 structured sparse matmul | Use when weight matrix has been pruned to sparse format |
 | [MXMmad](MXMmad.md) | Supports MX format (microscaling) matmul | Use for MX mixed-precision training |
 | [Iterate](Iterate.md) + [GetTensorC](GetTensorC.md) | Matmul high-level API loop iteration | Prefer high-level API when fine-grained L0A/L0B control is not needed |
@@ -441,7 +441,7 @@ void mad(__cc__ float *c, __ca__ half *a, __cb__ half *b,
     uint16_t m, uint16_t k, uint16_t n, uint8_t unitFlag,
     bool kDirectionAlign, bool cmatrixSource, bool cmatrixInitVal);
 
-For Ascend 950PR/DT:
+For Ascend 950PR/Ascend 950DT:
 void mad(__cc__ float *c, __ca__ half *a, __cb__ half *b,
     uint16_t m, uint16_t k, uint16_t n, uint8_t unit_Flag_ctrl,
     bool gemv_ctrl, bool BTbuf_ctrl, bool zero_Cmatrix_ctrl);

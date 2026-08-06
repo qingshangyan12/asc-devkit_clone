@@ -1,7 +1,7 @@
 ﻿# arange Example
 
 ## Overview
-This example implements the Arange operation based on the C API programming interface, primarily calling the [asc_arange](../../../../../docs/zh/api/SIMD-API/C-API/reg/index_operate/asc_arange.md) API.
+This example implements the Arange operation based on the C API programming interface, primarily calling the [asc_arange](../../../../../docs/zh/api/SIMD-API/c_api/reg/index_operate/asc_arange.md) API.
 - The asc_arange API generates an increasing/decreasing index sequence starting from the provided scalar value
 - This example uses the increasing mode with a starting value of 0
 
@@ -9,13 +9,13 @@ This example implements the Arange operation based on the C API programming inte
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
 ├── arange
 │   ├── scripts
-│   │   │   ├── gen_data.py            // Ground truth data generation script
+│   │   ├── gen_data.py            // Ground truth data generation script
 │   ├── CMakeLists.txt                 // Build configuration file
 │   ├── data_utils.h                   // Data read/write functions
 │   ├── arange.asc                     // Ascend C example implementation & invocation example

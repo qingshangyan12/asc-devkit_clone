@@ -2,7 +2,7 @@
 
 ## Overview
 
-Taking the [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md) interface as an example, this sample uses five groups of controlled experiments to demonstrate the performance differences of `asc_atomic_add()` under various usage scenarios — including different memory tiers (Global Memory / Unified Buffer), different atomic-accumulation organizations (direct atomic add / intra-block UB accumulation followed by GM writeback), whether the return value is used, the contention intensity on the same address, the Sector distribution of target addresses, and different data types (int32_t, int64_t) — and provides corresponding optimization guidance.
+Taking the [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md) interface as an example, this sample uses five groups of controlled experiments to demonstrate the performance differences of `asc_atomic_add()` under various usage scenarios — including different memory tiers (Global Memory / Unified Buffer), different atomic-accumulation organizations (direct atomic add / intra-block UB accumulation followed by GM writeback), whether the return value is used, the contention intensity on the same address, the Sector distribution of target addresses, and different data types (int32_t, int64_t) — and provides corresponding optimization guidance.
 
 ## Supported Products
 
@@ -16,8 +16,9 @@ Taking the [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/原子操�
 
 ```text
 ├── atomic_add_perf
-│   ├── CMakeLists.txt         // Sample build script
-│   ├── atomic_add_perf.asc    // Sample source code
+│   ├── figures                         // Image resources for README
+│   ├── CMakeLists.txt                  // Sample build script
+│   ├── atomic_add_perf.asc             // Sample source code
 │   ├── README.md
 │   └── README_en.md
 ```
@@ -240,6 +241,8 @@ The reason for this difference is: whether `asc_atomic_add()` uses the return va
 
 **Goal**: Compare the impact on atomic-add performance of different thread counts per address (contention intensity) and the Sector distribution of target addresses.
 
+To understand how these two factors affect atomic-add performance, the following principles are introduced first.
+
 **Principle 1: Atomic operations on the same address queue serially.**
 
 An atomic add must complete three steps: "read old value → compute new value → write back new value," guaranteeing the entire process is indivisible. When multiple threads update the same address, atomic operations can only complete one at a time; the more threads on the same address, the more atomic adds waiting to execute, and the higher the total time.
@@ -247,8 +250,6 @@ An atomic add must complete three steps: "read old value → compute new value �
 **Principle 2: GM atomic operations work at Sector granularity.**
 
 When an atomic add accesses a GM address, it passes through the L2 cache hierarchy and completes the "read–compute–write" on the L2 side. The L2 cache manages memory in units of 512B Cache Lines, each containing 4 contiguous 128B Sectors; GM atomic operations are processed at 128B Sector granularity. When the target addresses of atomic operations are concentrated within the same Sector, processing efficiency is lower; when the target addresses are spread across more Sectors, processing efficiency is higher.
-
-A 128B Sector can hold 32 `int32_t` addresses. Padding layout places 32 target addresses in 32 separate Sectors; dense layout places 32 target addresses contiguously within a single Sector.
 
 **Controlled design**:
 
@@ -263,6 +264,12 @@ A 128B Sector can hold 32 `int32_t` addresses. Padding layout places 32 target a
 | 10 | Global Memory | int32_t | 48×256 | Padding | 12 | 384 | 32 |
 | 11 | Global Memory | int32_t | 48×256 | Padding | 384 | 12288 | 32 |
 | 12 | Global Memory | int32_t | 48×256 | Dense | 384 | 12288 | 1 |
+
+**Address layout illustration**: A 128B Sector can hold 32 `int32_t` addresses. Padding layout places 32 target addresses in 32 separate Sectors; dense layout places 32 target addresses contiguously within a single Sector.
+
+The two address layouts are compared in the following figure:
+
+<img src="figures/case4_address_layout.png" alt="Case 4 Padding and dense layout comparison" style="width: 90%; height: auto;">
 
 **Core implementation**: Launch 48 thread blocks of 256 threads each, using a fixed set of 32 `int32_t` GM target addresses. The `threads_per_target` controls the number of threads per address; the number of active threads is `target_count * threads_per_target`, and each active thread performs 1 atomic add. To prevent Sector-distribution changes from affecting the contention-intensity comparison, scenarios 9–11 set `target_stride` to 32 `int32_t` elements, so that adjacent target addresses are spaced 128B apart and each falls in a different Sector. To isolate the impact of Sector distribution, scenario 12 keeps the same target address count and threads per address as scenario 11, but sets `target_stride` to 1, making the target addresses densely packed. The target array start address is 128B-aligned, ensuring that 32 densely packed `int32_t` addresses fall exactly within a single Sector.
 

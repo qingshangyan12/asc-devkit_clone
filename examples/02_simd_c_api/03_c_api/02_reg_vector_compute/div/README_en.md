@@ -2,13 +2,13 @@
 
 ## Overview
 
-This example is based on the C API programming interface to implement Div operation, mainly calling the [asc_div](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_div.md) interface.
+This example is based on the C API programming interface to implement Div operation, mainly calling the [asc_div](../../../../../docs/zh/api/SIMD-API/c_api/reg/arithmetic_compute/asc_div.md) interface.
 
 ## Supported Products and CANN Versions
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 

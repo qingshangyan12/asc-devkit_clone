@@ -1,13 +1,13 @@
 ﻿# truncate样例
 
 ## 概述
-本样例基于C API编程接口实现Truncate运算，用于将矢量数据寄存器的浮点数截断到整数位，主要调用[asc_floor](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_type_convert/asc_floor.md)接口。
+本样例基于C API编程接口实现Truncate运算，用于将矢量数据寄存器的浮点数截断到整数位，主要调用[asc_floor](../../../../../docs/zh/api/SIMD-API/c_api/reg/data_type_convert/asc_floor.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 ```
