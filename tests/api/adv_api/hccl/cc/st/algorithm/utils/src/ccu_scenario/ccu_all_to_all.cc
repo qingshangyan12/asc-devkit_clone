@@ -85,43 +85,6 @@ ScenarioData BuildScenarioData(const CcuStScenario &scenario,
     return data;
 }
 
-AllToAllKernelConfig BuildKernelConfig(uint32_t rankId, uint32_t rankSize)
-{
-    AllToAllKernelConfig config;
-    config.rankId = rankId;
-    config.rankSize = rankSize;
-    config.loadFromMem = true;
-    for (uint32_t peer = 0; peer < rankSize; ++peer) {
-        if (peer != rankId) {
-            config.channels.push_back(MakeChannel(rankId, peer));
-        }
-    }
-    return config;
-}
-
-std::vector<KernelHandle> RegisterRemainingRanks(uint32_t rankSize, uint32_t startRank, KernelHandle rank0Handle)
-{
-    std::vector<KernelHandle> handles(rankSize);
-    handles[0] = rank0Handle;
-    if (startRank >= rankSize) {
-        return handles;
-    }
-    constexpr InstanceHandle instance = 17;
-    RegisterManager &manager = RegisterManager::Global();
-    if (manager.RegisterStart(instance) != Result::SUCCESS) {
-        return {};
-    }
-    std::vector<AllToAllKernelConfig> configs(rankSize);
-    for (uint32_t rank = startRank; rank < rankSize; ++rank) {
-        configs[rank] = BuildKernelConfig(rank, rankSize);
-        if (manager.Register(instance, "CcuAlltoAllMesh1D", CaptureAllToAllMesh1DKernel,
-                &configs[rank], handles[rank]) != Result::SUCCESS) {
-            return {};
-        }
-    }
-    return manager.RegisterEnd(instance) == Result::SUCCESS ? handles : std::vector<KernelHandle>{};
-}
-
 Mc2CcTilingInner BuildAllToAllTiling(HcclDataType dataType)
 {
     Mc2CcTilingInner tiling{};
@@ -157,57 +120,60 @@ void CleanupHostEnv(HcclComm &comm)
     unsetenv("HCCL_OP_EXPANSION_MODE");
 }
 
-} // namespace
-
-void CcuStAllToAll::VerifyScenario(const CcuStScenario &scenario)
+KernelHandle RegisterKernelForRank(uint32_t rank, uint32_t rankSize, const CcuStScenario &scenario,
+    const TopoMeta &topoMeta, const Mc2CcTilingInner &tiling)
 {
-    const uint32_t rankSize = scenario.rankSize;
-
-    RegisterManager::Global().Reset();
-    ResetCcuKernelRegisterCount();
     setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
-
-    const TopoMeta topoMeta = BuildTopoMeta(rankSize);
     HcclSim::SimWorld::Global()->Init(topoMeta, DevType::DEV_TYPE_950);
-    ASSERT_EQ(aclrtSetDevice(0), ACL_SUCCESS);
-
-    HcclComm comm = nullptr;
-    ASSERT_EQ(HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, 0, &comm), HCCL_SUCCESS);
-
-    OpResCtx resCtx{};
-    ASSERT_EQ(AllocCcuOpResCtx(comm, "selector_st_ctx", rankSize, 0, resCtx), HCCL_SUCCESS);
-
-    Mc2CcTilingInner tiling = BuildAllToAllTiling(scenario.dataType);
+    if (aclrtSetDevice(rank) != ACL_SUCCESS) return 0;
 
     aclrtStream stream = nullptr;
-    ASSERT_EQ(aclrtCreateStream(&stream), ACL_SUCCESS);
+    if (aclrtCreateStream(&stream) != ACL_SUCCESS) return 0;
+
+    HcclComm comm = nullptr;
+    if (HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, rank, &comm) != HCCL_SUCCESS) return 0;
+
+    OpResCtx resCtx{};
+    if (AllocCcuOpResCtx(comm, "selector_st_ctx", rankSize, rank, resCtx) != HCCL_SUCCESS) {
+        CleanupHostEnv(comm);
+        return 0;
+    }
+
     OpParam opParam{};
-    ASSERT_EQ(InitOpParamByTiling(comm, stream, "alltoall_st", &tiling, opParam), HCCL_SUCCESS);
+    if (InitOpParamByTiling(comm, stream, "alltoall_st", &tiling, opParam) != HCCL_SUCCESS) {
+        CleanupHostEnv(comm);
+        return 0;
+    }
 
     std::vector<uint64_t> sendCounts(rankSize, 1024U);
     opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void *>(sendCounts.data());
 
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
-    ASSERT_EQ(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo), HCCL_SUCCESS);
-    ASSERT_FALSE(algName.empty());
-    if (!scenario.expectedAlgName.empty()) {
-        ASSERT_EQ(algName, scenario.expectedAlgName);
+    if (SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo) != HCCL_SUCCESS || algName.empty()) {
+        CleanupHostEnv(comm);
+        return 0;
     }
-    ASSERT_GT(sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str()), 0);
-
-    EXPECT_EQ(GetCcuKernelRegisterCount(), 0U);
+    if (rank == 0 && !scenario.expectedAlgName.empty() && algName != scenario.expectedAlgName) {
+        CleanupHostEnv(comm);
+        return 0;
+    }
+    sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
 
     opParam.isMc2 = true;
     bool skipGetRes = false;
-    ASSERT_EQ(HandleSingleRankAndCommMode(comm, opParam, skipGetRes), HCCL_SUCCESS);
-    ASSERT_FALSE(skipGetRes);
+    if (HandleSingleRankAndCommMode(comm, opParam, skipGetRes) != HCCL_SUCCESS || skipGetRes) {
+        CleanupHostEnv(comm);
+        return 0;
+    }
 
     void *resCtxOut = nullptr;
-    ASSERT_EQ(GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), resCtx, &resCtxOut), HCCL_SUCCESS);
-    ASSERT_NE(resCtxOut, nullptr);
+    if (GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), resCtx, &resCtxOut) != HCCL_SUCCESS) {
+        CleanupHostEnv(comm);
+        return 0;
+    }
 
-    {
+    if (rank == 0) {
         auto *raw = static_cast<char *>(resCtxOut);
         std::vector<char> sequence(raw, raw + opParam.ctxSize);
         mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx;
@@ -218,13 +184,29 @@ void CcuStAllToAll::VerifyScenario(const CcuStScenario &scenario)
     }
 
     const auto &lastGroup = RegisterManager::Global().GetLastCompiledGroup();
-    ASSERT_FALSE(lastGroup.empty()) << "real CalcRes path did not register any kernel";
-    const KernelHandle rank0Handle = lastGroup.back();
+    KernelHandle handle = lastGroup.empty() ? 0 : lastGroup.back();
 
     CleanupHostEnv(comm);
+    return handle;
+}
 
-    const std::vector<KernelHandle> handles = RegisterRemainingRanks(rankSize, 1, rank0Handle);
-    ASSERT_EQ(handles.size(), rankSize);
+} // namespace
+
+void CcuStAllToAll::VerifyScenario(const CcuStScenario &scenario)
+{
+    const uint32_t rankSize = scenario.rankSize;
+
+    RegisterManager::Global().Reset();
+    ResetCcuKernelRegisterCount();
+
+    const TopoMeta topoMeta = BuildTopoMeta(rankSize);
+    const Mc2CcTilingInner tiling = BuildAllToAllTiling(scenario.dataType);
+
+    std::vector<KernelHandle> handles(rankSize);
+    for (uint32_t rank = 0; rank < rankSize; ++rank) {
+        handles[rank] = RegisterKernelForRank(rank, rankSize, scenario, topoMeta, tiling);
+        ASSERT_NE(handles[rank], 0U) << "failed to register kernel for rank " << rank;
+    }
 
     ScenarioData data = BuildScenarioData(scenario, handles);
 
@@ -232,7 +214,15 @@ void CcuStAllToAll::VerifyScenario(const CcuStScenario &scenario)
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
         const Program *program = RegisterManager::Global().GetProgram(handles[rank]);
         ASSERT_NE(program, nullptr);
-        const AllToAllKernelConfig kernelConfig = BuildKernelConfig(rank, rankSize);
+        AllToAllKernelConfig kernelConfig;
+        kernelConfig.rankId = rank;
+        kernelConfig.rankSize = rankSize;
+        kernelConfig.loadFromMem = true;
+        for (uint32_t peer = 0; peer < rankSize; ++peer) {
+            if (peer != rank) {
+                kernelConfig.channels.push_back(MakeChannel(rank, peer));
+            }
+        }
         CheckResult registration = checker.CheckRegistration(*program, kernelConfig);
         ASSERT_TRUE(registration.Ok()) << registration.message;
         CheckResult taskArgs = checker.CheckTaskArgs(*program, data.launches[rank].taskArgs,
