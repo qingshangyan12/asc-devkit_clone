@@ -187,7 +187,7 @@ void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
     const uint32_t rankSize = scenario.rankSize;
 
     ResetCcuKernelRegisterCount();
-    setenv("HCCL_OP_EXPANSION_MODE", "CCU_MS", 1);
+    setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
 
     const TopoMeta topoMeta = BuildTopoMeta(rankSize);
     HcclSim::SimWorld::Global()->Init(topoMeta, DevType::DEV_TYPE_950);
