@@ -166,7 +166,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
     vector_bool squeeze_mask)
 {
     if ASC_IS_AIV {
-        vsqz(dst, src1, squeeze_mask, MODE_STORED);
+        vsqz((vector_int8_t&)dst, (vector_int8_t&)src1, squeeze_mask, MODE_STORED);
         __ubuf__ float4_e1m2x2_t*& dst_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*&>(dst_addr);
         vstur(src0, *reinterpret_cast<vector_fp4x2_e1m2_t*>(&dst), dst_tmp, POST_UPDATE);
     }
