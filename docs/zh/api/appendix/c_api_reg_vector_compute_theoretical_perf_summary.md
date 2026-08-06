@@ -42,6 +42,7 @@ Ascend 950PR/Ascend 950DT
 | asc_min_scalar | int16_t | int16_t | 128 |
 | asc_min_scalar | uint16_t | uint16_t | 128 |
 | asc_min_scalar | half | half | 128 |
+| asc_min_scalar | bfloat16_t | bfloat16_t | 128 |
 | asc_min_scalar | int32_t | int32_t | 64 |
 | asc_min_scalar | uint32_t | uint32_t | 64 |
 | asc_min_scalar | float | float | 64 |
