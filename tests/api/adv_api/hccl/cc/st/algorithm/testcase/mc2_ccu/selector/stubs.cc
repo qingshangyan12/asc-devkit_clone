@@ -101,6 +101,16 @@ HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 
 HcclResult HcclCalcTopoInfo(HcclComm comm, OpParam& param, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo)
 {
+    if (topoInfo == nullptr) {
+        topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    }
+    uint32_t rankSize = 0;
+    HcclGetRankSize(comm, &rankSize);
+    topoInfo->userRank = 0;
+    topoInfo->userRankSize = rankSize;
+    topoInfo->topoLevelNums = 1;
+    topoInfo->level0Topo = Level0Shape::MESH_1D;
+    topoInfo->level0MeshType = Level0MeshType::SINGLE_DIE;
     return HcclResult::HCCL_SUCCESS;
 }
 

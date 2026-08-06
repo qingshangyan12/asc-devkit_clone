@@ -145,6 +145,7 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_ubx.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_ubx_1d.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
+    ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
     ${UTILS_DIR}/ccu/ccu_all_to_all_v_mesh1d_adapter.cc
     ${UTILS_DIR}/ccu_st_all_to_all_v.cc
 )
