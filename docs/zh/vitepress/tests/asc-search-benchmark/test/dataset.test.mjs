@@ -27,6 +27,11 @@ test('dataset has unique and complete cases', () => {
       assert.ok(item.expect.descriptionIncludes.length > 0)
       assert.ok(item.expect.descriptionIncludes.every(value => typeof value === 'string' && value))
     }
+    if (item.expect.highlightIncludes !== undefined) {
+      assert.ok(Array.isArray(item.expect.highlightIncludes))
+      assert.ok(item.expect.highlightIncludes.length > 0)
+      assert.ok(item.expect.highlightIncludes.every(value => typeof value === 'string' && value))
+    }
     if (item.expect.sectionHash !== undefined) {
       assert.match(item.expect.sectionHash, /^#./)
     }
@@ -55,6 +60,7 @@ test('dataset covers compiler option identifier regressions', () => {
     assert.deepEqual(item.expect.descriptionIncludes, ['NO_OVERLAP_IN_MULTI_REPEAT', '内存同步指令'])
   }
   assert.equal(dataset.cases.find(item => item.query === 'NO_OVER').expect.sectionHash, '#内置编译宏开关')
+  assert.deepEqual(dataset.cases.find(item => item.query === 'NO_OVER').expect.highlightIncludes, ['NO_OVER'])
 })
 
 test('dataset covers existing section navigation', () => {
