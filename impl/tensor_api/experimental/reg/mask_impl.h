@@ -40,8 +40,8 @@ __simd_callee__ inline reg_tensor<bool> ones()
     return result;
 }
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_MASK_IMPL_H
 

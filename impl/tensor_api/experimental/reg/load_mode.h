@@ -32,8 +32,8 @@ enum class load_sideband_mode : uint8_t {
     upsample,
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_LOAD_MODE_H
 

@@ -50,8 +50,8 @@ struct reg_tensor<bool> {
 
     reg_type reg;
 };
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_REG_TENSOR_IMPL_H
 

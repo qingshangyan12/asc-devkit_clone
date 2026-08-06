@@ -129,8 +129,8 @@ struct type_get<fp4x2_e1m2_t> {
 
 #endif
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_TYPE_GET_H
 
