@@ -292,4 +292,14 @@
 
 - [asc_sync_vec（无入参原型）](../SIMD-API/c_api/sync/asc_sync_vec.md)接口
 
-    `asc_sync_vec()`接口已废弃，请使用[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)执行针对所有流水线的同步操作。
+    `asc_sync_vec()`接口已废弃，请使用[asc_sync](../SIMD-API/C-API/sync/asc_sync.md)执行针对所有流水线的同步操作。
+
+## Utils API
+
+<!-- npu="950" id9 -->
+### C++标准库
+
+- [CeilDivision](../Utils-API/CPP标准库/数学函数/CeilDivision.md)接口
+
+    此接口已废弃，请使用[ceil\_div](../Utils-API/CPP标准库/数学函数/ceil_div.md)接口。
+<!-- end id9 -->
