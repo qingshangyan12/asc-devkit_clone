@@ -438,17 +438,12 @@ static void InitReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
     }
 
     HCCL_INFO(
-        "[ScratchOverflowDiag] InitReduceScatterAddr: rankSize=%u, rankId=%u, sliceSize=%llu, "
-        "scratchBase=0x%llx, scratchSpan(rankSize*sliceSize)=%llu bytes, "
-        "scratchFixed(MC2_WORKSPACE_SIZE)=%llu bytes, overflow=%s",
-        ctx.rankSize, ctx.rankId, static_cast<uint64_t>(ctx.sliceSize),
-        static_cast<uint64_t>(ctx.scratch[ctx.rankId]),
-        static_cast<uint64_t>(ctx.rankSize) * static_cast<uint64_t>(ctx.sliceSize),
-        static_cast<uint64_t>(16u * 1024u * 1024u),
-        (static_cast<uint64_t>(ctx.rankSize) * static_cast<uint64_t>(ctx.sliceSize) >
-         static_cast<uint64_t>(16u * 1024u * 1024u))
-            ? "YES"
-            : "NO");
+        "[ScratchOverflowDiag] InitReduceScatterAddr: rankSize=%u, rankId=%u, "
+        "sliceSize is ccu::Variable (symbolic, resolved at CCU runtime — see AIV-side "
+        "CcuPrepareForReduceScatterM2M log for actual value), "
+        "scratch is ccu::Variable (symbolic). "
+        "Refer to [ScratchOverflowDiag] CcuPrepareForReduceScatterM2M for overflow diagnosis.",
+        ctx.rankSize, ctx.rankId);
 }
 
 static void ResetReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
