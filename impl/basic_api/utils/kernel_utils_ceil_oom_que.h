@@ -47,6 +47,7 @@ __aicore__ inline uint32_t Ceil(uint32_t a, uint32_t b) { return (a + b - 1) / b
 #if defined(__NPU_ARCH__) &&                                                                                      \
         ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
     defined(__ASC_NPU_HOST__)
+[[deprecated("NOTICE: AscendC::CeilDivision is deprecated. Please use AscendC::Std::ceil_div instead.")]]
 __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {
     if (num2 == 0) {
@@ -59,6 +60,7 @@ __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 #endif
 }
 #else
+[[deprecated("NOTICE: AscendC::CeilDivision is deprecated. Please use AscendC::Std::ceil_div instead.")]]
 __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {
     if (num2 == 0) {

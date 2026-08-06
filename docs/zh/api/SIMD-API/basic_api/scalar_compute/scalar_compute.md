@@ -8,8 +8,6 @@
 
 -   **[GetSFFValue](GetSFFValue.md)**  
 
--   **[CeilDivision](CeilDivision.md)**
-
 -   **[Cast（float转half/int32\_t）](Cast_float_to_half_int32.md)**  
 
 -   **[Cast（float转bfloat16\_t）](Cast_float_to_bfloat16.md)**  
