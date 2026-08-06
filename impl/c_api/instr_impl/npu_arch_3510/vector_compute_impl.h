@@ -5854,6 +5854,7 @@ __simd_callee__ inline void asc_mull(
     asc_mull_impl(dst0, dst1, src0, src1, mask);
 }
 
+[[deprecated("NOTICE: asc_clear_ar_spr is deprecated. Please use asc_squeeze_and_storeunalign_init instead.")]]
 __simd_callee__ inline void asc_clear_ar_spr() { asc_clear_ar_spr_impl(); }
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_init() { asc_clear_ar_spr_impl(); }
