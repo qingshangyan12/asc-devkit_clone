@@ -90,7 +90,7 @@
 如[图1](#fig1196816115710)所示，以float数据类型为例，切片搬运接口能从shape为3\*87的源操作中，选取四个不连续的横向切片搬运到目的操作数中，下面结合图示对SliceInfo结构体参数进行解析：
 
 **图1**  参数解析示意图<a name="fig1196816115710"></a>  
-![](../../../../figures/slice_datacopy_parameter_analysis_diagram.png "参数解析示意图")
+![](../../../../figures/slice_datacopy_parameter_analysis_diagram.png) "参数解析示意图")
 
 - dimValue为2，表示操作数有2维。
 - srcSliceInfo为 {{16, 70, 7, 3, 87},  {0, 2, 1, 1, 3}}

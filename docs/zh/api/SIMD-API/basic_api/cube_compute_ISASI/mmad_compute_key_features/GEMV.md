@@ -16,7 +16,7 @@ Gemv的核心功能体现为：当矩阵A的维度M取值为1时，接口会自�
 
 **图1** GEMV模式，矩阵乘示意图
 
-![GEMV模式-矩阵乘示意图](../../../../figures/mmad_gemv.png "GEMV模式-矩阵乘示意图")
+![GEMV模式-矩阵乘示意图](../../../../figures/mmad_gemv.png) "GEMV模式-矩阵乘示意图")
 
 **使用优势：**
 
@@ -28,7 +28,7 @@ M=1时自动开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进
 
     **图2** GEMV模式M=1的矩阵乘计算示意图
 
-    ![GEMV模式M=1的矩阵乘计算示意图](../../../../figures/mmad_gemv_compare.png "GEMV模式M=1的矩阵乘计算示意图")
+    ![GEMV模式M=1的矩阵乘计算示意图](../../../../figures/mmad_gemv_compare.png) "GEMV模式M=1的矩阵乘计算示意图")
 
 - 非GEMV模式
 
@@ -36,7 +36,7 @@ M=1时自动开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进
 
     **图3** 非GEMV模式M=1的矩阵乘计算示意图
 
-    ![非GEMV模式M=1的矩阵乘计算示意图](../../../../figures/mmad_nongemv_compare.png "非GEMV模式M=1的矩阵乘计算示意图")
+    ![非GEMV模式M=1的矩阵乘计算示意图](../../../../figures/mmad_nongemv_compare.png) "非GEMV模式M=1的矩阵乘计算示意图")
 
 **使用示例：**
 
@@ -54,7 +54,7 @@ C矩阵为1\* 256的向量，共可以划分为16个1 \* 16的子向量，占用
 
 **图4** GEMV模式矩阵乘示意图
 
-![GEMV模式-矩阵乘示意图-demo](../../../../figures/mmad_gemv_demo.png "GEMV模式-矩阵乘示意图-demo")
+![GEMV模式-矩阵乘示意图-demo](../../../../figures/mmad_gemv_demo.png) "GEMV模式-矩阵乘示意图-demo")
 
 GEMV功能的完整示例：[GEMV样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_gemv)。
 

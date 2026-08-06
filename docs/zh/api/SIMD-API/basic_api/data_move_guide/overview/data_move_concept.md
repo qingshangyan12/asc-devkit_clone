@@ -12,7 +12,7 @@
 
 **图 1**  基础连续搬运示意图  
 
-![](../../../../figures/continuous_data_copy_diagram.png "基础连续搬运示意图")
+![](../../../../figures/continuous_data_copy_diagram.png) "基础连续搬运示意图")
 
 ## 高维切分数据搬运（DataCopy高维切分）
 
@@ -27,11 +27,11 @@
 
 **图 2**  高维切分连续搬运示意图  
 
-![](../../../../figures/continuous_data_copy_diagram.png "高维切分连续搬运示意图")
+![](../../../../figures/continuous_data_copy_diagram.png) "高维切分连续搬运示意图")
 
 **图 3**  高维切分非连续搬运示意图  
 
-![](../../../../figures/discontinuous_data_copy_diagram.png "高维切分非连续搬运示意图")
+![](../../../../figures/discontinuous_data_copy_diagram.png) "高维切分非连续搬运示意图")
 
 ## 切片数据搬运（DataCopy切片）
 
@@ -49,7 +49,7 @@
 
 **图 4**  ND2NZ格式转换示意图
 
-![](../../../../figures/nd2nz_conversion_half.png "ND2NZ格式转换示意图")
+![](../../../../figures/nd2nz_conversion_half.png) "ND2NZ格式转换示意图")
 
 ## 随路量化激活搬运（FixPipe/DataCopy量化激活）
 

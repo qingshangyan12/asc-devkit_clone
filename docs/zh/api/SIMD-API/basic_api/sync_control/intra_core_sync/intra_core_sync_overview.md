@@ -9,7 +9,7 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 针对[NPU架构2201](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
 
 **图 1**  架构图<a name="zh-cn_topic_0000002542725361_fig11732135516285"></a>  
-![](../../../../figures/atlas_a2_a3_architecture.png "Atlas_A2_A3_硬件架构图")
+![](../../../../figures/atlas_a2_a3_architecture.png) "Atlas_A2_A3_硬件架构图")
 
 <!-- end id1 -->
 
@@ -18,7 +18,7 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 针对[NPU架构3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
 
 **图 2**  架构图<a name="zh-cn_topic_0000002542725361_fig31512113433"></a>  
-![](../../../../figures/ascend_950pr_950dt_architecture.png "Ascend_950PR_950DT_硬件架构图")
+![](../../../../figures/ascend_950pr_950dt_architecture.png) "Ascend_950PR_950DT_硬件架构图")
 
 <!-- end id2 -->
 
@@ -28,11 +28,11 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 2. 进行计算；
 3. 然后再通过DMA执行单元将计算结果从Local Memory搬出到Global Memory。
 
-![](../../../../figures/vector_compute_data_flow.png "Vector_计算_数据流示意图")
+![](../../../../figures/vector_compute_data_flow.png) "Vector_计算_数据流示意图")
 
 四个执行单元Scalar、Vector、DMA（MTE2）、DMA(MTE3)并行执行，若访问同一片Local Memory，需要同步机制来控制它们的访问时序：保证先搬入Local Memory后再计算，计算完成后再搬出。
 
-![](../../../../figures/intra_core_parallel_pipeline_execution_timing.png "intra_core_parallel_pipeline_execution_timing")
+![](../../../../figures/intra_core_parallel_pipeline_execution_timing.png) "intra_core_parallel_pipeline_execution_timing")
 
 ## 硬件流水类型<a name="zh-cn_topic_0000002542725361_section1272612276459"></a>
 

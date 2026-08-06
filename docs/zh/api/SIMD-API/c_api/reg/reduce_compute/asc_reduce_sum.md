@@ -73,7 +73,7 @@ __simd_callee__ inline void asc_reduce_sum(vector_float& dst, vector_float src, 
 3. 以此类推，得到目的操作数为1个half类型的数据sum。
 
 **图1** reg_reduce_index
-![reg_reduce_index](../../../../figures/reg_reduce_index.png "reg_reduce_index")
+![reg_reduce_index](../../../../figures/reg_reduce_index.png) "reg_reduce_index")
 
 ## 调用示例
 

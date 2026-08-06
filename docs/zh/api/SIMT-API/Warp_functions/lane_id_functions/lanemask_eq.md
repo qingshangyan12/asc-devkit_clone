@@ -32,7 +32,7 @@
 
 **图1**  lanemask\_eq示意图
 
-![](../../../figures/lanemask_eq.png "lanemask_eq图示")
+![](../../../figures/lanemask_eq.png) "lanemask_eq图示")
 
 ## 函数原型
 

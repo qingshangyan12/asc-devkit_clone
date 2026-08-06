@@ -75,7 +75,7 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
 - Bias为矩阵乘偏置，形状为[1,N]。对(scaleA⊗A)*(scaleB⊗B)结果矩阵的每一行都采用该Bias进行偏置。
 
 **图1** MmadMx接口矩阵乘分形示意图<a id="zh_cn_topic_mmadmx_section2_figure1"></a>
-![MmadMx接口矩阵乘分形示意图](../../../../figures/mxmmad_demo_a5.png "MmadMx接口矩阵乘分形示意图")
+![MmadMx接口矩阵乘分形示意图](../../../../figures/mxmmad_demo_a5.png) "MmadMx接口矩阵乘分形示意图")
 
 **表1** 矩阵计算矩阵A、B、C解释说明
 

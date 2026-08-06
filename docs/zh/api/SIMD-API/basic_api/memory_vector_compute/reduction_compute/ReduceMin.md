@@ -40,7 +40,7 @@
 
 **图1**  `ReduceMin`计算示意图<a id="fig1"></a>
 
-![ReduceMin计算示意图](../../../../figures/ReduceMin_scale.png "ReduceMin计算示意图")
+![ReduceMin计算示意图](../../../../figures/ReduceMin_scale.png) "ReduceMin计算示意图")
 
 ## 函数原型
 

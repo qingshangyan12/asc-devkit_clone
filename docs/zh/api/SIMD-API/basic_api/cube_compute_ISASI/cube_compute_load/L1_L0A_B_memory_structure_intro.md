@@ -21,7 +21,7 @@ L1_ADDR[18:0] = {BANK[0:0], BANK_DEPTH[9:0], BG[2:0], BANK_WIDTH[4:0]}    // bit
 ```
 
 **图1** L1 Buffer内存结构图<a name="zh-cn_topic_0000002545385271_fig5383229131020"></a>  
-![](../../../../figures/l1_memory_bank.png "L1内存结构图")
+![](../../../../figures/l1_memory_bank.png) "L1内存结构图")
 
 ## L0A Buffer/L0B Buffer内存结构<a name="zh-cn_topic_0000002545385271_section6770135142516"></a>
 
@@ -37,4 +37,4 @@ L0B_ADDR[15:0] = { BANK_DEPTH[6:0], BANK_WIDTH[8:0] }
 ```
 
 **图2** L0A Buffer/L0B Buffer内存结构图<a name="zh-cn_topic_0000002545385271_fig2046019020496"></a>  
-![](../../../../figures/l0al0b_memory_bank.png "L0A-B内存结构图")
+![](../../../../figures/l0al0b_memory_bank.png) "L0A-B内存结构图")

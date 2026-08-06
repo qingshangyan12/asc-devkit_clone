@@ -73,7 +73,7 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector
 3. 以此类推，得到目的操作数为1个half类型的数据sum。
 
 **图1** asc_reduce_sum_datablock示意图
-![asc_reduce_sum_datablock示意图](../../../../figures/reg_reduce_datablock_index.png "asc_reduce_sum_datablock示意图")
+![asc_reduce_sum_datablock示意图](../../../../figures/reg_reduce_datablock_index.png) "asc_reduce_sum_datablock示意图")
 
 ## 调用示例
 

@@ -40,7 +40,7 @@
 
 **图1**  ReduceRepeat计算示意图
 
-![](../../../../figures/ReduceRepeat.png "ReduceRepeat计算示意图")
+![](../../../../figures/ReduceRepeat.png) "ReduceRepeat计算示意图")
 
 ## 函数原型
 

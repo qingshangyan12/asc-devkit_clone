@@ -84,7 +84,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 - dstNdMatrixStride = 48，表达dst中第x个目的ND矩阵的起点和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，即为3个DataBlock，3 \* 16 = 48个元素。
 
 **图1**  NZ2ND转换示意图（half数据类型）<a name="fig15851251122815"></a>  
-![](../../../../figures/nz2nd_conversion_half.png "NZ2ND转换示意图（half数据类型）")
+![](../../../../figures/nz2nd_conversion_half.png) "NZ2ND转换示意图（half数据类型）")
 
 以float数据类型为例，NZ2ND转换示意图如下，样例中参数设置值和解释说明如下：
 
@@ -97,7 +97,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 - dstNdMatrixStride = 40，表示dst中第x个目的ND矩阵的起点和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，为5个DataBlock，5 \* 8 = 40个元素。
 
 **图2**  NZ2ND转换示意图（float数据类型）<a name="fig5586175192811"></a>  
-![](../../../../figures/nz2nd_conversion_float.png "NZ2ND转换示意图（float数据类型）")
+![](../../../../figures/nz2nd_conversion_float.png) "NZ2ND转换示意图（float数据类型）")
 
 ## 数据类型<a name="section4219135304818"></a>
 

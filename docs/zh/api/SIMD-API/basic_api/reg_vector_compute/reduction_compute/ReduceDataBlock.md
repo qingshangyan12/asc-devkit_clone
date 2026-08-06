@@ -111,7 +111,7 @@ __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
 3. 以此类推，得到目的操作数为1个half类型的数据sum。
 
 **图1** ReduceDataBlock示意图<a name="zh-cn_topic_0000002568852247_fig10524085414"></a>  
-![ReduceDataBlock示意图](../../../../figures/reg_reduce_datablock_index.png "ReduceDataBlock示意图")
+![ReduceDataBlock示意图](../../../../figures/reg_reduce_datablock_index.png) "ReduceDataBlock示意图")
 
 ### mask为空场景及异常值处理
 

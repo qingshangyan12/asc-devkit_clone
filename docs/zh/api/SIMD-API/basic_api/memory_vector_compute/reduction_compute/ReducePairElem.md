@@ -34,7 +34,7 @@
 
 **图1**  `ReducePairElem<ReduceType::SUM>`示意图
 
-![ReducePairElem<ReduceType::SUM>示意图](../../../../figures/ReducePairElem.png "ReducePairElem<ReduceType::SUM>示意图")
+![ReducePairElem<ReduceType::SUM>示意图](../../../../figures/ReducePairElem.png) "ReducePairElem<ReduceType::SUM>示意图")
 
 ## 函数原型
 

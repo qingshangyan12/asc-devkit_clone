@@ -8,7 +8,7 @@
 下图为UB bank结构示意图。Ascend 950PR/Ascend 950DT的UB划分为16个bank，并组织为8个bank group；SIMT编程模式下，每个bank进一步划分为4个subbank。若同一个Warp内多个线程在同一条UB访问指令中访问同一个bank group的相同编号subbank，硬件需要排队处理，从而形成subbank冲突并增加访问延迟。
 
 **图 1** bank结构示意图
-![img](../../../figures/bank结构示意图.png "bank结构示意图")
+![img](../../../figures/bank结构示意图.png) "bank结构示意图")
 
 SIMT编程方式下，bank冲突为更细粒度的subbank冲突，主要有以下两类：
 

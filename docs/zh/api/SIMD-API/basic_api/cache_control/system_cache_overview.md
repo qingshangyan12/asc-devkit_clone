@@ -9,13 +9,13 @@ Cache（缓存）的主要作用是在搬运单元或Scalar单元与外部存储
 以[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)为例，图1展示了AI Core中支持的五类Cache（L2 Cache、DCache、ICache、SIMT DCache、NDDMA Cache）在硬件架构中的位置关系。
 
 **图1**  五类Cache在AI Core中的位置关系示意图  
-![](../../../../api/figures/atlas_950_cache_architecture_diagram.png "atlas_950_cache_architecture_diagram")
+![](../../../../api/figures/atlas_950_cache_architecture_diagram.png) "atlas_950_cache_architecture_diagram")
 <!-- end id1 -->
 <!-- npu="A3,910b" id2 -->
 以[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)为例，图2展示了AI Core中支持的三类Cache（L2 Cache、DCache和ICache）在硬件架构中的位置关系。
 
 **图2**  三类Cache在AI Core中的位置关系示意图<a name="zh-cn_topic_0000002583420201_fig496311278412"></a>  
-![](../../../../api/figures/atlas_a2_a3_cache_architecture_diagram.png "atlas_a2_a3_cache_architecture_diagram")
+![](../../../../api/figures/atlas_a2_a3_cache_architecture_diagram.png) "atlas_a2_a3_cache_architecture_diagram")
 <!-- end id2 -->
 
 **表1**  Cache类型及功能说明 <a name="table1"></a>

@@ -77,10 +77,10 @@ MaskGenWithRegTensor支持b16和b32，搬运原理如[图1](#fig-maskgen-b16)、
 - 当操作数类型为b32时，RegTensor的一个数据块大小为8B，每个bit经过broadcast成4bit后变为32B，即一个MaskReg（32B）。此外，一个RegTensor有256B/8B = 32个数据块，偏移量offset取值范围为[0, 31]。
 
 **图 1**  MaskGenWithRegTensor搬运原理（b16）<a id="fig-maskgen-b16"></a>  
-![](../../../../figures/reg_maskgenwithregtensor_b16.png "MaskGenWithRegTensor搬运原理（b16）")
+![](../../../../figures/reg_maskgenwithregtensor_b16.png) "MaskGenWithRegTensor搬运原理（b16）")
 
 **图 2**  MaskGenWithRegTensor搬运原理（b32）<a id="fig-maskgen-b32"></a>  
-![](../../../../figures/reg_maskgenwithregtensor_b32.png "MaskGenWithRegTensor搬运原理（b32）")
+![](../../../../figures/reg_maskgenwithregtensor_b32.png) "MaskGenWithRegTensor搬运原理（b32）")
 
 ## 约束说明
 

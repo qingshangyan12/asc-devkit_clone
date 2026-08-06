@@ -76,7 +76,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 **图 1**  DataCopyParams结构体参数使用示意图<a id="fig_repeat_times_demo"></a>
 
-![](../../../../figures/repeat-times.png "DataCopyParams结构体参数使用示意图")
+![](../../../../figures/repeat-times.png) "DataCopyParams结构体参数使用示意图")
 
 ## 数据类型
 

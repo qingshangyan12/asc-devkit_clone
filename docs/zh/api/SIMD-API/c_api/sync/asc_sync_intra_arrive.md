@@ -44,7 +44,7 @@ AIC 1中在执行asc_sync_intra_wait后，此时AIC 1 sync_id=0的计数器为0�
 - AIV 1-2的PIPE_MTE3指令全部执行完毕后，asc_sync_intra_arrive生效。此时调度模块感知1个AIV已执行完asc_sync_intra_arrive，因此将AIC 1 sync_id=0的计数器值增加为1。AIC 1检测到对应的sync_id=0的计数器变为1，则AIC 1核解除阻塞，继续执行后续PIPE_FIX的指令，并且将计数器值减去1。
 
 **图1**  block内同步时序图（AIV进行asc_sync_intra_arrive）
-![](../../../figures/single_ai_core_aic_single_aiv_sync.png "block内同步时序图（AIV进行asc_sync_intra_arrive）")
+![](../../../figures/single_ai_core_aic_single_aiv_sync.png) "block内同步时序图（AIV进行asc_sync_intra_arrive）")
 
 ## 函数原型
 

@@ -32,7 +32,7 @@
 
 **图1**  lanemask\_gt示意图
 
-![](../../../figures/lanemask_gt.png "lanemask_gt图示")
+![](../../../figures/lanemask_gt.png) "lanemask_gt图示")
 
 ## 函数原型
 

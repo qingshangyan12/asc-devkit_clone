@@ -94,7 +94,7 @@ LoadData2DParamsV2结构体在不启用转置时，示意图如下，参数设�
 
 **图1** LoadData2DParamsV2结构体参数示例（以half数据类型，不启用转置为例）
 
-![](../../../../figures/LoadData2DParamsV2结构体参数示例（以half数据类型-不启用转置为例）.png)
+![](../../../../figures/loaddata2dparamsv2_half_no_transpose.png)
 
 ## 数据类型
 
@@ -131,7 +131,7 @@ $$
 
 **图2** 搬运起始位置示意图
 
-![](../../../../figures/load2dv2_start_addr_demo.png "搬运起始位置示意图")
+![](../../../../figures/load2dv2_start_addr_demo.png) "搬运起始位置示意图")
 
 ### 转置场景搬入
 
@@ -146,19 +146,19 @@ $$
 
 **图3** b4数据类型转置示意图
 
-![](../../../../figures/load2dv2_l12l0_trans_b4.png "b4数据类型转置示意图")
+![](../../../../figures/load2dv2_l12l0_trans_b4.png) "b4数据类型转置示意图")
 
 **图4** b8数据类型转置示意图
 
-![](../../../../figures/load2dv2_l12l0_trans_b8.png "b8数据类型转置示意图")
+![](../../../../figures/load2dv2_l12l0_trans_b8.png) "b8数据类型转置示意图")
 
 **图5** b16数据类型转置示意图
 
-![](../../../../figures/load2dv2_l12l0_trans_b16.png "b16数据类型转置示意图")
+![](../../../../figures/load2dv2_l12l0_trans_b16.png) "b16数据类型转置示意图")
 
 **图6** b32数据类型转置示意图
 
-![](../../../../figures/load2dv2_l12l0_trans_b32.png "b32数据类型转置示意图")
+![](../../../../figures/load2dv2_l12l0_trans_b32.png) "b32数据类型转置示意图")
 
 ## 调用示例
 

@@ -6,7 +6,7 @@ Mutex用于核内异步流水指令之间的同步控制，其功能类似于传
 - [Unlock](Unlock.md)：直到当前流水的前序指令执行完成后，根据MutexID释放对应Mutex。
 
 **图 1**  Lock/UnLock接口<a name="fig58242463299"></a>  
-![](../../../../figures/lock_unlock.png "Lock-UnLock接口")
+![](../../../../figures/lock_unlock.png) "Lock-UnLock接口")
 
 每个锁有固定的一个MutexID，在不同编程范式中，该ID的获取以及释放方式不同：
 
@@ -19,7 +19,7 @@ Mutex用于核内异步流水指令之间的同步控制，其功能类似于传
 - 可以使用更多的同步信号量。
 
 **图 2**  SetFlag/WaitFlag同步与Lock/Unlock同步代码差异<a name="fig27101823165111"></a>  
-![](../../../../figures/setflag_waitflag_vs_lock_unlock_diff.png "SetFlag-WaitFlag同步与Lock-Unlock同步代码差异")
+![](../../../../figures/setflag_waitflag_vs_lock_unlock_diff.png) "SetFlag-WaitFlag同步与Lock-Unlock同步代码差异")
 
 Mutex类定义如下：
 

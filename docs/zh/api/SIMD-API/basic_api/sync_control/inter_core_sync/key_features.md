@@ -8,7 +8,7 @@
 - 模式4：AI Core内部，AIC与单个AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。
 
 **图1**  同步控制模式示意图<a name="fig37581010773"></a>  
-![](../../../../figures/3510_sync_control_mode_diagram.png "同步控制模式示意图")
+![](../../../../figures/3510_sync_control_mode_diagram.png) "同步控制模式示意图")
 
 下述同步特性均以该场景配置为例：每个AI Core包含1个AIC和M个AIV，共启动N个AI Core，即存在N个AIC和M \* N个AIV。
 
@@ -42,7 +42,7 @@ AIC 1中在执行CrossCoreWaitFlag后，此时AIC 1 flagId=0的计数器为0，�
 AIC 2的CrossCoreSetFlag执行完后，此时调度模块感知到2个AIC均已执行完CrossCoreSetFlag，因此所有AIC各自的flagId=0的计数器值增加为1。AIC 1和AIC 2检测到各自对应的flagId=0的计数器变为1，都解除阻塞，继续执行后续指令，并且将计数器值减去1。
 
 **图1**  模式0：多AI Core中AIC全核同步<a name="zh-cn_topic_0000002517901268_fig288716464319"></a>  
-![](../../../../figures/inter_core_aic_all_sync.png "多AI_Core中AIC全核同步")
+![](../../../../figures/inter_core_aic_all_sync.png) "多AI_Core中AIC全核同步")
 
 ## 单AI Core中AIV全核同步<a name="ZH-CN_TOPIC_0000002555621176"></a>
 
@@ -67,7 +67,7 @@ AIV 1-1中在执行CrossCoreWaitFlag后，此时AIV 1-1 flagId=0的计数器为0
 AIV 1-2的CrossCoreSetFlag执行完后，此时调度模块感知到2个AIV均已执行完CrossCoreSetFlag，因此将AIV 1-1和AIV 1-2各自的flagId=0的计数器值增加为1。AIV 1-1和AIV 1-2检测到各自对应的flagId=0的计数器变为1，都解除阻塞，继续执行后续指令，并且将计数器值减去1。
 
 **图2**  模式1：单AI Core中AIV全核同步<a name="zh-cn_topic_0000002518061186_fig15383112914156"></a>  
-![](../../../../figures/single_core_aiv_all_sync.png "单AI_Core中AIV全核同步")
+![](../../../../figures/single_core_aiv_all_sync.png) "单AI_Core中AIV全核同步")
 
 ## 单AI Core中AIC与AIV全核同步<a name="ZH-CN_TOPIC_0000002555780808"></a>
 
@@ -105,7 +105,7 @@ AIC 1中在执行CrossCoreWaitFlag后，此时AIC 1 flagId=0的计数器为0，�
 当AIV 1-1的Vector指令1、2全部执行完毕后，前置PIPE\_V的指令全部完成，CrossCoreSetFlag生效。此时调度模块感知到2个AIV均已执行完CrossCoreSetFlag，因此将AIC 1 flagId=0的计数器值增加为1。AIC 1检测到对应的flagId=0的计数器变为1，则AIC 1核解除阻塞，继续执行后续指令Matrix指令2，并且将计数器值减去1。
 
 **图3**  模式2：单AI Core中AIC与AIV全核同步（AIV进行CrossCoreSetFlag）<a name="zh-cn_topic_0000002549581037_fig164171141103813"></a>  
-![](../../../../figures/single_core_aic_aiv_sync_aiv_setflag.png "单AI_Core中AIC与AIV全核同步（AIV进行CrossCoreSetFlag）")
+![](../../../../figures/single_core_aic_aiv_sync_aiv_setflag.png) "单AI_Core中AIC与AIV全核同步（AIV进行CrossCoreSetFlag）")
 
 ## 单AI Core中AIC与单个AIV同步<a name="ZH-CN_TOPIC_0000002586300742"></a>
 
@@ -150,4 +150,4 @@ AIC 1中在执行CrossCoreWaitFlag后，此时AIC 1 flagId=0的计数器为0，�
 - AIV 1-2的PIPE_MTE3指令全部执行完毕后，CrossCoreSetFlag生效。此时调度模块感知1个AIV已执行完CrossCoreSetFlag，因此将AIC 1 flagId=0的计数器值增加为1。AIC 1检测到对应的flagId=0的计数器变为1，则AIC 1核解除阻塞，继续执行后续PIPE_FIX的指令，并且将计数器值减去1。
 
 **图4**  模式4：单AI Core中AIC与单个AIV同步（AIV进行CrossCoreSetFlag）<a name="zh-cn_topic_0000002549581037_fig164171141103814"></a>  
-![](../../../../figures/single_ai_core_aic_single_aiv_sync.png "单AI_Core中AIC与单个AIV同步（AIV进行CrossCoreSetFlag）")
+![](../../../../figures/single_ai_core_aic_single_aiv_sync.png) "单AI_Core中AIC与单个AIV同步（AIV进行CrossCoreSetFlag）")

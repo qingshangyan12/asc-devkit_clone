@@ -99,7 +99,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 
 **图 1**  Normal模式与Compact模式搬运配置示意图<a id="fig_paddingmode_demo"></a>
 
-![](../../../../figures/paddingMode.png "Normal模式与Compact模式搬运配置示意图")
+![](../../../../figures/paddingMode.png) "Normal模式与Compact模式搬运配置示意图")
 
 ## 数据类型
 

@@ -64,7 +64,7 @@
 
 **图1**  归约接口选择决策树
 
-![归约接口选择决策树](../../../../figures/reduce_decision_tree.png "归约接口选择决策树")
+![归约接口选择决策树](../../../../figures/reduce_decision_tree.png) "归约接口选择决策树")
 
 注：在数据类型为`half`时，`ReduceDataBlock`及`ReduceRepeat`接口并行度不如`ReducePairElem`及基础算术接口[Add](../basic_arithmetic/Add.md)，[Max](../basic_arithmetic/Max.md)，[Min](../basic_arithmetic/Min.md)。在数据量较大，需要多次调用`ReduceDataBlock`及`ReduceRepeat`时，可以考虑使用`ReducePairElem`或基础算术接口对数据进行初步归约后再调用归约计算接口。
 <!-- end id2 -->

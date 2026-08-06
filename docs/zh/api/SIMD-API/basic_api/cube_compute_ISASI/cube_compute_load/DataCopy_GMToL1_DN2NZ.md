@@ -40,7 +40,7 @@ DN到NZ的格式转换等价于ND到ZN的格式转换，如下图所示：
 
 **图1** DN到NZ格式转换示意图
 
-![](../../../../figures/gm2l1_dn2nz_concept.png "DN到NZ格式转换示意图")
+![](../../../../figures/gm2l1_dn2nz_concept.png) "DN到NZ格式转换示意图")
 
 ## 函数原型<a id="section1954364615315"></a>
 
@@ -94,7 +94,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 **图2** DN2NZ转换示意图（连续搬运）
 
-![](../../../../figures/gm2l1_dn2nz_continuous.png "DN2NZ转换示意图（连续搬运）")
+![](../../../../figures/gm2l1_dn2nz_continuous.png) "DN2NZ转换示意图（连续搬运）")
 
 **非连续搬运**
 
@@ -111,7 +111,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 **图3** DN2NZ转换示意图（非连续搬运）
 
-![](../../../../figures/gm2l1_dn2nz.png "DN2NZ转换示意图（非连续搬运）")
+![](../../../../figures/gm2l1_dn2nz.png) "DN2NZ转换示意图（非连续搬运）")
 
 **SmallC0模式**
 
@@ -121,7 +121,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 **图4** DN2NZ转换示意图（SmallC0模式）
 
-![](../../../../figures/gm2l1_dn2nz_smallc0.png "DN2NZ转换示意图（SmallC0模式）")
+![](../../../../figures/gm2l1_dn2nz_smallc0.png) "DN2NZ转换示意图（SmallC0模式）")
 
 ## 数据类型<a id="section4219135304818"></a>
 

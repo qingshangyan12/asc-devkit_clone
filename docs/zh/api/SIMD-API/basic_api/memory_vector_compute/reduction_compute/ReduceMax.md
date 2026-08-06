@@ -40,7 +40,7 @@
 
 **图1**  `ReduceMax`计算示意图<a id="fig1"></a>
 
-![ReduceMax计算示意图](../../../../figures/ReduceMax_scale.png "ReduceMax计算示意图")
+![ReduceMax计算示意图](../../../../figures/ReduceMax_scale.png) "ReduceMax计算示意图")
 
 ## 函数原型
 

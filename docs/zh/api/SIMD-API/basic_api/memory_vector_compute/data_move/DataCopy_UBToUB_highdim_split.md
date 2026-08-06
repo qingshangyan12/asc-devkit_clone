@@ -92,7 +92,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     - dstGap = 0，目的操作数相邻数据块之间的间隔为0。
 
     **图1**  连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig4621152141711"></a>  
-    ![](../../../../figures/continuous_data_copy_diagram.png "连续搬运示意图")
+    ![](../../../../figures/continuous_data_copy_diagram.png) "连续搬运示意图")
 
 - 示例2：非连续搬运
 
@@ -106,7 +106,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     - dstGap = 2，目的操作数相邻数据块之间的间隔为2。
 
     **图2**  非连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig422819202304"></a>  
-    ![](../../../../figures/discontinuous_data_copy_diagram.png "非连续搬运示意图")
+    ![](../../../../figures/discontinuous_data_copy_diagram.png) "非连续搬运示意图")
 
 ## 数据类型<a name="section4219135304818"></a>
 

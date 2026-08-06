@@ -40,7 +40,7 @@
 
 **图1**  `ReduceDataBlock`归约示意图
 
-![ReduceDataBlock归约示意图](../../../../figures/ReduceDataBlock.png "ReduceDataBlock归约示意图")
+![ReduceDataBlock归约示意图](../../../../figures/ReduceDataBlock.png) "ReduceDataBlock归约示意图")
 
 ## 函数原型
 
@@ -178,7 +178,7 @@
 
         **图2**  `ReduceDataBlock<ReduceType::SUM>`饱和模式数值溢出情况处理说明
 
-        ![ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明](../../../../figures/vcgadd_overflow.png "ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明")
+        ![ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明](../../../../figures/vcgadd_overflow.png) "ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明")
 
 ## 关键特性说明
 
@@ -192,7 +192,7 @@
 
 **图3**  `ReduceDataBlock<ReduceType::SUM>`求和示意图
 
-![ReduceDataBlock<ReduceType::SUM>求和示意图](../../../../figures/vcgadd_binary_add.png "ReduceDataBlock<ReduceType::SUM>求和示意图")
+![ReduceDataBlock<ReduceType::SUM>求和示意图](../../../../figures/vcgadd_binary_add.png) "ReduceDataBlock<ReduceType::SUM>求和示意图")
 
 ## 调用示例
 

@@ -30,11 +30,11 @@
 
 单次repeat内转换规则如下：
 
-- 当输入数据类型位宽为16位时，每个DataBlock中包含16个数，指令内部会循环16次，每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成一个新的DataBlock单元放入目的地址中。如下图所示，图中的srcList[0]-srcList[15]代表源操作数的16个DataBlock。![](../figures/asc_transto5hd_b16.png "图1输入数据类型位宽为16位时的转换规则")
+- 当输入数据类型位宽为16位时，每个DataBlock中包含16个数，指令内部会循环16次，每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成一个新的DataBlock单元放入目的地址中。如下图所示，图中的srcList[0]-srcList[15]代表源操作数的16个DataBlock。![](../figures/asc_transto5hd_b16.png) "图1输入数据类型位宽为16位时的转换规则")
 
-- 当数据类型位宽为32位时，每个DataBlock包含8个数，指令内部会循环8次，每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成2个新的DataBlock放入目的地址中。如下图所示：![](../figures/asc_transto5hd_b32.png "图2 输入数据类型位宽为32位时的转换规则")
+- 当数据类型位宽为32位时，每个DataBlock包含8个数，指令内部会循环8次，每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成2个新的DataBlock放入目的地址中。如下图所示：![](../figures/asc_transto5hd_b32.png) "图2 输入数据类型位宽为32位时的转换规则")
 
-- 当数据类型位宽为8位时，每个DataBlock包含32个数，指令内部会循环16次，每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成半个DataBlock放入目的地址中，读取和存放是在DataBlock的高半部还是低半部由参数srcHighHalf和dstHighHalf决定。如下图所示：![](../figures/asc_transto5hd_b8.png "图3 输入数据类型位宽为8位时的转换规则")
+- 当数据类型位宽为8位时，每个DataBlock包含32个数，指令内部会循环16次，每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成半个DataBlock放入目的地址中，读取和存放是在DataBlock的高半部还是低半部由参数srcHighHalf和dstHighHalf决定。如下图所示：![](../figures/asc_transto5hd_b8.png) "图3 输入数据类型位宽为8位时的转换规则")
 
 基于以上的转换规则，使用该接口进行NC1HWC0格式转换或者矩阵转置。NC1HWC0格式转换相对复杂，这里给出其具体的转换方法：
 

@@ -76,13 +76,13 @@ FP32与HF32格式的精度对比如下图所示：
 <!-- npu="A3,910b" id10 -->
 **图1** FP32与HF32格式精度示意图（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh_cn_topic_hf32_figure1"></a>
 
-![FP32与HF32格式精度示意图（NPU架构版本2201）](../../../figures/mmad_hf32.png "FP32与HF32格式精度示意图（NPU架构版本2201）")
+![FP32与HF32格式精度示意图（NPU架构版本2201）](../../../figures/mmad_hf32.png) "FP32与HF32格式精度示意图（NPU架构版本2201）")
 <!-- end id10 -->
 
 <!-- npu="950" id11 -->
 **图2** FP32与HF32格式精度示意图（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh_cn_topic_hf32_figure2"></a>
 
-![FP32与HF32格式精度示意图（NPU架构版本3510）](../../../figures/mmad_hf32_950.png "FP32与HF32格式精度示意图（NPU架构版本3510）")
+![FP32与HF32格式精度示意图（NPU架构版本3510）](../../../figures/mmad_hf32_950.png) "FP32与HF32格式精度示意图（NPU架构版本3510）")
 <!-- end id11 -->
 
 ## 函数原型
