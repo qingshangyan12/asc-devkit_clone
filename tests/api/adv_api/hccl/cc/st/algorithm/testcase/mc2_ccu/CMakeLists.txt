@@ -148,8 +148,8 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
     ${UTILS_DIR}/ccu/ccu_all_to_all_v_mesh1d_adapter.cc
     ${UTILS_DIR}/ccu/ccu_all_to_all_mesh1d_adapter.cc
-    ${UTILS_DIR}/ccu_st_all_to_all_v.cc
-    ${UTILS_DIR}/ccu_st_all_to_all.cc
+    ${UTILS_DIR}/ccu_st/ccu_st_all_to_all_v.cc
+    ${UTILS_DIR}/ccu_st/ccu_st_all_to_all.cc
 )
 
 add_executable(${HCCL_MC2_CCU_SELECTOR_TARGET}
@@ -164,7 +164,7 @@ add_executable(${HCCL_MC2_CCU_SELECTOR_TARGET}
 target_include_directories(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
     ${HCCL_MC2_CCU_SELECTOR_DIR}/shim
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
-    ${UTILS_DIR}
+    ${UTILS_DIR}/ccu_st
     ${HCCL_CC_SRC_DIR}
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/executor
