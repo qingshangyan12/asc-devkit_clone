@@ -103,6 +103,9 @@ ASCENDC_HOST_AICORE inline constexpr auto ceil_div_generic(const T& a, const U& 
 template <typename T, typename U>
 ASCENDC_HOST_AICORE inline constexpr auto ceil_div(const T& a, const U& b)
 {
+    if (b == 0) {
+        return 0;
+    }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 || !defined(SPLIT_CORE_VEC)
     return ceil_div_generic(a, b);
 #else

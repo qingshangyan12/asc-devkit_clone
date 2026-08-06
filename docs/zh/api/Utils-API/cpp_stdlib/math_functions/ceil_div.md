@@ -60,7 +60,7 @@ __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 ## 约束说明
 
 - T和U必须为整型。
-- b不能为0。
+- b不能为0, b为0时结果固定返回为0。
 - 对于有符号输入，调用方需确保a >= 0且b > 0。
 <!-- npu="950" id1 -->
 - 在Ascend 950PR/Ascend 950DT设备中，在非 CPU Debug 且定义了`__vector__`时，`ceil_div`返回值类型为`uint16_t`，调用方需确保向上取整结果在`uint16_t`可表示范围内。
