@@ -141,12 +141,13 @@ const CannSyms& LoadCannSyms()
 
 bool UseCannBridge(const OpParam& param)
 {
-    return (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
-           (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
-            param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+    (void)param;
+    // AllReduce and AllToAll(V) now have local selectors and executors in mc2_client.
+    return false;
 }
 
-HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName)
+HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo,
+    std::string& algName)
 {
     const cann_abi::CannSyms& syms = cann_abi::LoadCannSyms();
     if (!syms.selectorOk) {
@@ -178,7 +179,8 @@ HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo
     }
     if (algName.empty()) {
         HCCL_ERROR(
-            "[HostCannBridge][Select] CANN selected empty algName, opType=%u", static_cast<u32>(ascParam.opType));
+            "[HostCannBridge][Select] CANN selected empty algName, opType=%u",
+            static_cast<u32>(ascParam.opType));
         return HCCL_E_NOT_SUPPORT;
     }
 
