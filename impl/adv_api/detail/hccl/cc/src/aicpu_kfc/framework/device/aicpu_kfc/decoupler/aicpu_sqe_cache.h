@@ -47,11 +47,43 @@ typedef struct {
 } HcommAicpuSqeCacheParam;
 
 extern "C" {
+/**
+ * @brief 按当前算子参数查找并回放兼容的 AICPU SQE 缓存
+ * @param[in] param 当前算子的缓存匹配参数
+ * @param[out] replayed 是否命中并完成回放，非 0 表示已回放
+ * @return int32_t 执行结果状态码
+ */
 int32_t HcommAicpuSqeCacheReplay(const HcommAicpuSqeCacheParam *param, uint32_t *replayed);
+
+/**
+ * @brief 创建本次 AICPU SQE 捕获上下文
+ * @param[in] param 当前算子的缓存绑定参数
+ * @return int32_t 执行结果状态码
+ */
 int32_t HcommAicpuSqeCacheBegin(const HcommAicpuSqeCacheParam *param);
+
+/**
+ * @brief 将 MC2 使用的 Thread 绑定到当前 SQE 捕获上下文
+ * @param[in] thread AICPU TS Thread 句柄
+ * @return int32_t 执行结果状态码
+ */
 int32_t HcommAicpuSqeCacheBindThread(uint64_t thread);
+
+/**
+ * @brief 冻结当前捕获结果并解除全部 Thread/RTSQ 绑定
+ * @return int32_t 执行结果状态码
+ */
 int32_t HcommAicpuSqeCacheFreezeAndUnbind(void);
+
+/**
+ * @brief 提交当前捕获结果并发布为可回放缓存
+ * @return int32_t 执行结果状态码
+ */
 int32_t HcommAicpuSqeCacheCommit(void);
+
+/**
+ * @brief 终止当前捕获并清理全部 Thread/RTSQ 绑定
+ */
 void HcommAicpuSqeCacheAbort(void);
 }
 

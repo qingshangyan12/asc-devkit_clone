@@ -130,6 +130,13 @@ bool IsMc2BatchModeOp(HcclCMDType opType)
 
 constexpr u64 PHASE_ONE_MAX_TRANSFER_BYTES = 256ULL * 1024ULL * 1024ULL;
 
+/**
+ * @brief 安全计算两个无符号整数的乘积
+ * @param[in] lhs 左操作数
+ * @param[in] rhs 右操作数
+ * @param[out] result 乘积
+ * @return bool 是否计算成功，溢出时返回 false
+ */
 bool SafeMul(u64 lhs, u64 rhs, u64& result)
 {
     if (lhs != 0U && rhs > std::numeric_limits<u64>::max() / lhs) {
@@ -139,6 +146,13 @@ bool SafeMul(u64 lhs, u64 rhs, u64& result)
     return true;
 }
 
+/**
+ * @brief 安全计算位移与长度覆盖范围的结束位置
+ * @param[in] displacement 起始位移
+ * @param[in] count 数据长度
+ * @param[out] span 覆盖范围的结束位置
+ * @return bool 是否计算成功，溢出时返回 false
+ */
 bool SafeSpan(u64 displacement, u64 count, u64& span)
 {
     if (displacement > std::numeric_limits<u64>::max() - count) {
@@ -148,6 +162,11 @@ bool SafeSpan(u64 displacement, u64 count, u64& span)
     return true;
 }
 
+/**
+ * @brief 将一个整数值合入 FNV 风格哈希
+ * @param[in] value 待合入的值
+ * @param[in,out] hash 当前哈希值
+ */
 void HashValue(u64 value, u64& hash)
 {
     constexpr u64 FNV_PRIME = 1099511628211ULL;
@@ -155,6 +174,11 @@ void HashValue(u64 value, u64& hash)
     hash *= FNV_PRIME;
 }
 
+/**
+ * @brief 根据拓扑、CCL 内存、Thread 和 Channel 生成通信资源标识
+ * @param[in] resCtx 当前算子的通信资源上下文
+ * @return u64 通信资源哈希标识
+ */
 u64 BuildResourceId(const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
 {
     u64 hash = 1469598103934665603ULL;
@@ -177,6 +201,11 @@ u64 BuildResourceId(const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
     return hash;
 }
 
+/**
+ * @brief 根据执行引擎、模式、数据类型和内存模式生成缓存模式标识
+ * @param[in] param 当前算子参数
+ * @return u32 缓存模式哈希标识
+ */
 u32 BuildModeFlags(const mc2_ops_hccl::OpParam& param)
 {
     u64 hash = 2166136261U;
@@ -204,6 +233,14 @@ struct SqeCacheBindingStorage {
     std::vector<uint64_t> recvDispls;
 };
 
+/**
+ * @brief 向缓存绑定信息中追加一段有效地址范围
+ * @param[in,out] storage 缓存绑定信息存储对象
+ * @param[in] addr 地址范围起始地址
+ * @param[in] size 地址范围大小
+ * @param[in] kind 地址范围类型
+ * @param[in] index 地址范围对应的资源或对端索引
+ */
 void AddRange(SqeCacheBindingStorage& storage, u64 addr, u64 size, u32 kind, u32 index)
 {
     if (addr == 0U || size == 0U) {
@@ -212,6 +249,15 @@ void AddRange(SqeCacheBindingStorage& storage, u64 addr, u64 size, u32 kind, u32
     storage.ranges.push_back(HcommAicpuSqeCacheRange{addr, size, kind, index});
 }
 
+/**
+ * @brief 为对称内存 AllGather 补充各对端输出地址范围
+ * @param[in] param 当前算子参数
+ * @param[in] resCtx 当前算子的通信资源上下文
+ * @param[in,out] storage 缓存绑定信息存储对象
+ * @param[in] outputSpan 单个输出地址范围大小
+ * @param[out] reason 不可缓存时的原因
+ * @return bool 是否成功补充地址范围
+ */
 bool AddAllGatherSymmetricRanges(const mc2_ops_hccl::OpParam& param,
                                  const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
                                  SqeCacheBindingStorage& storage, u64 outputSpan,
@@ -246,6 +292,17 @@ bool AddAllGatherSymmetricRanges(const mc2_ops_hccl::OpParam& param,
     return true;
 }
 
+/**
+ * @brief 将 AllToAll/AllToAllV 的 counts 和 displacements 转换为字节语义
+ * @param[in] param 当前算子参数
+ * @param[in] resCtx 当前算子的通信资源上下文
+ * @param[in,out] storage 缓存绑定信息存储对象
+ * @param[out] inputSpan 输入地址覆盖范围
+ * @param[out] outputSpan 输出地址覆盖范围
+ * @param[out] maxTransfer 单个对端的最大传输字节数
+ * @param[out] reason 不可缓存时的原因
+ * @return bool 参数是否满足缓存准入条件
+ */
 bool BuildAllToAllVShape(const mc2_ops_hccl::OpParam& param,
                          const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
                          SqeCacheBindingStorage& storage, u64& inputSpan, u64& outputSpan, u64& maxTransfer,
@@ -306,6 +363,14 @@ bool BuildAllToAllVShape(const mc2_ops_hccl::OpParam& param,
     return true;
 }
 
+/**
+ * @brief 根据当前算子和通信资源构造 SQE 缓存匹配参数
+ * @param[in] param 当前算子参数
+ * @param[in] resCtx 当前算子的通信资源上下文
+ * @param[out] storage 缓存绑定信息及其数组存储
+ * @param[out] reason 不可缓存时的原因
+ * @return bool 是否满足 SQE 缓存准入条件
+ */
 bool BuildSqeCacheBinding(const mc2_ops_hccl::OpParam& param,
                           const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
                           SqeCacheBindingStorage& storage, const char*& reason)
@@ -489,6 +554,14 @@ HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
     return HCCL_SUCCESS;
 }
 
+/**
+ * @brief 在 MC2 batch 模式下执行 SQE 缓存的回放、捕获和提交流程
+ * @tparam Func 正常算法展开函数类型
+ * @param[in] param 当前算子参数
+ * @param[in] resCtx 当前算子的通信资源上下文
+ * @param[in] func 正常算法展开函数
+ * @return HcclResult 执行结果状态码
+ */
 template <typename Func>
 HcclResult RunWithAicpuSqeCache(const mc2_ops_hccl::OpParam& param,
                                 const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, Func func)
