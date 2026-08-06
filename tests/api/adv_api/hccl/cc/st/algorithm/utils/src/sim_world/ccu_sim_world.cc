@@ -280,6 +280,15 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
                 return false;
             }
             std::memmove(destinationPointer, sourcePointer, static_cast<size_t>(length));
+            ExecutionLogEntry logEntry;
+            logEntry.rank = static_cast<uint32_t>(rankIndex);
+            logEntry.operationIndex = state.pc;
+            logEntry.code = operation.code;
+            logEntry.source = MemoryInterval{sourceRank,
+                state.addresses[localIterator->second.first], length, false};
+            logEntry.destination = MemoryInterval{destinationRank,
+                state.addresses[destinationAddress], length, true};
+            executionLog_.rankEntries[rankIndex].push_back(logEntry);
             if (operation.code != OpCode::GROUP_COPY) {
                 state.events[operation.immediate] |= operation.mask;
             }
@@ -312,6 +321,8 @@ Result RuntimeWorld::Launch(const std::vector<RankLaunch> &launches)
 {
     lastError_.clear();
     lastExecutionStats_.assign(launches.size(), RankExecutionStats{});
+    executionLog_.programs.assign(launches.size(), nullptr);
+    executionLog_.rankEntries.assign(launches.size(), {});
     if (launches.empty()) {
         SetError("no ranks were provided");
         return Result::PARAM_ERROR;
@@ -332,6 +343,7 @@ Result RuntimeWorld::Launch(const std::vector<RankLaunch> &launches)
         states[rank].program = program;
         states[rank].launch = &launches[rank];
         states[rank].taskParams = PackTaskArgs(launches[rank].taskArgs);
+        executionLog_.programs[rank] = program;
     }
 
     Result result = Result::SUCCESS;
@@ -365,6 +377,11 @@ const std::string &RuntimeWorld::LastError() const
 const std::vector<RankExecutionStats> &RuntimeWorld::LastExecutionStats() const
 {
     return lastExecutionStats_;
+}
+
+const ExecutionLog &RuntimeWorld::ExecutionLogData() const
+{
+    return executionLog_;
 }
 
 void RuntimeWorld::SetError(const std::string &message)

@@ -11,6 +11,7 @@
 #include "ccu_st_all_to_all_v.h"
 #include "ccu_kernel_proxy.h"
 #include "ccu_sim_world.h"
+#include "ccu_dag_checker.h"
 #include "ccu_all_to_all_v_semantics_checker.h"
 
 #include "sim_communicator.h"
@@ -283,6 +284,8 @@ void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
 
     RuntimeWorld world;
     ASSERT_EQ(world.Launch(data.launches), Result::SUCCESS) << world.LastError();
+    CheckResult dagResult = CcuDagChecker().Check(world.ExecutionLogData());
+    ASSERT_TRUE(dagResult.Ok()) << dagResult.message;
     CheckResult runtime = checker.CheckRuntime(expectation, data.memories, world);
     ASSERT_TRUE(runtime.Ok()) << runtime.message;
 

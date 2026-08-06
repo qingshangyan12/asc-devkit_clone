@@ -12,6 +12,7 @@
 #define HCCL_CCU_SIM_WORLD_H
 
 #include "ccu_kernel_proxy.h"
+#include "ccu_dag_types.h"
 
 #include <string>
 
@@ -48,6 +49,7 @@ public:
     Result Launch(const std::vector<RankLaunch> &launches);
     const std::string &LastError() const;
     const std::vector<RankExecutionStats> &LastExecutionStats() const;
+    const ExecutionLog &ExecutionLogData() const;
 
 private:
     struct RankState;
@@ -60,6 +62,7 @@ private:
 
     std::string lastError_;
     std::vector<RankExecutionStats> lastExecutionStats_;
+    ExecutionLog executionLog_;
 };
 
 } // namespace CcuSt
