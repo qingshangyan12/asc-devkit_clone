@@ -1013,7 +1013,6 @@ void ManifestBundleCompiler::Compile() const
         CollectedManifestRepository(manifestSearchRoot).Load();
     BuildWorkspace workspace = BuildWorkspace::Create(request_.workDir, request_.keepTemp);
     if (request_.keepTemp) {
-        std::cerr << "asc_compile_exporter temporary directory: " << workspace.Session() << '\n';
         ASCENDLOGI("Keeping temporary bundle directory %s", workspace.Session().c_str());
     }
 
