@@ -39,13 +39,13 @@ std::string ReadTestFile(const std::string& path)
 
 bool PathExists(const std::string& path)
 {
-    struct stat info{};
+    struct stat info {};
     return lstat(path.c_str(), &info) == 0;
 }
 
 bool IsRegularPath(const std::string& path)
 {
-    struct stat info{};
+    struct stat info {};
     return stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode);
 }
 
@@ -452,8 +452,8 @@ TEST_F(ManifestGeneratorModuleTest, BundlePublisherReportsRenameFailure)
 
 TEST_F(ManifestGeneratorModuleTest, BundlePublisherCopiesAcrossFileSystems)
 {
-    struct stat rootInfo{};
-    struct stat sharedMemoryInfo{};
+    struct stat rootInfo {};
+    struct stat sharedMemoryInfo {};
     if (stat(root_.c_str(), &rootInfo) != 0 || stat("/dev/shm", &sharedMemoryInfo) != 0 ||
         rootInfo.st_dev == sharedMemoryInfo.st_dev || access("/dev/shm", W_OK) != 0) {
         GTEST_SKIP() << "cross-filesystem writable directory is unavailable";

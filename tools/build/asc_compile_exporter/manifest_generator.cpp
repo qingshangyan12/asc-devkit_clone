@@ -115,7 +115,7 @@ bool ResolveCanonicalPath(const std::string& path, std::string& resolved)
 
 bool IsDirectory(const std::string& path)
 {
-    struct stat info{};
+    struct stat info {};
     return stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode);
 }
 
@@ -186,7 +186,7 @@ void CreateDirectories(const std::string& path)
 
 void RemoveTree(const std::string& path) noexcept
 {
-    struct stat info{};
+    struct stat info {};
     if (lstat(path.c_str(), &info) != 0) {
         return;
     }
@@ -224,7 +224,7 @@ std::vector<uint8_t> ReadRegularFile(const std::string& path, uintmax_t maximum,
     if (descriptor < 0) {
         throw SystemError("failed to open " + field + " " + path);
     }
-    struct stat info{};
+    struct stat info {};
     if (fstat(descriptor, &info) != 0 || !S_ISREG(info.st_mode) || info.st_size < 0 ||
         static_cast<uintmax_t>(info.st_size) > maximum ||
         static_cast<uintmax_t>(info.st_size) > static_cast<uintmax_t>(std::numeric_limits<size_t>::max())) {
@@ -370,7 +370,7 @@ private:
                     continue;
                 }
                 const std::string path = JoinPath(directory, name);
-                struct stat info{};
+                struct stat info {};
                 if (lstat(path.c_str(), &info) != 0) {
                     throw SystemError("failed to inspect collection entry " + path);
                 }
@@ -423,7 +423,7 @@ private:
                     continue;
                 }
                 const std::string source = JoinPath(directory, name);
-                struct stat info{};
+                struct stat info {};
                 if (lstat(source.c_str(), &info) != 0) {
                     throw SystemError("failed to inspect manifest resource " + source);
                 }
@@ -687,7 +687,7 @@ private:
         if (!ResolveCanonicalPath(candidate, canonical)) {
             return std::string();
         }
-        struct stat info{};
+        struct stat info {};
         if (stat(canonical.c_str(), &info) != 0 || !S_ISREG(info.st_mode) || access(canonical.c_str(), X_OK) != 0) {
             return std::string();
         }
@@ -812,7 +812,7 @@ private:
         }
         const std::string includeDir = JoinPath(cannHome, "include");
         const std::string abiHeader = JoinPath(includeDir, "ascendc_compile_resource/ascendc_manifest_abi.h");
-        struct stat info{};
+        struct stat info {};
         if (lstat(abiHeader.c_str(), &info) != 0 || !S_ISREG(info.st_mode)) {
             throw std::runtime_error("CANN package include is missing ascendc_manifest_abi.h: " + includeDir);
         }
@@ -845,7 +845,7 @@ public:
 private:
     static void RejectSymlink(const std::string& output)
     {
-        struct stat info{};
+        struct stat info {};
         if (lstat(output.c_str(), &info) != 0) {
             if (errno == ENOENT) {
                 return;
@@ -863,7 +863,7 @@ private:
         if (input < 0) {
             throw SystemError("failed to open staged bundle output");
         }
-        struct stat info{};
+        struct stat info {};
         if (fstat(input, &info) != 0 || !S_ISREG(info.st_mode)) {
             (void)close(input);
             throw std::runtime_error("staged bundle output is not a regular file");

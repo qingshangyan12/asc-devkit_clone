@@ -76,13 +76,13 @@ std::string ParentTestPath(const std::string& path)
 
 bool IsTestDirectory(const std::string& path)
 {
-    struct stat info{};
+    struct stat info {};
     return stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode);
 }
 
 bool IsTestRegularFile(const std::string& path)
 {
-    struct stat info{};
+    struct stat info {};
     return stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode);
 }
 
@@ -99,7 +99,7 @@ void CreateTestDirectories(const std::string& path)
 
 void RemoveTestTree(const std::string& path) noexcept
 {
-    struct stat info{};
+    struct stat info {};
     if (lstat(path.c_str(), &info) != 0) {
         return;
     }
