@@ -94,7 +94,7 @@
 
     CMake配置文件示例：
 
-    ```
+    ```cmake
     cmake_minimum_required(VERSION 3.16)
     # find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
     find_package(ASC REQUIRED)
@@ -114,15 +114,17 @@
 
     编译并执行：
 
-    ```
+    ```bash
     mkdir -p build && cd build;
     cmake ..;make -j;
     ./demo
     ```
 
-    > [!NOTE] 说明
+    > [!NOTE]说明
     > - 该样例支持以下型号：
-    >     - Ascend 950PR / Ascend 950DT
+    >     <!-- npu="950" id1 -->
+    >     - Ascend 950PR/Ascend 950DT
+    >     <!-- end id1 -->
     > - 编译选项`--npu-arch`用于指定NPU架构版本，`dav-`后为架构版本号，请替换为您实际使用的版本。各AI处理器型号对应的架构版本号请通过[AI处理器型号和 \_\_NPU\_ARCH\_\_ 的对应关系](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)查询。
     > - 编译选项`--enable-simt`用于启用SIMT编程场景。
 

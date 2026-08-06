@@ -39,11 +39,6 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #endif
 
 namespace __asc_aicore {
-__aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
-{
-    copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
-}
-
 __aicore__ inline void enable_asc_diagnostics()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
@@ -299,15 +294,16 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 #endif
 }
 
-__aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
+__aicore__ static __attribute__((noinline)) bool AscVFDebugTransferUb()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
     __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
     if (g_sysPrintFifoSpace != nullptr) {
         pipe_barrier(PIPE_ALL);
-        asc_vf_debug_ub2gm();
+        return asc_vf_debug_ub2gm();
     }
 #endif
+    return false;
 }
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__)

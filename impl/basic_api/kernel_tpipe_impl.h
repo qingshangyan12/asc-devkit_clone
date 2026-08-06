@@ -75,9 +75,6 @@ __aicore__ inline TPipe::TPipe()
 {
     InitSocState();
     Init();
-#ifdef ASCENDC_TIME_STAMP_ON
-    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_TPIPE));
-#endif
 }
 
 __aicore__ inline TPipe::~TPipe()
@@ -226,7 +223,7 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, const Std::tuple<U, V>& addr0, 
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "buffer number is %u, which should be the same as TQueConfig::bufferNumber(%u)", num,
             que.config.bufferNumber));
-    static_assert(T::dstPosition != TPosition::TSCM, "Init Buffer is not support Postion TSCM");
+    static_assert(T::dstPosition != TPosition::TSCM, "Init Buffer is not support Postion L1 Buffer(TSCM)");
     Hardware pool = GetBufferPos(T::srcPosition, T::dstPosition);
     que.bufStart = this->g_tpipeImpl.buf_ + this->g_tpipeImpl.curBufSize_;
     que.value = num;
@@ -243,9 +240,6 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, const Std::tuple<U, V>& addr0, 
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n",
             this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN));
-#ifdef ASCENDC_TIME_STAMP_ON
-    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
-#endif
     return true;
 }
 
@@ -346,9 +340,6 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num, uint32_t len)
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "tscm addr is %d, limits is %d",
             this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr, this->g_tpipeImpl.tscmBufferPtr_));
-#ifdef ASCENDC_TIME_STAMP_ON
-    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
-#endif
     return true;
 }
 
@@ -412,9 +403,6 @@ __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf, uint32_t len)
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n",
             this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN));
-#ifdef ASCENDC_TIME_STAMP_ON
-    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
-#endif
     return true;
 }
 

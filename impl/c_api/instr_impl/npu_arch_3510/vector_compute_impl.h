@@ -8,6 +8,13 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_H
 
@@ -320,30 +327,30 @@ __simd_callee__ inline void asc_add(
 }
 
 __simd_callee__ inline void asc_add(
-    vector_bool& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+    vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
-    asc_add_impl(dst0, dst1, src0, src1, mask);
+    asc_add_impl(carry, dst, src0, src1, mask);
 }
 
 __simd_callee__ inline void asc_add(
-    vector_bool& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+    vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
-    asc_add_impl(dst0, dst1, src0, src1, mask);
+    asc_add_impl(carry, dst, src0, src1, mask);
 }
 
 // // ==========asc_addc(uint32_t/int32_t)==========
 __simd_callee__ inline void asc_addc(
-    vector_bool& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool src2,
+    vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
     vector_bool mask)
 {
-    asc_addc_impl(dst0, dst1, src0, src1, src2, mask);
+    asc_addc_impl(carry, dst, src0, src1, carry_src, mask);
 }
 
 __simd_callee__ inline void asc_addc(
-    vector_bool& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1, vector_bool src2,
+    vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src,
     vector_bool mask)
 {
-    asc_addc_impl(dst0, dst1, src0, src1, src2, mask);
+    asc_addc_impl(carry, dst, src0, src1, carry_src, mask);
 }
 
 // ==========asc_shiftleft(u8/s8/u16/s16/u32/s32)==========
@@ -3273,6 +3280,12 @@ __simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, ha
     asc_min_scalar_impl(dst, src, value, mask);
 }
 
+__simd_callee__ inline void asc_min_scalar(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
+{
+    asc_min_scalar_impl(dst, src, value, mask);
+}
+
 //==================asc_reduce_max_datablock====================
 __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst, vector_half src, vector_bool mask)
 {
@@ -4996,50 +5009,79 @@ asc_uint82uint16_v2(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 }
 
 // ==========asc_pack(bool/uint16_t/int16_t/uint32_t/int32_t)==========
-__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src) { asc_pack_impl(dst, src); }
+[[deprecated("NOTICE: asc_pack is deprecated.  Please use asc_pack_to_low instead.")]] __simd_callee__ inline void
+asc_pack(vector_uint8_t& dst, vector_uint16_t src)
+{
+    asc_pack_impl(dst, src);
+}
 
-__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_int16_t src) { asc_pack_impl(dst, src); }
+[[deprecated("NOTICE: asc_pack is deprecated.  Please use asc_pack_to_low instead.")]] __simd_callee__ inline void
+asc_pack(vector_uint8_t& dst, vector_int16_t src)
+{
+    asc_pack_impl(dst, src);
+}
 
-__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_uint32_t src) { asc_pack_impl(dst, src); }
+[[deprecated("NOTICE: asc_pack is deprecated.  Please use asc_pack_to_low instead.")]] __simd_callee__ inline void
+asc_pack(vector_uint16_t& dst, vector_uint32_t src)
+{
+    asc_pack_impl(dst, src);
+}
 
-__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_int32_t src) { asc_pack_impl(dst, src); }
+[[deprecated("NOTICE: asc_pack is deprecated.  Please use asc_pack_to_low instead.")]] __simd_callee__ inline void
+asc_pack(vector_uint16_t& dst, vector_int32_t src)
+{
+    asc_pack_impl(dst, src);
+}
 
-__simd_callee__ inline void asc_pack(vector_bool& dst, vector_bool src) { asc_pack_impl(dst, src); }
+[[deprecated("NOTICE: asc_pack is deprecated.  Please use asc_pack_to_low instead.")]] __simd_callee__ inline void
+asc_pack(vector_bool& dst, vector_bool src)
+{
+    asc_pack_impl(dst, src);
+}
 
-[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_pack_v2 is deprecated.  Please use asc_pack_to_high instead.")]] __simd_callee__ inline void
 asc_pack_v2(vector_uint8_t& dst, vector_uint16_t src)
 {
     asc_pack_v2_impl(dst, src);
 }
 
-[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_pack_v2 is deprecated.  Please use asc_pack_to_high instead.")]] __simd_callee__ inline void
 asc_pack_v2(vector_uint8_t& dst, vector_int16_t src)
 {
     asc_pack_v2_impl(dst, src);
 }
 
-[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_pack_v2 is deprecated.  Please use asc_pack_to_high instead.")]] __simd_callee__ inline void
 asc_pack_v2(vector_uint16_t& dst, vector_uint32_t src)
 {
     asc_pack_v2_impl(dst, src);
 }
 
-[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_pack_v2 is deprecated.  Please use asc_pack_to_high instead.")]] __simd_callee__ inline void
 asc_pack_v2(vector_uint16_t& dst, vector_int32_t src)
 {
     asc_pack_v2_impl(dst, src);
 }
 
-[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_pack_v2 is deprecated.  Please use asc_pack_to_high instead.")]] __simd_callee__ inline void
 asc_pack_v2(vector_bool& dst, vector_bool src)
 {
     asc_pack_v2_impl(dst, src);
 }
+
+// ==========asc_pack_to_low(bool/uint16_t/uint32_t)==========
+__simd_callee__ inline void asc_pack_to_low(vector_uint8_t& dst, vector_uint16_t src) { asc_pack_impl(dst, src); }
+
+__simd_callee__ inline void asc_pack_to_low(vector_uint16_t& dst, vector_uint32_t src) { asc_pack_impl(dst, src); }
+
+__simd_callee__ inline void asc_pack_to_low(vector_bool& dst, vector_bool src) { asc_pack_impl(dst, src); }
+
+// ==========asc_pack_to_high(bool/uint16_t/uint32_t)==========
+__simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_uint16_t src) { asc_pack_v2_impl(dst, src); }
+
+__simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_uint32_t src) { asc_pack_v2_impl(dst, src); }
+
+__simd_callee__ inline void asc_pack_to_high(vector_bool& dst, vector_bool src) { asc_pack_v2_impl(dst, src); }
 
 // ==========asc_exp_sub(half/float)==========
 __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask)
@@ -5152,7 +5194,7 @@ __simd_callee__ inline void asc_max_scalar(
     asc_max_scalar_impl(dst, src, value, mask);
 }
 
-// ==========asc_ne(uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t/half/float)==========
+// ==========asc_ne(uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t/half/bfloat16_t/float)==========
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     asc_ne_impl(dst, src0, src1, mask);
@@ -5184,6 +5226,11 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_int32_t src0, vector
 }
 
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
+{
+    asc_ne_impl(dst, src0, src1, mask);
+}
+
+__simd_callee__ inline void asc_ne(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     asc_ne_impl(dst, src0, src1, mask);
 }
@@ -5969,4 +6016,9 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_arra
 {
     asc_set_va_reg_impl(addr, src_array);
 }
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif

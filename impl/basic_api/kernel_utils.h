@@ -29,7 +29,14 @@
 #include "utils/kernel_utils_struct_norm_sort.h"
 #include "utils/kernel_utils_struct_param.h"
 #include "../utils/debug/asc_debug_utils.h"
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) &&             \
+    ((defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)) || \
+     (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(__ASC_DISABLE_RESERVED_UBUF__)))
+#define ASCENDC_INTERNAL_SIMD_VF_OVERFLOW_WARNING_ENABLED
+#include "../utils/debug/asc_aicore_printf_impl.h"
+#endif
 
+#include "../utils/base/helpers_impl.h"
 #include "../../include/basic_api/kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"
 #include "kernel_utils_base.h"
@@ -270,22 +277,11 @@ enum class TimeStampId : uint32_t {
 
     TIME_STAMP_MAX = 0xffff,
 };
-
-template <auto funcPtr, typename DebugTag = Internal::SimdVfDebugTag, typename... Args>
-__aicore__ static inline void AscVFCallImpl(Args&&... args)
-{
-    if constexpr (Internal::SimdVfDebugTraits<DebugTag>::enabled) {
-        AscVFDebugInitUb();
-    }
-
-    funcPtr(args...);
-
-    if constexpr (Internal::SimdVfDebugTraits<DebugTag>::enabled) {
-        AscVFDebugTransferUb();
-    }
-}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_UTILS_H
+#ifdef ASCENDC_INTERNAL_SIMD_VF_OVERFLOW_WARNING_ENABLED
+#undef ASCENDC_INTERNAL_SIMD_VF_OVERFLOW_WARNING_ENABLED
+#endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_H__
