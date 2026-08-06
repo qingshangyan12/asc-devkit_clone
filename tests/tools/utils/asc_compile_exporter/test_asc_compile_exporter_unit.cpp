@@ -20,26 +20,18 @@ namespace {
 
 class CerrCapture final {
 public:
-    CerrCapture() : previous_(std::cerr.rdbuf(stream_.rdbuf()))
-    {
-    }
+    CerrCapture() : previous_(std::cerr.rdbuf(stream_.rdbuf())) {}
 
-    ~CerrCapture()
-    {
-        std::cerr.rdbuf(previous_);
-    }
+    ~CerrCapture() { std::cerr.rdbuf(previous_); }
 
-    std::string Content() const
-    {
-        return stream_.str();
-    }
+    std::string Content() const { return stream_.str(); }
 
-    CerrCapture(const CerrCapture &) = delete;
-    CerrCapture &operator=(const CerrCapture &) = delete;
+    CerrCapture(const CerrCapture&) = delete;
+    CerrCapture& operator=(const CerrCapture&) = delete;
 
 private:
     std::ostringstream stream_;
-    std::streambuf *previous_;
+    std::streambuf* previous_;
 };
 
 TEST(CompileExporterCliUnitTest, ParseJobsAcceptsOnlyPositiveUint32Values)
@@ -65,9 +57,9 @@ TEST(CompileExporterCliUnitTest, RunRejectsIncompleteAndUnknownCommands)
     char program[] = "asc_compile_exporter";
     char command[] = "--build_collected_manifest_bundle";
     char unknown[] = "--unknown";
-    char *noCommand[] = {program};
-    char *incomplete[] = {program, command};
-    char *unknownCommand[] = {program, unknown};
+    char* noCommand[] = {program};
+    char* incomplete[] = {program, command};
+    char* unknownCommand[] = {program, unknown};
 
     EXPECT_EQ(::Run(1, noCommand), 1);
     EXPECT_EQ(::Run(2, incomplete), 1);
@@ -86,12 +78,8 @@ TEST(CompileExporterCliUnitTest, RunRejectsDuplicateAndInvalidOptionsBeforeCompi
     char keepTemp[] = "--keep-temp";
     char jobsOption[] = "--jobs";
     char zeroJobs[] = "0";
-    char *duplicateKeepTemp[] = {
-        program, command, package, manifestRoot, output, keepTemp, keepTemp
-    };
-    char *invalidJobs[] = {
-        program, command, package, manifestRoot, output, jobsOption, zeroJobs
-    };
+    char* duplicateKeepTemp[] = {program, command, package, manifestRoot, output, keepTemp, keepTemp};
+    char* invalidJobs[] = {program, command, package, manifestRoot, output, jobsOption, zeroJobs};
 
     EXPECT_EQ(::Run(7, duplicateKeepTemp), 1);
     EXPECT_EQ(::Run(7, invalidJobs), 1);
@@ -109,9 +97,7 @@ TEST(CompileExporterCliUnitTest, RunBuildsRequestWithOptionalArgumentsBeforeComp
     char keepTemp[] = "--keep-temp";
     char jobsOption[] = "--jobs";
     char jobs[] = "3";
-    char *arguments[] = {
-        program, command, package, manifestRoot, output, workDir, keepTemp, jobsOption, jobs
-    };
+    char* arguments[] = {program, command, package, manifestRoot, output, workDir, keepTemp, jobsOption, jobs};
 
     EXPECT_THROW(::Run(9, arguments), std::runtime_error);
 }
@@ -124,8 +110,8 @@ TEST(CompileExporterCliUnitTest, ProgramMainReturnsRunStatusAndCatchesExceptions
     char package[] = "package";
     char manifestRoot[] = "/path/that/does/not/exist";
     char output[] = "output/bundle.so";
-    char *usageArguments[] = {program};
-    char *failingArguments[] = {program, command, package, manifestRoot, output};
+    char* usageArguments[] = {program};
+    char* failingArguments[] = {program, command, package, manifestRoot, output};
 
     EXPECT_EQ(AscCompileExporterProgramMain(1, usageArguments), 1);
     EXPECT_EQ(AscCompileExporterProgramMain(5, failingArguments), 1);

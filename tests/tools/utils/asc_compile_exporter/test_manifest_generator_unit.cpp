@@ -17,7 +17,7 @@ namespace ascendc {
 namespace manifest_generator {
 namespace {
 
-void WriteTestFile(const std::string &path, const std::string &content)
+void WriteTestFile(const std::string& path, const std::string& content)
 {
     CreateDirectories(ParentPath(path));
     std::ofstream output(path.c_str(), std::ios::binary | std::ios::trunc);
@@ -31,29 +31,29 @@ void WriteTestFile(const std::string &path, const std::string &content)
     }
 }
 
-std::string ReadTestFile(const std::string &path)
+std::string ReadTestFile(const std::string& path)
 {
     std::ifstream input(path.c_str(), std::ios::binary);
     return std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
 }
 
-bool PathExists(const std::string &path)
+bool PathExists(const std::string& path)
 {
-    struct stat info {};
+    struct stat info{};
     return lstat(path.c_str(), &info) == 0;
 }
 
-bool IsRegularPath(const std::string &path)
+bool IsRegularPath(const std::string& path)
 {
-    struct stat info {};
+    struct stat info{};
     return stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode);
 }
 
 class ScopedEnvironment final {
 public:
-    ScopedEnvironment(const char *name, const char *value) : name_(name)
+    ScopedEnvironment(const char* name, const char* value) : name_(name)
     {
-        const char *current = std::getenv(name);
+        const char* current = std::getenv(name);
         existed_ = current != nullptr;
         if (current != nullptr) {
             oldValue_ = current;
@@ -76,8 +76,8 @@ public:
         }
     }
 
-    ScopedEnvironment(const ScopedEnvironment &) = delete;
-    ScopedEnvironment &operator=(const ScopedEnvironment &) = delete;
+    ScopedEnvironment(const ScopedEnvironment&) = delete;
+    ScopedEnvironment& operator=(const ScopedEnvironment&) = delete;
 
 private:
     std::string name_;
@@ -89,26 +89,22 @@ class ManifestGeneratorModuleTest : public testing::Test {
 protected:
     void SetUp() override
     {
-        const char *temporary = std::getenv("TMPDIR");
+        const char* temporary = std::getenv("TMPDIR");
         std::string pathTemplate = JoinPath(
-            temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary,
-            "asc_compile_exporter_module_ut_XXXXXX");
+            temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary, "asc_compile_exporter_module_ut_XXXXXX");
         std::vector<char> buffer(pathTemplate.begin(), pathTemplate.end());
         buffer.push_back('\0');
-        char *created = mkdtemp(buffer.data());
+        char* created = mkdtemp(buffer.data());
         ASSERT_NE(created, nullptr);
         root_ = created;
     }
 
-    void TearDown() override
-    {
-        RemoveTree(root_);
-    }
+    void TearDown() override { RemoveTree(root_); }
 
-    void CreateManifest(const std::string &unit, const std::string &name) const
+    void CreateManifest(const std::string& unit, const std::string& name) const
     {
-        WriteTestFile(JoinPath(unit, name + "_manifest.json"),
-                      "{\"base_dir\":\"resources\",\"name\":\"" + name + "\"}");
+        WriteTestFile(
+            JoinPath(unit, name + "_manifest.json"), "{\"base_dir\":\"resources\",\"name\":\"" + name + "\"}");
     }
 
     std::string root_;
@@ -148,8 +144,7 @@ TEST_F(ManifestGeneratorModuleTest, PathHelpersCheckDirectoryContainmentByCompon
     EXPECT_TRUE(IsWithin(nested, resourceRoot));
     EXPECT_TRUE(IsWithin(resourceRoot, resourceRoot));
     EXPECT_FALSE(IsWithin(outside, resourceRoot));
-    EXPECT_EQ(CanonicalDirectoryWithin(nested, resourceRoot, "resource"),
-              CanonicalDirectory(nested, "resource"));
+    EXPECT_EQ(CanonicalDirectoryWithin(nested, resourceRoot, "resource"), CanonicalDirectory(nested, "resource"));
     EXPECT_THROW(CanonicalDirectoryWithin(outside, resourceRoot, "resource"), std::runtime_error);
 }
 
@@ -230,8 +225,7 @@ TEST_F(ManifestGeneratorModuleTest, RepositorySortsManifestsAndResourcesAndSkips
     CreateManifest(second, "Second");
     WriteTestFile(JoinPath(root_, "collection/ignored.json"), "not a manifest");
 
-    const std::vector<ManifestUnit> units =
-        CollectedManifestRepository(JoinPath(root_, "collection")).Load();
+    const std::vector<ManifestUnit> units = CollectedManifestRepository(JoinPath(root_, "collection")).Load();
 
     ASSERT_EQ(units.size(), 2U);
     EXPECT_NE(units[0].json.find("Second"), std::string::npos);
@@ -266,8 +260,7 @@ TEST_F(ManifestGeneratorModuleTest, RepositorySkipsSymlinkedManifestsAndAcceptsA
     const std::string unit = JoinPath(collection, "Unit");
     const std::string resources = JoinPath(unit, "resources");
     WriteTestFile(JoinPath(resources, "kernel.cpp"), "source");
-    WriteTestFile(JoinPath(unit, "Unit_manifest.json"),
-                  "{\"base_dir\":\"" + resources + "\"}");
+    WriteTestFile(JoinPath(unit, "Unit_manifest.json"), "{\"base_dir\":\"" + resources + "\"}");
 
     const std::string ignoredManifest = JoinPath(root_, "ignored_manifest.json");
     WriteTestFile(ignoredManifest, "{\"base_dir\":\"resources\"}");
@@ -287,8 +280,7 @@ TEST_F(ManifestGeneratorModuleTest, RepositoryRejectsNonRegularResource)
     ASSERT_EQ(mkfifo(JoinPath(resources, "resource.pipe").c_str(), 0600), 0);
     CreateManifest(unit, "Unit");
 
-    EXPECT_THROW(CollectedManifestRepository(JoinPath(root_, "collection-special")).Load(),
-                 std::runtime_error);
+    EXPECT_THROW(CollectedManifestRepository(JoinPath(root_, "collection-special")).Load(), std::runtime_error);
 }
 
 TEST_F(ManifestGeneratorModuleTest, SourceGeneratorEmitsBundleManifestAndMakefile)
@@ -296,9 +288,7 @@ TEST_F(ManifestGeneratorModuleTest, SourceGeneratorEmitsBundleManifestAndMakefil
     const std::string work = JoinPath(root_, "work");
     CreateDirectories(work);
     const std::vector<ManifestUnit> units = {
-        {"{\"base_dir\":\"resources\"}",
-         {{"kernel.bin", "resources/kernel.bin", {0U, 127U, 255U}}}}
-    };
+        {"{\"base_dir\":\"resources\"}", {{"kernel.bin", "resources/kernel.bin", {0U, 127U, 255U}}}}};
 
     BundleSourceGenerator(work, "unit_package", units).Generate();
 
@@ -321,9 +311,7 @@ TEST_F(ManifestGeneratorModuleTest, SourceGeneratorEmitsManifestWithoutResourceF
 {
     const std::string work = JoinPath(root_, "empty-resource-work");
     CreateDirectories(work);
-    const std::vector<ManifestUnit> units = {
-        {"{\"base_dir\":\"resources\"}", {}}
-    };
+    const std::vector<ManifestUnit> units = {{"{\"base_dir\":\"resources\"}", {}}};
 
     BundleSourceGenerator(work, "empty_package", units).Generate();
 
@@ -373,8 +361,7 @@ TEST_F(ManifestGeneratorModuleTest, BuildWorkspaceUsesTmpDirAndSupportsMoveConst
 TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorValidatesRequiredExecutable)
 {
     EXPECT_TRUE(IsRegularPath(ExecutableLocator::FindRequired("sh")));
-    EXPECT_THROW(ExecutableLocator::FindRequired("asc_compile_exporter_missing_executable"),
-                 std::runtime_error);
+    EXPECT_THROW(ExecutableLocator::FindRequired("asc_compile_exporter_missing_executable"), std::runtime_error);
 }
 
 TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorHandlesSearchPath)
@@ -416,8 +403,7 @@ TEST_F(ManifestGeneratorModuleTest, ProcessRunnerPropagatesEnvironmentAndExitSta
 TEST_F(ManifestGeneratorModuleTest, ProcessRunnerReportsExecEnvironmentAndSignalFailures)
 {
     EXPECT_THROW(ProcessRunner::Run({JoinPath(root_, "missing-command")}, {}), std::runtime_error);
-    EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "exit 0"}, {{"INVALID=NAME", "value"}}),
-                 std::runtime_error);
+    EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "exit 0"}, {{"INVALID=NAME", "value"}}), std::runtime_error);
     EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "kill -TERM $$"}, {}), std::runtime_error);
 }
 
@@ -425,15 +411,13 @@ TEST_F(ManifestGeneratorModuleTest, MakeBundleBuilderValidatesCannHomeAndAbiHead
 {
     {
         ScopedEnvironment cannHome("ASCEND_HOME_PATH", nullptr);
-        EXPECT_THROW(MakeBundleBuilder(root_, JoinPath(root_, "bundle.so"), 1U).Build(),
-                     std::runtime_error);
+        EXPECT_THROW(MakeBundleBuilder(root_, JoinPath(root_, "bundle.so"), 1U).Build(), std::runtime_error);
     }
     {
         const std::string cann = JoinPath(root_, "incomplete-cann");
         CreateDirectories(JoinPath(cann, "include"));
         ScopedEnvironment cannHome("ASCEND_HOME_PATH", cann.c_str());
-        EXPECT_THROW(MakeBundleBuilder(root_, JoinPath(root_, "bundle.so"), 1U).Build(),
-                     std::runtime_error);
+        EXPECT_THROW(MakeBundleBuilder(root_, JoinPath(root_, "bundle.so"), 1U).Build(), std::runtime_error);
     }
 }
 
@@ -462,15 +446,14 @@ TEST_F(ManifestGeneratorModuleTest, BundlePublisherReportsRenameFailure)
 {
     const std::string output = JoinPath(root_, "output/missing.so");
     CreateDirectories(ParentPath(output));
-    EXPECT_THROW(BundlePublisher::Publish(JoinPath(root_, "missing-staged.so"), output),
-                 std::runtime_error);
+    EXPECT_THROW(BundlePublisher::Publish(JoinPath(root_, "missing-staged.so"), output), std::runtime_error);
     EXPECT_FALSE(PathExists(output));
 }
 
 TEST_F(ManifestGeneratorModuleTest, BundlePublisherCopiesAcrossFileSystems)
 {
-    struct stat rootInfo {};
-    struct stat sharedMemoryInfo {};
+    struct stat rootInfo{};
+    struct stat sharedMemoryInfo{};
     if (stat(root_.c_str(), &rootInfo) != 0 || stat("/dev/shm", &sharedMemoryInfo) != 0 ||
         rootInfo.st_dev == sharedMemoryInfo.st_dev || access("/dev/shm", W_OK) != 0) {
         GTEST_SKIP() << "cross-filesystem writable directory is unavailable";
@@ -489,15 +472,15 @@ TEST_F(ManifestGeneratorModuleTest, BundlePublisherCopiesAcrossFileSystems)
 
     const std::string stagedDirectory = JoinPath(root_, "staged-directory");
     CreateDirectories(stagedDirectory);
-    EXPECT_THROW(BundlePublisher::Publish(
-                     stagedDirectory, JoinPath(destinationWorkspace.Session(), "directory.so")),
-                 std::runtime_error);
+    EXPECT_THROW(
+        BundlePublisher::Publish(stagedDirectory, JoinPath(destinationWorkspace.Session(), "directory.so")),
+        std::runtime_error);
 
     const std::string stagedSymlink = JoinPath(root_, "staged-symlink.so");
     ASSERT_EQ(symlink(staged.c_str(), stagedSymlink.c_str()), 0);
-    EXPECT_THROW(BundlePublisher::Publish(
-                     stagedSymlink, JoinPath(destinationWorkspace.Session(), "symlink.so")),
-                 std::runtime_error);
+    EXPECT_THROW(
+        BundlePublisher::Publish(stagedSymlink, JoinPath(destinationWorkspace.Session(), "symlink.so")),
+        std::runtime_error);
 
     const std::string outputDirectory = JoinPath(destinationWorkspace.Session(), "existing-directory");
     CreateDirectories(outputDirectory);

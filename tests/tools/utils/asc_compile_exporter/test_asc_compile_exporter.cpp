@@ -34,26 +34,21 @@ using ascendc::manifest_generator::BuildCollectedBundleRequest;
 using ascendc::manifest_generator::ManifestBundleCompiler;
 
 struct SavedEnvironment {
-    SavedEnvironment() : exists(false)
-    {
-    }
+    SavedEnvironment() : exists(false) {}
 
-    SavedEnvironment(bool existsValue, const std::string &valueValue)
-        : exists(existsValue), value(valueValue)
-    {
-    }
+    SavedEnvironment(bool existsValue, const std::string& valueValue) : exists(existsValue), value(valueValue) {}
 
     bool exists;
     std::string value;
 };
 
-SavedEnvironment SaveEnvironment(const char *name)
+SavedEnvironment SaveEnvironment(const char* name)
 {
-    const char *value = std::getenv(name);
+    const char* value = std::getenv(name);
     return SavedEnvironment(value != nullptr, value == nullptr ? std::string() : std::string(value));
 }
 
-void RestoreEnvironment(const char *name, const SavedEnvironment &saved) noexcept
+void RestoreEnvironment(const char* name, const SavedEnvironment& saved) noexcept
 {
     if (saved.exists) {
         (void)setenv(name, saved.value.c_str(), 1);
@@ -62,7 +57,7 @@ void RestoreEnvironment(const char *name, const SavedEnvironment &saved) noexcep
     }
 }
 
-std::string JoinTestPath(const std::string &left, const std::string &right)
+std::string JoinTestPath(const std::string& left, const std::string& right)
 {
     if (left.empty()) {
         return right;
@@ -70,7 +65,7 @@ std::string JoinTestPath(const std::string &left, const std::string &right)
     return left[left.size() - 1U] == '/' ? left + right : left + "/" + right;
 }
 
-std::string ParentTestPath(const std::string &path)
+std::string ParentTestPath(const std::string& path)
 {
     const size_t separator = path.find_last_of('/');
     if (separator == std::string::npos) {
@@ -79,19 +74,19 @@ std::string ParentTestPath(const std::string &path)
     return separator == 0U ? "/" : path.substr(0U, separator);
 }
 
-bool IsTestDirectory(const std::string &path)
+bool IsTestDirectory(const std::string& path)
 {
-    struct stat info {};
+    struct stat info{};
     return stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode);
 }
 
-bool IsTestRegularFile(const std::string &path)
+bool IsTestRegularFile(const std::string& path)
 {
-    struct stat info {};
+    struct stat info{};
     return stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode);
 }
 
-void CreateTestDirectories(const std::string &path)
+void CreateTestDirectories(const std::string& path)
 {
     if (path.empty() || path == "/" || IsTestDirectory(path)) {
         return;
@@ -102,9 +97,9 @@ void CreateTestDirectories(const std::string &path)
     }
 }
 
-void RemoveTestTree(const std::string &path) noexcept
+void RemoveTestTree(const std::string& path) noexcept
 {
-    struct stat info {};
+    struct stat info{};
     if (lstat(path.c_str(), &info) != 0) {
         return;
     }
@@ -112,9 +107,9 @@ void RemoveTestTree(const std::string &path) noexcept
         (void)unlink(path.c_str());
         return;
     }
-    DIR *directory = opendir(path.c_str());
+    DIR* directory = opendir(path.c_str());
     if (directory != nullptr) {
-        while (dirent *entry = readdir(directory)) {
+        while (dirent* entry = readdir(directory)) {
             const std::string name(entry->d_name);
             if (name != "." && name != "..") {
                 RemoveTestTree(JoinTestPath(path, name));
@@ -125,14 +120,14 @@ void RemoveTestTree(const std::string &path) noexcept
     (void)rmdir(path.c_str());
 }
 
-std::vector<std::string> ListTestDirectory(const std::string &path)
+std::vector<std::string> ListTestDirectory(const std::string& path)
 {
-    DIR *directory = opendir(path.c_str());
+    DIR* directory = opendir(path.c_str());
     if (directory == nullptr) {
         throw std::runtime_error("failed to enumerate test directory: " + path);
     }
     std::vector<std::string> names;
-    while (dirent *entry = readdir(directory)) {
+    while (dirent* entry = readdir(directory)) {
         const std::string name(entry->d_name);
         if (name != "." && name != "..") {
             names.push_back(name);
@@ -142,7 +137,7 @@ std::vector<std::string> ListTestDirectory(const std::string &path)
     return names;
 }
 
-void WriteFile(const std::string &path, const std::string &content)
+void WriteFile(const std::string& path, const std::string& content)
 {
     CreateTestDirectories(ParentTestPath(path));
     std::ofstream output(path.c_str(), std::ios::binary | std::ios::trunc);
@@ -156,16 +151,13 @@ void WriteFile(const std::string &path, const std::string &content)
     }
 }
 
-std::string ReadFile(const std::string &path)
+std::string ReadFile(const std::string& path)
 {
     std::ifstream input(path.c_str(), std::ios::binary);
     return std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
 }
 
-std::string ToString(const AcString &value)
-{
-    return std::string(value.data, value.size);
-}
+std::string ToString(const AcString& value) { return std::string(value.data, value.size); }
 
 class AscCompileExporterTest : public testing::Test {
 protected:
@@ -173,13 +165,12 @@ protected:
     {
         ascendHome_ = SaveEnvironment("ASCEND_HOME_PATH");
 
-        const char *temporary = std::getenv("TMPDIR");
+        const char* temporary = std::getenv("TMPDIR");
         std::string pathTemplate = JoinTestPath(
-            temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary,
-            "asc_compile_exporter_ut_XXXXXX");
+            temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary, "asc_compile_exporter_ut_XXXXXX");
         std::vector<char> buffer(pathTemplate.begin(), pathTemplate.end());
         buffer.push_back('\0');
-        char *created = mkdtemp(buffer.data());
+        char* created = mkdtemp(buffer.data());
         ASSERT_NE(created, nullptr);
         root_ = created;
 
@@ -192,7 +183,7 @@ protected:
         RemoveTestTree(root_);
     }
 
-    BuildCollectedBundleRequest Request(const std::string &packageId = "test_package") const
+    BuildCollectedBundleRequest Request(const std::string& packageId = "test_package") const
     {
         BuildCollectedBundleRequest request;
         request.packageId = packageId;
@@ -204,20 +195,20 @@ protected:
         return request;
     }
 
-    void CreateManifest(const std::string &unit, const std::string &name,
-                        const std::string &baseDir = "resources") const
+    void CreateManifest(
+        const std::string& unit, const std::string& name, const std::string& baseDir = "resources") const
     {
-        WriteFile(JoinTestPath(unit, name + "_manifest.json"),
-                  "{\"base_dir\":\"" + baseDir + "\",\"name\":\"" + name + "\"}");
+        WriteFile(
+            JoinTestPath(unit, name + "_manifest.json"),
+            "{\"base_dir\":\"" + baseDir + "\",\"name\":\"" + name + "\"}");
     }
 
-    static void ExpectCompileError(const BuildCollectedBundleRequest &request,
-                                   const std::string &message)
+    static void ExpectCompileError(const BuildCollectedBundleRequest& request, const std::string& message)
     {
         try {
             ManifestBundleCompiler(request).Compile();
             FAIL() << "expected manifest bundle compilation to fail";
-        } catch (const std::runtime_error &error) {
+        } catch (const std::runtime_error& error) {
             EXPECT_NE(std::string(error.what()).find(message), std::string::npos) << error.what();
         }
     }
@@ -337,20 +328,19 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
         EXPECT_NE(workEntries[index].find(".manifest-generator-"), 0U);
     }
 
-    void *handle = dlopen(request.outputSo.c_str(), RTLD_NOW | RTLD_LOCAL);
-    const char *loadError = handle == nullptr ? dlerror() : nullptr;
+    void* handle = dlopen(request.outputSo.c_str(), RTLD_NOW | RTLD_LOCAL);
+    const char* loadError = handle == nullptr ? dlerror() : nullptr;
     ASSERT_NE(handle, nullptr) << (loadError == nullptr ? "dlopen failed" : loadError);
-    auto getter = reinterpret_cast<AscendcGetCompileResourceBundleFn>(
-        dlsym(handle, "AscendcGetCompileResourceBundle"));
+    auto getter = reinterpret_cast<AscendcGetCompileResourceBundleFn>(dlsym(handle, "AscendcGetCompileResourceBundle"));
     ASSERT_NE(getter, nullptr);
-    const AcCompileResourceBundleHeader *header = getter();
+    const AcCompileResourceBundleHeader* header = getter();
     ASSERT_NE(header, nullptr);
     EXPECT_EQ(header->magic, AC_COMPILE_RESOURCE_MAGIC);
     EXPECT_EQ(header->abi_version, AC_COMPILE_RESOURCE_ABI_VERSION);
     EXPECT_EQ(header->struct_size, sizeof(AcCompileResourceBundle));
     EXPECT_EQ(header->flags, 0U);
 
-    const auto *bundle = reinterpret_cast<const AcCompileResourceBundle *>(header);
+    const auto* bundle = reinterpret_cast<const AcCompileResourceBundle*>(header);
     EXPECT_EQ(ToString(bundle->package_id), "multi_manifest");
     ASSERT_EQ(bundle->manifest_count, 2U);
     EXPECT_EQ(bundle->extensions, nullptr);
@@ -361,16 +351,16 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
     bool foundEmptyFile = false;
     bool foundFirstSource = false;
     for (uint64_t manifestIndex = 0U; manifestIndex < bundle->manifest_count; ++manifestIndex) {
-        const AcCompileResourceManifest &manifest = bundle->manifests[manifestIndex];
+        const AcCompileResourceManifest& manifest = bundle->manifests[manifestIndex];
         totalFiles += manifest.file_count;
         for (uint64_t fileIndex = 0U; fileIndex < manifest.file_count; ++fileIndex) {
-            const AcCompileResourceFile &file = manifest.files[fileIndex];
+            const AcCompileResourceFile& file = manifest.files[fileIndex];
             const std::string path = ToString(file.file_path);
             foundNestedHeader = foundNestedHeader || path == "resources/include/nested.h";
             foundEmptyFile = foundEmptyFile || path == "resources/empty.bin";
             foundFirstSource = foundFirstSource ||
-                (path == "resources/kernel.cpp" &&
-                 std::string(reinterpret_cast<const char *>(file.data), file.size) == "first source");
+                               (path == "resources/kernel.cpp" &&
+                                std::string(reinterpret_cast<const char*>(file.data), file.size) == "first source");
         }
     }
     EXPECT_EQ(totalFiles, 3U);

@@ -20,7 +20,7 @@ extern "C" {
 #define AC_COMPILE_RESOURCE_ABI_VERSION 1u
 
 typedef struct AcString {
-    const char *data;
+    const char* data;
     uint64_t size;
 } AcString;
 
@@ -28,20 +28,20 @@ typedef struct AcCompileResourceExtension {
     uint32_t type;
     uint32_t version;
     uint64_t flags;
-    const void *data;
+    const void* data;
     uint64_t data_size;
 } AcCompileResourceExtension;
 
 typedef struct AcCompileResourceFile {
     AcString file_name;
     AcString file_path;
-    const uint8_t *data;
+    const uint8_t* data;
     uint64_t size;
 } AcCompileResourceFile;
 
 typedef struct AcCompileResourceManifest {
     AcString json;
-    const AcCompileResourceFile *files;
+    const AcCompileResourceFile* files;
     uint64_t file_count;
 } AcCompileResourceManifest;
 
@@ -55,13 +55,13 @@ typedef struct AcCompileResourceBundleHeader {
 typedef struct AcCompileResourceBundle {
     AcCompileResourceBundleHeader header;
     AcString package_id;
-    const AcCompileResourceManifest *manifests;
+    const AcCompileResourceManifest* manifests;
     uint64_t manifest_count;
-    const AcCompileResourceExtension *extensions;
+    const AcCompileResourceExtension* extensions;
     uint64_t extension_count;
 } AcCompileResourceBundle;
 
-typedef const AcCompileResourceBundleHeader *(*AscendcGetCompileResourceBundleFn)(void);
+typedef const AcCompileResourceBundleHeader* (*AscendcGetCompileResourceBundleFn)(void);
 
 #ifdef __cplusplus
 }
