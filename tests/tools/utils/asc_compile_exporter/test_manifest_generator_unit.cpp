@@ -423,33 +423,32 @@ TEST_F(ManifestGeneratorModuleTest, ProcessRunnerPropagatesEnvironmentAndExitSta
     EXPECT_EQ(ReadTestFile(output), "visible|unset");
 }
 
-TEST_F(ManifestGeneratorModuleTest, ProcessRunnerReportsExecEnvironmentAndSignalFailures)
+TEST_F(ManifestGeneratorModuleTest, ProcessRunnerReportsExecAndSignalFailures)
 {
     EXPECT_THROW(ProcessRunner::Run({JoinPath(root_, "missing-command")}, {}), std::runtime_error);
-    EXPECT_THROW(
-        ProcessRunner::Run({"/bin/sh", "-c", "exit 0"}, {{"INVALID=NAME", "value"}}), std::invalid_argument);
-    EXPECT_THROW(
-        ProcessRunner::Run({"/bin/sh", "-c", "exit 0"}, {{"DUPLICATE", "first"}, {"DUPLICATE", "second"}}),
-        std::invalid_argument);
     EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "kill -TERM $$"}, {}), std::runtime_error);
 }
 
 TEST_F(ManifestGeneratorModuleTest, ProcessRunnerTimesOutAndReapsProcessGroup)
 {
     const std::string pidFile = JoinPath(root_, "timed-out.pid");
+    const std::string terminationFile = JoinPath(root_, "termination.txt");
     EXPECT_THROW(
         ProcessRunner::Run(
-            {"/bin/sh", "-c", "printf '%s' \"$$\" > \"$ASC_COMPILE_EXPORTER_PID_FILE\"; sleep 10"},
-            {{"ASC_COMPILE_EXPORTER_PID_FILE", pidFile}}, std::chrono::milliseconds(100U)),
+            {"/bin/sh", "-c",
+             "trap 'printf terminated > \"$ASC_COMPILE_EXPORTER_TERMINATION_FILE\"; exit 0' TERM; "
+             "printf '%s' \"$$\" > \"$ASC_COMPILE_EXPORTER_PID_FILE\"; sleep 10"},
+            {{"ASC_COMPILE_EXPORTER_PID_FILE", pidFile}, {"ASC_COMPILE_EXPORTER_TERMINATION_FILE", terminationFile}},
+            std::chrono::milliseconds(100U)),
         std::runtime_error);
 
+    EXPECT_EQ(ReadTestFile(terminationFile), "terminated");
     const pid_t child = static_cast<pid_t>(std::strtol(ReadTestFile(pidFile).c_str(), nullptr, 10));
     ASSERT_GT(child, 0);
     errno = 0;
     EXPECT_EQ(kill(child, 0), -1);
     EXPECT_EQ(errno, ESRCH);
-    EXPECT_THROW(
-        ProcessRunner::Run({"/bin/true"}, {}, std::chrono::milliseconds(0U)), std::invalid_argument);
+    EXPECT_THROW(ProcessRunner::Run({"/bin/true"}, {}, std::chrono::milliseconds(0U)), std::invalid_argument);
 }
 
 TEST_F(ManifestGeneratorModuleTest, MakeBundleBuilderValidatesCannHomeAndAbiHeader)

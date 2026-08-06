@@ -23,7 +23,6 @@
 #include <iostream>
 #include <limits.h>
 #include <limits>
-#include <spawn.h>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -40,8 +39,6 @@
 
 using Json = nlohmann::json;
 
-extern char** environ;
-
 namespace ascendc {
 namespace manifest_generator {
 namespace {
@@ -54,6 +51,7 @@ constexpr size_t kMaxFilesPerManifest = 4096U;
 constexpr size_t kMaxFilesPerBundle = 65536U;
 constexpr size_t kMaxDirectoryDepth = 64U;
 constexpr uint32_t kSubprocessTimeoutSeconds = 30U * 60U;
+constexpr uint32_t kSubprocessTerminationGraceSeconds = 5U;
 constexpr uint32_t kSubprocessPollMilliseconds = 10U;
 
 std::runtime_error SystemError(const std::string& operation)
@@ -461,8 +459,8 @@ private:
                 if (S_ISDIR(info.st_mode)) {
                     if (depth >= kMaxDirectoryDepth) {
                         throw std::runtime_error(
-                            "manifest resources exceed directory depth limit of " +
-                            std::to_string(kMaxDirectoryDepth) + ": " + source);
+                            "manifest resources exceed directory depth limit of " + std::to_string(kMaxDirectoryDepth) +
+                            ": " + source);
                     }
                     LoadResourceFiles(source, manifestRoot, manifestPath, budget, unit, depth + 1U);
                     continue;
@@ -780,38 +778,26 @@ public:
         }
         argv.push_back(nullptr);
 
-        const std::vector<std::string> environmentStrings = BuildEnvironment(environment);
-        std::vector<char*> envp;
-        envp.reserve(environmentStrings.size() + 1U);
-        for (const std::string& item : environmentStrings) {
-            envp.push_back(const_cast<char*>(item.c_str()));
-        }
-        envp.push_back(nullptr);
-
-        posix_spawnattr_t attributes {};
-        int spawnError = posix_spawnattr_init(&attributes);
-        if (spawnError != 0) {
-            throw std::runtime_error(
-                "failed to initialize subprocess: " + std::string(std::strerror(spawnError)));
-        }
-        spawnError = posix_spawnattr_setpgroup(&attributes, 0);
-        if (spawnError == 0) {
-            spawnError = posix_spawnattr_setflags(&attributes, POSIX_SPAWN_SETPGROUP);
-        }
-        if (spawnError != 0) {
-            (void)posix_spawnattr_destroy(&attributes);
-            throw std::runtime_error(
-                "failed to configure subprocess: " + std::string(std::strerror(spawnError)));
-        }
-
-        pid_t child = -1;
-        spawnError = posix_spawn(&child, argv[0], nullptr, &attributes, argv.data(), envp.data());
-        (void)posix_spawnattr_destroy(&attributes);
-        if (spawnError != 0) {
-            const std::runtime_error error(
-                "failed to spawn subprocess " + arguments.front() + ": " + std::strerror(spawnError));
+        const pid_t child = fork();
+        if (child < 0) {
+            const std::runtime_error error = SystemError("failed to fork subprocess");
             ASCENDLOGD("Subprocess launch failed: %s", error.what());
             throw error;
+        }
+        if (child == 0) {
+            if (setpgid(0, 0) != 0) {
+                _exit(126);
+            }
+            for (const char* name : {"MAKEFLAGS", "MFLAGS", "MAKEFILES", "GNUMAKEFLAGS"}) {
+                (void)unsetenv(name);
+            }
+            for (const auto& item : environment) {
+                if (setenv(item.first.c_str(), item.second.c_str(), 1) != 0) {
+                    _exit(126);
+                }
+            }
+            execv(argv[0], argv.data());
+            _exit(127);
         }
 
         ASCENDLOGD("Started subprocess pid=%d executable=%s", static_cast<int>(child), arguments.front().c_str());
@@ -825,14 +811,14 @@ public:
             }
             if (waited < 0 && errno != EINTR) {
                 const int waitError = errno;
-                KillAndReap(child);
+                TerminateAndReap(child);
                 const std::runtime_error error(
                     "failed to wait for subprocess: " + std::string(std::strerror(waitError)));
                 ASCENDLOGD("Subprocess wait failed: %s", error.what());
                 throw error;
             }
             if (std::chrono::steady_clock::now() >= deadline) {
-                KillAndReap(child);
+                TerminateAndReap(child);
                 throw std::runtime_error("subprocess timed out: " + arguments.front());
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(kSubprocessPollMilliseconds));
@@ -854,62 +840,34 @@ public:
     }
 
 private:
-    static bool IsMakeControlVariable(const std::string& name)
+    static void TerminateAndReap(pid_t child) noexcept
     {
-        return name == "MAKEFLAGS" || name == "MFLAGS" || name == "MAKEFILES" || name == "GNUMAKEFLAGS";
-    }
-
-    static bool IsOverridden(
-        const std::string& name, const std::vector<std::pair<std::string, std::string>>& environment)
-    {
-        return std::find_if(
-                   environment.begin(), environment.end(), [&name](const std::pair<std::string, std::string>& item) {
-                       return item.first == name;
-                   }) != environment.end();
-    }
-
-    static std::vector<std::string> BuildEnvironment(
-        const std::vector<std::pair<std::string, std::string>>& environment)
-    {
-        for (size_t index = 0U; index < environment.size(); ++index) {
-            const std::string& name = environment[index].first;
-            if (name.empty() || name.find('=') != std::string::npos || name.find('\0') != std::string::npos ||
-                environment[index].second.find('\0') != std::string::npos) {
-                throw std::invalid_argument("invalid subprocess environment variable");
-            }
-            for (size_t previous = 0U; previous < index; ++previous) {
-                if (environment[previous].first == name) {
-                    throw std::invalid_argument("duplicate subprocess environment variable: " + name);
-                }
-            }
-        }
-
-        std::vector<std::string> result;
-        for (char** current = environ; current != nullptr && *current != nullptr; ++current) {
-            const std::string item(*current);
-            const size_t separator = item.find('=');
-            if (separator == std::string::npos) {
-                continue;
-            }
-            const std::string name = item.substr(0U, separator);
-            if (!IsMakeControlVariable(name) && !IsOverridden(name, environment)) {
-                result.push_back(item);
-            }
-        }
-        for (const auto& item : environment) {
-            result.push_back(item.first + "=" + item.second);
-        }
-        return result;
-    }
-
-    static void KillAndReap(pid_t child) noexcept
-    {
-        (void)kill(-child, SIGKILL);
+        (void)kill(-child, SIGTERM);
+        const std::chrono::steady_clock::time_point deadline =
+            std::chrono::steady_clock::now() + std::chrono::seconds(kSubprocessTerminationGraceSeconds);
         int status = 0;
-        pid_t waited = -1;
-        do {
-            waited = waitpid(child, &status, 0);
-        } while (waited < 0 && errno == EINTR);
+        bool childReaped = false;
+        while (std::chrono::steady_clock::now() < deadline) {
+            if (!childReaped) {
+                const pid_t waited = waitpid(child, &status, WNOHANG);
+                childReaped = waited == child || (waited < 0 && errno == ECHILD);
+            }
+            errno = 0;
+            if (kill(-child, 0) != 0 && errno == ESRCH) {
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(kSubprocessPollMilliseconds));
+        }
+        errno = 0;
+        if (kill(-child, 0) == 0 || errno != ESRCH) {
+            (void)kill(-child, SIGKILL);
+        }
+        if (!childReaped) {
+            pid_t waited = -1;
+            do {
+                waited = waitpid(child, &status, 0);
+            } while (waited < 0 && errno == EINTR);
+        }
     }
 };
 
