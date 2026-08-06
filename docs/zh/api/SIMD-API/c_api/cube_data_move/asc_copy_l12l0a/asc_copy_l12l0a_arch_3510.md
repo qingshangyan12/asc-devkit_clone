@@ -26,170 +26,149 @@
 
 ## 功能说明
 
-用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里，包含2D格式搬运、2D格式转置搬运、3D格式搬运。
+头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
+
+将L1 Buffer中以分形（512字节为单位）组织的Cube矩阵数据搬运到L0A Buffer，供后续Cube矩阵乘使用。本接口提供两种参数列表完全不同的功能模式，用户按需选择对应重载：
+
+- **2D分形搬运模式**：按M维（行方向）与K维（通道方向）的起点与步长，从源矩阵中提取若干512字节分形写入L0A Buffer，可选开启转置。
+- **3D img2col搬运模式**：对NC1HWC0格式的feature map执行image to column操作，按stride/filter/dilation/padding配置展开为img2col分形矩阵后写入L0A Buffer，可选开启转置，支持repeat模式。
+
+两种模式参数列表完全不同，用户必须按使用场景选择对应重载系列，不可混用。本接口仅在AIC上执行有效，在AIV上调用为空操作。3D img2col搬运模式下，feature map描述（fm_w、fm_h及四周padding）需通过[asc_set_l13d_fmatrix](../asc_set_l13d_fmatrix.md)预先配置，填充值与填充模式需通过[asc_set_l13d_padding](../asc_set_l13d_padding.md)预先配置，L1 Buffer容量上限需通过[asc_set_l13d_size](../asc_set_l13d_size.md)预先配置；如需使用repeat模式，repeat方向、次数与步长需通过[asc_set_l13d_rpt](../asc_set_l13d_rpt.md)预先配置。
 
 ## 函数原型
 
-- 常规搬运2D格式
+### 2D搬运模式
 
-     ```cpp
-
-    __aicore__ inline void asc_copy_l12l0a(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-
-    ```
-
-- 同步常规搬运2D格式
-
-     ```cpp
-
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-
-    ```
-
-- 转置搬运2D格式
-
-     ```cpp
-
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-
-    ```
-
-- 同步转置搬运2D格式
-
-     ```cpp
-
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-    
-    ```
-
-- 高维切分搬运3D格式
-
-    ```cpp
-
-    __aicore__ inline void asc_copy_l12l0a(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a(__ca__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-
-    ```
-
-- 同步高维切分搬运3D格式
+#### 模板原型（占位符形式）
 
 ```cpp
+__aicore__ inline void asc_copy_l12l0a(__ca__ <dtype>* dst, __cbuf__ <dtype>* src,
+                                       uint16_t m_start_position, uint16_t k_start_position,
+                                       uint8_t m_step, uint8_t k_step, int16_t src_stride,
+                                       uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0a_sync(__ca__ <dtype>* dst, __cbuf__ <dtype>* src,
+                                            uint16_t m_start_position, uint16_t k_start_position,
+                                            uint8_t m_step, uint8_t k_step, int16_t src_stride,
+                                            uint16_t dst_stride)
+```
 
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
-    __aicore__ inline void asc_copy_l12l0a_sync(__ca__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
+#### dtype支持的数据类型
 
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+#### 典型示例
+
+```cpp
+// 示例：half类型的2D搬运。
+__aicore__ inline void asc_copy_l12l0a(__ca__ half* dst, __cbuf__ half* src,
+                                       uint16_t m_start_position, uint16_t k_start_position,
+                                       uint8_t m_step, uint8_t k_step, int16_t src_stride,
+                                       uint16_t dst_stride)
+```
+
+### 2D转置搬运模式
+
+#### 模板原型（占位符形式）
+
+```cpp
+__aicore__ inline void asc_copy_l12l0a_transpose(__ca__ <dtype>* dst, __cbuf__ <dtype>* src,
+                                                 uint16_t m_start_position, uint16_t k_start_position,
+                                                 uint8_t m_step, uint8_t k_step, int16_t src_stride,
+                                                 uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ <dtype>* dst, __cbuf__ <dtype>* src,
+                                                      uint16_t m_start_position,
+                                                      uint16_t k_start_position, uint8_t m_step,
+                                                      uint8_t k_step, int16_t src_stride,
+                                                      uint16_t dst_stride)
+```
+
+#### dtype支持的数据类型
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+#### 典型示例
+
+```cpp
+// 示例：half类型的2D同步转置搬运。
+__aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ half* dst, __cbuf__ half* src,
+                                                      uint16_t m_start_position,
+                                                      uint16_t k_start_position, uint8_t m_step,
+                                                      uint8_t k_step, int16_t src_stride,
+                                                      uint16_t dst_stride)
+```
+
+### 3D搬运模式
+
+#### 模板原型（占位符形式）
+
+```cpp
+__aicore__ inline void asc_copy_l12l0a(
+    __ca__ <dtype>* dst, __cbuf__ <dtype>* src, uint16_t k_extension, uint16_t m_extension,
+    uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w,
+    uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w,
+    bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
+__aicore__ inline void asc_copy_l12l0a_sync(
+    __ca__ <dtype>* dst, __cbuf__ <dtype>* src, uint16_t k_extension, uint16_t m_extension,
+    uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w,
+    uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w,
+    bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
+```
+
+#### dtype支持的数据类型
+
+dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+#### 典型示例
+
+```cpp
+// 示例：half类型的3D搬运。
+__aicore__ inline void asc_copy_l12l0a(
+    __ca__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension,
+    uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w,
+    uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w,
+    bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
 ```
 
 ## 参数说明
 
-**表1** 2D格式参数说明
-| 参数名              | 输入/输出 | 描述 |
-|:-----------------| :--- |:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| dst              | 输出 | 目的L0A Buffer地址。 |
-| src              | 输入 | 源L1 Buffer地址。 |
-| m_start_position | 输入 | 以M*K矩阵为例，源矩阵M轴方向的起始位置，单位为16个元素。 |
-| k_start_position | 输入 | 以M*K矩阵为例，源矩阵K轴方向的起始位置，单位为32B。 |
-| m_step           | 输入 | 以M*K矩阵为例，源矩阵M轴方向搬运长度，单位为16个元素。取值范围：[0, 255]。当进行转置搬运时，还需满足以下额外约束：<br>数据位宽为4时，m_step必须为4的倍数；<br>数据位宽为8时，m_step必须为2的倍数；<br>数据位宽为16时，m_step必须为1的倍数；<br>数据位宽为32时，m_step无额外约束。 |
-| k_step           | 输入 | 以M*K矩阵为例，源矩阵M轴方向搬运长度，单位为32B。取值范围：[0. 255]。当进行转置搬运时，还需满足以下额外约束：<br>数据位宽为4、8或16时，k_step没有额外约束；<br>数据位宽为32时，k_step必须是2的倍数。 |
-| src_stride       | 输入 | 以M*K矩阵为例，源矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位为512B。 |
-| dst_stride       | 输入 | 以M*K矩阵为例，目标矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位为512B。 |
+### 2D分形搬运模式
 
-**表2** 3D格式参数说明
+**表1** 参数说明
+
 | 参数名 | 输入/输出 | 描述 |
-| :--- | :--- | :--- |
-| dst | 输出 | 目的L0A Buffer地址。 |
-| src | 输入 | 源L1 Buffer地址。 |
-| k_extension | 输入 | 该指令在目的操作数width维度的传输长度。<br>如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t类型，应为32的倍数；<br>如果覆盖最右侧的分形，则无倍数要求。取值范围：[1, 65535]。 |
-| m_extension | 输入 | 该指令在目的操作数height维度的传输长度。<br>如果不覆盖最下侧的分形，对于half/int8_t/uint8_t类型，应为16的倍数；<br>如果覆盖最下侧的分形，则无倍数要求。取值范围：[1, 65535]。 |
-| k_start_pt | 输入 | 该指令在目的操作数width维度的起点。对于half类型，应为16的倍数，对于int8_t/uint8_t类型，应为32的倍数。取值范围：[0, 65535] |
-| m_start_pt | 输入 | 该指令在目的操作数height维度的起点，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t，应为16的倍数；如果覆盖最下侧的分形，则无倍数要求。取值范围：[0, 65535]。|
-| stride_w | 输入 | 卷积核在源操作数width维度滑动的步长，取值范围：[1, 63]。 |
-| stride_h | 输入 | 卷积核在源操作数height维度滑动的步长，取值范围：[1, 63]。 |
-| filter_w | 输入 | 卷积核width，取值范围：[1, 255]。 |
-| filter_h | 输入 | 卷积核height，取值范围：[1, 255]。 |
-| dilation_filter_w | 输入 | 卷积核width膨胀系数，取值范围：[1, 255]。 |
-| dilation_filter_h | 输入 | 卷积核height膨胀系数，取值范围：[1, 255]。 |
-| filter_size_w | 输入 | 是否在filter_w的基础上将卷积核width增加256个元素。true表示增加；false表示不增加。 |
-| filter_size_h | 输入 | 是否在filter_h的基础上将卷积核height增加256个元素。true表示增加；false表示不增加。 |
-| transpose | 输入 | 是否启用转置功能，对整个目标矩阵进行转置，仅在源操作数为half类型时有效。true表示启用；false表示不启用。 |
-| f_matrix_ctrl | 输入 | 表示asc_copy_l12l0a指令从左矩阵还是右矩阵获取FeatureMap的属性描述，当前只支持设置为false。 |
-| channel_size | 输入 | 源操作数的通道数，取值范围：[1, 63]。 <br>对于uint32_t/int32_t/float，channelSize可取值为4，N * 8，N * 8 + 4；<br>对于half/bfloat16，channelSize可取值为4，8，N * 16，N * 16 + 4，N * 16 + 8；<br>对于int8_t/uint8_t，channelSize可取值为4，8，16， 32 * N，N * 32 + 4，N * 32 + 8，N * 32 + 16；<br>对于int4b_t，ChannelSize可取值为8，16，32，N * 64，N * 64 + 8，N * 64 + 16，N * 64 + 32。N为正整数。|
+|---|---|---|
+| dst | 输出 | 目的缓冲（L0A Buffer）的起始地址，dtype由重载决定。起始地址需512字节对齐。 |
+| src | 输入 | 源缓冲（L1 Buffer）的起始地址，dtype与dst一致。起始地址需32字节对齐。 |
+| m_start_position | 输入 | M维（行方向）起始分形位置，单位16（即一个分形的M维高度）。取值范围 [0, 2^16−1]。 |
+| k_start_position | 输入 | K维（通道方向）起始分形位置，单位32字节（即一个分形的K维字节宽度）。取值范围 [0, 2^16−1]。 |
+| m_step | 输入 | M维分形步长，即一次提取的分形行数，单位16。取值范围 [1, 255]，不可为0。 |
+| k_step | 输入 | K维分形步长，即一次提取的分形列数，单位32字节。取值范围 [1, 255]，不可为0。 |
+| src_stride | 输入 | 相邻K步在源端（L1 Buffer）的步长，单位分形（512字节），可为负值（用于反向读取）。取值范围 [−2^15, 2^15−1]。 |
+| dst_stride | 输入 | 相邻K步在目的端（L0A Buffer）的步长，单位分形（512字节），不可为负值。取值范围 [0, 2^16−1]，即使k_step为1也不可为0。 |
+
+### 3D img2col搬运模式
+
+**表2** 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的缓冲（L0A Buffer）的起始地址，dtype由重载决定。起始地址需512字节对齐。 |
+| src | 输入 | 源缓冲（L1 Buffer）的起始地址，dtype与dst一致。起始地址按channel_size与dtype字节对齐（channel_size × sizeof(dtype) ≥ 32时需32字节对齐，否则按channel_size × sizeof(dtype) 对齐）。 |
+| k_extension | 输入 | K维（通道方向）扩展步长，即img2col后K维提取的扩展长度。取值范围 [1, 2^16−1]，不可为0。若不覆盖最右侧分形，需按dtype位宽对齐：`b8`需为32的倍数、`b16`需为16的倍数、`b32`需为8的倍数。 |
+| m_extension | 输入 | M维（行方向）扩展步长，即img2col后M维提取的扩展长度，单位16。取值范围 [1, 2^16−1]，不可为0。若不覆盖最下侧分形，需为16的倍数。 |
+| k_start_pt | 输入 | img2col后矩阵K维起始位置。取值范围 [0, 2^16−1]。需按dtype位宽对齐：`b8`需为32的倍数、`b16`需为16的倍数、`b32`需为8的倍数。 |
+| m_start_pt | 输入 | img2col后矩阵M维起始位置，单位16。取值范围 [0, 32767]。 |
+| stride_w | 输入 | W维（宽方向）卷积步长。取值范围 [1, 63]，不可为0（传入0硬件按1处理）。 |
+| stride_h | 输入 | H维（高方向）卷积步长。取值范围 [1, 63]，不可为0（传入0硬件按1处理）。 |
+| filter_w | 输入 | W维卷积核宽度（dilation前的尺寸）。取值范围 [1, 255]，传入0硬件按1处理。 |
+| filter_h | 输入 | H维卷积核高度（dilation前的尺寸）。取值范围 [1, 255]，传入0硬件按1处理。 |
+| dilation_filter_w | 输入 | W维空洞（dilation）大小。取值范围 [0, 255]，传入0硬件按1处理。 |
+| dilation_filter_h | 输入 | H维空洞（dilation）大小。取值范围 [0, 255]，传入0硬件按1处理。 |
+| filter_size_w | 输入 | W维卷积核尺寸扩展控制位，用于9 bit卷积核宽的高位。• false：卷积核宽不扩展；• true：卷积核宽按9 bit解码（实际卷积核宽 = {filter_size_w, filter_w}）。 |
+| filter_size_h | 输入 | H维卷积核尺寸扩展控制位，用于9 bit卷积核高的高位。• false：卷积核高不扩展；• true：卷积核高按9 bit解码（实际卷积核高 = {filter_size_h, filter_h}）。 |
+| transpose | 输入 | 转置使能。• false：不开启转置；• true：开启转置，将img2col后的整张矩阵转置后再写入L0A Buffer。仅`b8`/`b16`/`b32`系列dtype解码使能，其他dtype时被忽略。 |
+| f_matrix_ctrl | 输入 | feature map描述寄存器组选择位，用于选择使用第一组或第二组feature map描述。• false：使用第一组feature map描述（fm_w、fm_h、padding、repeat等配置）；• true：使用第二组feature map描述。两组描述须分别通过配套setter接口预先配置。 |
+| channel_size | 输入 | 通道数N，受dtype位宽约束。`b8`取值 {0, 4, 8, 16, N×32, N×32+4, N×32+8, N×32+16}，上限65520；`b16`取值 {0, 4, 8, N×16, N×16+4, N×16+8}，上限65528；`b32`取值 {0, 4, N×8, N×8+4}，上限65532。不可为0。需按dtype满足对齐约束（与k_start_pt同基准）。 |
 
 ## 返回值说明
 
@@ -203,6 +182,43 @@ PIPE_MTE1
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
+
+### 通用约束
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- dst起始地址需512字节对齐（L0A Buffer对齐要求），否则会导致搬运异常。
+- src起始地址需32字节对齐（L1 Buffer对齐要求），否则会导致搬运异常。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- L0A Buffer容量上限：L0A Buffer总容量64KB，dst偏移+搬运大小不可越界，否则触发异常。
+- L1 Buffer容量上限：L1 Buffer总容量512KB，src偏移+源矩阵占用大小不可越界，否则触发异常。
+
+### 2D分形搬运模式约束
+
+- m_step或k_step为0时不执行搬运，本接口被视为NOP（空操作）。
+- dst_stride即使k_step为1也不可为0，否则触发异常。
+- 开启transpose时需按dtype满足分形对齐约束：`int4b_t`需m_step为4的倍数；`int8_t`、`uint8_t`需m_step为2的倍数；`fp4x2_e2m1_t`、`fp4x2_e1m2_t`需m_step为1的倍数；`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`需m_step为2的倍数；`int16_t`、`uint16_t`、`half`、`bfloat16_t`需m_step为1的倍数；`int32_t`、`uint32_t`、`float`需k_step为2的倍数，否则触发地址对齐异常。
+- 开启transpose时仅支持`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`，其他dtype触发异常。
+
+### 3D img2col搬运模式约束
+
+- k_extension、m_extension或channel_size为0时不执行搬运，本接口被视为NOP（空操作）。
+- filter_w为0且filter_size_w为false，或filter_h为0且filter_size_h为false时不执行搬运，本接口被视为NOP（空操作）。
+- stride_w与stride_h不可为0，传入0硬件按1处理。
+- m_start_pt不可超过32767，否则触发异常。
+- 须先调用配套setter接口预先配置feature map描述（fm_w、fm_h、pad_l、pad_r、pad_t、pad_b）、填充值与填充模式、L1 Buffer容量上限，再调用本接口，否则feature map描述使用未初始化的配置值产生错误结果。如需使用repeat模式，须先调用配套setter接口配置repeat方向、次数与步长。
+- 调用本模式前，必须通过[asc_set_l3d_rpt_b](../asc_set_l3d_rpt_b.md)设置目的端步长。
+- feature map尺寸fm_w与fm_h须>0且≤32767，否则指令被置为NOP不执行。
+- feature map（含padding）须≥卷积核（含dilation）尺寸，即fm_w+pad_l+pad_r≥ (filter_w − 1) ×dilation_filter_w+1，fm_h+pad_t+pad_b≥ (filter_h − 1) ×dilation_filter_h+1，否则触发异常。
+- feature map（不含padding）与通道数须满足fm_w×fm_h×channel_size×sizeof(dtype) ≤L1 Buffer容量，否则触发异常。
+- k_start_pt+k_extension不可超过img2col后K维总长（=filter_h×filter_w×channel_size），m_start_pt+m_extension不可超过img2col后M维总长（=Hstep×Wstep，其中Hstep=floor((fm_h+pad_t+pad_b − (filter_h − 1) ×dilation_filter_h − 1) /stride_h) +1，Wstep同理），否则触发异常。
+- channel_size需按dtype位宽满足对齐约束：`b8`需为32的倍数、或4、或8、或16、或32的倍数+4、或32的倍数+8、或32的倍数+16；`b16`需为16的倍数、或4、或8、或16的倍数+4、或16的倍数+8；`b32`需为8的倍数或8的倍数+4。k_start_pt需按同基准对齐，否则触发异常。
+- channel_size不可超过dtype上限：`b8`系列≤65520、`b16`系列≤65528、`b32`系列≤65532，否则触发异常。
+- img2col后矩阵尺寸受K/M维起点位宽限制：fm_w×fm_h须<2^16，Wstep×Hstep须<2^15，否则触发异常。
+- transpose仅在`b8`/`b16`/`b32`系列dtype时解码使能，其他dtype时transpose字段被忽略恒为false。
+- 若需同时使用本接口的3D img2col模式与历史3D模式，须在两者之间插入同步指令保证串行化，防止feature map配置串扰。
+- `b4`系列dtype（`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`）不支持，本模式重载未提供这些dtype，传入会触发异常。
+- stride_w传入>63的值会截断处理（如64→0、65→1）。截断后实际生效值偏小，导致W维卷积步长与预期不符，img2col后的窗口位置错位，提取的feature map数据与预期不一致。参数类型为`uint8_t`（0~255），截断后若值为0会被硬件按1处理。
+- stride_h传入>63的值会截断处理（如64→0、65→1）。截断后实际生效值偏小，导致H维卷积步长与预期不符，img2col后的窗口位置错位，提取的feature map数据与预期不一致。参数类型为`uint8_t`（0~255），截断后若值为0会被硬件按1处理。
 
 ## 3D数据格式说明
 
