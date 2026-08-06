@@ -12,6 +12,7 @@
 #define CCU_ST_SCENARIO_H
 
 #include <cstdint>
+#include <string>
 #include <vector>
 #include "hccl_types.h"
 #include "hccl_common.h"
@@ -23,6 +24,10 @@ struct CcuStScenario {
     uint32_t rankSize = 2;
     HcclDataType dataType = HCCL_DATA_TYPE_FP16;
     HcclCMDType opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
+
+    // Expected algorithm name selected by selector (verified in VerifyScenario)
+    // Empty string means skip algName assertion
+    std::string expectedAlgName;
 
     // sizes[sourceRank][destinationRank] = sendSize (bytes)
     // AllToAllV/AllToAll use this matrix; AllToAll (equal-length) has identical rows

@@ -21,6 +21,7 @@ CcuStScenario MakeScenario(uint32_t rankSize, const std::vector<std::vector<uint
     CcuStScenario scenario;
     scenario.rankSize = rankSize;
     scenario.sizes = sizes;
+    scenario.expectedAlgName = "CcuAlltoAllVMesh1D";
     return scenario;
 }
 

@@ -22,6 +22,7 @@ CcuStScenario MakeScenario(uint32_t rankSize, uint64_t sliceSize)
     scenario.rankSize = rankSize;
     scenario.opType = HcclCMDType::HCCL_CMD_ALLTOALL;
     scenario.sizes.assign(rankSize, std::vector<uint64_t>(rankSize, sliceSize));
+    scenario.expectedAlgName = "CcuAlltoAllMesh1D";
     return scenario;
 }
 

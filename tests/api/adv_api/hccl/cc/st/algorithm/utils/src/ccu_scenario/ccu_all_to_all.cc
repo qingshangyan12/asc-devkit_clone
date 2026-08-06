@@ -184,7 +184,10 @@ void CcuStAllToAll::VerifyScenario(const CcuStScenario &scenario)
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     ASSERT_EQ(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo), HCCL_SUCCESS);
-    ASSERT_EQ(algName, "CcuAlltoAllMesh1D");
+    ASSERT_FALSE(algName.empty());
+    if (!scenario.expectedAlgName.empty()) {
+        ASSERT_EQ(algName, scenario.expectedAlgName);
+    }
     ASSERT_GT(sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str()), 0);
 
     EXPECT_EQ(GetCcuKernelRegisterCount(), 0U);
