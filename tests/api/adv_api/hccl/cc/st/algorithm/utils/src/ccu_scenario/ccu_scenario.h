@@ -25,8 +25,19 @@ struct CcuStScenario {
     HcclCMDType opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
 
     // sizes[sourceRank][destinationRank] = sendSize (bytes)
-    // For AllToAll (equal-length), every row must be identical
+    // AllToAllV/AllToAll use this matrix; AllToAll (equal-length) has identical rows
     std::vector<std::vector<uint64_t>> sizes;
+
+    // Per-rank element count for equal-length collectives (AllGather/ReduceScatter)
+    // dataSize = count * DataTypeSizeGet(dataType)
+    uint64_t count = 0;
+
+    // Reduce operation type (ReduceScatter/AllReduce)
+    HcclReduceOp reduceType = HCCL_REDUCE_SUM;
+
+    // Output data type for low-precision reduce (e.g. FP16 input → FP32 output)
+    // HCCL_DATA_TYPE_RESERVED means same as dataType
+    HcclDataType outputType = HCCL_DATA_TYPE_RESERVED;
 
     // negative test controls
     bool corruptOutput = false;
