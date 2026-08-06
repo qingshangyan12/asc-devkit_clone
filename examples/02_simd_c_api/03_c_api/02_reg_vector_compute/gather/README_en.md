@@ -1,13 +1,13 @@
 ﻿# gather Example
 
 ## Overview
-This example implements the functionality of collecting elements from a vector data register by index, based on the C API programming interface, primarily calling the [asc_gather](../../../../../docs/zh/api/SIMD-API/C-API/reg/reg_load/asc_gather.md) API.
+This example implements the functionality of collecting elements from a vector data register by index, based on the C API programming interface, primarily calling the [asc_gather](../../../../../docs/zh/api/SIMD-API/c_api/reg/reg_load/asc_gather.md) API.
 
 ## Supported Products and CANN Versions
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```

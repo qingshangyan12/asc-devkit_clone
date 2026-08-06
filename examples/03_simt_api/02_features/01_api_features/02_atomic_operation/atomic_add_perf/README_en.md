@@ -2,7 +2,7 @@
 
 ## Overview
 
-Taking the [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md) interface as an example, this sample uses five groups of controlled experiments to demonstrate the performance differences of `asc_atomic_add()` under various usage scenarios — including different memory tiers (Global Memory / Unified Buffer), different atomic-accumulation organizations (direct atomic add / intra-block UB accumulation followed by GM writeback), whether the return value is used, the contention intensity on the same address, the Sector distribution of target addresses, and different data types (int32_t, int64_t) — and provides corresponding optimization guidance.
+Taking the [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md) interface as an example, this sample uses five groups of controlled experiments to demonstrate the performance differences of `asc_atomic_add()` under various usage scenarios — including different memory tiers (Global Memory / Unified Buffer), different atomic-accumulation organizations (direct atomic add / intra-block UB accumulation followed by GM writeback), whether the return value is used, the contention intensity on the same address, the Sector distribution of target addresses, and different data types (int32_t, int64_t) — and provides corresponding optimization guidance.
 
 ## Supported Products
 

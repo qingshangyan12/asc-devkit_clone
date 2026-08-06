@@ -1,7 +1,7 @@
 ﻿# reduce_pair Example
 
 ## Overview
-This example implements the PairReduceElem operation based on the C API programming interface, primarily calling the [asc_pair_reduce_sum](../../../../../docs/zh/api/SIMD-API/C-API/reg/reduce_compute/asc_pair_reduce_sum.md) API (SUM mode).
+This example implements the PairReduceElem operation based on the C API programming interface, primarily calling the [asc_pair_reduce_sum](../../../../../docs/zh/api/SIMD-API/c_api/reg/reduce_compute/asc_pair_reduce_sum.md) API (SUM mode).
 - The asc_pair_reduce_sum API performs reduction sum on adjacent odd-even element pairs. Currently, only the SUM reduction mode is supported.
 
 
@@ -9,7 +9,7 @@ This example implements the PairReduceElem operation based on the C API programm
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
