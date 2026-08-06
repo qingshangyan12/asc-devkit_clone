@@ -155,9 +155,20 @@ PIPE_MTE1
 ## 约束说明
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
-- repeat=0表示不执行搬运操作。
 - 开发者需要保证目的操作数转置后的分形没有重叠。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
+
+### 通用约束
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- src起始地址需32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。
+- dst起始地址需512字节对齐（L0B Buffer对齐要求），否则触发地址对齐异常。
+- 如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。
+- L1 Buffer容量上限：L1 Buffer总容量512KB，src偏移+搬运大小不可越界，否则触发地址溢出异常。
+- L0B Buffer容量上限：L0B Buffer总容量64KB，dst偏移+搬运大小不可越界，否则触发地址溢出异常。
+- repeat为0时不执行搬运，本接口被视为NOP（空操作）。
+- index_id、src_stride等参数任意迭代组合后的源侧分形索引不可小于0，否则触发异常。
+- dtype仅支持b4/b8/b16/f16/b32对应的C类型（即`int4b_t`/`int8_t`/`int16_t`/`half`/`bfloat16_t`/`fp8_e4m3fn_t`/`fp8_e5m2_t`/`hifloat8_t`/`int32_t`/`uint32_t`/`float`/`fp4x2_e1m2_t`/`fp4x2_e2m1_t`），其他dtype触发异常。
 
 ## 调用示例
 

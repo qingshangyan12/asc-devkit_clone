@@ -204,6 +204,43 @@ PIPE_MTE1
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
 
+### 通用约束
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- dst起始地址需512字节对齐（L0A Buffer对齐要求），否则会导致搬运异常。
+- src起始地址需32字节对齐（L1 Buffer对齐要求），否则会导致搬运异常。
+- 如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。
+- L0A Buffer容量上限：L0A Buffer总容量64KB，dst偏移+搬运大小不可越界，否则触发异常。
+- L1 Buffer容量上限：L1 Buffer总容量512KB，src偏移+源矩阵占用大小不可越界，否则触发异常。
+
+### 2D分形搬运模式约束
+
+- m_step或k_step为0时不执行搬运，本接口被视为NOP（空操作）。
+- dst_stride即使k_step为1也不可为0，否则触发异常。
+- 开启transpose时需按dtype满足分形对齐约束：`int4b_t`需m_step为4的倍数；`int8_t`/`uint8_t`/`fp8_e4m3fn_t`/`fp8_e5m2_t`/`hifloat8_t`需m_step为2的倍数；`bfloat16_t`/`half`/`int16_t`/`uint16_t`/`fp4x2_e2m1_t`/`fp4x2_e1m2_t`需m_step为1的倍数；`float`/`int32_t`/`uint32_t`需k_step为2的倍数，否则触发地址对齐异常。
+- 开启transpose时仅支持`int4b_t`、`int8_t`/`uint8_t`/`fp8_e4m3fn_t`/`fp8_e5m2_t`/`hifloat8_t`、`bfloat16_t`/`half`/`int16_t`/`uint16_t`/`fp4x2_e2m1_t`/`fp4x2_e1m2_t`、`float`/`int32_t`/`uint32_t`四类dtype，其他dtype触发异常。
+
+### 3D img2col搬运模式约束
+
+- k_extension、m_extension或channel_size为0时不执行搬运，本接口被视为NOP（空操作）。
+- filter_w为0且filter_size_w为false，或filter_h为0且filter_size_h为false时不执行搬运，本接口被视为NOP（空操作）。
+- stride_w与stride_h不可为0，传入0硬件按1处理。
+- m_start_pt不可超过32767，否则触发异常。
+- 须先调用配套setter接口预先配置feature map描述（fm_w、fm_h、pad_l、pad_r、pad_t、pad_b）、填充值与填充模式、L1 Buffer容量上限，再调用本接口，否则feature map描述使用未初始化的配置值产生错误结果。如需使用repeat模式，须先调用配套setter接口配置repeat方向、次数与步长。
+- 调用本模式前，必须通过[asc_set_l3d_rpt_b](../asc_set_l3d_rpt_b.md)设置目的端步长。
+- feature map尺寸fm_w与fm_h须>0且≤32767，否则指令被置为NOP不执行。
+- feature map（含padding）须≥卷积核（含dilation）尺寸，即fm_w+pad_l+pad_r≥ (filter_w − 1) ×dilation_filter_w+1，fm_h+pad_t+pad_b≥ (filter_h − 1) ×dilation_filter_h+1，否则触发异常。
+- feature map（不含padding）与通道数须满足fm_w×fm_h×channel_size×sizeof(dtype) ≤L1 Buffer容量，否则触发异常。
+- k_start_pt+k_extension不可超过img2col后K维总长（=filter_h×filter_w×channel_size），m_start_pt+m_extension不可超过img2col后M维总长（=Hstep×Wstep，其中Hstep=floor((fm_h+pad_t+pad_b − (filter_h − 1) ×dilation_filter_h − 1) /stride_h) +1，Wstep同理），否则触发异常。
+- channel_size需按dtype满足对齐约束：`b32`系列（`float`/`int32_t`/`uint32_t`）需为8的倍数或8的倍数+4；`b16`系列（`half`/`bfloat16_t`/`int16_t`/`uint16_t`）需为16的倍数、或4、或8、或16的倍数+4、或16的倍数+8；`b8`系列（`int8_t`/`uint8_t`/`fp8_e4m3fn_t`/`fp8_e5m2_t`/`hifloat8_t`）需为32的倍数、或4、或8、或16、或32的倍数+4、或32的倍数+8、或32的倍数+16。k_start_pt需按同基准对齐，否则触发异常。
+- channel_size不可超过dtype上限：`b32`系列≤65532、`b16`系列≤65528、`b8`系列≤65520，否则触发异常。
+- img2col后矩阵尺寸受K/M维起点位宽限制：fm_w×fm_h须<2^16，Wstep×Hstep须<2^15，否则触发异常。
+- transpose仅在`b8`/`b16`/`b32`系列dtype时解码使能，其他dtype时transpose字段被忽略恒为false。
+- 若需同时使用本接口的3D img2col模式与历史3D模式，须在两者之间插入同步指令保证串行化，防止feature map配置串扰。
+- `b4`系列dtype（`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`）不支持，本模式重载未提供这些dtype，传入会触发异常。
+- stride_w传入>63的值会截断处理（如64→0、65→1）。截断后实际生效值偏小，导致W维卷积步长与预期不符，img2col后的窗口位置错位，提取的feature map数据与预期不一致。参数类型为`uint8_t`（0~255），截断后若值为0会被硬件按1处理。
+- stride_h传入>63的值会截断处理（如64→0、65→1）。截断后实际生效值偏小，导致H维卷积步长与预期不符，img2col后的窗口位置错位，提取的feature map数据与预期不一致。参数类型为`uint8_t`（0~255），截断后若值为0会被硬件按1处理。
+
 ## 3D数据格式说明
 
 要求输入的feature map和filter的格式是NC1HWC0，其中C0是最低维度而且C0是固定值为16（对于u8/s8类型为32），C1=C/C0。

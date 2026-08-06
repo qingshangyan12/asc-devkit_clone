@@ -39,15 +39,3 @@
 - **[asc_set_ctrl](asc_set_ctrl.md)**
 
 - **[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)**
-
-- **[asc_set_gm2l1_nz_para](asc_set_gm2l1_nz_para.md)**
-
-- **[asc_set_l0c2gm_channel_para](asc_set_l0c2gm_channel_para.md)**
-
-- **[asc_set_l0c2gm_quant_post](asc_set_l0c2gm_quant_post.md)**
-
-- **[asc_set_l0c2gm_relu_alpha](asc_set_l0c2gm_relu_alpha.md)**
-
-- **[asc_set_l12l0_padding_val](asc_set_l12l0_padding_val.md)**
-
-- **[asc_set_l3d_rpt_b](asc_set_l3d_rpt_b.md)**

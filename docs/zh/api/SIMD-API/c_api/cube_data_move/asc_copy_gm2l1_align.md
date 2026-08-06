@@ -97,7 +97,35 @@ PIPE_MTE2
 ## 约束说明
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-- 目的操作数不得存在地址重叠。对于存在地址重叠的操作，硬件将不返回任何警告或错误，也无法保证地址重叠数据的正确性。
+- 目的操作数不得存在地址重叠。对于存在地址重叠的操作，无法保证地址重叠数据的正确性。
+
+### 通用约束
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- dst起始地址需32字节对齐（L1 Buffer对齐要求），否则触发异常。
+- src起始地址需1字节对齐（Global Memory对齐要求），不满足触发异常。
+- `left_padding_count×sizeof(dtype)`与`right_padding_count×sizeof(dtype)`均不能超过32字节。
+- 如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。
+- L1 Buffer容量上限：L1 Buffer总容量512KB，dst偏移+搬运大小不可越界，否则触发目的地址越界异常。当搬运规模`n_burst×len_burst`满足`L1 Buffer容量<n_burst×len_burst<2×L1 Buffer容量`时触发目的地址越界异常，当`n_burst×len_burst≥2×L1 Buffer容量`时触发异常。
+- 源端数据占用的内存不可超出Global Memory容量，否则触发源地址越界异常。
+- 当`burst_dst_stride`不等于`len_burst`时（即存在padding），`burst_dst_stride`需32字节对齐，否则触发异常，该约束即使`n_burst`为1仍生效。
+- `len_burst`需满足dtype字节对齐：dtype为`int16_t`/`uint16_t`/`half`/`bfloat16_t`/`hifloat8_t`时需为2的倍数，dtype为`int32_t`/`uint32_t`/`float`时需为4的倍数，否则触发异常。
+
+### 填充模式约束
+
+- 具体上限为：dtype为`int8_t`、`uint8_t`或`hifloat8_t`时，填充元素个数取值范围为[0, 32]；dtype为`int16_t`、`uint16_t`、`half`或`bfloat16_t`时，取值范围为[0, 16]；dtype为`int32_t`、`uint32_t`或`float`时，取值范围为[0, 8]。
+- 当`left_padding_count`与`right_padding_count`均为0时，本接口处于normal padding或compact padding模式，不进行左右填充；其中至少一个非0时处于LP/RP模式，硬件强制采用常量填充，`data_select_bit`设为false无效，填充值需通过配套setter接口预先配置。
+- LP/RP模式下，`left_padding_count×sizeof(dtype) +right_padding_count×sizeof(dtype) +len_burst`加上末尾对齐填充后需32字节对齐。
+- 常量填充模式下，填充值需通过配套setter接口预先配置；未配置时填充值不确定。
+
+### 字段截断约束
+
+- n_burst取值范围为[1, 2097152]，超出取值范围的值会被截断，导致搬运结果不符合预期。
+- len_burst取值范围为[1, 2097152]，超出取值范围的值会被截断，导致搬运结果不符合预期。
+- `left_padding_count`传入>63的值会截断处理（如64→0、65→1）。截断后实际填充元素数小于预期，边界区域填充不足，部分应填充位置仍为旧数据。
+- `right_padding_count`传入>63的值会截断处理（如64→0、65→1）。截断后实际填充元素数小于预期，边界区域填充不足，部分应填充位置仍为旧数据。
+- burst_src_stride取值范围为[0, 2^40−1]，超出取值范围的值会被截断，导致搬运结果不符合预期。
+- burst_dst_stride取值范围为[0, 2^21−1]，超出取值范围的值会被截断，导致搬运结果不符合预期。
 
 ## 调用示例
 
