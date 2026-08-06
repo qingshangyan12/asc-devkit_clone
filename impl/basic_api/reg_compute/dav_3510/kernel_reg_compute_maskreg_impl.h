@@ -35,16 +35,8 @@ __simd_callee__ inline MaskReg UpdateMaskImpl(uint32_t& scalarValue)
     } else if constexpr (sizeof(T) == 2) {
         reg = plt_b16(scalarValue, POST_UPDATE);
     } else if constexpr (sizeof(T) == 4) {
-        if constexpr (SupportType<T, complex32>()) {
-            if constexpr (regTrait.REG_NUM == 2) {
-                reg = plt_b16(scalarValue, POST_UPDATE);
-            } else {
-                uint32_t updateScalar = scalarValue;
-                reg = plt_b16(scalarValue, POST_UPDATE);
-                punpack(reg, reg, LOWER);
-                constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(T);
-                scalarValue = (updateScalar > one_repeat_num) ? (updateScalar - one_repeat_num) : 0;
-            }
+        if constexpr (SupportType<T, complex32>() && regTrait.REG_NUM == 2) {
+            reg = plt_b16(scalarValue, POST_UPDATE);
         } else {
             reg = plt_b32(scalarValue, POST_UPDATE);
         }
@@ -71,12 +63,6 @@ __simd_callee__ inline constexpr MaskPattern GetMaskPattern()
         } else if constexpr (mode == MaskPattern::Q) {
             return MaskPattern::VL8;
         }
-    } else if constexpr ((regTrait.REG_NUM == 1) && SupportType<T, complex32>()) {
-        if constexpr (mode == MaskPattern::H) {
-            return MaskPattern::VL32;
-        } else if constexpr (mode == MaskPattern::Q) {
-            return MaskPattern::VL16;
-        }
     }
     return mode;
 }
@@ -92,11 +78,8 @@ __simd_callee__ inline MaskReg CreateMaskImpl()
     } else if constexpr (sizeof(T) == 2) {
         reg = pset_b16(modeValue);
     } else if constexpr (sizeof(T) == 4) {
-        if constexpr (SupportType<T, complex32>()) {
+        if constexpr (SupportType<T, complex32>() && regTrait.REG_NUM == 2) {
             reg = pset_b16(modeValue);
-            if constexpr (regTrait.REG_NUM == 1) {
-                punpack(reg, reg, LOWER);
-            }
         } else {
             reg = pset_b32(modeValue);
         }
