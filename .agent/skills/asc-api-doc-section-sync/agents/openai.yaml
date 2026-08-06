@@ -1,0 +1,4 @@
+interface:
+  display_name: "AscendC API文档章节同步"
+  short_description: "安全同步AscendC API文档的功能说明、函数原型和参数说明章节"
+  default_prompt: "使用 $asc-api-doc-section-sync 将源文档的功能说明、函数原型和参数说明同步到正式API文档。"
