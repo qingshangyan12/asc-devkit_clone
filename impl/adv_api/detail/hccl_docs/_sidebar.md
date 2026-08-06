@@ -1,0 +1,31 @@
+- [HCCL 概述](/)
+- 架构设计
+  - [整体架构总览](architecture/overview.md)
+  - [四层架构设计](architecture/layer-design.md)
+  - [设备-服务端消息通信](architecture/device-server-comm.md)
+  - [核心数据结构](architecture/data-structures.md)
+- API 参考
+  - [Hccl 模板类](api-reference/hccl-class.md)
+  - [集合通信算子](api-reference/collective-ops.md)
+  - [生命周期 API](api-reference/lifecycle.md)
+  - [查询与工具 API](api-reference/query-utils.md)
+  - [Tiling 配置 API](api-reference/tiling-api.md)
+- 算法体系
+  - [算法类型体系](algorithm/algo-types.md)
+  - [算法选择机制](algorithm/selection-mechanism.md)
+  - [执行器注册与调度](algorithm/executor-registry.md)
+  - [模板注册机制](algorithm/template-registry.md)
+  - [拓扑识别与匹配](algorithm/topo-matching.md)
+- 算子详解
+  - [AllGather](operators/allgather.md)
+  - [ReduceScatter](operators/reducescatter.md)
+- 具体实现
+  - [设备侧 AICPU 实现](implementation/device-aicpu.md)
+  - [设备侧 CCU 实现](implementation/device-ccu.md)
+  - [AICPU 服务端](implementation/aicpu-server.md)
+  - [平台分发机制](implementation/platform-dispatch.md)
+- 流程演示
+  - [完整调用流程](flow-demo/full-call-flow.md)
+  - [算法选择决策演示](flow-demo/algo-selection-demo.md)
+  - [Commit/Wait 时序演示](flow-demo/commit-wait-demo.md)
+- [Agent 持续更新指南](_agent_guide.md)

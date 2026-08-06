@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>HCCL 设计文档</title>
+  <meta name="description" content="HCCL 集合通信高阶 API 与算法设计文档">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="vendor/vue.css">
+  <style>
+    .markdown-section { max-width: 1100px; }
+    .mermaid { text-align: center; margin: 16px 0; }
+  </style>
+</head>
+<body>
+  <div id="app">正在加载...</div>
+
+  <script>
+    window.$docsify = {
+      name: 'HCCL 设计文档',
+      repo: '',
+      loadSidebar: true,
+      loadCoverpage: true,
+      subMaxLevel: 3,
+      search: {
+        placeholder: '搜索',
+        noData: '无结果',
+        depth: 3
+      },
+      plugins: [
+        function mermaidPlugin(hook) {
+          hook.beforeEach(function(content) {
+            return content.replace(/```mermaid\n([\s\S]*?)```/g, function(match, code) {
+              return '<div class="mermaid">' + code + '</div>';
+            });
+          });
+          hook.doneEach(function() {
+            var els = document.querySelectorAll('.mermaid');
+            if (els.length === 0) return;
+            if (!window.mermaid) {
+              var s = document.createElement('script');
+              s.src = 'vendor/mermaid.min.js';
+              s.onload = function() {
+                mermaid.initialize({ startOnLoad: false, theme: 'default' });
+                mermaid.run({ nodes: document.querySelectorAll('.mermaid') }).catch(function(){});
+              };
+              document.head.appendChild(s);
+            } else {
+              mermaid.run({ nodes: els }).catch(function(){});
+            }
+          });
+        }
+      ]
+    };
+  </script>
+  <script src="vendor/docsify.min.js"></script>
+  <script src="vendor/search.min.js"></script>
+</body>
+</html>
