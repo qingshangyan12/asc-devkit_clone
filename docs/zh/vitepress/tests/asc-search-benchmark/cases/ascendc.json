@@ -169,6 +169,57 @@
       }
     },
     {
+      "id": "syntax-kernel-launch-prefix",
+      "query": "<<<",
+      "category": "special-character",
+      "intent": "Find kernel launch configuration while the punctuation-only syntax is still incomplete.",
+      "expect": {
+        "minResults": 1,
+        "descriptionIncludes": ["<<<"],
+        "highlightIncludes": ["<<<"],
+        "sectionHash": "#<<<>>>调用",
+        "targets": [
+          { "exact": "/api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config", "grade": 3 },
+          { "exact": "/guide/编程指南/语言扩展层/SIMD与SIMT混合编程BuiltIn关键字", "grade": 3 },
+          { "exact": "/api/SIMT-API/SIMT_programming_intro/extended_syntax/kernel_function_config", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "syntax-kernel-launch-empty",
+      "query": "<<<>>>",
+      "category": "special-character",
+      "intent": "Locate the kernel launch configuration syntax despite punctuation-only tokenization.",
+      "expect": {
+        "minResults": 1,
+        "descriptionIncludes": ["<<<"],
+        "highlightIncludes": ["<<<"],
+        "sectionHash": "#<<<>>>调用",
+        "targets": [
+          { "exact": "/api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config", "grade": 3 },
+          { "exact": "/guide/编程指南/语言扩展层/SIMD与SIMT混合编程BuiltIn关键字", "grade": 3 },
+          { "exact": "/api/SIMT-API/SIMT_programming_intro/extended_syntax/kernel_function_config", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "syntax-kernel-launch-placeholder",
+      "query": "<<<...>>>",
+      "category": "special-character",
+      "intent": "Treat a parameterized kernel launch placeholder as the same searchable syntax.",
+      "expect": {
+        "minResults": 1,
+        "descriptionIncludes": ["<<<"],
+        "highlightIncludes": ["<<<"],
+        "sectionHash": "#<<<>>>调用",
+        "targets": [
+          { "exact": "/api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config", "grade": 3 },
+          { "exact": "/guide/编程指南/语言扩展层/SIMD与SIMT混合编程BuiltIn关键字", "grade": 3 },
+          { "exact": "/api/SIMT-API/SIMT_programming_intro/extended_syntax/kernel_function_config", "grade": 3 }
+        ]
+      }
+    },
+    {
       "id": "api-datatype-fp8",
       "query": "fp8_e4m3fn_t",
       "category": "special-character",
@@ -1883,6 +1934,23 @@
         "targets": [
           { "exact": "/api/SIMT-API/cooperative_groups/thread_block/thread_block", "grade": 3 },
           { "prefix": "/api/SIMT-API/cooperative_groups/thread_block/", "grade": 2 }
+        ]
+      }
+    },
+    {
+      "id": "technical-concept-block-word",
+      "query": "block",
+      "category": "technical-concept",
+      "intent": "Prefer titles containing the exact word block over one-edit spelling corrections such as Lock.",
+      "expect": {
+        "minResults": 1,
+        "targets": [
+          { "exact": "/api/SIMT-API/cooperative_groups/thread_block/thread_block_intro", "grade": 3 },
+          { "exact": "/api/SIMT-API/cooperative_groups/thread_block/thread_block_constructor", "grade": 3 },
+          { "exact": "/api/SIMT-API/cooperative_groups/thread_block/thread_block", "grade": 3 },
+          { "exact": "/api/SIMT-API/cooperative_groups/thread_block_tile/thread_block_tile_intro", "grade": 2 },
+          { "exact": "/api/SIMT-API/cooperative_groups/thread_block_tile/thread_block_tile_constructor", "grade": 2 },
+          { "exact": "/api/SIMT-API/cooperative_groups/thread_block_tile/thread_block_tile", "grade": 2 }
         ]
       }
     },

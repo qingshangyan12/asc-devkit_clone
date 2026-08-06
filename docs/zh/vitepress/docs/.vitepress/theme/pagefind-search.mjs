@@ -8,6 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+import {
+  findKernelLaunch,
+  normalizeKernelLaunchQuery,
+} from '../search-syntax.mjs'
+
 const CJK_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/
 const CJK_PHRASE_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]{2,}/g
 const RESULTS_PER_VARIANT = 80
@@ -27,6 +32,13 @@ function normalize(value) {
 
 function compactEnglish(value) {
   return normalize(value).replace(/[^a-z0-9]+/g, '')
+}
+
+function englishWords(value) {
+  return normalizeCase(value)
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .toLocaleLowerCase()
+    .match(/[a-z]+[0-9]*|[0-9]+/g) || []
 }
 
 function normalizeRoute(url) {
@@ -163,6 +175,8 @@ function createQueryPlan(query) {
   const caseQuery = normalizeCase(query)
   const normalizedQuery = normalize(query)
   const compactQuery = compactEnglish(query)
+  const specialSyntaxQuery = normalizeKernelLaunchQuery(caseQuery)
+  const specialSyntaxIntent = Boolean(specialSyntaxQuery)
   const cjkPhrases = caseQuery.match(CJK_PHRASE_REGEX) || []
   const allEnglishParts = normalizedQuery
     .replace(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g, ' ')
@@ -172,18 +186,20 @@ function createQueryPlan(query) {
   const separatedIdentifierIntent = cjkPhrases.length === 0
     && allEnglishParts.length >= 2
     && /^[a-z0-9_\-\s]+$/i.test(caseQuery)
-  const identifierQuery = identifierIntent
-    ? normalizedQuery
-    : separatedIdentifierIntent ? allEnglishParts.join('_') : ''
+  const identifierQuery = specialSyntaxIntent
+    ? specialSyntaxQuery
+    : identifierIntent ? normalizedQuery
+      : separatedIdentifierIntent ? allEnglishParts.join('_') : ''
   return {
     query: String(query),
     caseQuery,
     normalizedQuery,
     compactQuery,
+    specialSyntaxIntent,
     identifierIntent,
     separatedIdentifierIntent,
     identifierQuery,
-    strongIdentifierIntent: identifierIntent,
+    strongIdentifierIntent: identifierIntent || specialSyntaxIntent,
     cjkPhrases,
     englishParts,
     cjkSubPhrases: cjkPhrases.map(generateSubPhrases),
@@ -236,7 +252,7 @@ function titleVariants(plan, variants) {
 
 async function loadIdentifierIndex() {
   if (!identifierIndexPromise) {
-    identifierIndexPromise = fetch('/search-identifiers.json?v=5', { cache: 'no-store' })
+    identifierIndexPromise = fetch('/search-identifiers.json?v=6', { cache: 'no-store' })
       .then((response) => {
         if (!response.ok) throw new Error(`Identifier index request failed with ${response.status}`)
         return response.json()
@@ -256,11 +272,12 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;')
 }
 
-function highlightIdentifierExcerpt(excerpt, query) {
+function highlightIdentifierExcerpt(excerpt, query, specialSyntaxIntent = false) {
   const text = String(excerpt || '')
-  const position = text.toLocaleLowerCase().indexOf(query)
+  const syntaxMatch = specialSyntaxIntent ? findKernelLaunch(text) : null
+  const position = syntaxMatch?.index ?? text.toLocaleLowerCase().indexOf(query)
   if (position < 0) return escapeHtml(text)
-  const end = position + query.length
+  const end = position + (syntaxMatch?.value.length || query.length)
   return `${escapeHtml(text.slice(0, position))}<mark>${escapeHtml(text.slice(position, end))}</mark>${escapeHtml(text.slice(end))}`
 }
 
@@ -277,7 +294,7 @@ function lowerBoundIdentifier(entries, query) {
 
 async function searchIdentifierIndex(plan) {
   const query = plan.identifierQuery
-  if (!query || compactEnglish(query).length < 3) {
+  if (!query || (!plan.specialSyntaxIntent && compactEnglish(query).length < 3)) {
     return { exact: false, exclusive: false, strong: false, results: [] }
   }
   const index = await loadIdentifierIndex()
@@ -311,7 +328,7 @@ async function searchIdentifierIndex(plan) {
       const sourceDescription = Number.isInteger(contextId) && contextId >= 0
         ? snippets[contextId] || pageDescription
         : pageDescription
-      const description = highlightIdentifierExcerpt(sourceDescription, query)
+      const description = highlightIdentifierExcerpt(sourceDescription, query, plan.specialSyntaxIntent)
       const sectionId = sectionIds[rank]
       const route = routeWithSection(
         pageRoute,
@@ -341,8 +358,9 @@ async function searchIdentifierIndex(plan) {
   }
   return {
     exact: exactIdentifier,
-    exclusive: uniquePrefix && results.length === 1,
-    strong: plan.identifierIntent || !exactIdentifier,
+    exclusive: (plan.specialSyntaxIntent && exactIdentifier && results.length > 0)
+      || (uniquePrefix && results.length === 1),
+    strong: plan.specialSyntaxIntent || plan.identifierIntent || !exactIdentifier,
     results,
   }
 }
@@ -523,12 +541,15 @@ function scoreCandidate(candidate, plan) {
     const titleExact = plan.compactQuery.length >= 2 && compactTitle === plan.compactQuery
     const titlePrefix = plan.compactQuery.length >= 2 && compactTitle.startsWith(plan.compactQuery)
     const titleContains = plan.compactQuery.length >= 2 && compactTitle.includes(plan.compactQuery)
+    const titleWordExact = plan.englishParts.length === 1
+      && englishWords(title).includes(plan.englishParts[0])
     const identifierExact = leadingIdentifier && leadingIdentifier === plan.compactQuery
     if (typoTitleMatch) englishScore = Math.max(englishScore, 700000 + plan.compactQuery.length * 100)
     if (titleContains && plan.englishParts.length === 1) {
       englishScore = Math.max(englishScore, 800000 + plan.compactQuery.length * 100)
     }
     if (titlePrefix) englishScore = Math.max(englishScore, 900000 + plan.compactQuery.length * 100)
+    if (titleWordExact) englishScore = Math.max(englishScore, 1000000 + plan.compactQuery.length * 100)
     if (identifierExact) englishScore = Math.max(englishScore, 1100000 + plan.compactQuery.length * 100)
     if (titleExact) englishScore = Math.max(englishScore, 1200000 + plan.compactQuery.length * 100)
     if (titleExact && pureEnglishTitle) {
