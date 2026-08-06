@@ -177,7 +177,7 @@ class TestHcclTilingUseCcuKfc : public TestHcclTiling {
 protected:
     void SetUp() override
     {
-        const char* env = std::getenv("USE_CCU_KFC");
+        const char* env = std::getenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
         hasOldEnv_ = (env != nullptr);
         if (hasOldEnv_) {
             oldEnv_ = env;
@@ -187,18 +187,18 @@ protected:
     void TearDown() override
     {
         if (hasOldEnv_) {
-            setenv("USE_CCU_KFC", oldEnv_.c_str(), 1);
+            setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", oldEnv_.c_str(), 1);
         } else {
-            unsetenv("USE_CCU_KFC");
+            unsetenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
         }
     }
 
     void ExpectInitTilingVersion(const char* envValue, uint32_t opType, uint8_t commEngine, uint32_t expectedVersion)
     {
         if (envValue == nullptr) {
-            unsetenv("USE_CCU_KFC");
+            unsetenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
         } else {
-            setenv("USE_CCU_KFC", envValue, 1);
+            setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", envValue, 1);
         }
 
         ::Mc2InitTiling initTiling{};
