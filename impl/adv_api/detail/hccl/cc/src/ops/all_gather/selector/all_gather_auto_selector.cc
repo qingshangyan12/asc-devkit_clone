@@ -21,8 +21,9 @@ SelectorStatus AllGatherAutoSelector::SelectCcuMsAlgo(
     HCCL_DEBUG("[AllGatherAutoSelector][%s] start, topoInfo topoLevelNums[%u]", __func__, topoInfo->topoLevelNums);
     (void)configAlgMap;
     // Temporary KFC convergence: only enable single-level Mesh1D Mem2Mem before other CCU paths are verified.
-    if (topoInfo->topoLevelNums > 1 || topoInfo->level0Topo != Level0Shape::MESH_1D) {
-        HCCL_DEBUG("[AllGatherAutoSelector] only single level MESH_1D is supported for ccu_ms mode.");
+    if (topoInfo->topoLevelNums != 1 || topoInfo->level0Topo != Level0Shape::MESH_1D ||
+        topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
+        HCCL_DEBUG("[AllGatherAutoSelector] only single-level, single-die MESH_1D is supported for ccu_ms mode.");
         return SelectorStatus::NOT_MATCH;
     }
     if (IsInputOutputOverlap(opParam)) {
@@ -71,7 +72,7 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
     (void)dataSize;
     // Temporary KFC convergence: route only regular Mesh1D to the KFC Mem2Mem implementation.
     if (topoInfo->level0Topo != Level0Shape::MESH_1D ||
-        topoInfo->level0MeshType == Level0MeshType::TWO_DIE_NOT_REGULAR) {
+        topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
         HCCL_DEBUG(
             "[AllGatherAutoSelector] level0Topo[%d], level0MeshType[%d] is not supported for ccu schedule mode.",
             topoInfo->level0Topo, topoInfo->level0MeshType);
