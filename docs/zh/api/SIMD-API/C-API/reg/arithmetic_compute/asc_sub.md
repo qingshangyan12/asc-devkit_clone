@@ -121,9 +121,9 @@ $$
     ```cpp
     __simd_vf__ inline void sub_vf(__ubuf__ uint32_t* carry_addr, __ubuf__ uint32_t* dst_addr, __ubuf__ uint32_t* src0_addr, __ubuf__ uint32_t* src1_addr, uint32_t count, int32_t one_repeat_size, int32_t one_block_size, uint16_t repeat_time)
     {
-        vector_half src0;
-        vector_half src1;
-        vector_half dst;
+        vector_uint32_t src0;
+        vector_uint32_t src1;
+        vector_uint32_t dst;
         vector_bool carry;
         vector_bool mask;
         for (uint16_t i = 0; i < repeat_time; ++i) {
