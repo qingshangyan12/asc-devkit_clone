@@ -12,6 +12,8 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <chrono>
+#include <csignal>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -21,6 +23,7 @@
 #include <iostream>
 #include <limits.h>
 #include <limits>
+#include <spawn.h>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -37,6 +40,8 @@
 
 using Json = nlohmann::json;
 
+extern char** environ;
+
 namespace ascendc {
 namespace manifest_generator {
 namespace {
@@ -47,6 +52,9 @@ constexpr uintmax_t kMaxBundleBytes = 256U * 1024U * 1024U;
 constexpr size_t kMaxManifestCount = 4096U;
 constexpr size_t kMaxFilesPerManifest = 4096U;
 constexpr size_t kMaxFilesPerBundle = 65536U;
+constexpr size_t kMaxDirectoryDepth = 64U;
+constexpr uint32_t kSubprocessTimeoutSeconds = 30U * 60U;
+constexpr uint32_t kSubprocessPollMilliseconds = 10U;
 
 std::runtime_error SystemError(const std::string& operation)
 {
@@ -132,7 +140,7 @@ bool IsWithin(const std::string& path, const std::string& root)
 
 std::string CanonicalDirectory(const std::string& path, const std::string& field)
 {
-    struct stat inputInfo{};
+    struct stat inputInfo {};
     if (lstat(path.c_str(), &inputInfo) != 0 || S_ISLNK(inputInfo.st_mode)) {
         throw std::runtime_error(field + " must exist and must not be a symlink: " + path);
     }
@@ -184,27 +192,41 @@ void CreateDirectories(const std::string& path)
     }
 }
 
-void RemoveTree(const std::string& path) noexcept
+bool RemoveTree(const std::string& path) noexcept
 {
     struct stat info {};
     if (lstat(path.c_str(), &info) != 0) {
-        return;
+        return errno == ENOENT;
     }
     if (!S_ISDIR(info.st_mode) || S_ISLNK(info.st_mode)) {
-        (void)unlink(path.c_str());
-        return;
+        return unlink(path.c_str()) == 0 || errno == ENOENT;
     }
     DIR* directory = opendir(path.c_str());
-    if (directory != nullptr) {
-        while (dirent* entry = readdir(directory)) {
-            const std::string name(entry->d_name);
-            if (name != "." && name != "..") {
-                RemoveTree(JoinPath(path, name));
-            }
-        }
-        (void)closedir(directory);
+    if (directory == nullptr) {
+        return false;
     }
-    (void)rmdir(path.c_str());
+    bool success = true;
+    while (true) {
+        errno = 0;
+        dirent* entry = readdir(directory);
+        if (entry == nullptr) {
+            if (errno != 0) {
+                success = false;
+            }
+            break;
+        }
+        const std::string name(entry->d_name);
+        if (name != "." && name != ".." && !RemoveTree(JoinPath(path, name))) {
+            success = false;
+        }
+    }
+    if (closedir(directory) != 0) {
+        success = false;
+    }
+    if (rmdir(path.c_str()) != 0 && errno != ENOENT) {
+        success = false;
+    }
+    return success;
 }
 
 struct ResourceFile {
@@ -357,7 +379,8 @@ private:
                name.compare(name.size() - std::strlen(suffix), std::strlen(suffix), suffix) == 0;
     }
 
-    static void DiscoverManifestFilesBelow(const std::string& directory, std::vector<std::string>& manifests)
+    static void DiscoverManifestFilesBelow(
+        const std::string& directory, std::vector<std::string>& manifests, size_t depth)
     {
         DIR* stream = opendir(directory.c_str());
         if (stream == nullptr) {
@@ -378,7 +401,12 @@ private:
                     continue;
                 }
                 if (S_ISDIR(info.st_mode)) {
-                    DiscoverManifestFilesBelow(path, manifests);
+                    if (depth >= kMaxDirectoryDepth) {
+                        throw std::runtime_error(
+                            "collection exceeds directory depth limit of " + std::to_string(kMaxDirectoryDepth) + ": " +
+                            path);
+                    }
+                    DiscoverManifestFilesBelow(path, manifests, depth + 1U);
                     continue;
                 }
                 if (!S_ISREG(info.st_mode) || !IsManifestFile(path)) {
@@ -400,7 +428,7 @@ private:
     static std::vector<std::string> DiscoverManifestFiles(const std::string& manifestSearchRoot)
     {
         std::vector<std::string> manifests;
-        DiscoverManifestFilesBelow(manifestSearchRoot, manifests);
+        DiscoverManifestFilesBelow(manifestSearchRoot, manifests, 0U);
         std::sort(manifests.begin(), manifests.end());
         if (manifests.empty()) {
             throw std::runtime_error("collected resources contain no manifest units");
@@ -410,7 +438,7 @@ private:
 
     static void LoadResourceFiles(
         const std::string& directory, const std::string& manifestRoot, const std::string& manifestPath,
-        ResourceBudget& budget, ManifestUnit& unit)
+        ResourceBudget& budget, ManifestUnit& unit, size_t depth)
     {
         DIR* stream = opendir(directory.c_str());
         if (stream == nullptr) {
@@ -431,7 +459,12 @@ private:
                     throw std::runtime_error("manifest base_dir contains a symlink: " + source);
                 }
                 if (S_ISDIR(info.st_mode)) {
-                    LoadResourceFiles(source, manifestRoot, manifestPath, budget, unit);
+                    if (depth >= kMaxDirectoryDepth) {
+                        throw std::runtime_error(
+                            "manifest resources exceed directory depth limit of " +
+                            std::to_string(kMaxDirectoryDepth) + ": " + source);
+                    }
+                    LoadResourceFiles(source, manifestRoot, manifestPath, budget, unit, depth + 1U);
                     continue;
                 }
                 if (!S_ISREG(info.st_mode)) {
@@ -473,7 +506,7 @@ private:
         const std::string resourceInput =
             !baseDir.empty() && baseDir[0] == '/' ? baseDir : JoinPath(manifestRoot, baseDir);
         const std::string resourceRoot = CanonicalDirectoryWithin(resourceInput, manifestRoot, "manifest base_dir");
-        LoadResourceFiles(resourceRoot, manifestRoot, manifestPath, budget, unit);
+        LoadResourceFiles(resourceRoot, manifestRoot, manifestPath, budget, unit, 0U);
         std::sort(unit.files.begin(), unit.files.end(), [](const ResourceFile& left, const ResourceFile& right) {
             return left.filePath < right.filePath;
         });
@@ -644,8 +677,11 @@ public:
     ~BuildWorkspace()
     {
         if (!session_.empty() && !keepTemp_) {
-            RemoveTree(session_);
-            ASCENDLOGD("Removed private bundle work directory %s", session_.c_str());
+            if (RemoveTree(session_)) {
+                ASCENDLOGD("Removed private bundle work directory %s", session_.c_str());
+            } else {
+                ASCENDLOGW("Failed to completely remove private bundle work directory %s", session_.c_str());
+            }
         }
     }
 
@@ -724,8 +760,18 @@ public:
     static void Run(
         const std::vector<std::string>& arguments, const std::vector<std::pair<std::string, std::string>>& environment)
     {
+        Run(arguments, environment, std::chrono::seconds(kSubprocessTimeoutSeconds));
+    }
+
+    static void Run(
+        const std::vector<std::string>& arguments, const std::vector<std::pair<std::string, std::string>>& environment,
+        std::chrono::milliseconds timeout)
+    {
         if (arguments.empty()) {
             throw std::invalid_argument("subprocess arguments must not be empty");
+        }
+        if (timeout.count() <= 0) {
+            throw std::invalid_argument("subprocess timeout must be positive");
         }
         std::vector<char*> argv;
         argv.reserve(arguments.size() + 1U);
@@ -733,36 +779,63 @@ public:
             argv.push_back(const_cast<char*>(argument.c_str()));
         }
         argv.push_back(nullptr);
-        const pid_t child = fork();
-        if (child < 0) {
-            const std::runtime_error error = SystemError("failed to fork subprocess");
+
+        const std::vector<std::string> environmentStrings = BuildEnvironment(environment);
+        std::vector<char*> envp;
+        envp.reserve(environmentStrings.size() + 1U);
+        for (const std::string& item : environmentStrings) {
+            envp.push_back(const_cast<char*>(item.c_str()));
+        }
+        envp.push_back(nullptr);
+
+        posix_spawnattr_t attributes {};
+        int spawnError = posix_spawnattr_init(&attributes);
+        if (spawnError != 0) {
+            throw std::runtime_error(
+                "failed to initialize subprocess: " + std::string(std::strerror(spawnError)));
+        }
+        spawnError = posix_spawnattr_setpgroup(&attributes, 0);
+        if (spawnError == 0) {
+            spawnError = posix_spawnattr_setflags(&attributes, POSIX_SPAWN_SETPGROUP);
+        }
+        if (spawnError != 0) {
+            (void)posix_spawnattr_destroy(&attributes);
+            throw std::runtime_error(
+                "failed to configure subprocess: " + std::string(std::strerror(spawnError)));
+        }
+
+        pid_t child = -1;
+        spawnError = posix_spawn(&child, argv[0], nullptr, &attributes, argv.data(), envp.data());
+        (void)posix_spawnattr_destroy(&attributes);
+        if (spawnError != 0) {
+            const std::runtime_error error(
+                "failed to spawn subprocess " + arguments.front() + ": " + std::strerror(spawnError));
             ASCENDLOGD("Subprocess launch failed: %s", error.what());
             throw error;
-        }
-        if (child == 0) {
-            for (const char* name : {"MAKEFLAGS", "MFLAGS", "MAKEFILES", "GNUMAKEFLAGS"}) {
-                unsetenv(name);
-            }
-            for (const auto& item : environment) {
-                if (setenv(item.first.c_str(), item.second.c_str(), 1) != 0) {
-                    _exit(126);
-                }
-            }
-            execv(argv[0], argv.data());
-            _exit(127);
         }
 
         ASCENDLOGD("Started subprocess pid=%d executable=%s", static_cast<int>(child), arguments.front().c_str());
 
         int status = 0;
-        pid_t waited = -1;
-        do {
-            waited = waitpid(child, &status, 0);
-        } while (waited < 0 && errno == EINTR);
-        if (waited < 0) {
-            const std::runtime_error error = SystemError("failed to wait for subprocess");
-            ASCENDLOGD("Subprocess wait failed: %s", error.what());
-            throw error;
+        const std::chrono::steady_clock::time_point deadline = std::chrono::steady_clock::now() + timeout;
+        while (true) {
+            const pid_t waited = waitpid(child, &status, WNOHANG);
+            if (waited == child) {
+                break;
+            }
+            if (waited < 0 && errno != EINTR) {
+                const int waitError = errno;
+                KillAndReap(child);
+                const std::runtime_error error(
+                    "failed to wait for subprocess: " + std::string(std::strerror(waitError)));
+                ASCENDLOGD("Subprocess wait failed: %s", error.what());
+                throw error;
+            }
+            if (std::chrono::steady_clock::now() >= deadline) {
+                KillAndReap(child);
+                throw std::runtime_error("subprocess timed out: " + arguments.front());
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(kSubprocessPollMilliseconds));
         }
         if (WIFSIGNALED(status)) {
             const std::string message =
@@ -778,6 +851,65 @@ public:
             throw std::runtime_error(message);
         }
         ASCENDLOGD("Subprocess pid=%d completed successfully", static_cast<int>(child));
+    }
+
+private:
+    static bool IsMakeControlVariable(const std::string& name)
+    {
+        return name == "MAKEFLAGS" || name == "MFLAGS" || name == "MAKEFILES" || name == "GNUMAKEFLAGS";
+    }
+
+    static bool IsOverridden(
+        const std::string& name, const std::vector<std::pair<std::string, std::string>>& environment)
+    {
+        return std::find_if(
+                   environment.begin(), environment.end(), [&name](const std::pair<std::string, std::string>& item) {
+                       return item.first == name;
+                   }) != environment.end();
+    }
+
+    static std::vector<std::string> BuildEnvironment(
+        const std::vector<std::pair<std::string, std::string>>& environment)
+    {
+        for (size_t index = 0U; index < environment.size(); ++index) {
+            const std::string& name = environment[index].first;
+            if (name.empty() || name.find('=') != std::string::npos || name.find('\0') != std::string::npos ||
+                environment[index].second.find('\0') != std::string::npos) {
+                throw std::invalid_argument("invalid subprocess environment variable");
+            }
+            for (size_t previous = 0U; previous < index; ++previous) {
+                if (environment[previous].first == name) {
+                    throw std::invalid_argument("duplicate subprocess environment variable: " + name);
+                }
+            }
+        }
+
+        std::vector<std::string> result;
+        for (char** current = environ; current != nullptr && *current != nullptr; ++current) {
+            const std::string item(*current);
+            const size_t separator = item.find('=');
+            if (separator == std::string::npos) {
+                continue;
+            }
+            const std::string name = item.substr(0U, separator);
+            if (!IsMakeControlVariable(name) && !IsOverridden(name, environment)) {
+                result.push_back(item);
+            }
+        }
+        for (const auto& item : environment) {
+            result.push_back(item.first + "=" + item.second);
+        }
+        return result;
+    }
+
+    static void KillAndReap(pid_t child) noexcept
+    {
+        (void)kill(-child, SIGKILL);
+        int status = 0;
+        pid_t waited = -1;
+        do {
+            waited = waitpid(child, &status, 0);
+        } while (waited < 0 && errno == EINTR);
     }
 };
 
@@ -926,10 +1058,11 @@ private:
 
 uint32_t ResolveJobCount(uint32_t requested) noexcept
 {
+    const uint32_t reportedCpuCount = static_cast<uint32_t>(std::thread::hardware_concurrency());
+    const uint32_t cpuCount = reportedCpuCount == 0U ? 1U : reportedCpuCount;
     if (requested != 0U) {
-        return requested;
+        return std::min(requested, cpuCount);
     }
-    const uint32_t cpuCount = static_cast<uint32_t>(std::thread::hardware_concurrency());
     return cpuCount < 2U ? 1U : cpuCount / 2U;
 }
 

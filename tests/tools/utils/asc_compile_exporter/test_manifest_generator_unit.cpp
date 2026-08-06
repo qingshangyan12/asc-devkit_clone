@@ -191,13 +191,14 @@ TEST_F(ManifestGeneratorModuleTest, DirectoryFunctionsCreateValidateAndRemovePat
     const std::string symlinkPath = JoinPath(root_, "directory-link");
     ASSERT_EQ(symlink(directory.c_str(), symlinkPath.c_str()), 0);
     EXPECT_THROW(CanonicalDirectory(symlinkPath, "directory link"), std::runtime_error);
-    RemoveTree(symlinkPath);
+    EXPECT_TRUE(RemoveTree(symlinkPath));
     EXPECT_FALSE(PathExists(symlinkPath));
     EXPECT_TRUE(IsDirectory(directory));
 
-    RemoveTree(regularFile);
+    EXPECT_TRUE(RemoveTree(regularFile));
     EXPECT_FALSE(PathExists(regularFile));
-    RemoveTree(JoinPath(root_, "does-not-exist"));
+    EXPECT_TRUE(RemoveTree(JoinPath(root_, "does-not-exist")));
+    EXPECT_FALSE(RemoveTree("/dev/null/child"));
 }
 
 TEST_F(ManifestGeneratorModuleTest, ResourceBudgetEnforcesPayloadAndFileCountLimits)
@@ -281,6 +282,25 @@ TEST_F(ManifestGeneratorModuleTest, RepositoryRejectsNonRegularResource)
     CreateManifest(unit, "Unit");
 
     EXPECT_THROW(CollectedManifestRepository(JoinPath(root_, "collection-special")).Load(), std::runtime_error);
+}
+
+TEST_F(ManifestGeneratorModuleTest, RepositoryEnforcesDirectoryDepthLimit)
+{
+    const std::string allowedCollection = JoinPath(root_, "collection-depth-allowed");
+    std::string allowedDirectory = allowedCollection;
+    for (size_t depth = 0U; depth < kMaxDirectoryDepth; ++depth) {
+        allowedDirectory = JoinPath(allowedDirectory, "level-" + std::to_string(depth));
+    }
+    WriteTestFile(JoinPath(allowedDirectory, "Deep_manifest.json"), "{\"base_dir\":\".\"}");
+    EXPECT_NO_THROW(CollectedManifestRepository(allowedCollection).Load());
+
+    const std::string rejectedCollection = JoinPath(root_, "collection-depth-rejected");
+    std::string rejectedDirectory = rejectedCollection;
+    for (size_t depth = 0U; depth <= kMaxDirectoryDepth; ++depth) {
+        rejectedDirectory = JoinPath(rejectedDirectory, "level-" + std::to_string(depth));
+    }
+    CreateDirectories(rejectedDirectory);
+    EXPECT_THROW(CollectedManifestRepository(rejectedCollection).Load(), std::runtime_error);
 }
 
 TEST_F(ManifestGeneratorModuleTest, SourceGeneratorEmitsBundleManifestAndMakefile)
@@ -394,17 +414,42 @@ TEST_F(ManifestGeneratorModuleTest, ProcessRunnerPropagatesEnvironmentAndExitSta
     EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "exit 7"}, {}), std::runtime_error);
 
     const std::string output = JoinPath(root_, "environment.txt");
+    ScopedEnvironment makeFlags("MAKEFLAGS", "must-not-leak");
     ProcessRunner::Run(
-        {"/bin/sh", "-c", "printf '%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" > \"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
+        {"/bin/sh", "-c",
+         "printf '%s|%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" \"${MAKEFLAGS-unset}\" > "
+         "\"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
         {{"ASC_COMPILE_EXPORTER_UNIT_VALUE", "visible"}, {"ASC_COMPILE_EXPORTER_UNIT_OUTPUT", output}});
-    EXPECT_EQ(ReadTestFile(output), "visible");
+    EXPECT_EQ(ReadTestFile(output), "visible|unset");
 }
 
 TEST_F(ManifestGeneratorModuleTest, ProcessRunnerReportsExecEnvironmentAndSignalFailures)
 {
     EXPECT_THROW(ProcessRunner::Run({JoinPath(root_, "missing-command")}, {}), std::runtime_error);
-    EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "exit 0"}, {{"INVALID=NAME", "value"}}), std::runtime_error);
+    EXPECT_THROW(
+        ProcessRunner::Run({"/bin/sh", "-c", "exit 0"}, {{"INVALID=NAME", "value"}}), std::invalid_argument);
+    EXPECT_THROW(
+        ProcessRunner::Run({"/bin/sh", "-c", "exit 0"}, {{"DUPLICATE", "first"}, {"DUPLICATE", "second"}}),
+        std::invalid_argument);
     EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "kill -TERM $$"}, {}), std::runtime_error);
+}
+
+TEST_F(ManifestGeneratorModuleTest, ProcessRunnerTimesOutAndReapsProcessGroup)
+{
+    const std::string pidFile = JoinPath(root_, "timed-out.pid");
+    EXPECT_THROW(
+        ProcessRunner::Run(
+            {"/bin/sh", "-c", "printf '%s' \"$$\" > \"$ASC_COMPILE_EXPORTER_PID_FILE\"; sleep 10"},
+            {{"ASC_COMPILE_EXPORTER_PID_FILE", pidFile}}, std::chrono::milliseconds(100U)),
+        std::runtime_error);
+
+    const pid_t child = static_cast<pid_t>(std::strtol(ReadTestFile(pidFile).c_str(), nullptr, 10));
+    ASSERT_GT(child, 0);
+    errno = 0;
+    EXPECT_EQ(kill(child, 0), -1);
+    EXPECT_EQ(errno, ESRCH);
+    EXPECT_THROW(
+        ProcessRunner::Run({"/bin/true"}, {}, std::chrono::milliseconds(0U)), std::invalid_argument);
 }
 
 TEST_F(ManifestGeneratorModuleTest, MakeBundleBuilderValidatesCannHomeAndAbiHeader)
@@ -487,10 +532,14 @@ TEST_F(ManifestGeneratorModuleTest, BundlePublisherCopiesAcrossFileSystems)
     EXPECT_THROW(BundlePublisher::Publish(staged, outputDirectory), std::runtime_error);
 }
 
-TEST(ManifestGeneratorStandaloneUnitTest, ResolveJobCountHonorsExplicitValue)
+TEST(ManifestGeneratorStandaloneUnitTest, ResolveJobCountClampsExplicitValueToHardwareConcurrency)
 {
-    EXPECT_EQ(ResolveJobCount(7U), 7U);
-    EXPECT_GE(ResolveJobCount(0U), 1U);
+    const uint32_t reportedCpuCount = static_cast<uint32_t>(std::thread::hardware_concurrency());
+    const uint32_t cpuCount = reportedCpuCount == 0U ? 1U : reportedCpuCount;
+    EXPECT_EQ(ResolveJobCount(1U), 1U);
+    EXPECT_EQ(ResolveJobCount(cpuCount), cpuCount);
+    EXPECT_EQ(ResolveJobCount(std::numeric_limits<uint32_t>::max()), cpuCount);
+    EXPECT_EQ(ResolveJobCount(0U), cpuCount < 2U ? 1U : cpuCount / 2U);
 }
 
 } // namespace
