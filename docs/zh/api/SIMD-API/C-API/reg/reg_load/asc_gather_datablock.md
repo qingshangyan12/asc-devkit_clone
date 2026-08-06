@@ -107,30 +107,30 @@
 
 - 支持掩码控制，允许选择性收集数据
     ```cpp
-    __simd_vf__ inline void gather_datablock_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, int32_t one_repeat_size, uint16_t repeat_time)
+    __simd_vf__ inline void gather_datablock_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, int32_t index_repeat_size, int32_t dst_repeat_size, uint16_t repeat_time)
     {
         vector_int8_t dst;
         vector_uint32_t index;
-        vector_bool cal_mask = asc_create_mask_b32(PAT_VL8);
+        vector_bool cal_mask = asc_create_mask_b32(PAT_VL8); // PAT_VL8表示8个DataBlock都更新
         vector_bool store_mask = asc_create_mask_b8(PAT_ALL);
         for (uint16_t i = 0; i < repeat_time; ++i) {
-            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_loadalign_postupdate(index, index_addr, index_repeat_size);
             asc_gather_datablock(dst, src_addr, index, cal_mask);
-            asc_storealign_postupdate(dst_addr, dst, one_repeat_size, store_mask);
+            asc_storealign_postupdate(dst_addr, dst, dst_repeat_size, store_mask);
         }
     }
     ```
 - 无掩码控制，默认收集所有索引对应的数据块
     ```cpp
-    __simd_vf__ inline void gather_datablock_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, int32_t one_repeat_size, uint16_t repeat_time)
+    __simd_vf__ inline void gather_datablock_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, int32_t index_repeat_size, int32_t dst_repeat_size, uint16_t repeat_time)
     {
         vector_int8_t dst;
         vector_uint32_t index;
         vector_bool mask = asc_create_mask_b8(PAT_ALL);
         for (uint16_t i = 0; i < repeat_time; ++i) {
-            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_loadalign_postupdate(index, index_addr, index_repeat_size);
             asc_gather_datablock(dst, src_addr, index);
-            asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
+            asc_storealign_postupdate(dst_addr, dst, dst_repeat_size, mask);
         }
     }
     ```
