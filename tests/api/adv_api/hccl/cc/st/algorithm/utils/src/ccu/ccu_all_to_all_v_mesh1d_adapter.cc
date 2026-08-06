@@ -11,10 +11,42 @@
 #include "ccu_all_to_all_v_mesh1d_adapter.h"
 
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
+#include "ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_primitives_stub.h"
+#include "ccu_kernel_proxy.h"
+#include "alg_param.h"
 
 namespace HcclSim {
 namespace CcuSt {
+
+namespace {
+
+void *ConvertAllToAllVArg(const void *productArg, uint32_t argNum)
+{
+    if (productArg == nullptr) {
+        return nullptr;
+    }
+    const auto *src = static_cast<const mc2_ops_hccl::CcuKernelArgAlltoAllMesh1D *>(productArg);
+    auto *config = new AllToAllVKernelConfig();
+    config->rankId = src->rankId;
+    config->rankSize = static_cast<uint32_t>(src->rankSize);
+    for (uint32_t i = 0; i < src->channelCount; ++i) {
+        uint32_t peerRank = i;
+        if (peerRank >= config->rankId) {
+            peerRank++;
+        }
+        config->channels.push_back(MakeChannel(config->rankId, peerRank));
+    }
+    return config;
+}
+
+bool g_registered = []() {
+    RegisterCaptureFunction("CcuKernelAlltoAllVMesh1D", CaptureAllToAllVMesh1DKernel, ConvertAllToAllVArg,
+        [](void *p) { delete static_cast<AllToAllVKernelConfig *>(p); });
+    return true;
+}();
+
+} // namespace
 
 Result CaptureAllToAllVMesh1DKernel(void *kernelArg)
 {

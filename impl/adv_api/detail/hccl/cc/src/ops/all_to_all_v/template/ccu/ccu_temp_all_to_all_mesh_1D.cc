@@ -11,6 +11,7 @@
 #include "channel.h"
 #include "alg_data_trans_wrapper.h"
 #include "kernel/ccu_kernel_all_to_all_mesh1d.h"
+#include "kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 #include "ccu_temp_all_to_all_mesh_1D.h"
 #include "ccu_launch_dl.h"
 
@@ -45,8 +46,13 @@ HcclResult CcuTempAlltoAllMesh1D::CalcRes(HcclComm comm, const OpParam& param, c
     typeSize_ = DataTypeSizeGet(param.all2AllDataDes.sendType);
     CcuKernelInfo kernelInfo;
 
-    strcpy(kernelInfo.kernelFuncName, "CcuKernelAlltoAllMesh1D");
-    kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuAlltoAllMesh1DKernel);
+    if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        strcpy(kernelInfo.kernelFuncName, "CcuKernelAlltoAllVMesh1D");
+        kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuAlltoAllVMesh1DKernel);
+    } else {
+        strcpy(kernelInfo.kernelFuncName, "CcuKernelAlltoAllMesh1D");
+        kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuAlltoAllMesh1DKernel);
+    }
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
     auto kernelArg = std::make_shared<CcuKernelArgAlltoAllMesh1D>();
