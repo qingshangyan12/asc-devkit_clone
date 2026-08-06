@@ -96,6 +96,7 @@ $$
 ## 调用示例
 
 - 不支持进位计算接口
+
   ```cpp
   __simd_vf__ inline void add_vf(__ubuf__ half* dst_addr, __ubuf__ half* src0_addr, __ubuf__ half* src1_addr, uint32_t count, int32_t one_repeat_size, uint16_t repeat_time)
   {
@@ -114,6 +115,7 @@ $$
   ```
 
 - 支持进位计算接口
+
   ```cpp
   __simd_vf__ inline void add_vf(__ubuf__ uint32_t* carry_addr, __ubuf__ uint32_t* dst_addr, __ubuf__ uint32_t* src0_addr, __ubuf__ uint32_t* src1_addr, uint32_t count, int32_t one_repeat_size, int32_t one_block_size, uint16_t repeat_time)
   {

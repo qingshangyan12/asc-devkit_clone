@@ -29,9 +29,11 @@
 根据索引位置index将源操作数src按元素收集到目的操作数dst中。
 
 **图 1**  收集UB中的元素
+
 ![收集UB中的元素](../../figures/asc_gather_ub.png)
 
 **图 2**  收集矢量数据寄存器中的元素
+
 ![收集矢量数据寄存器中的元素](../../figures/asc_gather_vec.png)
 
 ## 函数原型
