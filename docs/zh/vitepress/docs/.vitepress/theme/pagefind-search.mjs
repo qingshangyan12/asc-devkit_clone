@@ -12,8 +12,10 @@ const CJK_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/
 const CJK_PHRASE_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]{2,}/g
 const RESULTS_PER_VARIANT = 80
 const MAX_CANDIDATES = 240
+const MAX_IDENTIFIER_MATCHES = 64
 const TITLE_INDEX_SOURCE = 'title-route'
 const initializedPagefindInstances = new WeakSet()
+let identifierIndexPromise = null
 
 function normalizeCase(value) {
   return String(value || '').normalize('NFKC').replace(/\s+/g, ' ').trim()
@@ -156,21 +158,29 @@ function createQueryPlan(query) {
   const normalizedQuery = normalize(query)
   const compactQuery = compactEnglish(query)
   const cjkPhrases = caseQuery.match(CJK_PHRASE_REGEX) || []
-  const englishParts = normalizedQuery
+  const allEnglishParts = normalizedQuery
     .replace(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g, ' ')
-    .match(/[a-z0-9]+/g)
-    ?.filter(part => part.length >= 2) || []
+    .match(/[a-z0-9]+/g) || []
+  const englishParts = allEnglishParts.filter(part => part.length >= 2)
+  const identifierIntent = caseQuery.includes('_') && /^[a-z_][a-z0-9_]*$/i.test(caseQuery)
+  const separatedIdentifierIntent = cjkPhrases.length === 0
+    && allEnglishParts.length >= 2
+    && /^[a-z0-9_\-\s]+$/i.test(caseQuery)
+  const identifierQuery = identifierIntent
+    ? normalizedQuery
+    : separatedIdentifierIntent ? allEnglishParts.join('_') : ''
   return {
     query: String(query),
     caseQuery,
     normalizedQuery,
     compactQuery,
-    identifierIntent: caseQuery.includes('_') && /^[a-z_][a-z0-9_]*$/i.test(caseQuery),
+    identifierIntent,
+    separatedIdentifierIntent,
+    identifierQuery,
+    strongIdentifierIntent: identifierIntent,
     cjkPhrases,
     englishParts,
     cjkSubPhrases: cjkPhrases.map(generateSubPhrases),
-    dataTypeIntent: /^[a-z_][a-z0-9_]*_t$/i.test(caseQuery),
-    macroIntent: /^__[a-z0-9_]+__$/i.test(caseQuery),
   }
 }
 
@@ -195,22 +205,14 @@ function primaryVariants(plan) {
     addVariant(variants, plan.englishParts.join('_'), 1.5)
     if (!plan.identifierIntent) {
       addVariant(variants, plan.compactQuery, 1.4)
-      for (const part of plan.englishParts) addVariant(variants, part, 0.8)
+      if (!plan.strongIdentifierIntent) {
+        for (const part of plan.englishParts) addVariant(variants, part, 0.8)
+      }
     }
   }
   for (const phrase of plan.cjkPhrases) {
     addVariant(variants, phrase, 1.4)
     addVariant(variants, `"${phrase}"`, 2)
-  }
-  if (plan.dataTypeIntent) {
-    addVariant(variants, `${plan.caseQuery} data type`, 1.8)
-    addVariant(variants, `${plan.caseQuery} 数据类型`, 1.8)
-  }
-  if (plan.macroIntent) {
-    const identifier = plan.caseQuery.replace(/^__|__$/g, '')
-    addVariant(variants, `${identifier} builtin`, 1.8)
-    addVariant(variants, `${identifier} keyword`, 1.8)
-    addVariant(variants, `${identifier} 关键字`, 1.8)
   }
   return [...variants.values()]
 }
@@ -224,6 +226,113 @@ function titleVariants(plan, variants) {
     }
   }
   return [...titleQueries.values()]
+}
+
+async function loadIdentifierIndex() {
+  if (!identifierIndexPromise) {
+    identifierIndexPromise = fetch('/search-identifiers.json?v=4', { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Identifier index request failed with ${response.status}`)
+        return response.json()
+      })
+      .then(index => Array.isArray(index?.p) && Array.isArray(index?.i) ? index : { p: [], i: [], s: [] })
+      .catch(() => ({ p: [], i: [], s: [] }))
+  }
+  return identifierIndexPromise
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+}
+
+function highlightIdentifierExcerpt(excerpt, query) {
+  const text = String(excerpt || '')
+  const position = text.toLocaleLowerCase().indexOf(query)
+  if (position < 0) return escapeHtml(text)
+  const end = position + query.length
+  return `${escapeHtml(text.slice(0, position))}<mark>${escapeHtml(text.slice(position, end))}</mark>${escapeHtml(text.slice(end))}`
+}
+
+function lowerBoundIdentifier(entries, query) {
+  let left = 0
+  let right = entries.length
+  while (left < right) {
+    const middle = Math.floor((left + right) / 2)
+    if (String(entries[middle]?.[0] || '') < query) left = middle + 1
+    else right = middle
+  }
+  return left
+}
+
+async function searchIdentifierIndex(plan) {
+  const query = plan.identifierQuery
+  if (!query || compactEnglish(query).length < 3) {
+    return { exact: false, exclusive: false, strong: false, results: [] }
+  }
+  const index = await loadIdentifierIndex()
+  const entries = index.i
+  const pages = index.p
+  const snippets = Array.isArray(index.s) ? index.s : []
+  const start = lowerBoundIdentifier(entries, query)
+  const matches = []
+  for (let offset = start; offset < entries.length && matches.length <= MAX_IDENTIFIER_MATCHES; offset++) {
+    const entry = entries[offset]
+    if (!String(entry?.[0] || '').startsWith(query)) break
+    matches.push(entry)
+  }
+  if (matches.length === 0) return { exact: false, exclusive: false, strong: false, results: [] }
+  const truncated = matches.length > MAX_IDENTIFIER_MATCHES
+  const selectedMatches = matches.slice(0, MAX_IDENTIFIER_MATCHES)
+
+  const resultsByRoute = new Map()
+  let exactIdentifier = false
+  for (const [identifier, pageIds, contextIds = []] of selectedMatches) {
+    const exact = identifier === query
+    exactIdentifier ||= exact
+    const identifierScore = (exact ? 3300000 : 3100000)
+      - Math.max(0, identifier.length - query.length) * 1000
+    for (let rank = 0; rank < pageIds.length; rank++) {
+      const page = pages[pageIds[rank]]
+      if (!page) continue
+      const [route, title, pageDescription = ''] = page
+      const contextId = contextIds[rank]
+      const sourceDescription = Number.isInteger(contextId) && contextId >= 0
+        ? snippets[contextId] || pageDescription
+        : pageDescription
+      const description = highlightIdentifierExcerpt(sourceDescription, query)
+      const result = {
+        route,
+        title: title || route,
+        description,
+        meta: { title: title || route, description },
+        score: identifierScore - rank * 20000,
+      }
+      const normalizedRoute = normalizeRoute(route)
+      resultsByRoute.set(normalizedRoute, mergeRouteResult(resultsByRoute.get(normalizedRoute), result))
+    }
+  }
+  const results = [...resultsByRoute.values()]
+    .sort((left, right) => right.score - left.score || left.route.localeCompare(right.route))
+    .slice(0, 20)
+  const uniquePrefix = !exactIdentifier && !truncated && matches.length === 1
+  const ambiguousSeparatedPrefix = plan.separatedIdentifierIntent
+    && !plan.identifierIntent
+    && !exactIdentifier
+    && !uniquePrefix
+  if (ambiguousSeparatedPrefix) {
+    return { exact: false, exclusive: false, strong: false, results: [] }
+  }
+  return {
+    exact: exactIdentifier,
+    exclusive: uniquePrefix && results.length === 1,
+    strong: plan.identifierIntent || !exactIdentifier,
+    results,
+  }
 }
 
 async function collectCandidates(pagefind, variants, candidates = new Map(), source = 'content') {
@@ -375,30 +484,17 @@ function scoreCandidate(candidate, plan) {
   if (plan.cjkPhrases.length === 0 && plan.englishParts.length > 0) {
     let englishScore = Math.max(...plan.englishParts.map(part => part.length * 10000), 0)
       + plan.englishParts.reduce((sum, part) => sum + part.length, 0) * 100
-    const titleSignalsAllowed = !plan.macroIntent
-    const titleExact = titleSignalsAllowed && plan.compactQuery.length >= 2 && compactTitle === plan.compactQuery
-    const titlePrefix = titleSignalsAllowed && plan.compactQuery.length >= 2 && compactTitle.startsWith(plan.compactQuery)
-    const titleContains = titleSignalsAllowed && plan.compactQuery.length >= 2 && compactTitle.includes(plan.compactQuery)
-    const identifierExact = titleSignalsAllowed && leadingIdentifier && leadingIdentifier === plan.compactQuery
-    const dataTypeDefinition = plan.dataTypeIntent && /数据类型|data\s*types?/i.test(title)
-    const builtinDataTypeDefinition = plan.dataTypeIntent && /内置数据类型|built-?in\s+data\s*types?/i.test(title)
-    const exactIdentifierCount = plan.macroIntent
-      ? normalizedText.split(plan.normalizedQuery).length - 1
-      : 0
-    const macroDefinition = plan.macroIntent && /builtin|关键字|macros?|宏/i.test(title)
-    const builtinKeywordDefinition = plan.macroIntent && /builtin.*关键字|关键字.*builtin/i.test(title)
-    if (exactIdentifierCount > 0) englishScore = Math.max(englishScore, 600000 + exactIdentifierCount * 10000)
+    const titleExact = plan.compactQuery.length >= 2 && compactTitle === plan.compactQuery
+    const titlePrefix = plan.compactQuery.length >= 2 && compactTitle.startsWith(plan.compactQuery)
+    const titleContains = plan.compactQuery.length >= 2 && compactTitle.includes(plan.compactQuery)
+    const identifierExact = leadingIdentifier && leadingIdentifier === plan.compactQuery
     if (typoTitleMatch) englishScore = Math.max(englishScore, 700000 + plan.compactQuery.length * 100)
     if (titleContains && plan.englishParts.length === 1) {
       englishScore = Math.max(englishScore, 800000 + plan.compactQuery.length * 100)
     }
     if (titlePrefix) englishScore = Math.max(englishScore, 900000 + plan.compactQuery.length * 100)
-    if (dataTypeDefinition) englishScore = Math.max(englishScore, 2700000 + plan.compactQuery.length * 100)
-    if (macroDefinition) englishScore = Math.max(englishScore, 2700000 + plan.compactQuery.length * 100)
     if (identifierExact) englishScore = Math.max(englishScore, 1100000 + plan.compactQuery.length * 100)
     if (titleExact) englishScore = Math.max(englishScore, 1200000 + plan.compactQuery.length * 100)
-    if (builtinDataTypeDefinition) englishScore = Math.max(englishScore, 2800000 + plan.compactQuery.length * 100)
-    if (builtinKeywordDefinition) englishScore = Math.max(englishScore, 2800000 + plan.compactQuery.length * 100)
     if (titleExact && pureEnglishTitle) {
       englishScore = Math.max(englishScore, 1400000 + plan.compactQuery.length * 100)
     }
@@ -458,7 +554,6 @@ function scoreCandidate(candidate, plan) {
     + routeMatchBonus(route, plan.cjkPhrases)
     + compactCjkRouteBonus(route, plan.cjkPhrases)
     + Math.round(coverage * 20000)
-    + (plan.macroIntent ? normalizedText.split(plan.normalizedQuery).length * 5000 : 0)
     - wrappedEnglishPhrasePenalty
   const { ascSearchSource, ...displayMeta } = data.meta || {}
   const description = ascSearchSource === TITLE_INDEX_SOURCE ? '' : data.excerpt || ''
@@ -502,8 +597,22 @@ function rankCandidates(candidates, plan) {
   return ranked.slice(0, 20)
 }
 
+function mergeRankedResults(primary, additional) {
+  const resultsByRoute = new Map()
+  for (const result of [...primary, ...additional]) {
+    const route = normalizeRoute(result.route)
+    resultsByRoute.set(route, mergeRouteResult(resultsByRoute.get(route), result))
+  }
+  return [...resultsByRoute.values()]
+    .sort((left, right) => right.score - left.score || left.route.localeCompare(right.route))
+    .slice(0, 20)
+}
+
 export async function searchPagefind(pagefind, query) {
   const plan = createQueryPlan(query)
+  const identifierSearch = await searchIdentifierIndex(plan)
+  if (identifierSearch.exclusive) return identifierSearch.results
+  plan.strongIdentifierIntent ||= identifierSearch.strong
   const variants = primaryVariants(plan)
   const candidateMap = await collectCandidates(pagefind, variants)
   await collectCandidates(pagefind, titleVariants(plan, []), candidateMap, 'title-alias')
@@ -524,7 +633,10 @@ export async function searchPagefind(pagefind, query) {
     candidates = await materializeCandidates(candidateMap)
     ranked = rankCandidates(candidates, plan)
   }
-  return ranked
+  const hasExactLexicalTitle = plan.separatedIdentifierIntent
+    && identifierSearch.exact
+    && ranked.some(result => compactEnglish(result.title) === plan.compactQuery)
+  return mergeRankedResults(hasExactLexicalTitle ? [] : identifierSearch.results, ranked)
 }
 
 export async function initializePagefindSearch(pagefind) {
