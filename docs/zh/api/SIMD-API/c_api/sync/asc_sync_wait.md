@@ -54,7 +54,9 @@ PIPE_S
 
 ## 约束说明
 
-asc_sync_notify和asc_sync_wait必须成对使用。
+- asc_sync_notify和asc_sync_wait必须成对使用。
+- `pipe` 与 `tpipe` 取值不可为 `PIPE_ALL`，否则触发异常。
+- 本接口只阻塞其所在流水线（`tpipe`）的后续指令，不影响其他流水线指令的执行；阻塞期间 `pipe` 流水线可继续执行后续指令。
 
 ## 调用示例
 
