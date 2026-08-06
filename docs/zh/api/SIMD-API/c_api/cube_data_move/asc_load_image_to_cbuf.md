@@ -73,6 +73,8 @@ PIPE_MTE2
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
+- 搬运到dst的图片大小与padding大小之和不能超过L1 Buffer可用空间。
+- 使用块填充或镜像块填充模式时，left_pad_size和right_pad_size不能超过hor_size，top_pad_size和bot_pad_size不能超过ver_size。
 
 ## 调用示例
 

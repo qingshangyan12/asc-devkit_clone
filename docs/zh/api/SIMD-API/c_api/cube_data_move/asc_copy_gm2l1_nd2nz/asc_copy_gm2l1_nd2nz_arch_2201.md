@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将数据从Global Memory (GM)搬运到Level 1 cache (L1)，支持在数据搬运时进行ND格式到NZ格式的转换。
+将数据从Global Memory (GM)搬运到Level 1 cache (L1)，支持在数据搬运时进行ND格式到Nz格式的转换。
 
 ## 函数原型
 
@@ -102,9 +102,9 @@
 | d_value              | 输入    | ND矩阵的列数，取值范围：d_value∈[0, 65535]。                                                                                                      |
 | src_nd_matrix_stride | 输入    | 源操作数相邻ND矩阵起始地址间的偏移，取值范围：src_nd_matrix_stride∈[0, 65535]，单位为元素。                                                                        |
 | src_d_value          | 输入    | 源操作数同一ND矩阵的相邻行起始地址间的偏移，取值范围：src_d_value∈[1, 65535]，单位为元素。                                                                             |
-| dst_nz_c0_stride     | 输入    | ND转换到NZ格式后，源操作数中的一行会转换为目的操作数的多行。dst_nz_c0_stride表示，目的NZ矩阵中，来自源操作数同一行的多行数据相邻起始地址间的偏移，取值范围：dst_nz_c0_stride∈[1, 16384]，单位：C0_SIZE（32B）。 |
-| dst_nz_n_stride      | 输入    | 目的NZ矩阵中，Z型矩阵相邻行起始地址之间的偏移。取值范围：dst_nz_n_stride∈[1, 16384]，单位：C0_SIZE（32B）。                                                             |
-| dst_nz_matrix_stride | 输入    | 目的NZ矩阵中，相邻NZ矩阵起始地址间的偏移，取值范围：dst_nz_matrix_stride∈[1, 65535]，单位为元素。                                                                    |
+| dst_nz_c0_stride     | 输入    | ND转换到Nz格式后，源操作数中的一行会转换为目的操作数的多行。dst_nz_c0_stride表示，目的Nz矩阵中，来自源操作数同一行的多行数据相邻起始地址间的偏移，取值范围：dst_nz_c0_stride∈[1, 16384]，单位：C0_SIZE（32B）。 |
+| dst_nz_n_stride      | 输入    | 目的Nz矩阵中，Z型矩阵相邻行起始地址之间的偏移。取值范围：dst_nz_n_stride∈[1, 16384]，单位：C0_SIZE（32B）。                                                             |
+| dst_nz_matrix_stride | 输入    | 目的Nz矩阵中，相邻Nz矩阵起始地址间的偏移，取值范围：dst_nz_matrix_stride∈[1, 65535]，单位为元素。                                                                    |
 
 ## 返回值说明
 
