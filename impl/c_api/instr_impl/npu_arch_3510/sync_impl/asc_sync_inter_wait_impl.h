@@ -27,14 +27,14 @@
 
 __aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, int64_t flag_id)
 {
-    if (pipe == PIPE_S) {
-        wait_flag_dev(PIPE_S, flag_id);
-    } else if (pipe == PIPE_V) {
-        wait_flag_dev(PIPE_V, flag_id);
-    } else if (pipe == PIPE_MTE2) {
-        wait_flag_dev(PIPE_MTE2, flag_id);
-    } else if (pipe == PIPE_MTE3) {
-        wait_flag_dev(PIPE_MTE3, flag_id);
+    if (pipe == pipe_t::PIPE_S) {
+        wait_flag_dev(pipe_t::PIPE_S, flag_id);
+    } else if (pipe == pipe_t::PIPE_V) {
+        wait_flag_dev(pipe_t::PIPE_V, flag_id);
+    } else if (pipe == pipe_t::PIPE_MTE2) {
+        wait_flag_dev(pipe_t::PIPE_MTE2, flag_id);
+    } else if (pipe == pipe_t::PIPE_MTE3) {
+        wait_flag_dev(pipe_t::PIPE_MTE3, flag_id);
     } else {}
 }
 

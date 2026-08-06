@@ -63,8 +63,6 @@ __aicore__ inline void asc_sync_pipe(pipe_t pipe)
     asc_sync_pipe_impl(pipe);
 }
 
-__aicore__ inline void asc_sync_vec() { asc_sync_vec_impl(); }
-
 __aicore__ inline void asc_sync_mte3(int id) { asc_sync_mte3_impl(id); }
 
 __aicore__ inline void asc_sync_mte2(int id) { asc_sync_mte2_impl(id); }

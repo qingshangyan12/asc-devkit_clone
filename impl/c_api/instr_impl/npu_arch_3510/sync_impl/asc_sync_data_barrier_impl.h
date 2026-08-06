@@ -31,9 +31,9 @@ __aicore__ inline void asc_sync_data_barrier_impl(mem_dsb_t arg)
         dsb(mem_dsb_t::DSB_ALL);
     } else if (arg == mem_dsb_t::DSB_DDR) {
         dsb(mem_dsb_t::DSB_DDR);
-    } else if (arg == mem_dsb_t::DSG_UB) {
+    } else if (arg == mem_dsb_t::DSB_UB) {
         dsb(mem_dsb_t::DSB_UB);
-    } else if (arg == mem_dsb_t::DSG_SEQ) {
+    } else if (arg == mem_dsb_t::DSB_SEQ) {
         dsb(mem_dsb_t::DSB_SEQ);
     } else {}
 }

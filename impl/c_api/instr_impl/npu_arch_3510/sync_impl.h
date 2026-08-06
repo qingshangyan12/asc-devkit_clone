@@ -42,6 +42,11 @@ __aicore__ inline void asc_sync_vec()
 
 __aicore__ inline void asc_sync_vec(int id) { asc_sync_vec_impl(id); }
 
+__aicore__ inline void asc_sync_pipe(pipe_t pipe)
+{
+    asc_sync_pipe_impl(pipe);
+}
+
 __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     asc_sync_notify_impl(pipe, tpipe, id);
@@ -51,8 +56,6 @@ __aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     asc_sync_wait_impl(pipe, tpipe, id);
 }
-
-__aicore__ inline void asc_sync_vec() { asc_sync_vec_impl(); }
 
 __aicore__ inline void asc_sync_mte3(int id) { asc_sync_mte3_impl(id); }
 
@@ -92,12 +95,12 @@ __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id)
 
 __aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint8_t sync_id)
 {
-    asc_sync_intra_wait_impl(pipe, flag_id);
+    asc_sync_intra_wait_impl(pipe, sync_id);
 }
 
 __aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id)
 {
-    asc_sync_intra_wait_impl(pipe, flag_id);
+    asc_sync_intra_wait_impl(pipe, sync_id);
 }
 
 __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint8_t flag_id)
