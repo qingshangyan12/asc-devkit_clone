@@ -11,7 +11,6 @@
 #include "manifest_generator.h"
 
 #include <algorithm>
-#include <array>
 #include <cerrno>
 #include <cstdint>
 #include <cstdlib>
@@ -106,12 +105,11 @@ std::string AbsolutePath(const std::string &path)
 
 bool ResolveCanonicalPath(const std::string &path, std::string &resolved)
 {
-    std::array<char, PATH_MAX + 1U> buffer {};
-    if (realpath(path.c_str(), buffer.data()) == nullptr) {
+    char resolvedPath[PATH_MAX] = {0};
+    if (realpath(path.c_str(), resolvedPath) == nullptr) {
         return false;
     }
-    buffer.back() = '\0';
-    resolved.assign(buffer.data());
+    resolved = std::string(resolvedPath);
     return true;
 }
 
