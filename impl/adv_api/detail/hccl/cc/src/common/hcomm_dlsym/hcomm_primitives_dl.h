@@ -94,6 +94,25 @@ DECL_WEAK_FUNC(
 DECL_WEAK_FUNC(
     HcclResult, HcclCommSymWinGet, HcclComm comm, void* ptr, size_t size, HcclCommSymWindow* winHandle, size_t* offset);
 DECL_SUPPORT_FLAG(HcommBatchTransferOnThread);
+DECL_WEAK_FUNC(int32_t, HcommAicpuTsTaskCacheLookup, const char* tag, bool* isHit);
+DECL_WEAK_FUNC(
+    int32_t, HcommAicpuTsTaskCacheStart, const char* tag, void** addrs, uint64_t* sizes, uint64_t count);
+DECL_WEAK_FUNC(int32_t, HcommAicpuTsTaskCacheEnd, const char* tag);
+DECL_WEAK_FUNC(
+    int32_t, HcommAicpuTsTaskCacheExecute, const char* tag, void** addrs, uint64_t* sizes, uint64_t count);
+DECL_WEAK_FUNC(int32_t, HcommAicpuTsTaskCacheClear, const char* tag);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheLookup);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheStart);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheEnd);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheExecute);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheClear);
+
+bool HcommIsSupportAicpuTsTaskCache(void);
+int32_t HcclHcommAicpuTsTaskCacheLookup(const char* tag, bool* isHit);
+int32_t HcclHcommAicpuTsTaskCacheStart(const char* tag, void** addrs, uint64_t* sizes, uint64_t count);
+int32_t HcclHcommAicpuTsTaskCacheEnd(const char* tag);
+int32_t HcclHcommAicpuTsTaskCacheExecute(const char* tag, void** addrs, uint64_t* sizes, uint64_t count);
+int32_t HcclHcommAicpuTsTaskCacheClear(const char* tag);
 
 int32_t HcclHcommBatchTransferOnThread(
     ThreadHandle thread, ChannelHandle channel, const HcclHcommBatchTransferDesc* transferDescs,
