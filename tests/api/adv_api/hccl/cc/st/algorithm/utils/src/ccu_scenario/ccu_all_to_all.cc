@@ -4,15 +4,15 @@
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "ccu_st_all_to_all_v.h"
+#include "ccu_all_to_all.h"
 #include "ccu_kernel_proxy.h"
 #include "ccu_sim_world.h"
 #include "ccu_dag_checker.h"
-#include "ccu_all_to_all_v_semantics_checker.h"
+#include "ccu_all_to_all_semantics_checker.h"
 
 #include "sim_communicator.h"
 #include "sim_world.h"
@@ -38,7 +38,7 @@ namespace {
 
 struct ScenarioData {
     std::vector<RankMemory> memories;
-    std::vector<AllToAllVLaunchConfig> configs;
+    std::vector<AllToAllLaunchConfig> configs;
     std::vector<RankLaunch> launches;
 };
 
@@ -46,9 +46,9 @@ ScenarioData BuildScenarioData(const CcuStScenario &scenario,
                                 const std::vector<KernelHandle> &handles)
 {
     const uint32_t rankSize = scenario.rankSize;
+    const uint64_t sliceSize = scenario.sizes[0][0];
     constexpr uint64_t sourceBaseOffset = 7;
     constexpr uint64_t destinationBaseOffset = 11;
-    constexpr uint64_t gap = 5;
     constexpr uint64_t guard = 32;
 
     ScenarioData data;
@@ -56,68 +56,41 @@ ScenarioData BuildScenarioData(const CcuStScenario &scenario,
     data.configs.resize(rankSize);
     data.launches.resize(rankSize);
 
-    std::vector<std::vector<uint64_t>> sendOffsets(rankSize, std::vector<uint64_t>(rankSize));
-    std::vector<std::vector<uint64_t>> recvOffsets(rankSize, std::vector<uint64_t>(rankSize));
-    std::vector<uint64_t> inputSizes(rankSize, sourceBaseOffset + guard);
-    std::vector<uint64_t> outputSizes(rankSize, destinationBaseOffset + guard);
-
-    for (uint32_t src = 0; src < rankSize; ++src) {
-        uint64_t offset = 0;
-        for (uint32_t dst = 0; dst < rankSize; ++dst) {
-            sendOffsets[src][dst] = offset;
-            offset += scenario.sizes[src][dst] + gap;
-        }
-        inputSizes[src] += offset;
-    }
-    for (uint32_t dst = 0; dst < rankSize; ++dst) {
-        uint64_t offset = 0;
-        for (uint32_t src = 0; src < rankSize; ++src) {
-            recvOffsets[dst][src] = offset;
-            offset += scenario.sizes[src][dst] + gap;
-        }
-        outputSizes[dst] += offset;
-    }
+    const uint64_t inputSize = sourceBaseOffset + rankSize * sliceSize + guard;
+    const uint64_t outputSize = destinationBaseOffset + rankSize * sliceSize + guard;
 
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
         RankMemory &memory = data.memories[rank];
-        memory.input.assign(inputSizes[rank], 0x5a);
-        memory.output.assign(outputSizes[rank], 0xa5);
-        AllToAllVLaunchConfig &config = data.configs[rank];
+        memory.input.assign(inputSize, 0x5a);
+        memory.output.assign(outputSize, 0xa5);
+        AllToAllLaunchConfig &config = data.configs[rank];
         config.inputAddress = memory.InputAddress();
         config.outputAddress = memory.OutputAddress();
         config.token = 0x1000U + rank;
-        config.sourceBaseOffset = sourceBaseOffset;
-        config.destinationBaseOffset = destinationBaseOffset;
+        config.sliceSize = sliceSize;
+        config.srcStride = sliceSize;
+        config.srcOffset = sourceBaseOffset;
+        config.dstOffset = destinationBaseOffset + static_cast<uint64_t>(rank) * sliceSize;
         config.rankId = rank;
-        config.peers.resize(rankSize);
-        memory.parameter.reserve(rankSize * ALL_TO_ALL_V_EXT_FIELD_COUNT);
-        for (uint32_t peer = 0; peer < rankSize; ++peer) {
-            AllToAllVPeerParam &peerParam = config.peers[peer];
-            peerParam.sendSize = scenario.sizes[rank][peer];
-            peerParam.reserved = 0xcccc0000U + peer;
-            peerParam.sendOffset = sendOffsets[rank][peer];
-            peerParam.recvOffset = recvOffsets[rank][peer];
-            memory.parameter.push_back(peerParam.sendSize);
-            memory.parameter.push_back(peerParam.reserved);
-            memory.parameter.push_back(peerParam.sendOffset);
-            memory.parameter.push_back(peerParam.recvOffset);
-            for (uint64_t byte = 0; byte < peerParam.sendSize; ++byte) {
-                memory.input[sourceBaseOffset + peerParam.sendOffset + byte] =
-                    static_cast<uint8_t>(17U + rank * 41U + peer * 13U + byte);
+        for (uint32_t dest = 0; dest < rankSize; ++dest) {
+            const uint64_t offset = sourceBaseOffset + static_cast<uint64_t>(dest) * sliceSize;
+            for (uint64_t byte = 0; byte < sliceSize; ++byte) {
+                memory.input[offset + byte] =
+                    static_cast<uint8_t>(17U + rank * 41U + dest * 13U + byte);
             }
         }
-        config.parameterAddress = memory.ParameterAddress();
         data.launches[rank] = RankLaunch{handles[rank],
-            PrepareAllToAllVTaskArgs(config), &memory};
+            PrepareAllToAllTaskArgs(config), &memory};
     }
     return data;
 }
 
-AllToAllVKernelConfig BuildKernelConfig(uint32_t rankId, uint32_t rankSize)
+AllToAllKernelConfig BuildKernelConfig(uint32_t rankId, uint32_t rankSize)
 {
-    AllToAllVKernelConfig config;
+    AllToAllKernelConfig config;
     config.rankId = rankId;
     config.rankSize = rankSize;
+    config.loadFromMem = true;
     for (uint32_t peer = 0; peer < rankSize; ++peer) {
         if (peer != rankId) {
             config.channels.push_back(MakeChannel(rankId, peer));
@@ -134,10 +107,10 @@ std::vector<KernelHandle> RegisterAllRanks(uint32_t rankSize)
         return {};
     }
     std::vector<KernelHandle> handles(rankSize);
-    std::vector<AllToAllVKernelConfig> configs(rankSize);
+    std::vector<AllToAllKernelConfig> configs(rankSize);
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
         configs[rank] = BuildKernelConfig(rank, rankSize);
-        if (manager.Register(instance, "CcuAlltoallVMesh1D", CaptureAllToAllVMesh1DKernel,
+        if (manager.Register(instance, "CcuAlltoAllMesh1D", CaptureAllToAllMesh1DKernel,
                 &configs[rank], handles[rank]) != Result::SUCCESS) {
             return {};
         }
@@ -145,10 +118,10 @@ std::vector<KernelHandle> RegisterAllRanks(uint32_t rankSize)
     return manager.RegisterEnd(instance) == Result::SUCCESS ? handles : std::vector<KernelHandle>{};
 }
 
-Mc2CcTilingInner BuildAllToAllVTiling(HcclDataType dataType)
+Mc2CcTilingInner BuildAllToAllTiling(HcclDataType dataType)
 {
     Mc2CcTilingInner tiling{};
-    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV);
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
     tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
     tiling.srcDataType = static_cast<uint8_t>(dataType);
     tiling.dstDataType = static_cast<uint8_t>(dataType);
@@ -182,7 +155,7 @@ void CleanupHostEnv(HcclComm &comm)
 
 } // namespace
 
-void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
+void CcuStAllToAll::VerifyScenario(const CcuStScenario &scenario)
 {
     const uint32_t rankSize = scenario.rankSize;
 
@@ -199,11 +172,11 @@ void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
     OpResCtx resCtx{};
     ASSERT_EQ(AllocCcuOpResCtx(comm, "selector_st_ctx", rankSize, 0, resCtx), HCCL_SUCCESS);
 
-    Mc2CcTilingInner tiling = BuildAllToAllVTiling(scenario.dataType);
+    Mc2CcTilingInner tiling = BuildAllToAllTiling(scenario.dataType);
 
     int dummyStream = 1;
     OpParam opParam{};
-    ASSERT_EQ(InitOpParamByTiling(comm, &dummyStream, "alltoallv_st", &tiling, opParam), HCCL_SUCCESS);
+    ASSERT_EQ(InitOpParamByTiling(comm, &dummyStream, "alltoall_st", &tiling, opParam), HCCL_SUCCESS);
 
     std::vector<uint64_t> sendCounts(rankSize, 1024U);
     opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void *>(sendCounts.data());
@@ -211,12 +184,12 @@ void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     ASSERT_EQ(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo), HCCL_SUCCESS);
-    ASSERT_EQ(algName, "CcuAlltoAllVMesh1D");
+    ASSERT_EQ(algName, "CcuAlltoAllMesh1D");
     ASSERT_GT(sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str()), 0);
 
     EXPECT_EQ(GetCcuKernelRegisterCount(), 0U);
 
-    opParam.isKfc = true;
+    opParam.isMc2 = true;
     bool skipGetRes = false;
     ASSERT_EQ(HandleSingleRankAndCommMode(comm, opParam, skipGetRes), HCCL_SUCCESS);
     ASSERT_FALSE(skipGetRes);
@@ -243,11 +216,11 @@ void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
 
     ScenarioData data = BuildScenarioData(scenario, handles);
 
-    CcuAllToAllVSemanticsChecker checker;
+    CcuAllToAllSemanticsChecker checker;
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
         const Program *program = RegisterManager::Global().GetProgram(handles[rank]);
         ASSERT_NE(program, nullptr);
-        const AllToAllVKernelConfig kernelConfig = BuildKernelConfig(rank, rankSize);
+        const AllToAllKernelConfig kernelConfig = BuildKernelConfig(rank, rankSize);
         CheckResult registration = checker.CheckRegistration(*program, kernelConfig);
         ASSERT_TRUE(registration.Ok()) << registration.message;
         CheckResult taskArgs = checker.CheckTaskArgs(*program, data.launches[rank].taskArgs,
@@ -256,14 +229,14 @@ void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
     }
 
     if (scenario.swapTaskArgs) {
-        std::swap(data.launches[0].taskArgs[3], data.launches[0].taskArgs[4]);
+        std::swap(data.launches[0].taskArgs[5], data.launches[0].taskArgs[6]);
         EXPECT_FALSE(checker.CheckTaskArgs(
             *RegisterManager::Global().GetProgram(handles[0]), data.launches[0].taskArgs,
             data.configs[0]).Ok());
         return;
     }
 
-    AllToAllVRuntimeExpectation expectation;
+    AllToAllRuntimeExpectation expectation;
     CheckResult capture = checker.CaptureRuntimeExpectation(data.memories, data.configs, expectation);
     ASSERT_TRUE(capture.Ok()) << capture.message;
 
@@ -271,14 +244,6 @@ void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
         data.launches[1].taskArgs.pop_back();
         RuntimeWorld world;
         EXPECT_EQ(world.Launch(data.launches), Result::CONTRACT_ERROR);
-        return;
-    }
-
-    if (scenario.outOfRangeParam) {
-        data.configs[0].parameterAddress += data.memories[0].parameter.size() * sizeof(uint64_t);
-        data.launches[0].taskArgs = PrepareAllToAllVTaskArgs(data.configs[0]);
-        RuntimeWorld world;
-        EXPECT_EQ(world.Launch(data.launches), Result::OUT_OF_RANGE);
         return;
     }
 
@@ -290,7 +255,7 @@ void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
     ASSERT_TRUE(runtime.Ok()) << runtime.message;
 
     if (scenario.corruptOutput) {
-        data.memories[0].output[data.configs[0].destinationBaseOffset] ^= 1U;
+        data.memories[0].output[data.configs[0].dstOffset] ^= 1U;
         EXPECT_FALSE(checker.CheckRuntime(expectation, data.memories, world).Ok());
     }
 }

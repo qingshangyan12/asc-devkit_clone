@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "ccu_st_all_to_all_v.h"
+#include "ccu_all_to_all_v.h"
 
 #include <vector>
 

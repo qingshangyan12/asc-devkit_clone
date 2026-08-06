@@ -13,7 +13,7 @@
 
 #include <gtest/gtest.h>
 #include "ccu_kernel_proxy.h"
-#include "ccu_st_scenario.h"
+#include "ccu_scenario.h"
 #include "ccu_checker.h"
 #include "ccu_dag_checker.h"
 #include "ccu_sim_world.h"
