@@ -81,10 +81,12 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
     const u64 scratchMultiplier =
         algTemplate->CalcScratchMultiple(dataParams.buffInfo.inBuffType, dataParams.buffInfo.outBuffType);
+    const u64 transportBoundDataSize = (param.engine == CommEngine::COMM_ENGINE_AICPU_TS) ?
+        resCtx.cclMem.size : UB_MAX_DATA_SIZE;
     const u64 scratchBound = scratchMultiplier == 0 ?
-                                 UB_MAX_DATA_SIZE :
+                                 transportBoundDataSize :
                                  resCtx.cclMem.size / scratchMultiplier / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
-    const u64 maxDataSizePerLoop = std::min<u64>(UB_MAX_DATA_SIZE, scratchBound);
+    const u64 maxDataSizePerLoop = std::min<u64>(transportBoundDataSize, scratchBound);
     const u64 maxCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
     CHK_PRT_RET(maxCountPerLoop == 0, HCCL_ERROR("[InsV2AllReduceSoleExecutor] maxCountPerLoop is 0"), HCCL_E_INTERNAL);
 
