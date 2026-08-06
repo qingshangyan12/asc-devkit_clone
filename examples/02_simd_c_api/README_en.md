@@ -5,3 +5,4 @@
 | [01_utilities](./01_utilities) | Simple examples based on Ascend C, demonstrating system utility usage including on-board printing, exception detection, and CPU twin debugging through APIs such as printf, assert, and DumpTensor, suitable for debugging phases |
 | [02_features](./02_features) | Feature examples based on Ascend C, demonstrating sample implementation methods using Framework, C_API, and other features |
 | [03_c_api](./03_c_api) | C_API examples based on Ascend C, introducing usage methods of C_APIs such as data movement and computation |
+| [04_best_practices](./04_best_practices) | Ascend C C API performance optimization practices that compare baseline implementations with double-buffer optimizations for Vector and Matrix computation |
