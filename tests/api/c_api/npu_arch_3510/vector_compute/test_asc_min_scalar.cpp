@@ -18,4 +18,27 @@ TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(Vmins, asc_min_scalar, vmins, vector_int
 TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(Vmins, asc_min_scalar, vmins, vector_uint8_t, uint8_t);
 TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(Vmins, asc_min_scalar, vmins, vector_float, float);
 TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(Vmins, asc_min_scalar, vmins, vector_half, half);
-TEST_VECTOR_COMPUTE_BINARY_SCALAR_INSTR(Vmins, asc_min_scalar, vmins, vector_bfloat16_t, bfloat16_t);
+
+namespace {
+void VminsBfloat16Stub(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask, Literal mode)
+{}
+} // namespace
+
+TEST(TestVectorComputeVminsBfloat16CApi, asc_min_scalar_bfloat16_t_Succ)
+{
+    using AscMinScalarBfloat16Func =
+        void (*)(vector_bfloat16_t&, vector_bfloat16_t, bfloat16_t, vector_bool);
+    AscMinScalarBfloat16Func ascMinScalarBfloat16 = static_cast<AscMinScalarBfloat16Func>(&asc_min_scalar);
+    vector_bfloat16_t dst;
+    vector_bfloat16_t src;
+    bfloat16_t value;
+    vector_bool mask;
+
+    MOCKER_CPP(vmins, void(vector_bfloat16_t&, vector_bfloat16_t, bfloat16_t, vector_bool, Literal))
+        .times(1)
+        .will(invoke(VminsBfloat16Stub));
+
+    ascMinScalarBfloat16(dst, src, value, mask);
+    GlobalMockObject::verify();
+}
