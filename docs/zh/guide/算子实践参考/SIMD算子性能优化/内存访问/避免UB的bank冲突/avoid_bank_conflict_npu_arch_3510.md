@@ -17,7 +17,7 @@ UB_ADDR[18:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
 
 **图1**  bank结构示意图（图中箭头方向表示内存排布的顺序）<a name="fig873359165316"></a>  
 
-![](../../../../figures/950_ub_memory_structure.png "950_UB内存结构图")
+![](../../../../figures/950_UB内存结构图.png "950_UB内存结构图")
 
 3510架构使用低位编址，地址排布情况如图所示：
 
