@@ -2,7 +2,7 @@
 
 ## Overview
 
-Taking the [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md) atomic add as an example, this sample uses five groups of controlled experiments to show how the memory tier (Global Memory / Unified Buffer), the organization of the atomic operation (direct atomic add / intra-block accumulation followed by GM writeback), whether the return value is used, the contention intensity on the same address, and the data type (int32 / int64) affect the performance of atomic add, and provides corresponding optimization guidance.
+Taking the [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md) atomic add as an example, this sample uses five groups of controlled experiments to show how the memory tier (Global Memory / Unified Buffer), the organization of the atomic operation (direct atomic add / intra-block accumulation followed by GM writeback), whether the return value is used, the contention intensity on the same address, and the data type (int32 / int64) affect the performance of atomic add, and provides corresponding optimization guidance.
 
 ## Supported Products
 
@@ -300,7 +300,7 @@ As described in Case 1, atomic operations on the same address can only execute s
 
 **Principle: GM atomic operations work at Sector granularity.**
 
-When an atomic add accesses a GM address, it passes through the L2 cache hierarchy and is processed by the atomic processing unit on the L2 side. The L2 cache manages memory in units of 512B Cache Lines, each containing 4 contiguous 128B Sectors; GM atomic operations are processed at 128B Sector granularity. When the target addresses of atomic operations are concentrated within the same Sector, processing efficiency is lower; when the target addresses are spread across more Sectors, processing efficiency is higher.
+When an atomic add accesses a GM address, it passes through the L2 cache hierarchy and completes the "read-compute-write" on the L2 side. The L2 cache manages memory in units of 512B Cache Lines, each containing 4 contiguous 128B Sectors; GM atomic operations are processed at 128B Sector granularity. When the target addresses of atomic operations are concentrated within the same Sector, processing efficiency is lower; when the target addresses are spread across more Sectors, processing efficiency is higher.
 
 This principle explains phenomenon 2. Taking int32 as an example, a 128B Sector can hold 32 int32 addresses (32 × 4B = 128B). At `target_count = 32`, the 32 addresses all fall within the same Sector; at `target_count = 1`, all threads concentrate on a single address, also within one Sector. Since GM atomic operations are processed at 128B Sector granularity, the target addresses in both cases fall within the same Sector, so processing efficiency is similar. Accordingly, from `target_count = 32` to `target_count = 1`, the time does not continue to increase but tends to saturate (2233.62 μs and 2136.16 μs are basically level).
 

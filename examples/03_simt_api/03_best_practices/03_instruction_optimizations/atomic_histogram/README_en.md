@@ -78,7 +78,7 @@ Both Cases use the same number of thread blocks and threads, with identical inpu
 |:---:|:---:|:---:|:---:|
 | 0 | GM | uint32_t | 64×2048 |
 
-**Core Implementation**: Launches 64 thread blocks, each with 2048 threads. Each thread traverses input bytes with a fixed stride across the grid, incrementing the corresponding bin of the GM histogram via [asc_atomic_add()](../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md). All 262144 atomic updates are concentrated on 256 GM addresses.
+**Core Implementation**: Launches 64 thread blocks, each with 2048 threads. Each thread traverses input bytes with a fixed stride across the grid, incrementing the corresponding bin of the GM histogram via [asc_atomic_add()](../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md). All 262144 atomic updates are concentrated on 256 GM addresses.
 
 In Case 0, each thread directly performs atomic accumulation on the global histogram in GM. The execution flow is shown in the figure below.
 
@@ -123,7 +123,7 @@ For details on the above two principles, see the [atomic_add_perf sample](../../
 |:---:|:---:|:---:|:---:|
 | 1 | UB block-local accumulation + GM merge | uint32_t | 64×2048 |
 
-**Core Implementation**: Launches 64 thread blocks, each with 2048 threads. Each thread block maintains a 256-bin histogram in UB. First, initialize all bins of the UB histogram to 0 collaboratively and synchronize via `asc_syncthreads()` to ensure all threads complete the zeroing before accumulation begins; then each thread traverses input bytes with a fixed stride across the grid, performing [asc_atomic_add()](../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md) on the Block-private UB histogram for atomic increment, and synchronize again via `asc_syncthreads()` after accumulation to ensure the UB count results are complete before merging to GM; finally, the first 256 threads atomically accumulate the UB histogram results to the final GM histogram.
+**Core Implementation**: Launches 64 thread blocks, each with 2048 threads. Each thread block maintains a 256-bin histogram in UB. First, initialize all bins of the UB histogram to 0 collaboratively and synchronize via `asc_syncthreads()` to ensure all threads complete the zeroing before accumulation begins; then each thread traverses input bytes with a fixed stride across the grid, performing [asc_atomic_add()](../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md) on the Block-private UB histogram for atomic increment, and synchronize again via `asc_syncthreads()` after accumulation to ensure the UB count results are complete before merging to GM; finally, the first 256 threads atomically accumulate the UB histogram results to the final GM histogram.
 
 In Case 1, each thread block maintains an independent histogram in UB and merges the results to GM at the end. The execution flow is shown in the figure below.
 

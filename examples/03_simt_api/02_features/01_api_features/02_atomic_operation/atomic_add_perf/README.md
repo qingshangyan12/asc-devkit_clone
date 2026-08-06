@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以[asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md)接口为例，通过五组对照实验，展示不同内存空间（Global Memory / Unified Buffer）、不同原子累加组织方式（直接原子加 / 线程块内先累加再写回GM）、是否使用返回值、同一地址上的竞争强度，以及数据类型（int32 / int64）等不同使用场景下的接口性能差异，并给出相应的优化指导。
+本样例以[asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md)接口为例，通过五组对照实验，展示不同内存空间（Global Memory / Unified Buffer）、不同原子累加组织方式（直接原子加 / 线程块内先累加再写回GM）、是否使用返回值、同一地址上的竞争强度，以及数据类型（int32 / int64）等不同使用场景下的接口性能差异，并给出相应的优化指导。
 
 ## 支持的产品
 
@@ -300,7 +300,7 @@ int32与int64在四档竞争强度下的耗时对比如下图（纵轴为耗时�
 
 **原理：GM原子操作以Sector为粒度。**
 
-原子加访问GM地址时，会经过L2缓存层级，由L2侧的原子处理单元完成“读—算—写”。L2 Cache以512B Cache Line为缓存管理单位，每条Cache Line包含4个连续的128B Sector；GM原子操作以128B Sector为处理粒度。原子操作的目标地址集中在同一个Sector内时，处理效率较低；目标地址分布在更多Sector内时，处理效率较高。
+原子加访问GM地址时，会经过L2缓存层级，在L2侧完成“读—算—写”。L2 Cache以512B Cache Line为缓存管理单位，每条Cache Line包含4个连续的128B Sector；GM原子操作以128B Sector为处理粒度。原子操作的目标地址集中在同一个Sector内时，处理效率较低；目标地址分布在更多Sector内时，处理效率较高。
 
 这一原理解释了现象2。以int32为例，一个128B Sector可容纳32个int32地址（32 × 4B = 128B）。`target_count = 32`时，32个地址恰好全部位于同一个Sector内；`target_count = 1`时，所有线程集中到唯一一个地址，同样位于一个Sector内。由于GM原子操作以128B Sector为处理粒度，两种情形的目标地址均位于同一个Sector内，因此处理效率接近。相应地，从`target_count = 32`到`target_count = 1`，耗时未继续增加，而是趋于饱和（2233.62μs与2136.16μs基本持平）。
 
