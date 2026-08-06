@@ -836,24 +836,16 @@ HcclResult HcclGetAlgRes(
             aicpuRet, size, *resCtxSequence);
         CHK_RET(aicpuRet);
     } else if (param.engine == COMM_ENGINE_CCU) {
-        if (std::string(param.algName).find("Ins") == 0) {
-            bool increCreateChannelFlag = false;
-            HcclResult aicpuRet = GetAlgResAICPU(
-                comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size,
-                increCreateChannelFlag);
-            CHK_RET(aicpuRet);
-        } else {
-            HCCL_INFO(
-                "[asc][AlgoResource][HcclGetAlgRes] before GetAlgResCcu, opType[%d], algTag[%s].", param.opType,
-                param.algTag);
-            HcclResult ccuRet =
-                GetAlgResCcu(comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size);
-            HCCL_INFO(
-                "[asc][AlgoResource][HcclGetAlgRes] after GetAlgResCcu, ret[%d], ctxSize[%llu], "
-                "resCtxSequence[%p].",
-                ccuRet, size, *resCtxSequence);
-            CHK_RET(ccuRet);
-        }
+        HCCL_INFO(
+            "[asc][AlgoResource][HcclGetAlgRes] before GetAlgResCcu, opType[%d], algTag[%s].", param.opType,
+            param.algTag);
+        HcclResult ccuRet =
+            GetAlgResCcu(comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size);
+        HCCL_INFO(
+            "[asc][AlgoResource][HcclGetAlgRes] after GetAlgResCcu, ret[%d], ctxSize[%llu], "
+            "resCtxSequence[%p].",
+            ccuRet, size, *resCtxSequence);
+        CHK_RET(ccuRet);
     } else {
         HCCL_ERROR("fail to get engine.", HCCL_E_PARA);
     }
