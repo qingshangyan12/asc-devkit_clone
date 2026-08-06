@@ -372,8 +372,9 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
         HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == AICPU_TS!");
         CHK_RET(AllocComResourceByTilingAicpu(
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
-    } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
-        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_SCHED!");
+    } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_MS) ||
+               commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine is a CCU engine!");
         if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
             HCCL_INFO("[HcclAllocComResourceByTiling]Current ccu algorithm is not supported in mc2_client.");
             return HCCL_E_ALG_NOT_SUPPORTED;

@@ -84,11 +84,20 @@ set(HCCL_CHECKER_COMMON_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/aiv
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/executor
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/selector
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu/kernel
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/executor
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel
     ${UTILS_DIR}/sim_world
     ${UTILS_DIR}/common/utils
     ${UTILS_DIR}/common/exception
