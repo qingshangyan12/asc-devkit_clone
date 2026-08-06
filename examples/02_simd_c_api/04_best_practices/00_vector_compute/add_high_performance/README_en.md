@@ -2,9 +2,11 @@
 
 ## Overview
 
-This sample implements half-precision element-wise Add with the Ascend C C API. It provides a single-buffer baseline and a Ping-Pong double-buffer scenario. Both scenarios use the same inputs, core count, tiling, and vector arithmetic so that the effect of overlapping GM/UB data movement with Vector computation can be compared directly.
+This sample implements float16 element-wise Add with the Ascend C C API. It provides a single-buffer baseline and a Ping-Pong double-buffer scenario. Both scenarios use the same inputs, core count, tiling, and vector arithmetic so that the effect of overlapping GM/UB data movement with Vector computation can be compared directly.
 
 ## Supported Products and CANN Versions
+
+**Table 1**  Supported Products and CANN Versions
 
 | Product | CANN Version |
 | --- | --- |
@@ -15,7 +17,7 @@ This sample implements half-precision element-wise Add with the Ascend C C API. 
 ```text
 add_high_performance
 |-- figures
-|   `-- DoubleBuffer.png     # Double-buffer pipeline diagram
+|   `-- double_buffer.png    # Double-buffer pipeline diagram
 |-- scripts
 |   |-- gen_data.py          # Generates input and golden data
 |   `-- verify_result.py     # Verifies the output
@@ -28,7 +30,7 @@ add_high_performance
 
 ## Sample Description
 
-The sample performs element-wise addition on two half matrices with shape `[8192, 8192]`:
+The sample performs element-wise addition on two float16 matrices with shape `[8192, 8192]`:
 
 ```text
 z = x + y
@@ -36,48 +38,56 @@ z = x + y
 
 The input, output, and golden data used for accuracy verification are listed below. All data is stored contiguously in ND format in GM.
 
+**Table 2**  Input and Output Data Specifications
+
 | Data | Input/Output | Data file | Data type | Shape | Description |
 | --- | --- | --- | --- | --- | --- |
-| x | Input | `input/input_x.bin` | half | `[8192, 8192]` | Randomly generated in the range `[1, 100)` |
-| y | Input | `input/input_y.bin` | half | `[8192, 8192]` | Randomly generated in the range `[1, 100)` |
-| z | Output | `output/output.bin` | half | `[8192, 8192]` | Result computed by the Kernel |
-| golden | Golden data | `output/golden.bin` | half | `[8192, 8192]` | Generated using `(x + y).astype(np.float16)` |
+| x | Input | `input/input_x.bin` | float16 | `[8192, 8192]` | Randomly generated in the range `[1, 100)`. |
+| y | Input | `input/input_y.bin` | float16 | `[8192, 8192]` | Randomly generated in the range `[1, 100)`. |
+| z | Output | `output/output.bin` | float16 | `[8192, 8192]` | Result computed by the Kernel |
+| golden | Golden data | `output/golden.bin` | float16 | `[8192, 8192]` | Generated using `(x + y).astype(np.float16)`. |
 
 Both scenarios use the same multicore partitioning and tile size. The matrix is evenly partitioned along the M axis across 64 cores. Each core processes 128 contiguous rows, or 1048576 elements, in 49 iterations: 48 full-tile iterations followed by one tail iteration.
+
+**Table 3**  Multicore Partitioning and Tile Parameters
 
 | Parameter | Value | Description |
 | --- | --- | --- |
 | Total matrix elements | 67108864 | `8192 * 8192` |
-| Number of cores | 64 | Each core processes a contiguous range along the M axis |
+| Number of cores | 64 | Each core processes a contiguous range along the M axis. |
 | Rows per core | 128 | `8192 / 64` |
 | Elements per core | 1048576 | `128 * 8192` |
 | Iterations per core | 49 | 48 full tiles and one tail tile |
-| Valid elements in a full tile | 21760 | Corresponds to `DATA_COPY_LENGTH` |
+| Valid elements in a full tile | 21760 | Corresponds to `DATA_COPY_LENGTH`. |
 | Valid elements in the tail tile | 4096 | `1048576 - 48 * 21760` |
-| Reserved length of each UB buffer | 21840 half elements | Corresponds to `MAX_DATA_COPY_LENGTH` and defines the UB address range of each buffer |
-| VF vector length | 256 bytes | Processes 128 half elements at a time; a full tile uses 170 VF iterations and the tail tile uses 32 |
+| Reserved length of each UB buffer | 21840 float16 elements | Corresponds to `MAX_DATA_COPY_LENGTH` and defines the UB address range of each buffer. |
+| VF vector length | 256 bytes | Processes 128 float16 elements at a time; a full tile uses 170 VF iterations and the tail tile uses 32. |
 
 The `SCENARIO_NUM` build option selects the single-buffer baseline or the Ping-Pong double-buffer optimization. Both scenarios use identical input data, multicore partitioning, tile size, and vector computation. They differ only in the number of UB buffers and pipeline synchronization.
 
+**Table 4**  Scenario Configuration
+
 | `SCENARIO_NUM` | Kernel | Scenario | UB buffer configuration | UB address space | Pipeline behavior |
 | --- | --- | --- | --- | --- | --- |
-| 0 | `add_baseline` | Single-buffer baseline | One x/y/z buffer group | `3 * 21840 * sizeof(half)` = 131040 bytes | Completes load, compute, and store before processing the next tile |
-| 1 | `add_double_buffer` | Double-buffer optimization | Ping/Pong x/y/z buffer groups | `6 * 21840 * sizeof(half)` = 262080 bytes | MTE2, Vector, and MTE3 process different tiles with cross-iteration overlap |
+| 0 | `add_baseline` | Single-buffer baseline | One x/y/z buffer group | `3 * 21840 * sizeof(half)` = 131040 bytes | Completes load, compute, and store before processing the next tile. |
+| 1 | `add_double_buffer` | Double-buffer optimization | Ping/Pong x/y/z buffer groups | `6 * 21840 * sizeof(half)` = 262080 bytes | MTE2, Vector, and MTE3 process different tiles with cross-iteration overlap. |
 
 ### Scenario 0: Single-Buffer Baseline
 
-The baseline Kernel, `add_baseline`, allocates only one x/y/z buffer group. The three buffers are contiguous in UB. Each buffer reserves 21840 half elements, while the current iteration accesses only the valid elements specified by `current_length`.
+The baseline Kernel, `add_baseline`, allocates only one x/y/z buffer group. The three buffers are contiguous in UB. Each buffer reserves 21840 float16 elements, while the current iteration accesses only the valid elements specified by `current_length`.
 
-| UB buffer | Start offset (half elements) | Valid elements in a full tile | Purpose |
+**Table 5**  Single-Buffer UB Layout
+
+| UB buffer | Start offset (float16 elements) | Valid elements in a full tile | Purpose |
 | --- | --- | --- | --- |
-| `x_local` | 0 | 21760 | Stores x loaded from GM for the current iteration |
-| `y_local` | 21840 | 21760 | Stores y loaded from GM for the current iteration |
-| `z_local` | 43680 | 21760 | Stores the Add result for the current iteration |
+| `x_local` | 0 | 21760 | Stores x loaded from GM for the current iteration. |
+| `y_local` | 21840 | 21760 | Stores y loaded from GM for the current iteration. |
+| `z_local` | 43680 | 21760 | Stores the Add result for the current iteration. |
 
 Each iteration processes one tile in the following order:
 
 1. The MTE2 pipeline calls `asc_copy_gm2ub_align` twice to load the current x and y tiles from GM to UB.
-2. The `MTE2 -> V` synchronization ensures that both inputs have been loaded before the Vector pipeline calls `add_vf`. A full tile executes 170 `asc_add` operations in groups of 128 half elements, while the tail tile executes 32 operations.
+2. The `MTE2 -> V` synchronization ensures that both inputs have been loaded before the Vector pipeline calls `add_vf`. A full tile executes 170 `asc_add` operations in groups of 128 float16 elements, while the tail tile executes 32 operations.
 3. The `V -> MTE3` synchronization ensures that computation has finished before the MTE3 pipeline calls `asc_copy_ub2gm_align` to store z from UB to GM.
 4. At the end of every iteration, `asc_sync_pipe(PIPE_ALL)` waits for MTE2, Vector, and MTE3 to finish before the next iteration can overwrite the same UB addresses.
 
@@ -87,19 +97,23 @@ Therefore, while the Vector pipeline is computing iteration n, MTE2 cannot load 
 
 The optimized Kernel, `add_double_buffer`, divides UB into two independent x/y/z buffer groups. Even-numbered iterations use Ping with `EVENT_ID0`, while odd-numbered iterations use Pong with `EVENT_ID1`. Adjacent iterations therefore do not access the same UB addresses.
 
+**Table 6**  Ping-Pong Buffer Layout
+
 | Iteration | Buffer group | Event ID | x start offset | y start offset | z start offset |
 | --- | --- | --- | --- | --- | --- |
 | Even | Ping | `EVENT_ID0` | 0 | 21840 | 43680 |
 | Odd | Pong | `EVENT_ID1` | 65520 | 87360 | 109200 |
 
-All offsets in the table are measured in half elements. Each group still reserves 21840 half elements for each of x, y, and z, so the data movement and Vector workload per iteration are identical to the baseline. The difference is that the optimized Kernel does not perform a full pipeline synchronization at the end of each iteration. Instead, `asc_sync_notify` and `asc_sync_wait` manage the producer-consumer dependencies of each buffer group independently.
+All offsets in the table are measured in float16 elements. Each group still reserves 21840 float16 elements for each of x, y, and z, so the data movement and Vector workload per iteration are identical to the baseline. The difference is that the optimized Kernel does not perform a full pipeline synchronization at the end of each iteration. Instead, `asc_sync_notify` and `asc_sync_wait` manage the producer-consumer dependencies of each buffer group independently.
+
+**Table 7**  Double-Buffer Synchronization Dependencies
 
 | Synchronization direction | Enforced dependency | Buffer reuse condition |
 | --- | --- | --- |
-| `MTE2 -> V` | Vector can read x and y only after they have been loaded | Prevents Vector from reading incomplete input data |
-| `V -> MTE2` | MTE2 can load subsequent data into an input group only after Vector has finished reading x and y | Prevents MTE2 from overwriting inputs still in use |
-| `V -> MTE3` | MTE3 can store z only after Vector has finished writing the result | Prevents MTE3 from storing an incomplete result |
-| `MTE3 -> V` | Vector can write to an output group again only after MTE3 has finished storing z | Prevents Vector from overwriting a result still being stored |
+| `MTE2 -> V` | Vector can read x and y only after they have been loaded. | Prevents Vector from reading incomplete input data. |
+| `V -> MTE2` | MTE2 can load subsequent data into an input group only after Vector has finished reading x and y. | Prevents MTE2 from overwriting inputs still in use. |
+| `V -> MTE3` | MTE3 can store z only after Vector has finished writing the result. | Prevents MTE3 from storing an incomplete result. |
+| `MTE3 -> V` | Vector can write to an output group again only after MTE3 has finished storing z. | Prevents Vector from overwriting a result still being stored. |
 
 Before entering the loop, the Kernel marks both input and output buffer groups as available. During the loop, each iteration waits only for the state associated with its Event ID. As soon as Vector finishes reading one x/y group, it notifies MTE2 that the input buffers can be reused without waiting for z in the same group to be stored. After all 49 iterations have been issued, the Kernel waits for both Event ID groups and calls `asc_sync_pipe(PIPE_ALL)` once to ensure that the final data movement and computation have completed.
 
@@ -107,16 +121,18 @@ For example, iteration 0 uses Ping, iteration 1 uses Pong, and iteration 2 reuse
 
 The main differences between the two scenarios are summarized below.
 
+**Table 8**  Single-Buffer and Double-Buffer Comparison
+
 | Comparison | Scenario 0: Single-buffer baseline | Scenario 1: Ping-Pong double buffering |
 | --- | --- | --- |
 | UB buffers | One x/y/z group, 131040 bytes | Two x/y/z groups, 262080 bytes |
-| Addresses used by adjacent iterations | The same; reuse waits for the previous iteration to finish | Different; alternates between Ping and Pong |
-| End-of-iteration synchronization | Calls `asc_sync_pipe(PIPE_ALL)` in every iteration | Uses two Event ID groups for local dependencies and performs one full synchronization after all iterations |
-| Cross-iteration pipeline overlap | Not supported | MTE2, Vector, and MTE3 can process different iterations |
-| Optimization cost | Lower UB usage | Doubles the UB address space to enable pipeline overlap |
+| Addresses used by adjacent iterations | The same; reuse waits for the previous iteration to finish. | Different; alternates between Ping and Pong. |
+| End-of-iteration synchronization | Calls `asc_sync_pipe(PIPE_ALL)` in every iteration. | Uses two Event ID groups for local dependencies and performs one full synchronization after all iterations. |
+| Cross-iteration pipeline overlap | Not supported | MTE2, Vector, and MTE3 can process different iterations. |
+| Optimization cost | Lower UB usage | Doubles the UB address space to enable pipeline overlap. |
 
 <p align="center">
-  <img src="figures/DoubleBuffer.png" width="50%">
+  <img src="figures/double_buffer.png" width="50%">
 </p>
 
 ## Performance Comparison
@@ -149,7 +165,9 @@ python3 ../scripts/gen_data.py
 python3 ../scripts/verify_result.py output/output.bin output/golden.bin
 ```
 
-Set `SCENARIO_NUM=1` and rerun CMake, build, execution, and verification to test the double-buffer scenario. Clear the CMake cache before switching run modes.
+Set `SCENARIO_NUM=1` and rerun CMake, build, execution, and verification to test the double-buffer scenario. Clear the CMake cache before switching scenarios.
+
+**Table 9**  Build Options
 
 | Build option | Values | Description |
 | --- | --- | --- |
