@@ -2,7 +2,7 @@
 
 本节介绍CPU域调试的方法：CPU侧验证核函数，gdb调试、使用printf命令打印。当前SIMT编程场景不支持。
 
->[!NOTE] 说明
+>[!NOTE]说明
 >CPU调测过程中，配置日志相关环境变量，可以记录程序的运行过程及异常信息，有助于开发者进行功能调测。
 >关于环境变量的使用约束以及详细说明，可参见[《环境变量参考》](https://www.hiascend.com/document/redirect/CannCommunityEnvRef)中“辅助功能 \> 日志”章节。
 
@@ -15,17 +15,7 @@
 
 推荐使用CMake编译方式，可在最小化修改的情况下快速开启CPU域孪生调试功能。
 
-1.  启用CPU域调试需包含"cpu\_debug\_launch.h"头文件。
-
-    bisheng编译器在CPU调试模式下会对<<<\>\>\>调用核函数的过程进行转义，实现核函数在CPU域下的调用，相关调用函数定义在"cpu\_debug\_launch.h"中，在使用<<<\>\>\>语法调用核函数的源文件中，请通过以下方式包含必需的头文件：
-
-    ```
-    #ifdef ASCENDC_CPU_DEBUG
-    #include "cpu_debug_launch.h"
-    #endif
-    ```
-
-2.  通过在CMake配置阶段传入变量CMAKE\_ASC\_RUN\_MODE和CMAKE\_ASC\_ARCHITECTURES即可开启CPU域编译。命令示例如下：
+1.  通过在CMake配置阶段传入变量CMAKE\_ASC\_RUN\_MODE和CMAKE\_ASC\_ARCHITECTURES即可开启CPU域编译。命令示例如下：
 
     ```
     cmake -B build -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201
@@ -35,7 +25,7 @@
 
     其他CMakeLists.txt项目配置[通过CMake编译](../../编译与运行/算子编译/AI-Core算子编译基本用法.md#ZH-CN_TOPIC_0000002428982142)进行编写。
 
->[!NOTE] 说明 
+>[!NOTE]说明 
 >为了实现CPU域与NPU域代码归一，框架在CPU域中仅对部分acl接口进行适配，开发者在使用CPU域调测功能时，仅支持使用如下acl接口，并且不支持用户自行链接**ascendcl库**：
 >- 有实际功能接口，支持CPU域调用
 >    - aclDataTypeSize、aclFloat16ToFloat、aclFloatToFloat16。

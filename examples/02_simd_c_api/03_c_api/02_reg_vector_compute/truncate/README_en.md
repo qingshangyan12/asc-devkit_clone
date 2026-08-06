@@ -1,13 +1,13 @@
 ﻿# truncate Example
 
 ## Overview
-This example implements the Truncate operation based on the C API programming interface, which truncates floating-point numbers in a vector data register to integer values. It primarily calls the [asc_floor](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_type_convert/asc_floor.md) API.
+This example implements the Truncate operation based on the C API programming interface, which truncates floating-point numbers in a vector data register to integer values. It primarily calls the [asc_floor](../../../../../docs/zh/api/SIMD-API/c_api/reg/data_type_convert/asc_floor.md) API.
 
 ## Supported Products and CANN Versions
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```

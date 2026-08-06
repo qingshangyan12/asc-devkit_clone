@@ -18,6 +18,9 @@ set(ASCENDC_UTILS_INCLUDE ${ASCENDC_DIR}/include/utils)
 
 set(PRODUCT_TYPE_LIST_INIT ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend950pr_9599_AIC ascend950pr_9599_AIV ascend310B1 KirinX90_AIV Kirin9030_AIV)
 set(PRODUCT_TYPE_LIST ${PRODUCT_TYPE_LIST_INIT} CACHE STRING "Supported product types")
+set(TILING_PRODUCT_TYPE_LIST ${PRODUCT_TYPE_LIST})
+# The shared tiling cases assert server-side matmul parameters and are not valid for Kirin platforms.
+list(REMOVE_ITEM TILING_PRODUCT_TYPE_LIST KirinX90_AIV Kirin9030_AIV)
 
 set(ASCENDC_DEP_HEADER_DIR
     ${ASCEND_CANN_PACKAGE_PATH}/include
@@ -188,7 +191,6 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/test_matmul_shape_info.cpp
     matmul/test_matmul_shape_info_left.cpp
     hccl/test_hccl.cpp
-    hcomm/test_hcomm.cpp
     matmul/copy_cube_in/test_copy_cube_in_norm.cpp
     matmul/copy_cube_in/test_copy_cube_in_mdl.cpp
     matmul/copy_cube_in/test_copy_cube_in_params.cpp
@@ -454,8 +456,6 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
     hccl/test_hccl_aicpu_950.cpp
-    hcomm/test_hcomm_roce_950.cpp
-    hcomm/test_hcomm_urma_950.cpp
 )
 
 # ascend310B1 test cases
@@ -564,7 +564,7 @@ file(GLOB ASCENDC_TILING_SRC_FILES
 )
 
 # ascendc_tiling_utest
-foreach(product_type ${PRODUCT_TYPE_LIST})
+foreach(product_type ${TILING_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_adv_api_tiling_${product_type}
         ${ASCENDC_DIR}/tests/main.cpp
         ../common/platform_stub.cpp
@@ -634,5 +634,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
 endforeach()
 
 add_subdirectory(hccl/cc)
+add_subdirectory(hccl/ccu)
 
 add_subdirectory(api_host_check)
