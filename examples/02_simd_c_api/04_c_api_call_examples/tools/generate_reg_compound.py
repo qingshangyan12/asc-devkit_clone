@@ -170,6 +170,8 @@ int main()
         even_device.Get(), odd_device.Get(), src0_device.Get(), src1_device.Get());
     if (!CApiExample::CheckAcl(aclrtSynchronizeDevice(), "aclrtSynchronizeDevice") ||
         !even_device.CopyTo(even) || !odd_device.CopyTo(odd)) return 1;
+    CApiExample::Print("Input 0", src0);
+    CApiExample::Print("Input 1", src1);
     CApiExample::Print("asc_exp_sub output", even);
     CApiExample::Print("asc_exp_sub_v2 output", odd);
     CApiExample::Print("Golden", golden);

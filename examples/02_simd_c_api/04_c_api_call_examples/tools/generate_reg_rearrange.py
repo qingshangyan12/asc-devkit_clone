@@ -11,6 +11,8 @@ PREFIX = "examples/02_simd_c_api/04_c_api_call_examples"
 def source(api: str) -> str:
     rel = f"reg/data_rearrange/{api}"
     kernel = "".join(x.capitalize() for x in api.split("_")) + "Kernel"
+    mask_calls = "\n".join(
+        f"    {api}_{width}(mask_dst0, mask_dst1, mask, mask);" for width in ("b8", "b16", "b32"))
     golden = (
         "for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {\n"
         "        const uint32_t combined_index = 2 * i;\n"
@@ -43,6 +45,8 @@ __simd_vf__ inline void Rearrange(__ubuf__ float* dst0, __ubuf__ float* dst1,
     vector_float dst0_reg, dst1_reg, src0_reg, src1_reg;
     uint32_t count = ELEMENT_COUNT;
     vector_bool mask = asc_update_mask_b32(count);
+    vector_bool mask_dst0, mask_dst1;
+{mask_calls}
     asc_loadalign(src0_reg, src0);
     asc_loadalign(src1_reg, src1);
     {api}(dst0_reg, dst1_reg, src0_reg, src1_reg);
@@ -84,6 +88,8 @@ int main()
     {kernel}<<<1, 0>>>(dst0_device.Get(), dst1_device.Get(), src0_device.Get(), src1_device.Get());
     if (!CApiExample::CheckAcl(aclrtSynchronizeDevice(), "aclrtSynchronizeDevice") ||
         !dst0_device.CopyTo(output0) || !dst1_device.CopyTo(output1)) return 1;
+    CApiExample::Print("Input 0", src0);
+    CApiExample::Print("Input 1", src1);
     CApiExample::Print("Output 0", output0);
     CApiExample::Print("Golden 0", golden0);
     CApiExample::Print("Output 1", output1);

@@ -97,9 +97,9 @@ int main()
         !low_device.CopyTo(low) || !high_device.CopyTo(high)) return 1;
     CApiExample::Print("Input", src);
     CApiExample::Print("Low output", low);
-    CApiExample::Print("Low golden", golden_low);
+    CApiExample::Print("Low Golden", golden_low);
     CApiExample::Print("High output", high);
-    CApiExample::Print("High golden", golden_high);
+    CApiExample::Print("High Golden", golden_high);
     const bool passed = {check};
     std::cout << (passed ? "[Success] {names} passed." : "[Failed] {names} failed.") << std::endl;
     return passed ? 0 : 1;
@@ -170,7 +170,9 @@ int main()
         !lower_device.CopyTo(lower) || !upper_device.CopyTo(upper)) return 1;
     CApiExample::Print("Input", src);
     CApiExample::Print("Lower output", lower);
+    CApiExample::Print("Lower Golden", golden_lower);
     CApiExample::Print("Upper output", upper);
+    CApiExample::Print("Upper Golden", golden_upper);
     const bool passed = CApiExample::Compare(lower, golden_lower) && CApiExample::Compare(upper, golden_upper);
     std::cout << (passed ? "[Success] asc_unpack_lower/asc_unpack_upper passed."
                          : "[Failed] asc_unpack_lower/asc_unpack_upper failed.") << std::endl;
@@ -212,6 +214,7 @@ __global__ __vector__ void AscUnsqueezeKernel(__gm__ uint32_t* dst)
 }} // namespace
 int main()
 {{
+    std::vector<uint32_t> input = {{ELEMENT_COUNT}};
     std::vector<uint32_t> output(ELEMENT_COUNT, 0), golden(ELEMENT_COUNT);
     for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) golden[i] = i;
     CApiExample::Runtime runtime;
@@ -220,6 +223,7 @@ int main()
     if (!dst_device.Allocate("aclrtMalloc(dst)")) return 1;
     AscUnsqueezeKernel<<<1, 0>>>(dst_device.Get());
     if (!CApiExample::CheckAcl(aclrtSynchronizeDevice(), "aclrtSynchronizeDevice") || !dst_device.CopyTo(output)) return 1;
+    CApiExample::Print("Input mask count", input);
     CApiExample::Print("Output", output);
     CApiExample::Print("Golden", golden);
     const bool passed = CApiExample::Compare(output, golden);
