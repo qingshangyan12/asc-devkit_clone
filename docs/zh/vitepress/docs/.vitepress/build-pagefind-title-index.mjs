@@ -15,10 +15,17 @@ import { gunzipSync } from 'node:zlib'
 import { load } from 'cheerio'
 import { createIndex } from 'pagefind'
 
+import {
+  findKernelLaunch,
+  KERNEL_LAUNCH_TOKEN,
+  kernelLaunchMatches,
+} from './search-syntax.mjs'
+
 const CJK_PHRASE_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]{2,}/g
 const IDENTIFIER_REGEX = /[A-Za-z_][A-Za-z0-9_]*(?:_[A-Za-z0-9_]+)+/g
 const FORMAT_CHARACTER_REGEX = /[\u200b-\u200d\u2060\ufeff]/g
 const MAX_IDENTIFIER_ROUTES = 8
+const MAX_SPECIAL_SYNTAX_ROUTES = 20
 const PAGE_RANK_DAMPING = 0.85
 const PAGE_RANK_ITERATIONS = 60
 const PAGE_RANK_TOLERANCE = 1e-12
@@ -67,8 +74,15 @@ function identifierMatches(content) {
     })
 }
 
+function searchTokenMatches(content) {
+  return [
+    ...identifierMatches(content),
+    ...kernelLaunchMatches(content).map(() => KERNEL_LAUNCH_TOKEN),
+  ]
+}
+
 function extractIdentifiers(content) {
-  return [...new Set(identifierMatches(content))]
+  return [...new Set(searchTokenMatches(content))]
 }
 
 function normalizeRoute(route) {
@@ -112,7 +126,9 @@ function identifierExcerpt(content, identifier) {
     .replace(FORMAT_CHARACTER_REGEX, '')
     .replace(/\s+/g, ' ')
     .trim()
-  const position = text.toLocaleLowerCase().indexOf(identifier)
+  const position = identifier === KERNEL_LAUNCH_TOKEN
+    ? findKernelLaunch(text)?.index ?? -1
+    : text.toLocaleLowerCase().indexOf(identifier)
   if (position < 0) return ''
   if (text.length <= MAX_EXCERPT_LENGTH) return text
 
@@ -123,7 +139,7 @@ function identifierExcerpt(content, identifier) {
   return `${start > 0 ? '...' : ''}${excerpt}`
 }
 
-function contextScore(field, excerpt, identifier) {
+function contextScore(field, excerpt, identifier, section = '') {
   const fieldScore = {
     catalogDefinition: 700,
     definition: 650,
@@ -133,20 +149,26 @@ function contextScore(field, excerpt, identifier) {
     heading: 200,
     code: 50,
   }[field] || 0
-  const position = excerpt.toLocaleLowerCase().indexOf(identifier)
+  const position = identifier === KERNEL_LAUNCH_TOKEN
+    ? findKernelLaunch(excerpt)?.index ?? -1
+    : excerpt.toLocaleLowerCase().indexOf(identifier)
+  const sectionOwnsToken = identifier === KERNEL_LAUNCH_TOKEN
+    ? Boolean(findKernelLaunch(section))
+    : section.toLocaleLowerCase().includes(identifier)
   const hasExplanation = excerpt.length >= identifier.length + 12
   return fieldScore
+    + (sectionOwnsToken ? 800 : 0)
     + (hasExplanation ? 100 : 0)
     + (position >= 0 && position <= 2 ? 40 : 0)
     + Math.min(excerpt.length, MAX_EXCERPT_LENGTH) / MAX_EXCERPT_LENGTH
 }
 
 function addIdentifierContext(signals, content, field, section = '') {
-  for (const identifier of new Set(identifierMatches(content))) {
+  for (const identifier of new Set(searchTokenMatches(content))) {
     if (!signals.has(identifier)) signals.set(identifier, createIdentifierSignal())
     const signal = signals.get(identifier)
     const excerpt = identifierExcerpt(content, identifier)
-    const score = contextScore(field, excerpt, identifier)
+    const score = contextScore(field, excerpt, identifier, section)
     if (excerpt && score > signal.excerptScore) {
       signal.excerpt = excerpt
       signal.excerptScore = score
@@ -156,7 +178,7 @@ function addIdentifierContext(signals, content, field, section = '') {
 }
 
 function addIdentifierSignals(signals, content, field, section = '') {
-  for (const identifier of identifierMatches(content)) {
+  for (const identifier of searchTokenMatches(content)) {
     if (!signals.has(identifier)) signals.set(identifier, createIdentifierSignal())
     signals.get(identifier)[field]++
   }
@@ -165,11 +187,14 @@ function addIdentifierSignals(signals, content, field, section = '') {
 
 function addDefinitionSignal(signals, content, field = 'definition', section = '') {
   const text = String(content || '').replace(FORMAT_CHARACTER_REGEX, '').trim()
-  const identifier = identifierMatches(text)[0]
+  const identifier = searchTokenMatches(text)[0]
   if (!identifier) return
-  const start = text.toLocaleLowerCase().indexOf(identifier)
-  const suffix = text.slice(start + identifier.length).trimStart()
-  const isStandalone = compactIdentifier(text) === compactIdentifier(identifier)
+  const match = identifier === KERNEL_LAUNCH_TOKEN ? findKernelLaunch(text) : null
+  const start = match?.index ?? text.toLocaleLowerCase().indexOf(identifier)
+  const suffix = text.slice(start + (match?.value.length || identifier.length)).trimStart()
+  const isStandalone = match
+    ? text === match.value
+    : compactIdentifier(text) === compactIdentifier(identifier)
   const isLeadingDefinition = start === 0 && /^[:\uFF1A\-\u2013\u2014]/.test(suffix)
   if (!isStandalone && !isLeadingDefinition) return
   if (!signals.has(identifier)) signals.set(identifier, createIdentifierSignal())
@@ -231,7 +256,8 @@ function identifierRelevance(identifier, record, analysis) {
   const titleKey = compactIdentifier(record.meta.title)
   const leaf = routeSegments(record.url).at(-1) || ''
   const leafKey = compactIdentifier(leaf)
-  const exactOwner = titleKey === key || leafKey === key
+  const exactOwner = (key.length > 0 && (titleKey === key || leafKey === key))
+    || (identifier === KERNEL_LAUNCH_TOKEN && signal.heading > 0)
   const partialOwner = key.length >= 4 && (titleKey.includes(key) || leafKey.includes(key))
   const coverage = identifierIdentityCoverage(identifier, analysis.identityTokens)
   const nonCodeCount = signal.heading + signal.catalogDefinition + signal.definition
@@ -352,7 +378,9 @@ async function analyzeRecord(sourceDirectory, record) {
 
   const articleText = article.text().normalize('NFKC').toLocaleLowerCase()
   for (const [identifier, signal] of signals) {
-    const position = articleText.indexOf(identifier)
+    const position = identifier === KERNEL_LAUNCH_TOKEN
+      ? findKernelLaunch(articleText)?.index ?? -1
+      : articleText.indexOf(identifier)
     signal.first = position < 0 ? 1 : position / Math.max(1, articleText.length)
   }
   for (const identifier of record.identifiers) {
@@ -490,7 +518,7 @@ function createIdentifierIndex(records, analyses, pageRanks) {
         || right.relevance - left.relevance
         || right.authority - left.authority
         || records[left.pageId].url.localeCompare(records[right.pageId].url))
-      .slice(0, MAX_IDENTIFIER_ROUTES)
+      .slice(0, key === KERNEL_LAUNCH_TOKEN ? MAX_SPECIAL_SYNTAX_ROUTES : MAX_IDENTIFIER_ROUTES)
     const pageIds = selected.map(candidate => candidate.pageId)
     const contextIds = selected.map(candidate => internSnippet(
       analyses[candidate.pageId].signals.get(key)?.excerpt || ''
@@ -500,7 +528,7 @@ function createIdentifierIndex(records, analyses, pageRanks) {
     ))
     return [key, pageIds, contextIds, selectedSectionIds]
   }).sort((left, right) => left[0] < right[0] ? -1 : left[0] > right[0] ? 1 : 0)
-  return { v: 5, p: pages, i: entries, s: snippets, h: sections }
+  return { v: 6, p: pages, i: entries, s: snippets, h: sections }
 }
 
 function decodeFragment(buffer) {
