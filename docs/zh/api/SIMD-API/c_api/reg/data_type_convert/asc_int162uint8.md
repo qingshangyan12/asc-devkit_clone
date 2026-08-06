@@ -32,15 +32,23 @@
 
 ## 函数原型
 
-```cpp
+```c
 // 非饱和模式，结果写入dst各组内第0个位置，直接截断。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162uint8(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162uint8(vector_uint8_t& dst,
+                                            vector_int16_t src,
+                                            vector_bool mask)
 // 非饱和模式，结果写入dst各组内第1个位置，直接截断。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162uint8_v2(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162uint8_v2(vector_uint8_t& dst,
+                                               vector_int16_t src,
+                                               vector_bool mask)
 // 饱和模式，超出[0, 255]范围的值钳位到边界。结果写入dst各组内第0个位置。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162uint8_sat(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162uint8_sat(vector_uint8_t& dst,
+                                                vector_int16_t src,
+                                                vector_bool mask)
 // 饱和模式，超出[0, 255]范围的值钳位到边界。结果写入dst各组内第1个位置。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162uint8_sat_v2(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162uint8_sat_v2(vector_uint8_t& dst,
+                                                   vector_int16_t src,
+                                                   vector_bool mask)
 ```
 
 ## 参数说明
@@ -61,7 +69,10 @@ __simd_callee__ inline void asc_int162uint8_sat_v2(vector_uint8_t& dst, vector_i
 
 ## 约束说明
 
-mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 本接口数据类型固定不可混用。
+- 同一组源、目、掩码参数下饱和与非饱和函数原型的参数列表完全一致，仅越界处理行为不同。
 
 ## 调用示例
 

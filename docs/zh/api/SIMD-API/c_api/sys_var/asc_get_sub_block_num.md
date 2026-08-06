@@ -26,11 +26,11 @@
 
 ## 功能说明
 
-分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。
+分离模式下，读取当前一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline int64_t asc_get_sub_block_num()
 ```
 
@@ -56,7 +56,8 @@ PIPE_S
 
 ## 约束说明
 
-无
+- 本接口读取的sub_block值保存在只读特殊寄存器中，在kernel启动前配置，kernel运行期间不可修改。
+- 返回值反映当前AI Core的sub_block数量，仅在分离模式下有意义。
 
 ## 调用示例
 

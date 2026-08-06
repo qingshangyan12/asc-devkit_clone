@@ -32,11 +32,15 @@
 
 ## 函数原型
 
-```cpp
+```c
 // 取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
-__simd_callee__ inline void asc_hif82half(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
+__simd_callee__ inline void asc_hif82half(vector_half& dst,
+                                          vector_hifloat8_t src,
+                                          vector_bool mask)
 // 取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
-__simd_callee__ inline void asc_hif82half_v2(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
+__simd_callee__ inline void asc_hif82half_v2(vector_half& dst,
+                                             vector_hifloat8_t src,
+                                             vector_bool mask)
 ```
 
 ## 参数说明
@@ -57,7 +61,9 @@ __simd_callee__ inline void asc_hif82half_v2(vector_half& dst, vector_hifloat8_t
 
 ## 约束说明
 
-mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口数据类型固定不可混用。
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 ## 调用示例
 

@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_set_ctrl(uint64_t config)
 ```
 

@@ -44,31 +44,43 @@
 
 - 矢量数据寄存器复制到矢量数据寄存器
 
-    ```cpp
-    __simd_callee__ inline void asc_copy(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_half& dst, vector_half src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_float& dst, vector_float src, vector_bool mask)
+    ```c
+    __simd_callee__ inline void asc_copy(vector_<dtype>& dst,
+                                         vector_<dtype> src,
+                                         vector_bool mask)
+    ```
+
+    支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、bfloat16_t、half、int32_t、uint32_t、float。
+
+- 矢量数据寄存器复制到掩码寄存器（**part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**）
+
+    ```c
+    __simd_callee__ inline void asc_copy(vector_bool& dst,
+                                         vector_uint16_t src,
+                                         int16_t part)
+    __simd_callee__ inline void asc_copy(vector_bool& dst,
+                                         vector_uint32_t src,
+                                         int16_t part)
     ```
 
 - 掩码寄存器复制到掩码寄存器
 
-    ```cpp
-    __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src, vector_bool mask)
-    __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src)
+    ```c
+    __simd_callee__ inline void asc_copy(vector_bool& dst,
+                                         vector_bool src,
+                                         vector_bool mask)
+    __simd_callee__ inline void asc_copy(vector_bool& dst,
+                                         vector_bool src)
     ```
 
-- 矢量数据寄存器复制到掩码寄存器（**part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**）
+- 典型示例
 
-    ```cpp
-    __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part)
-    __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part)
-    ```
+```c
+// 示例：对half矢量数据寄存器复制到矢量数据寄存器
+__simd_callee__ inline void asc_copy(vector_half& dst,
+                                     vector_half src,
+                                     vector_bool mask)
+```
 
 ## 参数说明
 
@@ -80,21 +92,21 @@
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中保持原值。 |
 
-**表2** 参数说明（掩码寄存器复制到掩码寄存器）
-
-| 参数名 | 输入/输出 | 描述 |
-| --- | --- | --- |
-| dst | 输出 | 目的操作数（掩码寄存器）。 |
-| src | 输入 | 源操作数（掩码寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
-
-**表3** 参数说明（矢量数据寄存器复制到掩码寄存器）
+**表2** 参数说明（矢量数据寄存器复制到掩码寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（掩码寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | part | 输入 | part决定了src中需要搬运的数据块，具体描述请参考[关键特性说明](#关键特性说明)。<br>&bull; 当数据类型为uint16_t，part∈[0, 15]。<br>&bull; 当数据类型为uint32_t，part∈[0, 31]。 |
+
+**表3** 参数说明（掩码寄存器复制到掩码寄存器）
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dst | 输出 | 目的操作数（掩码寄存器）。 |
+| src | 输入 | 源操作数（掩码寄存器）。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -104,11 +116,13 @@
 
 ## 约束说明
 
+- 本接口仅在AIV上生效，非AIV调用直接返回。
 - 针对矢量数据寄存器复制到矢量数据寄存器：dst中未被mask筛选的位置保持原值。
-- 针对掩码寄存器复制到掩码寄存器：带mask的接口dst中未被mask筛选的位置填0。
 - 针对矢量寄存器复制到掩码寄存器：**part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**
     - 当数据类型为uint16_t，part∈[0, 15]；
     - 当数据类型为uint32_t，part∈[0, 31]。
+- 针对掩码寄存器复制到掩码寄存器：带mask的接口dst中未被mask筛选的位置填0。
+- 无掩码搬运时不区分有效位置，按全部比特位整体复制；dst的所有比特位被src的对应比特位覆盖。
 
 ## 关键特性说明
 

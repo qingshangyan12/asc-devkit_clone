@@ -33,7 +33,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __simd_callee__ inline vector_bool asc_get_mask_spr_b16()
 __simd_callee__ inline vector_bool asc_get_mask_spr_b32()
 ```
@@ -48,7 +48,21 @@ vector_bool，掩码寄存器。
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口由接口封装实现，不触发硬件访存动作；返回的`vector_bool`掩码寄存器仅作为后续Reg矢量计算接口的`mask`入参使用。
+- 本接口需在Vector Function（`__simd_vf__`标记的函数）内调用；典型用法是先通过配套setter接口配置MASK SPR的具体比特值，再调用本接口读取并扩展为`vector_bool`，最后传给同Vector Function内的Reg矢量计算接口的`mask`入参。
+- MASK SPR由配套setter接口写入具体比特值，本接口仅读取当前MASK SPR值并按所选重载规则扩展为256bit掩码返回，不修改MASK SPR内容。
+- 每条矢量流水（PIPE_V）拥有独立的MASK SPR，本接口读取的是当前矢量流水的MASK SPR值；如需读取其他矢量流水的MASK SPR，须切换至对应矢量流水后重新调用本接口。
+- 本接口读取的MASK SPR值为配套setter接口最近一次写入值；若配套setter接口尚未调用，读取到的是MASK SPR复位初值（默认全1，即所有元素默认参与计算）。
+
+### b16/b32共用约束
+
+- `asc_get_mask_spr_b16`读取MASK0与MASK1两段共128bit，每1bit扩展为2bit；MASK0控制256bit掩码的低128bit（对应前64个16bit元素位置），MASK1控制高128bit（对应后64个16bit元素位置）。
+- `asc_get_mask_spr_b32`仅读取MASK0一段64bit，每1bit扩展为4bit，控制256bit掩码的全部64个32bit元素位置；本重载不读MASK1，MASK1的值不影响`asc_get_mask_spr_b32`的返回结果。
+- 调用顺序应为先调用配套setter接口写入MASK SPR值，再调用本接口读取扩展为`vector_bool`，最后调用Reg矢量计算接口；若顺序颠倒，本接口读到的是上一次写入或复位初值，与本批次矢量计算预期的掩码不一致。
+- 同一Vector Function内若同时存在16bit与32bit dtype的矢量计算，须分别为两种dtype调用对应重载读取掩码，不可共用一个`vector_bool`跨dtype传给矢量计算接口（两重载读取的MASK SPR范围与扩展规则不同，掩码比特与元素位置映射关系不同）。
 
 ## 调用示例
 

@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline int64_t asc_get_ctrl()
 ```
 

@@ -32,11 +32,15 @@
 
 ## 函数原型
 
-```cpp
+```c
 // 取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162float(vector_float& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162float(vector_float& dst,
+                                            vector_int16_t src,
+                                            vector_bool mask)
 // 取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162float_v2(vector_float& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162float_v2(vector_float& dst,
+                                               vector_int16_t src,
+                                               vector_bool mask)
 ```
 
 ## 参数说明
@@ -58,6 +62,13 @@ __simd_callee__ inline void asc_int162float_v2(vector_float& dst, vector_int16_t
 ## 约束说明
 
 mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+
+
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口数据类型固定不可混用。
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 ## 调用示例
 
