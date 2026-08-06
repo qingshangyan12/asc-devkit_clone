@@ -61,7 +61,7 @@
 | src     | 输入     | 源操作数（矢量）的起始地址。 |
 | count   | 输入     | 参与连续计算的元素个数。 |
 | repeat | 输入 | 迭代次数。|
-| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。<br>以一个repeat归约后的长度为单位，PairReduce完成后，一个repeat的长度减半。|
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间的地址步长，以一个repeat归约后的长度为单位，即128字节。PairReduce完成后，一个repeat的输出长度减半。|
 | src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。|
 | src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。|
 
@@ -81,10 +81,16 @@ PIPE_V
 ## 调用示例
 
 ```cpp
+// 示例计算256个half的相邻元素求和，分2次迭代完成，每次迭代处理128个元素，输出64个结果
 constexpr uint32_t src_length = 256;
-constexpr uint32_t dst_length = 16;
+constexpr uint32_t dst_length = 128;
 __ubuf__ half src[src_length];
 __ubuf__ half dst[dst_length];
+
+// 使用高维切分计算接口，需设置mask
+asc_set_mask_norm();
+asc_set_vector_mask(0xffffffffffffffff, 0xffffffffffffffff);    // 设置每个迭代内所有元素均参与计算。
+
 // 每次repeat256B，2次repeat，无间隔
 asc_pair_reduce_sum(dst, src, 2, 1, 1, 8);
 ```
