@@ -38,7 +38,7 @@ jobs:
       -
         name: staticcheck
         identifier: staticcheck
-        uses: cann/.gitcode/actions/staticcheck@master
+        uses: zhouchongshun/.gitcode/actions/staticcheck@master
         with:
           check_type: ${{ inputs.check_type }}
           target_branch: ${{ env.TARGET_BRANCH }}

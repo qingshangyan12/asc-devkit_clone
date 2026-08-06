@@ -60,5 +60,5 @@ ge::graphStatus TilingXXX(gert::TilingContext* context) {
 }
 ```
 
-完整样例可参考[与数学库高阶API配合使用的样例](../../../SIMD-API/adv_api/math_compute/more_examples.md#section577043422516)。
+完整样例可参考[与数学库高阶API配合使用的样例](../../../SIMD-API/高阶API.md/数学计算.md/更多样例.md#section577043422516)。
 
