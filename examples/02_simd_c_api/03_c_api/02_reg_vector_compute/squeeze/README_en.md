@@ -1,13 +1,13 @@
 ﻿# squeeze Example
 
 ## Overview
-This example implements the Squeeze operation based on the C API programming interface, primarily calling the [asc_squeeze](../../../../../docs/zh/api/SIMD-API/C-API/reg/compare_and_select/asc_squeeze.md) API.
+This example implements the Squeeze operation based on the C API programming interface, primarily calling the [asc_squeeze](../../../../../docs/zh/api/SIMD-API/c_api/reg/compare_and_select/asc_squeeze.md) API.
 
 ## Supported Products and CANN Versions
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
