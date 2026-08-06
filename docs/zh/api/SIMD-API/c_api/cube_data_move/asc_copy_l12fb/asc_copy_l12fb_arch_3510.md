@@ -72,6 +72,29 @@ PIPE_FIX
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
 
+### 通用约束
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- src起始地址需32字节对齐（L1 Buffer端口对齐要求），否则触发异常。
+- dst的mem_block区段取值仅允许0（Quant PRE区）、1（ReLU PRE区）、6（同0），其他值触发异常。mem_block同时决定dst区段：0/6→Quant PRE区，1→ReLU PRE区。
+- Fixpipe Buffer地址对齐：mem_block为Quant PRE区时dst起始地址需128字节对齐；mem_block为ReLU PRE区时需64字节对齐，否则触发异常。
+- mem_block为Quant PRE区时，`len_burst`与`dst_gap_size`均须2对齐，否则触发异常。
+- dst起始地址不得超过6144（Fixpipe Buffer各区段寻址上限），否则触发Fixpipe Buffer写越界异常。
+- Fixpipe Buffer总容量上限6KB。dst偏移+搬运大小越界时硬件按位宽截断处理，不触发异常码，不保证数据完整，建议调用方自行确保不越界。
+- L1 Buffer总容量512KB，src偏移+搬运大小不可越界，否则触发地址越界异常。
+- 如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。
+
+### 高维切分搬运模式约束
+
+- n_burst不可为0，否则触发异常。
+- len_burst不可为0，否则触发异常。
+- n_burst传入>4095的值会按位宽截断处理（如4096→0、4097→1），硬件不报错。截断后实际生效值偏小，导致实际搬运的连续数据块数小于预期，部分数据未被搬运。参数类型为`uint16_t`（0~65535），截断后若值为0会同时触发n_burst不可为0的异常。
+
+### 前n个数据搬运模式约束
+
+- size需为正数。实现层将size转换为`len_burst=size/32`，size为0时len_burst为0，会触发len_burst不可为0的异常。
+- 实际搬运字节数为`len_burst×64字节`，当size非64字节整数倍时实际搬运字节数大于size，调用方需确保dst与src在按64字节对齐的范围内可写可读。
+
 ## 调用示例
 
 ```cpp

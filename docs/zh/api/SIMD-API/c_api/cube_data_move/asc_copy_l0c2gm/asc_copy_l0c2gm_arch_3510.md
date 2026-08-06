@@ -293,6 +293,40 @@ PIPE_FIX
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 
+### 通用约束
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- src起始地址需按源dtype字节对齐：src为`float`或`int32_t`时需64字节对齐，src为`half`时需32字节对齐，否则触发异常。
+- dst起始地址需1字节对齐，否则触发异常。
+- 如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。
+- L0C Buffer容量上限：L0C Buffer总容量256KB，src偏移+搬运大小不可超过L0C Buffer容量，否则触发源地址越界异常。
+- 量化与激活模式中使用的M1/M2/M3/M4缩放系数不可为INF/NaN或非规格化数，否则结果错误。
+- `split_en`仅在输出dtype为`float`时可设为true，其他输出dtype设为true触发异常。
+- 开启NZ2DN转换时，需通过配套setter接口预先配置loop0 src stride，且loop0 src stride不可为0，否则触发异常。
+
+### 随路量化激活参数约束
+
+- `quant_pre`取值不可为保留值或非法值（含6、7、[17, 20]、[27, 30]、[35, 2^5−1] 等区间），否则触发异常。
+- `relu_pre`取值不可为保留值（[4, 7]），否则触发异常。
+- `clip_relu_pre`取值不可为保留值（[2, 3]），否则触发异常。
+- `clip_relu_pre`设为标量模式时需搭配`relu_pre`与量化功能一起使用。
+
+### 字段截断约束
+
+- `n_size`传入>2^12−1的值会按位宽截断处理（如2^12→0、2^12+1→1），硬件不报错。截断后实际生效值偏小，导致N方向实际搬运元素数小于预期，部分元素未被搬运。
+- `l2_cache_ctl`传入>2^4−1的值会按位宽截断处理（如2^4→0、2^4+1→1），硬件不报错。截断后实际生效值偏小，导致实际生效的缓存策略与预期不符，可能降低搬运命中率。截断后若值落在3、5~7、11、15仍会触发L2 Cache策略异常。
+- `clip_relu_pre`传入>3的值会按位宽截断处理（如4→0、5→1），硬件不报错。截断后若值落在2、3仍会触发保留值异常。
+- `unit_flag_ctl`传入>3的值会按位宽截断处理，硬件不报错。
+- `quant_pre`传入>2^5−1的值会按位宽截断处理（如2^5→0、2^5+1→1），硬件不报错。截断后实际生效值偏小，导致实际生效的量化模式与预期不符，输出数据类型与数值错误。截断后若值落在保留值或非法值区间仍会触发异常。
+- `relu_pre`传入>7的值会按位宽截断处理，硬件不报错。截断后若值落在4~7仍会触发保留值异常。
+
+### n_size组合约束
+
+- 未开启`split_en`、未开启`nz2nd_en`、未开启`nz2dn_en`时：输出dtype为`bfloat16_t`/`half`/`int8_t`/`uint8_t`/`fp8_e4m3fn_t`/`fp8_e5m2_t`/`hifloat8_t`时n_size需为16的倍数；输出dtype为`int32_t`/`float`时n_size需为16的倍数。
+- 开启`split_en`、未开启`nz2nd_en`、未开启`nz2dn_en`时：输出dtype为`float`时n_size需为8的倍数。
+- 未开启`split_en`、开启`nz2nd_en`时：输出dtype为`bfloat16_t`/`half`/`int8_t`/`uint8_t`/`fp8_e4m3fn_t`/`fp8_e5m2_t`/`hifloat8_t`/`int32_t`/`float`时n_size可为任意大于0的值。
+- 未开启`split_en`、未开启`nz2nd_en`、开启`nz2dn_en`时：输出dtype为`bfloat16_t`/`half`/`int8_t`/`uint8_t`/`fp8_e4m3fn_t`/`fp8_e5m2_t`/`hifloat8_t`/`int32_t`/`float`时n_size可为任意大于0的值。
+
 ## 调用示例
 
 ```cpp

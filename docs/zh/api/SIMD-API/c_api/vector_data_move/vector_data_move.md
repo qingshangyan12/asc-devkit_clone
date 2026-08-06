@@ -8,8 +8,6 @@
 
 - **[asc_copy_ub2gm_align](asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)**
 
-- **[asc_copy_ub2l1](asc_copy_ub2l1.md)**
-
 - **[asc_copy_ub2ub](asc_copy_ub2ub.md)**
 
 - **[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)**
