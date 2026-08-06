@@ -11,6 +11,7 @@
 #include "manifest_generator.h"
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <cstdint>
 #include <cstdlib>
@@ -19,6 +20,7 @@
 #include <fcntl.h>
 #include <fstream>
 #include <iostream>
+#include <limits.h>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -102,6 +104,17 @@ std::string AbsolutePath(const std::string &path)
     return !path.empty() && path[0] == '/' ? path : JoinPath(CurrentDirectory(), path);
 }
 
+bool ResolveCanonicalPath(const std::string &path, std::string &resolved)
+{
+    std::array<char, PATH_MAX + 1U> buffer {};
+    if (realpath(path.c_str(), buffer.data()) == nullptr) {
+        return false;
+    }
+    buffer.back() = '\0';
+    resolved.assign(buffer.data());
+    return true;
+}
+
 bool IsDirectory(const std::string &path)
 {
     struct stat info {};
@@ -125,12 +138,10 @@ std::string CanonicalDirectory(const std::string &path, const std::string &field
     if (lstat(path.c_str(), &inputInfo) != 0 || S_ISLNK(inputInfo.st_mode)) {
         throw std::runtime_error(field + " must exist and must not be a symlink: " + path);
     }
-    char *resolved = realpath(path.c_str(), nullptr);
-    if (resolved == nullptr) {
+    std::string canonical;
+    if (!ResolveCanonicalPath(path, canonical)) {
         throw SystemError("failed to resolve " + field);
     }
-    const std::string canonical(resolved);
-    std::free(resolved);
     if (!IsDirectory(canonical)) {
         throw std::runtime_error(field + " is not a directory: " + path);
     }
@@ -704,12 +715,10 @@ public:
 private:
     static std::string ExecutablePath(const std::string &candidate)
     {
-        char *resolved = realpath(candidate.c_str(), nullptr);
-        if (resolved == nullptr) {
+        std::string canonical;
+        if (!ResolveCanonicalPath(candidate, canonical)) {
             return std::string();
         }
-        const std::string canonical(resolved);
-        std::free(resolved);
         struct stat info {};
         if (stat(canonical.c_str(), &info) != 0 || !S_ISREG(info.st_mode) || access(canonical.c_str(), X_OK) != 0) {
             return std::string();

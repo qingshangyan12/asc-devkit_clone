@@ -123,6 +123,7 @@ TEST_F(ManifestGeneratorModuleTest, PosixFileHelpersReadFilesAndProtectGenerated
     EXPECT_EQ(std::string(data.begin(), data.end()), std::string("A\0B", 3U));
     EXPECT_THROW(ReadRegularFile(input, 2U, "input"), std::runtime_error);
     EXPECT_THROW(ReadRegularFile(JoinPath(root_, "missing"), 3U, "missing"), std::runtime_error);
+    EXPECT_THROW(ReadRegularFile(root_, 3U, "directory"), std::runtime_error);
 
     const std::string generated = JoinPath(root_, "generated.cpp");
     std::ofstream output = OpenGeneratedFile(generated);
@@ -130,6 +131,10 @@ TEST_F(ManifestGeneratorModuleTest, PosixFileHelpersReadFilesAndProtectGenerated
     FinishOutput(output, generated);
     EXPECT_EQ(ReadTestFile(generated), "generated");
     EXPECT_THROW(OpenGeneratedFile(generated), std::runtime_error);
+
+    std::ofstream failedOutput;
+    failedOutput.setstate(std::ios::badbit);
+    EXPECT_THROW(FinishOutput(failedOutput, "failed-output"), std::runtime_error);
 }
 
 TEST_F(ManifestGeneratorModuleTest, PathHelpersCheckDirectoryContainmentByComponent)
@@ -146,6 +151,58 @@ TEST_F(ManifestGeneratorModuleTest, PathHelpersCheckDirectoryContainmentByCompon
     EXPECT_EQ(CanonicalDirectoryWithin(nested, resourceRoot, "resource"),
               CanonicalDirectory(nested, "resource"));
     EXPECT_THROW(CanonicalDirectoryWithin(outside, resourceRoot, "resource"), std::runtime_error);
+}
+
+TEST_F(ManifestGeneratorModuleTest, PathFunctionsHandleEmptyRelativeAndRootInputs)
+{
+    EXPECT_EQ(JoinPath("", "child"), "child");
+    EXPECT_EQ(JoinPath("parent", ""), "parent");
+    EXPECT_EQ(JoinPath("parent/", "child"), "parent/child");
+    EXPECT_EQ(ParentPath("file"), "");
+    EXPECT_EQ(ParentPath("/file"), "/");
+    EXPECT_EQ(FileName(""), "");
+    EXPECT_EQ(FileName("/directory/"), "");
+    EXPECT_EQ(FileName("file"), "file");
+
+    const std::string current = CurrentDirectory();
+    EXPECT_FALSE(current.empty());
+    EXPECT_EQ(AbsolutePath("/absolute"), "/absolute");
+    EXPECT_EQ(AbsolutePath("relative"), JoinPath(current, "relative"));
+    EXPECT_TRUE(IsWithin("/child", "/"));
+    EXPECT_FALSE(IsWithin("relative", "/"));
+
+    std::string resolved;
+    EXPECT_TRUE(ResolveCanonicalPath(root_, resolved));
+    EXPECT_EQ(resolved, CanonicalDirectory(root_, "test root"));
+    EXPECT_EQ(resolved.c_str()[resolved.size()], '\0');
+    EXPECT_FALSE(ResolveCanonicalPath(JoinPath(root_, "missing"), resolved));
+}
+
+TEST_F(ManifestGeneratorModuleTest, DirectoryFunctionsCreateValidateAndRemovePaths)
+{
+    EnsureDirectory("");
+    EnsureDirectory("/");
+    const std::string directory = JoinPath(root_, "directory");
+    EnsureDirectory(directory);
+    EnsureDirectory(directory);
+    EXPECT_TRUE(IsDirectory(directory));
+
+    const std::string regularFile = JoinPath(root_, "regular-file");
+    WriteTestFile(regularFile, "data");
+    EXPECT_THROW(EnsureDirectory(regularFile), std::runtime_error);
+    EXPECT_THROW(CanonicalDirectory(regularFile, "regular file"), std::runtime_error);
+    EXPECT_THROW(CanonicalDirectory(JoinPath(root_, "missing"), "missing"), std::runtime_error);
+
+    const std::string symlinkPath = JoinPath(root_, "directory-link");
+    ASSERT_EQ(symlink(directory.c_str(), symlinkPath.c_str()), 0);
+    EXPECT_THROW(CanonicalDirectory(symlinkPath, "directory link"), std::runtime_error);
+    RemoveTree(symlinkPath);
+    EXPECT_FALSE(PathExists(symlinkPath));
+    EXPECT_TRUE(IsDirectory(directory));
+
+    RemoveTree(regularFile);
+    EXPECT_FALSE(PathExists(regularFile));
+    RemoveTree(JoinPath(root_, "does-not-exist"));
 }
 
 TEST_F(ManifestGeneratorModuleTest, ResourceBudgetEnforcesPayloadAndFileCountLimits)
@@ -185,6 +242,55 @@ TEST_F(ManifestGeneratorModuleTest, RepositorySortsManifestsAndResourcesAndSkips
     EXPECT_EQ(std::string(units[1].files[0].data.begin(), units[1].files[0].data.end()), "a");
 }
 
+TEST_F(ManifestGeneratorModuleTest, RepositoryReportsManifestJsonAndBaseDirErrors)
+{
+    const std::string malformed = JoinPath(root_, "malformed/Unit");
+    WriteTestFile(JoinPath(malformed, "resources/kernel.cpp"), "source");
+    WriteTestFile(JoinPath(malformed, "Unit_manifest.json"), "{\"base_dir\":");
+    EXPECT_THROW(CollectedManifestRepository(JoinPath(root_, "malformed")).Load(), std::runtime_error);
+
+    const std::string missing = JoinPath(root_, "missing-base/Unit");
+    WriteTestFile(JoinPath(missing, "resources/kernel.cpp"), "source");
+    WriteTestFile(JoinPath(missing, "Unit_manifest.json"), "{}");
+    EXPECT_THROW(CollectedManifestRepository(JoinPath(root_, "missing-base")).Load(), std::runtime_error);
+
+    const std::string wrongType = JoinPath(root_, "wrong-type/Unit");
+    WriteTestFile(JoinPath(wrongType, "resources/kernel.cpp"), "source");
+    WriteTestFile(JoinPath(wrongType, "Unit_manifest.json"), "{\"base_dir\":7}");
+    EXPECT_THROW(CollectedManifestRepository(JoinPath(root_, "wrong-type")).Load(), std::runtime_error);
+}
+
+TEST_F(ManifestGeneratorModuleTest, RepositorySkipsSymlinkedManifestsAndAcceptsAbsoluteBaseDir)
+{
+    const std::string collection = JoinPath(root_, "collection-absolute");
+    const std::string unit = JoinPath(collection, "Unit");
+    const std::string resources = JoinPath(unit, "resources");
+    WriteTestFile(JoinPath(resources, "kernel.cpp"), "source");
+    WriteTestFile(JoinPath(unit, "Unit_manifest.json"),
+                  "{\"base_dir\":\"" + resources + "\"}");
+
+    const std::string ignoredManifest = JoinPath(root_, "ignored_manifest.json");
+    WriteTestFile(ignoredManifest, "{\"base_dir\":\"resources\"}");
+    ASSERT_EQ(symlink(ignoredManifest.c_str(), JoinPath(collection, "Link_manifest.json").c_str()), 0);
+
+    const std::vector<ManifestUnit> units = CollectedManifestRepository(collection).Load();
+    ASSERT_EQ(units.size(), 1U);
+    ASSERT_EQ(units[0].files.size(), 1U);
+    EXPECT_EQ(units[0].files[0].filePath, "resources/kernel.cpp");
+}
+
+TEST_F(ManifestGeneratorModuleTest, RepositoryRejectsNonRegularResource)
+{
+    const std::string unit = JoinPath(root_, "collection-special/Unit");
+    const std::string resources = JoinPath(unit, "resources");
+    CreateDirectories(resources);
+    ASSERT_EQ(mkfifo(JoinPath(resources, "resource.pipe").c_str(), 0600), 0);
+    CreateManifest(unit, "Unit");
+
+    EXPECT_THROW(CollectedManifestRepository(JoinPath(root_, "collection-special")).Load(),
+                 std::runtime_error);
+}
+
 TEST_F(ManifestGeneratorModuleTest, SourceGeneratorEmitsBundleManifestAndMakefile)
 {
     const std::string work = JoinPath(root_, "work");
@@ -211,6 +317,21 @@ TEST_F(ManifestGeneratorModuleTest, SourceGeneratorEmitsBundleManifestAndMakefil
     EXPECT_THROW(BundleSourceGenerator(work, "unit_package", units).Generate(), std::runtime_error);
 }
 
+TEST_F(ManifestGeneratorModuleTest, SourceGeneratorEmitsManifestWithoutResourceFiles)
+{
+    const std::string work = JoinPath(root_, "empty-resource-work");
+    CreateDirectories(work);
+    const std::vector<ManifestUnit> units = {
+        {"{\"base_dir\":\"resources\"}", {}}
+    };
+
+    BundleSourceGenerator(work, "empty_package", units).Generate();
+
+    const std::string manifestSource = ReadTestFile(JoinPath(work, "manifest_0.cpp"));
+    EXPECT_NE(manifestSource.find("nullptr, 0ULL"), std::string::npos);
+    EXPECT_EQ(manifestSource.find("AcCompileResourceFile g_manifest_0_files"), std::string::npos);
+}
+
 TEST_F(ManifestGeneratorModuleTest, BuildWorkspaceHonorsCleanupPolicy)
 {
     const std::string parent = JoinPath(root_, "sessions");
@@ -234,6 +355,21 @@ TEST_F(ManifestGeneratorModuleTest, BuildWorkspaceHonorsCleanupPolicy)
     EXPECT_THROW(BuildWorkspace::Create(regularFile, false), std::runtime_error);
 }
 
+TEST_F(ManifestGeneratorModuleTest, BuildWorkspaceUsesTmpDirAndSupportsMoveConstruction)
+{
+    ScopedEnvironment temporary("TMPDIR", root_.c_str());
+    std::string session;
+    {
+        BuildWorkspace workspace = BuildWorkspace::Create("", false);
+        session = workspace.Session();
+        EXPECT_TRUE(IsWithin(session, root_));
+        BuildWorkspace moved(std::move(workspace));
+        EXPECT_TRUE(workspace.Session().empty());
+        EXPECT_EQ(moved.Session(), session);
+    }
+    EXPECT_FALSE(PathExists(session));
+}
+
 TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorValidatesConfiguredCompiler)
 {
     EXPECT_TRUE(IsRegularPath(ExecutableLocator::FindRequired("sh")));
@@ -242,6 +378,43 @@ TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorValidatesConfiguredCompiler
 
     ScopedEnvironment validCompiler("CXX", "/bin/sh");
     EXPECT_TRUE(IsRegularPath(ExecutableLocator::FindCompiler()));
+}
+
+TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorHandlesSearchPathAndInvalidCompilers)
+{
+    {
+        ScopedEnvironment compiler("CXX", JoinPath(root_, "missing-compiler").c_str());
+        EXPECT_THROW(ExecutableLocator::FindCompiler(), std::runtime_error);
+    }
+    {
+        const std::string nonExecutable = JoinPath(root_, "non-executable");
+        WriteTestFile(nonExecutable, "not executable");
+        ScopedEnvironment compiler("CXX", nonExecutable.c_str());
+        EXPECT_THROW(ExecutableLocator::FindCompiler(), std::runtime_error);
+    }
+
+    const std::string bin = JoinPath(root_, "bin");
+    const std::string fakeCompiler = JoinPath(bin, "g++");
+    WriteTestFile(fakeCompiler, "#!/bin/sh\nexit 0\n");
+    ASSERT_EQ(chmod(fakeCompiler.c_str(), 0700), 0);
+    ScopedEnvironment compiler("CXX", nullptr);
+    ScopedEnvironment path("PATH", bin.c_str());
+    EXPECT_EQ(ExecutableLocator::FindCompiler(), CanonicalDirectory(bin, "compiler directory") + "/g++");
+    EXPECT_TRUE(IsRegularPath(ExecutableLocator::FindRequired(fakeCompiler)));
+}
+
+TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorUsesDefaultPathAndReportsMissingCompiler)
+{
+    {
+        ScopedEnvironment compiler("CXX", nullptr);
+        ScopedEnvironment path("PATH", nullptr);
+        EXPECT_TRUE(IsRegularPath(ExecutableLocator::FindRequired("sh")));
+    }
+    {
+        ScopedEnvironment compiler("CXX", nullptr);
+        ScopedEnvironment path("PATH", root_.c_str());
+        EXPECT_THROW(ExecutableLocator::FindCompiler(), std::runtime_error);
+    }
 }
 
 TEST_F(ManifestGeneratorModuleTest, ProcessRunnerPropagatesEnvironmentAndExitStatus)
@@ -254,6 +427,31 @@ TEST_F(ManifestGeneratorModuleTest, ProcessRunnerPropagatesEnvironmentAndExitSta
         {"/bin/sh", "-c", "printf '%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" > \"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
         {{"ASC_COMPILE_EXPORTER_UNIT_VALUE", "visible"}, {"ASC_COMPILE_EXPORTER_UNIT_OUTPUT", output}});
     EXPECT_EQ(ReadTestFile(output), "visible");
+}
+
+TEST_F(ManifestGeneratorModuleTest, ProcessRunnerReportsExecEnvironmentAndSignalFailures)
+{
+    EXPECT_THROW(ProcessRunner::Run({JoinPath(root_, "missing-command")}, {}), std::runtime_error);
+    EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "exit 0"}, {{"INVALID=NAME", "value"}}),
+                 std::runtime_error);
+    EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "kill -TERM $$"}, {}), std::runtime_error);
+}
+
+TEST_F(ManifestGeneratorModuleTest, MakeBundleBuilderValidatesCannHomeAndAbiHeader)
+{
+    ScopedEnvironment compiler("CXX", "/bin/sh");
+    {
+        ScopedEnvironment cannHome("ASCEND_HOME_PATH", nullptr);
+        EXPECT_THROW(MakeBundleBuilder(root_, JoinPath(root_, "bundle.so"), 1U).Build(),
+                     std::runtime_error);
+    }
+    {
+        const std::string cann = JoinPath(root_, "incomplete-cann");
+        CreateDirectories(JoinPath(cann, "include"));
+        ScopedEnvironment cannHome("ASCEND_HOME_PATH", cann.c_str());
+        EXPECT_THROW(MakeBundleBuilder(root_, JoinPath(root_, "bundle.so"), 1U).Build(),
+                     std::runtime_error);
+    }
 }
 
 TEST_F(ManifestGeneratorModuleTest, BundlePublisherPublishesFilesAndRejectsSymlinks)
@@ -275,6 +473,52 @@ TEST_F(ManifestGeneratorModuleTest, BundlePublisherPublishesFilesAndRejectsSymli
     WriteTestFile(victim, "victim");
     ASSERT_EQ(symlink(victim.c_str(), symlinkPath.c_str()), 0);
     EXPECT_THROW(BundlePublisher::Prepare(symlinkPath), std::runtime_error);
+}
+
+TEST_F(ManifestGeneratorModuleTest, BundlePublisherReportsRenameFailure)
+{
+    const std::string output = JoinPath(root_, "output/missing.so");
+    CreateDirectories(ParentPath(output));
+    EXPECT_THROW(BundlePublisher::Publish(JoinPath(root_, "missing-staged.so"), output),
+                 std::runtime_error);
+    EXPECT_FALSE(PathExists(output));
+}
+
+TEST_F(ManifestGeneratorModuleTest, BundlePublisherCopiesAcrossFileSystems)
+{
+    struct stat rootInfo {};
+    struct stat sharedMemoryInfo {};
+    if (stat(root_.c_str(), &rootInfo) != 0 || stat("/dev/shm", &sharedMemoryInfo) != 0 ||
+        rootInfo.st_dev == sharedMemoryInfo.st_dev || access("/dev/shm", W_OK) != 0) {
+        GTEST_SKIP() << "cross-filesystem writable directory is unavailable";
+    }
+
+    BuildWorkspace destinationWorkspace = BuildWorkspace::Create("/dev/shm", false);
+    const std::string staged = JoinPath(root_, "large-staged.so");
+    const std::string output = JoinPath(destinationWorkspace.Session(), "bundle.so");
+    const std::string content(128U * 1024U + 17U, 'x');
+    WriteTestFile(staged, content);
+
+    BundlePublisher::Publish(staged, output);
+
+    EXPECT_EQ(ReadTestFile(output), content);
+    EXPECT_TRUE(PathExists(staged));
+
+    const std::string stagedDirectory = JoinPath(root_, "staged-directory");
+    CreateDirectories(stagedDirectory);
+    EXPECT_THROW(BundlePublisher::Publish(
+                     stagedDirectory, JoinPath(destinationWorkspace.Session(), "directory.so")),
+                 std::runtime_error);
+
+    const std::string stagedSymlink = JoinPath(root_, "staged-symlink.so");
+    ASSERT_EQ(symlink(staged.c_str(), stagedSymlink.c_str()), 0);
+    EXPECT_THROW(BundlePublisher::Publish(
+                     stagedSymlink, JoinPath(destinationWorkspace.Session(), "symlink.so")),
+                 std::runtime_error);
+
+    const std::string outputDirectory = JoinPath(destinationWorkspace.Session(), "existing-directory");
+    CreateDirectories(outputDirectory);
+    EXPECT_THROW(BundlePublisher::Publish(staged, outputDirectory), std::runtime_error);
 }
 
 TEST(ManifestGeneratorStandaloneUnitTest, ResolveJobCountHonorsExplicitValue)
