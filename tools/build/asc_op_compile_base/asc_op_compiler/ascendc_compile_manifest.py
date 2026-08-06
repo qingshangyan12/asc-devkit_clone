@@ -346,12 +346,10 @@ class OpCompileManifestRecorder:
             recipe_commands = []
             command_stages = self._command_stages(grouped[mode])
             for (stage, tokens, _, _), command_stage in zip(grouped[mode], command_stages):
-                output_index = self._output_index(tokens)
                 options = [
                     self._normalize_command_token(token, output_markers)
-                    for index, token in enumerate(tokens[1:], start=1)
-                    if index not in (output_index - 1, output_index) and
-                    not self._is_nonportable_common_include(token)
+                    for token in tokens[1:]
+                    if not self._is_nonportable_common_include(token)
                 ]
                 command_type = self._command_type(tokens[0], stage)
                 if command_type == "bisheng":

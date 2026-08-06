@@ -182,6 +182,10 @@ inline void InitTilingData() {}
                 self.assertTrue(all(
                     set(command) == {"type", "stage", "options"} for command in commands))
                 self.assertTrue(all(isinstance(command["stage"], int) for command in commands))
+                self.assertTrue(all(command["options"].count("-o") == 1 for command in commands))
+                self.assertTrue(all(
+                    command["options"][command["options"].index("-o") + 1].startswith("${output:")
+                    for command in commands))
                 self.assertEqual([command["type"] for command in commands].count("ld"), 2)
                 self.assertTrue(all("-r" in command["options"]
                                     for command in commands if command["type"] == "ld"))
@@ -253,6 +257,14 @@ inline void InitTilingData() {}
                           commands[-1]["options"])
             self.assertIn("${output:intermediates/normal/mix_aiv.o}",
                           commands[-1]["options"])
+            self.assertEqual([
+                command["options"][command["options"].index("-o") + 1]
+                for command in commands
+            ], [
+                "${output:intermediates/normal/mix_aic.o}",
+                "${output:intermediates/normal/mix_aiv.o}",
+                "${output:artifacts/Matmul_0123456789abcdef_1.o}",
+            ])
 
 
 if __name__ == "__main__":
