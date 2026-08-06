@@ -16,7 +16,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_REG_STORE_ASC_SQUEEZE_AND_STOREUNALIGN_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_REG_STORE_ASC_SQUEEZE_AND_STOREUNALIGN_IMPL_H
 
-#include "instr_impl/npu_arch_3510/utils_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
     __ubuf__ int8_t* dst_addr, vector_int8_t dst, vector_store_unalign& src0, vector_int8_t src1, vector_bool squeeze_mask)
@@ -72,14 +72,14 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
     }
 }
 
-__simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
-    __ubuf__ int64_t* dst_addr, vector_int64_t dst, vector_store_unalign& src0, vector_int64_t src1, vector_bool squeeze_mask)
-{
-    if ASC_IS_AIV {
-        vsqz(dst, src1, squeeze_mask, MODE_STORED);
-        vstur(src0, dst, dst_addr, POST_UPDATE);
-    }
-}
+// __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
+//     __ubuf__ int64_t* dst_addr, vector_int64_t dst, vector_store_unalign& src0, vector_int64_t src1, vector_bool squeeze_mask)
+// {
+//     if ASC_IS_AIV {
+//         vsqz(dst, src1, squeeze_mask, MODE_STORED);
+//         vstur(src0, dst, dst_addr, POST_UPDATE);
+//     }
+// }
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
     __ubuf__ half* dst_addr, vector_half dst, vector_store_unalign& src0, vector_half src1, vector_bool squeeze_mask)
@@ -138,25 +138,25 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
     }
 }
 
-__simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
-    __ubuf__ fp4x2_e2m1_t* dst_addr, vector_fp4x2_e2m1_t dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1, vector_bool squeeze_mask)
-{
-    if ASC_IS_AIV {
-        vsqz(dst, src1, squeeze_mask, MODE_STORED);
-        __ubuf__ float4_e2m1x2_t* dst_tmp = reinterpret_cast<__ubuf__ float4_e2m1x2_t*>(dst_addr);
-        vstur(src0, dst, dst_tmp, POST_UPDATE);
-    }
-}
+// __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
+//     __ubuf__ fp4x2_e2m1_t* dst_addr, vector_fp4x2_e2m1_t dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1, vector_bool squeeze_mask)
+// {
+//     if ASC_IS_AIV {
+//         vsqz(dst, src1, squeeze_mask, MODE_STORED);
+//         __ubuf__ float4_e2m1x2_t* dst_tmp = reinterpret_cast<__ubuf__ float4_e2m1x2_t*>(dst_addr);
+//         vstur(src0, dst, dst_tmp, POST_UPDATE);
+//     }
+// }
 
-__simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
-    __ubuf__ fp4x2_e1m2_t* dst_addr, vector_fp4x2_e1m2_t dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1, vector_bool squeeze_mask)
-{
-    if ASC_IS_AIV {
-        vsqz(dst, src1, squeeze_mask, MODE_STORED);
-        __ubuf__ float4_e1m2x2_t* dst_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(dst_addr);
-        vstur(src0, dst, dst_tmp, POST_UPDATE);
-    }
-}
+// __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
+//     __ubuf__ fp4x2_e1m2_t* dst_addr, vector_fp4x2_e1m2_t dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1, vector_bool squeeze_mask)
+// {
+//     if ASC_IS_AIV {
+//         vsqz(dst, src1, squeeze_mask, MODE_STORED);
+//         __ubuf__ float4_e1m2x2_t* dst_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(dst_addr);
+//         vstur(src0, dst, dst_tmp, POST_UPDATE);
+//     }
+// }
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
     __ubuf__ int4b_t* dst_addr, vector_int4x2_t dst, vector_store_unalign& src0, vector_int4x2_t src1, vector_bool squeeze_mask)

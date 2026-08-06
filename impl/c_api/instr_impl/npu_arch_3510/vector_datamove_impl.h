@@ -1629,11 +1629,11 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
     asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
 }
 
-__simd_callee__ inline void asc_squeeze_and_storeunalign(
-    __ubuf__ int64_t* dst_addr, vector_int64_t dst, vector_store_unalign& src0, vector_int64_t src1, vector_bool squeeze_mask)
-{
-    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
-}
+// __simd_callee__ inline void asc_squeeze_and_storeunalign(
+//     __ubuf__ int64_t* dst_addr, vector_int64_t dst, vector_store_unalign& src0, vector_int64_t src1, vector_bool squeeze_mask)
+// {
+//     asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+// }
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ half* dst_addr, vector_half dst, vector_store_unalign& src0, vector_half src1, vector_bool squeeze_mask)
@@ -1671,17 +1671,17 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
     asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
 }
 
-__simd_callee__ inline void asc_squeeze_and_storeunalign(
-    __ubuf__ fp4x2_e2m1_t* dst_addr, vector_fp4x2_e2m1_t dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1, vector_bool squeeze_mask)
-{
-    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
-}
+// __simd_callee__ inline void asc_squeeze_and_storeunalign(
+//     __ubuf__ fp4x2_e2m1_t* dst_addr, vector_fp4x2_e2m1_t dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1, vector_bool squeeze_mask)
+// {
+//     asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+// }
 
-__simd_callee__ inline void asc_squeeze_and_storeunalign(
-    __ubuf__ fp4x2_e1m2_t* dst_addr, vector_fp4x2_e1m2_t dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1, vector_bool squeeze_mask)
-{
-    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
-}
+// __simd_callee__ inline void asc_squeeze_and_storeunalign(
+//     __ubuf__ fp4x2_e1m2_t* dst_addr, vector_fp4x2_e1m2_t dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1, vector_bool squeeze_mask)
+// {
+//     asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+// }
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ int4b_t* dst_addr, vector_int4x2_t dst, vector_store_unalign& src0, vector_int4x2_t src1, vector_bool squeeze_mask)
