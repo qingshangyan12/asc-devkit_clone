@@ -15,27 +15,29 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <filesystem>
+#include <dirent.h>
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <string>
-#include <system_error>
 #include <thread>
 #include <utility>
 #include <vector>
 
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 #include "ascendc_tool_log.h"
 #include "nlohmann/json.hpp"
 
-namespace fs = std::filesystem;
 using Json = nlohmann::json;
 
-namespace ascendc::manifest_generator {
+namespace ascendc {
+namespace manifest_generator {
 namespace {
 
 constexpr uintmax_t kMaxManifestBytes = 8U * 1024U * 1024U;
@@ -50,6 +52,153 @@ std::runtime_error SystemError(const std::string &operation)
     return std::runtime_error(operation + ": " + std::strerror(errno));
 }
 
+std::string JoinPath(const std::string &left, const std::string &right)
+{
+    if (left.empty()) {
+        return right;
+    }
+    if (right.empty()) {
+        return left;
+    }
+    return left[left.size() - 1U] == '/' ? left + right : left + "/" + right;
+}
+
+std::string ParentPath(const std::string &path)
+{
+    const size_t separator = path.find_last_of('/');
+    if (separator == std::string::npos) {
+        return std::string();
+    }
+    return separator == 0U ? "/" : path.substr(0U, separator);
+}
+
+std::string FileName(const std::string &path)
+{
+    if (path.empty() || path[path.size() - 1U] == '/') {
+        return std::string();
+    }
+    const size_t separator = path.find_last_of('/');
+    return separator == std::string::npos ? path : path.substr(separator + 1U);
+}
+
+std::string CurrentDirectory()
+{
+    size_t size = 256U;
+    while (size <= 1024U * 1024U) {
+        std::vector<char> buffer(size);
+        if (getcwd(buffer.data(), buffer.size()) != nullptr) {
+            return std::string(buffer.data());
+        }
+        if (errno != ERANGE) {
+            throw SystemError("failed to get current directory");
+        }
+        size *= 2U;
+    }
+    throw std::runtime_error("current directory path is too long");
+}
+
+std::string AbsolutePath(const std::string &path)
+{
+    return !path.empty() && path[0] == '/' ? path : JoinPath(CurrentDirectory(), path);
+}
+
+bool IsDirectory(const std::string &path)
+{
+    struct stat info {};
+    return stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode);
+}
+
+bool IsWithin(const std::string &path, const std::string &root)
+{
+    if (path == root) {
+        return true;
+    }
+    if (root == "/") {
+        return !path.empty() && path[0] == '/';
+    }
+    return path.size() > root.size() && path.compare(0U, root.size(), root) == 0 && path[root.size()] == '/';
+}
+
+std::string CanonicalDirectory(const std::string &path, const std::string &field)
+{
+    struct stat inputInfo {};
+    if (lstat(path.c_str(), &inputInfo) != 0 || S_ISLNK(inputInfo.st_mode)) {
+        throw std::runtime_error(field + " must exist and must not be a symlink: " + path);
+    }
+    char *resolved = realpath(path.c_str(), nullptr);
+    if (resolved == nullptr) {
+        throw SystemError("failed to resolve " + field);
+    }
+    const std::string canonical(resolved);
+    std::free(resolved);
+    if (!IsDirectory(canonical)) {
+        throw std::runtime_error(field + " is not a directory: " + path);
+    }
+    return canonical;
+}
+
+std::string CanonicalDirectoryWithin(const std::string &path, const std::string &root,
+                                     const std::string &field)
+{
+    const std::string canonical = CanonicalDirectory(path, field);
+    if (!IsWithin(canonical, root)) {
+        throw std::runtime_error(field + " is not a directory below the manifest: " + path);
+    }
+    return canonical;
+}
+
+void EnsureDirectory(const std::string &path)
+{
+    if (path.empty() || path == "/") {
+        return;
+    }
+    if (mkdir(path.c_str(), 0700) == 0) {
+        return;
+    }
+    const int mkdirError = errno;
+    if (mkdirError == EEXIST && IsDirectory(path)) {
+        return;
+    }
+    throw std::runtime_error("failed to create directory " + path + ": " + std::strerror(mkdirError));
+}
+
+void CreateDirectories(const std::string &path)
+{
+    const std::string absolute = AbsolutePath(path);
+    size_t begin = 1U;
+    while (begin < absolute.size()) {
+        const size_t separator = absolute.find('/', begin);
+        EnsureDirectory(absolute.substr(0U, separator));
+        if (separator == std::string::npos) {
+            break;
+        }
+        begin = separator + 1U;
+    }
+}
+
+void RemoveTree(const std::string &path) noexcept
+{
+    struct stat info {};
+    if (lstat(path.c_str(), &info) != 0) {
+        return;
+    }
+    if (!S_ISDIR(info.st_mode) || S_ISLNK(info.st_mode)) {
+        (void)unlink(path.c_str());
+        return;
+    }
+    DIR *directory = opendir(path.c_str());
+    if (directory != nullptr) {
+        while (dirent *entry = readdir(directory)) {
+            const std::string name(entry->d_name);
+            if (name != "." && name != "..") {
+                RemoveTree(JoinPath(path, name));
+            }
+        }
+        (void)closedir(directory);
+    }
+    (void)rmdir(path.c_str());
+}
+
 struct ResourceFile {
     std::string fileName;
     std::string filePath;
@@ -61,143 +210,75 @@ struct ManifestUnit {
     std::vector<ResourceFile> files;
 };
 
-class FileSystem final {
-public:
-    static fs::path CanonicalDirectoryWithin(const fs::path &path, const fs::path &root,
-                                             const std::string &field)
-    {
-        const fs::path canonical = CanonicalDirectory(path, field);
-        if (!IsWithin(canonical, root)) {
-            throw std::runtime_error(field + " is not a directory below the manifest: " +
-                                     path.string());
-        }
-        return canonical;
+std::vector<uint8_t> ReadRegularFile(const std::string &path, uintmax_t maximum,
+                                     const std::string &field)
+{
+    const int descriptor = open(path.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+    if (descriptor < 0) {
+        throw SystemError("failed to open " + field + " " + path);
     }
+    struct stat info {};
+    if (fstat(descriptor, &info) != 0 || !S_ISREG(info.st_mode) || info.st_size < 0 ||
+        static_cast<uintmax_t>(info.st_size) > maximum ||
+        static_cast<uintmax_t>(info.st_size) > static_cast<uintmax_t>(std::numeric_limits<size_t>::max())) {
+        (void)close(descriptor);
+        throw std::runtime_error(field + " is not a permitted regular file: " + path);
+    }
+    std::vector<uint8_t> data(static_cast<size_t>(info.st_size));
+    size_t offset = 0U;
+    while (offset < data.size()) {
+        const ssize_t count = read(descriptor, data.data() + offset, data.size() - offset);
+        if (count < 0 && errno == EINTR) {
+            continue;
+        }
+        if (count <= 0) {
+            (void)close(descriptor);
+            throw std::runtime_error(field + " changed while being read: " + path);
+        }
+        offset += static_cast<size_t>(count);
+    }
+    uint8_t extra = 0U;
+    ssize_t extraCount = -1;
+    do {
+        extraCount = read(descriptor, &extra, 1U);
+    } while (extraCount < 0 && errno == EINTR);
+    const int readError = errno;
+    (void)close(descriptor);
+    if (extraCount > 0) {
+        throw std::runtime_error(field + " grew while being read: " + path);
+    }
+    if (extraCount < 0) {
+        throw std::runtime_error("failed to read " + field + ": " + std::strerror(readError));
+    }
+    return data;
+}
 
-    static uintmax_t FileSize(const fs::path &path, const std::string &field)
-    {
-        std::error_code error;
-        const uintmax_t size = fs::file_size(path, error);
-        if (error) {
-            throw std::runtime_error("failed to get " + field + " size: " + error.message());
-        }
-        return size;
+std::ofstream OpenGeneratedFile(const std::string &path)
+{
+    const int descriptor = open(path.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
+    if (descriptor < 0) {
+        throw SystemError("failed to create generated file " + path);
     }
+    (void)close(descriptor);
+    std::ofstream output(path.c_str(), std::ios::trunc);
+    if (!output.is_open()) {
+        (void)unlink(path.c_str());
+        throw std::runtime_error("failed to open generated file: " + path);
+    }
+    return output;
+}
 
-    static std::vector<uint8_t> ReadBytes(const fs::path &path, uintmax_t expectedSize,
-                                          const std::string &field)
-    {
-        if (expectedSize > static_cast<uintmax_t>(std::numeric_limits<size_t>::max()) ||
-            expectedSize > static_cast<uintmax_t>(std::numeric_limits<std::streamsize>::max())) {
-            throw std::runtime_error(field + " is too large to read: " + path.string());
-        }
-        std::ifstream input(path, std::ios::binary);
-        if (!input.is_open()) {
-            throw std::runtime_error("failed to read " + field + ": " + path.string());
-        }
-        std::vector<uint8_t> data(static_cast<size_t>(expectedSize));
-        if (!data.empty()) {
-            input.read(reinterpret_cast<char *>(data.data()),
-                       static_cast<std::streamsize>(data.size()));
-            if (input.gcount() != static_cast<std::streamsize>(data.size())) {
-                throw std::runtime_error(field + " changed while being read: " + path.string());
-            }
-        }
-        char extra = '\0';
-        if (input.get(extra)) {
-            throw std::runtime_error(field + " grew while being read: " + path.string());
-        }
-        if (!input.eof()) {
-            throw std::runtime_error("failed to read " + field + ": " + path.string());
-        }
-        return data;
+void FinishOutput(std::ofstream &output, const std::string &path)
+{
+    output.flush();
+    if (!output) {
+        throw std::runtime_error("failed to write generated file: " + path);
     }
-
-    static std::string ReadText(const fs::path &path, uintmax_t expectedSize,
-                                const std::string &field)
-    {
-        const std::vector<uint8_t> bytes = ReadBytes(path, expectedSize, field);
-        return std::string(bytes.begin(), bytes.end());
+    output.close();
+    if (!output) {
+        throw std::runtime_error("failed to close generated file: " + path);
     }
-
-    static std::ofstream OpenOutput(const fs::path &path)
-    {
-        std::error_code error;
-        const bool exists = fs::exists(path, error);
-        if (error) {
-            throw std::runtime_error("failed to inspect generated file path: " + error.message());
-        }
-        if (exists) {
-            throw std::runtime_error("generated file already exists in private work directory: " +
-                                     path.string());
-        }
-        std::ofstream output(path, std::ios::trunc);
-        if (!output.is_open()) {
-            throw std::runtime_error("failed to create generated file: " + path.string());
-        }
-        return output;
-    }
-
-    static void FinishOutput(std::ofstream &output, const fs::path &path)
-    {
-        output.flush();
-        if (!output) {
-            throw std::runtime_error("failed to write generated file: " + path.string());
-        }
-        output.close();
-        if (!output) {
-            throw std::runtime_error("failed to close generated file: " + path.string());
-        }
-    }
-
-    template <typename Visitor>
-    static void ForEachRecursiveEntry(const fs::path &root, Visitor visitor)
-    {
-        std::error_code error;
-        fs::recursive_directory_iterator iterator(root, error);
-        if (error) {
-            throw std::runtime_error("failed to enumerate " + root.string() + ": " + error.message());
-        }
-        const fs::recursive_directory_iterator end;
-        while (iterator != end) {
-            visitor(*iterator);
-            iterator.increment(error);
-            if (error) {
-                throw std::runtime_error("failed to enumerate " + root.string() + ": " + error.message());
-            }
-        }
-    }
-
-    static bool IsWithin(const fs::path &path, const fs::path &root)
-    {
-        auto pathIt = path.begin();
-        for (auto rootIt = root.begin(); rootIt != root.end(); ++rootIt, ++pathIt) {
-            if (pathIt == path.end() || *pathIt != *rootIt) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-private:
-    static fs::path CanonicalDirectory(const fs::path &path, const std::string &field)
-    {
-        std::error_code error;
-        const fs::file_status status = fs::symlink_status(path, error);
-        if (error || fs::is_symlink(status)) {
-            throw std::runtime_error(field + " must exist and must not be a symlink: " +
-                                     path.string());
-        }
-        const fs::path canonical = fs::canonical(path, error);
-        if (error) {
-            throw std::runtime_error("failed to resolve " + field + ": " + path.string());
-        }
-        if (error || !fs::is_directory(canonical, error)) {
-            throw std::runtime_error(field + " is not a directory: " + path.string());
-        }
-        return canonical;
-    }
-};
+}
 
 class ResourceBudget final {
 public:
@@ -226,7 +307,7 @@ private:
 
 class CollectedManifestRepository final {
 public:
-    explicit CollectedManifestRepository(fs::path manifestSearchRoot) noexcept
+    explicit CollectedManifestRepository(std::string manifestSearchRoot) noexcept
         : manifestSearchRoot_(std::move(manifestSearchRoot))
     {
     }
@@ -235,24 +316,24 @@ public:
     {
         ASCENDLOGD("Discovering manifests under %s", manifestSearchRoot_.c_str());
         ResourceBudget budget;
-        const std::vector<fs::path> manifests = DiscoverManifestFiles(manifestSearchRoot_);
+        const std::vector<std::string> manifests = DiscoverManifestFiles(manifestSearchRoot_);
         ASCENDLOGI("Discovered %zu manifest(s)", manifests.size());
         std::vector<ManifestUnit> units;
         units.reserve(manifests.size());
-        for (const fs::path &manifest : manifests) {
+        for (const std::string &manifest : manifests) {
             units.push_back(LoadUnit(manifest, budget));
         }
         return units;
     }
 
 private:
-    static std::string ReadBaseDir(const std::string &text, const fs::path &manifestPath)
+    static std::string ReadBaseDir(const std::string &text, const std::string &manifestPath)
     {
         Json manifest;
         try {
             manifest = Json::parse(text);
         } catch (const Json::parse_error &error) {
-            throw std::runtime_error("manifest is not valid JSON: " + manifestPath.string() +
+            throw std::runtime_error("manifest is not valid JSON: " + manifestPath +
                                      ": " + error.what());
         }
 
@@ -260,33 +341,63 @@ private:
             return manifest.at("base_dir").get<std::string>();
         } catch (const Json::exception &error) {
             throw std::runtime_error("manifest base_dir is unavailable: " +
-                                     manifestPath.string() + ": " + error.what());
+                                     manifestPath + ": " + error.what());
         }
     }
 
-    static bool IsManifestFile(const fs::path &path)
+    static bool IsManifestFile(const std::string &path)
     {
         constexpr const char *suffix = "_manifest.json";
-        const std::string name = path.filename().string();
+        const std::string name = FileName(path);
         return name.size() > std::strlen(suffix) &&
             name.compare(name.size() - std::strlen(suffix), std::strlen(suffix), suffix) == 0;
     }
 
-    static std::vector<fs::path> DiscoverManifestFiles(const fs::path &manifestSearchRoot)
+    static void DiscoverManifestFilesBelow(const std::string &directory,
+                                           std::vector<std::string> &manifests)
     {
-        std::vector<fs::path> manifests;
-        FileSystem::ForEachRecursiveEntry(manifestSearchRoot, [&](const fs::directory_entry &entry) {
-            std::error_code error;
-            if (entry.is_symlink(error) || error || !entry.is_regular_file(error) || error ||
-                !IsManifestFile(entry.path())) {
-                return;
+        DIR *stream = opendir(directory.c_str());
+        if (stream == nullptr) {
+            throw SystemError("failed to enumerate " + directory);
+        }
+        try {
+            while (dirent *entry = readdir(stream)) {
+                const std::string name(entry->d_name);
+                if (name == "." || name == "..") {
+                    continue;
+                }
+                const std::string path = JoinPath(directory, name);
+                struct stat info {};
+                if (lstat(path.c_str(), &info) != 0) {
+                    throw SystemError("failed to inspect collection entry " + path);
+                }
+                if (S_ISLNK(info.st_mode)) {
+                    continue;
+                }
+                if (S_ISDIR(info.st_mode)) {
+                    DiscoverManifestFilesBelow(path, manifests);
+                    continue;
+                }
+                if (!S_ISREG(info.st_mode) || !IsManifestFile(path)) {
+                    continue;
+                }
+                if (manifests.size() >= kMaxManifestCount) {
+                    throw std::runtime_error("collection exceeds manifest count limit of " +
+                                             std::to_string(kMaxManifestCount));
+                }
+                manifests.push_back(path);
             }
-            if (manifests.size() >= kMaxManifestCount) {
-                throw std::runtime_error("collection exceeds manifest count limit of " +
-                                         std::to_string(kMaxManifestCount));
-            }
-            manifests.push_back(entry.path());
-        });
+        } catch (...) {
+            (void)closedir(stream);
+            throw;
+        }
+        (void)closedir(stream);
+    }
+
+    static std::vector<std::string> DiscoverManifestFiles(const std::string &manifestSearchRoot)
+    {
+        std::vector<std::string> manifests;
+        DiscoverManifestFilesBelow(manifestSearchRoot, manifests);
         std::sort(manifests.begin(), manifests.end());
         if (manifests.empty()) {
             throw std::runtime_error("collected resources contain no manifest units");
@@ -294,53 +405,74 @@ private:
         return manifests;
     }
 
-    static ManifestUnit LoadUnit(const fs::path &manifestPath, ResourceBudget &budget)
+    static void LoadResourceFiles(const std::string &directory, const std::string &manifestRoot,
+                                  const std::string &manifestPath, ResourceBudget &budget,
+                                  ManifestUnit &unit)
+    {
+        DIR *stream = opendir(directory.c_str());
+        if (stream == nullptr) {
+            throw SystemError("failed to enumerate manifest base_dir " + directory);
+        }
+        try {
+            while (dirent *entry = readdir(stream)) {
+                const std::string name(entry->d_name);
+                if (name == "." || name == "..") {
+                    continue;
+                }
+                const std::string source = JoinPath(directory, name);
+                struct stat info {};
+                if (lstat(source.c_str(), &info) != 0) {
+                    throw SystemError("failed to inspect manifest resource " + source);
+                }
+                if (S_ISLNK(info.st_mode)) {
+                    throw std::runtime_error("manifest base_dir contains a symlink: " + source);
+                }
+                if (S_ISDIR(info.st_mode)) {
+                    LoadResourceFiles(source, manifestRoot, manifestPath, budget, unit);
+                    continue;
+                }
+                if (!S_ISREG(info.st_mode)) {
+                    throw std::runtime_error("manifest base_dir contains a non-regular file: " + source);
+                }
+                const std::vector<uint8_t> data =
+                    ReadRegularFile(source, kMaxResourceFileBytes, "manifest resource");
+                if (data.empty()) {
+                    ASCENDLOGD("Skipping empty manifest resource %s", source.c_str());
+                    continue;
+                }
+                if (unit.files.size() >= kMaxFilesPerManifest) {
+                    throw std::runtime_error("manifest exceeds resource file count limit: " + manifestPath);
+                }
+                budget.AddResource(data.size(), "manifest resource " + source);
+                const std::string filePath = source.substr(manifestRoot.size() + 1U);
+                ResourceFile file;
+                file.fileName = name;
+                file.filePath = filePath;
+                file.data = data;
+                unit.files.push_back(std::move(file));
+            }
+        } catch (...) {
+            (void)closedir(stream);
+            throw;
+        }
+        (void)closedir(stream);
+    }
+
+    static ManifestUnit LoadUnit(const std::string &manifestPath, ResourceBudget &budget)
     {
         ASCENDLOGD("Loading manifest %s", manifestPath.c_str());
         ManifestUnit unit;
-        const uintmax_t manifestSize = FileSystem::FileSize(manifestPath, "manifest");
-        if (manifestSize > kMaxManifestBytes) {
-            throw std::runtime_error("manifest exceeds size limit: " + manifestPath.string());
-        }
-        budget.AddPayload(manifestSize, "manifest " + manifestPath.string());
-        unit.json = FileSystem::ReadText(manifestPath, manifestSize, "manifest");
+        const std::vector<uint8_t> manifestBytes = ReadRegularFile(manifestPath, kMaxManifestBytes, "manifest");
+        budget.AddPayload(manifestBytes.size(), "manifest " + manifestPath);
+        unit.json.assign(manifestBytes.begin(), manifestBytes.end());
         const std::string baseDir = ReadBaseDir(unit.json, manifestPath);
 
-        const fs::path manifestRoot = manifestPath.parent_path();
-        const fs::path resourceRoot = FileSystem::CanonicalDirectoryWithin(
-            manifestRoot / baseDir, manifestRoot, "manifest base_dir");
-        FileSystem::ForEachRecursiveEntry(resourceRoot, [&](const fs::directory_entry &entry) {
-            std::error_code error;
-            if (entry.is_symlink(error) || error) {
-                throw std::runtime_error("manifest base_dir contains a symlink: " +
-                                         entry.path().string());
-            }
-            if (entry.is_directory(error) && !error) {
-                return;
-            }
-            if (error || !entry.is_regular_file(error) || error) {
-                throw std::runtime_error("manifest base_dir contains a non-regular file: " +
-                                         entry.path().string());
-            }
-            const fs::path source = entry.path();
-            const std::string fileName = source.filename().string();
-            const std::string filePath = source.lexically_relative(manifestRoot).generic_string();
-            const uintmax_t resourceSize = FileSystem::FileSize(source, "manifest resource");
-            if (resourceSize == 0U) {
-                ASCENDLOGD("Skipping empty manifest resource %s", source.c_str());
-                return;
-            }
-            if (resourceSize > kMaxResourceFileBytes) {
-                throw std::runtime_error("manifest resource exceeds size limit: " + source.string());
-            }
-            if (unit.files.size() >= kMaxFilesPerManifest) {
-                throw std::runtime_error("manifest exceeds resource file count limit: " +
-                                         manifestPath.string());
-            }
-            budget.AddResource(resourceSize, "manifest resource " + source.string());
-            unit.files.push_back({fileName, filePath,
-                                  FileSystem::ReadBytes(source, resourceSize, "manifest resource")});
-        });
+        const std::string manifestRoot = ParentPath(manifestPath);
+        const std::string resourceInput = !baseDir.empty() && baseDir[0] == '/' ?
+            baseDir : JoinPath(manifestRoot, baseDir);
+        const std::string resourceRoot =
+            CanonicalDirectoryWithin(resourceInput, manifestRoot, "manifest base_dir");
+        LoadResourceFiles(resourceRoot, manifestRoot, manifestPath, budget, unit);
         std::sort(unit.files.begin(), unit.files.end(),
                   [](const ResourceFile &left, const ResourceFile &right) {
                       return left.filePath < right.filePath;
@@ -350,12 +482,12 @@ private:
         return unit;
     }
 
-    fs::path manifestSearchRoot_;
+    std::string manifestSearchRoot_;
 };
 
 class BundleSourceGenerator final {
 public:
-    BundleSourceGenerator(fs::path workDir, std::string packageId,
+    BundleSourceGenerator(std::string workDir, std::string packageId,
                           const std::vector<ManifestUnit> &units) noexcept
         : workDir_(std::move(workDir)), packageId_(std::move(packageId)), units_(units)
     {
@@ -364,16 +496,16 @@ public:
     void Generate() const
     {
         ASCENDLOGD("Generating bundle sources in %s", workDir_.c_str());
-        const fs::path bundleSource = workDir_ / "compile_resource_bundle.cpp";
+        const std::string bundleSource = JoinPath(workDir_, "compile_resource_bundle.cpp");
         ASCENDLOGD("Generating bundle source %s", bundleSource.c_str());
         EmitBundleSource(bundleSource);
         for (size_t unitIndex = 0; unitIndex < units_.size(); ++unitIndex) {
-            const fs::path manifestSource =
-                workDir_ / ("manifest_" + std::to_string(unitIndex) + ".cpp");
+            const std::string manifestSource =
+                JoinPath(workDir_, "manifest_" + std::to_string(unitIndex) + ".cpp");
             ASCENDLOGD("Generating manifest source %s", manifestSource.c_str());
             EmitManifestSource(manifestSource, unitIndex, units_[unitIndex]);
         }
-        const fs::path makefile = workDir_ / "Makefile";
+        const std::string makefile = JoinPath(workDir_, "Makefile");
         ASCENDLOGD("Generating build file %s", makefile.c_str());
         EmitMakefile(makefile);
         ASCENDLOGI("Generated bundle sources for %zu manifest(s)", units_.size());
@@ -404,9 +536,9 @@ private:
                << name << "_bytes), " << value.size() << "ULL };\n";
     }
 
-    static void EmitManifestSource(const fs::path &path, size_t unitIndex, const ManifestUnit &unit)
+    static void EmitManifestSource(const std::string &path, size_t unitIndex, const ManifestUnit &unit)
     {
-        std::ofstream output = FileSystem::OpenOutput(path);
+        std::ofstream output = OpenGeneratedFile(path);
         const std::string prefix = "g_manifest_" + std::to_string(unitIndex);
         output << "#include \"ascendc_compile_resource/ascendc_manifest_abi.h\"\n\nnamespace {\n";
         EmitString(output, prefix + "_json", unit.json);
@@ -427,23 +559,24 @@ private:
             }
             output << "};\n";
         }
-        output << "} // namespace\n\nnamespace ascendc::resource::generated {\n"
+        output << "} // namespace\n\nnamespace ascendc {\nnamespace resource {\nnamespace generated {\n"
                << "AcCompileResourceManifest GetManifest" << unitIndex << "()\n{\n"
                << "    return { " << prefix << "_json, "
                << (unit.files.empty() ? "nullptr" : prefix + "_files") << ", "
-               << unit.files.size() << "ULL };\n}\n} // namespace ascendc::resource::generated\n";
-        FileSystem::FinishOutput(output, path);
+               << unit.files.size() << "ULL };\n}\n} // namespace generated\n"
+                  "} // namespace resource\n} // namespace ascendc\n";
+        FinishOutput(output, path);
     }
 
-    void EmitBundleSource(const fs::path &path) const
+    void EmitBundleSource(const std::string &path) const
     {
-        std::ofstream output = FileSystem::OpenOutput(path);
+        std::ofstream output = OpenGeneratedFile(path);
         output << "#include \"ascendc_compile_resource/ascendc_manifest_abi.h\"\n\n"
-                  "namespace ascendc::resource::generated {\n";
+                  "namespace ascendc {\nnamespace resource {\nnamespace generated {\n";
         for (size_t unitIndex = 0; unitIndex < units_.size(); ++unitIndex) {
             output << "AcCompileResourceManifest GetManifest" << unitIndex << "();\n";
         }
-        output << "} // namespace ascendc::resource::generated\n\nnamespace {\n";
+        output << "} // namespace generated\n} // namespace resource\n} // namespace ascendc\n\nnamespace {\n";
         EmitString(output, "g_package_id", packageId_);
         output << "static const AcCompileResourceManifest g_manifests[] = {\n";
         for (size_t unitIndex = 0; unitIndex < units_.size(); ++unitIndex) {
@@ -457,12 +590,12 @@ private:
                << "extern \"C\" __attribute__((visibility(\"default\")))\n"
                   "const AcCompileResourceBundleHeader *AscendcGetCompileResourceBundle(void)\n"
                   "{\n    return &g_bundle.header;\n}\n";
-        FileSystem::FinishOutput(output, path);
+        FinishOutput(output, path);
     }
 
-    void EmitMakefile(const fs::path &path) const
+    void EmitMakefile(const std::string &path) const
     {
-        std::ofstream output = FileSystem::OpenOutput(path);
+        std::ofstream output = OpenGeneratedFile(path);
         output << "SOURCES := compile_resource_bundle.cpp";
         for (size_t unitIndex = 0; unitIndex < units_.size(); ++unitIndex) {
             output << " manifest_" << unitIndex << ".cpp";
@@ -474,35 +607,27 @@ private:
                   "-Wl,-z,relro,-z,now,-z,noexecstack "
                   "-o \"$${ASCENDC_BUNDLE_OUTPUT}\"\n\n"
                   "%.o: %.cpp\n"
-                  "\t\"$${ASCENDC_BUNDLE_CXX}\" -std=c++17 -fPIC -fvisibility=hidden -O2 "
+                  "\t\"$${ASCENDC_BUNDLE_CXX}\" -std=c++11 -fPIC -fvisibility=hidden -O2 "
                   "-I\"$${ASCENDC_BUNDLE_INCLUDE_DIR}\" -c $< -o $@\n";
-        FileSystem::FinishOutput(output, path);
+        FinishOutput(output, path);
     }
 
-    fs::path workDir_;
+    std::string workDir_;
     std::string packageId_;
     const std::vector<ManifestUnit> &units_;
 };
 
 class BuildWorkspace final {
 public:
-    static BuildWorkspace Create(const fs::path &requestedParent, bool keepTemp)
+    static BuildWorkspace Create(const std::string &requestedParent, bool keepTemp)
     {
-        std::error_code error;
-        const fs::path parent = requestedParent.empty() ? fs::temp_directory_path(error) :
-                                                         fs::absolute(requestedParent, error);
-        if (error) {
-            throw std::runtime_error("failed to resolve bundle work directory: " + error.message());
-        }
-        fs::create_directories(parent, error);
-        if (error) {
-            throw std::runtime_error("failed to create bundle work directory: " + error.message());
-        }
-        if (!fs::is_directory(parent, error) || error) {
-            throw std::runtime_error("bundle work directory is not a directory: " + parent.string());
-        }
-
-        std::string pathTemplate = (parent / ".manifest-generator-XXXXXX").string();
+        const char *temporary = std::getenv("TMPDIR");
+        const std::string requested = requestedParent.empty() ?
+            (temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary) : requestedParent;
+        const std::string absolute = AbsolutePath(requested);
+        CreateDirectories(absolute);
+        const std::string parent = CanonicalDirectory(absolute, "bundle work directory");
+        std::string pathTemplate = JoinPath(parent, ".manifest-generator-XXXXXX");
         std::vector<char> buffer(pathTemplate.begin(), pathTemplate.end());
         buffer.push_back('\0');
         char *created = mkdtemp(buffer.data());
@@ -525,29 +650,23 @@ public:
     ~BuildWorkspace()
     {
         if (!session_.empty() && !keepTemp_) {
-            std::error_code ignored;
-            fs::remove_all(session_, ignored);
-            if (ignored) {
-                ASCENDLOGE("Failed to remove private bundle work directory %s: %s",
-                         session_.c_str(), ignored.message().c_str());
-            } else {
-                ASCENDLOGD("Removed private bundle work directory %s", session_.c_str());
-            }
+            RemoveTree(session_);
+            ASCENDLOGD("Removed private bundle work directory %s", session_.c_str());
         }
     }
 
-    const fs::path &Session() const noexcept
+    const std::string &Session() const noexcept
     {
         return session_;
     }
 
 private:
-    BuildWorkspace(fs::path session, bool keepTemp) noexcept
+    BuildWorkspace(std::string session, bool keepTemp) noexcept
         : session_(std::move(session)), keepTemp_(keepTemp)
     {
     }
 
-    fs::path session_;
+    std::string session_;
     bool keepTemp_ = false;
 };
 
@@ -557,25 +676,25 @@ public:
     {
         const char *configured = std::getenv("CXX");
         if (configured != nullptr && configured[0] != '\0') {
-            const fs::path found = Find(configured);
+            const std::string found = Find(configured);
             if (found.empty()) {
                 throw std::runtime_error("CXX does not resolve to an executable compiler: " +
                                          std::string(configured));
             }
-            return found.string();
+            return found;
         }
         for (const char *candidate : {"c++", "g++", "clang++"}) {
-            const fs::path found = Find(candidate);
+            const std::string found = Find(candidate);
             if (!found.empty()) {
-                return found.string();
+                return found;
             }
         }
         throw std::runtime_error("no C++ compiler found in PATH; set CXX to an executable compiler");
     }
 
-    static fs::path FindRequired(const std::string &name)
+    static std::string FindRequired(const std::string &name)
     {
-        const fs::path found = Find(name);
+        const std::string found = Find(name);
         if (found.empty()) {
             throw std::runtime_error("executable not found in PATH: " + name);
         }
@@ -583,21 +702,25 @@ public:
     }
 
 private:
-    static fs::path ExecutablePath(const fs::path &candidate)
+    static std::string ExecutablePath(const std::string &candidate)
     {
-        std::error_code error;
-        if (!fs::is_regular_file(candidate, error) || error || access(candidate.c_str(), X_OK) != 0) {
-            return {};
+        char *resolved = realpath(candidate.c_str(), nullptr);
+        if (resolved == nullptr) {
+            return std::string();
         }
-        const fs::path canonical = fs::canonical(candidate, error);
-        return error ? fs::path{} : canonical;
+        const std::string canonical(resolved);
+        std::free(resolved);
+        struct stat info {};
+        if (stat(canonical.c_str(), &info) != 0 || !S_ISREG(info.st_mode) || access(canonical.c_str(), X_OK) != 0) {
+            return std::string();
+        }
+        return canonical;
     }
 
-    static fs::path Find(const std::string &name)
+    static std::string Find(const std::string &name)
     {
-        const fs::path requested(name);
-        if (requested.has_parent_path()) {
-            return ExecutablePath(requested);
+        if (name.find('/') != std::string::npos) {
+            return ExecutablePath(name);
         }
         const char *pathEnvironment = std::getenv("PATH");
         const std::string searchPath = pathEnvironment == nullptr ? "/usr/bin:/bin" : pathEnvironment;
@@ -606,8 +729,7 @@ private:
             const size_t end = searchPath.find(':', begin);
             const std::string directory = searchPath.substr(
                 begin, end == std::string::npos ? std::string::npos : end - begin);
-            const fs::path found = ExecutablePath(
-                (directory.empty() ? fs::path(".") : fs::path(directory)) / name);
+            const std::string found = ExecutablePath(JoinPath(directory.empty() ? "." : directory, name));
             if (!found.empty()) {
                 return found;
             }
@@ -616,7 +738,7 @@ private:
             }
             begin = end + 1U;
         }
-        return {};
+        return std::string();
     }
 };
 
@@ -685,125 +807,152 @@ public:
 
 class MakeBundleBuilder final {
 public:
-    MakeBundleBuilder(fs::path workDir, fs::path output, uint32_t jobs) noexcept
+    MakeBundleBuilder(std::string workDir, std::string output, uint32_t jobs) noexcept
         : workDir_(std::move(workDir)), output_(std::move(output)), jobs_(jobs)
     {
     }
 
     void Build() const
     {
-        const fs::path make = ExecutableLocator::FindRequired("make");
+        const std::string make = ExecutableLocator::FindRequired("make");
         const std::string compiler = ExecutableLocator::FindCompiler();
-        const fs::path includeDir = CannIncludeDirectory();
+        const std::string includeDir = CannIncludeDirectory();
         ASCENDLOGD("Building bundle with make=%s compiler=%s include=%s jobs=%u", make.c_str(),
                  compiler.c_str(), includeDir.c_str(), jobs_);
         ProcessRunner::Run(
-            {make.string(), "-C", workDir_.string(), "-f", "Makefile", "-B",
+            {make, "-C", workDir_, "-f", "Makefile", "-B",
              "-j" + std::to_string(jobs_)},
             {{"ASCENDC_BUNDLE_CXX", compiler},
-             {"ASCENDC_BUNDLE_INCLUDE_DIR", includeDir.string()},
-             {"ASCENDC_BUNDLE_OUTPUT", output_.string()}});
+             {"ASCENDC_BUNDLE_INCLUDE_DIR", includeDir},
+             {"ASCENDC_BUNDLE_OUTPUT", output_}});
         ASCENDLOGI("Built staged compile resource bundle %s", output_.c_str());
     }
 
 private:
-    static fs::path CannIncludeDirectory()
+    static std::string CannIncludeDirectory()
     {
         const char *cannHome = std::getenv("ASCEND_HOME_PATH");
         if (cannHome == nullptr || cannHome[0] == '\0') {
             throw std::runtime_error("ASCEND_HOME_PATH is not configured");
         }
-        const fs::path includeDir = fs::path(cannHome) / "include";
-        const fs::path abiHeader = includeDir / "ascendc_compile_resource/ascendc_manifest_abi.h";
-        std::error_code error;
-        if (!fs::is_regular_file(abiHeader, error) || error) {
+        const std::string includeDir = JoinPath(cannHome, "include");
+        const std::string abiHeader =
+            JoinPath(includeDir, "ascendc_compile_resource/ascendc_manifest_abi.h");
+        struct stat info {};
+        if (lstat(abiHeader.c_str(), &info) != 0 || !S_ISREG(info.st_mode)) {
             throw std::runtime_error("CANN package include is missing ascendc_manifest_abi.h: " +
-                                     includeDir.string());
+                                     includeDir);
         }
-        const fs::path canonical = fs::canonical(includeDir, error);
-        if (error || !fs::is_directory(canonical)) {
-            throw std::runtime_error("failed to resolve CANN package include directory: " +
-                                     includeDir.string());
-        }
-        return canonical;
+        return CanonicalDirectory(includeDir, "CANN package include directory");
     }
 
-    fs::path workDir_;
-    fs::path output_;
+    std::string workDir_;
+    std::string output_;
     uint32_t jobs_ = 1U;
 };
 
 class BundlePublisher final {
 public:
-    static void Prepare(const fs::path &output)
+    static void Prepare(const std::string &output)
     {
-        std::error_code error;
-        fs::create_directories(output.parent_path(), error);
-        if (error) {
-            throw std::runtime_error("failed to create bundle output directory: " + error.message());
-        }
         RejectSymlink(output);
     }
 
-    static void Publish(const fs::path &staged, const fs::path &output)
+    static void Publish(const std::string &staged, const std::string &output)
     {
         RejectSymlink(output);
-        std::error_code error;
-        fs::rename(staged, output, error);
-        if (!error) {
+        if (rename(staged.c_str(), output.c_str()) == 0) {
             ASCENDLOGI("Published compile resource bundle %s", output.c_str());
             return;
         }
-        if (error != std::make_error_code(std::errc::cross_device_link)) {
-            throw std::runtime_error("failed to publish bundle output: " + error.message());
+        if (errno != EXDEV) {
+            throw SystemError("failed to publish bundle output");
         }
         PublishAcrossFileSystems(staged, output);
         ASCENDLOGI("Published compile resource bundle %s", output.c_str());
     }
 
 private:
-    static void RejectSymlink(const fs::path &output)
+    static void RejectSymlink(const std::string &output)
     {
-        std::error_code error;
-        const fs::file_status status = fs::symlink_status(output, error);
-        if (error == std::make_error_code(std::errc::no_such_file_or_directory)) {
-            return;
+        struct stat info {};
+        if (lstat(output.c_str(), &info) != 0) {
+            if (errno == ENOENT) {
+                return;
+            }
+            throw SystemError("failed to inspect bundle output path");
         }
-        if (error) {
-            throw std::runtime_error("failed to inspect bundle output path: " + error.message());
-        }
-        if (fs::is_symlink(status)) {
+        if (S_ISLNK(info.st_mode)) {
             throw std::runtime_error("bundle output must not be a symlink");
         }
     }
 
-    static void PublishAcrossFileSystems(const fs::path &staged, const fs::path &output)
+    static void CopyRegularFile(const std::string &source, const std::string &destination)
+    {
+        const int input = open(source.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+        if (input < 0) {
+            throw SystemError("failed to open staged bundle output");
+        }
+        struct stat info {};
+        if (fstat(input, &info) != 0 || !S_ISREG(info.st_mode)) {
+            (void)close(input);
+            throw std::runtime_error("staged bundle output is not a regular file");
+        }
+        const int output = open(destination.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC,
+                                info.st_mode & 0777);
+        if (output < 0) {
+            (void)close(input);
+            throw SystemError("failed to create copied bundle output");
+        }
+        try {
+            std::vector<uint8_t> buffer(64U * 1024U);
+            while (true) {
+                const ssize_t count = read(input, buffer.data(), buffer.size());
+                if (count < 0 && errno == EINTR) {
+                    continue;
+                }
+                if (count < 0) {
+                    throw SystemError("failed to read staged bundle output");
+                }
+                if (count == 0) {
+                    break;
+                }
+                size_t offset = 0U;
+                while (offset < static_cast<size_t>(count)) {
+                    const ssize_t written = write(output, buffer.data() + offset,
+                                                  static_cast<size_t>(count) - offset);
+                    if (written < 0 && errno == EINTR) {
+                        continue;
+                    }
+                    if (written <= 0) {
+                        throw SystemError("failed to write copied bundle output");
+                    }
+                    offset += static_cast<size_t>(written);
+                }
+            }
+        } catch (...) {
+            (void)close(input);
+            (void)close(output);
+            (void)unlink(destination.c_str());
+            throw;
+        }
+        (void)close(input);
+        if (close(output) != 0) {
+            (void)unlink(destination.c_str());
+            throw SystemError("failed to close copied bundle output");
+        }
+    }
+
+    static void PublishAcrossFileSystems(const std::string &staged, const std::string &output)
     {
         ASCENDLOGD("Copying staged bundle across filesystems: %s -> %s", staged.c_str(),
                  output.c_str());
-        BuildWorkspace publishWorkspace = BuildWorkspace::Create(output.parent_path(), false);
-        const fs::path copied = publishWorkspace.Session() / "compile_resource_bundle.so";
-        std::error_code error;
-        fs::copy_file(staged, copied, error);
-        if (error) {
-            throw std::runtime_error("failed to copy staged bundle output: " + error.message());
-        }
-
-        const fs::file_status stagedStatus = fs::status(staged, error);
-        if (error) {
-            throw std::runtime_error("failed to inspect staged bundle permissions: " +
-                                     error.message());
-        }
-        fs::permissions(copied, stagedStatus.permissions(), fs::perm_options::replace, error);
-        if (error) {
-            throw std::runtime_error("failed to preserve staged bundle permissions: " +
-                                     error.message());
-        }
-
+        BuildWorkspace publishWorkspace = BuildWorkspace::Create(ParentPath(output), false);
+        const std::string copied = JoinPath(publishWorkspace.Session(), "compile_resource_bundle.so");
+        CopyRegularFile(staged, copied);
         RejectSymlink(output);
-        fs::rename(copied, output, error);
-        if (error) {
-            throw std::runtime_error("failed to publish copied bundle output: " + error.message());
+        if (rename(copied.c_str(), output.c_str()) != 0) {
+            throw SystemError("failed to publish copied bundle output");
         }
     }
 };
@@ -832,21 +981,23 @@ void ManifestBundleCompiler::Compile() const
     if (request_.packageId.empty()) {
         throw std::runtime_error("bundle package ID must not be empty");
     }
-    std::error_code error;
-    const fs::path manifestSearchRoot = fs::canonical(request_.manifestSearchRoot, error);
-    if (error || !fs::is_directory(manifestSearchRoot)) {
-        throw std::runtime_error("manifest search root is not a directory");
-    }
+    const std::string manifestSearchRoot =
+        CanonicalDirectory(request_.manifestSearchRoot, "manifest search root");
     if (request_.outputSo.empty()) {
         throw std::runtime_error("bundle output path must not be empty");
     }
-    if (!request_.outputSo.has_parent_path()) {
+    const std::string outputParent = ParentPath(request_.outputSo);
+    const std::string outputName = FileName(request_.outputSo);
+    if (outputParent.empty()) {
         throw std::runtime_error("bundle output path must include a parent directory");
     }
-    const fs::path output = fs::absolute(request_.outputSo, error).lexically_normal();
-    if (error) {
-        throw std::runtime_error("failed to resolve bundle output path: " + error.message());
+    if (outputName.empty() || outputName == "." || outputName == "..") {
+        throw std::runtime_error("bundle output path has an invalid file name");
     }
+    const std::string absoluteOutputParent = AbsolutePath(outputParent);
+    CreateDirectories(absoluteOutputParent);
+    const std::string output = JoinPath(
+        CanonicalDirectory(absoluteOutputParent, "bundle output directory"), outputName);
     BundlePublisher::Prepare(output);
     const uint32_t jobs = ResolveJobCount(request_.jobs);
     ASCENDLOGI("Using %u parallel bundle build job(s)", jobs);
@@ -860,10 +1011,11 @@ void ManifestBundleCompiler::Compile() const
     }
 
     BundleSourceGenerator(workspace.Session(), request_.packageId, units).Generate();
-    const fs::path stagedOutput = workspace.Session() / "compile_resource_bundle.so";
+    const std::string stagedOutput = JoinPath(workspace.Session(), "compile_resource_bundle.so");
     MakeBundleBuilder(workspace.Session(), stagedOutput, jobs).Build();
     BundlePublisher::Publish(stagedOutput, output);
     ASCENDLOGI("Bundle generation completed successfully: %s", output.c_str());
 }
 
-} // namespace ascendc::manifest_generator
+} // namespace manifest_generator
+} // namespace ascendc

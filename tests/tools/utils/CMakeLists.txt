@@ -222,10 +222,6 @@ function(configure_asc_compile_exporter_test target_name)
         -Werror
     )
 
-    target_compile_options(${target_name} PRIVATE
-    -std=c++17
-    )
-
     target_link_libraries(${target_name} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         json

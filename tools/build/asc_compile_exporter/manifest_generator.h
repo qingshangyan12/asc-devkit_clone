@@ -12,16 +12,16 @@
 #define ASCENDC_MANIFEST_GENERATOR_H
 
 #include <cstdint>
-#include <filesystem>
 #include <string>
 
-namespace ascendc::manifest_generator {
+namespace ascendc {
+namespace manifest_generator {
 
 struct BuildCollectedBundleRequest {
     std::string packageId;
-    std::filesystem::path manifestSearchRoot;
-    std::filesystem::path outputSo;
-    std::filesystem::path workDir;
+    std::string manifestSearchRoot;
+    std::string outputSo;
+    std::string workDir;
     bool keepTemp = false;
     uint32_t jobs = 0U;
 };
@@ -36,6 +36,7 @@ private:
     BuildCollectedBundleRequest request_;
 };
 
-} // namespace ascendc::manifest_generator
+} // namespace manifest_generator
+} // namespace ascendc
 
 #endif // ASCENDC_MANIFEST_GENERATOR_H

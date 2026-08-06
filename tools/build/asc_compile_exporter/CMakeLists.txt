@@ -46,10 +46,6 @@ target_link_libraries(asc_compile_exporter PRIVATE
   json
 )
 
-target_compile_options(asc_compile_exporter PRIVATE
-  -std=c++17
-)
-
 target_link_options(asc_compile_exporter PRIVATE
     -pie
     $<$<CONFIG:Release>:-s>

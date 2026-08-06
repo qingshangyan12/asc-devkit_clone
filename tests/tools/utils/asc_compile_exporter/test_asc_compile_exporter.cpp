@@ -9,15 +9,17 @@
  */
 
 #include <dlfcn.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
+#include <cerrno>
 #include <cstdlib>
-#include <filesystem>
+#include <cstring>
 #include <fstream>
 #include <iterator>
 #include <stdexcept>
 #include <string>
-#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -28,19 +30,27 @@
 
 namespace {
 
-namespace fs = std::filesystem;
 using ascendc::manifest_generator::BuildCollectedBundleRequest;
 using ascendc::manifest_generator::ManifestBundleCompiler;
 
 struct SavedEnvironment {
-    bool exists = false;
+    SavedEnvironment() : exists(false)
+    {
+    }
+
+    SavedEnvironment(bool existsValue, const std::string &valueValue)
+        : exists(existsValue), value(valueValue)
+    {
+    }
+
+    bool exists;
     std::string value;
 };
 
 SavedEnvironment SaveEnvironment(const char *name)
 {
     const char *value = std::getenv(name);
-    return {value != nullptr, value == nullptr ? std::string{} : std::string(value)};
+    return SavedEnvironment(value != nullptr, value == nullptr ? std::string() : std::string(value));
 }
 
 void RestoreEnvironment(const char *name, const SavedEnvironment &saved) noexcept
@@ -52,27 +62,103 @@ void RestoreEnvironment(const char *name, const SavedEnvironment &saved) noexcep
     }
 }
 
-void WriteFile(const fs::path &path, const std::string &content)
+std::string JoinTestPath(const std::string &left, const std::string &right)
 {
-    std::error_code error;
-    fs::create_directories(path.parent_path(), error);
-    if (error) {
-        throw std::runtime_error("failed to create test directory: " + error.message());
+    if (left.empty()) {
+        return right;
     }
-    std::ofstream output(path, std::ios::binary | std::ios::trunc);
+    return left[left.size() - 1U] == '/' ? left + right : left + "/" + right;
+}
+
+std::string ParentTestPath(const std::string &path)
+{
+    const size_t separator = path.find_last_of('/');
+    if (separator == std::string::npos) {
+        return std::string();
+    }
+    return separator == 0U ? "/" : path.substr(0U, separator);
+}
+
+bool IsTestDirectory(const std::string &path)
+{
+    struct stat info {};
+    return stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode);
+}
+
+bool IsTestRegularFile(const std::string &path)
+{
+    struct stat info {};
+    return stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode);
+}
+
+void CreateTestDirectories(const std::string &path)
+{
+    if (path.empty() || path == "/" || IsTestDirectory(path)) {
+        return;
+    }
+    CreateTestDirectories(ParentTestPath(path));
+    if (mkdir(path.c_str(), 0700) != 0 && !(errno == EEXIST && IsTestDirectory(path))) {
+        throw std::runtime_error("failed to create test directory " + path + ": " + std::strerror(errno));
+    }
+}
+
+void RemoveTestTree(const std::string &path) noexcept
+{
+    struct stat info {};
+    if (lstat(path.c_str(), &info) != 0) {
+        return;
+    }
+    if (!S_ISDIR(info.st_mode) || S_ISLNK(info.st_mode)) {
+        (void)unlink(path.c_str());
+        return;
+    }
+    DIR *directory = opendir(path.c_str());
+    if (directory != nullptr) {
+        while (dirent *entry = readdir(directory)) {
+            const std::string name(entry->d_name);
+            if (name != "." && name != "..") {
+                RemoveTestTree(JoinTestPath(path, name));
+            }
+        }
+        (void)closedir(directory);
+    }
+    (void)rmdir(path.c_str());
+}
+
+std::vector<std::string> ListTestDirectory(const std::string &path)
+{
+    DIR *directory = opendir(path.c_str());
+    if (directory == nullptr) {
+        throw std::runtime_error("failed to enumerate test directory: " + path);
+    }
+    std::vector<std::string> names;
+    while (dirent *entry = readdir(directory)) {
+        const std::string name(entry->d_name);
+        if (name != "." && name != "..") {
+            names.push_back(name);
+        }
+    }
+    (void)closedir(directory);
+    return names;
+}
+
+void WriteFile(const std::string &path, const std::string &content)
+{
+    CreateTestDirectories(ParentTestPath(path));
+    std::ofstream output(path.c_str(), std::ios::binary | std::ios::trunc);
     if (!output.is_open()) {
-        throw std::runtime_error("failed to create test file: " + path.string());
+        throw std::runtime_error("failed to create test file: " + path);
     }
     output.write(content.data(), static_cast<std::streamsize>(content.size()));
     output.close();
     if (!output) {
-        throw std::runtime_error("failed to write test file: " + path.string());
+        throw std::runtime_error("failed to write test file: " + path);
     }
 }
 
-std::string ReadFile(const fs::path &path)
+std::string ReadFile(const std::string &path)
 {
-    std::ifstream input(path, std::ios::binary);
+    std::ifstream input(path.c_str(), std::ios::binary);
     return std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
 }
 
@@ -88,7 +174,10 @@ protected:
         ascendHome_ = SaveEnvironment("ASCEND_HOME_PATH");
         compiler_ = SaveEnvironment("CXX");
 
-        std::string pathTemplate = (fs::temp_directory_path() / "asc_compile_exporter_ut_XXXXXX").string();
+        const char *temporary = std::getenv("TMPDIR");
+        std::string pathTemplate = JoinTestPath(
+            temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary,
+            "asc_compile_exporter_ut_XXXXXX");
         std::vector<char> buffer(pathTemplate.begin(), pathTemplate.end());
         buffer.push_back('\0');
         char *created = mkdtemp(buffer.data());
@@ -103,20 +192,25 @@ protected:
     {
         RestoreEnvironment("CXX", compiler_);
         RestoreEnvironment("ASCEND_HOME_PATH", ascendHome_);
-        std::error_code ignored;
-        fs::remove_all(root_, ignored);
+        RemoveTestTree(root_);
     }
 
     BuildCollectedBundleRequest Request(const std::string &packageId = "test_package") const
     {
-        return {packageId, root_ / "collection", root_ / "output/bundle.so",
-                root_ / "work", false, 1U};
+        BuildCollectedBundleRequest request;
+        request.packageId = packageId;
+        request.manifestSearchRoot = JoinTestPath(root_, "collection");
+        request.outputSo = JoinTestPath(root_, "output/bundle.so");
+        request.workDir = JoinTestPath(root_, "work");
+        request.keepTemp = false;
+        request.jobs = 1U;
+        return request;
     }
 
-    void CreateManifest(const fs::path &unit, const std::string &name,
+    void CreateManifest(const std::string &unit, const std::string &name,
                         const std::string &baseDir = "resources") const
     {
-        WriteFile(unit / (name + "_manifest.json"),
+        WriteFile(JoinTestPath(unit, name + "_manifest.json"),
                   "{\"base_dir\":\"" + baseDir + "\",\"name\":\"" + name + "\"}");
     }
 
@@ -131,7 +225,7 @@ protected:
         }
     }
 
-    fs::path root_;
+    std::string root_;
 
 private:
     SavedEnvironment ascendHome_;
@@ -140,18 +234,18 @@ private:
 
 TEST_F(AscCompileExporterTest, RejectsEmptyPackageId)
 {
-    fs::create_directories(root_ / "collection");
+    CreateTestDirectories(JoinTestPath(root_, "collection"));
     ExpectCompileError(Request(""), "package ID must not be empty");
 }
 
 TEST_F(AscCompileExporterTest, RejectsInvalidManifestSearchRoot)
 {
-    ExpectCompileError(Request(), "manifest search root is not a directory");
+    ExpectCompileError(Request(), "manifest search root must exist");
 }
 
 TEST_F(AscCompileExporterTest, RejectsOutputWithoutParentDirectory)
 {
-    fs::create_directories(root_ / "collection");
+    CreateTestDirectories(JoinTestPath(root_, "collection"));
     BuildCollectedBundleRequest request = Request();
     request.outputSo = "bundle.so";
     ExpectCompileError(request, "output path must include a parent directory");
@@ -159,7 +253,7 @@ TEST_F(AscCompileExporterTest, RejectsOutputWithoutParentDirectory)
 
 TEST_F(AscCompileExporterTest, RejectsMissingManifestWithoutReplacingOutput)
 {
-    fs::create_directories(root_ / "collection");
+    CreateTestDirectories(JoinTestPath(root_, "collection"));
     const BuildCollectedBundleRequest request = Request();
     WriteFile(request.outputSo, "previous bundle");
 
@@ -169,9 +263,9 @@ TEST_F(AscCompileExporterTest, RejectsMissingManifestWithoutReplacingOutput)
 
 TEST_F(AscCompileExporterTest, RejectsMalformedJsonWithoutReplacingOutput)
 {
-    const fs::path unit = root_ / "collection/Malformed";
-    WriteFile(unit / "resources/kernel.cpp", "source");
-    WriteFile(unit / "Malformed_manifest.json", "{\"base_dir\":\"resources\"");
+    const std::string unit = JoinTestPath(root_, "collection/Malformed");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
+    WriteFile(JoinTestPath(unit, "Malformed_manifest.json"), "{\"base_dir\":\"resources\"");
     const BuildCollectedBundleRequest request = Request();
     WriteFile(request.outputSo, "previous bundle");
 
@@ -181,8 +275,8 @@ TEST_F(AscCompileExporterTest, RejectsMalformedJsonWithoutReplacingOutput)
 
 TEST_F(AscCompileExporterTest, RejectsBaseDirectoryOutsideManifestDirectory)
 {
-    const fs::path unit = root_ / "collection/Traversal";
-    WriteFile(root_ / "collection/outside/kernel.cpp", "source");
+    const std::string unit = JoinTestPath(root_, "collection/Traversal");
+    WriteFile(JoinTestPath(root_, "collection/outside/kernel.cpp"), "source");
     CreateManifest(unit, "Traversal", "../outside");
 
     ExpectCompileError(Request(), "is not a directory below the manifest");
@@ -190,10 +284,11 @@ TEST_F(AscCompileExporterTest, RejectsBaseDirectoryOutsideManifestDirectory)
 
 TEST_F(AscCompileExporterTest, RejectsSymlinkInResourceDirectory)
 {
-    const fs::path unit = root_ / "collection/Symlink";
-    WriteFile(unit / "resources/kernel.cpp", "source");
-    WriteFile(root_ / "outside.cpp", "outside");
-    fs::create_symlink(root_ / "outside.cpp", unit / "resources/link.cpp");
+    const std::string unit = JoinTestPath(root_, "collection/Symlink");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
+    const std::string outside = JoinTestPath(root_, "outside.cpp");
+    WriteFile(outside, "outside");
+    ASSERT_EQ(symlink(outside.c_str(), JoinTestPath(unit, "resources/link.cpp").c_str()), 0);
     CreateManifest(unit, "Symlink");
 
     ExpectCompileError(Request(), "base_dir contains a symlink");
@@ -201,35 +296,37 @@ TEST_F(AscCompileExporterTest, RejectsSymlinkInResourceDirectory)
 
 TEST_F(AscCompileExporterTest, RejectsOversizedResourceWithoutReplacingOutput)
 {
-    const fs::path unit = root_ / "collection/Large";
-    WriteFile(unit / "resources/kernel.cpp", "");
-    fs::resize_file(unit / "resources/kernel.cpp", 1U * 1024U * 1024U + 1U);
+    const std::string unit = JoinTestPath(root_, "collection/Large");
+    const std::string resource = JoinTestPath(unit, "resources/kernel.cpp");
+    WriteFile(resource, "");
+    ASSERT_EQ(truncate(resource.c_str(), 1U * 1024U * 1024U + 1U), 0);
     CreateManifest(unit, "Large");
     const BuildCollectedBundleRequest request = Request();
     WriteFile(request.outputSo, "previous bundle");
 
-    ExpectCompileError(request, "resource exceeds size limit");
+    ExpectCompileError(request, "not a permitted regular file");
     EXPECT_EQ(ReadFile(request.outputSo), "previous bundle");
 }
 
 TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
 {
-    const fs::path first = root_ / "collection/nested/First";
-    const fs::path second = root_ / "collection/Second";
-    WriteFile(first / "resources/kernel.cpp", "first source");
-    WriteFile(first / "resources/include/nested.h", "nested header");
-    WriteFile(first / "resources/empty.bin", "");
-    WriteFile(second / "resources/kernel.cpp", "second source");
+    const std::string first = JoinTestPath(root_, "collection/nested/First");
+    const std::string second = JoinTestPath(root_, "collection/Second");
+    WriteFile(JoinTestPath(first, "resources/kernel.cpp"), "first source");
+    WriteFile(JoinTestPath(first, "resources/include/nested.h"), "nested header");
+    WriteFile(JoinTestPath(first, "resources/empty.bin"), "");
+    WriteFile(JoinTestPath(second, "resources/kernel.cpp"), "second source");
     CreateManifest(first, "First");
     CreateManifest(second, "Second");
 
     const BuildCollectedBundleRequest request = Request("multi_manifest");
     ManifestBundleCompiler(request).Compile();
 
-    ASSERT_TRUE(fs::is_regular_file(request.outputSo));
-    ASSERT_TRUE(fs::is_directory(request.workDir));
-    for (const fs::directory_entry &entry : fs::directory_iterator(request.workDir)) {
-        EXPECT_NE(entry.path().filename().string().rfind(".manifest-generator-", 0U), 0U);
+    ASSERT_TRUE(IsTestRegularFile(request.outputSo));
+    ASSERT_TRUE(IsTestDirectory(request.workDir));
+    const std::vector<std::string> workEntries = ListTestDirectory(request.workDir);
+    for (size_t index = 0U; index < workEntries.size(); ++index) {
+        EXPECT_NE(workEntries[index].find(".manifest-generator-"), 0U);
     }
 
     void *handle = dlopen(request.outputSo.c_str(), RTLD_NOW | RTLD_LOCAL);

@@ -8,13 +8,13 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include <charconv>
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
 #include <cstdint>
 #include <exception>
-#include <filesystem>
 #include <iostream>
 #include <string>
-#include <system_error>
 #include <utility>
 
 #include "ascendc_tool_log.h"
@@ -31,12 +31,21 @@ void PrintUsage(const char *program)
 
 bool ParseJobs(const std::string &text, uint32_t &jobs)
 {
-    uint32_t parsed = 0U;
-    const auto result = std::from_chars(text.data(), text.data() + text.size(), parsed);
-    if (result.ec != std::errc{} || result.ptr != text.data() + text.size() || parsed == 0U) {
+    if (text.empty()) {
         return false;
     }
-    jobs = parsed;
+    for (const char character : text) {
+        if (character < '0' || character > '9') {
+            return false;
+        }
+    }
+    errno = 0;
+    char *end = nullptr;
+    const unsigned long parsed = std::strtoul(text.c_str(), &end, 10);
+    if (errno == ERANGE || end == text.c_str() || *end != '\0' || parsed == 0UL || parsed > UINT32_MAX) {
+        return false;
+    }
+    jobs = static_cast<uint32_t>(parsed);
     return true;
 }
 
@@ -52,7 +61,7 @@ int Run(int argc, char **argv)
             PrintUsage(argv[0]);
             return 1;
         }
-        std::filesystem::path workDir;
+        std::string workDir;
         bool keepTemp = false;
         uint32_t jobs = 0U;
         bool jobsSpecified = false;
@@ -71,8 +80,14 @@ int Run(int argc, char **argv)
                 return 1;
             }
         }
-        ascendc::manifest_generator::ManifestBundleCompiler compiler(
-            {argv[2], argv[3], argv[4], std::move(workDir), keepTemp, jobs});
+        ascendc::manifest_generator::BuildCollectedBundleRequest request;
+        request.packageId = argv[2];
+        request.manifestSearchRoot = argv[3];
+        request.outputSo = argv[4];
+        request.workDir = std::move(workDir);
+        request.keepTemp = keepTemp;
+        request.jobs = jobs;
+        ascendc::manifest_generator::ManifestBundleCompiler compiler(std::move(request));
         compiler.Compile();
         return 0;
     }
