@@ -294,7 +294,8 @@ HcclResult AllocComResourceByTilingCcu(
     return HCCL_SUCCESS;
 }
 
-HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
+namespace {
+HcclResult HcclAllocComResourceByTilingImpl(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     HCCL_RUN_INFO(
