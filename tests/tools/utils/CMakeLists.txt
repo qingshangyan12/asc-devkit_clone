@@ -197,6 +197,47 @@ run_llt_test(
     TASK_NUM 1
 )
 
+# ================ asc_compile_exporter ================
+add_executable(ascendc_ut_asc_compile_exporter
+    ${ASCENDC_DIR}/tests/main.cpp
+    asc_compile_exporter/test_asc_compile_exporter_unit.cpp
+    asc_compile_exporter/test_manifest_generator_unit.cpp
+    asc_compile_exporter/test_asc_compile_exporter.cpp
+)
+
+function(configure_asc_compile_exporter_test target_name)
+    target_compile_definitions(${target_name} PRIVATE
+        UT_TEST
+        ASC_COMPILE_EXPORTER_TEST_CANN_HOME="${CMAKE_CURRENT_SOURCE_DIR}/asc_compile_exporter/fixtures/cann"
+        ASC_COMPILE_EXPORTER_TEST_CXX="${CMAKE_CXX_COMPILER}"
+    )
+
+    target_include_directories(${target_name} PRIVATE
+        ${ASCENDC_DIR}/tools/build/asc_compile_exporter
+        ${ASCENDC_DIR}/tools/build/common
+        ${CMAKE_CURRENT_SOURCE_DIR}/asc_compile_exporter/fixtures/cann/include
+    )
+
+    target_compile_options(${target_name} PRIVATE
+        -Werror
+    )
+
+    target_link_libraries(${target_name} PRIVATE
+        $<BUILD_INTERFACE:intf_llt_pub_basic>
+        json
+        mmpa_headers
+        metadef_headers
+        dl
+    )
+endfunction()
+
+configure_asc_compile_exporter_test(ascendc_ut_asc_compile_exporter)
+
+run_llt_test(
+    TARGET ascendc_ut_asc_compile_exporter
+    TASK_NUM 1
+)
+
 
 # ###################################opbuild ut#################################
 add_library(ops_utest SHARED ${ASCENDC_DIR}/tests/tools/utils/opbuild/test_ops.cpp)
