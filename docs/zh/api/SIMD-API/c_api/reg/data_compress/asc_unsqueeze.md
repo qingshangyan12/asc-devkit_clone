@@ -36,12 +36,18 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_unsqueeze(vector_int8_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_uint8_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_int16_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_uint16_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_int32_t& dst, vector_bool mask)
-__simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask)
+__simd_callee__ inline void asc_unsqueeze(vector_<dtype>& dst,
+                                          vector_bool mask)
+```
+
+支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+
+- 典型示例
+
+```cpp
+// 示例：对int8_t矢量数据寄存器执行解压缩
+__simd_callee__ inline void asc_unsqueeze(vector_int8_t& dst,
+                                          vector_bool mask)
 ```
 
 ## 参数说明
@@ -61,7 +67,10 @@ __simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- dst写入值为非负整数计数，dtype选`uint8_t`/`uint16_t`/`uint32_t`时计数直接表达；选`int8_t`/`int16_t`/`int32_t`时计数以有符号整数表达，因计数非负，实际占用有符号dtype的非负区间，不会出现负值。
 
 ## 调用示例
 

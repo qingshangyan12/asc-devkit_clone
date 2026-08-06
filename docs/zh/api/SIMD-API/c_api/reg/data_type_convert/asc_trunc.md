@@ -33,9 +33,20 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_trunc(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_trunc(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-__simd_callee__ inline void asc_trunc(vector_float& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_trunc(vector_<dtype>& dst,
+                                      vector_<dtype> src,
+                                      vector_bool mask)
+```
+
+支持的数据类型：half、bfloat16_t、float。
+
+- 典型示例
+
+```cpp
+// 示例：对half矢量数据寄存器执行截断
+__simd_callee__ inline void asc_trunc(vector_half& dst,
+                                      vector_half src,
+                                      vector_bool mask)
 ```
 
 ## 参数说明
@@ -56,7 +67,10 @@ __simd_callee__ inline void asc_trunc(vector_float& dst, vector_float src, vecto
 
 ## 约束说明
 
-float类型只支持不饱和模式。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- float类型只支持不饱和模式。
+- dst与src的dtype必须一致且符合支持的数据类型，传入整数类型或类型不匹配会触发异常。
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 ## 调用示例
 

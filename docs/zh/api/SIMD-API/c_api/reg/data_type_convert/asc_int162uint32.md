@@ -34,9 +34,13 @@
 
 ```cpp
 //取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162uint32(vector_uint32_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162uint32(vector_uint32_t& dst,
+                                             vector_int16_t src,
+                                             vector_bool mask)
 //取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
-__simd_callee__ inline void asc_int162uint32_v2(vector_uint32_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162uint32_v2(vector_uint32_t& dst,
+                                                vector_int16_t src,
+                                                vector_bool mask)
 ```
 
 ## 参数说明
@@ -57,7 +61,9 @@ __simd_callee__ inline void asc_int162uint32_v2(vector_uint32_t& dst, vector_int
 
 ## 约束说明
 
-mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 源与目的寄存器重叠时行为不保证：dst与src寄存器号重叠时，转换结果不保证正确性，硬件不报错但数据可能被覆盖。
 
 ## 调用示例
 
