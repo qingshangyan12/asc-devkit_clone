@@ -683,7 +683,7 @@ public:
             }
             return found;
         }
-        for (const char *candidate : {"c++", "g++", "clang++"}) {
+        for (const char *candidate : {"c++", "g++"}) {
             const std::string found = Find(candidate);
             if (!found.empty()) {
                 return found;
