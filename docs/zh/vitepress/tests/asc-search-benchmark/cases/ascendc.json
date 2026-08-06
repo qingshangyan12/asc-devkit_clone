@@ -189,6 +189,7 @@
         "minResults": 1,
         "maxResults": 1,
         "descriptionIncludes": ["NO_OVERLAP_IN_MULTI_REPEAT", "内存同步指令"],
+        "highlightIncludes": ["NO_OVER"],
         "sectionHash": "#内置编译宏开关",
         "targets": [
           { "exact": "/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法", "grade": 3 }

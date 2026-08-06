@@ -185,20 +185,21 @@ html [command-item][aria-selected="true"] .des {
 /* Highlight (mark) */
 html [command-item] .des mark,
 html [command-item] .headings mark {
-  background-color: var(--vp-c-brand-light) !important;
-  color: var(--vp-c-brand-dark) !important;
+  background-color: var(--vp-c-brand-soft) !important;
+  color: var(--vp-c-brand-1) !important;
   border-radius: 2px !important;
   padding: 0 2px !important;
   font-weight: inherit !important;
+  text-decoration: none !important;
 }
 
 html [command-item][aria-selected="true"] .des mark,
 html [command-item][aria-selected="true"] .headings mark,
 html [command-item]:hover .des mark,
 html [command-item]:hover .headings mark {
-  color: inherit !important;
-  text-decoration: underline !important;
-  background: none !important;
+  background-color: var(--vp-c-brand-soft) !important;
+  color: var(--vp-c-brand-1) !important;
+  text-decoration: none !important;
 }
 
 /* Footer */
