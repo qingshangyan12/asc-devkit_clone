@@ -24,7 +24,7 @@ namespace asc {
 namespace te {
 
 template <typename DataType>
-__simd_callee__ inline reg_tensor<bool> full_mask()
+__simd_callee__ inline reg_tensor<bool> ones()
 {
     static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t) ||
         sizeof(DataType) == sizeof(uint32_t), "full_mask only supports 8-bit, 16-bit, and 32-bit element types");
