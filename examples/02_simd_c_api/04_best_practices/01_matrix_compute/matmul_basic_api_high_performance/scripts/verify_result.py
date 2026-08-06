@@ -8,23 +8,24 @@ import numpy as np
 
 RELATIVE_TOL = 1e-3
 ABSOLUTE_TOL = 1e-3
-MAX_ERROR_RATIO = 1e-3
+EXPECTED_ELEMENTS = 1024 * 1024
 
 
 def verify_result(output_path, golden_path):
     output = np.fromfile(output_path, dtype=np.float32)
     golden = np.fromfile(golden_path, dtype=np.float32)
-    if output.size != golden.size:
-        raise ValueError(f"size mismatch: output={output.size}, golden={golden.size}")
+    if output.size != EXPECTED_ELEMENTS or golden.size != EXPECTED_ELEMENTS:
+        raise ValueError(
+            f"size mismatch: expected={EXPECTED_ELEMENTS}, output={output.size}, golden={golden.size}"
+        )
 
     matched = np.isclose(output, golden, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True)
     mismatch_indices = np.flatnonzero(~matched)
     for index in mismatch_indices[:10]:
         print(f"index {index}: expected={golden[index]:.9f}, actual={output[index]:.9f}")
 
-    error_ratio = mismatch_indices.size / golden.size
-    print(f"error ratio: {error_ratio:.6f}, tolerance: {MAX_ERROR_RATIO:.6f}")
-    return error_ratio <= MAX_ERROR_RATIO
+    print(f"mismatched elements: {mismatch_indices.size}, tolerance: 0")
+    return mismatch_indices.size == 0
 
 
 if __name__ == "__main__":
