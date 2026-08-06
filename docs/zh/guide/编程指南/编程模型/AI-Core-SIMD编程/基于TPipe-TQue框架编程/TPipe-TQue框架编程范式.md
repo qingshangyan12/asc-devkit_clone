@@ -25,7 +25,7 @@
 
 ## 矢量编程范式<a name="section116515238815"></a>
 
-![](../../../../figures/矩阵编程逻辑位置示意图.png)
+![](../../../../figures/tscm.png)
 
 如上图所示，矢量编程范式将算子实现流程划分为三个基本任务：CopyIn、Compute和CopyOut。
 
