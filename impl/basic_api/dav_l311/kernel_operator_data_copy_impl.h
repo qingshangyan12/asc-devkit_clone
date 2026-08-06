@@ -38,7 +38,8 @@ __aicore__ inline void CopyGmToUbufAlignV2(
     const bool isPad = false, const uint8_t sid = 0)
 {
     // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte / 32bytes
-    uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
+    uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN; 
+
     uint32_t burstLength = blockLen * unitOfBytes;
     uint32_t padLength = leftPaddingCount * sizeof(T) + rightPaddingCount * sizeof(T);
     uint64_t srcStride310 = srcStride * unitOfBytes + burstLength; // GM  DataCopy:32Bytes, DataCopyPad:1Byte
