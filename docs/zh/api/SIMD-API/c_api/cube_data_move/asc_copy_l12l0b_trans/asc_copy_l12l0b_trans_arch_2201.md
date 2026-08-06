@@ -104,13 +104,13 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float* dst, __cbuf__ fl
 
 | 参数名       | 输入/输出 | 描述               |
 | --------- | ----- | ---------------- |
-| dst       | 输出    | 目的操作数。            |
-| src | 输入    | 源操作数。            |
+| dst       | 输出    | 目的操作数，存储位置为L0B Buffer。            |
+| src | 输入    | 源操作数，存储位置为L1 Buffer。            |
 | index_id |输入 |方块矩阵的ID，搬运起始位置为源操作数中第几个方块矩阵（0为源操作数中第1个方块矩阵）。取值范围：index_id∈[0, 65535]。|
 | repeat |输入 |迭代重复次数。repeat∈[0, 255]。<br> 对于uint8_t/int8_t数据类型，每次迭代处理32 × 32 × 1B数据；<br> 对于half/bfloat16_t数据类型，每次迭代处理16 × 16 × 2B数据；<br> 对于float/int32_t/uint32_t数据类型，每次迭代处理16 × 16 × 4B数据。|
 | src_stride | 输入|表示相邻迭代间，源操作数前一个方块矩阵与后一个方块矩阵起始地址的间隔，单位：（1024B）。取值范围：src_stride∈[0, 65535]。<br> 对于uint8_t/int8_t数据类型，单位是32 × 32 × 1B； <br> 对于half/bfloat16_t数据类型，单位是16 × 16 × 2B；<br> 对于float/int32_t/uint32_t数据类型，单位是16 × 16 × 4B； <br> 对于int4b_t数据类型，每次迭代处理16 × 64 × 0.5B数据。|
 | dst_gap | 输入|表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。取值范围：dst_gap∈[0, 65535]。 |
-| enable_addr_decrement | 输入| 控制地址更新方式。<br>false: 递增，每次迭代在前一个地址的基础上加上src_stride。<br>true: 递减，每次迭代在前一个地址的基础上减去src_stride。 |
+| `enable_addr_decrement` | 输入| 控制地址更新方式。<br>&nbsp;&nbsp;&bull; `false`：递增，每次迭代在前一个地址的基础上加上src_stride；<br>&nbsp;&nbsp;&bull; `true`：递减，每次迭代在前一个地址的基础上减去src_stride。 |
 | dst_frac_gap | 输入  | 每个迭代内目的操作数转置前一个分形结束地址与后一个分形起始地址的间隔，单位为512B，仅在数据类型为float/int32_t/uint32_t/uint8_t/int8_t时有效。|
 
 
