@@ -54,6 +54,8 @@ TEST(CompileExporterCliUnitTest, ParseJobsAcceptsOnlyPositiveUint32Values)
     EXPECT_FALSE(ParseJobs("-1", jobs));
     EXPECT_FALSE(ParseJobs("4jobs", jobs));
     EXPECT_FALSE(ParseJobs("4294967296", jobs));
+    EXPECT_FALSE(ParseJobs("", jobs));
+    EXPECT_FALSE(ParseJobs(std::string(128U, '9'), jobs));
     EXPECT_EQ(jobs, 4294967295U);
 }
 
@@ -93,6 +95,40 @@ TEST(CompileExporterCliUnitTest, RunRejectsDuplicateAndInvalidOptionsBeforeCompi
 
     EXPECT_EQ(::Run(7, duplicateKeepTemp), 1);
     EXPECT_EQ(::Run(7, invalidJobs), 1);
+    EXPECT_NE(capture.Content().find("Usage:"), std::string::npos);
+}
+
+TEST(CompileExporterCliUnitTest, RunBuildsRequestWithOptionalArgumentsBeforeCompilation)
+{
+    char program[] = "asc_compile_exporter";
+    char command[] = "--build_collected_manifest_bundle";
+    char package[] = "package";
+    char manifestRoot[] = "/path/that/does/not/exist";
+    char output[] = "output/bundle.so";
+    char workDir[] = "work";
+    char keepTemp[] = "--keep-temp";
+    char jobsOption[] = "--jobs";
+    char jobs[] = "3";
+    char *arguments[] = {
+        program, command, package, manifestRoot, output, workDir, keepTemp, jobsOption, jobs
+    };
+
+    EXPECT_THROW(::Run(9, arguments), std::runtime_error);
+}
+
+TEST(CompileExporterCliUnitTest, ProgramMainReturnsRunStatusAndCatchesExceptions)
+{
+    CerrCapture capture;
+    char program[] = "asc_compile_exporter";
+    char command[] = "--build_collected_manifest_bundle";
+    char package[] = "package";
+    char manifestRoot[] = "/path/that/does/not/exist";
+    char output[] = "output/bundle.so";
+    char *usageArguments[] = {program};
+    char *failingArguments[] = {program, command, package, manifestRoot, output};
+
+    EXPECT_EQ(AscCompileExporterProgramMain(1, usageArguments), 1);
+    EXPECT_EQ(AscCompileExporterProgramMain(5, failingArguments), 1);
     EXPECT_NE(capture.Content().find("Usage:"), std::string::npos);
 }
 

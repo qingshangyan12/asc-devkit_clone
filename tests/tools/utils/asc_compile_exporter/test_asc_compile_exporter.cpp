@@ -251,6 +251,18 @@ TEST_F(AscCompileExporterTest, RejectsOutputWithoutParentDirectory)
     ExpectCompileError(request, "output path must include a parent directory");
 }
 
+TEST_F(AscCompileExporterTest, RejectsEmptyAndInvalidOutputPaths)
+{
+    CreateTestDirectories(JoinTestPath(root_, "collection"));
+    BuildCollectedBundleRequest emptyOutput = Request();
+    emptyOutput.outputSo.clear();
+    ExpectCompileError(emptyOutput, "output path must not be empty");
+
+    BuildCollectedBundleRequest invalidOutput = Request();
+    invalidOutput.outputSo = JoinTestPath(root_, "output/");
+    ExpectCompileError(invalidOutput, "output path has an invalid file name");
+}
+
 TEST_F(AscCompileExporterTest, RejectsMissingManifestWithoutReplacingOutput)
 {
     CreateTestDirectories(JoinTestPath(root_, "collection"));
@@ -370,6 +382,22 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
     EXPECT_FALSE(foundEmptyFile);
     EXPECT_TRUE(foundFirstSource);
     EXPECT_EQ(dlclose(handle), 0);
+}
+
+TEST_F(AscCompileExporterTest, KeepsTemporaryWorkspaceWhenRequested)
+{
+    const std::string unit = JoinTestPath(root_, "collection/Keep");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
+    CreateManifest(unit, "Keep");
+
+    BuildCollectedBundleRequest request = Request("keep_workspace");
+    request.keepTemp = true;
+    ManifestBundleCompiler(request).Compile();
+
+    const std::vector<std::string> workEntries = ListTestDirectory(request.workDir);
+    ASSERT_EQ(workEntries.size(), 1U);
+    EXPECT_EQ(workEntries[0].find(".manifest-generator-"), 0U);
+    EXPECT_TRUE(IsTestRegularFile(request.outputSo));
 }
 
 } // namespace
