@@ -56,6 +56,12 @@ ChannelHandle MakeChannel(uint32_t localRank, uint32_t remoteRank);
 uint32_t ChannelLocalRank(ChannelHandle channel);
 uint32_t ChannelRemoteRank(ChannelHandle channel);
 
+using ArgConverter = std::function<void *(const void *, uint32_t)>;
+using ArgDeleter = std::function<void(void *)>;
+
+void RegisterCaptureFunction(const std::string &name, const RegisterManager::KernelFunction &capture,
+    const ArgConverter &convert, const ArgDeleter &deleter);
+
 } // namespace CcuSt
 } // namespace HcclSim
 

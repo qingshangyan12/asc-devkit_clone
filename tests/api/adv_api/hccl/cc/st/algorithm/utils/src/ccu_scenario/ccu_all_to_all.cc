@@ -99,16 +99,20 @@ AllToAllKernelConfig BuildKernelConfig(uint32_t rankId, uint32_t rankSize)
     return config;
 }
 
-std::vector<KernelHandle> RegisterAllRanks(uint32_t rankSize)
+std::vector<KernelHandle> RegisterRemainingRanks(uint32_t rankSize, uint32_t startRank, KernelHandle rank0Handle)
 {
+    std::vector<KernelHandle> handles(rankSize);
+    handles[0] = rank0Handle;
+    if (startRank >= rankSize) {
+        return handles;
+    }
     constexpr InstanceHandle instance = 17;
     RegisterManager &manager = RegisterManager::Global();
     if (manager.RegisterStart(instance) != Result::SUCCESS) {
         return {};
     }
-    std::vector<KernelHandle> handles(rankSize);
     std::vector<AllToAllKernelConfig> configs(rankSize);
-    for (uint32_t rank = 0; rank < rankSize; ++rank) {
+    for (uint32_t rank = startRank; rank < rankSize; ++rank) {
         configs[rank] = BuildKernelConfig(rank, rankSize);
         if (manager.Register(instance, "CcuAlltoAllMesh1D", CaptureAllToAllMesh1DKernel,
                 &configs[rank], handles[rank]) != Result::SUCCESS) {
@@ -159,6 +163,7 @@ void CcuStAllToAll::VerifyScenario(const CcuStScenario &scenario)
 {
     const uint32_t rankSize = scenario.rankSize;
 
+    RegisterManager::Global().Reset();
     ResetCcuKernelRegisterCount();
     setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
 
@@ -174,9 +179,10 @@ void CcuStAllToAll::VerifyScenario(const CcuStScenario &scenario)
 
     Mc2CcTilingInner tiling = BuildAllToAllTiling(scenario.dataType);
 
-    int dummyStream = 1;
+    aclrtStream stream = nullptr;
+    ASSERT_EQ(aclrtCreateStream(&stream), ACL_SUCCESS);
     OpParam opParam{};
-    ASSERT_EQ(InitOpParamByTiling(comm, &dummyStream, "alltoall_st", &tiling, opParam), HCCL_SUCCESS);
+    ASSERT_EQ(InitOpParamByTiling(comm, stream, "alltoall_st", &tiling, opParam), HCCL_SUCCESS);
 
     std::vector<uint64_t> sendCounts(rankSize, 1024U);
     opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void *>(sendCounts.data());
@@ -211,10 +217,13 @@ void CcuStAllToAll::VerifyScenario(const CcuStScenario &scenario)
         EXPECT_EQ(resourceCtx.kfcServerArgs[1], resCtx.ckeAddr);
     }
 
-    CleanupHostEnv(comm);
-    ResetCcuKernelRegisterCount();
+    const auto &lastGroup = RegisterManager::Global().GetLastCompiledGroup();
+    ASSERT_FALSE(lastGroup.empty()) << "real CalcRes path did not register any kernel";
+    const KernelHandle rank0Handle = lastGroup.back();
 
-    const std::vector<KernelHandle> handles = RegisterAllRanks(rankSize);
+    CleanupHostEnv(comm);
+
+    const std::vector<KernelHandle> handles = RegisterRemainingRanks(rankSize, 1, rank0Handle);
     ASSERT_EQ(handles.size(), rankSize);
 
     ScenarioData data = BuildScenarioData(scenario, handles);

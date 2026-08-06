@@ -15,8 +15,11 @@
 #include "ccu_rep_context_v1.h"
 #include "ccu_types.h"
 #include "hccl_ccu_res.h"
+#include "ccu_kernel_proxy.h"
 #include <vector>
 #include <string>
+#include <map>
+#include <functional>
 
 using namespace hcomm::CcuRep;
 
@@ -343,6 +346,28 @@ uint16_t CcuBuf::Id() const { return 0; }
 
 } // namespace hcomm
 
+struct CaptureEntry {
+    HcclSim::CcuSt::RegisterManager::KernelFunction capture;
+    HcclSim::CcuSt::ArgConverter convert;
+    HcclSim::CcuSt::ArgDeleter deleter;
+};
+
+static std::map<std::string, CaptureEntry> &GetCaptureRegistry()
+{
+    static std::map<std::string, CaptureEntry> registry;
+    return registry;
+}
+
+void HcclSim::CcuSt::RegisterCaptureFunction(const std::string &name,
+    const RegisterManager::KernelFunction &capture, const ArgConverter &convert, const ArgDeleter &deleter)
+{
+    CaptureEntry entry;
+    entry.capture = capture;
+    entry.convert = convert;
+    entry.deleter = deleter;
+    GetCaptureRegistry()[name] = entry;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -385,17 +410,42 @@ HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle *insHandles, uint32_t
 }
 
 CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle) {
-    return CCU_SUCCESS;
+    HcclSim::CcuSt::Result r = HcclSim::CcuSt::RegisterManager::Global().RegisterStart(
+        static_cast<HcclSim::CcuSt::InstanceHandle>(insHandle));
+    return r == HcclSim::CcuSt::Result::SUCCESS ? CCU_SUCCESS : CCU_E_INTERNAL;
 }
 
 CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle, uint32_t dieId, const char *kernelFuncName,
     const void *kernelFunc, const void **kernelArgs, uint32_t argNum, CcuKernelHandle *kernelHandle) {
-    *kernelHandle = RecordCcuKernelRegistrationForTest();
+    auto &registry = GetCaptureRegistry();
+    auto it = registry.find(kernelFuncName);
+    if (it == registry.end()) {
+        *kernelHandle = RecordCcuKernelRegistrationForTest();
+        return CCU_SUCCESS;
+    }
+
+    void *stArg = it->second.convert(kernelArgs[0], argNum);
+
+    HcclSim::CcuSt::KernelHandle handle = 0;
+    HcclSim::CcuSt::Result result = HcclSim::CcuSt::RegisterManager::Global().Register(
+        static_cast<HcclSim::CcuSt::InstanceHandle>(insHandle),
+        kernelFuncName, it->second.capture, stArg, handle);
+
+    if (it->second.deleter) {
+        it->second.deleter(stArg);
+    }
+
+    if (result != HcclSim::CcuSt::Result::SUCCESS) {
+        return CCU_E_INTERNAL;
+    }
+    *kernelHandle = static_cast<CcuKernelHandle>(handle);
     return CCU_SUCCESS;
 }
 
 CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle) {
-    return CCU_SUCCESS;
+    HcclSim::CcuSt::Result r = HcclSim::CcuSt::RegisterManager::Global().RegisterEnd(
+        static_cast<HcclSim::CcuSt::InstanceHandle>(insHandle));
+    return r == HcclSim::CcuSt::Result::SUCCESS ? CCU_SUCCESS : CCU_E_INTERNAL;
 }
 
 CcuResult HcommCcuKernelLaunch(ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void *taskArgs, uint32_t argSize) {

@@ -12,9 +12,39 @@
 
 #include "ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_primitives_stub.h"
+#include "alg_param.h"
 
 namespace HcclSim {
 namespace CcuSt {
+
+namespace {
+
+void *ConvertAllToAllArg(const void *productArg, uint32_t argNum)
+{
+    if (productArg == nullptr) {
+        return nullptr;
+    }
+    const auto *src = static_cast<const mc2_ops_hccl::CcuKernelArgAlltoAllMesh1D *>(productArg);
+    auto *config = new AllToAllKernelConfig();
+    config->rankId = src->rankId;
+    config->rankSize = static_cast<uint32_t>(src->rankSize);
+    config->loadFromMem = src->loadFromMem;
+    for (uint32_t i = 0; i < src->channelCount; ++i) {
+        uint32_t peerRank = i;
+        if (peerRank >= config->rankId) {
+            peerRank++;
+        }
+        config->channels.push_back(MakeChannel(config->rankId, peerRank));
+    }
+    return config;
+}
+
+bool g_registered = []() {
+    RegisterCaptureFunction("CcuKernelAlltoAllMesh1D", CaptureAllToAllMesh1DKernel, ConvertAllToAllArg,
+        [](void *p) { delete static_cast<AllToAllKernelConfig *>(p); });
+    return true;
+}();
+} // namespace
 
 Result CaptureAllToAllMesh1DKernel(void *kernelArg)
 {
