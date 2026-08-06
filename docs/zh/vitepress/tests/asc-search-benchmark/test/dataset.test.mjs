@@ -15,7 +15,7 @@ import { test } from 'node:test'
 const dataset = JSON.parse(await readFile(new URL('../cases/ascendc.json', import.meta.url), 'utf8'))
 
 test('dataset has unique and complete cases', () => {
-  assert.equal(dataset.cases.length, 154)
+  assert.equal(dataset.cases.length, 155)
   assert.equal(new Set(dataset.cases.map(item => item.id)).size, dataset.cases.length)
   for (const item of dataset.cases) {
     assert.ok(item.id)
@@ -26,6 +26,9 @@ test('dataset has unique and complete cases', () => {
       assert.ok(Array.isArray(item.expect.descriptionIncludes))
       assert.ok(item.expect.descriptionIncludes.length > 0)
       assert.ok(item.expect.descriptionIncludes.every(value => typeof value === 'string' && value))
+    }
+    if (item.expect.sectionHash !== undefined) {
+      assert.match(item.expect.sectionHash, /^#./)
     }
     for (const target of item.expect.targets) {
       assert.equal(['exact', 'prefix', 'contains'].filter(key => key in target).length, 1)
@@ -51,6 +54,13 @@ test('dataset covers compiler option identifier regressions', () => {
     assert.deepEqual(item.expect.targets, [{ exact: target, grade: 3 }])
     assert.deepEqual(item.expect.descriptionIncludes, ['NO_OVERLAP_IN_MULTI_REPEAT', '内存同步指令'])
   }
+  assert.equal(dataset.cases.find(item => item.query === 'NO_OVER').expect.sectionHash, '#内置编译宏开关')
+})
+
+test('dataset covers existing section navigation', () => {
+  const item = dataset.cases.find(candidate => candidate.id === 'zh-section-memory-lifecycle')
+  assert.ok(item)
+  assert.equal(item.expect.sectionHash, '#内存生命周期管理：AllocTensor/FreeTensor解决读后写冲突')
 })
 
 test('dataset covers humanized identifiers and incomplete prefixes', () => {

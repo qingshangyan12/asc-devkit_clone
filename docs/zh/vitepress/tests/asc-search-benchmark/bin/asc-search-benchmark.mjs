@@ -449,9 +449,9 @@ async function initializeSearchPage(client, targetUrl, timeoutMs) {
       window.__ascSearchBenchmark.errors.push(event.error?.stack || event.message || String(event.error))
     })
     const button = await waitFor(() => document.querySelector('.nav-search-btn-wait'), ${timeoutMs}, 'the search button')
+    await waitFor(() => window.__pagefind__?.search, ${timeoutMs}, 'Pagefind initialization')
     button.click()
     await waitFor(() => document.querySelector('input[command-input]'), ${timeoutMs}, 'the search input')
-    await waitFor(() => window.__pagefind__?.search, ${timeoutMs}, 'Pagefind initialization')
     return { userAgent: navigator.userAgent, title: document.title }
   })()`)
   return { ...payload, initMs: performance.now() - initStarted }
@@ -509,6 +509,57 @@ async function runSearchCase(client, definition) {
   })()`)
 }
 
+async function runSectionNavigation(client, definition, resultRank) {
+  return evaluate(client, `(async () => {
+    const definition = ${JSON.stringify({ id: definition.id, sectionHash: definition.expect.sectionHash })}
+    const resultRank = ${resultRank}
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+    const waitFor = async (check, timeout, description) => {
+      const started = performance.now()
+      while (performance.now() - started < timeout) {
+        const value = check()
+        if (value) return value
+        await sleep(${POLL_INTERVAL_MS})
+      }
+      throw new Error('Timed out waiting for ' + description + ' after ' + timeout + 'ms')
+    }
+    const item = document.querySelectorAll('[command-item]')[resultRank]
+    if (!item) throw new Error('Section result rank ' + (resultRank + 1) + ' is not available')
+    const resultRoute = item.getAttribute('data-route') || ''
+    item.click()
+    await waitFor(() => {
+      try {
+        return decodeURIComponent(location.hash) === definition.sectionHash
+      }
+      catch {
+        return false
+      }
+    }, ${QUERY_TIMEOUT_MS}, 'section hash ' + definition.sectionHash)
+    await waitFor(() => {
+      try {
+        const target = document.getElementById(decodeURIComponent(location.hash).slice(1))
+        const rect = target?.getBoundingClientRect()
+        return rect && rect.bottom > 0 && rect.top < innerHeight
+      }
+      catch {
+        return false
+      }
+    }, 3000, 'visible section ' + definition.sectionHash)
+    const decodedHash = decodeURIComponent(location.hash)
+    const target = document.getElementById(decodedHash.slice(1))
+    const rect = target?.getBoundingClientRect()
+    return {
+      resultRank: resultRank + 1,
+      resultRoute,
+      hash: decodedHash,
+      targetExists: Boolean(target),
+      targetVisible: Boolean(rect && rect.bottom > 0 && rect.top < innerHeight),
+      targetTop: rect?.top ?? null,
+      scrollY,
+    }
+  })()`)
+}
+
 async function readResources(client, origin) {
   return evaluate(client, `performance.getEntriesByType('resource').map(entry => ({
     name: entry.name.replace(${JSON.stringify(origin)}, ''),
@@ -552,6 +603,10 @@ function validateDataset(dataset) {
         || definition.expect.descriptionIncludes.some(value => typeof value !== 'string' || !value))) {
       throw new Error(`Case ${definition.id} expect.descriptionIncludes must be a non-empty string array`)
     }
+    if (definition.expect.sectionHash !== undefined
+      && (typeof definition.expect.sectionHash !== 'string' || !definition.expect.sectionHash.startsWith('#'))) {
+      throw new Error(`Case ${definition.id} expect.sectionHash must start with #`)
+    }
     for (const target of definition.expect.targets) {
       const matchers = ['exact', 'prefix', 'contains'].filter(key => target[key] !== undefined)
       if (matchers.length !== 1) throw new Error(`Target in ${definition.id} must have exactly one matcher`)
@@ -570,6 +625,15 @@ function targetMatches(route, target) {
 
 function relevanceForRoute(route, targets) {
   return targets.reduce((grade, target) => targetMatches(route, target) ? Math.max(grade, target.grade) : grade, 0)
+}
+
+function routeHash(route) {
+  try {
+    return decodeURIComponent(new URL(route, 'http://search-benchmark.local').hash)
+  }
+  catch {
+    return ''
+  }
 }
 
 function dcg(grades) {
@@ -628,13 +692,24 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
   const descriptionValid = expectedDescriptionIncludes.every(value => normalizedDescription.includes(
     String(value).normalize('NFKC').toLocaleLowerCase()
   ))
+  const expectedSectionHash = definition.expect.sectionHash || ''
+  const sectionResult = firstRelevantIndex >= 0 ? results[firstRelevantIndex] : results[0]
+  const sectionRouteValid = !expectedSectionHash || routeHash(sectionResult?.route) === expectedSectionHash
+  const navigation = observed.navigation || null
+  const sectionNavigationValid = !expectedSectionHash || Boolean(
+    navigation
+    && navigation.hash === expectedSectionHash
+    && navigation.targetExists
+    && navigation.targetVisible
+  )
   const invalidResults = results.slice(0, topK).filter(result => routeValidity.get(normalizeRoute(result.route)) === false)
   return {
     id: definition.id,
     query: definition.query,
     category: definition.category,
     intent: definition.intent,
-    passed: runtimeComplete && resultCountValid && targetFound && descriptionValid && invalidResults.length === 0,
+    passed: runtimeComplete && resultCountValid && targetFound && descriptionValid
+      && sectionRouteValid && sectionNavigationValid && invalidResults.length === 0,
     runtimeComplete,
     timedOut: Boolean(observed.timedOut),
     errors,
@@ -643,6 +718,10 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
     resultCountValid,
     descriptionValid,
     expectedDescriptionIncludes,
+    expectedSectionHash,
+    sectionRouteValid,
+    sectionNavigationValid,
+    navigation,
     firstRelevantRank: firstRelevantIndex >= 0 ? firstRelevantIndex + 1 : null,
     reciprocalRankAt10: firstRelevantIndex >= 0 && firstRelevantIndex < 10 ? 1 / (firstRelevantIndex + 1) : 0,
     successAt1: relevantCase ? firstRelevantIndex === 0 : null,
@@ -826,6 +905,8 @@ function failureReason(item) {
   if (!item.resultCountValid) return `结果数量不符合预期，实际 ${item.resultCount}`
   if (item.firstRelevantRank === null) return '未返回主要目标'
   if (!item.descriptionValid) return `摘要未包含：${item.expectedDescriptionIncludes.join('、')}`
+  if (!item.sectionRouteValid) return `结果未定位到小节：${item.expectedSectionHash}`
+  if (!item.sectionNavigationValid) return `点击后未滚动到小节：${item.expectedSectionHash}`
   return `首个主要目标位于第 ${item.firstRelevantRank} 名`
 }
 
@@ -910,7 +991,12 @@ async function main() {
     console.log(`Running ${dataset.cases.length} search cases against ${target.url} with ${chromiumVersion}...`)
     const page = await initializeSearchPage(browser.client, target.url, options.timeoutMs)
     const observedCases = []
+    let searchPageReady = true
     for (const [index, definition] of dataset.cases.entries()) {
+      if (!searchPageReady) {
+        await initializeSearchPage(browser.client, target.url, options.timeoutMs)
+        searchPageReady = true
+      }
       browserErrors.length = 0
       let observed
       try {
@@ -920,6 +1006,23 @@ async function main() {
         observed = { id: definition.id, query: definition.query, latencyMs: null, timedOut: false, errors: [error.stack || String(error)], results: [] }
       }
       observed.errors.push(...browserErrors)
+      if (definition.expect.sectionHash) {
+        const resultRank = observed.results.findIndex(result => relevanceForRoute(
+          result.route,
+          definition.expect.targets
+        ) >= (dataset.successGrade || 1))
+        if (resultRank >= 0) {
+          browserErrors.length = 0
+          try {
+            observed.navigation = await runSectionNavigation(browser.client, definition, resultRank)
+          }
+          catch (error) {
+            observed.errors.push(error.stack || String(error))
+          }
+          observed.errors.push(...browserErrors)
+          searchPageReady = false
+        }
+      }
       observedCases.push(observed)
       process.stdout.write(`\r${String(index + 1).padStart(String(dataset.cases.length).length)}/${dataset.cases.length} ${definition.query.slice(0, 48).padEnd(48)}`)
     }

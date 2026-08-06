@@ -12,7 +12,7 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 import { Command } from 'vue-command-palette'
-import { useData, useRoute, useRouter, withBase } from 'vitepress'
+import { getScrollOffset, useData, useRouter, withBase } from 'vitepress'
 import { useLocalStorage, useMagicKeys } from '@vueuse/core'
 
 import { searchConfig as _searchConfig } from 'virtual:pagefind'
@@ -211,12 +211,30 @@ const showSearchResult = computed(() => {
 })
 
 const router = useRouter()
-const route = useRoute()
-function handleSelect(target: string) {
-  hideSearchModal()
-  if (route.path !== target) {
-    router.go(target)
+let activeNavigation = 0
+
+function alignSection(hash: string, navigation: number, attempt = 0) {
+  if (navigation !== activeNavigation || location.hash !== hash) return
+  try {
+    const section = document.getElementById(decodeURIComponent(hash).slice(1))
+    if (!section) return
+    const top = window.scrollY + section.getBoundingClientRect().top - getScrollOffset()
+    window.scrollTo(0, Math.max(0, top))
+    if (attempt < 3) {
+      window.setTimeout(() => alignSection(hash, navigation, attempt + 1), (attempt + 1) * 100)
+    }
   }
+  catch {}
+}
+
+async function handleSelect(target: string) {
+  const navigation = ++activeNavigation
+  hideSearchModal()
+  await router.go(target)
+  const hash = new URL(target, location.origin).hash
+  if (!hash || navigation !== activeNavigation) return
+  await nextTick()
+  requestAnimationFrame(() => alignSection(hash, navigation))
 }
 
 const langReload = computed(() => finalSearchConfig.value.langReload ?? true)
