@@ -81,7 +81,6 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 <!-- npu="A3" id13 -->Atlas A3训练系列产品/Atlas A3推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。<!-- end id13 --><br>
 <!-- npu="310b" id14 -->Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。<!-- end id14 --><br>
 <!-- npu="950" id15 -->Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。<!-- end id15 --><br>
-<br>
 
 ## 返回值说明
 

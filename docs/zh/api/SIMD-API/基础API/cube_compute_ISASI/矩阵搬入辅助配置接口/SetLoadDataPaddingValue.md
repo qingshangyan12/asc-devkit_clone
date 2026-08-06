@@ -52,7 +52,6 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue)
 <!-- npu="910b" id12 -->Atlas A2训练系列产品/Atlas A2推理系列产品，支持数据类型：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。<!-- end id12 --><br>
 <!-- npu="A3" id13 -->Atlas A3训练系列产品/Atlas A3推理系列产品，支持数据类型：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。<!-- end id13 --><br>
 <!-- npu="310b" id14 -->Atlas 200I/500 A2 推理产品，支持数据类型：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。<!-- end id14 --><br>
-<br>
 
 ## 返回值说明
 
