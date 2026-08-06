@@ -15,18 +15,8 @@
 #ifndef IMPL_STD_CEIL_DIVISION_H
 #define IMPL_STD_CEIL_DIVISION_H
 
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CEIL_DIVISION_H__
-#endif
-
 #include "utils/std/algorithm.h"
 #include "utils/std/type_traits.h"
-
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CEIL_DIVISION_H__)
-#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CEIL_DIVISION_H__
-#endif
 
 namespace AscendC {
 namespace Std {
