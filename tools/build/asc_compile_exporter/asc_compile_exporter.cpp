@@ -22,14 +22,14 @@
 
 namespace {
 
-void PrintUsage(const char *program)
+void PrintUsage(const char* program)
 {
     std::cerr << "Usage:\n  " << program
               << " --build_collected_manifest_bundle <package_id> <manifest_search_root> <out.so>"
                  " [work_dir] [--keep-temp] [--jobs <N>]\n";
 }
 
-bool ParseJobs(const std::string &text, uint32_t &jobs)
+bool ParseJobs(const std::string& text, uint32_t& jobs)
 {
     if (text.empty()) {
         return false;
@@ -40,7 +40,7 @@ bool ParseJobs(const std::string &text, uint32_t &jobs)
         }
     }
     errno = 0;
-    char *end = nullptr;
+    char* end = nullptr;
     const unsigned long parsed = std::strtoul(text.c_str(), &end, 10);
     if (errno == ERANGE || end == text.c_str() || *end != '\0' || parsed == 0UL || parsed > UINT32_MAX) {
         return false;
@@ -49,7 +49,7 @@ bool ParseJobs(const std::string &text, uint32_t &jobs)
     return true;
 }
 
-int Run(int argc, char **argv)
+int Run(int argc, char** argv)
 {
     if (argc < 2) {
         PrintUsage(argv[0]);
@@ -69,8 +69,7 @@ int Run(int argc, char **argv)
             const std::string argument = argv[index];
             if (argument == "--keep-temp" && !keepTemp) {
                 keepTemp = true;
-            } else if (argument == "--jobs" && !jobsSpecified && index + 1 < argc &&
-                       ParseJobs(argv[index + 1], jobs)) {
+            } else if (argument == "--jobs" && !jobsSpecified && index + 1 < argc && ParseJobs(argv[index + 1], jobs)) {
                 jobsSpecified = true;
                 ++index;
             } else if (workDir.empty() && argument.rfind("--", 0U) != 0U) {
@@ -97,11 +96,11 @@ int Run(int argc, char **argv)
 
 } // namespace
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     try {
         return Run(argc, argv);
-    } catch (const std::exception &error) {
+    } catch (const std::exception& error) {
         ASCENDLOGE("asc_compile_exporter failed: %s", error.what());
         return 1;
     }

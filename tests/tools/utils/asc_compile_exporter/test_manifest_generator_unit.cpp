@@ -370,34 +370,20 @@ TEST_F(ManifestGeneratorModuleTest, BuildWorkspaceUsesTmpDirAndSupportsMoveConst
     EXPECT_FALSE(PathExists(session));
 }
 
-TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorValidatesConfiguredCompiler)
+TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorValidatesRequiredExecutable)
 {
     EXPECT_TRUE(IsRegularPath(ExecutableLocator::FindRequired("sh")));
     EXPECT_THROW(ExecutableLocator::FindRequired("asc_compile_exporter_missing_executable"),
                  std::runtime_error);
-
-    ScopedEnvironment validCompiler("CXX", "/bin/sh");
-    EXPECT_TRUE(IsRegularPath(ExecutableLocator::FindCompiler()));
 }
 
-TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorHandlesSearchPathAndInvalidCompilers)
+TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorHandlesSearchPath)
 {
-    {
-        ScopedEnvironment compiler("CXX", JoinPath(root_, "missing-compiler").c_str());
-        EXPECT_THROW(ExecutableLocator::FindCompiler(), std::runtime_error);
-    }
-    {
-        const std::string nonExecutable = JoinPath(root_, "non-executable");
-        WriteTestFile(nonExecutable, "not executable");
-        ScopedEnvironment compiler("CXX", nonExecutable.c_str());
-        EXPECT_THROW(ExecutableLocator::FindCompiler(), std::runtime_error);
-    }
-
     const std::string bin = JoinPath(root_, "bin");
     const std::string fakeCompiler = JoinPath(bin, "g++");
     WriteTestFile(fakeCompiler, "#!/bin/sh\nexit 0\n");
     ASSERT_EQ(chmod(fakeCompiler.c_str(), 0700), 0);
-    ScopedEnvironment compiler("CXX", nullptr);
+    ScopedEnvironment compiler("CXX", JoinPath(root_, "missing-compiler").c_str());
     ScopedEnvironment path("PATH", bin.c_str());
     EXPECT_EQ(ExecutableLocator::FindCompiler(), CanonicalDirectory(bin, "compiler directory") + "/g++");
     EXPECT_TRUE(IsRegularPath(ExecutableLocator::FindRequired(fakeCompiler)));
@@ -406,12 +392,10 @@ TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorHandlesSearchPathAndInvalid
 TEST_F(ManifestGeneratorModuleTest, ExecutableLocatorUsesDefaultPathAndReportsMissingCompiler)
 {
     {
-        ScopedEnvironment compiler("CXX", nullptr);
         ScopedEnvironment path("PATH", nullptr);
         EXPECT_TRUE(IsRegularPath(ExecutableLocator::FindRequired("sh")));
     }
     {
-        ScopedEnvironment compiler("CXX", nullptr);
         ScopedEnvironment path("PATH", root_.c_str());
         EXPECT_THROW(ExecutableLocator::FindCompiler(), std::runtime_error);
     }
@@ -439,7 +423,6 @@ TEST_F(ManifestGeneratorModuleTest, ProcessRunnerReportsExecEnvironmentAndSignal
 
 TEST_F(ManifestGeneratorModuleTest, MakeBundleBuilderValidatesCannHomeAndAbiHeader)
 {
-    ScopedEnvironment compiler("CXX", "/bin/sh");
     {
         ScopedEnvironment cannHome("ASCEND_HOME_PATH", nullptr);
         EXPECT_THROW(MakeBundleBuilder(root_, JoinPath(root_, "bundle.so"), 1U).Build(),

@@ -172,7 +172,6 @@ protected:
     void SetUp() override
     {
         ascendHome_ = SaveEnvironment("ASCEND_HOME_PATH");
-        compiler_ = SaveEnvironment("CXX");
 
         const char *temporary = std::getenv("TMPDIR");
         std::string pathTemplate = JoinTestPath(
@@ -185,12 +184,10 @@ protected:
         root_ = created;
 
         ASSERT_EQ(setenv("ASCEND_HOME_PATH", ASC_COMPILE_EXPORTER_TEST_CANN_HOME, 1), 0);
-        ASSERT_EQ(setenv("CXX", ASC_COMPILE_EXPORTER_TEST_CXX, 1), 0);
     }
 
     void TearDown() override
     {
-        RestoreEnvironment("CXX", compiler_);
         RestoreEnvironment("ASCEND_HOME_PATH", ascendHome_);
         RemoveTestTree(root_);
     }
@@ -229,7 +226,6 @@ protected:
 
 private:
     SavedEnvironment ascendHome_;
-    SavedEnvironment compiler_;
 };
 
 TEST_F(AscCompileExporterTest, RejectsEmptyPackageId)
