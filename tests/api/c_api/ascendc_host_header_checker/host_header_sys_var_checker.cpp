@@ -22,12 +22,6 @@ static void test_host_c_api_sys_var_0()
     using ::asc_get_overflow_status;
     using ::asc_get_phy_buf_addr;
     using ::asc_get_phy_stack_base;
-    using ::asc_get_pipe_fix_idle_slot_count;
-    using ::asc_get_pipe_m_idle_slot_count;
-    using ::asc_get_pipe_mte1_idle_slot_count;
-    using ::asc_get_pipe_mte2_idle_slot_count;
-    using ::asc_get_pipe_mte3_idle_slot_count;
-    using ::asc_get_pipe_v_idle_slot_count;
     using ::asc_get_program_counter;
     using ::asc_get_smmu_tag_version;
     using ::asc_get_squeeze_status;

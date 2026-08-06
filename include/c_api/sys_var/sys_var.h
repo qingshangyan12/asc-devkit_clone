@@ -31,18 +31,6 @@
 
 #endif
 
-__aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count();
-
-__aicore__ inline uint8_t asc_get_pipe_m_idle_slot_count();
-
-__aicore__ inline uint8_t asc_get_pipe_mte1_idle_slot_count();
-
-__aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count();
-
-__aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count();
-
-__aicore__ inline uint8_t asc_get_pipe_fix_idle_slot_count();
-
 __aicore__ inline int64_t asc_get_smmu_tag_version();
 
 __aicore__ inline int64_t asc_get_phy_stack_base();

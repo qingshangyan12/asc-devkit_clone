@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
-#include "include/c_api/asc_simd.h"
+#include "include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
 
 namespace {
 constexpr uint8_t EXPECTED_IDLE_SLOT_COUNT = 2;
