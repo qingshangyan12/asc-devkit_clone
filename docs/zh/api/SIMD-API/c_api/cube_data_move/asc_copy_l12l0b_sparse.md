@@ -65,9 +65,17 @@ PIPE_MTE1
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
-- repeat为0表示不执行。
+- repeat取值范围为[0, 255]，为0时不执行搬运，本接口被视为NOP（空操作）。
 - start_index不能小于0。
-- 不支持转置功能。
+- 仅支持L1 Buffer->L0B Buffer通路，且L1 Buffer中的源数据为ZN排布。
+- 不支持转置和跳stride，仅支持连续的数据分形搬运。
+
+<!-- npu="950" id8 -->
+### 通用约束
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- 本接口在本芯片变体下不提供，调用无实际效果。如需在本变体下将L1 Buffer中的权重数据加载到L0B Buffer，应按功能说明章节所述的替代方式使用。
+<!-- end id8 -->
 
 ## 调用示例
 
