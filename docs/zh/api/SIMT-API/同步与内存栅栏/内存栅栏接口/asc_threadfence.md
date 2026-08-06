@@ -82,7 +82,7 @@ inline void asc_threadfence()
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelThreadFence(int32_t* data, int32_t* flag, int32_t* result)
     {
         if (blockIdx.x == 0 && threadIdx.x == 0) {
@@ -102,7 +102,7 @@ inline void asc_threadfence()
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelThreadFence(
         __gm__ int32_t* data, __gm__ int32_t* flag, __gm__ int32_t* result)
     {
