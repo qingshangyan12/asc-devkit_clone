@@ -8,6 +8,7 @@
 | [min](CPP标准库/算法/min-268.md) | 比较相同数据类型的两个数中的最小值。 |
 | [abs](CPP标准库/数学函数/abs1.md) | 获取输入数据的绝对值。 |
 | [sqrt](CPP标准库/数学函数/sqrt1.md) | 计算输入数据的平方根。 |
+| [ceil\_div](CPP标准库/数学函数/ceil_div.md) | 计算两个整型数a和b相除后向上取整的结果。 |
 | [integer_sequence](CPP标准库/通用工具/integer_sequence.md) | 用于生成一个整数序列。 |
 | [tuple](CPP标准库/容器函数/tuple.md) | 允许存储多个不同类型元素的容器。 |
 | [get](CPP标准库/容器函数/get1.md) | 从tuple容器中提取指定位置的元素。 |
