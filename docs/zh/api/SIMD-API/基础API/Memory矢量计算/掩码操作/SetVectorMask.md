@@ -64,7 +64,7 @@
 | 参数名 | 描述 |
 | --- | --- |
 | T | 矢量计算操作数数据类型。 |
-| mode | Mask模式，MaskMode类型，定义如下：enum class MaskMode : uint8_t {<br>    NORMAL = 0,  // Normal模式<br>    COUNTER      // Counter模式<br>};<br>|
+| mode | Mask模式，MaskMode类型，定义如下：<br><pre>enum class MaskMode : uint8_t {<br>    NORMAL = 0,  // Normal模式<br>    COUNTER      // Counter模式<br>};</pre>|
 
 **表2**  参数说明
 
