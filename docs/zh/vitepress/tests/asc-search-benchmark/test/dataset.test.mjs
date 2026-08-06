@@ -15,7 +15,7 @@ import { test } from 'node:test'
 const dataset = JSON.parse(await readFile(new URL('../cases/ascendc.json', import.meta.url), 'utf8'))
 
 test('dataset has unique and complete cases', () => {
-  assert.equal(dataset.cases.length, 155)
+  assert.equal(dataset.cases.length, 159)
   assert.equal(new Set(dataset.cases.map(item => item.id)).size, dataset.cases.length)
   for (const item of dataset.cases) {
     assert.ok(item.id)
@@ -76,4 +76,27 @@ test('dataset covers humanized identifiers and incomplete prefixes', () => {
   for (const query of ['uint32 t', 'fp8 e4m3fn t', 'dst repeat stride', 'GET_TIL', 'vector_uint']) {
     assert.ok(dataset.cases.some(item => item.query === query), `missing case for ${query}`)
   }
+})
+
+test('dataset covers kernel launch syntax variants', () => {
+  const targets = [
+    { exact: '/api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config', grade: 3 },
+    { exact: '/guide/编程指南/语言扩展层/SIMD与SIMT混合编程BuiltIn关键字', grade: 3 },
+    { exact: '/api/SIMT-API/SIMT_programming_intro/extended_syntax/kernel_function_config', grade: 3 },
+  ]
+  for (const query of ['<<<', '<<<>>>', '<<<...>>>']) {
+    const item = dataset.cases.find(candidate => candidate.query === query)
+    assert.ok(item, `missing case for ${query}`)
+    assert.deepEqual(item.expect.targets, targets)
+    assert.deepEqual(item.expect.highlightIncludes, ['<<<'])
+    assert.equal(item.expect.sectionHash, '#<<<>>>调用')
+  }
+})
+
+test('dataset covers exact English words outranking spelling corrections', () => {
+  const item = dataset.cases.find(candidate => candidate.query === 'block')
+  assert.ok(item)
+  assert.equal(item.category, 'technical-concept')
+  assert.equal(item.expect.targets.length, 6)
+  assert.ok(item.expect.targets.every(target => target.exact?.includes('/cooperative_groups/thread_block')))
 })
