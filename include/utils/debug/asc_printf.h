@@ -39,7 +39,7 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(cons
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 namespace __asc_aicore {
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
+__aicore__ static __attribute__((noinline)) void printf(__gm__ const char* fmt, Args&&... args);
 } // namespace __asc_aicore
 
 namespace __asc_simd_vf {
@@ -61,7 +61,7 @@ __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args);
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 
-#if (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+#if __NPU_ARCH__ == 3510
 #include "impl/utils/debug/asc_simd_printf_impl.h"
 #endif
 #endif
