@@ -37,7 +37,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/SetGlobalBuffer", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/SetGlobalBuffer", "grade": 3 }
         ]
       }
     },
@@ -49,8 +49,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/C-API/cube_compute/asc_mmad", "grade": 3 },
-          { "prefix": "/api/SIMD-API/C-API/cube_compute/asc_mmad_", "grade": 1 }
+          { "exact": "/api/SIMD-API/c_api/cube_compute/asc_mmad", "grade": 3 },
+          { "prefix": "/api/SIMD-API/c_api/cube_compute/asc_mmad_", "grade": 1 }
         ]
       }
     },
@@ -62,8 +62,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "prefix": "/api/SIMD-API/C-API/vector_datamove/asc_copy_gm2ub/", "grade": 3 },
-          { "prefix": "/api/SIMD-API/C-API/vector_datamove/asc_copy_gm2ub_align/", "grade": 1 }
+          { "prefix": "/api/SIMD-API/c_api/vector_data_move/asc_copy_gm2ub/", "grade": 3 },
+          { "prefix": "/api/SIMD-API/c_api/vector_data_move/asc_copy_gm2ub_align/", "grade": 1 }
         ]
       }
     },
@@ -75,8 +75,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介", "grade": 2 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro", "grade": 2 }
         ]
       }
     },
@@ -88,8 +88,8 @@
       "expect": {
         "minResults": 5,
         "targets": [
-          { "contains": "/数据搬运/DataCopy（", "grade": 3 },
-          { "contains": "/矩阵计算的搬入/DataCopy（", "grade": 2 },
+          { "contains": "/memory_vector_compute/data_move/DataCopy_", "grade": 3 },
+          { "contains": "/cube_compute_load/DataCopy_", "grade": 2 },
           { "contains": "/DataCopyPad", "grade": 1 }
         ]
       }
@@ -102,7 +102,7 @@
       "expect": {
         "minResults": 5,
         "targets": [
-          { "contains": "/数据搬运/DataCopy（", "grade": 3 }
+          { "contains": "/memory_vector_compute/data_move/DataCopy_", "grade": 3 }
         ]
       }
     },
@@ -114,7 +114,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/数据搬运/DataCopy（", "grade": 3 }
+          { "contains": "/memory_vector_compute/data_move/DataCopy_", "grade": 3 }
         ]
       }
     },
@@ -126,7 +126,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/C-API/cube_compute/asc_mmad", "grade": 3 }
+          { "exact": "/api/SIMD-API/c_api/cube_compute/asc_mmad", "grade": 3 }
         ]
       }
     },
@@ -138,7 +138,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/C-API/cube_compute/asc_mmad", "grade": 3 }
+          { "exact": "/api/SIMD-API/c_api/cube_compute/asc_mmad", "grade": 3 }
         ]
       }
     },
@@ -150,8 +150,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/operator", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/operator", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/operator", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/operator", "grade": 3 }
         ]
       }
     },
@@ -176,7 +176,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/内置数据类型", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/builtin_data_types", "grade": 3 }
         ]
       }
     },
@@ -296,9 +296,9 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/DataCopyPad（GMToUB非对齐数据搬运）", "grade": 3 },
-          { "contains": "/DataCopyPad（UBToGM非对齐数据搬运）", "grade": 3 },
-          { "contains": "/DataCopyPad（", "grade": 2 }
+          { "contains": "/DataCopyPad_GMToUB", "grade": 3 },
+          { "contains": "/DataCopyPad_UBToGM", "grade": 3 },
+          { "contains": "/DataCopyPad_", "grade": 2 }
         ]
       }
     },
@@ -310,7 +310,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/DataCopyPad（GMToUB非对齐数据搬运）", "grade": 3 }
+          { "contains": "/DataCopyPad_GMToUB", "grade": 3 }
         ]
       }
     },
@@ -348,7 +348,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor", "grade": 3 }
         ]
       }
     },
@@ -360,7 +360,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/资源管理/TPipe/TPipe", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/resource_management/TPipe/TPipe", "grade": 3 }
         ]
       }
     },
@@ -372,7 +372,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/资源管理/TQue/TQue", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/resource_management/TQue/TQue", "grade": 3 }
         ]
       }
     },
@@ -384,7 +384,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/GlobalTensor", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor", "grade": 3 }
         ]
       }
     },
@@ -396,8 +396,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/GetValue", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/GetValue", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/GetValue", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/GetValue", "grade": 3 }
         ]
       }
     },
@@ -409,8 +409,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/SetValue", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/SetValue", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/SetValue", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/SetValue", "grade": 3 }
         ]
       }
     },
@@ -422,8 +422,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/矩阵计算（TensorAPI）/Mmad计算/Mmad", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/cube_compute_TensorAPI/mmad_compute/Mmad", "grade": 3 }
         ]
       }
     },
@@ -435,7 +435,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/高阶API/激活函数/SoftMax接口/SoftMax", "grade": 3 }
+          { "exact": "/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftMax", "grade": 3 }
         ]
       }
     },
@@ -447,8 +447,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum", "grade": 3 },
-          { "exact": "/api/SIMD-API/高阶API/归约操作/ReduceSum接口/ReduceSum-90", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum", "grade": 3 },
+          { "exact": "/api/SIMD-API/adv_api/reduction_operations/ReduceSum_interface/ReduceSum-90", "grade": 3 }
         ]
       }
     },
@@ -460,7 +460,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/同步控制/核间同步/SyncAll", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/sync_control/inter_core_sync/SyncAll", "grade": 3 }
         ]
       }
     },
@@ -472,7 +472,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx", "grade": 3 }
         ]
       }
     },
@@ -484,9 +484,9 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/Add", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/Reg矢量计算/基础算术/Add", "grade": 3 },
-          { "contains": "/C-API/", "grade": 1 }
+          { "exact": "/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Add", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Add", "grade": 3 },
+          { "contains": "/c_api/", "grade": 1 }
         ]
       }
     },
@@ -498,8 +498,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/Mul", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/Reg矢量计算/基础算术/Mul", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Mul", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Mul", "grade": 3 }
         ]
       }
     },
@@ -511,8 +511,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Memory矢量计算/数据填充/Duplicate", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/Reg矢量计算/数据填充/Duplicate", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/memory_vector_compute/data_padding/Duplicate", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/reg_vector_compute/data_padding/Duplicate", "grade": 3 }
         ]
       }
     },
@@ -524,8 +524,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Memory矢量计算/离散与聚合/Gather", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/Reg矢量计算/离散操作/Gather", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Gather", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/reg_vector_compute/scatter_operations/Gather", "grade": 3 }
         ]
       }
     },
@@ -537,8 +537,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax", "grade": 3 },
-          { "exact": "/api/SIMD-API/高阶API/归约操作/ReduceMax接口/ReduceMax-91", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMax", "grade": 3 },
+          { "exact": "/api/SIMD-API/adv_api/reduction_operations/ReduceMax_interface/ReduceMax-91", "grade": 3 }
         ]
       }
     },
@@ -550,7 +550,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/资源管理/TPipe/TPipe", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/resource_management/TPipe/TPipe", "grade": 3 }
         ]
       }
     },
@@ -562,7 +562,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/GlobalTensor", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor", "grade": 3 }
         ]
       }
     },
@@ -574,8 +574,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/GetValue", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/GetValue", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/GetValue", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/GetValue", "grade": 3 }
         ]
       }
     },
@@ -587,8 +587,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/C-API/reg/arithmetic_compute/asc_add", "grade": 3 },
-          { "exact": "/api/SIMD-API/C-API/vector_compute/asc_add", "grade": 3 }
+          { "exact": "/api/SIMD-API/c_api/reg/arithmetic_compute/asc_add", "grade": 3 },
+          { "exact": "/api/SIMD-API/c_api/vector_compute/asc_add", "grade": 3 }
         ]
       }
     },
@@ -600,7 +600,7 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "prefix": "/api/SIMD-API/C-API/vector_datamove/asc_copy_ub2gm/", "grade": 3 }
+          { "prefix": "/api/SIMD-API/c_api/vector_data_move/asc_copy_ub2gm/", "grade": 3 }
         ]
       }
     },
@@ -612,7 +612,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/DataCopyPad（", "grade": 3 }
+          { "contains": "/DataCopyPad_", "grade": 3 }
         ]
       }
     },
@@ -624,7 +624,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/高阶API/激活函数/SoftMax接口/SoftMax", "grade": 3 }
+          { "exact": "/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftMax", "grade": 3 }
         ]
       }
     },
@@ -636,7 +636,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/SetGlobalBuffer", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/SetGlobalBuffer", "grade": 3 }
         ]
       }
     },
@@ -648,7 +648,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor", "grade": 3 }
         ]
       }
     },
@@ -660,7 +660,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "prefix": "/api/SIMD-API/C-API/vector_datamove/asc_copy_ub2gm/", "grade": 3 }
+          { "prefix": "/api/SIMD-API/c_api/vector_data_move/asc_copy_ub2gm/", "grade": 3 }
         ]
       }
     },
@@ -672,8 +672,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum", "grade": 3 },
-          { "exact": "/api/SIMD-API/高阶API/归约操作/ReduceSum接口/ReduceSum-90", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum", "grade": 3 },
+          { "exact": "/api/SIMD-API/adv_api/reduction_operations/ReduceSum_interface/ReduceSum-90", "grade": 3 }
         ]
       }
     },
@@ -685,7 +685,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx", "grade": 3 }
         ]
       }
     },
@@ -697,8 +697,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/operator()", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/operator()", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/operator_call", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/operator_call", "grade": 3 }
         ]
       }
     },
@@ -710,7 +710,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/辅助数据结构/TPosition", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/aux_data_structures/TPosition", "grade": 3 }
         ]
       }
     },
@@ -722,7 +722,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/内置数据类型", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/builtin_data_types", "grade": 3 }
         ]
       }
     },
@@ -746,7 +746,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/原子操作/AtomicAdd", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/atomic_operations/AtomicAdd", "grade": 3 }
         ]
       }
     },
@@ -880,7 +880,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Kernel-Tiling/Kernel-Tiling", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/Kernel-Tiling/Kernel-Tiling", "grade": 3 }
         ]
       }
     },
@@ -904,9 +904,9 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/原子操作/原子操作", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/atomic_operations/atomic_operations", "grade": 3 },
           { "exact": "/guide/编程指南/编程模型/AI-Core-SIMT编程/原子操作", "grade": 3 },
-          { "contains": "/原子操作/", "grade": 2 }
+          { "contains": "/atomic_operations/", "grade": 2 }
         ]
       }
     },
@@ -918,7 +918,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/高阶API/张量变换/张量变换", "grade": 3 }
+          { "exact": "/api/SIMD-API/adv_api/tensor_transform/tensor_transform", "grade": 3 }
         ]
       }
     },
@@ -930,8 +930,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMT-API/地址空间谓词函数/地址空间谓词函数", "grade": 3 },
-          { "exact": "/api/SIMT-API/地址空间转换函数/地址空间转换函数", "grade": 3 }
+          { "exact": "/api/SIMT-API/address_space_predicate_functions/address_space_predicate_functions", "grade": 3 },
+          { "exact": "/api/SIMT-API/address_space_conversion_functions/address_space_conversion_functions", "grade": 3 }
         ]
       }
     },
@@ -943,8 +943,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/内置数据类型", "grade": 3 },
-          { "contains": "/扩展语法/内置数据类型", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/builtin_data_types", "grade": 3 },
+          { "contains": "/extended_syntax/builtin_data_types", "grade": 3 }
         ]
       }
     },
@@ -981,9 +981,9 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/同步控制/同步控制", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/Reg矢量计算/同步控制/同步控制", "grade": 3 },
-          { "contains": "/C-API/sync/同步控制", "grade": 2 }
+          { "exact": "/api/SIMD-API/basic_api/sync_control/sync_control", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/reg_vector_compute/sync_control/sync_control", "grade": 3 },
+          { "contains": "/c_api/sync/sync_control", "grade": 2 }
         ]
       }
     },
@@ -995,8 +995,8 @@
       "expect": {
         "minResults": 2,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/同步控制/核间同步/核间同步", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/同步控制/核间同步/核间同步能力概述", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/sync_control/inter_core_sync/inter_core_sync", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/sync_control/inter_core_sync/inter_core_sync_overview", "grade": 3 }
         ]
       }
     },
@@ -1008,7 +1008,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/高阶API/激活函数/SoftMax接口/SoftMax", "grade": 3 }
+          { "exact": "/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftMax", "grade": 3 }
         ]
       }
     },
@@ -1020,8 +1020,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum", "grade": 3 },
-          { "exact": "/api/SIMD-API/高阶API/归约操作/ReduceSum接口/ReduceSum-90", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum", "grade": 3 },
+          { "exact": "/api/SIMD-API/adv_api/reduction_operations/ReduceSum_interface/ReduceSum-90", "grade": 3 }
         ]
       }
     },
@@ -1033,7 +1033,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Kernel-Tiling/Kernel-Tiling", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/Kernel-Tiling/Kernel-Tiling", "grade": 3 }
         ]
       }
     },
@@ -1045,8 +1045,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/SIMT编程简介/扩展语法/核函数配置", "grade": 3 },
-          { "exact": "/api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147", "grade": 2 }
+          { "exact": "/api/SIMT-API/SIMT_programming_intro/extended_syntax/kernel_function_config", "grade": 3 },
+          { "exact": "/api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config", "grade": 2 }
         ]
       }
     },
@@ -1071,8 +1071,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/DataCopy（UBToGM", "grade": 3 },
-          { "contains": "/DataCopyPad（UBToGM", "grade": 3 }
+          { "contains": "/DataCopy_UBToGM", "grade": 3 },
+          { "contains": "/DataCopyPad_UBToGM", "grade": 3 }
         ]
       }
     },
@@ -1084,7 +1084,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/原子操作/AtomicAdd", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/atomic_operations/AtomicAdd", "grade": 3 }
         ]
       }
     },
@@ -1135,7 +1135,7 @@
         "minResults": 1,
         "targets": [
           { "exact": "/guide/算子实践参考/SIMD与SIMT混合算子性能优化/概述", "grade": 3 },
-          { "exact": "/api/SIMT-API/访存函数/访存函数简介", "grade": 2 }
+          { "exact": "/api/SIMT-API/memory_access_functions/memory_access_functions_intro", "grade": 2 }
         ]
       }
     },
@@ -1148,7 +1148,7 @@
         "minResults": 1,
         "targets": [
           { "exact": "/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510", "grade": 3 },
-          { "contains": "/Cube分组管理（ISASI）/", "grade": 2 },
+          { "contains": "/cube_group_mgmt_ISASI/", "grade": 2 },
           { "exact": "/guide/算子实践参考/SIMD算子性能优化/流水编排/使能Iterate或IterateAll异步接口避免AIC-AIV同步依赖", "grade": 3 }
         ]
       }
@@ -1163,7 +1163,7 @@
         "targets": [
           { "exact": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程", "grade": 3 },
           { "exact": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/资源管理/TPipe/InitBufPool", "grade": 2 }
+          { "exact": "/api/SIMD-API/basic_api/resource_management/TPipe/InitBufPool", "grade": 2 }
         ]
       }
     },
@@ -1188,7 +1188,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/数据搬运/DataCopy（", "grade": 3 }
+          { "contains": "/memory_vector_compute/data_move/DataCopy_", "grade": 3 }
         ]
       }
     },
@@ -1200,7 +1200,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/GlobalTensor", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor", "grade": 3 }
         ]
       }
     },
@@ -1212,7 +1212,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/GlobalTensor/SetGlobalBuffer", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/GlobalTensor/SetGlobalBuffer", "grade": 3 }
         ]
       }
     },
@@ -1224,8 +1224,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum", "grade": 3 },
-          { "exact": "/api/SIMD-API/高阶API/归约操作/ReduceSum接口/ReduceSum-90", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum", "grade": 3 },
+          { "exact": "/api/SIMD-API/adv_api/reduction_operations/ReduceSum_interface/ReduceSum-90", "grade": 3 }
         ]
       }
     },
@@ -1237,7 +1237,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/原子操作/AtomicAdd", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/atomic_operations/AtomicAdd", "grade": 3 }
         ]
       }
     },
@@ -1249,8 +1249,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/数学函数/float类型数学库函数/isnan1", "grade": 3 },
-          { "exact": "/api/SIMD-API/高阶API/数学计算/IsNan接口/IsNan", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isnan1", "grade": 3 },
+          { "exact": "/api/SIMD-API/adv_api/math_compute/IsNan_interface/IsNan", "grade": 1 }
         ]
       }
     },
@@ -1262,8 +1262,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/高阶API/数学计算/IsNan接口/IsNan", "grade": 3 },
-          { "exact": "/api/SIMT-API/数学函数/float类型数学库函数/isnan1", "grade": 1 }
+          { "exact": "/api/SIMD-API/adv_api/math_compute/IsNan_interface/IsNan", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isnan1", "grade": 1 }
         ]
       }
     },
@@ -1275,8 +1275,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/数学函数/float类型数学库函数/isinf1", "grade": 3 },
-          { "exact": "/api/SIMD-API/高阶API/数学计算/IsInf接口/IsInf", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isinf1", "grade": 3 },
+          { "exact": "/api/SIMD-API/adv_api/math_compute/IsInf_interface/IsInf", "grade": 1 }
         ]
       }
     },
@@ -1288,8 +1288,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/高阶API/数学计算/IsInf接口/IsInf", "grade": 3 },
-          { "exact": "/api/SIMT-API/数学函数/float类型数学库函数/isinf1", "grade": 1 }
+          { "exact": "/api/SIMD-API/adv_api/math_compute/IsInf_interface/IsInf", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isinf1", "grade": 1 }
         ]
       }
     },
@@ -1301,8 +1301,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/数学函数/float类型数学库函数/isfinite1", "grade": 3 },
-          { "exact": "/api/SIMD-API/高阶API/数学计算/IsFinite接口/IsFinite", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isfinite1", "grade": 3 },
+          { "exact": "/api/SIMD-API/adv_api/math_compute/IsFinite_interface/IsFinite", "grade": 1 }
         ]
       }
     },
@@ -1314,8 +1314,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/高阶API/数学计算/IsFinite接口/IsFinite", "grade": 3 },
-          { "exact": "/api/SIMT-API/数学函数/float类型数学库函数/isfinite1", "grade": 1 }
+          { "exact": "/api/SIMD-API/adv_api/math_compute/IsFinite_interface/IsFinite", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isfinite1", "grade": 1 }
         ]
       }
     },
@@ -1327,8 +1327,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/Utils-API/CPP标准库/数学函数/abs1", "grade": 3 },
-          { "contains": "/基础算术/Abs", "grade": 1 }
+          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/abs1", "grade": 3 },
+          { "contains": "/basic_arithmetic/Abs", "grade": 1 }
         ]
       }
     },
@@ -1340,8 +1340,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/基础算术/Abs", "grade": 3 },
-          { "exact": "/api/Utils-API/CPP标准库/数学函数/abs1", "grade": 1 }
+          { "contains": "/basic_arithmetic/Abs", "grade": 3 },
+          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/abs1", "grade": 1 }
         ]
       }
     },
@@ -1353,8 +1353,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/Utils-API/CPP标准库/数学函数/sqrt1", "grade": 3 },
-          { "contains": "/基础算术/Sqrt", "grade": 1 }
+          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/sqrt1", "grade": 3 },
+          { "contains": "/basic_arithmetic/Sqrt", "grade": 1 }
         ]
       }
     },
@@ -1366,8 +1366,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/基础算术/Sqrt", "grade": 3 },
-          { "exact": "/api/Utils-API/CPP标准库/数学函数/sqrt1", "grade": 1 }
+          { "contains": "/basic_arithmetic/Sqrt", "grade": 3 },
+          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/sqrt1", "grade": 1 }
         ]
       }
     },
@@ -1379,10 +1379,10 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/数学函数/整型数学库函数/max1", "grade": 3 },
-          { "exact": "/api/Utils-API/CPP标准库/算法/max-267", "grade": 3 },
-          { "contains": "/基础算术/Max", "grade": 1 },
-          { "contains": "/NumericLimits工具类/Max", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/max1", "grade": 3 },
+          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/max-267", "grade": 3 },
+          { "contains": "/basic_arithmetic/Max", "grade": 1 },
+          { "contains": "/NumericLimits_utils/Max", "grade": 1 }
         ]
       }
     },
@@ -1394,10 +1394,10 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/基础算术/Max", "grade": 3 },
-          { "contains": "/NumericLimits工具类/Max", "grade": 3 },
-          { "exact": "/api/SIMT-API/数学函数/整型数学库函数/max1", "grade": 1 },
-          { "exact": "/api/Utils-API/CPP标准库/算法/max-267", "grade": 1 }
+          { "contains": "/basic_arithmetic/Max", "grade": 3 },
+          { "contains": "/NumericLimits_utils/Max", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/max1", "grade": 1 },
+          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/max-267", "grade": 1 }
         ]
       }
     },
@@ -1409,10 +1409,10 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/数学函数/整型数学库函数/min1", "grade": 3 },
-          { "exact": "/api/Utils-API/CPP标准库/算法/min-268", "grade": 3 },
-          { "contains": "/基础算术/Min", "grade": 1 },
-          { "contains": "/NumericLimits工具类/Min", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/min1", "grade": 3 },
+          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/min-268", "grade": 3 },
+          { "contains": "/basic_arithmetic/Min", "grade": 1 },
+          { "contains": "/NumericLimits_utils/Min", "grade": 1 }
         ]
       }
     },
@@ -1424,10 +1424,10 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/基础算术/Min", "grade": 3 },
-          { "contains": "/NumericLimits工具类/Min", "grade": 3 },
-          { "exact": "/api/SIMT-API/数学函数/整型数学库函数/min1", "grade": 1 },
-          { "exact": "/api/Utils-API/CPP标准库/算法/min-268", "grade": 1 }
+          { "contains": "/basic_arithmetic/Min", "grade": 3 },
+          { "contains": "/NumericLimits_utils/Min", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/min1", "grade": 1 },
+          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/min-268", "grade": 1 }
         ]
       }
     },
@@ -1439,8 +1439,8 @@
       "expect": {
         "minResults": 5,
         "targets": [
-          { "contains": "/数据搬运/DataCopy（", "grade": 3 },
-          { "contains": "/矩阵计算的搬入/DataCopy（", "grade": 2 },
+          { "contains": "/memory_vector_compute/data_move/DataCopy_", "grade": 3 },
+          { "contains": "/cube_compute_load/DataCopy_", "grade": 2 },
           { "contains": "/DataCopyPad", "grade": 1 }
         ]
       }
@@ -1453,8 +1453,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor", "grade": 3 },
-          { "exact": "/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介", "grade": 2 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor", "grade": 3 },
+          { "exact": "/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro", "grade": 2 }
         ]
       }
     },
@@ -1466,9 +1466,9 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/DataCopyPad（GMToUB非对齐数据搬运）", "grade": 3 },
-          { "contains": "/DataCopyPad（UBToGM非对齐数据搬运）", "grade": 3 },
-          { "contains": "/DataCopyPad（", "grade": 2 }
+          { "contains": "/DataCopyPad_GMToUB", "grade": 3 },
+          { "contains": "/DataCopyPad_UBToGM", "grade": 3 },
+          { "contains": "/DataCopyPad_", "grade": 2 }
         ]
       }
     },
@@ -1578,7 +1578,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/Utils-API/Tiling模板编程/ASCENDC_TPL_SEL_PARAM", "grade": 3 }
+          { "exact": "/api/Utils-API/Tiling_template_programming/ASCENDC_TPL_SEL_PARAM", "grade": 3 }
         ]
       }
     },
@@ -1618,7 +1618,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Reg矢量计算/辅助数据类型/SatMode", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/reg_vector_compute/aux_data_types/SatMode", "grade": 3 }
         ]
       }
     },
@@ -1630,7 +1630,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "contains": "/同步控制/核内同步/PipeBarrier", "grade": 3 }
+          { "contains": "/sync_control/intra_core_sync/PipeBarrier", "grade": 3 }
         ]
       }
     },
@@ -1642,7 +1642,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/Utils-API/原型注册与管理/OpParamDef/FormatForBinQuery", "grade": 3 }
+          { "exact": "/api/Utils-API/prototype_register_management/OpParamDef/FormatForBinQuery", "grade": 3 }
         ]
       }
     },
@@ -1654,7 +1654,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/Utils-API/原型注册与管理/OpParamDef/DataTypeForBinQuery", "grade": 3 }
+          { "exact": "/api/Utils-API/prototype_register_management/OpParamDef/DataTypeForBinQuery", "grade": 3 }
         ]
       }
     },
@@ -1666,8 +1666,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Kernel-Tiling/GET_TILING_DATA", "grade": 3 },
-          { "prefix": "/api/SIMD-API/基础API/Kernel-Tiling/GET_TILING_DATA_", "grade": 2 }
+          { "exact": "/api/SIMD-API/basic_api/Kernel-Tiling/GET_TILING_DATA", "grade": 3 },
+          { "prefix": "/api/SIMD-API/basic_api/Kernel-Tiling/GET_TILING_DATA_", "grade": 2 }
         ]
       }
     },
@@ -1679,7 +1679,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Kernel-Tiling/TILING_KEY_IS", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/Kernel-Tiling/TILING_KEY_IS", "grade": 3 }
         ]
       }
     },
@@ -1691,8 +1691,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/调试接口/CPU孪生调试/ICPU_RUN_KF", "grade": 3 },
-          { "prefix": "/api/SIMD-API/基础API/调试接口/CPU孪生调试/", "grade": 2 }
+          { "exact": "/api/SIMD-API/basic_api/debug_interface/cpu_twin_debug/ICPU_RUN_KF", "grade": 3 },
+          { "prefix": "/api/SIMD-API/basic_api/debug_interface/cpu_twin_debug/", "grade": 2 }
         ]
       }
     },
@@ -1716,7 +1716,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/内置数据类型", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/builtin_data_types", "grade": 3 }
         ]
       }
     },
@@ -1728,7 +1728,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/内置数据类型", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/builtin_data_types", "grade": 3 }
         ]
       }
     },
@@ -1740,7 +1740,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/内置数据类型", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/builtin_data_types", "grade": 3 }
         ]
       }
     },
@@ -1752,7 +1752,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/数据结构/内置数据类型", "grade": 3 }
+          { "exact": "/api/SIMD-API/basic_api/data_structures/builtin_data_types", "grade": 3 }
         ]
       }
     },
@@ -1764,7 +1764,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/C-API/reg/reg_data_types/data_type_definition", "grade": 3 }
+          { "exact": "/api/SIMD-API/c_api/reg/reg_data_types/data_type_definition", "grade": 3 }
         ]
       }
     },
@@ -1776,7 +1776,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/C-API/通用说明和约束", "grade": 3 },
+          { "exact": "/api/SIMD-API/c_api/general_description_and_constraints", "grade": 3 },
           { "contains": "/SetLoadDataRepeatWithStride", "grade": 2 }
         ]
       }
@@ -1831,8 +1831,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/基础API/Kernel-Tiling/GET_TILING_DATA", "grade": 3 },
-          { "prefix": "/api/SIMD-API/基础API/Kernel-Tiling/GET_TILING_DATA_", "grade": 2 }
+          { "exact": "/api/SIMD-API/basic_api/Kernel-Tiling/GET_TILING_DATA", "grade": 3 },
+          { "prefix": "/api/SIMD-API/basic_api/Kernel-Tiling/GET_TILING_DATA_", "grade": 2 }
         ]
       }
     },
@@ -1844,7 +1844,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/C-API/reg/reg_data_types/data_type_definition", "grade": 3 }
+          { "exact": "/api/SIMD-API/c_api/reg/reg_data_types/data_type_definition", "grade": 3 }
         ]
       }
     },
@@ -1856,8 +1856,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling类/Matmul-Tiling类", "grade": 3 },
-          { "prefix": "/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling类/", "grade": 2 }
+          { "exact": "/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/Matmul_Tiling", "grade": 3 },
+          { "prefix": "/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/", "grade": 2 }
         ]
       }
     },
@@ -1881,8 +1881,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/协作组/thread_block/thread_block", "grade": 3 },
-          { "prefix": "/api/SIMT-API/协作组/thread_block/", "grade": 2 }
+          { "exact": "/api/SIMT-API/cooperative_groups/thread_block/thread_block", "grade": 3 },
+          { "prefix": "/api/SIMT-API/cooperative_groups/thread_block/", "grade": 2 }
         ]
       }
     },
