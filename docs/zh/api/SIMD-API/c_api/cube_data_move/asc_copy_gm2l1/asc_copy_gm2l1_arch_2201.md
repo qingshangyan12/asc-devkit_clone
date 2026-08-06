@@ -45,11 +45,11 @@
     __aicore__ inline void asc_copy_gm2l1_pad4(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
     // 以32B为单位，每8B插入8B的pad
     __aicore__ inline void asc_copy_gm2l1_pad5(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
-    // 每32B删除最高位的28B,最低位的4B连续存储
+    // 每32字节删除最高位的28字节，最低位的4字节连续存储
     __aicore__ inline void asc_copy_gm2l1_pad6(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
-    // 每32B删除最高位的24B,最低位的8B连续存储
+    // 每32字节删除最高位的24字节，最低位的8字节连续存储
     __aicore__ inline void asc_copy_gm2l1_pad7(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
-    // 每32B删除最高位的16B,最低位的16B连续存储
+    // 每32字节删除最高位的16字节，最低位的16字节连续存储
     __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
     ```
 
@@ -74,13 +74,13 @@
     // 以32B为单位，每8B插入8B的pad
     __aicore__ inline void asc_copy_gm2l1_pad5(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
-    // 每32B删除最高位的28B,最低位的4B连续存储
+    // 每32字节删除最高位的28字节，最低位的4字节连续存储
     __aicore__ inline void asc_copy_gm2l1_pad6(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
-    // 每32B删除最高位的24B,最低位的8B连续存储
+    // 每32字节删除最高位的24字节，最低位的8字节连续存储
     __aicore__ inline void asc_copy_gm2l1_pad7(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
-    // 每32B删除最高位的16B,最低位的16B连续存储
+    // 每32字节删除最高位的16字节，最低位的16字节连续存储
     __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
     ```
@@ -100,11 +100,11 @@
     __aicore__ inline void asc_copy_gm2l1_pad4_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
     // 以32B为单位，每8B插入8B的pad
     __aicore__ inline void asc_copy_gm2l1_pad5_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
-    // 每32B删除最高位的28B,最低位的4B连续存储
+    // 每32字节删除最高位的28字节，最低位的4字节连续存储
     __aicore__ inline void asc_copy_gm2l1_pad6_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
-    // 每32B删除最高位的24B,最低位的8B连续存储
+    // 每32字节删除最高位的24字节，最低位的8字节连续存储
     __aicore__ inline void asc_copy_gm2l1_pad7_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
-    // 每32B删除最高位的16B,最低位的16B连续存储
+    // 每32字节删除最高位的16字节，最低位的16字节连续存储
     __aicore__ inline void asc_copy_gm2l1_pad8_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
     ```
 
@@ -170,10 +170,10 @@
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| base_idx | 输入 | 分形矩阵ID，说明搬运起始位置为源操作数中的第几个分形（0为源操作数中的第一个分形矩阵）。取值范围：[0, 65535]。单位512B。默认为0。 |
+| base_idx | 输入 | 分形矩阵ID，说明搬运起始位置为源操作数中的第几个分形（0为源操作数中的第一个分形矩阵），每个索引对应512字节数据。取值范围：[0, 65535]。默认为0。 |
 | repeat | 输入 | 迭代次数。 |
-| src_stride |输入| 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位：512B。取值范围：[0, 65535]。默认为0。 |
-| dst_gap | 输入 | 相邻迭代间，目的操作数前一个分形结束地址与后一个分形起始地址的间隔，单位：512B。取值范围：[0, 65536]。默认为0。 |
+| src_stride |输入| 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位512字节。取值范围：[0, 65535]。默认为0。 |
+| dst_gap | 输入 | 相邻迭代间，目的操作数前一个分形结束地址与后一个分形起始地址的间隔，单位512字节。取值范围：[0, 65536]。默认为0。 |
 
 ## 返回值说明
 
