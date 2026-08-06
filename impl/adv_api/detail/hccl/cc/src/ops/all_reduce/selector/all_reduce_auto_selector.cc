@@ -15,20 +15,10 @@ namespace mc2_ops_hccl {
 SelectorStatus AllReduceAutoSelector::SelectKfcMesh1D(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
 {
-    if (topoInfo->topoLevelNums != 1 || topoInfo->level0Topo != Level0Shape::MESH_1D ||
-        topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
-        return SelectorStatus::NOT_MATCH;
-    }
-    if (IsInputOutputOverlap(opParam) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD ||
-        Is64BitDataType(opParam.DataDes.dataType) || opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT8) {
-        return SelectorStatus::NOT_MATCH;
-    }
-    if (opParam.DataDes.outputType != HcclDataType::HCCL_DATA_TYPE_RESERVED &&
-        opParam.DataDes.outputType != opParam.DataDes.dataType) {
-        return SelectorStatus::NOT_MATCH;
-    }
-    selectAlgName = "CcuAllReduceMesh1DMem2Mem";
-    return SelectorStatus::MATCH;
+    (void)topoInfo;
+    (void)opParam;
+    (void)selectAlgName;
+    return SelectorStatus::NOT_MATCH;
 }
 
 SelectorStatus AllReduceAutoSelector::SelectCcuMsAlgo(
