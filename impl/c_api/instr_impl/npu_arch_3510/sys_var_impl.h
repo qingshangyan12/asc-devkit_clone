@@ -19,6 +19,7 @@
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_H
 
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_ar_spr_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_pipe_idle_slot_count_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_program_counter_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_ctrl_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_block_idx_impl.h"
@@ -42,6 +43,18 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sub_block_id_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sub_block_num_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sys_virtual_base_impl.h"
+
+__aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count() { return asc_get_pipe_mte2_idle_slot_count_impl(); }
+
+__aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count() { return asc_get_pipe_mte3_idle_slot_count_impl(); }
+
+__aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count() { return asc_get_pipe_v_idle_slot_count_impl(); }
+
+__aicore__ inline uint8_t asc_get_pipe_m_idle_slot_count() { return asc_get_pipe_m_idle_slot_count_impl(); }
+
+__aicore__ inline uint8_t asc_get_pipe_mte1_idle_slot_count() { return asc_get_pipe_mte1_idle_slot_count_impl(); }
+
+__aicore__ inline uint8_t asc_get_pipe_fix_idle_slot_count() { return asc_get_pipe_fix_idle_slot_count_impl(); }
 
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
              "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
