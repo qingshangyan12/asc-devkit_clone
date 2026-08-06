@@ -104,6 +104,19 @@ Mc2CcTilingConfig / Mc2CcTiling：生成并保存 mc2 初始化参数和 AllRedu
       -> GetOpParam：根据 tiling 初始化 `OpParam`，完成算法选择和资源上下文创建。
         -> InitOpParamByTiling：将 AllReduce 类型、数据类型、归约类型和通信配置写入 `OpParam`。
           -> PrepareParamForAllReduce：补充 AllReduce 专用参数，并将资源阶段的 `DataDes.count` 初始化为 0。
+        -> TryForcedAlgAndPrepareEngine  指定算法名称，走此路径
+              -> GetForcedAlgName
+                  -> forcedAlgName = InsAllReduceMesh1DTwoShot
+              -> 备份 OpParam
+              -> PrepareTopoInfoForOp
+              -> PrepareEngineForAlg
+              -> CheckForcedAlgResource
+                  -> GetAlgExecutorForOp
+                  -> executor->CalcAlgHierarchyInfo
+                  -> executor->CalcRes
+              -> algName = InsAllReduceMesh1DTwoShot
+              -> forcedAlgAccepted = true
+              -> 跳过 SelectAlgAndPrepareEngine
         -> SelectAlgAndPrepareEngine：计算通信拓扑，选择算法并准备 AICPU 通信引擎。
           -> ExecuteSelector::Run：从 AllReduce selector 注册表中查找能够匹配当前拓扑的算法选择器。
             -> AllReduceAutoSelector::SelectAicpuAlgo：检查单层 Mesh1D 拓扑并选择标准 TwoShot 算法。
