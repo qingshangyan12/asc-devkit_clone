@@ -26,7 +26,13 @@
 
 ## 功能说明
 
-设置[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。
+头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
+
+设置3D格式分形矩阵搬运（img2col展开）的L1 Buffer边界值，作为后续3D格式分形矩阵搬运接口在L1 Buffer侧的容量上限。配置写入后作用于后续调用的3D格式分形矩阵搬运接口，约束Feature Map（由`fm_w × fm_h × channel_size`描述）占用的字节数不可超过本接口设置的边界值。
+
+本接口仅在AIC上执行有效，在AIV上调用为空操作。
+
+3D格式分形矩阵搬运场景下，L1 Buffer侧容量上限需通过本接口配置；Feature Map属性需通过[asc_set_l13d_fmatrix](asc_set_l13d_fmatrix.md)、[asc_set_l13d_fmatrix_b](asc_set_l13d_fmatrix_b.md)配置，填充值需通过[asc_set_l13d_padding](asc_set_l13d_padding.md)配置，repeat控制参数需通过[asc_set_l13d_rpt](asc_set_l13d_rpt.md)配置，各setter需配合使用后再调用3D格式分形矩阵搬运接口执行搬运。
 
 ## 函数原型
 
@@ -38,9 +44,9 @@ __aicore__ inline void asc_set_l13d_size(uint64_t value)
 
 **表1** 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| value | 输入 | 用于设置asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口在L1 Buffer的边界值，单位是字节。非0场景的边界值不能小于1024。<br>如果value设置为0，则表示无边界，asc_copy_l12l0a/asc_copy_l12l0b接口可使用整个L1 Buffer。 |
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| `value` | 输入 | L1 Buffer边界值，作为3D格式分形矩阵搬运接口在L1 Buffer侧的容量上限，约束Feature Map字节数`fm_w × fm_h × channel_size × sizeof(dtype)`不超过该值。取值范围：[0, 2^64−1]。 |
 
 ## 返回值说明
 
@@ -52,11 +58,15 @@ PIPE_S
 
 ## 约束说明
 
-- 需配合asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口使用。
-- 如果使用asc_set_l13d_size接口设置了边界值，asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口的L1 Buffer初始地址要在设置的边界内（value）。
-- 如果asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口的源操作数在L1 Buffer上的地址超出设置的边界值（value），则会从L1 Buffer起始地址开始读取数据。
+- 需配合[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口使用。
+- 如果使用asc_set_l13d_size接口设置了边界值，[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的L1 Buffer初始地址要在设置的边界内（value）。
+- value为0表示不设置边界，可使用整个L1 Buffer。
+- 配合3D格式搬运接口使用时，非0边界值不能小于1024；设置为1~1023时，行为未定义。
 - 操作数地址对齐约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 
+### value参数约束
+
+- value取值范围为[0, 2^32−1]，超出取值范围的值会被截断，导致后续搬运结果不符合预期。
 
 
 ## 调用示例
