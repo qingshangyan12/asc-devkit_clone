@@ -13,6 +13,35 @@
 
 namespace mc2_ops_hccl {
 
+SelectorStatus AlltoAllAutoSelector::SelectCcuMeshAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
+{
+    if (topoInfo == nullptr || topoInfo->topoLevelNums != 1 || topoInfo->level0Topo != Level0Shape::MESH_1D ||
+        topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE ||
+        opParam.opType != HcclCMDType::HCCL_CMD_ALLTOALL) {
+        return SelectorStatus::NOT_MATCH;
+    }
+    selectAlgName = "CcuAlltoAllMesh1D";
+    HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+    return SelectorStatus::MATCH;
+}
+
+SelectorStatus AlltoAllAutoSelector::SelectCcuMsAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
+{
+    (void)configAlgMap;
+    return SelectCcuMeshAlgo(topoInfo, opParam, selectAlgName);
+}
+
+SelectorStatus AlltoAllAutoSelector::SelectCcuScheduleAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
+{
+    (void)configAlgMap;
+    return SelectCcuMeshAlgo(topoInfo, opParam, selectAlgName);
+}
+
 SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
