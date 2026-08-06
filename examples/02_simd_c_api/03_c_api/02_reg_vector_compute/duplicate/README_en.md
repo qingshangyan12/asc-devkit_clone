@@ -1,7 +1,7 @@
 ﻿# duplicate Example
 
 ## Overview
-This example implements the Duplicate operation (scalar fill mode) based on the C API programming interface, primarily calling the [asc_duplicate_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_fill/asc_duplicate_scalar.md) API.
+This example implements the Duplicate operation (scalar fill mode) based on the C API programming interface, primarily calling the [asc_duplicate_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg/data_fill/asc_duplicate_scalar.md) API.
 - The `asc_duplicate_scalar(dst vector data register, scalar, mask)` API copies a scalar value multiple times and fills it into a vector
 - The `asc_duplicate(dst vector data register, src vector data register, mask)` API copies the first element of the source vector data register multiple times and fills it into a vector
 
@@ -9,13 +9,13 @@ This example implements the Duplicate operation (scalar fill mode) based on the 
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
 ├── duplicate
 │   ├── scripts
-│   │   │   ├── gen_data.py            // Ground truth data generation script
+│   │   ├── gen_data.py            // Ground truth data generation script
 │   ├── CMakeLists.txt                 // Build configuration file
 │   ├── data_utils.h                   // Data read/write functions
 │   ├── duplicate.asc                  // Ascend C example implementation & invocation example
