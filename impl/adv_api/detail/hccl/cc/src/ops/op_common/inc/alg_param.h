@@ -609,6 +609,9 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     u32 aicpuRecordCpuIdx = 0; // aicpu record host的notifyIdx
     u32 dataCount = 0;         // 算子上报dfx的数据量
     DevAicpuOpConfig opConfig; // 收编算子配置类变量
+    ThreadHandle exportHostOrderThread = 0;     // host侧保序流映射到device
+    ThreadHandle deviceOrderThread = 0;         // device侧保序流
+    bool isCapture = false;                     // 是否为aclgraph
     u64 varMemSize{0};
     u8 varData[0];
     u64 ccuKfcArgs[4];  // 测试，ccu-kfc作为通信算子
