@@ -100,8 +100,9 @@ __host__ __aicore__ inline constexpr auto ceil_div_generic(const T& a, const U& 
 template <typename T, typename U>
 __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 {
+    using ReType = decltype(ceil_div_generic(a, b));
     if (b == 0) {
-        return 0;
+        return ReType(0);
     }
 #if defined(__NPU_HOST__)
     return ceil_div_generic(a, b);
@@ -111,7 +112,7 @@ __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 || !defined(SPLIT_CORE_VEC)
     return ceil_div_generic(a, b);
 #else
-    return get_repeat_ceiling(a, b);
+    return ReType(get_repeat_ceiling(a, b));
 #endif
 #else
     return ceil_div_generic(a, b);
