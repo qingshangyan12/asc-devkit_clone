@@ -13,10 +13,10 @@ Conv3dBackpropFilter的计算公式为：
 -   ∂L/∂W为Weight权重的反向传播误差GradWeight。
 
 **图1**  卷积反向权重传播示意图<a name="fig1710410547569"></a>  
-![](../../../../figures/卷积反向权重传播示意图.png "卷积反向权重传播示意图")
+![](../../../../figures/conv_backward_weight_propagation.png "卷积反向权重传播示意图")
 
 **图2**  卷积反向权重计算过程示意图<a name="fig25291917533"></a>  
-![](../../../../figures/卷积反向权重计算过程示意图.png "卷积反向权重计算过程示意图")
+![](../../../../figures/conv_backward_weight_compute.png "卷积反向权重计算过程示意图")
 
 Kernel侧实现Conv3DBackpropFilter求解反向传播误差运算的步骤概括为：
 
@@ -108,7 +108,7 @@ Kernel侧实现Conv3DBackpropFilter求解反向传播误差运算的步骤概括
 
 4.  完成卷积反向操作。
 
-    调用[Iterate](Iterate-125.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算。
+    调用[Iterate](Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算。
 
     ```
     while (gradWeight_.Iterate()) {
