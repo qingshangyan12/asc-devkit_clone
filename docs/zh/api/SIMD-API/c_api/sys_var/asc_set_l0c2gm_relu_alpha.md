@@ -26,30 +26,34 @@
 
 ## 功能说明
 
-对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。
+头文件路径：`"c_api/sys_var/sys_var.h"`。
 
-其中各bit含义如下：
+本接口用于配置L0C Buffer搬出过程中，预处理阶段Scalar ReLU使用的alpha系数。配置写入后，由后续的[asc_copy_l0c2gm](../cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)等L0C Buffer搬出接口使用。
 
-**表1** RELU_ALPHA寄存器比特位说明
-
-| bit范围 |                                           含义                                           | 
-|:------|:--------------------------------------------------------------------------------------:|
-| 31:13 | 表示ReLU_PRE中Scalar ReLU的M2值，只有Scalar ReLU时生效。硬件将以1位符号位，8位指数位和10位尾数位的格式用于计算，不能是INF/NAN。  |
-| 63:45 | 表示ReLU_POST中Scalar ReLU的M2值，只有Scalar ReLU时生效。硬件将以1位符号位，8位指数位和10位尾数位的格式用于计算，不能是INF/NAN。 |
+当搬出接口的`relu_pre_mode`设置为2（Scalar ReLU）时，本接口配置的alpha系数生效：输入大于等于0时，输出等于输入；输入小于0时，输出等于`alpha * 输入`。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config)
 ```
 
 ## 参数说明
 
-**表2** 参数说明
+**表1** 参数说明
 
-|参数名|输入/输出| 描述        |
-| :------ | :---  |:----------|
-|config   |输入   | 待设置的寄存器值。 |
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| config | 输入 | Scalar ReLU的64 bit alpha系数配置。接口不检查或转换字段值，需按照[表2](#table2)完成拼装。 |
+
+**表2** config字段说明 <a id="table2"></a>
+
+| bit范围 | 字段 | 描述 |
+|---|---|---|
+| 12:0 | - | 保留位，需设置为0。 |
+| 31:13 | M2 | 预处理阶段Scalar ReLU的alpha系数。该字段为19 bit的(1, 8, 10)浮点格式，即1 bit符号位、8 bit指数位和10 bit尾数位。 |
+| 44:32 | - | 保留位，需设置为0。 |
+| 63:45 | M4 | 后处理阶段Scalar ReLU的alpha系数，格式与M2相同。当前L0C Buffer搬出C API的`relu_post`为无效参数，本字段需设置为0。 |
 
 ## 返回值说明
 
@@ -61,13 +65,18 @@ PIPE_S
 
 ## 约束说明
 
-无
+- 本接口仅在AIC上生效，在AIV上调用不生效。
+- 本接口需在对应的L0C Buffer搬出接口执行前调用，并将搬出接口的`relu_pre_mode`设置为2。其他ReLU模式不使用本接口配置的M2字段。
+- M2系数不能为INF、NAN或非规格化数。系数为0时，指数位和尾数位均需为0。
+- 由标准IEEE 754 FP32数值生成M2字段时，保留符号位、8 bit指数位和高10 bit尾数位，舍弃低13 bit尾数位。
+- `config[12:0]`、`config[44:32]`以及当前不支持的M4字段需设置为0。接口会将`config`整体写入，不会检查字段值。
+- 配置会持续生效，直至再次调用本接口覆盖。不同搬出任务使用的alpha系数不同时，需在对应搬出接口执行前重新配置。
 
 ## 调用示例
 
 ```cpp
-uint32_t pre_m2 = (0<<18)|(127<<10)|0;
-uint32_t post_m2 = (0<<18)|(124<<10)|0;
-uint64_t config = ((uint64_t)pre_m2<<13)|((uint64_t)post_m2<<45);
+// alpha = 0.5：(1, 8, 10)格式的符号位为0、指数为126、尾数为0
+constexpr uint32_t relu_pre_m2 = (0U << 18) | (126U << 10);
+uint64_t config = static_cast<uint64_t>(relu_pre_m2) << 13;
 asc_set_l0c2gm_relu_alpha(config);
 ```
