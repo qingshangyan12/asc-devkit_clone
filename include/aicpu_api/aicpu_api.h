@@ -35,5 +35,6 @@
 
 namespace AscendC {
 void printf(const char* fmt, ...);
+void printf_empty(const char* fmt, ...);
 static inline void DataStoreBarrier(void) { asm volatile("dsb st" ::: "memory"); }
 } // namespace AscendC
