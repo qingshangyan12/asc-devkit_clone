@@ -206,16 +206,28 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[0] = GetOpId(commParam); // ccu xn0
     auto dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commParam->dataType)];
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
-    xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
-    xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
+    xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1 - inputAddr
+    xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2 - outputAddr
 
     uint64_t loopCount = CCU_LOOP_COUNT_M2M_AG;
     uint64_t sliceCount = commParam->count;
     uint64_t sliceSize = sliceCount * dataSize;
 
-    xnData_[3] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
-    xnData_[4] = sliceSize;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
+    uint64_t rankSliceOffset =
+        ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
+
+    xnData_[3] = 0;                               // unused (token comes from ctx.token)
+    xnData_[4] = rankSliceOffset;                 // currentRankSliceInputOffset
+    xnData_[5] = rankSliceOffset;                 // currentRankSliceOutputOffset
+    xnData_[6] = UINT64_MAX - commParam->repeat;  // tmpRepeatNum
+    xnData_[7] = 0;                               // inputRepeatStride
+    xnData_[8] = 0;                               // outputRepeatStride
+    xnData_[9] = sliceSize;                       // normalSliceSize
+    xnData_[10] = sliceSize;                      // lastSliceSize (AllGather: all slices same size)
+    xnData_[11] = static_cast<uint64_t>(
+        ((uint64_t)commParam->sendBuf + offset + rankSliceOffset) ==
+        ((uint64_t)commParam->recvBuf + offset + rankSliceOffset)); // isInputOutputEqual
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[12]); // goSize[0~3]
 }
 
 template <const auto& config>
