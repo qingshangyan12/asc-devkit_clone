@@ -26,34 +26,65 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_vector.h"`。
+
 `src` 中的每个元素逐个与标量 `value` 比较是否不相等，如果 `src_i != value`，则输出结果 `dst` 对应比特位为1，否则为0，每个元素的比较结果占一个bit。`dst` 为掩码寄存器，按掩码 `mask` 指示参与计算的元素。
 
 $$
 dst_i = (src_i \neq value)
 $$
 
+```python
+# 以half类型为例（b16位宽，256B共128个元素）
+# src:    half[128]   (vector_half, 源操作数)
+# value:  half        (标量参数)
+# dst:    bool[128]   (vector_bool, 掩码寄存器，每个元素比较结果占1 bit)
+# mask:   bool[128]   (vector_bool, 控制哪些元素参与比较)
+#
+# 逐元素比较 src[i] != value，结果写入dst掩码寄存器；
+# mask为0的元素不参与比较，对应结果位置false（置0）
+
+def asc_ne_scalar(dst, src, value, mask):
+    for i in range(128):
+        if mask[i]:
+            dst[i] = (src[i] != value)
+        else:
+            dst[i] = False
+```
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
+### 模板原型
+
+```c
+__simd_callee__ inline void asc_ne_scalar(vector_bool& dst,
+                                          vector_<dtype> src,
+                                          <dtype> value,
+                                          vector_bool mask)
 ```
+
+dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
+
+### 典型示例
+
+```c
+// 示例：half源向量与标量不等比较，结果写入vector_bool掩码寄存器
+__simd_callee__ inline void asc_ne_scalar(vector_bool& dst,
+                                          vector_half src,
+                                          half value,
+                                          vector_bool mask)
+```
+
 ## 参数说明
 
 **表1** 参数说明
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（掩码寄存器）。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。 |
-| value | 输入 | 源操作数（标量）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+
+| 参数名 | 输入/输出 | 描述                                                                                                             |
+| ------ | --------- | ---------------------------------------------------------------------------------------------------------------- |
+| dst    | 输出      | 目的操作数（掩码寄存器）。                                                                                       |
+| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
+| value  | 输入      | 源操作数（标量）。                                                                                               |
+| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -67,8 +98,9 @@ PIPE_V
 
 ## 约束说明
 
-- mask未筛选的元素在输出中置零。
-- 浮点数据类型比较，涉及`nan`时比较结果为1。
+- src与value的数据类型需要保持一致。
+- 掩码位为0时，dst对应比特位置0。
+- 浮点比较输入含nan时，dst对应比特位写1。
 
 ## 调用示例
 

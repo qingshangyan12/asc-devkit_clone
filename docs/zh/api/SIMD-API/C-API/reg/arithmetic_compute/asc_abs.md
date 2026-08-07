@@ -26,29 +26,56 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_vector.h"`。
+
 按元素取绝对值，i为元素索引。计算公式如下：
 $$
 dst_i = |src_i|
 $$
 
+```python
+# src: half[128]  (vector_half, 256B = 128个half元素; 以half为例, b32类型为64元素)
+# dst: half[128]  (vector_half)
+# mask: bool[128] (b16位宽, 每元素1bit)
+#
+# 逐元素取绝对值, mask为0的元素置零(MODE_ZEROING)
+
+def asc_abs(dst, src, mask):
+    for i in range(128):
+        if mask[i]:
+            dst[i] = abs(src[i])
+        else:
+            dst[i] = 0
+```
+
 ## 函数原型
 
-  ```cpp
-  __simd_callee__ inline void asc_abs(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
-  __simd_callee__ inline void asc_abs(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_abs(vector_half& dst, vector_half src, vector_bool mask)
-  __simd_callee__ inline void asc_abs(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask)
-  ```
+### 模板原型
+
+```c
+__simd_callee__ inline void asc_abs(vector_<dtype>& dst,
+                                    vector_<dtype> src,
+                                    vector_bool mask)
+```
+
+dtype支持的数据类型为`int8_t`、`int16_t`、`int32_t`、`half`、`float`
+
+### 典型示例
+
+```c
+__simd_callee__ inline void asc_abs(vector_half& dst,
+                                    vector_half src,
+                                    vector_bool mask)
+```
 
 ## 参数说明
 
 **表1** 参数说明
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst       | 输出    | 目的操作数（矢量数据寄存器）。 |
-| src       | 输入    | 源操作数（矢量数据寄存器）。 |
-| mask      | 输入    | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| 参数名 | 输入/输出 | 描述                                                                                                                                                                                     |
+| :----- | :-------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| dst    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                                                                                           |
+| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                                                                                             |
+| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -62,7 +89,10 @@ PIPE_V
 
 ## 约束说明
 
-mask未筛选的元素在输出中置零。
+- dst与src的数据类型需要保持一致。
+- 掩码位为0时，dst对应元素置0。
+- 整数输入取算术绝对值；当输入为有符号整数类型的最小负值时，结果保留原值不变。
+- 浮点输入取绝对值：正数和+0保持不变，负数转为对应正数，-0转为+0，-inf转为+inf；输入为nan时，输出为nan。
 
 ## 调用示例
 
