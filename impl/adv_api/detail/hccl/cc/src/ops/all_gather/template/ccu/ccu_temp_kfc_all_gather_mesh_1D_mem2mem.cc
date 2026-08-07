@@ -62,25 +62,40 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::KernelRun(
     uint64_t token = 0;
     CHK_RET(GetToken(buffInfo_, token));
 
-    const uint64_t outputOffset = templateDataParams.outputSliceStride * mySubCommRank_;
-    uint64_t sliceSize = templateDataParams.sliceSize;
+    const uint64_t inputSliceStride = templateDataParams.inputSliceStride;
+    const uint64_t outputSliceStride = templateDataParams.outputSliceStride;
+    const uint64_t repeatNum = templateDataParams.repeatNum;
+    const uint64_t inputRepeatStride = templateDataParams.inputRepeatStride;
+    const uint64_t outputRepeatStride = templateDataParams.outputRepeatStride;
+    uint64_t normalSliceSize = templateDataParams.sliceSize;
+    const uint64_t lastSliceSize = templateDataParams.tailSize;
+
     if (templateDataParams.tailSize != 0 && mySubCommRank_ == templateRankSize_ - 1) {
-        sliceSize = templateDataParams.tailSize;
+        normalSliceSize = templateDataParams.tailSize;
     }
-    if (sliceSize == 0) {
+    if (normalSliceSize == 0 && lastSliceSize == 0) {
         return HcclResult::HCCL_SUCCESS;
     }
+
+    const uint64_t currentRankSliceInputOffset = inputSliceStride * mySubCommRank_;
+    const uint64_t currentRankSliceOutputOffset = outputSliceStride * mySubCommRank_;
+    const uint64_t tmpRepeatNum = UINT64_MAX - repeatNum;
+    const bool inputOutputEqual =
+        (inputAddr + currentRankSliceInputOffset == outputAddr + currentRankSliceOutputOffset);
+    const uint64_t isInputOutputEqual = static_cast<uint64_t>(inputOutputEqual);
 
     LoopGroupConfig config{};
     config.msInterleave = CCU_MS_INTERLEAVE;
     config.loopCount = CCU_MS_LOCAL_COPY_LOOP_COUNT;
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
-    const auto goSize = CalGoSize(sliceSize, config);
+    const auto goSize = CalGoSize(normalSliceSize, config);
 
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
     CHK_RET(FillCachedArgs(
-        submitInfo, inputAddr, outputAddr, token, outputOffset, sliceSize, goSize[0], goSize[1], goSize[2], goSize[3]));
+        submitInfo, inputAddr, outputAddr, token, currentRankSliceInputOffset, currentRankSliceOutputOffset,
+        tmpRepeatNum, inputRepeatStride, outputRepeatStride, normalSliceSize, lastSliceSize, isInputOutputEqual,
+        goSize[0], goSize[1], goSize[2], goSize[3]));
     templateResource.submitInfos.push_back(submitInfo);
     return HcclResult::HCCL_SUCCESS;
 }
