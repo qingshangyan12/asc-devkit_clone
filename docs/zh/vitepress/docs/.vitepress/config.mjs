@@ -188,6 +188,25 @@ for (const { prefix, sourceFileName } of sidebarConfigs) {
   filteredSidebars[prefix] = filterEmptyPages(items, docsRoot)
 }
 
+const navigationDataId = 'virtual:api-navigation-data'
+const resolvedNavigationDataId = '\0' + navigationDataId
+
+function navigationDataPlugin() {
+  return {
+    name: 'vitepress-navigation-data',
+    resolveId(source) {
+      if (source === navigationDataId) return resolvedNavigationDataId
+    },
+    load(id) {
+      if (id !== resolvedNavigationDataId) return null
+      return [
+        `export const sidebarConfig = ${JSON.stringify(filteredSidebars)}`,
+        `export const apiUnsupportedIndex = ${JSON.stringify(apiUnsupportedIndex)}`,
+      ].join('\n')
+    },
+  }
+}
+
 function extractBodyContent(html) {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
   if (bodyMatch) return bodyMatch[1]
@@ -718,6 +737,7 @@ function balanceDivTags(html) {
         external: ['/pagefind/pagefind.js'],
         output: {
           manualChunks(id) {
+            if (id.includes(navigationDataId)) return 'navigation-data'
             if (id.includes('node_modules')) return 'vendor'
           },
         },
@@ -726,7 +746,7 @@ function balanceDivTags(html) {
     resolve: {
       preserveSymlinks: true,
     },
-    plugins: [htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
+    plugins: [navigationDataPlugin(), htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
       btnPlaceholder: '搜索',
       placeholder: '搜索文档、API 与示例',
       emptyText: '未找到结果',
@@ -766,15 +786,20 @@ function balanceDivTags(html) {
         if (normalizedId.includes('vitepress/dist/client/theme-default/composables/sidebar.js')) {
           const result = code.replace(
             'const sidebarConfig = theme.value.sidebar;',
-            'const sidebarConfig = getProductFilteredSidebarConfig(theme.value);'
+            'const sidebarConfig = getProductFilteredSidebarConfig();'
           )
           return result === code ? null : importLine + result
         }
 
         if (normalizedId.includes('vitepress/dist/client/theme-default/composables/prev-next.js')) {
-          const original = "const candidates = uniqBy(links, (link) => link.link.replace(/[?#].*$/, ''));"
-          const replacement = "const candidates = getProductFilteredNavigationCandidates(uniqBy(links, (link) => link.link.replace(/[?#].*$/, '')), page.value.relativePath, theme.value);"
-          const result = code.replace(original, replacement)
+          let result = code.replace(
+            'const sidebar = getSidebar(theme.value.sidebar, page.value.relativePath);',
+            'const sidebar = getSidebar(getProductFilteredSidebarConfig(), page.value.relativePath);'
+          )
+          result = result.replace(
+            "const candidates = uniqBy(links, (link) => link.link.replace(/[?#].*$/, ''));",
+            "const candidates = getProductFilteredNavigationCandidates(uniqBy(links, (link) => link.link.replace(/[?#].*$/, '')), page.value.relativePath);"
+          )
           return result === code ? null : importLine + result
         }
 
@@ -786,7 +811,7 @@ function balanceDivTags(html) {
       transform(code, id) {
         if (!id.includes('VPSidebarItem') || !id.includes('vitepress')) return null
         let result = code
-        result = result.replace('depth < 5', 'true')
+        result = result.replace('v-if="depth < 5"', 'v-if="!collapsed || hasActiveLink"')
         result = result.replace('props.depth + 2 === 7', 'props.depth + 2 >= 7')
         if (result === code) return null
         return result
@@ -818,10 +843,6 @@ function balanceDivTags(html) {
     search: {
       provider: 'algolia',
     },
-
-    sidebar: filteredSidebars,
-    apiSidebarSource: filteredSidebars['/api/'],
-    apiUnsupportedIndex,
 
     outline: false,
 
