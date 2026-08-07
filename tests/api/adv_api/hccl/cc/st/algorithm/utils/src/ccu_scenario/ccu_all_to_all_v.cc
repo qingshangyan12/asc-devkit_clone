@@ -113,7 +113,7 @@ ScenarioData BuildScenarioData(const CcuStScenario &scenario,
     return data;
 }
 
-Mc2CcTilingInner BuildAllToAllVTiling(HcclDataType dataType)
+Mc2CcTilingInner BuildAllToAllVTiling(HcclDataType dataType, const std::string &algConfig)
 {
     Mc2CcTilingInner tiling{};
     tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV);
@@ -121,7 +121,7 @@ Mc2CcTilingInner BuildAllToAllVTiling(HcclDataType dataType)
     tiling.srcDataType = static_cast<uint8_t>(dataType);
     tiling.dstDataType = static_cast<uint8_t>(dataType);
     strcpy(tiling.groupName, "test_group");
-    strcpy(tiling.algConfig, "default");
+    strcpy(tiling.algConfig, algConfig.empty() ? "default" : algConfig.c_str());
     return tiling;
 }
 
@@ -232,7 +232,7 @@ void CcuStAllToAllV::VerifyScenario(const CcuStScenario &scenario)
     ResetCcuKernelRegisterCount();
 
     const TopoMeta topoMeta = BuildTopoMeta(rankSize);
-    const Mc2CcTilingInner tiling = BuildAllToAllVTiling(scenario.dataType);
+    const Mc2CcTilingInner tiling = BuildAllToAllVTiling(scenario.dataType, scenario.algConfig);
 
     std::vector<KernelHandle> handles(rankSize);
     for (uint32_t rank = 0; rank < rankSize; ++rank) {

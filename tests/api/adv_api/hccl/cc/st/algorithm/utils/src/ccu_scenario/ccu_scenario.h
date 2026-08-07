@@ -29,6 +29,10 @@ struct CcuStScenario {
     // Empty string means skip algName assertion
     std::string expectedAlgName;
 
+    // Force a specific algorithm via tiling.algConfig (overrides selector)
+    // Empty string means use "default" (let selector choose)
+    std::string algConfig;
+
     // sizes[sourceRank][destinationRank] = sendSize (bytes)
     // AllToAllV/AllToAll use this matrix; AllToAll (equal-length) has identical rows
     std::vector<std::vector<uint64_t>> sizes;
