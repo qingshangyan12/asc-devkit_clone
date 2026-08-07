@@ -122,6 +122,21 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     tempAlgParams.repeatNum = 1;
     tempAlgParams.inputRepeatStride = 0;
     tempAlgParams.outputRepeatStride = 0;
+    // KFC server 模式：把 xnAddr/ckeAddr 透传给模板，供 KernelRun 写入参数队列并触发 cke 信号
+    if (param.engine == COMM_ENGINE_CCU && resCtx.kfcServerArgs.size() >= 2) {
+        tempAlgParams.ccuKfcArgs.push_back(resCtx.kfcServerArgs[0]); // xnAddr
+        tempAlgParams.ccuKfcArgs.push_back(resCtx.kfcServerArgs[1]); // ckeAddr
+        HCCL_INFO(
+            "[InsV2AllGatherSoleExecutor][OrchestrateLoop] KFC ccuKfcArgs: xnAddr[0x%llx], ckeAddr[0x%llx], "
+            "kfcServerArgSize[%u].",
+            static_cast<unsigned long long>(resCtx.kfcServerArgs[0]),
+            static_cast<unsigned long long>(resCtx.kfcServerArgs[1]), resCtx.kfcServerArgSize);
+    } else if (param.engine == COMM_ENGINE_CCU) {
+        HCCL_WARNING(
+            "[InsV2AllGatherSoleExecutor][OrchestrateLoop] CCU mode but kfcServerArgs size[%zu] < 2, "
+            "KFC submit will be skipped.",
+            resCtx.kfcServerArgs.size());
+    }
     HCCL_INFO(
         "[InsV2AllGatherSoleExecutor][OrchestrateLoop] myRank[%u], inputPtr[%#llx] outputPtr[%#llx], "
         "cclAddr[%#llx], cclSize[%llu], channelSize[%lu], threadSize[%lu], ",
