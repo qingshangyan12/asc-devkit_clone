@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Make generated C API examples self-contained and print-only on the host."""
+"""Make generated C API examples self-contained while preserving validation."""
 
 from __future__ import annotations
 
@@ -17,6 +17,31 @@ void PrintData(const char* label, const std::vector<T>& values)
     for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
     if (values.size() > count) std::cout << " ...";
     std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
 }
 
 void PrintHalfData(const char* label, const std::vector<aclFloat16>& values)
@@ -173,10 +198,6 @@ def replace_device_buffers(source: str) -> str:
 def simplify(path: Path) -> None:
     source = path.read_text()
     if "sample_host.h" not in source:
-        if "DeviceBuffer<" in source:
-            source = replace_device_buffers(source)
-        source = re.sub(r"^\s*const .*\bexpected\b.*\n", "", source, flags=re.MULTILINE)
-        path.write_text(source)
         return
     relative = path.relative_to(ROOT.parents[2]).as_posix()
     architecture = re.search(r"^// Architecture: (.+)$", source, re.MULTILINE).group(1)
@@ -206,32 +227,25 @@ def simplify(path: Path) -> None:
     source = prefix + "int main()" + replace_status_if_blocks(main_body)
     source = source.replace("CApiExample::PrintHalf", "PrintHalfData")
     source = source.replace("CApiExample::Print", "PrintData")
-    source = re.sub(r'^\s*Print(?:Half)?Data\("[^"]*[Gg]olden[^"]*".*\);\n', "", source, flags=re.MULTILINE)
+    source = source.replace("CApiExample::CompareRange", "CompareRangeData")
+    source = source.replace("CApiExample::Compare", "CompareData")
 
-    passed = source.find("    const bool passed =")
-    if passed == -1:
-        raise RuntimeError(f"missing comparison tail: {path}")
-    close = source.rfind("}\n")
     buffers = sorted(set(re.findall(r"\b(\w+_device)\s*\(", source)))
     cleanup = "".join(f"    {name}.Free();\n" for name in buffers)
-    source = (
-        source[:passed]
-        + cleanup
+    return_pattern = re.compile(r"(?m)^    return passed \? 0 : 1;$")
+    if not return_pattern.search(source):
+        raise RuntimeError(f"missing validation return: {path}")
+    source = return_pattern.sub(
+        cleanup
         + "    aclrtResetDevice(0);\n"
         + "    aclFinalize();\n"
-        + "    return 0;\n"
-        + source[close:]
+        + "    return passed ? 0 : 1;",
+        source,
+        count=1,
     )
-
-    # Preserve mixed input initialization while removing the corresponding golden assignment.
-    source = re.sub(r"(\w+\[[^]]+\])\s*=\s*golden\[[^]]+\]\s*=", r"\1 =", source)
-    source = remove_golden_declarations(source)
-    source = re.sub(r"^.*golden.*\n", "", source, flags=re.MULTILINE | re.IGNORECASE)
-    source = re.sub(r"^\s*const .*\bexpected\b.*\n", "", source, flags=re.MULTILINE)
-    source = re.sub(r"(?ms)^\s*for \([^\n]+\) \{\n\s*\}\n", "", source)
     source = replace_device_buffers(source)
 
-    if "CApiExample::" in source or "sample_host.h" in source or "golden" in source.lower():
+    if "CApiExample::" in source or "sample_host.h" in source or "DeviceBuffer<" in source:
         raise RuntimeError(f"incomplete simplification: {path}")
     path.write_text(source)
 
