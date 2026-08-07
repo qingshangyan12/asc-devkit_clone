@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include "securec.h"
 #include "aicpu_api/aicpu_api.h"
+#include "impl/utils/debug/asc_utils_types.h"
 
 struct DumpConfig {
     void* dumpBufAddr;
@@ -52,5 +53,17 @@ void printf(const char* fmt, ...)
         aicpuDumpBufSize - aicpuDumpOffSet, fmt, otherArgs);
     *reinterpret_cast<size_t*>(g_aicpuDumpConfig.dumpBufAddr) = aicpuDumpOffSet;
     va_end(otherArgs);
+}
+
+inline void enable_asc_aicpu_fifo_debug()
+{
+#if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0))
+    static const struct AscTlv __asc_aicpu_meta_section__ __attribute__((used, section(".ascend.meta"))) = {4, 4, 6};
+#endif // (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0))
+}
+
+void printf_empty(const char* fmt, ...)
+{
+    enable_asc_aicpu_fifo_debug();
 }
 } // namespace AscendC
