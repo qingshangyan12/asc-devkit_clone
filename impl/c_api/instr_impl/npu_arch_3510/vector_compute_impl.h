@@ -3239,7 +3239,7 @@ __simd_callee__ inline void asc_max(
     asc_max_impl(dst, src0, src1, mask);
 }
 
-// ==========asc_min_scalar(int8_t/int16_t/int32_t/uint8_t/uint16_t/uint32_t/half/bfloat16_t/float)==========
+// ==========asc_min_scalar(int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
 __simd_callee__ inline void asc_min_scalar(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask)
 {
     asc_min_scalar_impl(dst, src, value, mask);

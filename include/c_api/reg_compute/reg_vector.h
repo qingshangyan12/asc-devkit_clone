@@ -1022,7 +1022,7 @@ __simd_callee__ inline void asc_max(vector_half& dst, vector_half src0, vector_h
 __simd_callee__ inline void asc_max(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
-// ==========asc_min_scalar(int8_t/int16_t/int32_t/uint8_t/uint16_t/uint32_t/half/bfloat16_t/float)==========
+// ==========asc_min_scalar(int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
 __simd_callee__ inline void asc_min_scalar(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask);
 
 __simd_callee__ inline void asc_min_scalar(vector_uint32_t& dst, vector_uint32_t src, uint32_t value, vector_bool mask);
