@@ -228,3 +228,12 @@ synchronous variants. The three loop-register examples select two or four
 non-contiguous 32-byte source blocks and expose their packed L1 layout.
 `asc_set_gm2l1_pad` produces eight `0xa5` bytes on each side of a 16-byte
 payload, and both `asc_fill_l1` variants initialize 64 float values to 1.0.
+
+The next nine Cube data-movement examples were revalidated on 2026-08-07.
+All nine compiled and ran successfully with exact Golden comparisons and no
+timeout. The regular/synchronous `asc_copy_gm2l1_nd2nz`, L1-to-L0A,
+L1-to-L0B, transposed L1-to-L0B, and L0C-to-GM paths each carry real int8
+matrix operands through MMAD and produce an int32 diagonal of 2. The DN-to-NZ
+and two L1-to-L0 MX copies carry unit E8M0 scales into FP8 E4M3 MMAD and
+produce a float identity matrix. The two L1-to-FB variants load a per-channel
+scale of 2 and quantize a float diagonal of 3 to signed int8 6.
