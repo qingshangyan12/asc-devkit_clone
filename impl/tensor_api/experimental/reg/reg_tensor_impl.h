@@ -29,6 +29,8 @@ struct reg_tensor;
 template <>
 struct reg_tensor<bool>;
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
 template <>
 struct reg_tensor<bool> {
     using type = bool;
@@ -51,6 +53,7 @@ struct reg_tensor {
     reg_type reg;
     vector_bool mask;
 };
+#endif
 } // namespace te
 } // namespace asc
 
