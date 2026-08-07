@@ -659,6 +659,12 @@ function validateDataset(dataset) {
       && (typeof definition.expect.sectionHash !== 'string' || !definition.expect.sectionHash.startsWith('#'))) {
       throw new Error(`Case ${definition.id} expect.sectionHash must start with #`)
     }
+    if (definition.expect.maxFirstRelevantRank !== undefined
+      && (!Number.isInteger(definition.expect.maxFirstRelevantRank)
+        || definition.expect.maxFirstRelevantRank < 1
+        || definition.expect.maxFirstRelevantRank > 10)) {
+      throw new Error(`Case ${definition.id} expect.maxFirstRelevantRank must be an integer between 1 and 10`)
+    }
     for (const target of definition.expect.targets) {
       const matchers = ['exact', 'prefix', 'contains'].filter(key => target[key] !== undefined)
       if (matchers.length !== 1) throw new Error(`Target in ${definition.id} must have exactly one matcher`)
@@ -751,6 +757,9 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
   const relevantCase = targets.length > 0
   const grades = results.map(result => relevanceForRoute(result.route, targets))
   const firstRelevantIndex = grades.findIndex(grade => grade >= successGrade)
+  const maxFirstRelevantRank = definition.expect.maxFirstRelevantRank ?? null
+  const firstRelevantRankValid = maxFirstRelevantRank === null
+    || (firstRelevantIndex >= 0 && firstRelevantIndex + 1 <= maxFirstRelevantRank)
   const matchedTargets = targets.filter(target => results.slice(0, topK).some(result => targetMatches(result.route, target)))
   const idealGrades = targets.map(target => target.grade).sort((left, right) => right - left).slice(0, topK)
   const idealDcg = dcg(idealGrades)
@@ -802,7 +811,8 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
       && highlightContentValid && highlightStyleValid && highlightVisibleValid
       && sectionTitleValid && sectionPlacementValid && sectionHighlightValidation.contentValid
       && sectionHighlightValidation.styleValid && sectionHighlightValidation.visibleValid
-      && sectionRouteValid && sectionNavigationValid && invalidResults.length === 0,
+      && sectionRouteValid && sectionNavigationValid && firstRelevantRankValid
+      && invalidResults.length === 0,
     runtimeComplete,
     timedOut: Boolean(observed.timedOut),
     errors,
@@ -828,6 +838,8 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
     expectedSectionHash,
     sectionRouteValid,
     sectionNavigationValid,
+    maxFirstRelevantRank,
+    firstRelevantRankValid,
     navigation,
     firstRelevantRank: firstRelevantIndex >= 0 ? firstRelevantIndex + 1 : null,
     reciprocalRankAt10: firstRelevantIndex >= 0 && firstRelevantIndex < 10 ? 1 / (firstRelevantIndex + 1) : 0,
@@ -1012,6 +1024,7 @@ function failureReason(item) {
   if (item.invalidResultCountAt10) return `Top 10 包含 ${item.invalidResultCountAt10} 个无效链接`
   if (!item.resultCountValid) return `结果数量不符合预期，实际 ${item.resultCount}`
   if (item.firstRelevantRank === null) return '未返回主要目标'
+  if (!item.firstRelevantRankValid) return `首个主要目标位于第 ${item.firstRelevantRank} 名，要求不超过第 ${item.maxFirstRelevantRank} 名`
   if (!item.descriptionValid) return `摘要未包含：${item.expectedDescriptionIncludes.join('、')}`
   if (!item.sectionTitleValid) return `小标题未包含：${item.expectedSectionTitleIncludes.join('、')}`
   if (!item.sectionPlacementValid) return '小标题未紧跟大标题或换行后未左对齐'
@@ -1063,9 +1076,9 @@ function buildMarkdown(report) {
     lines.push(`| ${labels[metric] || metric} | ${actual} | ${threshold} | ${evaluation.passed ? '通过' : '未通过'} |`)
   }
   lines.push('', `通过用例：${report.summary.passedCaseCount}/${report.summary.caseCount}；运行时异常：${report.summary.runtimeErrorCaseCount}；超时：${report.summary.timeoutCaseCount}。`)
-  lines.push('', '## 分类指标', '', '| 分类 | 用例 | 完成率 | Success@10 | MRR@10 | nDCG@10 | P95 |', '| --- | ---: | ---: | ---: | ---: | ---: | ---: |')
+  lines.push('', '## 分类指标', '', '| 分类 | 用例 | 完成率 | Success@1 | Success@3 | Success@10 | MRR@10 | nDCG@10 | P95 |', '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |')
   for (const [category, summary] of Object.entries(report.categories)) {
-    lines.push(`| ${category} | ${summary.caseCount} | ${formatPercent(summary.completionRate)} | ${formatPercent(summary.successAt10)} | ${summary.mrrAt10 ?? '-'} | ${summary.ndcgAt10 ?? '-'} | ${summary.p95LatencyMs} ms |`)
+    lines.push(`| ${category} | ${summary.caseCount} | ${formatPercent(summary.completionRate)} | ${formatPercent(summary.successAt1)} | ${formatPercent(summary.successAt3)} | ${formatPercent(summary.successAt10)} | ${summary.mrrAt10 ?? '-'} | ${summary.ndcgAt10 ?? '-'} | ${summary.p95LatencyMs} ms |`)
   }
   const failures = report.cases.filter(item => !item.passed)
   lines.push('', '## 未通过用例', '')

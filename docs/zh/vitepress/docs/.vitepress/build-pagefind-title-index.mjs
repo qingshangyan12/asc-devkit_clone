@@ -204,6 +204,22 @@ function addDefinitionSignal(signals, content, field = 'definition', section = n
   addIdentifierContext(signals, text, field, section)
 }
 
+function markedListDefinition($, element, fallbackSection) {
+  const firstParagraph = $(element).children('p').first()
+  if (!firstParagraph.length) return null
+  const marker = firstParagraph.find('strong,code').first()
+  if (!marker.length) return null
+  const label = marker.text().replace(/\s+/g, ' ').trim()
+  const identifiers = [...new Set(searchTokenMatches(label))]
+    .filter(identifier => compactIdentifier(identifier) === compactIdentifier(label))
+  if (identifiers.length === 0) return null
+  const anchor = firstParagraph.find('a[id]').first().attr('id') || ''
+  return {
+    identifiers,
+    section: anchor ? { id: anchor, title: label } : fallbackSection,
+  }
+}
+
 function asciiWords(value) {
   return String(value || '')
     .normalize('NFKC')
@@ -370,9 +386,17 @@ async function analyzeRecord(sourceDirectory, record) {
     const item = $(element).clone()
     item.children('ul,ol,table,pre,.code-block').remove()
     const content = item.text()
-    const section = sections.get(element)
+    const definition = markedListDefinition($, element, sections.get(element))
+    const section = definition?.section || sections.get(element)
     addIdentifierSignals(signals, content, 'list', section)
     addDefinitionSignal(signals, content, 'definition', section)
+    if (definition) {
+      for (const identifier of definition.identifiers) {
+        if (!signals.has(identifier)) signals.set(identifier, createIdentifierSignal())
+        signals.get(identifier).catalogDefinition++
+      }
+      addIdentifierContext(signals, content, 'catalogDefinition', section)
+    }
   })
   article.find('p').each((_, element) => {
     if ($(element).parents('li,td,th,pre').length > 0) return

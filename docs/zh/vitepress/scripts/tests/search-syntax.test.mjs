@@ -18,6 +18,8 @@ import {
 } from '../../docs/.vitepress/search-syntax.mjs'
 import {
   bestPagefindSection,
+  createQueryPlan,
+  findIdentifierIndexMatches,
   highlightIdentifierExcerpt,
   highlightSearchText,
 } from '../../docs/.vitepress/theme/pagefind-search.mjs'
@@ -110,5 +112,30 @@ test('escapes and highlights section titles', () => {
   assert.equal(
     highlightSearchText('<unsafe> section', 'section'),
     '&lt;unsafe&gt; <mark>section</mark>',
+  )
+})
+
+test('matches omitted identifier decorators and prefers canonical macro spelling', () => {
+  const entries = [
+    ['__npu_arch__'],
+    ['acl_rtc_npu_arch'],
+    ['npu_arch'],
+    ['npu_arch_2201'],
+  ]
+  for (const query of ['__NPU_ARCH__', '_NPU_ARCH', 'NPU_ARCH']) {
+    const plan = createQueryPlan(query)
+    assert.equal(plan.preferDecoratedIdentifier, true)
+    assert.deepEqual(
+      findIdentifierIndexMatches(entries, plan.identifierQuery, plan.preferDecoratedIdentifier)
+        .map(match => match.entry[0]),
+      ['__npu_arch__', 'npu_arch', 'npu_arch_2201'],
+    )
+  }
+
+  const lowercasePlan = createQueryPlan('npu_arch')
+  assert.equal(lowercasePlan.preferDecoratedIdentifier, false)
+  assert.equal(
+    findIdentifierIndexMatches(entries, lowercasePlan.identifierQuery)[0].entry[0],
+    'npu_arch',
   )
 })

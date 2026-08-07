@@ -15,7 +15,7 @@ import { test } from 'node:test'
 const dataset = JSON.parse(await readFile(new URL('../cases/ascendc.json', import.meta.url), 'utf8'))
 
 test('dataset has unique and complete cases', () => {
-  assert.equal(dataset.cases.length, 160)
+  assert.equal(dataset.cases.length, 162)
   assert.equal(new Set(dataset.cases.map(item => item.id)).size, dataset.cases.length)
   for (const item of dataset.cases) {
     assert.ok(item.id)
@@ -35,6 +35,10 @@ test('dataset has unique and complete cases', () => {
     }
     if (item.expect.sectionHash !== undefined) {
       assert.match(item.expect.sectionHash, /^#./)
+    }
+    if (item.expect.maxFirstRelevantRank !== undefined) {
+      assert.ok(Number.isInteger(item.expect.maxFirstRelevantRank))
+      assert.ok(item.expect.maxFirstRelevantRank >= 1 && item.expect.maxFirstRelevantRank <= 10)
     }
     for (const target of item.expect.targets) {
       assert.equal(['exact', 'prefix', 'contains'].filter(key => key in target).length, 1)
@@ -63,6 +67,19 @@ test('dataset covers compiler option identifier regressions', () => {
   assert.equal(dataset.cases.find(item => item.query === 'NO_OVER').expect.sectionHash, '#内置编译宏开关')
   assert.deepEqual(dataset.cases.find(item => item.query === 'NO_OVER').expect.highlightIncludes, ['NO_OVER'])
   assert.deepEqual(dataset.cases.find(item => item.query === 'NO_OVER').expect.sectionTitleIncludes, ['内置编译宏开关'])
+})
+
+test('dataset covers omitted predefined macro decorators', () => {
+  for (const query of ['__NPU_ARCH__', '_NPU_ARCH', 'NPU_ARCH']) {
+    const item = dataset.cases.find(candidate => candidate.query === query)
+    assert.ok(item, `missing case for ${query}`)
+    assert.equal(item.expect.maxFirstRelevantRank, 1)
+    assert.equal(item.expect.sectionHash, '#npu-arch')
+    assert.deepEqual(item.expect.targets[0], {
+      exact: '/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字',
+      grade: 3,
+    })
+  }
 })
 
 test('dataset covers existing section navigation', () => {

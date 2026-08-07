@@ -162,6 +162,50 @@
       "intent": "Find the macro definition and migration guidance.",
       "expect": {
         "minResults": 1,
+        "maxFirstRelevantRank": 1,
+        "descriptionIncludes": ["__NPU_ARCH__"],
+        "highlightIncludes": ["__NPU_ARCH__"],
+        "sectionTitleIncludes": ["__NPU_ARCH__"],
+        "sectionHighlightIncludes": ["__NPU_ARCH__"],
+        "sectionHash": "#npu-arch",
+        "targets": [
+          { "exact": "/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字", "grade": 3 },
+          { "exact": "/guide/跨代迁移兼容性指南/概述", "grade": 2 }
+        ]
+      }
+    },
+    {
+      "id": "api-special-macro-leading-underscore",
+      "query": "_NPU_ARCH",
+      "category": "special-character",
+      "intent": "Find a decorated predefined macro when one leading and both trailing underscores are omitted.",
+      "expect": {
+        "minResults": 1,
+        "maxFirstRelevantRank": 1,
+        "descriptionIncludes": ["__NPU_ARCH__"],
+        "highlightIncludes": ["_NPU_ARCH"],
+        "sectionTitleIncludes": ["__NPU_ARCH__"],
+        "sectionHighlightIncludes": ["_NPU_ARCH"],
+        "sectionHash": "#npu-arch",
+        "targets": [
+          { "exact": "/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字", "grade": 3 },
+          { "exact": "/guide/跨代迁移兼容性指南/概述", "grade": 2 }
+        ]
+      }
+    },
+    {
+      "id": "api-special-macro-undecorated",
+      "query": "NPU_ARCH",
+      "category": "special-character",
+      "intent": "Prefer the decorated predefined macro when all outer underscores are omitted.",
+      "expect": {
+        "minResults": 1,
+        "maxFirstRelevantRank": 1,
+        "descriptionIncludes": ["__NPU_ARCH__"],
+        "highlightIncludes": ["NPU_ARCH"],
+        "sectionTitleIncludes": ["__NPU_ARCH__"],
+        "sectionHighlightIncludes": ["NPU_ARCH"],
+        "sectionHash": "#npu-arch",
         "targets": [
           { "exact": "/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字", "grade": 3 },
           { "exact": "/guide/跨代迁移兼容性指南/概述", "grade": 2 }
