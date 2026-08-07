@@ -106,8 +106,8 @@ static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
 
 static CcuResult LoadArgs(
     KfcReduceScatterMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr,
-    ccu::Variable tokenInfo, ccu::Variable scratch, ccu::Variable currentRankSliceInputOffset, ccu::Variable normalSliceSize, ccu::Variable lastSliceSize,
-    ccu::Variable scratchRepeatStride,
+    ccu::Variable tokenInfo, ccu::Variable scratch, ccu::Variable currentRankSliceInputOffset,
+    ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable scratchRepeatStride,
     ccu::Variable repeatNum, ccu::Variable goSizeAddrOffset, ccu::Variable goSizeLoopParam,
     ccu::Variable goSizeParallelParam, ccu::Variable goSizeResidual)
 {
@@ -117,6 +117,10 @@ static CcuResult LoadArgs(
     ctx.scratch[ctx.rankId] = scratch;
     ctx.currentRankSliceInputOffset = currentRankSliceInputOffset;
     ctx.currentRankSliceOutputOffset = 0;
+    CCU_IF(inputAddr == outputAddr)
+    {
+        ctx.currentRankSliceOutputOffset = currentRankSliceInputOffset;
+    }
     ctx.inputRepeatStride = 0;
     ctx.outputRepeatStride = 0;
     ctx.normalSliceSize = normalSliceSize;
@@ -482,46 +486,131 @@ static CcuResult DoReduceScatterReduce(KfcReduceScatterMesh1DMem2MemContext& ctx
     return CCU_SUCCESS;
 }
 
+static CcuResult DoReduceScatterReadReduceFast(KfcReduceScatterMesh1DMem2MemContext& ctx)
+{
+    ccu::LocalAddr fastOutput;
+    fastOutput.addr = ctx.output + ctx.currentRankSliceOutputOffset;
+    fastOutput.token = ctx.token[ctx.rankId];
+
+    uint32_t peerId = 1 - ctx.rankId;
+    ccu::RemoteAddr peerAddr;
+    peerAddr.addr = ctx.input[peerId] + ctx.currentRankSliceInputOffset;
+    peerAddr.token = ctx.token[peerId];
+
+    ccu::Variable offset = 0;
+    ccu::Variable memSlice = CCU_MS_SIZE;
+    ccu::Variable one = 1;
+
+    ccu::Variable totalChunks = ctx.sliceSize / memSlice;
+    ccu::Variable tailSize = ctx.sliceSize - totalChunks * memSlice;
+    ccu::Variable hasTail = 0;
+    CCU_IF(tailSize != 0)
+    {
+        hasTail = one;
+        totalChunks += one;
+    }
+
+    ccu::Variable chunkIdx = 0;
+    CCU_WHILE(chunkIdx != totalChunks)
+    {
+        ccu::Variable issued = 0;
+
+        for (uint32_t i = 0; i < RS_UNROLL_NUM; i++) {
+            CCU_IF(chunkIdx != totalChunks)
+            {
+                ccu::Variable chunkLen = memSlice;
+                CCU_IF(hasTail != 0)
+                {
+                    ccu::Variable lastChunkIdx = totalChunks - one;
+                    CCU_IF(chunkIdx == lastChunkIdx)
+                    {
+                        chunkLen = tailSize;
+                    }
+                }
+
+                ccu::LocalAddr chunkOut = fastOutput;
+                chunkOut.addr += offset;
+                ccu::RemoteAddr chunkRemote = peerAddr;
+                chunkRemote.addr += offset;
+
+                ccu::ReadReduce(ctx.channels[0], chunkOut, chunkRemote, chunkLen, ctx.dataType, ctx.reduceOp,
+                                ctx.events[i], 1);
+
+                offset += chunkLen;
+                chunkIdx += one;
+                issued += one;
+            }
+        }
+
+        ccu::Variable waitCount = issued;
+        for (uint32_t i = 0; i < RS_UNROLL_NUM; i++) {
+            CCU_IF(waitCount != 0)
+            {
+                ccu::EventWait(ctx.events[i], 1);
+                waitCount -= one;
+            }
+        }
+    }
+
+    return CCU_SUCCESS;
+}
+
 static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
     InitReduceScatterAddr(ctx);
 
-    ctx.waitRepeatNum = ctx.repeatNum;
-    ctx.readRepeatNum = ctx.repeatNum;
-
-    CCU_IF(ctx.repeatNum != UINT64_MAX)
-    {
-        ctx.repeatNum += ctx.constVar1;
-        DoReduceScatterRead(ctx, 0);
+    ccu::Variable useFast = 0;
+    if (ctx.rankSize == 2) {
+        CCU_IF(ctx.input[ctx.rankId] == ctx.output)
+        {
+            useFast = 1;
+        }
     }
 
-    for (uint32_t i = 1; i < RS_UNROLL_NUM; i++) {
+    CCU_IF(useFast != 0)
+    {
+        CCU_CHK_RET(DoReduceScatterReadReduceFast(ctx));
+    }
+
+    CCU_IF(useFast == 0)
+    {
+        ctx.waitRepeatNum = ctx.repeatNum;
+        ctx.readRepeatNum = ctx.repeatNum;
+
         CCU_IF(ctx.repeatNum != UINT64_MAX)
         {
             ctx.repeatNum += ctx.constVar1;
-            for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
-                if (rankIdx == ctx.rankId) {
-                    ctx.myInput.addr += ctx.inputRepeatStride;
-                } else {
-                    ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
+            DoReduceScatterRead(ctx, 0);
+        }
+
+        for (uint32_t i = 1; i < RS_UNROLL_NUM; i++) {
+            CCU_IF(ctx.repeatNum != UINT64_MAX)
+            {
+                ctx.repeatNum += ctx.constVar1;
+                for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
+                    if (rankIdx == ctx.rankId) {
+                        ctx.myInput.addr += ctx.inputRepeatStride;
+                    } else {
+                        ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
+                    }
+                    ctx.scratchMem[rankIdx].addr += ctx.scratchRepeatStride;
                 }
-                ctx.scratchMem[rankIdx].addr += ctx.scratchRepeatStride;
+                DoReduceScatterRead(ctx, i);
             }
-            DoReduceScatterRead(ctx, i);
         }
-    }
 
-    for (uint32_t i = 0; i < RS_UNROLL_NUM; i++) {
-        CCU_IF(ctx.waitRepeatNum != UINT64_MAX)
-        {
-            ctx.waitRepeatNum += ctx.constVar1;
-            DoReduceScatterWait(ctx, i);
+        for (uint32_t i = 0; i < RS_UNROLL_NUM; i++) {
+            CCU_IF(ctx.waitRepeatNum != UINT64_MAX)
+            {
+                ctx.waitRepeatNum += ctx.constVar1;
+                DoReduceScatterWait(ctx, i);
+            }
         }
+
+        ResetReduceScatterAddr(ctx);
+
+        CCU_CHK_RET(DoReduceScatterReduce(ctx));
     }
-
-    ResetReduceScatterAddr(ctx);
-
-    CCU_CHK_RET(DoReduceScatterReduce(ctx));
 
     return CCU_SUCCESS;
 }
