@@ -119,5 +119,38 @@ The following 18 examples still exceeded 60 seconds:
 
 No retested example returned a precision mismatch or another runtime error.
 
-Precision comparison code was used only in the temporary validation copies and
-is not present in the final minimal examples.
+The original minimal examples removed temporary precision comparisons. The
+functional rewrite below supersedes that policy and retains concise Golden
+checks for computational and data-layout behavior.
+
+## Functional Rewrite Progress
+
+The functional rewrite replaces marker-only calls with scenarios that expose
+the documented effect of each API. Completed batches are compiled and run with
+a 30-second timeout before each checkpoint.
+
+The six Cube-only system-variable setters were revalidated on 2026-08-07. All
+six compiled and ran successfully, with no timeout:
+
+- `asc_set_gm2l1_nz_para`: ND-to-NZ configuration followed by a 16x16 MMAD and
+  an identity-matrix Golden comparison.
+- `asc_set_l0c2gm_channel_para`: NZ-to-DN conversion of a non-symmetric 16x32
+  matrix, including the second source fragment controlled by the channel
+  stride.
+- `asc_set_l0c2gm_relu_alpha`: Scalar ReLU alpha 0.5 changes an FP16 `-1.0`
+  diagonal to `-0.5`.
+- `asc_set_l12l0_padding_val`: a zero L1 feature map with one top-padding row
+  produces a row of FP16 `1.0` values through 3D L1-to-L0B movement and MMAD.
+- `asc_set_l3d_rpt_b`: one L1-to-L0B call repeats in the K direction and moves
+  both 16-column fragments.
+- `asc_set_l0c2gm_quant_post`: 257 alternating/final register writes are timed
+  with the system cycle counter.
+
+`asc_set_l0c2gm_quant_post` cannot currently be validated through a numeric
+post-quantization result using the public DAV 3510 C API. The paired
+`asc_copy_l0c2gm`, `asc_copy_l0c2l1`, and `asc_copy_l0c2ub` documentation marks
+all `quant_post` arguments as invalid. Three board attempts used
+`SHIFT2S8_POST`, `QF162B8_POST`, and an int32-to-FP16-to-int8 two-stage path;
+each produced only the pre-quantized FP16 `0x3c00`. The final example therefore
+validates the documented register encoding and measurable setter execution
+without claiming an unsupported numeric effect.
