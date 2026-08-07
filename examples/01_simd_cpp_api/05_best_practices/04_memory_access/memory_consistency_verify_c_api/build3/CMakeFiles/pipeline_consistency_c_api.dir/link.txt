@@ -1,0 +1,1 @@
+ /usr/local/Ascend/cann-9.1.0/bin/bisheng  --npu-arch=dav-2201 CMakeFiles/pipeline_consistency_c_api.dir/pipeline_consistency_c_api.asc.o -o pipeline_consistency_c_api 

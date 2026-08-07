@@ -1,0 +1,5 @@
+/data/hxj/code/2/asc-devkit_0616/examples/01_simd_cpp_api/05_best_practices/04_memory_access/memory_consistency_verify_c_api/build3/CMakeFiles/rebuild_cache.dir
+/data/hxj/code/2/asc-devkit_0616/examples/01_simd_cpp_api/05_best_practices/04_memory_access/memory_consistency_verify_c_api/build3/CMakeFiles/atomic_consistency_c_api.dir
+/data/hxj/code/2/asc-devkit_0616/examples/01_simd_cpp_api/05_best_practices/04_memory_access/memory_consistency_verify_c_api/build3/CMakeFiles/edit_cache.dir
+/data/hxj/code/2/asc-devkit_0616/examples/01_simd_cpp_api/05_best_practices/04_memory_access/memory_consistency_verify_c_api/build3/CMakeFiles/pipeline_consistency_c_api.dir
+/data/hxj/code/2/asc-devkit_0616/examples/01_simd_cpp_api/05_best_practices/04_memory_access/memory_consistency_verify_c_api/build3/CMakeFiles/host_stream_consistency_c_api.dir

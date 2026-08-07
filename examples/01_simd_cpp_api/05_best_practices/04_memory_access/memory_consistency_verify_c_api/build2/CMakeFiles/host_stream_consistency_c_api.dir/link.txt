@@ -1,0 +1,1 @@
+ /usr/local/Ascend/cann-9.1.0/bin/bisheng  --npu-arch=dav-2201 CMakeFiles/host_stream_consistency_c_api.dir/host_stream_consistency_c_api.asc.o -o host_stream_consistency_c_api 
