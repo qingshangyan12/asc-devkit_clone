@@ -1,0 +1,105 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * Licensed under the CANN Open Software License Agreement Version 2.0.
+ */
+
+:root {
+  --asc-green-dark: #258a6d;
+  --asc-green-core: #37c597;
+  --asc-green-light: #ebfcf7;
+  --asc-teal-dark: #147b70;
+  --asc-teal-core: #1aafd0;
+  --asc-teal-light: #e8f7fb;
+  --asc-purple-dark: #4f4da7;
+  --asc-purple-core: #6a67ce;
+  --asc-purple-bright: #a177ff;
+  --asc-purple-med: #d0b8ff;
+  --asc-purple-light: #f0effa;
+  --asc-gold-dark: #9a6300;
+  --asc-gold-core: #f5a800;
+  --asc-gold-light: #fff8e5;
+  --asc-coral-dark: #bd3037;
+  --asc-coral-core: #fc636b;
+  --asc-coral-light: #feeff0;
+
+  --asc-gray-1: #f8f8f9;
+  --asc-gray-2: #eff0f1;
+  --asc-gray-3: #e1e2e4;
+  --asc-gray-4: #cdcfd2;
+  --asc-gray-6: #a1a4aa;
+  --asc-gray-8: #676d76;
+  --asc-gray-9: #495058;
+  --asc-gray-10: #1b2432;
+  --asc-navy: #273347;
+
+  --asc-radius-lg: 16px;
+  --asc-radius-md: 10px;
+  --asc-radius-sm: 8px;
+  --asc-shadow-soft: 0 1px 2px rgba(39, 51, 71, 0.04), 0 8px 24px rgba(39, 51, 71, 0.05);
+  --asc-shadow-pop: 0 18px 48px rgba(39, 51, 71, 0.18);
+  --asc-content-max: 1680px;
+  --asc-reading-width: 880px;
+
+  --vp-c-brand-1: var(--asc-purple-core);
+  --vp-c-brand-2: var(--asc-purple-dark);
+  --vp-c-brand-3: var(--asc-purple-bright);
+  --vp-c-brand-soft: var(--asc-purple-light);
+  --vp-c-brand: var(--asc-purple-core);
+  --vp-c-brand-light: var(--asc-purple-light);
+  --vp-c-brand-dark: var(--asc-purple-dark);
+
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: var(--asc-gray-1);
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-bg-soft: var(--asc-gray-2);
+  --vp-c-divider: var(--asc-gray-3);
+  --vp-c-border: var(--asc-gray-4);
+  --vp-c-text-1: var(--asc-gray-10);
+  --vp-c-text-2: var(--asc-gray-9);
+  --vp-c-text-3: var(--asc-gray-8);
+
+  --vp-c-tip-1: var(--asc-green-dark);
+  --vp-c-tip-2: var(--asc-green-core);
+  --vp-c-tip-3: var(--asc-green-light);
+  --vp-c-warning-1: var(--asc-gold-dark);
+  --vp-c-warning-2: var(--asc-gold-core);
+  --vp-c-warning-3: var(--asc-gold-light);
+  --vp-c-danger-1: var(--asc-coral-dark);
+  --vp-c-danger-2: var(--asc-coral-core);
+  --vp-c-danger-3: var(--asc-coral-light);
+
+  --vp-button-brand-bg: var(--asc-purple-core);
+  --vp-button-brand-hover-bg: var(--asc-purple-dark);
+  --vp-button-brand-active-bg: var(--asc-purple-dark);
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-alt-bg: rgba(255, 255, 255, 0.74);
+  --vp-button-alt-hover-bg: #ffffff;
+
+  --vp-font-family-base: "Inter", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  --vp-font-family-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --vp-nav-height: 64px;
+}
+
+html.dark {
+  --vp-c-bg: #182130;
+  --vp-c-bg-alt: #1d2838;
+  --vp-c-bg-elv: #253247;
+  --vp-c-bg-soft: #273347;
+  --vp-c-divider: #3c485a;
+  --vp-c-border: #536075;
+  --vp-c-text-1: #f4f6f8;
+  --vp-c-text-2: #c5ccd4;
+  --vp-c-text-3: #aab4bf;
+  --vp-c-brand-1: #b39aff;
+  --vp-c-brand-2: #d0b8ff;
+  --vp-c-brand-3: #80e6ff;
+  --vp-c-brand-soft: rgba(161, 119, 255, 0.16);
+  --vp-c-brand-light: rgba(161, 119, 255, 0.2);
+  --vp-c-brand-dark: #d0b8ff;
+  --vp-button-alt-bg: rgba(39, 51, 71, 0.78);
+  --vp-button-alt-hover-bg: #334157;
+  --asc-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.12), 0 10px 28px rgba(0, 0, 0, 0.14);
+  --asc-shadow-pop: 0 20px 56px rgba(0, 0, 0, 0.42);
+}
+

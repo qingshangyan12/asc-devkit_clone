@@ -728,7 +728,7 @@ function balanceDivTags(html) {
     },
     plugins: [htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
       btnPlaceholder: '搜索',
-      placeholder: '简易搜索，暂不支持多语言和特殊符号',
+      placeholder: '搜索文档、API 与示例',
       emptyText: '未找到结果',
       heading: '共: {{searchResult}} 条结果',
       forceLanguage: 'zh',
@@ -804,7 +804,9 @@ function balanceDivTags(html) {
     },
   },
 
-  head: [],
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+  ],
 
   themeConfig: {
     nav: [

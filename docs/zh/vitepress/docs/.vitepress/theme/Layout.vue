@@ -15,10 +15,18 @@ import BackToTop from './BackToTop.vue'
 import CustomOutline from './CustomOutline.vue'
 import ApiDownload from './ApiDownload.vue'
 import EditOnGitcode from './EditOnGitcode.vue'
+import HomeHeroExtras from './HomeHeroExtras.vue'
+import HomeSections from './HomeSections.vue'
 </script>
 
 <template>
   <DefaultTheme.Layout>
+    <template #home-hero-info-after>
+      <HomeHeroExtras />
+    </template>
+    <template #home-hero-after>
+      <HomeSections />
+    </template>
     <template #nav-bar-content-after>
       <FilterToggle />
     </template>
@@ -29,8 +37,10 @@ import EditOnGitcode from './EditOnGitcode.vue'
       <EditOnGitcode />
     </template>
     <template #layout-bottom>
-      <ApiDownload />
-      <BackToTop />
+      <div class="floating-tools" aria-label="页面工具">
+        <ApiDownload />
+        <BackToTop />
+      </div>
       <SidebarResizer />
     </template>
   </DefaultTheme.Layout>
