@@ -23,6 +23,7 @@
 namespace asc {
 namespace te {
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> ones()
 {
@@ -32,7 +33,6 @@ __simd_callee__ inline reg_tensor<bool> ones()
 
     reg_tensor<bool> result;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
         result.reg = asc_create_mask_b32(PAT_ALL);
     } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
@@ -40,9 +40,9 @@ __simd_callee__ inline reg_tensor<bool> ones()
     } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
         result.reg = asc_create_mask_b8(PAT_ALL);
     }
-#endif
     return result;
 }
+#endif
 
 } // namespace te
 } // namespace asc
