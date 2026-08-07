@@ -72,18 +72,53 @@ PIPE_S
 
 ## 约束说明
 
-- 需要保证每一个ID的计数器不会溢出，否则会出现异常。
-- 需要保证相同的ID只会被一个流水线控制。
-- 每个ID对应一个计数器，特定CORE的同步ID计数器可通过其他CORE发起的asc_sync_intra_arrive递增；也可通过本身发起的asc_sync_intra_wait递减。 
-- 三个CORE的ID映射规则如下：
-    - ID为0~15的Vector Core 0的asc_sync_intra_arrive指令会被映射到Cube Core的0~15的ID。 
-    - ID为0~15的Vector Core 1的asc_sync_intra_arrive指令会被映射到Cube Core的16~31的ID。 
-    - ID为0~15的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 0的0~15的ID。 
-    - ID为16~31的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 1的0~15的ID。 
-
-- 必须保证配套使用asc_sync_intra_arrive和[asc_sync_intra_wait](asc_sync_intra_wait.md)，否则会出现未定义行为。
+- 用户需要确保配套使用（`sync_id`必须按照映射规则对应）asc_sync_intra_arrive和asc_sync_intra_wait，否则会出现未定义行为。
+- 由于当使用__vector__和__cube__修饰核函数时，硬件不会开启调度模块，也就无法正常进行核间同步。因此即使是在纯Vector或纯Cube场景下，也不能用__vector__或__cube__修饰核函数。
 - pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_S，不支持PIPE_ALL。
 - 一个核连续发出的asc_sync_intra_arrive，硬件不保证执行顺序。
+- `pipe`标识本指令在本核的执行流水，本接口不阻塞pipe流水中的后续指令。
+
+
+
+- 计数器取值范围为[0, 15]
+- 需要保证相同的sync_id只会被一个流水线控制。
+- 每个sync_id对应一个计数器，特定CORE的同步sync_id计数器可通过其他CORE发起的asc_sync_intra_arrive递增；也可通过本身发起的asc_sync_intra_wait递减。 
+- 三个CORE的sync_id映射规则如下：
+    - sync_id为0~15的Vector Core 0的asc_sync_intra_arrive指令会被映射到Cube Core的0~15的sync_id。 
+    - sync_id为0~15的Vector Core 1的asc_sync_intra_arrive指令会被映射到Cube Core的16~31的sync_id。 
+    - sync_id为0~15的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 0的0~15的sync_id。 
+    - sync_id为16~31的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 1的0~15的sync_id。 
+
+
+
+
+- `sync_id` 取值范围为 [0, 31]。CUBECORE侧共32个sync_id（0~15映射到第一个Vector单元、16~31映射到第二个Vector单元），Vector单元侧各16个sync_id。`uint8_t` 重载底层以5位立即数编码，`uint64_t` 重载运行期从xt寄存器低5位取值，传入 > 31的值对 `uint64_t` 重载会被按位宽截断处理为低5位（如32→0、33→1），硬件不报错。截断后实际生效的同步sync_id与预期不符，可能与其他同步sync_id冲突，导致跨核同步关系错误或对端核等待挂起。
+- 每个同步sync_id上对应一个4位计数器（最大值15）。软件必须保证每个sync_id的计数器不会溢出，否则触发异常。即对同一 `sync_id` 累计投递但未被对端核消费的次数不可超过15次。
+- 软件必须保证同一 `sync_id` 在同一时刻只被对端核一条流水等待，否则触发同步语义未定义行为。
+- 本接口不阻塞其所在流水的后续指令，仅在其前序指令全部提交后才会执行投递；后续指令可与本接口并行进入流水。
+- 本接口不涉及Global Memory读写，无地址对齐与容量上限约束。
+
+### 投递-计数语义约束
+
+- 本接口在其 `pipe` 指定流水的前序指令全部提交后执行，将对端核对应 `sync_id` 的4位计数器加1，本流水后续指令不阻塞。
+- 对端核通过配套等待接口在对应计数器为0时阻塞其所在流水的后续指令；计数器变为非零后将其减1并放行。
+- 软件须保证对端核最终一定会调用配套等待接口消费本接口投递的计数器值；若对端核不消费，对应 `sync_id` 的计数器会持续累积，超过15次后触发异常。
+- 同一 `sync_id` 上连续多次投递的累计未消费次数受4位计数器上限15约束；如需在同一 `sync_id` 上建立多次同步关系，须确保每次投递后对端核及时消费。
+
+### 跨核sync_id映射约束
+
+- mix-mode block由1个CUBECORE与2个Vector单元构成。CUBECORE侧拥有32个同步sync_id（0~31），每个Vector单元侧各拥有16个同步sync_id（0~15）。
+- 跨核sync_id映射规则：第一个Vector单元的sync_id 0~15映射到CUBECORE的sync_id 0~15；第二个Vector单元的sync_id 0~15映射到CUBECORE的sync_id 16~31；CUBECORE的sync_id 0~15映射到第一个Vector单元的sync_id 0~15；CUBECORE的sync_id 16~31映射到第二个Vector单元的sync_id 0~15。
+- 本接口与配套等待接口须按上述映射规则使用对应 `sync_id`，否则同步关系不成立。                                           
+
+
+
+
+
+
+
+
+
 
 ## 调用示例
 

@@ -55,15 +55,13 @@ PIPE_S
 
 ## 约束说明
 
-- 不建议开发者同时使用该接口和Matmul高阶API，否则会有flag_id冲突的风险。
-- 同一flag_id的计数器最多设置15次。
-
-- 必须保证配套使用asc_sync_inter_arrive和[asc_sync_inter_wait](asc_sync_inter_wait.md)，否则会出现未定义行为。
-- 需要保证每个flag_id的计数器不溢出，否则将引发异常。
+- 用户需要确保配套使用（`flag_id`必须完全一致）asc_sync_inter_arrive和asc_sync_inter_wait，否则会出现未定义行为。
+- 由于当使用__vector__和__cube__修饰核函数时，硬件不会开启调度模块，也就无法正常进行核间同步。因此即使是在纯Vector或纯Cube场景下，也不能用__vector__或__cube__修饰核函数。
+- `flag_id`取值范围为[0, 15]，每个flag ID各自拥有独立的4位计数器，计数器取值范围为[0, 15]。
 - pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_ALL和PIPE_S。
-- flag_id的值超出取值范围时，会截取最低4位为准。
 - 一个核连续发出的asc_sync_inter_arrive，硬件不保证执行顺序。
-- 使用该接口时，建议开启batchmode模式，使算子独占全部所需核资源，否则在多流并发场景下（≥2条执行流、≥2个算子并发、核数总和超过物理核数）可能导致死锁。
+- `pipe`标识本指令在本核的执行流水，本接口不阻塞pipe流水中的后续指令。
+- `flag_id`传入大于15的值会被按位宽截断处理为低4位（如16→0、17→1），硬件不报错。截断后实际生效值与预期不符，导致同步关系错乱。
 
 ## 调用示例
 
