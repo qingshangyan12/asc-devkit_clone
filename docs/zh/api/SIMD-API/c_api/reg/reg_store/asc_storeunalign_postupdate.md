@@ -64,7 +64,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int16_t*& dst, vector_store_unalign& src0, vector_int16_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst, vector_store_unalign& src0, vector_uint16_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int32_t*& dst, vector_store_unalign& src0, vector_int32_t src1, uint32_t count)
-    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint32_t*& dst, vector_store_unalign& src0, vector_uint32_t src1, uint32_t count) 
+    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint32_t*& dst, vector_store_unalign& src0, vector_uint32_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int64_t*& dst, vector_store_unalign& src0, vector_int64_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ half*& dst, vector_store_unalign& src0, vector_half src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ float*& dst, vector_store_unalign& src0, vector_float src1, uint32_t count)
@@ -104,7 +104,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
 
 - 不指定存储偏移量
 
-    **表1** 参数说明
+    **表 1**  参数说明
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
@@ -114,7 +114,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
 
 - 使用uint32_t作为存储偏移量
 
-    **表2** 参数说明
+    **表 2**  参数说明
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
@@ -125,7 +125,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
 
 - 使用addr_reg作为存储偏移量
 
-    **表3** 参数说明
+    **表 3**  参数说明
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
@@ -148,23 +148,24 @@ PIPE_V
 
 ### 通用约束
 
-- **本接口仅在AIV上生效，非AIV调用直接返回。**
-- 本接口在Vector Function（`__simd_vf__` 标记的函数）内调用，src1为矢量数据寄存器，dst为UB地址，UB地址空间外的指针不可作为dst传入。
-- dst起始地址可不32字节对齐；本接口按非对齐方式将矢量数据寄存器内容写入UB，不要求对齐，不会报错。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__` 标记的函数）内调用，src1为矢量数据寄存器或掩码寄存器，dst为UB地址，UB地址空间外的指针不可作为dst传入。
+- dst起始地址可不32字节对齐；本接口按非对齐方式将矢量数据寄存器或掩码寄存器内容写入UB，不要求对齐，不会报错。
 - 使用uint32_t作为存储偏移量时，本接口应与[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)接口配合使用。asc_storeunalign_post_postupdate接口用于处理该场景下非对齐搬出的尾块。
 - 使用addr_reg作为存储偏移量时，本接口应与[asc_storeunalign_post](asc_storeunalign_post.md)接口配合使用。asc_storeunalign_post接口用于处理该场景下非对齐搬出的尾块。
-- **UB容量上限**：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst偏移与写出区域对应的UB范围不可超过实际可用容量，否则会报错。
+- UB容量上限：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst偏移与写出区域对应的UB范围不可超过实际可用容量，否则会报错。
+- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 使用uint32_t作为存储偏移量搬出约束
 
 - count不可大于矢量数据寄存器容纳的最大元素个数VL / sizeof(dtype)；超出寄存器范围的元素无有效数据，写入dst的内容不确定，建议取 [0, VL ÷ sizeof(dtype)] 范围内有效值。
 - count × sizeof(dtype) 字节为实际搬出数据量，Post Update后dst指针底层UB地址向后偏移 `count × sizeof(dtype)` 字节；dst起始地址与累计偏移量之和不可超过UB实际可用容量，否则会报错。
-- count取0时dst不写入数据，dst指针不变，可重复向同一地址写入同一值；count取负值场景不适用（uint32_t无符号）。
+- count取0时dst不写入数据，dst指针不变；count取负值场景不适用（uint32_t无符号）。
 
 ### 使用addr_reg作为存储偏移量搬出约束
 
 - count必须由配套的地址寄存器构造接口预先构造。
-- count取值偏移后需使在UB地址范围内，否则会报错。
+- count取值偏移后需在UB地址范围内，否则会报错。
 - Post Update仅累加 `addr_reg` 寄存器内值，不修改dst指针，调用后`addr_reg`内的偏移量累加一个VL；多次调用时每次按更新后的偏移寻址，若需同步推进dst指针应由调用方手动维护。
 
 ## 调用示例
@@ -172,7 +173,7 @@ PIPE_V
 - 不指定存储偏移量
 
     ```cpp
-    // dst为ub地址，起始地址为8,非32B对齐
+    // dst为ub地址，起始地址为8，非32B对齐
     vector_store_unalign ureg;
     vector_uint32_t src;
     asc_storeunalign_postupdate(dst, ureg, src);
@@ -182,7 +183,7 @@ PIPE_V
 - 掩码寄存器连续非对齐搬出
 
     ```cpp
-    // dst为ub地址，起始地址为8,非32B对齐
+    // dst为ub地址，起始地址为8，非32B对齐
     vector_store_unalign ureg;
     vector_bool src;
     uint32_t remain_count = 128;
@@ -200,7 +201,7 @@ PIPE_V
 - 使用uint32_t作为存储偏移量
 
     ```cpp
-    // dst为ub地址，起始地址为8,非32B对齐
+    // dst为ub地址，起始地址为8，非32B对齐
     vector_store_unalign ureg;
     vector_uint32_t src;
     uint32_t count = 64;
@@ -219,7 +220,7 @@ PIPE_V
 - 使用addr_reg作为存储偏移量
 
     ```cpp
-    // dst为ub地址，起始地址为8,非32B对齐
+    // dst为ub地址，起始地址为8，非32B对齐
     vector_store_unalign ureg;
     vector_uint32_t src;
     uint32_t repeat = 2;
@@ -231,7 +232,7 @@ PIPE_V
         // 第二次：ureg[0:2] + src[0:62] 写入dst[-2:62]（即UB[256:512]）；同时src[62:64] 写入ureg[0:2]；同时dst自增为dst[128]（即UB[520]）
         asc_storeunalign_postupdate(dst, ureg, src, count);
     }
-    // dst结束地址为520，但此时dst已经自增到了520，所以offset要配置为0 
+    // dst结束地址为520，但此时dst已经自增到了520，所以offset要配置为0
     addr_reg offset = asc_update_addr_reg_b32(0);
     // ureg[0:2] 写入dst[-2:0]（即UB[512:520]）
     asc_storeunalign_post(dst, ureg, offset);
