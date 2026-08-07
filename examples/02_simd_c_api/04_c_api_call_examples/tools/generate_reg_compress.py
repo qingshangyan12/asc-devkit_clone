@@ -22,7 +22,7 @@ def pack_source(file_name: str, low_api: Optional[str], high_api: Optional[str])
     if low_api:
         checks.append("CApiExample::CompareRange(low, golden_low, 0, SRC_COUNT)")
     if high_api:
-        checks.append("CApiExample::CompareRange(high, golden_high, SRC_COUNT, DST_COUNT)")
+        checks.append("CApiExample::CompareRange(high, golden_high, SRC_COUNT, SRC_COUNT)")
     check = " && ".join(checks)
     names = "/".join(x for x in [low_api, high_api] if x)
     return f'''// Build/run ({PREFIX}/{rel}.asc): bash {PREFIX}/run_example.sh {rel}

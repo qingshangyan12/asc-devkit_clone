@@ -82,6 +82,10 @@ MASK_BODY = '''    vector_uint8_t value8;
     asc_storealign(reinterpret_cast<__ubuf__ uint16_t*>(output + 256), value16, mask16);
     asc_storealign(reinterpret_cast<__ubuf__ uint32_t*>(output + 512), value32, mask32);'''
 
+MASK_GOLDEN = '''    for (uint32_t i = 0; i < 256; ++i) golden[i] = 1;
+    for (uint32_t i = 256; i < 512; i += sizeof(uint16_t)) golden[i] = 1;
+    for (uint32_t i = 512; i < BUFFER_BYTES; i += sizeof(uint32_t)) golden[i] = 1;'''
+
 
 def generate() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
@@ -92,7 +96,7 @@ def generate() -> None:
                 mask8="asc_create_mask_b8(PAT_ALL)",
                 mask16="asc_create_mask_b16(PAT_ALL)",
                 mask32="asc_create_mask_b32(PAT_ALL)"),
-            "    std::fill(golden.begin(), golden.end(), static_cast<uint8_t>(1));",
+            MASK_GOLDEN,
             "asc_create_mask_b8/asc_create_mask_b16/asc_create_mask_b32"),
         "asc_update_mask": source(
             "asc_update_mask",
@@ -101,7 +105,7 @@ def generate() -> None:
                 mask8="asc_update_mask_b8(count8)",
                 mask16="asc_update_mask_b16(count16)",
                 mask32="asc_update_mask_b32(count32)"),
-            "    std::fill(golden.begin(), golden.end(), static_cast<uint8_t>(1));",
+            MASK_GOLDEN,
             "asc_update_mask_b8/asc_update_mask_b16/asc_update_mask_b32"),
         "asc_get_mask_spr": source(
             "asc_get_mask_spr",
@@ -117,7 +121,8 @@ def generate() -> None:
     vector_uint32_t value32;
     asc_duplicate_scalar(value32, static_cast<uint32_t>(1), seed32);
     asc_storealign(reinterpret_cast<__ubuf__ uint32_t*>(output + 256), value32, mask32);''',
-            '''    std::fill(golden.begin(), golden.begin() + 512, static_cast<uint8_t>(1));
+            '''    for (uint32_t i = 0; i < 256; i += sizeof(uint16_t)) golden[i] = 1;
+    for (uint32_t i = 256; i < 512; i += sizeof(uint32_t)) golden[i] = 1;
     std::copy(input.begin() + 512, input.end(), golden.begin() + 512);''',
             "asc_get_mask_spr_b16/asc_get_mask_spr_b32"),
         "asc_update_addr_reg": source(
