@@ -237,3 +237,14 @@ matrix operands through MMAD and produce an int32 diagonal of 2. The DN-to-NZ
 and two L1-to-L0 MX copies carry unit E8M0 scales into FP8 E4M3 MMAD and
 produce a float identity matrix. The two L1-to-FB variants load a per-channel
 scale of 2 and quantize a float diagonal of 3 to signed int8 6.
+
+The final nine Cube data-movement examples were revalidated on 2026-08-07.
+All nine compiled and ran successfully with exact Golden comparisons and no
+timeout. L0C-to-L1 and L0C-to-UB convert a real 16x64 float MMAD result to
+int4; both regular/synchronous variants produce 512 bytes of packed `0x33`.
+L1-to-Bias-Table initializes MMAD from the Bias vector 1..16 for both copy
+variants. Leaky ReLU alpha 0.5 changes -1.0 to FP16 -0.5, while scalar
+prequant scale 2 changes float 3.0 to signed int8 6. The FeatureMap A/B and
+padding setters turn one padded row into 16 values of 1.0, and the Load3D
+repeat setter loads positive and negative identity fragments into consecutive
+height blocks.
