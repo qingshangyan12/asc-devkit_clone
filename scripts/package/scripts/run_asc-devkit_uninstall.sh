@@ -84,11 +84,32 @@ if [ ! -d "$common_parse_dir/share/info/asc-devkit" ]; then
     exit 1
 fi
 
+# 清理 hcomm 在 comm_api 下的软链接
+remove_hcomm_softlink() {
+    local _root="$common_parse_dir"
+    local _links="include/comm_api/aicore/hcomm impl/comm_api/aicore/hcomm"
+    for _link_rel in $_links; do
+        local _link_name="$_root/asc/$_link_rel"
+        if [ -L "$_link_name" ]; then
+            rm -f "$_link_name"
+            log "INFO" "remove hcomm softlink: $_link_name"
+        fi
+        # 尝试回收可能变空的父目录(aicore、comm_api、asc)，非空则保留
+        local _d=$(dirname "$_link_name")
+        rmdir "$_d" 2>/dev/null
+        rmdir "$(dirname "$_d")" 2>/dev/null
+        rmdir "$_root/asc" 2>/dev/null
+    done
+}
+
 new_uninstall() {
     if [ ! -d "${common_parse_dir}/share/info/asc-devkit" ]; then
         log "INFO" "no need to uninstall asc-devkit files."
         return 0
     fi
+
+    # 先清理 hcomm 软链接，避免卸载 parser 遇到悬空链接
+    remove_hcomm_softlink
 
     # 赋可写权限
     chmod +w -R "${SOURCE_INSTALL_COMMON_PARSER_FILE}"
