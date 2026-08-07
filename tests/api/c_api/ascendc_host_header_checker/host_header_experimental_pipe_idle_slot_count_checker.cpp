@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#define CANN_ASC_USE_EXPERIMENTAL
 #include "c_api/experimental/asc_get_pipe_idle_slot_count.h"
 
 static void test_host_c_api_experimental_pipe_idle_slot_count()

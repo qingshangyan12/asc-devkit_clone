@@ -20,13 +20,16 @@
 #ifndef INCLUDE_C_API_EXPERIMENTAL_ASC_GET_PIPE_IDLE_SLOT_COUNT_H
 #define INCLUDE_C_API_EXPERIMENTAL_ASC_GET_PIPE_IDLE_SLOT_COUNT_H
 
+#ifndef CANN_ASC_USE_EXPERIMENTAL
+#error "this is experimental feature, pls set CANN_ASC_USE_EXPERIMENTAL = ON to use it"
+#endif
 // WARNING: The APIs in this header are unstable and may change or be removed in future releases.
 
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_pipe_idle_slot_count_impl.h"
 
 __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count();
 

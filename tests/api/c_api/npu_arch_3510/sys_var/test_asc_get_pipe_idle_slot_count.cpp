@@ -11,6 +11,8 @@
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
+
+#define CANN_ASC_USE_EXPERIMENTAL
 #include "include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
 
 namespace {
@@ -59,6 +61,7 @@ TEST_P(TestSysVarAscGetPipeIdleSlotCountCApi, GetIdleSlotCountSucc)
 
 TEST(TestSysVarAscGetPipeIdleSlotCountUnsupportedCore, GetIdleSlotCountReturnsZero)
 {
+    MOCKER_CPP(get_iqent, int64_t(pipe_t)).times(0);
 #if defined(__DAV_VEC__)
     g_coreType = C_API_AIV_TYPE;
     EXPECT_EQ(0, asc_get_pipe_m_idle_slot_count());
@@ -69,6 +72,7 @@ TEST(TestSysVarAscGetPipeIdleSlotCountUnsupportedCore, GetIdleSlotCountReturnsZe
     EXPECT_EQ(0, asc_get_pipe_v_idle_slot_count());
 #endif
     g_coreType = C_API_AIV_TYPE;
+    GlobalMockObject::verify();
 }
 
 INSTANTIATE_TEST_SUITE_P(
