@@ -26,11 +26,42 @@
 
 ## 功能说明
 
-完成矩阵乘加操作。计算公式如下：
+本接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。
+
+本接口实现昇腾NPU矩阵乘计算能力，其数学表达式为：
 
 $$
-c_{matrix} = (a_{matrix} * b_{matrix}) + c_{matrix}
+C = A \times B + C
 $$
+
+<!-- npu="950" id8 -->
+针对Ascend 950PR/Ascend 950DT：
+
+**表1** 矩阵计算矩阵A、B、C解释说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
+| 矩阵计算逻辑 | 矩阵计算物理位置 | 维度 | 输入/输出数据格式 |
+| --- | --- | --- | --- |
+| A | L0A Buffer | M x K | Nz |
+| B | L0B Buffer | K x N | Zn |
+| C | L0C Buffer | M x N，可支持使用偏置矩阵Bias进行初始化，维度为1 x N | Nz |
+<!-- end id8 -->
+
+<!-- npu="A3,910b" id9 -->
+针对如下产品型号，矩阵说明见下表：
+<!-- npu="A3" id10 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id10 -->
+<!-- npu="910b" id11 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id11 -->
+**表2** 矩阵计算矩阵A、B、C解释说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
+| 矩阵计算逻辑 | 矩阵计算物理位置 | 维度 | 输入/输出数据格式 |
+| --- | --- | --- | --- |
+| A | L0A Buffer | M x K | Zz |
+| B | L0B Buffer | K x N | Zn |
+| C | L0C Buffer | M x N，可支持使用偏置矩阵Bias进行初始化，维度为1 x N | Nz |
+<!-- end id9 -->
 
 ## 函数原型
 
@@ -135,20 +166,15 @@ PIPE_M
 ## 调用示例
 
 ```cpp
-// total_length指参与搬运的数据总长度
-constexpr uint64_t total_length = 128;
-// 以下三个参数分别对应矩阵c,a,b的地址
-__cc__ int32_t c_matrix[total_length];
-__ca__ int8_t a_matrix[total_length];
-__cb__ int8_t b_matrix[total_length];
-// 其余入参均已默认数值传入
-uint16_t left_height = 16;
-uint16_t n_dim = 16;
-uint16_t right_width =16;
+__cc__ int32_t c_matrix[128 * 128];
+__ca__ int8_t a_matrix[128 * 64];
+__cb__ int8_t b_matrix[64 * 128];
+uint16_t left_height = 128;
+uint16_t n_dim = 64;
+uint16_t right_width = 128;
 uint8_t unit_flag = 0;
 bool disable_gemv = false;
 bool c_matrix_source = false;
 bool c_matrix_init_val = true;
-// 函数调用
 asc_mmad_sync(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source, c_matrix_init_val);
 ```

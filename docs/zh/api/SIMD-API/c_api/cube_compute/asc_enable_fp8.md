@@ -26,13 +26,17 @@
 
 ## 功能说明
 
-用于设置Mmad计算开启FP8模式。该接口会关闭HiF8模式（与[asc_enable_hif8](./asc_enable_hif8.md)相反），开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。
+本接口用于启用矩阵乘加（Mmad）计算的FP8模式。调用该接口会关闭HiF8模式，其作用与[asc_enable_hif8](./asc_enable_hif8.md)相反，两个接口不同时生效。启用FP8模式后，当矩阵乘加指令的左矩阵A和右矩阵B均以`fp8_e4m3fn_t`作为输入数据类型时，L0A Buffer和L0B Buffer中的数据在参与矩阵乘法运算前不会转换为`hifloat8_t`，而是直接以`fp8_e4m3fn_t`类型参与计算。
 
 ## 函数原型
 
- ```cpp
+```c
 __aicore__ inline void asc_enable_fp8()
 ```
+
+## 参数说明
+
+无
 
 ## 返回值说明
 
@@ -44,8 +48,9 @@ PIPE_S
 
 ## 约束说明
 
-- 与[asc_enable_hif8](./asc_enable_hif8.md)相反，二者不同时生效。
-- 需在[asc_mmad](./asc_mmad.md)执行前调用。
+- 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。
+- FP8模式启用后会持续生效，不会自动关闭。后续矩阵乘加指令若不显式重新配置，将沿用当前模式。如需切换为HiF8模式，请重新调用[asc_enable_hif8](./asc_enable_hif8.md)接口。
+- 本接口仅对矩阵乘加输入数据类型为`fp8_e4m3fn_t`×`fp8_e4m3fn_t`的场景生效，其他FP8数据类型组合（`fp8_e4m3fn_t`×`fp8_e5m2_t`、`fp8_e5m2_t`×`fp8_e4m3fn_t`、`fp8_e5m2_t`×`fp8_e5m2_t`）不支持FP8与HiF8模式选择，调用本接口不产生实际作用。
 
 ## 调用示例
 
