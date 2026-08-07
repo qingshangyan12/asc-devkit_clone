@@ -38,18 +38,31 @@ asc_xor支持两种接口：
 - 操作数为矢量数据寄存器
 
 ```cpp
-__simd_callee__ inline void asc_xor(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_xor(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_xor(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_xor(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_xor(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_xor(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_xor(vector_<dtype>& dst,
+                                    vector_<dtype> src0,
+                                    vector_<dtype> src1,
+                                    vector_bool mask)
 ```
+
+dtype支持的数据类型为`bool`、`uint8_t`、`int8_t`、`uint16_t`、`int16_t`、`uint32_t`、`int32_t`
 
 - 操作数为掩码寄存器
 
 ```cpp
-__simd_callee__ inline void asc_xor(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
+__simd_callee__ inline void asc_xor(vector_bool& dst,
+                                    vector_bool src0,
+                                    vector_bool src1,
+                                    vector_bool mask)
+```
+
+- 典型示例
+
+```cpp
+// 示例：对int32_t矢量数据寄存器执行按位异或
+__simd_callee__ inline void asc_xor(vector_int32_t& dst,
+                                    vector_int32_t src0,
+                                    vector_int32_t src1,
+                                    vector_bool mask)
 ```
 
 ## 参数说明
@@ -80,7 +93,10 @@ __simd_callee__ inline void asc_xor(vector_bool& dst, vector_bool src0, vector_b
 
 ## 约束说明
 
-dst中未被mask筛选的位置被置为0。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- src0、src1、dst三者dtype必须完全一致且符合支持的数据类型，否则触发数据类型异常。
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 按位异或按元素的二进制位逐位执行，无溢出、无进位、无NaN/Inf异常上报。
 
 ## 调用示例
 

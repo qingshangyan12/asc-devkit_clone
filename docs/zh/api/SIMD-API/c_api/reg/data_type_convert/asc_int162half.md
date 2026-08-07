@@ -32,15 +32,25 @@
 
 ```cpp
 // 向负无穷方向舍入（rd）
-__simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162half_rd(vector_half& dst,
+                                              vector_int16_t src,
+                                              vector_bool mask)
 // 四舍六入五成双舍入（rn）
-__simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162half_rn(vector_half& dst,
+                                              vector_int16_t src,
+                                              vector_bool mask)
 // 四舍五入舍入（rna）
-__simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162half_rna(vector_half& dst,
+                                               vector_int16_t src,
+                                               vector_bool mask)
 // 向正无穷方向舍入（ru）
-__simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162half_ru(vector_half& dst,
+                                              vector_int16_t src,
+                                              vector_bool mask)
 // 向零方向舍入（rz）
-__simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_int162half_rz(vector_half& dst,
+                                              vector_int16_t src,
+                                              vector_bool mask)
 ```
 
 ## 参数说明
@@ -61,7 +71,11 @@ __simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t s
 
 ## 约束说明
 
-mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- src的dtype必须为`int16_t`，dst的dtype必须为`half`，dtype固定不可混用，否则触发异常。
+- dst与src寄存器号重叠时，转换结果不保证正确性，硬件不报错但数据可能被覆盖。
+- 不同舍入模式的函数原型源、目、掩码参数完全一致，仅舍入方向不同；绝对值不超过2048的整数在5种舍入模式下结果完全一致（精确表示，无舍入误差），差异仅体现在绝对值超过2048的整数上。
 
 ## 调用示例
 
