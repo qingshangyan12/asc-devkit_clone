@@ -512,7 +512,12 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
 
 <template>
   <div class="blog-search" data-pagefind-ignore="all">
-    <div class="nav-search-btn-wait" @click="searchModal = true">
+    <button
+      class="nav-search-btn-wait"
+      type="button"
+      aria-label="搜索文档"
+      @click="searchModal = true"
+    >
       <span>
         <svg width="14" height="14" viewBox="0 0 20 20">
           <path
@@ -525,13 +530,13 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
         finalSearchConfig?.btnPlaceholder || 'Search'
       }}</span>
       <span v-if="metaKey" class="metaKey"> {{ metaKey }} K </span>
-    </div>
+    </button>
     <ClientOnly>
       <Command.Dialog :visible="searchModal" theme="algolia">
         <template #header>
           <div class="search-bar">
             <div class="search-actions before">
-              <button class="back-button" title="Close search" @click="searchModal = false">
+              <button class="back-button" type="button" title="关闭搜索" aria-label="关闭搜索" @click="searchModal = false">
                 <span class="vpi-arrow-left local-search-icon" />
               </button>
             </div>
@@ -542,12 +547,12 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
             <div class="search-actions">
               <button
                 :class="{ active: showDetail }" class="toggle-layout-button" type="button"
-                title="Display detailed list" @click="handleToggleDetail"
+                title="切换结果详情" aria-label="切换结果详情" @click="handleToggleDetail"
               >
                 <span class="vpi-layout-list local-search-icon" />
               </button>
               <button
-                :disabled="!searchWords" class="clear-button" type="reset" title="Reset search"
+                :disabled="!searchWords" class="clear-button" type="reset" title="清空搜索" aria-label="清空搜索"
                 @click="handleClearSearch"
               >
                 <span class="vpi-delete local-search-icon" />
@@ -644,7 +649,7 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
 .blog-search {
   flex: 1;
   display: flex;
-  padding-left: 32px;
+  padding-left: 12px;
 }
 
 .blog-search>.nav-search-btn-wait {
@@ -654,12 +659,12 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
   justify-content: center;
   box-sizing: border-box;
   border: 1px solid transparent;
-  border-radius: 6px;
   transition: .2s border;
   border-radius: 8px;
   padding: 0 10px 0 12px;
-  height: 40px;
+  height: 36px;
   background-color: var(--vp-c-bg-alt);
+  color: var(--vp-c-text-2);
 }
 
 .blog-search .nav-search-btn-wait .metaKey {
@@ -672,11 +677,11 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
 
 .blog-search .nav-search-btn-wait:hover {
   border: 1px solid var(--vp-c-brand-1);
-  border-radius: 6px;
+  background: var(--vp-c-brand-soft);
 }
 
 .blog-search .nav-search-btn-wait .search-tip {
-  color: #909399;
+  color: var(--vp-c-text-2);
   font-size: 12px;
   padding-left: 8px;
   padding-right: 16px;

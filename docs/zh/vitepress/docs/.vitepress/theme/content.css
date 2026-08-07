@@ -1,0 +1,309 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * Licensed under the CANN Open Software License Agreement Version 2.0.
+ */
+
+.VPDoc.has-aside .content-container {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.vp-doc {
+  color: var(--vp-c-text-2);
+  font-size: 15px;
+  line-height: 1.78;
+}
+
+.vp-doc :where(h1, h2, h3, h4, h5, h6) {
+  max-width: var(--asc-reading-width);
+  color: var(--vp-c-text-1);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.vp-doc h1 {
+  margin-bottom: 24px;
+  font-size: 34px;
+  line-height: 1.28;
+}
+
+.vp-doc h2 {
+  margin-top: 52px;
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--vp-c-divider) 78%, transparent);
+  font-size: 24px;
+}
+
+.vp-doc h3 {
+  margin-top: 36px;
+  font-size: 19px;
+}
+
+.vp-doc > :where(p, ul, ol, blockquote),
+.vp-doc > div > :where(p, ul, ol, blockquote),
+.vp-doc .markdown-body > :where(p, ul, ol, blockquote) {
+  max-width: var(--asc-reading-width);
+}
+
+.vp-doc a {
+  color: var(--vp-c-brand-1);
+  font-weight: 550;
+  text-decoration-color: color-mix(in srgb, var(--vp-c-brand-1) 42%, transparent);
+  text-underline-offset: 3px;
+}
+
+.vp-doc a:hover {
+  color: var(--vp-c-brand-2);
+  text-decoration-color: currentColor;
+}
+
+.vp-doc :not(pre) > code {
+  border: 0;
+  border-radius: 5px;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-2);
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.9em;
+}
+
+.vp-doc img {
+  border-radius: var(--asc-radius-sm);
+}
+
+.vp-doc .vp-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  margin: 24px 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  border-radius: var(--asc-radius-sm);
+  background: var(--vp-c-bg-elv);
+  box-shadow: var(--asc-shadow-soft);
+}
+
+.vp-doc table {
+  display: table;
+  width: auto;
+  min-width: 100%;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+}
+
+.vp-doc table th,
+.vp-doc table td {
+  border: 0;
+  vertical-align: middle;
+}
+
+.vp-doc table th {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: color-mix(in srgb, var(--vp-c-bg-alt) 64%, transparent);
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.vp-doc table td {
+  padding: 13px 16px;
+  background: var(--vp-c-bg-elv);
+  color: var(--vp-c-text-2);
+  line-height: 1.62;
+}
+
+.vp-doc table tr:nth-child(2n) {
+  background: transparent;
+}
+
+.vp-doc table tbody tr:not(:last-child) td {
+  border-bottom: 1px solid color-mix(in srgb, var(--vp-c-divider) 48%, transparent);
+}
+
+.vp-doc table tbody tr:hover td {
+  background: color-mix(in srgb, var(--vp-c-brand-soft) 45%, var(--vp-c-bg-elv));
+}
+
+.vp-doc table.vp-table-mixed-layout {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.vp-doc table.vp-table-mixed-layout col.vp-table-compact-column {
+  width: var(--vp-table-column-width);
+}
+
+.vp-doc table .vp-table-compact-cell,
+.vp-doc table .vp-table-nowrap {
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+.markdown-body .callout {
+  max-width: var(--asc-reading-width);
+  margin: 24px 0;
+  padding: 16px 18px;
+  border: 0 !important;
+  border-radius: var(--asc-radius-sm);
+  box-shadow: none;
+}
+
+.markdown-body .callout .callout-title {
+  padding: 0;
+  font-weight: 700;
+}
+
+.markdown-body .callout > p:last-child {
+  padding-bottom: 0;
+}
+
+.markdown-body .callout-note {
+  background: var(--asc-teal-light);
+}
+
+.markdown-body .callout-note .callout-title,
+.markdown-body .callout-note .callout-icon {
+  color: var(--asc-teal-dark);
+  fill: var(--asc-teal-dark);
+}
+
+.markdown-body .callout-tip {
+  background: var(--asc-green-light);
+}
+
+.markdown-body .callout-tip .callout-title,
+.markdown-body .callout-tip .callout-icon {
+  color: var(--asc-green-dark);
+  fill: var(--asc-green-dark);
+}
+
+.markdown-body .callout-important {
+  background: var(--asc-purple-light);
+}
+
+.markdown-body .callout-important .callout-title,
+.markdown-body .callout-important .callout-icon {
+  color: var(--asc-purple-dark);
+  fill: var(--asc-purple-dark);
+}
+
+.markdown-body .callout-warning {
+  background: var(--asc-gold-light);
+}
+
+.markdown-body .callout-warning .callout-title,
+.markdown-body .callout-warning .callout-icon {
+  color: var(--asc-gold-dark);
+  fill: var(--asc-gold-dark);
+}
+
+.markdown-body .callout-caution {
+  background: var(--asc-coral-light);
+}
+
+.markdown-body .callout-caution .callout-title,
+.markdown-body .callout-caution .callout-icon {
+  color: var(--asc-coral-dark);
+  fill: var(--asc-coral-dark);
+}
+
+.dark .markdown-body .callout {
+  background: var(--vp-c-bg-soft);
+}
+
+.dark .markdown-body .callout-note .callout-title,
+.dark .markdown-body .callout-note .callout-icon {
+  color: #80e6ff;
+  fill: #80e6ff;
+}
+
+.dark .markdown-body .callout-tip .callout-title,
+.dark .markdown-body .callout-tip .callout-icon {
+  color: #9dfbe8;
+  fill: #9dfbe8;
+}
+
+.dark .markdown-body .callout-important .callout-title,
+.dark .markdown-body .callout-important .callout-icon {
+  color: #d0b8ff;
+  fill: #d0b8ff;
+}
+
+.dark .markdown-body .callout-warning .callout-title,
+.dark .markdown-body .callout-warning .callout-icon {
+  color: #ffe87f;
+  fill: #ffe87f;
+}
+
+.dark .markdown-body .callout-caution .callout-title,
+.dark .markdown-body .callout-caution .callout-icon {
+  color: #ffb6c8;
+  fill: #ffb6c8;
+}
+
+.markdown-body .code-block {
+  max-width: 100%;
+  margin: 24px 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--asc-radius-sm);
+  background: var(--vp-c-bg-elv);
+  box-shadow: var(--asc-shadow-soft);
+}
+
+.markdown-body .code-block .code-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  background: #202b3d;
+  color: #b3bcc4;
+}
+
+.markdown-body .code-block pre,
+.markdown-body .code-block pre {
+  background: #f7f8fa;
+  color: var(--asc-gray-10);
+  line-height: 1.65;
+}
+
+.dark .markdown-body .code-block pre {
+  background: #182130;
+  color: #edf2f7;
+}
+
+.markdown-body .code-header .copy-btn {
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #d7dde3;
+}
+
+.markdown-body .code-header .copy-btn:hover,
+.markdown-body .code-header .copy-btn.copied {
+  background: rgba(128, 230, 255, 0.12);
+  color: #80e6ff;
+}
+
+@media (max-width: 767px) {
+  .vp-doc {
+    font-size: 14.5px;
+  }
+
+  .vp-doc h1 {
+    font-size: 28px;
+  }
+
+  .vp-doc h2 {
+    margin-top: 40px;
+    font-size: 22px;
+  }
+
+  .vp-doc table th,
+  .vp-doc table td {
+    padding: 11px 13px;
+  }
+}

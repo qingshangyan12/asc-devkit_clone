@@ -13,10 +13,13 @@ import Layout from './Layout.vue'
 import BackToTop from './BackToTop.vue'
 import SidebarResizer from './SidebarResizer.vue'
 import { installAutomaticTableLayout } from './table_layout.mjs'
+import './tokens.css'
+import './base.css'
 import './code-theme.css'
+import './content.css'
 import './search-overrides.css'
-
 import './filter.css'
+import './home.css'
 import './code-copy.js'
 
 export default {

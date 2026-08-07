@@ -222,6 +222,7 @@ async function handleDownload() {
       :class="{ loading }"
       :disabled="loading"
       :title="loading ? progress : '下载全部 API Markdown'"
+      aria-label="下载全部 API Markdown"
       @click="handleDownload"
     >
       <svg
@@ -241,41 +242,41 @@ async function handleDownload() {
       </svg>
       <span v-else class="spinner" />
     </button>
-    <div v-if="progress" class="download-progress" :class="{ error: progress.startsWith('失败:') }">{{ progress }}</div>
+    <div
+      v-if="progress"
+      class="download-progress"
+      :class="{ error: progress.startsWith('失败:') }"
+      aria-live="polite"
+    >{{ progress }}</div>
   </div>
 </template>
 
 <style scoped>
 .api-download-wrapper {
-  position: fixed;
-  bottom: 40px;
-  right: 96px;
-  z-index: 99;
+  position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
 }
 
 .api-download-btn {
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 50%;
-  background: var(--vp-c-bg-soft);
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--vp-c-bg-elv);
   color: var(--vp-c-text-2);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: color 0.2s, background-color 0.2s, transform 0.2s;
+  box-shadow: var(--asc-shadow-soft);
 }
 
 .api-download-btn:hover:not(:disabled) {
-  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
 }
 
 .api-download-btn:disabled {
@@ -284,7 +285,7 @@ async function handleDownload() {
 }
 
 .api-download-btn.loading {
-  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
 }
 
@@ -298,18 +299,21 @@ async function handleDownload() {
 }
 
 .download-progress {
+  position: absolute;
+  top: 50%;
+  right: 52px;
+  transform: translateY(-50%);
   font-size: 11px;
   color: var(--vp-c-text-2);
   white-space: nowrap;
-  background: var(--vp-c-bg-soft);
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-elv);
+  padding: 6px 9px;
+  border-radius: 6px;
+  box-shadow: var(--asc-shadow-soft);
 }
 
 .download-progress.error {
   color: var(--vp-c-danger-1);
-  border-color: var(--vp-c-danger-1);
 }
 
 @keyframes spin {

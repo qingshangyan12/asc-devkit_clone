@@ -56,14 +56,14 @@ const headers = computed(() => {
 
 <style scoped>
 .custom-outline {
-  border-left: 1px solid var(--vp-c-divider);
-  padding-left: 16px;
+  padding-left: 4px;
   font-size: 13px;
 }
 .outline-title {
-  font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: var(--vp-c-text-1);
+  font-size: 12px;
+  font-weight: 700;
 }
 .outline-list {
   list-style: none;
@@ -71,7 +71,7 @@ const headers = computed(() => {
   margin: 0;
 }
 .outline-item {
-  margin: 4px 0;
+  margin: 2px 0;
 }
 .outline-item.h3 {
   padding-left: 12px;
@@ -81,9 +81,11 @@ const headers = computed(() => {
   text-decoration: none;
   transition: color 0.2s;
   display: block;
-  padding: 2px 0;
+  padding: 5px 8px;
+  border-radius: 6px;
 }
 .outline-link:hover {
   color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
 }
 </style>
