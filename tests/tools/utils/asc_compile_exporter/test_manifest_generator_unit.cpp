@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 
 // Internal components live in an unnamed namespace, so unit tests share their translation unit.
-#include "manifest_generator.cpp"
+#include "manifest_bundle_compiler.cpp"
 
 namespace ascendc {
 namespace manifest_generator {

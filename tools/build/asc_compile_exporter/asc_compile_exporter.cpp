@@ -18,7 +18,7 @@
 #include <utility>
 
 #include "ascendc_tool_log.h"
-#include "manifest_generator.h"
+#include "manifest_bundle_compiler.h"
 
 namespace {
 

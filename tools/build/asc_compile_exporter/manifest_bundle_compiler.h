@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef ASCENDC_MANIFEST_GENERATOR_H
-#define ASCENDC_MANIFEST_GENERATOR_H
+#ifndef ASCENDC_MANIFEST_BUNDLE_COMPILER_H
+#define ASCENDC_MANIFEST_BUNDLE_COMPILER_H
 
 #include <cstdint>
 #include <string>
@@ -39,4 +39,4 @@ private:
 } // namespace manifest_generator
 } // namespace ascendc
 
-#endif // ASCENDC_MANIFEST_GENERATOR_H
+#endif // ASCENDC_MANIFEST_BUNDLE_COMPILER_H

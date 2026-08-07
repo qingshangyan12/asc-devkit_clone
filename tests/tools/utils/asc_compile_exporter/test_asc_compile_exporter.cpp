@@ -26,7 +26,7 @@
 #include <gtest/gtest.h>
 
 #include "ascendc_compile_resource/ascendc_manifest_abi.h"
-#include "manifest_generator.h"
+#include "manifest_bundle_compiler.h"
 
 namespace {
 
