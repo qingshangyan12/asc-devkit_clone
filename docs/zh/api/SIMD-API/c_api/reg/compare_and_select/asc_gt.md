@@ -34,18 +34,25 @@ $$
 dst_i = (src0_i > src1_i)
 $$
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_gt(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_gt(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_gt(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_gt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_gt(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_gt(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
+```c
+__simd_callee__ inline void asc_gt(vector_bool& dst,
+                                   vector_<dtype> src0,
+                                   vector_<dtype> src1,
+                                   vector_bool mask)
+```
+
+dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
+
+```c
+// 示例：half类型逐元素大于比较
+__simd_callee__ inline void asc_gt(vector_bool& dst,
+                                   vector_half src0,
+                                   vector_half src1,
+                                   vector_bool mask)
 ```
 
 ## 参数说明
@@ -67,10 +74,15 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_float src0, vector_f
 
 ## 约束说明
 
-- 通过mask参数控制的未选中元素在目的操作数中被置零。
-- 操作数重叠约束：src0和src1可以是同一个矢量数据寄存器。
-- 浮点数据类型比较，涉及`nan`时比较结果为0。
-- 当源操作数为浮点数据类型时，+0与-0视为相等。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- src0、src1的dtype必须完全一致，否则触发数据类型异常。
+- dtype仅支持`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`共9种，其他dtype触发数据类型异常。
+- src0和src1可以是同一个矢量数据寄存器。
+- mask比特位按元素大小步进过滤：每个元素占用`sizeof(dtype)`个比特位，元素i的有效mask比特位于`i × sizeof(dtype)`位置。如half（2字节）元素i的mask比特位于`i × 2`位置，int32_t（4字节）元素i的mask比特位于`i × 4`位置。
+- dst为目的掩码寄存器（`vector_bool`），比较结果按1 bit/元素紧凑打包，元素i的结果写入dst的比特位i，与输入mask的字节步进布局不同。
+- mask比特位为0的位置采用清零模式（ZEROING）：dst对应比特位写0，不参与比较也不保留dst原值。
+- 浮点dtype（`half`、`bfloat16_t`、`float`）比较时，+0与-0视为相等。
+- 浮点dtype（`half`、`bfloat16_t`、`float`）比较输入含NaN时，比较结果按IEEE 754标准返回false（NaN与任何值都不满足大于关系），dst对应比特位写0。
 
 ## 调用示例
 

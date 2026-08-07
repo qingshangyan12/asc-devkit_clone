@@ -30,8 +30,9 @@
 
 ## 函数原型
 
-```cpp
-__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx)
+```c
+__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits,
+                                          int64_t idx)
 ```
 
 ## 参数说明
@@ -53,7 +54,9 @@ PIPE_S
 
 ## 约束说明
 
-当idx > 63或者idx < 0时，计算逻辑是：(idx % 64 + 64) % 64，得到结果位，设置结果位为1。
+- 本接口为标量运算，AIC与AIV均可调用，行为一致。
+- 本接口仅支持64位无符号整数（`uint64_t`）位操作，`bits`参数与返回值均为64位无符号整数。
+- 当参数idx > 63或者idx < 0时，计算逻辑是：(idx % 64 + 64) % 64，得到结果位，设置结果位为1。
 
 ## 调用示例
 

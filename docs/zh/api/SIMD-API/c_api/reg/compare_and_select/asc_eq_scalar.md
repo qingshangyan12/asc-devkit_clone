@@ -34,16 +34,27 @@ $$
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
+### 模板原型
+
+本接口对 9 种 dtype 暴露相同结构的原型，模板原型如下（`<dtype>` ∈ {int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float}，对应矢量寄存器类型 `vector_<dtype>`）：
+
+```c
+__simd_callee__ inline void asc_eq_scalar(vector_bool& dst,
+                                          vector_<dtype> src,
+                                          <dtype> value,
+                                          vector_bool mask)
+```
+
+dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
+
+### 典型示例
+
+```c
+// 示例：half 源向量与标量相等比较，结果写入 vector_bool 掩码寄存器
+__simd_callee__ inline void asc_eq_scalar(vector_bool& dst,
+                                          vector_half src,
+                                          half value,
+                                          vector_bool mask)
 ```
 
 ## 参数说明
@@ -65,7 +76,15 @@ __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_float src, fl
 
 ## 约束说明
 
-dst中未被mask筛选的位置被置为0。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst、src、mask均为寄存器操作数，不涉及UB地址，无UB容量与地址对齐约束。
+- src与value的dtype必须完全一致（int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float之一），其他dtype触发数据类型异常。。
+- dst为`vector_bool`类型掩码寄存器，写入1 bit/元素的比较结果，不可与其他矢量数据寄存器类型混用。
+- mask为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask比特位按元素大小步进过滤：每个元素占用`sizeof(dtype)`个比特位，元素i的有效mask比特位于`i × sizeof(dtype)`位置。
+- mask比特位为0的位置采用清零模式（ZEROING）：dst对应比特位写0，不参与比较也不保留dst原值。
+- 浮点dtype（`half`、`bfloat16_t`、`float`）比较时，+0与-0视为相等。
+- 浮点dtype（`half`、`bfloat16_t`、`float`）比较输入含NaN时，比较结果按IEEE 754标准返回false（NaN与任何值都不相等），dst对应比特位写0。
 
 ## 调用示例
 

@@ -32,14 +32,20 @@
 
 ![累计统计](../../../../figures/asc_cumulative_histogram.png)
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
-  ```cpp
-  // 低位模式
-  __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
-  // 高位模式
-  __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
-  ```
+```c
+__simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst,
+                                                          vector_uint8_t src,
+                                                          vector_bool mask)
+__simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst,
+                                                          vector_uint8_t src,
+                                                          vector_bool mask)
+```
+
+dtype支持的数据类型为`uint8_t`、`uint16_t`、`bool`
 
 ## 参数说明
 
@@ -59,8 +65,21 @@
 
 ## 约束说明
 
-- 当mask位数为0时，对应位置的src源操作数的数值被忽略，dst对应位置数值为忽略该位置src后计算得到的值。
-- dst的数据类型为uint16_t，最大值为65535，使用时需注意累加溢出问题。
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- dst的dtype必须为`uint16_t`，src的dtype必须为`uint8_t`，mask必须为`vector_bool`掩码寄存器；其他dtype触发数据类型异常。
+- mask的第j个比特位控制`src[j]`是否参与统计：比特位为1时参与统计，为0时忽略该元素。
+- 本次统计结果累加到dst对应元素的原值上，多次调用可累积跨批次数据。dst元素的最大值为65535，使用时需注意累加溢出。
+
+### BIN0模式约束
+
+- 对dst的第i个元素（i ∈ {0,1,...,127}），本次调用累加mask有效且满足`src[j] ≤ i`的源元素个数。
+
+### BIN1模式约束
+
+- 对dst的第i个元素（i ∈ {0,1,...,127}），本次调用累加mask有效且满足`src[j] ≤ 128 + i`的源元素个数。
 
 ## 调用示例
 

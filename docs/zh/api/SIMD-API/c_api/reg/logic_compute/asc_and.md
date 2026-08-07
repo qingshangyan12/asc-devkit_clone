@@ -38,21 +38,35 @@ $$
 dst_i = src0_i \& src1_i
 $$
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_and(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+### 模板原型
+
+本接口对11种dtype暴露相同结构的矢量数据寄存器原型（`<dtype>`对应`vector_<dtype>`），另有1种`vector_bool`掩码寄存器原型，模板原型如下：
+
+```c
+__simd_callee__ inline void asc_and(vector_bool& dst,
+                                    vector_bool src0,
+                                    vector_bool src1,
+                                    vector_bool mask)
+__simd_callee__ inline void asc_and(vector_<dtype>& dst,
+                                    vector_<dtype> src0,
+                                    vector_<dtype> src1,
+                                    vector_bool mask)
+```
+
+dtype支持的数据类型为`bool`、`uint8_t`、`int8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`uint16_t`、`int16_t`、`half`、`bfloat16_t`、`uint32_t`、`int32_t`、`float`
+
+### 典型示例
+
+```c
+// 示例：对half矢量数据寄存器执行按位与
+__simd_callee__ inline void asc_and(vector_half& dst,
+                                    vector_half src0,
+                                    vector_half src1,
+                                    vector_bool mask)
 ```
 
 ## 参数说明
@@ -74,7 +88,24 @@ __simd_callee__ inline void asc_and(vector_float& dst, vector_float src0, vector
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- src0、src1、dst三者dtype必须完全一致，否则触发数据类型异常。
+- mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口（如`asc_update_mask`系列）预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask比特位按元素大小步进过滤：矢量数据寄存器按位与中每个元素占用`sizeof(dtype)`个比特位，元素i的有效mask比特位于`i × sizeof(dtype)`位置；掩码寄存器按位与中每个比特独立对应1个掩码位。
+- 参与计算的元素个数由矢量长度（VL）决定，矢量数据寄存器按位与中元素个数 = VL ÷ sizeof(dtype)；掩码寄存器按位与中比特个数 = VL。
+- mask比特位为0的位置采用清零模式（ZEROING）：dst对应位置写0，不保留src0、src1原值也不保留dst原值。
+- 按位与按元素的二进制位逐位执行，无溢出、无进位、无NaN/Inf异常上报；浮点dtype（half、bfloat16_t、float）的按位与直接对其二进制表示位执行，结果通常无浮点语义意义，常用于位掩码操作（如清除/置位符号位或指数位）。
+
+### 矢量数据寄存器按位与约束
+
+- dtype仅支持bool、int8_t、uint8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float共11种矢量数据寄存器类型，其他dtype触发数据类型异常。
+
+### 掩码寄存器按位与约束
+
+- dst、src0、src1必须均为`vector_bool`类型，与其他矢量数据寄存器类型混用触发数据类型异常。
+- 掩码寄存器按位与用于复合掩码生成：典型用法是将两个由`asc_update_mask`系列生成的源掩码按位与，得到同时满足两个条件的复合掩码，再传给后续计算接口。
 
 ## 调用示例
 
