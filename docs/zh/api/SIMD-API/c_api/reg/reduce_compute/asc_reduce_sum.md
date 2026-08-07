@@ -26,27 +26,60 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_vector.h"`。
+
 根据mask对源操作数src进行归约求和操作，用于将src中的所有参与计算的元素求和，得到的结果保存在dst中的0位置。
+
+```python
+# 以half类型为例(b16位宽, vector_half共128个元素; b32类型如float为64个元素)
+# src: half[128]  (vector_half, 256B = 128个half元素)
+# dst: half[128]  (vector_half, 归约结果)
+# mask: bool[128] (b16位宽, 每元素1bit)
+#
+# 对mask为1的元素求和, 结果写入dst[0], 其余位置置0
+# 不输出索引; mask为0的元素视为0不参与累加
+# 注: 整型(int16/uint16)求和时dst会提升精度到int32/uint32以避免溢出
+
+def asc_reduce_sum(dst, src, mask):
+    sum_val = 0
+    for i in range(128):
+        if mask[i]:
+            sum_val = sum_val + src[i]  # 底层为二叉树累加, 此处顺序展开仅作示意
+    dst[0] = sum_val                    # 求和值
+    for i in range(1, 128):
+        dst[i] = 0                      # 其余位置置0
+```
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_reduce_sum(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_float& dst, vector_float src, vector_bool mask)
+### 模板原型
+
+```c
+__simd_callee__ inline void asc_reduce_sum(vector_<dst_dtype>& dst,
+                                           vector_<src_dtype> src,
+                                           vector_bool mask)
+```
+
+dtype支持的数据类型为`int16_t`、`int32_t`、`uint16_t`、`uint32_t`、`half`、`float`
+
+### 典型示例
+
+```c
+// 示例：float类型归约求和
+__simd_callee__ inline void asc_reduce_sum(vector_float& dst,
+                                           vector_float src,
+                                           vector_bool mask)
 ```
 
 ## 参数说明
 
 **表1** 参数说明
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
+
+| 参数名 | 输入/输出 | 描述                                     |
+| ------ | --------- | ---------------------------------------- |
+| dst    | 输出      | 目的操作数（矢量数据寄存器）。           |
+| src    | 输入      | 源操作数（矢量数据寄存器）。             |
+| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 

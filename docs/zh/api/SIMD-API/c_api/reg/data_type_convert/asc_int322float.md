@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
+
 将int32_t类型转化为float类型，并支持多种舍入模式。
 $$
 dst_i = (float)src_i
@@ -33,29 +35,54 @@ $$
 
 关于舍入模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
 
+```python
+# src: int32[64]   (vector_int32_t, 256B = 64个int32元素)
+# dst: float[64]   (vector_float, 256B = 64个float元素)
+# mask: bool[64]   (b32位宽)
+#
+# 等宽转换(1:1): 逐元素将int32转换为float, 支持多种舍入模式
+# 舍入模式后缀: rd(FLOOR)/rn(RINT)/rna(ROUND)/ru(CEIL)/rz(TRUNC)
+
+def asc_int322float_rn(dst, src, mask):
+    for i in range(64):
+        if mask[i]:
+            dst[i] = float(src[i])       # int32 -> float, RINT舍入
+        else:
+            dst[i] = 0.0                 # mask未选中, 置零
+```
+
 ## 函数原型
 
-```cpp
+### 模板原型
+
+```c
+__simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
+                                                         vector_int32_t src,
+                                                         vector_bool mask)
+```
+
+`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
+
+src与dst的dtype固定，src支持的数据类型为`int32_t`，dst支持的数据类型为`float`
+
+### 典型示例
+
+```c
 // RINT舍入模式
-__simd_callee__ inline void asc_int322float_rn(vector_float& dst, vector_int32_t src, vector_bool mask)
-// ROUND舍入模式
-__simd_callee__ inline void asc_int322float_rna(vector_float& dst, vector_int32_t src, vector_bool mask)
-// FLOOR舍入模式
-__simd_callee__ inline void asc_int322float_rd(vector_float& dst, vector_int32_t src, vector_bool mask)
-// CEIL舍入模式
-__simd_callee__ inline void asc_int322float_ru(vector_float& dst, vector_int32_t src, vector_bool mask)
-// TRUNC舍入模式
-__simd_callee__ inline void asc_int322float_rz(vector_float& dst, vector_int32_t src, vector_bool mask)
+__simd_callee__ inline void asc_int322float_rn(vector_float& dst,
+                                               vector_int32_t src,
+                                               vector_bool mask)
 ```
 
 ## 参数说明
 
-**表1** 参数说明
-| 参数名    | 输入/输出 | 描述                |
-| :------ | :----- | :----------------- |
-| dst    | 输出    | 目的操作数（矢量数据寄存器）。            |
-| src    | 输入    | 源操作数（矢量数据寄存器）。             |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+**表1**参数说明
+
+| 参数名 | 输入/输出 | 描述                                                                                                             |
+| ------ | --------- | ---------------------------------------------------------------------------------------------------------------- |
+| dst    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                   |
+| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
+| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -65,8 +92,9 @@ __simd_callee__ inline void asc_int322float_rz(vector_float& dst, vector_int32_t
 
 ## 约束说明
 
-- 当int32_t的值超出float可精确表示的整数范围（绝对值大于2^24）时，按函数后缀指定的舍入模式进行舍入。
-- mask未筛选的元素在输出中置零。
+- src与dst的数据类型需要与函数原型匹配。
+- 掩码位为0时，dst对应元素置0。
+- 当int32_t的绝对值大于2^24时，按函数后缀指定的舍入模式进行舍入。
 
 ## 调用示例
 

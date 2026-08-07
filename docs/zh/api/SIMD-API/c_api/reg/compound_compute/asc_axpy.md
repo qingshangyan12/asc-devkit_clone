@@ -26,29 +26,62 @@
 
 ## 功能说明
 
-根据mask对源操作数src、value进行按元素做乘加操作，将结果写入目的操作数dst。
+头文件路径：`"c_api/reg_compute/reg_vector.h"`。
+
+根据mask将源操作数src中每个元素与标量value求积后，与目的操作数dst中的对应元素相加，将结果写入目的操作数dst。其中dst既作为输入累加器参与计算，又作为输出存储最终结果。
 计算公式如下：
 
 $$
 dst_i = src_i \times value + dst_i
 $$
 
+```python
+# src:   half[128]  (vector_half, 256B = 128个half元素)
+# value: half       (标量)
+# dst:   half[128]  (vector_half, 既作为输入累加器又作为输出)
+# mask:  bool[128]  (b16位宽)
+#
+# 标量乘加(AXPY: a*x plus y): dst = value * src + dst, mask为0的元素置零
+# 注意: dst的原始值参与累加, mask为0时该位置结果置0(原值丢失)
+
+def asc_axpy(dst, src, value, mask):
+    for i in range(128):
+        if mask[i]:
+            dst[i] = value * src[i] + dst[i]
+        else:
+            dst[i] = 0
+```
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_axpy(vector_half& dst, vector_half src, half value, vector_bool mask)
-__simd_callee__ inline void asc_axpy(vector_float& dst, vector_float src, float value, vector_bool mask)
+### 模板原型
+
+```c
+__simd_callee__ inline void asc_axpy(vector_<dtype>& dst,
+                                     vector_<dtype> src,
+                                     <dtype> value,
+                                     vector_bool mask)
+```
+
+dtype支持的数据类型为`half`、`float`
+
+### 典型示例
+
+```c
+__simd_callee__ inline void asc_axpy(vector_float& dst,
+                                     vector_float src,
+                                     float value,
+                                     vector_bool mask)
 ```
 
 ## 参数说明
 
-**表1** 参数说明
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。 |
-| value | 输入 | 源操作数（标量）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| 参数名 | 输入/输出 | 描述                                                                                                             |
+| ------ | --------- | ---------------------------------------------------------------------------------------------------------------- |
+| dst    | 输入/输出 | 目的操作数（矢量数据寄存器）。                                                                                   |
+| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
+| value  | 输入      | 源操作数（标量）。                                                                                               |
+| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -58,7 +91,8 @@ __simd_callee__ inline void asc_axpy(vector_float& dst, vector_float src, float 
 
 ## 约束说明
 
-mask未筛选的元素在输出中置零。
+- dst、src和value的数据类型需要保持一致。
+- 掩码位为0时，dst对应元素置0。
 
 ## 调用示例
 
