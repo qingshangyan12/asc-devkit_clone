@@ -21,6 +21,7 @@ const { isSidebarEnabled } = useSidebar()
 
 const dragging = ref(false)
 const hovering = ref(false)
+const widthValue = ref(DEFAULT_WIDTH)
 
 let startX = 0
 let startWidth = DEFAULT_WIDTH
@@ -36,6 +37,7 @@ function getCurrentWidth() {
 
 function applyWidth(px) {
   currentWidth = px
+  widthValue.value = px
   document.documentElement.style.setProperty('--vp-sidebar-width', px + 'px')
 }
 
@@ -93,6 +95,19 @@ function onDoubleClick() {
   saveWidth()
 }
 
+function onKeyDown(e) {
+  if (!isSidebarEnabled.value) return
+  if (!['ArrowLeft', 'ArrowRight', 'Home'].includes(e.key)) return
+  e.preventDefault()
+  if (e.key === 'Home') {
+    applyWidth(DEFAULT_WIDTH)
+  } else {
+    const delta = e.key === 'ArrowLeft' ? -16 : 16
+    applyWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, getCurrentWidth() + delta)))
+  }
+  saveWidth()
+}
+
 function onVisibilityChange() {
   if (document.hidden) endDrag(false)
 }
@@ -119,11 +134,20 @@ onUnmounted(() => {
     v-if="isSidebarEnabled"
     class="sidebar-resizer"
     :class="{ active: dragging, hover: hovering }"
+    role="separator"
+    aria-orientation="vertical"
+    :aria-valuemin="MIN_WIDTH"
+    :aria-valuemax="MAX_WIDTH"
+    :aria-valuenow="widthValue"
+    aria-label="调整侧栏宽度"
+    title="拖动或使用方向键调整侧栏宽度；双击重置"
+    tabindex="0"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"
     @pointercancel="onPointerCancel"
     @dblclick="onDoubleClick"
+    @keydown="onKeyDown"
     @mouseenter="hovering = true"
     @mouseleave="hovering = false"
   ></div>
@@ -166,7 +190,8 @@ onUnmounted(() => {
 }
 
 .sidebar-resizer.hover::after,
-.sidebar-resizer.active::after {
+.sidebar-resizer.active::after,
+.sidebar-resizer:focus-visible::after {
   background-color: var(--vp-c-brand-1);
 }
 

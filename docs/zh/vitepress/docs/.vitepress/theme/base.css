@@ -1,0 +1,160 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * Licensed under the CANN Open Software License Agreement Version 2.0.
+ */
+
+html {
+  background: var(--vp-c-bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--vp-c-text-1);
+  font-family: var(--vp-font-family-base);
+  letter-spacing: 0;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: 0;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--vp-c-brand-1) 46%, transparent);
+  outline-offset: 2px;
+}
+
+.VPNav {
+  border-bottom: 1px solid color-mix(in srgb, var(--vp-c-divider) 76%, transparent);
+  background: color-mix(in srgb, var(--vp-c-bg) 92%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+.VPNavBar {
+  max-width: var(--asc-content-max);
+  margin: 0 auto;
+}
+
+.VPNavBarTitle .title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.VPNavBarTitle .logo {
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+}
+
+.VPNavBarMenuLink,
+.VPNavBarMenuGroup .button {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.VPNavBarMenuLink.active,
+.VPNavBarMenuLink:hover,
+.VPNavBarMenuGroup .button:hover {
+  color: var(--vp-c-brand-1);
+}
+
+.VPButton {
+  border-radius: var(--asc-radius-sm) !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+}
+
+.VPFooter {
+  border-top: 1px solid var(--vp-c-divider) !important;
+  background: var(--vp-c-bg-alt) !important;
+}
+
+.VPFooter .message,
+.VPFooter .copyright {
+  max-width: 1040px;
+  margin-right: auto;
+  margin-left: auto;
+  line-height: 1.75;
+}
+
+.VPFooter a {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+
+.VPFooter a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.VPSidebar {
+  background: var(--vp-c-bg-alt);
+  border-right: 1px solid var(--vp-c-divider);
+}
+
+.VPSidebarItem.level-0 > .item > .text,
+.VPSidebarItem.level-0 > .item > .link > .text {
+  font-weight: 700;
+  color: var(--vp-c-text-1);
+}
+
+.VPSidebarItem .item {
+  min-height: 32px;
+  border-radius: 6px;
+}
+
+.VPSidebarItem.is-active > .item {
+  background: var(--vp-c-brand-soft);
+}
+
+.VPSidebarItem.is-active > .item .text,
+.VPSidebarItem.is-active > .item .link > .text {
+  color: var(--vp-c-brand-1) !important;
+}
+
+.VPSidebarItem .link:hover .text {
+  color: var(--vp-c-brand-1);
+}
+
+.floating-tools {
+  position: fixed;
+  right: 24px;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+@media (max-width: 959px) {
+  .VPNavBar {
+    max-width: none;
+  }
+
+  .floating-tools {
+    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
