@@ -10,14 +10,14 @@
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { useData, useRoute } from 'vitepress'
+import { useRoute } from 'vitepress'
 import {
   isApiRouteUnsupported,
 } from '../../../scripts/api-support.mjs'
+import { apiUnsupportedIndex } from './api-navigation-filter.mjs'
 import { selectedFilter } from './filter-state.js'
 
 const route = useRoute()
-const { theme } = useData()
 const isApiPage = ref(route.path.startsWith('/api/'))
 
 const filterOptions = [
@@ -47,7 +47,7 @@ function applyPageSupportFilter(content) {
   })
 
   const unsupported = isApiRouteUnsupported(
-    theme.value.apiUnsupportedIndex,
+    apiUnsupportedIndex,
     route.path,
     selectedFilter.value
   )
