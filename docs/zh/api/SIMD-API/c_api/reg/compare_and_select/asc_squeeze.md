@@ -30,6 +30,8 @@
 
 本接口不会将有效数据大小保存至AR寄存器，如果想将有效数据大小保存至AR寄存器，请参考[asc_squeeze_with_status](asc_squeeze_with_status.md)。
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
 ```cpp
@@ -63,9 +65,16 @@ __simd_callee__ inline void asc_squeeze(vector_float& dst, vector_float src, vec
 ## 返回值说明
 
 无
+
 ## 约束说明
 
-dst中未被mask筛选的位置被置为0。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- dst与src的dtype必须完全一致（int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float之一），否则触发数据类型异常。
+- mask为`vector_bool`类型掩码寄存器，需通过配套的掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致压缩结果错误。
+- mask比特位按元素大小步进过滤：每个元素占用`sizeof(dtype)`个比特位，元素i的有效mask比特位于`i × sizeof(dtype)`位置。如half（2字节）元素i的mask比特位于`i × 2`位置，int32_t（4字节）元素i的mask比特位于`i × 4`位置。
+- mask比特位为1的src元素按原顺序紧凑排列到dst低位；mask比特位为0的src元素不参与压缩，dst中压缩结果之后的剩余高位采用清零模式（ZEROING），统一写0且不保留dst原值。
+- 浮点dtype（hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、float）仅按元素搬移src的二进制数据，不进行浮点数值计算，因此不检查NaN/Inf，也不上报浮点异常；src包含NaN/Inf时仍可正常压缩。
 
 ## 调用示例
 

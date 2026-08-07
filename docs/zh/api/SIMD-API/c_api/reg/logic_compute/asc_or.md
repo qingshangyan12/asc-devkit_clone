@@ -38,6 +38,8 @@ $$
 dst_i = src0_i | src1_i
 $$
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
 ```cpp
@@ -71,7 +73,24 @@ __simd_callee__ inline void asc_or(vector_float& dst, vector_float src0, vector_
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- src0、src1、dst三者dtype必须完全一致，否则触发数据类型异常。
+- mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口（如`asc_update_mask`系列）预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask比特位按元素大小步进过滤：矢量数据寄存器按位或中每个元素占用`sizeof(dtype)`个比特位，元素i的有效mask比特位于`i × sizeof(dtype)`位置；掩码寄存器按位或中每个比特独立对应1个掩码位。
+- 参与计算的元素个数由矢量长度（VL）决定，矢量数据寄存器按位或中元素个数 = VL ÷ sizeof(dtype)；掩码寄存器按位或中比特个数 = VL。
+- mask比特位为0的位置采用清零模式（ZEROING）：dst对应位置写0，不保留src0、src1原值也不保留dst原值。
+- 按位或按元素的二进制位逐位执行，无溢出、无进位、无NaN/Inf异常上报；浮点dtype（half、float）的按位或直接对其二进制表示位执行，结果通常无浮点语义意义，常用于位掩码操作（如置位符号位或指数位、合并多个位域标记）。
+
+### 矢量数据寄存器按位或约束
+
+- dtype仅支持int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float共8种矢量数据寄存器类型，其他dtype触发数据类型异常。
+
+### 掩码寄存器按位或约束
+
+- dst、src0、src1必须均为`vector_bool`类型，其他dtype触发数据类型异常。
+- 掩码寄存器按位或用于复合掩码生成：典型用法是将两个由`asc_update_mask`系列生成的源掩码按位或，得到满足任一条件的复合掩码，再传给后续计算接口。
 
 ## 调用示例
 
