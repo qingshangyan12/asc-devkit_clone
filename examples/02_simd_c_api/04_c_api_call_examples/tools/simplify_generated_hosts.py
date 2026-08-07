@@ -245,6 +245,21 @@ def simplify(path: Path) -> None:
     )
     source = replace_device_buffers(source)
 
+    if source.count("CompareData(") == 1:
+        source = re.sub(
+            r"(?ms)\ntemplate <typename T>\nbool CompareData\(.*?\n\}\n",
+            "\n",
+            source,
+            count=1,
+        )
+    if source.count("CompareRangeData(") == 1:
+        source = re.sub(
+            r"(?ms)\ntemplate <typename T>\nbool CompareRangeData\(.*?\n\}\n",
+            "\n",
+            source,
+            count=1,
+        )
+
     if "CApiExample::" in source or "sample_host.h" in source or "DeviceBuffer<" in source:
         raise RuntimeError(f"incomplete simplification: {path}")
     path.write_text(source)
