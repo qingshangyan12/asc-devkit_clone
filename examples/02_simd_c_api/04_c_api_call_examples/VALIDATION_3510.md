@@ -129,6 +129,18 @@ The functional rewrite replaces marker-only calls with scenarios that expose
 the documented effect of each API. Completed batches are compiled and run with
 a 30-second timeout before each checkpoint.
 
+The 18 synchronization examples were revalidated on 2026-08-07. All 18
+compiled and ran successfully, with no timeout. Local pipeline APIs now guard a
+real GM-to-UB, vector-add, and UB-to-GM dependency chain; event APIs pair
+producer and consumer pipelines; and inter/subblock APIs copy and compare input
+data across their synchronization point. The intra APIs use an AIV-to-AIC
+mixed-core visibility scenario. The former `asc_sync_block_arrive` and
+`asc_sync_block_wait` timeouts were fixed by replacing the invalid single-AIV
+self-pairing with an AIV-arrive/AIC-wait mixed-core scenario. DAV 3510 does not
+use `asc_set_ffts_base_addr`; that setter is intentionally unavailable in the
+3510 implementation and the product documentation states that Ascend 950 does
+not require the FFTS base-address setup.
+
 The six Cube-only system-variable setters were revalidated on 2026-08-07. All
 six compiled and ran successfully, with no timeout:
 
