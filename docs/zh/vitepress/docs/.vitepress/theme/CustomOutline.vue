@@ -12,15 +12,16 @@
 import { computed } from 'vue'
 import { useData, useRoute } from 'vitepress'
 import { isApiRouteUnsupported } from '../../../scripts/api-support.mjs'
+import { apiUnsupportedIndex } from './api-navigation-filter.mjs'
 import { selectedFilter } from './filter-state.js'
 
 const route = useRoute()
-const { page, theme } = useData()
+const { page } = useData()
 
 const headers = computed(() => {
   const h = page.value?.outlineHeaders || []
   const unsupported = isApiRouteUnsupported(
-    theme.value.apiUnsupportedIndex,
+    apiUnsupportedIndex,
     route.path,
     selectedFilter.value
   )
