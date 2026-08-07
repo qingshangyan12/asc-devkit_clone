@@ -141,6 +141,17 @@ use `asc_set_ffts_base_addr`; that setter is intentionally unavailable in the
 3510 implementation and the product documentation states that Ascend 950 does
 not require the FFTS base-address setup.
 
+The five memory-vector-compute examples were revalidated on 2026-08-07. All
+five compiled and ran successfully with exact Golden comparisons and no
+timeout. `asc_bitsort` validates descending `(score,index)` pairs,
+`asc_mrgsort4` merges four pre-sorted queues, and `asc_transpose` checks a
+16x16 matrix transpose for both regular and synchronous variants. The
+`asc_set_va_reg` example rebinds VA0/VA1 to a second destination and verifies
+that both address lists receive the transpose. The former
+`asc_transto5hd` timeout is resolved: separate aligned b8, b16, and b32
+workspaces now validate all six regular/synchronous entry points, including
+the low/high half behavior of the b8 variant.
+
 The six Cube-only system-variable setters were revalidated on 2026-08-07. All
 six compiled and ran successfully, with no timeout:
 
