@@ -20,15 +20,6 @@
 
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_sync_notify_impl(pipe_t pipe, pipe_t tpipe, event_t id)
-{
-    if ASC_IS_AIC {
-        asc_sync_notify_impl_aic(pipe, tpipe, id);
-    } else if ASC_IS_AIV {
-        asc_sync_notify_impl_aiv(pipe, tpipe, id);
-    }
-}
-
 __aicore__ inline void asc_sync_notify_impl_aic(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     if (pipe == pipe_t::PIPE_S) {
@@ -136,6 +127,15 @@ __aicore__ inline void asc_sync_notify_impl_aiv(pipe_t pipe, pipe_t tpipe, event
         } else if (tpipe == pipe_t::PIPE_MTE3) {
             set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
         }
+    }
+}
+
+__aicore__ inline void asc_sync_notify_impl(pipe_t pipe, pipe_t tpipe, event_t id)
+{
+    if ASC_IS_AIC {
+        asc_sync_notify_impl_aic(pipe, tpipe, id);
+    } else if ASC_IS_AIV {
+        asc_sync_notify_impl_aiv(pipe, tpipe, id);
     }
 }
 
