@@ -34,14 +34,27 @@ $$
 dst_i = -src_i
 $$
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_neg(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
-__simd_callee__ inline void asc_neg(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
-__simd_callee__ inline void asc_neg(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_neg(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-__simd_callee__ inline void asc_neg(vector_float& dst, vector_float src, vector_bool mask)
+### 模板原型
+
+```c
+__simd_callee__ inline void asc_neg(vector_<dtype>& dst,
+                                    vector_<dtype> src,
+                                    vector_bool mask)
+```
+
+dtype支持的数据类型为`int8_t`、`int16_t`、`int32_t`、`half`、`float`
+
+### 典型示例
+
+```c
+// 示例：对half矢量寄存器取相反数
+__simd_callee__ inline void asc_neg(vector_half& dst,
+                                    vector_half src,
+                                    vector_bool mask)
 ```
 
 ## 参数说明
@@ -62,7 +75,14 @@ __simd_callee__ inline void asc_neg(vector_float& dst, vector_float src, vector_
 
 ## 约束说明
 
-无
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- mask为`vector_bool`类型掩码寄存器，需通过掩码设置接口（如`asc_update_mask`系列）预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- dst与src的dtype必须完全一致（int8_t、int16_t、half、int32_t、float之一），否则触发异常。
+- mask比特位为0的位置采用清零模式（ZEROING）：dst对应位置写0，不保留src原值也不保留dst原值。
+- 整数输入按有符号整数算术取反，当输入为该有符号整数类型的最小负值（int8_t为-128、int16_t为-32768、int32_t为-2147483648）时，相反数超出该类型可表示范围，结果保留原值不变。
+- 浮点输入（half、float）通过翻转符号位实现取反：正数变为对应负数，负数变为对应正数，+0变为-0，-0变为+0，INF输入翻转符号位（+INF变为-INF，-INF变为+INF）。
+- 浮点（half、float）输入NaN，取反结果为NaN。
 
 ## 调用示例
 
