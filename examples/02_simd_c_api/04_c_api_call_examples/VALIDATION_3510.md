@@ -26,7 +26,7 @@ were removed; the timeout exceptions are listed below.
 - Runtime precision: 300 passed, 8 failed, 6 timed out, and 11 reported device
   runtime errors.
 
-The eight precision failures were fixed and revalidated:
+The eight initial precision failures were addressed:
 
 - `asc_create_mask`, `asc_get_mask_spr`, and `asc_update_mask`: the Golden data
   incorrectly treated 16-bit and 32-bit values as byte fills.
@@ -34,12 +34,15 @@ The eight precision failures were fixed and revalidated:
   `asc_atomic_xor`: the kernels missed the DCache maintenance required by the
   scalar atomic API contract.
 
+The corrected mask cases and the scalar atomic cases that completed returned
+matching Golden data. Atomic timeout cases are covered by the retest below.
+
 The runtime errors were addressed by correcting matrix parameters, completing
 VA register setup, using the DAV 3510 mixed-core ratio, initializing source
 storage, and launching incompatible asynchronous/synchronous variants in
 separate kernels.
 
-## Timeout Cases
+## Initial Timeout Cases
 
 The following examples exceeded the 30-second validation limit and were skipped:
 
@@ -74,9 +77,47 @@ additional runs exceeded the 30-second limit:
 - `vector_compute/asc_transto5hd.asc`
 
 The remaining scalar atomic examples were skipped after the repeated timeout
-pattern. Their temporary precision-validation runs had already completed, and
-all scalar atomic kernels use the same DCache maintenance pattern in the final
-sources.
+pattern. The timeout retest below covers all eleven scalar atomic examples; all
+of their final kernels use the same DCache maintenance pattern.
+
+## Timeout Retest
+
+The timeout cases were retested on 2026-08-07 with the temporary precision
+comparison binaries and a 60-second per-example limit. An initial attempt
+overlapped another NPU workload and was discarded. The complete retest was run
+after the device became idle. A known-good matrix example was run after every
+timeout and always completed successfully, confirming that each timeout was
+isolated from the following result.
+
+Four initial timeout cases completed with matching Golden data:
+
+- `reg/reg_load/asc_loadalign_brc_datablock_postupdate.asc` (5 seconds)
+- `reg/reg_load/asc_loadalign_unpack4.asc` (6 seconds)
+- `reg/reg_load/asc_load.asc` (6 seconds)
+- `reg/reg_store/asc_storealign_pack_quarter.asc` (6 seconds)
+
+The following 18 examples still exceeded 60 seconds:
+
+- `sync/asc_sync_block_arrive.asc`
+- `sync/asc_sync_block_wait.asc`
+- `cube_datamove/asc_copy_l0c2ub.asc`
+- `cube_datamove/asc_copy_l12ub.asc`
+- `vector_datamove/asc_copy_ub2l1.asc`
+- `cache_ctrl/asc_dcci.asc`
+- `scalar_compute/asc_atomic_add.asc`
+- `scalar_compute/asc_atomic_and.asc`
+- `scalar_compute/asc_atomic_cas.asc`
+- `scalar_compute/asc_atomic_dec.asc`
+- `scalar_compute/asc_atomic_exch.asc`
+- `scalar_compute/asc_atomic_inc.asc`
+- `scalar_compute/asc_atomic_max.asc`
+- `scalar_compute/asc_atomic_min.asc`
+- `scalar_compute/asc_atomic_or.asc`
+- `scalar_compute/asc_atomic_sub.asc`
+- `scalar_compute/asc_atomic_xor.asc`
+- `vector_compute/asc_transto5hd.asc`
+
+No retested example returned a precision mismatch or another runtime error.
 
 Precision comparison code was used only in the temporary validation copies and
 is not present in the final minimal examples.
