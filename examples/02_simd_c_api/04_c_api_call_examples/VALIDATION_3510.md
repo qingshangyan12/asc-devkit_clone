@@ -219,3 +219,12 @@ register changes in the same in-flight matrix context can be observed by the
 wrong MMAD. The final 8bit examples set one mode per kernel, and the HF32
 rounding comparisons use separate launches so each matrix operation observes
 its intended register value.
+
+The first eight Cube data-movement examples were revalidated on 2026-08-07.
+All eight compiled and ran successfully with a 30-second limit, with no
+timeout. `asc_copy_gm2l1`, `asc_copy_gm2l1_align`, and `asc_copy_l12ub`
+perform complete GM-to-L1-to-UB-to-GM round trips for their regular and
+synchronous variants. The three loop-register examples select two or four
+non-contiguous 32-byte source blocks and expose their packed L1 layout.
+`asc_set_gm2l1_pad` produces eight `0xa5` bytes on each side of a 16-byte
+payload, and both `asc_fill_l1` variants initialize 64 float values to 1.0.
