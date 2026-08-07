@@ -946,6 +946,12 @@ __aicore__ inline void TPipe::ResetPool()
         }
     }
 #endif
+    auto bufEntry = g_tpipeImpl.buf_;
+    for (int32_t i = 0; i < QBUF_MAX_LEN; i++, bufEntry++) {
+        bufEntry->freeBufEvtID = INVALID_TEVENTID;
+        bufEntry->enQueEvtID = INVALID_TEVENTID;
+        bufEntry->state = TBufState::FREE;
+    }
     auto evt = Internal::g_occupyEventPool;
 #if defined(ASCENDC_CPU_DEBUG) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ != 2201) && (__NPU_ARCH__ != 3510))
     for (int32_t i = 0; i < static_cast<uint8_t>(HardEvent::MAX); i++, evt++) {
