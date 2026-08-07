@@ -26,64 +26,75 @@
 
 ## 功能说明
 
-数据搬运接口，适用于从UB非32B对齐地址起始连续搬入。
+头文件路径为：`"c_api/reg_compute/reg_load.h"`。
 
-- asc_loadunalign_postupdate（不带addr_reg入参）：配合asc_loadunalign_pre（不带addr_reg入参）接口使用。
-- asc_loadunalign_postupdate（带addr_reg入参）：配合asc_loadunalign_pre（带addr_reg入参）接口使用。
+将Unified Buffer（UB）中起始地址任意字节对齐的连续数据搬入矢量数据寄存器，搬入数据量为VL。读取完成后启用Post Update模式，自动更新源地址指针或地址寄存器偏移。本接口是非对齐搬入的第二阶段，需要先调用[asc_loadunalign_pre](asc_loadunalign_pre.md)初始化`src0`。本接口提供两种功能模式：
+
+- PostUpdate搬入：从`src1`起始地址搬入数据，接口执行后src1地址移动`count * sizeof(dtype)`字节。
+- 带地址寄存器偏移PostUpdate搬入：通过`addr_reg`类型的地址寄存器偏移指定起始位置，接口执行后地址寄存器偏移量增加`inc`个元素。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
+
+本接口仅在AIV上执行有效，在AIC上调用为空操作。由接口封装实现完成非对齐加载与Post Update，无对应底层指令。
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst, vector_load_unalign& src0, __ubuf__ int8_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_uint8_t& dst, vector_load_unalign& src0, __ubuf__ uint8_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp4x2_e2m1_t& dst, vector_load_unalign& src0, __ubuf__ fp4x2_e2m1_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp4x2_e1m2_t& dst, vector_load_unalign& src0, __ubuf__ fp4x2_e1m2_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp8_e8m0_t& dst, vector_load_unalign& src0, __ubuf__ fp8_e8m0_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp8_e5m2_t& dst, vector_load_unalign& src0, __ubuf__ fp8_e5m2_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp8_e4m3fn_t& dst, vector_load_unalign& src0, __ubuf__ fp8_e4m3fn_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_hifloat8_t& dst, vector_load_unalign& src0, __ubuf__ hifloat8_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_half& dst, vector_load_unalign& src0, __ubuf__ half*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int16_t& dst, vector_load_unalign& src0, __ubuf__ int16_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_uint16_t& dst, vector_load_unalign& src0, __ubuf__ uint16_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_bfloat16_t& dst, vector_load_unalign& src0, __ubuf__ bfloat16_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int32_t& dst, vector_load_unalign& src0, __ubuf__ int32_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_uint32_t& dst, vector_load_unalign& src0, __ubuf__ uint32_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_float& dst, vector_load_unalign& src0, __ubuf__ float*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int64_t& dst, vector_load_unalign& src0, __ubuf__ int64_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int4x2_t& dst, vector_load_unalign& src0, __ubuf__ int4b_t*& src1, uint32_t count)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst, vector_load_unalign& src0, __ubuf__ int8_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_uint8_t& dst, vector_load_unalign& src0, __ubuf__ uint8_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp4x2_e2m1_t& dst, vector_load_unalign& src0, __ubuf__ fp4x2_e2m1_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp4x2_e1m2_t& dst, vector_load_unalign& src0, __ubuf__ fp4x2_e1m2_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp8_e8m0_t& dst, vector_load_unalign& src0, __ubuf__ fp8_e8m0_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp8_e5m2_t& dst, vector_load_unalign& src0, __ubuf__ fp8_e5m2_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_fp8_e4m3fn_t& dst, vector_load_unalign& src0, __ubuf__ fp8_e4m3fn_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_hifloat8_t& dst, vector_load_unalign& src0, __ubuf__ hifloat8_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int16_t& dst, vector_load_unalign& src0, __ubuf__ int16_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_uint16_t& dst, vector_load_unalign& src0, __ubuf__ uint16_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_half& dst, vector_load_unalign& src0, __ubuf__ half *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_bfloat16_t& dst, vector_load_unalign& src0, __ubuf__ bfloat16_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int32_t& dst, vector_load_unalign& src0, __ubuf__ int32_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_uint32_t& dst, vector_load_unalign& src0, __ubuf__ uint32_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_float& dst, vector_load_unalign& src0, __ubuf__ float *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int64_t& dst, vector_load_unalign& src0, __ubuf__ int64_t *src1, addr_reg& offset, uint32_t inc)
-__simd_callee__ inline void asc_loadunalign_postupdate(vector_int4x2_t& dst, vector_load_unalign& src0, __ubuf__ int4b_t *src1, addr_reg& offset, uint32_t inc)
+### Post Update搬入
+
+```c
+__simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
+                                                       vector_load_unalign& src0,
+                                                       __ubuf__ <dtype>*& src1,
+                                                       uint32_t count)
+```
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。
+
+```c
+__simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
+                                                       vector_load_unalign& src0,
+                                                       __ubuf__ int8_t*& src1,
+                                                       uint32_t count)
+```
+
+### 带地址寄存器偏移Post Update搬入
+
+```c
+__simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
+                                                       vector_load_unalign& src0,
+                                                       __ubuf__ <dtype>* src1,
+                                                       addr_reg& offset,
+                                                       uint32_t inc)
+```
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。
+
+```c
+__simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
+                                                       vector_load_unalign& src0,
+                                                       __ubuf__ int8_t* src1,
+                                                       addr_reg& offset,
+                                                       uint32_t inc)
 ```
 
 ## 参数说明
 
-**表1** 参数说明
+**表1** 参数说明（Post Update搬入）
 
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量）。 |
-| src0 | 输入 | 源操作数（矢量数据寄存器）。 |
-| src1 | 输入/输出 | 源操作数（矢量）的起始地址。当使用不含addr_reg参数的接口时，搬运完成后该地址会被自动更新。 |
-| offset | 输入/输出 | 存储地址的偏移量。当使用含addr_reg参数的接口时，搬运完成后该偏移量会被自动更新。 |
-| count | 输入 | 搬运元素个数。 |
-| inc | 输入 | 在多次循环中，多次调用该接口时，每次搬运完成后，下次搬运的offset在自增前会更新为offset + inc。建议设置为0。|
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的矢量数据寄存器，写入单个VL长度的非对齐加载拼接结果。dtype由重载决定，须与src1一致（`int4b_t`对应`vector_int4x2_t`）。 |
+| src0 | 输入 | `vector_load_unalign`临时寄存器，保存上一阶段加载的VL长度数据，须通过配套接口预先初始化为有效状态。 |
+| src1 | 输入/输出 | 源UB地址，按指针引用传入（`<dtype>*&`）。dtype须与dst一致。起始地址无32字节对齐要求（本接口用于非对齐加载场景）。接口读取VL字节数据后，按Post Update模式自动将src1指针的底层UB地址向后偏移`count * sizeof(dtype)`字节，调用方下一次读取直接使用更新后的src1即可。src1起始地址与累计偏移量之和不可超过UB实际可用容量。 |
+| count | 输入 | Post Update步长，单位元素个数。接口执行后将src1指针的底层UB地址向后偏移`count * sizeof(dtype)`字节。取值范围为[0，2^32−1]。底层以字节数`count * sizeof(dtype)`累加到源地址，需满足`count * sizeof(dtype) ≤ VL+32`（VL为当前矢量长度，单位字节），否则触发指令非法配置异常。取0时src1指针不变，可重复读取同一组数据。实际有效范围同时受UB可用容量约束（见约束说明章节），超出UB区间会触发读越界异常。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+**表2** 参数说明（带地址寄存器偏移Post Update搬入）
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的矢量数据寄存器，写入单个VL长度的非对齐加载拼接结果。dtype由重载决定，须与src1一致（`int4b_t`对应`vector_int4x2_t`）。 |
+| src0 | 输入 | `vector_load_unalign`临时寄存器，保存上一阶段加载的VL长度数据，须通过配套接口预先初始化为有效状态。 |
+| src1 | 输入 | 源UB地址（裸指针，非引用）。dtype须与dst一致。起始地址无32字节对齐要求（本接口用于非对齐加载场景）。本模式下src1指针本身不被更新，源地址推进通过`offset`地址寄存器偏移实现。 |
+| offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，由[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)预先构造。相对`src1`起始地址的偏移，单位为元素个数（非字节），底层按dtype字节大小把AR中的元素偏移换算为字节偏移。偏移后实际访问地址须落在UB地址范围内。接口执行后按Post Update模式自动将offset的底层地址寄存器值累加`inc * sizeof(dtype)`字节，调用方下一次读取直接使用更新后的offset即可。 |
+| inc | 输入 | Post Update步长，单位元素个数。接口执行后将offset的底层地址寄存器值向后偏移`inc * sizeof(dtype)`字节。取值范围为[0，2^32−1]。底层以字节数`inc * sizeof(dtype)`累加到地址寄存器，需满足`inc * sizeof(dtype) ≤ VL+32`（VL为当前矢量长度，单位字节），否则触发指令非法配置异常。取0时offset不变，可重复读取同一组数据。实际有效范围同时受UB可用容量约束（见约束说明章节），超出UB区间会触发读越界异常。 |
 
 ## 返回值说明
 
@@ -95,7 +106,36 @@ PIPE_V
 
 ## 约束说明
 
-- 接口中的src1不需要32B对齐。
+### 通用约束
+
+- src1起始地址只需1字节对齐。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为UB地址，目的操作数为矢量数据寄存器。
+- src1与dst的dtype必须完全一致（`int4b_t`对应`vector_int4x2_t`），dtype不一致触发异常。
+- src0必须为`vector_load_unalign`类型，且须通过配套接口预先初始化为有效状态；未初始化的src0内容不确定，会导致dst拼接结果错误。
+- 本接口须在配套接口完成首个VL长度数据加载后调用，二者需成对使用以保证非对齐拼接语义正确。
+- 本接口无对应底层指令。
+- UB容量上限：UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少。src1起始地址（或`src1 + offset * sizeof(dtype)`）与Post Update累计偏移量之和不可超过实际可用容量，否则会报错。
+- 单次搬入的数据量为一个矢量长度（VL），按dtype字节大小换算为元素个数；VL由当前矢量计算配置决定。
+- 如果需要执行多条本接口指令，且源地址存在重叠或与同流水的其他搬入接口存在依赖，需要插入内存屏障同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)（如`asc_mem_bar(VV_ALL)`或`asc_mem_bar(VST_VLD)`，按实际生产-消费关系选择合适的`mem_type`），保证多个指令串行化，防止出现异常数据。
+
+### Post Update搬入约束
+
+- count单位为元素个数，非字节、非32字节块。例如count=256表示src1指针底层UB地址向后偏移`256×sizeof(dtype)`字节。
+- count取0时src1指针不变，dst仍按当前src1起始位置的VL字节拼接填充，可重复读取同一组源数据。
+- count需满足`count * sizeof(dtype) ≤ VL+32`（VL为当前矢量长度，单位字节），超出该上限会报错。
+- Post Update后的src1新地址（src1旧地址+`count * sizeof(dtype)`字节）仍需落在UB地址范围内，否则下一次调用本接口会报错。
+- Post Update仅更新src1指针，不影响dst寄存器内容；多次调用时每次dst都被新一次搬入结果覆盖，如需保留前一次结果应先保存到其他寄存器或搬出到UB。
+
+### 带地址寄存器偏移Post Update搬入约束
+
+- offset必须由[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)预先构造，传入其他类型的地址寄存器会触发异常。
+- offset取值需使`src1 + offset * sizeof(dtype)`落在UB地址范围内，否则会报错。
+- inc单位为元素个数，非字节、非32字节块。例如inc=256表示offset底层地址寄存器值向后偏移`256×sizeof(dtype)`字节。
+- inc取0时offset不变，dst仍按当前`src1 + offset * sizeof(dtype)`起始位置的VL字节拼接填充，可重复读取同一组源数据。
+- inc需满足`inc * sizeof(dtype) ≤ VL+32`（VL为当前矢量长度，单位字节），超出该上限会报错。
+- Post Update后的offset新值需使实际访问地址`src1 + offset新值`仍落在UB地址范围内，否则下一次调用本接口会报错。offset底层地址寄存器值的单位为字节。
+- Post Update仅更新offset地址寄存器，不影响src1裸指针、dst寄存器内容；多次调用时每次dst都被新一次搬入结果覆盖，如需保留前一次结果应先保存到其他寄存器或搬出到UB。
 
 ## 调用示例
 
@@ -104,5 +144,6 @@ vector_int8_t dst;
 vector_load_unalign src0;
 __ubuf__ int8_t* src_ptr = (__ubuf__ int8_t*)asc_get_phy_buf_addr(0);
 uint32_t count = 16;
+asc_loadunalign_pre(src0, src_ptr);
 asc_loadunalign_postupdate(dst, src0, src_ptr, count);
 ```

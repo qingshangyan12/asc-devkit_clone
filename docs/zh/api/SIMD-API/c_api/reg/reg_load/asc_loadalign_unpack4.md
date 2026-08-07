@@ -26,61 +26,91 @@
 
 ## 功能说明
 
-对齐数据搬运接口，从UB连续对齐搬入目的操作数，实现UNPACK4搬入模式：解压缩模式，按无符号整型u8加载VL/4长度数据，unpack到VL长度u32类型，中间位置补0。
+头文件路径为：`"c_api/reg_compute/reg_load.h"`。
 
-支持三种偏移方式：
-- 偏移固定传入0，由用户自行更新源操作数的地址。
-- 通过int32_t传入偏移，用户可以选择更新偏移或者更新源操作数的地址。
-- 通过addr_reg地址寄存器传入偏移，用户可以选择更新偏移或者更新源操作数的地址。
+从Unified Buffer（UB）中起始地址32字节对齐的位置读取VL/4长度的连续数据，在每个源元素后补3个0，并将得到的VL长度数据写入目的矢量数据寄存器。本接口提供三种功能模式：
+
+- 无偏移搬入：从`src`起始地址搬入数据。
+- 带偏移搬入：从`src`起始地址加上`offset * sizeof(dtype)`字节偏移位置开始搬入数据。
+- 带地址寄存器偏移搬入：通过`addr_reg`类型的地址寄存器偏移指定起始位置开始搬入数据。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
+
+本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为UB地址，目的操作数为矢量数据寄存器。本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
 ## 函数原型
 
-- 偏移固定传入0，由用户自行更新源操作数的地址
-  ```cpp
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
-  ```
-- 通过int32_t传入偏移
-  ```cpp
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
-  ```
-- 通过addr_reg地址寄存器传入偏移
-  ```cpp
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src, addr_reg offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
-  __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
-  ```
+### 无偏移搬入
+
+```c
+__simd_callee__ inline void asc_loadalign_unpack4(vector_<dtype>& dst,
+                                                  __ubuf__ <dtype>* src)
+```
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`。
+
+```c
+// 示例：从UB起始地址按b8解压缩粒度搬入一个VL长度的int8_t数据。
+__simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst,
+                                                  __ubuf__ int8_t* src)
+```
+
+### 带偏移搬入
+
+```c
+__simd_callee__ inline void asc_loadalign_unpack4(vector_<dtype>& dst,
+                                                  __ubuf__ <dtype>* src,
+                                                  int32_t offset)
+```
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`。
+
+```c
+// 示例：带偏移从UB按b8解压缩粒度搬入一个VL长度的int8_t数据。
+__simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst,
+                                                  __ubuf__ int8_t* src,
+                                                  int32_t offset)
+```
+
+### 带地址寄存器偏移搬入
+
+```c
+__simd_callee__ inline void asc_loadalign_unpack4(vector_<dtype>& dst,
+                                                  __ubuf__ <dtype>* src,
+                                                  addr_reg offset)
+```
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`。
+
+```c
+// 示例：按地址寄存器偏移从UB按b8解压缩粒度搬入一个VL长度的int8_t数据。
+__simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst,
+                                                  __ubuf__ int8_t* src,
+                                                  addr_reg offset)
+```
 
 ## 参数说明
 
-**表1** 参数说明
+**表1** 参数说明（无偏移搬入）
 
-| 参数名       | 输入/输出 | 描述               |
-| --------- | ----- | ---------------- |
-| dst       | 输出    | 目的操作数（矢量数据寄存器）。            |
-| src | 输入    | 源操作数（矢量）的起始地址。            |
-| offset | 输入    | 偏移量。            |
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的矢量数据寄存器，dtype必须和src一致。每个源元素后补3个0，写入VL长度数据。 |
+| src | 输入 | 源UB地址，起始地址需32字节对齐。从src起始位置读取VL/4长度数据。 |
+
+**表2** 参数说明（带偏移搬入）
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的矢量数据寄存器，dtype必须和src一致。每个源元素后补3个0，写入VL长度数据。 |
+| src | 输入 | 源UB地址，起始地址需32字节对齐。从src起始位置读取VL/4长度数据。 |
+| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。offset为负值表示源地址向低地址方向移动。 |
+
+**表3** 参数说明（带地址寄存器偏移搬入）
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的矢量数据寄存器，dtype必须和src一致。每个源元素后补3个0，写入VL长度数据。 |
+| src | 输入 | 源UB地址，起始地址需32字节对齐。从src起始位置读取VL/4长度数据。 |
+| offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，单位为元素个数。vector_bool使用b32模式，实际字节偏移为元素偏移乘4。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -94,7 +124,15 @@ PIPE_V
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
+- src与dst的dtype必须完全一致，dtype不一致触发异常。
+- 实际读取的UB地址和偏移后的UB地址必须32字节对齐，并且在UB地址空间内且不越界，否则会报错。
+- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
+- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 针对带地址寄存器偏移搬入：必须先调用`asc_update_addr_reg`接口。
 
 ## 调用示例
 

@@ -26,29 +26,46 @@
 
 ## 功能说明
 
-当[asc_ndim_copy_gm2ub](./asc_ndim_copy_gm2ub.md)接口的padding_mode参数为true时，该值将设置为Padding的填充固定值。fp8_e8m0_t，fp8_e5m2_t，fp8_e4m3fn_t类型的数据需转换成int8_t类型后再调用本接口。
+头文件路径为：`"c_api/vector_datamove/vector_datamove.h"`。
+
+设置多维数据搬运接口在常数填充模式下使用的填充值。配置写入后供后续调用的多维数据搬运接口在搬运过程中对边界区域执行常数填充时取用，填充值的数据类型应与搬运接口所选数据类型一致。本接口提供9个数据类型重载，按传入值的位宽分为三类：
+
+- **8位重载（`int8_t`、`uint8_t`）**：传入一个8位数据元素作为填充值，实现按原始比特位写入配置寄存器的低8位。
+- **16位重载（`int16_t`、`uint16_t`、`half`、`bfloat16_t`）**：传入一个16位数据元素作为填充值，实现按原始比特位写入配置寄存器的低16位。
+- **32位重载（`int32_t`、`uint32_t`、`float`）**：传入一个32位数据元素作为填充值，实现按原始比特位写入配置寄存器的全部32位。
+
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
+常数填充模式下，填充值通过本接口设置，填充元素数需通过`asc_set_ndim_pad_count`预先配置，两者配合构成多维数据搬运接口完整的padding参数集。
+
+`fp8_e8m0_t`、`fp8_e5m2_t`和`fp8_e4m3fn_t`类型的数据需转换为`int8_t`类型后再调用本接口。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_set_ndim_pad_value(int8_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(uint8_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(int16_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(uint16_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(half pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(bfloat16_t pad_value)
+### 模板原型（占位符形式）
+
+```c
+__aicore__ inline void asc_set_ndim_pad_value(<dtype> pad_value)
+```
+
+### dtype支持数据类型
+
+dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+### 典型示例
+
+```c
+// 示例：int32_t类型填充值设置。
 __aicore__ inline void asc_set_ndim_pad_value(int32_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(uint32_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(float pad_value)
 ```
 
 ## 参数说明
 
-**表1** 参数说明
+**表 1**  参数说明
 
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| pad_value | 输入 | 用于设置asc_ndim_copy_gm2ub接口Padding的填充固定值。数据类型需要与asc_ndim_copy_gm2ub接口中dst和src的数据类型保持一致。 |
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| `pad_value` | 输入 | 常数填充值，写入填充值配置寄存器后供后续调用的多维数据搬运接口在搬运边界区域执行常数填充时取用。填充值的数据类型应与搬运接口所选数据类型一致。按重载位宽分三类语义：<br>• `int8_t`、`uint8_t`重载：传入一个8位数据元素，实现按原始比特位写入寄存器低8位，对应搬运接口b8数据类型的填充。<br>• `int16_t`、`uint16_t`、`half`、`bfloat16_t`重载：传入一个16位数据元素，实现按原始比特位写入寄存器低16位，对应搬运接口b16数据类型的填充；`half`、`bfloat16_t`按16位浮点的原始比特位写入，硬件按b16取用。<br>• `int32_t`、`uint32_t`、`float`重载：传入一个32位数据元素，实现按原始比特位写入寄存器全部32位，对应搬运接口b32数据类型的填充；`float`按32位浮点的原始比特位写入。<br>取值范围：各重载类型的可表示范围（`int8_t`为[−2^7，2^7−1]，`uint8_t`为[0，2^8−1]，`int16_t`为[−2^15，2^15−1]，`uint16_t`为[0，2^16−1]，`half`、`bfloat16_t`为对应16位浮点的可表示值集合，`int32_t`为[−2^31，2^31−1]，`uint32_t`为[0，2^32−1]，`float`为32位浮点的可表示值集合）。所有重载位宽均不超过寄存器位宽（64位），无截断风险。 |
 
 ## 返回值说明
 
@@ -60,11 +77,21 @@ PIPE_S
 
 ## 约束说明
 
-需配合[asc_ndim_copy_gm2ub](./asc_ndim_copy_gm2ub.md)使用。
+### 通用约束
+
+- **本接口仅在AIV上生效，非AIV调用直接返回。**
+- 本接口仅设置填充值，实际填充由后续调用的多维数据搬运接口在搬运过程中取用该填充值完成，须先调用本接口写入配置，再调用对应搬运接口。
+- 本接口与配套setter接口协同配置多维数据搬运接口的完整padding参数集（填充元素数 + 填充值），调用搬运接口前须完成全部相关配套setter的配置（配套setter名见功能说明章节）。
+- 配置写入后对后续所有多维数据搬运接口调用生效，直至再次调用本接口覆盖配置；不同搬运任务间若需不同填充值，应在调用搬运接口前重新调用本接口设置。
+- 填充值仅在搬运接口选择常数填充模式时被取用；若选为最近值填充模式，填充值配置寄存器不被取用，本接口设置不生效。
+- `pad_value`的数据类型应与搬运接口所选数据类型一致：b8搬运使用8位重载，b16搬运使用16位重载，b32搬运使用32位重载；类型不匹配时硬件按所选搬运数据类型的位宽从配置寄存器取用对应位区间，填充结果与预期不符（硬件不报错）。
+- `fp8_e8m0_t`、`fp8_e5m2_t`和`fp8_e4m3fn_t`类型的数据需转换为`int8_t`类型后再调用本接口。
+- 8位、16位重载仅写入配置寄存器的低8位、低16位，高位保持为0；若后续搬运接口按b32取用配置寄存器全部32位，仅低8位、低16位为本接口写入的填充值，高位为0。
+- `pad_value`参数位宽不超过填充值配置寄存器位宽（64位），整个值原样写入寄存器对应位区间，无字段截断风险。
 
 ## 调用示例
 
 ```cpp
 half pad_value = 2.0;
-asc_set_ndim_pad_value(pad_value); 
+asc_set_ndim_pad_value(pad_value);
 ```

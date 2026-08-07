@@ -26,99 +26,60 @@
 
 ## 功能说明
 
-`asc_loadalign_deintlv_postupdate`用于从UB中读取以32B对齐地址`src`为起始位置的连续`2 x VL`长度数据。数据按元素类型宽度进行解释，在Load过程中完成解交织后，分别写入两个目的向量寄存器`dst0`和`dst1`。
+从Unified Buffer（UB）中起始地址32字节对齐的位置读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`，每个矢量数据寄存器写入VL长度数据。读取完成后启用PostUpdate模式，自动将src地址移动`offset * sizeof(dtype)`字节，无需手动偏移地址。
 
-与[`asc_loadalign_deintlv`](asc_loadalign_deintlv.md)不同，该接口在完成数据加载后，会对源地址参数`src`执行后更新操作：
-
-```cpp
-src = src + offset
-```
-
-其中，`offset`的单位为元素个数，实际地址偏移字节数为：`offset * sizeof(data_type)`。
-
-以`float`数据类型、Ascend 950PR/Ascend 950DT产品为例，若`VL = 256B`、`src = 32`、`offset = 128`，调用`asc_loadalign_deintlv_postupdate`后，数据从UB到Reg的排布如下图所示，同时`src`会更新为`544`，可直接用于后续计算。
-
-![](../../figures/asc_loadalign_deintlv_postupdate.png)
-
-> 提示：
->
-> 1. 使用本接口需要包含头文件`reg_load.h`。
-> 2. 本接口会修改输入的UB地址参数`src`。若需要保留原始地址，请使用[`asc_loadalign_deintlv`](asc_loadalign_deintlv.md)。
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
 ## 函数原型
 
-支持的数据类型请参见[数据类型](#data-type)章节。
+```c
+__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_<dtype>& dst0,
+                                                             vector_<dtype>& dst1,
+                                                             __ubuf__ <dtype>*& src,
+                                                             int32_t offset)
+```
 
-```cpp
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int8_t& dst0, vector_int8_t& dst1, __ubuf__ int8_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_uint8_t& dst0, vector_uint8_t& dst1, __ubuf__ uint8_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_uint16_t& dst0, vector_uint16_t& dst1, __ubuf__ uint16_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_half& dst0, vector_half& dst1, __ubuf__ half*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, __ubuf__ bfloat16_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int32_t& dst0, vector_int32_t& dst1, __ubuf__ int32_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_uint32_t& dst0, vector_uint32_t& dst1, __ubuf__ uint32_t*& src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_float& dst0, vector_float& dst1, __ubuf__ float*& src, int32_t offset)
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+```c
+// 示例：int16_t类型去交织搬入并更新src。
+__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int16_t& dst0,
+                                                             vector_int16_t& dst1,
+                                                             __ubuf__ int16_t*& src,
+                                                             int32_t offset)
 ```
 
 ## 参数说明
 
 **表1** 参数说明
 
-| 参数名 | 输入/输出 | 说明 |
-| :--- | :--- | :--- |
-| dst0 | 输出 | 第一个目的向量寄存器。 |
-| dst1 | 输出 | 第二个目的向量寄存器。 |
-| src | 输入/输出 | 源数据在UB中的起始地址，要求32B对齐。接口执行完成后，`src`会更新为`src + offset`。 |
-| offset | 输入 | 地址偏移量，单位为元素个数。 |
-
-向量寄存器类型的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
-
-## 数据类型<a name="data-type"></a>
-
-`asc_loadalign_deintlv_postupdate`支持的数据类型如下表所示。
-
-**表2** 数据类型
-
-| 源数据类型`src` | 目的寄存器类型`dst0/dst1` |
-| :--- | :--- |
-| `int4b_t` | `vector_int4x2_t` |
-| `fp4x2_e1m2_t` | `vector_fp4x2_e1m2_t` |
-| `fp4x2_e2m1_t` | `vector_fp4x2_e2m1_t` |
-| `int8_t` | `vector_int8_t` |
-| `uint8_t` | `vector_uint8_t` |
-| `fp8_e4m3fn_t` | `vector_fp8_e4m3fn_t` |
-| `fp8_e5m2_t` | `vector_fp8_e5m2_t` |
-| `fp8_e8m0_t` | `vector_fp8_e8m0_t` |
-| `hifloat8_t` | `vector_hifloat8_t` |
-| `int16_t` | `vector_int16_t` |
-| `uint16_t` | `vector_uint16_t` |
-| `half` | `vector_half` |
-| `bfloat16_t` | `vector_bfloat16_t` |
-| `int32_t` | `vector_int32_t` |
-| `uint32_t` | `vector_uint32_t` |
-| `float` | `vector_float` |
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst0 | 输出 | 目的矢量数据寄存器。接口从UB连续读入2×VL字节长度数据，偶数下标元素写入`dst0`，搬入VL长度数据。 |
+| dst1 | 输出 | 目的矢量数据寄存器。接口从UB连续读入2×VL字节长度数据，奇数下标元素写入`dst1`，搬入VL长度数据。 |
+| src | 输入/输出 | 源UB地址，起始地址需32字节对齐。从src起始位置读取2×VL长度数据。 |
+| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。offset为负值表示源地址向低地址方向移动。 |
 
 ## 返回值说明
 
-无。
+无
 
 ## 流水类型
 
-`PIPE_V`
+PIPE_V
 
 ## 约束说明
 
-- `src`必须为32B对齐地址，且访问范围不能超过UB有效地址上界减去`2 x VL`，否则可能导致UB越界访问。
-- 在循环中使用本接口时，`offset`的取值需要保证更新后的`src`仍满足32B对齐要求。
-- `offset`以元素为单位，实际地址步长需要结合源数据类型宽度进行换算。
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
+- src与dst的dtype必须完全一致，dtype不一致触发异常。
+- 实际读取的UB地址和偏移后的UB地址必须32字节对齐，并且在UB地址空间内且不越界，否则会报错。
+- dst0与dst1必须为不同的矢量数据寄存器。
+- offset取0时，接口仍从当前src地址搬入数据，src指针保持不变，可重复读取同一组源数据。
+- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
+- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ## 调用示例
 
