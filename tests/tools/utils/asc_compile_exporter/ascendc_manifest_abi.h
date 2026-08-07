@@ -29,12 +29,12 @@ typedef struct AcCompileResourceExtension {
     uint32_t version;
     uint64_t flags;
     const void* data;
-    uint64_t data_size;
+    uint64_t dataSize;
 } AcCompileResourceExtension;
 
 typedef struct AcCompileResourceFile {
-    AcString file_name;
-    AcString file_path;
+    AcString fileName;
+    AcString filePath;
     const uint8_t* data;
     uint64_t size;
 } AcCompileResourceFile;
@@ -42,23 +42,23 @@ typedef struct AcCompileResourceFile {
 typedef struct AcCompileResourceManifest {
     AcString json;
     const AcCompileResourceFile* files;
-    uint64_t file_count;
+    uint64_t fileCount;
 } AcCompileResourceManifest;
 
 typedef struct AcCompileResourceBundleHeader {
     uint32_t magic;
-    uint32_t abi_version;
-    uint32_t struct_size;
+    uint32_t abiVersion;
+    uint32_t structSize;
     uint32_t flags;
 } AcCompileResourceBundleHeader;
 
 typedef struct AcCompileResourceBundle {
     AcCompileResourceBundleHeader header;
-    AcString package_id;
+    AcString packageId;
     const AcCompileResourceManifest* manifests;
-    uint64_t manifest_count;
+    uint64_t manifestCount;
     const AcCompileResourceExtension* extensions;
-    uint64_t extension_count;
+    uint64_t extensionCount;
 } AcCompileResourceBundle;
 
 typedef const AcCompileResourceBundleHeader* (*AscendcGetCompileResourceBundleFn)(void);

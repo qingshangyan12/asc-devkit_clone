@@ -25,37 +25,13 @@
 
 #include <gtest/gtest.h>
 
-#include "ascendc_compile_resource/ascendc_manifest_abi.h"
+#include "ascendc_manifest_abi.h"
 #include "manifest_bundle_compiler.h"
 
 namespace {
 
 using ascendc::manifest_generator::BuildCollectedBundleRequest;
 using ascendc::manifest_generator::ManifestBundleCompiler;
-
-struct SavedEnvironment {
-    SavedEnvironment() : exists(false) {}
-
-    SavedEnvironment(bool existsValue, const std::string& valueValue) : exists(existsValue), value(valueValue) {}
-
-    bool exists;
-    std::string value;
-};
-
-SavedEnvironment SaveEnvironment(const char* name)
-{
-    const char* value = std::getenv(name);
-    return SavedEnvironment(value != nullptr, value == nullptr ? std::string() : std::string(value));
-}
-
-void RestoreEnvironment(const char* name, const SavedEnvironment& saved) noexcept
-{
-    if (saved.exists) {
-        (void)setenv(name, saved.value.c_str(), 1);
-    } else {
-        (void)unsetenv(name);
-    }
-}
 
 std::string JoinTestPath(const std::string& left, const std::string& right)
 {
@@ -163,8 +139,6 @@ class AscCompileExporterTest : public testing::Test {
 protected:
     void SetUp() override
     {
-        ascendHome_ = SaveEnvironment("ASCEND_HOME_PATH");
-
         const char* temporary = std::getenv("TMPDIR");
         std::string pathTemplate = JoinTestPath(
             temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary, "asc_compile_exporter_ut_XXXXXX");
@@ -173,15 +147,9 @@ protected:
         char* created = mkdtemp(buffer.data());
         ASSERT_NE(created, nullptr);
         root_ = created;
-
-        ASSERT_EQ(setenv("ASCEND_HOME_PATH", ASC_COMPILE_EXPORTER_TEST_CANN_HOME, 1), 0);
     }
 
-    void TearDown() override
-    {
-        RestoreEnvironment("ASCEND_HOME_PATH", ascendHome_);
-        RemoveTestTree(root_);
-    }
+    void TearDown() override { RemoveTestTree(root_); }
 
     BuildCollectedBundleRequest Request(const std::string& packageId = "test_package") const
     {
@@ -214,9 +182,6 @@ protected:
     }
 
     std::string root_;
-
-private:
-    SavedEnvironment ascendHome_;
 };
 
 TEST_F(AscCompileExporterTest, RejectsEmptyPackageId)
@@ -336,26 +301,26 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
     const AcCompileResourceBundleHeader* header = getter();
     ASSERT_NE(header, nullptr);
     EXPECT_EQ(header->magic, AC_COMPILE_RESOURCE_MAGIC);
-    EXPECT_EQ(header->abi_version, AC_COMPILE_RESOURCE_ABI_VERSION);
-    EXPECT_EQ(header->struct_size, sizeof(AcCompileResourceBundle));
+    EXPECT_EQ(header->abiVersion, AC_COMPILE_RESOURCE_ABI_VERSION);
+    EXPECT_EQ(header->structSize, sizeof(AcCompileResourceBundle));
     EXPECT_EQ(header->flags, 0U);
 
     const auto* bundle = reinterpret_cast<const AcCompileResourceBundle*>(header);
-    EXPECT_EQ(ToString(bundle->package_id), "multi_manifest");
-    ASSERT_EQ(bundle->manifest_count, 2U);
+    EXPECT_EQ(ToString(bundle->packageId), "multi_manifest");
+    ASSERT_EQ(bundle->manifestCount, 2U);
     EXPECT_EQ(bundle->extensions, nullptr);
-    EXPECT_EQ(bundle->extension_count, 0U);
+    EXPECT_EQ(bundle->extensionCount, 0U);
 
     uint64_t totalFiles = 0U;
     bool foundNestedHeader = false;
     bool foundEmptyFile = false;
     bool foundFirstSource = false;
-    for (uint64_t manifestIndex = 0U; manifestIndex < bundle->manifest_count; ++manifestIndex) {
+    for (uint64_t manifestIndex = 0U; manifestIndex < bundle->manifestCount; ++manifestIndex) {
         const AcCompileResourceManifest& manifest = bundle->manifests[manifestIndex];
-        totalFiles += manifest.file_count;
-        for (uint64_t fileIndex = 0U; fileIndex < manifest.file_count; ++fileIndex) {
+        totalFiles += manifest.fileCount;
+        for (uint64_t fileIndex = 0U; fileIndex < manifest.fileCount; ++fileIndex) {
             const AcCompileResourceFile& file = manifest.files[fileIndex];
-            const std::string path = ToString(file.file_path);
+            const std::string path = ToString(file.filePath);
             foundNestedHeader = foundNestedHeader || path == "resources/include/nested.h";
             foundEmptyFile = foundEmptyFile || path == "resources/empty.bin";
             foundFirstSource = foundFirstSource ||

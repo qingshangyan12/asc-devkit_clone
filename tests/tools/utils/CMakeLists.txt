@@ -208,13 +208,11 @@ add_executable(ascendc_ut_asc_compile_exporter
 function(configure_asc_compile_exporter_test target_name)
     target_compile_definitions(${target_name} PRIVATE
         UT_TEST
-        ASC_COMPILE_EXPORTER_TEST_CANN_HOME="${CMAKE_CURRENT_SOURCE_DIR}/asc_compile_exporter/fixtures/cann"
     )
 
     target_include_directories(${target_name} PRIVATE
         ${ASCENDC_DIR}/tools/build/asc_compile_exporter
         ${ASCENDC_DIR}/tools/build/common
-        ${CMAKE_CURRENT_SOURCE_DIR}/asc_compile_exporter/fixtures/cann/include
     )
 
     target_compile_options(${target_name} PRIVATE

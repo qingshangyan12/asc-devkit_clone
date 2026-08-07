@@ -524,6 +524,9 @@ public:
     void Generate() const
     {
         ASCENDLOGD("Generating bundle sources in %s", workDir_.c_str());
+        const std::string abiHeader = JoinPath(workDir_, "ascendc_manifest_abi.h");
+        ASCENDLOGD("Generating bundle ABI header %s", abiHeader.c_str());
+        EmitAbiHeader(abiHeader);
         const std::string bundleSource = JoinPath(workDir_, "compile_resource_bundle.cpp");
         ASCENDLOGD("Generating bundle source %s", bundleSource.c_str());
         EmitBundleSource(bundleSource);
@@ -539,6 +542,77 @@ public:
     }
 
 private:
+    static void EmitAbiHeader(const std::string& path)
+    {
+        std::ofstream output = OpenGeneratedFile(path);
+        output << R"header(#ifndef ASCENDC_MANIFEST_ABI_H
+#define ASCENDC_MANIFEST_ABI_H
+
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define AC_COMPILE_RESOURCE_MAGIC 0x41435253u
+#define AC_COMPILE_RESOURCE_ABI_VERSION 1u
+#define AC_COMPILE_RESOURCE_EXTENSION_REQUIRED 0x1ULL
+
+typedef struct AcString {
+    const char *data;
+    uint64_t size;
+} AcString;
+
+typedef struct AcCompileResourceExtension {
+    uint32_t type;
+    uint32_t version;
+    uint64_t flags;
+    const void *data;
+    uint64_t dataSize;
+} AcCompileResourceExtension;
+
+typedef struct AcCompileResourceFile {
+    AcString fileName;
+    AcString filePath;
+    const uint8_t *data;
+    uint64_t size;
+} AcCompileResourceFile;
+
+typedef struct AcCompileResourceManifest {
+    AcString json;
+    const AcCompileResourceFile *files;
+    uint64_t fileCount;
+} AcCompileResourceManifest;
+
+typedef struct AcCompileResourceBundleHeader {
+    uint32_t magic;
+    uint32_t abiVersion;
+    uint32_t structSize;
+    uint32_t flags;
+} AcCompileResourceBundleHeader;
+
+typedef struct AcCompileResourceBundle {
+    AcCompileResourceBundleHeader header;
+    AcString packageId;
+    const AcCompileResourceManifest *manifests;
+    uint64_t manifestCount;
+    const AcCompileResourceExtension *extensions;
+    uint64_t extensionCount;
+} AcCompileResourceBundle;
+
+typedef const AcCompileResourceBundleHeader *(*AscendcGetCompileResourceBundleFn)(void);
+
+const AcCompileResourceBundleHeader *AscendcGetCompileResourceBundle(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ASCENDC_MANIFEST_ABI_H
+)header";
+        FinishOutput(output, path);
+    }
+
     static void EmitByteArray(
         std::ostream& output, const std::string& name, const uint8_t* data, size_t size, bool nulTerminate)
     {
@@ -566,7 +640,7 @@ private:
     {
         std::ofstream output = OpenGeneratedFile(path);
         const std::string prefix = "g_manifest_" + std::to_string(unitIndex);
-        output << "#include \"ascendc_compile_resource/ascendc_manifest_abi.h\"\n\nnamespace {\n";
+        output << "#include \"ascendc_manifest_abi.h\"\n\nnamespace {\n";
         EmitString(output, prefix + "_json", unit.json);
         for (size_t fileIndex = 0; fileIndex < unit.files.size(); ++fileIndex) {
             const ResourceFile& file = unit.files[fileIndex];
@@ -596,7 +670,7 @@ private:
     void EmitBundleSource(const std::string& path) const
     {
         std::ofstream output = OpenGeneratedFile(path);
-        output << "#include \"ascendc_compile_resource/ascendc_manifest_abi.h\"\n\n"
+        output << "#include \"ascendc_manifest_abi.h\"\n\n"
                   "namespace ascendc {\nnamespace resource {\nnamespace generated {\n";
         for (size_t unitIndex = 0; unitIndex < units_.size(); ++unitIndex) {
             output << "AcCompileResourceManifest GetManifest" << unitIndex << "();\n";
@@ -632,8 +706,7 @@ private:
                   "-Wl,-z,relro,-z,now,-z,noexecstack "
                   "-o \"$${ASCENDC_BUNDLE_OUTPUT}\"\n\n"
                   "%.o: %.cpp\n"
-                  "\t\"$${ASCENDC_BUNDLE_CXX}\" -std=c++11 -fPIC -fvisibility=hidden -O2 "
-                  "-I\"$${ASCENDC_BUNDLE_INCLUDE_DIR}\" -c $< -o $@\n";
+                  "\t\"$${ASCENDC_BUNDLE_CXX}\" -std=c++11 -fPIC -fvisibility=hidden -O2 -c $< -o $@\n";
         FinishOutput(output, path);
     }
 
@@ -881,34 +954,14 @@ public:
     {
         const std::string make = ExecutableLocator::FindRequired("make");
         const std::string compiler = ExecutableLocator::FindCompiler();
-        const std::string includeDir = CannIncludeDirectory();
-        ASCENDLOGD(
-            "Building bundle with make=%s compiler=%s include=%s jobs=%u", make.c_str(), compiler.c_str(),
-            includeDir.c_str(), jobs_);
+        ASCENDLOGD("Building bundle with make=%s compiler=%s jobs=%u", make.c_str(), compiler.c_str(), jobs_);
         ProcessRunner::Run(
             {make, "-C", workDir_, "-f", "Makefile", "-B", "-j" + std::to_string(jobs_)},
-            {{"ASCENDC_BUNDLE_CXX", compiler},
-             {"ASCENDC_BUNDLE_INCLUDE_DIR", includeDir},
-             {"ASCENDC_BUNDLE_OUTPUT", output_}});
+            {{"ASCENDC_BUNDLE_CXX", compiler}, {"ASCENDC_BUNDLE_OUTPUT", output_}});
         ASCENDLOGI("Built staged compile resource bundle %s", output_.c_str());
     }
 
 private:
-    static std::string CannIncludeDirectory()
-    {
-        const char* cannHome = std::getenv("ASCEND_HOME_PATH");
-        if (cannHome == nullptr || cannHome[0] == '\0') {
-            throw std::runtime_error("ASCEND_HOME_PATH is not configured");
-        }
-        const std::string includeDir = JoinPath(cannHome, "include");
-        const std::string abiHeader = JoinPath(includeDir, "ascendc_compile_resource/ascendc_manifest_abi.h");
-        struct stat info {};
-        if (lstat(abiHeader.c_str(), &info) != 0 || !S_ISREG(info.st_mode)) {
-            throw std::runtime_error("CANN package include is missing ascendc_manifest_abi.h: " + includeDir);
-        }
-        return CanonicalDirectory(includeDir, "CANN package include directory");
-    }
-
     std::string workDir_;
     std::string output_;
     uint32_t jobs_ = 1U;

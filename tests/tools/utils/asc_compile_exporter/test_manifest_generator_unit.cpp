@@ -312,17 +312,23 @@ TEST_F(ManifestGeneratorModuleTest, SourceGeneratorEmitsBundleManifestAndMakefil
 
     BundleSourceGenerator(work, "unit_package", units).Generate();
 
+    const std::string abiHeader = ReadTestFile(JoinPath(work, "ascendc_manifest_abi.h"));
     const std::string bundleSource = ReadTestFile(JoinPath(work, "compile_resource_bundle.cpp"));
     const std::string manifestSource = ReadTestFile(JoinPath(work, "manifest_0.cpp"));
     const std::string makefile = ReadTestFile(JoinPath(work, "Makefile"));
+    EXPECT_NE(abiHeader.find("AC_COMPILE_RESOURCE_MAGIC"), std::string::npos);
+    EXPECT_NE(abiHeader.find("typedef struct AcCompileResourceBundle"), std::string::npos);
+    EXPECT_NE(abiHeader.find("AscendcGetCompileResourceBundle(void)"), std::string::npos);
+    EXPECT_NE(bundleSource.find("#include \"ascendc_manifest_abi.h\""), std::string::npos);
     EXPECT_NE(bundleSource.find("GetManifest0()"), std::string::npos);
     EXPECT_NE(bundleSource.find("1ULL, nullptr, 0ULL"), std::string::npos);
+    EXPECT_NE(manifestSource.find("#include \"ascendc_manifest_abi.h\""), std::string::npos);
     EXPECT_NE(manifestSource.find("0, 127, 255"), std::string::npos);
     EXPECT_NE(manifestSource.find("g_manifest_0_file_0_path_bytes"), std::string::npos);
     EXPECT_NE(manifestSource.find("g_manifest_0_file_0_path ="), std::string::npos);
     EXPECT_NE(manifestSource.find("20ULL"), std::string::npos);
     EXPECT_NE(makefile.find("manifest_0.cpp"), std::string::npos);
-    EXPECT_NE(makefile.find("ASCENDC_BUNDLE_INCLUDE_DIR"), std::string::npos);
+    EXPECT_EQ(makefile.find("ASCENDC_BUNDLE_INCLUDE_DIR"), std::string::npos);
     EXPECT_NE(makefile.find("-std=c++11"), std::string::npos);
     EXPECT_THROW(BundleSourceGenerator(work, "unit_package", units).Generate(), std::runtime_error);
 }
@@ -451,18 +457,17 @@ TEST_F(ManifestGeneratorModuleTest, ProcessRunnerTimesOutAndReapsProcessGroup)
     EXPECT_THROW(ProcessRunner::Run({"/bin/true"}, {}, std::chrono::milliseconds(0U)), std::invalid_argument);
 }
 
-TEST_F(ManifestGeneratorModuleTest, MakeBundleBuilderValidatesCannHomeAndAbiHeader)
+TEST_F(ManifestGeneratorModuleTest, MakeBundleBuilderBuildsGeneratedSourcesWithoutCannHome)
 {
-    {
-        ScopedEnvironment cannHome("ASCEND_HOME_PATH", nullptr);
-        EXPECT_THROW(MakeBundleBuilder(root_, JoinPath(root_, "bundle.so"), 1U).Build(), std::runtime_error);
-    }
-    {
-        const std::string cann = JoinPath(root_, "incomplete-cann");
-        CreateDirectories(JoinPath(cann, "include"));
-        ScopedEnvironment cannHome("ASCEND_HOME_PATH", cann.c_str());
-        EXPECT_THROW(MakeBundleBuilder(root_, JoinPath(root_, "bundle.so"), 1U).Build(), std::runtime_error);
-    }
+    const std::string work = JoinPath(root_, "standalone-build");
+    const std::string output = JoinPath(root_, "bundle.so");
+    CreateDirectories(work);
+    const std::vector<ManifestUnit> units = {{"{\"base_dir\":\"resources\"}", {}}};
+    BundleSourceGenerator(work, "standalone_package", units).Generate();
+    ScopedEnvironment cannHome("ASCEND_HOME_PATH", nullptr);
+
+    EXPECT_NO_THROW(MakeBundleBuilder(work, output, 1U).Build());
+    EXPECT_TRUE(IsRegularPath(output));
 }
 
 TEST_F(ManifestGeneratorModuleTest, BundlePublisherPublishesFilesAndRejectsSymlinks)

@@ -16,7 +16,7 @@ add_executable(asc_compile_exporter
   manifest_bundle_compiler.cpp
 )
 
-target_compile_options(asc_compile_exporter PRIVATE -Wextra -Wfloat-equal -fno-common -fpie -Werror -DNO_OPERATOR_IMPL)
+target_compile_options(asc_compile_exporter PRIVATE -Wextra -Wfloat-equal -fno-common -fpie -Werror)
 
 if(BUILD_OPEN_PROJECT)
   target_include_directories(asc_compile_exporter PRIVATE
