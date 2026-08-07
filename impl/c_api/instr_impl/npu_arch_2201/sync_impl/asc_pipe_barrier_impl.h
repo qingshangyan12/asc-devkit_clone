@@ -27,21 +27,27 @@
 
 __aicore__ inline void asc_sync_pipe_impl(pipe_t pipe)
 {
-    if (pipe == pipe_t::PIPE_V) {
-        pipe_barrier(pipe_t::PIPE_V);
-    } else if (pipe == pipe_t::PIPE_M) {
-        pipe_barrier(pipe_t::PIPE_M);
-    } else if (pipe == pipe_t::PIPE_MTE1) {
-        pipe_barrier(pipe_t::PIPE_MTE1);
-    } else if (pipe == pipe_t::PIPE_MTE2) {
-        pipe_barrier(pipe_t::PIPE_MTE2);
-    } else if (pipe == pipe_t::PIPE_MTE3) {
-        pipe_barrier(pipe_t::PIPE_MTE3);
-    } else if (pipe == pipe_t::PIPE_FIX) {
-        pipe_barrier(pipe_t::PIPE_FIX);
-    } else if (pipe == pipe_t::PIPE_ALL) {
-        pipe_barrier(pipe_t::PIPE_ALL);
-    } else {}
+    if ASC_IS_AIC {
+        if (pipe == pipe_t::PIPE_M) {
+            pipe_barrier(pipe_t::PIPE_M);
+        } else if (pipe == pipe_t::MTE1) {
+            pipe_barrier(pipe_t::PIPE_MTE1);
+        } else if (pipe == pipe_t::MTE2) {
+            pipe_barrier(pipe_t::PIPE_MTE2);
+        } else if (pipe == pipe_t::ALL) {
+            pipe_barrier(pipe_t::PIPE_ALL);
+        } else if (pipe == pipe_t::FIX) {
+            pipe_barrier(pipe_t::PIPE_FIX);
+        }
+    } else if ASC_IS_AIV {
+        if (pipe == pipe_t::PIPE_M) {
+            pipe_barrier(pipe_t::PIPE_M);
+        } else if (pipe == pipe_t::MTE2) {
+            pipe_barrier(pipe_t::PIPE_MTE2);
+        } else if (pipe == pipe_t::MTE3) {
+            pipe_barrier(pipe_t::PIPE_MTE3);
+        }
+    }
 }
 
 __aicore__ inline void asc_sync_vec_impl() { pipe_barrier(pipe_t::PIPE_ALL); }

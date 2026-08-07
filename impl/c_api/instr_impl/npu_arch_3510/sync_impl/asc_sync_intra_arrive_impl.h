@@ -26,16 +26,29 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
 __aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint64_t sync_id)
-{
-    if (pipe == pipe_t::PIPE_S) {
-        set_intra_block(pipe_t::PIPE_S, sync_id);
-    } else if (pipe == pipe_t::PIPE_V) {
-        set_intra_block(pipe_t::PIPE_V, sync_id);
-    } else if (pipe == pipe_t::PIPE_MTE2) {
-        set_intra_block(pipe_t::PIPE_MTE2, sync_id);
-    } else if (pipe == pipe_t::PIPE_MTE3) {
-        set_intra_block(pipe_t::PIPE_MTE3, sync_id);
-    } else {}
+{、
+
+    if ASC_IS_AIC {
+        if (pipe == pipe_t::PIPE_S) {
+            set_intra_block(pipe_t::PIPE_S, sync_id);
+        } else if (pipe == pipe_t::PIPE_M) {
+            set_intra_block(pipe_t::PIPE_M, sync_id);
+        } else if (pipe == pipe_t::PIPE_MTE1) {
+            set_intra_block(pipe_t::PIPE_MTE1, sync_id);
+        } else if (pipe == pipe_t::PIPE_MTE2) {
+            set_intra_block(pipe_t::PIPE_MTE2, sync_id);
+        } else if (pipe == pipe_t::PIPE_FIX) {
+            set_intra_block(pipe_t::PIPE_FIX, sync_id);
+        }
+    } else if ASC_IS_AIV {
+        if (pipe == pipe_t::PIPE_S) {
+            set_intra_block(pipe_t::PIPE_S, sync_id);
+        } else if (pipe == pipe_t::PIPE_MTE2) {
+            set_intra_block(pipe_t::PIPE_MTE2, sync_id);
+        } else if (pipe == pipe_t::PIPE_MTE3) {
+            set_intra_block(pipe_t::PIPE_MTE3, sync_id);
+        }
+    }
 }
 
 __aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint8_t sync_id)

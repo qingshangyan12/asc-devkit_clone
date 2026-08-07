@@ -22,119 +22,121 @@
 
 __aicore__ inline void asc_sync_notify_impl(pipe_t pipe, pipe_t tpipe, event_t id)
 {
+    if ASC_IS_AIC {
+        asc_sync_notify_impl_aic(pipe, tpipe, id);
+    } else if ASC_IS_AIV {
+        asc_sync_notify_impl_aiv(pipe, tpipe, id);
+    }
+}
+
+__aicore__ inline void asc_sync_notify_impl_aic(pipe_t pipe, pipe_t tpipe, event_t id)
+{
     if (pipe == pipe_t::PIPE_S) {
         if (tpipe == pipe_t::PIPE_S) {
             set_flag(pipe_t::PIPE_S, pipe_t::PIPE_S, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_V) {
-            set_flag(pipe_t::PIPE_S, pipe_t::PIPE_V, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_M) {
             set_flag(pipe_t::PIPE_S, pipe_t::PIPE_M, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE1) {
             set_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE2) {
             set_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE3) {
-            set_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_FIX) {
             set_flag(pipe_t::PIPE_S, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
-        } else {}
-    } else if (pipe == pipe_t::PIPE_V) {
-        if (tpipe == pipe_t::PIPE_S) {
-            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_S, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_V) {
-            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_V, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_M) {
-            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_M, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE1) {
-            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE2) {
-            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE3) {
-            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_FIX) {
-            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
-        } else {}
+        }
     } else if (pipe == pipe_t::PIPE_M) {
         if (tpipe == pipe_t::PIPE_S) {
             set_flag(pipe_t::PIPE_M, pipe_t::PIPE_S, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_V) {
-            set_flag(pipe_t::PIPE_M, pipe_t::PIPE_V, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_M) {
             set_flag(pipe_t::PIPE_M, pipe_t::PIPE_M, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE1) {
             set_flag(pipe_t::PIPE_M, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE2) {
             set_flag(pipe_t::PIPE_M, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE3) {
-            set_flag(pipe_t::PIPE_M, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_FIX) {
             set_flag(pipe_t::PIPE_M, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
-        } else {}
+        }
     } else if (pipe == pipe_t::PIPE_MTE1) {
         if (tpipe == pipe_t::PIPE_S) {
             set_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_S, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_V) {
-            set_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_V, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_M) {
             set_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_M, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE1) {
             set_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE2) {
             set_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE3) {
-            set_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_FIX) {
             set_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
-        } else {}
+        }
     } else if (pipe == pipe_t::PIPE_MTE2) {
         if (tpipe == pipe_t::PIPE_S) {
             set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_S, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_V) {
-            set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_M) {
             set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_M, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE1) {
             set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE2) {
             set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE3) {
-            set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_FIX) {
             set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
-        } else {}
-    } else if (pipe == pipe_t::PIPE_MTE3) {
-        if (tpipe == pipe_t::PIPE_S) {
-            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_S, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_V) {
-            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_V, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_M) {
-            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_M, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE1) {
-            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE2) {
-            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE3) {
-            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_FIX) {
-            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
-        } else {}
+        }
     } else if (pipe == pipe_t::PIPE_FIX) {
         if (tpipe == pipe_t::PIPE_S) {
             set_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_S, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_V) {
-            set_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_V, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_M) {
             set_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_M, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE1) {
             set_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_MTE2) {
             set_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
-        } else if (tpipe == pipe_t::PIPE_MTE3) {
-            set_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
         } else if (tpipe == pipe_t::PIPE_FIX) {
             set_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
-        } else {}
-    } else {}
+        }
+    }
+}
+
+__aicore__ inline void asc_sync_notify_impl_aiv(pipe_t pipe, pipe_t tpipe, event_t id)
+{
+    if (pipe == pipe_t::PIPE_S) {
+        if (tpipe == pipe_t::PIPE_S) {
+            set_flag(pipe_t::PIPE_S, pipe_t::PIPE_S, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_V) {
+            set_flag(pipe_t::PIPE_S, pipe_t::PIPE_V, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_MTE2) {
+            set_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_MTE3) {
+            set_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
+        }
+    } else if (pipe == pipe_t::PIPE_V) {
+        if (tpipe == pipe_t::PIPE_S) {
+            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_S, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_V) {
+            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_V, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_MTE2) {
+            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_MTE3) {
+            set_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
+        }
+    } else if (pipe == pipe_t::PIPE_MTE2) {
+        if (tpipe == pipe_t::PIPE_S) {
+            set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_S, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_V) {
+            set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_MTE2) {
+            set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_MTE3) {
+            set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
+        }
+    } else if (pipe == pipe_t::PIPE_MTE3) {
+        if (tpipe == pipe_t::PIPE_S) {
+            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_S, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_V) {
+            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_V, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_MTE2) {
+            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+        } else if (tpipe == pipe_t::PIPE_MTE3) {
+            set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
+        }
+    }
 }
 
 #endif

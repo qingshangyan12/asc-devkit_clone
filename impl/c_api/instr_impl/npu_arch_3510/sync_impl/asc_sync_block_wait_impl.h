@@ -27,15 +27,27 @@
 
 __aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, int64_t flag_id)
 {
-    if (pipe == pipe_t::PIPE_S) {
-        wait_flag_dev(pipe_t::PIPE_S, flag_id);
-    } else if (pipe == pipe_t::PIPE_V) {
-        wait_flag_dev(pipe_t::PIPE_V, flag_id);
-    } else if (pipe == pipe_t::PIPE_MTE2) {
-        wait_flag_dev(pipe_t::PIPE_MTE2, flag_id);
-    } else if (pipe == pipe_t::PIPE_MTE3) {
-        wait_flag_dev(pipe_t::PIPE_MTE3, flag_id);
-    } else {}
+    if ASC_IS_AIC {
+        if (pipe == pipe_t::PIPE_S) {
+            wait_flag_dev(pipe_t::PIPE_S, flag_id);
+        } else if (pipe == pipe_t::PIPE_M) {
+            wait_flag_dev(pipe_t::PIPE_M, flag_id);
+        } else if (pipe == pipe_t::PIPE_MTE1) {
+            wait_flag_dev(pipe_t::PIPE_MTE1, flag_id);
+        } else if (pipe == pipe_t::PIPE_MTE2) {
+            wait_flag_dev(pipe_t::PIPE_MTE2, flag_id);
+        } else if (pipe == pipe_t::PIPE_FIX) {
+            wait_flag_dev(pipe_t::PIPE_FIX, flag_id);
+        }
+    } else if ASC_IS_AIV {
+        if (pipe == pipe_t::PIPE_S) {
+            wait_flag_dev(pipe_t::PIPE_S, flag_id);
+        } else if (pipe == pipe_t::PIPE_MTE2) {
+            wait_flag_dev(pipe_t::PIPE_MTE2, flag_id);
+        } else if (pipe == pipe_t::PIPE_MTE3) {
+            wait_flag_dev(pipe_t::PIPE_MTE3, flag_id);
+        }
+    }
 }
 
 __aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, uint8_t flag_id)
