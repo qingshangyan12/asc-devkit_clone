@@ -12,7 +12,7 @@ BUFFER_BYTES = 4096
 
 
 def architecture(path: Path, markdown: str) -> str:
-    if path.stem in {"asc_mmad", "asc_mmad_sparse"}:
+    if path.stem == "asc_mmad_sparse":
         return "dav-2201"
     line = next((line for line in markdown.splitlines() if "Ascend 950PR/Ascend 950DT" in line), "")
     return "dav-3510" if "：支持" in line else "dav-2201"
@@ -160,6 +160,8 @@ def generate(doc_dir: Path) -> None:
         items = prototypes(markdown)
         if not items:
             continue
+        if path.stem == "asc_mmad" and architecture(path, markdown) == "dav-3510":
+            items = [(api, args) for api, args in items if api not in {"asc_mmad_s4", "asc_mmad_s4_sync"}]
         body, unsupported = calls_for(items)
         if unsupported:
             pending.append((path.name, sorted(set(unsupported))))

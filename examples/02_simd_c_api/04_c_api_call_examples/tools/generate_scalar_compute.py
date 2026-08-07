@@ -59,8 +59,10 @@ int main()
 
 def atomic(name: str, call: str, initial: int, updated: int) -> str:
     body = f'''    __gm__ uint32_t* address = reinterpret_cast<__gm__ uint32_t*>(output);
+    asc_dcci_entire_all();
     const uint32_t old_value = {call};
     asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    asc_dcci_entire_all();
     output[1] = static_cast<int64_t>(old_value);'''
     return source(name, body, [initial, 0], [updated, initial], name)
 

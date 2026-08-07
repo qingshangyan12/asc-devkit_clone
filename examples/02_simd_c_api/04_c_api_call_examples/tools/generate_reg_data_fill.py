@@ -86,9 +86,7 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     cases = {
         "asc_duplicate": ("asc_duplicate", False),
-        "asc_duplicate_merge": ("asc_duplicate_merge", False),
         "asc_duplicate_scalar": ("asc_duplicate_scalar", True),
-        "asc_duplicate_scalar_merge": ("asc_duplicate_scalar_merge", True),
     }
     for file_name, (api, scalar) in cases.items():
         (OUTPUT_DIR / f"{file_name}.asc").write_text(source(file_name, api, scalar))

@@ -67,12 +67,10 @@ def main() -> None:
             '''    __ubuf__ uint8_t scratch[256];
     asc_dcci_single(output);
     asc_ub_dcci_single(scratch);
-    asc_dcci_entire_ub();
     asc_dcci_entire_out();
     asc_dcci_entire_all();
     asc_dcci_entire_atomic();''',
-            "asc_dcci_single/asc_ub_dcci_single/asc_dcci_entire_ub/asc_dcci_entire_out/asc_dcci_entire_all/asc_dcci_entire_atomic",
-            "dav-2201"),
+            "asc_dcci_single/asc_ub_dcci_single/asc_dcci_entire_out/asc_dcci_entire_all/asc_dcci_entire_atomic"),
         "asc_dci": source(
             "cache_ctrl", "asc_dci",
             "    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);\n    asc_dci();",
