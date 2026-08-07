@@ -63,11 +63,51 @@ function getLeadingIdentifier(value) {
   return normalize(value).match(/^[a-z_][a-z0-9_]*/)?.[0] || ''
 }
 
-function identifierMatch(value, query) {
+function identifierCore(value) {
+  return normalize(value).replace(/^_+|_+$/g, '')
+}
+
+function identifierEntryMatch(identifier, query, preferDecorated = false) {
+  const normalizedIdentifier = normalize(identifier)
+  const normalizedQuery = normalize(query)
+  const coreIdentifier = identifierCore(normalizedIdentifier)
+  const coreQuery = identifierCore(normalizedQuery)
+  if (!coreIdentifier || !coreQuery) return null
+
+  const decorated = coreIdentifier !== normalizedIdentifier
+  const directExact = normalizedIdentifier === normalizedQuery
+  const coreExact = coreIdentifier === coreQuery
+  const directPrefix = normalizedQuery.length >= 4 && normalizedIdentifier.startsWith(normalizedQuery)
+  const corePrefix = coreQuery.length >= 4 && coreIdentifier.startsWith(coreQuery)
+  if (!coreExact && !directPrefix && !corePrefix) return null
+
+  let priority
+  if (coreExact) {
+    priority = preferDecorated && decorated ? 430 : directExact ? 420 : decorated ? 410 : 400
+  }
+  else {
+    priority = preferDecorated && decorated ? 330 : directPrefix ? 320 : decorated ? 310 : 300
+  }
+  return { exact: coreExact, type: coreExact ? 'exact' : 'prefix', priority }
+}
+
+export function findIdentifierIndexMatches(entries, query, preferDecorated = false) {
+  return entries
+    .map((entry) => {
+      const match = identifierEntryMatch(entry?.[0], query, preferDecorated)
+      return match ? { entry, ...match } : null
+    })
+    .filter(Boolean)
+    .sort((left, right) => right.priority - left.priority
+      || left.entry[0].length - right.entry[0].length
+      || left.entry[0].localeCompare(right.entry[0]))
+}
+
+function identifierMatch(value, query, preferDecorated = false) {
   const tokens = normalize(value).match(/[a-z_][a-z0-9_]*/g) || []
-  if (tokens.includes(query)) return 'exact'
-  if (query.length >= 4 && tokens.some(token => token.startsWith(query))) return 'prefix'
-  return ''
+  const matches = tokens.map(token => identifierEntryMatch(token, query, preferDecorated)).filter(Boolean)
+  if (matches.some(match => match.type === 'exact')) return 'exact'
+  return matches.some(match => match.type === 'prefix') ? 'prefix' : ''
 }
 
 function isDirectoryLandingPage(url, title) {
@@ -173,7 +213,7 @@ function compactCjkRouteBonus(url, cjkPhrases) {
   return cjkPhrases.some(phrase => segments.includes(phrase)) ? 60000 : 0
 }
 
-function createQueryPlan(query) {
+export function createQueryPlan(query) {
   const caseQuery = normalizeCase(query)
   const normalizedQuery = normalize(query)
   const compactQuery = compactEnglish(query)
@@ -185,6 +225,10 @@ function createQueryPlan(query) {
     .match(/[a-z0-9]+/g) || []
   const englishParts = allEnglishParts.filter(part => part.length >= 2)
   const identifierIntent = caseQuery.includes('_') && /^[a-z_][a-z0-9_]*$/i.test(caseQuery)
+  const undecoratedIdentifier = caseQuery.replace(/^_+|_+$/g, '')
+  const preferDecoratedIdentifier = identifierIntent
+    && undecoratedIdentifier.includes('_')
+    && /^[A-Z][A-Z0-9_]*$/.test(undecoratedIdentifier)
   const separatedIdentifierIntent = cjkPhrases.length === 0
     && allEnglishParts.length >= 2
     && /^[a-z0-9_\-\s]+$/i.test(caseQuery)
@@ -201,6 +245,7 @@ function createQueryPlan(query) {
     identifierIntent,
     separatedIdentifierIntent,
     identifierQuery,
+    preferDecoratedIdentifier,
     strongIdentifierIntent: identifierIntent || specialSyntaxIntent,
     cjkPhrases,
     englishParts,
@@ -300,17 +345,6 @@ export function highlightSearchText(value, query) {
   return `${escapeHtml(text.slice(0, position))}<mark>${escapeHtml(text.slice(position, end))}</mark>${escapeHtml(text.slice(end))}`
 }
 
-function lowerBoundIdentifier(entries, query) {
-  let left = 0
-  let right = entries.length
-  while (left < right) {
-    const middle = Math.floor((left + right) / 2)
-    if (String(entries[middle]?.[0] || '') < query) left = middle + 1
-    else right = middle
-  }
-  return left
-}
-
 async function searchIdentifierIndex(plan) {
   const query = plan.identifierQuery
   if (!query || (!plan.specialSyntaxIntent && compactEnglish(query).length < 3)) {
@@ -321,23 +355,18 @@ async function searchIdentifierIndex(plan) {
   const pages = index.p
   const snippets = Array.isArray(index.s) ? index.s : []
   const sections = Array.isArray(index.h) ? index.h : []
-  const start = lowerBoundIdentifier(entries, query)
-  const matches = []
-  for (let offset = start; offset < entries.length && matches.length <= MAX_IDENTIFIER_MATCHES; offset++) {
-    const entry = entries[offset]
-    if (!String(entry?.[0] || '').startsWith(query)) break
-    matches.push(entry)
-  }
+  const matches = findIdentifierIndexMatches(entries, query, plan.preferDecoratedIdentifier)
   if (matches.length === 0) return { exact: false, exclusive: false, strong: false, results: [] }
   const truncated = matches.length > MAX_IDENTIFIER_MATCHES
   const selectedMatches = matches.slice(0, MAX_IDENTIFIER_MATCHES)
 
   const resultsByRoute = new Map()
   let exactIdentifier = false
-  for (const [identifier, pageIds, contextIds = [], sectionIds = []] of selectedMatches) {
-    const exact = identifier === query
+  for (const { entry, exact, priority } of selectedMatches) {
+    const [identifier, pageIds, contextIds = [], sectionIds = []] = entry
     exactIdentifier ||= exact
     const identifierScore = (exact ? 3300000 : 3100000)
+      + priority * 1000
       - Math.max(0, identifier.length - query.length) * 1000
     for (let rank = 0; rank < pageIds.length; rank++) {
       const page = pages[pageIds[rank]]
@@ -497,13 +526,13 @@ function scoreCandidate(candidate, plan) {
   const compactTitle = compactEnglish(title)
   const leadingIdentifier = getLeadingIdentifier(title)
   const identifierTitleMatch = plan.identifierIntent
-    ? identifierMatch(title, plan.normalizedQuery)
+    ? identifierMatch(title, plan.normalizedQuery, plan.preferDecoratedIdentifier)
     : ''
   const identifierRouteMatch = plan.identifierIntent
-    ? identifierMatch(normalizeRoute(route), plan.normalizedQuery)
+    ? identifierMatch(normalizeRoute(route), plan.normalizedQuery, plan.preferDecoratedIdentifier)
     : ''
   const identifierTextMatch = plan.identifierIntent
-    ? identifierMatch(text, plan.normalizedQuery)
+    ? identifierMatch(text, plan.normalizedQuery, plan.preferDecoratedIdentifier)
     : ''
   if (plan.identifierIntent && !identifierTextMatch) return null
   const pureEnglishTitle = !CJK_REGEX.test(title)
