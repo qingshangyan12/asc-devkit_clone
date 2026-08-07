@@ -163,19 +163,20 @@ export function renumberSidebarItems(items, prefix = '') {
   })
 }
 
-export function getFilteredSidebarConfig(theme, selectedFilter) {
-  if (!theme?.sidebar || !Array.isArray(theme.apiSidebarSource)) {
-    return theme?.sidebar
+export function getFilteredSidebarConfig(sidebarConfig, selectedFilter, unsupportedIndex = {}) {
+  const apiSidebarSource = sidebarConfig?.['/api/']
+  if (!sidebarConfig || !Array.isArray(apiSidebarSource)) {
+    return sidebarConfig
   }
-  if (!selectedFilter || selectedFilter === 'all') return theme.sidebar
+  if (!selectedFilter || selectedFilter === 'all') return sidebarConfig
 
   return {
-    ...theme.sidebar,
+    ...sidebarConfig,
     '/api/': renumberSidebarItems(
       filterSidebarItems(
-        theme.apiSidebarSource,
+        apiSidebarSource,
         selectedFilter,
-        theme.apiUnsupportedIndex
+        unsupportedIndex
       )
     ),
   }

@@ -132,24 +132,24 @@ test('builds an API sidebar config for the selected product without mutating the
     { text: 'Hidden', link: '/api/hidden' },
     { text: 'Visible', link: '/api/visible' },
   ]
-  const theme = {
-    sidebar: {
-      '/guide/': [{ text: 'Guide', link: '/guide/start' }],
-      '/api/': apiSidebarSource,
-    },
-    apiSidebarSource,
-    apiUnsupportedIndex: { '/api/hidden': ['310p'] },
+  const sidebar = {
+    '/guide/': [{ text: 'Guide', link: '/guide/start' }],
+    '/api/': apiSidebarSource,
   }
 
-  const filtered = getFilteredSidebarConfig(theme, '310p')
+  const filtered = getFilteredSidebarConfig(
+    sidebar,
+    '310p',
+    { '/api/hidden': ['310p'] }
+  )
 
   assert.deepEqual(filtered['/api/'], [{
     text: '1. Visible',
     link: '/api/visible',
     unnumberedText: 'Visible',
   }])
-  assert.equal(filtered['/guide/'], theme.sidebar['/guide/'])
-  assert.equal(theme.sidebar['/api/'].length, 2)
+  assert.equal(filtered['/guide/'], sidebar['/guide/'])
+  assert.equal(sidebar['/api/'].length, 2)
 })
 
 test('renumbers every visible sidebar level after product filtering', () => {
@@ -185,15 +185,15 @@ test('uses the untouched original sidebar config for the all filter', () => {
     unnumberedText: 'Reg vector',
     link: '/api/reg/reg',
   }]
-  const theme = {
-    sidebar: { '/api/': apiSidebarSource },
-    apiSidebarSource,
-    apiUnsupportedIndex: { '/api/reg/reg': ['A3'] },
-  }
+  const sidebar = { '/api/': apiSidebarSource }
 
-  const filtered = getFilteredSidebarConfig(theme, 'all')
+  const filtered = getFilteredSidebarConfig(
+    sidebar,
+    'all',
+    { '/api/reg/reg': ['A3'] }
+  )
 
-  assert.equal(filtered, theme.sidebar)
+  assert.equal(filtered, sidebar)
   assert.equal(filtered['/api/'], apiSidebarSource)
   assert.equal(filtered['/api/'][0].text, '2.2.9. Reg vector')
 })
