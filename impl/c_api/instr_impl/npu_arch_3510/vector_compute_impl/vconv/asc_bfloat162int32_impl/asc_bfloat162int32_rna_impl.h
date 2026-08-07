@@ -60,7 +60,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtfi_bf162s32_x(src, mask, (ULL)1, (ULL)0, (ULL)0);
+        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_EVEN, MODE_ZEROING);
     }
 }
 
@@ -69,7 +69,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtfi_bf162s32_x(src, mask, (ULL)1, (ULL)0, (ULL)1);
+        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_ODD, MODE_ZEROING);
     }
 }
 
@@ -78,7 +78,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna_sat_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtfi_bf162s32_x(src, mask, (ULL)1, (ULL)1, (ULL)0);
+        vcvt(dst, src, mask, ROUND_A, RS_ENABLE, PART_EVEN, MODE_ZEROING);
     }
 }
 
@@ -87,7 +87,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna_sat_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtfi_bf162s32_x(src, mask, (ULL)1, (ULL)1, (ULL)1);
+        vcvt(dst, src, mask, ROUND_A, RS_ENABLE, PART_ODD, MODE_ZEROING);
     }
 }
 

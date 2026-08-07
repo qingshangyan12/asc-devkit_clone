@@ -37,7 +37,7 @@ __simd_callee__ inline void asc_exp_sub_half2float_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vexpdif_v128f16f32(src0, src1, mask, (ULL)0);
+        vexpdif(dst, src0, src1, mask, PART_EVEN);
     }
 }
 
@@ -46,7 +46,7 @@ __simd_callee__ inline void asc_exp_sub_half2float_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vexpdif_v128f16f32(src0, src1, mask, (ULL)1);
+        vexpdif(dst, src0, src1, mask, PART_ODD);
     }
 }
 

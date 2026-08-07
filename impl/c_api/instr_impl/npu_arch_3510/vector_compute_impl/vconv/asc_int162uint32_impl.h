@@ -37,7 +37,7 @@ __simd_callee__ inline void asc_int162uint32_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_s162u32_x(src, mask, (ULL)0);
+        vcvt(dst, src, mask, PART_EVEN, MODE_ZEROING);
     }
 }
 
@@ -46,7 +46,7 @@ __simd_callee__ inline void asc_int162uint32_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_s162u32_x(src, mask, (ULL)1);
+        vcvt(dst, src, mask, PART_ODD, MODE_ZEROING);
     }
 }
 

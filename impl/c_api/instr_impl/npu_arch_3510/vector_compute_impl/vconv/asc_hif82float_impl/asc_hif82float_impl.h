@@ -51,7 +51,7 @@ __simd_callee__ inline void asc_hif82float_impl(
         src_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_hif82f32_x(src, mask, (ULL)0);
+        vcvt(dst, src, mask, PART_P0, MODE_ZEROING);
     }
 }
 
@@ -61,7 +61,7 @@ __simd_callee__ inline void asc_hif82float_impl(
         src_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_hif82f32_x(src, mask, (ULL)1);
+        vcvt(dst, src, mask, PART_P1, MODE_ZEROING);
     }
 }
 
@@ -71,7 +71,7 @@ __simd_callee__ inline void asc_hif82float_impl(
         src_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_hif82f32_x(src, mask, (ULL)2);
+        vcvt(dst, src, mask, PART_P2, MODE_ZEROING);
     }
 }
 
@@ -81,7 +81,7 @@ __simd_callee__ inline void asc_hif82float_impl(
         src_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_hif82f32_x(src, mask, (ULL)3);
+        vcvt(dst, src, mask, PART_P3, MODE_ZEROING);
     }
 }
 

@@ -48,7 +48,7 @@ __simd_callee__ inline void asc_uint322int16_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322s16_x(src, mask, (ULL)0, (ULL)0);
+        vcvt(dst, src, mask, RS_DISABLE, PART_EVEN, MODE_ZEROING);
     }
 }
 
@@ -57,7 +57,7 @@ __simd_callee__ inline void asc_uint322int16_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322s16_x(src, mask, (ULL)0, (ULL)1);
+        vcvt(dst, src, mask, RS_DISABLE, PART_ODD, MODE_ZEROING);
     }
 }
 
@@ -66,7 +66,7 @@ __simd_callee__ inline void asc_uint322int16_sat_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322s16_x(src, mask, (ULL)1, (ULL)0);
+        vcvt(dst, src, mask, RS_ENABLE, PART_EVEN, MODE_ZEROING);
     }
 }
 
@@ -75,7 +75,7 @@ __simd_callee__ inline void asc_uint322int16_sat_impl(
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322s16_x(src, mask, (ULL)1, (ULL)1);
+        vcvt(dst, src, mask, RS_ENABLE, PART_ODD, MODE_ZEROING);
     }
 }
 

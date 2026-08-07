@@ -87,7 +87,7 @@ __simd_callee__ inline void asc_uint322uint8_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322u8_x(src, mask, (ULL)0, (ULL)0);
+        vcvt(dst, src, mask, RS_DISABLE, PART_P0, MODE_ZEROING);
     }
 }
 
@@ -97,7 +97,7 @@ __simd_callee__ inline void asc_uint322uint8_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322u8_x(src, mask, (ULL)0, (ULL)1);
+        vcvt(dst, src, mask, RS_DISABLE, PART_P1, MODE_ZEROING);
     }
 }
 
@@ -107,7 +107,7 @@ __simd_callee__ inline void asc_uint322uint8_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322u8_x(src, mask, (ULL)0, (ULL)2);
+        vcvt(dst, src, mask, RS_DISABLE, PART_P2, MODE_ZEROING);
     }
 }
 
@@ -117,7 +117,7 @@ __simd_callee__ inline void asc_uint322uint8_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322u8_x(src, mask, (ULL)0, (ULL)3);
+        vcvt(dst, src, mask, RS_DISABLE, PART_P3, MODE_ZEROING);
     }
 }
 
@@ -127,7 +127,7 @@ __simd_callee__ inline void asc_uint322uint8_sat_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322u8_x(src, mask, (ULL)1, (ULL)0);
+        vcvt(dst, src, mask, RS_ENABLE, PART_P0, MODE_ZEROING);
     }
 }
 
@@ -137,7 +137,7 @@ __simd_callee__ inline void asc_uint322uint8_sat_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322u8_x(src, mask, (ULL)1, (ULL)1);
+        vcvt(dst, src, mask, RS_ENABLE, PART_P1, MODE_ZEROING);
     }
 }
 
@@ -147,7 +147,7 @@ __simd_callee__ inline void asc_uint322uint8_sat_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322u8_x(src, mask, (ULL)1, (ULL)2);
+        vcvt(dst, src, mask, RS_ENABLE, PART_P2, MODE_ZEROING);
     }
 }
 
@@ -157,7 +157,7 @@ __simd_callee__ inline void asc_uint322uint8_sat_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtii_u322u8_x(src, mask, (ULL)1, (ULL)3);
+        vcvt(dst, src, mask, RS_ENABLE, PART_P3, MODE_ZEROING);
     }
 }
 

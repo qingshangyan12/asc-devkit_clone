@@ -82,7 +82,7 @@ __simd_callee__ inline void asc_float2e4m3_rn_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_f322f8e4m3_x(src, mask, (ULL)0, (ULL)0, (ULL)0);
+        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P0, MODE_ZEROING);
     }
 }
 
@@ -92,7 +92,7 @@ __simd_callee__ inline void asc_float2e4m3_rn_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_f322f8e4m3_x(src, mask, (ULL)0, (ULL)0, (ULL)1);
+        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P1, MODE_ZEROING);
     }
 }
 
@@ -102,7 +102,7 @@ __simd_callee__ inline void asc_float2e4m3_rn_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_f322f8e4m3_x(src, mask, (ULL)0, (ULL)0, (ULL)2);
+        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P2, MODE_ZEROING);
     }
 }
 
@@ -112,7 +112,7 @@ __simd_callee__ inline void asc_float2e4m3_rn_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_f322f8e4m3_x(src, mask, (ULL)0, (ULL)0, (ULL)3);
+        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P3, MODE_ZEROING);
     }
 }
 
@@ -122,7 +122,7 @@ __simd_callee__ inline void asc_float2e4m3_rn_sat_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_f322f8e4m3_x(src, mask, (ULL)0, (ULL)1, (ULL)0);
+        vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_P0, MODE_ZEROING);
     }
 }
 
@@ -132,7 +132,7 @@ __simd_callee__ inline void asc_float2e4m3_rn_sat_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_f322f8e4m3_x(src, mask, (ULL)0, (ULL)1, (ULL)1);
+        vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_P1, MODE_ZEROING);
     }
 }
 
@@ -142,7 +142,7 @@ __simd_callee__ inline void asc_float2e4m3_rn_sat_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_f322f8e4m3_x(src, mask, (ULL)0, (ULL)1, (ULL)2);
+        vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_P2, MODE_ZEROING);
     }
 }
 
@@ -152,7 +152,7 @@ __simd_callee__ inline void asc_float2e4m3_rn_sat_impl(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_f322f8e4m3_x(src, mask, (ULL)0, (ULL)1, (ULL)3);
+        vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_P3, MODE_ZEROING);
     }
 }
 
