@@ -14,6 +14,45 @@ SCALAR_TYPES = {
     "vector_int4x2_t": "int4b_t",
 }
 
+# Little-endian in-memory encodings of the exactly representable value 1.
+# The packed 4-bit types contain two values per byte.
+ONE_ENCODING = {
+    "vector_int8_t": (0x01,),
+    "vector_uint8_t": (0x01,),
+    "vector_int16_t": (0x01, 0x00),
+    "vector_uint16_t": (0x01, 0x00),
+    "vector_half": (0x00, 0x3C),
+    "vector_bfloat16_t": (0x80, 0x3F),
+    "vector_int32_t": (0x01, 0x00, 0x00, 0x00),
+    "vector_uint32_t": (0x01, 0x00, 0x00, 0x00),
+    "vector_float": (0x00, 0x00, 0x80, 0x3F),
+    "vector_int64_t": (0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
+    "vector_hifloat8_t": (0x08,),
+    "vector_fp8_e4m3fn_t": (0x38,),
+    "vector_fp8_e5m2_t": (0x3C,),
+    "vector_fp4x2_e2m1_t": (0x22,),
+    "vector_fp4x2_e1m2_t": (0x44,),
+    "vector_int4x2_t": (0x11,),
+}
+
+TYPE_BITS = {
+    "vector_int8_t": 8,
+    "vector_uint8_t": 8,
+    "vector_int16_t": 16,
+    "vector_uint16_t": 16,
+    "vector_half": 16,
+    "vector_bfloat16_t": 16,
+    "vector_int32_t": 32,
+    "vector_uint32_t": 32,
+    "vector_float": 32,
+    "vector_int64_t": 64,
+    "vector_hifloat8_t": 8,
+    "vector_fp8_e4m3fn_t": 8,
+    "vector_fp8_e5m2_t": 8,
+    "vector_fp4x2_e2m1_t": 4,
+    "vector_fp4x2_e1m2_t": 4,
+    "vector_int4x2_t": 4,
+}
 
 def scalar_type(vector_type: str) -> str:
     if vector_type in SCALAR_TYPES:
@@ -43,11 +82,38 @@ def prototypes(markdown: str):
     return found
 
 
+def primary_golden(src_type: str, dst_type: str):
+    src_bits = TYPE_BITS[src_type]
+    dst_bits = TYPE_BITS[dst_type]
+    if src_bits <= dst_bits:
+        return ONE_ENCODING[dst_type]
+
+    ratio = src_bits // dst_bits
+    if dst_bits >= 8:
+        bytes_per_element = dst_bits // 8
+        return ONE_ENCODING[dst_type] + (0,) * (bytes_per_element * (ratio - 1))
+
+    # A packed destination byte receives two adjacent source elements. The
+    # base variant writes that byte at index 0 of each source-width group.
+    return ONE_ENCODING[dst_type] + (0,) * (ratio - 1)
+
+
 def source(file_name: str, calls) -> str:
+    dst_types = {dst_type for _, dst_type, _ in calls}
+    src_types = {src_type for _, _, src_type in calls}
+    if len(dst_types) != 1 or len(src_types) != 1:
+        raise ValueError(f"Mixed conversion types in {file_name}: {calls}")
+    dst_type = next(iter(dst_types))
+    src_type = next(iter(src_types))
+    input_pattern = ", ".join(f"0x{value:02x}" for value in ONE_ENCODING[src_type])
+    golden_pattern = ", ".join(f"0x{value:02x}" for value in primary_golden(src_type, dst_type))
     rel = f"reg/data_type_convert/{file_name}"
     kernel = "".join(x.capitalize() for x in file_name.split("_")) + "Kernel"
     statements = []
-    for index, (api, dst_type, src_type) in enumerate(calls):
+    # Leave the base variant's index-0 result in output. Other rounding,
+    # saturation, and index variants are still compiled and executed first.
+    execution_calls = calls[1:] + calls[:1]
+    for index, (api, dst_type, src_type) in enumerate(execution_calls):
         dst_scalar = scalar_type(dst_type)
         src_scalar = scalar_type(src_type)
         store = (
@@ -98,9 +164,15 @@ __global__ __vector__ void {kernel}(__gm__ uint8_t* output, __gm__ uint8_t* inpu
 }} // namespace
 int main()
 {{
-    std::vector<uint8_t> input(BUFFER_BYTES, 0);
+    constexpr uint8_t input_pattern[] = {{{input_pattern}}};
+    constexpr uint8_t golden_pattern[] = {{{golden_pattern}}};
+    std::vector<uint8_t> input(BUFFER_BYTES);
     std::vector<uint8_t> output(BUFFER_BYTES, 0xff);
-    std::vector<uint8_t> golden(BUFFER_BYTES, 0);
+    std::vector<uint8_t> golden(BUFFER_BYTES);
+    for (size_t i = 0; i < BUFFER_BYTES; ++i) {{
+        input[i] = input_pattern[i % sizeof(input_pattern)];
+        golden[i] = golden_pattern[i % sizeof(golden_pattern)];
+    }}
     CApiExample::Runtime runtime;
     if (!runtime.Init()) return 1;
     CApiExample::DeviceBuffer<uint8_t> input_device(BUFFER_BYTES), output_device(BUFFER_BYTES);
@@ -108,9 +180,10 @@ int main()
         !input_device.CopyFrom(input)) return 1;
     {kernel}<<<1, 0>>>(output_device.Get(), input_device.Get());
     if (!CApiExample::CheckAcl(aclrtSynchronizeDevice(), "aclrtSynchronizeDevice") || !output_device.CopyTo(output)) return 1;
-    CApiExample::Print("Input bytes", input);
-    CApiExample::Print("Output bytes", output);
-    CApiExample::Print("Golden bytes", golden);
+    std::cout << "Conversion: {src_type} -> {dst_type}" << std::endl;
+    CApiExample::Print("Input 1.0 (raw bytes)", input);
+    CApiExample::Print("Output (raw bytes)", output);
+    CApiExample::Print("Golden 1.0 (raw bytes)", golden);
     const bool passed = CApiExample::Compare(output, golden);
     std::cout << (passed ? "[Success] {api_names} passed." : "[Failed] {api_names} failed.") << std::endl;
     return passed ? 0 : 1;
