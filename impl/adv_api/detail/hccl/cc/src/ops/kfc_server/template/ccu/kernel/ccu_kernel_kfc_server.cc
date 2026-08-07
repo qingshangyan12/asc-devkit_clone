@@ -120,9 +120,23 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
     {
         CcuKfcAllGatherMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-            ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+            param[HBM_PARAM_IDX_1],  // inputAddr
+            param[HBM_PARAM_IDX_2],  // outputAddr
+            ctx.token,               // tokenInfo
+            param[HBM_PARAM_IDX_4],  // currentRankSliceInputOffset
+            param[HBM_PARAM_IDX_5],  // currentRankSliceOutputOffset
+            param[HBM_PARAM_IDX_6],  // tmpRepeatNum
+            param[HBM_PARAM_IDX_7],  // inputRepeatStride
+            param[HBM_PARAM_IDX_8],  // outputRepeatStride
+            param[HBM_PARAM_IDX_9],  // normalSliceSize
+            param[HBM_PARAM_IDX_10], // lastSliceSize
+            param[HBM_PARAM_IDX_11], // isInputOutputEqual
+            param[HBM_PARAM_IDX_12], // goSize0
+            param[HBM_PARAM_IDX_13], // goSize1
+            param[HBM_PARAM_IDX_14], // goSize2
+            param[HBM_PARAM_IDX_15], // goSize3
+            ctx.arg->channels, ctx.arg->channelCount, 
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
     }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER))
     {

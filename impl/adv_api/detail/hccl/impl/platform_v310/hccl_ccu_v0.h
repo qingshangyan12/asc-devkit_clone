@@ -253,7 +253,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
-        ccuUsedXnNum_ = 9;
+        ccuUsedXnNum_ = 16;
         CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
         ccuUsedXnNum_ = 15;
