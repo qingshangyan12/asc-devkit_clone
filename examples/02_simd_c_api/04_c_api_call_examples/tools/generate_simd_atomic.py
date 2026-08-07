@@ -80,13 +80,68 @@ __global__ __vector__ void {kernel}(__gm__ int32_t* output, __gm__ int32_t* inpu
 {{
     asc_init();
     __ubuf__ int32_t local[ELEMENTS];
-    asc_copy_gm2ub_align(local, input, BYTES);
+    asc_copy_gm2ub_align_sync(local, input, BYTES);
     asc_set_atomic_{operation}_int32();
     asc_copy_ub2gm_sync(output, local, BYTES);
     asc_set_atomic_none();
 }}
 '''
     return source + main_body(kernel, name, str(initial), golden_expr)
+
+
+def atomic_add_example() -> str:
+    name = "asc_set_atomic_add"
+    kernel = "AscSetAtomicAddKernel"
+    return header(name) + f'''
+__global__ __vector__ void {kernel}(__gm__ float* output, __gm__ float* input0, __gm__ float* input1)
+{{
+    asc_init();
+    __ubuf__ float local0[ELEMENTS];
+    __ubuf__ float local1[ELEMENTS];
+    asc_copy_gm2ub_align_sync(local0, input0, BYTES);
+    asc_copy_gm2ub_align_sync(local1, input1, BYTES);
+    asc_copy_ub2gm(output, local0, BYTES);
+    asc_sync_pipe(PIPE_MTE3);
+    asc_set_atomic_add_float();
+    asc_copy_ub2gm(output, local1, BYTES);
+    asc_set_atomic_none();
+}}
+
+}} // namespace
+
+int main()
+{{
+    std::vector<float> input0(ELEMENTS), input1(ELEMENTS), output(ELEMENTS), golden(ELEMENTS);
+    for (uint32_t i = 0; i < ELEMENTS; ++i) {{
+        input0[i] = static_cast<float>(i % 8 + 1);
+        input1[i] = 2.0f;
+        golden[i] = input0[i] + input1[i];
+    }}
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    float *input0_device = nullptr, *input1_device = nullptr, *output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input0_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&input1_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input0_device, BYTES, input0.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(input1_device, BYTES, input1.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    {kernel}<<<1, 0>>>(output_device, input0_device, input1_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), BYTES, output_device, BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input0", input0);
+    PrintData("Input1", input1);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] {name} passed." : "[Failed] {name} failed.") << std::endl;
+    aclrtFree(input0_device);
+    aclrtFree(input1_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}}
+'''
 
 
 def one_operation(name: str, setter: str, initial: int, golden_expr: str) -> str:
@@ -96,7 +151,7 @@ __global__ __vector__ void {kernel}(__gm__ int32_t* output, __gm__ int32_t* inpu
 {{
     asc_init();
     __ubuf__ int32_t local[ELEMENTS];
-    asc_copy_gm2ub_align(local, input, BYTES);
+    asc_copy_gm2ub_align_sync(local, input, BYTES);
     {setter};
     asc_copy_ub2gm_sync(output, local, BYTES);
     asc_set_atomic_none();
@@ -135,7 +190,7 @@ __global__ __vector__ void {kernel}(__gm__ int32_t* output, __gm__ int32_t* inpu
 {{
     asc_init();
     __ubuf__ int32_t local[ELEMENTS];
-    asc_copy_gm2ub_align(local, input, BYTES);
+    asc_copy_gm2ub_align_sync(local, input, BYTES);
     asc_set_atomic_add_int32();
     asc_copy_ub2gm_sync(output, local, BYTES);
     asc_set_atomic_none();
@@ -152,7 +207,7 @@ def main() -> None:
             "asc_get_store_atomic_config", "    asc_set_store_atomic_config_v2(1, 2);", 33),
         "asc_set_atomic_add_int_deprecated": one_operation(
             "asc_set_atomic_add_int_deprecated", "asc_set_atomic_add_int()", 10, "10 + input[i]"),
-        "asc_set_atomic_add": atomic_family("asc_set_atomic_add", "add", 10, "10 + input[i]"),
+        "asc_set_atomic_add": atomic_add_example(),
         "asc_set_atomic_max_int_deprecated": one_operation(
             "asc_set_atomic_max_int_deprecated", "asc_set_atomic_max_int()", 5, "input[i] > 5 ? input[i] : 5"),
         "asc_set_atomic_max": atomic_family(

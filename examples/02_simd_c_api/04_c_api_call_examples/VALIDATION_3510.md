@@ -248,3 +248,23 @@ prequant scale 2 changes float 3.0 to signed int8 6. The FeatureMap A/B and
 padding setters turn one padded row into 16 values of 1.0, and the Load3D
 repeat setter loads positive and negative identity fragments into consecutive
 height blocks.
+
+## Full Functional Validation
+
+A clean full-set compile on 2026-08-07 passed all 325 examples for `dav-3510`.
+The first continuous runtime pass used a 30-second timeout per example and
+completed with 324 passes, one precision failure, and no timeout. The only
+failure was `simd_atomic/asc_set_atomic_add.asc`.
+
+The failure was caused by reading an asynchronous GM-to-UB result from another
+pipeline before the transfer had reliably completed. Repeated standalone runs
+therefore observed different stale UB values. The atomic examples now use
+`asc_copy_gm2ub_align_sync` before consuming their local input. The primary
+`asc_set_atomic_add` example also follows the documented functional sequence:
+write `input0` to GM, wait for MTE3, enable float atomic add, and write
+`input1` to the same address. Its output is compared with `input0 + input1`.
+
+After the correction, all nine SIMD atomic examples compiled and ran
+independently with exact Golden comparisons under the same 30-second timeout.
+There were no atomic timeouts to retest. A second continuous full-set runtime
+pass is recorded after the final checkpoint below.
