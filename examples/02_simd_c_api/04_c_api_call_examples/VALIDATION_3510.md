@@ -191,3 +191,31 @@ all `quant_post` arguments as invalid. Three board attempts used
 each produced only the pre-quantized FP16 `0x3c00`. The final example therefore
 validates the documented register encoding and measurable setter execution
 without claiming an unsupported numeric effect.
+
+The 12 Cube compute examples were revalidated on 2026-08-07. All 12 compiled
+and ran successfully with a 30-second limit, with no timeout:
+
+- `asc_mmad` compares a real 16x32 by 32x16 int8 matrix product against a CPU
+  Golden, while `asc_mmad_mx` validates FP8 E4M3 inputs with unit E8M0 scales.
+- `asc_enable_fp8` and `asc_enable_hif8` use the raw encodings `0x38` and
+  `0x08` for 1.0 and verify that the selected 8bit MMAD mode produces an
+  identity matrix.
+- `asc_enable_hf32` exposes the loss from rounding 1.0003 to HF32, and
+  `asc_set_fp32_mode` shows the full-precision result after restoring FP32.
+- `asc_set_hf32_round_mode` and `asc_enable_hf32_trans` run the two modes in
+  separate kernel launches. A value exactly halfway above 1.0 rounds to
+  1.0009765625 in mode 1/NEAREST_ZERO and to 1.0 in
+  mode 0/NEAREST_EVEN.
+- `asc_set_l0c2gm_config` loads per-channel scale 2.0 into FB and checks that
+  Fixpipe quantizes an FP32 diagonal of 3.0 to signed int8 6.
+- `asc_set_l0c2gm_nz2nd` converts the MMAD result from the internal NZ layout
+  to a row-major ND identity matrix.
+- `asc_set_mmad_direction_m` and `asc_set_mmad_direction_n` print launch
+  timings and verify that both fragment-generation orders preserve the same
+  matrix values.
+
+The initial two-mode 8bit and HF32 rounding prototypes exposed that control
+register changes in the same in-flight matrix context can be observed by the
+wrong MMAD. The final 8bit examples set one mode per kernel, and the HF32
+rounding comparisons use separate launches so each matrix operation observes
+its intended register value.
