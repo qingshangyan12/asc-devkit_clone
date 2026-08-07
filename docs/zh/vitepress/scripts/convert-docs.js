@@ -11,7 +11,7 @@
 
 const { spawnSync } = require('node:child_process')
 const { resolve, join } = require('node:path')
-const { copyFileSync, cpSync, existsSync, mkdirSync } = require('node:fs')
+const { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } = require('node:fs')
 
 const scriptsDir = resolve(__dirname)
 const root = resolve(scriptsDir, '..')
@@ -44,6 +44,10 @@ function runMdparser(inputDir, outputDir, label) {
     console.error(`Failed to convert ${label}`)
     process.exit(result.status || 1)
   }
+}
+
+for (const generatedDir of ['api', 'guide', 'figures']) {
+  rmSync(resolve(root, 'docs', generatedDir), { recursive: true, force: true })
 }
 
 runMdparser('api', 'api', 'API docs')

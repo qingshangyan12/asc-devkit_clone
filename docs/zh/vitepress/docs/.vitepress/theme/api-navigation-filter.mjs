@@ -12,19 +12,29 @@ import {
   filterNavigationCandidates,
   getFilteredSidebarConfig,
 } from '../../../scripts/api-support.mjs'
+import {
+  apiUnsupportedIndex,
+  sidebarConfig,
+} from 'virtual:api-navigation-data'
 import { selectedFilter } from './filter-state.js'
 
-export function getProductFilteredSidebarConfig(theme) {
-  return getFilteredSidebarConfig(theme, selectedFilter.value)
+export { apiUnsupportedIndex }
+
+export function getProductFilteredSidebarConfig() {
+  return getFilteredSidebarConfig(
+    sidebarConfig,
+    selectedFilter.value,
+    apiUnsupportedIndex
+  )
 }
 
-export function getProductFilteredNavigationCandidates(candidates, currentRelativePath, theme) {
-  const sidebarConfig = getFilteredSidebarConfig(theme, selectedFilter.value)
+export function getProductFilteredNavigationCandidates(candidates, currentRelativePath) {
+  const filteredSidebarConfig = getProductFilteredSidebarConfig()
   return filterNavigationCandidates(
     candidates,
     currentRelativePath,
     selectedFilter.value,
-    theme.apiUnsupportedIndex,
-    sidebarConfig?.['/api/']
+    apiUnsupportedIndex,
+    filteredSidebarConfig?.['/api/']
   )
 }
