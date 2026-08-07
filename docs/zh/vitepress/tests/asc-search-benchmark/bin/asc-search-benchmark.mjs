@@ -23,6 +23,8 @@ const DEFAULT_CASES = resolve(REPOSITORY_ROOT, 'cases/ascendc.json')
 const DEFAULT_OUTPUT = resolve(REPOSITORY_ROOT, 'results/current.json')
 const DEFAULT_BUILD_COMMAND = 'bash docs/zh/vitepress/deploy.sh'
 const DEFAULT_DIST_RELATIVE = 'docs/zh/vitepress/docs/.vitepress/dist'
+const DEFAULT_VIEWPORT_WIDTH = 800
+const DEFAULT_VIEWPORT_HEIGHT = 600
 const POLL_INTERVAL_MS = 20
 const QUERY_TIMEOUT_MS = 15000
 
@@ -477,19 +479,48 @@ async function runSearchCase(client, definition) {
       setter.call(input, value)
       input.dispatchEvent(new Event('input', { bubbles: true }))
     }
+    const readHighlights = (element, selector) => Array.from(element.querySelectorAll(selector)).map(mark => {
+      const style = getComputedStyle(mark)
+      const rect = mark.getBoundingClientRect()
+      const containerRect = mark.closest('.des, .headings, .section-title')?.getBoundingClientRect()
+      const intersectionWidth = containerRect
+        ? Math.max(0, Math.min(rect.right, containerRect.right) - Math.max(rect.left, containerRect.left))
+        : 0
+      const intersectionHeight = containerRect
+        ? Math.max(0, Math.min(rect.bottom, containerRect.bottom) - Math.max(rect.top, containerRect.top))
+        : 0
+      const visibleRatio = rect.width > 0 && rect.height > 0
+        ? intersectionWidth * intersectionHeight / (rect.width * rect.height)
+        : 0
+      return {
+        text: mark.textContent || '',
+        backgroundColor: style.backgroundColor,
+        color: style.color,
+        textDecorationLine: style.textDecorationLine,
+        visibleRatio: Number(visibleRatio.toFixed(4)),
+      }
+    })
+    const sectionPlacementValid = (element) => {
+      const headingRect = element.querySelector('.headings')?.getBoundingClientRect()
+      const sectionRect = element.querySelector('.section-title')?.getBoundingClientRect()
+      const titleRect = element.querySelector('.title')?.getBoundingClientRect()
+      if (!headingRect || !sectionRect || !titleRect) return false
+      const sameLine = Math.abs(headingRect.bottom - sectionRect.bottom) <= 3
+      if (sameLine) {
+        const gap = sectionRect.left - headingRect.right
+        return gap >= -1 && gap <= 24
+      }
+      return sectionRect.top >= headingRect.bottom - 2
+        && Math.abs(sectionRect.left - titleRect.left) <= 2
+    }
     const results = () => Array.from(document.querySelectorAll('[command-item]')).map(element => ({
       route: element.getAttribute('data-route') || element.getAttribute('data-value') || '',
       title: element.querySelector('.headings')?.textContent?.trim() || '',
+      sectionTitle: element.querySelector('.section-title')?.textContent?.replace(/\\s+/g, ' ').trim() || '',
+      sectionPlacementValid: sectionPlacementValid(element),
       description: element.querySelector('.des')?.textContent?.replace(/\\s+/g, ' ').trim() || '',
-      highlights: Array.from(element.querySelectorAll('.des mark, .headings mark')).map(mark => {
-        const style = getComputedStyle(mark)
-        return {
-          text: mark.textContent || '',
-          backgroundColor: style.backgroundColor,
-          color: style.color,
-          textDecorationLine: style.textDecorationLine,
-        }
-      })
+      highlights: readHighlights(element, '.des mark, .headings mark, .section-title mark'),
+      sectionHighlights: readHighlights(element, '.section-title mark'),
     })).filter(result => result.route)
 
     setValue('')
@@ -513,6 +544,7 @@ async function runSearchCase(client, definition) {
       latencyMs: performance.now() - started,
       timedOut,
       errors: [...window.__ascSearchBenchmark.errors],
+      viewportWidth: innerWidth,
       results: results()
     }
   })()`)
@@ -605,18 +637,23 @@ function validateDataset(dataset) {
     if (!definition.query || !definition.category || !definition.expect) {
       throw new Error(`Case ${definition.id} is missing query, category, or expect`)
     }
-    if (!Array.isArray(definition.expect.targets)) throw new Error(`Case ${definition.id} must define expect.targets`)
-    if (definition.expect.descriptionIncludes !== undefined
-      && (!Array.isArray(definition.expect.descriptionIncludes)
-        || definition.expect.descriptionIncludes.length === 0
-        || definition.expect.descriptionIncludes.some(value => typeof value !== 'string' || !value))) {
-      throw new Error(`Case ${definition.id} expect.descriptionIncludes must be a non-empty string array`)
+    if (definition.viewportWidth !== undefined
+      && (!Number.isInteger(definition.viewportWidth) || definition.viewportWidth < 320 || definition.viewportWidth > 3840)) {
+      throw new Error(`Case ${definition.id} viewportWidth must be an integer between 320 and 3840`)
     }
-    if (definition.expect.highlightIncludes !== undefined
-      && (!Array.isArray(definition.expect.highlightIncludes)
-        || definition.expect.highlightIncludes.length === 0
-        || definition.expect.highlightIncludes.some(value => typeof value !== 'string' || !value))) {
-      throw new Error(`Case ${definition.id} expect.highlightIncludes must be a non-empty string array`)
+    if (!Array.isArray(definition.expect.targets)) throw new Error(`Case ${definition.id} must define expect.targets`)
+    for (const key of [
+      'descriptionIncludes',
+      'highlightIncludes',
+      'sectionTitleIncludes',
+      'sectionHighlightIncludes',
+    ]) {
+      const values = definition.expect[key]
+      if (values !== undefined
+        && (!Array.isArray(values) || values.length === 0
+          || values.some(value => typeof value !== 'string' || !value))) {
+        throw new Error(`Case ${definition.id} expect.${key} must be a non-empty string array`)
+      }
     }
     if (definition.expect.sectionHash !== undefined
       && (typeof definition.expect.sectionHash !== 'string' || !definition.expect.sectionHash.startsWith('#'))) {
@@ -686,6 +723,27 @@ function assignUniqueTargetGrades(results, targets, topK) {
   })
 }
 
+function evaluateHighlights(highlights, expectedValues) {
+  const matches = (item, expected) => String(item.text || '')
+    .normalize('NFKC')
+    .toLocaleLowerCase()
+    .includes(String(expected).normalize('NFKC').toLocaleLowerCase())
+  return {
+    contentValid: expectedValues.every(expected => highlights.some(item => matches(item, expected))),
+    styleValid: expectedValues.every(expected => highlights.some((item) => {
+      const background = String(item.backgroundColor || '').replace(/\s+/g, '').toLocaleLowerCase()
+      return matches(item, expected)
+        && background !== ''
+        && background !== 'transparent'
+        && background !== 'rgba(0,0,0,0)'
+        && item.textDecorationLine === 'none'
+    })),
+    visibleValid: expectedValues.every(expected => highlights.some(item => (
+      matches(item, expected) && Number(item.visibleRatio) >= 0.95
+    ))),
+  }
+}
+
 function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
   const results = observed.results || []
   const targets = definition.expect.targets || []
@@ -710,22 +768,20 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
   const expectedHighlightIncludes = definition.expect.highlightIncludes || []
   const highlightResult = firstRelevantIndex >= 0 ? results[firstRelevantIndex] : results[0]
   const highlights = highlightResult?.highlights || []
-  const normalizedHighlights = highlights.map(item => String(item.text || '').normalize('NFKC').toLocaleLowerCase())
-  const highlightContentValid = expectedHighlightIncludes.every(value => normalizedHighlights.some(text => text.includes(
+  const highlightValidation = evaluateHighlights(highlights, expectedHighlightIncludes)
+  const highlightContentValid = highlightValidation.contentValid
+  const highlightStyleValid = highlightValidation.styleValid
+  const highlightVisibleValid = highlightValidation.visibleValid
+  const expectedSectionTitleIncludes = definition.expect.sectionTitleIncludes || []
+  const normalizedSectionTitle = String(highlightResult?.sectionTitle || '').normalize('NFKC').toLocaleLowerCase()
+  const sectionTitleValid = expectedSectionTitleIncludes.every(value => normalizedSectionTitle.includes(
     String(value).normalize('NFKC').toLocaleLowerCase()
-  )))
-  const highlightStyleValid = expectedHighlightIncludes.every((value) => {
-    const expected = String(value).normalize('NFKC').toLocaleLowerCase()
-    return highlights.some((item) => {
-      const text = String(item.text || '').normalize('NFKC').toLocaleLowerCase()
-      const background = String(item.backgroundColor || '').replace(/\s+/g, '').toLocaleLowerCase()
-      return text.includes(expected)
-        && background !== ''
-        && background !== 'transparent'
-        && background !== 'rgba(0,0,0,0)'
-        && item.textDecorationLine === 'none'
-    })
-  })
+  ))
+  const sectionPlacementValid = expectedSectionTitleIncludes.length === 0
+    || Boolean(highlightResult?.sectionPlacementValid)
+  const expectedSectionHighlightIncludes = definition.expect.sectionHighlightIncludes || []
+  const sectionHighlights = highlightResult?.sectionHighlights || []
+  const sectionHighlightValidation = evaluateHighlights(sectionHighlights, expectedSectionHighlightIncludes)
   const expectedSectionHash = definition.expect.sectionHash || ''
   const sectionResult = firstRelevantIndex >= 0 ? results[firstRelevantIndex] : results[0]
   const sectionRouteValid = !expectedSectionHash || routeHash(sectionResult?.route) === expectedSectionHash
@@ -743,20 +799,32 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
     category: definition.category,
     intent: definition.intent,
     passed: runtimeComplete && resultCountValid && targetFound && descriptionValid
-      && highlightContentValid && highlightStyleValid
+      && highlightContentValid && highlightStyleValid && highlightVisibleValid
+      && sectionTitleValid && sectionPlacementValid && sectionHighlightValidation.contentValid
+      && sectionHighlightValidation.styleValid && sectionHighlightValidation.visibleValid
       && sectionRouteValid && sectionNavigationValid && invalidResults.length === 0,
     runtimeComplete,
     timedOut: Boolean(observed.timedOut),
     errors,
     latencyMs: observed.latencyMs,
+    viewportWidth: observed.viewportWidth,
     resultCount: results.length,
     resultCountValid,
     descriptionValid,
     expectedDescriptionIncludes,
     highlightContentValid,
     highlightStyleValid,
+    highlightVisibleValid,
     expectedHighlightIncludes,
     highlights,
+    sectionTitleValid,
+    sectionPlacementValid,
+    expectedSectionTitleIncludes,
+    sectionHighlightContentValid: sectionHighlightValidation.contentValid,
+    sectionHighlightStyleValid: sectionHighlightValidation.styleValid,
+    sectionHighlightVisibleValid: sectionHighlightValidation.visibleValid,
+    expectedSectionHighlightIncludes,
+    sectionHighlights,
     expectedSectionHash,
     sectionRouteValid,
     sectionNavigationValid,
@@ -774,6 +842,7 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
       rank: index + 1,
       route: result.route,
       title: result.title,
+      ...(result.sectionTitle ? { sectionTitle: result.sectionTitle } : {}),
       ...(result.description ? { description: result.description } : {}),
       relevance: grades[index],
       routeExists: routeValidity.get(normalizeRoute(result.route)) ?? null,
@@ -944,6 +1013,14 @@ function failureReason(item) {
   if (!item.resultCountValid) return `结果数量不符合预期，实际 ${item.resultCount}`
   if (item.firstRelevantRank === null) return '未返回主要目标'
   if (!item.descriptionValid) return `摘要未包含：${item.expectedDescriptionIncludes.join('、')}`
+  if (!item.sectionTitleValid) return `小标题未包含：${item.expectedSectionTitleIncludes.join('、')}`
+  if (!item.sectionPlacementValid) return '小标题未紧跟大标题或换行后未左对齐'
+  if (!item.highlightContentValid) return `摘要未高亮：${item.expectedHighlightIncludes.join('、')}`
+  if (!item.highlightStyleValid) return `摘要高亮样式无效：${item.expectedHighlightIncludes.join('、')}`
+  if (!item.highlightVisibleValid) return `摘要高亮被裁剪：${item.expectedHighlightIncludes.join('、')}`
+  if (!item.sectionHighlightContentValid) return `小标题未高亮：${item.expectedSectionHighlightIncludes.join('、')}`
+  if (!item.sectionHighlightStyleValid) return `小标题高亮样式无效：${item.expectedSectionHighlightIncludes.join('、')}`
+  if (!item.sectionHighlightVisibleValid) return `小标题高亮被裁剪：${item.expectedSectionHighlightIncludes.join('、')}`
   if (!item.sectionRouteValid) return `结果未定位到小节：${item.expectedSectionHash}`
   if (!item.sectionNavigationValid) return `点击后未滚动到小节：${item.expectedSectionHash}`
   return `首个主要目标位于第 ${item.firstRelevantRank} 名`
@@ -1032,6 +1109,12 @@ async function main() {
     const observedCases = []
     let searchPageReady = true
     for (const [index, definition] of dataset.cases.entries()) {
+      await browser.client.command('Emulation.setDeviceMetricsOverride', {
+        width: definition.viewportWidth || DEFAULT_VIEWPORT_WIDTH,
+        height: DEFAULT_VIEWPORT_HEIGHT,
+        deviceScaleFactor: 1,
+        mobile: false,
+      })
       if (!searchPageReady) {
         await initializeSearchPage(browser.client, target.url, options.timeoutMs)
         searchPageReady = true
