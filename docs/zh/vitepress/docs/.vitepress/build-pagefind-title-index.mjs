@@ -117,7 +117,8 @@ function createIdentifierSignal() {
     first: 1,
     excerpt: '',
     excerptScore: -1,
-    section: '',
+    sectionId: '',
+    sectionTitle: '',
   }
 }
 
@@ -139,7 +140,7 @@ function identifierExcerpt(content, identifier) {
   return `${start > 0 ? '...' : ''}${excerpt}`
 }
 
-function contextScore(field, excerpt, identifier, section = '') {
+function contextScore(field, excerpt, identifier, sectionTitle = '') {
   const fieldScore = {
     catalogDefinition: 700,
     definition: 650,
@@ -153,8 +154,8 @@ function contextScore(field, excerpt, identifier, section = '') {
     ? findKernelLaunch(excerpt)?.index ?? -1
     : excerpt.toLocaleLowerCase().indexOf(identifier)
   const sectionOwnsToken = identifier === KERNEL_LAUNCH_TOKEN
-    ? Boolean(findKernelLaunch(section))
-    : section.toLocaleLowerCase().includes(identifier)
+    ? Boolean(findKernelLaunch(sectionTitle))
+    : sectionTitle.toLocaleLowerCase().includes(identifier)
   const hasExplanation = excerpt.length >= identifier.length + 12
   return fieldScore
     + (sectionOwnsToken ? 800 : 0)
@@ -163,21 +164,22 @@ function contextScore(field, excerpt, identifier, section = '') {
     + Math.min(excerpt.length, MAX_EXCERPT_LENGTH) / MAX_EXCERPT_LENGTH
 }
 
-function addIdentifierContext(signals, content, field, section = '') {
+function addIdentifierContext(signals, content, field, section = null) {
   for (const identifier of new Set(searchTokenMatches(content))) {
     if (!signals.has(identifier)) signals.set(identifier, createIdentifierSignal())
     const signal = signals.get(identifier)
     const excerpt = identifierExcerpt(content, identifier)
-    const score = contextScore(field, excerpt, identifier, section)
+    const score = contextScore(field, excerpt, identifier, section?.title || '')
     if (excerpt && score > signal.excerptScore) {
       signal.excerpt = excerpt
       signal.excerptScore = score
-      signal.section = section
+      signal.sectionId = section?.id || ''
+      signal.sectionTitle = section?.title || ''
     }
   }
 }
 
-function addIdentifierSignals(signals, content, field, section = '') {
+function addIdentifierSignals(signals, content, field, section = null) {
   for (const identifier of searchTokenMatches(content)) {
     if (!signals.has(identifier)) signals.set(identifier, createIdentifierSignal())
     signals.get(identifier)[field]++
@@ -185,7 +187,7 @@ function addIdentifierSignals(signals, content, field, section = '') {
   addIdentifierContext(signals, content, field, section)
 }
 
-function addDefinitionSignal(signals, content, field = 'definition', section = '') {
+function addDefinitionSignal(signals, content, field = 'definition', section = null) {
   const text = String(content || '').replace(FORMAT_CHARACTER_REGEX, '').trim()
   const identifier = searchTokenMatches(text)[0]
   if (!identifier) return
@@ -297,17 +299,18 @@ function extractExcerpt($, article) {
     ?.content.slice(0, MAX_EXCERPT_LENGTH) || ''
 }
 
-function existingSectionIds($, article) {
+function existingSections($, article) {
   const sections = new WeakMap()
   const seen = new Map()
-  let currentSection = ''
+  let currentSection = null
   article.find('h2,h3,h4,h5,h6,pre,tr,th,td,li,p').each((_, element) => {
     if (/^h[2-6]$/.test(element.tagName)) {
-      const baseSlug = $(element).text().trim().replace(/\s+/g, '-')
+      const title = $(element).text().replace(/\s+/g, ' ').trim()
+      const baseSlug = title.replace(/\s+/g, '-')
       const count = seen.get(baseSlug) || 0
       const generatedId = count === 0 ? baseSlug : `${baseSlug}-${count}`
       seen.set(baseSlug, count + 1)
-      currentSection = $(element).attr('id') || generatedId
+      currentSection = { id: $(element).attr('id') || generatedId, title }
     }
     sections.set(element, currentSection)
   })
@@ -339,7 +342,7 @@ async function analyzeRecord(sourceDirectory, record) {
   const article = $('.markdown-body').first()
   if (!article.length) return fallback
   const excerpt = extractExcerpt($, article)
-  const sections = existingSectionIds($, article)
+  const sections = existingSections($, article)
   const headings = article.find('h1,h2,h3,h4,h5,h6').map((_, element) => $(element).text()).get()
   article.find('h1,h2,h3,h4,h5,h6').each((_, element) => {
     addIdentifierSignals(signals, $(element).text(), 'heading', sections.get(element))
@@ -485,13 +488,14 @@ function createIdentifierIndex(records, analyses, pageRanks) {
     }
     return snippetIds.get(value)
   }
-  function internSection(value) {
-    if (!value) return -1
-    if (!sectionIds.has(value)) {
-      sectionIds.set(value, sections.length)
-      sections.push(value)
+  function internSection(id, title) {
+    if (!id) return -1
+    const key = `${id}\u0000${title}`
+    if (!sectionIds.has(key)) {
+      sectionIds.set(key, sections.length)
+      sections.push([id, title])
     }
-    return sectionIds.get(value)
+    return sectionIds.get(key)
   }
   const identifiers = new Map()
   for (let pageId = 0; pageId < records.length; pageId++) {
@@ -523,12 +527,13 @@ function createIdentifierIndex(records, analyses, pageRanks) {
     const contextIds = selected.map(candidate => internSnippet(
       analyses[candidate.pageId].signals.get(key)?.excerpt || ''
     ))
-    const selectedSectionIds = selected.map(candidate => internSection(
-      analyses[candidate.pageId].signals.get(key)?.section || ''
-    ))
+    const selectedSectionIds = selected.map((candidate) => {
+      const signal = analyses[candidate.pageId].signals.get(key)
+      return internSection(signal?.sectionId || '', signal?.sectionTitle || '')
+    })
     return [key, pageIds, contextIds, selectedSectionIds]
   }).sort((left, right) => left[0] < right[0] ? -1 : left[0] > right[0] ? 1 : 0)
-  return { v: 6, p: pages, i: entries, s: snippets, h: sections }
+  return { v: 7, p: pages, i: entries, s: snippets, h: sections }
 }
 
 function decodeFragment(buffer) {

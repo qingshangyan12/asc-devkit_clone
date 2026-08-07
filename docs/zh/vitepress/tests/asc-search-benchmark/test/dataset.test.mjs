@@ -15,22 +15,23 @@ import { test } from 'node:test'
 const dataset = JSON.parse(await readFile(new URL('../cases/ascendc.json', import.meta.url), 'utf8'))
 
 test('dataset has unique and complete cases', () => {
-  assert.equal(dataset.cases.length, 159)
+  assert.equal(dataset.cases.length, 160)
   assert.equal(new Set(dataset.cases.map(item => item.id)).size, dataset.cases.length)
   for (const item of dataset.cases) {
     assert.ok(item.id)
     assert.ok(item.query)
     assert.ok(item.category)
     assert.ok(Array.isArray(item.expect.targets))
-    if (item.expect.descriptionIncludes !== undefined) {
-      assert.ok(Array.isArray(item.expect.descriptionIncludes))
-      assert.ok(item.expect.descriptionIncludes.length > 0)
-      assert.ok(item.expect.descriptionIncludes.every(value => typeof value === 'string' && value))
-    }
-    if (item.expect.highlightIncludes !== undefined) {
-      assert.ok(Array.isArray(item.expect.highlightIncludes))
-      assert.ok(item.expect.highlightIncludes.length > 0)
-      assert.ok(item.expect.highlightIncludes.every(value => typeof value === 'string' && value))
+    for (const key of [
+      'descriptionIncludes',
+      'highlightIncludes',
+      'sectionTitleIncludes',
+      'sectionHighlightIncludes',
+    ]) {
+      if (item.expect[key] === undefined) continue
+      assert.ok(Array.isArray(item.expect[key]))
+      assert.ok(item.expect[key].length > 0)
+      assert.ok(item.expect[key].every(value => typeof value === 'string' && value))
     }
     if (item.expect.sectionHash !== undefined) {
       assert.match(item.expect.sectionHash, /^#./)
@@ -61,12 +62,15 @@ test('dataset covers compiler option identifier regressions', () => {
   }
   assert.equal(dataset.cases.find(item => item.query === 'NO_OVER').expect.sectionHash, '#内置编译宏开关')
   assert.deepEqual(dataset.cases.find(item => item.query === 'NO_OVER').expect.highlightIncludes, ['NO_OVER'])
+  assert.deepEqual(dataset.cases.find(item => item.query === 'NO_OVER').expect.sectionTitleIncludes, ['内置编译宏开关'])
 })
 
 test('dataset covers existing section navigation', () => {
   const item = dataset.cases.find(candidate => candidate.id === 'zh-section-memory-lifecycle')
   assert.ok(item)
   assert.equal(item.expect.sectionHash, '#内存生命周期管理：AllocTensor/FreeTensor解决读后写冲突')
+  assert.deepEqual(item.expect.sectionTitleIncludes, ['内存生命周期管理：AllocTensor/FreeTensor解决读后写冲突'])
+  assert.deepEqual(item.expect.sectionHighlightIncludes, ['内存生命周期管理'])
 })
 
 test('dataset covers humanized identifiers and incomplete prefixes', () => {
@@ -91,6 +95,18 @@ test('dataset covers kernel launch syntax variants', () => {
     assert.deepEqual(item.expect.highlightIncludes, ['<<<'])
     assert.equal(item.expect.sectionHash, '#<<<>>>调用')
   }
+
+  const mobileHighlight = dataset.cases.find(item => item.id === 'syntax-kernel-launch-prefix-second-visible-mobile')
+  assert.ok(mobileHighlight)
+  assert.equal(mobileHighlight.viewportWidth, 375)
+  assert.deepEqual(mobileHighlight.expect.highlightIncludes, ['<<<'])
+  assert.deepEqual(mobileHighlight.expect.sectionTitleIncludes, ['<<<>>>调用'])
+  assert.deepEqual(mobileHighlight.expect.sectionHighlightIncludes, ['<<<'])
+  assert.deepEqual(mobileHighlight.expect.targets, [targets[1]])
+
+  const prefix = dataset.cases.find(item => item.id === 'syntax-kernel-launch-prefix')
+  assert.deepEqual(prefix.expect.sectionTitleIncludes, ['<<<>>>调用'])
+  assert.deepEqual(prefix.expect.sectionHighlightIncludes, ['<<<'])
 })
 
 test('dataset covers exact English words outranking spelling corrections', () => {
