@@ -8,9 +8,13 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/ SRC)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/specialization SPECIALIZATION_SRC)
+
+add_cann_third_party(json)
 
 add_library(acl_rtc SHARED
     ${SRC}
+    ${SPECIALIZATION_SRC}
 )
 
 if(BUILD_OPEN_PROJECT)
@@ -18,6 +22,7 @@ if(BUILD_OPEN_PROJECT)
         ${CMAKE_CURRENT_SOURCE_DIR}/../include
     )
     target_include_directories(acl_rtc PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../build/common
         ${ASCEND_CANN_PACKAGE_PATH}/include
         ${ASCEND_CANN_PACKAGE_PATH}/include/acl
         ${ASCEND_CANN_PACKAGE_PATH}/include/pkg_inc/base/
@@ -30,7 +35,11 @@ else()
     target_include_directories(acl_rtc PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../include
         ${TOP_DIR}/runtime/include/external
- 	    ${TOP_DIR}/runtime/include/external/acl
+        ${TOP_DIR}/runtime/include/external/acl
+        ${TOP_DIR}/abl/libc_sec/include
+        ${TOP_DIR}/abl/mmpa/inc
+        ${TOP_DIR}/abl/slog/inc/toolchain
+        ${TOP_DIR}/asc/asc-devkit/tools/build/common
         ${CCEC_PATH}/../include
     )
 endif()
@@ -41,8 +50,13 @@ target_link_directories(acl_rtc PRIVATE
 
 target_link_libraries(acl_rtc PRIVATE
     $<BUILD_INTERFACE:intf_pub>
+    $<BUILD_INTERFACE:mmpa_headers>
+    $<BUILD_INTERFACE:metadef_headers>
     dl
     c_sec_static
+    json
+    mmpa
+    unified_dlog
 )
 
 target_compile_options(acl_rtc PRIVATE

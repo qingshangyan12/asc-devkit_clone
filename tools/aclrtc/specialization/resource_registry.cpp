@@ -1,0 +1,598 @@
+/**
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+#include "resource_registry.h"
+
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
+#include <dlfcn.h>
+#include <exception>
+#include <fstream>
+#include <mutex>
+#include <new>
+#include <set>
+#include <string>
+#include <vector>
+
+#include "ascendc_manifest_abi.h"
+#include "ascendc_tool_log.h"
+#include "file_utils.h"
+#include "resource_manifest.h"
+
+namespace ascendc {
+namespace resource {
+namespace {
+
+ResourceStatus CopyString(const AcString& value, const char* field, uint64_t maxSize, std::string& output)
+{
+    if (value.size != 0U && value.data == nullptr) {
+        ASCENDLOGE("Invalid compile resource field: field=%s, data is null, size=%" PRIu64, field, value.size);
+        return ResourceStatus::InvalidResource;
+    }
+    if (value.size > maxSize) {
+        ASCENDLOGE(
+            "Compile resource field exceeds size limit: field=%s, size=%" PRIu64 ", limit=%" PRIu64, field, value.size,
+            maxSize);
+        return ResourceStatus::InvalidResource;
+    }
+    output.assign(value.size == 0U ? "" : value.data, value.size);
+    return ResourceStatus::Success;
+}
+
+std::string ReplaceResourceRoot(std::string value, const std::string& materializedRoot)
+{
+    constexpr const char* marker = "${resource}";
+    size_t begin = 0U;
+    while ((begin = value.find(marker, begin)) != std::string::npos) {
+        value.replace(begin, std::strlen(marker), materializedRoot);
+        begin += materializedRoot.size();
+    }
+    return value;
+}
+
+std::string ReferencedResourcePath(const std::string& value, const std::string& materializedRoot)
+{
+    constexpr const char* marker = "${resource}";
+    const size_t begin = value.find(marker);
+    if (begin == std::string::npos) {
+        return std::string();
+    }
+    const size_t pathBegin = begin + std::strlen(marker) + 1U;
+    return FileUtils::JoinPath(materializedRoot, value.substr(pathBegin));
+}
+
+bool IsResourceSoName(const std::string& path)
+{
+    const std::string name = FileUtils::FileName(path);
+    return name.size() > std::strlen("lib_compile_database.so") && name.rfind("lib", 0U) == 0U &&
+           name.compare(
+               name.size() - std::strlen("_compile_database.so"), std::strlen("_compile_database.so"),
+               "_compile_database.so") == 0;
+}
+
+std::string Trim(const std::string& value)
+{
+    const size_t begin = value.find_first_not_of(" \t\r\n");
+    if (begin == std::string::npos) {
+        return {};
+    }
+    const size_t end = value.find_last_not_of(" \t\r\n");
+    return value.substr(begin, end - begin + 1U);
+}
+
+std::vector<std::string> SplitList(const char* value, char delimiter)
+{
+    std::vector<std::string> result;
+    if (value == nullptr) {
+        return result;
+    }
+    const std::string text(value);
+    size_t begin = 0U;
+    while (begin <= text.size()) {
+        const size_t end = text.find(delimiter, begin);
+        const std::string item = Trim(text.substr(begin, end == std::string::npos ? std::string::npos : end - begin));
+        if (!item.empty() && std::find(result.begin(), result.end(), item) == result.end()) {
+            result.push_back(item);
+        }
+        if (end == std::string::npos) {
+            break;
+        }
+        begin = end + 1U;
+    }
+    return result;
+}
+
+std::vector<std::string> ReadConfiguredVendors(const std::string& oppRoot)
+{
+    std::ifstream input(FileUtils::JoinPath(oppRoot, "vendors/config.ini"));
+    std::string line;
+    while (std::getline(input, line)) {
+        const size_t separator = line.find('=');
+        if (separator == std::string::npos || Trim(line.substr(0U, separator)) != "load_priority") {
+            continue;
+        }
+        return SplitList(line.substr(separator + 1U).c_str(), ',');
+    }
+    return {};
+}
+
+std::vector<std::string> AutomaticSearchRoots()
+{
+    constexpr const char* relativeJitRoot = "op_impl/ai_core/tbe/kernel/jit";
+    std::vector<std::string> roots;
+    for (const std::string& customRoot : SplitList(std::getenv("ASCEND_CUSTOM_OPP_PATH"), ':')) {
+        roots.push_back(FileUtils::JoinPath(customRoot, relativeJitRoot));
+    }
+    const char* oppEnvironment = std::getenv("ASCEND_OPP_PATH");
+    if (oppEnvironment != nullptr && *oppEnvironment != '\0') {
+        const std::string oppRoot(oppEnvironment);
+        for (const std::string& vendor : ReadConfiguredVendors(oppRoot)) {
+            if (FileUtils::FileName(vendor) == vendor && vendor != "." && vendor != "..") {
+                roots.push_back(
+                    FileUtils::JoinPath(
+                        FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "vendors"), vendor), relativeJitRoot));
+            }
+        }
+        roots.push_back(FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "built-in"), relativeJitRoot));
+    }
+    return roots;
+}
+
+void AddLibrary(const std::string& path, std::set<std::string>& libraries)
+{
+    if (!FileUtils::IsRegularFile(path) || FileUtils::IsSymlink(path) || !IsResourceSoName(path)) {
+        return;
+    }
+    std::string canonical;
+    if (FileUtils::CanonicalPath(path, canonical)) {
+        libraries.insert(canonical);
+    }
+}
+
+bool CollectLibraries(
+    const std::string& directory, bool recursive, bool ignoreOpenFailure, std::set<std::string>& libraries)
+{
+    std::vector<std::string> paths;
+    if (!FileUtils::WalkDirectory(directory, recursive, ignoreOpenFailure, paths)) {
+        return false;
+    }
+    for (const std::string& path : paths) {
+        AddLibrary(path, libraries);
+    }
+    return true;
+}
+
+ResourceStatus DiscoverDirectLibraries(const std::string& directory, std::set<std::string>& libraries)
+{
+    std::string root;
+    if (!FileUtils::CanonicalPath(directory, root) || !FileUtils::IsDirectory(root)) {
+        ASCENDLOGE("JIT_COMPILE_RESOURCE_DIR is not a directory: path=%s", directory.c_str());
+        return ResourceStatus::InvalidResource;
+    }
+    ASCENDLOGD("Scanning explicit compile resource directory: path=%s", root.c_str());
+    return CollectLibraries(root, false, false, libraries) ? ResourceStatus::Success : ResourceStatus::IoError;
+}
+
+ResourceStatus DiscoverRecursiveLibraries(const std::string& directory, std::set<std::string>& libraries)
+{
+    if (FileUtils::IsSymlink(directory)) {
+        ASCENDLOGW("Skipping symlinked automatic compile resource root: path=%s", directory.c_str());
+        return ResourceStatus::Success;
+    }
+    std::string root;
+    if (!FileUtils::CanonicalPath(directory, root) || !FileUtils::IsDirectory(root)) {
+        ASCENDLOGD("Automatic compile resource root is unavailable: path=%s", directory.c_str());
+        return ResourceStatus::Success;
+    }
+    ASCENDLOGD("Scanning automatic compile resource root: path=%s", root.c_str());
+    return CollectLibraries(root, true, true, libraries) ? ResourceStatus::Success : ResourceStatus::IoError;
+}
+
+ResourceStatus DiscoverLibraries(const std::string& explicitDirectory, std::vector<std::string>& libraries)
+{
+    std::set<std::string> found;
+    if (!explicitDirectory.empty()) {
+        const ResourceStatus status = DiscoverDirectLibraries(explicitDirectory, found);
+        if (status != ResourceStatus::Success) {
+            return status;
+        }
+    } else {
+        for (const std::string& root : AutomaticSearchRoots()) {
+            const ResourceStatus status = DiscoverRecursiveLibraries(root, found);
+            if (status != ResourceStatus::Success) {
+                return status;
+            }
+        }
+    }
+    if (found.empty()) {
+        if (explicitDirectory.empty()) {
+            ASCENDLOGW("No compile resource shared object found from ASCEND_CUSTOM_OPP_PATH or ASCEND_OPP_PATH");
+        } else {
+            ASCENDLOGE(
+                "JIT_COMPILE_RESOURCE_DIR contains no compile resource shared object: path=%s",
+                explicitDirectory.c_str());
+        }
+        return ResourceStatus::NotFound;
+    }
+    libraries.assign(found.begin(), found.end());
+    ASCENDLOGI("Discovered compile resource shared objects: count=%zu", libraries.size());
+    return ResourceStatus::Success;
+}
+
+constexpr uint64_t kMaxPackageIdSize = 4096U;
+constexpr uint64_t kMaxManifestSize = 8U * 1024U * 1024U;
+constexpr uint64_t kMaxPathSize = 4096U;
+constexpr uint64_t kMaxResourceFileSize = 256U * 1024U * 1024U;
+constexpr uint64_t kMaxManifestCount = 4096U;
+constexpr uint64_t kMaxExtensionCount = 1024U;
+constexpr uint64_t kMaxFileCount = 65536U;
+
+} // namespace
+
+ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, ResourceRecordPack& pack)
+{
+    if (pack.filesMaterialized) {
+        return ResourceStatus::Success;
+    }
+    if (temporaryRoot_.empty()) {
+        if (!FileUtils::MakeTempRoot(temporaryRoot_)) {
+            return ResourceStatus::IoError;
+        }
+    }
+    std::string materializedRoot;
+    try {
+        materializedRoot = FileUtils::JoinPath(temporaryRoot_, resourceId);
+        ASCENDLOGI("Materializing compile resources: resource_id=%s, files=%zu", resourceId.c_str(), pack.files.size());
+        std::vector<std::string> materializedPaths;
+        materializedPaths.reserve(pack.files.size());
+        for (const ResourceFileData& file : pack.files) {
+            materializedPaths.push_back(FileUtils::JoinPath(materializedRoot, file.filePath));
+            if (!FileUtils::WriteFile(materializedPaths.back(), file.bytes)) {
+                FileUtils::RemoveTree(materializedRoot);
+                return ResourceStatus::IoError;
+            }
+        }
+
+        std::unordered_map<std::string, std::unique_ptr<ResourceRecord>> resolvedRecords;
+        resolvedRecords.reserve(pack.records.size());
+        for (const auto& item : pack.records) {
+            std::unique_ptr<ResourceRecord> record(new ResourceRecord());
+            record->resourceId = item.second->resourceId;
+            record->socVersion = item.second->socVersion;
+            record->sourceFile = item.second->sourceFile;
+            record->materializedRoot = materializedRoot;
+            record->resourceSoPath = pack.resourceSoPath;
+            record->kernel = item.second->kernel;
+            for (ManifestConstant& constant : record->kernel.constants) {
+                constant.file = ReplaceResourceRoot(std::move(constant.file), materializedRoot);
+                if (!FileUtils::IsRegularFile(constant.file)) {
+                    ASCENDLOGE("Constant references an unavailable resource: path=%s", constant.file.c_str());
+                    FileUtils::RemoveTree(materializedRoot);
+                    return ResourceStatus::InvalidResource;
+                }
+            }
+            for (ManifestObject& object : record->kernel.objects) {
+                for (ManifestCommand& command : object.commands) {
+                    for (std::string& option : command.options) {
+                        const std::string referenced = ReferencedResourcePath(option, materializedRoot);
+                        if (!referenced.empty() && !FileUtils::Exists(referenced)) {
+                            ASCENDLOGE("Command references an unavailable resource: path=%s", referenced.c_str());
+                            FileUtils::RemoveTree(materializedRoot);
+                            return ResourceStatus::InvalidResource;
+                        }
+                        option = ReplaceResourceRoot(std::move(option), materializedRoot);
+                    }
+                }
+            }
+            for (std::string& option : record->kernel.linkOptions) {
+                const std::string referenced = ReferencedResourcePath(option, materializedRoot);
+                if (!referenced.empty() && !FileUtils::Exists(referenced)) {
+                    ASCENDLOGE("Link option references an unavailable resource: path=%s", referenced.c_str());
+                    FileUtils::RemoveTree(materializedRoot);
+                    return ResourceStatus::InvalidResource;
+                }
+                option = ReplaceResourceRoot(std::move(option), materializedRoot);
+            }
+            resolvedRecords.emplace(item.first, std::move(record));
+        }
+
+        for (size_t index = 0U; index < pack.files.size(); ++index) {
+            pack.files[index].materializedPath.swap(materializedPaths[index]);
+        }
+        pack.records.swap(resolvedRecords);
+        pack.filesMaterialized = true;
+        ASCENDLOGI(
+            "Compile resources materialized successfully: resource_id=%s, kernels=%zu", resourceId.c_str(),
+            pack.records.size());
+        return ResourceStatus::Success;
+    } catch (const std::bad_alloc&) {
+        FileUtils::RemoveTree(materializedRoot);
+        ASCENDLOGE("Compile resource materialization failed: out of memory, resource_id=%s", resourceId.c_str());
+        return ResourceStatus::NoMemory;
+    } catch (const std::exception& error) {
+        FileUtils::RemoveTree(materializedRoot);
+        ASCENDLOGE(
+            "Compile resource materialization failed unexpectedly: resource_id=%s, error=%s", resourceId.c_str(),
+            error.what());
+        return ResourceStatus::InternalError;
+    } catch (...) {
+        FileUtils::RemoveTree(materializedRoot);
+        ASCENDLOGE("Compile resource materialization failed unexpectedly: resource_id=%s", resourceId.c_str());
+        return ResourceStatus::InternalError;
+    }
+}
+
+ResourceStatus ResourceRegistry::LoadLibrary(const std::string& libraryPath)
+{
+    ASCENDLOGI("Loading compile resource shared object: path=%s", libraryPath.c_str());
+    void* library = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+    if (library == nullptr) {
+        const char* error = dlerror();
+        ASCENDLOGE(
+            "Failed to load compile resource shared object: path=%s, error=%s", libraryPath.c_str(),
+            error == nullptr ? "unknown" : error);
+        return ResourceStatus::LoadError;
+    }
+    libraries_.push_back(library);
+    dlerror();
+    AscendcGetCompileResourceBundleFn getter =
+        reinterpret_cast<AscendcGetCompileResourceBundleFn>(dlsym(library, "AscendcGetCompileResourceBundle"));
+    const char* symbolError = dlerror();
+    if (symbolError != nullptr || getter == nullptr) {
+        ASCENDLOGE("Compile resource shared object has no bundle entry point: path=%s", libraryPath.c_str());
+        return ResourceStatus::InvalidResource;
+    }
+    const AcCompileResourceBundleHeader* header = getter();
+    if (header == nullptr || header->magic != AC_COMPILE_RESOURCE_MAGIC ||
+        header->abiVersion != AC_COMPILE_RESOURCE_ABI_VERSION ||
+        header->structSize != sizeof(AcCompileResourceBundle) || header->flags != 0U) {
+        ASCENDLOGE("Invalid compile resource bundle header: path=%s", libraryPath.c_str());
+        return ResourceStatus::InvalidResource;
+    }
+    const AcCompileResourceBundle* bundle = reinterpret_cast<const AcCompileResourceBundle*>(header);
+    if (bundle->manifestCount == 0U || bundle->manifestCount > kMaxManifestCount || bundle->manifests == nullptr ||
+        bundle->extensionCount > kMaxExtensionCount ||
+        ((bundle->extensionCount == 0U) != (bundle->extensions == nullptr))) {
+        ASCENDLOGE(
+            "Invalid compile resource bundle table: path=%s, manifests=%" PRIu64 ", extensions=%" PRIu64,
+            libraryPath.c_str(), bundle->manifestCount, bundle->extensionCount);
+        return ResourceStatus::InvalidResource;
+    }
+    for (uint64_t extensionIndex = 0U; extensionIndex < bundle->extensionCount; ++extensionIndex) {
+        const AcCompileResourceExtension& extension = bundle->extensions[extensionIndex];
+        if ((extension.flags & ~AC_COMPILE_RESOURCE_EXTENSION_REQUIRED) != 0U ||
+            ((extension.dataSize == 0U) != (extension.data == nullptr))) {
+            ASCENDLOGE(
+                "Invalid compile resource extension: path=%s, index=%" PRIu64, libraryPath.c_str(), extensionIndex);
+            return ResourceStatus::InvalidResource;
+        }
+        if ((extension.flags & AC_COMPILE_RESOURCE_EXTENSION_REQUIRED) != 0U) {
+            ASCENDLOGE(
+                "Unsupported required compile resource extension: path=%s, index=%" PRIu64, libraryPath.c_str(),
+                extensionIndex);
+            return ResourceStatus::InvalidResource;
+        }
+        ASCENDLOGW(
+            "Ignoring optional compile resource extension: path=%s, index=%" PRIu64, libraryPath.c_str(),
+            extensionIndex);
+    }
+    std::string packageId;
+    ResourceStatus status = CopyString(bundle->packageId, "packageId", kMaxPackageIdSize, packageId);
+    if (status != ResourceStatus::Success) {
+        return status;
+    }
+    ASCENDLOGD(
+        "Validated compile resource bundle: package_id=%s, manifests=%" PRIu64, packageId.c_str(),
+        bundle->manifestCount);
+    for (uint64_t manifestIndex = 0U; manifestIndex < bundle->manifestCount; ++manifestIndex) {
+        status = LoadManifest(bundle->manifests[manifestIndex], libraryPath, manifestIndex);
+        if (status != ResourceStatus::Success) {
+            return status;
+        }
+    }
+    ASCENDLOGI("Loaded compile resource shared object: path=%s, package_id=%s", libraryPath.c_str(), packageId.c_str());
+    return ResourceStatus::Success;
+}
+
+ResourceStatus ResourceRegistry::LoadManifest(
+    const AcCompileResourceManifest& unit, const std::string& libraryPath, uint64_t manifestIndex)
+{
+    std::string manifestText;
+    ResourceStatus status = CopyString(unit.json, "manifest.json", kMaxManifestSize, manifestText);
+    if (status != ResourceStatus::Success) {
+        return status;
+    }
+    const std::string manifestOrigin = libraryPath + ":manifest[" + std::to_string(manifestIndex) + "]";
+    ResourceManifest manifest;
+    if (!ParseResourceManifest(manifestText, manifestOrigin, manifest)) {
+        ASCENDLOGE("Invalid compile resource manifest: origin=%s", manifestOrigin.c_str());
+        return ResourceStatus::InvalidResource;
+    }
+    if (unit.fileCount > kMaxFileCount || ((unit.fileCount == 0U) != (unit.files == nullptr))) {
+        ASCENDLOGE(
+            "Manifest has an invalid resource file table: resource_id=%s, files=%" PRIu64, manifest.resourceId.c_str(),
+            unit.fileCount);
+        return ResourceStatus::InvalidResource;
+    }
+    if (recordPacks_.count(manifest.resourceId) != 0U) {
+        ASCENDLOGE("Duplicate resource_id in compile resource bundles: resource_id=%s", manifest.resourceId.c_str());
+        return ResourceStatus::InvalidResource;
+    }
+    ResourceRecordPack pack;
+    pack.socVersion = manifest.socVersion;
+    pack.resourceSoPath = libraryPath;
+    pack.files.reserve(static_cast<size_t>(unit.fileCount));
+    std::set<std::string> bundleFilePaths;
+    for (uint64_t fileIndex = 0U; fileIndex < unit.fileCount; ++fileIndex) {
+        const AcCompileResourceFile& file = unit.files[fileIndex];
+        std::string fileName;
+        std::string filePath;
+        status = CopyString(file.fileName, "resource.fileName", kMaxPathSize, fileName);
+        if (status == ResourceStatus::Success) {
+            status = CopyString(file.filePath, "resource.filePath", kMaxPathSize, filePath);
+        }
+        if (status != ResourceStatus::Success) {
+            return status;
+        }
+        if (!ValidateRelativeResourcePath(fileName) || FileUtils::FileName(fileName) != fileName) {
+            ASCENDLOGE("Bundle resource has an invalid file name: value=%s", fileName.c_str());
+            return ResourceStatus::InvalidResource;
+        }
+        if (!ValidateRelativeResourcePath(filePath) ||
+            (!manifest.baseDir.empty() && !FileUtils::IsWithinPath(filePath, manifest.baseDir)) ||
+            (!manifest.baseDir.empty() &&
+             FileUtils::PathComponents(filePath) == FileUtils::PathComponents(manifest.baseDir)) ||
+            FileUtils::FileName(filePath) != fileName) {
+            ASCENDLOGE("Bundle resource has an invalid file path: value=%s", filePath.c_str());
+            return ResourceStatus::InvalidResource;
+        }
+        if (file.size > kMaxResourceFileSize || (file.size != 0U && file.data == nullptr)) {
+            ASCENDLOGE("Bundle resource has invalid data: path=%s, size=%" PRIu64, filePath.c_str(), file.size);
+            return ResourceStatus::InvalidResource;
+        }
+        if (!bundleFilePaths.insert(filePath).second) {
+            ASCENDLOGE("Duplicate resource file path in bundle: path=%s", filePath.c_str());
+            return ResourceStatus::InvalidResource;
+        }
+        std::vector<uint8_t> bytes;
+        if (file.size != 0U) {
+            bytes.assign(file.data, file.data + file.size);
+        }
+        pack.files.push_back({fileName, filePath, std::string(), std::move(bytes)});
+        ASCENDLOGD(
+            "Validated bundled resource file: resource_id=%s, path=%s, size=%" PRIu64, manifest.resourceId.c_str(),
+            filePath.c_str(), file.size);
+    }
+    std::sort(pack.files.begin(), pack.files.end(), [](const ResourceFileData& left, const ResourceFileData& right) {
+        return left.filePath < right.filePath;
+    });
+    for (const ManifestKernel& kernel : manifest.kernels) {
+        std::unique_ptr<ResourceRecord> record(new ResourceRecord());
+        record->resourceId = manifest.resourceId;
+        record->socVersion = manifest.socVersion;
+        record->sourceFile = manifest.sourceFile;
+        record->resourceSoPath = libraryPath;
+        record->kernel = kernel;
+        pack.records.emplace(kernel.kernelName, std::move(record));
+    }
+    ASCENDLOGI(
+        "Validated compile resource manifest: resource_id=%s, kernels=%zu, files=%zu", manifest.resourceId.c_str(),
+        pack.records.size(), pack.files.size());
+    recordPacks_.emplace(manifest.resourceId, std::move(pack));
+    return ResourceStatus::Success;
+}
+
+ResourceRegistry::ResourceRegistry() = default;
+
+ResourceRegistry::~ResourceRegistry()
+{
+    recordPacks_.clear();
+    for (auto iterator = libraries_.rbegin(); iterator != libraries_.rend(); ++iterator) {
+        if (dlclose(*iterator) != 0) {
+            ASCENDLOGW("Failed to close compile resource shared object");
+        }
+    }
+    if (!temporaryRoot_.empty()) {
+        ASCENDLOGD("Removing compile resource temporary root: path=%s", temporaryRoot_.c_str());
+        FileUtils::RemoveTree(temporaryRoot_);
+    }
+}
+
+ResourceStatus ResourceRegistry::Load(const std::string& directory) noexcept
+{
+    try {
+        ASCENDLOGI(
+            "Starting compile resource registry load: explicit_directory=%s",
+            directory.empty() ? "<automatic>" : directory.c_str());
+        std::vector<std::string> libraryPaths;
+        ResourceStatus status = DiscoverLibraries(directory, libraryPaths);
+        if (status != ResourceStatus::Success) {
+            return status;
+        }
+        libraries_.reserve(libraryPaths.size());
+        for (const std::string& libraryPath : libraryPaths) {
+            status = LoadLibrary(libraryPath);
+            if (status != ResourceStatus::Success) {
+                ASCENDLOGE("Compile resource registry load stopped: path=%s", libraryPath.c_str());
+                return status;
+            }
+        }
+        ASCENDLOGI(
+            "Compile resource registry loaded successfully: libraries=%zu, manifests=%zu", libraryPaths.size(),
+            recordPacks_.size());
+        return ResourceStatus::Success;
+    } catch (const std::bad_alloc&) {
+        ASCENDLOGE("Compile resource registry load failed: out of memory");
+        return ResourceStatus::NoMemory;
+    } catch (const std::exception& error) {
+        ASCENDLOGE("Compile resource registry load failed unexpectedly: error=%s", error.what());
+        return ResourceStatus::InternalError;
+    } catch (...) {
+        ASCENDLOGE("Compile resource registry load failed unexpectedly: unknown error");
+        return ResourceStatus::InternalError;
+    }
+}
+
+ResourceStatus ResourceRegistry::Lookup(
+    const std::string& resourceId, const std::string& kernelName, const ResourceRecord*& record) noexcept
+{
+    record = nullptr;
+    try {
+        ASCENDLOGD("Looking up compile resource: resource_id=%s, kernel=%s", resourceId.c_str(), kernelName.c_str());
+        std::lock_guard<std::mutex> lock(lookupMutex_);
+        const auto packIterator = recordPacks_.find(resourceId);
+        if (packIterator == recordPacks_.end()) {
+            ASCENDLOGD("Compile resource resource_id was not found: resource_id=%s", resourceId.c_str());
+            return ResourceStatus::NotFound;
+        }
+        ResourceRecordPack& pack = packIterator->second;
+        const auto recordIterator = pack.records.find(kernelName);
+        if (recordIterator == pack.records.end() || recordIterator->second->socVersion != pack.socVersion) {
+            ASCENDLOGD(
+                "Compile resource kernel was not found: resource_id=%s, kernel=%s", resourceId.c_str(),
+                kernelName.c_str());
+            return ResourceStatus::NotFound;
+        }
+        const ResourceStatus status = Materialize(resourceId, pack);
+        if (status != ResourceStatus::Success) {
+            return status;
+        }
+        const auto resolvedIterator = pack.records.find(kernelName);
+        if (resolvedIterator == pack.records.end()) {
+            ASCENDLOGE(
+                "Materialized compile resource record disappeared: resource_id=%s, kernel=%s", resourceId.c_str(),
+                kernelName.c_str());
+            return ResourceStatus::InternalError;
+        }
+        record = resolvedIterator->second.get();
+        ASCENDLOGD(
+            "Compile resource lookup succeeded: resource_id=%s, kernel=%s", resourceId.c_str(), kernelName.c_str());
+        return ResourceStatus::Success;
+    } catch (const std::bad_alloc&) {
+        ASCENDLOGE(
+            "Compile resource lookup failed: out of memory, resource_id=%s, kernel=%s", resourceId.c_str(),
+            kernelName.c_str());
+        return ResourceStatus::NoMemory;
+    } catch (const std::exception& error) {
+        ASCENDLOGE(
+            "Compile resource lookup failed unexpectedly: resource_id=%s, kernel=%s, error=%s", resourceId.c_str(),
+            kernelName.c_str(), error.what());
+        return ResourceStatus::InternalError;
+    } catch (...) {
+        ASCENDLOGE(
+            "Compile resource lookup failed unexpectedly: resource_id=%s, kernel=%s", resourceId.c_str(),
+            kernelName.c_str());
+        return ResourceStatus::InternalError;
+    }
+}
+
+} // namespace resource
+} // namespace ascendc
