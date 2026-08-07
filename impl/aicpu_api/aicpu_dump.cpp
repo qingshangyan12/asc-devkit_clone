@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include "securec.h"
 #include "aicpu_api/aicpu_api.h"
-#include "impl/utils/debug/asc_utils_types.h"
 
 struct DumpConfig {
     void* dumpBufAddr;
@@ -55,10 +54,20 @@ void printf(const char* fmt, ...)
     va_end(otherArgs);
 }
 
+struct AscAicpuTlvHead { // TLV Head include type and length
+    uint16_t type;
+    uint16_t len;
+};
+
+struct AscAicpuTlv {
+    AscAicpuTlvHead head;
+    uint32_t value; // feature: PRINT = 1, FFTS = 2, L2CACHE = 3
+};
+
 inline void enable_asc_aicpu_fifo_debug()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0))
-    static const struct AscTlv __asc_aicpu_meta_section__ __attribute__((used, section(".ascend.meta"))) = {4, 4, 6};
+    static const struct AscAicpuTlv __asc_aicpu_meta_section__ __attribute__((used, section(".ascend.meta"))) = {4, 4, 6};
 #endif // (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0))
 }
 
