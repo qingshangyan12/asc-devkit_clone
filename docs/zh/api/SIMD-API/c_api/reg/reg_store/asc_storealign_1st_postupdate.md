@@ -64,7 +64,22 @@ PIPE_V
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器，dst_align32b为UB地址，UB地址空间外的指针不可作为dst_align32b传入。
+- dst_align32b起始地址需32字节对齐。
+- UB容量上限：UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst_align32b起始地址与Post Update累计偏移量之和不可超过实际可用容量。
+- 单次搬出的数据量为单个元素（dtype字节大小为1/2/4时对应1/2/4字节），由本接口模式决定，不可由参数调整。
+
+### 单元素搬出与Post Update约束
+
+- offset单位为元素个数。例如dtype为`int16_t`时offset=2表示dst_align32b指针底层UB地址向后偏移2 × 2 = 4字节；dtype为`float`时offset=1表示偏移4字节。
+- offset取0时dst_align32b指针不变，dst仍按当前dst_align32b起始位置写入src第一个元素，可重复向同一地址写入同一值。
+- offset取负值时dst_align32b指针向后回退，需确保回退后的地址仍32字节对齐且不低于UB起始地址。
+- Post Update后的dst_align32b新地址仍需满足32字节对齐，否则下一次调用本接口会报错；通常取offset使偏移量为32字节的整数倍以保证对齐（如dtype为`int8_t`时取offset为32的整数倍，dtype为`float`时取offset为8的整数倍）。
+- Post Update仅更新dst_align32b指针，不影响src寄存器内容；多次调用时每次都搬出当前src第一个元素，若需搬出不同元素应先在src中更新元素或使用其他搬出接口。
+- 本接口忽略mask，无论是否传入掩码寄存器都向dst写入src第一个元素；如需按mask过滤的有效元素搬出，应使用带mask参数的搬出接口。
 
 ## 调用示例
 

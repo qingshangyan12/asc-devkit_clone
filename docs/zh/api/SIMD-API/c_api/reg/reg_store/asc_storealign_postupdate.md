@@ -84,7 +84,21 @@ PIPE_V
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器，目的操作数为UB地址。
+- dst_align32b起始地址需32字节对齐（UB端口对齐要求），否则会报错。
+- UB容量上限：UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst_align32b起始地址与Post Update累计偏移量之和不可超过实际可用容量，否则会报错。
+- mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask比特位为0的位置采用保持模式：dst_align32b对应位置保持原值不变，不写入src数据。
+
+### 连续对齐搬出约束
+
+- offset取0时dst_align32b指针不变，仍按当前dst_align32b起始位置写入VL字节，可重复写入同一组目的地址。
+- offset取负值时dst_align32b指针向后回退，需确保回退后的地址仍32字节对齐且不低于UB起始地址，否则会报错。
+- Post Update后的dst_align32b新地址仍需满足32字节对齐，否则下一次调用本接口会报错。
+- Post Update仅更新dst_align32b指针，不影响src寄存器内容；多次调用时每次都从同一src寄存器搬出数据，如需搬出不同数据应先更新src寄存器内容。
 
 ## 调用示例
 

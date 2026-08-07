@@ -108,7 +108,13 @@ PIPE_V
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__` 标记的函数）内调用，src0/src1为矢量数据寄存器、dst_align32b为UB地址，UB地址空间外的指针不可作为dst_align32b传入。
+- dst_align32b起始地址需32字节对齐。
+- **UB容量上限**：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst_align32b偏移与写出字节数不可超过实际可用容量。
+- offset偏移后需要保证不超出UB可用容量范围且写出区域须落在UB地址空间内不越界，并且仍需32字节对齐。
 
 ## 调用示例
 

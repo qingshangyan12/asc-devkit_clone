@@ -86,8 +86,14 @@ PIPE_V
 
 ## 约束说明
 
-- 该接口中的dst不需要32B对齐，但数据类型为T的dst需要sizeof(T) Byte对齐。
+### 通用约束
+
+- **本接口仅在AIV上生效，非AIV调用直接返回。**
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器，dst为UB地址，UB地址空间外的指针不可作为dst传入。
+- dst起始地址可非32字节对齐；本接口按非对齐方式将矢量数据寄存器内容写入UB，不要求对齐，不会报错。
 - 调用本接口之前，需要调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)使用uint32_t作为存储偏移量的接口，且本接口与前序接口的非对齐寄存器要保持一致。
+- **UB容量上限**：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst起始地址、offset与写出区域对应的UB范围不可超过实际可用容量，否则会报错。
+- offset单位为元素，偏移后须落在UB地址空间内，offset为负值时尤其需确认向前偏移后地址不越界，否则会报错。
 
 ## 调用示例
 

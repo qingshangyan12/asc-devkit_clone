@@ -84,7 +84,32 @@ PIPE_V
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器或`vector_bool`掩码寄存器，dst_align32b/dst为UB地址，UB地址空间外的指针不可作为目的地址传入。
+- dst_align32b/dst起始地址需32字节对齐。
+- 矢量数据寄存器压缩搬出模式下，mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- UB容量上限：UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst_align32b/dst起始地址与Post Update累计偏移量及写出区域对应的UB范围不可超过实际可用容量。
+
+### 矢量数据寄存器压缩搬出约束
+
+- offset单位为元素个数。例如dtype为`int16_t`时offset=2表示dst_align32b指针底层UB地址向后偏移2 × 2 = 4字节；dtype为`float`时offset=1表示偏移4字节；dtype为`int64_t`时offset=1表示偏移8字节。
+- offset取0时dst_align32b指针不变，dst仍按当前dst_align32b起始位置写入本次压缩结果，可重复向同一地址写入同一组有效元素。
+- offset取负值时dst_align32b指针向后回退，需确保回退后的地址仍32字节对齐且不低于UB起始地址。
+- Post Update后的dst_align32b新地址仍需满足32字节对齐，否则下一次调用本接口会报错；通常取offset使偏移量为32字节的整数倍以保证对齐（如dtype为`int16_t`时取offset为16的整数倍，dtype为`float`时取offset为8的整数倍，dtype为`int64_t`时取offset为4的整数倍）。
+- Post Update仅更新dst_align32b指针，不影响src寄存器与mask寄存器内容；多次调用时每次都按当前src与mask重新压缩写出，若需搬出不同数据应先在src中更新元素或使用其他搬出接口。
+- offset入参为`int32_t`类型，需保证偏移后写出区域不超出UB可用容量范围。
+
+### 掩码寄存器压缩搬出约束
+
+- 本模式无mask参数，src自身即为`vector_bool`掩码寄存器参与计算。
+- offset单位为字节。例如offset=32表示dst指针底层UB地址向后偏移32字节。
+- offset取0时dst指针不变，dst仍按当前dst起始位置写入本次压缩结果，可重复向同一地址写入同一组有效比特。
+- offset取负值时dst指针向后回退，需确保回退后的地址仍32字节对齐且不低于UB起始地址，否则会报错。
+- Post Update后的dst新地址（dst + offset字节）仍需满足32字节对齐，否则下一次调用本接口会报错；通常取offset为32字节的整数倍以保证对齐。
+- Post Update仅更新dst指针，不影响src寄存器内容；多次调用时每次都按当前src重新压缩写出，若需搬出不同掩码数据应先在src中更新比特位。
+- offset入参为`int32_t`类型，需保证偏移后写出区域不超出UB可用容量范围。
 
 ## 调用示例
 
