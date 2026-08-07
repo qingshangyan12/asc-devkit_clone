@@ -266,5 +266,10 @@ write `input0` to GM, wait for MTE3, enable float atomic add, and write
 
 After the correction, all nine SIMD atomic examples compiled and ran
 independently with exact Golden comparisons under the same 30-second timeout.
-There were no atomic timeouts to retest. A second continuous full-set runtime
-pass is recorded after the final checkpoint below.
+There were no atomic timeouts to retest.
+
+The second continuous full-set runtime pass then completed with all 325
+examples passing: no precision failure, runtime error, or timeout. Every
+historical timeout listed above also completed within the final 30-second
+per-example limit. Because the final timeout list was empty, no separate
+60-second timeout retest was required.
