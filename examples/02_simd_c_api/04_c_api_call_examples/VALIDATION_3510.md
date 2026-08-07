@@ -152,6 +152,20 @@ that both address lists receive the transpose. The former
 workspaces now validate all six regular/synchronous entry points, including
 the low/high half behavior of the b8 variant.
 
+The 18 vector data-movement examples were revalidated on 2026-08-07. All 18
+compiled and ran successfully with exact byte comparisons and no timeout.
+Continuous and aligned copies preserve two independent regular/synchronous
+results; the GM-to-UB and UB-to-GM loop-register examples expose a 2x2 strided
+block selection; and the padding setters show two 24-byte payloads surrounded
+by four fixed-value bytes. The N-D examples demonstrate a 3x4 transpose and a
+two-dimensional constant border. They explicitly clear the persistent N-D
+pad-count register before a non-padding transfer, after a whole-batch rerun
+showed that a preceding padding kernel otherwise changes the next standalone
+example. The former `asc_copy_ub2l1` timeout is resolved by a complete
+UB-to-L1-to-UB round trip: both AIV subblocks participate in the group arrive,
+the AIC waits and copies L1 back to AIV0, and an intra-core signal releases the
+final GM write.
+
 The six Cube-only system-variable setters were revalidated on 2026-08-07. All
 six compiled and ran successfully, with no timeout:
 
