@@ -129,6 +129,29 @@ create_latest_linux_softlink() {
     fi
 }
 
+# 为 hcomm 在 comm_api 下创建软链接，指向 adv_api 下的实际内容
+create_hcomm_softlink() {
+    local _root ="$common_parse_dir"
+    local _links="include/comm_api/aicore/hcomm|../../adv_api/hcomm|asc/include/adv_api/hcomm
+impl/comm_api/aicore/hcomm|../../adv_api/detail/hcomm|asc/impl/adv_api/detail/hcomm"
+    echo "$_links" | while IFS='|' read -r _link_rel _link_target _check_rel; do
+        local _link_name="$_root/asc/$_link_rel"
+        local _check_path="$_root/$_check_rel"
+        local _link_dir
+        _link_dir=$(dirname "$_link_name")
+        if [ ! -d "$_link_dir" ]; then
+            mkdir -p "$_link_dir"
+        fi
+        if [ -e "$_check_path" ]; then
+            rm -f "$_link_name" 2>/dev/null
+            ln -sfn "$_link_target" "$_link_name"
+            log "INFO" "create hcomm softlink: $_link_name -> $_link_target"
+        else
+            log "WARNING" "skip hcomm softlink, target not exist: $_check_path"
+        fi
+    done
+}
+
 ##########################################################################
 log "INFO" "step into run_asc-devkit_install.sh ......"
 log "INFO" "install target dir $common_parse_dir, type $common_parse_type."
@@ -170,6 +193,7 @@ new_install() {
     fi
 
     create_latest_linux_softlink
+    create_hcomm_softlink
     return 0
 }
 
