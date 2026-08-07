@@ -12,9 +12,6 @@
  * \file kernel_operator_common_impl.h
  * \brief AscendC l311 support common api.
  */
-#if(__NPU_ARCH__== 3113)
-using namespace __cce_simd;
-#endif
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_l311/kernel_operator_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
@@ -27,6 +24,9 @@ using namespace __cce_simd;
 #include "../utils/kernel_utils_mode.h"
 #include "../../../include/basic_api/kernel_common.h"
 #include "../kernel_utils.h"
+#if(__NPU_ARCH__== 3113)
+using namespace __cce_simd;
+#endif
 #define GetLoopBoundB8(x) (((x) - 1) / VECTOR_REG_WIDTH)
 #define GetLoopBoundB16(x) (((x) - 1) / (VECTOR_REG_WIDTH / B16_BYTE_SIZE))
 #define GetLoopBoundB32(x) (((x) - 1) / (VECTOR_REG_WIDTH / B32_BYTE_SIZE))
