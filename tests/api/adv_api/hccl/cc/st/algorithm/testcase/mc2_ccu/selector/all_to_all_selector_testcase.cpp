@@ -58,3 +58,11 @@ TEST_F(CcuStAllToAll, LaunchRejectsMissingDynamicArgument)
     scenario.missingTaskArg = true;
     VerifyScenario(scenario);
 }
+
+TEST_F(CcuStAllToAll, ForcedAlgConfigOverridesSelector)
+{
+    CcuStScenario scenario = MakeScenario(2, 100);
+    scenario.algConfig = "CcuAlltoAllMesh1D";
+    scenario.expectedAlgName = "CcuAlltoAllMesh1D";
+    VerifyScenario(scenario);
+}
