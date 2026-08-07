@@ -117,29 +117,10 @@ struct BaseTensor {
     using data_type = GetAttributeElementType<elementType*>;
 
     template <asc::te::load_sideband_mode sidebandMode = asc::te::load_sideband_mode::direct, typename Coord>
-    __simd_callee__ inline decltype(auto) load(const Coord& coord) const {
-        static_assert(Std::is_same_v<GetMemLocation<EngineType>, Location::UB>,
-            "Tensor::load only supports tensors located in UB");
-
-        asc::te::reg_tensor<data_type> dst;
-        auto srcEngine = Engine() + Layout()(coord);
-        auto src = srcEngine.Begin().Get();
-        if constexpr (sidebandMode == asc::te::load_sideband_mode::direct) {
-            asc_loadalign(dst.reg, src);
-        }
-        return dst;
-    }
+    __simd_callee__ inline asc::te::reg_tensor<data_type> load(const Coord& coord) const;
 
     template <typename Coord, typename RegDataType>
-    __simd_callee__ inline void store(const Coord& coord, const asc::te::reg_tensor<RegDataType>& src) {
-        static_assert(Std::is_same_v<GetMemLocation<EngineType>, Location::UB>,
-            "Tensor::store only supports tensors located in UB");
-        static_assert(Std::is_same_v<data_type, RegDataType>,
-            "Tensor::store requires the tensor and reg_tensor to have the same element type");
-
-        auto dst = Engine() + Layout()(coord);
-        asc_storealign(dst.Begin().Get(), src.reg, src.mask);
-    }
+    __simd_callee__ inline void store(const Coord& coord, const asc::te::reg_tensor<RegDataType>& src);
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
@@ -191,6 +172,41 @@ private:
 
     Std::tuple<layoutType, engineType> rep;
 };
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+template <typename EngineType, typename LayoutType>
+template <asc::te::load_sideband_mode sidebandMode, typename Coord>
+__simd_callee__ inline asc::te::reg_tensor<typename BaseTensor<EngineType, LayoutType>::data_type>
+BaseTensor<EngineType, LayoutType>::load(const Coord& coord) const
+{
+    static_assert(Std::is_same_v<GetMemLocation<EngineType>, Location::UB>,
+        "Tensor::load only supports tensors located in UB");
+
+    asc::te::reg_tensor<data_type> dst;
+    auto srcEngine = Engine() + Layout()(coord);
+    auto src = srcEngine.Begin().Get();
+    if constexpr (sidebandMode == asc::te::load_sideband_mode::direct) {
+        asc_loadalign(dst.reg, src);
+    }
+    return dst;
+}
+
+template <typename EngineType, typename LayoutType>
+template <typename Coord, typename RegDataType>
+__simd_callee__ inline void BaseTensor<EngineType, LayoutType>::store(
+    const Coord& coord, const asc::te::reg_tensor<RegDataType>& src)
+{
+    static_assert(Std::is_same_v<GetMemLocation<EngineType>, Location::UB>,
+        "Tensor::store only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>,
+        "Tensor::store requires the tensor and reg_tensor to have the same element type");
+
+    auto dst = Engine() + Layout()(coord);
+    asc_storealign(dst.Begin().Get(), src.reg, src.mask);
+}
+
+#endif
 
 template <typename T>
 struct IsAttrTensor : Std::false_type {};
