@@ -207,6 +207,12 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     // ReduceScatter KFC follows pr_4523 and partitions this fixed 16 MiB buffer as rankSize * sliceSize.
     opResCtx.res[0] = reinterpret_cast<uint64_t>(scratchPtr);
 
+    HCCL_WARNING(
+        "[ScratchOverflowDiag] AllocCcuOpResCtx: scratch is FIXED at MC2_WORKSPACE_SIZE=%llu bytes (%llu MB), "
+        "independent of runtime data size. ReduceScatter partitions it as rankSize*sliceSize. "
+        "If rankSize*sliceSize > %llu, scratch will overflow.",
+        scratchSize, scratchSize / (1024 * 1024), scratchSize);
+
     HCCL_INFO(
         "[AllocCcuOpResCtx] workspace[%p], workspaceSize[%llu], scratch[%p], scratchSize[%llu], "
         "comParam[%p], comParamBufSize[%llu], comSync[%p], comSyncBufSize[%llu], "
@@ -448,6 +454,10 @@ HcclResult PrepareParamForReduceScatter(
     param.reduceType = static_cast<HcclReduceOp>(ccTiling->reduceType);
     param.DataDes.dataType = static_cast<HcclDataType>(ccTiling->srcDataType);
     param.DataDes.count = 0;
+    HCCL_WARNING(
+        "[ScratchOverflowDiag] PrepareParamForReduceScatter: DataDes.count hardcoded to 0, "
+        "selector 8MB guard will be bypassed (dataSize=0 < RS_M2M_1D_MAX_DATA_SIZE). "
+        "Actual recvCount only known at device execution time.");
 
     HCCL_INFO("Print PrepareParamForReduceScatter.");
     CHK_RET(PrintOpsCommParam(param));

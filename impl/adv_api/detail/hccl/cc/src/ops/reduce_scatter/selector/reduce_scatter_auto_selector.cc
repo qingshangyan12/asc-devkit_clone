@@ -138,6 +138,10 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoCcuSchedule(
 {
     u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
     u64 dataSize = opParam.DataDes.count * perDataSize;
+    HCCL_WARNING(
+        "[ScratchOverflowDiag] SelectMeshAlgoCcuSchedule: DataDes.count=%llu, perDataSize=%llu, "
+        "dataSize(count*perDataSize)=%llu, RS_M2M_1D_MAX_DATA_SIZE=%llu",
+        opParam.DataDes.count, perDataSize, dataSize, RS_M2M_1D_MAX_DATA_SIZE);
     if (topoInfo->level0Topo == Level0Shape::MESH_1D && topoInfo->level0MeshType == Level0MeshType::SINGLE_DIE) {
         double ratio; // 以8卡为基线确定ratio，用来表示不同卡数对下发的影响系数
         if (topoInfo->userRankSize == 0) {
@@ -146,6 +150,11 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoCcuSchedule(
         } else {
             ratio = DEFAULT_RANK_SIZE / topoInfo->userRankSize;
         }
+        HCCL_WARNING(
+            "[ScratchOverflowDiag] guard check: dataSize(%llu) * ratio(%f) = %f, threshold=%llu, "
+            "willReject=%s",
+            dataSize, ratio, dataSize * ratio, RS_M2M_1D_MAX_DATA_SIZE,
+            (dataSize * ratio >= RS_M2M_1D_MAX_DATA_SIZE) ? "YES(fallback to AICPU)" : "NO(select KFC)");
         if (dataSize * ratio >= RS_M2M_1D_MAX_DATA_SIZE) {
             HCCL_DEBUG(
                 "[ReduceScatterAutoSelector] dataSize[%lu] * ratio[%f] >= MAX_DATA_SIZE[%lu].", dataSize, ratio,
