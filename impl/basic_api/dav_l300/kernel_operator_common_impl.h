@@ -12,7 +12,7 @@
  * \file kernel_operator_common_impl.h
  * \brief AscendC l300 support common api.
  */
-#if(__NPU_ARCH__==3003)
+#if(__NPU_ARCH__== 3003)
 using namespace __cce_simd;
 #endif
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
