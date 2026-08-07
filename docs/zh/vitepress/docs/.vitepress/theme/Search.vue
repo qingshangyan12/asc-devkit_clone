@@ -17,7 +17,7 @@ import { useLocalStorage, useMagicKeys } from '@vueuse/core'
 
 import { searchConfig as _searchConfig } from 'virtual:pagefind'
 import LogoPagefind from './LogoPagefind.vue'
-import { initializePagefindSearch, searchPagefind } from './pagefind-search.mjs'
+import { highlightSearchText, initializePagefindSearch, searchPagefind } from './pagefind-search.mjs'
 import type { SearchConfig } from './type'
 import { formatShowDate } from './utils'
 
@@ -347,6 +347,10 @@ function dirLabel(url: string) {
                     <div v-if="dirLabel(item.route)" class="breadcrumb-row">{{ dirLabel(item.route) }}</div>
                     <div class="title">
                       <span class="headings">{{ item.meta.title }}</span>
+                      <span
+                        v-if="item.meta.sectionTitle" class="section-title"
+                        v-html="highlightSearchText(item.meta.sectionTitle, searchWords)"
+                      />
                       <span v-if="showDateInfo && item.meta.date" class="date">
                         {{ formatShowDateFn(item.meta.date, lang) }}</span>
                     </div>

@@ -177,6 +177,8 @@
         "minResults": 1,
         "descriptionIncludes": ["<<<"],
         "highlightIncludes": ["<<<"],
+        "sectionTitleIncludes": ["<<<>>>调用"],
+        "sectionHighlightIncludes": ["<<<"],
         "sectionHash": "#<<<>>>调用",
         "targets": [
           { "exact": "/api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config", "grade": 3 },
@@ -199,6 +201,23 @@
           { "exact": "/api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config", "grade": 3 },
           { "exact": "/guide/编程指南/语言扩展层/SIMD与SIMT混合编程BuiltIn关键字", "grade": 3 },
           { "exact": "/api/SIMT-API/SIMT_programming_intro/extended_syntax/kernel_function_config", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "syntax-kernel-launch-prefix-second-visible-mobile",
+      "query": "<<<",
+      "category": "special-character",
+      "intent": "Keep the highlighted launch syntax visible in the second result on a narrow viewport.",
+      "viewportWidth": 375,
+      "expect": {
+        "minResults": 2,
+        "descriptionIncludes": ["<<<"],
+        "highlightIncludes": ["<<<"],
+        "sectionTitleIncludes": ["<<<>>>调用"],
+        "sectionHighlightIncludes": ["<<<"],
+        "targets": [
+          { "exact": "/guide/编程指南/语言扩展层/SIMD与SIMT混合编程BuiltIn关键字", "grade": 3 }
         ]
       }
     },
@@ -241,6 +260,7 @@
         "maxResults": 1,
         "descriptionIncludes": ["NO_OVERLAP_IN_MULTI_REPEAT", "内存同步指令"],
         "highlightIncludes": ["NO_OVER"],
+        "sectionTitleIncludes": ["内置编译宏开关"],
         "sectionHash": "#内置编译宏开关",
         "targets": [
           { "exact": "/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法", "grade": 3 }
@@ -1986,6 +2006,8 @@
       "intent": "Open the existing section that contains the matching documentation content.",
       "expect": {
         "minResults": 1,
+        "sectionTitleIncludes": ["内存生命周期管理：AllocTensor/FreeTensor解决读后写冲突"],
+        "sectionHighlightIncludes": ["内存生命周期管理"],
         "sectionHash": "#内存生命周期管理：AllocTensor/FreeTensor解决读后写冲突",
         "targets": [
           { "exact": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理", "grade": 3 }

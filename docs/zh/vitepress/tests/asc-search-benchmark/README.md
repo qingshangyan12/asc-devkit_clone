@@ -56,10 +56,11 @@ node bin/asc-search-benchmark.mjs \
 
 ## 查询集与指标
 
-[`cases/ascendc.json`](cases/ascendc.json) 包含 159 个版本化用例，覆盖 API 精确名称、大小写同名 API、下划线标识符的空格/连字符写法、不完整标识符前缀、数据类型后缀、中英文组合、中文标题和正文、Unicode 归一化、拼写错误、特殊符号及无结果查询。每个期望 URL 按 3、2、1 三级相关性标注。
+[`cases/ascendc.json`](cases/ascendc.json) 包含 160 个版本化用例，覆盖 API 精确名称、大小写同名 API、下划线标识符的空格/连字符写法、不完整标识符前缀、数据类型后缀、中英文组合、中文标题和正文、Unicode 归一化、拼写错误、特殊符号及无结果查询。每个期望 URL 按 3、2、1 三级相关性标注。
 
 用例可通过 `expect.descriptionIncludes` 声明相关结果摘要必须包含的文本，用于看护标识符定义等不能只靠页面排名验证的搜索质量。
-`expect.highlightIncludes` 用于声明相关结果必须以可见的非透明背景高亮指定文本，避免只生成 `<mark>` 但主题样式不可见。
+`expect.highlightIncludes` 用于声明相关结果必须以可见的非透明背景高亮指定文本；高亮节点至少 95% 的面积必须位于摘要或标题的可视区域内，避免 `<mark>` 被单行裁剪。用例可通过 `viewportWidth` 指定 320～3840 像素的视口宽度，以验证响应式布局。
+`expect.sectionTitleIncludes` 用于声明相关结果展示的小节标题，并验证它紧跟大标题或换行后左对齐；`expect.sectionHighlightIncludes` 进一步验证查询词在小标题中具有可见高亮。小标题与结果 URL 的锚点由同一个搜索结果提供，防止展示标题和实际跳转位置错配。
 `expect.sectionHash` 用于声明结果应定位到的既有标题锚点；基准会真实点击相关结果，并验证目标标题存在且已经滚动进入可视区域。
 使用 `--enforce` 时，只有聚合指标达到阈值且所有用例的结果数量、目标页面、摘要和链接约束全部通过，命令才会成功。
 

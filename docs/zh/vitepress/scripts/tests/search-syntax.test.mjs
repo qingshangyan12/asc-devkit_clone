@@ -16,6 +16,11 @@ import {
   kernelLaunchMatches,
   normalizeKernelLaunchQuery,
 } from '../../docs/.vitepress/search-syntax.mjs'
+import {
+  bestPagefindSection,
+  highlightIdentifierExcerpt,
+  highlightSearchText,
+} from '../../docs/.vitepress/theme/pagefind-search.mjs'
 
 test('normalizes kernel launch syntax queries and prefixes', () => {
   for (const query of [
@@ -45,4 +50,65 @@ test('finds complete launch syntax while preferring the canonical spelling', () 
     index: 12,
     value: '<<<>>>',
   })
+})
+
+test('centers identifier excerpts around the highlighted match', () => {
+  const highlighted = highlightIdentifierExcerpt(
+    `${'前'.repeat(40)}核函数通过<<<...>>>启动${'后'.repeat(120)}`,
+    '<<<>>>',
+    true,
+  )
+  const markStart = highlighted.indexOf('<mark>')
+  const markEnd = highlighted.indexOf('</mark>')
+
+  assert.ok(highlighted.startsWith('...'))
+  assert.equal(Array.from(highlighted.slice(3, markStart)).length, 12)
+  assert.equal(highlighted.slice(markStart, markEnd + 7), '<mark>&lt;&lt;&lt;...&gt;&gt;&gt;</mark>')
+  assert.ok(highlighted.endsWith('...'))
+})
+
+test('escapes identifier excerpts before adding highlight markup', () => {
+  assert.equal(
+    highlightIdentifierExcerpt('<tag>NO_OVER suffix', 'no_over'),
+    '&lt;tag&gt;<mark>NO_OVER</mark> suffix',
+  )
+  assert.equal(
+    highlightIdentifierExcerpt('<tag>without a match', 'no_over'),
+    '&lt;tag&gt;without a match',
+  )
+})
+
+test('selects the Pagefind section containing the strongest match', () => {
+  const section = bestPagefindSection({
+    url: '/guide/page.html',
+    weighted_locations: [{ location: 18, weight: 10 }],
+    sub_results: [
+      {
+        url: '/guide/page.html#first',
+        anchor: { text: 'First section' },
+        locations: [0, 9],
+      },
+      {
+        url: '/guide/page.html#second',
+        anchor: { text: 'Second：section' },
+        locations: [10, 20],
+      },
+    ],
+  })
+
+  assert.deepEqual(section, {
+    route: '/guide/page.html#second',
+    sectionTitle: 'Second：section',
+  })
+})
+
+test('escapes and highlights section titles', () => {
+  assert.equal(
+    highlightSearchText('配置<<<...>>>调用', '<<<'),
+    '配置<mark>&lt;&lt;&lt;...&gt;&gt;&gt;</mark>调用',
+  )
+  assert.equal(
+    highlightSearchText('<unsafe> section', 'section'),
+    '&lt;unsafe&gt; <mark>section</mark>',
+  )
 })

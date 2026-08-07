@@ -18,6 +18,8 @@ const CJK_PHRASE_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]{2,}/g
 const RESULTS_PER_VARIANT = 80
 const MAX_CANDIDATES = 240
 const MAX_IDENTIFIER_MATCHES = 64
+const IDENTIFIER_EXCERPT_PREFIX_CHARS = 12
+const IDENTIFIER_EXCERPT_SUFFIX_CHARS = 96
 const TITLE_INDEX_SOURCE = 'title-route'
 const initializedPagefindInstances = new WeakSet()
 let identifierIndexPromise = null
@@ -252,7 +254,7 @@ function titleVariants(plan, variants) {
 
 async function loadIdentifierIndex() {
   if (!identifierIndexPromise) {
-    identifierIndexPromise = fetch('/search-identifiers.json?v=6', { cache: 'no-store' })
+    identifierIndexPromise = fetch('/search-identifiers.json?v=7', { cache: 'no-store' })
       .then((response) => {
         if (!response.ok) throw new Error(`Identifier index request failed with ${response.status}`)
         return response.json()
@@ -272,12 +274,29 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;')
 }
 
-function highlightIdentifierExcerpt(excerpt, query, specialSyntaxIntent = false) {
+export function highlightIdentifierExcerpt(excerpt, query, specialSyntaxIntent = false) {
   const text = String(excerpt || '')
   const syntaxMatch = specialSyntaxIntent ? findKernelLaunch(text) : null
   const position = syntaxMatch?.index ?? text.toLocaleLowerCase().indexOf(query)
   if (position < 0) return escapeHtml(text)
   const end = position + (syntaxMatch?.value.length || query.length)
+  const prefix = Array.from(text.slice(0, position))
+  const suffix = Array.from(text.slice(end))
+  const visiblePrefix = prefix.slice(-IDENTIFIER_EXCERPT_PREFIX_CHARS).join('')
+  const visibleSuffix = suffix.slice(0, IDENTIFIER_EXCERPT_SUFFIX_CHARS).join('')
+  return `${prefix.length > IDENTIFIER_EXCERPT_PREFIX_CHARS ? '...' : ''}${escapeHtml(visiblePrefix)}`
+    + `<mark>${escapeHtml(text.slice(position, end))}</mark>`
+    + `${escapeHtml(visibleSuffix)}${suffix.length > IDENTIFIER_EXCERPT_SUFFIX_CHARS ? '...' : ''}`
+}
+
+export function highlightSearchText(value, query) {
+  const text = String(value || '')
+  const normalizedQuery = normalizeCase(query)
+  if (!text || !normalizedQuery) return escapeHtml(text)
+  const syntaxMatch = normalizeKernelLaunchQuery(normalizedQuery) ? findKernelLaunch(text) : null
+  const position = syntaxMatch?.index ?? text.toLocaleLowerCase().indexOf(normalizedQuery.toLocaleLowerCase())
+  if (position < 0) return escapeHtml(text)
+  const end = position + (syntaxMatch?.value.length || normalizedQuery.length)
   return `${escapeHtml(text.slice(0, position))}<mark>${escapeHtml(text.slice(position, end))}</mark>${escapeHtml(text.slice(end))}`
 }
 
@@ -330,15 +349,23 @@ async function searchIdentifierIndex(plan) {
         : pageDescription
       const description = highlightIdentifierExcerpt(sourceDescription, query, plan.specialSyntaxIntent)
       const sectionId = sectionIds[rank]
+      const sectionEntry = Number.isInteger(sectionId) && sectionId >= 0 ? sections[sectionId] : null
+      const sectionAnchor = Array.isArray(sectionEntry) ? sectionEntry[0] : sectionEntry || ''
+      const rawSectionTitle = Array.isArray(sectionEntry) ? sectionEntry[1] : ''
+      const sectionTitle = normalize(rawSectionTitle) !== normalize(title) ? rawSectionTitle : ''
       const route = routeWithSection(
         pageRoute,
-        Number.isInteger(sectionId) && sectionId >= 0 ? sections[sectionId] : ''
+        sectionAnchor
       )
       const result = {
         route,
         title: title || route,
         description,
-        meta: { title: title || route, description },
+        meta: {
+          title: title || route,
+          description,
+          ...(sectionTitle ? { sectionTitle } : {}),
+        },
         score: identifierScore - rank * 20000,
       }
       const normalizedRoute = normalizeRoute(route)
@@ -420,10 +447,14 @@ async function materializeCandidates(candidates) {
   return selected
 }
 
-function bestPagefindSectionRoute(data) {
+export function bestPagefindSection(data) {
   const pageRoute = data.url || data.raw_url || ''
   const subResults = Array.isArray(data.sub_results) ? data.sub_results : []
-  if (subResults.length === 0) return pageRoute
+  const result = (subResult = null) => ({
+    route: subResult?.url || pageRoute,
+    sectionTitle: String(subResult?.anchor?.text || subResult?.title || '').replace(/\s+/g, ' ').trim(),
+  })
+  if (subResults.length === 0) return result()
   const weightedLocations = Array.isArray(data.weighted_locations)
     ? [...data.weighted_locations].sort((left, right) => right.weight - left.weight || left.location - right.location)
     : []
@@ -439,24 +470,26 @@ function bestPagefindSectionRoute(data) {
       if (!selected || candidate.locations.length > selected.locations.length) return candidate
       return selected
     }, null)
-    if (best?.url) return best.url
+    if (best?.url) return result(best)
   }
-  return subResults[0]?.url || pageRoute
+  return result(subResults[0])
 }
 
 function candidateFields(candidate) {
   const data = candidate.data || {}
   const title = String(data.meta?.title || '').replace(/___PAGEFIND_ANCHOR___\S*/g, '').trim()
-  const route = bestPagefindSectionRoute(data)
+  const section = bestPagefindSection(data)
+  const route = section.route
+  const sectionTitle = normalize(section.sectionTitle) !== normalize(title) ? section.sectionTitle : ''
   const headings = (data.anchors || []).map(anchor => String(anchor.text || '').trim()).filter(Boolean)
   const text = [title, data.content, data.raw_content, data.excerpt, ...headings, normalizeRoute(route)]
     .filter(Boolean)
     .join(' ')
-  return { data, title, route, headings, text }
+  return { data, title, route, sectionTitle, headings, text }
 }
 
 function scoreCandidate(candidate, plan) {
-  const { data, title, route, headings, text } = candidateFields(candidate)
+  const { data, title, route, sectionTitle, headings, text } = candidateFields(candidate)
   const normalizedTitle = normalize(title)
   const caseTitle = normalizeCase(title)
   const normalizedText = normalize(text)
@@ -622,6 +655,7 @@ function scoreCandidate(candidate, plan) {
       ...displayMeta,
       title: title || route,
       description,
+      ...(sectionTitle ? { sectionTitle } : {}),
     },
     score,
   }
@@ -632,15 +666,21 @@ function mergeRouteResult(existing, result) {
   const preferred = result.score > existing.score ? result : existing
   const fallback = preferred === result ? existing : result
   const description = preferred.description || fallback.description || ''
-  const route = preferred.route.includes('#') || !fallback.route.includes('#')
-    ? preferred.route
-    : fallback.route
-  if (description === preferred.description && route === preferred.route) return preferred
+  const routeResult = preferred.route.includes('#') || !fallback.route.includes('#') ? preferred : fallback
+  const route = routeResult.route
+  const sectionTitle = routeResult.meta?.sectionTitle || ''
+  if (description === preferred.description && route === preferred.route
+    && sectionTitle === (preferred.meta?.sectionTitle || '')) return preferred
+  const { sectionTitle: _ignoredSectionTitle, ...preferredMeta } = preferred.meta || {}
   return {
     ...preferred,
     route,
     description,
-    meta: { ...preferred.meta, description },
+    meta: {
+      ...preferredMeta,
+      description,
+      ...(sectionTitle ? { sectionTitle } : {}),
+    },
   }
 }
 
