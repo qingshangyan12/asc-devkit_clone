@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sys_var/sys_var.h"`。
-
 本接口用于配置GM到L1 Buffer的ND2NZ和DN2NZ搬运参数，包括矩阵数量以及目的NZ矩阵的三项步长。配置写入后，由后续的[asc_copy_gm2l1_nd2nz](../cube_data_move/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](../cube_data_move/asc_copy_gm2l1_dn2nz.md)接口使用。
 
 本接口只配置目的侧的NZ参数。源矩阵步长、矩阵行列数和SmallC0模式等参数由后续搬运接口配置。

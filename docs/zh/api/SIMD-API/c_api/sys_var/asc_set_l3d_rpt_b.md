@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sys_var/sys_var.h"`。
-
 本接口用于配置右矩阵（B组）Feature Map的repeat参数。配置写入后，由[asc_copy_l12l0a](../cube_data_move/asc_copy_l12l0a/asc_copy_l12l0a_arch_3510.md)或[asc_copy_l12l0b](../cube_data_move/asc_copy_l12l0b/asc_copy_l12l0b_arch_3510.md)的3D格式搬运接口在执行Image to Column展开时使用。
 
 仅当3D格式搬运接口的`f_matrix_ctrl`设置为true、选择右矩阵的Feature Map属性时，本接口的配置生效。`f_matrix_ctrl`设置为false时，需使用[asc_set_l13d_rpt](../cube_data_move/asc_set_l13d_rpt.md)配置左矩阵的repeat参数。

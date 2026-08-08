@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sys_var/sys_var.h"`。
-
 本接口用于配置L0C Buffer搬出过程中，预处理阶段Scalar ReLU使用的alpha系数。配置写入后，由后续的[asc_copy_l0c2gm](../cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)等L0C Buffer搬出接口使用。
 
 当搬出接口的`relu_pre_mode`设置为2（Scalar ReLU）时，本接口配置的alpha系数生效：输入大于等于0时，输出等于输入；输入小于0时，输出等于`alpha * 输入`。

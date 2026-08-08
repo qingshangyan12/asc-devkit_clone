@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sys_var/sys_var.h"`。
-
 本接口用于配置L0C Buffer搬出并执行NZ2DN格式转换时，源NZ矩阵中相邻行的地址偏移。配置写入后，由后续开启NZ2DN功能的[asc_copy_l0c2gm](../cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)等L0C Buffer搬出接口使用；未开启NZ2DN功能时，本配置不生效。
 
 ## 函数原型
