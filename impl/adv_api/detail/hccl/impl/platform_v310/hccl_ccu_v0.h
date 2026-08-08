@@ -528,10 +528,6 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
         if (waitCke != 0) {
             if (workingFlag_) {
-                if (waitCke == 1) {
-                    __asm__ volatile ("mov X1, %0" : : "l" (waitCke) : "X1");
-                    trap();
-                }
                 finishNumTemp_++;
                 WriteHBMData(finishCntGM_, finishNumTemp_);
                 WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr), CCU_MSG_CKE_INIT_VALUE);
