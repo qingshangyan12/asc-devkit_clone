@@ -12,6 +12,29 @@
 #include <cstdint>
 #include "stub_fun.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+namespace tensor_api_test_stub {
+constexpr Literal pat_vl1 = static_cast<Literal>(100);
+constexpr Literal pat_vl2 = static_cast<Literal>(101);
+constexpr Literal pat_vl3 = static_cast<Literal>(102);
+constexpr Literal pat_vl4 = static_cast<Literal>(103);
+constexpr Literal pat_vl128 = static_cast<Literal>(104);
+constexpr Literal pat_m3 = static_cast<Literal>(105);
+constexpr Literal pat_m4 = static_cast<Literal>(106);
+constexpr Literal pat_q = static_cast<Literal>(107);
+} // namespace tensor_api_test_stub
+
+// CANN 9.2 CPU-debug stubs omit these hardware pattern literals.
+#define PAT_VL1 tensor_api_test_stub::pat_vl1
+#define PAT_VL2 tensor_api_test_stub::pat_vl2
+#define PAT_VL3 tensor_api_test_stub::pat_vl3
+#define PAT_VL4 tensor_api_test_stub::pat_vl4
+#define PAT_VL128 tensor_api_test_stub::pat_vl128
+#define PAT_M3 tensor_api_test_stub::pat_m3
+#define PAT_M4 tensor_api_test_stub::pat_m4
+#define PAT_Q tensor_api_test_stub::pat_q
+#endif
+
 #ifndef ULL
 #define ULL unsigned long long
 #endif
