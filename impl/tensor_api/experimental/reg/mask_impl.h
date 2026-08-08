@@ -41,17 +41,6 @@ enum class mask_pattern {
     none,
 };
 
-enum class mask_half {
-    low,
-    high,
-};
-
-template <typename DataType>
-struct reg_pair {
-    reg_tensor<DataType> first;
-    reg_tensor<DataType> second;
-};
-
 template <mask_pattern Pattern = mask_pattern::all, typename DataType>
 __simd_callee__ reg_tensor<bool> make_mask();
 
@@ -63,21 +52,6 @@ __simd_callee__ reg_tensor<bool> zeros();
 
 template <typename DataType>
 __simd_callee__ reg_tensor<bool> update_mask(uint32_t& remain);
-
-template <typename DataType>
-__simd_callee__ reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
-
-template <typename DataType>
-__simd_callee__ reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
-
-__simd_callee__ reg_tensor<bool> select(
-    reg_tensor<bool> condition, reg_tensor<bool> src0, reg_tensor<bool> src1);
-
-template <mask_half Half = mask_half::low>
-__simd_callee__ reg_tensor<bool> pack(reg_tensor<bool> src);
-
-template <mask_half Half = mask_half::low>
-__simd_callee__ reg_tensor<bool> unpack(reg_tensor<bool> src);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
