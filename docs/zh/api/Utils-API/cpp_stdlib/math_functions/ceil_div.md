@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2 推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品 AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品 Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
@@ -28,25 +28,25 @@
 
 头文件路径为：`"utils/std/cmath.h"`。
 
-计算两个整型数a和b相除后向上取整的结果。该接口可在Host侧和AI Core侧使用。
+计算两个整数a和b相除后向上取整的结果。该接口可在Host侧和AI Core侧使用。
 
 ## 函数原型
 
 ```cpp
 template <typename T, typename U>
-__host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
+__host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b);
 ```
 
 ## 参数说明
 
-**表1** 模板参数说明
+**表 1** 模板参数说明
 
 | 参数名 | 含义 |
 | --- | --- |
 | T | 参数a的数据类型，必须为整型。 |
 | U | 参数b的数据类型，必须为整型。 |
 
-**表2** 接口参数说明
+**表 2** 接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -60,10 +60,10 @@ __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 ## 约束说明
 
 - T和U必须为整型，支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。
-- 当b为0时，结果为0.
-- 对于有符号输入，调用方需确保a >= 0且b > 0；
+- 当b为0时，结果为0。
+- 对于有符号输入，调用方需确保a >= 0且b > 0。
 <!-- npu="950" id8 -->
-- 针对Ascend 950PR/Ascend 950DT，vector侧使用时，该接口入参仅支持`uint32_t`类型，返回值仅支持`uint16_t`类型（VF和非VF场景保持一致），调用方需确保向上取整结果在`uint16_t`可表示范围内；该约束源于VF Hardware Loop编码规范，更多规范内容可参考[Hardware Loop编码规范](../../../../guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化.md#section11326136133217)。
+- 针对Ascend 950PR/Ascend 950DT，vector侧使用时，该接口入参仅支持`uint32_t`类型，返回值仅支持`uint16_t`类型（VF和非VF场景保持一致），调用方需确保向上取整结果在`uint16_t`可表示范围内；该约束源于VF Hardware Loop编码规范，更多规范内容可参考[《Hardware Loop编码规范》](../../../../guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化.md#section11326136133217)。
 <!-- end id8 -->
 
 ## 调用示例
@@ -72,7 +72,7 @@ __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b)
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void AddCustomImpl(__local_mem__ T *dst, __local_mem__ T *src0, __local_mem__ T *src1,
+__simd_vf__ inline void AddCustom(__local_mem__ T *dst, __local_mem__ T *src0, __local_mem__ T *src1,
     uint32_t count)
 {
     AscendC::Reg::RegTensor<T> srcReg0;
@@ -83,8 +83,8 @@ __simd_vf__ inline void AddCustomImpl(__local_mem__ T *dst, __local_mem__ T *src
     uint16_t repeatTime = static_cast<uint16_t>(AscendC::Std::ceil_div(count, oneRepeatSize));
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg0, src0 + i * oneRepeatSize );
-        AscendC::Reg::LoadAlign(srcReg1, src1 + i * oneRepeatSize );
+        AscendC::Reg::LoadAlign(srcReg0, src0 + i * oneRepeatSize);
+        AscendC::Reg::LoadAlign(srcReg1, src1 + i * oneRepeatSize);
         AscendC::Reg::Add(dstReg, srcReg0, srcReg1, mask);
         AscendC::Reg::StoreAlign(dst + i * oneRepeatSize, dstReg, mask);
     }

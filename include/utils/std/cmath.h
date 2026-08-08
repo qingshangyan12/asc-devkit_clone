@@ -32,10 +32,10 @@ template <typename T> __aicore__ inline T abs(const T src);
 
 /*
  * @ingroup Cmath
- * @brief Divide a by b and round the result up
+ * @brief Divide a by b and return the ceiling of the quotient
  * @param [in] a dividend
  * @param [in] b divisor
- * @return Result of a divided by b, rounded up
+ * @return Ceiling of the quotient a / b
  * @note For signed inputs, callers must ensure a >= 0 and b > 0.
  */
 template <typename T, typename U> __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b);
