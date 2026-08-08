@@ -12,28 +12,6 @@
 #include <cstdint>
 #include "stub_fun.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-namespace tensor_api_test_stub {
-constexpr Literal pat_vl1 = static_cast<Literal>(100);
-constexpr Literal pat_vl2 = static_cast<Literal>(101);
-constexpr Literal pat_vl3 = static_cast<Literal>(102);
-constexpr Literal pat_vl4 = static_cast<Literal>(103);
-constexpr Literal pat_vl128 = static_cast<Literal>(104);
-constexpr Literal pat_m3 = static_cast<Literal>(105);
-constexpr Literal pat_m4 = static_cast<Literal>(106);
-constexpr Literal pat_q = static_cast<Literal>(107);
-} // namespace tensor_api_test_stub
-
-// CANN 9.2 CPU-debug stubs omit these hardware pattern literals.
-#define PAT_VL1 tensor_api_test_stub::pat_vl1
-#define PAT_VL2 tensor_api_test_stub::pat_vl2
-#define PAT_VL3 tensor_api_test_stub::pat_vl3
-#define PAT_VL4 tensor_api_test_stub::pat_vl4
-#define PAT_VL128 tensor_api_test_stub::pat_vl128
-#define PAT_M3 tensor_api_test_stub::pat_m3
-#define PAT_M4 tensor_api_test_stub::pat_m4
-#define PAT_Q tensor_api_test_stub::pat_q
-#endif
 
 #ifndef ULL
 #define ULL unsigned long long
@@ -662,19 +640,6 @@ inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint16_t
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-// asc_copy_gm2ub_impl uses void*; stub_fun.h void* overload lacks l2_cache_ctl param.
-inline void copy_gm_to_ubuf_align_v2(
-    __ubuf__ void* dst_addr, __gm__ void* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
-    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
-    uint64_t burst_src_stride, uint32_t burst_dst_stride)
-{}
-// asc_copy_ub2gm_impl uses void*; stub_fun.h void* overload lacks l2_cache_mode param.
-inline void copy_ubuf_to_gm_align_v2(
-    __gm__ void* dst_addr, __ubuf__ void* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
-    uint8_t l2_cache_mode, uint64_t burst_dst_stride, uint32_t burst_src_stride)
-{}
-#endif
 
 // ==========vstar===========
 inline void vstar(vector_align data, __ubuf__ fp8_e4m3fn_t* base) {}
