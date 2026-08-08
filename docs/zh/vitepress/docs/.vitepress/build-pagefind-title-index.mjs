@@ -95,11 +95,11 @@ function normalizeRoute(route) {
   return normalized || '/'
 }
 
-function sourcePathForRoute(sourceDirectory, route) {
+function sourcePathForRoute(intermediateHtmlDirectory, route) {
   const relativeRoute = normalizeRoute(route).replace(/^\/+/, '')
   if (!relativeRoute) return null
-  const candidate = resolve(sourceDirectory, `${relativeRoute}.html`)
-  const relativePath = relative(sourceDirectory, candidate)
+  const candidate = resolve(intermediateHtmlDirectory, `${relativeRoute}.html`)
+  const relativePath = relative(intermediateHtmlDirectory, candidate)
   if (relativePath.startsWith('..') || relativePath.startsWith('/')) return null
   return candidate
 }
@@ -333,7 +333,7 @@ function existingSections($, article) {
   return sections
 }
 
-async function analyzeRecord(sourceDirectory, record) {
+async function analyzeRecord(intermediateHtmlDirectory, record) {
   const signals = new Map()
   const fallback = {
     signals,
@@ -342,7 +342,7 @@ async function analyzeRecord(sourceDirectory, record) {
     excerpt: '',
     links: [],
   }
-  const sourcePath = sourcePathForRoute(sourceDirectory, record.url)
+  const sourcePath = sourcePathForRoute(intermediateHtmlDirectory, record.url)
   if (!sourcePath) return fallback
 
   let html
@@ -442,12 +442,12 @@ async function analyzeRecord(sourceDirectory, record) {
   }
 }
 
-async function analyzeRecords(sourceDirectory, records) {
+async function analyzeRecords(intermediateHtmlDirectory, records) {
   const analyses = new Array(records.length)
   const batchSize = 32
   for (let offset = 0; offset < records.length; offset += batchSize) {
     const batch = await Promise.all(records.slice(offset, offset + batchSize)
-      .map(record => analyzeRecord(sourceDirectory, record)))
+      .map(record => analyzeRecord(intermediateHtmlDirectory, record)))
     batch.forEach((analysis, index) => { analyses[offset + index] = analysis })
   }
   return analyses
@@ -617,8 +617,10 @@ async function buildTitleIndex(distDirectory) {
   if (written.errors.length > 0) throw new Error(written.errors.join('; '))
   console.log(`[pagefind-titles] Indexed ${indexed} page titles and routes into ${outputPath}`)
 
-  const sourceDirectory = resolve(distDirectory, '..', '..')
-  const analyses = await analyzeRecords(sourceDirectory, records)
+  // mdparser writes lean HTML containing .markdown-body beside .vitepress;
+  // analyze it instead of the much larger VitePress output in distDirectory.
+  const intermediateHtmlDirectory = resolve(distDirectory, '..', '..')
+  const analyses = await analyzeRecords(intermediateHtmlDirectory, records)
   const pageRank = calculatePageRanks(records, analyses)
   console.log(`[search-identifiers] Ranked ${records.length} pages over ${pageRank.edgeCount} body links`)
   const identifierIndex = createIdentifierIndex(records, analyses, pageRank.ranks)

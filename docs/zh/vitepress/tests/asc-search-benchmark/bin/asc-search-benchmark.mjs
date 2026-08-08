@@ -18,6 +18,8 @@ import { tmpdir } from 'node:os'
 import { dirname, extname, isAbsolute, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { fetchSameOrigin, markdownReportPath, resolveSameOriginHttpUrl } from '../lib/benchmark-utils.mjs'
+
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const DEFAULT_CASES = resolve(REPOSITORY_ROOT, 'cases/ascendc.json')
 const DEFAULT_OUTPUT = resolve(REPOSITORY_ROOT, 'results/current.json')
@@ -960,7 +962,13 @@ async function buildRouteValidity(observedCases, target, topK, enabled) {
   }
   console.log(`Checking ${routes.length} unique result URLs...`)
   const states = await mapLimit(routes, 12, async (route) => {
-    const originalUrl = new URL(routeMap.get(route), target.url)
+    let originalUrl
+    try {
+      originalUrl = resolveSameOriginHttpUrl(routeMap.get(route), target.url)
+    }
+    catch {
+      return false
+    }
     const attempts = [originalUrl]
     if (!extname(originalUrl.pathname) && !originalUrl.pathname.endsWith('/')) {
       attempts.push(new URL(`${originalUrl.pathname}.html`, originalUrl))
@@ -968,15 +976,13 @@ async function buildRouteValidity(observedCases, target, topK, enabled) {
     }
     for (const url of attempts) {
       try {
-        let response = await fetch(url, {
+        let response = await fetchSameOrigin(url, target.url, {
           method: 'HEAD',
-          redirect: 'follow',
           signal: AbortSignal.timeout(10000),
         })
         if (!response.ok && ![404, 410].includes(response.status)) {
-          response = await fetch(url, {
+          response = await fetchSameOrigin(url, target.url, {
             headers: { Range: 'bytes=0-0' },
-            redirect: 'follow',
             signal: AbortSignal.timeout(10000),
           })
           await response.body?.cancel()
@@ -993,7 +999,11 @@ async function buildRouteValidity(observedCases, target, topK, enabled) {
 
 async function readEngine(targetUrl) {
   try {
-    const response = await fetch(new URL('/pagefind/pagefind-entry.json', targetUrl), { signal: AbortSignal.timeout(10000) })
+    const response = await fetchSameOrigin(
+      new URL('/pagefind/pagefind-entry.json', targetUrl),
+      targetUrl,
+      { signal: AbortSignal.timeout(10000) },
+    )
     if (!response.ok) return null
     const entry = await response.json()
     const [language, languageData] = Object.entries(entry.languages || {})[0] || []
@@ -1195,7 +1205,7 @@ async function main() {
     report.passed = report.thresholdPassed && report.casePassed
     await mkdir(dirname(options.output), { recursive: true })
     await writeFile(options.output, `${JSON.stringify(report, null, 2)}\n`, 'utf8')
-    const markdownPath = options.output.replace(/\.json$/i, '.md')
+    const markdownPath = markdownReportPath(options.output)
     await writeFile(markdownPath, buildMarkdown(report), 'utf8')
     console.log(`Completion: ${formatPercent(summary.completionRate)}`)
     console.log(`Cases passed: ${summary.passedCaseCount}/${summary.caseCount}`)

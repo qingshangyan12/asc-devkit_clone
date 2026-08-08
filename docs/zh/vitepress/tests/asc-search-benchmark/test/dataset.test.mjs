@@ -133,3 +133,24 @@ test('dataset covers exact English words outranking spelling corrections', () =>
   assert.equal(item.expect.targets.length, 6)
   assert.ok(item.expect.targets.every(target => target.exact?.includes('/cooperative_groups/thread_block')))
 })
+
+test('dataset targets only current multicore and lowercase API routes', () => {
+  const targets = dataset.cases.flatMap(item => item.expect.targets)
+    .flatMap(target => [target.exact, target.prefix, target.contains])
+    .filter(Boolean)
+  assert.ok(targets.some(target => target.includes('/多核Tiling切分/')))
+  for (const staleRoute of [
+    '/多核-Tiling切分/',
+    '/isnan1',
+    '/isinf1',
+    '/isfinite1',
+    '/abs1',
+    '/sqrt1',
+    '/max1',
+    '/max-267',
+    '/min1',
+    '/min-268',
+  ]) {
+    assert.equal(targets.some(target => target.includes(staleRoute)), false, `stale target ${staleRoute}`)
+  }
+})
