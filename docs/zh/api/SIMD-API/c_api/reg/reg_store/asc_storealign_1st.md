@@ -46,14 +46,14 @@
 
 本接口对16种dtype暴露相同结构的原型（`<dtype>`∈{int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float, bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, fp8_e8m0_t, hifloat8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, int4b_t}，对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`）。模板原型如下：
 
-```c
+```cpp
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
                                                vector_<dtype> src)
 ```
 
 #### 典型示例
 
-```c
+```cpp
 // 示例：int8_t类型无偏移搬出
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
                                                vector_int8_t src)
@@ -69,7 +69,7 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`in
 
 本接口对16种dtype暴露相同结构的原型。模板原型如下：
 
-```c
+```cpp
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
                                                vector_<dtype> src,
                                                int32_t offset)
@@ -77,7 +77,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
 
 #### 典型示例
 
-```c
+```cpp
 // 示例：int8_t类型int32_t偏移搬出
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
                                                vector_int8_t src,
@@ -94,7 +94,7 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`in
 
 本接口对16种dtype暴露相同结构的原型。模板原型如下：
 
-```c
+```cpp
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
                                                vector_<dtype> src,
                                                addr_reg offset)
@@ -102,7 +102,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
 
 #### 典型示例
 
-```c
+```cpp
 // 示例：int8_t类型addr_reg偏移搬出
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
                                                vector_int8_t src,
@@ -161,9 +161,9 @@ PIPE_V
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器，目的操作数为UB地址，UB地址空间外的指针不可作为dst_align32b传入。
 - dst_align32b起始地址需dtype对齐。
-- 本接口固定搬出矢量数据寄存器的首个元素，单次搬出数据量为`sizeof(dtype)`字节（dtype字节数为1/2/4时对应搬出1/2/4字节）。
+- 本接口固定搬出矢量数据寄存器的首个元素，单次搬出数据量为`sizeof(dtype)`字节。
 - 本接口忽略掩码，不要求也不读取`vector_bool`掩码寄存器，掩码状态不影响搬出行为。
-- UB容量上限：UB总容量256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst偏移+`sizeof(dtype)`字节不可超过实际可用容量。
+- UB总容量256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst偏移+`sizeof(dtype)`字节不可超过实际可用容量。
 - offset取值偏移后需要落在UB地址范围内，且仍需dtype对齐。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 

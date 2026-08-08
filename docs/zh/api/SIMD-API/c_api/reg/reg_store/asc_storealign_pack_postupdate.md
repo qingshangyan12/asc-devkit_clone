@@ -87,9 +87,9 @@ PIPE_V
 ### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器或`vector_bool`掩码寄存器，dst_align32b/dst为UB地址，UB地址空间外的指针不可作为目的地址传入。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器或`vector_bool`掩码寄存器，dst_align32b、dst为UB地址，UB地址空间外的指针不可作为目的地址传入。
 - 矢量数据寄存器压缩搬出模式下，mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- UB容量上限：UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst_align32b/dst起始地址与Post Update累计偏移量及写出区域对应的UB范围不可超过实际可用容量。
+- UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst_align32b、dst起始地址与Post Update累计偏移量及写出区域对应的UB范围不可超过实际可用容量。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 矢量数据寄存器压缩搬出约束

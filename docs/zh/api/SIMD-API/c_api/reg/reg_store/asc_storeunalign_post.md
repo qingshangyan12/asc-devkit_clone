@@ -155,7 +155,7 @@ PIPE_V
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为`vector_store_unalign`临时寄存器，目的操作数为UB地址，UB地址空间外的指针不可作为dst传入。
 - dst起始地址可非32字节对齐；本接口按非对齐方式将临时寄存器内容写入UB，不要求对齐，不会报错。
 - 本接口是非对齐搬出序列的收尾阶段，调用本接口之前，需要调用[asc_storeunalign](asc_storeunalign.md)接口，或者[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)接口，且本接口与前序接口的非对齐寄存器要保持一致。
-- UB容量上限：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst偏移与写出区域对应的UB范围不可超过实际可用容量，否则会报错。
+- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst偏移与写出区域对应的UB范围不可超过实际可用容量，否则会报错。
 - offset取值偏移后需落在UB地址范围内，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 

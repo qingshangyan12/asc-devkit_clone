@@ -34,7 +34,7 @@
 
 本接口对9种dtype暴露相同结构的原型（`<dtype>` ∈ {int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float, bfloat16_t}，对应矢量数据寄存器类型`vector_<dtype>`）。模板原型如下：
 
-```c
+```cpp
 __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__ <dtype>*& dst_align32b,
                                                           vector_<dtype> src,
                                                           int32_t offset)
@@ -44,7 +44,7 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`in
 
 以`int16_t`为例的典型调用原型如下：
 
-```c
+```cpp
 __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__ int16_t*& dst_align32b,
                                                           vector_int16_t src,
                                                           int32_t offset)
@@ -77,7 +77,7 @@ PIPE_V
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器，dst_align32b为UB地址，UB地址空间外的指针不可作为dst_align32b传入。
 - dst_align32b起始地址需按照dtype数据类型对齐。
-- UB容量上限：UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst_align32b起始地址与Post Update累计偏移量之和不可超过实际可用容量，否则会报错。
+- UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst_align32b起始地址与Post Update累计偏移量之和不可超过实际可用容量，否则会报错。
 - 单次搬出的数据量为单个元素（dtype字节大小为1/2/4时对应1/2/4字节），由本接口模式决定，不可由参数调整。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 

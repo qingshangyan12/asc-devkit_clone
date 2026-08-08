@@ -82,7 +82,7 @@ PIPE_V
 - dst起始地址可非32字节对齐；本接口按非对齐方式将拼接结果写入UB，不要求对齐，不会报错。
 - 调用该接口之后，需要调用[asc_storeunalign_post](asc_storeunalign_post.md)处理非对齐搬出的尾块。
 - src0按引用传入，本接口调用后其内容被更新为本次搬出尾部数据，供后续拼接继续使用。
-- UB容量上限：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst偏移后不可超过实际可用容量，否则会报错。
+- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst偏移后不可超过实际可用容量，否则会报错。
 - count不可大于矢量数据寄存器容纳的最大元素个数VL/sizeof(dtype)；超出寄存器范围的元素无有效数据，写入dst的内容不确定，建议取[0, VL/sizeof(dtype)]范围内有效值。
 - count×sizeof(dtype)字节为实际写入数据量，与dst起始地址相加后不可越过UB可用容量上限，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
