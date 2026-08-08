@@ -20,6 +20,7 @@
 
 #include "c_api/reg_compute/reg_convert.h"
 #include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
+#include "impl/tensor_api/arch/utils/arch_utils.h"
 
 namespace asc {
 namespace te {
