@@ -39,7 +39,7 @@ endif()
 
 # asc-comm 迁出后，devkit 仅把从 asc-comm 迁移来的 hcomm 头按删除前的源码路径打入包。
 set(ASC_COMM_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm)
-set(ASC_COMM_DETAIL_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/src/aicore/hcomm/detail)
+set(ASC_COMM_DETAIL_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/src/aicore/hcomm)
 if(NOT EXISTS ${ASC_COMM_PUBLIC_HEADER_DIR})
     message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public hcomm headers: ${ASC_COMM_PUBLIC_HEADER_DIR}")
 endif()
