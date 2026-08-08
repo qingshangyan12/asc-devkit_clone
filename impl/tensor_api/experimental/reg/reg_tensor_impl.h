@@ -34,7 +34,10 @@ struct reg_tensor {
     using type = DataType;
     using reg_type = typename type_get<DataType>::T;
 
-    __simd_callee__ inline reg_tensor with_mask(const reg_tensor<bool>& maskReg);
+    __simd_callee__ inline reg_tensor with_mask(const reg_tensor<bool>& maskReg){
+        mask = maskReg.reg;
+        return *this;
+    }
 
     reg_type reg;
     vector_bool mask;
@@ -47,13 +50,6 @@ struct reg_tensor<bool> {
 
     reg_type reg;
 };
-
-template <typename DataType>
-__simd_callee__ inline reg_tensor<DataType> reg_tensor<DataType>::with_mask(const reg_tensor<bool>& maskReg)
-{
-    mask = maskReg.reg;
-    return *this;
-}
 } // namespace te
 } // namespace asc
 
