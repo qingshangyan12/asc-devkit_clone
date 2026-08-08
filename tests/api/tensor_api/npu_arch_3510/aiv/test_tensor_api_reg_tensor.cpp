@@ -49,6 +49,63 @@ static_assert(std::is_same_v<typename asc::te::reg_tensor<bool>::reg_type, vecto
 static_assert(has_mask_member<asc::te::reg_tensor<float>>::value);
 static_assert(!has_mask_member<asc::te::reg_tensor<bool>>::value);
 static_assert(std::is_same_v<decltype(asc::te::ones<float>()), asc::te::reg_tensor<bool>>);
+static_assert(std::is_same_v<decltype(asc::te::zeros<float>()), asc::te::reg_tensor<bool>>);
+static_assert(std::is_same_v<
+    decltype(asc::te::make_mask<asc::te::mask_pattern::vl8, float>()), asc::te::reg_tensor<bool>>);
+static_assert(std::is_same_v<
+    decltype(asc::te::interleave<float>({}, {})), asc::te::reg_pair<bool>>);
+static_assert(std::is_same_v<
+    decltype(asc::te::deinterleave<float>({}, {})), asc::te::reg_pair<bool>>);
+static_assert(std::is_same_v<
+    decltype(asc::te::select({}, {}, {})), asc::te::reg_tensor<bool>>);
+static_assert(std::is_same_v<
+    decltype(asc::te::pack({})), asc::te::reg_tensor<bool>>);
+static_assert(std::is_same_v<
+    decltype(asc::te::unpack({})), asc::te::reg_tensor<bool>>);
+
+template <typename T>
+__aicore__ inline void CompileMaskApis(uint32_t& remain)
+{
+    auto all = asc::te::make_mask<asc::te::mask_pattern::all, T>();
+    auto vl1 = asc::te::make_mask<asc::te::mask_pattern::vl1, T>();
+    auto vl2 = asc::te::make_mask<asc::te::mask_pattern::vl2, T>();
+    auto vl3 = asc::te::make_mask<asc::te::mask_pattern::vl3, T>();
+    auto vl4 = asc::te::make_mask<asc::te::mask_pattern::vl4, T>();
+    auto vl8 = asc::te::make_mask<asc::te::mask_pattern::vl8, T>();
+    auto vl16 = asc::te::make_mask<asc::te::mask_pattern::vl16, T>();
+    auto vl32 = asc::te::make_mask<asc::te::mask_pattern::vl32, T>();
+    auto vl64 = asc::te::make_mask<asc::te::mask_pattern::vl64, T>();
+    auto vl128 = asc::te::make_mask<asc::te::mask_pattern::vl128, T>();
+    auto every3 = asc::te::make_mask<asc::te::mask_pattern::every3, T>();
+    auto every4 = asc::te::make_mask<asc::te::mask_pattern::every4, T>();
+    auto half = asc::te::make_mask<asc::te::mask_pattern::half, T>();
+    auto quarter = asc::te::make_mask<asc::te::mask_pattern::quarter, T>();
+    auto none = asc::te::make_mask<asc::te::mask_pattern::none, T>();
+    auto updated = asc::te::update_mask<T>(remain);
+    auto interleaved = asc::te::interleave<T>(all, none);
+    auto deinterleaved = asc::te::deinterleave<T>(interleaved.first, interleaved.second);
+    auto selected = asc::te::select(updated, deinterleaved.first, deinterleaved.second);
+    auto packedLow = asc::te::pack(selected);
+    auto packedHigh = asc::te::pack<asc::te::mask_half::high>(selected);
+    auto unpackedLow = asc::te::unpack(packedLow);
+    auto unpackedHigh = asc::te::unpack<asc::te::mask_half::high>(packedHigh);
+
+    (void)vl1;
+    (void)vl2;
+    (void)vl3;
+    (void)vl4;
+    (void)vl8;
+    (void)vl16;
+    (void)vl32;
+    (void)vl64;
+    (void)vl128;
+    (void)every3;
+    (void)every4;
+    (void)half;
+    (void)quarter;
+    (void)unpackedLow;
+    (void)unpackedHigh;
+}
 
 template <typename T, asc::te::load_sideband_mode sidebandMode = asc::te::load_sideband_mode::direct>
 __aicore__ inline void CompileTensorRegLoadStore(
@@ -73,7 +130,13 @@ TEST(TestTensorApiRegTensor, HoldsRegisterAndMask)
     (void)value.mask;
 
     auto compileLoadStore = &CompileTensorRegLoadStore<float>;
+    auto compileMask8 = &CompileMaskApis<uint8_t>;
+    auto compileMask16 = &CompileMaskApis<half>;
+    auto compileMask32 = &CompileMaskApis<float>;
     (void)compileLoadStore;
+    (void)compileMask8;
+    (void)compileMask16;
+    (void)compileMask32;
 }
 
 } // namespace Te
