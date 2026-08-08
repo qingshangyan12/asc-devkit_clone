@@ -238,6 +238,10 @@ function(configure_asc_compile_exporter_test target_name)
 
     target_link_options(${target_name} PRIVATE
         -Wl,--wrap=fork
+        -Wl,--wrap=getcwd
+        -Wl,--wrap=mkdir
+        -Wl,--wrap=readdir
+        -Wl,--wrap=waitpid
     )
 
     target_link_libraries(${target_name} PRIVATE

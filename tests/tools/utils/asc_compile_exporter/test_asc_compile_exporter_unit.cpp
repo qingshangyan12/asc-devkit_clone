@@ -60,10 +60,12 @@ TEST(CompileExporterCliUnitTest, RunRejectsIncompleteAndUnknownCommands)
     char unknown[] = "--unknown";
     char* noCommand[] = {program};
     char* incomplete[] = {program, manifestRoot};
+    char* missingBuildOptions[] = {program, manifestRoot, output};
     char* unknownCommand[] = {program, manifestRoot, output, unknown};
 
     EXPECT_EQ(::Run(1, noCommand), 1);
     EXPECT_EQ(::Run(2, incomplete), 1);
+    EXPECT_EQ(::Run(3, missingBuildOptions), 1);
     EXPECT_EQ(::Run(4, unknownCommand), 1);
     EXPECT_NE(capture.Content().find("Usage:"), std::string::npos);
 }

@@ -15,6 +15,7 @@
 #include <cstdlib>
 
 #include <signal.h>
+#include <sys/wait.h>
 
 #include "file_utils.h"
 #include "process_runner.h"
@@ -23,10 +24,12 @@
 namespace {
 
 bool g_failFork = false;
+bool g_failNextWaitpid = false;
 
 } // namespace
 
 extern "C" pid_t __real_fork(void);
+extern "C" pid_t __real_waitpid(pid_t pid, int* status, int options);
 
 extern "C" pid_t __wrap_fork(void)
 {
@@ -35,6 +38,16 @@ extern "C" pid_t __wrap_fork(void)
         return -1;
     }
     return __real_fork();
+}
+
+extern "C" pid_t __wrap_waitpid(pid_t pid, int* status, int options)
+{
+    if (g_failNextWaitpid) {
+        g_failNextWaitpid = false;
+        errno = EIO;
+        return -1;
+    }
+    return __real_waitpid(pid, status, options);
 }
 
 namespace ascendc {
@@ -88,6 +101,13 @@ TEST_F(ModuleTest, ProcessRunnerTimesOutAndReapsProcessGroup)
     errno = 0;
     EXPECT_EQ(kill(child, 0), -1);
     EXPECT_EQ(errno, ESRCH);
+}
+
+TEST_F(ModuleTest, ProcessRunnerReportsWaitFailureAndReapsChild)
+{
+    g_failNextWaitpid = true;
+    EXPECT_THROW(ProcessRunner::Run({"/bin/true"}, {}, std::chrono::seconds(1U)), std::runtime_error);
+    EXPECT_FALSE(g_failNextWaitpid);
 }
 
 } // namespace

@@ -10,8 +10,11 @@
 
 #include <gtest/gtest.h>
 
+#include <cerrno>
+#include <dirent.h>
 #include <fstream>
 #include <limits.h>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -20,6 +23,48 @@
 
 #include "file_utils.h"
 #include "test_support.h"
+
+namespace {
+
+bool g_failNextGetcwd = false;
+bool g_failNextMkdir = false;
+bool g_failNextReaddir = false;
+
+} // namespace
+
+extern "C" char* __real_getcwd(char* buffer, size_t size);
+extern "C" int __real_mkdir(const char* path, mode_t mode);
+extern "C" dirent* __real_readdir(DIR* directory);
+
+extern "C" char* __wrap_getcwd(char* buffer, size_t size)
+{
+    if (g_failNextGetcwd) {
+        g_failNextGetcwd = false;
+        errno = EACCES;
+        return nullptr;
+    }
+    return __real_getcwd(buffer, size);
+}
+
+extern "C" int __wrap_mkdir(const char* path, mode_t mode)
+{
+    if (g_failNextMkdir) {
+        g_failNextMkdir = false;
+        errno = EACCES;
+        return -1;
+    }
+    return __real_mkdir(path, mode);
+}
+
+extern "C" dirent* __wrap_readdir(DIR* directory)
+{
+    if (g_failNextReaddir) {
+        g_failNextReaddir = false;
+        errno = EIO;
+        return nullptr;
+    }
+    return __real_readdir(directory);
+}
 
 namespace ascendc {
 namespace {
@@ -51,6 +96,7 @@ TEST_F(ModuleTest, FileUtilsHandlesPathOperations)
     EXPECT_EQ(absolute, FileUtils::JoinPath(current, "relative"));
 
     EXPECT_EQ(FileUtils::SplitPath("//one///two/"), (std::vector<std::string>{"one", "two"}));
+    EXPECT_EQ(FileUtils::SplitPath("single"), (std::vector<std::string>{"single"}));
     EXPECT_TRUE(FileUtils::SplitPath("/").empty());
     EXPECT_TRUE(FileUtils::IsPathWithin("/root/child", "/root"));
     EXPECT_TRUE(FileUtils::IsPathWithin("/root", "/root"));
@@ -186,6 +232,49 @@ TEST_F(ModuleTest, FileUtilsProtectsSymlinksAndCopiesExclusively)
         FileUtils::CopyFileExclusive(FileUtils::JoinPath(root_, "missing"), FileUtils::JoinPath(root_, "copy")));
     EXPECT_FALSE(FileUtils::CopyFileExclusive(root_, FileUtils::JoinPath(root_, "directory-copy")));
     EXPECT_FALSE(FileUtils::CopyFileExclusive(sourceLink, FileUtils::JoinPath(root_, "link-copy")));
+}
+
+TEST_F(ModuleTest, FileUtilsReportsInjectedSystemCallFailures)
+{
+    std::string absolute = "stale";
+    g_failNextGetcwd = true;
+    EXPECT_FALSE(FileUtils::MakeAbsolutePath("relative", absolute));
+    EXPECT_TRUE(absolute.empty());
+
+    std::vector<std::string> paths;
+    g_failNextReaddir = true;
+    EXPECT_FALSE(FileUtils::ListDirectory(root_, false, false, paths));
+
+    std::string temporary = "stale";
+    g_failNextMkdir = true;
+    EXPECT_FALSE(FileUtils::CreateTempDirectory(temporary));
+    EXPECT_TRUE(temporary.empty());
+}
+
+TEST_F(ModuleTest, FileUtilsReportsStreamAndSpecialFileFailures)
+{
+    const std::string procOutput = "/proc/asc_compile_exporter_forbidden_output.bin";
+    EXPECT_FALSE(FileUtils::WriteBinaryFile(procOutput, {1U}));
+
+    std::vector<uint8_t> data = {1U};
+    EXPECT_FALSE(FileUtils::ReadRegularFile("/proc/self/cmdline", std::numeric_limits<uintmax_t>::max(), data));
+    EXPECT_TRUE(data.empty());
+
+    const std::string openedPath = FileUtils::JoinPath(root_, "opened.bin");
+    const std::string exclusivePath = FileUtils::JoinPath(root_, "exclusive.bin");
+    std::ofstream opened(openedPath.c_str());
+    ASSERT_TRUE(opened.is_open());
+    EXPECT_FALSE(FileUtils::OpenExclusiveOutput(exclusivePath, opened));
+    opened.close();
+
+    const std::string throwingPath = FileUtils::JoinPath(root_, "throwing.bin");
+    std::ofstream throwingOutput(throwingPath.c_str());
+    ASSERT_TRUE(throwingOutput.is_open());
+    throwingOutput.close();
+    throwingOutput.exceptions(std::ios::failbit | std::ios::badbit);
+    EXPECT_FALSE(FileUtils::FinalizeOutput(throwingOutput));
+
+    EXPECT_FALSE(FileUtils::CopyFileExclusive("/proc/self/mem", FileUtils::JoinPath(root_, "memory-copy")));
 }
 
 } // namespace
