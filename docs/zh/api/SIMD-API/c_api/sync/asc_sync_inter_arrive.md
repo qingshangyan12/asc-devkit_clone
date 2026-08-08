@@ -57,7 +57,8 @@ PIPE_S
 
 - 用户需要确保配套使用（`flag_id`必须完全一致）asc_sync_inter_arrive和asc_sync_inter_wait，否则会出现未定义行为。
 - 由于当使用__vector__和__cube__修饰核函数时，硬件不会开启调度模块，也就无法正常进行核间同步。因此即使是在纯Vector或纯Cube场景下，也不能用__vector__或__cube__修饰核函数。
-- `flag_id`取值范围为[0, 15]，每个flag ID各自拥有独立的4位计数器，计数器取值范围为[0, 15]。
+- `flag_id`取值范围为[0, 15]，每个flag ID各自拥有独立的4位计数器。
+- 计数器取值范围为[0, 15]，软件须保证每个flag ID的计数器不会溢出，否则触发异常。
 - pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_ALL和PIPE_S。
 - 一个核连续发出的asc_sync_inter_arrive，硬件不保证执行顺序。
 - `pipe`标识本指令在本核的执行流水，本接口不阻塞pipe流水中的后续指令。
