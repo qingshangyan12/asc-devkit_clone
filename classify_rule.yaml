@@ -53,8 +53,6 @@ asc-devkit:
       - impl/tensor_api/atom/vector/*.h
       - impl/tensor_api/arch/cube/**/routing.h
       - impl/tensor_api/arch/vector/**/routing.h
-      - impl/tensor_api/arch/vector/transform/transform_vf_set.h
-      - impl/tensor_api/arch/vector/cast/cast_trait_map.h
       - impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_sync_data_barrier_impl.h
       - impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_data_barrier_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_set_flag_impl.h
