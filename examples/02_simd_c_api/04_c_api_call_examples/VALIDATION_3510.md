@@ -273,3 +273,24 @@ examples passing: no precision failure, runtime error, or timeout. Every
 historical timeout listed above also completed within the final 30-second
 per-example limit. Because the final timeout list was empty, no separate
 60-second timeout retest was required.
+
+## asc_duplicate Highest-Position Validation
+
+The `asc_duplicate` example was extended and revalidated on 2026-08-08. The
+public C API exposes only the lowest-position, zeroing form, so the two
+highest-position cases directly call the compiler `vdup` intrinsic with
+`POS_HIGHEST` and either `MODE_ZEROING` or `MODE_MERGING`.
+
+The source vector contains 1 through 64, the first four destination lanes are
+selected by the mask, and every destination lane starts at -7. The three
+observed results exactly matched their Golden data:
+
+- Lowest plus zeroing: `1 1 1 1 0 0 0 0 ...`
+- Highest plus zeroing: `64 64 64 64 0 0 0 0 ...`
+- Highest plus merging: `64 64 64 64 -7 -7 -7 -7 ...`
+
+This confirms that `POS_HIGHEST` broadcasts the highest vector element on
+DAV 3510. It also confirms that zeroing clears unselected destination lanes,
+while merging preserves their original values. Both `asc_duplicate.asc` and
+the regenerated `asc_duplicate_scalar.asc` compiled and ran successfully with
+the 30-second runtime timeout.
