@@ -62,6 +62,27 @@
     __simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
     ```
 
+    ```c
+    __simd_callee__ inline void asc_gather(vector_<dtype>& dst,
+                                        __ubuf__ <dtype>* src,
+                                        vector_<index_t> index,
+                                        vector_bool mask)
+    ```
+
+    #### dtype支持数据类型
+
+    dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`、`bfloat16_t`、`fp8_e4m3fn_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e8m0_t`
+
+    #### 典型示例
+
+    ```c
+    // 示例：int16_t 类型 UB 源收集（窄索引组）
+    __simd_callee__ inline void asc_gather(vector_int16_t& dst,
+                                        __ubuf__ int16_t* src,
+                                        vector_uint16_t index,
+                                        vector_bool mask)
+    ```
+
 - 收集矢量数据寄存器中的元素
 
     ```cpp

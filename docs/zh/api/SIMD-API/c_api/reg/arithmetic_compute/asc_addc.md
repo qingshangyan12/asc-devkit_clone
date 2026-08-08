@@ -44,8 +44,13 @@ $$
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_addc(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src, vector_bool mask)
+```c
+__simd_callee__ inline void asc_addc(vector_bool& dst0,
+                                     vector_uint32_t& dst1,
+                                     vector_uint32_t src0,
+                                     vector_uint32_t src1,
+                                     vector_bool src2,
+                                     vector_bool mask)
 ```
 
 ## 参数说明
@@ -69,8 +74,12 @@ __simd_callee__ inline void asc_addc(vector_bool& carry, vector_uint32_t& dst, v
 
 ## 约束说明
 
-- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
-
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- src0、src1、dst三者dtype必须完全一致（uint32_t），否则触发数据类型异常。
+- mask比特位为0的位置采用清零模式（ZEROING）：dst对应位置写0，不保留src原值也不保留dst原值。
+- 整型加法按32位无符号加法执行后取低32位写入dst，超出32位的部分不保留在dst中，仅通过carry的进位输出体现；该溢出不触发异常，结果按回绕（wrap）方式处理。
+- 源与目的寄存器重叠时行为不保证：carry、dst与src0、src1、carry_src寄存器号重叠时，计算结果不保证正确性，硬件不报错但数据可能被覆盖。
 - 运算输出完整计算结果（包含进位位），不受[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
 
 ## 调用示例

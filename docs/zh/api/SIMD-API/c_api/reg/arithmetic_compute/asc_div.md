@@ -36,14 +36,24 @@ $$
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_div(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_div(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-__simd_callee__ inline void asc_div(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_div(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_div(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_div(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+```c
+__simd_callee__ inline void asc_div(vector_<dtype>& dst,
+                                    vector_<dtype> src0,
+                                    vector_<dtype> src1,
+                                    vector_bool mask)
+dtype支持的数据类型为`half`、`float`
 ```
+
+### 典型示例
+
+```c
+// 示例：对half矢量寄存器求商操作
+__simd_callee__ inline void asc_div(vector_half& dst,
+                                    vector_half src0,
+                                    vector_half src1,
+                                    vector_bool mask)
+```
+
 ## 参数说明
 
 **表1** 参数说明
@@ -63,8 +73,12 @@ __simd_callee__ inline void asc_div(vector_uint32_t& dst, vector_uint32_t src0, 
 
 ## 约束说明
 
-- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
-
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- src0、src1、dst三者dtype必须完全一致，且仅支持`half`、`float`两种浮点类型，其他dtype触发数据类型异常。
+- mask为 `vector_bool` 类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask比特位为0的位置采用清零模式（ZEROING）：dst对应位置写0，不保留src原值也不保留dst原值。
+- half、float默认走近似除法路径，与标准IEEE 754二进制浮点除法相比存在精度差异，对精度敏感的场景需评估结果偏差。
 - 注意除零错误，结果请参考[Div特殊值/边界值输入的计算结果说明](../../../../appendix/reg_vector_compute_interface_boundary_value_summary.md#table1325925915217)。
 
 ## 调用示例

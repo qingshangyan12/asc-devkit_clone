@@ -49,21 +49,32 @@ $$
 ## 函数原型
 
 - 不支持进位计算接口
-  ```cpp
-  __simd_callee__ inline void asc_add(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-  __simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-  __simd_callee__ inline void asc_add(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-  __simd_callee__ inline void asc_add(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-  __simd_callee__ inline void asc_add(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-  __simd_callee__ inline void asc_add(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-  __simd_callee__ inline void asc_add(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-  __simd_callee__ inline void asc_add(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-  __simd_callee__ inline void asc_add(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+  ```c
+  __simd_callee__ inline void asc_add(vector_<dtype>& dst,
+                                      vector_<dtype> src0,
+                                      vector_<dtype> src1,
+                                      vector_bool mask)
+  ```
+
+  dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
+
+  ### 典型示例
+
+  ```c
+  // 示例：float类型无进位加法
+  __simd_callee__ inline void asc_add(vector_float& dst,
+                                      vector_float src0,
+                                      vector_float src1,
+                                      vector_bool mask)
   ```
 
 - 支持进位计算接口
-  ```cpp
-  __simd_callee__ inline void asc_add(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+  ```c
+  __simd_callee__ inline void asc_add(vector_bool& dst0,
+                                      vector_uint32_t& dst1,
+                                      vector_uint32_t src0,
+                                      vector_uint32_t src1,
+                                      vector_bool mask)
   ```
 
 ## 参数说明
@@ -86,12 +97,25 @@ $$
 
 ## 约束说明
 
-- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+### 通用约束
 
-- 支持进位计算接口
-  - 仅支持uint32_t类型。
-  - 需手动调用，接口内部不支持自动识别触发。
-  - 运算输出完整计算结果（包含进位位），不受[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src0、src1、dst为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- src0、src1、dst三者dtype必须完全一致，否则触发数据类型异常。
+- mask为 `vector_bool` 类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask比特位为0的位置采用清零模式（ZEROING）：dst对应位置写0，不保留src原值也不保留dst原值。
+
+### 无进位加法约束
+
+- dtype仅支持int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float共9种，其他dtype触发数据类型异常。
+- uint32_t加法使用无符号32位专用算子，溢出语义与其他整型dtype的饱和策略不同。
+
+### 带进位输出加法约束
+
+- dtype仅支持uint32_t，其他dtype触发数据类型异常。
+- 运算输出完整计算结果（包含进位位），不受[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
+- 进位输出按32位无符号加法产生：每个元素的进位为`(src0_i + src1_i) >> 32`取最高位1bit。
+- 和值截断为32位：dst1写入`(src0_i + src1_i) & 0xFFFFFFFF`，超出32位的部分不保留，仅通过carry的进位输出体现。
 
 ## 调用示例
 

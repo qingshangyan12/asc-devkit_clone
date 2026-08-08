@@ -40,21 +40,35 @@
 ## 函数原型
 
 - 递增模式
-    ```cpp
-    __simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t value)
-    __simd_callee__ inline void asc_arange(vector_int16_t& dst, int16_t value)
-    __simd_callee__ inline void asc_arange(vector_half& dst, half value)
-    __simd_callee__ inline void asc_arange(vector_int32_t& dst, int32_t value)
-    __simd_callee__ inline void asc_arange(vector_float& dst, float value)
+    ```c
+    __simd_callee__ inline void asc_arange(vector_<dtype>& dst,
+                                        <dtype> value)
+    ```
+
+    dtype支持的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`
+
+    ### 典型示例
+
+    ```c
+    // 示例：以 half 标量为基值生成递增序列
+    __simd_callee__ inline void asc_arange(vector_half& dst,
+                                        half value)
     ```
 
 - 递减模式
-    ```cpp
-    __simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t value)
-    __simd_callee__ inline void asc_arange_descend(vector_int16_t& dst, int16_t value)
-    __simd_callee__ inline void asc_arange_descend(vector_half& dst, half value)
-    __simd_callee__ inline void asc_arange_descend(vector_int32_t& dst, int32_t value)
-    __simd_callee__ inline void asc_arange_descend(vector_float& dst, float value)
+    ```c
+    __simd_callee__ inline void asc_arange_descend(vector_<dtype>& dst,
+                                        <dtype> value)
+    ```
+
+    dtype支持的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`
+
+    ### 典型示例
+
+    ```c
+    // 示例：以 half 标量为基值生成递减序列
+    __simd_callee__ inline void asc_arange_descend(vector_half& dst,
+                                        half value)
     ```
 
 ## 参数说明
@@ -74,7 +88,11 @@
 
 ## 约束说明
 
-对于整型数据类型，如果生成的索引发生溢出，结果将环绕。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- dst与src的dtype必须完全一致（half、float之一），仅支持浮点dtype，整型与其他dtype触发异常。
+- 本接口无掩码寄存器参数，目的矢量寄存器的全部元素均参与计算并写入结果，不存在清零或保留原值的位置。
+- 整型dtype（int8_t、int16_t、int32_t）按二进制补码加法计算，结果在`value + i`超出该dtype可表示范围时回绕（wrap-around），不触发异常。例如int8_t取value=127时，序列前128个元素依次为127、−128、−127、…、0；value=−128时，序列前128个元素依次为−128、−127、…、−1、0。
 
 ## 调用示例
 
