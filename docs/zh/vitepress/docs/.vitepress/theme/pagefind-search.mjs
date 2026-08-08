@@ -421,7 +421,7 @@ async function searchIdentifierIndex(plan) {
   }
 }
 
-async function collectCandidates(pagefind, variants, candidates = new Map(), source = 'content') {
+export async function collectCandidates(pagefind, variants, candidates = new Map(), source = 'content') {
   const responses = await Promise.all(variants.map(async (variant) => {
     try {
       return { variant, response: await pagefind.search(variant.query) }
@@ -436,7 +436,7 @@ async function collectCandidates(pagefind, variants, candidates = new Map(), sou
     for (let rank = 0; rank < results.length; rank++) {
       const result = results[rank]
       const key = `${source}:${result.id || `${variant.query}:${rank}`}`
-      const sourceWeight = source === 'title' ? 1.3 : 1
+      const sourceWeight = source === 'title-alias' ? 1.3 : 1
       const reciprocalRank = sourceWeight * variant.weight / (60 + rank + 1)
       const existing = candidates.get(key)
       if (existing) {
@@ -488,17 +488,7 @@ export function bestPagefindSection(data) {
     ? [...data.weighted_locations].sort((left, right) => right.weight - left.weight || left.location - right.location)
     : []
   for (const { location } of weightedLocations) {
-    const matching = subResults.filter((subResult) => {
-      const locations = subResult.locations || []
-      const first = locations[0]
-      if (!Number.isFinite(first)) return false
-      const last = locations.length === 1 ? Number.POSITIVE_INFINITY : locations.at(-1)
-      return first <= location && location <= last
-    })
-    const best = matching.reduce((selected, candidate) => {
-      if (!selected || candidate.locations.length > selected.locations.length) return candidate
-      return selected
-    }, null)
+    const best = subResults.find(subResult => (subResult.locations || []).includes(location))
     if (best?.url) return result(best)
   }
   return result(subResults[0])
@@ -771,7 +761,12 @@ export async function searchPagefind(pagefind, query) {
 
 export async function initializePagefindSearch(pagefind) {
   if (initializedPagefindInstances.has(pagefind)) return pagefind
-  await pagefind.mergeIndex('/pagefind-titles/', { indexWeight: 2 })
+  try {
+    await pagefind.mergeIndex('/pagefind-titles/', { indexWeight: 2 })
+  }
+  catch (error) {
+    console.warn('[search] Title index is unavailable; continuing with the primary Pagefind index.', error)
+  }
   initializedPagefindInstances.add(pagefind)
   return pagefind
 }

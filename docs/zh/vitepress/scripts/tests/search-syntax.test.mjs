@@ -18,10 +18,12 @@ import {
 } from '../../docs/.vitepress/search-syntax.mjs'
 import {
   bestPagefindSection,
+  collectCandidates,
   createQueryPlan,
   findIdentifierIndexMatches,
   highlightIdentifierExcerpt,
   highlightSearchText,
+  initializePagefindSearch,
 } from '../../docs/.vitepress/theme/pagefind-search.mjs'
 
 test('normalizes kernel launch syntax queries and prefixes', () => {
@@ -88,12 +90,12 @@ test('selects the Pagefind section containing the strongest match', () => {
       {
         url: '/guide/page.html#first',
         anchor: { text: 'First section' },
-        locations: [0, 9],
+        locations: [4],
       },
       {
         url: '/guide/page.html#second',
         anchor: { text: 'Second：section' },
-        locations: [10, 20],
+        locations: [18],
       },
     ],
   })
@@ -102,6 +104,40 @@ test('selects the Pagefind section containing the strongest match', () => {
     route: '/guide/page.html#second',
     sectionTitle: 'Second：section',
   })
+})
+
+test('weights title alias candidates above content candidates', async () => {
+  const pagefind = {
+    async search() {
+      return { results: [{ id: 'page', score: 1 }] }
+    },
+  }
+  const variants = [{ query: 'page', weight: 1 }]
+  const content = await collectCandidates(pagefind, variants)
+  const title = await collectCandidates(pagefind, variants, new Map(), 'title-alias')
+
+  assert.equal(content.get('content:page').retrievalScore, 1 / 61)
+  assert.equal(title.get('title-alias:page').retrievalScore, 1.3 / 61)
+})
+
+test('continues with the primary index when the title index is unavailable', async () => {
+  let mergeCalls = 0
+  const pagefind = {
+    async mergeIndex() {
+      mergeCalls++
+      throw new Error('404')
+    },
+  }
+  const originalWarn = console.warn
+  console.warn = () => {}
+  try {
+    assert.equal(await initializePagefindSearch(pagefind), pagefind)
+    assert.equal(await initializePagefindSearch(pagefind), pagefind)
+  }
+  finally {
+    console.warn = originalWarn
+  }
+  assert.equal(mergeCalls, 1)
 })
 
 test('escapes and highlights section titles', () => {

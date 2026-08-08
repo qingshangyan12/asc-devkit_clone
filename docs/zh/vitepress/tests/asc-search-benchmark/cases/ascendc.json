@@ -1237,7 +1237,7 @@
         "minResults": 1,
         "targets": [
           { "exact": "/guide/算子实践参考/SIMD算子实现/矢量编程/DoubleBuffer场景", "grade": 3 },
-          { "prefix": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/", "grade": 3 }
+          { "prefix": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/", "grade": 3 }
         ]
       }
     },
@@ -1290,7 +1290,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "prefix": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/", "grade": 3 },
+          { "prefix": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/", "grade": 3 },
           { "exact": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/基础知识", "grade": 2 }
         ]
       }
@@ -1364,7 +1364,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isnan1", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isnan", "grade": 3 },
           { "exact": "/api/SIMD-API/adv_api/math_compute/IsNan_interface/IsNan", "grade": 1 }
         ]
       }
@@ -1378,7 +1378,7 @@
         "minResults": 1,
         "targets": [
           { "exact": "/api/SIMD-API/adv_api/math_compute/IsNan_interface/IsNan", "grade": 3 },
-          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isnan1", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isnan", "grade": 1 }
         ]
       }
     },
@@ -1390,7 +1390,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isinf1", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isinf", "grade": 3 },
           { "exact": "/api/SIMD-API/adv_api/math_compute/IsInf_interface/IsInf", "grade": 1 }
         ]
       }
@@ -1404,7 +1404,7 @@
         "minResults": 1,
         "targets": [
           { "exact": "/api/SIMD-API/adv_api/math_compute/IsInf_interface/IsInf", "grade": 3 },
-          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isinf1", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isinf", "grade": 1 }
         ]
       }
     },
@@ -1416,7 +1416,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isfinite1", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isfinite", "grade": 3 },
           { "exact": "/api/SIMD-API/adv_api/math_compute/IsFinite_interface/IsFinite", "grade": 1 }
         ]
       }
@@ -1430,7 +1430,7 @@
         "minResults": 1,
         "targets": [
           { "exact": "/api/SIMD-API/adv_api/math_compute/IsFinite_interface/IsFinite", "grade": 3 },
-          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isfinite1", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/float_math_functions/isfinite", "grade": 1 }
         ]
       }
     },
@@ -1442,7 +1442,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/abs1", "grade": 3 },
+          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/abs", "grade": 3 },
           { "contains": "/basic_arithmetic/Abs", "grade": 1 }
         ]
       }
@@ -1456,7 +1456,7 @@
         "minResults": 1,
         "targets": [
           { "contains": "/basic_arithmetic/Abs", "grade": 3 },
-          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/abs1", "grade": 1 }
+          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/abs", "grade": 1 }
         ]
       }
     },
@@ -1468,7 +1468,7 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/sqrt1", "grade": 3 },
+          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/sqrt", "grade": 3 },
           { "contains": "/basic_arithmetic/Sqrt", "grade": 1 }
         ]
       }
@@ -1482,7 +1482,7 @@
         "minResults": 1,
         "targets": [
           { "contains": "/basic_arithmetic/Sqrt", "grade": 3 },
-          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/sqrt1", "grade": 1 }
+          { "exact": "/api/Utils-API/cpp_stdlib/math_functions/sqrt", "grade": 1 }
         ]
       }
     },
@@ -1494,8 +1494,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/max1", "grade": 3 },
-          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/max-267", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/max", "grade": 3 },
+          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/max", "grade": 3 },
           { "contains": "/basic_arithmetic/Max", "grade": 1 },
           { "contains": "/NumericLimits_utils/Max", "grade": 1 }
         ]
@@ -1511,8 +1511,8 @@
         "targets": [
           { "contains": "/basic_arithmetic/Max", "grade": 3 },
           { "contains": "/NumericLimits_utils/Max", "grade": 3 },
-          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/max1", "grade": 1 },
-          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/max-267", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/max", "grade": 1 },
+          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/max", "grade": 1 }
         ]
       }
     },
@@ -1524,8 +1524,8 @@
       "expect": {
         "minResults": 1,
         "targets": [
-          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/min1", "grade": 3 },
-          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/min-268", "grade": 3 },
+          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/min", "grade": 3 },
+          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/min", "grade": 3 },
           { "contains": "/basic_arithmetic/Min", "grade": 1 },
           { "contains": "/NumericLimits_utils/Min", "grade": 1 }
         ]
@@ -1541,8 +1541,8 @@
         "targets": [
           { "contains": "/basic_arithmetic/Min", "grade": 3 },
           { "contains": "/NumericLimits_utils/Min", "grade": 3 },
-          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/min1", "grade": 1 },
-          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/min-268", "grade": 1 }
+          { "exact": "/api/SIMT-API/math_functions/integer_math_functions/min", "grade": 1 },
+          { "exact": "/api/Utils-API/cpp_stdlib/algorithms/min", "grade": 1 }
         ]
       }
     },
