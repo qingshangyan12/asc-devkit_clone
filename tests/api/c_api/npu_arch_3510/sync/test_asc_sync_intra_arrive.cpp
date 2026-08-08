@@ -21,23 +21,44 @@ __aicore__ inline void set_intra_block_stub(pipe_t pipe, uint64_t sync_id)
 
 class TEST_ASC_SYNC_INTRA_ARRIVE : public testing::Test {
 protected:
-    void SetUp() {}
-    void TearDown() {}
+    void SetUp() { g_coreType = C_API_AIV_TYPE; }
+    void TearDown() { g_coreType = C_API_AIV_TYPE; }
 };
 
-#define TEST_ASC_SYNC_INTRA_ARRIVE(dtype)                                                                    \
-                                                                                                             \
-    TEST_F(TEST_ASC_SYNC_INTRA_ARRIVE, TEST_ASC_SYNC_INTRA_ARRIVE_##dtype)                                   \
-    {                                                                                                        \
-        MOCKER_CPP(set_intra_block, void(pipe_t, uint64_t)).times(1).will(invoke(set_intra_block_stub));     \
-                                                                                                             \
-        pipe_t pipe = static_cast<pipe_t>(pipe_t::PIPE_S);                                                   \
-        dtype sync_id = static_cast<dtype>(22);                                                              \
-                                                                                                             \
-        asc_sync_intra_arrive(pipe, sync_id);                                                                \
-        GlobalMockObject::verify();                                                                          \
+#define TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(coreType, pipeVal, dtype)                                \
+    void set_intra_block_stub_##coreType##_##pipeVal##_##dtype(pipe_t pipe, uint64_t sync_id)       \
+    {                                                                                               \
+        EXPECT_EQ(pipe, pipeVal);                                                                   \
+        EXPECT_EQ(sync_id, static_cast<uint64_t>(22));                                              \
+    }                                                                                               \
+                                                                                                    \
+    TEST_F(TEST_ASC_SYNC_INTRA_ARRIVE, TEST_ASC_SYNC_INTRA_ARRIVE_##coreType##_##pipeVal##_##dtype) \
+    {                                                                                               \
+        g_coreType = coreType;                                                                      \
+        MOCKER_CPP(set_intra_block, void(pipe_t, uint64_t))                                         \
+            .times(1)                                                                               \
+            .will(invoke(set_intra_block_stub_##coreType##_##pipeVal##_##dtype));                   \
+        pipe_t pipe = pipeVal;                                                                      \
+        dtype sync_id = static_cast<dtype>(22);                                                     \
+        asc_sync_intra_arrive(pipe, sync_id);                                                       \
+        GlobalMockObject::verify();                                                                 \
     }
 
-// ==========asc_sync_intra_arrive==========
-TEST_ASC_SYNC_INTRA_ARRIVE(uint8_t);
-TEST_ASC_SYNC_INTRA_ARRIVE(uint64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_S, uint8_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_S, uint64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_M, uint8_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_M, uint64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_MTE1, uint8_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_MTE1, uint64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_MTE2, uint8_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_MTE2, uint64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_FIX, uint8_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIC_TYPE, PIPE_FIX, uint64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIV_TYPE, PIPE_S, uint8_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIV_TYPE, PIPE_S, uint64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIV_TYPE, PIPE_MTE2, uint8_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIV_TYPE, PIPE_MTE2, uint64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIV_TYPE, PIPE_MTE3, uint8_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIV_TYPE, PIPE_MTE3, uint64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIV_TYPE, PIPE_V, uint8_t);
+TEST_ASC_SYNC_INTRA_ARRIVE_BY_PIPE(C_API_AIV_TYPE, PIPE_V, uint64_t);
