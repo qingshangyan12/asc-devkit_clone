@@ -7,16 +7,19 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
-#ifndef HCCLV2_INS_V2_ALL_REDUCE_SOLE_EXECUTOR_H
-#define HCCLV2_INS_V2_ALL_REDUCE_SOLE_EXECUTOR_H
+
+#ifndef HCCLV2_INS_ALL_REDUCE_SOLE_EXECUTOR_H
+#define HCCLV2_INS_ALL_REDUCE_SOLE_EXECUTOR_H
 
 #include "executor_common_ops.h"
+#include "topo_match_1d.h"
+#include "topo_match_base.h"
 
 namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 class InsV2AllReduceSoleExecutor : public InsCollAlgBase {
 public:
-    InsV2AllReduceSoleExecutor() = default;
+    explicit InsV2AllReduceSoleExecutor();
     ~InsV2AllReduceSoleExecutor() override = default;
 
     HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
@@ -28,10 +31,18 @@ public:
     HcclResult CalcAlgHierarchyInfo(
         HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
 
+#ifndef AICPU_COMPILE
+    HcclResult FastLaunchSaveCtx(
+        const OpParam& param, const TemplateResource& templateAlgRes, u32 notifyNumOnMainThread) const;
+    HcclResult FastLaunch(const OpParam& param, const CcuFastLaunchCtx* fastLaunchCtx) override;
+#endif
+
 protected:
     HcclResult OrchestrateLoop(const OpParam& param, const AlgResourceCtxSerializable& resCtx);
+
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
+    std::vector<ThreadHandle> threads_;
 };
 } // namespace mc2_ops_hccl
 
-#endif
+#endif // HCCLV2_INS_ALL_REDUCE_SOLE_EXECUTOR_H

@@ -7,11 +7,15 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #include "ins_v2_all_reduce_sole_executor.h"
-#include "topo_match_1d.h"
 #include "ins_temp_all_reduce_mesh_1D_one_shot.h"
 
 namespace mc2_ops_hccl {
+
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllReduceSoleExecutor()
+{}
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcAlgHierarchyInfo(
@@ -37,6 +41,12 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate Start.");
+    maxTmpMemSize_ = resCtx.cclMem.size;
+    threads_ = resCtx.threads;
+    if (param.engine != CommEngine::COMM_ENGINE_AIV && param.engine != CommEngine::COMM_ENGINE_CCU) {
+        CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
+    }
     dataCount_ = param.DataDes.count;
     dataType_ = param.DataDes.dataType;
     dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
@@ -45,70 +55,169 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         HCCL_ERROR("[InsV2AllReduceSoleExecutor] invalid count[%llu] or dataType[%d]", dataCount_, dataType_),
         HCCL_E_PARA);
     dataSize_ = dataCount_ * dataTypeSize_;
-
-    if (param.engine != CommEngine::COMM_ENGINE_AIV) {
-        CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
-    }
-
-    return OrchestrateLoop(param, resCtx);
+    HcclResult ret = OrchestrateLoop(param, resCtx);
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR("[InsV2AllReduceSoleExecutor][Orchestrate]errNo[0x%016llx] AllReduce executor kernel run failed",
+            HCCL_ERROR_CODE(ret)),
+        ret);
+    return HCCL_SUCCESS;
 }
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    TemplateResource templateResource;
-    templateResource.ccuKernels = resCtx.ccuKernels;
-    templateResource.threads = resCtx.threads;
-    templateResource.aivCommInfoPtr = resCtx.aivCommInfoPtr;
-    if (param.engine != CommEngine::COMM_ENGINE_AIV && !remoteRankToChannelInfo_.empty()) {
-        templateResource.channels = remoteRankToChannelInfo_[0];
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] Start");
+    TemplateResource templateAlgRes;
+    if (param.engine == COMM_ENGINE_CCU) {
+        templateAlgRes.ccuKernels = resCtx.ccuKernels;
     }
+    if (param.engine != CommEngine::COMM_ENGINE_AIV && param.engine != CommEngine::COMM_ENGINE_CCU &&
+        remoteRankToChannelInfo_.size() > 0) {
+        templateAlgRes.channels = remoteRankToChannelInfo_[0];
+    }
+    templateAlgRes.threads = resCtx.threads;
+    templateAlgRes.aivCommInfoPtr = resCtx.aivCommInfoPtr;
 
-    TemplateDataParams dataParams;
-    dataParams.buffInfo.inputPtr = param.inputPtr;
-    dataParams.buffInfo.outputPtr = param.outputPtr;
-    dataParams.buffInfo.hcclBuff = resCtx.cclMem;
-    dataParams.buffInfo.inBuffType = BufferType::INPUT;
-    dataParams.buffInfo.outBuffType = BufferType::OUTPUT;
-    dataParams.buffInfo.hcclBuffType = BufferType::HCCL_BUFFER;
-    dataParams.buffInfo.inputSize = param.inputSize;
-    dataParams.buffInfo.outputSize = param.outputSize;
-    dataParams.enableRemoteMemAccess = param.opMode == OpMode::OFFLOAD;
-    dataParams.repeatNum = 1;
+    TemplateDataParams tempAlgParams;
+    tempAlgParams.buffInfo.inputPtr = param.inputPtr;
+    tempAlgParams.buffInfo.outputPtr = param.outputPtr;
+    tempAlgParams.buffInfo.hcclBuff = resCtx.cclMem;
+    tempAlgParams.buffInfo.inBuffType = BufferType::INPUT;
+    tempAlgParams.buffInfo.outBuffType = BufferType::OUTPUT;
+    tempAlgParams.buffInfo.hcclBuffType = BufferType::HCCL_BUFFER;
+    tempAlgParams.buffInfo.inputSize = param.inputSize;
+    tempAlgParams.buffInfo.outputSize = param.outputSize;
+    tempAlgParams.enableRemoteMemAccess = param.opMode == OpMode::OFFLOAD;
+    tempAlgParams.repeatNum = 1;
+    tempAlgParams.inputRepeatStride = 0;
+    tempAlgParams.outputRepeatStride = 0;
 
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
-    const u64 scratchMultiplier =
-        algTemplate->CalcScratchMultiple(dataParams.buffInfo.inBuffType, dataParams.buffInfo.outBuffType);
-    const u64 transportBoundDataSize = (param.engine == CommEngine::COMM_ENGINE_AICPU_TS) ?
-        resCtx.cclMem.size : UB_MAX_DATA_SIZE;
-    const u64 scratchBound = scratchMultiplier == 0 ?
-                                 transportBoundDataSize :
-                                 resCtx.cclMem.size / scratchMultiplier / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
-    const u64 maxDataSizePerLoop = std::min<u64>(transportBoundDataSize, scratchBound);
-    const u64 maxCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
-    CHK_PRT_RET(maxCountPerLoop == 0, HCCL_ERROR("[InsV2AllReduceSoleExecutor] maxCountPerLoop is 0"), HCCL_E_INTERNAL);
+    u32 templateScratchMultiplier =
+        algTemplate->CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
 
-    const u64 loopTimes = dataCount_ / maxCountPerLoop + static_cast<u64>(dataCount_ % maxCountPerLoop != 0);
-    u64 processedCount = 0;
-    for (u64 loop = 0; loop < loopTimes; ++loop) {
-        const u64 currentCount = loop + 1 == loopTimes ? dataCount_ - processedCount : maxCountPerLoop;
-        dataParams.count = currentCount;
-        dataParams.sliceSize = currentCount * dataTypeSize_;
-        dataParams.tailSize = dataParams.sliceSize;
-        dataParams.inputSliceStride = 0;
-        dataParams.outputSliceStride = 0;
-        dataParams.inputRepeatStride = 0;
-        dataParams.outputRepeatStride = 0;
-        dataParams.buffInfo.inBuffBaseOff = processedCount * dataTypeSize_;
-        dataParams.buffInfo.outBuffBaseOff = processedCount * dataTypeSize_;
-        dataParams.buffInfo.hcclBuffBaseOff = 0;
-        CHK_RET(algTemplate->KernelRun(param, dataParams, templateResource));
-        processedCount += currentCount;
+    u64 maxDataSizePerLoop = 0;
+    maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
+    u64 transportBoundDataSize =
+        (param.engine == CommEngine::COMM_ENGINE_AICPU_TS) ? maxTmpMemSize_ : UB_MAX_DATA_SIZE;
+    HCCL_INFO("[InsV2AllReduceSoleExecutor]maxTmpMemSize_ [%u]", maxTmpMemSize_);
+    if (templateScratchMultiplier != 0) {
+        u64 scratchBoundDataSize =
+            maxTmpMemSize_ / templateScratchMultiplier / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
+        maxDataSizePerLoop = std::min(transportBoundDataSize, scratchBoundDataSize);
+    } else {
+        maxDataSizePerLoop = transportBoundDataSize;
+    }
+    CHK_PRT_RET(
+        dataTypeSize_ == 0, HCCL_ERROR("[InsV2AllReduceSoleExecutor][OrchestrateOpbase] dataTypeSize_ is 0"),
+        HCCL_E_INTERNAL);
+    u64 maxDataCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
+    HCCL_INFO(
+        "[InsV2AllReduceSoleExecutor][OrchestrateOpbase] maxDataCountPerLoop[%llu], maxDataSizePerLoop[%llu], "
+        "transportBoundDataSize[%llu], templateScratchMultiplier[%llu]",
+        maxDataCountPerLoop, maxDataSizePerLoop, transportBoundDataSize, templateScratchMultiplier);
+    CHK_PRT_RET(
+        maxDataCountPerLoop == 0,
+        HCCL_ERROR("[InsV2AllReduceSoleExecutor][OrchestrateOpbase] maxDataCountPerLoop is 0"), HCCL_E_INTERNAL);
+
+    u64 loopTimes = dataCount_ / maxDataCountPerLoop + static_cast<u64>(dataCount_ % maxDataCountPerLoop != 0);
+    u64 processedDataCount = 0;
+    for (u64 loop = 0; loop < loopTimes; loop++) {
+        u64 currDataCount = (loop == loopTimes - 1) ? dataCount_ - processedDataCount : maxDataCountPerLoop;
+        tempAlgParams.count = currDataCount;
+        tempAlgParams.buffInfo.inBuffBaseOff = processedDataCount * dataTypeSize_;
+        tempAlgParams.buffInfo.outBuffBaseOff = processedDataCount * dataTypeSize_;
+        tempAlgParams.buffInfo.hcclBuffBaseOff = 0;
+        tempAlgParams.sliceSize = currDataCount * dataTypeSize_;
+        tempAlgParams.tailSize = tempAlgParams.sliceSize;
+        tempAlgParams.inputSliceStride = 0;
+        tempAlgParams.outputSliceStride = 0;
+        HCCL_INFO(
+            "[InsV2AllReduceSoleExecutor] loop [%u] tempAlgParams.inputSliceStride [%u],"
+            "tempAlgParams.outputSliceStride [%u] tempAlgParams.sliceSize [%u]",
+            loop, tempAlgParams.inputSliceStride, tempAlgParams.outputSliceStride, tempAlgParams.sliceSize);
+        HCCL_INFO(
+            "[InsV2AllReduceSoleExecutor] loop [%u] tempAlgParams.buffInfo.inBuffBaseOff [%u],"
+            "tempAlgParams.buffInfo.outBuffBaseOff [%u]",
+            loop, tempAlgParams.buffInfo.inBuffBaseOff, tempAlgParams.buffInfo.outBuffBaseOff);
+        CHK_RET(algTemplate->KernelRun(param, tempAlgParams, templateAlgRes));
+        processedDataCount += currDataCount;
+    }
+#ifndef AICPU_COMPILE
+    if (loopTimes == 1 && param.engine == CommEngine::COMM_ENGINE_CCU && param.opMode != OpMode::OFFLOAD) {
+        CHK_RET(FastLaunchSaveCtx(param, templateAlgRes, resCtx.notifyNumOnMainThread));
+    }
+#endif
+
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] End.");
+    return HCCL_SUCCESS;
+}
+
+#ifndef AICPU_COMPILE
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunchSaveCtx(
+    const OpParam& param, const TemplateResource& templateAlgRes, u32 notifyNumOnMainThread) const
+{
+    HCCL_INFO("[InsV2AllReduceSoleExecutor] loopTimes==1, save fast launch ctx.");
+    u32 threadNum = 1;
+    u32 ccuKernelNum = templateAlgRes.submitInfos.size();
+    if (ccuKernelNum < 1) {
+        HCCL_INFO("[InsV2AllReduceSoleExecutor] ccu kernel num is 0, no need to save.");
+        return HCCL_SUCCESS;
+    }
+    HCCL_INFO(
+        "[InsV2AllReduceSoleExecutor][HcclEngineCtxCreate] threadNum[%llu], ccuKernelNum[%llu]", threadNum,
+        ccuKernelNum);
+
+    u64 size = CcuFastLaunchCtx::GetCtxSize(threadNum, ccuKernelNum);
+    void* ctxPtr = nullptr;
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][HcclEngineCtxCreate] Tag[%s], size[%llu]", param.fastLaunchTag, size);
+    CHK_RET(HcclEngineCtxCreate(param.hcclComm, param.fastLaunchTag, CommEngine::COMM_ENGINE_CCU, size, &ctxPtr));
+
+    CcuFastLaunchCtx* ccuFastLaunchCtx = reinterpret_cast<CcuFastLaunchCtx*>(ctxPtr);
+    CHK_SAFETY_FUNC_RET(strcpy_s(ccuFastLaunchCtx->algName, sizeof(ccuFastLaunchCtx->algName), param.algName));
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunchSaveCtx] algName[%s]", ccuFastLaunchCtx->algName);
+
+    ccuFastLaunchCtx->threadNum = threadNum;
+    ccuFastLaunchCtx->notifyNumOnMainThread = notifyNumOnMainThread;
+    ThreadHandle* threads = ccuFastLaunchCtx->GetThreadHandlePtr();
+    threads[0] = templateAlgRes.threads[0];
+
+    ccuFastLaunchCtx->ccuKernelNum[0] = ccuKernelNum;
+    CcuKernelSubmitInfo* kernelSubmitInfos = ccuFastLaunchCtx->GetCcuKernelSubmitInfoPtr();
+    for (u32 i = 0; i < ccuKernelNum; i++) {
+        kernelSubmitInfos[i] = templateAlgRes.submitInfos[i];
     }
     return HCCL_SUCCESS;
 }
+
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
+    const OpParam& param, const CcuFastLaunchCtx* fastLaunchCtx)
+{
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] Start.");
+    TemplateFastLaunchCtx tempFastLaunchCtx;
+    ThreadHandle* threads = fastLaunchCtx->GetThreadHandlePtr();
+    tempFastLaunchCtx.threads.assign(threads, threads + fastLaunchCtx->threadNum);
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] threadNum[%llu]", fastLaunchCtx->threadNum);
+
+    CcuKernelSubmitInfo* ccuKernelSubmitInfos = fastLaunchCtx->GetCcuKernelSubmitInfoPtr();
+    tempFastLaunchCtx.ccuKernelSubmitInfos.assign(
+        ccuKernelSubmitInfos, ccuKernelSubmitInfos + fastLaunchCtx->ccuKernelNum[0]);
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] ccuKernelNum[%llu]", fastLaunchCtx->ccuKernelNum[0]);
+    tempFastLaunchCtx.buffInfo.inputPtr = param.inputPtr;
+    tempFastLaunchCtx.buffInfo.outputPtr = param.outputPtr;
+    tempFastLaunchCtx.buffInfo.hcclBuff = param.hcclBuff;
+
+    std::unique_ptr<InsAlgTemplate> algTemplate = std::make_unique<InsAlgTemplate>();
+    CHK_RET(algTemplate->FastLaunch(param, tempFastLaunchCtx));
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] End.");
+    return HCCL_SUCCESS;
+}
+#endif
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceMesh1DOneShot, InsV2AllReduceSoleExecutor, TopoMatch1D,

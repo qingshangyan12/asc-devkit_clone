@@ -225,8 +225,7 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     const bool useCannBridge =
         (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
-         (param->opType == HCCL_CMD_ALLREDUCE &&
-          std::string(param->algName) != "InsAllReduceMesh1DOneShot"));
+         param->opType == HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
         HcclResult cannRet =
             RunWithMc2BatchMode(*param, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });

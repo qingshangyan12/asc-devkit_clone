@@ -765,9 +765,6 @@ HcclResult GetOpParamResCtx(
     void** resCtxOut)
 {
     bool useCannResCtx = UseCannBridge(opParam);
-    if (algName == "InsAllReduceMesh1DOneShot") {
-        useCannResCtx = false;
-    }
     std::unique_ptr<InsCollAlgBase> executor = nullptr;
     if (useCannResCtx) {
         executor = GetAlgExecViaCann(opParam.opType, algName);
