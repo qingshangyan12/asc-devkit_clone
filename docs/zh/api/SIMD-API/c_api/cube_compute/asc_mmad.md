@@ -26,61 +26,46 @@
 
 ## 功能说明
 
-<!-- npu="950" id8 -->
-头文件路径：`"c_api/cube_compute/cube_compute.h"`。
-
-本接口用于完成矩阵乘加计算，计算公式如下：
-
-$$
-C = A \times B + C_{init}
-$$
-
-其中，左矩阵A的形状为M x K，右矩阵B的形状为K x N，结果矩阵C的形状为M x N。$C_{init}$可通过`c_matrix_init_val`和`c_matrix_source`配置为全0矩阵、L0C Buffer中的矩阵C或Bias矩阵。使用Bias矩阵时，形状为1 x N，并沿M方向广播，Bias矩阵位于BT Buffer（BiasTable Buffer）。
-
-常规计算接口`asc_mmad`只下发矩阵乘加指令；同步计算接口`asc_mmad_sync`在完成矩阵乘加指令下发后执行`PIPE_ALL`同步，等待此前提交到各流水的指令执行完成。
-
-**表1** 矩阵说明（Ascend 950PR/Ascend 950DT）
-
-| 矩阵 | 物理存储位置 | 形状 | 数据格式 |
-| --- | --- | --- | --- |
-| A | L0A Buffer | M x K | Nz |
-| B | L0B Buffer | K x N | Zn |
-| C | L0C Buffer | M x N | Nz |
-| Bias | BT Buffer | 1 x N | ND |
-
-矩阵C的分形大小为16 x 16，矩阵A的分形大小为16 x K0，矩阵B的分形大小为K0 x 16。输入数据类型为`half`或`bfloat16_t`时，K0为16；输入数据类型为`float`时，K0为8；输入数据类型为`int8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`或`hifloat8_t`时，K0为32。
-<!-- end id8 -->
-
-<!-- npu="A3,910b" id9 -->
-本接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。
-
-本接口实现昇腾NPU矩阵乘计算能力，其数学表达式为：
+本接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其计算公式如下：
 
 $$
 C = A \times B + C
 $$
 
-针对如下产品型号，矩阵说明见下表：
-<!-- npu="A3" id10 -->
-Atlas A3 训练系列产品/Atlas A3 推理系列产品
-<!-- end id10 -->
-<!-- npu="910b" id11 -->
-Atlas A2 训练系列产品/Atlas A2 推理系列产品
-<!-- end id11 -->
+其中，A、B、C分别为左、右、结果矩阵。C矩阵可以通过本接口的参数初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵。Bias矩阵位于BiasTable Buffer，形状为1 x N，使用时沿M方向广播初始化C矩阵。
 
-**表2** 矩阵计算矩阵A、B、C解释说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+<!-- npu="950" id8 -->
+针对Ascend 950PR/Ascend 950DT，各矩阵的信息说明见下表：
 
-| 矩阵计算逻辑 | 矩阵计算物理位置 | 维度 | 输入/输出数据格式 |
-| --- | --- | --- | --- |
-| A | L0A Buffer | M x K | Zz |
-| B | L0B Buffer | K x N | Zn |
-| C | L0C Buffer | M x N，可支持使用偏置矩阵Bias进行初始化，维度为1 x N | Nz |
+**表1** 矩阵信息说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
+| 矩阵 | 物理存储位置 | 形状 | 数据格式 | 分型大小 |
+| --- | --- | --- | --- | --- |
+| A | L0A Buffer | M x K | Nz | 16 x K0 |
+| B | L0B Buffer | K x N | Zn | K0 x 16 |
+| C | L0C Buffer | M x N | Nz | 16 x 16 |
+| Bias | BiasTable Buffer | 1 x N | ND | - |
+
+表格中K0的取值为`32Byte / sizeof(dtype)`，dtype为矩阵的数据类型。
+<!-- end id8 -->
+
+<!-- npu="A3,910b" id9 -->
+**表2** 矩阵信息说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
+| 矩阵 | 物理存储位置 | 形状 | 数据格式 | 分型大小 |
+| --- | --- | --- | --- | --- |
+| A | L0A Buffer | M x K | Zz | 16 x K0 |
+| B | L0B Buffer | K x N | Zn | K0 x 16 |
+| C | L0C Buffer | M x N | Nz | 16 x 16 |
+| Bias | BiasTable Buffer | 1 x N | ND | - |
+
+表格中K0的取值为`32Byte / sizeof(dtype)`，dtype为矩阵的数据类型。
 <!-- end id9 -->
 
 ## 函数原型
 
 <!-- npu="950" id12 -->
-### 模板原型
+### 模板原型（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
 - 常规计算
 
@@ -112,11 +97,11 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
                                        bool c_matrix_init_val)
   ```
 
-### 数据类型<a id="asc_mmad_data_type"></a>
+a_dtype、b_dtype、c_dtype的取值组合见下表：
 
-**表3** 输入矩阵、Bias矩阵和结果矩阵支持的数据类型组合（Ascend 950PR/Ascend 950DT）
+**表3** 输入矩阵、Bias矩阵和结果矩阵支持的数据类型组合（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_data_type"></a>
 
-| `a_dtype` | `b_dtype` | Bias数据类型 | `c_dtype` |
+| a_dtype | b_dtype | c_dtype | Bias数据类型 |
 | --- | --- | --- | --- |
 | `int8_t` | `int8_t` | `int32_t` | `int32_t` |
 | `half` | `half` | `float` | `float` |
@@ -130,58 +115,62 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id12 -->
 
 <!-- npu="A3,910b" id13 -->
+### 模板原型（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
 - 常规计算
 
-  ```cpp
+  ```c
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad(__cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad(__cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
   ```
 
 - 同步计算
 
-  ```cpp
+  ```c
   __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
   __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
   ```
+
+a_dtype、b_dtype、c_dtype的取值组合见下表：
+
+**表4** 输入矩阵、Bias矩阵和结果矩阵支持的数据类型组合（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
+| a_dtype | b_dtype | c_dtype | Bias数据类型 |
+| --- | --- | --- | --- |
+| `int8_t` | `int8_t` | `int32_t` | `int32_t` |
+| `half` | `half` | `float` | `float` |
+| `float` | `float` | `float` | `float` |
+| `bfloat16_t` | `bfloat16_t` | `float` | `float` |
+  
 <!-- end id13 -->
 
 ## 参数说明
 
 <!-- npu="950" id14 -->
-**表4** 参数说明（Ascend 950PR/Ascend 950DT）<a id="asc_mmad_param_table"></a>
+针对Ascend 950PR/Ascend 950DT，参数明见下表：
+
+**表4** 参数说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_param_table"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_data_type)。<br>当`c_matrix_init_val`为false且`c_matrix_source`为true时，该参数低32位为矩阵C在L0C Buffer中的起始地址，高32位为Bias矩阵在BT Buffer中的起始地址；Bias矩阵起始地址需按照64字节对齐。 |
+| c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_data_type)。 |
 | a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_data_type)。 |
 | b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_data_type)。 |
 | left_height | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
-| n_dim | 输入 | 左矩阵A的K维大小，也是右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]。 |
+| n_dim | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]。 |
 | right_width | 输入 | 右矩阵B和结果矩阵C的N维大小，单位为元素，取值范围为[0, 4095]。 |
-| unit_flag | 输入 | 用于控制矩阵乘加指令和Fixpipe指令细粒度并行。取值说明如下：<br>&nbsp;&nbsp;&bull; 0：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; 2：开启UnitFlag，硬件执行完指令后不复位单元标记位。<br>&nbsp;&nbsp;&bull; 3：开启UnitFlag，硬件执行完指令后复位单元标记位。<br>不支持取值1。开启UnitFlag时，矩阵乘加指令与配套Fixpipe指令的UnitFlag均需设置为2或3。 |
+| unit_flag | 输入 | 用于控制矩阵乘加指令和Fixpipe指令细粒度并行。取值说明如下：<br>&nbsp;&nbsp;&bull; 0：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; 2：开启UnitFlag，硬件执行完指令后不复位单元标记位。<br>&nbsp;&nbsp;&bull; 3：开启UnitFlag，硬件执行完指令后复位单元标记位。<br>开启UnitFlag时，矩阵乘加指令与配套Fixpipe指令的UnitFlag均需设置为2或3。 |
 | disable_gemv | 输入 | M为1时，配置是否关闭[GEMV](../../basic_api/cube_compute_ISASI/mmad_compute_key_features/GEMV.md)模式。<br>&nbsp;&nbsp;&bull; false：开启GEMV模式。<br>&nbsp;&nbsp;&bull; true：关闭GEMV模式。<br>M不为1时，该参数不生效。 |
-| c_matrix_source | 输入 | 当`c_matrix_init_val`为false时，配置矩阵C的初值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初值来源于BT Buffer，Bias矩阵沿M方向广播。 |
+| c_matrix_source | 输入 | 当`c_matrix_init_val`为false时，配置矩阵C的初值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初值来源于BiasTable Buffer。 |
 | c_matrix_init_val | 输入 | 配置是否将矩阵C的初值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初值设置为0，`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初值由`c_matrix_source`配置。 |
 <!-- end id14 -->
 
 <!-- npu="A3,910b" id15 -->
-**表5** 参数说明
+**表5** 参数说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_param_table"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -211,28 +200,27 @@ PIPE_M
 ## 约束说明
 
 <!-- npu="950" id16 -->
+针对Ascend 950PR/Ascend 950DT，约束说明如下：
+
 - 本接口的矩阵乘加计算仅在AIC上生效，在AIV上调用时不执行矩阵乘加计算。
-- 结果矩阵C只支持位于L0C Buffer，左矩阵A只支持位于L0A Buffer，右矩阵B只支持位于L0B Buffer；使用Bias矩阵时，Bias只支持位于BT Buffer。
-- L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB，BT Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+- L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB，BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
 - 各矩阵的起始地址需满足[表4](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 - `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP（空操作）。
 - 当M为1且`disable_gemv`为false时，默认开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
-- 矩阵存储空间需按照分形大小补齐：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数。K0的取值请参见功能说明中的分形说明。`left_height`、`n_dim`和`right_width`仍传入矩阵的有效M、K、N值；补齐部分为无效数据，不参与结果矩阵有效区域的计算。
-- 使用常规计算接口沿K轴分块并将结果累加到同一块L0C Buffer时，当`(left_height / 16) * (right_width / 16) < 10`，需在相邻两次矩阵乘加之间调用[asc_sync_pipe](../sync/asc_sync_pipe.md)，并将`pipe`设置为`PIPE_M`；也可以使用同步计算接口完成同步。
-- 开启UnitFlag时，矩阵乘加指令与配套Fixpipe指令需同时开启UnitFlag。连续操作同一块L0C Buffer时，前n-1条指令的`unit_flag`设置为2，最后一条指令设置为3。
-- 开启UnitFlag时，矩阵计算方向需与Fixpipe读取顺序保持一致。Fixpipe开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](./asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](./asc_set_mmad_direction_m.md)。
-- 开启UnitFlag后，建议矩阵乘加的计算数据量与Fixpipe搬出的数据量保持一致。两者不一致可能导致执行异常。需要清除UnitFlag产生的残留状态时，可调用[asc_set_l0c2gm_config](./asc_set_l0c2gm_config.md)，并将`enable_unit_flag`设置为true，将L0C Buffer中所有内存块的单元标志位设置为0。调用时`relu_pre`需传入0；后续搬出不使用Vector量化时，`quant_pre`也传入0，否则传入对应的Vector量化参数地址索引。
-- 浮点类型的输入或输出包含INF/NaN时，可通过[asc_set_ctrl](../sys_var/asc_set_ctrl.md)配置CTRL[48]：设置为0时使用饱和模式，INF输出饱和为正负MAX、NaN输出饱和为0；设置为1时使用非饱和模式，INF/NaN保持原输出。Mmad指令应避免NaN输入。整数类型仅支持饱和模式。
-<!-- end id16 -->
+- 矩阵存储空间需按照分形大小补齐：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数。K0的取值为`32Byte / sizeof(dtype)`，dtype为矩阵的数据类型。`left_height`、`n_dim`和`right_width`仍传入矩阵的有效M、K、N值；补齐部分为无效数据，不参与结果矩阵有效区域的计算。
+- 使用常规计算接口沿K轴分块并将结果累加到同一块L0C Buffer时，当`(left_height / 16) * (right_width / 16) < 10`，需在相邻两次矩阵乘加之间调用[asc_sync_pipe](../sync/asc_sync_pipe.md)，并将`pipe`设置为`PIPE_M`。
+- 开启UnitFlag时，矩阵乘加指令与矩阵搬出指令需同时开启UnitFlag。当希望同一块L0C Buffer内存空间能持续只被多条矩阵乘加指令或多条矩阵搬出指令操作时，需将前n-1条指令的unitFlag值设置为2，维持被操作内存空间的持续占用状态，最后一条指令设置为3，解除被占用状态。
+- 开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致。矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](./asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](./asc_set_mmad_direction_m.md)。
+- 开启UnitFlag后，建议矩阵乘加的计算数据量与矩阵搬出的数据量保持一致。两者不一致可能导致执行异常。需要清除UnitFlag产生的残留状态时，可调用[asc_set_l0c2gm_config](./asc_set_l0c2gm_config.md)，并将`enable_unit_flag`设置为true，将L0C Buffer中所有内存块的单元标志位设置为0并关闭UnitFlag。
+- 浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../sys_var/asc_set_ctrl.md)配置CTRL[48]：
+  - 设置为0时使用饱和模式，inf输出饱和为±MAX、nan输出饱和为0；
+  - 设置为1时使用非饱和模式，inf/nan保持原输出。
 
-<!-- npu="A3,910b" id17 -->
-- 当left_height、right_width、n_dim中的任意一个值为0时，该指令不会被执行。
-- 操作数地址对齐约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-<!-- end id17 -->
+    注：应避免nan输入，否则可能会产生执行报错；整数类型仅支持饱和模式。
+<!-- end id16 -->
 
 ## 调用示例
 
-<!-- npu="950" id18 -->
 ```cpp
 __cc__ int32_t c_matrix[128 * 128];
 __ca__ int8_t a_matrix[128 * 64];
@@ -249,4 +237,3 @@ asc_mmad_sync(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width,
 ```
 
 完整使用样例请参考[asc_mmad样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad)。
-<!-- end id18 -->
