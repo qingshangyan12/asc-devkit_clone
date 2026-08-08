@@ -19,29 +19,29 @@ protected:
     void TearDown() { g_coreType = C_API_AIV_TYPE; }
 };
 
-#define TEST_ASC_SYNC_INTER_ARRIVE(coreType, pipeVal)                                                     \
-    void ffts_cross_core_sync_stub_##coreType##_##pipeVal(pipe_t pipe, uint64_t config)                   \
-    {                                                                                                     \
-        constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;                                                     \
-        constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;                                                     \
-        uint16_t mode = 0x00;                                                                             \
-        uint64_t flag_id = 5;                                                                             \
-        uint64_t expectedConfig =                                                                         \
-            (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE)); \
-        EXPECT_EQ(pipe, pipeVal);                                                                         \
-        EXPECT_EQ(config, expectedConfig);                                                                \
-    }                                                                                                     \
-                                                                                                          \
-    TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_##coreType##_##pipeVal)                \
-    {                                                                                                     \
-        g_coreType = coreType;                                                                            \
-        MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))                                          \
-            .times(1)                                                                                     \
-            .will(invoke(ffts_cross_core_sync_stub_##coreType##_##pipeVal));                              \
-        pipe_t pipe = pipeVal;                                                                            \
-        int64_t flag_id = 5;                                                                              \
-        asc_sync_inter_arrive(pipe, flag_id);                                                             \
-        GlobalMockObject::verify();                                                                       \
+#define TEST_ASC_SYNC_INTER_ARRIVE(coreType, pipeVal)                                                          \
+    void sync_inter_arrive_3510_ffts_cross_core_sync_stub_##coreType##_##pipeVal(pipe_t pipe, uint64_t config) \
+    {                                                                                                          \
+        constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;                                                          \
+        constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;                                                          \
+        uint16_t mode = 0x00;                                                                                  \
+        uint64_t flag_id = 5;                                                                                  \
+        uint64_t expectedConfig =                                                                              \
+            (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));      \
+        EXPECT_EQ(pipe, pipeVal);                                                                              \
+        EXPECT_EQ(config, expectedConfig);                                                                     \
+    }                                                                                                          \
+                                                                                                               \
+    TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_##coreType##_##pipeVal)                     \
+    {                                                                                                          \
+        g_coreType = coreType;                                                                                 \
+        MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))                                               \
+            .times(1)                                                                                          \
+            .will(invoke(sync_inter_arrive_3510_ffts_cross_core_sync_stub_##coreType##_##pipeVal));            \
+        pipe_t pipe = pipeVal;                                                                                 \
+        int64_t flag_id = 5;                                                                                   \
+        asc_sync_inter_arrive(pipe, flag_id);                                                                  \
+        GlobalMockObject::verify();                                                                            \
     }
 
 TEST_ASC_SYNC_INTER_ARRIVE(C_API_AIC_TYPE, PIPE_M);
