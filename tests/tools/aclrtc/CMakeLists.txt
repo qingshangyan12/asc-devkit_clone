@@ -10,6 +10,8 @@
 project(ascendc_tools_aclrtc_tests)
 cmake_minimum_required(VERSION 3.16.0)
 
+add_cann_third_party(json)
+
 set(ACLRTC_TEST_HEADERS_FILES
     ${ASCENDC_DIR}/tools/include
 )
@@ -18,24 +20,64 @@ file(GLOB ACLRTC_SRC_FILES
     ${ASCENDC_DIR}/tools/aclrtc/*.cpp
 )
 
+file(GLOB ACLRTC_SPECIALIZATION_SRC_FILES
+    ${ASCENDC_DIR}/tools/aclrtc/specialization/*.cpp
+)
+
 file(GLOB TEST_ACLRTC_SRC_FILES
     ${ASCENDC_DIR}/tests/main.cpp
     stub/*.cpp
     *.cpp
 )
 
+add_library(aclrtc_ut_resource_plugin SHARED
+    resource_plugin/resource_plugin.cpp
+)
+target_include_directories(aclrtc_ut_resource_plugin PRIVATE
+    ${ASCENDC_DIR}/tools/aclrtc/specialization
+)
+set_target_properties(aclrtc_ut_resource_plugin PROPERTIES
+    OUTPUT_NAME aclrtc_ut_compile_database
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/resource_plugin/valid
+)
+
+add_library(aclrtc_ut_no_entry_plugin SHARED
+    resource_plugin/resource_plugin.cpp
+)
+target_compile_definitions(aclrtc_ut_no_entry_plugin PRIVATE
+    ACLRTC_UT_NO_ENTRY
+)
+target_include_directories(aclrtc_ut_no_entry_plugin PRIVATE
+    ${ASCENDC_DIR}/tools/aclrtc/specialization
+)
+set_target_properties(aclrtc_ut_no_entry_plugin PROPERTIES
+    OUTPUT_NAME aclrtc_ut_no_entry_compile_database
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/resource_plugin/no_entry
+)
+
 add_executable(ascendc_ut_aclrtc
     ${ACLRTC_SRC_FILES}
+    ${ACLRTC_SPECIALIZATION_SRC_FILES}
     ${TEST_ACLRTC_SRC_FILES}
+)
+
+add_dependencies(ascendc_ut_aclrtc
+    aclrtc_ut_resource_plugin
+    aclrtc_ut_no_entry_plugin
 )
 
 target_compile_definitions(ascendc_ut_aclrtc PRIVATE
     UT_TEST
     ASCENDC_CPU_DEBUG=1
+    ACLRTC_UT_PLUGIN_PATH="$<TARGET_FILE:aclrtc_ut_resource_plugin>"
+    ACLRTC_UT_PLUGIN_DIR="$<TARGET_FILE_DIR:aclrtc_ut_resource_plugin>"
+    ACLRTC_UT_NO_ENTRY_PLUGIN_PATH="$<TARGET_FILE:aclrtc_ut_no_entry_plugin>"
 )
 
 target_include_directories(ascendc_ut_aclrtc PRIVATE
     ${ACLRTC_TEST_HEADERS_FILES}
+    ${ASCENDC_DIR}/tools/aclrtc/specialization
+    ${ASCENDC_DIR}/tools/build/common
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/acl
 )
@@ -55,6 +97,9 @@ target_link_libraries(ascendc_ut_aclrtc PRIVATE
     dl
     -Wl,--as-needed
     GTest::gtest
+    json
+    mmpa_headers
+    unified_dlog_headers
 )
 
 run_llt_test(

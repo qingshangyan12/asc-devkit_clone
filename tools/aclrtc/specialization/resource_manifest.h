@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef JIT_DEMO_RESOURCE_MANIFEST_H
-#define JIT_DEMO_RESOURCE_MANIFEST_H
+#ifndef ASCENDC_ACLRTC_SPECIALIZATION_RESOURCE_MANIFEST_H
+#define ASCENDC_ACLRTC_SPECIALIZATION_RESOURCE_MANIFEST_H
 
 #include <string>
 
@@ -24,4 +24,4 @@ bool ParseResourceManifest(const std::string& json, const std::string& origin, R
 } // namespace resource
 } // namespace ascendc
 
-#endif // JIT_DEMO_RESOURCE_MANIFEST_H
+#endif // ASCENDC_ACLRTC_SPECIALIZATION_RESOURCE_MANIFEST_H

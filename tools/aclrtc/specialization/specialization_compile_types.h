@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef JIT_DEMO_COMMON_COMPILE_SPECIALIZATION_COMPILE_TYPES_H
-#define JIT_DEMO_COMMON_COMPILE_SPECIALIZATION_COMPILE_TYPES_H
+#ifndef ASCENDC_ACLRTC_SPECIALIZATION_COMPILE_TYPES_H
+#define ASCENDC_ACLRTC_SPECIALIZATION_COMPILE_TYPES_H
 
 #include <cstdint>
 #include <memory>
@@ -88,4 +88,4 @@ struct CompiledOutput {
 } // namespace resource
 } // namespace ascendc
 
-#endif // JIT_DEMO_COMMON_COMPILE_SPECIALIZATION_COMPILE_TYPES_H
+#endif // ASCENDC_ACLRTC_SPECIALIZATION_COMPILE_TYPES_H

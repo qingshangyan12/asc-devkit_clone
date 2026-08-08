@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef JIT_DEMO_COMMON_COMPILE_RESOURCE_REGISTRY_H
-#define JIT_DEMO_COMMON_COMPILE_RESOURCE_REGISTRY_H
+#ifndef ASCENDC_ACLRTC_SPECIALIZATION_RESOURCE_REGISTRY_H
+#define ASCENDC_ACLRTC_SPECIALIZATION_RESOURCE_REGISTRY_H
 
 #include <cstdint>
 #include <mutex>
@@ -54,4 +54,4 @@ private:
 } // namespace resource
 } // namespace ascendc
 
-#endif // JIT_DEMO_COMMON_COMPILE_RESOURCE_REGISTRY_H
+#endif // ASCENDC_ACLRTC_SPECIALIZATION_RESOURCE_REGISTRY_H
