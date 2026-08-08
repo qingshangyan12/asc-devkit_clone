@@ -25,8 +25,16 @@ namespace {
 void PrintUsage(const char* program)
 {
     std::cerr << "Usage:\n  " << program
-              << " --build_collected_manifest_bundle <package_id> <manifest_search_root> <out.so>"
-                 " [work_dir] [--keep-temp] [--jobs <N>]\n";
+              << " <manifest_search_root> <out.so> --make <path> --cxx <path>"
+                 " [--keep-temp] [--jobs <N>]\n\n"
+                 "Arguments:\n"
+                 "  <manifest_search_root>  Directory recursively searched for *_manifest.json files.\n"
+                 "  <out.so>                Output shared-library path, including its parent directory.\n"
+                 "  --make <path>           Path to the make executable used to build generated sources.\n"
+                 "  --cxx <path>            Path to the C++ compiler used by the generated Makefile.\n"
+                 "  --keep-temp             Preserve the private build directory under TMPDIR or /tmp.\n"
+                 "  --jobs <N>              Positive make job count, capped at the detected CPU count;\n"
+                 "                            defaults to half the CPU count, with a minimum of one.\n";
 }
 
 bool ParseJobs(const std::string& text, uint32_t& jobs)
@@ -51,47 +59,45 @@ bool ParseJobs(const std::string& text, uint32_t& jobs)
 
 int Run(int argc, char** argv)
 {
-    if (argc < 2) {
+    if (argc < 3 || argc > 10) {
         PrintUsage(argv[0]);
         return 1;
     }
-    const std::string command = argv[1];
-    if (command == "--build_collected_manifest_bundle") {
-        if (argc < 5 || argc > 9) {
+    std::string makeExecutable;
+    std::string cxxCompiler;
+    bool keepTemp = false;
+    uint32_t jobs = 0U;
+    bool jobsSpecified = false;
+    for (int index = 3; index < argc; ++index) {
+        const std::string argument = argv[index];
+        if (argument == "--keep-temp" && !keepTemp) {
+            keepTemp = true;
+        } else if (argument == "--make" && makeExecutable.empty() && index + 1 < argc) {
+            makeExecutable = argv[++index];
+        } else if (argument == "--cxx" && cxxCompiler.empty() && index + 1 < argc) {
+            cxxCompiler = argv[++index];
+        } else if (argument == "--jobs" && !jobsSpecified && index + 1 < argc && ParseJobs(argv[index + 1], jobs)) {
+            jobsSpecified = true;
+            ++index;
+        } else {
             PrintUsage(argv[0]);
             return 1;
         }
-        std::string workDir;
-        bool keepTemp = false;
-        uint32_t jobs = 0U;
-        bool jobsSpecified = false;
-        for (int index = 5; index < argc; ++index) {
-            const std::string argument = argv[index];
-            if (argument == "--keep-temp" && !keepTemp) {
-                keepTemp = true;
-            } else if (argument == "--jobs" && !jobsSpecified && index + 1 < argc && ParseJobs(argv[index + 1], jobs)) {
-                jobsSpecified = true;
-                ++index;
-            } else if (workDir.empty() && argument.rfind("--", 0U) != 0U) {
-                workDir = argument;
-            } else {
-                PrintUsage(argv[0]);
-                return 1;
-            }
-        }
-        ascendc::manifest_generator::BuildCollectedBundleRequest request;
-        request.packageId = argv[2];
-        request.manifestSearchRoot = argv[3];
-        request.outputSo = argv[4];
-        request.workDir = std::move(workDir);
-        request.keepTemp = keepTemp;
-        request.jobs = jobs;
-        ascendc::manifest_generator::ManifestBundleCompiler compiler(std::move(request));
-        compiler.Compile();
-        return 0;
     }
-    PrintUsage(argv[0]);
-    return 1;
+    if (makeExecutable.empty() || cxxCompiler.empty()) {
+        PrintUsage(argv[0]);
+        return 1;
+    }
+    ascendc::manifest_generator::BuildCollectedBundleRequest request;
+    request.manifestSearchRoot = argv[1];
+    request.outputSo = argv[2];
+    request.makeExecutable = std::move(makeExecutable);
+    request.cxxCompiler = std::move(cxxCompiler);
+    request.keepTemp = keepTemp;
+    request.jobs = jobs;
+    ascendc::manifest_generator::ManifestBundleCompiler compiler(std::move(request));
+    compiler.Compile();
+    return 0;
 }
 
 } // namespace

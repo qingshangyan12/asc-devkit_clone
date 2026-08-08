@@ -55,15 +55,16 @@ TEST(CompileExporterCliUnitTest, RunRejectsIncompleteAndUnknownCommands)
 {
     CerrCapture capture;
     char program[] = "asc_compile_exporter";
-    char command[] = "--build_collected_manifest_bundle";
+    char manifestRoot[] = "collection";
+    char output[] = "output/bundle.so";
     char unknown[] = "--unknown";
     char* noCommand[] = {program};
-    char* incomplete[] = {program, command};
-    char* unknownCommand[] = {program, unknown};
+    char* incomplete[] = {program, manifestRoot};
+    char* unknownCommand[] = {program, manifestRoot, output, unknown};
 
     EXPECT_EQ(::Run(1, noCommand), 1);
     EXPECT_EQ(::Run(2, incomplete), 1);
-    EXPECT_EQ(::Run(2, unknownCommand), 1);
+    EXPECT_EQ(::Run(4, unknownCommand), 1);
     EXPECT_NE(capture.Content().find("Usage:"), std::string::npos);
 }
 
@@ -71,50 +72,52 @@ TEST(CompileExporterCliUnitTest, RunRejectsDuplicateAndInvalidOptionsBeforeCompi
 {
     CerrCapture capture;
     char program[] = "asc_compile_exporter";
-    char command[] = "--build_collected_manifest_bundle";
-    char package[] = "package";
     char manifestRoot[] = "collection";
     char output[] = "output/bundle.so";
     char keepTemp[] = "--keep-temp";
     char jobsOption[] = "--jobs";
     char zeroJobs[] = "0";
-    char* duplicateKeepTemp[] = {program, command, package, manifestRoot, output, keepTemp, keepTemp};
-    char* invalidJobs[] = {program, command, package, manifestRoot, output, jobsOption, zeroJobs};
+    char* duplicateKeepTemp[] = {program, manifestRoot, output, keepTemp, keepTemp};
+    char* invalidJobs[] = {program, manifestRoot, output, jobsOption, zeroJobs};
 
-    EXPECT_EQ(::Run(7, duplicateKeepTemp), 1);
-    EXPECT_EQ(::Run(7, invalidJobs), 1);
+    EXPECT_EQ(::Run(5, duplicateKeepTemp), 1);
+    EXPECT_EQ(::Run(5, invalidJobs), 1);
     EXPECT_NE(capture.Content().find("Usage:"), std::string::npos);
 }
 
 TEST(CompileExporterCliUnitTest, RunBuildsRequestWithOptionalArgumentsBeforeCompilation)
 {
     char program[] = "asc_compile_exporter";
-    char command[] = "--build_collected_manifest_bundle";
-    char package[] = "package";
     char manifestRoot[] = "/path/that/does/not/exist";
     char output[] = "output/bundle.so";
-    char workDir[] = "work";
     char keepTemp[] = "--keep-temp";
     char jobsOption[] = "--jobs";
     char jobs[] = "3";
-    char* arguments[] = {program, command, package, manifestRoot, output, workDir, keepTemp, jobsOption, jobs};
+    char makeOption[] = "--make";
+    char makeExecutable[] = "/usr/bin/make";
+    char cxxOption[] = "--cxx";
+    char cxxCompiler[] = "/usr/bin/c++";
+    char* arguments[] = {program, manifestRoot, output,         keepTemp,  jobsOption,
+                         jobs,    makeOption,   makeExecutable, cxxOption, cxxCompiler};
 
-    EXPECT_THROW(::Run(9, arguments), std::runtime_error);
+    EXPECT_THROW(::Run(10, arguments), std::runtime_error);
 }
 
 TEST(CompileExporterCliUnitTest, ProgramMainReturnsRunStatusAndCatchesExceptions)
 {
     CerrCapture capture;
     char program[] = "asc_compile_exporter";
-    char command[] = "--build_collected_manifest_bundle";
-    char package[] = "package";
     char manifestRoot[] = "/path/that/does/not/exist";
     char output[] = "output/bundle.so";
+    char makeOption[] = "--make";
+    char makeExecutable[] = "/usr/bin/make";
+    char cxxOption[] = "--cxx";
+    char cxxCompiler[] = "/usr/bin/c++";
     char* usageArguments[] = {program};
-    char* failingArguments[] = {program, command, package, manifestRoot, output};
+    char* failingArguments[] = {program, manifestRoot, output, makeOption, makeExecutable, cxxOption, cxxCompiler};
 
     EXPECT_EQ(AscCompileExporterProgramMain(1, usageArguments), 1);
-    EXPECT_EQ(AscCompileExporterProgramMain(5, failingArguments), 1);
+    EXPECT_EQ(AscCompileExporterProgramMain(7, failingArguments), 1);
     EXPECT_NE(capture.Content().find("Usage:"), std::string::npos);
 }
 

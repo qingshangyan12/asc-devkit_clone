@@ -27,9 +27,11 @@
 
 #include "ascendc_manifest_abi.h"
 #include "manifest_bundle_compiler.h"
+#include "test_support.h"
 
 namespace {
 
+using asc_compile_exporter_test::ScopedEnvironment;
 using ascendc::manifest_generator::BuildCollectedBundleRequest;
 using ascendc::manifest_generator::ManifestBundleCompiler;
 
@@ -151,13 +153,13 @@ protected:
 
     void TearDown() override { RemoveTestTree(root_); }
 
-    BuildCollectedBundleRequest Request(const std::string& packageId = "test_package") const
+    BuildCollectedBundleRequest Request() const
     {
         BuildCollectedBundleRequest request;
-        request.packageId = packageId;
         request.manifestSearchRoot = JoinTestPath(root_, "collection");
         request.outputSo = JoinTestPath(root_, "output/bundle.so");
-        request.workDir = JoinTestPath(root_, "work");
+        request.makeExecutable = "/usr/bin/make";
+        request.cxxCompiler = "/usr/bin/c++";
         request.keepTemp = false;
         request.jobs = 1U;
         return request;
@@ -184,10 +186,16 @@ protected:
     std::string root_;
 };
 
-TEST_F(AscCompileExporterTest, RejectsEmptyPackageId)
+TEST_F(AscCompileExporterTest, RejectsMissingBuildExecutables)
 {
     CreateTestDirectories(JoinTestPath(root_, "collection"));
-    ExpectCompileError(Request(""), "package ID must not be empty");
+    BuildCollectedBundleRequest request = Request();
+    request.makeExecutable.clear();
+    ExpectCompileError(request, "make executable must not be empty");
+
+    request = Request();
+    request.cxxCompiler.clear();
+    ExpectCompileError(request, "C++ compiler must not be empty");
 }
 
 TEST_F(AscCompileExporterTest, RejectsInvalidManifestSearchRoot)
@@ -243,7 +251,7 @@ TEST_F(AscCompileExporterTest, RejectsBaseDirectoryOutsideManifestDirectory)
     WriteFile(JoinTestPath(root_, "collection/outside/kernel.cpp"), "source");
     CreateManifest(unit, "Traversal", "../outside");
 
-    ExpectCompileError(Request(), "is not a directory below the manifest");
+    ExpectCompileError(Request(), "must be a directory below the manifest root");
 }
 
 TEST_F(AscCompileExporterTest, RejectsSymlinkInResourceDirectory)
@@ -268,12 +276,13 @@ TEST_F(AscCompileExporterTest, RejectsOversizedResourceWithoutReplacingOutput)
     const BuildCollectedBundleRequest request = Request();
     WriteFile(request.outputSo, "previous bundle");
 
-    ExpectCompileError(request, "not a permitted regular file");
+    ExpectCompileError(request, "failed to read permitted manifest resource");
     EXPECT_EQ(ReadFile(request.outputSo), "previous bundle");
 }
 
 TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
 {
+    ScopedEnvironment temporary("TMPDIR", root_.c_str());
     const std::string first = JoinTestPath(root_, "collection/nested/First");
     const std::string second = JoinTestPath(root_, "collection/Second");
     WriteFile(JoinTestPath(first, "resources/kernel.cpp"), "first source");
@@ -283,12 +292,11 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
     CreateManifest(first, "First");
     CreateManifest(second, "Second");
 
-    const BuildCollectedBundleRequest request = Request("multi_manifest");
+    const BuildCollectedBundleRequest request = Request();
     ManifestBundleCompiler(request).Compile();
 
     ASSERT_TRUE(IsTestRegularFile(request.outputSo));
-    ASSERT_TRUE(IsTestDirectory(request.workDir));
-    const std::vector<std::string> workEntries = ListTestDirectory(request.workDir);
+    const std::vector<std::string> workEntries = ListTestDirectory(root_);
     for (size_t index = 0U; index < workEntries.size(); ++index) {
         EXPECT_NE(workEntries[index].find(".manifest-generator-"), 0U);
     }
@@ -306,7 +314,6 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
     EXPECT_EQ(header->flags, 0U);
 
     const auto* bundle = reinterpret_cast<const AcCompileResourceBundle*>(header);
-    EXPECT_EQ(ToString(bundle->packageId), "multi_manifest");
     ASSERT_EQ(bundle->manifestCount, 2U);
     EXPECT_EQ(bundle->extensions, nullptr);
     EXPECT_EQ(bundle->extensionCount, 0U);
@@ -337,17 +344,21 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
 
 TEST_F(AscCompileExporterTest, KeepsTemporaryWorkspaceWhenRequested)
 {
+    ScopedEnvironment temporary("TMPDIR", root_.c_str());
     const std::string unit = JoinTestPath(root_, "collection/Keep");
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
     CreateManifest(unit, "Keep");
 
-    BuildCollectedBundleRequest request = Request("keep_workspace");
+    BuildCollectedBundleRequest request = Request();
     request.keepTemp = true;
     ManifestBundleCompiler(request).Compile();
 
-    const std::vector<std::string> workEntries = ListTestDirectory(request.workDir);
-    ASSERT_EQ(workEntries.size(), 1U);
-    EXPECT_EQ(workEntries[0].find(".manifest-generator-"), 0U);
+    const std::vector<std::string> workEntries = ListTestDirectory(root_);
+    size_t workspaceCount = 0U;
+    for (size_t index = 0U; index < workEntries.size(); ++index) {
+        workspaceCount += workEntries[index].find(".manifest-generator-") == 0U ? 1U : 0U;
+    }
+    EXPECT_EQ(workspaceCount, 1U);
     EXPECT_TRUE(IsTestRegularFile(request.outputSo));
 }
 

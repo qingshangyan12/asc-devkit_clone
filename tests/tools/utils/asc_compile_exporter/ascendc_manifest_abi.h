@@ -18,6 +18,7 @@ extern "C" {
 
 #define AC_COMPILE_RESOURCE_MAGIC 0x41435253u
 #define AC_COMPILE_RESOURCE_ABI_VERSION 1u
+#define AC_COMPILE_RESOURCE_EXTENSION_REQUIRED 0x1ULL
 
 typedef struct AcString {
     const char* data;
@@ -54,7 +55,6 @@ typedef struct AcCompileResourceBundleHeader {
 
 typedef struct AcCompileResourceBundle {
     AcCompileResourceBundleHeader header;
-    AcString packageId;
     const AcCompileResourceManifest* manifests;
     uint64_t manifestCount;
     const AcCompileResourceExtension* extensions;
@@ -62,6 +62,8 @@ typedef struct AcCompileResourceBundle {
 } AcCompileResourceBundle;
 
 typedef const AcCompileResourceBundleHeader* (*AscendcGetCompileResourceBundleFn)(void);
+
+const AcCompileResourceBundleHeader* AscendcGetCompileResourceBundle(void);
 
 #ifdef __cplusplus
 }

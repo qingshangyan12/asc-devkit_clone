@@ -18,10 +18,10 @@ namespace ascendc {
 namespace manifest_generator {
 
 struct BuildCollectedBundleRequest {
-    std::string packageId;
     std::string manifestSearchRoot;
     std::string outputSo;
-    std::string workDir;
+    std::string makeExecutable;
+    std::string cxxCompiler;
     bool keepTemp = false;
     uint32_t jobs = 0U;
 };
