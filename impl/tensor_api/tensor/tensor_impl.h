@@ -29,7 +29,6 @@
 #include "impl/tensor_api/experimental/reg/load_mode.h"
 #include "impl/tensor_api/experimental/reg/mask_impl.h"
 
-
 namespace AscendC {
 
 template <typename T>
