@@ -46,6 +46,8 @@ __aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, int64_t flag_id)
             wait_flag_dev(pipe_t::PIPE_MTE2, flag_id);
         } else if (pipe == pipe_t::PIPE_MTE3) {
             wait_flag_dev(pipe_t::PIPE_MTE3, flag_id);
+        }  else if (pipe == pipe_t::PIPE_V) {
+            wait_flag_dev(pipe_t::PIPE_V, flag_id);
         }
     }
 }

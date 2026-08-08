@@ -47,6 +47,8 @@ __aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint64_t sync_id)
             set_intra_block(pipe_t::PIPE_MTE2, sync_id);
         } else if (pipe == pipe_t::PIPE_MTE3) {
             set_intra_block(pipe_t::PIPE_MTE3, sync_id);
+        } else if (pipe == pipe_t::PIPE_V) {
+            set_intra_block(pipe_t::PIPE_V, sync_id);
         }
     }
 }

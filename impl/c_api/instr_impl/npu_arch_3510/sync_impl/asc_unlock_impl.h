@@ -47,6 +47,8 @@ __aicore__ inline void asc_unlock_impl(pipe_t pipe, uint8_t mutex_id, const ascM
                 rls_buf(pipe_t::PIPE_MTE2, static_cast<uint64_t>(mutex_id), false);
             } else if (pipe == pipe_t::PIPE_MTE3) {
                 rls_buf(pipe_t::PIPE_MTE3, static_cast<uint64_t>(mutex_id), false);
+            } else if (pipe == pipe_t::PIPE_V) {
+                rls_buf(pipe_t::PIPE_V, static_cast<uint64_t>(mutex_id), false);
             }
         }
     } else {
@@ -69,6 +71,8 @@ __aicore__ inline void asc_unlock_impl(pipe_t pipe, uint8_t mutex_id, const ascM
                 rls_buf(pipe_t::PIPE_MTE2, static_cast<uint64_t>(mutex_id), true);
             } else if (pipe == pipe_t::PIPE_MTE3) {
                 rls_buf(pipe_t::PIPE_MTE3, static_cast<uint64_t>(mutex_id), true);
+            } else if (pipe == pipe_t::PIPE_V) {
+                rls_buf(pipe_t::PIPE_V, static_cast<uint64_t>(mutex_id), true);
             }
         }
     }

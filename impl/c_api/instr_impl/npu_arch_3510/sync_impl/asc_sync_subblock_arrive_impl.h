@@ -47,6 +47,8 @@ __aicore__ inline void asc_sync_subblock_arrive_impl(pipe_t pipe, int64_t flag_i
             ffts_cross_core_sync(pipe_t::PIPE_MTE2, config); 
         } else if (pipe == pipe_t::PIPE_MTE3) {
             ffts_cross_core_sync(pipe_t::PIPE_MTE3, config);
+        } else if (pipe == pipe_t::PIPE_V) {
+            ffts_cross_core_sync(pipe_t::PIPE_V, config);
         }
     }
 }
