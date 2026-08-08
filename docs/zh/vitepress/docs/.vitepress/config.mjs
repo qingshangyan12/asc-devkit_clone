@@ -22,6 +22,7 @@ import {
   extractUnsupportedProducts,
   normalizeApiRoute,
 } from '../../scripts/api-support.mjs'
+import { loadGitTimestamps } from '../../scripts/git-timestamps.mjs'
 
 const docsRoot = resolve(import.meta.dirname, '..')
 const repoRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
@@ -200,21 +201,6 @@ function resolveBuildDate() {
   return new Date()
 }
 
-function loadGitTimestamps() {
-  const timestamps = new Map()
-  const history = runGit(['log', '--format=@@%ct', '--name-only', '--', 'docs'])
-  let timestamp = 0
-
-  for (const line of history.split('\n')) {
-    if (line.startsWith('@@')) {
-      timestamp = Number(line.slice(2)) * 1000
-    } else if (line && timestamp > 0 && !timestamps.has(line)) {
-      timestamps.set(line, timestamp)
-    }
-  }
-  return timestamps
-}
-
 const buildDate = resolveBuildDate()
 const buildCommit = process.env.DOCS_COMMIT || process.env.CI_COMMIT_SHA ||
   process.env.GIT_COMMIT || runGit(['rev-parse', 'HEAD'])
@@ -240,7 +226,7 @@ const documentationBuild = {
     hour12: false,
   }).format(buildDate),
 }
-const gitTimestamps = loadGitTimestamps()
+const gitTimestamps = loadGitTimestamps(runGit)
 
 const sidebarConfigs = [
   { prefix: '/guide/', sourceFileName: 'index.md' },
@@ -313,29 +299,6 @@ function resolveSourceTimestamp(relativePath) {
 }
 
 const breadcrumbMap = buildBreadcrumbMap()
-
-// Keep only enough sidebar data in each generated HTML file to preserve the
-// layout. The full tree is loaded once by the client from a separate chunk.
-const sidebarShells = Object.fromEntries(
-  Object.keys(filteredSidebars).map(prefix => [prefix, [{ text: '', items: [] }]])
-)
-
-function sidebarDataPlugin() {
-  const publicId = 'virtual:asc-sidebar-data'
-  const resolvedId = `\0${publicId}`
-
-  return {
-    name: 'asc-sidebar-data',
-    resolveId(id) {
-      if (id === publicId) return resolvedId
-    },
-    load(id) {
-      if (id === resolvedId) {
-        return `export default ${JSON.stringify(filteredSidebars)}`
-      }
-    },
-  }
-}
 
 function extractBodyContent(html) {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
@@ -851,6 +814,7 @@ function balanceDivTags(html) {
   },
 
   buildConcurrency: 1,
+  metaChunk: true,
 
   transformHtml(code) {
     code = code.replace(/href="\/\/pagefind/g, 'href="/pagefind')
@@ -874,7 +838,7 @@ function balanceDivTags(html) {
     resolve: {
       preserveSymlinks: true,
     },
-    plugins: [sidebarDataPlugin(), htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
+    plugins: [htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
       btnPlaceholder: '搜索',
       placeholder: '简易搜索，暂不支持多语言和特殊符号',
       emptyText: '未找到结果',
@@ -979,8 +943,7 @@ function balanceDivTags(html) {
       provider: 'algolia',
     },
 
-    sidebar: sidebarShells,
-    apiSidebarSource: filteredSidebars['/api/'],
+    sidebar: filteredSidebars,
     apiUnsupportedIndex,
 
     outline: false,

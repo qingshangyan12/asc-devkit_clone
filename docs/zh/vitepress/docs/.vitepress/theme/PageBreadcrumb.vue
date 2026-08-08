@@ -39,7 +39,7 @@ const breadcrumbs = computed(() => frontmatter.value.breadcrumbs || [])
           </span>
         </li>
       </template>
-      <li v-if="breadcrumbs.length > 4" class="breadcrumb-ellipsis" aria-hidden="true">
+      <li v-if="breadcrumbs.length > 3" class="breadcrumb-ellipsis" aria-hidden="true">
         <span class="vpi-chevron-right separator" />
         <span>...</span>
       </li>
