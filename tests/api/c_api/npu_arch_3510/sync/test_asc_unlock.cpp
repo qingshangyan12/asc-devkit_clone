@@ -20,24 +20,24 @@ protected:
 };
 
 namespace {
-void rls_buf_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
+void rls_buf_stub(pipe_t pipe, uint64_t mutex_id, bool mode)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_MTE3);
-    EXPECT_EQ(mutex_id, static_cast<uint8_t>(11));
+    EXPECT_EQ(mutex_id, static_cast<uint64_t>(11));
     EXPECT_EQ(mode, false);
 }
 
-void rls_buf_non_block_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
+void rls_buf_non_block_stub(pipe_t pipe, uint64_t mutex_id, bool mode)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_MTE3);
-    EXPECT_EQ(mutex_id, static_cast<uint8_t>(11));
+    EXPECT_EQ(mutex_id, static_cast<uint64_t>(11));
     EXPECT_EQ(mode, true);
 }
 } // namespace
 
 TEST_F(TEST_ASC_UNLOCK, asc_unlock_DefaultBlockSucc)
 {
-    MOCKER_CPP(rls_buf, void(pipe_t, uint8_t, bool)).times(1).will(invoke(rls_buf_stub));
+    MOCKER_CPP(rls_buf, void(pipe_t, uint64_t, bool)).times(1).will(invoke(rls_buf_stub));
 
     asc_unlock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(11));
     GlobalMockObject::verify();
@@ -45,7 +45,7 @@ TEST_F(TEST_ASC_UNLOCK, asc_unlock_DefaultBlockSucc)
 
 TEST_F(TEST_ASC_UNLOCK, asc_unlock_BlockSucc)
 {
-    MOCKER_CPP(rls_buf, void(pipe_t, uint8_t, bool)).times(1).will(invoke(rls_buf_stub));
+    MOCKER_CPP(rls_buf, void(pipe_t, uint64_t, bool)).times(1).will(invoke(rls_buf_stub));
 
     asc_unlock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(11), ASC_LOCK_BLOCK);
     GlobalMockObject::verify();
@@ -53,7 +53,7 @@ TEST_F(TEST_ASC_UNLOCK, asc_unlock_BlockSucc)
 
 TEST_F(TEST_ASC_UNLOCK, asc_unlock_NonBlockSucc)
 {
-    MOCKER_CPP(rls_buf, void(pipe_t, uint8_t, bool)).times(1).will(invoke(rls_buf_non_block_stub));
+    MOCKER_CPP(rls_buf, void(pipe_t, uint64_t, bool)).times(1).will(invoke(rls_buf_non_block_stub));
 
     asc_unlock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(11), ASC_LOCK_NON_BLOCK);
     GlobalMockObject::verify();
