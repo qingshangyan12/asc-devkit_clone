@@ -101,7 +101,7 @@ HcclResult InsTempAllReduceNHR::PrepareDataSplitForMultiChannel(const TemplateRe
 HcclResult InsTempAllReduceNHR::KernelRun(
     const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
-    HCCL_INFO("[InsTempAllReduceNHR] KernelRun Start.");
+    HCCL_INFO("[InsTempAllReduceNHR] KernelRun Start123123.");
 
     CHK_PRT_RET(
         subCommRanks_.empty(), HCCL_ERROR("[InsTempAllReduceNHR][KernelRun] subCommRanks is empty."),
