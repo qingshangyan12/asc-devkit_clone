@@ -31,7 +31,6 @@ struct reg_tensor<bool>;
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-template <>
 struct reg_tensor<bool> {
     using type = bool;
     using reg_type = typename type_get<bool>::type;
@@ -54,7 +53,6 @@ struct reg_tensor {
     vector_bool mask;
 };
 #endif
-} // namespace te
 } // namespace asc
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_REG_TENSOR_IMPL_H

@@ -279,7 +279,6 @@ __simd_callee__ inline void base_tensor<EngineType, LayoutType>::store(
     const Coord& coord, const reg_tensor<RegDataType>& src)
 {
     static_assert(Std::is_same_v<get_mem_location<EngineType>, location::ub>,
-                  "base_tensor::store only supports tensors located in UB");
     static_assert(Std::is_same_v<data_type, RegDataType>,
                   "base_tensor::store requires the tensor and reg_tensor to have the same element type");
 
@@ -314,7 +313,6 @@ template <typename EngineType, typename LayoutType>
 struct local_tensor : public base_tensor<EngineType, LayoutType> {
     using tensor_api_base = base_tensor<EngineType, LayoutType>;
     using layoutType = typename tensor_api_base::layout_type;
-
     using tensor_api_base::tensor_api_base;
 
     __aicore__ inline local_tensor() = default;
