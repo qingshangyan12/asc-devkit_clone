@@ -402,12 +402,11 @@ TEST_F(ResourceRegistryTest, AutomaticLoadReadsCustomAndVendorSearchRoots)
     ASSERT_TRUE(CopyFile(kPluginPath, customPlugin));
 
     const std::string oppRoot = FileUtils::JoinPath(root_, "opp");
-    ASSERT_TRUE(
-        FileUtils::WriteBinaryFile(
-            FileUtils::JoinPath(oppRoot, "vendors/config.ini"),
-            std::vector<uint8_t>{'o', 't', 'h', 'e', 'r', '=', 'x', '\n', ' ', 'l', 'o', 'a', 'd', '_',
-                                 'p', 'r', 'i', 'o', 'r', 'i', 't', 'y',  ' ', '=', ' ', 'v', 'e', 'n',
-                                 'd', 'o', 'r', 'A', ',', ' ', 'v', 'e',  'n', 'd', 'o', 'r', 'A', '\n'}));
+    ASSERT_TRUE(FileUtils::WriteBinaryFile(
+        FileUtils::JoinPath(oppRoot, "vendors/config.ini"),
+        std::vector<uint8_t>{'o', 't', 'h', 'e', 'r', '=', 'x', '\n', ' ', 'l', 'o', 'a', 'd', '_',
+                                'p', 'r', 'i', 'o', 'r', 'i', 't', 'y',  ' ', '=', ' ', 'v', 'e', 'n',
+                                'd', 'o', 'r', 'A', ',', ' ', 'v', 'e',  'n', 'd', 'o', 'r', 'A', '\n'}));
     ASSERT_EQ(setenv("ASCEND_CUSTOM_OPP_PATH", ("  " + customRoot + ":" + customRoot).c_str(), 1), 0);
     ASSERT_EQ(setenv("ASCEND_OPP_PATH", oppRoot.c_str(), 1), 0);
 

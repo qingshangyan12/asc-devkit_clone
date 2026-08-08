@@ -183,9 +183,8 @@ std::vector<std::string> AutomaticSearchRoots()
         const std::string oppRoot(oppEnvironment);
         for (const std::string& vendor : ReadConfiguredVendors(oppRoot)) {
             if (FileUtils::FileName(vendor) == vendor && vendor != "." && vendor != "..") {
-                roots.push_back(
-                    FileUtils::JoinPath(
-                        FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "vendors"), vendor), relativeJitRoot));
+                roots.push_back(FileUtils::JoinPath(
+                    FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "vendors"), vendor), relativeJitRoot));
             }
         }
         roots.push_back(FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "built-in"), relativeJitRoot));
