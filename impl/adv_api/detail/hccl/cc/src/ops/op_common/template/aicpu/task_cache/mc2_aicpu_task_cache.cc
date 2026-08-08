@@ -142,6 +142,20 @@ uint64_t GetDataTypeSize(HcclDataType dataType)
     return type < static_cast<uint32_t>(HCCL_DATA_TYPE_RESERVED) ? DATATYPE_SIZE_TABLE[type] : 0U;
 }
 
+bool GetStridedSpan(
+    uint64_t count, uint64_t strideCount, uint32_t rankSize, uint64_t elementSize, uint64_t& span)
+{
+    if (rankSize == 0U) {
+        return false;
+    }
+
+    const uint64_t effectiveStrideCount = strideCount == 0U ? count : strideCount;
+    uint64_t lastRankOffset = 0U;
+    uint64_t totalCount = 0U;
+    return SafeMul(effectiveStrideCount, rankSize - 1U, lastRankOffset) &&
+           SafeAdd(lastRankOffset, count, totalCount) && SafeMul(totalCount, elementSize, span);
+}
+
 bool IsSupportedOp(HcclCMDType opType)
 {
     return opType == HCCL_CMD_ALLGATHER || opType == HCCL_CMD_REDUCE_SCATTER || opType == HCCL_CMD_ALLREDUCE ||
@@ -238,17 +252,13 @@ bool GetRegularSpans(
         return false;
     }
     if (param.opType == HCCL_CMD_ALLGATHER) {
-        const uint64_t strideCount = param.DataDes.strideCount == 0U ? param.DataDes.count : param.DataDes.strideCount;
-        uint64_t lastRankOffset = 0U;
-        uint64_t outputCount = 0U;
-        if (!SafeMul(strideCount, rankSize - 1U, lastRankOffset) ||
-            !SafeAdd(lastRankOffset, param.DataDes.count, outputCount) ||
-            !SafeMul(outputCount, outputTypeSize, outputSpan)) {
+        if (!GetStridedSpan(
+                param.DataDes.count, param.DataDes.strideCount, rankSize, outputTypeSize, outputSpan)) {
             return false;
         }
         inputSpan = countBytes;
     } else if (param.opType == HCCL_CMD_REDUCE_SCATTER) {
-        if (!SafeMul(param.DataDes.count, rankSize, inputSpan) || !SafeMul(inputSpan, dataTypeSize, inputSpan)) {
+        if (!GetStridedSpan(param.DataDes.count, param.DataDes.strideCount, rankSize, dataTypeSize, inputSpan)) {
             return false;
         }
         outputSpan = outputCountBytes;
