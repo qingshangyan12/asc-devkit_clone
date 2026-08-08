@@ -26,12 +26,10 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/reg_load.h"`。
+将Unified Buffer（UB）中从任意字节地址开始的32字节数据搬入非对齐寄存器[vector_load_unalign](../reg_data_types/data_type_definition.md#非对齐寄存器)，作为非对齐搬入的预处理阶段。本接口需要与[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)配合使用。本接口提供两种功能模式：
 
-将Unified Buffer（UB）中起始地址任意字节对齐的数据搬入`vector_load_unalign`临时寄存器，作为非对齐搬入的预处理阶段。本接口需要与[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)配合使用。本接口提供两种功能模式：
-
-- **无偏移预处理搬入**：从`src`起始地址搬入数据。
-- **带地址寄存器偏移预处理搬入**：通过`addr_reg`类型的地址寄存器偏移指定起始位置开始搬入数据。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
+- 无偏移预处理搬入：从`src`起始地址搬入数据。
+- 带地址寄存器偏移预处理搬入：通过`addr_reg`类型的地址寄存器指定起始地址偏移并搬入数据。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。接口不会修改`src`指针或按值传入的`offset`。
 
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
@@ -73,16 +71,16 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的`vector_load_unalign`临时寄存器，写入单个VL长度的对齐32字节块数据，作为后续非对齐加载拼接接口的输入源。 |
-| src | 输入 | 源UB地址。起始地址只需1字节对齐（本接口用于非对齐加载场景），但须落在UB地址范围内。 |
+| dst | 输出 | 目的非对齐寄存器。搬入32字节数据。 |
+| src | 输入 | 源UB地址。起始地址无需32字节对齐。 |
 
 **表2** 参数说明（带地址寄存器偏移预处理搬入）
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的`vector_load_unalign`临时寄存器，写入单个VL长度的对齐32字节块数据，作为后续非对齐加载拼接接口的输入源。 |
-| src | 输入 | 源UB地址。起始地址只需1字节对齐（本接口用于非对齐加载场景），但须落在UB地址范围内。 |
-| offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，由[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)预先构造。相对`src`起始地址的偏移，单位为元素个数（非字节），底层按dtype字节大小把AR中的元素偏移换算为字节偏移。偏移后实际访问地址须落在UB地址范围内。 |
+| dst | 输出 | 目的非对齐寄存器。搬入32字节数据。 |
+| src | 输入 | 源UB地址。起始地址无需32字节对齐。 |
+| offset | 输入 | 地址寄存器，类型为`addr_reg`，须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。 |
 
 ## 返回值说明
 
@@ -94,20 +92,12 @@ PIPE_V
 
 ## 约束说明
 
-### 通用约束
-
 - 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为UB地址，目的操作数为`vector_load_unalign`临时寄存器。
-- 本接口无对应底层指令。
-- 实际访问地址在内部向低对齐到32字节边界后从UB读取数据，传入的`src`（或`src + offset * sizeof(dtype)`）起始地址无需32字节对齐，对齐由接口内部完成。
-- 单次搬入的数据量为一个矢量长度（VL），按dtype字节大小换算为元素个数；VL由当前矢量计算配置决定。
-- UB容量上限：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。src偏移+单次搬入数据量不可超过实际可用容量，否则触发读越界异常。
-- 如果需要执行多条本接口指令，且源地址存在重叠，需要插入内存屏障同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)（如`asc_mem_bar(VV_ALL)`或`asc_mem_bar(VST_VLD)`，按实际生产-消费关系选择合适的`mem_type`），保证多个指令串行化，防止出现异常数据。
-
-### 带地址寄存器偏移预处理搬入约束
-
-- offset必须由[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)预先构造，传入其他类型的地址寄存器会触发异常。
-- offset取值需使`src + offset * sizeof(dtype)`落在UB地址范围内，否则会报错。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
+- 实际访问地址在接口内部向低地址方向对齐到32字节边界后读取数据。传入的`src`或`src`与`offset`确定的地址无需32字节对齐，对齐后的32字节读取范围须在UB地址空间内，否则会报错。
+- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
+- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 该接口必须与[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)配合使用。
 
 ## 调用示例
 

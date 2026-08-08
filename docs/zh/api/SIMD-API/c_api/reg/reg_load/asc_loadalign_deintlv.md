@@ -26,13 +26,11 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/reg_load.h"`。
-
-从Unified Buffer（UB）中起始地址32字节对齐的位置读取2×VL长度的数据，将偶数下标元素写入`dst0`，将奇数下标元素写入`dst1`，每个目的寄存器写入VL长度数据。本接口提供三种功能模式：
+从Unified Buffer（UB）中起始地址32字节对齐的位置读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`，每个矢量数据寄存器写入VL长度数据。本接口提供三种功能模式：
 
 - 无偏移搬入：从`src`起始地址搬入数据。
 - 带偏移搬入：从`src`起始地址加上`offset * sizeof(dtype)`字节偏移位置开始搬入数据。
-- 带地址寄存器偏移搬入：通过`addr_reg`类型的地址寄存器偏移指定起始位置，读取2×VL长度数据。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
+- 带地址寄存器偏移搬入：通过`addr_reg`类型的地址寄存器指定起始地址偏移，读取2×VL长度数据。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。接口不会修改`src`指针或按值传入的`offset`。
 
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
@@ -99,27 +97,27 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst0 | 输出 | 目的矢量数据寄存器，接口从UB连续读入2×VL字节长度数据，偶数下标元素写入`dst0`，搬入VL长度数据。 |
-| dst1 | 输出 | 目的矢量数据寄存器，接口从UB连续读入2×VL字节长度数据，奇数下标元素写入`dst1`，搬入VL长度数据。 |
-| src | 输入 | 源UB地址，起始地址需32字节对齐。从src起始位置读取2×VL长度数据。 |
+| dst0 | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入源数据中的偶数下标元素，数据长度为VL。 |
+| dst1 | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入源数据中的奇数下标元素，数据长度为VL。 |
+| src | 输入 | 源UB地址，实际读取地址需32字节对齐。从`src`起始位置读取2×VL长度数据。 |
 
 **表2** 参数说明（带偏移搬入）
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst0 | 输出 | 目的矢量数据寄存器，接口从UB连续读入2×VL字节长度数据，偶数下标元素写入`dst0`，搬入VL长度数据。 |
-| dst1 | 输出 | 目的矢量数据寄存器，接口从UB连续读入2×VL字节长度数据，奇数下标元素写入`dst1`，搬入VL长度数据。 |
-| src | 输入 | 源UB地址，起始地址需32字节对齐。从src起始位置读取2×VL长度数据。 |
-| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。offset为负值表示源地址向低地址方向移动。 |
+| dst0 | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入源数据中的偶数下标元素，数据长度为VL。 |
+| dst1 | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入源数据中的奇数下标元素，数据长度为VL。 |
+| src | 输入 | 源UB地址，实际读取地址需32字节对齐。从`src`起始位置读取2×VL长度数据。 |
+| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。`offset`为负值表示源地址向低地址方向移动。 |
 
 **表3** 参数说明（带地址寄存器偏移搬入）
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst0 | 输出 | 目的矢量数据寄存器，接口从UB连续读入2×VL字节长度数据，偶数下标元素写入`dst0`，搬入VL长度数据。 |
-| dst1 | 输出 | 目的矢量数据寄存器，接口从UB连续读入2×VL字节长度数据，奇数下标元素写入`dst1`，搬入VL长度数据。 |
-| src | 输入 | 源UB地址，起始地址需32字节对齐。从src起始位置读取2×VL长度数据。 |
-| offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，单位为元素个数。vector_bool使用b32模式，实际字节偏移为元素偏移乘4。 |
+| dst0 | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入源数据中的偶数下标元素，数据长度为VL。 |
+| dst1 | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入源数据中的奇数下标元素，数据长度为VL。 |
+| src | 输入 | 源UB地址，实际读取地址需32字节对齐。从`src`起始位置读取2×VL长度数据。 |
+| offset | 输入 | 地址寄存器，类型为`addr_reg`，须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。 |
 
 ## 返回值说明
 
@@ -131,14 +129,12 @@ PIPE_V
 
 ## 约束说明
 
-### 通用约束
-
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- src与dst的dtype必须完全一致，dtype不一致触发异常。
+- src与dst0、dst1的dtype必须完全一致，dtype不一致触发异常。
 - 实际读取的UB地址和偏移后的UB地址必须32字节对齐，并且在UB地址空间内且不越界，否则会报错。
 - dst0与dst1必须为不同的矢量数据寄存器。
-- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
+- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 - 针对带地址寄存器偏移搬入：必须先调用`asc_update_addr_reg`接口。
 
@@ -158,13 +154,13 @@ for (uint16_t i = 0; i < repeat_times; i++) {
 ### 标量偏移寻址接口
 
 ```cpp
-// 方式1：通过offset控制偏移
+// 方式1：通过offset控制偏移。
 for (uint16_t i = 0; i < repeat_times; i++) {
     asc_loadalign_deintlv(reg0, reg1, src, i * one_repeat_size);
     ...
 }
 
-// 方式2：通过src控制偏移
+// 方式2：通过src控制偏移。
 for (uint16_t i = 0; i < repeat_times; i++) {
     asc_loadalign_deintlv(reg0, reg1, src + i * one_repeat_size, 0);
     ...

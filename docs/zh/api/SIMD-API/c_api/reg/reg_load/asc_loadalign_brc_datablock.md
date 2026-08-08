@@ -26,13 +26,11 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/reg_load.h"`。
-
 从Unified Buffer（UB）中起始地址32字节对齐的位置读取一个DataBlock（32字节），并将该DataBlock广播到整个矢量数据寄存器（256字节）。本接口提供三种功能模式：
 
 - 无偏移搬入：从`src`起始地址读取一个DataBlock并广播到VL长度数据。
 - 带偏移搬入：从`src`起始地址加上`offset * sizeof(dtype)`字节偏移位置读取一个DataBlock并广播到VL长度数据。
-- 带地址寄存器偏移搬入：通过`addr_reg`类型的地址寄存器偏移指定起始位置，读取一个DataBlock并广播到VL长度数据。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
+- 带地址寄存器偏移搬入：通过`addr_reg`类型的地址寄存器指定起始地址偏移，读取一个DataBlock并广播到VL长度数据。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。接口不会修改`src`指针或按值传入的`offset`。
 
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
@@ -93,24 +91,24 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype必须和src一致，搬入VL长度数据。 |
-| src | 输入 | 源UB地址，起始地址需32字节对齐。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
 
 **表2** 参数说明（带偏移搬入）
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype必须和src一致，搬入VL长度数据。 |
-| src | 输入 | 源UB地址，起始地址需32字节对齐。 |
-| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。偏移后的地址仍需32字节对齐，且须在UB地址范围内。offset为负值表示源地址向低地址方向移动。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
+| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。`offset`为负值表示源地址向低地址方向移动。 |
 
 **表3** 参数说明（带地址寄存器偏移搬入）
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype必须和src一致，搬入VL长度数据。 |
-| src | 输入 | 源UB地址，起始地址需32字节对齐。 |
-| offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，单位为元素个数。vector_bool使用b32模式，实际字节偏移为元素偏移乘4。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
+| offset | 输入 | 地址寄存器，类型为`addr_reg`，须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -123,8 +121,6 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst,
 PIPE_V
 
 ## 约束说明
-
-### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。

@@ -26,9 +26,7 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/reg_load.h"`。
-
-将Unified Buffer（UB）中起始地址任意字节对齐的连续数据搬入矢量数据寄存器，搬入数据量为VL。本接口是非对齐搬入的第二阶段，需要先调用[asc_loadunalign_pre](asc_loadunalign_pre.md)初始化`src0`。
+将Unified Buffer（UB）中起始地址任意字节对齐的连续数据搬入矢量数据寄存器，搬入数据量为VL。本接口是非对齐搬入的第二阶段，需要先调用[asc_loadunalign_pre](asc_loadunalign_pre.md)初始化非对齐寄存器[vector_load_unalign](../reg_data_types/data_type_definition.md#非对齐寄存器)。
 
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
@@ -55,9 +53,9 @@ __simd_callee__ inline void asc_loadunalign(vector_int8_t& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器，写入单个VL长度的非对齐加载拼接结果。dtype由重载决定，须与src1一致。 |
-| src0 | 输入 | `vector_load_unalign`临时寄存器，保存上一阶段加载的VL长度数据，须通过配套接口预先初始化为有效状态。 |
-| src1 | 输入 | 源UB地址，本次搬入的相邻下一块VL长度数据。dtype须与dst一致。起始地址无32字节对齐要求（本接口用于非对齐加载场景），但须落在UB地址范围内。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype须与src1一致，搬入VL长度数据。 |
+| src0 | 输入 | 非对齐寄存器。保存非32字节对齐的数据，该寄存器大小为32字节，须通过[asc_loadunalign_pre](asc_loadunalign_pre.md)预先初始化。 |
+| src1 | 输入 | 源UB地址，实际读取地址无需32字节对齐。 |
 
 ## 返回值说明
 
@@ -69,18 +67,13 @@ PIPE_V
 
 ## 约束说明
 
-### 通用约束
-
-- src1起始地址只需1字节对齐。
 - 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为UB地址，目的操作数为矢量数据寄存器。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - src1与dst的dtype必须完全一致，dtype不一致触发异常。
-- src0必须为`vector_load_unalign`类型，且须通过配套接口预先初始化为有效状态；未初始化的src0内容不确定，会导致dst拼接结果错误。
-- 本接口须在配套接口完成首个VL长度数据加载后调用，二者需成对使用以保证非对齐拼接语义正确。
-- 本接口无对应底层指令。
-- UB容量上限：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。src1偏移+单次搬入数据量不可超过实际可用容量，否则会报错。
-- 单次搬入的数据量为一个矢量长度（VL），按dtype字节大小换算为元素个数；VL由当前矢量计算配置决定。
-- 如果需要执行多条本接口指令，且源地址存在重叠，需要插入内存屏障同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)（如`asc_mem_bar(VV_ALL)`或`asc_mem_bar(VST_VLD)`，按实际生产-消费关系选择合适的`mem_type`），保证多个指令串行化，防止出现异常数据。
+- `src1`起始地址无需32字节对齐，但实际访问范围须在UB地址空间内，否则会报错。
+- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
+- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 该接口必须与[asc_loadunalign_pre](asc_loadunalign_pre.md)配合使用。
 
 ## 调用示例
 

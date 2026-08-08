@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/reg_load.h"`。
-
 将Unified Buffer（UB）中一段连续的、起始地址只需1字节对齐的数据搬入目的矢量数据寄存器，搬运量为VL（256字节）。连续搬运时，用户需手动更新`src`地址。
 
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
@@ -53,8 +51,8 @@ __simd_callee__ inline void asc_load(vector_float& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype必须和src一致，搬入VL长度数据。 |
-| src | 输入 | 源UB地址，起始地址只需1字节对齐。从src起始位置连续读取VL长度数据。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址只需1字节对齐。从`src`起始位置连续读取VL长度数据。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
