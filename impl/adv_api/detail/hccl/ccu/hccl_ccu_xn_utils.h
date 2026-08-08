@@ -42,7 +42,7 @@ constexpr uint64_t MASK = 0x7f;
 __aicore__ inline uint64_t GetOpId(__gm__ CommonPrepareParamCcu* commParam)
 {
     if (commParam->commType.msgType == ControlMsgType::HCCL_CMD_FINALIZE) {
-        return 0xffffffffffffffff;
+        return 0xaaaaaaaaaaaaaaaa;
     }
 
     uint64_t algoType = 0U;
