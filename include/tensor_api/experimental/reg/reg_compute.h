@@ -23,8 +23,7 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_COMPUTE_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_COMPUTE_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/experimental/reg/reg_compute_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/reg_compute_impl.h"
 
 namespace asc {
 namespace te {
@@ -189,8 +188,6 @@ ASC_TE_DECLARE_COMPARISON(>=);
 
 } // namespace te
 } // namespace asc
-#endif
-
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_COMPUTE_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE)

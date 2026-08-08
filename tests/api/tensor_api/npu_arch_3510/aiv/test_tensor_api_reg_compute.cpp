@@ -99,7 +99,9 @@ struct IntrinsicCapture {
     size_t subCalls = 0;
     size_t divCalls = 0;
     size_t duplicateCalls = 0;
+    size_t intScalarCalls = 0;
     std::array<float, 16> floatScalars {};
+    std::array<int32_t, 16> intScalars {};
     std::array<int16_t, 8> shiftScalars {};
 };
 
@@ -114,6 +116,16 @@ void ResetCapture(const vector_bool& expectedMask)
 void CaptureMask(const vector_bool& mask)
 {
     gCapture.masksMatch = gCapture.masksMatch && SameBytes(mask, gCapture.expectedMask);
+}
+
+template <typename T, size_t N>
+void CaptureScalar(std::array<T, N>& values, size_t& count, T value)
+{
+    if (count >= values.size()) {
+        ADD_FAILURE() << "scalar capture capacity exceeded";
+        return;
+    }
+    values[count++] = value;
 }
 
 void UnaryFloatStub(vector_float& dst, vector_float, vector_bool mask, Literal)
@@ -133,7 +145,7 @@ void BinaryFloatStub(vector_float& dst, vector_float, vector_float, vector_bool 
 void ScalarFloatStub(vector_float& dst, vector_float, float value, vector_bool mask, Literal)
 {
     CaptureMask(mask);
-    gCapture.floatScalars[gCapture.scalarCalls++] = value;
+    CaptureScalar(gCapture.floatScalars, gCapture.scalarCalls, value);
     FillBytes(dst, RESULT_TOKEN);
 }
 
@@ -148,14 +160,14 @@ void LogScaleStub(vector_float& dst, vector_float src, float value, vector_bool 
 {
     CaptureMask(mask);
     gCapture.operandsMatch = gCapture.operandsMatch && HasByteValue(src, SRC1_TOKEN);
-    gCapture.floatScalars[gCapture.scalarCalls++] = value;
+    CaptureScalar(gCapture.floatScalars, gCapture.scalarCalls, value);
     FillBytes(dst, RESULT_TOKEN);
 }
 
 void DuplicateFloatStub(vector_float& dst, float value, vector_bool mask, Literal)
 {
     CaptureMask(mask);
-    gCapture.floatScalars[gCapture.scalarCalls++] = value;
+    CaptureScalar(gCapture.floatScalars, gCapture.scalarCalls, value);
     ++gCapture.duplicateCalls;
     FillBytes(dst, BROADCAST_TOKEN);
 }
@@ -174,7 +186,7 @@ void LeakyReluStub(vector_float& dst, vector_float src, float value, vector_bool
 {
     CaptureMask(mask);
     gCapture.operandsMatch = gCapture.operandsMatch && HasByteValue(src, SRC0_TOKEN);
-    gCapture.floatScalars[gCapture.scalarCalls++] = value;
+    CaptureScalar(gCapture.floatScalars, gCapture.scalarCalls, value);
     FillBytes(dst, RESULT_TOKEN);
 }
 
@@ -207,15 +219,21 @@ void BinaryIntStub(vector_int32_t& dst, vector_int32_t, vector_int32_t, vector_b
     FillBytes(dst, RESULT_TOKEN);
 }
 
-void DuplicateIntStub(vector_int32_t& dst, int32_t, vector_bool mask, Literal)
+void DuplicateIntStub(vector_int32_t& dst, int32_t value, vector_bool mask, Literal)
 {
-    if (gCapture.duplicateCalls == 0) {
+    const size_t call = gCapture.duplicateCalls++;
+    CaptureScalar(gCapture.intScalars, gCapture.intScalarCalls, value);
+    if (call == 0) {
+        CaptureMask(mask);
+        gCapture.operandsMatch = gCapture.operandsMatch && value == 0;
+    } else if (call == 1) {
         gCapture.predicateMaskMatch = HasByteValue(mask, PREDICATE_TOKEN);
+        gCapture.operandsMatch = gCapture.operandsMatch && value == 1;
     } else {
         CaptureMask(mask);
+        gCapture.operandsMatch = gCapture.operandsMatch && value == 3;
     }
-    ++gCapture.duplicateCalls;
-    FillBytes(dst, BROADCAST_TOKEN);
+    FillBytes(dst, call == 0 ? 0 : BROADCAST_TOKEN);
 }
 
 void EqZeroStub(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
@@ -228,7 +246,7 @@ void EqZeroStub(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool
 void ShiftScalarIntStub(vector_int32_t& dst, vector_int32_t, int16_t shift, vector_bool mask, Literal)
 {
     CaptureMask(mask);
-    gCapture.shiftScalars[gCapture.scalarCalls++] = shift;
+    CaptureScalar(gCapture.shiftScalars, gCapture.scalarCalls, shift);
     FillBytes(dst, RESULT_TOKEN);
 }
 
@@ -242,7 +260,7 @@ void CompareRegFloatStub(vector_bool& dst, vector_float, vector_float, vector_bo
 void CompareScalarFloatStub(vector_bool& dst, vector_float, float value, vector_bool mask)
 {
     CaptureMask(mask);
-    gCapture.floatScalars[gCapture.scalarCalls++] = value;
+    CaptureScalar(gCapture.floatScalars, gCapture.scalarCalls, value);
     FillBytes(dst, PREDICATE_TOKEN);
 }
 
@@ -754,7 +772,7 @@ TEST_F(TestTensorApiRegCompute, LogicalAndBitwiseOverloadsUsePredicateAndBroadca
         .times(1)
         .will(invoke(EqZeroStub));
     MOCKER_CPP(vdup, void(vector_int32_t&, int32_t, vector_bool, Literal))
-        .times(7)
+        .times(8)
         .will(invoke(DuplicateIntStub));
     MOCKER_CPP(vand, void(vector_int32_t&, vector_int32_t, vector_int32_t, vector_bool, Literal))
         .times(3)
@@ -779,7 +797,13 @@ TEST_F(TestTensorApiRegCompute, LogicalAndBitwiseOverloadsUsePredicateAndBroadca
 
     GlobalMockObject::verify();
     EXPECT_EQ(gCapture.binaryCalls, 9U);
-    EXPECT_EQ(gCapture.duplicateCalls, 7U);
+    EXPECT_EQ(gCapture.duplicateCalls, 8U);
+    EXPECT_EQ(gCapture.intScalarCalls, 8U);
+    EXPECT_EQ(gCapture.intScalars[0], 0);
+    EXPECT_EQ(gCapture.intScalars[1], 1);
+    for (size_t i = 2; i < gCapture.intScalarCalls; ++i) {
+        EXPECT_EQ(gCapture.intScalars[i], 3);
+    }
     EXPECT_TRUE(gCapture.operandsMatch);
     EXPECT_TRUE(gCapture.predicateMaskMatch);
     EXPECT_TRUE(gCapture.masksMatch);
