@@ -13,18 +13,18 @@ import { withBase } from 'vitepress'
 import UiIcon from './UiIcon.vue'
 
 const tasks = [
-  { icon: 'play', title: '首次开发算子', detail: '从概念到 HelloWorld', link: '/guide/入门教程/Ascend-C概述与学习路径' },
-  { icon: 'search', title: '查询 API', detail: '按产品与接口定位', link: '/api/README' },
+  { icon: 'play', title: '首次开发算子', detail: '从概念到HelloWorld', link: '/guide/入门教程/Ascend-C概述与学习路径' },
+  { icon: 'search', title: '查询API', detail: '按产品与接口定位', link: '/api/README' },
   { icon: 'gauge', title: '调试与调优', detail: '分析功能与性能问题', link: '/guide/算子实践参考/本文档组织结构' },
-  { icon: 'refresh', title: '跨代迁移', detail: '检查 API 兼容策略', link: '/guide/跨代迁移兼容性指南/概述' },
+  { icon: 'refresh', title: '跨代迁移', detail: '检查API兼容策略', link: '/guide/跨代迁移兼容性指南/概述' },
 ]
 
 const sections = [
-  { icon: 'play', tone: 'green', title: '入门教程', detail: '环境准备、基础概念和首个 Ascend C 算子的完整上手路径。', link: '/guide/入门教程/Ascend-C概述与学习路径' },
-  { icon: 'book', tone: 'purple', title: '编程指南', detail: 'SIMD、SIMT 编程模型、语言扩展、编译运行与开发能力。', link: '/guide/编程指南/本文档组织结构' },
+  { icon: 'play', tone: 'green', title: '入门教程', detail: '环境准备、基础概念和首个Ascend C算子的完整上手路径。', link: '/guide/入门教程/Ascend-C概述与学习路径' },
+  { icon: 'book', tone: 'purple', title: '编程指南', detail: 'SIMD、SIMT编程模型、语言扩展、编译运行与开发能力。', link: '/guide/编程指南/本文档组织结构' },
   { icon: 'gauge', tone: 'gold', title: '算子实践参考', detail: '功能调试、性能分析、优化方法和可复用的优秀实践。', link: '/guide/算子实践参考/本文档组织结构' },
-  { icon: 'refresh', tone: 'coral', title: '跨代迁移兼容性指南', detail: '面向不同架构版本的 API 兼容策略和迁移注意事项。', link: '/guide/跨代迁移兼容性指南/概述' },
-  { icon: 'library', tone: 'neutral', title: '技术附录', detail: 'C++ 标准支持、概念原理、术语表及补充参考信息。', link: '/guide/技术附录/概念原理和术语/术语表' },
+  { icon: 'refresh', tone: 'coral', title: '跨代迁移兼容性指南', detail: '面向不同架构版本的API兼容策略和迁移注意事项。', link: '/guide/跨代迁移兼容性指南/概述' },
+  { icon: 'library', tone: 'neutral', title: '技术附录', detail: 'C++标准支持、概念原理、术语表及补充参考信息。', link: '/guide/技术附录/概念原理和术语/术语表' },
   { icon: 'braces', tone: 'teal', title: 'Ascend C API', detail: 'SIMD、SIMT、AI CPU 与 Utils API 的完整接口参考。', link: '/api/README' },
 ]
 </script>

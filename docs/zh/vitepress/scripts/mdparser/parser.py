@@ -533,7 +533,9 @@ def _fix_callouts(html: str) -> str:
     def _replace(m):
         callout_type = m.group(1)
         callout_lower = callout_type.lower()
-        title = m.group(2).strip()
+        title, separator, leading_body = m.group(2).partition("\n")
+        title = title.strip()
+        leading_body = leading_body.strip() if separator else ""
         body_content = m.group(3).strip()
         icon = _CALLOUT_ICONS.get(callout_type, "")
         type_label = dict(
@@ -543,12 +545,10 @@ def _fix_callouts(html: str) -> str:
             WARNING="Warning",
             CAUTION="Caution",
         ).get(callout_type, callout_type)
-        if not body_content and "\n" in title:
-            title, body_content = title.split("\n", 1)
-            title = title.strip()
-            body_content = f"<p>{body_content.strip()}</p>"
         title_text = title if title else type_label
         parts = [f'<p class="callout-title">{icon}{title_text}</p>']
+        if leading_body:
+            parts.append(f"<p>{leading_body}</p>")
         if body_content:
             parts.append(body_content)
         body_html = "\n".join(parts)

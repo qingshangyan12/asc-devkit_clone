@@ -268,7 +268,6 @@
   color: #b3bcc4;
 }
 
-.markdown-body .code-block pre,
 .markdown-body .code-block pre {
   background: #f7f8fa;
   color: var(--asc-gray-10);
