@@ -49,7 +49,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
 
 static ge::graphStatus GenSimplifiedKeyFunc(gert::TilingContext* context, ge::char_t* simplifiedKey)
 {
-    constexpr size_t SIMPLIFIED_KEY_MAX_LEN = 100;
+    constexpr size_t CUSTOM_SIMPLIFIED_KEY_MAX_LEN = 256U;
     if (context == nullptr || simplifiedKey == nullptr || context->GetInputDesc(0) == nullptr) {
         return ge::GRAPH_FAILED;
     }
@@ -65,7 +65,7 @@ static ge::graphStatus GenSimplifiedKeyFunc(gert::TilingContext* context, ge::ch
         default:
             return ge::GRAPH_FAILED;
     }
-    return strcpy_s(simplifiedKey, SIMPLIFIED_KEY_MAX_LEN, key) == EOK ? ge::GRAPH_SUCCESS : ge::GRAPH_FAILED;
+    return strcpy_s(simplifiedKey, CUSTOM_SIMPLIFIED_KEY_MAX_LEN, key) == EOK ? ge::GRAPH_SUCCESS : ge::GRAPH_FAILED;
 }
 
 IMPL_OP_OPTILING(AddCustomTemplate).GenSimplifiedKey(GenSimplifiedKeyFunc);
