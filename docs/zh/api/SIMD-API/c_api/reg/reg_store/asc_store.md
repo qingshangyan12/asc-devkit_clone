@@ -98,7 +98,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst,
 |---|---|---|
 | dst | 输出 | 目的操作数（矢量）的起始地址，类型为`__ubuf__ <dtype>*`。地址可非32字节对齐（本接口为非对齐搬出），但须落在UB地址空间内，且`dst`起始地址+count×sizeof(dtype)字节不可越过UB可用容量上限。 |
 | src | 输入 | 源矢量数据寄存器，dtype须与dst一致。仅前`count`个元素参与搬出，其余元素被忽略。 |
-| count | 输入 | 实际搬出的元素个数。不可大于矢量数据寄存器容纳的最大元素个数VL/sizeof(dtype)。传入量大于寄存器容纳上限时，超出寄存器范围的元素无有效数据，写入dst的内容不确定；建议按需取[0, VL/sizeof(dtype)]范围内有效值。 |
+| count | 输入 | 实际搬出的元素个数。不可大于矢量数据寄存器容纳的最大元素个数VL/sizeof(dtype)。count传入量大于寄存器容纳上限时，超出寄存器范围的元素无有效数据，写入dst的内容不确定；建议按需取[0, VL/sizeof(dtype)]范围内有效值。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 

@@ -68,7 +68,7 @@ PIPE_V
 - UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。`dst_align32b`起始地址、`offset × sizeof(dtype)`偏移与写出区域对应的UB范围三者之和不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
-### quarter pack压缩与Post Update约束
+### Quarter Pack压缩与Post Update约束
 
 - `offset`入参为`int32_t`类型，需保证偏移后写出区域不超出UB可用容量范围。
 - `offset`取0时写入位置与`dst_align32b`当前指向地址重合，且Post Update后`dst_align32b`指针不变，可重复向同一地址写入同一`src`内容。
