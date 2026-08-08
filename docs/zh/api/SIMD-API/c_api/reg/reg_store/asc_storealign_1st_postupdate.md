@@ -32,15 +32,13 @@
 
 ## 函数原型
 
-本接口对9种dtype暴露相同结构的原型（`<dtype>` ∈ {int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float, bfloat16_t}，对应矢量数据寄存器类型`vector_<dtype>`）。模板原型如下：
-
 ```cpp
 __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__ <dtype>*& dst_align32b,
                                                           vector_<dtype> src,
                                                           int32_t offset)
 ```
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`float`、`bfloat16_t`。
+dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 以`int16_t`为例的典型调用原型如下：
 
@@ -83,7 +81,7 @@ PIPE_V
 
 ### 单元素搬出与Post Update约束
 
-- offset单位为元素个数。例如dtype为`int16_t`时offset=2表示dst_align32b指针底层UB地址向后偏移4字节；dtype为`float`时offset=1表示偏移4字节。
+- offset单位为元素个数。
 - offset取0时dst_align32b指针不变，dst仍按当前dst_align32b起始位置写入src第一个元素，可重复向同一地址写入同一值。
 - offset取负值时dst_align32b指针向后回退，需确保回退后的地址仍按照dtype对齐且不低于UB起始地址。
 - Post Update后的dst_align32b新地址仍需满足dtype对齐，否则下一次调用本接口会报错。

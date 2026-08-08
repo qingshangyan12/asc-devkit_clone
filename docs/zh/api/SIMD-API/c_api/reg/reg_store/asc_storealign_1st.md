@@ -44,8 +44,6 @@
 
 #### 模板原型（占位符形式）
 
-本接口对16种dtype暴露相同结构的原型（`<dtype>`∈{int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float, bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, fp8_e8m0_t, hifloat8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, int4b_t}，对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`）。模板原型如下：
-
 ```cpp
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
                                                vector_<dtype> src)
@@ -54,14 +52,14 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
 #### 典型示例
 
 ```cpp
-// 示例：int8_t类型无偏移搬出
+// 示例：int8_t类型无偏移搬出。
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
                                                vector_int8_t src)
 ```
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`float`、`bfloat16_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`hifloat8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`int4b_t`
+dtype支持的数据类型为`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
 
 ### int32_t偏移搬出模式
 
@@ -78,7 +76,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
 #### 典型示例
 
 ```cpp
-// 示例：int8_t类型int32_t偏移搬出
+// 示例：int8_t类型int32_t偏移搬出。
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
                                                vector_int8_t src,
                                                int32_t offset)
@@ -86,7 +84,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`float`、`bfloat16_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`hifloat8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`int4b_t`
+dtype支持的数据类型为`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
 
 ### addr_reg偏移搬出模式
 
@@ -103,7 +101,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
 #### 典型示例
 
 ```cpp
-// 示例：int8_t类型addr_reg偏移搬出
+// 示例：int8_t类型addr_reg偏移搬出。
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
                                                vector_int8_t src,
                                                addr_reg offset)
@@ -111,7 +109,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`float`、`bfloat16_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`hifloat8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`int4b_t`
+dtype支持的数据类型为`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
 
 ## 参数说明
 
