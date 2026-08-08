@@ -26,7 +26,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
 __aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint64_t sync_id)
-{、
+{
 
     if ASC_IS_AIC {
         if (pipe == pipe_t::PIPE_S) {
