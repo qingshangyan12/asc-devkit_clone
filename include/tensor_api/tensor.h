@@ -29,6 +29,7 @@
 #include "tensor_api/tensor/tensor.h"
 #include "tensor_api/tensor/pointer.h"
 #include "tensor_api/utils/utils.h"
+#include "tensor_api/arch/vector/reg_cast.h"
 
 #endif // INCLUDE_TENSOR_API_TENSOR_H
 
