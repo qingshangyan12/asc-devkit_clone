@@ -47,7 +47,7 @@ __aicore__ inline void asc_sync_pipe_impl(pipe_t pipe)
         } else if (pipe == pipe_t::PIPE_MTE3) {
             pipe_barrier(pipe_t::PIPE_MTE3);
         } else if (pipe == pipe_t::PIPE_V) {
-            pipe_barrier(pipe_t::PIPE_v);
+            pipe_barrier(pipe_t::PIPE_V);
         }
     }
 }
