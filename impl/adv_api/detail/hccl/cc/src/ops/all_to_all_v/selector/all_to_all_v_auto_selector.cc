@@ -55,15 +55,14 @@ SelectorStatus AllToAllVAutoSelector::SelectAicpuAlgo(
     (void)configAlgMap;
     HCCL_DEBUG("[AllToAllVAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
     if (topoInfo->topoLevelNums > 1) {
-        if (topoInfo->level0Topo == Level0Shape::MESH_1D || topoInfo->level0Topo == Level0Shape::MESH_2D ||
-            topoInfo->level0Topo == Level0Shape::CLOS) {
+        if (topoInfo->level0Topo == Level0Shape::MESH_1D || topoInfo->level0Topo == Level0Shape::CLOS) {
             selectAlgName = "InsAlltoAllvMesh";
         } else {
             return SelectorStatus::NOT_MATCH;
         }
     } else {
-        if (topoInfo->level0Topo == Level0Shape::MESH_1D || topoInfo->level0Topo == Level0Shape::MESH_2D ||
-            topoInfo->level0Topo == Level0Shape::CLOS || topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
+        if (topoInfo->level0Topo == Level0Shape::MESH_1D || topoInfo->level0Topo == Level0Shape::CLOS ||
+            topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
             selectAlgName = "InsAlltoAllvMesh";
         } else {
             return SelectorStatus::NOT_MATCH;

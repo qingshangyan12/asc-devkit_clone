@@ -95,10 +95,6 @@ HcclResult InsV2AllToAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     tempAlgParams.repeatNum = 1;
     tempAlgParams.inputRepeatStride = 0;
     tempAlgParams.outputRepeatStride = 0;
-    tempAlgParams.sendCounts = param.all2AllVDataDes.sendCounts;
-    tempAlgParams.recvCounts = param.all2AllVDataDes.recvCounts;
-    tempAlgParams.sdispls = param.all2AllVDataDes.sdispls;
-    tempAlgParams.rdispls = param.all2AllVDataDes.rdispls;
 
     HCCL_INFO(
         "[InsV2AllToAllVSoleExecutor][OrchestrateLoop] myRank[%u], inputPtr[%#llx] outputPtr[%#llx], "

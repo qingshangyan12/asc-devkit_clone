@@ -139,7 +139,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_8],
             param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
             ctx.arg->channels, ctx.arg->channelCount,
-            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.missionIndex);
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, 0);
     }
 }
 

@@ -51,12 +51,10 @@ HcclResult CcuTempKfcHalfAllToAllVMesh1D::KernelRun(
     buffInfo_ = templateDataParams.buffInfo;
 
     const uint64_t inputAddr = PointerToAddr(buffInfo_.inputPtr) + buffInfo_.inBuffBaseOff;
-    const uint64_t outputAddr = PointerToAddr(buffInfo_.outputPtr) + buffInfo_.outBuffBaseOff;
+    const uint64_t sendSizesAddr = PointerToAddr(param.all2AllVDataDes.sendCounts);
+    const uint64_t sendOffsetsAddr = PointerToAddr(param.all2AllVDataDes.sdispls);
     uint64_t token = 0;
     CHK_RET(GetToken(buffInfo_, token));
-
-    const uint64_t sendSizesAddr = PointerToAddr(templateDataParams.sendCounts);
-    const uint64_t sendOffsetsAddr = PointerToAddr(templateDataParams.sdispls);
 
     const uint64_t recvOffset = mySubCommRank_ * templateDataParams.sliceSize;
 

@@ -17,14 +17,10 @@ constexpr int A2AV_TOKEN_XN_ID = 2;
 constexpr int A2AV_POST_SYNC_CKE_IDX = 0;
 constexpr int A2AV_OUTPUT_CKE_IDX = 1;
 constexpr int A2AV_TOKEN_CKE_IDX = 2;
-constexpr int A2AV_MI_SYNC_CKE_IDX = 3;
 constexpr uint16_t A2AV_POST_SYNC_BIT = 1U;
 constexpr uint16_t A2AV_OUTPUT_BIT = 1U << A2AV_OUTPUT_XN_ID;
 constexpr uint16_t A2AV_TOKEN_BIT = 1U << A2AV_TOKEN_XN_ID;
 constexpr uint32_t A2AV_BITS_PER_EVENT = 16;
-constexpr uint16_t A2AV_RANK_NUM_PER_CKE = 16;
-constexpr uint32_t A2AV_MI_SYNC_ARG_NUM = 4;
-constexpr uint32_t A2AV_MI0_SYNC_MASK = (1U << A2AV_MI_SYNC_ARG_NUM) - 1;
 
 struct KfcHalfAllToAllVMesh1DContext : CcuKernelCtxBase {
     const ChannelHandle* channels{nullptr};
@@ -73,7 +69,6 @@ static CcuResult InitResource(KfcHalfAllToAllVMesh1DContext& ctx)
     const uint32_t eventNum = (ctx.rankSize + A2AV_BITS_PER_EVENT - 1) / A2AV_BITS_PER_EVENT;
     ctx.writeDoneEvents.resize(eventNum);
 
-    const uint32_t signalNum = (ctx.rankSize + A2AV_RANK_NUM_PER_CKE - 1) / A2AV_RANK_NUM_PER_CKE;
     ctx.sendSizeA.resize(ctx.rankSize);
     ctx.sendSizeB.resize(ctx.rankSize);
     ctx.sendOffsetA.resize(ctx.rankSize);
@@ -104,26 +99,31 @@ static CcuResult LoadSendParamsFromMem(KfcHalfAllToAllVMesh1DContext& ctx)
     ccu::Variable elemSize;
     elemSize = 8U;
 
-    ccu::Variable sendSizesBase = ctx.sendSizesAddr;
-    ccu::Variable sendOffsetsBase = ctx.sendOffsetsAddr;
+    ccu::Variable curSizesAddr = ctx.sendSizesAddr;
+    ccu::Variable curOffsetsAddr = ctx.sendOffsetsAddr;
 
     for (uint32_t i = 0; i < ctx.rankSize; i++) {
-        ccu::Variable offset;
-        offset = i * elemSize;
-        CCU_CHK_RET(ccu::Load(sendSizesBase + offset, ctx.sendSizeA[i]));
-        CCU_CHK_RET(ccu::Load(sendOffsetsBase + offset, ctx.sendOffsetA[i]));
+        CCU_CHK_RET(ccu::Load(curSizesAddr, ctx.sendSizeA[i]));
+        CCU_CHK_RET(ccu::Load(curOffsetsAddr, ctx.sendOffsetA[i]));
+        curSizesAddr += elemSize;
+        curOffsetsAddr += elemSize;
     }
 
     ccu::Variable halfRankSize;
-    halfRankSize = ctx.rankSize;
-    ccu::Variable bBase;
-    bBase = halfRankSize * elemSize;
+    halfRankSize = static_cast<uint64_t>(ctx.rankSize);
+    ccu::Variable bBaseOffset;
+    bBaseOffset = static_cast<uint64_t>(ctx.rankSize) * 8U;
+
+    curSizesAddr = ctx.sendSizesAddr;
+    curSizesAddr += bBaseOffset;
+    curOffsetsAddr = ctx.sendOffsetsAddr;
+    curOffsetsAddr += bBaseOffset;
 
     for (uint32_t i = 0; i < ctx.rankSize; i++) {
-        ccu::Variable offset;
-        offset = i * elemSize;
-        CCU_CHK_RET(ccu::Load(sendSizesBase + bBase + offset, ctx.sendSizeB[i]));
-        CCU_CHK_RET(ccu::Load(sendOffsetsBase + bBase + offset, ctx.sendOffsetB[i]));
+        CCU_CHK_RET(ccu::Load(curSizesAddr, ctx.sendSizeB[i]));
+        CCU_CHK_RET(ccu::Load(curOffsetsAddr, ctx.sendOffsetB[i]));
+        curSizesAddr += elemSize;
+        curOffsetsAddr += elemSize;
     }
 
     return CCU_SUCCESS;
@@ -155,13 +155,15 @@ static CcuResult DoHalfAllToAllVWrite(KfcHalfAllToAllVMesh1DContext& ctx)
         ccu::Variable& curOffset = (ctx.missionId == 0) ? ctx.sendOffsetA[peerId] : ctx.sendOffsetB[peerId];
 
         ccu::LocalAddr src;
-        src.addr = ctx.userInAddr + curOffset;
+        src.addr = ctx.userInAddr;
+        src.addr += curOffset;
         src.token = ctx.token[ctx.rankId];
 
         if (peerId == ctx.rankId) {
             if (ctx.missionId == 0) {
                 ccu::LocalAddr localDst;
-                localDst.addr = ctx.cclBuffer[ctx.rankId] + ctx.recvOffset;
+                localDst.addr = ctx.cclBuffer[ctx.rankId];
+                localDst.addr += ctx.recvOffset;
                 localDst.token = ctx.token[ctx.rankId];
                 CCU_CHK_RET(GroupCopy(ctx, localDst, src, ctx.goSize));
             }
@@ -170,7 +172,8 @@ static CcuResult DoHalfAllToAllVWrite(KfcHalfAllToAllVMesh1DContext& ctx)
         }
 
         ccu::RemoteAddr dst;
-        dst.addr = ctx.cclBuffer[peerId] + ctx.recvOffset;
+        dst.addr = ctx.cclBuffer[peerId];
+        dst.addr += ctx.recvOffset;
         if (ctx.missionId == 1) {
             dst.addr += ctx.sendSizeA[peerId];
         }
