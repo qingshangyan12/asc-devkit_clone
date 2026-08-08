@@ -83,7 +83,7 @@ struct reg_cast_op {
 template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat, typename From>
 __simd_callee__ inline reg_tensor<To> cast_impl(reg_tensor<From> src)
 {
-    static_assert(!Std::is_same_v<To, From>,
+    static_assert(!AscendC::Std::is_same_v<To, From>,
         "reg_tensor cast requires different source and destination element types");
 
     using op = reg_cast_op<To, From, Layout, Round, Sat>;
