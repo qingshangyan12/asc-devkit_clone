@@ -75,10 +75,10 @@ this->AICore().AddConfig("Ascend950", config);
 `ASCEND_COMPUTE_UNIT=ascend950` 匹配。opbuild 不修改 AddConfig 注册 API 的存储
 结构，而是在消费 AddConfig map 时建立 canonical 小写视图。
 
-AddConfig 不接受 full SKU 作为 series。此次改动不新增 full SKU 到 short series 的
-转换逻辑，也不让 full SKU 进入算子信息库中的 series 字段或路径。opbuild 对
-canonical AddConfig key 复用其现有小写 `VALID_SOC_SET` 校验，不新增混合大小写
-合法表；`Ascend950PR_9599` 转为 `ascend950pr_9599` 后因不在该集合中而报错。
+AddConfig key 的语义仍是 short series，但本需求不收紧其既有非法值处理。此次改动
+不新增 AddConfig 合法性校验，也不把 full SKU 反向映射为 short series。例如
+`Ascend950PR_9599` 只会归一化为 `ascend950pr_9599`，仍按既有非法 AddConfig
+路径处理，不会被当作合法的 `ascend950`。
 
 同一个算子内，任意两个 AddConfig key 如果转小写后相同，opbuild 必须报错并终止
 生成，无论两份配置内容是否一致。例如以下写法属于重复配置：
@@ -131,8 +131,10 @@ canonical 小写 series -> {原始 AddConfig key, OpAICoreConfig}
 构建该视图时：
 
 1. 对每个 AddConfig key 执行 ASCII 小写转换。
-2. 使用现有 `VALID_SOC_SET` 校验 canonical key，非法 series 和 full SKU 均报错。
-3. 若 canonical key 已存在，则记录明确错误并使本次 opbuild 生成失败。
+2. 不新增合法性校验，非法 series 和 full SKU 保持既有忽略、默认回退或
+   `SOC_VERSION_INVALID` 行为。
+3. 若两个不同原始 key 的 canonical key 相同，则记录明确错误并使本次 opbuild
+   生成失败；完全相同的原始 key 在 AddConfig 内部仍保持后一次覆盖前一次。
 4. 保留原始 key，以便读取依赖原始注册 key 的 `OpAICoreConfig`、MC2 等配置。
 5. 后续匹配、去重、支持列表和输出命名只使用 canonical key。
 
@@ -153,7 +155,7 @@ aic-<canonical-series>-ops-info.ini
 ```
 
 文件内容涉及 series 的字段也使用 canonical 小写值，不将 AddConfig 原始大小写写入
-算子信息库。
+算子信息库。非法 AddConfig 继续沿用现有生成行为，仅输出名称被归一化为小写。
 
 ### ACLNN 算子信息生成
 
@@ -163,6 +165,7 @@ ACLNN generator 已在部分位置调用 `ToLower`，本次需统一改为复用
 - AddConfig 支持列表中的 soc name 始终为小写 canonical series；
 - compute unit 与 AddConfig 按大小写不敏感方式匹配；
 - 同 series 的不同大小写 AddConfig 不会生成重复枚举或重复支持项，而是明确报错；
+- 非法 AddConfig 继续 warning 并生成 `SOC_VERSION_INVALID`，不升级为硬错误；
 - 仍可通过保存的原始 key 读取 MC2 和具体 `OpAICoreConfig`。
 
 ### 路径与 OPC 边界
@@ -193,7 +196,9 @@ AddConfig key=ascend950
         +--> 算子信息库 soc name=ascend950
 ```
 
-full SKU 的选择不影响目录名、算子信息库 series 或运行时 path key。
+框架通过 `SOC_MAP_EXT` 选择的合法 full SKU 不影响目录名、算子信息库 series 或
+运行时 path key。非法 AddConfig 不属于该映射链路；在未传 `compute_unit` 的场景
+仍保持既有生成行为，只将其原始 key 统一转为小写。
 
 ## 错误处理
 
@@ -202,9 +207,11 @@ full SKU 的选择不影响目录名、算子信息库 series 或运行时 path 
 - 新旧构建配置同时定义；
 - 新配置归一化后不在 `ASC_VALID_SOC_LIST`；
 - 配置 list 中任意一项非法；
-- AddConfig 使用 full SKU 或其他非法 series，经小写归一化后被现有
-  `VALID_SOC_SET` 拒绝；
 - 同一算子存在 canonical series 相同的重复 AddConfig key。
+
+AddConfig 使用 full SKU 或其他非法 series 时不新增错误：cfg generator 保持既有
+忽略、默认回退或生成行为，ACLNN generator 保持 warning 和
+`SOC_VERSION_INVALID` 行为。
 
 显式传入空值时继续沿用现有 CMake list 语义，本需求不新增空值规则。
 
@@ -229,8 +236,10 @@ full SKU 的选择不影响目录名、算子信息库 series 或运行时 path 
 3. ACLNN 支持列表和 soc name list 输出小写 `ascend950`。
 4. `AddConfig("ascend950")` 与 `AddConfig("Ascend950")` 同时存在时生成失败。
 5. 单个合法 AddConfig 不因大小写不同而失败。
-6. full SKU AddConfig 不被转换为 short series，并被 `VALID_SOC_SET` 拒绝。
-7. MC2 及依赖原始 AddConfig key 的配置仍能正确读取。
+6. full SKU AddConfig 只转小写，不被转换为 short series，且保持既有软处理行为。
+7. 非法 AddConfig 在 ACLNN 产物中仍为 `SOC_VERSION_INVALID`。
+8. 完全相同的 AddConfig key 重复注册时仍由后一次覆盖前一次。
+9. MC2 及依赖原始 AddConfig key 的配置仍能正确读取。
 
 ### 集成验证
 
@@ -243,7 +252,7 @@ full SKU 的选择不影响目录名、算子信息库 series 或运行时 path 
 ## 不在本需求范围内
 
 - 新增或修改 `ASC_VALID_SOC_LIST`、`SOC_MAP_EXT` 条目。
-- 接受用户配置的 full SKU。
+- 将用户配置的 full SKU 视为合法 short series。
 - 根据 full SKU 反向推导 short series。
 - 给 opbuild 或 Python 构建工具新增 `soc_series` 参数。
 - 重命名既有 `compute_unit` API、变量、文件或元数据。
