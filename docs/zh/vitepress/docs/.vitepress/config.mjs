@@ -22,6 +22,7 @@ import {
   extractUnsupportedProducts,
   normalizeApiRoute,
 } from '../../scripts/api-support.mjs'
+import { addHeadingAnchors } from '../../scripts/heading-utils.mjs'
 
 const docsRoot = resolve(import.meta.dirname, '..')
 const repoRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
@@ -515,22 +516,6 @@ function escapeVueInterpolations(html) {
   )
 }
 
-function addHeadingAnchors(html) {
-  const headingRegex = /<h([23456])((?:\s[^>]*)?)>([\s\S]*?)<\/h\1>/gi
-  const seen = new Map()
-  return html.replace(headingRegex, (match, level, attrs, content) => {
-    const text = content.replace(/<[^>]+>/g, '').trim()
-    if (!text) return match
-    const baseSlug = text.replace(/\s+/g, '-')
-    const count = seen.get(baseSlug) || 0
-    const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`
-    seen.set(baseSlug, count + 1)
-    const idAttr = attrs.match(/\sid\s*=\s*["']/) ? '' : ` id="${slug}"`
-    const anchor = `<a class="header-anchor" href="#${slug}">&#x200B;</a>`
-    return `<h${level}${attrs}${idAttr}>${content}${anchor}</h${level}>`
-  })
-}
-
 function loadHeaderCache(filePath) {
   const absPath = resolve(import.meta.dirname, '..', filePath)
   const cachePath = absPath + '.header'
@@ -748,7 +733,7 @@ function balanceDivTags(html) {
     },
     plugins: [navigationDataPlugin(), htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
       btnPlaceholder: '搜索',
-      placeholder: '搜索文档、API 与示例',
+      placeholder: '搜索文档、API与示例',
       emptyText: '未找到结果',
       heading: '共: {{searchResult}} 条结果',
       forceLanguage: 'zh',

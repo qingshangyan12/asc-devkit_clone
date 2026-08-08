@@ -30,6 +30,9 @@ importers:
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
+      entities:
+        specifier: ^4.5.0
+        version: 4.5.0
       pagefind:
         specifier: 1.0.4
         version: 1.0.4

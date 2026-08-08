@@ -137,7 +137,7 @@ onUnmounted(() => clearTimeout(filterTimer))
       id="cann-product-filter"
       v-model="selectedFilter"
       class="filter-select"
-      aria-label="筛选 API 适用产品"
+      aria-label="筛选API适用产品"
       @change="onFilterChange"
     >
       <option v-for="opt in filterOptions" :key="opt.value" :value="opt.value">

@@ -21,7 +21,7 @@ function openSearch() {
   <div class="home-hero-extra">
     <button class="home-search-trigger" type="button" @click="openSearch">
       <UiIcon name="search" :size="20" />
-      <span>搜索文档、API 与示例</span>
+      <span>搜索文档、API与示例</span>
       <kbd>Ctrl K</kbd>
     </button>
     <div class="home-capabilities" aria-label="主要编程能力">
