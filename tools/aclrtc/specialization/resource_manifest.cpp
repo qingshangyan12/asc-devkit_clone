@@ -47,7 +47,7 @@ public:
                 "resource path is not a relative POSIX path: " + value)) {
             return false;
         }
-        for (const std::string& component : FileUtils::PathComponents(value)) {
+        for (const std::string& component : FileUtils::SplitPath(value)) {
             if (!CheckAndLog(
                     component != "." && component != "..", "resource path contains an unsafe component: " + value)) {
                 return false;
@@ -74,7 +74,7 @@ public:
         const std::string path = value.substr(pathBegin + 1U);
         return ValidateRelativePath(path) &&
                (baseDir.empty() ||
-                CheckAndLog(FileUtils::IsWithinPath(path, baseDir), "resource path is outside base_dir: " + path));
+                CheckAndLog(FileUtils::IsPathWithin(path, baseDir), "resource path is outside base_dir: " + path));
     }
 
     bool ValidateMarkerSyntax(const std::string& value, const std::string& baseDir) const

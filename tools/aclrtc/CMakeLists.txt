@@ -9,8 +9,11 @@
 # ----------------------------------------------------------------------------------------------------------
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/ SRC)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/specialization SPECIALIZATION_SRC)
+set(ACLRTC_COMMON_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/common/file_utils.cpp
+)
 
-set_source_files_properties(${SPECIALIZATION_SRC} PROPERTIES
+set_source_files_properties(${SPECIALIZATION_SRC} ${ACLRTC_COMMON_SRC} PROPERTIES
     COMPILE_OPTIONS "-fvisibility=hidden;-fvisibility-inlines-hidden"
 )
 
@@ -19,6 +22,7 @@ add_cann_third_party(json)
 add_library(acl_rtc SHARED
     ${SRC}
     ${SPECIALIZATION_SRC}
+    ${ACLRTC_COMMON_SRC}
 )
 
 if(BUILD_OPEN_PROJECT)

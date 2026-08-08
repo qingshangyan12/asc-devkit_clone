@@ -134,14 +134,14 @@ bool CopyFile(const std::string& source, const std::string& destination)
         return false;
     }
     const std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-    return !input.bad() && FileUtils::WriteFile(destination, bytes) && chmod(destination.c_str(), 0700) == 0;
+    return !input.bad() && FileUtils::WriteBinaryFile(destination, bytes) && chmod(destination.c_str(), 0700) == 0;
 }
 
 class ResourceRegistryTest : public testing::Test {
 protected:
     void SetUp() override
     {
-        ASSERT_TRUE(FileUtils::MakeTempRoot(root_));
+        ASSERT_TRUE(FileUtils::CreateTempDirectory(root_));
         unsetenv("ACLRTC_UT_BUNDLE_MODE");
         unsetenv("ASCEND_CUSTOM_OPP_PATH");
         unsetenv("ASCEND_OPP_PATH");
@@ -152,7 +152,7 @@ protected:
         unsetenv("ACLRTC_UT_BUNDLE_MODE");
         unsetenv("ASCEND_CUSTOM_OPP_PATH");
         unsetenv("ASCEND_OPP_PATH");
-        FileUtils::RemoveTree(root_);
+        EXPECT_TRUE(FileUtils::RemoveAll(root_));
     }
 
     std::string root_;
@@ -310,7 +310,7 @@ TEST_F(ResourceRegistryTest, MaterializeResolvesReferencesAndHandlesMissingResou
 TEST_F(ResourceRegistryTest, MaterializeReportsWriteFailure)
 {
     const std::string blocker = FileUtils::JoinPath(root_, "blocker");
-    ASSERT_TRUE(FileUtils::WriteFile(blocker, {1U}));
+    ASSERT_TRUE(FileUtils::WriteBinaryFile(blocker, {1U}));
     ResourceRegistry registry;
     registry.temporaryRoot_ = blocker;
     ResourceRecordPack pack = MakePack();
@@ -351,8 +351,6 @@ TEST_F(ResourceRegistryTest, LoadLibraryValidatesHeadersTablesExtensionsAndSymbo
         "invalid_extension_flags",
         "invalid_extension_data",
         "required_extension",
-        "null_package",
-        "large_package",
     };
     for (const std::string& mode : invalidModes) {
         ASSERT_EQ(setenv("ACLRTC_UT_BUNDLE_MODE", mode.c_str(), 1), 0);
@@ -365,7 +363,7 @@ TEST_F(ResourceRegistryTest, LoadLibraryValidatesHeadersTablesExtensionsAndSymbo
     EXPECT_EQ(noEntryRegistry.LoadLibrary(kNoEntryPluginPath), ResourceStatus::InvalidResource);
     ResourceRegistry notElfRegistry;
     const std::string notElf = FileUtils::JoinPath(root_, "lib_bad_compile_database.so");
-    ASSERT_TRUE(FileUtils::WriteFile(notElf, {'n', 'o', 't', '-', 'e', 'l', 'f'}));
+    ASSERT_TRUE(FileUtils::WriteBinaryFile(notElf, {'n', 'o', 't', '-', 'e', 'l', 'f'}));
     EXPECT_EQ(notElfRegistry.LoadLibrary(notElf), ResourceStatus::LoadError);
 
     ASSERT_EQ(setenv("ACLRTC_UT_BUNDLE_MODE", "optional_extension", 1), 0);
@@ -405,7 +403,7 @@ TEST_F(ResourceRegistryTest, AutomaticLoadReadsCustomAndVendorSearchRoots)
 
     const std::string oppRoot = FileUtils::JoinPath(root_, "opp");
     ASSERT_TRUE(
-        FileUtils::WriteFile(
+        FileUtils::WriteBinaryFile(
             FileUtils::JoinPath(oppRoot, "vendors/config.ini"),
             std::vector<uint8_t>{'o', 't', 'h', 'e', 'r', '=', 'x', '\n', ' ', 'l', 'o', 'a', 'd', '_',
                                  'p', 'r', 'i', 'o', 'r', 'i', 't', 'y',  ' ', '=', ' ', 'v', 'e', 'n',
@@ -425,10 +423,10 @@ TEST_F(ResourceRegistryTest, AutomaticLoadSkipsUnavailableAndSymlinkRoots)
     EXPECT_EQ(noEnvironmentRegistry.Load(""), ResourceStatus::NotFound);
 
     const std::string actualRoot = FileUtils::JoinPath(root_, "actual");
-    ASSERT_TRUE(FileUtils::WriteFile(FileUtils::JoinPath(actualRoot, "marker"), {}));
+    ASSERT_TRUE(FileUtils::WriteBinaryFile(FileUtils::JoinPath(actualRoot, "marker"), {}));
     const std::string customRoot = FileUtils::JoinPath(root_, "symlink_custom");
     const std::string jitParent = FileUtils::JoinPath(customRoot, "op_impl/ai_core/tbe/kernel");
-    ASSERT_TRUE(FileUtils::WriteFile(FileUtils::JoinPath(jitParent, "marker"), {}));
+    ASSERT_TRUE(FileUtils::WriteBinaryFile(FileUtils::JoinPath(jitParent, "marker"), {}));
     const std::string rootLink = FileUtils::JoinPath(jitParent, "jit");
     ASSERT_EQ(symlink(actualRoot.c_str(), rootLink.c_str()), 0);
     ASSERT_EQ(setenv("ASCEND_CUSTOM_OPP_PATH", customRoot.c_str(), 1), 0);

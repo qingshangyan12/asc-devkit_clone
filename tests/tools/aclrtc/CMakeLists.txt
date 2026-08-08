@@ -24,6 +24,10 @@ file(GLOB ACLRTC_SPECIALIZATION_SRC_FILES
     ${ASCENDC_DIR}/tools/aclrtc/specialization/*.cpp
 )
 
+set(ACLRTC_COMMON_SRC_FILES
+    ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
+)
+
 file(GLOB TEST_ACLRTC_SRC_FILES
     ${ASCENDC_DIR}/tests/main.cpp
     stub/*.cpp
@@ -58,6 +62,7 @@ set_target_properties(aclrtc_ut_no_entry_plugin PROPERTIES
 add_executable(ascendc_ut_aclrtc
     ${ACLRTC_SRC_FILES}
     ${ACLRTC_SPECIALIZATION_SRC_FILES}
+    ${ACLRTC_COMMON_SRC_FILES}
     ${TEST_ACLRTC_SRC_FILES}
 )
 

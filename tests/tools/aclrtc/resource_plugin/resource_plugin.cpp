@@ -62,7 +62,6 @@ AcCompileResourceManifest gManifest = {{kManifest, std::char_traits<char>::lengt
 AcCompileResourceExtension gExtension = {1U, 1U, 0U, nullptr, 0U};
 AcCompileResourceBundle gBundle = {
     {AC_COMPILE_RESOURCE_MAGIC, AC_COMPILE_RESOURCE_ABI_VERSION, sizeof(AcCompileResourceBundle), 0U},
-    {"ut_package", 10U},
     &gManifest,
     1U,
     nullptr,
@@ -73,7 +72,6 @@ void ResetBundle()
 {
     gBundle = {
         {AC_COMPILE_RESOURCE_MAGIC, AC_COMPILE_RESOURCE_ABI_VERSION, sizeof(AcCompileResourceBundle), 0U},
-        {"ut_package", 10U},
         &gManifest,
         1U,
         nullptr,
@@ -125,10 +123,6 @@ extern "C" const AcCompileResourceBundleHeader* AscendcGetCompileResourceBundle(
     } else if (mode == "optional_extension") {
         gBundle.extensions = &gExtension;
         gBundle.extensionCount = 1U;
-    } else if (mode == "null_package") {
-        gBundle.packageId = {nullptr, 1U};
-    } else if (mode == "large_package") {
-        gBundle.packageId.size = 4097U;
     }
     return &gBundle.header;
 }

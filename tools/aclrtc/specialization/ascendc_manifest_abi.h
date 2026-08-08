@@ -56,7 +56,6 @@ typedef struct AcCompileResourceBundleHeader {
 
 typedef struct AcCompileResourceBundle {
     AcCompileResourceBundleHeader header;
-    AcString packageId;
     const AcCompileResourceManifest* manifests;
     uint64_t manifestCount;
     const AcCompileResourceExtension* extensions;
