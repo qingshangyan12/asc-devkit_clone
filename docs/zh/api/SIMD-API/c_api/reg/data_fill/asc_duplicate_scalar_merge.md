@@ -28,8 +28,6 @@
 
 merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
 
-头文件路径为：`c_api/reg_compute/reg_vector.h`。
-
 ## 函数原型
 
 ```cpp
