@@ -9,6 +9,7 @@
  */
 
 #include <algorithm>
+#include <cerrno>
 #include <cstdint>
 #include <fstream>
 #include <string>
@@ -19,7 +20,9 @@
 #undef private
 
 #include <gtest/gtest.h>
+#include <mockcpp/mockcpp.hpp>
 
+#include <dirent.h>
 #include <unistd.h>
 
 namespace ascendc {
@@ -34,6 +37,12 @@ protected:
 
     std::string root_;
 };
+
+dirent* ReaddirErrorStub(DIR*)
+{
+    errno = EIO;
+    return nullptr;
+}
 
 TEST_F(FileUtilsTest, PathOperationsCoverBoundaryCases)
 {
@@ -115,6 +124,14 @@ TEST_F(FileUtilsTest, WriteAndWalkDirectory)
     const std::string missing = FileUtils::JoinPath(root_, "missing");
     EXPECT_FALSE(FileUtils::WalkDirectory(missing, false, false, paths));
     EXPECT_TRUE(FileUtils::WalkDirectory(missing, false, true, paths));
+}
+
+TEST_F(FileUtilsTest, WalkDirectoryReportsReaddirErrors)
+{
+    MOCKER(readdir).expects(once()).will(invoke(ReaddirErrorStub));
+    std::vector<std::string> paths;
+    EXPECT_FALSE(FileUtils::WalkDirectory(root_, false, false, paths));
+    GlobalMockObject::verify();
 }
 
 TEST_F(FileUtilsTest, RemoveTreeHandlesFilesLinksDirectoriesAndMissingPaths)

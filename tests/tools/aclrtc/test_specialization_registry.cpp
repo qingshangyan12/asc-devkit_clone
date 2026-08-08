@@ -180,6 +180,30 @@ TEST_F(ResourceRegistryTest, LoadManifestAcceptsValidFilesAndRejectsDuplicates)
     EXPECT_EQ(duplicateFilesRegistry.LoadManifest(unit, "direct.so", 0U), ResourceStatus::InvalidResource);
 }
 
+TEST_F(ResourceRegistryTest, LoadManifestRejectsParentChildFilePathConflicts)
+{
+    ManifestUnitBuilder parentFirst;
+    parentFirst.AddFile("a", "assets/a", {1U});
+    parentFirst.AddFile("b", "assets/a/b", {2U});
+    AcCompileResourceManifest unit = parentFirst.Build();
+    ResourceRegistry parentFirstRegistry;
+    EXPECT_EQ(parentFirstRegistry.LoadManifest(unit, "direct.so", 0U), ResourceStatus::InvalidResource);
+
+    ManifestUnitBuilder childFirst;
+    childFirst.AddFile("b", "assets/a/b", {1U});
+    childFirst.AddFile("a", "assets/a", {2U});
+    unit = childFirst.Build();
+    ResourceRegistry childFirstRegistry;
+    EXPECT_EQ(childFirstRegistry.LoadManifest(unit, "direct.so", 0U), ResourceStatus::InvalidResource);
+
+    ManifestUnitBuilder similarPrefix;
+    similarPrefix.AddFile("a", "assets/a", {1U});
+    similarPrefix.AddFile("a-prefix", "assets/a-prefix", {2U});
+    unit = similarPrefix.Build();
+    ResourceRegistry similarPrefixRegistry;
+    EXPECT_EQ(similarPrefixRegistry.LoadManifest(unit, "direct.so", 0U), ResourceStatus::Success);
+}
+
 TEST_F(ResourceRegistryTest, LoadManifestRejectsInvalidManifestAndFileTables)
 {
     ResourceRegistry registry;

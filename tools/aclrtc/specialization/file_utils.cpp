@@ -172,7 +172,20 @@ bool FileUtils::WalkDirectory(
             "Failed to read compile resource directory: path=%s, error=%s", directory.c_str(), std::strerror(errno));
         return false;
     }
-    while (dirent* entry = readdir(stream)) {
+    while (true) {
+        errno = 0;
+        dirent* entry = readdir(stream);
+        if (entry == nullptr) {
+            const int readError = errno;
+            const int closeResult = closedir(stream);
+            if (readError != 0) {
+                ASCENDLOGE(
+                    "Failed while reading compile resource directory: path=%s, error=%s", directory.c_str(),
+                    std::strerror(readError));
+                return false;
+            }
+            return closeResult == 0;
+        }
         const std::string name(entry->d_name);
         if (name == "." || name == "..") {
             continue;
@@ -184,7 +197,6 @@ bool FileUtils::WalkDirectory(
             return false;
         }
     }
-    return closedir(stream) == 0;
 }
 
 bool FileUtils::MakeTempRoot(std::string& root)
