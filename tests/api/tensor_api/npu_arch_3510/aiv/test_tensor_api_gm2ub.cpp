@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
-#include "c_api/stub/cce_stub.h"
+#include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Vector_Copy_3510 : public testing::Test {
