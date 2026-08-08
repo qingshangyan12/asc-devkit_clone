@@ -638,7 +638,6 @@ inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Lite
 #include "instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint16_t*& dst) {}
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
-inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
 #endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -653,7 +652,6 @@ inline void copy_ubuf_to_gm_align_v2(
     __gm__ void* dst_addr, __ubuf__ void* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t l2_cache_mode, uint64_t burst_dst_stride, uint32_t burst_src_stride)
 {}
-#endif
 #endif
 
 

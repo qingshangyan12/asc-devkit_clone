@@ -253,8 +253,6 @@ private:
 
     Std::tuple<layout_type, engine_type> rep;
 };
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
 template <typename EngineType, typename LayoutType>
 template <load_sideband_mode sideband_mode, typename Coord>
 __simd_callee__ inline reg_tensor<typename base_tensor<EngineType, LayoutType>::data_type>
@@ -279,6 +277,7 @@ __simd_callee__ inline void base_tensor<EngineType, LayoutType>::store(
     const Coord& coord, const reg_tensor<RegDataType>& src)
 {
     static_assert(Std::is_same_v<get_mem_location<EngineType>, location::ub>,
+                  "base_tensor::store only supports tensors located in UB");
     static_assert(Std::is_same_v<data_type, RegDataType>,
                   "base_tensor::store requires the tensor and reg_tensor to have the same element type");
 
@@ -287,7 +286,6 @@ __simd_callee__ inline void base_tensor<EngineType, LayoutType>::store(
     asc_storealign(dst_engine.begin().get(), src.reg, src.mask);
 }
 
-#endif
 
 template <typename EngineType, typename LayoutType>
 struct global_tensor : public base_tensor<EngineType, LayoutType> {
@@ -313,6 +311,7 @@ template <typename EngineType, typename LayoutType>
 struct local_tensor : public base_tensor<EngineType, LayoutType> {
     using tensor_api_base = base_tensor<EngineType, LayoutType>;
     using layoutType = typename tensor_api_base::layout_type;
+
     using tensor_api_base::tensor_api_base;
 
     __aicore__ inline local_tensor() = default;
