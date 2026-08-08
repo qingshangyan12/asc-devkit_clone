@@ -90,7 +90,7 @@ __BLOCK_LOCAL__ __inline__ uint64_t g_deqScale;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
 __BLOCK_LOCAL__ __inline__ uint32_t g_bufId;
 #else
-__BLOCK_LOCAL__ __inline__ uint32_t g_bufId = 0;
+__BLOCK_LOCAL__ __inline__ uint32_t g_bufId;// = 0;
 #endif
 __BLOCK_LOCAL__ __inline__ uint32_t g_sharedEvtId;
 // global variables g_aipp* are used to simulate the spr for SetAippFunctions and LoadImageToLocal, they will save
