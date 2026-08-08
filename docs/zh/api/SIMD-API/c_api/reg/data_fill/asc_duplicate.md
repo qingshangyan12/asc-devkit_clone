@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/reg_vector.h"`。
-
 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
 
 ## 函数原型
@@ -40,7 +38,7 @@ __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
                                           vector_bool mask)
 ```
 
-其中，`<dtype>`可取`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`和`float`。
+其中，`<dtype>`可取`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ## 参数说明
 

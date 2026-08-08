@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/reg_vector.h"`。
-
 根据mask对目的操作数dst、源操作数src0和src1执行逐元素融合乘加运算：将dst中的原有元素与src0中的对应元素相乘，再与src1中的对应元素相加，并将结果写回dst。计算公式如下：
 
 $$
@@ -49,8 +47,6 @@ __simd_callee__ inline void asc_madd(vector_float& dst,
                                      vector_float src1,
                                      vector_bool mask)
 ```
-
-操作数支持的数据类型为`half`和`float`。
 
 ## 参数说明
 
@@ -79,7 +75,7 @@ __simd_callee__ inline void asc_madd(vector_float& dst,
 - 本接口不修改全局寄存器的值。
 - 使用mask前，需要通过掩码设置或搬入接口完成初始化；未初始化的掩码寄存器内容不确定。
 - mask未筛选的元素在dst中置零。
-- 输入包含NaN或Inf时，结果遵循浮点融合乘加规则。例如，`NaN × 有限数 + 有限数`和`Inf × 0 + 有限数`的结果均为NaN。
+- 输入包含nan或inf时，结果遵循浮点融合乘加规则。例如，`nan × 有限数 + 有限数`和`inf × 0 + 有限数`的结果均为nan。
 
 ## 调用示例
 

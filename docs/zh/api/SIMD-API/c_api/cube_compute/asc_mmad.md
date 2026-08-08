@@ -67,6 +67,8 @@ $$
 <!-- npu="950" id12 -->
 ### 模板原型（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
+以下使用`<c_dtype>`、`<a_dtype>`、`<b_dtype>`作为数据类型占位符表示各重载的函数原型：
+
 - 常规计算
 
   ```c
@@ -153,7 +155,7 @@ a_dtype、b_dtype、c_dtype的取值组合见下表：
 <!-- npu="950" id14 -->
 针对Ascend 950PR/Ascend 950DT，参数明见下表：
 
-**表4** 参数说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_param_table"></a>
+**表5** 参数说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_param_table"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -170,7 +172,7 @@ a_dtype、b_dtype、c_dtype的取值组合见下表：
 <!-- end id14 -->
 
 <!-- npu="A3,910b" id15 -->
-**表5** 参数说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_param_table"></a>
+**表6** 参数说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_param_table"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -204,7 +206,7 @@ PIPE_M
 
 - 本接口的矩阵乘加计算仅在AIC上生效，在AIV上调用时不执行矩阵乘加计算。
 - L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB，BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
-- 各矩阵的起始地址需满足[表4](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
+- 各矩阵的起始地址需满足[表5](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 - `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP（空操作）。
 - 当M为1且`disable_gemv`为false时，默认开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
 - 矩阵存储空间需按照分形大小补齐：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数。K0的取值为`32Byte / sizeof(dtype)`，dtype为矩阵的数据类型。`left_height`、`n_dim`和`right_width`仍传入矩阵的有效M、K、N值；补齐部分为无效数据，不参与结果矩阵有效区域的计算。
