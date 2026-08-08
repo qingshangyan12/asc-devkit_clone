@@ -26,44 +26,32 @@ using asc::te::cast_layout;
 using asc::te::cast_round_mode;
 using asc::te::cast_sat_mode;
 
-struct VcvtCall {
+struct CastCall {
     vector_bool mask = 0;
-    Literal round = MODE_ZEROING;
-    Literal sat = MODE_ZEROING;
-    Literal part = MODE_ZEROING;
-    Literal mode = MODE_ZEROING;
 };
 
-VcvtCall g_vcvt_call;
+CastCall g_cast_call;
 
-void HalfToFloatVcvtStub(
-    vector_float&, vector_half, vector_bool mask, Literal part, Literal mode)
+void HalfToFloatCastStub(vector_float&, vector_half, vector_bool mask)
 {
-    g_vcvt_call.mask = mask;
-    g_vcvt_call.part = part;
-    g_vcvt_call.mode = mode;
+    g_cast_call.mask = mask;
 }
 
-void FloatToHalfVcvtStub(vector_half&, vector_float, vector_bool mask, Literal round,
-    Literal sat, Literal part, Literal mode)
+void FloatToHalfCastStub(vector_half&, vector_float, vector_bool mask)
 {
-    g_vcvt_call.mask = mask;
-    g_vcvt_call.round = round;
-    g_vcvt_call.sat = sat;
-    g_vcvt_call.part = part;
-    g_vcvt_call.mode = mode;
+    g_cast_call.mask = mask;
 }
 
 void Int32ToUint8Stub(vector_uint8_t&, vector_int32_t, vector_bool mask)
 {
-    g_vcvt_call.mask = mask;
+    g_cast_call.mask = mask;
 }
 
 class TestTensorApiRegCast : public testing::Test {
 protected:
     void SetUp() override
     {
-        g_vcvt_call = {};
+        g_cast_call = {};
     }
 };
 
@@ -83,9 +71,9 @@ static_assert(std::is_same_v<decltype(asc::te::cast<float>(std::declval<HalfReg>
 TEST_F(TestTensorApiRegCast, DefaultPolicyDispatchesHalfToFloatAndPreservesMask)
 {
     constexpr vector_bool mask = 17;
-    MOCKER_CPP(vcvt, void(vector_float&, vector_half, vector_bool, Literal, Literal))
+    MOCKER_CPP(asc_half2float, void(vector_float&, vector_half, vector_bool))
         .times(1)
-        .will(invoke(HalfToFloatVcvtStub));
+        .will(invoke(HalfToFloatCastStub));
 
     asc::te::reg_tensor<half> src {};
     src.mask = mask;
@@ -93,18 +81,15 @@ TEST_F(TestTensorApiRegCast, DefaultPolicyDispatchesHalfToFloatAndPreservesMask)
 
     GlobalMockObject::verify();
     EXPECT_EQ(dst.mask, mask);
-    EXPECT_EQ(g_vcvt_call.mask, mask);
-    EXPECT_EQ(g_vcvt_call.part, PART_EVEN);
-    EXPECT_EQ(g_vcvt_call.mode, MODE_ZEROING);
+    EXPECT_EQ(g_cast_call.mask, mask);
 }
 
 TEST_F(TestTensorApiRegCast, ExplicitPolicyDispatchesLayoutRoundAndSaturation)
 {
     constexpr vector_bool mask = 23;
-    MOCKER_CPP(vcvt,
-        void(vector_half&, vector_float, vector_bool, Literal, Literal, Literal, Literal))
+    MOCKER_CPP(asc_float2half_ru_sat_v2, void(vector_half&, vector_float, vector_bool))
         .times(1)
-        .will(invoke(FloatToHalfVcvtStub));
+        .will(invoke(FloatToHalfCastStub));
 
     asc::te::reg_tensor<float> src {};
     src.mask = mask;
@@ -113,11 +98,7 @@ TEST_F(TestTensorApiRegCast, ExplicitPolicyDispatchesLayoutRoundAndSaturation)
 
     GlobalMockObject::verify();
     EXPECT_EQ(dst.mask, mask);
-    EXPECT_EQ(g_vcvt_call.mask, mask);
-    EXPECT_EQ(g_vcvt_call.round, ROUND_C);
-    EXPECT_EQ(g_vcvt_call.sat, RS_ENABLE);
-    EXPECT_EQ(g_vcvt_call.part, PART_ODD);
-    EXPECT_EQ(g_vcvt_call.mode, MODE_ZEROING);
+    EXPECT_EQ(g_cast_call.mask, mask);
 }
 
 TEST_F(TestTensorApiRegCast, FourWayNarrowingDispatchesLayoutTwoSaturatedIntrinsic)
@@ -135,7 +116,7 @@ TEST_F(TestTensorApiRegCast, FourWayNarrowingDispatchesLayoutTwoSaturatedIntrins
 
     GlobalMockObject::verify();
     EXPECT_EQ(dst.mask, mask);
-    EXPECT_EQ(g_vcvt_call.mask, mask);
+    EXPECT_EQ(g_cast_call.mask, mask);
 }
 
 } // namespace
