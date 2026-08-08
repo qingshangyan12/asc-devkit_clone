@@ -58,7 +58,7 @@ __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__ int16_t*& dst
 |---|---|---|
 | dst_align32b | 输入/输出 | 目的操作数（矢量）的起始地址，按指针引用传入（`__ubuf__ <dtype>*&`）。dtype须与src一致。 |
 | src | 输入 | 源操作数（矢量数据寄存器），dtype须与dst_align32b一致。接口仅搬出src中第一个元素写入目的地址，其余元素忽略，不受mask影响。 |
-| offset | 输入 | 地址偏移量，单位为元素个数。接口执行后将 dst_align32b 指针的底层 UB 地址向后偏移 `offset × sizeof(dtype)` 字节。通常取非负值用于向前推进；取 0 时 dst_align32b 指针不变，可重复向同一地址写入；取负值时 dst_align32b 指针向后回退，需确保回退后地址dtype对齐且不低于 UB 起始地址。实际有效范围受 UB 可用容量约束（见约束说明章节），超出 UB 区间会报错。 |
+| offset | 输入 | 地址偏移量，单位为元素个数。接口执行后将dst_align32b指针的底层UB地址向后偏移`offset × sizeof(dtype)`字节。通常取非负值用于向前推进；取0时dst_align32b指针不变，可重复向同一地址写入；取负值时dst_align32b指针向后回退，需确保回退后地址dtype对齐且不低于UB起始地址。实际有效范围受UB可用容量约束（见约束说明章节），超出UB区间会报错。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -83,7 +83,7 @@ PIPE_V
 
 ### 单元素搬出与Post Update约束
 
-- offset单位为元素个数。例如dtype为`int16_t`时offset=2表示dst_align32b指针底层UB地址向后偏移2 × 2 = 4字节；dtype为`float`时offset=1表示偏移4字节。
+- offset单位为元素个数。例如dtype为`int16_t`时offset=2表示dst_align32b指针底层UB地址向后偏移4字节；dtype为`float`时offset=1表示偏移4字节。
 - offset取0时dst_align32b指针不变，dst仍按当前dst_align32b起始位置写入src第一个元素，可重复向同一地址写入同一值。
 - offset取负值时dst_align32b指针向后回退，需确保回退后的地址仍按照dtype对齐且不低于UB起始地址。
 - Post Update后的dst_align32b新地址仍需满足dtype对齐，否则下一次调用本接口会报错。

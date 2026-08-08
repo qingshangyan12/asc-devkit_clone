@@ -95,7 +95,7 @@ PIPE_V
 ### 矢量数据寄存器压缩搬出约束
 
 - dst_align32b起始地址需32字节对齐。
-- offset单位为元素个数。例如dtype为`int16_t`时offset=2表示dst_align32b指针底层UB地址向后偏移2 × 2 = 4字节；dtype为`float`时offset=1表示偏移4字节；dtype为`int64_t`时offset=1表示偏移8字节。
+- offset单位为元素个数。例如dtype为`int16_t`时offset=2表示dst_align32b指针底层UB地址向后偏移4字节；dtype为`float`时offset=1表示偏移4字节；dtype为`int64_t`时offset=1表示偏移8字节。
 - offset取0时dst_align32b指针不变，dst仍按当前dst_align32b起始位置写入本次压缩结果，可重复向同一地址写入同一组有效元素。
 - offset取负值时dst_align32b指针向后回退，需确保回退后的地址仍32字节对齐且不低于UB起始地址。
 - Post Update后的dst_align32b新地址仍需满足32字节对齐，否则下一次调用本接口会报错；通常取offset使偏移量为32字节的整数倍以保证对齐（如dtype为`int16_t`时取offset为16的整数倍，dtype为`float`时取offset为8的整数倍，dtype为`int64_t`时取offset为4的整数倍）。

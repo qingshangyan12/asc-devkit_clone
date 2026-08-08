@@ -149,7 +149,7 @@ PIPE_V
 ### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__` 标记的函数）内调用，src1为矢量数据寄存器或掩码寄存器，dst为UB地址，UB地址空间外的指针不可作为dst传入。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src1为矢量数据寄存器或掩码寄存器，dst为UB地址，UB地址空间外的指针不可作为dst传入。
 - dst起始地址可不32字节对齐；本接口按非对齐方式将矢量数据寄存器或掩码寄存器内容写入UB，不要求对齐，不会报错。
 - 使用uint32_t作为存储偏移量时，本接口应与[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)接口配合使用。asc_storeunalign_post_postupdate接口用于处理该场景下非对齐搬出的尾块。
 - 使用addr_reg作为存储偏移量时，本接口应与[asc_storeunalign_post](asc_storeunalign_post.md)接口配合使用。asc_storeunalign_post接口用于处理该场景下非对齐搬出的尾块。
@@ -158,15 +158,15 @@ PIPE_V
 
 ### 使用uint32_t作为存储偏移量搬出约束
 
-- count不可大于矢量数据寄存器容纳的最大元素个数VL / sizeof(dtype)；超出寄存器范围的元素无有效数据，写入dst的内容不确定，建议取 [0, VL ÷ sizeof(dtype)] 范围内有效值。
-- count × sizeof(dtype) 字节为实际搬出数据量，Post Update后dst指针底层UB地址向后偏移 `count × sizeof(dtype)` 字节；dst起始地址与累计偏移量之和不可超过UB实际可用容量，否则会报错。
+- count不可大于矢量数据寄存器容纳的最大元素个数VL/sizeof(dtype)；超出寄存器范围的元素无有效数据，写入dst的内容不确定，建议取[0, VL/sizeof(dtype)]范围内有效值。
+- count×sizeof(dtype)字节为实际搬出数据量，Post Update后dst指针底层UB地址向后偏移`count×sizeof(dtype)`字节；dst起始地址与累计偏移量之和不可超过UB实际可用容量，否则会报错。
 - count取0时dst不写入数据，dst指针不变；count取负值场景不适用（uint32_t无符号）。
 
 ### 使用addr_reg作为存储偏移量搬出约束
 
 - count必须由配套的地址寄存器构造接口预先构造。
 - count取值偏移后需在UB地址范围内，否则会报错。
-- Post Update仅累加 `addr_reg` 寄存器内值，不修改dst指针，调用后`addr_reg`内的偏移量累加一个VL；多次调用时每次按更新后的偏移寻址，若需同步推进dst指针应由调用方手动维护。
+- Post Update仅累加`addr_reg`寄存器内值，不修改dst指针，调用后`addr_reg`内的偏移量累加一个VL；多次调用时每次按更新后的偏移寻址，若需同步推进dst指针应由调用方手动维护。
 
 ## 调用示例
 

@@ -93,14 +93,14 @@ PIPE_V
 ### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__` 标记的函数）内调用，src为矢量数据寄存器，dst_align32b为UB地址，UB地址空间外的指针不可作为dst_align32b传入。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器，dst_align32b为UB地址，UB地址空间外的指针不可作为dst_align32b传入。
 - dst_align32b起始地址需32字节对齐，否则会报错。
 - UB容量上限：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst_align32b偏移与写出区域对应的UB范围不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 带立即数偏移压缩搬出约束
 
-- offset单位为元素个数。例如dtype为 `int16_t` 时offset=2表示实际访问地址向后偏移2 × 2 = 4字节；dtype为 `float` 时offset=1表示偏移4字节。
+- offset单位为元素个数。例如dtype为`int16_t`时offset=2表示实际访问地址向后偏移4字节；dtype为`float`时offset=1表示偏移4字节。
 - offset取值偏移后需落在UB地址范围内，且仍需32字节对齐，否则会报错，需保证偏移后的写出区域不超出UB可用容量范围。
 
 ### 带地址寄存器偏移压缩搬出约束

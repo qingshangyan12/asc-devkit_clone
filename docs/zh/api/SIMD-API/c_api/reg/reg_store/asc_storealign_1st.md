@@ -32,7 +32,7 @@
 
 - **无偏移搬出模式**：偏移固定为0，从矢量数据寄存器首个元素搬出到UB起始地址，由用户自行更新目的地址。
 - **int32_t偏移搬出模式**：通过`int32_t offset`指定相对目的起始地址的元素偏移，用户可选择更新偏移或更新目的地址。
-- **addr_reg偏移搬出模式**：通过地址寄存器`addr_reg offset`指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与`asc_create_addr_reg_b8`、`asc_create_addr_reg_b16`、`asc_create_addr_reg_b32`配合使用。
+- **addr_reg偏移搬出模式**：通过地址寄存器`addr_reg offset`指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_create_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
 
 三种模式参数列表完全不同，用户必须按使用场景选择对应重载系列，不可混用。
 
@@ -132,7 +132,7 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`in
 |---|---|---|
 | dst_align32b | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`。起始地址需dtype对齐。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。仅首个元素参与搬出，其余元素被忽略。 |
-| offset | 输入 | 相对dst_align32b起始地址的偏移量，单位为元素。实际访问地址为`dst_align32b + offset`，起始地址需dtype对齐，且须落在UB地址范围内。 |
+| offset | 输入 | 相对dst_align32b起始地址的偏移量，单位为元素。起始地址需dtype对齐，偏移后须落在UB地址范围内。 |
 
 ### addr_reg偏移搬出模式
 
