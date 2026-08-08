@@ -18,6 +18,7 @@ std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, PrepareParamForReduceScatter},
     {HcclCMDType::HCCL_CMD_ALLTOALL, PrepareParamForAlltoAll},
     {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
+    {HcclCMDType::HCCL_CMD_HALF_ALLTOALLV, PrepareParamForAlltoAllV},
 };
 
 CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine)
@@ -120,7 +121,8 @@ namespace {
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
     return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_HALF_ALLTOALLV);
 }
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
@@ -505,7 +507,6 @@ HcclResult PrepareParamForAlltoAllV(
 
     u64 varMemSize = ALL_TO_ALL_V_VECTOR_NUM * userRankSize * sizeof(u64);
     param.varMemSize = varMemSize;
-    param.opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
     param.all2AllVDataDes.sendType = static_cast<HcclDataType>(ccTiling->srcDataType);
     param.all2AllVDataDes.recvType = static_cast<HcclDataType>(ccTiling->dstDataType);
     param.all2AllVDataDes.sendCounts = nullptr;
