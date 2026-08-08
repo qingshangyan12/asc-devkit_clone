@@ -12,7 +12,6 @@
 
 #include <cerrno>
 #include <chrono>
-#include <cstdio>
 #include <dirent.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -297,23 +296,22 @@ bool FileUtils::ListDirectory(
 
 bool FileUtils::CreateTempDirectory(std::string& path) noexcept
 {
-    const auto timestamp =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
-            .count();
-    char candidate[PATH_MAX] = {0};
-    for (uint64_t suffix = 0U; suffix < 1000U; ++suffix) {
-        const int length = std::snprintf(
-            candidate, sizeof(candidate), "/tmp/%lld",
-            static_cast<long long>(timestamp + static_cast<int64_t>(suffix)));
-        if (length <= 0 || static_cast<size_t>(length) >= sizeof(candidate) || !AssignString(candidate, path)) {
-            break;
+    try {
+        const auto timestamp =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
+                .count();
+        for (uint64_t suffix = 0U; suffix < 1000U; ++suffix) {
+            path = "/tmp/" + std::to_string(timestamp + static_cast<int64_t>(suffix));
+            if (mkdir(path.c_str(), 0700) == 0) {
+                return true;
+            }
+            if (errno != EEXIST) {
+                break;
+            }
         }
-        if (mkdir(path.c_str(), 0700) == 0) {
-            return true;
-        }
-        if (errno != EEXIST) {
-            break;
-        }
+    } catch (...) {
+        path.clear();
+        return false;
     }
     path.clear();
     return false;
