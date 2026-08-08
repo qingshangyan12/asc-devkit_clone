@@ -17,13 +17,12 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
-    (void)opParam;
     (void)configAlgMap;
     HCCL_DEBUG("[AllReduceAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
 
     if (topoInfo->topoLevelNums != 1) {
         HCCL_WARNING(
-            "[AllReduceAutoSelector] InsAllReduceMesh1DTwoShot only supports a single network level, actual[%u].",
+            "[AllReduceAutoSelector] local AllReduce only supports a single network level, actual[%u].",
             topoInfo->topoLevelNums);
         return SelectorStatus::NOT_MATCH;
     }
@@ -34,8 +33,20 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
         topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix &&
         IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
         selectAlgName = "InsAllReduceMesh1DTwoShot";
+    } else if (
+        topoInfo->level0Topo == Level0Shape::CLOS || topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
+        bool isDataTypeOrReduceTypeSpecial =
+            opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
+            opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
+            opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_FP64 ||
+            opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
+        if (isDataTypeOrReduceTypeSpecial) {
+            HCCL_WARNING("[AllReduceAutoSelector] current NHR does not support 64-bit data or PROD reduction.");
+            return SelectorStatus::NOT_MATCH;
+        }
+        selectAlgName = "InsAllReduceNHR";
     } else {
-        HCCL_WARNING("[AllReduceAutoSelector] topology[%u] does not match Mesh1D TwoShot.", topoInfo->level0Topo);
+        HCCL_WARNING("[AllReduceAutoSelector] topology[%u] does not match local AllReduce.", topoInfo->level0Topo);
         return SelectorStatus::NOT_MATCH;
     }
 

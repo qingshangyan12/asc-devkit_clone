@@ -10,6 +10,7 @@
 
 #include "ins_v2_all_reduce_sole_executor.h"
 #include "ins_temp_all_reduce_mesh_1D_two_shot.h"
+#include "ins_temp_all_reduce_nhr.h"
 
 namespace mc2_ops_hccl {
 
@@ -247,5 +248,8 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceMesh1DTwoShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceMesh1DTwoShot);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceNHR, InsV2AllReduceSoleExecutor, TopoMatch1D,
+    InsTempAllReduceNHR);
 
 } // namespace mc2_ops_hccl
