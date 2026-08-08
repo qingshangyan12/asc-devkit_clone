@@ -11,6 +11,8 @@
 const { readdirSync, writeFileSync, existsSync, mkdirSync, readFileSync } = require('node:fs')
 const { join, resolve } = require('node:path')
 
+let extractHeaders
+
 const docsDir = resolve(__dirname, '..', 'docs')
 const manifestFile = resolve(__dirname, '..', '.stubs-manifest.json')
 const figuresDir = join(docsDir, 'api', 'figures')
@@ -24,28 +26,6 @@ function extractBodyContent(html) {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
   if (bodyMatch) return bodyMatch[1]
   return html
-}
-
-function slugify(text) {
-  return text.trim().replace(/\s+/g, '-')
-}
-
-function extractHeaders(html) {
-  const headingRegex = /<h([23456])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/gi
-  const headers = []
-  const seen = new Map()
-  let match
-  while ((match = headingRegex.exec(html)) !== null) {
-    const level = parseInt(match[1])
-    let text = match[2].replace(/<[^>]+>/g, '').trim()
-    if (!text) continue
-    const baseSlug = slugify(text)
-    const count = seen.get(baseSlug) || 0
-    const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`
-    seen.set(baseSlug, count + 1)
-    headers.push({ level, title: text, slug, link: `#${slug}` })
-  }
-  return headers
 }
 
 function genHeaderCache(htmlPath, mdPath) {
@@ -99,16 +79,27 @@ function genStubs(subdir) {
 }
 
 const allStubs = []
-genStubs('api')
-genStubs('guide')
 
-writeFileSync(manifestFile, JSON.stringify(allStubs, null, 2), 'utf-8')
-console.log(`Total: ${allStubs.length} .md stubs generated`)
+async function main() {
+  const headingUtils = await import('./heading-utils.mjs')
+  extractHeaders = headingUtils.extractHeaders
 
-if (!existsSync(figuresDir)) {
-  mkdirSync(figuresDir, { recursive: true })
+  genStubs('api')
+  genStubs('guide')
+
+  writeFileSync(manifestFile, JSON.stringify(allStubs, null, 2), 'utf-8')
+  console.log(`Total: ${allStubs.length} .md stubs generated`)
+
+  if (!existsSync(figuresDir)) {
+    mkdirSync(figuresDir, { recursive: true })
+  }
+  if (!existsSync(join(figuresDir, 'placeholder.png'))) {
+    writeFileSync(join(figuresDir, 'placeholder.png'), PLACEHOLDER_PNG)
+    console.log('Created figures/placeholder.png')
+  }
 }
-if (!existsSync(join(figuresDir, 'placeholder.png'))) {
-  writeFileSync(join(figuresDir, 'placeholder.png'), PLACEHOLDER_PNG)
-  console.log('Created figures/placeholder.png')
-}
+
+main().catch(error => {
+  console.error(error)
+  process.exitCode = 1
+})
