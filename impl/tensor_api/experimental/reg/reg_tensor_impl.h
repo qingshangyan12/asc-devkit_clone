@@ -29,16 +29,6 @@ struct reg_tensor;
 template <>
 struct reg_tensor<bool>;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-template <>
-struct reg_tensor<bool> {
-    using type = bool;
-    using reg_type = typename type_get<bool>::T;
-
-    reg_type reg;
-};
-
 template <typename DataType>
 struct reg_tensor {
     using type = DataType;
@@ -53,8 +43,13 @@ struct reg_tensor {
     vector_bool mask;
 };
 
-#endif
+template <>
+struct reg_tensor<bool> {
+    using type = bool;
+    using reg_type = typename type_get<bool>::T;
 
+    reg_type reg;
+};
 } // namespace te
 } // namespace asc
 

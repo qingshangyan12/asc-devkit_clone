@@ -25,7 +25,6 @@
 #include "impl/tensor_api/arch/vector/axpy/axpy_vf.h"
 #include "impl/tensor_api/arch/vector/binary/binary_vf.h"
 #include "impl/tensor_api/arch/vector/binary_scalar/binary_scalar_vf.h"
-#include "impl/tensor_api/arch/vector/cast/cast_vf.h"
 #include "impl/tensor_api/arch/vector/dual/dual_vf.h"
 #include "impl/tensor_api/arch/vector/unary/unary_vf.h"
 #include "impl/tensor_api/utils/map_impl.h"
