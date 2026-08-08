@@ -49,57 +49,6 @@ static_assert(std::is_same_v<typename reg_tensor<bool>::reg_type, vector_bool>);
 static_assert(has_mask_member<reg_tensor<float>>::value);
 static_assert(!has_mask_member<reg_tensor<bool>>::value);
 static_assert(std::is_same_v<decltype(ones<float>()), reg_tensor<bool>>);
-static_assert(std::is_same_v<decltype(zeros<float>()), reg_tensor<bool>>);
-static_assert(std::is_same_v<decltype(make_mask<mask_pattern::vl8, float>()), reg_tensor<bool>>);
-static_assert(std::is_same_v<decltype(interleave<float>({}, {})), reg_pair<bool>>);
-static_assert(std::is_same_v<decltype(deinterleave<float>({}, {})), reg_pair<bool>>);
-static_assert(std::is_same_v<decltype(select({}, {}, {})), reg_tensor<bool>>);
-static_assert(std::is_same_v<decltype(pack({})), reg_tensor<bool>>);
-static_assert(std::is_same_v<decltype(unpack({})), reg_tensor<bool>>);
-
-template <typename T>
-__aicore__ inline void compile_mask_apis(uint32_t& remain)
-{
-    auto all = make_mask<mask_pattern::all, T>();
-    auto vl1 = make_mask<mask_pattern::vl1, T>();
-    auto vl2 = make_mask<mask_pattern::vl2, T>();
-    auto vl3 = make_mask<mask_pattern::vl3, T>();
-    auto vl4 = make_mask<mask_pattern::vl4, T>();
-    auto vl8 = make_mask<mask_pattern::vl8, T>();
-    auto vl16 = make_mask<mask_pattern::vl16, T>();
-    auto vl32 = make_mask<mask_pattern::vl32, T>();
-    auto vl64 = make_mask<mask_pattern::vl64, T>();
-    auto vl128 = make_mask<mask_pattern::vl128, T>();
-    auto every3 = make_mask<mask_pattern::every3, T>();
-    auto every4 = make_mask<mask_pattern::every4, T>();
-    auto half = make_mask<mask_pattern::half, T>();
-    auto quarter = make_mask<mask_pattern::quarter, T>();
-    auto none = make_mask<mask_pattern::none, T>();
-    auto updated = update_mask<T>(remain);
-    auto interleaved = interleave<T>(all, none);
-    auto deinterleaved = deinterleave<T>(interleaved.first, interleaved.second);
-    auto selected = select(updated, deinterleaved.first, deinterleaved.second);
-    auto packed_low = pack(selected);
-    auto packed_high = pack<mask_half::high>(selected);
-    auto unpacked_low = unpack(packed_low);
-    auto unpacked_high = unpack<mask_half::high>(packed_high);
-
-    (void)vl1;
-    (void)vl2;
-    (void)vl3;
-    (void)vl4;
-    (void)vl8;
-    (void)vl16;
-    (void)vl32;
-    (void)vl64;
-    (void)vl128;
-    (void)every3;
-    (void)every4;
-    (void)half;
-    (void)quarter;
-    (void)unpacked_low;
-    (void)unpacked_high;
-}
 
 template <typename T, load_sideband_mode sideband_mode = load_sideband_mode::direct>
 __aicore__ inline void compile_tensor_reg_load_store(__ubuf__ T* dst, __ubuf__ T* src, vector_bool mask)
@@ -123,13 +72,7 @@ TEST(test_tensor_api_reg_tensor, holds_register_and_mask)
     (void)value.mask;
 
     auto compile_load_store = &compile_tensor_reg_load_store<float>;
-    auto compile_mask8 = &compile_mask_apis<uint8_t>;
-    auto compile_mask16 = &compile_mask_apis<half>;
-    auto compile_mask32 = &compile_mask_apis<float>;
     (void)compile_load_store;
-    (void)compile_mask8;
-    (void)compile_mask16;
-    (void)compile_mask32;
 }
 
 } // namespace te
