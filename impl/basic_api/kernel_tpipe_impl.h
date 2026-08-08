@@ -1126,12 +1126,6 @@ __aicore__ inline void TPipe::ResetPool()
         evt->eventOccupy = 0;
     }
 #else
-    auto bufEntry = g_tpipeImpl.buf_;
-    for (int32_t i = 0; i < QBUF_MAX_LEN; i++, bufEntry++) {
-        bufEntry->freeBufEvtID = INVALID_TEVENTID;
-        bufEntry->enQueEvtID = INVALID_TEVENTID;
-        bufEntry->state = TBufState::FREE;
-    }
     auto buf = Internal::g_tPipeAddrBufPool;
     for (int32_t i = 0; i < static_cast<int32_t>(Hardware::MAX); i++, buf++) {
         *buf = 0;
