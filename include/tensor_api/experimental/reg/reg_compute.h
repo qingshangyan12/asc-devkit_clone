@@ -23,7 +23,8 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_COMPUTE_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_COMPUTE_H
 
-#include "impl/tensor_api/arch/vector/experimental/reg_compute_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/reg_compute_arithmetic_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/reg_compute_logic_impl.h"
 
 namespace asc {
 namespace te {
