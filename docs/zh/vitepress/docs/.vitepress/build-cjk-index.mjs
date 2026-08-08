@@ -10,6 +10,8 @@
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs'
 import { resolve, join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { decodeHtmlEntities } from '../../scripts/heading-utils.mjs'
 
 const MAX_TEXT_LENGTH = 2000
 const CJK_REGEX = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/
@@ -36,7 +38,7 @@ function stripTags(html) {
   text = text.replace(/<footer\b[\s\S]*?<\/footer>/gi, '')
   text = text.replace(/<header\b[\s\S]*?<\/header>/gi, '')
   text = text.replace(/<[^>]+>/g, ' ')
-  text = text.replace(/&\w+;/g, ' ')
+  text = decodeHtmlEntities(text)
   text = text.replace(/\s+/g, ' ').trim()
   return text
 }
@@ -122,9 +124,14 @@ function buildIndex(distDir) {
   console.log(`[cjk-index] Output: ${outputPath} (${sizeKB} KB)`)
 }
 
-const distDir = process.argv[2]
-if (!distDir) {
-  console.error('Usage: node build-cjk-index.mjs <distDir>')
-  process.exit(1)
+const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+if (isMain) {
+  const distDir = process.argv[2]
+  if (!distDir) {
+    console.error('Usage: node build-cjk-index.mjs <distDir>')
+    process.exit(1)
+  }
+  buildIndex(distDir)
 }
-buildIndex(distDir)
+
+export { buildIndex, extractHeadings, stripTags }

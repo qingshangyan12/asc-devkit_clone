@@ -221,8 +221,8 @@ async function handleDownload() {
       class="api-download-btn"
       :class="{ loading }"
       :disabled="loading"
-      :title="loading ? progress : '下载全部 API Markdown'"
-      aria-label="下载全部 API Markdown"
+      :title="loading ? progress : '下载全部API Markdown'"
+      aria-label="下载全部API Markdown"
       @click="handleDownload"
     >
       <svg
