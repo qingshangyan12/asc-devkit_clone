@@ -79,6 +79,9 @@ public:
 
     bool ValidateMarkerSyntax(const std::string& value, const std::string& baseDir) const
     {
+        if (!CheckAndLog(value.find('\0') == std::string::npos, "command value contains an embedded NUL")) {
+            return false;
+        }
         size_t begin = 0U;
         while ((begin = value.find("${", begin)) != std::string::npos) {
             const size_t end = value.find('}', begin + 2U);
@@ -215,7 +218,11 @@ private:
             if (!CheckAndLog(option.is_string(), "common compile option must be a string")) {
                 return false;
             }
-            commonCompileOptions_.push_back(option.get<std::string>());
+            const std::string value = option.get<std::string>();
+            if (!references_.ValidateMarkerSyntax(value, baseDir_)) {
+                return false;
+            }
+            commonCompileOptions_.push_back(value);
         }
         if (commonCompileOptions_.empty()) {
             ASCENDLOGW("Manifest common_compile is empty");
@@ -452,7 +459,9 @@ private:
             }
 
             command.options.push_back(value);
-            if (!references_.ValidateMarkerSyntax(value, baseDir_)) {
+        }
+        for (const std::string& option : command.options) {
+            if (!references_.ValidateMarkerSyntax(option, baseDir_)) {
                 return false;
             }
         }

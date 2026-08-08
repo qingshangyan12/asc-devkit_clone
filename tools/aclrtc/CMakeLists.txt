@@ -10,6 +10,10 @@
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/ SRC)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/specialization SPECIALIZATION_SRC)
 
+set_source_files_properties(${SPECIALIZATION_SRC} PROPERTIES
+    COMPILE_OPTIONS "-fvisibility=hidden;-fvisibility-inlines-hidden"
+)
+
 add_cann_third_party(json)
 
 add_library(acl_rtc SHARED

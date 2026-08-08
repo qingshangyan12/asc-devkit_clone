@@ -16,6 +16,7 @@
 #include <dlfcn.h>
 #include <exception>
 #include <fstream>
+#include <memory>
 #include <mutex>
 #include <new>
 #include <set>
@@ -30,6 +31,28 @@
 namespace ascendc {
 namespace resource {
 namespace {
+
+void CloseLibrary(void* library) noexcept
+{
+    if (library != nullptr && dlclose(library) != 0) {
+        ASCENDLOGW("Failed to close compile resource shared object");
+    }
+}
+
+struct LibraryDeleter {
+    void operator()(void* library) const noexcept { CloseLibrary(library); }
+};
+
+using LibraryHandle = std::unique_ptr<void, LibraryDeleter>;
+
+bool TryAddWithinLimit(uint64_t value, uint64_t limit, uint64_t& total) noexcept
+{
+    if (total > limit || value > limit - total) {
+        return false;
+    }
+    total += value;
+    return true;
+}
 
 ResourceStatus CopyString(const AcString& value, const char* field, uint64_t maxSize, std::string& output)
 {
@@ -231,9 +254,12 @@ constexpr uint64_t kMaxPackageIdSize = 4096U;
 constexpr uint64_t kMaxManifestSize = 8U * 1024U * 1024U;
 constexpr uint64_t kMaxPathSize = 4096U;
 constexpr uint64_t kMaxResourceFileSize = 256U * 1024U * 1024U;
+constexpr uint64_t kMaxManifestResourceSize = 512U * 1024U * 1024U;
+constexpr uint64_t kMaxRegistryResourceSize = 1024U * 1024U * 1024U;
 constexpr uint64_t kMaxManifestCount = 4096U;
 constexpr uint64_t kMaxExtensionCount = 1024U;
 constexpr uint64_t kMaxFileCount = 65536U;
+constexpr uint64_t kMaxRegistryFileCount = 131072U;
 
 } // namespace
 
@@ -333,7 +359,7 @@ ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, Reso
 ResourceStatus ResourceRegistry::LoadLibrary(const std::string& libraryPath)
 {
     ASCENDLOGI("Loading compile resource shared object: path=%s", libraryPath.c_str());
-    void* library = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+    LibraryHandle library(dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL));
     if (library == nullptr) {
         const char* error = dlerror();
         ASCENDLOGE(
@@ -341,10 +367,9 @@ ResourceStatus ResourceRegistry::LoadLibrary(const std::string& libraryPath)
             error == nullptr ? "unknown" : error);
         return ResourceStatus::LoadError;
     }
-    libraries_.push_back(library);
     dlerror();
     AscendcGetCompileResourceBundleFn getter =
-        reinterpret_cast<AscendcGetCompileResourceBundleFn>(dlsym(library, "AscendcGetCompileResourceBundle"));
+        reinterpret_cast<AscendcGetCompileResourceBundleFn>(dlsym(library.get(), "AscendcGetCompileResourceBundle"));
     const char* symbolError = dlerror();
     if (symbolError != nullptr || getter == nullptr) {
         ASCENDLOGE("Compile resource shared object has no bundle entry point: path=%s", libraryPath.c_str());
@@ -398,6 +423,8 @@ ResourceStatus ResourceRegistry::LoadLibrary(const std::string& libraryPath)
             return status;
         }
     }
+    libraries_.push_back(library.get());
+    (void)library.release();
     ASCENDLOGI("Loaded compile resource shared object: path=%s, package_id=%s", libraryPath.c_str(), packageId.c_str());
     return ResourceStatus::Success;
 }
@@ -416,14 +443,20 @@ ResourceStatus ResourceRegistry::LoadManifest(
         ASCENDLOGE("Invalid compile resource manifest: origin=%s", manifestOrigin.c_str());
         return ResourceStatus::InvalidResource;
     }
-    if (unit.fileCount > kMaxFileCount || ((unit.fileCount == 0U) != (unit.files == nullptr))) {
+    if (unit.fileCount > kMaxFileCount || ((unit.fileCount == 0U) != (unit.files == nullptr)) ||
+        resourceFileCount_ > kMaxRegistryFileCount || unit.fileCount > kMaxRegistryFileCount - resourceFileCount_) {
         ASCENDLOGE(
-            "Manifest has an invalid resource file table: resource_id=%s, files=%" PRIu64, manifest.resourceId.c_str(),
-            unit.fileCount);
+            "Manifest has an invalid resource file table: resource_id=%s, files=%" PRIu64 ", registry_files=%" PRIu64,
+            manifest.resourceId.c_str(), unit.fileCount, resourceFileCount_);
         return ResourceStatus::InvalidResource;
     }
     if (recordPacks_.count(manifest.resourceId) != 0U) {
         ASCENDLOGE("Duplicate resource_id in compile resource bundles: resource_id=%s", manifest.resourceId.c_str());
+        return ResourceStatus::InvalidResource;
+    }
+    if (!ValidateRelativeResourcePath(manifest.resourceId) ||
+        FileUtils::FileName(manifest.resourceId) != manifest.resourceId) {
+        ASCENDLOGE("Compile resource manifest has an unsafe resource_id: resource_id=%s", manifest.resourceId.c_str());
         return ResourceStatus::InvalidResource;
     }
     ResourceRecordPack pack;
@@ -431,6 +464,8 @@ ResourceStatus ResourceRegistry::LoadManifest(
     pack.resourceSoPath = libraryPath;
     pack.files.reserve(static_cast<size_t>(unit.fileCount));
     std::set<std::string> bundleFilePaths;
+    uint64_t manifestResourceBytes = 0U;
+    uint64_t registryResourceBytes = resourceBytes_;
     for (uint64_t fileIndex = 0U; fileIndex < unit.fileCount; ++fileIndex) {
         const AcCompileResourceFile& file = unit.files[fileIndex];
         std::string fileName;
@@ -456,6 +491,13 @@ ResourceStatus ResourceRegistry::LoadManifest(
         }
         if (file.size > kMaxResourceFileSize || (file.size != 0U && file.data == nullptr)) {
             ASCENDLOGE("Bundle resource has invalid data: path=%s, size=%" PRIu64, filePath.c_str(), file.size);
+            return ResourceStatus::InvalidResource;
+        }
+        if (!TryAddWithinLimit(file.size, kMaxManifestResourceSize, manifestResourceBytes) ||
+            !TryAddWithinLimit(file.size, kMaxRegistryResourceSize, registryResourceBytes)) {
+            ASCENDLOGE(
+                "Bundle resource exceeds aggregate size limit: resource_id=%s, path=%s, size=%" PRIu64,
+                manifest.resourceId.c_str(), filePath.c_str(), file.size);
             return ResourceStatus::InvalidResource;
         }
         if (!bundleFilePaths.insert(filePath).second) {
@@ -486,7 +528,13 @@ ResourceStatus ResourceRegistry::LoadManifest(
     ASCENDLOGI(
         "Validated compile resource manifest: resource_id=%s, kernels=%zu, files=%zu", manifest.resourceId.c_str(),
         pack.records.size(), pack.files.size());
-    recordPacks_.emplace(manifest.resourceId, std::move(pack));
+    const auto inserted = recordPacks_.emplace(manifest.resourceId, std::move(pack));
+    if (!inserted.second) {
+        ASCENDLOGE("Duplicate resource_id in compile resource bundles: resource_id=%s", manifest.resourceId.c_str());
+        return ResourceStatus::InvalidResource;
+    }
+    resourceBytes_ = registryResourceBytes;
+    resourceFileCount_ += unit.fileCount;
     return ResourceStatus::Success;
 }
 
@@ -496,9 +544,7 @@ ResourceRegistry::~ResourceRegistry()
 {
     recordPacks_.clear();
     for (auto iterator = libraries_.rbegin(); iterator != libraries_.rend(); ++iterator) {
-        if (dlclose(*iterator) != 0) {
-            ASCENDLOGW("Failed to close compile resource shared object");
-        }
+        CloseLibrary(*iterator);
     }
     if (!temporaryRoot_.empty()) {
         ASCENDLOGD("Removing compile resource temporary root: path=%s", temporaryRoot_.c_str());
@@ -509,6 +555,11 @@ ResourceRegistry::~ResourceRegistry()
 ResourceStatus ResourceRegistry::Load(const std::string& directory) noexcept
 {
     try {
+        std::lock_guard<std::mutex> lock(lookupMutex_);
+        if (!libraries_.empty() || !recordPacks_.empty()) {
+            ASCENDLOGE("Compile resource registry cannot be loaded more than once");
+            return ResourceStatus::InvalidResource;
+        }
         ASCENDLOGI(
             "Starting compile resource registry load: explicit_directory=%s",
             directory.empty() ? "<automatic>" : directory.c_str());
@@ -517,14 +568,19 @@ ResourceStatus ResourceRegistry::Load(const std::string& directory) noexcept
         if (status != ResourceStatus::Success) {
             return status;
         }
-        libraries_.reserve(libraryPaths.size());
+        ResourceRegistry staged;
+        staged.libraries_.reserve(libraryPaths.size());
         for (const std::string& libraryPath : libraryPaths) {
-            status = LoadLibrary(libraryPath);
+            status = staged.LoadLibrary(libraryPath);
             if (status != ResourceStatus::Success) {
                 ASCENDLOGE("Compile resource registry load stopped: path=%s", libraryPath.c_str());
                 return status;
             }
         }
+        libraries_.swap(staged.libraries_);
+        recordPacks_.swap(staged.recordPacks_);
+        resourceBytes_ = staged.resourceBytes_;
+        resourceFileCount_ = staged.resourceFileCount_;
         ASCENDLOGI(
             "Compile resource registry loaded successfully: libraries=%zu, manifests=%zu", libraryPaths.size(),
             recordPacks_.size());

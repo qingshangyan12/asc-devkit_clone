@@ -46,6 +46,8 @@ private:
     std::string temporaryRoot_;
     std::vector<void*> libraries_;
     std::unordered_map<std::string, ResourceRecordPack> recordPacks_;
+    uint64_t resourceBytes_ = 0U;
+    uint64_t resourceFileCount_ = 0U;
     std::mutex lookupMutex_;
 };
 
