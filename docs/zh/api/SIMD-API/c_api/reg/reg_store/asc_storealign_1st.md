@@ -26,77 +26,121 @@
 
 ## 功能说明
 
-从矢量数据寄存器搬出第一个元素到UB的接口，忽略mask，向dst_align32b中搬运src第一个元素，支持数据类型为b8、b16、b32。
+将矢量数据寄存器中的首个元素搬出到Unified Buffer（UB），单次搬出量为一个元素。本接口忽略掩码，固定搬出矢量数据寄存器中第一个元素到`dst`起始地址处，搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，源操作数为矢量数据寄存器，目的操作数为UB地址。
+
+本接口提供三种参数列表不同的功能模式，用户按需选择对应重载：
+
+- **无偏移搬出模式**：偏移固定为0，从矢量数据寄存器首个元素搬出到UB起始地址，由用户自行更新目的地址。
+- **int32_t偏移搬出模式**：通过`int32_t offset`指定相对目的起始地址的元素偏移，用户可选择更新偏移或更新目的地址。
+- **addr_reg偏移搬出模式**：通过地址寄存器`addr_reg offset`指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_create_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
+
+三种模式参数列表完全不同，用户必须按使用场景选择对应重载系列，不可混用。
+
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
 ## 函数原型
 
-- 偏移固定传入0，由用户自行更新目的操作数的地址
-  ```cpp
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b, vector_int8_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint8_t* dst_align32b, vector_uint8_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int16_t* dst_align32b, vector_int16_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int32_t* dst_align32b, vector_int32_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ half* dst_align32b, vector_half src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ float* dst_align32b, vector_float src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int4b_t* dst_align32b, vector_int4x2_t src)
-  ```
-- 通过int32_t传入偏移，用户可以选择更新偏移或者更新目的操作数的地址
-  ```cpp
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b, vector_int8_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint8_t* dst_align32b, vector_uint8_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int16_t* dst_align32b, vector_int16_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ half* dst_align32b, vector_half src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ float* dst_align32b, vector_float src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src, int32_t offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int4b_t* dst_align32b, vector_int4x2_t src, int32_t offset)
-  ```
-- 通过addr_reg地址寄存器传入偏移
-  ```cpp
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b, vector_int8_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint8_t* dst_align32b, vector_uint8_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int16_t* dst_align32b, vector_int16_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int32_t* dst_align32b, vector_int32_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ half* dst_align32b, vector_half src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ float* dst_align32b, vector_float src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src, addr_reg offset)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__ int4b_t* dst_align32b, vector_int4x2_t src, addr_reg offset)
-  ```
+### 无偏移搬出模式
+
+#### 模板原型（占位符形式）
+
+```cpp
+__simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
+                                               vector_<dtype> src)
+```
+
+#### 典型示例
+
+```cpp
+// 示例：int8_t类型无偏移搬出。
+__simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
+                                               vector_int8_t src)
+```
+
+#### dtype支持数据类型
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
+
+### int32_t偏移搬出模式
+
+#### 模板原型（占位符形式）
+
+本接口对16种dtype暴露相同结构的原型。模板原型如下：
+
+```cpp
+__simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
+                                               vector_<dtype> src,
+                                               int32_t offset)
+```
+
+#### 典型示例
+
+```cpp
+// 示例：int8_t类型int32_t偏移搬出。
+__simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
+                                               vector_int8_t src,
+                                               int32_t offset)
+```
+
+#### dtype支持数据类型
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
+
+### addr_reg偏移搬出模式
+
+#### 模板原型（占位符形式）
+
+本接口对16种dtype暴露相同结构的原型。模板原型如下：
+
+```cpp
+__simd_callee__ inline void asc_storealign_1st(__ubuf__ <dtype>* dst_align32b,
+                                               vector_<dtype> src,
+                                               addr_reg offset)
+```
+
+#### 典型示例
+
+```cpp
+// 示例：int8_t类型addr_reg偏移搬出。
+__simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
+                                               vector_int8_t src,
+                                               addr_reg offset)
+```
+
+#### dtype支持数据类型
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
 
 ## 参数说明
 
-**表1** 参数说明
+### 无偏移搬出模式
 
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst_align32b | 输出 | 目的操作数（矢量）的起始地址。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。 |
-| offset | 输入 | 偏移量。 |
+**表 1**  参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst_align32b | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`。起始地址需dtype对齐。单次搬出量为一个元素（`sizeof(dtype)`字节），dst偏移+`sizeof(dtype)`不可超过UB可用容量。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。仅首个元素参与搬出，其余元素被忽略。 |
+
+### int32_t偏移搬出模式
+
+**表 2**  参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst_align32b | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`。起始地址需dtype对齐。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。仅首个元素参与搬出，其余元素被忽略。 |
+| offset | 输入 | 相对dst_align32b起始地址的偏移量，单位为元素。起始地址需dtype对齐，偏移后须落在UB地址范围内。 |
+
+### addr_reg偏移搬出模式
+
+**表 3**  参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst_align32b | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`。起始地址需dtype对齐。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。仅首个元素参与搬出，其余元素被忽略。 |
+| offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，由配套的地址寄存器构造接口预先构造。单位为元素。偏移后实际访问地址仍需dtype对齐，且须落在UB地址范围内。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -110,7 +154,16 @@ PIPE_V
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器，目的操作数为UB地址，UB地址空间外的指针不可作为dst_align32b传入。
+- dst_align32b起始地址需dtype对齐。
+- 本接口固定搬出矢量数据寄存器的首个元素，单次搬出数据量为`sizeof(dtype)`字节。
+- 本接口忽略掩码，不要求也不读取`vector_bool`掩码寄存器，掩码状态不影响搬出行为。
+- UB总容量256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst_align32b偏移+`sizeof(dtype)`字节不可超过实际可用容量。
+- offset取值偏移后需要落在UB地址范围内，且仍需dtype对齐。
+- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ## 调用示例
 

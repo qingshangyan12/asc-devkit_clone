@@ -110,7 +110,7 @@ store_unalign或store_unalign_postupdate接口执行时，会将主块搬出至U
 
 - 不指定偏移量
 
-    **表1** 参数说明
+    **表 1**  参数说明
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
@@ -119,7 +119,7 @@ store_unalign或store_unalign_postupdate接口执行时，会将主块搬出至U
 
 - 使用int32_t作为存储偏移量
 
-    **表2** 参数说明
+    **表 2**  参数说明
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
@@ -129,7 +129,7 @@ store_unalign或store_unalign_postupdate接口执行时，会将主块搬出至U
 
 - 使用addr_reg作为存储偏移量
 
-    **表3** 参数说明
+    **表 3**  参数说明
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
@@ -149,9 +149,15 @@ PIPE_V
 
 ## 约束说明
 
-- 该接口中的dst不需要32B对齐，但数据类型为T的dst需要sizeof(T) Byte对齐。
-- 调用本接口之前，需要调用[asc_storeunalign](asc_storeunalign.md)接口，或者[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)接口，且本接口与前序接口的非对齐寄存器要保持一致。
-- 需要保证目的操作数的地址加上offset对应的偏移地址，结果等于数据搬运的结束地址，具体见调用示例。
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为`vector_store_unalign`临时寄存器，目的操作数为UB地址，UB地址空间外的指针不可作为dst传入。
+- dst起始地址可非32字节对齐；本接口按非对齐方式将临时寄存器内容写入UB，不要求对齐，不会报错。
+- 本接口是非对齐搬出序列的收尾阶段，调用本接口之前，需要调用[asc_storeunalign](asc_storeunalign.md)接口，或者[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)接口，且本接口与前序接口的非对齐寄存器要保持一致。
+- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。dst偏移与写出区域对应的UB范围不可超过实际可用容量，否则会报错。
+- offset取值偏移后需落在UB地址范围内，否则会报错。
+- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ## 调用示例
 
@@ -204,7 +210,7 @@ PIPE_V
         // 第二次：ureg[0:2] + src[0:62] 写入dst[-2:62]（即UB[256:512]）；同时src[62:64] 写入ureg[0:2]；同时dst自增为dst[128]（即UB[520]）
         asc_storeunalign_postupdate(dst, ureg, src, count);
     }
-    // dst结束地址为520，但此时dst已经自增到了520，所以offset要配置为0 
+    // dst结束地址为520，但此时dst已经自增到了520，所以offset要配置为0
     addr_reg offset = asc_update_addr_reg_b32(0);
     // ureg[0:2] 写入dst[-2:0]（即UB[512:520]）
     asc_storeunalign_post(dst, ureg, offset);
