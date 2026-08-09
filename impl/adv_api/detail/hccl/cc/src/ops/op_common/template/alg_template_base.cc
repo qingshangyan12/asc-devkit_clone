@@ -8,6 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "alg_template_base.h"
+#include "aicpu/task_cache/mc2_aicpu_primitive_cache.h"
+
+#define HcommLocalCopyOnThread Mc2CachedHcommLocalCopyOnThread
+#define HcommChannelNotifyRecordOnThread Mc2CachedHcommChannelNotifyRecordOnThread
+#define HcommChannelNotifyWaitOnThread Mc2CachedHcommChannelNotifyWaitOnThread
 
 namespace mc2_ops_hccl {
 AlgTemplateBase::AlgTemplateBase()

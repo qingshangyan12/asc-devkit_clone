@@ -15,17 +15,31 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 #include "alg_param.h"
 
 namespace mc2_ops_hccl {
 
+enum class Mc2TaskCacheBackend : uint8_t {
+    BYPASS = 0,
+    ASC_PRIMITIVE_PLAN,
+    HCOMM_RAW_TASK,
+};
+
+struct Mc2TaskCacheMemoryRange {
+    void* addr = nullptr;
+    uint64_t size = 0U;
+};
+
 struct Mc2AicpuTaskCachePlan {
     bool enabled = false;
+    Mc2TaskCacheBackend backend = Mc2TaskCacheBackend::BYPASS;
     std::string tag;
     void* comm = nullptr;
     std::array<void*, 2> addrs{{nullptr, nullptr}};
     std::array<uint64_t, 2> sizes{{0U, 0U}};
+    std::vector<Mc2TaskCacheMemoryRange> fixedRanges;
 };
 
 HcclResult BuildMc2AicpuTaskCachePlan(

@@ -18,6 +18,7 @@
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
 #include "hcomm_primitives.h"
+#include "task_cache/mc2_aicpu_primitive_cache.h"
 #include "task_cache/mc2_aicpu_task_cache.h"
 
 namespace {
@@ -129,7 +130,9 @@ void ClearMc2TaskCacheBestEffort(const mc2_ops_hccl::Mc2AicpuTaskCachePlan& plan
     if (!plan.enabled) {
         return;
     }
-    const HcclResult ret = mc2_ops_hccl::Mc2AicpuTaskCacheClear(plan);
+    const HcclResult ret = plan.backend == mc2_ops_hccl::Mc2TaskCacheBackend::ASC_PRIMITIVE_PLAN ?
+                               mc2_ops_hccl::Mc2PrimitiveTaskCacheClear(plan) :
+                               mc2_ops_hccl::Mc2AicpuTaskCacheClear(plan);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("[MC2_TASK_CACHE][Clear] stage[%s], tag[%s], ret[%d].", stage, plan.tag.c_str(), ret);
     }
@@ -167,6 +170,70 @@ HcclResult RunWithMc2TaskCache(
             return execRet;
         }
         return endRet;
+    }
+
+    if (plan.backend == mc2_ops_hccl::Mc2TaskCacheBackend::ASC_PRIMITIVE_PLAN) {
+        bool isHit = false;
+        HcclResult lookupRet = mc2_ops_hccl::Mc2PrimitiveTaskCacheLookup(plan, isHit);
+        if (lookupRet != HCCL_SUCCESS) {
+            HCCL_WARNING(
+                "[MC2_PRIMITIVE_CACHE][Lookup] failed and fallback to executor, tag[%s], ret[%d].",
+                plan.tag.c_str(), lookupRet);
+            ClearMc2TaskCacheBestEffort(plan, "primitive lookup");
+            HcclResult execRet = func();
+            HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+            return execRet != HCCL_SUCCESS ? execRet : endRet;
+        }
+
+        if (isHit) {
+            const HcclResult replayRet = mc2_ops_hccl::Mc2PrimitiveTaskCacheReplay(plan);
+            const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+            HCCL_INFO(
+                "[MC2_PRIMITIVE_CACHE][Hit] tag[%s], replayRet[%d], batchEndRet[%d].", plan.tag.c_str(),
+                replayRet, endRet);
+            if (replayRet != HCCL_SUCCESS) {
+                ClearMc2TaskCacheBestEffort(plan, "primitive replay");
+                return replayRet;
+            }
+            if (endRet != HCCL_SUCCESS) {
+                ClearMc2TaskCacheBestEffort(plan, "primitive hit batch end");
+                return endRet;
+            }
+            return HCCL_SUCCESS;
+        }
+
+        const HcclResult captureRet = mc2_ops_hccl::Mc2PrimitiveTaskCacheBeginCapture(plan);
+        if (captureRet != HCCL_SUCCESS) {
+            HCCL_WARNING(
+                "[MC2_PRIMITIVE_CACHE][Begin] failed and fallback to executor, tag[%s], ret[%d].",
+                plan.tag.c_str(), captureRet);
+            mc2_ops_hccl::Mc2PrimitiveTaskCacheAbortCapture();
+            ClearMc2TaskCacheBestEffort(plan, "primitive begin");
+            HcclResult execRet = func();
+            HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+            return execRet != HCCL_SUCCESS ? execRet : endRet;
+        }
+
+        HcclResult execRet = func();
+        if (execRet == HCCL_SUCCESS) {
+            mc2_ops_hccl::Mc2PrimitiveTaskCacheFinishCapture();
+        } else {
+            mc2_ops_hccl::Mc2PrimitiveTaskCacheAbortCapture();
+        }
+        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        if (execRet != HCCL_SUCCESS || endRet != HCCL_SUCCESS) {
+            mc2_ops_hccl::Mc2PrimitiveTaskCacheAbortCapture();
+            ClearMc2TaskCacheBestEffort(plan, "primitive capture failure");
+            return execRet != HCCL_SUCCESS ? execRet : endRet;
+        }
+
+        const HcclResult publishRet = mc2_ops_hccl::Mc2PrimitiveTaskCachePublish(plan);
+        if (publishRet != HCCL_SUCCESS) {
+            ClearMc2TaskCacheBestEffort(plan, "primitive publish");
+            return publishRet;
+        }
+        HCCL_INFO("[MC2_PRIMITIVE_CACHE][Capture] tag[%s] published.", plan.tag.c_str());
+        return HCCL_SUCCESS;
     }
 
     bool isHit = false;

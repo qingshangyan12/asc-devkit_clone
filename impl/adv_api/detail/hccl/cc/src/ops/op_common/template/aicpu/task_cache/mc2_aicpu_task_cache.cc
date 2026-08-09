@@ -18,12 +18,14 @@
 #include "alg_env_config.h"
 #include "hcomm_primitives_dl.h"
 #include "log.h"
+#include "mc2_aicpu_primitive_cache.h"
 
 namespace mc2_ops_hccl {
 namespace {
 
 constexpr uint64_t CACHE_ADDR_COUNT = 2U;
-constexpr char CACHE_TAG_PREFIX[] = "mc2tc:v1";
+constexpr char RAW_CACHE_TAG_PREFIX[] = "mc2tc:v1";
+constexpr char PRIMITIVE_CACHE_TAG_PREFIX[] = "mc2plan:v1";
 
 class Digest128Builder {
 public:
@@ -162,6 +164,17 @@ bool IsSupportedOp(HcclCMDType opType)
            opType == HCCL_CMD_ALLTOALL || opType == HCCL_CMD_ALLTOALLV;
 }
 
+Mc2TaskCacheBackend GetCacheBackend(HcclCMDType opType)
+{
+    if (opType == HCCL_CMD_ALLGATHER || opType == HCCL_CMD_REDUCE_SCATTER) {
+        return Mc2TaskCacheBackend::ASC_PRIMITIVE_PLAN;
+    }
+    if (opType == HCCL_CMD_ALLREDUCE || opType == HCCL_CMD_ALLTOALL || opType == HCCL_CMD_ALLTOALLV) {
+        return Mc2TaskCacheBackend::HCOMM_RAW_TASK;
+    }
+    return Mc2TaskCacheBackend::BYPASS;
+}
+
 bool RequiresAicpuReduction(const OpParam& param)
 {
     if (param.opType != HCCL_CMD_ALLREDUCE && param.opType != HCCL_CMD_REDUCE_SCATTER) {
@@ -180,6 +193,7 @@ bool IsSupportedProtocol(CommProtocol protocol)
 void SetBypass(Mc2AicpuTaskCachePlan& plan, const char* reason)
 {
     plan.enabled = false;
+    plan.backend = Mc2TaskCacheBackend::BYPASS;
     HCCL_DEBUG("[MC2_TASK_CACHE][Bypass] reason[%s].", reason);
 }
 
@@ -489,6 +503,30 @@ bool AddResourceFields(
     return hasValidChannel;
 }
 
+void AddFixedRange(const HcclMem& mem, std::vector<Mc2TaskCacheMemoryRange>& ranges)
+{
+    if (mem.addr != nullptr && mem.size > 0U) {
+        ranges.push_back({mem.addr, mem.size});
+    }
+}
+
+void BuildFixedRanges(const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan)
+{
+    AddFixedRange(resCtx.cclMem, plan.fixedRanges);
+    for (const auto& levelChannels : resCtx.channels) {
+        for (const ChannelInfo& channel : levelChannels) {
+            if (!channel.isValid) {
+                continue;
+            }
+            AddFixedRange(channel.remoteCclMem, plan.fixedRanges);
+            AddFixedRange(channel.remoteInputGraphMode, plan.fixedRanges);
+            AddFixedRange(channel.remoteOutputGraphMode, plan.fixedRanges);
+            AddFixedRange(channel.remoteInput, plan.fixedRanges);
+            AddFixedRange(channel.remoteOutput, plan.fixedRanges);
+        }
+    }
+}
+
 } // namespace
 
 HcclResult BuildMc2AicpuTaskCachePlan(
@@ -499,12 +537,13 @@ HcclResult BuildMc2AicpuTaskCachePlan(
         SetBypass(plan, "AICPU_CacheDisable");
         return HCCL_SUCCESS;
     }
-    if (!HcommIsSupportAicpuTsTaskCache()) {
-        SetBypass(plan, "hcomm task cache symbols incomplete");
-        return HCCL_SUCCESS;
-    }
     if (!IsSupportedOp(param.opType) || param.engine != CommEngine::COMM_ENGINE_AICPU_TS) {
         SetBypass(plan, "unsupported op or engine");
+        return HCCL_SUCCESS;
+    }
+    plan.backend = GetCacheBackend(param.opType);
+    if (plan.backend == Mc2TaskCacheBackend::HCOMM_RAW_TASK && !HcommIsSupportAicpuTsTaskCache()) {
+        SetBypass(plan, "hcomm task cache symbols incomplete");
         return HCCL_SUCCESS;
     }
     if (param.opMode == OpMode::OFFLOAD) {
@@ -546,6 +585,7 @@ HcclResult BuildMc2AicpuTaskCachePlan(
         SetBypass(plan, "unsupported or empty channel resource");
         return HCCL_SUCCESS;
     }
+    BuildFixedRanges(resCtx, plan);
 
     plan.comm = param.hcclComm;
     plan.addrs[0] = param.inputPtr;
@@ -557,11 +597,14 @@ HcclResult BuildMc2AicpuTaskCachePlan(
         return HCCL_SUCCESS;
     }
 
-    plan.tag = std::string(CACHE_TAG_PREFIX) + ":" + std::to_string(static_cast<uint32_t>(param.opType)) + ":" +
+    const char* tagPrefix = plan.backend == Mc2TaskCacheBackend::ASC_PRIMITIVE_PLAN ? PRIMITIVE_CACHE_TAG_PREFIX :
+                                                                                     RAW_CACHE_TAG_PREFIX;
+    plan.tag = std::string(tagPrefix) + ":" + std::to_string(static_cast<uint32_t>(param.opType)) + ":" +
                shape.Finish() + ":" + resource.Finish();
     plan.enabled = true;
     HCCL_INFO(
-        "[MC2_TASK_CACHE][Plan] tag[%s], input[%p,%llu], output[%p,%llu].", plan.tag.c_str(), plan.addrs[0],
+        "[MC2_TASK_CACHE][Plan] backend[%u], tag[%s], input[%p,%llu], output[%p,%llu].",
+        static_cast<uint32_t>(plan.backend), plan.tag.c_str(), plan.addrs[0],
         static_cast<unsigned long long>(plan.sizes[0]), plan.addrs[1],
         static_cast<unsigned long long>(plan.sizes[1]));
     return HCCL_SUCCESS;
@@ -614,18 +657,18 @@ void Mc2AicpuTaskCacheManager::Register(void* comm, const std::string& tag)
 
 HcclResult Mc2AicpuTaskCacheManager::Evict(void* comm)
 {
+    HcclResult result = Mc2PrimitiveTaskCacheEvict(comm);
     std::unordered_set<std::string> tags;
     {
         std::lock_guard<std::mutex> lock(mutex_);
         const auto iter = commTags_.find(comm);
         if (iter == commTags_.end()) {
-            return HCCL_SUCCESS;
+            return result;
         }
         tags = std::move(iter->second);
         commTags_.erase(iter);
     }
 
-    HcclResult result = HCCL_SUCCESS;
     for (const std::string& tag : tags) {
         const HcclResult ret = static_cast<HcclResult>(HcclHcommAicpuTsTaskCacheClear(tag.c_str()));
         if (ret != HCCL_SUCCESS) {
