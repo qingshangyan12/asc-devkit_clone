@@ -22,6 +22,7 @@ public:
     ~InsV2AllReduceSoleExecutor() override = default;
 
     HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
+    const std::vector<CcuKernelSubmitInfo>& GetCcuSubmitInfos() const override { return ccuSubmitInfos_; }
 
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
@@ -40,6 +41,7 @@ protected:
 
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
     std::vector<ThreadHandle> threads_;
+    std::vector<CcuKernelSubmitInfo> ccuSubmitInfos_;
 };
 } // namespace mc2_ops_hccl
 
