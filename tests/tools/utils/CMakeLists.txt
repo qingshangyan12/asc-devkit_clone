@@ -239,7 +239,7 @@ function(configure_asc_compile_exporter_test target_name)
     )
 
     target_link_libraries(${target_name} PRIVATE
-        asc_compile_exporter_boost_filesystem
+        asc_boost_filesystem
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         json
         mmpa_headers

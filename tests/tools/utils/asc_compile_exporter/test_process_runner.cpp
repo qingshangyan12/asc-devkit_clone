@@ -67,8 +67,8 @@ TEST_F(ModuleTest, ProcessRunnerValidatesArgumentsAndPropagatesEnvironment)
     ScopedEnvironment makeFlags("MAKEFLAGS", "must-not-leak");
     ASSERT_TRUE(ProcessRunner::Run(
         {"/bin/sh", "-c",
-            "printf '%s|%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" \"${MAKEFLAGS-unset}\" > "
-            "\"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
+         "printf '%s|%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" \"${MAKEFLAGS-unset}\" > "
+         "\"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
         {{"ASC_COMPILE_EXPORTER_UNIT_VALUE", "visible"}, {"ASC_COMPILE_EXPORTER_UNIT_OUTPUT", output}}));
     EXPECT_EQ(ReadTestFile(output), "visible|unset");
 }
@@ -88,8 +88,8 @@ TEST_F(ModuleTest, ProcessRunnerTimesOutAndReapsProcessGroup)
     const std::string terminationFile = FileUtils::JoinPath(root_, "termination.txt");
     EXPECT_FALSE(ProcessRunner::Run(
         {"/bin/sh", "-c",
-            "trap 'printf terminated > \"$ASC_COMPILE_EXPORTER_TERMINATION_FILE\"; exit 0' TERM; "
-            "printf '%s' \"$$\" > \"$ASC_COMPILE_EXPORTER_PID_FILE\"; sleep 10"},
+         "trap 'printf terminated > \"$ASC_COMPILE_EXPORTER_TERMINATION_FILE\"; exit 0' TERM; "
+         "printf '%s' \"$$\" > \"$ASC_COMPILE_EXPORTER_PID_FILE\"; sleep 10"},
         {{"ASC_COMPILE_EXPORTER_PID_FILE", pidFile}, {"ASC_COMPILE_EXPORTER_TERMINATION_FILE", terminationFile}},
         std::chrono::milliseconds(100U)));
 
