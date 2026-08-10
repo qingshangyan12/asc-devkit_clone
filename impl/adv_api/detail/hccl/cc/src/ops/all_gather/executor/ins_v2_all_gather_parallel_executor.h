@@ -17,7 +17,7 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 class InsV2AllGatherParallelExecutor : public InsCollAlgBase {
 public:
     explicit InsV2AllGatherParallelExecutor();
-    HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
+    HcclResult Orchestrate(const OpParam& param, AlgResourceCtxSerializable& resCtx) override;
 
     /* *************** 资源计算 *************** */
     HcclResult CalcRes(

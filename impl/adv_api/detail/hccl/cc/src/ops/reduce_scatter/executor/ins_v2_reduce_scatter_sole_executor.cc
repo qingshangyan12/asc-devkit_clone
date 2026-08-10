@@ -49,7 +49,7 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2ReduceScatterSoleExecutor][Orchestrate] Orchestrate Start");
     // maxTmpMemSize_设定为cclIn的大小，op中将申请的HcclBuff全给了cclIn
@@ -77,7 +77,7 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2ReduceScatterSoleExecutor][OrchestrateLoop] Start");
     // 准备资源

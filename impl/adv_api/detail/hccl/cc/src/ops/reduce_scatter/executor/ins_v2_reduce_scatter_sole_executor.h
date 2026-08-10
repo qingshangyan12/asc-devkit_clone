@@ -21,7 +21,7 @@ public:
     explicit InsV2ReduceScatterSoleExecutor();
     ~InsV2ReduceScatterSoleExecutor() override = default;
 
-    HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
+    HcclResult Orchestrate(const OpParam& param, AlgResourceCtxSerializable& resCtx) override;
 
     /* *************** 资源计算 *************** */
 

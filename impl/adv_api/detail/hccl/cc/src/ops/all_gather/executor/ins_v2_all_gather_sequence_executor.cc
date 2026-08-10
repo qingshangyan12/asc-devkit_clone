@@ -74,7 +74,7 @@ HcclResult InsV2AllGatherSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsV2AllGatherSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllGatherSequenceExecutor][Orchestrate] Orchestrate Start");
     // 参数填充
@@ -106,7 +106,7 @@ HcclResult InsV2AllGatherSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsV2AllGatherSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::OrchestrateLoop(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllGatherSequenceExecutor][OrchestrateLoop] Start");
 

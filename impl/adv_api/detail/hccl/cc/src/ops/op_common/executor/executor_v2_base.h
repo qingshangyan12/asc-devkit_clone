@@ -39,7 +39,7 @@ public:
         const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest) = 0;
 
     // device
-    virtual HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) = 0;
+    virtual HcclResult Orchestrate(const OpParam& param, AlgResourceCtxSerializable& resCtx) = 0;
 
     virtual HcclResult FastLaunch(const OpParam& param, const CcuFastLaunchCtx* resCtx);
 

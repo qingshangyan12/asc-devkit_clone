@@ -21,7 +21,7 @@ public:
     explicit InsV2AllReduceSoleExecutor();
     ~InsV2AllReduceSoleExecutor() override = default;
 
-    HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
+    HcclResult Orchestrate(const OpParam& param, AlgResourceCtxSerializable& resCtx) override;
 
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
@@ -36,7 +36,7 @@ public:
 #endif
 
 protected:
-    HcclResult OrchestrateLoop(const OpParam& param, const AlgResourceCtxSerializable& resCtx);
+    HcclResult OrchestrateLoop(const OpParam& param, AlgResourceCtxSerializable& resCtx);
 
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
     std::vector<ThreadHandle> threads_;

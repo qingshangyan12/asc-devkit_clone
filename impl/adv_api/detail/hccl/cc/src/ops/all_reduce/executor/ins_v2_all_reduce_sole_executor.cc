@@ -40,7 +40,7 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate Start, engine=%u, opType=%u, algName=%s",
               static_cast<uint32_t>(param.engine), static_cast<uint32_t>(param.opType), param.algName);
@@ -70,13 +70,14 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         HCCL_ERROR(
             "[InsV2AllReduceSoleExecutor] errNo[0x%016llx] AllReduce executor kernel run failed", HCCL_ERROR_CODE(ret)),
         ret);
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate End.");
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate End, ccuSubmitInfos.size=%zu",
+              resCtx.ccuSubmitInfos.size());
     return HCCL_SUCCESS;
 }
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] Start.");
     TemplateResource templateAlgRes;
@@ -153,6 +154,11 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         CHK_RET(FastLaunchSaveCtx(param, templateAlgRes));
     }
 #endif
+    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        resCtx.ccuSubmitInfos = templateAlgRes.submitInfos;
+        HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] stored %zu submitInfos to resCtx",
+                  resCtx.ccuSubmitInfos.size());
+    }
     HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] End.");
     return HCCL_SUCCESS;
 }

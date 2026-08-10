@@ -27,7 +27,7 @@ public:
     std::string Describe() const override { return "Instruction based Reduce Scatter Parallel Executor."; }
 
     // HOST 接口
-    HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
+    HcclResult Orchestrate(const OpParam& param, AlgResourceCtxSerializable& resCtx) override;
 
     /* *************** 资源计算 *************** */
 

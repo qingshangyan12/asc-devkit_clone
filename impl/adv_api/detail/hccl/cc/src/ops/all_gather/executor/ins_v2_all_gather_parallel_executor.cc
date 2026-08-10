@@ -111,7 +111,7 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GenTemplateAlgParamsIntra0(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
+    const OpParam& param, AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
     const u64 dataCountPerLoopAixs0, const u64 scratchOffset, TemplateDataParams& tempAlgParamsIntra0) const
 {
     tempAlgParamsIntra0.buffInfo.inputPtr = param.inputPtr;
@@ -150,7 +150,7 @@ void InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplat
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GenTemplateAlgParamsInter0(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
+    const OpParam& param, AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
     const u64 dataCountPerLoopAixs0, const u64 scratchOffset, TemplateDataParams& tempAlgParamsInter0) const
 {
     tempAlgParamsInter0.buffInfo.inputPtr = param.outputPtr;
@@ -187,7 +187,7 @@ void InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplat
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GenTemplateAlgParamsInter1(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
+    const OpParam& param, AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
     const u64 dataCountPerLoopAixs1, const u64 scratchOffset, TemplateDataParams& tempAlgParamsInter1) const
 {
     tempAlgParamsInter1.buffInfo.inputPtr = param.inputPtr;
@@ -224,7 +224,7 @@ void InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplat
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GenTemplateAlgParamsIntra1(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
+    const OpParam& param, AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
     const u64 dataCountPerLoopAixs1, const u64 scratchOffset, TemplateDataParams& tempAlgParamsIntra1) const
 {
     tempAlgParamsIntra1.buffInfo.inputPtr = param.outputPtr;
@@ -272,7 +272,7 @@ uint64_t InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTem
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllGatherParallelExecutor][Orchestrate] Orchestrate Start");
     maxTmpMemSize_ = resCtx.cclMem.size; // maxTmpMemSize_设定为cclIn的大小，op中将申请的HcclBuff全给了cclIn
@@ -364,7 +364,7 @@ void InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplat
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::OrchestrateLoop(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, InsAlgTemplate0& tempAlgIntra,
+    const OpParam& param, AlgResourceCtxSerializable& resCtx, InsAlgTemplate0& tempAlgIntra,
     InsAlgTemplate1& tempAlgInter)
 {
     HCCL_INFO("[InsV2AllGatherParallelExecutor] AlgTemplate intra server is [%s]", tempAlgIntra.Describe().c_str());

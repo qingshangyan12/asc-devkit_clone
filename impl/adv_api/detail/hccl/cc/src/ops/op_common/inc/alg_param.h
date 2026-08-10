@@ -446,6 +446,7 @@ struct AlgResourceCtxSerializable {
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
     std::vector<uint64_t> kfcServerArgs;  // kfc server算子入参
     u32 kfcServerArgSize = 0;             // kfc server算子入参个数
+    std::vector<CcuKernelSubmitInfo> ccuSubmitInfos; // ccu kernel cachedArgs
 
     std::vector<char> Serialize()
     {
@@ -474,6 +475,7 @@ struct AlgResourceCtxSerializable {
         binaryStream << dieSplitRatio;
         binaryStream << kfcServerArgs;
         binaryStream << kfcServerArgSize;
+        binaryStream << ccuSubmitInfos;
         std::vector<char> seq = topoInfo.Serialize();
         topoInfoSeqSize = seq.size();
         binaryStream << topoInfoSeqSize;
@@ -511,6 +513,7 @@ struct AlgResourceCtxSerializable {
         binaryStream >> dieSplitRatio;
         binaryStream >> kfcServerArgs;
         binaryStream >> kfcServerArgSize;
+        binaryStream >> ccuSubmitInfos;
         binaryStream >> topoInfoSeqSize;
         size_t startPos = data.size() - topoInfoSeqSize;
         std::vector<char> tailData(data.begin() + startPos, data.end());
