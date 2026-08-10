@@ -26,6 +26,8 @@ DECL_WEAK_FUNC(
     CcuResult, HcommCcuInsResDescSetNum, HcommCcuResDescHandle resDesc, HcommCcuResType resType, uint32_t resNum);
 DECL_WEAK_FUNC(
     CcuResult, HcommCcuInsResDescQueryNum, HcommCcuResDescHandle resDesc, HcommCcuResType resType, uint32_t* resNum);
+    CcuResult, HcommCcuKernelQueryResReq, const void* kernelFunc, const void** kernelArgs, uint32_t argNum,
+    HcommCcuResDescHandle resDesc);
 DECL_WEAK_FUNC(
     CcuResult, HcommCcuInsCreate, const HcommCcuResDescHandle* resDescs, uint32_t resDescNum,
     CcuInsHandle* ccuInsHandle);
@@ -45,6 +47,12 @@ DECL_SUPPORT_FLAG(HcommCcuInsDestroy);
 DECL_SUPPORT_FLAG(HcommCcuInsQueryResDesc);
 DECL_SUPPORT_FLAG(HcommCcuQueryRemainResDesc);
 DECL_SUPPORT_FLAG(HcommCcuKernelQueryResReq);
+
+DECL_SUPPORT_FLAG(HcommCcuInsResDescCreate);
+DECL_SUPPORT_FLAG(HcommCcuInsResDescDestroy);
+DECL_SUPPORT_FLAG(HcommCcuKernelQueryResReq);
+DECL_SUPPORT_FLAG(HcommCcuInsCreate);
+DECL_SUPPORT_FLAG(HcommCcuInsDestroy);
 
 void CcuResDlInit(void* libHcommHandle);
 
