@@ -393,7 +393,6 @@ struct SknlKernelMap {
 #define SIMT_ONE_CORE_DUMP_SIZE (2048 * 2048)
 #endif
 
-
 #if !defined(ASCENDC_CPU_DEBUG)
 #include "../../utils/common_types.h"
 #endif
