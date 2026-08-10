@@ -57,13 +57,17 @@ def asc_reduce_min_datablock(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口使用`<dtype>`表示支持的数据类型，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_reduce_min_datablock(vector_<dtype>& dst,
                                                      vector_<dtype> src,
                                                      vector_bool mask)
 ```
+
+#### dtype支持数据类型
 
 dtype支持的数据类型为`int16_t`、`int32_t`、`uint16_t`、`uint32_t`、`half`、`float`
 
@@ -93,6 +97,8 @@ __simd_callee__ inline void asc_reduce_min_datablock(vector_half& dst,
 无
 
 ## 约束说明
+
+### 通用约束
 
 - 在比较中，遵循min(-0, +0) = -0。
 - 找到源操作数中每个DataBlock内的最小值，连续写入到目的操作数，目的操作数中的其它元素置0。

@@ -64,7 +64,9 @@ def asc_int322int64_v2(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口包含2种分块位置，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_int322int64<v2_suffix>(vector_int64_t& dst,
@@ -102,6 +104,8 @@ __simd_callee__ inline void asc_int322int64(vector_int64_t& dst,
 无
 
 ## 约束说明
+
+### 通用约束
 
 - src与dst的数据类型需要与函数原型匹配。
 - 掩码位为0时，dst对应元素置0。

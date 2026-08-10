@@ -53,11 +53,15 @@ def asc_relu(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口使用`<dtype>`表示支持的数据类型，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_relu(vector_<dtype>& dst, vector_<dtype> src, vector_bool mask);
 ```
+
+#### dtype支持数据类型
 
 dtype支持的数据类型为`half`、`int32_t`、`float`
 
@@ -85,10 +89,11 @@ __simd_callee__ inline void asc_relu(vector_half& dst, vector_half src, vector_b
 
 ## 约束说明
 
+### 通用约束
+
 - dst与src的数据类型需要保持一致。
 - 掩码位为0时，dst对应元素置0。
-- 浮点输入（half/float）按符号位判定：负数（含-0、-inf）写0，正数与+0原样输出，+inf保留，nan输入返回标准nan。
-- 整数输入（int32_t）按算术符号判定：负数写0，非负数原样输出。
+- 输入为负数或-0时输出0，其他数值保持不变；输入为nan时，输出为nan。
 
 ## 调用示例
 

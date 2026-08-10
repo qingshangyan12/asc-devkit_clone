@@ -54,7 +54,9 @@ def asc_gt_scalar(dst, src, value, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口使用`<dtype>`表示支持的数据类型，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst,
@@ -62,6 +64,8 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst,
                                           <dtype> value,
                                           vector_bool mask)
 ```
+
+#### dtype支持数据类型
 
 dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
 
@@ -93,6 +97,8 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst,
 无
 
 ## 约束说明
+
+### 通用约束
 
 - src与value的数据类型需要保持一致。
 - 掩码位为0时，dst对应比特位置0。

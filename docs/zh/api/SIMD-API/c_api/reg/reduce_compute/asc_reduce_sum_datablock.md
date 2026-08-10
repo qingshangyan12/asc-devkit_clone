@@ -58,13 +58,17 @@ def asc_reduce_sum_datablock(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口使用`<src_dtype>`和`<dst_dtype>`分别表示源操作数和目的操作数的数据类型，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_<dst_dtype>& dst,
                                                      vector_<src_dtype> src,
                                                      vector_bool mask)
 ```
+
+#### dtype支持数据类型
 
 dtype支持的数据类型为`int16_t`、`int32_t`、`uint16_t`、`uint32_t`、`half`、`float`
 
@@ -94,6 +98,8 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst,
 无
 
 ## 约束说明
+
+### 通用约束
 
 - 指令内累加顺序采用二叉树累加方式，在每个DataBlock（32B）内两两相加逐层归约求和，结果连续写入到目的操作数，目的操作数中的其它元素置0。
 - 当DataBlock中的元素均不参与计算（mask全为0）时，将0写入dst对应位置（对于浮点数则为+0）。

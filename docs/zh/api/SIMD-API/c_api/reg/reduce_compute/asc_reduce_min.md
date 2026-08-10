@@ -61,13 +61,17 @@ def asc_reduce_min(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口使用`<dtype>`表示支持的数据类型，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_reduce_min(vector_<dtype>& dst,
                                            vector_<dtype> src,
                                            vector_bool mask)
 ```
+
+#### dtype支持数据类型
 
 dtype支持的数据类型为`int16_t`、`int32_t`、`uint16_t`、`uint32_t`、`half`、`float`
 
@@ -97,6 +101,8 @@ __simd_callee__ inline void asc_reduce_min(vector_half& dst,
 无
 
 ## 约束说明
+
+### 通用约束
 
 - 将最小值写入目的操作数的第一个数，将最小值的下标写入目的操作数的第二个数， 如果有多个最小值，第二个数为最小的下标，其余值都将被填充为0。
 - 未被mask选中的元素被视为最大值（浮点数为+inf），如果一个DataBlock中所有元素都未被mask选中，最大值(浮点数为+inf)将被填充到目的操作数的第一个数，其余值都将被填充为0（包括下标）。

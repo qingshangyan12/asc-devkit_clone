@@ -54,7 +54,9 @@ def asc_select(dst, src0, src1, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口支持矢量数据寄存器和掩码寄存器，模板原型如下（`<dtype>`表示对应的数据类型）：
 
 ```c
 __simd_callee__ inline void asc_select(vector_<dtype>& dst,
@@ -62,6 +64,8 @@ __simd_callee__ inline void asc_select(vector_<dtype>& dst,
                                        vector_<dtype> src1,
                                        vector_bool mask)
 ```
+
+#### dtype支持数据类型
 
 dtype支持的数据类型为`bool`、`uint8_t`、`int8_t`、`fp8_e4m3fn_t`、`hifloat8_t`、`fp8_e5m2_t`、`uint16_t`、`int16_t`、`half`、`bfloat16_t`、`uint32_t`、`int32_t`、`float`
 
@@ -107,8 +111,12 @@ __simd_callee__ inline void asc_select(vector_half& dst,
 
 ## 约束说明
 
+### 通用约束
+
 - src0、src1和dst的数据类型需要保持一致。
+- 当dtype为`bool`时，dst、src0和src1均为掩码寄存器；其他dtype对应矢量数据寄存器。
 - 掩码位为1时，dst取src0对应元素；为0时，dst取src1对应元素。
+- 本接口按元素选择源操作数，不执行算术运算。
 
 ## 调用示例
 

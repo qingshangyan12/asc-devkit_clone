@@ -57,13 +57,17 @@ def asc_reduce_max_datablock(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口使用`<dtype>`表示支持的数据类型，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_reduce_max_datablock(vector_<dtype>& dst,
                                                      vector_<dtype> src,
                                                      vector_bool mask)
 ```
+
+#### dtype支持数据类型
 
 dtype支持的数据类型为`half`、`float`、`uint16_t`、`int16_t`、`uint32_t`、`int32_t`
 
@@ -93,6 +97,8 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst,
 无
 
 ## 约束说明
+
+### 通用约束
 
 - dst与src的数据类型需要保持一致。
 - 找到源操作数中每个DataBlock内的最大值，连续写入到目的操作数，目的操作数中的其它元素置0。

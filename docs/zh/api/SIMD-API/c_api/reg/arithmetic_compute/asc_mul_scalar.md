@@ -52,7 +52,9 @@ def asc_mul_scalar(dst, src, value, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口使用`<dtype>`表示支持的数据类型，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_mul_scalar(vector_<dtype>& dst,
@@ -60,6 +62,8 @@ __simd_callee__ inline void asc_mul_scalar(vector_<dtype>& dst,
                                            <dtype> value,
                                            vector_bool mask)
 ```
+
+#### dtype支持数据类型
 
 dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`
 
@@ -91,8 +95,9 @@ __simd_callee__ inline void asc_mul_scalar(vector_half& dst,
 
 ## 约束说明
 
+### 通用约束
+
 - dst与src的数据类型需要保持一致。
-- dtype仅支持上述6种，其他dtype触发数据类型异常。
 - 掩码位为0时，dst对应元素置0。
 
 ## 调用示例

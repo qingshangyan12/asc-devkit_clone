@@ -50,13 +50,17 @@ def asc_ln(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型
+### 模板原型（占位符形式）
+
+本接口使用`<dtype>`表示支持的数据类型，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_ln(vector_<dtype>& dst,
                                    vector_<dtype> src,
                                    vector_bool mask)
 ```
+
+#### dtype支持数据类型
 
 dtype支持的数据类型为`half`、`float`
 
@@ -85,6 +89,8 @@ __simd_callee__ inline void asc_ln(vector_half& dst,
 无
 
 ## 约束说明
+
+### 通用约束
 
 - dst与src的数据类型需要保持一致。
 - 掩码位为0时，dst对应元素置0。
