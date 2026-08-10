@@ -97,10 +97,7 @@ Mc2TaskCacheTestStubState& GetMc2TaskCacheTestStubState()
     return state;
 }
 
-void ResetMc2TaskCacheTestStubState()
-{
-    GetMc2TaskCacheTestStubState() = Mc2TaskCacheTestStubState{};
-}
+void ResetMc2TaskCacheTestStubState() { GetMc2TaskCacheTestStubState() = Mc2TaskCacheTestStubState{}; }
 
 #ifdef __cplusplus
 extern "C" {

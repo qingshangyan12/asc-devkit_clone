@@ -256,7 +256,8 @@ TEST_F(Mc2AicpuTaskCacheTest, CacheMissCapturesAndCacheHitSkipsExecutor)
     uint32_t executorCalls = 0U;
     EXPECT_EQ(
         RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx, [&executorCalls]() {
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
                 ++executorCalls;
                 return HCCL_SUCCESS;
             },
@@ -272,7 +273,8 @@ TEST_F(Mc2AicpuTaskCacheTest, CacheMissCapturesAndCacheHitSkipsExecutor)
     state.lookupHit = true;
     EXPECT_EQ(
         RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx, [&executorCalls]() {
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
                 ++executorCalls;
                 return HCCL_SUCCESS;
             },
@@ -291,7 +293,8 @@ TEST_F(Mc2AicpuTaskCacheTest, CapacityFullBypassesAllHcommCacheCalls)
     uint32_t executorCalls = 0U;
     EXPECT_EQ(
         RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx, [&executorCalls]() {
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
                 ++executorCalls;
                 return HCCL_SUCCESS;
             },
@@ -316,7 +319,8 @@ TEST_F(Mc2AicpuTaskCacheTest, ExecuteFailureClearsWithoutFallingBack)
     uint32_t executorCalls = 0U;
     EXPECT_EQ(
         RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx, [&executorCalls]() {
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
                 ++executorCalls;
                 return HCCL_SUCCESS;
             },
@@ -335,7 +339,8 @@ TEST_F(Mc2AicpuTaskCacheTest, LookupFailureClearsThenFallsBack)
     uint32_t executorCalls = 0U;
     EXPECT_EQ(
         RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx, [&executorCalls]() {
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
                 ++executorCalls;
                 return HCCL_SUCCESS;
             },
@@ -355,7 +360,8 @@ TEST_F(Mc2AicpuTaskCacheTest, StartFailureClearsThenFallsBack)
     uint32_t executorCalls = 0U;
     EXPECT_EQ(
         RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx, [&executorCalls]() {
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
                 ++executorCalls;
                 return HCCL_SUCCESS;
             },
@@ -374,7 +380,8 @@ TEST_F(Mc2AicpuTaskCacheTest, ExecutorFailureClearsOnceAndReturnsError)
     uint32_t executorCalls = 0U;
     EXPECT_EQ(
         RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx, [&executorCalls]() {
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
                 ++executorCalls;
                 return HCCL_E_PARA;
             },
@@ -395,7 +402,8 @@ TEST_F(Mc2AicpuTaskCacheTest, CacheEndFailureClearsAndReturnsError)
     uint32_t executorCalls = 0U;
     EXPECT_EQ(
         RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx, [&executorCalls]() {
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
                 ++executorCalls;
                 return HCCL_SUCCESS;
             },

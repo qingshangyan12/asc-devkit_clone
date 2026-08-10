@@ -27,10 +27,7 @@ constexpr char CACHE_TAG_PREFIX[] = "mc2tc:v1";
 
 class Digest128Builder {
 public:
-    explicit Digest128Builder(const char* domain)
-    {
-        AddString(domain, std::strlen(domain));
-    }
+    explicit Digest128Builder(const char* domain) { AddString(domain, std::strlen(domain)); }
 
     void AddU8(uint8_t value) { AddBytes(&value, sizeof(value)); }
 
@@ -83,10 +80,7 @@ public:
     }
 
 private:
-    static uint64_t RotateLeft(uint64_t value, uint32_t count)
-    {
-        return (value << count) | (value >> (64U - count));
-    }
+    static uint64_t RotateLeft(uint64_t value, uint32_t count) { return (value << count) | (value >> (64U - count)); }
 
     static uint64_t Avalanche(uint64_t value)
     {
@@ -142,8 +136,7 @@ uint64_t GetDataTypeSize(HcclDataType dataType)
     return type < static_cast<uint32_t>(HCCL_DATA_TYPE_RESERVED) ? DATATYPE_SIZE_TABLE[type] : 0U;
 }
 
-bool GetStridedSpan(
-    uint64_t count, uint64_t strideCount, uint32_t rankSize, uint64_t elementSize, uint64_t& span)
+bool GetStridedSpan(uint64_t count, uint64_t strideCount, uint32_t rankSize, uint64_t elementSize, uint64_t& span)
 {
     if (rankSize == 0U) {
         return false;
@@ -152,8 +145,8 @@ bool GetStridedSpan(
     const uint64_t effectiveStrideCount = strideCount == 0U ? count : strideCount;
     uint64_t lastRankOffset = 0U;
     uint64_t totalCount = 0U;
-    return SafeMul(effectiveStrideCount, rankSize - 1U, lastRankOffset) &&
-           SafeAdd(lastRankOffset, count, totalCount) && SafeMul(totalCount, elementSize, span);
+    return SafeMul(effectiveStrideCount, rankSize - 1U, lastRankOffset) && SafeAdd(lastRankOffset, count, totalCount) &&
+           SafeMul(totalCount, elementSize, span);
 }
 
 bool IsSupportedOp(HcclCMDType opType)
@@ -168,8 +161,8 @@ bool RequiresAicpuReduction(const OpParam& param)
         return false;
     }
     const HcclDataType dataType = param.DataDes.dataType;
-    return dataType == HCCL_DATA_TYPE_INT64 || dataType == HCCL_DATA_TYPE_UINT64 ||
-           dataType == HCCL_DATA_TYPE_FP64 || param.reduceType == HCCL_REDUCE_PROD;
+    return dataType == HCCL_DATA_TYPE_INT64 || dataType == HCCL_DATA_TYPE_UINT64 || dataType == HCCL_DATA_TYPE_FP64 ||
+           param.reduceType == HCCL_REDUCE_PROD;
 }
 
 bool IsSupportedProtocol(CommProtocol protocol)
@@ -214,8 +207,7 @@ bool GetAllToAllVSpans(
             !SafeMul(recvCounts[rank], recvTypeSize, recvCountBytes) ||
             !SafeMul(sendDispls[rank], sendTypeSize, sendDisplBytes) ||
             !SafeMul(recvDispls[rank], recvTypeSize, recvDisplBytes) ||
-            !SafeAdd(sendDisplBytes, sendCountBytes, sendEnd) ||
-            !SafeAdd(recvDisplBytes, recvCountBytes, recvEnd)) {
+            !SafeAdd(sendDisplBytes, sendCountBytes, sendEnd) || !SafeAdd(recvDisplBytes, recvCountBytes, recvEnd)) {
             return false;
         }
         shape.AddU64(sendCountBytes);
@@ -229,12 +221,11 @@ bool GetAllToAllVSpans(
 }
 
 bool GetRegularSpans(
-    const OpParam& param, uint32_t rankSize, uint64_t& inputSpan, uint64_t& outputSpan,
-    Digest128Builder& shape)
+    const OpParam& param, uint32_t rankSize, uint64_t& inputSpan, uint64_t& outputSpan, Digest128Builder& shape)
 {
     const uint64_t dataTypeSize = GetDataTypeSize(param.DataDes.dataType);
-    const HcclDataType outputType = param.DataDes.outputType == HCCL_DATA_TYPE_RESERVED ? param.DataDes.dataType :
-                                                                                         param.DataDes.outputType;
+    const HcclDataType outputType =
+        param.DataDes.outputType == HCCL_DATA_TYPE_RESERVED ? param.DataDes.dataType : param.DataDes.outputType;
     const uint64_t outputTypeSize = GetDataTypeSize(outputType);
     if (dataTypeSize == 0U || outputTypeSize == 0U) {
         return false;
@@ -252,8 +243,7 @@ bool GetRegularSpans(
         return false;
     }
     if (param.opType == HCCL_CMD_ALLGATHER) {
-        if (!GetStridedSpan(
-                param.DataDes.count, param.DataDes.strideCount, rankSize, outputTypeSize, outputSpan)) {
+        if (!GetStridedSpan(param.DataDes.count, param.DataDes.strideCount, rankSize, outputTypeSize, outputSpan)) {
             return false;
         }
         inputSpan = countBytes;
@@ -329,8 +319,7 @@ void AddShapeFields(const OpParam& param, uint64_t inputSpan, uint64_t outputSpa
     shape.AddU64(outputSpan);
 }
 
-bool AddResourceFields(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Digest128Builder& resource)
+bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& resCtx, Digest128Builder& resource)
 {
     resource.AddPointer(param.hcclComm);
     resource.AddString(param.commName, COMM_INDENTIFIER_MAX_LENGTH);
@@ -562,8 +551,7 @@ HcclResult BuildMc2AicpuTaskCachePlan(
     plan.enabled = true;
     HCCL_INFO(
         "[MC2_TASK_CACHE][Plan] tag[%s], input[%p,%llu], output[%p,%llu].", plan.tag.c_str(), plan.addrs[0],
-        static_cast<unsigned long long>(plan.sizes[0]), plan.addrs[1],
-        static_cast<unsigned long long>(plan.sizes[1]));
+        static_cast<unsigned long long>(plan.sizes[0]), plan.addrs[1], static_cast<unsigned long long>(plan.sizes[1]));
     return HCCL_SUCCESS;
 }
 
@@ -627,8 +615,8 @@ Mc2TaskCacheReserveResult Mc2AicpuTaskCacheManager::TryReserve(void* comm, const
             capacityWarningReported_ = true;
         } else {
             HCCL_DEBUG(
-                "[MC2_TASK_CACHE][Capacity] bypass tag[%s], trackedCount[%zu/%zu], trackedBytes[%zu/%zu].",
-                tag.c_str(), trackedTagCount_, maxTagCount_, trackedTagBytes_, maxTagBytes_);
+                "[MC2_TASK_CACHE][Capacity] bypass tag[%s], trackedCount[%zu/%zu], trackedBytes[%zu/%zu].", tag.c_str(),
+                trackedTagCount_, maxTagCount_, trackedTagBytes_, maxTagBytes_);
         }
         if (tags.empty()) {
             commTags_.erase(comm);

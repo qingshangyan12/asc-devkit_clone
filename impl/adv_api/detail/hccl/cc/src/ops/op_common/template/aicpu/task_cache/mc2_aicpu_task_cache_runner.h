@@ -85,8 +85,7 @@ HcclResult RunWithMc2TaskCache(
     HcclResult lookupRet = Mc2AicpuTaskCacheLookup(plan, isHit);
     if (lookupRet != HCCL_SUCCESS) {
         HCCL_WARNING(
-            "[MC2_TASK_CACHE][Lookup] failed and fallback to executor, tag[%s], ret[%d].", plan.tag.c_str(),
-            lookupRet);
+            "[MC2_TASK_CACHE][Lookup] failed and fallback to executor, tag[%s], ret[%d].", plan.tag.c_str(), lookupRet);
         ClearMc2TaskCacheBestEffort(plan, "lookup", manager);
         HcclResult execRet = func();
         HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
@@ -100,8 +99,7 @@ HcclResult RunWithMc2TaskCache(
         const HcclResult executeRet = Mc2AicpuTaskCacheExecute(plan);
         const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
         HCCL_INFO(
-            "[MC2_TASK_CACHE][Hit] tag[%s], executeRet[%d], batchEndRet[%d].", plan.tag.c_str(), executeRet,
-            endRet);
+            "[MC2_TASK_CACHE][Hit] tag[%s], executeRet[%d], batchEndRet[%d].", plan.tag.c_str(), executeRet, endRet);
         if (executeRet != HCCL_SUCCESS) {
             ClearMc2TaskCacheBestEffort(plan, "execute", manager);
             return executeRet;
