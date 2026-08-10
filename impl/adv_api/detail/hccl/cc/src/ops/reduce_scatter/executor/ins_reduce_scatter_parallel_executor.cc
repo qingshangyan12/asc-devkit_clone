@@ -114,7 +114,7 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 // 传入的insQue为一条主流
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GenTemplateAlgParamsIntra0(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx,
+    const OpParam &param, AlgResourceCtxSerializable &resCtx,
     const u64 dataOffset, const u64 dataCountPerLoopAixs0,
     std::vector<u64> &scratchOffVec, TemplateDataParams &tempAlgParamsIntra0) const
 {
@@ -143,7 +143,7 @@ void InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GenTemplateAlgParamsInter0(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx,
+    const OpParam &param, AlgResourceCtxSerializable &resCtx,
     const u64 dataOffset, const u64 dataCountPerLoopAixs0,
     std::vector<u64> &scratchOffVec, TemplateDataParams &tempAlgParamsInter0) const
 {
@@ -172,7 +172,7 @@ void InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GenTemplateAlgParamsInter1(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx,
+    const OpParam &param, AlgResourceCtxSerializable &resCtx,
     const u64 dataOffset, const u64 dataCountPerLoopAixs1,
     std::vector<u64> &scratchOffVec, TemplateDataParams &tempAlgParamsInter1) const
 {
@@ -201,7 +201,7 @@ void InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GenTemplateAlgParamsIntra1(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx,
+    const OpParam &param, AlgResourceCtxSerializable &resCtx,
     const u64 dataOffset, const u64 dataCountPerLoopAixs1,
     std::vector<u64> &scratchOffVec, TemplateDataParams &tempAlgParamsIntra1) const
 {
@@ -263,7 +263,7 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx)
+    const OpParam &param, AlgResourceCtxSerializable &resCtx)
 {
     HCCL_INFO("[InsReduceScatterParallelExecutor][Orchestrate] Orchestrate Start");
 
@@ -322,7 +322,7 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::OrchestrateLoop(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx, InsAlgTemplate0 &tempAlgIntra,
+    const OpParam &param, AlgResourceCtxSerializable &resCtx, InsAlgTemplate0 &tempAlgIntra,
     InsAlgTemplate1 &tempAlgInter)
 {
     HCCL_INFO("[InsReduceScatterParallelExecutor][OrchestrateLoop] Start");
