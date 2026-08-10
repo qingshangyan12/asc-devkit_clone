@@ -38,8 +38,7 @@ __simd_callee__ inline reg_tensor<T> operator!(reg_tensor<T> src)
     static_assert(detail::supports_not_v<T>,
         "operator! supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_not_v<T>) {
+    if constexpr (detail::supports_not_v<T>) {
         vector_bool isZero;
         asc_eq_scalar(isZero, src.reg, static_cast<T>(0), src.mask);
         asc_duplicate_scalar(dst.reg, static_cast<T>(0), src.mask);
@@ -57,8 +56,7 @@ __simd_callee__ inline reg_tensor<T> operator&(reg_tensor<T> src0, reg_tensor<T>
     static_assert(detail::supports_bitwise_v<T>,
         "operator& supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_bitwise_v<T>) {
+    if constexpr (detail::supports_bitwise_v<T>) {
         asc_and(dst.reg, src0.reg, src1.reg, src0.mask);
         dst.mask = src0.mask;
     }
@@ -72,8 +70,7 @@ __simd_callee__ inline reg_tensor<T> operator&(reg_tensor<T> src, Scalar value)
     static_assert(detail::supports_bitwise_v<T>,
         "scalar operator& supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_bitwise_v<T>) {
+    if constexpr (detail::supports_bitwise_v<T>) {
         return src & detail::broadcast_scalar<T>(static_cast<T>(value), src.mask);
     }
 #endif
@@ -93,8 +90,7 @@ __simd_callee__ inline reg_tensor<T> operator|(reg_tensor<T> src0, reg_tensor<T>
     static_assert(detail::supports_bitwise_v<T>,
         "operator| supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_bitwise_v<T>) {
+    if constexpr (detail::supports_bitwise_v<T>) {
         asc_or(dst.reg, src0.reg, src1.reg, src0.mask);
         dst.mask = src0.mask;
     }
@@ -108,8 +104,7 @@ __simd_callee__ inline reg_tensor<T> operator|(reg_tensor<T> src, Scalar value)
     static_assert(detail::supports_bitwise_v<T>,
         "scalar operator| supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_bitwise_v<T>) {
+    if constexpr (detail::supports_bitwise_v<T>) {
         return src | detail::broadcast_scalar<T>(static_cast<T>(value), src.mask);
     }
 #endif
@@ -129,8 +124,7 @@ __simd_callee__ inline reg_tensor<T> operator^(reg_tensor<T> src0, reg_tensor<T>
     static_assert(detail::supports_bitwise_v<T>,
         "operator^ supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_bitwise_v<T>) {
+    if constexpr (detail::supports_bitwise_v<T>) {
         asc_xor(dst.reg, src0.reg, src1.reg, src0.mask);
         dst.mask = src0.mask;
     }
@@ -144,8 +138,7 @@ __simd_callee__ inline reg_tensor<T> operator^(reg_tensor<T> src, Scalar value)
     static_assert(detail::supports_bitwise_v<T>,
         "scalar operator^ supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_bitwise_v<T>) {
+    if constexpr (detail::supports_bitwise_v<T>) {
         return src ^ detail::broadcast_scalar<T>(static_cast<T>(value), src.mask);
     }
 #endif
@@ -165,8 +158,7 @@ __simd_callee__ inline reg_tensor<T> operator<<(reg_tensor<T> src, reg_tensor<Sh
     static_assert(detail::supports_shift_pair_v<T, ShiftT>,
         "register operator<< requires an integer source and a signed shift register of the same width");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_shift_pair_v<T, ShiftT>) {
+    if constexpr (detail::supports_shift_pair_v<T, ShiftT>) {
         asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
         dst.mask = src.mask;
     }
@@ -183,8 +175,7 @@ __simd_callee__ inline reg_tensor<T> operator<<(reg_tensor<T> src, Scalar shift)
     static_assert(::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>,
         "scalar operator<< requires an integer shift value");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_shift_v<T> && ::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>) {
+    if constexpr (detail::supports_shift_v<T> && ::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>) {
         asc_shiftleft_scalar(dst.reg, src.reg, static_cast<int16_t>(shift), src.mask);
         dst.mask = src.mask;
     }
@@ -199,8 +190,7 @@ __simd_callee__ inline reg_tensor<T> operator>>(reg_tensor<T> src, reg_tensor<Sh
     static_assert(detail::supports_shift_pair_v<T, ShiftT>,
         "register operator>> requires an integer source and a signed shift register of the same width");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_shift_pair_v<T, ShiftT>) {
+    if constexpr (detail::supports_shift_pair_v<T, ShiftT>) {
         asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
         dst.mask = src.mask;
     }
@@ -217,8 +207,7 @@ __simd_callee__ inline reg_tensor<T> operator>>(reg_tensor<T> src, Scalar shift)
     static_assert(::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>,
         "scalar operator>> requires an integer shift value");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        detail::supports_shift_v<T> && ::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>) {
+    if constexpr (detail::supports_shift_v<T> && ::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>) {
         asc_shiftright_scalar(dst.reg, src.reg, static_cast<int16_t>(shift), src.mask);
         dst.mask = src.mask;
     }
@@ -240,8 +229,7 @@ __simd_callee__ inline reg_tensor<bool> compare(reg_tensor<T> src0, reg_tensor<T
     reg_tensor<bool> dst;
     static_assert(supports_compare_v<T>, "comparison does not support this element type");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        supports_compare_v<T>) {
+    if constexpr (supports_compare_v<T>) {
         if constexpr (Op == comparison_op::EQ) {
             asc_eq(dst.reg, src0.reg, src1.reg, src0.mask);
         } else if constexpr (Op == comparison_op::NE) {
@@ -266,8 +254,7 @@ __simd_callee__ inline reg_tensor<bool> compare(reg_tensor<T> src, Scalar value)
     reg_tensor<bool> dst;
     static_assert(supports_compare_v<T>, "comparison does not support this element type");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (::AscendC::Te::CURRENT_ARCH_VERSION == ::AscendC::Te::ArchVersion::V3510 &&
-        supports_compare_v<T>) {
+    if constexpr (supports_compare_v<T>) {
         if constexpr (Op == comparison_op::EQ) {
             asc_eq_scalar(dst.reg, src.reg, static_cast<T>(value), src.mask);
         } else if constexpr (Op == comparison_op::NE) {
