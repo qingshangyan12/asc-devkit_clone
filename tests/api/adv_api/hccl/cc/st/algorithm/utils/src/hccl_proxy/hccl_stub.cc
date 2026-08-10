@@ -372,6 +372,10 @@ HcclResult HcclChannelAcquire(
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
     CHK_PTR_NULL(simComm);
     std::string channelTag = "channelTag";
+    if (engine == COMM_ENGINE_CCU) {
+        return simComm->ChannelCommCreateForCcu(
+            simComm->GetIdentifier(), channelTag.c_str(), engine, channelDescList, listNum, channelList);
+    }
     return simComm->ChannelCommCreate(
         simComm->GetIdentifier(), channelTag.c_str(), engine, channelDescList, listNum, channelList);
 }
