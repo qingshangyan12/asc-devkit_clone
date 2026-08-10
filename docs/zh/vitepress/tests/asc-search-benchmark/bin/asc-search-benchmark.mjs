@@ -354,53 +354,93 @@ async function findPageTarget(debuggerPort, deadline) {
   throw new Error('Timed out waiting for a Chromium page target')
 }
 
+async function terminateChild(child, signal = 'SIGTERM') {
+  if (!child?.pid || child.exitCode !== null || child.signalCode !== null) return
+  const exited = new Promise(resolvePromise => child.once('exit', resolvePromise))
+  if (!child.kill(signal)) return
+  if (signal === 'SIGKILL') {
+    await exited
+    return
+  }
+  let timeout
+  const exitedGracefully = await Promise.race([
+    exited.then(() => true),
+    new Promise(resolvePromise => {
+      timeout = setTimeout(() => resolvePromise(false), 1000)
+    }),
+  ])
+  clearTimeout(timeout)
+  if (!exitedGracefully && child.exitCode === null && child.signalCode === null) {
+    if (child.kill('SIGKILL')) await exited
+  }
+}
+
+async function cleanupBrowser(client, child, userDataDir, signal = 'SIGTERM') {
+  try {
+    client?.close()
+  }
+  finally {
+    try {
+      await terminateChild(child, signal)
+    }
+    finally {
+      await rm(userDataDir, { recursive: true, force: true })
+    }
+  }
+}
+
 async function launchBrowser(chromium, timeoutMs) {
   const userDataDir = await mkdtemp(join(tmpdir(), 'asc-search-browser-'))
-  const args = [
-    '--headless',
-    '--no-sandbox',
-    '--disable-gpu',
-    '--disable-dev-shm-usage',
-    '--disable-background-timer-throttling',
-    '--disable-renderer-backgrounding',
-    '--remote-debugging-port=0',
-    `--user-data-dir=${userDataDir}`,
-    'about:blank',
-  ]
-  const child = spawn(chromium, args, { stdio: ['ignore', 'ignore', 'pipe'] })
-  child.stderr.setEncoding('utf8')
-  let stderr = ''
-  const deadline = Date.now() + timeoutMs
-  let debuggerPort
-  while (!debuggerPort && Date.now() < deadline) {
-    const chunk = await new Promise((resolvePromise, reject) => {
-      const timeout = setTimeout(() => resolvePromise(''), 100)
-      child.stderr.once('data', (data) => {
-        clearTimeout(timeout)
-        resolvePromise(data)
+  let child
+  let client
+  try {
+    const args = [
+      '--headless',
+      '--no-sandbox',
+      '--disable-gpu',
+      '--disable-dev-shm-usage',
+      '--disable-background-timer-throttling',
+      '--disable-renderer-backgrounding',
+      '--remote-debugging-port=0',
+      `--user-data-dir=${userDataDir}`,
+      'about:blank',
+    ]
+    child = spawn(chromium, args, { stdio: ['ignore', 'ignore', 'pipe'] })
+    child.stderr.setEncoding('utf8')
+    let stderr = ''
+    const deadline = Date.now() + timeoutMs
+    let debuggerPort
+    while (!debuggerPort && Date.now() < deadline) {
+      const chunk = await new Promise((resolvePromise, reject) => {
+        const timeout = setTimeout(() => resolvePromise(''), 100)
+        child.stderr.once('data', (data) => {
+          clearTimeout(timeout)
+          resolvePromise(data)
+        })
+        child.once('error', reject)
       })
-      child.once('error', reject)
+      stderr += chunk
+      debuggerPort = stderr.match(/DevTools listening on ws:\/\/127\.0\.0\.1:(\d+)\//)?.[1]
+      if (child.exitCode !== null) throw new Error(`Chromium exited during startup (${child.exitCode})\n${stderr}`)
+    }
+    if (!debuggerPort) throw new Error(`Timed out waiting for Chromium DevTools after ${timeoutMs}ms\n${stderr}`)
+    client = await connectCdp(await findPageTarget(debuggerPort, deadline))
+    await client.command('Runtime.enable')
+    await client.command('Page.enable')
+    return {
+      client,
+      child,
+      userDataDir,
+      async dispose() {
+        await cleanupBrowser(client, child, userDataDir)
+      },
+    }
+  }
+  catch (error) {
+    await cleanupBrowser(client, child, userDataDir, 'SIGKILL').catch((cleanupError) => {
+      error.cause = cleanupError
     })
-    stderr += chunk
-    debuggerPort = stderr.match(/DevTools listening on ws:\/\/127\.0\.0\.1:(\d+)\//)?.[1]
-    if (child.exitCode !== null) throw new Error(`Chromium exited during startup (${child.exitCode})\n${stderr}`)
-  }
-  if (!debuggerPort) {
-    child.kill('SIGKILL')
-    throw new Error(`Timed out waiting for Chromium DevTools after ${timeoutMs}ms\n${stderr}`)
-  }
-  const client = await connectCdp(await findPageTarget(debuggerPort, deadline))
-  await client.command('Runtime.enable')
-  await client.command('Page.enable')
-  return {
-    client,
-    child,
-    userDataDir,
-    async dispose() {
-      client.close()
-      child.kill('SIGTERM')
-      await rm(userDataDir, { recursive: true, force: true })
-    },
+    throw error
   }
 }
 
