@@ -17,20 +17,22 @@
 ```text
 ├── reg_compute_tensor_api
 │   ├── scripts
-│   │   └── gen_data.py             // 输入数据和真值数据生成脚本
+│   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py        // 输出数据和真值数据校验脚本
 │   ├── CMakeLists.txt              // 编译工程文件
+│   ├── data_utils.h                // 数据读入和写出函数
 │   ├── README.md                   // 中文说明文档
 │   ├── README_En.md                // 英文说明文档
-│   └── reg_compute_tensor_api.asc  // Ascend C算子实现、调用和精度校验样例
+│   └── reg_compute_tensor_api.asc  // Ascend C算子实现和调用样例
 ```
 
-执行数据生成脚本后会在样例目录下生成`input`和`output`目录，其中的二进制文件无需提交。
+执行数据生成脚本后会在`build`目录下生成`input`和`output`目录，其中的二进制文件无需提交。
 
 ## 算子描述
 
 - 算子功能：
 
-  本样例分别对64个`float`元素和64个`int32_t`元素执行Reg Compute基础计算。浮点计算生成38组结果，整数计算生成14组结果，Host侧将所有输出与NumPy生成的真值数据逐元素比较。
+  本样例分别对64个`float`元素和64个`int32_t`元素执行Reg Compute基础计算。浮点计算生成38组结果，整数计算生成14组结果，验证脚本将所有输出与NumPy生成的真值数据逐元素比较。
 
 - 算子规格：
 
@@ -89,7 +91,7 @@
 
   - 调用实现
 
-    使用内核调用符`<<<>>>`调用核函数。核函数执行完成后，Host侧读取`golden_float.bin`和`golden_int.bin`进行精度校验。`exp`、`sqrt`和`log`系列接口采用绝对误差和相对误差均为`5e-3`的组合容差，其余浮点计算采用`1e-4`，整数和比较结果要求精确一致。
+    使用内核调用符`<<<>>>`调用核函数。核函数执行完成后，Host侧将结果写入`float_output.bin`和`int_output.bin`，`verify_result.py`负责与`golden_float.bin`和`golden_int.bin`进行精度校验。`exp`、`sqrt`和`log`系列接口采用绝对误差和相对误差均为`5e-3`的组合容差，其余浮点计算采用`1e-4`，整数和比较结果要求精确一致。
 
 ## 编译运行
 
@@ -120,18 +122,22 @@
 - 样例执行
 
   ```bash
-  python3 scripts/gen_data.py
-  cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-3510
-  cmake --build build -j
-  ./build/demo
+  mkdir -p build && cd build
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510
+  cmake --build . -j
+  python3 ../scripts/gen_data.py
+  ./demo
+  python3 ../scripts/verify_result.py \
+    output/float_output.bin output/golden_float.bin \
+    output/int_output.bin output/golden_int.bin
   ```
 
-  执行结果如下，说明所有接口计算结果均通过精度校验。
+  验证脚本输出如下，说明所有接口计算结果均通过精度校验。
 
   ```text
   Float results passed, max absolute error: <value>
   Int32 results passed.
-  reg_compute_tensor_api sample passed.
+  test pass!
   ```
 
 - 编译选项说明
