@@ -579,8 +579,10 @@ HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName)
 std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, const std::string& algName)
 {
     if (UseCannBridge(opParam)) {
+        HCCL_INFO("[GetAlgExecutorForOp] UseCannBridge algname[%s].", algName.c_str());
         return GetAlgExecViaCann(opParam.opType, algName);
     }
+    HCCL_INFO("[GetAlgExecutorForOp] Not UseCannBridge algname[%s].", algName.c_str());
     return CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
 }
 

@@ -26,7 +26,7 @@ HcclResult ExecuteSelector::Run(
 
     if (UseCannBridge(opParam)) {
         HCCL_INFO(
-            "[asc][AlgoSelect][ExecuteSelector::Run] before SelectViaCann, opType[%d], "
+            "[hld][asc][AlgoSelect][ExecuteSelector::Run] before SelectViaCann, opType[%d], "
             "opExecuteConfig[%d], engine[%d].",
             opParam.opType, opParam.opExecuteConfig, opParam.engine);
         return SelectViaCann(opParam, topoInfo, selectAlgName);
