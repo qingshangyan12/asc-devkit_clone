@@ -6,14 +6,14 @@ NPU域上板调试手段主要包含上板数据打印、msSanitizer内存异常
 
 printf主要用于打印标量和字符串信息，SIMT编程及SIMD编程均支持。
 
-printf示例如下，printf接口的使用说明和具体约束请参考[printf](../../../../api/Utils-API/调测接口/printf.md)。
+printf示例如下，printf接口的使用说明和具体约束请参考[printf](../../../../api/Utils-API/tuning_interface/printf.md)。
 
 ```
 printf("fmt string %d", 0x123);
 ```
 
 >[!NOTE]说明
->printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[printf](../../../../api/Utils-API/调测接口/printf.md)。
+>printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[printf](../../../../api/Utils-API/tuning_interface/printf.md)。
 
 ## SIMD编程通过DumpTensor打印进行调试<a name="section16452184823718"></a>
 
@@ -45,7 +45,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 
 ```
 
-> [!NOTE] 说明
+> [!NOTE]说明
 > DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[DumpTensor](../../../../api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md)。
 
 ## 使用msSanitizer工具进行异常检测<a name="section931475414217"></a>
@@ -61,7 +61,7 @@ msSanitizer工具是基于AI处理器的异常检测工具，包含了单算子�
 
 **异常检测程序编译**
 ```shell
-// bisheng编译时增加sanitizer命令行
+// bisheng编译时增加相关的sanitizer编译选项。
 bisheng add_custom.asc -o add_custom --sanitizer -lineinfo
 ```
 **异常检测工具的使用**
