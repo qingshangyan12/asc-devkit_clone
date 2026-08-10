@@ -26,7 +26,11 @@
 
 ## 功能说明
 
-等待所有流水线操作完成。
+头文件路径：`"c_api/sync/sync.h"`。
+
+用于同一核内所有流水线之间的全流水同步。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。
+
+本接口适用于需要等待核内所有并行执行单元同时到达一个一致状态后再继续执行的场景。
 
 ## 函数原型
 
@@ -48,7 +52,8 @@ PIPE_S
 
 ## 约束说明
 
-asc_sync会等待所有流水线中所有先前提交的接口完成，这会对性能产生影响。若仅需阻塞单条流水线，应避免随意调用asc_sync，可选用[asc_sync_pipe](asc_sync_pipe.md)、[asc_sync_mte2](asc_sync_mte2.md)、[asc_sync_mte3](asc_sync_mte3.md)等接口精准控制，以提升性能。
+- AIC与AIV中均可调用本接口。
+- asc_sync会等待所有流水线中所有先前提交的接口完成，这会对性能产生影响。若仅需阻塞单条流水线，应避免随意调用asc_sync，可选用[asc_sync_pipe](asc_sync_pipe.md)、[asc_sync_mte2](asc_sync_mte2.md)、[asc_sync_mte3](asc_sync_mte3.md)等接口精准控制同步，以提升性能。
 
 ## 调用示例
 
