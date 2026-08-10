@@ -14,11 +14,20 @@
 
 namespace mc2_ops_hccl {
 
+// 最多支持 8 * 16 = 128 个 rank 的 unroll 展开（与 hccl 独立仓保持一致）
+constexpr uint32_t AG_M2M_UNROLL_NUM = 16;
+
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable outputOffset,
     ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
+<<<<<<< HEAD
     ccu::Variable isInputOutputEqual, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
     uint32_t rankId);
+=======
+    ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum, ccu::Variable inputRepeatStride,
+    ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize, ccu::Variable isInputOutputEqual,
+    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId);
+>>>>>>> f5610b3dd (test)
 
 } // namespace mc2_ops_hccl
 
