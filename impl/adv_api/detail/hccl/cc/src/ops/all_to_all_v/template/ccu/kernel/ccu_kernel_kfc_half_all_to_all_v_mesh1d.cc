@@ -109,8 +109,6 @@ static CcuResult LoadSendParamsFromMem(KfcHalfAllToAllVMesh1DContext& ctx)
         curOffsetsAddr += elemSize;
     }
 
-    ccu::Variable halfRankSize;
-    halfRankSize = static_cast<uint64_t>(ctx.rankSize);
     ccu::Variable bBaseOffset;
     bBaseOffset = static_cast<uint64_t>(ctx.rankSize) * 8U;
 
@@ -151,8 +149,15 @@ static CcuResult DoHalfAllToAllVWrite(KfcHalfAllToAllVMesh1DContext& ctx)
         const uint32_t eventIdx = peerId / A2AV_BITS_PER_EVENT;
         const uint16_t peerMask = 1U << (peerId % A2AV_BITS_PER_EVENT);
 
-        ccu::Variable& curCount = (ctx.missionId == 0) ? ctx.sendSizeA[peerId] : ctx.sendSizeB[peerId];
-        ccu::Variable& curOffset = (ctx.missionId == 0) ? ctx.sendOffsetA[peerId] : ctx.sendOffsetB[peerId];
+        ccu::Variable curCount;
+        ccu::Variable curOffset;
+        if (ctx.missionId == 0) {
+            curCount = ctx.sendSizeA[peerId];
+            curOffset = ctx.sendOffsetA[peerId];
+        } else {
+            curCount = ctx.sendSizeB[peerId];
+            curOffset = ctx.sendOffsetB[peerId];
+        }
 
         ccu::LocalAddr src;
         src.addr = ctx.userInAddr;
@@ -181,7 +186,8 @@ static CcuResult DoHalfAllToAllVWrite(KfcHalfAllToAllVMesh1DContext& ctx)
 
         CCU_IF(curCount != 0)
         {
-            CCU_CHK_RET(ccu::Write(ctx.channels[channelIdx], dst, src, curCount, ctx.writeDoneEvents[eventIdx], peerMask));
+            CCU_CHK_RET(ccu::Write(
+                ctx.channels[channelIdx], dst, src, curCount, ctx.writeDoneEvents[eventIdx], peerMask));
         }
         CCU_IF(curCount == 0)
         {
