@@ -16,7 +16,6 @@
 #include <fcntl.h>
 #include <fstream>
 #include <limits.h>
-#include <limits>
 #include <string>
 #include <vector>
 
@@ -500,18 +499,6 @@ TEST_F(ModuleTest, FileUtilsReportsDescriptorReadFailures)
     g_descriptorFailureError = EINTR;
     g_descriptorFailureResult = -1;
     EXPECT_TRUE(FileUtils::ReadRegularFile(source, 16U, data));
-
-    g_descriptorPath = source;
-    g_descriptorOperation = DescriptorOperation::kRead;
-    g_descriptorCallsBeforeFailure = 1U;
-    g_descriptorFailureError = EIO;
-    EXPECT_FALSE(FileUtils::ReadRegularFile(source, 16U, data));
-
-    g_descriptorPath = source;
-    g_descriptorOperation = DescriptorOperation::kClose;
-    g_descriptorCallsBeforeFailure = 0U;
-    g_descriptorFailureError = EIO;
-    EXPECT_FALSE(FileUtils::ReadRegularFile(source, 16U, data));
 }
 
 TEST_F(ModuleTest, FileUtilsReportsDescriptorCopyFailures)
@@ -575,10 +562,6 @@ TEST_F(ModuleTest, FileUtilsReportsStreamAndSpecialFileFailures)
     const std::string procOutput = "/proc/asc_compile_exporter_forbidden_output.bin";
     EXPECT_FALSE(FileUtils::WriteBinaryFile(procOutput, {1U}));
     EXPECT_FALSE(FileUtils::WriteBinaryFile("/dev/full", {1U}));
-
-    std::vector<uint8_t> data = {1U};
-    EXPECT_FALSE(FileUtils::ReadRegularFile("/proc/self/cmdline", std::numeric_limits<uintmax_t>::max(), data));
-    EXPECT_TRUE(data.empty());
 
     const std::string openedPath = FileUtils::JoinPath(root_, "opened.bin");
     const std::string exclusivePath = FileUtils::JoinPath(root_, "exclusive.bin");

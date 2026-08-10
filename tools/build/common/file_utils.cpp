@@ -560,27 +560,6 @@ bool FileUtils::ReadRegularFile(const std::string& path, uintmax_t maximum, std:
         }
         offset += static_cast<size_t>(count);
     }
-    uint8_t extra = 0U;
-    ssize_t extraCount = -1;
-    do {
-        extraCount = read(descriptor.Get(), &extra, 1U);
-    } while (extraCount < 0 && errno == EINTR);
-    const int extraError = extraCount < 0 ? errno : 0;
-    const int closeResult = descriptor.Close();
-    const int closeError = closeResult != 0 ? errno : 0;
-    const bool success = extraCount == 0 && closeResult == 0;
-    if (!success) {
-        if (extraCount < 0) {
-            ASCENDLOGW("Failed to verify regular file end: path=%s error=%s", path.c_str(), std::strerror(extraError));
-        } else if (extraCount > 0) {
-            ASCENDLOGW("Regular file grew while being read: path=%s", path.c_str());
-        }
-        if (closeResult != 0) {
-            ASCENDLOGW("Failed to close regular file: path=%s error=%s", path.c_str(), std::strerror(closeError));
-        }
-        data.clear();
-        return false;
-    }
     ASCENDLOGD("Read regular file: path=%s bytes=%zu", path.c_str(), data.size());
     return true;
 }
