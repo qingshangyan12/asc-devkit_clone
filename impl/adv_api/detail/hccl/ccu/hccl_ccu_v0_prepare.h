@@ -232,6 +232,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[3] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
     xnData_[4] = sliceSize;
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
+<<<<<<< HEAD
     xnData_[9] = (xnData_[1] == xnData_[2] + xnData_[3]) ? 1U : 0U;
 }
 
@@ -279,6 +280,16 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             1U :
             0U;
     CalcGoSize(nhrSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_NHR_GO_SIZE_0]);
+=======
+
+    // 3 阶段 unroll 高性能版 DoRepeatAllGather 所需参数（与 KFC server 分发保持一致）
+    xnData_[9] = 0;          // currentRankSliceInputOffset：input 为独立 sendBuf，无 slice 偏移
+    xnData_[10] = UINT64_MAX - 1; // tmpRepeatNum：单次执行
+    xnData_[11] = 0;         // inputRepeatStride
+    xnData_[12] = 0;         // outputRepeatStride
+    xnData_[13] = sliceSize; // lastSliceSize
+    xnData_[14] = 0;         // isInputOutputEqual
+>>>>>>> f5610b3dd (test)
 }
 
 template <const auto& config>
