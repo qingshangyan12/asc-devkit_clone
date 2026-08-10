@@ -50,10 +50,13 @@ add_executable(${HCCL_MC2_CCU_SELECTOR_TARGET}
     ${HCCL_MC2_CCU_SELECTOR_DIR}/all_to_all_selector_testcase.cpp
     ${HCCL_MC2_CCU_SELECTOR_DIR}/dag_conflict_testcase.cpp
     ${HCCL_MC2_CCU_SELECTOR_DIR}/stubs.cc
+    ${UTILS_DIR}/ccu/ccu_all_to_all_mesh1d_adapter.cc
+    ${UTILS_DIR}/ccu_scenario/ccu_all_to_all.cc
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )
 
 target_include_directories(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
+    ${HCCL_MC2_CCU_SELECTOR_DIR}/shim
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
     ${UTILS_DIR}/ccu_scenario
     ${HCCL_CC_SRC_DIR}
