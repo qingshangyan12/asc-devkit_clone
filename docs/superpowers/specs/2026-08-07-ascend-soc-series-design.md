@@ -63,6 +63,38 @@ AddConfig 原始 key 生成 `aic-<soc>-ops-info.ini`，从而可能产生混合�
 实现不得新增混合大小写合法表、full SKU 合法表或 full SKU 到 series 的反向映射。
 既有 `ASC_VALID_SOC_LIST` 是构建入口判断合法 series 的唯一数据源。
 
+### 使用方式
+
+`ASCEND_SOC_SERIES` 支持与既有 `ASCEND_COMPUTE_UNIT` 相同的 CMake 配置方式。
+
+方式一，在 `CMakePresets.json` 的 `cacheVariables` 中配置：
+
+```json
+"ASCEND_SOC_SERIES": {
+    "type": "STRING",
+    "value": "Ascend910B;Ascend950"
+}
+```
+
+方式二，在 CMake configure 命令行通过 `-D` 配置；多值中的分号需要避免被 shell
+解释：
+
+```bash
+cmake -S . -B build_out '-DASCEND_SOC_SERIES=Ascend910B;Ascend950'
+```
+
+方式三，在顶层 `CMakeLists.txt` 中直接设置。仓库现有算子工程样例在
+`find_package(ASC REQUIRED)` 之后设置 `ASCEND_COMPUTE_UNIT`，新配置必须兼容
+相同顺序：
+
+```cmake
+find_package(ASC REQUIRED)
+set(ASCEND_SOC_SERIES Ascend910B Ascend950)
+```
+
+也允许在 `find_package(ASC REQUIRED)` 之前设置。无论采用哪种方式，都不得同时
+定义 `ASCEND_SOC_SERIES` 和 `ASCEND_COMPUTE_UNIT`。
+
 ### AddConfig 输入
 
 `op_host` 的 AddConfig key 仍表示 short series，但匹配不区分大小写。例如：
@@ -105,20 +137,36 @@ this->AICore().AddConfig("Ascend950", configB);
 
 ### 构建入口归一化
 
-适配逻辑放在 `cmake/asc/fwk_modules/config.cmake`，位于现有默认值和白名单校验
-之前：
+归一化和互斥检查封装为 CMake 内部公共解析函数，输出供当前消费作用域使用的
+canonical `ASCEND_COMPUTE_UNIT`。解析需要覆盖两个时机：
 
-1. 检测 `ASCEND_SOC_SERIES` 与 `ASCEND_COMPUTE_UNIT` 是否同时定义；若是则
-   configure 失败。
-2. 仅定义 `ASCEND_SOC_SERIES` 时，使用 CMake `string(TOLOWER)` 转为小写，赋给
-   非 cache 的 `ASCEND_COMPUTE_UNIT`。
-3. 未定义新配置时，保留旧配置或既有默认值。
-4. 使用不变的 `ASC_VALID_SOC_LIST` 校验 canonical `ASCEND_COMPUTE_UNIT` list。
+1. `cmake/asc/fwk_modules/config.cmake` 加载时，处理 preset、命令行 `-D` 或在
+   `find_package` 前设置的变量。
+2. `npu_op_code_gen`、`npu_op_package_add` 等实际消费 SoC 配置的公共构建入口，
+   再次解析调用方当前作用域中的变量，以支持在 `find_package` 后通过 `set()` 配置。
+
+解析规则如下：
+
+1. 检测 `ASCEND_SOC_SERIES` 与用户显式配置的 `ASCEND_COMPUTE_UNIT` 是否同时
+   定义；若是则 configure 失败。
+2. 仅定义 `ASCEND_SOC_SERIES` 时，使用 CMake `string(TOLOWER)` 转为小写，写入
+   当前消费作用域的 `ASCEND_COMPUTE_UNIT`。
+3. 未定义新旧配置时，在消费入口使用既有默认值 `ascend910b`。
+4. 使用不变的 `ASC_VALID_SOC_LIST` 校验 canonical `ASCEND_SOC_SERIES` list。
 5. 新配置非法时，错误信息明确指出只接受 SoC series、不接受 full SKU，并打印
-   支持的 series 列表；旧配置非法时保留既有错误行为。
+   支持的 series 列表。
+6. 旧 `ASCEND_COMPUTE_UNIT` 保持现有校验时机和大小写行为；本需求不借机收紧
+   `find_package` 后设置旧变量的历史行为。
 
-入口适配完成后不再引入新变量。opbuild 仍接收 `--compute_unit`，Python 构建工具仍
-接收 `--compute-unit`，打包逻辑仍消费 `ASCEND_COMPUTE_UNIT`。
+为可靠区分“用户显式配置”与默认值，模块加载阶段不应提前把默认值物化为公共
+`ASCEND_COMPUTE_UNIT` cache 项。解析函数在新旧变量均未定义时惰性返回
+`ascend910b`；解析得到的 canonical 值只赋给当前消费函数的局部
+`ASCEND_COMPUTE_UNIT`。模块加载阶段只校验当时已经存在的用户输入，不把新配置
+永久回写为旧公共变量。这样后续 `set(ASCEND_SOC_SERIES ...)` 仍能被识别为唯一输入，
+而用户后续同时 `set()` 新旧变量时也能无歧义报错。
+
+解析完成后不再引入新的下游接口。opbuild 仍接收 `--compute_unit`，Python 构建工具
+仍接收 `--compute-unit`，打包逻辑仍消费 canonical `ASCEND_COMPUTE_UNIT`。
 
 ### opbuild AddConfig 归一化
 
@@ -226,6 +274,9 @@ AddConfig 使用 full SKU 或其他非法 series 时不新增错误：cfg genera
 5. 新旧变量同时定义时始终失败，包括两者内容相同的情况。
 6. 只使用旧配置时保持既有行为。
 7. 两者均未配置时保持 `ascend910b` 默认值。
+8. preset、命令行、`find_package` 前 `set()` 和 `find_package` 后 `set()` 四种入口
+   得到相同 canonical 结果。
+9. 通过任意入口显式配置新旧变量时均触发互斥错误。
 
 ### opbuild 单元测试
 
