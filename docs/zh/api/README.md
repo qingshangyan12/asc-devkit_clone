@@ -1333,6 +1333,8 @@
             -   [asc_hf32_round_mode](SIMD-API/c_api/enum/asc_hf32_round_mode.md)
             -   [asc_load_l2_cache_mode](SIMD-API/c_api/enum/asc_load_l2_cache_mode.md)
             -   [asc_store_l2_cache_mode](SIMD-API/c_api/enum/asc_store_l2_cache_mode.md)
+        -   [实验接口](SIMD-API/c_api/experimental/experimental.md)
+            -   [asc_get_pipe_idle_slot_count](SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md)
 
     -   [高阶API](SIMD-API/adv_api/adv_api.md)
         -   [高阶API列表](SIMD-API/adv_api/adv_api_list.md)

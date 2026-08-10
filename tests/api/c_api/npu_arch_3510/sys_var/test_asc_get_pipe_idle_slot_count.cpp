@@ -70,6 +70,7 @@ TEST(TestSysVarAscGetPipeIdleSlotCountUnsupportedCore, GetIdleSlotCountReturnsZe
 #elif defined(__DAV_CUBE__)
     g_coreType = C_API_AIC_TYPE;
     EXPECT_EQ(0, asc_get_pipe_v_idle_slot_count());
+    EXPECT_EQ(0, asc_get_pipe_mte3_idle_slot_count());
 #endif
     g_coreType = C_API_AIV_TYPE;
     GlobalMockObject::verify();
@@ -87,7 +88,6 @@ INSTANTIATE_TEST_SUITE_P(
         GetIdleSlotCountParams{asc_get_pipe_m_idle_slot_count, PIPE_M},
         GetIdleSlotCountParams{asc_get_pipe_mte1_idle_slot_count, PIPE_MTE1},
         GetIdleSlotCountParams{asc_get_pipe_mte2_idle_slot_count, PIPE_MTE2},
-        GetIdleSlotCountParams{asc_get_pipe_mte3_idle_slot_count, PIPE_MTE3},
         GetIdleSlotCountParams{asc_get_pipe_fix_idle_slot_count, PIPE_FIX})
 #endif
 );

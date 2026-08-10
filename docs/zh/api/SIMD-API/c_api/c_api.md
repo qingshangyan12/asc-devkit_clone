@@ -574,3 +574,18 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_hf32_round_mode](enum/asc_hf32_round_mode.md) | 表示Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略。 |
 | [asc_load_l2_cache_mode](enum/asc_load_l2_cache_mode.md) | 表示数据从GM搬运到UB时的L2 cache策略。 |
 | [asc_store_l2_cache_mode](enum/asc_store_l2_cache_mode.md) | 表示数据从UB搬运到GM时的L2 cache策略。 |
+
+## 实验接口
+
+实验接口的名称、功能和行为可能在后续版本中变更或删除，使用前需要包含对应的实验接口头文件，并开启实验特性。
+
+**表14**  实验接口列表
+
+| API名称 | 说明 |
+| --- | --- |
+| [asc_get_pipe_mte2_idle_slot_count](experimental/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_MTE2`发射队列的空闲槽位数量。 |
+| [asc_get_pipe_mte3_idle_slot_count](experimental/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_MTE3`发射队列的空闲槽位数量。 |
+| [asc_get_pipe_v_idle_slot_count](experimental/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_V`发射队列的空闲槽位数量。 |
+| [asc_get_pipe_m_idle_slot_count](experimental/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_M`发射队列的空闲槽位数量。 |
+| [asc_get_pipe_mte1_idle_slot_count](experimental/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_MTE1`发射队列的空闲槽位数量。 |
+| [asc_get_pipe_fix_idle_slot_count](experimental/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_FIX`发射队列的空闲槽位数量。 |

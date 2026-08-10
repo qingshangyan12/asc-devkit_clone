@@ -26,28 +26,30 @@
 
 ## 功能说明
 
+使用本组接口前，需要通过`#include "c_api/experimental/asc_get_pipe_idle_slot_count.h"`包含头文件。
+
 获取指定流水线对应发射队列（Issue Queue）当前的空闲槽位数量。空闲槽位表示发射队列还能接收的待发射指令数量，可用于观察队列占用情况。
 
-本组接口包含以下六个函数，各函数查询的流水线和适用的AI Core如下：
+本组接口包含以下六个函数，各函数查询的流水线、适用的AI Core和最大空闲槽位数量如下：
 
 <a id="table1"></a>
-**表1**  接口与流水线对应关系
+**表1**  接口、流水线与最大值对应关系
 
-| 函数 | 查询的流水线 | 适用AI Core |
-| --- | --- | --- |
-| `asc_get_pipe_mte2_idle_slot_count` | PIPE_MTE2 | AIC、AIV |
-| `asc_get_pipe_mte3_idle_slot_count` | PIPE_MTE3 | AIC、AIV |
-| `asc_get_pipe_v_idle_slot_count` | PIPE_V | AIV |
-| `asc_get_pipe_m_idle_slot_count` | PIPE_M | AIC |
-| `asc_get_pipe_mte1_idle_slot_count` | PIPE_MTE1 | AIC |
-| `asc_get_pipe_fix_idle_slot_count` | PIPE_FIX | AIC |
+| 函数 | 查询的流水线 | 适用AI Core | 最大空闲槽位数量 |
+| --- | --- | --- | --- |
+| `asc_get_pipe_mte2_idle_slot_count` | PIPE_MTE2 | AIC、AIV | AIC：16；AIV：16 |
+| `asc_get_pipe_mte3_idle_slot_count` | PIPE_MTE3 | AIV | 16 |
+| `asc_get_pipe_v_idle_slot_count` | PIPE_V | AIV | 32 |
+| `asc_get_pipe_m_idle_slot_count` | PIPE_M | AIC | 16 |
+| `asc_get_pipe_mte1_idle_slot_count` | PIPE_MTE1 | AIC | 32 |
+| `asc_get_pipe_fix_idle_slot_count` | PIPE_FIX | AIC | 32 |
 
 ## 函数原型
 
   ```cpp
   // 获取PIPE_MTE2发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count()
-  // 获取PIPE_MTE3发射队列的空闲槽位数量
+  // 获取PIPE_MTE3发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count()
   // 获取PIPE_V发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count()
@@ -75,7 +77,7 @@ PIPE_S。
 
 - 本组接口为实验接口，接口名称、功能和行为可能在后续版本中变更或删除。使用前需要增加编译选项`-DCANN_ASC_USE_EXPERIMENTAL`开启实验特性。
 - 使用本组接口前，需要通过`#include "c_api/experimental/asc_get_pipe_idle_slot_count.h"`包含头文件。
-- 各接口仅支持[表1 接口与流水线对应关系](#table1)所列的AI Core类型。在不支持的AI Core类型上调用时，接口返回0。此时无法区分发射队列没有空闲槽位和当前AI Core类型不支持该接口这两种情况。
+- 各接口仅支持[表1 接口、流水线与最大值对应关系](#table1)所列的AI Core类型。在不支持的AI Core类型上调用时，接口返回0。此时无法区分发射队列没有空闲槽位和当前AI Core类型不支持该接口这两种情况。
 
 ## 调用示例
 

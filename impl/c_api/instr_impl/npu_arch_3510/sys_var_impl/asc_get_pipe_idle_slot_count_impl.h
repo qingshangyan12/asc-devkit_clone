@@ -22,7 +22,13 @@
 
 __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count() { return static_cast<uint8_t>(get_iqent(PIPE_MTE2)); }
 
-__aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count() { return static_cast<uint8_t>(get_iqent(PIPE_MTE3)); }
+__aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count()
+{
+    if ASC_IS_AIV {
+        return static_cast<uint8_t>(get_iqent(PIPE_MTE3));
+    }
+    return 0;
+}
 
 __aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count()
 {
