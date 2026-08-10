@@ -69,6 +69,16 @@ HcclResult CcuTempKfcHalfAllToAllVMesh1D::KernelRun(
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
     const auto goSize = CalGoSize(sliceSize, config);
 
+    HCCL_INFO(
+        "[CcuTempKfcHalfAllToAllVMesh1D][KernelRun] inputAddr[0x%llx], sendSizesAddr[0x%llx], "
+        "sendOffsetsAddr[0x%llx], recvOffset[0x%llx], token[0x%llx], sliceSize[%llu], "
+        "goSize[0x%llx, 0x%llx, 0x%llx, 0x%llx]",
+        static_cast<unsigned long long>(inputAddr), static_cast<unsigned long long>(sendSizesAddr),
+        static_cast<unsigned long long>(sendOffsetsAddr), static_cast<unsigned long long>(recvOffset),
+        static_cast<unsigned long long>(token), static_cast<unsigned long long>(sliceSize),
+        static_cast<unsigned long long>(goSize[0]), static_cast<unsigned long long>(goSize[1]),
+        static_cast<unsigned long long>(goSize[2]), static_cast<unsigned long long>(goSize[3]));
+
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
     CHK_RET(FillCachedArgs(

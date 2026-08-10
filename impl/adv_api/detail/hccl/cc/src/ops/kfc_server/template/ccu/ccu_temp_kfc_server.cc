@@ -36,6 +36,11 @@ void InheritKfcServerKernelArg(
         kfcArg->loadFromMem = false;
         kfcArg->opParam = param;
         kfcArg->subCommRanks = subCommRanks;
+        HCCL_INFO(
+            "[InheritKfcServerKernelArg] srcKernel[%s], opType[%u], rankSize[%u], rankId[%u], "
+            "subCommRanks[0].size[%u]",
+            srcName.c_str(), static_cast<uint32_t>(param.opType), kfcArg->rankSize, kfcArg->rankId,
+            static_cast<uint32_t>(subCommRanks[0].size()));
     } else {
         HCCL_WARNING(
             "[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
