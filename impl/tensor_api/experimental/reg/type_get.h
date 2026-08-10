@@ -24,13 +24,12 @@
 
 namespace asc {
 namespace te {
+namespace detail {
 
 // Keep the primary template incomplete so unsupported element types fail at
 // compile time when reg_tensor<T> requests the corresponding register type.
 template <typename DataType>
 struct type_get;
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 template <>
 struct type_get<bool> {
@@ -127,8 +126,7 @@ struct type_get<fp4x2_e1m2_t> {
     using T = vector_fp4x2_e1m2_t;
 };
 
-#endif
-
+} // namespace detail
 } // namespace te
 } // namespace asc
 

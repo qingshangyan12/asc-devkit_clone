@@ -9,14 +9,12 @@
 */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
-    "impl/tensor_api/experimental/reg/reg_tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_TENSOR
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
 #endif
 
-#ifndef IMPL_TENSOR_API_EXPERIMENTAL_REG_REG_TENSOR_IMPL_H
-#define IMPL_TENSOR_API_EXPERIMENTAL_REG_REG_TENSOR_IMPL_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_TENSOR_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_TENSOR_H
 
 #include "impl/tensor_api/experimental/reg/type_get.h"
 
@@ -27,14 +25,13 @@ template <typename DataType>
 struct reg_tensor;
 
 template <>
-struct reg_tensor<bool>;
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-template <>
 struct reg_tensor<bool> {
     using type = bool;
-    using reg_type = typename type_get<bool>::T;
+    using elem_type = bool;
+    using reg_type = typename detail::type_get<bool>::T;
+
+    __simd_callee__ reg_tensor() = default;
+    __simd_callee__ reg_tensor(reg_type regValue) : reg(regValue) {}
 
     reg_type reg;
 };
@@ -42,9 +39,21 @@ struct reg_tensor<bool> {
 template <typename DataType>
 struct reg_tensor {
     using type = DataType;
-    using reg_type = typename type_get<DataType>::T;
+    using elem_type = DataType;
+    using reg_type = typename detail::type_get<DataType>::T;
 
-    __simd_callee__ inline reg_tensor with_mask(const reg_tensor<bool>& maskReg){
+    __simd_callee__ reg_tensor() = default;
+    __simd_callee__ reg_tensor(vector_bool maskValue) : mask(maskValue) {}
+
+    template <typename ScalarType>
+    __simd_callee__ inline reg_tensor& operator=(ScalarType src)
+    {
+        asc_duplicate_scalar(reg, static_cast<DataType>(src), mask);
+        return *this;
+    }
+
+    __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg)
+    {
         mask = maskReg.reg;
         return *this;
     }
@@ -53,14 +62,12 @@ struct reg_tensor {
     vector_bool mask;
 };
 
-#endif
-
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_REG_TENSOR_IMPL_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_TENSOR_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_TENSOR)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_TENSOR
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
 #endif
