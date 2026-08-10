@@ -31,8 +31,7 @@ __aicore__ inline int64_t GetBlockIdxImpl() { return block_idx; }
 
 __aicore__ inline void GetArchVersionImpl(uint32_t& coreVersion)
 {
-    const int32_t coreVersionOffset = 32;
-    coreVersion = static_cast<uint32_t>((static_cast<uint64_t>(get_arch_ver()) >> coreVersionOffset) & 0xFFF);
+    ASCENDC_ASSERT((false), "unsupported GetArchVersion!");
 }
 
 __aicore__ inline int64_t GetSubBlockNumImpl() { return 1; }
@@ -75,8 +74,8 @@ __aicore__ inline int64_t GetParameterBaseAddrImpl()
 
 __aicore__ inline int64_t GetProgramCounterImpl()
 {
-    int64_t pc = static_cast<int64_t>(static_cast<uint64_t>(get_pc()) & 0xFFFFFFFFFFFF);
-    return pc;
+    ASCENDC_ASSERT((false), "unsupported GetProgramCounter!");
+    return 0;
 }
 
 __aicore__ inline int64_t GetSystemCycleImpl()
