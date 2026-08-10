@@ -217,6 +217,7 @@ enum class DataCopyMode {
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
     defined(__ASC_NPU_HOST__)
+constexpr int FTZ_MODE = __ASC_FTZ__;
 struct ExpSpecificMode {
     MaskMergeMode mrgMode = MaskMergeMode::ZEROING;
     ExpAlgo algo = ExpAlgo::INTRINSIC;
