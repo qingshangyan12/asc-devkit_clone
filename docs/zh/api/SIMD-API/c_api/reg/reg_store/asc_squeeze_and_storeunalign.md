@@ -96,6 +96,6 @@ __simd_vf__ inline void vf_squeeze_and_storeunalign(__ubuf__ half* dst_addr, __u
         asc_loadalign_postupdate(src, src_addr, one_repeat_size);
         asc_squeeze_and_storeunalign(dst_addr, dst, ureg, src, mask);
     }
-    asc_squeeze_and_storeunalign_finalize(dst_addr, ureg, dst);
+    asc_squeeze_and_storeunalign_finalize(dst_addr, ureg);
 }
 ```

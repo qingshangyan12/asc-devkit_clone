@@ -45,3 +45,7 @@
 - **[asc_storealign_v5（废弃）](asc_storealign_v5_deprecated.md)**
 
 - **[asc_scatter（废弃）](asc_scatter_deprecated.md)**
+
+- **[asc_storeunalign_post（废弃）](asc_storeunalign_post_deprecated.md)**
+
+- **[asc_storeunalign_postupdate（废弃）](asc_storeunalign_postupdate_deprecated.md)**
