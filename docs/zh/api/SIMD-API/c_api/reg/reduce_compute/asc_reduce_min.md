@@ -108,15 +108,104 @@ __simd_callee__ inline void asc_reduce_min(vector_half& dst,
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void reduce_min_vf(__ubuf__ half* src_addr, __ubuf__ half* dst_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/reduce_compute/asc_reduce_min.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/reduce_compute/asc_reduce_min.asc -lm -o /tmp/c_api_reg_reduce_compute_asc_reduce_min && /tmp/c_api_reg_reduce_compute_asc_reduce_min
+// Architecture: dav-3510
+
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+namespace {
+template <typename T>
+void PrintData(const char* label, const std::vector<T>& values)
 {
-    vector_half src, dst;
-    vector_bool mask;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src, src_addr, one_repeat_size);
-        asc_reduce_min(dst, src, mask);
-        asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
     }
+    return true;
+}
+
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+__simd_vf__ inline void Reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
+{
+    vector_uint32_t dst_reg, src_reg;
+    uint32_t count = ELEMENT_COUNT;
+    vector_bool mask = asc_update_mask_b32(count);
+    asc_loadalign(src_reg, src);
+    asc_reduce_min(dst_reg, src_reg, mask);
+    asc_storealign(dst, dst_reg, mask);
+}
+__global__ __vector__ void AscReduceMinKernel(__gm__ uint32_t* dst, __gm__ uint32_t* src)
+{
+    asc_init();
+    __ubuf__ uint32_t dst_local[ELEMENT_COUNT], src_local[ELEMENT_COUNT];
+    asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(uint32_t));
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    Reduce(dst_local, src_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(uint32_t));
+    asc_sync();
+}
+} // namespace
+int main()
+{
+    std::vector<uint32_t> src(ELEMENT_COUNT), output(ELEMENT_COUNT, 0), golden(ELEMENT_COUNT, 0);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) src[i] = i + 1;
+    golden[0] = src.front(); golden[1] = 0;
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint32_t* src_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), (ELEMENT_COUNT) * sizeof(uint32_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    uint32_t* dst_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(uint32_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src_device, src.size() * sizeof(uint32_t), src.data(), src.size() * sizeof(uint32_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    AscReduceMinKernel<<<1, 0>>>(dst_device, src_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), dst_device, output.size() * sizeof(uint32_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input", src);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden);
+    std::cout << (passed ? "[Success] asc_reduce_min passed." : "[Failed] asc_reduce_min failed.") << std::endl;
+    aclrtFree(dst_device);
+    aclrtFree(src_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```

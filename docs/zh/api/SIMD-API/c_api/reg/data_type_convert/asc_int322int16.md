@@ -111,17 +111,120 @@ __simd_callee__ inline void asc_int322int16(vector_int16_t& dst,
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void int322int16_vf(__ubuf__ int32_t* src_addr, __ubuf__ int16_t* dst_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/data_type_convert/asc_int322int16.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/data_type_convert/asc_int322int16.asc -lm -o /tmp/c_api_reg_data_type_convert_asc_int322int16 && /tmp/c_api_reg_data_type_convert_asc_int322int16
+// Architecture: dav-3510
+
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+namespace {
+template <typename T>
+void PrintData(const char* label, const std::vector<T>& values)
 {
-    vector_int32_t src;
-    vector_int16_t dst;
-    vector_bool mask;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        mask = asc_update_mask_b32(count);
-        asc_loadalign_postupdate(src, src_addr, one_repeat_size);
-        asc_int322int16(dst, src, mask);
-        asc_store(dst_addr, dst);
-        dst_addr += one_repeat_size * 2;
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
     }
+    return true;
+}
+
+
+
+
+constexpr uint32_t BUFFER_BYTES = 256;
+__simd_vf__ inline void Convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+{
+    vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    vector_int16_t dst_0;
+    vector_int32_t src_0;
+    asc_loadalign(dst_0, reinterpret_cast<__ubuf__ int16_t*>(output));
+    asc_loadalign(src_0, reinterpret_cast<__ubuf__ int32_t*>(input));
+    asc_int322int16_sat(dst_0, src_0, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ int16_t*>(output), dst_0, mask);
+    vector_int16_t dst_1;
+    vector_int32_t src_1;
+    asc_loadalign(dst_1, reinterpret_cast<__ubuf__ int16_t*>(output));
+    asc_loadalign(src_1, reinterpret_cast<__ubuf__ int32_t*>(input));
+    asc_int322int16_v2(dst_1, src_1, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ int16_t*>(output), dst_1, mask);
+    vector_int16_t dst_2;
+    vector_int32_t src_2;
+    asc_loadalign(dst_2, reinterpret_cast<__ubuf__ int16_t*>(output));
+    asc_loadalign(src_2, reinterpret_cast<__ubuf__ int32_t*>(input));
+    asc_int322int16_sat_v2(dst_2, src_2, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ int16_t*>(output), dst_2, mask);
+    vector_int16_t dst_3;
+    vector_int32_t src_3;
+    asc_loadalign(dst_3, reinterpret_cast<__ubuf__ int16_t*>(output));
+    asc_loadalign(src_3, reinterpret_cast<__ubuf__ int32_t*>(input));
+    asc_int322int16(dst_3, src_3, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ int16_t*>(output), dst_3, mask);
+}
+__global__ __vector__ void AscInt322int16Kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t output_local[BUFFER_BYTES];
+    __ubuf__ uint8_t input_local[BUFFER_BYTES];
+    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
+    asc_copy_gm2ub_align(output_local, input, BUFFER_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    Convert(output_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_sync();
+}
+} // namespace
+int main()
+{
+    constexpr uint8_t input_pattern[] = {0x01, 0x00, 0x00, 0x00};
+    constexpr uint8_t golden_pattern[] = {0x01, 0x00, 0x00, 0x00};
+    std::vector<uint8_t> input(BUFFER_BYTES);
+    std::vector<uint8_t> output(BUFFER_BYTES, 0xff);
+    std::vector<uint8_t> golden(BUFFER_BYTES);
+    for (size_t i = 0; i < BUFFER_BYTES; ++i) {
+        input[i] = input_pattern[i % sizeof(input_pattern)];
+        golden[i] = golden_pattern[i % sizeof(golden_pattern)];
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t* input_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), (BUFFER_BYTES) * sizeof(uint8_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    uint8_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (BUFFER_BYTES) * sizeof(uint8_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, input.size() * sizeof(uint8_t), input.data(), input.size() * sizeof(uint8_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    AscInt322int16Kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    std::cout << "Conversion: vector_int32_t -> vector_int16_t" << std::endl;
+    PrintData("Input 1.0 (raw bytes)", input);
+    PrintData("Output (raw bytes)", output);
+    PrintData("Golden 1.0 (raw bytes)", golden);
+    const bool passed = CompareData(output, golden);
+    std::cout << (passed ? "[Success] asc_int322int16/asc_int322int16_sat/asc_int322int16_v2/asc_int322int16_sat_v2 passed." : "[Failed] asc_int322int16/asc_int322int16_sat/asc_int322int16_v2/asc_int322int16_sat_v2 failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```
