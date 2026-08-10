@@ -37,12 +37,18 @@
 
 ### 无偏移预处理搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
                                                 __ubuf__ <dtype>* src)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。
+
+#### 典型示例
 
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
@@ -51,13 +57,19 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
 
 ### 带地址寄存器偏移预处理搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
                                                 __ubuf__ <dtype>* src,
                                                 addr_reg offset)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。
+
+#### 典型示例
 
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,

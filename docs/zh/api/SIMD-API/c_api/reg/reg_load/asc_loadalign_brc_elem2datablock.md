@@ -38,12 +38,19 @@
 
 ### 无偏移搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,
                                                             __ubuf__ <dtype>* src)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+#### 典型示例
+
 ```c
 // 示例：从UB读取8个half元素并广播填充到目的矢量寄存器。
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
@@ -51,13 +58,21 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
 ```
 
 ### 带偏移搬入
+
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,
                                                             __ubuf__ <dtype>* src,
                                                             int32_t offset)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+#### 典型示例
+
 ```c
 // 示例：从UB偏移8个half元素处读取并广播。
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
@@ -66,13 +81,21 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
 ```
 
 ### 带地址寄存器偏移搬入
+
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,
                                                             __ubuf__ <dtype>* src,
                                                             addr_reg offset)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+#### 典型示例
+
 ```c
 // 示例：按地址寄存器偏移从UB读取8个half元素并广播填充。
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,

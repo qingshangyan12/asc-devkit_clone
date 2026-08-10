@@ -32,19 +32,15 @@
 
 - 带地址寄存器偏移Post Update搬入：`src1`为固定的基地址指针，接口不会修改该指针。实际搬入地址为`src1`的底层UB地址与`offset`记录的实际字节偏移之和。接口先使用当前`offset`搬入数据，搬入完成后再将`offset`记录的地址偏移量增加`inc`个元素。该模式需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
 
-`asc_update_addr_reg`的参数和本接口的`inc`分别控制不同循环迭代之间和同一循环迭代之内的地址偏移：
-
-**不同循环迭代之间**：以一维循环和b8模式为例，`asc_update_addr_reg_b8`的`offset`参数表示相邻循环迭代之间的迭代偏移量。第`i`轮生成的地址寄存器中，记录的起始偏移量为`i * offset`。进入第`i + 1`轮并再次调用`asc_update_addr_reg_b8(offset)`时，地址寄存器会根据新的循环索引生成`(i + 1) * offset`，不会从上一轮经`inc`更新后的值继续累加。
-
-**同一循环迭代之内**：`inc`表示本次搬入完成后对`offset`记录的地址偏移量追加的元素偏移，用于为本轮的下一次带地址寄存器偏移搬入准备地址。本轮最后一次调用之后若不再使用该地址寄存器，可将`inc`设置为0。下一轮的起始偏移仍由`asc_update_addr_reg`生成。
-
-例如，每轮只调用一次本接口且每轮搬入一个VL时，将`asc_update_addr_reg`的迭代偏移量设置为一个VL，将`inc`设置为0。第`i`轮从基地址加`i`个VL的位置搬入，下一轮从基地址加`i + 1`个VL的位置搬入。每轮连续调用两次本接口时，将迭代偏移量设置为两个VL，将第一次调用的`inc`设置为一个VL，并将第二次调用的`inc`设置为0。第`i`轮依次从基地址加`2 * i`个VL和基地址加`2 * i + 1`个VL的位置搬入，下一轮从基地址加`2 * (i + 1)`个VL的位置开始。具体代码请参考[调用示例](#调用示例)。
+`asc_update_addr_reg`根据循环索引生成每轮起始偏移；`inc`仅在当前循环迭代内更新`offset`，不会影响下一轮的起始偏移。本轮最后一次使用`offset`时，可将`inc`设置为0。
 
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
 ## 函数原型
 
 ### Post Update搬入
+
+#### 模板原型（占位符形式）
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
@@ -53,7 +49,11 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
                                                        uint32_t count)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。
+
+#### 典型示例
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
@@ -64,6 +64,8 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 
 ### 带地址寄存器偏移Post Update搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
                                                        vector_load_unalign& src0,
@@ -72,7 +74,11 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
                                                        uint32_t inc)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。
+
+#### 典型示例
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
@@ -147,34 +153,6 @@ __simd_vf__ inline void load_store_postupdate(
 }
 ```
 
-第`i`轮循环使用更新前的`src_addr`搬入数据，实际搬入地址为`src_base + i * count`；数据搬出到`dst_base + i * count`。本轮搬运完成后，`src_addr`和`dst_addr`分别更新为对应基地址加`(i + 1) * count`个元素。循环结束后，两个地址相对各自基地址均增加`repeat_times * count`个元素。
-
-### 每轮调用一次带地址寄存器偏移Post Update搬入
-
-下面以`int8_t`为例，每轮循环搬运一个VL。`vl_elements`表示一个VL包含的`int8_t`元素个数，同时作为`asc_update_addr_reg_b8`的迭代偏移量。每轮仅调用一次`asc_loadunalign_postupdate`，因此`inc`设置为0。搬入的数据通过`asc_storeunalign_postupdate`连续搬出到目的地址，并在循环结束后完成尾部写回。
-
-```cpp
-__simd_vf__ inline void load_store_one_vl_per_loop(
-    __ubuf__ int8_t* dst_base, __ubuf__ int8_t* src_addr,
-    uint32_t vl_elements, uint16_t repeat_times)
-{
-    vector_int8_t data;
-    vector_load_unalign load_unalign_reg;
-    vector_store_unalign store_unalign_reg;
-    __ubuf__ int8_t* dst_addr = dst_base;
-    addr_reg offset;
-    for (uint16_t i = 0; i < repeat_times; ++i) {
-        offset = asc_update_addr_reg_b8(vl_elements);
-        asc_loadunalign_pre(load_unalign_reg, src_addr, offset);
-        asc_loadunalign_postupdate(data, load_unalign_reg, src_addr, offset, 0);
-        asc_storeunalign_postupdate(dst_addr, store_unalign_reg, data, vl_elements);
-    }
-    asc_storeunalign_post_postupdate(dst_addr, store_unalign_reg, 0);
-}
-```
-
-第`i`轮循环的搬入地址为`src_addr + i * vl_elements`，下一轮由`asc_update_addr_reg_b8`根据迭代偏移量生成新的起始偏移。搬出地址为`dst_base + i * vl_elements`，每轮搬出后由`asc_storeunalign_postupdate`自动推进一个VL。
-
 ### 每轮调用两次带地址寄存器偏移Post Update搬入
 
 下面以`int8_t`为例，每轮循环连续搬运两个VL。`asc_update_addr_reg_b8`的迭代偏移量为`2 * vl_elements`。第一次调用将`inc`设置为`vl_elements`，使`offset`在搬运完成后增加一个VL；第二次调用使用更新后的`offset`搬运同一轮内的第二个VL。第二次调用后不再使用当前`offset`，因此其`inc`设置为0。两次搬入的数据分别搬出，目的地址随每次搬出自动推进一个VL；循环结束后再统一完成尾部写回。
@@ -201,5 +179,3 @@ __simd_vf__ inline void load_store_two_vl_per_loop(
     asc_storeunalign_post_postupdate(dst_addr, store_unalign_reg, 0);
 }
 ```
-
-第`i`轮循环的两次搬入地址依次为`src_addr + i * 2 * vl_elements`和`src_addr + i * 2 * vl_elements + vl_elements`，对应搬出地址依次为`dst_base + i * 2 * vl_elements`和`dst_base + i * 2 * vl_elements + vl_elements`。进入下一轮循环后，`asc_update_addr_reg_b8`重新生成该轮的搬入起始偏移；`dst_addr`则已由两次搬出自动推进两个VL。

@@ -32,13 +32,19 @@
 
 ## 函数原型
 
+### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(vector_<dtype>& dst,
                                                                         __ubuf__ <dtype>*& src,
                                                                         int32_t offset)
 ```
 
+### dtype支持数据类型
+
 dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+### 典型示例
 
 ```c
 // 示例：b16重载，读取N个half元素并分别广播到对应DataBlock。

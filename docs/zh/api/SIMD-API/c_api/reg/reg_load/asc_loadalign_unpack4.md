@@ -38,12 +38,18 @@
 
 ### 无偏移搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadalign_unpack4(vector_<dtype>& dst,
                                                   __ubuf__ <dtype>* src)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`。
+
+#### 典型示例
 
 ```c
 // 示例：从UB起始地址按b8解压缩粒度搬入一个VL长度的int8_t数据。
@@ -53,13 +59,19 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst,
 
 ### 带偏移搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadalign_unpack4(vector_<dtype>& dst,
                                                   __ubuf__ <dtype>* src,
                                                   int32_t offset)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`。
+
+#### 典型示例
 
 ```c
 // 示例：带偏移从UB按b8解压缩粒度搬入一个VL长度的int8_t数据。
@@ -70,13 +82,19 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst,
 
 ### 带地址寄存器偏移搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadalign_unpack4(vector_<dtype>& dst,
                                                   __ubuf__ <dtype>* src,
                                                   addr_reg offset)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`。
+
+#### 典型示例
 
 ```c
 // 示例：按地址寄存器偏移从UB按b8解压缩粒度搬入一个VL长度的int8_t数据。

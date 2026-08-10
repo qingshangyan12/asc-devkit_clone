@@ -30,12 +30,18 @@
 
 ## 函数原型
 
+### 模板原型（占位符形式）
+
 ```c
 __aicore__ inline <dtype> asc_atomic_add(__gm__ <dtype>* address,
                                          <dtype> val)
 ```
 
+### dtype支持数据类型
+
 dtype支持的数据类型为`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。
+
+### 典型示例
 
 ```c
 // 示例：int32_t类型标量原子加。

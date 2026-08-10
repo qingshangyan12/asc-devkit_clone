@@ -42,6 +42,8 @@
 
 ### 无偏移搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
@@ -51,7 +53,11 @@ __simd_callee__ inline void asc_loadalign(vector_bool& dst,
                                           __ubuf__ uint32_t* src)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。
+
+#### 典型示例
 
 ```c
 // 示例：float类型。
@@ -60,6 +66,8 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 ```
 
 ### 带偏移搬入
+
+#### 模板原型（占位符形式）
 
 ```c
 // 搬入矢量数据寄存器。
@@ -72,7 +80,11 @@ __simd_callee__ inline void asc_loadalign(vector_bool& dst,
                                           int32_t offset)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。
+
+#### 典型示例
 
 ```c
 // 示例：float类型。
@@ -83,6 +95,8 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 
 ### 带地址寄存器偏移搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
@@ -94,7 +108,11 @@ __simd_callee__ inline void asc_loadalign(vector_bool& dst,
                                           addr_reg offset)
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。
+
+#### 典型示例
 
 ```c
 // 示例：float类型。
@@ -105,6 +123,8 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 
 ### 非连续对齐搬入
 
+#### 模板原型（占位符形式）
+
 ```c
 __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
                                           __ubuf__ <dtype>* src,
@@ -113,7 +133,11 @@ __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
                                           vector_bool mask);
 ```
 
+#### dtype支持数据类型
+
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。
+
+#### 典型示例
 
 ```c
 // 示例：float类型。
