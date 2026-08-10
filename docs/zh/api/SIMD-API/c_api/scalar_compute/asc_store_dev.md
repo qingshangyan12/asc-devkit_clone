@@ -29,34 +29,35 @@
 不经过DCache向GM地址上写数据。
 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
 
+本接口为标量访存，运行在标量流水上，AIC与AIV均可调用，行为一致。
+
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_store_dev(__gm__ int8_t* addr, int8_t value)
+### 模板原型
 
-__aicore__ inline void asc_store_dev(__gm__ uint8_t* addr, uint8_t value)
+```c
+__aicore__ inline void asc_store_dev(__gm__ <dtype>* addr,
+                                     <dtype> value)
+```
 
-__aicore__ inline void asc_store_dev(__gm__ int16_t* addr, int16_t value)
+dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
 
-__aicore__ inline void asc_store_dev(__gm__ uint16_t* addr, uint16_t value)
+### 典型示例
 
-__aicore__ inline void asc_store_dev(__gm__ int32_t* addr, int32_t value)
-
-__aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value)
-
-__aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value)
-
-__aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value)
+```c
+// 示例：写入32 bit无符号整数
+__aicore__ inline void asc_store_dev(__gm__ uint32_t* addr,
+                                     uint32_t value)
 ```
 
 ## 参数说明
 
 **表1** 参数说明
 
-|参数名|输入/输出|描述|
-|------------|------------|-----------|
-| addr     | 输出     | 目标GM地址。|
-| value     | 输入     | 待写入目标的数据。|
+| 参数名 | 输入/输出 | 描述 |
+| ------------ | ------------ | ----------- |
+| addr | 输出 | 目标GM地址。 |
+| value | 输入 | 待写入目标的数据。 |
 
 ## 返回值说明
 
@@ -68,7 +69,10 @@ PIPE_S
 
 ## 约束说明
 
-无
+- `addr`起始地址须按写入dtype字节宽度对齐，未对齐触发异常。
+- `addr`须落在GM可访问地址空间内。
+- 本接口运行在标量流水上，与后续依赖该写入结果的指令之间存在标量数据依赖；如后续有读取同一GM地址的指令，须通过同步指令建立依赖顺序，标量流水本身的顺序执行不保证跨指令访存可见性。
+- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../guide/编程指南/高级编程/内存模型/缓存一致性.md#scalar原子操作与dcache一致性)。
 
 ## 调用示例
 

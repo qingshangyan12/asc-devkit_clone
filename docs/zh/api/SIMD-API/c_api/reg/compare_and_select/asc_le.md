@@ -34,18 +34,19 @@ $$
 dst_i = (src0_i \leq src1_i)
 $$
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_le(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_le(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_le(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_le(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_le(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_le(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_le(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_le(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_le(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
+```c
+__simd_callee__ inline void asc_le(vector_bool& dst, vector_<dtype> src0, vector_<dtype> src1, vector_bool mask);
+```
+
+dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+```c
+// 典型示例：half类型逐元素小于等于比较
+__simd_callee__ inline void asc_le(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask);
 ```
 
 ## 参数说明
@@ -57,7 +58,7 @@ __simd_callee__ inline void asc_le(vector_bool& dst, vector_float src0, vector_f
 | dst | 输出 | 目的操作数（掩码寄存器）。 |
 | src0 | 输入 | 源操作数（矢量数据寄存器）。 |
 | src1 | 输入 | 源操作数（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -65,12 +66,19 @@ __simd_callee__ inline void asc_le(vector_bool& dst, vector_float src0, vector_f
 
 无
 
+## 流水类型
+
+PIPE_V
+
 ## 约束说明
 
-- 通过mask参数控制的未选中元素在目的操作数中被置零。
-- 操作数重叠约束：src0和src1可以是同一个矢量数据寄存器。
-- 浮点数据类型比较，涉及`nan`时比较结果为0。
-- 当源操作数为浮点数据类型时，+0与-0视为相等。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst、src0、src1、mask均为寄存器操作数，不涉及UB地址，无UB容量与地址对齐约束。
+- mask为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- src0与src1的dtype需要保持一致。
+- mask比特位为0时，dst对应比特位写0。
+- 浮点比较时，+0与-0视为相等。
+- 浮点比较输入含nan时，dst对应比特位写0。
 
 ## 调用示例
 
