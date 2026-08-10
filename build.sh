@@ -29,8 +29,6 @@ USE_CXX11_ABI=0
 CMAKE_TOOLCHAIN_FILE_VAL=""
 UTILS_SOURCE_REPO=${ASC_DEVKIT_UTILS_REPO:-"https://gitcode.com/cann/asc-devkit.git"}
 UTILS_SOURCE_BRANCH=${ASC_DEVKIT_UTILS_BRANCH:-"9.0.0"}
-HELPERS_SOURCE_REPO=${ASC_DEVKIT_HELPERS_REPO:-"${UTILS_SOURCE_REPO}"}
-HELPERS_SOURCE_BRANCH=${ASC_DEVKIT_HELPERS_BRANCH:-"master"}
 
 dotted_line="----------------------------------------------------------------"
 
@@ -471,21 +469,17 @@ function sync_utils_from_asc_devkit()
     exit 1
   fi
 
-  log "Info: Sync helpers from ${HELPERS_SOURCE_REPO}, branch ${HELPERS_SOURCE_BRANCH}."
-  if ! GIT_TERMINAL_PROMPT=0 git -C "${tmp_dir}" fetch --depth 1 "${HELPERS_SOURCE_REPO}" "${HELPERS_SOURCE_BRANCH}"; then
-    log "Error: Failed to fetch helpers from ${HELPERS_SOURCE_REPO} branch ${HELPERS_SOURCE_BRANCH}."
-    exit 1
-  fi
-  if ! git -C "${tmp_dir}" checkout --quiet FETCH_HEAD -- \
-    include/utils/base/helpers.h impl/utils/base/helpers_impl.h; then
-    log "Error: Helper files were not found in ${HELPERS_SOURCE_REPO} branch ${HELPERS_SOURCE_BRANCH}."
-    exit 1
-  fi
-
   rm -rf "${CURRENT_DIR}/impl/utils" "${CURRENT_DIR}/include/utils"
   mkdir -p "${CURRENT_DIR}/impl" "${CURRENT_DIR}/include"
   cp -a "${tmp_dir}/impl/utils" "${CURRENT_DIR}/impl/"
   cp -a "${tmp_dir}/include/utils" "${CURRENT_DIR}/include/"
+
+  local asc_simd_header="${CURRENT_DIR}/include/c_api/asc_simd.h"
+  if [[ ! -f "${asc_simd_header}" ]]; then
+    log "Error: ${asc_simd_header} was not found."
+    exit 1
+  fi
+  sed -i '/^[[:space:]]*#include[[:space:]]*"utils\/base\/helpers\.h"[[:space:]]*$/d' "${asc_simd_header}"
 
   local utils_cmake="${CURRENT_DIR}/impl/utils/CMakeLists.txt"
   if [[ -f "${utils_cmake}" ]]; then
