@@ -61,7 +61,8 @@ public:
     template <
         typename Constraints = tuple_constraints<Tp, Tps...>,
         enable_if_t<Constraints::variadic_copy_constructible, int> = 0>
-    ASCENDC_HOST_AICORE inline constexpr tuple(const Tp& val, const Tps&... params) : tuple<Tps...>(params...), value(val)
+    ASCENDC_HOST_AICORE inline constexpr tuple(const Tp& val, const Tps&... params)
+        : tuple<Tps...>(params...), value(val)
     {
         tuple_static_assert<0, Tp, Tps...>();
     }
@@ -194,7 +195,8 @@ ASCENDC_HOST_AICORE inline constexpr typename tuple_element<N, tuple<Tps...>>::t
 }
 
 template <size_t N, typename... Tps>
-ASCENDC_HOST_AICORE inline constexpr const typename tuple_element<N, tuple<Tps...>>::type& get(const tuple<Tps...>& t) noexcept
+ASCENDC_HOST_AICORE inline constexpr const typename tuple_element<N, tuple<Tps...>>::type& get(
+    const tuple<Tps...>& t) noexcept
 {
     tuple_static_assert<N, Tps...>();
     using type = const typename tuple_element<N, tuple<Tps...>>::type;
@@ -210,7 +212,8 @@ ASCENDC_HOST_AICORE inline constexpr typename tuple_element<N, tuple<Tps...>>::t
 }
 
 template <size_t N, typename... Tps>
-ASCENDC_HOST_AICORE inline constexpr const typename tuple_element<N, tuple<Tps...>>::type&& get(const tuple<Tps...>&& t) noexcept
+ASCENDC_HOST_AICORE inline constexpr const typename tuple_element<N, tuple<Tps...>>::type&& get(
+    const tuple<Tps...>&& t) noexcept
 {
     using type = const typename tuple_element<N, tuple<Tps...>>::type;
     return static_cast<type&&>(get<N, Tps...>(static_cast<const tuple<Tps...>&>(t)));
