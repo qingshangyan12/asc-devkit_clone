@@ -26,8 +26,8 @@
 #include "impl/tensor_api/tensor/layout_impl.h"
 #include "impl/tensor_api/tensor/engine_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
-#include "impl/tensor_api/experimental/reg/load_mode.h"
-#include "impl/tensor_api/experimental/reg/mask_impl.h"
+#include "tensor_api/experimental/reg/load_mode.h"
+#include "tensor_api/experimental/reg/reg_tensor.h"
 
 namespace asc {
 namespace te {
@@ -122,34 +122,10 @@ struct base_tensor {
     using data_type = get_attribute_element_type<element_type*>;
 
     template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Coord>
-    __simd_callee__ inline decltype(auto) load(const Coord& coord) const
-    {
-        static_assert(Std::is_same_v<get_mem_location<EngineType>, location::ub>,
-                      "base_tensor::load only supports tensors located in UB");
-
-        reg_tensor<data_type> dst;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-        auto src_engine = engine() + layout()(coord);
-        auto src = src_engine.begin().get();
-        if constexpr (sideband_mode == load_sideband_mode::direct) {
-            asc_loadalign(dst.reg, src);
-        }
-#endif
-        return dst;
-    }
+    __simd_callee__ inline decltype(auto) load(const Coord& coord) const;
 
     template <typename Coord, typename RegDataType>
-    __simd_callee__ inline void store(const Coord& coord, const reg_tensor<RegDataType>& src)
-    {
-        static_assert(Std::is_same_v<get_mem_location<EngineType>, location::ub>,
-                      "base_tensor::store only supports tensors located in UB");
-        static_assert(Std::is_same_v<data_type, RegDataType>,
-                      "base_tensor::store requires the tensor and reg_tensor to have the same element type");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-        auto dst_engine = engine() + layout()(coord);
-        asc_storealign(dst_engine.begin().get(), src.reg, src.mask);
-#endif
-    }
+    __simd_callee__ inline void store(const Coord& coord, const reg_tensor<RegDataType>& src);
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord)
@@ -412,6 +388,8 @@ __aicore__ inline constexpr auto squeeze(const T& x, const Pattern& pattern)
 
 } // namespace te
 } // namespace asc
+
+#include "impl/tensor_api/experimental/reg/load_store.h"
 
 #endif // IMPL_TENSOR_API_TENSOR_TENSOR_IMPL_H
 
