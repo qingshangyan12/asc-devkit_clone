@@ -279,8 +279,8 @@ bool FileUtils::CopyFile(const std::string& source, const std::string& destinati
     if (!fs::copy_file(fs::path(source), fs::path(destination), fs::copy_options::none, error)) {
         if (error) {
             ASCENDLOGW(
-                "Failed to copy file: source=%s destination=%s error=%s",
-                source.c_str(), destination.c_str(), error.message().c_str());
+                "Failed to copy file: source=%s destination=%s error=%s", source.c_str(), destination.c_str(),
+                error.message().c_str());
         } else {
             ASCENDLOGW("Failed to copy file: source=%s destination=%s", source.c_str(), destination.c_str());
         }
