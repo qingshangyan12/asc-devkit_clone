@@ -50,6 +50,7 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_transpose, transpose, sizeof(T), kStep, "CopyL12L0A");
         if constexpr (transpose) {
             asc_copy_l12l0a_transpose(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         } else {

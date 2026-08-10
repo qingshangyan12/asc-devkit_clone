@@ -56,6 +56,9 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.Layout(), "dst", "CopyGM2L1");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, src.Layout(), "src", "CopyGM2L1");
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "CopyGM2L1");
         using CopyGM2L1Impl = typename CopyGM2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyGM2L1Impl::template Run<trait, T, U>(dst, src);
     }

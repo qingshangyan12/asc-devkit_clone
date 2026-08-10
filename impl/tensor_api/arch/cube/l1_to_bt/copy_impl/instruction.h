@@ -48,6 +48,7 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_blocks, blockCount, blockLen, "CopyL12BT instruction");
 
         asc_copy_l12bt(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
     }
