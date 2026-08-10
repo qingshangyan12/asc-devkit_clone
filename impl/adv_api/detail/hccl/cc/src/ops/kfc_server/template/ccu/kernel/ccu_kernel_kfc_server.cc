@@ -137,7 +137,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLTOALL))
     {
-        CcuKernelArg alltoAllArg = reinterpret_cast<CcuKernelArg>(ctx.arg);
+        CcuKernelArg alltoAllArg = reinterpret_cast<CcuKernelArg>(const_cast<CcuKernelArgKfcServer*>(ctx.arg));
         CcuAlltoAllMesh1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
             param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
