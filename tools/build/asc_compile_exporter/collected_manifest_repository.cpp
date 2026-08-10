@@ -11,14 +11,12 @@
 #include "collected_manifest_repository.h"
 
 #include <algorithm>
-#include <cerrno>
 #include <cstdint>
 #include <cstring>
-#include <dirent.h>
-#include <memory>
 #include <utility>
 
-#include <sys/stat.h>
+#include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "ascendc_tool_log.h"
 #include "file_utils.h"
@@ -30,6 +28,8 @@ namespace ascendc {
 namespace manifest_generator {
 namespace {
 
+namespace fs = boost::filesystem;
+
 constexpr uint32_t MAX_MANIFEST_BYTES = 8U * 1024U * 1024U;
 constexpr uint32_t MAX_RESOURCE_FILE_BYTES = 1U * 1024U * 1024U;
 constexpr uint32_t MAX_BUNDLE_BYTES = 256U * 1024U * 1024U;
@@ -37,17 +37,6 @@ constexpr size_t MAX_MANIFEST_COUNT = 4096U;
 constexpr size_t MAX_FILES_PER_MANIFEST = 4096U;
 constexpr size_t MAX_FILES_PER_BUNDLE = 65536U;
 constexpr size_t MAX_DIRECTORY_DEPTH = 64U;
-
-struct DirectoryCloser {
-    void operator()(DIR* directory) const noexcept
-    {
-        if (directory != nullptr) {
-            (void)closedir(directory);
-        }
-    }
-};
-
-using DirectoryHandle = std::unique_ptr<DIR, DirectoryCloser>;
 
 class ResourceBudget final {
 public:
@@ -96,63 +85,58 @@ bool ReadBaseDir(const std::string& text, const std::string& manifestPath, std::
     return true;
 }
 
-bool IsManifestFile(const std::string& path)
+bool IsManifestFile(const fs::path& path)
 {
     constexpr const char* suffix = "_manifest.json";
-    const std::string name = FileUtils::FileName(path);
+    const std::string name = path.filename().string();
     return name.size() > std::strlen(suffix) &&
            name.compare(name.size() - std::strlen(suffix), std::strlen(suffix), suffix) == 0;
 }
 
-bool DiscoverManifestFilesBelow(const std::string& directory, std::vector<std::string>& manifests, size_t depth)
+bool AdvanceIterator(fs::recursive_directory_iterator& iterator, const std::string& root)
 {
-    DirectoryHandle stream(opendir(directory.c_str()));
-    if (!stream) {
-        const int openError = errno;
-        ASCENDLOGE("Failed to enumerate %s: %s", directory.c_str(), std::strerror(openError));
-        return false;
+    boost::system::error_code error;
+    iterator.increment(error);
+    if (!error) {
+        return true;
     }
-    while (dirent* entry = readdir(stream.get())) {
-        const std::string name(entry->d_name);
-        if (name == "." || name == "..") {
-            continue;
-        }
-        const std::string path = FileUtils::JoinPath(directory, name);
-        struct stat info {};
-        if (lstat(path.c_str(), &info) != 0) {
-            const int inspectError = errno;
-            ASCENDLOGE("Failed to inspect collection entry %s: %s", path.c_str(), std::strerror(inspectError));
-            return false;
-        }
-        if (S_ISLNK(info.st_mode)) {
-            continue;
-        }
-        if (S_ISDIR(info.st_mode)) {
-            if (depth >= MAX_DIRECTORY_DEPTH) {
-                ASCENDLOGE("Collection exceeds directory depth limit of %zu: %s", MAX_DIRECTORY_DEPTH, path.c_str());
-                return false;
-            }
-            if (!DiscoverManifestFilesBelow(path, manifests, depth + 1U)) {
-                return false;
-            }
-            continue;
-        }
-        if (!S_ISREG(info.st_mode) || !IsManifestFile(path)) {
-            continue;
-        }
-        if (manifests.size() >= MAX_MANIFEST_COUNT) {
-            ASCENDLOGE("Collection exceeds manifest count limit of %zu", MAX_MANIFEST_COUNT);
-            return false;
-        }
-        manifests.push_back(path);
-    }
-    return true;
+    ASCENDLOGE("Failed to enumerate %s: %s", root.c_str(), error.message().c_str());
+    return false;
 }
 
 bool DiscoverManifestFiles(const std::string& manifestSearchRoot, std::vector<std::string>& manifests)
 {
-    if (!DiscoverManifestFilesBelow(manifestSearchRoot, manifests, 0U)) {
+    boost::system::error_code error;
+    fs::recursive_directory_iterator iterator(fs::path(manifestSearchRoot), fs::directory_options::none, error);
+    const fs::recursive_directory_iterator end;
+    if (error) {
+        ASCENDLOGE("Failed to enumerate %s: %s", manifestSearchRoot.c_str(), error.message().c_str());
         return false;
+    }
+    while (iterator != end) {
+        const fs::path path = iterator->path();
+        const fs::file_status status = iterator->symlink_status(error);
+        if (error) {
+            ASCENDLOGE("Failed to inspect collection entry %s: %s", path.c_str(), error.message().c_str());
+            return false;
+        }
+        if (fs::is_symlink(status)) {
+            iterator.disable_recursion_pending();
+        } else if (fs::is_directory(status)) {
+            if (static_cast<size_t>(iterator.depth()) >= MAX_DIRECTORY_DEPTH) {
+                ASCENDLOGE("Collection exceeds directory depth limit of %zu: %s", MAX_DIRECTORY_DEPTH, path.c_str());
+                return false;
+            }
+        } else if (fs::is_regular_file(status) && IsManifestFile(path)) {
+            if (manifests.size() >= MAX_MANIFEST_COUNT) {
+                ASCENDLOGE("Collection exceeds manifest count limit of %zu", MAX_MANIFEST_COUNT);
+                return false;
+            }
+            manifests.push_back(path.string());
+        }
+        if (!AdvanceIterator(iterator, manifestSearchRoot)) {
+            return false;
+        }
     }
     std::sort(manifests.begin(), manifests.end());
     if (manifests.empty()) {
@@ -164,66 +148,72 @@ bool DiscoverManifestFiles(const std::string& manifestSearchRoot, std::vector<st
 
 bool LoadResourceFiles(
     const std::string& directory, const std::string& manifestRoot, const std::string& manifestPath,
-    ResourceBudget& budget, ManifestUnit& unit, size_t depth)
+    ResourceBudget& budget, ManifestUnit& unit)
 {
-    DirectoryHandle stream(opendir(directory.c_str()));
-    if (!stream) {
-        const int openError = errno;
-        ASCENDLOGE("Failed to enumerate manifest base_dir %s: %s", directory.c_str(), std::strerror(openError));
+    boost::system::error_code error;
+    fs::recursive_directory_iterator iterator(fs::path(directory), fs::directory_options::none, error);
+    const fs::recursive_directory_iterator end;
+    if (error) {
+        ASCENDLOGE("Failed to enumerate manifest base_dir %s: %s", directory.c_str(), error.message().c_str());
         return false;
     }
-    while (dirent* entry = readdir(stream.get())) {
-        const std::string name(entry->d_name);
-        if (name == "." || name == "..") {
-            continue;
-        }
-        const std::string source = FileUtils::JoinPath(directory, name);
-        struct stat info {};
-        if (lstat(source.c_str(), &info) != 0) {
-            const int inspectError = errno;
-            ASCENDLOGE("Failed to inspect manifest resource %s: %s", source.c_str(), std::strerror(inspectError));
+    while (iterator != end) {
+        const fs::path source = iterator->path();
+        const fs::file_status status = iterator->symlink_status(error);
+        if (error) {
+            ASCENDLOGE("Failed to inspect manifest resource %s: %s", source.c_str(), error.message().c_str());
             return false;
         }
-        if (S_ISLNK(info.st_mode)) {
+        if (fs::is_symlink(status)) {
             ASCENDLOGE("Manifest base_dir contains a symlink: %s", source.c_str());
             return false;
         }
-        if (S_ISDIR(info.st_mode)) {
-            if (depth >= MAX_DIRECTORY_DEPTH) {
+        if (fs::is_directory(status)) {
+            if (static_cast<size_t>(iterator.depth()) >= MAX_DIRECTORY_DEPTH) {
                 ASCENDLOGE(
                     "Manifest resources exceed directory depth limit of %zu: %s", MAX_DIRECTORY_DEPTH, source.c_str());
                 return false;
             }
-            if (!LoadResourceFiles(source, manifestRoot, manifestPath, budget, unit, depth + 1U)) {
+            if (!AdvanceIterator(iterator, directory)) {
                 return false;
             }
             continue;
         }
-        if (!S_ISREG(info.st_mode)) {
+        if (!fs::is_regular_file(status)) {
             ASCENDLOGE("Manifest base_dir contains a non-regular file: %s", source.c_str());
             return false;
         }
         std::vector<uint8_t> data;
-        if (!FileUtils::ReadRegularFile(source, MAX_RESOURCE_FILE_BYTES, data)) {
+        if (!FileUtils::ReadRegularFile(source.string(), MAX_RESOURCE_FILE_BYTES, data)) {
             ASCENDLOGE("Failed to read permitted manifest resource: %s", source.c_str());
             return false;
         }
-        if (data.empty()) {
+        if (!data.empty()) {
+            if (unit.files.size() >= MAX_FILES_PER_MANIFEST) {
+                ASCENDLOGE("Manifest exceeds resource file count limit: %s", manifestPath.c_str());
+                return false;
+            }
+            if (!budget.AddResource(static_cast<uint32_t>(data.size()), "manifest resource " + source.string())) {
+                return false;
+            }
+            const fs::path relative = fs::relative(source, fs::path(manifestRoot), error);
+            if (error || relative.empty()) {
+                ASCENDLOGE(
+                    "Failed to make manifest resource path relative: path=%s root=%s error=%s", source.c_str(),
+                    manifestRoot.c_str(), error ? error.message().c_str() : "empty relative path");
+                return false;
+            }
+            ResourceFile file;
+            file.fileName = source.filename().string();
+            file.filePath = relative.generic_string();
+            file.data = std::move(data);
+            unit.files.push_back(std::move(file));
+        } else {
             ASCENDLOGD("Skipping empty manifest resource %s", source.c_str());
-            continue;
         }
-        if (unit.files.size() >= MAX_FILES_PER_MANIFEST) {
-            ASCENDLOGE("Manifest exceeds resource file count limit: %s", manifestPath.c_str());
+        if (!AdvanceIterator(iterator, directory)) {
             return false;
         }
-        if (!budget.AddResource(static_cast<uint32_t>(data.size()), "manifest resource " + source)) {
-            return false;
-        }
-        ResourceFile file;
-        file.fileName = name;
-        file.filePath = source.substr(manifestRoot.size() + 1U);
-        file.data = std::move(data);
-        unit.files.push_back(std::move(file));
     }
     return true;
 }
@@ -246,8 +236,8 @@ bool LoadUnit(const std::string& manifestPath, ResourceBudget& budget, ManifestU
     }
 
     const std::string manifestRoot = FileUtils::ParentPath(manifestPath);
-    const std::string resourceInput =
-        !baseDir.empty() && baseDir[0] == '/' ? baseDir : FileUtils::JoinPath(manifestRoot, baseDir);
+    const fs::path baseDirPath(baseDir);
+    const std::string resourceInput = baseDirPath.is_absolute() ? baseDir : FileUtils::JoinPath(manifestRoot, baseDir);
     std::string resourceRoot;
     if (!FileUtils::ResolveSubdirectory(resourceInput, manifestRoot, resourceRoot)) {
         ASCENDLOGE(
@@ -255,7 +245,7 @@ bool LoadUnit(const std::string& manifestPath, ResourceBudget& budget, ManifestU
             resourceInput.c_str());
         return false;
     }
-    if (!LoadResourceFiles(resourceRoot, manifestRoot, manifestPath, budget, unit, 0U)) {
+    if (!LoadResourceFiles(resourceRoot, manifestRoot, manifestPath, budget, unit)) {
         return false;
     }
     std::sort(unit.files.begin(), unit.files.end(), [](const ResourceFile& left, const ResourceFile& right) {

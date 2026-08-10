@@ -10,104 +10,21 @@
 
 #include "file_utils.h"
 
-#include <cerrno>
-#include <chrono>
-#include <cstdio>
-#include <cstring>
-#include <dirent.h>
-#include <fcntl.h>
-#include <limits.h>
 #include <limits>
-#include <memory>
 
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "ascendc_tool_log.h"
 
 namespace ascendc {
 namespace {
 
-struct DirectoryCloser {
-    void operator()(DIR* directory) const noexcept
-    {
-        if (directory != nullptr) {
-            (void)closedir(directory);
-        }
-    }
-};
+namespace fs = boost::filesystem;
 
-using DirectoryHandle = std::unique_ptr<DIR, DirectoryCloser>;
-
-class FileDescriptor final {
-public:
-    explicit FileDescriptor(int descriptor) noexcept : descriptor_(descriptor) {}
-
-    ~FileDescriptor() { (void)Close(); }
-
-    FileDescriptor(const FileDescriptor&) = delete;
-    FileDescriptor& operator=(const FileDescriptor&) = delete;
-
-    bool IsValid() const noexcept { return descriptor_ >= 0; }
-    int Get() const noexcept { return descriptor_; }
-
-    int Close() noexcept
-    {
-        if (!IsValid()) {
-            return 0;
-        }
-        const int descriptor = descriptor_;
-        descriptor_ = -1;
-        return close(descriptor);
-    }
-
-private:
-    int descriptor_;
-};
-
-bool ListDirectoryImpl(
-    const std::string& directory, bool recursive, bool ignoreOpenFailure, std::vector<std::string>& paths)
+void LogFilesystemError(const char* operation, const std::string& path, const boost::system::error_code& error)
 {
-    DirectoryHandle stream(opendir(directory.c_str()));
-    if (!stream) {
-        const int openError = errno;
-        if (ignoreOpenFailure) {
-            ASCENDLOGD(
-                "Ignoring directory open failure: path=%s error=%s", directory.c_str(), std::strerror(openError));
-            return true;
-        }
-        ASCENDLOGW("Failed to open directory: path=%s error=%s", directory.c_str(), std::strerror(openError));
-        return false;
-    }
-    while (true) {
-        errno = 0;
-        dirent* entry = readdir(stream.get());
-        if (entry == nullptr) {
-            const int readError = errno;
-            const int closeResult = closedir(stream.release());
-            if (readError != 0) {
-                ASCENDLOGW("Failed to read directory: path=%s error=%s", directory.c_str(), std::strerror(readError));
-                return false;
-            }
-            if (closeResult != 0) {
-                const int closeError = errno;
-                ASCENDLOGW("Failed to close directory: path=%s error=%s", directory.c_str(), std::strerror(closeError));
-                return false;
-            }
-            return true;
-        }
-        const std::string name(entry->d_name);
-        if (name == "." || name == "..") {
-            continue;
-        }
-        const std::string path = FileUtils::JoinPath(directory, name);
-        paths.push_back(path);
-        if (recursive && FileUtils::IsDirectory(path) && !FileUtils::IsSymlink(path) &&
-            !ListDirectoryImpl(path, true, ignoreOpenFailure, paths)) {
-            return false;
-        }
-    }
+    ASCENDLOGW("Failed to %s: path=%s error=%s", operation, path.c_str(), error.message().c_str());
 }
 
 } // namespace
@@ -120,151 +37,87 @@ std::string FileUtils::JoinPath(const std::string& left, const std::string& righ
     if (right.empty()) {
         return left;
     }
-    return left[left.size() - 1U] == '/' ? left + right : left + "/" + right;
+    return (fs::path(left) / fs::path(right)).string();
 }
 
-std::string FileUtils::ParentPath(const std::string& path)
-{
-    const size_t separator = path.find_last_of('/');
-    if (separator == std::string::npos) {
-        return std::string();
-    }
-    return separator == 0U ? "/" : path.substr(0U, separator);
-}
+std::string FileUtils::ParentPath(const std::string& path) { return fs::path(path).parent_path().string(); }
 
-std::string FileUtils::FileName(const std::string& path)
-{
-    if (path.empty() || path[path.size() - 1U] == '/') {
-        return std::string();
-    }
-    const size_t separator = path.find_last_of('/');
-    return separator == std::string::npos ? path : path.substr(separator + 1U);
-}
-
-bool FileUtils::CurrentDirectory(std::string& current)
-{
-    char buffer[PATH_MAX] = {0};
-    if (getcwd(buffer, sizeof(buffer)) == nullptr) {
-        const int currentDirectoryError = errno;
-        ASCENDLOGW("Failed to get current directory: error=%s", std::strerror(currentDirectoryError));
-        current.clear();
-        return false;
-    }
-    current.assign(buffer);
-    return true;
-}
+std::string FileUtils::FileName(const std::string& path) { return fs::path(path).filename().string(); }
 
 bool FileUtils::MakeAbsolutePath(const std::string& path, std::string& absolute)
 {
     ASCENDLOGD("Making path absolute: path=%s", path.c_str());
-    if (!path.empty() && path[0] == '/') {
-        absolute = path;
-        ASCENDLOGD("Path is already absolute: path=%s", absolute.c_str());
-        return true;
-    }
-    std::string current;
-    if (!CurrentDirectory(current)) {
+    boost::system::error_code error;
+    const fs::path result = fs::absolute(fs::path(path), error);
+    if (error) {
+        LogFilesystemError("make path absolute", path, error);
         absolute.clear();
         return false;
     }
-    absolute = JoinPath(current, path);
+    absolute = result.string();
     ASCENDLOGD("Made path absolute: input=%s absolute=%s", path.c_str(), absolute.c_str());
     return true;
 }
 
-std::vector<std::string> FileUtils::SplitPath(const std::string& path)
-{
-    std::vector<std::string> components;
-    size_t begin = 0U;
-    while (begin < path.size()) {
-        while (begin < path.size() && path[begin] == '/') {
-            ++begin;
-        }
-        if (begin == path.size()) {
-            break;
-        }
-        const size_t end = path.find('/', begin);
-        components.push_back(path.substr(begin, end == std::string::npos ? std::string::npos : end - begin));
-        if (end == std::string::npos) {
-            break;
-        }
-        begin = end + 1U;
-    }
-    return components;
-}
-
 bool FileUtils::IsPathWithin(const std::string& path, const std::string& root)
 {
-    if (path.empty() || root.empty() || (path[0] == '/') != (root[0] == '/')) {
+    if (path.empty() || root.empty()) {
         return false;
     }
-    if (root == "/") {
-        return path[0] == '/';
+    const fs::path normalizedPath = fs::path(path).lexically_normal();
+    const fs::path normalizedRoot = fs::path(root).lexically_normal();
+    if (normalizedPath.is_absolute() != normalizedRoot.is_absolute()) {
+        return false;
     }
-    size_t pathBegin = 0U;
-    size_t rootBegin = 0U;
-    bool matchedComponent = false;
-    while (true) {
-        while (rootBegin < root.size() && root[rootBegin] == '/') {
-            ++rootBegin;
-        }
-        if (rootBegin == root.size()) {
-            return matchedComponent;
-        }
-        while (pathBegin < path.size() && path[pathBegin] == '/') {
-            ++pathBegin;
-        }
-        if (pathBegin == path.size()) {
+    fs::path::const_iterator pathPart = normalizedPath.begin();
+    for (fs::path::const_iterator rootPart = normalizedRoot.begin(); rootPart != normalizedRoot.end(); ++rootPart) {
+        if (pathPart == normalizedPath.end() || *pathPart != *rootPart) {
             return false;
         }
-        const size_t rootEnd = root.find('/', rootBegin);
-        const size_t pathEnd = path.find('/', pathBegin);
-        const size_t rootLength = (rootEnd == std::string::npos ? root.size() : rootEnd) - rootBegin;
-        const size_t pathLength = (pathEnd == std::string::npos ? path.size() : pathEnd) - pathBegin;
-        if (rootLength != pathLength || path.compare(pathBegin, pathLength, root, rootBegin, rootLength) != 0) {
-            return false;
-        }
-        matchedComponent = true;
-        rootBegin = rootEnd == std::string::npos ? root.size() : rootEnd;
-        pathBegin = pathEnd == std::string::npos ? path.size() : pathEnd;
+        ++pathPart;
     }
+    return true;
 }
 
 bool FileUtils::PathExists(const std::string& path) noexcept
 {
-    struct stat info {};
-    return stat(path.c_str(), &info) == 0;
+    boost::system::error_code error;
+    const bool result = fs::exists(fs::path(path), error);
+    return !error && result;
 }
 
 bool FileUtils::IsDirectory(const std::string& path) noexcept
 {
-    struct stat info {};
-    return stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode);
+    boost::system::error_code error;
+    const bool result = fs::is_directory(fs::path(path), error);
+    return !error && result;
 }
 
 bool FileUtils::IsRegularFile(const std::string& path) noexcept
 {
-    struct stat info {};
-    return stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode);
+    boost::system::error_code error;
+    const bool result = fs::is_regular_file(fs::path(path), error);
+    return !error && result;
 }
 
 bool FileUtils::IsSymlink(const std::string& path) noexcept
 {
-    struct stat info {};
-    return lstat(path.c_str(), &info) == 0 && S_ISLNK(info.st_mode);
+    boost::system::error_code error;
+    const fs::file_status status = fs::symlink_status(fs::path(path), error);
+    return !error && fs::is_symlink(status);
 }
 
 bool FileUtils::ResolveCanonicalPath(const std::string& path, std::string& resolved)
 {
     ASCENDLOGD("Resolving canonical path: path=%s", path.c_str());
-    char resolvedPath[PATH_MAX] = {0};
-    if (realpath(path.c_str(), resolvedPath) == nullptr) {
-        const int resolveError = errno;
-        ASCENDLOGW("Failed to resolve canonical path: path=%s error=%s", path.c_str(), std::strerror(resolveError));
+    boost::system::error_code error;
+    const fs::path canonical = fs::canonical(fs::path(path), error);
+    if (error) {
+        LogFilesystemError("resolve canonical path", path, error);
         resolved.clear();
         return false;
     }
-    resolved.assign(resolvedPath);
+    resolved = canonical.string();
     ASCENDLOGD("Resolved canonical path: path=%s resolved=%s", path.c_str(), resolved.c_str());
     return true;
 }
@@ -272,29 +125,34 @@ bool FileUtils::ResolveCanonicalPath(const std::string& path, std::string& resol
 bool FileUtils::ResolveDirectory(const std::string& path, std::string& resolved)
 {
     ASCENDLOGD("Resolving directory: path=%s", path.c_str());
-    struct stat inputInfo {};
-    if (lstat(path.c_str(), &inputInfo) != 0) {
-        const int inspectError = errno;
-        ASCENDLOGW("Failed to inspect directory: path=%s error=%s", path.c_str(), std::strerror(inspectError));
+    boost::system::error_code error;
+    const fs::file_status inputStatus = fs::symlink_status(fs::path(path), error);
+    if (error) {
+        LogFilesystemError("inspect directory", path, error);
         resolved.clear();
         return false;
     }
-    if (S_ISLNK(inputInfo.st_mode)) {
+    if (fs::is_symlink(inputStatus)) {
         ASCENDLOGW("Rejected symlink directory: path=%s", path.c_str());
         resolved.clear();
         return false;
     }
-    std::string canonical;
-    if (!ResolveCanonicalPath(path, canonical)) {
+    const fs::path canonical = fs::canonical(fs::path(path), error);
+    if (error) {
+        LogFilesystemError("resolve directory", path, error);
         resolved.clear();
         return false;
     }
-    if (!IsDirectory(canonical)) {
-        ASCENDLOGW("Resolved path is not a directory: path=%s resolved=%s", path.c_str(), canonical.c_str());
+    if (!fs::is_directory(canonical, error) || error) {
+        if (error) {
+            LogFilesystemError("inspect resolved directory", canonical.string(), error);
+        } else {
+            ASCENDLOGW("Resolved path is not a directory: path=%s resolved=%s", path.c_str(), canonical.c_str());
+        }
         resolved.clear();
         return false;
     }
-    resolved.swap(canonical);
+    resolved = canonical.string();
     ASCENDLOGD("Resolved directory: path=%s resolved=%s", path.c_str(), resolved.c_str());
     return true;
 }
@@ -319,198 +177,40 @@ bool FileUtils::ResolveSubdirectory(const std::string& path, const std::string& 
     return true;
 }
 
-bool FileUtils::EnsureDirectory(const char* path) noexcept
-{
-    if (path == nullptr || path[0] == '\0' || (path[0] == '/' && path[1] == '\0')) {
-        return true;
-    }
-    if (mkdir(path, 0700) == 0) {
-        ASCENDLOGD("Created directory component: path=%s", path);
-        return true;
-    }
-    if (errno != EEXIST) {
-        const int createError = errno;
-        ASCENDLOGW("Failed to create directory component: path=%s error=%s", path, std::strerror(createError));
-        return false;
-    }
-    struct stat info {};
-    if (stat(path, &info) != 0) {
-        const int inspectError = errno;
-        ASCENDLOGW("Failed to inspect existing path: path=%s error=%s", path, std::strerror(inspectError));
-        return false;
-    }
-    if (!S_ISDIR(info.st_mode)) {
-        ASCENDLOGW("Existing path is not a directory: path=%s", path);
-        return false;
-    }
-    return true;
-}
-
 bool FileUtils::CreateDirectories(const std::string& path)
 {
     ASCENDLOGD("Creating directories: path=%s", path.c_str());
     if (path.empty()) {
         return true;
     }
-    if (path.size() >= PATH_MAX) {
-        ASCENDLOGW("Directory path exceeds PATH_MAX: path=%s size=%zu", path.c_str(), path.size());
+    boost::system::error_code error;
+    fs::create_directories(fs::path(path), error);
+    if (error) {
+        LogFilesystemError("create directories", path, error);
         return false;
     }
-    char component[PATH_MAX] = {0};
-    for (size_t index = 0U; index < path.size(); ++index) {
-        component[index] = path[index];
-    }
-    size_t begin = path[0] == '/' ? 1U : 0U;
-    while (begin < path.size()) {
-        const size_t separator = path.find('/', begin);
-        if (separator != std::string::npos) {
-            component[separator] = '\0';
+    if (!fs::is_directory(fs::path(path), error) || error) {
+        if (error) {
+            LogFilesystemError("inspect created directory", path, error);
+        } else {
+            ASCENDLOGW("Created path is not a directory: path=%s", path.c_str());
         }
-        if (!EnsureDirectory(component)) {
-            return false;
-        }
-        if (separator == std::string::npos) {
-            break;
-        }
-        component[separator] = '/';
-        begin = separator + 1U;
+        return false;
     }
     ASCENDLOGD("Created or verified directories: path=%s", path.c_str());
     return true;
 }
 
-bool FileUtils::ListDirectory(
-    const std::string& directory, bool recursive, bool ignoreOpenFailure, std::vector<std::string>& paths)
-{
-    ASCENDLOGD("Listing directory: path=%s recursive=%s", directory.c_str(), recursive ? "true" : "false");
-    const size_t initialCount = paths.size();
-    const bool success = ListDirectoryImpl(directory, recursive, ignoreOpenFailure, paths);
-    if (success) {
-        ASCENDLOGD("Listed directory: path=%s entries=%zu", directory.c_str(), paths.size() - initialCount);
-    }
-    return success;
-}
-
-bool FileUtils::CreateTempDirectory(std::string& path)
-{
-    ASCENDLOGD("Creating temporary directory under /tmp");
-    const auto timestamp =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
-            .count();
-    bool exhaustedCandidates = true;
-    for (uint64_t suffix = 0U; suffix < 1000U; ++suffix) {
-        path = "/tmp/" + std::to_string(timestamp + static_cast<int64_t>(suffix));
-        if (mkdir(path.c_str(), 0700) == 0) {
-            ASCENDLOGI("Created temporary directory: path=%s", path.c_str());
-            return true;
-        }
-        if (errno != EEXIST) {
-            const int createError = errno;
-            ASCENDLOGW(
-                "Failed to create temporary directory: path=%s error=%s", path.c_str(), std::strerror(createError));
-            exhaustedCandidates = false;
-            break;
-        }
-    }
-    if (exhaustedCandidates) {
-        ASCENDLOGW("Exhausted temporary directory candidates: last_path=%s", path.c_str());
-    }
-    path.clear();
-    return false;
-}
-
-bool FileUtils::RemoveAllImpl(const std::string& path)
-{
-    struct stat info {};
-    if (lstat(path.c_str(), &info) != 0) {
-        const int inspectError = errno;
-        if (inspectError == ENOENT) {
-            return true;
-        }
-        ASCENDLOGW("Failed to inspect removal path: path=%s error=%s", path.c_str(), std::strerror(inspectError));
-        return false;
-    }
-    if (!S_ISDIR(info.st_mode) || S_ISLNK(info.st_mode)) {
-        if (unlink(path.c_str()) == 0) {
-            return true;
-        }
-        const int unlinkError = errno;
-        if (unlinkError == ENOENT) {
-            return true;
-        }
-        ASCENDLOGW("Failed to remove file: path=%s error=%s", path.c_str(), std::strerror(unlinkError));
-        return false;
-    }
-    DirectoryHandle directory(opendir(path.c_str()));
-    if (!directory) {
-        const int openError = errno;
-        ASCENDLOGW("Failed to open directory for removal: path=%s error=%s", path.c_str(), std::strerror(openError));
-        return false;
-    }
-    bool success = true;
-    while (true) {
-        errno = 0;
-        dirent* entry = readdir(directory.get());
-        if (entry == nullptr) {
-            if (errno != 0) {
-                const int readError = errno;
-                ASCENDLOGW(
-                    "Failed to read directory for removal: path=%s error=%s", path.c_str(), std::strerror(readError));
-                success = false;
-            }
-            break;
-        }
-        const std::string name(entry->d_name);
-        if (name != "." && name != ".." && !RemoveAllImpl(JoinPath(path, name))) {
-            success = false;
-        }
-    }
-    if (closedir(directory.release()) != 0) {
-        const int closeError = errno;
-        ASCENDLOGW(
-            "Failed to close directory after removal: path=%s error=%s", path.c_str(), std::strerror(closeError));
-        success = false;
-    }
-    if (rmdir(path.c_str()) != 0) {
-        const int removeError = errno;
-        if (removeError != ENOENT) {
-            ASCENDLOGW("Failed to remove directory: path=%s error=%s", path.c_str(), std::strerror(removeError));
-            success = false;
-        }
-    }
-    return success;
-}
-
 bool FileUtils::RemoveAll(const std::string& path)
 {
     ASCENDLOGD("Removing path recursively: path=%s", path.c_str());
-    const bool success = RemoveAllImpl(path);
-    if (success) {
-        ASCENDLOGI("Removed path recursively: path=%s", path.c_str());
-    }
-    return success;
-}
-
-bool FileUtils::WriteBinaryFile(const std::string& path, const std::vector<uint8_t>& bytes)
-{
-    ASCENDLOGD("Writing binary file: path=%s bytes=%zu", path.c_str(), bytes.size());
-    if (!CreateDirectories(ParentPath(path))) {
+    boost::system::error_code error;
+    (void)fs::remove_all(fs::path(path), error);
+    if (error) {
+        LogFilesystemError("remove path recursively", path, error);
         return false;
     }
-    std::ofstream output(path.c_str(), std::ios::binary | std::ios::trunc);
-    if (!output.is_open()) {
-        ASCENDLOGW("Failed to open binary file for writing: path=%s", path.c_str());
-        return false;
-    }
-    if (!bytes.empty()) {
-        output.write(reinterpret_cast<const char*>(bytes.data()), static_cast<std::streamsize>(bytes.size()));
-    }
-    output.close();
-    if (!output) {
-        ASCENDLOGW("Failed to write or close binary file: path=%s", path.c_str());
-        return false;
-    }
-    ASCENDLOGI("Wrote binary file: path=%s bytes=%zu", path.c_str(), bytes.size());
+    ASCENDLOGI("Removed path recursively: path=%s", path.c_str());
     return true;
 }
 
@@ -518,88 +218,43 @@ bool FileUtils::ReadRegularFile(const std::string& path, uintmax_t maximum, std:
 {
     ASCENDLOGD("Reading regular file: path=%s maximum=%ju", path.c_str(), maximum);
     data.clear();
-    FileDescriptor descriptor(open(path.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW));
-    if (!descriptor.IsValid()) {
-        const int openError = errno;
-        ASCENDLOGW("Failed to open regular file: path=%s error=%s", path.c_str(), std::strerror(openError));
+    boost::system::error_code error;
+    const fs::file_status inputStatus = fs::symlink_status(fs::path(path), error);
+    if (error || fs::is_symlink(inputStatus) || !fs::is_regular_file(inputStatus)) {
+        if (error) {
+            LogFilesystemError("inspect regular file", path, error);
+        } else {
+            ASCENDLOGW("Rejected non-regular file: path=%s", path.c_str());
+        }
         return false;
     }
-    struct stat info {};
-    if (fstat(descriptor.Get(), &info) != 0) {
-        const int inspectError = errno;
-        ASCENDLOGW("Failed to inspect regular file: path=%s error=%s", path.c_str(), std::strerror(inspectError));
+    const uintmax_t fileSize = fs::file_size(fs::path(path), error);
+    if (error) {
+        LogFilesystemError("read regular file size", path, error);
         return false;
     }
-    if (!S_ISREG(info.st_mode) || info.st_size < 0) {
-        ASCENDLOGW("Rejected non-regular file: path=%s", path.c_str());
-        return false;
-    }
-    const uintmax_t fileSize = static_cast<uintmax_t>(info.st_size);
-    if (fileSize > maximum || fileSize > static_cast<uintmax_t>(std::numeric_limits<size_t>::max())) {
+    if (fileSize > maximum || fileSize > static_cast<uintmax_t>(std::numeric_limits<size_t>::max()) ||
+        fileSize > static_cast<uintmax_t>(std::numeric_limits<std::streamsize>::max())) {
         ASCENDLOGW("Regular file exceeds size limit: path=%s size=%ju maximum=%ju", path.c_str(), fileSize, maximum);
         return false;
     }
+    std::ifstream input(path.c_str(), std::ios::binary);
+    if (!input.is_open()) {
+        ASCENDLOGW("Failed to open regular file: path=%s", path.c_str());
+        return false;
+    }
     data.resize(static_cast<size_t>(fileSize));
-    size_t offset = 0U;
-    while (offset < data.size()) {
-        const ssize_t count = read(descriptor.Get(), data.data() + offset, data.size() - offset);
-        if (count < 0 && errno == EINTR) {
-            continue;
-        }
-        if (count <= 0) {
-            if (count < 0) {
-                const int readError = errno;
-                ASCENDLOGW("Failed to read regular file: path=%s error=%s", path.c_str(), std::strerror(readError));
-            } else {
-                ASCENDLOGW(
-                    "Regular file ended before expected size: path=%s offset=%zu size=%zu", path.c_str(), offset,
-                    data.size());
-            }
-            data.clear();
-            return false;
-        }
-        offset += static_cast<size_t>(count);
+    if (!data.empty()) {
+        input.read(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(data.size()));
+    }
+    input.close();
+    if (!input) {
+        ASCENDLOGW("Failed to read or close regular file: path=%s", path.c_str());
+        data.clear();
+        return false;
     }
     ASCENDLOGD("Read regular file: path=%s bytes=%zu", path.c_str(), data.size());
     return true;
-}
-
-bool FileUtils::OpenExclusiveOutput(const std::string& path, std::ofstream& output)
-{
-    ASCENDLOGD("Opening exclusive output: path=%s", path.c_str());
-    if (output.is_open()) {
-        ASCENDLOGW("Output stream is already open: path=%s", path.c_str());
-        return false;
-    }
-    const int descriptor = open(path.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
-    if (descriptor < 0) {
-        const int openError = errno;
-        ASCENDLOGW("Failed to create exclusive output: path=%s error=%s", path.c_str(), std::strerror(openError));
-        return false;
-    }
-    if (close(descriptor) != 0) {
-        const int closeError = errno;
-        ASCENDLOGW(
-            "Failed to close exclusive output descriptor: path=%s error=%s", path.c_str(), std::strerror(closeError));
-        if (unlink(path.c_str()) != 0 && errno != ENOENT) {
-            const int cleanupError = errno;
-            ASCENDLOGW(
-                "Failed to remove incomplete output: path=%s error=%s", path.c_str(), std::strerror(cleanupError));
-        }
-        return false;
-    }
-
-    output.open(path.c_str(), std::ios::trunc);
-    if (output.is_open()) {
-        ASCENDLOGI("Opened exclusive output: path=%s", path.c_str());
-        return true;
-    }
-    ASCENDLOGW("Failed to open exclusive output stream: path=%s", path.c_str());
-    if (unlink(path.c_str()) != 0 && errno != ENOENT) {
-        const int cleanupError = errno;
-        ASCENDLOGW("Failed to remove incomplete output: path=%s error=%s", path.c_str(), std::strerror(cleanupError));
-    }
-    return false;
 }
 
 bool FileUtils::FinalizeOutput(std::ofstream& output)
@@ -617,107 +272,20 @@ bool FileUtils::FinalizeOutput(std::ofstream& output)
     return true;
 }
 
-bool FileUtils::CheckNonSymlink(const std::string& path) noexcept
+bool FileUtils::CopyFile(const std::string& source, const std::string& destination) noexcept
 {
-    ASCENDLOGD("Checking output path for symlink: path=%s", path.c_str());
-    struct stat info {};
-    if (lstat(path.c_str(), &info) != 0) {
-        const int inspectError = errno;
-        if (inspectError == ENOENT) {
-            return true;
-        }
-        ASCENDLOGW("Failed to inspect output path: path=%s error=%s", path.c_str(), std::strerror(inspectError));
-        return false;
-    }
-    if (S_ISLNK(info.st_mode)) {
-        ASCENDLOGW("Rejected symlink output path: path=%s", path.c_str());
-        return false;
-    }
-    return true;
-}
-
-bool FileUtils::CopyFileExclusive(const std::string& source, const std::string& destination) noexcept
-{
-    ASCENDLOGD("Copying file exclusively: source=%s destination=%s", source.c_str(), destination.c_str());
-    const int input = open(source.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
-    if (input < 0) {
-        const int openError = errno;
-        ASCENDLOGW("Failed to open copy source: path=%s error=%s", source.c_str(), std::strerror(openError));
-        return false;
-    }
-    struct stat info {};
-    if (fstat(input, &info) != 0) {
-        const int inspectError = errno;
-        ASCENDLOGW("Failed to inspect copy source: path=%s error=%s", source.c_str(), std::strerror(inspectError));
-        (void)close(input);
-        return false;
-    }
-    if (!S_ISREG(info.st_mode)) {
-        ASCENDLOGW("Rejected non-regular copy source: path=%s", source.c_str());
-        (void)close(input);
-        return false;
-    }
-    const int output = open(destination.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, info.st_mode & 0777);
-    if (output < 0) {
-        const int openError = errno;
-        ASCENDLOGW(
-            "Failed to create copy destination: path=%s error=%s", destination.c_str(), std::strerror(openError));
-        (void)close(input);
-        return false;
-    }
-    bool success = true;
-    uint8_t buffer[64U * 1024U] = {0};
-    while (success) {
-        const ssize_t count = read(input, buffer, sizeof(buffer));
-        if (count < 0 && errno == EINTR) {
-            continue;
-        }
-        if (count < 0) {
-            const int readError = errno;
-            ASCENDLOGW("Failed to read copy source: path=%s error=%s", source.c_str(), std::strerror(readError));
-            success = false;
-            break;
-        }
-        if (count == 0) {
-            break;
-        }
-        size_t offset = 0U;
-        while (offset < static_cast<size_t>(count)) {
-            const ssize_t written = write(output, buffer + offset, static_cast<size_t>(count) - offset);
-            if (written < 0 && errno == EINTR) {
-                continue;
-            }
-            if (written <= 0) {
-                const int writeError = errno;
-                ASCENDLOGW(
-                    "Failed to write copy destination: path=%s error=%s", destination.c_str(),
-                    std::strerror(writeError));
-                success = false;
-                break;
-            }
-            offset += static_cast<size_t>(written);
-        }
-    }
-    if (close(input) != 0) {
-        const int closeError = errno;
-        ASCENDLOGW("Failed to close copy source: path=%s error=%s", source.c_str(), std::strerror(closeError));
-        success = false;
-    }
-    if (close(output) != 0) {
-        const int closeError = errno;
-        ASCENDLOGW(
-            "Failed to close copy destination: path=%s error=%s", destination.c_str(), std::strerror(closeError));
-        success = false;
-    }
-    if (!success) {
-        if (unlink(destination.c_str()) != 0 && errno != ENOENT) {
-            const int cleanupError = errno;
-            ASCENDLOGW(
-                "Failed to remove incomplete copy: path=%s error=%s", destination.c_str(), std::strerror(cleanupError));
+    ASCENDLOGD("Copying file: source=%s destination=%s", source.c_str(), destination.c_str());
+    boost::system::error_code error;
+    if (!fs::copy_file(fs::path(source), fs::path(destination), fs::copy_options::none, error)) {
+        if (error) {
+            ASCENDLOGW("Failed to copy file: source=%s destination=%s error=%s",
+                source.c_str(), destination.c_str(), error.message().c_str());
+        } else {
+            ASCENDLOGW("Failed to copy file: source=%s destination=%s", source.c_str(), destination.c_str());
         }
         return false;
     }
-    ASCENDLOGI("Copied file exclusively: source=%s destination=%s", source.c_str(), destination.c_str());
+    ASCENDLOGI("Copied file: source=%s destination=%s", source.c_str(), destination.c_str());
     return true;
 }
 

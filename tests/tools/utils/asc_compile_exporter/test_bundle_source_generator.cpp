@@ -50,7 +50,7 @@ TEST_F(ModuleTest, SourceGeneratorEmitsBundleManifestAbiAndMakefile)
     EXPECT_NE(makefile.find("-std=c++11"), std::string::npos);
     EXPECT_NE(makefile.find("-shared $(OBJECTS)"), std::string::npos);
     EXPECT_NE(makefile.find("-Wl,-z,relro,-z,now,-z,noexecstack"), std::string::npos);
-    EXPECT_FALSE(BundleSourceGenerator(work, units, BundleOutputKind::kSharedObject).Generate());
+    EXPECT_TRUE(BundleSourceGenerator(work, units, BundleOutputKind::kSharedObject).Generate());
 }
 
 TEST_F(ModuleTest, SourceGeneratorEmitsRelocatableObjectMakefile)
@@ -87,17 +87,17 @@ TEST_F(ModuleTest, SourceGeneratorReportsFailureAtEachGenerationStage)
 
     const std::string bundleWork = FileUtils::JoinPath(root_, "bundle-failure-work");
     ASSERT_TRUE(FileUtils::CreateDirectories(bundleWork));
-    ASSERT_TRUE(FileUtils::WriteBinaryFile(FileUtils::JoinPath(bundleWork, "compile_resource_bundle.cpp"), {}));
+    ASSERT_TRUE(FileUtils::CreateDirectories(FileUtils::JoinPath(bundleWork, "compile_resource_bundle.cpp")));
     EXPECT_FALSE(BundleSourceGenerator(bundleWork, units, BundleOutputKind::kSharedObject).Generate());
 
     const std::string manifestWork = FileUtils::JoinPath(root_, "manifest-failure-work");
     ASSERT_TRUE(FileUtils::CreateDirectories(manifestWork));
-    ASSERT_TRUE(FileUtils::WriteBinaryFile(FileUtils::JoinPath(manifestWork, "manifest_0.cpp"), {}));
+    ASSERT_TRUE(FileUtils::CreateDirectories(FileUtils::JoinPath(manifestWork, "manifest_0.cpp")));
     EXPECT_FALSE(BundleSourceGenerator(manifestWork, units, BundleOutputKind::kSharedObject).Generate());
 
     const std::string makefileWork = FileUtils::JoinPath(root_, "makefile-failure-work");
     ASSERT_TRUE(FileUtils::CreateDirectories(makefileWork));
-    ASSERT_TRUE(FileUtils::WriteBinaryFile(FileUtils::JoinPath(makefileWork, "Makefile"), {}));
+    ASSERT_TRUE(FileUtils::CreateDirectories(FileUtils::JoinPath(makefileWork, "Makefile")));
     EXPECT_FALSE(BundleSourceGenerator(makefileWork, units, BundleOutputKind::kSharedObject).Generate());
 }
 

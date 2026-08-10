@@ -24,7 +24,8 @@ namespace {
 
 bool OpenGeneratedOutput(const std::string& path, std::ofstream& output)
 {
-    if (!FileUtils::OpenExclusiveOutput(path, output)) {
+    output.open(path.c_str(), std::ios::trunc);
+    if (!output.is_open()) {
         ASCENDLOGE("Failed to create generated output: %s", path.c_str());
         return false;
     }

@@ -10,10 +10,10 @@
 
 #include "build_workspace.h"
 
-#include <cerrno>
 #include <cstdlib>
-#include <cstring>
-#include <vector>
+
+#include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "ascendc_tool_log.h"
 #include "file_utils.h"
@@ -44,17 +44,17 @@ bool BuildWorkspace::Create(const std::string& requestedParent, bool keepTemp)
         ASCENDLOGE("Bundle work directory is unavailable: %s", absolute.c_str());
         return false;
     }
-    std::string pathTemplate = FileUtils::JoinPath(parent, ".manifest-generator-XXXXXX");
-    std::vector<char> buffer(pathTemplate.begin(), pathTemplate.end());
-    buffer.push_back('\0');
-    char* created = mkdtemp(buffer.data());
-    if (created == nullptr) {
-        const int createError = errno;
-        ASCENDLOGE("Failed to create private bundle work directory: %s", std::strerror(createError));
+    boost::system::error_code error;
+    const boost::filesystem::path candidate =
+        boost::filesystem::path(parent) / boost::filesystem::unique_path(".manifest-generator-%%%%%%%%", error);
+    if (error || !boost::filesystem::create_directory(candidate, error)) {
+        ASCENDLOGE(
+            "Failed to create private bundle work directory: parent=%s error=%s", parent.c_str(),
+            error ? error.message().c_str() : "path already exists");
         return false;
     }
-    ASCENDLOGD("Created private bundle work directory %s", created);
-    session_ = created;
+    ASCENDLOGD("Created private bundle work directory %s", candidate.c_str());
+    session_ = candidate.string();
     keepTemp_ = keepTemp;
     return true;
 }
@@ -62,9 +62,7 @@ bool BuildWorkspace::Create(const std::string& requestedParent, bool keepTemp)
 BuildWorkspace::~BuildWorkspace()
 {
     if (!session_.empty() && !keepTemp_) {
-        bool removed = false;
-        removed = FileUtils::RemoveAll(session_);
-        if (removed) {
+        if (FileUtils::RemoveAll(session_)) {
             ASCENDLOGD("Removed private bundle work directory %s", session_.c_str());
         } else {
             ASCENDLOGW("Failed to completely remove private bundle work directory %s", session_.c_str());

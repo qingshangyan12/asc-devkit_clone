@@ -52,11 +52,6 @@ bool ParseJobs(const std::string& text, uint32_t& jobs)
     if (text.empty()) {
         return false;
     }
-    for (const char character : text) {
-        if (character < '0' || character > '9') {
-            return false;
-        }
-    }
     errno = 0;
     char* end = nullptr;
     const unsigned long parsed = std::strtoul(text.c_str(), &end, 10);
@@ -127,76 +122,109 @@ bool PrepareOutputPath(
     return true;
 }
 
-bool ParseArguments(int argc, char** argv, ascendc::manifest_generator::BuildCollectedBundleRequest& request)
-{
-    ascendc::manifest_generator::BuildCollectedBundleRequest parsed;
-    parsed.jobs = ResolveJobCount(0U);
-    bool inputDirSpecified = false;
-    bool outputSpecified = false;
-    bool makeSpecified = false;
-    bool cxxSpecified = false;
-    bool saveTempFilesSpecified = false;
-    bool jobsSpecified = false;
-    for (int index = 1; index < argc; ++index) {
-        const std::string argument = argv[index];
-        std::string value;
-        if (argument == "--input-dir") {
-            if (!ReadOptionValue(argc, argv, index, argument, inputDirSpecified, value)) {
-                return false;
-            }
-            if (!ascendc::FileUtils::ResolveDirectory(value, parsed.manifestSearchRoot)) {
-                return ReportArgumentError("Invalid value for argument --input-dir", value);
-            }
-        } else if (argument == "--output") {
-            if (!ReadOptionValue(argc, argv, index, argument, outputSpecified, value) ||
-                !PrepareOutputPath(value, parsed.outputPath, parsed.outputKind)) {
-                return false;
-            }
-        } else if (argument == "--make") {
-            if (!ReadOptionValue(argc, argv, index, argument, makeSpecified, parsed.makeExecutable)) {
-                return false;
-            }
-        } else if (argument == "--cxx") {
-            if (!ReadOptionValue(argc, argv, index, argument, cxxSpecified, parsed.cxxCompiler)) {
-                return false;
-            }
-        } else if (argument == "--save-temp-files") {
-            if (saveTempFilesSpecified) {
-                return ReportArgumentError("Duplicate argument", argument);
-            }
-            saveTempFilesSpecified = true;
-            parsed.keepTemp = true;
-        } else if (argument == "--jobs") {
-            if (!ReadOptionValue(argc, argv, index, argument, jobsSpecified, value)) {
-                return false;
-            }
-            uint32_t jobs = 0U;
-            if (!ParseJobs(value, jobs)) {
-                return ReportArgumentError("Invalid value for argument --jobs", value);
-            }
-            parsed.jobs = ResolveJobCount(jobs);
-        } else {
-            return ReportArgumentError("Unable to parse argument", argument);
-        }
-    }
+struct ArgumentState {
+    ascendc::manifest_generator::BuildCollectedBundleRequest request;
+    bool inputDirSpecified{false};
+    bool outputSpecified{false};
+    bool makeSpecified{false};
+    bool cxxSpecified{false};
+    bool saveTempFilesSpecified{false};
+    bool jobsSpecified{false};
+};
 
-    bool complete = true;
-    if (!inputDirSpecified) {
-        complete = ReportArgumentError("Missing required argument", "--input-dir");
-    }
-    if (!outputSpecified) {
-        complete = ReportArgumentError("Missing required argument", "--output");
-    }
-    if (!makeSpecified) {
-        complete = ReportArgumentError("Missing required argument", "--make");
-    }
-    if (!cxxSpecified) {
-        complete = ReportArgumentError("Missing required argument", "--cxx");
-    }
-    if (!complete) {
+bool ParseInputDirectory(int argc, char** argv, int& index, const std::string& argument, ArgumentState& state)
+{
+    std::string value;
+    if (!ReadOptionValue(argc, argv, index, argument, state.inputDirSpecified, value)) {
         return false;
     }
-    request = std::move(parsed);
+    if (!ascendc::FileUtils::ResolveDirectory(value, state.request.manifestSearchRoot)) {
+        return ReportArgumentError("Invalid value for argument --input-dir", value);
+    }
+    return true;
+}
+
+bool ParseOutput(int argc, char** argv, int& index, const std::string& argument, ArgumentState& state)
+{
+    std::string value;
+    return ReadOptionValue(argc, argv, index, argument, state.outputSpecified, value) &&
+           PrepareOutputPath(value, state.request.outputPath, state.request.outputKind);
+}
+
+bool ParseJobCount(int argc, char** argv, int& index, const std::string& argument, ArgumentState& state)
+{
+    std::string value;
+    if (!ReadOptionValue(argc, argv, index, argument, state.jobsSpecified, value)) {
+        return false;
+    }
+    uint32_t jobs = 0U;
+    if (!ParseJobs(value, jobs)) {
+        return ReportArgumentError("Invalid value for argument --jobs", value);
+    }
+    state.request.jobs = ResolveJobCount(jobs);
+    return true;
+}
+
+bool ParseArgument(int argc, char** argv, int& index, ArgumentState& state)
+{
+    const std::string argument = argv[index];
+    if (argument == "--input-dir") {
+        return ParseInputDirectory(argc, argv, index, argument, state);
+    }
+    if (argument == "--output") {
+        return ParseOutput(argc, argv, index, argument, state);
+    }
+    if (argument == "--make") {
+        return ReadOptionValue(argc, argv, index, argument, state.makeSpecified, state.request.makeExecutable);
+    }
+    if (argument == "--cxx") {
+        return ReadOptionValue(argc, argv, index, argument, state.cxxSpecified, state.request.cxxCompiler);
+    }
+    if (argument == "--save-temp-files") {
+        if (state.saveTempFilesSpecified) {
+            return ReportArgumentError("Duplicate argument", argument);
+        }
+        state.saveTempFilesSpecified = true;
+        state.request.keepTemp = true;
+        return true;
+    }
+    if (argument == "--jobs") {
+        return ParseJobCount(argc, argv, index, argument, state);
+    }
+    return ReportArgumentError("Unable to parse argument", argument);
+}
+
+bool ValidateRequiredArguments(const ArgumentState& state)
+{
+    bool complete = true;
+    if (!state.inputDirSpecified) {
+        complete = ReportArgumentError("Missing required argument", "--input-dir");
+    }
+    if (!state.outputSpecified) {
+        complete = ReportArgumentError("Missing required argument", "--output");
+    }
+    if (!state.makeSpecified) {
+        complete = ReportArgumentError("Missing required argument", "--make");
+    }
+    if (!state.cxxSpecified) {
+        complete = ReportArgumentError("Missing required argument", "--cxx");
+    }
+    return complete;
+}
+
+bool ParseArguments(int argc, char** argv, ascendc::manifest_generator::BuildCollectedBundleRequest& request)
+{
+    ArgumentState state;
+    state.request.jobs = ResolveJobCount(0U);
+    for (int index = 1; index < argc; ++index) {
+        if (!ParseArgument(argc, argv, index, state)) {
+            return false;
+        }
+    }
+    if (!ValidateRequiredArguments(state)) {
+        return false;
+    }
+    request = std::move(state.request);
     return true;
 }
 

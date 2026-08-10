@@ -223,7 +223,7 @@ protected:
     std::string root_;
 };
 
-TEST_F(AscCompileExporterTest, ReportsWorkspaceBuildAndPublishFailures)
+TEST_F(AscCompileExporterTest, ReportsWorkspaceAndBuildFailures)
 {
     const std::string unit = JoinTestPath(root_, "collection/Failures");
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
@@ -237,12 +237,22 @@ TEST_F(AscCompileExporterTest, ReportsWorkspaceBuildAndPublishFailures)
     BuildCollectedBundleRequest buildFailure = Request();
     buildFailure.makeExecutable = "/path/that/does/not/exist";
     ExpectCompileFailure(buildFailure);
+}
 
-    BuildCollectedBundleRequest publishFailure = Request();
+TEST_F(AscCompileExporterTest, ReplacesTrustedOutputSymlinkWithoutFollowingIt)
+{
+    const std::string unit = JoinTestPath(root_, "collection/SymlinkOutput");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
+    CreateManifest(unit, "SymlinkOutput");
+
+    const BuildCollectedBundleRequest request = Request();
     const std::string victim = JoinTestPath(root_, "victim.so");
     WriteFile(victim, "victim");
-    ASSERT_EQ(symlink(victim.c_str(), publishFailure.outputPath.c_str()), 0);
-    ExpectCompileFailure(publishFailure);
+    ASSERT_EQ(symlink(victim.c_str(), request.outputPath.c_str()), 0);
+
+    ASSERT_TRUE(ManifestBundleCompiler(request).Compile());
+    EXPECT_TRUE(IsTestRegularFile(request.outputPath));
+    EXPECT_EQ(ReadFile(victim), "victim");
 }
 
 TEST_F(AscCompileExporterTest, ReportsDirectPublishRenameFailureWithoutReplacingOutput)

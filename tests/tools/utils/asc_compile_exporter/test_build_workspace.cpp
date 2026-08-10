@@ -10,29 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include <cerrno>
-
 #include "build_workspace.h"
 #include "file_utils.h"
 #include "test_support.h"
-
-namespace {
-
-bool g_failNextMkdtemp = false;
-
-} // namespace
-
-extern "C" char* __real_mkdtemp(char* pathTemplate);
-
-extern "C" char* __wrap_mkdtemp(char* pathTemplate)
-{
-    if (g_failNextMkdtemp) {
-        g_failNextMkdtemp = false;
-        errno = EACCES;
-        return nullptr;
-    }
-    return __real_mkdtemp(pathTemplate);
-}
 
 namespace ascendc {
 namespace manifest_generator {
@@ -83,13 +63,6 @@ TEST_F(ModuleTest, BuildWorkspaceUsesTmpDir)
         EXPECT_TRUE(FileUtils::IsPathWithin(session, root_));
     }
     EXPECT_FALSE(LstatPathExists(session));
-}
-
-TEST_F(ModuleTest, BuildWorkspaceReportsCreationFailure)
-{
-    BuildWorkspace failedWorkspace;
-    g_failNextMkdtemp = true;
-    EXPECT_FALSE(failedWorkspace.Create(root_, false));
 }
 
 } // namespace

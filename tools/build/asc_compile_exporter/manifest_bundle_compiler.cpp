@@ -10,11 +10,11 @@
 
 #include "manifest_bundle_compiler.h"
 
-#include <cerrno>
-#include <cstring>
-#include <stdio.h>
 #include <utility>
 #include <vector>
+
+#include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "ascendc_tool_log.h"
 #include "build_workspace.h"
@@ -48,17 +48,14 @@ bool ManifestBundleCompiler::BuildBundle(const std::string& workDir, const std::
 bool ManifestBundleCompiler::PublishBundle(const std::string& staged) const
 {
     // Prefer rename because replacing the output is atomic when both paths are on the same filesystem.
-    if (!FileUtils::CheckNonSymlink(request_.outputPath)) {
-        ASCENDLOGE("Bundle output must not be a symlink and must be inspectable: %s", request_.outputPath.c_str());
-        return false;
-    }
-    if (rename(staged.c_str(), request_.outputPath.c_str()) == 0) {
+    boost::system::error_code error;
+    boost::filesystem::rename(boost::filesystem::path(staged), boost::filesystem::path(request_.outputPath), error);
+    if (!error) {
         ASCENDLOGI("Published compile resource bundle %s", request_.outputPath.c_str());
         return true;
     }
-    if (errno != EXDEV) {
-        const int publishError = errno;
-        ASCENDLOGE("Failed to publish bundle output: %s", std::strerror(publishError));
+    if (error != boost::system::errc::cross_device_link) {
+        ASCENDLOGE("Failed to publish bundle output: %s", error.message().c_str());
         return false;
     }
 
@@ -79,14 +76,15 @@ bool ManifestBundleCompiler::PublishBundleAcrossFileSystems(const std::string& s
         return false;
     }
     const std::string copied = FileUtils::JoinPath(publishWorkspace.Session(), FileUtils::FileName(staged));
-    if (!FileUtils::CopyFileExclusive(staged, copied)) {
+    if (!FileUtils::CopyFile(staged, copied)) {
         ASCENDLOGE("Failed to copy staged bundle across filesystems: %s", staged.c_str());
         return false;
     }
 
-    if (rename(copied.c_str(), request_.outputPath.c_str()) != 0) {
-        const int publishError = errno;
-        ASCENDLOGE("Failed to publish copied bundle output: %s", std::strerror(publishError));
+    boost::system::error_code error;
+    boost::filesystem::rename(boost::filesystem::path(copied), boost::filesystem::path(request_.outputPath), error);
+    if (error) {
+        ASCENDLOGE("Failed to publish copied bundle output: %s", error.message().c_str());
         return false;
     }
     return true;
@@ -117,9 +115,9 @@ bool ManifestBundleCompiler::Compile() const
     if (!BundleSourceGenerator(workspace.Session(), units, request_.outputKind).Generate()) {
         return false;
     }
-    const std::string stagedName = request_.outputKind == BundleOutputKind::kSharedObject
-                                       ? "compile_resource_bundle.so"
-                                       : "compile_resource_bundle_relocatable.o";
+    const std::string stagedName = request_.outputKind == BundleOutputKind::kSharedObject ?
+                                       "compile_resource_bundle.so" :
+                                       "compile_resource_bundle_relocatable.o";
     const std::string stagedOutput = FileUtils::JoinPath(workspace.Session(), stagedName);
     if (!BuildBundle(workspace.Session(), stagedOutput)) {
         return false;

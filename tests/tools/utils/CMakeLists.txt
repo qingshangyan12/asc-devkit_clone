@@ -233,26 +233,13 @@ function(configure_asc_compile_exporter_test target_name)
     )
 
     target_link_options(${target_name} PRIVATE
-        -Wl,--wrap=close
-        -Wl,--wrap=closedir
-        -Wl,--wrap=fstat
         -Wl,--wrap=fork
-        -Wl,--wrap=getcwd
-        -Wl,--wrap=lstat
-        -Wl,--wrap=mkdtemp
-        -Wl,--wrap=mkdir
-        -Wl,--wrap=open
-        -Wl,--wrap=opendir
-        -Wl,--wrap=read
-        -Wl,--wrap=readdir
         -Wl,--wrap=rename
-        -Wl,--wrap=stat
-        -Wl,--wrap=unlink
         -Wl,--wrap=waitpid
-        -Wl,--wrap=write
     )
 
     target_link_libraries(${target_name} PRIVATE
+        asc_compile_exporter_boost_filesystem
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         json
         mmpa_headers
