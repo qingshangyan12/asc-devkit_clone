@@ -65,8 +65,10 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::KernelRun(
 
     const uint64_t outputOffset = templateDataParams.outputSliceStride * mySubCommRank_;
     uint64_t sliceSize = templateDataParams.sliceSize;
+    uint64_t lastSliceSize = templateDataParams.tailSize;
     if (templateDataParams.tailSize != 0 && mySubCommRank_ == templateRankSize_ - 1) {
         sliceSize = templateDataParams.tailSize;
+        lastSliceSize = templateDataParams.tailSize;
     }
     if (sliceSize == 0) {
         return HcclResult::HCCL_SUCCESS;
@@ -78,10 +80,18 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::KernelRun(
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
     const auto goSize = CalGoSize(sliceSize, config);
 
+    // 3 阶段 unroll 高性能版 DoRepeatAllGather 所需参数（与 KFC server 分发保持一致）
+    const uint64_t currentRankSliceInputOffset = templateDataParams.inputSliceStride * mySubCommRank_;
+    const uint64_t tmpRepeatNum = UINT64_MAX - templateDataParams.repeatNum;
+    const uint64_t inputRepeatStride = templateDataParams.inputRepeatStride;
+    const uint64_t outputRepeatStride = templateDataParams.outputRepeatStride;
+    const uint64_t isInputOutputEqual = (inputAddr == outputAddr) ? 1 : 0;
+
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
-    CHK_RET(FillCachedArgs(
-        submitInfo, inputAddr, outputAddr, token, outputOffset, sliceSize, goSize[0], goSize[1], goSize[2], goSize[3]));
+    CHK_RET(FillCachedArgs(submitInfo, inputAddr, outputAddr, token, outputOffset, sliceSize, goSize[0], goSize[1],
+        goSize[2], goSize[3], currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride,
+        lastSliceSize, isInputOutputEqual));
     templateResource.submitInfos.push_back(submitInfo);
     return HcclResult::HCCL_SUCCESS;
 }
