@@ -124,6 +124,8 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
 {
     ccu::Variable opType;
     opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
+    AscendC::PRINTF("[KFC_SERVER] DispatchKfcSubKernel: opType=%lu, param[0]=%lu\n",
+                    static_cast<uint64_t>(opType), static_cast<uint64_t>(param[HBM_PARAM_IDX_0]));
     // CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
     // {
     //     CcuKfcAllGatherMesh1DMem2MemKernel(
@@ -141,6 +143,8 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     // }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLREDUCE))
     {
+        AscendC::PRINTF("[KFC_SERVER] dispatching ALLREDUCE kernel, rankSize=%u, rankId=%u, channelCount=%u\n",
+                        ctx.arg->rankSize, ctx.arg->rankId, ctx.arg->channelCount);
         // FillCachedArgs order: [0]inputAddr [1]outputAddr [2]token [3]scratchAddr
         //   [4]currentRankSliceInputOffset [5]currentRankSliceOutputOffset
         //   [6]normalSliceSize [7]lastSliceSize [8]mySliceSize [9]sliceOffset
@@ -155,6 +159,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+        AscendC::PRINTF("[KFC_SERVER] ALLREDUCE kernel returned\n");
     }
 }
 
@@ -194,14 +199,19 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 
     CCU_WHILE(repeatCond == 0)
     {
+        AscendC::PRINTF("[KFC_SERVER] CircularQueue: waiting turn start, queueIdx=%lu\n", static_cast<uint64_t>(queueIdx));
         CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
+        AscendC::PRINTF("[KFC_SERVER] CircularQueue: turn start received, loading params\n");
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
+        AscendC::PRINTF("[KFC_SERVER] CircularQueue: params loaded, param[0]=%lu\n", static_cast<uint64_t>(param[HBM_PARAM_IDX_0]));
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
+            AscendC::PRINTF("[KFC_SERVER] CircularQueue: dispatching sub kernel\n");
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
             DispatchKfcSubKernel(param, ctx);
             MissionPostSync(ctx);
+            AscendC::PRINTF("[KFC_SERVER] CircularQueue: sub kernel done, setting turn end\n");
             CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
         }
         waitAddr += ckeSize;
@@ -250,6 +260,8 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 {
     auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
     KfcServerContext ctx;
+    AscendC::PRINTF("[KFC_SERVER] CcuKfcServerKernel entry, opType=%u, rankSize=%u, rankId=%u\n",
+                    static_cast<uint32_t>(kernelArg->opParam.opType), kernelArg->rankSize, kernelArg->rankId);
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
     CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
     HCCL_INFO("[CcuKernelKfcServer] ParseKernelArg finish");
@@ -260,8 +272,10 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
+    AscendC::PRINTF("[KFC_SERVER] entering KfcServerGenCircularQueue\n");
     CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
     // CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
+    AscendC::PRINTF("[KFC_SERVER] CcuKfcServerKernel exit\n");
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }
