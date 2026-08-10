@@ -68,20 +68,28 @@ __aicore__ inline void DivImpl(
     static_assert(
         (SupportType<T, uint16_t, int16_t, uint32_t, int32_t, half, float>()),
         "current data type is not supported on current device!");
-    if constexpr (config.algo == DivAlgo::INTRINSIC || config.algo == DivAlgo::PRECISION_1ULP_FTZ_TRUE) {
-        constexpr auto func = Reg::Div<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
+    if constexpr (
+        (FTZ_MODE == 1 && config.algo == DivAlgo::INTRINSIC) || config.algo == DivAlgo::PRECISION_1ULP_FTZ_TRUE) {
+        static constexpr Reg::DivSpecificMode mode = {
+            Reg::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_1ULP_FTZ_TRUE};
+        constexpr auto func = Reg::Div<T, &mode, Reg::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
-    } else if constexpr (config.algo == DivAlgo::DIFF_COMPENSATION || config.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE) {
+    } else if constexpr (
+        (FTZ_MODE == 1 && config.algo == DivAlgo::DIFF_COMPENSATION) ||
+        config.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE) {
         static constexpr AscendC::Reg::DivSpecificMode mode = {
             Reg::MaskMergeMode::ZEROING, true, DivAlgo::PRECISION_0ULP_FTZ_TRUE};
         constexpr auto func = Reg::Div<T, &mode, Reg::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
-    } else if constexpr (config.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
+    } else if constexpr (
+        (FTZ_MODE == 0 && config.algo == DivAlgo::DIFF_COMPENSATION) ||
+        config.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
         static constexpr AscendC::Reg::DivSpecificMode mode = {
             Reg::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_0ULP_FTZ_FALSE};
         constexpr auto func = Reg::Div<T, &mode, Reg::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
-    } else if constexpr (config.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
+    } else if constexpr (
+        (FTZ_MODE == 0 && config.algo == DivAlgo::INTRINSIC) || config.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
         static constexpr AscendC::Reg::DivSpecificMode mode = {
             Reg::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_1ULP_FTZ_FALSE};
         constexpr auto func = Reg::Div<T, &mode, Reg::RegTensor<T>>;
@@ -181,23 +189,31 @@ __aicore__ inline void DivImpl(
     static_assert(
         (SupportType<T, uint16_t, int16_t, uint32_t, int32_t, half, float>()),
         "current data type is not supported on current device!");
-    if constexpr (config.algo == DivAlgo::INTRINSIC || config.algo == DivAlgo::PRECISION_1ULP_FTZ_TRUE) {
-        constexpr auto func = Reg::Div<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
+    if constexpr (
+        (FTZ_MODE == 1 && config.algo == DivAlgo::INTRINSIC) || config.algo == DivAlgo::PRECISION_1ULP_FTZ_TRUE) {
+        static constexpr Reg::DivSpecificMode mode = {
+            Reg::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_1ULP_FTZ_TRUE};
+        constexpr auto func = Reg::Div<T, &mode, Reg::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, false>(
             dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
-    } else if constexpr (config.algo == DivAlgo::DIFF_COMPENSATION || config.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE) {
+    } else if constexpr (
+        (FTZ_MODE == 1 && config.algo == DivAlgo::DIFF_COMPENSATION) ||
+        config.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE) {
         static constexpr AscendC::Reg::DivSpecificMode mode = {
             Reg::MaskMergeMode::ZEROING, true, DivAlgo::PRECISION_0ULP_FTZ_TRUE};
         constexpr auto func = Reg::Div<T, &mode, Reg::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, false>(
             dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
-    } else if constexpr (config.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
+    } else if constexpr (
+        (FTZ_MODE == 0 && config.algo == DivAlgo::DIFF_COMPENSATION) ||
+        config.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
         static constexpr AscendC::Reg::DivSpecificMode mode = {
             Reg::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_0ULP_FTZ_FALSE};
         constexpr auto func = Reg::Div<T, &mode, Reg::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, false>(
             dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
-    } else if constexpr (config.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
+    } else if constexpr (
+        (FTZ_MODE == 0 && config.algo == DivAlgo::INTRINSIC) || config.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
         static constexpr AscendC::Reg::DivSpecificMode mode = {
             Reg::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_1ULP_FTZ_FALSE};
         constexpr auto func = Reg::Div<T, &mode, Reg::RegTensor<T>>;
