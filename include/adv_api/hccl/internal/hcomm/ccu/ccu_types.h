@@ -72,8 +72,6 @@ typedef struct {
 
 typedef uint64_t CcuInsHandle;
 
-typedef uint64_t HcommCcuResDescHandle;
-
 typedef uint64_t CcuKernelHandle;
 
 typedef uint64_t CcuVariableHandle;
