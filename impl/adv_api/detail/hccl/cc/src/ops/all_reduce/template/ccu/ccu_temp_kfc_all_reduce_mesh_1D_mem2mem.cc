@@ -63,6 +63,8 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::CalcRes(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     AlgResourceRequest& resourceRequest)
 {
+    HCCL_INFO("[CcuTempKfcAllReduceMesh1DMem2Mem::CalcRes] start, templateRankSize=%u, mySubCommRank=%u",
+              templateRankSize_, mySubCommRank_);
     CHK_RET(GetRes(resourceRequest));
     resourceRequest.ccuKernelNum.push_back(1);
 
@@ -82,9 +84,12 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::CalcRes(
             }
         }
     }
+    HCCL_INFO("[CcuTempKfcAllReduceMesh1DMem2Mem::CalcRes] channelDescs.size=%zu", channelDescs.size());
 
     kernelInfo.channels = channelDescs;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
+    HCCL_INFO("[CcuTempKfcAllReduceMesh1DMem2Mem::CalcRes] done, ccuKernelInfos.size=%zu",
+              resourceRequest.ccuKernelInfos.size());
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -92,6 +97,8 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::KernelRun(
     const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
     (void)param;
+    HCCL_INFO("[CcuTempKfcAllReduceMesh1DMem2Mem::KernelRun] start, sliceSize=%lu, tailSize=%lu",
+              templateDataParams.sliceSize, templateDataParams.tailSize);
     buffInfo_ = templateDataParams.buffInfo;
 
     if (templateDataParams.sliceSize == 0 && templateDataParams.tailSize == 0) {
@@ -116,6 +123,10 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::KernelRun(
     const uint64_t currentRankSliceOutputOffset = 0;
     const uint64_t sliceOffset = normalSliceSize * mySubCommRank_;
 
+    HCCL_INFO("[CcuTempKfcAllReduceMesh1DMem2Mem::KernelRun] inputAddr=0x%llx, outputAddr=0x%llx, scratchAddr=0x%llx, "
+              "normalSliceSize=%llu, lastSliceSize=%llu, mySliceSize=%llu, sliceOffset=%llu, mySubCommRank=%u",
+              inputAddr, outputAddr, scratchAddr, normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, mySubCommRank_);
+
     LoopGroupConfig config{};
     config.msInterleave = CCU_MS_INTERLEAVE;
     config.loopCount = CCU_M2M_LOCAL_COPY_LOOP_COUNT;
@@ -123,6 +134,9 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::KernelRun(
     const std::vector<uint64_t> goSize = (mySubCommRank_ != templateRankSize_ - 1) ?
                                              CalGoSize(normalSliceSize, config) :
                                              CalGoSize(lastSliceSize, config);
+
+    HCCL_INFO("[CcuTempKfcAllReduceMesh1DMem2Mem::KernelRun] goSize: [0]=%llu, [1]=%llu, [2]=%llu, [3]=%llu",
+              goSize[0], goSize[1], goSize[2], goSize[3]);
 
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
@@ -133,6 +147,8 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::KernelRun(
         buffInfo_.hcclBuffBaseOff));
     templateResource.submitInfos.push_back(submitInfo);
 
+    HCCL_INFO("[CcuTempKfcAllReduceMesh1DMem2Mem::KernelRun] done, submitInfos.size=%zu",
+              templateResource.submitInfos.size());
     return HcclResult::HCCL_SUCCESS;
 }
 

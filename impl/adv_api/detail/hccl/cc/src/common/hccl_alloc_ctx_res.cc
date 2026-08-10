@@ -893,6 +893,7 @@ HcclResult SelectCcuAlgorithm(
     OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo,
     AlgorithmType& algorithmType)
 {
+    HCCL_INFO("[CcuSelectAlg] SelectCcuAlgorithm[%u] start, opType=%u", tilingIndex, ccTiling->opType);
     CHK_RET(InitOpParamByTiling(comm, stream, topoTag, ccTiling, opParam));
     HCCL_INFO("[CcuSelectAlg]InitOpParamByTiling[%u] successfully!", tilingIndex);
 
@@ -908,6 +909,8 @@ HcclResult SelectCcuAlgorithm(
         return HCCL_E_NOT_SUPPORT;
     }
     algorithmType = it->second;
+    HCCL_INFO("[CcuSelectAlg] algorithmMap matched: algName[%s] -> algorithmType[%u]", algName.c_str(),
+              static_cast<uint32_t>(algorithmType));
 
     int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
     CHK_PRT_RET(result <= 0, HCCL_ERROR("failed to fill opParam.algName"), HCCL_E_INTERNAL);
@@ -975,6 +978,7 @@ HcclResult ProcessCcuTiling(
     HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex,
     const Mc2InitTilingInner* initTiling, OpResCtx& opResCtx)
 {
+    HCCL_INFO("[CcuSelectAlg] ProcessCcuTiling[%u] start, opType=%u", tilingIndex, ccTiling->opType);
     RunCcuSelectAlgCheck(ccTiling, tilingIndex);
 
     OpParam opParam{};
@@ -986,10 +990,13 @@ HcclResult ProcessCcuTiling(
     FillCcuAlgorithmInfo(tilingIndex, ccTiling, algName, algorithmType, opParam, opResCtx);
 
     bool skipGetRes = false;
+    HCCL_INFO("[CcuSelectAlg] ProcessCcuTiling[%u] calling PrepareCcuAlgorithmResource, algName[%s]", tilingIndex, algName.c_str());
     CHK_RET(PrepareCcuAlgorithmResource(comm, tilingIndex, algName, opParam, topoInfo.get(), opResCtx, skipGetRes));
     if (skipGetRes) {
+        HCCL_INFO("[CcuSelectAlg] ProcessCcuTiling[%u] skipGetRes=true, returning early", tilingIndex);
         return HCCL_SUCCESS;
     }
+    HCCL_INFO("[CcuSelectAlg] ProcessCcuTiling[%u] calling CopyCcuOpParamToDevice", tilingIndex);
     return CopyCcuOpParamToDevice(comm, tilingIndex, initTiling, opParam, opResCtx);
 }
 } // namespace
@@ -999,13 +1006,16 @@ HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
     void* mc2Tiling, OpResCtx& opResCtx)
 {
-    HCCL_INFO("[CcuSelectAlg]start CcuSelectAlg!");
+    HCCL_INFO("[CcuSelectAlg]start CcuSelectAlg! tilingNum=%u", tilingNum);
     HCCL_INFO("[CcuSelectAlg]received: workspace[%p], size[%llu]", (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
     Mc2InitTilingInner* initTiling = static_cast<Mc2InitTilingInner*>(mc2Tiling);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
+        HCCL_INFO("[CcuSelectAlg] processing tiling[%u]: opType=%u, commEngine=%u", i, ccTiling->opType, ccTiling->commEngine);
         CHK_RET(ProcessCcuTiling(comm, stream, topoTag[i], ccTiling, i, initTiling, opResCtx));
+        HCCL_INFO("[CcuSelectAlg] tiling[%u] processed successfully", i);
     }
 
+    HCCL_INFO("[CcuSelectAlg] CcuSelectAlg done, all tilings processed.");
     return HCCL_SUCCESS;
 }
