@@ -120,6 +120,14 @@ int32_t HcclHcommBatchTransferOnThread(
 
 void HcommPrimitivesDlInit(void* libHcommHandle); // 本模块独立初始化
 
+#ifdef UT_TEST
+void HcommAicpuTsTaskCacheSetTestFunctions(
+    int32_t (*lookup)(const char*, bool*), int32_t (*start)(const char*, void**, uint64_t*, uint64_t),
+    int32_t (*end)(const char*), int32_t (*execute)(const char*, void**, uint64_t*, uint64_t),
+    int32_t (*clear)(const char*));
+void HcommAicpuTsTaskCacheResetTestFunctions(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

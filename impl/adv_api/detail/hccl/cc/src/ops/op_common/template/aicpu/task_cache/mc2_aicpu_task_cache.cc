@@ -603,13 +603,65 @@ Mc2AicpuTaskCacheManager& Mc2AicpuTaskCacheManager::Instance()
     return manager;
 }
 
-void Mc2AicpuTaskCacheManager::Register(void* comm, const std::string& tag)
+Mc2AicpuTaskCacheManager::Mc2AicpuTaskCacheManager(size_t maxTagCount, size_t maxTagBytes)
+    : maxTagCount_(maxTagCount), maxTagBytes_(maxTagBytes)
+{}
+
+Mc2TaskCacheReserveResult Mc2AicpuTaskCacheManager::TryReserve(void* comm, const std::string& tag)
+{
+    if (comm == nullptr || tag.empty()) {
+        return Mc2TaskCacheReserveResult::FULL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto& tags = commTags_[comm];
+    if (tags.find(tag) != tags.end()) {
+        return Mc2TaskCacheReserveResult::EXISTING;
+    }
+    const bool countFull = trackedTagCount_ >= maxTagCount_;
+    const bool bytesFull = tag.size() > maxTagBytes_ - std::min(trackedTagBytes_, maxTagBytes_);
+    if (countFull || bytesFull) {
+        if (!capacityWarningReported_) {
+            HCCL_RUN_INFO(
+                "[MC2_TASK_CACHE][Capacity] bypass new tags, trackedCount[%zu/%zu], trackedBytes[%zu/%zu].",
+                trackedTagCount_, maxTagCount_, trackedTagBytes_, maxTagBytes_);
+            capacityWarningReported_ = true;
+        } else {
+            HCCL_DEBUG(
+                "[MC2_TASK_CACHE][Capacity] bypass tag[%s], trackedCount[%zu/%zu], trackedBytes[%zu/%zu].",
+                tag.c_str(), trackedTagCount_, maxTagCount_, trackedTagBytes_, maxTagBytes_);
+        }
+        if (tags.empty()) {
+            commTags_.erase(comm);
+        }
+        return Mc2TaskCacheReserveResult::FULL;
+    }
+    tags.insert(tag);
+    ++trackedTagCount_;
+    trackedTagBytes_ += tag.size();
+    return Mc2TaskCacheReserveResult::RESERVED;
+}
+
+void Mc2AicpuTaskCacheManager::Unregister(void* comm, const std::string& tag)
 {
     if (comm == nullptr || tag.empty()) {
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    commTags_[comm].insert(tag);
+    const auto commIter = commTags_.find(comm);
+    if (commIter == commTags_.end()) {
+        return;
+    }
+    const auto tagIter = commIter->second.find(tag);
+    if (tagIter == commIter->second.end()) {
+        return;
+    }
+    trackedTagBytes_ -= tagIter->size();
+    --trackedTagCount_;
+    commIter->second.erase(tagIter);
+    if (commIter->second.empty()) {
+        commTags_.erase(commIter);
+    }
+    capacityWarningReported_ = false;
 }
 
 HcclResult Mc2AicpuTaskCacheManager::Evict(void* comm)
@@ -621,8 +673,7 @@ HcclResult Mc2AicpuTaskCacheManager::Evict(void* comm)
         if (iter == commTags_.end()) {
             return HCCL_SUCCESS;
         }
-        tags = std::move(iter->second);
-        commTags_.erase(iter);
+        tags = iter->second;
     }
 
     HcclResult result = HCCL_SUCCESS;
@@ -631,7 +682,9 @@ HcclResult Mc2AicpuTaskCacheManager::Evict(void* comm)
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR("[MC2_TASK_CACHE][Evict] comm[%p], tag[%s], ret[%d].", comm, tag.c_str(), ret);
             result = ret;
+            continue;
         }
+        Unregister(comm, tag);
     }
     return result;
 }

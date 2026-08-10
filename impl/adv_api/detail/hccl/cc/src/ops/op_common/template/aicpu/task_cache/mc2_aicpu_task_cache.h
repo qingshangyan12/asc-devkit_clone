@@ -20,6 +20,15 @@
 
 namespace mc2_ops_hccl {
 
+constexpr size_t MC2_TASK_CACHE_MAX_TRACKED_TAG_COUNT = 65536U;
+constexpr size_t MC2_TASK_CACHE_MAX_TRACKED_TAG_BYTES = 8U * 1024U * 1024U;
+
+enum class Mc2TaskCacheReserveResult {
+    EXISTING,
+    RESERVED,
+    FULL,
+};
+
 struct Mc2AicpuTaskCachePlan {
     bool enabled = false;
     std::string tag;
@@ -41,17 +50,26 @@ class Mc2AicpuTaskCacheManager {
 public:
     static Mc2AicpuTaskCacheManager& Instance();
 
-    void Register(void* comm, const std::string& tag);
+    explicit Mc2AicpuTaskCacheManager(
+        size_t maxTagCount = MC2_TASK_CACHE_MAX_TRACKED_TAG_COUNT,
+        size_t maxTagBytes = MC2_TASK_CACHE_MAX_TRACKED_TAG_BYTES);
+    ~Mc2AicpuTaskCacheManager() = default;
+
+    Mc2TaskCacheReserveResult TryReserve(void* comm, const std::string& tag);
+    void Unregister(void* comm, const std::string& tag);
     HcclResult Evict(void* comm);
 
 private:
-    Mc2AicpuTaskCacheManager() = default;
-    ~Mc2AicpuTaskCacheManager() = default;
     Mc2AicpuTaskCacheManager(const Mc2AicpuTaskCacheManager&) = delete;
     Mc2AicpuTaskCacheManager& operator=(const Mc2AicpuTaskCacheManager&) = delete;
 
     std::mutex mutex_;
     std::unordered_map<void*, std::unordered_set<std::string>> commTags_;
+    size_t trackedTagCount_ = 0U;
+    size_t trackedTagBytes_ = 0U;
+    const size_t maxTagCount_;
+    const size_t maxTagBytes_;
+    bool capacityWarningReported_ = false;
 };
 
 } // namespace mc2_ops_hccl

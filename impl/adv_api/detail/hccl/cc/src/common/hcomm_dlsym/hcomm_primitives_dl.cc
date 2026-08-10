@@ -28,6 +28,24 @@ static HcommAicpuTsTaskCacheEndFunc g_HcommAicpuTsTaskCacheEnd = nullptr;
 static HcommAicpuTsTaskCacheExecuteFunc g_HcommAicpuTsTaskCacheExecute = nullptr;
 static HcommAicpuTsTaskCacheClearFunc g_HcommAicpuTsTaskCacheClear = nullptr;
 
+#ifdef UT_TEST
+extern "C" void HcommAicpuTsTaskCacheSetTestFunctions(
+    HcommAicpuTsTaskCacheLookupFunc lookup, HcommAicpuTsTaskCacheStartFunc start, HcommAicpuTsTaskCacheEndFunc end,
+    HcommAicpuTsTaskCacheExecuteFunc execute, HcommAicpuTsTaskCacheClearFunc clear)
+{
+    g_HcommAicpuTsTaskCacheLookup = lookup;
+    g_HcommAicpuTsTaskCacheStart = start;
+    g_HcommAicpuTsTaskCacheEnd = end;
+    g_HcommAicpuTsTaskCacheExecute = execute;
+    g_HcommAicpuTsTaskCacheClear = clear;
+}
+
+extern "C" void HcommAicpuTsTaskCacheResetTestFunctions(void)
+{
+    HcommAicpuTsTaskCacheSetTestFunctions(nullptr, nullptr, nullptr, nullptr, nullptr);
+}
+#endif
+
 extern "C" bool HcommIsSupportHcommBatchTransferOnThread(void) { return g_HcommBatchTransferOnThreadSupported; }
 
 extern "C" int32_t HcclHcommBatchTransferOnThread(
@@ -115,30 +133,49 @@ extern "C" bool HcommIsSupportHcommAicpuTsTaskCacheClear(void)
 
 extern "C" int32_t HcclHcommAicpuTsTaskCacheLookup(const char* tag, bool* isHit)
 {
-    return g_HcommAicpuTsTaskCacheLookup == nullptr ? -1 : g_HcommAicpuTsTaskCacheLookup(tag, isHit);
+    if (g_HcommAicpuTsTaskCacheLookup == nullptr) {
+        HCCL_ERROR("[HcclWrapper] HcommAicpuTsTaskCacheLookup not supported");
+        return HCCL_E_NOT_SUPPORT;
+    }
+    return g_HcommAicpuTsTaskCacheLookup(tag, isHit);
 }
 
 extern "C" int32_t HcclHcommAicpuTsTaskCacheStart(
     const char* tag, void** addrs, uint64_t* sizes, uint64_t count)
 {
-    return g_HcommAicpuTsTaskCacheStart == nullptr ? -1 : g_HcommAicpuTsTaskCacheStart(tag, addrs, sizes, count);
+    if (g_HcommAicpuTsTaskCacheStart == nullptr) {
+        HCCL_ERROR("[HcclWrapper] HcommAicpuTsTaskCacheStart not supported");
+        return HCCL_E_NOT_SUPPORT;
+    }
+    return g_HcommAicpuTsTaskCacheStart(tag, addrs, sizes, count);
 }
 
 extern "C" int32_t HcclHcommAicpuTsTaskCacheEnd(const char* tag)
 {
-    return g_HcommAicpuTsTaskCacheEnd == nullptr ? -1 : g_HcommAicpuTsTaskCacheEnd(tag);
+    if (g_HcommAicpuTsTaskCacheEnd == nullptr) {
+        HCCL_ERROR("[HcclWrapper] HcommAicpuTsTaskCacheEnd not supported");
+        return HCCL_E_NOT_SUPPORT;
+    }
+    return g_HcommAicpuTsTaskCacheEnd(tag);
 }
 
 extern "C" int32_t HcclHcommAicpuTsTaskCacheExecute(
     const char* tag, void** addrs, uint64_t* sizes, uint64_t count)
 {
-    return g_HcommAicpuTsTaskCacheExecute == nullptr ? -1 :
-                                                       g_HcommAicpuTsTaskCacheExecute(tag, addrs, sizes, count);
+    if (g_HcommAicpuTsTaskCacheExecute == nullptr) {
+        HCCL_ERROR("[HcclWrapper] HcommAicpuTsTaskCacheExecute not supported");
+        return HCCL_E_NOT_SUPPORT;
+    }
+    return g_HcommAicpuTsTaskCacheExecute(tag, addrs, sizes, count);
 }
 
 extern "C" int32_t HcclHcommAicpuTsTaskCacheClear(const char* tag)
 {
-    return g_HcommAicpuTsTaskCacheClear == nullptr ? -1 : g_HcommAicpuTsTaskCacheClear(tag);
+    if (g_HcommAicpuTsTaskCacheClear == nullptr) {
+        HCCL_ERROR("[HcclWrapper] HcommAicpuTsTaskCacheClear not supported");
+        return HCCL_E_NOT_SUPPORT;
+    }
+    return g_HcommAicpuTsTaskCacheClear(tag);
 }
 
 // ---------- 初始化函数 ----------

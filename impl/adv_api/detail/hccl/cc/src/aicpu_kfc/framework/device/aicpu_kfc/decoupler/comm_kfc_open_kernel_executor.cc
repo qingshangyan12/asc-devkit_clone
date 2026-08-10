@@ -19,6 +19,7 @@
 #include "cann_dispatch_bridge.h"
 #include "hcomm_primitives.h"
 #include "task_cache/mc2_aicpu_task_cache.h"
+#include "task_cache/mc2_aicpu_task_cache_runner.h"
 
 namespace {
 mc2_ops_hccl::OpParam* AsOpenOpParam(std::vector<uint8_t>& opParam)
@@ -118,160 +119,6 @@ HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam& param, const mc2_ops_hc
     return ret;
 }
 
-bool IsMc2BatchModeOp(HcclCMDType opType)
-{
-    return opType == HCCL_CMD_ALLREDUCE || opType == HCCL_CMD_ALLGATHER || opType == HCCL_CMD_REDUCE_SCATTER ||
-           opType == HCCL_CMD_ALLTOALLV || opType == HCCL_CMD_ALLTOALL;
-}
-
-void ClearMc2TaskCacheBestEffort(const mc2_ops_hccl::Mc2AicpuTaskCachePlan& plan, const char* stage)
-{
-    if (!plan.enabled) {
-        return;
-    }
-    const HcclResult ret = mc2_ops_hccl::Mc2AicpuTaskCacheClear(plan);
-    if (ret != HCCL_SUCCESS) {
-        HCCL_ERROR("[MC2_TASK_CACHE][Clear] stage[%s], tag[%s], ret[%d].", stage, plan.tag.c_str(), ret);
-    }
-}
-
-template <typename Func>
-HcclResult RunWithMc2TaskCache(
-    const mc2_ops_hccl::OpParam& param, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, Func func)
-{
-    if (!IsMc2BatchModeOp(param.opType)) {
-        return func();
-    }
-
-    HCCL_DEBUG(
-        "[MC2_BATCH][Start] opType[%u], algName[%s], algTag[%s].", static_cast<u32>(param.opType), param.algName,
-        param.algTag);
-    HcclResult startRet = static_cast<HcclResult>(HcommBatchModeStart(param.algTag));
-    CHK_PRT_RET(
-        startRet != HCCL_SUCCESS,
-        HCCL_ERROR(
-            "[MC2_BATCH][Start] failed, ret[%d], opType[%u], algName[%s], algTag[%s].", static_cast<int>(startRet),
-            static_cast<u32>(param.opType), param.algName, param.algTag),
-        startRet);
-
-    bool batchActive = true;
-    mc2_ops_hccl::Mc2AicpuTaskCachePlan plan;
-    HcclResult policyRet = mc2_ops_hccl::BuildMc2AicpuTaskCachePlan(param, resCtx, plan);
-    if (policyRet != HCCL_SUCCESS || !plan.enabled) {
-        if (policyRet != HCCL_SUCCESS) {
-            HCCL_WARNING("[MC2_TASK_CACHE][Policy] failed and fallback to executor, ret[%d].", policyRet);
-        }
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        if (execRet != HCCL_SUCCESS) {
-            return execRet;
-        }
-        return endRet;
-    }
-
-    bool isHit = false;
-    HcclResult lookupRet = mc2_ops_hccl::Mc2AicpuTaskCacheLookup(plan, isHit);
-    if (lookupRet != HCCL_SUCCESS) {
-        HCCL_WARNING(
-            "[MC2_TASK_CACHE][Lookup] failed and fallback to executor, tag[%s], ret[%d].", plan.tag.c_str(),
-            lookupRet);
-        ClearMc2TaskCacheBestEffort(plan, "lookup");
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        if (execRet != HCCL_SUCCESS) {
-            return execRet;
-        }
-        return endRet;
-    }
-
-    if (isHit) {
-        const HcclResult executeRet = mc2_ops_hccl::Mc2AicpuTaskCacheExecute(plan);
-        const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        HCCL_INFO(
-            "[MC2_TASK_CACHE][Hit] tag[%s], executeRet[%d], batchEndRet[%d].", plan.tag.c_str(), executeRet,
-            endRet);
-        if (executeRet != HCCL_SUCCESS) {
-            ClearMc2TaskCacheBestEffort(plan, "execute");
-            return executeRet;
-        }
-        if (endRet != HCCL_SUCCESS) {
-            ClearMc2TaskCacheBestEffort(plan, "hit batch end");
-            return endRet;
-        }
-        mc2_ops_hccl::Mc2AicpuTaskCacheManager::Instance().Register(plan.comm, plan.tag);
-        return HCCL_SUCCESS;
-    }
-
-    const HcclResult cacheStartRet = mc2_ops_hccl::Mc2AicpuTaskCacheStart(plan);
-    if (cacheStartRet != HCCL_SUCCESS) {
-        HCCL_WARNING(
-            "[MC2_TASK_CACHE][Start] failed and fallback to executor, tag[%s], ret[%d].", plan.tag.c_str(),
-            cacheStartRet);
-        ClearMc2TaskCacheBestEffort(plan, "start");
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        if (execRet != HCCL_SUCCESS) {
-            return execRet;
-        }
-        return endRet;
-    }
-
-    HcclResult execRet = func();
-    if (execRet != HCCL_SUCCESS) {
-        ClearMc2TaskCacheBestEffort(plan, "executor");
-    }
-
-    HcclResult flushRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-    batchActive = false;
-    HcclResult restartRet = HCCL_SUCCESS;
-    if (flushRet == HCCL_SUCCESS) {
-        restartRet = static_cast<HcclResult>(HcommBatchModeStart(param.algTag));
-        batchActive = (restartRet == HCCL_SUCCESS);
-    }
-
-    HcclResult cacheEndRet = HCCL_SUCCESS;
-    if (execRet == HCCL_SUCCESS && flushRet == HCCL_SUCCESS && restartRet == HCCL_SUCCESS) {
-        cacheEndRet = mc2_ops_hccl::Mc2AicpuTaskCacheEnd(plan);
-        if (cacheEndRet != HCCL_SUCCESS) {
-            ClearMc2TaskCacheBestEffort(plan, "cache end");
-        }
-    } else {
-        ClearMc2TaskCacheBestEffort(plan, "capture failure");
-    }
-
-    HcclResult endRet = HCCL_SUCCESS;
-    if (batchActive) {
-        endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        if (endRet != HCCL_SUCCESS) {
-            ClearMc2TaskCacheBestEffort(plan, "final batch end");
-        }
-    }
-    HCCL_DEBUG(
-        "[MC2_BATCH][End] opType[%u], algName[%s], algTag[%s], execRet[%d], flushRet[%d], restartRet[%d], "
-        "cacheEndRet[%d], endRet[%d].",
-        static_cast<u32>(param.opType), param.algName, param.algTag, static_cast<int>(execRet),
-        static_cast<int>(flushRet), static_cast<int>(restartRet), static_cast<int>(cacheEndRet),
-        static_cast<int>(endRet));
-
-    if (execRet != HCCL_SUCCESS) {
-        return execRet;
-    }
-    if (flushRet != HCCL_SUCCESS) {
-        return flushRet;
-    }
-    if (restartRet != HCCL_SUCCESS) {
-        return restartRet;
-    }
-    if (cacheEndRet != HCCL_SUCCESS) {
-        return cacheEndRet;
-    }
-    if (endRet != HCCL_SUCCESS) {
-        return endRet;
-    }
-    mc2_ops_hccl::Mc2AicpuTaskCacheManager::Instance().Register(plan.comm, plan.tag);
-    HCCL_INFO("[MC2_TASK_CACHE][Capture] tag[%s] published.", plan.tag.c_str());
-    return HCCL_SUCCESS;
-}
 } // namespace
 
 HcclResult LaunchOpenOpParamDataImpl(
@@ -334,7 +181,7 @@ HcclResult LaunchOpenOpParamDataImpl(
          param->opType == HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
         HcclResult cannRet =
-            RunWithMc2TaskCache(*param, resCtx, [&]() -> HcclResult {
+            mc2_ops_hccl::RunWithMc2TaskCache(*param, resCtx, [&]() -> HcclResult {
                 return mc2_ops_hccl::LaunchViaCann(*param, resCtx);
             });
         CHK_PRT_RET(
@@ -352,7 +199,8 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
     HcclResult ret =
-        RunWithMc2TaskCache(*param, resCtx, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
+        mc2_ops_hccl::RunWithMc2TaskCache(
+            *param, resCtx, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
 
     return HCCL_SUCCESS;
