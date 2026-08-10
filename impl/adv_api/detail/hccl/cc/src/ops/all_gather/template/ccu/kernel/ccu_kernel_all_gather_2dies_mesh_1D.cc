@@ -13,6 +13,7 @@
 namespace mc2_ops_hccl {
 using namespace hcomm;
 
+
 constexpr int OUTPUT_XN_ID = 1;
 constexpr int TOKEN_XN_ID = 2;
 constexpr int POST_SYNC_ID = 3;
