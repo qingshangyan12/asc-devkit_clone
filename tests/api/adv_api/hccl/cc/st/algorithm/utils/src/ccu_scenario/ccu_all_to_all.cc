@@ -118,12 +118,14 @@ void CleanupHostEnv(HcclComm &comm)
     }
     HcclSim::SimWorld::Global()->Deinit();
     unsetenv("HCCL_OP_EXPANSION_MODE");
+    unsetenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
 }
 
 KernelHandle RegisterKernelForRank(uint32_t rank, uint32_t rankSize, const CcuStScenario &scenario,
     const TopoMeta &topoMeta, const Mc2CcTilingInner &tiling)
 {
     setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
+    setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", "1", 1);
     HcclSim::SimWorld::Global()->Init(topoMeta, DevType::DEV_TYPE_950);
     if (aclrtSetDevice(rank) != ACL_SUCCESS) return 0;
 
@@ -147,6 +149,8 @@ KernelHandle RegisterKernelForRank(uint32_t rank, uint32_t rankSize, const CcuSt
 
     std::vector<uint64_t> sendCounts(rankSize, 1024U);
     opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void *>(sendCounts.data());
+
+    opParam.opExecuteConfig = mc2_ops_hccl::OpExecuteConfig::CCU_SCHED;
 
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
