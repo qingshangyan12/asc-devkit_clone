@@ -117,14 +117,9 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
     HCCL_INFO(
-        "[DispatchKfcSubKernel] opType[%u], rankSize[%u], rankId[%u], channelCount[%u], "
-        "param[0-8]: [0x%llx, 0x%llx, 0x%llx, 0x%llx, 0x%llx, 0x%llx, 0x%llx, 0x%llx, 0x%llx]",
-        static_cast<uint32_t>(ctx.arg->opParam.opType), ctx.arg->rankSize, ctx.arg->rankId, ctx.arg->channelCount,
-        static_cast<unsigned long long>(0), static_cast<unsigned long long>(0),
-        static_cast<unsigned long long>(0), static_cast<unsigned long long>(0),
-        static_cast<unsigned long long>(0), static_cast<unsigned long long>(0),
-        static_cast<unsigned long long>(0), static_cast<unsigned long long>(0),
-        static_cast<unsigned long long>(0));
+        "[DispatchKfcSubKernel] opType[%u], rankSize[%u], rankId[%u], channelCount[%u]. "
+        "param[0-8] are ccu::Variable (runtime values from HBM, not printable at translation time).",
+        static_cast<uint32_t>(ctx.arg->opParam.opType), ctx.arg->rankSize, ctx.arg->rankId, ctx.arg->channelCount);
 
     ccu::Variable opType;
     opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
@@ -147,12 +142,22 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_HALF_ALLTOALLV))
     {
-        HCCL_INFO("[DispatchKfcSubKernel] dispatch to HalfAllToAllV");
+        HCCL_INFO("[DispatchKfcSubKernel] dispatch to HalfAllToAllV Mi0");
+        ccu::Variable miVar0;
+        miVar0 = 0U;
         CcuKfcHalfAll2AllVMesh1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_8],
             param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
             ctx.arg->channels, ctx.arg->channelCount,
-            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, 0);
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, miVar0);
+        HCCL_INFO("[DispatchKfcSubKernel] dispatch to HalfAllToAllV Mi1");
+        ccu::Variable miVar1;
+        miVar1 = 1U;
+        CcuKfcHalfAll2AllVMesh1DKernel(
+            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_8],
+            param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
+            ctx.arg->channels, ctx.arg->channelCount,
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, miVar1);
     }
 }
 

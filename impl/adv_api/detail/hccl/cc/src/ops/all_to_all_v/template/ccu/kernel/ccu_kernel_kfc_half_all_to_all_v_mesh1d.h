@@ -17,7 +17,8 @@ namespace mc2_ops_hccl {
 CcuResult CcuKfcHalfAll2AllVMesh1DKernel(
     ccu::Variable userInAddr, ccu::Variable sendSizesAddr, ccu::Variable sendOffsetsAddr, ccu::Variable recvOffset,
     ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId, uint32_t missionId);
+    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
+    ccu::Variable missionId);
 
 } // namespace mc2_ops_hccl
 
