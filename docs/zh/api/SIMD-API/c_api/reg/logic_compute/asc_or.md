@@ -38,18 +38,42 @@ $$
 dst_i = src0_i | src1_i
 $$
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_or(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+### 矢量数据寄存器按位或
+
+#### 模板原型
+
+```c
+__simd_callee__ inline void asc_or(vector_<dtype>& dst,
+                                   vector_<dtype> src0,
+                                   vector_<dtype> src1,
+                                   vector_bool mask)
+```
+
+#### dtype支持数据类型
+
+dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
+
+#### 典型示例
+
+```c
+// 示例：对half矢量数据寄存器执行按位或
+__simd_callee__ inline void asc_or(vector_half& dst,
+                                   vector_half src0,
+                                   vector_half src1,
+                                   vector_bool mask)
+```
+
+### 掩码寄存器按位或
+
+```c
+__simd_callee__ inline void asc_or(vector_bool& dst,
+                                   vector_bool src0,
+                                   vector_bool src1,
+                                   vector_bool mask)
 ```
 
 ## 参数说明
@@ -69,9 +93,27 @@ __simd_callee__ inline void asc_or(vector_float& dst, vector_float src0, vector_
 
 无
 
+## 流水类型
+
+PIPE_V
+
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- 参与计算的元素个数由矢量长度（VL）决定，矢量数据寄存器按位与中元素个数 = VL ÷ sizeof(dtype)；掩码寄存器按位与中比特个数 = VL。
+- src0、src1、dst的dtype需要保持一致。
+- mask比特位为0时，dst对应比特位写0。
+
+### 矢量数据寄存器按位或约束
+
+dtype支持int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float共8种数据类型。
+
+### 掩码寄存器按位或约束
+
+dst、src0、src1必须均为`vector_bool`类型。
 
 ## 调用示例
 

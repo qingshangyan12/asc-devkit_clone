@@ -34,14 +34,27 @@ $$
 dst_i = -src_i
 $$
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_neg(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
-__simd_callee__ inline void asc_neg(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
-__simd_callee__ inline void asc_neg(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_neg(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-__simd_callee__ inline void asc_neg(vector_float& dst, vector_float src, vector_bool mask)
+### 模板原型
+
+```c
+__simd_callee__ inline void asc_neg(vector_<dtype>& dst,
+                                    vector_<dtype> src,
+                                    vector_bool mask)
+```
+
+dtype支持的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
+
+### 典型示例
+
+```c
+// 示例：对half矢量寄存器取相反数
+__simd_callee__ inline void asc_neg(vector_half& dst,
+                                    vector_half src,
+                                    vector_bool mask)
 ```
 
 ## 参数说明
@@ -52,7 +65,7 @@ __simd_callee__ inline void asc_neg(vector_float& dst, vector_float src, vector_
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -60,9 +73,20 @@ __simd_callee__ inline void asc_neg(vector_float& dst, vector_float src, vector_
 
 无
 
+## 流水类型
+
+PIPE_V
+
 ## 约束说明
 
-无
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- mask为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- dst与src的dtype需要保持一致。
+- mask比特位为0时，dst对应比特位写0。
+- 整数输入为有符号整数类型的最小负值时，结果保留原值不变。
+- 浮点输入通过翻转符号位实现取反：正数变为对应负数，负数变为对应正数，+0变为-0，-0变为+0，+inf变为-inf，-inf变为inf。
+- 浮点输入nan，取反结果为nan。
 
 ## 调用示例
 
