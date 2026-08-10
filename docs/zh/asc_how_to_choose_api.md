@@ -38,12 +38,12 @@ Ascend C 构建了覆盖不同编程范式的分层接口体系，开发者可�
 
 ```mermaid
 graph TD
-    A[**Ascend C 算子开发接口选型**] --> B[1. 偏好原生指针式编程范式]
+    A[Ascend C 算子开发接口选型] --> B[1. 偏好原生指针式编程范式]
     A --> C[2. 偏好Tensor抽象式编程范式]
-    B -->|离散/不规则计算场景| E[**SIMT API**]
-    B -->|规整计算场景| F[**SIMD C API**]
-    C -->|自主管控内存排布与同步逻辑| G[**Tensor API**]
-    C -->|Tpipe/Tque框架自动化托管内存与同步| H[**Basic API**]
+    B -->|离散/不规则计算场景| E[SIMT API]
+    B -->|规整计算场景| F[SIMD C API]
+    C -->|自主管控内存排布与同步逻辑| G[Tensor API]
+    C -->|Tpipe/Tque框架自动化托管内存与同步| H[Basic API]
 ```
 
 也可结合核心业务诉求，依据以下关键维度进行快速决策：
