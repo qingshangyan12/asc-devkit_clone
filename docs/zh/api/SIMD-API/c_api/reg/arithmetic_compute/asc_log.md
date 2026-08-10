@@ -28,7 +28,7 @@
 
 按元素取自然对数，计算公式如下：
 $$
-dst_i = ln(src_i)
+dst_i = log_e(src_i)
 $$
 
 ## 函数原型
@@ -41,6 +41,7 @@ __simd_callee__ inline void asc_log(vector_float& dst, vector_float src, vector_
 ## 参数说明
 
 **表1** 参数说明
+
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |

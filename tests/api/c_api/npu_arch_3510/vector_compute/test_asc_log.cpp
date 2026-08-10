@@ -10,5 +10,5 @@
 
 #include "tests/api/c_api/npu_arch_3510/utils/test_unary_instr_utils.h"
 
-TEST_VECTOR_COMPUTE_UNARY_INSTR(Vln, asc_log, vln, vector_half);
-TEST_VECTOR_COMPUTE_UNARY_INSTR(Vln, asc_log, vln, vector_float);
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Vlog, asc_log, vln, vector_half);
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Vlog, asc_log, vln, vector_float);

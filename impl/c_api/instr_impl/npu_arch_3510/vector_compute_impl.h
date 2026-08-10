@@ -5554,8 +5554,11 @@ __simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_b
     asc_ln_impl(dst, src, mask);
 }
 
-// ==========asc_ln(half/float)==========
-__simd_callee__ inline void asc_log(vector_half& dst, vector_half src, vector_bool mask) { asc_log_impl(dst, src, mask); }
+// ==========asc_log(half/float)==========
+__simd_callee__ inline void asc_log(vector_half& dst, vector_half src, vector_bool mask)
+{
+    asc_log_impl(dst, src, mask);
+}
 
 __simd_callee__ inline void asc_log(vector_float& dst, vector_float src, vector_bool mask)
 {
