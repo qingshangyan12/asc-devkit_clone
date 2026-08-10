@@ -229,8 +229,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
 
     uint64_t loopCount = CCU_LOOP_COUNT_M2M_RE;
-    uint64_t sliceCount = commParam->count;
-    uint64_t sliceSize = sliceCount * dataSize;
+    constexpr uint64_t CCU_MIN_SLICE_ALIGN = 128;
+    uint64_t rawSliceSize = commParam->count * dataSize;
+    uint64_t sliceSize = (rawSliceSize + CCU_MIN_SLICE_ALIGN - 1) / CCU_MIN_SLICE_ALIGN * CCU_MIN_SLICE_ALIGN;
+    uint64_t normalSliceSize = sliceSize;
+    uint64_t lastSliceSize = sliceSize;
 
     xnData_[3] = ccuParam_.scratchAddr;
     uint64_t rankSliceOffset =
@@ -239,8 +242,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
-    xnData_[7] = sliceSize;
-    xnData_[8] = UINT64_MAX - 1;
+    xnData_[5] = normalSliceSize;
+    xnData_[6] = lastSliceSize;
+    xnData_[7] = ccuParam_.rankNum * normalSliceSize; // scratchRepeatStride
+    xnData_[8] = UINT64_MAX - 1; // repeatNum = 1
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
 }
 } // namespace AscendC
