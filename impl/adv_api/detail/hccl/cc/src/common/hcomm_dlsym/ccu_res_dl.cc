@@ -14,6 +14,7 @@
 #include <stdlib.h>
 
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuGetMemToken, uint64_t srcVa, uint64_t size, uint64_t* tokenInfo);
+<<<<<<< HEAD
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuInsResDescCreate, uint32_t dieId, HcommCcuResDescHandle* resDesc);
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuInsResDescDestroy, HcommCcuResDescHandle resDesc);
 DEFINE_WEAK_FUNC(
@@ -49,3 +50,8 @@ void CcuResDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuInsCreate);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuInsDestroy);
 }
+=======
+
+// 初始化
+void CcuResDlInit(void* libHcommHandle) { INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuGetMemToken); }
+>>>>>>> f86afae6e (1)

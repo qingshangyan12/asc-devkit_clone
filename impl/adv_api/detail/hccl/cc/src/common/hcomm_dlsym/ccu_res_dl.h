@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 DECL_WEAK_FUNC(CcuResult, HcommCcuGetMemToken, uint64_t srcVa, uint64_t size, uint64_t* tokenInfo);
+<<<<<<< HEAD
 DECL_WEAK_FUNC(CcuResult, HcommCcuInsResDescCreate, uint32_t dieId, HcommCcuResDescHandle* resDesc);
 DECL_WEAK_FUNC(CcuResult, HcommCcuInsResDescDestroy, HcommCcuResDescHandle resDesc);
 DECL_WEAK_FUNC(
@@ -53,6 +54,8 @@ DECL_SUPPORT_FLAG(HcommCcuInsResDescDestroy);
 DECL_SUPPORT_FLAG(HcommCcuKernelQueryResReq);
 DECL_SUPPORT_FLAG(HcommCcuInsCreate);
 DECL_SUPPORT_FLAG(HcommCcuInsDestroy);
+=======
+>>>>>>> f86afae6e (1)
 
 void CcuResDlInit(void* libHcommHandle);
 
