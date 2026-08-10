@@ -1458,12 +1458,29 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
                 dstReg, srcReg0, srcReg1, mask);
         }
     } else if constexpr (SupportType<ActualT, half>()) {
-        if constexpr (sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
+        if constexpr (
+            sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE
+#if !defined(__ASC_FTZ__)
+            || sprMode.algo == DivAlgo::INTRINSIC
+#endif
+        ) {
             DivIEEE754HalfImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
         } else {
             vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
         }
     } else if constexpr (SupportType<ActualT, float>()) {
+#if !defined(__ASC_FTZ__)
+        if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE) {
+            DivPrecisionImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
+        } else if constexpr (sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_TRUE) {
+            vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
+        } else if constexpr (
+            sprMode.algo == DivAlgo::DIFF_COMPENSATION || sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
+            DivIEEE754FloatImpl<T, mode, U, true>(dstReg, srcReg0, srcReg1, mask);
+        } else {
+            DivIEEE754FloatImpl<T, mode, U, false>(dstReg, srcReg0, srcReg1, mask);
+        }
+#else
         if constexpr (sprMode.precisionMode) {
             if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
                 DivIEEE754FloatImpl<T, mode, U, true>(dstReg, srcReg0, srcReg1, mask);
@@ -1475,12 +1492,14 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
                 DivIEEE754FloatImpl<T, mode, U, true>(dstReg, srcReg0, srcReg1, mask);
             } else if constexpr (sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
                 DivIEEE754FloatImpl<T, mode, U, false>(dstReg, srcReg0, srcReg1, mask);
-            } else if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE) {
+            } else if constexpr (
+                sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE || sprMode.algo == DivAlgo::DIFF_COMPENSATION) {
                 DivPrecisionImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
             } else {
                 vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
             }
         }
+#endif
     } else {
         vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
     }
