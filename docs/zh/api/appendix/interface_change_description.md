@@ -21,6 +21,7 @@
 | SetHF32Mode | [SetHF32Mode](../SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_aux_config/SetHF32Mode.md) | 接口名不变，参数类型由bool修改为枚举HF32Mode。 |
 | SetHF32TransMode | [SetHF32TransMode](../SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_aux_config/SetHF32TransMode.md) | 接口名不变，参数类型由bool修改为枚举HF32TransMode。 |
 | CalcTschBlockDim | [CalcTschNumBlocks](../Utils-API/platform_info/PlatformAscendC/CalcTschNumBlocks.md) | 无 |
+| CeilDivision | [ceil_div](../Utils-API/cpp_stdlib/math_functions/ceil_div.md) | 原`AscendC::CeilDivision`接口已废弃，请使用`AscendC::Std::ceil_div`接口。 |
 
 以下表格的接口于9.1.0修改，相比于CANN9.0.0及前序版本，部分API命名有变更，具体变更情况请参考以下表格：
 
