@@ -72,18 +72,27 @@ PIPE_S
 
 ## 约束说明
 
-- 需要保证每一个ID的计数器不会溢出，否则会出现异常。
-- 需要保证相同的ID只会被一个流水线控制。
-- 每个ID对应一个计数器，特定CORE的同步ID计数器可通过其他CORE发起的asc_sync_intra_arrive递增；也可通过本身发起的asc_sync_intra_wait递减。 
-- 三个CORE的ID映射规则如下：
-    - ID为0~15的Vector Core 0的asc_sync_intra_arrive指令会被映射到Cube Core的0~15的ID。 
-    - ID为0~15的Vector Core 1的asc_sync_intra_arrive指令会被映射到Cube Core的16~31的ID。 
-    - ID为0~15的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 0的0~15的ID。 
-    - ID为16~31的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 1的0~15的ID。 
-
-- 必须保证配套使用asc_sync_intra_arrive和[asc_sync_intra_wait](asc_sync_intra_wait.md)，否则会出现未定义行为。
+- 用户需要确保配套使用（`sync_id`必须按照映射规则对应）asc_sync_intra_arrive和asc_sync_intra_wait，否则会出现未定义行为。
+- 由于当使用__vector__和__cube__修饰核函数时，硬件不会开启调度模块，也就无法正常进行核间同步。因此即使是在纯Vector或纯Cube场景下，也不能用__vector__或__cube__修饰核函数。
 - pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_S，不支持PIPE_ALL。
 - 一个核连续发出的asc_sync_intra_arrive，硬件不保证执行顺序。
+- `pipe`标识本指令在本核的执行流水，本接口不阻塞pipe流水中的后续指令。
+- 计数器取值范围为[0, 15]，软件须保证每个flag ID的计数器不会溢出，否则触发异常。
+- CUBECORE侧共32个sync_id（0~15映射到第一个Vector单元、16~31映射到第二个Vector单元），Vector单元侧各16个sync_id，以上各个核的sync_id映射规则如下：
+    - sync_id为0~15的Vector Core 0的asc_sync_intra_arrive指令会被映射到Cube Core的0~15的sync_id。 
+    - sync_id为0~15的Vector Core 1的asc_sync_intra_arrive指令会被映射到Cube Core的16~31的sync_id。 
+    - sync_id为0~15的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 0的0~15的sync_id。 
+    - sync_id为16~31的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 1的0~15的sync_id。 
+
+
+
+
+
+
+
+
+
+
 
 ## 调用示例
 

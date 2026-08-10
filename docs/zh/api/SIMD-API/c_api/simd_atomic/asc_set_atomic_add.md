@@ -26,11 +26,7 @@
 
 ## 功能说明
 
-设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到GM的数据传输开启原子累加。累加的数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。
-开启原子累加后，后续执行搬运操作从Unified Buffer/L0C Buffer/L1 Buffer到GM时，GM中原始数据将与新搬运数据进行逐元素累加，累加结果写回GM。
-<!-- npu="950" id8 -->
-特别地，针对Ascend 950PR/Ascend 950DT，不支持L1 Buffer到GM的通路。
-<!-- end id8 -->
+对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据通路请参考。原子累加过程：将待拷贝的内容和GM已有内容进行求和，然后将求和结果写入GM。接口可选择不同的函数原型来设定不同的累加数据类型。
 
 ## 函数原型
 
@@ -40,13 +36,13 @@ __aicore__ inline void asc_set_atomic_add_int16()
 __aicore__ inline void asc_set_atomic_add_int32()
 __aicore__ inline void asc_set_atomic_add_float16()
 __aicore__ inline void asc_set_atomic_add_bfloat()
-__aicore__ inline void asc_set_atomic_add_int()
 __aicore__ inline void asc_set_atomic_add_float()
 ```
 
 ## 参数说明
 
 无
+
 ## 返回值说明
 
 无
@@ -57,11 +53,38 @@ PIPE_S
 
 ## 约束说明
 
-- 使用完成后，建议清空原子操作的状态（详见[asc_set_atomic_none](./asc_set_atomic_none.md)），以免影响后续相关指令功能。
-- 该指令执行前不会对GM的数据做清零操作，开发者可以在需要时手动添加清零操作。
-<!-- npu="950" id9 -->
-- Ascend 950PR/Ascend 950DT，不支持L1 Buffer到GM的通路。
-<!-- end id9 -->
+- 各个产品由于硬件架构不同，支持的数据通路也不同，具体情况如下：
+    <!-- npu="950" id7 -->
+    - Ascend 950PR/Ascend 950DT，支持的数据通路为UB/L0C Buffer-\>GM。
+    <!-- end id7 -->
+
+    <!-- npu="A3" id8 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer-\>GM。
+    <!-- end id8 -->
+
+    <!-- npu="910b" id9 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer-\>GM。
+    <!-- end id9 -->
+- 本接口调用后会对后续所有目的地址为GM的搬运指令生效，因此调用后如需切换其他类型的原子操作、或关闭原子操作，必须调用[asc_set_atomic_none](./asc_set_atomic_none.md)接口清空原子操作的状态。 
+- 该接口执行前不会自动清零GM数据。开发者需根据算子逻辑判断是否清零，如需清零，请在执行前手动完成。
+- AIC与AIV中均可调用本接口。
+- 本接口仅对后续目的地址为GM的搬运指令生效，对于标量写GM的指令（例如[asc_store_dev](../scalar_compute/asc_store_dev.md)）不生效。
+- 本接口与紧邻的后续搬运指令之间的同步由硬件保证，因此以下示例中插入的多流水同步是不必要的：
+    ```cpp
+    asc_set_atomic_add_int8();
+
+    // asc_set_atomic_add_int8与asc_copy_ub2gm之间的同步由硬件保证，因此以下同步是不必要的。
+    asc_sync_notify(PIPE_S, PIPE_MTE3, EVENT_ID0);  
+    asc_sync_wait(PIPE_S, PIPE_MTE3, EVENT_ID0);  
+
+    asc_copy_ub2gm(dst, src1, total_length * sizeof(int8_t));
+    // 关闭原子操作
+    asc_set_atomic_none();
+    ```
+- 后续搬运指令的操作数据类型需与所选接口设置的数据类型一致，否则操作结果与预期不符（硬件不报错）。
+- 本接口配置写入后对后续所有目的地址为Global Memory的搬运指令生效，直至再次调用本类原子操作配置接口覆盖配置；调用后如需切换为其他数据类型的原子操作、改用其他原子操作配置或关闭原子操作，须显式调用对应接口覆盖配置。
+- 本接口不能保证后续搬运指令的执行顺序，若需保证确定性的执行顺序请参考[原子操作-确定性计算]()。
+- 本接口不支持纯SIMT编译模式（设置编译选项`--enable-simt`），在该模式下包含头文件`atomic.h`会触发编译错误。
 
 ## 调用示例
 

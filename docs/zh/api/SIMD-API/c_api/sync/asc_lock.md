@@ -97,7 +97,7 @@ PIPE_S
 - asc_lock与asc_unlock必须严格成对使用，并使用相同的mutex_id与mode。此外，对应的asc_unlock必须始终写在asc_lock之后，否则硬件行为无定义。
 - 对于mutex_id相同的asc_lock与asc_unlock组合，无论pipe和mode是否相同，都不得在代码中嵌套使用，否则硬件行为将不可预测。
 - 成对使用的asc_lock和asc_unlock必须配置相同的mode，否则硬件行为将不可预测。
-- 如果代码中连续出现多个pipe和mutex_id均相同的调用，则后一个asc_lock不会再阻塞流水线运行。若需要表达同一流水线内的依赖关系，必须使用接口asc_sync_pipe。
+- 对`pipe`与`mutex_id`相同且连续出现的asc_lock与asc_unlock配对，后一次asc_lock不再阻塞流水线；若需保证同一流水线内指令间的依赖，需使用单流水同步接口asc_sync_pipe。
 
 ## 调用示例
 
@@ -267,4 +267,3 @@ MTE2: |==id0==|        |==id1==|        |==id0==|        |==id1==|
 V:          |==id0==|        |==id1==|        |==id0==|        |==id1==|
 MTE3:            |==id0==|        |==id1==|        |==id0==|        |==id1==|
 ```
-

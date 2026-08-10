@@ -26,12 +26,18 @@
 
 ## 功能说明
 
-设置同步标志，通知目标流水线。
+头文件路径：`"c_api/sync/sync.h"`。
+
+与`asc_sync_wait`配对使用，用于实现AI Core内部不同流水之间的同步控制，asc_sync_notify和asc_sync_wait各自的功能如下：
+    - asc_sync_notify：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。asc_sync_notify只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。
+    - asc_sync_wait：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
+```c
+__aicore__ inline void asc_sync_notify(pipe_t pipe,
+                                       pipe_t tpipe, 
+                                       event_t id)
 ```
 
 ## 参数说明
@@ -39,10 +45,12 @@ __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
 **表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-| :--- | :--- | :--- |
-| pipe | 输入 | 源流水线类型。需传入编译期常量。 |
-| tpipe | 输入 | 目标流水线类型。需传入编译期常量。 |
-| id | 输入 | 同步ID。取值范围为[0, 7]。 |
+|---|---|---|
+| `pipe` | 输入 | 源流水类型，即"等待哪条流水的前序指令完成"。取值范围为`pipe_t`枚举：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。不可取`PIPE_ALL`，否则触发异常。 |
+| `tpipe` | 输入 | 目标流水类型，即"解除哪条流水的`asc_sync_wait`阻塞"。取值范围与`pipe`相同，为`pipe_t`枚举。不可取`PIPE_ALL`，否则触发异常。 |
+| `id` | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`EVENT_ID0`~`EVENT_ID7`（即0~7）。 |
+
+针对不同产品，AIC与AIV中支持的“源流水-目的流水”的组合不同，具体请参考[支持的多流水同步组合]()。
 
 ## 返回值说明
 
@@ -54,9 +62,16 @@ PIPE_S
 
 ## 约束说明
 
-- asc_sync_notify和asc_sync_wait必须成对使用。
-
+- AIC与AIV中均可调用本接口。
 - 相同源流水、相同目标流水、相同id下，连续使用asc_sync_notify会引发未定义行为。
+- 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致，否则同步关系不成立。
+- `pipe`与`tpipe`均不可取`PIPE_ALL`，否则触发异常。
+- `id`取值范围为0~7，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。
+- 本接口仅在AI Core内部建立跨流水依赖，不涉及Global Memory读写，无地址对齐与容量上限约束。。<span style="color:red">**（莫名其妙的约束）**</span>
+- 本接口对同一流水中的后续指令不产生阻塞效果。
+<!-- npu="950" id8 -->
+- 在[NPU架构3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)上，`asc_lock`与`asc_unlock`组合也可实现多流水同步。与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水线解耦，可简化反向同步逻辑。
+<!-- end id8 -->
 
 ## 调用示例
 
