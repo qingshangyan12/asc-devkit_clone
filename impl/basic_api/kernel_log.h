@@ -26,10 +26,14 @@
     !(defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1))
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 #endif
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || \
+    ((defined(__NPU_HOST__) || defined(__ASCC_HOST__)) && !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__) && \
+        !defined(__CCE__) && !defined(__BISHENG_CCEC__))
+#include <csignal>
+#endif
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <string>
 #include <map>
-#include <csignal>
 #include <cstdio>
 #include <unistd.h>
 #include "stub_def.h"
@@ -273,11 +277,11 @@ inline std::string GenBlockStr()
 #else
 
 #define KERNEL_LOG(level, format, ...)
-#if !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
+#if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__) || defined(__CCE__) || defined(__BISHENG_CCEC__)
 
 #define ASCENDC_ASSERT(cond, behavior)
 
-#else // define (__NPU_HOST__) || defined(__ASCC_HOST__)
+#elif defined(__NPU_HOST__) || defined(__ASCC_HOST__)
 
 #ifndef ASCC_ASCENDC_ASSERT
 #define ASCC_ASCENDC_ASSERT
@@ -290,7 +294,11 @@ inline std::string GenBlockStr()
     } while (0)
 #endif
 
-#endif // !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
+#else
+
+#define ASCENDC_ASSERT(cond, behavior)
+
+#endif // defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__) || defined(__CCE__) || defined(__BISHENG_CCEC__)
 #define ASCENDC_REPORT_NOT_SUPPORT(cond, apiMsg)
 #define ASCENDC_CHECK_VALUE_RANGE(value, rangeLow, rangeHigh, paramName, apiMsg)
 #define ASCENDC_CHECK_TENSOR_PTR_ALIGN(tensorPtr, tPos, alignBytes, tensorName, apiMsg)
