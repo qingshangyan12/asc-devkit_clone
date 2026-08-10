@@ -65,12 +65,11 @@ TEST_F(ModuleTest, ProcessRunnerValidatesArgumentsAndPropagatesEnvironment)
 
     const std::string output = FileUtils::JoinPath(root_, "environment.txt");
     ScopedEnvironment makeFlags("MAKEFLAGS", "must-not-leak");
-    ASSERT_TRUE(
-        ProcessRunner::Run(
-            {"/bin/sh", "-c",
-             "printf '%s|%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" \"${MAKEFLAGS-unset}\" > "
-             "\"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
-            {{"ASC_COMPILE_EXPORTER_UNIT_VALUE", "visible"}, {"ASC_COMPILE_EXPORTER_UNIT_OUTPUT", output}}));
+    ASSERT_TRUE(ProcessRunner::Run(
+        {"/bin/sh", "-c",
+            "printf '%s|%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" \"${MAKEFLAGS-unset}\" > "
+            "\"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
+        {{"ASC_COMPILE_EXPORTER_UNIT_VALUE", "visible"}, {"ASC_COMPILE_EXPORTER_UNIT_OUTPUT", output}}));
     EXPECT_EQ(ReadTestFile(output), "visible|unset");
 }
 
@@ -87,13 +86,12 @@ TEST_F(ModuleTest, ProcessRunnerTimesOutAndReapsProcessGroup)
 {
     const std::string pidFile = FileUtils::JoinPath(root_, "timed-out.pid");
     const std::string terminationFile = FileUtils::JoinPath(root_, "termination.txt");
-    EXPECT_FALSE(
-        ProcessRunner::Run(
-            {"/bin/sh", "-c",
-             "trap 'printf terminated > \"$ASC_COMPILE_EXPORTER_TERMINATION_FILE\"; exit 0' TERM; "
-             "printf '%s' \"$$\" > \"$ASC_COMPILE_EXPORTER_PID_FILE\"; sleep 10"},
-            {{"ASC_COMPILE_EXPORTER_PID_FILE", pidFile}, {"ASC_COMPILE_EXPORTER_TERMINATION_FILE", terminationFile}},
-            std::chrono::milliseconds(100U)));
+    EXPECT_FALSE(ProcessRunner::Run(
+        {"/bin/sh", "-c",
+            "trap 'printf terminated > \"$ASC_COMPILE_EXPORTER_TERMINATION_FILE\"; exit 0' TERM; "
+            "printf '%s' \"$$\" > \"$ASC_COMPILE_EXPORTER_PID_FILE\"; sleep 10"},
+        {{"ASC_COMPILE_EXPORTER_PID_FILE", pidFile}, {"ASC_COMPILE_EXPORTER_TERMINATION_FILE", terminationFile}},
+        std::chrono::milliseconds(100U)));
 
     EXPECT_EQ(ReadTestFile(terminationFile), "terminated");
     const pid_t child = static_cast<pid_t>(std::strtol(ReadTestFile(pidFile).c_str(), nullptr, 10));
