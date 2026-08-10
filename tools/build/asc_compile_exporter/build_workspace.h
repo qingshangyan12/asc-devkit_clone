@@ -18,7 +18,9 @@ namespace manifest_generator {
 
 class BuildWorkspace final {
 public:
-    static BuildWorkspace Create(const std::string& requestedParent, bool keepTemp);
+    BuildWorkspace() noexcept = default;
+
+    static bool Create(const std::string& requestedParent, bool keepTemp, BuildWorkspace& workspace);
 
     BuildWorkspace(const BuildWorkspace&) = delete;
     BuildWorkspace& operator=(const BuildWorkspace&) = delete;

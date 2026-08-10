@@ -41,8 +41,8 @@ TEST_F(ModuleTest, RepositorySortsManifestsAndResourcesAndSkipsEmptyFiles)
     CreateManifest(second, "Second");
     WriteTestFile(FileUtils::JoinPath(root_, "collection/ignored.json"), "not a manifest");
 
-    const std::vector<ManifestUnit> units =
-        CollectedManifestRepository(FileUtils::JoinPath(root_, "collection")).Load();
+    std::vector<ManifestUnit> units;
+    ASSERT_TRUE(CollectedManifestRepository(FileUtils::JoinPath(root_, "collection")).Load(units));
 
     ASSERT_EQ(units.size(), 2U);
     EXPECT_NE(units[0].json.find("Second"), std::string::npos);
@@ -59,17 +59,18 @@ TEST_F(ModuleTest, RepositoryReportsManifestJsonAndBaseDirErrors)
     const std::string malformed = FileUtils::JoinPath(root_, "malformed/Unit");
     WriteTestFile(FileUtils::JoinPath(malformed, "resources/kernel.cpp"), "source");
     WriteTestFile(FileUtils::JoinPath(malformed, "Unit_manifest.json"), "{\"base_dir\":");
-    EXPECT_THROW(CollectedManifestRepository(FileUtils::JoinPath(root_, "malformed")).Load(), std::runtime_error);
+    std::vector<ManifestUnit> units;
+    EXPECT_FALSE(CollectedManifestRepository(FileUtils::JoinPath(root_, "malformed")).Load(units));
 
     const std::string missing = FileUtils::JoinPath(root_, "missing-base/Unit");
     WriteTestFile(FileUtils::JoinPath(missing, "resources/kernel.cpp"), "source");
     WriteTestFile(FileUtils::JoinPath(missing, "Unit_manifest.json"), "{}");
-    EXPECT_THROW(CollectedManifestRepository(FileUtils::JoinPath(root_, "missing-base")).Load(), std::runtime_error);
+    EXPECT_FALSE(CollectedManifestRepository(FileUtils::JoinPath(root_, "missing-base")).Load(units));
 
     const std::string wrongType = FileUtils::JoinPath(root_, "wrong-type/Unit");
     WriteTestFile(FileUtils::JoinPath(wrongType, "resources/kernel.cpp"), "source");
     WriteTestFile(FileUtils::JoinPath(wrongType, "Unit_manifest.json"), "{\"base_dir\":7}");
-    EXPECT_THROW(CollectedManifestRepository(FileUtils::JoinPath(root_, "wrong-type")).Load(), std::runtime_error);
+    EXPECT_FALSE(CollectedManifestRepository(FileUtils::JoinPath(root_, "wrong-type")).Load(units));
 }
 
 TEST_F(ModuleTest, RepositorySkipsSymlinkedManifestsAndAcceptsAbsoluteBaseDir)
@@ -84,7 +85,8 @@ TEST_F(ModuleTest, RepositorySkipsSymlinkedManifestsAndAcceptsAbsoluteBaseDir)
     WriteTestFile(ignoredManifest, "{\"base_dir\":\"resources\"}");
     ASSERT_EQ(symlink(ignoredManifest.c_str(), FileUtils::JoinPath(collection, "Link_manifest.json").c_str()), 0);
 
-    const std::vector<ManifestUnit> units = CollectedManifestRepository(collection).Load();
+    std::vector<ManifestUnit> units;
+    ASSERT_TRUE(CollectedManifestRepository(collection).Load(units));
     ASSERT_EQ(units.size(), 1U);
     ASSERT_EQ(units[0].files.size(), 1U);
     EXPECT_EQ(units[0].files[0].filePath, "resources/kernel.cpp");
@@ -98,8 +100,8 @@ TEST_F(ModuleTest, RepositoryRejectsNonRegularResource)
     ASSERT_EQ(mkfifo(FileUtils::JoinPath(resources, "resource.pipe").c_str(), 0600), 0);
     CreateManifest(unit, "Unit");
 
-    EXPECT_THROW(
-        CollectedManifestRepository(FileUtils::JoinPath(root_, "collection-special")).Load(), std::runtime_error);
+    std::vector<ManifestUnit> units;
+    EXPECT_FALSE(CollectedManifestRepository(FileUtils::JoinPath(root_, "collection-special")).Load(units));
 }
 
 TEST_F(ModuleTest, RepositoryEnforcesDirectoryDepthLimit)
@@ -110,7 +112,8 @@ TEST_F(ModuleTest, RepositoryEnforcesDirectoryDepthLimit)
         allowedDirectory = FileUtils::JoinPath(allowedDirectory, "level-" + std::to_string(depth));
     }
     WriteTestFile(FileUtils::JoinPath(allowedDirectory, "Deep_manifest.json"), "{\"base_dir\":\".\"}");
-    EXPECT_NO_THROW(CollectedManifestRepository(allowedCollection).Load());
+    std::vector<ManifestUnit> units;
+    EXPECT_TRUE(CollectedManifestRepository(allowedCollection).Load(units));
 
     const std::string rejectedCollection = FileUtils::JoinPath(root_, "collection-depth-rejected");
     std::string rejectedDirectory = rejectedCollection;
@@ -118,12 +121,13 @@ TEST_F(ModuleTest, RepositoryEnforcesDirectoryDepthLimit)
         rejectedDirectory = FileUtils::JoinPath(rejectedDirectory, "level-" + std::to_string(depth));
     }
     ASSERT_TRUE(FileUtils::CreateDirectories(rejectedDirectory));
-    EXPECT_THROW(CollectedManifestRepository(rejectedCollection).Load(), std::runtime_error);
+    EXPECT_FALSE(CollectedManifestRepository(rejectedCollection).Load(units));
 }
 
 TEST_F(ModuleTest, RepositoryReportsDirectoryOpenFailure)
 {
-    EXPECT_THROW(CollectedManifestRepository("/dev/null").Load(), std::runtime_error);
+    std::vector<ManifestUnit> units;
+    EXPECT_FALSE(CollectedManifestRepository("/dev/null").Load(units));
 }
 
 } // namespace

@@ -25,33 +25,33 @@ public:
     static std::string JoinPath(const std::string& left, const std::string& right);
     static std::string ParentPath(const std::string& path);
     static std::string FileName(const std::string& path);
-    static bool MakeAbsolutePath(const std::string& path, std::string& absolute) noexcept;
+    static bool MakeAbsolutePath(const std::string& path, std::string& absolute);
     static std::vector<std::string> SplitPath(const std::string& path);
-    static bool IsPathWithin(const std::string& path, const std::string& root) noexcept;
+    static bool IsPathWithin(const std::string& path, const std::string& root);
 
     static bool PathExists(const std::string& path) noexcept;
     static bool IsDirectory(const std::string& path) noexcept;
     static bool IsRegularFile(const std::string& path) noexcept;
     static bool IsSymlink(const std::string& path) noexcept;
-    static bool ResolveCanonicalPath(const std::string& path, std::string& resolved) noexcept;
-    static bool ResolveDirectory(const std::string& path, std::string& resolved) noexcept;
-    static bool ResolveSubdirectory(const std::string& path, const std::string& root, std::string& resolved) noexcept;
+    static bool ResolveCanonicalPath(const std::string& path, std::string& resolved);
+    static bool ResolveDirectory(const std::string& path, std::string& resolved);
+    static bool ResolveSubdirectory(const std::string& path, const std::string& root, std::string& resolved);
 
-    static bool CreateDirectories(const std::string& path) noexcept;
+    static bool CreateDirectories(const std::string& path);
     static bool ListDirectory(
-        const std::string& directory, bool recursive, bool ignoreOpenFailure, std::vector<std::string>& paths) noexcept;
-    static bool CreateTempDirectory(std::string& path) noexcept;
-    static bool RemoveAll(const std::string& path) noexcept;
+        const std::string& directory, bool recursive, bool ignoreOpenFailure, std::vector<std::string>& paths);
+    static bool CreateTempDirectory(std::string& path);
+    static bool RemoveAll(const std::string& path);
 
-    static bool WriteBinaryFile(const std::string& path, const std::vector<uint8_t>& bytes) noexcept;
-    static bool ReadRegularFile(const std::string& path, uintmax_t maximum, std::vector<uint8_t>& data) noexcept;
-    static bool OpenExclusiveOutput(const std::string& path, std::ofstream& output) noexcept;
-    static bool FinalizeOutput(std::ofstream& output) noexcept;
+    static bool WriteBinaryFile(const std::string& path, const std::vector<uint8_t>& bytes);
+    static bool ReadRegularFile(const std::string& path, uintmax_t maximum, std::vector<uint8_t>& data);
+    static bool OpenExclusiveOutput(const std::string& path, std::ofstream& output);
+    static bool FinalizeOutput(std::ofstream& output);
     static bool CheckNonSymlink(const std::string& path) noexcept;
     static bool CopyFileExclusive(const std::string& source, const std::string& destination) noexcept;
 
 private:
-    static bool CurrentDirectory(std::string& current) noexcept;
+    static bool CurrentDirectory(std::string& current);
     static bool EnsureDirectory(const char* path) noexcept;
     static bool RemoveAllImpl(const std::string& path);
 };

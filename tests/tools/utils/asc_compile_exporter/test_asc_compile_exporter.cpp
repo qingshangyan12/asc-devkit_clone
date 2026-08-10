@@ -173,14 +173,9 @@ protected:
             "{\"base_dir\":\"" + baseDir + "\",\"name\":\"" + name + "\"}");
     }
 
-    static void ExpectCompileError(const BuildCollectedBundleRequest& request, const std::string& message)
+    static void ExpectCompileFailure(const BuildCollectedBundleRequest& request)
     {
-        try {
-            ManifestBundleCompiler(request).Compile();
-            FAIL() << "expected manifest bundle compilation to fail";
-        } catch (const std::runtime_error& error) {
-            EXPECT_NE(std::string(error.what()).find(message), std::string::npos) << error.what();
-        }
+        EXPECT_FALSE(ManifestBundleCompiler(request).Compile());
     }
 
     std::string root_;
@@ -191,24 +186,21 @@ TEST_F(AscCompileExporterTest, RejectsMissingBuildExecutables)
     CreateTestDirectories(JoinTestPath(root_, "collection"));
     BuildCollectedBundleRequest request = Request();
     request.makeExecutable.clear();
-    ExpectCompileError(request, "make executable must not be empty");
+    ExpectCompileFailure(request);
 
     request = Request();
     request.cxxCompiler.clear();
-    ExpectCompileError(request, "C++ compiler must not be empty");
+    ExpectCompileFailure(request);
 }
 
-TEST_F(AscCompileExporterTest, RejectsInvalidManifestSearchRoot)
-{
-    ExpectCompileError(Request(), "manifest search root must exist");
-}
+TEST_F(AscCompileExporterTest, RejectsInvalidManifestSearchRoot) { ExpectCompileFailure(Request()); }
 
 TEST_F(AscCompileExporterTest, RejectsOutputWithoutParentDirectory)
 {
     CreateTestDirectories(JoinTestPath(root_, "collection"));
     BuildCollectedBundleRequest request = Request();
     request.outputSo = "bundle.so";
-    ExpectCompileError(request, "output path must include a parent directory");
+    ExpectCompileFailure(request);
 }
 
 TEST_F(AscCompileExporterTest, RejectsEmptyAndInvalidOutputPaths)
@@ -216,11 +208,11 @@ TEST_F(AscCompileExporterTest, RejectsEmptyAndInvalidOutputPaths)
     CreateTestDirectories(JoinTestPath(root_, "collection"));
     BuildCollectedBundleRequest emptyOutput = Request();
     emptyOutput.outputSo.clear();
-    ExpectCompileError(emptyOutput, "output path must not be empty");
+    ExpectCompileFailure(emptyOutput);
 
     BuildCollectedBundleRequest invalidOutput = Request();
     invalidOutput.outputSo = JoinTestPath(root_, "output/");
-    ExpectCompileError(invalidOutput, "output path has an invalid file name");
+    ExpectCompileFailure(invalidOutput);
 }
 
 TEST_F(AscCompileExporterTest, RejectsMissingManifestWithoutReplacingOutput)
@@ -229,7 +221,7 @@ TEST_F(AscCompileExporterTest, RejectsMissingManifestWithoutReplacingOutput)
     const BuildCollectedBundleRequest request = Request();
     WriteFile(request.outputSo, "previous bundle");
 
-    ExpectCompileError(request, "contain no manifest units");
+    ExpectCompileFailure(request);
     EXPECT_EQ(ReadFile(request.outputSo), "previous bundle");
 }
 
@@ -241,7 +233,7 @@ TEST_F(AscCompileExporterTest, RejectsMalformedJsonWithoutReplacingOutput)
     const BuildCollectedBundleRequest request = Request();
     WriteFile(request.outputSo, "previous bundle");
 
-    ExpectCompileError(request, "manifest is not valid JSON");
+    ExpectCompileFailure(request);
     EXPECT_EQ(ReadFile(request.outputSo), "previous bundle");
 }
 
@@ -251,7 +243,7 @@ TEST_F(AscCompileExporterTest, RejectsBaseDirectoryOutsideManifestDirectory)
     WriteFile(JoinTestPath(root_, "collection/outside/kernel.cpp"), "source");
     CreateManifest(unit, "Traversal", "../outside");
 
-    ExpectCompileError(Request(), "must be a directory below the manifest root");
+    ExpectCompileFailure(Request());
 }
 
 TEST_F(AscCompileExporterTest, RejectsSymlinkInResourceDirectory)
@@ -263,7 +255,7 @@ TEST_F(AscCompileExporterTest, RejectsSymlinkInResourceDirectory)
     ASSERT_EQ(symlink(outside.c_str(), JoinTestPath(unit, "resources/link.cpp").c_str()), 0);
     CreateManifest(unit, "Symlink");
 
-    ExpectCompileError(Request(), "base_dir contains a symlink");
+    ExpectCompileFailure(Request());
 }
 
 TEST_F(AscCompileExporterTest, RejectsOversizedResourceWithoutReplacingOutput)
@@ -276,7 +268,7 @@ TEST_F(AscCompileExporterTest, RejectsOversizedResourceWithoutReplacingOutput)
     const BuildCollectedBundleRequest request = Request();
     WriteFile(request.outputSo, "previous bundle");
 
-    ExpectCompileError(request, "failed to read permitted manifest resource");
+    ExpectCompileFailure(request);
     EXPECT_EQ(ReadFile(request.outputSo), "previous bundle");
 }
 
@@ -293,7 +285,7 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
     CreateManifest(second, "Second");
 
     const BuildCollectedBundleRequest request = Request();
-    ManifestBundleCompiler(request).Compile();
+    ASSERT_TRUE(ManifestBundleCompiler(request).Compile());
 
     ASSERT_TRUE(IsTestRegularFile(request.outputSo));
     const std::vector<std::string> workEntries = ListTestDirectory(root_);
@@ -351,7 +343,7 @@ TEST_F(AscCompileExporterTest, KeepsTemporaryWorkspaceWhenRequested)
 
     BuildCollectedBundleRequest request = Request();
     request.keepTemp = true;
-    ManifestBundleCompiler(request).Compile();
+    ASSERT_TRUE(ManifestBundleCompiler(request).Compile());
 
     const std::vector<std::string> workEntries = ListTestDirectory(root_);
     size_t workspaceCount = 0U;

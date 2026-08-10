@@ -96,7 +96,9 @@ int Run(int argc, char** argv)
     request.keepTemp = keepTemp;
     request.jobs = jobs;
     ascendc::manifest_generator::ManifestBundleCompiler compiler(std::move(request));
-    compiler.Compile();
+    if (!compiler.Compile()) {
+        return 1;
+    }
     return 0;
 }
 
@@ -107,7 +109,7 @@ int main(int argc, char** argv)
     try {
         return Run(argc, argv);
     } catch (const std::exception& error) {
-        ASCENDLOGE("asc_compile_exporter failed: %s", error.what());
+        ASCENDLOGE("asc_compile_exporter failed unexpectedly: %s", error.what());
         return 1;
     }
 }

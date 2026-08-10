@@ -23,7 +23,7 @@ class CollectedManifestRepository final {
 public:
     explicit CollectedManifestRepository(std::string manifestSearchRoot) noexcept;
 
-    std::vector<ManifestUnit> Load() const;
+    bool Load(std::vector<ManifestUnit>& units) const;
 
 private:
     std::string manifestSearchRoot_;

@@ -13,7 +13,6 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
-#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -22,40 +21,39 @@
 
 namespace ascendc {
 namespace manifest_generator {
-namespace {
 
-std::runtime_error SystemError(const std::string& operation)
-{
-    return std::runtime_error(operation + ": " + std::strerror(errno));
-}
-
-} // namespace
-
-BuildWorkspace BuildWorkspace::Create(const std::string& requestedParent, bool keepTemp)
+bool BuildWorkspace::Create(const std::string& requestedParent, bool keepTemp, BuildWorkspace& workspace)
 {
     const char* temporary = std::getenv("TMPDIR");
     const std::string requested =
         requestedParent.empty() ? (temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary) : requestedParent;
     std::string absolute;
     if (!FileUtils::MakeAbsolutePath(requested, absolute)) {
-        throw std::runtime_error("failed to resolve bundle work directory: " + requested);
+        ASCENDLOGE("Failed to resolve bundle work directory: %s", requested.c_str());
+        return false;
     }
     if (!FileUtils::CreateDirectories(absolute)) {
-        throw std::runtime_error("failed to create bundle work directory: " + absolute);
+        ASCENDLOGE("Failed to create bundle work directory: %s", absolute.c_str());
+        return false;
     }
     std::string parent;
     if (!FileUtils::ResolveDirectory(absolute, parent)) {
-        throw std::runtime_error("bundle work directory is unavailable: " + absolute);
+        ASCENDLOGE("Bundle work directory is unavailable: %s", absolute.c_str());
+        return false;
     }
     std::string pathTemplate = FileUtils::JoinPath(parent, ".manifest-generator-XXXXXX");
     std::vector<char> buffer(pathTemplate.begin(), pathTemplate.end());
     buffer.push_back('\0');
     char* created = mkdtemp(buffer.data());
     if (created == nullptr) {
-        throw SystemError("failed to create private bundle work directory");
+        const int createError = errno;
+        ASCENDLOGE("Failed to create private bundle work directory: %s", std::strerror(createError));
+        return false;
     }
     ASCENDLOGD("Created private bundle work directory %s", created);
-    return BuildWorkspace(created, keepTemp);
+    workspace.session_ = created;
+    workspace.keepTemp_ = keepTemp;
+    return true;
 }
 
 BuildWorkspace::BuildWorkspace(BuildWorkspace&& other) noexcept
@@ -67,7 +65,9 @@ BuildWorkspace::BuildWorkspace(BuildWorkspace&& other) noexcept
 BuildWorkspace::~BuildWorkspace()
 {
     if (!session_.empty() && !keepTemp_) {
-        if (FileUtils::RemoveAll(session_)) {
+        bool removed = false;
+        removed = FileUtils::RemoveAll(session_);
+        if (removed) {
             ASCENDLOGD("Removed private bundle work directory %s", session_.c_str());
         } else {
             ASCENDLOGW("Failed to completely remove private bundle work directory %s", session_.c_str());

@@ -28,7 +28,7 @@ TEST_F(ModuleTest, SourceGeneratorEmitsBundleManifestAbiAndMakefile)
     const std::vector<ManifestUnit> units = {
         {"{\"base_dir\":\"resources\"}", {{"kernel.bin", "resources/kernel.bin", {0U, 127U, 255U}}}}};
 
-    BundleSourceGenerator(work, units).Generate();
+    ASSERT_TRUE(BundleSourceGenerator(work, units).Generate());
 
     const std::string abiHeader = ReadTestFile(FileUtils::JoinPath(work, "ascendc_manifest_abi.h"));
     const std::string bundleSource = ReadTestFile(FileUtils::JoinPath(work, "compile_resource_bundle.cpp"));
@@ -48,7 +48,7 @@ TEST_F(ModuleTest, SourceGeneratorEmitsBundleManifestAbiAndMakefile)
     EXPECT_NE(makefile.find("manifest_0.cpp"), std::string::npos);
     EXPECT_EQ(makefile.find("ASCENDC_BUNDLE_INCLUDE_DIR"), std::string::npos);
     EXPECT_NE(makefile.find("-std=c++11"), std::string::npos);
-    EXPECT_THROW(BundleSourceGenerator(work, units).Generate(), std::runtime_error);
+    EXPECT_FALSE(BundleSourceGenerator(work, units).Generate());
 }
 
 TEST_F(ModuleTest, SourceGeneratorEmitsManifestWithoutResourceFiles)
@@ -57,11 +57,31 @@ TEST_F(ModuleTest, SourceGeneratorEmitsManifestWithoutResourceFiles)
     ASSERT_TRUE(FileUtils::CreateDirectories(work));
     const std::vector<ManifestUnit> units = {{"{\"base_dir\":\"resources\"}", {}}};
 
-    BundleSourceGenerator(work, units).Generate();
+    ASSERT_TRUE(BundleSourceGenerator(work, units).Generate());
 
     const std::string manifestSource = ReadTestFile(FileUtils::JoinPath(work, "manifest_0.cpp"));
     EXPECT_NE(manifestSource.find("nullptr, 0ULL"), std::string::npos);
     EXPECT_EQ(manifestSource.find("AcCompileResourceFile g_manifest_0_files"), std::string::npos);
+}
+
+TEST_F(ModuleTest, SourceGeneratorReportsFailureAtEachGenerationStage)
+{
+    const std::vector<ManifestUnit> units = {{"{\"base_dir\":\"resources\"}", {}}};
+
+    const std::string bundleWork = FileUtils::JoinPath(root_, "bundle-failure-work");
+    ASSERT_TRUE(FileUtils::CreateDirectories(bundleWork));
+    ASSERT_TRUE(FileUtils::WriteBinaryFile(FileUtils::JoinPath(bundleWork, "compile_resource_bundle.cpp"), {}));
+    EXPECT_FALSE(BundleSourceGenerator(bundleWork, units).Generate());
+
+    const std::string manifestWork = FileUtils::JoinPath(root_, "manifest-failure-work");
+    ASSERT_TRUE(FileUtils::CreateDirectories(manifestWork));
+    ASSERT_TRUE(FileUtils::WriteBinaryFile(FileUtils::JoinPath(manifestWork, "manifest_0.cpp"), {}));
+    EXPECT_FALSE(BundleSourceGenerator(manifestWork, units).Generate());
+
+    const std::string makefileWork = FileUtils::JoinPath(root_, "makefile-failure-work");
+    ASSERT_TRUE(FileUtils::CreateDirectories(makefileWork));
+    ASSERT_TRUE(FileUtils::WriteBinaryFile(FileUtils::JoinPath(makefileWork, "Makefile"), {}));
+    EXPECT_FALSE(BundleSourceGenerator(makefileWork, units).Generate());
 }
 
 } // namespace

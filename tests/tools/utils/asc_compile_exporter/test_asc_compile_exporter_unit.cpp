@@ -102,10 +102,10 @@ TEST(CompileExporterCliUnitTest, RunBuildsRequestWithOptionalArgumentsBeforeComp
     char* arguments[] = {program, manifestRoot, output,         keepTemp,  jobsOption,
                          jobs,    makeOption,   makeExecutable, cxxOption, cxxCompiler};
 
-    EXPECT_THROW(::Run(10, arguments), std::runtime_error);
+    EXPECT_EQ(::Run(10, arguments), 1);
 }
 
-TEST(CompileExporterCliUnitTest, ProgramMainReturnsRunStatusAndCatchesExceptions)
+TEST(CompileExporterCliUnitTest, ProgramMainReturnsRunStatus)
 {
     CerrCapture capture;
     char program[] = "asc_compile_exporter";

@@ -15,7 +15,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <stdexcept>
 #include <thread>
 
 #include <sys/types.h>
@@ -31,28 +30,25 @@ constexpr uint32_t kSubprocessTimeoutSeconds = 30U * 60U;
 constexpr uint32_t kSubprocessTerminationGraceSeconds = 5U;
 constexpr uint32_t kSubprocessPollMilliseconds = 10U;
 
-std::runtime_error SystemError(const std::string& operation)
-{
-    return std::runtime_error(operation + ": " + std::strerror(errno));
-}
-
 } // namespace
 
-void ProcessRunner::Run(
+bool ProcessRunner::Run(
     const std::vector<std::string>& arguments, const std::vector<std::pair<std::string, std::string>>& environment)
 {
-    Run(arguments, environment, std::chrono::seconds(kSubprocessTimeoutSeconds));
+    return Run(arguments, environment, std::chrono::seconds(kSubprocessTimeoutSeconds));
 }
 
-void ProcessRunner::Run(
+bool ProcessRunner::Run(
     const std::vector<std::string>& arguments, const std::vector<std::pair<std::string, std::string>>& environment,
     std::chrono::milliseconds timeout)
 {
     if (arguments.empty()) {
-        throw std::invalid_argument("subprocess arguments must not be empty");
+        ASCENDLOGE("Subprocess arguments must not be empty");
+        return false;
     }
     if (timeout.count() <= 0) {
-        throw std::invalid_argument("subprocess timeout must be positive");
+        ASCENDLOGE("Subprocess timeout must be positive");
+        return false;
     }
     std::vector<char*> argv;
     argv.reserve(arguments.size() + 1U);
@@ -63,9 +59,9 @@ void ProcessRunner::Run(
 
     const pid_t child = fork();
     if (child < 0) {
-        const std::runtime_error error = SystemError("failed to fork subprocess");
-        ASCENDLOGD("Subprocess launch failed: %s", error.what());
-        throw error;
+        const int forkError = errno;
+        ASCENDLOGE("Failed to fork subprocess: %s", std::strerror(forkError));
+        return false;
     }
     if (child == 0) {
         if (setpgid(0, 0) != 0) {
@@ -95,30 +91,27 @@ void ProcessRunner::Run(
         if (waited < 0 && errno != EINTR) {
             const int waitError = errno;
             TerminateAndReap(child);
-            const std::runtime_error error("failed to wait for subprocess: " + std::string(std::strerror(waitError)));
-            ASCENDLOGD("Subprocess wait failed: %s", error.what());
-            throw error;
+            ASCENDLOGE("Failed to wait for subprocess: %s", std::strerror(waitError));
+            return false;
         }
         if (std::chrono::steady_clock::now() >= deadline) {
             TerminateAndReap(child);
-            throw std::runtime_error("subprocess timed out: " + arguments.front());
+            ASCENDLOGE("Subprocess timed out: %s", arguments.front().c_str());
+            return false;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(kSubprocessPollMilliseconds));
     }
     if (WIFSIGNALED(status)) {
-        const std::string message =
-            "subprocess terminated by signal " + std::to_string(WTERMSIG(status)) + ": " + arguments.front();
-        ASCENDLOGD("%s", message.c_str());
-        throw std::runtime_error(message);
+        ASCENDLOGE("Subprocess terminated by signal %d: %s", WTERMSIG(status), arguments.front().c_str());
+        return false;
     }
     if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
         const int exitCode = WIFEXITED(status) ? WEXITSTATUS(status) : -1;
-        const std::string message =
-            "subprocess exited with code " + std::to_string(exitCode) + ": " + arguments.front();
-        ASCENDLOGD("%s", message.c_str());
-        throw std::runtime_error(message);
+        ASCENDLOGE("Subprocess exited with code %d: %s", exitCode, arguments.front().c_str());
+        return false;
     }
     ASCENDLOGD("Subprocess pid=%d completed successfully", static_cast<int>(child));
+    return true;
 }
 
 void ProcessRunner::TerminateAndReap(pid_t child) noexcept

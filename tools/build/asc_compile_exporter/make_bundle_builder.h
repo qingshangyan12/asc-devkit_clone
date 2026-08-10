@@ -23,7 +23,7 @@ public:
         std::string workDir, std::string output, std::string makeExecutable, std::string cxxCompiler,
         uint32_t jobs) noexcept;
 
-    void Build() const;
+    bool Build() const;
 
 private:
     std::string workDir_;

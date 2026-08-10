@@ -30,7 +30,7 @@ class ManifestBundleCompiler final {
 public:
     explicit ManifestBundleCompiler(BuildCollectedBundleRequest request) noexcept;
 
-    void Compile() const;
+    bool Compile() const;
 
 private:
     BuildCollectedBundleRequest request_;

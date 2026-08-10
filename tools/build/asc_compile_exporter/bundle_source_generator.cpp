@@ -12,7 +12,6 @@
 
 #include <fstream>
 #include <ostream>
-#include <stdexcept>
 #include <utility>
 
 #include "ascendc_tool_log.h"
@@ -23,20 +22,22 @@ namespace ascendc {
 namespace manifest_generator {
 namespace {
 
-std::ofstream OpenGeneratedOutput(const std::string& path)
+bool OpenGeneratedOutput(const std::string& path, std::ofstream& output)
 {
-    std::ofstream output;
     if (!FileUtils::OpenExclusiveOutput(path, output)) {
-        throw std::runtime_error("failed to create generated output: " + path);
+        ASCENDLOGE("Failed to create generated output: %s", path.c_str());
+        return false;
     }
-    return output;
+    return true;
 }
 
-void FinishGeneratedOutput(std::ofstream& output, const std::string& path)
+bool FinishGeneratedOutput(std::ofstream& output, const std::string& path)
 {
     if (!FileUtils::FinalizeOutput(output)) {
-        throw std::runtime_error("failed to finalize generated output: " + path);
+        ASCENDLOGE("Failed to finalize generated output: %s", path.c_str());
+        return false;
     }
+    return true;
 }
 
 } // namespace
@@ -45,32 +46,44 @@ BundleSourceGenerator::BundleSourceGenerator(std::string workDir, const std::vec
     : workDir_(std::move(workDir)), units_(units)
 {}
 
-void BundleSourceGenerator::Generate() const
+bool BundleSourceGenerator::Generate() const
 {
     ASCENDLOGD("Generating bundle sources in %s", workDir_.c_str());
     const std::string abiHeader = FileUtils::JoinPath(workDir_, "ascendc_manifest_abi.h");
     ASCENDLOGD("Generating bundle ABI header %s", abiHeader.c_str());
-    EmitAbiHeader(abiHeader);
+    if (!EmitAbiHeader(abiHeader)) {
+        return false;
+    }
     const std::string bundleSource = FileUtils::JoinPath(workDir_, "compile_resource_bundle.cpp");
     ASCENDLOGD("Generating bundle source %s", bundleSource.c_str());
-    EmitBundleSource(bundleSource);
+    if (!EmitBundleSource(bundleSource)) {
+        return false;
+    }
     for (size_t unitIndex = 0; unitIndex < units_.size(); ++unitIndex) {
         const std::string manifestSource =
             FileUtils::JoinPath(workDir_, "manifest_" + std::to_string(unitIndex) + ".cpp");
         ASCENDLOGD("Generating manifest source %s", manifestSource.c_str());
-        EmitManifestSource(manifestSource, unitIndex, units_[unitIndex]);
+        if (!EmitManifestSource(manifestSource, unitIndex, units_[unitIndex])) {
+            return false;
+        }
     }
     const std::string makefile = FileUtils::JoinPath(workDir_, "Makefile");
     ASCENDLOGD("Generating build file %s", makefile.c_str());
-    EmitMakefile(makefile);
+    if (!EmitMakefile(makefile)) {
+        return false;
+    }
     ASCENDLOGI("Generated bundle sources for %zu manifest(s)", units_.size());
+    return true;
 }
 
-void BundleSourceGenerator::EmitAbiHeader(const std::string& path)
+bool BundleSourceGenerator::EmitAbiHeader(const std::string& path)
 {
-    std::ofstream output = OpenGeneratedOutput(path);
+    std::ofstream output;
+    if (!OpenGeneratedOutput(path, output)) {
+        return false;
+    }
     output << kManifestAbiHeaderContent;
-    FinishGeneratedOutput(output, path);
+    return FinishGeneratedOutput(output, path);
 }
 
 void BundleSourceGenerator::EmitByteArray(
@@ -96,9 +109,12 @@ void BundleSourceGenerator::EmitString(std::ostream& output, const std::string& 
            << value.size() << "ULL };\n";
 }
 
-void BundleSourceGenerator::EmitManifestSource(const std::string& path, size_t unitIndex, const ManifestUnit& unit)
+bool BundleSourceGenerator::EmitManifestSource(const std::string& path, size_t unitIndex, const ManifestUnit& unit)
 {
-    std::ofstream output = OpenGeneratedOutput(path);
+    std::ofstream output;
+    if (!OpenGeneratedOutput(path, output)) {
+        return false;
+    }
     const std::string prefix = "g_manifest_" + std::to_string(unitIndex);
     output << "#include \"ascendc_manifest_abi.h\"\n\nnamespace {\n";
     EmitString(output, prefix + "_json", unit.json);
@@ -124,12 +140,15 @@ void BundleSourceGenerator::EmitManifestSource(const std::string& path, size_t u
            << unit.files.size()
            << "ULL };\n}\n} // namespace generated\n"
               "} // namespace resource\n} // namespace ascendc\n";
-    FinishGeneratedOutput(output, path);
+    return FinishGeneratedOutput(output, path);
 }
 
-void BundleSourceGenerator::EmitBundleSource(const std::string& path) const
+bool BundleSourceGenerator::EmitBundleSource(const std::string& path) const
 {
-    std::ofstream output = OpenGeneratedOutput(path);
+    std::ofstream output;
+    if (!OpenGeneratedOutput(path, output)) {
+        return false;
+    }
     output << "#include \"ascendc_manifest_abi.h\"\n\n"
               "namespace ascendc {\nnamespace resource {\nnamespace generated {\n";
     for (size_t unitIndex = 0; unitIndex < units_.size(); ++unitIndex) {
@@ -148,12 +167,15 @@ void BundleSourceGenerator::EmitBundleSource(const std::string& path) const
            << "extern \"C\" __attribute__((visibility(\"default\")))\n"
               "const AcCompileResourceBundleHeader *AscendcGetCompileResourceBundle(void)\n"
               "{\n    return &g_bundle.header;\n}\n";
-    FinishGeneratedOutput(output, path);
+    return FinishGeneratedOutput(output, path);
 }
 
-void BundleSourceGenerator::EmitMakefile(const std::string& path) const
+bool BundleSourceGenerator::EmitMakefile(const std::string& path) const
 {
-    std::ofstream output = OpenGeneratedOutput(path);
+    std::ofstream output;
+    if (!OpenGeneratedOutput(path, output)) {
+        return false;
+    }
     output << "SOURCES := compile_resource_bundle.cpp";
     for (size_t unitIndex = 0; unitIndex < units_.size(); ++unitIndex) {
         output << " manifest_" << unitIndex << ".cpp";
@@ -166,7 +188,7 @@ void BundleSourceGenerator::EmitMakefile(const std::string& path) const
               "-o \"$${ASCENDC_BUNDLE_OUTPUT}\"\n\n"
               "%.o: %.cpp\n"
               "\t\"$${ASCENDC_BUNDLE_CXX}\" -std=c++11 -fPIC -fvisibility=hidden -O2 -c $< -o $@\n";
-    FinishGeneratedOutput(output, path);
+    return FinishGeneratedOutput(output, path);
 }
 
 } // namespace manifest_generator

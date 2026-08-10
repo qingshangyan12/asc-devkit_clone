@@ -28,14 +28,17 @@ MakeBundleBuilder::MakeBundleBuilder(
       jobs_(jobs)
 {}
 
-void MakeBundleBuilder::Build() const
+bool MakeBundleBuilder::Build() const
 {
     ASCENDLOGD(
         "Building bundle with make=%s compiler=%s jobs=%u", makeExecutable_.c_str(), cxxCompiler_.c_str(), jobs_);
-    ProcessRunner::Run(
-        {makeExecutable_, "-C", workDir_, "-f", "Makefile", "-B", "-j" + std::to_string(jobs_)},
-        {{"ASCENDC_BUNDLE_CXX", cxxCompiler_}, {"ASCENDC_BUNDLE_OUTPUT", output_}});
+    if (!ProcessRunner::Run(
+            {makeExecutable_, "-C", workDir_, "-f", "Makefile", "-B", "-j" + std::to_string(jobs_)},
+            {{"ASCENDC_BUNDLE_CXX", cxxCompiler_}, {"ASCENDC_BUNDLE_OUTPUT", output_}})) {
+        return false;
+    }
     ASCENDLOGI("Built staged compile resource bundle %s", output_.c_str());
+    return true;
 }
 
 } // namespace manifest_generator

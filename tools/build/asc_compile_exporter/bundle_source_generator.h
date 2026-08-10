@@ -26,16 +26,16 @@ class BundleSourceGenerator final {
 public:
     BundleSourceGenerator(std::string workDir, const std::vector<ManifestUnit>& units) noexcept;
 
-    void Generate() const;
+    bool Generate() const;
 
 private:
-    static void EmitAbiHeader(const std::string& path);
+    static bool EmitAbiHeader(const std::string& path);
     static void EmitByteArray(
         std::ostream& output, const std::string& name, const uint8_t* data, size_t size, bool nulTerminate);
     static void EmitString(std::ostream& output, const std::string& name, const std::string& value);
-    static void EmitManifestSource(const std::string& path, size_t unitIndex, const ManifestUnit& unit);
-    void EmitBundleSource(const std::string& path) const;
-    void EmitMakefile(const std::string& path) const;
+    static bool EmitManifestSource(const std::string& path, size_t unitIndex, const ManifestUnit& unit);
+    bool EmitBundleSource(const std::string& path) const;
+    bool EmitMakefile(const std::string& path) const;
 
     std::string workDir_;
     const std::vector<ManifestUnit>& units_;

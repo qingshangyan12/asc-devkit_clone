@@ -59,41 +59,41 @@ using asc_compile_exporter_test::ScopedEnvironment;
 
 TEST_F(ModuleTest, ProcessRunnerValidatesArgumentsAndPropagatesEnvironment)
 {
-    EXPECT_THROW(ProcessRunner::Run({}, {}), std::invalid_argument);
-    EXPECT_THROW(ProcessRunner::Run({"/bin/true"}, {}, std::chrono::milliseconds(0U)), std::invalid_argument);
-    EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "exit 7"}, {}), std::runtime_error);
+    EXPECT_FALSE(ProcessRunner::Run({}, {}));
+    EXPECT_FALSE(ProcessRunner::Run({"/bin/true"}, {}, std::chrono::milliseconds(0U)));
+    EXPECT_FALSE(ProcessRunner::Run({"/bin/sh", "-c", "exit 7"}, {}));
 
     const std::string output = FileUtils::JoinPath(root_, "environment.txt");
     ScopedEnvironment makeFlags("MAKEFLAGS", "must-not-leak");
-    ProcessRunner::Run(
-        {"/bin/sh", "-c",
-         "printf '%s|%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" \"${MAKEFLAGS-unset}\" > "
-         "\"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
-        {{"ASC_COMPILE_EXPORTER_UNIT_VALUE", "visible"}, {"ASC_COMPILE_EXPORTER_UNIT_OUTPUT", output}});
+    ASSERT_TRUE(
+        ProcessRunner::Run(
+            {"/bin/sh", "-c",
+             "printf '%s|%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" \"${MAKEFLAGS-unset}\" > "
+             "\"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
+            {{"ASC_COMPILE_EXPORTER_UNIT_VALUE", "visible"}, {"ASC_COMPILE_EXPORTER_UNIT_OUTPUT", output}}));
     EXPECT_EQ(ReadTestFile(output), "visible|unset");
 }
 
 TEST_F(ModuleTest, ProcessRunnerReportsExecAndSignalFailures)
 {
     g_failFork = true;
-    EXPECT_THROW(ProcessRunner::Run({"/bin/true"}, {}), std::runtime_error);
+    EXPECT_FALSE(ProcessRunner::Run({"/bin/true"}, {}));
     g_failFork = false;
-    EXPECT_THROW(ProcessRunner::Run({FileUtils::JoinPath(root_, "missing-command")}, {}), std::runtime_error);
-    EXPECT_THROW(ProcessRunner::Run({"/bin/sh", "-c", "kill -TERM $$"}, {}), std::runtime_error);
+    EXPECT_FALSE(ProcessRunner::Run({FileUtils::JoinPath(root_, "missing-command")}, {}));
+    EXPECT_FALSE(ProcessRunner::Run({"/bin/sh", "-c", "kill -TERM $$"}, {}));
 }
 
 TEST_F(ModuleTest, ProcessRunnerTimesOutAndReapsProcessGroup)
 {
     const std::string pidFile = FileUtils::JoinPath(root_, "timed-out.pid");
     const std::string terminationFile = FileUtils::JoinPath(root_, "termination.txt");
-    EXPECT_THROW(
+    EXPECT_FALSE(
         ProcessRunner::Run(
             {"/bin/sh", "-c",
              "trap 'printf terminated > \"$ASC_COMPILE_EXPORTER_TERMINATION_FILE\"; exit 0' TERM; "
              "printf '%s' \"$$\" > \"$ASC_COMPILE_EXPORTER_PID_FILE\"; sleep 10"},
             {{"ASC_COMPILE_EXPORTER_PID_FILE", pidFile}, {"ASC_COMPILE_EXPORTER_TERMINATION_FILE", terminationFile}},
-            std::chrono::milliseconds(100U)),
-        std::runtime_error);
+            std::chrono::milliseconds(100U)));
 
     EXPECT_EQ(ReadTestFile(terminationFile), "terminated");
     const pid_t child = static_cast<pid_t>(std::strtol(ReadTestFile(pidFile).c_str(), nullptr, 10));
@@ -106,7 +106,7 @@ TEST_F(ModuleTest, ProcessRunnerTimesOutAndReapsProcessGroup)
 TEST_F(ModuleTest, ProcessRunnerReportsWaitFailureAndReapsChild)
 {
     g_failNextWaitpid = true;
-    EXPECT_THROW(ProcessRunner::Run({"/bin/true"}, {}, std::chrono::seconds(1U)), std::runtime_error);
+    EXPECT_FALSE(ProcessRunner::Run({"/bin/true"}, {}, std::chrono::seconds(1U)));
     EXPECT_FALSE(g_failNextWaitpid);
 }
 

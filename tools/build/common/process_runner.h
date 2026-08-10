@@ -24,9 +24,9 @@ class ProcessRunner final {
 public:
     ProcessRunner() = delete;
 
-    static void Run(
+    static bool Run(
         const std::vector<std::string>& arguments, const std::vector<std::pair<std::string, std::string>>& environment);
-    static void Run(
+    static bool Run(
         const std::vector<std::string>& arguments, const std::vector<std::pair<std::string, std::string>>& environment,
         std::chrono::milliseconds timeout);
 

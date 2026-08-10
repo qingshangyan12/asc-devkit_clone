@@ -12,8 +12,6 @@
 
 #include <cerrno>
 #include <cstring>
-#include <stdexcept>
-
 #include <stdio.h>
 
 #include "ascendc_tool_log.h"
@@ -24,48 +22,61 @@ namespace ascendc {
 namespace manifest_generator {
 namespace {
 
-std::runtime_error SystemError(const std::string& operation)
-{
-    return std::runtime_error(operation + ": " + std::strerror(errno));
-}
-
-void CheckOutputPath(const std::string& output)
+bool CheckOutputPath(const std::string& output)
 {
     if (!FileUtils::CheckNonSymlink(output)) {
-        throw std::runtime_error("bundle output must not be a symlink and must be inspectable: " + output);
+        ASCENDLOGE("Bundle output must not be a symlink and must be inspectable: %s", output.c_str());
+        return false;
     }
+    return true;
 }
 
 } // namespace
 
-void BundlePublisher::Prepare(const std::string& output) { CheckOutputPath(output); }
+bool BundlePublisher::Prepare(const std::string& output) { return CheckOutputPath(output); }
 
-void BundlePublisher::Publish(const std::string& staged, const std::string& output)
+bool BundlePublisher::Publish(const std::string& staged, const std::string& output)
 {
-    CheckOutputPath(output);
+    if (!CheckOutputPath(output)) {
+        return false;
+    }
     if (rename(staged.c_str(), output.c_str()) == 0) {
         ASCENDLOGI("Published compile resource bundle %s", output.c_str());
-        return;
+        return true;
     }
     if (errno != EXDEV) {
-        throw SystemError("failed to publish bundle output");
+        const int publishError = errno;
+        ASCENDLOGE("Failed to publish bundle output: %s", std::strerror(publishError));
+        return false;
     }
-    PublishAcrossFileSystems(staged, output);
+    if (!PublishAcrossFileSystems(staged, output)) {
+        return false;
+    }
     ASCENDLOGI("Published compile resource bundle %s", output.c_str());
+    return true;
 }
 
-void BundlePublisher::PublishAcrossFileSystems(const std::string& staged, const std::string& output)
+bool BundlePublisher::PublishAcrossFileSystems(const std::string& staged, const std::string& output)
 {
     ASCENDLOGD("Copying staged bundle across filesystems: %s -> %s", staged.c_str(), output.c_str());
-    BuildWorkspace publishWorkspace = BuildWorkspace::Create(FileUtils::ParentPath(output), false);
+    BuildWorkspace publishWorkspace;
+    if (!BuildWorkspace::Create(FileUtils::ParentPath(output), false, publishWorkspace)) {
+        return false;
+    }
     const std::string copied = FileUtils::JoinPath(publishWorkspace.Session(), "compile_resource_bundle.so");
     if (!FileUtils::CopyFileExclusive(staged, copied)) {
-        throw std::runtime_error("failed to copy staged bundle across filesystems: " + staged);
+        ASCENDLOGE("Failed to copy staged bundle across filesystems: %s", staged.c_str());
+        return false;
     }
-    CheckOutputPath(output);
+    if (!CheckOutputPath(output)) {
+        return false;
+    }
     if (rename(copied.c_str(), output.c_str()) != 0) {
-        throw SystemError("failed to publish copied bundle output");
+        const int publishError = errno;
+        ASCENDLOGE("Failed to publish copied bundle output: %s", std::strerror(publishError));
+        return false;
     }
+    return true;
 }
 
 } // namespace manifest_generator

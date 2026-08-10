@@ -28,10 +28,10 @@ TEST_F(ModuleTest, MakeBundleBuilderBuildsGeneratedSourcesWithoutCannHome)
     const std::string output = FileUtils::JoinPath(root_, "bundle.so");
     ASSERT_TRUE(FileUtils::CreateDirectories(work));
     const std::vector<ManifestUnit> units = {{"{\"base_dir\":\"resources\"}", {}}};
-    BundleSourceGenerator(work, units).Generate();
+    ASSERT_TRUE(BundleSourceGenerator(work, units).Generate());
     ScopedEnvironment cannHome("ASCEND_HOME_PATH", nullptr);
 
-    EXPECT_NO_THROW(MakeBundleBuilder(work, output, "/usr/bin/make", "/usr/bin/c++", 1U).Build());
+    EXPECT_TRUE(MakeBundleBuilder(work, output, "/usr/bin/make", "/usr/bin/c++", 1U).Build());
     EXPECT_TRUE(FileUtils::IsRegularFile(output));
 }
 

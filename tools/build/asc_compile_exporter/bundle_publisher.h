@@ -20,11 +20,11 @@ class BundlePublisher final {
 public:
     BundlePublisher() = delete;
 
-    static void Prepare(const std::string& output);
-    static void Publish(const std::string& staged, const std::string& output);
+    static bool Prepare(const std::string& output);
+    static bool Publish(const std::string& staged, const std::string& output);
 
 private:
-    static void PublishAcrossFileSystems(const std::string& staged, const std::string& output);
+    static bool PublishAcrossFileSystems(const std::string& staged, const std::string& output);
 };
 
 } // namespace manifest_generator
