@@ -10,7 +10,25 @@
 #include "alg_data_trans_wrapper.h"
 #include "hcomm_primitives_dl.h"
 
+#ifdef MC2_SERVER_ONLY
+#include "aicpu/task_cache/mc2_aicpu_primitive_cache.h"
+#endif
+
 #include <atomic>
+
+#ifdef MC2_SERVER_ONLY
+#define HcommLocalCopyOnThread Mc2CachedHcommLocalCopyOnThread
+#define HcommLocalReduceOnThread Mc2CachedHcommLocalReduceOnThread
+#define HcommThreadNotifyRecordOnThread Mc2CachedHcommThreadNotifyRecordOnThread
+#define HcommThreadNotifyWaitOnThread Mc2CachedHcommThreadNotifyWaitOnThread
+#define HcommWriteOnThread Mc2CachedHcommWriteOnThread
+#define HcommWriteReduceOnThread Mc2CachedHcommWriteReduceOnThread
+#define HcommReadOnThread Mc2CachedHcommReadOnThread
+#define HcommReadReduceOnThread Mc2CachedHcommReadReduceOnThread
+#define HcommChannelNotifyRecordOnThread Mc2CachedHcommChannelNotifyRecordOnThread
+#define HcommChannelNotifyWaitOnThread Mc2CachedHcommChannelNotifyWaitOnThread
+#define HcclHcommBatchTransferOnThread Mc2CachedHcclHcommBatchTransferOnThread
+#endif
 
 namespace mc2_ops_hccl {
 

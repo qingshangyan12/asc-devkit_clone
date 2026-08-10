@@ -9,6 +9,14 @@
  */
 #include "alg_template_base.h"
 
+#ifdef MC2_SERVER_ONLY
+#include "aicpu/task_cache/mc2_aicpu_primitive_cache.h"
+
+#define HcommLocalCopyOnThread Mc2CachedHcommLocalCopyOnThread
+#define HcommChannelNotifyRecordOnThread Mc2CachedHcommChannelNotifyRecordOnThread
+#define HcommChannelNotifyWaitOnThread Mc2CachedHcommChannelNotifyWaitOnThread
+#endif
+
 namespace mc2_ops_hccl {
 AlgTemplateBase::AlgTemplateBase()
     : slices_(slicesDummy_),
