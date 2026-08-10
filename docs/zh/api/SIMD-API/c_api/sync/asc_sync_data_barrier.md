@@ -26,7 +26,9 @@
 
 ## 功能说明
 
-阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。
+头文件路径：`"c_api/sync/sync.h"`。
+
+数据同步屏障接口，用于阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。开发者通过`arg`参数指定屏障作用的内存范围，取值的范围以及各个取值的含义见[参数说明]()。
 
 ## 函数原型
 
@@ -40,7 +42,7 @@ __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg)
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| arg | 输入 | 表示需要等待的内存位置，类型为mem_dsb_t，可取值为： <br>&bull; DSB_ALL：等待所有内存访问指令。 <br>&bull; DSB_DDR：等待GM访问指令。<br>&bull; DSB_UB：等待UB访问指令。<br>&bull; DSB_SEQ：预留参数，暂未启动，为后续的功能扩展做保留。|
+| arg | 输入 | 表示需要等待的内存位置，类型为mem_dsb_t类型的枚举，可取值为： <br>&bull; DSB_ALL：等待所有内存访问指令。 <br>&bull; DSB_DDR：等待GM访问指令。<br>&bull; DSB_UB：等待UB访问指令。<br>&bull; DSB_SEQ：等待SEQ访问指令。|
 
 ## 返回值说明
 
@@ -52,8 +54,10 @@ PIPE_S
 
 ## 约束说明
 
-- mem_dsb_t类型的入参必须直接传递枚举值字面量。
+- mem_dsb_t类型的入参的取值范围[0, 3]，如果传入的取值不在此范围内会导致编译失败。
 - 等待的内存位置取值为DSB_ALL时，只能等待GM和UB的访问指令，不包括其他内存位置，例如L0C Buffer、L1 Buffer。
+- 本接口在AIC与AIV上均可调用。
+- 本接口属于核内同步接口。
 
 ## 调用示例
 
@@ -64,5 +68,11 @@ asc_dcci接口与asc_store_dev接口向GM写数据时硬件不能保证两个接
 根据以上的描述，为了简化编程（开发者无需关心addr是否在DCache缓存以及是否被标记为"脏"），建议开发者在使用asc_store_dev接口时采用如下代码片段：
 
 ```cpp
+// x_gm是外部输入的GM地址，value是待写入GM内存的数据，类型为：uint64_t。
+asc_dcci_single(reinterpret_cast<__gm__ uint64_t*>(x_gm));
+// 保证asc_store_dev接口向x_gm写入value之前，DCache中的脏数据已经写回GM。
 asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+
+uint64_t value = 2;
+asc_store_dev(reinterpret_cast<__gm__ uint64_t*>(x_gm), value);
 ```
