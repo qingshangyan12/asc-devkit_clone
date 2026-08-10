@@ -9,10 +9,13 @@
  */
 
 #include "aicpu/ins_temp_reduce_scatter_mesh_1D.h"
+
+#ifdef MC2_SERVER_ONLY
 #include "aicpu/task_cache/mc2_aicpu_primitive_cache.h"
 
 #define HcommBatchModeStart Mc2CachedHcommBatchModeStart
 #define HcommBatchModeEnd Mc2CachedHcommBatchModeEnd
+#endif
 
 namespace mc2_ops_hccl {
 InsTempReduceScatterMesh1D::InsTempReduceScatterMesh1D(
