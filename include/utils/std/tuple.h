@@ -51,7 +51,7 @@ ASCENDC_HOST_AICORE inline constexpr tuple<Tps& ...> tie(Tps& ...args) noexcept;
 
 // get
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline constexpr typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept;
+ASCENDC_HOST_AICORE inline constexpr typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept; 
 
 template <size_t N, typename ...Tps>
 ASCENDC_HOST_AICORE inline constexpr const typename tuple_element<N, tuple<Tps...> >::type& get(const tuple<Tps...>& t) noexcept;
