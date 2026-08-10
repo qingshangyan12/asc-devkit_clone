@@ -26,10 +26,12 @@
     !(defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1))
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 #endif
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(__NPU_HOST__) || defined(__ASCC_HOST__)
+#include <csignal>
+#endif
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <string>
 #include <map>
-#include <csignal>
 #include <cstdio>
 #include <unistd.h>
 #include "stub_def.h"
