@@ -1143,6 +1143,11 @@ __simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_boo
 
 __simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_bool mask);
 
+// ==========asc_log(half/float)==========
+__simd_callee__ inline void asc_log(vector_half& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_log(vector_float& dst, vector_float src, vector_bool mask);
+
 // ==========asc_div(half/float/int16_t/uint16_t/int32_t/uint32_t)==========
 __simd_callee__ inline void asc_div(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 

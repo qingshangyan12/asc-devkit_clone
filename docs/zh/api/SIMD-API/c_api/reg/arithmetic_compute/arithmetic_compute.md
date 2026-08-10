@@ -16,6 +16,8 @@
 
 -   **[asc_ln](asc_ln.md)**
 
+-   **[asc_log](asc_log.md)**
+
 -   **[asc_max](asc_max.md)**
 
 -   **[asc_max_scalar](asc_max_scalar.md)**

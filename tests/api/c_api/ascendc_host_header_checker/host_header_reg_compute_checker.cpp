@@ -531,6 +531,7 @@ static void test_host_c_api_reg_compute_15()
     using ::asc_le_scalar;
     using ::asc_leakyrelu;
     using ::asc_ln;
+    using ::asc_log;
     using ::asc_load;
     using ::asc_loadalign;
     using ::asc_loadalign_brc;

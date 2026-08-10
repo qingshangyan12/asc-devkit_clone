@@ -442,6 +442,7 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_exp](reg/arithmetic_compute/asc_exp.md) | 对源操作数逐元素计算指数。 |
 | [asc_leakyrelu](reg/arithmetic_compute/asc_leakyrelu.md) | 按元素执行Leaky ReLU（Leaky Rectified Linear Unit）操作。 |
 | [asc_ln](reg/arithmetic_compute/asc_ln.md) | 对源操作数逐元素计算自然对数。 |
+| [asc_log](reg/arithmetic_compute/asc_log.md) | 对源操作数逐元素计算自然对数。 |
 | [asc_max](reg/arithmetic_compute/asc_max.md) | 按元素求最大值。 |
 | [asc_max_scalar](reg/arithmetic_compute/asc_max_scalar.md) | 按元素求矢量和标量的最大值。 |
 | [asc_min](reg/arithmetic_compute/asc_min.md) | 根据mask对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 |

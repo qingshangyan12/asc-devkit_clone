@@ -1035,6 +1035,7 @@
                 -   [asc_exp](SIMD-API/c_api/reg/arithmetic_compute/asc_exp.md)
                 -   [asc_leakyrelu](SIMD-API/c_api/reg/arithmetic_compute/asc_leakyrelu.md)
                 -   [asc_ln](SIMD-API/c_api/reg/arithmetic_compute/asc_ln.md)
+                -   [asc_log](SIMD-API/c_api/reg/arithmetic_compute/asc_log.md)
                 -   [asc_max](SIMD-API/c_api/reg/arithmetic_compute/asc_max.md)
                 -   [asc_max_scalar](SIMD-API/c_api/reg/arithmetic_compute/asc_max_scalar.md)
                 -   [asc_min](SIMD-API/c_api/reg/arithmetic_compute/asc_min.md)
