@@ -25,6 +25,7 @@ __aicore__ inline void asc_init_soc_state_impl()
     if ASC_IS_AIV {
         set_atomic_none();
         set_mask_norm();
+        Internal::g_deqValue
         set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
     }
 }
