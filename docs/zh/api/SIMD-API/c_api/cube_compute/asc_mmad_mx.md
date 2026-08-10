@@ -26,13 +26,13 @@
 
 ## 功能说明
 
-本接口用于完成带有量化系数的矩阵乘法（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。MmadMx场景中，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法，其计算公式如下：
+本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。在MmadMx场景中，左量化系数矩阵与左矩阵相乘，右量化系数矩阵与右矩阵相乘，然后对两个乘积的结果做矩阵乘法，其计算公式如下：
 
 $$
 C = (ScaleA \otimes A) \times (ScaleB \otimes B) + C
 $$
 
-其中，$\otimes$表示广播乘法。左矩阵A的形状为M x K，ScaleA矩阵的形状为M x (K / 32)；右矩阵B的形状为K x N，ScaleB矩阵的形状为(K / 32) x N；结果矩阵C的形状为M x N。K方向上每32个元素共享一个量化因子。C矩阵可以通过本接口的参数初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵。Bias矩阵位于BiasTable Buffer，形状为1 x N，使用时沿M方向广播初始化C矩阵。
+其中，$\otimes$表示广播乘法。左矩阵A的形状为M×K，ScaleA矩阵的形状为M×(K / 32)，右矩阵B的形状为K×N，ScaleB矩阵的形状为(K / 32)×N；结果矩阵C的形状为M×N。K方向上每32个元素共享一个量化因子。C矩阵可以通过本接口的参数初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵。Bias矩阵位于BiasTable Buffer，形状为1×N，使用时沿M方向广播初始化C矩阵。
 
 ScaleA和ScaleB的数据类型均为`fp8_e8m0_t`。本接口不单独传入Scale矩阵地址，而是根据`a_matrix`和`b_matrix`的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。
 
@@ -40,12 +40,12 @@ ScaleA和ScaleB的数据类型均为`fp8_e8m0_t`。本接口不单独传入Scale
 
 | 矩阵 | 物理存储位置 | 形状 | 数据格式 | 分型大小 |
 | --- | --- | --- | --- | --- |
-| A | L0A Buffer | M x K | Nz | 16 x K0 |
-| ScaleA | L0A_MX Buffer | M x (K / 32) | Zz | 16 x 2 |
-| B | L0B Buffer | K x N | Zn | K0 x 16 |
-| ScaleB | L0B_MX Buffer | (K / 32) x N | Nn | 2 x 16 |
-| C | L0C Buffer | M x N | Nz | 16 x 16 |
-| Bias | BiasTable Buffer | 1 x N | ND | - |
+| A | L0A Buffer | M×K | Nz | 16×K0 |
+| ScaleA | L0A_MX Buffer | M×(K / 32) | Zz | 16×2 |
+| B | L0B Buffer | K×N | Zn | K0×16 |
+| ScaleB | L0B_MX Buffer | (K / 32)×N | Nn | 2×16 |
+| C | L0C Buffer | M×N | Nz | 16×16 |
+| Bias | BiasTable Buffer | 1×N | ND | - |
 
 表格中K0的取值为`32Byte / sizeof(dtype)`，dtype为矩阵的数据类型。
 
