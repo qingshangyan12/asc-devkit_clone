@@ -28,7 +28,7 @@ template <>
 struct reg_tensor<bool> {
     using type = bool;
     using elem_type = bool;
-    using reg_type = typename detail::type_get<bool>::T;
+    using reg_type = typename detail::type_get<bool>::type;
 
     __simd_callee__ reg_tensor() = default;
     __simd_callee__ reg_tensor(reg_type regValue) : reg(regValue) {}
@@ -40,7 +40,7 @@ template <typename DataType>
 struct reg_tensor {
     using type = DataType;
     using elem_type = DataType;
-    using reg_type = typename detail::type_get<DataType>::T;
+    using reg_type = typename detail::type_get<DataType>::type;
 
     __simd_callee__ reg_tensor() = default;
     __simd_callee__ reg_tensor(vector_bool maskValue) : mask(maskValue) {}
