@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef HCCLV2_ALLTOALL_AUTO_SELECTOR_H
 #define HCCLV2_ALLTOALL_AUTO_SELECTOR_H
 
@@ -14,12 +15,24 @@
 
 namespace mc2_ops_hccl {
 
+
 class AlltoAllAutoSelector : public AutoSelectorBase {
 private:
-    SelectorStatus SelectAicpuAlgo(
-        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
-        const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
-        std::string& selectAlgName) const override;
+    SelectorStatus SelectCcuScheduleAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
+                                const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
+                                std::string &selectAlgName) const override;
+    SelectorStatus SelectCcuMsAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
+                                 const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
+                                 std::string                                 &selectAlgName) const override;
+    SelectorStatus SelectAicpuAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
+                                   const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
+                                   std::string &selectAlgName) const override;
+    SelectorStatus SelectAivAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
+                                 const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
+                                 std::string &selectAlgName) const override;
+    SelectorStatus SelectDPUAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
+                                 const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
+                                 std::string &selectAlgName) const override;
 };
 
 } // namespace mc2_ops_hccl
