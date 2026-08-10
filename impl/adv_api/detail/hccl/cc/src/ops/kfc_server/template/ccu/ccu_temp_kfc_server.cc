@@ -66,6 +66,8 @@ HcclResult CcuTempKfcServer::CalcRes(
         HCCL_ERROR("[CcuTempKfcServer::CalcRes] unsupported opType[%u]", static_cast<uint32_t>(param.opType));
         return HCCL_E_NOT_SUPPORT;
     }
+    HCCL_INFO("[CcuTempKfcServer::CalcRes] mySubCommRank[%u] tempRankSize[%u] subCommRanks[0].size[%zu]",
+        mySubCommRank_, tempRankSize_, subCommRanks_.empty() ? 0 : subCommRanks_[0].size());
     // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;
     resourceRequest.slaveThreadNum = 0;
@@ -124,6 +126,11 @@ HcclResult CcuTempKfcServer::KernelRun(
     uint64_t dieNum = 1;
     uint64_t missionNum = 1;
     uint64_t missionIndex = 0;
+
+    HCCL_INFO("[CcuTempKfcServer][KernelRun] rankId[%u] tempRankSize[%u] opType[%u] "
+        "xnAddr[%llu] ckeAddr[%llu] workSpace[%llu] workSpaceSize[%llu] token[%llu]",
+        mySubCommRank_, tempRankSize_, static_cast<uint32_t>(param.opType),
+        xnAddr, ckeAddr, workSpace, workSpaceSize, token);
 
     std::unique_ptr<hcomm::CcuTaskArg> taskArg =
         std::make_unique<CcuTaskArgKfcServer>(xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token);
