@@ -26,8 +26,8 @@
 #include "impl/tensor_api/tensor/layout_impl.h"
 #include "impl/tensor_api/tensor/engine_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
-#include "impl/tensor_api/experimental/reg/load_mode.h"
-#include "impl/tensor_api/experimental/reg/mask_impl.h"
+#include "tensor_api/experimental/reg/load_mode.h"
+#include "tensor_api/experimental/reg/mask.h"
 
 namespace AscendC {
 
