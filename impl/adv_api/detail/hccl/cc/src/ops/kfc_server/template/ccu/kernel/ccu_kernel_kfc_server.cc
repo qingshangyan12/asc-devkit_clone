@@ -115,6 +115,11 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
 
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
+    HCCL_INFO("[RS_DIAG] DispatchKfcSubKernel entered, opType=%u, rankSize=%llu, rankId=%llu, channelCount=%llu",
+        static_cast<uint32_t>(ctx.arg->opParam.opType),
+        static_cast<uint64_t>(ctx.arg->rankSize),
+        static_cast<uint64_t>(ctx.arg->rankId),
+        static_cast<uint64_t>(ctx.arg->channelCount));
     ccu::Variable opType;
     opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))

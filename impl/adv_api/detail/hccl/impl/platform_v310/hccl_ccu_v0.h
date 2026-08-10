@@ -271,6 +271,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
         ccuUsedXnNum_ = 13;
+        AscendC::printf("[RS_DIAG] CcuPrepareForOp: entered REDUCE_SCATTER branch, handleId=%u, ccuUsedXnNum=%u\n",
+            static_cast<uint32_t>(handleId), static_cast<uint32_t>(ccuUsedXnNum_));
         CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
     }
 }

@@ -245,11 +245,17 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
 
     HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem run");
     CCU_CHK_RET(InitResource(ctx));
+    HCCL_INFO("[RS_DIAG] InitResource done, channelCount=%u, rankSize=%u, rankId=%u",
+        ctx.channelCount, ctx.rankSize, ctx.rankId);
     CCU_CHK_RET(
         LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, sliceSize, repeatNum));
+    HCCL_INFO("[RS_DIAG] LoadArgs done");
     CCU_CHK_RET(PreSync(ctx));
+    HCCL_INFO("[RS_DIAG] PreSync done");
     CCU_CHK_RET(DoRepeatReduceScatter(ctx));
+    HCCL_INFO("[RS_DIAG] DoRepeatReduceScatter done");
     CCU_CHK_RET(PostSync(ctx));
+    HCCL_INFO("[RS_DIAG] PostSync done");
     HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem end");
 
     return CCU_SUCCESS;

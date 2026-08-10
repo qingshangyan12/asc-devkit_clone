@@ -17,6 +17,7 @@
 
 #include "hccl_ccu_xn_utils.h"
 #include "../impl/platform_v310/hccl_ccu_v0_def.h"
+#include "utils/debug/asc_printf.h"
 
 namespace AscendC {
 template <const auto& config>
@@ -238,6 +239,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
+    AscendC::printf("[RS_DIAG] count=%llu dataSize=%llu sliceSize=%llu strideCount=%llu rankId=%u rankNum=%u "
+                    "scratchAddr=0x%llx rankSliceOffset=%llu xnData[1]=0x%llx xnData[2]=0x%llx\n",
+        static_cast<uint64_t>(commParam->count), static_cast<uint64_t>(dataSize), sliceSize,
+        static_cast<uint64_t>(commParam->strideCount), static_cast<uint32_t>(ccuParam_.rankId),
+        static_cast<uint32_t>(ccuParam_.rankNum), static_cast<uint64_t>(ccuParam_.scratchAddr),
+        rankSliceOffset, xnData_[1], xnData_[2]);
+    AscendC::printf("[RS_DIAG] xnData[3]=0x%llx xnData[4]=%llu xnData[7]=%llu xnData[8]=%llu "
+                    "xnData[9]=%llu xnData[10]=%llu xnData[11]=%llu xnData[12]=%llu\n",
+        xnData_[3], xnData_[4], xnData_[7], xnData_[8], xnData_[9], xnData_[10], xnData_[11], xnData_[12]);
     xnData_[4] = rankSliceOffset;
     xnData_[7] = sliceSize;
     xnData_[8] = UINT64_MAX - 1;
