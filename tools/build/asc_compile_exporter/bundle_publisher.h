@@ -20,7 +20,6 @@ class BundlePublisher final {
 public:
     BundlePublisher() = delete;
 
-    static bool Prepare(const std::string& output);
     static bool Publish(const std::string& staged, const std::string& output);
 
 private:

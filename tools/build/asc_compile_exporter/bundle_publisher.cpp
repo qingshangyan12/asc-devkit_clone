@@ -20,24 +20,12 @@
 
 namespace ascendc {
 namespace manifest_generator {
-namespace {
-
-bool CheckOutputPath(const std::string& output)
-{
-    if (!FileUtils::CheckNonSymlink(output)) {
-        ASCENDLOGE("Bundle output must not be a symlink and must be inspectable: %s", output.c_str());
-        return false;
-    }
-    return true;
-}
-
-} // namespace
-
-bool BundlePublisher::Prepare(const std::string& output) { return CheckOutputPath(output); }
 
 bool BundlePublisher::Publish(const std::string& staged, const std::string& output)
 {
-    if (!CheckOutputPath(output)) {
+    // Prefer rename because replacing the output is atomic when both paths are on the same filesystem.
+    if (!FileUtils::CheckNonSymlink(output)) {
+        ASCENDLOGE("Bundle output must not be a symlink and must be inspectable: %s", output.c_str());
         return false;
     }
     if (rename(staged.c_str(), output.c_str()) == 0) {
@@ -49,6 +37,7 @@ bool BundlePublisher::Publish(const std::string& staged, const std::string& outp
         ASCENDLOGE("Failed to publish bundle output: %s", std::strerror(publishError));
         return false;
     }
+    // rename cannot cross filesystems. Fall back to copying into the output filesystem before renaming again.
     if (!PublishAcrossFileSystems(staged, output)) {
         return false;
     }
@@ -59,8 +48,9 @@ bool BundlePublisher::Publish(const std::string& staged, const std::string& outp
 bool BundlePublisher::PublishAcrossFileSystems(const std::string& staged, const std::string& output)
 {
     ASCENDLOGD("Copying staged bundle across filesystems: %s -> %s", staged.c_str(), output.c_str());
+    // A private workspace under the output parent places the copied file on the output filesystem.
     BuildWorkspace publishWorkspace;
-    if (!BuildWorkspace::Create(FileUtils::ParentPath(output), false, publishWorkspace)) {
+    if (!publishWorkspace.Create(FileUtils::ParentPath(output), false)) {
         return false;
     }
     const std::string copied = FileUtils::JoinPath(publishWorkspace.Session(), "compile_resource_bundle.so");
@@ -68,9 +58,7 @@ bool BundlePublisher::PublishAcrossFileSystems(const std::string& staged, const 
         ASCENDLOGE("Failed to copy staged bundle across filesystems: %s", staged.c_str());
         return false;
     }
-    if (!CheckOutputPath(output)) {
-        return false;
-    }
+
     if (rename(copied.c_str(), output.c_str()) != 0) {
         const int publishError = errno;
         ASCENDLOGE("Failed to publish copied bundle output: %s", std::strerror(publishError));

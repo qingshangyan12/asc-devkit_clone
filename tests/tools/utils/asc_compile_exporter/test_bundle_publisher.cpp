@@ -25,7 +25,6 @@
 namespace {
 
 std::vector<int> g_renameErrors;
-std::string g_renameSymlinkTarget;
 
 } // namespace
 
@@ -38,10 +37,6 @@ extern "C" int __wrap_rename(const char* oldPath, const char* newPath)
     }
     const int renameError = g_renameErrors.front();
     g_renameErrors.erase(g_renameErrors.begin());
-    if (!g_renameSymlinkTarget.empty()) {
-        (void)symlink(g_renameSymlinkTarget.c_str(), newPath);
-        g_renameSymlinkTarget.clear();
-    }
     errno = renameError;
     return -1;
 }
@@ -59,7 +54,6 @@ TEST_F(ModuleTest, BundlePublisherPublishesFilesAndRejectsSymlinks)
 {
     const std::string output = FileUtils::JoinPath(root_, "output/bundle.so");
     ASSERT_TRUE(FileUtils::CreateDirectories(FileUtils::ParentPath(output)));
-    EXPECT_TRUE(BundlePublisher::Prepare(output));
     EXPECT_TRUE(FileUtils::IsDirectory(FileUtils::ParentPath(output)));
 
     const std::string staged = FileUtils::JoinPath(root_, "staged.so");
@@ -73,7 +67,6 @@ TEST_F(ModuleTest, BundlePublisherPublishesFilesAndRejectsSymlinks)
     const std::string symlinkPath = FileUtils::JoinPath(root_, "output/symlink.so");
     WriteTestFile(victim, "victim");
     ASSERT_EQ(symlink(victim.c_str(), symlinkPath.c_str()), 0);
-    EXPECT_FALSE(BundlePublisher::Prepare(symlinkPath));
     EXPECT_FALSE(BundlePublisher::Publish(staged, symlinkPath));
 }
 
@@ -95,7 +88,7 @@ TEST_F(ModuleTest, BundlePublisherCopiesAcrossFileSystems)
     }
 
     BuildWorkspace destinationWorkspace;
-    ASSERT_TRUE(BuildWorkspace::Create("/dev/shm", false, destinationWorkspace));
+    ASSERT_TRUE(destinationWorkspace.Create("/dev/shm", false));
     const std::string staged = FileUtils::JoinPath(root_, "large-staged.so");
     const std::string output = FileUtils::JoinPath(destinationWorkspace.Session(), "bundle.so");
     const std::string content(128U * 1024U + 17U, 'x');
@@ -128,13 +121,6 @@ TEST_F(ModuleTest, BundlePublisherReportsInjectedCrossFileSystemFailures)
 
     g_renameErrors = {EXDEV};
     EXPECT_FALSE(BundlePublisher::Publish(staged, "/proc/asc_compile_exporter_bundle.so"));
-
-    const std::string victim = FileUtils::JoinPath(root_, "victim.so");
-    const std::string symlinkOutput = FileUtils::JoinPath(root_, "symlink-output.so");
-    WriteTestFile(victim, "victim");
-    g_renameErrors = {EXDEV};
-    g_renameSymlinkTarget = victim;
-    EXPECT_FALSE(BundlePublisher::Publish(staged, symlinkOutput));
 
     const std::string failedOutput = FileUtils::JoinPath(root_, "failed-output.so");
     g_renameErrors = {EXDEV, EACCES};

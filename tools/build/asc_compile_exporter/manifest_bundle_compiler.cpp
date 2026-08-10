@@ -97,9 +97,6 @@ bool ManifestBundleCompiler::Compile() const
         return false;
     }
     const std::string output = FileUtils::JoinPath(resolvedOutputParent, outputName);
-    if (!BundlePublisher::Prepare(output)) {
-        return false;
-    }
     const uint32_t jobs = ResolveJobCount(request_.jobs);
     ASCENDLOGI("Using %u parallel bundle build job(s)", jobs);
 
@@ -109,7 +106,7 @@ bool ManifestBundleCompiler::Compile() const
         return false;
     }
     BuildWorkspace workspace;
-    if (!BuildWorkspace::Create(std::string(), request_.keepTemp, workspace)) {
+    if (!workspace.Create(std::string(), request_.keepTemp)) {
         return false;
     }
     if (request_.keepTemp) {

@@ -11,11 +11,8 @@
 #include <gtest/gtest.h>
 
 #include <cerrno>
-#include <utility>
 
-#define private public
 #include "build_workspace.h"
-#undef private
 #include "file_utils.h"
 #include "test_support.h"
 
@@ -52,16 +49,18 @@ TEST_F(ModuleTest, BuildWorkspaceHonorsCleanupPolicy)
     std::string removedSession;
     {
         BuildWorkspace workspace;
-        ASSERT_TRUE(BuildWorkspace::Create(parent, false, workspace));
+        ASSERT_TRUE(workspace.Create(parent, false));
         removedSession = workspace.Session();
         EXPECT_TRUE(FileUtils::IsDirectory(removedSession));
+        EXPECT_FALSE(workspace.Create(parent, false));
+        EXPECT_EQ(workspace.Session(), removedSession);
     }
     EXPECT_FALSE(LstatPathExists(removedSession));
 
     std::string keptSession;
     {
         BuildWorkspace workspace;
-        ASSERT_TRUE(BuildWorkspace::Create(parent, true, workspace));
+        ASSERT_TRUE(workspace.Create(parent, true));
         keptSession = workspace.Session();
     }
     EXPECT_TRUE(FileUtils::IsDirectory(keptSession));
@@ -69,34 +68,28 @@ TEST_F(ModuleTest, BuildWorkspaceHonorsCleanupPolicy)
     const std::string regularFile = FileUtils::JoinPath(root_, "not-a-directory");
     WriteTestFile(regularFile, "file");
     BuildWorkspace failedWorkspace;
-    EXPECT_FALSE(BuildWorkspace::Create(regularFile, false, failedWorkspace));
-    EXPECT_FALSE(BuildWorkspace::Create("/proc", false, failedWorkspace));
+    EXPECT_FALSE(failedWorkspace.Create(regularFile, false));
+    EXPECT_FALSE(failedWorkspace.Create("/proc", false));
 }
 
-TEST_F(ModuleTest, BuildWorkspaceUsesTmpDirAndSupportsMoveConstruction)
+TEST_F(ModuleTest, BuildWorkspaceUsesTmpDir)
 {
     ScopedEnvironment temporary("TMPDIR", root_.c_str());
     std::string session;
     {
         BuildWorkspace workspace;
-        ASSERT_TRUE(BuildWorkspace::Create("", false, workspace));
+        ASSERT_TRUE(workspace.Create("", false));
         session = workspace.Session();
         EXPECT_TRUE(FileUtils::IsPathWithin(session, root_));
-        BuildWorkspace moved(std::move(workspace));
-        EXPECT_TRUE(workspace.Session().empty());
-        EXPECT_EQ(moved.Session(), session);
     }
     EXPECT_FALSE(LstatPathExists(session));
 }
 
-TEST_F(ModuleTest, BuildWorkspaceReportsCreationAndCleanupFailures)
+TEST_F(ModuleTest, BuildWorkspaceReportsCreationFailure)
 {
     BuildWorkspace failedWorkspace;
     g_failNextMkdtemp = true;
-    EXPECT_FALSE(BuildWorkspace::Create(root_, false, failedWorkspace));
-
-    BuildWorkspace cleanupFailure("/dev/null/child", false);
-    EXPECT_EQ(cleanupFailure.Session(), "/dev/null/child");
+    EXPECT_FALSE(failedWorkspace.Create(root_, false));
 }
 
 } // namespace

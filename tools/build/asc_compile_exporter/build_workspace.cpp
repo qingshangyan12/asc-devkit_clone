@@ -13,7 +13,6 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
-#include <utility>
 #include <vector>
 
 #include "ascendc_tool_log.h"
@@ -22,8 +21,12 @@
 namespace ascendc {
 namespace manifest_generator {
 
-bool BuildWorkspace::Create(const std::string& requestedParent, bool keepTemp, BuildWorkspace& workspace)
+bool BuildWorkspace::Create(const std::string& requestedParent, bool keepTemp)
 {
+    if (!session_.empty()) {
+        ASCENDLOGE("Build workspace is already initialized: %s", session_.c_str());
+        return false;
+    }
     const char* temporary = std::getenv("TMPDIR");
     const std::string requested =
         requestedParent.empty() ? (temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary) : requestedParent;
@@ -51,15 +54,9 @@ bool BuildWorkspace::Create(const std::string& requestedParent, bool keepTemp, B
         return false;
     }
     ASCENDLOGD("Created private bundle work directory %s", created);
-    workspace.session_ = created;
-    workspace.keepTemp_ = keepTemp;
+    session_ = created;
+    keepTemp_ = keepTemp;
     return true;
-}
-
-BuildWorkspace::BuildWorkspace(BuildWorkspace&& other) noexcept
-    : session_(std::move(other.session_)), keepTemp_(other.keepTemp_)
-{
-    other.session_.clear();
 }
 
 BuildWorkspace::~BuildWorkspace()
@@ -76,10 +73,6 @@ BuildWorkspace::~BuildWorkspace()
 }
 
 const std::string& BuildWorkspace::Session() const noexcept { return session_; }
-
-BuildWorkspace::BuildWorkspace(std::string session, bool keepTemp) noexcept
-    : session_(std::move(session)), keepTemp_(keepTemp)
-{}
 
 } // namespace manifest_generator
 } // namespace ascendc

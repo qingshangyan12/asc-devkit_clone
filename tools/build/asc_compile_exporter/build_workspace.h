@@ -20,18 +20,15 @@ class BuildWorkspace final {
 public:
     BuildWorkspace() noexcept = default;
 
-    static bool Create(const std::string& requestedParent, bool keepTemp, BuildWorkspace& workspace);
+    bool Create(const std::string& requestedParent, bool keepTemp);
 
     BuildWorkspace(const BuildWorkspace&) = delete;
     BuildWorkspace& operator=(const BuildWorkspace&) = delete;
-    BuildWorkspace(BuildWorkspace&& other) noexcept;
     ~BuildWorkspace();
 
     const std::string& Session() const noexcept;
 
 private:
-    BuildWorkspace(std::string session, bool keepTemp) noexcept;
-
     std::string session_;
     bool keepTemp_ = false;
 };
