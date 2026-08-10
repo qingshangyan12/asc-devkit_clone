@@ -381,12 +381,12 @@ extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourc
 namespace {
 CcuResult CopyOpResCtxToHost(void* opResCtx, OpResCtx& opResHost)
 {
-    HCCL_INFO("[CcuKernelLaunch]Obtain OpResCtx.");
+    HCCL_INFO("[j_test CcuKernelLaunch]Obtain OpResCtx.");
     aclError aclRet = aclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
         aclRet != ACL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] aclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].", aclRet, opResCtx,
+            "[j_test CcuKernelLaunch] aclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].", aclRet, opResCtx,
             sizeof(OpResCtx)),
         CCU_E_INTERNAL);
     CHK_PRT_RET(
@@ -403,14 +403,14 @@ CcuResult CopyOpResCtxToHost(void* opResCtx, OpResCtx& opResHost)
 
 CcuResult CopyOpParamToHost(const OpResCtx& opResHost, OpParam& opParamHost)
 {
-    HCCL_INFO("[CcuKernelLaunch]Obtain OpParam.");
+    HCCL_INFO("[j_test CcuKernelLaunch]Obtain OpParam.");
     void* opParamDev = reinterpret_cast<void*>(opResHost.algInfo[0].opParam);
     aclError aclRet =
         aclrtMemcpy(&opParamHost, sizeof(OpParam), opParamDev, sizeof(OpParam), ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
         aclRet != ACL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] aclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].", aclRet, opParamDev,
+            "[j_test CcuKernelLaunch] aclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].", aclRet, opParamDev,
             sizeof(OpParam)),
         CCU_E_INTERNAL);
     CHK_PRT_RET(
@@ -422,19 +422,19 @@ CcuResult CopyOpParamToHost(const OpResCtx& opResHost, OpParam& opParamHost)
 
 CcuResult LoadResourceCtx(const OpParam& opParamHost, AlgResourceCtxSerializable& resourceCtx)
 {
-    HCCL_INFO("[CcuKernelLaunch]Obtain resCtx.");
+    HCCL_INFO("[j_test CcuKernelLaunch]Obtain resCtx.");
     auto* resCtx = static_cast<char*>(opParamHost.resCtx);
     std::vector<char> seq(opParamHost.ctxSize);
-    HCCL_INFO("[CcuKernelLaunch]Start aclrtMemcpy D2H.");
+    HCCL_INFO("[j_test CcuKernelLaunch]Start aclrtMemcpy D2H.");
     aclError aclRet =
         aclrtMemcpy(seq.data(), opParamHost.ctxSize, resCtx, opParamHost.ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
         aclRet != ACL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet, seq.data(),
+            "[j_test CcuKernelLaunch] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet, seq.data(),
             resCtx, opParamHost.ctxSize),
         CCU_E_INTERNAL);
-    HCCL_INFO("[CcuKernelLaunch]Start resourceCtx DeSerialize.");
+    HCCL_INFO("[j_test CcuKernelLaunch]Start resourceCtx DeSerialize.");
     resourceCtx.DeSerialize(seq);
     return CCU_SUCCESS;
 }
@@ -462,7 +462,7 @@ void LogKernelLaunchArgs(
 {
     if (resourceCtx.kfcServerArgs.size() >= 6U) {
         HCCL_INFO(
-            "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
+            "[j_test CcuKernelLaunch] HcommCcuKernelLaunch args: "
             "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], "
             "xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], missionNum[%llu], "
             "missionIndex[%llu], token[%llu]",
@@ -475,7 +475,7 @@ void LogKernelLaunchArgs(
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[5]));
     } else {
         HCCL_INFO(
-            "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
+            "[j_test CcuKernelLaunch] HcommCcuKernelLaunch args: "
             "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], kfcServerArgsSize[%zu]",
             static_cast<unsigned long long>(threadHandle), static_cast<unsigned long long>(kernelHandle),
             resourceCtx.kfcServerArgSize, resourceCtx.kfcServerArgs.size());
@@ -485,6 +485,7 @@ void LogKernelLaunchArgs(
 
 CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
 {
+    HCCL_INFO("[j_test CcuKernelLaunch] CcuKernelLaunch entry, comm=%p, opResCtx=%p", comm, opResCtx);
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
     CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
 
@@ -492,27 +493,76 @@ CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
     OpResCtx opResHost{};
     CcuResult ret = CopyOpResCtxToHost(opResCtx, opResHost);
     if (ret != CCU_SUCCESS) {
+        HCCL_ERROR("[j_test CcuKernelLaunch] CopyOpResCtxToHost failed, ret=%d", ret);
         return ret;
     }
+    HCCL_INFO("[j_test CcuKernelLaunch] CopyOpResCtxToHost success, workSpace=%p, xnAddr=0x%llx, ckeAddr=0x%llx",
+              (void*)opResHost.workSpace, static_cast<unsigned long long>(opResHost.xnAddr),
+              static_cast<unsigned long long>(opResHost.ckeAddr));
     OpParam opParamHost{};
     ret = CopyOpParamToHost(opResHost, opParamHost);
     if (ret != CCU_SUCCESS) {
+        HCCL_ERROR("[j_test CcuKernelLaunch] CopyOpParamToHost failed, ret=%d", ret);
         return ret;
     }
+    HCCL_INFO("[j_test CcuKernelLaunch] CopyOpParamToHost success, opType=%u, algName=%s",
+              static_cast<u32>(opParamHost.opType), opParamHost.algName);
     AlgResourceCtxSerializable resourceCtx;
     ret = LoadResourceCtx(opParamHost, resourceCtx);
     if (ret != CCU_SUCCESS) {
+        HCCL_ERROR("[j_test CcuKernelLaunch] LoadResourceCtx failed, ret=%d", ret);
         return ret;
     }
+    HCCL_INFO("[j_test CcuKernelLaunch] LoadResourceCtx success, threads.size=%zu, ccuKernels.size=%zu, kfcServerArgs.size=%zu",
+              resourceCtx.threads.size(), resourceCtx.ccuKernels.size(), resourceCtx.kfcServerArgs.size());
+
+    // 从 CcuFastLaunchCtx 读取 cachedArgs（由 device 侧 AICPU kernel 的 Orchestrate → FastLaunchSaveCtx 保存）
+    void* fastLaunchCtxPtr = nullptr;
+    uint64_t fastLaunchCtxSize = 0;
+    HcclResult ctxRet = HcclEngineCtxGet(
+        comm, opParamHost.fastLaunchTag, CommEngine::COMM_ENGINE_CCU, &fastLaunchCtxPtr, &fastLaunchCtxSize);
+    CHK_PRT_RET(
+        ctxRet != HCCL_SUCCESS || fastLaunchCtxPtr == nullptr,
+        HCCL_ERROR("[j_test CcuKernelLaunch] Failed to get CcuFastLaunchCtx, tag[%s]", opParamHost.fastLaunchTag),
+        CCU_E_PTR);
+    CcuFastLaunchCtx* ccuFastLaunchCtx = static_cast<CcuFastLaunchCtx*>(fastLaunchCtxPtr);
+    CcuKernelSubmitInfo* submitInfos = ccuFastLaunchCtx->GetCcuKernelSubmitInfoPtr();
+    u32 totalKernelNum = ccuFastLaunchCtx->ccuKernelNum[0];
+    HCCL_INFO("[j_test CcuKernelLaunch] CcuFastLaunchCtx loaded, totalKernelNum=%u", totalKernelNum);
+    CHK_PRT_RET(
+        totalKernelNum == 0 || submitInfos == nullptr,
+        HCCL_ERROR("[j_test CcuKernelLaunch] no submitInfos in CcuFastLaunchCtx"), CCU_E_PTR);
+
+    // 将 cachedArgs 写入 HBM 的 xnAddr（KfcServerGenCircularQueue 从此读取 param[]）
+    constexpr uint64_t paramSizePerTask = Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
+    for (u32 i = 0; i < totalKernelNum; ++i) {
+        uint64_t dstAddr = opResHost.xnAddr + i * paramSizePerTask;
+        aclError aclRet = aclrtMemcpy(
+            reinterpret_cast<void*>(dstAddr), paramSizePerTask, submitInfos[i].cachedArgs,
+            sizeof(uint64_t) * CCU_MAX_TASK_ARG_NUM, ACL_MEMCPY_HOST_TO_DEVICE);
+        CHK_PRT_RET(
+            aclRet != ACL_ERROR_NONE,
+            HCCL_ERROR("[j_test CcuKernelLaunch] aclrtMemcpy cachedArgs to HBM failed, ret[%d], dstAddr[0x%llx]", aclRet,
+                       static_cast<unsigned long long>(dstAddr)),
+            CCU_E_INTERNAL);
+        HCCL_INFO("[j_test CcuKernelLaunch] cachedArgs[%u] written to HBM xnAddr[0x%llx], firstArg=0x%llx", i,
+                  static_cast<unsigned long long>(dstAddr),
+                  static_cast<unsigned long long>(submitInfos[i].cachedArgs[0]));
+    }
+
     ThreadHandle threadHandle = 0;
     CcuKernelHandle kernelHandle = 0;
     ret = GetLaunchHandles(resourceCtx, threadHandle, kernelHandle);
     if (ret != CCU_SUCCESS) {
+        HCCL_ERROR("[j_test CcuKernelLaunch] GetLaunchHandles failed, ret=%d", ret);
         return ret;
     }
+    HCCL_INFO("[j_test CcuKernelLaunch] GetLaunchHandles success, threadHandle=0x%llx, kernelHandle=0x%llx",
+              static_cast<unsigned long long>(threadHandle), static_cast<unsigned long long>(kernelHandle));
     LogKernelLaunchArgs(resourceCtx, threadHandle, kernelHandle);
-    HCCL_INFO("[CcuKernelLaunch]Start HcommCcuKernelLaunch.");
+    HCCL_INFO("[j_test CcuKernelLaunch]Start HcommCcuKernelLaunch.");
     const void* kfcArgs =
         resourceCtx.kfcServerArgs.empty() ? nullptr : static_cast<const void*>(resourceCtx.kfcServerArgs.data());
+    HCCL_INFO("[j_test CcuKernelLaunch] kfcArgs=%p, kfcServerArgSize=%u", kfcArgs, resourceCtx.kfcServerArgSize);
     return HcommCcuKernelLaunch(threadHandle, kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
 }

@@ -241,9 +241,9 @@ HcclResult SetOpParamFastLaunchTag(OpParam& param)
         const std::string reduceType = HCOM_REDUCE_OP_STR_MAP.at(param.reduceType);
         tagBuilder += "_" + reduceType;
     }
-    // 3.count
-    if (param.opType != HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        std::string count = std::to_string(param.DataDes.count); // todo: alltoall 的count不是从这里取
+    // 3.count（MC2 KFC 流程中 count 在 device 端动态填充，host 侧为 0，不作为 tag 组成部分）
+    if (param.opType != HcclCMDType::HCCL_CMD_ALLTOALLV && !param.isKfc) {
+        std::string count = std::to_string(param.DataDes.count);
         tagBuilder += "_" + count;
     }
     // 4.root
