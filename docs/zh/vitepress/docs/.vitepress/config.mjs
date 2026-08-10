@@ -260,7 +260,7 @@ function stripSidebarNumber(text) {
 
 function buildBreadcrumbMap() {
   const roots = {
-    '/api/': { text: 'Ascend C API', link: '/api/Ascend-C-API列表' },
+    '/api/': { text: 'Ascend C API', link: '/api/api_list' },
     '/guide/': { text: 'Ascend C算子开发指南', link: '/guide/入门教程/Ascend-C概述与学习路径' },
   }
   const breadcrumbs = new Map()
