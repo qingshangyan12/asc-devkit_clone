@@ -82,7 +82,10 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    HCCL_INFO("[InsKfcServerSoleExecutor][OrchestrateLoop] Start");
+    HCCL_INFO("[InsKfcServerSoleExecutor][OrchestrateLoop] Start opType[%u] engine[%u] "
+        "ccuKernels.size[%zu] remoteRankToChannelInfo_.size[%zu]",
+        static_cast<uint32_t>(param.opType), static_cast<uint32_t>(param.engine),
+        resCtx.ccuKernels.size(), remoteRankToChannelInfo_.size());
     // TemplateResource参数计算
     TemplateResource templateAlgRes;
     if (remoteRankToChannelInfo_.size() > 0) {
