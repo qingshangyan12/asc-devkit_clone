@@ -194,6 +194,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_pack_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_exp_sub_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_ln_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_log_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_div_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_max_scalar.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_ne.h"
@@ -5683,6 +5684,17 @@ __simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_boo
 __simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_bool mask)
 {
     asc_ln_impl(dst, src, mask);
+}
+
+// ==========asc_log(half/float)==========
+__simd_callee__ inline void asc_log(vector_half& dst, vector_half src, vector_bool mask)
+{
+    asc_log_impl(dst, src, mask);
+}
+
+__simd_callee__ inline void asc_log(vector_float& dst, vector_float src, vector_bool mask)
+{
+    asc_log_impl(dst, src, mask);
 }
 
 // ==========asc_div(half/float/int16_t/uint16_t/int32_t/uint32_t)==========

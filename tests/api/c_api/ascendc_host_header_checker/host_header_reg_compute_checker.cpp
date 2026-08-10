@@ -555,6 +555,7 @@ static void test_host_c_api_reg_compute_15()
     using ::asc_loadalign_unpack;
     using ::asc_loadalign_unpack4;
     using ::asc_loadalign_unpack4_postupdate;
+    using ::asc_log;
 }
 
 static void test_host_c_api_reg_compute_16()

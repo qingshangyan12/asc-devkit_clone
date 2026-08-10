@@ -28,6 +28,8 @@ Ascend 950PR/Ascend 950DT
 | asc_add_scalar | float | float | 32 |
 | asc_ln | half | half | 16 |
 | asc_ln | float | float | 16 |
+| asc_log | half | half | 16 |
+| asc_log | float | float | 16 |
 | asc_max_scalar | int8_t | int8_t | 256 |
 | asc_max_scalar | uint8_t | uint8_t | 256 |
 | asc_max_scalar | int16_t | int16_t | 128 |
