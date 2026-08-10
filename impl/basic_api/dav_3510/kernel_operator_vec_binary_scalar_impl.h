@@ -629,8 +629,10 @@ namespace RegDivs {
 template <typename T, typename RegT>
 __simd_callee__ inline void Divs(RegT& dstReg, RegT& srcReg, T scalarValue, Reg::MaskReg& mask)
 {
-    Reg::Duplicate(dstReg, scalarValue, mask);
-    Reg::Div(dstReg, srcReg, dstReg, mask);
+    static constexpr Reg::DivSpecificMode mode = {
+        Reg::MaskMergeMode::ZEROING, false, Reg::DivAlgo::PRECISION_1ULP_FTZ_TRUE};
+    Reg::Duplicate<T>(dstReg, scalarValue, mask);
+    Reg::Div<T, &mode>(dstReg, srcReg, dstReg, mask);
 }
 } // namespace RegDivs
 // Divs::Level 0
@@ -678,8 +680,10 @@ namespace RegDivs {
 template <typename T, typename RegT>
 __simd_callee__ inline void Divs2(RegT& dstReg, RegT& srcReg, T scalarValue, Reg::MaskReg& mask)
 {
-    Reg::Duplicate(dstReg, scalarValue, mask);
-    Reg::Div(dstReg, dstReg, srcReg, mask);
+    static constexpr Reg::DivSpecificMode mode = {
+        Reg::MaskMergeMode::ZEROING, false, Reg::DivAlgo::PRECISION_1ULP_FTZ_TRUE};
+    Reg::Duplicate<T>(dstReg, scalarValue, mask);
+    Reg::Div<T, &mode>(dstReg, dstReg, srcReg, mask);
 }
 } // namespace RegDivs
 // Div::Level 0
@@ -873,6 +877,8 @@ __simd_vf__ inline void BinaryScalarOpTemplateCntB64(
     Reg::MaskReg mask;
     Reg::UnalignReg ureg;
     Reg::RegTensor<uint32_t> zeroReg;
+    static constexpr Reg::DivSpecificMode divMode = {
+        Reg::MaskMergeMode::ZEROING, false, Reg::DivAlgo::PRECISION_1ULP_FTZ_TRUE};
     uint32_t sreg = static_cast<uint32_t>(calCount);
     uint32_t repeatStride = static_cast<uint32_t>(B64_DATA_NUM_PER_REPEAT) * 2;
     uint16_t repeatTime = CeilDivision(calCount, repeatStride);
@@ -913,7 +919,7 @@ __simd_vf__ inline void BinaryScalarOpTemplateCntB64(
         } else if constexpr (op == BinaryScalarOp::SUBS) {
             Reg::Sub(dstReg, srcReg0, srcReg1, mask);
         } else if constexpr (op == BinaryScalarOp::DIVS) {
-            Reg::Div(dstReg, srcReg0, srcReg1, mask);
+            Reg::Div<T, &divMode>(dstReg, srcReg0, srcReg1, mask);
         } else if constexpr (op == BinaryScalarOp::ANDS) {
             Reg::And(dstReg, srcReg0, srcReg1, mask);
         } else if constexpr (op == BinaryScalarOp::ORS) {
@@ -932,6 +938,8 @@ __simd_vf__ inline void BinaryScalarOpTemplateCnt(
     Reg::RegTensor<T> vDstReg0;
     uint32_t sreg = static_cast<uint32_t>(calCount);
     Reg::MaskReg preg;
+    static constexpr Reg::DivSpecificMode divMode = {
+        Reg::MaskMergeMode::ZEROING, false, Reg::DivAlgo::PRECISION_1ULP_FTZ_TRUE};
 
     uint32_t sregLower = static_cast<uint32_t>(GetVecLen() / sizeof(T));
     uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
@@ -957,7 +965,7 @@ __simd_vf__ inline void BinaryScalarOpTemplateCnt(
         } else if constexpr (op == BinaryScalarOp::SUBS) {
             Reg::Sub(vDstReg0, vSrcReg0, vSrcReg1, preg);
         } else if constexpr (op == BinaryScalarOp::DIVS) {
-            Reg::Div(vDstReg0, vSrcReg0, vSrcReg1, preg);
+            Reg::Div<T, &divMode>(vDstReg0, vSrcReg0, vSrcReg1, preg);
         } else if constexpr (op == BinaryScalarOp::ANDS) {
             Reg::And(vDstReg0, vSrcReg0, vSrcReg1, preg);
         } else if constexpr (op == BinaryScalarOp::ORS) {
