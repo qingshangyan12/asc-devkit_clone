@@ -62,29 +62,16 @@ PIPE_S
 
 ## 约束说明
 
+- AIC与AIV中均可调用本接口。
 - 相同源流水、相同目标流水、相同id下，连续使用asc_sync_notify会引发未定义行为。
 - 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致，否则同步关系不成立。
 - `pipe`与`tpipe`均不可取`PIPE_ALL`，否则触发异常。
 - `id`取值范围为0~7，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。
-
-
-
-
-
-**已验证：1、2、3、6、9**
-- 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致，否则同步关系不成立。本指令设置标志位，`asc_sync_wait`消费标志位，二者构成跨流水软同步的执行期闭环。<span style="color:green">**（pass）**</span>
-- `pipe`与`tpipe`均不可取`PIPE_ALL`，否则触发异常。<span style="color:green">**（pass，这个描述是在isa中有对应的）**</span>
-- `id`取值范围为0~7，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID<span style="color:green">**（这个描述是在isa中有对应的）**</span>。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。<span style="color:green">**（pass）**</span>
-- 不允许出现两个相同`pipe`、`tpipe`、`id`三元组的`asc_sync_notify`调用却没有对应的`asc_sync_wait`消费，否则同步标志在析构期残留，使用错误。。<span style="color:red">**（需重点关注，手动设计样例）**</span><span style="color:green">**（这个描述是在isa中有对应的，之前洋哥在字节现场遇到过的问题是连续调用相同的pipe、id是未定义行为，可能触发卡死）**</span>
-- AIC与AIV之间不支持使用本接口与`asc_sync_wait`进行同步，可能触发硬件未定义行为。AIC与AIV之间的同步属于核间同步，需使用`asc_sync_block_arrive`与`asc_sync_block_wait`完成。
 - 本接口仅在AI Core内部建立跨流水依赖，不涉及Global Memory读写，无地址对齐与容量上限约束。。<span style="color:red">**（莫名其妙的约束）**</span>
-- 本接口对同一流水中的后续指令不产生阻塞，仅设置一个同步标志位，待本指令之前的所有指令提交后才触发对应的`asc_sync_wait`。<span style="color:green">**（isa中的描述）**</span>
-
-### 流水组合约束
-
-- 源流水与目标流水的合法组合由当前核类型（AIC或AIV）决定，需选择硬件支持的流水对，否则`pipe`或`tpipe`取值落入非法枚举触发异常。AIC中可用的核内同步流水组合参见核内同步能力概述。<span style="color:red">**（需加跳转）**</span>，AIV中可用的核内同步流水组合参见同一文档的AIV同步组合表。<span style="color:green">**（pass）**</span>
-- 在NPU架构3510下，本接口仍可用于兼容场景的跨流水依赖同步；多流水依赖也可改用`asc_lock`与`asc_unlock`按"锁定-释放"方式处理。<span style="color:green">**（pass）**</span>
-- 编译器在C API编程方式下会自动插入部分流水同步（具体范围见核内同步关键特性说明），开发者不应重复插入编译器已自动插入的同步指令，否则可能导致程序逻辑异常或性能下降。。<span style="color:red">**（需重点关注，手动设计样例）**</span>
+- 本接口对同一流水中的后续指令不产生阻塞效果。
+<!-- npu="950" id8 -->
+- 在[NPU架构3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)上，`asc_lock`与`asc_unlock`组合也可实现多流水同步。与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水线解耦，可简化反向同步逻辑。
+<!-- end id8 -->
 
 ## 调用示例
 
