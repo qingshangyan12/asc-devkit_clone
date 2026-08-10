@@ -217,6 +217,30 @@ HcclResult BuildTagsAndValidate(
     return HCCL_SUCCESS;
 }
 
+HcclResult CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum)
+{
+    if (tilingNum > 1) {
+        HCCL_WARNING(
+            "[AllocComResourceByTilingCcu] tilingNum[%zu] is not supported in mc2_client.", tilingNum);
+        return HCCL_E_ALG_NOT_SUPPORTED;
+    }
+    for (uint32_t i = 0U; i < tilingNum; ++i) {
+        const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
+        std::string algName;
+        if (!GetForcedAlgName(ccTiling, algName)) {
+            continue;
+        }
+        const auto opType = static_cast<HcclCMDType>(ccTiling->opType);
+        if (!CollAlgExecRegistryV2::Instance().IsRegistered(opType, algName)) {
+            HCCL_WARNING(
+                "[AllocComResourceByTilingCcu] algorithm[%s] is not registered in mc2_client for opType[%u].",
+                algName.c_str(), ccTiling->opType);
+            return HCCL_E_ALG_NOT_SUPPORTED;
+        }
+    }
+    return HCCL_SUCCESS;
+}
+
 // AICPU引擎资源分配流程
 HcclResult AllocComResourceByTilingAicpu(
     HcclComm comm, void* stream, void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, const char* commName,
@@ -260,6 +284,8 @@ HcclResult AllocComResourceByTilingCcu(
     std::string topoTag[Hccl::MC2_MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
     HCCL_INFO("[AllocComResourceByTilingCcu]BuildTagsAndValidate successfully!");
+
+    CHK_RET(CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum));
 
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};

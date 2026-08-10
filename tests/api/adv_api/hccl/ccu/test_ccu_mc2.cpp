@@ -22,6 +22,10 @@
 #include "topo_model.h"
 #include "sim_common.h"
 
+namespace mc2_ops_hccl {
+extern bool g_stubCcuAlgorithmRegistered;
+}
+
 namespace {
 
 static u32 g_stubRankSize = 8;
@@ -43,6 +47,7 @@ static void StubCleanup()
     g_stubRankSize = 8;
     g_stubRankId = 0;
     g_stubDeviceType = DevType::DEV_TYPE_950;
+    mc2_ops_hccl::g_stubCcuAlgorithmRegistered = true;
     unsetenv("HCCL_OP_EXPANSION_MODE");
 }
 
@@ -102,6 +107,14 @@ static Mc2TilingTestData BuildMc2Tiling(
         strcpy(tiling.ccTiling[i].algConfig, "default");
     }
     return tiling;
+}
+
+static HcclResult RunCcuSelectAlg(
+    HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
+    OpResCtx& resCtx)
+{
+    Mc2InitTilingInner initTiling{};
+    return CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, &initTiling, resCtx);
 }
 
 class CcuMc2TestSuite : public testing::Test {
@@ -184,7 +197,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather)
     const void* ccTilingList[] = {&ccTiling};
     std::string topoTag[] = {"tag0"};
 
-    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
+    EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
     EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
 }
@@ -205,7 +218,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterKfcMesh1DMem2Mem)
     const void* ccTilingList[] = {&ccTiling};
     std::string topoTag[] = {"tag0"};
 
-    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
+    EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
     EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER));
     EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuReduceScatterMeshMem2Mem1D));
 }
@@ -224,7 +237,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterRejectsInt8)
     const void* ccTilingList[] = {&ccTiling};
     std::string topoTag[] = {"tag0"};
 
-    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_E_NOT_SUPPORT);
 }
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterRejects64BitTypes)
@@ -243,7 +256,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterRejects64BitTypes)
         const void* ccTilingList[] = {&ccTiling};
         std::string topoTag[] = {"tag0"};
 
-        EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_E_NOT_SUPPORT);
+        EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_E_NOT_SUPPORT);
     }
 }
 
@@ -261,7 +274,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterRejectsProd)
     const void* ccTilingList[] = {&ccTiling};
     std::string topoTag[] = {"tag0"};
 
-    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_E_NOT_SUPPORT);
 }
 
 TEST_F(CcuMc2TestSuite, CheckCcuKfcFlow_RejectsMixedOps)
@@ -389,6 +402,21 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
 }
 
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuAlgorithmNotRegistered)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling =
+        BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    strcpy(tiling.ccTiling[0].algConfig, "CcuAllGatherMeshMem2Mem1D");
+    mc2_ops_hccl::g_stubCcuAlgorithmRegistered = false;
+
+    void* opResCtx = nullptr;
+    HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
+
+    EXPECT_EQ(ret, HCCL_E_ALG_NOT_REGISTERER);
+    EXPECT_EQ(opResCtx, nullptr);
+}
+
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_ReduceScatterCcuPath)
 {
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)};
@@ -456,7 +484,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AicpuAlgNotSupported)
     const void* ccTilingList[] = {&ccTiling};
     std::string topoTag[] = {"tag0"};
     OpResCtx resCtx{};
-    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_E_NOT_SUPPORT);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_UnsupportedEngine)
