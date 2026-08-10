@@ -38,6 +38,12 @@ const uint32_t HBM_PARAM_IDX_5 = 5;
 const uint32_t HBM_PARAM_IDX_6 = 6;
 const uint32_t HBM_PARAM_IDX_7 = 7;
 const uint32_t HBM_PARAM_IDX_8 = 8;
+const uint32_t HBM_PARAM_IDX_9 = 9;
+const uint32_t HBM_PARAM_IDX_10 = 10;
+const uint32_t HBM_PARAM_IDX_11 = 11;
+const uint32_t HBM_PARAM_IDX_12 = 12;
+const uint32_t HBM_PARAM_IDX_13 = 13;
+const uint32_t HBM_PARAM_IDX_14 = 14;
 
 const uint32_t SINGLE_DIE = 1;
 const uint32_t DOUBLE_DIE = 2;
@@ -130,6 +136,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
     {
+<<<<<<< HEAD
         if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
             CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
                 param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], ctx.token,
@@ -151,6 +158,14 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 param[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL], ctx.arg->channels, ctx.arg->channelCount,
                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
         }
+=======
+        CcuKfcAllGatherMesh1DMem2MemKernel(
+            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
+            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
+            param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], param[HBM_PARAM_IDX_12],
+            param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14], ctx.arg->channels, ctx.arg->channelCount,
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+>>>>>>> f5610b3dd (test)
     }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER))
     {
