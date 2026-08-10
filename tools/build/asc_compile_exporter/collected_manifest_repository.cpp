@@ -146,6 +146,42 @@ bool DiscoverManifestFiles(const std::string& manifestSearchRoot, std::vector<st
     return true;
 }
 
+bool LoadResourceFile(
+    const fs::path& source, const std::string& manifestRoot, const std::string& manifestPath, ResourceBudget& budget,
+    ManifestUnit& unit)
+{
+    std::vector<uint8_t> data;
+    if (!FileUtils::ReadRegularFile(source.string(), MAX_RESOURCE_FILE_BYTES, data)) {
+        ASCENDLOGE("Failed to read permitted manifest resource: %s", source.c_str());
+        return false;
+    }
+    if (data.empty()) {
+        ASCENDLOGD("Skipping empty manifest resource %s", source.c_str());
+        return true;
+    }
+    if (unit.files.size() >= MAX_FILES_PER_MANIFEST) {
+        ASCENDLOGE("Manifest exceeds resource file count limit: %s", manifestPath.c_str());
+        return false;
+    }
+    if (!budget.AddResource(static_cast<uint32_t>(data.size()), "manifest resource " + source.string())) {
+        return false;
+    }
+    boost::system::error_code error;
+    const fs::path relative = fs::relative(source, fs::path(manifestRoot), error);
+    if (error || relative.empty()) {
+        ASCENDLOGE(
+            "Failed to make manifest resource path relative: path=%s root=%s error=%s", source.c_str(),
+            manifestRoot.c_str(), error ? error.message().c_str() : "empty relative path");
+        return false;
+    }
+    ResourceFile file;
+    file.fileName = source.filename().string();
+    file.filePath = relative.generic_string();
+    file.data = std::move(data);
+    unit.files.push_back(std::move(file));
+    return true;
+}
+
 bool LoadResourceFiles(
     const std::string& directory, const std::string& manifestRoot, const std::string& manifestPath,
     ResourceBudget& budget, ManifestUnit& unit)
@@ -174,42 +210,11 @@ bool LoadResourceFiles(
                     "Manifest resources exceed directory depth limit of %zu: %s", MAX_DIRECTORY_DEPTH, source.c_str());
                 return false;
             }
-            if (!AdvanceIterator(iterator, directory)) {
-                return false;
-            }
-            continue;
-        }
-        if (!fs::is_regular_file(status)) {
+        } else if (!fs::is_regular_file(status)) {
             ASCENDLOGE("Manifest base_dir contains a non-regular file: %s", source.c_str());
             return false;
-        }
-        std::vector<uint8_t> data;
-        if (!FileUtils::ReadRegularFile(source.string(), MAX_RESOURCE_FILE_BYTES, data)) {
-            ASCENDLOGE("Failed to read permitted manifest resource: %s", source.c_str());
+        } else if (!LoadResourceFile(source, manifestRoot, manifestPath, budget, unit)) {
             return false;
-        }
-        if (!data.empty()) {
-            if (unit.files.size() >= MAX_FILES_PER_MANIFEST) {
-                ASCENDLOGE("Manifest exceeds resource file count limit: %s", manifestPath.c_str());
-                return false;
-            }
-            if (!budget.AddResource(static_cast<uint32_t>(data.size()), "manifest resource " + source.string())) {
-                return false;
-            }
-            const fs::path relative = fs::relative(source, fs::path(manifestRoot), error);
-            if (error || relative.empty()) {
-                ASCENDLOGE(
-                    "Failed to make manifest resource path relative: path=%s root=%s error=%s", source.c_str(),
-                    manifestRoot.c_str(), error ? error.message().c_str() : "empty relative path");
-                return false;
-            }
-            ResourceFile file;
-            file.fileName = source.filename().string();
-            file.filePath = relative.generic_string();
-            file.data = std::move(data);
-            unit.files.push_back(std::move(file));
-        } else {
-            ASCENDLOGD("Skipping empty manifest resource %s", source.c_str());
         }
         if (!AdvanceIterator(iterator, directory)) {
             return false;
