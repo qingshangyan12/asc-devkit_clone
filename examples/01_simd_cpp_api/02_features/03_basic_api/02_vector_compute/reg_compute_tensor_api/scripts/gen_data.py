@@ -25,9 +25,9 @@ def prelu(src: np.ndarray, slope: Union[np.ndarray, np.float32]) -> np.ndarray:
 
 
 def main() -> None:
-    sample_dir = Path(__file__).resolve().parent.parent
-    input_dir = sample_dir / "input"
-    output_dir = sample_dir / "output"
+    work_dir = Path.cwd()
+    input_dir = work_dir / "input"
+    output_dir = work_dir / "output"
     input_dir.mkdir(exist_ok=True)
     output_dir.mkdir(exist_ok=True)
 
