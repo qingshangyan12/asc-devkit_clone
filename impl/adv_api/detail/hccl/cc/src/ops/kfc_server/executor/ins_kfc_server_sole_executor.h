@@ -23,7 +23,7 @@ public:
     explicit InsKfcServerSoleExecutor();
     ~InsKfcServerSoleExecutor() override = default;
 
-    HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
+    HcclResult Orchestrate(const OpParam& param, AlgResourceCtxSerializable& resCtx) override;
 
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,

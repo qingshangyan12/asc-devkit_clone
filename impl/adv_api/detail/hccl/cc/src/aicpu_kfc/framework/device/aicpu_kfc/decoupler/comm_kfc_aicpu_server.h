@@ -69,7 +69,7 @@ public:
     HcclResult LaunchOpenCcoreWait(
         const ServerExecCtx& execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast);
     HcclResult LaunchOpenAicpuKernelServer(
-        std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
+        std::vector<uint8_t>& opParam, mc2_ops_hccl::const AlgResourceCtxSerializable& resCtx);
     HcclResult FormatOpParamFromMsg(
         const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, const ServerExecCtx& execCtx, u32 repeat,
         std::vector<uint8_t>& runParam);

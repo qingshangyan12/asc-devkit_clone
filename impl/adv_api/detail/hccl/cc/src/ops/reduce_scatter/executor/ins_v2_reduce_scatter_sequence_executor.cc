@@ -110,7 +110,7 @@ HcclResult InsV2ReduceScatterSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
 // ! 已编码完成
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsV2ReduceScatterSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     // 参数填充
     myRank_ = resCtx.topoInfo.userRank;
@@ -153,7 +153,7 @@ HcclResult InsV2ReduceScatterSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
 // ! 已编码完成
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsV2ReduceScatterSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::OrchestrateLoop(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     // 将ccl-buffer分成ccl-in和ccl-out 2部分区分使用
     void* cclInAddr = resCtx.cclMem.addr;

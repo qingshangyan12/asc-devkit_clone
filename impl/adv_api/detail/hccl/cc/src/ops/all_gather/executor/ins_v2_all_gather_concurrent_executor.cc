@@ -119,7 +119,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GenTemplateAlgParams(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 dataCountPerLoop,
+    const OpParam& param, AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 dataCountPerLoop,
     const u64 scratchOffset, TemplateDataParams& tempAlgParams) const
 {
     tempAlgParams.buffInfo.inputPtr = param.inputPtr;
@@ -192,7 +192,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllGatherConcurrentExecutor][Orchestrate] Orchestrate Start");
     algHierarchyInfo_ = resCtx.algHierarchyInfo;
@@ -247,7 +247,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::OrchestrateLoop(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, InsAlgTemplate0& algTemplate0,
+    const OpParam& param, AlgResourceCtxSerializable& resCtx, InsAlgTemplate0& algTemplate0,
     InsAlgTemplate1& algTemplate1)
 {
     HCCL_INFO("[InsV2AllGatherConcurrentExecutor][OrchestrateLoop] Start");

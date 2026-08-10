@@ -57,7 +57,7 @@ HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsKfcServerSoleExecutor][Orchestrate] Orchestrate Start");
 
@@ -80,7 +80,7 @@ HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsKfcServerSoleExecutor][OrchestrateLoop] Start");
     // TemplateResource参数计算

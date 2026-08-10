@@ -19,7 +19,7 @@
 #include "alg_param.h"
 
 extern HcclResult LaunchOpenOpParamDataImpl(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
+    std::vector<uint8_t>& opParam, mc2_ops_hccl::const AlgResourceCtxSerializable& resCtx);
 
 namespace {
 u64 GetDataTypeSize(HcclDataType dataType)
@@ -273,7 +273,7 @@ HcclResult FormatOpenOpParamDataFromMsg(
     return HCCL_SUCCESS;
 }
 
-HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam, mc2_ops_hccl::const AlgResourceCtxSerializable& resCtx)
 {
     if (opParam.empty()) {
         HCCL_ERROR("Op param is empty.");

@@ -55,7 +55,7 @@ u64 GetDataTypeSize(HcclDataType dataType)
     }
 }
 
-HcclResult RestoreVarDataAlltoAllV(mc2_ops_hccl::OpParam& param, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+HcclResult RestoreVarDataAlltoAllV(mc2_ops_hccl::OpParam& param, const mc2_ops_hccl::const AlgResourceCtxSerializable& resCtx)
 {
     u64 rankSize = resCtx.topoInfo.userRankSize;
     CHK_PRT_RET(
@@ -108,7 +108,7 @@ HcclResult RestoreVarDataAlltoAllV(mc2_ops_hccl::OpParam& param, const mc2_ops_h
     return HCCL_SUCCESS;
 }
 
-HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam& param, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam& param, const mc2_ops_hccl::const AlgResourceCtxSerializable& resCtx)
 {
     HcclResult ret = HCCL_SUCCESS;
     if (param.opType == HCCL_CMD_ALLTOALLV || param.opType == HCCL_CMD_ALLTOALL) {
@@ -169,7 +169,7 @@ HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
 } // namespace
 
 HcclResult LaunchOpenOpParamDataImpl(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+    std::vector<uint8_t>& opParam, mc2_ops_hccl::const AlgResourceCtxSerializable& resCtx)
 {
     auto* param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);

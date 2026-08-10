@@ -19,7 +19,7 @@ public:
     explicit InsV2AllGatherSoleExecutor();
     ~InsV2AllGatherSoleExecutor() override = default;
 
-    HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
+    HcclResult Orchestrate(const OpParam& param, AlgResourceCtxSerializable& resCtx) override;
 
     /* *************** 资源计算 *************** */
     HcclResult CalcRes(

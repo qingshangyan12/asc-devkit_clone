@@ -488,7 +488,7 @@ HcclResult CommKfcAicpuServer::FormatOpParamFromMsg(
 }
 
 HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+    std::vector<uint8_t>& opParam, mc2_ops_hccl::const AlgResourceCtxSerializable& resCtx)
 {
     LogOpenOpParamBrief("KernelServerBegin", opParam);
     HcclResult ret = LaunchOpenOpParamData(opParam, resCtx);
