@@ -24,7 +24,7 @@ namespace ascendc {
 namespace manifest_generator {
 namespace {
 
-constexpr size_t kTestMaxDirectoryDepth = 64U;
+constexpr size_t TEST_MAX_DIRECTORY_DEPTH = 64U;
 
 using asc_compile_exporter_test::ModuleTest;
 using asc_compile_exporter_test::WriteTestFile;
@@ -108,7 +108,7 @@ TEST_F(ModuleTest, RepositoryEnforcesDirectoryDepthLimit)
 {
     const std::string allowedCollection = FileUtils::JoinPath(root_, "collection-depth-allowed");
     std::string allowedDirectory = allowedCollection;
-    for (size_t depth = 0U; depth < kTestMaxDirectoryDepth; ++depth) {
+    for (size_t depth = 0U; depth < TEST_MAX_DIRECTORY_DEPTH; ++depth) {
         allowedDirectory = FileUtils::JoinPath(allowedDirectory, "level-" + std::to_string(depth));
     }
     WriteTestFile(FileUtils::JoinPath(allowedDirectory, "Deep_manifest.json"), "{\"base_dir\":\".\"}");
@@ -117,7 +117,7 @@ TEST_F(ModuleTest, RepositoryEnforcesDirectoryDepthLimit)
 
     const std::string rejectedCollection = FileUtils::JoinPath(root_, "collection-depth-rejected");
     std::string rejectedDirectory = rejectedCollection;
-    for (size_t depth = 0U; depth <= kTestMaxDirectoryDepth; ++depth) {
+    for (size_t depth = 0U; depth <= TEST_MAX_DIRECTORY_DEPTH; ++depth) {
         rejectedDirectory = FileUtils::JoinPath(rejectedDirectory, "level-" + std::to_string(depth));
     }
     ASSERT_TRUE(FileUtils::CreateDirectories(rejectedDirectory));

@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <cstdint>
 #include <cstring>
 #include <dirent.h>
 #include <memory>
@@ -29,13 +30,13 @@ namespace ascendc {
 namespace manifest_generator {
 namespace {
 
-constexpr uintmax_t kMaxManifestBytes = 8U * 1024U * 1024U;
-constexpr uintmax_t kMaxResourceFileBytes = 1U * 1024U * 1024U;
-constexpr uintmax_t kMaxBundleBytes = 256U * 1024U * 1024U;
-constexpr size_t kMaxManifestCount = 4096U;
-constexpr size_t kMaxFilesPerManifest = 4096U;
-constexpr size_t kMaxFilesPerBundle = 65536U;
-constexpr size_t kMaxDirectoryDepth = 64U;
+constexpr uint32_t MAX_MANIFEST_BYTES = 8U * 1024U * 1024U;
+constexpr uint32_t MAX_RESOURCE_FILE_BYTES = 1U * 1024U * 1024U;
+constexpr uint32_t MAX_BUNDLE_BYTES = 256U * 1024U * 1024U;
+constexpr size_t MAX_MANIFEST_COUNT = 4096U;
+constexpr size_t MAX_FILES_PER_MANIFEST = 4096U;
+constexpr size_t MAX_FILES_PER_BUNDLE = 65536U;
+constexpr size_t MAX_DIRECTORY_DEPTH = 64U;
 
 struct DirectoryCloser {
     void operator()(DIR* directory) const noexcept
@@ -50,10 +51,10 @@ using DirectoryHandle = std::unique_ptr<DIR, DirectoryCloser>;
 
 class ResourceBudget final {
 public:
-    bool AddResource(uintmax_t size, const std::string& field)
+    bool AddResource(uint32_t size, const std::string& field)
     {
-        if (fileCount_ >= kMaxFilesPerBundle) {
-            ASCENDLOGE("Bundle exceeds resource file count limit of %zu", kMaxFilesPerBundle);
+        if (fileCount_ >= MAX_FILES_PER_BUNDLE) {
+            ASCENDLOGE("Bundle exceeds resource file count limit of %zu", MAX_FILES_PER_BUNDLE);
             return false;
         }
         if (!AddPayload(size, field)) {
@@ -63,9 +64,9 @@ public:
         return true;
     }
 
-    bool AddPayload(uintmax_t size, const std::string& field)
+    bool AddPayload(uint32_t size, const std::string& field)
     {
-        if (size > kMaxBundleBytes - totalBytes_) {
+        if (size > MAX_BUNDLE_BYTES - totalBytes_) {
             ASCENDLOGE("Bundle exceeds raw payload limit while adding %s", field.c_str());
             return false;
         }
@@ -74,7 +75,7 @@ public:
     }
 
 private:
-    uintmax_t totalBytes_{0U};
+    uint32_t totalBytes_{0U};
     size_t fileCount_{0U};
 };
 
@@ -127,8 +128,8 @@ bool DiscoverManifestFilesBelow(const std::string& directory, std::vector<std::s
             continue;
         }
         if (S_ISDIR(info.st_mode)) {
-            if (depth >= kMaxDirectoryDepth) {
-                ASCENDLOGE("Collection exceeds directory depth limit of %zu: %s", kMaxDirectoryDepth, path.c_str());
+            if (depth >= MAX_DIRECTORY_DEPTH) {
+                ASCENDLOGE("Collection exceeds directory depth limit of %zu: %s", MAX_DIRECTORY_DEPTH, path.c_str());
                 return false;
             }
             if (!DiscoverManifestFilesBelow(path, manifests, depth + 1U)) {
@@ -139,8 +140,8 @@ bool DiscoverManifestFilesBelow(const std::string& directory, std::vector<std::s
         if (!S_ISREG(info.st_mode) || !IsManifestFile(path)) {
             continue;
         }
-        if (manifests.size() >= kMaxManifestCount) {
-            ASCENDLOGE("Collection exceeds manifest count limit of %zu", kMaxManifestCount);
+        if (manifests.size() >= MAX_MANIFEST_COUNT) {
+            ASCENDLOGE("Collection exceeds manifest count limit of %zu", MAX_MANIFEST_COUNT);
             return false;
         }
         manifests.push_back(path);
@@ -188,9 +189,9 @@ bool LoadResourceFiles(
             return false;
         }
         if (S_ISDIR(info.st_mode)) {
-            if (depth >= kMaxDirectoryDepth) {
+            if (depth >= MAX_DIRECTORY_DEPTH) {
                 ASCENDLOGE(
-                    "Manifest resources exceed directory depth limit of %zu: %s", kMaxDirectoryDepth, source.c_str());
+                    "Manifest resources exceed directory depth limit of %zu: %s", MAX_DIRECTORY_DEPTH, source.c_str());
                 return false;
             }
             if (!LoadResourceFiles(source, manifestRoot, manifestPath, budget, unit, depth + 1U)) {
@@ -203,7 +204,7 @@ bool LoadResourceFiles(
             return false;
         }
         std::vector<uint8_t> data;
-        if (!FileUtils::ReadRegularFile(source, kMaxResourceFileBytes, data)) {
+        if (!FileUtils::ReadRegularFile(source, MAX_RESOURCE_FILE_BYTES, data)) {
             ASCENDLOGE("Failed to read permitted manifest resource: %s", source.c_str());
             return false;
         }
@@ -211,11 +212,11 @@ bool LoadResourceFiles(
             ASCENDLOGD("Skipping empty manifest resource %s", source.c_str());
             continue;
         }
-        if (unit.files.size() >= kMaxFilesPerManifest) {
+        if (unit.files.size() >= MAX_FILES_PER_MANIFEST) {
             ASCENDLOGE("Manifest exceeds resource file count limit: %s", manifestPath.c_str());
             return false;
         }
-        if (!budget.AddResource(data.size(), "manifest resource " + source)) {
+        if (!budget.AddResource(static_cast<uint32_t>(data.size()), "manifest resource " + source)) {
             return false;
         }
         ResourceFile file;
@@ -231,11 +232,11 @@ bool LoadUnit(const std::string& manifestPath, ResourceBudget& budget, ManifestU
 {
     ASCENDLOGD("Loading manifest %s", manifestPath.c_str());
     std::vector<uint8_t> manifestBytes;
-    if (!FileUtils::ReadRegularFile(manifestPath, kMaxManifestBytes, manifestBytes)) {
+    if (!FileUtils::ReadRegularFile(manifestPath, MAX_MANIFEST_BYTES, manifestBytes)) {
         ASCENDLOGE("Failed to read permitted manifest: %s", manifestPath.c_str());
         return false;
     }
-    if (!budget.AddPayload(manifestBytes.size(), "manifest " + manifestPath)) {
+    if (!budget.AddPayload(static_cast<uint32_t>(manifestBytes.size()), "manifest " + manifestPath)) {
         return false;
     }
     unit.json.assign(manifestBytes.begin(), manifestBytes.end());
