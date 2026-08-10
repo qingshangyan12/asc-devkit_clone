@@ -9,7 +9,6 @@
 # ----------------------------------------------------------------------------------------------------------
 
 add_cann_third_party(makeself-fetch)
-add_cann_third_party(json)
 
 set(script_prefix ${CMAKE_CURRENT_SOURCE_DIR}/scripts/package/scripts/)
 install(DIRECTORY ${script_prefix}/

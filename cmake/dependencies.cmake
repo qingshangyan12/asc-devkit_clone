@@ -16,6 +16,7 @@ set(CMAKE_MODULE_PATH
 )
 
 add_cann_third_party(boost)
+add_cann_third_party(json)
 
 find_cann_package(unified_dlog REQUIRED)
 find_cann_package(securec REQUIRED)
