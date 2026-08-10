@@ -99,6 +99,7 @@ basic_test_four_targets=(
     ascendc_pyut_compile_trace_log
     generate_hidden_dat_file_ut
     install_adapter_api_ut
+    ascendc_custom_simplified_key_compile_smoke
     run_all_tests_and_clean
     asc_opc_unittest
     ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC

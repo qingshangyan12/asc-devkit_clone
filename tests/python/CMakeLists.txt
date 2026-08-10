@@ -78,6 +78,15 @@ run_python_llt_test(
     COVERAGERC_DIR
 )
 
+add_custom_target(ascendc_custom_simplified_key_compile_smoke
+    COMMAND python3 -m pytest -q
+        ${ASCENDC_DIR}/tests/python/ascendc_compile_smoke/test_custom_simplified_key_build.py
+        --basetemp ${CMAKE_BINARY_DIR}/custom_simplified_key_pytest
+        -s
+    WORKING_DIRECTORY ${ASCENDC_DIR}
+    COMMENT "Run custom simplified key compile smoke test"
+)
+
 set(OPC_BASE "${CMAKE_CURRENT_SOURCE_DIR}")
 file(MAKE_DIRECTORY ${OPC_BASE}/asc_opc/output)
 file(WRITE ${OPC_BASE}/asc_opc/stub/files/kernel_meta/MatMul_build_res.o "")
