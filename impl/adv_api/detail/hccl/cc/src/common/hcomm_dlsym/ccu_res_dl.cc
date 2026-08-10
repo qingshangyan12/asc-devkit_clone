@@ -14,6 +14,23 @@
 #include <stdlib.h>
 
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuGetMemToken, uint64_t srcVa, uint64_t size, uint64_t* tokenInfo);
+DEFINE_WEAK_FUNC(CcuResult, HcommCcuInsResDescCreate, uint32_t dieId, HcommCcuResDescHandle* resDesc);
+DEFINE_WEAK_FUNC(CcuResult, HcommCcuInsResDescDestroy, HcommCcuResDescHandle resDesc);
+DEFINE_WEAK_FUNC(
+    CcuResult, HcommCcuKernelQueryResReq, const void* kernelFunc, const void** kernelArgs, uint32_t argNum,
+    HcommCcuResDescHandle resDesc);
+DEFINE_WEAK_FUNC(
+    CcuResult, HcommCcuInsCreate, const HcommCcuResDescHandle* resDescs, uint32_t resDescNum,
+    CcuInsHandle* ccuInsHandle);
+DEFINE_WEAK_FUNC(CcuResult, HcommCcuInsDestroy, CcuInsHandle ccuInsHandle);
 
 // 初始化
-void CcuResDlInit(void* libHcommHandle) { INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuGetMemToken); }
+void CcuResDlInit(void* libHcommHandle)
+{
+    INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuGetMemToken);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuInsResDescCreate);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuInsResDescDestroy);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelQueryResReq);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuInsCreate);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuInsDestroy);
+}

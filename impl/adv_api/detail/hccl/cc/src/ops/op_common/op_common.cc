@@ -43,6 +43,8 @@
 #include "dlhcomm_function.h"
 #include "cann_host_bridge.h"
 #include "ccu_launch_dl.h"
+#include "ccu_res_dl.h"
+#include "hccl_ccu_res_dl.h"
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
 
@@ -1386,15 +1388,11 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
 
 #if MC2_CLIENT_ENABLE_CCU
 namespace {
-HcclResult QueryCcuInsHandle(HcclComm comm, CcuInsHandle& insHandle)
+bool IsOnDemandCcuResourceApiSupported()
 {
-    uint32_t insNum = 0;
-    CHK_RET(HcclCommQueryCcuIns(comm, &insHandle, &insNum));
-    HCCL_INFO("[HcclGetCcuKernel] HcclCommQueryCcuIns returned insNum[%u]", insNum);
-    CHK_PRT_RET(
-        insNum != 1, HCCL_ERROR("[HcclGetCcuKernel] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
-        HCCL_E_INTERNAL);
-    return HCCL_SUCCESS;
+    return HcommIsSupportHcommCcuInsResDescCreate() && HcommIsSupportHcommCcuInsResDescDestroy() &&
+           HcommIsSupportHcommCcuKernelQueryResReq() && HcommIsSupportHcommCcuInsCreate() &&
+           HcommIsSupportHcommCcuInsDestroy() && HcommIsSupportHcclCommAssignCcuIns();
 }
 
 HcclResult ValidateCcuKernelRequest(const AlgResourceRequest& resRequest, u32& totalKernelNum)
@@ -1412,6 +1410,85 @@ HcclResult ValidateCcuKernelRequest(const AlgResourceRequest& resRequest, u32& t
     CHK_PRT_RET(
         resRequest.ccuKernelInfos.empty(), HCCL_ERROR("[HcclGetCcuKernel] no kernel to register!"), HCCL_E_INTERNAL);
     return HCCL_SUCCESS;
+}
+
+HcclResult CreateAndAssignCcuIns(
+    HcclComm comm, const AlgResourceRequest& resRequest, CcuInsHandle& insHandle)
+{
+    // HcommCcuKernelQueryResReq overwrites one descriptor. The KFC path currently
+    // registers exactly one server kernel, so do not silently under-allocate a
+    // shared instance if a future caller supplies multiple kernels here.
+    CHK_PRT_RET(
+        resRequest.ccuKernelInfos.size() != 1,
+        HCCL_ERROR(
+            "[HcclGetCcuKernel] on-demand CCU allocation only supports one kernel, actual[%zu]",
+            resRequest.ccuKernelInfos.size()),
+        HCCL_E_NOT_SUPPORT);
+
+    constexpr uint32_t dieId = 0U;
+    HcommCcuResDescHandle resDesc{0};
+    CcuResult ccuRet = HcommCcuInsResDescCreate(dieId, &resDesc);
+    if (ccuRet != CCU_SUCCESS) {
+        HCCL_ERROR("[HcclGetCcuKernel] HcommCcuInsResDescCreate failed, ccuRet[%d]", ccuRet);
+        return ConvertCcuToHccl(ccuRet);
+    }
+
+    const CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[0];
+    const void* kernelArgs[] = {kernelInfo.kernelArg};
+    constexpr uint32_t kernelArgNum = 1U;
+    ccuRet = HcommCcuKernelQueryResReq(
+        reinterpret_cast<const void*>(kernelInfo.kernelFunc), kernelArgs, kernelArgNum, resDesc);
+    if (ccuRet != CCU_SUCCESS) {
+        HCCL_ERROR("[HcclGetCcuKernel] HcommCcuKernelQueryResReq failed, ccuRet[%d]", ccuRet);
+        (void)HcommCcuInsResDescDestroy(resDesc);
+        return ConvertCcuToHccl(ccuRet);
+    }
+
+    ccuRet = HcommCcuInsCreate(&resDesc, 1U, &insHandle);
+    CcuResult destroyDescRet = HcommCcuInsResDescDestroy(resDesc);
+    if (ccuRet != CCU_SUCCESS) {
+        HCCL_ERROR("[HcclGetCcuKernel] HcommCcuInsCreate failed, ccuRet[%d]", ccuRet);
+        return ConvertCcuToHccl(ccuRet);
+    }
+    if (destroyDescRet != CCU_SUCCESS) {
+        HCCL_ERROR("[HcclGetCcuKernel] HcommCcuInsResDescDestroy failed, ccuRet[%d]", destroyDescRet);
+        (void)HcommCcuInsDestroy(insHandle);
+        insHandle = 0;
+        return ConvertCcuToHccl(destroyDescRet);
+    }
+
+    HcclResult assignRet = HcclCommAssignCcuIns(comm, insHandle);
+    if (assignRet != HCCL_SUCCESS) {
+        HCCL_ERROR("[HcclGetCcuKernel] HcclCommAssignCcuIns failed, hcclRet[%d]", assignRet);
+        (void)HcommCcuInsDestroy(insHandle);
+        insHandle = 0;
+        return assignRet;
+    }
+    HCCL_INFO("[HcclGetCcuKernel] created and assigned on-demand CCU instance[%llu]", insHandle);
+    return HCCL_SUCCESS;
+}
+
+HcclResult QueryOrCreateCcuInsHandle(
+    HcclComm comm, const AlgResourceRequest& resRequest, CcuInsHandle& insHandle)
+{
+    uint32_t insNum = 0;
+    HcclResult queryRet = HcclCommQueryCcuIns(comm, &insHandle, &insNum);
+    if (queryRet == HCCL_SUCCESS) {
+        HCCL_INFO("[HcclGetCcuKernel] HcclCommQueryCcuIns returned insNum[%u]", insNum);
+        CHK_PRT_RET(
+            insNum != 1, HCCL_ERROR("[HcclGetCcuKernel] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
+            HCCL_E_INTERNAL);
+        return HCCL_SUCCESS;
+    }
+    if (queryRet != HCCL_E_UNAVAIL || !IsOnDemandCcuResourceApiSupported()) {
+        HCCL_ERROR(
+            "[HcclGetCcuKernel] no bound CCU instance and on-demand resource APIs are unavailable, hcclRet[%d]",
+            queryRet);
+        return queryRet;
+    }
+
+    HCCL_INFO("[HcclGetCcuKernel] no preallocated CCU instance; creating one on demand");
+    return CreateAndAssignCcuIns(comm, resRequest, insHandle);
 }
 
 HcclResult RegisterCcuDfxOpInfo(HcclComm comm, const OpParam& param)
@@ -1515,11 +1592,10 @@ HcclResult HcclGetCcuKernel(
     HCCL_ERROR("[HcclGetCcuKernel] CCU kernel registration is not supported by mc2_client.");
     return HCCL_E_NOT_SUPPORT;
 #else
-    CcuInsHandle insHandle{0};
-    CHK_RET(QueryCcuInsHandle(comm, insHandle));
-
     u32 totalKernelNum = 0;
     CHK_RET(ValidateCcuKernelRequest(resRequest, totalKernelNum));
+    CcuInsHandle insHandle{0};
+    CHK_RET(QueryOrCreateCcuInsHandle(comm, resRequest, insHandle));
     CHK_RET(RegisterCcuDfxOpInfo(comm, param));
     CHK_RET(RegisterCcuKernels(insHandle, totalKernelNum, resRequest, *resCtxHost));
 
