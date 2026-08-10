@@ -15,6 +15,7 @@ target_include_directories(intf_llt_pub_basic INTERFACE)
 target_compile_definitions(intf_llt_pub_basic INTERFACE
     CFG_BUILD_DEBUG
     _GLIBCXX_USE_CXX11_ABI=0
+    __callee__=
     $<$<BOOL:${ENABLE_GCOV}>:ENABLE_GCOV>
 )
 
