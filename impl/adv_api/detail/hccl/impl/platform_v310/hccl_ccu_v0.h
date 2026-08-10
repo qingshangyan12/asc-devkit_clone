@@ -265,6 +265,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+<<<<<<< HEAD
         if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_AG_PARAM_NUM;
             CcuPrepareForConcurrentAllGatherM2M(&handleParamGM_[handleId]);
@@ -272,6 +273,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             ccuUsedXnNum_ = 10;
             CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
         }
+=======
+        ccuUsedXnNum_ = 15;
+        CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
+>>>>>>> f5610b3dd (test)
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
         ccuUsedXnNum_ = 15;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);

@@ -41,6 +41,13 @@ const uint32_t HBM_PARAM_IDX_7 = 7;
 const uint32_t HBM_PARAM_IDX_8 = 8;
 const uint32_t HBM_PARAM_IDX_9 = 9;
 const uint32_t HBM_PARAM_IDX_10 = 10;
+<<<<<<< HEAD
+=======
+const uint32_t HBM_PARAM_IDX_11 = 11;
+const uint32_t HBM_PARAM_IDX_12 = 12;
+const uint32_t HBM_PARAM_IDX_13 = 13;
+const uint32_t HBM_PARAM_IDX_14 = 14;
+>>>>>>> 2bea8aaba (test)
 
 const uint32_t SINGLE_DIE = 1;
 const uint32_t DOUBLE_DIE = 2;
