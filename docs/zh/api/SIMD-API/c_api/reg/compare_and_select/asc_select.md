@@ -25,30 +25,39 @@
 <!-- end id7 -->
 ## 功能说明
 
-根据mask的比特位值，从源操作数src0，src1中选择元素，得到目的操作数dst。选择的规则为：当mask的比特位为1时，从src0中选取对应位置的数；当mask的比特位为0时，从src1中选取对应位置的数。
-
-计算公式如下：
+根据mask从源操作数src0，src1中选择元素，得到目的操作数dst。选择的规则为：当mask的比特位为1时，从src0中选取对应位置的数；当mask的比特位为0时，从src1中选取对应位置的数。计算公式如下：
 
 $$
-dst_i = (mask_i == 1)\ ?\ src0_i : src1_i
+dst_i = 
+\begin{cases}
+ src0_i, & mask_i = 1 \\
+ src1_i, & mask_i = 0 \\
+\end{cases}
 $$
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_select(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+### 模板原型（占位符形式）
+
+```c
+__simd_callee__ inline void asc_select(vector_<dtype>& dst,
+                                       vector_<dtype> src0,
+                                       vector_<dtype> src1,
+                                       vector_bool mask)
+```
+
+### dtype支持数据类型
+
+dtype支持的数据类型为`bool`、`uint8_t`、`int8_t`、`fp8_e4m3fn_t`、`hifloat8_t`、`fp8_e5m2_t`、`uint16_t`、`int16_t`、`half`、`bfloat16_t`、`uint32_t`、`int32_t`、`float`
+
+### 典型示例
+
+```c
+// 示例：对half矢量数据寄存器执行按掩码选择
+__simd_callee__ inline void asc_select(vector_half& dst,
+                                       vector_half src0,
+                                       vector_half src1,
+                                       vector_bool mask)
 ```
 
 ## 参数说明
@@ -69,7 +78,10 @@ __simd_callee__ inline void asc_select(vector_float& dst, vector_float src0, vec
 
 ## 约束说明
 
-通过mask参数控制的未选中的元素保持源操作数的值而非清零。
+### 通用约束
+
+- 通过mask参数控制的未选中的元素保持源操作数的值而非清零。
+- src0、src1和dst的数据类型需要保持一致。
 
 ## 调用示例
 

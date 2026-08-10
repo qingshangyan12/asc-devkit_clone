@@ -26,27 +26,60 @@
 
 ## 功能说明
 
-根据mask对源操作数src进行归约求和操作，用于将src中的所有参与计算的元素求和，得到的结果保存在dst中的0位置。
+根据mask对源操作数src进行归约求和操作，用于将src中的所有参与计算的元素求和，得到的结果保存在dst中的0位置。参考伪代码：
+
+```python
+def asc_reduce_sum(dst, src, mask):
+    sum_val = 0
+    for i in range(128):
+        if mask[i]:
+            sum_val = sum_val + src[i]  # 底层为二叉树累加, 此处顺序展开仅作示意
+    dst[0] = sum_val                    # 求和值
+    for i in range(1, 128):
+        dst[i] = 0                      # 其余位置置0
+```
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_reduce_sum(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum(vector_float& dst, vector_float src, vector_bool mask)
+### 模板原型（占位符形式）
+
+本接口使用`<src_dtype>`和`<dst_dtype>`分别表示源操作数和目的操作数的数据类型，模板原型如下：
+
+```c
+__simd_callee__ inline void asc_reduce_sum(vector_<dst_dtype>& dst,
+                                           vector_<src_dtype> src,
+                                           vector_bool mask)
+```
+
+#### src_dtype与dst_dtype支持组合
+
+| src_dtype | dst_dtype |
+| --------- | --------- |
+| `int16_t` | `int32_t` |
+| `int32_t` | `int32_t` |
+| `uint16_t` | `uint32_t` |
+| `uint32_t` | `uint32_t` |
+| `half` | `half` |
+| `float` | `float` |
+
+### 典型示例
+
+```c
+// 示例：float类型归约求和
+__simd_callee__ inline void asc_reduce_sum(vector_float& dst,
+                                           vector_float src,
+                                           vector_bool mask)
 ```
 
 ## 参数说明
 
 **表1** 参数说明
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
+
+| 参数名 | 输入/输出 | 描述                                     |
+| ------ | --------- | ---------------------------------------- |
+| dst    | 输出      | 目的操作数（矢量数据寄存器）。           |
+| src    | 输入      | 源操作数（矢量数据寄存器）。             |
+| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -55,6 +88,8 @@ __simd_callee__ inline void asc_reduce_sum(vector_float& dst, vector_float src, 
 无
 
 ## 约束说明
+
+### 通用约束
 
 - 指令内累加顺序采用二叉树累加方式，结果连续写入到目的操作数，目的操作数中的其它元素置0。
 - 当所有元素均不参与计算（mask全为0）时，将0写入目的操作数对应位置（特别的，对于浮点数为+0）。

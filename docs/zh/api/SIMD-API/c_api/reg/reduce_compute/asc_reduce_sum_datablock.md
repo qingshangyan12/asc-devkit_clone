@@ -26,27 +26,62 @@
 
 ## 功能说明
 
-将每个DataBlock（32B）中参与计算的元素相加，并将最终的计算结果依次保存在dst的最低位。
+根据mask将每个DataBlock（32B）中参与计算的元素相加，并将最终的计算结果依次保存在dst的最低位。参考伪代码：
+
+```python
+def asc_reduce_sum_datablock(dst, src, mask):
+    num_blocks = 8                      # 128元素 / 16元素每块 = 8块
+    elems_per_block = 16                # 32B / 2B(half) = 16
+    for b in range(num_blocks):
+        sum_val = 0
+        for j in range(elems_per_block):
+            i = b * elems_per_block + j
+            if mask[i]:
+                sum_val = sum_val + src[i]
+        dst[b] = sum_val                # 每块求和值连续写入dst低位
+    for i in range(num_blocks, 128):
+        dst[i] = 0                      # 其余位置置0
+```
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum_datablock(vector_float& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum_datablock(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum_datablock(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
-__simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
+### 模板原型（占位符形式）
+
+```c
+__simd_callee__ inline void asc_reduce_sum_datablock(vector_<dst_dtype>& dst,
+                                                     vector_<src_dtype> src,
+                                                     vector_bool mask)
+```
+
+#### src_dtype与dst_dtype支持组合
+
+| src_dtype | dst_dtype |
+| --------- | --------- |
+| `int16_t` | `int32_t` |
+| `int32_t` | `int32_t` |
+| `uint16_t` | `uint32_t` |
+| `uint32_t` | `uint32_t` |
+| `half` | `half` |
+| `float` | `float` |
+
+### 典型示例
+
+```c
+// 示例：half类型树形归约求和
+__simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst,
+                                                     vector_half src,
+                                                     vector_bool mask)
 ```
 
 ## 参数说明
 
 **表1** 参数说明
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
+
+| 参数名 | 输入/输出 | 描述                                     |
+| ------ | --------- | ---------------------------------------- |
+| dst    | 输出      | 目的操作数（矢量数据寄存器）。           |
+| src    | 输入      | 源操作数（矢量数据寄存器）。             |
+| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -55,6 +90,8 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector
 无
 
 ## 约束说明
+
+### 通用约束
 
 - 指令内累加顺序采用二叉树累加方式，在每个DataBlock（32B）内两两相加逐层归约求和，结果连续写入到目的操作数，目的操作数中的其它元素置0。
 - 当DataBlock中的元素均不参与计算（mask全为0）时，将0写入dst对应位置（对于浮点数则为+0）。

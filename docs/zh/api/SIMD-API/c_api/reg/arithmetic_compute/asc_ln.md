@@ -26,26 +26,42 @@
 
 ## 功能说明
 
-按元素取自然对数，计算公式如下：
+根据mask将源操作数src按元素取自然对数，将结果写入目的操作数dst。计算公式如下：
 $$
 dst_i = ln(src_i)
 $$
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_bool mask)
+### 模板原型（占位符形式）
+
+```c
+__simd_callee__ inline void asc_ln(vector_<dtype>& dst,
+                                   vector_<dtype> src,
+                                   vector_bool mask)
+```
+
+### dtype支持数据类型
+
+dtype支持的数据类型为`half`、`float`
+
+### 典型示例
+
+```c
+// 示例：对half矢量寄存器取自然对数
+__simd_callee__ inline void asc_ln(vector_half& dst,
+                                   vector_half src,
+                                   vector_bool mask)
 ```
 
 ## 参数说明
 
 **表1** 参数说明
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| 参数名 | 输入/输出 | 描述                                                                                                                                     |
+| :----- | :-------- | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| dst    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                                           |
+| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                                             |
+| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -55,7 +71,10 @@ __simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_b
 
 ## 约束说明
 
-mask未筛选的元素在输出中置零。
+### 通用约束
+
+- dst与src的数据类型需要保持一致。
+- mask掩码位为0时，dst对应元素置0。
 
 ## 调用示例
 

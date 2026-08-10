@@ -26,7 +26,22 @@
 
 ## 功能说明
 
-将vector_int32_t类型的源操作数转换为vector_int64_t类型，并写入目的操作数。
+根据mask将src中的每个int32_t类型元素转换为int64_t类型，结果写入dst。伪代码如下：
+```python
+def asc_int322int64(dst, src, mask):
+    for i in range(32):
+        if mask[2 * i]:                  # 偶数索引位置参与计算
+            dst[i] = int64(src[2 * i])   # int32 -> int64 扩展转换
+        else:
+            dst[i] = 0                   # mask未选中, 置零
+
+def asc_int322int64_v2(dst, src, mask):
+    for i in range(32):
+        if mask[2 * i + 1]:              # 奇数索引位置参与计算
+            dst[i] = int64(src[2 * i + 1])
+        else:
+            dst[i] = 0
+```
 
 由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
 
@@ -35,27 +50,40 @@
 - asc_int322int64_v2：取src的奇数索引元素（索引1, 3, 5, ...）进行转换。
 
 
-$$
-dst_i = (int64\_t)src_i
-$$
-
 ## 函数原型
 
-```cpp
-// 取src的偶数索引元素（索引0, 2, 4, ...）进行转换
-__simd_callee__ inline void asc_int322int64(vector_int64_t& dst, vector_int32_t src, vector_bool mask)
-// 取src的奇数索引元素（索引1, 3, 5, ...）进行转换
-__simd_callee__ inline void asc_int322int64_v2(vector_int64_t& dst, vector_int32_t src, vector_bool mask)
+### 模板原型（占位符形式）
+
+本接口包含2种分块位置，模板原型如下：
+
+```c
+__simd_callee__ inline void asc_int322int64<v2_suffix>(vector_int64_t& dst,
+                                                       vector_int32_t src,
+                                                       vector_bool mask)
+```
+
+`<v2_suffix>`为空时，读取src的偶数索引位置元素；取值为`_v2`时，读取src的奇数索引位置元素。
+
+src支持的数据类型为`int32_t`，dst支持的数据类型为`int64_t`
+
+### 典型示例
+
+```c
+// 数据写入索引为偶数的位置
+__simd_callee__ inline void asc_int322int64(vector_int64_t& dst,
+                                            vector_int32_t src,
+                                            vector_bool mask)
 ```
 
 ## 参数说明
 
-**表1** 参数说明
-| 参数名       | 输入/输出 | 描述               |
-| --------- | ----- | ---------------- |
-| dst       | 输出    | 目的操作数（矢量数据寄存器）。            |
-| src | 输入    | 源操作数（矢量数据寄存器）。            |
-| mask     | 输入    | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。        |
+**表1**参数说明
+
+| 参数名 | 输入/输出 | 描述                                                                                                             |
+| ------ | --------- | ---------------------------------------------------------------------------------------------------------------- |
+| dst    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                   |
+| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
+| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -65,7 +93,10 @@ __simd_callee__ inline void asc_int322int64_v2(vector_int64_t& dst, vector_int32
 
 ## 约束说明
 
-mask未筛选的元素在输出中置零。
+### 通用约束
+
+- src与dst的数据类型需要与函数原型匹配。
+- mask掩码位为0时，dst对应元素置0。
 
 ## 调用示例
 
@@ -79,7 +110,8 @@ __simd_vf__ inline void int322int64_vf(__ubuf__ int32_t* src_addr, __ubuf__ int6
         mask = asc_update_mask_b32(count);
         asc_loadalign_postupdate(src, src_addr, one_repeat_size);
         asc_int322int64(dst, src, mask);
-        asc_storealign_pack_postupdate(dst_addr, dst, one_block_size, mask);
+        asc_store(dst_addr, dst);
+        dst_addr += one_block_size;
     }
 }
 ```
