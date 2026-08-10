@@ -134,6 +134,7 @@ struct RsqrtConfig {
 
 constexpr RsqrtConfig DEFAULT_RSQRT_CONFIG = {RsqrtAlgo::INTRINSIC};
 
+constexpr int FTZ_MODE = __ASC_FTZ__;
 namespace Reg {
 enum class RegLayout { UNKNOWN = -1, ZERO, ONE, TWO, THREE };
 
