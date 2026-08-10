@@ -43,6 +43,7 @@ class BinParamBuilder(opdesc_parser.OpDesc):
         self.op_debug_config = ""
         self.op_super_config = []
         self.kernel_template_input = ""
+        self.simplified_key_mode = 0
 
     def set_soc_version(self: any, soc: str):
         self.soc = soc
@@ -507,7 +508,7 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
         compile_file = os.path.realpath(compile_file)
 
         bin_cmd_str = "res=$(asc_opc $1 --main_func={fun} --input_param={param} --soc_version={soc} \
-                --output=$2 --impl_mode={impl} --simplified_key_mode=0 --op_mode=dynamic "
+                --output=$2 --impl_mode={impl} --op_mode=dynamic "
 
         build_cmd_var = "#!/bin/bash\n"
         build_cmd_var += f'echo "[{self.soc}] Generating {bin_file} ..."\n'
@@ -526,6 +527,9 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
             param=param_file,
             impl="high_performance,optional",
         )
+        if self.simplified_key_mode is not None:
+            build_cmd_var += f" --simplified_key_mode={self.simplified_key_mode}"
+
         enable_tiling_keys = False
         if self.tiling_keys:
             tiling_keys_list = sorted(list(self.tiling_keys))
@@ -604,7 +608,7 @@ def _parse_soc_list(compute_unit_str):
 
 
 def _is_soc_match(compute_unit, target_soc):
-    if not compute_unit:
+    if not compute_unit or compute_unit == "ALL":
         return True
     soc_lists = _parse_soc_list(compute_unit)
     return target_soc in soc_lists
@@ -643,6 +647,14 @@ def _process_kernel_template_input_option(op_type, options, kernel_template_inpu
         kernel_template_input_info[op_type] = kernel_template_input
 
 
+def _process_simplified_key_mode_option(op_type, options, simplified_key_mode_info):
+    if "--simplified_key_mode" in options:
+        simplified_key_mode = _extract_option_value(options)
+        simplified_key_mode_info[op_type] = (
+            None if simplified_key_mode == "None" else int(simplified_key_mode)
+        )
+
+
 def _process_opc_options(
     op_type,
     opc_configs,
@@ -652,6 +664,7 @@ def _process_opc_options(
     kernel_json_file,
     input_param_file,
     kernel_template_input_info,
+    simplified_key_mode_info,
 ):
     compute_unit = opc_configs[1]
     if not _is_soc_match(compute_unit, soc):
@@ -665,6 +678,9 @@ def _process_opc_options(
         _process_kernel_template_input_option(
             op_type, options, kernel_template_input_info
         )
+        _process_simplified_key_mode_option(
+            op_type, options, simplified_key_mode_info
+        )
 
 
 def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
@@ -673,6 +689,7 @@ def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
     kernel_json_file = defaultdict(dict)
     input_param_file = defaultdict(dict)
     kernel_template_input_info = defaultdict(dict)
+    simplified_key_mode_info = defaultdict(dict)
 
     if not opc_config_file or not os.path.exists(opc_config_file):
         return (
@@ -681,6 +698,7 @@ def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
             kernel_json_file,
             input_param_file,
             kernel_template_input_info,
+            simplified_key_mode_info,
         )
 
     with open(opc_config_file, "r") as file:
@@ -705,6 +723,7 @@ def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
             kernel_json_file,
             input_param_file,
             kernel_template_input_info,
+            simplified_key_mode_info,
         )
 
     return (
@@ -713,6 +732,7 @@ def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
         kernel_json_file,
         input_param_file,
         kernel_template_input_info,
+        simplified_key_mode_info,
     )
 
 
@@ -749,6 +769,7 @@ def gen_bin_param_file(
         kernel_json_file,
         input_param_file,
         kernel_template_input_info,
+        simplified_key_mode_info,
     ) = parse_op_debug_config(opc_config_file, soc)
     gen_option_config(debug_config, super_config, op_debug_config)
 
@@ -773,6 +794,10 @@ def gen_bin_param_file(
             op_desc.json_file = kernel_json_file[op_desc.op_type]
         if all_soc_key in kernel_json_file:
             op_desc.json_file = kernel_json_file[all_soc_key]
+        if op_desc.op_type in simplified_key_mode_info:
+            op_desc.simplified_key_mode = simplified_key_mode_info[op_desc.op_type]
+        if all_soc_key in simplified_key_mode_info:
+            op_desc.simplified_key_mode = simplified_key_mode_info[all_soc_key]
         if all_soc_key in kernel_template_input_info:
             op_desc.set_kernel_template_input(kernel_template_input_info[all_soc_key])
         if op_desc.op_type in kernel_template_input_info:
