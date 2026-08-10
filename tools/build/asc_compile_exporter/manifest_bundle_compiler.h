@@ -14,25 +14,33 @@
 #include <cstdint>
 #include <string>
 
+#include "manifest_bundle_types.h"
+
 namespace ascendc {
 namespace manifest_generator {
 
 struct BuildCollectedBundleRequest {
     std::string manifestSearchRoot;
-    std::string outputSo;
+    std::string outputPath;
     std::string makeExecutable;
     std::string cxxCompiler;
+    BundleOutputKind outputKind = BundleOutputKind::kSharedObject;
     bool keepTemp = false;
     uint32_t jobs = 0U;
 };
 
 class ManifestBundleCompiler final {
 public:
+    // The request must contain paths, an output kind, and a job count already validated by the caller.
     explicit ManifestBundleCompiler(BuildCollectedBundleRequest request) noexcept;
 
     bool Compile() const;
 
 private:
+    bool BuildBundle(const std::string& workDir, const std::string& output) const;
+    bool PublishBundle(const std::string& staged) const;
+    bool PublishBundleAcrossFileSystems(const std::string& staged) const;
+
     BuildCollectedBundleRequest request_;
 };
 

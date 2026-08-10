@@ -10,6 +10,7 @@
 
 #include <dlfcn.h>
 #include <dirent.h>
+#include <elf.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -27,13 +28,18 @@
 
 #include "ascendc_manifest_abi.h"
 #include "manifest_bundle_compiler.h"
+#include "process_runner.h"
 #include "test_support.h"
 
 namespace {
 
 using asc_compile_exporter_test::ScopedEnvironment;
+using ascendc::ProcessRunner;
 using ascendc::manifest_generator::BuildCollectedBundleRequest;
+using ascendc::manifest_generator::BundleOutputKind;
 using ascendc::manifest_generator::ManifestBundleCompiler;
+
+std::vector<int> g_renameErrors;
 
 std::string JoinTestPath(const std::string& left, const std::string& right)
 {
@@ -137,6 +143,36 @@ std::string ReadFile(const std::string& path)
 
 std::string ToString(const AcString& value) { return std::string(value.data, value.size); }
 
+bool ReadElfType(const std::string& path, uint16_t& type)
+{
+    std::ifstream input(path.c_str(), std::ios::binary);
+    Elf64_Ehdr header{};
+    input.read(reinterpret_cast<char*>(&header), static_cast<std::streamsize>(sizeof(header)));
+    if (input.gcount() != static_cast<std::streamsize>(sizeof(header)) ||
+        std::memcmp(header.e_ident, ELFMAG, SELFMAG) != 0 || header.e_ident[EI_CLASS] != ELFCLASS64) {
+        return false;
+    }
+    type = header.e_type;
+    return true;
+}
+
+} // namespace
+
+extern "C" int __real_rename(const char* oldPath, const char* newPath);
+
+extern "C" int __wrap_rename(const char* oldPath, const char* newPath)
+{
+    if (g_renameErrors.empty()) {
+        return __real_rename(oldPath, newPath);
+    }
+    const int renameError = g_renameErrors.front();
+    g_renameErrors.erase(g_renameErrors.begin());
+    errno = renameError;
+    return -1;
+}
+
+namespace {
+
 class AscCompileExporterTest : public testing::Test {
 protected:
     void SetUp() override
@@ -151,15 +187,21 @@ protected:
         root_ = created;
     }
 
-    void TearDown() override { RemoveTestTree(root_); }
+    void TearDown() override
+    {
+        g_renameErrors.clear();
+        RemoveTestTree(root_);
+    }
 
     BuildCollectedBundleRequest Request() const
     {
+        CreateTestDirectories(JoinTestPath(root_, "output"));
         BuildCollectedBundleRequest request;
         request.manifestSearchRoot = JoinTestPath(root_, "collection");
-        request.outputSo = JoinTestPath(root_, "output/bundle.so");
+        request.outputPath = JoinTestPath(root_, "output/bundle.so");
         request.makeExecutable = "/usr/bin/make";
         request.cxxCompiler = "/usr/bin/c++";
+        request.outputKind = BundleOutputKind::kSharedObject;
         request.keepTemp = false;
         request.jobs = 1U;
         return request;
@@ -181,48 +223,88 @@ protected:
     std::string root_;
 };
 
-TEST_F(AscCompileExporterTest, RejectsMissingBuildExecutables)
+TEST_F(AscCompileExporterTest, ReportsWorkspaceBuildAndPublishFailures)
 {
-    CreateTestDirectories(JoinTestPath(root_, "collection"));
-    BuildCollectedBundleRequest request = Request();
-    request.makeExecutable.clear();
-    ExpectCompileFailure(request);
+    const std::string unit = JoinTestPath(root_, "collection/Failures");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
+    CreateManifest(unit, "Failures");
 
-    request = Request();
-    request.cxxCompiler.clear();
+    {
+        ScopedEnvironment temporary("TMPDIR", "/dev/null");
+        ExpectCompileFailure(Request());
+    }
+
+    BuildCollectedBundleRequest buildFailure = Request();
+    buildFailure.makeExecutable = "/path/that/does/not/exist";
+    ExpectCompileFailure(buildFailure);
+
+    BuildCollectedBundleRequest publishFailure = Request();
+    const std::string victim = JoinTestPath(root_, "victim.so");
+    WriteFile(victim, "victim");
+    ASSERT_EQ(symlink(victim.c_str(), publishFailure.outputPath.c_str()), 0);
+    ExpectCompileFailure(publishFailure);
+}
+
+TEST_F(AscCompileExporterTest, ReportsDirectPublishRenameFailureWithoutReplacingOutput)
+{
+    const std::string unit = JoinTestPath(root_, "collection/PublishFailure");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
+    CreateManifest(unit, "PublishFailure");
+    const BuildCollectedBundleRequest request = Request();
+    WriteFile(request.outputPath, "previous bundle");
+
+    g_renameErrors = {EACCES};
+    ExpectCompileFailure(request);
+    EXPECT_EQ(ReadFile(request.outputPath), "previous bundle");
+}
+
+TEST_F(AscCompileExporterTest, PublishesBundleAfterCrossFileSystemRenameFailure)
+{
+    const std::string unit = JoinTestPath(root_, "collection/CrossFileSystem");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
+    CreateManifest(unit, "CrossFileSystem");
+    const BuildCollectedBundleRequest request = Request();
+    WriteFile(request.outputPath, "previous bundle");
+
+    g_renameErrors = {EXDEV};
+    ASSERT_TRUE(ManifestBundleCompiler(request).Compile());
+    EXPECT_TRUE(IsTestRegularFile(request.outputPath));
+    EXPECT_NE(ReadFile(request.outputPath), "previous bundle");
+}
+
+TEST_F(AscCompileExporterTest, ReportsCrossFileSystemWorkspaceFailure)
+{
+    const std::string unit = JoinTestPath(root_, "collection/CrossFileSystemWorkspaceFailure");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
+    CreateManifest(unit, "CrossFileSystemWorkspaceFailure");
+    BuildCollectedBundleRequest request = Request();
+    request.outputPath = "/proc/asc_compile_exporter_bundle.so";
+
+    g_renameErrors = {EXDEV};
     ExpectCompileFailure(request);
 }
 
-TEST_F(AscCompileExporterTest, RejectsInvalidManifestSearchRoot) { ExpectCompileFailure(Request()); }
-
-TEST_F(AscCompileExporterTest, RejectsOutputWithoutParentDirectory)
+TEST_F(AscCompileExporterTest, ReportsCrossFileSystemFinalRenameFailureWithoutReplacingOutput)
 {
-    CreateTestDirectories(JoinTestPath(root_, "collection"));
-    BuildCollectedBundleRequest request = Request();
-    request.outputSo = "bundle.so";
+    const std::string unit = JoinTestPath(root_, "collection/CrossFileSystemRenameFailure");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
+    CreateManifest(unit, "CrossFileSystemRenameFailure");
+    const BuildCollectedBundleRequest request = Request();
+    WriteFile(request.outputPath, "previous bundle");
+
+    g_renameErrors = {EXDEV, EACCES};
     ExpectCompileFailure(request);
-}
-
-TEST_F(AscCompileExporterTest, RejectsEmptyAndInvalidOutputPaths)
-{
-    CreateTestDirectories(JoinTestPath(root_, "collection"));
-    BuildCollectedBundleRequest emptyOutput = Request();
-    emptyOutput.outputSo.clear();
-    ExpectCompileFailure(emptyOutput);
-
-    BuildCollectedBundleRequest invalidOutput = Request();
-    invalidOutput.outputSo = JoinTestPath(root_, "output/");
-    ExpectCompileFailure(invalidOutput);
+    EXPECT_EQ(ReadFile(request.outputPath), "previous bundle");
 }
 
 TEST_F(AscCompileExporterTest, RejectsMissingManifestWithoutReplacingOutput)
 {
     CreateTestDirectories(JoinTestPath(root_, "collection"));
     const BuildCollectedBundleRequest request = Request();
-    WriteFile(request.outputSo, "previous bundle");
+    WriteFile(request.outputPath, "previous bundle");
 
     ExpectCompileFailure(request);
-    EXPECT_EQ(ReadFile(request.outputSo), "previous bundle");
+    EXPECT_EQ(ReadFile(request.outputPath), "previous bundle");
 }
 
 TEST_F(AscCompileExporterTest, RejectsMalformedJsonWithoutReplacingOutput)
@@ -231,10 +313,10 @@ TEST_F(AscCompileExporterTest, RejectsMalformedJsonWithoutReplacingOutput)
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
     WriteFile(JoinTestPath(unit, "Malformed_manifest.json"), "{\"base_dir\":\"resources\"");
     const BuildCollectedBundleRequest request = Request();
-    WriteFile(request.outputSo, "previous bundle");
+    WriteFile(request.outputPath, "previous bundle");
 
     ExpectCompileFailure(request);
-    EXPECT_EQ(ReadFile(request.outputSo), "previous bundle");
+    EXPECT_EQ(ReadFile(request.outputPath), "previous bundle");
 }
 
 TEST_F(AscCompileExporterTest, RejectsBaseDirectoryOutsideManifestDirectory)
@@ -266,15 +348,16 @@ TEST_F(AscCompileExporterTest, RejectsOversizedResourceWithoutReplacingOutput)
     ASSERT_EQ(truncate(resource.c_str(), 1U * 1024U * 1024U + 1U), 0);
     CreateManifest(unit, "Large");
     const BuildCollectedBundleRequest request = Request();
-    WriteFile(request.outputSo, "previous bundle");
+    WriteFile(request.outputPath, "previous bundle");
 
     ExpectCompileFailure(request);
-    EXPECT_EQ(ReadFile(request.outputSo), "previous bundle");
+    EXPECT_EQ(ReadFile(request.outputPath), "previous bundle");
 }
 
 TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
 {
     ScopedEnvironment temporary("TMPDIR", root_.c_str());
+    ScopedEnvironment cannHome("ASCEND_HOME_PATH", nullptr);
     const std::string first = JoinTestPath(root_, "collection/nested/First");
     const std::string second = JoinTestPath(root_, "collection/Second");
     WriteFile(JoinTestPath(first, "resources/kernel.cpp"), "first source");
@@ -285,15 +368,17 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
     CreateManifest(second, "Second");
 
     const BuildCollectedBundleRequest request = Request();
+    WriteFile(request.outputPath, "previous bundle");
     ASSERT_TRUE(ManifestBundleCompiler(request).Compile());
 
-    ASSERT_TRUE(IsTestRegularFile(request.outputSo));
+    ASSERT_TRUE(IsTestRegularFile(request.outputPath));
+    EXPECT_NE(ReadFile(request.outputPath), "previous bundle");
     const std::vector<std::string> workEntries = ListTestDirectory(root_);
     for (size_t index = 0U; index < workEntries.size(); ++index) {
         EXPECT_NE(workEntries[index].find(".manifest-generator-"), 0U);
     }
 
-    void* handle = dlopen(request.outputSo.c_str(), RTLD_NOW | RTLD_LOCAL);
+    void* handle = dlopen(request.outputPath.c_str(), RTLD_NOW | RTLD_LOCAL);
     const char* loadError = handle == nullptr ? dlerror() : nullptr;
     ASSERT_NE(handle, nullptr) << (loadError == nullptr ? "dlopen failed" : loadError);
     auto getter = reinterpret_cast<AscendcGetCompileResourceBundleFn>(dlsym(handle, "AscendcGetCompileResourceBundle"));
@@ -334,6 +419,43 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
     EXPECT_EQ(dlclose(handle), 0);
 }
 
+TEST_F(AscCompileExporterTest, BuildsRelocatableObjectThatCanBeLinkedIntoSharedLibrary)
+{
+    const std::string unit = JoinTestPath(root_, "collection/Relocatable");
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "relocatable source");
+    CreateManifest(unit, "Relocatable");
+
+    BuildCollectedBundleRequest request = Request();
+    request.outputPath = JoinTestPath(root_, "output/bundle.o");
+    request.outputKind = BundleOutputKind::kRelocatableObject;
+    g_renameErrors = {EXDEV};
+    ASSERT_TRUE(ManifestBundleCompiler(request).Compile());
+    ASSERT_TRUE(IsTestRegularFile(request.outputPath));
+
+    uint16_t elfType = ET_NONE;
+    ASSERT_TRUE(ReadElfType(request.outputPath, elfType));
+    EXPECT_EQ(elfType, ET_REL);
+
+    const std::string linkedBundle = JoinTestPath(root_, "output/linked-bundle.so");
+    ASSERT_TRUE(ProcessRunner::Run({request.cxxCompiler, "-shared", request.outputPath, "-o", linkedBundle}, {}));
+
+    void* handle = dlopen(linkedBundle.c_str(), RTLD_NOW | RTLD_LOCAL);
+    const char* loadError = handle == nullptr ? dlerror() : nullptr;
+    ASSERT_NE(handle, nullptr) << (loadError == nullptr ? "dlopen failed" : loadError);
+    auto getter = reinterpret_cast<AscendcGetCompileResourceBundleFn>(dlsym(handle, "AscendcGetCompileResourceBundle"));
+    ASSERT_NE(getter, nullptr);
+    const auto* bundle = reinterpret_cast<const AcCompileResourceBundle*>(getter());
+    ASSERT_NE(bundle, nullptr);
+    ASSERT_EQ(bundle->manifestCount, 1U);
+    ASSERT_EQ(bundle->manifests[0].fileCount, 1U);
+    EXPECT_EQ(ToString(bundle->manifests[0].files[0].filePath), "resources/kernel.cpp");
+    EXPECT_EQ(
+        std::string(
+            reinterpret_cast<const char*>(bundle->manifests[0].files[0].data), bundle->manifests[0].files[0].size),
+        "relocatable source");
+    EXPECT_EQ(dlclose(handle), 0);
+}
+
 TEST_F(AscCompileExporterTest, KeepsTemporaryWorkspaceWhenRequested)
 {
     ScopedEnvironment temporary("TMPDIR", root_.c_str());
@@ -351,7 +473,7 @@ TEST_F(AscCompileExporterTest, KeepsTemporaryWorkspaceWhenRequested)
         workspaceCount += workEntries[index].find(".manifest-generator-") == 0U ? 1U : 0U;
     }
     EXPECT_EQ(workspaceCount, 1U);
-    EXPECT_TRUE(IsTestRegularFile(request.outputSo));
+    EXPECT_TRUE(IsTestRegularFile(request.outputPath));
 }
 
 } // namespace

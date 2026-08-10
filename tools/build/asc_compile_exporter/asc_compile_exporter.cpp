@@ -8,16 +8,19 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <algorithm>
 #include <cerrno>
 #include <climits>
-#include <cstdlib>
 #include <cstdint>
+#include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <utility>
 
 #include "ascendc_tool_log.h"
+#include "file_utils.h"
 #include "manifest_bundle_compiler.h"
 
 namespace {
@@ -25,16 +28,23 @@ namespace {
 void PrintUsage(const char* program)
 {
     std::cerr << "Usage:\n  " << program
-              << " <manifest_search_root> <out.so> --make <path> --cxx <path>"
-                 " [--keep-temp] [--jobs <N>]\n\n"
-                 "Arguments:\n"
-                 "  <manifest_search_root>  Directory recursively searched for *_manifest.json files.\n"
-                 "  <out.so>                Output shared-library path, including its parent directory.\n"
-                 "  --make <path>           Path to the make executable used to build generated sources.\n"
-                 "  --cxx <path>            Path to the C++ compiler used by the generated Makefile.\n"
-                 "  --keep-temp             Preserve the private build directory under TMPDIR or /tmp.\n"
-                 "  --jobs <N>              Positive make job count, capped at the detected CPU count;\n"
-                 "                            defaults to half the CPU count, with a minimum of one.\n";
+              << " --input-dir <path> --output <path> --make <path> --cxx <path>"
+                 " [--save-temp-files] [--jobs <N>]\n\n"
+                 "Required arguments:\n"
+                 "  --input-dir <path>       Directory recursively searched for *_manifest.json files.\n"
+                 "  --output <path>          Output path ending in .so or .o, including its parent directory.\n"
+                 "  --make <path>            Path to the make executable used to build generated sources.\n"
+                 "  --cxx <path>             Path to the C++ compiler used by the generated Makefile.\n"
+                 "\nOptional arguments:\n"
+                 "  --save-temp-files        Preserve the private build directory under TMPDIR or /tmp.\n"
+                 "  --jobs <N>               Positive make job count, capped at the detected CPU count;\n"
+                 "                             defaults to half the CPU count, with a minimum of one.\n";
+}
+
+bool ReportArgumentError(const char* reason, const std::string& argument)
+{
+    std::cerr << reason << ": " << argument << '\n';
+    return false;
 }
 
 bool ParseJobs(const std::string& text, uint32_t& jobs)
@@ -57,44 +67,146 @@ bool ParseJobs(const std::string& text, uint32_t& jobs)
     return true;
 }
 
-int Run(int argc, char** argv)
+uint32_t ResolveJobCount(uint32_t requested) noexcept
 {
-    if (argc < 3 || argc > 10) {
-        PrintUsage(argv[0]);
-        return 1;
+    const uint32_t reportedCpuCount = static_cast<uint32_t>(std::thread::hardware_concurrency());
+    const uint32_t cpuCount = reportedCpuCount == 0U ? 1U : reportedCpuCount;
+    if (requested != 0U) {
+        return std::min(requested, cpuCount);
     }
-    std::string makeExecutable;
-    std::string cxxCompiler;
-    bool keepTemp = false;
-    uint32_t jobs = 0U;
+    return cpuCount < 2U ? 1U : cpuCount / 2U;
+}
+
+bool ReadOptionValue(int argc, char** argv, int& index, const std::string& option, bool& specified, std::string& value)
+{
+    if (specified) {
+        return ReportArgumentError("Duplicate argument", option);
+    }
+    if (index + 1 >= argc) {
+        return ReportArgumentError("Missing value for argument", option);
+    }
+    const std::string candidate = argv[index + 1];
+    if (candidate.empty()) {
+        return ReportArgumentError("Invalid value for argument", option);
+    }
+    if (candidate.compare(0U, 2U, "--") == 0) {
+        std::cerr << "Missing value for argument " << option << ": " << candidate << '\n';
+        return false;
+    }
+    value = candidate;
+    specified = true;
+    ++index;
+    return true;
+}
+
+bool PrepareOutputPath(
+    const std::string& argument, std::string& output, ascendc::manifest_generator::BundleOutputKind& outputKind)
+{
+    const std::string outputParent = ascendc::FileUtils::ParentPath(argument);
+    const std::string outputName = ascendc::FileUtils::FileName(argument);
+    if (outputParent.empty() || outputName.empty() || outputName == "." || outputName == "..") {
+        return ReportArgumentError("Invalid value for argument --output", argument);
+    }
+    if (outputName.size() >= 3U && outputName.compare(outputName.size() - 3U, 3U, ".so") == 0) {
+        outputKind = ascendc::manifest_generator::BundleOutputKind::kSharedObject;
+    } else if (outputName.size() >= 2U && outputName.compare(outputName.size() - 2U, 2U, ".o") == 0) {
+        outputKind = ascendc::manifest_generator::BundleOutputKind::kRelocatableObject;
+    } else {
+        return ReportArgumentError("Unsupported output suffix for argument --output (expected .so or .o)", argument);
+    }
+    std::string absoluteOutputParent;
+    if (!ascendc::FileUtils::MakeAbsolutePath(outputParent, absoluteOutputParent) ||
+        !ascendc::FileUtils::CreateDirectories(absoluteOutputParent)) {
+        return ReportArgumentError("Invalid value for argument --output", argument);
+    }
+    std::string resolvedOutputParent;
+    if (!ascendc::FileUtils::ResolveDirectory(absoluteOutputParent, resolvedOutputParent)) {
+        return ReportArgumentError("Invalid value for argument --output", argument);
+    }
+    output = ascendc::FileUtils::JoinPath(resolvedOutputParent, outputName);
+    return true;
+}
+
+bool ParseArguments(int argc, char** argv, ascendc::manifest_generator::BuildCollectedBundleRequest& request)
+{
+    ascendc::manifest_generator::BuildCollectedBundleRequest parsed;
+    parsed.jobs = ResolveJobCount(0U);
+    bool inputDirSpecified = false;
+    bool outputSpecified = false;
+    bool makeSpecified = false;
+    bool cxxSpecified = false;
+    bool saveTempFilesSpecified = false;
     bool jobsSpecified = false;
-    for (int index = 3; index < argc; ++index) {
+    for (int index = 1; index < argc; ++index) {
         const std::string argument = argv[index];
-        if (argument == "--keep-temp" && !keepTemp) {
-            keepTemp = true;
-        } else if (argument == "--make" && makeExecutable.empty() && index + 1 < argc) {
-            makeExecutable = argv[++index];
-        } else if (argument == "--cxx" && cxxCompiler.empty() && index + 1 < argc) {
-            cxxCompiler = argv[++index];
-        } else if (argument == "--jobs" && !jobsSpecified && index + 1 < argc && ParseJobs(argv[index + 1], jobs)) {
-            jobsSpecified = true;
-            ++index;
+        std::string value;
+        if (argument == "--input-dir") {
+            if (!ReadOptionValue(argc, argv, index, argument, inputDirSpecified, value)) {
+                return false;
+            }
+            if (!ascendc::FileUtils::ResolveDirectory(value, parsed.manifestSearchRoot)) {
+                return ReportArgumentError("Invalid value for argument --input-dir", value);
+            }
+        } else if (argument == "--output") {
+            if (!ReadOptionValue(argc, argv, index, argument, outputSpecified, value) ||
+                !PrepareOutputPath(value, parsed.outputPath, parsed.outputKind)) {
+                return false;
+            }
+        } else if (argument == "--make") {
+            if (!ReadOptionValue(argc, argv, index, argument, makeSpecified, parsed.makeExecutable)) {
+                return false;
+            }
+        } else if (argument == "--cxx") {
+            if (!ReadOptionValue(argc, argv, index, argument, cxxSpecified, parsed.cxxCompiler)) {
+                return false;
+            }
+        } else if (argument == "--save-temp-files") {
+            if (saveTempFilesSpecified) {
+                return ReportArgumentError("Duplicate argument", argument);
+            }
+            saveTempFilesSpecified = true;
+            parsed.keepTemp = true;
+        } else if (argument == "--jobs") {
+            if (!ReadOptionValue(argc, argv, index, argument, jobsSpecified, value)) {
+                return false;
+            }
+            uint32_t jobs = 0U;
+            if (!ParseJobs(value, jobs)) {
+                return ReportArgumentError("Invalid value for argument --jobs", value);
+            }
+            parsed.jobs = ResolveJobCount(jobs);
         } else {
-            PrintUsage(argv[0]);
-            return 1;
+            return ReportArgumentError("Unable to parse argument", argument);
         }
     }
-    if (makeExecutable.empty() || cxxCompiler.empty()) {
+
+    bool complete = true;
+    if (!inputDirSpecified) {
+        complete = ReportArgumentError("Missing required argument", "--input-dir");
+    }
+    if (!outputSpecified) {
+        complete = ReportArgumentError("Missing required argument", "--output");
+    }
+    if (!makeSpecified) {
+        complete = ReportArgumentError("Missing required argument", "--make");
+    }
+    if (!cxxSpecified) {
+        complete = ReportArgumentError("Missing required argument", "--cxx");
+    }
+    if (!complete) {
+        return false;
+    }
+    request = std::move(parsed);
+    return true;
+}
+
+int Run(int argc, char** argv)
+{
+    ascendc::manifest_generator::BuildCollectedBundleRequest request;
+    if (!ParseArguments(argc, argv, request)) {
         PrintUsage(argv[0]);
         return 1;
     }
-    ascendc::manifest_generator::BuildCollectedBundleRequest request;
-    request.manifestSearchRoot = argv[1];
-    request.outputSo = argv[2];
-    request.makeExecutable = std::move(makeExecutable);
-    request.cxxCompiler = std::move(cxxCompiler);
-    request.keepTemp = keepTemp;
-    request.jobs = jobs;
     ascendc::manifest_generator::ManifestBundleCompiler compiler(std::move(request));
     if (!compiler.Compile()) {
         return 1;

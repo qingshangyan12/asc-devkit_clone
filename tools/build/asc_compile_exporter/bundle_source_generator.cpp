@@ -42,8 +42,9 @@ bool FinishGeneratedOutput(std::ofstream& output, const std::string& path)
 
 } // namespace
 
-BundleSourceGenerator::BundleSourceGenerator(std::string workDir, const std::vector<ManifestUnit>& units) noexcept
-    : workDir_(std::move(workDir)), units_(units)
+BundleSourceGenerator::BundleSourceGenerator(
+    std::string workDir, const std::vector<ManifestUnit>& units, BundleOutputKind outputKind) noexcept
+    : workDir_(std::move(workDir)), units_(units), outputKind_(outputKind)
 {}
 
 bool BundleSourceGenerator::Generate() const
@@ -182,11 +183,15 @@ bool BundleSourceGenerator::EmitMakefile(const std::string& path) const
     }
     output << "\nOBJECTS := $(SOURCES:.cpp=.o)\n\n"
               ".PHONY: all\n"
-              "all: $(OBJECTS)\n"
-              "\t\"$${ASCENDC_BUNDLE_CXX}\" -shared $(OBJECTS) "
-              "-Wl,-z,relro,-z,now,-z,noexecstack "
-              "-o \"$${ASCENDC_BUNDLE_OUTPUT}\"\n\n"
-              "%.o: %.cpp\n"
+              "all: $(OBJECTS)\n";
+    if (outputKind_ == BundleOutputKind::kSharedObject) {
+        output << "\t\"$${ASCENDC_BUNDLE_CXX}\" -shared $(OBJECTS) "
+                  "-Wl,-z,relro,-z,now,-z,noexecstack "
+                  "-o \"$${ASCENDC_BUNDLE_OUTPUT}\"\n\n";
+    } else {
+        output << "\t\"$${ASCENDC_BUNDLE_CXX}\" -r $(OBJECTS) -o \"$${ASCENDC_BUNDLE_OUTPUT}\"\n\n";
+    }
+    output << "%.o: %.cpp\n"
               "\t\"$${ASCENDC_BUNDLE_CXX}\" -std=c++11 -fPIC -fvisibility=hidden -O2 -c $< -o $@\n";
     return FinishGeneratedOutput(output, path);
 }

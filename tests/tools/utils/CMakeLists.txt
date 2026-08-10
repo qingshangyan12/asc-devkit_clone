@@ -203,19 +203,15 @@ add_executable(ascendc_ut_asc_compile_exporter
     asc_compile_exporter/test_asc_compile_exporter_unit.cpp
     asc_compile_exporter/test_asc_compile_exporter.cpp
     asc_compile_exporter/test_build_workspace.cpp
-    asc_compile_exporter/test_bundle_publisher.cpp
     asc_compile_exporter/test_bundle_source_generator.cpp
     asc_compile_exporter/test_collected_manifest_repository.cpp
     asc_compile_exporter/test_file_utils.cpp
-    asc_compile_exporter/test_make_bundle_builder.cpp
     asc_compile_exporter/test_manifest_bundle_types.cpp
     asc_compile_exporter/test_process_runner.cpp
     asc_compile_exporter/test_ascendc_tool_log.cpp
     ${ASCENDC_DIR}/tools/build/asc_compile_exporter/build_workspace.cpp
-    ${ASCENDC_DIR}/tools/build/asc_compile_exporter/bundle_publisher.cpp
     ${ASCENDC_DIR}/tools/build/asc_compile_exporter/bundle_source_generator.cpp
     ${ASCENDC_DIR}/tools/build/asc_compile_exporter/collected_manifest_repository.cpp
-    ${ASCENDC_DIR}/tools/build/asc_compile_exporter/make_bundle_builder.cpp
     ${ASCENDC_DIR}/tools/build/asc_compile_exporter/manifest_bundle_compiler.cpp
     ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
     ${ASCENDC_DIR}/tools/build/common/process_runner.cpp

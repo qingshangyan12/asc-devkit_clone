@@ -18,6 +18,11 @@
 namespace ascendc {
 namespace manifest_generator {
 
+enum class BundleOutputKind : uint8_t {
+    kSharedObject,
+    kRelocatableObject,
+};
+
 struct ResourceFile {
     std::string fileName;
     std::string filePath;

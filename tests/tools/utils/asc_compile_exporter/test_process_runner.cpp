@@ -66,7 +66,7 @@ TEST_F(ModuleTest, ProcessRunnerValidatesArgumentsAndPropagatesEnvironment)
     const std::string output = FileUtils::JoinPath(root_, "environment.txt");
     ScopedEnvironment makeFlags("MAKEFLAGS", "must-not-leak");
     ASSERT_TRUE(ProcessRunner::Run(
-        {"/bin/sh", "-c", 
+        {"/bin/sh", "-c",
          "printf '%s|%s' \"$ASC_COMPILE_EXPORTER_UNIT_VALUE\" \"${MAKEFLAGS-unset}\" > "
          "\"$ASC_COMPILE_EXPORTER_UNIT_OUTPUT\""},
         {{"ASC_COMPILE_EXPORTER_UNIT_VALUE", "visible"}, {"ASC_COMPILE_EXPORTER_UNIT_OUTPUT", output}}));

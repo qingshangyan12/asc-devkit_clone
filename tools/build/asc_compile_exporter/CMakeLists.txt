@@ -35,10 +35,8 @@ configure_file(
 add_executable(asc_compile_exporter
   asc_compile_exporter.cpp
   build_workspace.cpp
-  bundle_publisher.cpp
   bundle_source_generator.cpp
   collected_manifest_repository.cpp
-  make_bundle_builder.cpp
   manifest_bundle_compiler.cpp
   ../common/file_utils.cpp
   ../common/process_runner.cpp

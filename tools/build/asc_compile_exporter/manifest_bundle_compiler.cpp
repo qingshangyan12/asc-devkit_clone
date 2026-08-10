@@ -10,99 +10,99 @@
 
 #include "manifest_bundle_compiler.h"
 
-#include <algorithm>
-#include <thread>
+#include <cerrno>
+#include <cstring>
+#include <stdio.h>
 #include <utility>
 #include <vector>
 
 #include "ascendc_tool_log.h"
 #include "build_workspace.h"
-#include "bundle_publisher.h"
 #include "bundle_source_generator.h"
 #include "collected_manifest_repository.h"
 #include "file_utils.h"
-#include "make_bundle_builder.h"
 #include "manifest_bundle_types.h"
+#include "process_runner.h"
 
 namespace ascendc {
 namespace manifest_generator {
-namespace {
-
-uint32_t ResolveJobCount(uint32_t requested) noexcept
-{
-    const uint32_t reportedCpuCount = static_cast<uint32_t>(std::thread::hardware_concurrency());
-    const uint32_t cpuCount = reportedCpuCount == 0U ? 1U : reportedCpuCount;
-    if (requested != 0U) {
-        return std::min(requested, cpuCount);
-    }
-    return cpuCount < 2U ? 1U : cpuCount / 2U;
-}
-
-} // namespace
 
 ManifestBundleCompiler::ManifestBundleCompiler(BuildCollectedBundleRequest request) noexcept
     : request_(std::move(request))
 {}
 
+bool ManifestBundleCompiler::BuildBundle(const std::string& workDir, const std::string& output) const
+{
+    ASCENDLOGD(
+        "Building bundle with make=%s compiler=%s jobs=%u", request_.makeExecutable.c_str(),
+        request_.cxxCompiler.c_str(), request_.jobs);
+    if (!ProcessRunner::Run(
+            {request_.makeExecutable, "-C", workDir, "-f", "Makefile", "-B", "-j" + std::to_string(request_.jobs)},
+            {{"ASCENDC_BUNDLE_CXX", request_.cxxCompiler}, {"ASCENDC_BUNDLE_OUTPUT", output}})) {
+        return false;
+    }
+    ASCENDLOGI("Built staged compile resource bundle %s", output.c_str());
+    return true;
+}
+
+bool ManifestBundleCompiler::PublishBundle(const std::string& staged) const
+{
+    // Prefer rename because replacing the output is atomic when both paths are on the same filesystem.
+    if (!FileUtils::CheckNonSymlink(request_.outputPath)) {
+        ASCENDLOGE("Bundle output must not be a symlink and must be inspectable: %s", request_.outputPath.c_str());
+        return false;
+    }
+    if (rename(staged.c_str(), request_.outputPath.c_str()) == 0) {
+        ASCENDLOGI("Published compile resource bundle %s", request_.outputPath.c_str());
+        return true;
+    }
+    if (errno != EXDEV) {
+        const int publishError = errno;
+        ASCENDLOGE("Failed to publish bundle output: %s", std::strerror(publishError));
+        return false;
+    }
+
+    // rename cannot cross filesystems. Copy into the output filesystem before renaming again.
+    if (!PublishBundleAcrossFileSystems(staged)) {
+        return false;
+    }
+    ASCENDLOGI("Published compile resource bundle %s", request_.outputPath.c_str());
+    return true;
+}
+
+bool ManifestBundleCompiler::PublishBundleAcrossFileSystems(const std::string& staged) const
+{
+    ASCENDLOGD("Copying staged bundle across filesystems: %s -> %s", staged.c_str(), request_.outputPath.c_str());
+    // A private workspace under the output parent places the copied file on the output filesystem.
+    BuildWorkspace publishWorkspace;
+    if (!publishWorkspace.Create(FileUtils::ParentPath(request_.outputPath), false)) {
+        return false;
+    }
+    const std::string copied = FileUtils::JoinPath(publishWorkspace.Session(), FileUtils::FileName(staged));
+    if (!FileUtils::CopyFileExclusive(staged, copied)) {
+        ASCENDLOGE("Failed to copy staged bundle across filesystems: %s", staged.c_str());
+        return false;
+    }
+
+    if (rename(copied.c_str(), request_.outputPath.c_str()) != 0) {
+        const int publishError = errno;
+        ASCENDLOGE("Failed to publish copied bundle output: %s", std::strerror(publishError));
+        return false;
+    }
+    return true;
+}
+
 bool ManifestBundleCompiler::Compile() const
 {
     ASCENDLOGI(
         "Starting bundle generation: manifest_root=%s output=%s keep_temp=%s", request_.manifestSearchRoot.c_str(),
-        request_.outputSo.c_str(), request_.keepTemp ? "true" : "false");
+        request_.outputPath.c_str(), request_.keepTemp ? "true" : "false");
 
-    // Validate required inputs before creating output or temporary directories.
-    if (request_.makeExecutable.empty()) {
-        ASCENDLOGE("Bundle make executable must not be empty");
-        return false;
-    }
-    if (request_.cxxCompiler.empty()) {
-        ASCENDLOGE("Bundle C++ compiler must not be empty");
-        return false;
-    }
-    std::string manifestSearchRoot;
-    if (!FileUtils::ResolveDirectory(request_.manifestSearchRoot, manifestSearchRoot)) {
-        ASCENDLOGE(
-            "Manifest search root must exist, must be a directory, and must not be a symlink: %s",
-            request_.manifestSearchRoot.c_str());
-        return false;
-    }
-
-    // Normalize the output path and reject unsafe targets before starting the expensive build stages.
-    if (request_.outputSo.empty()) {
-        ASCENDLOGE("Bundle output path must not be empty");
-        return false;
-    }
-    const std::string outputParent = FileUtils::ParentPath(request_.outputSo);
-    const std::string outputName = FileUtils::FileName(request_.outputSo);
-    if (outputParent.empty()) {
-        ASCENDLOGE("Bundle output path must include a parent directory");
-        return false;
-    }
-    if (outputName.empty() || outputName == "." || outputName == "..") {
-        ASCENDLOGE("Bundle output path has an invalid file name");
-        return false;
-    }
-    std::string absoluteOutputParent;
-    if (!FileUtils::MakeAbsolutePath(outputParent, absoluteOutputParent)) {
-        ASCENDLOGE("Failed to resolve bundle output directory: %s", outputParent.c_str());
-        return false;
-    }
-    if (!FileUtils::CreateDirectories(absoluteOutputParent)) {
-        ASCENDLOGE("Failed to create bundle output directory: %s", absoluteOutputParent.c_str());
-        return false;
-    }
-    std::string resolvedOutputParent;
-    if (!FileUtils::ResolveDirectory(absoluteOutputParent, resolvedOutputParent)) {
-        ASCENDLOGE("Bundle output directory is unavailable: %s", absoluteOutputParent.c_str());
-        return false;
-    }
-    const std::string output = FileUtils::JoinPath(resolvedOutputParent, outputName);
-    const uint32_t jobs = ResolveJobCount(request_.jobs);
-    ASCENDLOGI("Using %u parallel bundle build job(s)", jobs);
+    ASCENDLOGI("Using %u parallel bundle build job(s)", request_.jobs);
 
     // Load and validate the complete collection before allocating a private build workspace.
     std::vector<ManifestUnit> units;
-    if (!CollectedManifestRepository(manifestSearchRoot).Load(units)) {
+    if (!CollectedManifestRepository(request_.manifestSearchRoot).Load(units)) {
         return false;
     }
     BuildWorkspace workspace;
@@ -113,21 +113,23 @@ bool ManifestBundleCompiler::Compile() const
         ASCENDLOGI("Keeping temporary bundle directory %s", workspace.Session().c_str());
     }
 
-    // Generate isolated translation units and compile them into a staged shared library.
-    if (!BundleSourceGenerator(workspace.Session(), units).Generate()) {
+    // Generate isolated translation units and compile them into a staged output.
+    if (!BundleSourceGenerator(workspace.Session(), units, request_.outputKind).Generate()) {
         return false;
     }
-    const std::string stagedOutput = FileUtils::JoinPath(workspace.Session(), "compile_resource_bundle.so");
-    if (!MakeBundleBuilder(workspace.Session(), stagedOutput, request_.makeExecutable, request_.cxxCompiler, jobs)
-             .Build()) {
+    const std::string stagedName = request_.outputKind == BundleOutputKind::kSharedObject
+                                       ? "compile_resource_bundle.so"
+                                       : "compile_resource_bundle_relocatable.o";
+    const std::string stagedOutput = FileUtils::JoinPath(workspace.Session(), stagedName);
+    if (!BuildBundle(workspace.Session(), stagedOutput)) {
         return false;
     }
 
     // Publish only after a successful build so failures never replace an existing output bundle.
-    if (!BundlePublisher::Publish(stagedOutput, output)) {
+    if (!PublishBundle(stagedOutput)) {
         return false;
     }
-    ASCENDLOGI("Bundle generation completed successfully: %s", output.c_str());
+    ASCENDLOGI("Bundle generation completed successfully: %s", request_.outputPath.c_str());
     return true;
 }
 
