@@ -37,9 +37,21 @@ $$
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_sqrt(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_sqrt(vector_float& dst, vector_float src, vector_bool mask)
+```c
+__simd_callee__ inline void asc_sqrt(vector_<dtype>& dst,
+                                     vector_<dtype> src,
+                                     vector_bool mask)
+```
+
+dtype支持的数据类型为`half`、`float`
+
+### 典型示例
+
+```c
+// 示例：对half矢量寄存器取平方根
+__simd_callee__ inline void asc_sqrt(vector_half& dst,
+                                     vector_half src,
+                                     vector_bool mask)
 ```
 
 ## 参数说明
@@ -60,7 +72,11 @@ __simd_callee__ inline void asc_sqrt(vector_float& dst, vector_float src, vector
 
 ## 约束说明
 
-- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- dst与src的dtype必须完全一致（half、float之一），仅支持浮点dtype，整型与其他dtype触发异常。
+- mask为 `vector_bool` 类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask比特位为0的位置采用清零模式（ZEROING）：dst对应位置写0，不保留src原值也不保留dst原值。
 - 输入为负数时结果为nan。
 - 输入为-0时结果为-0。
 
