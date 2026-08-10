@@ -413,7 +413,7 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuAlgorithmNotRegistered)
     void* opResCtx = nullptr;
     HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
 
-    EXPECT_EQ(ret, HCCL_E_ALG_NOT_REGISTERER);
+    EXPECT_EQ(ret, HCCL_E_ALG_NOT_SUPPORTED);
     EXPECT_EQ(opResCtx, nullptr);
 }
 

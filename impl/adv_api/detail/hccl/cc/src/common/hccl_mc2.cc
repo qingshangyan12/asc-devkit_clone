@@ -221,14 +221,14 @@ HcclResult CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t til
 {
     if (tilingNum > 1) {
         HCCL_WARNING(
-            "[AllocComResourceByTilingCcu] tilingNum[%zu] is not supported in mc2_client.", tilingNum);
+            "[AllocComResourceByTilingCcu] tilingNum[%u] is not supported in mc2_client.", tilingNum);
         return HCCL_E_ALG_NOT_SUPPORTED;
     }
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         std::string algName;
         if (!GetForcedAlgName(ccTiling, algName)) {
-            continue;
+            return HCCL_E_ALG_NOT_SUPPORTED;
         }
         const auto opType = static_cast<HcclCMDType>(ccTiling->opType);
         if (!CollAlgExecRegistryV2::Instance().IsRegistered(opType, algName)) {
