@@ -65,12 +65,12 @@ __simd_callee__ inline void asc_div(vector_uint32_t& dst, vector_uint32_t src0, 
 
 - mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
-- 注意除零错误，结果请参考[Div特殊值/边界值输入的计算结果说明](../../../../附录/Reg矢量计算接口边界值汇总.md#table1325925915217)。
+- 注意除零错误，结果请参考[Div特殊值/边界值输入的计算结果说明](../../../../appendix/reg_vector_compute_interface_boundary_value_summary.md#table1325925915217)。
 
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void div_vf(__ubuf__ half* dst_addr, __ubuf__ half* src0_addr, __ubuf__ half* src1_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+__simd_vf__ inline void div_vf(__ubuf__ half* dst_addr, __ubuf__ half* src0_addr, __ubuf__ half* src1_addr, uint32_t count, int32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half src0;
     vector_half src1;
@@ -81,7 +81,7 @@ __simd_vf__ inline void div_vf(__ubuf__ half* dst_addr, __ubuf__ half* src0_addr
         asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
         asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
         asc_div(dst, src0, src1, mask);
-        asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
     }
 }
 ```
