@@ -8,15 +8,9 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
-#endif
-
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_REG_MASK_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_REG_MASK_H
 
-#include <cstddef>
 #include <cstdint>
 
 #include "tensor_api/experimental/reg/reg_tensor.h"
@@ -33,21 +27,11 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
-template <std::size_t N = 1, typename DataType>
-__simd_callee__ inline reg_tensor<DataType> fill(DataType value, reg_tensor<bool> mask = all_mask<DataType>());
-
-template <std::size_t N = 1, typename DataType>
-__simd_callee__ inline reg_tensor<DataType> fill(reg_tensor<DataType> value,
-                                                 reg_tensor<bool> mask = all_mask<DataType>());
-
 } // namespace te
 } // namespace asc
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/tensor_api/experimental/reg/mask_impl.h"
+#endif
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_REG_MASK_H
-
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H)
-#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
-#endif
