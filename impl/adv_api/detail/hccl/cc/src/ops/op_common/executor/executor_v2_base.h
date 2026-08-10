@@ -43,6 +43,12 @@ public:
 
     virtual HcclResult FastLaunch(const OpParam& param, const CcuFastLaunchCtx* resCtx);
 
+    virtual const std::vector<CcuKernelSubmitInfo>& GetCcuSubmitInfos() const
+    {
+        static const std::vector<CcuKernelSubmitInfo> empty;
+        return empty;
+    }
+
     HcclResult SetTempFastLaunchAddr(
         TemplateFastLaunchCtx& tempFastLaunchCtx, void* inputPtr, void* outputPtr, const HcclMem& hcclBuff) const;
 

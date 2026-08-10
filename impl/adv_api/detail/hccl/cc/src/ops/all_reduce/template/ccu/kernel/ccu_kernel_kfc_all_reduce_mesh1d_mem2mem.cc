@@ -13,6 +13,8 @@
 namespace mc2_ops_hccl {
 using namespace hcomm;
 
+#define AR_DBG_PRINT(fmt, ...) HCCL_INFO("[j_test AR_KERNEL] " fmt, ##__VA_ARGS__)
+
 #define MAX_LOOP_NUM 2
 constexpr int INPUT_XN_ID = 0;
 constexpr int OUTPUT_XN_ID = 1;
@@ -64,6 +66,7 @@ struct KfcAllReduceMesh1DMem2MemContext : CcuKernelCtxBase {
 
 static CcuResult InitResource(KfcAllReduceMesh1DMem2MemContext& ctx)
 {
+    AR_DBG_PRINT("InitResource start, channelCount=%u, rankSize=%u, rankId=%u", ctx.channelCount, ctx.rankSize, ctx.rankId);
     if (ctx.channelCount == 0) {
         HCCL_ERROR("[CcuKfcAllReduceMesh1DMem2Mem] channels is empty!");
         return CcuResult::CCU_E_INTERNAL;
@@ -88,6 +91,7 @@ static CcuResult InitResource(KfcAllReduceMesh1DMem2MemContext& ctx)
     ctx.events.resize(ctx.rankSize);
 
     ctx.resourceAllocated = false;
+    AR_DBG_PRINT("InitResource done");
     return CCU_SUCCESS;
 }
 
@@ -98,6 +102,7 @@ static CcuResult LoadArgs(
     ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
     ccu::Variable goSize3)
 {
+    AR_DBG_PRINT("LoadArgs start");
     ctx.input[ctx.rankId] = inputAddr;
     ctx.output[ctx.rankId] = outputAddr;
     ctx.token[ctx.rankId] = tokenInfo;
@@ -113,11 +118,13 @@ static CcuResult LoadArgs(
     ctx.goSize.loopParam = goSize1;
     ctx.goSize.parallelParam = goSize2;
     ctx.goSize.residual = goSize3;
+    AR_DBG_PRINT("LoadArgs done");
     return CCU_SUCCESS;
 }
 
 static CcuResult PreSync(KfcAllReduceMesh1DMem2MemContext& ctx)
 {
+    AR_DBG_PRINT("PreSync start, channelCount=%u", ctx.channelCount);
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         CCU_CHK_RET(ccu::WriteVariableWithNotify(
             ctx.channels[i], ctx.input[ctx.rankId], INPUT_XN_ID, CKE_IDX_0, 1 << INPUT_XN_ID));
@@ -126,21 +133,26 @@ static CcuResult PreSync(KfcAllReduceMesh1DMem2MemContext& ctx)
         CCU_CHK_RET(ccu::WriteVariableWithNotify(
             ctx.channels[i], ctx.token[ctx.rankId], TOKEN_XN_ID, CKE_IDX_0, 1 << TOKEN_XN_ID));
     }
+    AR_DBG_PRINT("PreSync WriteVariableWithNotify done, waiting NotifyWait");
     uint32_t allBit = (1 << INPUT_XN_ID) | (1 << OUTPUT_XN_ID) | (1 << TOKEN_XN_ID);
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, allBit));
     }
+    AR_DBG_PRINT("PreSync NotifyWait done");
     return CCU_SUCCESS;
 }
 
 static CcuResult PostSync(KfcAllReduceMesh1DMem2MemContext& ctx)
 {
+    AR_DBG_PRINT("PostSync start");
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         CCU_CHK_RET(ccu::NotifyRecord(ctx.channels[i], CKE_IDX_0, 1 << POST_SYNC_ID));
     }
+    AR_DBG_PRINT("PostSync NotifyRecord done, waiting NotifyWait");
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, 1 << POST_SYNC_ID));
     }
+    AR_DBG_PRINT("PostSync NotifyWait done");
     return CCU_SUCCESS;
 }
 
@@ -337,21 +349,26 @@ static CcuResult ReduceLoopGroup(KfcAllReduceMesh1DMem2MemContext& ctx, ccu::Loc
 
 static CcuResult DoLocalReduce(KfcAllReduceMesh1DMem2MemContext& ctx)
 {
+    AR_DBG_PRINT("DoLocalReduce start, rankSize=%u, GROUP_REDUCE_MAX_PIECE_CNT=%u", ctx.rankSize, GROUP_REDUCE_MAX_PIECE_CNT);
     if (ctx.rankSize <= GROUP_REDUCE_MAX_PIECE_CNT) {
+        AR_DBG_PRINT("DoLocalReduce: rankSize<=8, go ReduceLoopGroup");
         ccu::LocalAddr srcLoc;
         srcLoc.addr = ctx.reduceScatterSrc[ctx.rankId].addr;
         srcLoc.token = ctx.reduceScatterSrc[ctx.rankId].token;
         CCU_CHK_RET(ReduceLoopGroup(ctx, srcLoc));
     } else {
+        AR_DBG_PRINT("DoLocalReduce: rankSize>8, go PairwiseLocalReduce");
         CCU_CHK_RET(PairwiseLocalReduce(
             ctx, ctx.localDstMem, ctx.reduceScatterDst, ctx.sliceSize, ctx.dataType, ctx.outputDataType, ctx.reduceOp));
     }
+    AR_DBG_PRINT("DoLocalReduce done");
     return CCU_SUCCESS;
 }
 
 static CcuResult ReduceRmtToLoc(
     KfcAllReduceMesh1DMem2MemContext& ctx, const std::vector<ccu::Variable>& srcAddr, const ccu::Variable& dstAddr)
 {
+    AR_DBG_PRINT("ReduceRmtToLoc start, rankSize=%u, channelCount=%u", ctx.rankSize, ctx.channelCount);
     ccu::Variable scratchOffset;
     if (srcAddr.size() != ctx.channelCount + 1) {
         HCCL_ERROR("[ReduceRmtToLoc] srcAddr.size[%zu] != channels_ size[%zu] +1", srcAddr.size(), ctx.channelCount);
@@ -374,6 +391,7 @@ static CcuResult ReduceRmtToLoc(
         ctx.reduceScatterDst[rankIdx].token = ctx.token[ctx.rankId];
     }
 
+    AR_DBG_PRINT("ReduceRmtToLoc: before Read/EventRecord");
     uint32_t channelIdx = 0;
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
         uint32_t eventIdx = rankIdx / BIT_NUM_PER_CKE;
@@ -395,6 +413,7 @@ static CcuResult ReduceRmtToLoc(
             channelIdx++;
         }
     }
+    AR_DBG_PRINT("ReduceRmtToLoc: Read done, waiting EventWait");
     uint32_t eventNum = (ctx.rankSize + BIT_NUM_PER_CKE - 1) / BIT_NUM_PER_CKE;
     for (uint32_t i = 0; i < eventNum; i++) {
         uint32_t sigNum = BIT_NUM_PER_CKE;
@@ -403,13 +422,16 @@ static CcuResult ReduceRmtToLoc(
         }
         ccu::EventWait(ctx.events[i], (1 << sigNum) - 1);
     }
+    AR_DBG_PRINT("ReduceRmtToLoc: EventWait done, calling DoLocalReduce");
     CCU_CHK_RET(DoLocalReduce(ctx));
+    AR_DBG_PRINT("ReduceRmtToLoc done");
     return CCU_SUCCESS;
 }
 
 static CcuResult BcastLocToRmt(
     KfcAllReduceMesh1DMem2MemContext& ctx, const ccu::Variable& srcAddr, const std::vector<ccu::Variable>& dstAddr)
 {
+    AR_DBG_PRINT("BcastLocToRmt start, rankSize=%u, channelCount=%u", ctx.rankSize, ctx.channelCount);
     if (dstAddr.size() != ctx.channelCount + 1) {
         HCCL_ERROR("[BcastLocToRmt] dstAddr.size[%zu] != channels_ size[%zu] + 1", dstAddr.size(), ctx.channelCount);
         return CCU_E_INTERNAL;
@@ -418,6 +440,7 @@ static CcuResult BcastLocToRmt(
     ctx.srcMem.addr += ctx.sliceOffset;
     ctx.srcMem.token = ctx.token[ctx.rankId];
 
+    AR_DBG_PRINT("BcastLocToRmt: before Write");
     uint32_t channelIdx = 0;
     for (uint32_t rmtId = 0; rmtId < dstAddr.size(); rmtId++) {
         uint32_t eventIdx = rmtId / BIT_NUM_PER_CKE;
@@ -433,6 +456,7 @@ static CcuResult BcastLocToRmt(
             1 << (rmtId % BIT_NUM_PER_CKE));
         channelIdx++;
     }
+    AR_DBG_PRINT("BcastLocToRmt: Write done, waiting EventWait");
     uint32_t eventNum = (ctx.rankSize + BIT_NUM_PER_CKE - 1) / BIT_NUM_PER_CKE;
     for (uint32_t eventIdx = 0; eventIdx < eventNum; eventIdx++) {
         uint32_t sigNum = BIT_NUM_PER_CKE;
@@ -441,18 +465,23 @@ static CcuResult BcastLocToRmt(
         }
         ccu::EventWait(ctx.events[eventIdx], (1 << sigNum) - 1);
     }
+    AR_DBG_PRINT("BcastLocToRmt: EventWait done");
     return CCU_SUCCESS;
 }
 
 static CcuResult DoRepeatAllReduce(KfcAllReduceMesh1DMem2MemContext& ctx)
 {
+    AR_DBG_PRINT("DoRepeatAllReduce start, rankId=%u, rankSize=%u", ctx.rankId, ctx.rankSize);
     if (ctx.rankId != ctx.rankSize - 1) {
         ctx.sliceSize = ctx.normalSliceSize;
     } else {
         ctx.sliceSize = ctx.lastSliceSize;
     }
+    AR_DBG_PRINT("DoRepeatAllReduce: calling ReduceRmtToLoc");
     CCU_CHK_RET(ReduceRmtToLoc(ctx, ctx.input, ctx.output[ctx.rankId]));
+    AR_DBG_PRINT("DoRepeatAllReduce: ReduceRmtToLoc done, calling BcastLocToRmt");
     CCU_CHK_RET(BcastLocToRmt(ctx, ctx.output[ctx.rankId], ctx.output));
+    AR_DBG_PRINT("DoRepeatAllReduce done");
     return CCU_SUCCESS;
 }
 
@@ -477,6 +506,8 @@ CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
     ctx.reduceOp = reduceType;
     InitCcuKernelCtxBase(ctx);
 
+    AR_DBG_PRINT("==== Kernel entry: rankId=%u, rankSize=%u, channelCount=%u, dataType=%u, reduceOp=%u ====",
+                 rankId, rankSize, channelCount, static_cast<uint32_t>(dataType), static_cast<uint32_t>(reduceType));
     HCCL_INFO("[CcuKfcAllReduceMesh1DMem2Mem] AllReduceMeshMem2Mem1D run");
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(LoadArgs(
@@ -485,9 +516,11 @@ CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
         goSize3));
     CCU_CHK_RET(PreSync(ctx));
 
+    AR_DBG_PRINT("Before DoRepeatAllReduce");
     CCU_IF(ctx.mySliceSize != 0) { CCU_CHK_RET(DoRepeatAllReduce(ctx)); }
 
     CCU_CHK_RET(PostSync(ctx));
+    AR_DBG_PRINT("==== Kernel exit: rankId=%u ====", rankId);
     HCCL_INFO("[CcuKfcAllReduceMesh1DMem2Mem] AllReduceMeshMem2Mem1D end");
     return CCU_SUCCESS;
 }

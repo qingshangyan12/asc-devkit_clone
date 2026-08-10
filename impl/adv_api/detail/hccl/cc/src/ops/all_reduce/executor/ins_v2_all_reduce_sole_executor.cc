@@ -42,9 +42,12 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate Start.");
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate Start, engine=%u, opType=%u, algName=%s",
+              static_cast<uint32_t>(param.engine), static_cast<uint32_t>(param.opType), param.algName);
     maxTmpMemSize_ = resCtx.cclMem.size;
     threads_ = resCtx.threads;
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][Orchestrate] threads.size=%zu, cclMem.size=%llu, ccuKernels.size=%zu",
+              threads_.size(), resCtx.cclMem.size, resCtx.ccuKernels.size());
     if (param.engine != CommEngine::COMM_ENGINE_AIV && param.engine != CommEngine::COMM_ENGINE_CCU) {
         CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
     }
@@ -53,18 +56,22 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
     if (dataCount_ > UINT64_MAX / dataTypeSize_) {
         HCCL_ERROR(
-            "[InsV2AllReduceSoleExecutor] dataCount[%llu] * dataTypeSize_[%llu] > UINT64_MAX", dataCount_,
+            "[j_test InsV2AllReduceSoleExecutor] dataCount[%llu] * dataTypeSize_[%llu] > UINT64_MAX", dataCount_,
             dataTypeSize_);
         return HCCL_E_INTERNAL;
     }
     dataSize_ = dataCount_ * dataTypeSize_;
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][Orchestrate] dataCount=%llu, dataSize=%llu, dataTypeSize=%llu",
+              dataCount_, dataSize_, dataTypeSize_);
 
     HcclResult ret = OrchestrateLoop(param, resCtx);
     CHK_PRT_RET(
         ret != HCCL_SUCCESS,
         HCCL_ERROR(
-            "[InsV2AllReduceSoleExecutor] errNo[0x%016llx] AllReduce executor kernel run failed", HCCL_ERROR_CODE(ret)),
+            "[j_test InsV2AllReduceSoleExecutor] errNo[0x%016llx] AllReduce executor kernel run failed", HCCL_ERROR_CODE(ret)),
         ret);
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][Orchestrate] Orchestrate End, ccuSubmitInfos_.size=%zu",
+              ccuSubmitInfos_.size());
     return HCCL_SUCCESS;
 }
 
@@ -72,10 +79,11 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] Start.");
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][OrchestrateLoop] Start.");
     TemplateResource templateAlgRes;
     if (param.engine == COMM_ENGINE_CCU) {
         templateAlgRes.ccuKernels = resCtx.ccuKernels;
+        HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][OrchestrateLoop] CCU mode, ccuKernels.size=%zu", templateAlgRes.ccuKernels.size());
     }
     if (param.engine != CommEngine::COMM_ENGINE_AIV && remoteRankToChannelInfo_.size() > 0) {
         templateAlgRes.channels = remoteRankToChannelInfo_[0];
@@ -105,7 +113,8 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     u64 maxDataSizePerLoop = 0;
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
     u64 transportBoundDataSize = UB_MAX_DATA_SIZE;
-    HCCL_INFO("[InsV2AllReduceSoleExecutor] maxTmpMemSize_ [%u]", maxTmpMemSize_);
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor] maxTmpMemSize_[%llu], templateScratchMultiplier[%u]",
+              maxTmpMemSize_, templateScratchMultiplier);
     if (templateScratchMultiplier != 0) {
         u64 scratchBoundDataSize =
             maxTmpMemSize_ / templateScratchMultiplier / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
@@ -113,12 +122,14 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     } else {
         maxDataSizePerLoop = transportBoundDataSize;
     }
-    CHK_PRT_RET(dataTypeSize_ == 0, HCCL_ERROR("[InsV2AllReduceSoleExecutor] dataTypeSize_ is 0"), HCCL_E_INTERNAL);
+    CHK_PRT_RET(dataTypeSize_ == 0, HCCL_ERROR("[j_test InsV2AllReduceSoleExecutor] dataTypeSize_ is 0"), HCCL_E_INTERNAL);
     u64 maxDataCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
     CHK_PRT_RET(
-        maxDataCountPerLoop == 0, HCCL_ERROR("[InsV2AllReduceSoleExecutor] maxDataCountPerLoop is 0"), HCCL_E_INTERNAL);
+        maxDataCountPerLoop == 0, HCCL_ERROR("[j_test InsV2AllReduceSoleExecutor] maxDataCountPerLoop is 0"), HCCL_E_INTERNAL);
     u64 loopTimes = dataCount_ / maxDataCountPerLoop + static_cast<u64>(dataCount_ % maxDataCountPerLoop != 0);
     u64 processedDataCount = 0;
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][OrchestrateLoop] loopTimes=%llu, maxDataCountPerLoop=%llu",
+              loopTimes, maxDataCountPerLoop);
     for (u64 loop = 0; loop < loopTimes; loop++) {
         u64 currDataCount = (loop == loopTimes - 1) ? dataCount_ - processedDataCount : maxDataCountPerLoop;
         tempAlgParams.count = currDataCount;
@@ -129,16 +140,26 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         tempAlgParams.tailSize = tempAlgParams.sliceSize;
         tempAlgParams.inputSliceStride = 0;
         tempAlgParams.outputSliceStride = 0;
+        HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][OrchestrateLoop] loop[%llu/%llu], currDataCount=%llu, sliceSize=%llu",
+                  loop, loopTimes, currDataCount, tempAlgParams.sliceSize);
         CHK_RET(algTemplate->KernelRun(param, tempAlgParams, templateAlgRes));
+        HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][OrchestrateLoop] loop[%llu] KernelRun done, submitInfos.size=%zu",
+                  loop, templateAlgRes.submitInfos.size());
         processedDataCount += currDataCount;
     }
 
 #ifndef AICPU_COMPILE
     if (loopTimes == 1 && param.engine == CommEngine::COMM_ENGINE_CCU) {
+        HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][OrchestrateLoop] loopTimes==1, CCU mode, saving fast launch ctx.");
         CHK_RET(FastLaunchSaveCtx(param, templateAlgRes));
     }
 #endif
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] End.");
+    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        ccuSubmitInfos_ = templateAlgRes.submitInfos;
+        HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][OrchestrateLoop] stored %zu submitInfos to ccuSubmitInfos_",
+                  ccuSubmitInfos_.size());
+    }
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][OrchestrateLoop] End.");
     return HCCL_SUCCESS;
 }
 
@@ -147,11 +168,11 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunchSaveCtx(
     const OpParam& param, const TemplateResource& templateAlgRes)
 {
-    HCCL_INFO("[InsV2AllReduceSoleExecutor] loopTimes==1, save fast launch ctx.");
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor] loopTimes==1, save fast launch ctx.");
     u32 threadNum = 1;
     u32 ccuKernelNum = templateAlgRes.submitInfos.size();
     if (ccuKernelNum < 1) {
-        HCCL_INFO("[InsV2AllReduceSoleExecutor] ccu kernel num is 0, no need to save.");
+        HCCL_INFO("[j_test InsV2AllReduceSoleExecutor] ccu kernel num is 0, no need to save.");
         return HCCL_SUCCESS;
     }
     u64 size = CcuFastLaunchCtx::GetCtxSize(threadNum, ccuKernelNum);
@@ -173,7 +194,7 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
     const OpParam& param, const CcuFastLaunchCtx* fastLaunchCtx)
 {
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] Start.");
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][FastLaunch] Start.");
     TemplateFastLaunchCtx tempFastLaunchCtx;
     ThreadHandle* threads = fastLaunchCtx->GetThreadHandlePtr();
     tempFastLaunchCtx.threads.assign(threads, threads + fastLaunchCtx->threadNum);
@@ -185,7 +206,7 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
     tempFastLaunchCtx.buffInfo.hcclBuff = param.hcclBuff;
     std::unique_ptr<InsAlgTemplate> algTemplate = std::make_unique<InsAlgTemplate>();
     CHK_RET(algTemplate->FastLaunch(param, tempFastLaunchCtx));
-    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] End.");
+    HCCL_INFO("[j_test InsV2AllReduceSoleExecutor][FastLaunch] End.");
     return HCCL_SUCCESS;
 }
 #endif
