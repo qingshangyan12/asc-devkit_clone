@@ -556,7 +556,7 @@ test pass
 如果输出`test failed`、ACL Error或动态库`not found`类错误，请检查：
 1. CANN环境变量是否已加载（`source /usr/local/Ascend/cann/set_env.sh`）。
 2. 算子是否已按照[部署](#部署)步骤正确部署。
-3. Kernel侧和Host侧代码是否按[Kernel代码](#修改Kernel侧代码)、[Host代码](#修改Tiling与Host侧实现)正确修改。
+3. Kernel侧和Host侧代码是否按[Kernel代码](#修改kernel侧代码)、[Host代码](#修改tiling与host侧实现)正确修改。
 
 ## 下一步指引
 
