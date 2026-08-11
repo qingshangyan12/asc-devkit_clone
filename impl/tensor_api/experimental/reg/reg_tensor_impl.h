@@ -27,7 +27,12 @@ template <typename DataType>
 struct reg_tensor;
 
 template <>
-struct reg_tensor<bool>;
+struct reg_tensor<bool> {
+    using type = bool;
+    using reg_type = vector_bool;
+
+    reg_type reg;
+};
 
 template <>
 struct reg_tensor<bool> {
