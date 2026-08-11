@@ -28,8 +28,6 @@
 namespace asc {
 namespace te {
 
-struct copy_ub_to_l1_trait {};
-
 class copy_ub_to_l1_common {
 protected:
     template <typename T, typename U>
@@ -37,7 +35,7 @@ protected:
                                             int64_t src_stride, int64_t dst_stride)
     {
         copy_ub_to_l1_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
-                                         dst_stride);
+                                       dst_stride);
     }
 };
 

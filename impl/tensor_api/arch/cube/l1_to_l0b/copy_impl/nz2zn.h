@@ -26,44 +26,46 @@
 
 namespace asc {
 namespace te {
+
+template <bool is_b8b4>
 class load_data_l1_to_l0b_nz2zn {
 
 public:
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U>
+    template <const l1_to_l0b_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src) {
         check_template<trait, T, U>();
-        if constexpr (T::layout_type::depth == FIVE_DIM_DATA) {
+        if constexpr (T::layout_type::depth == five_dim_data) {
             batch_load_data_impl<trait, T, U>(dst, src);
-        } else if constexpr (T::layout_type::depth == FOUR_DIM_DATA) {
+        } else if constexpr (T::layout_type::depth == four_dim_data) {
             load_data_impl<trait, T, U>(dst, src);
         } else {
-            static_assert(T::layout_type::depth == FOUR_DIM_DATA || T::layout_type::depth == FIVE_DIM_DATA,
+            static_assert(T::layout_type::depth == four_dim_data || T::layout_type::depth == five_dim_data,
                           "load_data_l1_to_l0b_nz2zn only supports the plain fractal layout "
                           "((col0,col1),(row0,row1)) or the batch layout (B,((col0,col1),(row0,row1))).");
         }
     }
 
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    template <const l1_to_l0b_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(
-        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& copy_shape)
+        const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape)
     {
         check_template<trait, T, U>();
-        auto src_shape = make_slice_shape(coord_src, src.layout(), copy_shape);
-        auto dst_offset = dst.layout()(coord_dst);
-        auto src_offset = src.layout()(coord_src);
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto dst_offset = dst.layout()(dst_coord);
+        auto src_offset = src.layout()(src_coord);
         using dst_type = typename T::element_type;
-        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
+        constexpr uint32_t stride_unit = c0_element<dst_type> * fractal_fixed;
         auto m_step = get<0, 1>(src_shape);
         auto k_step = get_element<attr_info::shape, attr_info::column, 1>(dst.layout()) *
-            get_element<attr_info::shape, attr_info::column, 0>(dst.layout()) / C0_ELEMENT<dst_type>;
-        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) / STRIDE_UNIT;
-        auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst.layout()) / STRIDE_UNIT;
+            get_element<attr_info::shape, attr_info::column, 0>(dst.layout()) / c0_element<dst_type>;
+        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) / stride_unit;
+        auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst.layout()) / stride_unit;
         load_l1_to_l0b_instr::load_data_with_offset<true>(
             dst, src, dst_offset, src_offset, 0, 0, m_step, k_step, src_stride, dst_stride);
     }
 
 private:
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U>
+    template <const l1_to_l0b_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<T, U>();
@@ -79,24 +81,24 @@ private:
         uint16_t k_start_position = 0;
         auto m_step = get_element<attr_info::shape, attr_info::row, 1>(src_layout);
         auto k_step = get_element<attr_info::shape, attr_info::column, 1>(dst_layout)
-                      * get_element<attr_info::shape, attr_info::column, 0>(dst_layout) / C0_ELEMENT<dst_type>;
+                      * get_element<attr_info::shape, attr_info::column, 0>(dst_layout) / c0_element<dst_type>;
         TENSOR_API_DEBUG_CHECK(debug_check_l0_step, m_step, "m_step", "copy_l1_to_l0b nz2zn path");
         TENSOR_API_DEBUG_CHECK(debug_check_l0_step, k_step, "k_step", "copy_l1_to_l0b nz2zn path");
         // Nz -> Zn
-        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
-        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / STRIDE_UNIT;
-        auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout) / STRIDE_UNIT;
+        constexpr uint32_t stride_unit = c0_element<dst_type> * fractal_fixed;
+        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / stride_unit;
+        auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout) / stride_unit;
         load_l1_to_l0b_instr::load_data<true>(dst.data().get(), src.data().get(), m_start_position,
                                                 k_start_position, m_step, k_step, src_stride, dst_stride);
     }
 
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U>
+    template <const l1_to_l0b_trait& trait, typename T, typename U>
     __aicore__ inline static void load_data_impl(const T& dst, const U& src)
     {
         load_data_fractal(dst, src, dst.layout(), src.layout());
     }
 
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U>
+    template <const l1_to_l0b_trait& trait, typename T, typename U>
     __aicore__ inline static void batch_load_data_impl(const T& dst, const U& src)
     {
         auto dst_layout = dst.layout();

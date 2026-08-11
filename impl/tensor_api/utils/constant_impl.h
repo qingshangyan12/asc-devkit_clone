@@ -22,52 +22,25 @@
 #ifndef IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 #define IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 
+#include "tensor_api/utils/utils.h"
 #include "impl/tensor_api/utils/extra_impl.h"
 #include "impl/tensor_api/utils/map_impl.h"
 
 namespace asc {
 namespace te {
-namespace inst {}
 
-using Std::Int;
-using _0 = Std::Int<0>;
-using _1 = Std::Int<1>;
-using _2 = Std::Int<2>;
-using _3 = Std::Int<3>;
-using _4 = Std::Int<4>;
-using _5 = Std::Int<5>;
-using _6 = Std::Int<6>;
-using _7 = Std::Int<7>;
-using _8 = Std::Int<8>;
-using _9 = Std::Int<9>;
-using _10 = Std::Int<10>;
-using _16 = Std::Int<16>;
-using _24 = Std::Int<24>;
-using _32 = Std::Int<32>;
-using _64 = Std::Int<64>;
-using _128 = Std::Int<128>;
-using _256 = Std::Int<256>;
-using _512 = Std::Int<512>;
-using _1024 = Std::Int<1024>;
-using _2048 = Std::Int<2048>;
-using _4096 = Std::Int<4096>;
-
-// Squeeze pattern mark: positions marked with `_` are kept (only `_1` marks a squeeze).
-struct keep_mark {
-    __aicore__ inline constexpr keep_mark() = default;
-};
-inline constexpr keep_mark _{};
-
-constexpr size_t TWO_DIM_DATA = 2;
-constexpr size_t THREE_DIM_DATA = 3;
-constexpr size_t FOUR_DIM_DATA = 4;
-constexpr size_t FIVE_DIM_DATA = 5;
-constexpr size_t FRACTAL_FIXED = 16;
-constexpr size_t MX_SCALE_K0 = 2;
-constexpr uint32_t BLOCK_CUBE = 16;
-constexpr uint64_t HIFLOAT8_MMAD_CTRL_MASK = 0x200000000000ULL;
+constexpr size_t two_dim_data = 2;
+constexpr size_t three_dim_data = 3;
+constexpr size_t four_dim_data = 4;
+constexpr size_t five_dim_data = 5;
+constexpr size_t fractal_fixed = 16;
+constexpr size_t mx_scale_k0 = 2;
+constexpr uint32_t block_cube = 16;
+constexpr uint64_t hifloat8_mmad_ctrl_mask = 0x200000000000ULL;
 
 struct arch_version {
+    static constexpr uint32_t v3510 = 3510;
+    static constexpr uint32_t v2201 = 2201;
     static constexpr uint32_t V3510 = 3510;
     static constexpr uint32_t V2201 = 2201;
 };
@@ -83,28 +56,7 @@ struct get_arch_version {
     }
 };
 
-constexpr uint32_t CURRENT_ARCH_VERSION = get_arch_version{}();
-
-namespace copy_mode {
-struct normal {};
-struct trans {};
-struct trans_b8b4 {};
-}; // namespace copy_mode
-
-namespace location {
-struct invalid {};
-struct gm {};
-struct ub {};
-struct l1 {};
-struct l0a {};
-struct l0b {};
-struct l0scalea {};
-struct l0scaleb {};
-struct l0c {};
-struct bias {};
-struct fixbuf {};
-struct ssbuf {};
-} // namespace location
+constexpr uint32_t current_arch_version = get_arch_version{}();
 
 template <typename T>
 struct is_hardware {
@@ -141,13 +93,14 @@ struct location_attr {
     using bias_attr = __biasbuf__ T*;
     using none_attr = T*;
 
-    using type = Std::tuple<gm_attr, l1_attr, l0a_attr, l0b_attr, l0c_attr, ub_attr, fixbuf_attr, ssbuf_attr, bias_attr>;
+    using type =
+        Std::tuple<gm_attr, l1_attr, l0a_attr, l0b_attr, l0c_attr, ub_attr, fixbuf_attr, ssbuf_attr, bias_attr>;
 
     using location_map = tuple_map<Std::tuple<location::gm, gm_attr>, Std::tuple<location::l1, l1_attr>,
-                                  Std::tuple<location::l0a, l0a_attr>, Std::tuple<location::l0b, l0b_attr>,
-                                  Std::tuple<location::l0scalea, none_attr>, Std::tuple<location::l0scaleb, none_attr>,
-                                  Std::tuple<location::l0c, l0c_attr>, Std::tuple<location::ub, ub_attr>,
-                                  Std::tuple<location::bias, bias_attr>, Std::tuple<location::fixbuf, fixbuf_attr>>;
+                                   Std::tuple<location::l0a, l0a_attr>, Std::tuple<location::l0b, l0b_attr>,
+                                   Std::tuple<location::l0scalea, none_attr>, Std::tuple<location::l0scaleb, none_attr>,
+                                   Std::tuple<location::l0c, l0c_attr>, Std::tuple<location::ub, ub_attr>,
+                                   Std::tuple<location::bias, bias_attr>, Std::tuple<location::fixbuf, fixbuf_attr>>;
 };
 
 template <typename A, typename ProcessedTuple>
@@ -203,10 +156,7 @@ __aicore__ inline constexpr size_t get_c0_size()
 }
 
 template <typename T = Std::ignore_t>
-constexpr size_t C0_SIZE = get_c0_size<T>();
-
-template <typename T>
-constexpr size_t C0_ELEMENT = C0_SIZE<T> / sizeof(T);
+constexpr size_t c0_size = get_c0_size<T>();
 
 // is_integral_constant
 template <typename T>
@@ -220,8 +170,6 @@ constexpr bool is_integral_constant_v = is_integral_constant<T>::value;
 
 } // namespace te
 } // namespace asc
-
-
 
 #endif // IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 

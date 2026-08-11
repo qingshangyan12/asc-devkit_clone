@@ -29,24 +29,24 @@ namespace te {
 
 class copy_l1_to_fixbuf_nd {
 public:
-    template <const copy_l1_to_fixbuf_trait& trait, typename T, typename U>
+    template <const l1_to_fixbuf_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         data_copy_impl<trait, T, U>(dst, src);
     }
 
-    template <const copy_l1_to_fixbuf_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    template <const l1_to_fixbuf_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(
-        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& copy_shape)
+        const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape)
     {
         check_template<trait, T, U>();
         using src_type = typename U::element_type;
         using dst_type = typename T::element_type;
-        constexpr uint32_t ADDR_ALIGN = 128;
-        constexpr uint16_t BURST_UNIT = 64;
-        auto src_shape = make_slice_shape(coord_src, src.layout(), copy_shape);
-        auto dst_offset = dst.layout()(coord_dst);
-        auto src_offset = src.layout()(coord_src);
+        constexpr uint32_t addr_align = 128;
+        constexpr uint16_t burst_unit = 64;
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto dst_offset = dst.layout()(dst_coord);
+        auto src_offset = src.layout()(src_coord);
         uint16_t src_col = get_shape_columns(src_shape);
         uint16_t block_count = get_shape_rows(src_shape);
         uint16_t src_row;
@@ -58,22 +58,22 @@ public:
             src_row = get_element<attr_info::stride, attr_info::row, 1>(src.layout());
             dst_row = get_element<attr_info::stride, attr_info::row, 1>(dst.layout());
         }
-        uint16_t block_len = Std::ceil_align(src_col * sizeof(src_type), ADDR_ALIGN) / BURST_UNIT;
-        uint16_t src_stride = Std::ceil_division(src_row * sizeof(src_type), C0_SIZE<>);
-        uint16_t dst_stride = Std::ceil_align(dst_row * sizeof(dst_type), ADDR_ALIGN) / BURST_UNIT;
+        uint16_t block_len = Std::ceil_align(src_col * sizeof(src_type), addr_align) / burst_unit;
+        uint16_t src_stride = Std::ceil_division(src_row * sizeof(src_type), c0_size<>);
+        uint16_t dst_stride = Std::ceil_align(dst_row * sizeof(dst_type), addr_align) / burst_unit;
         copy_l1_to_fixbuf_instr::data_copy_with_offset(
             dst, src, dst_offset, src_offset, block_count, block_len, src_stride, dst_stride);
     }
 
 private:
-    template <const copy_l1_to_fixbuf_trait& trait, typename T, typename U>
+    template <const l1_to_fixbuf_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_data_type::check_l1_to_fixbuf_data_type<T, U>();
         check_layout_pattern<U, T>();
     }
 
-    template <const copy_l1_to_fixbuf_trait& trait, typename T, typename U>
+    template <const l1_to_fixbuf_trait& trait, typename T, typename U>
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
     {
         check_template<trait, T, U>();
@@ -110,11 +110,14 @@ private:
             dst_row = get_element<attr_info::stride, attr_info::row, 1>(dst_layout);
         }
 
-        uint16_t block_len = Std::ceil_align(src_col * sizeof(src_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
-        uint16_t src_stride = Std::ceil_division(src_row * sizeof(src_type), C0_SIZE<>);
-        uint16_t dst_stride = Std::ceil_align(dst_row * sizeof(dst_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
+        uint16_t block_len =
+            Std::ceil_align(src_col * sizeof(src_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
+        uint16_t src_stride = Std::ceil_division(src_row * sizeof(src_type), c0_size<>);
+        uint16_t dst_stride =
+            Std::ceil_align(dst_row * sizeof(dst_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
 
-        copy_l1_to_fixbuf_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride, dst_stride);
+        copy_l1_to_fixbuf_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
+                                              dst_stride);
     }
 };
 

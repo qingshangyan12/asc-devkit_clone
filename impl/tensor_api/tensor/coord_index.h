@@ -28,8 +28,8 @@
 namespace asc {
 namespace te {
 
-template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto crd2idx(const T& coord, const U& shape, const S& stride);
+template <typename Coord, typename Shape, typename Stride>
+__aicore__ inline constexpr auto crd2idx(const Coord& coord, const Shape& shape, const Stride& stride);
 
 template <typename T, typename U, typename S, size_t... Is>
 __aicore__ inline constexpr auto crd2idx_ttt(const T& coord, const U& shape, const S& stride,
@@ -56,26 +56,35 @@ __aicore__ inline constexpr auto crd2idx_itt(const T& coord, const U& shape, con
     }
 }
 
-template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto crd2idx(const T& coord, const U& shape, const S& stride)
+template <typename Coord, typename Shape, typename Stride>
+__aicore__ inline constexpr auto crd2idx(const Coord& coord, const Shape& shape, const Stride& stride)
 {
     TENSOR_API_DEBUG_CHECK(debug_check_coord_shape, shape, coord, "crd2idx");
-    if constexpr (Std::is_tuple_v<T>) {
-        if constexpr (Std::is_tuple_v<U>) { // tuple tuple tuple
-            static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "Shape and Coord Mismatched Ranks");
-            static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<S>, "Stride and Coord Mismatched Ranks");
-            return crd2idx_ttt(coord, shape, stride, tuple_sequence<T>{});
+    if constexpr (Std::is_tuple_v<Coord>) {
+        if constexpr (Std::is_tuple_v<Shape>) { // tuple tuple tuple
+            static_assert(Std::tuple_size_v<Coord> == Std::tuple_size_v<Shape>, "Shape and Coord Mismatched Ranks");
+            static_assert(Std::tuple_size_v<Coord> == Std::tuple_size_v<Stride>,
+                          "Stride and Coord Mismatched Ranks");
+            return crd2idx_ttt(coord, shape, stride, tuple_sequence<Coord>{});
         } else { // tuple "int" "int"
-            static_assert(sizeof(T) == 0, "Invalid parameters, U is not tuple!");
+            static_assert(sizeof(Coord) == 0, "Invalid parameters, Shape is not tuple!");
         }
     } else {
-        if constexpr (Std::is_tuple_v<U>) { // "int" tuple tuple
-            static_assert(Std::tuple_size_v<U> == Std::tuple_size_v<S>, "Shape and Stride Mismatched Ranks");
-            return crd2idx_itt(coord, shape, stride, tuple_sequence<U>{});
+        if constexpr (Std::is_tuple_v<Shape>) { // "int" tuple tuple
+            static_assert(Std::tuple_size_v<Shape> == Std::tuple_size_v<Stride>,
+                          "Shape and Stride Mismatched Ranks");
+            return crd2idx_itt(coord, shape, stride, tuple_sequence<Shape>{});
         } else { // "int" "int" "int"
             return coord * stride;
         }
     }
+}
+
+template <typename T, typename U, typename Info>
+template <typename S>
+__aicore__ inline constexpr auto layout<T, U, Info>::operator()(const S& coord) const
+{
+    return crd2idx(coord, shape(), stride());
 }
 
 template <typename T, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
