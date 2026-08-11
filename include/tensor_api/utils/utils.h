@@ -18,6 +18,7 @@
 #include "utils/base/sys_macros.h"
 #include "utils/base/sys_constants.h"
 #include "utils/common_types.h"
+#include "utils/std/type_traits.h"
 
 namespace AscendC {
 namespace Std {}
@@ -28,6 +29,52 @@ namespace te {
 
 namespace Std = AscendC::Std;
 
+using _0 = Std::Int<0>;
+using _1 = Std::Int<1>;
+using _2 = Std::Int<2>;
+using _3 = Std::Int<3>;
+using _4 = Std::Int<4>;
+using _5 = Std::Int<5>;
+using _6 = Std::Int<6>;
+using _7 = Std::Int<7>;
+using _8 = Std::Int<8>;
+using _9 = Std::Int<9>;
+using _10 = Std::Int<10>;
+using _16 = Std::Int<16>;
+using _24 = Std::Int<24>;
+using _32 = Std::Int<32>;
+using _64 = Std::Int<64>;
+using _128 = Std::Int<128>;
+using _256 = Std::Int<256>;
+using _512 = Std::Int<512>;
+using _1024 = Std::Int<1024>;
+using _2048 = Std::Int<2048>;
+using _4096 = Std::Int<4096>;
+
+struct keep_mark {
+    __aicore__ inline constexpr keep_mark() = default;
+};
+inline constexpr keep_mark _{};
+
+namespace location {
+struct invalid {};
+struct gm {};
+struct ub {};
+struct l1 {};
+struct l0a {};
+struct l0b {};
+struct l0scalea {};
+struct l0scaleb {};
+struct l0c {};
+struct bias {};
+struct fixbuf {};
+struct ssbuf {};
+} // namespace location
+
+template <typename T>
+constexpr size_t c0_element =
+    ((Std::is_same_v<T, fp4x2_e1m2_t> || Std::is_same_v<T, fp4x2_e2m1_t>) ? 64 : 32) / sizeof(T);
+
 enum class cache_mode : uint8_t { normal = 0, disable = 4, last = 5, persistent = 6 };
 
 enum class mmad_type : uint8_t { normal = 0, mx = 1 };
@@ -35,8 +82,8 @@ enum class mmad_type : uint8_t { normal = 0, mx = 1 };
 struct mmad_trait {
     __aicore__ constexpr mmad_trait(){};
 
-    __aicore__ constexpr mmad_trait(int32_t fm_offset, bool k_direction_align, bool cmatrix_source,
-                                    bool disable_gemv, asc::te::mmad_type mmad_type) :
+    __aicore__ constexpr mmad_trait(int32_t fm_offset, bool k_direction_align, bool cmatrix_source, bool disable_gemv,
+                                    asc::te::mmad_type mmad_type) :
         fm_offset(fm_offset), k_direction_align(k_direction_align), cmatrix_source(cmatrix_source),
         disable_gemv(disable_gemv), mmad_type(mmad_type){};
 
@@ -50,8 +97,7 @@ struct mmad_trait {
 struct mmad_params {
     __aicore__ constexpr mmad_params(){};
 
-    __aicore__ constexpr mmad_params(uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                     bool cmatrix_init_val) :
+    __aicore__ constexpr mmad_params(uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag, bool cmatrix_init_val) :
         m(m), n(n), k(k), unit_flag(unit_flag), cmatrix_init_val(cmatrix_init_val){};
 
     uint16_t m = 0;

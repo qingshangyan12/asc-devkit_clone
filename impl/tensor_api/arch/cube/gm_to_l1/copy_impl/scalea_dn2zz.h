@@ -32,7 +32,7 @@ public:
     template <const copy_gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
-        if constexpr (U::layout_type::depth == THREE_DIM_DATA || U::layout_type::depth == FIVE_DIM_DATA) {
+        if constexpr (U::layout_type::depth == three_dim_data || U::layout_type::depth == five_dim_data) {
             TENSOR_API_DEBUG_CHECK(debug_check_batch_count, get<0>(src.layout().shape()),
                                    "copy_gm_to_l1 scalea_dn2zz path");
         }
@@ -69,7 +69,7 @@ public:
 
         uint16_t n_value = src_col_shape;
         uint32_t d_value = src_row_shape;
-        uint16_t dst_nz_c0_stride = dst_b_row_stride * sizeof(type) / C0_SIZE<>;
+        uint16_t dst_nz_c0_stride = dst_b_row_stride * sizeof(type) / c0_size<>;
         uint16_t dst_nz_n_stride = 1;
 
         uint64_t loop1_src_stride = src_col_stride * sizeof(type);
@@ -77,7 +77,7 @@ public:
 
         uint16_t loop2_dst_stride = dst_nz_n_stride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3_dst_stride = dst_nz_c0_stride; // loop3_dst_stride = dst_nz_c0_Stride
-        uint16_t loop4_dst_stride = dst_nz_matrix_stride * sizeof(type) / C0_SIZE<>;
+        uint16_t loop4_dst_stride = dst_nz_matrix_stride * sizeof(type) / c0_size<>;
         uint8_t cache_mode = src.engine().get_cache_mode();
         // fp8 scale use b16 for movement
         copy_gm_to_l1_multi_nd2nz_instr::data_copy(

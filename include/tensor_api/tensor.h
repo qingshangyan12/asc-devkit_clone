@@ -20,14 +20,14 @@
 #ifndef INCLUDE_TENSOR_API_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_H
 
+#include "tensor_api/tensor/layout_interface.h"
+#include "tensor_api/tensor/tensor.h"
+#include "tensor_api/tensor/pointer.h"
+#include "tensor_api/utils/utils.h"
 #include "tensor_api/algorithm/copy.h"
 #include "tensor_api/algorithm/mmad.h"
 #include "tensor_api/arch/arch.h"
 #include "tensor_api/atom/atom.h"
-#include "tensor_api/tensor/layout.h"
-#include "tensor_api/tensor/tensor.h"
-#include "tensor_api/tensor/pointer.h"
-#include "tensor_api/utils/utils.h"
 #include "impl/tensor_api/legacy/legacy.h"
 
 #endif // INCLUDE_TENSOR_API_TENSOR_H

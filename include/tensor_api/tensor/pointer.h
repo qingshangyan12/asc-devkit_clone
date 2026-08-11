@@ -21,6 +21,15 @@
 #ifndef INCLUDE_TENSOR_API_TENSOR_POINTER_H
 #define INCLUDE_TENSOR_API_TENSOR_POINTER_H
 
+namespace asc {
+namespace te {
+
+template <typename T>
+using get_mem_location = typename T::iterator::ptr_pattern;
+
+} // namespace te
+} // namespace asc
+
 #include "impl/tensor_api/tensor/pointer_pattern.h"
 
 namespace asc {
