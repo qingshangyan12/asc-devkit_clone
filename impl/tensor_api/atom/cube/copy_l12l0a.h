@@ -35,7 +35,7 @@ struct copy_traits<copy_l1_to_l0a, Traits> : public copy_traits<copy_l1_to_l0a, 
     using base_type::with;
 
     template <typename PadT>
-    __aicore__ inline constexpr auto with(const Img2ColParams<PadT>& params) const
+    __aicore__ inline constexpr auto with(const AscendC::Te::Img2ColParams<PadT>& params) const
     {
         return copy_traits<copy_l1_to_l0a_with, Traits, PadT>{normalize_img2col_params(params)};
     }

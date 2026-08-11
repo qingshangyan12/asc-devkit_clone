@@ -22,30 +22,32 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0A_COPY_IMPL_ZN2NZB8B4_H
 #define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0A_COPY_IMPL_ZN2NZB8B4_H
 
-#include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/instruction.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/zn2nz.h"
 
 namespace asc {
 namespace te {
-class load_data_l1_to_l0a_zn2nz_b8b4 {
+
+template <>
+class load_data_l1_to_l0a_zn2nz<true> {
 public:
     template <const copy_l1_to_l0a_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         check_template<trait, T, U>();
-        if constexpr (T::layout_type::depth == FIVE_DIM_DATA) {
+        if constexpr (T::layout_type::depth == five_dim_data) {
             batch_load_data_impl<trait, T, U>(dst, src);
-        } else if constexpr (T::layout_type::depth == FOUR_DIM_DATA) {
+        } else if constexpr (T::layout_type::depth == four_dim_data) {
             load_data_impl<trait, T, U>(dst, src);
         } else {
-            static_assert(T::layout_type::depth == FOUR_DIM_DATA || T::layout_type::depth == FIVE_DIM_DATA,
-                          "load_data_l1_to_l0a_zn2nz_b8b4 only supports the plain fractal layout "
+            static_assert(T::layout_type::depth == four_dim_data || T::layout_type::depth == five_dim_data,
+                          "load_data_l1_to_l0a_zn2nz<true> only supports the plain fractal layout "
                           "((row0,row1),(col0,col1)) or the batch layout (B,((row0,row1),(col0,col1))).");
         }
     }
 
 private:
-    static constexpr uint8_t M_STEP_MIN_VAL_B4 = 4;
-    static constexpr uint8_t M_STEP_MIN_VAL_B8 = 2;
+    static constexpr uint8_t m_step_min_val_b4 = 4;
+    static constexpr uint8_t m_step_min_val_b8 = 2;
 
     template <const copy_l1_to_l0a_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
@@ -81,23 +83,24 @@ private:
                   - get_element<attr_info::shape, attr_info::row, 1>(dst_layout)
                         * get_element<attr_info::shape, attr_info::row, 0>(dst_layout);
         auto m_step = get_element<attr_info::shape, attr_info::column, 1>(dst_layout)
-                      * get_element<attr_info::shape, attr_info::column, 0>(dst_layout) / FRACTAL_FIXED;
+                      * get_element<attr_info::shape, attr_info::column, 0>(dst_layout) / fractal_fixed;
         auto k_step = get_element<attr_info::shape, attr_info::row, 1>(src_layout);
         TENSOR_API_DEBUG_CHECK(debug_check_l0_step, k_step, "k_step", "copy_l1_to_l0a zn2nz b8/b4 path");
-        TENSOR_API_DEBUG_CHECK(debug_check_l0_m_step, m_step, is_b4_type<dst_type>, "copy_l1_to_l0a zn2nz b8/b4 path");
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_m_step, m_step, is_b4_type<dst_type>,
+                               "copy_l1_to_l0a zn2nz b8/b4 path");
         // Zn -> Nz
-        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
-        auto src_stride = get_element<attr_info::stride, attr_info::row, 1>(src_layout) / STRIDE_UNIT;
-        auto dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / STRIDE_UNIT;
-        if (m1 < FRACTAL_FIXED) {
+        constexpr uint32_t stride_unit = c0_element<dst_type> * fractal_fixed;
+        auto src_stride = get_element<attr_info::stride, attr_info::row, 1>(src_layout) / stride_unit;
+        auto dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / stride_unit;
+        if (m1 < fractal_fixed) {
             TENSOR_API_DEBUG_CHECK(debug_check_l0_step, m_step, "m_step", "copy_l1_to_l0a zn2nz b8/b4 path");
             load_l1_to_l0a_instr::load_data<true>(dst.data().get(), src.data().get(), m_start_position,
                                                     k_start_position, m_step, k_step, src_stride, dst_stride);
         } else if constexpr (is_b4_type<dst_type>) {
-            load_data_impl_split<M_STEP_MIN_VAL_B4>(dst, src, m_start_position, k_start_position, m_step, k_step,
+            load_data_impl_split<m_step_min_val_b4>(dst, src, m_start_position, k_start_position, m_step, k_step,
                                                     src_stride, dst_stride);
         } else {
-            load_data_impl_split<M_STEP_MIN_VAL_B8>(dst, src, m_start_position, k_start_position, m_step, k_step,
+            load_data_impl_split<m_step_min_val_b8>(dst, src, m_start_position, k_start_position, m_step, k_step,
                                                     src_stride, dst_stride);
         }
     }

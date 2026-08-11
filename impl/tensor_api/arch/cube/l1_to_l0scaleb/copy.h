@@ -27,11 +27,11 @@
 namespace asc {
 namespace te {
 
-constexpr copy_l1_to_l0scaleb_trait DEFAULT_COPY_L1_TO_L0SCALEB_TRAIT;
+constexpr copy_l1_to_l0scaleb_trait default_copy_l1_to_l0scaleb_trait;
 
 struct copy_l1_to_l0scaleb_trait_default {
     using trait_type = copy_l1_to_l0scaleb_trait;
-    static constexpr const trait_type value = DEFAULT_COPY_L1_TO_L0SCALEB_TRAIT;
+    static constexpr const trait_type value = default_copy_l1_to_l0scaleb_trait;
 };
 
 struct copy_l1_to_l0scaleb {
@@ -45,15 +45,15 @@ public:
     }
 
 private:
-    template <const copy_l1_to_l0scaleb_trait& trait = DEFAULT_COPY_L1_TO_L0SCALEB_TRAIT, typename T, typename U>
+    template <const copy_l1_to_l0scaleb_trait& trait = default_copy_l1_to_l0scaleb_trait, typename T, typename U>
     __aicore__ inline static void load_data(const T& dst, const U& src)
     {
         using dst_pos = get_mem_location<T>;
         using src_pos = get_mem_location<U>;
         static_assert(Std::is_same_v<dst_pos, location::l0scaleb>,
-                      "When Copy tensor from L1 to L0ScaleB, dst tensor must on L0ScaleB");
+                      "For copy_l1_to_l0scaleb, the destination tensor must be located in L0ScaleB.");
         static_assert(Std::is_same_v<src_pos, location::l1>,
-                      "When Copy tensor from L1 to L0ScaleB, src tensor must on L1");
+                      "For copy_l1_to_l0scaleb, the source tensor must be located in L1.");
         using dst_layout = typename T::layout_type;
         using src_layout = typename U::layout_type;
         using dst_pattern = get_layout_pattern<dst_layout>;
@@ -62,7 +62,7 @@ private:
         TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy_l1_to_l0scaleb");
         TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "copy_l1_to_l0scaleb");
         using copy_l1_to_l0scaleb_impl =
-            typename copy_l1_to_l0scaleb_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern>::type;
+            typename copy_l1_to_l0scaleb_routing<current_arch_version, dst_pattern, src_pattern>::type;
         copy_l1_to_l0scaleb_impl::template run<trait, T, U>(dst, src);
     }
 };

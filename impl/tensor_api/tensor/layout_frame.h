@@ -39,18 +39,6 @@ using layout_format_set =
              Std::tuple<nhwc_layout_ptn, make_nhwc_frame_layout>, Std::tuple<nc1hwc0_layout_ptn, make_nc1hwc0_frame_layout>,
              Std::tuple<ncdhw_layout_ptn, make_ncdhw_frame_layout>, Std::tuple<ndc1hwc0_layout_ptn, make_ndc1hwc0_frame_layout>>;
 
-template <typename T, typename C0>
-struct layout_trait {
-    static constexpr auto C0_ELEMENT = C0{};
-};
-
-template <typename T = uint16_t, typename C0 = Std::Int<C0_ELEMENT<T>>>
-struct layout_trait_default : layout_trait<T, C0> {};
-
-struct layout_trait_scale : layout_trait_default<fp8_e8m0_t, Std::Int<MX_SCALE_K0 / sizeof(fp8_e8m0_t)>> {};
-
-struct layout_trait_fp4 : layout_trait_default<fp4x2_e2m1_t, Std::Int<C0_ELEMENT<fp4x2_e2m1_t>>> {};
-
 using format_trait_set = tuple_map<
     Std::tuple<nz_layout_ptn, layout_trait_default<>>, Std::tuple<nd_layout_ptn, layout_trait<Std::ignore_t, _1>>,
     Std::tuple<dn_layout_ptn, layout_trait<Std::ignore_t, _1>>, Std::tuple<nd_ext_layout_ptn, layout_trait<Std::ignore_t, _1>>,
@@ -70,7 +58,7 @@ template <typename T, typename = void>
 struct is_frame_layout_trait : Std::false_type {};
 
 template <typename T>
-struct is_frame_layout_trait<T, void_t<decltype(T::C0_ELEMENT)>> : Std::true_type {};
+struct is_frame_layout_trait<T, void_t<decltype(T::c0_element)>> : Std::true_type {};
 
 template <typename T>
 constexpr bool is_frame_layout_trait_v = is_frame_layout_trait<T>::value;
@@ -165,7 +153,7 @@ __aicore__ inline constexpr auto make_multi_batch_frame_layout(const Args&... ar
         Std::make_tuple(args...), Std::make_index_sequence<sizeof...(Args) - 2>{});
 }
 
-template <typename LayoutPattern, typename TraitType = Std::ignore_t, typename... Args>
+template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline constexpr decltype(auto) make_frame_layout(const Args&... args)
 {
     using trait = typename trait_conversion<LayoutPattern, TraitType>::type;
@@ -186,14 +174,13 @@ __aicore__ inline constexpr decltype(auto) make_frame_layout(const Args&... args
     return make_frame_layout<LayoutPattern, Std::Int<C0Element>>(args...);
 }
 
-template <typename LayoutPattern, typename TraitType = layout_trait_default<>>
-struct frame_layout_format {
-    template <typename... Args>
-    __aicore__ inline constexpr decltype(auto) operator()(const Args&... args)
-    {
-        return make_frame_layout<LayoutPattern, TraitType>(args...);
-    }
-};
+template <typename LayoutPattern, typename TraitType>
+template <typename... Args>
+__aicore__ inline constexpr decltype(auto) frame_layout_format<LayoutPattern, TraitType>::operator()(
+    const Args&... args)
+{
+    return make_frame_layout<LayoutPattern, TraitType>(args...);
+}
 
 } // namespace te
 } // namespace asc

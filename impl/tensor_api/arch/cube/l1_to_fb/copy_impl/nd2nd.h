@@ -82,7 +82,7 @@ private:
 
         uint16_t block_len =
             Std::ceil_align(src_col * sizeof(src_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
-        uint16_t src_stride = Std::ceil_division(src_row * sizeof(src_type), C0_SIZE<>);
+        uint16_t src_stride = Std::ceil_division(src_row * sizeof(src_type), c0_size<>);
         uint16_t dst_stride =
             Std::ceil_align(dst_row * sizeof(dst_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
 

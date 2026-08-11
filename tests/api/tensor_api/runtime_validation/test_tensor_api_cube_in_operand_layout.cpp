@@ -135,48 +135,48 @@ template <typename ElementType>
 auto make_nz_shape_error(int invalid_shape = 0)
 {
     using namespace asc::te;
-    constexpr auto C0 = C0_ELEMENT<ElementType>;
-    using C0Type = asc::te::Std::Int<C0>;
-    using FractalStrideType = asc::te::Std::Int<C0 * FRACTAL_FIXED>;
+    constexpr auto c0 = c0_element<ElementType>;
+    using c0_type = asc::te::Std::Int<c0>;
+    using fractal_stride_type = asc::te::Std::Int<c0 * fractal_fixed>;
     return make_pattern_layout<nz_layout_ptn, layout_trait_default<ElementType>>(
-        make_shape(make_shape(_16{}, invalid_shape), make_shape(C0Type{}, 1)),
-        make_stride(make_stride(C0Type{}, FractalStrideType{}), make_stride(_1{}, C0 * FRACTAL_FIXED)));
+        make_shape(make_shape(_16{}, invalid_shape), make_shape(c0_type{}, 1)),
+        make_stride(make_stride(c0_type{}, fractal_stride_type{}), make_stride(_1{}, c0 * fractal_fixed)));
 }
 
 template <typename ElementType>
 auto make_nz_stride_error()
 {
     using namespace asc::te;
-    constexpr auto C0 = C0_ELEMENT<ElementType>;
-    using C0Type = asc::te::Std::Int<C0>;
-    using FractalStrideType = asc::te::Std::Int<C0 * FRACTAL_FIXED>;
+    constexpr auto c0 = c0_element<ElementType>;
+    using c0_type = asc::te::Std::Int<c0>;
+    using fractal_stride_type = asc::te::Std::Int<c0 * fractal_fixed>;
     return make_pattern_layout<nz_layout_ptn, layout_trait_default<ElementType>>(
-        make_shape(make_shape(_16{}, 1), make_shape(C0Type{}, 1)),
-        make_stride(make_stride(C0Type{}, FractalStrideType{}), make_stride(_1{}, -1)));
+        make_shape(make_shape(_16{}, 1), make_shape(c0_type{}, 1)),
+        make_stride(make_stride(c0_type{}, fractal_stride_type{}), make_stride(_1{}, -1)));
 }
 
 template <typename ElementType>
 auto make_zn_shape_error(int invalid_shape = 0)
 {
     using namespace asc::te;
-    constexpr auto C0 = C0_ELEMENT<ElementType>;
-    using C0Type = asc::te::Std::Int<C0>;
-    using FractalStrideType = asc::te::Std::Int<C0 * FRACTAL_FIXED>;
+    constexpr auto c0 = c0_element<ElementType>;
+    using c0_type = asc::te::Std::Int<c0>;
+    using fractal_stride_type = asc::te::Std::Int<c0 * fractal_fixed>;
     return make_pattern_layout<zn_layout_ptn, layout_trait_default<ElementType>>(
-        make_shape(make_shape(C0Type{}, invalid_shape), make_shape(_16{}, 1)),
-        make_stride(make_stride(_1{}, C0 * FRACTAL_FIXED), make_stride(C0Type{}, FractalStrideType{})));
+        make_shape(make_shape(c0_type{}, invalid_shape), make_shape(_16{}, 1)),
+        make_stride(make_stride(_1{}, c0 * fractal_fixed), make_stride(c0_type{}, fractal_stride_type{})));
 }
 
 template <typename ElementType>
 auto make_zn_stride_error()
 {
     using namespace asc::te;
-    constexpr auto C0 = C0_ELEMENT<ElementType>;
-    using C0Type = asc::te::Std::Int<C0>;
-    using FractalStrideType = asc::te::Std::Int<C0 * FRACTAL_FIXED>;
+    constexpr auto c0 = c0_element<ElementType>;
+    using c0_type = asc::te::Std::Int<c0>;
+    using fractal_stride_type = asc::te::Std::Int<c0 * fractal_fixed>;
     return make_pattern_layout<zn_layout_ptn, layout_trait_default<ElementType>>(
-        make_shape(make_shape(C0Type{}, 1), make_shape(_16{}, 1)),
-        make_stride(make_stride(_1{}, -1), make_stride(C0Type{}, FractalStrideType{})));
+        make_shape(make_shape(c0_type{}, 1), make_shape(_16{}, 1)),
+        make_stride(make_stride(_1{}, -1), make_stride(c0_type{}, fractal_stride_type{})));
 }
 
 auto make_nc1hwc0_shape_error(int invalid_shape = 0)
