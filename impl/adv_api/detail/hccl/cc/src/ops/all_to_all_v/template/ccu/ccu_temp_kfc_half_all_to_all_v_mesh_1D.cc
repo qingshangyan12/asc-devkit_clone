@@ -79,24 +79,12 @@ HcclResult CcuTempKfcHalfAllToAllVMesh1D::KernelRun(
         static_cast<unsigned long long>(goSize[0]), static_cast<unsigned long long>(goSize[1]),
         static_cast<unsigned long long>(goSize[2]), static_cast<unsigned long long>(goSize[3]));
 
-    // Mission 0 — 搬运前半数据 (sendSizeA/sendOffsetA)
-    CcuKernelSubmitInfo submitInfo0{};
-    submitInfo0.kernelHandle = templateResource.ccuKernels[0];
-    submitInfo0.cachedArgs[0] = 0ULL;
-    FillCachedArgsPayload(
-        submitInfo0, inputAddr, sendSizesAddr, sendOffsetsAddr, recvOffset,
-        goSize[0], goSize[1], goSize[2], goSize[3]);
-    templateResource.submitInfos.push_back(submitInfo0);
-
-    // Mission 1 — 搬运后半数据 (sendSizeB/sendOffsetB)
-    CcuKernelSubmitInfo submitInfo1{};
-    submitInfo1.kernelHandle = templateResource.ccuKernels[0];
-    submitInfo1.cachedArgs[0] = 1ULL;
-    FillCachedArgsPayload(
-        submitInfo1, inputAddr, sendSizesAddr, sendOffsetsAddr, recvOffset,
-        goSize[0], goSize[1], goSize[2], goSize[3]);
-    templateResource.submitInfos.push_back(submitInfo1);
-
+    CcuKernelSubmitInfo submitInfo{};
+    submitInfo.kernelHandle = templateResource.ccuKernels[0];
+    CHK_RET(FillCachedArgs(
+        submitInfo, inputAddr, sendSizesAddr, sendOffsetsAddr, recvOffset,
+        goSize[0], goSize[1], goSize[2], goSize[3]));
+    templateResource.submitInfos.push_back(submitInfo);
     return HcclResult::HCCL_SUCCESS;
 }
 
