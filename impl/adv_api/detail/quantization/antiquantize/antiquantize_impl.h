@@ -198,21 +198,29 @@ __aicore__ inline void AntiQuantizePerGroupImpl(
     AscendAntiQuantParam antiParams = {params.m, params.n, params.m * params.n, params.groupSize};
 
     if constexpr (config.kDim == 1) {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
         if constexpr (SupportType<SrcT, fp4x2_e1m2_t, fp4x2_e2m1_t>()) {
             AntiQuantPerGroupForColFp4<DstT, SrcT, typename ScaleT::PrimType, antiConfig>(
                 dstTensor, srcTensor, scale, antiParams);
         } else {
+#endif
             AntiQuantizePerGroupForColCommon<DstT, SrcT, typename ScaleT::PrimType, antiConfig>(
                 dstTensor, srcTensor, scale, offset, antiParams);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
         }
+#endif
     } else {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
         if constexpr (SupportType<SrcT, fp4x2_e1m2_t, fp4x2_e2m1_t>()) {
             AntiQuantPerGroupForRowFp4<DstT, SrcT, typename ScaleT::PrimType, antiConfig>(
                 dstTensor, srcTensor, scale, antiParams);
         } else {
+#endif
             AntiQuantizePerGroupForRowCommon<DstT, SrcT, typename ScaleT::PrimType, antiConfig>(
                 dstTensor, srcTensor, scale, offset, antiParams);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
         }
+#endif
     }
 }
 
