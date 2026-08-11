@@ -69,10 +69,6 @@ protected:
                                                const CcuStScenario &scenario,
                                                const TopoMeta &topoMeta,
                                                const Mc2CcTilingInner &tiling);
-
-private:
-    // 保存 scenario 供 DoCheckXxx 使用
-    CcuStScenario currentScenario_;
 };
 
 } // namespace CcuSt
