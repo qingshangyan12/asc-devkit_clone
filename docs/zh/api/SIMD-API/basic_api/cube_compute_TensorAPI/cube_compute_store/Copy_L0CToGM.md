@@ -147,7 +147,7 @@ struct FixpipeParams {
 |成员|默认值|描述|
 |--------|--------|--------|
 |unitFlag|`0`|控制Mmad指令和Fixpipe指令的细粒度并行。`0`表示不使能，`2`表示使能且执行后不复位单元标记位，`3`表示使能且执行后复位单元标记位。开启时，`MmadParams`和`FixpipeParams`中的`unitFlag`需要配套设置为`2`或`3`。|
-|subBlockId|`false`|在启用单目标模式时指示目标UB的编号，L0C Buffer到Global Memory数据搬运时该参数无效。|
+|subBlockId|`false`|在启用单目标模式时指示目标Unified Buffer（UB）的编号，L0C Buffer到Global Memory数据搬运时该参数无效。|
 
 ## 数据类型
 

@@ -16,7 +16,7 @@ Conv3DBackpropInput的计算公式为：
 **图2**  反向传播误差计算示意图<a name="fig1953483815252"></a>  
 ![](../../../../figures/backward_error_compute.png "反向传播误差计算示意图")
 
-Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括为：
+核函数（Kernel）侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括为：
 
 1.  创建Conv3DBackpropInput对象。
 2.  初始化操作。

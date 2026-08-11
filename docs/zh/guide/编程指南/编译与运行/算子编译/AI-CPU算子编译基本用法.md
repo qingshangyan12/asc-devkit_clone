@@ -1,10 +1,10 @@
 # AI CPU算子编译<a name="ZH-CN_TOPIC_0000002522571023"></a>
 
-与AI Core算子只需一个`.asc`文件即可编译生成可执行文件不同，AI CPU算子需要同时包含`.aicpu`文件（核函数定义）和`.asc`文件（通过内核调用符调用核函数）才能编译生成可执行文件。
+与AI Core算子只需一个`.asc`文件即可编译生成可执行文件不同，AI CPU算子需要同时包含`.aicpu`文件（核函数（Kernel）定义）和`.asc`文件（通过内核调用符调用核函数（Kernel））才能编译生成可执行文件。
 
 ## 通过bisheng命令行编译<a name="section153291123460"></a>
 
-下文基于一个Hello World打印样例来讲解如何通过bisheng命令行编译AI CPU算子。该样例包含`hello_world.aicpu`文件（AI CPU核函数定义）和`main.asc`文件（通过内核调用符调用AI CPU核函数）。
+下文基于一个Hello World打印样例来讲解如何通过bisheng命令行编译AI CPU算子。该样例包含`hello_world.aicpu`文件（AI CPU核函数（Kernel）定义）和`main.asc`文件（通过内核调用符调用AI CPU核函数（Kernel））。
 
 hello\_world.aicpu文件内容如下：
 
@@ -64,7 +64,7 @@ bisheng --npu-arch=dav-2201 main.asc -c -o main.asc.o
 bisheng hello_world.aicpu.o main.asc.o -o demo
 ```
 
-上文我们通过一个入门示例介绍了使用bisheng命令行编译生成可执行文件的示例。除此之外，使用bisheng命令行也支持编译生成AI CPU算子的动态库与静态库，用户可在asc代码中通过内核调用符<<<...\>\>\>调用AI CPU算子的核函数，并在编译asc代码源文件生成可执行文件的时候，链接AI CPU动态库或者静态库，注意：若单独编译AI CPU算子代码生成动态库、静态库时，需要手动链接[表格中的库文件](AI-Core算子编译基本用法.md#内置链接库)。
+上文我们通过一个入门示例介绍了使用bisheng命令行编译生成可执行文件的示例。除此之外，使用bisheng命令行也支持编译生成AI CPU算子的动态库与静态库，用户可在asc代码中通过内核调用符<<<...\>\>\>调用AI CPU算子的核函数（Kernel），并在编译asc代码源文件生成可执行文件的时候，链接AI CPU动态库或者静态库，注意：若单独编译AI CPU算子代码生成动态库、静态库时，需要手动链接[表格中的库文件](AI-Core算子编译基本用法.md#内置链接库)。
 
 -   编译生成算子动态库
 

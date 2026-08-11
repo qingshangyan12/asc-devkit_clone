@@ -267,7 +267,7 @@ examples/
 │   ├── 02_features/        # Advanced features
 │   ├── 03_basic_api/       # Basic API examples
 │   │   └── 00_data_movement/
-│   │       └── copy_ub2ub/ # UB to UB copy example
+│   │       └── copy_ub2ub/ # Unified Buffer to Unified Buffer copy example
 │   │           ├── CMakeLists.txt
 │   │           ├── copy.asc          # Kernel source (.asc extension)
 │   │           ├── data_utils.h     # Test data utilities

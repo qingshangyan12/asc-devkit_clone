@@ -149,7 +149,7 @@ AddCustom
 
 msOpGen生成的`op_host/add_custom.cpp`已包含`namespace ops`（算子原型注册）和`namespace ge`（InferShape/InferDataType）的框架代码，以及`TilingFunc`函数的空实现。后续只需修改`TilingFunc`的实现，保留框架代码不变。
 
-### 修改Kernel侧代码
+### 修改核函数（Kernel）侧代码<a name="修改Kernel侧代码"></a>
 
 编辑`op_kernel/add_custom.cpp`，将自动生成模板中的内容替换为完整的算子计算实现：
 
@@ -247,7 +247,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 ### 修改Tiling与Host侧实现
 
-Tiling负责将Host侧的调度信息（如数据总量、分块数）传递给Kernel侧执行。Tiling数据结构定义放在`op_kernel/add_custom_tiling.h`，供Host和Kernel共同引用。
+Tiling负责将Host侧的调度信息（如数据总量、分块数）传递给核函数（Kernel）侧执行。Tiling数据结构定义放在`op_kernel/add_custom_tiling.h`，供Host和核函数（Kernel）共同引用。
 
 #### 修改Tiling数据结构定义
 
@@ -556,7 +556,11 @@ test pass
 如果输出`test failed`、ACL Error或动态库`not found`类错误，请检查：
 1. CANN环境变量是否已加载（`source /usr/local/Ascend/cann/set_env.sh`）。
 2. 算子是否已按照[部署](#部署)步骤正确部署。
+<<<<<<< HEAD
 3. Kernel侧和Host侧代码是否按[Kernel代码](#修改kernel侧代码)、[Host代码](#修改tiling与host侧实现)正确修改。
+=======
+3. 核函数（Kernel）侧和Host侧代码是否按[核函数（Kernel）代码](#修改Kernel侧代码)、[Host代码](#修改Tiling与Host侧实现)正确修改。
+>>>>>>> a33fbc464 (refactor:统一ub和kernel的写法)
 
 ## 下一步指引
 

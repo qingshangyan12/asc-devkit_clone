@@ -1,4 +1,4 @@
-# 避免UB的Bank冲突
+# 避免Unified Buffer（UB）的Bank冲突
 
 【优先级】高
 
