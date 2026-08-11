@@ -58,10 +58,7 @@ HcclResult haclrtGetCaptureInfo(aclrtStream stream, aclmdlRICaptureStatus& captu
 
 extern "C" {
 
-void HcommDlInit(void)
-{
-    fprintf(stderr, "[HcclWrapper-STUB] HcommDlInit stub called (EMPTY IMPLEMENTATION)\n");
-}
+void HcommDlInit(void) { fprintf(stderr, "[HcclWrapper-STUB] HcommDlInit stub called (EMPTY IMPLEMENTATION)\n"); }
 
 int GetHcommVersion(void)
 {
