@@ -68,6 +68,30 @@ unsigned short min(unsigned short x, unsigned short y)
 unsigned char min(unsigned char x, unsigned char y)
 ```
 
+```cpp
+unsigned int min(unsigned int x, int y)
+```
+
+```cpp
+unsigned int min(int x, unsigned int y)
+```
+
+```cpp
+unsigned long min(long x, unsigned long y)
+```
+
+```cpp
+unsigned long min(unsigned long x, long y)
+```
+
+```cpp
+unsigned long long min(long long x, unsigned long long y)
+```
+
+```cpp
+unsigned long long min(unsigned long long x, long long y)
+```
+
 ## 参数说明
 
 **表1**  参数说明
@@ -83,7 +107,7 @@ unsigned char min(unsigned char x, unsigned char y)
 
 ## 约束说明
 
-无
+混合有符号与无符号整数入参的重载会先将有符号入参转换为对应的无符号类型，再比较大小。
 
 ## 需要包含的头文件
 
@@ -98,9 +122,12 @@ unsigned char min(unsigned char x, unsigned char y)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelMin(long long* dst, long long* x, long long* y)
+    __global__ __launch_bounds__(1024) void KernelMin(long long* dst, long long* x, long long* y, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = min(x[idx], y[idx]);
     }
     ```
@@ -108,9 +135,12 @@ unsigned char min(unsigned char x, unsigned char y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelMin(__gm__ long long* dst, __gm__ long long* x, __gm__ long long* y)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelMin(__gm__ long long* dst, __gm__ long long* x, __gm__ long long* y, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = min(x[idx], y[idx]);
     }
     ```
