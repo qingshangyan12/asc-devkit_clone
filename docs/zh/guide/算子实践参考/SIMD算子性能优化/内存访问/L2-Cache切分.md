@@ -2,36 +2,106 @@
 
 【优先级】：高
 
-【描述】在部分产品上，L2 Cache读写混合带宽和GM带宽处于不同量级，例如L2 Cache理论或典型带宽约为7TB/s，GM带宽约为1.6TB/s。上述数据仅用于说明访问层级之间的带宽差异，不表示所有产品或实际算子的可达带宽。实际性能还受到芯片型号、访存模式、并发流量和工具统计口径等因素影响。
+【描述】假设，AI处理器的L2 Cache大小为192MB，L2 Cache读写混合带宽约为7TB/s，而GM的带宽约为1.6TB/s，两者之间存在较大差距。搬入或搬出相同数据量的情况下，访问L2 Cache读写数据比GM更快。若数据无法命中L2 Cache，即需要访问的数据不在L2 Cache内，导致需要去GM上读写，带宽利用效率较低，最终算子搬入或搬出数据变为算子整个运行过程的性能瓶颈。切分策略建议：当输入和输出数据的数据量超过L2 Cache大小时，Tiling中开启L2 Cache切分策略。
 
-当算子需要多次访问同一批数据时，关键是重复访问发生时目标数据是否仍驻留在L2 Cache中。L2 Cache由同一阶段内并发工作的多个核共同使用，容量压力应按所有核在该阶段覆盖的GM地址范围合计评估，而不是只看单个核的数据量。如果首次访问后，继续访问的新数据量超过L2 Cache有效容量，早先进入L2 Cache的数据可能在同一轮扫描过程中就被后续数据替换；再次访问早先地址时就可能出现Cache Miss，需要从GM重新取数，数据搬入可能成为性能瓶颈。
-
-优化的核心思想是：**不要把所有核合计超过L2 Cache有效容量的大数据范围作为一次跨轮复用的整体工作集，而是根据L2 Cache有效容量按有机会驻留的粒度切分，并尽快完成同一批数据的多次访问**。本文和配套样例将单批L2 Cache有效工作集阈值设为100MB，但该值不是所有产品的固定物理L2 Cache容量。实际算子应结合目标产品、并发业务和Profile结果确定阈值。
+优化的核心思路是：**通过开启L2 Cache切分策略，将单轮处理的数据规模控制在L2 Cache有效工作集阈值内，提升数据在L2 Cache中的复用率，从而减少重复的数据搬入或搬出**。本文及配套样例将单批L2 Cache有效工作集阈值设为100MB，该取值仅用于样例展示，不代表所有产品的固定物理L2 Cache容量。
 
 ## 场景设定
 
 为便于理解，以下正反例基于同一固定场景：
 
-- 使用一份384MB的GM数据Buffer，每轮在同一Buffer上原地计算。
-- 每个元素执行两轮“加1”运算，最终结果为`input + 2`。
-- 使用20个Vector Core并行计算，每个核处理一段连续且互不重叠的GM地址范围；判断L2 Cache容量压力时，需要看20个核同一阶段合计覆盖的数据量。
-- 每个核内部再按Unified Buffer容量切分为UB Tile，UB Tile仅解决UB容量限制，不代表L2 Cache切分粒度。
-- 反例不做L2 Cache切分，每轮把384MB数据作为一个整体，20个核共同从`data[0]`所在地址范围连续扫描到384MB末尾。
-- 正例将384MB数据切成B0至B3四个L2 Batch，每批是一段96MB的连续索引范围；单个Batch内20个核合计覆盖的数据量不超过100MB阈值，并在切换到下一批前完成同一批的两轮计算。
-- 每个阶段结束后执行全核同步，保证下一阶段开始前所有核均已完成当前阶段的UB->GM搬运。反例按整份数据每轮同步，正例按每个L2 Batch和每轮组合同步。
+- 使用20个Vector Core并行计算，每个元素执行两轮“加1”运算，最终结果为`input + 2`。
+- 反例不做L2 Cache切分，每轮把384MB数据作为一个整体，20个核共同从头连续扫描到384MB末尾。
+- 正例将384MB数据切成B0至B3四个L2 Batch，每批是96MB的数据量，并在切换到下一批前完成同一批的两轮计算。
 
-## 数据量和L2 Cache阈值
+## 反例：不做L2 Cache切分
 
-样例在GM中分配一份名为`data`的数据Buffer，包含201326592个`half`元素，共占384MB。这里的384MB就是实际待处理的数据量，也是输入文件和输出文件的大小。
+不切分反例把384MB数据作为一个整体处理。L2 Cache对用户不可见，用户主要感知到的是GM->UB搬运：384MB总数据由20个核均分，平均每个核搬运约19.2MB。
 
-单批L2 Cache有效工作集阈值设为100MB。整份384MB数据超过该阈值，如果不切分，单轮同一阶段内20个核合计覆盖的活跃工作集就是384MB：
+**图 1**  不切分反例的用户视角和L2 Cache替换风险
+
+**【用户视角】**：只感知GM->UB逻辑搬运
 
 ```text
-不切分单阶段全核工作集 = 384MB
-L2 Cache有效工作集阈值 = 100MB
+GM data[0, 384MB) -------------------------------> UB
+384MB总数据 / 20核 = 19.2MB/核
 ```
 
-正例按阈值向上取整得到4个L2 Batch，再将384MB数据等分为4个96MB L2 Batch：
+**【实际数据路径】**：Cache Miss时会先从GM填充L2 Cache，再到UB
+
+```text
+GM ----------------------> L2 Cache ----------------------> UB
+                           硬件自动管理，对用户不可见
+
+假设20个核处理的数据按核序逐段搬入L2 Cache：
+
+L2 Cache有效工作集阈值 = 100MB
+约可容纳5个核的数据量：5 * 19.2MB = 96MB
+
+先搬入L2 Cache并可能驻留的数据：
+
+        核0      核1      核2      核3      核4
+L2   | 19.2MB | 19.2MB | 19.2MB | 19.2MB | 19.2MB |
+     |------------------- 约96MB，接近100MB有效阈值 -------------------|
+
+后续继续搬入L2 Cache的新数据：
+
+        核5      核6              ...       核19
+L2   | 19.2MB | 19.2MB |        ...      | 19.2MB |
+        |
+        +-- 新数据继续填充L2 Cache时，可能替换核0至核4对应的早期Cache Line。
+```
+
+**【性能观察重点】**
+
+```text
+只执行一轮计算：
+  R0是首轮访问，反例和正例都需要从GM首次搬入数据，Cache Miss差异通常不明显。
+
+通过复用体现优化：
+  R1再次访问同一批地址时，目标数据是否仍在L2 Cache中，才是减少Cache Miss的关键。
+```
+
+反例的循环层级为`Round -> Whole Data`。外层每轮都处理完整384MB范围：
+
+```cpp
+for (uint32_t roundIdx = 0; roundIdx < COMPUTE_ROUND_NUM; ++roundIdx) {
+    ProcessWholeData();
+    AscendC::SyncAll();
+}
+```
+
+**图 2**  不切分反例的执行时间线
+
+```text
+循环层级：Round -> Whole Data
+
+时间 --------------------------------------------------------------->
+
+R0：首轮处理完整384MB
+    data[0, 384MB)
+    |----------- 20核并发扫描完整GM范围，合计工作集384MB -----------|
+    |-- 核0至核4约96MB，接近100MB有效阈值 --|
+                                        |-- 核5至核19继续搬入新地址，
+                                            早期Cache Line可能被替换 --|
+
+SyncAll()
+
+R1：再次处理完整384MB
+    data[0, 384MB)
+    |-- 重新访问起始地址范围 --|------ 继续扫描到384MB末尾 ------|
+       ^
+       |
+       如果R0中核0至核4对应的早期数据已被替换，
+       R1再次访问这些地址时更可能发生Cache Miss，并从GM重新填充L2 Cache。
+```
+
+R0从起始地址到384MB末尾的过程中，后续核搬入可能替换早先核搬入的数据。由于R0是首轮访问，仅比较一轮搬运计算不能稳定体现L2 Cache命中收益；R1重新访问起始地址范围时，早先数据更可能已经不在L2 Cache中，因此更可能从GM重新搬运。
+
+## 正例：按L2 Cache切分
+
+正例把384MB数据根据阈值100MB进行切分，分成4个Batch，每份96MB。每轮20核共处理96MB数据，每轮数据复用，这样每次计算前读取的数据能够命中L2 Cache，提升算子性能。
+正例的循环层级为`L2 Batch -> Round`。同一批连续完成全部轮次后，再切换到下一批：
 
 ```text
 L2 Batch数       = ceil(总数据量 / L2 Cache有效工作集阈值)
@@ -40,24 +110,48 @@ L2 Batch数       = ceil(总数据量 / L2 Cache有效工作集阈值)
 单个L2 Batch大小 = 384MB / 4 = 96MB
 ```
 
-**图 1**  384MB数据的不切分和L2 Batch切分关系
+```cpp
+for (uint32_t l2BatchIdx = 0; l2BatchIdx < L2_BATCH_NUM; ++l2BatchIdx) {
+    for (uint32_t roundIdx = 0; roundIdx < COMPUTE_ROUND_NUM; ++roundIdx) {
+        ProcessL2Batch(l2BatchIdx);
+        AscendC::SyncAll();
+    }
+}
+```
+
+**图 3**  L2 Cache切分正例的执行时间线
 
 ```text
-不切分反例：
+循环层级：L2 Batch -> Round
 
-data 384MB  |---------------------------- 384MB ----------------------------|
-              一轮内20个核共同覆盖完整GM范围，全核工作集超过100MB有效阈值
+时间 ------------------------------------------------------------------------->
 
-L2切分正例：
+整体顺序：
+B0/R0 -> SyncAll -> B0/R1 -> B1/R0 -> SyncAll -> B1/R1
+      -> B2/R0 -> SyncAll -> B2/R1 -> B3/R0 -> SyncAll -> B3/R1
 
-                               L2 Cache Batch维度
-                  B0             B1             B2             B3
-             +--------------+--------------+--------------+--------------+
-data 384MB  | 96MB        | 96MB        | 96MB        | 96MB        |
-             +--------------+--------------+--------------+--------------+
+B0阶段：
+  B0/R0  首次访问data[0MB, 96MB)，全核合计工作集96MB <= 100MB
+  B0/R1  立即再次访问data[0MB, 96MB)，复用B0/R0刚访问的数据
 
-每个L2 Batch = 96MB <= 100MB有效阈值
+B1阶段：
+  B1/R0  首次访问data[96MB, 192MB)，全核合计工作集96MB <= 100MB
+  B1/R1  立即再次访问data[96MB, 192MB)，复用B1/R0刚访问的数据
+
+B2阶段：
+  B2/R0  首次访问data[192MB, 288MB)，全核合计工作集96MB <= 100MB
+  B2/R1  立即再次访问data[192MB, 288MB)，复用B2/R0刚访问的数据
+
+B3阶段：
+  B3/R0  首次访问data[288MB, 384MB)，全核合计工作集96MB <= 100MB
+  B3/R1  立即再次访问data[288MB, 384MB)，复用B3/R0刚访问的数据
+
+同一Batch的两轮访问之间，没有插入其他超过100MB有效阈值的大数据范围，
+因此第2轮更有机会命中第1轮留在L2 Cache中的数据。
 ```
+
+B0的全核合计工作集为96MB，不超过100MB阈值；B0在两次访问之间也没有其他大数据插入更新L2 Cache，因此R1更有机会从L2 Cache读取R0的结果。B0处理完毕后再依次处理B1至B3，原理相同。
+
 
 **表 1**  样例数据量口径
 
@@ -73,33 +167,15 @@ data 384MB  | 96MB        | 96MB        | 96MB        | 96MB        |
 
 ## 为什么不切分会降低复用概率
 
-不切分反例把384MB作为一个整体。第1轮处理时，20个核分别处理相邻子区间，从全局地址范围看会覆盖`data[0, 384MB)`。粗略平均时，每个核处理约19.2MB，看起来小于100MB阈值；但L2 Cache看到的是20个核在同一阶段持续搬入的GM地址合计，而不是某一个核的19.2MB。
-
-以本文100MB阈值为例，核0至核4合计处理约96MB，已经接近L2 Cache有效容量；当核5及后续核继续搬入新的GM地址时，单阶段内全核合计工作集会超过100MB阈值，核0等较早进入L2 Cache的数据就可能被替换。也就是说，替换风险在第1轮处理过程中已经产生，不是等到第2轮才产生。如果算子在同一轮后续步骤就复用早期地址，这种替换会在单轮内直接表现为Cache Miss。
+以本文100MB阈值为例，核0至核4合计处理约96MB，已经接近L2 Cache有效容量；当核5及后续核继续搬入新数据时，总数据量超过100MB阈值，核0等较早进入L2 Cache的数据就可能被替换。也就是说，替换风险在第1轮处理过程中已经产生，不是等到第2轮才产生。如果算子在同一轮后续步骤就复用早期地址，这种替换会在单轮内直接表现为Cache Miss。
 
 文档中设计两轮计算，是为了显式体现数据复用：第2轮再次访问第1轮刚处理过的同一批地址。不切分时，第2轮重新访问`data[0]`所在地址范围，早先数据可能已经在第1轮后续扫描中被替换，因此更可能发生Cache Miss并从GM重新取数。
 
-L2 Cache切分正例将跨轮复用的工作集限制在96MB。单个Batch内，20个核合计覆盖的数据量不超过100MB阈值，每个核只处理约4.8MB。先在`data[B0]`上完成第1轮和第2轮，再依次处理B1至B3。同一批两轮访问之间没有插入其他超过L2 Cache有效容量的大数据范围，因此第2轮更有机会直接命中第1轮刚写回的L2 Cache数据。
-
-## GM到L2 Cache的数据量口径
-
-每轮读取并写回整份384MB数据。两轮计算的逻辑搬运量为：
-
-```text
-逻辑GM->UB读量 = 384MB/轮 * 2轮 = 768MB
-逻辑UB->GM写量 = 384MB/轮 * 2轮 = 768MB
-逻辑搬运总量   = 768MB + 768MB = 1536MB
-```
-
-`DataCopy`从GM地址读取数据时会经过L2 Cache，因此Profile中的逻辑GM->UB读量约为768MB。但是，逻辑GM->UB读量不等于实际从主存储器搬入L2 Cache的数据量：L2 Cache命中时直接从L2 Cache读取，只有Cache Miss才需要从主存储器取数并填充L2 Cache。
-
-下文的768MB和384MB是仅考虑MTE2读取路径的理想读侧估算值，表示GM->UB读取发生Cache Miss时，从主存储器取数并填充到L2 Cache的数据量。该口径不包含UB->GM写回的MTE3写流量，也不包含写回策略可能引入的额外主存储器读流量。本文不对写回路径采用write-through或write-allocate策略作硬件判断；如果具体产品或配置在写回时存在write-allocate、read-for-ownership等行为，由此产生的GM读量应作为写侧副作用单独统计，不计入以下MTE2读侧理想值。
-
-仅考虑MTE2读取，在冷Cache、忽略Cache Line粒度和其他系统流量的理想分析中，首轮读取的384MB需要从主存储器取数。不切分反例在第1轮内由20个核共同完整扫描384MB范围，早期地址可能在同一轮后续搬运中被替换；第2轮再次访问这些地址时，更可能再次从主存储器读取，MTE2读触发的实际GM->L2填充量可接近768MB。L2切分正例在每个96MB L2 Batch写回后立即开始同一批的第2轮，因此MTE2读触发的实际GM->L2填充量可接近384MB。实际数值取决于命中率、替换策略和同期流量，应通过L2 Cache命中率、主存储器读写计数以及MTE2/MTE3搬运指标共同确认。
+L2 Cache切分正例将工作集限制在96MB。单个Batch内，20个核合计覆盖的数据量不超过100MB阈值，每个核只处理约4.8MB。先在`data[B0]`上完成第1轮和第2轮，再依次处理B1至B3。同一批两轮访问之间没有插入其他大数据更新L2 Cache，因此第2轮更有机会直接命中第1轮刚写回的L2 Cache数据。
 
 ## 公共处理逻辑
 
-两种实现都使用同一份`data` Buffer，并将结果写回搬入时的同一GM地址。差异在于传给公共处理函数的连续数据范围不同：反例传入完整384MB范围，正例传入单个96MB L2 Batch范围。代码展示实际样例采用的32字节DataBlock分核公式以及尾块长度计算方式；为突出数据通路，仅省略了MTE2、Vector、MTE3之间的核内流水同步代码。
+两种实现都使用同一份`data` Buffer，并将结果写回搬入时的同一GM地址。差异在于传给公共处理函数的连续数据范围不同：反例传入完整384MB范围，正例传入单个96MB L2 Batch范围。以下代码仅展示实际样例采用的32字节DataBlock分核公式和正反例传入范围差异，不展开单核内部搬运和计算细节。
 
 ```cpp
 __aicore__ inline void ProcessWholeData()
@@ -130,68 +206,10 @@ __aicore__ inline void ProcessDataRange(int64_t rangeOffsetInData, uint32_t rang
     ProcessCoreRange(coreOffsetInData, coreElementNum);
 }
 
-__aicore__ inline void ProcessCoreRange(int64_t coreOffsetInData, uint32_t coreElementNum)
-{
-    const uint32_t ubTileNum =
-        (coreElementNum + UB_TILE_CAPACITY_ELEMENTS - 1) / UB_TILE_CAPACITY_ELEMENTS;
-    for (uint32_t ubTileIdx = 0; ubTileIdx < ubTileNum; ++ubTileIdx) {
-        const uint32_t processedElementNum = ubTileIdx * UB_TILE_CAPACITY_ELEMENTS;
-        const uint32_t remainingElementNum = coreElementNum - processedElementNum;
-        const uint32_t tileElementNum = remainingElementNum > UB_TILE_CAPACITY_ELEMENTS ?
-                                            UB_TILE_CAPACITY_ELEMENTS : remainingElementNum;
-        const int64_t gmElementOffset = coreOffsetInData + processedElementNum;
-        AscendC::DataCopy(inputLocal, dataGm[gmElementOffset], tileElementNum);
-        AscendC::Adds(outputLocal, inputLocal, half(1.0), tileElementNum);
-        AscendC::DataCopy(dataGm[gmElementOffset], outputLocal, tileElementNum);
-    }
-}
+// 单核内部搬运和计算流程以配套样例完整实现为准。
 ```
 
 对于不切分反例的384MB整体范围，前12个核各处理629146个DataBlock，其余8个核各处理629145个DataBlock，单核数据量约19.2MB，20个核合计覆盖完整`data[0, 384MB)`范围且互不重叠。对于正例的单个96MB L2 Batch，前8个核各处理157287个DataBlock，其余12个核各处理157286个DataBlock，单核数据量约4.8MB，20个核合计覆盖完整L2 Batch且互不重叠。每个DataBlock包含16个`half`元素，因此所有`DataCopy`长度均满足32字节对齐要求。完整核内流水同步实现以配套样例为准；阶段之间的核间同步由配套样例的`KernelAdd::SyncAllCores`直接调用公开API`AscendC::SyncAll()`完成，不是额外封装的自定义同步函数。
-
-## 反例：不做L2 Cache切分
-
-反例的循环层级为`Round -> Whole Data -> UB Tile`。外层每轮都处理完整384MB范围：
-
-```cpp
-for (uint32_t roundIdx = 0; roundIdx < COMPUTE_ROUND_NUM; ++roundIdx) {
-    ProcessWholeData();
-    AscendC::SyncAll();
-}
-```
-
-**图 2**  不切分反例的执行时间线
-
-```text
-R0/data[0, 384MB) -> R1/data[0, 384MB)
-  |------ R0内20核合计扫描384MB，超过L2 Cache有效阈值 ------|
-  |-- 核0至核4约96MB --|-- 核5及后续核继续搬入新地址，早期Cache Line可能被替换 --|
-```
-
-R0从起始地址范围扫描到384MB末尾的过程中，后续核搬入的新地址可能替换早先核搬入的数据。R1重新访问起始地址范围时，早先数据更可能已经不在L2 Cache中，因此更可能从GM重新搬运。实际命中情况受L2 Cache容量、替换策略和同期流量影响，应以Profile结果为准。
-
-## 正例：按L2 Cache切分
-
-正例的循环层级为`L2 Batch -> Round -> UB Tile`。同一批连续完成全部轮次后，再切换到下一批：
-
-```cpp
-for (uint32_t l2BatchIdx = 0; l2BatchIdx < L2_BATCH_NUM; ++l2BatchIdx) {
-    for (uint32_t roundIdx = 0; roundIdx < COMPUTE_ROUND_NUM; ++roundIdx) {
-        ProcessL2Batch(l2BatchIdx);
-        AscendC::SyncAll();
-    }
-}
-```
-
-**图 3**  L2 Cache切分正例的执行时间线
-
-```text
-B0/R0 -> B0/R1 -> B1/R0 -> B1/R1 -> B2/R0 -> B2/R1 -> B3/R0 -> B3/R1
-  |         |        |         |        |         |        |         |
-  +-- B0 ---+        +-- B1 ---+        +-- B2 ---+        +-- B3 ---+
-```
-
-B0的全核合计工作集为96MB，不超过100MB阈值；B0在两次访问之间也没有其他大数据范围插入，因此R1更有机会从L2 Cache读取R0的结果。B0处理完毕后再依次处理B1至B3，原理相同。
 
 ## 正反例对比总结
 
@@ -200,7 +218,7 @@ B0的全核合计工作集为96MB，不超过100MB阈值；B0在两次访问之�
 | 维度 | 反例 | 正例 |
 | ------ | ------ | ------ |
 | L2 Cache切分 | 不切分 | 切分为4个96MB L2 Batch |
-| 循环层级 | `Round -> Whole Data -> UB Tile` | `L2 Batch -> Round -> UB Tile` |
+| 循环层级 | `Round -> Whole Data` | `L2 Batch -> Round` |
 | 单阶段全核工作集 | 384MB | 96MB |
 | 单核平均处理量 | 约19.2MB | 约4.8MB |
 | 执行时间线 | `R0/data[0,384MB) -> R1/data[0,384MB)` | `B0/R0 -> B0/R1 -> ... -> B3/R0 -> B3/R1` |
@@ -208,30 +226,14 @@ B0的全核合计工作集为96MB，不超过100MB阈值；B0在两次访问之�
 | L2 Cache数据替换风险 | 较高 | 较低 |
 | 第2轮L2 Cache命中率 | 预期较低，以实测为准 | 预期较高，以实测为准 |
 
-## 核心原则
-
-尽量保证数据从首次加载到末次使用期间驻留在L2 Cache中。所有核在同一阶段合计覆盖的总工作集超过有效阈值，且同一批数据需要多次访问时，不应把全量数据作为一个跨轮复用整体；应按能够驻留的粒度切分，采用L2 Batch优先、Round次之、UB Tile最内层的循环层级。
-
 ## 适用场景
 
 - 总工作集超过目标算子的L2 Cache有效阈值，且同一批数据需要被多次读取，例如多轮迭代计算、Reduce和卷积等。
 - 只读取一次的数据不存在跨轮复用，调整L2 Cache切分顺序通常收益有限。
 
-## 注意事项
-
-1. **有效阈值的确定**：100MB仅为本文样例值。实际阈值需要计入输入、输出和其他会占用L2 Cache的缓冲区，并通过目标环境实测确定。
-
-2. **批次数与开销的平衡**：批次过大会降低重复访问的命中概率，批次过细会增加同步和换批开销。建议在命中率改善的前提下减少不必要的批次。
-
-3. **与UB Tiling的关系**：L2 Cache级分批控制跨轮复用的工作集，最内层UB Tiling解决Unified Buffer容量问题。即使单个核一次只搬运一个UB Tile，20个核在同一阶段连续扫描的总地址范围仍可能填满并替换L2 Cache。
-
-4. **核间同步**：所有核共同处理同一个数据阶段时，需要在进入下一阶段前完成核间同步。配套样例使用硬件同步接口`AscendC::SyncAll()`，不需要额外GM同步工作空间。不要使用仅保证单核流水顺序的`PipeBarrier`替代核间同步。
-
-5. **CacheMode配合**：对于只访问一次的数据，可以评估使用`SetL2CacheHint(CACHE_MODE_DISABLE)`避免占用L2 Cache。具体支持范围和约束请参考[设置合理的L2 CacheMode](./设置合理的L2-CacheMode.md)。
-
 ## 测试用例设计
 
-测试保留固定负载下的一组正反例。两者使用相同的一份大小为384MB的GM数据Buffer、核数、Round数、UB Tile处理逻辑和计算逻辑。唯一核心差异是反例不做L2 Cache切分，正例按100MB有效工作集阈值切分为4个96MB L2 Batch。
+测试保留固定负载下的一组正反例。两者使用相同的一份大小为384MB的GM数据Buffer、核数、Round数和计算逻辑。唯一核心差异是反例不做L2 Cache切分，正例按100MB有效工作集阈值切分为4个96MB L2 Batch。
 
 ### 正反例用例
 
@@ -239,8 +241,8 @@ B0的全核合计工作集为96MB，不超过100MB阈值；B0在两次访问之�
 
 | 用例 | 循环层级 | 执行时间线 | 数据元素数 | 数据量 | 核数 | L2 Cache切分 | Round数 | 验证目的 |
 | ------ | ------ | ------ | -------: | -------: | -----: | ------ | -----: | ------ |
-| 反例no-split | `Round -> Whole Data -> UB Tile` | `R0/data[0,384MB) -> R1/data[0,384MB)` | 201326592 | 384MB | 20 | 不切分 | 2 | 验证20核合计384MB工作集超过L2 Cache有效阈值时的替换风险 |
-| 正例L2-split | `L2 Batch -> Round -> UB Tile` | `B0/R0 -> B0/R1 -> ... -> B3/R0 -> B3/R1` | 201326592 | 384MB | 20 | 4个96MB Batch | 2 | 验证单个96MB Batch连续复用带来的L2 Cache局部性改善 |
+| 反例no-split | `Round -> Whole Data` | `R0/data[0,384MB) -> R1/data[0,384MB)` | 201326592 | 384MB | 20 | 不切分 | 2 | 验证20核合计384MB工作集超过L2 Cache有效阈值时的替换风险 |
+| 正例L2-split | `L2 Batch -> Round` | `B0/R0 -> B0/R1 -> ... -> B3/R0 -> B3/R1` | 201326592 | 384MB | 20 | 4个96MB Batch | 2 | 验证单个96MB Batch连续复用带来的L2 Cache局部性改善 |
 
 正例每个L2 Batch包含50331648个`half`元素，占96MB。以32字节DataBlock为最小单位分配给20个Vector Core，前8个核各处理2516592个元素，其余12个核各处理2516576个元素。反例每轮直接处理完整384MB范围，20个核共同覆盖`data[0,384MB)`。所有`DataCopy`长度均保持32字节对齐。
 
