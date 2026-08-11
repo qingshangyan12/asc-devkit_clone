@@ -84,12 +84,12 @@ __aicore__ inline constexpr decltype(auto) resolve_copy_coord(
         Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type>;
     constexpr size_t batch_num = Std::tuple_size_v<origin_shape> - 1;
     constexpr bool is_flat_batch = Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type> &&
-        Std::tuple_size_v<origin_shape> >= TWO_DIM_DATA && origin_shape_depth == batch_num + FOUR_DIM_DATA &&
-        slice_shape_depth == batch_num + TWO_DIM_DATA;
+        Std::tuple_size_v<origin_shape> >= two_dim_data && origin_shape_depth == batch_num + four_dim_data &&
+        slice_shape_depth == batch_num + two_dim_data;
 
     if constexpr (is_same_shape) {
         return make_zero_coord_like(layout.shape());
-    } else if constexpr (origin_shape_depth == FOUR_DIM_DATA && slice_shape_depth == TWO_DIM_DATA) {
+    } else if constexpr (origin_shape_depth == four_dim_data && slice_shape_depth == two_dim_data) {
         return make_coord(_0{}, _0{});
     } else if constexpr (is_flat_batch) {
         return make_zero_coord_like(slice_shape);
@@ -121,8 +121,8 @@ __aicore__ inline decltype(auto) make_coord_layout(const Coord& coord, const Lay
     return make_pattern_layout<pattern_type, trait_type>(coord_shape, layout.stride());
 }
 
-template <typename LayoutType, typename ShapeType>
-__aicore__ inline decltype(auto) make_slice_pattern_layout(const LayoutType& layout, const ShapeType& shape)
+template <typename LayoutType, typename CopyShape>
+__aicore__ inline decltype(auto) make_slice_pattern_layout(const LayoutType& layout, const CopyShape& shape)
 {
     using trait_type = get_layout_trait<LayoutType>;
     using pattern_type = get_layout_pattern<LayoutType>;
@@ -141,8 +141,7 @@ template <typename Coord, typename LayoutType, typename SliceShape>
 __aicore__ inline decltype(auto) make_4d_slice_shape(
     const Coord& coord, const LayoutType& layout, const SliceShape& slice_shape)
 {
-    static_assert(nesting_depth_v<SliceShape> == TWO_DIM_DATA,
-        "SliceShape must be Two Dim when layout is Four Dim");
+    static_assert(nesting_depth_v<SliceShape> == two_dim_data, "SliceShape must be Two Dim when layout is Four Dim");
     auto inner_row = get<0, 0>(layout.shape());
     auto inner_col = get<1, 0>(layout.shape());
 
@@ -198,25 +197,27 @@ __aicore__ inline decltype(auto) make_slice_shape(
     using slice_shape_type = Std::remove_cvref_t<SliceShape>;
     constexpr auto origin_shape_depth = nesting_depth_v<origin_shape>;
     constexpr auto slice_shape_depth = nesting_depth_v<slice_shape_type>;
-    constexpr bool is_same_shape = origin_shape_depth == slice_shape_depth &&
-        Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type>;
+    constexpr bool is_same_shape = origin_shape_depth == slice_shape_depth
+                                   && Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type>;
     // Flat multi-batch: same arity on both sides, batch axes are scalars and the last element is the
     // fractal block on the layout side vs a logical (x, y) pair on the slice side. Depth is then
     // batch_num + 4 against batch_num + 2. batch_num == 1 covers the classic five-dim/three-dim case.
     constexpr size_t batch_num = Std::tuple_size_v<origin_shape> - 1;
-    constexpr bool is_flat_batch = Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type> &&
-        Std::tuple_size_v<origin_shape> >= TWO_DIM_DATA &&
-        origin_shape_depth == batch_num + FOUR_DIM_DATA && slice_shape_depth == batch_num + TWO_DIM_DATA;
+    constexpr bool is_flat_batch = Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type>
+                                   && Std::tuple_size_v<origin_shape> >= two_dim_data
+                                   && origin_shape_depth == batch_num + four_dim_data
+                                   && slice_shape_depth == batch_num + two_dim_data;
 
     if constexpr (is_same_shape) {
         return make_same_slice_shape(coord, layout, slice_shape);
-    } else if constexpr (origin_shape_depth == FOUR_DIM_DATA && slice_shape_depth == TWO_DIM_DATA) {
+    } else if constexpr (origin_shape_depth == four_dim_data && slice_shape_depth == two_dim_data) {
         return make_4d_slice_shape(coord, layout, slice_shape);
     } else if constexpr (is_flat_batch) {
         return make_flat_slice_shape(coord, layout, slice_shape);
     } else {
-        static_assert(is_same_shape || (origin_shape_depth == FOUR_DIM_DATA && slice_shape_depth == TWO_DIM_DATA) ||
-            is_flat_batch,
+        static_assert(
+            is_same_shape || (origin_shape_depth == four_dim_data && slice_shape_depth == two_dim_data)
+                || is_flat_batch,
             "SliceShape must be same structure as Layout shape, or logical Two Dim Shape for Four Dim Layout, "
             "or (batch0, ..., batch_n, logical Two Dim Shape) for a flat multi-batch Layout.");
     }
@@ -235,7 +236,8 @@ __aicore__ inline decltype(auto) make_slice_layout(const Coord& coord, const Src
                                                    const DstLayoutType& dst_layout)
 {
     static_assert(is_layout_v<SrcLayoutType>, "SrcLayoutType must be Layout");
-    static_assert(SrcLayoutType::rank == DstLayoutType::rank, "SrcLayout Rank must be equal to DstLayout Rank");
+    static_assert(SrcLayoutType::rank_size == DstLayoutType::rank_size,
+                  "SrcLayout Rank must be equal to DstLayout Rank");
 
     auto slice_layout = make_coord_layout(coord, src_layout);
     auto slice_shape = transform_tuple_apply(slice_layout.shape(), dst_layout.shape(), min_op{});
@@ -248,7 +250,7 @@ template <typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutTyp
 __aicore__ inline constexpr decltype(auto) remove_batch_dim(const LayoutType& layout)
 {
     constexpr auto layout_depth = LayoutType::depth;
-    static_assert(layout_depth == THREE_DIM_DATA || layout_depth == FIVE_DIM_DATA,
+    static_assert(layout_depth == three_dim_data || layout_depth == five_dim_data,
                   "RemoveBatchDim only supports Three Dim or Five Dim Layout.");
     using trait_type = get_layout_trait<LayoutType>;
     using pattern_type = get_layout_pattern<LayoutType>;
@@ -289,7 +291,7 @@ struct dims_mask_impl<Shape, Std::index_sequence<Dims...>, Std::index_sequence<I
 };
 template <typename Shape, size_t... Dims>
 using dims_mask = typename dims_mask_impl<Shape, Std::index_sequence<Dims...>,
-                                         Std::make_index_sequence<Std::tuple_size_v<Shape>>>::type;
+                                          Std::make_index_sequence<Std::tuple_size_v<Shape>>>::type;
 
 // pattern_mask: keep mask. Drop axis I iff pattern[I] is _1 && SqueezableSize.
 template <typename Shape, typename Pattern, typename IdxSeq>
@@ -389,14 +391,12 @@ __aicore__ inline constexpr auto squeeze_layout(const LayoutType& layout, const 
         return make_pattern_layout<layout_pattern_type, layout_trait_type>(out_shape, out_stride);
     } else {
         return make_pattern_layout<layout_pattern_type, layout_trait_type>(Std::make_tuple(out_shape),
-                                                                       Std::make_tuple(out_stride));
+                                                                           Std::make_tuple(out_stride));
     }
 }
 
 } // namespace te
 } // namespace asc
-
-
 
 #endif // IMPL_TENSOR_API_TENSOR_LAYOUT_IMPL_H
 

@@ -29,7 +29,7 @@ namespace te {
 
 class copy_gm_to_l1_nhwc2nc1hwc0 {
 public:
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         using type = typename U::element_type;
@@ -62,14 +62,14 @@ public:
                                                    n_value, d_value, loop4_src_stride, false);
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    template <const gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(
-        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& copy_shape)
+        const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape)
     {
         using type = typename U::element_type;
-        auto src_shape = make_slice_shape(coord_src, src.layout(), copy_shape);
-        auto dst_offset = dst.layout()(coord_dst);
-        auto src_offset = src.layout()(coord_src);
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto dst_offset = dst.layout()(dst_coord);
+        auto src_offset = src.layout()(src_coord);
         uint16_t nd_num = get<1>(src_shape);
         uint16_t n_value = get<2>(src_shape);
         uint32_t d_value = get<3>(src_shape);

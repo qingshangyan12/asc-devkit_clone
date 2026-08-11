@@ -22,61 +22,63 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0B_COPY_IMPL_NZ2ZNB8B4_H
 #define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0B_COPY_IMPL_NZ2ZNB8B4_H
 
-#include "impl/tensor_api/arch/cube/l1_to_l0b/copy_impl/instruction.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0b/copy_impl/nz2zn.h"
 
 namespace asc {
 namespace te {
-class load_data_l1_to_l0b_nz2zn_b8b4 {
+
+template <>
+class load_data_l1_to_l0b_nz2zn<true> {
 
 public:
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U>
+    template <const l1_to_l0b_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src) {
         check_template<trait, T, U>();
-        if constexpr (T::layout_type::depth == FIVE_DIM_DATA) {
+        if constexpr (T::layout_type::depth == five_dim_data) {
             batch_load_data_impl<trait, T, U>(dst, src);
-        } else if constexpr (T::layout_type::depth == FOUR_DIM_DATA) {
+        } else if constexpr (T::layout_type::depth == four_dim_data) {
             load_data_impl<trait, T, U>(dst, src);
         } else {
-            static_assert(T::layout_type::depth == FOUR_DIM_DATA || T::layout_type::depth == FIVE_DIM_DATA,
+            static_assert(T::layout_type::depth == four_dim_data || T::layout_type::depth == five_dim_data,
                           "load_data_l1_to_l0b_nz2zn_b8b4 only supports the plain fractal layout "
                           "((col0,col1),(row0,row1)) or the batch layout (B,((col0,col1),(row0,row1))).");
         }
     }
 
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    template <const l1_to_l0b_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(
-        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& copy_shape)
+        const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape)
     {
         check_template<trait, T, U>();
-        auto src_shape = make_slice_shape(coord_src, src.layout(), copy_shape);
-        auto dst_offset = dst.layout()(coord_dst);
-        auto src_offset = src.layout()(coord_src);
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto dst_offset = dst.layout()(dst_coord);
+        auto src_offset = src.layout()(src_coord);
         using dst_type = typename T::element_type;
-        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
+        constexpr uint32_t stride_unit = c0_element<dst_type> * fractal_fixed;
         auto src_column_size = get_shape_columns(src_shape);
         auto dst_column_size = get_shape_columns(dst.layout().shape());
         auto n1 = src_column_size - dst_column_size;
-        auto m_step = get_shape_rows(dst.layout().shape()) / FRACTAL_FIXED;
-        auto k_step = Std::ceil_division(src_column_size, C0_ELEMENT<dst_type>);
-        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) / STRIDE_UNIT;
-        auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst.layout()) / STRIDE_UNIT;
-        if (n1 < FRACTAL_FIXED) {
+        auto m_step = get_shape_rows(dst.layout().shape()) / fractal_fixed;
+        auto k_step = Std::ceil_division(src_column_size, c0_element<dst_type>);
+        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) / stride_unit;
+        auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst.layout()) / stride_unit;
+        if (n1 < fractal_fixed) {
             load_l1_to_l0b_instr::load_data_with_offset<true>(
                 dst, src, dst_offset, src_offset, 0, 0, m_step, k_step, src_stride, dst_stride);
         } else if constexpr (is_b4_type<dst_type>) {
-            load_split_with_offset<M_STEP_MIN_VAL_B4>(
+            load_split_with_offset<m_step_min_val_b4>(
                 dst, src, dst_offset, src_offset, m_step, k_step, src_stride, dst_stride);
         } else {
-            load_split_with_offset<M_STEP_MIN_VAL_B8>(
+            load_split_with_offset<m_step_min_val_b8>(
                 dst, src, dst_offset, src_offset, m_step, k_step, src_stride, dst_stride);
         }
     }
 
 private:
-    static constexpr uint8_t M_STEP_MIN_VAL_B4 = 4;
-    static constexpr uint8_t M_STEP_MIN_VAL_B8 = 2;
+    static constexpr uint8_t m_step_min_val_b4 = 4;
+    static constexpr uint8_t m_step_min_val_b8 = 2;
 
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U>
+    template <const l1_to_l0b_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<T, U>();
@@ -122,34 +124,35 @@ private:
                   get_element<attr_info::shape, attr_info::column, 1>(dst_layout) *
                   get_element<attr_info::shape, attr_info::column, 0>(dst_layout);
         auto m_step = get_element<attr_info::shape, attr_info::row, 1>(dst_layout) *
-                get_element<attr_info::shape, attr_info::row, 0>(dst_layout) / FRACTAL_FIXED;
+                get_element<attr_info::shape, attr_info::row, 0>(dst_layout) / fractal_fixed;
         auto k_step = get_element<attr_info::shape, attr_info::column, 1>(src_layout);
         TENSOR_API_DEBUG_CHECK(debug_check_l0_step, k_step, "k_step", "copy_l1_to_l0b nz2zn b8/b4 path");
-        TENSOR_API_DEBUG_CHECK(debug_check_l0_m_step, m_step, is_b4_type<dst_type>, "copy_l1_to_l0b nz2zn b8/b4 path");
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_m_step, m_step, is_b4_type<dst_type>,
+                               "copy_l1_to_l0b nz2zn b8/b4 path");
         // Nz -> Zn
-        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
-        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / STRIDE_UNIT;
-        auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout) / STRIDE_UNIT;
-        if (n1 < FRACTAL_FIXED) {
+        constexpr uint32_t stride_unit = c0_element<dst_type> * fractal_fixed;
+        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / stride_unit;
+        auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout) / stride_unit;
+        if (n1 < fractal_fixed) {
             TENSOR_API_DEBUG_CHECK(debug_check_l0_step, m_step, "m_step", "copy_l1_to_l0b nz2zn b8/b4 path");
             load_l1_to_l0b_instr::load_data<true>(dst.data().get(), src.data().get(), m_start_position,
                                                     k_start_position, m_step, k_step, src_stride, dst_stride);
         } else if constexpr (is_b4_type<dst_type>) {
-            load_data_impl_split<M_STEP_MIN_VAL_B4>(dst, src, m_start_position, k_start_position, m_step, k_step,
+            load_data_impl_split<m_step_min_val_b4>(dst, src, m_start_position, k_start_position, m_step, k_step,
                                                     src_stride, dst_stride);
         } else {
-            load_data_impl_split<M_STEP_MIN_VAL_B8>(dst, src, m_start_position, k_start_position, m_step, k_step,
+            load_data_impl_split<m_step_min_val_b8>(dst, src, m_start_position, k_start_position, m_step, k_step,
                                                     src_stride, dst_stride);
         }
     }
 
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U>
+    template <const l1_to_l0b_trait& trait, typename T, typename U>
     __aicore__ inline static void load_data_impl(const T& dst, const U& src)
     {
         load_data_fractal(dst, src, dst.layout(), src.layout());
     }
 
-    template <const copy_l1_to_l0b_trait& trait, typename T, typename U>
+    template <const l1_to_l0b_trait& trait, typename T, typename U>
     __aicore__ inline static void batch_load_data_impl(const T& dst, const U& src)
     {
         auto dst_layout = dst.layout();

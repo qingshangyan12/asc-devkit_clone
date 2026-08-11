@@ -29,23 +29,23 @@ namespace te {
 
 class copy_gm_to_l1_nd2nz {
 public:
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
-        if constexpr (U::layout_type::depth == THREE_DIM_DATA || U::layout_type::depth == FIVE_DIM_DATA) {
+        if constexpr (U::layout_type::depth == three_dim_data || U::layout_type::depth == five_dim_data) {
             TENSOR_API_DEBUG_CHECK(debug_check_batch_count, get<0>(src.layout().shape()), "copy_gm_to_l1 nd2nz path");
         }
         run_gm_to_l1_batched<trait, copy_gm_to_l1_nd2nz, T, U>(dst, src);
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    template <const gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(
-        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& copy_shape)
+        const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape)
     {
-        run_gm_to_l1_batched<trait, copy_gm_to_l1_nd2nz, T, U>(dst, src, coord_dst, coord_src, copy_shape);
+        run_gm_to_l1_batched<trait, copy_gm_to_l1_nd2nz, T, U>(dst, src, dst_coord, src_coord, copy_shape);
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<U, T>();
@@ -83,7 +83,7 @@ public:
         }
 
         uint64_t src_d_value = src_row_stride;
-        uint16_t dst_nz_c0_stride = dst_column_stride / C0_ELEMENT<type>;
+        uint16_t dst_nz_c0_stride = dst_column_stride / c0_element<type>;
         uint16_t dst_nz_n_stride = 1;
 
         uint64_t loop1_src_stride = src_d_value * sizeof(type);
@@ -92,15 +92,15 @@ public:
         uint16_t loop2_dst_stride = dst_nz_n_stride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3_dst_stride = dst_nz_c0_stride; // loop3_dst_stride = dst_nz_c0_Stride
         // loop4_dst_stride: dst_nz_matrix_stride * size_of_dst_type / C0_size
-        uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / C0_ELEMENT<type>);
+        uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / c0_element<type>);
         uint8_t cache_mode = src.engine().get_cache_mode();
 
         copy_gm_to_l1_multi_nd2nz_instr::data_copy(dst.data().get(), src.data().get(), nd_num, loop2_dst_stride, loop3_dst_stride, loop4_dst_stride,
                                               loop1_src_stride, cache_mode, n_value, d_value, loop4_src_stride, false);
     }
 
-    template <typename T, typename U, typename ShapeType, typename DstOffset, typename SrcOffset>
-    __aicore__ inline static void emit_copy(const T& dst, const U& src, const ShapeType& copy_shape, uint16_t nd_num,
+    template <typename T, typename U, typename CopyShape, typename DstOffset, typename SrcOffset>
+    __aicore__ inline static void emit_copy(const T& dst, const U& src, const CopyShape& copy_shape, uint16_t nd_num,
         uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride, const DstOffset& dst_offset,
         const SrcOffset& src_offset)
     {
@@ -116,8 +116,8 @@ public:
         }
         uint64_t loop1_src_stride = src_row_stride * sizeof(type);
         uint64_t loop4_src_stride = src_nd_matrix_stride * sizeof(type);
-        uint16_t loop3_dst_stride = dst_column_stride / C0_ELEMENT<type>;
-        uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / C0_ELEMENT<type>);
+        uint16_t loop3_dst_stride = dst_column_stride / c0_element<type>;
+        uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / c0_element<type>);
         uint8_t cache_mode = src.engine().get_cache_mode();
         copy_gm_to_l1_multi_nd2nz_instr::data_copy_with_offset(dst, src, dst_offset, src_offset, nd_num, 1,
             loop3_dst_stride, loop4_dst_stride, loop1_src_stride, cache_mode, n_value, d_value, loop4_src_stride, false);

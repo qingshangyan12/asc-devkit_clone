@@ -29,21 +29,21 @@ namespace te {
 
 class copy_ub_to_gm_dn : private copy_ub_to_gm_common {
 public:
-    template <const copy_ub_to_gm_trait& trait, typename T, typename U>
+    template <const ub_to_gm_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         data_copy_impl<trait, T, U>(dst, src);
     }
 
 private:
-    template <const copy_ub_to_gm_trait& trait, typename T, typename U>
+    template <const ub_to_gm_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<U, T>();
         check_data_type::check_ub_to_gm_data_type<T, U>();
     }
 
-    template <const copy_ub_to_gm_trait& trait, typename T, typename U>
+    template <const ub_to_gm_trait& trait, typename T, typename U>
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
     {
         using src_type = typename U::element_type;

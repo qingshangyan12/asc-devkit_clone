@@ -29,24 +29,24 @@ namespace te {
 
 class copy_gm_to_l1_zn2zn {
 public:
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         run_gm_to_l1_batched<trait, copy_gm_to_l1_zn2zn, T, U>(dst, src);
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    template <const gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(
-        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& copy_shape)
+        const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape)
     {
         check_template<trait, T, U>();
         using type = typename U::element_type;
-        auto src_shape = make_slice_shape(coord_src, src.layout(), copy_shape);
-        auto dst_offset = dst.layout()(coord_dst);
-        auto src_offset = src.layout()(coord_src);
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto dst_offset = dst.layout()(dst_coord);
+        auto src_offset = src.layout()(src_coord);
         auto block_count = get_shape_batch_size(src_shape) *
-            Std::ceil_division(get_shape_rows(src_shape), FRACTAL_FIXED);
-        auto block_len = get_shape_columns(src_shape) * C0_SIZE<>;
+            Std::ceil_division(get_shape_rows(src_shape), fractal_fixed);
+        auto block_len = get_shape_columns(src_shape) * c0_size<>;
         auto src_stride = get_matrix_element<attr_info::stride, attr_info::row, 1>(src.layout()) * sizeof(type);
         auto dst_stride = get_matrix_element<attr_info::stride, attr_info::row, 1>(dst.layout()) * sizeof(type);
         if constexpr (is_b4_type<type>) {
@@ -57,7 +57,7 @@ public:
             src.engine().get_cache_mode(), src_stride, dst_stride);
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<U, T>();
@@ -90,7 +90,7 @@ public:
         uint8_t cache_mode = src.engine().get_cache_mode();
 
         auto block_count = big_fractal_size * matrix_num;
-        auto block_len = small_fractal_size * C0_SIZE<>;
+        auto block_len = small_fractal_size * c0_size<>;
         auto src_stride = src_stride_size * sizeof(type);
         auto dst_stride = dst_stride_size * sizeof(type);
         if constexpr (is_b4_type<type>) {
