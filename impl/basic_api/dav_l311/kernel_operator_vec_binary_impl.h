@@ -33,7 +33,7 @@ constexpr Reg::CastTrait float2halfCastTrait = {
     Reg::RegLayout::ZERO, Reg::SatMode::SAT, Reg::MaskMergeMode::ZEROING, RoundMode::CAST_RINT};
 constexpr Reg::CastTrait mulAddDstTrait = {
     Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN, Reg::MaskMergeMode::ZEROING, RoundMode::UNKNOWN};
-}
+} // namespace CastParam
 
 const uint32_t B64_DATA_NUM_PER_REPEAT = 32;
 const uint32_t B4_BYTE_SIZE_PER_REPEAT = 64;
@@ -709,9 +709,8 @@ template <typename T>
 __simd_vf__ inline void FusedMulAddReluImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t calCount)
 {
     static_assert(
-        SupportType<T, half, float>(),
-        "Failed to check dtype in FusedMulAddRelu, current "
-        "api support dtype combination is src and dst both: half / float.");
+        SupportType<T, half, float>(), "Failed to check dtype in FusedMulAddRelu, current "
+                                       "api support dtype combination is src and dst both: half / float.");
     const T scalarValue = 0;
     uint32_t sreg = static_cast<uint32_t>(calCount);
     if constexpr (sizeof(T) == 8) {

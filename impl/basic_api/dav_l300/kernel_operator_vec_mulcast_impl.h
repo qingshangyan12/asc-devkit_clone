@@ -26,7 +26,6 @@
 #include "../kernel_check.h"
 #endif
 
-
 namespace AscendC {
 template <typename T, typename U>
 constexpr __aicore__ inline void CheckMulCastSupportType()

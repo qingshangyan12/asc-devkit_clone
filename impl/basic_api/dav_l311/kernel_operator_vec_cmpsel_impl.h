@@ -1951,8 +1951,7 @@ __aicore__ inline void VselImpl(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
-        "current data type is not supported!");
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
     if (isCounterMode) {
@@ -1968,8 +1967,7 @@ __aicore__ inline void VselImpl(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
-        "current data type is not supported!");
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     SetVectorMask<T>(mask[1], mask[0]);
     bool isCounterMode = Internal::IsCounterMode();
@@ -2151,8 +2149,7 @@ __aicore__ inline void VselImpl(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
-        "current data type is not supported!");
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
     if (isCounterMode) {
@@ -2180,8 +2177,7 @@ __aicore__ inline void VselImpl(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
-        "current data type is not supported!");
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     SetVectorMask<T>(mask[1], mask[0]);
     bool isCounterMode = Internal::IsCounterMode();
@@ -2271,8 +2267,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, uint32_t calCount)
 {
     static_assert(
-        SupportType<
-            T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        SupportType<T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "current data type is not supported!");
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     SelectMode1Level2<T, U, Reg::RegTensor<T>>(dst, sel, src0, src1, calCount);
@@ -2343,8 +2338,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, T src0, __ubuf__ T* src1, SELMODE selMode, uint32_t calCount)
 {
     static_assert(
-        SupportType<
-            T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        SupportType<T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "current data type is not supported!");
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     SelectSrc0ScalarMode1Level2<T, U, Reg::RegTensor<T>>(dst, sel, src0, src1, calCount);
@@ -2469,8 +2463,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, uint32_t calCount)
 {
     static_assert(
-        SupportType<
-            T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        SupportType<T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
         "current data type is not supported!");
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     if constexpr (sizeof(T) == 1) {
