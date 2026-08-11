@@ -99,6 +99,7 @@ enum AlgorithmType {
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
+    {"CcuKfcAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
     {"CcuKfcReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
