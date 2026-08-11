@@ -58,11 +58,11 @@ __aicore__ inline constexpr auto make_batch_pattern_layout(const Batch& batch, c
 struct make_nz_frame_layout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto make(T row, U column) {
-        constexpr auto c0_ele = TraitType::C0_ELEMENT;
-        auto shape = make_shape(make_shape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
+        constexpr auto c0_ele = TraitType::c0_element;
+        auto shape = make_shape(make_shape(Std::Int<fractal_fixed>{}, Std::ceil_division(row, fractal_fixed)),
                                make_shape(c0_ele, Std::ceil_division(column, c0_ele)));
-        auto stride = make_stride(make_stride(c0_ele, c0_ele * Std::Int<FRACTAL_FIXED>{}),
-                                 make_stride(_1{}, c0_ele * Std::ceil_align(row, FRACTAL_FIXED)));
+        auto stride = make_stride(make_stride(c0_ele, c0_ele * Std::Int<fractal_fixed>{}),
+                                 make_stride(_1{}, c0_ele * Std::ceil_align(row, fractal_fixed)));
         using layout_t = layout<decltype(shape), decltype(stride), Std::tuple<nz_layout_ptn, TraitType>>;
         return layout_t(shape, stride);
     }
@@ -106,11 +106,11 @@ struct make_nd_frame_layout {
 struct make_zn_frame_layout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto make(T row, U column) {
-        constexpr auto c0_ele = TraitType::C0_ELEMENT;
+        constexpr auto c0_ele = TraitType::c0_element;
         auto shape = make_shape(make_shape(c0_ele, Std::ceil_division(row, c0_ele)),
-                               make_shape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
-        auto stride = make_stride(make_stride(_1{}, c0_ele * Std::ceil_align(column, FRACTAL_FIXED)),
-                                 make_stride(c0_ele, c0_ele * Std::Int<FRACTAL_FIXED>{}));
+                               make_shape(Std::Int<fractal_fixed>{}, Std::ceil_division(column, fractal_fixed)));
+        auto stride = make_stride(make_stride(_1{}, c0_ele * Std::ceil_align(column, fractal_fixed)),
+                                 make_stride(c0_ele, c0_ele * Std::Int<fractal_fixed>{}));
         using layout_t = layout<decltype(shape), decltype(stride), Std::tuple<zn_layout_ptn, TraitType>>;
         return layout_t(shape, stride);
     }
@@ -154,11 +154,11 @@ struct make_dn_ext_frame_layout {
 struct make_zz_frame_layout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto make(T row, U column) {
-        constexpr auto c0_ele = TraitType::C0_ELEMENT;
-        auto shape = make_shape(make_shape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
+        constexpr auto c0_ele = TraitType::c0_element;
+        auto shape = make_shape(make_shape(Std::Int<fractal_fixed>{}, Std::ceil_division(row, fractal_fixed)),
                                make_shape(c0_ele, Std::ceil_division(column, c0_ele)));
-        auto stride = make_stride(make_stride(c0_ele, FRACTAL_FIXED * Std::ceil_align(column, c0_ele)),
-                                 make_stride(_1{}, c0_ele * Std::Int<FRACTAL_FIXED>{}));
+        auto stride = make_stride(make_stride(c0_ele, fractal_fixed * Std::ceil_align(column, c0_ele)),
+                                 make_stride(_1{}, c0_ele * Std::Int<fractal_fixed>{}));
         using layout_t = layout<decltype(shape), decltype(stride), Std::tuple<zz_layout_ptn, TraitType>>;
         return layout_t(shape, stride);
     }
@@ -172,11 +172,11 @@ struct make_zz_frame_layout {
 struct make_nn_frame_layout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto make(T row, U column) {
-        constexpr auto c0_ele = TraitType::C0_ELEMENT;
+        constexpr auto c0_ele = TraitType::c0_element;
         static_assert(c0_ele == 2, "NnLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
-        auto shape = make_shape(make_shape(c0_ele, row / c0_ele), make_shape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
-        auto stride = make_stride(make_stride(_1{}, c0_ele * Std::Int<FRACTAL_FIXED>{}),
-                                 make_stride(c0_ele, row * FRACTAL_FIXED));
+        auto shape = make_shape(make_shape(c0_ele, row / c0_ele), make_shape(Std::Int<fractal_fixed>{}, Std::ceil_division(column, fractal_fixed)));
+        auto stride = make_stride(make_stride(_1{}, c0_ele * Std::Int<fractal_fixed>{}),
+                                 make_stride(c0_ele, row * fractal_fixed));
         using layout_t = layout<decltype(shape), decltype(stride), Std::tuple<nn_layout_ptn, TraitType>>;
         return layout_t(shape, stride);
     }
@@ -190,7 +190,7 @@ struct make_nn_frame_layout {
 struct make_scalea_nd_frame_layout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto make(T row, U column) {
-        constexpr auto c0_ele = TraitType::C0_ELEMENT;
+        constexpr auto c0_ele = TraitType::c0_element;
         static_assert(c0_ele == 2, "scalea_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
         auto shape = make_shape(make_shape(_1{}, row), make_shape(_1{}, column));
         auto stride = make_stride(make_stride(_0{}, column), make_stride(_0{}, _1{}));
@@ -207,7 +207,7 @@ struct make_scalea_nd_frame_layout {
 struct make_scalea_dn_frame_layout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto make(T row, U column) {
-        constexpr auto c0_ele = TraitType::C0_ELEMENT;
+        constexpr auto c0_ele = TraitType::c0_element;
         static_assert(c0_ele == 2, "scalea_dn_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
         auto shape = make_shape(make_shape(_1{}, row), make_shape(c0_ele, column / c0_ele));
         auto stride = make_stride(make_stride(_0{}, c0_ele),
@@ -225,7 +225,7 @@ struct make_scalea_dn_frame_layout {
 struct make_scaleb_nd_frame_layout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto make(T row, U column) {
-        constexpr auto c0_ele = TraitType::C0_ELEMENT;
+        constexpr auto c0_ele = TraitType::c0_element;
         static_assert(c0_ele == 2, "scaleb_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
         auto shape = make_shape(make_shape(c0_ele, row / c0_ele), make_shape(_1{}, column));
         auto stride = make_stride(make_stride(_1{}, c0_ele * column),

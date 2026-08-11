@@ -24,7 +24,6 @@
 namespace asc {
 namespace te {
 
-
 struct mmad_trait_default;
 struct mmad_operation;
 

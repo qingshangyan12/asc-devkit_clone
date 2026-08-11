@@ -39,9 +39,6 @@ using shape_type = Std::tuple<Shapes...>;
 template <typename... Strides>
 using stride_type = Std::tuple<Strides...>;
 
-template <typename... Layouts>
-using tile_type = Std::tuple<Layouts...>;
-
 template <typename... Coords>
 using coord_type = Std::tuple<Coords...>;
 
@@ -49,7 +46,7 @@ template <typename T, typename U, typename Info = Std::ignore_t>
 struct layout_type : private Std::tuple<T, U> {
 public:
     static constexpr auto depth = nesting_depth_v<T>;
-    static constexpr auto rank = Std::tuple_size_v<T>;
+    static constexpr auto rank_size = Std::tuple_size_v<T>;
 
     __aicore__ inline constexpr layout_type(const T& shape = {}, const U& stride = {}) : Std::tuple<T, U>(shape, stride)
     {
@@ -103,7 +100,7 @@ public:
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) get_rank() const
+    __aicore__ inline constexpr decltype(auto) rank() const
     {
         static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>,
                       "The dimensions of the Shape and Stride are not the same.");
@@ -161,7 +158,7 @@ public:
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) Rank() const
     {
-        return get_rank<I...>();
+        return rank<I...>();
     }
 
     template <size_t... I>

@@ -30,15 +30,15 @@
 namespace asc {
 namespace te {
 
-constexpr copy_l0c_to_l1_trait DEFAULT_COPY_L0C_TO_L1_TRAIT = copy_l0c_to_l1_trait{};
+constexpr copy_l0c_to_l1_trait default_copy_l0c_to_l1_trait = copy_l0c_to_l1_trait{};
 struct copy_l0c_to_l1_trait_default {
     using trait_type = copy_l0c_to_l1_trait;
-    static constexpr const trait_type value = DEFAULT_COPY_L0C_TO_L1_TRAIT;
+    static constexpr const trait_type value = default_copy_l0c_to_l1_trait;
 };
 
 struct copy_l0c_to_l1_base {
 public:
-    template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C_TO_L1_TRAIT, typename T, typename U>
+    template <const copy_l0c_to_l1_trait& trait = default_copy_l0c_to_l1_trait, typename T, typename U>
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src,
                                                  const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
@@ -50,11 +50,11 @@ public:
         using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
         using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
 
-        using copy_l0c_to_l1_impl = typename copy_l0c_to_l1_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        using copy_l0c_to_l1_impl = typename copy_l0c_to_l1_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
         copy_l0c_to_l1_impl::template run<trait>(dst, src, params);
     }
 
-    template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C_TO_L1_TRAIT, typename T, typename U, typename S>
+    template <const copy_l0c_to_l1_trait& trait = default_copy_l0c_to_l1_trait, typename T, typename U, typename S>
     __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type
     data_copy_impl(const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
@@ -66,11 +66,11 @@ public:
         using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
         using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
 
-        using copy_l0c_to_l1_impl = typename copy_l0c_to_l1_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        using copy_l0c_to_l1_impl = typename copy_l0c_to_l1_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
         copy_l0c_to_l1_impl::template run<trait>(dst, src, quant, params);
     }
 
-    template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C_TO_L1_TRAIT, typename T, typename U, typename S>
+    template <const copy_l0c_to_l1_trait& trait = default_copy_l0c_to_l1_trait, typename T, typename U, typename S>
     __aicore__ inline static typename Std::enable_if<is_attr_tensor_v<S>, void>::type
     data_copy_impl(const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
@@ -82,7 +82,7 @@ public:
         using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
         using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
 
-        using copy_l0c_to_l1_impl = typename copy_l0c_to_l1_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        using copy_l0c_to_l1_impl = typename copy_l0c_to_l1_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
         copy_l0c_to_l1_impl::template run<trait>(dst, src, quant, params);
     }
 };

@@ -29,18 +29,18 @@
 namespace asc {
 namespace te {
 
-constexpr copy_gm_to_ub_trait DEFAULT_COPY_GM_TO_UB_TRAIT = copy_gm_to_ub_trait{};
+constexpr copy_gm_to_ub_trait default_copy_gm_to_ub_trait = copy_gm_to_ub_trait{};
 
 struct copy_gm_to_ub_trait_default {
     using trait_type = copy_gm_to_ub_trait;
-    static constexpr const trait_type value = DEFAULT_COPY_GM_TO_UB_TRAIT;
+    static constexpr const trait_type value = default_copy_gm_to_ub_trait;
 };
 
 constexpr copy_gm_to_ub_params DEFAULT_COPY_GM_TO_UB_PARAMS{};
 
 struct copy_gm_to_ub_base {
 public:
-    template <const copy_gm_to_ub_trait& trait = DEFAULT_COPY_GM_TO_UB_TRAIT, typename T, typename U>
+    template <const copy_gm_to_ub_trait& trait = default_copy_gm_to_ub_trait, typename T, typename U>
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src,
                                                  const copy_gm_to_ub_params& params = DEFAULT_COPY_GM_TO_UB_PARAMS)
     {
@@ -50,7 +50,7 @@ public:
         static_assert(Std::is_same_v<src_pos, location::gm>, "When Copy tensor from GM to UB, src tensor must on GM");
         using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
         using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
-        using copy_gm_to_ub_impl = typename copy_gm_to_ub_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        using copy_gm_to_ub_impl = typename copy_gm_to_ub_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
         copy_gm_to_ub_impl::template run<trait, T, U>(dst, src, params);
     }
 };

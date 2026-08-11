@@ -140,8 +140,6 @@ inline constexpr bool is_satisfied_ptn_format_v = is_satisfied_ptn_format<Tensor
 } // namespace te
 } // namespace asc
 
-
-
 #endif // IMPL_TENSOR_API_ARCH_UTILS_IS_FORMAT_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

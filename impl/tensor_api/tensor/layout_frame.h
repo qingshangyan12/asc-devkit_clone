@@ -41,15 +41,11 @@ using layout_format_set =
 
 template <typename T, typename C0>
 struct layout_trait {
-    static constexpr auto C0_ELEMENT = C0{};
+    static constexpr auto c0_element = C0{};
 };
 
-template <typename T = uint16_t, typename C0 = Std::Int<C0_ELEMENT<T>>>
+template <typename T = uint16_t, typename C0 = Std::Int<c0_element<T>>>
 struct layout_trait_default : layout_trait<T, C0> {};
-
-struct layout_trait_scale : layout_trait_default<fp8_e8m0_t, Std::Int<MX_SCALE_K0 / sizeof(fp8_e8m0_t)>> {};
-
-struct layout_trait_fp4 : layout_trait_default<fp4x2_e2m1_t, Std::Int<C0_ELEMENT<fp4x2_e2m1_t>>> {};
 
 using format_trait_set = tuple_map<
     Std::tuple<nz_layout_ptn, layout_trait_default<>>, Std::tuple<nd_layout_ptn, layout_trait<Std::ignore_t, _1>>,
@@ -70,7 +66,7 @@ template <typename T, typename = void>
 struct is_frame_layout_trait : Std::false_type {};
 
 template <typename T>
-struct is_frame_layout_trait<T, void_t<decltype(T::C0_ELEMENT)>> : Std::true_type {};
+struct is_frame_layout_trait<T, void_t<decltype(T::c0_element)>> : Std::true_type {};
 
 template <typename T>
 constexpr bool is_frame_layout_trait_v = is_frame_layout_trait<T>::value;
