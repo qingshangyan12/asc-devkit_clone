@@ -228,7 +228,7 @@ MX Mmad通常需要在调用`Mmad`前完成左矩阵缩放数据ScaleA和右矩�
 - [L1到L0ScaleA数据搬运](../cube_compute_load/Copy_L1ToL0ScaleA.md)
 - [L1到L0ScaleB数据搬运](../cube_compute_load/Copy_L1ToL0ScaleB.md)
 - [L0C到GM数据搬运](../cube_compute_store/Copy_L0CToGM.md)
-- [L0C到UB数据搬运](../cube_compute_store/Copy_L0CToUB.md)
+- [L0C到Unified Buffer（UB）数据搬运](../cube_compute_store/Copy_L0CToUB.md)
 
 ## 调用示例
 

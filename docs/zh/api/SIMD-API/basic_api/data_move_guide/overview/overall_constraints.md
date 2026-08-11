@@ -11,7 +11,7 @@ AI Core上的各类存储单元有不同的地址对齐要求。Ascend C API操�
 | 存储单元 | 对齐要求 | 说明 |
 |----------|----------|------|
 | Global Memory | 1字节对齐 | 最宽松的对齐要求，任意字节地址均可 |
-| Unified Buffer | 32字节对齐 | 与DataBlock大小一致，地址必须为32的整数倍 |
+| Unified Buffer（UB） | 32字节对齐 | 与DataBlock大小一致，地址必须为32的整数倍 |
 | L1 Buffer | 32字节对齐 | 同UB，地址必须为32的整数倍 |
 | L0A Buffer/L0B Buffer | 512字节对齐 | 矩阵计算输入的高对齐要求 |
 | L0C Buffer | 64字节对齐 | 矩阵计算结果缓冲区 |

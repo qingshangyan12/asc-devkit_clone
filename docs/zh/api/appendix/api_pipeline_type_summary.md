@@ -109,7 +109,7 @@
 | 掩码操作 | ResetMask | AIV | PIPE_S |
 | 数据重排 | Interleave | AIV | PIPE_V |
 | 数据重排 | DeInterleave | AIV | PIPE_V |
-| 数据搬运 | DataCopy(GM->UB) | AIV | PIPE_MTE2 |
+| 数据搬运 | DataCopy(GM->Unified Buffer（UB）) | AIV | PIPE_MTE2 |
 | 数据搬运 | DataCopy(UB->GM) | AIV | PIPE_MTE3 |
 | 数据搬运 | DataCopyPad(GM->UB) | AIV | PIPE_MTE2 |
 | 数据搬运 | DataCopyPad(UB->GM) | AIV | PIPE_MTE3 |

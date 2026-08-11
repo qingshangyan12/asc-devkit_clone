@@ -26,8 +26,8 @@
 
 ## 功能说明
 
-设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到GM的数据传输开启原子累加。累加的数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。
-开启原子累加后，后续执行搬运操作从Unified Buffer/L0C Buffer/L1 Buffer到GM时，GM中原始数据将与新搬运数据进行逐元素累加，累加结果写回GM。
+设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子累加。累加的数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。
+开启原子累加后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，GM中原始数据将与新搬运数据进行逐元素累加，累加结果写回GM。
 <!-- npu="950" id8 -->
 特别地，针对Ascend 950PR/Ascend 950DT，不支持L1 Buffer到GM的通路。
 <!-- end id8 -->

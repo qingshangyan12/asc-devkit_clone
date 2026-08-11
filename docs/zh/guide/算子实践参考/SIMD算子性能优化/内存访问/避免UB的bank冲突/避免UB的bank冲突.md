@@ -1,3 +1,3 @@
-# 避免UB的bank冲突
+# 避免Unified Buffer（UB）的bank冲突
 
 本文件为文档发布时所需的索引文件。

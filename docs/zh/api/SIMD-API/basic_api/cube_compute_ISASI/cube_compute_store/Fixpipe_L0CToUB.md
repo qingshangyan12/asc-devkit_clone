@@ -1,4 +1,4 @@
-# Fixpipe（L0C Buffer到UB数据搬运）<a name="ZH-CN_TOPIC_0000002563847576"></a>
+# Fixpipe（L0C Buffer到Unified Buffer（UB）数据搬运）<a name="ZH-CN_TOPIC_0000002563847576"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002549846732_section796754519912"></a>
 
@@ -34,7 +34,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_fixpipe_intf.h"`。
 
-矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Unified Buffer（UB）中，并且在搬运过程中支持随路格式转换等操作。
+矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至UB中，并且在搬运过程中支持随路格式转换等操作。
 
 <!-- npu="950" id10 -->
 以Ascend 950PR/Ascend 950DT为例，下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。

@@ -97,6 +97,7 @@ Establish a **unified terminology mapping table** (independent appendix file) sh
 
 **Specific Requirements**:
 - Any code name / abbreviation that appears in the documentation must be annotated with its full name on first occurrence and linked to the mapping table
+- In natural-language text, write "Unified Buffer (UB)" on its first occurrence in each document and use "UB" thereafter. Keep code identifiers and link targets unchanged
 - The same concept may use different-level names in different documents, but must have an equivalence relationship in the terminology mapping table
 - Terminology groups that must be mapped: DMA/MTE/DataCopy (three-layer name for the same transfer function), Local Memory/L1/`__cbuf__` (three-layer name for the same storage), etc.
 

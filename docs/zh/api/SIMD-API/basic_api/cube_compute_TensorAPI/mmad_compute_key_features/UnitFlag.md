@@ -45,7 +45,7 @@ Mmad和Copy接口设置unitFlag值为2/3后，系统会启动单元标志位。
 
 - [Mmad](../mmad_compute/Mmad.md)
 - [Copy（L0C到GM数据搬运）](../cube_compute_store/Copy_L0CToGM.md)
-- [Copy（L0C到UB数据搬运）](../cube_compute_store/Copy_L0CToUB.md)
+- [Copy（L0C到Unified Buffer（UB）数据搬运）](../cube_compute_store/Copy_L0CToUB.md)
 - [SetFixPipeConfig](../../cube_compute_ISASI/cube_store_aux_config/SetFixPipeConfig.md)
 - [SetMMColumnMajor/SetMMRowMajor](../../cube_compute_ISASI/mmad_compute_aux_config/SetMMColumnMajor-SetMMRowMajor.md)
 

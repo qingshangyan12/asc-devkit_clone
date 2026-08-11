@@ -16,6 +16,6 @@
 
 - **[随路量化与随路ReLU场景组合](accompanying_quantization_and_relu_scenario_combination.md)**
 
-- **[L0C Buffer到UB双目标模式](L0C_to_UB_dual_target_mode.md)**
+- **[L0C Buffer到Unified Buffer（UB）双目标模式](L0C_to_UB_dual_target_mode.md)**
 
 - **[卷积格式转换](convolution_format_conversion.md)**

@@ -1,6 +1,6 @@
 # 数据搬运<a name="ZH-CN_TOPIC_0000001499154365"></a>
 
-- **[DataCopy（GM与UB连续数据搬运）](DataCopy_GMAndUB_continuous.md)**
+- **[DataCopy（GM与Unified Buffer（UB）连续数据搬运）](DataCopy_GMAndUB_continuous.md)**
 - **[DataCopy（GM与UB高维切分数据搬运）](DataCopy_GMAndUB_highdim_split.md)**
 - **[DataCopy（GM与UB切片数据搬运）](DataCopy_GMAndUB_slice.md)**
 - **[DataCopy（GM -> UB随路转换ND2NZ搬运）](DataCopy_GMToUB_ND2NZ.md)**

@@ -132,7 +132,7 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
 
 开启cce-auto-sync编译选项的自动同步功能需满足以下前提条件方可生效：
 
-- 异构编译直调（<<<>>>调用）、Kernel直调算子工程以及自定义算子开发工程已默认设置`--cce-auto-sync=on`，如果开发者手动设置`--cce-auto-sync=off`，毕昇编译器无法自动插入同步。
+- 异构编译直调（<<<>>>调用）、核函数（Kernel）直调算子工程以及自定义算子开发工程已默认设置`--cce-auto-sync=on`，如果开发者手动设置`--cce-auto-sync=off`，毕昇编译器无法自动插入同步。
 - 属于PIPE\_V、PIPE\_MTE2、PIPE\_MTE3的接口必须操作基础Tensor（包含[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)和[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)）。
 - 属于PIPE\_S的接口必须在以下接口集合内：
     - Tensor标量读写：[LocalTensor::GetValue](../../data_structures/LocalTensor/GetValue.md)、[LocalTensor::SetValue](../../data_structures/LocalTensor/SetValue.md)、[LocalTensor::operator()](../../data_structures/LocalTensor/operator_call.md)、[GlobalTensor::GetValue](../../data_structures/GlobalTensor/GetValue.md)、[GlobalTensor::operator()](../../data_structures/GlobalTensor/operator_call.md)。
@@ -231,7 +231,7 @@ TPipe-TQue框架编程范式插入的同步并没有单独的日志功能，但�
 [info] [00002118] (PC: 0x10d0d4b8) VEC      : (Binary: 0x85c4c6bc) VADD  XD:X2=0x4000, XN:X12=0, XM:X13=0x2000, XT:X15=0x100080808010101, Dtype:F32, Id:308
 ```
 
-以上日志片段大致与Add向量加法样例的如下代码片段对应，日志中`MOV_OUT_TO_UB`对应`DataCopy`（源地址GM、目的地址UB）、`SET_FLAG`对应`SetFlag`、`WAIT_FLAG`对应`WaitFlag`、`VADD`对应`Add`，从日志第2009行、第2010行和第2011行可以看到，TPipe-TQue框架编程范式在PIPE_MTE2和PIPE_V之间自动插入了`SetFlag`和`WaitFlag`指令。
+以上日志片段大致与Add向量加法样例的如下代码片段对应，日志中`MOV_OUT_TO_UB`对应`DataCopy`（源地址GM、目的地址Unified Buffer（UB））、`SET_FLAG`对应`SetFlag`、`WAIT_FLAG`对应`WaitFlag`、`VADD`对应`Add`，从日志第2009行、第2010行和第2011行可以看到，TPipe-TQue框架编程范式在PIPE_MTE2和PIPE_V之间自动插入了`SetFlag`和`WaitFlag`指令。
 
 ```cpp
 AscendC::LocalTensor<float> xLocal = inQueueX.AllocTensor<float>();

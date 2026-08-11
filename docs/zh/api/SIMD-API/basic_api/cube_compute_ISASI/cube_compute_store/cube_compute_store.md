@@ -12,7 +12,7 @@
 
 - **[Fixpipe（L0C到L1数据搬运）](Fixpipe_L0CToL1.md)**
 
-- **[Fixpipe（L0C到UB数据搬运）](Fixpipe_L0CToUB.md)**
+- **[Fixpipe（L0C到Unified Buffer（UB）数据搬运）](Fixpipe_L0CToUB.md)**
 
 - **[DataCopy（L0C到UB数据搬运）](DataCopy_L0CToUB.md)**
 

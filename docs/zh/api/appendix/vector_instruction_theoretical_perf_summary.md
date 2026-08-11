@@ -41,7 +41,7 @@
 <a id="table3"></a>
 | 接口 | 理论并行度（bytes/cycle） |
 | --- | --- |
-| DataCopy(UB->UB) | 256 |
+| DataCopy(Unified Buffer（UB）->UB) | 256 |
 
 **表4**  标量计算类指令理论性能汇总
 

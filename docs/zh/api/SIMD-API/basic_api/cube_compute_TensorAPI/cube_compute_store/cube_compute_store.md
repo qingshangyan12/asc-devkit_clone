@@ -6,4 +6,4 @@
 
 - **[Copy（L0C Buffer到Global Memory数据搬运）](Copy_L0CToGM.md)**
 
-- **[Copy（L0C Buffer到Unified Buffer数据搬运）](Copy_L0CToUB.md)**
+- **[Copy（L0C Buffer到Unified Buffer（UB）数据搬运）](Copy_L0CToUB.md)**

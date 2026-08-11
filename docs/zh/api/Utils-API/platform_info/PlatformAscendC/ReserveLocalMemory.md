@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001647201621_zh-cn_topic_0000001442758437_section36583473819"></a>
 
-该函数用于在Unified Buffer中预留指定大小的内存空间。调用该接口后，使用[GetCoreMemSize](GetCoreMemSize.md)可以获取实际可用的剩余Unified Buffer空间大小。
+该函数用于在Unified Buffer（UB）中预留指定大小的内存空间。调用该接口后，使用[GetCoreMemSize](GetCoreMemSize.md)可以获取实际可用的剩余UB空间大小。
 
 ## 函数原型<a name="zh-cn_topic_0000001647201621_zh-cn_topic_0000001442758437_section13230182415108"></a>
 
