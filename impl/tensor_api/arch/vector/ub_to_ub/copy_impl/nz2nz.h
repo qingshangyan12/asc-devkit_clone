@@ -35,6 +35,26 @@ public:
         data_copy_impl<trait, DstTensor, SrcTensor>(dst, src);
     }
 
+    template <const copy_ub_to_ub_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord,
+        typename ShapeType>
+    __aicore__ inline static void run(const T& dst, const U& src, const DstCoord& dst_coord,
+        const SrcCoord& src_coord, const ShapeType& copy_shape)
+    {
+        check_template<trait, T, U>();
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto block_count = get_shape_batch_size(src_shape) *
+            Std::ceil_division(get_shape_columns(src_shape), C0_ELEMENT<src_type>);
+        auto block_len = get_shape_rows(src_shape) * C0_SIZE<>;
+        auto src_stride = get_matrix_element<attr_info::stride, attr_info::column, 1>(src.layout()) * sizeof(src_type) -
+            block_len;
+        auto dst_stride = get_matrix_element<attr_info::stride, attr_info::column, 1>(dst.layout()) * sizeof(dst_type) -
+            block_len;
+        emit_copy(dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len,
+            src_stride, dst_stride);
+    }
+
 private:
     template <const ub_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static constexpr void check_template()
