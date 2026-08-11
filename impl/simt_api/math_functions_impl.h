@@ -197,6 +197,92 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isnan(float x) { return __isnan(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isinf(float x) { return __isinf(x); }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int __internal_nan_kernel(const char* s)
+{
+    unsigned long long i = 0;
+    int c;
+    int ovfl = 0;
+    int invld = 0;
+    if (s && (*s == '0')) {
+        s++;
+        if ((*s == 'x') || (*s == 'X')) {
+            s++;
+            while (*s == '0')
+                s++;
+            while (*s) {
+                if (i > 0x0fffffffffffffffULL) {
+                    ovfl = 1;
+                }
+                c = (((*s) >= 'A') && ((*s) <= 'F')) ? (*s + 'a' - 'A') : (*s);
+                if ((c >= 'a') && (c <= 'f')) {
+                    c = c - 'a' + 10;
+                    i = i * 16 + c;
+                } else if ((c >= '0') && (c <= '9')) {
+                    c = c - '0';
+                    i = i * 16 + c;
+                } else {
+                    invld = 1;
+                }
+                s++;
+            }
+        } else {
+            while (*s == '0')
+                s++;
+            while (*s) {
+                if (i > 0x1fffffffffffffffULL) {
+                    ovfl = 1;
+                }
+                c = *s;
+                if ((c >= '0') && (c <= '7')) {
+                    c = c - '0';
+                    i = i * 8 + c;
+                } else {
+                    invld = 1;
+                }
+                s++;
+            }
+        }
+    } else if (s) {
+        while (*s) {
+            c = *s;
+            if ((i > 1844674407370955161ULL) || ((i == 1844674407370955161ULL) && (c > '5'))) {
+                ovfl = 1;
+            }
+            if ((c >= '0') && (c <= '9')) {
+                c = c - '0';
+                i = i * 10 + c;
+            } else {
+                invld = 1;
+            }
+            s++;
+        }
+    }
+    if (ovfl) {
+        i = ~0ULL;
+    }
+
+    if (invld) {
+        i = 0ULL;
+    }
+    i = (i & 0x000fffffffffffffULL) | 0x7ff8000000000000ULL;
+    return i;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nanf(const char* tagp)
+{
+    float f;
+    unsigned int i;
+    i = (unsigned int)__internal_nan_kernel(tagp);
+    i = (i & 0x007fffff) | 0x7fc00000;
+
+    union Data {
+        unsigned int u;
+        float f;
+    };
+    union Data data = {.u = i};
+    return data.f;
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdimf(float x, float y)
 {
     if (isnan(x)) {
@@ -2897,6 +2983,66 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int ullmin(
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int umin(const unsigned int x, const unsigned int y)
 {
     return min(x, y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int max(unsigned int x, int y)
+{
+    return max(x, static_cast<unsigned int>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int max(int x, unsigned int y)
+{
+    return max(static_cast<unsigned int>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long max(long x, unsigned long y)
+{
+    return ullmax(static_cast<unsigned long>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long max(unsigned long x, long y)
+{
+    return ullmax(x, static_cast<unsigned long>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long max(long long x, unsigned long long y)
+{
+    return max(static_cast<unsigned long long>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long max(unsigned long long x, long long y)
+{
+    return max(x, static_cast<unsigned long long>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int min(unsigned int x, int y)
+{
+    return min(x, static_cast<unsigned int>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int min(int x, unsigned int y)
+{
+    return min(static_cast<unsigned int>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long min(long x, unsigned long y)
+{
+    return ullmin(static_cast<unsigned long>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long min(unsigned long x, long y)
+{
+    return ullmin(x, static_cast<unsigned long>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long min(long long x, unsigned long long y)
+{
+    return min(static_cast<unsigned long long>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long min(unsigned long long x, long long y)
+{
+    return min(x, static_cast<unsigned long long>(y));
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return x / y; }

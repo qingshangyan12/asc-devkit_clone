@@ -415,6 +415,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_shfl_xor(
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t make_bfloat162(bfloat16_t x, bfloat16_t y);
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short __bfloat16_as_short(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short __bfloat16_as_ushort(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __short_as_bfloat16(const short x);
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __ushort_as_bfloat16(const unsigned short int x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __heq(bfloat16_t x, bfloat16_t y);
@@ -560,6 +566,42 @@ __hfmax2_relu(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16x2_t z);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ bfloat16x2_t
 __hcmadd(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16x2_t z);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline signed char __bfloat162char_rz(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned char __bfloat162uchar_rz(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short __bfloat162short_rn(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short __bfloat162short_rz(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short __bfloat162short_rd(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short __bfloat162short_ru(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __short2bfloat16_rn(const short x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __short2bfloat16_rz(const short x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __short2bfloat16_rd(const short x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __short2bfloat16_ru(const short x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short __bfloat162ushort_rn(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short __bfloat162ushort_rz(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short __bfloat162ushort_rd(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short __bfloat162ushort_ru(const bfloat16_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __ushort2bfloat16_rn(const unsigned short x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __ushort2bfloat16_rz(const unsigned short x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __ushort2bfloat16_rd(const unsigned short x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __ushort2bfloat16_ru(const unsigned short x);
 
 #include "impl/simt_api/asc_bf16_impl.h"
 
