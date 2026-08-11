@@ -28,7 +28,9 @@ void InheritKfcServerKernelArg(
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isReduceScatter =
         srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
-    if (isAllGather || isReduceScatter) {
+    const bool isAllReduce =
+        srcName == "CcuKernelAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
+    if (isAllGather || isReduceScatter || isAllReduce) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;
@@ -62,7 +64,10 @@ HcclResult CcuTempKfcServer::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     HCCL_INFO("[CcuTempKfcServer::CalcRes start]");
-    if (param.opType != HcclCMDType::HCCL_CMD_ALLGATHER && param.opType != HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+    HCCL_INFO("[j_test][KfcServerTemplate][CalcRes] enter, opType[%u]", static_cast<uint32_t>(param.opType));
+    if (param.opType != HcclCMDType::HCCL_CMD_ALLGATHER && param.opType != HcclCMDType::HCCL_CMD_REDUCE_SCATTER &&
+        param.opType != HcclCMDType::HCCL_CMD_ALLREDUCE) {
+        HCCL_ERROR("[j_test][KfcServerTemplate][CalcRes] NOT_SUPPORT: opType[%u]", static_cast<uint32_t>(param.opType));
         HCCL_ERROR("[CcuTempKfcServer::CalcRes] unsupported opType[%u]", static_cast<uint32_t>(param.opType));
         return HCCL_E_NOT_SUPPORT;
     }
@@ -85,7 +90,9 @@ HcclResult CcuTempKfcServer::CalcRes(
             sourceName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
         const bool isReduceScatter = sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" &&
                                      param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
-        if (!isAllGather && !isReduceScatter) {
+        const bool isAllReduce =
+            sourceName == "CcuKernelAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
+        if (!isAllGather && !isReduceScatter && !isAllReduce) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported source kernel[%s]",
                 resourceRequest.ccuKernelInfos.back().kernelFuncName);
@@ -97,6 +104,8 @@ HcclResult CcuTempKfcServer::CalcRes(
         InheritKfcServerKernelArg(
             resourceRequest.ccuKernelInfos.back(), kernelInfo, param, mySubCommRank_, subCommRanks_);
         resourceRequest.ccuKernelInfos.back() = kernelInfo;
+        HCCL_INFO("[j_test][KfcServerTemplate][CalcRes] inherited from[%s], isAllReduce[%d]",
+            sourceName.c_str(), static_cast<int>(isAllReduce));
     } else {
         HCCL_ERROR(
             "[CcuTempKfcServer::CalcRes] no preceding kernel to inherit from, KfcServer requires a source kernel");
