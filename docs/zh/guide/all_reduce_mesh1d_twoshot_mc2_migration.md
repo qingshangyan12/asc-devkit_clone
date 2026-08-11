@@ -192,6 +192,36 @@ AscendC::Hccl::Wait：等待完成计数达到预期值，确保 AllReduce 输�
 - 每轮先完成 ReduceScatter，再完成 AllGather，输出地址按 `processedDataCount` 递增。
 
 ## 4. mc2 分发适配
+```text
+Host
+-> 本地 selector
+-> 本地 executor registry
+-> 本地 TwoShot executor
+-> 本地 resource CalcRes
+-> 本地 CMake 编译的 template
+
+Device
+-> 本地 V2 registry
+-> 本地 TwoShot executor
+-> 本地 OrchestrateLoop
+-> 本地 TwoShot KernelRun
+```
+
+
+```text
+Host
+  -> UseCannBridge
+  -> 外部 CANN selector
+  -> 外部 CANN executor registry
+  -> 外部 resource CalcRes
+
+Device
+  -> UseCannBridge
+  -> LaunchViaCann
+  -> 外部 CANN registry
+  -> 外部 TwoShot executor
+  -> 外部 TwoShot template
+```
 
 迁移前，AICPU AllReduce 被强制分发到外部 CANN bridge：
 

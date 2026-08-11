@@ -120,6 +120,103 @@ MC2 Host 资源阶段和 Device 运行阶段编译同一个 executor 文件，�
 | Scratch 倍数 | 1 | 较高，取决于四个模板 | 按多层 slice 和带宽计算 |
 | 固定调度开销 | 最低 | 中等 | 最高 |
 
+#### 3.3.1 源仓 InsAllReduceNHR 覆盖场景
+
+`D:/code/comm/hccl` 中 `InsAllReduceNHR` 的选择入口位于 `src/ops/all_reduce/selector/all_reduce_auto_selector.cc`。源仓按照运行时真实数据量计算：
+
+```text
+dataSize = opParam.DataDes.count * DATATYPE_SIZE_TABLE[opParam.DataDes.dataType]
+```
+
+在进入以下场景前，源仓还存在两个公共前置条件：
+
+1. 严格保序模式优先选择 `AllReduceOrderPreserved` 或 `AllReduceOrderPreservedGroup`，不会选择 `InsAllReduceNHR`。
+2. `INT64`、`UINT64`、`FP64` 或 `HCCL_REDUCE_PROD` 优先选择 `InsAllReduceAicpuReduceNHR`，不会选择当前 `InsAllReduceNHR`。
+
+排除上述分支后，源仓会在以下场景直接返回精确算法名 `InsAllReduceNHR`：
+
+| 编号 | 源仓选择条件 | 选择原因 | 迁移后验证要求 |
+| --- | --- | --- | --- |
+| S1 | `topoLevelNums == 3 && level2Uboe == true && deviceNumPerModule != 8 && localNetInsSizeOfLayer[1] == 1` | Level 1 本地实例退化为单 rank，多维 UBOE 并行没有可利用空间 | 构造三级 UBOE 拓扑验证算法选择和正确性；当前目标 selector 及 `TopoMatch1D` 未支持三级拓扑，应将无法选择或资源计算失败记录为待补齐能力，不能视为已覆盖 |
+| S2 | `topoLevelNums > 1 && Level1Nhr == true`，且未先命中三级 UBOE 分支 | Level 0 各网络实例大小的 GCD 为 1，无法形成规则 Mesh 分组，退化为扁平 NHR | 分别覆盖两级、三级非规则实例规模，例如 `{3, 4}`；验证 `Level1Nhr` 计算、selector、NHR channel 和非 2 次幂 rank 正确性 |
+| S3 | `topoLevelNums > 1 && Level1Nhr == false && localNetInsSizeOfLayer[0] == 1` | Level 0 没有可利用的多卡通信维度，直接在更高层 rank 间执行 NHR | 覆盖两级和三级、每个 Level 0 实例单 rank 的退化拓扑；验证 rank 映射、建链和 AllReduce 结果 |
+| S4 | `topoLevelNums == 2 && level0Topo == MESH_1D && Level1Nhr == false && localNetInsSizeOfLayer[0] != 1 && dataSize <= 32 MiB` | 两级规则 Mesh1D 的小数据场景，NHR 固定开销低于 ParallelRSAG | 验证 `< 32 MiB`、`== 32 MiB` 和 `> 32 MiB` 边界；前两者应覆盖 NHR，源仓在 `> 32 MiB && <= 4 GiB` 时切换 `InsAllReduceParallelRSAG` |
+| S5 | `topoLevelNums > 1 && level0Topo == MESH_1D`，但层数既不是 2 也不是 3 | 源 selector 中的防御性兜底分支 | 若目标产品允许新增层数，需要验证该兜底；当前拓扑通常最多三级，可作为前向兼容测试而非当前主场景 |
+| S6 | 单层 `MESH_1D_CLOS && level0PcieMix == false` 进入 UBX helper，且未命中等规模小 rank、特殊类型或矩形大数据分支 | 不适合 Concurrent/ParallelRSAGUBX 的 UBX 场景使用一维 NHR 回退 | 至少覆盖矩形 UBX 小数据和非规则 UBX 两类拓扑，验证 channel 协议、rank 映射和运行结果 |
+
+S6 的完整排除顺序为：
+
+```text
+if meshRankNum == closRankNum && userRankSize <= 4:
+    选择 Mesh OneShot/Concurrent，不选择 NHR
+else if dataType/reduceType 为特殊类型:
+    选择 InsAllReduceAicpuReduceNHR
+else if closRankNum 是 meshRankNum 的严格倍数 && dataSize >= 512 KiB:
+    选择 InsAllReduceParallelRSAGUBX
+else:
+    选择 InsAllReduceNHR
+```
+
+因此 S6 至少包含：
+
+- `closRankNum` 是 `meshRankNum` 的严格倍数，且 `dataSize < 512 KiB` 的矩形 UBX 小数据场景。
+- Mesh/CLOS 规模不满足等规模或严格倍数关系的非规则 UBX 场景，此时不受 512 KiB 阈值限制。
+
+#### 3.3.2 复用 NHR Template 的等价场景
+
+源仓还有两类 CLOS 场景没有返回精确字符串 `InsAllReduceNHR`，而是选择：
+
+```text
+AicpuAllReduceSoleNHRTwoShotMultiLink
+```
+
+该算法名与 `InsAllReduceNHR` 共用：
+
+```text
+InsV2AllReduceSoleExecutor<TopoMatch1D, InsTempAllReduceNHR>
+```
+
+相关场景为：
+
+- 多层拓扑中 `level0Topo == CLOS`，且未命中特殊数据类型/reduce op 分支。
+- 单层 `level0Topo == CLOS`，且未命中特殊数据类型/reduce op 分支。
+
+目标仓没有迁移 `AicpuAllReduceSoleNHRTwoShotMultiLink` 注册名，而是对单层 CLOS 直接选择 `InsAllReduceNHR`。因此纯 CLOS 必须纳入迁移验证，并需要区分：
+
+- 算法 RS/AG 语义与 `InsTempAllReduceNHR` 的正确性。
+- 源仓 multi-link/multi-jetty 能力与目标仓当前 `CalcChannelRequestNhr` 单 channel 适配之间的性能和资源差异。
+
+#### 3.3.3 迁移后验证矩阵
+
+上述 S1～S6 及 CLOS 等价场景都是迁移后需要验证的场景。验证分为三层：
+
+1. 选择验证：确认 Host selector 返回预期算法名；对于目标 selector 当前未接入的多层场景，应明确记录 `NOT_MATCH` 或 matcher 不支持，作为能力缺口。
+2. 资源验证：确认 Host 和 Device registry 均命中，NHR 对端 channel 完整，thread/notify 数量正确，HCCL buffer scratch multiplier 为 1。
+3. 运行验证：确认 ReduceScatter、AllGather、非均匀切片、非 2 次幂 rank、大数据分轮和最终输出正确。
+
+建议验证矩阵如下：
+
+| 维度 | 必测取值 |
+| --- | --- |
+| 拓扑 | S1～S6、单层 CLOS、多层 CLOS |
+| rank size | 1、2、3、4、5、7、8，以及 UBX 实际规格 |
+| dataSize 边界 | 512 KiB 前后、32 MiB 前后；两级 Mesh1D 额外覆盖 4 GiB 前后以确认不会错误继续选择 NHR |
+| count | 0、1、`rankSize - 1`、`rankSize`、不能整除 rankSize、大于单轮 HCCL buffer 容量 |
+| datatype | FP16、FP32、BF16、INT8 |
+| reduce op | SUM、MAX、MIN |
+| 反向选择 | INT64、UINT64、FP64、PROD 必须确认不会由默认 selector 进入当前 NHR |
+| buffer | in-place、out-of-place |
+| protocol | PCIe Read、非 PCIe Batch Write、UBX/UBC 场景 |
+| 选择方式 | 默认 selector、`algConfig="InsAllReduceNHR"` 强制算法 |
+
+由于 MC2 Host 资源阶段的 `DataDes.count` 固定为 0，目标 selector 无法直接照搬源仓依赖真实 `dataSize` 的 512 KiB、32 MiB 和 4 GiB 分界。数据量相关场景应采用以下方式验证：
+
+- 使用 selector 单元测试构造带真实 count 的 `OpParam`，验证源选择规则的边界语义。
+- 使用 `algConfig="InsAllReduceNHR"` 强制创建资源，在 Device 运行阶段分别传入边界前后的真实 count，验证 NHR 本身的正确性和分轮行为。
+- 对目标默认 selector 仅验证当前文档定义的拓扑规则，不应声称其已经复现源仓按数据量切换 NHR、ParallelRSAG 和 OmniPipe 的策略。
+
+当前迁移实现只自动覆盖单层 CLOS 和部分单层 Mesh1DClos。S1～S5 中的多层场景以及 S6 的完整 UBX/multi-jetty 能力尚未全部接入默认 selector；这些场景仍必须保留在迁移验证清单中，并将未通过原因归类为“实现缺陷”或“未迁移能力”，不能从测试范围中删除。
+
 
 ### 3.4 构建接入
 
