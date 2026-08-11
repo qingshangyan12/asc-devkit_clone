@@ -193,7 +193,6 @@ __simd_callee__ inline void TransRegForS8(
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
 template <typename DstT, typename ScaleT, const Reg::CastTrait& castTrait>
 __simd_callee__ inline void TransRegForFp4(
     Reg::RegTensor<ScaleT>& vreg, Reg::RegTensor<DstT>& dstVreg, Reg::MaskReg& mask)
@@ -233,7 +232,6 @@ __simd_callee__ inline void TransRegForFp4(
         }
     }
 }
-#endif
 
 template <typename T>
 __simd_callee__ inline void GetPerGroupScale(
@@ -425,9 +423,7 @@ __simd_vf__ inline void QuantizePerGroupForKColFp4VF(
                 Reg::LoadAlign<SrcT, Reg::LoadDist::DIST_NORM>(srcVreg, srcUb + i * params.n + j * vecLen);
             }
             Reg::Mul(srcVreg, srcVreg, scaleVreg, mask);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
             QuantizeUtils::TransRegForFp4<DstT, float, castTrait>(srcVreg, dstVreg, mask);
-#endif
             Reg::StoreAlign<uint8_t, Reg::StoreDist::DIST_PACK4_B32>(
                 (__ubuf__ uint8_t*)dstUb + (i * params.n + j * vecLen) / 2, (Reg::RegTensor<uint8_t>&)dstVreg, mask);
         }
@@ -595,7 +591,6 @@ __aicore__ inline void QuantizePerGroupForKRowCommon(
         dstUb, srcUb, scaleUb, offsetUb, offset, params, rowNum, tailRow);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
 template <typename DstT, typename SrcT, typename ActualScaleT, const Reg::CastTrait& castTrait>
 __simd_callee__ inline void QuantizePerGroupForKRowFp4OneRow(
     __ubuf__ DstT* dstAddr, __ubuf__ SrcT* srcAddr, __ubuf__ ActualScaleT* scaleAddr, Reg::RegTensor<DstT>& dstVreg,
@@ -624,7 +619,6 @@ __simd_callee__ inline void QuantizePerGroupForKRowFp4OneRow(
             (__ubuf__ uint8_t*)dstAddr + (j * vecLen) / 2, (Reg::RegTensor<uint8_t>&)dstVreg, mask);
     }
 }
-#endif
 
 template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename ActualScaleT>
 __simd_vf__ inline void QuantizePerGroupForKRowFp4VF(
