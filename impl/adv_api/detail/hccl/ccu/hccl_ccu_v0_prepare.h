@@ -75,6 +75,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[1] = reinterpret_cast<uint64_t>(commParam->sendBuf); // 1 is index of xnData
     xnData_[2] = commParam->wParamExt.sendSizes;                 // 2 is index of xnData
     xnData_[8] = commParam->wParamExt.remoteWinOffset;           // 8 is index of xnData
+    xnData_[9] = reinterpret_cast<uint64_t>(commParam->recvBuf); // 9 is cclBufferAddr for HalfAllToAllV
     uint64_t sliceSize = commParam->count;
 
     xnData_[3] = commParam->wParamExt.sendOffsets; // 3 is index of xnData
