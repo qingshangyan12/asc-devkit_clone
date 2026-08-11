@@ -75,11 +75,20 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[1] = reinterpret_cast<uint64_t>(commParam->sendBuf); // 1 is index of xnData
     xnData_[2] = commParam->wParamExt.sendSizes;                 // 2 is index of xnData
     xnData_[8] = commParam->wParamExt.remoteWinOffset;           // 8 is index of xnData
-    xnData_[9] = reinterpret_cast<uint64_t>(commParam->recvBuf); // 9 is cclBufferAddr for HalfAllToAllV
+    xnData_[9] = ccuParam_.scratchAddr;                           // 9 is cclBufferAddr (scratch) for HalfAllToAllV
     uint64_t sliceSize = commParam->count;
 
     xnData_[3] = commParam->wParamExt.sendOffsets; // 3 is index of xnData
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[4]);
+
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "ApiClient CcuPrepareForAllToAllVWrite: sendBuf=0x%llx, sendSizes=0x%llx, sendOffsets=0x%llx, "
+        "remoteWinOffset=0x%llx, scratchAddr=0x%llx, sliceSize=%llu, goSize=[0x%llx,0x%llx,0x%llx,0x%llx], "
+        "rankId=%u, rankSize=%u, xnNum=%u",
+        xnData_[1], xnData_[2], xnData_[3], xnData_[8], xnData_[9], sliceSize,
+        xnData_[4], xnData_[5], xnData_[6], xnData_[7],
+        ccuParam_.rankId, ccuParam_.rankNum, ccuUsedXnNum_);
 }
 
 template <const auto& config>
