@@ -295,6 +295,89 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isnan(float x) { return __isnan(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isinf(float x) { return __isinf(x); }
 
+#define __INTERNAL_NANF(tagp)                                                                       \
+    do {                                                                                            \
+        unsigned long long i = 0;                                                                   \
+        int c;                                                                                      \
+        int ovfl = 0;                                                                               \
+        int invld = 0;                                                                              \
+        if (tagp && (*tagp == '0')) {                                                               \
+            tagp++;                                                                                 \
+            if ((*tagp == 'x') || (*tagp == 'X')) {                                                 \
+                tagp++;                                                                             \
+                while (*tagp == '0')                                                                \
+                    tagp++;                                                                         \
+                while (*tagp) {                                                                     \
+                    if (i > 0x0fffffffffffffffULL) {                                                \
+                        ovfl = 1;                                                                   \
+                    }                                                                               \
+                    c = (((*tagp) >= 'A') && ((*tagp) <= 'F')) ? (*tagp + 'a' - 'A') : (*tagp);     \
+                    if ((c >= 'a') && (c <= 'f')) {                                                 \
+                        c = c - 'a' + 10;                                                           \
+                        i = i * 16 + c;                                                             \
+                    } else if ((c >= '0') && (c <= '9')) {                                          \
+                        c = c - '0';                                                                \
+                        i = i * 16 + c;                                                             \
+                    } else {                                                                        \
+                        invld = 1;                                                                  \
+                    }                                                                               \
+                    tagp++;                                                                         \
+                }                                                                                   \
+            } else {                                                                                \
+                while (*tagp == '0')                                                                \
+                    tagp++;                                                                         \
+                while (*tagp) {                                                                     \
+                    if (i > 0x1fffffffffffffffULL) {                                                \
+                        ovfl = 1;                                                                   \
+                    }                                                                               \
+                    c = *tagp;                                                                      \
+                    if ((c >= '0') && (c <= '7')) {                                                 \
+                        c = c - '0';                                                                \
+                        i = i * 8 + c;                                                              \
+                    } else {                                                                        \
+                        invld = 1;                                                                  \
+                    }                                                                               \
+                    tagp++;                                                                         \
+                }                                                                                   \
+            }                                                                                       \
+        } else if (tagp) {                                                                          \
+            while (*tagp) {                                                                         \
+                c = *tagp;                                                                          \
+                if ((i > 1844674407370955161ULL) || ((i == 1844674407370955161ULL) && (c > '5'))) { \
+                    ovfl = 1;                                                                       \
+                }                                                                                   \
+                if ((c >= '0') && (c <= '9')) {                                                     \
+                    c = c - '0';                                                                    \
+                    i = i * 10 + c;                                                                 \
+                } else {                                                                            \
+                    invld = 1;                                                                      \
+                }                                                                                   \
+                tagp++;                                                                             \
+            }                                                                                       \
+        }                                                                                           \
+        if (ovfl) {                                                                                 \
+            i = ~0ULL;                                                                              \
+        }                                                                                           \
+        if (invld) {                                                                                \
+            i = 0ULL;                                                                               \
+        }                                                                                           \
+        i = (i & 0x000fffffffffffffULL) | 0x7ff8000000000000ULL;                                    \
+        unsigned int i1 = (unsigned int)i;                                                          \
+        i1 = (i1 & 0x007fffff) | 0x7fc00000;                                                        \
+        union Data {                                                                                \
+            unsigned int u;                                                                         \
+            float f;                                                                                \
+        };                                                                                          \
+        union Data data = {.u = i1};                                                                \
+        return data.f;                                                                              \
+    } while (0)
+
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nanf(const __gm__ char* tagp) { __INTERNAL_NANF(tagp); }
+#else
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nanf(const char* tagp) { __INTERNAL_NANF(tagp); }
+#endif
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdimf(float x, float y)
 {
     if (isnan(x)) {
@@ -2995,6 +3078,66 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int ullmin(
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int umin(const unsigned int x, const unsigned int y)
 {
     return min(x, y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int max(unsigned int x, int y)
+{
+    return max(x, static_cast<unsigned int>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int max(int x, unsigned int y)
+{
+    return max(static_cast<unsigned int>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long max(long x, unsigned long y)
+{
+    return ullmax(static_cast<unsigned long>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long max(unsigned long x, long y)
+{
+    return ullmax(x, static_cast<unsigned long>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long max(long long x, unsigned long long y)
+{
+    return max(static_cast<unsigned long long>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long max(unsigned long long x, long long y)
+{
+    return max(x, static_cast<unsigned long long>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int min(unsigned int x, int y)
+{
+    return min(x, static_cast<unsigned int>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int min(int x, unsigned int y)
+{
+    return min(static_cast<unsigned int>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long min(long x, unsigned long y)
+{
+    return ullmin(static_cast<unsigned long>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long min(unsigned long x, long y)
+{
+    return ullmin(x, static_cast<unsigned long>(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long min(long long x, unsigned long long y)
+{
+    return min(static_cast<unsigned long long>(x), y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long min(unsigned long long x, long long y)
+{
+    return min(x, static_cast<unsigned long long>(y));
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return x / y; }
