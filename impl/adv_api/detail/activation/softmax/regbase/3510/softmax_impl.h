@@ -278,8 +278,8 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZWithTailVFImpl(
         Reg::MaskAnd(pregOneBlk, pregkTail, pregCnt, pregFull);
         Reg::Div(dstVreg, tmpVreg, sumVreg, pregOneBlk);
         if constexpr (isLog) {
-                Reg::Log10(dstVreg, dstVreg, pregOneBlk);
-            }
+            Reg::Log10(dstVreg, dstVreg, pregOneBlk);
+        }
         StoreIfNeedCast<T1>(dstUb + i * FLOAT_REPEAT_SIZE + kRepeatTimes * dataBlock, dstVreg, pregOneBlk);
     }
 }
