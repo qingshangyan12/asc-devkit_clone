@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "reg_cast.h is internal; include <tensor_api/arch/vector/reg_cast.h> instead."
+    "reg_cast.h is internal; include <tensor_api/arch/vector/experimental/cast/reg_cast.h> instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_CAST
 #endif
@@ -18,44 +18,14 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_REG_CAST_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_REG_CAST_H
 
+#if !defined(INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_CAST_REG_CAST_H)
+#include "tensor_api/arch/vector/experimental/cast/reg_cast.h"
+#endif
 #include "c_api/reg_compute/reg_convert.h"
-#include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
 namespace asc {
 namespace te {
-
-/** @brief Data layout selected by a width-changing register cast. */
-enum class cast_layout {
-    unknow = -1,
-    zero,
-    one,
-    two,
-    three,
-};
-
-/** @brief Rounding behavior for register cast. */
-enum class cast_round_mode {
-    unknow = -1,
-    rint,
-    round,
-    floor,
-    ceil,
-    trunc,
-};
-
-/** @brief Saturation behavior for register cast. */
-enum class cast_sat_mode {
-    unknow = -1,
-    not_sat,
-    sat,
-};
-
-struct cast_options {
-    cast_layout layout = cast_layout::zero;
-    cast_round_mode round = cast_round_mode::rint;
-    cast_sat_mode sat = cast_sat_mode::not_sat;
-};
 
 namespace reg_cast_detail {
 
@@ -100,24 +70,14 @@ __simd_callee__ inline reg_tensor<To> cast_impl(reg_tensor<From> src)
 
 } // namespace reg_cast_detail
 
-/**
- * @brief Converts a register vector from From to To using a hardware Cast instruction.
- *
- * The source mask must be created in the predicate domain of the wider element
- * type. Width-changing casts preserve that mask and use options.layout to select
- * the physical lane part. Callers must pair widening casts with unpacked loads
- * or narrowing casts with packed stores as required by the selected data path.
- */
 #if __cplusplus >= 202002L
-template <typename To, cast_options Options = cast_options {}, typename From>
+template <typename To, cast_options Options, typename From>
 __simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src)
 {
     return reg_cast_detail::cast_impl<To, Options.layout, Options.round, Options.sat>(src);
 }
 #else
-// C++17 cannot use cast_options as a non-type template parameter.
-template <typename To, cast_layout Layout = cast_layout::zero, cast_round_mode Round = cast_round_mode::rint,
-    cast_sat_mode Sat = cast_sat_mode::not_sat, typename From>
+template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat, typename From>
 __simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src)
 {
     return reg_cast_detail::cast_impl<To, Layout, Round, Sat>(src);
