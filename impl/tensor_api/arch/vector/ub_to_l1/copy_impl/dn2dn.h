@@ -35,6 +35,24 @@ public:
         data_copy_impl<trait, T, U>(dst, src);
     }
 
+    template <const copy_ub_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord,
+        typename ShapeType>
+    __aicore__ inline static void run(const T& dst, const U& src, const DstCoord& dst_coord,
+        const SrcCoord& src_coord, const ShapeType& copy_shape)
+    {
+        check_template<trait, T, U>();
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto rows = get_shape_rows(src_shape);
+        auto block_count = get_shape_columns(src_shape);
+        auto block_len = Std::ceil_division(rows, C0_ELEMENT<src_type>);
+        auto src_stride = Std::ceil_division(get_column_stride(src.layout()) - rows, C0_ELEMENT<src_type>);
+        auto dst_stride = Std::ceil_division(get_column_stride(dst.layout()) - rows, C0_ELEMENT<dst_type>);
+        emit_copy(dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len,
+            src_stride, dst_stride);
+    }
+
 private:
     template <const copy_ub_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()

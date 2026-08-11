@@ -97,6 +97,9 @@ void run_copy_call_paths(const dst_tensor_type& dst, const src_tensor_type& src)
 
     copy_atom<copy_traits<copy_operation, trait_type>>{}.call(dst, src);
     copy(copy_atom<copy_traits<copy_operation, trait_type>>{}, dst, src);
+    if constexpr (Std::is_same_v<trait_type, copy_l0c_to_gm_trait_default>) {
+        copy(dst, src);
+    }
 }
 
 template <typename copy_operation, typename trait_type, typename param_type, typename dst_tensor_type, typename src_tensor_type>
@@ -211,6 +214,23 @@ void run_l0c_to_gm_batch_nz_to_nz_no_quant()
 }
 
 } // namespace
+
+TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_src_stride)
+{
+    using namespace asc::te;
+    constexpr uint32_t m = 32;
+    constexpr uint32_t n = 32;
+    __cc__ float src_default[m * n] = {0};
+    __cc__ float src_c0_16[m * n] = {0};
+
+    auto default_tensor = make_tensor_at<location::l0c>(
+        src_default, make_frame_layout<nz_layout_ptn, layout_trait_default<float>>(m, n));
+    auto c0_16_tensor = make_tensor_at<location::l0c>(
+        src_c0_16, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
+
+    EXPECT_EQ(get_l0c_to_gm_src_stride(default_tensor), m);
+    EXPECT_EQ(get_l0c_to_gm_src_stride(c0_16_tensor), m);
+}
 
 TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nd)
 {
@@ -370,6 +390,10 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_batch_tensor_quant_coord_shape_
 
     if (false) {
         copy(atom, dst_tensor, src_tensor, quant_tensor,
+            make_coord(1, make_coord(0, 0)), make_coord(1, make_coord(0, 0)),
+            make_shape(1, make_shape(m, n)));
+        copy(dst_tensor, src_tensor, quant_tensor);
+        copy(dst_tensor, src_tensor, quant_tensor,
             make_coord(1, make_coord(0, 0)), make_coord(1, make_coord(0, 0)),
             make_shape(1, make_shape(m, n)));
     }

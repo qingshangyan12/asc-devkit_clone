@@ -43,6 +43,20 @@ struct copy_l0c_to_gm_trait {
     bool enable_channel_split = false;
 };
 
+template <typename SrcLayout>
+__aicore__ inline static constexpr uint32_t get_l0c_to_gm_src_stride_from_layout(const SrcLayout& layout)
+{
+    const auto column_stride = get_matrix_element<attr_info::stride, attr_info::column, 1>(layout);
+    const auto c0_elements = get_matrix_element<attr_info::shape, attr_info::column, 0>(layout);
+    return static_cast<uint32_t>(column_stride / c0_elements);
+}
+
+template <typename SrcTensorType>
+__aicore__ inline static constexpr uint32_t get_l0c_to_gm_src_stride(const SrcTensorType& src)
+{
+    return get_l0c_to_gm_src_stride_from_layout(src.layout());
+}
+
 class data_copy_l0c_to_gm_no_vector_quant {
 public:
     template <const copy_l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename T, typename U>
@@ -70,6 +84,7 @@ public:
             auto dst_shape = make_slice_shape(coord_dst, dst.layout(), copy_shape);
             copy_params = make_l0c_out_copy_params<T, U>(dst.layout(), src.layout(), dst_shape);
         }
+        copy_params.src_stride = get_l0c_to_gm_src_stride(src);
         constexpr bool is_nd_format = is_l0c_out_nd_format_v<T>;
         constexpr bool is_dn_format = is_l0c_out_dn_format_v<T>;
         copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre, T, U>(dst, src, dst_offset, src_offset, copy_params.n_size,
@@ -86,6 +101,7 @@ private:
         constexpr bool is_nd_format = is_l0c_out_nd_format_v<T>;
         constexpr bool is_dn_format = is_l0c_out_dn_format_v<T>;
         auto copy_params = make_l0c_out_copy_params<T, U>(dst_layout, src_layout);
+        copy_params.src_stride = get_l0c_to_gm_src_stride(src);
 
         bool relu_en = trait.enable_relu;
         uint8_t unit_flag = params.unit_flag;
@@ -131,6 +147,7 @@ public:
             auto dst_shape = make_slice_shape(coord_dst, dst.layout(), copy_shape);
             copy_params = make_l0c_out_copy_params<T, U>(dst.layout(), src.layout(), dst_shape);
         }
+        copy_params.src_stride = get_l0c_to_gm_src_stride(src);
         uint16_t n_iter_num = Std::ceil_division(copy_params.n_size, MAIN_LOOP_N_SIZE);
         for (uint16_t i = 0; i < n_iter_num; ++i) {
             uint32_t n_offset = i * MAIN_LOOP_N_SIZE;
@@ -198,7 +215,7 @@ private:
             }
         }
 
-        const uint32_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / FRACTAL_FIXED;
+        const uint32_t src_stride = get_l0c_to_gm_src_stride_from_layout(src_layout);
         uint32_t dst_stride = 0;
         if constexpr (is_nd_format) {
             dst_stride = get_l0c_out_nd_stride<T>(dst_layout);
