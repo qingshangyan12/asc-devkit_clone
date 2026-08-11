@@ -327,7 +327,6 @@ __aicore__ constexpr bool SupportEnum()
     return T == U;
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 template <typename T>
 struct GetComplexElementType {
     using Type = T;
@@ -363,7 +362,6 @@ struct Complex {
     T real;
     T imag;
 };
-#endif
 
 template <typename T, int U, int... Args>
 __aicore__ constexpr bool SupportBytes()
@@ -383,10 +381,10 @@ __aicore__ inline void VF_CALL(Args&&... args)
 #endif
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 namespace AscendC {
 template <typename T>
 class LocalTensor;
