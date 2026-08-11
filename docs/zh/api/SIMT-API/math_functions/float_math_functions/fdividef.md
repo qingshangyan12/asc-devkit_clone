@@ -53,7 +53,7 @@ inline float fdividef(float x, float y)
 ## 约束说明
 
 <!-- npu="950" id7 -->
-针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
+针对Ascend 950PR/Ascend 950DT，默认情况下遵循常规除法运算行为。如果指定了[--cce-use-fast-math](../../../../guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)，且未通过显式的--cce-prec-div=true进行修正，则可以使用[\_\_fdividef()](../float_math_functions/__fdividef.md)以获得更高的性能。
 <!-- end id7 -->
 
 ## 需要包含的头文件
