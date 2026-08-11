@@ -26,29 +26,33 @@
 
 ## 功能说明
 
-对PADDING_B寄存器中的值进行设置，这是一个64bit的寄存器，用于存储搬运过程中padding的值。
-其中各bit含义如下：
+本接口用于配置右矩阵（B组）Feature Map的Pad填充值。配置写入后，由[asc_copy_l12l0a](../cube_data_move/asc_copy_l12l0a/asc_copy_l12l0a_arch_3510.md)或[asc_copy_l12l0b](../cube_data_move/asc_copy_l12l0b/asc_copy_l12l0b_arch_3510.md)的3D格式搬运接口在执行Image to Column展开时使用，对Feature Map边界外的数据进行定值填充。
 
-**表1** PADDING_B寄存器比特位说明
-
-| bit范围 |                                                                           含义                                                                           | 
-| :-----------|:------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| 31:0 | 存储进行padding时的值。<br>数据位宽为32时，直接使用31:0位；<br> 数据位宽为16时，使用15:0位，31:16位被忽略； <br> 数据位宽为8时，15:8位应与7:0位相同，31:16位被忽略；数据位宽为4时，15:12，11:8，7:4和3:0位应该相同，31:16位被忽略。 |
-| 33:32 | 表示所使用的padding模式，当前支持三种模式。<br>2'b00：固定padding；<br>2'b01：按通道padding；<br>2'b10/2'b11：当前保留。 |
+仅当3D格式搬运接口的`f_matrix_ctrl`设置为true、选择右矩阵的Feature Map属性时，本接口的配置生效。`f_matrix_ctrl`设置为false时，本接口的配置不生效。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config)
 ```
 
 ## 参数说明
 
-**表2** 参数说明
+**表1** 参数说明
 
-|参数名|输入/输出| 描述        |
-| :------ | :---  |:----------|
-|config   |输入   | 待设置的寄存器值。 |
+| 参数名 | 输入/输出 | 描述 |
+| :--- | :--- | :--- |
+| config | 输入 | 右矩阵Feature Map的64 bit Pad填充值配置。接口不检查或转换字段值，需按照[表2](#table2)完成拼装。 |
+
+**表2** config参数说明 <a id="table2"></a>
+
+| 搬运数据位宽 | `config[31:0]`的配置方法 |
+| :--- | :--- |
+| 8 bit | `config[7:0]`为Pad填充值的原始位模式，`config[15:8]`必须与`config[7:0]`相同，`config[31:16]`设置为0。 |
+| 16 bit | `config[15:0]`为Pad填充值的原始位模式，`config[31:16]`设置为0。 |
+| 32 bit | `config[31:0]`为Pad填充值的原始位模式。 |
+
+`config[63:32]`为保留位，必须设置为0。
 
 ## 返回值说明
 
@@ -60,10 +64,18 @@ PIPE_S
 
 ## 约束说明
 
-无
+- 本接口仅在AIC上生效，在AIV上调用不生效。
+- 本接口需在对应的3D格式搬运接口执行前调用，并将搬运接口的`f_matrix_ctrl`设置为true。配置会持续生效，直至再次调用本接口覆盖。
+- 使用右矩阵Feature Map时，还需通过[asc_set_l13d_fmatrix_b](../cube_data_move/asc_set_l13d_fmatrix_b.md)配置Feature Map属性，并通过[asc_set_l3d_rpt_b](./asc_set_l3d_rpt_b.md)配置repeat参数。
+- 配置8 bit Pad填充值时，必须将同一个8 bit原始位模式分别写入`config[7:0]`和`config[15:8]`，否则搬运结果未定义。本接口不会自动复制填充值。
+- 本接口直接写入完整配置，不检查字段取值。除[表2](#table2)中使用的字段外，其余位必须设置为0。
 
 ## 调用示例
+
 ```cpp
-uint64_t config = 0;
+// 将int8_t类型的Pad填充值配置为-1，其原始位模式为0xFF。
+constexpr uint8_t paddingValue = 0xFF;
+uint64_t config = static_cast<uint64_t>(paddingValue) |
+                  (static_cast<uint64_t>(paddingValue) << 8);
 asc_set_l12l0_padding_val(config);
 ```
