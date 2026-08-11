@@ -97,6 +97,9 @@ void run_copy_call_paths(const dst_tensor_type& dst, const src_tensor_type& src)
 
     copy_atom<copy_traits<copy_operation, trait_type>>{}.call(dst, src);
     copy(copy_atom<copy_traits<copy_operation, trait_type>>{}, dst, src);
+    if constexpr (Std::is_same_v<trait_type, copy_l0c_to_gm_trait_default>) {
+        copy(dst, src);
+    }
 }
 
 template <typename copy_operation, typename trait_type, typename param_type, typename dst_tensor_type, typename src_tensor_type>
@@ -211,6 +214,42 @@ void run_l0c_to_gm_batch_nz_to_nz_no_quant()
 }
 
 } // namespace
+
+TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nd_tile_params_cover_full_32x32)
+{
+    using namespace asc::te;
+    constexpr l0c_out_copy_params copy_params{32, 32, 16, 32};
+
+    constexpr auto tile00 = make_l0c_to_gm_nd_tile_params(0, 0, 0, 0, copy_params, 32);
+    constexpr auto tile10 = make_l0c_to_gm_nd_tile_params(0, 0, 0, 16, copy_params, 32);
+    constexpr auto tile01 = make_l0c_to_gm_nd_tile_params(0, 0, 16, 0, copy_params, 32);
+    constexpr auto tile11 = make_l0c_to_gm_nd_tile_params(0, 0, 16, 16, copy_params, 32);
+
+    EXPECT_EQ(tile00.n_size, 16);
+    EXPECT_EQ(tile00.m_size, 16);
+    EXPECT_EQ(tile00.dst_offset, 0);
+    EXPECT_EQ(tile00.src_offset, 0);
+    EXPECT_EQ(tile10.dst_offset, 512);
+    EXPECT_EQ(tile10.src_offset, 256);
+    EXPECT_EQ(tile01.dst_offset, 16);
+    EXPECT_EQ(tile01.src_offset, 512);
+    EXPECT_EQ(tile11.dst_offset, 528);
+    EXPECT_EQ(tile11.src_offset, 768);
+}
+
+TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nd_tile_params_apply_base_offsets_and_tails)
+{
+    using namespace asc::te;
+    constexpr l0c_out_copy_params copy_params{24, 20, 48, 40};
+    constexpr auto tile = make_l0c_to_gm_nd_tile_params(65, 96, 16, 16, copy_params, 48);
+
+    EXPECT_EQ(tile.n_offset, 16);
+    EXPECT_EQ(tile.m_offset, 16);
+    EXPECT_EQ(tile.n_size, 8);
+    EXPECT_EQ(tile.m_size, 4);
+    EXPECT_EQ(tile.dst_offset, 721);
+    EXPECT_EQ(tile.src_offset, 1120);
+}
 
 TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nd)
 {
@@ -370,6 +409,10 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_batch_tensor_quant_coord_shape_
 
     if (false) {
         copy(atom, dst_tensor, src_tensor, quant_tensor,
+            make_coord(1, make_coord(0, 0)), make_coord(1, make_coord(0, 0)),
+            make_shape(1, make_shape(m, n)));
+        copy(dst_tensor, src_tensor, quant_tensor);
+        copy(dst_tensor, src_tensor, quant_tensor,
             make_coord(1, make_coord(0, 0)), make_coord(1, make_coord(0, 0)),
             make_shape(1, make_shape(m, n)));
     }

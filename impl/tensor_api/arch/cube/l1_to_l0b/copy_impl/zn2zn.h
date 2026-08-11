@@ -53,8 +53,8 @@ public:
         auto dst_layout = dst.layout();
         using dst_type = typename T::element_type;
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
-        auto m_step = get_element<attr_info::shape, attr_info::column, 1>(dst_layout);
-        auto k_step = get_element<attr_info::shape, attr_info::row, 1>(dst_layout);
+        auto m_step = get<1>(copy_shape) / FRACTAL_FIXED;
+        auto k_step = get<0>(copy_shape) / C0_ELEMENT<dst_type>;
         auto src_stride = get_element<attr_info::stride, attr_info::row, 1>(src.layout()) / STRIDE_UNIT;
         auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout) / STRIDE_UNIT;
         load_l1_to_l0b_instr::load_data_with_offset<false>(

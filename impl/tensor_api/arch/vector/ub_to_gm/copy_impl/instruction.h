@@ -33,7 +33,7 @@ public:
     __aicore__ inline static void
     data_copy(__gm__ T* dst, __ubuf__ T* src, const uint16_t block_count, const uint32_t block_len,
                  const int64_t src_stride, const int64_t dst_stride,
-                 const asc_store_l2_cache_mode cache_mode = asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM)
+                 const uint8_t cache_mode = 0)
     {
         if ASCEND_IS_AIC {
             return;

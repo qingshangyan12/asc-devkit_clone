@@ -43,6 +43,54 @@ struct copy_l0c_to_gm_trait {
     bool enable_channel_split = false;
 };
 
+template <typename T>
+__aicore__ inline static constexpr uint32_t get_l0c_out_matrix_rows(const T& tensor)
+{
+    if constexpr (is_l0c_out_src_batch_layout_v<T>) {
+        return get_total_row_shape(get<1>(tensor.layout()));
+    } else {
+        return get_total_row_shape(tensor.layout());
+    }
+}
+
+struct l0c_to_gm_nd_tile_params {
+    uint32_t n_offset;
+    uint32_t m_offset;
+    uint32_t n_size;
+    uint32_t m_size;
+    uint32_t dst_offset;
+    uint32_t src_offset;
+};
+
+template <const copy_l0c_to_gm_trait& trait>
+__aicore__ inline static void check_l0c_to_gm_nd_copy_params(
+    const l0c_out_copy_params& copy_params, const fixpipe_params& params)
+{
+    TENSOR_API_DEBUG_CHECK(debug_check_block_count, copy_params.n_size, "n_size", "copy_l0c_to_gm instruction");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_fixpipe_n, copy_params.n_size, trait.enable_channel_split, true, false, "copy_l0c_to_gm");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_fixpipe_m, copy_params.m_size, true, "copy_l0c_to_gm instruction");
+    TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, copy_params.src_stride, copy_params.dst_stride,
+        "copy_l0c_to_gm instruction");
+    TENSOR_API_DEBUG_CHECK(debug_check_unit_flag, params.unit_flag, "copy_l0c_to_gm instruction");
+}
+
+__aicore__ inline static constexpr l0c_to_gm_nd_tile_params make_l0c_to_gm_nd_tile_params(
+    uint32_t base_dst_offset, uint32_t base_src_offset, uint32_t n_offset, uint32_t m_offset,
+    const l0c_out_copy_params& copy_params, uint32_t src_rows)
+{
+    constexpr uint32_t tile_size = static_cast<uint32_t>(FRACTAL_FIXED);
+    return {
+        n_offset,
+        m_offset,
+        Std::min(copy_params.n_size - n_offset, tile_size),
+        Std::min(copy_params.m_size - m_offset, tile_size),
+        base_dst_offset + m_offset * copy_params.dst_stride + n_offset,
+        base_src_offset + (n_offset / tile_size * src_rows + m_offset) * tile_size,
+    };
+}
+
 class data_copy_l0c_to_gm_no_vector_quant {
 public:
     template <const copy_l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename T, typename U>
@@ -70,11 +118,7 @@ public:
             auto dst_shape = make_slice_shape(coord_dst, dst.layout(), copy_shape);
             copy_params = make_l0c_out_copy_params<T, U>(dst.layout(), src.layout(), dst_shape);
         }
-        constexpr bool is_nd_format = is_l0c_out_nd_format_v<T>;
-        constexpr bool is_dn_format = is_l0c_out_dn_format_v<T>;
-        copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre, T, U>(dst, src, dst_offset, src_offset, copy_params.n_size,
-            copy_params.m_size, copy_params.src_stride, copy_params.dst_stride, dst.engine().get_cache_mode(),
-            trait.enable_relu, params.unit_flag, trait.enable_channel_split, is_nd_format, is_dn_format);
+        emit_instruction<trait, quant_pre>(dst, src, dst_offset, src_offset, copy_params, params);
     }
 
 private:
@@ -83,21 +127,38 @@ private:
     __aicore__ inline static void emit_data_copy(const T& dst, const U& src, const DstLayout& dst_layout,
                                                  const SrcLayout& src_layout, const fixpipe_params& params)
     {
+        auto copy_params = make_l0c_out_copy_params<T, U>(dst_layout, src_layout);
+        emit_instruction<trait, quant_pre>(dst, src, 0, 0, copy_params, params);
+    }
+
+    template <const copy_l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename T, typename U,
+              typename DstOffset, typename SrcOffset>
+    __aicore__ inline static void emit_instruction(const T& dst, const U& src, DstOffset base_dst_offset,
+                                                   SrcOffset base_src_offset,
+                                                   const l0c_out_copy_params& copy_params,
+                                                   const fixpipe_params& params)
+    {
         constexpr bool is_nd_format = is_l0c_out_nd_format_v<T>;
         constexpr bool is_dn_format = is_l0c_out_dn_format_v<T>;
-        auto copy_params = make_l0c_out_copy_params<T, U>(dst_layout, src_layout);
-
-        bool relu_en = trait.enable_relu;
-        uint8_t unit_flag = params.unit_flag;
-        bool nz2nd_en = is_nd_format;
-        bool nz2dn_en = is_dn_format;
-
-        uint8_t cache_mode = dst.engine().get_cache_mode();
-        bool is_channel_split = trait.enable_channel_split;
-
-        copy_l0c_to_gm_instr::data_copy<quant_pre>(
-            dst.data().get(), src.data().get(), copy_params.n_size, copy_params.m_size, copy_params.src_stride,
-            copy_params.dst_stride, cache_mode, relu_en, unit_flag, is_channel_split, nz2nd_en, nz2dn_en);
+        if constexpr (is_nd_format) {
+            check_l0c_to_gm_nd_copy_params<trait>(copy_params, params);
+            const uint32_t src_rows = get_l0c_out_matrix_rows(src);
+            for (uint32_t n_offset = 0; n_offset < copy_params.n_size; n_offset += FRACTAL_FIXED) {
+                for (uint32_t m_offset = 0; m_offset < copy_params.m_size; m_offset += FRACTAL_FIXED) {
+                    const auto tile = make_l0c_to_gm_nd_tile_params(
+                        base_dst_offset, base_src_offset, n_offset, m_offset, copy_params, src_rows);
+                    copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre>(
+                        dst, src, tile.dst_offset, tile.src_offset, tile.n_size, tile.m_size, copy_params.src_stride,
+                        copy_params.dst_stride, dst.engine().get_cache_mode(), trait.enable_relu, params.unit_flag,
+                        trait.enable_channel_split, is_nd_format, is_dn_format);
+                }
+            }
+        } else {
+            copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre>(
+                dst, src, base_dst_offset, base_src_offset, copy_params.n_size, copy_params.m_size,
+                copy_params.src_stride, copy_params.dst_stride, dst.engine().get_cache_mode(), trait.enable_relu,
+                params.unit_flag, trait.enable_channel_split, is_nd_format, is_dn_format);
+        }
     }
 };
 
@@ -131,19 +192,39 @@ public:
             auto dst_shape = make_slice_shape(coord_dst, dst.layout(), copy_shape);
             copy_params = make_l0c_out_copy_params<T, U>(dst.layout(), src.layout(), dst_shape);
         }
-        uint16_t n_iter_num = Std::ceil_division(copy_params.n_size, MAIN_LOOP_N_SIZE);
-        for (uint16_t i = 0; i < n_iter_num; ++i) {
-            uint32_t n_offset = i * MAIN_LOOP_N_SIZE;
-            uint32_t cal_n_size = Std::min(copy_params.n_size - n_offset, MAIN_LOOP_N_SIZE);
-            copy_l1_to_fixbuf(quant, cal_n_size, i);
-            insert_sync();
-            auto src_coord = make_src_coord<U>(i * CBURST_NUM);
-            auto dst_coord = make_dst_coord<T>(n_offset);
-            auto dst_offset = base_dst_offset + dst.layout()(dst_coord);
-            copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre>(dst, src(src_coord), dst_offset, src_offset, cal_n_size,
-                copy_params.m_size, copy_params.src_stride, copy_params.dst_stride, dst.engine().get_cache_mode(),
-                trait.enable_relu, params.unit_flag, trait.enable_channel_split, is_l0c_out_nd_format_v<T>,
-                is_l0c_out_dn_format_v<T>);
+        if constexpr (is_l0c_out_nd_format_v<T>) {
+            check_l0c_to_gm_nd_copy_params<trait>(copy_params, params);
+            const uint32_t src_rows = get_l0c_out_matrix_rows(src);
+            uint16_t n_iter_num = Std::ceil_division(copy_params.n_size, FRACTAL_FIXED);
+            for (uint16_t i = 0; i < n_iter_num; ++i) {
+                uint32_t n_offset = i * FRACTAL_FIXED;
+                uint32_t cal_n_size = Std::min(copy_params.n_size - n_offset, FRACTAL_FIXED);
+                copy_l1_to_fixbuf(quant, cal_n_size, n_offset);
+                insert_sync();
+                for (uint32_t m_offset = 0; m_offset < copy_params.m_size; m_offset += FRACTAL_FIXED) {
+                    const auto tile = make_l0c_to_gm_nd_tile_params(
+                        base_dst_offset, src_offset, n_offset, m_offset, copy_params, src_rows);
+                    copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre>(
+                        dst, src, tile.dst_offset, tile.src_offset, tile.n_size, tile.m_size, copy_params.src_stride,
+                        copy_params.dst_stride, dst.engine().get_cache_mode(), trait.enable_relu, params.unit_flag,
+                        trait.enable_channel_split, true, false);
+                }
+            }
+        } else {
+            uint16_t n_iter_num = Std::ceil_division(copy_params.n_size, MAIN_LOOP_N_SIZE);
+            for (uint16_t i = 0; i < n_iter_num; ++i) {
+                uint32_t n_offset = i * MAIN_LOOP_N_SIZE;
+                uint32_t cal_n_size = Std::min(copy_params.n_size - n_offset, MAIN_LOOP_N_SIZE);
+                copy_l1_to_fixbuf(quant, cal_n_size, n_offset);
+                insert_sync();
+                auto src_coord = make_src_coord<U>(i * CBURST_NUM);
+                auto dst_coord = make_dst_coord<T>(n_offset);
+                auto dst_offset = base_dst_offset + dst.layout()(dst_coord);
+                copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre>(
+                    dst, src(src_coord), dst_offset, src_offset, cal_n_size, copy_params.m_size,
+                    copy_params.src_stride, copy_params.dst_stride, dst.engine().get_cache_mode(), trait.enable_relu,
+                    params.unit_flag, trait.enable_channel_split, false, is_l0c_out_dn_format_v<T>);
+            }
         }
     }
 
@@ -168,6 +249,28 @@ private:
                                                  const DstLayout& dst_layout, const SrcLayout& src_layout,
                                                  const fixpipe_params& params)
     {
+        if constexpr (is_l0c_out_nd_format_v<T>) {
+            auto copy_params = make_l0c_out_copy_params<T, U>(dst_layout, src_layout);
+            check_l0c_to_gm_nd_copy_params<trait>(copy_params, params);
+            const uint32_t src_rows = get_l0c_out_matrix_rows(src);
+            uint16_t n_iter_num = Std::ceil_division(copy_params.n_size, FRACTAL_FIXED);
+            for (uint16_t i = 0; i < n_iter_num; ++i) {
+                uint32_t n_offset = i * FRACTAL_FIXED;
+                uint32_t cal_n_size = Std::min(copy_params.n_size - n_offset, FRACTAL_FIXED);
+                copy_l1_to_fixbuf(quant, cal_n_size, n_offset);
+                insert_sync();
+                for (uint32_t m_offset = 0; m_offset < copy_params.m_size; m_offset += FRACTAL_FIXED) {
+                    const auto tile = make_l0c_to_gm_nd_tile_params(
+                        0, 0, n_offset, m_offset, copy_params, src_rows);
+                    copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre>(
+                        dst, src, tile.dst_offset, tile.src_offset, tile.n_size, tile.m_size, copy_params.src_stride,
+                        copy_params.dst_stride, dst.engine().get_cache_mode(), trait.enable_relu, params.unit_flag,
+                        trait.enable_channel_split, true, false);
+                }
+            }
+            return;
+        }
+
         uint32_t n_size = Std::min(get_total_column_shape(src_layout), get_total_column_shape(dst_layout));
         uint16_t n_iter_num = 1;
         uint32_t cal_n_size = n_size;
@@ -221,11 +324,11 @@ private:
     }
 
     template <typename T>
-    __aicore__ inline static void copy_l1_to_fixbuf(const T& src, uint16_t cal_n_size, uint16_t n_iter_index)
+    __aicore__ inline static void copy_l1_to_fixbuf(const T& src, uint16_t cal_n_size, uint32_t n_offset)
     {
         auto dst_addr = reinterpret_cast<__fbuf__ uint64_t*>(alloc_fixbuf_temp_buf(cal_n_size));
         auto dst = make_tensor(make_mem_ptr<location::fixbuf>(dst_addr), src.layout());
-        auto coord = make_coord(_0{}, n_iter_index * MAIN_LOOP_N_SIZE);
+        auto coord = make_coord(_0{}, n_offset);
         auto shape = make_shape(_1{}, cal_n_size);
         auto tile_src = src.slice(coord, shape);
         copy_l1_to_fixbuf_nd::run<DEFAULT_COPY_L1_FIXBUF_TRAIT>(dst, tile_src);
@@ -277,7 +380,7 @@ private:
         const auto main_loop_param = generate_params<trait, T, false>(dst, dst_layout, src_layout, params);
 
         for (uint16_t i = 0; i < n_iter_num; ++i) {
-            copy_l1_to_fixbuf(quant, cal_n_size, i);
+            copy_l1_to_fixbuf(quant, cal_n_size, i * MAIN_LOOP_N_SIZE);
             insert_sync();
 
             const auto src_coord = make_src_coord<U>(i * CBURST_NUM);
@@ -289,7 +392,7 @@ private:
         if (tail_n_size) {
             const auto tail_param = generate_params<trait, T, true>(dst, dst_layout, src_layout, params);
 
-            copy_l1_to_fixbuf(quant, tail_n_size, n_iter_num);
+            copy_l1_to_fixbuf(quant, tail_n_size, n_iter_num * MAIN_LOOP_N_SIZE);
             insert_sync();
 
             const auto src_coord = make_src_coord<U>(n_iter_num * CBURST_NUM);
