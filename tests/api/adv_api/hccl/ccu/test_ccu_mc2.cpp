@@ -104,7 +104,16 @@ static Mc2TilingTestData BuildMc2Tiling(
         tiling.ccTiling[i].dstDataType = HCCL_DATA_TYPE_FP16;
         tiling.ccTiling[i].reduceType = HCCL_REDUCE_SUM;
         strcpy(tiling.ccTiling[i].groupName, "test_group");
-        strcpy(tiling.ccTiling[i].algConfig, "default");
+        if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED) &&
+            opTypes[i] == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)) {
+            strcpy(tiling.ccTiling[i].algConfig, "CcuAllGatherMesh1DMem2Mem");
+        } else if (
+            commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED) &&
+            opTypes[i] == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) {
+            strcpy(tiling.ccTiling[i].algConfig, "CcuKfcReduceScatterMesh1DMem2Mem");
+        } else {
+            strcpy(tiling.ccTiling[i].algConfig, "default");
+        }
     }
     return tiling;
 }
@@ -407,7 +416,6 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuAlgorithmNotRegistered)
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
     Mc2TilingTestData tiling =
         BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
-    strcpy(tiling.ccTiling[0].algConfig, "CcuAllGatherMeshMem2Mem1D");
     mc2_ops_hccl::g_stubCcuAlgorithmRegistered = false;
 
     void* opResCtx = nullptr;
@@ -439,6 +447,27 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuPath)
     HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
     EXPECT_EQ(ret, HCCL_SUCCESS);
     ASSERT_NE(opResCtx, nullptr);
+}
+
+TEST_F(CcuMc2TestSuite, InitOpParamByTiling_SetsExpansionMode)
+{
+    Mc2CcTilingInner ccTiling{};
+    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.reduceType = HCCL_REDUCE_SUM;
+
+    ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::AICPU_TS);
+    OpParam aicpuOpParam{};
+    ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "aicpu_tag", &ccTiling, aicpuOpParam), HCCL_SUCCESS);
+    EXPECT_EQ(
+        aicpuOpParam.commOpExpansionMode, HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU);
+
+    ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    OpParam ccuOpParam{};
+    ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "ccu_tag", &ccTiling, ccuOpParam), HCCL_SUCCESS);
+    EXPECT_EQ(
+        ccuOpParam.commOpExpansionMode, HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_MixedOpsRejected)

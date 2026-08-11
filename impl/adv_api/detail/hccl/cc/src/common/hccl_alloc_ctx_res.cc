@@ -538,6 +538,13 @@ HcclResult InitOpParamByTiling(
     opParam.opType = static_cast<HcclCMDType>(ccTiling->opType);
     opParam.stream = reinterpret_cast<aclrtStream>(stream);
     opParam.engine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
+
+    if (ccTiling->commEngine == static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) {
+        opParam.commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;
+    } else if (ccTiling->commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        opParam.commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED;
+    }
+
     CHK_RET(HcclGetCommName(comm, opParam.commName));
     CHK_RET(PrepareOpParams(comm, tag, ccTiling, opParam));
     if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {

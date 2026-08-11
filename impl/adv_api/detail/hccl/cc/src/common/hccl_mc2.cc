@@ -217,28 +217,38 @@ HcclResult BuildTagsAndValidate(
     return HCCL_SUCCESS;
 }
 
-HcclResult CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum)
+bool HcclIsCcuAlgorithmRegistered(uint32_t opType, const char* algName)
 {
+    if (algName == nullptr || algorithmMap.count(algName) == 0U) {
+        return false;
+    }
+    return CollAlgExecRegistryV2::Instance().IsRegistered(static_cast<HcclCMDType>(opType), algName);
+}
+
+bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum)
+{
+    HCCL_INFO("[CheckCcuAlgorithmsRegistered]Start CheckCcuAlgorithmsRegistered!");
     if (tilingNum > 1) {
         HCCL_WARNING(
             "[AllocComResourceByTilingCcu] tilingNum[%u] is not supported in mc2_client.", tilingNum);
-        return HCCL_E_ALG_NOT_SUPPORTED;
+        return false;
     }
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         std::string algName;
         if (!GetForcedAlgName(ccTiling, algName)) {
-            return HCCL_E_ALG_NOT_SUPPORTED;
+            HCCL_WARNING(
+                "[AllocComResourceByTilingCcu] algName[%s] is not supported in mc2_client.", algName.c_str());
+            return false;
         }
-        const auto opType = static_cast<HcclCMDType>(ccTiling->opType);
-        if (!CollAlgExecRegistryV2::Instance().IsRegistered(opType, algName)) {
+        if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, algName.c_str())) {
             HCCL_WARNING(
                 "[AllocComResourceByTilingCcu] algorithm[%s] is not registered in mc2_client for opType[%u].",
                 algName.c_str(), ccTiling->opType);
-            return HCCL_E_ALG_NOT_SUPPORTED;
+            return false;
         }
     }
-    return HCCL_SUCCESS;
+    return true;
 }
 
 // AICPU引擎资源分配流程
@@ -285,7 +295,9 @@ HcclResult AllocComResourceByTilingCcu(
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
     HCCL_INFO("[AllocComResourceByTilingCcu]BuildTagsAndValidate successfully!");
 
-    CHK_RET(CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum));
+    if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
+        return HCCL_E_ALG_NOT_SUPPORTED;
+    }
 
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};
