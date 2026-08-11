@@ -8,12 +8,10 @@ ROOT = Path(__file__).resolve().parents[1]
 PREFIX = "examples/02_simd_c_api/04_c_api_call_examples"
 
 
-def raw_source(rel, kernel, api, aic_body, input_bytes, output_bytes, launches=2, golden=""):
+def raw_source(rel, kernel, api, aic_body, input_bytes, output_bytes, golden=""):
     binary = "c_api_cube_datamove_" + rel.replace("/", "_").replace(".asc", "")
     if not golden:
-        golden = f'''    for (uint32_t mode = 0; mode < {launches}; ++mode) {{
-        for (uint32_t i = 0; i < OUTPUT_BYTES; ++i) golden[mode * OUTPUT_BYTES + i] = input[i];
-    }}'''
+        golden = '''    for (uint32_t i = 0; i < OUTPUT_BYTES; ++i) golden[i] = input[i];'''
     return f'''// Build/run ({PREFIX}/cube_datamove/{rel}): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang {PREFIX}/cube_datamove/{rel} -lm -o /tmp/{binary} && /tmp/{binary}
 // Architecture: dav-3510
 
@@ -27,7 +25,7 @@ namespace {{
 constexpr uint32_t INPUT_BYTES = {input_bytes};
 constexpr uint32_t OUTPUT_BYTES = {output_bytes};
 
-__global__ __mix__(1, 2) void {kernel}(__gm__ uint8_t* output, __gm__ uint8_t* input, uint32_t mode)
+__global__ __mix__(1, 2) void {kernel}(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {{
     asc_init();
     __cbuf__ uint8_t l1[256];
@@ -40,7 +38,7 @@ __global__ __mix__(1, 2) void {kernel}(__gm__ uint8_t* output, __gm__ uint8_t* i
     if ASC_IS_AIV {{
         if (asc_get_sub_block_id() == 0) {{
             asc_sync_intra_wait(PIPE_MTE3, intra_id);
-            asc_copy_ub2gm_align(output + mode * OUTPUT_BYTES, readback, OUTPUT_BYTES);
+            asc_copy_ub2gm_align(output, readback, OUTPUT_BYTES);
             asc_sync_mte3(0);
         }}
     }}
@@ -56,7 +54,7 @@ void PrintData(const char* label, const std::vector<uint8_t>& data)
 
 int main()
 {{
-    std::vector<uint8_t> input(INPUT_BYTES), output(OUTPUT_BYTES * {launches}), golden(output.size());
+    std::vector<uint8_t> input(INPUT_BYTES), output(OUTPUT_BYTES), golden(OUTPUT_BYTES);
     for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i + 1);
 {golden}
     aclInit(nullptr);
@@ -65,10 +63,8 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size(), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
-    for (uint32_t mode = 0; mode < {launches}; ++mode) {{
-        {kernel}<<<1, 0>>>(output_device, input_device, mode);
-        aclrtSynchronizeDevice();
-    }}
+    {kernel}<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size(), output_device, output.size(), ACL_MEMCPY_DEVICE_TO_HOST);
     PrintData("Input", input);
     PrintData("Output", output);
@@ -99,7 +95,7 @@ def fill_source():
 namespace {{
 constexpr uint32_t ELEMENTS = 64;
 
-__global__ __mix__(1, 2) void AscFillL1Kernel(__gm__ float* output, uint32_t mode)
+__global__ __mix__(1, 2) void AscFillL1Kernel(__gm__ float* output)
 {{
     asc_init();
     __cbuf__ float l1[ELEMENTS];
@@ -110,8 +106,8 @@ __global__ __mix__(1, 2) void AscFillL1Kernel(__gm__ float* output, uint32_t mod
         config.repeat = 1;
         config.blk_num = ELEMENTS * sizeof(float) / 32;
         config.dst_gap = 0;
-        if (mode == 0) asc_fill_l1(l1, 0x3f800000U, config);
-        else asc_fill_l1_sync(l1, 0x3f800000U, config);
+        // Fill 8 data blocks in L1 with the FP32 bit pattern for 1.0.
+        asc_fill_l1(l1, 0x3f800000U, config);
         asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_copy_l12ub(readback, l1, false, 1, ELEMENTS * sizeof(float) / 32, 0, 0);
@@ -120,7 +116,7 @@ __global__ __mix__(1, 2) void AscFillL1Kernel(__gm__ float* output, uint32_t mod
     if ASC_IS_AIV {{
         if (asc_get_sub_block_id() == 0) {{
             asc_sync_intra_wait(PIPE_MTE3, intra_id);
-            asc_copy_ub2gm_align(output + mode * ELEMENTS, readback, ELEMENTS * sizeof(float));
+            asc_copy_ub2gm_align(output, readback, ELEMENTS * sizeof(float));
             asc_sync_mte3(0);
         }}
     }}
@@ -129,21 +125,19 @@ __global__ __mix__(1, 2) void AscFillL1Kernel(__gm__ float* output, uint32_t mod
 
 int main()
 {{
-    std::vector<float> output(ELEMENTS * 2), golden(ELEMENTS * 2, 1.0f);
+    std::vector<float> output(ELEMENTS), golden(ELEMENTS, 1.0f);
     aclInit(nullptr);
     aclrtSetDevice(0);
     float* output_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
-    for (uint32_t mode = 0; mode < 2; ++mode) {{
-        AscFillL1Kernel<<<1, 0>>>(output_device, mode);
-        aclrtSynchronizeDevice();
-    }}
+    AscFillL1Kernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), output_device, output.size() * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
     std::cout << "Filled L1 values:";
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << output[i];
     std::cout << " ..." << std::endl;
     const bool passed = output == golden;
-    std::cout << (passed ? "[Success] asc_fill_l1/asc_fill_l1_sync filled L1 with 1.0."
+    std::cout << (passed ? "[Success] asc_fill_l1 filled L1 with 1.0."
                          : "[Failed] asc_fill_l1 result mismatch.") << std::endl;
     aclrtFree(output_device);
     aclrtResetDevice(0);
@@ -158,8 +152,8 @@ def matrix_source(rel, kernel, api, target):
     b_is_nk = target == "l12l0b"
     if target == "nd2nz":
         load_a = '''    asc_set_gm2l1_nz_para(nz_config);
-    if (mode == 0) asc_copy_gm2l1_nd2nz(a_l1, a, K, 0, M, K, 0, false);
-    else asc_copy_gm2l1_nd2nz_sync(a_l1, a, K, 0, M, K, 0, false);'''
+    // Convert the MxK ND matrix in GM to Nz layout in L1.
+    asc_copy_gm2l1_nd2nz(a_l1, a, K, 0, M, K, 0, false);'''
     else:
         load_a = '''    asc_set_gm2l1_nz_para(nz_config);
     asc_copy_gm2l1_nd2nz(a_l1, a, K, 0, M, K, 0, false);'''
@@ -170,30 +164,28 @@ def matrix_source(rel, kernel, api, target):
         load_b = '''    asc_set_gm2l1_nz_para(nz_config);
     asc_copy_gm2l1_nd2nz(b_l1, b, N, 0, K, N, 0, false);'''
     if target == "l12l0a":
-        copy_a = '''    if (mode == 0) asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
-    else asc_copy_l12l0a_sync(a_l0, a_l1, 0, 0, 1, 1, 1, 1);'''
+        copy_a = '''    // Load one 16x32 Nz tile from L1 into L0A.
+    asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);'''
     else:
         copy_a = '''    asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);'''
     if target == "l12l0b":
-        copy_b = '''    if (mode == 0) asc_copy_l12l0b(b_l0, b_l1, 0, 0, 1, 1, 1, 1);
-    else asc_copy_l12l0b_sync(b_l0, b_l1, 0, 0, 1, 1, 1, 1);'''
+        copy_b = '''    // Load one 16x32 Nz tile from L1 into L0B without transposition.
+    asc_copy_l12l0b(b_l0, b_l1, 0, 0, 1, 1, 1, 1);'''
     elif target == "l12l0b_trans":
-        copy_b = '''    if (mode == 0) asc_copy_l12l0b_trans(b_l0, b_l1, static_cast<uint16_t>(0),
-        static_cast<uint8_t>(1), static_cast<uint16_t>(2), static_cast<uint16_t>(1),
-        static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-    else asc_copy_l12l0b_trans_sync(b_l0, b_l1, static_cast<uint16_t>(0),
+        copy_b = '''    // Load two K blocks into L0B and transpose them for MMAD.
+    asc_copy_l12l0b_trans(b_l0, b_l1, static_cast<uint16_t>(0),
         static_cast<uint8_t>(1), static_cast<uint16_t>(2), static_cast<uint16_t>(1),
         static_cast<uint16_t>(0), static_cast<uint16_t>(0));'''
     else:
         copy_b = '''    asc_copy_l12l0b_trans(b_l0, b_l1, static_cast<uint16_t>(0),
         static_cast<uint8_t>(1), static_cast<uint16_t>(2), static_cast<uint16_t>(1),
         static_cast<uint16_t>(0), static_cast<uint16_t>(0));'''
-    copy_out_call = '''output + mode * ELEMENTS, c_l0, N, M, N, M, 0, 0, 0,
+    copy_out_call = '''output, c_l0, N, M, N, M, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false'''
     if target == "l0c2gm":
-        copy_out = f'''    if (mode == 0) asc_copy_l0c2gm({copy_out_call});
-    else asc_copy_l0c2gm_sync({copy_out_call});'''
+        copy_out = f'''    // Convert the 16x16 L0C result from Nz to contiguous ND in GM.
+    asc_copy_l0c2gm({copy_out_call});'''
     else:
         copy_out = f'''    asc_copy_l0c2gm({copy_out_call});'''
     b_index = "col * K + k" if b_is_nk else "k * N + col"
@@ -210,7 +202,7 @@ namespace {{
 constexpr uint32_t M = 16, K = 32, N = 16, ELEMENTS = M * N;
 
 __global__ __cube__ void {kernel}(__gm__ int8_t* a, __gm__ int8_t* b,
-    __gm__ int32_t* output, uint32_t mode)
+    __gm__ int32_t* output)
 {{
     asc_init();
     __cbuf__ int8_t a_l1[M * K], b_l1[K * N];
@@ -231,7 +223,7 @@ __global__ __cube__ void {kernel}(__gm__ int8_t* a, __gm__ int8_t* b,
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c2gm_nz2nd(1, 0, 0);
 {copy_out}
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync_pipe(PIPE_FIX);
 }}
 
 template <typename T>
@@ -246,15 +238,13 @@ void PrintRow(const char* label, const std::vector<T>& data)
 int main()
 {{
     std::vector<int8_t> a(M * K), b(K * N);
-    std::vector<int32_t> output(ELEMENTS * 2), golden(ELEMENTS * 2);
+    std::vector<int32_t> output(ELEMENTS), golden(ELEMENTS);
     for (uint32_t i = 0; i < M; ++i) a[i * K + i] = 1;
     for (uint32_t i = 0; i < N; ++i) b[{('i * K + i' if b_is_nk else 'i * N + i')}] = 2;
-    for (uint32_t mode = 0; mode < 2; ++mode) {{
-        for (uint32_t row = 0; row < M; ++row) {{
-            for (uint32_t col = 0; col < N; ++col) {{
-                for (uint32_t k = 0; k < K; ++k)
-                    golden[mode * ELEMENTS + row * N + col] += a[row * K + k] * b[{b_index}];
-            }}
+    for (uint32_t row = 0; row < M; ++row) {{
+        for (uint32_t col = 0; col < N; ++col) {{
+            for (uint32_t k = 0; k < K; ++k)
+                golden[row * N + col] += a[row * K + k] * b[{b_index}];
         }}
     }}
     aclInit(nullptr);
@@ -266,10 +256,8 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, a.size(), a.data(), a.size(), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, b.size(), b.data(), b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
-    for (uint32_t mode = 0; mode < 2; ++mode) {{
-        {kernel}<<<1, 0>>>(a_device, b_device, output_device, mode);
-        aclrtSynchronizeDevice();
-    }}
+    {kernel}<<<1, 0>>>(a_device, b_device, output_device);
+    aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), output_device,
         output.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
     PrintRow("Input A row 0", a);
@@ -294,25 +282,22 @@ def mx_source(rel, kernel, api, target):
         reinterpret_cast<__gm__ half*>(scale_a), SCALE_K, 0, SCALE_K / 2, M, 0, false);'''
     if target == "dn2nz":
         scale_a_load = '''    asc_set_gm2l1_nz_para(scale_config);
-    if (mode == 0) asc_copy_gm2l1_dn2nz(reinterpret_cast<__cbuf__ half*>(scale_a_l1),
-        reinterpret_cast<__gm__ half*>(scale_a), SCALE_K, 0, SCALE_K / 2, M, 0, false);
-    else asc_copy_gm2l1_dn2nz_sync(reinterpret_cast<__cbuf__ half*>(scale_a_l1),
+    // Convert the per-row scale matrix from DN in GM to Nz in L1.
+    asc_copy_gm2l1_dn2nz(reinterpret_cast<__cbuf__ half*>(scale_a_l1),
         reinterpret_cast<__gm__ half*>(scale_a), SCALE_K, 0, SCALE_K / 2, M, 0, false);'''
     scale_a_copy = '''    asc_copy_l12l0a_mx(static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a_l0)) / 16,
         scale_a_l1, 0, 0, 1, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);'''
     if target == "l12l0a_mx":
-        scale_a_copy = '''    if (mode == 0) asc_copy_l12l0a_mx(
+        scale_a_copy = '''    // Load A's E8M0 scale tile into the MX region associated with L0A.
+    asc_copy_l12l0a_mx(
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a_l0)) / 16,
-        scale_a_l1, 0, 0, 1, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);
-    else asc_copy_l12l0a_mx_sync(static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a_l0)) / 16,
         scale_a_l1, 0, 0, 1, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);'''
     scale_b_copy = '''    asc_copy_l12l0b_mx(static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b_l0)) / 16,
         scale_b_l1, 0, 0, 1, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);'''
     if target == "l12l0b_mx":
-        scale_b_copy = '''    if (mode == 0) asc_copy_l12l0b_mx(
+        scale_b_copy = '''    // Load B's E8M0 scale tile into the MX region associated with L0B.
+    asc_copy_l12l0b_mx(
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b_l0)) / 16,
-        scale_b_l1, 0, 0, 1, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);
-    else asc_copy_l12l0b_mx_sync(static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b_l0)) / 16,
         scale_b_l1, 0, 0, 1, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);'''
     return f'''// Build/run ({PREFIX}/cube_datamove/{rel}): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang {PREFIX}/cube_datamove/{rel} -lm -o /tmp/{binary} && /tmp/{binary}
 // Architecture: dav-3510
@@ -327,7 +312,7 @@ namespace {{
 constexpr uint32_t M = 16, K = 64, N = 16, SCALE_K = 2, ELEMENTS = M * N;
 
 __global__ __cube__ void {kernel}(__gm__ uint8_t* a, __gm__ uint8_t* scale_a,
-    __gm__ uint8_t* b, __gm__ uint8_t* scale_b, __gm__ float* output, uint32_t mode)
+    __gm__ uint8_t* b, __gm__ uint8_t* scale_b, __gm__ float* output)
 {{
     asc_init();
     __cbuf__ fp8_e4m3fn_t a_l1[M * K], b_l1[N * K];
@@ -357,10 +342,10 @@ __global__ __cube__ void {kernel}(__gm__ uint8_t* a, __gm__ uint8_t* scale_a,
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c2gm_nz2nd(1, 0, 0);
-    asc_copy_l0c2gm(output + mode * ELEMENTS, c_l0, N, M, N, M, 0, 0, 0,
+    asc_copy_l0c2gm(output, c_l0, N, M, N, M, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync_pipe(PIPE_FIX);
 }}
 
 void PrintRow(const char* label, const std::vector<float>& data)
@@ -374,11 +359,10 @@ void PrintRow(const char* label, const std::vector<float>& data)
 int main()
 {{
     std::vector<uint8_t> a(M * K), b(N * K), scale_a(M * SCALE_K, 127), scale_b(N * SCALE_K, 127);
-    std::vector<float> output(ELEMENTS * 2), golden(ELEMENTS * 2);
+    std::vector<float> output(ELEMENTS), golden(ELEMENTS);
     for (uint32_t i = 0; i < M; ++i) a[i * K + i] = 0x38;
     for (uint32_t i = 0; i < N; ++i) b[i * K + i] = 0x38;
-    for (uint32_t mode = 0; mode < 2; ++mode)
-        for (uint32_t i = 0; i < M; ++i) golden[mode * ELEMENTS + i * N + i] = 1.0f;
+    for (uint32_t i = 0; i < M; ++i) golden[i * N + i] = 1.0f;
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t *a_device = nullptr, *b_device = nullptr, *scale_a_device = nullptr, *scale_b_device = nullptr;
@@ -392,10 +376,8 @@ int main()
     aclrtMemcpy(b_device, b.size(), b.data(), b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(scale_a_device, scale_a.size(), scale_a.data(), scale_a.size(), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(scale_b_device, scale_b.size(), scale_b.data(), scale_b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
-    for (uint32_t mode = 0; mode < 2; ++mode) {{
-        {kernel}<<<1, 0>>>(a_device, scale_a_device, b_device, scale_b_device, output_device, mode);
-        aclrtSynchronizeDevice();
-    }}
+    {kernel}<<<1, 0>>>(a_device, scale_a_device, b_device, scale_b_device, output_device);
+    aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), output_device,
         output.size() * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
     std::cout << "Input FP8 1.0 / E8M0 scale 1.0: 0x38 / " << +scale_a[0] << std::endl;
@@ -430,7 +412,7 @@ constexpr uint16_t HALF_ONE = 0x3c00, HALF_THREE = 0x4200;
 constexpr uint64_t SIGNED_SCALE_TWO = 0x40000000ULL | (1ULL << 46);
 
 __global__ __cube__ void AscCopyL12fbKernel(__gm__ uint16_t* a, __gm__ uint16_t* b,
-    __gm__ uint64_t* scales, __gm__ int8_t* output, uint32_t mode)
+    __gm__ uint64_t* scales, __gm__ int8_t* output)
 {{
     asc_init();
     __cbuf__ half a_l1[ELEMENTS], b_l1[ELEMENTS];
@@ -454,18 +436,18 @@ __global__ __cube__ void AscCopyL12fbKernel(__gm__ uint16_t* a, __gm__ uint16_t*
     asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
     asc_sync_notify(PIPE_MTE2, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_FIX, EVENT_ID0);
-    if (mode == 0) asc_copy_l12fb(scale_fb, scale_l1, 1, 2, 0, 0);
-    else asc_copy_l12fb_sync(scale_fb, scale_l1, DIM * sizeof(uint64_t));
+    // Copy 16 contiguous scale entries from L1 to the Fixpipe Buffer.
+    asc_copy_l12fb(scale_fb, scale_l1, DIM * sizeof(uint64_t));
     const uint64_t scale_address = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_fb)) / 128;
     asc_set_l0c2gm_config(0, scale_address, false);
     asc_sync_pipe(PIPE_FIX);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c2gm_nz2nd(1, 0, 0);
-    asc_copy_l0c2gm(output + mode * ELEMENTS, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
+    asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::VQF322B8_PRE), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync_pipe(PIPE_FIX);
 }}
 
 void PrintRow(const char* label, const std::vector<int8_t>& data)
@@ -480,11 +462,11 @@ int main()
 {{
     std::vector<uint16_t> a(ELEMENTS), b(ELEMENTS);
     std::vector<uint64_t> scales(DIM, SIGNED_SCALE_TWO);
-    std::vector<int8_t> output(ELEMENTS * 2), golden(ELEMENTS * 2);
+    std::vector<int8_t> output(ELEMENTS), golden(ELEMENTS);
     for (uint32_t i = 0; i < DIM; ++i) {{
         a[i * DIM + i] = HALF_ONE;
         b[i * DIM + i] = HALF_THREE;
-        golden[i * DIM + i] = golden[ELEMENTS + i * DIM + i] = 6;
+        golden[i * DIM + i] = 6;
     }}
     aclInit(nullptr);
     aclrtSetDevice(0);
@@ -498,16 +480,14 @@ int main()
     aclrtMemcpy(a_device, a.size() * sizeof(uint16_t), a.data(), a.size() * sizeof(uint16_t), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, b.size() * sizeof(uint16_t), b.data(), b.size() * sizeof(uint16_t), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(scales_device, scales.size() * sizeof(uint64_t), scales.data(), scales.size() * sizeof(uint64_t), ACL_MEMCPY_HOST_TO_DEVICE);
-    for (uint32_t mode = 0; mode < 2; ++mode) {{
-        AscCopyL12fbKernel<<<1, 0>>>(a_device, b_device, scales_device, output_device, mode);
-        aclrtSynchronizeDevice();
-    }}
+    AscCopyL12fbKernel<<<1, 0>>>(a_device, b_device, scales_device, output_device);
+    aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size(), output_device, output.size(), ACL_MEMCPY_DEVICE_TO_HOST);
     std::cout << "Input diagonal: 1 * 3; FB scale: 2" << std::endl;
     PrintRow("Quantized output row 0", output);
     PrintRow("Golden row 0", golden);
     const bool passed = output == golden;
-    std::cout << (passed ? "[Success] asc_copy_l12fb/asc_copy_l12fb_sync loaded scale 2."
+    std::cout << (passed ? "[Success] asc_copy_l12fb loaded scale 2."
                          : "[Failed] asc_copy_l12fb result mismatch.") << std::endl;
     aclrtFree(a_device); aclrtFree(b_device); aclrtFree(scales_device); aclrtFree(output_device);
     aclrtResetDevice(0);
@@ -521,16 +501,13 @@ def l0c_local_source(target):
     is_l1 = target == "l1"
     rel = ("asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.asc" if is_l1 else "asc_copy_l0c2ub.asc")
     kernel = "AscCopyL0c2l1Kernel" if is_l1 else "AscCopyL0c2ubKernel"
-    api = ("asc_copy_l0c2l1/asc_copy_l0c2l1_sync" if is_l1 else "asc_copy_l0c2ub/asc_copy_l0c2ub_sync")
+    api = ("asc_copy_l0c2l1" if is_l1 else "asc_copy_l0c2ub")
     binary = "c_api_cube_datamove_" + ("asc_copy_l0c2l1" if is_l1 else "asc_copy_l0c2ub")
     if is_l1:
         local_decl = '''    __cbuf__ uint8_t packed_l1[PACKED_BYTES];
     __ubuf__ uint8_t packed_ub[PACKED_BYTES];'''
-        target_call = '''        if (mode == 0) asc_copy_l0c2l1(reinterpret_cast<__cbuf__ int4b_t*>(packed_l1),
-            c_l0, N, M, N, M, 0, 0, 0,
-            static_cast<uint64_t>(QuantMode_t::QF322S4_PRE), 0, false, true, 0, 0, false, 0,
-            false, false, false, false);
-        else asc_copy_l0c2l1_sync(reinterpret_cast<__cbuf__ int4b_t*>(packed_l1),
+        target_call = '''        // Quantize the FP32 L0C matrix to packed signed int4 in L1.
+        asc_copy_l0c2l1(reinterpret_cast<__cbuf__ int4b_t*>(packed_l1),
             c_l0, N, M, N, M, 0, 0, 0,
             static_cast<uint64_t>(QuantMode_t::QF322S4_PRE), 0, false, true, 0, 0, false, 0,
             false, false, false, false);
@@ -540,11 +517,8 @@ def l0c_local_source(target):
         asc_sync_intra_arrive(PIPE_MTE1, intra_id);'''
     else:
         local_decl = '''    __ubuf__ uint8_t packed_ub[PACKED_BYTES];'''
-        target_call = '''        if (mode == 0) asc_copy_l0c2ub(reinterpret_cast<__ubuf__ int4b_t*>(packed_ub),
-            c_l0, N, M, N, M, 0, false, 0, 0,
-            static_cast<uint64_t>(QuantMode_t::QF322S4_PRE), 0, false, true, 0, 0, false, 0,
-            false, false, false, false);
-        else asc_copy_l0c2ub_sync(reinterpret_cast<__ubuf__ int4b_t*>(packed_ub),
+        target_call = '''        // Quantize the FP32 L0C matrix to packed signed int4 in AIV0's UB.
+        asc_copy_l0c2ub(reinterpret_cast<__ubuf__ int4b_t*>(packed_ub),
             c_l0, N, M, N, M, 0, false, 0, 0,
             static_cast<uint64_t>(QuantMode_t::QF322S4_PRE), 0, false, true, 0, 0, false, 0,
             false, false, false, false);
@@ -564,7 +538,7 @@ constexpr uint32_t M = 16, K = 16, N = 64, ELEMENTS = M * N, PACKED_BYTES = M * 
 constexpr uint64_t SIGNED_SCALE_ONE = 0x3f800000ULL | (1ULL << 46);
 
 __global__ __mix__(1, 2) void {kernel}(__gm__ uint16_t* a, __gm__ uint16_t* b,
-    __gm__ uint8_t* output, uint32_t mode)
+    __gm__ uint8_t* output)
 {{
     asc_init();
     __cbuf__ half a_l1[ELEMENTS], b_l1[ELEMENTS];
@@ -594,7 +568,7 @@ __global__ __mix__(1, 2) void {kernel}(__gm__ uint16_t* a, __gm__ uint16_t* b,
     if ASC_IS_AIV {{
         if (asc_get_sub_block_id() == 0) {{
             asc_sync_intra_wait(PIPE_MTE3, intra_id);
-            asc_copy_ub2gm_align(output + mode * PACKED_BYTES,
+            asc_copy_ub2gm_align(output,
                 reinterpret_cast<__ubuf__ uint8_t*>(packed_ub), PACKED_BYTES);
             asc_sync_mte3(0);
         }}
@@ -613,12 +587,11 @@ int main()
 {{
     constexpr uint16_t HALF_ONE = 0x3c00, HALF_THREE = 0x4200;
     std::vector<uint16_t> a(ELEMENTS), b(ELEMENTS);
-    std::vector<uint8_t> output(PACKED_BYTES * 2), golden(PACKED_BYTES * 2);
+    std::vector<uint8_t> output(PACKED_BYTES), golden(PACKED_BYTES);
     for (uint32_t i = 0; i < M; ++i) a[i * K + i] = HALF_ONE;
     for (uint32_t i = 0; i < ELEMENTS; ++i) b[i] = HALF_THREE;
-    for (uint32_t mode = 0; mode < 2; ++mode)
-        for (uint32_t row = 0; row < M; ++row)
-            for (uint32_t i = 0; i < N / 2; ++i) golden[mode * PACKED_BYTES + row * 32 + i] = 0x33;
+    for (uint32_t row = 0; row < M; ++row)
+        for (uint32_t i = 0; i < N / 2; ++i) golden[row * 32 + i] = 0x33;
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint16_t *a_device = nullptr, *b_device = nullptr;
@@ -628,10 +601,8 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size(), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, a.size() * sizeof(uint16_t), a.data(), a.size() * sizeof(uint16_t), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, b.size() * sizeof(uint16_t), b.data(), b.size() * sizeof(uint16_t), ACL_MEMCPY_HOST_TO_DEVICE);
-    for (uint32_t mode = 0; mode < 2; ++mode) {{
-        {kernel}<<<1, 0>>>(a_device, b_device, output_device, mode);
-        aclrtSynchronizeDevice();
-    }}
+    {kernel}<<<1, 0>>>(a_device, b_device, output_device);
+    aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size(), output_device, output.size(), ACL_MEMCPY_DEVICE_TO_HOST);
     std::cout << "Input: identity * FP16 matrix filled with 3" << std::endl;
     PrintBytes("Packed int4 output row 0", output, 0);
@@ -656,6 +627,7 @@ def fixpipe_setter_source(kind):
     binary = "c_api_cube_datamove_" + api
     if is_lrelu:
         setter = '''    float alpha = 0.5f;
+    // Set the negative slope used by Fixpipe leaky-ReLU conversion to FP16.
     asc_set_l0c2gm_lrelu_alpha(alpha);'''
         output_type = "uint16_t"
         output_cast = "reinterpret_cast<__gm__ half*>(output)"
@@ -680,6 +652,7 @@ def fixpipe_setter_source(kind):
         success = "applied alpha 0.5 to -1.0"
     else:
         setter = '''    constexpr uint64_t signed_scale_two = 0x40000000ULL | (1ULL << 46);
+    // Apply scalar scale 2.0 during signed int8 Fixpipe pre-quantization.
     asc_set_l0c_copy_prequant(signed_scale_two);'''
         output_type = "int8_t"
         output_cast = "output"
@@ -743,7 +716,7 @@ __global__ __cube__ void {kernel}(__gm__ uint16_t* a, __gm__ uint16_t* b, __gm__
     asc_copy_l0c2gm({output_cast}, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>({quant}), {relu}, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync_pipe(PIPE_FIX);
 }}
 
 {print_func}
@@ -792,7 +765,7 @@ def bias_source():
 namespace {{
 constexpr uint32_t DIM = 16, ELEMENTS = DIM * DIM, BIAS_BYTES = DIM * sizeof(float);
 
-__global__ __cube__ void AscCopyL12btKernel(__gm__ float* bias, __gm__ float* output, uint32_t mode)
+__global__ __cube__ void AscCopyL12btKernel(__gm__ float* bias, __gm__ float* output)
 {{
     asc_init();
     __cbuf__ half a_l1[ELEMENTS], b_l1[ELEMENTS];
@@ -811,18 +784,18 @@ __global__ __cube__ void AscCopyL12btKernel(__gm__ float* bias, __gm__ float* ou
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
     asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0, 1, 1, 1, 1);
-    if (mode == 0) asc_copy_l12bt(0, bias_l1, BIAS_BYTES);
-    else asc_copy_l12bt_sync(0, bias_l1, BIAS_BYTES);
+    // Load 16 FP32 bias values from L1 into Bias Table offset 0.
+    asc_copy_l12bt(0, bias_l1, BIAS_BYTES);
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, false, true, false);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c2gm_nz2nd(1, 0, 0);
-    asc_copy_l0c2gm(output + mode * ELEMENTS, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
+    asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync_pipe(PIPE_FIX);
 }}
 
 void PrintRow(const char* label, const std::vector<float>& data)
@@ -835,28 +808,25 @@ void PrintRow(const char* label, const std::vector<float>& data)
 
 int main()
 {{
-    std::vector<float> bias(DIM), output(ELEMENTS * 2), golden(ELEMENTS * 2);
+    std::vector<float> bias(DIM), output(ELEMENTS), golden(ELEMENTS);
     for (uint32_t i = 0; i < DIM; ++i) bias[i] = static_cast<float>(i + 1);
-    for (uint32_t mode = 0; mode < 2; ++mode)
-        for (uint32_t row = 0; row < DIM; ++row)
-            for (uint32_t col = 0; col < DIM; ++col) golden[mode * ELEMENTS + row * DIM + col] = bias[col];
+    for (uint32_t row = 0; row < DIM; ++row)
+        for (uint32_t col = 0; col < DIM; ++col) golden[row * DIM + col] = bias[col];
     aclInit(nullptr);
     aclrtSetDevice(0);
     float *bias_device = nullptr, *output_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&bias_device), BIAS_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(bias_device, BIAS_BYTES, bias.data(), BIAS_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
-    for (uint32_t mode = 0; mode < 2; ++mode) {{
-        AscCopyL12btKernel<<<1, 0>>>(bias_device, output_device, mode);
-        aclrtSynchronizeDevice();
-    }}
+    AscCopyL12btKernel<<<1, 0>>>(bias_device, output_device);
+    aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), output_device,
         output.size() * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
     PrintRow("Input Bias", bias);
     PrintRow("MMAD output row 0", output);
     PrintRow("Golden row 0", golden);
     const bool passed = output == golden;
-    std::cout << (passed ? "[Success] asc_copy_l12bt/asc_copy_l12bt_sync initialized MMAD from Bias Table."
+    std::cout << (passed ? "[Success] asc_copy_l12bt initialized MMAD from Bias Table."
                          : "[Failed] asc_copy_l12bt result mismatch.") << std::endl;
     aclrtFree(bias_device); aclrtFree(output_device);
     aclrtResetDevice(0);
@@ -878,6 +848,7 @@ def load3d_padding_source(target):
     feature_map.l1_width = 1;
     feature_map.l1_height = DIM - 1;
     feature_map.padding_top_size = 1;
+    // Describe B as 15 L1 rows plus one logical top-padding row.
     asc_set_l13d_fmatrix_b(feature_map);
     asc_load3d_v2_config repeat;
     asc_set_l13d_rpt(repeat);
@@ -891,9 +862,11 @@ def load3d_padding_source(target):
     feature_map.l1_width = 1;
     feature_map.l1_height = DIM - 1;
     feature_map.padding_top_size = 1;
+    // Describe A as 15 L1 rows plus one logical top-padding row.
     asc_set_l13d_fmatrix(feature_map);
     asc_load3d_v2_config repeat;
     asc_set_l13d_rpt(repeat);
+    // Supply 1.0 for positions outside the configured feature map.
     asc_set_l13d_padding(static_cast<half>(1.0f));
     asc_copy_l12l0a(a_l0, a_l1, DIM, DIM, 0, 0, 1, 1, 1, 1, 1, 1,
         false, false, false, false, DIM);'''
@@ -940,7 +913,7 @@ __global__ __cube__ void {kernel}(__gm__ uint16_t* a, __gm__ uint16_t* b, __gm__
     asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync_pipe(PIPE_FIX);
 }}
 
 void PrintRow(const char* label, const std::vector<float>& data, uint32_t offset)
@@ -1025,6 +998,7 @@ __global__ __cube__ void AscSetL13dRptKernel(
     repeat.rpt_time = 2;
     repeat.rpt_mode = 0;
     repeat.config |= 2ULL << 32;
+    // Load two height fragments with one-fragment stride from L1 to L0A.
     asc_set_l13d_rpt(repeat);
     asc_set_l13d_padding(static_cast<half>(0.0f));
     asc_copy_l12l0a(a_l0, a_l1, K, 16, 0, 0, 1, 1, 1, 1, 1, 1,
@@ -1039,7 +1013,7 @@ __global__ __cube__ void AscSetL13dRptKernel(
     asc_copy_l0c2gm(output, c_l0, N, M, N, M, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync_pipe(PIPE_FIX);
 }}
 
 void PrintRow(const char* label, const std::vector<float>& data, uint32_t offset)
@@ -1096,37 +1070,44 @@ def sources():
         asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_copy_l12ub(readback, l1, false, 1, OUTPUT_BYTES / 32, 0, 0);'''
     items = {}
-    body = '''        if (mode == 0) asc_copy_gm2l1(l1, input, 1, OUTPUT_BYTES / 32, 0, 0, 0);
-        else asc_copy_gm2l1_sync(l1, input, 1, OUTPUT_BYTES / 32, 0, 0, 0);
+    body = '''        // Copy one contiguous 64-byte GM range to L1: n_burst=1, len_burst=2 blocks.
+        asc_copy_gm2l1(l1, input, 1, OUTPUT_BYTES / 32, 0, 0, 0);
 ''' + plain_readback
     items["asc_copy_gm2l1/asc_copy_gm2l1_arch_3510.asc"] = raw_source(
         "asc_copy_gm2l1/asc_copy_gm2l1_arch_3510.asc", "AscCopyGm2l1Kernel",
-        "asc_copy_gm2l1/asc_copy_gm2l1_sync", body, 64, 64)
+        "asc_copy_gm2l1", body, 64, 64)
 
-    body = '''        if (mode == 0) asc_copy_gm2l1_align(l1, input, 2, 32, 0, 0, false, 0, 32, 32);
-        else asc_copy_gm2l1_align_sync(l1, input, 2, 32, 0, 0, false, 0, 32, 32);
+    body = '''        // Copy two 32-byte aligned bursts without head/tail padding.
+        asc_copy_gm2l1_align(l1, input, 2, 32, 0, 0, false, 0, 32, 32);
 ''' + plain_readback
     items["asc_copy_gm2l1_align.asc"] = raw_source(
         "asc_copy_gm2l1_align.asc", "AscCopyGm2l1AlignKernel",
-        "asc_copy_gm2l1_align/asc_copy_gm2l1_align_sync", body, 64, 64)
+        "asc_copy_gm2l1_align", body, 64, 64)
 
     body = '''        asc_copy_gm2l1(l1, input, 1, OUTPUT_BYTES / 32, 0, 0, 0);
         asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
-        if (mode == 0) asc_copy_l12ub(readback, l1, false, 1, OUTPUT_BYTES / 32, 0, 0);
-        else asc_copy_l12ub_sync(readback, l1, false, 1, OUTPUT_BYTES / 32, 0, 0);'''
+        // sub_blockid=false selects AIV0's UB for one two-block L1 transfer.
+        asc_copy_l12ub(readback, l1, false, 1, OUTPUT_BYTES / 32, 0, 0);'''
     items["asc_copy_l12ub.asc"] = raw_source(
-        "asc_copy_l12ub.asc", "AscCopyL12ubKernel", "asc_copy_l12ub/asc_copy_l12ub_sync", body, 64, 64)
+        "asc_copy_l12ub.asc", "AscCopyL12ubKernel", "asc_copy_l12ub", body, 64, 64)
 
     loop_cases = [
         ("asc_set_gm2l1_loop1_stride.asc", "AscSetGm2l1Loop1StrideKernel", "asc_set_gm2l1_loop1_stride",
-         "asc_set_gm2l1_loop_size(2, 1);\n        asc_set_gm2l1_loop1_stride(64, 32);", 96, 64,
+         "asc_set_gm2l1_loop_size(2, 1);\n"
+         "        // Select source/destination byte strides for the first GM-to-L1 loop.\n"
+         "        asc_set_gm2l1_loop1_stride(64, 32);", 96, 64,
          '''    for (uint32_t i = 0; i < 32; ++i) { golden[i] = input[i]; golden[32 + i] = input[64 + i]; }'''),
         ("asc_set_gm2l1_loop2_stride.asc", "AscSetGm2l1Loop2StrideKernel", "asc_set_gm2l1_loop2_stride",
-         "asc_set_gm2l1_loop_size(1, 2);\n        asc_set_gm2l1_loop2_stride(64, 32);", 96, 64,
+         "asc_set_gm2l1_loop_size(1, 2);\n"
+         "        // Select source/destination byte strides for the second GM-to-L1 loop.\n"
+         "        asc_set_gm2l1_loop2_stride(64, 32);", 96, 64,
          '''    for (uint32_t i = 0; i < 32; ++i) { golden[i] = input[i]; golden[32 + i] = input[64 + i]; }'''),
         ("asc_set_gm2l1_loop_size.asc", "AscSetGm2l1LoopSizeKernel", "asc_set_gm2l1_loop_size",
-         "asc_set_gm2l1_loop_size(2, 2);\n        asc_set_gm2l1_loop1_stride(64, 32);\n        asc_set_gm2l1_loop2_stride(128, 64);", 224, 128,
+         "// Execute a 2x2 nested GM-to-L1 transfer.\n"
+         "        asc_set_gm2l1_loop_size(2, 2);\n"
+         "        asc_set_gm2l1_loop1_stride(64, 32);\n"
+         "        asc_set_gm2l1_loop2_stride(128, 64);", 224, 128,
          '''    for (uint32_t block = 0; block < 4; ++block) {
         for (uint32_t i = 0; i < 32; ++i) golden[block * 32 + i] = input[block * 64 + i];
     }'''),
@@ -1136,37 +1117,38 @@ def sources():
         asc_copy_gm2l1_align(l1, input, 1, 32, 0, 0, false, 0, 0, 0);
         asc_set_gm2l1_loop_size(1, 1);
 ''' + plain_readback
-        items[rel] = raw_source(rel, kernel, api, body, inp, out, 1, golden)
+        items[rel] = raw_source(rel, kernel, api, body, inp, out, golden)
 
     pad_golden = '''    for (uint32_t i = 0; i < 8; ++i) golden[i] = golden[24 + i] = 0xa5;
     for (uint32_t i = 0; i < 16; ++i) golden[8 + i] = input[i];'''
-    body = '''        asc_set_gm2l1_pad(0xa5a5a5a5U);
+    body = '''        // Use byte value 0xa5 for the configured head and tail padding.
+        asc_set_gm2l1_pad(0xa5a5a5a5U);
         asc_copy_gm2l1_align(l1, input, 1, 16, 8, 8, false, 0, 0, 0);
 ''' + plain_readback
     items["asc_set_gm2l1_pad.asc"] = raw_source(
-        "asc_set_gm2l1_pad.asc", "AscSetGm2l1PadKernel", "asc_set_gm2l1_pad", body, 16, 32, 1, pad_golden)
+        "asc_set_gm2l1_pad.asc", "AscSetGm2l1PadKernel", "asc_set_gm2l1_pad", body, 16, 32, pad_golden)
     items["asc_fill_l1.asc"] = fill_source()
     matrix_cases = [
         ("asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.asc", "AscCopyGm2l1Nd2nzKernel",
-         "asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_sync", "nd2nz"),
+         "asc_copy_gm2l1_nd2nz", "nd2nz"),
         ("asc_copy_l12l0a/asc_copy_l12l0a_arch_3510.asc", "AscCopyL12l0aKernel",
-         "asc_copy_l12l0a/asc_copy_l12l0a_sync", "l12l0a"),
+         "asc_copy_l12l0a", "l12l0a"),
         ("asc_copy_l12l0b/asc_copy_l12l0b_arch_3510.asc", "AscCopyL12l0bKernel",
-         "asc_copy_l12l0b/asc_copy_l12l0b_sync", "l12l0b"),
+         "asc_copy_l12l0b", "l12l0b"),
         ("asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.asc", "AscCopyL12l0bTransKernel",
-         "asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_sync", "l12l0b_trans"),
+         "asc_copy_l12l0b_trans", "l12l0b_trans"),
         ("asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.asc", "AscCopyL0c2gmKernel",
-         "asc_copy_l0c2gm/asc_copy_l0c2gm_sync", "l0c2gm"),
+         "asc_copy_l0c2gm", "l0c2gm"),
     ]
     for rel, kernel, api, target in matrix_cases:
         items[rel] = matrix_source(rel, kernel, api, target)
     mx_cases = [
         ("asc_copy_gm2l1_dn2nz.asc", "AscCopyGm2l1Dn2nzKernel",
-         "asc_copy_gm2l1_dn2nz/asc_copy_gm2l1_dn2nz_sync", "dn2nz"),
+         "asc_copy_gm2l1_dn2nz", "dn2nz"),
         ("asc_copy_l12l0a_mx.asc", "AscCopyL12l0aMxKernel",
-         "asc_copy_l12l0a_mx/asc_copy_l12l0a_mx_sync", "l12l0a_mx"),
+         "asc_copy_l12l0a_mx", "l12l0a_mx"),
         ("asc_copy_l12l0b_mx.asc", "AscCopyL12l0bMxKernel",
-         "asc_copy_l12l0b_mx/asc_copy_l12l0b_mx_sync", "l12l0b_mx"),
+         "asc_copy_l12l0b_mx", "l12l0b_mx"),
     ]
     for rel, kernel, api, target in mx_cases:
         items[rel] = mx_source(rel, kernel, api, target)

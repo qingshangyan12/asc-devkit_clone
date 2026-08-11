@@ -80,9 +80,13 @@ __global__ __vector__ void {kernel}(__gm__ int32_t* output, __gm__ int32_t* inpu
 {{
     asc_init();
     __ubuf__ int32_t local[ELEMENTS];
-    asc_copy_gm2ub_align_sync(local, input, BYTES);
+    asc_copy_gm2ub_align(local, input, BYTES);
+    asc_sync_mte2(0);
+    // Select int32 atomic {operation} for the following UB-to-GM transfer.
     asc_set_atomic_{operation}_int32();
-    asc_copy_ub2gm_sync(output, local, BYTES);
+    // Apply the selected atomic mode to this UB-to-GM transfer only.
+    asc_copy_ub2gm(output, local, BYTES);
+    asc_sync_mte3(0);
     asc_set_atomic_none();
 }}
 '''
@@ -98,12 +102,15 @@ __global__ __vector__ void {kernel}(__gm__ float* output, __gm__ float* input0, 
     asc_init();
     __ubuf__ float local0[ELEMENTS];
     __ubuf__ float local1[ELEMENTS];
-    asc_copy_gm2ub_align_sync(local0, input0, BYTES);
-    asc_copy_gm2ub_align_sync(local1, input1, BYTES);
+    asc_copy_gm2ub_align(local0, input0, BYTES);
+    asc_copy_gm2ub_align(local1, input1, BYTES);
+    asc_sync_mte2(0);
     asc_copy_ub2gm(output, local0, BYTES);
-    asc_sync_pipe(PIPE_MTE3);
+    asc_sync_mte3(0);
+    // Add local1 atomically to the values already stored in GM.
     asc_set_atomic_add_float();
     asc_copy_ub2gm(output, local1, BYTES);
+    asc_sync_mte3(0);
     asc_set_atomic_none();
 }}
 
@@ -151,9 +158,14 @@ __global__ __vector__ void {kernel}(__gm__ int32_t* output, __gm__ int32_t* inpu
 {{
     asc_init();
     __ubuf__ int32_t local[ELEMENTS];
-    asc_copy_gm2ub_align_sync(local, input, BYTES);
+    asc_copy_gm2ub_align(local, input, BYTES);
+    asc_sync_mte2(0);
+    // Select the deprecated int32 atomic mode for the following transfer.
     {setter};
-    asc_copy_ub2gm_sync(output, local, BYTES);
+    // Apply the selected atomic mode to this UB-to-GM transfer only.
+    asc_copy_ub2gm(output, local, BYTES);
+    asc_sync_mte3(0);
+    // Clear the selected atomic mode after the transfer completes.
     asc_set_atomic_none();
 }}
 ''' + main_body(kernel, name, str(initial), golden_expr)
@@ -168,6 +180,7 @@ __global__ __vector__ void {kernel}(__gm__ int32_t* output, __gm__ int32_t* inpu
     asc_init();
 {calls}
     asc_store_atomic_config config;
+    // Read the current store-atomic register into config.config.
     asc_get_store_atomic_config(config);
     raw_config[0] = config.config;
     asc_set_atomic_none();
@@ -190,11 +203,16 @@ __global__ __vector__ void {kernel}(__gm__ int32_t* output, __gm__ int32_t* inpu
 {{
     asc_init();
     __ubuf__ int32_t local[ELEMENTS];
-    asc_copy_gm2ub_align_sync(local, input, BYTES);
+    asc_copy_gm2ub_align(local, input, BYTES);
+    asc_sync_mte2(0);
     asc_set_atomic_add_int32();
-    asc_copy_ub2gm_sync(output, local, BYTES);
+    asc_copy_ub2gm(output, local, BYTES);
+    asc_sync_mte3(0);
+    // Clear atomic add so the following transfer performs an ordinary overwrite.
     asc_set_atomic_none();
-    asc_copy_ub2gm_sync(output, local, BYTES);
+    // The second transfer overwrites instead of accumulating after atomic mode reset.
+    asc_copy_ub2gm(output, local, BYTES);
+    asc_sync_mte3(0);
 }}
 '''
     return source + main_body(kernel, name, "10", "input[i]")
@@ -204,7 +222,9 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     cases = {
         "asc_get_store_atomic_config": config_example(
-            "asc_get_store_atomic_config", "    asc_set_store_atomic_config_v2(1, 2);", 33),
+            "asc_get_store_atomic_config",
+            "    // Encode atomic type=1 and data type=2, then read the raw register back.\n"
+            "    asc_set_store_atomic_config_v2(1, 2);", 33),
         "asc_set_atomic_add_int_deprecated": one_operation(
             "asc_set_atomic_add_int_deprecated", "asc_set_atomic_add_int()", 10, "10 + input[i]"),
         "asc_set_atomic_add": atomic_add_example(),
@@ -219,6 +239,7 @@ def main() -> None:
         "asc_set_atomic_none": none_example(),
         "asc_set_store_atomic_config_v2_deprecated": config_example(
             "asc_set_store_atomic_config_v2_deprecated",
+            "    // Encode atomic type=1 and data type=2 in the store-atomic register.\n"
             "    asc_set_store_atomic_config_v2(1, 2);", 33),
     }
     for name, text in cases.items():

@@ -72,27 +72,33 @@ def datacache_preload() -> str:
 __global__ __vector__ void {kernel}(__gm__ uint64_t* output, __gm__ uint64_t* input)
 {{
     asc_init();
+    // Invalidate DCache so input[0] is a cold Scalar read.
     asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
     asc_dci();
     uint64_t begin = asc_get_system_cycle();
     const uint64_t cold_value = input[0];
-    uint64_t end = asc_get_system_cycle();
-    output[2] = end - begin;
+    const uint64_t cold_cycles = asc_get_system_cycle() - begin;
 
+    // Start from another cold cache line, then preload its 64 bytes into DCache.
     asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
     asc_dci();
     begin = asc_get_system_cycle();
+    // offset=64 selects the cache line containing input[8].
     asc_datacache_preload(input, 64);
-    end = asc_get_system_cycle();
-    output[3] = end - begin;
+    const uint64_t preload_cycles = asc_get_system_cycle() - begin;
+    for (volatile uint32_t i = 0; i < 128; ++i) {{}}
     begin = asc_get_system_cycle();
     const uint64_t prefetched_value = input[8];
-    end = asc_get_system_cycle();
+    const uint64_t prefetched_cycles = asc_get_system_cycle() - begin;
 
     output[0] = cold_value;
     output[1] = prefetched_value;
-    output[4] = end - begin;
-    asc_dcci_entire_all();
+    output[2] = cold_cycles;
+    output[3] = preload_cycles;
+    output[4] = prefetched_cycles;
+    // Publish the Scalar result stores; this is separate from DCache preload.
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
 }}
 ''' + host(
         "cache_ctrl", name, kernel,
@@ -111,32 +117,24 @@ def dcci() -> str:
 __global__ __vector__ void {kernel}(__gm__ uint64_t* output, __gm__ uint64_t* input)
 {{
     asc_init();
-    __ubuf__ uint8_t scratch[256];
+    __ubuf__ uint8_t observed[64];
+    // Scalar stores reach DCache first and can remain dirty instead of reaching GM.
     output[0] = input[0] + 1;
-    uint64_t begin = asc_get_system_cycle();
+    // Clean/invalidate the 64B cache line containing output[0], then wait for writeback.
     asc_dcci_single(output);
-    output[1] = asc_get_system_cycle() - begin;
-    begin = asc_get_system_cycle();
-    asc_ub_dcci_single(scratch);
-    output[2] = asc_get_system_cycle() - begin;
-    begin = asc_get_system_cycle();
-    asc_dcci_entire_out();
-    output[3] = asc_get_system_cycle() - begin;
-    begin = asc_get_system_cycle();
-    asc_dcci_entire_atomic();
-    output[4] = asc_get_system_cycle() - begin;
-    begin = asc_get_system_cycle();
-    asc_dcci_entire_all();
-    output[5] = asc_get_system_cycle() - begin;
-    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+
+    // MTE2 bypasses DCache, so this readback observes the value now visible in GM.
+    asc_copy_gm2ub_align(observed, reinterpret_cast<__gm__ uint8_t*>(output), 64);
+    asc_sync_mte2(0);
+    asc_copy_ub2gm_align(reinterpret_cast<__gm__ uint8_t*>(output + 8), observed, 64);
+    asc_sync_mte3(0);
 }}
 ''' + host(
         "cache_ctrl", name, kernel, "    input[0] = 41;",
-        "output[0] == 42 && output[1] + output[2] + output[3] + output[4] + output[5] > 0",
-        '''    std::cout << "Flushed scalar value: " << output[0] << std::endl;
-    std::cout << "Cycles (single, UB single, entire out, atomic, all): "
-              << output[1] << ' ' << output[2] << ' ' << output[3] << ' '
-              << output[4] << ' ' << output[5] << std::endl;
+        "output[0] == 42 && output[8] == 42",
+        '''    std::cout << "Scalar value after DCCI: " << output[0] << std::endl;
+    std::cout << "MTE2 value read from GM: " << output[8] << std::endl;
 ''')
 
 
@@ -147,48 +145,60 @@ def dci() -> str:
 __global__ __vector__ void {kernel}(__gm__ uint64_t* output, __gm__ uint64_t* input)
 {{
     asc_init();
-    const uint64_t begin = asc_get_system_cycle();
+    // Wait for prior memory accesses before discarding every DCache line.
     asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    const uint64_t begin = asc_get_system_cycle();
+    // DCI invalidates the whole DCache without writing dirty lines back to GM.
     asc_dci();
-    const uint64_t end = asc_get_system_cycle();
-    output[0] = input[0];
-    output[1] = end - begin;
-    asc_dcci_entire_all();
+    const uint64_t dci_cycles = asc_get_system_cycle() - begin;
+    output[0] = *reinterpret_cast<__gm__ volatile uint64_t*>(input);
+    output[1] = dci_cycles;
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
 }}
 ''' + host(
         "cache_ctrl", name, kernel, "    input[0] = 1234;",
-        "output[0] == input[0] && output[1] > 0",
-        '''    std::cout << "Value read after invalidation: " << output[0] << std::endl;
-    std::cout << "DSB + DCI cycles: " << output[1] << std::endl;
+        "output[0] == input[0]",
+        '''    std::cout << "Value read after DCache invalidation: " << output[0] << std::endl;
+    std::cout << "DCI issue cycles: " << output[1] << std::endl;
 ''')
 
 
 def icache(name: str, read_status_twice: bool) -> str:
     kernel = "".join(part.capitalize() for part in name.split("_")) + "Kernel"
-    second = '''    for (volatile uint32_t i = 0; i < 128; ++i) {}
-    const uint64_t later_status = asc_get_icache_preload_status();''' if read_status_twice else \
-        "    const uint64_t later_status = immediate_status;"
+    target_comment = "// Query whether the ICache preload engine is busy (1) or idle (0)." if read_status_twice else \
+        "// Preload one 2KB instruction region starting at the current program counter."
     return header("cache_ctrl", name) + f'''
 __global__ __vector__ void {kernel}(__gm__ uint64_t* output, __gm__ uint64_t* input)
 {{
     asc_init();
     const uint64_t pc = static_cast<uint64_t>(asc_get_program_counter()) & 0xFFFFFFFFFFFFULL;
     const uint64_t begin = asc_get_system_cycle();
+    {target_comment if not read_status_twice else '// Issue a 2KB instruction prefetch; this does not preload scalar GM data.'}
     asc_icache_preload(reinterpret_cast<const void*>(pc), 1);
+    {target_comment if read_status_twice else '// Read the debug status immediately after issuing the preload.'}
     const uint64_t immediate_status = asc_get_icache_preload_status();
-{second}
-    const uint64_t end = asc_get_system_cycle();
+    uint64_t final_status = immediate_status;
+    uint64_t polls = 0;
+    while (final_status != 0 && polls < 1024) {{
+        final_status = asc_get_icache_preload_status();
+        ++polls;
+    }}
+    const uint64_t preload_cycles = asc_get_system_cycle() - begin;
     output[0] = immediate_status;
-    output[1] = later_status;
-    output[2] = end - begin;
+    output[1] = final_status;
+    output[2] = preload_cycles;
     output[3] = pc;
-    asc_dcci_entire_all();
+    output[4] = polls;
+    // Flush Scalar result stores to GM; this DCache step is unrelated to ICache.
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
 }}
 ''' + host(
         "cache_ctrl", name, kernel, "    input[0] = 1;",
-        "output[0] <= 1 && output[1] <= 1 && output[2] > 0 && output[3] != 0",
-        '''    std::cout << "ICache status (immediate, later): " << output[0] << ' ' << output[1] << std::endl;
-    std::cout << "Preload/status cycles: " << output[2] << std::endl;
+        "output[0] <= 1 && output[1] == 0 && output[2] > 0 && output[3] != 0",
+        '''    std::cout << "ICache status (immediate, final): " << output[0] << ' ' << output[1] << std::endl;
+    std::cout << "Preload/status cycles and polls: " << output[2] << ' ' << output[4] << std::endl;
 ''')
 
 
@@ -203,8 +213,11 @@ __global__ __vector__ void {kernel}(__gm__ uint64_t* output, __gm__ uint64_t* in
     asc_copy_gm2ub_align(local, reinterpret_cast<__gm__ uint32_t*>(input), BYTES);
     asc_sync_mte2(0);
     asc_set_atomic_add_int32();
+    // Reinitialize the core and clear persistent state such as the atomic mode.
     asc_init();
-    asc_copy_ub2gm_sync(reinterpret_cast<__gm__ uint32_t*>(output), local, BYTES);
+    // asc_init resets the atomic mode, so this is an ordinary UB-to-GM copy.
+    asc_copy_ub2gm(reinterpret_cast<__gm__ uint32_t*>(output), local, BYTES);
+    asc_sync_mte3(0);
 }}
 ''' + host(
         "misc", name, kernel,

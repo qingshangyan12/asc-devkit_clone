@@ -81,25 +81,27 @@ def duplicate_golden(bytes_count: int = 256) -> str:
     }}'''
 
 
+def single_golden(bytes_count: int = 256) -> str:
+    return f'''    for (uint32_t i = 0; i < {bytes_count}; ++i) golden[i] = input[i];'''
+
+
 def continuous_copy(rel: str, direction: str, aligned: bool) -> str:
     api = f"asc_copy_{direction}" + ("_align" if aligned else "")
-    sync_api = api + "_sync"
     if direction == "gm2ub":
-        body = f'''    __ubuf__ uint8_t local[OUTPUT_BYTES];
+        body = f'''    __ubuf__ uint8_t local[INPUT_BYTES];
+    // Copy INPUT_BYTES from GM to UB, then wait only for PIPE_MTE2.
     {api}(local, input, INPUT_BYTES);
     asc_sync_mte2(0);
-    {sync_api}(local + INPUT_BYTES, input, INPUT_BYTES);
-    asc_sync();
-    asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
+    asc_copy_ub2gm_align(output, local, INPUT_BYTES);
     asc_sync_mte3(0);'''
     else:
         body = f'''    __ubuf__ uint8_t local[INPUT_BYTES];
     asc_copy_gm2ub_align(local, input, INPUT_BYTES);
     asc_sync_mte2(0);
+    // Copy INPUT_BYTES from UB to GM, then wait only for PIPE_MTE3.
     {api}(output, local, INPUT_BYTES);
-    {sync_api}(output + INPUT_BYTES, local, INPUT_BYTES);
     asc_sync_mte3(0);'''
-    return vector_source(rel, body, 256, 512, duplicate_golden(), f"{api}/{sync_api}")
+    return vector_source(rel, body, 256, 256, single_golden(), api)
 
 
 GM_LOOP_BODY = '''    __ubuf__ uint8_t local[OUTPUT_BYTES];
@@ -191,70 +193,90 @@ NDIM_PADDING_GOLDEN = '''    for (uint32_t i = 0; i < OUTPUT_BYTES; ++i) golden[
 def ub2l1_source() -> str:
     rel = "asc_copy_ub2l1"
     return header(rel) + r'''
-constexpr uint32_t BYTES = 256;
+constexpr uint32_t DIM = 16;
+constexpr uint32_t ELEMENTS = DIM * DIM;
+constexpr uint32_t INPUT_BYTES = ELEMENTS * sizeof(half);
 
 __global__ __mix__(1, 2) void AscCopyUb2l1Kernel(
-    __gm__ uint8_t* output, __gm__ uint8_t* input, uint32_t mode)
+    __gm__ float* output, __gm__ uint16_t* a, __gm__ uint16_t* b)
 {
     asc_init();
-    __ubuf__ uint8_t source[BYTES], readback[BYTES];
-    __cbuf__ uint8_t l1[BYTES];
-    constexpr int64_t block_flag = 2;
-    constexpr uint64_t intra_id = 2;
+    __ubuf__ half a_ub[ELEMENTS], b_ub[ELEMENTS];
+    __cbuf__ half a_l1[ELEMENTS], b_l1[ELEMENTS];
+    __ca__ half a_l0[ELEMENTS];
+    __cb__ half b_l0[ELEMENTS];
+    __cc__ float c_l0[ELEMENTS];
+    constexpr int64_t l1_ready = 2;
     if ASC_IS_AIV {
-        if (asc_get_sub_block_id() == 0) {
-            asc_copy_gm2ub_align(source, input, BYTES);
-            asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            if (mode == 0) asc_copy_ub2l1(l1, source, BYTES);
-            else asc_copy_ub2l1_sync(l1, source, BYTES);
-        }
-        asc_sync_block_arrive(PIPE_MTE3, block_flag);
-        if (asc_get_sub_block_id() == 0) {
-            asc_sync_intra_wait(PIPE_MTE3, intra_id);
-            asc_copy_ub2gm_align(output + mode * BYTES, readback, BYTES);
-            asc_sync_mte3(0);
-        }
+        asc_copy_gm2ub_align(a_ub, reinterpret_cast<__gm__ half*>(a), INPUT_BYTES);
+        asc_copy_gm2ub_align(b_ub, reinterpret_cast<__gm__ half*>(b), INPUT_BYTES);
+        asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+        // Copy two contiguous Nz matrices from UB to the L1 buffers consumed by AIC.
+        asc_copy_ub2l1(a_l1, a_ub, INPUT_BYTES);
+        asc_copy_ub2l1(b_l1, b_ub, INPUT_BYTES);
+        asc_sync_block_arrive(PIPE_MTE3, l1_ready);
     }
     if ASC_IS_AIC {
-        asc_sync_block_wait(PIPE_MTE1, block_flag);
-        asc_copy_l12ub(readback, l1, false, 1, BYTES / 32, 0, 0);
-        asc_sync_intra_arrive(PIPE_MTE1, intra_id);
+        // AIC starts reading L1 only after both AIV MTE3 pipelines arrive.
+        asc_sync_block_wait(PIPE_MTE1, l1_ready);
+        asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
+        asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0, 1, 1, 1, 1);
+        asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, false, false, true);
+        asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_set_l0c2gm_nz2nd(1, 0, 0);
+        asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
+            static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+        asc_sync_pipe(PIPE_FIX);
     }
 }
 
-void PrintData(const char* name, const std::vector<uint8_t>& data)
+void PrintRow(const char* name, const std::vector<float>& data)
 {
     std::cout << name << ":";
-    for (uint32_t i = 0; i < 16; ++i) std::cout << ' ' << +data[i];
+    for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
     std::cout << " ..." << std::endl;
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> input(BYTES), output(BYTES * 2, 0), golden(BYTES * 2);
-    for (uint32_t i = 0; i < BYTES; ++i) {
-        input[i] = static_cast<uint8_t>(i + 1);
-        golden[i] = golden[BYTES + i] = input[i];
+    constexpr uint16_t half_bits[] = {0x3c00, 0x4000, 0x4200, 0x4400};
+    std::vector<uint16_t> a(ELEMENTS), b(ELEMENTS, 0);
+    std::vector<float> input(ELEMENTS), output(ELEMENTS, 0), golden(ELEMENTS);
+    for (uint32_t row = 0; row < DIM; ++row) {
+        for (uint32_t column = 0; column < DIM; ++column) {
+            const uint32_t value = (row + column) % 4;
+            a[row * DIM + column] = half_bits[value];
+            input[row * DIM + column] = static_cast<float>(value + 1);
+            golden[row * DIM + column] = input[row * DIM + column];
+        }
+        b[row * DIM + row] = half_bits[0];
     }
     aclInit(nullptr);
     aclrtSetDevice(0);
-    uint8_t *input_device = nullptr, *output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), BYTES * 2, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(input_device, BYTES, input.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
-    for (uint32_t mode = 0; mode < 2; ++mode) {
-        AscCopyUb2l1Kernel<<<1, 0>>>(output_device, input_device, mode);
-        aclrtSynchronizeDevice();
-    }
-    aclrtMemcpy(output.data(), BYTES * 2, output_device, BYTES * 2, ACL_MEMCPY_DEVICE_TO_HOST);
-    PrintData("Input", input);
-    PrintData("L1 round-trip output", output);
+    uint16_t *a_device = nullptr, *b_device = nullptr;
+    float* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&a_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&b_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(a_device, INPUT_BYTES, a.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(b_device, INPUT_BYTES, b.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    AscCopyUb2l1Kernel<<<1, 0>>>(output_device, a_device, b_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(float), output_device, output.size() * sizeof(float),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintRow("Input A row 0", input);
+    PrintRow("Output row 0", output);
+    PrintRow("Golden row 0", golden);
     const bool passed = output == golden;
-    std::cout << (passed ? "[Success] asc_copy_ub2l1/asc_copy_ub2l1_sync passed."
-                         : "[Failed] asc_copy_ub2l1/asc_copy_ub2l1_sync failed.") << std::endl;
-    aclrtFree(input_device);
+    std::cout << (passed ? "[Success] asc_copy_ub2l1 passed." : "[Failed] asc_copy_ub2l1 failed.") << std::endl;
+    aclrtFree(a_device);
+    aclrtFree(b_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);
     aclFinalize();
@@ -275,16 +297,16 @@ def main() -> None:
             "asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510", "ub2gm", True),
         "asc_copy_ub2ub": vector_source(
             "asc_copy_ub2ub",
-            '''    __ubuf__ uint8_t source[INPUT_BYTES], first[INPUT_BYTES], second[INPUT_BYTES];
+            '''    __ubuf__ uint8_t source[INPUT_BYTES], copied[INPUT_BYTES];
     asc_copy_gm2ub_align(source, input, INPUT_BYTES);
     asc_sync_mte2(0);
-    asc_copy_ub2ub(first, source, INPUT_BYTES);
-    asc_sync();
-    asc_copy_ub2ub_sync(second, source, INPUT_BYTES);
-    asc_copy_ub2gm_align(output, first, INPUT_BYTES);
-    asc_copy_ub2gm_align(output + INPUT_BYTES, second, INPUT_BYTES);
+    // Copy INPUT_BYTES within UB on PIPE_V before the MTE3 consumer starts.
+    asc_copy_ub2ub(copied, source, INPUT_BYTES);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, copied, INPUT_BYTES);
     asc_sync_mte3(0);''',
-            256, 512, duplicate_golden(), "asc_copy_ub2ub/asc_copy_ub2ub_sync"),
+            256, 256, single_golden(), "asc_copy_ub2ub"),
         "asc_copy_ub2l1": ub2l1_source(),
         "asc_ndim_copy_gm2ub": vector_source(
             "asc_ndim_copy_gm2ub", NDIM_TRANSPOSE_BODY, 12, 12, NDIM_TRANSPOSE_GOLDEN, "asc_ndim_copy_gm2ub"),

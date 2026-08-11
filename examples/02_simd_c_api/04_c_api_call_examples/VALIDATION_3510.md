@@ -5,7 +5,7 @@ Validation environment:
 - Target architecture: `dav-3510`
 - CANN: `/usr/local/Ascend/cann-9.2.0`
 - Compiler: `$ASCEND_HOME_PATH/bin/bisheng`
-- Validation date: 2026-08-07
+- Latest validation date: 2026-08-11
 
 ## Scope
 
@@ -294,3 +294,70 @@ DAV 3510. It also confirms that zeroing clears unselected destination lanes,
 while merging preserves their original values. Both `asc_duplicate.asc` and
 the regenerated `asc_duplicate_scalar.asc` compiled and ran successfully with
 the 30-second runtime timeout.
+
+## Cache Semantics and Explicit-Synchronization Revalidation
+
+The affected examples were revalidated on 2026-08-11 with a 60-second compile
+limit and a 30-second runtime limit. This pass supersedes the earlier
+regular/synchronous comparison wording: all 44 convenience `_sync` calls that
+had remained in 35 generated examples were removed. A full-tree static scan
+now finds no C API `_sync` invocation. Each ordinary API is followed by the
+narrowest dependency required by its actual consumer, such as MTE2-to-MTE3,
+Vector-to-Scalar, Vector-to-MTE3, or a specific final pipeline wait.
+
+The five cache-control examples distinguish the two cache domains and all
+passed:
+
+- `asc_datacache_preload` invalidates DCache, preloads the 64-byte line at
+  byte offset 64, and then performs the Scalar read from that line.
+- `asc_dcci_single` writes back the dirty DCache line produced by a Scalar GM
+  store. A following MTE2 read, which bypasses DCache, observes the value 42
+  in GM after DSB.
+- `asc_dci` demonstrates whole-DCache invalidation without dirty-line
+  writeback and performs a Scalar read only after the invalidation.
+- `asc_icache_preload` prefetches one 2KB instruction region at the current
+  PC. `asc_get_icache_preload_status` observes busy-to-idle status changes;
+  neither operation is presented as a scalar-data cache operation.
+
+An enhanced DCI probe was also attempted: Scalar first cached value 11, MTE3
+then replaced the GM cache line with value 22, and an MTE2 snapshot confirmed
+22 in GM. A subsequent volatile Scalar read still returned 11 after DSB, DCI,
+and another DSB. Because this behavior does not match the expected invalidation
+visibility for that constructed mixed-pipeline sequence, the final example uses
+only the documented DSB-plus-DCI pattern. The probe result is retained here as
+an implementation/validation issue rather than encoded as a misleading
+Golden.
+
+The installed CANN implementation of `asc_sync_vec(0)` calls
+`pipe_barrier(PIPE_V)`, which this DAV 3510 compiler rejects because that
+builtin accepts pipeline values in the reported range `[4, 6]`. The five
+Vector-compute examples therefore use explicit `PIPE_V -> PIPE_S` event pairs,
+and the UB-to-UB example uses `PIPE_V -> PIPE_MTE3`. All five Vector-compute
+examples and the six affected Vector data-movement examples passed exact
+Golden comparisons without timeout.
+
+Removing `asc_copy_ub2l1_sync` initially exposed an invalid validation chain.
+The first ordinary-copy run produced incorrect L1-to-UB readback, and two
+cross-core synchronization variants timed out. A single-subblock variant then
+completed with zero readback, showing that the auxiliary L1-to-UB path was not
+a reliable verifier for this target API. The final example follows the
+documented compute use case: AIV copies two 16x16 FP16 Nz matrices from UB to
+L1, AIC waits for MTE3, consumes those matrices in MMAD with an identity
+operand, and writes FP32 output. It printed `1 2 3 4 1 2 3 4 ...` for input,
+output, and Golden, and passed.
+
+All 26 Cube data-movement examples were reduced from duplicate regular/sync
+launches to one ordinary call and one result. Every example compiled and ran
+successfully, including GM/L1/L0/UB movement, int4 conversion, Bias/Fixpipe
+Buffer movement, loop and padding registers, MX scales, and 3D feature-map
+configuration. The nine SIMD atomic examples also passed after waiting for
+each MTE3 transfer before clearing its atomic mode. `asc_init` passed with an
+ordinary UB-to-GM copy after demonstrating that initialization clears the
+atomic configuration.
+
+In total, all 52 affected or regenerated runnable examples passed in this
+revalidation: five cache-control, one miscellaneous, nine SIMD atomic, five
+Vector-compute, six Vector data-movement, and 26 Cube data-movement examples.
+There were no final precision failures, runtime errors, or timeouts, so there
+was no remaining timeout case to retest. The 273 unchanged examples retain the
+2026-08-07 full-set validation result above.
