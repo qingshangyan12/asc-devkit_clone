@@ -24,8 +24,6 @@
 #include "tensor_api/algorithm/mmad.h"
 #include "tensor_api/arch/arch.h"
 #include "tensor_api/atom/atom.h"
-#include "tensor_api/experimental/reg/load_mode.h"
-#include "tensor_api/experimental/reg/mask.h"
 #include "tensor_api/tensor/layout.h"
 #include "tensor_api/tensor/tensor.h"
 #include "tensor_api/tensor/pointer.h"
