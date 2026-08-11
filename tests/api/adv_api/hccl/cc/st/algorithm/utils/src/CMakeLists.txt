@@ -36,3 +36,7 @@ target_compile_definitions(hccl-model-proxy PRIVATE
 target_include_directories(hccl-model-proxy PUBLIC
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
 )
+
+target_link_libraries(hccl-model-proxy PUBLIC
+    ${HCCL_CHECKER_KERNEL_TARGET}
+)
