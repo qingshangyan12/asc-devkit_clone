@@ -45,4 +45,4 @@ CPU 调试或 NPU 仿真模式分别增加 `-DCMAKE_ASC_RUN_MODE=cpu` 或
 test pass!
 ```
 
-> `asc::te::cast` 当前为 experimental 接口，样例包含 `tensor_api/arch/vector/experimental/cast/reg_cast.h`。
+> `asc::te::cast` 当前为 experimental 接口，样例包含 `tensor_api/arch/vector/experimental/reg_cast.h`。

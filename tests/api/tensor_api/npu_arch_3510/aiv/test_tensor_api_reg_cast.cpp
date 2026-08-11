@@ -16,7 +16,7 @@
 
 #include "c_api/stub/cce_stub.h"
 
-#include "tensor_api/arch/vector/experimental/cast/reg_cast.h"
+#include "tensor_api/arch/vector/experimental/reg_cast.h"
 
 namespace {
 

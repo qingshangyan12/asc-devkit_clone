@@ -16,7 +16,7 @@
 
 #include "c_api/stub/cce_stub.h"
 
-#include "tensor_api/arch/vector/experimental/truncate/reg_truncate.h"
+#include "tensor_api/arch/vector/experimental/reg_truncate.h"
 
 namespace {
 
