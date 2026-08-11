@@ -11,6 +11,7 @@
 #include "ccu_kernel.h"
 #include "ccu_rep_loopcall_v1.h"
 #include "ccu_condition_v1.h"
+#include "ccu_repeat_v1.h"
 #include "ccu_datatype_v1.h"
 #include "ccu_rep_context_v1.h"
 #include "ccu_types.h"
@@ -247,6 +248,16 @@ void CcuRepLoopBlock::DefineArg(const std::vector<RemoteAddr> addrList) {}
 CompletedEvent::CompletedEvent(CcuRepContext* context) : CcuVirRes(context) {}
 
 void CompletedEvent::SetMask(uint32_t compeletedMask) {}
+
+Repeat::Repeat(CcuRepContext* context, CcuRelationalOperator<Variable, uint64_t> rel) {}
+
+Repeat::~Repeat() {}
+
+void Repeat::Break() {}
+
+bool Repeat::Check() const { return true; }
+
+void Repeat::Run() {}
 
 Condition::Condition(CcuRepContext* context, CcuRelationalOperator<Variable, uint64_t> rel) {}
 
