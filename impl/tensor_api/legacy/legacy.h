@@ -23,8 +23,10 @@
 
 #include "impl/tensor_api/legacy/legacy_atom.h"
 
-namespace asc {
-namespace te {
+namespace AscendC {
+namespace Te {
+
+using namespace asc::te;
 
 template <typename T>
 using GetMemLocation = get_mem_location<T>;
@@ -32,7 +34,7 @@ using GetMemLocation = get_mem_location<T>;
 template <typename LayoutPattern, typename TraitType = layout_trait_default<>>
 using FrameLayoutFormat = frame_layout_format<LayoutPattern, TraitType>;
 
-template <typename T, typename C0 = Std::Int<C0_ELEMENT<T>>>
+template <typename T, typename C0 = Std::Int<c0_element<T>>>
 using LayoutTrait = layout_trait<T, C0>;
 
 using ArchVersion = arch_version;
@@ -41,7 +43,7 @@ template <typename TensorType, typename TargetLayoutPtn>
 inline constexpr bool IsSatisfiedPtnFormatV = is_satisfied_ptn_format_v<TensorType, TargetLayoutPtn>;
 
 template <typename T>
-inline constexpr bool IsAttrTensorV = is_attr_tensor_v<T>;
+inline constexpr bool IsAttrTensorV = asc::te::is_attr_tensor_v<T>;
 
 template <typename LayoutType>
 __aicore__ inline constexpr auto GetTotalColumnShape(const LayoutType& layout)
@@ -91,86 +93,74 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape)
     return make_layout(shape);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto GetShape(const LayoutType& layout)
 {
     return get_shape<Is...>(layout);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto GetShape(LayoutType& layout)
 {
     return get_shape<Is...>(layout);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto GetStride(const LayoutType& layout)
 {
     return get_stride<Is...>(layout);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto GetStride(LayoutType& layout)
 {
     return get_stride<Is...>(layout);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto Coshape(const LayoutType& layout)
 {
     return coshape<Is...>(layout);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto Cosize(const LayoutType& layout)
 {
     return cosize<Is...>(layout);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto Rank(const LayoutType& layout)
 {
     return rank<Is...>(layout);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto Select(const LayoutType& layout)
 {
     return select<Is...>(layout);
 }
 
-template <size_t I, typename Tuple, typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
-__aicore__ inline constexpr auto Get(Tuple&& tuple)
-{
-    return get<I>(tuple);
-}
-
-template <size_t I0, size_t I1, size_t... Is, typename Tuple,
+template <size_t I, size_t... Is, typename Tuple,
           typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
 __aicore__ inline constexpr auto Get(Tuple&& tuple)
 {
-    return get<I0, I1, Is...>(tuple);
+    return get<I, Is...>(static_cast<Tuple&&>(tuple));
 }
 
-template <typename Tuple, typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
-__aicore__ inline constexpr auto Get(Tuple&& tuple)
-{
-    return get(tuple);
-}
-
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto Get(const LayoutType& layout)
 {
     return get<Is...>(layout);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto Size(const LayoutType& layout)
 {
     return size<Is...>(layout);
 }
 
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto Capacity(const LayoutType& layout)
 {
     return capacity<Is...>(layout);
@@ -188,7 +178,7 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S
     return crd2idx(coord, shape, stride);
 }
 
-template <typename T, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+template <typename T, typename LayoutType, typename = Std::enable_if_t<asc::te::is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout)
 {
     return crd2idx(coord, layout);
@@ -218,19 +208,19 @@ __aicore__ inline auto MakeLocationMemPtr(Iterator iterator)
     return make_location_mem_ptr<PtrPattern>(iterator);
 }
 
-template <typename PtrPattern, typename DataType, typename Addr, enable_make_ptr_by_trait<PtrPattern, Addr> = 0>
+template <typename PtrPattern, typename DataType, typename Addr, asc::te::enable_make_ptr_by_trait<PtrPattern, Addr> = 0>
 __aicore__ inline auto MakeMemPtr(Addr address)
 {
     return make_mem_ptr<PtrPattern, DataType>(address);
 }
 
-template <typename PtrPattern, typename Iterator, enable_make_hardware_ptr<PtrPattern, Iterator> = 0>
+template <typename PtrPattern, typename Iterator, asc::te::enable_make_hardware_ptr<PtrPattern, Iterator> = 0>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
 {
     return make_mem_ptr<PtrPattern>(iterator);
 }
 
-template <typename Iterator, enable_make_ptr_by_iter<Iterator> = 0>
+template <typename Iterator, asc::te::enable_make_ptr_by_iter<Iterator> = 0>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
 {
     return make_mem_ptr(iterator);
@@ -243,14 +233,14 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iterator, const Args
 }
 
 template <size_t... SqueezeDims, typename T,
-          typename = Std::enable_if_t<(is_layout_v<T> || is_attr_tensor_v<T>) && (sizeof...(SqueezeDims) > 0)>>
+          typename = Std::enable_if_t<(asc::te::is_layout_v<T> || asc::te::is_attr_tensor_v<T>) && (sizeof...(SqueezeDims) > 0)>>
 __aicore__ inline constexpr auto Squeeze(const T& value)
 {
     return squeeze<SqueezeDims...>(value);
 }
 
 template <typename Pattern, typename T,
-          typename = Std::enable_if_t<(is_layout_v<T> || is_attr_tensor_v<T>)
+          typename = Std::enable_if_t<(asc::te::is_layout_v<T> || asc::te::is_attr_tensor_v<T>)
                                       && Std::is_tuple_v<Std::remove_cvref_t<Pattern>>>>
 __aicore__ inline constexpr auto Squeeze(const T& value, const Pattern& pattern)
 {
@@ -266,7 +256,7 @@ __aicore__ inline void Mmad(const MmadAtom<MmadTraits<Args...>>& atom, const Dst
 }
 
 template <typename... Args, typename DstTensor, typename FmTensor, typename FilterTensor, typename BiasTensor,
-          Std::enable_if_t<is_attr_tensor_v<BiasTensor>, int> = 0>
+          Std::enable_if_t<asc::te::is_attr_tensor_v<BiasTensor>, int> = 0>
 __aicore__ inline void Mmad(const MmadAtom<MmadTraits<Args...>>& atom, const DstTensor& dst, const FmTensor& fm,
                             const FilterTensor& filter, const BiasTensor& bias)
 {
@@ -285,8 +275,8 @@ __aicore__ inline constexpr auto MakeMmad(const MmadOperationType& operation, co
     return MmadAtom<MmadTraits<MmadOperationType, MmadTraitType>>{};
 }
 
-} // namespace te
-} // namespace asc
+} // namespace Te
+} // namespace AscendC
 
 #endif // IMPL_TENSOR_API_LEGACY_LEGACY_H
 

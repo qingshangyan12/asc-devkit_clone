@@ -27,14 +27,12 @@
 namespace asc {
 namespace te {
 
-struct copy_l1_to_ub_trait {};
-
 class copy_l1_to_ub_instr {
 public:
     template <typename T>
     __aicore__ inline static void data_copy(__ubuf__ T* dst, __cbuf__ T* src, const uint16_t block_count,
-                                                const uint16_t block_len, const uint16_t src_stride,
-                                                const uint16_t dst_stride)
+                                            const uint16_t block_len, const uint16_t src_stride,
+                                            const uint16_t dst_stride)
     {
         if ASCEND_IS_AIV {
             return;

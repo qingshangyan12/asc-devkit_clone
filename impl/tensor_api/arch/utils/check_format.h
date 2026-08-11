@@ -33,22 +33,22 @@ struct check_nz_layout_pattern {
     template <typename T, typename TraitType>
     __aicore__ inline static constexpr void check()
     {
-        constexpr auto C0_ELEMENT = TraitType::C0_ELEMENT;
+        constexpr auto c0_element = TraitType::c0_element;
         using shape_row0 = typename get_n_dim_type<T, attr_info::shape, attr_info::row, 0>::type;
         using shape_column0 = typename get_n_dim_type<T, attr_info::shape, attr_info::column, 0>::type;
-        static_assert(Std::is_same_v<shape_row0, Std::Int<FRACTAL_FIXED>>,
+        static_assert(Std::is_same_v<shape_row0, Std::Int<fractal_fixed>>,
                       "Layout->Shape->Row->ZeroDim must be Int<16>!");
-        static_assert(Std::is_same_v<shape_column0, Std::Int<C0_ELEMENT>>,
-                      "Layout->Shape->Column->ZeroDim is different from C0_ELEMENT!");
+        static_assert(Std::is_same_v<shape_column0, Std::Int<c0_element>>,
+                      "Layout->Shape->Column->ZeroDim is different from c0_element!");
 
         using stride_row0 = typename get_n_dim_type<T, attr_info::stride, attr_info::row, 0>::type;
         using stride_column0 = typename get_n_dim_type<T, attr_info::stride, attr_info::column, 0>::type;
         using stride_row1 = typename get_n_dim_type<T, attr_info::stride, attr_info::row, 1>::type;
-        static_assert(Std::is_same_v<stride_row0, Std::Int<C0_ELEMENT>>,
-                      "Layout->Stride->Row->ZeroDim is different from C0_ELEMENT!");
+        static_assert(Std::is_same_v<stride_row0, Std::Int<c0_element>>,
+                      "Layout->Stride->Row->ZeroDim is different from c0_element!");
         static_assert(Std::is_same_v<stride_column0, _1>, "Layout->Stride->Column->ZeroDim must be Int<1>!");
-        static_assert(Std::is_same_v<stride_row1, Std::Int<C0_ELEMENT * FRACTAL_FIXED>>,
-                      "Layout->Stride->Row->OneDim is different from C0_ELEMENT * FRACTAL_FIXED!");
+        static_assert(Std::is_same_v<stride_row1, Std::Int<c0_element * fractal_fixed>>,
+                      "Layout->Stride->Row->OneDim is different from c0_element * fractal_fixed!");
     }
 };
 
@@ -128,19 +128,19 @@ struct check_zz_layout_pattern {
     template <typename T, typename TraitType>
     __aicore__ inline static constexpr void check()
     {
-        constexpr auto C0_ELEMENT = TraitType::C0_ELEMENT;
+        constexpr auto c0_element = TraitType::c0_element;
         using shape_row0 = typename get_n_dim_type<T, attr_info::shape, attr_info::row, 0>::type;
         using shape_column0 = typename get_n_dim_type<T, attr_info::shape, attr_info::column, 0>::type;
-        static_assert(Std::is_same_v<shape_column0, Std::Int<C0_ELEMENT>>,
-                      "Layout->Shape->Column->ZeroDim is different from C0_ELEMENT!");
-        static_assert(Std::is_same_v<shape_row0, Std::Int<FRACTAL_FIXED>>,
+        static_assert(Std::is_same_v<shape_column0, Std::Int<c0_element>>,
+                      "Layout->Shape->Column->ZeroDim is different from c0_element!");
+        static_assert(Std::is_same_v<shape_row0, Std::Int<fractal_fixed>>,
                       "Layout->Shape->Row->ZeroDim must be Int<16>!");
 
         using stride_row0 = typename get_n_dim_type<T, attr_info::stride, attr_info::row, 0>::type;
         using stride_column0 = typename get_n_dim_type<T, attr_info::stride, attr_info::column, 0>::type;
         static_assert(Std::is_same_v<stride_column0, _1>, "Layout->Stride->Column->ZeroDim must be Int<1>!");
-        static_assert(Std::is_same_v<stride_row0, Std::Int<C0_ELEMENT>>,
-                      "Layout->Stride->Row->ZeroDim is different from C0_ELEMENT!");
+        static_assert(Std::is_same_v<stride_row0, Std::Int<c0_element>>,
+                      "Layout->Stride->Row->ZeroDim is different from c0_element!");
     }
 };
 
@@ -148,18 +148,18 @@ struct check_zn_layout_pattern {
     template <typename T, typename TraitType>
     __aicore__ inline static constexpr void check()
     {
-        constexpr auto C0_ELEMENT = TraitType::C0_ELEMENT;
+        constexpr auto c0_element = TraitType::c0_element;
         using shape_row0 = typename get_n_dim_type<T, attr_info::shape, attr_info::row, 0>::type;
         using shape_column0 = typename get_n_dim_type<T, attr_info::shape, attr_info::column, 0>::type;
-        static_assert(Std::is_same_v<shape_column0, Std::Int<FRACTAL_FIXED>>,
+        static_assert(Std::is_same_v<shape_column0, Std::Int<fractal_fixed>>,
                       "Layout->Shape->Column->ZeroDim must be Int<16>!");
-        static_assert(Std::is_same_v<shape_row0, Std::Int<C0_ELEMENT>>,
-                      "Layout->Shape->Row->ZeroDim is different from C0_ELEMENT!");
+        static_assert(Std::is_same_v<shape_row0, Std::Int<c0_element>>,
+                      "Layout->Shape->Row->ZeroDim is different from c0_element!");
 
         using stride_row0 = typename get_n_dim_type<T, attr_info::stride, attr_info::row, 0>::type;
         using stride_column0 = typename get_n_dim_type<T, attr_info::stride, attr_info::column, 0>::type;
-        static_assert(Std::is_same_v<stride_column0, Std::Int<C0_ELEMENT>>,
-                      "Layout->Stride->Column->ZeroDim is different from C0_ELEMENT!");
+        static_assert(Std::is_same_v<stride_column0, Std::Int<c0_element>>,
+                      "Layout->Stride->Column->ZeroDim is different from c0_element!");
         static_assert(Std::is_same_v<stride_row0, _1>, "Layout->Stride->Row->ZeroDim must be Int<1>!");
     }
 };

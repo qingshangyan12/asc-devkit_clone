@@ -72,10 +72,10 @@ namespace {
 using namespace asc::te;
 constexpr bool enable_relu = false;
 constexpr bool enable_channel_split = true;
-constexpr copy_l0c_to_gm_trait l0c_togm_trait = {round_mode::default_round, enable_relu, enable_channel_split};
+constexpr l0c_to_gm_trait l0c_togm_trait = {round_mode::default_round, enable_relu, enable_channel_split};
 
 struct copy_l0c_to_gm_trait_custom {
-    using trait_type = copy_l0c_to_gm_trait;
+    using trait_type = l0c_to_gm_trait;
     static constexpr const trait_type value = l0c_togm_trait;
 };
 
@@ -135,7 +135,7 @@ void run_l0c_to_gm_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en,
     constexpr uint32_t k_m = 32;
     constexpr uint32_t k_n = 64;
     constexpr uint32_t k_matrix_size = k_m * k_n;
-    constexpr uint32_t k_src_batch_stride = k_matrix_size / FRACTAL_FIXED;
+    constexpr uint32_t k_src_batch_stride = k_matrix_size / fractal_fixed;
     constexpr uint16_t k_src_matrix_stride = k_m;
     constexpr uint64_t k_src_c0_stride = 1;
 
@@ -164,7 +164,7 @@ void run_l0c_to_gm_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en,
         MOCKER_CPP(set_channel_para, void(uint64_t)).times(1).will(invoke(set_channel_para_stub));
     }
 
-    auto atom = make_copy(copy_l0c_to_gm{}, copy_l0c_to_gm_trait_default{});
+    auto atom = make_copy(copy_l0c_to_gm{}, l0c_to_gm_trait_default{});
     atom.call(dst_tensor, src_tensor);
 
     GlobalMockObject::verify();
@@ -180,7 +180,7 @@ void run_l0c_to_gm_batch_nz_to_nz_no_quant()
     constexpr uint32_t k_n = 64;
     constexpr uint32_t k_matrix_size = k_m * k_n;
     constexpr uint16_t k_src_matrix_stride = k_m;
-    constexpr uint32_t k_dst_matrix_stride = FRACTAL_FIXED * k_m;
+    constexpr uint32_t k_dst_matrix_stride = fractal_fixed * k_m;
 
     __cc__ float src[k_src_batch * k_matrix_size] = {0};
     __gm__ float dst[k_dst_batch * k_matrix_size] = {0};
@@ -202,7 +202,7 @@ void run_l0c_to_gm_batch_nz_to_nz_no_quant()
 
     MOCKER(set_loop3_para, void(uint64_t)).times(1).will(invoke(set_loop3_para_stub));
 
-    auto atom = make_copy(copy_l0c_to_gm{}, copy_l0c_to_gm_trait_default{});
+    auto atom = make_copy(copy_l0c_to_gm{}, l0c_to_gm_trait_default{});
     atom.call(dst_tensor, src_tensor);
 
     GlobalMockObject::verify();
@@ -222,8 +222,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nd)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto gm_tensor = make_tensor_at<location::gm>(dst, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<float>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -240,8 +240,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nd_layout)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto gm_tensor = make_tensor_at<location::gm>(dst, make_frame_layout<nd_layout_ptn, layout_trait_default<float>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -258,8 +258,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_dn)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto gm_tensor = make_tensor_at<location::gm>(dst, make_frame_layout<dn_ext_layout_ptn, layout_trait_default<float>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -276,8 +276,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_dn_layout)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto gm_tensor = make_tensor_at<location::gm>(dst, make_frame_layout<dn_layout_ptn, layout_trait_default<float>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -294,8 +294,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nz_no_channel_split)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto gm_tensor = make_tensor_at<location::gm>(dst, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -314,7 +314,7 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nz_with_channel_split)
     auto gm_tensor = make_tensor_at<location::gm>(dst, make_frame_layout<nz_layout_ptn, layout_trait_default<float>>(m, n));
 
     run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_custom>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_custom>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_custom>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -373,20 +373,20 @@ public:
                 m_size_global = m;
             }
             dst_stride_global = n;
-            src_stride_global = C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
+            src_stride_global = c0_size<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, fractal_fixed) / fractal_fixed;
             NZ2ND_en_global = true;
             NZ2DN_en_global = false;
         } else if constexpr (c_data_type::format == cube_format::NZ) {
             if constexpr (has_coord) {
-                n_size_global = AscendC::Std::ceil_align(n - base, FRACTAL_FIXED);
-                m_size_global =  AscendC::Std::ceil_align(m - base, C0_SIZE<uint16_t> / sizeof(uint16_t));
+                n_size_global = AscendC::Std::ceil_align(n - base, fractal_fixed);
+                m_size_global =  AscendC::Std::ceil_align(m - base, c0_size<uint16_t> / sizeof(uint16_t));
             } else {
-                n_size_global = AscendC::Std::ceil_align(n, FRACTAL_FIXED);
-                m_size_global =  AscendC::Std::ceil_align(m, C0_SIZE<uint16_t> / sizeof(uint16_t));
+                n_size_global = AscendC::Std::ceil_align(n, fractal_fixed);
+                m_size_global =  AscendC::Std::ceil_align(m, c0_size<uint16_t> / sizeof(uint16_t));
             }
             using cast_t = std::conditional_t<sizeof(dst_type) == 4, half, dst_type>;
-            dst_stride_global = C0_SIZE<> / sizeof(cast_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED);
-            src_stride_global = C0_SIZE<> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
+            dst_stride_global = c0_size<> / sizeof(cast_t) * AscendC::Std::ceil_align(m, fractal_fixed);
+            src_stride_global = c0_size<> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, fractal_fixed) / fractal_fixed;
             NZ2ND_en_global = false;
             NZ2DN_en_global = false;
         } else {
@@ -398,7 +398,7 @@ public:
                 m_size_global = m;
             }
             dst_stride_global = m;
-            src_stride_global = C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
+            src_stride_global = c0_size<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, fractal_fixed) / fractal_fixed;
             NZ2ND_en_global = false;
             NZ2DN_en_global = true;
         }
@@ -409,10 +409,10 @@ public:
             if constexpr (has_coord) {
                 auto gm_tensor_tile = slice(gm_tensor, make_coord(base, base), make_shape(m - base, n - base));
                 gm_addr_global = gm_tensor_tile.data().get();
-                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor_tile, l0c_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_gm, l0c_to_gm_trait_default>>{}, gm_tensor_tile, l0c_tensor);
             } else {
                 gm_addr_global = gm_c_;
-                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor, l0c_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_gm, l0c_to_gm_trait_default>>{}, gm_tensor, l0c_tensor);
             }
         } else if constexpr (is_tensor_value) {
             auto q_iterator = make_mem_ptr<location::l1>(q_addr);
@@ -421,20 +421,20 @@ public:
             if constexpr (has_coord) {
                 auto gm_tensor_tile = slice(gm_tensor, make_coord(base, base), make_shape(m - base, n - base));
                 gm_addr_global = gm_tensor_tile.data().get();
-                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor_tile, l0c_tensor, q_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_gm, l0c_to_gm_trait_default>>{}, gm_tensor_tile, l0c_tensor, q_tensor);
             } else {
                 gm_addr_global = gm_c_;
-                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor, l0c_tensor, q_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_gm, l0c_to_gm_trait_default>>{}, gm_tensor, l0c_tensor, q_tensor);
             }
         } else {
             uint64_t quant = 1;
             if constexpr (has_coord) {
                 auto gm_tensor_tile = slice(gm_tensor, make_coord(base, base), make_shape(m - base, n - base));
                 gm_addr_global = gm_tensor_tile.data().get();
-                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor_tile, l0c_tensor, quant);
+                copy(copy_atom<copy_traits<copy_l0c_to_gm, l0c_to_gm_trait_default>>{}, gm_tensor_tile, l0c_tensor, quant);
             } else {
                 gm_addr_global = gm_c_;
-                copy(copy_atom<copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>>{}, gm_tensor, l0c_tensor, quant);
+                copy(copy_atom<copy_traits<copy_l0c_to_gm, l0c_to_gm_trait_default>>{}, gm_tensor, l0c_tensor, quant);
             }
         }
     }
@@ -569,8 +569,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nc1_hwc0)
         dst, make_frame_layout<nc1hwc0_layout_ptn>(
                  1, static_cast<int>(c1), static_cast<int>(height), static_cast<int>(width), static_cast<int>(c0_value)));
 
-    run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -594,8 +594,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nhwc)
         dst, make_frame_layout<nhwc_layout_ptn, layout_trait_default<float>>(
                  1, static_cast<int>(height), static_cast<int>(width), static_cast<int>(channel)));
 
-    run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -620,8 +620,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_nchw)
         dst, make_frame_layout<nchw_layout_ptn, layout_trait_default<float>>(
                  1, static_cast<int>(channel), static_cast<int>(height), static_cast<int>(width)));
 
-    run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -648,8 +648,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_gm_nz_to_ncdhw)
         dst, make_frame_layout<ncdhw_layout_ptn, layout_trait_default<float>>(
                  1, static_cast<int>(channel), static_cast<int>(depth), static_cast<int>(height), static_cast<int>(width)));
 
-    run_copy_call_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_gm, l0c_to_gm_trait_default>(gm_tensor, l0c_tensor, l0c_to_gm_params{});
 
     EXPECT_EQ(dst[0], 0);
 }

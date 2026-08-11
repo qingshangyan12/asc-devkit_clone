@@ -32,7 +32,7 @@ public:
     template <QuantMode_t quant_pre, typename T, typename U>
     __aicore__ inline static void data_copy(__ubuf__ T* dst, __cc__ U* src, uint32_t n_size, uint32_t m_size,
                                                    uint32_t src_stride, uint32_t dst_stride, uint8_t dual_dst_ctl,
-                                                   bool relu_en, uint8_t unit_flag, bool sub_block_id,
+                                                   bool relu_en, uint8_t unit_flag, uint8_t sub_block_id,
                                                    bool is_channel_split, bool nz2nd_en, bool nz2dn_en)
     {
         if ASCEND_IS_AIV {

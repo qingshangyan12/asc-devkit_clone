@@ -27,13 +27,11 @@
 namespace asc {
 namespace te {
 
-struct copy_l1_to_biastable_trait {};
-
 class copy_l1_to_biastable_instr {
 public:
     template <typename T>
     __aicore__ inline static void data_copy(uint64_t dst, __cbuf__ T* src, bool conv_control, uint16_t block_count,
-                                              uint16_t block_len, uint16_t src_stride, uint16_t dst_stride)
+                                            uint16_t block_len, uint16_t src_stride, uint16_t dst_stride)
     {
         if ASCEND_IS_AIV {
             return;

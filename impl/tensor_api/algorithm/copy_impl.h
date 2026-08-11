@@ -34,30 +34,30 @@ constexpr bool is_quant_scalar_v =
 template <typename QuantParam>
 constexpr bool is_copy_quant_param_v = is_quant_scalar_v<QuantParam> || is_attr_tensor_v<QuantParam>;
 
-template <typename AtomType, typename DstTensor, typename SrcTensor>
-__aicore__ inline void copy(const copy_atom<AtomType>& atom, const DstTensor& dst, const SrcTensor& src)
+template <typename Atom, typename DstTensor, typename SrcTensor>
+__aicore__ inline void copy(const copy_atom<Atom>& atom, const DstTensor& dst, const SrcTensor& src)
 {
     atom.call(dst, src);
 }
 
-template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
-          Std::enable_if_t<is_copy_quant_param_v<QuantParam>, int> = 0>
-__aicore__ inline void copy(const copy_atom<AtomType>& atom, const DstTensor& dst, const SrcTensor& src,
+template <typename Atom, typename DstTensor, typename SrcTensor, typename QuantParam,
+          Std::enable_if_t<is_copy_quant_param_v<QuantParam>, int> Enable = 0>
+__aicore__ inline void copy(const copy_atom<Atom>& atom, const DstTensor& dst, const SrcTensor& src,
                             const QuantParam& quant)
 {
     atom.call(dst, src, quant);
 }
 
-template <typename CopyOperationType>
-__aicore__ inline constexpr auto make_copy(const CopyOperationType& copy_operation)
+template <typename CopyOperation>
+__aicore__ inline constexpr auto make_copy(const CopyOperation& operation)
 {
-    return copy_atom<copy_traits<CopyOperationType>>{};
+    return copy_atom<copy_traits<CopyOperation>>{};
 }
 
-template <typename CopyOperationType, typename CopyTraitType>
-__aicore__ inline constexpr auto make_copy(const CopyOperationType& copy_operation, const CopyTraitType& copy_trait)
+template <typename CopyOperation, typename CopyTrait>
+__aicore__ inline constexpr auto make_copy(const CopyOperation& operation, const CopyTrait& trait)
 {
-    return copy_atom<copy_traits<CopyOperationType, CopyTraitType>>{};
+    return copy_atom<copy_traits<CopyOperation, CopyTrait>>{};
 }
 
 } // namespace te
