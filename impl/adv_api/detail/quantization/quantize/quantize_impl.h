@@ -37,29 +37,32 @@ __aicore__ inline void CheckApiDtypeValid()
         SupportType<
             Tuple<SrcT, ScaleT, DstT>, Tuple<half, half, fp8_e4m3fn_t>, Tuple<half, half, fp8_e5m2_t>
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
-            , Tuple<bfloat16_t, bfloat16_t, fp8_e4m3fn_t>, Tuple<bfloat16_t, bfloat16_t, fp8_e5m2_t>
+            ,
+            Tuple<bfloat16_t, bfloat16_t, fp8_e4m3fn_t>, Tuple<bfloat16_t, bfloat16_t, fp8_e5m2_t>
 #endif
-            , Tuple<float, float, fp8_e4m3fn_t>, Tuple<float, float, fp8_e5m2_t>, Tuple<half, float, fp8_e4m3fn_t>,
+            ,
+            Tuple<float, float, fp8_e4m3fn_t>, Tuple<float, float, fp8_e5m2_t>, Tuple<half, float, fp8_e4m3fn_t>,
             Tuple<half, float, fp8_e5m2_t>
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
-            , Tuple<bfloat16_t, float, fp8_e4m3fn_t>,
-            Tuple<bfloat16_t, float, fp8_e5m2_t>, Tuple<half, half, hifloat8_t>,
-            Tuple<bfloat16_t, bfloat16_t, hifloat8_t>,
-            Tuple<bfloat16_t, bfloat16_t, int8_t>,
-            Tuple<float, float, hifloat8_t>, Tuple<half, float, hifloat8_t>,
-            Tuple<bfloat16_t, float, hifloat8_t>, Tuple<bfloat16_t, float, int8_t>
+            ,
+            Tuple<bfloat16_t, float, fp8_e4m3fn_t>, Tuple<bfloat16_t, float, fp8_e5m2_t>, Tuple<half, half, hifloat8_t>,
+            Tuple<bfloat16_t, bfloat16_t, hifloat8_t>, Tuple<bfloat16_t, bfloat16_t, int8_t>,
+            Tuple<float, float, hifloat8_t>, Tuple<half, float, hifloat8_t>, Tuple<bfloat16_t, float, hifloat8_t>,
+            Tuple<bfloat16_t, float, int8_t>
 #endif
-            , Tuple<half, half, int8_t>,
-            Tuple<float, float, int8_t>, Tuple<half, float, int8_t>,
+            ,
+            Tuple<half, half, int8_t>, Tuple<float, float, int8_t>, Tuple<half, float, int8_t>,
             Tuple<half, half, fp4x2_e1m2_t>, Tuple<half, half, fp4x2_e2m1_t>
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
-            , Tuple<bfloat16_t, bfloat16_t, fp4x2_e1m2_t>, Tuple<bfloat16_t, bfloat16_t, fp4x2_e2m1_t>
+            ,
+            Tuple<bfloat16_t, bfloat16_t, fp4x2_e1m2_t>, Tuple<bfloat16_t, bfloat16_t, fp4x2_e2m1_t>
 #endif
-            , Tuple<float, float, fp4x2_e1m2_t>, Tuple<float, float, fp4x2_e2m1_t>, Tuple<half, float, fp4x2_e1m2_t>,
+            ,
+            Tuple<float, float, fp4x2_e1m2_t>, Tuple<float, float, fp4x2_e2m1_t>, Tuple<half, float, fp4x2_e1m2_t>,
             Tuple<half, float, fp4x2_e2m1_t>
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
-            , Tuple<bfloat16_t, float, fp4x2_e1m2_t>,
-            Tuple<bfloat16_t, float, fp4x2_e2m1_t>
+            ,
+            Tuple<bfloat16_t, float, fp4x2_e1m2_t>, Tuple<bfloat16_t, float, fp4x2_e2m1_t>
 #endif
             >(),
         "Failed to check data type for Quantize");
@@ -168,7 +171,7 @@ __simd_callee__ inline void TransRegForS8(
             (Reg::RegTensor<ScaleT>&)dstVreg2);
     } else
 #endif
-    if constexpr (SupportType<ScaleT, float>()) {
+        if constexpr (SupportType<ScaleT, float>()) {
         // fp32->s16->fp16->s8
         Reg::RegTensor<half> f16Vreg;
         if constexpr (
@@ -994,8 +997,7 @@ __aicore__ inline void CheckQuantizeParams(
             SupportType<ActualScaleT, half, float, bfloat16_t>(),
             "Quantize only support half/float/bfloat16_t scale dtype");
 #else
-            SupportType<ActualScaleT, half, float>(),
-            "Quantize only support half/float scale dtype");
+            SupportType<ActualScaleT, half, float>(), "Quantize only support half/float scale dtype");
 #endif
     }
 }

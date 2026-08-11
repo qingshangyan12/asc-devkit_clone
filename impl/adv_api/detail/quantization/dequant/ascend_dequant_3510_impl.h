@@ -179,7 +179,7 @@ __simd_vf__ inline void DequantPertensorVFImpl(
             preg = Reg::UpdateMask<uint32_t>(sreg);
             Reg::LoadAlign<int32_t, Reg::LoadDist::DIST_NORM>(s32vreg, srcUb + i * N + j * sregLower);
             Reg::Cast<float, int32_t, MrgZRndA>(f32vreg, s32vreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)            
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
             if constexpr (SupportType<scaleT, bfloat16_t>()) {
                 Reg::Muls(f32vreg, f32vreg, ToFloat(deqScale), preg);
             } else {
@@ -650,11 +650,9 @@ __aicore__ inline void AscendDequantImpl(
     CheckTensorPosition(offsetTensor, "offsetTensor", "VECIN/VECOUT/VECCALC");
     static_assert(SupportType<srcT, int32_t, float>(), "AscendDequant only support int32_t/float input dtype");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    static_assert(SupportType<dstT, half, float>(), "AscendDequant only support half/float output dtype for l300/l311");
     static_assert(
-        SupportType<dstT, half, float>(), "AscendDequant only support half/float output dtype for l300/l311");
-    static_assert(
-        SupportType<scaleT, half, float>(),
-        "AscendDequant only support half/float scaleT dtype for l300/l311");
+        SupportType<scaleT, half, float>(), "AscendDequant only support half/float scaleT dtype for l300/l311");
 #else
     static_assert(
         SupportType<dstT, bfloat16_t, half, float>(), "AscendDequant only support bfloat16_t/half/float output dtype");
