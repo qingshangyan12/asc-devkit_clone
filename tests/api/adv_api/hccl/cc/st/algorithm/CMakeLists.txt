@@ -14,8 +14,6 @@ set(HCCL_CHECKER_MODEL_PROXY_TARGET ascendc_ut_hccl_cc_algorithm_model_proxy)
 set(HCCL_CHECKER_VERIFIER_TARGET ascendc_ut_hccl_cc_algorithm_verifier)
 set(HCCL_CHECKER_SELECTOR_TARGET ascendc_ut_hccl_cc_algorithm_selectors)
 set(HCCL_CHECKER_EXECUTOR_TARGET ascendc_ut_hccl_cc_algorithm_executors)
-set(HCCL_MC2_CCU_HOST_TARGET ascendc_ut_adv_api_hccl_ccu_mc2_host)
-set(HCCL_MC2_CCU_DEVICE_TARGET ascendc_ut_adv_api_hccl_ccu_mc2_device)
 
 set(HCCL_CC_DIR ${ASCENDC_DIR}/impl/adv_api/detail/hccl/cc)
 set(HCCL_CC_SRC_DIR ${HCCL_CC_DIR}/src)
