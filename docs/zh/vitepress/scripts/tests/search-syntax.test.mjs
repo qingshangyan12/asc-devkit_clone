@@ -9,6 +9,7 @@
  */
 
 import assert from 'node:assert/strict'
+import { resolve } from 'node:path'
 import { test } from 'node:test'
 
 import {
@@ -24,7 +25,10 @@ import {
   highlightIdentifierExcerpt,
   highlightSearchText,
   initializePagefindSearch,
+  MAX_CJK_SUBPHRASES,
+  MAX_QUERY_LENGTH,
 } from '../../docs/.vitepress/theme/pagefind-search.mjs'
+import { sourcePathsForRoute } from '../../docs/.vitepress/build-pagefind-title-index.mjs'
 
 test('normalizes kernel launch syntax queries and prefixes', () => {
   for (const query of [
@@ -174,4 +178,23 @@ test('matches omitted identifier decorators and prefers canonical macro spelling
     findIdentifierIndexMatches(entries, lowercasePlan.identifierQuery)[0].entry[0],
     'npu_arch',
   )
+})
+
+test('bounds long CJK queries and generated subphrases', () => {
+  const plan = createQueryPlan('中'.repeat(2048))
+
+  assert.equal(Array.from(plan.query).length, MAX_QUERY_LENGTH)
+  assert.ok(plan.cjkSubPhrases[0].length <= MAX_CJK_SUBPHRASES)
+  assert.ok(plan.cjkSubPhrases[0].includes('中中'))
+})
+
+test('maps directory routes to intermediate index pages', () => {
+  const root = resolve('/tmp/intermediate-html')
+
+  assert.deepEqual(sourcePathsForRoute(root, '/guide/'), [
+    resolve(root, 'guide.html'),
+    resolve(root, 'guide/index.html'),
+  ])
+  assert.deepEqual(sourcePathsForRoute(root, '/'), [resolve(root, 'index.html')])
+  assert.deepEqual(sourcePathsForRoute(root, '/../outside'), [])
 })

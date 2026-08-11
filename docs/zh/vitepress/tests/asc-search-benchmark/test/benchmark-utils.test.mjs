@@ -9,11 +9,17 @@
  */
 
 import assert from 'node:assert/strict'
+import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { test } from 'node:test'
 
 import {
+  escapeMarkdownCell,
   fetchSameOrigin,
   markdownReportPath,
+  pathMatchesPrefix,
+  resolveFileWithinRoot,
   resolveSameOriginHttpUrl,
 } from '../lib/benchmark-utils.mjs'
 
@@ -73,4 +79,39 @@ test('derives a distinct Markdown report path', () => {
   assert.equal(markdownReportPath('/tmp/report.JSON'), '/tmp/report.md')
   assert.equal(markdownReportPath('/tmp/report'), '/tmp/report.md')
   assert.equal(markdownReportPath('/tmp/report.data'), '/tmp/report.data.md')
+})
+
+test('matches route prefixes only at path segment boundaries', () => {
+  assert.equal(pathMatchesPrefix('/api/asc_copy_gm2ub', '/api/asc_copy_gm2ub'), true)
+  assert.equal(pathMatchesPrefix('/api/asc_copy_gm2ub/page', '/api/asc_copy_gm2ub'), true)
+  assert.equal(pathMatchesPrefix('/api/asc_copy_gm2ub_align/page', '/api/asc_copy_gm2ub'), false)
+  assert.equal(pathMatchesPrefix('/api/page', '/'), true)
+})
+
+test('does not resolve files through symlinks outside the static root', async () => {
+  const testDirectory = await mkdtemp(join(tmpdir(), 'asc-search-static-root-'))
+  const root = join(testDirectory, 'dist')
+  const outside = join(testDirectory, 'outside.txt')
+  const inside = join(root, 'inside.txt')
+  const escaped = join(root, 'escaped.txt')
+  try {
+    await mkdir(root)
+    await writeFile(outside, 'outside', 'utf8')
+    await writeFile(inside, 'inside', 'utf8')
+    await symlink(outside, escaped)
+
+    assert.equal(resolveFileWithinRoot(root, [inside]), inside)
+    assert.equal(resolveFileWithinRoot(root, [escaped]), null)
+  }
+  finally {
+    await rm(testDirectory, { recursive: true, force: true })
+  }
+})
+
+test('escapes HTML and table delimiters in Markdown cells', () => {
+  assert.equal(
+    escapeMarkdownCell('<img src=x onerror=alert(1)> & value|next\r\nrow'),
+    '&lt;img src=x onerror=alert(1)&gt; &amp; value\\|next  row',
+  )
+  assert.deepEqual([...escapeMarkdownCell('\\|')], ['\\', '\\', '\\', '|'])
 })

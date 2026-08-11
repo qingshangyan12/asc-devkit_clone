@@ -8,6 +8,9 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+import { realpathSync, statSync } from 'node:fs'
+import { isAbsolute, relative, sep } from 'node:path'
+
 const HTTP_PROTOCOLS = new Set(['http:', 'https:'])
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308])
 
@@ -40,4 +43,33 @@ export function markdownReportPath(jsonReportPath) {
   return /\.json$/i.test(jsonReportPath)
     ? jsonReportPath.replace(/\.json$/i, '.md')
     : `${jsonReportPath}.md`
+}
+
+export function pathMatchesPrefix(path, prefix) {
+  return path === prefix || (prefix === '/' ? path.startsWith('/') : path.startsWith(`${prefix}/`))
+}
+
+export function resolveFileWithinRoot(root, candidates) {
+  const realRoot = realpathSync(root)
+  for (const candidate of candidates) {
+    try {
+      const realCandidate = realpathSync(candidate)
+      const relativePath = relative(realRoot, realCandidate)
+      if (relativePath === '..' || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath)) continue
+      if (statSync(realCandidate).isFile()) return realCandidate
+    }
+    catch {}
+  }
+  return null
+}
+
+export function escapeMarkdownCell(value) {
+  return String(value ?? '-')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('\\', '\\\\')
+    .replaceAll('|', '\\|')
+    .replaceAll('\r', ' ')
+    .replaceAll('\n', ' ')
 }

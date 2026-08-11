@@ -17,7 +17,7 @@ import { useLocalStorage, useMagicKeys } from '@vueuse/core'
 
 import { searchConfig as _searchConfig } from 'virtual:pagefind'
 import LogoPagefind from './LogoPagefind.vue'
-import { highlightSearchText, initializePagefindSearch, searchPagefind } from './pagefind-search.mjs'
+import { highlightSearchText, initializePagefindSearch, MAX_QUERY_LENGTH, searchPagefind } from './pagefind-search.mjs'
 import type { SearchConfig } from './type'
 import { formatShowDate } from './utils'
 
@@ -311,6 +311,7 @@ function dirLabel(url: string) {
             </div>
             <Command.Input
               ref="searchInput" v-model:value="searchWords"
+              :maxlength="MAX_QUERY_LENGTH"
               :placeholder="finalSearchConfig?.placeholder || 'Search Docs'"
             />
             <div class="search-actions">
