@@ -46,7 +46,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
 | 流水类型 | 含义 |
 | --- | --- |
 | PIPE_S | 标量流水线，使用GlobalTensor/LocalTensor的GetValue函数时为此流水 |
-| PIPE_V | 矢量计算流水及部分硬件架构下的L0C Buffer-&gt;UB数据搬运流水 |
+| PIPE_V | 矢量计算流水及部分硬件架构下的L0C Buffer-&gt;Unified Buffer（UB）数据搬运流水 |
 | PIPE_M | 矩阵计算流水 |
 | PIPE_MTE1 | L1 Buffer -&gt;L0A Buffer、L1 Buffer-&gt;L0B Buffer数据搬运流水 |
 | PIPE_MTE2 | GM-&gt;L1 Buffer、GM-&gt;UB等数据搬运流水 |

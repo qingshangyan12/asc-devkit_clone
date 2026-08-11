@@ -76,7 +76,7 @@ __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
 </td>
 <td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="p755318134134"><a name="p755318134134"></a><a name="p755318134134"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p1185064715302"><a name="p1185064715302"></a><a name="p1185064715302"></a>核函数传入的workspace的指针，包括系统workspace和用户使用的workspace。</p>
+<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p1185064715302"><a name="p1185064715302"></a><a name="p1185064715302"></a>核函数（Kernel）传入的workspace的指针，包括系统workspace和用户使用的workspace。</p>
 </td>
 </tr>
 </tbody>

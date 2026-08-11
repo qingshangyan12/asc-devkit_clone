@@ -2,7 +2,7 @@
 
 - **[概览](overview/overview.md)**  
 
-- **[GM与UB数据搬运](GM_UB_data_move.md)**  
+- **[GM与UB数据搬运](GM_UB_data_move.md)**
 
 - **[GM与L1或L0数据搬运](GM_L1_or_L0_data_move.md)**  
 

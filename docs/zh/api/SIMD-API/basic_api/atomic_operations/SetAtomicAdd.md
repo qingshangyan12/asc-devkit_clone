@@ -78,7 +78,7 @@ __aicore__ inline void SetAtomicAdd()
 ## 约束说明<a name="section633mcpsimp"></a>
 
 <!-- npu="950" id7 -->
-- Ascend 950PR/Ascend 950DT，支持的数据通路为UB/L0C Buffer-\>GM。
+- Ascend 950PR/Ascend 950DT，支持的数据通路为Unified Buffer（UB）/L0C Buffer-\>GM。
 <!-- end id7 -->
 
 <!-- npu="A3" id8 -->

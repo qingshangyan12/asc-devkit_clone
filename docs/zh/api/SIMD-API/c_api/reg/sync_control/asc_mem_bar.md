@@ -67,7 +67,7 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 **表3** Reg计算流水线说明
 | 流水线 | 含义 |
 | ------ | -------- |
-| VEC_STORE | SIMD_VF函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，例如[asc_store](../reg_store/asc_store.md)。 |
+| VEC_STORE | SIMD_VF函数内矢量写Unified Buffer（UB）流水线。<br>对应寄存器到UB的搬运指令，例如[asc_store](../reg_store/asc_store.md)。 |
 | VEC_LOAD | SIMD_VF函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，例如[asc_load](../reg_load/asc_load.md)。 |
 | SCALAR_STORE | SIMD_VF函数内标量写UB流水线。 |
 | SCALAR_LOAD | SIMD_VF函数内标量读UB流水线。 |

@@ -6,7 +6,7 @@ Compare、Compares称之为比较接口，用于逐元素比较Tensor或Scalar�
 
 | API | 核心功能 | Mask类型 | 应用场景 |
 | --- | --- | --- | --- |
-| [Compare](Compare.md) | 逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。支持多种比较模式（等于、小于、大于...）。<br>不支持Vector计算的Mask设置。结果存入UB。 | 未使用 | 逐元素比较，结果写入内存。 |
+| [Compare](Compare.md) | 逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。支持多种比较模式（等于、小于、大于...）。<br>不支持Vector计算的Mask设置。结果存入Unified Buffer（UB）。 | 未使用 | 逐元素比较，结果写入内存。 |
 | [Compare（结果存入寄存器）](Compare_store_to_register.md) | 逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。支持多种比较模式。<br>支持Vector计算的Mask设置。结果暂存CmpMask寄存器。详情参考[表2 CmpMask与VectorMask](#cmpMask-vectorMask)。 | src传参mask用于Vector计算；<br>输出结果为CmpMask（比较掩码）。 | 逐元素比较，结果写寄存器。 |
 | [Compares](Compares.md) | 逐元素比较一个tensor中的元素和另一个scalar的大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。<br>支持多种比较模式。 | 未使用 | 张量和标量逐元素比较，结果写入内存。 |
 | [Select](Select.md) | 给定两个源操作数src0和src1，根据selMask（用于选择的Mask掩码）的比特位值选取元素。<br>支持CmpMask设置，支持用于Vector计算的Mask的设置。详情参考[表2 CmpMask与VectorMask](#cmpMask-vectorMask)。 | src传参mask用于Vector计算；<br>src传参selMask为CmpMask（比较掩码）。 | 掩码条件选择输出。 |
