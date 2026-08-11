@@ -32,9 +32,6 @@ struct hardware_mem_ptr : iter_adaptor<Pointer, hardware_mem_ptr<PtrPattern, Poi
     using ptr_pattern = PtrPattern;
 };
 
-template <typename T>
-using get_mem_location = typename T::iterator::ptr_pattern;
-
 // is hardware mem
 template <typename PtrPattern, typename Pointer, typename = void>
 struct is_hardware_mem : Std::false_type {};

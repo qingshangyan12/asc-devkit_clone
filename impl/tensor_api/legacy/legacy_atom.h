@@ -13,8 +13,47 @@
 
 #include "impl/tensor_api/legacy/legacy_type.h"
 
-namespace asc {
-namespace te {
+namespace AscendC {
+namespace Te {
+
+using namespace asc::te;
+
+template <typename Params>
+__aicore__ inline constexpr mmad_params normalize_mmad_params(const Params& params)
+{
+    using params_type = Std::remove_cvref_t<Params>;
+    if constexpr (Std::is_same_v<params_type, mmad_params>) {
+        return params;
+    } else {
+        static_assert(Std::is_same_v<params_type, MmadParams>, "Params must be mmad_params or MmadParams.");
+        return mmad_params{params.m, params.n, params.k, params.unitFlag, params.cmatrixInitVal};
+    }
+}
+
+template <typename Params>
+__aicore__ inline constexpr fixpipe_params normalize_fixpipe_params(const Params& params)
+{
+    using params_type = Std::remove_cvref_t<Params>;
+    if constexpr (Std::is_same_v<params_type, fixpipe_params>) {
+        return params;
+    } else {
+        static_assert(Std::is_same_v<params_type, FixpipeParams>, "Params must be fixpipe_params or FixpipeParams.");
+        return fixpipe_params{params.unitFlag, params.subBlockId};
+    }
+}
+
+template <typename Params>
+__aicore__ inline constexpr copy_gm_to_ub_params normalize_copy_gm_to_ub_params(const Params& params)
+{
+    using params_type = Std::remove_cvref_t<Params>;
+    if constexpr (Std::is_same_v<params_type, copy_gm_to_ub_params>) {
+        return params;
+    } else {
+        static_assert(Std::is_same_v<params_type, CopyGM2UBParams>,
+                      "Params must be copy_gm_to_ub_params or CopyGM2UBParams.");
+        return copy_gm_to_ub_params{params.leftPaddingCount, params.rightPaddingCount, params.enableConstantPad};
+    }
+}
 
 // MmadTraits: 独立的 PascalCase 模板，不依赖 mmad_traits
 template <typename MmadOperationType, typename... MmadOpArgs>
@@ -39,17 +78,17 @@ struct MmadTraits<MmadOp, MmadTraitsType, MmadOpWith, MmadTraitsWith> {
     template <typename Params>
     __aicore__ inline constexpr MmadTraits<MmadOpWith, MmadTraitsWith> with(const Params& p) const
     {
-        return {normalize_mmad_params(p)};
+        return {AscendC::Te::normalize_mmad_params(p)};
     }
 
     template <const TraitType& trait = defaultTrait, typename... Args>
     __aicore__ inline void mmad_unpack(const Args&... args) const
     {
-        using normalized_t = Std::remove_cvref_t<decltype(normalize_mmad_trait(TraitType{}))>;
+        using normalized_t = Std::remove_cvref_t<decltype(AscendC::Te::normalize_mmad_trait(TraitType{}))>;
         if constexpr (Std::is_same_v<TraitType, normalized_t>) {
             MmadOp::template mmad<TraitType, trait, Args...>(args..., params);
         } else {
-            constexpr static normalized_t normalized_trait = normalize_mmad_trait(trait);
+            constexpr static normalized_t normalized_trait = AscendC::Te::normalize_mmad_trait(trait);
             MmadOp::template mmad<normalized_t, normalized_trait, Args...>(args..., params);
         }
     }
@@ -121,20 +160,20 @@ __aicore__ inline constexpr Trait normalize_copy_trait(const Trait& trait)
     return trait;
 }
 
-__aicore__ inline constexpr copy_l0c_to_gm_trait normalize_copy_trait(const CopyL0C2GMTrait& trait)
+__aicore__ inline constexpr l0c_to_gm_trait normalize_copy_trait(const CopyL0C2GMTrait& trait)
 {
-    return {normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit};
+    return {AscendC::Te::normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit};
 }
 
-__aicore__ inline constexpr copy_l0c_to_ub_trait normalize_copy_trait(const CopyL0C2UBTrait& trait)
+__aicore__ inline constexpr l0c_to_ub_trait normalize_copy_trait(const CopyL0C2UBTrait& trait)
 {
-    return {normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit,
-            normalize_dual_dst_mode(trait.dualDstCtl)};
+    return {AscendC::Te::normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit,
+            AscendC::Te::normalize_dual_dst_mode(trait.dualDstCtl)};
 }
 
-__aicore__ inline constexpr copy_l0c_to_l1_trait normalize_copy_trait(const CopyL0C2L1Trait& trait)
+__aicore__ inline constexpr l0c_to_l1_trait normalize_copy_trait(const CopyL0C2L1Trait& trait)
 {
-    return {normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit};
+    return {AscendC::Te::normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit};
 }
 
 // 检测 CopyOp 是否有 snake_case copy 方法
@@ -169,11 +208,11 @@ struct CopyTraits<CopyOp, Traits, CopyOpWith, TraitsWith> {
     __aicore__ inline constexpr CopyTraits<CopyOpWith, TraitsWith> with(const Params& p) const
     {
         using params_type = Std::remove_cvref_t<Params>;
-        if constexpr (Std::is_same_v<params_type, fixpipe_params> || Std::is_same_v<params_type, FixpipeParams>) {
-            return {normalize_fixpipe_params(p)};
-        } else if constexpr (Std::is_same_v<params_type, copy_gm_to_ub_params>
-                             || Std::is_same_v<params_type, CopyGM2UBParams>) {
-            return {normalize_copy_gm_to_ub_params(p)};
+        if constexpr (Std::is_same_v<params_type, asc::te::fixpipe_params> || Std::is_same_v<params_type, AscendC::Te::FixpipeParams>) {
+            return {AscendC::Te::normalize_fixpipe_params(p)};
+        } else if constexpr (Std::is_same_v<params_type, asc::te::copy_gm_to_ub_params>
+                             || Std::is_same_v<params_type, AscendC::Te::CopyGM2UBParams>) {
+            return {AscendC::Te::normalize_copy_gm_to_ub_params(p)};
         } else {
             return {p};
         }
@@ -190,11 +229,11 @@ struct CopyTraits<CopyOp, Traits, CopyOpWith, TraitsWith> {
                 CopyOp::template Copy<normalized_t, trait, Args...>(args...);
             }
         } else {
-            constexpr static normalized_t normalized_trait = normalize_copy_trait(trait);
-            if constexpr (has_copy_method<void, CopyOp, normalized_t, normalized_trait, Args...>::value) {
-                CopyOp::template copy<normalized_t, normalized_trait, Args...>(args...);
+            static constexpr normalized_t normalized_trait_val = normalize_copy_trait(trait);
+            if constexpr (has_copy_method<void, CopyOp, normalized_t, normalized_trait_val, Args...>::value) {
+                CopyOp::template copy<normalized_t, normalized_trait_val, Args...>(args...);
             } else {
-                CopyOp::template Copy<normalized_t, normalized_trait, Args...>(args...);
+                CopyOp::template Copy<normalized_t, normalized_trait_val, Args...>(args...);
             }
         }
     }
@@ -211,21 +250,21 @@ template <typename CopyOp, typename Traits>
 struct CopyTraits<CopyOp, Traits> : public CopyTraits<CopyOp, Traits, CopyOp, Traits> {};
 
 // CopyTraits 1参数特化: 标准操作绑定默认 trait
-template <> struct CopyTraits<copy_gm_to_l1> : public CopyTraits<copy_gm_to_l1, copy_gm_to_l1_trait_default> {};
-template <> struct CopyTraits<copy_gm_to_ub> : public CopyTraits<copy_gm_to_ub, copy_gm_to_ub_trait_default> {};
-template <> struct CopyTraits<copy_ub_to_gm> : public CopyTraits<copy_ub_to_gm, copy_ub_to_gm_trait_default> {};
-template <> struct CopyTraits<copy_ub_to_l1> : public CopyTraits<copy_ub_to_l1, copy_ub_to_l1_trait_default> {};
-template <> struct CopyTraits<copy_ub_to_ub> : public CopyTraits<copy_ub_to_ub, copy_ub_to_ub_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_ub> : public CopyTraits<copy_l1_to_ub, copy_l1_to_ub_trait_default> {};
-template <> struct CopyTraits<copy_l0c_to_gm> : public CopyTraits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default> {};
-template <> struct CopyTraits<copy_l0c_to_ub> : public CopyTraits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default> {};
-template <> struct CopyTraits<copy_l0c_to_l1> : public CopyTraits<copy_l0c_to_l1, copy_l0c_to_l1_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_l0a> : public CopyTraits<copy_l1_to_l0a, copy_l1_to_l0a_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_l0b> : public CopyTraits<copy_l1_to_l0b, copy_l1_to_l0b_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_l0scalea> : public CopyTraits<copy_l1_to_l0scalea, copy_l1_to_l0scalea_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_l0scaleb> : public CopyTraits<copy_l1_to_l0scaleb, copy_l1_to_l0scaleb_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_fixbuf> : public CopyTraits<copy_l1_to_fixbuf, copy_l1_to_fixbuf_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_biastable> : public CopyTraits<copy_l1_to_biastable, copy_l1_to_biastable_trait_default> {};
+template <> struct CopyTraits<copy_gm_to_l1> : public CopyTraits<copy_gm_to_l1, gm_to_l1_trait_default> {};
+template <> struct CopyTraits<copy_gm_to_ub> : public CopyTraits<copy_gm_to_ub, gm_to_ub_trait_default> {};
+template <> struct CopyTraits<copy_ub_to_gm> : public CopyTraits<copy_ub_to_gm, ub_to_gm_trait_default> {};
+template <> struct CopyTraits<copy_ub_to_l1> : public CopyTraits<copy_ub_to_l1, ub_to_l1_trait_default> {};
+template <> struct CopyTraits<copy_ub_to_ub> : public CopyTraits<copy_ub_to_ub, ub_to_ub_trait_default> {};
+template <> struct CopyTraits<copy_l1_to_ub> : public CopyTraits<copy_l1_to_ub, l1_to_ub_trait_default> {};
+template <> struct CopyTraits<copy_l0c_to_gm> : public CopyTraits<copy_l0c_to_gm, l0c_to_gm_trait_default> {};
+template <> struct CopyTraits<copy_l0c_to_ub> : public CopyTraits<copy_l0c_to_ub, l0c_to_ub_trait_default> {};
+template <> struct CopyTraits<copy_l0c_to_l1> : public CopyTraits<copy_l0c_to_l1, l0c_to_l1_trait_default> {};
+template <> struct CopyTraits<copy_l1_to_l0a> : public CopyTraits<copy_l1_to_l0a, l1_to_l0a_trait_default> {};
+template <> struct CopyTraits<copy_l1_to_l0b> : public CopyTraits<copy_l1_to_l0b, l1_to_l0b_trait_default> {};
+template <> struct CopyTraits<copy_l1_to_l0scalea> : public CopyTraits<copy_l1_to_l0scalea, l1_to_l0scalea_trait_default> {};
+template <> struct CopyTraits<copy_l1_to_l0scaleb> : public CopyTraits<copy_l1_to_l0scaleb, l1_to_l0scaleb_trait_default> {};
+template <> struct CopyTraits<copy_l1_to_fixbuf> : public CopyTraits<copy_l1_to_fixbuf, l1_to_fixbuf_trait_default> {};
+template <> struct CopyTraits<copy_l1_to_biastable> : public CopyTraits<copy_l1_to_biastable, l1_to_biastable_trait_default> {};
 
 // CopyAtom: 独立的 PascalCase 模板，不依赖 copy_atom
 template <typename... Args>
@@ -300,7 +339,7 @@ __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copy_operatio
     return CopyAtom<CopyTraits<CopyOperationType, CopyTraitType>>{};
 }
 
-} // namespace te
-} // namespace asc
+} // namespace Te
+} // namespace AscendC
 
 #endif // IMPL_TENSOR_API_LEGACY_LEGACY_ATOM_H

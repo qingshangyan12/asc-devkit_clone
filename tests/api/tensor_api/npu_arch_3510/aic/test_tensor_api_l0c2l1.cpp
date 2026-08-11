@@ -27,10 +27,10 @@ namespace {
 using namespace asc::te;
 constexpr bool enable_relu = false;
 constexpr bool enable_channel_split = true;
-constexpr copy_l0c_to_l1_trait l0c_tol1_trait = {round_mode::default_round, enable_relu, enable_channel_split};
+constexpr l0c_to_l1_trait l0c_tol1_trait = {round_mode::default_round, enable_relu, enable_channel_split};
 
 struct copy_l0c_to_l1_trait_custom {
-    using trait_type = copy_l0c_to_l1_trait;
+    using trait_type = l0c_to_l1_trait;
     static constexpr const trait_type value = l0c_tol1_trait;
 };
 
@@ -81,8 +81,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_l1_nz_to_nz_float)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, float>(m, n));
     auto l1_tensor = make_tensor_at<location::l1>(dst, make_frame_layout<nz_layout_ptn, float>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(l1_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(l1_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_l1, l0c_to_l1_trait_default>(l1_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_l1, l0c_to_l1_trait_default>(l1_tensor, l0c_tensor, fixpipe_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -99,8 +99,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_l1_nz_to_nz_int32)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, int32_t>(m, n));
     auto l1_tensor = make_tensor_at<location::l1>(dst, make_frame_layout<nz_layout_ptn, int32_t>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(l1_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(l1_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_l1, l0c_to_l1_trait_default>(l1_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_l1, l0c_to_l1_trait_default>(l1_tensor, l0c_tensor, fixpipe_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -117,8 +117,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_l1_nz_to_nz_f32_to_f16)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, float>(m, n));
     auto l1_tensor = make_tensor_at<location::l1>(dst, make_frame_layout<nz_layout_ptn, half>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(l1_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(l1_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_l1, l0c_to_l1_trait_default>(l1_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_l1, l0c_to_l1_trait_default>(l1_tensor, l0c_tensor, fixpipe_params{});
 
     EXPECT_EQ(dst[0], static_cast<half>(0));
 }

@@ -75,10 +75,10 @@ using namespace asc::te;
 constexpr bool enable_relu = false;
 constexpr bool enable_channel_split = true;
 constexpr dual_dst_mode dual_dst_ctl = disable;
-constexpr copy_l0c_to_ub_trait l0c_toub_trait = {round_mode::default_round, enable_relu, enable_channel_split, dual_dst_ctl};
+constexpr l0c_to_ub_trait l0c_toub_trait = {round_mode::default_round, enable_relu, enable_channel_split, dual_dst_ctl};
 
 struct copy_l0c_to_ub_trait_custom {
-    using trait_type = copy_l0c_to_ub_trait;
+    using trait_type = l0c_to_ub_trait;
     static constexpr const trait_type value = l0c_toub_trait;
 };
 
@@ -139,7 +139,7 @@ void run_l0c_to_ub_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en,
     constexpr uint32_t k_m = 32;
     constexpr uint32_t k_n = 64;
     constexpr uint32_t k_matrix_size = k_m * k_n;
-    constexpr uint32_t k_src_batch_stride = k_matrix_size / FRACTAL_FIXED;
+    constexpr uint32_t k_src_batch_stride = k_matrix_size / fractal_fixed;
     constexpr uint16_t k_src_matrix_stride = k_m;
     constexpr uint64_t k_src_c0_stride = 1;
 
@@ -169,7 +169,7 @@ void run_l0c_to_ub_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en,
         MOCKER_CPP(set_channel_para, void(uint64_t)).times(1).will(invoke(set_channel_para_stub));
     }
 
-    auto atom = make_copy(copy_l0c_to_ub{}, copy_l0c_to_ub_trait_default{});
+    auto atom = make_copy(copy_l0c_to_ub{}, l0c_to_ub_trait_default{});
     atom.call(dst_tensor, src_tensor);
 
     GlobalMockObject::verify();
@@ -186,7 +186,7 @@ void run_l0c_to_ub_batch_nz_to_nz_no_quant()
     constexpr uint32_t k_n = 64;
     constexpr uint32_t k_matrix_size = k_m * k_n;
     constexpr uint16_t k_src_matrix_stride = k_m;
-    constexpr uint32_t k_dst_matrix_stride = FRACTAL_FIXED * k_m;
+    constexpr uint32_t k_dst_matrix_stride = fractal_fixed * k_m;
 
     __cc__ float src[k_src_batch * k_matrix_size] = {0};
     __ubuf__ float dst[k_dst_batch * k_matrix_size] = {0};
@@ -209,7 +209,7 @@ void run_l0c_to_ub_batch_nz_to_nz_no_quant()
 
     MOCKER(set_loop3_para, void(uint64_t)).times(1).will(invoke(set_loop3_para_stub));
 
-    auto atom = make_copy(copy_l0c_to_ub{}, copy_l0c_to_ub_trait_default{});
+    auto atom = make_copy(copy_l0c_to_ub{}, l0c_to_ub_trait_default{});
     atom.call(dst_tensor, src_tensor);
 
     GlobalMockObject::verify();
@@ -230,8 +230,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_ub_nz_to_nd)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<float>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -248,8 +248,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_ub_nz_to_nd_layout)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nd_layout_ptn, layout_trait_default<float>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -267,8 +267,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_ub_nz_to_dn)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<dn_ext_layout_ptn, layout_trait_default<float>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -285,8 +285,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_ub_nz_to_dn_layout)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<dn_layout_ptn, layout_trait_default<float>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -303,8 +303,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_ub_nz_to_nz_no_channel_split)
     auto l0c_tensor = make_tensor_at<location::l0c>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
     auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(m, n));
 
-    run_copy_call_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
-    run_copy_with_param_paths<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
+    run_copy_call_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor);
+    run_copy_with_param_paths<copy_l0c_to_ub, l0c_to_ub_trait_default>(ub_tensor, l0c_tensor, fixpipe_params{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -378,9 +378,9 @@ public:
         if constexpr (quant_mode_value == QuantMode_t::NoQuant || quant_mode_value == QuantMode_t::F322F16) {
             if constexpr (has_coord) {
                 auto ub_tensor_tile = slice(ub_tensor, make_coord(base, base), make_shape(m - base, n - base));
-                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor_tile, l0c_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_ub, l0c_to_ub_trait_default>>{}, ub_tensor_tile, l0c_tensor);
             } else {
-                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_ub, l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor);
             }
         } else if constexpr (is_tensor_value) {
             auto q_iterator = make_mem_ptr<location::l1>(q_addr_);
@@ -388,17 +388,17 @@ public:
             auto q_tensor = make_tensor(q_iterator, q_matrix_layout);
             if constexpr (has_coord) {
                 auto ub_tensor_tile = slice(ub_tensor, make_coord(base, base), make_shape(m - base, n - base));
-                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor_tile, l0c_tensor, q_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_ub, l0c_to_ub_trait_default>>{}, ub_tensor_tile, l0c_tensor, q_tensor);
             } else {
-                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor, q_tensor);
+                copy(copy_atom<copy_traits<copy_l0c_to_ub, l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor, q_tensor);
             }
         } else {
             uint64_t quant = 1;
             if constexpr (has_coord) {
                 auto ub_tensor_tile = slice(ub_tensor, make_coord(base, base), make_shape(m - base, n - base));
-                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor_tile, l0c_tensor, quant);
+                copy(copy_atom<copy_traits<copy_l0c_to_ub, l0c_to_ub_trait_default>>{}, ub_tensor_tile, l0c_tensor, quant);
             } else {
-                copy(copy_atom<copy_traits<copy_l0c_to_ub, copy_l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor, quant);
+                copy(copy_atom<copy_traits<copy_l0c_to_ub, l0c_to_ub_trait_default>>{}, ub_tensor, l0c_tensor, quant);
             }
         }
     }

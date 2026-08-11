@@ -36,12 +36,12 @@ namespace te {
 //   - Batch (depth 3/5): strip B with remove_batch_dim (keeps pattern/trait), matrix_num/strides from
 //     the B axis. The GM stride comes straight from the layout, so both bmk-contiguous and
 //     mbk-non-contiguous memory are covered.
-template <const copy_gm_to_l1_trait& trait, typename CopyOp, typename T, typename U>
+template <const gm_to_l1_trait& trait, typename CopyOp, typename T, typename U>
 __aicore__ inline void run_gm_to_l1_batched(const T& dst, const U& src)
 {
     CopyOp::template check_template<trait, T, U>();
     constexpr auto src_depth = nesting_depth_v<decltype(src.layout().shape())>;
-    if constexpr (src_depth == THREE_DIM_DATA || src_depth == FIVE_DIM_DATA) {
+    if constexpr (src_depth == three_dim_data || src_depth == five_dim_data) {
         auto src_layout = src.layout();
         auto dst_layout = dst.layout();
         uint16_t matrix_num = get<0>(src_layout.shape());

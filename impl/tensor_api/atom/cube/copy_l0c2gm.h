@@ -46,7 +46,7 @@ template <typename Traits>
 struct copy_traits<copy_l0c_to_gm, Traits> : public copy_traits<copy_l0c_to_gm, Traits, copy_l0c_to_gm_with, Traits> {};
 
 template <>
-struct copy_traits<copy_l0c_to_gm> : public copy_traits<copy_l0c_to_gm, copy_l0c_to_gm_trait_default> {};
+struct copy_traits<copy_l0c_to_gm> : public copy_traits<copy_l0c_to_gm, l0c_to_gm_trait_default> {};
 
 } // namespace te
 } // namespace asc
