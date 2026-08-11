@@ -44,16 +44,12 @@ inline half __ushort_as_half(const unsigned short int x)
 
 unsigned short int的数据按位重新解释为half的值。特殊值如下：
 
-| x值 | 返回值 |
-| --- | --- |
-| 0 | 0 |
-| -0 | -0 |
-| nan | nan |
-| inf | inf |
-| -inf | -inf |
-| ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
-| -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
-| ASCRT\_MIN\_DENORM\_FP16 | ASCRT\_MIN\_DENORM\_FP16 |
+| x值    | 返回值  |
+|-------|------|
+| 0     | 0    |
+| 32256 | nan  |
+| 31744 | inf  |
+| 64512 | -inf |
 
 ## 约束说明
 

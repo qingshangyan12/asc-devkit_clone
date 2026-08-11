@@ -68,6 +68,30 @@ unsigned short max(unsigned short x, unsigned short y)
 unsigned char max(unsigned char x, unsigned char y)
 ```
 
+```cpp
+unsigned int max(unsigned int x, int y)
+```
+
+```cpp
+unsigned int max(int x, unsigned int y)
+```
+
+```cpp
+unsigned long max(long x, unsigned long y)
+```
+
+```cpp
+unsigned long max(unsigned long x, long y)
+```
+
+```cpp
+unsigned long long max(long long x, unsigned long long y)
+```
+
+```cpp
+unsigned long long max(unsigned long long x, long long y)
+```
+
 ## 参数说明
 
 **表1**  参数说明
@@ -83,7 +107,7 @@ unsigned char max(unsigned char x, unsigned char y)
 
 ## 约束说明
 
-无
+混合有符号与无符号整数入参的重载会先将有符号入参转换为对应的无符号类型，再比较大小。
 
 ## 需要包含的头文件
 
