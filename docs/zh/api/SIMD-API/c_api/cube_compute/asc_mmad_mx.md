@@ -47,7 +47,7 @@ $$
 | C | L0C Buffer | M×N | Nz | 16×16 |
 | Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
-表格中K0的取值为`32Byte / sizeof(dtype)`，`dtype`为矩阵的数据类型。
+当矩阵数据类型为FP8时，`K0 = 32`；当矩阵数据类型为FP4时，`K0 = 64`。
 
 ## 函数原型
 
@@ -135,7 +135,7 @@ PIPE_M
   - 各矩阵的起始地址需满足[表3](#asc_mmad_mx_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
   - ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16，ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。搬入Scale矩阵时需使用与矩阵A和矩阵B匹配的目的地址。
   - `n_dim`需为64的倍数。原始K不是64的倍数时，需将K向上补齐到64的倍数，并将补齐区域的矩阵A和矩阵B数据设置为0；传入接口的`n_dim`、矩阵存储空间以及Scale矩阵的K维大小均需按照补齐后的K计算。
-  - 矩阵存储空间的M、N维需分别向上补齐到16的倍数。
+  - 矩阵存储空间的M、N维需分别向上补齐到16的倍数，`left_height`和`right_width`仍传入矩阵的有效M、N值。补齐部分为无效数据，不参与结果矩阵有效区域的计算。
   - Scale矩阵需覆盖本次矩阵乘加所需的全部数据。ScaleA的M维需向上补齐到16的倍数，K维大小为K / 32；ScaleB的K维大小为K / 32，N维需向上补齐到16的倍数。对应的起始地址与占用空间不能超出MX Buffer的范围。
   - 当M为1且`disable_gemv`为false时，默认开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需满足[表3](#asc_mmad_mx_param_table)中的对齐要求。
 
@@ -156,7 +156,7 @@ PIPE_M
   - 设置为0时使用饱和模式，inf输出饱和为±MAX、nan输出饱和为0；
   - 设置为1时使用非饱和模式，inf/nan保持原输出。
 
-  注意，应避免nan输入，否则可能会产生执行报错；整数类型仅支持饱和模式。
+  注意，应避免nan输入，否则可能会产生执行报错。
 
 ## 调用示例
 
@@ -165,8 +165,11 @@ PIPE_M
 以下为可执行的调用示例代码：
 
 ```cpp
-// 假设示例代码保存到asc_mmad_mx.asc中，保存路径为ASCEND_EXAMPLE_PATH，构建产物保存路径为ASCEND_BUILD_PATH
-// 编译与运行命令: "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang $ASCEND_EXAMPLE_PATH/asc_mmad_mx.asc -lm -o $ASCEND_BUILD_PATH && $ASCEND_BUILD_PATH
+// 假设示例代码保存为 ASCEND_EXAMPLE_PATH/asc_mmad_mx.asc
+// 构建产物保存目录为 ASCEND_BUILD_PATH
+// 可执行文件名为 c_api_cube_compute_asc_mmad_mx
+// 编译与运行命令：
+// "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang "$ASCEND_EXAMPLE_PATH/asc_mmad_mx.asc" -lm -o "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_mmad_mx" && "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_mmad_mx"
 
 #include <cstdint>
 #include <iostream>

@@ -44,7 +44,7 @@ $$
 | C | L0C Buffer | M×N | Nz | 16×16 |
 | Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
-表格中K0的取值为`32Byte / sizeof(dtype)`，`dtype`为矩阵的数据类型。
+表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。
 <!-- end id8 -->
 
 <!-- npu="A3,910b" id9 -->
@@ -57,7 +57,7 @@ $$
 | C | L0C Buffer | M×N | Nz | 16×16 |
 | Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩 | ND | - |
 
-表格中K0的取值为`32Byte / sizeof(dtype)`，`dtype`为矩阵的数据类型。
+表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。特别的，当数据类型为`int4b_t`时，`K0 = 64`。
 <!-- end id9 -->
 
 ## 函数原型
@@ -177,7 +177,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 | k_direction_align | 输入 | K方向对齐的核心功能是通过`k_direction_align`参数控制在使用float数据类型时，L0A Buffer和L0B Buffer矩阵在K方向上的对齐方式。<br>取值说明如下：<br>&nbsp;&nbsp;&bull; false：K方向对齐到`ceil(n_dim / 8) * 8`。<br>&nbsp;&nbsp;&bull; true：K方向对齐到`ceil(n_dim / 16) * 16`。 |
 | is_weight_offset | 输入 | 启用weight matrix offset。 |
 | c_matrix_source | 输入 | 当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer。 |
-| c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数c_matrix_source配置。 |
+| c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数`c_matrix_source`配置。 |
 <!-- end id15 -->
 
 ## 返回值说明
@@ -190,16 +190,19 @@ PIPE_M
 
 ## 约束说明
 
-- `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP（空操作）。
+- 本接口仅在AIC上生效，在AIV上调用为NOP（空操作）。
+- `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP。
 
 - **内存使用约束说明**
 
   <!-- npu="950" id10 -->
-  - 针对Ascend 950PR/Ascend 950DT，L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
-  <!-- end id10 -->
+  针对Ascend 950PR/Ascend 950DT:
+
+  - L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
   - 各矩阵的起始地址需满足[表5](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-  - 申请矩阵存储空间时，需使用按照分形大小补齐后的数值进行申请：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数，K0的取值为`32Byte / sizeof(dtype)`，`dtype`为矩阵的数据类型。
+  - 申请矩阵存储空间时，需使用按照分形大小补齐后的数值进行申请：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数，K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。`left_height`、`n_dim`和`right_width`仍传入矩阵的有效M、K、N值，补齐部分为无效数据，不参与结果矩阵有效区域的计算。
   - 当M为1且`disable_gemv`为false时，将开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
+  <!-- end id10 -->
 
   <!-- npu="A3,910b" id11 -->
   针对如下产品型号：
@@ -233,13 +236,19 @@ PIPE_M
 
 ## 调用示例
 
+<!-- npu="950" id18 -->
+针对Ascend 950PR/Ascend 950DT，示例如下：
+
 完整使用样例请参考[asc_mmad样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad)。
 
 以下为可执行的调用示例代码：
 
 ```cpp
-// 假设示例代码保存到asc_mmad.asc中，保存路径为ASCEND_EXAMPLE_PATH，构建产物保存路径为ASCEND_BUILD_PATH
-// 编译与运行命令: "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang $ASCEND_EXAMPLE_PATH/asc_mmad.asc -lm -o $ASCEND_BUILD_PATH && $ASCEND_BUILD_PATH
+// 假设示例代码保存为 ASCEND_EXAMPLE_PATH/asc_mmad.asc
+// 构建产物保存目录为 ASCEND_BUILD_PATH
+// 可执行文件名为 c_api_cube_compute_asc_mmad
+// 编译与运行命令：
+// "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang "$ASCEND_EXAMPLE_PATH/asc_mmad.asc" -lm -o "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_mmad" && "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_mmad"
 
 #include <cstdint>
 #include <iostream>
@@ -336,3 +345,4 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+<!-- end id18 -->
