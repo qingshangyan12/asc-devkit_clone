@@ -1,0 +1,155 @@
+# asc_copy_l12l0b
+
+## 产品支持情况
+
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+
+## 功能说明
+
+将数据从L1 Buffer搬运到L0B Buffer。本接口提供两种参数列表完全不同的功能模式，用户按需选择对应重载：
+
+- **2D矩阵搬运模式**：以512字节的分形为单位，从L1 Buffer中按M维（行方向）与K维（通道方向）的起始位置、步长切分提取多个分形矩阵搬运到L0B Buffer，用于普通矩阵计算所需的2D格式数据加载。
+
+本接口仅在AIC上执行有效，非AIC调用直接返回。
+
+## 函数原型
+
+### 2D搬运模式
+
+```cpp
+__aicore__ inline void asc_copy_l12l0b(__cb__ <dtype>* dst,
+                                       __cbuf__ <dtype>* src,
+                                       uint16_t m_start_position,
+                                       uint16_t k_start_position,
+                                       uint8_t m_step,
+                                       uint8_t k_step,
+                                       int16_t src_stride,
+                                       uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_sync(__cb__ <dtype>* dst,
+                                            __cbuf__ <dtype>* src,
+                                            uint16_t m_start_position,
+                                            uint16_t k_start_position,
+                                            uint8_t m_step,
+                                            uint8_t k_step,
+                                            int16_t src_stride,
+                                            uint16_t dst_stride)
+```
+
+### 2D转置搬运模式
+
+```cpp
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ <dtype>* dst,
+                                                 __cbuf__ <dtype>* src,
+                                                 uint16_t m_start_position,
+                                                 uint16_t k_start_position,
+                                                 uint8_t m_step,
+                                                 uint8_t k_step,
+                                                 int16_t src_stride,
+                                                 uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ <dtype>* dst,
+                                                      __cbuf__ <dtype>* src,
+                                                      uint16_t m_start_position,
+                                                      uint16_t k_start_position,
+                                                      uint8_t m_step,
+                                                      uint8_t k_step,
+                                                      int16_t src_stride,
+                                                      uint16_t dst_stride)
+```
+
+#### dtype支持的数据类型
+
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+#### 典型示例
+
+```cpp
+// 示例：half类型的2D搬运。
+__aicore__ inline void asc_copy_l12l0b(__cb__ half* dst,
+                                       __cbuf__ half* src,
+                                       uint16_t m_start_position,
+                                       uint16_t k_start_position,
+                                       uint8_t m_step,
+                                       uint8_t k_step,
+                                       int16_t src_stride,
+                                       uint16_t dst_stride)
+```
+
+## 参数说明
+
+### 2D矩阵搬运模式
+
+**表1** 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的操作数，存储位置为L0B Buffer。目的地址需512字节对齐。 |
+| src | 输入 | 源操作数，存储位置为L1 Buffer。源地址需32字节对齐。 |
+| m_start_position | 输入 | 源矩阵中首个分形在M维（行方向）的起始位置，单位为16个元素。取值范围 [0, 2^16−1]。 |
+| k_start_position | 输入 | 源矩阵中首个分形在K维（通道方向）的起始位置，单位32字节。取值范围 [0, 2^16−1]。 |
+| m_step | 输入 | M维（行方向）加载步长，即一次加载的分形行数，单位为16个元素。取值范围 [1, 255]。 |
+| k_step | 输入 | K维（通道方向）加载步长，即一次加载的分形列数，单位32字节。取值范围 [1, 255]。 |
+| src_stride | 输入 | 源端（L1 Buffer）相邻K步之间的步长，单位512字节。取值范围 [−2^15, 2^15−1]，可为负值（负值表示源端反向取数）。 |
+| dst_stride | 输入 | 目的端（L0B Buffer）相邻K步之间的步长，单位512字节。取值范围 [0, 2^16−1]，不可为负值。 |
+
+## 返回值说明
+
+无
+
+## 流水类型
+
+PIPE_MTE1
+
+## 约束说明
+
+- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
+
+### 通用约束
+
+- **本接口仅在AIC上生效，非AIC调用直接返回。**
+- dst起始地址需512字节对齐（L0B Buffer对齐要求），否则会导致搬运异常。
+- src起始地址需32字节对齐（L1 Buffer对齐要求），2D矩阵搬运模式下需32字节对齐；3D格式img2col搬运模式下按channel_size×sizeof(dtype) 对齐（channel_size≥dtype阈值时32字节对齐，channel_size较小时按对应字节数对齐）。不满足触发异常。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- L0B Buffer容量上限：L0B Buffer总容量64KB，dst偏移+搬运大小不可越界，否则触发写溢出异常。
+- L1 Buffer容量上限：L1 Buffer总容量512KB，src偏移+源矩阵占用大小不可越界，否则触发异常。
+
+### 2D矩阵搬运模式约束
+
+- m_step或k_step为0时不执行搬运，本接口被视为NOP（空操作）。
+- 2D矩阵搬运模式下不执行转置。如需转置，请使用对应的转置搬运接口。
+- src_stride为有符号数，可为负值；负值表示源端沿K维反向取数。dst_stride不可为负值。
+- 源矩阵在L1 Buffer中的占用不可超过L1 Buffer容量（含地址下溢），目的矩阵在L0B Buffer中的占用不可超过L0B Buffer容量，否则触发地址溢出异常。
+
+## 调用示例
+
+```cpp
+__cb__ bfloat16_t dst[256];
+__cbuf__ bfloat16_t src[256];
+uint16_t m_start_position = 8;
+uint16_t k_start_position = 2;
+uint8_t m_step = 4;
+uint8_t k_step = 4;
+int16_t src_stride = 1;
+uint16_t dst_stride = 1;
+asc_copy_l12l0b(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+```
