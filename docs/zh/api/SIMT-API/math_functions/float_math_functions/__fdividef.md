@@ -53,7 +53,7 @@ float __fdividef(float x, float y)
 ## 约束说明
 
 <!-- npu="950" id7 -->
-针对Ascend 950PR/Ascend 950DT，本接口受编译选项[--cce-use-fast-math](../../../../guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)的影响。但其不受编译选项[--cce-prec-div](../../../../guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)的影响。
+针对Ascend 950PR/Ascend 950DT，本接口不受编译选项[--cce-prec-div](../../../../guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)的影响。
 <!-- end id7 -->
 
 ## 需要包含的头文件
