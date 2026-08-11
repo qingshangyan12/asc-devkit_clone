@@ -40,16 +40,12 @@ __aicore__ inline void asc_sync_pipe_impl(pipe_t pipe)
             pipe_barrier(pipe_t::PIPE_FIX);
         }
     } else if ASC_IS_AIV {
-        if (pipe == pipe_t::PIPE_M) {
-            pipe_barrier(pipe_t::PIPE_M);
-        } else if (pipe == pipe_t::PIPE_MTE2) {
+        if (pipe == pipe_t::PIPE_MTE2) {
             pipe_barrier(pipe_t::PIPE_MTE2);
         } else if (pipe == pipe_t::PIPE_MTE3) {
             pipe_barrier(pipe_t::PIPE_MTE3);
         } else if (pipe == pipe_t::PIPE_ALL) {
             pipe_barrier(pipe_t::PIPE_ALL);
-        } else if (pipe == pipe_t::PIPE_V) {
-            pipe_barrier(pipe_t::PIPE_V);
         }
     }
 }
