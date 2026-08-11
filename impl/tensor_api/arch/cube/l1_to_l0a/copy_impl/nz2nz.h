@@ -55,13 +55,13 @@ public:
         auto src_offset = src.layout()(src_coord);
         auto dst_layout = dst.layout();
         using dst_type = typename DstTensor::element_type;
-        constexpr uint32_t stride_unit = c0_element<dst_type> * fractal_fixed;
-        auto m_step = get_element<attr_info::shape, attr_info::row, 1>(dst_layout);
-        auto k_step = get_element<attr_info::shape, attr_info::column, 1>(dst_layout);
-        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) / stride_unit;
-        auto dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / stride_unit;
-        load_l1_to_l0a_instr::load_data_with_offset<false>(dst, src, dst_offset, src_offset, 0, 0, m_step, k_step,
-                                                           src_stride, dst_stride);
+        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
+        auto m_step = get<0>(copy_shape) / FRACTAL_FIXED;
+        auto k_step = get<1>(copy_shape) / C0_ELEMENT<dst_type>;
+        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) / STRIDE_UNIT;
+        auto dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / STRIDE_UNIT;
+        load_l1_to_l0a_instr::load_data_with_offset<false>(
+            dst, src, dst_offset, src_offset, 0, 0, m_step, k_step, src_stride, dst_stride);
     }
 
 private:

@@ -35,7 +35,7 @@ public:
                                                         const Params&... params)
     {
         auto src_data = src.data() + src_offset;
-        data_copy(reinterpret_cast<uint64_t>(dst.data().get()), src_data.get(), params...);
+        data_copy(reinterpret_cast<uint64_t>((dst.data() + dst_offset).get()), src_data.get(), params...);
     }
 
     template <typename SrcType>
