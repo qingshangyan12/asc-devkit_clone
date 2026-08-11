@@ -47,9 +47,9 @@ __aicore__ inline void asc_sync_notify(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| `pipe` | 输入 | 源流水类型，即"等待哪条流水的前序指令完成"。取值范围为`pipe_t`枚举：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。不可取`PIPE_ALL`，否则触发异常。 |
-| `tpipe` | 输入 | 目标流水类型，即"解除哪条流水的`asc_sync_wait`阻塞"。取值范围与`pipe`相同，为`pipe_t`枚举。不可取`PIPE_ALL`，否则触发异常。 |
-| `id` | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`EVENT_ID0`~`EVENT_ID7`（即0~7）。 |
+| pipe | 输入 | 源流水类型，即“等待哪条流水的前序指令完成”。取值范围为`pipe_t`枚举：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。不可取`PIPE_ALL`，否则触发异常。 |
+| tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。不可取`PIPE_ALL`，否则触发异常。 |
+| id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`EVENT_ID0`~`EVENT_ID7`（即0~7）。 |
 
 针对不同产品，AIC与AIV中支持的“源流水-目的流水”的组合不同，具体请参考[核内同步概述](intra_core_sync_overview.md)。
 

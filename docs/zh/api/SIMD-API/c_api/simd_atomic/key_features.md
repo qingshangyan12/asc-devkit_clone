@@ -2,10 +2,11 @@
 
 确定性计算是指在相同输入条件下，无论执行次数或执行环境如何变化，总能产生完全一致输出结果的计算过程。确定性计算为系统稳定性和实验可验证性提供保障。
 
-> [!NOTE]说明
-> - 对于浮点数类型的原子累加，本文以`asc_set_atomic_add_float()`为例，更多原子操作类型参考[asc_set_atomic_add](asc_set_atomic_add.md)。
-> - 对于原子最大和原子最小，本文以`asc_set_atomic_max_float()`和`asc_set_atomic_min_float()`为例，更多原子操作类型参考[asc_set_atomic_max](asc_set_atomic_max.md)和[asc_set_atomic_min](asc_set_atomic_min.md)。
-> - 对于AIV和AIC中向GM搬运数据的接口，本文分别以`asc_copy_ub2gm()`和`asc_copy_l0c2gm()`为例，更多搬运接口参考[矢量数据搬运](../vector_data_move/)和[矩阵数据搬运](../cube_data_move/)。
+对下文描述中出现的接口有以下说明：
+
+- 对于浮点数类型的原子累加，本文以`asc_set_atomic_add_float()`为例，更多原子操作类型参考[asc_set_atomic_add](asc_set_atomic_add.md)。
+- 对于原子最大和原子最小，本文以`asc_set_atomic_max_float()`和`asc_set_atomic_min_float()`为例，更多原子操作类型参考[asc_set_atomic_max](asc_set_atomic_max.md)和[asc_set_atomic_min](asc_set_atomic_min.md)。
+- 对于AIV和AIC中向GM搬运数据的接口，本文分别以`asc_copy_ub2gm()`和`asc_copy_l0c2gm()`为例，更多搬运接口参考[矢量数据搬运](../vector_data_move/)和[矩阵数据搬运](../cube_data_move/)。
 
 ## 确定性计算概述<a name="ZH-CN_TOPIC_0000002555780816"></a>
 
@@ -36,7 +37,7 @@
 1. 初始状态，GM数据为：随机值；
 2. 向GM搬运data0，GM数据被初始化为：data0；
 3. 执行`asc_set_atomic_add_float()`，为后续搬运指令开启原子累加，GM数据为：data0；
-4. 三次带随路原子操作的搬运指令乱序，实际执行顺序为"搬出data2→搬出data3→搬出data1"，最终GM上数据为：data0 + data2 + data3 + data1。
+4. 三次带随路原子操作的搬运指令乱序，实际执行顺序为“搬出data2→搬出data3→搬出data1”，最终GM上数据为：data0 + data2 + data3 + data1。
 
 **非确定性计算的产生原因1：**
 
@@ -44,8 +45,8 @@
 
 带随路原子操作的搬运指令乱序，导致最终结果产生偏差的前提条件有以下三条：
 
-- 原子操作类型为原子累加（最大值、最小值运算满足结合律）
-- 原子操作数据类型为浮点数（整数加法满足结合律）
+- 原子操作类型为原子累加（最大值、最小值运算满足结合律）。
+- 原子操作数据类型为浮点数（整数加法满足结合律）。
 - 带随路原子操作的搬运指令达到3条及以上（浮点数加法满足交换律，但是不满足结合律）。
 
 ## 非确定性计算，结果2<a name="zh-cn_topic_0000002552941426_section1547411390818"></a>
@@ -83,7 +84,7 @@
     >开启原子操作的指令与后续搬运指令之间的同步由硬件保证。
 
 ```text
-// 整个原子累加在同一个核内执行，控制5个指令的执行顺序为"1→2→3→4→5"。
+// 整个原子累加在同一个核内执行，控制5个指令的执行顺序为“1→2→3→4→5”。
 1. 向GM搬运数据data0;    // 数据搬运，覆盖GM原有随机值，期望GM数据为data0。
 核内同步
 2. asc_set_atomic_add_float();         // 开启原子累加，后续从UB/L0C Buffer/L1 Buffer到GM的搬运均执行原子累加。

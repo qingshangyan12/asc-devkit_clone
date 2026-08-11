@@ -44,9 +44,9 @@ __aicore__ inline void asc_sync_wait(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| `pipe` | 输入 | 源流水类型，即"等待哪条流水的前序指令完成"。取值范围为`pipe_t`枚举：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。不可取`PIPE_ALL`，否则触发异常。 |
-| `tpipe` | 输入 | 目标流水类型，即"解除哪条流水的`asc_sync_wait`阻塞"。取值范围与`pipe`相同，为`pipe_t`枚举。不可取`PIPE_ALL`，否则触发异常。 |
-| `id` | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`EVENT_ID0`~`EVENT_ID7`（即0~7）。 |
+| pipe | 输入 | 源流水类型，即“等待哪条流水的前序指令完成”。取值范围为`pipe_t`枚举：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。不可取`PIPE_ALL`，否则触发异常。 |
+| tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。不可取`PIPE_ALL`，否则触发异常。 |
+| id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`EVENT_ID0`~`EVENT_ID7`（即0~7）。 |
 
 针对不同产品，AIC与AIV中支持的“源流水-目的流水”的组合不同，具体请参考[核内同步概述](intra_core_sync_overview.md)。
 
@@ -65,7 +65,7 @@ PIPE_S
 - 本接口需与`asc_sync_notify`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致，否则同步关系不成立。
 - `pipe`与`tpipe`均不可取`PIPE_ALL`，否则触发异常。
 - `id`取值范围为0~7，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。
-- 本接口只阻塞其所在流水线（`tpipe`）的后续指令，不影响其他流水线指令的执行；阻塞期间 `pipe` 流水线可继续执行后续指令。
+- 本接口只阻塞其所在流水线（`tpipe`）的后续指令，不影响其他流水线指令的执行；阻塞期间`pipe`流水线可继续执行后续指令。
 <!-- npu="950" id8 -->
 - 在[NPU架构3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)上，[asc_lock](asc_lock.md)与[asc_unlock](asc_unlock.md)组合也可实现多流水同步。与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水线解耦，可简化反向同步逻辑。
 <!-- end id8 -->
