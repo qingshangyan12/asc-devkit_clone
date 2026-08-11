@@ -51,6 +51,7 @@ add_executable(${HCCL_MC2_CCU_SELECTOR_TARGET}
     ${HCCL_MC2_CCU_SELECTOR_DIR}/dag_conflict_testcase.cpp
     ${HCCL_MC2_CCU_SELECTOR_DIR}/stubs.cc
     ${UTILS_DIR}/ccu/ccu_all_to_all_mesh1d_adapter.cc
+    ${UTILS_DIR}/ccu_scenario/ccu_fixture.cc
     ${UTILS_DIR}/ccu_scenario/ccu_all_to_all.cc
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )
