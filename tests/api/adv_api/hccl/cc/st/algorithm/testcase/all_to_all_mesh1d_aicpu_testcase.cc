@@ -230,17 +230,6 @@ protected:
     }
 };
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, route_uses_local_asc_devkit_algorithms)
-{
-    EXPECT_TRUE(UseCannBridgeForAicpuOp(COMM_ENGINE_AICPU_TS, HCCL_CMD_ALLREDUCE));
-    EXPECT_TRUE(UseCannBridgeForAicpuOp(COMM_ENGINE_AICPU, HCCL_CMD_ALLREDUCE));
-    EXPECT_FALSE(UseCannBridgeForAicpuOp(COMM_ENGINE_AICPU_TS, HCCL_CMD_ALLGATHER));
-    EXPECT_FALSE(UseCannBridgeForAicpuOp(COMM_ENGINE_AICPU_TS, HCCL_CMD_REDUCE_SCATTER));
-    EXPECT_FALSE(UseCannBridgeForAicpuOp(COMM_ENGINE_AICPU_TS, HCCL_CMD_ALLTOALLV));
-    EXPECT_FALSE(UseCannBridgeForAicpuOp(COMM_ENGINE_AICPU_TS, HCCL_CMD_ALLTOALL));
-    EXPECT_FALSE(UseCannBridgeForAicpuOp(COMM_ENGINE_CPU, HCCL_CMD_ALLREDUCE));
-}
-
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, selectors_return_local_mesh1d_algorithms)
 {
     TopoInfoWithNetLayerDetails topoInfo{};

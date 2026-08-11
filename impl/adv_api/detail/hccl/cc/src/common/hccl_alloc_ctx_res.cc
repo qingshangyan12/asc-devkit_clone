@@ -813,6 +813,19 @@ HcclResult GetOpParam(
 {
     CHK_RET(InitOpParamByTiling(comm, stream, tag, ccTiling, opParam));
 
+    // ALLTOALL场景下sendCounts需指向host侧真实数组，且必须在整个GetOpParam调用链
+    // (含SelectAlgAndPrepareEngine、GetOpParamResCtx中的GetAlgExecViaCann)期间保持存活。
+    // 该数组持有在本函数栈帧，覆盖opParam的全部使用范围。
+    constexpr uint64_t ALLTOALL_DEFAULT_SEND_COUNTS = 200ULL * 1024 * 1024;
+    std::vector<uint64_t> sendCounts;
+    void* origSendCounts = opParam.all2AllVDataDes.sendCounts;
+    if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+        uint32_t userRankSize = 0;
+        CHK_RET(HcclGetRankSize(comm, &userRankSize));
+        sendCounts.assign(userRankSize, ALLTOALL_DEFAULT_SEND_COUNTS);
+        opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void*>(sendCounts.data());
+    }
+
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     bool forcedAlgAccepted = false;
@@ -826,6 +839,7 @@ HcclResult GetOpParam(
     bool skipGetRes = false;
     CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
     if (skipGetRes) {
+        opParam.all2AllVDataDes.sendCounts = origSendCounts;
         return HCCL_SUCCESS;
     }
 
@@ -842,12 +856,16 @@ HcclResult GetOpParam(
         CHK_RET(FillOpParamAlgName(opParam, algName));
         CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
         if (skipGetRes) {
+            opParam.all2AllVDataDes.sendCounts = origSendCounts;
             return HCCL_SUCCESS;
         }
         CHK_RET(GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence));
     } else {
         CHK_RET(resRet);
     }
+    // GetOpParamResCtx执行结束，sendCounts的临时host数组已不再需要，
+    // 将指向恢复为原值(大概率为nullptr)，避免遗留指向本函数栈内vector的悬空指针。
+    opParam.all2AllVDataDes.sendCounts = origSendCounts;
     return HCCL_SUCCESS;
 }
 
