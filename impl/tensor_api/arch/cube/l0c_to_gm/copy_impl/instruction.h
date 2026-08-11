@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -29,11 +29,24 @@ namespace te {
 
 class copy_l0c_to_gm_instr {
 public:
+    template <QuantMode_t quant_pre, typename T, typename U, typename... param_types>
+    __aicore__ inline static void data_copy_tensor(const T& dst, const U& src, const param_types&... params)
+    { data_copy<quant_pre>(dst.data().get(), src.data().get(), params...); }
+
+    template <QuantMode_t quant_pre, typename T, typename U, typename dst_offset_type, typename src_offset_type, typename... param_types>
+    __aicore__ inline static void data_copy_region(
+        const T& dst, const U& src, const dst_offset_type& dst_offset, const src_offset_type& src_offset, const param_types&... params)
+    {
+        auto dst_data = dst.data() + dst_offset;
+        auto src_data = src.data() + src_offset;
+        data_copy<quant_pre>(dst_data.get(), src_data.get(), params...);
+    }
+
     template <QuantMode_t quant_pre, typename T, typename U>
     __aicore__ inline static void data_copy(__gm__ T* dst, __cc__ U* src, uint32_t n_size, uint32_t m_size,
-                                                       uint32_t src_stride, uint32_t dst_stride, uint8_t cache_mode,
-                                                       bool relu_en, uint8_t unit_flag, bool is_channel_split,
-                                                       bool nz2nd_en, bool nz2dn_en)
+                                                   uint32_t src_stride, uint32_t dst_stride, uint8_t cache_mode,
+                                                   bool relu_en, uint8_t unit_flag, bool is_channel_split, bool nz2nd_en,
+                                                   bool nz2dn_en)
     {
         if ASCEND_IS_AIV {
             return;

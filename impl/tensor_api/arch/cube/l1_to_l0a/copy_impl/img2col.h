@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/img2col.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -28,33 +28,52 @@ namespace asc {
 namespace te {
 class load_data_l1_to_l0a_img2col {
 public:
-    template <const copy_l1_to_l0a_trait& trait, typename DstTensor, typename SrcTensor, typename PadT>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const img2col_params<PadT>& params)
+    template <const copy_l1_to_l0a_trait& trait, typename dst_tensor_type, typename src_tensor_type, typename pad_type>
+    __aicore__ inline static void run(const dst_tensor_type& dst, const src_tensor_type& src, const img2col_params<pad_type>& params)
     {
-        // PadT (the pad_value type) should match the L0A dst element type so the padding register bit
-        // pattern is correct; the caller picks it when constructing img2col_params<PadT>.
+        // pad_type (the pad_value type) should match the l0a dst element type so the padding register bit
+        // pattern is correct; the caller picks it when constructing img2col_params<pad_type>.
         auto dst_layout = dst.layout();
         auto src_layout = src.layout();
 
-        // Window start offsets come from params (default 0). Non-zero values let an M tile start
-        // mid-row (m_start_pt = wout_start) or a K chunk start inside a C0 block (k_start_pt).
+        // Window start offsets come from params (default 0). Non-zero values let an m_value tile start
+        // mid-row (m_start_pt = wout_start) or a k_size chunk start inside a c0_value block (k_start_pt).
         uint16_t k_start_pt = params.k_start_pt;
         uint16_t m_start_pt = params.m_start_pt;
 
-        // src L1 NC1HWC0 (N, C1, H, W, C0): l1_h/l1_w are the feature-map dims, channel_size = C1*C0.
+        // src l1 NC1HWC0 (n_value, c1, height, width, c0_value): l1_h/l1_w are the feature-map dims, channel_size = c1*c0_value.
         uint16_t l1_h = get<2>(src_layout.shape());
         uint16_t l1_w = get<3>(src_layout.shape());
         uint16_t channel_size = get<1>(src_layout.shape()) * get<4>(src_layout.shape());
 
         load_l1_to_l0a_img2col_instr::set_f_matrix(l1_h, l1_w, params.pad_list);
         load_l1_to_l0a_img2col_instr::set_padding(params.pad_value);
-        load_l1_to_l0a_img2col_instr::set_repeat(
-            static_cast<uint16_t>(Std::ceil_division(params.m_extension, FRACTAL_FIXED)));
-        load_l1_to_l0a_img2col_instr::load_data(dst.data().get(), src.data().get(), params.k_extension,
-                                            params.m_extension, k_start_pt, m_start_pt,
-                                           params.stride_w, params.stride_h, params.filter_w, params.filter_h,
-                                           params.dilation_filter_w, params.dilation_filter_h, params.filter_size_w,
-                                           params.filter_size_h, params.transpose, params.f_matrix_ctrl, channel_size);
+        load_l1_to_l0a_img2col_instr::set_repeat(static_cast<uint16_t>(Std::ceil_division(params.m_extension, FRACTAL_FIXED)));
+        load_l1_to_l0a_img2col_instr::load_data_tensor(
+            dst, src, params.k_extension, params.m_extension, k_start_pt, m_start_pt, params.stride_w, params.stride_h,
+            params.filter_w, params.filter_h, params.dilation_filter_w, params.dilation_filter_h, params.filter_size_w,
+            params.filter_size_h, params.transpose, params.f_matrix_ctrl, channel_size);
+    }
+
+    template <const copy_l1_to_l0a_trait& trait, typename dst_tensor_type, typename src_tensor_type, typename coord_dst_type,
+        typename coord_src_type, typename shape_type, typename pad_type>
+    __aicore__ inline static void run(const dst_tensor_type& dst, const src_tensor_type& src, const coord_dst_type& coord_dst,
+        const coord_src_type& coord_src, const shape_type& shape, const img2col_params<pad_type>& params)
+    {
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        uint16_t l1_h = get<2>(region_shape);
+        uint16_t l1_w = get<3>(region_shape);
+        uint16_t channel_size = get<1>(region_shape) * get<4>(region_shape);
+        load_l1_to_l0a_img2col_instr::set_f_matrix(l1_h, l1_w, params.pad_list);
+        load_l1_to_l0a_img2col_instr::set_padding(params.pad_value);
+        load_l1_to_l0a_img2col_instr::set_repeat(static_cast<uint16_t>(Std::ceil_division(params.m_extension, FRACTAL_FIXED)));
+        load_l1_to_l0a_img2col_instr::load_data_region(dst, src, dst_offset, src_offset, params.k_extension, params.m_extension, 0, 0,
+            params.stride_w, params.stride_h, params.filter_w, params.filter_h, params.dilation_filter_w,
+            params.dilation_filter_h, params.filter_size_w, params.filter_size_h, params.transpose,
+            params.f_matrix_ctrl, channel_size);
     }
 };
 

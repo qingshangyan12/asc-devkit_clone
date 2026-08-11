@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -33,6 +33,37 @@ public:
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         data_copy_impl<trait, T, U>(dst, src);
+    }
+
+    template <const copy_l1_to_fixbuf_trait& trait, typename T, typename U, typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape)
+    {
+        check_template<trait, T, U>();
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        constexpr uint32_t ADDR_ALIGN = 128;
+        constexpr uint16_t BURST_UNIT = 64;
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        uint16_t src_col = get_total_column_shape_from_shape(region_shape);
+        uint16_t block_count = get_total_row_shape_from_shape(region_shape);
+        uint16_t src_row;
+        uint16_t dst_row;
+        if constexpr (is_satisfied_ptn_format_v<U, nd_layout_ptn>) {
+            src_row = get_element<attr_info::stride, attr_info::row>(src.layout());
+            dst_row = get_element<attr_info::stride, attr_info::row>(dst.layout());
+        } else {
+            src_row = get_element<attr_info::stride, attr_info::row, 1>(src.layout());
+            dst_row = get_element<attr_info::stride, attr_info::row, 1>(dst.layout());
+        }
+        uint16_t block_len = Std::ceil_align(src_col * sizeof(src_type), ADDR_ALIGN) / BURST_UNIT;
+        uint16_t src_stride = Std::ceil_division(src_row * sizeof(src_type), C0_SIZE<>);
+        uint16_t dst_stride = Std::ceil_align(dst_row * sizeof(dst_type), ADDR_ALIGN) / BURST_UNIT;
+        copy_l1_to_fixbuf_instr::data_copy_region(
+            dst, src, dst_offset, src_offset, block_count, block_len, src_stride, dst_stride);
     }
 
 private:
@@ -79,14 +110,11 @@ private:
             dst_row = get_element<attr_info::stride, attr_info::row, 1>(dst_layout);
         }
 
-        uint16_t block_len =
-            Std::ceil_align(src_col * sizeof(src_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
+        uint16_t block_len = Std::ceil_align(src_col * sizeof(src_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
         uint16_t src_stride = Std::ceil_division(src_row * sizeof(src_type), C0_SIZE<>);
-        uint16_t dst_stride =
-            Std::ceil_align(dst_row * sizeof(dst_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
+        uint16_t dst_stride = Std::ceil_align(dst_row * sizeof(dst_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
 
-        copy_l1_to_fixbuf_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
-                                              dst_stride);
+        copy_l1_to_fixbuf_instr::data_copy_tensor(dst, src, block_count, block_len, src_stride, dst_stride);
     }
 };
 
