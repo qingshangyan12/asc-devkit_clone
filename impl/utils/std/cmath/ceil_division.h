@@ -15,8 +15,8 @@
 #ifndef IMPL_STD_CEIL_DIVISION_H
 #define IMPL_STD_CEIL_DIVISION_H
 
-#include "utils/std/algorithm.h"
-#include "utils/std/type_traits.h"
+#include "../algorithm/min.h"
+#include "../type_traits/is_integral.h"
 
 namespace AscendC {
 namespace Std {
