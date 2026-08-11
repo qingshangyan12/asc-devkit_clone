@@ -33,7 +33,7 @@ public:
     __aicore__ inline static void
     data_copy(__ubuf__ T* dst, __gm__ T* src, const uint16_t block_count, const uint32_t block_len,
                  const uint8_t left_padding_count, const uint8_t right_padding_count,
-                 const bool enable_constant_pad, const asc_load_l2_cache_mode cache_mode,
+                 const bool enable_constant_pad, const uint8_t cache_mode,
                  const int64_t src_stride, const int64_t dst_stride)
     {
         if ASCEND_IS_AIC {

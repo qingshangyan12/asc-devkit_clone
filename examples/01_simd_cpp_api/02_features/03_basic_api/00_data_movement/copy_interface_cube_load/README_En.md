@@ -1,0 +1,3 @@
+# Tensor API Copy Cube Load Interface Example
+
+`COPY_ROUTE=0..4` covers `GM->L1`, `L1->UB`, `L1->BiasTable`, `L1->L0A`, and `L1->L0B`. `SCENARIO_NUM=0..2` selects explicit-Atom regional, inferred-Atom whole-Tensor, or inferred-Atom regional calls. All five routes use data golden checks. The first two export shared UB through AIV after cross-core synchronization, BiasTable is observed through biased MMAD, and L0A/L0B are reconstructed with right/left `32x32` identity MMAD probes. L0A/L0B S0 uses a `32x16` region crossing M fractals; S2 uses a `16x32` region crossing N fractals. Regional cases also check the untouched sentinel area. Run the verifier with both route and scenario. There are 15 combinations.
