@@ -118,8 +118,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* src_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 
@@ -136,8 +135,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 
@@ -145,8 +143,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float4_e2m1x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e2m1x2_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 
@@ -154,8 +151,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 
@@ -163,8 +159,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
-        vgatherb(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, index, mask);
+        vgatherb(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src, index, mask);
     }
 }
 
@@ -172,8 +167,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e8m0_t* src_tmp = reinterpret_cast<__ubuf__ float8_e8m0_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 // ==========无mask参数=========
@@ -262,8 +256,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* src_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 
@@ -279,8 +272,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 
@@ -288,8 +280,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float4_e2m1x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e2m1x2_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 
@@ -297,8 +288,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 
@@ -315,8 +305,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e8m0_t* src_tmp = reinterpret_cast<__ubuf__ float8_e8m0_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 
