@@ -52,7 +52,7 @@ Ascend C documentation follows the three-dimension requirements defined in the "
 
 | Rule | Requirement | Wrong Example | Correct Example |
 |------|-------------|---------------|-----------------|
-| Terminology Layering | High-level chapters use abstract terms; low-level chapters associate hardware terms on first occurrence | Overview document directly writes "data is moved from UB into VEC" | Overview document writes "data is moved from external storage into on-chip storage", low-level document writes "data is moved from Global Memory into UB (on-chip storage)" |
+| Terminology Layering | High-level chapters use abstract terms; low-level chapters associate hardware terms on first occurrence | Overview document directly writes "data is moved from Unified Buffer into VEC" | Overview document writes "data is moved from external storage into on-chip storage", low-level document writes "data is moved from Global Memory into Unified Buffer (on-chip storage)" |
 | Easily Confused Concept Distinction | Similar-named concepts must be distinguished with comparison tables, not left for readers to infer | Only mentions "four-step method" without distinguishing Tiling flow and TPipe pipeline | Use a table to distinguish: four-step = programming flow, TPipe four steps = pipeline management paradigm |
 | Constraint Visibility | Hardware constraints should be annotated when concepts first appear, not deferred to later chapters or only exposed through compiler errors | 32B alignment constraint only appears in assert | Add a separate "Constraints and Limitations" paragraph before parameter descriptions |
 | First-occurrence Linking | When content managed by another document is mentioned, add a link on first occurrence only, not repeated | Every mention of DataCopy gets a link | Only the first mention of DataCopy links to the API Reference Manual |
@@ -202,7 +202,7 @@ For Ascend 950PR/Ascend 950DT products:
 
 **Requirements**:
 - When different products use different layout formats (e.g., Zz vs Nz), **separate tables are required**
-- Physical location uses Buffer names (L0A/L0B/L0C/UB, etc.)
+- Physical location uses Buffer names (L0A/L0B/L0C/Unified Buffer, etc.)
 - Format uses fractal layout names (Zz/Zn/Nz/ND, etc.)
 - If a bias matrix exists, annotate in the C matrix row: "Can support bias matrix Bias initialization, dimension 1 x N"
 

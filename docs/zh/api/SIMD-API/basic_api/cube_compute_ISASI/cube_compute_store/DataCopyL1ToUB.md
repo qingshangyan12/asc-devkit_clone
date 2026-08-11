@@ -1,4 +1,4 @@
-# DataCopyL1ToUB（L1到UB数据搬运）
+# DataCopyL1ToUB（L1到Unified Buffer（UB）数据搬运）
 
 ## 产品支持情况
 
@@ -32,7 +32,7 @@
 
 ## 功能说明
 
-提供从L1 Buffer搬运数据到Unified Buffer的基础能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。
+提供从L1 Buffer搬运数据到UB的基础能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。
 
 ## 函数原型
 

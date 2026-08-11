@@ -34,11 +34,11 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer的数据搬运过程中进行ND到NZ格式的转换。
+该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer（UB）的数据搬运过程中进行ND到NZ格式的转换。
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../aux_data_structures/TPosition.md)表示）：
 
-- Global Memory -> Unified Buffer
+- Global Memory -> UB
     - GM -> VECIN
 
 ## 函数原型<a name="section1954364615315"></a>
@@ -150,7 +150,7 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
     | dstNzMatrixStride | [1, 65535] |
 
 <!-- npu="310p" id6 -->
-- 针对Atlas 推理系列产品AI Core，需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区。
+- 针对Atlas 推理系列产品AI Core，需要预留8KB的UB空间，作为接口的临时数据存放区。
 <!-- end id6 -->
 
 ## 调用示例<a name="section10309141400"></a>

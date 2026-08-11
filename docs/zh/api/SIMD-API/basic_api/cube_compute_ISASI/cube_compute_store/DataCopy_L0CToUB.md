@@ -1,4 +1,4 @@
-# DataCopy（L0C Buffer到UB数据搬运）<a name="ZH-CN_TOPIC_0000002382867725"></a>
+# DataCopy（L0C Buffer到Unified Buffer（UB）数据搬运）<a name="ZH-CN_TOPIC_0000002382867725"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -29,7 +29,7 @@
 
 ## 功能说明<a name="section474617392321"></a>
 
-对数据搬运能力进行增强，相比于基础数据搬运接口，增加了L0C Buffer-\>Unified Buffer（UB）通路的随路计算。
+对数据搬运能力进行增强，相比于基础数据搬运接口，增加了L0C Buffer-\>UB通路的随路计算。
 
 ## 函数原型<a name="section1954364615315"></a>
 

@@ -48,7 +48,7 @@ __aicore__ inline int64_t asc_get_status()
 | 5 | 浮点运算溢出。SIMD指令int16_t和int32_t算术运算溢出也会上报到该位。 |
 | 6 | 浮点运算下溢（结果浮点数小于非规格化数能表示的最小值，则结果为0）。 |
 | 7 | 将任意浮点数转换为无符号整数时，输入为负数。 |
-| 8 | 从L0C到UB的数据搬运过程中发生溢出（float->half、int32_t->half）。 |
+| 8 | 从L0C到Unified Buffer（UB）的数据搬运过程中发生溢出（float->half、int32_t->half）。 |
 | 9 | 从L0C到UB的数据搬运过程中发生下溢（float->half）。 |
 | 10 | CUBE累加运算溢出（可能是float、half、int32_t）。 |
 | 11 | CUBE累加运算下溢（可能是float、half）。 |

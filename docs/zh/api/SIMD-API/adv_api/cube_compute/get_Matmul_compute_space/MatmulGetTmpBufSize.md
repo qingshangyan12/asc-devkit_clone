@@ -2,7 +2,7 @@
 
 ## 功能说明
 
-本接口用于在调用[GetTiling](../Matmul_Tiling/GetTiling.md)接口获取Tiling参数后，根据Tiling结构体信息获取L1 Buffer/Unified Buffer/L0C Buffer的使用大小。
+本接口用于在调用[GetTiling](../Matmul_Tiling/GetTiling.md)接口获取Tiling参数后，根据Tiling结构体信息获取L1 Buffer/Unified Buffer（UB）/L0C Buffer的使用大小。
 
 ## 函数原型
 
@@ -17,7 +17,7 @@ int32_t MatmulGetTmpBufSize(optiling::TCubeTiling& tiling, matmul_tiling::SysTil
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | tiling | 输入 | Matmul单核Tiling的结构体，即MatmulTiling对象得到的TCubeTiling结构体。 |
-| bufSize | 输出 | Tiling中L1 Buffer/Unified Buffer/L0C Buffer的使用大小。<br><br>SysTilingTempBufSize结构定义如下方代码所示。 |
+| bufSize | 输出 | Tiling中L1 Buffer/UB/L0C Buffer的使用大小。<br><br>SysTilingTempBufSize结构定义如下方代码所示。 |
 
 ```
 struct SysTilingTempBufSize {

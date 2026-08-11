@@ -95,7 +95,7 @@ Matmul Tiling API分为Matmul单核Tiling接口、多核Tiling接口和BatchMatm
 | EnableBias | 设置Bias是否参与运算。 |
 | SetBias | 设置Bias是否参与运算。建议使用EnableBias接口。 |
 | SetFixSplit | 设置固定的baseM、baseN、baseK，单位为元素个数。 |
-| SetBufferSpace | 设置Matmul计算时可用的L1/L0C/UB空间大小，单位为字节。 |
+| SetBufferSpace | 设置Matmul计算时可用的L1/L0C/Unified Buffer（UB）空间大小，单位为字节。 |
 | SetTraverse | 设置遍历方式，M轴优先还是N轴优先。 |
 | SetMadType | 设置是否开启HF32模式。当前版本暂不支持。 |
 | SetSplitRange | 设置baseM/baseN/baseK的最大值和最小值。 |

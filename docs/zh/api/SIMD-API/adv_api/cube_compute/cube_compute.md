@@ -1,6 +1,6 @@
 # 矩阵计算
 
--   **[Matmul Kernel侧接口](Matmul_Kernel/Matmul_Kernel.md)**  
+-   **[Matmul Kernel侧接口](Matmul_Kernel/Matmul_Kernel.md)**
 
 -   **[Matmul Tiling类](Matmul_Tiling/Matmul_Tiling.md)**
 
