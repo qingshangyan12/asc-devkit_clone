@@ -60,17 +60,19 @@ private:
             check_template_for_mx<trait, T, U, S, V>();
         }
 
-        bool cmatrix_source = false;
+        bool init_with_btbuf = false;
         if constexpr (Std::is_same_v<get_mem_location<V>, location::bias>) {
-            cmatrix_source = true;
+            init_with_btbuf = true;
         }
 
         if constexpr (trait.mmad_type == mmad_type::normal) {
-            mmad_bias_instr::mmad(dst, fm, filter, bias, params.m, params.k, params.n, params.unit_flag,
-                                  trait.disable_gemv, cmatrix_source, false);
+            mmad_bias_instr::mmad(dst, fm, filter, bias, params.m, params.k, params.n,
+                                  static_cast<uint8_t>(params.unit_flag),
+                                  trait.disable_gemv, init_with_btbuf, false);
         } else if constexpr (trait.mmad_type == mmad_type::mx) {
-            mmad_mx_bias_instr::mmad(dst, fm, filter, bias, params.m, params.k, params.n, params.unit_flag,
-                                     trait.disable_gemv, cmatrix_source, false);
+            mmad_mx_bias_instr::mmad(dst, fm, filter, bias, params.m, params.k, params.n,
+                                     static_cast<uint8_t>(params.unit_flag),
+                                     trait.disable_gemv, init_with_btbuf, false);
         }
     }
 };

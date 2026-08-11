@@ -32,14 +32,14 @@ namespace te {
 __aicore__ inline static void set_ctrl_for_hifloat8()
 {
     uint64_t ori_config = asc_get_ctrl();
-    uint64_t config = ori_config | HIFLOAT8_MMAD_CTRL_MASK;
+    uint64_t config = ori_config | hifloat8_mmad_ctrl_mask;
     asc_set_ctrl(config);
 }
 
 __aicore__ inline static void reset_ctrl_for_hifloat8()
 {
     uint64_t ori_config = asc_get_ctrl();
-    uint64_t config = ori_config & ~HIFLOAT8_MMAD_CTRL_MASK;
+    uint64_t config = ori_config & ~hifloat8_mmad_ctrl_mask;
     asc_set_ctrl(config);
 }
 
@@ -54,8 +54,8 @@ public:
 private:
     template <typename T, typename U, typename S>
     __aicore__ inline static void mmad_impl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t k,
-                                            uint16_t n, uint8_t unit_flag, bool disable_gemv, bool cmatrix_source,
-                                            bool cmatrix_init_val)
+                                            uint16_t n, uint8_t unit_flag, bool disable_gemv, bool init_with_btbuf,
+                                            bool init_with_zero)
     {
         if ASCEND_IS_AIV {
             return;
@@ -63,10 +63,10 @@ private:
         if constexpr (Std::is_same_v<U, hifloat8_t> && Std::is_same_v<S, hifloat8_t>) {
             set_ctrl_for_hifloat8();
             asc_mmad(dst, reinterpret_cast<__ca__ fp8_e4m3fn_t*>(fm), reinterpret_cast<__cb__ fp8_e4m3fn_t*>(filter), m,
-                     k, n, unit_flag, disable_gemv, cmatrix_source, cmatrix_init_val);
+                     k, n, unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
             reset_ctrl_for_hifloat8();
         } else {
-            asc_mmad(dst, fm, filter, m, k, n, unit_flag, disable_gemv, cmatrix_source, cmatrix_init_val);
+            asc_mmad(dst, fm, filter, m, k, n, unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
         }
     }
 };
@@ -85,7 +85,7 @@ private:
     template <typename T, typename U, typename S>
     __aicore__ inline static void mmad_impl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, uint16_t m,
                                             uint16_t k, uint16_t n, int8_t unit_flag, bool disable_gemv,
-                                            bool cmatrix_source, bool cmatrix_init_val)
+                                            bool init_with_btbuf, bool init_with_zero)
     {
         if ASCEND_IS_AIV {
             return;
@@ -95,11 +95,11 @@ private:
         if constexpr (Std::is_same_v<U, hifloat8_t> && Std::is_same_v<S, hifloat8_t>) {
             set_ctrl_for_hifloat8();
             asc_mmad((__cc__ T*)xd, reinterpret_cast<__ca__ fp8_e4m3fn_t*>(fm),
-                     reinterpret_cast<__cb__ fp8_e4m3fn_t*>(filter), m, k, n, unit_flag, disable_gemv, cmatrix_source,
-                     cmatrix_init_val);
+                     reinterpret_cast<__cb__ fp8_e4m3fn_t*>(filter), m, k, n, unit_flag, disable_gemv, init_with_btbuf,
+                     init_with_zero);
             reset_ctrl_for_hifloat8();
         } else {
-            asc_mmad((__cc__ T*)xd, fm, filter, m, k, n, unit_flag, disable_gemv, cmatrix_source, cmatrix_init_val);
+            asc_mmad((__cc__ T*)xd, fm, filter, m, k, n, unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
         }
     }
 };
@@ -115,13 +115,13 @@ public:
 private:
     template <typename T, typename U, typename S>
     __aicore__ inline static void mmad_impl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t k,
-                                            uint16_t n, uint8_t unit_flag, bool disable_gemv, bool cmatrix_source,
-                                            bool cmatrix_init_val)
+                                            uint16_t n, uint8_t unit_flag, bool disable_gemv, bool init_with_btbuf,
+                                            bool init_with_zero)
     {
         if ASCEND_IS_AIV {
             return;
         }
-        asc_mmad_mx(dst, fm, filter, m, k, n, unit_flag, disable_gemv, cmatrix_source, cmatrix_init_val);
+        asc_mmad_mx(dst, fm, filter, m, k, n, unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
     }
 };
 
@@ -139,13 +139,13 @@ private:
     template <typename T, typename U, typename S>
     __aicore__ inline static void mmad_impl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, uint16_t m,
                                             uint16_t k, uint16_t n, int8_t unit_flag, bool disable_gemv,
-                                            bool cmatrix_source, bool cmatrix_init_val)
+                                            bool init_with_btbuf, bool init_with_zero)
     {
         if ASCEND_IS_AIV {
             return;
         }
         uint64_t xd = ((uint64_t)dst) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
-        asc_mmad_mx((__cc__ T*)xd, fm, filter, m, k, n, unit_flag, disable_gemv, cmatrix_source, cmatrix_init_val);
+        asc_mmad_mx((__cc__ T*)xd, fm, filter, m, k, n, unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
     }
 };
 

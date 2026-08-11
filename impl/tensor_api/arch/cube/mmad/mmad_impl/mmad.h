@@ -55,12 +55,14 @@ private:
     {
         if constexpr (trait.mmad_type == mmad_type::normal) {
             check_template_for_normal<trait, T, U, S>();
-            mmad_instr::mmad(dst, fm, filter, params.m, params.k, params.n, params.unit_flag, trait.disable_gemv,
-                             trait.cmatrix_source, params.cmatrix_init_val);
+            mmad_instr::mmad(dst, fm, filter, params.m, params.k, params.n,
+                             static_cast<uint8_t>(params.unit_flag), trait.disable_gemv,
+                             trait.init_with_btbuf, params.init_with_zero);
         } else if constexpr (trait.mmad_type == mmad_type::mx) {
             check_template_for_mx<trait, T, U, S>();
-            mmad_mx_instr::mmad(dst, fm, filter, params.m, params.k, params.n, params.unit_flag, trait.disable_gemv,
-                                trait.cmatrix_source, params.cmatrix_init_val);
+            mmad_mx_instr::mmad(dst, fm, filter, params.m, params.k, params.n,
+                                static_cast<uint8_t>(params.unit_flag), trait.disable_gemv,
+                                trait.init_with_btbuf, params.init_with_zero);
         }
     }
 };

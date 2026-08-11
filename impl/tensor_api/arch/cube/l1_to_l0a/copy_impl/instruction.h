@@ -27,16 +27,14 @@
 namespace asc {
 namespace te {
 
-struct copy_l1_to_l0a_trait {};
-
-constexpr img2col_params<int16_t> DEFAULT_IMG2COL_PARAMS{};
+constexpr img2col_params<int16_t> default_img2col_params{};
 
 class load_l1_to_l0a_instr {
 public:
     template <bool transpose, typename T>
     __aicore__ inline static void load_data(__ca__ T* dst, __cbuf__ T* src, uint16_t m_start_position,
-                                               uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
-                                               int16_t src_stride, uint16_t dst_stride)
+                                            uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+                                            int16_t src_stride, uint16_t dst_stride)
     {
         if ASCEND_IS_AIV {
             return;
@@ -93,9 +91,9 @@ public:
     template <typename T>
     __aicore__ inline static void
     load_data(__ca__ T* dst, __cbuf__ T* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
-                 uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
-                 uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-                 bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
+              uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
+              uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
+              bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
     {
         if ASCEND_IS_AIV {
             return;

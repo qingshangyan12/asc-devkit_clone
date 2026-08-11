@@ -30,8 +30,8 @@ namespace te {
 
 class data_copy_l0c_to_gm_nz2ncdhw {
 public:
-    template <const copy_l0c_to_gm_trait& trait, typename T, typename U>
-    __aicore__ inline static void run(const T& dst, const U& src, const fixpipe_params& params)
+    template <const l0c_to_gm_trait& trait, typename T, typename U>
+    __aicore__ inline static void run(const T& dst, const U& src, const l0c_to_gm_params& params)
     {
         constexpr QuantMode_t quant_pre = get_quant_mode<trait.round_mode, T, U>();
         check_data_type::check_l0c_to_gm_data_type<quant_pre, T, U>();
@@ -50,12 +50,12 @@ public:
         // row count = Stride[1] (= D*H*W).
         uint32_t n_size = get<1>(dst_layout.shape());
         uint32_t m_size = get<2>(dst_layout.shape()) * get<3>(dst_layout.shape()) * get<4>(dst_layout.shape());
-        uint32_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / FRACTAL_FIXED;
+        uint32_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / fractal_fixed;
         uint32_t dst_stride = get<1>(dst_layout.stride());
 
         uint8_t cache_mode = dst.engine().get_cache_mode();
         bool relu_en = trait.enable_relu;
-        uint8_t unit_flag = params.unit_flag;
+        uint8_t unit_flag = static_cast<uint8_t>(params.unit_flag);
         bool is_channel_split = trait.enable_channel_split;
 
         copy_l0c_to_gm_instr::data_copy<quant_pre>(dst.data().get(), src.data().get(), n_size, m_size, src_stride,

@@ -29,8 +29,6 @@
 namespace asc {
 namespace te {
 
-struct copy_ub_to_ub_trait {};
-
 class copy_ub_to_ub_common {
 protected:
     template <typename T, typename U>
@@ -48,7 +46,7 @@ protected:
         uint16_t dst_stride_in32_b = static_cast<uint16_t>(dst_stride >> 5);
 
         copy_ub_to_ub_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len_in32_b,
-                                          src_stride_in32_b, dst_stride_in32_b);
+                                       src_stride_in32_b, dst_stride_in32_b);
     }
 };
 
