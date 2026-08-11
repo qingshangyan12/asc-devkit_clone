@@ -56,7 +56,8 @@ __simd_callee__ inline void asc_loadunalign_pre_impl(vector_load_unalign& dst, _
 __simd_callee__ inline void asc_loadunalign_pre_impl(vector_load_unalign& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
-        vldas(dst, src);
+        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
+        vldas(dst, src_tmp);
     }
 }
 
@@ -177,7 +178,8 @@ __simd_callee__ inline void asc_loadunalign_pre_impl(
 __simd_callee__ inline void asc_loadunalign_pre_impl(vector_load_unalign& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
-        vlda(dst, src, offset);
+        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
+        vlda(dst, src_tmp, offset);
     }
 }
 

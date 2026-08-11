@@ -491,7 +491,7 @@ __simd_callee__ inline void asc_storealign_intlv_impl(
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        vsts(src0, src1, dst_align32b_, 0, INTLV_B8, mask);
+        vsts(src0, src1, dst_align32b, 0, INTLV_B8, mask);
     }
 }
 

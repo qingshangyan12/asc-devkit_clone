@@ -1338,7 +1338,8 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
-        vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src, offset, DS_B8);
+        __ubuf__ float4_e1m2x2* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2*>(src);
+        vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, DS_B8);
     }
 }
 

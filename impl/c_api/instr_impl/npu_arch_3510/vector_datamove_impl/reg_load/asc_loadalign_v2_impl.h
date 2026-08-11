@@ -24,7 +24,6 @@ __simd_callee__ inline void asc_loadalign_impl(vector_fp4x2_e1m2_t& dst, __ubuf_
 __simd_callee__ inline void asc_loadalign_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
-
         vld(dst, src, offset, NORM);
     }
 }

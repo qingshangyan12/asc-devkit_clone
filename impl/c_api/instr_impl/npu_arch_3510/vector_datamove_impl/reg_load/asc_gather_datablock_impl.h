@@ -159,7 +159,8 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vgatherb(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src, index, mask);
+        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
+        vgatherb(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, index, mask);
     }
 }
 
