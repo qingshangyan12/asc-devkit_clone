@@ -99,7 +99,7 @@
 
 - 配置环境变量
 
-  首先根据[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install)，构建并安装包含本接口的asc-devkit开发套件包，然后选择对应的环境变量配置命令。
+  首先根据[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md#prepare&install)，构建并安装包含本接口的asc-devkit开发套件包，然后选择对应的环境变量配置命令。
 
   - 默认路径，root用户安装CANN软件包
 
