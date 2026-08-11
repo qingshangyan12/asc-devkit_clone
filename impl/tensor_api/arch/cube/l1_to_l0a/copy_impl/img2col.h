@@ -28,7 +28,7 @@ namespace asc {
 namespace te {
 class load_data_l1_to_l0a_img2col {
 public:
-    template <const copy_l1_to_l0a_trait& trait, typename DstTensor, typename SrcTensor, typename PadT>
+    template <const l1_to_l0a_trait& trait, typename DstTensor, typename SrcTensor, typename PadT>
     __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const img2col_params<PadT>& params)
     {
         // PadT (the pad_value type) should match the L0A dst element type so the padding register bit
@@ -49,7 +49,7 @@ public:
         load_l1_to_l0a_img2col_instr::set_f_matrix(l1_h, l1_w, params.pad_list);
         load_l1_to_l0a_img2col_instr::set_padding(params.pad_value);
         load_l1_to_l0a_img2col_instr::set_repeat(
-            static_cast<uint16_t>(Std::ceil_division(params.m_extension, FRACTAL_FIXED)));
+            static_cast<uint16_t>(Std::ceil_division(params.m_extension, fractal_fixed)));
         load_l1_to_l0a_img2col_instr::load_data(dst.data().get(), src.data().get(), params.k_extension,
                                             params.m_extension, k_start_pt, m_start_pt,
                                            params.stride_w, params.stride_h, params.filter_w, params.filter_h,

@@ -29,8 +29,6 @@
 namespace asc {
 namespace te {
 
-struct copy_ub_to_gm_trait {};
-
 class copy_ub_to_gm_common {
 protected:
     template <typename T, typename U>
@@ -43,8 +41,8 @@ protected:
         adjust_b4_copy_params<src_type, dst_type>(block_len, src_stride, dst_stride);
 
         auto cache_mode = static_cast<asc_store_l2_cache_mode>(dst.engine().get_cache_mode());
-        copy_ub_to_gm_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len,
-                                                   src_stride, dst_stride, cache_mode);
+        copy_ub_to_gm_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
+                                       dst_stride, cache_mode);
     }
 };
 

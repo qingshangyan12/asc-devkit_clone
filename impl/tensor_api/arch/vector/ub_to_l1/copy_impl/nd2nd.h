@@ -29,21 +29,21 @@ namespace te {
 
 class copy_ub_to_l1_nd : private copy_ub_to_l1_common {
 public:
-    template <const copy_ub_to_l1_trait& trait, typename T, typename U>
+    template <const ub_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         data_copy_impl<trait, T, U>(dst, src);
     }
 
 private:
-    template <const copy_ub_to_l1_trait& trait, typename T, typename U>
+    template <const ub_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<U, T>();
         check_data_type::check_ub_to_l1_data_type<T, U>();
     }
 
-    template <const copy_ub_to_l1_trait& trait, typename T, typename U>
+    template <const ub_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
     {
         using src_type = typename U::element_type;
@@ -55,12 +55,13 @@ private:
         auto src_layout = src.layout();
 
         uint16_t block_count = get_total_row_shape(src_layout);
-        TENSOR_API_DEBUG_CHECK(debug_check_block_count, block_count, "src row shape size", "copy_ub_to_l1 ND path");
-        uint32_t block_len = Std::ceil_division(get_total_column_shape(src_layout), C0_ELEMENT<src_type>);
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, block_count, "src row shape size",
+                               "copy_ub_to_l1 ND path");
+        uint32_t block_len = Std::ceil_division(get_total_column_shape(src_layout), c0_element<src_type>);
         int64_t src_stride =
-            Std::ceil_division(get_row_stride(src_layout) - get_total_column_shape(src_layout), C0_ELEMENT<src_type>);
+            Std::ceil_division(get_row_stride(src_layout) - get_total_column_shape(src_layout), c0_element<src_type>);
         int64_t dst_stride =
-            Std::ceil_division(get_row_stride(dst_layout) - get_total_column_shape(src_layout), C0_ELEMENT<dst_type>);
+            Std::ceil_division(get_row_stride(dst_layout) - get_total_column_shape(src_layout), c0_element<dst_type>);
 
         emit_copy(dst, src, block_count, block_len, src_stride, dst_stride);
     }

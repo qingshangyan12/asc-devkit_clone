@@ -29,14 +29,15 @@ namespace te {
 
 class copy_gm_to_l1_nd2nd {
 public:
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
         // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
         constexpr auto gm_depth = nesting_depth_v<decltype(src.layout().shape())>;
-        if constexpr (gm_depth == THREE_DIM_DATA || gm_depth == FIVE_DIM_DATA) {
-            TENSOR_API_DEBUG_CHECK(debug_check_batch_count, get<0>(src.layout().shape()), "copy_gm_to_l1 nd2nd path");
+        if constexpr (gm_depth == three_dim_data || gm_depth == five_dim_data) {
+            TENSOR_API_DEBUG_CHECK(debug_check_batch_count, get<0>(src.layout().shape()),
+                                   "copy_gm_to_l1 nd2nd path");
             batch_data_copy_impl<trait, T, U>(dst, src);
         } else {
             data_copy_impl<trait, T, U>(dst, src);
@@ -44,14 +45,14 @@ public:
     }
 
 private:
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<U, T>();
         check_data_type::check_gm_to_l1_align_v2_nd_data_type<T, U>();
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
     {
         check_template<trait, T, U>();
@@ -86,7 +87,7 @@ private:
 
         uint8_t cache_mode = src.engine().get_cache_mode();
 
-        // normal mode, dst_stride % C0_SIZE should be 0
+        // normal mode, dst_stride % c0_size should be 0
         // compact mode, block_len equals dst_stride
         // multi rows copy, dst non-contiguous case
         uint32_t block_count = src_shape_rows;
@@ -122,7 +123,7 @@ private:
     //   - get<0>(Shape/Stride) returns the batch size and per-matrix start-to-start stride.
     //   - When batches are also contiguous (src_batch_stride == M*N && dst_batch_stride == M*N),
     //     fold the B blocks into a single B*M*N block; otherwise emit B blocks, one per matrix.
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void batch_data_copy_impl(const T& dst, const U& src)
     {
         check_template<trait, T, U>();

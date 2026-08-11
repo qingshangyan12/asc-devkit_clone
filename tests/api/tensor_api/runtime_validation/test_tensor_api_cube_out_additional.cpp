@@ -237,7 +237,7 @@ void expect_gm_batch_capacity_trap()
     auto batched_quant = make_tensor_at<location::l1>(
         batched_quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(SRC_BATCH, _1{}, N));
 
-    expect_batch_copy_trap<variant, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, shared_quant,
+    expect_batch_copy_trap<variant, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, shared_quant,
                                                                                   batched_quant);
 }
 
@@ -261,7 +261,7 @@ void expect_ub_batch_capacity_trap()
     auto batched_quant = make_tensor_at<location::l1>(
         batched_quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(SRC_BATCH, _1{}, N));
 
-    expect_batch_copy_trap<variant, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, shared_quant,
+    expect_batch_copy_trap<variant, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, shared_quant,
                                                                                   batched_quant);
 }
 
@@ -305,7 +305,7 @@ void expect_gm_invalid_role_trap()
     alignas(512) static __gm__ float dst_data[M * N] = {};
     alignas(512) static __cc__ float src_data[M * N] = {};
     alignas(512) static __cbuf__ uint64_t quant_data[N] = {};
-    expect_l0c_out_invalid_role_trap<location::gm, copy_l0c_to_gm, copy_l0c_to_gm_trait_default, variant, role, kind>(
+    expect_l0c_out_invalid_role_trap<location::gm, copy_l0c_to_gm, l0c_to_gm_trait_default, variant, role, kind>(
         dst_data, src_data, quant_data);
 }
 
@@ -317,7 +317,7 @@ void expect_ub_invalid_role_trap()
     alignas(512) static __ubuf__ float dst_data[M * N] = {};
     alignas(512) static __cc__ float src_data[M * N] = {};
     alignas(512) static __cbuf__ uint64_t quant_data[N] = {};
-    expect_l0c_out_invalid_role_trap<location::ub, copy_l0c_to_ub, copy_l0c_to_ub_trait_default, variant, role, kind>(
+    expect_l0c_out_invalid_role_trap<location::ub, copy_l0c_to_ub, l0c_to_ub_trait_default, variant, role, kind>(
         dst_data, src_data, quant_data);
 }
 
@@ -367,7 +367,7 @@ void expect_gm_zero_dst_stride_trap()
     auto dst = make_tensor_at<location::gm>(dst_data, make_zero_row_stride_layout<DstLayoutPattern>());
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
 }
 
 template <typename DstLayoutPattern>
@@ -384,7 +384,7 @@ void expect_ub_zero_dst_stride_trap()
     auto dst = make_tensor_at<location::ub>(dst_data, make_zero_row_stride_layout<DstLayoutPattern>());
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
 }
 
 template <QuantVariant variant>
@@ -402,7 +402,7 @@ void expect_l1_matrix_capacity_trap()
     auto dst = make_tensor_at<location::l1>(dst_data, make_frame_layout<nz_layout_ptn, LayoutTraitType>(DST_M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<variant, copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(dst, src, quant);
+    expect_copy_trap<variant, copy_l0c_to_l1, l0c_to_l1_trait_default>(dst, src, quant);
 }
 
 template <QuantVariant variant, InvalidTensorRole role, InvalidLayoutKind kind>
@@ -422,19 +422,19 @@ void expect_l1_invalid_role_trap()
         auto dst = make_tensor_directly<location::l1>(dst_data, make_invalid_nz_layout<float, kind, LayoutTraitType>());
         auto src = make_tensor_at<location::l0c>(src_data, valid_src_layout);
         auto quant = make_tensor_at<location::l1>(quant_data, valid_quant_layout);
-        expect_copy_trap<variant, copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(dst, src, quant);
+        expect_copy_trap<variant, copy_l0c_to_l1, l0c_to_l1_trait_default>(dst, src, quant);
     } else if constexpr (role == InvalidTensorRole::SRC) {
         auto dst = make_tensor_at<location::l1>(dst_data, valid_dst_layout);
         auto src =
             make_tensor_directly<location::l0c>(src_data, make_invalid_nz_layout<float, kind, LayoutTraitType>());
         auto quant = make_tensor_at<location::l1>(quant_data, valid_quant_layout);
-        expect_copy_trap<variant, copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(dst, src, quant);
+        expect_copy_trap<variant, copy_l0c_to_l1, l0c_to_l1_trait_default>(dst, src, quant);
     } else {
         static_assert(role == InvalidTensorRole::QUANT && variant == QuantVariant::TENSOR);
         auto dst = make_tensor_at<location::l1>(dst_data, valid_dst_layout);
         auto src = make_tensor_at<location::l0c>(src_data, valid_src_layout);
         auto quant = make_tensor_directly<location::l1>(quant_data, make_invalid_ndext_layout<uint64_t, kind>());
-        expect_copy_trap<variant, copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(dst, src, quant);
+        expect_copy_trap<variant, copy_l0c_to_l1, l0c_to_l1_trait_default>(dst, src, quant);
     }
 }
 
@@ -466,7 +466,7 @@ void expect_l1_n_limit_trap()
     auto dst = make_tensor_at<location::l1>(dst_data, make_frame_layout<nz_layout_ptn, LayoutTraitType>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_l1, l0c_to_l1_trait_default>(dst, src, quant);
 }
 
 void expect_l1_m_limit_trap()
@@ -481,7 +481,7 @@ void expect_l1_m_limit_trap()
     auto dst = make_tensor_at<location::l1>(dst_data, make_frame_layout<nz_layout_ptn, LayoutTraitType>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_l1, l0c_to_l1_trait_default>(dst, src, quant);
 }
 
 void expect_l1_src_stride_limit_trap()
@@ -499,7 +499,7 @@ void expect_l1_src_stride_limit_trap()
     auto dst = make_tensor_at<location::l1>(dst_data, make_frame_layout<nz_layout_ptn, LayoutTraitType>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_l1, l0c_to_l1_trait_default>(dst, src, quant);
 }
 
 void expect_l1_zero_dst_stride_trap()
@@ -514,7 +514,7 @@ void expect_l1_zero_dst_stride_trap()
     auto dst = make_tensor_at<location::l1>(dst_data, make_zero_nz_column_stride_layout<float, LayoutTraitType>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_l1, l0c_to_l1_trait_default>(dst, src, quant);
 }
 
 void expect_l1_invalid_unit_flag_trap()
@@ -528,9 +528,9 @@ void expect_l1_invalid_unit_flag_trap()
     auto src = make_tensor_at<location::l0c>(src_data, make_frame_layout<nz_layout_ptn, LayoutTraitType>(M, N));
     auto dst = make_tensor_at<location::l1>(dst_data, make_frame_layout<nz_layout_ptn, LayoutTraitType>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
-    fixpipe_params params{1};
+    fixpipe_params params{static_cast<unit_flag_mode>(1)};
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_l1, copy_l0c_to_l1_trait_default>(dst, src, quant, params);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_l1, l0c_to_l1_trait_default>(dst, src, quant, params);
 }
 
 template <typename DstLayoutPattern, QuantVariant variant>
@@ -549,7 +549,7 @@ void expect_gm_matrix_capacity_trap()
     auto dst = make_tensor_at<location::gm>(dst_data, make_frame_layout<DstLayoutPattern, float>(DST_M, DST_N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, SRC_N));
 
-    expect_copy_trap<variant, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<variant, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
 }
 
 template <typename DstLayoutPattern, QuantVariant variant>
@@ -568,7 +568,7 @@ void expect_ub_matrix_capacity_trap()
     auto dst = make_tensor_at<location::ub>(dst_data, make_frame_layout<DstLayoutPattern, float>(DST_M, DST_N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, SRC_N));
 
-    expect_copy_trap<variant, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<variant, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
 }
 
 template <QuantVariant variant>
@@ -588,7 +588,7 @@ void expect_gm_nc1hwc0_capacity_trap()
         dst_data, make_frame_layout<nc1hwc0_layout_ptn, float>(_1{}, _1{}, _1{}, _16{}, DST_C0));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, SRC_N));
 
-    expect_copy_trap<variant, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<variant, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
 }
 
 template <typename DstLayoutPattern>
@@ -607,7 +607,7 @@ void expect_gm_conv_capacity_trap()
         make_tensor_at<location::gm>(dst_data, make_frame_layout<DstLayoutPattern, float>(_1{}, _1{}, _16{}, _16{}));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, SRC_N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMNDRejectsInsufficientCapacityForAllQuantVariants)
@@ -806,8 +806,8 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMRejectsNAboveInstr
     auto dst = make_tensor_at<location::gm>(dst_data, make_frame_layout<nd_ext_layout_ptn, float>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsNAboveInstructionLimitForDirectQuantForms)
@@ -823,8 +823,8 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsNAboveInstr
     auto dst = make_tensor_at<location::ub>(dst_data, make_frame_layout<dn_ext_layout_ptn, float>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMRejectsNDMAboveLimitWithTensorQuant)
@@ -840,8 +840,8 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMRejectsNDMAboveLim
     auto dst = make_tensor_at<location::gm>(dst_data, make_frame_layout<nd_ext_layout_ptn, float>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsNDMAboveLimitWithoutQuant)
@@ -857,7 +857,7 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsNDMAboveLim
     auto dst = make_tensor_at<location::ub>(dst_data, make_frame_layout<nd_layout_ptn, float>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMRejectsNZMAboveLimitWithScalarQuant)
@@ -874,7 +874,7 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMRejectsNZMAboveLim
                                             make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsNZMAboveLimitWithTensorQuant)
@@ -891,8 +891,8 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsNZMAboveLim
                                             make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMRejectsNZNNotDivisibleBy16)
@@ -910,9 +910,9 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMRejectsNZNNotDivis
     auto dst = make_tensor_at<location::gm>(dst_data, make_frame_layout<nz_layout_ptn, float>(DST_M, DST_N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, DST_N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
-    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsNZNNotDivisibleBy16)
@@ -930,9 +930,9 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsNZNNotDivis
     auto dst = make_tensor_at<location::ub>(dst_data, make_frame_layout<nz_layout_ptn, float>(DST_M, DST_N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, DST_N));
 
-    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
-    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::NONE, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMRejectsSourceStrideAboveLimit)
@@ -950,7 +950,7 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMRejectsSourceStrid
     auto dst = make_tensor_at<location::gm>(dst_data, make_frame_layout<nd_ext_layout_ptn, float>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsSourceStrideAboveLimit)
@@ -968,7 +968,7 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBRejectsSourceStrid
     auto dst = make_tensor_at<location::ub>(dst_data, make_frame_layout<nd_ext_layout_ptn, float>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant);
+    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMQuantOverloadsRejectInvalidUnitFlag)
@@ -978,15 +978,15 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2GMQuantOverloadsReje
     alignas(512) __cc__ float src_data[M * N] = {};
     alignas(512) __gm__ float dst_data[M * N] = {};
     alignas(512) __cbuf__ uint64_t quant_data[N] = {};
-    fixpipe_params params{1};
+    fixpipe_params params{static_cast<unit_flag_mode>(1)};
 
     auto src = make_tensor_at<location::l0c>(src_data,
                                              make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(M, N));
     auto dst = make_tensor_at<location::gm>(dst_data, make_frame_layout<nd_ext_layout_ptn, float>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant, params);
-    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_gm, copy_l0c_to_gm_trait_default>(dst, src, quant, params);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant, params);
+    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_gm, l0c_to_gm_trait_default>(dst, src, quant, params);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBQuantOverloadsRejectInvalidUnitFlag)
@@ -996,15 +996,15 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, CopyL0C2UBQuantOverloadsReje
     alignas(512) __cc__ float src_data[M * N] = {};
     alignas(512) __ubuf__ float dst_data[M * N] = {};
     alignas(512) __cbuf__ uint64_t quant_data[N] = {};
-    fixpipe_params params{1};
+    fixpipe_params params{static_cast<unit_flag_mode>(1)};
 
     auto src = make_tensor_at<location::l0c>(src_data,
                                              make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(M, N));
     auto dst = make_tensor_at<location::ub>(dst_data, make_frame_layout<nd_ext_layout_ptn, float>(M, N));
     auto quant = make_tensor_at<location::l1>(quant_data, make_frame_layout<nd_ext_layout_ptn, uint64_t>(_1{}, N));
 
-    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant, params);
-    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_ub, copy_l0c_to_ub_trait_default>(dst, src, quant, params);
+    expect_copy_trap<QuantVariant::SCALAR, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant, params);
+    expect_copy_trap<QuantVariant::TENSOR, copy_l0c_to_ub, l0c_to_ub_trait_default>(dst, src, quant, params);
 }
 
 constexpr mmad_trait GEMV_ENABLED_MMAD_TRAIT = {0, false, false, false, mmad_type::normal};
@@ -1107,7 +1107,7 @@ void expect_mmad_no_bias_invalid_role_trap(const MmadTraitType& trait)
     alignas(512) static __ca__ InputType fm_data[M * K] = {};
     alignas(512) static __cb__ InputType filter_data[K * N] = {};
     alignas(512) static __cc__ float dst_data[M * N] = {};
-    mmad_params params{M, N, K, 0, true};
+    mmad_params params{M, N, K, unit_flag_mode::disable, true};
     auto atom = make_mmad(mmad_operation{}, trait).with(params);
 
     if constexpr (role == InvalidTensorRole::DST) {
@@ -1166,7 +1166,7 @@ void expect_mmad_with_bias_invalid_role_trap()
     alignas(512) static __cc__ float dst_data[M * N] = {};
     alignas(512) static __cc__ float l0c_bias_data[M * N] = {};
     alignas(512) static __biasbuf__ float bias_data[M * N] = {};
-    mmad_params params{M, N, K, 0, false};
+    mmad_params params{M, N, K, unit_flag_mode::disable, false};
     auto atom = make_mmad(mmad_operation{}, mmad_trait_default{}).with(params);
 
     if constexpr (role == InvalidTensorRole::DST) {
@@ -1225,16 +1225,16 @@ void expect_mmad_with_bias_invalid_roles()
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadNormalDefaultAtomRejectsInvalidUnitFlag)
 {
-    mmad_params params{16, 16, 16, 1, true};
+    mmad_params params{16, 16, 16, static_cast<unit_flag_mode>(1), true};
 
     EXPECT_THROW((run_normal_mmad_with_default_atom(params)), TrapException);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadMxRejectsDimensionsAboveLimit)
 {
-    mmad_params invalid_m{4096, 16, 16, 0, true};
-    mmad_params invalid_n{16, 4096, 16, 0, true};
-    mmad_params invalid_k{16, 16, 4096, 0, true};
+    mmad_params invalid_m{4096, 16, 16, unit_flag_mode::disable, true};
+    mmad_params invalid_n{16, 4096, 16, unit_flag_mode::disable, true};
+    mmad_params invalid_k{16, 16, 4096, unit_flag_mode::disable, true};
 
     EXPECT_THROW((run_mx_mmad(invalid_m)), TrapException);
     EXPECT_THROW((run_mx_mmad(invalid_n)), TrapException);
@@ -1243,7 +1243,7 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadMxRejectsDimensionsAbove
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadMxRejectsInvalidUnitFlag)
 {
-    mmad_params params{16, 16, 16, 1, true};
+    mmad_params params{16, 16, 16, static_cast<unit_flag_mode>(1), true};
 
     EXPECT_THROW((run_mx_mmad(params)), TrapException);
 }
@@ -1262,9 +1262,9 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadWithBiasRejectsInvalidOp
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadWithBiasRejectsDimensionAboveLimit)
 {
-    mmad_params invalid_m{4096, 16, 16, 0, false};
-    mmad_params invalid_n{16, 4096, 16, 0, false};
-    mmad_params invalid_k{16, 16, 4096, 0, false};
+    mmad_params invalid_m{4096, 16, 16, unit_flag_mode::disable, false};
+    mmad_params invalid_n{16, 4096, 16, unit_flag_mode::disable, false};
+    mmad_params invalid_k{16, 16, 4096, unit_flag_mode::disable, false};
 
     EXPECT_THROW((run_mmad_with_bias_at<location::bias>(invalid_m, mmad_trait_default{})), TrapException);
     EXPECT_THROW((run_mmad_with_bias_at<location::bias>(invalid_n, mmad_trait_default{})), TrapException);
@@ -1273,23 +1273,23 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadWithBiasRejectsDimension
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadWithBiasRejectsInvalidUnitFlag)
 {
-    mmad_params params{16, 16, 16, 1, false};
+    mmad_params params{16, 16, 16, static_cast<unit_flag_mode>(1), false};
 
     EXPECT_THROW((run_mmad_with_bias_at<location::bias>(params, mmad_trait_default{})), TrapException);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadWithBiasRejectsMatrixMAboveOneInGemvMode)
 {
-    mmad_params params{16, 16, 16, 0, false};
+    mmad_params params{16, 16, 16, unit_flag_mode::disable, false};
 
     EXPECT_THROW((run_mmad_with_bias_at<location::bias>(params, GemvEnabledMmadTrait{})), TrapException);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadWithL0CBiasRejectsDimensionAboveLimit)
 {
-    mmad_params invalid_m{4096, 16, 16, 0, false};
-    mmad_params invalid_n{16, 4096, 16, 0, false};
-    mmad_params invalid_k{16, 16, 4096, 0, false};
+    mmad_params invalid_m{4096, 16, 16, unit_flag_mode::disable, false};
+    mmad_params invalid_n{16, 4096, 16, unit_flag_mode::disable, false};
+    mmad_params invalid_k{16, 16, 4096, unit_flag_mode::disable, false};
 
     EXPECT_THROW((run_mmad_with_bias_at<location::l0c>(invalid_m, mmad_trait_default{})), TrapException);
     EXPECT_THROW((run_mmad_with_bias_at<location::l0c>(invalid_n, mmad_trait_default{})), TrapException);
@@ -1298,14 +1298,14 @@ TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadWithL0CBiasRejectsDimens
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadWithL0CBiasRejectsInvalidUnitFlag)
 {
-    mmad_params params{16, 16, 16, 1, false};
+    mmad_params params{16, 16, 16, static_cast<unit_flag_mode>(1), false};
 
     EXPECT_THROW((run_mmad_with_bias_at<location::l0c>(params, mmad_trait_default{})), TrapException);
 }
 
 TEST_F(TensorApiCubeOutAdditionalRuntimeValidation, MmadWithL0CBiasRejectsMatrixMAboveOneInGemvMode)
 {
-    mmad_params params{16, 16, 16, 0, false};
+    mmad_params params{16, 16, 16, unit_flag_mode::disable, false};
 
     EXPECT_THROW((run_mmad_with_bias_at<location::l0c>(params, GemvEnabledMmadTrait{})), TrapException);
 }

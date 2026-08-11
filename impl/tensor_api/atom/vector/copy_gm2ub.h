@@ -33,7 +33,7 @@ template <typename Traits>
 struct copy_traits<copy_gm_to_ub, Traits> : public copy_traits<copy_gm_to_ub, Traits, copy_gm_to_ub_with, Traits> {};
 
 template <>
-struct copy_traits<copy_gm_to_ub> : public copy_traits<copy_gm_to_ub, copy_gm_to_ub_trait_default> {};
+struct copy_traits<copy_gm_to_ub> : public copy_traits<copy_gm_to_ub, gm_to_ub_trait_default> {};
 
 template <typename TraitStruct>
 struct copy_traits<copy_gm_to_ub_with, TraitStruct> {
