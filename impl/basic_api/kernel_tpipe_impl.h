@@ -25,6 +25,10 @@
 #include "dav_3510/kernel_tpipe_impl_c310.h"
 #include "dav_3510/kernel_tpipe_impl_c310_vec.h"
 #include "kernel_tquesync_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+#include "dav_5161/kernel_tpipe_impl_c310.h"
+#include "dav_5161/kernel_tpipe_impl_c310_vec.h"
+#include "kernel_tquesync_impl.h"
 #else
 #include <type_traits>
 #include "kernel_tquebind_impl.h"
@@ -682,7 +686,8 @@ __aicore__ inline void TPipe::InitSpmBuffer(const GlobalTensor<T>& workspace, co
 
 __aicore__ inline void TPipe::InitSpmBuffer(const int32_t bufferSize)
 {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165)
     (void)(bufferSize);
     ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "not supported on current device"));
 #else

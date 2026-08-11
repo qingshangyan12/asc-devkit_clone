@@ -55,7 +55,7 @@ public:
     __aicore__ inline TQueBind();
     __aicore__ inline void FreeBuffer(TBufHandle buf);
     __aicore__ inline TBuffAddr GetBufferAddr(TBufHandle buf);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     template <typename T>
     __aicore__ inline __sync_noalias__ LocalTensor<T> AllocTensor();
     template <typename T>
@@ -105,7 +105,8 @@ protected:
     static constexpr HardEvent enQueEvt = GetQueEvt(srcHardType, dstHardType, true, nd2nz, nz2nd);
     static constexpr HardEvent freeBufEvt = GetQueEvt(srcHardType, dstHardType, false, nd2nz, nz2nd);
     static constexpr int32_t queDepth = depth;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     static constexpr bool enableGlobalManageQue = EnableGlobalManageQue<GetBufferPos(src, dst)>(config);
     static constexpr pipe_t srcPipe = GetPipe(srcHardType, dstHardType, true);
     static constexpr pipe_t dstPipe = GetPipe(srcHardType, dstHardType, false);
@@ -125,7 +126,7 @@ protected:
             uint8_t bufCursor;
         };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
         struct {
             uint32_t freeMask;
             uint8_t staticHead;
@@ -136,7 +137,7 @@ protected:
 #endif
     };
     typename TBufHandleAux<depth>::T que_;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     typename BufInfoAux<enableGlobalManageQue, config>::type bufStart;
 #else
     struct TBufType* bufStart;
@@ -147,7 +148,7 @@ protected:
     friend class TQue;
     template <TPosition pos, uint32_t bufIDSize>
     friend class TBufPool;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     template <TPosition bufPos, uint32_t bufIDSize>
     friend class TBufPoolExtImpl;
 #endif
@@ -160,7 +161,7 @@ private:
     __aicore__ inline LocalTensor<T> Buf2Tensor(TBufHandle buf);
     __aicore__ inline TBufState GetState(const TBufHandle& handle) const;
     static constexpr bool isTQue = true;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     __aicore__ inline uint64_t GetNext(const int32_t len = 1);
 #endif
     __aicore__ inline TBufHandle AllocBuffer();
@@ -168,7 +169,7 @@ private:
     __aicore__ inline bool EnQue(TBufHandle buf);
     template <TPosition srcUserPos, TPosition dstUserPos>
     __aicore__ inline TBufHandle DeQue();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     template <typename IMPL, typename A, typename B, typename L0cT, class C, const auto& MM_CFG, typename>
     friend class Impl::Detail::CubeOutBuffer;
     template <typename T>
@@ -194,7 +195,7 @@ private:
     template <TPosition bufPos, uint32_t bufIDSize>
     friend class TBufPool;
     static constexpr bool isTQue = true;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     template <TPosition bufPos, uint32_t bufIDSize>
     friend class TBufPoolExtImpl;
     template <typename T>
@@ -245,13 +246,13 @@ private:
     friend class TPipe;
     template <TPosition bufPos, uint32_t bufIDSize>
     friend class TBufPool;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     template <TPosition bufPos, uint32_t bufIDSize>
     friend class TBufPoolExtImpl;
 #endif
     static constexpr bool isTQue = false;
 };
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
 template <TPosition pos, uint32_t bufIDSize = defaultBufIDSize>
 class TBufPool : public TBufPoolExtImpl<pos, bufIDSize> {
 public:
@@ -296,7 +297,7 @@ private:
 };
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
 #define EXTERN_IMPL_BUFPOOL(EXT_BUFPOOL, POSITION, BUFID_SIZE)                           \
 public:                                                                                  \
     static constexpr AscendC::TPosition poolPos = POSITION;                              \
@@ -478,7 +479,8 @@ public:
     // NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
     template <TPosition pos>
     __aicore__ inline TBuffAddr GetAbsAddr(int32_t offset, int32_t len) const;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     __aicore__ inline MutexID AllocMutexID();
     __aicore__ inline void ReleaseMutexID(MutexID id);
 #endif
@@ -555,7 +557,7 @@ private:
      */
     template <TPosition pos>
     __aicore__ inline uint64_t GetQueueEndAddress();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165)
     __aicore__ inline TBufId AllocTscmBufId();
     __aicore__ inline int8_t AllocCrossSyncId();
 #endif

@@ -33,7 +33,7 @@ struct TBufHandleAux<1> {
     using T = TBufHandle;
 };
 constexpr TEventID INVALID_TEVENTID = (static_cast<TEventID>(-1));
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165)
 constexpr uint8_t INVALID_STATIC_ENQUE_HEAD = 0xff;
 constexpr int32_t MIN_BUFFER_BLOCK_SIZE = 32 * 1024;
 constexpr uint8_t TSCM_BUFID_MAX = 20;
@@ -144,7 +144,7 @@ struct TPipeImpl {
     SpmInfo spmInfo_;
     // the tscm buffer addr
     uint32_t tscmBufferPtr_;
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165)
     TBufId bufIdPool_;
     TBufId tscmBufIdPool_;
     TBufId sharedEvtId_;

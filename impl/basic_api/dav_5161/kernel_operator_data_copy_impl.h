@@ -58,9 +58,9 @@ template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void CopyGmToUbufAlignV2(
     __ubuf__ T* dst, __gm__ T* src, const uint16_t blockCount, const uint32_t blockLen, const uint8_t leftPaddingCount,
     const uint8_t rightPaddingCount, const int64_t srcStride, const int64_t dstStride, const bool isDataCopyPad,
-    const uint8_t cacheMode = 0, const bool isPad = true)
+    const bool isPad = true)
 {
-    if ASCEND_IS_AIV {
+    // if ASCEND_IS_AIV { // chengn
         // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte
         uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
         uint32_t burstLength = blockLen * unitOfBytes;
@@ -80,21 +80,21 @@ __aicore__ inline void CopyGmToUbufAlignV2(
         if constexpr (sizeof(T) == 8) { // B64
             copy_gm_to_ubuf_align_v2(
                 (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt * 2,
-                rigntPaddingCnt * 2, isPad, cacheMode, srcStride310, dstStride310);
+                rigntPaddingCnt * 2, isPad, srcStride310, dstStride310);
         } else if constexpr (sizeof(T) == 4) {
             copy_gm_to_ubuf_align_v2(
                 (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt,
-                rigntPaddingCnt, isPad, cacheMode, srcStride310, dstStride310);
+                rigntPaddingCnt, isPad, srcStride310, dstStride310);
         } else if constexpr (sizeof(T) == 2) {
             copy_gm_to_ubuf_align_v2(
                 (__ubuf__ uint16_t*)dst, (__gm__ uint16_t*)src, 0, blockCount, burstLength, leftPaddingCnt,
-                rigntPaddingCnt, isPad, cacheMode, srcStride310, dstStride310);
+                rigntPaddingCnt, isPad, srcStride310, dstStride310);
         } else if constexpr (sizeof(T) == 1) {
             copy_gm_to_ubuf_align_v2(
                 (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, blockCount, burstLength, leftPaddingCnt,
-                rigntPaddingCnt, isPad, cacheMode, srcStride310, dstStride310);
+                rigntPaddingCnt, isPad, srcStride310, dstStride310);
         }
-    }
+    // }
 }
 
 // only support VecCore   PIPE_MTE3
@@ -102,9 +102,9 @@ __aicore__ inline void CopyGmToUbufAlignV2(
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void CopyUbufToGmAlignV2(
     __gm__ T* dst, __ubuf__ T* src, const uint16_t blockCount, const uint32_t blockLen, const int64_t srcStride,
-    const int64_t dstStride, const bool isDataCopyPad, const uint8_t cacheMode = 0)
+    const int64_t dstStride, const bool isDataCopyPad)
 {
-    if ASCEND_IS_AIV {
+    // if ASCEND_IS_AIV { // chengn
         // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte / 32bytes
         uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
         uint32_t burstLength = blockLen * unitOfBytes;
@@ -119,8 +119,8 @@ __aicore__ inline void CopyUbufToGmAlignV2(
         }
         uint64_t dstStride310 = dstStride * unitOfBytes + burstLength; // GM   DataCopy:32Bytes, DataCopyPad:1Byte
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, burstLength, cacheMode, dstStride310, srcStride310);
-    }
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, burstLength, dstStride310, srcStride310);
+    // }
 }
 
 // only support CubeCore   PIPE_MTE2
@@ -170,17 +170,17 @@ __aicore__ inline void CopyGmToCbufAlignV2(
     // }
 }
 
-// only support VecCore   PIPE_V
-// UB -> UB: copy_ubuf_to_ubuf:  Note: burstLen + stride is unit of 32B
-template <typename T>
-__aicore__ inline void CopyUbufToUbuf(
-    __ubuf__ T* dst, __ubuf__ T* src, const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride,
-    const uint16_t dstStride)
-{
-    if ASCEND_IS_AIV {
-        copy_ubuf_to_ubuf((__ubuf__ void*)dst, (__ubuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
-    }
-}
+// // only support VecCore   PIPE_V
+// // UB -> UB: copy_ubuf_to_ubuf:  Note: burstLen + stride is unit of 32B
+// template <typename T>
+// __aicore__ inline void CopyUbufToUbuf(
+//     __ubuf__ T* dst, __ubuf__ T* src, const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride,
+//     const uint16_t dstStride)
+// {
+//     if ASCEND_IS_AIV {
+//         copy_ubuf_to_ubuf((__ubuf__ void*)dst, (__ubuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
+//     }
+// }
 
 // only support VecCore   PIPE_MTE3
 // UB -> L1: copy_ubuf_to_cbuf:  Note: burstLen + stride is unit of 32B
@@ -234,11 +234,11 @@ __aicore__ inline void CopyCbufToBt(
 // Small C0 Mode: only when D value <= 4 can enable
 __aicore__ inline void SmallC0Checker(bool enableSmallC0, uint16_t dValue)
 {
-    if (enableSmallC0) {
-        ASCENDC_ASSERT((dValue <= 4), {
-            KERNEL_LOG(KERNEL_ERROR, "Small C0 can be enabled only when D value is less or equal to 4.");
-        });
-    }
+    // if (enableSmallC0) {
+    //     ASCENDC_ASSERT((dValue <= 4), {
+    //         KERNEL_LOG(KERNEL_ERROR, "Small C0 can be enabled only when D value is less or equal to 4.");
+    //     });
+    // }
 }
 
 /* **************************************************************************************************
@@ -247,8 +247,7 @@ __aicore__ inline void SmallC0Checker(bool enableSmallC0, uint16_t dValue)
 
 // SRC: GM
 template <typename T>
-__aicore__ inline void DataCopyGM2UBImpl(
-    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+__aicore__ inline void DataCopyGM2UBImpl(__ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -258,11 +257,11 @@ __aicore__ inline void DataCopyGM2UBImpl(
         if constexpr (SupportType<T, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
             CopyGmToUbufAlignV2(
                 (__ubuf__ uint16_t*)dst, (__gm__ uint16_t*)src, intriParams.blockCount, intriParams.blockLen, 0, 0,
-                intriParams.srcStride, intriParams.dstStride, false, cacheMode, true);
+                intriParams.srcStride, intriParams.dstStride, false, true);
         } else {
             CopyGmToUbufAlignV2(
                 dst, src, intriParams.blockCount, intriParams.blockLen, 0, 0, intriParams.srcStride,
-                intriParams.dstStride, false, cacheMode, true);
+                intriParams.dstStride, false, true);
         }
     }
 }
@@ -270,14 +269,13 @@ __aicore__ inline void DataCopyGM2UBImpl(
 // Keep for compile
 template <>
 __aicore__ inline void DataCopyGM2UBImpl(
-    __ubuf__ void* dst, __gm__ void* src, const DataCopyParams& intriParams, const uint8_t cacheMode)
+    __ubuf__ void* dst, __gm__ void* src, const DataCopyParams& intriParams)
 {
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopyGM2UBImpl not support type void*"); });
 }
 
 template <typename T>
-__aicore__ inline void DataCopyGM2L1Impl(
-    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+__aicore__ inline void DataCopyGM2L1Impl(__cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams)
 {
 //     if constexpr (g_gm_overflow_check) {
 //         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -498,84 +496,84 @@ __aicore__ inline void DataCopyGM2UBND2NZImpl(
 
 __aicore__ inline void SetLoopModeOutParaImpl(const LoopModeParams& loopParams)
 {
-    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big and needs to be less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop1DstStride < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1DstStride is too big and needs to be less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop2DstStride < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2DstStride is too big and needs to be less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop1SrcStride < (1ul << 40)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big and needs to be less than 2^40");
-    });
-    ASCENDC_ASSERT((loopParams.loop2SrcStride < (1ul << 40)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big and needs to be less than 2^40");
-    });
-    uint64_t loopSizePara = static_cast<uint64_t>(loopParams.loop2Size) << 21; // LOOP_SIZE_OUTTOUB[42:21]
-    loopSizePara |= static_cast<uint64_t>(loopParams.loop1Size);               // LOOP_SIZE_OUTTOUB[20:0]
+    // ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 21)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^21");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big and needs to be less than 2^21");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop1DstStride < (1ul << 21)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1DstStride is too big and needs to be less than 2^21");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop2DstStride < (1ul << 21)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2DstStride is too big and needs to be less than 2^21");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop1SrcStride < (1ul << 40)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big and needs to be less than 2^40");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop2SrcStride < (1ul << 40)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big and needs to be less than 2^40");
+    // });
+    // uint64_t loopSizePara = static_cast<uint64_t>(loopParams.loop2Size) << 21; // LOOP_SIZE_OUTTOUB[42:21]
+    // loopSizePara |= static_cast<uint64_t>(loopParams.loop1Size);               // LOOP_SIZE_OUTTOUB[20:0]
 
-    // LOOP1_STRIDE_OUTTOUB[60:40], must be 32B aligned
-    ASCENDC_ASSERT((loopParams.loop1DstStride % GetDataBlockSizeInBytes() == 0), {
-        KERNEL_LOG(KERNEL_ERROR, "loop1DstStride must be 32B aligned");
-    });
-    uint64_t loop1StridePara = (loopParams.loop1DstStride) << 40; // loop1DstStride must be 32B aligned
-    loop1StridePara |= loopParams.loop1SrcStride;                 // LOOP1_STRIDE_OUTTOUB[39:0]
-    // LOOP2_STRIDE_OUTTOUB[60:40], must be 32B aligned
-    ASCENDC_ASSERT((loopParams.loop2DstStride % GetDataBlockSizeInBytes() == 0), {
-        KERNEL_LOG(KERNEL_ERROR, "loop2DstStride must be 32B aligned");
-    });
-    uint64_t loop2StridePara = (loopParams.loop2DstStride) << 40; // loop2DstStride must be 32B aligned
-    loop2StridePara |= loopParams.loop2SrcStride;                 // LOOP2_STRIDE_OUTTOUB[39:0]
+    // // LOOP1_STRIDE_OUTTOUB[60:40], must be 32B aligned
+    // ASCENDC_ASSERT((loopParams.loop1DstStride % GetDataBlockSizeInBytes() == 0), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loop1DstStride must be 32B aligned");
+    // });
+    // uint64_t loop1StridePara = (loopParams.loop1DstStride) << 40; // loop1DstStride must be 32B aligned
+    // loop1StridePara |= loopParams.loop1SrcStride;                 // LOOP1_STRIDE_OUTTOUB[39:0]
+    // // LOOP2_STRIDE_OUTTOUB[60:40], must be 32B aligned
+    // ASCENDC_ASSERT((loopParams.loop2DstStride % GetDataBlockSizeInBytes() == 0), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loop2DstStride must be 32B aligned");
+    // });
+    // uint64_t loop2StridePara = (loopParams.loop2DstStride) << 40; // loop2DstStride must be 32B aligned
+    // loop2StridePara |= loopParams.loop2SrcStride;                 // LOOP2_STRIDE_OUTTOUB[39:0]
 
-    set_loop_size_outtoub(loopSizePara);
-    set_loop1_stride_outtoub(loop1StridePara);
-    set_loop2_stride_outtoub(loop2StridePara);
+    // set_loop_size_outtoub(loopSizePara);
+    // set_loop1_stride_outtoub(loop1StridePara);
+    // set_loop2_stride_outtoub(loop2StridePara);
 }
 
 __aicore__ inline void SetLoopModeUBParaImpl(const LoopModeParams& loopParams)
 {
-    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big and needs to be less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop1SrcStride < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big and needs to be less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop2SrcStride < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big and needs to be less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop1DstStride < (1ul << 40)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1DstStride is too big and needs to be less than 2^40");
-    });
-    ASCENDC_ASSERT((loopParams.loop2DstStride < (1ul << 40)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2DstStride is too big and needs to be less than 2^40");
-    });
-    uint64_t loopSizePara = static_cast<uint64_t>(loopParams.loop2Size) << 21; // LOOP_SIZE_UBTOOUT[42:21]
-    loopSizePara |= static_cast<uint64_t>(loopParams.loop1Size);               // LOOP_SIZE_UBTOOUT[20:0]
+    // ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 21)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^21");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big and needs to be less than 2^21");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop1SrcStride < (1ul << 21)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big and needs to be less than 2^21");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop2SrcStride < (1ul << 21)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big and needs to be less than 2^21");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop1DstStride < (1ul << 40)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1DstStride is too big and needs to be less than 2^40");
+    // });
+    // ASCENDC_ASSERT((loopParams.loop2DstStride < (1ul << 40)), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2DstStride is too big and needs to be less than 2^40");
+    // });
+    // uint64_t loopSizePara = static_cast<uint64_t>(loopParams.loop2Size) << 21; // LOOP_SIZE_UBTOOUT[42:21]
+    // loopSizePara |= static_cast<uint64_t>(loopParams.loop1Size);               // LOOP_SIZE_UBTOOUT[20:0]
 
-    // LOOP1_STRIDE_UBTOOUT[60:40], must be 32B aligned
-    ASCENDC_ASSERT((loopParams.loop1SrcStride % GetDataBlockSizeInBytes() == 0), {
-        KERNEL_LOG(KERNEL_ERROR, "loop1SrcStride must be 32B aligned");
-    });
-    uint64_t loop1StridePara = (loopParams.loop1SrcStride) << 40; // loop1SrcStride must be 32B aligned
-    loop1StridePara |= loopParams.loop1DstStride;                 // LOOP1_STRIDE_UBTOOUT[39:0]
-    // LOOP2_STRIDE_UBTOOUT[60:40], must be 32B aligned
-    ASCENDC_ASSERT((loopParams.loop2SrcStride % GetDataBlockSizeInBytes() == 0), {
-        KERNEL_LOG(KERNEL_ERROR, "loop2SrcStride must be 32B aligned");
-    });
-    uint64_t loop2StridePara = (loopParams.loop2SrcStride) << 40; // loop2SrcStride must be 32B aligned
-    loop2StridePara |= loopParams.loop2DstStride;                 // LOOP2_STRIDE_UBTOOUT[39:0]
+    // // LOOP1_STRIDE_UBTOOUT[60:40], must be 32B aligned
+    // ASCENDC_ASSERT((loopParams.loop1SrcStride % GetDataBlockSizeInBytes() == 0), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loop1SrcStride must be 32B aligned");
+    // });
+    // uint64_t loop1StridePara = (loopParams.loop1SrcStride) << 40; // loop1SrcStride must be 32B aligned
+    // loop1StridePara |= loopParams.loop1DstStride;                 // LOOP1_STRIDE_UBTOOUT[39:0]
+    // // LOOP2_STRIDE_UBTOOUT[60:40], must be 32B aligned
+    // ASCENDC_ASSERT((loopParams.loop2SrcStride % GetDataBlockSizeInBytes() == 0), {
+    //     KERNEL_LOG(KERNEL_ERROR, "loop2SrcStride must be 32B aligned");
+    // });
+    // uint64_t loop2StridePara = (loopParams.loop2SrcStride) << 40; // loop2SrcStride must be 32B aligned
+    // loop2StridePara |= loopParams.loop2DstStride;                 // LOOP2_STRIDE_UBTOOUT[39:0]
 
-    set_loop_size_ubtoout(loopSizePara);
-    set_loop1_stride_ubtoout(loop1StridePara);
-    set_loop2_stride_ubtoout(loop2StridePara);
+    // set_loop_size_ubtoout(loopSizePara);
+    // set_loop1_stride_ubtoout(loop1StridePara);
+    // set_loop2_stride_ubtoout(loop2StridePara);
 }
 
 __aicore__ inline void ResetUBLoopModeParaImpl(void)
@@ -593,23 +591,23 @@ __aicore__ inline void ResetOutLoopModeParaImpl(void)
 }
 
 template <typename T>
-__aicore__ inline void DataCopyUB2GMImpl(
-    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+__aicore__ inline void DataCopyUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
         AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, false, intriParams);
     }
     CopyUbufToGmAlignV2(
-        dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, false,
-        cacheMode);
+        dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, false);
 }
 
 template <typename T>
 __aicore__ inline void DataCopyUB2UBImpl(__ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
-    CopyUbufToUbuf(
-        dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride);
+    // 当前#1018实现有问题，需要手动拼1017的config值
+    uint64_t config = ((uint64_t)intriParams.dstStride << 48) + (((uint64_t)intriParams.srcStride) << 32) +
+                      (((uint64_t)intriParams.blockLen) << 16) + ((uint64_t)intriParams.blockCount);
+    copy_ubuf_to_ubuf((__ubuf__ void*)dst, (__ubuf__ void*)src, config);
 }
 
 template <TPosition pos>
@@ -1114,61 +1112,58 @@ __aicore__ inline void CheckSrcGmDataCopyExtParamsRange(const DataCopyExtParams&
 
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadGm2UBImpl(
-    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams,
-    const uint8_t cacheMode = 0)
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams)
 {
     // if ASCEND_IS_AIC {
     //     return;
     // }
-    // if constexpr (g_gm_overflow_check) {
-    //     __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-    //     AscendCUtils::CheckGmMemOverflowNormal(src, workSpace, true, true, intriParams);
-    // }
-    // if (padParams.isPad == true) {
-    //     set_mov_pad_val(padParams.paddingValue);
-    // }
-    // if constexpr (sizeof(T) > B32_BYTE_SIZE) {
-    //     ASCENDC_ASSERT((padParams.paddingValue == 0), {
-    //         KERNEL_LOG(KERNEL_ERROR, "b64 paddingValue on current device only support 0");
-    //     });
-    // }
-    // CopyGmToUbufAlignV2<T, mode>(
-    //     dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
-    //     intriParams.srcStride, intriParams.dstStride, true, cacheMode,
-    //     padParams.isPad); // padding is 0
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNormal(src, workSpace, true, true, intriParams);
+    }
+    if (padParams.isPad == true) {
+        set_mov_pad_val(padParams.paddingValue);
+    }
+    if constexpr (sizeof(T) > B32_BYTE_SIZE) {
+        ASCENDC_ASSERT((padParams.paddingValue == 0), {
+            KERNEL_LOG(KERNEL_ERROR, "b64 paddingValue on current device only support 0");
+        });
+    }
+    CopyGmToUbufAlignV2<T, mode>(
+        dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
+        intriParams.srcStride, intriParams.dstStride, true,
+        padParams.isPad); // padding is 0
 }
 
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadGm2UBImpl(
-    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams,
-    const uint8_t cacheMode = 0)
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams)
 {
     // if ASCEND_IS_AIC {
     //     return;
     // }
-    // if (padParams.isPad == true) {
-    //     set_mov_pad_val(GetScalarBitcodeValue(padParams.paddingValue));
-    // }
-    // if constexpr (sizeof(T) > B32_BYTE_SIZE) {
-    //     ASCENDC_ASSERT((padParams.paddingValue == 0), {
-    //         KERNEL_LOG(KERNEL_ERROR, "b64 paddingValue on current device only support 0");
-    //     });
-    // }
-    // if constexpr (g_gm_overflow_check) {
-    //     __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-    //     AscendCUtils::CheckGmMemOverflowNormal(src, workSpace, true, true, intriParams);
-    // }
+    if (padParams.isPad == true) {
+        set_pad_val_outtoub(GetScalarBitcodeValue(padParams.paddingValue));
+    }
+    if constexpr (sizeof(T) > B32_BYTE_SIZE) {
+        ASCENDC_ASSERT((padParams.paddingValue == 0), {
+            KERNEL_LOG(KERNEL_ERROR, "b64 paddingValue on current device only support 0");
+        });
+    }
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNormal(src, workSpace, true, true, intriParams);
+    }
 
-    // CheckSrcGmDataCopyExtParamsRange(intriParams);
-    // CopyGmToUbufAlignV2<T, mode>(
-    //     dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
-    //     intriParams.srcStride, intriParams.dstStride, true, cacheMode, padParams.isPad);
+    CheckSrcGmDataCopyExtParamsRange(intriParams);
+    CopyGmToUbufAlignV2<T, mode>(
+        dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
+        intriParams.srcStride, intriParams.dstStride, true, padParams.isPad);
 }
 
-template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline void DataCopyPadGm2L1Impl(
-    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams,
-    const uint8_t cacheMode = 0)
+template <typename T>
+__aicore__ inline void DataCopyPadGM2L1Impl(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams)
 {
     // if ASCEND_IS_AIV {
     //     return;
@@ -1190,10 +1185,9 @@ __aicore__ inline void DataCopyPadGm2L1Impl(
     //     intriParams.srcStride, intriParams.dstStride, true, cacheMode);
 }
 
-template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline void DataCopyPadGm2L1Impl(
-    __cbuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams,
-    const uint8_t cacheMode = 0)
+template <typename T>
+__aicore__ inline void DataCopyPadGM2L1Impl(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams)
 {
     // if ASCEND_IS_AIV {
     //     return;
@@ -1217,29 +1211,54 @@ __aicore__ inline void DataCopyPadGm2L1Impl(
     //     intriParams.srcStride, intriParams.dstStride, true, cacheMode);
 }
 
+template <typename T>
+__aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
+{
+    // if constexpr (g_gm_overflow_check) {
+    //     __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+    //     AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, (uint64_t) true, intriParams);
+    // }
+
+    // uint64_t srcStride = AlignUp(intriParams.srcStride * BYTE_32_ALIGN + intriParams.blockLen, BYTE_32_ALIGN);
+    // uint32_t dstStride = intriParams.blockLen + intriParams.dstStride;
+
+    // copy_cbuf_to_gm_align_v2(dst, src, 0, intriParams.blockCount, intriParams.blockLen, dstStride, srcStride);
+}
+
+template <typename T>
+__aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyExtParams& intriParams)
+{
+    // if constexpr (g_gm_overflow_check) {
+    //     __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+    //     AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, (uint64_t) true, intriParams);
+    // }
+
+    // uint64_t srcStride = AlignUp(intriParams.srcStride * BYTE_32_ALIGN + intriParams.blockLen, BYTE_32_ALIGN);
+    // uint32_t dstStride = intriParams.blockLen + intriParams.dstStride;
+
+    // copy_cbuf_to_gm_align_v2(dst, src, 0, intriParams.blockCount, intriParams.blockLen, dstStride, srcStride);
+}
+
 // UB -> GM   DataCopyPad with DataCopyParams
 template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline void DataCopyPadUB2GMImpl(
-    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+__aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
         AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
     }
     CopyUbufToGmAlignV2<T, mode>(
-        dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, true,
-        cacheMode);
+        dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, true);
 }
 
 // UB -> GM   DataCopyPad with DataCopyExtParams
 template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline void DataCopyPadUB2GMImpl(
-    __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& intriParams, const uint8_t cacheMode = 0)
+__aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& intriParams)
 {
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
-    }
+    // if constexpr (g_gm_overflow_check) {
+    //     __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+    //     AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
+    // }
     ASCENDC_ASSERT((intriParams.dstStride <= static_cast<int64_t>(1ul << 40 - 1)), {
         KERNEL_LOG(KERNEL_ERROR, "dstStride is %ld, which should be no more than 2^40-1", intriParams.dstStride);
     });
@@ -1253,8 +1272,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(
         KERNEL_LOG(KERNEL_ERROR, "srcStride is %ld, which should be no less than 0", intriParams.srcStride);
     });
     CopyUbufToGmAlignV2<T, mode>(
-        dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, true,
-        cacheMode);
+        dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, true);
 }
 
 template <typename T, typename IntrinParams>
@@ -1373,36 +1391,36 @@ template <typename T, typename U>
 __aicore__ inline void DataCopyL0C2GMImpl(
     __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams, uint8_t cacheMode)
 {
-    if ASCEND_IS_AIC {
-        static_assert(
-            (SupportType<
-                Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
-                Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
-                Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
-            "Failed to check dtype in "
-            "DataCopy from L0C Buffer(CO1) to GM, current api support dtype combination is "
-            "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
-            "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
-        if (IsSupportQuantMode(intriParams.quantPre)) {
-            uint32_t dstStride = intriParams.dstStride;
-            if (!intriParams.nz2ndEn) {
-                dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
-            }
-            return copy_matrix_cc_to_gm(
-                dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
-                cacheMode, 0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-                intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
-                false);
-        } else {
-            ASCENDC_ASSERT(false, {
-                KERNEL_LOG(
-                    KERNEL_ERROR,
-                    "Failed to check quantPre value in DataCopy from L0C Buffer(CO1) "
-                    "to GM, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
-                    "VQF322B8_PRE / REQ8 / VREQ8.");
-            });
-        }
-    }
+    // if ASCEND_IS_AIC {
+    //     static_assert(
+    //         (SupportType<
+    //             Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
+    //             Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
+    //             Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
+    //         "Failed to check dtype in "
+    //         "DataCopy from L0C Buffer(CO1) to GM, current api support dtype combination is "
+    //         "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
+    //         "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
+    //     if (IsSupportQuantMode(intriParams.quantPre)) {
+    //         uint32_t dstStride = intriParams.dstStride;
+    //         if (!intriParams.nz2ndEn) {
+    //             dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
+    //         }
+    //         return copy_matrix_cc_to_gm(
+    //             dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
+    //             cacheMode, 0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+    //             intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
+    //             false);
+    //     } else {
+    //         ASCENDC_ASSERT(false, {
+    //             KERNEL_LOG(
+    //                 KERNEL_ERROR,
+    //                 "Failed to check quantPre value in DataCopy from L0C Buffer(CO1) "
+    //                 "to GM, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
+    //                 "VQF322B8_PRE / REQ8 / VREQ8.");
+    //         });
+    //     }
+    // }
 }
 
 template <typename T>

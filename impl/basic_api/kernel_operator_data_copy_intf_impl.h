@@ -459,8 +459,7 @@ __aicore__ inline void DataCopy(
             CheckTensorAlign<T>(dst, 64, "dst", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 64B align
             CheckTensorAlign<U>(
                 src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 32B align
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
             if constexpr (
                 Std::is_same<PrimDstType, int32_t>::value &&
@@ -1564,8 +1563,7 @@ __aicore__ inline void DataCopyPad(
 }
 
 // override DataCopyPad, use new param DataCopyExtParams
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
@@ -1616,9 +1614,9 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to UB(VECIN/VECOUT)");
 #endif
 #endif
-    if ASCEND_IS_AIC {
-        return;
-    }
+    // if ASCEND_IS_AIC { // chengn
+    //     return;
+    // }
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to UB(VECIN/VECOUT)")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to UB(VECIN/VECOUT)", KernelFuncType::NONE_MODE);
@@ -1685,8 +1683,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams);
 }
 
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
@@ -1728,9 +1725,9 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         dst, src, dataCopyParams, "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams");
 #endif
 #endif
-    if ASCEND_IS_AIC {
-        return;
-    }
+    // if ASCEND_IS_AIC { // chengn
+    //     return;
+    // }
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams)));
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     if (srcHWPos == Hardware::UB) {

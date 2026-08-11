@@ -58,11 +58,13 @@ using float8_e8m0_t = fp8_e8m0_t;
 #define K_MAX_SHAPE_DIM 8
 #endif
 
-#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
+#if (defined(__DAV_CUBE__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
 #define SPLIT_CORE_CUBE
 #endif
 
-#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
+#if (defined(__DAV_VEC__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
 #define SPLIT_CORE_VEC
 #endif
 
