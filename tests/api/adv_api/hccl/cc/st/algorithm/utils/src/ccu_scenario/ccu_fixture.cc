@@ -30,6 +30,8 @@ uint32_t GetCcuKernelRegisterCount();
 namespace HcclSim {
 namespace CcuSt {
 
+constexpr uint32_t GRID_SIZE = 8;
+
 Mc2CcTilingInner CcuStFixture::BuildTiling(HcclCMDType opType, HcclDataType dataType,
                                              const std::string &algConfig)
 {
@@ -47,7 +49,14 @@ TopoMeta CcuStFixture::BuildTopoMeta(uint32_t rankSize, StTopoType topoType)
 {
     switch (topoType) {
     case StTopoType::TWO_DIE_REGULAR: {
-        ServerMeta server = {0, 1, 2, 3, 8, 9, 10, 11};
+        const uint32_t half = rankSize / 2;
+        ServerMeta server;
+        for (uint32_t i = 0; i < half; ++i) {
+            server.push_back(i);           // die 0: phyId 0..half-1
+        }
+        for (uint32_t i = 0; i < rankSize - half; ++i) {
+            server.push_back(i + GRID_SIZE);  // die 1: phyId 8..8+remaining-1
+        }
         return {{{server}}};
     }
     case StTopoType::MESH_1D_CLOS: {
@@ -155,7 +164,6 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
 
 void CcuStFixture::VerifyScenario(const CcuStScenario &scenario)
 {
-    currentScenario_ = scenario;
     const uint32_t rankSize = scenario.rankSize;
 
     RegisterManager::Global().Reset();
