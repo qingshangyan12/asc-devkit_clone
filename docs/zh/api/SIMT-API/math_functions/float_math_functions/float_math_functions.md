@@ -1,182 +1,186 @@
 # float类型数学库函数
 
--   **[tanf](tanf.md)**
+- **[tanf](tanf.md)**
 
--   **[tanhf](tanhf.md)**
+- **[tanhf](tanhf.md)**
 
--   **[tanpif](tanpif.md)**
+- **[tanpif](tanpif.md)**
 
--   **[atanf](atanf.md)**
+- **[atanf](atanf.md)**
 
--   **[atan2f](atan2f.md)**
+- **[atan2f](atan2f.md)**
 
--   **[atanhf](atanhf.md)**
+- **[atanhf](atanhf.md)**
 
--   **[expf](expf.md)**
+- **[expf](expf.md)**
 
--   **[exp2f](exp2f.md)**
+- **[exp2f](exp2f.md)**
 
--   **[exp10f](exp10f.md)**
+- **[exp10f](exp10f.md)**
 
--   **[expm1f](expm1f.md)**
+- **[expm1f](expm1f.md)**
 
--   **[logf](logf.md)**
+- **[logf](logf.md)**
 
--   **[log2f](log2f.md)**
+- **[log2f](log2f.md)**
 
--   **[log10f](log10f.md)**
+- **[log10f](log10f.md)**
 
--   **[log1pf](log1pf.md)**
+- **[log1pf](log1pf.md)**
 
--   **[logbf](logbf.md)**
+- **[logbf](logbf.md)**
 
--   **[ilogbf](ilogbf.md)**
+- **[ilogbf](ilogbf.md)**
 
--   **[cosf](cosf.md)**
+- **[cosf](cosf.md)**
 
--   **[coshf](coshf.md)**
+- **[coshf](coshf.md)**
 
--   **[cospif](cospif.md)**
+- **[cospif](cospif.md)**
 
--   **[acosf](acosf.md)**
+- **[acosf](acosf.md)**
 
--   **[acoshf](acoshf.md)**
+- **[acoshf](acoshf.md)**
 
--   **[sinf](sinf.md)**
+- **[sinf](sinf.md)**
 
--   **[sinhf](sinhf.md)**
+- **[sinhf](sinhf.md)**
 
--   **[sinpif](sinpif.md)**
+- **[sinpif](sinpif.md)**
 
--   **[asinf](asinf.md)**
+- **[asinf](asinf.md)**
 
--   **[asinhf](asinhf.md)**
+- **[asinhf](asinhf.md)**
 
--   **[sincosf](sincosf.md)**
+- **[sincosf](sincosf.md)**
 
--   **[sincospif](sincospif.md)**
+- **[sincospif](sincospif.md)**
 
--   **[frexpf](frexpf.md)**
+- **[frexpf](frexpf.md)**
 
--   **[ldexpf](ldexpf.md)**
+- **[ldexpf](ldexpf.md)**
 
--   **[sqrtf](sqrtf.md)**
+- **[sqrtf](sqrtf.md)**
 
--   **[rsqrtf](rsqrtf.md)**
+- **[rsqrtf](rsqrtf.md)**
 
--   **[hypotf](hypotf.md)**
+- **[hypotf](hypotf.md)**
 
--   **[rhypotf](rhypotf.md)**
+- **[rhypotf](rhypotf.md)**
 
--   **[powf](powf.md)**
+- **[powf](powf.md)**
 
--   **[norm3df](norm3df.md)**
+- **[norm3df](norm3df.md)**
 
--   **[rnorm3df](rnorm3df.md)**
+- **[rnorm3df](rnorm3df.md)**
 
--   **[norm4df](norm4df.md)**
+- **[norm4df](norm4df.md)**
 
--   **[rnorm4df](rnorm4df.md)**
+- **[rnorm4df](rnorm4df.md)**
 
--   **[normf](normf.md)**
+- **[normf](normf.md)**
 
--   **[rnormf](rnormf.md)**
+- **[rnormf](rnormf.md)**
 
--   **[cbrtf](cbrtf.md)**
+- **[cbrtf](cbrtf.md)**
 
--   **[rcbrtf](rcbrtf.md)**
+- **[rcbrtf](rcbrtf.md)**
 
--   **[erff](erff.md)**
+- **[erff](erff.md)**
 
--   **[erfcf](erfcf.md)**
+- **[erfcf](erfcf.md)**
 
--   **[erfinvf](erfinvf.md)**
+- **[erfinvf](erfinvf.md)**
 
--   **[erfcinvf](erfcinvf.md)**
+- **[erfcinvf](erfcinvf.md)**
 
--   **[erfcxf](erfcxf.md)**
+- **[erfcxf](erfcxf.md)**
 
--   **[tgammaf](tgammaf.md)**
+- **[tgammaf](tgammaf.md)**
 
--   **[lgammaf](lgammaf.md)**
+- **[lgammaf](lgammaf.md)**
 
--   **[cyl\_bessel\_i0f](cyl_bessel_i0f.md)**
+- **[cyl\_bessel\_i0f](cyl_bessel_i0f.md)**
 
--   **[cyl\_bessel\_i1f](cyl_bessel_i1f.md)**
+- **[cyl\_bessel\_i1f](cyl_bessel_i1f.md)**
 
--   **[normcdff](normcdff.md)**
+- **[normcdff](normcdff.md)**
 
--   **[normcdfinvf](normcdfinvf.md)**
+- **[normcdfinvf](normcdfinvf.md)**
 
--   **[j0f](j0f.md)**
+- **[j0f](j0f.md)**
 
--   **[j1f](j1f.md)**
+- **[j1f](j1f.md)**
 
--   **[jnf](jnf.md)**
+- **[jnf](jnf.md)**
 
--   **[y0f](y0f.md)**
+- **[y0f](y0f.md)**
 
--   **[y1f](y1f.md)**
+- **[y1f](y1f.md)**
 
--   **[ynf](ynf.md)**
+- **[ynf](ynf.md)**
 
--   **[fabsf](fabsf.md)**
+- **[fabsf](fabsf.md)**
 
--   **[fmaf](fmaf.md)**
+- **[abs](abs.md)**
 
--   **[fmaxf](fmaxf.md)**
+- **[fmaf](fmaf.md)**
 
--   **[fminf](fminf.md)**
+- **[fmaxf](fmaxf.md)**
 
--   **[fdimf](fdimf.md)**
+- **[fminf](fminf.md)**
 
--   **[remquof](remquof.md)**
+- **[nanf](nanf.md)**
 
--   **[fmodf](fmodf.md)**
+- **[fdimf](fdimf.md)**
 
--   **[remainderf](remainderf.md)**
+- **[remquof](remquof.md)**
 
--   **[copysignf](copysignf.md)**
+- **[fmodf](fmodf.md)**
 
--   **[nearbyintf](nearbyintf.md)**
+- **[remainderf](remainderf.md)**
 
--   **[nextafterf](nextafterf.md)**
+- **[copysignf](copysignf.md)**
 
--   **[scalbnf](scalbnf.md)**
+- **[nearbyintf](nearbyintf.md)**
 
--   **[scalblnf](scalblnf.md)**
+- **[nextafterf](nextafterf.md)**
 
--   **[modff](modff.md)**
+- **[scalbnf](scalbnf.md)**
 
--   **[fdividef](fdividef.md)**
+- **[scalblnf](scalblnf.md)**
 
--   **[signbit](signbit.md)**
+- **[modff](modff.md)**
 
--   **[\_\_saturatef](__saturatef.md)**
+- **[fdividef](fdividef.md)**
 
--   **[\_\_fdividef](__fdividef.md)**
+- **[signbit](signbit.md)**
 
--   **[rintf](rintf.md)**
+- **[\_\_saturatef](__saturatef.md)**
 
--   **[lrintf](lrintf.md)**
+- **[\_\_fdividef](__fdividef.md)**
 
--   **[llrintf](llrintf.md)**
+- **[rintf](rintf.md)**
 
--   **[roundf](roundf.md)**
+- **[lrintf](lrintf.md)**
 
--   **[lroundf](lroundf.md)**
+- **[llrintf](llrintf.md)**
 
--   **[llroundf](llroundf.md)**
+- **[roundf](roundf.md)**
 
--   **[floorf](floorf.md)**
+- **[lroundf](lroundf.md)**
 
--   **[ceilf](ceilf.md)**
+- **[llroundf](llroundf.md)**
 
--   **[truncf](truncf.md)**
+- **[floorf](floorf.md)**
 
--   **[isfinite](isfinite.md)**
+- **[ceilf](ceilf.md)**
 
--   **[isnan](isnan.md)**
+- **[truncf](truncf.md)**
 
--   **[isinf](isinf.md)**
+- **[isfinite](isfinite.md)**
+
+- **[isnan](isnan.md)**
+
+- **[isinf](isinf.md)**
 
