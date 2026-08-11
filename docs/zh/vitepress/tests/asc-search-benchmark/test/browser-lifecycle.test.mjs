@@ -43,7 +43,7 @@ if (process.argv[2] === '--version') {
   process.exit(0)
 }
 const userDataDir = process.argv.find(arg => arg.startsWith('--user-data-dir=')).split('=')[1]
-writeFileSync(${JSON.stringify(statePath)}, JSON.stringify({ pid: process.pid, userDataDir }))
+writeFileSync(${JSON.stringify(statePath)}, JSON.stringify({ args: process.argv.slice(2), pid: process.pid, userDataDir }))
 console.error('DevTools listening on ws://127.0.0.1:9/devtools/browser/fake')
 setInterval(() => {}, 1000)
 `, 'utf8')
@@ -61,6 +61,7 @@ setInterval(() => {}, 1000)
     )
 
     state = JSON.parse(await readFile(statePath, 'utf8'))
+    assert.equal(state.args.includes('--no-sandbox'), false)
     assert.equal(processExists(state.pid), false)
     await assert.rejects(readFile(state.userDataDir), { code: 'ENOENT' })
   }

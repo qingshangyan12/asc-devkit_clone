@@ -9,7 +9,8 @@
  */
 
 import { readFile, writeFile } from 'node:fs/promises'
-import { join, relative, resolve } from 'node:path'
+import { isAbsolute, join, relative, resolve, sep } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { gunzipSync } from 'node:zlib'
 
 import { load } from 'cheerio'
@@ -95,13 +96,15 @@ function normalizeRoute(route) {
   return normalized || '/'
 }
 
-function sourcePathForRoute(intermediateHtmlDirectory, route) {
+export function sourcePathsForRoute(intermediateHtmlDirectory, route) {
   const relativeRoute = normalizeRoute(route).replace(/^\/+/, '')
-  if (!relativeRoute) return null
-  const candidate = resolve(intermediateHtmlDirectory, `${relativeRoute}.html`)
-  const relativePath = relative(intermediateHtmlDirectory, candidate)
-  if (relativePath.startsWith('..') || relativePath.startsWith('/')) return null
-  return candidate
+  const relativeCandidates = relativeRoute
+    ? [`${relativeRoute}.html`, join(relativeRoute, 'index.html')]
+    : ['index.html']
+  return relativeCandidates.map(candidate => resolve(intermediateHtmlDirectory, candidate)).filter((candidate) => {
+    const relativePath = relative(intermediateHtmlDirectory, candidate)
+    return relativePath !== '..' && !relativePath.startsWith(`..${sep}`) && !isAbsolute(relativePath)
+  })
 }
 
 function createIdentifierSignal() {
@@ -306,7 +309,7 @@ function extractExcerpt($, article) {
       const item = $(element).clone()
       item.find('pre,code,table,ul,ol').remove()
       const content = item.text().replace(/\s+/g, ' ').trim()
-      if (content.length >= 20) candidates.push({ content, index })
+      if (content.length >= 4) candidates.push({ content, index })
     })
   }
   return candidates
@@ -342,17 +345,19 @@ async function analyzeRecord(intermediateHtmlDirectory, record) {
     excerpt: '',
     links: [],
   }
-  const sourcePath = sourcePathForRoute(intermediateHtmlDirectory, record.url)
-  if (!sourcePath) return fallback
-
   let html
-  try {
-    html = await readFile(sourcePath, 'utf8')
+  let selectedSourcePath
+  for (const sourcePath of sourcePathsForRoute(intermediateHtmlDirectory, record.url)) {
+    try {
+      html = await readFile(sourcePath, 'utf8')
+      selectedSourcePath = sourcePath
+      break
+    }
+    catch (error) {
+      if (error?.code !== 'ENOENT') throw error
+    }
   }
-  catch (error) {
-    if (error?.code === 'ENOENT') return fallback
-    throw error
-  }
+  if (html === undefined) return fallback
 
   const $ = load(html)
   const article = $('.markdown-body').first()
@@ -418,7 +423,11 @@ async function analyzeRecord(intermediateHtmlDirectory, record) {
     }
   }
 
-  const baseUrl = new URL(encodeURI(`${normalizeRoute(record.url)}.html`), 'http://asc-search.local')
+  const normalizedRecordRoute = normalizeRoute(record.url)
+  const recordPath = selectedSourcePath.endsWith(`${sep}index.html`)
+    ? normalizedRecordRoute === '/' ? '/index.html' : `${normalizedRecordRoute}/index.html`
+    : `${normalizedRecordRoute}.html`
+  const baseUrl = new URL(encodeURI(recordPath), 'http://asc-search.local')
   const links = new Set()
   article.find('a[href]').each((_, element) => {
     const href = $(element).attr('href')
@@ -427,7 +436,7 @@ async function analyzeRecord(intermediateHtmlDirectory, record) {
       const target = new URL(href, baseUrl)
       if (target.origin !== baseUrl.origin) return
       const route = normalizeRoute(target.pathname)
-      if (route !== normalizeRoute(record.url)) links.add(route)
+      if (route !== normalizedRecordRoute) links.add(route)
     }
     catch {}
   })
@@ -630,6 +639,8 @@ async function buildTitleIndex(distDirectory) {
   console.log(`[search-identifiers] Indexed ${identifierIndex.i.length} identifiers into ${identifierPath} (${Math.round(Buffer.byteLength(identifierJson) / 1024)} KB)`)
 }
 
-const distDirectory = process.argv[2]
-if (!distDirectory) throw new Error('Usage: node build-pagefind-title-index.mjs <dist-directory>')
-await buildTitleIndex(resolve(distDirectory))
+if (resolve(process.argv[1] || '') === fileURLToPath(import.meta.url)) {
+  const distDirectory = process.argv[2]
+  if (!distDirectory) throw new Error('Usage: node build-pagefind-title-index.mjs <dist-directory>')
+  await buildTitleIndex(resolve(distDirectory))
+}

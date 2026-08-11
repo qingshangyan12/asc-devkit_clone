@@ -23,6 +23,7 @@ import {
   normalizeApiRoute,
 } from '../../scripts/api-support.mjs'
 import { loadGitTimestamps } from '../../scripts/git-timestamps.mjs'
+import { shellQuote } from '../../scripts/shell-utils.mjs'
 
 const docsRoot = resolve(import.meta.dirname, '..')
 const repoRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
@@ -65,7 +66,7 @@ function getOriginalSourceFile(relativePath) {
 
 const distDir = resolve(docsRoot, '.vitepress', 'dist')
 const pagefindTitleScript = resolve(import.meta.dirname, 'build-pagefind-title-index.mjs')
-const pagefindIndexingCommand = `npx pagefind --site "${distDir}" --exclude-selectors "div.aside, a.header-anchor" --force-language zh --include-characters "_:" && node "${pagefindTitleScript}" "${distDir}"`
+const pagefindIndexingCommand = `npx pagefind --site ${shellQuote(distDir)} --exclude-selectors ${shellQuote('div.aside, a.header-anchor')} --force-language zh --include-characters ${shellQuote('_:')} && node ${shellQuote(pagefindTitleScript)} ${shellQuote(distDir)}`
 
 function removeSelfRefItems(items) {
   return items.map(item => {
