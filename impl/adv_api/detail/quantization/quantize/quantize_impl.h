@@ -166,7 +166,7 @@ __simd_callee__ inline void TransRegForS8(
         Reg::DeInterleave(
             (Reg::RegTensor<ScaleT>&)dstVreg, (Reg::RegTensor<ScaleT>&)dstVreg2, (Reg::RegTensor<ScaleT>&)dstVreg,
             (Reg::RegTensor<ScaleT>&)dstVreg2);
-    } else 
+    } else
 #endif
     if constexpr (SupportType<ScaleT, float>()) {
         // fp32->s16->fp16->s8
