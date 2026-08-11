@@ -30,8 +30,7 @@ namespace te {
 class load_data_l1_to_l0b_microscale {
 public:
     template <const copy_l1_to_l0scaleb_trait& trait, typename T, typename U>
-    __aicore__ inline static void run(const T& dst, const U& src)
-    {
+    __aicore__ inline static void run(const T& dst, const U& src) {
         check_template<trait, T, U>();
         if constexpr (T::layout_type::depth == FIVE_DIM_DATA) {
             batch_load_data_impl<trait, T, U>(dst, src);
@@ -39,9 +38,26 @@ public:
             load_data_impl<trait, T, U>(dst, src);
         } else {
             static_assert(T::layout_type::depth == FOUR_DIM_DATA || T::layout_type::depth == FIVE_DIM_DATA,
-                          "load_data_l1_to_l0b_microscale only supports the plain fractal layout "
-                          "((row0,row1),(col0,col1)) or the batch layout (B,((row0,row1),(col0,col1))).");
+                "load_data_l1_to_l0b_microscale only supports the plain fractal layout "
+                "((row0,row1),(col0,col1)) or the batch layout (batch_value,((row0,row1),(col0,col1))).");
         }
+    }
+
+    template <const copy_l1_to_l0scaleb_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape)
+    {
+        check_template<trait, T, U>();
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        auto m_step = get<1, 1>(src_shape);
+        auto k_step = get<0, 1>(src_shape);
+        auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) >> 5;
+        auto dst_stride = k_step;
+        uint64_t mx_dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>((dst.data() + dst_offset).get()));
+        load_l1_to_l0b_scale_instr::load_data_region(
+            mx_dst_addr, src, _0{}, src_offset, 0, 0, m_step, k_step, src_stride, dst_stride);
     }
 
 private:
@@ -53,8 +69,8 @@ private:
     }
 
     template <typename DstT, typename SrcT, typename DstLayoutT, typename SrcLayoutT>
-    __aicore__ inline static void load_data_fractal(const DstT& dst, const SrcT& src, const DstLayoutT& dst_layout,
-                                                    const SrcLayoutT& src_layout)
+    __aicore__ inline static void load_data_fractal(const DstT& dst, const SrcT& src,
+        const DstLayoutT& dst_layout, const SrcLayoutT& src_layout)
     {
         uint16_t m_start_position = 0;
         uint16_t k_start_position = 0;
@@ -63,8 +79,8 @@ private:
         auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) >> 5;
         auto dst_stride = k_step;
         uint64_t mx_dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.data().get()));
-        load_l1_to_l0b_scale_instr::load_data(mx_dst_addr, src.data().get(), m_start_position, k_start_position,
-                                                 m_step, k_step, src_stride, dst_stride);
+        load_l1_to_l0b_scale_instr::load_data_tensor(mx_dst_addr, src, m_start_position, k_start_position, m_step, k_step,
+            src_stride, dst_stride);
     }
 
     template <const copy_l1_to_l0scaleb_trait& trait, typename T, typename U>
@@ -80,9 +96,10 @@ private:
         auto src_no_batch_layout = remove_batch_dim(src.layout());
         auto batch_num = get<0>(dst.layout().shape());
         for (uint32_t i = 0; i < batch_num; ++i) {
-            load_data_fractal(dst(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))),
-                              src(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))), dst_no_batch_layout,
-                              src_no_batch_layout);
+            load_data_fractal(
+                dst(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))),
+                src(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))),
+                dst_no_batch_layout, src_no_batch_layout);
         }
     }
 };

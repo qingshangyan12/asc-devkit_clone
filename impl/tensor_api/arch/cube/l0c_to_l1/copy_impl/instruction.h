@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l0c_to_l1/copy_impl/instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -29,20 +29,36 @@ namespace te {
 
 class copy_l0c_to_l1_instr {
 public:
+    template <QuantMode_t quant_pre, typename T, typename U, typename... ParamTypes>
+    __aicore__ inline static void data_copy_tensor(const T& dst, const U& src, const ParamTypes&... params)
+    {
+        data_copy<quant_pre>(dst.data().get(), src.data().get(), params...);
+    }
+
+    template <QuantMode_t quant_pre, typename T, typename U, typename DstOffset, typename SrcOffset, typename... ParamTypes>
+    __aicore__ inline static void data_copy_region(
+        const T& dst, const U& src, const DstOffset& dst_offset, const SrcOffset& src_offset, const ParamTypes&... params)
+    {
+        auto dst_data = dst.data() + dst_offset;
+        auto src_data = src.data() + src_offset;
+        data_copy<quant_pre>(dst_data.get(), src_data.get(), params...);
+    }
+
     // This path only emits straight NZ output, so nz2nd_en is always false.
     template <QuantMode_t quant_pre, typename T, typename U>
-    __aicore__ inline static void data_copy(__cbuf__ T* dst, __cc__ U* src, uint32_t n_size, uint32_t m_size,
-                                                   uint32_t src_stride, uint32_t dst_stride, bool relu_en,
-                                                   uint8_t unit_flag, bool is_channel_split)
+    __aicore__ inline static void data_copy(
+        __cbuf__ T* dst, __cc__ U* src, uint32_t n_size, uint32_t m_size, uint32_t src_stride, uint32_t dst_stride,
+        bool relu_en, uint8_t unit_flag, bool is_channel_split)
     {
         if ASCEND_IS_AIV {
             return;
         }
 
-        asc_copy_l0c2l1(dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
-                        static_cast<uint16_t>(src_stride), 0, unit_flag, static_cast<uint64_t>(quant_pre),
-                        static_cast<uint8_t>(relu_en), is_channel_split, false,
-                        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, 0, false);
+        asc_copy_l0c2l1(
+            dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
+            static_cast<uint16_t>(src_stride), 0, unit_flag, static_cast<uint64_t>(quant_pre),
+            static_cast<uint8_t>(relu_en), is_channel_split, false, static_cast<uint64_t>(QuantMode_post::NoConv), 0,
+            false, 0, 0, false);
     }
 };
 

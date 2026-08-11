@@ -36,6 +36,34 @@ public:
         execute<trait>(dst, src);
     }
 
+    template <const copy_l1_to_ub_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape)
+    {
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        uint16_t block_count = get_total_row_shape_from_shape(region_shape);
+        auto columns = get_total_column_shape_from_shape(region_shape);
+        uint32_t block_len = Std::ceil_division(columns, C0_ELEMENT<src_type>);
+        uint32_t src_row_stride;
+        uint32_t dst_row_stride;
+        if constexpr (is_satisfied_ptn_format_v<U, nd_layout_ptn>) {
+            src_row_stride = get_element<attr_info::stride, attr_info::row>(src.layout());
+            dst_row_stride = get_element<attr_info::stride, attr_info::row>(dst.layout());
+        } else {
+            src_row_stride = get_element<attr_info::stride, attr_info::row, 1>(src.layout());
+            dst_row_stride = get_element<attr_info::stride, attr_info::row, 1>(dst.layout());
+        }
+        int64_t src_stride = Std::ceil_division(src_row_stride - columns, C0_ELEMENT<src_type>);
+        int64_t dst_stride = Std::ceil_division(dst_row_stride - columns, C0_ELEMENT<dst_type>);
+        copy_l1_to_ub_instr::data_copy_region(
+            dst, src, dst_offset, src_offset, block_count, block_len, src_stride, dst_stride);
+    }
+
 private:
     template <const copy_l1_to_ub_trait& trait, typename T, typename U>
     __aicore__ inline static void execute(const T& dst, const U& src)
@@ -61,13 +89,10 @@ private:
         } else {
             dst_row_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout);
         }
-        int64_t src_stride =
-            Std::ceil_division(src_row_stride - get_total_column_shape(src_layout), C0_ELEMENT<src_type>);
-        int64_t dst_stride =
-            Std::ceil_division(dst_row_stride - get_total_column_shape(src_layout), C0_ELEMENT<dst_type>);
+        int64_t src_stride = Std::ceil_division(src_row_stride - get_total_column_shape(src_layout), C0_ELEMENT<src_type>);
+        int64_t dst_stride = Std::ceil_division(dst_row_stride - get_total_column_shape(src_layout), C0_ELEMENT<dst_type>);
 
-        copy_l1_to_ub_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
-                                         dst_stride);
+        copy_l1_to_ub_instr::data_copy_tensor(dst, src, block_count, block_len, src_stride, dst_stride);
     }
 };
 
@@ -77,6 +102,34 @@ public:
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         execute<trait>(dst, src);
+    }
+
+    template <const copy_l1_to_ub_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape)
+    {
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        auto rows = get_total_row_shape_from_shape(region_shape);
+        uint16_t block_count = get_total_column_shape_from_shape(region_shape);
+        uint32_t block_len = Std::ceil_division(rows, C0_ELEMENT<src_type>);
+        uint32_t src_column_stride;
+        uint32_t dst_column_stride;
+        if constexpr (is_satisfied_ptn_format_v<U, dn_layout_ptn>) {
+            src_column_stride = get_element<attr_info::stride, attr_info::column>(src.layout());
+            dst_column_stride = get_element<attr_info::stride, attr_info::column>(dst.layout());
+        } else {
+            src_column_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout());
+            dst_column_stride = get_element<attr_info::stride, attr_info::column, 1>(dst.layout());
+        }
+        int64_t src_stride = Std::ceil_division(src_column_stride - rows, C0_ELEMENT<src_type>);
+        int64_t dst_stride = Std::ceil_division(dst_column_stride - rows, C0_ELEMENT<dst_type>);
+        copy_l1_to_ub_instr::data_copy_region(
+            dst, src, dst_offset, src_offset, block_count, block_len, src_stride, dst_stride);
     }
 
 private:
@@ -104,13 +157,10 @@ private:
         } else {
             dst_column_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout);
         }
-        int64_t src_stride =
-            Std::ceil_division(src_column_stride - get_total_row_shape(src_layout), C0_ELEMENT<src_type>);
-        int64_t dst_stride =
-            Std::ceil_division(dst_column_stride - get_total_row_shape(src_layout), C0_ELEMENT<dst_type>);
+        int64_t src_stride = Std::ceil_division(src_column_stride - get_total_row_shape(src_layout), C0_ELEMENT<src_type>);
+        int64_t dst_stride = Std::ceil_division(dst_column_stride - get_total_row_shape(src_layout), C0_ELEMENT<dst_type>);
 
-        copy_l1_to_ub_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
-                                         dst_stride);
+        copy_l1_to_ub_instr::data_copy_tensor(dst, src, block_count, block_len, src_stride, dst_stride);
     }
 };
 
@@ -120,6 +170,26 @@ public:
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         execute<trait>(dst, src);
+    }
+
+    template <const copy_l1_to_ub_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape)
+    {
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        uint16_t block_count = get<1, 1>(region_shape);
+        uint32_t block_len = get_total_row_shape_from_shape(region_shape);
+        int64_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) /
+            C0_ELEMENT<src_type> - block_len;
+        int64_t dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst.layout()) /
+            C0_ELEMENT<dst_type> - block_len;
+        copy_l1_to_ub_instr::data_copy_region(
+            dst, src, dst_offset, src_offset, block_count, block_len, src_stride, dst_stride);
     }
 
 private:
@@ -134,13 +204,12 @@ private:
 
         uint16_t block_count = get_element<attr_info::shape, attr_info::column, 1>(src_layout);
         uint32_t block_len = get_total_row_shape(src_layout);
-        int64_t src_stride =
-            get_element<attr_info::stride, attr_info::column, 1>(src_layout) / C0_ELEMENT<src_type> - block_len;
-        int64_t dst_stride =
-            get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / C0_ELEMENT<dst_type> - block_len;
+        int64_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / C0_ELEMENT<src_type> -
+            block_len;
+        int64_t dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / C0_ELEMENT<dst_type> -
+            block_len;
 
-        copy_l1_to_ub_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
-                                         dst_stride);
+        copy_l1_to_ub_instr::data_copy_tensor(dst, src, block_count, block_len, src_stride, dst_stride);
     }
 };
 

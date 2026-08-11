@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/nz2nhwc.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -39,7 +39,7 @@ public:
         auto dst_layout = dst.layout();
         auto src_layout = src.layout();
 
-        // dst_stride = C = Stride[2] (row-major NHWC stride is (H*W*C, W*C, C, 1)).
+        // dst_stride = channel = stride[2] (row-major NHWC stride is (height*width*channel, width*channel, channel, 1)).
         uint32_t n_size = get<3>(dst_layout.shape());
         uint32_t m_size = get<1>(dst_layout.shape()) * get<2>(dst_layout.shape());
         uint32_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / FRACTAL_FIXED;
@@ -50,9 +50,28 @@ public:
         uint8_t unit_flag = params.unit_flag;
         bool is_channel_split = trait.enable_channel_split;
 
-        copy_l0c_to_gm_instr::data_copy<quant_pre>(dst.data().get(), src.data().get(), n_size, m_size, src_stride,
-                                                               dst_stride, cache_mode, relu_en, unit_flag, is_channel_split,
-                                                               true, false);
+        copy_l0c_to_gm_instr::data_copy_tensor<quant_pre, T, U>(
+            dst, src, n_size, m_size, src_stride, dst_stride, cache_mode, relu_en, unit_flag, is_channel_split, true, false);
+    }
+
+    template <const copy_l0c_to_gm_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord,
+        typename ShapeType>
+    __aicore__ inline static void run(const T& dst, const U& src, const DstCoord& coord_dst,
+        const SrcCoord& coord_src, const ShapeType& shape, const fixpipe_params& params)
+    {
+        constexpr QuantMode_t quant_pre = get_quant_mode<trait.round_mode, T, U>();
+        check_data_type::check_l0c_to_gm_data_type<quant_pre, T, U>();
+        set_register_impl<T, U>(dst, src);
+        auto region_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        uint32_t n_size = get_total_column_shape_from_shape(region_shape);
+        uint32_t m_size = get_total_row_shape_from_shape(region_shape);
+        uint32_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src.layout()) / FRACTAL_FIXED;
+        uint32_t dst_stride = get<2>(dst.layout().stride());
+        copy_l0c_to_gm_instr::data_copy_region<quant_pre>(dst, src, dst_offset, src_offset, n_size, m_size, src_stride,
+            dst_stride, dst.engine().get_cache_mode(), trait.enable_relu, params.unit_flag,
+            trait.enable_channel_split, true, false);
     }
 };
 

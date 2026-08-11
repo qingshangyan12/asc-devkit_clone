@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning                                                                                                              \
     "impl/tensor_api/arch/cube/l1_to_bt/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -58,6 +58,19 @@ private:
         using src_layout_ptn = get_layout_pattern<src_layout>;
         using copy_l1_to_bt_impl = typename copy_l1_to_biastable_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
         copy_l1_to_bt_impl::template run<trait, T, U>(dst, src);
+    }
+
+    template <const copy_l1_to_biastable_trait& trait = DEFAULT_COPY_L1_BIASTABLE_TRAIT, typename T, typename U,
+        typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void data_copy_impl(
+        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape)
+    {
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
+        using impl = typename copy_l1_to_biastable_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        auto resolved_coord_dst = resolve_copy_coord(dst.layout(), shape, coord_dst);
+        auto resolved_coord_src = resolve_copy_coord(src.layout(), shape, coord_src);
+        impl::template run<trait, T, U>(dst, src, resolved_coord_dst, resolved_coord_src, shape);
     }
 };
 
