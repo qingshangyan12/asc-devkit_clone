@@ -26,22 +26,13 @@
 
 ## 功能说明
 
-根据mask将每个DataBlock(32B)中的最大值依次保存在dst中的最低位。参考伪代码：
+根据mask将每个DataBlock(32B)中的最大值依次保存在dst中的最低位。计算公式如下：
 
-```python
-def asc_reduce_max_datablock(dst, src, mask):
-    num_blocks = 8                      # 128元素 / 16元素每块 = 8块
-    elems_per_block = 16                # 32B / 2B(half) = 16
-    for b in range(num_blocks):
-        max_val = float('-inf')
-        for j in range(elems_per_block):
-            i = b * elems_per_block + j
-            if mask[i] and src[i] > max_val:
-                max_val = src[i]
-        dst[b] = max_val                # 每块最大值连续写入dst低位
-    for i in range(num_blocks, 128):
-        dst[i] = 0                      # 其余位置置0
-```
+$$
+dst_j = \max\{src_i \mid jN \le i < (j+1)N,\ mask_i = 1\}, \quad j = 0,1,\ldots,7
+$$
+
+其中，N表示每个DataBlock包含的元素个数；$j$表示DataBlock的索引。
 
 ## 函数原型
 

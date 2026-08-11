@@ -28,13 +28,6 @@
 
 根据mask将src中的每个int32_t类型数据转换成float类型，并支持多种舍入模式，结果写入dst。参考伪代码如下：
 ```python
-# src: int32[64]   (vector_int32_t, 256B = 64个int32元素)
-# dst: float[64]   (vector_float, 256B = 64个float元素)
-# mask: bool[64]   (b32位宽)
-#
-# 等宽转换(1:1): 逐元素将int32转换为float, 支持多种舍入模式
-# 舍入模式后缀: rd(FLOOR)/rn(RINT)/rna(ROUND)/ru(CEIL)/rz(TRUNC)
-
 def asc_int322float_rn(dst, src, mask):
     for i in range(64):
         if mask[i]:
@@ -42,14 +35,11 @@ def asc_int322float_rn(dst, src, mask):
         else:
             dst[i] = 0.0                 # mask未选中, 置零
 ```
-
 关于舍入模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
 
 ## 函数原型
 
 ### 模板原型（占位符形式）
-
-本接口包含5种舍入模式，模板原型如下：
 
 ```c
 __simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
@@ -57,9 +47,9 @@ __simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
                                                          vector_bool mask)
 ```
 
-`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
+### 占位符说明
 
-src与dst的dtype固定，src支持的数据类型为`int32_t`，dst支持的数据类型为`float`
+- `<round_mode>`表示支持的舍入模式，支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 
 ### 典型示例
 

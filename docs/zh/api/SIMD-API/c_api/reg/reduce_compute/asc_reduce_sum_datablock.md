@@ -33,12 +33,14 @@ def asc_reduce_sum_datablock(dst, src, mask):
     num_blocks = 8                      # 128元素 / 16元素每块 = 8块
     elems_per_block = 16                # 32B / 2B(half) = 16
     for b in range(num_blocks):
-        sum_val = 0
+        values = []
         for j in range(elems_per_block):
             i = b * elems_per_block + j
-            if mask[i]:
-                sum_val = sum_val + src[i]
-        dst[b] = sum_val                # 每块求和值连续写入dst低位
+            values.append(src[i] if mask[i] else 0)
+        while len(values) > 1:
+            values = [values[j] + values[j + 1]
+                      for j in range(0, len(values), 2)]
+        dst[b] = values[0]              # 每块求和值连续写入dst低位
     for i in range(num_blocks, 128):
         dst[i] = 0                      # 其余位置置0
 ```
@@ -53,7 +55,7 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_<dst_dtype>& dst,
                                                      vector_bool mask)
 ```
 
-#### src_dtype与dst_dtype支持组合
+#### src_dtype与dst_dtype数据类型支持情况
 
 | src_dtype | dst_dtype |
 | --------- | --------- |

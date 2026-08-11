@@ -27,11 +27,7 @@
 ## 功能说明
 
 根据mask将src中的每个float类型数据转换成bfloat16_t类型，并支持多种舍入模式与饱和模式，结果写入dst。
-
-
-
-由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。参考伪代码如下：
-
+由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。伪代码如下：
 ```python
 def asc_float2bfloat16_rn(dst, src, mask):
     for i in range(64):
@@ -50,22 +46,22 @@ def asc_float2bfloat16_rn_v2(dst, src, mask):
         else:
             dst[2 * i + 1] = 0
 ```
+关于舍入模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
 
 ## 函数原型
 
 ### 模板原型（占位符形式）
 
 ```c
-__simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><v2_suffix>(vector_bfloat16_t& dst,
+__simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><position_mode>(vector_bfloat16_t& dst,
                                                                                    vector_float src,
                                                                                    vector_bool mask)
 ```
+### 占位符说明
 
-- `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
-- `<sat_suffix>`为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-- `<v2_suffix>`为空时，结果写入dst的偶数索引位置；取值为`_v2`时，结果写入dst的奇数索引位置。
-
-src支持的数据类型为`float`，dst支持的数据类型为`bfloat16_t`
+- `<round_mode>`表示支持的舍入模式，支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
+- `<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
+- `<position_mode>`表示dst写入的位置，为空时，结果写入dst的偶数索引位置；取值为`_v2`时，结果写入dst的奇数索引位置。
 
 ### 典型示例
 

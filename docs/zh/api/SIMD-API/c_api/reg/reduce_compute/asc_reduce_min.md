@@ -97,13 +97,31 @@ __simd_callee__ inline void asc_reduce_min(vector_half& dst,
 
 ## 关键特性
 
-**索引值需要强制类型转换**：
-
-索引不是dst数据类型的数值，而是按dst元素位宽保存的无符号整数原始位模式。读取`int16_t`、`uint16_t`或`half`结果中的索引时，应按`uint16_t`位模式解释；读取`int32_t`、`uint32_t`或`float`结果中的索引时，应按`uint32_t`位模式解释。
-
-**提取结果（值+索引）：**
+**提取结果时，索引值需要强制类型转换**：
 
 归约产生两个有效结果，需要分别提取。
+
+以下以`half`类型为例，先在Vector Function中将归约结果写入UB，再在Vector Function外同步并分别提取最小值和索引：
+
+```cpp
+__simd_vf__ inline void ReduceMinVF(__ubuf__ half* dst_addr,
+                                    __ubuf__ half* src_addr,
+                                    uint32_t count)
+{
+    vector_half src_reg, dst_reg;
+    vector_bool mask = asc_update_mask_b16(count);
+    asc_loadalign(src_reg, src_addr);
+    asc_reduce_min(dst_reg, src_reg, mask);
+    asc_storealign(dst_addr, dst_reg, mask);
+}
+
+// 以下代码需要放在Vector Function外执行。
+ReduceMinVF(dst_addr, src_addr, count);
+asc_sync(); // 等待归约结果写入UB
+half min_value = dst_addr[0];
+half index_bits = dst_addr[1];
+uint16_t min_index = *reinterpret_cast<uint16_t*>(&index_bits);
+```
 
 ## 调用示例
 

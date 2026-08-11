@@ -26,22 +26,7 @@
 
 ## 功能说明
 
-根据mask对源操作数src进行归约最大值操作：将src中的最大值写入目的操作数dst的0位置，最大值在src中的索引写入目的操作数dst的1位置，dst的其他位置将被置为0，如果有多个最大值，第二个数为最小的下标，其余值都将被填充为0。参考伪代码：
-```python
-def asc_reduce_max(dst, src, mask):
-    max_val = float('-inf')
-    max_idx = 0
-    for i in range(128):
-        if mask[i] and src[i] > max_val:
-            max_val = src[i]
-            max_idx = i
-    dst[0] = max_val                    # 最大值
-    dst_bits[1] = unsigned_bits(max_idx) # 写入索引的原始位模式
-    for i in range(2, 128):
-        dst[i] = 0                      # 其余位置置0
-```
-
-计算公式如下：
+根据mask对源操作数src进行归约最大值操作：将src中的最大值写入目的操作数dst的0位置，最大值在src中的索引写入目的操作数dst的1位置，dst的其他位置将被置为0，如果有多个最大值，第二个数为最小的下标，其余值都将被填充为0。计算公式如下：
 
 $$
 dst_0 = \max\{src_i \mid mask_i = 1\} \\
@@ -96,13 +81,29 @@ __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
 
 ## 关键特性
 
-**索引值需要强制类型转换**：
+**提取结果时，索引值需要强制类型转换**：
 
-索引不是dst数据类型的数值，而是按dst元素位宽保存的无符号整数原始位模式。读取`int16_t`、`uint16_t`或`half`结果中的索引时，应按`uint16_t`位模式解释；读取`int32_t`、`uint32_t`或`float`结果中的索引时，应按`uint32_t`位模式解释。
+以下以`half`类型为例，先在Vector Function中将归约结果写入UB，再在Vector Function外分别提取最大值和索引：
 
-**提取结果（值+索引）：**
+```cpp
+__simd_vf__ inline void ReduceMaxVF(__ubuf__ half* dst_addr,
+                                    __ubuf__ half* src_addr,
+                                    uint32_t count)
+{
+    vector_half src_reg, dst_reg;
+    vector_bool mask = asc_update_mask_b16(count);
+    asc_loadalign(src_reg, src_addr);
+    asc_reduce_max(dst_reg, src_reg, mask);
+    asc_storealign(dst_addr, dst_reg, mask);
+}
 
-归约产生两个有效结果，需要分别提取。
+// 以下代码需要放在Vector Function外执行。
+ReduceMaxVF(dst_addr, src_addr, count);
+asc_sync(); // 等待归约结果写入UB
+half max_value = dst_addr[0];
+half index_bits = dst_addr[1];
+uint16_t max_index = *reinterpret_cast<uint16_t*>(&index_bits);
+```
 
 ## 调用示例
 

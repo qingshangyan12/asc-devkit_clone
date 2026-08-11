@@ -30,12 +30,12 @@
 
 ```python
 def asc_reduce_sum(dst, src, mask):
-    sum_val = 0
-    for i in range(128):
-        if mask[i]:
-            sum_val = sum_val + src[i]  # 底层为二叉树累加, 此处顺序展开仅作示意
-    dst[0] = sum_val                    # 求和值
-    for i in range(1, 128):
+    values = [src[i] if mask[i] else 0 for i in range(len(src))]
+    while len(values) > 1:
+        values = [values[i] + values[i + 1]
+                  for i in range(0, len(values), 2)]
+    dst[0] = values[0]                  # 求和值
+    for i in range(1, len(dst)):
         dst[i] = 0                      # 其余位置置0
 ```
 

@@ -26,8 +26,7 @@
 
 ## 功能说明
 
-根据mask将源操作数src中的每个uint8_t类型元素转为uint16_t类型，结果写入dst。参考伪代码如下：
-
+根据mask将源操作数src中的每个uint8_t类型元素转为uint16_t类型，结果写入dst。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。参考伪代码如下：
 ```python
 def asc_uint82uint16(dst, src, mask):
     for i in range(128):
@@ -44,8 +43,6 @@ def asc_uint82uint16_v2(dst, src, mask):
             dst[i] = 0
 ```
 
-由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
-
 ## 函数原型
 
 ### 模板原型（占位符形式）
@@ -53,14 +50,14 @@ def asc_uint82uint16_v2(dst, src, mask):
 本接口包含2种分块位置，模板原型如下：
 
 ```c
-__simd_callee__ inline void asc_uint82uint16<v2_suffix>(vector_uint16_t& dst,
-                                                        vector_uint8_t src,
-                                                        vector_bool mask)
+__simd_callee__ inline void asc_uint82uint16<position_mode>(vector_uint16_t& dst,
+                                                            vector_uint8_t src,
+                                                            vector_bool mask)
 ```
 
-`<v2_suffix>`为空时，读取src的偶数索引位置；取值为`_v2`时，读取src的奇数索引位置。
+### 占位符说明
 
-src支持的数据类型为`uint8_t`，dst支持的数据类型为`uint16_t`
+- `<position_mode>`表示src读取的位置，为空时，读取src的偶数索引位置；取值为`_v2`时，读取src的奇数索引位置。
 
 ### 典型示例
 

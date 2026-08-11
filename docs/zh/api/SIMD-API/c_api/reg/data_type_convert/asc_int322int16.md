@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-根据mask将src中的每个int32_t类型元素转化为int16_t类型，支持饱和/非饱和模式，结果写入dst。参考伪代码如下：
+根据mask将src中的每个int32_t类型元素转化为int16_t类型，支持饱和/非饱和模式，结果写入dst。由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。参考伪代码如下：
 ```python
 def asc_int322int16(dst, src, mask):
     for i in range(64):
@@ -45,36 +45,22 @@ def asc_int322int16_v2(dst, src, mask):
         else:
             dst[2 * i + 1] = 0
 ```
-由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口将结果写入dst的偶数索引或奇数索引位置。
-
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
-
-由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。
-
-- asc_int322int16：非饱和模式，数据写入索引为偶数的位置。
-
-- asc_int322int16_sat：饱和模式，数据写入索引为偶数的位置。
-
-- asc_int322int16_v2：非饱和模式，数据写入索引为奇数的位置。
-
-- asc_int322int16_sat_v2：饱和模式，数据写入索引为奇数的位置。
 
 ## 函数原型
 
 ### 模板原型（占位符形式）
 
-本接口包含2种分块位置和2种饱和模式，共4个原型，模板原型如下：
-
 ```c
-__simd_callee__ inline void asc_int322int16<sat_suffix><v2_suffix>(vector_int16_t& dst,
-                                                                  vector_int32_t src,
-                                                                  vector_bool mask)
+__simd_callee__ inline void asc_int322int16<sat_mode><position_mode>(vector_int16_t& dst,
+                                                                    vector_int32_t src,
+                                                                    vector_bool mask)
 ```
 
-其中：
+### 占位符说明
 
-- `<sat_suffix>`为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-- `<v2_suffix>`为空时，结果写入dst的偶数索引位置；取值为`_v2`时，结果写入dst的奇数索引位置。
+- `<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
+- `<position_mode>`表示dst写入的位置，为空时，结果写入dst的偶数索引位置；取值为`_v2`时，结果写入dst的奇数索引位置。
 
 ### 典型示例
 
