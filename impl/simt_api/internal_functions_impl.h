@@ -77,6 +77,51 @@ __aicore__ inline constexpr ::ROUND __internal_get_round()
 }
 #endif
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline signed char __internal_cvt_char(int32_t x)
+{
+    if (x > 127) {
+        return static_cast<signed char>(127);
+    }
+    if (x < -128) {
+        return static_cast<signed char>(-128);
+    }
+    return static_cast<signed char>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned char __internal_cvt_uchar(uint32_t x)
+{
+    if (x > 255U) {
+        return static_cast<unsigned char>(255U);
+    }
+    return static_cast<unsigned char>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short int __internal_cvt_short(int32_t x)
+{
+    if (x > 32767) {
+        return static_cast<short int>(32767);
+    }
+    if (x < -32768) {
+        return static_cast<short int>(-32768);
+    }
+    return static_cast<short int>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short int __internal_cvt_ushort(uint32_t x)
+{
+    if (x > 65535U) {
+        return static_cast<unsigned short int>(65535U);
+    }
+    return static_cast<unsigned short int>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t __internal_cvt_int(short int x) { return static_cast<int32_t>(x); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t __internal_cvt_uint(unsigned short int x)
+{
+    return static_cast<uint32_t>(x);
+}
+
 #endif
 #endif // IMPL_SIMT_API_INTERNAL_FUNCTIONS_IMPL_H
 
