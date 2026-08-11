@@ -63,7 +63,7 @@ protected:
     // 通用工具函数
     static Mc2CcTilingInner BuildTiling(HcclCMDType opType, HcclDataType dataType,
                                          const std::string &algConfig);
-    static TopoMeta BuildTopoMeta(uint32_t rankSize);
+    static TopoMeta BuildTopoMeta(uint32_t rankSize, StTopoType topoType = StTopoType::SINGLE_DIE_MESH1D);
     static void CleanupHostEnv(HcclComm &comm);
     static KernelHandle RegisterKernelForRank(uint32_t rank, uint32_t rankSize,
                                                const CcuStScenario &scenario,

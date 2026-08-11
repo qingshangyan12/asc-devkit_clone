@@ -20,10 +20,17 @@
 namespace HcclSim {
 namespace CcuSt {
 
+enum class StTopoType {
+    SINGLE_DIE_MESH1D = 0,    // 1 server, single die (default)
+    TWO_DIE_REGULAR,          // 1 server, 2D phyId layout, 2 die
+    MESH_1D_CLOS,             // 2 servers, cross-server CLOS
+};
+
 struct CcuStScenario {
     uint32_t rankSize = 2;
     HcclDataType dataType = HCCL_DATA_TYPE_FP16;
     HcclCMDType opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
+    StTopoType topoType = StTopoType::SINGLE_DIE_MESH1D;
 
     // Expected algorithm name selected by selector (verified in VerifyScenario)
     // Empty string means skip algName assertion
