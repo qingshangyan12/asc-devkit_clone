@@ -25,30 +25,39 @@
 <!-- end id7 -->
 ## 功能说明
 
-根据mask的比特位值，从源操作数src0，src1中选择元素，得到目的操作数dst。选择的规则为：当mask的比特位为1时，从src0中选取对应位置的数；当mask的比特位为0时，从src1中选取对应位置的数。
-
-计算公式如下：
+根据mask从源操作数src0，src1中选择元素，得到目的操作数dst。选择的规则为：当mask的比特位为1时，从src0中选取对应位置的数；当mask的比特位为0时，从src1中选取对应位置的数。计算公式如下：
 
 $$
-dst_i = (mask_i == 1)\ ?\ src0_i : src1_i
+dst_i = 
+\begin{cases}
+ src0_i, & mask_i = 1 \\
+ src1_i, & mask_i = 0 \\
+\end{cases}
 $$
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_select(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_select(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+### 模板原型（占位符形式）
+
+```c
+__simd_callee__ inline void asc_select(vector_<dtype>& dst,
+                                       vector_<dtype> src0,
+                                       vector_<dtype> src1,
+                                       vector_bool mask)
+```
+
+### dtype支持数据类型
+
+dtype支持的数据类型为`bool`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
+
+### 典型示例
+
+```c
+// 示例：对half矢量数据寄存器执行按掩码选择
+__simd_callee__ inline void asc_select(vector_half& dst,
+                                       vector_half src0,
+                                       vector_half src1,
+                                       vector_bool mask)
 ```
 
 ## 参数说明
@@ -69,21 +78,135 @@ __simd_callee__ inline void asc_select(vector_float& dst, vector_float src0, vec
 
 ## 约束说明
 
-通过mask参数控制的未选中的元素保持源操作数的值而非清零。
+### 通用约束
+
+- 通过mask参数控制的未选中的元素保持源操作数的值而非清零。
+- src0、src1和dst的数据类型需要保持一致。
 
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void select_vf(__ubuf__ half* src0_addr, __ubuf__ half* src1_addr, __ubuf__ half* dst_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void PrintData(const char* label, const std::vector<T>& values)
 {
-    vector_half src0, src1, dst;
-    vector_bool mask;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
-        asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
-        asc_select(dst, src0, src1, mask);
-        asc_storealign_postupdate(dst_addr, dst, one_repeat_size, mask);
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
     }
+    return true;
+}
+
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+
+__simd_vf__ inline void Select(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
+{
+    vector_float dst_reg;
+    vector_float src0_reg;
+    vector_float src1_reg;
+    vector_bool predicate;
+    uint32_t count = ELEMENT_COUNT;
+    vector_bool mask = asc_update_mask_b32(count);
+    asc_loadalign(src0_reg, src0);
+    asc_loadalign(src1_reg, src1);
+    asc_gt(predicate, src0_reg, src1_reg, mask);
+    asc_select(dst_reg, src0_reg, src1_reg, predicate);
+    asc_storealign(dst, dst_reg, mask);
+}
+
+__global__ __vector__ void AscSelectKernel(__gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
+{
+    asc_init();
+    __ubuf__ float dst_local[ELEMENT_COUNT];
+    __ubuf__ float src0_local[ELEMENT_COUNT];
+    __ubuf__ float src1_local[ELEMENT_COUNT];
+    asc_copy_gm2ub_align(src0_local, src0, ELEMENT_COUNT * sizeof(float));
+    asc_copy_gm2ub_align(src1_local, src1, ELEMENT_COUNT * sizeof(float));
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    Select(dst_local, src0_local, src1_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<float> src0(ELEMENT_COUNT);
+    std::vector<float> src1(ELEMENT_COUNT);
+    std::vector<float> output(ELEMENT_COUNT, 0.0f);
+    std::vector<float> golden(ELEMENT_COUNT);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+        src0[i] = static_cast<float>(i);
+        src1[i] = static_cast<float>(ELEMENT_COUNT - i);
+        golden[i] = src0[i] > src1[i] ? src0[i] : src1[i];
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    float* src0_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src0_device), (ELEMENT_COUNT) * sizeof(float),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    float* src1_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src1_device), (ELEMENT_COUNT) * sizeof(float),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    float* dst_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(float),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src0_device, src0.size() * sizeof(float), src0.data(), src0.size() * sizeof(float),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(src1_device, src1.size() * sizeof(float), src1.data(), src1.size() * sizeof(float),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    AscSelectKernel<<<1, 0>>>(dst_device, src0_device, src1_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input src0", src0);
+    PrintData("Input src1", src1);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden);
+    std::cout << (passed ? "[Success] asc_select passed." : "[Failed] asc_select failed.") << std::endl;
+    aclrtFree(dst_device);
+    aclrtFree(src0_device);
+    aclrtFree(src1_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```
