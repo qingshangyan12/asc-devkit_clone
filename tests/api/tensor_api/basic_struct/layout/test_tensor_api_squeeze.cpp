@@ -450,9 +450,9 @@ TEST_F(tensor_api_layout_squeeze, test_squeeze_nn_two_batch_after_slice)
     // Strides of the base block survive the slice + squeeze unchanged.
     auto stride = squeezed.stride();
     EXPECT_EQ((asc::te::get<0, 0>(stride)), 1);
-    EXPECT_EQ((asc::te::get<0, 1>(stride)), 32); // c0_value * FRACTAL_FIXED = 2 * 16
+    EXPECT_EQ((asc::te::get<0, 1>(stride)), 32); // c0_value * fractal_fixed = 2 * 16
     EXPECT_EQ((asc::te::get<1, 0>(stride)), 2);  // c0_value
-    EXPECT_EQ((asc::te::get<1, 1>(stride)), 256); // row * FRACTAL_FIXED = 16 * 16
+    EXPECT_EQ((asc::te::get<1, 1>(stride)), 256); // row * fractal_fixed = 16 * 16
 
     // Mode 2 (isomorphic pattern) on the same sliced layout gives the same result.
     auto squeezed_by_pattern =

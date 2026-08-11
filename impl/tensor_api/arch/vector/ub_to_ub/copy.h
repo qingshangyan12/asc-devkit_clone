@@ -29,11 +29,11 @@
 namespace asc {
 namespace te {
 
-constexpr copy_ub_to_ub_trait DEFAULT_COPY_UB_TO_UB_TRAIT = copy_ub_to_ub_trait{};
+constexpr copy_ub_to_ub_trait default_copy_ub_to_ub_trait = copy_ub_to_ub_trait{};
 
 struct copy_ub_to_ub_trait_default {
     using trait_type = copy_ub_to_ub_trait;
-    static constexpr const trait_type value = DEFAULT_COPY_UB_TO_UB_TRAIT;
+    static constexpr const trait_type value = default_copy_ub_to_ub_trait;
 };
 
 struct copy_ub_to_ub {
@@ -47,7 +47,7 @@ public:
     }
 
 private:
-    template <const copy_ub_to_ub_trait& trait = DEFAULT_COPY_UB_TO_UB_TRAIT, typename T, typename U>
+    template <const copy_ub_to_ub_trait& trait = default_copy_ub_to_ub_trait, typename T, typename U>
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
     {
         using dst_pos = get_mem_location<T>;
@@ -56,7 +56,7 @@ private:
         static_assert(Std::is_same_v<src_pos, location::ub>, "When Copy tensor from UB to UB, src tensor must on UB");
         using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
         using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
-        using copy_ub_to_ub_impl = typename copy_ub_to_ub_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        using copy_ub_to_ub_impl = typename copy_ub_to_ub_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
         copy_ub_to_ub_impl::template run<trait, T, U>(dst, src);
     }
 };

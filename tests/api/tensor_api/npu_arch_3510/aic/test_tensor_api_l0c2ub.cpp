@@ -139,7 +139,7 @@ void run_l0c_to_ub_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en,
     constexpr uint32_t k_m = 32;
     constexpr uint32_t k_n = 64;
     constexpr uint32_t k_matrix_size = k_m * k_n;
-    constexpr uint32_t k_src_batch_stride = k_matrix_size / FRACTAL_FIXED;
+    constexpr uint32_t k_src_batch_stride = k_matrix_size / fractal_fixed;
     constexpr uint16_t k_src_matrix_stride = k_m;
     constexpr uint64_t k_src_c0_stride = 1;
 
@@ -186,7 +186,7 @@ void run_l0c_to_ub_batch_nz_to_nz_no_quant()
     constexpr uint32_t k_n = 64;
     constexpr uint32_t k_matrix_size = k_m * k_n;
     constexpr uint16_t k_src_matrix_stride = k_m;
-    constexpr uint32_t k_dst_matrix_stride = FRACTAL_FIXED * k_m;
+    constexpr uint32_t k_dst_matrix_stride = fractal_fixed * k_m;
 
     __cc__ float src[k_src_batch * k_matrix_size] = {0};
     __ubuf__ float dst[k_dst_batch * k_matrix_size] = {0};
