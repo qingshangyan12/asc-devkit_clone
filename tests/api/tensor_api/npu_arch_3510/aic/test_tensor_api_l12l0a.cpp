@@ -50,11 +50,11 @@ void run_copy_call_paths(const dst_tensor_type& dst, const src_tensor_type& src)
 }
 
 template <typename copy_operation, typename trait_type, typename dst_tensor_type, typename src_tensor_type>
-void run_copy_with_paths(const dst_tensor_type& dst, const src_tensor_type& src)
+void run_copy_default_paths(const dst_tensor_type& dst, const src_tensor_type& src)
 {
     using namespace asc::te;
 
-    auto atom = copy_atom<copy_traits<copy_operation, trait_type>>{}.with();
+    auto atom = copy_atom<copy_traits<copy_operation, trait_type>>{};
     atom.call(dst, src);
     copy(atom, dst, src);
 }
@@ -81,7 +81,7 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0a_routes_to_cube_arch_copy)
     auto l0a_tensor = make_tensor_at<location::l0a>(dst, make_frame_layout<nz_layout_ptn, layout_trait_default<float>>(m, n));
 
     run_copy_call_paths<copy_l1_to_l0a, copy_l1_to_l0a_trait_default>(l0a_tensor, l1_tensor);
-    run_copy_with_paths<copy_l1_to_l0a, copy_l1_to_l0a_trait_default>(l0a_tensor, l1_tensor);
+    run_copy_default_paths<copy_l1_to_l0a, copy_l1_to_l0a_trait_default>(l0a_tensor, l1_tensor);
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -229,8 +229,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0a_batch_zn_to_nz_b8_b4)
     __cbuf__ fp4x2_e1m2_t src[batch * src_batch_stride];
     __ca__ fp4x2_e1m2_t dst[batch * dst_batch_stride];
 
-    auto src_batch_layout = make_frame_layout<zn_layout_ptn, layout_trait_fp4>(batch, m, n);
-    auto dst_batch_layout = make_frame_layout<nz_layout_ptn, layout_trait_fp4>(batch, m, n);
+    auto src_batch_layout = make_frame_layout<zn_layout_ptn, layout_trait_default<fp4x2_e1m2_t>>(batch, m, n);
+    auto dst_batch_layout = make_frame_layout<nz_layout_ptn, layout_trait_default<fp4x2_e1m2_t>>(batch, m, n);
     auto l1_tensor = make_tensor_at<location::l1>(src, src_batch_layout);
     auto l0a_tensor = make_tensor_at<location::l0a>(dst, dst_batch_layout);
 
@@ -285,12 +285,12 @@ TEST_F(tensor_api_cube_copy_3510, TEST_L1_TO_L0A_CONCAT_(test_load_s4_data_l1_to
     using namespace asc::te; \
     __##dst_tag##__ data_type dst[m_value * n_value]; \
     auto dst_iterator = make_mem_ptr<location::l0a>(dst); \
-    auto dst_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(dst_format), layout_trait_fp4>(m_value, n_value); \
+    auto dst_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(dst_format), layout_trait_default<data_type>>(m_value, n_value); \
     auto dst_tensor = make_tensor(dst_iterator, dst_matrix_layout); \
  \
     __##src_tag##__ data_type src[m_value * n_value]; \
     auto src_iterator = make_mem_ptr<location::l1>(src); \
-    auto src_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(src_format), layout_trait_fp4>(m_value, n_value); \
+    auto src_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(src_format), layout_trait_default<data_type>>(m_value, n_value); \
     auto src_tensor = make_tensor(src_iterator, src_matrix_layout); \
  \
     copy(copy_atom<copy_traits<copy_l1_to_l0a, copy_l1_to_l0a_trait_default>>{}, dst_tensor, src_tensor); \

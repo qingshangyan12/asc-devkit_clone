@@ -57,9 +57,9 @@ private:
         uint16_t block_count = get_element<attr_info::shape, attr_info::row, 1>(src_layout);
         uint32_t block_len = get_total_column_shape(src_layout);
         int64_t src_stride =
-            get_element<attr_info::stride, attr_info::row, 1>(src_layout) / C0_ELEMENT<src_type> - block_len;
+            get_element<attr_info::stride, attr_info::row, 1>(src_layout) / c0_element<src_type> - block_len;
         int64_t dst_stride =
-            get_element<attr_info::stride, attr_info::row, 1>(dst_layout) / C0_ELEMENT<dst_type> - block_len;
+            get_element<attr_info::stride, attr_info::row, 1>(dst_layout) / c0_element<dst_type> - block_len;
 
         emit_copy(dst, src, block_count, block_len, src_stride, dst_stride);
     }

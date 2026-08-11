@@ -47,7 +47,7 @@ private:
         auto src_layout = src.layout();
 
         uint16_t block_count = get_total_row_shape(src_layout);
-        uint32_t block_len = Std::ceil_division(get_total_column_shape(src_layout), C0_ELEMENT<src_type>);
+        uint32_t block_len = Std::ceil_division(get_total_column_shape(src_layout), c0_element<src_type>);
 
         uint32_t src_row_stride;
         uint32_t dst_row_stride;
@@ -62,9 +62,9 @@ private:
             dst_row_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout);
         }
         int64_t src_stride =
-            Std::ceil_division(src_row_stride - get_total_column_shape(src_layout), C0_ELEMENT<src_type>);
+            Std::ceil_division(src_row_stride - get_total_column_shape(src_layout), c0_element<src_type>);
         int64_t dst_stride =
-            Std::ceil_division(dst_row_stride - get_total_column_shape(src_layout), C0_ELEMENT<dst_type>);
+            Std::ceil_division(dst_row_stride - get_total_column_shape(src_layout), c0_element<dst_type>);
 
         copy_l1_to_ub_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
                                          dst_stride);
@@ -90,7 +90,7 @@ private:
         auto src_layout = src.layout();
 
         uint16_t block_count = get_total_column_shape(src_layout);
-        uint32_t block_len = Std::ceil_division(get_total_row_shape(src_layout), C0_ELEMENT<src_type>);
+        uint32_t block_len = Std::ceil_division(get_total_row_shape(src_layout), c0_element<src_type>);
 
         uint32_t src_column_stride;
         uint32_t dst_column_stride;
@@ -105,9 +105,9 @@ private:
             dst_column_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout);
         }
         int64_t src_stride =
-            Std::ceil_division(src_column_stride - get_total_row_shape(src_layout), C0_ELEMENT<src_type>);
+            Std::ceil_division(src_column_stride - get_total_row_shape(src_layout), c0_element<src_type>);
         int64_t dst_stride =
-            Std::ceil_division(dst_column_stride - get_total_row_shape(src_layout), C0_ELEMENT<dst_type>);
+            Std::ceil_division(dst_column_stride - get_total_row_shape(src_layout), c0_element<dst_type>);
 
         copy_l1_to_ub_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
                                          dst_stride);
@@ -135,9 +135,9 @@ private:
         uint16_t block_count = get_element<attr_info::shape, attr_info::column, 1>(src_layout);
         uint32_t block_len = get_total_row_shape(src_layout);
         int64_t src_stride =
-            get_element<attr_info::stride, attr_info::column, 1>(src_layout) / C0_ELEMENT<src_type> - block_len;
+            get_element<attr_info::stride, attr_info::column, 1>(src_layout) / c0_element<src_type> - block_len;
         int64_t dst_stride =
-            get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / C0_ELEMENT<dst_type> - block_len;
+            get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / c0_element<dst_type> - block_len;
 
         copy_l1_to_ub_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
                                          dst_stride);
