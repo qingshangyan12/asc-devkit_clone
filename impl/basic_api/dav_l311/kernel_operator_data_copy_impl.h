@@ -86,7 +86,6 @@ __aicore__ inline void CopyUbufToGmAlignV2(
     copy_ubuf_to_gm_align_v2(dst, src, 0, blockCount, burstLength, dstStride310, srcStride310);
 }
 
-
 // only support CubeCore   PIPE_MTE2
 // GM -> L1: copy_gm_to_cbuf_align_v2
 template <typename T>
@@ -395,7 +394,6 @@ __aicore__ inline void DataCopyL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const D
     CopyCbufToGmAlignV2(
         dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride);
 }
-
 
 template <typename T>
 __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
