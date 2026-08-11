@@ -371,6 +371,18 @@ HcclResult FillCachedArgs(CcuKernelSubmitInfo& info, Args... args)
     return HcclResult::HCCL_SUCCESS;
 }
 
+// cachedArgs[0] 留给 missionId 等元数据，从 cachedArgs[1] 开始填充算法参数
+template <typename... Args>
+void FillCachedArgsPayload(CcuKernelSubmitInfo& info, Args... args)
+{
+    constexpr size_t argNum = sizeof...(Args);
+    static_assert(argNum + 1 <= CCU_MAX_TASK_ARG_NUM, "argNum + missionId exceeds CCU_MAX_TASK_ARG_NUM");
+    uint64_t temp[] = {static_cast<uint64_t>(args)...};
+    for (size_t i = 0; i < argNum; i++) {
+        info.cachedArgs[i + 1] = temp[i];
+    }
+}
+
 HcclResult CalcDataSplitByPortGroupCommon(
     const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
     std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset, const u32 channelsPerRank);

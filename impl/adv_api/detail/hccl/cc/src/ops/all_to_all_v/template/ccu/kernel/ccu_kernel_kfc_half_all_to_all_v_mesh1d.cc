@@ -313,8 +313,15 @@ CcuResult CcuKfcHalfAll2AllVMesh1DKernel(
         HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] goSize0 == 0, skip data transfer");
     }
 
-    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 6: PostSync");
-    CCU_CHK_RET(PostSync(ctx));
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 6: PostSync (only Mi0)");
+    CCU_IF(missionId == 0)
+    {
+        CCU_CHK_RET(PostSync(ctx));
+    }
+    CCU_IF(missionId != 0)
+    {
+        HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] missionId!=0, skip PostSync");
+    }
 
     HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Kernel exit");
     return CCU_SUCCESS;
