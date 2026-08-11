@@ -16,12 +16,30 @@ namespace mc2_ops_hccl {
 
 class AllReduceAutoSelector : public AutoSelectorBase {
 private:
+    SelectorStatus SelectCcuScheduleAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+        const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
+        std::string& selectAlgName) const override;
+    SelectorStatus SelectCcuScheduleLevel0Algo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName,
+        const u64 dataSize) const;
+    SelectorStatus SelectCcuMsAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+        const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
+        std::string& selectAlgName) const override;
     SelectorStatus SelectAicpuAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+        const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
+        std::string& selectAlgName) const override;
+    SelectorStatus SelectAivAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+        const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
+        std::string& selectAlgName) const override;
+    SelectorStatus SelectDPUAlgo(
         const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
         const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
         std::string& selectAlgName) const override;
 };
 
 } // namespace mc2_ops_hccl
-
 #endif // HCCLV2_ALL_REDUCE_AUTO_SELECTOR_H
