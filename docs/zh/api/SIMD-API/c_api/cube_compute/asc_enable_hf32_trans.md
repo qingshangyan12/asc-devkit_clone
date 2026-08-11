@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-设置HF32模式舍入方式。使用该接口前需要先使用[asc_enable_hf32](./asc_enable_hf32.md)开启HF32模式。
+本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](./asc_enable_hf32.md)开启HF32模式。
 
 ## 函数原型
 
@@ -56,7 +56,98 @@ mode仅支持如下2种取值：<br>0：FP32将以最接近偶数的方式四舍
 
 ## 调用示例
 
+以下为可执行的调用示例代码：
+
 ```cpp
-uint32_t mode = 0;
-asc_enable_hf32_trans(mode);
+// 假设示例代码保存为 ASCEND_EXAMPLE_PATH/asc_enable_hf32_trans.asc
+// 构建产物保存目录为 ASCEND_BUILD_PATH
+// 可执行文件名为 c_api_cube_compute_asc_enable_hf32_trans
+// 编译与运行命令：
+// "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang "$ASCEND_EXAMPLE_PATH/asc_enable_hf32_trans.asc" -lm -o "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_enable_hf32_trans" && "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_enable_hf32_trans"
+
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t DIM = 16, ELEMENTS = DIM * DIM;
+
+__global__ __cube__ void asc_enable_hf32_trans_kernel(
+    __gm__ float* a, __gm__ float* b, __gm__ float* output, uint32_t mode)
+{
+    asc_init();
+    __cbuf__ float a_l1[ELEMENTS], b_l1[ELEMENTS];
+    __ca__ float a_l0[ELEMENTS];
+    __cb__ float b_l0[ELEMENTS];
+    __cc__ float c_l0[ELEMENTS];
+    constexpr uint64_t nz_config = (16ULL << 32) | (1ULL << 16) | 1ULL;
+    asc_set_gm2l1_nz_para(nz_config);
+    asc_copy_gm2l1_nd2nz(a_l1, a, DIM * sizeof(float), 0, DIM, DIM, 0, false);
+    asc_set_gm2l1_nz_para(nz_config);
+    asc_copy_gm2l1_nd2nz(b_l1, b, DIM * sizeof(float), 0, DIM, DIM, 0, false);
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+    asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 2, 1, 1);
+    asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0, 1, 2, 1, 1);
+    asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
+    asc_enable_hf32();
+    asc_enable_hf32_trans(mode);
+    asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
+    asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
+    asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
+    asc_set_l0c2gm_nz2nd(1, 0, 0);
+    asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
+        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
+        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_sync_pipe(PIPE_ALL);
+}
+
+void print_row(const char* label, const std::vector<float>& data)
+{
+    std::cout << label << ':';
+    for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
+    std::cout << " ..." << std::endl;
+}
+} // namespace
+
+int main()
+{
+    constexpr float tie = 1.0f + 0.5f / 1024.0f;
+    std::vector<float> a(ELEMENTS), b(ELEMENTS), mode1(ELEMENTS), mode0(ELEMENTS);
+    std::vector<float> mode1_golden(ELEMENTS), mode0_golden(ELEMENTS);
+    for (uint32_t i = 0; i < DIM; ++i) {
+        a[i * DIM + i] = tie;
+        b[i * DIM + i] = 1.0f;
+        mode1_golden[i * DIM + i] = 1.0f + 1.0f / 1024.0f;
+        mode0_golden[i * DIM + i] = 1.0f;
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    float *a_device = nullptr, *b_device = nullptr, *mode1_device = nullptr, *mode0_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&a_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&b_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&mode1_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&mode0_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(a_device, ELEMENTS * sizeof(float), a.data(), ELEMENTS * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(b_device, ELEMENTS * sizeof(float), b.data(), ELEMENTS * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_enable_hf32_trans_kernel<<<1, 0>>>(a_device, b_device, mode1_device, 1);
+    aclrtSynchronizeDevice();
+    asc_enable_hf32_trans_kernel<<<1, 0>>>(a_device, b_device, mode0_device, 0);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(mode1.data(), ELEMENTS * sizeof(float), mode1_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(mode0.data(), ELEMENTS * sizeof(float), mode0_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
+    print_row("Input tie row 0", a);
+    print_row("mode 1 row 0", mode1);
+    print_row("mode 0 row 0", mode0);
+    const bool passed = mode1 == mode1_golden && mode0 == mode0_golden;
+    std::cout << (passed ? "[Success] asc_enable_hf32_trans selects tie rounding."
+                         : "[Failed] asc_enable_hf32_trans result mismatch.") << std::endl;
+    aclrtFree(a_device); aclrtFree(b_device); aclrtFree(mode1_device); aclrtFree(mode0_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
