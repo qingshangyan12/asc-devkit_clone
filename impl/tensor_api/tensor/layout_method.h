@@ -223,7 +223,7 @@ __aicore__ inline constexpr auto cosize(const LayoutType& layout)
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto rank(const LayoutType& layout)
 {
-    return layout.template get_rank<Is...>();
+    return layout.template rank<Is...>();
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>

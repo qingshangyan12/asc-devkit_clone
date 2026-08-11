@@ -45,11 +45,11 @@ struct copy_traits<CopyOp, Traits, CopyOpWith, TraitsWith> {
     __aicore__ inline constexpr copy_traits<CopyOpWith, TraitsWith> with(const Params& params) const
     {
         using params_type = Std::remove_cvref_t<Params>;
-        if constexpr (Std::is_same_v<params_type, fixpipe_params> || Std::is_same_v<params_type, FixpipeParams>) {
-            return {normalize_fixpipe_params(params)};
+        if constexpr (Std::is_same_v<params_type, fixpipe_params> || Std::is_same_v<params_type, AscendC::Te::FixpipeParams>) {
+            return {AscendC::Te::normalize_fixpipe_params(params)};
         } else if constexpr (Std::is_same_v<params_type, copy_gm_to_ub_params>
-                             || Std::is_same_v<params_type, CopyGM2UBParams>) {
-            return {normalize_copy_gm_to_ub_params(params)};
+                             || Std::is_same_v<params_type, AscendC::Te::CopyGM2UBParams>) {
+            return {AscendC::Te::normalize_copy_gm_to_ub_params(params)};
         } else {
             return {params};
         }

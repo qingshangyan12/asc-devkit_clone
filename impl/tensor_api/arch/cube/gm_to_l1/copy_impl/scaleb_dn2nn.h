@@ -71,8 +71,8 @@ public:
         uint64_t loop4_src_stride = src_dn_matrix_stride * sizeof(type);
 
         uint16_t loop2_dst_stride = dst_nz_n_stride;                             // loop2_dst_stride = dst_nz_n_stride
-        uint16_t loop3_dst_stride = dst_b_col_stride * sizeof(type) / C0_SIZE<>; // loop3_dst_stride = dst_nz_c0_Stride
-        uint16_t loop4_dst_stride = dst_nz_matrix_stride * sizeof(type) / C0_SIZE<>;
+        uint16_t loop3_dst_stride = dst_b_col_stride * sizeof(type) / c0_size<>; // loop3_dst_stride = dst_nz_c0_Stride
+        uint16_t loop4_dst_stride = dst_nz_matrix_stride * sizeof(type) / c0_size<>;
         uint8_t cache_mode = src.engine().get_cache_mode();
         // fp8 scale use b16 for movement
         copy_gm_to_l1_multi_dn2nz_instr::data_copy(

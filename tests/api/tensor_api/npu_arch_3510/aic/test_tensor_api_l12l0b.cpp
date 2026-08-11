@@ -126,17 +126,17 @@ template <typename data_type, uint32_t batch_value, uint32_t m_value, uint32_t n
 auto make_batch_zn_layout()
 {
     using namespace asc::te;
-    constexpr uint32_t c0_value = C0_ELEMENT<data_type>;
+    constexpr uint32_t c0_value = c0_element<data_type>;
 
     auto shape = make_shape(AscendC::Std::Int<batch_value>{},
         make_shape(make_shape(AscendC::Std::Int<c0_value>{}, AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{},
             AscendC::Std::Int<c0_value>{})),
-        make_shape(AscendC::Std::Int<FRACTAL_FIXED>{}, AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{},
-            AscendC::Std::Int<FRACTAL_FIXED>{}))));
+        make_shape(AscendC::Std::Int<fractal_fixed>{}, AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{},
+            AscendC::Std::Int<fractal_fixed>{}))));
     auto stride = make_stride(AscendC::Std::Int<m_value * n_value>{},
         make_stride(make_stride(_1{}, AscendC::Std::Int<c0_value>{} *
-            AscendC::Std::ceil_align(AscendC::Std::Int<n_value>{}, AscendC::Std::Int<FRACTAL_FIXED>{})),
-        make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * FRACTAL_FIXED>{})));
+            AscendC::Std::ceil_align(AscendC::Std::Int<n_value>{}, AscendC::Std::Int<fractal_fixed>{})),
+        make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * fractal_fixed>{})));
     return make_pattern_layout<zn_layout_ptn, layout_trait_default<data_type>>(shape, stride);
 }
 
@@ -144,17 +144,17 @@ template <typename data_type, uint32_t batch_value, uint32_t m_value, uint32_t n
 auto make_batch_nz_layout()
 {
     using namespace asc::te;
-    constexpr uint32_t c0_value = C0_ELEMENT<data_type>;
+    constexpr uint32_t c0_value = c0_element<data_type>;
 
     auto shape = make_shape(AscendC::Std::Int<batch_value>{},
-        make_shape(make_shape(AscendC::Std::Int<FRACTAL_FIXED>{}, AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{},
-            AscendC::Std::Int<FRACTAL_FIXED>{})),
+        make_shape(make_shape(AscendC::Std::Int<fractal_fixed>{}, AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{},
+            AscendC::Std::Int<fractal_fixed>{})),
         make_shape(AscendC::Std::Int<c0_value>{}, AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{},
             AscendC::Std::Int<c0_value>{}))));
     auto stride = make_stride(AscendC::Std::Int<m_value * n_value>{},
-        make_stride(make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * FRACTAL_FIXED>{}),
+        make_stride(make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * fractal_fixed>{}),
         make_stride(_1{}, AscendC::Std::Int<c0_value>{} *
-            AscendC::Std::ceil_align(AscendC::Std::Int<m_value>{}, AscendC::Std::Int<FRACTAL_FIXED>{}))));
+            AscendC::Std::ceil_align(AscendC::Std::Int<m_value>{}, AscendC::Std::Int<fractal_fixed>{}))));
     return make_pattern_layout<nz_layout_ptn, layout_trait_default<data_type>>(shape, stride);
 }
 

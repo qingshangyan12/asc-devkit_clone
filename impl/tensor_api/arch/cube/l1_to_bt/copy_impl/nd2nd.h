@@ -35,7 +35,7 @@ public:
         // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
         // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
         constexpr auto l1_depth = nesting_depth_v<decltype(src.layout().shape())>;
-        if constexpr (l1_depth == THREE_DIM_DATA || l1_depth == FIVE_DIM_DATA) {
+        if constexpr (l1_depth == three_dim_data || l1_depth == five_dim_data) {
             batch_data_copy_impl<trait, T, U>(dst, src);
         } else {
             data_copy_impl<trait, T, U>(dst, src);
@@ -88,13 +88,13 @@ private:
             conv_control = true;
         }
 
-        uint16_t block_len = Std::ceil_division(src_col, C0_ELEMENT<src_type>);
+        uint16_t block_len = Std::ceil_division(src_col, c0_element<src_type>);
         if constexpr (is_one_of_attr_v<src_type, float, int32_t>) {
             block_len = Std::ceil_align(block_len, 2);
         }
 
-        uint16_t src_stride = (src_row - src_col) / C0_ELEMENT<src_type>;
-        uint16_t dst_stride = Std::ceil_align((dst_row - src_col) / C0_ELEMENT<dst_type>, 2);
+        uint16_t src_stride = (src_row - src_col) / c0_element<src_type>;
+        uint16_t dst_stride = Std::ceil_align((dst_row - src_col) / c0_element<dst_type>, 2);
         copy_l1_to_biastable_instr::data_copy(reinterpret_cast<uint64_t>(dst.data().get()), src.data().get(),
                                                  conv_control, block_count, block_len, src_stride, dst_stride);
     }
@@ -107,7 +107,7 @@ private:
     //   - get<0>(Shape/Stride) returns the batch size and per-matrix start-to-start stride.
     //   - When batches are also contiguous (src_batch_stride == M*N && dst_batch_stride == M*N),
     //     fold the B blocks into a single B*M*N block; otherwise emit B blocks, one per matrix.
-    //   - Both src_stride and dst_stride encode the end-to-next-start gap in C0_ELEMENT units, in
+    //   - Both src_stride and dst_stride encode the end-to-next-start gap in c0_element units, in
     //     keeping with the L1->BT instruction's stride convention.
     template <const copy_l1_to_biastable_trait& trait, typename T, typename U>
     __aicore__ inline static void batch_data_copy_impl(const T& dst, const U& src)
@@ -147,12 +147,12 @@ private:
 
         // batch-strided: B blocks, stride encodes per-matrix end-to-next-start gap.
         uint16_t block_count = batch_size;
-        uint16_t block_len = Std::ceil_division(matrix_elems, C0_ELEMENT<src_type>);
+        uint16_t block_len = Std::ceil_division(matrix_elems, c0_element<src_type>);
         if constexpr (is_one_of_attr_v<src_type, float, int32_t>) {
             block_len = Std::ceil_align(block_len, 2);
         }
-        uint16_t src_stride = (src_batch_stride - matrix_elems) / C0_ELEMENT<src_type>;
-        uint16_t dst_stride = Std::ceil_align((dst_batch_stride - matrix_elems) / C0_ELEMENT<dst_type>, 2);
+        uint16_t src_stride = (src_batch_stride - matrix_elems) / c0_element<src_type>;
+        uint16_t dst_stride = Std::ceil_align((dst_batch_stride - matrix_elems) / c0_element<dst_type>, 2);
 
         copy_l1_to_biastable_instr::data_copy(reinterpret_cast<uint64_t>(dst.data().get()), src.data().get(),
                                                  conv_control, block_count, block_len, src_stride, dst_stride);
