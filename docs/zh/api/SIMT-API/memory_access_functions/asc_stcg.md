@@ -85,6 +85,10 @@ inline void asc_stcg(unsigned char* address, unsigned char val)
 ```
 
 ```cpp
+inline void asc_stcg(char* address, char val)
+```
+
+```cpp
 inline void asc_stcg(char2* address, char2 val)
 ```
 
