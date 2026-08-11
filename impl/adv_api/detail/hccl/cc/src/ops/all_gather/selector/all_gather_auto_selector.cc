@@ -29,7 +29,7 @@ SelectorStatus AllGatherAutoSelector::SelectCcuMsAlgo(
         HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu_ms does not support inplace allgather.");
         return SelectorStatus::NOT_MATCH;
     }
-    selectAlgName = "CcuKfcAllGatherMesh1DMem2Mem";
+    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
     HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
@@ -49,7 +49,7 @@ SelectorStatus AllGatherAutoSelector::SelectMeshAlgo(
         HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu_ms does not support inplace allgather.");
         return SelectorStatus::NOT_MATCH;
     }
-    selectAlgName = "CcuKfcAllGatherMesh1DMem2Mem";
+    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
     HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
