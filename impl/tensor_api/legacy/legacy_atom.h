@@ -13,8 +13,10 @@
 
 #include "impl/tensor_api/legacy/legacy_type.h"
 
-namespace asc {
-namespace te {
+namespace AscendC {
+namespace Te {
+
+using namespace asc::te;
 
 // MmadTraits: 独立的 PascalCase 模板，不依赖 mmad_traits
 template <typename MmadOperationType, typename... MmadOpArgs>
@@ -39,17 +41,17 @@ struct MmadTraits<MmadOp, MmadTraitsType, MmadOpWith, MmadTraitsWith> {
     template <typename Params>
     __aicore__ inline constexpr MmadTraits<MmadOpWith, MmadTraitsWith> with(const Params& p) const
     {
-        return {normalize_mmad_params(p)};
+        return {AscendC::Te::normalize_mmad_params(p)};
     }
 
     template <const TraitType& trait = defaultTrait, typename... Args>
     __aicore__ inline void mmad_unpack(const Args&... args) const
     {
-        using normalized_t = Std::remove_cvref_t<decltype(normalize_mmad_trait(TraitType{}))>;
+        using normalized_t = Std::remove_cvref_t<decltype(AscendC::Te::normalize_mmad_trait(TraitType{}))>;
         if constexpr (Std::is_same_v<TraitType, normalized_t>) {
             MmadOp::template mmad<TraitType, trait, Args...>(args..., params);
         } else {
-            constexpr static normalized_t normalized_trait = normalize_mmad_trait(trait);
+            constexpr static normalized_t normalized_trait = AscendC::Te::normalize_mmad_trait(trait);
             MmadOp::template mmad<normalized_t, normalized_trait, Args...>(args..., params);
         }
     }
@@ -123,18 +125,18 @@ __aicore__ inline constexpr Trait normalize_copy_trait(const Trait& trait)
 
 __aicore__ inline constexpr copy_l0c_to_gm_trait normalize_copy_trait(const CopyL0C2GMTrait& trait)
 {
-    return {normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit};
+    return {AscendC::Te::normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit};
 }
 
 __aicore__ inline constexpr copy_l0c_to_ub_trait normalize_copy_trait(const CopyL0C2UBTrait& trait)
 {
-    return {normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit,
-            normalize_dual_dst_mode(trait.dualDstCtl)};
+    return {AscendC::Te::normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit,
+            AscendC::Te::normalize_dual_dst_mode(trait.dualDstCtl)};
 }
 
 __aicore__ inline constexpr copy_l0c_to_l1_trait normalize_copy_trait(const CopyL0C2L1Trait& trait)
 {
-    return {normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit};
+    return {AscendC::Te::normalize_round_mode(trait.roundMode), trait.enableRelu, trait.enableChannelSplit};
 }
 
 // 检测 CopyOp 是否有 snake_case copy 方法
@@ -169,11 +171,11 @@ struct CopyTraits<CopyOp, Traits, CopyOpWith, TraitsWith> {
     __aicore__ inline constexpr CopyTraits<CopyOpWith, TraitsWith> with(const Params& p) const
     {
         using params_type = Std::remove_cvref_t<Params>;
-        if constexpr (Std::is_same_v<params_type, fixpipe_params> || Std::is_same_v<params_type, FixpipeParams>) {
-            return {normalize_fixpipe_params(p)};
-        } else if constexpr (Std::is_same_v<params_type, copy_gm_to_ub_params>
-                             || Std::is_same_v<params_type, CopyGM2UBParams>) {
-            return {normalize_copy_gm_to_ub_params(p)};
+        if constexpr (Std::is_same_v<params_type, asc::te::fixpipe_params> || Std::is_same_v<params_type, AscendC::Te::FixpipeParams>) {
+            return {AscendC::Te::normalize_fixpipe_params(p)};
+        } else if constexpr (Std::is_same_v<params_type, asc::te::copy_gm_to_ub_params>
+                             || Std::is_same_v<params_type, AscendC::Te::CopyGM2UBParams>) {
+            return {AscendC::Te::normalize_copy_gm_to_ub_params(p)};
         } else {
             return {p};
         }
@@ -190,11 +192,11 @@ struct CopyTraits<CopyOp, Traits, CopyOpWith, TraitsWith> {
                 CopyOp::template Copy<normalized_t, trait, Args...>(args...);
             }
         } else {
-            constexpr static normalized_t normalized_trait = normalize_copy_trait(trait);
-            if constexpr (has_copy_method<void, CopyOp, normalized_t, normalized_trait, Args...>::value) {
-                CopyOp::template copy<normalized_t, normalized_trait, Args...>(args...);
+            static constexpr normalized_t normalized_trait_val = normalize_copy_trait(trait);
+            if constexpr (has_copy_method<void, CopyOp, normalized_t, normalized_trait_val, Args...>::value) {
+                CopyOp::template copy<normalized_t, normalized_trait_val, Args...>(args...);
             } else {
-                CopyOp::template Copy<normalized_t, normalized_trait, Args...>(args...);
+                CopyOp::template Copy<normalized_t, normalized_trait_val, Args...>(args...);
             }
         }
     }
@@ -300,7 +302,7 @@ __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copy_operatio
     return CopyAtom<CopyTraits<CopyOperationType, CopyTraitType>>{};
 }
 
-} // namespace te
-} // namespace asc
+} // namespace Te
+} // namespace AscendC
 
 #endif // IMPL_TENSOR_API_LEGACY_LEGACY_ATOM_H

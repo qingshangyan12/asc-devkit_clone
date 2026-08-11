@@ -73,7 +73,7 @@ public:
         uint32_t d_value = src_row_shape;
         uint64_t src_d_value = src_row_stride;
 
-        uint16_t dst_nz_c0_stride = dst_b_row_stride / C0_ELEMENT<type>;
+        uint16_t dst_nz_c0_stride = dst_b_row_stride / c0_element<type>;
         uint16_t dst_nz_n_stride = 1;
 
         uint64_t loop1_src_stride = src_d_value * sizeof(type);
@@ -82,7 +82,7 @@ public:
         uint16_t loop2_dst_stride = dst_nz_n_stride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3_dst_stride = dst_nz_c0_stride; // loop3_dst_stride = dst_nz_c0_Stride
         // loop4_dst_stride: dst_nz_matrix_stride * size_of_dst_type / C0_size
-        uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / C0_ELEMENT<type>);
+        uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / c0_element<type>);
 
         uint8_t cache_mode = src.engine().get_cache_mode();
 

@@ -48,7 +48,7 @@ public:
         // Shape[2]*Shape[3] (row count), dst_stride = H*W (the DN column stride = row count = Stride[1]).
         uint32_t n_size = get<1>(dst_layout.shape());
         uint32_t m_size = get<2>(dst_layout.shape()) * get<3>(dst_layout.shape());
-        uint32_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / FRACTAL_FIXED;
+        uint32_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / fractal_fixed;
         uint32_t dst_stride = get<1>(dst_layout.stride());
 
         uint8_t cache_mode = dst.engine().get_cache_mode();

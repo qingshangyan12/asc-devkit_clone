@@ -67,7 +67,7 @@ public:
         uint8_t cache_mode = src.engine().get_cache_mode();
 
         auto block_count = big_fractal_size * matrix_num;
-        auto block_len = small_fractal_size * C0_SIZE<>;
+        auto block_len = small_fractal_size * c0_size<>;
         auto src_stride = src_stride_size * sizeof(type);
         auto dst_stride = dst_stride_size * sizeof(type);
         if constexpr (is_b4_type<type>) {
