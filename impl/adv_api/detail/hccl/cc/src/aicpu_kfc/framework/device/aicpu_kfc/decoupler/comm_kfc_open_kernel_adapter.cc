@@ -141,7 +141,8 @@ void CreateOpParamByBaseOpParam(
             static_cast<u32>(msgOpType), static_cast<unsigned long long>(msg.dataCnt), repeatCnt,
             static_cast<unsigned long long>(effectiveStrideCount));
         if (effectiveStrideCount == 0U && repeatCnt > 1U &&
-            (msgOpType == HCCL_CMD_ALLGATHER || msgOpType == HCCL_CMD_REDUCE_SCATTER)) {
+            (msgOpType == HCCL_CMD_ALLGATHER || msgOpType == HCCL_CMD_REDUCE_SCATTER ||
+             msgOpType == HCCL_CMD_ALLREDUCE)) {
             effectiveStrideCount = msg.dataCnt * static_cast<u64>(repeatCnt);
             HCCL_INFO(
                 "[MC2_OPEN_DIAG][FormatStrideFallback] opType %u, dataCnt %llu, repeatCnt %u, "
