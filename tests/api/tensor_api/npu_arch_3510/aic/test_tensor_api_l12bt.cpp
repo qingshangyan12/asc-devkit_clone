@@ -219,9 +219,9 @@ DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(half, 1, 64, float, 1, 64)
 // s_b == m_value*n_value. The implementation only keeps the batched branch:
 //   conv_control = 0 (same-type) or 1 (half->float)
 //   block_count  = batch_value
-//   block_len    = ceil_division(m_value*n_value, C0_ELEMENT<src_type>), rounded up to 2 for fp32/int32
-//   src_stride   = (s_b - m_value*n_value) / C0_ELEMENT<src_type>
-//   dst_stride   = ceil_align((s_b - m_value*n_value) / C0_ELEMENT<dst_type>, 2)
+//   block_len    = ceil_division(m_value*n_value, c0_element<src_type>), rounded up to 2 for fp32/int32
+//   src_stride   = (s_b - m_value*n_value) / c0_element<src_type>
+//   dst_stride   = ceil_align((s_b - m_value*n_value) / c0_element<dst_type>, 2)
 // With s_b == m_value*n_value both strides are 0.
 // =========================================================================
 template <typename data_type, int batch_value, int m_value, int n_value>

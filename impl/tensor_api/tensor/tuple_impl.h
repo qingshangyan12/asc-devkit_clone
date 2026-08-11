@@ -109,19 +109,16 @@ struct product {
     }
 };
 
-template <size_t I, typename Tuple, typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
-__aicore__ inline constexpr auto get(Tuple&& t)
-{
-    static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
-    return Std::get<I>(static_cast<Tuple&&>(t));
-}
-
-template <size_t I0, size_t I1, size_t... Is, typename Tuple,
+template <size_t I, size_t... Is, typename Tuple,
           typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
 __aicore__ inline constexpr auto get(Tuple&& t)
 {
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
-    return get<I1, Is...>(get<I0>(static_cast<Tuple&&>(t)));
+    if constexpr (sizeof...(Is) == 0) {
+        return Std::get<I>(static_cast<Tuple&&>(t));
+    } else {
+        return get<Is...>(get<I>(static_cast<Tuple&&>(t)));
+    }
 }
 
 template <typename Tuple, typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
@@ -314,8 +311,6 @@ constexpr bool is_same_structure_v = is_same_structure<Std::remove_cvref_t<T>, S
 
 } // namespace te
 } // namespace asc
-
-
 
 #endif // IMPL_TENSOR_API_TENSOR_TUPLE_IMPL_H
 

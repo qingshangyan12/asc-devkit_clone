@@ -39,24 +39,24 @@ public:
     }
 };
 
-template <uint32_t version, typename DstLayoutPattern, typename SrcLayoutPattern, typename CopyMode>
+template <uint32_t version, typename DstLayoutPattern, typename SrcLayoutPattern, bool is_b8b4>
 struct copy_l1_to_l0b_routing {
     using type = copy_l1_to_l0b_ignore;
 };
 
-template <uint32_t version>
-struct copy_l1_to_l0b_routing<version, zn_layout_ptn, zn_layout_ptn, copy_mode::normal> {
+template <uint32_t version, bool is_b8b4>
+struct copy_l1_to_l0b_routing<version, zn_layout_ptn, zn_layout_ptn, is_b8b4> {
     using type = load_data_l1_to_l0b_zn2zn;
 };
 
 template <uint32_t version>
-struct copy_l1_to_l0b_routing<version, zn_layout_ptn, nz_layout_ptn, copy_mode::trans> {
-    using type = load_data_l1_to_l0b_nz2zn;
+struct copy_l1_to_l0b_routing<version, zn_layout_ptn, nz_layout_ptn, false> {
+    using type = load_data_l1_to_l0b_nz2zn<false>;
 };
 
 template <uint32_t version>
-struct copy_l1_to_l0b_routing<version, zn_layout_ptn, nz_layout_ptn, copy_mode::trans_b8b4> {
-    using type = load_data_l1_to_l0b_nz2zn_b8b4;
+struct copy_l1_to_l0b_routing<version, zn_layout_ptn, nz_layout_ptn, true> {
+    using type = load_data_l1_to_l0b_nz2zn<true>;
 };
 
 } // namespace te
