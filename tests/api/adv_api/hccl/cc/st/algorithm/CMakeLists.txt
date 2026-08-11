@@ -95,7 +95,6 @@ set(HCCL_CHECKER_COMMON_INCLUDE_LIST
     ${UTILS_DIR}/hccl_proxy/communicator
     ${UTILS_DIR}/hccl_proxy/topo_model
     ${UTILS_DIR}/hccl_depends_stub
-    ${UTILS_DIR}/ccu
 )
 
 add_subdirectory(utils)
