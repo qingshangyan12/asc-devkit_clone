@@ -21,7 +21,8 @@
 #endif
 #ifndef LIB_MATH_IS_FINITE_IMPL_H
 #define LIB_MATH_IS_FINITE_IMPL_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 // Implementation Process
@@ -92,7 +93,8 @@ __simd_vf__ inline void IsFiniteVFImpl(__ubuf__ U* dstUb, __ubuf__ T* srcUb, uin
             Reg::CompareScalar<uint32_t, CMPMODE::EQ>(cmpMaskReg, vExpResultReg32, FLOAT_EXP_MASK, preg);
         } else if constexpr (IsSameType<T, half>::value) {
             Reg::And(vExpResultReg16, (Reg::RegTensor<uint16_t>&)vSrcReg0, vExpMaskReg16, preg);
-            Reg::CompareScalar<uint16_t, CMPMODE::EQ>(cmpMaskReg, vExpResultReg16, static_cast<uint16_t>(HALF_EXP_MASK), preg);
+            Reg::CompareScalar<uint16_t, CMPMODE::EQ>(
+                cmpMaskReg, vExpResultReg16, static_cast<uint16_t>(HALF_EXP_MASK), preg);
         }
 #else
         Reg::Compare<T, CMPMODE::NE>(cmpMaskNAN, vSrcReg0, vSrcReg0, preg);
@@ -149,20 +151,19 @@ __aicore__ inline void IsFiniteImpl(const LocalTensor<U>& dst, const LocalTensor
         return;
     });
 
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     static_assert(
-        (SupportType<
-            Tuple<U, T>, Tuple<half, half>, Tuple<bool, half>, Tuple<float, float>, Tuple<bool, float>>()),
+        (SupportType<Tuple<U, T>, Tuple<half, half>, Tuple<bool, half>, Tuple<float, float>, Tuple<bool, float>>()),
         "Failed to check dtype in IsFinite, current api support dtype combination is U : half/bool, "
         "T : half; U : float/bool, T : float");
-    #else
+#else
     static_assert(
         (SupportType<
             Tuple<U, T>, Tuple<half, half>, Tuple<bool, half>, Tuple<float, float>, Tuple<bool, float>,
             Tuple<bfloat16_t, bfloat16_t>, Tuple<bool, bfloat16_t>>()),
         "Failed to check dtype in IsInf, current api support dtype combination is U : half/bool, "
         "T : half; U : float/bool, T : float, U: bfloat16_t/bool, T: bfloat16_t");
-    #endif
+#endif
 
     __ubuf__ T* srcUb = (__ubuf__ T*)src.GetPhyAddr();
     __ubuf__ U* dstUb = (__ubuf__ U*)dst.GetPhyAddr();

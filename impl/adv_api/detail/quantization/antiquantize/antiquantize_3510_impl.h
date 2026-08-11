@@ -295,9 +295,11 @@ __aicore__ inline void AntiQuantizePerTensor(
     const LocalTensor<uint8_t>& sharedTmpBuffer, const AntiQuantizeParams& params)
 {
     static_assert(
-        SupportType<SrcT, fp8_e4m3fn_t, fp8_e5m2_t, int8_t
+        SupportType<
+            SrcT, fp8_e4m3fn_t, fp8_e5m2_t, int8_t
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
-            , hifloat8_t
+            ,
+            hifloat8_t
 #endif
             >(),
         "This AntiQuantize only support fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t/int8_t input dtype");
