@@ -44,7 +44,7 @@ $$
 | C | L0C Buffer | M×N | Nz | 16×16 |
 | Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
-表格中K0的取值为`32Byte/sizeof(dtype)`，`dtype`为矩阵的数据类型。
+表格中K0的取值为`32Byte / sizeof(dtype)`，`dtype`为矩阵的数据类型。
 <!-- end id8 -->
 
 <!-- npu="A3,910b" id9 -->
@@ -57,15 +57,13 @@ $$
 | C | L0C Buffer | M×N | Nz | 16×16 |
 | Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩 | ND | - |
 
-表格中K0的取值为`32Byte/sizeof(dtype)`，`dtype`为矩阵的数据类型。
+表格中K0的取值为`32Byte / sizeof(dtype)`，`dtype`为矩阵的数据类型。
 <!-- end id9 -->
 
 ## 函数原型
 
 <!-- npu="950" id12 -->
 ### 模板原型（占位符形式，[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
-
-以下使用`<c_dtype>`、`<a_dtype>`、`<b_dtype>`作为数据类型占位符表示各重载的函数原型：
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
@@ -80,11 +78,13 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 bool c_matrix_init_val)
 ```
 
-`<c_dtype>`、`<a_dtype>`、`<b_dtype>`的取值组合见下表：
+### dtype支持数据类型（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
+`c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
 **表3** 支持的数据类型组合（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_data_type"></a>
 
-| <a_dtype> | <b_dtype> | <c_dtype> | Bias数据类型 |
+| a_dtype | b_dtype | c_dtype | Bias数据类型 |
 | --- | --- | --- | --- |
 | `int8_t` | `int8_t` | `int32_t` | `int32_t` |
 | `hifloat8_t` | `hifloat8_t` | `float` | `float` |
@@ -97,6 +97,21 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 | `float` | `float` | `float` | `float` |
 <!-- end id12 -->
 
+### 典型示例（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
+```c
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix,
+                                __ca__ bfloat16_t* a_matrix,
+                                __cb__ bfloat16_t* b_matrix,
+                                uint16_t left_height,
+                                uint16_t n_dim,
+                                uint16_t right_width,
+                                uint8_t unit_flag,
+                                bool disable_gemv,
+                                bool c_matrix_source,
+                                bool c_matrix_init_val)
+```
+
 <!-- npu="A3,910b" id13 -->
 ### 模板原型（占位符形式，[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
@@ -107,11 +122,11 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
   __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
   ```
 
-  `<c_dtype>`、`<a_dtype>`、`<b_dtype>`的取值组合见下表：
+  `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
   **表4** 支持的数据类型组合（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
-  | <a_dtype> | <b_dtype> | <c_dtype> | Bias数据类型 |
+  | a_dtype | b_dtype | c_dtype | Bias数据类型 |
   | --- | --- | --- | --- |
   | `int8_t` | `int8_t` | `int32_t` | `int32_t` |
   | `half` | `half` | `float` | `float` |
@@ -139,8 +154,8 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 | left_height | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | n_dim | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]。 |
 | right_width | 输入 | 右矩阵B和结果矩阵C的N维大小，单位为元素，取值范围为[0, 4095]。 |
-| unit_flag | 输入 | 用于控制矩阵乘加指令与矩阵搬出指令的细粒度并行，开启UnitFlag后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; 2：开启UnitFlag，硬件执行完指令后不改变单元标志位。<br>&nbsp;&nbsp;&bull; 3：开启UnitFlag，硬件执行完指令后改变单元标志位。<br>矩阵乘加指令与对应的矩阵搬出指令必须都开启或都不开启UnitFlag，开启后指令之间无需再插入同步指令，参数设置方案和特性细节请参考[UnitFlag特性说明]()。 |
-| disable_gemv | 输入 | M为1时，配置是否关闭[GEMV]()模式。<br>&nbsp;&nbsp;&bull; false：开启GEMV模式。<br>&nbsp;&nbsp;&bull; true：关闭GEMV模式。<br>M不为1时，该参数不生效。 |
+| unit_flag | 输入 | 用于控制矩阵乘加指令与矩阵搬出指令的细粒度并行，开启UnitFlag后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; 2：开启UnitFlag，硬件执行完指令后不改变单元标志位。<br>&nbsp;&nbsp;&bull; 3：开启UnitFlag，硬件执行完指令后改变单元标志位。<br>矩阵乘加指令与对应的矩阵搬出指令必须都开启或都不开启UnitFlag，开启后指令之间无需再插入同步指令。 |
+| disable_gemv | 输入 | M为1时，配置是否关闭GEMV模式。<br>&nbsp;&nbsp;&bull; false：开启GEMV模式。<br>&nbsp;&nbsp;&bull; true：关闭GEMV模式。<br>M不为1时，该参数不生效。 |
 | c_matrix_source | 输入 | 当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer。 |
 | c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数`c_matrix_source`配置。 |
 <!-- end id14 -->
@@ -159,10 +174,10 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 | feat_offset | 输入 | 保留参数。 |
 | smask_offset | 输入 | 权重矩阵的偏移位。 |
 | unit_flag | 输入 | 用于控制矩阵乘加指令与矩阵搬出指令的细粒度并行，开启UnitFlag后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; 2：开启UnitFlag，硬件执行完指令后不改变单元标志位。<br>&nbsp;&nbsp;&bull; 3：开启UnitFlag，硬件执行完指令后改变单元标志位。<br>矩阵乘加指令与对应的矩阵搬出指令必须都开启或都不开启UnitFlag，开启后指令之间无需再插入同步指令。 |
-| k_direction_align | 输入 | 当源操作数和目的操作数为float时，L0A和L0B中的矩阵在right_width方向上按ceil(right_width/16)*16方式都对齐到48，对于right_width=44，L0A/L0B中的所有12个分形都会被读取到Cube中，而对于right_width=36，只有L0A/L0B中的10个分形会被读取到Cube中。 |
+| k_direction_align | 输入 | K方向对齐的核心功能是通过`k_direction_align`参数控制在使用float数据类型时，L0A Buffer和L0B Buffer矩阵在K方向上的对齐方式。<br>取值说明如下：<br>&nbsp;&nbsp;&bull; false：K方向对齐到`ceil(n_dim / 8) * 8`。<br>&nbsp;&nbsp;&bull; true：K方向对齐到`ceil(n_dim / 16) * 16`。 |
 | is_weight_offset | 输入 | 启用weight matrix offset。 |
-| c_matrix_source | 输入 | 当参数c_matrix_init_val为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer。 |
-| c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数c_matrix_source不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数c_matrix_source配置。 |
+| c_matrix_source | 输入 | 当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer。 |
+| c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数c_matrix_source配置。 |
 <!-- end id15 -->
 
 ## 返回值说明
@@ -175,19 +190,31 @@ PIPE_M
 
 ## 约束说明
 
-- 本接口仅在AIC上执行有效。
 - `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP（空操作）。
 
 - **内存使用约束说明**
 
-  - L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB。<!-- npu="950" id10 -->针对Ascend 950PR/Ascend 950DT，BiasTable Buffer大小为4KB。<!-- end id10 --><!-- npu="A3,910b" id11 -->针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，BiasTable Buffer大小为1KB。<!-- end id11 -->矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+  <!-- npu="950" id10 -->
+  - 针对Ascend 950PR/Ascend 950DT，L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+  <!-- end id10 -->
   - 各矩阵的起始地址需满足[表5](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-  - 申请矩阵存储空间时，需使用按照分形大小补齐后的数值进行申请：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数，K0的取值为`32Byte/sizeof(dtype)`，`dtype`为矩阵的数据类型。`left_height`、`n_dim`和`right_width`仍传入矩阵的有效M、K、N值，补齐部分为无效数据，不参与结果矩阵有效区域的计算。
-  - 当M为1，<!-- npu="950" id16 -->且`disable_gemv`为false时<!-- end id16 -->，将开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐，更多特性细节请参考[GEMV特性说明]()。
+  - 申请矩阵存储空间时，需使用按照分形大小补齐后的数值进行申请：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数，K0的取值为`32Byte / sizeof(dtype)`，`dtype`为矩阵的数据类型。
+  - 当M为1且`disable_gemv`为false时，将开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
+
+  <!-- npu="A3,910b" id11 -->
+  针对如下产品型号：
+  <!-- npu="A3" id16 -->
+  Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id16 -->
+  <!-- npu="910b" id17 -->
+  Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id17 -->
+  - L0C Buffer大小为128KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为1KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+  <!-- end id11 -->
 
 - **同步约束说明**
 
-  - 针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(left_height/16) * (right_width/16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。
+  - 针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(left_height / 16) * (right_width / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。
 
 - **UnitFlag约束说明**
 
@@ -206,19 +233,106 @@ PIPE_M
 
 ## 调用示例
 
-```cpp
-__cc__ int32_t c_matrix[128 * 128];
-__ca__ int8_t a_matrix[128 * 64];
-__cb__ int8_t b_matrix[64 * 128];
-uint16_t left_height = 128;
-uint16_t n_dim = 64;
-uint16_t right_width = 128;
-uint8_t unit_flag = 0;
-bool disable_gemv = false;
-bool c_matrix_source = false;
-bool c_matrix_init_val = true;
-asc_mmad_sync(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width,
-              unit_flag, disable_gemv, c_matrix_source, c_matrix_init_val);
-```
-
 完整使用样例请参考[asc_mmad样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad)。
+
+以下为可执行的调用示例代码：
+
+```cpp
+// 假设示例代码保存到asc_mmad.asc中，保存路径为ASCEND_EXAMPLE_PATH，构建产物保存路径为ASCEND_BUILD_PATH
+// 编译与运行命令: "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang $ASCEND_EXAMPLE_PATH/asc_mmad.asc -lm -o $ASCEND_BUILD_PATH && $ASCEND_BUILD_PATH
+
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t M = 16;
+constexpr uint32_t K = 32;
+constexpr uint32_t N = 16;
+
+__global__ __cube__ void asc_mmad_kernel(__gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
+{
+    asc_init();
+    __cbuf__ int8_t a_l1[M * K];
+    __cbuf__ int8_t b_l1[K * N];
+    __ca__ int8_t a_l0[M * K];
+    __cb__ int8_t b_l0[K * N];
+    __cc__ int32_t c_l0[M * N];
+    constexpr uint64_t a_nz_config = (32ULL << 32) | (1ULL << 16) | 1ULL;
+    constexpr uint64_t b_nz_config = (32ULL << 32) | (1ULL << 16) | 1ULL;
+
+    asc_set_gm2l1_nz_para(a_nz_config);
+    asc_copy_gm2l1_nd2nz(a_l1, a, K * sizeof(int8_t), 0, M, K, 0, false);
+    asc_set_gm2l1_nz_para(b_nz_config);
+    asc_copy_gm2l1_nd2nz(b_l1, b, N * sizeof(int8_t), 0, K, N, 0, false);
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+    asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
+    asc_copy_l12l0b_trans(b_l0, b_l1, static_cast<uint16_t>(0), static_cast<uint8_t>(1),
+        static_cast<uint16_t>(2), static_cast<uint16_t>(1), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+    asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
+    asc_mmad(c_l0, a_l0, b_l0, M, K, N, 0, true, false, true);
+    asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
+    asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
+    asc_set_l0c2gm_nz2nd(1, 0, 0);
+    asc_copy_l0c2gm(output, c_l0, N, M, N, M, 0, 0, 0,
+        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
+        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_sync_pipe(PIPE_ALL);
+}
+
+template <typename T>
+void print_row(const char* label, const std::vector<T>& data)
+{
+    std::cout << label << ':';
+    for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << +data[i];
+    std::cout << " ..." << std::endl;
+}
+} // namespace
+
+int main()
+{
+    std::vector<int8_t> a(M * K), b(K * N);
+    std::vector<int32_t> output(M * N), golden(M * N);
+    for (uint32_t row = 0; row < M; ++row) {
+        for (uint32_t k = 0; k < K; ++k) a[row * K + k] = static_cast<int8_t>((row + k) % 5 - 2);
+    }
+    for (uint32_t k = 0; k < K; ++k) {
+        for (uint32_t col = 0; col < N; ++col) b[k * N + col] = static_cast<int8_t>((k + 2 * col) % 7 - 3);
+    }
+    for (uint32_t row = 0; row < M; ++row) {
+        for (uint32_t col = 0; col < N; ++col) {
+            for (uint32_t k = 0; k < K; ++k) golden[row * N + col] += a[row * K + k] * b[k * N + col];
+        }
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int8_t *a_device = nullptr, *b_device = nullptr;
+    int32_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&a_device), a.size(), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&b_device), b.size(), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(a_device, a.size(), a.data(), a.size(), ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(b_device, b.size(), b.data(), b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_mmad_kernel<<<1, 0>>>(a_device, b_device, output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), output_device, output.size() * sizeof(int32_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_row("Input A row 0", a);
+    print_row("Input B row 0", b);
+    print_row("Output row 0", output);
+    print_row("Golden row 0", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_mmad passed." : "[Failed] asc_mmad failed.") << std::endl;
+    aclrtFree(a_device);
+    aclrtFree(b_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
+```
