@@ -61,12 +61,14 @@ private:
         auto m_step = get_element<attr_info::shape, attr_info::column, 1>(src_layout);
         auto k_step = get_element<attr_info::shape, attr_info::row, 1>(dst_layout)
                       * get_element<attr_info::shape, attr_info::row, 0>(dst_layout) / C0_ELEMENT<dst_type>;
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_step, m_step, "m_step", "copy_l1_to_l0a zn2nz path");
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_step, k_step, "k_step", "copy_l1_to_l0a zn2nz path");
         // Zn -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
         auto src_stride = get_element<attr_info::stride, attr_info::row, 1>(src_layout) / STRIDE_UNIT;
         auto dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / STRIDE_UNIT;
-        load_l1_to_l0a_instr::load_data<true>(dst.data().get(), src.data().get(), m_start_position,
-                                                k_start_position, m_step, k_step, src_stride, dst_stride);
+        load_l1_to_l0a_instr::load_data<true>(dst.data().get(), src.data().get(), m_start_position, k_start_position,
+                                              m_step, k_step, src_stride, dst_stride);
     }
 
     template <const copy_l1_to_l0a_trait& trait, typename T, typename U>

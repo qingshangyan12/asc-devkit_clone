@@ -36,7 +36,7 @@ struct copy_l1_to_l0a_trait_default {
 
 using copy_l1_to_l0a_mode_set =
     tuple_map<Std::tuple<Std::tuple<_1, _0>, copy_mode::normal>, Std::tuple<Std::tuple<_1, _1>, copy_mode::normal>,
-             Std::tuple<Std::tuple<_0, _0>, copy_mode::trans>, Std::tuple<Std::tuple<_0, _1>, copy_mode::trans_b8b4>>;
+              Std::tuple<Std::tuple<_0, _0>, copy_mode::trans>, Std::tuple<Std::tuple<_0, _1>, copy_mode::trans_b8b4>>;
 
 struct copy_l1_to_l0a_base {
 public:
@@ -55,20 +55,35 @@ public:
         using src_layout = typename U::layout_type;
         using dst_pattern = get_layout_pattern<dst_layout>;
         using src_pattern = get_layout_pattern<src_layout>;
-        if constexpr (Std::is_same_v<src_pattern, nc1hwc0_layout_ptn> || Std::is_same_v<src_pattern, ndc1hwc0_layout_ptn>) {
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy_l1_to_l0a");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy_l1_to_l0a");
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "copy_l1_to_l0a");
+        if constexpr (Std::is_same_v<dst_pattern, nz_layout_ptn> && Std::is_same_v<src_pattern, nc1hwc0_layout_ptn>
+                      && !is_b4_type<typename T::element_type>) {
+            TENSOR_API_DEBUG_CHECK(debug_check_img2col_coord<typename T::element_type>, params, "copy_l1_to_l0a");
+        }
+        if constexpr (Std::is_same_v<src_pattern, nc1hwc0_layout_ptn>
+                      || Std::is_same_v<src_pattern, ndc1hwc0_layout_ptn>) {
             // conv2D (NC1HWC0) and conv3D (NDC1HWC0) both take the img2col path; routing picks the
             // 2D or 3D implementation selected by the source pattern.
-            using copy_l1_to_l0a_impl =
-                typename copy_l1_to_l0a_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern, copy_mode::normal>::type;
+            using copy_l1_to_l0a_impl = typename copy_l1_to_l0a_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern,
+                                                                        copy_mode::normal>::type;
             copy_l1_to_l0a_impl::template run<trait, T, U, PadT>(dst, src, params);
         } else {
+            if constexpr (dst_layout::depth == FIVE_DIM_DATA && src_layout::depth == FIVE_DIM_DATA) {
+                TENSOR_API_DEBUG_CHECK(debug_check_batch_match, get<0>(src.layout().shape()),
+                                       get<0>(dst.layout().shape()), "copy_l1_to_l0a");
+                TENSOR_API_DEBUG_CHECK(debug_check_l0_batch_stride, get<0>(src.layout().stride()),
+                                       remove_batch_dim(src.layout()).capacity(), get<0>(dst.layout().stride()),
+                                       remove_batch_dim(dst.layout()).capacity(), "copy_l1_to_l0a");
+            }
             constexpr auto is_b8_b4_type = sizeof(typename T::element_type) == 1;
             constexpr auto no_trans = Std::is_same_v<dst_pattern, src_pattern>;
             using copy_l1_to_l0a_mode =
                 typename copy_l1_to_l0a_mode_set::template get<Std::tuple<Std::Int<no_trans>, Std::Int<is_b8_b4_type>>>;
             static_assert(!Std::is_same_v<copy_l1_to_l0a_mode, Std::ignore_t>, "Unsupported CopyL12L0A mode.");
-            using copy_l1_to_l0a_impl =
-                typename copy_l1_to_l0a_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern, copy_l1_to_l0a_mode>::type;
+            using copy_l1_to_l0a_impl = typename copy_l1_to_l0a_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern,
+                                                                        copy_l1_to_l0a_mode>::type;
             copy_l1_to_l0a_impl::template run<trait, T, U>(dst, src);
         }
     }

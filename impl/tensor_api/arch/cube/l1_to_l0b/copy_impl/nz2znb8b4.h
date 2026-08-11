@@ -64,7 +64,7 @@ private:
         for (uint16_t idx = 0; idx < n_loop; ++idx) {
             auto slice_dst = dst(make_coord(make_coord(0, idx), make_coord(0, 0)));
             load_l1_to_l0b_instr::load_data<true>(slice_dst.data().get(), src.data().get(), m_start_position,
-                                                    k_start_position, m_step, k_step, src_stride, dst_stride);
+                                                  k_start_position, m_step, k_step, src_stride, dst_stride);
             m_start_position += m_step_min_val;
         }
     }
@@ -83,13 +83,16 @@ private:
         auto m_step = get_element<attr_info::shape, attr_info::row, 1>(dst_layout)
                       * get_element<attr_info::shape, attr_info::row, 0>(dst_layout) / FRACTAL_FIXED;
         auto k_step = get_element<attr_info::shape, attr_info::column, 1>(src_layout);
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_step, k_step, "k_step", "copy_l1_to_l0b nz2zn b8/b4 path");
+        TENSOR_API_DEBUG_CHECK(debug_check_l0_m_step, m_step, is_b4_type<dst_type>, "copy_l1_to_l0b nz2zn b8/b4 path");
         // Nz -> Zn
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<dst_type> * FRACTAL_FIXED;
         auto src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / STRIDE_UNIT;
         auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout) / STRIDE_UNIT;
         if (n1 < FRACTAL_FIXED) {
+            TENSOR_API_DEBUG_CHECK(debug_check_l0_step, m_step, "m_step", "copy_l1_to_l0b nz2zn b8/b4 path");
             load_l1_to_l0b_instr::load_data<true>(dst.data().get(), src.data().get(), m_start_position,
-                                                    k_start_position, m_step, k_step, src_stride, dst_stride);
+                                                  k_start_position, m_step, k_step, src_stride, dst_stride);
         } else if constexpr (is_b4_type<dst_type>) {
             load_data_impl_split<M_STEP_MIN_VAL_B4>(dst, src, m_start_position, k_start_position, m_step, k_step,
                                                     src_stride, dst_stride);

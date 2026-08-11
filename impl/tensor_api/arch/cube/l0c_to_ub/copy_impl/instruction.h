@@ -31,14 +31,19 @@ class copy_l0c_to_ub_instr {
 public:
     template <QuantMode_t quant_pre, typename T, typename U>
     __aicore__ inline static void data_copy(__ubuf__ T* dst, __cc__ U* src, uint32_t n_size, uint32_t m_size,
-                                                   uint32_t src_stride, uint32_t dst_stride, uint8_t dual_dst_ctl,
-                                                   bool relu_en, uint8_t unit_flag, bool sub_block_id,
-                                                   bool is_channel_split, bool nz2nd_en, bool nz2dn_en)
+                                            uint32_t src_stride, uint32_t dst_stride, uint8_t dual_dst_ctl,
+                                            bool relu_en, uint8_t unit_flag, bool sub_block_id, bool is_channel_split,
+                                            bool nz2nd_en, bool nz2dn_en)
     {
         if ASCEND_IS_AIV {
             return;
         }
 
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, n_size, "n_size", "copy_l0c_to_ub instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_n, n_size, is_channel_split, nz2nd_en, nz2dn_en, "copy_l0c_to_ub");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_m, m_size, nz2nd_en, "copy_l0c_to_ub instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, src_stride, dst_stride, "copy_l0c_to_ub instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_unit_flag, unit_flag, "copy_l0c_to_ub instruction");
         asc_copy_l0c2ub(dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
                         static_cast<uint16_t>(src_stride), dual_dst_ctl, sub_block_id, 0, unit_flag,
                         static_cast<uint64_t>(quant_pre), static_cast<uint8_t>(relu_en), is_channel_split, nz2nd_en,

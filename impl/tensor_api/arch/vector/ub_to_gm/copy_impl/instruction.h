@@ -32,12 +32,18 @@ public:
     template <typename T>
     __aicore__ inline static void
     data_copy(__gm__ T* dst, __ubuf__ T* src, const uint16_t block_count, const uint32_t block_len,
-                 const int64_t src_stride, const int64_t dst_stride,
-                 const asc_store_l2_cache_mode cache_mode = asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM)
+              const int64_t src_stride, const int64_t dst_stride,
+              const asc_store_l2_cache_mode cache_mode = asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM)
     {
         if ASCEND_IS_AIC {
             return;
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_count, DEBUG_BLOCK_COUNT_MAX, "block_count",
+                               "copy_ub_to_gm instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_len, DEBUG_GM_UB_BLOCK_LEN_MAX, "block_len",
+                               "copy_ub_to_gm instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_ub2gm_stride, src_stride, block_len, block_count,
+                               "copy_ub_to_gm instruction");
         if constexpr (sizeof(T) == 1) {
             asc_copy_ub2gm_align((__gm__ uint8_t*)dst, (__ubuf__ uint8_t*)src, block_count, block_len, cache_mode,
                                  dst_stride, static_cast<uint32_t>(src_stride));

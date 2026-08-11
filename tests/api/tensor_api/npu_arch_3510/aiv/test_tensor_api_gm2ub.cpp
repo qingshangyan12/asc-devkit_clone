@@ -18,9 +18,15 @@ protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
 
-    void SetUp() override { AscendC::SetGCoreType(2); }
+    void SetUp() override
+    {
+        AscendC::SetGCoreType(2);
+    }
 
-    void TearDown() override { AscendC::SetGCoreType(0); }
+    void TearDown() override
+    {
+        AscendC::SetGCoreType(0);
+    }
 };
 
 namespace {
@@ -34,7 +40,7 @@ struct copy_gm_to_ub_capture {
 copy_gm_to_ub_capture g_copy_gm_to_ub_capture;
 
 void copy_gm_to_ub_stub(__ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t, uint8_t left_padding_count,
-                   uint8_t right_padding_count, bool enable_constant_pad, uint8_t, uint64_t, uint32_t)
+                        uint8_t right_padding_count, bool enable_constant_pad, uint8_t, uint64_t, uint32_t)
 {
     g_copy_gm_to_ub_capture = {left_padding_count, right_padding_count, enable_constant_pad};
 }
@@ -78,8 +84,10 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_nd_to_nd)
     __gm__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto gm_tensor = make_tensor_at<location::gm>(src, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
-    auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto gm_tensor =
+        make_tensor_at<location::gm>(src, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto ub_tensor =
+        make_tensor_at<location::ub>(dst, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
     run_copy_with_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
@@ -93,11 +101,14 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_with_padding_params)
 
     constexpr uint32_t m = 2;
     constexpr uint32_t n = 16;
+    constexpr uint32_t dst_n = 32;
     __gm__ int8_t src[m * n] = {0};
-    __ubuf__ int8_t dst[m * n] = {0};
+    __ubuf__ int8_t dst[m * dst_n] = {0};
 
-    auto gm_tensor = make_tensor_at<location::gm>(src, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
-    auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto gm_tensor =
+        make_tensor_at<location::gm>(src, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto ub_tensor =
+        make_tensor_at<location::ub>(dst, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, dst_n));
 
     MOCKER_CPP(copy_gm_to_ubuf_align_v2, void(__ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t, uint8_t,
                                               uint8_t, bool, uint8_t, uint64_t, uint32_t))
@@ -122,8 +133,10 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_default_padding_params)
     __gm__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto gm_tensor = make_tensor_at<location::gm>(src, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
-    auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto gm_tensor =
+        make_tensor_at<location::gm>(src, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto ub_tensor =
+        make_tensor_at<location::ub>(dst, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     MOCKER_CPP(copy_gm_to_ubuf_align_v2, void(__ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t, uint8_t,
                                               uint8_t, bool, uint8_t, uint64_t, uint32_t))
@@ -148,8 +161,10 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_nd_layout_to_nd_layout)
     __gm__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto gm_tensor = make_tensor_at<location::gm>(src, make_frame_layout<nd_layout_ptn, layout_trait_default<int8_t>>(m, n));
-    auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nd_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto gm_tensor =
+        make_tensor_at<location::gm>(src, make_frame_layout<nd_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto ub_tensor =
+        make_tensor_at<location::ub>(dst, make_frame_layout<nd_layout_ptn, layout_trait_default<int8_t>>(m, n));
     gm_tensor.set_l2_cache_hint(cache_mode::persistent);
 
     run_copy_call_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
@@ -167,8 +182,10 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_dn_to_dn)
     __gm__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto gm_tensor = make_tensor_at<location::gm>(src, make_frame_layout<dn_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
-    auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<dn_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto gm_tensor =
+        make_tensor_at<location::gm>(src, make_frame_layout<dn_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto ub_tensor =
+        make_tensor_at<location::ub>(dst, make_frame_layout<dn_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
     run_copy_with_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
@@ -185,8 +202,10 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_dn_layout_to_dn_layout)
     __gm__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto gm_tensor = make_tensor_at<location::gm>(src, make_frame_layout<dn_layout_ptn, layout_trait_default<int8_t>>(m, n));
-    auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<dn_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto gm_tensor =
+        make_tensor_at<location::gm>(src, make_frame_layout<dn_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto ub_tensor =
+        make_tensor_at<location::ub>(dst, make_frame_layout<dn_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
     run_copy_with_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
@@ -203,8 +222,10 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_nz_to_nz)
     __gm__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto gm_tensor = make_tensor_at<location::gm>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<int8_t>>(m, n));
-    auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nz_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto gm_tensor =
+        make_tensor_at<location::gm>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto ub_tensor =
+        make_tensor_at<location::ub>(dst, make_frame_layout<nz_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
     run_copy_with_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
@@ -221,8 +242,10 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_zn_to_zn)
     __gm__ int8_t src[m * n] = {0};
     __ubuf__ int8_t dst[m * n] = {0};
 
-    auto gm_tensor = make_tensor_at<location::gm>(src, make_frame_layout<zn_layout_ptn, layout_trait_default<int8_t>>(m, n));
-    auto ub_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<zn_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto gm_tensor =
+        make_tensor_at<location::gm>(src, make_frame_layout<zn_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto ub_tensor =
+        make_tensor_at<location::ub>(dst, make_frame_layout<zn_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);
     run_copy_with_paths<copy_gm_to_ub, copy_gm_to_ub_trait_default>(ub_tensor, gm_tensor);

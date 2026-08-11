@@ -71,6 +71,7 @@ private:
             src_row = get_element<attr_info::stride, attr_info::row, 1>(src_layout);
             block_count = get_element<attr_info::shape, attr_info::row, 1>(src_layout);
         }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, block_count, "src row shape size", "copy_l1_to_fixbuf");
         if constexpr (is_satisfied_ptn_format_v<T, nd_layout_ptn>) {
             dst_col = get_element<attr_info::shape, attr_info::column>(dst_layout);
             dst_row = get_element<attr_info::stride, attr_info::row>(dst_layout);
@@ -86,7 +87,7 @@ private:
             Std::ceil_align(dst_row * sizeof(dst_type), deq_tensor_addr_align_value) / fbuf_burst_len_unit;
 
         copy_l1_to_fixbuf_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_stride,
-                                              dst_stride);
+                                           dst_stride);
     }
 };
 
