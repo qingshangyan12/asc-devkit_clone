@@ -40,9 +40,9 @@ public:
             return;
         }
         using PaddingElementType = Std::conditional_t<(sizeof(T) > sizeof(uint32_t)), uint32_t, T>;
-        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_count, DEBUG_BLOCK_COUNT_MAX, "block_count",
+        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_count, debug_block_count_max, "block_count",
                                "copy_gm_to_ub instruction");
-        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_len, DEBUG_GM_UB_BLOCK_LEN_MAX, "block_len",
+        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_len, debug_gm_ub_block_len_max, "block_len",
                                "copy_gm_to_ub instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_gm2ub_stride, dst_stride, block_len, block_count,
                                "copy_gm_to_ub instruction");

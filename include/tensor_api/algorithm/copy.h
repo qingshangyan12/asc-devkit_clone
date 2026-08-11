@@ -20,6 +20,7 @@
 #ifndef INCLUDE_TENSOR_API_ALGORITHM_COPY_H
 #define INCLUDE_TENSOR_API_ALGORITHM_COPY_H
 
+#include "tensor_api/tensor/layout_interface.h"
 #include "impl/tensor_api/algorithm/copy_impl.h"
 
 namespace asc {

@@ -71,7 +71,7 @@ template <template <typename, typename> class TensorType, typename HPos, typenam
           typename ShapeCols, typename StrideRows, typename StrideCols, typename LayoutPattern>
 struct get_type_from_n_dim_trait<
     TensorType<view_engine<hardware_mem_ptr<HPos, Pointer>>,
-               layout<shape_type<ShapeRows, ShapeCols>, stride_type<StrideRows, StrideCols>, LayoutPattern>>> {
+               layout<shape<ShapeRows, ShapeCols>, stride<StrideRows, StrideCols>, LayoutPattern>>> {
     // A batched layout has a scalar Batch axis as rowPart and the matrix tuple as colPart.
     static constexpr bool is_batched = !Std::is_tuple_v<ShapeRows> && Std::is_tuple_v<ShapeCols>;
     using selector = select_row_col_tuples<ShapeRows, ShapeCols, StrideRows, StrideCols, is_batched>;
@@ -139,8 +139,6 @@ inline constexpr bool is_satisfied_ptn_format_v = is_satisfied_ptn_format<Tensor
 
 } // namespace te
 } // namespace asc
-
-
 
 #endif // IMPL_TENSOR_API_ARCH_UTILS_IS_FORMAT_H
 
