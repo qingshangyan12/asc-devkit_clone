@@ -32,7 +32,7 @@ namespace te {
 // otherwise a per-H loop emits C1 bursts of W*C0 each.
 class copy_gm_to_l1_nc1hwc02nc1hwc0 {
 public:
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         using type = typename U::element_type;

@@ -35,9 +35,6 @@ public:
                                                    uint32_t src_stride, uint32_t dst_stride, bool relu_en,
                                                    uint8_t unit_flag, bool is_channel_split)
     {
-        if ASCEND_IS_AIV {
-            return;
-        }
         TENSOR_API_DEBUG_CHECK(debug_check_block_count, n_size, "n_size", "copy_l0c_to_l1 instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_m, m_size, false, "copy_l0c_to_l1 instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, src_stride, dst_stride, "copy_l0c_to_l1 instruction");

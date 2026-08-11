@@ -29,16 +29,16 @@ namespace te {
 
 class copy_gm_to_l1_dn2zn {
 public:
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
-        if constexpr (U::layout_type::depth == THREE_DIM_DATA || U::layout_type::depth == FIVE_DIM_DATA) {
+        if constexpr (U::layout_type::depth == three_dim_data || U::layout_type::depth == five_dim_data) {
             TENSOR_API_DEBUG_CHECK(debug_check_batch_count, get<0>(src.layout().shape()), "copy_gm_to_l1 dn2zn path");
         }
         run_gm_to_l1_batched<trait, copy_gm_to_l1_dn2zn, T, U>(dst, src);
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<U, T>();
@@ -76,7 +76,7 @@ public:
         }
 
         uint64_t src_d_value = src_row_stride;
-        uint16_t dst_nz_c0_stride = dst_row_stride / C0_ELEMENT<type>;
+        uint16_t dst_nz_c0_stride = dst_row_stride / c0_element<type>;
         uint16_t dst_nz_n_stride = 1;
 
         uint64_t loop1_src_stride = src_d_value * sizeof(type);
@@ -84,8 +84,8 @@ public:
 
         uint16_t loop2_dst_stride = dst_nz_n_stride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3_dst_stride = dst_nz_c0_stride; // loop3_dst_stride = dst_nz_c0_stride
-        // loop4_dst_stride : dst_nz_matrix_stride * size_of_dst_type / C0_SIZE
-        uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / C0_ELEMENT<type>);
+        // loop4_dst_stride : dst_nz_matrix_stride * size_of_dst_type / c0_size
+        uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / c0_element<type>);
 
         uint8_t cache_mode = src.engine().get_cache_mode();
 

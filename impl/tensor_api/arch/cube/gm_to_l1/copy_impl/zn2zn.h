@@ -29,13 +29,13 @@ namespace te {
 
 class copy_gm_to_l1_zn2zn {
 public:
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         run_gm_to_l1_batched<trait, copy_gm_to_l1_zn2zn, T, U>(dst, src);
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<U, T>();
@@ -67,7 +67,7 @@ public:
         uint8_t cache_mode = src.engine().get_cache_mode();
 
         auto block_count = big_fractal_size * matrix_num;
-        auto block_len = small_fractal_size * C0_SIZE<>;
+        auto block_len = small_fractal_size * c0_size<>;
         auto src_stride = src_stride_size * sizeof(type);
         auto dst_stride = dst_stride_size * sizeof(type);
         if constexpr (is_b4_type<type>) {

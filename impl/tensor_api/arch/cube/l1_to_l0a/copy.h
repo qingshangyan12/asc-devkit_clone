@@ -27,30 +27,18 @@
 namespace asc {
 namespace te {
 
-constexpr copy_l1_to_l0a_trait DEFAULT_COPY_L1_TO_L0A_TRAIT;
-
-struct copy_l1_to_l0a_trait_default {
-    using trait_type = copy_l1_to_l0a_trait;
-    static constexpr const trait_type value = DEFAULT_COPY_L1_TO_L0A_TRAIT;
-};
-
-using copy_l1_to_l0a_mode_set =
-    tuple_map<Std::tuple<Std::tuple<_1, _0>, copy_mode::normal>, Std::tuple<Std::tuple<_1, _1>, copy_mode::normal>,
-             Std::tuple<Std::tuple<_0, _0>, copy_mode::trans>, Std::tuple<Std::tuple<_0, _1>, copy_mode::trans_b8b4>>;
-
 struct copy_l1_to_l0a_base {
 public:
-    template <const copy_l1_to_l0a_trait& trait = DEFAULT_COPY_L1_TO_L0A_TRAIT, typename T, typename U,
-              typename PadT = int16_t>
+    template <const l1_to_l0a_trait& trait, typename T, typename U, typename PadT = int16_t>
     __aicore__ inline static void load_data_impl(const T& dst, const U& src,
-                                                 const img2col_params<PadT>& params = DEFAULT_IMG2COL_PARAMS)
+                                                 const img2col_params<PadT>& params = default_img2col_params)
     {
         using dst_pos = get_mem_location<T>;
         using src_pos = get_mem_location<U>;
         static_assert(Std::is_same_v<dst_pos, location::l0a>,
-                      "When Copy tensor from L1 to L0A, dst tensor must be from L0A.");
+                      "For copy_l1_to_l0a, the destination tensor must be located in L0A.");
         static_assert(Std::is_same_v<src_pos, location::l1>,
-                      "When Copy tensor from L1 to L0A, src tensor must be from L1.");
+                      "For copy_l1_to_l0a, the source tensor must be located in L1.");
         using dst_layout = typename T::layout_type;
         using src_layout = typename U::layout_type;
         using dst_pattern = get_layout_pattern<dst_layout>;
@@ -62,51 +50,41 @@ public:
                       && !is_b4_type<typename T::element_type>) {
             TENSOR_API_DEBUG_CHECK(debug_check_img2col_coord<typename T::element_type>, params, "copy_l1_to_l0a");
         }
-        if constexpr (Std::is_same_v<src_pattern, nc1hwc0_layout_ptn> || Std::is_same_v<src_pattern, ndc1hwc0_layout_ptn>) {
+        if constexpr (Std::is_same_v<src_pattern, nc1hwc0_layout_ptn>
+                      || Std::is_same_v<src_pattern, ndc1hwc0_layout_ptn>) {
             // conv2D (NC1HWC0) and conv3D (NDC1HWC0) both take the img2col path; routing picks the
             // 2D or 3D implementation selected by the source pattern.
             using copy_l1_to_l0a_impl =
-                typename copy_l1_to_l0a_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern, copy_mode::normal>::type;
+                typename copy_l1_to_l0a_routing<current_arch_version, dst_pattern, src_pattern, false>::type;
             copy_l1_to_l0a_impl::template run<trait, T, U, PadT>(dst, src, params);
         } else {
-            if constexpr (dst_layout::depth == FIVE_DIM_DATA && src_layout::depth == FIVE_DIM_DATA) {
+            if constexpr (dst_layout::depth == five_dim_data && src_layout::depth == five_dim_data) {
                 TENSOR_API_DEBUG_CHECK(debug_check_batch_match, get<0>(src.layout().shape()),
                                        get<0>(dst.layout().shape()), "copy_l1_to_l0a");
                 TENSOR_API_DEBUG_CHECK(debug_check_l0_batch_stride, get<0>(src.layout().stride()),
                                        remove_batch_dim(src.layout()).capacity(), get<0>(dst.layout().stride()),
                                        remove_batch_dim(dst.layout()).capacity(), "copy_l1_to_l0a");
             }
-            constexpr auto is_b8_b4_type = sizeof(typename T::element_type) == 1;
-            constexpr auto no_trans = Std::is_same_v<dst_pattern, src_pattern>;
-            using copy_l1_to_l0a_mode =
-                typename copy_l1_to_l0a_mode_set::template get<Std::tuple<Std::Int<no_trans>, Std::Int<is_b8_b4_type>>>;
-            static_assert(!Std::is_same_v<copy_l1_to_l0a_mode, Std::ignore_t>, "Unsupported CopyL12L0A mode.");
+            constexpr bool is_b8b4 = sizeof(typename T::element_type) == 1;
             using copy_l1_to_l0a_impl =
-                typename copy_l1_to_l0a_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern, copy_l1_to_l0a_mode>::type;
+                typename copy_l1_to_l0a_routing<current_arch_version, dst_pattern, src_pattern, is_b8b4>::type;
             copy_l1_to_l0a_impl::template run<trait, T, U>(dst, src);
         }
     }
 };
 
-struct copy_l1_to_l0a : public copy_l1_to_l0a_base {
-public:
-    template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void copy(const Args&... args)
-    {
-        if ASCEND_IS_AIC {
-            load_data_impl<trait>(args...);
-        }
-    }
-};
+template <typename Trait, const Trait& trait, typename... Args>
+__aicore__ inline void copy_l1_to_l0a::copy(const Args&... args)
+{
+    copy_l1_to_l0a_base::load_data_impl<trait>(args...);
+}
 
 struct copy_l1_to_l0a_with : public copy_l1_to_l0a_base {
 public:
     template <typename Tp, const Tp& trait, typename... Args>
     __aicore__ inline static void copy(const Args&... args)
     {
-        if ASCEND_IS_AIC {
-            load_data_impl<trait>(args...);
-        }
+        load_data_impl<trait>(args...);
     }
 };
 
