@@ -64,10 +64,13 @@ private:
         const std::vector<u32>& commRanks, const TemplateDataParams& tempAlgParams,
         const std::map<u32, std::vector<ChannelInfo>>& channels, const std::vector<ThreadHandle>& threads, u32 roundIdx,
         u32 commLoops);
-    HcclResult RunSendRecvByChannel(
+    HcclResult RunSendRecvForRank(
         const TemplateDataParams& tempAlgParams, u32 roundIdx, u32 curValidChannelsSize,
         const std::vector<ChannelInfo>& curChannels, u32 remoteRank, const std::vector<ThreadHandle>& threads,
         u32 commLoops) const;
+    HcclResult RunSendRecvOnChannel(
+        const TemplateDataParams& tempAlgParams, const ChannelInfo& channel, const ThreadHandle& thread, u32 channelId,
+        u32 myRankCclBuffIdx, u32 remoteCclBuffIdx, u32 remoteRank, bool needPreCopy) const;
     HcclResult RunSendRecv(
         const SendRecvInfo& sendRecvInfo, const DataInfo& sendInfo, const DataInfo& recvInfo,
         const ThreadHandle& thread, u32 channelId) const;

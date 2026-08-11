@@ -360,7 +360,7 @@ HcclResult InsTempAlltoAllVMesh1D::RunSendRecvByLoop(
         CHK_RET(CalcDataSplitByPortGroupCommon(
             tempAlgParams.recvCounts[remoteRank], dataTypeSize_, curChannels, recvCountsSplit_, recvSizeSplit_,
             recvOffsetSplit_, curValidChannelsSize));
-        CHK_RET(RunSendRecvByChannel(
+        CHK_RET(RunSendRecvForRank(
             tempAlgParams, roundIdx, curValidChannelsSize, curChannels, remoteRank, threads, commLoops));
     }
     return HCCL_SUCCESS;
@@ -384,7 +384,7 @@ HcclResult InsTempAlltoAllVMesh1D::PostSyncInterThreadsPerRank(
     return PostSyncInterThreads(mainThreadCurRank, subThreadsCurRank, notifyIndexes);
 }
 
-HcclResult InsTempAlltoAllVMesh1D::RunSendRecvByChannel(
+HcclResult InsTempAlltoAllVMesh1D::RunSendRecvForRank(
     const TemplateDataParams& tempAlgParams, u32 roundIdx, u32 curValidChannelsSize,
     const std::vector<ChannelInfo>& curChannels, u32 remoteRank, const std::vector<ThreadHandle>& threads,
     u32 commLoops) const
@@ -395,72 +395,83 @@ HcclResult InsTempAlltoAllVMesh1D::RunSendRecvByChannel(
     CHK_PRT_RET(
         myRankCclBuffIdx > (std::numeric_limits<u32>::max() - 1U) / channelsPerRank_,
         HCCL_ERROR("[InsTempAlltoAllVMesh1D] thread index overflows."), HCCL_E_PARA);
-    u32 queIdx = myRankCclBuffIdx * channelsPerRank_ + 1U;
+    const u32 baseQueIdx = myRankCclBuffIdx * channelsPerRank_ + 1U;
     CHK_PRT_RET(
-        queIdx >= threads.size() || curValidChannelsSize > threads.size() - queIdx,
+        baseQueIdx >= threads.size() || curValidChannelsSize > threads.size() - baseQueIdx,
         HCCL_ERROR(
-            "[InsTempAlltoAllVMesh1D] insufficient threads, index[%u], channels[%u], size[%zu].", queIdx,
+            "[InsTempAlltoAllVMesh1D] insufficient threads, index[%u], channels[%u], size[%zu].", baseQueIdx,
             curValidChannelsSize, threads.size()),
         HCCL_E_INTERNAL);
 
-    const ThreadHandle& mainThreadCurRank = threads[queIdx];
+    const ThreadHandle& mainThreadCurRank = threads[baseQueIdx];
     std::vector<ThreadHandle> subThreadsCurRank;
     if (curValidChannelsSize > 1U) {
-        subThreadsCurRank.assign(threads.begin() + queIdx + 1U, threads.begin() + queIdx + curValidChannelsSize);
+        subThreadsCurRank.assign(
+            threads.begin() + baseQueIdx + 1U, threads.begin() + baseQueIdx + curValidChannelsSize);
         if (roundIdx != 0U) {
             CHK_RET(PreSyncInterThreadsPerRank(mainThreadCurRank, subThreadsCurRank));
         }
     }
 
-    for (u32 channelId = 0U; channelId < curValidChannelsSize; ++channelId, ++queIdx) {
-        if (roundIdx != 0U && isDmaRead_ && sendSizeSplit_[channelId] > 0U) {
-            CHK_RET(PreCopy(
-                tempAlgParams, threads[queIdx], myRankCclBuffIdx, remoteRank, sendSizeSplit_[channelId],
-                sendCountsSplit_[channelId], sendOffsetSplit_[channelId]));
-        }
-        const ChannelInfo& channel = curChannels[channelId];
-        void* remoteCclBuffAddr = channel.remoteCclMem.addr;
-        u64 txSourceOffset = 0U;
-        u64 txDestinationOffset = 0U;
-        u64 rxSourceOffset = 0U;
-        u64 rxDestinationOffset = 0U;
-        CHK_RET(CalcUserSliceOffset(
-            tempAlgParams.sdispls[remoteRank], dataTypeSize_, sendOffsetSplit_[channelId], txSourceOffset));
-        CHK_RET(CalcCclSliceOffset(
-            remoteCclBuffIdx, tempAlgParams.inputSliceStride, tempAlgParams.buffInfo.hcclBuffBaseOff,
-            sendOffsetSplit_[channelId], txDestinationOffset));
-        CHK_RET(CalcCclSliceOffset(
-            remoteCclBuffIdx, tempAlgParams.inputSliceStride, tempAlgParams.buffInfo.hcclBuffBaseOff,
-            recvOffsetSplit_[channelId], rxSourceOffset));
-        CHK_RET(CalcUserSliceOffset(
-            tempAlgParams.rdispls[remoteRank], dataTypeSize_, recvOffsetSplit_[channelId], rxDestinationOffset));
-        const DataSlice txSrcSlice(
-            tempAlgParams.buffInfo.inputPtr, txSourceOffset, sendSizeSplit_[channelId], sendCountsSplit_[channelId]);
-        const DataSlice txDstSlice(
-            remoteCclBuffAddr, txDestinationOffset, sendSizeSplit_[channelId], sendCountsSplit_[channelId]);
-        const DataSlice rxSrcSlice(
-            remoteCclBuffAddr, rxSourceOffset, recvSizeSplit_[channelId], recvCountsSplit_[channelId]);
-        const DataSlice rxDstSlice(
-            tempAlgParams.buffInfo.outputPtr, rxDestinationOffset, recvSizeSplit_[channelId],
-            recvCountsSplit_[channelId]);
-
-        const std::vector<DataSlice> txSrcSlices{txSrcSlice};
-        const std::vector<DataSlice> txDstSlices{txDstSlice};
-        const std::vector<DataSlice> rxSrcSlices{rxSrcSlice};
-        const std::vector<DataSlice> rxDstSlices{rxDstSlice};
-        const DataInfo sendInfo{channel, {txSrcSlices, txDstSlices}, dataType_};
-        const DataInfo recvInfo{channel, {rxSrcSlices, rxDstSlices}, dataType_};
-        const SendRecvInfo sendRecvInfo{
-            {channel, channel}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}, dataType_};
-        CHK_RET(RunSendRecv(sendRecvInfo, sendInfo, recvInfo, threads[queIdx], channelId));
-        if (!isDmaRead_ && recvSizeSplit_[channelId] > 0U) {
-            CHK_RET(PostCopy(
-                tempAlgParams, threads[queIdx], myRankCclBuffIdx, remoteRank, recvSizeSplit_[channelId],
-                recvCountsSplit_[channelId], recvOffsetSplit_[channelId]));
-        }
+    const bool needPreCopy = roundIdx != 0U && isDmaRead_;
+    for (u32 channelId = 0U; channelId < curValidChannelsSize; ++channelId) {
+        CHK_RET(RunSendRecvOnChannel(
+            tempAlgParams, curChannels[channelId], threads[baseQueIdx + channelId], channelId, myRankCclBuffIdx,
+            remoteCclBuffIdx, remoteRank, needPreCopy));
     }
     if (curValidChannelsSize > 1U && roundIdx + 1U < commLoops) {
         CHK_RET(PostSyncInterThreadsPerRank(mainThreadCurRank, subThreadsCurRank));
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult InsTempAlltoAllVMesh1D::RunSendRecvOnChannel(
+    const TemplateDataParams& tempAlgParams, const ChannelInfo& channel, const ThreadHandle& thread, u32 channelId,
+    u32 myRankCclBuffIdx, u32 remoteCclBuffIdx, u32 remoteRank, bool needPreCopy) const
+{
+    if (needPreCopy && sendSizeSplit_[channelId] > 0U) {
+        CHK_RET(PreCopy(
+            tempAlgParams, thread, myRankCclBuffIdx, remoteRank, sendSizeSplit_[channelId], sendCountsSplit_[channelId],
+            sendOffsetSplit_[channelId]));
+    }
+
+    void* remoteCclBuffAddr = channel.remoteCclMem.addr;
+    u64 txSourceOffset = 0U;
+    u64 txDestinationOffset = 0U;
+    u64 rxSourceOffset = 0U;
+    u64 rxDestinationOffset = 0U;
+    CHK_RET(CalcUserSliceOffset(
+        tempAlgParams.sdispls[remoteRank], dataTypeSize_, sendOffsetSplit_[channelId], txSourceOffset));
+    CHK_RET(CalcCclSliceOffset(
+        remoteCclBuffIdx, tempAlgParams.inputSliceStride, tempAlgParams.buffInfo.hcclBuffBaseOff,
+        sendOffsetSplit_[channelId], txDestinationOffset));
+    CHK_RET(CalcCclSliceOffset(
+        remoteCclBuffIdx, tempAlgParams.inputSliceStride, tempAlgParams.buffInfo.hcclBuffBaseOff,
+        recvOffsetSplit_[channelId], rxSourceOffset));
+    CHK_RET(CalcUserSliceOffset(
+        tempAlgParams.rdispls[remoteRank], dataTypeSize_, recvOffsetSplit_[channelId], rxDestinationOffset));
+    const DataSlice txSrcSlice(
+        tempAlgParams.buffInfo.inputPtr, txSourceOffset, sendSizeSplit_[channelId], sendCountsSplit_[channelId]);
+    const DataSlice txDstSlice(
+        remoteCclBuffAddr, txDestinationOffset, sendSizeSplit_[channelId], sendCountsSplit_[channelId]);
+    const DataSlice rxSrcSlice(
+        remoteCclBuffAddr, rxSourceOffset, recvSizeSplit_[channelId], recvCountsSplit_[channelId]);
+    const DataSlice rxDstSlice(
+        tempAlgParams.buffInfo.outputPtr, rxDestinationOffset, recvSizeSplit_[channelId], recvCountsSplit_[channelId]);
+
+    const std::vector<DataSlice> txSrcSlices{txSrcSlice};
+    const std::vector<DataSlice> txDstSlices{txDstSlice};
+    const std::vector<DataSlice> rxSrcSlices{rxSrcSlice};
+    const std::vector<DataSlice> rxDstSlices{rxDstSlice};
+    const DataInfo sendInfo{channel, {txSrcSlices, txDstSlices}, dataType_};
+    const DataInfo recvInfo{channel, {rxSrcSlices, rxDstSlices}, dataType_};
+    const SendRecvInfo sendRecvInfo{
+        {channel, channel}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}, dataType_};
+    CHK_RET(RunSendRecv(sendRecvInfo, sendInfo, recvInfo, thread, channelId));
+    if (!isDmaRead_ && recvSizeSplit_[channelId] > 0U) {
+        CHK_RET(PostCopy(
+            tempAlgParams, thread, myRankCclBuffIdx, remoteRank, recvSizeSplit_[channelId], recvCountsSplit_[channelId],
+            recvOffsetSplit_[channelId]));
     }
     return HCCL_SUCCESS;
 }
