@@ -41,5 +41,6 @@ target_compile_definitions(hccl-verifier PRIVATE
 
 target_include_directories(hccl-verifier PUBLIC
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
+    ${UTILS_DIR}/ccu_scenario
     ${UTILS_DIR}/pub_inc
 )
