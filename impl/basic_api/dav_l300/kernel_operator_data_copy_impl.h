@@ -777,9 +777,9 @@ __aicore__ inline void DataCopyGM2UBSingleImpl(
         MAX_REPEAT_TIMES, static_cast<uint32_t>(computeLen),
         static_cast<uint32_t>(intriParams.srcDValue * sizeof(T) - computeLen),
         static_cast<uint32_t>(
-            (static_cast<uint16_t>(dstNzNStride * static_cast<uint16_t>(DEFAULT_C0_SIZE)) - 
-            static_cast<uint16_t>(DEFAULT_C0_SIZE)) / 
-           static_cast<uint16_t>(DEFAULT_C0_SIZE)),
+            (static_cast<uint16_t>(dstNzNStride * static_cast<uint16_t>(DEFAULT_C0_SIZE)) -
+             static_cast<uint16_t>(DEFAULT_C0_SIZE)) /
+            static_cast<uint16_t>(DEFAULT_C0_SIZE)),
         0};
     DataCopyPadExtParams<T> padParams;
     for (int repeatTime = 0; repeatTime < repeatCount; ++repeatTime) {
@@ -791,8 +791,7 @@ __aicore__ inline void DataCopyGM2UBSingleImpl(
     if (repeatTail != 0) {
         int dstOffset = (dstCopyStartOffset + repeatCount * MAX_REPEAT_TIMES * c0Count);
         int srcOffset = (srcCopyStartOffset + repeatCount * MAX_REPEAT_TIMES * dValue);
-        DataCopyPadGm2UBImpl(
-            (__ubuf__ T*)(dst + dstOffset), (__gm__ T*)(src + srcOffset), copyParams, padParams);
+        DataCopyPadGm2UBImpl((__ubuf__ T*)(dst + dstOffset), (__gm__ T*)(src + srcOffset), copyParams, padParams);
     }
 }
 
