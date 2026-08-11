@@ -34,24 +34,21 @@ __aicore__ inline constexpr auto crd2idx(const T& coord, const U& shape, const S
 
 // struct layout
 template <typename... Shapes>
-using shape_type = Std::tuple<Shapes...>;
+using shape = Std::tuple<Shapes...>;
 
 template <typename... Strides>
-using stride_type = Std::tuple<Strides...>;
-
-template <typename... Layouts>
-using tile_type = Std::tuple<Layouts...>;
+using stride = Std::tuple<Strides...>;
 
 template <typename... Coords>
-using coord_type = Std::tuple<Coords...>;
+using coord = Std::tuple<Coords...>;
 
 template <typename T, typename U, typename Info = Std::ignore_t>
-struct layout_type : private Std::tuple<T, U> {
+struct layout : private Std::tuple<T, U> {
 public:
     static constexpr auto depth = nesting_depth_v<T>;
-    static constexpr auto rank = Std::tuple_size_v<T>;
+    static constexpr auto rank_size = Std::tuple_size_v<T>;
 
-    __aicore__ inline constexpr layout_type(const T& shape = {}, const U& stride = {}) : Std::tuple<T, U>(shape, stride)
+    __aicore__ inline constexpr layout(const T& shape = {}, const U& stride = {}) : Std::tuple<T, U>(shape, stride)
     {
         static_assert(Std::is_tuple_v<T> && Std::is_tuple_v<U>, "Shape or Stride is not tuple!");
     }
@@ -60,16 +57,6 @@ public:
     __aicore__ inline constexpr decltype(auto) capacity() const
     {
         return get_capacity(shape<I...>(), stride<I...>());
-    }
-
-    __aicore__ inline constexpr decltype(auto) layout()
-    {
-        return *this;
-    }
-
-    __aicore__ inline constexpr decltype(auto) layout() const
-    {
-        return *this;
     }
 
     template <size_t... I>
@@ -103,7 +90,7 @@ public:
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) get_rank() const
+    __aicore__ inline constexpr decltype(auto) rank() const
     {
         static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>,
                       "The dimensions of the Shape and Stride are not the same.");
@@ -161,7 +148,7 @@ public:
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) Rank() const
     {
-        return get_rank<I...>();
+        return rank<I...>();
     }
 
     template <size_t... I>
@@ -186,16 +173,13 @@ private:
     using tag = Info;
 };
 
-template <typename T, typename U, typename Info = Std::ignore_t>
-using layout = layout_type<T, U, Info>;
-
 template <typename T>
 struct get_layout_info {
     using type = Std::tuple<Std::ignore_t, Std::ignore_t>;
 };
 
 template <typename T, typename U, typename LayoutPattern, typename TraitType>
-struct get_layout_info<layout_type<T, U, Std::tuple<LayoutPattern, TraitType>>> {
+struct get_layout_info<layout<T, U, Std::tuple<LayoutPattern, TraitType>>> {
     using type = Std::tuple<LayoutPattern, TraitType>;
 };
 
@@ -222,15 +206,13 @@ template <typename T>
 struct is_layout : Std::false_type {};
 
 template <typename T, typename U, typename S>
-struct is_layout<layout_type<T, U, S>> : Std::true_type {};
+struct is_layout<layout<T, U, S>> : Std::true_type {};
 
 template <typename T>
 constexpr bool is_layout_v = is_layout<Std::remove_cvref_t<T>>::value;
 
 } // namespace te
 } // namespace asc
-
-
 
 #endif // IMPL_TENSOR_API_TENSOR_LAYOUT_DEFINITION_H
 

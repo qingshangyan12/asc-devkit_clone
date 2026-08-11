@@ -8,7 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
@@ -28,16 +27,13 @@ namespace te {
 
 // layout construction
 template <typename... Ts>
-__aicore__ inline constexpr shape_type<Ts...> make_shape(const Ts&... t);
+__aicore__ inline constexpr shape<Ts...> make_shape(const Ts&... t);
 
 template <typename... Ts>
-__aicore__ inline constexpr stride_type<Ts...> make_stride(const Ts&... t);
+__aicore__ inline constexpr stride<Ts...> make_stride(const Ts&... t);
 
 template <typename... Ts>
-__aicore__ inline constexpr tile_type<Ts...> make_tile(const Ts&... t);
-
-template <typename... Ts>
-__aicore__ inline constexpr coord_type<Ts...> make_coord(const Ts&... t);
+__aicore__ inline constexpr coord<Ts...> make_coord(const Ts&... t);
 
 template <typename T, typename U>
 __aicore__ inline constexpr auto make_layout(const T& shape, const U& stride);
@@ -45,16 +41,10 @@ __aicore__ inline constexpr auto make_layout(const T& shape, const U& stride);
 template <typename T>
 __aicore__ inline constexpr auto make_layout(const T& shape);
 
-template <typename T, typename Shape, typename Stride> 
+template <typename T, typename Shape, typename Stride>
 __aicore__ inline constexpr auto crd2idx(const T& coord, const Shape& shape, const Stride& stride);
 
-template <size_t I, typename Tuple, typename Enable>
-__aicore__ inline constexpr auto get(Tuple&& t);
-
-template <size_t I0, size_t I1, size_t... Is, typename Tuple, typename Enable>
-__aicore__ inline constexpr auto get(Tuple&& t);
-
-template <typename Tuple, typename Enable>
+template <size_t I, size_t... Is, typename Tuple, typename Enable>
 __aicore__ inline constexpr auto get(Tuple&& t);
 
 template <size_t... Is, typename LayoutType, typename Enable>

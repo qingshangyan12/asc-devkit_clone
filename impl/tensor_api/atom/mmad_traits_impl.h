@@ -35,15 +35,10 @@ struct mmad_traits<MmadOp, MmadTraitsType, MmadOpWith, MmadTraitsWith> {
     using trait_type = get_trait_member_type_t<MmadTraitsType>;
     static constexpr const trait_type default_trait = MmadTraitsType::value;
 
-    __aicore__ inline constexpr mmad_traits<MmadOpWith, MmadTraitsWith> with() const
-    {
-        return {};
-    }
-
     template <typename Params>
     __aicore__ inline constexpr mmad_traits<MmadOpWith, MmadTraitsWith> with(const Params& params) const
     {
-        return {normalize_mmad_params(params)};
+        return {AscendC::Te::normalize_mmad_params(params)};
     }
 
     template <const trait_type& trait = default_trait, typename... Args>
