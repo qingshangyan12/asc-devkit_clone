@@ -84,6 +84,18 @@ __aicore__ inline constexpr decltype(auto) get_element(const T& layout)
     return layout.template get<shape_or_stride, row_or_column>();
 }
 
+template <typename Info1, typename Info2, size_t dim, typename T>
+__aicore__ inline constexpr decltype(auto) get_matrix_element(const T& layout)
+{
+    constexpr size_t shape_or_stride = Std::is_same_v<Info1, attr_info::shape> ? 0 : 1;
+    constexpr size_t row_or_column = Std::is_same_v<Info2, attr_info::row> ? 0 : 1;
+    if constexpr (T::depth == THREE_DIM_DATA || T::depth == FIVE_DIM_DATA) {
+        return layout.template get<shape_or_stride, 1, row_or_column, dim>();
+    } else {
+        return layout.template get<shape_or_stride, row_or_column, dim>();
+    }
+}
+
 template <typename LayoutType>
 __aicore__ inline static constexpr uint32_t get_total_column_shape(const LayoutType& layout)
 {
@@ -121,6 +133,48 @@ __aicore__ inline static constexpr decltype(auto) get_column_stride(const Layout
         return get<1>(layout.stride());
     } else {
         return get<1, 1>(layout.stride());
+    }
+}
+template <typename ShapeType>
+__aicore__ inline static constexpr uint32_t get_total_column_shape_from_shape(const ShapeType& shape)
+{
+    constexpr auto depth = nesting_depth_v<ShapeType>;
+    if constexpr (depth == TWO_DIM_DATA) {
+        return get<1>(shape);
+    } else if constexpr (depth == THREE_DIM_DATA) {
+        return get<1, 1>(shape);
+    } else if constexpr (depth == FOUR_DIM_DATA) {
+        return get<1, 0>(shape) * get<1, 1>(shape);
+    } else {
+        static_assert(depth == FIVE_DIM_DATA, "Only support 2D to 5D matrix shapes");
+        return get<1, 1, 0>(shape) * get<1, 1, 1>(shape);
+    }
+}
+
+template <typename ShapeType>
+__aicore__ inline static constexpr uint32_t get_total_row_shape_from_shape(const ShapeType& shape)
+{
+    constexpr auto depth = nesting_depth_v<ShapeType>;
+    if constexpr (depth == TWO_DIM_DATA) {
+        return get<0>(shape);
+    } else if constexpr (depth == THREE_DIM_DATA) {
+        return get<1, 0>(shape);
+    } else if constexpr (depth == FOUR_DIM_DATA) {
+        return get<0, 0>(shape) * get<0, 1>(shape);
+    } else {
+        static_assert(depth == FIVE_DIM_DATA, "Only support 2D to 5D matrix shapes");
+        return get<1, 0, 0>(shape) * get<1, 0, 1>(shape);
+    }
+}
+
+template <typename ShapeType>
+__aicore__ inline static constexpr uint32_t get_batch_shape_from_shape(const ShapeType& shape)
+{
+    constexpr auto depth = nesting_depth_v<ShapeType>;
+    if constexpr (depth == THREE_DIM_DATA || depth == FIVE_DIM_DATA) {
+        return get<0>(shape);
+    } else {
+        return 1;
     }
 }
 } // namespace te
