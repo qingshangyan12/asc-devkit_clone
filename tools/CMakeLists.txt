@@ -26,7 +26,7 @@ set_source_files_properties(${ASC_BOOST_FILESYSTEM_SOURCES} PROPERTIES GENERATED
 add_library(asc_boost_filesystem STATIC
   ${ASC_BOOST_FILESYSTEM_SOURCES}
 )
-add_dependencies(asc_boost_filesystem third_party_boost)
+add_dependencies(asc_boost_filesystem boost)
 set_target_properties(asc_boost_filesystem PROPERTIES
   CXX_STANDARD 11
   CXX_STANDARD_REQUIRED ON
