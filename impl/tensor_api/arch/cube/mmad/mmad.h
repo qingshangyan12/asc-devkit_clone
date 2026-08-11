@@ -27,7 +27,7 @@
 namespace asc {
 namespace te {
 
-constexpr mmad_trait DEFAULT_MMAD_TRAIT;
+constexpr mmad_trait default_mmad_trait;
 
 constexpr mmad_params default_mmad_params = {0, 0, 0, 0, true};
 
@@ -35,7 +35,7 @@ constexpr mmad_params default_mmad_with_bias_params = {0, 0, 0, 0, false};
 
 struct mmad_trait_default {
     using trait_type = mmad_trait;
-    static constexpr const trait_type value = DEFAULT_MMAD_TRAIT;
+    static constexpr const trait_type value = default_mmad_trait;
 };
 
 struct mmad_operation {
@@ -49,7 +49,7 @@ public:
     }
 
 private:
-    template <const mmad_trait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename Params>
+    template <const mmad_trait& trait = default_mmad_trait, typename T, typename U, typename S, typename Params>
     __aicore__ inline static void mmad_impl(const T& dst, const U& fm, const S& filter, const Params& params)
     {
         using dst_pos = get_mem_location<T>;
@@ -64,12 +64,12 @@ private:
         using dst_layout_ptn = get_layout_pattern<dst_layout>;
         using fm_layout_ptn = get_layout_pattern<fm_layout>;
         using filter_layout_ptn = get_layout_pattern<filter_layout>;
-        using mmad_impl = typename mmad_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, fm_layout_ptn, filter_layout_ptn,
+        using mmad_impl = typename mmad_routing<current_arch_version, dst_layout_ptn, fm_layout_ptn, filter_layout_ptn,
                                                location::invalid>::type;
         mmad_impl::template run<trait>(dst, fm, filter, params);
     }
 
-    template <const mmad_trait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V,
+    template <const mmad_trait& trait = default_mmad_trait, typename T, typename U, typename S, typename V,
               typename Params>
     __aicore__ inline static void mmad_impl(const T& dst, const U& fm, const S& filter, const V& bias,
                                             const Params& params)
@@ -90,7 +90,7 @@ private:
         using fm_layout_ptn = get_layout_pattern<fm_layout>;
         using filter_layout_ptn = get_layout_pattern<filter_layout>;
         using mmad_impl =
-            typename mmad_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, fm_layout_ptn, filter_layout_ptn, bias_pos>::type;
+            typename mmad_routing<current_arch_version, dst_layout_ptn, fm_layout_ptn, filter_layout_ptn, bias_pos>::type;
         mmad_impl::template run<trait>(dst, fm, filter, bias, params);
     }
 };

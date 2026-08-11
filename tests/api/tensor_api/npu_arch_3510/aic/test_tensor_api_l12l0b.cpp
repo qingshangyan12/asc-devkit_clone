@@ -50,11 +50,11 @@ void run_copy_call_paths(const dst_tensor_type& dst, const src_tensor_type& src)
 }
 
 template <typename copy_operation, typename trait_type, typename dst_tensor_type, typename src_tensor_type>
-void run_copy_with_paths(const dst_tensor_type& dst, const src_tensor_type& src)
+void run_copy_default_paths(const dst_tensor_type& dst, const src_tensor_type& src)
 {
     using namespace asc::te;
 
-    auto atom = copy_atom<copy_traits<copy_operation, trait_type>>{}.with();
+    auto atom = copy_atom<copy_traits<copy_operation, trait_type>>{};
     atom.call(dst, src);
     copy(atom, dst, src);
 }
@@ -74,7 +74,7 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0b_routes_to_cube_arch_copy)
     auto l0b_tensor = make_tensor_at<location::l0b>(dst, make_frame_layout<zn_layout_ptn, layout_trait_default<float>>(m, n));
 
     run_copy_call_paths<copy_l1_to_l0b, copy_l1_to_l0b_trait_default>(l0b_tensor, l1_tensor);
-    run_copy_with_paths<copy_l1_to_l0b, copy_l1_to_l0b_trait_default>(l0b_tensor, l1_tensor);
+    run_copy_default_paths<copy_l1_to_l0b, copy_l1_to_l0b_trait_default>(l0b_tensor, l1_tensor);
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -126,17 +126,17 @@ template <typename data_type, uint32_t batch_value, uint32_t m_value, uint32_t n
 auto make_batch_zn_layout()
 {
     using namespace asc::te;
-    constexpr uint32_t c0_value = C0_ELEMENT<data_type>;
+    constexpr uint32_t c0_value = c0_element<data_type>;
 
     auto shape = make_shape(AscendC::Std::Int<batch_value>{},
         make_shape(make_shape(AscendC::Std::Int<c0_value>{}, AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{},
             AscendC::Std::Int<c0_value>{})),
-        make_shape(AscendC::Std::Int<FRACTAL_FIXED>{}, AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{},
-            AscendC::Std::Int<FRACTAL_FIXED>{}))));
+        make_shape(AscendC::Std::Int<fractal_fixed>{}, AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{},
+            AscendC::Std::Int<fractal_fixed>{}))));
     auto stride = make_stride(AscendC::Std::Int<m_value * n_value>{},
         make_stride(make_stride(_1{}, AscendC::Std::Int<c0_value>{} *
-            AscendC::Std::ceil_align(AscendC::Std::Int<n_value>{}, AscendC::Std::Int<FRACTAL_FIXED>{})),
-        make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * FRACTAL_FIXED>{})));
+            AscendC::Std::ceil_align(AscendC::Std::Int<n_value>{}, AscendC::Std::Int<fractal_fixed>{})),
+        make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * fractal_fixed>{})));
     return make_pattern_layout<zn_layout_ptn, layout_trait_default<data_type>>(shape, stride);
 }
 
@@ -144,17 +144,17 @@ template <typename data_type, uint32_t batch_value, uint32_t m_value, uint32_t n
 auto make_batch_nz_layout()
 {
     using namespace asc::te;
-    constexpr uint32_t c0_value = C0_ELEMENT<data_type>;
+    constexpr uint32_t c0_value = c0_element<data_type>;
 
     auto shape = make_shape(AscendC::Std::Int<batch_value>{},
-        make_shape(make_shape(AscendC::Std::Int<FRACTAL_FIXED>{}, AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{},
-            AscendC::Std::Int<FRACTAL_FIXED>{})),
+        make_shape(make_shape(AscendC::Std::Int<fractal_fixed>{}, AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{},
+            AscendC::Std::Int<fractal_fixed>{})),
         make_shape(AscendC::Std::Int<c0_value>{}, AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{},
             AscendC::Std::Int<c0_value>{}))));
     auto stride = make_stride(AscendC::Std::Int<m_value * n_value>{},
-        make_stride(make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * FRACTAL_FIXED>{}),
+        make_stride(make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * fractal_fixed>{}),
         make_stride(_1{}, AscendC::Std::Int<c0_value>{} *
-            AscendC::Std::ceil_align(AscendC::Std::Int<m_value>{}, AscendC::Std::Int<FRACTAL_FIXED>{}))));
+            AscendC::Std::ceil_align(AscendC::Std::Int<m_value>{}, AscendC::Std::Int<fractal_fixed>{}))));
     return make_pattern_layout<nz_layout_ptn, layout_trait_default<data_type>>(shape, stride);
 }
 
@@ -221,8 +221,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0b_batch_nz_to_zn_b8_b4)
     __cbuf__ fp4x2_e1m2_t src[batch * src_buffer_size];
     __cb__ fp4x2_e1m2_t dst[batch * dst_buffer_size];
 
-    auto src_layout = make_frame_layout<nz_layout_ptn, layout_trait_fp4>(batch, m, n);
-    auto dst_layout = make_frame_layout<zn_layout_ptn, layout_trait_fp4>(batch, m, n);
+    auto src_layout = make_frame_layout<nz_layout_ptn, layout_trait_default<fp4x2_e1m2_t>>(batch, m, n);
+    auto dst_layout = make_frame_layout<zn_layout_ptn, layout_trait_default<fp4x2_e1m2_t>>(batch, m, n);
     auto src_tensor = make_tensor(make_mem_ptr<location::l1>(src), src_layout);
     auto dst_tensor = make_tensor(make_mem_ptr<location::l0b>(dst), dst_layout);
 
@@ -285,12 +285,12 @@ TEST_F(tensor_api_cube_copy_3510, TEST_L1_TO_L0B_CONCAT_(test_load_s4_data_l1_to
     using namespace asc::te; \
     __##dst_tag##__ data_type dst[m_value * n_value]; \
     auto dst_iterator = make_mem_ptr<location::l0b>(dst); \
-    auto dst_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(dst_format), layout_trait_fp4>(m_value, n_value); \
+    auto dst_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(dst_format), layout_trait_default<data_type>>(m_value, n_value); \
     auto dst_tensor = make_tensor(dst_iterator, dst_matrix_layout); \
  \
     __##src_tag##__ data_type src[m_value * n_value]; \
     auto src_iterator = make_mem_ptr<location::l1>(src); \
-    auto src_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(src_format), layout_trait_fp4>(m_value, n_value); \
+    auto src_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(src_format), layout_trait_default<data_type>>(m_value, n_value); \
     auto src_tensor = make_tensor(src_iterator, src_matrix_layout); \
  \
     copy(copy_atom<copy_traits<copy_l1_to_l0b, copy_l1_to_l0b_trait_default>>{}, dst_tensor, src_tensor); \

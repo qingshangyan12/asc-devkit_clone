@@ -33,12 +33,12 @@ public:
     __aicore__ inline static void run(const T& dst, const U& src)
     {
         check_template<trait, T, U>();
-        if constexpr (T::layout_type::depth == FIVE_DIM_DATA) {
+        if constexpr (T::layout_type::depth == five_dim_data) {
             batch_load_data_impl<trait, T, U>(dst, src);
-        } else if constexpr (T::layout_type::depth == FOUR_DIM_DATA) {
+        } else if constexpr (T::layout_type::depth == four_dim_data) {
             load_data_impl<trait, T, U>(dst, src);
         } else {
-            static_assert(T::layout_type::depth == FOUR_DIM_DATA || T::layout_type::depth == FIVE_DIM_DATA,
+            static_assert(T::layout_type::depth == four_dim_data || T::layout_type::depth == five_dim_data,
                           "load_data_l1_to_l0b_microscale only supports the plain fractal layout "
                           "((row0,row1),(col0,col1)) or the batch layout (B,((row0,row1),(col0,col1))).");
         }

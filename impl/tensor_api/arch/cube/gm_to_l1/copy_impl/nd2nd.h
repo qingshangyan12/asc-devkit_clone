@@ -35,7 +35,7 @@ public:
         // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
         // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
         constexpr auto gm_depth = nesting_depth_v<decltype(src.layout().shape())>;
-        if constexpr (gm_depth == THREE_DIM_DATA || gm_depth == FIVE_DIM_DATA) {
+        if constexpr (gm_depth == three_dim_data || gm_depth == five_dim_data) {
             batch_data_copy_impl<trait, T, U>(dst, src);
         } else {
             data_copy_impl<trait, T, U>(dst, src);
@@ -85,7 +85,7 @@ private:
 
         uint8_t cache_mode = src.engine().get_cache_mode();
 
-        // normal mode, dst_stride % C0_SIZE should be 0
+        // normal mode, dst_stride % c0_size should be 0
         // compact mode, block_len equals dst_stride
         // multi rows copy, dst non-contiguous case
         uint32_t block_count = src_shape_rows;

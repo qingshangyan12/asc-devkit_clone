@@ -43,11 +43,11 @@ void run_copy_call_paths(const dst_tensor_type& dst, const src_tensor_type& src)
 }
 
 template <typename copy_operation, typename trait_type, typename dst_tensor_type, typename src_tensor_type>
-void run_copy_with_paths(const dst_tensor_type& dst, const src_tensor_type& src)
+void run_copy_default_paths(const dst_tensor_type& dst, const src_tensor_type& src)
 {
     using namespace asc::te;
 
-    auto atom = copy_atom<copy_traits<copy_operation, trait_type>>{}.with();
+    auto atom = copy_atom<copy_traits<copy_operation, trait_type>>{};
     atom.call(dst, src);
     copy(atom, dst, src);
 }
@@ -67,7 +67,7 @@ TEST_F(tensor_api_vector_copy_3510, copy_ub_to_ub_nd_to_nd)
     auto dst_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
-    run_copy_with_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
+    run_copy_default_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -85,7 +85,7 @@ TEST_F(tensor_api_vector_copy_3510, copy_ub_to_ub_nd_layout_to_nd_layout)
     auto dst_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nd_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
-    run_copy_with_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
+    run_copy_default_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -103,7 +103,7 @@ TEST_F(tensor_api_vector_copy_3510, copy_ub_to_ub_dn_to_dn)
     auto dst_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<dn_ext_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
-    run_copy_with_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
+    run_copy_default_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -121,7 +121,7 @@ TEST_F(tensor_api_vector_copy_3510, copy_ub_to_ub_dn_layout_to_dn_layout)
     auto dst_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<dn_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
-    run_copy_with_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
+    run_copy_default_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -139,7 +139,7 @@ TEST_F(tensor_api_vector_copy_3510, copy_ub_to_ub_nz_to_nz)
     auto dst_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<nz_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
-    run_copy_with_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
+    run_copy_default_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -157,7 +157,7 @@ TEST_F(tensor_api_vector_copy_3510, copy_ub_to_ub_zn_to_zn)
     auto dst_tensor = make_tensor_at<location::ub>(dst, make_frame_layout<zn_layout_ptn, layout_trait_default<int8_t>>(m, n));
 
     run_copy_call_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
-    run_copy_with_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
+    run_copy_default_paths<copy_ub_to_ub, copy_ub_to_ub_trait_default>(dst_tensor, src_tensor);
 
     EXPECT_EQ(dst[0], 0);
 }

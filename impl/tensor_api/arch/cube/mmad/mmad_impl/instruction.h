@@ -32,14 +32,14 @@ namespace te {
 __aicore__ inline static void set_ctrl_for_hifloat8()
 {
     uint64_t ori_config = asc_get_ctrl();
-    uint64_t config = ori_config | HIFLOAT8_MMAD_CTRL_MASK;
+    uint64_t config = ori_config | hifloat8_mmad_ctrl_mask;
     asc_set_ctrl(config);
 }
 
 __aicore__ inline static void reset_ctrl_for_hifloat8()
 {
     uint64_t ori_config = asc_get_ctrl();
-    uint64_t config = ori_config & ~HIFLOAT8_MMAD_CTRL_MASK;
+    uint64_t config = ori_config & ~hifloat8_mmad_ctrl_mask;
     asc_set_ctrl(config);
 }
 

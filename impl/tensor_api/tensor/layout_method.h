@@ -45,12 +45,6 @@ __aicore__ inline constexpr stride_type<T, Ts...> make_stride(const T& t, const 
 }
 
 template <typename T, typename... Ts>
-__aicore__ inline constexpr tile_type<T, Ts...> make_tile(const T& t, const Ts&... ts)
-{
-    return {t, ts...};
-}
-
-template <typename T, typename... Ts>
 __aicore__ inline constexpr coord_type<T, Ts...> make_coord(const T& t, const Ts&... ts)
 {
     return {t, ts...};
@@ -165,19 +159,7 @@ __aicore__ inline constexpr auto get_shape(const LayoutType& layout)
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
-__aicore__ inline constexpr auto get_shape(LayoutType& layout)
-{
-    return layout.template shape<Is...>();
-}
-
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto get_stride(const LayoutType& layout)
-{
-    return layout.template stride<Is...>();
-}
-
-template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
-__aicore__ inline constexpr auto get_stride(LayoutType& layout)
 {
     return layout.template stride<Is...>();
 }
@@ -223,7 +205,7 @@ __aicore__ inline constexpr auto cosize(const LayoutType& layout)
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto rank(const LayoutType& layout)
 {
-    return layout.template get_rank<Is...>();
+    return layout.template rank<Is...>();
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>

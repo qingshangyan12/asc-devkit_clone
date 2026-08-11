@@ -47,7 +47,7 @@ private:
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
     {
         check_template<trait, T, U>();
-        if constexpr (U::layout_type::depth == FIVE_DIM_DATA) {
+        if constexpr (U::layout_type::depth == five_dim_data) {
             auto src_layout = src.layout();
             auto dst_layout = dst.layout();
             emit_copy(dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout), get<0>(src_layout.shape()),
@@ -74,7 +74,7 @@ private:
 
         uint8_t cache_mode = src.engine().get_cache_mode();
 
-        // lprp mode, dst_stride % C0_SIZE should be 0
+        // lprp mode, dst_stride % c0_size should be 0
         // multi rows copy, dst non-contiguous case
         uint32_t block_count = src_shape_col_b;
         uint32_t block_len = src_shape_row_b * sizeof(type) * src_shape_col_s * src_stride_col_s;

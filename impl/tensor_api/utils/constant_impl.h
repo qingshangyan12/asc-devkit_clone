@@ -27,9 +27,7 @@
 
 namespace asc {
 namespace te {
-namespace inst {}
 
-using Std::Int;
 using _0 = Std::Int<0>;
 using _1 = Std::Int<1>;
 using _2 = Std::Int<2>;
@@ -58,16 +56,18 @@ struct keep_mark {
 };
 inline constexpr keep_mark _{};
 
-constexpr size_t TWO_DIM_DATA = 2;
-constexpr size_t THREE_DIM_DATA = 3;
-constexpr size_t FOUR_DIM_DATA = 4;
-constexpr size_t FIVE_DIM_DATA = 5;
-constexpr size_t FRACTAL_FIXED = 16;
-constexpr size_t MX_SCALE_K0 = 2;
-constexpr uint32_t BLOCK_CUBE = 16;
-constexpr uint64_t HIFLOAT8_MMAD_CTRL_MASK = 0x200000000000ULL;
+constexpr size_t two_dim_data = 2;
+constexpr size_t three_dim_data = 3;
+constexpr size_t four_dim_data = 4;
+constexpr size_t five_dim_data = 5;
+constexpr size_t fractal_fixed = 16;
+constexpr size_t mx_scale_k0 = 2;
+constexpr uint32_t block_cube = 16;
+constexpr uint64_t hifloat8_mmad_ctrl_mask = 0x200000000000ULL;
 
 struct arch_version {
+    static constexpr uint32_t v3510 = 3510;
+    static constexpr uint32_t v2201 = 2201;
     static constexpr uint32_t V3510 = 3510;
     static constexpr uint32_t V2201 = 2201;
 };
@@ -83,13 +83,7 @@ struct get_arch_version {
     }
 };
 
-constexpr uint32_t CURRENT_ARCH_VERSION = get_arch_version{}();
-
-namespace copy_mode {
-struct normal {};
-struct trans {};
-struct trans_b8b4 {};
-}; // namespace copy_mode
+constexpr uint32_t current_arch_version = get_arch_version{}();
 
 namespace location {
 struct invalid {};
@@ -203,10 +197,10 @@ __aicore__ inline constexpr size_t get_c0_size()
 }
 
 template <typename T = Std::ignore_t>
-constexpr size_t C0_SIZE = get_c0_size<T>();
+constexpr size_t c0_size = get_c0_size<T>();
 
 template <typename T>
-constexpr size_t C0_ELEMENT = C0_SIZE<T> / sizeof(T);
+constexpr size_t c0_element = c0_size<T> / sizeof(T);
 
 // is_integral_constant
 template <typename T>
@@ -220,8 +214,6 @@ constexpr bool is_integral_constant_v = is_integral_constant<T>::value;
 
 } // namespace te
 } // namespace asc
-
-
 
 #endif // IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 
