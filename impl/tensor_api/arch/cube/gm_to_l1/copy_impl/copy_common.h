@@ -48,15 +48,35 @@ __aicore__ inline void run_gm_to_l1_batched(const T& dst, const U& src)
         uint64_t src_matrix_stride = get<0>(src_layout.stride());
         uint32_t dst_matrix_stride = get<0>(dst_layout.stride());
         CopyOp::emit_copy(dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout), matrix_num,
-                          src_matrix_stride, dst_matrix_stride);
+                         src_matrix_stride, dst_matrix_stride);
     } else {
         CopyOp::emit_copy(dst, src, src.layout(), dst.layout(), 1, 0, 0);
     }
 }
 
+template <const copy_gm_to_l1_trait& trait, typename CopyOp, typename T, typename U, typename DstCoord,
+    typename SrcCoord, typename ShapeType>
+__aicore__ inline void run_gm_to_l1_batched(
+    const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape)
+{
+    CopyOp::template check_template<trait, T, U>();
+    auto region_shape = make_slice_shape(coord_src, src.layout(), shape);
+    auto dst_offset = dst.layout()(coord_dst);
+    auto src_offset = src.layout()(coord_src);
+    uint16_t matrix_num = get_batch_shape_from_shape(region_shape);
+    uint64_t src_matrix_stride = 0;
+    uint32_t dst_matrix_stride = 0;
+    constexpr auto src_depth = nesting_depth_v<decltype(src.layout().shape())>;
+    if constexpr (src_depth == THREE_DIM_DATA || src_depth == FIVE_DIM_DATA) {
+        src_matrix_stride = get<0>(src.layout().stride());
+        dst_matrix_stride = get<0>(dst.layout().stride());
+    }
+    // Region emit_copy receives matrix strides in element units and performs instruction-specific conversion.
+    CopyOp::emit_copy(dst, src, region_shape, matrix_num, src_matrix_stride, dst_matrix_stride, dst_offset, src_offset);
+}
+
 } // namespace te
 } // namespace asc
-
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_IMPL_COPY_COMMON_H
 

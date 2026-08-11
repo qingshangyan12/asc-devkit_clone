@@ -40,7 +40,7 @@ struct copy_l0c_to_gm_base {
 public:
     template <const copy_l0c_to_gm_trait& trait = DEFAULT_COPY_L0C_TO_GM_TRAIT, typename T, typename U>
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src,
-                                                 const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+                                               const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dst_pos = get_mem_location<T>;
         using src_pos = get_mem_location<U>;
@@ -55,6 +55,19 @@ public:
 
         using copy_l0c_to_gm_impl = typename copy_l0c_to_gm_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
         copy_l0c_to_gm_impl::template run<trait>(dst, src, params);
+    }
+
+    template <const copy_l0c_to_gm_trait& trait = DEFAULT_COPY_L0C_TO_GM_TRAIT, typename T, typename U,
+        typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void data_copy_impl(const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape,
+        const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
+        using impl_type = typename copy_l0c_to_gm_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        auto resolved_coord_dst = resolve_copy_coord(dst.layout(), shape, coord_dst);
+        auto resolved_coord_src = resolve_copy_coord(src.layout(), shape, coord_src);
+        impl_type::template run<trait>(dst, src, resolved_coord_dst, resolved_coord_src, shape, params);
     }
 
     template <const copy_l0c_to_gm_trait& trait = DEFAULT_COPY_L0C_TO_GM_TRAIT, typename T, typename U, typename S>
@@ -74,6 +87,34 @@ public:
 
         using copy_l0c_to_gm_impl = typename copy_l0c_to_gm_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
         copy_l0c_to_gm_impl::template run<trait>(dst, src, quant, params);
+    }
+
+    template <const copy_l0c_to_gm_trait& trait = DEFAULT_COPY_L0C_TO_GM_TRAIT, typename T, typename U, typename S,
+        typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static typename Std::enable_if<is_attr_tensor_v<S>, void>::type data_copy_impl(
+        const T& dst, const U& src, const S& quant, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape,
+        const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
+        using impl_type = typename copy_l0c_to_gm_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        auto resolved_coord_dst = resolve_copy_coord(dst.layout(), shape, coord_dst);
+        auto resolved_coord_src = resolve_copy_coord(src.layout(), shape, coord_src);
+        impl_type::template run<trait>(dst, src, quant, resolved_coord_dst, resolved_coord_src, shape, params);
+    }
+
+    template <const copy_l0c_to_gm_trait& trait = DEFAULT_COPY_L0C_TO_GM_TRAIT, typename T, typename U, typename S,
+        typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type data_copy_impl(
+        const T& dst, const U& src, const S& quant, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape,
+        const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
+        using impl_type = typename copy_l0c_to_gm_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        auto resolved_coord_dst = resolve_copy_coord(dst.layout(), shape, coord_dst);
+        auto resolved_coord_src = resolve_copy_coord(src.layout(), shape, coord_src);
+        impl_type::template run<trait>(dst, src, quant, resolved_coord_dst, resolved_coord_src, shape, params);
     }
 
     template <const copy_l0c_to_gm_trait& trait = DEFAULT_COPY_L0C_TO_GM_TRAIT, typename T, typename U, typename S>

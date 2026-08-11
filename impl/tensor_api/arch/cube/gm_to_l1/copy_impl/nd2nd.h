@@ -43,6 +43,45 @@ public:
         }
     }
 
+    template <const copy_gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape)
+    {
+        check_template<trait, T, U>();
+
+        using type = typename U::element_type;
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        uint32_t src_shape_rows = get_total_row_shape_from_shape(region_shape);
+        uint32_t src_shape_columns = get_total_column_shape_from_shape(region_shape);
+        uint32_t src_stride_rows = get_matrix_element<attr_info::stride, attr_info::row, 1>(src.layout());
+        uint32_t dst_shape_columns = get_element<attr_info::shape, attr_info::column, 1>(dst.layout());
+        uint32_t dst_stride_rows = get_matrix_element<attr_info::stride, attr_info::row, 1>(dst.layout());
+
+        uint32_t block_count = src_shape_rows;
+        uint32_t block_len = src_shape_columns * sizeof(type);
+        uint64_t src_stride = src_stride_rows * sizeof(type);
+        uint32_t dst_stride = dst_stride_rows * sizeof(type);
+        if ((src_shape_rows == 1) || (src_shape_columns == 1) ||
+            (src_stride_rows == src_shape_columns && dst_stride_rows == dst_shape_columns &&
+                src_stride_rows == dst_stride_rows)) {
+            block_count = 1;
+            block_len = src_shape_rows * src_shape_columns * sizeof(type);
+            src_stride = 0;
+            dst_stride = block_len;
+        }
+        if constexpr (is_b4_type<type>) {
+            block_len >>= 1;
+            src_stride >>= 1;
+            dst_stride >>= 1;
+        }
+        uint8_t cache_mode = src.engine().get_cache_mode();
+        copy_gm_to_l1_align_v2_instr::data_copy_region(
+            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
+    }
+
 private:
     template <const copy_gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
@@ -66,7 +105,7 @@ private:
         uint32_t dst_shape_columns;
         uint32_t dst_stride_rows;
 
-        if constexpr (is_satisfied_ptn_format_v<T, nd_layout_ptn>) {
+        if constexpr(is_satisfied_ptn_format_v<T, nd_layout_ptn>){
             src_shape_rows = get_element<attr_info::shape, attr_info::row>(src_layout);
             src_shape_columns = get_element<attr_info::shape, attr_info::column>(src_layout);
             src_stride_rows = get_element<attr_info::stride, attr_info::row>(src_layout);
@@ -76,7 +115,7 @@ private:
             src_stride_rows = get_element<attr_info::stride, attr_info::row, 1>(src_layout);
         }
 
-        if constexpr (is_satisfied_ptn_format_v<T, nd_layout_ptn>) {
+        if constexpr(is_satisfied_ptn_format_v<T, nd_layout_ptn>){
             dst_shape_columns = get_element<attr_info::shape, attr_info::column>(dst_layout);
             dst_stride_rows = get_element<attr_info::stride, attr_info::row>(dst_layout);
         } else {
@@ -110,8 +149,7 @@ private:
             src_stride = src_stride >> 1;
             dst_stride = dst_stride >> 1;
         }
-        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride,
-                                                 dst_stride);
+        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
     }
 
     // Batch case: layout is (B, (M, N)) with strides (sB, (sM, sN)). Per-matrix internal
@@ -137,7 +175,7 @@ private:
 
         // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
         // would read the batch axis as row/column.
-        auto src_inner = get<1>(src_layout);
+        auto src_inner = te::get<1>(src_layout);
 
         uint32_t src_shape_rows;
         uint32_t src_shape_columns;
@@ -164,8 +202,7 @@ private:
             src_stride = src_stride >> 1;
             dst_stride = dst_stride >> 1;
         }
-        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride,
-                                                 dst_stride);
+        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
     }
 };
 } // namespace te
