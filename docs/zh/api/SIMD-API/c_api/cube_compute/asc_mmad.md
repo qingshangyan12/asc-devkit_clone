@@ -55,7 +55,7 @@ $$
 | A | L0A Buffer | M×K | Zz | 16×K0 |
 | B | L0B Buffer | K×N | Zn | K0×16 |
 | C | L0C Buffer | M×N | Nz | 16×16 |
-| Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩 | ND | - |
+| Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
 表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。特别的，当数据类型为`int4b_t`时，`K0 = 64`。
 <!-- end id9 -->
