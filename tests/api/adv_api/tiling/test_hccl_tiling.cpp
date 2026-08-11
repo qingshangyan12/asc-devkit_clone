@@ -190,7 +190,7 @@ protected:
 TEST_F(TestHcclTilingCcuKfc, UnsupportedOpTypeUsesDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE), "CcuAllGatherMesh1DMem2Mem", 5U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE), "CcuAlltoAllMesh1D", 6U, INIT_TILING_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
