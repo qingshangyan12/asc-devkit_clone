@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -32,14 +32,53 @@ public:
     template <const copy_gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
-        // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
-        // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
+        // Batch layouts carry a leading batch_value axis: (batch_value, (row, col)) -> depth 3,
+        // (batch_value, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
         constexpr auto gm_depth = nesting_depth_v<decltype(src.layout().shape())>;
         if constexpr (gm_depth == THREE_DIM_DATA || gm_depth == FIVE_DIM_DATA) {
             batch_data_copy_impl<trait, T, U>(dst, src);
         } else {
             data_copy_impl<trait, T, U>(dst, src);
         }
+    }
+
+    template <const copy_gm_to_l1_trait& trait, typename T, typename U, typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape)
+    {
+        check_template<trait, T, U>();
+
+        using type = typename U::element_type;
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        uint32_t src_shape_rows = get_total_row_shape_from_shape(region_shape);
+        uint32_t src_shape_columns = get_total_column_shape_from_shape(region_shape);
+        uint32_t src_stride_rows = get_matrix_element<attr_info::stride, attr_info::row, 1>(src.layout());
+        uint32_t dst_shape_columns = get_element<attr_info::shape, attr_info::column, 1>(dst.layout());
+        uint32_t dst_stride_rows = get_matrix_element<attr_info::stride, attr_info::row, 1>(dst.layout());
+
+        uint32_t block_count = src_shape_rows;
+        uint32_t block_len = src_shape_columns * sizeof(type);
+        uint64_t src_stride = src_stride_rows * sizeof(type);
+        uint32_t dst_stride = dst_stride_rows * sizeof(type);
+        if ((src_shape_rows == 1) || (src_shape_columns == 1) ||
+            (src_stride_rows == src_shape_columns && dst_stride_rows == dst_shape_columns &&
+                src_stride_rows == dst_stride_rows)) {
+            block_count = 1;
+            block_len = src_shape_rows * src_shape_columns * sizeof(type);
+            src_stride = 0;
+            dst_stride = block_len;
+        }
+        if constexpr (is_b4_type<type>) {
+            block_len >>= 1;
+            src_stride >>= 1;
+            dst_stride >>= 1;
+        }
+        uint8_t cache_mode = src.engine().get_cache_mode();
+        copy_gm_to_l1_align_v2_instr::data_copy_region(
+            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
     }
 
 private:
@@ -65,7 +104,7 @@ private:
         uint32_t dst_shape_columns;
         uint32_t dst_stride_rows;
 
-        if constexpr (is_satisfied_ptn_format_v<T, nd_layout_ptn>) {
+        if constexpr(is_satisfied_ptn_format_v<T, nd_layout_ptn>){
             src_shape_rows = get_element<attr_info::shape, attr_info::row>(src_layout);
             src_shape_columns = get_element<attr_info::shape, attr_info::column>(src_layout);
             src_stride_rows = get_element<attr_info::stride, attr_info::row>(src_layout);
@@ -75,7 +114,7 @@ private:
             src_stride_rows = get_element<attr_info::stride, attr_info::row, 1>(src_layout);
         }
 
-        if constexpr (is_satisfied_ptn_format_v<T, nd_layout_ptn>) {
+        if constexpr(is_satisfied_ptn_format_v<T, nd_layout_ptn>){
             dst_shape_columns = get_element<attr_info::shape, attr_info::column>(dst_layout);
             dst_stride_rows = get_element<attr_info::stride, attr_info::row>(dst_layout);
         } else {
@@ -98,7 +137,7 @@ private:
                 && src_stride_rows == dst_stride_rows)) {
             // compact mode, one line
             block_count = 1;
-            // must use srcShape, there is a scenario of small to large, using dstShape will cause src out of bound
+            // must use src_shape, there is a scenario of small to large, using dst_shape will cause src out of bound
             block_len = src_shape_rows * src_shape_columns * sizeof(type);
             src_stride = 0;
             dst_stride = block_len;
@@ -109,18 +148,17 @@ private:
             src_stride = src_stride >> 1;
             dst_stride = dst_stride >> 1;
         }
-        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride,
-                                                 dst_stride);
+        copy_gm_to_l1_align_v2_instr::data_copy_tensor(dst, src, block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
     }
 
-    // Batch case: layout is (B, (M, N)) with strides (sB, (sM, sN)). Per-matrix internal
-    // compactness is assumed (sM == N), so a single matrix can be moved as one block_len-sized block.
-    // Four DataCopy params are derived directly from the batched layout:
-    //   - get_element<Shape, Row/Column> on the batched layout returns sub-matrix M/N (the
+    // Batch case: layout is (batch_value, (m_value, n_value)) with strides (s_b, (s_m, s_n)). Per-matrix internal
+    // compactness is assumed (s_m == n_value), so a single matrix can be moved as one block_len-sized block.
+    // Four data_copy params are derived directly from the batched layout:
+    //   - get_element<shape_type, Row/column> on the batched layout returns sub-matrix m_value/n_value (the
     //     select_row_col_tuples helper in is_format.h handles batch-axis stripping).
-    //   - get<0>(Shape/Stride) returns the batch size and per-matrix start-to-start stride.
-    //   - When batches are also contiguous (src_batch_stride == M*N && dst_batch_stride == M*N),
-    //     fold the B blocks into a single B*M*N block; otherwise emit B blocks, one per matrix.
+    //   - get<0>(shape_type/stride) returns the batch size and per-matrix start-to-start stride.
+    //   - When batches are also contiguous (src_batch_stride == m_value*n_value && dst_batch_stride == m_value*n_value),
+    //     fold the batch_value blocks into a single batch_value*m_value*n_value block; otherwise emit batch_value blocks, one per matrix.
     template <const copy_gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void batch_data_copy_impl(const T& dst, const U& src)
     {
@@ -134,9 +172,9 @@ private:
         uint64_t src_batch_stride = get<0>(src_layout.stride());
         uint32_t dst_batch_stride = get<0>(dst_layout.stride());
 
-        // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
+        // Strip the leading batch_value axis before calling get_element, otherwise the dim=0/1 split below
         // would read the batch axis as row/column.
-        auto src_inner = get<1>(src_layout);
+        auto src_inner = te::get<1>(src_layout);
 
         uint32_t src_shape_rows;
         uint32_t src_shape_columns;
@@ -151,7 +189,7 @@ private:
         uint32_t matrix_elems = src_shape_rows * src_shape_columns;
         uint8_t cache_mode = src.engine().get_cache_mode();
 
-        // batch-strided: B blocks, stride = per-matrix start-to-start in bytes.
+        // batch-strided: batch_value blocks, stride = per-matrix start-to-start in bytes.
         uint32_t block_count = batch_size;
         uint32_t block_len = matrix_elems * sizeof(type);
         uint64_t src_stride = src_batch_stride * sizeof(type);
@@ -163,8 +201,7 @@ private:
             src_stride = src_stride >> 1;
             dst_stride = dst_stride >> 1;
         }
-        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride,
-                                                 dst_stride);
+        copy_gm_to_l1_align_v2_instr::data_copy_tensor(dst, src, block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
     }
 };
 } // namespace te
