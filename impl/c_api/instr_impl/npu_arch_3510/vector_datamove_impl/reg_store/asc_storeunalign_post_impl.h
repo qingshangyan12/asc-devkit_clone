@@ -383,7 +383,7 @@ __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ int4b_t* dst, ve
 {
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t* dst_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(dst);
-        vsta(src, dst, offset);
+        vsta(src, dst_tmp, offset);
     }
 }
 
