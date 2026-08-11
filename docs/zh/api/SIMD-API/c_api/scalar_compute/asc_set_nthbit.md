@@ -30,8 +30,9 @@
 
 ## 函数原型
 
-```cpp
-__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx)
+```c
+__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits,
+                                          int64_t idx)
 ```
 
 ## 参数说明
@@ -53,12 +54,91 @@ PIPE_S
 
 ## 约束说明
 
-当idx > 63或者idx < 0时，计算逻辑是：(idx % 64 + 64) % 64，得到结果位，设置结果位为1。
+- 本接口为标量运算，AIC与AIV均可调用，行为一致。
+- 本接口仅支持64位无符号整数（`uint64_t`）位操作，`bits`参数与返回值均为64位无符号整数。
+- 参数idx支持越界输入：idx > 63或者idx < 0时，计算逻辑是：(idx % 64 + 64) % 64，得到结果位，设置结果位为1。
 
 ## 调用示例
 
 ```cpp
-uint64_t bits = 0x0;
-int64_t idx = 0x2;
-uint64_t res = asc_set_nthbit(bits, idx); //结果res = 0x4
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void PrintData(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t ELEMENTS = 8;
+
+__global__ __vector__ void AscSetNthbitKernel(__gm__ int64_t* output)
+{
+    asc_init();
+    output[0] = static_cast<int64_t>(asc_set_nthbit(8, 1));
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<int64_t> input = {0};
+    std::vector<int64_t> golden = {10};
+    input.resize(ELEMENTS, 0);
+    golden.resize(ELEMENTS, 0);
+    std::vector<int64_t> output(ELEMENTS, -1);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int64_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (ELEMENTS) * sizeof(int64_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(output_device, input.size() * sizeof(int64_t), input.data(), input.size() * sizeof(int64_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    AscSetNthbitKernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int64_t), output_device, output.size() * sizeof(int64_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input", input);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden);
+    std::cout << (passed ? "[Success] asc_set_nthbit passed." : "[Failed] asc_set_nthbit failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
