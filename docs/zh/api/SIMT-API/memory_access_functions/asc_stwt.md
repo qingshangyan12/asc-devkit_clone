@@ -85,6 +85,10 @@ inline void asc_stwt(unsigned char* address, unsigned char val)
 ```
 
 ```cpp
+inline void asc_stwt(char* address, char val)
+```
+
+```cpp
 inline void asc_stwt(char2* address, char2 val)
 ```
 
