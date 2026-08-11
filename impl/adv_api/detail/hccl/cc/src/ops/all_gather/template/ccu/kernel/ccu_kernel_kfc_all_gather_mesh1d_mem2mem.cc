@@ -19,7 +19,7 @@ constexpr int AG_M2M_TOKEN_CKE_IDX = 2;
 constexpr uint16_t AG_M2M_POST_SYNC_BIT = 1U;
 constexpr uint16_t AG_M2M_OUTPUT_BIT = 1U << AG_M2M_OUTPUT_XN_ID;
 constexpr uint16_t AG_M2M_TOKEN_BIT = 1U << AG_M2M_TOKEN_XN_ID;
-constexpr uint32_t AG_M2M_BITS_PER_EVENT = 16;
+
 
 struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     const ChannelHandle* channels{nullptr};
@@ -30,10 +30,8 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable input;
     std::vector<ccu::Variable> output;
     std::vector<ccu::Variable> token;
-<<<<<<< HEAD
     ccu::Variable outputOffset;
     ccu::Variable sliceSize;
-=======
     ccu::Variable currentRankSliceInputOffset;
     ccu::Variable currentRankSliceOutputOffset;
     ccu::Variable tmpRepeatNum;
@@ -41,21 +39,22 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable outputRepeatStride;
     ccu::Variable normalSliceSize;
     ccu::Variable lastSliceSize;
->>>>>>> f5610b3dd (test)
     ccu::Variable isInputOutputEqual;
     GroupOpSizeVars goSize;
-    ccu::LocalAddr src_loccopy;
-    ccu::LocalAddr localDst;
-    std::vector<ccu::Event> events;
 
-    // 3 阶段 unroll 设计新增变量（与 hccl 独立仓保持一致）
+    // 地址资源（对齐高性能版）
+    ccu::LocalAddr src;          // 指向 input 数据（用于远端 Write）
+    ccu::LocalAddr src_loccopy;  // 指向 input 数据（用于本卡 GroupCopy）
+    ccu::LocalAddr localDst;     // 指向 output 中本卡位置（GroupCopy 目标）
+    std::vector<ccu::RemoteAddr> dst;  // 远端 output 位置
+
+    // 同步事件（单 event，通过 mask 区分 rank 位）
+    ccu::Event event;
+
+    // 循环控制变量
     ccu::Variable constVar1;
     ccu::Variable repeatTimeflag;
-    ccu::Variable waitRepeatNum;
-    ccu::Variable groupCopyRepeatNum;
     ccu::Variable sliceSize;
-    ccu::LocalAddr src;
-    std::vector<ccu::RemoteAddr> dst;
 };
 
 static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
@@ -79,9 +78,7 @@ static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
         channelIdx++;
     }
 
-    // unroll 后每个 repeat 迭代需要独立的一组 event，event 之间通过位掩码错开
-    const uint32_t eventNumPerIter = (ctx.rankSize + AG_M2M_BITS_PER_EVENT - 1) / AG_M2M_BITS_PER_EVENT;
-    ctx.events.resize(AG_M2M_UNROLL_NUM * eventNumPerIter);
+    ctx.dst.resize(ctx.rankSize);
 
     ctx.constVar1 = 1;
     ctx.repeatTimeflag = 0;
@@ -92,13 +89,9 @@ static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
 static CcuResult LoadArgs(
     KfcAllGatherMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
     ccu::Variable outputOffset, ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1,
-<<<<<<< HEAD
-    ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable isInputOutputEqual)
-=======
     ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum,
     ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize,
     ccu::Variable isInputOutputEqual)
->>>>>>> f5610b3dd (test)
 {
     ctx.input = inputAddr;
     ctx.output[ctx.rankId] = outputAddr;
@@ -170,126 +163,77 @@ static CcuResult InitAllGatherAddr(KfcAllGatherMesh1DMem2MemContext& ctx)
     return CCU_SUCCESS;
 }
 
-// Phase 1 的单个 unroll 迭代：将所有远端 WriteNb 下发（非阻塞，事件按位错开），本 rank 仅记录本地完成事件
-static CcuResult DoAllGatherWrite(
-    KfcAllGatherMesh1DMem2MemContext& ctx, const ccu::LocalAddr& src, const std::vector<ccu::RemoteAddr>& dst,
-    uint32_t unrollIdx)
+// 对齐高性能版 DoAllGather：单轮完整 AllGather
+// 遍历所有 rank：本卡做 GroupCopy + EventRecord，远端做 Write + EventRecord，最后统一 EventWait
+static CcuResult DoAllGather(KfcAllGatherMesh1DMem2MemContext& ctx,
+    const ccu::LocalAddr& src, const std::vector<ccu::RemoteAddr>& dst, const ccu::Variable& sliceSize)
 {
-    const uint32_t eventNumPerIter = (ctx.rankSize + AG_M2M_BITS_PER_EVENT - 1) / AG_M2M_BITS_PER_EVENT;
     uint32_t channelIdx = 0;
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
-        const uint32_t eventIdx = unrollIdx * eventNumPerIter + rankIdx / AG_M2M_BITS_PER_EVENT;
-        const uint16_t rankMask = 1U << (rankIdx % AG_M2M_BITS_PER_EVENT);
+        const uint16_t rankMask = 1U << rankIdx;
         if (rankIdx == ctx.rankId) {
-            CCU_CHK_RET(ccu::EventRecord(ctx.events[eventIdx], rankMask));
-            continue;
-        }
-        CCU_CHK_RET(ccu::Write(
-            ctx.channels[channelIdx], dst[rankIdx], src, ctx.normalSliceSize, ctx.events[eventIdx], rankMask));
-        channelIdx++;
-    }
-    return CCU_SUCCESS;
-}
-
-// Phase 3 的单个 unroll 迭代：批量等待该迭代对应 event 组的全部位
-static CcuResult DoAllGatherWait(KfcAllGatherMesh1DMem2MemContext& ctx, uint32_t unrollIdx)
-{
-    const uint32_t eventNumPerIter = (ctx.rankSize + AG_M2M_BITS_PER_EVENT - 1) / AG_M2M_BITS_PER_EVENT;
-    for (uint32_t i = 0; i < eventNumPerIter; i++) {
-        const uint32_t eventIdx = unrollIdx * eventNumPerIter + i;
-        const uint32_t remainingRanks = ctx.rankSize - i * AG_M2M_BITS_PER_EVENT;
-        const uint32_t bitCount = std::min(remainingRanks, AG_M2M_BITS_PER_EVENT);
-        const uint16_t eventMask = bitCount == AG_M2M_BITS_PER_EVENT ? static_cast<uint16_t>(UINT16_MAX) :
-                                                                       static_cast<uint16_t>((1U << bitCount) - 1);
-        CCU_CHK_RET(ccu::EventWait(ctx.events[eventIdx], eventMask));
-    }
-    return CCU_SUCCESS;
-}
-
-// Phase 2：使用 CCU_WHILE 完成本 rank 的本地拷贝（input slice -> output 对应位置）
-static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
-{
-    CCU_IF(ctx.isInputOutputEqual == 0)
-    {
-        CCU_IF(ctx.groupCopyRepeatNum != UINT64_MAX)
-        {
-            ctx.repeatTimeflag = 0;
-            CCU_WHILE(ctx.groupCopyRepeatNum != UINT64_MAX)
+            // 本卡：input==output 时仅记录事件；否则先 GroupCopy 再记录事件
+            CCU_IF(ctx.isInputOutputEqual != 0)
             {
-                ctx.groupCopyRepeatNum += ctx.constVar1;
-                CCU_IF(ctx.repeatTimeflag != 0)
-                {
-                    ctx.localDst.addr += ctx.outputRepeatStride;
-                    ctx.src_loccopy.addr += ctx.inputRepeatStride;
-                }
-                CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.src_loccopy, ctx.goSize));
-                ctx.repeatTimeflag = 1;
+                CCU_CHK_RET(ccu::EventRecord(ctx.event, rankMask));
             }
+            CCU_IF(ctx.isInputOutputEqual == 0)
+            {
+                CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.src_loccopy, ctx.goSize));
+                CCU_CHK_RET(ccu::EventRecord(ctx.event, rankMask));
+            }
+        } else {
+            CCU_IF(ctx.normalSliceSize != 0)
+            {
+                CCU_CHK_RET(ccu::Write(ctx.channels[channelIdx], dst[rankIdx], src, sliceSize, ctx.event, rankMask));
+            }
+            channelIdx++;
         }
     }
+    // 等待所有 rank 的位
+    const uint16_t allMask = static_cast<uint16_t>((1U << ctx.rankSize) - 1);
+    CCU_CHK_RET(ccu::EventWait(ctx.event, allMask));
     return CCU_SUCCESS;
 }
 
-// 三阶段 unroll 高性能版：Phase1 批量下发 WriteNb -> Phase2 GroupCopy -> Phase3 批量 WaitEvent
+// 对齐高性能版 DoRepeatAllGather：单个 CCU_WHILE 循环，支持任意 repeatNum
 static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_CHK_RET(InitAllGatherAddr(ctx));
-    ctx.waitRepeatNum = ctx.tmpRepeatNum;
-    ctx.groupCopyRepeatNum = ctx.tmpRepeatNum;
 
-    // Phase 1: 先下发所有 WriteNb（非阻塞，事件错开），不包含 GroupCopy
-    CCU_IF(ctx.tmpRepeatNum != UINT64_MAX)
+    CCU_WHILE(ctx.tmpRepeatNum != UINT64_MAX)
     {
         ctx.tmpRepeatNum += ctx.constVar1;
-        CCU_CHK_RET(DoAllGatherWrite(ctx, ctx.src, ctx.dst, 0));
-    }
-
-    for (uint32_t i = 1; i < AG_M2M_UNROLL_NUM; i++) {
-        CCU_IF(ctx.tmpRepeatNum != UINT64_MAX)
+        CCU_IF(ctx.repeatTimeflag != 0)
         {
-            ctx.tmpRepeatNum += ctx.constVar1;
             ctx.src.addr += ctx.inputRepeatStride;
             for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
-                if (rankIdx != ctx.rankId) {
+                if (rankIdx == ctx.rankId) {
+                    ctx.localDst.addr += ctx.outputRepeatStride;
+                } else {
                     ctx.dst[rankIdx].addr += ctx.outputRepeatStride;
                 }
             }
-            CCU_CHK_RET(DoAllGatherWrite(ctx, ctx.src, ctx.dst, i));
         }
-    }
-
-    // Phase 2: GroupCopy 使用 CCU_WHILE
-    CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
-
-    // Phase 3: 批量 WaitEvent
-    for (uint32_t i = 0; i < AG_M2M_UNROLL_NUM; i++) {
-        CCU_IF(ctx.waitRepeatNum != UINT64_MAX)
+        CCU_IF(ctx.normalSliceSize != 0)
         {
-            ctx.waitRepeatNum += ctx.constVar1;
-            CCU_CHK_RET(DoAllGatherWait(ctx, i));
+            CCU_CHK_RET(DoAllGather(ctx, ctx.src, ctx.dst, ctx.normalSliceSize));
         }
+        ctx.repeatTimeflag = 1;
     }
 
-<<<<<<< HEAD
     CCU_CHK_RET(DoAllGatherWrite(ctx, src, dst));
     CCU_IF(ctx.isInputOutputEqual == 0) { CCU_CHK_RET(GroupCopy(ctx, localDst, src, ctx.goSize)); }
     CCU_CHK_RET(DoAllGatherWait(ctx));
-=======
->>>>>>> f5610b3dd (test)
     return CCU_SUCCESS;
 }
 
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable outputOffset,
     ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-<<<<<<< HEAD
-    ccu::Variable isInputOutputEqual, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
-    uint32_t rankId)
-=======
     ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum, ccu::Variable inputRepeatStride,
     ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize, ccu::Variable isInputOutputEqual,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
->>>>>>> f5610b3dd (test)
 {
     KfcAllGatherMesh1DMem2MemContext ctx;
     ctx.channels = channels;
@@ -299,13 +243,8 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     InitCcuKernelCtxBase(ctx);
 
     CCU_CHK_RET(InitResource(ctx));
-<<<<<<< HEAD
-    CCU_CHK_RET(LoadArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, outputOffset, sliceSize, goSize0, goSize1, goSize2, goSize3,
-=======
     CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, outputOffset, sliceSize, goSize0, goSize1, goSize2,
         goSize3, currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride, lastSliceSize,
->>>>>>> f5610b3dd (test)
         isInputOutputEqual));
     CCU_CHK_RET(PreSync(ctx));
 
