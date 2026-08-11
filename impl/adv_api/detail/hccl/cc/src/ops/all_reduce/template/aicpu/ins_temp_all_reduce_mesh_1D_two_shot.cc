@@ -92,8 +92,7 @@ HcclResult InsTempAllReduceMesh1DTwoShot::KernelRun(
         HcclResult::HCCL_E_INTERNAL);
 
     CHK_PRT_RET(
-        subCommRanks_.size() == 0,
-        HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][KernelRun] subCommRanks is empty."),
+        subCommRanks_.size() == 0, HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][KernelRun] subCommRanks is empty."),
         HcclResult::HCCL_E_INTERNAL);
     rankList_ = subCommRanks_.at(0);
 
@@ -242,14 +241,12 @@ HcclResult InsTempAllReduceMesh1DTwoShot::ScatterData(
         void* remoteHcclBuffPtr = sendRecvChannel.remoteCclMem.addr;
 
         DataSlice sendSrcSlice(localInBuffPtr, inBuffBaseOffset + sendOffset, sendSize, sendCount);
-        DataSlice sendDstSlice(
-            remoteHcclBuffPtr, hcclBuffBaseOffset + myRankIdx_ * sendSize, sendSize, sendCount);
+        DataSlice sendDstSlice(remoteHcclBuffPtr, hcclBuffBaseOffset + myRankIdx_ * sendSize, sendSize, sendCount);
         std::vector<DataSlice> sendSrcSlicesList{sendSrcSlice};
         std::vector<DataSlice> sendDstSlicesList{sendDstSlice};
 
         DataSlice recvSrcSlice(remoteInBuffPtr, inBuffBaseOffset + recvOffset, recvSize, recvCount);
-        DataSlice recvDstSlice(
-            localHcclBuffPtr, hcclBuffBaseOffset + remoteIdx * recvSize, recvSize, recvCount);
+        DataSlice recvDstSlice(localHcclBuffPtr, hcclBuffBaseOffset + remoteIdx * recvSize, recvSize, recvCount);
         std::vector<DataSlice> recvSrcSlicesList{recvSrcSlice};
         std::vector<DataSlice> recvDstSlicesList{recvDstSlice};
 
@@ -259,16 +256,14 @@ HcclResult InsTempAllReduceMesh1DTwoShot::ScatterData(
             DataInfo recvInfo(sendRecvChannel, recvSlicesList);
             CHK_PRT_RET(
                 RecvWrite(recvInfo, threads.at(remoteIdx)),
-                HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ScatterData] Recv failed."),
-                HcclResult::HCCL_E_INTERNAL);
+                HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ScatterData] Recv failed."), HcclResult::HCCL_E_INTERNAL);
         } else if (recvSize == 0) {
             // 接收数据片为0时，只发送数据
             SlicesList sendSlicesList(sendSrcSlicesList, sendDstSlicesList);
             DataInfo sendInfo(sendRecvChannel, sendSlicesList, dataType_);
             CHK_PRT_RET(
                 SendBatchWrite(sendInfo, threads.at(remoteIdx)),
-                HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ScatterData] Send failed."),
-                HcclResult::HCCL_E_INTERNAL);
+                HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ScatterData] Send failed."), HcclResult::HCCL_E_INTERNAL);
         } else {
             TxRxChannels sendRecvChannels(sendRecvChannel, sendRecvChannel); // 收发双向用同一个Channel
             TxRxSlicesList sendRecvSlicesList(
@@ -302,13 +297,11 @@ HcclResult InsTempAllReduceMesh1DTwoShot::ReduceData(
     DataSlice reduceDstSlice(localHcclBuffPtr, hcclBuffBaseOffset, sliceSize, sliceCount);
 
     for (u32 sliceIdx = 1; sliceIdx < templateRankSize_; ++sliceIdx) {
-        DataSlice reduceSrcSlice(
-            localHcclBuffPtr, hcclBuffBaseOffset + sliceIdx * sliceSize, sliceSize, sliceCount);
+        DataSlice reduceSrcSlice(localHcclBuffPtr, hcclBuffBaseOffset + sliceIdx * sliceSize, sliceSize, sliceCount);
         // 确定性计算，顺序Reduce
         CHK_PRT_RET(
             LocalReduce(threads[0], reduceSrcSlice, reduceDstSlice, dataType_, reduceOp_),
-            HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ReduceData] LocalReduce failed"),
-            HcclResult::HCCL_E_INTERNAL);
+            HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ReduceData] LocalReduce failed"), HcclResult::HCCL_E_INTERNAL);
     }
 
     return HcclResult::HCCL_SUCCESS;
@@ -385,16 +378,14 @@ HcclResult InsTempAllReduceMesh1DTwoShot::GatherData(
             DataInfo recvInfo(sendRecvChannel, recvSlicesList, dataType_);
             CHK_PRT_RET(
                 RecvBatchRead(recvInfo, threads.at(remoteIdx)),
-                HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ScatterData] Recv failed."),
-                HcclResult::HCCL_E_INTERNAL);
+                HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ScatterData] Recv failed."), HcclResult::HCCL_E_INTERNAL);
         } else if (recvSize == 0) {
             // 接收数据片为0时，只发送数据
             SlicesList sendSlicesList(sendSrcSlicesList, sendDstSlicesList);
             DataInfo sendInfo(sendRecvChannel, sendSlicesList, dataType_);
             CHK_PRT_RET(
                 SendRead(sendInfo, threads.at(remoteIdx)),
-                HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ScatterData] Send failed."),
-                HcclResult::HCCL_E_INTERNAL);
+                HCCL_ERROR("[InsTempAllReduceMesh1DTwoShot][ScatterData] Send failed."), HcclResult::HCCL_E_INTERNAL);
         } else {
             TxRxChannels sendRecvChannels(sendRecvChannel, sendRecvChannel); // 收发双向用同一个Channel
             TxRxSlicesList sendRecvSlicesList(

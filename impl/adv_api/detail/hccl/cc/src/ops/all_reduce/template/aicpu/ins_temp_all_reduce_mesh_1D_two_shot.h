@@ -22,9 +22,7 @@ struct SplitSliceInfo {
     u64 size{0};
     u64 count{0};
 
-    SplitSliceInfo(const u64 offset, const u64 size, const u64 count)
-        : offset(offset), size(size), count(count)
-    {}
+    SplitSliceInfo(const u64 offset, const u64 size, const u64 count) : offset(offset), size(size), count(count) {}
 };
 
 class InsTempAllReduceMesh1DTwoShot : public InsAlgTemplateBase {
