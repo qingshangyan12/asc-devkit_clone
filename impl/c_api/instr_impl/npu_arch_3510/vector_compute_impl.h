@@ -1584,6 +1584,29 @@ __simd_callee__ inline void asc_duplicate(vector_float& dst, vector_float src, v
     asc_duplicate_impl(dst, src, mask);
 }
 
+#define ASC_DUPLICATE_HIGHEST_API(data_type)                                                         \
+    __simd_callee__ inline void asc_duplicate(                                                       \
+        data_type& dst, data_type src, vector_bool mask,                                             \
+        std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)               \
+    {                                                                                                \
+        asc_duplicate_impl(dst, src, mask, src_pos);                                                 \
+    }
+
+ASC_DUPLICATE_HIGHEST_API(vector_uint8_t)
+ASC_DUPLICATE_HIGHEST_API(vector_int8_t)
+ASC_DUPLICATE_HIGHEST_API(vector_fp8_e4m3fn_t)
+ASC_DUPLICATE_HIGHEST_API(vector_fp8_e5m2_t)
+ASC_DUPLICATE_HIGHEST_API(vector_fp8_e8m0_t)
+ASC_DUPLICATE_HIGHEST_API(vector_uint16_t)
+ASC_DUPLICATE_HIGHEST_API(vector_int16_t)
+ASC_DUPLICATE_HIGHEST_API(vector_half)
+ASC_DUPLICATE_HIGHEST_API(vector_bfloat16_t)
+ASC_DUPLICATE_HIGHEST_API(vector_uint32_t)
+ASC_DUPLICATE_HIGHEST_API(vector_int32_t)
+ASC_DUPLICATE_HIGHEST_API(vector_float)
+
+#undef ASC_DUPLICATE_HIGHEST_API
+
 // ==========asc_duplicate_merge(uint8_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/fp8_e8m0_t/uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_duplicate_merge(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
 {
@@ -1644,6 +1667,29 @@ __simd_callee__ inline void asc_duplicate_merge(vector_float& dst, vector_float 
 {
     asc_duplicate_merge_impl(dst, src, mask);
 }
+
+#define ASC_DUPLICATE_MERGE_HIGHEST_API(data_type)                                                   \
+    __simd_callee__ inline void asc_duplicate_merge(                                                 \
+        data_type& dst, data_type src, vector_bool mask,                                             \
+        std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)               \
+    {                                                                                                \
+        asc_duplicate_merge_impl(dst, src, mask, src_pos);                                           \
+    }
+
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_uint8_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_int8_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_fp8_e4m3fn_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_fp8_e5m2_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_fp8_e8m0_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_uint16_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_int16_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_half)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_bfloat16_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_uint32_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_int32_t)
+ASC_DUPLICATE_MERGE_HIGHEST_API(vector_float)
+
+#undef ASC_DUPLICATE_MERGE_HIGHEST_API
 
 // ==========asc_abs_sub(half/float)==========
 __simd_callee__ inline void asc_abs_sub(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)

@@ -389,6 +389,54 @@ __simd_callee__ inline void asc_duplicate(vector_int32_t& dst, vector_int32_t sr
 
 __simd_callee__ inline void asc_duplicate(vector_float& dst, vector_float src, vector_bool mask);
 
+__simd_callee__ inline void asc_duplicate(
+    vector_uint8_t& dst, vector_uint8_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_int8_t& dst, vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_uint16_t& dst, vector_uint16_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_int16_t& dst, vector_int16_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_half& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_uint32_t& dst, vector_uint32_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_int32_t& dst, vector_int32_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate(
+    vector_float& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
 // ==========asc_duplicate_merge(uint8_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/fp8_e8m0_t/uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_duplicate_merge(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
@@ -413,6 +461,54 @@ __simd_callee__ inline void asc_duplicate_merge(vector_uint32_t& dst, vector_uin
 __simd_callee__ inline void asc_duplicate_merge(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_duplicate_merge(vector_float& dst, vector_float src, vector_bool mask);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_uint8_t& dst, vector_uint8_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_int8_t& dst, vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_uint16_t& dst, vector_uint16_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_int16_t& dst, vector_int16_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_half& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_uint32_t& dst, vector_uint32_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_int32_t& dst, vector_int32_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
+
+__simd_callee__ inline void asc_duplicate_merge(
+    vector_float& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos);
 
 // ==========asc_abs_sub(half/float)==========
 __simd_callee__ inline void asc_abs_sub(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
