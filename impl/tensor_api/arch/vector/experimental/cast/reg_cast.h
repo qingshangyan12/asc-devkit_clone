@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "reg_cast.h is internal; include <tensor_api/arch/vector/experimental/cast/reg_cast.h> instead."
+    "reg_cast.h is internal; include <tensor_api/arch/vector/experimental/reg_cast.h> instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_CAST
 #endif
@@ -18,8 +18,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_REG_CAST_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_REG_CAST_H
 
-#if !defined(INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_CAST_REG_CAST_H)
-#include "tensor_api/arch/vector/experimental/cast/reg_cast.h"
+#if !defined(INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_CAST_H)
+#include "tensor_api/arch/vector/experimental/reg_cast.h"
 #endif
 #include "c_api/reg_compute/reg_convert.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"

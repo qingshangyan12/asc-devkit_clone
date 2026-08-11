@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "reg_truncate.h is internal; include <tensor_api/arch/vector/experimental/truncate/reg_truncate.h> instead."
+    "reg_truncate.h is internal; include <tensor_api/arch/vector/experimental/reg_truncate.h> instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_TRUNCATE
 #endif
@@ -18,8 +18,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TRUNCATE_REG_TRUNCATE_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TRUNCATE_REG_TRUNCATE_H
 
-#if !defined(INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TRUNCATE_REG_TRUNCATE_H)
-#include "tensor_api/arch/vector/experimental/truncate/reg_truncate.h"
+#if !defined(INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_TRUNCATE_H)
+#include "tensor_api/arch/vector/experimental/reg_truncate.h"
 #endif
 #include "c_api/reg_compute/reg_convert.h"
 
