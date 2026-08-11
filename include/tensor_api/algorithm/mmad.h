@@ -20,6 +20,7 @@
 #ifndef INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
 #define INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
 
+#include "tensor_api/tensor/layout_interface.h"
 #include "impl/tensor_api/algorithm/mmad_impl.h"
 
 namespace asc {

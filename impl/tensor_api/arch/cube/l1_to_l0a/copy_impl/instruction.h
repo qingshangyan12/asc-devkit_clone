@@ -29,7 +29,7 @@ namespace te {
 
 struct copy_l1_to_l0a_trait {};
 
-constexpr img2col_params<int16_t> DEFAULT_IMG2COL_PARAMS{};
+constexpr img2col_params<int16_t> default_img2col_params{};
 
 class load_l1_to_l0a_instr {
 public:

@@ -135,7 +135,7 @@ void run_l0c_to_gm_batch_no_quant(uint32_t expected_dst_stride, bool nz_tond_en,
     constexpr uint32_t k_m = 32;
     constexpr uint32_t k_n = 64;
     constexpr uint32_t k_matrix_size = k_m * k_n;
-    constexpr uint32_t k_src_batch_stride = k_matrix_size / FRACTAL_FIXED;
+    constexpr uint32_t k_src_batch_stride = k_matrix_size / fractal_fixed;
     constexpr uint16_t k_src_matrix_stride = k_m;
     constexpr uint64_t k_src_c0_stride = 1;
 
@@ -180,7 +180,7 @@ void run_l0c_to_gm_batch_nz_to_nz_no_quant()
     constexpr uint32_t k_n = 64;
     constexpr uint32_t k_matrix_size = k_m * k_n;
     constexpr uint16_t k_src_matrix_stride = k_m;
-    constexpr uint32_t k_dst_matrix_stride = FRACTAL_FIXED * k_m;
+    constexpr uint32_t k_dst_matrix_stride = fractal_fixed * k_m;
 
     __cc__ float src[k_src_batch * k_matrix_size] = {0};
     __gm__ float dst[k_dst_batch * k_matrix_size] = {0};
@@ -373,20 +373,20 @@ public:
                 m_size_global = m;
             }
             dst_stride_global = n;
-            src_stride_global = C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
+            src_stride_global = c0_size<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, fractal_fixed) / fractal_fixed;
             NZ2ND_en_global = true;
             NZ2DN_en_global = false;
         } else if constexpr (c_data_type::format == cube_format::NZ) {
             if constexpr (has_coord) {
-                n_size_global = AscendC::Std::ceil_align(n - base, FRACTAL_FIXED);
-                m_size_global =  AscendC::Std::ceil_align(m - base, C0_SIZE<uint16_t> / sizeof(uint16_t));
+                n_size_global = AscendC::Std::ceil_align(n - base, fractal_fixed);
+                m_size_global =  AscendC::Std::ceil_align(m - base, c0_size<uint16_t> / sizeof(uint16_t));
             } else {
-                n_size_global = AscendC::Std::ceil_align(n, FRACTAL_FIXED);
-                m_size_global =  AscendC::Std::ceil_align(m, C0_SIZE<uint16_t> / sizeof(uint16_t));
+                n_size_global = AscendC::Std::ceil_align(n, fractal_fixed);
+                m_size_global =  AscendC::Std::ceil_align(m, c0_size<uint16_t> / sizeof(uint16_t));
             }
             using cast_t = std::conditional_t<sizeof(dst_type) == 4, half, dst_type>;
-            dst_stride_global = C0_SIZE<> / sizeof(cast_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED);
-            src_stride_global = C0_SIZE<> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
+            dst_stride_global = c0_size<> / sizeof(cast_t) * AscendC::Std::ceil_align(m, fractal_fixed);
+            src_stride_global = c0_size<> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, fractal_fixed) / fractal_fixed;
             NZ2ND_en_global = false;
             NZ2DN_en_global = false;
         } else {
@@ -398,7 +398,7 @@ public:
                 m_size_global = m;
             }
             dst_stride_global = m;
-            src_stride_global = C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
+            src_stride_global = c0_size<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, fractal_fixed) / fractal_fixed;
             NZ2ND_en_global = false;
             NZ2DN_en_global = true;
         }
