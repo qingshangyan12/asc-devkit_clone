@@ -286,12 +286,17 @@ struct global_tensor : public base_tensor<EngineType, LayoutType> {
 
     __aicore__ inline global_tensor() = default;
 
+    __aicore__ inline constexpr uint8_t get_cache_mode() const
+    {
+        return this->engine().get_cache_mode();
+    }
+
     __aicore__ inline constexpr void set_l2_cache_hint(cache_mode mode)
     {
         this->engine().set_cache_mode(mode);
     }
 
-    __aicore__ inline constexpr void SetL2CacheHint(CacheMode mode)
+    __aicore__ inline constexpr void SetL2CacheHint(AscendC::Te::CacheMode mode)
     {
         set_l2_cache_hint(normalize_cache_mode(mode));
     }
@@ -366,7 +371,7 @@ template <typename Tensor>
 __aicore__ inline constexpr auto make_single_batch_sub_tensor(const Tensor& t, uint32_t batch_idx)
 {
     using layout_type = typename Tensor::layout_type;
-    static_assert(layout_type::depth == THREE_DIM_DATA || layout_type::depth == FIVE_DIM_DATA,
+    static_assert(layout_type::depth == three_dim_data || layout_type::depth == five_dim_data,
                   "make_single_batch_sub_tensor only supports batched layouts of depth 3 or 5.");
     auto layout = t.layout();
     auto batch_stride = get<0>(layout.stride());

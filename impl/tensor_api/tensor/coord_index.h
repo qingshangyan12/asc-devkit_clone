@@ -78,6 +78,13 @@ __aicore__ inline constexpr auto crd2idx(const T& coord, const U& shape, const S
     }
 }
 
+template <typename T, typename U, typename Info>
+template <typename S>
+__aicore__ inline constexpr auto layout<T, U, Info>::operator()(const S& coord) const
+{
+    return crd2idx(coord, shape(), stride());
+}
+
 template <typename T, typename LayoutType, typename = Std::enable_if_t<is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto crd2idx(const T& coord, const LayoutType& layout)
 {
