@@ -295,10 +295,6 @@ HcclResult AllocComResourceByTilingCcu(
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
     HCCL_INFO("[AllocComResourceByTilingCcu]BuildTagsAndValidate successfully!");
 
-    if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
-        return HCCL_E_ALG_NOT_SUPPORTED;
-    }
-
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};
     CHK_RET(AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx));
@@ -386,6 +382,10 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
         HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_SCHED!");
+        if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
+            HCCL_INFO("[HcclAllocComResourceByTiling]Current ccu algorithm is not supported in mc2_client.");
+            return HCCL_E_ALG_NOT_SUPPORTED;
+        }
         CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum));
         CHK_RET(AllocComResourceByTilingCcu(
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
