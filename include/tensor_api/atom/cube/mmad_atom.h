@@ -21,6 +21,8 @@
 #ifndef INCLUDE_TENSOR_API_ATOM_CUBE_MMAD_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_CUBE_MMAD_ATOM_H
 
+#include "tensor_api/tensor/layout_interface.h"
+#include "tensor_api/tensor/pointer.h"
 #include "impl/tensor_api/atom/mmad_atom_impl.h"
 
 namespace asc {
