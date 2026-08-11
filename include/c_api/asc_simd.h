@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #ifndef INCLUDE_C_API_ASC_SIMD_H
 #define INCLUDE_C_API_ASC_SIMD_H
 
-#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
+#include "c_api/defs/defs.h"
 #include "utils/base/helpers.h"
 
 #include "c_api/atomic/atomic.h"

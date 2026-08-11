@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 #define INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 #include "impl/utils/common_types.h"
 #include "c_api/utils/enum.h"
-#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
+#include "c_api/defs/defs.h"
 
-#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
+#include "c_api/defs/type.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
