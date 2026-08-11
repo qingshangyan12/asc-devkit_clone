@@ -99,7 +99,7 @@ Run the following steps in the root directory of this sample to build and run th
 
 - Configure environment variables
 
-  First follow the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install) to build and install an asc-devkit package containing these APIs, then select the appropriate environment configuration command.
+  First follow the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/en/quick_start.md#prepare&install) to build and install an asc-devkit package containing these APIs, then select the appropriate environment configuration command.
 
   - Default path for a CANN package installed by the root user
 

@@ -27,26 +27,28 @@ template <typename DataType>
 struct reg_tensor;
 
 template <>
-struct reg_tensor<bool> {
-    using type = bool;
-    using reg_type = typename type_get<bool>::T;
-
-    reg_type reg;
-};
+struct reg_tensor<bool>;
 
 template <typename DataType>
 struct reg_tensor {
     using type = DataType;
     using reg_type = typename type_get<DataType>::T;
 
-    __simd_callee__ inline reg_tensor with_mask(const reg_tensor<bool>& maskReg)
-    {
+    __simd_callee__ inline reg_tensor with_mask(const reg_tensor<bool>& maskReg){
         mask = maskReg.reg;
         return *this;
     }
 
     reg_type reg;
     vector_bool mask;
+};
+
+template <>
+struct reg_tensor<bool> {
+    using type = bool;
+    using reg_type = typename type_get<bool>::T;
+
+    reg_type reg;
 };
 } // namespace te
 } // namespace asc

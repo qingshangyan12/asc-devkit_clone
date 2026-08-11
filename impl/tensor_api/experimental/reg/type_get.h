@@ -30,8 +30,8 @@ namespace te {
 template <typename DataType>
 struct type_get;
 
-// Bisheng needs these compiler register types during unified parsing, before __NPU_ARCH__ is available.
-// Architecture guards remain inside the Reg Compute implementation functions.
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
 template <>
 struct type_get<bool> {
     using T = vector_bool;
@@ -39,93 +39,95 @@ struct type_get<bool> {
 
 template <>
 struct type_get<uint8_t> {
-    using T = vector_u8;
+    using T = vector_uint8_t;
 };
 
 template <>
 struct type_get<uint16_t> {
-    using T = vector_u16;
+    using T = vector_uint16_t;
 };
 
 template <>
 struct type_get<uint32_t> {
-    using T = vector_u32;
+    using T = vector_uint32_t;
 };
 
 template <>
 struct type_get<uint64_t> {
-    using T = vector_u64;
+    using T = vector_uint64_t;
 };
 
 template <>
 struct type_get<int8_t> {
-    using T = vector_s8;
+    using T = vector_int8_t;
 };
 
 template <>
 struct type_get<int16_t> {
-    using T = vector_s16;
+    using T = vector_int16_t;
 };
 
 template <>
 struct type_get<int32_t> {
-    using T = vector_s32;
+    using T = vector_int32_t;
 };
 
 template <>
 struct type_get<int64_t> {
-    using T = vector_s64;
+    using T = vector_int64_t;
 };
 
 template <>
 struct type_get<half> {
-    using T = vector_f16;
+    using T = vector_half;
 };
 
 template <>
 struct type_get<bfloat16_t> {
-    using T = vector_bf16;
+    using T = vector_bfloat16_t;
 };
 
 template <>
 struct type_get<float> {
-    using T = vector_f32;
+    using T = vector_float;
 };
 
 template <>
 struct type_get<hifloat8_t> {
-    using T = vector_hif8;
+    using T = vector_hifloat8_t;
 };
 
 template <>
 struct type_get<fp8_e4m3fn_t> {
-    using T = vector_f8e4m3;
+    using T = vector_fp8_e4m3fn_t;
 };
 
 template <>
 struct type_get<fp8_e5m2_t> {
-    using T = vector_f8e5m2;
+    using T = vector_fp8_e5m2_t;
 };
 
 template <>
 struct type_get<fp8_e8m0_t> {
-    using T = vector_f8e8m0;
+    using T = vector_fp8_e8m0_t;
 };
 
 template <>
 struct type_get<int4x2_t> {
-    using T = vector_s4x2;
+    using T = vector_int4x2_t;
 };
 
 template <>
 struct type_get<fp4x2_e2m1_t> {
-    using T = vector_f4e2m1x2;
+    using T = vector_fp4x2_e2m1_t;
 };
 
 template <>
 struct type_get<fp4x2_e1m2_t> {
-    using T = vector_f4e1m2x2;
+    using T = vector_fp4x2_e1m2_t;
 };
+
+#endif
 
 } // namespace te
 } // namespace asc
