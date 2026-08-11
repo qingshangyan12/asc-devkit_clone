@@ -68,7 +68,6 @@ static ge::graphStatus GenSimplifiedKeyFunc(gert::TilingContext* context, ge::ch
     return strcpy_s(simplifiedKey, CUSTOM_SIMPLIFIED_KEY_MAX_LEN, key) == EOK ? ge::GRAPH_SUCCESS : ge::GRAPH_FAILED;
 }
 
-IMPL_OP_OPTILING(AddCustomTemplate).GenSimplifiedKey(GenSimplifiedKeyFunc);
 } // namespace optiling
 
 namespace ge {
@@ -106,7 +105,10 @@ public:
             .Format({ge::FORMAT_ND, ge::FORMAT_ND});
 
         this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
-        this->AICore().SetTiling(optiling::TilingFunc).AddConfig("ascend910b");
+        this->AICore()
+            .SetTiling(optiling::TilingFunc)
+            .SetGenSimplifiedKey(optiling::GenSimplifiedKeyFunc)
+            .AddConfig("ascend910b");
     }
 };
 OP_ADD(AddCustomTemplate);
