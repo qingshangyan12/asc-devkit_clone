@@ -8,10 +8,10 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef IMPL_TENSOR_API_EXPERIMENTAL_REG_MASK_IMPL_H
-#define IMPL_TENSOR_API_EXPERIMENTAL_REG_MASK_IMPL_H
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_IMPL_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_IMPL_H
 
-#include "tensor_api/experimental/reg/mask.h"
+#include "tensor_api/arch/vector/experimental/mask.h"
 
 namespace asc {
 namespace te {
@@ -76,4 +76,4 @@ __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain)
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_MASK_IMPL_H
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_IMPL_H
