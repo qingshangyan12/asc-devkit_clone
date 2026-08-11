@@ -305,7 +305,14 @@ CcuResult CcuKfcHalfAll2AllVMesh1DKernel(
     HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 5: DoHalfAllToAllVWrite + Wait (guarded by goSize0 != 0)");
     CCU_IF(goSize0 != 0)
     {
-        CCU_CHK_RET(DoHalfAllToAllVWrite(ctx, missionId));
+        ccu::Variable miVar0;
+        miVar0 = 0U;
+        CCU_CHK_RET(DoHalfAllToAllVWrite(ctx, miVar0));
+        CCU_CHK_RET(DoHalfAllToAllVWait(ctx));
+
+        ccu::Variable miVar1;
+        miVar1 = 1U;
+        CCU_CHK_RET(DoHalfAllToAllVWrite(ctx, miVar1));
         CCU_CHK_RET(DoHalfAllToAllVWait(ctx));
     }
     CCU_IF(goSize0 == 0)
