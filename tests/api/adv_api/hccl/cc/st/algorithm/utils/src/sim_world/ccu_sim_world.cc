@@ -198,10 +198,8 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
                 return false;
             }
             remote.variables[variableIterator->second] = state.variables[operation.src0];
-            for (ChannelHandle channel : remote.program->channels) {
-                remote.notifies[{ChannelRemoteRank(channel), static_cast<uint32_t>(operation.immediate)}] |=
-                    operation.mask;
-            }
+            remote.notifies[{static_cast<uint32_t>(rankIndex), static_cast<uint32_t>(operation.immediate)}] |=
+                operation.mask;
             break;
         }
         case OpCode::NOTIFY_WAIT: {
@@ -215,9 +213,7 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
         }
         case OpCode::NOTIFY_RECORD: {
             const uint32_t remoteRank = ChannelRemoteRank(operation.channel);
-            for (ChannelHandle channel : states[remoteRank].program->channels) {
-                states[remoteRank].notifies[{ChannelRemoteRank(channel), operation.index}] |= operation.mask;
-            }
+            states[remoteRank].notifies[{static_cast<uint32_t>(rankIndex), operation.index}] |= operation.mask;
             break;
         }
         case OpCode::EVENT_RECORD:
