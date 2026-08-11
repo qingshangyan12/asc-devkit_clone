@@ -34,7 +34,7 @@
 
 - 内聚性更强，使用时与其它流水线解耦，可以简化反向同步。以PIPE_MTE2与PIPE_V之间同步为例，对比如下：
 
-    ```cpp
+    ```c
     // asc_sync_notify/asc_sync_wait机制
     For i=0:100
         if i > 0:
@@ -59,6 +59,7 @@
         asc_unlock(PIPE_V, 0)
     endFor
     ```
+
     其中EVENT_ID0为同步ID，取值范围为[0, 7]；mutex_id取值范围为[0, 31]。
 - 可以使用更多的同步信号量。
 
@@ -101,7 +102,7 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
+```c
 __simd_vf__ inline void add_vf(__ubuf__ half* src0_addr, __ubuf__ half* src1_addr, __ubuf__ half* dst_addr,
                                uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
@@ -148,7 +149,7 @@ __aicore__ inline void add_kernel(__gm__ half* x_gm, __gm__ half* y_gm, __gm__ h
 
 上述示例的流水线时序如下，三条流水线严格串行执行：
 
-```
+```text
 MTE2: |==搬入==|
 V:              |==计算==|
 MTE3:                   |==搬出==|
@@ -162,7 +163,7 @@ MTE3:                   |==搬出==|
 
 所有tile使用相同mutex_id，下一轮的`asc_lock(PIPE_MTE2)`必须等待上一轮`asc_unlock(PIPE_MTE3)`完成，三阶段严格串行。
 
-```cpp
+```c
 __simd_vf__ inline void add_vf(__ubuf__ half* src0_addr, __ubuf__ half* src1_addr, __ubuf__ half* dst_addr,
                                uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
@@ -210,7 +211,7 @@ __aicore__ inline void add_kernel_serial(__gm__ half* x_gm, __gm__ half* y_gm, _
 
 优化前的流水线时序，各轮次之间严格串行：
 
-```
+```text
 MTE2: |==id0==|                |==id0==|                |==id0==|                |==id0==|
 V:          |==id0==|                |==id0==|                |==id0==|                |==id0==|
 MTE3:            |==id0==|                |==id0==|                |==id0==|                |==id0==|
@@ -220,7 +221,7 @@ MTE3:            |==id0==|                |==id0==|                |==id0==|    
 
 使用两个mutex_id交替配合双buffer，相邻轮次的MTE2与MTE3可并行执行。
 
-```cpp
+```c
 __aicore__ inline void add_kernel_pingpong(__gm__ half* x_gm, __gm__ half* y_gm, __gm__ half* z_gm)
 {
     // 双buffer：buf0和buf1交替使用
@@ -262,9 +263,8 @@ __aicore__ inline void add_kernel_pingpong(__gm__ half* x_gm, __gm__ half* y_gm,
 
 优化后的流水线时序，相邻轮次的MTE2与MTE3并行执行：
 
-```
+```text
 MTE2: |==id0==|        |==id1==|        |==id0==|        |==id1==|
 V:          |==id0==|        |==id1==|        |==id0==|        |==id1==|
 MTE3:            |==id0==|        |==id1==|        |==id0==|        |==id1==|
 ```
-

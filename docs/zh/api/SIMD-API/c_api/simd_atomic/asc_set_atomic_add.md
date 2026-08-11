@@ -32,7 +32,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_set_atomic_add_int8()
 __aicore__ inline void asc_set_atomic_add_int16()
 __aicore__ inline void asc_set_atomic_add_int32()
@@ -70,8 +70,9 @@ PIPE_S
 - 本接口调用后会对后续所有目的地址为GM的搬运指令开启原子操作，可以调用[asc_set_atomic_none](./asc_set_atomic_none.md)接口关闭原子操作。 
 - 该接口执行前不会自动将GM上已有数据置零，如果在原子累加之前，需要保证GM上已有数据全为零，开发者需要手动清零。
 - AIC与AIV中均可调用本接口。
-- 本接口仅对后续目的地址为GM的搬运指令（通过MTE1/MET2/MTE3单元搬运）生效，对于标量写GM的指令（例如[asc_store_dev](../scalar_compute/asc_store_dev.md)）不生效。
+- 本接口仅对后续目的地址为GM的搬运指令（通过MTE1/MTE2/MTE3单元搬运）生效，对于标量写GM的指令（例如[asc_store_dev](../scalar_compute/asc_store_dev.md)）不生效。
 - 本接口与紧邻的后续搬运指令之间的同步由硬件保证，因此以下示例中插入的多流水同步是不必要的：
+
     ```cpp
     asc_set_atomic_add_int8();
 
@@ -85,10 +86,10 @@ PIPE_S
     // 关闭原子操作
     asc_set_atomic_none();
     ```
+
 - 后续搬运指令的操作数据类型需与所选接口设置的数据类型一致。
-- 本接口配置写入后对后续所有目的地址为Global Memory的搬运指令生效，直至再次调用本类原子操作配置接口覆盖配置；调用后如需切换为其他数据类型的原子操作、改用其他原子操作配置或关闭原子操作，须显式调用对应接口覆盖配置。
-- 本接口不能保证后续搬运指令的执行顺序，若需保证确定性的执行顺序请参考[原子操作-确定性计算]()。
-- 本接口不支持纯SIMT编译模式（设置编译选项`--enable-simt`），在该模式下包含头文件`atomic.h`会触发编译错误。
+- 本接口不能保证后续搬运指令的执行顺序，若需保证确定性的执行顺序请参考[关键特性说明](key_features.md)。
+- 本接口不支持纯SIMT编译模式（设置编译选项`--enable-simt`），在该模式下包含头文件`atomic.h`会导致编译失败。
 
 ## 调用示例
 
@@ -106,7 +107,7 @@ asc_set_atomic_none();
 
 结果示例：
 
-```
+```text
 输入数据src0：[1, 1, 1, ..., 1]  // int8_t类型
 输入数据src1：[2, 2, 2, ..., 2]  // int8_t类型
 输出数据dst：[3, 3, 3, ..., 3]   // int8_t类型

@@ -28,13 +28,11 @@
 
 **该接口已废弃，请使用[asc_set_atomic_min_int32](asc_set_atomic_min.md)替代。**
 
-头文件路径：`"c_api/atomic/atomic.h"`。
-
 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。
 
 ## 函数原型
 
-```cpp
+```c
 [[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]
 __aicore__ inline void asc_set_atomic_min_int()
 ```

@@ -26,8 +26,6 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
-
 完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。如图1所示，其作用是保证指定流水线中前序指令的所有数据读写全部完成后，该流水线的后序指令才能开始执行。
 
 **图1**  asc_sync_pipe接口功能示意图    
@@ -35,7 +33,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_sync_pipe(pipe_t pipe)
 ```
 
@@ -45,7 +43,7 @@ __aicore__ inline void asc_sync_pipe(pipe_t pipe)
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| pipe | 输入 | 阻塞的流水类别。支持的取值有PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_S。如果不关注流水类别，希望阻塞所有流水，可以传入PIPE_ALL（此时功能等价于[asc_sync](asc_sync.md)）。各流水类别的含义请参见[流水类型说明](../../c_api/sync/intra_core_sync/intra_core_sync_overview.md)。 |
+| pipe | 输入 | 阻塞的流水类别。支持的取值有PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_S。如果不关注流水类别，希望阻塞所有流水，可以传入PIPE_ALL（此时功能等价于[asc_sync](asc_sync.md)）。各流水类别的含义请参考[流水类型说明](intra_core_sync_overview.md)。 |
 
 ## 返回值说明
 

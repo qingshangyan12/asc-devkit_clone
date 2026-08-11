@@ -48,7 +48,7 @@ __aicore__ inline void asc_sync_wait(pipe_t pipe,
 | `tpipe` | 输入 | 目标流水类型，即"解除哪条流水的`asc_sync_wait`阻塞"。取值范围与`pipe`相同，为`pipe_t`枚举。不可取`PIPE_ALL`，否则触发异常。 |
 | `id` | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`EVENT_ID0`~`EVENT_ID7`（即0~7）。 |
 
-针对不同产品，AIC与AIV中支持的“源流水-目的流水”的组合不同，具体请参考[支持的多流水同步组合]()。
+针对不同产品，AIC与AIV中支持的“源流水-目的流水”的组合不同，具体请参考[核内同步概述](intra_core_sync_overview.md)。
 
 ## 返回值说明
 
@@ -68,7 +68,7 @@ PIPE_S
 - 本接口仅在AI Core内部建立跨流水依赖，不涉及Global Memory读写，无地址对齐与容量上限约束。。<span style="color:red">**（莫名其妙的约束）**</span>
 - 本接口只阻塞其所在流水线（`tpipe`）的后续指令，不影响其他流水线指令的执行；阻塞期间 `pipe` 流水线可继续执行后续指令。
 <!-- npu="950" id8 -->
-- 在[NPU架构3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)上，`asc_lock`与`asc_unlock`组合也可实现多流水同步。与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水线解耦，可简化反向同步逻辑。
+- 在[NPU架构3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)上，`asc_lock`与`asc_unlock`组合也可实现多流水同步。与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水线解耦，可简化反向同步逻辑。
 <!-- end id8 -->
 
 ## 调用示例
