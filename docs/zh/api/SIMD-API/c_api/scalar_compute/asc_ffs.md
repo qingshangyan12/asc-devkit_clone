@@ -30,7 +30,7 @@ FindFirstSet接口，输入数据的二进制表示中从最低位向最高位�
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline int64_t asc_ffs(uint64_t value)
 ```
 
@@ -38,13 +38,13 @@ __aicore__ inline int64_t asc_ffs(uint64_t value)
 
 **表1** 参数说明
 
-|参数名|输入/输出|描述|
-|------------|------------|-----------|
-| value     | 输入     | 输入数据。|
+| 参数名 | 输入/输出 | 描述 |
+| ------------ | ------------ | ----------- |
+| value | 输入 | 输入数据。 |
 
 ## 返回值说明
 
-int64_t类型，输入数据中第一个1出现的位置。
+int64_t类型，表示输入数据中第一个1出现的位置。
 
 ## 流水类型
 
@@ -52,11 +52,92 @@ PIPE_S
 
 ## 约束说明
 
-无
+- 本接口为标量单目位查找运算，操作数的dtype固定为`uint64_t`。
+- 返回值取值范围为[0, 63]或哨兵值-1，调用方接收返回值后需先判断是否为-1（对应输入全零、未找到1的情况），再当作位索引使用，否则将-1当作位索引使用会越界。
+- 本接口为纯位查找运算，不访问UB/GM/L1等存储单元，不涉及地址对齐与容量约束，也不产生浮点状态或异常上报。
+- 本接口运行在标量流水上，与后续依赖该返回值的指令之间存在标量数据依赖，由标量流水本身的顺序执行保证，无需额外插入同步指令。
 
 ## 调用示例
 
 ```cpp
-uint64_t value = 10;
-int64_t ret = asc_ffs(value);
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+template <typename T>
+bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t ELEMENTS = 8;
+
+__global__ __vector__ void asc_ffs_kernel(__gm__ int64_t* output)
+{
+    asc_init();
+    output[0] = asc_ffs(8);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<int64_t> input = {0};
+    std::vector<int64_t> golden = {3};
+    input.resize(ELEMENTS, 0);
+    golden.resize(ELEMENTS, 0);
+    std::vector<int64_t> output(ELEMENTS, -1);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int64_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (ELEMENTS) * sizeof(int64_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(output_device, input.size() * sizeof(int64_t), input.data(), input.size() * sizeof(int64_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_ffs_kernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int64_t), output_device, output.size() * sizeof(int64_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden);
+    std::cout << (passed ? "[Success] asc_ffs passed." : "[Failed] asc_ffs failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

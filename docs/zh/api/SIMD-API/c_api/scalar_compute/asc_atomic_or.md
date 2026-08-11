@@ -30,14 +30,23 @@
 
 ## 函数原型
 
-```cpp
-__aicore__ inline int32_t asc_atomic_or(__gm__ int32_t *address, int32_t val)
+### 模板原型（占位符形式）
 
-__aicore__ inline uint32_t asc_atomic_or(__gm__ uint32_t *address, uint32_t val)
+```c
+__aicore__ inline <dtype> asc_atomic_or(__gm__ <dtype>* address,
+                                        <dtype> val)
+```
 
-__aicore__ inline int64_t asc_atomic_or(__gm__ int64_t *address, int64_t val)
+### dtype支持数据类型
 
-__aicore__ inline uint64_t asc_atomic_or(__gm__ uint64_t *address, uint64_t val)
+dtype支持的数据类型为`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+
+### 典型示例
+
+```c
+// 示例：int32_t类型标量原子按位或
+__aicore__ inline int32_t asc_atomic_or(__gm__ int32_t* address,
+                                        int32_t val)
 ```
 
 ## 参数说明
@@ -59,13 +68,100 @@ PIPE_S
 
 ## 约束说明
 
-- 在开启编译器自动同步功能的前提下，编译器能够自动在PIPE_MTE2/PIPE_MTE3与PIPE_S之间插入同步。但是，asc_atomic_or为标量计算，在读写GM时如果与搬运单元（MTE2/MTE3）存在数据依赖，编译器却无法自动插入同步，开发者需要根据实际情况手动插入同步。
-- Scalar原子操作会绕过DCache，需要调用[asc_dcci](../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。
+- 本接口操作数固定为单个标量（不支持向量或连续多元素）。
+- `address`必须落在Global Memory地址空间。传入UB/L1/L0C/栈等非GM地址空间时，硬件不保证原子语义且可能触发异常。
+- `address`需按所访问dtype的字节数对齐。
+- `val`的dtype必须与`address`指向元素的dtype一致，无需额外配置dtype。（本接口与数据搬运随路原子操作接口相互独立，不受随路原子设置影响，也不会影响后续搬运指令）。
+- 本接口通过原子锁对“读取—按位或—写回”全过程串行化，多个AI Core或多线程并发调用同一`address`时不会相互覆盖。按位或运算满足交换律与结合律，多次按位或的最终结果与执行顺序无关，并发结果确定性可保证。
+- 本接口运行在标量流水（PIPE_S）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入`asc_sync_pipe`，或配合使用`asc_sync_notify`与`asc_sync_wait`保证执行顺序。
+- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../guide/编程指南/高级编程/内存模型/缓存一致性.md#scalar原子操作与dcache一致性)。
 
 ## 调用示例
 
 ```cpp
-// dst为外部输入的uint32_t类型的GM内存，此示例的初始值为0x0
-asc_dcci_entire_all();            // 手动同步
-uint32_t old = asc_atomic_or(dst, 0x5);  // 计算后dst = 0x5, old = 0x0
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+template <typename T>
+bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t ELEMENTS = 8;
+
+__global__ __vector__ void asc_atomic_or_kernel(__gm__ int64_t* output)
+{
+    asc_init();
+    __gm__ uint32_t* address = reinterpret_cast<__gm__ uint32_t*>(output);
+    asc_dcci_entire_all();
+    const uint32_t old_value = asc_atomic_or(address, 5U);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    asc_dcci_entire_all();
+    output[1] = static_cast<int64_t>(old_value);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<int64_t> input = {10, 0};
+    std::vector<int64_t> golden = {15, 10};
+    input.resize(ELEMENTS, 0);
+    golden.resize(ELEMENTS, 0);
+    std::vector<int64_t> output(ELEMENTS, -1);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int64_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (ELEMENTS) * sizeof(int64_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(output_device, input.size() * sizeof(int64_t), input.data(), input.size() * sizeof(int64_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_atomic_or_kernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int64_t), output_device, output.size() * sizeof(int64_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden);
+    std::cout << (passed ? "[Success] asc_atomic_or passed." : "[Failed] asc_atomic_or failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
