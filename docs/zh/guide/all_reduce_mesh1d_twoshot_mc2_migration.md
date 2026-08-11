@@ -112,17 +112,25 @@ Mc2CcTilingConfig / Mc2CcTiling：生成并保存 mc2 初始化参数和 AllRedu
               -> PrepareEngineForAlg
               -> CheckForcedAlgResource
                   -> GetAlgExecutorForOp
-                  -> executor->CalcAlgHierarchyInfo
-                  -> executor->CalcRes
+                    -> UseCannBridge：判断 Host 资源计算是否交给外部 CANN registry。
+                      -> true：GetAlgExecViaCann，从外部 CANN registry 获取 executor。
+                      -> false：CollAlgExecRegistryV2::GetAlgExec，从本地 registry 获取 executor；当前 AllReduce 走此分支。
+                    -> executor->CalcAlgHierarchyInfo
+                    -> executor->CalcRes
               -> algName = InsAllReduceMesh1DTwoShot
               -> forcedAlgAccepted = true
               -> 跳过 SelectAlgAndPrepareEngine
         -> SelectAlgAndPrepareEngine：计算通信拓扑，选择算法并准备 AICPU 通信引擎。
-          -> ExecuteSelector::Run：从 AllReduce selector 注册表中查找能够匹配当前拓扑的算法选择器。
-            -> AllReduceAutoSelector::SelectAicpuAlgo：检查单层 Mesh1D 拓扑并选择标准 TwoShot 算法。
-              -> algName = InsAllReduceMesh1DTwoShot：记录本次资源和运行阶段使用的算法名称。
+          -> ExecuteSelector::Run
+            -> UseCannBridge：判断算法选择是否交给外部 CANN selector。
+              -> true：SelectViaCann，调用外部 CANN ExecuteSelector::Run 返回算法名。
+              -> false：从本地 AllReduce selector 注册表查找匹配项；当前 AllReduce 走此分支。
+                -> AllReduceAutoSelector::SelectAicpuAlgo：检查单层 Mesh1D 拓扑并选择标准 TwoShot 算法。
+                  -> algName = InsAllReduceMesh1DTwoShot：记录本次资源和运行阶段使用的算法名称。
         -> GetOpParamResCtx：根据算法名称获取 executor，并创建对应的算法资源上下文。
-          -> CollAlgExecRegistryV2::GetAlgExec：从本地注册表中获取 `InsAllReduceMesh1DTwoShot` executor。
+          -> UseCannBridge：判断资源上下文使用外部 CANN executor 还是本地 executor。
+            -> true：GetAlgExecViaCann，从外部 CANN registry 获取 executor。
+            -> false：CollAlgExecRegistryV2::GetAlgExec，从本地注册表获取 `InsAllReduceMesh1DTwoShot` executor；当前 AllReduce 走此分支。
           -> HcclGetAlgRes：使用获取到的 executor 计算并申请算法资源。
             -> InsV2AllReduceSoleExecutor::CalcAlgHierarchyInfo：通过 `TopoMatch1D` 计算 0 级通信域和 rank 信息。
             -> InsV2AllReduceSoleExecutor::CalcRes：创建标准 TwoShot template 并发起资源计算。
@@ -170,7 +178,13 @@ KFC/AICPU server 消息轮询：持续检查共享消息区中是否出现 AICor
         -> LaunchOpenCcoreWait：等待 AICore 通过 AllReduce<true> 或 Commit 更新提交计数。
         -> LaunchOpenAicpuKernelServer：使用运行参数和已恢复的资源上下文启动本地 AICPU 算法。
           -> LaunchOpenOpParamData：检查运行参数是否有效，并进入 open-kernel 执行入口。
-            -> LaunchOpenOpParamDataImpl：初始化 batch mode，并按算子类型分发到本地算法注册表。
+            -> LaunchOpenOpParamDataImpl：恢复变长数据并初始化 batch mode。
+              -> useCannBridge：按算子类型判断 Device 执行是否交给外部 CANN。
+                -> true：RunWithMc2BatchMode
+                  -> LaunchViaCann
+                    -> 外部 CANN CollAlgExecRegistryV2::GetAlgExec
+                    -> 外部 executor->Orchestrate
+                -> false：使用本地 mc2_ops_hccl registry；当前 AllReduce 走此分支。
               -> CollAlgExecRegistryV2::GetAlgExec：根据 HCCL_CMD_ALLREDUCE 和 InsAllReduceMesh1DTwoShot 获取 executor。
               -> InsV2AllReduceSoleExecutor::Orchestrate：恢复 channel 和 thread，并读取运行时 count 与数据类型。
                 -> InsV2AllReduceSoleExecutor::OrchestrateLoop：根据 HCCL buffer 容量计算单轮 count，循环处理全部数据。
@@ -191,49 +205,7 @@ AscendC::Hccl::Wait：等待完成计数达到预期值，确保 AllReduce 输�
 - 所有数据量均执行标准 TwoShot；超过单轮 scratch 容量时由 executor 循环分块，不调用 TwoShotMeshChunk。
 - 每轮先完成 ReduceScatter，再完成 AllGather，输出地址按 `processedDataCount` 递增。
 
-## 4. mc2 分发适配
-```text
-Host
--> 本地 selector
--> 本地 executor registry
--> 本地 TwoShot executor
--> 本地 resource CalcRes
--> 本地 CMake 编译的 template
 
-Device
--> 本地 V2 registry
--> 本地 TwoShot executor
--> 本地 OrchestrateLoop
--> 本地 TwoShot KernelRun
-```
-
-
-```text
-Host
-  -> UseCannBridge
-  -> 外部 CANN selector
-  -> 外部 CANN executor registry
-  -> 外部 resource CalcRes
-
-Device
-  -> UseCannBridge
-  -> LaunchViaCann
-  -> 外部 CANN registry
-  -> 外部 TwoShot executor
-  -> 外部 TwoShot template
-```
-
-迁移前，AICPU AllReduce 被强制分发到外部 CANN bridge：
-
-- Host 侧 `UseCannBridge` 对 `HCCL_CMD_ALLREDUCE` 返回 `true`，selector 和资源计算使用外部 `ops_hccl` 注册表。
-- AICPU open-kernel 侧也将 `HCCL_CMD_ALLREDUCE` 交给 `LaunchViaCann`。
-
-这会绕过本次迁移到 `mc2_ops_hccl` 的 selector、executor 和 template。适配后：
-
-- `UseCannBridge` 仅保留 AllToAll 和 AllToAllV，AllReduce 使用本地 selector 与本地资源注册表。
-- AICPU open-kernel 侧 AllReduce 使用本地 `CollAlgExecRegistryV2` 和 `Orchestrate`。
-- Host 目标 `mc2_client` 编译 selector、executor 和 template。
-- Device 目标 `mc2_server` 编译 executor 和 template，保证设备运行阶段存在相同算法注册。
 
 ## 5. 构建接入
 
