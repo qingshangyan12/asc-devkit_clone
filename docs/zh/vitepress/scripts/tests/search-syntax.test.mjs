@@ -21,12 +21,14 @@ import {
   bestPagefindSection,
   collectCandidates,
   createQueryPlan,
+  deserializePagefindMeta,
   findIdentifierIndexMatches,
   highlightIdentifierExcerpt,
   highlightSearchText,
   initializePagefindSearch,
   MAX_CJK_SUBPHRASES,
   MAX_QUERY_LENGTH,
+  mergeRouteResult,
 } from '../../docs/.vitepress/theme/pagefind-search.mjs'
 import { sourcePathsForRoute } from '../../docs/.vitepress/build-pagefind-title-index.mjs'
 
@@ -142,6 +144,48 @@ test('continues with the primary index when the title index is unavailable', asy
     console.warn = originalWarn
   }
   assert.equal(mergeCalls, 1)
+})
+
+test('restores Pagefind dates and serialized frontmatter metadata', () => {
+  const frontmatter = { category: 'api', date: 1786410419730, publish: false }
+  const base64 = Buffer.from(encodeURIComponent(JSON.stringify(frontmatter))).toString('base64')
+
+  assert.deepEqual(deserializePagefindMeta({ base64, title: 'Page title' }), {
+    category: 'api',
+    date: 1786410419730,
+    publish: false,
+    title: 'Page title',
+  })
+  assert.deepEqual(deserializePagefindMeta({
+    date: '1786410419730',
+    title: 'Page title',
+  }), {
+    date: 1786410419730,
+    title: 'Page title',
+  })
+})
+
+test('keeps content metadata and result when a title alias ranks higher', () => {
+  const contentData = { meta: { date: '1786410419730', title: 'Page title' } }
+  const titleData = { meta: { ascSearchSource: 'title-route', title: 'Page title' } }
+  const merged = mergeRouteResult({
+    route: '/guide/page.html',
+    description: 'Content excerpt',
+    meta: { category: 'guide', date: 1786410419730, description: 'Content excerpt', title: 'Page title' },
+    result: contentData,
+    score: 10,
+  }, {
+    route: '/guide/page.html',
+    description: '',
+    meta: { description: '', title: 'Page title' },
+    result: titleData,
+    score: 20,
+  })
+
+  assert.equal(merged.description, 'Content excerpt')
+  assert.equal(merged.meta.category, 'guide')
+  assert.equal(merged.meta.date, 1786410419730)
+  assert.equal(merged.result, contentData)
 })
 
 test('escapes and highlights section titles', () => {

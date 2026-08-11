@@ -157,6 +157,7 @@ watch(
         .map(result => ({
           route: result.route.startsWith(site.value.base) ? result.route : withBase(result.route),
           meta: result.meta,
+          result: result.result,
           score: result.score,
         }))
         .filter(result => ignorePublish.value || result.meta.publish !== false)

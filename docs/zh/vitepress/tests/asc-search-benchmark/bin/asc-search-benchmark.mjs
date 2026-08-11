@@ -19,6 +19,7 @@ import { dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node
 import { fileURLToPath } from 'node:url'
 
 import {
+  assignUniqueTargetGrades,
   escapeMarkdownCell as escapeCell,
   fetchSameOrigin,
   markdownReportPath,
@@ -768,22 +769,6 @@ function round(value, digits = 4) {
   return Number(value.toFixed(digits))
 }
 
-function assignUniqueTargetGrades(results, targets, topK) {
-  const unmatched = new Set(targets.map((_, index) => index))
-  return results.slice(0, topK).map((result) => {
-    let selected = -1
-    let grade = 0
-    for (const index of unmatched) {
-      if (targets[index].grade > grade && targetMatches(result.route, targets[index])) {
-        selected = index
-        grade = targets[index].grade
-      }
-    }
-    if (selected >= 0) unmatched.delete(selected)
-    return grade
-  })
-}
-
 function evaluateHighlights(highlights, expectedValues) {
   const matches = (item, expected) => String(item.text || '')
     .normalize('NFKC')
@@ -815,7 +800,13 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
   const maxFirstRelevantRank = definition.expect.maxFirstRelevantRank ?? null
   const firstRelevantRankValid = maxFirstRelevantRank === null
     || (firstRelevantIndex >= 0 && firstRelevantIndex + 1 <= maxFirstRelevantRank)
-  const matchedTargets = targets.filter(target => results.slice(0, topK).some(result => targetMatches(result.route, target)))
+  const uniqueTargetGrades = assignUniqueTargetGrades(
+    results,
+    targets,
+    topK,
+    (result, target) => targetMatches(result.route, target),
+  )
+  const matchedTargetCount = uniqueTargetGrades.filter(grade => grade > 0).length
   const idealGrades = targets.map(target => target.grade).sort((left, right) => right - left).slice(0, topK)
   const idealDcg = dcg(idealGrades)
   const minResults = definition.expect.minResults ?? 0
@@ -901,8 +892,8 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
     successAt1: relevantCase ? firstRelevantIndex === 0 : null,
     successAt3: relevantCase ? firstRelevantIndex >= 0 && firstRelevantIndex < 3 : null,
     successAt10: relevantCase ? firstRelevantIndex >= 0 && firstRelevantIndex < 10 : null,
-    ndcgAt10: relevantCase && idealDcg > 0 ? dcg(assignUniqueTargetGrades(results, targets, topK)) / idealDcg : null,
-    targetRecallAt10: relevantCase ? matchedTargets.length / targets.length : null,
+    ndcgAt10: relevantCase && idealDcg > 0 ? dcg(uniqueTargetGrades) / idealDcg : null,
+    targetRecallAt10: relevantCase ? matchedTargetCount / targets.length : null,
     negativeCorrect: relevantCase ? null : results.length <= maxResults,
     invalidResultCountAt10: invalidResults.length,
     results: results.slice(0, topK).map((result, index) => ({
