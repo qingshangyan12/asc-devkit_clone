@@ -15,5 +15,5 @@ enum class asc_hf32_round_mode : uint8_t{
 
 |枚举值|HF32 舍入模式管理策略|
 |------|-----------|
-| NEAREST_ZERO | FP32将以向零靠近的方式四舍五入为HF32。 |
-| NEAREST_EVEN | FP32将以最接近偶数的方式四舍五入为HF32。 |
+| NEAREST_ZERO | FP32将以向最接近的值舍入，平局时远离零的方式舍入为HF32。 |
+| NEAREST_EVEN | FP32将以向最接近的值舍入，平局时向偶数舍入的方式舍入为HF32。 |
