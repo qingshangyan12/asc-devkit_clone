@@ -85,21 +85,21 @@ struct infer_nested_layout_pattern_impl<_2, ShapeRow1, _16, ShapeColumn1, _1, _3
 template <size_t ShapeRow0, typename ShapeRow1, size_t ShapeColumn0, typename ShapeColumn1, typename StrideColumn1>
 struct infer_nested_layout_pattern_impl<Std::Int<ShapeRow0>, ShapeRow1, Std::Int<ShapeColumn0>, ShapeColumn1,
                                         Std::Int<ShapeColumn0>, Std::Int<ShapeRow0 * ShapeColumn0>, _1, StrideColumn1,
-                                        3, Std::enable_if_t<ShapeRow0 == FRACTAL_FIXED>> {
+                                        3, Std::enable_if_t<ShapeRow0 == fractal_fixed>> {
     using type = nz_layout_ptn;
 };
 
 template <size_t ShapeRow0, typename ShapeRow1, size_t ShapeColumn0, typename ShapeColumn1, typename StrideRow1>
 struct infer_nested_layout_pattern_impl<Std::Int<ShapeRow0>, ShapeRow1, Std::Int<ShapeColumn0>, ShapeColumn1,
                                         Std::Int<ShapeColumn0>, StrideRow1, _1, Std::Int<ShapeRow0 * ShapeColumn0>, 4,
-                                        Std::enable_if_t<ShapeRow0 == FRACTAL_FIXED>> {
+                                        Std::enable_if_t<ShapeRow0 == fractal_fixed>> {
     using type = zz_layout_ptn;
 };
 
 template <size_t ShapeRow0, typename ShapeRow1, size_t ShapeColumn0, typename ShapeColumn1, typename StrideRow1>
 struct infer_nested_layout_pattern_impl<Std::Int<ShapeRow0>, ShapeRow1, Std::Int<ShapeColumn0>, ShapeColumn1, _1,
                                         StrideRow1, Std::Int<ShapeRow0>, Std::Int<ShapeRow0 * ShapeColumn0>, 5,
-                                        Std::enable_if_t<ShapeColumn0 == FRACTAL_FIXED>> {
+                                        Std::enable_if_t<ShapeColumn0 == fractal_fixed>> {
     using type = zn_layout_ptn;
 };
 

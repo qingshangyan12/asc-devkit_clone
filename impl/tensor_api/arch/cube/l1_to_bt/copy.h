@@ -27,11 +27,11 @@
 namespace asc {
 namespace te {
 
-constexpr copy_l1_to_biastable_trait DEFAULT_COPY_L1_BIASTABLE_TRAIT;
+constexpr copy_l1_to_biastable_trait default_copy_l1_to_biastable_trait;
 
 struct copy_l1_to_biastable_trait_default {
     using trait_type = copy_l1_to_biastable_trait;
-    static constexpr const trait_type value = DEFAULT_COPY_L1_BIASTABLE_TRAIT;
+    static constexpr const trait_type value = default_copy_l1_to_biastable_trait;
 };
 
 struct copy_l1_to_biastable {
@@ -45,7 +45,7 @@ public:
     }
 
 private:
-    template <const copy_l1_to_biastable_trait& trait = DEFAULT_COPY_L1_BIASTABLE_TRAIT, typename T, typename U>
+    template <const copy_l1_to_biastable_trait& trait = default_copy_l1_to_biastable_trait, typename T, typename U>
     __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
     {
         using dst_pos = get_mem_location<T>;
@@ -56,7 +56,7 @@ private:
         using src_layout = typename U::layout_type;
         using dst_layout_ptn = get_layout_pattern<dst_layout>;
         using src_layout_ptn = get_layout_pattern<src_layout>;
-        using copy_l1_to_bt_impl = typename copy_l1_to_biastable_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        using copy_l1_to_bt_impl = typename copy_l1_to_biastable_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
         copy_l1_to_bt_impl::template run<trait, T, U>(dst, src);
     }
 };
