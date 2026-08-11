@@ -56,7 +56,7 @@ __simd_callee__ inline void asc_reduce_min_datablock(vector_<dtype>& dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int16_t`、`int32_t`、`uint16_t`、`uint32_t`、`half`、`float`
+dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`
 
 ### 典型示例
 
@@ -95,9 +95,6 @@ __simd_callee__ inline void asc_reduce_min_datablock(vector_half& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/reduce_compute/asc_reduce_min_datablock.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/reduce_compute/asc_reduce_min_datablock.asc -lm -o /tmp/c_api_reg_reduce_compute_asc_reduce_min_datablock && /tmp/c_api_reg_reduce_compute_asc_reduce_min_datablock
-// Architecture: dav-3510
-
 #include <cstdint>
 #include <iostream>
 #include <vector>

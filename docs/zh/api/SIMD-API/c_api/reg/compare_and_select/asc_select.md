@@ -48,7 +48,7 @@ __simd_callee__ inline void asc_select(vector_<dtype>& dst,
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`bool`、`uint8_t`、`int8_t`、`fp8_e4m3fn_t`、`hifloat8_t`、`fp8_e5m2_t`、`uint16_t`、`int16_t`、`half`、`bfloat16_t`、`uint32_t`、`int32_t`、`float`
+dtype支持的数据类型为`bool`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
 
 ### 典型示例
 
@@ -86,9 +86,6 @@ __simd_callee__ inline void asc_select(vector_half& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/compare_and_select/asc_select.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/compare_and_select/asc_select.asc -lm -o /tmp/c_api_reg_compare_and_select_asc_select && /tmp/c_api_reg_compare_and_select_asc_select
-// Architecture: dav-3510
-
 #include <cstdint>
 #include <iostream>
 #include <vector>

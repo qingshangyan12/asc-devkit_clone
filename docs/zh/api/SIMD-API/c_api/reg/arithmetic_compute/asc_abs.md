@@ -43,7 +43,7 @@ __simd_callee__ inline void asc_abs(vector_<dtype>& dst,
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`int16_t`、`int32_t`、`half`、`float`
+dtype支持的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`
 
 ### 典型示例
 
@@ -80,9 +80,6 @@ __simd_callee__ inline void asc_abs(vector_half& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/arithmetic_compute/asc_abs.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/arithmetic_compute/asc_abs.asc -lm -o /tmp/c_api_reg_arithmetic_compute_asc_abs && /tmp/c_api_reg_arithmetic_compute_asc_abs
-// Architecture: dav-3510
-
 #include <algorithm>
 #include <cmath>
 #include <cstdint>

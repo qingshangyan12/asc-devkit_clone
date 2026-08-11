@@ -55,15 +55,11 @@ def asc_float2bfloat16_rn_v2(dst, src, mask):
 
 ### 模板原型（占位符形式）
 
-本接口包含5种舍入模式、2种分块位置和2种饱和模式，共20个原型，模板原型如下：
-
 ```c
-__simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_suffix><v2_suffix>(vector_bfloat16_t& dst,
+__simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><v2_suffix>(vector_bfloat16_t& dst,
                                                                                    vector_float src,
                                                                                    vector_bool mask)
 ```
-
-其中：
 
 - `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 - `<sat_suffix>`为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
@@ -108,9 +104,6 @@ __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/data_type_convert/asc_float2bfloat16.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/data_type_convert/asc_float2bfloat16.asc -lm -o /tmp/c_api_reg_data_type_convert_asc_float2bfloat16 && /tmp/c_api_reg_data_type_convert_asc_float2bfloat16
-// Architecture: dav-3510
-
 #include <cstdint>
 #include <iostream>
 #include <vector>

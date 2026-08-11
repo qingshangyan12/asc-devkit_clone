@@ -82,9 +82,6 @@ __simd_callee__ inline void asc_axpy(vector_float& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/compound_compute/asc_axpy.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/compound_compute/asc_axpy.asc -lm -o /tmp/c_api_reg_compound_compute_asc_axpy && /tmp/c_api_reg_compound_compute_asc_axpy
-// Architecture: dav-3510
-
 #include <cmath>
 #include <cstdint>
 #include <iostream>

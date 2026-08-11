@@ -83,9 +83,6 @@ __simd_callee__ inline void asc_abs_sub(vector_float& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/compound_compute/asc_abs_sub.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/compound_compute/asc_abs_sub.asc -lm -o /tmp/c_api_reg_compound_compute_asc_abs_sub && /tmp/c_api_reg_compound_compute_asc_abs_sub
-// Architecture: dav-3510
-
 #include <cmath>
 #include <cstdint>
 #include <iostream>

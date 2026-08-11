@@ -76,9 +76,6 @@ __simd_callee__ inline void asc_relu(vector_half& dst, vector_half src, vector_b
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/arithmetic_compute/asc_relu.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/arithmetic_compute/asc_relu.asc -lm -o /tmp/c_api_reg_arithmetic_compute_asc_relu && /tmp/c_api_reg_arithmetic_compute_asc_relu
-// Architecture: dav-3510
-
 #include <algorithm>
 #include <cmath>
 #include <cstdint>

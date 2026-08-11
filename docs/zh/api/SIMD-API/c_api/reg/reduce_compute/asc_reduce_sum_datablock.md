@@ -58,10 +58,10 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_<dst_dtype>& dst,
 | src_dtype | dst_dtype |
 | --------- | --------- |
 | `int16_t` | `int32_t` |
-| `int32_t` | `int32_t` |
 | `uint16_t` | `uint32_t` |
-| `uint32_t` | `uint32_t` |
 | `half` | `half` |
+| `int32_t` | `int32_t` |
+| `uint32_t` | `uint32_t` |
 | `float` | `float` |
 
 ### 典型示例
@@ -115,9 +115,6 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/reduce_compute/asc_reduce_sum_datablock.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/reduce_compute/asc_reduce_sum_datablock.asc -lm -o /tmp/c_api_reg_reduce_compute_asc_reduce_sum_datablock && /tmp/c_api_reg_reduce_compute_asc_reduce_sum_datablock
-// Architecture: dav-3510
-
 #include <cstdint>
 #include <iostream>
 #include <vector>

@@ -97,9 +97,6 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/data_type_convert/asc_int322float.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/data_type_convert/asc_int322float.asc -lm -o /tmp/c_api_reg_data_type_convert_asc_int322float && /tmp/c_api_reg_data_type_convert_asc_int322float
-// Architecture: dav-3510
-
 #include <cstdint>
 #include <iostream>
 #include <vector>

@@ -89,9 +89,6 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/compare_and_select/asc_ge_scalar.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/compare_and_select/asc_ge_scalar.asc -lm -o /tmp/c_api_reg_compare_and_select_asc_ge_scalar && /tmp/c_api_reg_compare_and_select_asc_ge_scalar
-// Architecture: dav-3510
-
 #include <cstdint>
 #include <iostream>
 #include <vector>

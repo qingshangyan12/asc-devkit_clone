@@ -101,9 +101,6 @@ __simd_callee__ inline void asc_int322int64(vector_int64_t& dst,
 ## 调用示例
 
 ```cpp
-// Build/run (examples/02_simd_c_api/04_c_api_call_examples/reg/data_type_convert/asc_int322int64.asc): "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang examples/02_simd_c_api/04_c_api_call_examples/reg/data_type_convert/asc_int322int64.asc -lm -o /tmp/c_api_reg_data_type_convert_asc_int322int64 && /tmp/c_api_reg_data_type_convert_asc_int322int64
-// Architecture: dav-3510
-
 #include <cstdint>
 #include <iostream>
 #include <vector>
