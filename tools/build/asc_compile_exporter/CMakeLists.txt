@@ -68,7 +68,7 @@ else()
 endif()
 
 target_link_libraries(asc_compile_exporter PRIVATE
-  asc_boost_filesystem
+  Boost::filesystem
   $<BUILD_INTERFACE:${ASC_COMPILE_EXPORTER_PUBLIC_INTERFACE}>
   $<BUILD_INTERFACE:mmpa_headers>
   $<BUILD_INTERFACE:c_sec_headers>
