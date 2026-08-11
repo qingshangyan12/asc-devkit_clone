@@ -3,9 +3,9 @@
 确定性计算是指在相同输入条件下，无论执行次数或执行环境如何变化，总能产生完全一致输出结果的计算过程。确定性计算为系统稳定性和实验可验证性提供保障。
 
 > [!NOTE]说明
-> - 对于浮点数类型的原子累加，本文以asc_set_atomic_add_float()为例，更多原子操作类型参考[asc_set_atomic_add](asc_set_atomic_add.md)。
-> - 对于原子最大和原子最小，本文以asc_set_atomic_max_float()和asc_set_atomic_min_float()为例，更多原子操作类型参考[asc_set_atomic_max](asc_set_atomic_max.md)和[asc_set_atomic_min](asc_set_atomic_min.md)。
-> - 对于AIV和AIC中向GM搬运数据的接口，本文分别以asc_copy_ub2gm()和asc_copy_l0c2gm()为例，更多搬运接口参考[矢量数据搬运](../vector_data_move/)和[矩阵数据搬运](../cube_data_move/)。
+> - 对于浮点数类型的原子累加，本文以`asc_set_atomic_add_float()`为例，更多原子操作类型参考[asc_set_atomic_add](asc_set_atomic_add.md)。
+> - 对于原子最大和原子最小，本文以`asc_set_atomic_max_float()`和`asc_set_atomic_min_float()`为例，更多原子操作类型参考[asc_set_atomic_max](asc_set_atomic_max.md)和[asc_set_atomic_min](asc_set_atomic_min.md)。
+> - 对于AIV和AIC中向GM搬运数据的接口，本文分别以`asc_copy_ub2gm()`和`asc_copy_l0c2gm()`为例，更多搬运接口参考[矢量数据搬运](../vector_data_move/)和[矩阵数据搬运](../cube_data_move/)。
 
 ## 确定性计算概述<a name="ZH-CN_TOPIC_0000002555780816"></a>
 

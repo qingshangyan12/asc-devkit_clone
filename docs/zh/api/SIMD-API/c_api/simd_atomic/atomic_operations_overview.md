@@ -28,15 +28,15 @@
 
 | 对应接口 | 接口功能描述 |
 | --- | --- |
-| [asc_atomic_add](../scalar_compute/asc_atomic_add.md) | 用于在指定GM地址上进行原子加操作，将address指向的GM地址上的旧值（old_value）与输入标量值（value）求和，将和结果（new_value）写回GM地址，返回该地址修改前的值（old_value）。 |
-| [asc_atomic_min](../scalar_compute/asc_atomic_min.md) | 用于在指定GM地址上进行原子取最小值操作，将address指向的GM地址上的旧值（old_value）与输入标量值（value）做比较，将较小值（new_value）写回GM地址，返回该地址修改前的值（old_value）。 |
-| [asc_atomic_max](../scalar_compute/asc_atomic_max.md) | 用于在指定GM地址上进行原子取大操作，将address指向的GM地址上的旧值（old_value）与输入的标量值（value）进行比较，将较大值（new_value）写回GM地址，返回该地址修改前的值（old_value）。 |
-| [asc_atomic_cas](../scalar_compute/asc_atomic_cas.md) | 在指定GM地址上进行原子比较操作，读取address指向的GM地址上的旧值（old_value）与输入标量值value1进行比较：如果相等，则将输入标量值value2写入GM地址；如果不相等，则GM地址上的值保持不变。返回该地址修改前的值（old_value）。 |
-| [asc_atomic_exch](../scalar_compute/asc_atomic_exch.md) | 用于在GM内存中执行原子交换操作，读取address指向的GM地址上的旧值（old_value），并将输入的标量值（value）替换旧值存储回同一地址，返回该地址修改前的值（old_value）。 |
-| [asc_atomic_and](../scalar_compute/asc_atomic_and.md) | 对Global Memory中的数据与指定数据执行原子与操作，即将val按位与到address指向的数据元素上。读取address指向的GM地址上的旧值（old_value），将旧值与输入标量值val进行按位与运算，将结果（new_value）写回GM地址，返回该地址修改前的值（old_value）。 |
-| [asc_atomic_inc](../scalar_compute/asc_atomic_inc.md) | 对Global Memory中address指向的计数器执行原子递增操作，如果address上的数值大于等于指定数值val，则对address赋值为0，否则将address上数值加1，返回该地址修改前的值（old_value）。 |
-| [asc_atomic_dec](../scalar_compute/asc_atomic_dec.md) | 对Global Memory中address指向的计数器执行原子递减操作，如果address上的数值等于0或大于指定数值val，则对address赋值为val，否则将address上数值减1，返回该地址修改前的值（old_value）。 |
-| [asc_atomic_or](../scalar_compute/asc_atomic_or.md) | 对Global Memory中的数据与指定数据执行原子或操作，即将val按位或到address指向的数据元素上。读取address指向的GM地址上的旧值（old_value），将旧值与输入标量值val进行按位或运算，将结果（new_value）写回GM地址，返回该地址修改前的值（old_value）。 |
-| [asc_atomic_sub](../scalar_compute/asc_atomic_sub.md) | 对Global Memory中的数据与指定数据执行原子减操作，即将val从address指向的数据元素上减去。读取address指向的GM地址上的旧值（old_value），将旧值减去输入标量值val，将结果（new_value）写回GM地址，返回该地址修改前的值（old_value）。 |
-| [asc_atomic_xor](../scalar_compute/asc_atomic_xor.md) | 对Global Memory中的数据与指定数据执行原子异或操作，即将val按位异或到address指向的数据元素上。读取address指向的GM地址上的旧值（old_value），将旧值与输入标量值val进行按位异或运算，将结果（new_value）写回GM地址，返回该地址修改前的值（old_value）。 |
+| [asc_atomic_add](../scalar_compute/asc_atomic_add.md) | 用于在指定GM地址上进行原子加操作，将address指向的GM地址上的旧值（`old_value`）与输入标量值（value）求和，将和结果（`new_value`）写回GM地址，返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_min](../scalar_compute/asc_atomic_min.md) | 用于在指定GM地址上进行原子取最小值操作，将address指向的GM地址上的旧值（`old_value`）与输入标量值（value）做比较，将较小值（`new_value`）写回GM地址，返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_max](../scalar_compute/asc_atomic_max.md) | 用于在指定GM地址上进行原子取大操作，将address指向的GM地址上的旧值（`old_value`）与输入的标量值（value）进行比较，将较大值（`new_value`）写回GM地址，返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_cas](../scalar_compute/asc_atomic_cas.md) | 在指定GM地址上进行原子比较操作，读取address指向的GM地址上的旧值（`old_value`）与输入标量值value1进行比较：如果相等，则将输入标量值value2写入GM地址；如果不相等，则GM地址上的值保持不变。返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_exch](../scalar_compute/asc_atomic_exch.md) | 用于在GM内存中执行原子交换操作，读取address指向的GM地址上的旧值（`old_value`），并将输入的标量值（value）替换旧值存储回同一地址，返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_and](../scalar_compute/asc_atomic_and.md) | 对Global Memory中的数据与指定数据执行原子与操作，即将val按位与到address指向的数据元素上。读取address指向的GM地址上的旧值（`old_value`），将旧值与输入标量值val进行按位与运算，将结果（`new_value`）写回GM地址，返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_inc](../scalar_compute/asc_atomic_inc.md) | 对Global Memory中address指向的计数器执行原子递增操作，如果address上的数值大于等于指定数值val，则对address赋值为0，否则将address上数值加1，返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_dec](../scalar_compute/asc_atomic_dec.md) | 对Global Memory中address指向的计数器执行原子递减操作，如果address上的数值等于0或大于指定数值val，则对address赋值为val，否则将address上数值减1，返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_or](../scalar_compute/asc_atomic_or.md) | 对Global Memory中的数据与指定数据执行原子或操作，即将val按位或到address指向的数据元素上。读取address指向的GM地址上的旧值（`old_value`），将旧值与输入标量值val进行按位或运算，将结果（`new_value`）写回GM地址，返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_sub](../scalar_compute/asc_atomic_sub.md) | 对Global Memory中的数据与指定数据执行原子减操作，即将val从address指向的数据元素上减去。读取address指向的GM地址上的旧值（`old_value`），将旧值减去输入标量值val，将结果（`new_value`）写回GM地址，返回该地址修改前的值（`old_value`）。 |
+| [asc_atomic_xor](../scalar_compute/asc_atomic_xor.md) | 对Global Memory中的数据与指定数据执行原子异或操作，即将val按位异或到address指向的数据元素上。读取address指向的GM地址上的旧值（`old_value`），将旧值与输入标量值val进行按位异或运算，将结果（`new_value`）写回GM地址，返回该地址修改前的值（`old_value`）。 |
 <!-- end id1 -->
