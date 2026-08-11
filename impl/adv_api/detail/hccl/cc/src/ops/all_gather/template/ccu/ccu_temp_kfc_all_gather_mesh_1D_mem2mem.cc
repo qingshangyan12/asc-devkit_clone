@@ -30,8 +30,12 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::CalcRes(
     resourceRequest.ccuKernelNum.push_back(1);
 
     CcuKernelInfo kernelInfo;
+<<<<<<< HEAD
     CHK_SAFETY_FUNC_RET(
         strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAllGatherMesh1DMem2Mem"));
+=======
+    strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllGatherMesh1DMem2Mem");
+>>>>>>> 8ae6d9c02 (1)
 
     std::vector<HcclChannelDesc> channelDescs;
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
@@ -87,9 +91,11 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::KernelRun(
     const uint64_t outputRepeatStride = templateDataParams.outputRepeatStride;
     const uint64_t isInputOutputEqual = (inputAddr == outputAddr) ? 1 : 0;
 
+    // KFC server 的 param[0] 是控制字（非 INVALID_U64 表示有效），param[1..14] 是实际参数。
+    // token 由 KFC server 从 ctx.token 读取，不写入 param。参数顺序需与 DispatchKfcSubKernel 一致。
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
-    CHK_RET(FillCachedArgs(submitInfo, inputAddr, outputAddr, token, outputOffset, sliceSize, goSize[0], goSize[1],
+    CHK_RET(FillCachedArgs(submitInfo, 1ULL, inputAddr, outputAddr, outputOffset, sliceSize, goSize[0], goSize[1],
         goSize[2], goSize[3], currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride,
         lastSliceSize, isInputOutputEqual));
     templateResource.submitInfos.push_back(submitInfo);
