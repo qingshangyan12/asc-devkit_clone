@@ -98,7 +98,7 @@ target_link_libraries(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
     dl
 )
 
-# run_llt_test(
-#     TARGET ${HCCL_MC2_CCU_SELECTOR_TARGET}
-#     TASK_NUM 1
-# )
+run_llt_test(
+    TARGET ${HCCL_MC2_CCU_SELECTOR_TARGET}
+    TASK_NUM 1
+)
