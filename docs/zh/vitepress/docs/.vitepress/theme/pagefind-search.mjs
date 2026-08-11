@@ -349,6 +349,22 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;')
 }
 
+export function deserializePagefindMeta(meta = {}) {
+  const { ascSearchSource: _source, base64, date, ...displayMeta } = meta || {}
+  let frontmatter = {}
+  if (base64) {
+    try {
+      frontmatter = JSON.parse(decodeURIComponent(atob(base64)))
+    }
+    catch {}
+  }
+  return {
+    ...(date ? { date: Number(date) } : {}),
+    ...frontmatter,
+    ...displayMeta,
+  }
+}
+
 export function highlightIdentifierExcerpt(excerpt, query, specialSyntaxIntent = false) {
   const text = String(excerpt || '')
   const syntaxMatch = specialSyntaxIntent ? findKernelLaunch(text) : null
@@ -694,7 +710,8 @@ function scoreCandidate(candidate, plan) {
     + compactCjkRouteBonus(route, plan.cjkPhrases)
     + Math.round(coverage * 20000)
     - wrappedEnglishPhrasePenalty
-  const { ascSearchSource, ...displayMeta } = data.meta || {}
+  const ascSearchSource = data.meta?.ascSearchSource
+  const displayMeta = deserializePagefindMeta(data.meta)
   const description = ascSearchSource === TITLE_INDEX_SOURCE ? '' : data.excerpt || ''
   return {
     route,
@@ -706,11 +723,20 @@ function scoreCandidate(candidate, plan) {
       description,
       ...(sectionTitle ? { sectionTitle } : {}),
     },
+    result: data,
     score,
   }
 }
 
-function mergeRouteResult(existing, result) {
+function preferredPagefindResult(preferred, fallback) {
+  const preferredResult = preferred.result
+  const fallbackResult = fallback.result
+  if (preferredResult?.meta?.ascSearchSource !== TITLE_INDEX_SOURCE) return preferredResult || fallbackResult
+  if (fallbackResult?.meta?.ascSearchSource !== TITLE_INDEX_SOURCE) return fallbackResult || preferredResult
+  return preferredResult || fallbackResult
+}
+
+export function mergeRouteResult(existing, result) {
   if (!existing) return result
   const preferred = result.score > existing.score ? result : existing
   const fallback = preferred === result ? existing : result
@@ -718,18 +744,20 @@ function mergeRouteResult(existing, result) {
   const routeResult = preferred.route.includes('#') || !fallback.route.includes('#') ? preferred : fallback
   const route = routeResult.route
   const sectionTitle = routeResult.meta?.sectionTitle || ''
-  if (description === preferred.description && route === preferred.route
-    && sectionTitle === (preferred.meta?.sectionTitle || '')) return preferred
   const { sectionTitle: _ignoredSectionTitle, ...preferredMeta } = preferred.meta || {}
+  const { sectionTitle: _ignoredFallbackSectionTitle, ...fallbackMeta } = fallback.meta || {}
+  const pagefindResult = preferredPagefindResult(preferred, fallback)
   return {
     ...preferred,
     route,
     description,
     meta: {
+      ...fallbackMeta,
       ...preferredMeta,
       description,
       ...(sectionTitle ? { sectionTitle } : {}),
     },
+    ...(pagefindResult ? { result: pagefindResult } : {}),
   }
 }
 
