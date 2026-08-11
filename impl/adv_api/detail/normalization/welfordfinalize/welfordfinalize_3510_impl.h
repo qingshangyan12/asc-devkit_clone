@@ -419,13 +419,13 @@ __aicore__ inline void WelfordFinalizeForB32(
         uint32_t kOverflow = k < K ? (k << 1) : k;
         for (uint16_t m = 0; m < 1; m++) {
             BinaryReduceSum(
-                outMean + m, inMean + m * para.headCountLength, sumTmpbuffer, para.headCountLength, k,
-                1.0f / kOverflow, para.abRec * kOverflow, para.rRecWithCorrection * kOverflow);
+                outMean + m, inMean + m * para.headCountLength, sumTmpbuffer, para.headCountLength, k, 1.0f / kOverflow,
+                para.abRec * kOverflow, para.rRecWithCorrection * kOverflow);
 
             WelfordFinalizeForB32RnVF<isReuseSource, config>(outMean, inMean, inVar, tmpbuffer, para, m);
             BinaryReduceSum<config.isCorrection>(
-                outVar + m, tmpbuffer, sumTmpbuffer, para.headCountLength, k, 1.0f / kOverflow,
-                para.rRec * kOverflow, para.rRecWithCorrection * kOverflow);
+                outVar + m, tmpbuffer, sumTmpbuffer, para.headCountLength, k, 1.0f / kOverflow, para.rRec * kOverflow,
+                para.rRecWithCorrection * kOverflow);
         }
     } else {
         uint32_t K = para.abLength;

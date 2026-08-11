@@ -63,7 +63,8 @@ __aicore__ inline void BatchNorm(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     BatchNormAPI::BatchNormImpl<T, isReuseSource, isBasicBlock>(
         output, outputMean, outputVariance, inputX, gamm, beta, sharedTmpBuffer, epsilon, tiling);
 #endif
@@ -78,7 +79,8 @@ __aicore__ inline void BatchNorm(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     BatchNormAPI::BatchNormImpl<T, isReuseSource, isBasicBlock>(
         output, outputMean, outputVariance, inputX, gamm, beta, epsilon, tiling);
 #endif
