@@ -78,7 +78,7 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
         return SelectorStatus::NOT_MATCH;
     }
 
-    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
+    selectAlgName = "CcuKfcAllGatherMesh1DMem2Mem";
     HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
