@@ -42,9 +42,9 @@ inline bfloat16_t __ushort_as_bfloat16(const unsigned short int x)
 
 ## 返回值说明
 
-unsigned short int的数据按位重新解释为bfloat16的值。特殊值如下：
+输入的无符号整数中的位重新解释成的bfloat16_t类型数据。特殊值如下：
 
-| 输入（uint16 位模式） | 返回值 |
+| x值 | 返回值 |
 |---|---|
 | 0 | 0 |
 | -0 | -0 |
@@ -54,7 +54,6 @@ unsigned short int的数据按位重新解释为bfloat16的值。特殊值如下
 | ASCRT_MAX_NORMAL_BF16 | ASCRT_MAX_NORMAL_BF16 |
 | -ASCRT_MAX_NORMAL_BF16 | -ASCRT_MAX_NORMAL_BF16 |
 | ASCRT_MIN_DENORM_BF16 | ASCRT_MIN_DENORM_BF16 |
-| 1.0 | 1.0 |
 
 ## 约束说明
 
@@ -70,7 +69,7 @@ unsigned short int的数据按位重新解释为bfloat16的值。特殊值如下
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__ushort_as_bfloat16(bfloat16_t* dst, unsigned short int* x)
@@ -80,7 +79,7 @@ unsigned short int的数据按位重新解释为bfloat16的值。特殊值如下
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__ushort_as_bfloat16(__gm__ bfloat16_t* dst, __gm__ unsigned short int* x)

@@ -56,9 +56,17 @@ inline float2 __half22float2(const half2 x)
 
 无
 
+## 需要包含的头文件
+
+使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
+
+```cpp
+#include "simt_api/asc_fp16.h"
+```
+
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -78,7 +86,7 @@ inline float2 __half22float2(const half2 x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
