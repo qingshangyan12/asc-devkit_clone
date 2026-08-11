@@ -85,6 +85,10 @@ inline void asc_stwt(unsigned char* address, unsigned char val)
 ```
 
 ```cpp
+inline void asc_stwt(char* address, char val)
+```
+
+```cpp
 inline void asc_stwt(char2* address, char2 val)
 ```
 
@@ -211,7 +215,7 @@ inline void asc_stwt(half2* address, half2 val)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel_asc_stwt(float* dst, float* val)
@@ -221,7 +225,7 @@ inline void asc_stwt(half2* address, half2 val)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间。
 
