@@ -8,12 +8,12 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_DUPLICATE_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_DUPLICATE_H
+#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_FILL_H
+#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_FILL_H
 
 #include <cstddef>
 
-#include "tensor_api/experimental/reg/mask.h"
+#include "tensor_api/arch/vector/experimental/mask.h"
 
 namespace asc {
 namespace te {
@@ -29,7 +29,7 @@ __simd_callee__ inline reg_tensor<DataType> fill(reg_tensor<DataType> value,
 } // namespace asc
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/duplicate_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/fill_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_DUPLICATE_H
+#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_FILL_H

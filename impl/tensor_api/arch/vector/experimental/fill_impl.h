@@ -8,10 +8,10 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_DUPLICATE_IMPL_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_DUPLICATE_IMPL_H
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_FILL_IMPL_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_FILL_IMPL_H
 
-#include "tensor_api/arch/vector/duplicate.h"
+#include "tensor_api/arch/vector/experimental/fill.h"
 
 namespace asc {
 namespace te {
@@ -54,4 +54,4 @@ __simd_callee__ inline reg_tensor<DataType> fill(reg_tensor<DataType> value, reg
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_DUPLICATE_IMPL_H
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_FILL_IMPL_H

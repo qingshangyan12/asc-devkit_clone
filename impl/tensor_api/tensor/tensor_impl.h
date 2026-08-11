@@ -26,8 +26,6 @@
 #include "impl/tensor_api/tensor/layout_impl.h"
 #include "impl/tensor_api/tensor/engine_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
-#include "tensor_api/experimental/reg/load_mode.h"
-#include "tensor_api/experimental/reg/reg_tensor.h"
 
 namespace asc {
 namespace te {
@@ -118,14 +116,6 @@ struct base_tensor {
     {
         return data()[layout()(coord)];
     }
-
-    using data_type = get_attribute_element_type<element_type*>;
-
-    template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Coord>
-    __simd_callee__ inline decltype(auto) load(const Coord& coord) const;
-
-    template <typename Coord, typename RegDataType>
-    __simd_callee__ inline void store(const Coord& coord, const reg_tensor<RegDataType>& src);
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord)
@@ -266,16 +256,6 @@ struct global_tensor : public base_tensor<EngineType, LayoutType> {
     }
 };
 
-template <typename EngineType, typename LayoutType>
-struct local_tensor : public base_tensor<EngineType, LayoutType> {
-    using tensor_api_base = base_tensor<EngineType, LayoutType>;
-    using layoutType = typename tensor_api_base::layout_type;
-
-    using tensor_api_base::tensor_api_base;
-
-    __aicore__ inline local_tensor() = default;
-};
-
 template <typename LocationType, typename EngineType, typename LayoutType>
 struct make_tensor_result {
     using type =
@@ -388,8 +368,6 @@ __aicore__ inline constexpr auto squeeze(const T& x, const Pattern& pattern)
 
 } // namespace te
 } // namespace asc
-
-#include "impl/tensor_api/experimental/reg/load_store.h"
 
 #endif // IMPL_TENSOR_API_TENSOR_TENSOR_IMPL_H
 
