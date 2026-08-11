@@ -21,6 +21,7 @@
 #ifndef INCLUDE_TENSOR_API_TENSOR_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_TENSOR_H
 
+#include "tensor_api/tensor/layout_interface.h"
 #include "impl/tensor_api/tensor/tuple_impl.h"
 #include "impl/tensor_api/tensor/tensor_impl.h"
 
@@ -30,6 +31,12 @@ namespace te {
 
 template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto make_tensor(const Iterator& iter, const Args&... args);
+
+template <size_t... SqueezeDims, typename T, typename Enable>
+__aicore__ inline constexpr auto squeeze(const T& x);
+
+template <typename Pattern, typename T, typename Enable>
+__aicore__ inline constexpr auto squeeze(const T& x, const Pattern& pattern);
 
 } // namespace te
 } // namespace asc
