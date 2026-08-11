@@ -24,19 +24,16 @@ target_link_libraries(demo PRIVATE)
 
 # 场景参数（通过命令行传入）
 # SCENARIO_NUM: 场景编号
-#   1 - 输出格式NZ，输出数据类型float
-#   2 - 输出格式ND，输出数据类型float
-#   3 - 输出格式DN，输出数据类型float
-#   4 - 输出格式ND，输出数据类型int8_t，使能Scalar量化
-#   5 - 输出格式ND，输出数据类型int8_t，使能Vector量化
-#   6 - 输出格式ND，输出数据类型float，使能relu
-#   7 - 输出格式NZ，输出数据类型float，使能channel split
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-7)")
-if(NOT SCENARIO_NUM MATCHES "^[1-7]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4, 5, 6 or 7, but got ${SCENARIO_NUM}")
+#   1-7:  原有场景（float L0C, half输入），支持 dav-2201 和 dav-3510（场景3仅dav-3510）
+#   8-41: float L0C 新数据类型组合（仅 dav-3510）
+#   42-59: int32_t L0C 数据类型组合（仅 dav-3510）
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-59)")
+if(SCENARIO_NUM LESS 1 OR SCENARIO_NUM GREATER 59)
+    message(FATAL_ERROR "SCENARIO_NUM must be 1-59, but got ${SCENARIO_NUM}")
 endif()
 
-if(SCENARIO_NUM STREQUAL "3" AND CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
+# 场景3 (DN) 和 场景8-59 仅支持 dav-3510
+if((SCENARIO_NUM STREQUAL "3" OR SCENARIO_NUM GREATER_EQUAL "8") AND CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
     message(FATAL_ERROR "SCENARIO_NUM=${SCENARIO_NUM} only supports dav-3510, not dav-2201")
 endif()
 
