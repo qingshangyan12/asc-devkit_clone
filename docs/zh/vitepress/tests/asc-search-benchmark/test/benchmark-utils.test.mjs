@@ -15,6 +15,7 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 
 import {
+  assignUniqueTargetGrades,
   escapeMarkdownCell,
   fetchSameOrigin,
   markdownReportPath,
@@ -86,6 +87,25 @@ test('matches route prefixes only at path segment boundaries', () => {
   assert.equal(pathMatchesPrefix('/api/asc_copy_gm2ub/page', '/api/asc_copy_gm2ub'), true)
   assert.equal(pathMatchesPrefix('/api/asc_copy_gm2ub_align/page', '/api/asc_copy_gm2ub'), false)
   assert.equal(pathMatchesPrefix('/api/page', '/'), true)
+})
+
+test('assigns each result to at most one overlapping recall target', () => {
+  const exact = { grade: 3, routes: ['/guide/page'] }
+  const prefix = { grade: 2, routes: ['/guide/page', '/guide/sibling'] }
+  const matches = (result, target) => target.routes.includes(result.route)
+
+  assert.deepEqual(assignUniqueTargetGrades(
+    [{ route: '/guide/page' }],
+    [exact, prefix],
+    10,
+    matches,
+  ), [3])
+  assert.deepEqual(assignUniqueTargetGrades(
+    [{ route: '/guide/page' }, { route: '/guide/sibling' }],
+    [exact, prefix],
+    10,
+    matches,
+  ), [3, 2])
 })
 
 test('does not resolve files through symlinks outside the static root', async () => {

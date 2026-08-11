@@ -49,6 +49,22 @@ export function pathMatchesPrefix(path, prefix) {
   return path === prefix || (prefix === '/' ? path.startsWith('/') : path.startsWith(`${prefix}/`))
 }
 
+export function assignUniqueTargetGrades(results, targets, topK, matches) {
+  const unmatched = new Set(targets.map((_, index) => index))
+  return results.slice(0, topK).map((result) => {
+    let selected = -1
+    let grade = 0
+    for (const index of unmatched) {
+      if (targets[index].grade > grade && matches(result, targets[index])) {
+        selected = index
+        grade = targets[index].grade
+      }
+    }
+    if (selected >= 0) unmatched.delete(selected)
+    return grade
+  })
+}
+
 export function resolveFileWithinRoot(root, candidates) {
   const realRoot = realpathSync(root)
   for (const candidate of candidates) {
