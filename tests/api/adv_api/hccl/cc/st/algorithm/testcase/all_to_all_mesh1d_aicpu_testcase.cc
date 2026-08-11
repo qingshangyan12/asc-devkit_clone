@@ -19,7 +19,6 @@
 #include "alg_env_config.h"
 #include "alltoall_auto_selector.h"
 #include "alltoallv_auto_selector.h"
-#include "cann_bridge_route.h"
 #include "check_utils.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "gtest/gtest.h"
