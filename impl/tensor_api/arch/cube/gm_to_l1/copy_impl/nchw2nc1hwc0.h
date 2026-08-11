@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nchw2nc1hwc0.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -48,13 +48,13 @@ public:
         uint16_t n_value = get<3>(src_layout.shape()); // src_w
         uint32_t d_value = get<1>(src_layout.shape()); // src_c
         // NCHW row-major stride: (C*H*W, H*W, W, 1) -> Stride[1]=H*W (dn_num step), Stride[2]=W (n_value step).
-        uint64_t loop1_src_stride = static_cast<uint64_t>(get<1>(src_layout.stride())) * sizeof(type); // H*W*sizeof
-        uint64_t loop4_src_stride = static_cast<uint64_t>(get<2>(src_layout.stride())) * sizeof(type); // W*sizeof
+        uint64_t loop1_src_stride = static_cast<uint64_t>(get<1>(src_layout.stride())) * sizeof(type); // height*width*sizeof
+        uint64_t loop4_src_stride = static_cast<uint64_t>(get<2>(src_layout.stride())) * sizeof(type); // width*sizeof
 
         // dst NC1HWC0 (N, C1, H, W, C0): loop4_dst_stride = dst_w = Shape[3]; loop3_dst_stride = dst_h*dst_w
         // = Shape[2]*Shape[3] (no stride carries the bare H*W product).
         uint16_t loop2_dst_stride = 1;
-        uint16_t loop4_dst_stride = get<3>(dst_layout.shape());                              // dst_w
+        uint16_t loop4_dst_stride = get<3>(dst_layout.shape());                             // dst_w
         uint16_t loop3_dst_stride = get<2>(dst_layout.shape()) * get<3>(dst_layout.shape()); // dst_h*dst_w
 
         if constexpr (is_b4_type<type>) {
@@ -64,9 +64,35 @@ public:
         }
         uint8_t cache_mode = src.engine().get_cache_mode();
 
-        copy_gm_to_l1_multi_dn2nz_instr::data_copy(dst.data().get(), src.data().get(), dn_num, loop2_dst_stride, loop3_dst_stride,
-                                                     loop4_dst_stride, loop1_src_stride, cache_mode, n_value, d_value,
-                                                     loop4_src_stride, false);
+        copy_gm_to_l1_multi_dn2nz_instr::data_copy(
+            dst.data().get(), src.data().get(), dn_num, loop2_dst_stride, loop3_dst_stride, loop4_dst_stride, loop1_src_stride, cache_mode, n_value, d_value,
+            loop4_src_stride, false);
+    }
+
+    template <const copy_gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& shape)
+    {
+        using type = typename U::element_type;
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        uint16_t dn_num = get<2>(region_shape);
+        uint16_t n_value = get<3>(region_shape);
+        uint32_t d_value = get<1>(region_shape);
+        uint64_t loop1_src_stride = static_cast<uint64_t>(get<1>(src.layout().stride())) * sizeof(type);
+        uint64_t loop4_src_stride = static_cast<uint64_t>(get<2>(src.layout().stride())) * sizeof(type);
+        uint16_t loop4_dst_stride = get<3>(dst.layout().shape());
+        uint16_t loop3_dst_stride = get<2>(dst.layout().shape()) * get<3>(dst.layout().shape());
+        if constexpr (is_b4_type<type>) {
+            d_value >>= 1;
+            loop4_src_stride >>= 1;
+            loop1_src_stride >>= 1;
+        }
+        copy_gm_to_l1_multi_dn2nz_instr::data_copy_region(dst, src, dst_offset, src_offset, dn_num, 1,
+            loop3_dst_stride, loop4_dst_stride, loop1_src_stride, src.engine().get_cache_mode(), n_value,
+            d_value, loop4_src_stride, false);
     }
 };
 
