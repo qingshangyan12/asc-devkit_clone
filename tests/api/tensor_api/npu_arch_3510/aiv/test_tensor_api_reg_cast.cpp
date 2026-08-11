@@ -16,9 +16,7 @@
 
 #include "c_api/stub/cce_stub.h"
 
-#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#include "impl/tensor_api/arch/vector/experimental/cast/reg_cast.h"
-#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#include "tensor_api/arch/vector/experimental/cast/reg_cast.h"
 
 namespace {
 

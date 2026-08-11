@@ -36,6 +36,7 @@ set(ASCEND_HOME "$ENV{ASCEND_HOME_PATH}")
 include_directories(
     "${ASCEND_HOME}/asc/"
     "${ASC_DEVKIT_ROOT}"
+    "${ASC_DEVKIT_ROOT}/include"
 )
 
 target_compile_definitions(demo PRIVATE
