@@ -56,6 +56,10 @@ inline float2 __half22float2(const half2 x)
 
 无
 
+## 需要包含的头文件
+
+使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
+
 ## 调用示例
 
 -   SIMT编程场景：
