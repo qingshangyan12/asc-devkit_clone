@@ -31,6 +31,7 @@ npu_op_kernel_sources(ascendc_kernels
     OP_TYPE AddCustomTemplate
     KERNEL_DIR add_custom_template
     KERNEL_FILE add_custom_template.cpp
+    BINARY_JSON ../op_host/config/ascend910b/add_custom_template_binary.json
 )
 
 npu_op_kernel_library(ascendc_kernels
