@@ -1,0 +1,330 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+#include "ccu_kernel_alg_base.h"
+#include "ccu_kernel_kfc_half_all_to_all_v_mesh1d.h"
+
+namespace mc2_ops_hccl {
+
+constexpr int A2AV_OUTPUT_XN_ID = 1;
+constexpr int A2AV_TOKEN_XN_ID = 2;
+constexpr int A2AV_POST_SYNC_CKE_IDX = 0;
+constexpr int A2AV_OUTPUT_CKE_IDX = 1;
+constexpr int A2AV_TOKEN_CKE_IDX = 2;
+constexpr uint16_t A2AV_POST_SYNC_BIT = 1U;
+constexpr uint16_t A2AV_OUTPUT_BIT = 1U << A2AV_OUTPUT_XN_ID;
+constexpr uint16_t A2AV_TOKEN_BIT = 1U << A2AV_TOKEN_XN_ID;
+constexpr uint32_t A2AV_BITS_PER_EVENT = 16;
+
+struct KfcHalfAllToAllVMesh1DContext : CcuKernelCtxBase {
+    const ChannelHandle* channels{nullptr};
+    uint32_t channelCount{0};
+    uint32_t rankSize{0};
+    uint32_t rankId{0};
+
+    ccu::Variable userInAddr;
+    ccu::Variable sendSizesAddr;
+    ccu::Variable sendOffsetsAddr;
+    ccu::Variable recvOffset;
+    GroupOpSizeVars goSize;
+
+    std::vector<ccu::Variable> cclBuffer;
+    std::vector<ccu::Variable> token;
+    std::vector<ccu::Event> writeDoneEvents;
+
+    std::vector<ccu::Variable> sendSizeA;
+    std::vector<ccu::Variable> sendSizeB;
+    std::vector<ccu::Variable> sendOffsetA;
+    std::vector<ccu::Variable> sendOffsetB;
+};
+
+static CcuResult InitResource(KfcHalfAllToAllVMesh1DContext& ctx)
+{
+    HCCL_INFO(
+        "[CcuKfcHalfAll2AllVMesh1D][Stage1 InitResource] rankSize[%u], rankId[%u], channelCount[%u]",
+        ctx.rankSize, ctx.rankId, ctx.channelCount);
+
+    if (ctx.rankSize == 0 || ctx.rankId >= ctx.rankSize || ctx.channelCount + 1 != ctx.rankSize) {
+        HCCL_ERROR(
+            "[CcuKfcHalfAll2AllVMesh1D][Stage1 InitResource] invalid rank/channel, rankSize[%u], rankId[%u], channelCount[%u]",
+            ctx.rankSize, ctx.rankId, ctx.channelCount);
+        return CcuResult::CCU_E_INTERNAL;
+    }
+
+    ctx.cclBuffer.resize(ctx.rankSize);
+    ctx.token.resize(ctx.rankSize);
+    uint32_t channelIdx = 0;
+    for (uint32_t peerId = 0; peerId < ctx.rankSize; peerId++) {
+        if (peerId == ctx.rankId) {
+            continue;
+        }
+        ctx.cclBuffer[peerId] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], A2AV_OUTPUT_XN_ID);
+        ctx.token[peerId] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], A2AV_TOKEN_XN_ID);
+        HCCL_INFO(
+            "[CcuKfcHalfAll2AllVMesh1D][Stage1 InitResource] peerId[%u], channelIdx[%u], cclBuffer+token acquired",
+            peerId, channelIdx);
+        channelIdx++;
+    }
+
+    const uint32_t eventNum = (ctx.rankSize + A2AV_BITS_PER_EVENT - 1) / A2AV_BITS_PER_EVENT;
+    ctx.writeDoneEvents.resize(eventNum);
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage1 InitResource] eventNum[%u]", eventNum);
+
+    ctx.sendSizeA.resize(ctx.rankSize);
+    ctx.sendSizeB.resize(ctx.rankSize);
+    ctx.sendOffsetA.resize(ctx.rankSize);
+    ctx.sendOffsetB.resize(ctx.rankSize);
+
+    ctx.resourceAllocated = false;
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage1 InitResource] done");
+    return CCU_SUCCESS;
+}
+
+static CcuResult LoadArgs(
+    KfcHalfAllToAllVMesh1DContext& ctx, ccu::Variable userInAddr, ccu::Variable sendSizesAddr,
+    ccu::Variable sendOffsetsAddr, ccu::Variable recvOffset, ccu::Variable goSize0, ccu::Variable goSize1,
+    ccu::Variable goSize2, ccu::Variable goSize3)
+{
+    ctx.userInAddr = userInAddr;
+    ctx.sendSizesAddr = sendSizesAddr;
+    ctx.sendOffsetsAddr = sendOffsetsAddr;
+    ctx.recvOffset = recvOffset;
+    ctx.goSize.addrOffset = goSize0;
+    ctx.goSize.loopParam = goSize1;
+    ctx.goSize.parallelParam = goSize2;
+    ctx.goSize.residual = goSize3;
+    HCCL_INFO(
+        "[CcuKfcHalfAll2AllVMesh1D][Stage2 LoadArgs] args are ccu::Variable (runtime values, not printable at "
+        "translation time). rankSize[%u], rankId[%u]",
+        ctx.rankSize, ctx.rankId);
+    return CCU_SUCCESS;
+}
+
+static CcuResult LoadSendParamsFromMem(KfcHalfAllToAllVMesh1DContext& ctx)
+{
+    HCCL_INFO(
+        "[CcuKfcHalfAll2AllVMesh1D][Stage3 LoadSendParamsFromMem] start, rankSize[%u]",
+        ctx.rankSize);
+
+    ccu::Variable elemSize;
+    elemSize = 8U;
+
+    ccu::Variable curSizesAddr = ctx.sendSizesAddr;
+    ccu::Variable curOffsetsAddr = ctx.sendOffsetsAddr;
+
+    for (uint32_t i = 0; i < ctx.rankSize; i++) {
+        CCU_CHK_RET(ccu::Load(curSizesAddr, ctx.sendSizeA[i]));
+        CCU_CHK_RET(ccu::Load(curOffsetsAddr, ctx.sendOffsetA[i]));
+        HCCL_INFO(
+            "[CcuKfcHalfAll2AllVMesh1D][Stage3 LoadSendParamsFromMem] A group peerId[%u], sendSizeA+sendOffsetA loaded",
+            i);
+        curSizesAddr += elemSize;
+        curOffsetsAddr += elemSize;
+    }
+
+    ccu::Variable bBaseOffset;
+    bBaseOffset = static_cast<uint64_t>(ctx.rankSize) * 8U;
+
+    curSizesAddr = ctx.sendSizesAddr;
+    curSizesAddr += bBaseOffset;
+    curOffsetsAddr = ctx.sendOffsetsAddr;
+    curOffsetsAddr += bBaseOffset;
+
+    for (uint32_t i = 0; i < ctx.rankSize; i++) {
+        CCU_CHK_RET(ccu::Load(curSizesAddr, ctx.sendSizeB[i]));
+        CCU_CHK_RET(ccu::Load(curOffsetsAddr, ctx.sendOffsetB[i]));
+        HCCL_INFO(
+            "[CcuKfcHalfAll2AllVMesh1D][Stage3 LoadSendParamsFromMem] B group peerId[%u], sendSizeB+sendOffsetB loaded",
+            i);
+        curSizesAddr += elemSize;
+        curOffsetsAddr += elemSize;
+    }
+
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage3 LoadSendParamsFromMem] done");
+    return CCU_SUCCESS;
+}
+
+static CcuResult PreSync(KfcHalfAllToAllVMesh1DContext& ctx)
+{
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage4 PreSync] start, channelCount[%u]", ctx.channelCount);
+    for (uint32_t i = 0; i < ctx.channelCount; i++) {
+        CCU_CHK_RET(ccu::WriteVariableWithNotify(
+            ctx.channels[i], ctx.cclBuffer[ctx.rankId], A2AV_OUTPUT_XN_ID, A2AV_OUTPUT_CKE_IDX, A2AV_OUTPUT_BIT));
+        CCU_CHK_RET(ccu::WriteVariableWithNotify(
+            ctx.channels[i], ctx.token[ctx.rankId], A2AV_TOKEN_XN_ID, A2AV_TOKEN_CKE_IDX, A2AV_TOKEN_BIT));
+    }
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage4 PreSync] WriteVariableWithNotify done, waiting NotifyWait...");
+    for (uint32_t i = 0; i < ctx.channelCount; i++) {
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], A2AV_OUTPUT_CKE_IDX, A2AV_OUTPUT_BIT));
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], A2AV_TOKEN_CKE_IDX, A2AV_TOKEN_BIT));
+    }
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage4 PreSync] done");
+    return CCU_SUCCESS;
+}
+
+static CcuResult DoHalfAllToAllVWrite(KfcHalfAllToAllVMesh1DContext& ctx, ccu::Variable missionIdVar)
+{
+    HCCL_INFO(
+        "[CcuKfcHalfAll2AllVMesh1D][Stage5 DoWrite] start, rankSize[%u], missionId is ccu::Variable",
+        ctx.rankSize);
+    uint32_t channelIdx = 0;
+    for (uint32_t peerId = 0; peerId < ctx.rankSize; peerId++) {
+        const uint32_t eventIdx = peerId / A2AV_BITS_PER_EVENT;
+        const uint16_t peerMask = 1U << (peerId % A2AV_BITS_PER_EVENT);
+
+        ccu::Variable curCount;
+        ccu::Variable curOffset;
+        CCU_IF(missionIdVar == 0)
+        {
+            curCount = ctx.sendSizeA[peerId];
+            curOffset = ctx.sendOffsetA[peerId];
+        }
+        CCU_IF(missionIdVar != 0)
+        {
+            curCount = ctx.sendSizeB[peerId];
+            curOffset = ctx.sendOffsetB[peerId];
+        }
+
+        ccu::LocalAddr src;
+        src.addr = ctx.userInAddr;
+        src.addr += curOffset;
+        src.token = ctx.token[ctx.rankId];
+
+        if (peerId == ctx.rankId) {
+            HCCL_INFO(
+                "[CcuKfcHalfAll2AllVMesh1D][Stage5 DoWrite] peerId[%u]==rankId[%u], GroupCopy+EventRecord",
+                peerId, ctx.rankId);
+            CCU_IF(missionIdVar == 0)
+            {
+                ccu::LocalAddr localDst;
+                localDst.addr = ctx.cclBuffer[ctx.rankId];
+                localDst.addr += ctx.recvOffset;
+                localDst.token = ctx.token[ctx.rankId];
+                CCU_CHK_RET(GroupCopy(ctx, localDst, src, ctx.goSize));
+            }
+            CCU_CHK_RET(ccu::EventRecord(ctx.writeDoneEvents[eventIdx], peerMask));
+            continue;
+        }
+
+        ccu::RemoteAddr dst;
+        dst.addr = ctx.cclBuffer[peerId];
+        dst.addr += ctx.recvOffset;
+        CCU_IF(missionIdVar != 0)
+        {
+            dst.addr += ctx.sendSizeA[peerId];
+        }
+        dst.token = ctx.token[peerId];
+
+        HCCL_INFO(
+            "[CcuKfcHalfAll2AllVMesh1D][Stage5 DoWrite] peerId[%u], channelIdx[%u], eventIdx[%u], peerMask[0x%x], "
+            "CCU_IF(curCount!=0)->Write, CCU_IF(curCount==0)->EventRecord",
+            peerId, channelIdx, eventIdx, peerMask);
+        CCU_IF(curCount != 0)
+        {
+            CCU_CHK_RET(ccu::Write(
+                ctx.channels[channelIdx], dst, src, curCount, ctx.writeDoneEvents[eventIdx], peerMask));
+        }
+        CCU_IF(curCount == 0)
+        {
+            CCU_CHK_RET(ccu::EventRecord(ctx.writeDoneEvents[eventIdx], peerMask));
+        }
+        channelIdx++;
+    }
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage5 DoWrite] done");
+    return CCU_SUCCESS;
+}
+
+static CcuResult DoHalfAllToAllVWait(KfcHalfAllToAllVMesh1DContext& ctx)
+{
+    const uint32_t eventNum = ctx.writeDoneEvents.size();
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage5 DoWait] start, eventNum[%u]", eventNum);
+    for (uint32_t eventIdx = 0; eventIdx < eventNum; eventIdx++) {
+        const uint32_t remainingRanks = ctx.rankSize - eventIdx * A2AV_BITS_PER_EVENT;
+        const uint32_t bitCount = std::min(remainingRanks, A2AV_BITS_PER_EVENT);
+        const uint16_t eventMask = bitCount == A2AV_BITS_PER_EVENT ? static_cast<uint16_t>(UINT16_MAX) :
+                                                                     static_cast<uint16_t>((1U << bitCount) - 1);
+        HCCL_INFO(
+            "[CcuKfcHalfAll2AllVMesh1D][Stage5 DoWait] eventIdx[%u], remainingRanks[%u], bitCount[%u], eventMask[0x%x]",
+            eventIdx, remainingRanks, bitCount, eventMask);
+        CCU_CHK_RET(ccu::EventWait(ctx.writeDoneEvents[eventIdx], eventMask));
+    }
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage5 DoWait] done");
+    return CCU_SUCCESS;
+}
+
+static CcuResult PostSync(KfcHalfAllToAllVMesh1DContext& ctx)
+{
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage6 PostSync] start, channelCount[%u]", ctx.channelCount);
+    for (uint32_t i = 0; i < ctx.channelCount; i++) {
+        CCU_CHK_RET(ccu::NotifyRecord(ctx.channels[i], A2AV_POST_SYNC_CKE_IDX, A2AV_POST_SYNC_BIT));
+    }
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage6 PostSync] NotifyRecord done, waiting NotifyWait...");
+    for (uint32_t i = 0; i < ctx.channelCount; i++) {
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], A2AV_POST_SYNC_CKE_IDX, A2AV_POST_SYNC_BIT));
+    }
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D][Stage6 PostSync] done");
+    return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcHalfAll2AllVMesh1DKernel(
+    ccu::Variable userInAddr, ccu::Variable sendSizesAddr, ccu::Variable sendOffsetsAddr, ccu::Variable recvOffset,
+    ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
+    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
+    ccu::Variable missionId)
+{
+    KfcHalfAllToAllVMesh1DContext ctx;
+    ctx.channels = channels;
+    ctx.channelCount = channelCount;
+    ctx.rankSize = rankSize;
+    ctx.rankId = rankId;
+    InitCcuKernelCtxBase(ctx);
+
+    HCCL_INFO(
+        "[CcuKfcHalfAll2AllVMesh1D] Kernel entry, rankId[%u], rankSize[%u], channelCount[%u], missionId is ccu::Variable",
+        ctx.rankId, ctx.rankSize, ctx.channelCount);
+
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 1: InitResource");
+    CCU_CHK_RET(InitResource(ctx));
+
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 2: LoadArgs");
+    CCU_CHK_RET(
+        LoadArgs(ctx, userInAddr, sendSizesAddr, sendOffsetsAddr, recvOffset, goSize0, goSize1, goSize2, goSize3));
+
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 3: LoadSendParamsFromMem");
+    CCU_CHK_RET(LoadSendParamsFromMem(ctx));
+
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 4: PreSync");
+    CCU_CHK_RET(PreSync(ctx));
+
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 5: DoHalfAllToAllVWrite + Wait (guarded by goSize0 != 0)");
+    CCU_IF(goSize0 != 0)
+    {
+        CCU_CHK_RET(DoHalfAllToAllVWrite(ctx, missionId));
+        CCU_CHK_RET(DoHalfAllToAllVWait(ctx));
+    }
+    CCU_IF(goSize0 == 0)
+    {
+        HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] goSize0 == 0, skip data transfer");
+    }
+
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 6: PostSync (only Mi0)");
+    CCU_IF(missionId == 0)
+    {
+        CCU_CHK_RET(PostSync(ctx));
+    }
+    CCU_IF(missionId != 0)
+    {
+        HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] missionId!=0, skip PostSync");
+    }
+
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Kernel exit");
+    return CCU_SUCCESS;
+}
+
+} // namespace mc2_ops_hccl

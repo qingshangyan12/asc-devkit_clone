@@ -120,7 +120,7 @@ HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam& param, const mc2_ops_hc
 bool IsMc2BatchModeOp(HcclCMDType opType)
 {
     return opType == HCCL_CMD_ALLREDUCE || opType == HCCL_CMD_ALLGATHER || opType == HCCL_CMD_REDUCE_SCATTER ||
-           opType == HCCL_CMD_ALLTOALLV || opType == HCCL_CMD_ALLTOALL;
+           opType == HCCL_CMD_ALLTOALLV || opType == HCCL_CMD_ALLTOALL || opType == HCCL_CMD_HALF_ALLTOALLV;
 }
 
 template <typename Func>
