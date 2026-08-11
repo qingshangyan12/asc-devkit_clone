@@ -32,25 +32,24 @@ HcclResult LaunchCacheEvictKernel(HcclComm comm)
     aclError ret = aclrtBinaryGetFunction(g_binKernelHandle, CACHE_EVICT_KERNEL, &funcHandle);
     CHK_PRT_RET(
         ret != ACL_SUCCESS,
-        HCCL_ERROR("[MC2_TASK_CACHE][Evict] get kernel[%s] failed, ret[%d].", CACHE_EVICT_KERNEL, ret),
-        HCCL_E_RUNTIME);
+        HCCL_ERROR("[MC2_TASK_CACHE][Evict] get kernel[%s] failed, ret[%d].", CACHE_EVICT_KERNEL, ret), HCCL_E_RUNTIME);
 
     aclrtArgsHandle argsHandle = nullptr;
     ret = aclrtKernelArgsInit(funcHandle, &argsHandle);
-    CHK_PRT_RET(ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] args init failed, ret[%d].", ret),
-        HCCL_E_RUNTIME);
+    CHK_PRT_RET(
+        ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] args init failed, ret[%d].", ret), HCCL_E_RUNTIME);
     aclrtParamHandle paramHandle = nullptr;
     ret = aclrtKernelArgsAppend(argsHandle, &comm, sizeof(comm), &paramHandle);
-    CHK_PRT_RET(ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] args append failed, ret[%d].", ret),
-        HCCL_E_RUNTIME);
+    CHK_PRT_RET(
+        ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] args append failed, ret[%d].", ret), HCCL_E_RUNTIME);
     ret = aclrtKernelArgsFinalize(argsHandle);
-    CHK_PRT_RET(ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] args finalize failed, ret[%d].", ret),
-        HCCL_E_RUNTIME);
+    CHK_PRT_RET(
+        ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] args finalize failed, ret[%d].", ret), HCCL_E_RUNTIME);
 
     aclrtStream stream = nullptr;
     ret = aclrtCreateStreamWithConfig(&stream, 0U, ACL_STREAM_FAST_SYNC);
-    CHK_PRT_RET(ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] create stream failed, ret[%d].", ret),
-        HCCL_E_RUNTIME);
+    CHK_PRT_RET(
+        ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] create stream failed, ret[%d].", ret), HCCL_E_RUNTIME);
 
     aclrtLaunchKernelAttr attr{};
     attr.id = ACL_RT_LAUNCH_KERNEL_ATTR_TIMEOUT;
@@ -84,8 +83,8 @@ HcclResult Mc2TaskCacheCommStateCallback(HcclComm comm, int32_t state, void* arg
     HCCL_INFO("[MC2_TASK_CACHE][CommState] comm[%p], state[%d].", comm, state);
     const HcclResult ret = LaunchCacheEvictKernel(comm);
     if (ret != HCCL_SUCCESS) {
-        HCCL_ERROR("[MC2_TASK_CACHE][CommState] best-effort eviction failed, comm[%p], state[%d], ret[%d].",
-            comm, state, ret);
+        HCCL_ERROR(
+            "[MC2_TASK_CACHE][CommState] best-effort eviction failed, comm[%p], state[%d], ret[%d].", comm, state, ret);
     }
     return HCCL_SUCCESS;
 }

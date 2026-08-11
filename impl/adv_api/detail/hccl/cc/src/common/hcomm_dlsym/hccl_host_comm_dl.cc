@@ -18,13 +18,9 @@ using HcclCommRegCommStateCallbackFunc =
 
 static HcclCommRegCommStateCallbackFunc g_HcclCommRegCommStateCallback = nullptr;
 
-extern "C" bool HcclMc2IsSupportCommStateCallback(void)
-{
-    return g_HcclCommRegCommStateCallback != nullptr;
-}
+extern "C" bool HcclMc2IsSupportCommStateCallback(void) { return g_HcclCommRegCommStateCallback != nullptr; }
 
-extern "C" HcclResult HcclMc2CommRegStateCallback(
-    const char* regName, Mc2HcclCommStateCallback callback, void* args)
+extern "C" HcclResult HcclMc2CommRegStateCallback(const char* regName, Mc2HcclCommStateCallback callback, void* args)
 {
     if (g_HcclCommRegCommStateCallback == nullptr) {
         return HCCL_E_NOT_SUPPORT;
@@ -36,8 +32,8 @@ extern "C" HcclResult HcclMc2CommRegStateCallback(
 void HcclCommDlInit(void* libHcommHandle)
 {
     dlerror();
-    g_HcclCommRegCommStateCallback = reinterpret_cast<HcclCommRegCommStateCallbackFunc>(
-        dlsym(libHcommHandle, "HcclCommRegCommStateCallback"));
+    g_HcclCommRegCommStateCallback =
+        reinterpret_cast<HcclCommRegCommStateCallbackFunc>(dlsym(libHcommHandle, "HcclCommRegCommStateCallback"));
     if (dlerror() != nullptr) {
         g_HcclCommRegCommStateCallback = nullptr;
     }

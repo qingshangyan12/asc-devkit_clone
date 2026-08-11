@@ -51,12 +51,17 @@ public:
 
     void AddBool(bool value) { AddU8(value ? 1U : 0U); }
 
-    void AddDouble(double value)
+    bool AddDouble(double value)
     {
         uint64_t bits = 0U;
         static_assert(sizeof(bits) == sizeof(value), "unexpected double size");
-        (void)std::memcpy(&bits, &value, sizeof(bits));
+        const int32_t ret = memcpy_s(&bits, sizeof(bits), &value, sizeof(value));
+        if (UNLIKELY(ret != EOK)) {
+            HCCL_ERROR("[MC2_TASK_CACHE][Digest] memcpy_s failed, ret[%d].", ret);
+            return false;
+        }
         AddU64(bits);
+        return true;
     }
 
     void AddPointer(const void* value) { AddU64(static_cast<uint64_t>(reinterpret_cast<uintptr_t>(value))); }
@@ -287,7 +292,7 @@ void AddHcclMem(Digest128Builder& digest, const HcclMem& mem)
     digest.AddU64(mem.size);
 }
 
-void AddShapeFields(const OpParam& param, uint64_t inputSpan, uint64_t outputSpan, Digest128Builder& shape)
+bool AddShapeFields(const OpParam& param, uint64_t inputSpan, uint64_t outputSpan, Digest128Builder& shape)
 {
     shape.AddU32(static_cast<uint32_t>(param.opType));
     shape.AddString(param.algName, OP_ALG_LENGTH);
@@ -309,7 +314,9 @@ void AddShapeFields(const OpParam& param, uint64_t inputSpan, uint64_t outputSpa
     shape.AddU32(param.numBlocksLimit);
     shape.AddBool(param.isAivClearEnable);
     shape.AddU32(param.opConfig.execTimeout);
-    shape.AddDouble(param.opConfig.multipleDimensionSplitRatio);
+    if (!shape.AddDouble(param.opConfig.multipleDimensionSplitRatio)) {
+        return false;
+    }
     shape.AddU32(static_cast<uint32_t>(param.opConfig.multipleDimensionSplitRatioSource));
     shape.AddU64(param.inputSize);
     shape.AddU64(param.outputSize);
@@ -317,6 +324,7 @@ void AddShapeFields(const OpParam& param, uint64_t inputSpan, uint64_t outputSpa
     shape.AddU64(param.varMemSize);
     shape.AddU64(inputSpan);
     shape.AddU64(outputSpan);
+    return true;
 }
 
 bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& resCtx, Digest128Builder& resource)
@@ -343,7 +351,9 @@ bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& r
         resource.AddU64(static_cast<uint64_t>(thread));
     }
     resource.AddU64(static_cast<uint64_t>(resCtx.unfoldThread));
-    resource.AddDouble(resCtx.dieSplitRatio);
+    if (!resource.AddDouble(resCtx.dieSplitRatio)) {
+        return false;
+    }
     resource.AddBool(resCtx.isHcommBatchTransferOnThreadSupported);
     resource.AddBool(resCtx.isHcclThreadAcquireWithConfigSupported);
     resource.AddPointer(resCtx.aivCommInfoPtr);
@@ -529,7 +539,10 @@ HcclResult BuildMc2AicpuTaskCachePlan(
         return HCCL_SUCCESS;
     }
 
-    AddShapeFields(param, inputSpan, outputSpan, shape);
+    if (!AddShapeFields(param, inputSpan, outputSpan, shape)) {
+        SetBypass(plan, "failed to serialize floating-point shape fields");
+        return HCCL_SUCCESS;
+    }
     Digest128Builder resource("mc2-task-cache-resource-v1");
     if (!AddResourceFields(param, resCtx, resource)) {
         SetBypass(plan, "unsupported or empty channel resource");
