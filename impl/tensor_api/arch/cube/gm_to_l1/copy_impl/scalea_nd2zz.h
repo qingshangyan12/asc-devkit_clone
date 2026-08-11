@@ -29,43 +29,43 @@ namespace te {
 
 class copy_gm_to_l1_scalea_nd2zz {
 public:
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
-        if constexpr (U::layout_type::depth == THREE_DIM_DATA || U::layout_type::depth == FIVE_DIM_DATA) {
+        if constexpr (U::layout_type::depth == three_dim_data || U::layout_type::depth == five_dim_data) {
             TENSOR_API_DEBUG_CHECK(debug_check_batch_count, get<0>(src.layout().shape()),
                                    "copy_gm_to_l1 scalea_nd2zz path");
         }
         run_gm_to_l1_batched<trait, copy_gm_to_l1_scalea_nd2zz, T, U>(dst, src);
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    template <const gm_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(
-        const T& dst, const U& src, const DstCoord& coord_dst, const SrcCoord& coord_src, const ShapeType& copy_shape)
+        const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape)
     {
         check_template<trait, T, U>();
         using type = typename U::element_type;
-        auto src_shape = make_slice_shape(coord_src, src.layout(), copy_shape);
-        auto dst_offset = dst.layout()(coord_dst);
-        auto src_offset = src.layout()(coord_src);
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto dst_offset = dst.layout()(dst_coord);
+        auto src_offset = src.layout()(src_coord);
         uint16_t matrix_num = get_shape_batch_size(src_shape);
         uint16_t n_value = get_shape_columns(src_shape) >> 1;
         uint32_t d_value = get_shape_rows(src_shape);
         uint32_t src_row_stride = get_matrix_element<attr_info::stride, attr_info::row, 1>(src.layout());
         uint16_t dst_stride = get_matrix_element<attr_info::stride, attr_info::row, 1>(dst.layout()) *
-            sizeof(type) / C0_SIZE<>;
+            sizeof(type) / c0_size<>;
         uint64_t src_matrix_stride = 0;
         uint16_t dst_matrix_stride = 0;
-        if constexpr (U::layout_type::depth == THREE_DIM_DATA) {
+        if constexpr (U::layout_type::depth == three_dim_data) {
             src_matrix_stride = get<0>(src.layout().stride()) * sizeof(type);
-            dst_matrix_stride = get<0>(dst.layout().stride()) * sizeof(type) / C0_SIZE<>;
+            dst_matrix_stride = get<0>(dst.layout().stride()) * sizeof(type) / c0_size<>;
         }
         copy_gm_to_l1_multi_dn2nz_instr::data_copy_with_offset(dst, src, dst_offset, src_offset, matrix_num, 1, dst_stride,
             dst_matrix_stride, src_row_stride * sizeof(type), src.engine().get_cache_mode(), n_value,
             d_value, src_matrix_stride, false);
     }
 
-    template <const copy_gm_to_l1_trait& trait, typename T, typename U>
+    template <const gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
         check_layout_pattern<U, T>();
@@ -100,8 +100,8 @@ public:
         uint64_t loop4_src_stride = src_dn_matrix_stride * sizeof(type);
 
         uint16_t loop2_dst_stride = dst_nz_n_stride;                             // loop2_dst_stride = dst_nz_n_stride
-        uint16_t loop3_dst_stride = dst_b_row_stride * sizeof(type) / C0_SIZE<>; // loop3_dst_stride = dst_nz_c0_Stride
-        uint16_t loop4_dst_stride = dst_nz_matrix_stride * sizeof(type) / C0_SIZE<>;
+        uint16_t loop3_dst_stride = dst_b_row_stride * sizeof(type) / c0_size<>; // loop3_dst_stride = dst_nz_c0_Stride
+        uint16_t loop4_dst_stride = dst_nz_matrix_stride * sizeof(type) / c0_size<>;
         uint8_t cache_mode = src.engine().get_cache_mode();
         // fp8 scale use b16 for movement
         copy_gm_to_l1_multi_dn2nz_instr::data_copy(

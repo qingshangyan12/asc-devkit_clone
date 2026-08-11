@@ -28,19 +28,21 @@
 namespace asc {
 namespace te {
 
-constexpr uint32_t MAIN_LOOP_N_SIZE = 512;
-constexpr uint32_t CBURST_NUM = MAIN_LOOP_N_SIZE / BLOCK_CUBE;
+constexpr uint32_t main_loop_n_size = 512;
+constexpr uint32_t cburst_num = main_loop_n_size / block_cube;
 
-constexpr fixpipe_params DEFAULT_FIXPIPE_PARAMS = fixpipe_params{};
+constexpr l0c_to_gm_params default_l0c_to_gm_params = {};
+constexpr l0c_to_ub_params default_l0c_to_ub_params = {};
+constexpr l0c_to_l1_params default_l0c_to_l1_params = {};
 
 template <typename TensorType>
-inline constexpr bool is_l0c_out_src_batch_layout_v = TensorType::layout_type::depth == FIVE_DIM_DATA;
+inline constexpr bool is_l0c_out_src_batch_layout_v = TensorType::layout_type::depth == five_dim_data;
 
 // Generic batched-layout predicate for L0C->out tensors that may use ND/DN/NDExt/DNExt or quant
 // shapes: non-batch depth is 2/4, batch depth is 3/5. Use is_l0c_out_src_batch_layout_v for src (NZ).
 template <typename TensorType>
 inline constexpr bool is_l0c_out_batched_layout_v =
-    TensorType::layout_type::depth == THREE_DIM_DATA || TensorType::layout_type::depth == FIVE_DIM_DATA;
+    TensorType::layout_type::depth == three_dim_data || TensorType::layout_type::depth == five_dim_data;
 
 template <typename TensorType>
 inline constexpr bool is_l0c_out_nd_format_v =
@@ -57,12 +59,12 @@ inline constexpr bool is_l0c_out_nz_format_v = is_satisfied_ptn_format_v<TensorT
 // NZ/ND/DN dst layouts are also depth 5 but nest to rank 2, so the rank check keeps them apart.
 template <typename TensorType>
 inline constexpr bool is_l0c_out_nc1hwc0_v =
-    TensorType::layout_type::depth == FIVE_DIM_DATA && TensorType::layout_type::rank == FIVE_DIM_DATA;
+    TensorType::layout_type::depth == five_dim_data && TensorType::layout_type::rank_size == five_dim_data;
 
 template <typename DstTensorType, typename SrcTensorType>
 inline constexpr bool is_l0c_out_batch_nz2nz_v =
     is_l0c_out_nz_format_v<DstTensorType> && is_l0c_out_nz_format_v<SrcTensorType>
-    && DstTensorType::layout_type::depth == FIVE_DIM_DATA && SrcTensorType::layout_type::depth == FIVE_DIM_DATA;
+    && DstTensorType::layout_type::depth == five_dim_data && SrcTensorType::layout_type::depth == five_dim_data;
 
 template <typename T, typename LayoutType>
 __aicore__ inline static constexpr uint32_t get_l0c_out_nd_stride(const LayoutType& layout)
@@ -102,7 +104,7 @@ __aicore__ inline static constexpr l0c_out_copy_params make_l0c_out_copy_params(
         auto dst_shape = dst_layout.shape();
         return {static_cast<uint32_t>(get<1>(dst_shape) * get<4>(dst_shape)),
                 static_cast<uint32_t>(get<2>(dst_shape) * get<3>(dst_shape)),
-                static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(src_layout) / FRACTAL_FIXED),
+                static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(src_layout) / fractal_fixed),
                 static_cast<uint32_t>(get<1>(dst_layout.stride()))};
     } else if constexpr (is_l0c_out_batch_nz2nz_v<T, U>) {
         auto src_no_batch_layout = remove_batch_dim(src_layout);
@@ -113,7 +115,7 @@ __aicore__ inline static constexpr l0c_out_copy_params make_l0c_out_copy_params(
             static_cast<uint32_t>(
                 Std::min(get_total_row_shape(src_no_batch_layout), get_total_row_shape(dst_no_batch_layout))),
             static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(src_no_batch_layout)
-                                  / FRACTAL_FIXED),
+                                  / fractal_fixed),
             static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(dst_no_batch_layout))};
     } else {
         const uint32_t n_size =
@@ -121,7 +123,7 @@ __aicore__ inline static constexpr l0c_out_copy_params make_l0c_out_copy_params(
         const uint32_t m_size =
             static_cast<uint32_t>(Std::min(get_total_row_shape(src_layout), get_total_row_shape(dst_layout)));
         const uint32_t src_stride =
-            static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(src_layout) / FRACTAL_FIXED);
+            static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(src_layout) / fractal_fixed);
 
         if constexpr (is_l0c_out_nd_format_v<T>) {
             return {n_size, m_size, src_stride, get_l0c_out_nd_stride<T>(dst_layout)};
@@ -143,7 +145,7 @@ __aicore__ inline static constexpr l0c_out_copy_params make_l0c_out_copy_params(
     const uint32_t m_size = static_cast<uint32_t>(
         Std::min(get_total_row_shape(src_layout), get_shape_rows(dst_shape)));
     const uint32_t src_stride = static_cast<uint32_t>(
-        get_element<attr_info::stride, attr_info::column, 1>(src_layout) / FRACTAL_FIXED);
+        get_element<attr_info::stride, attr_info::column, 1>(src_layout) / fractal_fixed);
     if constexpr (is_l0c_out_nd_format_v<T>) {
         return {n_size, m_size, src_stride, get_l0c_out_nd_stride<T>(dst_layout)};
     } else if constexpr (is_l0c_out_dn_format_v<T>) {
@@ -162,7 +164,7 @@ __aicore__ inline static constexpr l0c_out_copy_params make_nc1hwc0_params(
         get_shape_columns(src_shape),
         get_shape_rows(src_shape),
         static_cast<uint32_t>(
-            get_element<attr_info::stride, attr_info::column, 1>(src_layout) / FRACTAL_FIXED),
+            get_element<attr_info::stride, attr_info::column, 1>(src_layout) / fractal_fixed),
         static_cast<uint32_t>(get<1>(dst_layout.stride()))};
 }
 
@@ -285,15 +287,12 @@ public:
     }
 
 private:
-    static constexpr uint32_t SHIFT_LOOP3_DST_STRIDE = 32;
-    static constexpr uint32_t SHIFT_LOOP3_SRC_MATRIX = 16;
-    static constexpr uint32_t SHIFT_CHANNEL_C0_STRIDE = 48;
+    static constexpr uint32_t shift_loop3_dst_stride = 32;
+    static constexpr uint32_t shift_loop3_src_matrix = 16;
+    static constexpr uint32_t shift_channel_c0_stride = 48;
 
     __aicore__ inline static void set_quant_pre(uint64_t quant)
     {
-        if ASCEND_IS_AIV {
-            return;
-        }
 
         asc_set_l0c_copy_prequant(quant);
     }
@@ -307,30 +306,21 @@ private:
     template <typename T>
     __aicore__ inline static void set_channel_para(uint32_t src_n_z_c0_stride)
     {
-        if ASCEND_IS_AIV {
-            return;
-        }
 
         T channel_para = 0;
-        channel_para |= static_cast<T>(src_n_z_c0_stride) << SHIFT_CHANNEL_C0_STRIDE;
+        channel_para |= static_cast<T>(src_n_z_c0_stride) << shift_channel_c0_stride;
         asc_set_l0c2gm_channel_para(channel_para);
     }
 };
 
 __aicore__ inline auto alloc_fixbuf_temp_buf(const uint16_t& /* cal_n_size */)
 {
-    if ASCEND_IS_AIV {
-        return 0UL;
-    }
     return reinterpret_cast<uint64_t>(asc_get_phy_buf_addr(0));
 }
 
 template <typename T>
 __aicore__ inline void set_qua(const __fbuf__ T* deq_tensor_temp_buf)
 {
-    if ASCEND_IS_AIV {
-        return;
-    }
 
     uint64_t deq_tensor_addr = (reinterpret_cast<uint64_t>(deq_tensor_temp_buf) >> 7) << 8;
     asc_set_l0c_copy_prequant(deq_tensor_addr);
@@ -338,9 +328,6 @@ __aicore__ inline void set_qua(const __fbuf__ T* deq_tensor_temp_buf)
 
 __aicore__ inline void insert_sync()
 {
-    if ASCEND_IS_AIV {
-        return;
-    }
 
     asc_sync_pipe(PIPE_FIX);
 }
@@ -377,7 +364,7 @@ __aicore__ inline static void set_register_impl(const T& dst, const U& src)
             auto src_layout = src.layout();
             auto dst_layout = dst.layout();
             emit_set_register<T>(get<1>(src_layout), get<0>(src_layout.shape()), get<0>(dst_layout.stride()),
-                                 get<0>(src_layout.stride()) / FRACTAL_FIXED);
+                                 get<0>(src_layout.stride()) / fractal_fixed);
         } else {
             emit_set_register<T>(src.layout(), 1, 0, 0);
         }
@@ -394,7 +381,7 @@ __aicore__ inline static void set_register_impl(const T& dst, const U& src, uint
             auto src_layout = src.layout();
             auto dst_layout = dst.layout();
             emit_set_register<T>(get<1>(src_layout), quant, get<0>(src_layout.shape()), get<0>(dst_layout.stride()),
-                                 get<0>(src_layout.stride()) / FRACTAL_FIXED);
+                                 get<0>(src_layout.stride()) / fractal_fixed);
         } else {
             emit_set_register<T>(src.layout(), quant, 1, 0, 0);
         }

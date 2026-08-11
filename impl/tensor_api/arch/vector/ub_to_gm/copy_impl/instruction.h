@@ -35,12 +35,9 @@ public:
                  const int64_t src_stride, const int64_t dst_stride,
                  const asc_store_l2_cache_mode cache_mode = asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM)
     {
-        if ASCEND_IS_AIC {
-            return;
-        }
-        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_count, DEBUG_BLOCK_COUNT_MAX, "block_count",
+        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_count, debug_block_count_max, "block_count",
                                "copy_ub_to_gm instruction");
-        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_len, DEBUG_GM_UB_BLOCK_LEN_MAX, "block_len",
+        TENSOR_API_DEBUG_CHECK(debug_check_block_limit, block_len, debug_gm_ub_block_len_max, "block_len",
                                "copy_ub_to_gm instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_ub2gm_stride, src_stride, block_len, block_count,
                                "copy_ub_to_gm instruction");
