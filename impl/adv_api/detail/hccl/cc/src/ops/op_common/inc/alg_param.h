@@ -164,7 +164,7 @@ struct TopoInfo {
     u32 deviceNumPerModule = 0;                   // A2 每个module的卡数
     u32 serverNumPerSuperPod = 0;                 // 每个超节点的服务器个数
     u32 serverNum = 0;                            // 服务器数量
-    u32 moduleNum = 0;                            // A2 A+X场景moudleNum可能与serverNum不符
+    u32 moduleNum = 0;                            // A2 A+X场景moduleNum可能与serverNum不符
     u32 superPodNum = 0;                          // 超节点数量
     u32 moduleIdx = INVALID_UINT;                 // moduleId
     bool isDiffDeviceModule = false;              // A2 A+X
@@ -299,6 +299,8 @@ struct CcuKernelArgBase {
 struct CcuKernelInfo {
     // kernel资源组序号，group号不同时，资源复用
     u32 resGroup = 0;
+    // kernel所属dieId，从channel所在die获取，由各算法在CalcRes中填充；单die算法默认为0
+    u32 dieId = 0;
     // kernel名 string？
     char kernelFuncName[64];
     // kernel函数
