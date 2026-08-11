@@ -53,7 +53,7 @@ e的x次方。
 ## 约束说明
 
 <!-- npu="950" id7 -->
-针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
+针对Ascend 950PR/Ascend 950DT，本接口受编译选项[--cce-use-fast-math](../../../../guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)的影响。
 <!-- end id7 -->
 
 ## 需要包含的头文件
