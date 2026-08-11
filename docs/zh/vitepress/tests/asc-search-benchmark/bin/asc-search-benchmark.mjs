@@ -15,10 +15,17 @@ import { createServer } from 'node:http'
 import { accessSync, constants, createReadStream, existsSync, statSync } from 'node:fs'
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, extname, isAbsolute, join, relative, resolve } from 'node:path'
+import { dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { fetchSameOrigin, markdownReportPath, resolveSameOriginHttpUrl } from '../lib/benchmark-utils.mjs'
+import {
+  escapeMarkdownCell as escapeCell,
+  fetchSameOrigin,
+  markdownReportPath,
+  pathMatchesPrefix,
+  resolveFileWithinRoot,
+  resolveSameOriginHttpUrl,
+} from '../lib/benchmark-utils.mjs'
 
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const DEFAULT_CASES = resolve(REPOSITORY_ROOT, 'cases/ascendc.json')
@@ -51,6 +58,7 @@ Benchmark options:
   --cases <path>              Cases JSON (default: cases/ascendc.json)
   --case <id>                 Run one case; repeat to run more cases
   --chromium <path>           Chromium or Chrome executable
+  --no-sandbox                Disable the Chromium sandbox (isolated environments only)
   --enforce                   Exit with code 2 when configured thresholds fail
   --no-link-check             Do not verify Top 10 result URLs
   --output <path>             JSON report path (default: results/current.json)
@@ -68,6 +76,7 @@ function parseArgs(argv) {
     enforce: false,
     keepCheckout: false,
     linkCheck: true,
+    noSandbox: false,
     output: DEFAULT_OUTPUT,
     timeoutMs: 180000,
   }
@@ -87,6 +96,10 @@ function parseArgs(argv) {
     }
     if (argument === '--no-link-check') {
       options.linkCheck = false
+      continue
+    }
+    if (argument === '--no-sandbox') {
+      options.noSandbox = true
       continue
     }
     if (!argument.startsWith('--')) throw new Error(`Unknown argument: ${argument}`)
@@ -170,7 +183,7 @@ const CONTENT_TYPES = {
 function safePath(root, requestedPath) {
   const candidate = resolve(root, `.${requestedPath}`)
   const relativePath = relative(root, candidate)
-  if (relativePath.startsWith('..') || isAbsolute(relativePath)) return null
+  if (relativePath === '..' || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath)) return null
   return candidate
 }
 
@@ -179,10 +192,7 @@ function resolveStaticFile(root, requestedPath) {
   if (!candidate) return null
   const attempts = [candidate]
   if (extname(candidate) === '') attempts.push(`${candidate}.html`, join(candidate, 'index.html'))
-  for (const attempt of attempts) {
-    if (existsSync(attempt) && statSync(attempt).isFile()) return attempt
-  }
-  return null
+  return resolveFileWithinRoot(root, attempts)
 }
 
 function startStaticServer(distDir) {
@@ -389,20 +399,20 @@ async function cleanupBrowser(client, child, userDataDir, signal = 'SIGTERM') {
   }
 }
 
-async function launchBrowser(chromium, timeoutMs) {
+async function launchBrowser(chromium, timeoutMs, noSandbox = false) {
   const userDataDir = await mkdtemp(join(tmpdir(), 'asc-search-browser-'))
   let child
   let client
   try {
     const args = [
       '--headless',
-      '--no-sandbox',
       '--disable-gpu',
       '--disable-dev-shm-usage',
       '--disable-background-timer-throttling',
       '--disable-renderer-backgrounding',
       '--remote-debugging-port=0',
       `--user-data-dir=${userDataDir}`,
+      ...(noSandbox ? ['--no-sandbox'] : []),
       'about:blank',
     ]
     child = spawn(chromium, args, { stdio: ['ignore', 'ignore', 'pipe'] })
@@ -710,6 +720,9 @@ function validateDataset(dataset) {
     for (const target of definition.expect.targets) {
       const matchers = ['exact', 'prefix', 'contains'].filter(key => target[key] !== undefined)
       if (matchers.length !== 1) throw new Error(`Target in ${definition.id} must have exactly one matcher`)
+      if (typeof target[matchers[0]] !== 'string' || !target[matchers[0]]) {
+        throw new Error(`Target matcher in ${definition.id} must be a non-empty string`)
+      }
       if (![1, 2, 3].includes(target.grade)) throw new Error(`Target in ${definition.id} must have grade 1, 2, or 3`)
     }
   }
@@ -718,7 +731,7 @@ function validateDataset(dataset) {
 function targetMatches(route, target) {
   const normalizedRoute = normalizeRoute(route)
   if (target.exact !== undefined) return normalizedRoute === normalizeRoute(target.exact)
-  if (target.prefix !== undefined) return normalizedRoute.startsWith(normalizeRoute(target.prefix))
+  if (target.prefix !== undefined) return pathMatchesPrefix(normalizedRoute, normalizeRoute(target.prefix))
   if (target.contains !== undefined) return normalizedRoute.includes(target.contains)
   return false
 }
@@ -1064,10 +1077,6 @@ function formatPercent(value) {
   return value === null || value === undefined ? '-' : `${(value * 100).toFixed(1)}%`
 }
 
-function escapeCell(value) {
-  return String(value ?? '-').replaceAll('|', '\\|').replaceAll('\n', ' ')
-}
-
 function failureReason(item) {
   if (item.timedOut) return '查询超时'
   if (item.errors.length) return item.errors[0].split('\n')[0]
@@ -1147,6 +1156,9 @@ function buildMarkdown(report) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2))
+  if (options.noSandbox) {
+    console.warn('WARNING: Chromium sandbox is disabled; only use --no-sandbox inside a trusted isolation boundary.')
+  }
   if (!existsSync(options.cases)) throw new Error(`Cases file does not exist: ${options.cases}`)
   const dataset = JSON.parse(await readFile(options.cases, 'utf8'))
   validateDataset(dataset)
@@ -1162,7 +1174,7 @@ async function main() {
   const target = await prepareTarget(options)
   let browser
   try {
-    browser = await launchBrowser(chromium, options.timeoutMs)
+    browser = await launchBrowser(chromium, options.timeoutMs, options.noSandbox)
     const browserErrors = []
     browser.client.on('Runtime.exceptionThrown', params => {
       browserErrors.push(params.exceptionDetails?.exception?.description || params.exceptionDetails?.text || 'Runtime exception')

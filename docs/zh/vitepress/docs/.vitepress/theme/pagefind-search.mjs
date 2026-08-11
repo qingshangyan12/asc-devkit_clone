@@ -21,6 +21,9 @@ const MAX_IDENTIFIER_MATCHES = 64
 const IDENTIFIER_EXCERPT_PREFIX_CHARS = 12
 const IDENTIFIER_EXCERPT_SUFFIX_CHARS = 96
 const TITLE_INDEX_SOURCE = 'title-route'
+export const MAX_QUERY_LENGTH = 256
+export const MAX_CJK_SUBPHRASES = 2048
+const MAX_EXHAUSTIVE_CJK_LENGTH = 64
 const initializedPagefindInstances = new WeakSet()
 let identifierIndexPromise = null
 
@@ -30,6 +33,16 @@ function normalizeCase(value) {
 
 function normalize(value) {
   return normalizeCase(value).toLocaleLowerCase()
+}
+
+function truncateQuery(value) {
+  let result = ''
+  let length = 0
+  for (const character of String(value || '')) {
+    if (length++ >= MAX_QUERY_LENGTH) break
+    result += character
+  }
+  return result
 }
 
 function compactEnglish(value) {
@@ -164,13 +177,30 @@ function singleEditVariants(value) {
 }
 
 function generateSubPhrases(phrase) {
-  const result = []
-  for (let length = phrase.length; length >= 2; length--) {
-    for (let index = 0; index <= phrase.length - length; index++) {
-      result.push(phrase.slice(index, index + length))
+  const result = new Set()
+  if (phrase.length <= MAX_EXHAUSTIVE_CJK_LENGTH) {
+    for (let length = phrase.length; length >= 2; length--) {
+      for (let index = 0; index <= phrase.length - length; index++) {
+        result.add(phrase.slice(index, index + length))
+      }
     }
+    return [...result]
   }
-  return result
+
+  const lengths = [...new Set([phrase.length, 64, 32, 16, 8, 4, 3, 2]
+    .filter(length => length >= 2 && length <= phrase.length))]
+  for (let lengthIndex = 0; lengthIndex < lengths.length && result.size < MAX_CJK_SUBPHRASES; lengthIndex++) {
+    const length = lengths[lengthIndex]
+    const windowCount = phrase.length - length + 1
+    const remainingLengths = lengths.length - lengthIndex
+    const budget = Math.max(1, Math.floor((MAX_CJK_SUBPHRASES - result.size) / remainingLengths))
+    const stride = Math.max(1, Math.ceil(windowCount / budget))
+    for (let index = 0; index < windowCount && result.size < MAX_CJK_SUBPHRASES; index += stride) {
+      result.add(phrase.slice(index, index + length))
+    }
+    if (result.size < MAX_CJK_SUBPHRASES) result.add(phrase.slice(-length))
+  }
+  return [...result]
 }
 
 function cjkAlias(value) {
@@ -214,9 +244,9 @@ function compactCjkRouteBonus(url, cjkPhrases) {
 }
 
 export function createQueryPlan(query) {
-  const caseQuery = normalizeCase(query)
-  const normalizedQuery = normalize(query)
-  const compactQuery = compactEnglish(query)
+  const caseQuery = truncateQuery(normalizeCase(truncateQuery(query)))
+  const normalizedQuery = normalize(caseQuery)
+  const compactQuery = compactEnglish(caseQuery)
   const specialSyntaxQuery = normalizeKernelLaunchQuery(caseQuery)
   const specialSyntaxIntent = Boolean(specialSyntaxQuery)
   const cjkPhrases = caseQuery.match(CJK_PHRASE_REGEX) || []
@@ -237,7 +267,7 @@ export function createQueryPlan(query) {
     : identifierIntent ? normalizedQuery
       : separatedIdentifierIntent ? allEnglishParts.join('_') : ''
   return {
-    query: String(query),
+    query: caseQuery,
     caseQuery,
     normalizedQuery,
     compactQuery,
