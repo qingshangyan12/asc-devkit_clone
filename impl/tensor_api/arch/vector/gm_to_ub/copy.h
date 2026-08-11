@@ -56,6 +56,24 @@ public:
         using copy_gm_to_ub_impl = typename copy_gm_to_ub_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
         copy_gm_to_ub_impl::template run<trait, T, U>(dst, src, params);
     }
+
+    template <const copy_gm_to_ub_trait& trait = DEFAULT_COPY_GM_TO_UB_TRAIT, typename T, typename U,
+        typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void data_copy_impl(const T& dst, const U& src, const DstCoord& dst_coord,
+        const SrcCoord& src_coord, const ShapeType& copy_shape,
+        const copy_gm_to_ub_params& params = DEFAULT_COPY_GM_TO_UB_PARAMS)
+    {
+        using dst_pos = get_mem_location<T>;
+        using src_pos = get_mem_location<U>;
+        static_assert(Std::is_same_v<dst_pos, location::ub>, "When Copy tensor from GM to UB, dst tensor must on UB");
+        static_assert(Std::is_same_v<src_pos, location::gm>, "When Copy tensor from GM to UB, src tensor must on GM");
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
+        using impl = typename copy_gm_to_ub_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        auto resolved_dst = resolve_copy_coord(dst.layout(), copy_shape, dst_coord);
+        auto resolved_src = resolve_copy_coord(src.layout(), copy_shape, src_coord);
+        impl::template run<trait, T, U>(dst, src, resolved_dst, resolved_src, copy_shape, params);
+    }
 };
 
 struct copy_gm_to_ub : public copy_gm_to_ub_base {
