@@ -43,17 +43,30 @@ Mc2CcTilingInner CcuStFixture::BuildTiling(HcclCMDType opType, HcclDataType data
     return tiling;
 }
 
-TopoMeta CcuStFixture::BuildTopoMeta(uint32_t rankSize)
+TopoMeta CcuStFixture::BuildTopoMeta(uint32_t rankSize, StTopoType topoType)
 {
-    TopoMeta topoMeta;
-    SuperPodMeta superPod;
-    ServerMeta server;
-    for (uint32_t rank = 0; rank < rankSize; ++rank) {
-        server.push_back(rank);
+    switch (topoType) {
+    case StTopoType::TWO_DIE_REGULAR: {
+        ServerMeta server = {0, 1, 2, 3, 8, 9, 10, 11};
+        return {{{server}}};
     }
-    superPod.push_back(server);
-    topoMeta.push_back(superPod);
-    return topoMeta;
+    case StTopoType::MESH_1D_CLOS: {
+        uint32_t half = rankSize / 2;
+        ServerMeta server0;
+        ServerMeta server1;
+        for (uint32_t i = 0; i < half; ++i) server0.push_back(i);
+        for (uint32_t i = half; i < rankSize; ++i) server1.push_back(i);
+        return {{{server0, server1}}};
+    }
+    case StTopoType::SINGLE_DIE_MESH1D:
+    default: {
+        ServerMeta server;
+        for (uint32_t rank = 0; rank < rankSize; ++rank) {
+            server.push_back(rank);
+        }
+        return {{{server}}};
+    }
+    }
 }
 
 void CcuStFixture::CleanupHostEnv(HcclComm &comm)
@@ -102,9 +115,17 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
 
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
-    if (SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo) != HCCL_SUCCESS || algName.empty()) {
+
+    bool forcedAlgAccepted = false;
+    if (TryForcedAlgAndPrepareEngine(comm, &tiling, opParam, algName, topoInfo, forcedAlgAccepted) != HCCL_SUCCESS) {
         CleanupHostEnv(comm);
         return 0;
+    }
+    if (!forcedAlgAccepted) {
+        if (SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo) != HCCL_SUCCESS || algName.empty()) {
+            CleanupHostEnv(comm);
+            return 0;
+        }
     }
     if (rank == 0 && !scenario.expectedAlgName.empty() && algName != scenario.expectedAlgName) {
         CleanupHostEnv(comm);
@@ -140,7 +161,7 @@ void CcuStFixture::VerifyScenario(const CcuStScenario &scenario)
     RegisterManager::Global().Reset();
     ResetCcuKernelRegisterCount();
 
-    const TopoMeta topoMeta = BuildTopoMeta(rankSize);
+    const TopoMeta topoMeta = BuildTopoMeta(rankSize, scenario.topoType);
     const Mc2CcTilingInner tiling = BuildTiling(scenario.opType, scenario.dataType, scenario.algConfig);
 
     std::vector<KernelHandle> handles(rankSize);
