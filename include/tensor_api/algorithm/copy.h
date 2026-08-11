@@ -47,6 +47,28 @@ __aicore__ inline void copy(const copy_atom<AtomType>& atom, const DstTensor& ds
                             const QuantParam& quant);
 
 /**
+ * @brief Perform a copy operation using source/destination coordinates and a requested shape.
+ * @param dst_coord : Start coordinate in the destination tensor, or zero_coord.
+ * @param src_coord : Start coordinate in the source tensor, or zero_coord.
+ * @param copy_shape : Requested copy shape.
+ */
+template <typename AtomType, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+    typename CopyShape, Std::enable_if_t<is_valid_coord_v<DstCoord> && is_valid_coord_v<SrcCoord> &&
+        is_valid_shape_v<CopyShape>, int> Enable>
+__aicore__ inline void copy(const copy_atom<AtomType>& atom, const DstTensor& dst, const SrcTensor& src,
+    const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape);
+
+/**
+ * @brief Perform a quantized copy operation using source/destination coordinates and a requested shape.
+ */
+template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam, typename DstCoord,
+    typename SrcCoord, typename CopyShape,
+    Std::enable_if_t<is_copy_quant_param_v<QuantParam> && is_valid_coord_v<DstCoord> &&
+        is_valid_coord_v<SrcCoord> && is_valid_shape_v<CopyShape>, int> Enable>
+__aicore__ inline void copy(const copy_atom<AtomType>& atom, const DstTensor& dst, const SrcTensor& src,
+    const QuantParam& quant, const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape);
+
+/**
  * @brief Construct a copy_atom from the copy operation object.
  * @param copy_operation : Copy operation object.
  */
