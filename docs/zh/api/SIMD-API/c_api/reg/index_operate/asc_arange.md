@@ -107,7 +107,7 @@ __simd_callee__ inline void asc_arange_descend(vector_half& dst,
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
 - dst与value的dtype必须完全一致（int8_t、int16_t、half、int32_t、float之一），否则触发异常。
 - 本接口无掩码寄存器参数，目的矢量寄存器的全部元素均参与计算并写入结果，不存在清零或保留原值的位置。
-- 整型dtype（int8_t、int16_t、int32_t）结果在超出该dtype可表示范围时回绕（wrap-around），不触发异常。例如int8_t取value=127时，序列前128个元素依次为127、−128、−127、…、0；value=−128时，序列前128个元素依次为−128、−127、…、−1、0。
+- 整型dtype（int8_t、int16_t、int32_t）结果在超出该dtype可表示范围时回绕（wrap-around），不触发异常。例如int8_t取value=127时，序列前128个元素依次为127、−128、−127、…、-2；value=−128时，序列前128个元素依次为−128、−127、…、−1。
 
 ## 调用示例
 
