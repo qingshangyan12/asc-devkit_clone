@@ -20,7 +20,19 @@ namespace CcuSt {
 
 class CcuStAllToAll : public CcuStFixture {
 protected:
-    void VerifyScenario(const CcuStScenario &scenario);
+    ScenarioData BuildScenarioData(const CcuStScenario &scenario,
+                                   const std::vector<KernelHandle> &handles) override;
+    CheckResult DoCheckRegistration(const Program &program, uint32_t rank,
+                                    uint32_t rankSize) override;
+    CheckResult DoCheckTaskArgs(const Program &program, uint32_t rank,
+                                const ScenarioData &data) override;
+    CheckResult DoCaptureRuntimeExpectation(const ScenarioData &data) override;
+    CheckResult DoCheckRuntime(const ScenarioData &data, RuntimeWorld &world) override;
+
+private:
+    std::vector<AllToAllLaunchConfig> configs_;
+    AllToAllRuntimeExpectation expectation_;
+    CcuAllToAllSemanticsChecker checker_;
 };
 
 } // namespace CcuSt
