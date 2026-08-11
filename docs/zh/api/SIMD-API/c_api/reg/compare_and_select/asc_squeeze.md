@@ -30,22 +30,27 @@
 
 本接口不会将有效数据大小保存至AR寄存器，如果想将有效数据大小保存至AR寄存器，请参考[asc_squeeze_with_status](asc_squeeze_with_status.md)。
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_squeeze(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_hifloat8_t& dst, vector_hifloat8_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
-__simd_callee__ inline void asc_squeeze(vector_float& dst, vector_float src, vector_bool mask)
+### 模板原型
+
+```c
+__simd_callee__ inline void asc_squeeze(vector_<dtype>& dst,
+                                        vector_<dtype> src,
+                                        vector_bool mask)
+```
+
+dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+### 典型示例
+
+```c
+// 示例：对half矢量数据寄存器执行按掩码压缩
+__simd_callee__ inline void asc_squeeze(vector_half& dst,
+                                        vector_half src,
+                                        vector_bool mask)
 ```
 
 ## 参数说明
@@ -63,25 +68,124 @@ __simd_callee__ inline void asc_squeeze(vector_float& dst, vector_float src, vec
 ## 返回值说明
 
 无
+
+## 流水类型
+
+PIPE_V
+
 ## 约束说明
 
-dst中未被mask筛选的位置被置为0。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- mask为`vector_bool`类型掩码寄存器，需通过配套的掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致压缩结果错误。
+- dst与src的dtype需要保持一致。
+- mask比特位为1的src元素按原顺序紧凑排列到dst低位；mask比特位为0的src元素不参与压缩，dst中压缩结果之后的剩余高位统一写0。
+- 浮点dtype仅按元素搬移src的二进制数据，不进行浮点数值计算，因此不检查NaN/Inf，也不上报浮点异常；src包含NaN/Inf时仍可正常压缩。
 
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void squeeze_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void PrintData(const char* label, const std::vector<T>& values)
 {
-    vector_int8_t dst;
-    vector_int8_t src;
-    vector_bool mask;
-    addr_reg addr_reg;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        addr_reg = asc_update_addr_reg_b8(one_repeat_size);
-        mask = asc_update_mask_b8(count);
-        asc_loadalign(src, src_addr, addr_reg);
-        asc_squeeze(dst, src, mask);
-        asc_storealign(dst_addr, dst, addr_reg, mask);
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
     }
+    return true;
+}
+
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+
+__simd_vf__ inline void Squeeze(__ubuf__ float* dst, __ubuf__ float* src)
+{
+    vector_float dst_reg;
+    vector_float src_reg;
+    uint32_t count = ELEMENT_COUNT;
+    vector_bool mask = asc_update_mask_b32(count);
+    asc_loadalign(src_reg, src);
+    asc_squeeze(dst_reg, src_reg, mask);
+    asc_storealign(dst, dst_reg, mask);
+}
+
+__global__ __vector__ void AscSqueezeKernel(__gm__ float* dst, __gm__ float* src)
+{
+    asc_init();
+    __ubuf__ float dst_local[ELEMENT_COUNT];
+    __ubuf__ float src_local[ELEMENT_COUNT];
+    asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(float));
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    Squeeze(dst_local, src_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<float> src(ELEMENT_COUNT);
+    std::vector<float> output(ELEMENT_COUNT, 0.0f);
+    std::vector<float> golden(ELEMENT_COUNT);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) src[i] = golden[i] = static_cast<float>(i) * 0.25f;
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    float* src_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), (ELEMENT_COUNT) * sizeof(float),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    float* dst_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(float),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src_device, src.size() * sizeof(float), src.data(), src.size() * sizeof(float),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    AscSqueezeKernel<<<1, 0>>>(dst_device, src_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input", src);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden);
+    std::cout << (passed ? "[Success] asc_squeeze passed." : "[Failed] asc_squeeze failed.") << std::endl;
+    aclrtFree(dst_device);
+    aclrtFree(src_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```
