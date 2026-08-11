@@ -119,8 +119,10 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
 namespace {
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
-    return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+    bool ret = opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
+    return ret;
 }
 } // namespace
 
