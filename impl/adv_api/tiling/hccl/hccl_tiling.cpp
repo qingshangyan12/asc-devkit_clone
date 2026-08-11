@@ -146,9 +146,12 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     const char* useCcuKfc = std::getenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
     if (useCcuKfc != nullptr && std::string(useCcuKfc) == "1" &&
         (impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-         impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) &&
+         impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+         impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)) &&
         (impl_.commEngine_ == 5 || impl_.commEngine_ == 6)) {
         tilingInner->version = INIT_TILING_CCU_NEW_VERSION;
+        TILING_LOG_INFO("[j_test][GetTiling] CCU_KFC branch enabled, opType[%u], commEngine[%u], version set to NEW",
+            impl_.opType_, impl_.commEngine_);
     }
     ASCENDC_HOST_ASSERT(SetDevType(tilingInner) == EXIT_SUCCESS, return EXIT_FAILURE, "SetDevType failed.");
 
