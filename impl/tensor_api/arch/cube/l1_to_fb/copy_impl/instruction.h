@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -22,6 +22,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_COPY_IMPL_INSTRUCTION_H
 #define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_COPY_IMPL_INSTRUCTION_H
 
+#include "impl/tensor_api/tensor/pointer_pattern.h"
+#include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
 namespace asc {
@@ -31,9 +33,24 @@ struct copy_l1_to_fixbuf_trait {};
 
 class copy_l1_to_fixbuf_instr {
 public:
+    template <typename T, typename U, typename... param_types>
+    __aicore__ inline static void data_copy_tensor(const T& dst, const U& src, const param_types&... params)
+    {
+        copy_l1_to_fixbuf(dst.data().get(), src.data().get(), params...);
+    }
+
+    template <typename T, typename U, typename dst_offset_type, typename src_offset_type, typename... param_types>
+    __aicore__ inline static void data_copy_region(
+        const T& dst, const U& src, const dst_offset_type& dst_offset, const src_offset_type& src_offset, const param_types&... params)
+    {
+        auto src_data = src.data() + src_offset;
+        copy_l1_to_fixbuf((dst.data() + dst_offset).get(), src_data.get(), params...);
+    }
+
+private:
     template <typename T>
-    __aicore__ inline static void data_copy(__fbuf__ T* dst, __cbuf__ T* src, uint16_t block_count,
-                                              uint16_t block_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline static void copy_l1_to_fixbuf(__fbuf__ T* dst, __cbuf__ T* src, uint16_t block_count,
+        uint16_t block_len, uint16_t src_stride, uint16_t dst_stride)
     {
         if ASCEND_IS_AIV {
             return;

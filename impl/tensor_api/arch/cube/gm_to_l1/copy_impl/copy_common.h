@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -27,19 +27,19 @@
 namespace asc {
 namespace te {
 
-// Shared GM->L1 batch dispatch for the four copy ops (ND2Nz/DN2Nz/ND2Zn/DN2Zn). The op-specific
-// single-matrix parameter extraction lives in CopyOp::EmitCopy; this routine handles the parts that
-// are identical across ops: depth-based batch detection, stripping the leading B axis, and reading
-// the per-batch counts/strides. CopyOp must provide static check_template<trait,T,U>() and
+// Shared gm->l1 batch dispatch for the four copy ops (nd_to_nz/dn_to_nz/nd_to_zn/dn_to_zn). The op-specific
+// single-matrix parameter extraction lives in copy_operation::emit_copy; this routine handles the parts that
+// are identical across ops: depth-based batch detection, stripping the leading batch_value axis, and reading
+// the per-batch counts/strides. copy_operation must provide static check_template<trait,T,U>() and
 // emit_copy(dst, src, src_layout, dst_layout, matrix_num, src_matrix_stride, dst_matrix_stride).
 //   - Non-batch (depth 2/4): pass the full layouts, matrix_num=1, strides=0.
-//   - Batch (depth 3/5): strip B with remove_batch_dim (keeps pattern/trait), matrix_num/strides from
-//     the B axis. The GM stride comes straight from the layout, so both bmk-contiguous and
+//   - Batch (depth 3/5): strip batch_value with remove_batch_dim (keeps pattern/trait), matrix_num/strides from
+//     the batch_value axis. The gm stride comes straight from the layout, so both bmk-contiguous and
 //     mbk-non-contiguous memory are covered.
-template <const copy_gm_to_l1_trait& trait, typename CopyOp, typename T, typename U>
+template <const copy_gm_to_l1_trait& trait, typename copy_operation, typename T, typename U>
 __aicore__ inline void run_gm_to_l1_batched(const T& dst, const U& src)
 {
-    CopyOp::template check_template<trait, T, U>();
+    copy_operation::template check_template<trait, T, U>();
     constexpr auto src_depth = nesting_depth_v<decltype(src.layout().shape())>;
     if constexpr (src_depth == THREE_DIM_DATA || src_depth == FIVE_DIM_DATA) {
         auto src_layout = src.layout();
@@ -47,16 +47,36 @@ __aicore__ inline void run_gm_to_l1_batched(const T& dst, const U& src)
         uint16_t matrix_num = get<0>(src_layout.shape());
         uint64_t src_matrix_stride = get<0>(src_layout.stride());
         uint32_t dst_matrix_stride = get<0>(dst_layout.stride());
-        CopyOp::emit_copy(dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout), matrix_num,
-                          src_matrix_stride, dst_matrix_stride);
+        copy_operation::emit_copy(dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout), matrix_num,
+                         src_matrix_stride, dst_matrix_stride);
     } else {
-        CopyOp::emit_copy(dst, src, src.layout(), dst.layout(), 1, 0, 0);
+        copy_operation::emit_copy(dst, src, src.layout(), dst.layout(), 1, 0, 0);
     }
+}
+
+template <const copy_gm_to_l1_trait& trait, typename copy_operation, typename T, typename U, typename coord_dst_type,
+    typename coord_src_type, typename shape_type>
+__aicore__ inline void run_gm_to_l1_batched(
+    const T& dst, const U& src, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape)
+{
+    copy_operation::template check_template<trait, T, U>();
+    auto region_shape = make_slice_shape(coord_src, src.layout(), shape);
+    auto dst_offset = dst.layout()(coord_dst);
+    auto src_offset = src.layout()(coord_src);
+    uint16_t matrix_num = get_batch_shape_from_shape(region_shape);
+    uint64_t src_matrix_stride = 0;
+    uint32_t dst_matrix_stride = 0;
+    constexpr auto src_depth = nesting_depth_v<decltype(src.layout().shape())>;
+    if constexpr (src_depth == THREE_DIM_DATA || src_depth == FIVE_DIM_DATA) {
+        src_matrix_stride = get<0>(src.layout().stride());
+        dst_matrix_stride = get<0>(dst.layout().stride());
+    }
+    // region_type emit_copy receives matrix strides in element units and performs instruction-specific conversion.
+    copy_operation::emit_copy(dst, src, region_shape, matrix_num, src_matrix_stride, dst_matrix_stride, dst_offset, src_offset);
 }
 
 } // namespace te
 } // namespace asc
-
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_IMPL_COPY_COMMON_H
 

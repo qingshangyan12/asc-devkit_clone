@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
@@ -16,9 +16,9 @@
 #endif
 
 /*!
- * \file copy.h
- * \brief
- */
+* \file copy.h
+* \brief
+*/
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0B_COPY_H
 #define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0B_COPY_H
 
@@ -34,47 +34,62 @@ struct copy_l1_to_l0b_trait_default {
     static constexpr const trait_type value = DEFAULT_COPY_L1_TO_L0B_TRAIT;
 };
 
-using copy_l1_to_l0b_mode_set =
-    tuple_map<Std::tuple<Std::tuple<_1, _0>, copy_mode::normal>, Std::tuple<Std::tuple<_1, _1>, copy_mode::normal>,
-             Std::tuple<Std::tuple<_0, _0>, copy_mode::trans>, Std::tuple<Std::tuple<_0, _1>, copy_mode::trans_b8b4>>;
+using copy_l1_to_l0b_mode_set = tuple_map<
+    Std::tuple<Std::tuple<_1, _0>, copy_mode::normal>,
+    Std::tuple<Std::tuple<_1, _1>, copy_mode::normal>,
+    Std::tuple<Std::tuple<_0, _0>, copy_mode::trans>,
+    Std::tuple<Std::tuple<_0, _1>, copy_mode::trans_b8b4>>;
 
 struct copy_l1_to_l0b {
 public:
-    template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void copy(const Args&... args)
+    template <typename Tp, const Tp& traits, typename... arg_types>
+    __aicore__ inline static void copy(const arg_types& ...args)
     {
         if ASCEND_IS_AIC {
-            load_data<traits, Args...>(args...);
+            load_data<traits, arg_types...>(args...);
         }
     }
 
 private:
-    template <const copy_l1_to_l0b_trait& trait = DEFAULT_COPY_L1_TO_L0B_TRAIT, typename T, typename U>
+    template<const copy_l1_to_l0b_trait& trait = DEFAULT_COPY_L1_TO_L0B_TRAIT, typename T, typename U>
     __aicore__ inline static void load_data(const T& dst, const U& src)
     {
         using dst_pos = get_mem_location<T>;
         using src_pos = get_mem_location<U>;
         static_assert(Std::is_same_v<dst_pos, location::l0b>,
-                      "When Copy tensor from L1 to L0B, dst tensor must be from L0B.");
+            "When copy tensor from l1 to l0b, dst tensor must be from l0b.");
         static_assert(Std::is_same_v<src_pos, location::l1>,
-                      "When Copy tensor from L1 to L0B, src tensor must be from L1.");
+            "When copy tensor from l1 to l0b, src tensor must be from l1.");
         using dst_layout = typename T::layout_type;
         using src_layout = typename U::layout_type;
         using dst_pattern = get_layout_pattern<dst_layout>;
         using src_pattern = get_layout_pattern<src_layout>;
         constexpr auto is_b8_b4_type = sizeof(typename T::element_type) == 1;
         constexpr auto no_trans = Std::is_same_v<dst_pattern, src_pattern>;
-        using copy_l1_to_l0b_mode =
-            typename copy_l1_to_l0b_mode_set::template get<Std::tuple<Std::Int<no_trans>, Std::Int<is_b8_b4_type>>>;
-        static_assert(!Std::is_same_v<copy_l1_to_l0b_mode, Std::ignore_t>, "Unsupported CopyL12L0B mode.");
-        using copy_l1_to_l0b_impl =
-            typename copy_l1_to_l0b_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern, copy_l1_to_l0b_mode>::type;
+        using copy_l1_to_l0b_mode = typename copy_l1_to_l0b_mode_set::template get<Std::tuple<Std::Int<no_trans>, Std::Int<is_b8_b4_type>>>;
+        static_assert(!Std::is_same_v<copy_l1_to_l0b_mode, Std::ignore_t>, "Unsupported copy_l1_to_l0b_mode.");
+        using copy_l1_to_l0b_impl = typename copy_l1_to_l0b_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern, copy_l1_to_l0b_mode>::type;
         copy_l1_to_l0b_impl::template run<trait, T, U>(dst, src);
+    }
+
+    template<const copy_l1_to_l0b_trait& trait = DEFAULT_COPY_L1_TO_L0B_TRAIT, typename T, typename U,
+        typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static void load_data(const T& dst, const U& src, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape)
+    {
+        using dst_pattern = get_layout_pattern<typename T::layout_type>;
+        using src_pattern = get_layout_pattern<typename U::layout_type>;
+        constexpr auto is_b8_b4_type = sizeof(typename T::element_type) == 1;
+        constexpr auto no_trans = Std::is_same_v<dst_pattern, src_pattern>;
+        using mode_type = typename copy_l1_to_l0b_mode_set::template get<Std::tuple<Std::Int<no_trans>, Std::Int<is_b8_b4_type>>>;
+        using impl_type = typename copy_l1_to_l0b_routing<CURRENT_ARCH_VERSION, dst_pattern, src_pattern, mode_type>::type;
+        auto resolved_coord_dst = resolve_copy_coord(dst.layout(), shape, coord_dst);
+        auto resolved_coord_src = resolve_copy_coord(src.layout(), shape, coord_src);
+        impl_type::template run<trait, T, U>(dst, src, resolved_coord_dst, resolved_coord_src, shape);
     }
 };
 
-} // namespace te
-} // namespace asc
+}
+}
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0B_COPY_H
 

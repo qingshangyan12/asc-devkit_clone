@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -32,14 +32,47 @@ public:
     template <const copy_l1_to_biastable_trait& trait, typename T, typename U>
     __aicore__ inline static void run(const T& dst, const U& src)
     {
-        // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
-        // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
+        // Batch layouts carry a leading batch_value axis: (batch_value, (row, col)) -> depth 3,
+        // (batch_value, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
         constexpr auto l1_depth = nesting_depth_v<decltype(src.layout().shape())>;
         if constexpr (l1_depth == THREE_DIM_DATA || l1_depth == FIVE_DIM_DATA) {
             batch_data_copy_impl<trait, T, U>(dst, src);
         } else {
             data_copy_impl<trait, T, U>(dst, src);
         }
+    }
+
+    template <const copy_l1_to_biastable_trait& trait, typename T, typename U, typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape)
+    {
+        check_template<trait, T, U>();
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        uint32_t src_col;
+        uint16_t block_count;
+        if constexpr (U::layout_type::depth == TWO_DIM_DATA) {
+            block_count = get<0>(region_shape);
+            src_col = get<1>(region_shape);
+        } else {
+            block_count = get<0, 1>(region_shape);
+            src_col = get<1, 1>(region_shape);
+        }
+        auto src_row = get_element<attr_info::stride, attr_info::row, 1>(src.layout());
+        auto dst_row = get_element<attr_info::stride, attr_info::row, 1>(dst.layout());
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        bool conv_control = is_one_of_attr_v<src_type, half> && is_one_of_attr_v<dst_type, float>;
+        uint16_t block_len = Std::ceil_division(src_col, C0_ELEMENT<src_type>);
+        if constexpr (is_one_of_attr_v<src_type, float, int32_t>) {
+            block_len = Std::ceil_align(block_len, 2);
+        }
+        uint16_t src_stride = (src_row - src_col) / C0_ELEMENT<src_type>;
+        uint16_t dst_stride = Std::ceil_align((dst_row - src_col) / C0_ELEMENT<dst_type>, 2);
+        copy_l1_to_biastable_instr::data_copy_region(
+            dst, src, dst_offset, src_offset, conv_control, block_count, block_len, src_stride, dst_stride);
     }
 
 private:
@@ -95,20 +128,19 @@ private:
 
         uint16_t src_stride = (src_row - src_col) / C0_ELEMENT<src_type>;
         uint16_t dst_stride = Std::ceil_align((dst_row - src_col) / C0_ELEMENT<dst_type>, 2);
-        copy_l1_to_biastable_instr::data_copy(reinterpret_cast<uint64_t>(dst.data().get()), src.data().get(),
-                                                 conv_control, block_count, block_len, src_stride, dst_stride);
+        copy_l1_to_biastable_instr::data_copy_tensor(dst, src, conv_control, block_count, block_len, src_stride, dst_stride);
     }
 
-    // Batch case: layout is (B, (M, N)) with strides (sB, (sM, sN)). Per-matrix internal
-    // compactness is assumed (sM == N), so a single matrix can be moved as one block_len-sized block.
-    // Four DataCopy params are derived directly from the batched layout:
-    //   - get_element<Shape, Row/Column> on the batched layout returns sub-matrix M/N (the
+    // Batch case: layout is (batch_value, (m_value, n_value)) with strides (s_b, (s_m, s_n)). Per-matrix internal
+    // compactness is assumed (s_m == n_value), so a single matrix can be moved as one block_len-sized block.
+    // Four data_copy params are derived directly from the batched layout:
+    //   - get_element<shape_type, Row/column> on the batched layout returns sub-matrix m_value/n_value (the
     //     select_row_col_tuples helper in is_format.h handles batch-axis stripping).
-    //   - get<0>(Shape/Stride) returns the batch size and per-matrix start-to-start stride.
-    //   - When batches are also contiguous (src_batch_stride == M*N && dst_batch_stride == M*N),
-    //     fold the B blocks into a single B*M*N block; otherwise emit B blocks, one per matrix.
+    //   - get<0>(shape_type/stride) returns the batch size and per-matrix start-to-start stride.
+    //   - When batches are also contiguous (src_batch_stride == m_value*n_value && dst_batch_stride == m_value*n_value),
+    //     fold the batch_value blocks into a single batch_value*m_value*n_value block; otherwise emit batch_value blocks, one per matrix.
     //   - Both src_stride and dst_stride encode the end-to-next-start gap in C0_ELEMENT units, in
-    //     keeping with the L1->BT instruction's stride convention.
+    //     keeping with the l1->BT instruction's stride convention.
     template <const copy_l1_to_biastable_trait& trait, typename T, typename U>
     __aicore__ inline static void batch_data_copy_impl(const T& dst, const U& src)
     {
@@ -124,9 +156,9 @@ private:
         uint32_t src_batch_stride = get<0>(src_layout.stride());
         uint32_t dst_batch_stride = get<0>(dst_layout.stride());
 
-        // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
+        // Strip the leading batch_value axis before calling get_element, otherwise the dim=0/1 split below
         // would read the batch axis as row/column.
-        auto src_inner = get<1>(src_layout);
+        auto src_inner = te::get<1>(src_layout);
 
         uint32_t src_shape_rows;
         uint32_t src_shape_columns;
@@ -145,7 +177,7 @@ private:
 
         uint32_t matrix_elems = src_shape_rows * src_shape_columns;
 
-        // batch-strided: B blocks, stride encodes per-matrix end-to-next-start gap.
+        // batch-strided: batch_value blocks, stride encodes per-matrix end-to-next-start gap.
         uint16_t block_count = batch_size;
         uint16_t block_len = Std::ceil_division(matrix_elems, C0_ELEMENT<src_type>);
         if constexpr (is_one_of_attr_v<src_type, float, int32_t>) {
@@ -154,8 +186,7 @@ private:
         uint16_t src_stride = (src_batch_stride - matrix_elems) / C0_ELEMENT<src_type>;
         uint16_t dst_stride = Std::ceil_align((dst_batch_stride - matrix_elems) / C0_ELEMENT<dst_type>, 2);
 
-        copy_l1_to_biastable_instr::data_copy(reinterpret_cast<uint64_t>(dst.data().get()), src.data().get(),
-                                                 conv_control, block_count, block_len, src_stride, dst_stride);
+        copy_l1_to_biastable_instr::data_copy_tensor(dst, src, conv_control, block_count, block_len, src_stride, dst_stride);
     }
 };
 

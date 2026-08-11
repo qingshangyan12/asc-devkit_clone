@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l0c_to_l1/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -39,13 +39,13 @@ struct copy_l0c_to_l1_trait_default {
 struct copy_l0c_to_l1_base {
 public:
     template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C_TO_L1_TRAIT, typename T, typename U>
-    __aicore__ inline static void data_copy_impl(const T& dst, const U& src,
-                                                 const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+    __aicore__ inline static void data_copy_impl(
+        const T& dst, const U& src, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dst_pos = get_mem_location<T>;
         using src_pos = get_mem_location<U>;
-        static_assert(Std::is_same_v<dst_pos, location::l1>, "When Copy tensor from L0C to L1, dst tensor must on L1");
-        static_assert(Std::is_same_v<src_pos, location::l0c>, "When Copy tensor from L0C to L1, src tensor must on L0C");
+        static_assert(Std::is_same_v<dst_pos, location::l1>, "When copy tensor from l0c to l1, dst tensor must on l1");
+        static_assert(Std::is_same_v<src_pos, location::l0c>, "When copy tensor from l0c to l1, src tensor must on l0c");
 
         using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
         using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
@@ -54,14 +54,27 @@ public:
         copy_l0c_to_l1_impl::template run<trait>(dst, src, params);
     }
 
+    template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C_TO_L1_TRAIT, typename T, typename U,
+        typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static void data_copy_impl(const T& dst, const U& src, const coord_dst_type& coord_dst,
+        const coord_src_type& coord_src, const shape_type& shape, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
+        using impl_type = typename copy_l0c_to_l1_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        auto resolved_coord_dst = resolve_copy_coord(dst.layout(), shape, coord_dst);
+        auto resolved_coord_src = resolve_copy_coord(src.layout(), shape, coord_src);
+        impl_type::template run<trait>(dst, src, resolved_coord_dst, resolved_coord_src, shape, params);
+    }
+
     template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C_TO_L1_TRAIT, typename T, typename U, typename S>
-    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type
-    data_copy_impl(const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type data_copy_impl(
+        const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dst_pos = get_mem_location<T>;
         using src_pos = get_mem_location<U>;
-        static_assert(Std::is_same_v<dst_pos, location::l1>, "When Copy tensor from L0C to L1, dst tensor must on L1");
-        static_assert(Std::is_same_v<src_pos, location::l0c>, "When Copy tensor from L0C to L1, src tensor must on L0C");
+        static_assert(Std::is_same_v<dst_pos, location::l1>, "When copy tensor from l0c to l1, dst tensor must on l1");
+        static_assert(Std::is_same_v<src_pos, location::l0c>, "When copy tensor from l0c to l1, src tensor must on l0c");
 
         using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
         using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
@@ -70,27 +83,55 @@ public:
         copy_l0c_to_l1_impl::template run<trait>(dst, src, quant, params);
     }
 
+    template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C_TO_L1_TRAIT, typename T, typename U, typename S,
+        typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type data_copy_impl(
+        const T& dst, const U& src, const S& quant, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape,
+        const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
+        using impl_type = typename copy_l0c_to_l1_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        auto resolved_coord_dst = resolve_copy_coord(dst.layout(), shape, coord_dst);
+        auto resolved_coord_src = resolve_copy_coord(src.layout(), shape, coord_src);
+        impl_type::template run<trait>(dst, src, quant, resolved_coord_dst, resolved_coord_src, shape, params);
+    }
+
     template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C_TO_L1_TRAIT, typename T, typename U, typename S>
-    __aicore__ inline static typename Std::enable_if<is_attr_tensor_v<S>, void>::type
-    data_copy_impl(const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+    __aicore__ inline static typename Std::enable_if<is_attr_tensor_v<S>, void>::type data_copy_impl(
+        const T& dst, const U& src, const S& quant, const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
     {
         using dst_pos = get_mem_location<T>;
         using src_pos = get_mem_location<U>;
-        static_assert(Std::is_same_v<dst_pos, location::l1>, "When Copy tensor from L0C to L1, dst tensor must on L1");
-        static_assert(Std::is_same_v<src_pos, location::l0c>, "When Copy tensor from L0C to L1, src tensor must on L0C");
+        static_assert(Std::is_same_v<dst_pos, location::l1>, "When copy tensor from l0c to l1, dst tensor must on l1");
+        static_assert(Std::is_same_v<src_pos, location::l0c>, "When copy tensor from l0c to l1, src tensor must on l0c");
 
         using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
         using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
 
         using copy_l0c_to_l1_impl = typename copy_l0c_to_l1_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
         copy_l0c_to_l1_impl::template run<trait>(dst, src, quant, params);
+    }
+
+    template <const copy_l0c_to_l1_trait& trait = DEFAULT_COPY_L0C_TO_L1_TRAIT, typename T, typename U, typename S,
+        typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static typename Std::enable_if<is_attr_tensor_v<S>, void>::type data_copy_impl(
+        const T& dst, const U& src, const S& quant, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape,
+        const fixpipe_params& params = DEFAULT_FIXPIPE_PARAMS)
+    {
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
+        using impl_type = typename copy_l0c_to_l1_routing<CURRENT_ARCH_VERSION, dst_layout_ptn, src_layout_ptn>::type;
+        auto resolved_coord_dst = resolve_copy_coord(dst.layout(), shape, coord_dst);
+        auto resolved_coord_src = resolve_copy_coord(src.layout(), shape, coord_src);
+        impl_type::template run<trait>(dst, src, quant, resolved_coord_dst, resolved_coord_src, shape, params);
     }
 };
 
 struct copy_l0c_to_l1 : public copy_l0c_to_l1_base {
 public:
-    template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void copy(const Args&... args)
+    template <typename Tp, const Tp& trait, typename... arg_types>
+    __aicore__ inline static void copy(const arg_types&... args)
     {
         if ASCEND_IS_AIV {
             return;
@@ -101,8 +142,8 @@ public:
 
 struct copy_l0c_to_l1_with : public copy_l0c_to_l1_base {
 public:
-    template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void copy(const Args&... args)
+    template <typename Tp, const Tp& trait, typename... arg_types>
+    __aicore__ inline static void copy(const arg_types&... args)
     {
         if ASCEND_IS_AIV {
             return;

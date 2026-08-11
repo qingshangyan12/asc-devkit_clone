@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
+ * CANN Open Software License Agreement version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -35,6 +35,29 @@ public:
         run_gm_to_l1_batched<trait, copy_gm_to_l1_nz2nz, T, U>(dst, src);
     }
 
+    template <const copy_gm_to_l1_trait& trait, typename T, typename U, typename coord_dst_type, typename coord_src_type, typename shape_type>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const coord_dst_type& coord_dst, const coord_src_type& coord_src, const shape_type& shape)
+    {
+        check_template<trait, T, U>();
+        using type = typename U::element_type;
+        auto src_shape = make_slice_shape(coord_src, src.layout(), shape);
+        auto region_shape = src_shape;
+        auto dst_offset = dst.layout()(coord_dst);
+        auto src_offset = src.layout()(coord_src);
+        auto block_count = get_batch_shape_from_shape(region_shape) *
+            Std::ceil_division(get_total_column_shape_from_shape(region_shape), C0_ELEMENT<type>);
+        auto block_len = get_total_row_shape_from_shape(region_shape) * C0_SIZE<>;
+        auto src_stride = get_matrix_element<attr_info::stride, attr_info::column, 1>(src.layout()) * sizeof(type);
+        auto dst_stride = get_matrix_element<attr_info::stride, attr_info::column, 1>(dst.layout()) * sizeof(type);
+        if constexpr (is_b4_type<type>) {
+            src_stride >>= 1;
+            dst_stride >>= 1;
+        }
+        copy_gm_to_l1_align_v2_instr::data_copy_region(dst, src, dst_offset, src_offset, block_count, block_len, 0, 0,
+            src.engine().get_cache_mode(), src_stride, dst_stride);
+    }
+
     template <const copy_gm_to_l1_trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void check_template()
     {
@@ -44,20 +67,20 @@ public:
 
     // Extracts single-matrix parameters from the (batch-stripped) src/dst layouts and emits the
     // copy. matrix_num carries the batch dimension (1 when there is no batch). The align_v2
-    // instruction has no hardware batch loop, so the batch axis is folded into block_count: NZ
+    // instruction has no hardware batch loop, so the batch axis is folded into block_count: nz
     // matrices are laid out along the column (big-fractal) direction, so matrix_num matrices of
     // big_fractal_size big-fractals each become matrix_num * big_fractal_size contiguous blocks that
     // share the same per-big-fractal stride. src_nd_matrix_stride/dst_nz_matrix_stride are unused here
     // because that contiguity makes the single src_stride/dst_stride describe the whole sequence.
-    template <typename T, typename U, typename SrcLayout, typename DstLayout>
-    __aicore__ inline static void emit_copy(const T& dst, const U& src, const SrcLayout& src_layout,
-                                            const DstLayout& dst_layout, uint16_t matrix_num,
-                                            uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride)
+    template <typename T, typename U, typename src_layout_type, typename dst_layout_type>
+    __aicore__ inline static void emit_copy(const T& dst, const U& src, const src_layout_type& src_layout,
+                                           const dst_layout_type& dst_layout, uint16_t matrix_num,
+                                           uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride)
     {
         using type = typename U::element_type;
 
         auto small_fractal_size = get_element<attr_info::shape, attr_info::row, 0>(src_layout)
-                                  * get_element<attr_info::shape, attr_info::row, 1>(src_layout);
+                                * get_element<attr_info::shape, attr_info::row, 1>(src_layout);
         auto big_fractal_size = get_element<attr_info::shape, attr_info::column, 1>(src_layout);
         auto src_stride_size = get_element<attr_info::stride, attr_info::column, 1>(src_layout);
         auto dst_stride_size = get_element<attr_info::stride, attr_info::column, 1>(dst_layout);
@@ -75,8 +98,8 @@ public:
             src_stride = src_stride >> 1;
             dst_stride = dst_stride >> 1;
         }
-        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, left_padding_cnt, right_padding_cnt,
-                                                 cache_mode, src_stride, dst_stride);
+        copy_gm_to_l1_align_v2_instr::data_copy_tensor(dst, src, block_count, block_len, left_padding_cnt, right_padding_cnt, cache_mode,
+                                          src_stride, dst_stride);
     }
 };
 } // namespace te
