@@ -55,6 +55,7 @@ foreach(product_type ${SIMT_PRODUCT_TYPE_LIST})
         __CCE_KT_TEST__=1
         ASCENDC_CPU_DEBUG=1
         ASCENDC_DEBUG=1
+        __ASC_FTZ__
         $<$<STREQUAL:${product_type},ascend950pr_9599>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_VEC__>
         $<$<STREQUAL:${product_type},mc62cm12aa>:__NPU_ARCH__=5102>
     )
