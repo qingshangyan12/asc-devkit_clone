@@ -29,7 +29,7 @@ SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
         return SelectorStatus::NOT_MATCH;
     }
 
-    selectAlgName = "InsAlltoAllVMesh1D";
+    selectAlgName = "AicpuAlltoAllVSoleMesh";
     HCCL_INFO("[AlltoAllVAutoSelector] Algo match[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }

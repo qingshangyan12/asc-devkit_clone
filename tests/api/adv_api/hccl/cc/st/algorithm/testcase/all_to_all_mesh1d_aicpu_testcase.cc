@@ -53,9 +53,9 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, route_uses_cann_bridge)
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, cann_registry_contains_mesh1d_algorithms)
 {
-    EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALLV, "InsAlltoAllVMesh1D"), nullptr);
-    EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1DSingleChannel"), nullptr);
-    EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1D"), nullptr);
+    EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALLV, "AicpuAlltoAllVSoleMesh"), nullptr);
+    EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALL, "AicpuAlltoAllSoleMeshSingleChannel"), nullptr);
+    EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALL, "AicpuAlltoAllSoleMesh"), nullptr);
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoall_multi_channel_threshold_is_strict_and_overflow_safe)

@@ -15,9 +15,9 @@
 namespace mc2_ops_hccl {
 namespace {
 constexpr u64 ALLTOALL_MULTI_CHANNEL_DATA_SIZE_LIMIT = 150ULL * 1024ULL * 1024ULL;
-constexpr const char* ALLTOALL_SINGLE_CHANNEL_ALG = "InsAlltoAllMesh1DSingleChannel";
-constexpr const char* ALLTOALL_MULTI_CHANNEL_ALG = "InsAlltoAllMesh1D";
-constexpr const char* ALLTOALLV_MESH_ALG = "InsAlltoAllVMesh1D";
+constexpr const char* ALLTOALL_SINGLE_CHANNEL_ALG = "AicpuAlltoAllSoleMeshSingleChannel";
+constexpr const char* ALLTOALL_MULTI_CHANNEL_ALG = "AicpuAlltoAllSoleMesh";
+constexpr const char* ALLTOALLV_MESH_ALG = "AicpuAlltoAllVSoleMesh";
 
 bool AddOverflows(u64 lhs, u64 rhs) { return lhs > std::numeric_limits<u64>::max() - rhs; }
 

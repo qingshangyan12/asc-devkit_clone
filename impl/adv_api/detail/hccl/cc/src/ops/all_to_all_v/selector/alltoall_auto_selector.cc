@@ -30,7 +30,7 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     }
 
     // Host tiling has no runtime count. Select the multi-channel token to allocate a resource upper bound.
-    selectAlgName = "InsAlltoAllMesh1D";
+    selectAlgName = "AicpuAlltoAllSoleMesh";
     HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
