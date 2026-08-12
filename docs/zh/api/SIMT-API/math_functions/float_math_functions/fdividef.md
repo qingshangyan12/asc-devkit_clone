@@ -54,8 +54,8 @@ inline float fdividef(float x, float y)
 
 <!-- npu="950" id7 -->
 针对Ascend 950PR/Ascend 950DT，本接口受编译选项[--cce-use-fast-math](../../../../guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)的影响。
--   --cce-use-fast-math=true：开启快速计算模式，不支持subnormal场景的低精度除法计算，处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
--   --cce-use-fast-math=false：支持subnormal场景的高精度除法计算。
+-   --cce-use-fast-math=true：开启快速计算模式，不支持Subnormal场景的低精度除法计算，处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
+-   --cce-use-fast-math=false：支持Subnormal场景的高精度除法计算。
 <!-- end id7 -->
 
 ## 需要包含的头文件
