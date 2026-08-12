@@ -129,62 +129,24 @@ SelectorStatus AlltoAllAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNet
     return SelectorStatus::MATCH;
 }
 
-SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
-                                                     const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
-                                                     std::string &selectAlgName) const
+SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
-    HCCL_DEBUG("[AlltoAllAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
+    (void)opParam;
     (void)configAlgMap;
-    if (topoInfo->topoLevelNums > 1) {
-        if (topoInfo->level0Topo == Level0Shape::MESH_1D || topoInfo->level0Topo == Level0Shape::CLOS ||
-            topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
-            selectAlgName = "InsAlltoAllMesh1D";
-        } else {
-            HCCL_ERROR("[AlltoAllAutoSelector][%s] hccl algo no match");
-            return SelectorStatus::NOT_MATCH;
-        }
-    }
-
-    if (topoInfo->level0Topo == Level0Shape::MESH_1D || topoInfo->level0Topo == Level0Shape::CLOS) {
-        uint32_t dataTypeSize = DATATYPE_SIZE_TABLE[opParam.all2AllVDataDes.sendType];
-        u64* sendCounts = reinterpret_cast<u64*>(opParam.all2AllVDataDes.sendCounts);
-        CHK_PRT_RET(sendCounts == nullptr,
-            HCCL_WARNING("[AlltoAllAutoSelector][%s] sendCounts is nullptr.", __func__), SelectorStatus::NOT_MATCH);
-        uint64_t dataSize = sendCounts[0] * static_cast<u64>(dataTypeSize);
-        if (dataSize * topoInfo->userRankSize > ALLTOALL_ENABLE_MULTI_CHANNEL_DATA_SIZE_LIMIT) {
-            selectAlgName = "InsAlltoAllMesh1D";
-        } else {
-            selectAlgName = "InsAlltoAllMesh1DSingleChannel";
-        }
-    } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
-        // PCIE-SW定制机型，使用mesh1d算法
-        if (topoInfo->level0PcieMix) {
-            selectAlgName = "InsAlltoAllMesh1D";
-            HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
-            return SelectorStatus::MATCH;
-        }
-        uint32_t dataTypeSize = DATATYPE_SIZE_TABLE[opParam.all2AllVDataDes.sendType];
-        u64* sendCounts = reinterpret_cast<u64*>(opParam.all2AllVDataDes.sendCounts);
-        CHK_PRT_RET(sendCounts == nullptr,
-            HCCL_WARNING("[AlltoAllAutoSelector][%s] sendCounts is nullptr.", __func__), SelectorStatus::NOT_MATCH);
-        uint64_t dataSize = sendCounts[0] * dataTypeSize;
-        bool isMeshNumEqualToClosNum = false;
-        CHK_PRT_RET(CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
-            HCCL_ERROR("[AlltoAllAutoSelector] CheckMeshNumEqualToClosNum failed."),
-            SelectorStatus::NOT_MATCH);
-        if ((isMeshNumEqualToClosNum == true) && (topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT) &&
-            (sendCounts[0] > BIG_DATA_SIZE_LIMIT)) {
-            // 同一组4P且大数据量，走并发
-            selectAlgName = "InsAllToAllMesh1DConcurrent";
-        } else {
-            selectAlgName = "InsAlltoAllMesh1DUBX";
-        }
-    } else {
-        HCCL_ERROR("[AlltoAllAutoSelector][%s] hccl algo no match");
+    CHK_PRT_RET(
+        topoInfo == nullptr, HCCL_ERROR("[AlltoAllAutoSelector] topoInfo is nullptr."), SelectorStatus::NOT_MATCH);
+    if (topoInfo->userRankSize <= 1U ||
+        (topoInfo->level0Topo != Level0Shape::MESH_1D && topoInfo->level0Topo != Level0Shape::CLOS)) {
+        HCCL_WARNING(
+            "[AlltoAllAutoSelector] rankSize[%u], level0Topo[%u] is not supported by local AICPU Mesh1D.",
+            topoInfo->userRankSize, static_cast<u32>(topoInfo->level0Topo));
         return SelectorStatus::NOT_MATCH;
     }
-    HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
 
+    selectAlgName = "InsAlltoAllMesh1D";
+    HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
 
