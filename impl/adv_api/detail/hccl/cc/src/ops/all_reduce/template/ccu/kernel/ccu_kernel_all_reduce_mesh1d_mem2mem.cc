@@ -471,7 +471,10 @@ CcuResult CcuAllReduceMeshMem2Mem1DKernel(
     CCU_CHK_RET(PreSync(ctx));
     HCCL_INFO("[j_test][ARKernel] PreSync done");
 
-    CCU_IF(ctx.mySliceSize != 0) { CCU_CHK_RET(DoRepeatAllReduce(ctx)); }
+    CCU_IF(ctx.mySliceSize != 0) {
+        HCCL_INFO("[j_test][ARKernel] mySliceSize != 0, entering DoRepeatAllReduce");
+        CCU_CHK_RET(DoRepeatAllReduce(ctx));
+    }
     HCCL_INFO("[j_test][ARKernel] DoRepeatAllReduce done");
 
     CCU_CHK_RET(PostSync(ctx));
