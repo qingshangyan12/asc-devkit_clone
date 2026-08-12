@@ -10,6 +10,7 @@
 
 #include "ins_v2_all_to_all_v_sole_executor.h"
 #include "topo_match_1d.h"
+#include "ins_temp_all_to_all_v_mesh_1D.h"
 #ifndef AICPU_COMPILE
 #include "ccu_temp_all_to_all_mesh_1D.h"
 #endif
@@ -21,6 +22,14 @@
 #define INST_NUM_NET 2
 
 namespace mc2_ops_hccl {
+namespace {
+bool IsSupportedMesh1DTopo(Level0Shape topo) { return topo == Level0Shape::MESH_1D || topo == Level0Shape::CLOS; }
+
+bool IsValidDataType(HcclDataType dataType)
+{
+    return static_cast<u32>(dataType) < static_cast<u32>(HCCL_DATA_TYPE_RESERVED);
+}
+} // namespace
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AlltoAllVSoleExecutor()
@@ -77,6 +86,52 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
         std::make_shared<InsAlgTemplate>(param, topoInfo->userRank, tempAlgHierachyInfo);
     // 调用计算资源的函数
     CHK_RET(algTemplate->CalcRes(comm, param, topoInfo, resourceRequest));
+    return HCCL_SUCCESS;
+}
+
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::ValidateAndInit(
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+{
+    CHK_PRT_RET(
+        !IsSupportedMesh1DTopo(resCtx.topoInfo.level0Topo),
+        HCCL_ERROR(
+            "[InsV2AlltoAllVSoleExecutor] unsupported level0Topo[%u].", static_cast<u32>(resCtx.topoInfo.level0Topo)),
+        HCCL_E_NOT_SUPPORT);
+    rankSize_ = resCtx.topoInfo.userRankSize;
+    myRank_ = resCtx.topoInfo.userRank;
+    CHK_PRT_RET(
+        rankSize_ == 0U || myRank_ >= rankSize_,
+        HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] invalid rank[%u]/rankSize[%u].", myRank_, rankSize_), HCCL_E_PARA);
+    CHK_PRT_RET(
+        !IsValidDataType(param.all2AllVDataDes.sendType) || !IsValidDataType(param.all2AllVDataDes.recvType),
+        HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] invalid send/recv datatype."), HCCL_E_PARA);
+    CHK_PRT_RET(
+        param.all2AllVDataDes.sendType != param.all2AllVDataDes.recvType,
+        HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] send/recv datatype must match."), HCCL_E_PARA);
+    dataType_ = param.all2AllVDataDes.sendType;
+    dataTypeSize_ = DATATYPE_SIZE_TABLE[dataType_];
+    CHK_PRT_RET(dataTypeSize_ == 0U, HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] datatype size is zero."), HCCL_E_PARA);
+    CHK_PRT_RET(
+        param.varMemSize != ALL_TO_ALL_V_VECTOR_NUM * static_cast<u64>(rankSize_) * sizeof(u64),
+        HCCL_ERROR(
+            "[InsV2AlltoAllVSoleExecutor] invalid varMemSize[%llu] for rankSize[%u].",
+            static_cast<unsigned long long>(param.varMemSize), rankSize_),
+        HCCL_E_PARA);
+    CHK_PTR_NULL(param.all2AllVDataDes.sendCounts);
+    CHK_PTR_NULL(param.all2AllVDataDes.recvCounts);
+    CHK_PTR_NULL(param.all2AllVDataDes.sdispls);
+    CHK_PTR_NULL(param.all2AllVDataDes.rdispls);
+    CHK_PRT_RET(
+        resCtx.algHierarchyInfo.infos.empty() || resCtx.algHierarchyInfo.infos[0].empty(),
+        HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] hierarchy info is empty."), HCCL_E_PARA);
+
+    remoteRankToChannelInfo_.clear();
+    CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
+    CHK_PRT_RET(
+        rankSize_ > 1U && (remoteRankToChannelInfo_.empty() || remoteRankToChannelInfo_[0].empty()),
+        HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] restored channel map is empty."), HCCL_E_INTERNAL);
+    maxTmpMemSize_ = resCtx.cclMem.size;
     return HCCL_SUCCESS;
 }
 
@@ -429,6 +484,15 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
 
 
 #endif
+
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLTOALLV, InsAlltoAllVMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+    InsTempAlltoAllVMesh1D);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLTOALL, InsAlltoAllMesh1DSingleChannel, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+    InsTempAlltoAllVMesh1D);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLTOALL, InsAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D, InsTempAlltoAllVMesh1D);
 
 #ifndef AICPU_COMPILE
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
