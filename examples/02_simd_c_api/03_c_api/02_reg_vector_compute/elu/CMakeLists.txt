@@ -18,7 +18,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    elu.asc
+    op_kernel/elu.asc
 )
 
 target_link_libraries(demo PRIVATE
