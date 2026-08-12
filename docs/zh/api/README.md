@@ -1330,7 +1330,7 @@
             -   [asc_set_atomic_min](SIMD-API/c_api/simd_atomic/asc_set_atomic_min.md)
             -   [asc_set_atomic_none](SIMD-API/c_api/simd_atomic/asc_set_atomic_none.md)
             -   [asc_set_store_atomic_config_v1](SIMD-API/c_api/simd_atomic/asc_set_store_atomic_config_v1.md)
-            -   [asc_set_atomic_add_int（废弃）](SIMD-API/c_api/simd_atomic/asc_set_atomic_add_int_deprecated.md)
+            -   [asc_set_atomic_add_int（废弃）](appendix/deprecated_interface/asc_set_atomic_add_int_deprecated.md)
             -   [asc_set_atomic_max_int（废弃）](SIMD-API/c_api/simd_atomic/asc_set_atomic_max_int_deprecated.md)
             -   [asc_set_atomic_min_int（废弃）](SIMD-API/c_api/simd_atomic/asc_set_atomic_min_int_deprecated.md)
             -   [asc_set_store_atomic_config_v2（废弃）](SIMD-API/c_api/simd_atomic/asc_set_store_atomic_config_v2_deprecated.md)
