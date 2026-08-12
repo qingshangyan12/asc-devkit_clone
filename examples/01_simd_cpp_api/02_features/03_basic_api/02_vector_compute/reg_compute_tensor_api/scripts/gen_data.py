@@ -17,6 +17,8 @@ import numpy as np
 
 VECTOR_LENGTH = 64
 INT64_VECTOR_LENGTH = 32
+HISTOGRAM_INPUT_LENGTH = 256
+HISTOGRAM_INITIAL_VALUE = np.uint16(3)
 DEFAULT_PRELU_SLOPE = np.float32(0.25)
 DEFAULT_LEAKY_RELU_SLOPE = np.float32(0.01)
 
@@ -46,6 +48,10 @@ def main() -> None:
     int_shift = (np.arange(VECTOR_LENGTH) % 4).astype(np.int32)
     int64_a = (np.arange(INT64_VECTOR_LENGTH, dtype=np.int64) - np.int64(16)) * np.int64(1_000_003)
     int64_b = (np.arange(INT64_VECTOR_LENGTH, dtype=np.int64) % np.int64(9) - np.int64(4)) * np.int64(97)
+    histogram_input = (
+        np.arange(HISTOGRAM_INPUT_LENGTH, dtype=np.uint16) * np.uint16(37) +
+        np.arange(HISTOGRAM_INPUT_LENGTH, dtype=np.uint16) % np.uint16(11)
+    ).astype(np.uint8)
 
     float_results = np.stack(
         [
@@ -123,6 +129,16 @@ def main() -> None:
         ]
     ).astype(np.int64)
 
+    histogram_frequency = np.bincount(histogram_input, minlength=256).astype(np.uint16)
+    histogram_results = np.stack(
+        [
+            histogram_frequency[:128] + HISTOGRAM_INITIAL_VALUE,
+            histogram_frequency[128:] + HISTOGRAM_INITIAL_VALUE,
+            np.cumsum(histogram_frequency[:128], dtype=np.uint16) + HISTOGRAM_INITIAL_VALUE,
+            np.cumsum(histogram_frequency, dtype=np.uint16)[128:] + HISTOGRAM_INITIAL_VALUE,
+        ]
+    ).astype(np.uint16)
+
     float_a.tofile(input_dir / "float_a.bin")
     float_b.tofile(input_dir / "float_b.bin")
     float_slope.tofile(input_dir / "float_slope.bin")
@@ -131,13 +147,15 @@ def main() -> None:
     int_shift.tofile(input_dir / "int_shift.bin")
     int64_a.tofile(input_dir / "int64_a.bin")
     int64_b.tofile(input_dir / "int64_b.bin")
+    histogram_input.tofile(input_dir / "histogram_input.bin")
     float_results.tofile(output_dir / "golden_float.bin")
     int_results.tofile(output_dir / "golden_int.bin")
     int64_results.tofile(output_dir / "golden_int64.bin")
+    histogram_results.tofile(output_dir / "golden_histogram.bin")
 
     print(
         f"Generated {float_results.shape[0]} float rows, {int_results.shape[0]} int32 rows, "
-        f"and {int64_results.shape[0]} int64 rows."
+        f"{int64_results.shape[0]} int64 rows, and {histogram_results.shape[0]} histogram rows."
     )
 
 
