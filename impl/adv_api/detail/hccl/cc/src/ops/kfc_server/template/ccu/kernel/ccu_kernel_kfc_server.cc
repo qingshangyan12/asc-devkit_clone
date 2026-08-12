@@ -91,10 +91,13 @@ CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnS
 {
     const uint32_t getDieId = 1;
     // 单Die场景：等待HBM中的信号
+    HCCL_INFO("[j_test][KfcServer][WaitTurnStartSig] enter, waiting for signal at hbmSigAddr");
     CCU_WHILE(turnStartSig != 1)
     {
         CCU_CHK_RET(ccu::Load(hbmSigAddr, turnStartSig)); // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
     }
+    HCCL_INFO("[j_test][KfcServer][WaitTurnStartSig] signal received, turnStartSig[%llu]",
+        static_cast<unsigned long long>(turnStartSig));
     turnStartSig = 0;                                  // reset Xn
     CCU_CHK_RET(ccu::Store(hbmSigAddr, turnStartSig)); // reset HBM
     return CCU_SUCCESS;
@@ -117,6 +120,13 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
 
     // 一次性读取本轮32个参数
     CCU_CHK_RET(ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE));
+    HCCL_INFO("[j_test][KfcServer][LoadParam] read from paramAddr, param[0]=%llu, param[1]=0x%llx, param[2]=0x%llx, "
+        "param[3]=0x%llx, param[8]=%llu",
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_0]),
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_1]),
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_2]),
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_3]),
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_8]));
     return CCU_SUCCESS;
 }
 
@@ -141,7 +151,17 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     // }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLREDUCE))
     {
-        HCCL_INFO("[j_test][KfcServer][Dispatch] dispatch AllReduce kernel");
+        HCCL_INFO("[j_test][KfcServer][Dispatch] dispatch AllReduce kernel, "
+            "param[1]=0x%llx(inputAddr), param[2]=0x%llx(outputAddr), param[3]=0x%llx(scratch), "
+            "param[6]=%llu(normalSliceSize), param[7]=%llu(lastSliceSize), param[8]=%llu(mySliceSize), "
+            "param[9]=%llu(sliceOffset)",
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_1]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_2]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_3]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_6]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_7]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_8]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_9]));
         CcuAllReduceMeshMem2Mem1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
@@ -188,15 +208,24 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 
     CCU_WHILE(repeatCond == 0)
     {
+        HCCL_INFO("[j_test][KfcServer][CircularQueue] loop start, queueIdx[%llu], paramAddr offset from xnAddr",
+            static_cast<unsigned long long>(queueIdx));
         CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
-        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
+        HCCL_INFO("[j_test][KfcServer][CircularQueue] after LoadParam, param[0]=%llu, checking sentinel",
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_0]));
+        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) {
+            HCCL_INFO("[j_test][KfcServer][CircularQueue] param[0]==INVALID_U64, setting repeatCond=1 (terminate)");
+            repeatCond = 1;
+        }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
+            HCCL_INFO("[j_test][KfcServer][CircularQueue] param[0] valid, dispatching sub-kernel");
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
             DispatchKfcSubKernel(param, ctx);
             MissionPostSync(ctx);
             CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
+            HCCL_INFO("[j_test][KfcServer][CircularQueue] dispatch done, turn end sig set");
         }
         waitAddr += ckeSize;
         recordAddr += ckeSize;
@@ -253,8 +282,16 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     HCCL_INFO("[CcuKernelKfcServer] LoadArgs finish");
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
+    HCCL_INFO("[j_test][CcuKernelKfcServer] xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], missionNum[%llu], "
+        "missionIndex[%llu], token[0x%llx]",
+        static_cast<unsigned long long>(ctx.xnAddr), static_cast<unsigned long long>(ctx.ckeAddr),
+        static_cast<unsigned long long>(ctx.dieNum), static_cast<unsigned long long>(ctx.missionNum),
+        static_cast<unsigned long long>(ctx.missionIndex), static_cast<unsigned long long>(ctx.token));
     HCCL_INFO("[GenCircularQueue] KfcServer start");
-    CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
+    CCU_IF(ctx.missionIndex == 0) {
+        HCCL_INFO("[j_test][CcuKernelKfcServer] missionIndex==0, entering KfcServerGenCircularQueue");
+        CCU_CHK_RET(KfcServerGenCircularQueue(ctx));
+    }
     // CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
