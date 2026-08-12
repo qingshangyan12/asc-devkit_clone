@@ -64,8 +64,4 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
-int64_t flag_id = 1;
-asc_sync_block_arrive(PIPE_V, flag_id);
-asc_sync_block_wait(PIPE_V, flag_id);  
-```
+`asc_sync_block_wait`需与`asc_sync_block_arrive`配对使用，具体调用示例请参考[asc_sync_block_arrive调用示例](asc_sync_block_arrive.md#调用示例)。

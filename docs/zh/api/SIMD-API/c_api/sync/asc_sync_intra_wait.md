@@ -70,14 +70,4 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
-// 场景：AIC执行asc_sync_intra_wait等待1个AIV，对应AIV执行asc_sync_intra_arrive通知。
-// 注意：asc_sync_intra_wait与asc_sync_intra_arrive必须分别在不同Core上调用，同一Core连续调用无法实现跨核同步。
-
-// ---- AIC核代码 ----
-uint64_t sync_id = 1;
-asc_sync_intra_wait(PIPE_FIX, sync_id);   // AIC执行wait，等待AIV的arrive使计数器+1后解除阻塞
-
-// ---- AIV核代码 ----
-asc_sync_intra_arrive(PIPE_V, sync_id);   // AIV执行arrive，AIC对应sync_id计数器+1
-```
+`asc_sync_intra_wait`需与`asc_sync_intra_arrive`配对使用，具体调用示例请参考[asc_sync_intra_arrive调用示例](asc_sync_intra_arrive.md#调用示例)。

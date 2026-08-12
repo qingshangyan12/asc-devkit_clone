@@ -66,8 +66,84 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
-int64_t flag_id = 1;
-asc_sync_subblock_arrive(PIPE_V, flag_id);
-asc_sync_subblock_wait(PIPE_V, flag_id);  
+本示例采用`__mix__(1, 2)`声明核函数，同一group内包含2个AIV。两个AIV分别将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_subblock_arrive`。两个AIV在MTE2流水上调用`asc_sync_subblock_wait`，等待彼此均到达同步点。同步完成后，由AIV0读取并输出两个AIV生成的数据。
+
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id17 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id17 -->
+
+```c
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+
+constexpr uint32_t AIV_NUM = 2;
+constexpr uint32_t ELEMENTS_PER_AIV = 8;
+constexpr uint32_t TOTAL_ELEMENTS = AIV_NUM * ELEMENTS_PER_AIV;
+constexpr uint32_t AIV_BYTES = ELEMENTS_PER_AIV * sizeof(float);
+constexpr uint32_t TOTAL_BYTES = TOTAL_ELEMENTS * sizeof(float);
+constexpr int64_t FLAG_ID = 8;
+
+__global__ __mix__(1, 2) void AscSyncSubblockKernel(__gm__ float* contributions, __gm__ float* output)
+{
+    asc_init();
+    if ASC_IS_AIV {
+        __ubuf__ float local[ELEMENTS_PER_AIV];
+        __ubuf__ float snapshot[TOTAL_ELEMENTS];
+        const uint32_t subblock_id = asc_get_sub_block_id();
+        for (uint32_t i = 0; i < ELEMENTS_PER_AIV; ++i) {
+            local[i] = static_cast<float>(subblock_id + 1);
+        }
+        asc_sync_notify(PIPE_S, PIPE_MTE3, EVENT_ID0);
+        asc_sync_wait(PIPE_S, PIPE_MTE3, EVENT_ID0);
+        asc_copy_ub2gm_align(contributions + subblock_id * ELEMENTS_PER_AIV, local, AIV_BYTES);
+        asc_sync_subblock_arrive(PIPE_MTE3, FLAG_ID);
+        asc_sync_subblock_wait(PIPE_MTE2, FLAG_ID);
+        if (subblock_id == 0) {
+            asc_copy_gm2ub_align(snapshot, contributions, TOTAL_BYTES);
+            asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+            asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+            asc_copy_ub2gm_align(output, snapshot, TOTAL_BYTES);
+        }
+    }
+    asc_sync_pipe(PIPE_ALL);
+}
+
+} // namespace
+
+int main()
+{
+    std::vector<float> output(TOTAL_ELEMENTS, 0.0f);
+    float *contributions_device = nullptr, *output_device = nullptr;
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    aclrtMalloc(reinterpret_cast<void**>(&contributions_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    AscSyncSubblockKernel<<<1, 0>>>(contributions_device, output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), TOTAL_BYTES, output_device, TOTAL_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    bool passed = true;
+    for (uint32_t i = 0; i < TOTAL_ELEMENTS; ++i) {
+        const float expected = static_cast<float>(i / ELEMENTS_PER_AIV + 1);
+        passed = passed && (output[i] == expected);
+    }
+    std::cout << (passed ? "[Success] asc_sync_subblock_arrive passed."
+                          : "[Failed] asc_sync_subblock_arrive failed.") << std::endl;
+    aclrtFree(contributions_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
