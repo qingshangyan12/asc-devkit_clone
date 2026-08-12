@@ -11,45 +11,37 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="910" id4 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：不支持
+- Atlas 推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="310b" id7 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-将矢量数据寄存器或掩码寄存器中的数据连续对齐搬出到Unified Buffer（UB），搬出完成后启用Post Update模式自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。当源操作数为矢量数据寄存器时，单次搬出量为VL（256字节）。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节）。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。
-
-本接口提供三种参数列表不同的功能模式，用户按需选择对应重载。
+将矢量数据寄存器或掩码寄存器中的数据连续对齐搬出到Unified Buffer（UB），启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。当源操作数为矢量数据寄存器时，单次搬出量为VL（256字节），支持配置掩码用于指示参与搬出的元素，掩码为1的元素写入目的地址，掩码为0的元素保留目的地址原数据。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。
 
 矢量数据寄存器搬出场景提供以下两种模式：
 
-- **int32_t偏移并更新地址模式**：将矢量数据寄存器中的数据连续对齐搬出到当前目的地址，通过`int32_t offset`指定搬出完成后的目的地址更新量，单位为元素。
-- **步长参数搬出并更新地址模式**：单条指令搬运8个data_block，一个data_block数据量为32字节。通过`block_stride`指定相邻data_block数据块的步长，通过`repeat_stride`指定搬出完成后的目的地址更新量，单位为32字节，搬出完成后自动更新目的地址。
-
-以上两种模式均通过`mask`指示参与搬出的元素，掩码为0的元素不写入目的地址，保留目的地址原数据。
+- **立即数偏移搬出模式**：将矢量数据寄存器中的数据连续对齐搬出到当前目的地址，搬出完成后基于立即数累加目的地址指针，单位为元素。
+- **非连续对齐搬出模式**：单条指令搬运8个data_block，一个data_block数据量为32字节。通过参数配置相邻data_block的步长。搬出完成后基于立即数累加目的地址指针，单位为32字节。
 
 掩码寄存器搬出场景提供以下一种模式：
 
-- **掩码寄存器偏移并更新地址模式**：将掩码寄存器中的数据直接搬出到当前目的地址，通过`int32_t offset`指定搬出完成后的目的地址更新量，偏移单位为字节。
+- **立即数偏移搬出模式**：将掩码寄存器中的数据连续对齐搬出到当前目的地址，搬出完成后基于立即数累加目的地址指针，单位为字节。
 
-三种模式的参数列表不同，用户必须按使用场景选择对应重载系列，不可混用。
-
-本接口仅在AIV上执行有效，在AIC上调用为空操作。
+本接口仅在AIV上生效，非AIV调用直接返回。
 
 ## 函数原型
 
-### 矢量数据寄存器int32_t偏移并更新地址
-
-#### 模板原型（占位符形式）
+### 矢量数据寄存器立即数偏移搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst_align32b,
@@ -71,9 +63,7 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int8_t*& dst_alig
                                                        vector_bool mask)
 ```
 
-### 矢量数据寄存器步长参数搬出并更新地址
-
-#### 模板原型（占位符形式）
+### 矢量数据寄存器非连续对齐搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst_align32b,
@@ -97,9 +87,7 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int8_t*& dst_alig
                                                        vector_bool mask)
 ```
 
-### 掩码寄存器偏移并更新地址
-
-#### 模板原型（占位符形式）
+### 掩码寄存器立即数偏移搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst,
@@ -121,7 +109,7 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst,
 
 ## 参数说明
 
-### 矢量数据寄存器int32_t偏移并更新地址
+### 矢量数据寄存器立即数偏移搬出模式
 
 **表 1**  参数说明
 
@@ -132,7 +120,7 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst,
 | offset | 输入 | 目的地址更新量，类型为`int32_t`，单位为元素。接口执行后，目的地址偏移`offset × sizeof(dtype)`字节。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与搬出的元素。对应位置为1时参与搬出，为0时不参与搬出。需通过掩码设置接口预先赋值后再传入。 |
 
-### 矢量数据寄存器步长参数搬出并更新地址
+### 矢量数据寄存器非连续对齐搬出模式
 
 **表 2**  参数说明
 
@@ -144,7 +132,7 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst,
 | repeat_stride | 输入 | 目的地址Post Update后更新的偏移量，类型为`uint16_t`，单位为32字节。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与搬出的元素。对应位置为1时参与搬出，为0时不参与搬出。需通过掩码设置接口预先赋值后再传入。 |
 
-### 掩码寄存器偏移并更新地址
+### 掩码寄存器立即数偏移搬出模式
 
 **表 3**  参数说明
 
@@ -160,10 +148,6 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst,
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 ### 通用约束
@@ -176,17 +160,25 @@ PIPE_V
 
 ### 矢量数据寄存器搬出场景
 
-- mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - mask比特位为0的位置采用保持模式：dst_align32b对应位置保持原值不变，不写入src数据。
-- `int32_t offset`的单位为元素。offset取0时dst_align32b指针不变，仍按当前起始位置写入数据。
 - 步长参数模式下，通过block_stride和repeat_stride确定的实际访问地址需落在UB地址范围内，且Post Update后的dst_align32b新地址仍需32字节对齐，否则会报错。
 
 ### 掩码寄存器搬出场景
 
-- `int32_t offset`的单位为字节。offset取0时dst指针不变，仍按当前起始位置写入数据。
 - Post Update后的dst新地址仍需32字节对齐，否则下一次调用本接口会报错。
 
 ## 调用示例
+
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
 
 ```cpp
 #include <cstdint>
@@ -222,7 +214,6 @@ __global__ __vector__ void asc_storealign_postupdate_kernel(__gm__ uint8_t* outp
     asc_init();
     __ubuf__ uint8_t output_local[BUFFER_BYTES], input_local[BUFFER_BYTES];
     asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
-    asc_copy_gm2ub_align(output_local, input, BUFFER_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     Store(output_local, input_local);
@@ -253,11 +244,13 @@ int main()
         ACL_MEMCPY_DEVICE_TO_HOST);
     print_data("Input bytes", input);
     print_data("Output bytes", output);
-    std::cout << "[Success] asc_storealign_postupdate completed." << std::endl;
+    const bool passed = input == output;
+    std::cout << (passed ? "[Success] asc_loadalign completed." : "[Failed] asc_loadalign output mismatch.")
+              << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);
     aclFinalize();
-    return 1;
+    return passed ? 0 : 1;
 }
 ```

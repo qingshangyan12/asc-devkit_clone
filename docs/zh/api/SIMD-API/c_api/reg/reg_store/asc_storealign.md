@@ -11,47 +11,41 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="910" id4 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：不支持
+- Atlas 推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="310b" id7 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-将矢量数据寄存器或掩码寄存器中的数据以连续对齐搬出到Unified Buffer（UB）。当源操作数为矢量数据寄存器时，单次搬出量为VL（256字节），`mask`用于指示参与搬出的元素，掩码为1的元素写入目的地址，掩码为0的元素保留目的地址原数据。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），将掩码寄存器中的数据直接搬出，不支持配置`mask`参数。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。
-
-本接口提供七种参数列表不同的功能模式，用户按需选择对应重载。
+将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）。当源操作数为矢量数据寄存器时，单次搬出量为VL（256字节），支持配置掩码用于指示参与搬出的元素，掩码为1的元素写入目的地址，掩码为0的元素保留目的地址原数据。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），将掩码寄存器中的数据直接搬出，不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。
 
 矢量数据寄存器搬出场景提供以下四种模式：
 
-- **无偏移搬出模式**：偏移固定为0，将矢量数据寄存器中的数据搬出到UB起始地址，由用户自行更新目的地址。
-- **int32_t偏移搬出模式**：通过`int32_t offset`指定相对目的起始地址的偏移，单位为元素，用户可选择更新偏移或更新目的地址。
-- **addr_reg偏移搬出模式**：通过地址寄存器`addr_reg offset`指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
-- **步长参数搬出模式**：单条指令搬运8个data_block，一个data_block数据量为32字节。通过`block_stride`指定相邻data_block数据块的步长，通过`repeat_stride`指定相对目的起始地址的偏移，单位为32字节。
+- **连续对齐搬出模式**：将矢量数据寄存器中的数据搬出到UB目的地址，由用户自行更新目的地址。
+- **立即数偏移搬出模式**：通过立即数指定相对目的起始地址的偏移，单位为元素，用户可选择更新偏移或更新目的地址。
+- **地址寄存器偏移搬出模式**：通过地址寄存器指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
+- **非连续对齐搬出模式**：单条指令搬运8个data_block，一个data_block数据量为32字节。通过参数配置相邻data_block的步长和相对目的起始地址的偏移。
 
 掩码寄存器搬出场景提供以下三种模式：
 
-- **无偏移搬出模式**：偏移固定为0，将掩码寄存器中的数据搬出到UB起始地址，由用户自行更新目的地址。
-- **int32_t偏移搬出模式**：通过`int32_t offset`指定相对目的起始地址的偏移，偏移单位为字节，用户可选择更新偏移或更新目的地址。
-- **addr_reg偏移搬出模式**：通过地址寄存器`addr_reg offset`指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
+- **连续对齐搬出模式**：将掩码寄存器中的数据搬出到UB目的地址，由用户自行更新目的地址。
+- **立即数偏移搬出模式**：通过立即数指定相对目的起始地址的偏移，单位为字节，用户可选择更新偏移或更新目的地址。
+- **地址寄存器偏移搬出模式**：通过地址寄存器指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
 
-七种模式的参数列表不同，用户必须按使用场景选择对应重载系列，不可混用。
-
-本接口仅在AIV上执行有效，在AIC上调用为空操作。
+本接口仅在AIV上生效，非AIV调用直接返回。
 
 ## 函数原型
 
-### 矢量数据寄存器无偏移搬出
-
-#### 模板原型（占位符形式）
+### 矢量数据寄存器连续对齐搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst_align32b,
@@ -71,9 +65,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst_align32b,
                                            vector_bool mask)
 ```
 
-### 矢量数据寄存器int32_t偏移搬出
-
-#### 模板原型（占位符形式）
+### 矢量数据寄存器立即数偏移搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst_align32b,
@@ -95,9 +87,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst_align32b,
                                            vector_bool mask)
 ```
 
-### 矢量数据寄存器addr_reg偏移搬出
-
-#### 模板原型（占位符形式）
+### 矢量数据寄存器地址寄存器偏移搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst_align32b,
@@ -119,9 +109,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst_align32b,
                                            vector_bool mask)
 ```
 
-### 矢量数据寄存器步长参数搬出
-
-#### 模板原型（占位符形式）
+### 矢量数据寄存器非连续对齐搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst_align32b,
@@ -145,9 +133,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst_align32b,
                                            vector_bool mask)
 ```
 
-### 掩码寄存器无偏移搬出
-
-#### 模板原型（占位符形式）
+### 掩码寄存器连续对齐搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst,
@@ -165,9 +151,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
                                            vector_bool src)
 ```
 
-### 掩码寄存器int32_t偏移搬出
-
-#### 模板原型（占位符形式）
+### 掩码寄存器立即数偏移搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst,
@@ -187,9 +171,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
                                            int32_t offset)
 ```
 
-### 掩码寄存器addr_reg偏移搬出
-
-#### 模板原型（占位符形式）
+### 掩码寄存器地址寄存器偏移搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst,
@@ -211,7 +193,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 
 ## 参数说明
 
-### 矢量数据寄存器无偏移搬出
+### 矢量数据寄存器连续对齐搬出模式
 
 **表 1**  参数说明
 
@@ -221,7 +203,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 | src | 输入 | 源操作数（矢量数据寄存器）。dtype须与dst一致。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与搬出的元素。对应位置为1时参与搬出，为0时不参与搬出。需通过掩码设置接口预先赋值后再传入。 |
 
-### 矢量数据寄存器int32_t偏移搬出
+### 矢量数据寄存器立即数偏移搬出模式
 
 **表 2**  参数说明
 
@@ -232,7 +214,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 | offset | 输入 | 相对dst_align32b起始地址的偏移量，类型为`int32_t`，单位为元素。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与搬出的元素。对应位置为1时参与搬出，为0时不参与搬出。需通过掩码设置接口预先赋值后再传入。 |
 
-### 矢量数据寄存器addr_reg偏移搬出
+### 矢量数据寄存器地址寄存器偏移搬出模式
 
 **表 3**  参数说明
 
@@ -243,7 +225,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 | offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，由配套的地址寄存器构造接口预先构造。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与搬出的元素。对应位置为1时参与搬出，为0时不参与搬出。需通过掩码设置接口预先赋值后再传入。 |
 
-### 矢量数据寄存器步长参数搬出
+### 矢量数据寄存器非连续对齐搬出模式
 
 **表 4**  参数说明
 
@@ -255,7 +237,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 | repeat_stride | 输入 | 目的操作数起始地址偏移，类型为`uint16_t`，单位为32字节。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与搬出的元素。对应位置为1时参与搬出，为0时不参与搬出。需通过掩码设置接口预先赋值后再传入。 |
 
-### 掩码寄存器无偏移搬出
+### 掩码寄存器连续对齐搬出模式
 
 **表 5**  参数说明
 
@@ -264,7 +246,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 | dst | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
 | src | 输入 | 源操作数（掩码寄存器）。 |
 
-### 掩码寄存器int32_t偏移搬出
+### 掩码寄存器立即数偏移搬出模式
 
 **表 6**  参数说明
 
@@ -274,7 +256,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 | src | 输入 | 源操作数（掩码寄存器）。 |
 | offset | 输入 | 相对dst起始地址的偏移量，类型为`int32_t`，单位为字节。 |
 
-### 掩码寄存器addr_reg偏移搬出
+### 掩码寄存器地址寄存器偏移搬出模式
 
 **表 7**  参数说明
 
@@ -290,10 +272,6 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 ### 通用约束
@@ -306,7 +284,7 @@ PIPE_V
 
 ### 矢量数据寄存器搬出场景
 
-- mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - mask比特位为0的位置采用保持模式：dst对应位置保持原值不变，不写入src数据。
 - 通过offset、block_stride、repeat_stride等参数偏移后的实际访问地址落在UB地址范围内，且实际访问地址仍需32字节对齐，否则会报错。
 
@@ -315,6 +293,16 @@ PIPE_V
 - `int32_t offset`的单位为字节。通过offset参数偏移后的实际访问地址需落在UB地址范围内，且仍需32字节对齐，否则会报错。
 
 ## 调用示例
+
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
 
 ```cpp
 #include <cstdint>
@@ -352,7 +340,6 @@ __global__ __vector__ void asc_storealign_kernel(__gm__ uint8_t* output, __gm__ 
     asc_init();
     __ubuf__ uint8_t output_local[BUFFER_BYTES], input_local[BUFFER_BYTES];
     asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
-    asc_copy_gm2ub_align(output_local, input, BUFFER_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     store_vf(output_local, input_local);
@@ -383,11 +370,13 @@ int main()
         ACL_MEMCPY_DEVICE_TO_HOST);
     print_data("Input bytes", input);
     print_data("Output bytes", output);
-    std::cout << "[Success] asc_storealign completed." << std::endl;
+    const bool passed = input == output;
+    std::cout << (passed ? "[Success] asc_loadalign completed." : "[Failed] asc_loadalign output mismatch.")
+              << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);
     aclFinalize();
-    return 1;
+    return passed ? 0 : 1;
 }
 ```
