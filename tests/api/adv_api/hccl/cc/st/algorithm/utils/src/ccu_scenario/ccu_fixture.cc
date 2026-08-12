@@ -162,6 +162,7 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
     void *resCtxOut = nullptr;
     fprintf(stderr, "DEBUG step11: GetCcuOpParamResCtx\n");
     if (GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), resCtx, &resCtxOut) != HCCL_SUCCESS) {
+        fprintf(stderr, "DEBUG step11 FAILED\n");
         CleanupHostEnv(comm);
         return 0;
     }

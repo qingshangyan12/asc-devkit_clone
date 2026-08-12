@@ -33,7 +33,7 @@ extern "C" CcuKernelHandle RecordCcuKernelRegistrationForTest();
 
 bool HcclCheckLogLevel(int logType, int moduleId)
 {
-    return false;
+    return true;
 }
 
 bool IsErrorToWarn()
