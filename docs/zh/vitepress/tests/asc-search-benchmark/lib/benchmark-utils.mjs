@@ -13,6 +13,8 @@ import { isAbsolute, relative, sep } from 'node:path'
 
 const HTTP_PROTOCOLS = new Set(['http:', 'https:'])
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308])
+export const RESULT_HIGHLIGHT_SELECTOR = '.des mark, .headings mark'
+export const SECTION_HIGHLIGHT_SELECTOR = '.section-title mark'
 
 export function resolveSameOriginHttpUrl(value, targetUrl) {
   const target = targetUrl instanceof URL ? targetUrl : new URL(targetUrl)
