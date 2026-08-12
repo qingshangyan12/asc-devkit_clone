@@ -96,22 +96,28 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
 {
     setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
     setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", "1", 1);
+    fprintf(stderr, "DEBUG step1: SimWorld::Init\n");
     HcclSim::SimWorld::Global()->Init(topoMeta, DevType::DEV_TYPE_950);
+    fprintf(stderr, "DEBUG step2: aclrtSetDevice\n");
     if (aclrtSetDevice(rank) != ACL_SUCCESS) return 0;
 
     aclrtStream stream = nullptr;
+    fprintf(stderr, "DEBUG step3: aclrtCreateStream\n");
     if (aclrtCreateStream(&stream) != ACL_SUCCESS) return 0;
 
     HcclComm comm = nullptr;
+    fprintf(stderr, "DEBUG step4: Sim_HcclCommInitClusterInfo\n");
     if (HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, rank, &comm) != HCCL_SUCCESS) return 0;
 
     OpResCtx resCtx{};
+    fprintf(stderr, "DEBUG step5: AllocCcuOpResCtx\n");
     if (AllocCcuOpResCtx(comm, "selector_st_ctx", rankSize, rank, resCtx) != HCCL_SUCCESS) {
         CleanupHostEnv(comm);
         return 0;
     }
 
     OpParam opParam{};
+    fprintf(stderr, "DEBUG step6: InitOpParamByTiling\n");
     if (InitOpParamByTiling(comm, stream, "ccu_st", &tiling, opParam) != HCCL_SUCCESS) {
         CleanupHostEnv(comm);
         return 0;
@@ -126,16 +132,19 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
 
     bool forcedAlgAccepted = false;
+    fprintf(stderr, "DEBUG step7: TryForcedAlgAndPrepareEngine\n");
     if (TryForcedAlgAndPrepareEngine(comm, &tiling, opParam, algName, topoInfo, forcedAlgAccepted) != HCCL_SUCCESS) {
         CleanupHostEnv(comm);
         return 0;
     }
     if (!forcedAlgAccepted) {
+        fprintf(stderr, "DEBUG step8: SelectAlgAndPrepareEngine\n");
         if (SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo) != HCCL_SUCCESS || algName.empty()) {
             CleanupHostEnv(comm);
             return 0;
         }
     }
+    fprintf(stderr, "DEBUG step9: algName=%s\n", algName.c_str());
     if (rank == 0 && !scenario.expectedAlgName.empty() && algName != scenario.expectedAlgName) {
         CleanupHostEnv(comm);
         return 0;
@@ -144,16 +153,19 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
 
     opParam.isMc2 = true;
     bool skipGetRes = false;
+    fprintf(stderr, "DEBUG step10: HandleSingleRankAndCommMode\n");
     if (HandleSingleRankAndCommMode(comm, opParam, skipGetRes) != HCCL_SUCCESS || skipGetRes) {
         CleanupHostEnv(comm);
         return 0;
     }
 
     void *resCtxOut = nullptr;
+    fprintf(stderr, "DEBUG step11: GetCcuOpParamResCtx\n");
     if (GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), resCtx, &resCtxOut) != HCCL_SUCCESS) {
         CleanupHostEnv(comm);
         return 0;
     }
+    fprintf(stderr, "DEBUG step12: GetLastCompiledGroup\n");
 
     const auto &lastGroup = RegisterManager::Global().GetLastCompiledGroup();
     KernelHandle handle = lastGroup.empty() ? 0 : lastGroup.back();
