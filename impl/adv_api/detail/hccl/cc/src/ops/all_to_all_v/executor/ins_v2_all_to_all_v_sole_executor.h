@@ -47,6 +47,7 @@ protected:
     A2ASendRecvInfo localSendRecvInfo_;
 
     HcclResult OrchestrateLoop(const OpParam &param, const AlgResourceCtxSerializable &resCtx);
+    HcclResult ValidateAndInit(const OpParam& param, const AlgResourceCtxSerializable& resCtx);
 };
 }
 
