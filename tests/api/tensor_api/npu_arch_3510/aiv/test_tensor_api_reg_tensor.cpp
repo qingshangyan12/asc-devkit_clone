@@ -20,8 +20,9 @@
 #include "tensor_api/tensor.h"
 #include "tensor_api/utils/utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace {
+
+using namespace asc::te;
 
 template <typename T, typename = void>
 struct has_mask_member : std::false_type {};
@@ -29,156 +30,156 @@ struct has_mask_member : std::false_type {};
 template <typename T>
 struct has_mask_member<T, std::void_t<decltype(&T::mask)>> : std::true_type {};
 
-template <typename TensorType, typename Coord, typename = void>
+template <typename tensor_type, typename coord_type, typename = void>
 struct has_reg_load : std::false_type {};
 
-template <typename TensorType, typename Coord>
+template <typename tensor_type, typename coord_type>
 struct has_reg_load<
-    TensorType, Coord,
-    std::void_t<decltype(std::declval<const TensorType&>().template load<asc::te::load_sideband_mode::direct>(
-        std::declval<const Coord&>()))>> : std::true_type {};
+    tensor_type, coord_type,
+    std::void_t<decltype(std::declval<const tensor_type&>().template load<load_sideband_mode::direct>(
+        std::declval<const coord_type&>()))>> : std::true_type {};
 
-template <typename T, asc::te::load_sideband_mode sidebandMode = asc::te::load_sideband_mode::direct>
-__simd_vf__ inline void CompileRegLocalTensorLoadStore(
+template <typename T, load_sideband_mode sideband_mode = load_sideband_mode::direct>
+__simd_vf__ inline void compile_reg_local_tensor_load_store(
     __ubuf__ T* dst, __ubuf__ T* src, vector_bool mask)
 {
-    auto layout = MakeLayout(MakeShape(64));
-    auto dstMem = MakeMemPtr<Location::UB>(dst);
-    auto srcMem = MakeMemPtr<Location::UB>(src);
-    using engine_type = asc::te::view_engine<decltype(srcMem)>;
+    auto layout = make_layout(make_shape(64));
+    auto dst_mem = make_mem_ptr<location::ub>(dst);
+    auto src_mem = make_mem_ptr<location::ub>(src);
+    using engine_type = view_engine<decltype(src_mem)>;
     using layout_type = decltype(layout);
-    asc::te::local_tensor<engine_type, layout_type> dstTensor(dstMem, layout);
-    asc::te::local_tensor<engine_type, layout_type> srcTensor(srcMem, layout);
-    using coord_type = decltype(MakeCoord(0));
-    using tensor_api_base = typename decltype(srcTensor)::tensor_api_base;
+    local_tensor<engine_type, layout_type> dst_tensor(dst_mem, layout);
+    local_tensor<engine_type, layout_type> src_tensor(src_mem, layout);
+    using coord_type = decltype(make_coord(0));
+    using tensor_api_base = typename decltype(src_tensor)::tensor_api_base;
     static_assert(!has_reg_load<tensor_api_base, coord_type>::value);
-    static_assert(has_reg_load<decltype(srcTensor), coord_type>::value);
-    static_assert(std::is_base_of_v<tensor_api_base, decltype(srcTensor)>);
+    static_assert(has_reg_load<decltype(src_tensor), coord_type>::value);
+    static_assert(std::is_base_of_v<tensor_api_base, decltype(src_tensor)>);
 
-    asc::te::reg_tensor<bool> maskReg {mask};
-    auto value = srcTensor.template load<sidebandMode>(MakeCoord(0)).with_mask(maskReg);
+    reg_tensor<bool> mask_reg {mask};
+    auto value = src_tensor.template load<sideband_mode>(make_coord(0)).with_mask(mask_reg);
     static_assert(std::is_same_v<typename decltype(value)::type, T>);
-    dstTensor.store(MakeCoord(0), value);
+    dst_tensor.store(make_coord(0), value);
 
-    auto fullValue = srcTensor.load(MakeCoord(0)).with_mask(asc::te::all_mask<T>());
-    static_assert(std::is_same_v<typename decltype(fullValue)::type, T>);
+    auto full_value = src_tensor.load(make_coord(0)).with_mask(all_mask<T>());
+    static_assert(std::is_same_v<typename decltype(full_value)::type, T>);
 
-    asc::te::reg_tensor<T> assigned {mask};
-    auto& assignedRef = (assigned = static_cast<T>(1));
-    static_assert(std::is_same_v<decltype(assignedRef), asc::te::reg_tensor<T>&>);
+    reg_tensor<T> assigned {mask};
+    auto& assigned_ref = (assigned = static_cast<T>(1));
+    static_assert(std::is_same_v<decltype(assigned_ref), reg_tensor<T>&>);
 }
 
-template <asc::te::load_sideband_mode sidebandMode>
-__simd_vf__ inline void CompileRegLocalTensorLoadMode(__ubuf__ uint8_t* src)
+template <load_sideband_mode sideband_mode>
+__simd_vf__ inline void compile_reg_local_tensor_load_mode(__ubuf__ uint8_t* src)
 {
-    auto layout = MakeLayout(MakeShape(256));
-    auto srcTensor = MakeTensor(MakeMemPtr<Location::UB>(src), layout);
-    if constexpr (sidebandMode == asc::te::load_sideband_mode::deintlv) {
-        asc::te::reg_tensor<uint8_t> dst0;
-        asc::te::reg_tensor<uint8_t> dst1;
-        static_assert(std::is_same_v<decltype(srcTensor.load(MakeCoord(0), dst0, dst1)), void>);
-        srcTensor.template load<sidebandMode>(MakeCoord(0), dst0, dst1);
-        auto mask = asc::te::all_mask<uint8_t>();
+    auto layout = make_layout(make_shape(256));
+    auto src_tensor = make_tensor(make_mem_ptr<location::ub>(src), layout);
+    if constexpr (sideband_mode == load_sideband_mode::deintlv) {
+        reg_tensor<uint8_t> dst0;
+        reg_tensor<uint8_t> dst1;
+        static_assert(std::is_same_v<decltype(src_tensor.load(make_coord(0), dst0, dst1)), void>);
+        src_tensor.template load<sideband_mode>(make_coord(0), dst0, dst1);
+        auto mask = all_mask<uint8_t>();
         dst0.with_mask(mask);
         dst1.with_mask(mask);
     } else {
-        auto value = srcTensor.template load<sidebandMode>(MakeCoord(0));
-        static_assert(std::is_same_v<decltype(value), asc::te::reg_tensor<uint8_t>>);
-        value.with_mask(asc::te::all_mask<uint8_t>());
+        auto value = src_tensor.template load<sideband_mode>(make_coord(0));
+        static_assert(std::is_same_v<decltype(value), reg_tensor<uint8_t>>);
+        value.with_mask(all_mask<uint8_t>());
     }
 }
 
-template <asc::te::broadcast_mode broadcastMode>
-__simd_vf__ inline void CompileRegLocalTensorBroadcast(__ubuf__ float* src)
+template <broadcast_mode broadcast_mode_value>
+__simd_vf__ inline void compile_reg_local_tensor_broadcast(__ubuf__ float* src)
 {
-    auto layout = MakeLayout(MakeShape(64));
-    auto srcTensor = MakeTensor(MakeMemPtr<Location::UB>(src), layout);
-    auto value = srcTensor.template load_broadcast<broadcastMode>(MakeCoord(0));
-    static_assert(std::is_same_v<decltype(value), asc::te::reg_tensor<float>>);
-    value.with_mask(asc::te::all_mask<float>());
+    auto layout = make_layout(make_shape(64));
+    auto src_tensor = make_tensor(make_mem_ptr<location::ub>(src), layout);
+    auto value = src_tensor.template load_broadcast<broadcast_mode_value>(make_coord(0));
+    static_assert(std::is_same_v<decltype(value), reg_tensor<float>>);
+    value.with_mask(all_mask<float>());
 }
 
-template <asc::te::store_sideband_mode sidebandMode>
-__simd_vf__ inline void CompileRegLocalTensorStoreMode(__ubuf__ uint32_t* dst, vector_bool mask)
+template <store_sideband_mode sideband_mode>
+__simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* dst, vector_bool mask)
 {
-    auto layout = MakeLayout(MakeShape(64));
-    auto dstTensor = MakeTensor(MakeMemPtr<Location::UB>(dst), layout);
-    asc::te::reg_tensor<uint32_t> src0 {mask};
-    if constexpr (sidebandMode == asc::te::store_sideband_mode::intlv) {
-        asc::te::reg_tensor<uint32_t> src1 {mask};
-        static_assert(std::is_same_v<decltype(dstTensor.store(MakeCoord(0), src0, src1)), void>);
-        dstTensor.template store<sidebandMode>(MakeCoord(0), src0, src1);
+    auto layout = make_layout(make_shape(64));
+    auto dst_tensor = make_tensor(make_mem_ptr<location::ub>(dst), layout);
+    reg_tensor<uint32_t> src0 {mask};
+    if constexpr (sideband_mode == store_sideband_mode::intlv) {
+        reg_tensor<uint32_t> src1 {mask};
+        static_assert(std::is_same_v<decltype(dst_tensor.store(make_coord(0), src0, src1)), void>);
+        dst_tensor.template store<sideband_mode>(make_coord(0), src0, src1);
     } else {
-        static_assert(std::is_same_v<decltype(dstTensor.template store<sidebandMode>(MakeCoord(0), src0)), void>);
-        dstTensor.template store<sidebandMode>(MakeCoord(0), src0);
+        static_assert(
+            std::is_same_v<decltype(dst_tensor.template store<sideband_mode>(make_coord(0), src0)), void>);
+        dst_tensor.template store<sideband_mode>(make_coord(0), src0);
     }
 }
 
 template <typename T>
-__simd_vf__ inline void CompileRegMaskAndFill(T value, uint32_t remain)
+__simd_vf__ inline void compile_reg_mask_and_fill(T value, uint32_t remain)
 {
-    auto vl8Mask = asc::te::make_mask<asc::te::mask_pattern::vl8, T>();
-    auto every3Mask = asc::te::make_mask<asc::te::mask_pattern::every3, T>();
-    auto emptyMask = asc::te::none_mask<T>();
-    auto tailMask = asc::te::update_mask<T>(remain);
-    auto scalarFill = asc::te::fill(value, tailMask);
-    auto registerFill = asc::te::fill(scalarFill, tailMask);
-    static_assert(std::is_same_v<decltype(vl8Mask), asc::te::reg_tensor<bool>>);
-    static_assert(std::is_same_v<decltype(every3Mask), asc::te::reg_tensor<bool>>);
-    (void)vl8Mask;
-    (void)every3Mask;
-    (void)emptyMask;
-    (void)registerFill;
+    auto vl8_mask = make_mask<mask_pattern::vl8, T>();
+    auto every3_mask = make_mask<mask_pattern::every3, T>();
+    auto empty_mask = none_mask<T>();
+    auto tail_mask = update_mask<T>(remain);
+    auto scalar_fill = fill(value, tail_mask);
+    auto register_fill = fill(scalar_fill, tail_mask);
+    static_assert(std::is_same_v<decltype(vl8_mask), reg_tensor<bool>>);
+    static_assert(std::is_same_v<decltype(every3_mask), reg_tensor<bool>>);
+    (void)vl8_mask;
+    (void)every3_mask;
+    (void)empty_mask;
+    (void)register_fill;
 }
 
-TEST(TestTensorApiRegTensor, HoldsRegisterAndMask)
+TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
 {
-    asc::te::reg_tensor<float> value {};
+    reg_tensor<float> value {};
     (void)value.reg;
     (void)value.mask;
 
-    auto compileLoadStore = &CompileRegLocalTensorLoadStore<float>;
-    (void)compileLoadStore;
+    auto compile_load_store = &compile_reg_local_tensor_load_store<float>;
+    (void)compile_load_store;
 
-    auto compileDirect = &CompileRegLocalTensorLoadMode<asc::te::load_sideband_mode::direct>;
-    auto compileDeintlv = &CompileRegLocalTensorLoadMode<asc::te::load_sideband_mode::deintlv>;
-    auto compileDownsample = &CompileRegLocalTensorLoadMode<asc::te::load_sideband_mode::downsample>;
-    auto compileUnpack = &CompileRegLocalTensorLoadMode<asc::te::load_sideband_mode::unpack>;
-    auto compileUnpack4 = &CompileRegLocalTensorLoadMode<asc::te::load_sideband_mode::unpack4>;
-    auto compileUpsample = &CompileRegLocalTensorLoadMode<asc::te::load_sideband_mode::upsample>;
-    (void)compileDirect;
-    (void)compileDeintlv;
-    (void)compileDownsample;
-    (void)compileUnpack;
-    (void)compileUnpack4;
-    (void)compileUpsample;
+    auto compile_direct = &compile_reg_local_tensor_load_mode<load_sideband_mode::direct>;
+    auto compile_deintlv = &compile_reg_local_tensor_load_mode<load_sideband_mode::deintlv>;
+    auto compile_downsample = &compile_reg_local_tensor_load_mode<load_sideband_mode::downsample>;
+    auto compile_unpack = &compile_reg_local_tensor_load_mode<load_sideband_mode::unpack>;
+    auto compile_unpack4 = &compile_reg_local_tensor_load_mode<load_sideband_mode::unpack4>;
+    auto compile_upsample = &compile_reg_local_tensor_load_mode<load_sideband_mode::upsample>;
+    (void)compile_direct;
+    (void)compile_deintlv;
+    (void)compile_downsample;
+    (void)compile_unpack;
+    (void)compile_unpack4;
+    (void)compile_upsample;
 
-    auto compileBroadcastElem = &CompileRegLocalTensorBroadcast<asc::te::broadcast_mode::elem>;
-    auto compileBroadcastDatablock = &CompileRegLocalTensorBroadcast<asc::te::broadcast_mode::datablock>;
-    auto compileBroadcastElem2Datablock =
-        &CompileRegLocalTensorBroadcast<asc::te::broadcast_mode::elem2datablock>;
-    (void)compileBroadcastElem;
-    (void)compileBroadcastDatablock;
-    (void)compileBroadcastElem2Datablock;
+    auto compile_broadcast_elem = &compile_reg_local_tensor_broadcast<broadcast_mode::elem>;
+    auto compile_broadcast_datablock = &compile_reg_local_tensor_broadcast<broadcast_mode::datablock>;
+    auto compile_broadcast_elem2datablock =
+        &compile_reg_local_tensor_broadcast<broadcast_mode::elem2datablock>;
+    (void)compile_broadcast_elem;
+    (void)compile_broadcast_datablock;
+    (void)compile_broadcast_elem2datablock;
 
-    auto compileStoreDirect = &CompileRegLocalTensorStoreMode<asc::te::store_sideband_mode::direct>;
-    auto compileStore1st = &CompileRegLocalTensorStoreMode<asc::te::store_sideband_mode::store_1st>;
-    auto compileStoreIntlv = &CompileRegLocalTensorStoreMode<asc::te::store_sideband_mode::intlv>;
-    auto compileStorePack = &CompileRegLocalTensorStoreMode<asc::te::store_sideband_mode::pack>;
-    auto compileStorePackQuarter = &CompileRegLocalTensorStoreMode<asc::te::store_sideband_mode::pack_quarter>;
-    (void)compileStoreDirect;
-    (void)compileStore1st;
-    (void)compileStoreIntlv;
-    (void)compileStorePack;
-    (void)compileStorePackQuarter;
+    auto compile_store_direct = &compile_reg_local_tensor_store_mode<store_sideband_mode::direct>;
+    auto compile_store_1st = &compile_reg_local_tensor_store_mode<store_sideband_mode::store_1st>;
+    auto compile_store_intlv = &compile_reg_local_tensor_store_mode<store_sideband_mode::intlv>;
+    auto compile_store_pack = &compile_reg_local_tensor_store_mode<store_sideband_mode::pack>;
+    auto compile_store_pack_quarter = &compile_reg_local_tensor_store_mode<store_sideband_mode::pack_quarter>;
+    (void)compile_store_direct;
+    (void)compile_store_1st;
+    (void)compile_store_intlv;
+    (void)compile_store_pack;
+    (void)compile_store_pack_quarter;
 
-    auto compileRegMaskAndFillB8 = &CompileRegMaskAndFill<uint8_t>;
-    auto compileRegMaskAndFillB16 = &CompileRegMaskAndFill<half>;
-    auto compileRegMaskAndFillB32 = &CompileRegMaskAndFill<float>;
-    (void)compileRegMaskAndFillB8;
-    (void)compileRegMaskAndFillB16;
-    (void)compileRegMaskAndFillB32;
+    auto compile_reg_mask_and_fill_b8 = &compile_reg_mask_and_fill<uint8_t>;
+    auto compile_reg_mask_and_fill_b16 = &compile_reg_mask_and_fill<half>;
+    auto compile_reg_mask_and_fill_b32 = &compile_reg_mask_and_fill<float>;
+    (void)compile_reg_mask_and_fill_b8;
+    (void)compile_reg_mask_and_fill_b16;
+    (void)compile_reg_mask_and_fill_b32;
 }
 
-} // namespace Te
-} // namespace AscendC
+} // namespace
