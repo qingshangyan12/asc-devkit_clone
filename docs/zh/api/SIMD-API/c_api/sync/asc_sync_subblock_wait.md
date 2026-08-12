@@ -2,7 +2,6 @@
 
 ## 产品支持情况
 
-
 <!-- npu="950" id13 -->
 - Ascend 950PR/Ascend 950DT：支持
 <!-- end id13 -->
@@ -67,8 +66,4 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
-int64_t flag_id = 1;
-asc_sync_subblock_arrive(PIPE_V, flag_id);
-asc_sync_subblock_wait(PIPE_V, flag_id);  
-```
+`asc_sync_subblock_wait`需与`asc_sync_subblock_arrive`配对使用，具体调用示例请参考[asc_sync_subblock_arrive调用示例](asc_sync_subblock_arrive.md#调用示例)。

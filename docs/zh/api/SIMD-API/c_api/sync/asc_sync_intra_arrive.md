@@ -87,14 +87,94 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
-// 场景：1个AIV执行asc_sync_intra_arrive通知AIC，对应AIC执行asc_sync_intra_wait等待。
-// 注意：asc_sync_intra_arrive与asc_sync_intra_wait必须分别在不同Core上调用，同一Core连续调用无法实现跨核同步。
+本示例采用`__mix__(1, 2)`声明核函数。AIV0在UB中构造矩阵A和矩阵B，将矩阵搬运至共享L1 Buffer，然后在MTE3流水上调用`asc_sync_intra_arrive`。AIC在MTE1流水上调用`asc_sync_intra_wait`，等待AIV0到达同步点后，再读取L1 Buffer中的数据执行矩阵乘。AIV1不参与该次同步。
 
-// ---- AIV核代码 ----
-uint64_t sync_id = 1;
-asc_sync_intra_arrive(PIPE_V, sync_id);   // AIV执行arrive，AIC对应sync_id计数器+1
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
-// ---- AIC核代码 ----
-asc_sync_intra_wait(PIPE_FIX, sync_id);   // AIC执行wait，计数器>0则解除阻塞并-1
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
+```c
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+
+constexpr uint32_t MATRIX_DIM = 16;
+constexpr uint32_t MATRIX_ELEMENTS = MATRIX_DIM * MATRIX_DIM;
+constexpr uint32_t MATRIX_BYTES = MATRIX_ELEMENTS * sizeof(half);
+constexpr uint32_t OUTPUT_BYTES = MATRIX_ELEMENTS * sizeof(float);
+constexpr uint64_t SYNC_ID = 8;
+
+__global__ __mix__(1, 2) void AscSyncIntraKernel(__gm__ float* output)
+{
+    asc_init();
+    __cbuf__ half matrix_a_l1[MATRIX_ELEMENTS], matrix_b_l1[MATRIX_ELEMENTS];
+    __ubuf__ half input_ub[MATRIX_ELEMENTS];
+    __ca__ half matrix_a_l0[MATRIX_ELEMENTS];
+    __cb__ half matrix_b_l0[MATRIX_ELEMENTS];
+    __cc__ float output_l0[MATRIX_ELEMENTS];
+
+    if ASC_IS_AIV {
+        if (asc_get_sub_block_id() == 0) {
+            for (uint32_t i = 0; i < MATRIX_ELEMENTS; ++i) {
+                input_ub[i] = static_cast<half>(1.0f);
+            }
+            asc_sync_notify(PIPE_S, PIPE_MTE3, EVENT_ID0);
+            asc_sync_wait(PIPE_S, PIPE_MTE3, EVENT_ID0);
+            asc_copy_ub2l1(matrix_a_l1, input_ub, MATRIX_BYTES);
+            asc_copy_ub2l1(matrix_b_l1, input_ub, MATRIX_BYTES);
+            asc_sync_intra_arrive(PIPE_MTE3, SYNC_ID);
+        }
+    }
+
+    if ASC_IS_AIC {
+        asc_sync_intra_wait(PIPE_MTE1, SYNC_ID);
+        asc_copy_l12l0a(matrix_a_l0, matrix_a_l1, 0, 0, 1, 1, 1, 1);
+        asc_copy_l12l0b_transpose(matrix_b_l0, matrix_b_l1, 0, 0, 1, 1, 1, 1);
+        asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_mmad(output_l0, matrix_a_l0, matrix_b_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, 0, false, false, true);
+        asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_set_l0c2gm_nz2nd(1, 2, MATRIX_ELEMENTS);
+        asc_copy_l0c2gm(output, output_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, 0, 0, 0,
+                        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
+                        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    }
+    asc_sync_pipe(PIPE_ALL);
+}
+
+} // namespace
+
+int main()
+{
+    std::vector<float> output(MATRIX_ELEMENTS, 0.0f);
+    float* output_device = nullptr;
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    AscSyncIntraKernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    bool passed = true;
+    for (float value : output) {
+        passed = passed && (value == static_cast<float>(MATRIX_DIM));
+    }
+    std::cout << (passed ? "[Success] asc_sync_intra_arrive passed."
+                          : "[Failed] asc_sync_intra_arrive failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

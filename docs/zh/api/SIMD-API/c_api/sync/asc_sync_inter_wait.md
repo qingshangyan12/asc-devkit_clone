@@ -24,7 +24,6 @@
 - Atlas 训练系列产品：不支持
 <!-- end id8 -->
 
-
 ## 功能说明
 
 在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组间同步指不同group之间的同步，即所有block（所有AIC或所有AIV）之间的同步。
@@ -70,8 +69,4 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
-int64_t flag_id = 1;
-asc_sync_inter_arrive(PIPE_V, flag_id);
-asc_sync_inter_wait(PIPE_V, flag_id);  
-```
+`asc_sync_inter_wait`需与`asc_sync_inter_arrive`配对使用，具体调用示例请参考[asc_sync_inter_arrive调用示例](asc_sync_inter_arrive.md#调用示例)。

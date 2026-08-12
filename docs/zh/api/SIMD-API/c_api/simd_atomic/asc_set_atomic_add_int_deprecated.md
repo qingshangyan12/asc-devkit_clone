@@ -28,13 +28,11 @@
 
 **该接口已废弃，请使用[asc_set_atomic_add_int32](asc_set_atomic_add.md)替代。**
 
-头文件路径：`"c_api/atomic/atomic.h"`。
-
 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。
 
 ## 函数原型
 
-```c++
+```c
 [[deprecated("NOTICE: asc_set_atomic_add_int is deprecated. Please use asc_set_atomic_add_int32 instead.")]]
 __aicore__ inline void asc_set_atomic_add_int()
 ```

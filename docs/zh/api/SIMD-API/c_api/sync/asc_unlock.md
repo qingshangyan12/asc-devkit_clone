@@ -32,7 +32,7 @@
 
 - 内聚性更强，使用时与其它流水线解耦，可以简化反向同步。以PIPE_MTE2与PIPE_V之间同步为例，对比如下：
 
-    ```cpp
+    ```c
     // asc_sync_notify/asc_sync_wait机制
     For i=0:100
         if i > 0:
@@ -57,6 +57,7 @@
         asc_unlock(PIPE_V, 0)
     endFor
     ```
+
     其中EVENT_ID0为同步ID，取值范围为[0, 7]；mutex_id取值范围为[0, 31]。
 - 可以使用更多的同步信号量。
 
