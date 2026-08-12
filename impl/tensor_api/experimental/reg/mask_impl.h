@@ -27,10 +27,14 @@ template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> ones()
 {
     static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t) ||
-        sizeof(DataType) == sizeof(uint32_t), "full_mask only supports 8-bit, 16-bit, and 32-bit element types");
+        sizeof(DataType) == sizeof(uint32_t) || sizeof(DataType) == sizeof(uint64_t),
+        "full_mask only supports 8-bit, 16-bit, 32-bit, and 64-bit element types");
 
     reg_tensor<bool> result;
-    if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
+    if constexpr (sizeof(DataType) == sizeof(uint64_t)) {
+        result.reg = asc_create_mask_b32(PAT_ALL);
+        punpack(result.reg, result.reg, LOWER);
+    } else if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
         result.reg = asc_create_mask_b32(PAT_ALL);
     } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
         result.reg = asc_create_mask_b16(PAT_ALL);
