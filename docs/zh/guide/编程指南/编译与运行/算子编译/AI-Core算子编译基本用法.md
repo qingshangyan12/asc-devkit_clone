@@ -119,7 +119,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | --cce-auto-sync | 否 | 开启毕昇编译器自动同步。AI Core内部的执行单元是异步并行的，Tensor的读写可能存在数据依赖，开启后可由毕昇编译器自动插入部分同步。详细内容请参考[关键特性说明](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/key_features.md)。 |
 | --cce-auto-sync-log=&lt;file&gt; | 否 | 输出毕昇编译器自动同步插入信息到&lt;file&gt;文件中。 |
 
-更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
+更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。 
 
 <a id="note-reference"></a>
 
