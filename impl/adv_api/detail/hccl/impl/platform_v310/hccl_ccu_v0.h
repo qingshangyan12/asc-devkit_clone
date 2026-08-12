@@ -101,7 +101,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         "remoteWinOffset=0x%llx, localDataSize=%llu, workingFlag=%d, newCcuFlag=%d",
         usrIn, sendOffsets, sendSizes, remoteWinOffset, localDataSize, workingFlag_, newCcuFlag_);
 
-    AscendC::printf("ApiClient AlltoAllvWrite entry: usrIn=0x%llx, sendOffsets=0x%llx, sendSizes=0x%llx, "
+    AscendC::PRINTF("ApiClient AlltoAllvWrite entry: usrIn=0x%llx, sendOffsets=0x%llx, sendSizes=0x%llx, "
         "remoteWinOffset=0x%llx, localDataSize=%llu, workingFlag=%d, newCcuFlag=%d\n",
         usrIn, sendOffsets, sendSizes, remoteWinOffset, localDataSize, workingFlag_, newCcuFlag_);
 
@@ -300,13 +300,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
         if (workingFlag_) {
             KERNEL_LOG(KERNEL_INFO, "ApiClient CommitMsgInner before CcuPrepareForOp, handleId=%u, repeatIdx=%u", handleId, i);
-            AscendC::printf("ApiClient CommitMsgInner before PrepareOp, handleId=%u, repeatIdx=%u\n", handleId, i);
+            AscendC::PRINTF("ApiClient CommitMsgInner before PrepareOp, handleId=%u, repeatIdx=%u\n", handleId, i);
             CcuPrepareForOp(handleId);
             KERNEL_LOG(KERNEL_INFO, "ApiClient CommitMsgInner before CcuSendMsg, globalCurResId_=%u", globalCurResId_);
-            AscendC::printf("ApiClient CommitMsgInner before SendMsg, resId=%u\n", globalCurResId_);
+            AscendC::PRINTF("ApiClient CommitMsgInner before SendMsg, resId=%u\n", globalCurResId_);
             CcuSendMsg(globalCurResId_);
             KERNEL_LOG(KERNEL_INFO, "ApiClient CommitMsgInner after CcuSendMsg");
-            AscendC::printf("ApiClient CommitMsgInner after SendMsg\n");
+            AscendC::PRINTF("ApiClient CommitMsgInner after SendMsg\n");
         }
 
         msgQueueIsAvailable_[globalCurResId_] = false;
@@ -379,7 +379,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
             handleId, static_cast<uint32_t>(commonPrepareParam.commType.prepareType),
             commonPrepareParam.sendBuf, commonPrepareParam.recvBuf, commonPrepareParam.count,
             static_cast<uint32_t>(commonPrepareParam.dataType));
-        AscendC::printf("ApiClient CommonPrepareImpl working=true, handleId=%u, prepareType=%u, "
+        AscendC::PRINTF("ApiClient CommonPrepareImpl working=true, handleId=%u, prepareType=%u, "
             "sendBuf=0x%llx, recvBuf=0x%llx, count=%llu\n",
             handleId, static_cast<uint32_t>(commonPrepareParam.commType.prepareType),
             commonPrepareParam.sendBuf, commonPrepareParam.recvBuf, commonPrepareParam.count);

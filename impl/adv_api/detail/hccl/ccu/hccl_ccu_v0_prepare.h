@@ -17,7 +17,6 @@
 
 #include "hccl_ccu_xn_utils.h"
 #include "../impl/platform_v310/hccl_ccu_v0_def.h"
-#include "asc_printf.h"
 
 namespace AscendC {
 template <const auto& config>
@@ -91,7 +90,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         xnData_[4], xnData_[5], xnData_[6], xnData_[7],
         ccuParam_.rankId, ccuParam_.rankNum, ccuUsedXnNum_);
 
-    AscendC::printf("ApiClient CcuPrepareForAllToAllVWrite: sendBuf=0x%llx, sendSizes=0x%llx, sendOffsets=0x%llx, "
+    AscendC::PRINTF("ApiClient CcuPrepareForAllToAllVWrite: sendBuf=0x%llx, sendSizes=0x%llx, sendOffsets=0x%llx, "
         "remoteWinOffset=0x%llx, scratchAddr=0x%llx, sliceSize=%llu, goSize=[0x%llx,0x%llx,0x%llx,0x%llx], "
         "rankId=%u, rankSize=%u, xnNum=%u\n",
         xnData_[1], xnData_[2], xnData_[3], xnData_[8], xnData_[9], sliceSize,

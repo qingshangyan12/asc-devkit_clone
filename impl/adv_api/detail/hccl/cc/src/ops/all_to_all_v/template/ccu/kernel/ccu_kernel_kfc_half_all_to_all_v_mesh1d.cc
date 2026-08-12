@@ -306,8 +306,8 @@ CcuResult CcuKfcHalfAll2AllVMesh1DKernel(
     HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 4: PreSync");
     CCU_CHK_RET(PreSync(ctx));
 
-    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 5: DoHalfAllToAllVWrite + Wait (guarded by goSize0 != 0)");
-    CCU_IF(goSize0 != 0)
+    HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 5: DoHalfAllToAllVWrite + Wait");
+    CCU_IF(goSize2 != 0)
     {
         ccu::Variable miVar0;
         miVar0 = 0U;
@@ -319,9 +319,9 @@ CcuResult CcuKfcHalfAll2AllVMesh1DKernel(
         CCU_CHK_RET(DoHalfAllToAllVWrite(ctx, miVar1));
         CCU_CHK_RET(DoHalfAllToAllVWait(ctx));
     }
-    CCU_IF(goSize0 == 0)
+    CCU_IF(goSize2 == 0)
     {
-        HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] goSize0 == 0, skip data transfer");
+        HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] goSize2 == 0, skip data transfer");
     }
 
     HCCL_INFO("[CcuKfcHalfAll2AllVMesh1D] Stage 6: PostSync");
