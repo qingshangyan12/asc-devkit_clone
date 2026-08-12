@@ -58,9 +58,9 @@ PIPE_S
   - asc_hf32_round_mode::NEAREST_ZERO
   - asc_hf32_round_mode::NEAREST_EVEN
 
+<!-- npu="950" id8 -->
 ## 调用示例
 
-<!-- npu="950" id8 -->
 针对Ascend 950PR/Ascend 950DT，以下为可执行的调用示例代码：
 
 ```cpp

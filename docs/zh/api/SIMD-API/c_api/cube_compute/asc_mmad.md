@@ -234,9 +234,9 @@ PIPE_M
 
   注意，应避免nan输入，否则可能会产生执行报错；整数类型仅支持饱和模式。
 
+<!-- npu="950" id18 -->
 ## 调用示例
 
-<!-- npu="950" id18 -->
 针对Ascend 950PR/Ascend 950DT，示例如下：
 
 完整使用样例请参考[asc_mmad样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad)。
