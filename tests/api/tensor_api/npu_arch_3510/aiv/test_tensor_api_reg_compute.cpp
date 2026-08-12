@@ -18,7 +18,9 @@
 #include <mockcpp/mockcpp.hpp>
 
 #include "c_api/stub/cce_stub.h"
-#include "tensor_api/experimental/reg/reg_compute.h"
+#include "tensor_api/experimental/reg/basic_arithmetic.h"
+#include "tensor_api/experimental/reg/composite_compute.h"
+#include "tensor_api/experimental/reg/logical_compute.h"
 
 namespace {
 

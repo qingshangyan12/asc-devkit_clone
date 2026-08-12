@@ -10,22 +10,35 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/experimental/reg_compute_logic_impl.h is internal and must not be used directly."
+    "impl/tensor_api/arch/vector/experimental/logical_compute_impl.h is internal and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_LOGIC_IMPL
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOGICAL_COMPUTE_IMPL
 #endif
 
 /*!
- * \file reg_compute_logic_impl.h
+ * \file logical_compute_impl.h
  * \brief Register bitwise, shift, and comparison API implementations for asc::te.
  */
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_COMPUTE_LOGIC_IMPL_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_COMPUTE_LOGIC_IMPL_H
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_IMPL_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_IMPL_H
 
-#include "impl/tensor_api/arch/vector/experimental/reg_compute_arithmetic_impl.h"
+#include "impl/tensor_api/arch/utils/reg_compute_traits.h"
 
 namespace asc {
 namespace te {
+
+namespace detail {
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> broadcast_logic_scalar(T value, vector_bool mask)
+{
+    reg_tensor<T> dst;
+    asc_duplicate_scalar(dst.reg, static_cast<T>(value), mask);
+    dst.mask = mask;
+    return dst;
+}
+
+} // namespace detail
 
 // =============================================================================
 // Bitwise operations
@@ -37,7 +50,6 @@ __simd_callee__ inline reg_tensor<T> operator!(reg_tensor<T> src)
     reg_tensor<T> dst;
     static_assert(detail::supports_not_v<T>,
         "operator! supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_not_v<T>) {
         vector_bool isZero;
         asc_eq_scalar(isZero, src.reg, static_cast<T>(0), src.mask);
@@ -45,7 +57,6 @@ __simd_callee__ inline reg_tensor<T> operator!(reg_tensor<T> src)
         asc_duplicate_scalar(dst.reg, static_cast<T>(1), isZero);
         dst.mask = src.mask;
     }
-#endif
     return dst;
 }
 
@@ -55,29 +66,25 @@ __simd_callee__ inline reg_tensor<T> operator&(reg_tensor<T> src0, reg_tensor<T>
     reg_tensor<T> dst;
     static_assert(detail::supports_bitwise_v<T>,
         "operator& supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_bitwise_v<T>) {
         asc_and(dst.reg, src0.reg, src1.reg, src0.mask);
         dst.mask = src0.mask;
     }
-#endif
     return dst;
 }
 
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> = 0>
+template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar>>
 __simd_callee__ inline reg_tensor<T> operator&(reg_tensor<T> src, Scalar value)
 {
     static_assert(detail::supports_bitwise_v<T>,
         "scalar operator& supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_bitwise_v<T>) {
-        return src & detail::broadcast_scalar<T>(static_cast<T>(value), src.mask);
+        return src & detail::broadcast_logic_scalar<T>(static_cast<T>(value), src.mask);
     }
-#endif
     return {};
 }
 
-template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar> = 0>
+template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar>>
 __simd_callee__ inline reg_tensor<T> operator&(Scalar value, reg_tensor<T> src)
 {
     return src & value;
@@ -89,29 +96,25 @@ __simd_callee__ inline reg_tensor<T> operator|(reg_tensor<T> src0, reg_tensor<T>
     reg_tensor<T> dst;
     static_assert(detail::supports_bitwise_v<T>,
         "operator| supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_bitwise_v<T>) {
         asc_or(dst.reg, src0.reg, src1.reg, src0.mask);
         dst.mask = src0.mask;
     }
-#endif
     return dst;
 }
 
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> = 0>
+template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar>>
 __simd_callee__ inline reg_tensor<T> operator|(reg_tensor<T> src, Scalar value)
 {
     static_assert(detail::supports_bitwise_v<T>,
         "scalar operator| supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_bitwise_v<T>) {
-        return src | detail::broadcast_scalar<T>(static_cast<T>(value), src.mask);
+        return src | detail::broadcast_logic_scalar<T>(static_cast<T>(value), src.mask);
     }
-#endif
     return {};
 }
 
-template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar> = 0>
+template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar>>
 __simd_callee__ inline reg_tensor<T> operator|(Scalar value, reg_tensor<T> src)
 {
     return src | value;
@@ -123,29 +126,25 @@ __simd_callee__ inline reg_tensor<T> operator^(reg_tensor<T> src0, reg_tensor<T>
     reg_tensor<T> dst;
     static_assert(detail::supports_bitwise_v<T>,
         "operator^ supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_bitwise_v<T>) {
         asc_xor(dst.reg, src0.reg, src1.reg, src0.mask);
         dst.mask = src0.mask;
     }
-#endif
     return dst;
 }
 
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> = 0>
+template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar>>
 __simd_callee__ inline reg_tensor<T> operator^(reg_tensor<T> src, Scalar value)
 {
     static_assert(detail::supports_bitwise_v<T>,
         "scalar operator^ supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_bitwise_v<T>) {
-        return src ^ detail::broadcast_scalar<T>(static_cast<T>(value), src.mask);
+        return src ^ detail::broadcast_logic_scalar<T>(static_cast<T>(value), src.mask);
     }
-#endif
     return {};
 }
 
-template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar> = 0>
+template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar>>
 __simd_callee__ inline reg_tensor<T> operator^(Scalar value, reg_tensor<T> src)
 {
     return src ^ value;
@@ -157,16 +156,14 @@ __simd_callee__ inline reg_tensor<T> operator<<(reg_tensor<T> src, reg_tensor<Sh
     reg_tensor<T> dst;
     static_assert(detail::supports_shift_pair_v<T, ShiftT>,
         "register operator<< requires an integer source and a signed shift register of the same width");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_shift_pair_v<T, ShiftT>) {
         asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
         dst.mask = src.mask;
     }
-#endif
     return dst;
 }
 
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> = 0>
+template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar>>
 __simd_callee__ inline reg_tensor<T> operator<<(reg_tensor<T> src, Scalar shift)
 {
     reg_tensor<T> dst;
@@ -174,12 +171,11 @@ __simd_callee__ inline reg_tensor<T> operator<<(reg_tensor<T> src, Scalar shift)
         "scalar operator<< supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
     static_assert(::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>,
         "scalar operator<< requires an integer shift value");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (detail::supports_shift_v<T> && ::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>) {
+    if constexpr (detail::supports_shift_v<T> &&
+        ::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>) {
         asc_shiftleft_scalar(dst.reg, src.reg, static_cast<int16_t>(shift), src.mask);
         dst.mask = src.mask;
     }
-#endif
     return dst;
 }
 
@@ -189,16 +185,14 @@ __simd_callee__ inline reg_tensor<T> operator>>(reg_tensor<T> src, reg_tensor<Sh
     reg_tensor<T> dst;
     static_assert(detail::supports_shift_pair_v<T, ShiftT>,
         "register operator>> requires an integer source and a signed shift register of the same width");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_shift_pair_v<T, ShiftT>) {
         asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
         dst.mask = src.mask;
     }
-#endif
     return dst;
 }
 
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> = 0>
+template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar>>
 __simd_callee__ inline reg_tensor<T> operator>>(reg_tensor<T> src, Scalar shift)
 {
     reg_tensor<T> dst;
@@ -206,12 +200,11 @@ __simd_callee__ inline reg_tensor<T> operator>>(reg_tensor<T> src, Scalar shift)
         "scalar operator>> supports int8_t, uint8_t, int16_t, uint16_t, int32_t, and uint32_t");
     static_assert(::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>,
         "scalar operator>> requires an integer shift value");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    if constexpr (detail::supports_shift_v<T> && ::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>) {
+    if constexpr (detail::supports_shift_v<T> &&
+        ::AscendC::Std::is_integral_v<::AscendC::Std::remove_cvref_t<Scalar>>) {
         asc_shiftright_scalar(dst.reg, src.reg, static_cast<int16_t>(shift), src.mask);
         dst.mask = src.mask;
     }
-#endif
     return dst;
 }
 
@@ -228,7 +221,6 @@ __simd_callee__ inline reg_tensor<bool> compare(reg_tensor<T> src0, reg_tensor<T
 {
     reg_tensor<bool> dst;
     static_assert(supports_compare_v<T>, "comparison does not support this element type");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (supports_compare_v<T>) {
         if constexpr (Op == comparison_op::EQ) {
             asc_eq(dst.reg, src0.reg, src1.reg, src0.mask);
@@ -244,7 +236,6 @@ __simd_callee__ inline reg_tensor<bool> compare(reg_tensor<T> src0, reg_tensor<T
             asc_ge(dst.reg, src0.reg, src1.reg, src0.mask);
         }
     }
-#endif
     return dst;
 }
 
@@ -253,7 +244,6 @@ __simd_callee__ inline reg_tensor<bool> compare(reg_tensor<T> src, Scalar value)
 {
     reg_tensor<bool> dst;
     static_assert(supports_compare_v<T>, "comparison does not support this element type");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (supports_compare_v<T>) {
         if constexpr (Op == comparison_op::EQ) {
             asc_eq_scalar(dst.reg, src.reg, static_cast<T>(value), src.mask);
@@ -269,7 +259,6 @@ __simd_callee__ inline reg_tensor<bool> compare(reg_tensor<T> src, Scalar value)
             asc_ge_scalar(dst.reg, src.reg, static_cast<T>(value), src.mask);
         }
     }
-#endif
     return dst;
 }
 
@@ -282,13 +271,13 @@ __simd_callee__ inline reg_tensor<bool> compare(reg_tensor<T> src, Scalar value)
         return detail::compare<detail::comparison_op::KIND>(src0, src1);                                         \
     }                                                                                                             \
                                                                                                                   \
-    template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> = 0>                                \
+    template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar>>                                \
     __simd_callee__ inline reg_tensor<bool> operator OP(reg_tensor<T> src, Scalar value)                          \
     {                                                                                                             \
         return detail::compare<detail::comparison_op::KIND>(src, value);                                         \
     }                                                                                                             \
                                                                                                                   \
-    template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar> = 0>                                \
+    template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar>>                                \
     __simd_callee__ inline reg_tensor<bool> operator OP(Scalar value, reg_tensor<T> src)                          \
     {                                                                                                             \
         return detail::compare<detail::comparison_op::REVERSED_KIND>(src, value);                                \
@@ -306,9 +295,9 @@ ASC_TE_DEFINE_COMPARISON(>=, GE, LE)
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_COMPUTE_LOGIC_IMPL_H
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_IMPL_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_LOGIC_IMPL)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOGICAL_COMPUTE_IMPL)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_LOGIC_IMPL
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOGICAL_COMPUTE_IMPL
 #endif
