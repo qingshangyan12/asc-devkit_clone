@@ -56,7 +56,7 @@ PIPE_S
 - 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
 - 方向配置一旦写入会持续生效，后续矩阵乘加指令若不显式重新配置，将沿用当前方向配置。如需切换为先沿行方向、再沿列方向生成矩阵计算结果分形，请重新调用[asc_set_mmad_direction_m](./asc_set_mmad_direction_m.md)接口。
 
-<!-- npu="950" id1 -->
+<!-- npu="950" id8 -->
 ## 调用示例
 
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
@@ -156,4 +156,4 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-<!-- end id1 -->
+<!-- end id8 -->
