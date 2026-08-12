@@ -47,7 +47,7 @@ $$
 | C | L0C Buffer | M×N | Nz | 16×16 |
 | Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
-当矩阵数据类型为FP8时，`K0 = 32`；当矩阵数据类型为FP4时，`K0 = 64`。
+当矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时，`K0 = 32`；当矩阵数据类型为`fp4x2_e2m1_t`、`fp4x2_e1m2_t`时，`K0 = 64`。
 
 ## 函数原型
 
@@ -105,8 +105,8 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，数据类型为`float`，需按照1024字节对齐。 |
-| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>FP4场景需按照512字节对齐，FP8场景需按照1024字节对齐。<br>ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16。 |
-| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>FP4场景需按照512字节对齐，FP8场景需按照1024字节对齐。<br>ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。 |
+| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>矩阵数据类型为`fp4x2_e2m1_t`、`fp4x2_e1m2_t`时需按照512字节对齐，矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐。<br>ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16。 |
+| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>矩阵数据类型为`fp4x2_e2m1_t`、`fp4x2_e1m2_t`时需按照512字节对齐，矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐。<br>ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。 |
 | left_height | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | n_dim | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]，并且需为64的倍数。 |
 | right_width | 输入 | 右矩阵B和结果矩阵C的N维大小，单位为元素，取值范围为[0, 4095]。 |
@@ -165,8 +165,8 @@ PIPE_M
 以下为可执行的调用示例代码：
 
 ```cpp
-// 假设示例代码保存为：asc_mmad_mx.asc
-// 编译与运行命令：bisheng asc_mmad_mx.asc -o main --npu-arch=dav-3510; ./main
+// 将代码保存为example.asc后，使用以下命令编译与运行：
+// bisheng example.asc -o main --npu-arch=dav-3510; ./main
 
 #include <cstdint>
 #include <iostream>

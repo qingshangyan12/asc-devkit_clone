@@ -63,8 +63,8 @@ PIPE_S
 针对Ascend 950PR/Ascend 950DT，以下为可执行的调用示例代码：
 
 ```cpp
-// 假设示例代码保存为：asc_set_mmad_direction_m.asc
-// 编译与运行命令：bisheng asc_set_mmad_direction_m.asc -o main --npu-arch=dav-3510; ./main
+// 将代码保存为example.asc后，使用以下命令编译与运行：
+// bisheng example.asc -o main --npu-arch=dav-3510; ./main
 
 #include <chrono>
 #include <cstdint>
