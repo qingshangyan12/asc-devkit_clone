@@ -75,7 +75,7 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst_ali
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 #### 典型示例
 
@@ -198,7 +198,7 @@ void print_data(const char* label, const std::vector<T>& values)
 }
 
 constexpr uint32_t REGISTER_BYTES = 256;
-constexpr uint32_t BUFFER_BYTES = 320;
+constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void Store(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
