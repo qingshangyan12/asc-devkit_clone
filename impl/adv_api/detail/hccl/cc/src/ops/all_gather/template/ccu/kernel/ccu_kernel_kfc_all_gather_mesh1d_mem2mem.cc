@@ -269,6 +269,8 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
         goSize3, currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride, lastSliceSize,
 >>>>>>> f5610b3dd (test)
         isInputOutputEqual));
+    HCCL_INFO("[KFCAG_DEBUG][Kernel] rankId[%u] rankSize[%u] channelCount[%u]",
+        rankId, rankSize, channelCount);
     CCU_CHK_RET(PreSync(ctx));
 
     ctx.sliceSize = (ctx.rankId == (ctx.rankSize - 1)) ? ctx.lastSliceSize : ctx.normalSliceSize;
