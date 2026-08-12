@@ -54,12 +54,17 @@ PIPE_S
 <!-- npu="950" id8 -->
 ## 调用示例
 
-针对Ascend 950PR/Ascend 950DT，以下为可执行的调用示例代码：
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+```
+
+以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
 
 ```cpp
-// 将代码保存为example.asc后，使用以下命令编译与运行：
-// bisheng example.asc -o main --npu-arch=dav-3510; ./main
-
 #include <cmath>
 #include <cstdint>
 #include <iostream>
