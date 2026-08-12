@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以单核Softmax为例，展示从MemBase到RegBase、从基础循环到使用循环融合、循环展开等优化手段的完整性能调优路径，包含Case 0-5共六个逐步优化的版本。
+本样例以单核Softmax为例，展示从MemBase到RegBase、从基础循环到使用循环融合、循环展开等优化手段的完整性能调优路径，并基于仿真指令级别日志展开分析Case 5和Case 6对比地址和循环变量的数据类型对性能的影响，共包含Case 0-6七个版本。
 
 **优化路径**：
 - Case 0 → Case 1：MemBase → RegBase API（寄存器级计算）
@@ -32,7 +32,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   ├── softmax.asc             // Ascend C样例实现（Case 0-5六个版本）
+│   ├── softmax.asc             // Ascend C样例实现（Case 0-6七个版本）
 │   └── README.md               // 样例说明文档
 ```
 
@@ -72,6 +72,7 @@ $$
 | **Case 3** | RegBase | UpdateMask模式 + 外层循环展开，提升指令双发能力 | 2197 cycles |
 | **Case 4** | RegBase | 主尾块模式（main-tail block），替代UpdateMask | 3424 cycles |
 | **Case 5** | RegBase | 主尾块模式 + 外层循环展开 + ExpSub融合指令（最优） | 1785 cycles |
+| **Case 6** | RegBase | Case 5计算流程，地址和循环变量使用`uint32_t` | 见仿真指令日志分析 |
 
 
 **表2 AI Core 性能指标字段说明表**
@@ -338,7 +339,7 @@ Case 5同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
 
 - 切换版本
 
-  通过 `-DSCENARIO_NUM=N` (N=0~5) 指定要编译的版本：
+  通过`-DSCENARIO_NUM=N`（N=0~6）指定要编译的版本：
 
   | SCENARIO_NUM | 版本 | 说明 | CMAKE_VF_MODE |
   |:---:|:---:|:---|:---:|
@@ -347,7 +348,8 @@ Case 5同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
   | 2 | Case 2 | RegBase，UpdateMask+ExpSub+融合 | false |
   | 3 | Case 3 | RegBase，UpdateMask+循环展开 | false |
   | 4 | Case 4 | RegBase，主尾块模式 | false |
-  | 5 | Case 5 | RegBase，主尾块+循环展开+ExpSub | false |
+  | 5 | Case 5 | RegBase，主尾块+循环展开+ExpSub，地址和循环变量使用`uint16_t` | false |
+  | 6 | Case 6 | RegBase，主尾块+循环展开+ExpSub，地址和循环变量使用`uint32_t` | false |
 
 - 配置环境变量
   ```bash
@@ -377,7 +379,7 @@ Case 5同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
   |:---|:---|:---|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构 |
-  | `SCENARIO_NUM` | `0`~`5` | 版本编号 Case 0-5 |
+  | `SCENARIO_NUM` | `0`~`6` | 版本编号Case 0-6 |
   | `CMAKE_VF_MODE` | `true`、`false` | VF融合模式：默认为false |
 
 ### 性能分析
@@ -388,3 +390,98 @@ Case 5同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
 msopprof ./demo
 cat ./OPPROF_*/PipeUtilization.csv
 ```
+
+## 基于指令级的仿真日志性能分析
+
+### 对比场景
+
+本节对比Case 5和Case 6中参与地址计算和循环控制的标量变量类型，输入Shape、数据类型、计算流程和其他编译选项保持一致。编译和运行模式指定为**sim**。
+
+| 场景 | 变量设置 | 构建目录 |
+| --- | --- | --- |
+| Case 5 | `aDim`、`rDim`、`rDimAlign`、`tail`、`repeatTimesMain`、`hasTail`、`halfA`、`oneRepeatSize`以及循环变量`i`、`j`均使用`uint16_t` | `build_sim_case5` |
+| Case 6 | 上述参与地址计算和循环控制的变量均使用`uint32_t` | `build_sim_case6` |
+
+两种场景均使用CANN 9.2.0、`dav-3510`架构和关闭VF融合的配置。Case 5通过`-DSCENARIO_NUM=5`选择，Case 6通过`-DSCENARIO_NUM=6`选择。仿真器使用串行模式，实际加载的配置文件来自CANN安装目录下的`simulator/dav_3510`。本次直接执行sim模式生成的`demo`，未调用性能数据采集工具。
+
+### 日志相对路径
+
+仿真器在`./demo`的当前运行目录直接生成日志。本次分析使用以下日志，文件均已保留：
+
+| 场景 | 出队指令日志 | 同目录其他日志 |
+| --- | --- | --- |
+| Case 5 | `build_sim_case5/core0.veccore0.instr_popped_log.dump` | `core0.veccore0.instr_log.dump`、`core0.veccore0.ccu_log.dump`、`core0.veccore0.dcache_log.dump` |
+| Case 6 | `build_sim_case6/core0.veccore0.instr_popped_log.dump` | `core0.veccore0.instr_log.dump`、`core0.veccore0.ccu_log.dump`、`core0.veccore0.dcache_log.dump` |
+
+### 对比结果
+
+`instr_popped_log`末尾的kernel tick和出队日志行数如下。**这里的tick来自sim仿真日志，不是性能采集工具生成的上板性能数据**。日志行数包含完成记录，用于比较日志规模，不等同于严格的动态指令条数；各助记符计数则通过逐行统计对应指令得到。
+
+| 指标 | Case 5（`uint16_t`） | Case 6（`uint32_t`） | 差异 |
+| --- | ---: | ---: | ---: |
+| kernel tick | 17610 | 19029 | +1419（+8.06%） |
+| `instr_popped_log`行数 | 7870 | 9268 | +1398（+17.76%） |
+| `RVECEX`流水日志 | 1795 | 1795 | 0 |
+| MTE2流水日志 | 261 | 261 | 0 |
+| MTE3流水日志 | 133 | 133 | 0 |
+| `VF` | 1 | 1 | 0 |
+| `RV_VLOOPv2` | 258 | 258 | 0 |
+| `VF instr_num` | `0x2e`（46） | `0x50`（80） | +34（+73.91%） |
+| 外层`RV_VLOOPv2 instr_num` | 19 | 30 | +11（+57.89%） |
+| Vector Core加载指令 | 1024条`RV_VLD` | 1024条`RV_VLDI` | 数量不变，寻址形式变化 |
+| Vector Core存储指令 | 512条`RV_VST` | 512条`RV_VSTI` | 数量不变，寻址形式变化 |
+| `RV_SMOV` | 0 | 902 | +902 |
+| `RV_SADD` | 0 | 515 | +515 |
+| `RV_SZEROEXT` | 0 | 128 | +128 |
+
+两种场景的MTE2流水日志均为261条，MTE3流水日志均为133条，`RVECEX`流水日志均为1795条，Vector Core加载和存储次数也相同。因此，差异不是由GM与Unified Buffer（UB）搬运量增加或Softmax向量计算量变化引入的。
+
+源码中的`__simd_vf__`函数会映射为指令日志中的`VF`，`__simd_vf__`函数内的循环会映射为`RV_VLOOPv2`。Case 5和Case 6均只有1次`VF`启动和258条动态`RV_VLOOPv2`，说明VF启动次数和循环执行次数没有变化。但是，Case 6的`VF instr_num`由`0x2e`（46）增加到`0x50`（80），外层`RV_VLOOPv2 instr_num`由19增加到30，说明相同循环结构内包含了更多地址生成和循环控制指令。
+
+### 关键日志片段
+
+Case 5和Case 6的`VF`及`RV_VLOOPv2`日志如下：
+
+```text
+# Case 5：__simd_vf__映射为VF，循环映射为RV_VLOOPv2
+[00010055] (PC: 0x10d0d508) PUSHQ  : VF addr: 0x10d0d900, instr_num: 0x2e
+[00010074] (PC: 0x10d0d90c) RVECLP : RV_VLOOPv2 Sn[9]=0x40, Sn2[10]=0x0, instr_num: 19, layer: 0010, last: 0
+
+# Case 6：VF和RV_VLOOPv2数量不变，但循环体指令数增加
+[00010482] (PC: 0x10d0d450) PUSHQ  : VF addr: 0x10d0d800, instr_num: 0x50
+[00010502] (PC: 0x10d0d824) RVECLP : RV_VLOOPv2 Sn[3]=0x40, Sn2[4]=0x80, instr_num: 30, layer: 0010, last: 0
+```
+
+全部保持`uint16_t`时，加载指令使用`RV_VLD`的地址修饰量`Am`。内层循环推进时，`Am`从`0x0`变为`0x100`，无需在每次加载前显式更新完整的32位地址：
+
+```text
+[00010079] (PC: 0x10d0d91c) RVECLD : RV_VLD Vd[3], Sn[12]=0x0, Sn2[13]=0x0, Am[0]=0x0, dist:NORAML
+[00010080] (PC: 0x10d0d91c) RVECLD : RV_VLD Vd[3], Sn[12]=0x0, Sn2[13]=0x0, Am[0]=0x100, dist:NORAML
+```
+
+地址和循环变量改为`uint32_t`后，加载变为带自增语义的`RV_VLDI`。在加载前后可以看到显式的32位标量移动、地址加法和扩展指令：
+
+```text
+[00010504] (PC: 0x10d0d808) RVECSU : RV_SMOV dtype:B32, Sd[65]=0x0, Sn[0]=0x0, Sn2[1]=0x0
+[00010509] (PC: 0x10d0d818) RVECSU : RV_SADD dtype:B32, Sd[69]=0x28000, Sn[14]=0x20000, Sn2[15]=0x2, Sm[67]=0x8000
+[00010512] (PC: 0x10d0d828) RVECSU : RV_SZEROEXT dtype:UNDEF, Sd[68]=0x0, Sn[60]=0x0, Sn2[61]=0x0
+[00010516] (PC: 0x10d0d844) RVECLD : RV_VLDI Vd[3], Sn[71]=0x100, #offset=8, dist:NORAML, #p=1
+[00010526] (PC: 0x10d0d890) RVECSU : RV_SADD dtype:B32, Sd[69]=0x28200, Sn[69]=0x28200, Sm[64]=0x200
+[00010529] (PC: 0x10d0d89c) RVECSU : RV_SADD dtype:B32, Sd[65]=0x200, Sn[65]=0x200, Sm[64]=0x200
+```
+
+日志末尾直接记录了两种场景的kernel执行tick：
+
+```text
+# build_sim_case5/core0.veccore0.instr_popped_log.dump
+core: 0, subcore: 1, start: 208, tick: 17610, kernelId: 0, blkID: 0, blkDim: 1, done
+
+# build_sim_case6/core0.veccore0.instr_popped_log.dump
+core: 0, subcore: 1, start: 208, tick: 19029, kernelId: 0, blkID: 0, blkDim: 1, done
+```
+
+### 结论
+
+地址和循环变量改为`uint32_t`后，`VF`和`RV_VLOOPv2`的动态数量没有变化，但对应的`instr_num`明显增加。编译器不再采用`uint16_t`场景中的`Am`地址修饰寻址，而是生成`RV_VLDI`、`RV_VSTI`以及大量配套的32位`RV_SMOV`、`RV_SADD`、`RV_SZEROEXT`指令。新增的地址初始化、地址递推和循环控制指令使出队日志增加1398行，并占用Vector Core中的标量执行流水，最终使kernel仿真tick增加1419，即约8.06%。
+
+因此，本组输入范围能够由`uint16_t`正确表示时，保持地址计算和循环控制变量为`uint16_t`有利于编译器使用更紧凑的地址修饰模式。性能差异的直接来源是标量地址生成与循环控制开销，而不是Softmax向量计算指令或数据搬运次数变化。
