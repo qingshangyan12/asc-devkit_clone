@@ -23,6 +23,13 @@
 
 namespace asc {
 namespace te {
+
+/** @brief Selects the even or odd half of a register for widening/narrowing composite operations. */
+enum class reg_layout {
+    zero,
+    one,
+};
+
 namespace detail {
 
 template <typename T>
@@ -45,10 +52,8 @@ using enable_if_scalar_t =
 
 // These capability sets are the intersection of the documented Ascend 950
 // type matrices and the operations implemented by the current reg_tensor/C
-// API backend. The legacy documentation additionally lists software-emulated
-// int64_t/uint64_t/complex32/complex64 combinations for several APIs. Those
-// combinations must stay rejected until their multi-register implementations
-// are ported to the new reg_tensor representation.
+// API backend. Software-emulated types are enabled only where the corresponding
+// multi-register implementation has been ported to reg_tensor.
 template <typename T>
 inline constexpr bool supports_abs_v =
     ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
@@ -104,6 +109,22 @@ inline constexpr bool supports_shift_pair_v =
 template <typename T>
 inline constexpr bool supports_compare_v =
     ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_axpy_v = ::AscendC::Std::is_one_of_v<T, half, float, int64_t, uint64_t>;
+
+template <typename T>
+inline constexpr bool supports_abs_sub_v = ::AscendC::Std::is_one_of_v<T, half, float, int64_t>;
+
+template <typename T>
+inline constexpr bool supports_exp_sub_v = ::AscendC::Std::is_one_of_v<T, half, float>;
+
+template <typename T>
+inline constexpr bool supports_mul_dst_add_v = ::AscendC::Std::is_one_of_v<T, half, bfloat16_t, float>;
+
+template <typename T>
+inline constexpr bool supports_mul_add_dst_v =
+    ::AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t, uint64_t>;
 
 } // namespace detail
 } // namespace te

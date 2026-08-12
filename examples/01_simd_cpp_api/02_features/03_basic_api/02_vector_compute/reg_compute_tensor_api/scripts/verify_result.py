@@ -15,22 +15,25 @@ import numpy as np
 
 
 VECTOR_LENGTH = 64
-FLOAT_RESULT_ROWS = 38
+FLOAT_RESULT_ROWS = 44
 INT_RESULT_ROWS = 14
+INT64_VECTOR_LENGTH = 32
+INT64_RESULT_ROWS = 3
 MATH_ROW_BEGIN = 1
 MATH_ROW_END = 6
 COMPARE_ROW_BEGIN = 31
 COMPARE_ROW_END = 37
 MATH_TOLERANCE = 5e-3
 STANDARD_TOLERANCE = 1e-4
+COMPOSITE_MATH_ROWS = (40, 43)
 
 
-def load_result(path: str, dtype: np.dtype, rows: int) -> np.ndarray:
+def load_result(path: str, dtype: np.dtype, rows: int, vector_length: int = VECTOR_LENGTH) -> np.ndarray:
     result = np.fromfile(path, dtype=dtype)
-    expected_size = rows * VECTOR_LENGTH
+    expected_size = rows * vector_length
     if result.size != expected_size:
         raise ValueError(f"{path} contains {result.size} elements, expected {expected_size}")
-    return result.reshape(rows, VECTOR_LENGTH)
+    return result.reshape(rows, vector_length)
 
 
 def report_mismatch(kind: str, actual: np.ndarray, golden: np.ndarray, matches: np.ndarray) -> None:
@@ -53,6 +56,8 @@ def verify_float(actual_path: str, golden_path: str) -> bool:
     relative_tolerance = np.full((FLOAT_RESULT_ROWS, 1), STANDARD_TOLERANCE, dtype=np.float32)
     absolute_tolerance[MATH_ROW_BEGIN:MATH_ROW_END] = MATH_TOLERANCE
     relative_tolerance[MATH_ROW_BEGIN:MATH_ROW_END] = MATH_TOLERANCE
+    absolute_tolerance[list(COMPOSITE_MATH_ROWS)] = MATH_TOLERANCE
+    relative_tolerance[list(COMPOSITE_MATH_ROWS)] = MATH_TOLERANCE
     matches = np.isclose(actual, golden, rtol=relative_tolerance, atol=absolute_tolerance)
     matches[COMPARE_ROW_BEGIN:COMPARE_ROW_END] = (
         actual[COMPARE_ROW_BEGIN:COMPARE_ROW_END] == golden[COMPARE_ROW_BEGIN:COMPARE_ROW_END]
@@ -77,12 +82,28 @@ def verify_int(actual_path: str, golden_path: str) -> bool:
     return True
 
 
+def verify_int64(actual_path: str, golden_path: str) -> bool:
+    actual = load_result(actual_path, np.int64, INT64_RESULT_ROWS, INT64_VECTOR_LENGTH)
+    golden = load_result(golden_path, np.int64, INT64_RESULT_ROWS, INT64_VECTOR_LENGTH)
+    matches = actual == golden
+    if not np.all(matches):
+        report_mismatch("Int64", actual, golden, matches)
+        return False
+    print("Int64 results passed.")
+    return True
+
+
 def main() -> None:
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 7:
         raise ValueError(
-            "Usage: verify_result.py <float_output> <float_golden> <int_output> <int_golden>"
+            "Usage: verify_result.py <float_output> <float_golden> <int_output> <int_golden> "
+            "<int64_output> <int64_golden>"
         )
-    passed = verify_float(sys.argv[1], sys.argv[2]) and verify_int(sys.argv[3], sys.argv[4])
+    passed = (
+        verify_float(sys.argv[1], sys.argv[2])
+        and verify_int(sys.argv[3], sys.argv[4])
+        and verify_int64(sys.argv[5], sys.argv[6])
+    )
     if not passed:
         raise ValueError("[ERROR] result error")
     print("test pass!")
