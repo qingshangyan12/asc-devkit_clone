@@ -11,10 +11,10 @@ Conv3DBackpropInput的计算公式为：
 -   ∂L/∂X为特征矩阵的反向传播误差GradInput。
 
 **图1**  卷积层的前后向传播示意图<a name="fig1069918872512"></a>  
-![](../../../../figures/卷积层的前后向传播示意图.png "卷积层的前后向传播示意图")
+![](../../../../figures/conv_forward_backward.png "卷积层的前后向传播示意图")
 
 **图2**  反向传播误差计算示意图<a name="fig1953483815252"></a>  
-![](../../../../figures/反向传播误差计算示意图.png "反向传播误差计算示意图")
+![](../../../../figures/backward_error_compute.png "反向传播误差计算示意图")
 
 Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括为：
 
@@ -114,7 +114,7 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
 
 4.  完成卷积反向操作。
 
-    调用[Iterate](Iterate-111.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算。
+    调用[Iterate](Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算。
 
     ```
     while (gradInput_.Iterate()) {
