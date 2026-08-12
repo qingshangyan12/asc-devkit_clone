@@ -38,6 +38,9 @@ extern "C" {
 
 std::mutex g_mutex;
 thread_local ThreadHandle curThread;
+uint64_t g_workspaceReportedSizeOverride = 0;
+bool g_workspaceGetNullPtr = false;
+uint32_t g_engineCtxDestroyCallCount = 0;
 
 HcclResult HcclRankGraphGetRankSizeByLayer(HcclComm comm, uint32_t netLayer, uint32_t* rankNum)
 {
@@ -352,7 +355,23 @@ HcclResult HcclEngineCtxGet(HcclComm comm, const char* engineTag, CommEngine eng
 {
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
     CHK_PTR_NULL(simComm);
-    return simComm->contextManager_->GetCommEngineCtx(std::string(engineTag), engine, ctx, size);
+    HcclResult ret = simComm->contextManager_->GetCommEngineCtx(std::string(engineTag), engine, ctx, size);
+    if (ret != HCCL_SUCCESS) {
+        return ret;
+    }
+    const std::string tag(engineTag);
+    constexpr const char* WORKSPACE_SUFFIX = "_workSpace";
+    constexpr size_t WORKSPACE_SUFFIX_SIZE = sizeof("_workSpace") - 1;
+    if (tag.size() >= WORKSPACE_SUFFIX_SIZE &&
+        tag.compare(tag.size() - WORKSPACE_SUFFIX_SIZE, WORKSPACE_SUFFIX_SIZE, WORKSPACE_SUFFIX) == 0) {
+        if (g_workspaceReportedSizeOverride != 0) {
+            *size = g_workspaceReportedSizeOverride;
+        }
+        if (g_workspaceGetNullPtr) {
+            *ctx = nullptr;
+        }
+    }
+    return HCCL_SUCCESS;
 }
 
 HcclResult HcclEngineCtxCopy(
@@ -875,8 +894,14 @@ HcclResult HcomGetCommHandleByGroup(const char* group, HcclComm* commHandle)
 
 HcclResult HcclEngineCtxDestroy(HcclComm comm, const char* ctxTag, CommEngine engine)
 {
-    HCCL_WARNING("[%s] not support.", __func__);
-    return HCCL_SUCCESS;
+    ++g_engineCtxDestroyCallCount;
+    auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
+    CHK_PTR_NULL(simComm);
+    void* ctx = nullptr;
+    uint64_t size = 0;
+    CHK_RET(simComm->contextManager_->GetCommEngineCtx(std::string(ctxTag), engine, &ctx, &size));
+    HcclMem engineCtx{HCCL_MEM_TYPE_HOST, ctx, size};
+    return simComm->contextManager_->DestroyCommEngineCtx(&engineCtx);
 }
 
 HcclResult HcommThreadJoin(ThreadHandle thread, uint32_t timeout)
