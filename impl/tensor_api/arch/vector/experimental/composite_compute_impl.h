@@ -10,17 +10,17 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/experimental/reg_compute_composite_impl.h is internal and must not be used directly."
+    "impl/tensor_api/arch/vector/experimental/composite_compute_impl.h is internal and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_COMPOSITE_IMPL
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_COMPUTE_IMPL
 #endif
 
 /*!
- * \file reg_compute_composite_impl.h
+ * \file composite_compute_impl.h
  * \brief Register composite compute API implementations for asc::te.
  */
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_COMPUTE_COMPOSITE_IMPL_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_COMPUTE_COMPOSITE_IMPL_H
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_IMPL_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_IMPL_H
 
 #include "impl/tensor_api/arch/utils/reg_compute_traits.h"
 
@@ -129,7 +129,6 @@ __simd_callee__ inline reg_tensor<T> axpy(
     reg_tensor<T> dst, reg_tensor<T> src, detail::type_identity_t<T> scalar)
 {
     static_assert(detail::supports_axpy_v<T>, "axpy supports half, float, int64_t, and uint64_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_axpy_v<T>) {
         if constexpr (sizeof(T) == sizeof(uint64_t)) {
             vector_bool mask = detail::pack_uint64_mask(dst.mask);
@@ -141,7 +140,6 @@ __simd_callee__ inline reg_tensor<T> axpy(
             asc_axpy(dst.reg, src.reg, scalar, dst.mask);
         }
     }
-#endif
     return dst;
 }
 
@@ -151,7 +149,6 @@ __simd_callee__ inline reg_tensor<T> abs_sub(reg_tensor<T> src0, reg_tensor<T> s
 {
     reg_tensor<T> dst;
     static_assert(detail::supports_abs_sub_v<T>, "abs_sub supports half, float, and int64_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_abs_sub_v<T>) {
         if constexpr (::AscendC::Std::is_same_v<T, int64_t>) {
             vector_bool mask = detail::pack_uint64_mask(src0.mask);
@@ -163,17 +160,15 @@ __simd_callee__ inline reg_tensor<T> abs_sub(reg_tensor<T> src0, reg_tensor<T> s
         }
         dst.mask = src0.mask;
     }
-#endif
     return dst;
 }
 
 /** @brief Computes exp(src0 - src1); half inputs are widened to float by the instruction. */
-template <reg_layout Layout = reg_layout::zero, typename T>
+template <reg_layout Layout, typename T>
 __simd_callee__ inline reg_tensor<float> exp_sub(reg_tensor<T> src0, reg_tensor<T> src1)
 {
     reg_tensor<float> dst;
     static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float inputs and returns float");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_exp_sub_v<T>) {
         if constexpr (Layout == reg_layout::zero) {
             vexpdif(dst.reg, src0.reg, src1.reg, src0.mask, PART_EVEN);
@@ -182,7 +177,6 @@ __simd_callee__ inline reg_tensor<float> exp_sub(reg_tensor<T> src0, reg_tensor<
         }
         dst.mask = src0.mask;
     }
-#endif
     return dst;
 }
 
@@ -192,11 +186,9 @@ __simd_callee__ inline reg_tensor<T> mul_dst_add(
     reg_tensor<T> dst, reg_tensor<T> src0, reg_tensor<T> src1)
 {
     static_assert(detail::supports_mul_dst_add_v<T>, "mul_dst_add supports half, bfloat16_t, and float");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_mul_dst_add_v<T>) {
         vmadd(dst.reg, src0.reg, src1.reg, dst.mask, MODE_ZEROING);
     }
-#endif
     return dst;
 }
 
@@ -207,7 +199,6 @@ __simd_callee__ inline reg_tensor<T> mul_add_dst(
 {
     static_assert(detail::supports_mul_add_dst_v<T>,
         "mul_add_dst supports int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t, and uint64_t");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (detail::supports_mul_add_dst_v<T>) {
         if constexpr (sizeof(T) == sizeof(uint64_t)) {
             vector_bool mask = detail::pack_uint64_mask(dst.mask);
@@ -219,32 +210,29 @@ __simd_callee__ inline reg_tensor<T> mul_add_dst(
             vmula(dst.reg, src0.reg, src1.reg, dst.mask, MODE_ZEROING);
         }
     }
-#endif
     return dst;
 }
 
 /** @brief Multiplies float input by scalar and rounds the result to half. */
-template <reg_layout Layout = reg_layout::zero>
+template <reg_layout Layout>
 __simd_callee__ inline reg_tensor<half> muls_cast(reg_tensor<float> src, float scalar)
 {
     reg_tensor<half> dst;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (Layout == reg_layout::zero) {
         vmulscvt(dst.reg, src.reg, scalar, src.mask, PART_EVEN);
     } else {
         vmulscvt(dst.reg, src.reg, scalar, src.mask, PART_ODD);
     }
     dst.mask = src.mask;
-#endif
     return dst;
 }
 
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_COMPUTE_COMPOSITE_IMPL_H
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_IMPL_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_COMPOSITE_IMPL)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_COMPUTE_IMPL)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_COMPOSITE_IMPL
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_COMPUTE_IMPL
 #endif
