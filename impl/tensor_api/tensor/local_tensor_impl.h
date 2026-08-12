@@ -68,6 +68,30 @@ __simd_callee__ inline void load_local_tensor(const TensorType& tensor, const Co
     }
 }
 
+template <broadcast_mode brc_mode, typename TensorType, typename Coord>
+__simd_callee__ inline decltype(auto) load_broadcast_local_tensor(const TensorType& tensor, const Coord& coord)
+{
+    using engine_type = typename TensorType::engine_type;
+    using data_type = typename TensorType::data_type;
+    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+                  "local_tensor::load_broadcast only supports tensors located in UB");
+
+    auto srcEngine = tensor.engine() + tensor.layout()(coord);
+    auto src = srcEngine.begin().get();
+
+    reg_tensor<data_type> dst;
+    if constexpr (brc_mode == broadcast_mode::elem) {
+        asc_loadalign_brc_elem(dst.reg, src);
+    } else if constexpr (brc_mode == broadcast_mode::datablock) {
+        asc_loadalign_brc_datablock(dst.reg, src);
+    } else if constexpr (brc_mode == broadcast_mode::elem2datablock) {
+        asc_loadalign_brc_elem2datablock(dst.reg, src);
+    } else {
+        static_assert(brc_mode == broadcast_mode::elem, "unsupported broadcast mode");
+    }
+    return dst;
+}
+
 template <store_sideband_mode sideband_mode, typename TensorType, typename Coord, typename RegDataType>
 __simd_callee__ inline void store_local_tensor(TensorType& tensor, const Coord& coord,
                                                 const reg_tensor<RegDataType>& src)
@@ -134,6 +158,13 @@ __simd_callee__ inline void local_tensor<EngineType, LayoutType>::load(const Coo
                                                                        reg_tensor<RegDataType>& dst1) const
 {
     detail::load_local_tensor<sideband_mode>(*this, coord, dst0, dst1);
+}
+
+template <typename EngineType, typename LayoutType>
+template <broadcast_mode brc_mode, typename Coord>
+__simd_callee__ inline decltype(auto) local_tensor<EngineType, LayoutType>::load_broadcast(const Coord& coord) const
+{
+    return detail::load_broadcast_local_tensor<brc_mode>(*this, coord);
 }
 
 template <typename EngineType, typename LayoutType>

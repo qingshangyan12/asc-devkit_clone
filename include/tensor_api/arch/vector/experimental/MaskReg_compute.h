@@ -8,15 +8,20 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_H
+#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_H
+#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_H
 
+#include <cstddef>
 #include <cstdint>
 
-#include "tensor_api/experimental/reg/reg_tensor.h"
+#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/utils/utils.h"
 
 namespace asc {
 namespace te {
+
+template <mask_pattern Pattern = mask_pattern::all, typename DataType>
+__simd_callee__ inline reg_tensor<bool> make_mask();
 
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> all_mask();
@@ -27,11 +32,18 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
+template <std::size_t N = 1, typename DataType>
+__simd_callee__ inline reg_tensor<DataType> fill(DataType value, reg_tensor<bool> mask = all_mask<DataType>());
+
+template <std::size_t N = 1, typename DataType>
+__simd_callee__ inline reg_tensor<DataType> fill(reg_tensor<DataType> value,
+                                                 reg_tensor<bool> mask = all_mask<DataType>());
+
 } // namespace te
 } // namespace asc
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/mask_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/MaskReg_compute_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_H
+#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_H

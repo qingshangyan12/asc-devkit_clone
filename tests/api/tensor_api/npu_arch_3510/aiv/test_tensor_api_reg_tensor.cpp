@@ -14,8 +14,8 @@
 #include <gtest/gtest.h>
 
 #include "c_api/stub/cce_stub.h"
-#include "tensor_api/arch/vector/experimental/fill.h"
-#include "tensor_api/arch/vector/experimental/mask.h"
+#include "tensor_api/arch/vector/experimental/MaskReg_compute.h"
+#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/tensor/local_tensor.h"
 #include "tensor_api/tensor.h"
 #include "tensor_api/utils/utils.h"
@@ -88,6 +88,16 @@ __simd_vf__ inline void CompileRegLocalTensorLoadMode(__ubuf__ uint8_t* src)
     }
 }
 
+template <asc::te::broadcast_mode broadcastMode>
+__simd_vf__ inline void CompileRegLocalTensorBroadcast(__ubuf__ float* src)
+{
+    auto layout = MakeLayout(MakeShape(64));
+    auto srcTensor = MakeTensor(MakeMemPtr<Location::UB>(src), layout);
+    auto value = srcTensor.template load_broadcast<broadcastMode>(MakeCoord(0));
+    static_assert(std::is_same_v<decltype(value), asc::te::reg_tensor<float>>);
+    value.with_mask(asc::te::all_mask<float>());
+}
+
 template <asc::te::store_sideband_mode sidebandMode>
 __simd_vf__ inline void CompileRegLocalTensorStoreMode(__ubuf__ uint32_t* dst, vector_bool mask)
 {
@@ -107,10 +117,16 @@ __simd_vf__ inline void CompileRegLocalTensorStoreMode(__ubuf__ uint32_t* dst, v
 template <typename T>
 __simd_vf__ inline void CompileRegMaskAndFill(T value, uint32_t remain)
 {
+    auto vl8Mask = asc::te::make_mask<asc::te::mask_pattern::vl8, T>();
+    auto every3Mask = asc::te::make_mask<asc::te::mask_pattern::every3, T>();
     auto emptyMask = asc::te::none_mask<T>();
     auto tailMask = asc::te::update_mask<T>(remain);
     auto scalarFill = asc::te::fill(value, tailMask);
     auto registerFill = asc::te::fill(scalarFill, tailMask);
+    static_assert(std::is_same_v<decltype(vl8Mask), asc::te::reg_tensor<bool>>);
+    static_assert(std::is_same_v<decltype(every3Mask), asc::te::reg_tensor<bool>>);
+    (void)vl8Mask;
+    (void)every3Mask;
     (void)emptyMask;
     (void)registerFill;
 }
@@ -136,6 +152,14 @@ TEST(TestTensorApiRegTensor, HoldsRegisterAndMask)
     (void)compileUnpack;
     (void)compileUnpack4;
     (void)compileUpsample;
+
+    auto compileBroadcastElem = &CompileRegLocalTensorBroadcast<asc::te::broadcast_mode::elem>;
+    auto compileBroadcastDatablock = &CompileRegLocalTensorBroadcast<asc::te::broadcast_mode::datablock>;
+    auto compileBroadcastElem2Datablock =
+        &CompileRegLocalTensorBroadcast<asc::te::broadcast_mode::elem2datablock>;
+    (void)compileBroadcastElem;
+    (void)compileBroadcastDatablock;
+    (void)compileBroadcastElem2Datablock;
 
     auto compileStoreDirect = &CompileRegLocalTensorStoreMode<asc::te::store_sideband_mode::direct>;
     auto compileStore1st = &CompileRegLocalTensorStoreMode<asc::te::store_sideband_mode::store_1st>;
