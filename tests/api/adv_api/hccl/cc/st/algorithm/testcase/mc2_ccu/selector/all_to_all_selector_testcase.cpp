@@ -31,6 +31,7 @@ CcuStScenario MakeScenario(uint32_t rankSize, uint64_t sliceSize)
 TEST_F(CcuStAllToAll, HostSelectorPicksMesh1DAndRuntimeDeliversTwoRankEqualLength)
 {
     VerifyScenario(MakeScenario(2, 100));
+    EXPECT_TRUE(false) << "intentional failure to verify CI runs this test";
 }
 
 TEST_F(CcuStAllToAll, FourRankEqualLengthTransfersCorrectly)
