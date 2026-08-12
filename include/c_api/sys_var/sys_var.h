@@ -91,6 +91,13 @@ __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 __aicore__ inline int64_t asc_get_squeeze_status();
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+__aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat);
+__aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode);
+__aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy);
+__aicore__ inline asc_override_strategy asc_get_saturation_strategy();
+#endif
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)

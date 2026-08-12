@@ -22,4 +22,9 @@ static void test_host_c_api_cache_ctrl_0()
     using ::asc_icache_preload;
     using ::asc_ub_dcci_single;
     using __asc_aicore::asc_dcci_single;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using ::asc_get_scalar_load_cache_mode;
+    using ::asc_get_scalar_store_cache_mode;
+    using ::asc_set_scalar_cache_mode;
+#endif
 }

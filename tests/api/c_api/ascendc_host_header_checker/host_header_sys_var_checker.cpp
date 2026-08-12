@@ -40,4 +40,10 @@ static void test_host_c_api_sys_var_0()
     using ::asc_set_l12l0_padding_val;
     using ::asc_set_l13d_padding;
     using ::asc_set_l3d_rpt_b;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using ::asc_get_saturation_flag;
+    using ::asc_get_saturation_strategy;
+    using ::asc_set_saturation_flag;
+    using ::asc_set_saturation_strategy;
+#endif
 }
