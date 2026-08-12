@@ -77,7 +77,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
 
 **表2**  AIC中所有合法的核内同步组合<a name="zh-cn_topic_0000002542725361_table13753342164113"></a>
 
-| 源流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
+| 源流水/目的流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
 | --- | --- | --- | --- | --- | --- | --- |
 | PIPE_S | 不涉及 | 不涉及 | 不涉及 | 不涉及 | 不涉及 | 不涉及 |
 | PIPE_M | 不涉及 | PipeBarrier&lt;PIPE_M&gt;() | SetFlag&lt;M_MTE1&gt;(0)<br>WaitFlag&lt;M_MTE1&gt;(0) | SetFlag&lt;M_MTE2&gt;(0)<br>WaitFlag&lt;M_MTE2&gt;(0) | 不涉及 | SetFlag&lt;M_FIX&gt;(0)<br>WaitFlag&lt;M_FIX&gt;(0) |
@@ -88,7 +88,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
 
 **表3**  AIV中所有合法的核内同步组合<a name="zh-cn_topic_0000002542725361_table1555712177426"></a>
 
-| 源流水 | PIPE_S | PIPE_V | PIPE_MTE2 | PIPE_MTE3 |
+| 源流水/目的流水 | PIPE_S | PIPE_V | PIPE_MTE2 | PIPE_MTE3 |
 | --- | --- | --- | --- | --- |
 | PIPE_S | 不涉及 | SetFlag&lt;S_V&gt;(0)<br>WaitFlag&lt;S_V&gt;(0) | SetFlag&lt;S_MTE2&gt;(0)<br>WaitFlag&lt;S_MTE2&gt;(0) | SetFlag&lt;S_MTE3&gt;(0)<br>WaitFlag&lt;S_MTE3&gt;(0) |
 | PIPE_V | SetFlag&lt;V_S&gt;(0)<br>WaitFlag&lt;V_S&gt;(0) | PipeBarrier&lt;PIPE_V&gt;() | SetFlag&lt;V_MTE2&gt;(0)<br>WaitFlag&lt;V_MTE2&gt;(0) | SetFlag&lt;V_MTE3&gt;(0)<br>WaitFlag&lt;V_MTE3&gt;(0) |

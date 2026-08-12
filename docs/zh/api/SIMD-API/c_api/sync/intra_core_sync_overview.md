@@ -61,26 +61,25 @@ AI Core内部并行的指令流水类型和解释如下所示：
 
 - 多流水同步：同一核内具有数据依赖的不同类型流水指令之间的同步。
 
-    通过[asc_sync_notify](asc_sync_notify.md)/[asc_sync_wait](asc_sync_wait.md)接口进行不同流水线间的同步控制。在`asc_sync_notify`/`asc_sync_wait`的指令中，可以指定一对指令流水（源流水与目的流水）先后执行的关系，表示两个指令流水之间完成一组“锁”机制，其作用原理为：
-    - `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。
-    - `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
-
+    - 通过[asc_sync_notify](asc_sync_notify.md)/[asc_sync_wait](asc_sync_wait.md)接口进行不同流水线间的同步控制。在`asc_sync_notify`/`asc_sync_wait`的指令中，可以指定一对指令流水（源流水与目的流水）先后执行的关系，表示两个指令流水之间完成一组“锁”机制，其作用原理为：
+        - `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。
+        - `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
      <!-- npu="950" id3 -->
-     Ascend 950PR/Ascend 950DT新增通过[asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md)接口进行不同流水线间的同步控制。通过Lock锁定指定流水（阻塞后续指令），再通过Unlock释放流水，来完成流水间的同步依赖。
-    - `asc_lock`：根据mutex_id获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到前序指令中对应mutex_id的Mutex被`asc_unlock`。
-    - `asc_unlock`：当前流水的前置指令退出后，根据mutex_id释放对应Mutex。
+     - Ascend 950PR/Ascend 950DT新增通过[asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md)接口进行不同流水线间的同步控制。通过Lock锁定指定流水（阻塞后续指令），再通过Unlock释放流水，来完成流水间的同步依赖。
+        - `asc_lock`：根据mutex_id获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到前序指令中对应mutex_id的Mutex被`asc_unlock`。
+        - `asc_unlock`：当前流水的前置指令退出后，根据mutex_id释放对应Mutex。
      <!-- end id3 -->
-- 单流水同步：同一核内具有数据依赖的相同类型流水指令之间的同步。
-    - 通过[asc_sync_pipe](asc_sync_pipe.md)接口进行相同流水线间的同步控制。同一流水中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。`asc_sync_pipe`指令可以保证前序指令中所有数据读写全部完成，后序指令才开始执行。注意该接口不支持PIPE\_S单流水的同步。
+     - `asc_lock`与`asc_unlock`与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水线解耦，可简化反向同步逻辑，具体说明请参考[功能说明](asc_lock.md#功能说明)。
+
+- 单流水同步：同一核内具有数据依赖的相同类型流水指令之间的同步。通过[asc_sync_pipe](asc_sync_pipe.md)接口进行相同流水线间的同步控制。同一流水中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。`asc_sync_pipe`指令可以保证前序指令中所有数据读写全部完成，后序指令才开始执行。注意该接口不支持PIPE\_S单流水的同步。
 - 通过[asc_sync_data_barrier](asc_sync_data_barrier.md)接口阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。开发者通过`arg`参数指定屏障作用的内存范围，确保屏障前后的内存访问指令按预期顺序完成。
 
 <!-- npu="A3,910b" id4 -->
-
 以[NPU架构2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)为例，该硬件架构下所有合法的核内同步组合如[表2](#zh-cn_topic_0000002542725361_table13753342164113)和[表3](#zh-cn_topic_0000002542725361_table1555712177426)所示。其中，"不涉及"表示硬件层面不存在此种同步组合，"暂无应用场景"表示存在此种同步组合，但在实际开发场景中暂不需要使用。
 
 **表2**  AIC中所有合法的核内同步组合<a name="zh-cn_topic_0000002542725361_table13753342164113"></a>
 
-| 源流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
+| 源流水/目的流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
 | --- | --- | --- | --- | --- | --- | --- |
 | PIPE_S | 不涉及 | 不涉及 | 不涉及 | 不涉及 | 不涉及 | 不涉及 |
 | PIPE_M | 不涉及 | asc_sync_pipe(PIPE_M) | asc_sync_notify(PIPE_M, PIPE_MTE1, 0)<br>asc_sync_wait(PIPE_M, PIPE_MTE1, 0) | asc_sync_notify(PIPE_M, PIPE_MTE2, 0)<br>asc_sync_wait(PIPE_M, PIPE_MTE2, 0) | 不涉及 | asc_sync_notify(PIPE_M, PIPE_FIX, 0)<br>asc_sync_wait(PIPE_M, PIPE_FIX, 0) |
@@ -91,7 +90,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
 
 **表3**  AIV中所有合法的核内同步组合<a name="zh-cn_topic_0000002542725361_table1555712177426"></a>
 
-| 源流水 | PIPE_S | PIPE_V | PIPE_MTE2 | PIPE_MTE3 |
+| 源流水/目的流水 | PIPE_S | PIPE_V | PIPE_MTE2 | PIPE_MTE3 |
 | --- | --- | --- | --- | --- |
 | PIPE_S | 不涉及 | asc_sync_notify(PIPE_S, PIPE_V, 0)<br>asc_sync_wait(PIPE_S, PIPE_V, 0) | asc_sync_notify(PIPE_S, PIPE_MTE2, 0)<br>asc_sync_wait(PIPE_S, PIPE_MTE2, 0) | asc_sync_notify(PIPE_S, PIPE_MTE3, 0)<br>asc_sync_wait(PIPE_S, PIPE_MTE3, 0) |
 | PIPE_V | asc_sync_notify(PIPE_V, PIPE_S, 0)<br>asc_sync_wait(PIPE_V, PIPE_S, 0) | asc_sync_pipe(PIPE_V) | asc_sync_notify(PIPE_V, PIPE_MTE2, 0)<br>asc_sync_wait(PIPE_V, PIPE_MTE2, 0) | asc_sync_notify(PIPE_V, PIPE_MTE3, 0)<br>asc_sync_wait(PIPE_V, PIPE_MTE3, 0) |

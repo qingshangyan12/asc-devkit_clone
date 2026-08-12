@@ -47,11 +47,9 @@ __aicore__ inline void asc_sync_notify(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| pipe | 输入 | 源流水类型，即“等待哪条流水的前序指令完成”。取值范围为`pipe_t`枚举：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。不可取`PIPE_ALL`，否则触发异常。 |
-| tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。不可取`PIPE_ALL`，否则触发异常。 |
-| id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`EVENT_ID0`~`EVENT_ID7`（即0~7）。 |
-
-针对不同产品，AIC与AIV中支持的“源流水-目的流水”的组合不同，具体请参考[核内同步概述](intra_core_sync_overview.md)。
+| pipe | 输入 | 源流水类型，即“等待哪条流水的前序指令完成”。取值范围为`pipe_t`枚举：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。 |
+| tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。 |
+| id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`event_t`枚举类型：<pre>typedef enum {<br>    EVENT_ID0 = 0,<br>    EVENT_ID1 = 1,<br>    EVENT_ID2 = 2,<br>    EVENT_ID3 = 3,<br>    EVENT_ID4 = 4,<br>    EVENT_ID5 = 5,<br>    EVENT_ID6 = 6,<br>    EVENT_ID7 = 7<br>} event_t;</pre> |
 
 ## 返回值说明
 
@@ -63,37 +61,91 @@ PIPE_S
 
 ## 约束说明
 
-- AIC与AIV中均可调用本接口。
+- **`pipe`与`tpipe`并非任意组合，两者组合的取值存在范围限制**：针对不同产品，AIC与AIV中支持的组合不同，具体请参考[核内同步分类](intra_core_sync_overview.md#核内同步分类)中的表2和表3。
 - 相同源流水、相同目标流水、相同id下，连续使用`asc_sync_notify`会引发未定义行为。
 - 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致，否则同步关系不成立。
 - `pipe`与`tpipe`均不可取`PIPE_ALL`，否则触发异常。
 - `id`取值范围为0~7，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。
-- 本接口对同一流水中的后续指令不产生阻塞效果。
-<!-- npu="950" id8 -->
-- 在[NPU架构3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)上，[asc_lock](asc_lock.md)与[asc_unlock](asc_unlock.md)组合也可实现多流水同步。与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水线解耦，可简化反向同步逻辑。
-<!-- end id8 -->
+- 本接口不会对 `pipe`与`tpipe`两条流水的后续指令不产生阻塞效果。
 
 ## 调用示例
 
-```cpp
-// 本例中total_length指参与计算的数据总长度。src0_gm，src1_gm，dst_gm是外部输入的float类型的源操作数、目的操作数，指向GM内存空间。
-constexpr uint32_t total_length = 128;
-__ubuf__ float src0[total_length];
-__ubuf__ float src1[total_length];
-__ubuf__ float dst[total_length];
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
-asc_copy_gm2ub(src0, src0_gm, total_length * sizeof(float));
-asc_copy_gm2ub(src1, src1_gm, total_length * sizeof(float));
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
-// 同步操作：数据搬运操作（GM到UB，PIPE_MTE2流水）完成后才能启动计算操作（PIPE_V流水）。
-asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);  // EVENT_ID0为外部传入的同步ID。
-asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);  // EVENT_ID0为外部传入的同步ID。
+```bash
+bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
 
-asc_add(dst, src1, src0, total_length);
+```c
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
 
-// 同步操作：计算操作（PIPE_V流水）完成后才能启动数据搬运操作（UB到GM，PIPE_MTE3流水）。
-asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);  // EVENT_ID0为外部传入的同步ID。
-asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);  // EVENT_ID0为外部传入的同步ID。
+namespace {
 
-asc_copy_ub2gm(dst_gm, dst, total_length * sizeof(float));
+constexpr uint32_t ELEMENTS = 64;
+constexpr uint32_t BYTES = ELEMENTS * sizeof(float);
+
+void PrintData(const char* label, const std::vector<float>& data)
+{
+    std::cout << label << ":";
+    for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
+    std::cout << " ..." << std::endl;
+}
+
+__global__ __vector__ void AscSyncNotifyKernel(__gm__ float* output, __gm__ float* src0, __gm__ float* src1)
+{
+    asc_init();
+    __ubuf__ float x[ELEMENTS], y[ELEMENTS], z[ELEMENTS];
+    asc_copy_gm2ub_align(x, src0, BYTES);
+    asc_copy_gm2ub_align(y, src1, BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_add(z, x, y, ELEMENTS);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, z, BYTES);
+    asc_sync_mte3(0);
+}
+
+} // namespace
+
+int main()
+{
+    std::vector<float> src0(ELEMENTS), src1(ELEMENTS), output(ELEMENTS, 0.0f), golden(ELEMENTS);
+    for (uint32_t i = 0; i < ELEMENTS; ++i) {
+        src0[i] = static_cast<float>(i) * 0.25f;
+        src1[i] = static_cast<float>(ELEMENTS - i) * 0.5f;
+        golden[i] = src0[i] + src1[i];
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    float *src0_device = nullptr, *src1_device = nullptr, *output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src0_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&src1_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src0_device, BYTES, src0.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(src1_device, BYTES, src1.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    AscSyncNotifyKernel<<<1, 0>>>(output_device, src0_device, src1_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), BYTES, output_device, BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input src0", src0);
+    PrintData("Input src1", src1);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_sync_notify passed." : "[Failed] asc_sync_notify failed.") << std::endl;
+    aclrtFree(src0_device);
+    aclrtFree(src1_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
