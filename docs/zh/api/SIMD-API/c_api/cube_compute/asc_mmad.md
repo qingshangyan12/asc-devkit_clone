@@ -37,7 +37,7 @@ $$
 <!-- npu="950" id8 -->
 **表1** 矩阵信息说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
-| 矩阵 | 物理存储位置 | 形状（行数×列数） | 数据格式 | 分型大小（行数×列数） |
+| 矩阵 | 存储位置 | 形状（行数×列数） | 数据格式 | 分形大小（行数×列数） |
 | --- | --- | --- | --- | --- |
 | A | L0A Buffer | M×K | Nz | 16×K0 |
 | B | L0B Buffer | K×N | Zn | K0×16 |
@@ -50,7 +50,7 @@ $$
 <!-- npu="A3,910b" id9 -->
 **表2** 矩阵信息说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
-| 矩阵 | 物理存储位置 | 形状 | 数据格式 | 分型大小 |
+| 矩阵 | 存储位置 | 形状 | 数据格式 | 分形大小 |
 | --- | --- | --- | --- | --- |
 | A | L0A Buffer | M×K | Zz | 16×K0 |
 | B | L0B Buffer | K×N | Zn | K0×16 |
@@ -63,7 +63,7 @@ $$
 ## 函数原型
 
 <!-- npu="950" id12 -->
-### 模板原型（占位符形式，[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+**占位符形式（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）：**
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
@@ -78,7 +78,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 bool c_matrix_init_val)
 ```
 
-### dtype支持数据类型（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+**dtype支持的数据类型（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）：**
 
 `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
@@ -95,9 +95,8 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 | `half` | `half` | `float` | `float` |
 | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
 | `float` | `float` | `float` | `float` |
-<!-- end id12 -->
 
-### 典型示例（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+**典型示例（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）：**
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
@@ -111,9 +110,10 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
                                 bool c_matrix_source,
                                 bool c_matrix_init_val)
 ```
+<!-- end id12 -->
 
 <!-- npu="A3,910b" id13 -->
-### 模板原型（占位符形式，[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+**（占位符形式，[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）：**
 
 - asc_mmad接口：
 
@@ -190,8 +190,8 @@ PIPE_M
 
 ## 约束说明
 
-- 本接口仅在AIC上生效，在AIV上调用为NOP（空操作）。
-- `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP。
+- 本接口仅在AIC上生效，在AIV上调用将直接返回。
+- `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP（空操作）。
 
 - **内存使用约束说明**
 
@@ -244,11 +244,8 @@ PIPE_M
 以下为可执行的调用示例代码：
 
 ```cpp
-// 假设示例代码保存为 ASCEND_EXAMPLE_PATH/asc_mmad.asc
-// 构建产物保存目录为 ASCEND_BUILD_PATH
-// 可执行文件名为 c_api_cube_compute_asc_mmad
-// 编译与运行命令：
-// "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang "$ASCEND_EXAMPLE_PATH/asc_mmad.asc" -lm -o "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_mmad" && "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_mmad"
+// 假设示例代码保存为：asc_mmad.asc
+// 编译与运行命令：bisheng asc_mmad.asc -o main --npu-arch=dav-3510; ./main
 
 #include <cstdint>
 #include <iostream>

@@ -50,7 +50,7 @@ PIPE_S
 
 ## 约束说明
 
-- 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)）执行前调用，确保舍入模式配置在矩阵乘加结果生成前生效。
+- 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
 - 本接口配置的舍入模式仅在HF32模式开启期间生效，需先开启HF32模式再调用本接口，否则舍入模式配置不产生实际作用。
 - 舍入模式配置后会持续生效，HF32模式关闭后再次开启仍将沿用上次的舍入模式配置，如需切换舍入模式，请重新调用本接口。
 - hf32_round_mode仅支持如下2种枚举值：
@@ -60,14 +60,12 @@ PIPE_S
 
 ## 调用示例
 
-以下为可执行的调用示例代码：
+<!-- npu="950" id8 -->
+针对Ascend 950PR/Ascend 950DT，以下为可执行的调用示例代码：
 
 ```cpp
-// 假设示例代码保存为 ASCEND_EXAMPLE_PATH/asc_set_hf32_round_mode.asc
-// 构建产物保存目录为 ASCEND_BUILD_PATH
-// 可执行文件名为 c_api_cube_compute_asc_set_hf32_round_mode
-// 编译与运行命令：
-// "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang "$ASCEND_EXAMPLE_PATH/asc_set_hf32_round_mode.asc" -lm -o "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_set_hf32_round_mode" && "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_set_hf32_round_mode"
+// 假设示例代码保存为：asc_set_hf32_round_mode.asc
+// 编译与运行命令：bisheng asc_set_hf32_round_mode.asc -o main --npu-arch=dav-3510; ./main
 
 #include <cstdint>
 #include <iostream>
@@ -156,3 +154,4 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+<!-- end id8 -->

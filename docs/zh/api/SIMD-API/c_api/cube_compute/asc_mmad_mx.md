@@ -34,11 +34,11 @@ $$
 
 其中，$\otimes$表示广播乘法，矩阵A、B沿K维度每连续32个元素共享对应量化系数矩阵ScaleA、ScaleB中的一个量化系数。C矩阵可以通过配置本接口的参数，初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵。
 
-本接口不单独传入Scale矩阵地址，而是根据`a_matrix`和`b_matrix`的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。各矩阵的信息说明见下表：
+本接口不单独传入Scale矩阵地址，而是根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。各矩阵的信息说明见下表：
 
 **表1** 矩阵信息说明
 
-| 矩阵 | 物理存储位置 | 形状（行数×列数） | 数据格式 | 分型大小（行数×列数） |
+| 矩阵 | 存储位置 | 形状（行数×列数） | 数据格式 | 分形大小（行数×列数） |
 | --- | --- | --- | --- | --- |
 | A | L0A Buffer | M×K | Nz | 16×K0 |
 | ScaleA | L0A_MX Buffer | M×(K / 32) | Zz | 16×2 |
@@ -51,7 +51,7 @@ $$
 
 ## 函数原型
 
-### 模板原型（占位符形式）
+**占位符形式：**
 
 ```c
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
@@ -66,7 +66,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                     bool c_matrix_init_val)
 ```
 
-### dtype支持数据类型
+**dtype支持的数据类型：**
 
 `a_dtype`、`b_dtype`的取值组合见下表：
 
@@ -83,7 +83,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 | `fp8_e5m2_t` | `fp8_e4m3fn_t` | `fp8_e8m0_t` | `float` | `float` |
 | `fp8_e5m2_t` | `fp8_e5m2_t` | `fp8_e8m0_t` | `float` | `float` |
 
-### 典型示例
+**典型示例：**
 
 ```c
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
@@ -125,8 +125,8 @@ PIPE_M
 
 ## 约束说明
 
-- 本接口仅在AIC上生效，在AIV上调用为NOP（空操作）。
-- `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP。
+- 本接口仅在AIC上生效，在AIV上调用将直接返回。
+- `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP（空操作）。
 - 调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_data_move/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_data_move/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。ScaleA和ScaleB矩阵的数据类型必须为`fp8_e8m0_t`，K方向上每个Scale元素对应32个输入矩阵元素。
 
 - **内存使用约束说明**
@@ -165,11 +165,8 @@ PIPE_M
 以下为可执行的调用示例代码：
 
 ```cpp
-// 假设示例代码保存为 ASCEND_EXAMPLE_PATH/asc_mmad_mx.asc
-// 构建产物保存目录为 ASCEND_BUILD_PATH
-// 可执行文件名为 c_api_cube_compute_asc_mmad_mx
-// 编译与运行命令：
-// "$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 -Wno-deprecated-declarations --asc-aicore-lang "$ASCEND_EXAMPLE_PATH/asc_mmad_mx.asc" -lm -o "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_mmad_mx" && "$ASCEND_BUILD_PATH/c_api_cube_compute_asc_mmad_mx"
+// 假设示例代码保存为：asc_mmad_mx.asc
+// 编译与运行命令：bisheng asc_mmad_mx.asc -o main --npu-arch=dav-3510; ./main
 
 #include <cstdint>
 #include <iostream>
