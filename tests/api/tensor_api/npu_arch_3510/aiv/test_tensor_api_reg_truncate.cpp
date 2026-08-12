@@ -44,10 +44,10 @@ void FloatTruncateStub(vector_float&, vector_float, vector_bool mask)
 template <typename T>
 using TruncateResult = decltype(asc::te::trunc(std::declval<asc::te::reg_tensor<T>>()));
 
-static_assert(asc::te::reg_truncate_detail::is_supported<half>::value);
-static_assert(asc::te::reg_truncate_detail::is_supported<bfloat16_t>::value);
-static_assert(asc::te::reg_truncate_detail::is_supported<float>::value);
-static_assert(!asc::te::reg_truncate_detail::is_supported<int32_t>::value);
+static_assert(asc::te::detail::is_supported<half>::value);
+static_assert(asc::te::detail::is_supported<bfloat16_t>::value);
+static_assert(asc::te::detail::is_supported<float>::value);
+static_assert(!asc::te::detail::is_supported<int32_t>::value);
 static_assert(std::is_same_v<TruncateResult<half>, asc::te::reg_tensor<half>>);
 static_assert(std::is_same_v<TruncateResult<bfloat16_t>, asc::te::reg_tensor<bfloat16_t>>);
 static_assert(std::is_same_v<TruncateResult<float>, asc::te::reg_tensor<float>>);
