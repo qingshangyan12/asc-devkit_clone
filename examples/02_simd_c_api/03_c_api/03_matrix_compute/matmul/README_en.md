@@ -97,7 +97,7 @@ python3 -m unittest discover -s tests -v
 
 The tests cover all eight deterministic cases, exact file sizes, cancellation, NaN/Inf handling, maximum-error guards, the batch runner, required Cube APIs, one-block launch, layout parameters, Local Memory capacity, and the absence of Host elementwise compute loops.
 
-See [the self-test report](docs/self-test-report.md) for measured evidence, sanitizer limitations, and the CANN 9.0 compatibility blocker. This is an independent sample and does not modify the existing `mmad` scenarios.
+This is an independent sample and does not modify the existing `mmad` scenarios.
 
 ## Usability Feedback
 

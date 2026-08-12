@@ -46,8 +46,6 @@ L1 峰值为 18,240 字节。源码使用 `static_assert` 同时检查计算值�
 │   ├── run_cases.py
 │   └── verify_result.py
 ├── tests/
-├── docs/
-│   └── self-test-report.md
 ├── README.md
 ├── README_en.md
 └── requirements.txt
@@ -122,7 +120,7 @@ python3 -m unittest discover -s tests -v
 
 测试覆盖 8 个确定性数据用例、文件大小、取消场景、NaN/Inf、最大误差保护、批量 runner、单核/Cube API 合同、布局参数、Local Memory 容量和 Host 禁止逐元素计算。
 
-实测结果、工具诊断限制和 CANN 9.0 兼容性阻塞证据见 [自测报告](docs/self-test-report.md)。本目录是独立样例，不修改既有 `mmad` 场景。
+本目录是独立样例，不修改既有 `mmad` 场景。
 
 ## 易用性反馈
 
