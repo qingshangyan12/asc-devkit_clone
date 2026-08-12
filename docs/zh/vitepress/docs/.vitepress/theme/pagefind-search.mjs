@@ -25,7 +25,6 @@ export const MAX_QUERY_LENGTH = 256
 export const MAX_CJK_SUBPHRASES = 2048
 const MAX_EXHAUSTIVE_CJK_LENGTH = 64
 const initializedPagefindInstances = new WeakSet()
-let identifierIndexPromise = null
 
 function normalizeCase(value) {
   return String(value || '').normalize('NFKC').replace(/\s+/g, ' ').trim()
@@ -327,18 +326,31 @@ function titleVariants(plan, variants) {
   return [...titleQueries.values()]
 }
 
-async function loadIdentifierIndex() {
-  if (!identifierIndexPromise) {
-    identifierIndexPromise = fetch('/search-identifiers.json?v=7', { cache: 'no-store' })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Identifier index request failed with ${response.status}`)
-        return response.json()
-      })
-      .then(index => Array.isArray(index?.p) && Array.isArray(index?.i) ? index : { p: [], i: [], s: [], h: [] })
-      .catch(() => ({ p: [], i: [], s: [], h: [] }))
-  }
-  return identifierIndexPromise
+function emptyIdentifierIndex() {
+  return { p: [], i: [], s: [], h: [] }
 }
+
+export function createIdentifierIndexLoader(fetchIndex) {
+  let indexPromise = null
+  return function loadIdentifierIndex() {
+    if (!indexPromise) {
+      indexPromise = Promise.resolve()
+        .then(fetchIndex)
+        .then(index => Array.isArray(index?.p) && Array.isArray(index?.i) ? index : emptyIdentifierIndex())
+        .catch(() => {
+          indexPromise = null
+          return emptyIdentifierIndex()
+        })
+    }
+    return indexPromise
+  }
+}
+
+const loadIdentifierIndex = createIdentifierIndexLoader(async () => {
+  const response = await fetch('/search-identifiers.json?v=7', { cache: 'no-store' })
+  if (!response.ok) throw new Error(`Identifier index request failed with ${response.status}`)
+  return response.json()
+})
 
 function escapeHtml(value) {
   return String(value || '')

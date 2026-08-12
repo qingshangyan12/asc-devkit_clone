@@ -20,8 +20,10 @@ import {
   fetchSameOrigin,
   markdownReportPath,
   pathMatchesPrefix,
+  RESULT_HIGHLIGHT_SELECTOR,
   resolveFileWithinRoot,
   resolveSameOriginHttpUrl,
+  SECTION_HIGHLIGHT_SELECTOR,
 } from '../lib/benchmark-utils.mjs'
 
 test('accepts only same-origin HTTP(S) result URLs', () => {
@@ -87,6 +89,12 @@ test('matches route prefixes only at path segment boundaries', () => {
   assert.equal(pathMatchesPrefix('/api/asc_copy_gm2ub/page', '/api/asc_copy_gm2ub'), true)
   assert.equal(pathMatchesPrefix('/api/asc_copy_gm2ub_align/page', '/api/asc_copy_gm2ub'), false)
   assert.equal(pathMatchesPrefix('/api/page', '/'), true)
+})
+
+test('keeps result and section highlight selectors independent', () => {
+  assert.equal(RESULT_HIGHLIGHT_SELECTOR, '.des mark, .headings mark')
+  assert.equal(SECTION_HIGHLIGHT_SELECTOR, '.section-title mark')
+  assert.equal(RESULT_HIGHLIGHT_SELECTOR.includes('.section-title'), false)
 })
 
 test('assigns each result to at most one overlapping recall target', () => {

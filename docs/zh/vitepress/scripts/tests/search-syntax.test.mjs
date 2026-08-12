@@ -20,6 +20,7 @@ import {
 import {
   bestPagefindSection,
   collectCandidates,
+  createIdentifierIndexLoader,
   createQueryPlan,
   deserializePagefindMeta,
   findIdentifierIndexMatches,
@@ -144,6 +145,21 @@ test('continues with the primary index when the title index is unavailable', asy
     console.warn = originalWarn
   }
   assert.equal(mergeCalls, 1)
+})
+
+test('retries the identifier index after a temporary request failure', async () => {
+  const expected = { p: [['/api/page', 'Page']], i: [['identifier', [0]]], s: [], h: [] }
+  let calls = 0
+  const load = createIdentifierIndexLoader(async () => {
+    calls++
+    if (calls === 1) throw new Error('temporary failure')
+    return expected
+  })
+
+  assert.deepEqual(await load(), { p: [], i: [], s: [], h: [] })
+  assert.equal(await load(), expected)
+  assert.equal(await load(), expected)
+  assert.equal(calls, 2)
 })
 
 test('restores Pagefind dates and serialized frontmatter metadata', () => {

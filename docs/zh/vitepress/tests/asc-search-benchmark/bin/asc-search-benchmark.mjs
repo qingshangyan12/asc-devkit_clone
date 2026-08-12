@@ -24,8 +24,10 @@ import {
   fetchSameOrigin,
   markdownReportPath,
   pathMatchesPrefix,
+  RESULT_HIGHLIGHT_SELECTOR,
   resolveFileWithinRoot,
   resolveSameOriginHttpUrl,
+  SECTION_HIGHLIGHT_SELECTOR,
 } from '../lib/benchmark-utils.mjs'
 
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -572,8 +574,8 @@ async function runSearchCase(client, definition) {
       sectionTitle: element.querySelector('.section-title')?.textContent?.replace(/\\s+/g, ' ').trim() || '',
       sectionPlacementValid: sectionPlacementValid(element),
       description: element.querySelector('.des')?.textContent?.replace(/\\s+/g, ' ').trim() || '',
-      highlights: readHighlights(element, '.des mark, .headings mark, .section-title mark'),
-      sectionHighlights: readHighlights(element, '.section-title mark'),
+      highlights: readHighlights(element, ${JSON.stringify(RESULT_HIGHLIGHT_SELECTOR)}),
+      sectionHighlights: readHighlights(element, ${JSON.stringify(SECTION_HIGHLIGHT_SELECTOR)}),
     })).filter(result => result.route)
 
     setValue('')
