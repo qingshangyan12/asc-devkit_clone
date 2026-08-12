@@ -18,10 +18,11 @@ ELU(x) = alpha * scale * (exp(x * inputScale) - 1),  if x <= 0
 ## 目录结构介绍
 ```
 ├── elu
+│   ├── op_kernel
+│   │   └── elu.asc              // AscendC C API 实现 & 调用样例（核函数）
 │   ├── scripts
-│   │   └── gen_data.py         // 输入数据和真值数据生成脚本
+│   │   └── gen_data.py          // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt           // 编译工程文件
-│   ├── elu.asc                  // AscendC C API 实现 & 调用样例
 │   └── README.md                // 样例介绍
 ```
 
