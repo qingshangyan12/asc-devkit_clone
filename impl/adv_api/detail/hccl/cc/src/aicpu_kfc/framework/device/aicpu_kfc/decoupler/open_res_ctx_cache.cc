@@ -89,6 +89,7 @@ bool IsCacheableOp(HcclCMDType opType)
         case HCCL_CMD_REDUCE_SCATTER:
         case HCCL_CMD_ALLTOALL:
         case HCCL_CMD_ALLTOALLV:
+        case HCCL_CMD_HALF_ALLTOALLV:
             return true;
         default:
             return false;

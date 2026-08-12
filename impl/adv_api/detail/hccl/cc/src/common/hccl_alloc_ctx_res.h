@@ -117,13 +117,15 @@ enum AlgorithmType {
     CcuReduceScatterMesh2D,
     CcuAllReduceMesh1D = 100,
     CcuAllReduceMeshMem2Mem1D,
-    CcuAllReduceMesh2DOneShot
+    CcuAllReduceMesh2DOneShot,
+    CcuHalfAll2AllVMesh1D = 150
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
-    {"CcuKfcReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D}};
+    {"CcuKfcReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D},
+    {"CcuHalfAll2AllVMesh1D", CcuHalfAll2AllVMesh1D}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
@@ -170,6 +172,9 @@ HcclResult PrepareParamForAlltoAll(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
 
 HcclResult PrepareParamForAlltoAllV(
+    HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
+
+HcclResult PrepareParamForHalfAllToAllV(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
 
 HcclResult PrepareOpParams(HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam);

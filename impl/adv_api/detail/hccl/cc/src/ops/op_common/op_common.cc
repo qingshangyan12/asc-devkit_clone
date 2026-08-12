@@ -190,7 +190,8 @@ uint64_t GetHcclDfxOpInfoDataCount(const OpParam& param, const u32& rankSize)
 {
     u64 sendCount = 0;
     if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
-        param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {
+        param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC ||
+        param.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
         for (u64 i = 0; i < rankSize; i++) {
             sendCount += *(reinterpret_cast<const u64*>(param.all2AllVDataDes.sendCounts) + i);
         }
@@ -215,7 +216,8 @@ uint32_t GetHcclDfxOpInfoDataType(const OpParam& param)
         dataType = static_cast<u32>(param.vDataDes.dataType);
     } else if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
         dataType = static_cast<u32>(param.all2AllDataDes.sendType);
-    } else if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+    } else if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
+               param.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
         dataType = static_cast<u32>(param.all2AllVDataDes.sendType);
     } else if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {
         dataType = static_cast<u32>(param.all2AllVCDataDes.sendType);
@@ -229,7 +231,8 @@ HcclResult SetOpParamFastLaunchTag(OpParam& param)
 {
     HcclDataType tmpDataType;
     if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
-        param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {
+        param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC ||
+        param.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
         tmpDataType = param.all2AllVDataDes.sendType;
     } else {
         tmpDataType = param.DataDes.dataType;
@@ -2219,7 +2222,8 @@ HcclResult SingleRankProc(const OpParam& param)
     }
     u64 len{0};
     if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
-        param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {
+        param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC ||
+        param.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
         len = DATATYPE_SIZE_TABLE[param.all2AllVDataDes.sendType] *
               *(static_cast<const u64*>(param.all2AllVDataDes.sendCounts));
     } else if (param.opType == HCCL_CMD_ALLGATHER_V || param.opType == HCCL_CMD_REDUCE_SCATTER_V) {
@@ -2281,7 +2285,8 @@ HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
         try {
             HcclDataType tmpDataType;
             if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
-                param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {
+                param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC ||
+                param.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
                 tmpDataType = param.all2AllVDataDes.sendType;
             } else if (
                 param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER_V ||

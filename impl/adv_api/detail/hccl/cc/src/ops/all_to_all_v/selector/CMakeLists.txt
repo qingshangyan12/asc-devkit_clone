@@ -10,4 +10,5 @@
 target_sources(mc2_client PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/alltoall_auto_selector.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/alltoallv_auto_selector.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/all_to_all_v_auto_selector.cc
 )

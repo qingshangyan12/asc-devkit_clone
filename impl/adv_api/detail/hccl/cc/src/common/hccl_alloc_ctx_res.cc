@@ -12,12 +12,15 @@
 using namespace mc2_ops_hccl;
 using namespace hcomm::CcuRep;
 
+HcclResult PrepareParamForHalfAllToAllV(HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
+
 std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_ALLGATHER, PrepareParamForAllGather},
     {HcclCMDType::HCCL_CMD_ALLREDUCE, PrepareParamForAllReduce},
     {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, PrepareParamForReduceScatter},
     {HcclCMDType::HCCL_CMD_ALLTOALL, PrepareParamForAlltoAll},
     {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
+    {HcclCMDType::HCCL_CMD_HALF_ALLTOALLV, PrepareParamForHalfAllToAllV},
 };
 
 CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine)
@@ -120,7 +123,8 @@ namespace {
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
     return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_HALF_ALLTOALLV);
 }
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
@@ -519,6 +523,22 @@ HcclResult PrepareParamForAlltoAllV(
     HCCL_INFO("opType %u", static_cast<uint32_t>(param.opType));
     HCCL_INFO("all2AllVDataDes.sendType %u", static_cast<uint32_t>(param.all2AllVDataDes.sendType));
     HCCL_INFO("all2AllVDataDes.recvType %u", static_cast<uint32_t>(param.all2AllVDataDes.recvType));
+    return HCCL_SUCCESS;
+}
+
+HcclResult PrepareParamForHalfAllToAllV(
+    HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param)
+{
+    HcclResult ret = PrepareOpsCommParam(tag, param);
+    if (ret != HCCL_SUCCESS) { HCCL_ERROR("failed to fill OpsCommParam"); }
+    param.varMemSize = 0;
+    param.reduceType = HcclReduceOp::HCCL_REDUCE_SUM;
+    param.all2AllVDataDes.sendType = static_cast<HcclDataType>(ccTiling->srcDataType);
+    param.all2AllVDataDes.recvType = static_cast<HcclDataType>(ccTiling->dstDataType);
+    param.all2AllVDataDes.sendCounts = nullptr;
+    param.all2AllVDataDes.recvCounts = nullptr;
+    param.all2AllVDataDes.sdispls = nullptr;
+    param.all2AllVDataDes.rdispls = nullptr;
     return HCCL_SUCCESS;
 }
 

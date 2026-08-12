@@ -79,6 +79,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     xnData_[3] = commParam->wParamExt.sendOffsets; // 3 is index of xnData
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[4]);
+    xnData_[9] = ccuParam_.scratchAddr;
 }
 
 template <const auto& config>
