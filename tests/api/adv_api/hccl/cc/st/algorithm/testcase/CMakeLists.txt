@@ -10,6 +10,7 @@
 
 set(src_list
     main.cc
+    mc2_aicpu_task_cache_testcase.cc
 )
 
 add_executable(${HCCL_CHECKER_TARGET} ${src_list})
