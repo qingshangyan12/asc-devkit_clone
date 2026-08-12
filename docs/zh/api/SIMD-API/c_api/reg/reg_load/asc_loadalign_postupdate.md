@@ -96,7 +96,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst,
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
 | src | 输入/输出 | 源UB地址，实际读取地址需32字节对齐。 |
-| offset | 输入 | Post Update步长。接口从当前`src`地址完成搬入后更新`src`。<br>&bull; 当`dst`为矢量数据寄存器时，单位为元素个数，`src`增加`offset * sizeof(dtype)`字节。<br>&bull; 当`dst`为掩码寄存器时，单位为字节，`src`指针增加`offset`字节。 |
+| offset | 输入 | Post Update步长。接口从当前`src`地址完成搬入后更新`src`。<br>&bull; 当`dst`为矢量数据寄存器时，单位为元素个数，`src`增加`offset × sizeof(dtype)`字节。<br>&bull; 当`dst`为掩码寄存器时，单位为字节，`src`指针增加`offset`字节。 |
 
 ### 非连续对齐搬入模式
 
@@ -107,7 +107,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst,
 | dst | 输出 | 目的矢量数据寄存器。dtype须与`src`一致，搬入VL长度数据。 |
 | src | 输入/输出 | 源UB地址，实际读取地址需32字节对齐。 |
 | block_stride | 输入 | 源操作数相邻`data_block`之间起始地址的步长，单位为32字节。 |
-| repeat_stride | 输入 | Post Update步长，单位为32字节。接口完成本次搬入后，将`src`地址增加`repeat_stride * 32`字节。 |
+| repeat_stride | 输入 | Post Update步长，单位为32字节。接口完成本次搬入后，将`src`地址增加`repeat_stride × 32`字节。 |
 | mask | 输入 | 掩码寄存器，用于指示在计算过程中哪些元素参与计算。<br>&bull; 因该接口以`data_block`为数据搬运单元，当`data_block`中的任意一个元素被`mask`筛选成有效元素时，该`data_block`中所有数据都会搬入至矢量数据寄存器。<br>&bull; 当`data_block`中所有元素都被`mask`筛选成无效元素时，该`data_block`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。

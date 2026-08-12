@@ -177,7 +177,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 | dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。 |
 | src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
 | block_stride | 输入 | 源操作数相邻`data_block`之间起始地址的步长，单位为32字节。 |
-| repeat_stride | 输入 | 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride * 32`字节。 |
+| repeat_stride | 输入 | 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。 |
 | mask | 输入 | 掩码寄存器，用于指示在计算过程中哪些元素参与计算。<br>&bull; 因该接口以`data_block`为数据搬运单元，当`data_block`中的任意一个元素被`mask`筛选成有效元素时，该`data_block`中所有数据都会搬入至矢量数据寄存器。<br>&bull; 当`data_block`中所有元素都被`mask`筛选成无效元素时，该`data_block`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
