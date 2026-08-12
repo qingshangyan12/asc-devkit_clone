@@ -10,11 +10,11 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_REG_CAST
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_CAST_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_CAST_H
+#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
+#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
 
 #include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
 
@@ -71,14 +71,23 @@ template <typename To, cast_layout Layout = cast_layout::zero, cast_round_mode R
 __simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src);
 #endif
 
+/**
+ * @brief Truncates each active element toward zero.
+ * @tparam T Element type. Supported types are half, bfloat16_t, and float.
+ * @param src Source register and predicate mask.
+ * @return Truncated register with the source predicate mask.
+ */
+template <typename T>
+__simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src);
+
 } // namespace te
 } // namespace asc
 
-#include "impl/tensor_api/arch/vector/experimental/cast/reg_cast.h"
+#include "impl/tensor_api/arch/vector/experimental/type_conversion_impl.h"
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_CAST_H
+#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_REG_CAST)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_REG_CAST
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION
 #endif

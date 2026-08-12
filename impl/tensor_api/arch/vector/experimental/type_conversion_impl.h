@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -9,8 +8,43 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_REG_CAST_TABLE_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_REG_CAST_TABLE_H
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning                                                                                                               \
+    "type_conversion_impl.h is internal; include <tensor_api/arch/vector/experimental/type_conversion.h> instead."
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TYPE_CONVERSION
+#endif
+
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_IMPL_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_IMPL_H
+
+#if !defined(INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H)
+#include "tensor_api/arch/vector/experimental/type_conversion.h"
+#endif
+#include "c_api/reg_compute/reg_convert.h"
+#include "impl/tensor_api/arch/utils/arch_utils.h"
+
+namespace asc {
+namespace te {
+
+namespace reg_cast_detail {
+
+template <typename To, typename From, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat>
+struct reg_cast_op {
+    static constexpr bool supported = false;
+};
+
+#define ASC_REG_CAST_OP(TO, FROM, LAYOUT, ROUND, SAT, FUNC)                                                           \
+    template <>                                                                                                       \
+    struct reg_cast_op<TO, FROM, cast_layout::LAYOUT, cast_round_mode::ROUND, cast_sat_mode::SAT> {                  \
+        static constexpr bool supported = true;                                                                       \
+                                                                                                                       \
+        template <typename DstReg, typename SrcReg>                                                                   \
+        __simd_callee__ static void run(DstReg& dst, SrcReg src, vector_bool mask)                                   \
+        {                                                                                                              \
+            FUNC(dst, src, mask);                                                                                      \
+        }                                                                                                              \
+    }
 
 // bfloat16_t -> float
 ASC_REG_CAST_OP(float, bfloat16_t, zero, rint, not_sat, asc_bfloat162float);
@@ -543,4 +577,87 @@ ASC_REG_CAST_OP(fp4x2_e2m1_t, bfloat16_t, three, trunc, not_sat, asc_bfloat162e2
 #endif
 #endif
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_REG_CAST_TABLE_H
+
+#undef ASC_REG_CAST_OP
+
+template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat, typename From>
+__simd_callee__ inline reg_tensor<To> cast_impl(reg_tensor<From> src)
+{
+    static_assert(!AscendC::Std::is_same_v<To, From>,
+        "reg_tensor cast requires different source and destination element types");
+
+    using op = reg_cast_op<To, From, Layout, Round, Sat>;
+    static_assert(op::supported,
+        "register cast type or option combination is unsupported on the current architecture");
+
+    reg_tensor<To> dst;
+    if constexpr (op::supported) {
+        op::run(dst.reg, src.reg, src.mask);
+    }
+    dst.mask = src.mask;
+    return dst;
+}
+
+} // namespace reg_cast_detail
+
+namespace reg_truncate_detail {
+
+template <typename T>
+struct is_supported {
+    static constexpr bool value = false;
+};
+
+template <>
+struct is_supported<half> {
+    static constexpr bool value = true;
+};
+
+template <>
+struct is_supported<bfloat16_t> {
+    static constexpr bool value = true;
+};
+
+template <>
+struct is_supported<float> {
+    static constexpr bool value = true;
+};
+
+} // namespace reg_truncate_detail
+
+#if __cplusplus >= 202002L
+template <typename To, cast_options Options, typename From>
+__simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src)
+{
+    return reg_cast_detail::cast_impl<To, Options.layout, Options.round, Options.sat>(src);
+}
+#else
+template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat, typename From>
+__simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src)
+{
+    return reg_cast_detail::cast_impl<To, Layout, Round, Sat>(src);
+}
+#endif
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src)
+{
+    if constexpr (reg_truncate_detail::is_supported<T>::value) {
+        reg_tensor<T> dst;
+        asc_trunc(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        static_assert(reg_truncate_detail::is_supported<T>::value,
+            "reg_tensor trunc supports only half, bfloat16_t, and float");
+    }
+}
+
+} // namespace te
+} // namespace asc
+
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_IMPL_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TYPE_CONVERSION)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TYPE_CONVERSION
+#endif
