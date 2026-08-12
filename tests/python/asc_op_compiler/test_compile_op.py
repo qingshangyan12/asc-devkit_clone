@@ -15,7 +15,11 @@ import shutil
 import unittest
 from unittest import mock
 
+import hashlib
 import json
+from pathlib import Path
+import re
+import subprocess
 from collections import namedtuple
 
 
@@ -65,12 +69,17 @@ from asc_op_compile_base.asc_op_compiler.compile_op import (
 )
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import (
     call_bisheng_v220,
+    get_compile_core_types,
+    get_compile_target_options,
     get_ktype_section_variable,
     decode_mode,
     v220_mode,
     v310_mode,
 )
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_dfx import DFXSectionGenerator
+from asc_op_compile_base.asc_op_compiler.static_compile_resource_id import (
+    read_resource_id_section,
+)
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v200 import (
     call_bisheng_v200_static,
 )
@@ -114,6 +123,127 @@ class MockMatch:
 
     def __bool__(self):
         return True
+
+
+def make_test_tiling_def(_name):
+    from asc_op_compile_base.asc_op_compiler.get_op_tiling import TilingDef
+
+    definitions = {
+        "AddCustomUnalign": (
+            "TilingDataUnalign",
+            (
+                "formerNum",
+                "tailNum",
+                "formerLength",
+                "tailLength",
+                "alignNum",
+            ),
+            24,
+        ),
+        "CubeCustom": ("TilingData", ("totalLength", "tileNum"), 8),
+    }
+    if _name not in definitions:
+        return None
+    class_name, field_names, data_size = definitions[_name]
+    fields = [
+        {"classType": "0", "name": name, "dtype": "uint32_t"} for name in field_names
+    ]
+    return TilingDef(
+        {
+            "class_name": class_name,
+            "data_size": data_size,
+            "fields": fields,
+        }
+    )
+
+
+def manifest_compile_include_options():
+    ascend_home = os.environ["ASCEND_HOME_PATH"]
+    api_root = os.path.join(ascend_home, "aarch64-linux/asc")
+    return [
+        "-I" + api_root,
+        "-I" + os.path.join(api_root, "include"),
+        "-I" + os.path.join(api_root, "impl"),
+        "-I" + os.path.join(api_root, "include/basic_api"),
+        "-I" + os.path.join(api_root, "impl/basic_api"),
+        "-I" + os.path.join(api_root, "include/basic_api/reg_compute"),
+        "-I" + os.path.join(api_root, "impl/basic_api/reg_compute"),
+        "-I" + os.path.join(api_root, "include/simt_api"),
+        "-I" + os.path.join(api_root, "impl/simt_api"),
+        "-I" + os.path.join(api_root, "include/adv_api"),
+        "-I" + os.path.join(api_root, "impl/adv_api"),
+        "-I"
+        + os.path.join(
+            ascend_home,
+            "aarch64-linux/ascendc/include/highlevel_api",
+        ),
+    ]
+
+
+def compile_manifest_resources(manifest, manifest_dir):
+    with TemporaryDirectory() as temp_dir:
+        resource_root = os.path.join(temp_dir, manifest["resource_path"])
+        shutil.copytree(
+            os.path.join(manifest_dir, manifest["resource_path"]), resource_root
+        )
+        output_root = os.path.join(temp_dir, "outputs")
+        os.makedirs(output_root)
+
+        for kernel in manifest["kernels"]:
+            static_input = kernel["static_inputs"][0]
+            template_path = os.path.join(resource_root, static_input["file"])
+            template = Path(template_path).read_text(encoding="utf-8")
+            static_value = (
+                "{" + ", ".join("0" for _ in range(static_input["byte_size"])) + "}"
+            )
+            Path(template_path).write_text(
+                template.replace(static_input["token"], static_value),
+                encoding="utf-8",
+            )
+
+            for obj in kernel["objects"]:
+                for command in sorted(obj["commands"], key=lambda item: item["stage"]):
+                    argv = []
+                    for argument in command["cmd"]:
+                        values = (
+                            manifest["option"]["common_compile"]
+                            if argument == "${option:common_compile}"
+                            else [argument]
+                        )
+                        for value in values:
+                            value = value.replace(
+                                "${env:ASCEND_HOME_PATH}",
+                                os.environ["ASCEND_HOME_PATH"],
+                            )
+                            value = re.sub(
+                                r"\$\{resource:([^}]+)\}",
+                                lambda match: os.path.join(
+                                    resource_root, match.group(1)
+                                ),
+                                value,
+                            )
+                            value = re.sub(
+                                r"\$\{output:([^}]+)\}",
+                                lambda match: os.path.join(output_root, match.group(1)),
+                                value,
+                            )
+                            argv.append(value)
+                    result = subprocess.run(
+                        argv,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        check=False,
+                        text=True,
+                    )
+                    if result.returncode != 0:
+                        raise AssertionError(
+                            f"Manifest command failed: {' '.join(argv)}\n"
+                            f"{result.stdout}"
+                        )
+                for output in obj["outputs"]:
+                    output_name = output[len("${output:") : -1]
+                    if not os.path.isfile(os.path.join(output_root, output_name)):
+                        raise AssertionError(f"Manifest output is missing: {output}")
 
 
 class TestCompileOp(unittest.TestCase):
@@ -185,6 +315,29 @@ class TestCompileOp(unittest.TestCase):
             "ascendc_tiling_no_register", False
         )
 
+    def _assert_manifest_identity(self, op_info):
+        kernel_meta_dir = os.path.join(TOP_PATH, "kernel_meta")
+        binary_file = os.path.join(kernel_meta_dir, op_info.kernel_name + ".o")
+        json_file = os.path.join(kernel_meta_dir, op_info.kernel_name + ".json")
+        manifest_file = os.path.join(kernel_meta_dir, "manifest", "manifest.json")
+        self.assertTrue(os.path.isfile(binary_file))
+        resource_id = read_resource_id_section(binary_file)
+        with open(json_file, "r", encoding="utf-8") as file_obj:
+            kernel_json = json.load(file_obj)
+        with open(binary_file, "rb") as file_obj:
+            self.assertEqual(
+                kernel_json["sha256"], hashlib.sha256(file_obj.read()).hexdigest()
+            )
+        with open(manifest_file, "r", encoding="utf-8") as file_obj:
+            manifest = json.load(file_obj)
+        self.assertEqual(manifest["resource_id"], resource_id)
+        self.assertTrue(manifest["kernels"])
+        self.assertTrue(
+            os.path.isdir(os.path.join(kernel_meta_dir, "manifest", "resources"))
+        )
+        os.remove(binary_file)
+        os.remove(json_file)
+
     def test_decode_mode(self):
         mode1 = decode_mode(10)
         mode2 = decode_mode(3)
@@ -192,6 +345,27 @@ class TestCompileOp(unittest.TestCase):
         self.assertEqual(mode1, 10)
         self.assertEqual(mode2, CORE_TYPE_MIX)
         self.assertEqual(mode3, CORE_TYPE_VEC)
+
+    def test_shared_compile_rules_distinguish_explicit_kernel_type(self):
+        compile_info = CompileInfo()
+        compile_info.no_set_kernel_type = False
+        compile_info.code_channel = CORE_TYPE_MIX
+        compile_info.tiling_key_kernel_type = {
+            "1": KernelMetaType.KERNEL_TYPE_MIX_AIC_HARD_SYNC
+        }
+        compile_info.raw_tiling_key_kernel_type = dict(
+            compile_info.tiling_key_kernel_type
+        )
+
+        self.assertEqual(get_compile_core_types(compile_info, "1"), ("cube",))
+        self.assertNotIn(
+            f"-D{MIX_CORE_MACRO}=1",
+            get_compile_target_options(compile_info, "1", True),
+        )
+        self.assertNotIn(
+            "-D__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__",
+            get_compile_target_options(compile_info, "1", True),
+        )
 
     def test_global_storage(self):
         self.assertRaises(
@@ -310,24 +484,34 @@ class TestCompileOp(unittest.TestCase):
             "-I" + os.path.join(API_ROOT_PATH, "include/adv_api"),
             "-I" + os.path.join(API_ROOT_PATH, "impl/adv_api"),
             "-I" + os.path.join(TOP_PATH, "build"),
-            "-include"
-            + os.path.join(
-                TOP_PATH,
-                "tests/python/asc_op_compiler/stub_kernels/add_custom_unalign_tiling.h",
-            ),
             "-DHIGH_PERFORMANCE=1",
             "-DDETERMINISTIC_MODE=1",
         ]
+        compile_options = [
+            option for option in compile_options if not option.startswith("-I")
+        ] + manifest_compile_include_options()
         op_compile_option = "{}"
         ascendc_common_utilityop_module = importlib.import_module(
             "asc_op_compile_base.asc_op_compiler.ascendc_common_utility"
         )
-        with asc_op_compile_base.common.context.op_context.OpContext():
-            with buildcfg.build_config():
-                with mock.patch.object(
-                    ascendc_common_utilityop_module,
-                    "is_enable_ascendc_cov",
-                    return_value=True,
+        with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+            ctx.add_addition("super_kernel_sub_combine", True)
+            with buildcfg.build_config(
+                enable_super_kernel=True, kernel_meta_parent_dir=TOP_PATH
+            ):
+                with (
+                    mock.patch.object(
+                        ascendc_common_utilityop_module,
+                        "is_enable_ascendc_cov",
+                        return_value=True,
+                    ),
+                    mock.patch(
+                        "asc_op_compile_base.asc_op_compiler.get_op_tiling.get_tiling_def",
+                        side_effect=make_test_tiling_def,
+                    ),
+                    mock.patch(
+                        "asc_op_compile_base.asc_op_compiler.kernel_info_infer.check_exist_instrinsic_when_super_kernel"
+                    ),
                 ):
                     compile_op(
                         cce_file,
@@ -340,7 +524,64 @@ class TestCompileOp(unittest.TestCase):
 
         binary_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".o")
         json_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".json")
+        manifest_dir = os.path.join(TOP_PATH, "kernel_meta", "manifest")
+        manifest_file = os.path.join(manifest_dir, "manifest.json")
         self.assertTrue(os.path.exists(binary_file))
+        resource_id = read_resource_id_section(binary_file)
+        with open(binary_file, "rb") as file_obj:
+            final_hash = hashlib.sha256(file_obj.read()).hexdigest()
+        with open(json_file, "r", encoding="utf-8") as file_obj:
+            kernel_json = json.load(file_obj)
+        self.assertEqual(kernel_json["sha256"], final_hash)
+        self.assertNotEqual(final_hash, resource_id)
+
+        with open(manifest_file, "r", encoding="utf-8") as file_obj:
+            manifest = json.load(file_obj)
+        self.assertEqual(manifest["resource_id"], resource_id)
+        self.assertNotIn("intermediates", manifest)
+        objects = manifest["kernels"][0]["objects"]
+        self.assertEqual({obj["obj_name"] for obj in objects}, {"basic", "sk"})
+        sk_object = next(obj for obj in objects if obj["obj_name"] == "sk")
+        self.assertEqual(
+            [command["stage"] for command in sk_object["commands"]],
+            [0, 0, 1, 1, 1],
+        )
+        static_input = manifest["kernels"][0]["static_inputs"][0]
+        self.assertEqual(static_input["token"], "@@STATIC_VALUE_tiling_data@@")
+        template_ref = "${resource:" + static_input["file"] + "}"
+        template_file = os.path.join(
+            manifest_dir, manifest["resource_path"], static_input["file"]
+        )
+        with open(template_file, "r", encoding="utf-8") as file_obj:
+            self.assertEqual(file_obj.read().count(static_input["token"]), 1)
+        compile_argv = [
+            argument
+            for kernel in manifest["kernels"]
+            for obj in kernel["objects"]
+            for command in obj["commands"]
+            if command["type"] == "compile"
+            for argument in command["cmd"]
+        ]
+        self.assertTrue(
+            any(argument == "-include" + template_ref for argument in compile_argv)
+            or any(
+                compile_argv[index : index + 2] == ["-include", template_ref]
+                for index in range(len(compile_argv) - 1)
+            )
+        )
+        wrapper_refs = {
+            argument[len("${resource:") : -1]
+            for argument in compile_argv
+            if argument.startswith("${resource:src/") and argument.endswith("}")
+        }
+        self.assertTrue(wrapper_refs)
+        for wrapper_ref in wrapper_refs:
+            wrapper_file = os.path.join(
+                manifest_dir, manifest["resource_path"], wrapper_ref
+            )
+            with open(wrapper_file, "r", encoding="utf-8") as file_obj:
+                self.assertNotIn(static_input["token"], file_obj.read())
+        compile_manifest_resources(manifest, manifest_dir)
         os.remove(binary_file)
         os.remove(json_file)
 
@@ -450,14 +691,12 @@ class TestCompileOp(unittest.TestCase):
             "-I" + os.path.join(API_ROOT_PATH, "include/adv_api"),
             "-I" + os.path.join(API_ROOT_PATH, "impl/adv_api"),
             "-I" + os.path.join(TOP_PATH, "build"),
-            "-include"
-            + os.path.join(
-                TOP_PATH,
-                "tests/python/asc_op_compiler/stub_kernels/add_custom_unalign_tiling.h",
-            ),
             "-DHIGH_PERFORMANCE=1",
             "-DDETERMINISTIC_MODE=1",
         ]
+        compile_options = [
+            option for option in compile_options if not option.startswith("-I")
+        ] + manifest_compile_include_options()
         tiling_key_list = ["1", "2"]
         hard_sync = False
         no_kfc_server_flag = False
@@ -498,10 +737,16 @@ class TestCompileOp(unittest.TestCase):
         )
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
-                with mock.patch.object(
-                    ascendc_common_utilityop_module,
-                    "is_enable_ascendc_cov",
-                    return_value=True,
+                with (
+                    mock.patch.object(
+                        ascendc_common_utilityop_module,
+                        "is_enable_ascendc_cov",
+                        return_value=True,
+                    ),
+                    mock.patch(
+                        "asc_op_compile_base.asc_op_compiler.get_op_tiling.get_tiling_def",
+                        side_effect=make_test_tiling_def,
+                    ),
                 ):
                     compile_op_with_customized_config(
                         cce_file,
@@ -514,11 +759,7 @@ class TestCompileOp(unittest.TestCase):
                         customized_config,
                     )
 
-        binary_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".o")
-        json_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".json")
-        self.assertTrue(os.path.exists(binary_file))
-        os.remove(binary_file)
-        os.remove(json_file)
+        self._assert_manifest_identity(op_info)
 
     def test_compile_op_dynamic_c310(self):
         SetCurrentSocInfo("Ascend950PR_9599")
@@ -626,14 +867,12 @@ class TestCompileOp(unittest.TestCase):
             "-I" + os.path.join(API_ROOT_PATH, "include/adv_api"),
             "-I" + os.path.join(API_ROOT_PATH, "impl/adv_api"),
             "-I" + os.path.join(TOP_PATH, "build"),
-            "-include"
-            + os.path.join(
-                TOP_PATH,
-                "tests/python/asc_op_compiler/stub_kernels/add_custom_unalign_tiling.h",
-            ),
             "-DHIGH_PERFORMANCE=1",
             "-DDETERMINISTIC_MODE=1",
         ]
+        compile_options = [
+            option for option in compile_options if not option.startswith("-I")
+        ] + manifest_compile_include_options()
         op_compile_option = "{}"
         ascendc_common_utilityop_module = importlib.import_module(
             "asc_op_compile_base.asc_op_compiler.ascendc_common_utility"
@@ -644,10 +883,16 @@ class TestCompileOp(unittest.TestCase):
         original_search = re.search
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
-                with mock.patch.object(
-                    ascendc_common_utilityop_module,
-                    "is_enable_ascendc_cov",
-                    return_value=True,
+                with (
+                    mock.patch.object(
+                        ascendc_common_utilityop_module,
+                        "is_enable_ascendc_cov",
+                        return_value=True,
+                    ),
+                    mock.patch(
+                        "asc_op_compile_base.asc_op_compiler.get_op_tiling.get_tiling_def",
+                        side_effect=make_test_tiling_def,
+                    ),
                 ):
                     with mock.patch("re.search") as mock_search:
 
@@ -666,6 +911,7 @@ class TestCompileOp(unittest.TestCase):
                             op_compile_option,
                             {},
                         )
+        self._assert_manifest_identity(op_info)
 
     def test_compile_op_dynamic_m510(self):
         cce_file = os.path.join(
@@ -1279,24 +1525,28 @@ class TestCompileOp(unittest.TestCase):
             "-I" + os.path.join(API_ROOT_PATH, "include/adv_api"),
             "-I" + os.path.join(API_ROOT_PATH, "impl/adv_api"),
             "-I" + os.path.join(TOP_PATH, "build"),
-            "-include"
-            + os.path.join(
-                TOP_PATH,
-                "tests/python/asc_op_compiler/stub_kernels/cube_custom_tiling.h",
-            ),
             "-DHIGH_PERFORMANCE=1",
             "-DDETERMINISTIC_MODE=1",
         ]
+        compile_options = [
+            option for option in compile_options if not option.startswith("-I")
+        ] + manifest_compile_include_options()
         op_compile_option = "{}"
         ascendc_common_utilityop_module = importlib.import_module(
             "asc_op_compile_base.asc_op_compiler.ascendc_common_utility"
         )
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
-                with mock.patch.object(
-                    ascendc_common_utilityop_module,
-                    "is_enable_ascendc_cov",
-                    return_value=True,
+                with (
+                    mock.patch.object(
+                        ascendc_common_utilityop_module,
+                        "is_enable_ascendc_cov",
+                        return_value=True,
+                    ),
+                    mock.patch(
+                        "asc_op_compile_base.asc_op_compiler.get_op_tiling.get_tiling_def",
+                        side_effect=make_test_tiling_def,
+                    ),
                 ):
                     compile_op(
                         cce_file,
@@ -1307,11 +1557,7 @@ class TestCompileOp(unittest.TestCase):
                         op_compile_option,
                     )
 
-        binary_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".o")
-        json_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".json")
-        self.assertTrue(os.path.exists(binary_file))
-        os.remove(binary_file)
-        os.remove(json_file)
+        self._assert_manifest_identity(op_info)
 
     def test_add_op_param_to_workspace(self):
         op_info = OpInfo(
@@ -7825,6 +8071,9 @@ Contents of section
             "-DHIGH_PERFORMANCE=1",
             "-DDETERMINISTIC_MODE=1",
         ]
+        compile_options = [
+            option for option in compile_options if not option.startswith("-I")
+        ] + manifest_compile_include_options()
         op_compile_option = "{}"
 
         with asc_op_compile_base.common.context.op_context.OpContext():
