@@ -216,3 +216,16 @@ HcclResult DlHcommFunction::DlHcommFunctionInterInit()
 }
 
 } // namespace mc2_ops_hccl
+
+extern "C" {
+bool HcommIsSupportHcommCcuInsResDescCreate() { return false; }
+bool HcommIsSupportHcommCcuInsResDescDestroy() { return false; }
+bool HcommIsSupportHcommCcuInsResDescSetNum() { return false; }
+bool HcommIsSupportHcommCcuInsResDescQueryNum() { return false; }
+bool HcommIsSupportHcommCcuInsCreate() { return false; }
+bool HcommIsSupportHcommCcuInsDestroy() { return false; }
+bool HcommIsSupportHcommCcuInsQueryResDesc() { return false; }
+bool HcommIsSupportHcommCcuQueryRemainResDesc() { return false; }
+bool HcommIsSupportHcommCcuKernelQueryResReq() { return false; }
+bool HcommIsSupportHcclCommAssignCcuIns() { return false; }
+}
