@@ -45,6 +45,7 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
     std::vector<ccu::LocalAddr> scratchMem;
     ccu::Event event;
     ccu::Variable flag;
+    ccu::Variable skipLocalRankCopy;
 };
 
 static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
@@ -77,7 +78,7 @@ static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
 static CcuResult LoadArgs(
     KfcReduceScatterMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr,
     ccu::Variable tokenInfo, ccu::Variable scratch, ccu::Variable currentRankSliceInputOffset, ccu::Variable sliceSize,
-    ccu::Variable repeatNum)
+    ccu::Variable repeatNum, ccu::Variable skipLocalRankCopy)
 {
     ctx.input[ctx.rankId] = inputAddr;
     ctx.output = outputAddr;
@@ -85,11 +86,16 @@ static CcuResult LoadArgs(
     ctx.scratch[ctx.rankId] = scratch;
     ctx.currentRankSliceInputOffset = currentRankSliceInputOffset;
     ctx.currentRankSliceOutputOffset = 0;
+    CCU_IF(skipLocalRankCopy != 0)
+    {
+        ctx.currentRankSliceOutputOffset = currentRankSliceInputOffset;
+    }
     ctx.inputRepeatStride = 0;
     ctx.outputRepeatStride = 0;
     ctx.normalSliceSize = sliceSize;
     ctx.lastSliceSize = sliceSize;
     ctx.repeatNum = repeatNum;
+    ctx.skipLocalRankCopy = skipLocalRankCopy;
     return CCU_SUCCESS;
 }
 
@@ -166,6 +172,58 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
     return CCU_SUCCESS;
 }
 
+static CcuResult DoReduceScatterReadReduceFast(KfcReduceScatterMesh1DMem2MemContext& ctx)
+{
+    ccu::LocalAddr fastOutput;
+    fastOutput.addr = ctx.output + ctx.currentRankSliceOutputOffset;
+    fastOutput.token = ctx.token[ctx.rankId];
+
+    uint32_t peerId = 1 - ctx.rankId;
+    ccu::RemoteAddr peerAddr;
+    peerAddr.addr = ctx.input[peerId] + ctx.currentRankSliceInputOffset;
+    peerAddr.token = ctx.token[peerId];
+
+    ccu::Variable offset = 0;
+    ccu::Variable memSlice = CCU_MS_SIZE;
+    ccu::Variable one = 1;
+
+    ccu::Variable totalChunks = ctx.normalSliceSize / memSlice;
+    ccu::Variable tailSize = ctx.normalSliceSize - totalChunks * memSlice;
+    ccu::Variable hasTail = 0;
+    CCU_IF(tailSize != 0)
+    {
+        hasTail = one;
+        totalChunks += one;
+    }
+
+    ccu::Variable chunkIdx = 0;
+    CCU_WHILE(chunkIdx != totalChunks)
+    {
+        ccu::Variable chunkLen = memSlice;
+        CCU_IF(hasTail != 0)
+        {
+            ccu::Variable lastChunkIdx = totalChunks - one;
+            CCU_IF(chunkIdx == lastChunkIdx)
+            {
+                chunkLen = tailSize;
+            }
+        }
+
+        ccu::LocalAddr chunkOut = fastOutput;
+        chunkOut.addr += offset;
+        ccu::RemoteAddr chunkRemote = peerAddr;
+        chunkRemote.addr += offset;
+
+        ccu::ReadReduce(ctx.channels[0], chunkOut, chunkRemote, chunkLen, ctx.dataType, ctx.reduceOp, ctx.event, 1);
+        ccu::EventWait(ctx.event, 1);
+
+        offset += chunkLen;
+        chunkIdx += one;
+    }
+
+    return CCU_SUCCESS;
+}
+
 static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
     ccu::Variable scratchOffset;
@@ -190,26 +248,42 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
         ctx.scratchMem[rankIdx].token = ctx.token[ctx.rankId];
     }
 
-    ccu::Variable repeatNumAdd;
-    repeatNumAdd = 1;
-    ctx.flag = 0;
-    // AIV encodes one round as UINT64_MAX - 1; keep the original sentinel protocol unchanged.
-    CCU_WHILE(ctx.repeatNum != UINT64_MAX)
-    {
-        ctx.repeatNum += repeatNumAdd;
-        CCU_IF(ctx.flag == 1)
+    ccu::Variable useFast = 0;
+    if (ctx.rankSize == 2) {
+        CCU_IF(ctx.skipLocalRankCopy != 0)
         {
-            for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
-                if (rankIdx == ctx.rankId) {
-                    ctx.myInput.addr += ctx.inputRepeatStride;
-                } else {
-                    ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
-                }
-            }
-            ctx.output += ctx.outputRepeatStride;
+            useFast = 1;
         }
-        CCU_CHK_RET(DoReduceScatter(ctx));
-        ctx.flag = 1;
+    }
+
+    CCU_IF(useFast != 0)
+    {
+        CCU_CHK_RET(DoReduceScatterReadReduceFast(ctx));
+    }
+
+    CCU_IF(useFast == 0)
+    {
+        ccu::Variable repeatNumAdd;
+        repeatNumAdd = 1;
+        ctx.flag = 0;
+        // AIV encodes one round as UINT64_MAX - 1; keep the original sentinel protocol unchanged.
+        CCU_WHILE(ctx.repeatNum != UINT64_MAX)
+        {
+            ctx.repeatNum += repeatNumAdd;
+            CCU_IF(ctx.flag == 1)
+            {
+                for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
+                    if (rankIdx == ctx.rankId) {
+                        ctx.myInput.addr += ctx.inputRepeatStride;
+                    } else {
+                        ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
+                    }
+                }
+                ctx.output += ctx.outputRepeatStride;
+            }
+            CCU_CHK_RET(DoReduceScatter(ctx));
+            ctx.flag = 1;
+        }
     }
     return CCU_SUCCESS;
 }
@@ -217,8 +291,9 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
 CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable sliceSize, ccu::Variable repeatNum,
-    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
+    ccu::Variable skipLocalRankCopy, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
+    uint32_t rankId, const HcclDataType& dataType, const HcclDataType& outputType,
+    const HcclReduceOp& reduceType)
 {
     KfcReduceScatterMesh1DMem2MemContext ctx;
     ctx.channels = channels;
@@ -233,8 +308,9 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ctx.reduceOp = reduceType;
     HCCL_INFO(
         "[CcuKernelReduceScatterMesh1DMem2Mem] Init, KernelArgs are rankId[%u], rankSize_[%u], dataType[%d], "
-        "outputDataType[%d], reduceOp[%d]",
-        ctx.rankId, ctx.rankSize, ctx.dataType, ctx.outputDataType, ctx.reduceOp);
+        "outputDataType[%d], reduceOp[%d], skipLocalRankCopy[%llu]",
+        ctx.rankId, ctx.rankSize, ctx.dataType, ctx.outputDataType, ctx.reduceOp,
+        static_cast<uint64_t>(skipLocalRankCopy));
 
     ctx.resourceAllocated = false;
     ctx.moConfig.msInterleave = 0;
@@ -246,7 +322,8 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem run");
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(
-        LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, sliceSize, repeatNum));
+        LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, sliceSize, repeatNum,
+                 skipLocalRankCopy));
     CCU_CHK_RET(PreSync(ctx));
     CCU_CHK_RET(DoRepeatReduceScatter(ctx));
     CCU_CHK_RET(PostSync(ctx));
