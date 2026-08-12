@@ -252,11 +252,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 {
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
+    KERNEL_LOG(KERNEL_INFO, "[j_test][CcuPrepareForOp] enter, prepareType[%u], workingFlag_[%d]",
+        static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType), static_cast<int>(workingFlag_));
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         ccuUsedXnNum_ = 9;
         CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
         ccuUsedXnNum_ = 15;
+        KERNEL_LOG(KERNEL_INFO, "[j_test][CcuPrepareForOp] AllReduce branch, ccuUsedXnNum_[%u]", ccuUsedXnNum_);
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
         ccuUsedXnNum_ = 11;
@@ -281,6 +284,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     handleNeedCommitCnt_[handleId] += handleRepeatCnt_[handleId];
     for (uint32_t i = 0U; i < handleRepeatCnt_[handleId]; ++i) {
         if (msgQueueIsAvailable_[globalCurResId_] == false) {
+            KERNEL_LOG(KERNEL_INFO, "[j_test][CommitMsgInner] msgQueue not available, globalCurResId_[%d]", globalCurResId_);
             break;
         }
         KERNEL_LOG(KERNEL_INFO, "ApiClient do ccu prepare repeatIdx = %d, globalCurResId_ = %d.", i, globalCurResId_);
@@ -289,8 +293,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         ccuParam_.alltoallvCnt = globalCurResId_;
 
         if (workingFlag_) {
+            KERNEL_LOG(KERNEL_INFO, "[j_test][CommitMsgInner] workingFlag_ true, calling CcuPrepareForOp + CcuSendMsg");
             CcuPrepareForOp(handleId);
             CcuSendMsg(globalCurResId_);
+        } else {
+            KERNEL_LOG(KERNEL_INFO, "[j_test][CommitMsgInner] workingFlag_ false, skip CcuPrepareForOp");
         }
 
         msgQueueIsAvailable_[globalCurResId_] = false;
@@ -338,7 +345,11 @@ template <bool commit>
 __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CommonPrepareImpl(
     const CommonPrepareParam& commonPrepareParam)
 {
+    KERNEL_LOG(KERNEL_INFO, "[j_test][CommonPrepareImpl] enter, prepareType[%u], repeat[%u], workingFlag_[%d]",
+        static_cast<uint32_t>(commonPrepareParam.commType.prepareType), commonPrepareParam.repeat,
+        static_cast<int>(workingFlag_));
     if (unlikely(commonPrepareParam.repeat == 0U)) {
+        KERNEL_LOG(KERNEL_INFO, "[j_test][CommonPrepareImpl] repeat==0, return INVALID_HANDLE_ID");
         return INVALID_HANDLE_ID;
     }
 
@@ -407,6 +418,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
     ccuMsg_.xnAddr = xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
     ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
+    KERNEL_LOG(KERNEL_INFO, "[j_test][CcuSendMsg] resourceId[%d], xnAddr[0x%llx], ccuUsedXnNum_[%d], newCcuFlag_[%d]",
+        resourceId, static_cast<uint64_t>(ccuMsg_.xnAddr), ccuUsedXnNum_, static_cast<int>(newCcuFlag_));
 
     for (int i = 0; i < ccuUsedXnNum_; i++) {
         *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];

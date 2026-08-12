@@ -102,44 +102,10 @@ u64 CcuTempAllReduceMeshMem2Mem1D::CalcScratchMultiple(BufferType inBuffType, Bu
 HcclResult CcuTempAllReduceMeshMem2Mem1D::KernelRun(
     const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
-    buffInfo_ = templateDataParams.buffInfo;
-    HCCL_INFO("[j_test][ARTemplate][KernelRun] enter, sliceSize[%llu], templateRankSize[%u], mySubCommRank[%u]",
-        templateDataParams.sliceSize, templateRankSize_, mySubCommRank_);
-
-    RankSliceInfo sliceInfoVec;
-    CHK_RET(CalcSlice(templateDataParams.sliceSize, sliceInfoVec));
-
-    const uint64_t inputAddr = PointerToAddr(buffInfo_.inputPtr) + buffInfo_.inBuffBaseOff;
-    const uint64_t outputAddr = PointerToAddr(buffInfo_.outputPtr) + buffInfo_.outBuffBaseOff;
-    uint64_t token = 0;
-    CHK_RET(GetToken(buffInfo_, token));
-    const uint64_t scratchAddr = PointerToAddr(buffInfo_.hcclBuff.addr) + buffInfo_.hcclBuffBaseOff;
-    const uint64_t isInputOutputEqual = (inputAddr == outputAddr) ? 1 : 0;
-
-    const uint64_t normalSliceSize = sliceInfoVec[0][0].size;
-    const uint64_t lastSliceSize = sliceInfoVec[templateRankSize_ - 1][0].size;
-    const uint64_t mySliceSize = sliceInfoVec[mySubCommRank_][0].size;
-    const uint64_t currentRankSliceInputOffset = templateDataParams.inputSliceStride * myRank_;
-    const uint64_t currentRankSliceOutputOffset = templateDataParams.outputSliceStride * myRank_;
-    const uint64_t sliceOffset = normalSliceSize * myRank_;
-
-    LoopGroupConfig config{};
-    config.msInterleave = CCU_MS_INTERLEAVE;
-    config.loopCount = CCU_M2M_LOCAL_COPY_LOOP_COUNT;
-    config.memSlice = CCU_MS_SIZE;
-    const auto goSize = (myRank_ != templateRankSize_ - 1) ? CalGoSize(normalSliceSize, config) :
-                                                              CalGoSize(lastSliceSize, config);
-
-    CcuKernelSubmitInfo submitInfo{};
-    submitInfo.kernelHandle = templateResource.ccuKernels[0];
-    CHK_RET(FillCachedArgs(
-        submitInfo, inputAddr, outputAddr, token, scratchAddr, currentRankSliceInputOffset,
-        currentRankSliceOutputOffset, normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual,
-        goSize[0], goSize[1], goSize[2], goSize[3]));
-    templateResource.submitInfos.push_back(submitInfo);
-    HCCL_INFO("[j_test][ARTemplate][KernelRun] done, inputAddr[0x%llx], outputAddr[0x%llx], scratchAddr[0x%llx], "
-        "normalSliceSize[%llu], lastSliceSize[%llu], mySliceSize[%llu]",
-        inputAddr, outputAddr, scratchAddr, normalSliceSize, lastSliceSize, mySliceSize);
+    // Per-round parameters are written by CcuPrepareForAllReduceM2M and consumed by KFC server.
+    (void)param;
+    (void)templateDataParams;
+    (void)templateResource;
     return HcclResult::HCCL_SUCCESS;
 }
 

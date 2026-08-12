@@ -197,6 +197,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     } else {
         CalcGoSize(normalSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
     }
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "[j_test][CcuPrepareForAllReduceM2M] xnData: Id0=%llu, Id1=0x%llx(sendBuf), Id2=0x%llx(recvBuf), "
+        "Id3=0x%llx(scratch), Id4=%llu(inOffset), Id5=%llu(outOffset), Id6=%llu(normalSlice), Id7=%llu(lastSlice), "
+        "Id8=%llu(mySlice), Id9=%llu(sliceOffset), Id10=%llu(inOutEq), Id11-14=[%llu,%llu,%llu,%llu](goSize)",
+        xnData_[0], xnData_[1], xnData_[2], xnData_[3], xnData_[4], xnData_[5], xnData_[6], xnData_[7], xnData_[8],
+        xnData_[9], xnData_[10], xnData_[11], xnData_[12], xnData_[13], xnData_[14]);
 }
 
 template <const auto& config>
