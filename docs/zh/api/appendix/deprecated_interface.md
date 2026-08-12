@@ -11,7 +11,7 @@
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
-- [asc_copy_gm2ub_align](../SIMD-API/c_api/vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式函数原型）
+- [asc_copy_gm2ub_align](../SIMD-API/c_api/vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式和同步搬运函数原型）
 
     Ascend 950PR/Ascend 950DT上此接口的原高维切分搬运形式函数原型已废弃，请使用[asc_load_l2_cache_mode](../SIMD-API/c_api/enum/asc_load_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
 <!-- end id2 -->

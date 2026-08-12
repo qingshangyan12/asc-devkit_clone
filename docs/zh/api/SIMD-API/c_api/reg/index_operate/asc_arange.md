@@ -29,13 +29,15 @@
 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中。算法逻辑表示如下：
 ```cpp
 // 递增
-{value, value + 1, value + 2, ... value + VL_T - 2, value + VL_T - 1}
+{value, value + 1, value + 2, ... value + vl_length - 2, value + vl_length - 1}
 // 递减
-{value + VL_T - 1, value + VL_T - 2, value + VL_T - 3, ... value + 1, value}
+{value + vl_length - 1, value + vl_length - 2, value + vl_length - 3, ... value + 1, value}
 ```
 
 以int16_t数据类型，起始值`value=10`为例：
 递增索引为{10, 11, 12, 13, ... 135, 136, 137}，递减索引为{137, 136, 135, 134, ... 12, 11, 10}。
+
+本接口仅在AIV上生效，非AIV调用直接返回。
 
 ## 函数原型
 
@@ -47,7 +49,7 @@ __simd_callee__ inline void asc_arange(vector_<dtype>& dst,
                                        <dtype> value)
 ```
 
-dtype支持的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
+dtype可取的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
 
 #### 典型示例
 
@@ -65,7 +67,7 @@ __simd_callee__ inline void asc_arange_descend(vector_<dtype>& dst,
                                                <dtype> value)
 ```
 
-dtype支持的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
+dtype可取的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
 
 #### 典型示例
 
@@ -93,7 +95,7 @@ __simd_callee__ inline void asc_arange_descend(vector_half& dst,
 | 参数名       | 输入/输出 | 描述                |
 | --------- | ----- | ----------------- |
 | dst       | 输出    | 目的操作数（矢量数据寄存器）。 |
-| value     | 输入    | 源操作数（标量），dtype须与dst一致。作为递减序列的起点，序列第0个元素等于value + VL_T - 1，后续元素按1递减。取值范围为该dtype的可表示范围。 |
+| value     | 输入    | 源操作数（标量），dtype须与dst一致。作为递减序列的起点，序列第0个元素等于value + vl_length - 1，后续元素按1递减。取值范围为该dtype的可表示范围。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -105,13 +107,22 @@ __simd_callee__ inline void asc_arange_descend(vector_half& dst,
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
-- dst与value的dtype必须完全一致（int8_t、int16_t、half、int32_t、float之一），否则触发异常。
 - 本接口无掩码寄存器参数，目的矢量寄存器的全部元素均参与计算并写入结果，不存在清零或保留原值的位置。
 - 整型dtype（int8_t、int16_t、int32_t）结果在超出该dtype可表示范围时回绕（wrap-around），不触发异常。例如int8_t取value=127时，序列前128个元素依次为127、−128、−127、…、-2；value=−128时，序列前128个元素依次为−128、−127、…、−1。
 
 ## 调用示例
 
-```cpp
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)：
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
