@@ -14,11 +14,7 @@
 #include <gtest/gtest.h>
 
 #include "c_api/stub/cce_stub.h"
-#include "tensor_api/arch/vector/experimental/MaskReg_compute.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
-#include "tensor_api/tensor/local_tensor.h"
 #include "tensor_api/tensor.h"
-#include "tensor_api/utils/utils.h"
 
 namespace {
 
