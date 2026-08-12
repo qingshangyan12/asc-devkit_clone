@@ -1766,7 +1766,7 @@ typedef struct tag_ts_call_back_info {
     uint32_t fndata_high;
 
     /* word12-13 */
-    uint32_t res2; // noly vf & topic AICPU & callback msg use for hostpid.
+    uint32_t res2; // only vf & topic AICPU & callback msg use for hostpid.
     uint32_t res3;
 
     /* word14 */
@@ -2455,7 +2455,7 @@ typedef struct ts_stars_callback_sqe {
     uint32_t fndata_high;
 
     /* word12-13 */
-    uint32_t res5; // noly vf & topic AICPU & callback use for hostpid.
+    uint32_t res5; // only vf & topic AICPU & callback use for hostpid.
     uint32_t res6;
 
     /* word14 */
