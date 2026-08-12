@@ -462,6 +462,12 @@ CcuResult CcuAllReduceMeshMem2Mem1DKernel(
     HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] AllReduceMeshMem2Mem1D run");
     HCCL_INFO("[j_test][ARKernel] enter, rankSize[%u], rankId[%u], channelCount[%u], dataType[%u], reduceOp[%u]",
         rankSize, rankId, channelCount, static_cast<uint32_t>(dataType), static_cast<uint32_t>(reduceOp));
+    HCCL_INFO("[j_test][ARKernel] params: inputAddr[0x%llx], outputAddr[0x%llx], scratch[0x%llx], "
+        "normalSliceSize[%llu], lastSliceSize[%llu], mySliceSize[%llu], sliceOffset[%llu], isInputOutputEqual[%llu]",
+        static_cast<unsigned long long>(inputAddr), static_cast<unsigned long long>(outputAddr),
+        static_cast<unsigned long long>(scratch), static_cast<unsigned long long>(normalSliceSize),
+        static_cast<unsigned long long>(lastSliceSize), static_cast<unsigned long long>(mySliceSize),
+        static_cast<unsigned long long>(sliceOffset), static_cast<unsigned long long>(isInputOutputEqual));
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(LoadArgs(
         ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, currentRankSliceOutputOffset,
@@ -471,7 +477,11 @@ CcuResult CcuAllReduceMeshMem2Mem1DKernel(
     CCU_CHK_RET(PreSync(ctx));
     HCCL_INFO("[j_test][ARKernel] PreSync done");
 
-    CCU_IF(ctx.mySliceSize != 0) { CCU_CHK_RET(DoRepeatAllReduce(ctx)); }
+    CCU_IF(ctx.mySliceSize != 0) {
+        HCCL_INFO("[j_test][ARKernel] mySliceSize[%llu] != 0, entering DoRepeatAllReduce",
+            static_cast<unsigned long long>(ctx.mySliceSize));
+        CCU_CHK_RET(DoRepeatAllReduce(ctx));
+    }
     HCCL_INFO("[j_test][ARKernel] DoRepeatAllReduce done");
 
     CCU_CHK_RET(PostSync(ctx));

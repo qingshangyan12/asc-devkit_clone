@@ -133,13 +133,17 @@ HcclResult CcuTempAllReduceMeshMem2Mem1D::KernelRun(
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
     CHK_RET(FillCachedArgs(
-        submitInfo, inputAddr, outputAddr, token, scratchAddr, currentRankSliceInputOffset,
+        submitInfo, inputAddr, outputAddr, scratchAddr, currentRankSliceInputOffset,
         currentRankSliceOutputOffset, normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual,
         goSize[0], goSize[1], goSize[2], goSize[3]));
     templateResource.submitInfos.push_back(submitInfo);
     HCCL_INFO("[j_test][ARTemplate][KernelRun] done, inputAddr[0x%llx], outputAddr[0x%llx], scratchAddr[0x%llx], "
-        "normalSliceSize[%llu], lastSliceSize[%llu], mySliceSize[%llu]",
-        inputAddr, outputAddr, scratchAddr, normalSliceSize, lastSliceSize, mySliceSize);
+        "token[0x%llx], normalSliceSize[%llu], lastSliceSize[%llu], mySliceSize[%llu], "
+        "sliceOffset[%llu], isInputOutputEqual[%llu], goSize[0]=%llu, goSize[1]=%llu, goSize[2]=%llu, goSize[3]=%llu, "
+        "cachedArgsNum[%zu]",
+        inputAddr, outputAddr, scratchAddr, token, normalSliceSize, lastSliceSize, mySliceSize,
+        sliceOffset, isInputOutputEqual, goSize[0], goSize[1], goSize[2], goSize[3],
+        templateResource.submitInfos.size());
     return HcclResult::HCCL_SUCCESS;
 }
 

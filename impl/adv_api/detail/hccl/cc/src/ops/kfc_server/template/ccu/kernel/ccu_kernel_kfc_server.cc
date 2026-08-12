@@ -117,6 +117,13 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
 
     // 一次性读取本轮32个参数
     CCU_CHK_RET(ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE));
+    HCCL_INFO("[j_test][KfcServer][LoadParam] read from paramAddr, param[0]=%llu, param[1]=0x%llx, param[2]=0x%llx, "
+        "param[3]=0x%llx, param[8]=%llu",
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_0]),
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_1]),
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_2]),
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_3]),
+        static_cast<unsigned long long>(param[HBM_PARAM_IDX_8]));
     return CCU_SUCCESS;
 }
 
@@ -141,7 +148,17 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     // }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLREDUCE))
     {
-        HCCL_INFO("[j_test][KfcServer][Dispatch] dispatch AllReduce kernel");
+        HCCL_INFO("[j_test][KfcServer][Dispatch] dispatch AllReduce kernel, "
+            "param[1]=0x%llx(inputAddr), param[2]=0x%llx(outputAddr), param[3]=0x%llx(scratch), "
+            "param[6]=%llu(normalSliceSize), param[7]=%llu(lastSliceSize), param[8]=%llu(mySliceSize), "
+            "param[9]=%llu(sliceOffset)",
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_1]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_2]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_3]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_6]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_7]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_8]),
+            static_cast<unsigned long long>(param[HBM_PARAM_IDX_9]));
         CcuAllReduceMeshMem2Mem1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],

@@ -9,11 +9,18 @@
  */
 #include "ins_v2_all_reduce_sole_executor.h"
 #include "topo_match_1d.h"
+#include "adapter_acl.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_all_reduce_mesh_1D_mem2mem.h"
 #endif
 
 namespace mc2_ops_hccl {
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+constexpr uint32_t AR_KFC_PARAM_NUM_PER_DIE = 32;
+constexpr uint32_t AR_KFC_PARAM_NUM_MAX = 64;
+constexpr uint32_t AR_KFC_ONE_PARAM_SIZE = 8;
+constexpr uint64_t AR_KFC_INVALID_U64 = 0xFFFFFFFFFFFFFFFFULL;
+#endif
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllReduceSoleExecutor()
@@ -150,6 +157,58 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         HCCL_INFO("[j_test][ARExecutor][OrchestrateLoop] loop[%llu] KernelRun done, currDataCount[%llu]",
             loop, currDataCount);
         processedDataCount += currDataCount;
+    }
+
+    // Write cachedArgs to comParam (xnAddr) HBM buffer for KFC server to read
+    if (param.engine == COMM_ENGINE_CCU && !resCtx.kfcServerArgs.empty() &&
+        !templateAlgRes.submitInfos.empty()) {
+        const uint64_t xnAddr = resCtx.kfcServerArgs[0];
+        constexpr uint32_t PARAM_NUM_PER_ROUND = AR_KFC_PARAM_NUM_PER_DIE;  // 32
+        constexpr uint32_t ROUND_SIZE_BYTES = AR_KFC_PARAM_NUM_MAX * AR_KFC_ONE_PARAM_SIZE;  // 512
+        constexpr uint64_t SENTINEL_ACTIVE = 1;
+        const uint64_t sentinelTerm = AR_KFC_INVALID_U64;
+
+        HCCL_INFO("[j_test][ARExecutor][OrchestrateLoop] writing cachedArgs to xnAddr[0x%llx], "
+            "submitInfos size[%zu], roundSize[%u]",
+            xnAddr, templateAlgRes.submitInfos.size(), ROUND_SIZE_BYTES);
+
+        for (size_t i = 0; i < templateAlgRes.submitInfos.size(); i++) {
+            const auto& info = templateAlgRes.submitInfos[i];
+            std::vector<uint64_t> roundParams(PARAM_NUM_PER_ROUND, 0);
+            roundParams[0] = SENTINEL_ACTIVE;
+            for (size_t j = 0; j < CCU_MAX_TASK_ARG_NUM && j + 1 < PARAM_NUM_PER_ROUND; j++) {
+                roundParams[j + 1] = info.cachedArgs[j];
+            }
+
+            uint64_t offset = i * ROUND_SIZE_BYTES;
+            aclError aclRet = aclrtMemcpy(reinterpret_cast<void*>(xnAddr + offset),
+                PARAM_NUM_PER_ROUND * sizeof(uint64_t), roundParams.data(),
+                PARAM_NUM_PER_ROUND * sizeof(uint64_t), ACL_MEMCPY_HOST_TO_DEVICE);
+            CHK_PRT_RET(aclRet != ACL_SUCCESS,
+                HCCL_ERROR("[ARExecutor] aclrtMemcpy H2D xnAddr failed, ret[%d], offset[%llu]", aclRet, offset),
+                HCCL_E_RUNTIME);
+
+            HCCL_INFO("[j_test][ARExecutor][OrchestrateLoop] wrote round[%zu] to xnAddr+0x%llx, "
+                "param[0]=%llu, param[1]=0x%llx, param[2]=0x%llx, param[3]=0x%llx, param[8]=%llu",
+                i, offset, roundParams[0], roundParams[1], roundParams[2], roundParams[3], roundParams[8]);
+        }
+
+        // Write termination round
+        std::vector<uint64_t> termRound(PARAM_NUM_PER_ROUND, 0);
+        termRound[0] = sentinelTerm;
+        uint64_t termOffset = templateAlgRes.submitInfos.size() * ROUND_SIZE_BYTES;
+        aclError aclRet = aclrtMemcpy(reinterpret_cast<void*>(xnAddr + termOffset),
+            PARAM_NUM_PER_ROUND * sizeof(uint64_t), termRound.data(),
+            PARAM_NUM_PER_ROUND * sizeof(uint64_t), ACL_MEMCPY_HOST_TO_DEVICE);
+        CHK_PRT_RET(aclRet != ACL_SUCCESS,
+            HCCL_ERROR("[ARExecutor] aclrtMemcpy H2D termination xnAddr failed, ret[%d]", aclRet),
+            HCCL_E_RUNTIME);
+        HCCL_INFO("[j_test][ARExecutor][OrchestrateLoop] wrote termination round at xnAddr+0x%llx", termOffset);
+    } else {
+        HCCL_WARNING("[j_test][ARExecutor][OrchestrateLoop] skip writing xnAddr: engine[%u], "
+            "kfcServerArgs size[%zu], submitInfos size[%zu]",
+            static_cast<uint32_t>(param.engine), resCtx.kfcServerArgs.size(),
+            templateAlgRes.submitInfos.size());
     }
 
     HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] End.");
