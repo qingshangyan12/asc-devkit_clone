@@ -83,7 +83,9 @@ __simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src);
 } // namespace te
 } // namespace asc
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/tensor_api/arch/vector/experimental/type_conversion_impl.h"
+#endif
 
 #endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
 

@@ -53,13 +53,13 @@ protected:
     }
 };
 
-static_assert(asc::te::reg_cast_detail::reg_cast_op<float, half, cast_layout::zero,
+static_assert(asc::te::detail::reg_cast_op<float, half, cast_layout::zero,
     cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::reg_cast_detail::reg_cast_op<half, float, cast_layout::one,
+static_assert(asc::te::detail::reg_cast_op<half, float, cast_layout::one,
     cast_round_mode::ceil, cast_sat_mode::sat>::supported);
-static_assert(asc::te::reg_cast_detail::reg_cast_op<uint8_t, int32_t, cast_layout::two,
+static_assert(asc::te::detail::reg_cast_op<uint8_t, int32_t, cast_layout::two,
     cast_round_mode::rint, cast_sat_mode::sat>::supported);
-static_assert(!asc::te::reg_cast_detail::reg_cast_op<float, half, cast_layout::two,
+static_assert(!asc::te::detail::reg_cast_op<float, half, cast_layout::two,
     cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
 
 using HalfReg = asc::te::reg_tensor<half>;
