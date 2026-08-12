@@ -180,11 +180,6 @@ uint64_t DataTypeSizeGet(HcclDataType type)
     return DATATYPE_SIZE_TABLE[type];
 }
 
-HcclResult LocalCopy(const ThreadHandle& thread, const DataSlice& srcSlice, const DataSlice& dstSlice)
-{
-    return HCCL_SUCCESS;
-}
-
 std::vector<uint64_t> CalGoSize(uint64_t size)
 {
     return {size};
