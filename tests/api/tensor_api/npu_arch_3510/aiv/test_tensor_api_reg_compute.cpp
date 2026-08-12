@@ -100,9 +100,17 @@ struct IntrinsicCapture {
     size_t divCalls = 0;
     size_t duplicateCalls = 0;
     size_t intScalarCalls = 0;
+    size_t axpyCalls = 0;
+    size_t absSubCalls = 0;
+    size_t expSubCalls = 0;
+    size_t mulDstAddCalls = 0;
+    size_t mulAddDstCalls = 0;
+    size_t mulsCastCalls = 0;
+    size_t partCalls = 0;
     std::array<float, 16> floatScalars {};
     std::array<int32_t, 16> intScalars {};
     std::array<int16_t, 8> shiftScalars {};
+    std::array<int, 4> parts {};
 };
 
 IntrinsicCapture gCapture;
@@ -264,6 +272,65 @@ void CompareScalarFloatStub(vector_bool& dst, vector_float, float value, vector_
     FillBytes(dst, PREDICATE_TOKEN);
 }
 
+void AxpyFloatStub(vector_float& dst, vector_float src, float scalar, vector_bool mask, Literal)
+{
+    CaptureMask(mask);
+    gCapture.operandsMatch = gCapture.operandsMatch && HasByteValue(dst, BROADCAST_TOKEN) &&
+        HasByteValue(src, SRC0_TOKEN);
+    CaptureScalar(gCapture.floatScalars, gCapture.scalarCalls, scalar);
+    ++gCapture.axpyCalls;
+    FillBytes(dst, RESULT_TOKEN);
+}
+
+void AbsSubFloatStub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
+{
+    CaptureMask(mask);
+    gCapture.operandsMatch = gCapture.operandsMatch && HasByteValue(src0, SRC0_TOKEN) &&
+        HasByteValue(src1, SRC1_TOKEN);
+    ++gCapture.absSubCalls;
+    FillBytes(dst, RESULT_TOKEN);
+}
+
+void ExpSubFloatStub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, int part)
+{
+    CaptureMask(mask);
+    gCapture.operandsMatch = gCapture.operandsMatch && HasByteValue(src0, SRC0_TOKEN) &&
+        HasByteValue(src1, SRC1_TOKEN);
+    CaptureScalar(gCapture.parts, gCapture.partCalls, part);
+    ++gCapture.expSubCalls;
+    FillBytes(dst, RESULT_TOKEN);
+}
+
+void MulDstAddFloatStub(
+    vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
+{
+    CaptureMask(mask);
+    gCapture.operandsMatch = gCapture.operandsMatch && HasByteValue(dst, BROADCAST_TOKEN) &&
+        HasByteValue(src0, SRC0_TOKEN) && HasByteValue(src1, SRC1_TOKEN);
+    ++gCapture.mulDstAddCalls;
+    FillBytes(dst, RESULT_TOKEN);
+}
+
+void MulAddDstFloatStub(
+    vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
+{
+    CaptureMask(mask);
+    gCapture.operandsMatch = gCapture.operandsMatch && HasByteValue(dst, BROADCAST_TOKEN) &&
+        HasByteValue(src0, SRC0_TOKEN) && HasByteValue(src1, SRC1_TOKEN);
+    ++gCapture.mulAddDstCalls;
+    FillBytes(dst, RESULT_TOKEN);
+}
+
+void MulsCastFloatStub(vector_half& dst, vector_float src, float scalar, vector_bool mask, int part)
+{
+    CaptureMask(mask);
+    gCapture.operandsMatch = gCapture.operandsMatch && HasByteValue(src, SRC0_TOKEN);
+    CaptureScalar(gCapture.floatScalars, gCapture.scalarCalls, scalar);
+    CaptureScalar(gCapture.parts, gCapture.partCalls, part);
+    ++gCapture.mulsCastCalls;
+    FillBytes(dst, RESULT_TOKEN);
+}
+
 static_assert(asc::te::detail::supports_abs_v<int8_t>);
 static_assert(asc::te::detail::supports_abs_v<int16_t>);
 static_assert(asc::te::detail::supports_abs_v<half>);
@@ -287,6 +354,21 @@ static_assert(asc::te::detail::supports_shift_pair_v<uint16_t, int16_t>);
 static_assert(asc::te::detail::supports_shift_pair_v<uint32_t, int32_t>);
 static_assert(!asc::te::detail::supports_shift_pair_v<uint32_t, uint32_t>);
 static_assert(asc::te::detail::supports_compare_v<bfloat16_t>);
+static_assert(asc::te::detail::supports_axpy_v<half>);
+static_assert(asc::te::detail::supports_axpy_v<float>);
+static_assert(asc::te::detail::supports_axpy_v<int64_t>);
+static_assert(asc::te::detail::supports_axpy_v<uint64_t>);
+static_assert(asc::te::detail::supports_abs_sub_v<half>);
+static_assert(asc::te::detail::supports_abs_sub_v<float>);
+static_assert(asc::te::detail::supports_abs_sub_v<int64_t>);
+static_assert(asc::te::detail::supports_exp_sub_v<half>);
+static_assert(asc::te::detail::supports_exp_sub_v<float>);
+static_assert(asc::te::detail::supports_mul_dst_add_v<bfloat16_t>);
+static_assert(!asc::te::detail::supports_mul_dst_add_v<int32_t>);
+static_assert(asc::te::detail::supports_mul_add_dst_v<int16_t>);
+static_assert(asc::te::detail::supports_mul_add_dst_v<uint32_t>);
+static_assert(asc::te::detail::supports_mul_add_dst_v<int64_t>);
+static_assert(asc::te::detail::supports_mul_add_dst_v<uint64_t>);
 
 template <typename T>
 __aicore__ inline void CompileAbs()
@@ -400,6 +482,7 @@ __aicore__ inline void CompileFloatingPointRegCompute()
     (void)(2.0f / src0);
     (void)asc::te::max(src0, src1);
     (void)asc::te::max(src0, 1.0f);
+
     (void)asc::te::max(1.0f, src0);
     (void)asc::te::min(src0, src1);
     (void)asc::te::min(src0, 1.0f);
@@ -450,6 +533,65 @@ __aicore__ inline void CompileCompare()
     (void)(src0 <= scalar);
     (void)(scalar > src0);
     (void)(src0 >= src1);
+}
+
+template <typename T>
+__aicore__ inline void CompileAxpyAndAbsSub()
+{
+    asc::te::reg_tensor<T> dst {};
+    asc::te::reg_tensor<T> src0 {};
+    asc::te::reg_tensor<T> src1 {};
+    T scalar {};
+
+    static_assert(std::is_same_v<decltype(asc::te::axpy(dst, src0, scalar)), asc::te::reg_tensor<T>>);
+    static_assert(std::is_same_v<decltype(asc::te::abs_sub(src0, src1)), asc::te::reg_tensor<T>>);
+    (void)asc::te::axpy(dst, src0, scalar);
+    (void)asc::te::abs_sub(src0, src1);
+}
+
+template <typename T>
+__aicore__ inline void CompileExpSub()
+{
+    asc::te::reg_tensor<T> src0 {};
+    asc::te::reg_tensor<T> src1 {};
+
+    static_assert(std::is_same_v<decltype(asc::te::exp_sub(src0, src1)), asc::te::reg_tensor<float>>);
+    static_assert(std::is_same_v<decltype(asc::te::exp_sub<asc::te::reg_layout::one>(src0, src1)),
+        asc::te::reg_tensor<float>>);
+    (void)asc::te::exp_sub(src0, src1);
+    (void)asc::te::exp_sub<asc::te::reg_layout::one>(src0, src1);
+}
+
+template <typename T>
+__aicore__ inline void CompileMulDstAdd()
+{
+    asc::te::reg_tensor<T> dst {};
+    asc::te::reg_tensor<T> src0 {};
+    asc::te::reg_tensor<T> src1 {};
+
+    static_assert(std::is_same_v<decltype(asc::te::mul_dst_add(dst, src0, src1)), asc::te::reg_tensor<T>>);
+    (void)asc::te::mul_dst_add(dst, src0, src1);
+}
+
+template <typename T>
+__aicore__ inline void CompileMulAddDst()
+{
+    asc::te::reg_tensor<T> dst {};
+    asc::te::reg_tensor<T> src0 {};
+    asc::te::reg_tensor<T> src1 {};
+
+    static_assert(std::is_same_v<decltype(asc::te::mul_add_dst(dst, src0, src1)), asc::te::reg_tensor<T>>);
+    (void)asc::te::mul_add_dst(dst, src0, src1);
+}
+
+__aicore__ inline void CompileMulsCast()
+{
+    asc::te::reg_tensor<float> src {};
+    static_assert(std::is_same_v<decltype(asc::te::muls_cast(src, 2.0f)), asc::te::reg_tensor<half>>);
+    static_assert(std::is_same_v<decltype(asc::te::muls_cast<asc::te::reg_layout::one>(src, 2.0f)),
+        asc::te::reg_tensor<half>>);
+    (void)asc::te::muls_cast(src, 2.0f);
+    (void)asc::te::muls_cast<asc::te::reg_layout::one>(src, 2.0f);
 }
 
 TEST_F(TestTensorApiRegCompute, CompileReturnValueStyleApis)
@@ -557,6 +699,35 @@ TEST_F(TestTensorApiRegCompute, CompileDocumentedArithmeticTypeMatrix)
     CHECK_COMPILE(CompileMinMax, float);
 
 #undef CHECK_COMPILE
+}
+
+TEST_F(TestTensorApiRegCompute, CompileCompositeTypeMatrix)
+{
+    AscendC::SetGCoreType(0);
+
+    CompileAxpyAndAbsSub<half>();
+    CompileAxpyAndAbsSub<float>();
+    CompileAxpyAndAbsSub<int64_t>();
+    {
+        asc::te::reg_tensor<uint64_t> dst {};
+        asc::te::reg_tensor<uint64_t> src {};
+        (void)asc::te::axpy(dst, src, static_cast<uint64_t>(2));
+    }
+    CompileExpSub<half>();
+    CompileExpSub<float>();
+    CompileMulDstAdd<half>();
+    CompileMulDstAdd<bfloat16_t>();
+    CompileMulDstAdd<float>();
+    CompileMulAddDst<int16_t>();
+    CompileMulAddDst<uint16_t>();
+    CompileMulAddDst<half>();
+    CompileMulAddDst<bfloat16_t>();
+    CompileMulAddDst<int32_t>();
+    CompileMulAddDst<uint32_t>();
+    CompileMulAddDst<float>();
+    CompileMulAddDst<int64_t>();
+    CompileMulAddDst<uint64_t>();
+    CompileMulsCast();
 }
 
 TEST_F(TestTensorApiRegCompute, UnaryIntrinsicsForwardMaskAndResult)
@@ -910,6 +1081,106 @@ TEST_F(TestTensorApiRegCompute, ScalarComparisonsMapDirectAndReversedPredicates)
     for (size_t i = 0; i < gCapture.scalarCalls; ++i) {
         EXPECT_FLOAT_EQ(gCapture.floatScalars[i], 1.0f);
     }
+    EXPECT_TRUE(gCapture.masksMatch);
+}
+
+TEST_F(TestTensorApiRegCompute, CompositeAccumulationApisPreserveFormulaAndDestinationMask)
+{
+    auto dst = MakeReg<float>(BROADCAST_TOKEN);
+    auto src0 = MakeReg<float>();
+    auto src1 = MakeReg<float>(SRC1_TOKEN);
+    FillBytes(src0.mask, PREDICATE_TOKEN);
+    FillBytes(src1.mask, PREDICATE_TOKEN);
+    ResetCapture(dst.mask);
+
+    MOCKER_CPP(vaxpy, void(vector_float&, vector_float, float, vector_bool, Literal))
+        .times(1)
+        .will(invoke(AxpyFloatStub));
+    MOCKER_CPP(vmadd, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
+        .times(1)
+        .will(invoke(MulDstAddFloatStub));
+    MOCKER_CPP(vmula, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
+        .times(1)
+        .will(invoke(MulAddDstFloatStub));
+
+    ExpectResult(asc::te::axpy(dst, src0, 2.5f), dst.mask);
+    ExpectResult(asc::te::mul_dst_add(dst, src0, src1), dst.mask);
+    ExpectResult(asc::te::mul_add_dst(dst, src0, src1), dst.mask);
+
+    GlobalMockObject::verify();
+    EXPECT_EQ(gCapture.axpyCalls, 1U);
+    EXPECT_EQ(gCapture.mulDstAddCalls, 1U);
+    EXPECT_EQ(gCapture.mulAddDstCalls, 1U);
+    EXPECT_EQ(gCapture.scalarCalls, 1U);
+    EXPECT_FLOAT_EQ(gCapture.floatScalars[0], 2.5f);
+    EXPECT_TRUE(gCapture.operandsMatch);
+    EXPECT_TRUE(gCapture.masksMatch);
+}
+
+TEST_F(TestTensorApiRegCompute, AbsSubUsesFirstSourceMaskAndPreservesOperandOrder)
+{
+    auto src0 = MakeReg<float>();
+    auto src1 = MakeReg<float>(SRC1_TOKEN);
+    FillBytes(src0.mask, PREDICATE_TOKEN);
+    ResetCapture(src0.mask);
+
+    MOCKER_CPP(vabsdif, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
+        .times(1)
+        .will(invoke(AbsSubFloatStub));
+
+    ExpectResult(asc::te::abs_sub(src0, src1), src0.mask);
+
+    GlobalMockObject::verify();
+    EXPECT_EQ(gCapture.absSubCalls, 1U);
+    EXPECT_TRUE(gCapture.operandsMatch);
+    EXPECT_TRUE(gCapture.masksMatch);
+}
+
+TEST_F(TestTensorApiRegCompute, ExpSubMapsBothRegisterLayouts)
+{
+    auto src0 = MakeReg<float>();
+    auto src1 = MakeReg<float>(SRC1_TOKEN);
+    FillBytes(src0.mask, PREDICATE_TOKEN);
+    ResetCapture(src0.mask);
+
+    MOCKER_CPP(vexpdif, void(vector_float&, vector_float, vector_float, vector_bool, int))
+        .times(2)
+        .will(invoke(ExpSubFloatStub));
+
+    ExpectResult(asc::te::exp_sub(src0, src1), src0.mask);
+    ExpectResult(asc::te::exp_sub<asc::te::reg_layout::one>(src0, src1), src0.mask);
+
+    GlobalMockObject::verify();
+    EXPECT_EQ(gCapture.expSubCalls, 2U);
+    EXPECT_EQ(gCapture.partCalls, 2U);
+    EXPECT_EQ(gCapture.parts[0], PART_EVEN);
+    EXPECT_EQ(gCapture.parts[1], PART_ODD);
+    EXPECT_TRUE(gCapture.operandsMatch);
+    EXPECT_TRUE(gCapture.masksMatch);
+}
+
+TEST_F(TestTensorApiRegCompute, MulsCastMapsBothLayoutsAndReturnsHalf)
+{
+    auto src = MakeReg<float>();
+    FillBytes(src.mask, PREDICATE_TOKEN);
+    ResetCapture(src.mask);
+
+    MOCKER_CPP(vmulscvt, void(vector_half&, vector_float, float, vector_bool, int))
+        .times(2)
+        .will(invoke(MulsCastFloatStub));
+
+    ExpectResult(asc::te::muls_cast(src, 1.5f), src.mask);
+    ExpectResult(asc::te::muls_cast<asc::te::reg_layout::one>(src, 3.0f), src.mask);
+
+    GlobalMockObject::verify();
+    EXPECT_EQ(gCapture.mulsCastCalls, 2U);
+    EXPECT_EQ(gCapture.scalarCalls, 2U);
+    EXPECT_FLOAT_EQ(gCapture.floatScalars[0], 1.5f);
+    EXPECT_FLOAT_EQ(gCapture.floatScalars[1], 3.0f);
+    EXPECT_EQ(gCapture.partCalls, 2U);
+    EXPECT_EQ(gCapture.parts[0], PART_EVEN);
+    EXPECT_EQ(gCapture.parts[1], PART_ODD);
+    EXPECT_TRUE(gCapture.operandsMatch);
     EXPECT_TRUE(gCapture.masksMatch);
 }
 

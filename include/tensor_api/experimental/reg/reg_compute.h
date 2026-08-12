@@ -17,13 +17,14 @@
  * \file reg_compute.h
  * \brief Return-value-style register compute APIs for asc::te.
  *
- * This header provides chapter 4, "Basic compute", of vector_compute_api_manual.html.
+ * This header provides return-value-style basic and composite register compute operations.
  * These APIs are available only on NPU architecture 3510.
  */
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_COMPUTE_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_REG_REG_COMPUTE_H
 
 #include "impl/tensor_api/arch/vector/experimental/reg_compute_arithmetic_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/reg_compute_composite_impl.h"
 #include "impl/tensor_api/arch/vector/experimental/reg_compute_logic_impl.h"
 
 namespace asc {
@@ -123,6 +124,28 @@ __simd_callee__ inline reg_tensor<T> min(reg_tensor<T> src, detail::type_identit
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> min(detail::type_identity_t<T> value, reg_tensor<T> src);
+
+// Composite compute
+template <typename T>
+__simd_callee__ inline reg_tensor<T> axpy(
+    reg_tensor<T> dst, reg_tensor<T> src, detail::type_identity_t<T> scalar);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> abs_sub(reg_tensor<T> src0, reg_tensor<T> src1);
+
+template <reg_layout Layout, typename T>
+__simd_callee__ inline reg_tensor<float> exp_sub(reg_tensor<T> src0, reg_tensor<T> src1);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> mul_dst_add(
+    reg_tensor<T> dst, reg_tensor<T> src0, reg_tensor<T> src1);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> mul_add_dst(
+    reg_tensor<T> dst, reg_tensor<T> src0, reg_tensor<T> src1);
+
+template <reg_layout Layout>
+__simd_callee__ inline reg_tensor<half> muls_cast(reg_tensor<float> src, float scalar);
 
 // Bitwise operations
 template <typename T>

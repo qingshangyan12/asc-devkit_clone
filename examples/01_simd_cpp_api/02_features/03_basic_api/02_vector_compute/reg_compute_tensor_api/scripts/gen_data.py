@@ -16,6 +16,7 @@ import numpy as np
 
 
 VECTOR_LENGTH = 64
+INT64_VECTOR_LENGTH = 32
 DEFAULT_PRELU_SLOPE = np.float32(0.25)
 DEFAULT_LEAKY_RELU_SLOPE = np.float32(0.01)
 
@@ -43,6 +44,8 @@ def main() -> None:
     int_a = np.arange(VECTOR_LENGTH, dtype=np.int32)
     int_b = (3 * np.arange(VECTOR_LENGTH) + 1).astype(np.int32)
     int_shift = (np.arange(VECTOR_LENGTH) % 4).astype(np.int32)
+    int64_a = (np.arange(INT64_VECTOR_LENGTH, dtype=np.int64) - np.int64(16)) * np.int64(1_000_003)
+    int64_b = (np.arange(INT64_VECTOR_LENGTH, dtype=np.int64) % np.int64(9) - np.int64(4)) * np.int64(97)
 
     float_results = np.stack(
         [
@@ -84,6 +87,12 @@ def main() -> None:
             (np.float32(0.0) > float_a).astype(np.float32),
             (float_a >= float_b).astype(np.float32),
             np.where(float_a > 0.0, float_a + np.float32(1.0), np.float32(0.0)),
+            np.float32(0.25) * float_a + float_b,
+            np.abs(float_a - float_b),
+            np.exp(float_a - float_b),
+            float_a * float_b + float_slope,
+            float_b * float_slope + float_a,
+            (float_a * np.float32(1.5)).astype(np.float16).astype(np.float32),
         ]
     ).astype(np.float32)
 
@@ -106,16 +115,30 @@ def main() -> None:
         ]
     ).astype(np.int32)
 
+    int64_results = np.stack(
+        [
+            np.int64(-3) * int64_a + int64_b,
+            np.abs(int64_a - int64_b),
+            int64_a * int64_b + int64_b,
+        ]
+    ).astype(np.int64)
+
     float_a.tofile(input_dir / "float_a.bin")
     float_b.tofile(input_dir / "float_b.bin")
     float_slope.tofile(input_dir / "float_slope.bin")
     int_a.tofile(input_dir / "int_a.bin")
     int_b.tofile(input_dir / "int_b.bin")
     int_shift.tofile(input_dir / "int_shift.bin")
+    int64_a.tofile(input_dir / "int64_a.bin")
+    int64_b.tofile(input_dir / "int64_b.bin")
     float_results.tofile(output_dir / "golden_float.bin")
     int_results.tofile(output_dir / "golden_int.bin")
+    int64_results.tofile(output_dir / "golden_int64.bin")
 
-    print(f"Generated {float_results.shape[0]} float rows and {int_results.shape[0]} int32 rows.")
+    print(
+        f"Generated {float_results.shape[0]} float rows, {int_results.shape[0]} int32 rows, "
+        f"and {int64_results.shape[0]} int64 rows."
+    )
 
 
 if __name__ == "__main__":
