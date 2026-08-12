@@ -282,7 +282,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 | cmatrixInitVal | 是否使能C矩阵默认初始化清零。true=初始化为0，false=不初始化（由cmatrixSource控制）。默认true。 |
 | cmatrixSource | C矩阵初始值是否来源于BT Buffer。true=来源BT，false=不初始化。默认false。**注意**：带bias输入时此参数无效。 |
 | unitFlag | 控制Mmad和Fixpipe细粒度并行。0=不使能，2=使能不复位，3=使能并复位。详见UnitFlag特性说明。 |
-| disableGemv | M=1时是否关闭GEMV模式。**仅950PR/DT支持**。 |
+| disableGemv | M=1时是否关闭GEMV模式。**仅Ascend 950PR/Ascend 950DT支持**。 |
 ```
 
 **编写要求**：
@@ -311,7 +311,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 | bfloat16_t | bfloat16_t | float |
 | int4b_t | int4b_t | int32_t |
 
-针对Ascend 950PR/DT产品：
+针对Ascend 950PR/Ascend 950DT产品：
 （类似分表，含fp8/hifloat8等特有类型）
 
 | 左矩阵A | 右矩阵B | 偏置Bias | 结果矩阵C |
@@ -416,10 +416,10 @@ Mmad和Fixpipe的unitFlag需同步开启。前n-1条设为2（维持占用），
 当M=1时，Mmad自动触发GEMV（矩阵向量乘）加速通路，跳过不必要的矩阵加载。
 
 ### UnitFlag并行控制
-控制Mmad和Fixpipe的细粒度流水并行，详见[UnitFlag特性说明](UnitFlag.md)。
+控制Mmad和Fixpipe的细粒度流水并行，详见[UnitFlag特性说明](api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/UnitFlag.md)。
 
 ### K方向对齐约束
-k方向需满足特定的对齐要求，不同数据类型约束不同，详见[K方向对齐约束](K-方向对齐约束.md)。
+k方向需满足特定的对齐要求，不同数据类型约束不同，详见[K方向对齐约束](api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/k_direction_alignment_constraint.md)。
 ```
 
 **编写要求**：
@@ -440,8 +440,8 @@ k方向需满足特定的对齐要求，不同数据类型约束不同，详见[
 ## 理论性能
 
 本接口的理论性能数据请参考附录：
-- Cube指令理论性能汇总：详见[Cube指令理论性能汇总](api/附录/Cube指令理论性能汇总.md)
-- Vector指令理论性能汇总：详见[Vector指令理论性能汇总](api/附录/Vector指令理论性能汇总.md)
+- Cube指令理论性能汇总：详见[Cube指令理论性能汇总](api/appendix/cube_instruction_theoretical_perf_summary.md)
+- Vector指令理论性能汇总：详见[Vector指令理论性能汇总](api/appendix/vector_instruction_theoretical_perf_summary.md)
 ```
 
 **编写要求**：
@@ -499,9 +499,9 @@ extern "C" __global__ __aicore__ void mmad_custom(GM_ADDR x, GM_ADDR y, GM_ADDR 
 ```
 | 相似API | 与当前API区别 | 选择建议 |
 |---------|-------------|---------|
-| [MmadWithSparse](MmadWithSparse.md) | 支持4选2结构化稀疏矩阵乘 | 权重矩阵已剪枝为稀疏格式时选用 |
+| [MmadWithSparse](api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadWithSparse.md) | 支持4选2结构化稀疏矩阵乘 | 权重矩阵已剪枝为稀疏格式时选用 |
 | [MXMmad](MXMmad.md) | 支持MX格式（微缩放）矩阵乘 | 使用MX混合精度训练时选用 |
-| [Iterate](Iterate.md) + [GetTensorC](GetTensorC.md) | Matmul高阶API的循环迭代模式 | 不需要精细控制L0A/L0B排布时，优先用高阶API |
+| [Iterate](api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Iterate.md) + [GetTensorC](api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetTensorC.md) | Matmul高阶API的循环迭代模式 | 不需要精细控制L0A/L0B排布时，优先用高阶API |
 | Mmad带bias原型 | 支持偏置矩阵初始化C | 需要C+=A×B+Bias场景选用，比cmatrixSource配置更简单 |
 | Mmad不带bias + cmatrixSource | 通过参数配置C初始值来源 | 需要C初始值来自BT Buffer但不需要Bias时选用 |
 | Mmad + MmadBitModeParams | 位域联合体参数，单入参传递 | 追求极致性能、需要细粒度bit位操作时选用 |
@@ -522,7 +522,7 @@ void mad(__cc__ float *c, __ca__ half *a, __cb__ half *b,
     uint16_t m, uint16_t k, uint16_t n, uint8_t unitFlag,
     bool kDirectionAlign, bool cmatrixSource, bool cmatrixInitVal);
 
-针对Ascend 950PR/DT：
+针对Ascend 950PR/Ascend 950DT：
 void mad(__cc__ float *c, __ca__ half *a, __cb__ half *b,
     uint16_t m, uint16_t k, uint16_t n, uint8_t unit_Flag_ctrl,
     bool gemv_ctrl, bool BTbuf_ctrl, bool zero_Cmatrix_ctrl);

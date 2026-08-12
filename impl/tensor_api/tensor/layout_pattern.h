@@ -284,6 +284,75 @@ struct MakeScaleBDNFrameLayout {
     }
 };
 
+// Convolution feature-map patterns. These are flat (non-fractal) row-major layouts: shape carries
+// the logical dims in their natural order, stride is the row-major contiguous product (last dim = 1,
+// each earlier dim = product of all later dims). C0 is supplied by the caller, not derived from the
+// trait, so the stride stays a plain contiguous layout regardless of element type.
+
+struct NCHWLayoutPtn {};
+struct NHWCLayoutPtn {};
+struct NC1HWC0LayoutPtn {};
+
+struct MakeNCHWFrameLayout {
+    template <typename TraitType, typename N, typename C, typename H, typename W>
+    __aicore__ inline static auto Make(N n, C c, H h, W w)
+    {
+        auto shape = MakeShape(n, c, h, w);
+        auto stride = MakeStride(c * h * w, h * w, w, _1{});
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NCHWLayoutPtn, TraitType>>;
+        return LayoutT(shape, stride);
+    }
+};
+
+struct MakeNHWCFrameLayout {
+    template <typename TraitType, typename N, typename H, typename W, typename C>
+    __aicore__ inline static auto Make(N n, H h, W w, C c)
+    {
+        auto shape = MakeShape(n, h, w, c);
+        auto stride = MakeStride(h * w * c, w * c, c, _1{});
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NHWCLayoutPtn, TraitType>>;
+        return LayoutT(shape, stride);
+    }
+};
+
+struct MakeNC1HWC0FrameLayout {
+    template <typename TraitType, typename N, typename C1, typename H, typename W, typename C0>
+    __aicore__ inline static auto Make(N n, C1 c1, H h, W w, C0 c0)
+    {
+        auto shape = MakeShape(n, c1, h, w, c0);
+        auto stride = MakeStride(c1 * h * w * c0, h * w * c0, w * c0, c0, _1{});
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NC1HWC0LayoutPtn, TraitType>>;
+        return LayoutT(shape, stride);
+    }
+};
+
+// conv3D feature map formats. NCDHW is the row-major logical layout; NDC1HWC0 is the fractal L1
+// layout (C split into C1 outer / C0 inner, with the depth axis D between N and C1).
+struct NCDHWLayoutPtn {};
+struct NDC1HWC0LayoutPtn {};
+
+struct MakeNCDHWFrameLayout { // Shape = (N, C, D, H, W)
+    template <typename TraitType, typename N, typename C, typename D, typename H, typename W>
+    __aicore__ inline static auto Make(N n, C c, D d, H h, W w)
+    {
+        auto shape = MakeShape(n, c, d, h, w);
+        auto stride = MakeStride(c * d * h * w, d * h * w, h * w, w, _1{});
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NCDHWLayoutPtn, TraitType>>;
+        return LayoutT(shape, stride);
+    }
+};
+
+struct MakeNDC1HWC0FrameLayout { // Shape = (N, D, C1, H, W, C0)
+    template <typename TraitType, typename N, typename D, typename C1, typename H, typename W, typename C0>
+    __aicore__ inline static auto Make(N n, D d, C1 c1, H h, W w, C0 c0)
+    {
+        auto shape = MakeShape(n, d, c1, h, w, c0);
+        auto stride = MakeStride(d * c1 * h * w * c0, c1 * h * w * c0, h * w * c0, w * c0, c0, _1{});
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NDC1HWC0LayoutPtn, TraitType>>;
+        return LayoutT(shape, stride);
+    }
+};
+
 } // namespace Te
 } // namespace AscendC
 

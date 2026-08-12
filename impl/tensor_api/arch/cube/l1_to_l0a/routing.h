@@ -26,6 +26,8 @@
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/nz2nz.h"
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/zn2nz.h"
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/zn2nzb8b4.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/img2col.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/img2col3d.h"
 
 namespace AscendC {
 namespace Te {
@@ -57,6 +59,21 @@ struct CopyL12L0ARouting<Version, NZLayoutPtn, ZNLayoutPtn, CopyMode::TRANS> {
 template <uint32_t Version>
 struct CopyL12L0ARouting<Version, NZLayoutPtn, ZNLayoutPtn, CopyMode::TRANS_B8B4> {
     using type = LoadDataL12L0AZN2NZB8B4;
+};
+
+// Img2Col: L1(NC1HWC0) -> L0A(NZ) for conv feature maps. Dispatched when src carries the
+// NC1HWC0LayoutPtn tag and params is bound via CopyL12L0A.with(Img2ColParams).
+template <uint32_t Version>
+struct CopyL12L0ARouting<Version, NZLayoutPtn, NC1HWC0LayoutPtn, CopyMode::NORMAL> {
+    using type = LoadDataL12L0AImg2Col;
+};
+
+// conv3D img2col: L1(NDC1HWC0) -> L0A(NZ). Same img2col hardware path; the extra depth axis is
+// selected by the caller (tensor(coord)) and looped outside, so this reads one (C1,H,W,C0) plane
+// with indices shifted for the leading D axis.
+template <uint32_t Version>
+struct CopyL12L0ARouting<Version, NZLayoutPtn, NDC1HWC0LayoutPtn, CopyMode::NORMAL> {
+    using type = LoadDataL12L0AImg2Col3D;
 };
 
 } // namespace Te

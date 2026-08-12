@@ -1,4 +1,4 @@
-﻿# Cube矩阵计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
+# Cube矩阵计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
 本文介绍基于Ascend C语言扩展API，依托L1 Buffer、L0系列片上缓存实现矩阵计算的开发方法，该方式是Ascend C中最基础、通用的矩阵编程方案。AI Core中的Cube单元部署在AIC核，负责矩阵计算，拥有专属片上缓存：L0A Buffer存放左矩阵、L0B Buffer存放右矩阵、L0C Buffer用于保存初始累加值与矩阵运算结果。
 
@@ -195,7 +195,7 @@ int16_t dst_stride = 3;
 asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
 ```
 
-搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[cube_datamove](../../../../../api/SIMD-API/C-API/cube_datamove/矩阵数据搬运.md)查看更多内容。
+搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[cube_data_move](../../../../../api/SIMD-API/c_api/cube_data_move/cube_data_move.md)查看更多内容。
 
 当输入A矩阵（Global Memory）是转置排布(K × M)时，搬入到`L1 Buffer`为(K × N)排布的Nz分形。要使`L0A Buffer`存放(M × K)的Zz或Nz格式（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)），需要在L12L0A时进行转置，调用`asc_copy_l12l0a_transpose`接口。
 
@@ -230,16 +230,16 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_posit
 
 C语言编程提供了`asc_copy_l0c2gm`来使能发挥芯片的各种随路能力，通过直接传入配置参数可完成随路搬运的操作。
 ```c
-__aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t *dst_addr, __cc__ float *src_addr,
-                        uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl,
-                        uint8_t clip_relu_pre, uint8_t unit_flag_ctrl, uint64_t quant_pre, uint8_t relu_pre, 
-                        bool enable_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, 
-                        bool enable_clip_relu_post, uint8_t eltwise_op, bool enable_eltwise_antq, bool enable_c0_pad,
-                        bool enable_broadcast, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm(
+    __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
+    uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
+    bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn);
 
 ```
 
-另外，对于是否开启unit_flag，nz2nd信息的设置，需配置相应寄存器参数以启用不同功能。对应的接口和处理能力如下：
+另外，对于`unit_flag_mode`、`enable_nz2nd`参数的设置，需配置相应寄存器参数以启用不同功能。对应的接口和处理能力如下：
 ```c
 // 1.0 When performing inline quantization during data movement, call this interface to set vector quantization parameters in the quantization flow.
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool enable_unit_flag);
@@ -251,7 +251,7 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_str
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 ```
 
-详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/C-API/cube_datamove/asc_copy_l0c2gm)。
+详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2gm)。
 
 
 ## 矩阵计算能力说明
@@ -337,4 +337,4 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ## Cube矩阵计算示例
 
-目前完整的矩阵计算工程样例仍在开发，后续版本会持续补充。开发者可查阅API文档了解[Cube接口详细说明](../../../../../api/SIMD-API/C-API)。
+目前完整的矩阵计算工程样例仍在开发，后续版本会持续补充。开发者可查阅API文档了解[Cube接口详细说明](../../../../../api/SIMD-API/c_api/c_api.md)。
