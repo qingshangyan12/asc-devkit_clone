@@ -34,9 +34,9 @@ $$
 dst_i = src0_i \times src1_i
 $$
 
-## 函数原型
+本接口仅在AIV上生效，非AIV调用直接返回。
 
-### 模板原型（占位符形式）
+## 函数原型
 
 ```c
 __simd_callee__ inline void asc_mul(vector_<dtype>& dst,
@@ -45,9 +45,7 @@ __simd_callee__ inline void asc_mul(vector_<dtype>& dst,
                                     vector_bool mask)
 ```
 
-### dtype支持数据类型
-
-dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+dtype可取的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
@@ -83,11 +81,13 @@ __simd_callee__ inline void asc_mul(vector_half& dst,
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src0、src1、dst为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
 - src0、src1、dst三者dtype必须完全一致，否则触发数据类型异常。
-- mask为 `vector_bool` 类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- mask需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 
 ## 调用示例
 
 ```cpp
+// bisheng asc_mul.asc -o main --npu-arch=dav-3510; ./main
+
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
