@@ -80,12 +80,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expf(float x)
 #ifdef __ASC_FTZ__
     return __expf(x);
 #else
-    constexpr float subnormalBoundary = 1.17549435e-38f;
+    constexpr float subnormal_boundary = 1.17549435e-38f;
 
     float y = __expf(x);
-    if (y >= 0.0f && y < subnormalBoundary) {
-        float halfY = __expf(x * 0.5f);
-        return halfY * halfY;
+    if (y >= 0.0f && y < subnormal_boundary) {
+        float half_y = __expf(x * 0.5f);
+        return half_y * half_y;
     }
     return y;
 #endif
@@ -103,8 +103,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x) { return logf(x) / lo
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_sqrtf_precise_impl(float x)
 {
-    constexpr float scaleUp = 16777216.0f;       // 2^24
-    constexpr float scaleDown = 0.000244140625f; // 2^-12
+    constexpr float scale_up = 16777216.0f;       // 2^24
+    constexpr float scale_down = 0.000244140625f; // 2^-12
     constexpr float half = 0.5f;
 
     if (x == 0.0f || x == ASCRT_INF_F) {
@@ -112,10 +112,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_sqrtf_precise_impl(floa
     }
 
     bool scaled = x < 1.0f;
-    float b = scaled ? x * scaleUp : x;
+    float b = scaled ? x * scale_up : x;
 
-    float sqrtB = __sqrtf(b);
-    float inv = 1.0f / sqrtB;
+    float sqrt_b = __sqrtf(b);
+    float inv = 1.0f / sqrt_b;
 
     float err0 = fmaf(-(b * inv), inv, 1.0f);
     inv = fmaf(err0, inv * half, inv);
@@ -124,7 +124,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_sqrtf_precise_impl(floa
     float err1 = fmaf(-y, y, b);
     y = fmaf(inv * half, err1, y);
 
-    return scaled ? y * scaleDown : y;
+    return scaled ? y * scale_down : y;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x)
@@ -134,20 +134,20 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x)
 #elif !defined(__ASC_FTZ__) && defined(__ASC_PREC_SQRT__)
     return __asc_sqrtf_precise_impl(x);
 #else
-    constexpr float subnormalBoundary = 1.17549435e-38f;
-    float absX = fabsf(x);
-    bool isSubnormal = absX > 0.0f && absX < subnormalBoundary;
+    constexpr float subnormal_boundary = 1.17549435e-38f;
+    float abs_x = fabsf(x);
+    bool is_subnormal = abs_x > 0.0f && abs_x < subnormal_boundary;
 
 #if defined(__ASC_FTZ__) && defined(__ASC_PREC_SQRT__)
-    if (isSubnormal && x > 0.0f) {
+    if (is_subnormal && x > 0.0f) {
         x = 0.0f;
     }
     return __asc_sqrtf_precise_impl(x);
 #else
-    constexpr float scaleUp = 16777216.0f;       // 2^24
-    constexpr float scaleDown = 0.000244140625f; // 2^-12
-    if (isSubnormal && x > 0.0f) {
-        return __sqrtf(x * scaleUp) * scaleDown;
+    constexpr float scale_up = 16777216.0f;       // 2^24
+    constexpr float scale_down = 0.000244140625f; // 2^-12
+    if (is_subnormal && x > 0.0f) {
+        return __sqrtf(x * scale_up) * scale_down;
     }
     return __sqrtf(x);
 #endif

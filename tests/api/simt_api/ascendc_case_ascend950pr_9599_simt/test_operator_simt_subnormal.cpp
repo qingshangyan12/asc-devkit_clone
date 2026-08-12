@@ -34,7 +34,7 @@ protected:
     void TearDown() {}
 };
 
-TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_expfloatftzfasle)
+TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_expfloatftzfalse)
 {
     float x = 1.0f;
     float y = 2.0f;
@@ -42,7 +42,18 @@ TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_expfloatftzfasle)
     EXPECT_EQ(exp(y), expf(y));
 }
 
-TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_sqrtfloatftzfasle)
+TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_sqrtfloatftzfalseprectrue)
+{
+#ifndef __ASC_PREC_SQRT__
+#define __ASC_PREC_SQRT__
+#endif
+    float x = 1.0f;
+    float y = 2.0f;
+    EXPECT_EQ(sqrt(x), sqrtf(x));
+    EXPECT_EQ(sqrt(y), sqrtf(y));
+}
+
+TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_sqrtfloatftzfalseprecfalse)
 {
     float x = 1.0f;
     float y = 2.0f;
