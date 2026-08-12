@@ -19,6 +19,8 @@ FLOAT_RESULT_ROWS = 44
 INT_RESULT_ROWS = 14
 INT64_VECTOR_LENGTH = 32
 INT64_RESULT_ROWS = 3
+HISTOGRAM_BIN_LENGTH = 128
+HISTOGRAM_RESULT_ROWS = 4
 MATH_ROW_BEGIN = 1
 MATH_ROW_END = 6
 COMPARE_ROW_BEGIN = 31
@@ -93,16 +95,32 @@ def verify_int64(actual_path: str, golden_path: str) -> bool:
     return True
 
 
+def verify_histogram(actual_path: str, golden_path: str) -> bool:
+    actual = load_result(
+        actual_path, np.uint16, HISTOGRAM_RESULT_ROWS, HISTOGRAM_BIN_LENGTH
+    )
+    golden = load_result(
+        golden_path, np.uint16, HISTOGRAM_RESULT_ROWS, HISTOGRAM_BIN_LENGTH
+    )
+    matches = actual == golden
+    if not np.all(matches):
+        report_mismatch("Histogram", actual, golden, matches)
+        return False
+    print("Histogram results passed.")
+    return True
+
+
 def main() -> None:
-    if len(sys.argv) != 7:
+    if len(sys.argv) != 9:
         raise ValueError(
             "Usage: verify_result.py <float_output> <float_golden> <int_output> <int_golden> "
-            "<int64_output> <int64_golden>"
+            "<int64_output> <int64_golden> <histogram_output> <histogram_golden>"
         )
     passed = (
         verify_float(sys.argv[1], sys.argv[2])
         and verify_int(sys.argv[3], sys.argv[4])
         and verify_int64(sys.argv[5], sys.argv[6])
+        and verify_histogram(sys.argv[7], sys.argv[8])
     )
     if not passed:
         raise ValueError("[ERROR] result error")
