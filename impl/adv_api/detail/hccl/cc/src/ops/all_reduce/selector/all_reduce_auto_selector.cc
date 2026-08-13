@@ -19,7 +19,7 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     (void)topoInfo;
     (void)opParam;
     (void)configAlgMap;
-    selectAlgName = "InsAllReduceMesh1DOneShot";
+    selectAlgName = "AicpuAllReduceSoleMeshOneShot";
     return SelectorStatus::MATCH;
 }
 

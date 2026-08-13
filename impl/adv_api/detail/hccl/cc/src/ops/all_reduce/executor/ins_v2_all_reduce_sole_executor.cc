@@ -220,7 +220,7 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
 #endif
 
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceMesh1DOneShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshOneShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceMesh1DOneShot);
 
 } // namespace mc2_ops_hccl
