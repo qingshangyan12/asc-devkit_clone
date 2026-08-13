@@ -98,6 +98,8 @@ set(HCCL_CHECKER_COMMON_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel
     ${UTILS_DIR}/sim_world
+    ${UTILS_DIR}/ccu
+    ${UTILS_DIR}/hccl_depends_stub
     ${UTILS_DIR}/common/utils
     ${UTILS_DIR}/common/exception
     ${UTILS_DIR}/hccl_verifier

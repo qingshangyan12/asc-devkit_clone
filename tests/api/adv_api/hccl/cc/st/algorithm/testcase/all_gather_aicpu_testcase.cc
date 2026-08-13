@@ -17,6 +17,7 @@
 #include "check_utils.h"
 #include <thread>
 #include "alg_env_config.h"
+#include "task_cache_test_stub.h"
 
 using namespace HcclSim;
 using namespace mc2_ops_hccl;
@@ -48,6 +49,8 @@ protected:
     {
         unsetenv("HCCL_OP_EXPANSION_MODE");
         unsetenv("HCCL_ENABLE_OPEN_AICPU");
+        unsetenv("HCCL_ST_UBX_CONCURRENT_TOPO");
+        unsetenv("HCCL_ST_USE_OPEN_EXECUTOR");
     }
 
     static void SetUpTestCase() {}
@@ -64,8 +67,19 @@ u32 AnalyseRankSize(const TopoMeta& topoInfo)
     return rankSize;
 }
 
-void RunAllGatherAicpuA5(const TopoMeta& topoInfo, const u64& sendCount, const HcclDataType& dataType)
+void RunAllGatherAicpuA5(
+    const TopoMeta& topoInfo, const u64& sendCount, const HcclDataType& dataType,
+    const std::string& expectedAlgName = "", bool expectMultiKernel = false, bool useOpenExecutor = false,
+    bool checkTaskGraph = true)
 {
+    if (!expectedAlgName.empty()) {
+        setenv("HCCL_ST_UBX_CONCURRENT_TOPO", "1", 1);
+    }
+    ResetAicpuLaunchAlgNames();
+    ResetOpenExecutorLaunchCount();
+    if (useOpenExecutor) {
+        setenv("HCCL_ST_USE_OPEN_EXECUTOR", "1", 1);
+    }
     // 仿真模型初始化
     SimWorld::Global()->Init(topoInfo, DevType::DEV_TYPE_950);
 
@@ -117,11 +131,59 @@ void RunAllGatherAicpuA5(const TopoMeta& topoInfo, const u64& sendCount, const H
 
     // 结果成图校验
     auto taskQueues = SimTaskQueue::Global()->GetAllRankTaskQueues();
-    HcclResult res = CheckAllGather(taskQueues, rankSize, dataType, sendCount);
-    EXPECT_TRUE(res == HCCL_SUCCESS);
+    if (checkTaskGraph) {
+        HcclResult res = CheckAllGather(taskQueues, rankSize, dataType, sendCount);
+        EXPECT_TRUE(res == HCCL_SUCCESS);
+    }
+    if (!expectedAlgName.empty()) {
+        const auto algNames = GetAicpuLaunchAlgNames();
+        ASSERT_EQ(algNames.size(), rankSize);
+        for (const auto& algName : algNames) {
+            EXPECT_EQ(algName, expectedAlgName);
+        }
+    }
+    if (expectMultiKernel) {
+        for (const auto& pod : taskQueues) {
+            for (const auto& server : pod.second) {
+                for (const auto& rank : server.second) {
+                    size_t activeQueueNum = 0;
+                    for (const auto& queue : rank.second) {
+                        activeQueueNum += queue.empty() ? 0U : 1U;
+                    }
+                    EXPECT_GE(activeQueueNum, 4U);
+                }
+            }
+        }
+    }
+    EXPECT_EQ(GetOpenExecutorLaunchCount(), useOpenExecutor ? rankSize : 0U);
 
     // 资源清理
     SimWorld::Global()->Deinit();
+    unsetenv("HCCL_ST_UBX_CONCURRENT_TOPO");
+    unsetenv("HCCL_ST_USE_OPEN_EXECUTOR");
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, st_all_gather_a5_aicpu_ubx_4rank_512kb_selects_sole_mesh_test)
+{
+    TopoMeta topoMeta{{{0, 1, 2, 3}}};
+    RunAllGatherAicpuA5(
+        topoMeta, 512U * 1024U, HcclDataType::HCCL_DATA_TYPE_UINT8, "AicpuAllGatherSoleMesh");
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, st_all_gather_a5_aicpu_ubx_4rank_concurrent_mesh_nhr_e2e_test)
+{
+    TopoMeta topoMeta{{{0, 1, 2, 3}}};
+    RunAllGatherAicpuA5(
+        topoMeta, 600U * 1024U, HcclDataType::HCCL_DATA_TYPE_UINT8, "AicpuAllGatherConcurMeshNHR", true);
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, st_all_gather_a5_aicpu_ubx_4rank_concurrent_mc2_open_executor_e2e_test)
+{
+    TopoMeta topoMeta{{{0, 1, 2, 3}}};
+    // The persistent KFC server's initial thread waits are outside this test's captured task window.
+    RunAllGatherAicpuA5(
+        topoMeta, 600U * 1024U, HcclDataType::HCCL_DATA_TYPE_UINT8, "AicpuAllGatherConcurMeshNHR", true, true,
+        false);
 }
 
 TEST_F(ST_ALL_GATHER_AICPU_TEST, st_all_gather_a5_aicpu_mesh_1d_2rank_int64_small_data_test)
