@@ -12,97 +12,9 @@
 
 
 import json
-import sys
 from asc_op_compile_base.common.utils import log as logger
 from op_manager import get_inout_info_from_opstore
-from constant import (
-    CompileParam,
-    OpDataType,
-    OpFormatType,
-    OpcOptions,
-    OptionalInOutMode,
-    OpParamType,
-)
-
-
-def _is_supported_value(value, valid_values):
-    if not isinstance(value, str):
-        return False
-    if value in valid_values:
-        return True
-    return any(
-        isinstance(candidate, tuple) and value in candidate
-        for candidate in valid_values
-    )
-
-
-def _validate_custom_tensor_value(tensor, tensor_path, errors):
-    if tensor is None:
-        return
-    if isinstance(tensor, list):
-        for index, item in enumerate(tensor):
-            _validate_custom_tensor_value(item, f"{tensor_path}[{index}]", errors)
-        return
-    if not isinstance(tensor, dict):
-        return
-    if not tensor:
-        return
-
-    field_values = (
-        (CompileParam.DTYPE, OpDataType.DtypeValueDict),
-        (CompileParam.FORMAT, OpFormatType.FormatValueDict),
-    )
-    list_field_values = (
-        (CompileParam.DTYPE_FOR_BIN_QUERY, OpDataType.DtypeValueDict),
-        (CompileParam.FORMAT_FOR_BIN_QUERY, OpFormatType.FormatValueDict),
-    )
-    for field, valid_values in field_values:
-        value = tensor.get(field)
-        if not _is_supported_value(value, valid_values):
-            errors.append(f"{tensor_path}.{field}: unsupported value '{value}'")
-    for field, valid_values in list_field_values:
-        values = tensor.get(field)
-        if values is None:
-            continue
-        if not isinstance(values, list):
-            errors.append(f"{tensor_path}.{field}: expected array")
-            continue
-        for index, value in enumerate(values):
-            if not _is_supported_value(value, valid_values):
-                errors.append(
-                    f"{tensor_path}.{field}[{index}]: unsupported value '{value}'"
-                )
-
-
-def validate_custom_binary_dtype_format(json_dict, json_path):
-    errors = []
-    op_list = json_dict.get(CompileParam.OP_LIST)
-    if not isinstance(op_list, list):
-        return True
-    for op_index, op in enumerate(op_list):
-        if not isinstance(op, dict):
-            continue
-        simplified_key = op.get(CompileParam.SIMPLE_KEY)
-        if not isinstance(simplified_key, str) or not simplified_key:
-            continue
-        for field in (CompileParam.INPUTS, CompileParam.OUTPUTS):
-            tensors = op.get(field, [])
-            if not isinstance(tensors, list):
-                continue
-            for tensor_index, tensor in enumerate(tensors):
-                _validate_custom_tensor_value(
-                    tensor,
-                    f"op_list[{op_index}].{field}[{tensor_index}]",
-                    errors,
-                )
-    if errors:
-        error_message = "Invalid custom Binary JSON file[{}]:\n{}".format(
-            json_path, "\n".join(f"  - {error}" for error in errors)
-        )
-        logger.error("%s", error_message)
-        print(error_message, file=sys.stderr)
-        return False
-    return True
+from constant import CompileParam, OpcOptions, OptionalInOutMode, OpParamType
 
 
 def check_and_feed_optional_param(inout_infos, inouts):
@@ -172,9 +84,6 @@ def check_op_compilation_json(option, opc_compile_args):
 
     if "op_list" not in json_dict:
         logger.error("There is no op_list in json file[%s].", json_path)
-        return False, None
-
-    if not validate_custom_binary_dtype_format(json_dict, json_path):
         return False, None
 
     if not check_op_optional_paramtype(json_dict, opc_compile_args):

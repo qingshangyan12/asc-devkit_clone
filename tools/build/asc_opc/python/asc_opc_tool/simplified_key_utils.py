@@ -186,13 +186,6 @@ def generate_simplified_key_mode(
 def infer_simplified_key_mode(op, opc_compile_args):
     simplified_key_configured = op.get(OpcOptions.SIMPLE_KEY, None)
     if simplified_key_configured is not None and simplified_key_configured != "":
-        requested_mode = opc_compile_args.get(OpcOptions.SIMPLE_KEY_MODE)
-        if requested_mode in (0, 1):
-            logger.warn(
-                "Custom simplified_key takes precedence over "
-                "--simplified_key_mode=%d; custom mode 2 will be used.",
-                requested_mode,
-            )
         _check_simplified_key_length(
             simplified_key_configured,
             CUSTOM_SIMPLIFIED_KEY_MAX_LEN,
