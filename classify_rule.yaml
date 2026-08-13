@@ -98,6 +98,7 @@ asc-devkit:
       - impl/tensor_api/tensor/pointer_mem_impl.h
       - impl/tensor_api/arch/cube/**/routing.h
       - impl/tensor_api/arch/vector/**/routing.h
+      - impl/tensor_api/arch/vector/experimental/type_get.h
       - impl/tensor_api/arch/vector/transform/transform_vf_set.h
       - impl/tensor_api/arch/vector/cast/instruction/*.h
       - impl/tensor_api/arch/vector/cast/instruction.h
