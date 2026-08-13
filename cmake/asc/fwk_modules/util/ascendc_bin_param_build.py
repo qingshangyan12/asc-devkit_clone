@@ -527,8 +527,7 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
             param=param_file,
             impl="high_performance,optional",
         )
-        if self.simplified_key_mode is not None:
-            build_cmd_var += f" --simplified_key_mode={self.simplified_key_mode}"
+        build_cmd_var += f" --simplified_key_mode={self.simplified_key_mode}"
 
         enable_tiling_keys = False
         if self.tiling_keys:
@@ -649,10 +648,7 @@ def _process_kernel_template_input_option(op_type, options, kernel_template_inpu
 
 def _process_simplified_key_mode_option(op_type, options, simplified_key_mode_info):
     if "--simplified_key_mode" in options:
-        simplified_key_mode = _extract_option_value(options)
-        simplified_key_mode_info[op_type] = (
-            None if simplified_key_mode == "None" else int(simplified_key_mode)
-        )
+        simplified_key_mode_info[op_type] = _extract_option_value(options)
 
 
 def _process_opc_options(
@@ -790,14 +786,17 @@ def gen_bin_param_file(
             op_desc.set_tiling_key(tiling_key_info[op_desc.op_type])
         if all_soc_key in tiling_key_info:
             op_desc.set_tiling_key(tiling_key_info[all_soc_key])
-        if op_desc.op_type in kernel_json_file:
-            op_desc.json_file = kernel_json_file[op_desc.op_type]
         if all_soc_key in kernel_json_file:
             op_desc.json_file = kernel_json_file[all_soc_key]
-        if op_desc.op_type in simplified_key_mode_info:
-            op_desc.simplified_key_mode = simplified_key_mode_info[op_desc.op_type]
+        if op_desc.op_type in kernel_json_file:
+            op_desc.json_file = kernel_json_file[op_desc.op_type]
+        simplified_key_mode = None
         if all_soc_key in simplified_key_mode_info:
-            op_desc.simplified_key_mode = simplified_key_mode_info[all_soc_key]
+            simplified_key_mode = simplified_key_mode_info[all_soc_key]
+        if op_desc.op_type in simplified_key_mode_info:
+            simplified_key_mode = simplified_key_mode_info[op_desc.op_type]
+        if simplified_key_mode is not None:
+            op_desc.simplified_key_mode = int(simplified_key_mode)
         if all_soc_key in kernel_template_input_info:
             op_desc.set_kernel_template_input(kernel_template_input_info[all_soc_key])
         if op_desc.op_type in kernel_template_input_info:
