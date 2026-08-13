@@ -20,16 +20,73 @@
 #ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
 #define INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyGM2UB;
-struct CopyUB2L1;
-struct CopyUB2GM;
-struct CopyUB2UB;
+struct copy_gm_to_ub_trait {};
+struct copy_ub_to_l1_trait {};
+struct copy_ub_to_gm_trait {};
+struct copy_ub_to_ub_trait {};
 
-} // namespace Te
-} // namespace AscendC
+struct copy_gm_to_ub_trait_default {
+    using trait_type = copy_gm_to_ub_trait;
+    static constexpr const trait_type value = {};
+};
+
+struct copy_ub_to_l1_trait_default {
+    using trait_type = copy_ub_to_l1_trait;
+    static constexpr const trait_type value = {};
+};
+
+struct copy_ub_to_gm_trait_default {
+    using trait_type = copy_ub_to_gm_trait;
+    static constexpr const trait_type value = {};
+};
+
+struct copy_ub_to_ub_trait_default {
+    using trait_type = copy_ub_to_ub_trait;
+    static constexpr const trait_type value = {};
+};
+
+struct copy_gm_to_ub {
+    template <typename TraitType, const TraitType& trait, typename... Args>
+    __aicore__ inline static void copy(const Args&... args);
+};
+
+struct copy_ub_to_l1 {
+    template <typename TraitType, const TraitType& trait, typename... Args>
+    __aicore__ inline static void copy(const Args&... args);
+
+private:
+    template <const copy_ub_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src);
+};
+
+struct copy_ub_to_gm {
+    template <typename TraitType, const TraitType& trait, typename... Args>
+    __aicore__ inline static void copy(const Args&... args);
+
+private:
+    template <const copy_ub_to_gm_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src);
+};
+
+struct copy_ub_to_ub {
+    template <typename TraitType, const TraitType& trait, typename... Args>
+    __aicore__ inline static void copy(const Args&... args);
+
+private:
+    template <const copy_ub_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src);
+};
+
+} // namespace te
+} // namespace asc
+
+#include "impl/tensor_api/arch/vector/gm_to_ub/copy.h"
+#include "impl/tensor_api/arch/vector/ub_to_l1/copy.h"
+#include "impl/tensor_api/arch/vector/ub_to_gm/copy.h"
+#include "impl/tensor_api/arch/vector/ub_to_ub/copy.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
 

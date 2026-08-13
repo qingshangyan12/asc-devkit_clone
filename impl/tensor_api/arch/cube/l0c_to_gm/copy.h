@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/arch/cube/l0c_to_gm/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -23,96 +23,105 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_GM_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
-#include "impl/tensor_api/atom/copy_traits_impl.h"
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
 #include "impl/tensor_api/arch/cube/l0c_to_gm/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyL0C2GMTrait DEFAULT_COPY_L0C2GM_TRAIT = CopyL0C2GMTrait{};
-struct CopyL0C2GMTraitDefault {
-    using TraitType = CopyL0C2GMTrait;
-    static constexpr const TraitType value = DEFAULT_COPY_L0C2GM_TRAIT;
-};
-
-struct CopyL0C2GMBase {
+struct copy_l0c_to_gm_base {
 public:
-    template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(
-        const T& dst, const U& src, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    template <const copy_l0c_to_gm_trait& trait, typename T, typename U>
+    __aicore__ inline static void data_copy_impl(const T& dst, const U& src,
+                                                 const fixpipe_params& params = default_fixpipe_params)
     {
-        using dstPos = GetMemLocation<T>;
-        using srcPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<dstPos, Location::GM>, "When Copy tensor from L0C to GM, dst tensor must on GM");
-        static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to GM, src tensor must on L0C");
+        using dst_pos = get_mem_location<T>;
+        using src_pos = get_mem_location<U>;
+        static_assert(Std::is_same_v<dst_pos, location::gm>,
+                      "For copy_l0c_to_gm, the destination tensor must be located in GM.");
+        static_assert(Std::is_same_v<src_pos, location::l0c>,
+                      "For copy_l0c_to_gm, the source tensor must be located in L0C.");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy_l0c_to_gm");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy_l0c_to_gm");
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "copy_l0c_to_gm");
 
-        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
 
-        using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2GMImpl::template Run<trait>(dst, src, params);
+        using copy_l0c_to_gm_impl =
+            typename copy_l0c_to_gm_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
+        copy_l0c_to_gm_impl::template run<trait>(dst, src, params);
     }
 
-    template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>
-    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type DataCopyImpl(
-        const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    template <const copy_l0c_to_gm_trait& trait, typename T, typename U, typename S>
+    __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type
+    data_copy_impl(const T& dst, const U& src, const S& quant, const fixpipe_params& params = default_fixpipe_params)
     {
-        using dstPos = GetMemLocation<T>;
-        using srcPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<dstPos, Location::GM>, "When Copy tensor from L0C to GM, dst tensor must on GM");
-        static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to GM, src tensor must on L0C");
+        using dst_pos = get_mem_location<T>;
+        using src_pos = get_mem_location<U>;
+        static_assert(Std::is_same_v<dst_pos, location::gm>,
+                      "For copy_l0c_to_gm, the destination tensor must be located in GM.");
+        static_assert(Std::is_same_v<src_pos, location::l0c>,
+                      "For copy_l0c_to_gm, the source tensor must be located in L0C.");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy_l0c_to_gm");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy_l0c_to_gm");
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "copy_l0c_to_gm");
 
-        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
 
-        using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2GMImpl::template Run<trait>(dst, src, quant, params);
+        using copy_l0c_to_gm_impl =
+            typename copy_l0c_to_gm_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
+        copy_l0c_to_gm_impl::template run<trait>(dst, src, quant, params);
     }
 
-    template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>
-    __aicore__ inline static typename Std::enable_if<IsAttrTensorV<S>, void>::type DataCopyImpl(
-        const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
+    template <const copy_l0c_to_gm_trait& trait, typename T, typename U, typename S>
+    __aicore__ inline static typename Std::enable_if<is_attr_tensor_v<S>, void>::type
+    data_copy_impl(const T& dst, const U& src, const S& quant, const fixpipe_params& params = default_fixpipe_params)
     {
-        using dstPos = GetMemLocation<T>;
-        using srcPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<dstPos, Location::GM>, "When Copy tensor from L0C to GM, dst tensor must on GM");
-        static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to GM, src tensor must on L0C");
+        using dst_pos = get_mem_location<T>;
+        using src_pos = get_mem_location<U>;
+        static_assert(Std::is_same_v<dst_pos, location::gm>,
+                      "For copy_l0c_to_gm, the destination tensor must be located in GM.");
+        static_assert(Std::is_same_v<src_pos, location::l0c>,
+                      "For copy_l0c_to_gm, the source tensor must be located in L0C.");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy_l0c_to_gm");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy_l0c_to_gm");
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, quant.layout(), "quant", "copy_l0c_to_gm");
+        TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "copy_l0c_to_gm");
 
-        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using dst_layout_ptn = get_layout_pattern<typename T::layout_type>;
+        using src_layout_ptn = get_layout_pattern<typename U::layout_type>;
 
-        using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2GMImpl::template Run<trait>(dst, src, quant, params);
+        using copy_l0c_to_gm_impl =
+            typename copy_l0c_to_gm_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
+        copy_l0c_to_gm_impl::template run<trait>(dst, src, quant, params);
     }
 };
 
-struct CopyL0C2GM : public CopyL0C2GMBase {
+template <typename TraitType, const TraitType& trait, typename... Args>
+__aicore__ inline void copy_l0c_to_gm::copy(const Args&... args)
+{
+    if ASCEND_IS_AIV {
+        return;
+    }
+    copy_l0c_to_gm_base::data_copy_impl<trait>(args...);
+}
+
+struct copy_l0c_to_gm_with : public copy_l0c_to_gm_base {
 public:
     template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
+    __aicore__ inline static void copy(const Args&... args)
     {
         if ASCEND_IS_AIV {
             return;
         }
-        DataCopyImpl<trait>(args...);
+        data_copy_impl<trait>(args...);
     }
 };
 
-struct CopyL0C2GMWith : public CopyL0C2GMBase {
-public:
-    template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
-    {
-        if ASCEND_IS_AIV {
-            return;
-        }
-        DataCopyImpl<trait>(args...);
-    }
-};
-
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_GM_COPY_H
 

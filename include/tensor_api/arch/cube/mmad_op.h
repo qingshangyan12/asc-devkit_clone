@@ -20,14 +20,37 @@
 #ifndef INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
 #define INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
 
-namespace AscendC {
-namespace Te {
+#include "tensor_api/utils/utils.h"
 
-struct MmadTraitDefault;
-struct MmadOperation;
+namespace asc {
+namespace te {
 
-} // namespace Te
-} // namespace AscendC
+struct mmad_trait_default {
+    using trait_type = mmad_trait;
+    static constexpr const trait_type value = {};
+};
+
+struct mmad_operation {
+public:
+    template <typename TraitType, const TraitType& traits, typename... Args>
+    __aicore__ inline static void mmad(const Args&... args);
+
+private:
+    template <const mmad_trait& trait, typename DstTensor, typename FmTensor, typename FilterTensor,
+              typename ParamsType>
+    __aicore__ inline static void mmad_impl(const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter,
+                                            const ParamsType& params);
+
+    template <const mmad_trait& trait, typename DstTensor, typename FmTensor, typename FilterTensor,
+              typename BiasTensor, typename ParamsType>
+    __aicore__ inline static void mmad_impl(const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter,
+                                            const BiasTensor& bias, const ParamsType& params);
+};
+
+} // namespace te
+} // namespace asc
+
+#include "impl/tensor_api/arch/cube/mmad/mmad.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
 

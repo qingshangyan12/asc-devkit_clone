@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/arch/vector/ub_to_ub/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -23,46 +23,39 @@
 #define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
-#include "impl/tensor_api/atom/copy_traits_impl.h"
 #include "impl/tensor_api/arch/vector/ub_to_ub/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyUB2UBTrait DEFAULT_COPY_UB_TO_UB_TRAIT = CopyUB2UBTrait{};
-
-struct CopyUB2UBTraitDefault {
-    using TraitType = CopyUB2UBTrait;
-    static constexpr const TraitType value = DEFAULT_COPY_UB_TO_UB_TRAIT;
-};
-
-struct CopyUB2UB {
-public:
-    template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
-    {
-        if ASCEND_IS_AIV {
-            DataCopyImpl<traits, Args...>(args...);
-        }
+template <typename TraitType, const TraitType& trait, typename... Args>
+__aicore__ inline void copy_ub_to_ub::copy(const Args&... args)
+{
+    if ASCEND_IS_AIV {
+        data_copy_impl<trait, Args...>(args...);
     }
+}
 
-private:
-    template <const CopyUB2UBTrait& trait = DEFAULT_COPY_UB_TO_UB_TRAIT, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
-    {
-        using dstTPos = GetMemLocation<T>;
-        using srcTPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<dstTPos, Location::UB>, "When Copy tensor from UB to UB, dst tensor must on UB");
-        static_assert(Std::is_same_v<srcTPos, Location::UB>, "When Copy tensor from UB to UB, src tensor must on UB");
-        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
-        using CopyUB2UBImpl = typename CopyUB2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyUB2UBImpl::template Run<trait, T, U>(dst, src);
-    }
-};
+template <const copy_ub_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
+__aicore__ inline void copy_ub_to_ub::data_copy_impl(const DstTensor& dst, const SrcTensor& src)
+{
+    using dst_pos = get_mem_location<DstTensor>;
+    using src_pos = get_mem_location<SrcTensor>;
+    static_assert(Std::is_same_v<dst_pos, location::ub>,
+                  "For copy_ub_to_ub, the destination tensor must be located in UB.");
+    static_assert(Std::is_same_v<src_pos, location::ub>, "For copy_ub_to_ub, the source tensor must be located in UB.");
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy_ub_to_ub");
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy_ub_to_ub");
+    TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "copy_ub_to_ub");
+    using dst_layout_ptn = get_layout_pattern<typename DstTensor::layout_type>;
+    using src_layout_ptn = get_layout_pattern<typename SrcTensor::layout_type>;
+    using copy_ub_to_ub_impl =
+        typename copy_ub_to_ub_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
+    copy_ub_to_ub_impl::template run<trait, DstTensor, SrcTensor>(dst, src);
+}
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_H
 

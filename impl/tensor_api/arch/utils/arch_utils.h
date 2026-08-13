@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/arch/utils/arch_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -26,13 +26,13 @@
 #include "impl/tensor_api/arch/utils/check_format.h"
 #include "impl/tensor_api/arch/utils/is_format.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#define SCALAR_QUANT_MODE                                                                                             \
-    QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8, QuantMode_t::QS322BF16_PRE,                     \
-        QuantMode_t::QF322F16_PRE, QuantMode_t::QF322BF16_PRE, QuantMode_t::QF322FP8_PRE, QuantMode_t::QF322HIF8_PRE, \
+#define SCALAR_QUANT_MODE                                                                                              \
+    QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8, QuantMode_t::QS322BF16_PRE,                      \
+        QuantMode_t::QF322F16_PRE, QuantMode_t::QF322BF16_PRE, QuantMode_t::QF322FP8_PRE, QuantMode_t::QF322HIF8_PRE,  \
         QuantMode_t::QF322HIF8_PRE_HYBRID, QuantMode_t::QF322F32_PRE
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #define SCALAR_QUANT_MODE QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8
@@ -40,13 +40,13 @@ namespace Te {
 #define SCALAR_QUANT_MODE QuantMode_t::NoQuant
 #endif
 
-template <QuantMode_t quantPre>
-using IsScalarQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, SCALAR_QUANT_MODE>;
+template <QuantMode_t quant_pre>
+using is_scalar_quant_mode = Std::is_one_of_value<QuantMode_t, quant_pre, SCALAR_QUANT_MODE>;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#define TILE_OP_INTERNAL_TENSOR_QUANT_MODE                                                            \
-    QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8, QuantMode_t::VQS322BF16_PRE, \
-        QuantMode_t::VQF322F16_PRE, QuantMode_t::VQF322BF16_PRE, QuantMode_t::VQF322FP8_PRE,          \
+#define TILE_OP_INTERNAL_TENSOR_QUANT_MODE                                                                             \
+    QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8, QuantMode_t::VQS322BF16_PRE,                  \
+        QuantMode_t::VQF322F16_PRE, QuantMode_t::VQF322BF16_PRE, QuantMode_t::VQF322FP8_PRE,                           \
         QuantMode_t::VQF322HIF8_PRE, QuantMode_t::VQF322HIF8_PRE_HYBRID, QuantMode_t::VQF322F32_PRE
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #define TILE_OP_INTERNAL_TENSOR_QUANT_MODE QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8
@@ -54,8 +54,8 @@ using IsScalarQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, SCALAR_QUA
 #define TILE_OP_INTERNAL_TENSOR_QUANT_MODE QuantMode_t::NoQuant
 #endif
 
-template <QuantMode_t quantPre>
-using IsVectorQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, TILE_OP_INTERNAL_TENSOR_QUANT_MODE>;
+template <QuantMode_t quant_pre>
+using is_vector_quant_mode = Std::is_one_of_value<QuantMode_t, quant_pre, TILE_OP_INTERNAL_TENSOR_QUANT_MODE>;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define TILE_OP_INTERNAL_DIRECT_QUANT_MODE QuantMode_t::F322F16, QuantMode_t::F322BF16
@@ -65,46 +65,67 @@ using IsVectorQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, TILE_OP_IN
 #define TILE_OP_INTERNAL_DIRECT_QUANT_MODE QuantMode_t::NoQuant
 #endif
 
-template <QuantMode_t quantPre>
-using IsDirectQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
+template <QuantMode_t quant_pre>
+using is_direct_quant_mode = Std::is_one_of_value<QuantMode_t, quant_pre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
 
 template <typename info1, typename info2, size_t dim, typename T>
-__aicore__ inline constexpr decltype(auto) GetElement(const T& layout)
+__aicore__ inline constexpr decltype(auto) get_element(const T& layout)
 {
-    constexpr size_t shapeOrStride = (Std::is_same_v<info1, AttrInfo::Shape> ? 0 : 1);
-    constexpr size_t rowOrColumn = (Std::is_same_v<info2, AttrInfo::Row> ? 0 : 1);
-    return layout.template Get<shapeOrStride, rowOrColumn, dim>();
+    constexpr size_t shape_or_stride = (Std::is_same_v<info1, attr_info::shape> ? 0 : 1);
+    constexpr size_t row_or_column = (Std::is_same_v<info2, attr_info::row> ? 0 : 1);
+    return layout.template get<shape_or_stride, row_or_column, dim>();
 }
 
 template <typename info1, typename info2, typename T>
-__aicore__ inline constexpr decltype(auto) GetElement(const T& layout)
+__aicore__ inline constexpr decltype(auto) get_element(const T& layout)
 {
-    constexpr size_t shapeOrStride = (Std::is_same_v<info1, AttrInfo::Shape> ? 0 : 1);
-    constexpr size_t rowOrColumn = (Std::is_same_v<info2, AttrInfo::Row> ? 0 : 1);
-    return layout.template Get<shapeOrStride, rowOrColumn>();
+    constexpr size_t shape_or_stride = (Std::is_same_v<info1, attr_info::shape> ? 0 : 1);
+    constexpr size_t row_or_column = (Std::is_same_v<info2, attr_info::row> ? 0 : 1);
+    return layout.template get<shape_or_stride, row_or_column>();
 }
 
 template <typename LayoutType>
-__aicore__ inline static constexpr uint32_t GetTotalColumnShape(const LayoutType& layout)
+__aicore__ inline static constexpr uint32_t get_total_column_shape(const LayoutType& layout)
 {
     if constexpr (LayoutType::depth == 2) {
-        return Get<1>(layout.Shape());
+        return get<1>(layout.shape());
     } else {
-        return Get<1, 0>(layout.Shape()) * Get<1, 1>(layout.Shape());
+        return get<1, 0>(layout.shape()) * get<1, 1>(layout.shape());
     }
 }
 
 template <typename LayoutType>
-__aicore__ inline static constexpr uint32_t GetTotalRowShape(const LayoutType& layout)
+__aicore__ inline static constexpr uint32_t get_total_row_shape(const LayoutType& layout)
 {
     if constexpr (LayoutType::depth == 2) {
-        return Get<0>(layout.Shape());
+        return get<0>(layout.shape());
     } else {
-        return Get<0, 0>(layout.Shape()) * Get<0, 1>(layout.Shape());
+        return get<0, 0>(layout.shape()) * get<0, 1>(layout.shape());
     }
 }
-} // namespace Te
-} // namespace AscendC
+
+template <typename LayoutType>
+__aicore__ inline static constexpr decltype(auto) get_row_stride(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == 2) {
+        return get<0>(layout.stride());
+    } else {
+        return get<0, 1>(layout.stride());
+    }
+}
+
+template <typename LayoutType>
+__aicore__ inline static constexpr decltype(auto) get_column_stride(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == 2) {
+        return get<1>(layout.stride());
+    } else {
+        return get<1, 1>(layout.stride());
+    }
+}
+} // namespace te
+} // namespace asc
+
 
 #endif // IMPL_TENSOR_API_ARCH_UTILS_ARCH_UTILS_H
 

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/atom/mmad_atom_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -25,37 +25,26 @@
 #include "impl/tensor_api/atom/cube/mmad.h"
 #include "impl/tensor_api/atom/mmad_traits_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-template <typename... Args>
-struct MmadAtom;
+template <typename MmadOperationType, typename... Args>
+template <const typename mmad_atom<mmad_traits<MmadOperationType, Args...>>::trait_type& traits, typename... Params>
+__aicore__ inline void mmad_atom<mmad_traits<MmadOperationType, Args...>>::call(const Params&... params) const
+{
+    mmad_trait_type::template mmad_unpack<traits>(params...);
+}
 
-template <typename MmadOperation>
-struct MmadAtom<MmadOperation> : MmadAtom<MmadTraits<MmadOperation>> {};
+template <typename MmadOperationType, typename... Args>
+template <typename... TraitArgs>
+__aicore__ inline auto mmad_atom<mmad_traits<MmadOperationType, Args...>>::with(TraitArgs&&... args) const
+{
+    auto traits = mmad_trait_type::with(static_cast<TraitArgs&&>(args)...);
+    return mmad_atom<decltype(traits)>{traits};
+}
 
-template <typename MmadOperation, typename... Args>
-struct MmadAtom<MmadTraits<MmadOperation, Args...>> : MmadTraits<MmadOperation, Args...> {
-    using MmadTraitType = MmadTraits<MmadOperation, Args...>;
-    using TraitType = typename MmadTraitType::TraitType;
-    static constexpr const TraitType defaultTrait = MmadTraitType::defaultTrait;
-
-    template <const TraitType& traits = defaultTrait, typename... Params>
-    __aicore__ inline void Call(const Params&... params) const
-    {
-        MmadTraitType::template MmadUnpack<traits>(params...);
-    }
-
-    template <typename... TraitsArgs>
-    __aicore__ inline auto with(TraitsArgs&&... args) const
-    {
-        auto traits = MmadTraitType::with(static_cast<TraitsArgs&&>(args)...);
-        return MmadAtom<decltype(traits)>{traits};
-    }
-};
-
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ATOM_MMAD_ATOM_IMPL_H
 

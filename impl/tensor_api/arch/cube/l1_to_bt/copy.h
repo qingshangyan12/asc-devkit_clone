@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/arch/cube/l1_to_bt/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -24,45 +24,40 @@
 
 #include "impl/tensor_api/arch/cube/l1_to_bt/routing.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-constexpr CopyL12BTTrait DEFAULT_COPY_L1_BT_TRAIT;
-
-struct CopyL12BTTraitDefault {
-    using TraitType = CopyL12BTTrait;
-    static constexpr const TraitType value = DEFAULT_COPY_L1_BT_TRAIT;
-};
-
-struct CopyL12BT {
-public:
-    template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
-    {
-        if ASCEND_IS_AIC {
-            DataCopyImpl<traits, Args...>(args...);
-        }
+template <typename TraitType, const TraitType& trait, typename... Args>
+__aicore__ inline void copy_l1_to_biastable::copy(const Args&... args)
+{
+    if ASCEND_IS_AIC {
+        data_copy_impl<trait, Args...>(args...);
     }
+}
 
-private:
-    template <const CopyL12BTTrait& trait = DEFAULT_COPY_L1_BT_TRAIT, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
-    {
-        using DstPos = GetMemLocation<T>;
-        using SrcPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<DstPos, Location::BIAS>, "CopyL12BT requires destination on BIAS");
-        static_assert(Std::is_same_v<SrcPos, Location::L1>, "CopyL12BT requires source on L1");
-        using DstLayout = typename T::layoutType;
-        using SrcLayout = typename U::layoutType;
-        using DstLayoutPtn = GetLayoutPattern<DstLayout>;
-        using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
-        using CopyL12BTImpl = typename CopyL12BTRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL12BTImpl::template Run<trait, T, U>(dst, src);
-    }
-};
+template <const copy_l1_to_biastable_trait& trait, typename DstTensor, typename SrcTensor>
+__aicore__ inline void copy_l1_to_biastable::data_copy_impl(const DstTensor& dst, const SrcTensor& src)
+{
+    using dst_pos = get_mem_location<DstTensor>;
+    using src_pos = get_mem_location<SrcTensor>;
+    static_assert(Std::is_same_v<dst_pos, location::bias>,
+                  "For copy_l1_to_biastable, the destination tensor must be located in BIAS.");
+    static_assert(Std::is_same_v<src_pos, location::l1>,
+                  "For copy_l1_to_biastable, the source tensor must be located in L1.");
+    using dst_layout = typename DstTensor::layout_type;
+    using src_layout = typename SrcTensor::layout_type;
+    using dst_layout_ptn = get_layout_pattern<dst_layout>;
+    using src_layout_ptn = get_layout_pattern<src_layout>;
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy_l1_to_biastable");
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy_l1_to_biastable");
+    TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "copy_l1_to_biastable");
+    using copy_l1_to_bt_impl =
+        typename copy_l1_to_biastable_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
+    copy_l1_to_bt_impl::template run<trait, DstTensor, SrcTensor>(dst, src);
+}
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_BT_COPY_H
 
