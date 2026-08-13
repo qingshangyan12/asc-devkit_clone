@@ -4,22 +4,21 @@
 
   This example quantitatively demonstrates **the impact of struct type alignment on Global Memory access**: leveraging the 1B, 2B, 4B, 8B and 16B width memory access instructions supported by Ascend 950PR/Ascend 950DT, multiple structs of different sizes are constructed for element-wise data transfer, comparing the transfer efficiency differences brought by type alignment.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-  - Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-  - \>= CANN 9.1.0
+| Product | CANN Version |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
 
-  ```
-  ├── aligned_types
-  │   ├── aligned_types.asc      // SIMT implementation & invocation example
-  │   ├── CMakeLists.txt         // CMake build file
-  │   └── README.md
-  ```
+```text
+├── aligned_types
+│   ├── aligned_types.asc      // SIMT implementation & invocation example
+│   ├── CMakeLists.txt         // CMake build file
+│   ├── README.md              // Chinese sample documentation.
+│   └── README_en.md           // English sample documentation.
+```
 
 ## Example Description
 
