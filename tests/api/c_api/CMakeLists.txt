@@ -34,7 +34,6 @@ file(GLOB ASCENDC_UT_COMMON_SRC
     ../common/common.cpp
     ../common/alog_stub.cpp
     ../common/dlog_stub.cpp
-    stub/cce_stub.cpp
 )
 
 file(GLOB ASCENDC_UT_ascend910B1_AIC_CASE_SRC

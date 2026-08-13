@@ -12,10 +12,6 @@
 #include <cstdint>
 #include "stub_fun.h"
 
-int64_t ld_dev(__gm__ int8_t* src, int16_t offset);
-int64_t ld_dev(__gm__ int16_t* src, int16_t offset);
-int64_t ld_dev(__gm__ int32_t* src, int16_t offset);
-
 #ifndef ULL
 #define ULL unsigned long long
 #endif
