@@ -34,9 +34,9 @@ Json MakeValidManifest()
     Json command = {
         {"type", "compile"},
         {"stage", Json::number_unsigned_t(0U)},
-        {"cmd",
-         Json::array({"${options:common_compile}", "${source_dir}/kernel.cpp", "${resource}/resources/weight.bin",
-                      "${env:ASCEND_HOME_PATH}/include", "${source_file_path}", "${output}/kernel.o"})},
+        {"cmd", Json::array(
+                    {"${options:common_compile}", "${source_dir}/kernel.cpp", "${resource}/resources/weight.bin",
+                     "${env:ASCEND_HOME_PATH}/include", "${source_file_path}", "${output}/kernel.o"})},
     };
     Json object = {
         {"object_name", "kernel.o"},
@@ -85,13 +85,22 @@ TEST(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
     Object(skManifest)["object_type"] = "sk";
     EXPECT_TRUE(ValidateResourceManifest(skManifest, std::string()));
 
+    Json customObjectType = MakeValidManifest();
+    Object(customObjectType)["object_type"] = "custom";
+    EXPECT_TRUE(ValidateResourceManifest(customObjectType, "custom-object-type.json"));
+
+    Json embeddedOutput = MakeValidManifest();
+    Command(embeddedOutput)["cmd"].back() = "-o${output}/kernel.o";
+    EXPECT_TRUE(ValidateResourceManifest(embeddedOutput, "embedded-output.json"));
+
     Json minimal = MakeValidManifest();
     minimal.erase("source_file");
-    minimal.erase("resource_path");
+    minimal["resource_path"] = "";
     minimal.erase("options");
     Kernel(minimal).erase("constant_infos");
     Kernel(minimal).erase("link_options");
-    Command(minimal)["cmd"].erase(Command(minimal)["cmd"].begin());
+    Command(minimal)["cmd"] =
+        Json::array({"${source_dir}/kernel.cpp", "${env:ASCEND_HOME_PATH}/include", "${output}/kernel.o"});
     EXPECT_TRUE(ValidateResourceManifest(minimal, "minimal.json"));
 
     Json noCommonCompile = MakeValidManifest();
@@ -115,6 +124,7 @@ TEST(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
     ExpectInvalid("missing soc_version", [](Json& manifest) { manifest.erase("soc_version"); });
     ExpectInvalid("soc_version has wrong type", [](Json& manifest) { manifest["soc_version"] = 1U; });
     ExpectInvalid("soc_version is empty", [](Json& manifest) { manifest["soc_version"] = ""; });
+    ExpectInvalid("missing resource_path", [](Json& manifest) { manifest.erase("resource_path"); });
     ExpectInvalid("missing kernels", [](Json& manifest) { manifest.erase("kernels"); });
     ExpectInvalid("kernels has wrong type", [](Json& manifest) { manifest["kernels"] = Json::object(); });
     ExpectInvalid("kernels is empty", [](Json& manifest) { manifest["kernels"] = Json::array(); });
@@ -123,7 +133,8 @@ TEST(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
 TEST(ResourceManifestValidatorTest, ValidatesManifestPathsAndCommonOptions)
 {
     ExpectInvalid("source_file has wrong type", [](Json& manifest) { manifest["source_file"] = 1U; });
-    ExpectInvalid("source_file contains a directory", [](Json& manifest) { manifest["source_file"] = "src/kernel.cpp"; });
+    ExpectInvalid(
+        "source_file contains a directory", [](Json& manifest) { manifest["source_file"] = "src/kernel.cpp"; });
     ExpectInvalid("source_file traverses", [](Json& manifest) { manifest["source_file"] = "../kernel.cpp"; });
     ExpectInvalid("resource_path has wrong type", [](Json& manifest) { manifest["resource_path"] = 1U; });
     ExpectInvalid("resource_path is absolute", [](Json& manifest) { manifest["resource_path"] = "/resources"; });
@@ -131,13 +142,12 @@ TEST(ResourceManifestValidatorTest, ValidatesManifestPathsAndCommonOptions)
     ExpectInvalid("options has wrong type", [](Json& manifest) { manifest["options"] = Json::array(); });
     ExpectInvalid(
         "common_compile has wrong type", [](Json& manifest) { manifest["options"]["common_compile"] = "-O2"; });
-    ExpectInvalid(
-        "common_compile contains non-string",
-        [](Json& manifest) { manifest["options"]["common_compile"] = Json::array({1U}); });
-    ExpectInvalid(
-        "common_compile contains common marker", [](Json& manifest) {
-            manifest["options"]["common_compile"] = Json::array({"${options:common_compile}"});
-        });
+    ExpectInvalid("common_compile contains non-string", [](Json& manifest) {
+        manifest["options"]["common_compile"] = Json::array({1U});
+    });
+    ExpectInvalid("common_compile contains common marker", [](Json& manifest) {
+        manifest["options"]["common_compile"] = Json::array({"${options:common_compile}"});
+    });
 }
 
 TEST(ResourceManifestValidatorTest, ValidatesMarkersAndReferencedPaths)
@@ -160,19 +170,19 @@ TEST(ResourceManifestValidatorTest, ValidatesMarkersAndReferencedPaths)
     ExpectInvalid("resource path is outside resource_path", [](Json& manifest) {
         Command(manifest)["cmd"][1U] = "${resource}/outside/file.cpp";
     });
-    ExpectInvalid(
-        "output has no relative path", [](Json& manifest) { Command(manifest)["cmd"].back() = "${output}"; });
+    ExpectInvalid("resource marker with empty resource_path", [](Json& manifest) { manifest["resource_path"] = ""; });
+    ExpectInvalid("output has no relative path", [](Json& manifest) { Command(manifest)["cmd"].back() = "${output}"; });
     ExpectInvalid("output contains another marker", [](Json& manifest) {
         Command(manifest)["cmd"].back() = "${output}/${source_dir}/kernel.o";
     });
-    ExpectInvalid("output path traverses", [](Json& manifest) {
-        Command(manifest)["cmd"].back() = "${output}/../kernel.o";
-    });
+    ExpectInvalid(
+        "output path traverses", [](Json& manifest) { Command(manifest)["cmd"].back() = "${output}/../kernel.o"; });
 }
 
 TEST(ResourceManifestValidatorTest, ValidatesConstants)
 {
-    ExpectInvalid("constant is not an object", [](Json& manifest) { Kernel(manifest)["constant_infos"][0U] = "weight"; });
+    ExpectInvalid(
+        "constant is not an object", [](Json& manifest) { Kernel(manifest)["constant_infos"][0U] = "weight"; });
     ExpectInvalid("constant has extra field", [](Json& manifest) { Constant(manifest)["extra"] = true; });
     ExpectInvalid("constant name is missing", [](Json& manifest) {
         Constant(manifest).erase("name");
@@ -180,8 +190,7 @@ TEST(ResourceManifestValidatorTest, ValidatesConstants)
     });
     ExpectInvalid("constant name has wrong type", [](Json& manifest) { Constant(manifest)["name"] = 1U; });
     ExpectInvalid("constant name is empty", [](Json& manifest) { Constant(manifest)["name"] = ""; });
-    ExpectInvalid(
-        "parameter_index has wrong type", [](Json& manifest) { Constant(manifest)["parameter_index"] = -1; });
+    ExpectInvalid("parameter_index has wrong type", [](Json& manifest) { Constant(manifest)["parameter_index"] = -1; });
     ExpectInvalid("byte_size has wrong type", [](Json& manifest) { Constant(manifest)["byte_size"] = "4"; });
     ExpectInvalid(
         "byte_size is zero", [](Json& manifest) { Constant(manifest)["byte_size"] = Json::number_unsigned_t(0U); });
@@ -230,11 +239,8 @@ TEST(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
     ExpectInvalid("outputs is empty", [](Json& manifest) { Object(manifest)["outputs"] = Json::array(); });
     ExpectInvalid(
         "object name contains a path", [](Json& manifest) { Object(manifest)["object_name"] = "obj/kernel.o"; });
-    ExpectInvalid("object name is duplicated", [](Json& manifest) {
-        Kernel(manifest)["objects"].push_back(Object(manifest));
-    });
     ExpectInvalid(
-        "object type is unsupported", [](Json& manifest) { Object(manifest)["object_type"] = "unknown"; });
+        "object name is duplicated", [](Json& manifest) { Kernel(manifest)["objects"].push_back(Object(manifest)); });
     ExpectInvalid("object output is not a string", [](Json& manifest) { Object(manifest)["outputs"][0U] = 1U; });
     ExpectInvalid(
         "object output has invalid syntax", [](Json& manifest) { Object(manifest)["outputs"][0U] = "kernel.o"; });

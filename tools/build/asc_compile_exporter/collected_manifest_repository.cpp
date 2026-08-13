@@ -244,10 +244,15 @@ bool LoadUnit(const std::string& manifestPath, ResourceBudget& budget, ManifestU
     if (!ReadResourcePath(unit.json, manifestPath, resourcePath)) {
         return false;
     }
+    if (resourcePath.empty()) {
+        ASCENDLOGD("Loaded manifest %s with no resource files", manifestPath.c_str());
+        return true;
+    }
 
     const std::string manifestRoot = FileUtils::ParentPath(manifestPath);
     const fs::path resourcePathValue(resourcePath);
-    const std::string resourceInput = resourcePathValue.is_absolute() ? resourcePath : FileUtils::JoinPath(manifestRoot, resourcePath);
+    const std::string resourceInput =
+        resourcePathValue.is_absolute() ? resourcePath : FileUtils::JoinPath(manifestRoot, resourcePath);
     std::string resourceRoot;
     if (!FileUtils::ResolveSubdirectory(resourceInput, manifestRoot, resourceRoot)) {
         ASCENDLOGE(

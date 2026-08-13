@@ -23,8 +23,6 @@ using Json = nlohmann::json;
 
 constexpr const char* COMMON_COMPILE_MARKER = "${options:common_compile}";
 constexpr const char* RESOURCE_ROOT_MARKER = "${resource}";
-constexpr char OUTPUT_MARKER[] = "${output}";
-constexpr std::size_t OUTPUT_MARKER_SIZE = sizeof(OUTPUT_MARKER) - 1U;
 constexpr char OUTPUT_REFERENCE_PREFIX[] = "${output}/";
 constexpr std::size_t OUTPUT_REFERENCE_PREFIX_SIZE = sizeof(OUTPUT_REFERENCE_PREFIX) - 1U;
 constexpr const char* SOURCE_DIR_MARKER = "${source_dir}";
@@ -58,9 +56,8 @@ bool ValidateResourceReference(const std::string& value, const std::string& reso
     const std::string path = value.substr(pathBegin + 1U);
     return CheckAndLog(
                FileUtils::IsSafeRelativePath(path), "resource path is not a safe relative POSIX path: " + path) &&
-           (resourcePath.empty() ||
-            CheckAndLog(
-                FileUtils::IsPathWithin(path, resourcePath), "resource path is outside resource_path: " + path));
+           CheckAndLog(!resourcePath.empty(), "resource marker requires a nonempty resource_path") &&
+           CheckAndLog(FileUtils::IsPathWithin(path, resourcePath), "resource path is outside resource_path: " + path);
 }
 
 bool ValidateOutputMarker(const std::string& value)
@@ -100,13 +97,11 @@ bool ValidateMarkerSyntax(const std::string& value, const std::string& resourceP
 
 bool ValidateOptionValue(const std::string& value, const std::string& resourcePath)
 {
-    if (!(value.size() >= OUTPUT_MARKER_SIZE && value.compare(0U, OUTPUT_MARKER_SIZE, OUTPUT_MARKER) == 0)) {
+    const size_t outputBegin = value.find(OUTPUT_REFERENCE_PREFIX);
+    if (outputBegin == std::string::npos) {
         return ValidateMarkerSyntax(value, resourcePath);
     }
-    if (!ValidateOutputMarker(value)) {
-        return false;
-    }
-    return true;
+    return ValidateOutputMarker(value.substr(outputBegin));
 }
 
 bool ValidateOptionValue(
@@ -115,8 +110,9 @@ bool ValidateOptionValue(
     if (!ValidateOptionValue(value, resourcePath)) {
         return false;
     }
-    if (value.size() >= OUTPUT_MARKER_SIZE && value.compare(0U, OUTPUT_MARKER_SIZE, OUTPUT_MARKER) == 0) {
-        referencedOutputs.insert(value);
+    const size_t outputBegin = value.find(OUTPUT_REFERENCE_PREFIX);
+    if (outputBegin != std::string::npos) {
+        referencedOutputs.insert(value.substr(outputBegin));
     }
     return true;
 }
@@ -154,7 +150,29 @@ bool ValidateCommonCompileOptions(const Json& manifest, const std::string& resou
     return true;
 }
 
-bool ValidateManifestFields(const Json& manifest, std::string& resourcePath, bool& hasCommonCompileOptions)
+bool ValidateManifestBaseFields(const Json& manifest)
+{
+    return CheckAndLog(manifest.is_object(), "manifest must be an object") &&
+           CheckAndLog(
+               manifest.contains("schema_version") && manifest.at("schema_version").is_string(),
+               "invalid schema_version") &&
+           CheckAndLog(
+               manifest.contains("resource_id") && manifest.at("resource_id").is_string() &&
+                   !manifest.at("resource_id").get_ref<const std::string&>().empty(),
+               "invalid resource_id") &&
+           CheckAndLog(
+               manifest.contains("soc_version") && manifest.at("soc_version").is_string() &&
+                   !manifest.at("soc_version").get_ref<const std::string&>().empty(),
+               "invalid soc_version") &&
+           CheckAndLog(
+               manifest.contains("resource_path") && manifest.at("resource_path").is_string(),
+               "invalid resource_path") &&
+           CheckAndLog(
+               manifest.contains("kernels") && manifest.at("kernels").is_array() && !manifest.at("kernels").empty(),
+               "kernels must be a nonempty array");
+}
+
+bool ValidateManifestFields(const Json& manifest, const std::string& resourcePath, bool& hasCommonCompileOptions)
 {
     std::string sourceFile;
     if (manifest.contains("source_file")) {
@@ -168,16 +186,10 @@ bool ValidateManifestFields(const Json& manifest, std::string& resourcePath, boo
             return false;
         }
     }
-    if (manifest.contains("resource_path")) {
-        if (!CheckAndLog(manifest.at("resource_path").is_string(), "invalid resource_path")) {
-            return false;
-        }
-        resourcePath = manifest.at("resource_path").get_ref<const std::string&>();
-        if (!CheckAndLog(
-                FileUtils::IsSafeRelativePath(resourcePath),
-                "resource_path is not a safe relative POSIX path: " + resourcePath)) {
-            return false;
-        }
+    if (!resourcePath.empty() && !CheckAndLog(
+                                     FileUtils::IsSafeRelativePath(resourcePath),
+                                     "resource_path is not a safe relative POSIX path: " + resourcePath)) {
+        return false;
     }
 
     ASCENDLOGD(
@@ -345,7 +357,6 @@ bool ValidateObject(
             FileUtils::IsSafeRelativePath(objectName) && FileUtils::FileName(objectName) == objectName,
             "object_name must be a plain name") ||
         !CheckAndLog(objectNames.insert(objectName).second, "duplicate object_name") ||
-        !CheckAndLog(objectType == "basic" || objectType == "sk", "unsupported object_type") ||
         !ValidateObjectOutputs(object.at("outputs"))) {
         return false;
     }
@@ -414,26 +425,12 @@ bool ValidateKernel(
 
 bool ValidateManifest(const Json& manifest)
 {
-    if (!CheckAndLog(manifest.is_object(), "manifest must be an object") ||
-        !CheckAndLog(
-            manifest.contains("schema_version") && manifest.at("schema_version").is_string(),
-            "invalid schema_version") ||
-        !CheckAndLog(
-            manifest.contains("resource_id") && manifest.at("resource_id").is_string() &&
-                !manifest.at("resource_id").get_ref<const std::string&>().empty(),
-            "invalid resource_id") ||
-        !CheckAndLog(
-            manifest.contains("soc_version") && manifest.at("soc_version").is_string() &&
-                !manifest.at("soc_version").get_ref<const std::string&>().empty(),
-            "invalid soc_version") ||
-        !CheckAndLog(
-            manifest.contains("kernels") && manifest.at("kernels").is_array() && !manifest.at("kernels").empty(),
-            "kernels must be a nonempty array")) {
+    if (!ValidateManifestBaseFields(manifest)) {
         return false;
     }
     ASCENDLOGD("Manifest JSON and base fields are valid");
 
-    std::string resourcePath;
+    const std::string resourcePath = manifest.at("resource_path").get_ref<const std::string&>();
     bool hasCommonCompileOptions = false;
     if (!ValidateManifestFields(manifest, resourcePath, hasCommonCompileOptions)) {
         return false;

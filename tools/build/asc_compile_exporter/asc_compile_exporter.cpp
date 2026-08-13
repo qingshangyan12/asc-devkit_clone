@@ -277,7 +277,4 @@ int RunWithExceptionHandling(int argc, char** argv, RunFunction run)
 
 } // namespace
 
-int main(int argc, char** argv)
-{
-    return RunWithExceptionHandling(argc, argv, Run);
-}
+int main(int argc, char** argv) { return RunWithExceptionHandling(argc, argv, Run); }

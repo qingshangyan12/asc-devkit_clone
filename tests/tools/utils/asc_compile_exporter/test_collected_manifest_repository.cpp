@@ -99,6 +99,22 @@ TEST_F(ModuleTest, RepositorySkipsSymlinkedManifests)
     EXPECT_NE(units[0].json.find("Unit"), std::string::npos);
 }
 
+TEST_F(ModuleTest, RepositoryLoadsManifestWithNoResourceFiles)
+{
+    const std::string collection = FileUtils::JoinPath(root_, "collection-empty-resource-path");
+    const std::string unit = FileUtils::JoinPath(collection, "Unit");
+    CreateManifest(unit, "Unit");
+    std::string manifest = ReadTestFile(FileUtils::JoinPath(unit, "Unit_manifest.json"));
+    const std::string resourcePath = "\"resource_path\":\"resources\"";
+    manifest.replace(manifest.find(resourcePath), resourcePath.size(), "\"resource_path\":\"\"");
+    WriteTestFile(FileUtils::JoinPath(unit, "Unit_manifest.json"), manifest);
+
+    std::vector<ManifestUnit> units;
+    ASSERT_TRUE(CollectedManifestRepository(collection).Load(units));
+    ASSERT_EQ(units.size(), 1U);
+    EXPECT_TRUE(units[0].files.empty());
+}
+
 TEST_F(ModuleTest, RepositoryRejectsAbsoluteResourcePath)
 {
     const std::string collection = FileUtils::JoinPath(root_, "collection-absolute");

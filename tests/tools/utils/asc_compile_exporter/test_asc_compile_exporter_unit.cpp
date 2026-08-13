@@ -103,10 +103,7 @@ size_t CountOccurrences(const std::string& text, const std::string& value)
     return count;
 }
 
-int ThrowingRun(int, char**)
-{
-    throw std::runtime_error("test exception");
-}
+int ThrowingRun(int, char**) { throw std::runtime_error("test exception"); }
 
 TEST(CompileExporterCliUnitTest, ParseJobsAcceptsOnlyPositiveUint32Values)
 {
