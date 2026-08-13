@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <cstdio>
 #include <fstream>
 
 #define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR]  " fmt "\n", ##args)
@@ -43,19 +44,24 @@ bool ReadFile(const std::string& filePath, size_t& fileSize, void* buffer, size_
     }
 
     std::filebuf* buf = file.rdbuf();
-    size_t size = buf->pubseekoff(0, std::ios::end, std::ios::in);
-    if (size == 0) {
-        ERROR_LOG("file size is 0");
+    std::streamoff fileLength = buf->pubseekoff(0, std::ios::end, std::ios::in);
+    if (fileLength <= 0) {
+        ERROR_LOG("failed to get file size or file is empty");
         file.close();
         return false;
     }
+    size_t size = static_cast<size_t>(fileLength);
     if (size > bufferSize) {
         ERROR_LOG("file size is larger than buffer size");
         file.close();
         return false;
     }
-    buf->pubseekpos(0, std::ios::in);
-    buf->sgetn(static_cast<char*>(buffer), size);
+    if (buf->pubseekpos(0, std::ios::in) == std::streampos(std::streamoff(-1)) ||
+        buf->sgetn(static_cast<char*>(buffer), size) != static_cast<std::streamsize>(size)) {
+        ERROR_LOG("failed to read file. path = %s", filePath.c_str());
+        file.close();
+        return false;
+    }
     fileSize = size;
     file.close();
     return true;
