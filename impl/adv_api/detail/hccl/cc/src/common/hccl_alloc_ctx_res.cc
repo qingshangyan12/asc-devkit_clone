@@ -120,7 +120,8 @@ namespace {
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
     return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
 }
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
