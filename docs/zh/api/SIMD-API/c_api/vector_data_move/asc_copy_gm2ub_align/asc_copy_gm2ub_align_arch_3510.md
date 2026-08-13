@@ -74,7 +74,7 @@ dtype可取的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`�
 #### 典型示例
 
 ```c
-// 示例：bfloat16_t源与目的
+// 示例：源与目的数据类型为bfloat16_t
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst,
                                             __gm__ bfloat16_t* src,
                                             uint32_t size)
@@ -100,7 +100,7 @@ dtype可取的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`�
 #### 典型示例
 
 ```c
-// 示例：bfloat16_t源与目的
+// 示例：源与目的数据类型为bfloat16_t
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst,
                                             __gm__ bfloat16_t* src,
                                             uint16_t n_burst,
