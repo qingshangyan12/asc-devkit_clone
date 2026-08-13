@@ -59,14 +59,14 @@ public:
         this->Attr("bias0").AttrType(OPTIONAL).Int(0);
         this->Attr("bias1").AttrType(OPTIONAL).Float(0.0);
         this->Attr("bias2").AttrType(OPTIONAL).ListBool({true, false});
-        this->Attr("bias3").AttrType(OPTIONAL).ListFloat({0.1, 0.2});
+        this->Attr("bias3").AttrType(OPTIONAL).ListFloat({0.125F, 0.25F});
         this->Attr("bias4").AttrType(OPTIONAL).ListInt({1, 2});
         this->Attr("bias5").AttrType(OPTIONAL).String("ssss");
         this->Attr("bias6").AttrType(OPTIONAL).Bool(true);
         this->Attr("bias00").Int();
         this->Attr("bias11").Float();
         this->Attr("bias22").ListBool({true, false});
-        this->Attr("bias33").ListFloat({0.1, 0.2});
+        this->Attr("bias33").ListFloat({0.125F, 0.25F});
         this->Attr("bias44").ListInt({1, 2});
         this->Attr("bias55").String("ssss");
         this->Attr("bias66").Bool();
@@ -265,7 +265,7 @@ public:
         this->Attr("bias2").AttrType(OPTIONAL).Float(0.0).Version(2);
         this->Attr("bias3").AttrType(OPTIONAL).Bool(true).Version(2);
         this->Attr("bias4").AttrType(OPTIONAL).ListBool({true, false}).Version(1);
-        this->Attr("bias5").AttrType(OPTIONAL).ListFloat({0.1, 0.2}).Version(1);
+        this->Attr("bias5").AttrType(OPTIONAL).ListFloat({0.125F, 0.25F}).Version(1);
         this->Attr("bias6").AttrType(OPTIONAL).ListInt({1, 2}).Version(2);
         this->Attr("bias7").AttrType(OPTIONAL).String("ssss").Version(2);
         OpAICoreConfig aicConfig;

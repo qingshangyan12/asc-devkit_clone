@@ -616,7 +616,7 @@ TEST_F(TEST_OPBUILD, AclnnFallBackRunSuccess)
             this->Attr("bias0").AttrType(OPTIONAL).Int(0);
             this->Attr("bias1").AttrType(REQUIRED).Float(0.0);
             this->Attr("bias2").AttrType(OPTIONAL).ListBool({true, false});
-            this->Attr("bias3").AttrType(OPTIONAL).ListFloat({0.1, 0.2});
+            this->Attr("bias3").AttrType(OPTIONAL).ListFloat({0.125F, 0.25F});
             this->Attr("bias4").AttrType(REQUIRED).ListInt({1, 2});
             this->Attr("bias5").AttrType(OPTIONAL).String("ssss");
             this->Attr("bias6").AttrType(OPTIONAL).Bool(true);
