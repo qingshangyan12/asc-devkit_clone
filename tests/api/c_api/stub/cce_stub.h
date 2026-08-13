@@ -12,7 +12,6 @@
 #include <cstdint>
 #include "stub_fun.h"
 
-
 #ifndef ULL
 #define ULL unsigned long long
 #endif
@@ -653,7 +652,6 @@ inline void copy_ubuf_to_gm_align_v2(
     uint8_t l2_cache_mode, uint64_t burst_dst_stride, uint32_t burst_src_stride)
 {}
 #endif
-
 
 // ==========vstar===========
 inline void vstar(vector_align data, __ubuf__ fp8_e4m3fn_t* base) {}
