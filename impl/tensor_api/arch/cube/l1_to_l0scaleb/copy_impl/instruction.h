@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/arch/cube/l1_to_l0scaleb/copy_impl/instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -22,37 +22,24 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0SCALEB_COPY_IMPL_INSTRUCTION_H
 #define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0SCALEB_COPY_IMPL_INSTRUCTION_H
 
-#include "impl/tensor_api/tensor/pointer_pattern.h"
-#include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyL12L0ScaleBTrait {};
-
-class LoadCbufToL0MxScaleB3510 {
+class load_l1_to_l0b_scale_instr {
 public:
-    template <typename U, typename... Params>
-    __aicore__ inline static void LoadData(const uint64_t& mxDstAddr, const U& src, const Params&... params)
-    {
-        LoadCbufToMxScaleB(mxDstAddr, src.Data().Get(), params...);
-    }
-
-private:
     template <typename T>
-    __aicore__ inline static void LoadCbufToMxScaleB(
-        uint64_t mxDstAddr, __cbuf__ T* src, uint16_t mStartPosition, uint16_t kStartPosition, uint8_t mStep,
-        uint8_t kStep, int16_t srcStride, uint16_t dstStride)
+    __aicore__ inline static void load_data(uint64_t mx_dst_addr, __cbuf__ T* src, uint16_t m_start_position,
+                                            uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+                                            int16_t src_stride, uint16_t dst_stride)
     {
-        if ASCEND_IS_AIV {
-            return;
-        }
-        asc_copy_l12l0b_mx(mxDstAddr, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+        asc_copy_l12l0b_mx(mx_dst_addr, src, m_start_position, k_start_position, m_step, k_step, src_stride,
+                           dst_stride);
     }
 };
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0SCALEB_COPY_IMPL_INSTRUCTION_H
 
