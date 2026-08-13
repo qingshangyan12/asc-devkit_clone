@@ -1,5 +1,5 @@
 # AI Core编译基本用法<a name="section229217121411"></a>
-当开发者完成一个Kernel核函数的编写，并在Host侧通过<<<\>\>\>方式完成核函数的启动调用后，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
+当开发者完成一个核函数（Kernel）的编写，并在Host侧通过<<<\>\>\>方式完成核函数（Kernel）的启动调用后，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
 
 ## AI Core SIMD编译
 使用bisheng编译Ascend C源文件的基本命令如下，其中--npu-arch=dav-\<npu architecture\>用于指定AI处理器架构版本：
@@ -113,8 +113,13 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | -fPIC | 否 | 告知编译器产生位置无关代码。 |
 | -O | 否 | 用于指定编译器的优化级别，当前支持-O3，-O2，-O0。 |
 | --run-mode=sim | 否 | sim模式：链接时用户添加仿真模式对应的实现库，实现代码在仿真模式下运行，可以查看仿真相关日志，方便用户性能调试。 |
+<<<<<<< HEAD
 | --enable-simt | 否 | SIMT编程场景，指定SIMT方式编译。设置编译选项`--enable-simt`时，若包含[SIMD API](../../../../api/SIMD-API/SIMD-API.md)的头文件会导致编译失败。 |
 | --cce-disable-asc-reserved-ubuf | 否 | 禁用Ascend C接口使用预留UB空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。使用预留UB空间的API列表参考：[使用预留UB空间的API](../../编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md#使用预留ub空间的api范围)。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。 |
+=======
+| --enable-simt | 否 | SIMT编程场景，指定SIMT方式编译。 |
+| --cce-disable-asc-reserved-ubuf | 否 | 禁用Ascend C接口使用预留Unified Buffer（UB）空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。使用预留UB空间的API列表参考：[使用预留UB空间的API](../../编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md#使用预留ub空间的api范围)。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。 |
+>>>>>>> a33fbc464 (refactor:统一ub和kernel的写法)
 | --cce-disable-vf-stack-reserved-ubuf | 否 | 禁用SIMD VF栈预留的UB空间。开启后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用。针对 [NPU架构版本2201](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，此编译选项无实际效果；针对 [NPU架构版本3510](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，此编译选项生效，当用户使用此编译选项后，编译器将无法使用预留的UB空间进行寄存器溢出的缓存，需要用户保证寄存器不溢出。 |
 | --cce-auto-sync | 否 | 开启毕昇编译器自动同步。AI Core内部的执行单元是异步并行的，Tensor的读写可能存在数据依赖，开启后可由毕昇编译器自动插入部分同步。详细内容请参考[关键特性说明](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/key_features.md)。 |
 | --cce-auto-sync-log=&lt;file&gt; | 否 | 输出毕昇编译器自动同步插入信息到&lt;file&gt;文件中。 |

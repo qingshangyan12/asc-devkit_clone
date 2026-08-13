@@ -296,7 +296,7 @@
             -   [L2 Cache切分](算子实践参考/SIMD算子性能优化/内存访问/L2-Cache切分.md)
 
         -   [矢量计算](算子实践参考/SIMD算子性能优化/矢量计算/矢量计算.md)
-            -   [通过Unified Buffer融合实现连续vector计算](算子实践参考/SIMD算子性能优化/矢量计算/通过Unified-Buffer融合实现连续vector计算.md)
+            -   [通过UB融合实现连续vector计算](算子实践参考/SIMD算子性能优化/矢量计算/通过Unified-Buffer融合实现连续vector计算.md)
             -   [Vector算子灵活运用Counter模式](算子实践参考/SIMD算子性能优化/矢量计算/Vector算子灵活运用Counter模式.md)
             -   [选择低延迟指令，优化归约操作性能](算子实践参考/SIMD算子性能优化/矢量计算/选择低延迟指令-优化归约操作性能.md)
             -   [VF性能优化](算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化.md)
@@ -329,7 +329,7 @@
     -   [SIMD与SIMT混合算子性能优化](算子实践参考/SIMD与SIMT混合算子性能优化/SIMD与SIMT混合算子性能优化.md)
         -   [概述](算子实践参考/SIMD与SIMT混合算子性能优化/概述.md)
         -   [内存访问](算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)
-            -   [使用Unified Buffer提升内存访问效率](算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)
+            -   [使用UB提升内存访问效率](算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)
 
         -   [指令优化](算子实践参考/SIMD与SIMT混合算子性能优化/指令优化/整数除法的快速算法.md)
             -   [整数除法的快速算法](算子实践参考/SIMD与SIMT混合算子性能优化/指令优化/整数除法的快速算法.md)

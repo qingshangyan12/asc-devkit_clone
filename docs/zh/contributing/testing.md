@@ -90,7 +90,7 @@ tests/
 
 ---
 
-## Kernel侧UT编写规范
+## 核函数（Kernel）侧UT编写规范
 
 ### 文件结构（三段式）
 
@@ -145,7 +145,7 @@ TEST_P(AxpyTestsuite, AxpyTestCase)
 }
 ```
 
-### Kernel函数实现模板
+### 核函数（Kernel）实现模板
 
 ```cpp
 template <typename T, typename U>
@@ -312,7 +312,7 @@ function build_test() {
 
 ### 单算子测试
 
-完成Kernel侧代码后，通过搭建自定义算子工程进行端到端测试，详见 [Ascend C编程指南](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)。
+完成核函数（Kernel）侧代码后，通过搭建自定义算子工程进行端到端测试，详见 [Ascend C编程指南](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)。
 
 ---
 

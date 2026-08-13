@@ -53,7 +53,7 @@ __aicore__ inline int64_t GetTaskRatio()
 
 ## 返回值说明
 
-- 针对[分离模式](../../../../../guide/编程指南/高级编程/硬件实现/基本架构.md)，不同Kernel类型下（通过[设置Kernel类型](../../Kernel-Tiling/set_Kernel_type.md)接口设置），在AIC和AIV上调用该接口的返回值如下：
+- 针对[分离模式](../../../../../guide/编程指南/高级编程/硬件实现/基本架构.md)，不同核函数（Kernel）类型下（通过[设置Kernel类型](../../Kernel-Tiling/set_Kernel_type.md)接口设置），在AIC和AIV上调用该接口的返回值如下：
 
     **表1** 返回值列表
 

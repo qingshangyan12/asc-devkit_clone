@@ -97,6 +97,7 @@ Establish a **unified terminology mapping table** (independent appendix file) sh
 
 **Specific Requirements**:
 - Any code name / abbreviation that appears in the documentation must be annotated with its full name on first occurrence and linked to the mapping table
+- In natural-language prose, write "Unified Buffer" on its first occurrence in each document and use "Unified Buffer" thereafter. API lists, navigation or feature lists, and compact table entries or headers may use "Unified Buffer" in names, categories, summaries, or data-path labels without expansion; these uses do not count as the first prose occurrence. Keep code identifiers and link targets unchanged
 - The same concept may use different-level names in different documents, but must have an equivalence relationship in the terminology mapping table
 - Terminology groups that must be mapped: DMA/MTE/DataCopy (three-layer name for the same transfer function), Local Memory/L1/`__cbuf__` (three-layer name for the same storage), etc.
 
@@ -128,11 +129,11 @@ Documents use terminology appropriate to the chapter's abstraction level. **Cros
 
 | Chapter Level | Terminology Used | Cross-level Handling |
 |--------------|-----------------|---------------------|
-| High-level (abstract hardware architecture, overview) | Abstract names: Global Memory, Local Memory, compute units | Do not abruptly mix in UB, L0A, or other low-level names |
-| Low-level (programming model, data transfer) | Hardware names: UB, L1 Buffer, L0A/B/C | **On first occurrence**, parenthetical association: `UB (i.e., part of Local Memory in the abstract architecture)` |
+| High-level (abstract hardware architecture, overview) | Abstract names: Global Memory, Local Memory, compute units | Do not abruptly mix in Unified Buffer, L0A, or other low-level names |
+| Low-level (programming model, data transfer) | Hardware names: Unified Buffer, L1 Buffer, L0A/B/C | **On first occurrence**, parenthetical association: `Unified Buffer (i.e., part of Local Memory in the abstract architecture)` |
 | API Level (API Reference Manual) | API names: DataCopy, LocalTensor | **On first occurrence**, associate hardware name: `DataCopy (triggers MTE data transfer engine instructions)` |
 
-**Anti-pattern (prohibited)**: Abstract hardware architecture document directly writes "data is transferred from UB into VEC", skipping the abstraction layer.
+**Anti-pattern (prohibited)**: Abstract hardware architecture document directly writes "data is transferred from Unified Buffer into VEC", skipping the abstraction layer.
 
 ### Explicit Distinction of Easily Confused Concepts
 
@@ -145,10 +146,10 @@ Similar-named or hierarchically confusable concepts must be **explicitly disting
 | SPMD vs SIMD vs SIMT | SPMD=programming model, SIMD=instruction execution mode, SIMT=thread execution mode | Hierarchy diagram |
 | Four-step (Tiling→Transfer→Compute→Transfer) vs TPipe four steps (Alloc→EnQue→...) | Programming flow vs pipeline management paradigm | Comparison table |
 | DMA vs MTE vs DataCopy | Three-layer name for the same operation | Terminology mapping table |
-| MemBase (Basic API) vs RegBase (VF fusion API) | Different compute locations (UB vs register), different Load/Store counts | Comparison table + scenario recommendation |
+| MemBase (Basic API) vs RegBase (VF fusion API) | Different compute locations (Unified Buffer vs register), different Load/Store counts | Comparison table + scenario recommendation |
 | Block vs CTA | Ascend C programming unit vs CUDA equivalent concept | Competitive mapping table |
 | `LocalTensor` vs `GlobalTensor` vs `TBuf` | Compute buffer / external buffer / temporary buffer | Comparison table + scenario recommendation |
-| `__ubuf__` vs `__cbuf__` vs `__gm__` | UB space / L1 space / GM space address qualifiers | Comparison table |
+| `__ubuf__` vs `__cbuf__` vs `__gm__` | Unified Buffer space / L1 space / GM space address qualifiers | Comparison table |
 | `asc_` prefix vs `Ascend C::` prefix vs `cce::` prefix | C API / C++ API / legacy API naming conventions | Comparison table |
 
 ---

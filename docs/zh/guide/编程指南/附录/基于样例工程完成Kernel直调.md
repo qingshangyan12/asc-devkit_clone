@@ -1,9 +1,9 @@
-# 基于样例工程完成Kernel直调<a name="ZH-CN_TOPIC_0000001731910633"></a>
+# 基于样例工程完成核函数（Kernel）直调<a name="ZH-CN_TOPIC_0000001731910633"></a>
 
 >[!NOTE]说明 
->本章节介绍的基于样例工程完成Kernel直调的方式，后续不再演进。推荐开发者直接使用命令行或者编写Cmake文件进行编译，详细内容请参考[AI Core SIMD编译](../编译与运行/算子编译/AI-Core算子编译基本用法.md)。
+>本章节介绍的基于样例工程完成核函数（Kernel）直调的方式，后续不再演进。推荐开发者直接使用命令行或者编写Cmake文件进行编译，详细内容请参考[AI Core SIMD编译](../编译与运行/算子编译/AI-Core算子编译基本用法.md)。
 
-下文将以Add矢量算子为例对Kernel直调算子开发流程进行详细介绍。
+下文将以Add矢量算子为例对核函数（Kernel）直调算子开发流程进行详细介绍。
 
 ## 环境准备<a name="section33636642419"></a>
 
@@ -45,18 +45,18 @@ AddKernelInvocationNeo
 -   根据实际需要修改输入数据和真值数据生成脚本文件gen\_data.py；验证输出数据和真值数据是否一致的验证脚本verify\_result.py。
 -   根据实际需要修改编译运行算子的脚本run.sh并执行该脚本，完成算子的编译运行和结果验证。
 
-## 算子Kernel侧实现<a name="section186929199494"></a>
+## 算子核函数（Kernel）侧实现<a name="section186929199494"></a>
 
-请参考工程目录中的矢量算子、矩阵算子、融合算子的Kernel实现完成Ascend C算子实现文件的编写。
+请参考工程目录中的矢量算子、矩阵算子、融合算子的核函数（Kernel）实现完成Ascend C算子实现文件的编写。
 
 >[!NOTE]说明 
->一个算子Kernel实现文件中只支持定义一个核函数。
+>一个算子核函数（Kernel）实现文件中只支持定义一个核函数（Kernel）。
 
 ## 算子调用应用程序<a name="section883611324486"></a>
 
-下面代码以固定shape的add\_custom算子为例，介绍算子核函数调用的应用程序main.cpp如何编写。您在实现自己的应用程序时，需要关注由于算子核函数不同带来的修改，包括算子核函数名，入参出参的不同等，合理安排相应的内存分配、内存拷贝和文件读写等，相关API的调用方式直接复用即可。
+下面代码以固定shape的add\_custom算子为例，介绍算子核函数（Kernel）调用的应用程序main.cpp如何编写。您在实现自己的应用程序时，需要关注由于算子核函数（Kernel）不同带来的修改，包括算子核函数（Kernel）名，入参出参的不同等，合理安排相应的内存分配、内存拷贝和文件读写等，相关API的调用方式直接复用即可。
 
-1.  按需包含头文件，通过ASCENDC\_CPU\_DEBUG宏区分CPU/NPU侧需要包含的头文件。需要注意的是，NPU侧需要包含对应的核函数调用接口声明所在的头文件aclrtlaunch\_\{kernel\_name\}.h（该头文件为工程框架自动生成），kernel\_name为算子核函数的名称。
+1.  按需包含头文件，通过ASCENDC\_CPU\_DEBUG宏区分CPU/NPU侧需要包含的头文件。需要注意的是，NPU侧需要包含对应的核函数（Kernel）调用接口声明所在的头文件aclrtlaunch\_\{kernel\_name\}.h（该头文件为工程框架自动生成），kernel\_name为算子核函数（Kernel）的名称。
 
     ```
     #include "data_utils.h"
@@ -87,7 +87,7 @@ AddKernelInvocationNeo
     }
     ```
 
-3.  CPU侧运行验证。完成算子核函数CPU侧运行验证的步骤如下：
+3.  CPU侧运行验证。完成算子核函数（Kernel）CPU侧运行验证的步骤如下：
 
     **图1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>  
     ![](../../figures/CPU侧运行验证步骤.png "CPU侧运行验证步骤")
@@ -112,7 +112,7 @@ AddKernelInvocationNeo
         AscendC::GmFree((void *)z);
     ```
 
-4.  NPU侧运行验证。完成算子核函数NPU侧运行验证的步骤如下：
+4.  NPU侧运行验证。完成算子核函数（Kernel）NPU侧运行验证的步骤如下：
 
     **图2**  NPU侧运行验证步骤<a name="fig558132018817"></a>  
     ![](../../figures/NPU侧运行验证步骤.png "NPU侧运行验证步骤")
@@ -164,14 +164,14 @@ AddKernelInvocationNeo
     ```
 
     >[!NOTE]说明 
-    >针对<<<\>\>\>调用方式在[核函数](../编程模型/AI-Core-SIMD编程/核函数.md)章节已有说明，这里仅对ACLRT\_LAUNCH\_KERNEL调用接口的使用方法介绍如下：
+    >针对<<<\>\>\>调用方式在[核函数（Kernel）](../编程模型/AI-Core-SIMD编程/核函数.md)章节已有说明，这里仅对ACLRT\_LAUNCH\_KERNEL调用接口的使用方法介绍如下：
     >```
     >ACLRT_LAUNCH_KERNEL(kernel_name)(numBlocks, stream, argument list);
     >```
-    >- kernel\_name：算子核函数的名称。
-    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)来获取block\_idx。
+    >- kernel\_name：算子核函数（Kernel）的名称。
+    >- numBlocks：规定了核函数（Kernel）将会在几个核上执行。每个执行该核函数（Kernel）的核会被分配一个逻辑ID，即block\_idx，可以在核函数（Kernel）的实现中调用[GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)来获取block\_idx。
     >- stream，类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在Device上执行。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
-    >- argument list：参数列表，与核函数的参数列表保持一致。
+    >- argument list：参数列表，与核函数（Kernel）的参数列表保持一致。
 
 ## CMake编译配置文件编写<a name="section185111259496"></a>
 
@@ -235,17 +235,17 @@ AddKernelInvocationNeo
 </tr>
 <tr id="row158188167811"><td class="cellrowborder" valign="top" width="24.67%" headers="mcps1.2.3.1.1 "><p id="p151562145914"><a name="p151562145914"></a><a name="p151562145914"></a>ascendc_library</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.33%" headers="mcps1.2.3.1.2 "><p id="p83571846498"><a name="p83571846498"></a><a name="p83571846498"></a>使用指定的核函数源文件向项目（project）添加库。语法格式如下：</p>
+<td class="cellrowborder" valign="top" width="75.33%" headers="mcps1.2.3.1.2 "><p id="p83571846498"><a name="p83571846498"></a><a name="p83571846498"></a>使用指定的核函数（Kernel）源文件向项目（project）添加库。语法格式如下：</p>
 <pre class="screen" id="screen894213141527"><a name="screen894213141527"></a><a name="screen894213141527"></a>ascendc_library(&lt;target_name&gt; [STATIC | SHARED]
             [&lt;source&gt;...]) </pre>
-<p id="p211019713522"><a name="p211019713522"></a><a name="p211019713522"></a>其中&lt;target_name&gt;表示库文件的名字，该库文件会根据命令里列出的源文件来建立。STATIC、SHARED的作用是指定生成的库文件的类型。STATIC库是目标文件的归档文件，在连接其它目标的时候使用。SHARED库会被动态连接（动态连接库），在运行时会被加载。&lt;source&gt;表示核函数源文件。</p>
+<p id="p211019713522"><a name="p211019713522"></a><a name="p211019713522"></a>其中&lt;target_name&gt;表示库文件的名字，该库文件会根据命令里列出的源文件来建立。STATIC、SHARED的作用是指定生成的库文件的类型。STATIC库是目标文件的归档文件，在连接其它目标的时候使用。SHARED库会被动态连接（动态连接库），在运行时会被加载。&lt;source&gt;表示核函数（Kernel）源文件。</p>
 </td>
 </tr>
 <tr id="row7914182912215"><td class="cellrowborder" valign="top" width="24.67%" headers="mcps1.2.3.1.1 "><p id="p11914929132219"><a name="p11914929132219"></a><a name="p11914929132219"></a>ascendc_fatbin_library</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.33%" headers="mcps1.2.3.1.2 "><p id="p1887436151919"><a name="p1887436151919"></a><a name="p1887436151919"></a>使用指定的核函数源文件编译生成一个Kernel二进制文件，供Kernel加载和执行接口使用。语法格式如下：</p>
+<td class="cellrowborder" valign="top" width="75.33%" headers="mcps1.2.3.1.2 "><p id="p1887436151919"><a name="p1887436151919"></a><a name="p1887436151919"></a>使用指定的核函数（Kernel）源文件编译生成一个核函数（Kernel）二进制文件，供核函数（Kernel）加载和执行接口使用。语法格式如下：</p>
 <pre class="screen" id="screen487173618193"><a name="screen487173618193"></a><a name="screen487173618193"></a>ascendc_fatbin_library(&lt;target_name&gt; [&lt;source&gt;...]) </pre>
-<a name="ul191554253714"></a><a name="ul191554253714"></a><ul id="ul191554253714"><li>&lt;target_name&gt;表示库文件的名字，该库文件会根据命令里列出的核函数源文件编译生成&lt;target_name&gt;.o文件，放置于${CMAKE_INSTALL_PREFIX}/fatbin/${target_name}/路径下。</li><li>&lt;source&gt;表示核函数源文件。</li></ul>
+<a name="ul191554253714"></a><a name="ul191554253714"></a><ul id="ul191554253714"><li>&lt;target_name&gt;表示库文件的名字，该库文件会根据命令里列出的核函数（Kernel）源文件编译生成&lt;target_name&gt;.o文件，放置于${CMAKE_INSTALL_PREFIX}/fatbin/${target_name}/路径下。</li><li>&lt;source&gt;表示核函数（Kernel）源文件。</li></ul>
 <div class="note" id="note96252591853"><a name="note96252591853"></a><a name="note96252591853"></a><span class="notetitle"> 说明： </span><div class="notebody"><a name="ul143550276817"></a><a name="ul143550276817"></a><ul id="ul143550276817"><li>该编译选项暂不支持printf、DumpTensor、DumpAccChkPoint、assert接口。</li></ul>
 </div></div>
 </td>
@@ -292,7 +292,7 @@ AddKernelInvocationNeo
 </tbody>
 </table>
 
-简化的编译流程图如下图所示：将算子核函数源文件编译生成kernel侧的库文件（\*.so或\*.a库文件）；工程框架自动生成核函数调用接口声明头文件；编译main.cpp（算子调用应用程序）时依赖上述头文件，将编译应用程序生成的目标文件和kernel侧的库文件进行链接，生成最终的可执行文件。
+简化的编译流程图如下图所示：将算子核函数（Kernel）源文件编译生成kernel侧的库文件（\*.so或\*.a库文件）；工程框架自动生成核函数（Kernel）调用接口声明头文件；编译main.cpp（算子调用应用程序）时依赖上述头文件，将编译应用程序生成的目标文件和kernel侧的库文件进行链接，生成最终的可执行文件。
 
 **图3**  编译简化流程图<a name="fig744344916358"></a>  
 ![](../../figures/编译简化流程图.png "编译简化流程图")
@@ -441,14 +441,15 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 
 脚本执行完毕输出"test pass"字样表示算子精度符合要求。
 
-## CPU侧验证核函数<a name="section13472164395818"></a>
+## CPU侧验证核函数（Kernel）<a name="section13472164395818"></a>
 
-在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../编译与运行/算子编译/AI-Core算子编译基本用法.md)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。类似地，CPU域调试也是通过毕昇编译器编译算子Kernel程序。此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
+在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../编译与运行/算子编译/AI-Core算子编译基本用法.md)章节，我们已经介绍了算子核函数（Kernel）程序NPU域的编译运行。类似地，CPU域调试也是通过毕昇编译器编译算子核函数（Kernel）程序。此时算子核函数（Kernel）程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
 
-**图5**  CPU域和NPU域的核函数运行逻辑对比<a name="fig1274642720202"></a>  
+**图5**  CPU域和NPU域的核函数（Kernel）运行逻辑对比<a name="fig1274642720202"></a>
+
 ![](../../figures/CPU域和NPU域的核函数运行逻辑对比-36.png "CPU域和NPU域的核函数运行逻辑对比-36")
 
-基于Kernel直调样例工程，通过ACLRT\_LAUNCH\_KERNEL接口调用核函数时，可实现CPU与NPU域的代码的统一，且该方式仅支持以下型号：
+基于核函数（Kernel）直调样例工程，通过ACLRT\_LAUNCH\_KERNEL接口调用核函数（Kernel）时，可实现CPU与NPU域的代码的统一，且该方式仅支持以下型号：
 
 <!-- npu="A3" id1 -->
 -   Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -460,7 +461,7 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 -   Atlas 推理系列产品
 <!-- end id3 -->
 
-下面代码以add\_custom算子为例，介绍算子核函数在CPU侧验证时，算子调用的应用程序如何编写（通过ACLRT\_LAUNCH\_KERNEL接口调用核函数的方式）。您在实现自己的应用程序时，需要关注由于算子核函数不同带来的修改，包括算子核函数名，入参出参的不同等，合理安排相应的内存分配、内存拷贝和文件读写等，相关API的调用方式直接复用即可。
+下面代码以add\_custom算子为例，介绍算子核函数（Kernel）在CPU侧验证时，算子调用的应用程序如何编写（通过ACLRT\_LAUNCH\_KERNEL接口调用核函数（Kernel）的方式）。您在实现自己的应用程序时，需要关注由于算子核函数（Kernel）不同带来的修改，包括算子核函数（Kernel）名，入参出参的不同等，合理安排相应的内存分配、内存拷贝和文件读写等，相关API的调用方式直接复用即可。
 
 1.  按需包含头文件。
 

@@ -32,9 +32,9 @@ DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mo
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../aux_data_structures/TPosition.md)表示）：
 
-- Global Memory -> Unified Buffer
+- Global Memory -> Unified Buffer（UB）
     - GM -> VECIN
-- Unified Buffer -> Global Memory
+- UB -> Global Memory
     - VECOUT -> GM
 
 ## 函数原型<a name="section620mcpsimp"></a>

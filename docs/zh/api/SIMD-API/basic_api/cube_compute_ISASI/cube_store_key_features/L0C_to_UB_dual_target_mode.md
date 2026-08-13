@@ -1,4 +1,4 @@
-# L0C Buffer到UB双目标模式
+# L0C Buffer到Unified Buffer（UB）双目标模式
 
 ## 特性说明
 
