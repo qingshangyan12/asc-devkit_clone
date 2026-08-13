@@ -56,8 +56,8 @@ def asc_float2bfloat16_rn_v2(dst, src, mask):
 
 ```c
 __simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><position_mode>(vector_bfloat16_t& dst,
-                                                                                   vector_float src,
-                                                                                   vector_bool mask)
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
 ```
 
 ### 占位符说明

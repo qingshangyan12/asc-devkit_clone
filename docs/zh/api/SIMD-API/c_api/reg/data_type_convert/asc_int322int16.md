@@ -55,8 +55,8 @@ def asc_int322int16_v2(dst, src, mask):
 
 ```c
 __simd_callee__ inline void asc_int322int16<sat_mode><position_mode>(vector_int16_t& dst,
-                                                                    vector_int32_t src,
-                                                                    vector_bool mask)
+                                                                     vector_int32_t src,
+                                                                     vector_bool mask)
 ```
 
 ### 占位符说明
