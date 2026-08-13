@@ -16,13 +16,4 @@ bool UseCannBridge(const OpParam& param) { return false; }
 
 std::unique_ptr<InsCollAlgBase> GetAlgExecViaCann(HcclCMDType opType, const std::string& algName) { return nullptr; }
 
-class CcuKernelArg {
-public:
-    explicit CcuKernelArg() = default;
-    virtual ~CcuKernelArg() = default;
-    virtual CcuKernelSignature GetKernelSignature() const = 0;
-
-    std::vector<ChannelHandle> channels{};
-};
-
-}; // namespace mc2_ops_hccl
+} // namespace mc2_ops_hccl
