@@ -46,7 +46,7 @@ __aicore__ inline int64_t asc_get_block_num()
 
 ## 流水类型
 
-PIPE_S
+`PIPE_S`
 
 ## 约束说明
 

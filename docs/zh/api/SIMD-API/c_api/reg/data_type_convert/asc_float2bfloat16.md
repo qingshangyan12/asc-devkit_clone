@@ -26,8 +26,8 @@
 
 ## 功能说明
 
-根据mask将src中的每个float类型数据转换成bfloat16_t类型，并支持多种舍入模式与饱和模式，结果写入dst。
-由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。伪代码如下：
+根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。
+由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。伪代码如下：
 ```python
 def asc_float2bfloat16_rn(dst, src, mask):
     for i in range(64):
@@ -59,9 +59,9 @@ __simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><position_m
 ```
 ### 占位符说明
 
-- `<round_mode>`表示支持的舍入模式，支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
+- `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 - `<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-- `<position_mode>`表示dst写入的位置，为空时，结果写入dst的偶数索引位置；取值为`_v2`时，结果写入dst的奇数索引位置。
+- `<position_mode>`表示`dst`写入的位置，为空时，结果写入`dst`的偶数索引位置；取值为`_v2`时，结果写入`dst`的奇数索引位置。
 
 ### 典型示例
 
@@ -78,9 +78,9 @@ __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
 
 | 参数名 | 输入/输出 | 描述                                                                                                             |
 | ------ | --------- | ---------------------------------------------------------------------------------------------------------------- |
-| dst    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                   |
-| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
-| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| `dst`    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                   |
+| `src`    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
+| `mask`   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -90,12 +90,10 @@ __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
 
 ## 约束说明
 
-### 通用约束
-
-- src与dst的数据类型需要与函数原型匹配。
-- mask掩码位为0时，dst对应元素置0。
-- 结果写入dst的奇数索引位置时，偶数索引位置置0；结果写入偶数索引位置时，奇数索引位置置0。
-- 使用饱和或非饱和模式时，需要配置ctrl寄存器，详细说明请参见[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)。
+- `src`与`dst`的数据类型需要与函数原型匹配。
+- `mask`掩码位为0时，`dst`对应元素置0。
+- 结果写入`dst`的奇数索引位置时，偶数索引位置置0；结果写入偶数索引位置时，奇数索引位置置0。
+- 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)。
 
 ## 调用示例
 
@@ -129,9 +127,6 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     }
     return true;
 }
-
-
-
 
 constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
@@ -304,7 +299,27 @@ int main()
     print_data("Output (raw bytes)", output);
     print_data("Golden 1.0 (raw bytes)", golden);
     const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_float2bfloat16_rd/asc_float2bfloat16_rd_sat/asc_float2bfloat16_rd_v2/asc_float2bfloat16_rd_sat_v2/asc_float2bfloat16_rn/asc_float2bfloat16_rn_sat/asc_float2bfloat16_rn_v2/asc_float2bfloat16_rn_sat_v2/asc_float2bfloat16_rna/asc_float2bfloat16_rna_sat/asc_float2bfloat16_rna_v2/asc_float2bfloat16_rna_sat_v2/asc_float2bfloat16_ru/asc_float2bfloat16_ru_sat/asc_float2bfloat16_ru_v2/asc_float2bfloat16_ru_sat_v2/asc_float2bfloat16_rz/asc_float2bfloat16_rz_sat/asc_float2bfloat16_rz_v2/asc_float2bfloat16_rz_sat_v2 passed." : "[Failed] asc_float2bfloat16_rd/asc_float2bfloat16_rd_sat/asc_float2bfloat16_rd_v2/asc_float2bfloat16_rd_sat_v2/asc_float2bfloat16_rn/asc_float2bfloat16_rn_sat/asc_float2bfloat16_rn_v2/asc_float2bfloat16_rn_sat_v2/asc_float2bfloat16_rna/asc_float2bfloat16_rna_sat/asc_float2bfloat16_rna_v2/asc_float2bfloat16_rna_sat_v2/asc_float2bfloat16_ru/asc_float2bfloat16_ru_sat/asc_float2bfloat16_ru_v2/asc_float2bfloat16_ru_sat_v2/asc_float2bfloat16_rz/asc_float2bfloat16_rz_sat/asc_float2bfloat16_rz_v2/asc_float2bfloat16_rz_sat_v2 failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_float2bfloat16_rd/asc_float2bfloat16_rd_sat/"
+                           "asc_float2bfloat16_rd_v2/asc_float2bfloat16_rd_sat_v2/"
+                           "asc_float2bfloat16_rn/asc_float2bfloat16_rn_sat/"
+                           "asc_float2bfloat16_rn_v2/asc_float2bfloat16_rn_sat_v2/"
+                           "asc_float2bfloat16_rna/asc_float2bfloat16_rna_sat/"
+                           "asc_float2bfloat16_rna_v2/asc_float2bfloat16_rna_sat_v2/"
+                           "asc_float2bfloat16_ru/asc_float2bfloat16_ru_sat/"
+                           "asc_float2bfloat16_ru_v2/asc_float2bfloat16_ru_sat_v2/"
+                           "asc_float2bfloat16_rz/asc_float2bfloat16_rz_sat/"
+                           "asc_float2bfloat16_rz_v2/asc_float2bfloat16_rz_sat_v2 passed."
+                         : "[Failed] asc_float2bfloat16_rd/asc_float2bfloat16_rd_sat/"
+                           "asc_float2bfloat16_rd_v2/asc_float2bfloat16_rd_sat_v2/"
+                           "asc_float2bfloat16_rn/asc_float2bfloat16_rn_sat/"
+                           "asc_float2bfloat16_rn_v2/asc_float2bfloat16_rn_sat_v2/"
+                           "asc_float2bfloat16_rna/asc_float2bfloat16_rna_sat/"
+                           "asc_float2bfloat16_rna_v2/asc_float2bfloat16_rna_sat_v2/"
+                           "asc_float2bfloat16_ru/asc_float2bfloat16_ru_sat/"
+                           "asc_float2bfloat16_ru_v2/asc_float2bfloat16_ru_sat_v2/"
+                           "asc_float2bfloat16_rz/asc_float2bfloat16_rz_sat/"
+                           "asc_float2bfloat16_rz_v2/asc_float2bfloat16_rz_sat_v2 failed.")
+              << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);

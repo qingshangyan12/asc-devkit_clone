@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-根据mask将每个DataBlock（32B）中参与计算的元素相加，并将最终的计算结果依次保存在dst的最低位。参考伪代码：
+根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，并将最终的计算结果依次保存在`dst`的最低位。参考伪代码：
 
 ```python
 def asc_reduce_sum_datablock(dst, src, mask):
@@ -55,9 +55,9 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_<dst_dtype>& dst,
                                                      vector_bool mask)
 ```
 
-#### src_dtype与dst_dtype数据类型支持情况
+### src_dtype与dst_dtype数据类型支持情况
 
-| src_dtype | dst_dtype |
+| `src_dtype` | `dst_dtype` |
 | --------- | --------- |
 | `int16_t` | `int32_t` |
 | `uint16_t` | `uint32_t` |
@@ -81,9 +81,9 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述                                     |
 | ------ | --------- | ---------------------------------------- |
-| dst    | 输出      | 目的操作数（矢量数据寄存器）。           |
-| src    | 输入      | 源操作数（矢量数据寄存器）。             |
-| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
+| `dst`    | 输出      | 目的操作数（矢量数据寄存器）。           |
+| `src`    | 输入      | 源操作数（矢量数据寄存器）。             |
+| `mask`   | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -93,25 +93,24 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst,
 
 ## 约束说明
 
-### 通用约束
-
-- 指令内累加顺序采用二叉树累加方式，在每个DataBlock（32B）内两两相加逐层归约求和，结果连续写入到目的操作数，目的操作数中的其它元素置0。
-- 当DataBlock中的元素均不参与计算（mask全为0）时，将0写入dst对应位置（对于浮点数则为+0）。
-- 对于输入为uint16_t/int16_t类型的情况，会提升精度到uint32_t/int32_t进行计算。
+- 指令内累加顺序采用二叉树累加方式，在每个`DataBlock`（32B）内两两相加逐层归约求和，结果连续写入到目的操作数，目的操作数中的其它元素置0。
+- 当`DataBlock`中的元素均不参与计算（`mask`全为0）时，将0写入`dst`对应位置（对于浮点数则为+0）。
+- 对于输入为`uint16_t`/`int16_t`类型的情况，会提升精度到`uint32_t`/`int32_t`进行计算。
 
 ## 关键特性
 
 **asc_reduce_sum_datablock累加顺序**：
 
-以二叉树累加的方式计算每个DataBlock内的和。
+以二叉树累加的方式计算每个`DataBlock`内的和。
 
-以half类型的数据求和为例，在每个DataBlock内有16个数，通过二叉树的方式，两两相加，计算过程如下图所示：
+以`half`类型的数据求和为例，在每个`DataBlock`内有16个数，通过二叉树的方式，两两相加，计算过程如下图所示：
 
 1. data1和data2相加得到data01，data3和data4相加得到data02，……，data13和data14相加得到data07，data15和data16相加得到data08；
 2. data01和data02相加得到data001，data03和data04相加得到data002，……，data07和data08相加得到data004；
-3. 以此类推，得到目的操作数为1个half类型的数据sum。
+3. 以此类推，得到目的操作数为1个`half`类型的数据sum。
 
 **图1** asc_reduce_sum_datablock示意图
+
 ![asc_reduce_sum_datablock示意图](../../../../figures/reg_reduce_datablock_index.png "asc_reduce_sum_datablock示意图")
 
 ## 调用示例
@@ -146,21 +145,6 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     }
     return true;
 }
-
-template <typename T>
-bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
-    size_t begin, size_t count, double tolerance = 0.0)
-{
-    if (begin + count > actual.size() || begin + count > expected.size()) return false;
-    for (size_t i = begin; i < begin + count; ++i) {
-        if (actual[i] == expected[i]) continue;
-        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
-        if (diff > tolerance || diff < -tolerance) return false;
-    }
-    return true;
-}
-
-
 
 constexpr uint32_t ELEMENT_COUNT = 64;
 __simd_vf__ inline void reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
@@ -209,7 +193,9 @@ int main()
     print_data("Output", output);
     print_data("Golden", golden);
     const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_reduce_sum_datablock passed." : "[Failed] asc_reduce_sum_datablock failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_reduce_sum_datablock passed."
+                         : "[Failed] asc_reduce_sum_datablock failed.")
+              << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);
     aclrtResetDevice(0);
