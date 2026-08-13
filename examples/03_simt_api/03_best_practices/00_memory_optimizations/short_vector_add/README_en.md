@@ -26,7 +26,9 @@ short_vector_add
 │   │   └── verify_result.py // Verify output results
 │   ├── CMakeLists.txt       // Build project file
 │   ├── data_utils.h         // Data read/write utility functions
-│   └── short_vector_add.asc // Ascend C operator implementation & invocation example
+│   ├── short_vector_add.asc // Ascend C operator implementation & invocation example
+│   ├── README.md            // Chinese sample documentation.
+│   └── README_en.md         // English sample documentation.
 ```
 
 ## Example Description

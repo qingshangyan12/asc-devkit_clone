@@ -19,7 +19,8 @@
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── data_cache_hint.asc         // SIMT数据缓存样例实现
 │   ├── figures                     // README中的图片资源
-│   └── README.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述

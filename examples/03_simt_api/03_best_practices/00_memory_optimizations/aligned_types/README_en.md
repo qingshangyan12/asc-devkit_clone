@@ -18,7 +18,8 @@
   ├── aligned_types
   │   ├── aligned_types.asc      // SIMT implementation & invocation example
   │   ├── CMakeLists.txt         // CMake build file
-  │   └── README.md
+  │   ├── README.md              // Chinese sample documentation.
+  │   └── README_en.md           // English sample documentation.
   ```
 
 ## Example Description

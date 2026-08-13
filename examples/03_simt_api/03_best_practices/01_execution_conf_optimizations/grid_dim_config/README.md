@@ -18,7 +18,9 @@
 ├── grid_dim_config
 │   ├── figures                // README中的图片资源
 │   ├── CMakeLists.txt         // 编译工程文件
-│   └── grid_config.asc        // Ascend C算子实现 & 调用样例
+│   ├── grid_config.asc        // Ascend C算子实现 & 调用样例
+│   ├── README.md              // 样例说明文档
+│   └── README_en.md           // 英文样例说明文档
 ```
 
 ## 样例描述
