@@ -1156,6 +1156,8 @@
                 -   [asc_pack（废弃）](SIMD-API/c_api/reg/data_compress/asc_pack_deprecated.md)
             -   [数据填充](SIMD-API/c_api/reg/data_fill/data_fill.md)
                 -   [asc_duplicate](SIMD-API/c_api/reg/data_fill/asc_duplicate.md)
+                -   [asc_duplicate_highest](SIMD-API/c_api/reg/data_fill/asc_duplicate_highest.md)
+                -   [asc_duplicate_highest_merge](SIMD-API/c_api/reg/data_fill/asc_duplicate_highest_merge.md)
                 -   [asc_duplicate_merge](SIMD-API/c_api/reg/data_fill/asc_duplicate_merge.md)
                 -   [asc_duplicate_scalar](SIMD-API/c_api/reg/data_fill/asc_duplicate_scalar.md)
                 -   [asc_duplicate_scalar_merge](SIMD-API/c_api/reg/data_fill/asc_duplicate_scalar_merge.md)
