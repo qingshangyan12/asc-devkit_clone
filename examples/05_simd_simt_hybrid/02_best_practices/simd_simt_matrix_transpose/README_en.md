@@ -8,9 +8,9 @@ Based on the [matrix_transpose_practice sample](../../../03_simt_api/03_best_pra
 
 - Ascend 950PR/Ascend 950DT
 
-## Supported CANN Version
+## Supported CANN Software Version
 
-- CANN >= 9.2.0
+- \>= CANN 9.2.0
 
 ## Directory Structure
 
@@ -19,8 +19,8 @@ Based on the [matrix_transpose_practice sample](../../../03_simt_api/03_best_pra
 │   ├── figures                     // Image resources for README
 │   ├── CMakeLists.txt              // Build project file
 │   ├── matrix_transpose.asc        // SIMD and SIMT hybrid matrix transpose optimization path implementation
-│   ├── README.md                   // Sample documentation
-│   └── README_en.md                // English sample documentation
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Sample Description
@@ -60,7 +60,7 @@ This sample constructs an optimization path through five cases. The kernel, Thre
 
 Here, `core` is the hardware vector core count. The runtime queries this value by using `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`. The performance data in this sample was collected in a test environment where `core=64`. `tiles` is the total tile count `(W/32) x (H/32)`. When processing a 1024x1024 matrix, the matrix is divided into 32x32 tiles, so `tiles=1024`.
 
-#### Performance Metrics
+### Performance Metrics
 
 | Metric | Description |
 | ------ | ----------- |
@@ -338,8 +338,6 @@ Figure 5 shows that Case 4 uses double buffering to overlap adjacent iterations.
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
-
 The following table shows the performance data of each case when processing a 1024x1024 float matrix on Ascend 950PR.
 
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
@@ -412,7 +410,7 @@ In the sample root directory, perform the following steps to build and run the s
   [Success] Case accuracy verification passed.
   ```
 
-## Performance Analysis
+## Performance Debugging
 
 ### Introduction to the msOpProf Tool
 
@@ -422,27 +420,26 @@ In the sample root directory, perform the following steps to build and run the s
 
   On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
 
-  Run operator tuning on the `matrix_transpose` executable with `msopprof`:
+  Run operator tuning on the executable `matrix_transpose` with `msopprof`:
 
   ```bash
   msopprof ./matrix_transpose
   ```
 
-  - Performance data description
-    After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure is as follows:
+  After the command completes, a performance data folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The folder structure is as follows:
 
-    ```bash
-    ├──dump                       # Raw performance data; users do not need to inspect it
-    ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
-    ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
-    ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
-    ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
-    ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
-    ├──OpBasicInfo.csv            # Basic operator information
-    ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
-    ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
-    └──visualize_data.bin         # MindStudio Insight presentation file
-    ```
+  ```bash
+  ├──dump                       # Raw performance data; users do not need to inspect it
+  ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+  ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+  ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+  ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+  ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+  ├──OpBasicInfo.csv            # Basic operator information
+  ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+  ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+  └──visualize_data.bin         # MindStudio Insight presentation file
+  ```
 
   View the specific performance analysis results:
 

@@ -13,11 +13,13 @@ This example uses the FloorMod computation to demonstrate performance tuning met
 | Case 2 | 2 | SIMT non-contiguous UB access | GM data is transferred to UB via data transfer interfaces. Each SIMT thread processes a contiguous segment, but adjacent threads within a Warp access non-contiguous addresses. |
 | Case 3 | 3 | SIMT contiguous UB access | GM data is transferred to UB via data transfer interfaces. Thread mapping is adjusted so that adjacent threads within a Warp access contiguous addresses. |
 
-## Supported Products and CANN Versions
+## Supported Products
 
-| Product | CANN Version |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+- Ascend 950PR/Ascend 950DT
+
+## Supported CANN Software Version
+
+- \>= CANN 9.2.0
 
 ## Directory Structure
 
@@ -27,7 +29,8 @@ This example uses the FloorMod computation to demonstrate performance tuning met
 │   ├── data_utils.h          // Data read/write functions
 │   ├── figures               // Illustrations
 │   ├── floor_mod.asc         // Ascend C example implementation
-│   ├── README.md             // Example documentation
+│   ├── README.md             // Chinese sample documentation.
+│   ├── README_en.md          // English sample documentation.
 │   └── scripts
 │       ├── gen_data.py       // Input data and ground truth generation script
 │       └── verify_result.py  // Ground truth comparison script
@@ -352,8 +355,6 @@ __aicore__ inline void process_tiles(
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Comparison
-
 The following table shows the performance data comparison for this example running on Ascend 950 series products:
 
 | Case | Implementation | Cores | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | Primary Bottleneck |
@@ -363,7 +364,7 @@ The following table shows the performance data comparison for this example runni
 | 2 | SIMT non-contiguous UB access | 64 | 538.098 | 501.605 | 0.942 | 527.987 | 0.991 | 40.091 | 0.075 | Cross-bank-row UB access |
 | 3 | SIMT contiguous UB access | 64 | **463.179** | **301.474** | 0.668 | 437.055 | 0.968 | 110.788 | 0.245 | MTE2 bound |
 
-### Optimization Key Points Summary
+## Tuning Recommendations
 
 | Optimization Method | Core Principle | Example Demonstration |
 |:---|:---|:---|
@@ -428,39 +429,36 @@ Run the following steps in the root directory of this example to build and run t
   test pass!
   ```
 
-### Performance Analysis
+## Performance Debugging
 
 ### Introduction to the msOpProf Tool
 
-`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files). This sample only uses `msopprof` for on-device performance collection.
 
-- On-device performance collection
+On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
 
-    On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+Run operator tuning on the executable demo with `msopprof`:
 
-    Run operator tuning on the executable demo with `msopprof`:
+```bash
+msopprof ./demo
+```
 
-    ```
-    msopprof ./demo
-    ```
+After the command completes, a performance data folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The folder structure is as follows:
 
-    - Performance data description  
-      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+```bash
+├──dump                       # Raw performance data; users do not need to inspect it
+├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+├──OpBasicInfo.csv            # Basic operator information
+├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+└──visualize_data.bin         # MindStudio Insight presentation file
+```
 
-      ```bash
-      ├──dump                       # Raw performance data; users do not need to inspect it
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
-      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
-      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
-      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
-      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
-      ├──OpBasicInfo.csv            # Basic operator information
-      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
-      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
-      └──visualize_data.bin         # MindStudio Insight presentation file
-      ```
-
-View the specific performance analysis results:
+View performance analysis results:
 
 ```bash
 # View Task Duration and various metrics
