@@ -29,6 +29,8 @@
 
 PR文档约定：有符号地址返回`int64_t`。实机向GM写入负数后，PR head的读取结果如下：
 
+可通过`scalar_compute/asc_load_dev_signed_repro.asc`默认编译模式复现。
+
 | 重载 | 输入 | 实际返回 | 期望返回 |
 | --- | ---: | ---: | ---: |
 | `asc_load_dev(__gm__ int8_t*)` | -1 | 255 | -1 |
@@ -47,6 +49,8 @@ return static_cast<int32_t>(
 ### `int64_t*`重载无法编译
 
 在独立实机矩阵中调用`asc_load_dev(__gm__ int64_t*)`时，device编译报错：
+
+可通过`scalar_compute/asc_load_dev_signed_repro.asc`的`REPRO_INT64_COMPILE_FAILURE`模式复现。
 
 ```text
 asc_load_dev_impl.h:57:19: error: the 1st parameter maybe need a type 'half *'
