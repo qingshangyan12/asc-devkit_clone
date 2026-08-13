@@ -155,16 +155,10 @@ class CompileKernel:
             opc_config_file,
             [self.op_type],
         )
-        (
-            tiling_key_info,
-            op_debug_config,
-            kernel_json_file,
-            _,
-            kernel_template_input_info,
-            _,
-        ) = ascendc_bin_param_build.parse_op_debug_config(
+        parsed_config = ascendc_bin_param_build.parse_op_debug_config(
             opc_config_file, self.op_soc_ver
         )
+        op_debug_config = parsed_config.op_debug_config
         if self.op_type in op_debug_config:
             self.op_debug_config = op_debug_config[self.op_type]
         if "ALL" in op_debug_config:
