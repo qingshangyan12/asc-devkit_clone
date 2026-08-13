@@ -13,23 +13,21 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-#define TEST_ASC_LOAD_DEV(data_type, return_type, value)                                             \
-    namespace {                                                                                      \
-    return_type ld_dev_##data_type##_stub(__gm__ data_type* addr, int16_t offset)                   \
-    {                                                                                                \
-        EXPECT_EQ(offset, 0);                                                                        \
-        return static_cast<return_type>(value);                                                      \
-    }                                                                                                \
-    }                                                                                                \
-                                                                                                     \
-    TEST(AscLoadDev, data_type)                                                                      \
-    {                                                                                                \
-        __gm__ data_type* addr = nullptr;                                                            \
-        MOCKER_CPP(ld_dev, return_type(__gm__ data_type*, int16_t))                                 \
-            .times(1)                                                                                \
-            .will(invoke(ld_dev_##data_type##_stub));                                                \
-        EXPECT_EQ(asc_load_dev(addr), static_cast<return_type>(value));                              \
-        GlobalMockObject::verify();                                                                  \
+#define TEST_ASC_LOAD_DEV(data_type, return_type, value)                                                              \
+    namespace {                                                                                                       \
+    return_type ld_dev_##data_type##_stub(__gm__ data_type* addr, int16_t offset)                                     \
+    {                                                                                                                 \
+        EXPECT_EQ(offset, 0);                                                                                         \
+        return static_cast<return_type>(value);                                                                       \
+    }                                                                                                                 \
+    }                                                                                                                 \
+                                                                                                                      \
+    TEST(AscLoadDev, data_type)                                                                                       \
+    {                                                                                                                 \
+        __gm__ data_type* addr = nullptr;                                                                             \
+        MOCKER_CPP(ld_dev, return_type(__gm__ data_type*, int16_t)).times(1).will(invoke(ld_dev_##data_type##_stub)); \
+        EXPECT_EQ(asc_load_dev(addr), static_cast<return_type>(value));                                               \
+        GlobalMockObject::verify();                                                                                   \
     }
 
 TEST_ASC_LOAD_DEV(int8_t, int64_t, -1)

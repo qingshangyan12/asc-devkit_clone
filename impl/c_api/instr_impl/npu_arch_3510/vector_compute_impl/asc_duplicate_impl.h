@@ -102,13 +102,12 @@ __simd_callee__ inline void asc_duplicate_impl(vector_float& dst, vector_float s
     }
 }
 
-#define ASC_DUPLICATE_HIGHEST_IMPL(data_type)                                                        \
-    __simd_callee__ inline void asc_duplicate_highest_impl(                                          \
-        data_type& dst, data_type src, vector_bool mask)                                             \
-    {                                                                                                \
-        if ASC_IS_AIV {                                                                              \
-            vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);                                        \
-        }                                                                                            \
+#define ASC_DUPLICATE_HIGHEST_IMPL(data_type)                                                               \
+    __simd_callee__ inline void asc_duplicate_highest_impl(data_type& dst, data_type src, vector_bool mask) \
+    {                                                                                                       \
+        if ASC_IS_AIV {                                                                                     \
+            vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);                                                \
+        }                                                                                                   \
     }
 
 ASC_DUPLICATE_HIGHEST_IMPL(vector_uint8_t)
@@ -212,13 +211,12 @@ __simd_callee__ inline void asc_duplicate_merge_impl(vector_float& dst, vector_f
     }
 }
 
-#define ASC_DUPLICATE_HIGHEST_MERGE_IMPL(data_type)                                                  \
-    __simd_callee__ inline void asc_duplicate_highest_merge_impl(                                    \
-        data_type& dst, data_type src, vector_bool mask)                                             \
-    {                                                                                                \
-        if ASC_IS_AIV {                                                                              \
-            vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);                                        \
-        }                                                                                            \
+#define ASC_DUPLICATE_HIGHEST_MERGE_IMPL(data_type)                                                               \
+    __simd_callee__ inline void asc_duplicate_highest_merge_impl(data_type& dst, data_type src, vector_bool mask) \
+    {                                                                                                             \
+        if ASC_IS_AIV {                                                                                           \
+            vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);                                                      \
+        }                                                                                                         \
     }
 
 ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_uint8_t)

@@ -11,17 +11,8 @@
 #include <gtest/gtest.h>
 #include "tests/api/c_api/stub/cce_stub.h"
 
-int64_t ld_dev(__gm__ int8_t*, int16_t)
-{
-    return 0;
-}
+int64_t ld_dev(__gm__ int8_t*, int16_t) { return 0; }
 
-int64_t ld_dev(__gm__ int16_t*, int16_t)
-{
-    return 0;
-}
+int64_t ld_dev(__gm__ int16_t*, int16_t) { return 0; }
 
-int64_t ld_dev(__gm__ int32_t*, int16_t)
-{
-    return 0;
-}
+int64_t ld_dev(__gm__ int32_t*, int16_t) { return 0; }
