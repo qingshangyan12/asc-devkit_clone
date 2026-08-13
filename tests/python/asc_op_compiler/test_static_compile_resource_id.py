@@ -43,6 +43,34 @@ class TestStaticCompileResourceId(unittest.TestCase):
         ]
         self.assertEqual(temporary_files, [])
 
+    def test_generate_and_write_does_not_repeat_write_verification(self):
+        resource_id = "a" * 64
+        with ExitStack() as stack:
+            calculate = stack.enter_context(
+                mock.patch.object(
+                    MODULE, "calculate_resource_id", return_value=resource_id
+                )
+            )
+            write = stack.enter_context(
+                mock.patch.object(MODULE, "write_resource_id_section")
+            )
+            read = stack.enter_context(
+                mock.patch.object(
+                    MODULE,
+                    "read_resource_id_section",
+                    side_effect=AssertionError(
+                        "write verification must not be repeated"
+                    ),
+                )
+            )
+
+            result = MODULE.generate_and_write_resource_id(self.object_path)
+
+        self.assertEqual(result, resource_id)
+        calculate.assert_called_once_with(self.object_path)
+        write.assert_called_once_with(self.object_path, resource_id)
+        read.assert_not_called()
+
     def test_invalid_inputs_do_not_modify_object(self):
         before = Path(self.object_path).read_bytes()
         for resource_id in ("A" * 64, "0" * 63, "z" * 64):

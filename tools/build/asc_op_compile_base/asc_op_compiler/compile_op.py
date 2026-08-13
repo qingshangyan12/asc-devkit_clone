@@ -130,6 +130,7 @@ from .super_kernel_sub_op_compile import (
 from .static_compile_resource_id import generate_and_write_resource_id
 from .static_compile_resource_generator import (
     ManifestGenerationRequest,
+    ConstantInfoRecord,
     build_kernel_compile_records,
     generate_manifest,
 )
@@ -425,6 +426,7 @@ the superkernel cannot be integrated with the operator.",
     # get max tiling size when use tiling old
     else:
         max_tiling_size = tiling_info.tiling_data_size
+    compile_info.static_compile_tiling_size = int(max_tiling_size)
 
     # updata op_param size by flag of oom
     if "oom" in get_current_build_config("tir.op_debug_config"):
@@ -1198,6 +1200,13 @@ def _get_tiling_struct_size(compile_info):
             tiling_struct_size_map[tiling_struct] = dec_data
             max_tiling_size = max(max_tiling_size, dec_data)
 
+    compile_info.static_compile_tiling_size = int(max_tiling_size)
+    compile_info.static_compile_tiling_key_data_size = {
+        str(tiling_key): int(tiling_struct_size_map[tiling_struct])
+        for tiling_key, tiling_struct in compile_info.tiling_key_struct_map.items()
+        if tiling_struct in tiling_struct_size_map
+    }
+
     # The sk sub operator failed to rm tiling section because llvm-objcopy could not correctly process the ar obj.
     if (
         global_var_storage.get_variable("ascendc_enable_super_kernel") is True
@@ -1276,6 +1285,11 @@ def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
             )
             max_tiling_size = max(max_tiling_size, dec_data)
     compile_info.max_tiling_size = max_tiling_size
+    compile_info.static_compile_tiling_key_data_size = {
+        str(tiling_key): int(value[1])
+        for tiling_key, value in tiling_key_struct_size_map.items()
+        if isinstance(value, tuple) and len(value) == 2 and value[1] > 0
+    }
     return tiling_key_struct_size_map
 
 
@@ -2007,6 +2021,11 @@ def compile_op_common_part(
         metadata_json_path = os.path.join(
             kernel_meta_dir, compile_info.kernel_name + ".json"
         )
+        manifest_tiling_size = tiling_info.default_tiling_size
+        if manifest_tiling_size <= 0:
+            manifest_tiling_size = compile_info.static_compile_tiling_size
+        manifest_tiling_sizes = dict(tiling_info.tiling_key_data_size)
+        manifest_tiling_sizes.update(compile_info.static_compile_tiling_key_data_size)
         kernel_records = build_kernel_compile_records(
             basic_compile_info=basic_compile_info,
             basic_compile_option_tuple=basic_compile_option_tuple,
@@ -2015,20 +2034,23 @@ def compile_op_common_part(
             command_builder=build_static_compile_commands,
             chip_version=CommonUtility.get_chip_version(),
             metadata_json_path=metadata_json_path,
-            parameter_index=workspace_idx + 1,
-            tiling_template_path=tiling_info.tiling_data_file_path,
-            tiling_key_data_size=tiling_info.tiling_key_data_size,
-            default_tiling_size=tiling_info.default_tiling_size,
-            tiling_key_group_map=basic_compile_info.tiling_key_group_map,
+            constant_infos=(
+                ConstantInfoRecord(
+                    name="tiling_data",
+                    parameter_index=workspace_idx + 1,
+                    byte_size=manifest_tiling_size,
+                    template_path=tiling_info.tiling_data_file_path,
+                    template="@@STATIC_VALUE_tiling_data@@",
+                ),
+            ),
+            constant_info_size_by_tiling_key={"tiling_data": manifest_tiling_sizes},
         )
         generate_manifest(
             ManifestGenerationRequest(
                 soc_version=global_var_storage.get_variable(
                     "ascendc_short_soc_version"
                 ),
-                dynamic_object_path=compile_info.dst_file,
                 resource_id=resource_id,
-                metadata_json_path=metadata_json_path,
                 source_file_path=cce_file,
                 origin_func_name=origin_func_name,
                 output_root=kernel_meta_dir,
