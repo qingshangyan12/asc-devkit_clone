@@ -95,14 +95,14 @@ Therefore, while the Vector pipeline is computing iteration n, MTE2 cannot load 
 
 ### Scenario 1: Ping/Pong Buffer Optimization Enabled
 
-When Ping/Pong Buffer optimization is enabled, the Kernel `add_double_buffer` divides UB into two independent x/y/z buffer groups. Even-numbered iterations use Ping and Mutex 0, while odd-numbered iterations use Pong and Mutex 1. Adjacent iterations use different buffers and Mutexes, so they neither access the same UB addresses nor block on the same synchronization resource.
+When Ping/Pong Buffer optimization is enabled, the Kernel `add_double_buffer` divides UB into two independent x/y/z buffer groups. Each group uses separate input and output Mutexes: even-numbered iterations use Ping with Mutexes 0/2, while odd-numbered iterations use Pong with Mutexes 1/3. The input Mutex controls the dependency between MTE2 writing x/y and Vector reading x/y, while the output Mutex controls the dependency between Vector writing z and MTE3 reading z.
 
 **Table6**  Buffer Layout with Ping/Pong Buffer Optimization Enabled
 
-| Iteration | Buffer group | Mutex ID | x start offset | y start offset | z start offset |
-| --- | --- | --- | --- | --- | --- |
-| Even | Ping | 0 | 0 | 21840 | 43680 |
-| Odd | Pong | 1 | 65520 | 87360 | 109200 |
+| Iteration | Buffer group | Input Mutex ID | Output Mutex ID | x start offset | y start offset | z start offset |
+| --- | --- | --- | --- | --- | --- | --- |
+| Even | Ping | 0 | 2 | 0 | 21840 | 43680 |
+| Odd | Pong | 1 | 3 | 65520 | 87360 | 109200 |
 
 All offsets in the table are measured in float16 elements. Each group still reserves 21840 float16 elements for each of x, y, and z, so the data movement and Vector workload per iteration are identical to those with Ping/Pong Buffer optimization disabled. When the optimization is enabled, the Kernel does not perform a full pipeline synchronization at the end of each iteration. Instead, `asc_lock` and `asc_unlock` use a Mutex to manage the pipeline dependencies of each buffer group.
 
@@ -110,13 +110,13 @@ All offsets in the table are measured in float16 elements. Each group still rese
 
 | Pipeline stage | Mutex ID | Synchronization operation | Enforced dependency |
 | --- | --- | --- | --- |
-| MTE2 load | 0 for Ping, 1 for Pong | Acquire with `asc_lock(PIPE_MTE2, mutex_id)`, load x and y, and then call `asc_unlock`. | Before reusing a group, wait for its preceding MTE3 store to finish. |
-| Vector computation | Matches the current buffer group | Acquire with `asc_lock(PIPE_V, mutex_id)`, call `add_vf`, and then call `asc_unlock`. | Vector waits for the current MTE2 stage to release the Mutex and cannot read incomplete inputs. |
-| MTE3 store | Matches the current buffer group | Acquire with `asc_lock(PIPE_MTE3, mutex_id)`, store z, and then call `asc_unlock`. | MTE3 waits for the current Vector stage to release the Mutex and cannot store an incomplete result. |
+| MTE2 load | Input Mutex: 0 for Ping, 1 for Pong | Acquire the input Mutex, load x and y, and then release it. | Before rewriting x and y in a group, wait for the preceding Vector stage to finish reading them. |
+| Vector computation | Input and output Mutexes for the current group | Acquire both Mutexes, call `add_vf`, and then release both. | Wait for the current x/y load and for the preceding MTE3 stage to finish reading z in the same group. |
+| MTE3 store | Output Mutex: 2 for Ping, 3 for Pong | Acquire the output Mutex, store z, and then release it. | Wait for the current Vector stage to finish writing z. |
 
-Each iteration selects Mutex 0 or 1 using `loop_idx & 1`, then acquires and releases that Mutex on the MTE2, Vector, and MTE3 pipelines in sequence. The same Mutex chains the three stages of one buffer group, while different Mutexes do not block one another. After all 49 iterations have been issued, the Kernel calls `asc_sync_pipe(PIPE_ALL)` once to ensure that the final data movement and computation have completed. See [asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md) and [asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md) for interface constraints and the double-buffer pattern.
+Each iteration selects input Mutex 0 or 1 using `loop_idx & 1` and sets the output Mutex to the input Mutex plus 2. After Vector computation, the input Mutex allows a later MTE2 stage to reuse x/y, while the output Mutex allows the current MTE3 stage to read z. Because MTE2 does not access z and MTE3 does not access x or y, the next load into a group can overlap with the current store from that group. After all 49 iterations have been issued, the Kernel calls `asc_sync_pipe(PIPE_ALL)` once to ensure that the final data movement and computation have completed. See [asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md) and [asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md) for interface constraints and the double-buffer pattern.
 
-For example, iteration 0 uses Ping and Mutex 0, iteration 1 uses Pong and Mutex 1, and iteration 2 reuses Ping and Mutex 0. While Vector processes the Ping data for iteration 0, MTE2 can load the Pong data for iteration 1. While MTE3 stores the Ping result for iteration 0, Vector can process the Pong data for iteration 1. Iteration 2 waits for iteration 0 MTE3 to release Mutex 0 before reusing Ping. MTE2, Vector, and MTE3 can therefore process adjacent iterations concurrently and hide part of the GM-to-UB and UB-to-GM data movement latency.
+For example, iteration 0 uses Ping input/output Mutexes 0/2, iteration 1 uses Pong Mutexes 1/3, and iteration 2 reuses Ping Mutexes 0/2. After iteration 0 Vector releases Mutexes 0 and 2, iteration 2 MTE2 can use Mutex 0 to overwrite Ping x/y while iteration 0 MTE3 uses Mutex 2 to read Ping z. Iteration 2 Vector still waits for iteration 0 MTE3 to release Mutex 2 before overwriting Ping z. This preserves the required data dependencies while removing the unnecessary dependency between loads and stores in the same group.
 
 The main differences between the two scenarios are summarized below.
 
@@ -126,8 +126,8 @@ The main differences between the two scenarios are summarized below.
 | --- | --- | --- |
 | UB buffers | One x/y/z group, 131040 bytes | Two x/y/z groups, 262080 bytes |
 | Addresses used by adjacent iterations | The same; reuse waits for the previous iteration to finish. | Different; alternates between Ping and Pong. |
-| End-of-iteration synchronization | Uses Mutex 0 to chain iterations and performs one full synchronization after all iterations. | Uses Mutex 0/1 for Ping/Pong dependencies and performs one full synchronization after all iterations. |
-| Cross-iteration pipeline overlap | Not supported | MTE2, Vector, and MTE3 can process different iterations. |
+| Pipeline synchronization | Uses Mutex 0 to chain iterations and performs one full synchronization after all iterations. | Uses input Mutexes 0/1 and output Mutexes 2/3 for Ping/Pong, then performs one full synchronization after all iterations. |
+| Cross-iteration pipeline overlap | Not supported | MTE2, Vector, and MTE3 can process different iterations; MTE2 loads and MTE3 stores for the same group can also overlap. |
 | Optimization cost | Lower UB usage | Doubles the UB address space to enable pipeline overlap. |
 
 <p align="center">

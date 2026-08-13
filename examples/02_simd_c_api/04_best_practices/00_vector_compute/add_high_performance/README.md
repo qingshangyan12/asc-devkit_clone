@@ -57,10 +57,10 @@ $$
 | 核数 | 64 | 每个核处理连续的M轴数据。 |
 | 每核处理行数 | 128 | `8192 / 64` |
 | 每核处理元素数 | 1048576 | `128 * 8192` |
-| 每核循环次数 | 49 | 48个满块和1个尾块 |
-| 满块有效元素数 | 21760 | 对应`DATA_COPY_LENGTH`。 |
-| 尾块有效元素数 | 4096 | `1048576 - 48 * 21760` |
 | 单个UB缓冲区预留长度 | 21840个float16元素 | 对应`MAX_DATA_COPY_LENGTH`，用于划分各缓冲区的UB地址。 |
+| 满块有效元素数 | 21760 | 对应`DATA_COPY_LENGTH`，取不超过21840且满足512字节对齐的最大长度。 |
+| 尾块有效元素数 | 4096 | `1048576 % 21760` |
+| 每核循环次数 | 49 | `1048576 / 21760 = 48`余4096个元素，因此包含48个满块和1个尾块。 |
 | VF向量长度 | 256字节 | 每次可处理128个float16元素；满块执行170次VF计算，尾块执行32次。 |
 
 编译参数`SCENARIO_NUM`用于选择未开启或开启Ping/Pong Buffer优化。两个场景的输入数据、多核切分、分块大小和向量计算均保持一致，仅UB缓冲区数量及流水同步方式不同。
@@ -95,14 +95,14 @@ $$
 
 ### 场景1：开启Ping/Pong Buffer优化
 
-开启Ping/Pong Buffer优化时，Kernel `add_double_buffer`将UB划分为两组相互独立的x、y、z缓冲区。偶数轮使用Ping和Mutex 0，奇数轮使用Pong和Mutex 1。相邻轮次使用不同的缓冲区和Mutex，不会读写同一段UB地址，也不会因同步资源相同而相互阻塞。
+开启Ping/Pong Buffer优化时，Kernel `add_double_buffer`将UB划分为两组相互独立的x、y、z缓冲区。每组分别使用输入Mutex和输出Mutex：偶数轮使用Ping和Mutex 0/2，奇数轮使用Pong和Mutex 1/3。输入Mutex管理MTE2写x、y与Vector读x、y之间的依赖，输出Mutex管理Vector写z与MTE3读z之间的依赖。
 
 **表6**  开启Ping/Pong Buffer优化时的缓冲区布局
 
-| 轮次 | 缓冲区组 | Mutex ID | x起始偏移 | y起始偏移 | z起始偏移 |
-| --- | --- | --- | --- | --- | --- |
-| 偶数轮 | Ping | 0 | 0 | 21840 | 43680 |
-| 奇数轮 | Pong | 1 | 65520 | 87360 | 109200 |
+| 轮次 | 缓冲区组 | 输入Mutex ID | 输出Mutex ID | x起始偏移 | y起始偏移 | z起始偏移 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 偶数轮 | Ping | 0 | 2 | 0 | 21840 | 43680 |
+| 奇数轮 | Pong | 1 | 3 | 65520 | 87360 | 109200 |
 
 表中的偏移单位均为float16元素。每组缓冲区仍按x、y、z各预留21840个float16元素，单轮的数据搬运量和Vector计算量与未开启Ping/Pong Buffer优化的场景完全相同。区别在于开启优化后不再在每轮末尾执行全流水同步，而是使用`asc_lock`和`asc_unlock`按Mutex管理每组缓冲区的流水依赖。
 
@@ -110,13 +110,13 @@ $$
 
 | 流水阶段 | Mutex ID | 同步操作 | 保证的依赖 |
 | --- | --- | --- | --- |
-| MTE2搬入 | Ping为0，Pong为1 | `asc_lock(PIPE_MTE2, mutex_id)`后搬入x、y，完成后`asc_unlock`。 | 同一组缓冲区再次使用前，等待该组上一轮MTE3搬出完成。 |
-| Vector计算 | 与当前缓冲区组一致 | `asc_lock(PIPE_V, mutex_id)`后执行`add_vf`，完成后`asc_unlock`。 | Vector等待当前轮MTE2释放Mutex，防止读取尚未搬完的数据。 |
-| MTE3搬出 | 与当前缓冲区组一致 | `asc_lock(PIPE_MTE3, mutex_id)`后搬出z，完成后`asc_unlock`。 | MTE3等待当前轮Vector释放Mutex，防止搬出尚未计算完成的数据。 |
+| MTE2搬入 | 输入Mutex：Ping为0，Pong为1 | 获取输入Mutex后搬入x、y，完成后释放。 | 同一组x、y再次写入前，等待该组上一轮Vector读取完成。 |
+| Vector计算 | 当前组的输入Mutex和输出Mutex | 依次获取两个Mutex后执行`add_vf`，完成后分别释放。 | 等待当前轮x、y搬入完成，并等待上一轮MTE3读完同组z。 |
+| MTE3搬出 | 输出Mutex：Ping为2，Pong为3 | 获取输出Mutex后搬出z，完成后释放。 | 等待当前轮Vector写完z。 |
 
-每轮根据`loop_idx & 1`选择Mutex 0或1，并依次在MTE2、Vector和MTE3流水上获取、释放该Mutex。同一Mutex将一组缓冲区的三个阶段串联起来，不同Mutex之间互不阻塞。所有49轮指令下发后调用一次`asc_sync_pipe(PIPE_ALL)`，确保最后的搬运和计算结束。接口约束和双Buffer用法可参考[asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md)。
+每轮根据`loop_idx & 1`选择输入Mutex 0或1，并将输出Mutex设为输入Mutex加2。Vector计算完成后，输入Mutex允许后续MTE2复用x、y，输出Mutex允许当前MTE3读取z。由于MTE2不访问z、MTE3不访问x和y，同组下一轮的搬入可以与当前轮的搬出并行。所有49轮指令下发后调用一次`asc_sync_pipe(PIPE_ALL)`，确保最后的搬运和计算结束。接口约束和双Buffer用法可参考[asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md)。
 
-以连续三轮为例：第0轮使用Ping和Mutex 0，第1轮使用Pong和Mutex 1，第2轮再次使用Ping和Mutex 0。当Vector处理第0轮Ping数据时，MTE2可以搬入第1轮Pong数据；当MTE3搬出第0轮Ping结果时，Vector可以处理第1轮Pong数据。第2轮复用Mutex 0时，需要等待第0轮MTE3释放该Mutex。由此，MTE2、Vector和MTE3能够处理相邻轮次的不同数据块，隐藏部分GM与UB之间的数据搬运等待时间。
+以连续三轮为例：第0轮使用Ping的输入/输出Mutex 0/2，第1轮使用Pong的1/3，第2轮再次使用Ping的0/2。当第0轮Vector释放Mutex 0和2后，第2轮MTE2可以使用Mutex 0覆盖Ping的x、y，同时第0轮MTE3使用Mutex 2读取Ping的z。第2轮Vector仍需等待第0轮MTE3释放Mutex 2后才能覆盖Ping的z。这样既保留必要的数据依赖，又解除同组搬入与搬出之间不必要的依赖。
 
 两个场景的核心区别如下表所示。
 
@@ -126,8 +126,8 @@ $$
 | --- | --- | --- |
 | UB缓冲区 | 一组x/y/z，共131040字节 | 两组x/y/z，共262080字节 |
 | 相邻轮次使用的地址 | 相同，必须等待上一轮结束后复用。 | 不同，在Ping和Pong之间交替。 |
-| 轮末同步 | 使用Mutex 0串联各轮，全部轮次结束后执行一次全同步。 | Ping/Pong分别使用Mutex 0/1管理依赖，全部轮次结束后执行一次全同步。 |
-| 跨轮流水重叠 | 不支持 | MTE2、Vector、MTE3可处理不同轮次。 |
+| 流水同步 | 使用Mutex 0串联各轮，全部轮次结束后执行一次全同步。 | Ping/Pong的输入Mutex为0/1、输出Mutex为2/3，全部轮次结束后执行一次全同步。 |
+| 跨轮流水重叠 | 不支持 | MTE2、Vector、MTE3可处理不同轮次；同组MTE2搬入与MTE3搬出也可并行。 |
 | 优化代价 | UB占用较少。 | 以增加一倍UB地址空间换取流水重叠机会。 |
 
 <p align="center">
