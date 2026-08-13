@@ -1250,6 +1250,7 @@
             -   [asc_ffs](SIMD-API/c_api/scalar_compute/asc_ffs.md)
             -   [asc_ffz](SIMD-API/c_api/scalar_compute/asc_ffz.md)
             -   [asc_float2int32](SIMD-API/c_api/scalar_compute/asc_float2int32.md)
+            -   [asc_load_dev](SIMD-API/c_api/scalar_compute/asc_load_dev.md)
             -   [asc_popc](SIMD-API/c_api/scalar_compute/asc_popc.md)
             -   [asc_set_nthbit](SIMD-API/c_api/scalar_compute/asc_set_nthbit.md)
             -   [asc_sflbits](SIMD-API/c_api/scalar_compute/asc_sflbits.md)

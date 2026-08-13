@@ -66,17 +66,17 @@ __aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value) { asc_
 
 __aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value) { asc_store_dev_impl(addr, value); }
 
-__aicore__ inline int64_t asc_load_dev(__gm__ int8_t* addr) { return asc_load_dev_impl(addr); }
+__aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr) { return asc_load_dev_impl(addr); }
 
-__aicore__ inline uint64_t asc_load_dev(__gm__ uint8_t* addr) { return asc_load_dev_impl(addr); }
+__aicore__ inline uint8_t asc_load_dev(__gm__ uint8_t* addr) { return asc_load_dev_impl(addr); }
 
-__aicore__ inline int64_t asc_load_dev(__gm__ int16_t* addr) { return asc_load_dev_impl(addr); }
+__aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr) { return asc_load_dev_impl(addr); }
 
-__aicore__ inline uint64_t asc_load_dev(__gm__ uint16_t* addr) { return asc_load_dev_impl(addr); }
+__aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr) { return asc_load_dev_impl(addr); }
 
-__aicore__ inline int64_t asc_load_dev(__gm__ int32_t* addr) { return asc_load_dev_impl(addr); }
+__aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr) { return asc_load_dev_impl(addr); }
 
-__aicore__ inline uint64_t asc_load_dev(__gm__ uint32_t* addr) { return asc_load_dev_impl(addr); }
+__aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr) { return asc_load_dev_impl(addr); }
 
 __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr) { return asc_load_dev_impl(addr); }
 

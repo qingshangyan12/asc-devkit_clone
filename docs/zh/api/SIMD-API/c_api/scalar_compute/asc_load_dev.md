@@ -32,17 +32,17 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline int64_t asc_load_dev(__gm__ int8_t* addr)
+__aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr)
 
-__aicore__ inline uint64_t asc_load_dev(__gm__ uint8_t* addr)
+__aicore__ inline uint8_t asc_load_dev(__gm__ uint8_t* addr)
 
-__aicore__ inline int64_t asc_load_dev(__gm__ int16_t* addr)
+__aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr)
 
-__aicore__ inline uint64_t asc_load_dev(__gm__ uint16_t* addr)
+__aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr)
 
-__aicore__ inline int64_t asc_load_dev(__gm__ int32_t* addr)
+__aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr)
 
-__aicore__ inline uint64_t asc_load_dev(__gm__ uint32_t* addr)
+__aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr)
 
 __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr)
 ```
@@ -57,7 +57,7 @@ __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr)
 
 ## 返回值说明
 
-从GM读取的数据。`addr`指向有符号整型时返回`int64_t`，指向无符号整型时返回`uint64_t`。
+从GM读取的数据，返回值的数据类型与`addr`指向的数据类型一致。
 
 ## 流水类型
 
@@ -72,5 +72,5 @@ PIPE_S
 
 ```cpp
 // addr是外部输入的GM地址，类型为__gm__ int32_t*。
-int64_t value = asc_load_dev(addr);
+int32_t value = asc_load_dev(addr);
 ```

@@ -10,10 +10,11 @@
 
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
+#include <type_traits>
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-#define TEST_ASC_LOAD_DEV(data_type, cce_type, return_type, raw_value, expected_value)                            \
+#define TEST_ASC_LOAD_DEV(data_type, cce_type, raw_value, expected_value)                                         \
     namespace {                                                                                                   \
     uint64_t ld_dev_##data_type##_stub(__gm__ cce_type* addr, int16_t offset)                                     \
     {                                                                                                             \
@@ -25,17 +26,18 @@
     TEST(AscLoadDev, data_type)                                                                                   \
     {                                                                                                             \
         __gm__ data_type* addr = nullptr;                                                                         \
+        static_assert(std::is_same_v<decltype(asc_load_dev(addr)), data_type>);                                   \
         MOCKER_CPP(ld_dev, uint64_t(__gm__ cce_type*, int16_t)).times(1).will(invoke(ld_dev_##data_type##_stub)); \
-        EXPECT_EQ(asc_load_dev(addr), static_cast<return_type>(expected_value));                                  \
+        EXPECT_EQ(asc_load_dev(addr), static_cast<data_type>(expected_value));                                    \
         GlobalMockObject::verify();                                                                               \
     }
 
-TEST_ASC_LOAD_DEV(int8_t, uint8_t, int64_t, UINT8_MAX, -1)
-TEST_ASC_LOAD_DEV(uint8_t, uint8_t, uint64_t, 1, 1)
-TEST_ASC_LOAD_DEV(int16_t, uint16_t, int64_t, UINT16_MAX, -1)
-TEST_ASC_LOAD_DEV(uint16_t, uint16_t, uint64_t, 2, 2)
-TEST_ASC_LOAD_DEV(int32_t, uint32_t, int64_t, UINT32_MAX, -1)
-TEST_ASC_LOAD_DEV(uint32_t, uint32_t, uint64_t, 3, 3)
-TEST_ASC_LOAD_DEV(uint64_t, uint64_t, uint64_t, 4, 4)
+TEST_ASC_LOAD_DEV(int8_t, uint8_t, UINT8_MAX, -1)
+TEST_ASC_LOAD_DEV(uint8_t, uint8_t, 1, 1)
+TEST_ASC_LOAD_DEV(int16_t, uint16_t, UINT16_MAX, -1)
+TEST_ASC_LOAD_DEV(uint16_t, uint16_t, 2, 2)
+TEST_ASC_LOAD_DEV(int32_t, uint32_t, UINT32_MAX, -1)
+TEST_ASC_LOAD_DEV(uint32_t, uint32_t, 3, 3)
+TEST_ASC_LOAD_DEV(uint64_t, uint64_t, 4, 4)
 
 #undef TEST_ASC_LOAD_DEV

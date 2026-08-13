@@ -201,6 +201,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_ffs](scalar_compute/asc_ffs.md) | FindFirstSet接口，输入数据的二进制表示中从最低位向最高位查找第一个值为1的位，并返回其位置，如果没找到则返回-1。 |
 | [asc_ffz](scalar_compute/asc_ffz.md) | 获取一个uint64_t类型数字的二进制表示中从最低有效位开始的第一个0出现的位置，如果没找到则返回-1。 |
 | [asc_float2int32](scalar_compute/asc_float2int32.md) | 将float类型转化为int32_t类型，并支持多种舍入模式。 |
+| [asc_load_dev](scalar_compute/asc_load_dev.md) | 不经过DCache直接从GM地址读取整型数据。 |
 | [asc_popc](scalar_compute/asc_popc.md) | 获取一个uint64_t类型数字的二进制中1的个数。 |
 | [asc_set_nthbit](scalar_compute/asc_set_nthbit.md) | 计算一个uint64_t类型数字的指定二进制位置为1，其余位保持不变。 |
 | [asc_sflbits](scalar_compute/asc_sflbits.md) | 计算一个int64_t类型数字的二进制中，从最高数值位开始与符号位相同的连续比特位的个数。 |
