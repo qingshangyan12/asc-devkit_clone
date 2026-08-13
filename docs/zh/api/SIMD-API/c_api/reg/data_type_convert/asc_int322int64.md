@@ -47,8 +47,6 @@ def asc_int322int64_v2(dst, src, mask):
 
 ### 模板原型（占位符形式）
 
-本接口包含2种分块位置，模板原型如下：
-
 ```c
 __simd_callee__ inline void asc_int322int64<position_mode>(vector_int64_t& dst,
                                                            vector_int32_t src,
