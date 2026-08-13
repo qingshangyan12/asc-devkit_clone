@@ -52,11 +52,6 @@ __aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint32_t* addr)
     return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
-__aicore__ inline int64_t asc_load_dev_impl(__gm__ int64_t* addr)
-{
-    return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
-}
-
 __aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint64_t* addr)
 {
     return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);

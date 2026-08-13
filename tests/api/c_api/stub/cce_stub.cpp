@@ -25,8 +25,3 @@ int64_t ld_dev(__gm__ int32_t*, int16_t)
 {
     return 0;
 }
-
-int64_t ld_dev(__gm__ int64_t*, int16_t)
-{
-    return 0;
-}

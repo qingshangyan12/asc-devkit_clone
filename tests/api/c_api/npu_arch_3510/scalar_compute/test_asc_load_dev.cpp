@@ -38,7 +38,6 @@ TEST_ASC_LOAD_DEV(int16_t, int64_t, -2)
 TEST_ASC_LOAD_DEV(uint16_t, uint64_t, 2)
 TEST_ASC_LOAD_DEV(int32_t, int64_t, -3)
 TEST_ASC_LOAD_DEV(uint32_t, uint64_t, 3)
-TEST_ASC_LOAD_DEV(int64_t, int64_t, -4)
 TEST_ASC_LOAD_DEV(uint64_t, uint64_t, 4)
 
 #undef TEST_ASC_LOAD_DEV
