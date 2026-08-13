@@ -45,7 +45,6 @@ function(npu_op_kernel_options target_name OP_TYPE)
   endif()
   execute_process(COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_gen_options.py
                           ${auto_gen_path}/${CUSTOM_COMPILE_OPTIONS} ${OP_TYPE} ${OP_COMPILE_COMPUTE_UNIT}
-                          "--source-base-dir=${CMAKE_CURRENT_SOURCE_DIR}"
                           "${OP_COMPILE_OPTIONS}"
                   RESULT_VARIABLE EXEC_RESULT
                   OUTPUT_VARIABLE EXEC_INFO
@@ -335,7 +334,19 @@ function(simple_kernel_compile)
 endfunction()
 
 function(npu_op_kernel_sources target_name)
-  cmake_parse_arguments(KERNEL_SRC "" "KERNEL_FILE;KERNEL_DIR;OP_TYPE" "COMPUTE_UNIT" ${ARGN})
+  cmake_parse_arguments(KERNEL_SRC "" "KERNEL_FILE;KERNEL_DIR;OP_TYPE;BINARY_JSON" "COMPUTE_UNIT" ${ARGN})
+  if("BINARY_JSON" IN_LIST KERNEL_SRC_KEYWORDS_MISSING_VALUES)
+    message(FATAL_ERROR "BINARY_JSON requires a file path")
+  endif()
+  if(DEFINED KERNEL_SRC_BINARY_JSON)
+    if(NOT DEFINED KERNEL_SRC_OP_TYPE)
+      message(FATAL_ERROR "OP_TYPE must be provided when BINARY_JSON is used")
+    endif()
+    get_filename_component(binary_json_path "${KERNEL_SRC_BINARY_JSON}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    if(NOT EXISTS "${binary_json_path}" OR IS_DIRECTORY "${binary_json_path}")
+      message(FATAL_ERROR "BINARY_JSON must be an existing file: ${binary_json_path}")
+    endif()
+  endif()
   if(((DEFINED KERNEL_SRC_KERNEL_FILE) AND (NOT DEFINED KERNEL_SRC_OP_TYPE)) OR ((NOT DEFINED KERNEL_SRC_KERNEL_FILE) AND (DEFINED KERNEL_SRC_OP_TYPE)))
     message(FATAL_ERROR "op_type and kernel_file must exist at the same time")
   endif()
@@ -367,6 +378,12 @@ function(npu_op_kernel_sources target_name)
     message("process kernel source files info: ${EXEC_INFO}")
     message("process kernel source files error: ${EXEC_ERROR}")
     message(FATAL_ERROR "process kernel source files failed!")
+  endif()
+  if(DEFINED KERNEL_SRC_BINARY_JSON)
+    file(APPEND "${auto_gen_path}/${CUSTOM_OPC_OPTIONS}"
+      "${KERNEL_SRC_OP_TYPE}@ALL@--kernel-json-file=${binary_json_path}\n"
+      "${KERNEL_SRC_OP_TYPE}@ALL@--simplified_key_mode=None\n"
+    )
   endif()
 endfunction()
 
