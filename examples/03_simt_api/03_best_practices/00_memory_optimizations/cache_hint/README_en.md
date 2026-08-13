@@ -19,7 +19,8 @@ This example uses table-lookup sin computation to demonstrate data cache optimiz
 │   ├── CMakeLists.txt              // CMake build file
 │   ├── data_cache_hint.asc         // SIMT data cache example implementation
 │   ├── figures                     // Image resources for README
-│   └── README.md
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Example Description
@@ -183,8 +184,6 @@ asc_stcg(&output[idx], y);
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
-
 **Overall Optimization Effect**:
 - From Case 0 baseline to Case 1 optimized version, Task Duration decreases from 56.82us to 50.895us, a reduction of approximately 10.4%
 - DCache Read GM decreases from 5064 to 3531, a reduction of approximately 30.2%, eliminating 1533 Global Memory accesses
@@ -237,7 +236,9 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
+## Performance Debugging
+
+### Introduction to the msOpProf Tool
 
 Use the `msOpProf` tool to collect detailed performance data:
 

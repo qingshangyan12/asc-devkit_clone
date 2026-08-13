@@ -15,10 +15,11 @@
 ## 目录结构介绍
 
 ```text
-sincos_compute/
+├── sincos_compute
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── sincos_compute.asc          // sincos样例实现
-│   └── README.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -192,8 +193,6 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
-
 **综合优化效果**：
 - 从Case 0基线版本到Case 1优化版本，Task Duration从102.47μs降低到96.22μs，耗时下降约6.1%
 - DCache Read Vector从640减小至512，DCache Write Vector从768减小至256
@@ -257,7 +256,9 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
   [Success] Case accuracy is verification passed.
   ```
 
-## 性能分析
+## 性能调试
+
+### msOpProf工具介绍
 
 使用 `msOpProf` 工具获取详细性能数据：
 
