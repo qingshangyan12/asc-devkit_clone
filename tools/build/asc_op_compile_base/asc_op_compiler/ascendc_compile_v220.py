@@ -54,7 +54,7 @@ class StaticCompileCommandSpec:
     compiled_symbol: str
     core_type: str
     source_path: str
-    tiling_path: str
+    constant_info_files: Tuple[str, ...]
     argv: Tuple[str, ...]
     output_path: str
 
@@ -415,9 +415,10 @@ def get_compile_target_options(
 def build_static_compile_commands(
     compile_info: CompileInfo,
     compile_option_tuple,
-    tiling_template_path: str,
+    constant_info_files,
     chip_version: str,
 ):
+    constant_info_files = tuple(dict.fromkeys(constant_info_files))
     static_options = copy.deepcopy(compile_option_tuple)
     static_options.compile_options = [
         option
@@ -433,8 +434,6 @@ def build_static_compile_commands(
         for core_type in get_compile_core_types(compile_info, str(tiling_key))
     ]
     symbols = list(getattr(compile_info, "global_kernel_symbols", []))
-    if symbols and len(symbols) != len(targets):
-        raise ValueError("compiled symbol count does not match tiling/core targets")
 
     commands = []
     for index, (tiling_key, core_type) in enumerate(targets):
@@ -452,8 +451,13 @@ def build_static_compile_commands(
             output_path,
             static_options,
             f"dav-{chip_version}-{core_type}",
-            tiling_template_path,
+            "",
+            with_tiling_file=False,
         )
+        include_index = argv.index("-std=c++17")
+        for constant_info_file in constant_info_files:
+            argv[include_index:include_index] = ["-include", constant_info_file]
+            include_index += 2
         argv.extend(
             get_compile_target_options(
                 compile_info, tiling_key, "c310" in chip_version.lower()
@@ -472,8 +476,8 @@ def build_static_compile_commands(
                 tiling_key=tiling_key,
                 compiled_symbol=compiled_symbol,
                 core_type=core_type,
-                source_path=os.path.realpath(compile_info.gen_kernel_func_file),
-                tiling_path=os.path.realpath(tiling_template_path),
+                source_path=compile_info.gen_kernel_func_file,
+                constant_info_files=constant_info_files,
                 argv=tuple(argv),
                 output_path=output_path,
             )
