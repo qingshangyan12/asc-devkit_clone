@@ -109,7 +109,18 @@ def decode_relu_pre(relu_pre):
 # ============================================================================
 
 def saturate(value, min_value, max_value, dtype):
-    return np.round(np.clip(value, min_value, max_value)).astype(dtype)
+    """Saturate value to [min_value, max_value] and round to nearest integer.
+
+    For integer target types, ties are rounded away from zero (matching the
+    hardware's fixed-point quantization rounding). For float types, ties are
+    rounded to nearest even (banker's rounding, matching CAST_RINT).
+    """
+    clipped = np.clip(value, min_value, max_value)
+    if np.issubdtype(dtype, np.integer):
+        rounded = np.sign(clipped) * np.floor(np.abs(clipped) + 0.5)
+    else:
+        rounded = np.round(clipped)
+    return rounded.astype(dtype)
 
 
 def snap_near_half_integer(value, epsilon=1e-5):

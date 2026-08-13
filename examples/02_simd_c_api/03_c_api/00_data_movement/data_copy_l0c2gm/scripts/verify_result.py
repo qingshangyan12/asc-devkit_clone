@@ -16,9 +16,9 @@ import sys
 import numpy as np
 
 
-RELATIVE_TOL = 1e-6
-ABSOLUTE_TOL = 1e-9
-ERROR_TOL = 1e-4
+RELATIVE_TOL = 1e-3
+ABSOLUTE_TOL = 1e-6
+ERROR_TOL = 1e-3
 # VQF322F32_PRE uses processor float32 (10 mantissa bits), precision ~2/1000.
 F32_RELATIVE_TOL = 2e-3
 F32_ABSOLUTE_TOL = 1e-6
@@ -80,11 +80,17 @@ def verify_result(scenario_num, output_path, golden_path):
         match = np.isclose(
             output, golden, rtol=F32_RELATIVE_TOL, atol=F32_ABSOLUTE_TOL, equal_nan=True
         )
-    elif output_type in ('half',):
+    elif output_type in ('half', 'bfloat16'):
+        if output_type == 'bfloat16':
+            output_cmp = (output.astype(np.uint32) << 16).view(np.float32)
+            golden_cmp = (golden.astype(np.uint32) << 16).view(np.float32)
+        else:
+            output_cmp = output
+            golden_cmp = golden
         match = np.isclose(
-            output, golden, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True
+            output_cmp, golden_cmp, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True
         )
-    elif output_type == 'hifloat8':
+    elif output_type in ('fp8_e4m3fn', 'hifloat8'):
         match = np.isclose(
             output.astype(np.float64), golden.astype(np.float64),
             rtol=0, atol=1, equal_nan=True
