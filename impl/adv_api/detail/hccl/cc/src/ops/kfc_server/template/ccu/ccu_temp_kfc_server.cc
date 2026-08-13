@@ -13,6 +13,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "kernel/ccu_kernel_kfc_server.h"
 #include "ccu_temp_kfc_server.h"
+#include "ccu_temp_all_to_all_mesh_1D.h"
 #include "ccu_launch_dl.h"
 
 namespace mc2_ops_hccl {
@@ -29,9 +30,9 @@ void InheritKfcServerKernelArg(
     const bool isReduceScatter =
         srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
     const bool isAllToAllV =
-        srcName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
+        srcName == "CcuKernelAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
     if (isAllToAllV) {
-        const auto* srcArg = static_cast<const CcuKernelArgAlltoAllMesh1D*>(srcKernel.kernelArg);
+        const auto* srcArg = static_cast<const CcuKernelArgAlltoAllVMesh1D*>(srcKernel.kernelArg);
         kfcArg->rankSize = srcArg->rankSize;
         kfcArg->rankId = srcArg->rankId;
         kfcArg->loadFromMem = srcArg->loadFromMem;
@@ -96,7 +97,7 @@ HcclResult CcuTempKfcServer::CalcRes(
         const bool isReduceScatter = sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" &&
                                      param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
         const bool isAllToAllV =
-            sourceName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
+            sourceName == "CcuKernelAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
         if (!isAllGather && !isReduceScatter && !isAllToAllV) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported source kernel[%s]",

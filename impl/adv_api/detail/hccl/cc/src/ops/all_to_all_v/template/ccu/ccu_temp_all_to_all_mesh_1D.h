@@ -16,18 +16,25 @@
 
 namespace mc2_ops_hccl {
 
-class CcuTempAlltoAllMesh1D : public CcuAlgTemplateBase {
-public:
-    CcuTempAlltoAllMesh1D() = default;
-    explicit  CcuTempAlltoAllMesh1D(const OpParam& param,
-                                        const u32 rankId, // 传通信域的rankId，userRank
-                                        const std::vector<std::vector<u32>> &subCommRanks);
+struct CcuKernelArgAlltoAllVMesh1D : CcuKernelArgBase {
+    uint64_t rankSize;
+    uint32_t rankId;
+    bool loadFromMem;
+    OpParam opParam;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
 
-    ~CcuTempAlltoAllMesh1D() override;
+class CcuTempAlltoAllVMesh1D : public CcuAlgTemplateBase {
+public:
+    CcuTempAlltoAllVMesh1D() = default;
+    explicit CcuTempAlltoAllVMesh1D(
+        const OpParam& param, u32 rankId, const std::vector<std::vector<u32>>& subCommRanks);
+
+    ~CcuTempAlltoAllVMesh1D() override = default;
 
     std::string Describe() const override
     {
-        return StringFormat("Template of All to All ccu mesh 1D with tempRankSize [%u].",
+        return StringFormat("Template of MC2 AllToAllV CCU mesh 1D with tempRankSize [%u].",
                             tempRankSize_);
     }
 
@@ -40,26 +47,9 @@ public:
 
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
 
-    void InitInsAlgTemplate(
-        std::vector<u64> &sendCounts, std::vector<u64> &recvCounts,
-        std::vector<u64> &sdispls, std::vector<u64> &rdispls);
-
-    HcclResult FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx) override;
-
 private:
-    A2ASendRecvInfo localSendRecvInfo_;
-    u32             concurrentSendRecvNum_ = 8;
-    u64 buffBlockSize_ = 0;
-    BuffInfo buffInfo_;
-    uint64_t sendStrideSize_ = 0;  // Bytes
-    uint64_t recvStrideSize_ = 0;  // Bytes
-    uint32_t typeSize_ = 0;
     uint32_t mySubCommRank_ = 0;
     uint32_t tempRankSize_ = 0;
-    std::vector<u64> sendCounts_;
-    std::vector<u64> recvCounts_;
-    std::vector<u64> sdispls_;
-    std::vector<u64> rdispls_;
 };
 
 }// namespace mc2_ops_hccl

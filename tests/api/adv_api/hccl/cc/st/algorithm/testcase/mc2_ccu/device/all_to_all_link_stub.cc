@@ -8,18 +8,10 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
 #include "ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
-
-CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable, ccu::Variable, ccu::Variable,
-    ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable,
-    ccu::Variable, ccu::Variable, ccu::Variable, CcuKernelArg &)
-{
-    return CCU_E_NOT_SUPPORT;
-}
 
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable,
