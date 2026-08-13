@@ -44,6 +44,59 @@ canonical series 生成文件名和信息库内容。
 配置。在未传入 `compute_unit` 的 `JOIN_OP_DEF` 场景，cfg generator 还会直接使用
 AddConfig 原始 key 生成 `aic-<soc>-ops-info.ini`，从而可能产生混合大小写文件名。
 
+AddConfig 在 ACLNN 支持列表链路中已经部分实现大小写不敏感：
+`AclnnOpGenerator::BuildUnifiedSocList()` 会对 AddConfig key 调用 `ToLower()`，再
+生成 `socSupportList` 和小写 `socNameList`。但这不代表整个 opbuild 已大小写不敏感：
+
+| opbuild 链路 | 当前行为 |
+| --- | --- |
+| ACLNN `socSupportList` / `socNameList` | AddConfig key 先转小写 |
+| cfg generator 按 `compute_unit` 查 AddConfig | 使用原始 map key 精确匹配，大小写敏感 |
+| cfg generator 未传 `compute_unit` 时输出文件 | 直接使用 AddConfig 原始 key |
+| AddConfig map 存储 | 大小写敏感；大小写变体可同时存在 |
+
+因此本需求对 AddConfig 的适配重点是统一 cfg generator 的查找和输出命名，并让
+ACLNN generator 复用同一 canonical 视图，而不是重复增加一套 ACLNN 小写逻辑。
+
+### --compute_unit 现有传递链路
+
+`--compute_unit` 不是用户直接调用 opbuild 时额外维护的配置面，而是 CMake
+`npu_op_code_gen()` 根据 `ASCEND_COMPUTE_UNIT` 自动传入：
+
+```text
+CMake ASCEND_COMPUTE_UNIT
+        |
+        | npu_op_code_gen()
+        v
+RAW_COMPUTE_UNIT_ARG="--compute_unit=${ASCEND_COMPUTE_UNIT}"
+        |
+        | execute_process(op_build ... "${RAW_COMPUTE_UNIT_ARG}")
+        v
+opbuild Params::Parse()
+        |
+        | 按 '=' 拆分，保存 optionParams_["compute_unit"]
+        +-------------------------------+
+        |                               |
+        v                               v
+CfgGenerator::GenerateCode()    BuildUnifiedSocList()
+Optional("compute_unit")        Optional("compute_unit")
+```
+
+具体规则如下：
+
+- CMake 同时将同一值设置到环境变量 `OPS_PRODUCT_NAME`。
+- 默认 `OPBUILD_JOIN_OP_DEF=False` 时传入
+  `--compute_unit=<分号分隔的小写 series list>`。
+- `OPBUILD_JOIN_OP_DEF=True` 时不传 `--compute_unit`，cfg generator 改为遍历
+  AddConfig map；`OPS_PRODUCT_NAME` 仍然设置。
+- opbuild 参数解析不负责 SoC 归一化，只保存原始字符串。
+- cfg generator 使用该值决定生成哪些 `aic-<series>-ops-info.ini`，并尝试匹配
+  对应 AddConfig；ACLNN generator 将 compute unit 中尚未出现的合法 SoC 补充进
+  `socSupportList`。
+
+新增 `ASCEND_SOC_SERIES` 后，该传递接口不改变。CMake 入口先得到小写 canonical
+`ASCEND_COMPUTE_UNIT`，再继续通过既有 `--compute_unit` 和 `OPS_PRODUCT_NAME` 传递。
+
 ## 配置契约
 
 ### ASCEND_SOC_SERIES 输入
@@ -121,6 +174,23 @@ this->AICore().AddConfig("Ascend950", configB);
 ```
 
 禁止依赖 map 顺序静默覆盖或选择其中一份配置。
+
+AddConfig 不是 SoC 编译开关。实际 Kernel 编译集合仍由 `ASCEND_COMPUTE_UNIT`
+决定；AddConfig 为匹配的 SoC 提供 `OpAICoreConfig`，并参与 ACLNN 支持列表生成。
+默认 `OPBUILD_JOIN_OP_DEF=False` 时，现有行为如下：
+
+| `ASCEND_COMPUTE_UNIT` 含目标 SoC | AddConfig 含目标 SoC | 当前结果 |
+| --- | --- | --- |
+| 是 | 是 | 编译该 SoC Kernel，并使用对应 `OpAICoreConfig` |
+| 是 | 否 | 仍编译该 SoC Kernel，cfg generator 使用默认 `OpAICoreConfig` |
+| 否 | 是 | 不编译该 SoC Kernel；AddConfig 仍可能使 ACLNN 支持列表包含该 SoC |
+| 否 | 否 | 不编译该 SoC Kernel，也没有该 SoC 的 AddConfig 配置 |
+
+以 `custom_op` 样例为例，若构建值为 `ASCEND_COMPUTE_UNIT=ascend910b`，而算子写
+`AddConfig("ascend950")`，产物只包含 `ascend910b` Kernel；生成的 ACLNN
+`socSupportList`/`socNameList` 则可能同时包含 compute unit 补入的 `ascend910b` 和
+AddConfig 声明的 `ascend950`。本需求只补齐大小写一致性，不改变上述合并语义，也
+不把 AddConfig 变成 Kernel 编译目标来源。
 
 ### 兼容与互斥
 
@@ -207,8 +277,10 @@ aic-<canonical-series>-ops-info.ini
 
 ### ACLNN 算子信息生成
 
-ACLNN generator 已在部分位置调用 `ToLower`，本次需统一改为复用同一 canonical
-配置视图，以保证：
+ACLNN generator 当前已经在 `BuildUnifiedSocList()` 中对 AddConfig key 调用
+`ToLower()`，所以 `socSupportList` 和 `socNameList` 已能识别单个混合大小写
+AddConfig。本次需改为复用同一 canonical 配置视图，以补齐重复检测并避免与 cfg
+generator 形成两套规则，同时保证：
 
 - AddConfig 支持列表中的 soc name 始终为小写 canonical series；
 - compute unit 与 AddConfig 按大小写不敏感方式匹配；
