@@ -32,6 +32,7 @@ constexpr uint32_t HCOMM_URMA_DEFAULT_QP_IDX = 0;
 constexpr uint32_t HCOMM_URMA_TMP_BUF_SIZE = 512;
 constexpr uint32_t HCOMM_URMA_WQE_U32_NUM = 32;
 constexpr uint32_t HCOMM_URMA_CQE_U32_NUM = 16;
+constexpr uint32_t HCOMM_URMA_MUTEX_ID = 29U;
 
 template <typename T>
 struct UdmaParams {
