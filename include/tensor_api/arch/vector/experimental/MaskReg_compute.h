@@ -32,13 +32,6 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
-template <std::size_t N = 1, typename DataType>
-__simd_callee__ inline reg_tensor<DataType> fill(DataType value, reg_tensor<bool> mask = all_mask<DataType>());
-
-template <std::size_t N = 1, typename DataType>
-__simd_callee__ inline reg_tensor<DataType> fill(reg_tensor<DataType> value,
-                                                 reg_tensor<bool> mask = all_mask<DataType>());
-
 } // namespace te
 } // namespace asc
 
