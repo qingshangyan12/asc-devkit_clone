@@ -140,13 +140,14 @@ __global__ __mix__(1, 2) void asc_sync_block_kernel(__gm__ float* output)
 
 int main()
 {
+    uint32_t numBlocks = 1;
     std::vector<float> output(MATRIX_ELEMENTS, 0.0f);
     float* output_device = nullptr;
 
     aclInit(nullptr);
     aclrtSetDevice(0);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    asc_sync_block_kernel<<<1, 0>>>(output_device);
+    asc_sync_block_kernel<<<numBlocks, 0>>>(output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;
