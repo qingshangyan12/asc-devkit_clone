@@ -376,6 +376,11 @@ the superkernel cannot be integrated with the operator.",
         if not has_platform_info:
             js["platformInfo"] = {}
         js["platformInfo"]["deterministicLevel"] = int(deterministic_level)
+    pcie_through = get_context().get_addition("pcie_through")
+    if pcie_through is True:
+        if not has_platform_info:
+            js["platformInfo"] = {}
+        js["platformInfo"]["pcie_through"] = pcie_through
 
     # set tilingdata of mc2 operator when online static compile
     if (
