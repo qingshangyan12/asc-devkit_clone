@@ -35,7 +35,7 @@ $$
 其中，A、B、C分别为左、右、结果矩阵，C矩阵可以通过配置本接口的参数，初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，各矩阵的信息说明见下表：
 
 <!-- npu="950" id8 -->
-**表1** 矩阵信息说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+**表** 矩阵信息说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
 | 矩阵 | 存储位置 | 形状（行数×列数） | 数据格式 | 分形大小（行数×列数） |
 | --- | --- | --- | --- | --- |
@@ -48,7 +48,7 @@ $$
 <!-- end id8 -->
 
 <!-- npu="A3,910b" id9 -->
-**表2** 矩阵信息说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+**表** 矩阵信息说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
 | 矩阵 | 存储位置 | 形状 | 数据格式 | 分形大小 |
 | --- | --- | --- | --- | --- |
@@ -84,7 +84,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 
 `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
-**表3** 支持的数据类型组合（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_data_type"></a>
+**表** 支持的数据类型组合（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_data_type"></a>
 
 | a_dtype | b_dtype | c_dtype | Bias数据类型 |
 | --- | --- | --- | --- |
@@ -128,7 +128,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 
   `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
-  **表4** 支持的数据类型组合（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+  **表** 支持的数据类型组合（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
   | a_dtype | b_dtype | c_dtype | Bias数据类型 |
   | --- | --- | --- | --- |
@@ -148,13 +148,13 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 ## 参数说明
 
 <!-- npu="950" id14 -->
-**表5** 参数说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_param_table"></a>
+**表** 参数说明（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="asc_mmad_param_table"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_data_type)。 |
-| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_data_type)。 |
-| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_data_type)。 |
+| c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
+| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
+| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
 | left_height | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | n_dim | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]。 |
 | right_width | 输入 | 右矩阵B和结果矩阵C的N维大小，单位为元素，取值范围为[0, 4095]。 |
@@ -165,7 +165,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 <!-- end id14 -->
 
 <!-- npu="A3,910b" id15 -->
-**表6** 参数说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+**表** 参数说明（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -202,7 +202,7 @@ PIPE_M
   - 针对Ascend 950PR/Ascend 950DT:
 
       - L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
-      - 各矩阵的起始地址需满足[表5](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
+      - 各矩阵的起始地址需满足[参数说明](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
       - 申请矩阵存储空间时，需使用按照分形大小补齐后的数值进行申请：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数，K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。`left_height`、`n_dim`和`right_width`仍传入矩阵的有效M、K、N值，补齐部分为无效数据，不参与结果矩阵有效区域的计算。
       - 当M为1且`disable_gemv`为false时，将开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
   <!-- end id10 -->
