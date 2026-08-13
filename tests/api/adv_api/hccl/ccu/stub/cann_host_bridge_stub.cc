@@ -26,5 +26,3 @@ public:
 };
 
 }; // namespace mc2_ops_hccl
-
-#endif // _CCU_KERNEL_ARG_H
