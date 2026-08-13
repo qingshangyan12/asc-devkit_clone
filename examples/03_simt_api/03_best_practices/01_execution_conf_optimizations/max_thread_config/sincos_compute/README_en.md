@@ -16,10 +16,11 @@ This example uses sincos computation to demonstrate thread configuration optimiz
 ## Directory Structure
 
 ```text
-sincos_compute/
+├── sincos_compute
 │   ├── CMakeLists.txt              // CMake build file
 │   ├── sincos_compute.asc          // sincos example implementation
-│   └── README.md
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Example Description
@@ -193,8 +194,6 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
-
 **Overall Optimization Effect**:
 - From Case 0 baseline to Case 1 optimized version, Task Duration decreases from 102.47us to 96.22us, a reduction of approximately 6.1%
 - DCache Read Vector decreases from 640 to 512, DCache Write Vector decreases from 768 to 256
@@ -258,7 +257,7 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
+### Performance Analysis
 
 Use the `msOpProf` tool to collect detailed performance data:
 

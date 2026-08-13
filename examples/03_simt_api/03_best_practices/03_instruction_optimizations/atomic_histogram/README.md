@@ -23,8 +23,8 @@
 │   ├── figures                // README中的图片资源
 │   ├── CMakeLists.txt         // 样例构建脚本
 │   ├── histogram.asc          // Ascend C SIMT核函数实现 & Host调用样例
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md              // 样例说明文档
+│   └── README_en.md           // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -230,7 +230,7 @@ Case 1的Task Duration为7.95μs，相比Case 0的424.22μs下降至约1/53。�
   [Success] Case accuracy is verification passed.
   ```
 
-## 性能分析
+### 性能分析
 
 使用`msOpProf`工具获取详细性能数据：
 

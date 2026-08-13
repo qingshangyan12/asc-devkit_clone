@@ -19,7 +19,8 @@
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── data_cache_hint.asc         // SIMT数据缓存样例实现
 │   ├── figures                     // README中的图片资源
-│   └── README.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -183,8 +184,6 @@ asc_stcg(&output[idx], y);
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
-
 **综合优化效果**：
 - 从Case 0基线版本到Case 1优化版本，Task Duration从56.82μs降低到50.895μs，耗时下降约10.4%
 - DCache Read GM从5064次降至3531次，减少约30.2%，减少1533次Global Memory访问
@@ -237,7 +236,7 @@ asc_stcg(&output[idx], y);
   [Success] Case accuracy is verification passed.
   ```
 
-## 性能分析
+### 性能分析
 
 使用 `msOpProf` 工具获取详细性能数据：
 
