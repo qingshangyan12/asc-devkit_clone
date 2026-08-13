@@ -102,28 +102,90 @@ __simd_callee__ inline void asc_duplicate_impl(vector_float& dst, vector_float s
     }
 }
 
-#define ASC_DUPLICATE_HIGHEST_IMPL(data_type)                                                               \
-    __simd_callee__ inline void asc_duplicate_highest_impl(data_type& dst, data_type src, vector_bool mask) \
-    {                                                                                                       \
-        if ASC_IS_AIV {                                                                                     \
-            vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);                                                \
-        }                                                                                                   \
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
     }
+}
 
-ASC_DUPLICATE_HIGHEST_IMPL(vector_uint8_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_int8_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_fp8_e4m3fn_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_fp8_e5m2_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_fp8_e8m0_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_uint16_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_int16_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_half)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_bfloat16_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_uint32_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_int32_t)
-ASC_DUPLICATE_HIGHEST_IMPL(vector_float)
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
 
-#undef ASC_DUPLICATE_HIGHEST_IMPL
+__simd_callee__ inline void asc_duplicate_highest_impl(
+    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_half& dst, vector_half src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_impl(vector_float& dst, vector_float src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_ZEROING);
+    }
+}
 
 // vdup with merging mode
 __simd_callee__ inline void asc_duplicate_merge_impl(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
@@ -211,26 +273,93 @@ __simd_callee__ inline void asc_duplicate_merge_impl(vector_float& dst, vector_f
     }
 }
 
-#define ASC_DUPLICATE_HIGHEST_MERGE_IMPL(data_type)                                                               \
-    __simd_callee__ inline void asc_duplicate_highest_merge_impl(data_type& dst, data_type src, vector_bool mask) \
-    {                                                                                                             \
-        if ASC_IS_AIV {                                                                                           \
-            vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);                                                      \
-        }                                                                                                         \
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
     }
+}
 
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_uint8_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_int8_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_fp8_e4m3fn_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_fp8_e5m2_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_fp8_e8m0_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_uint16_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_int16_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_half)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_bfloat16_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_uint32_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_int32_t)
-ASC_DUPLICATE_HIGHEST_MERGE_IMPL(vector_float)
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
 
-#undef ASC_DUPLICATE_HIGHEST_MERGE_IMPL
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(
+    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(
+    vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(
+    vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(
+    vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(vector_half& dst, vector_half src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(
+    vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_duplicate_highest_merge_impl(vector_float& dst, vector_float src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vdup(dst, src, mask, POS_HIGHEST, MODE_MERGING);
+    }
+}
 #endif
