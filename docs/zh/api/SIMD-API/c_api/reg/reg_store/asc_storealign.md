@@ -33,7 +33,7 @@
 - **连续对齐搬出模式**：将矢量数据寄存器中的数据搬出到UB目的地址，由用户自行更新目的地址。
 - **立即数偏移搬出模式**：通过立即数指定相对目的起始地址的偏移，单位为元素，用户可选择更新偏移或更新目的地址。
 - **地址寄存器偏移搬出模式**：通过地址寄存器指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
-- **非连续对齐搬出模式**：单条指令搬运8个data_block，一个data_block数据量为32字节。通过参数配置相邻data_block的步长和相对目的起始地址的偏移。
+- **非连续对齐搬出模式**：单条指令搬运8个DataBlock，一个DataBlock数据量为32字节。通过参数配置相邻DataBlock的步长和相对目的起始地址的偏移。
 
 掩码寄存器搬出场景提供以下三种模式：
 
@@ -41,7 +41,7 @@
 - **立即数偏移搬出模式**：通过立即数指定相对目的起始地址的偏移，单位为字节，用户可选择更新偏移或更新目的地址。
 - **地址寄存器偏移搬出模式**：通过地址寄存器指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
 
-本接口仅在AIV上生效，非AIV调用直接返回。
+本接口仅在AIV上生效。
 
 ## 函数原型
 
@@ -233,7 +233,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 |---|---|---|
 | dst_align32b | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
-| block_stride | 输入 | 目的操作数相邻data_block之间起始地址的步长，类型为`uint16_t`，单位为32字节。 |
+| block_stride | 输入 | 目的操作数相邻DataBlock之间起始地址的步长，类型为`uint16_t`，单位为32字节。 |
 | repeat_stride | 输入 | 目的操作数起始地址偏移，类型为`uint16_t`，单位为32字节。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与搬出的元素。对应位置为1时参与搬出，为0时不参与搬出。需通过掩码设置接口预先赋值后再传入。 |
 
@@ -276,8 +276,8 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
 
 ### 通用约束
 
-- 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器或掩码寄存器，目的操作数为UB地址。
+- 非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - dst_align32b/dst起始地址需32字节对齐，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
