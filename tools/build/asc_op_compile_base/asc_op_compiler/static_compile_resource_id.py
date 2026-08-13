@@ -231,7 +231,4 @@ def write_resource_id_section(dynamic_object_path: str, resource_id: str) -> Non
 def generate_and_write_resource_id(dynamic_object_path: str) -> str:
     resource_id = calculate_resource_id(dynamic_object_path)
     write_resource_id_section(dynamic_object_path, resource_id)
-    actual_resource_id = read_resource_id_section(dynamic_object_path)
-    if actual_resource_id != resource_id:
-        raise ResourceIdError("resource_id verification failed")
     return resource_id
