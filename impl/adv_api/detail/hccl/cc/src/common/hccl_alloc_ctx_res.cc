@@ -540,6 +540,11 @@ HcclResult PrepareParamForHalfAlltoAllV(
 
     param.varMemSize = ALL_TO_ALL_V_VECTOR_NUM * userRankSize * sizeof(u64);
     param.opType = HcclCMDType::HCCL_CMD_HALF_ALLTOALLV;
+    // KFC Server 的 DispatchKfcSubKernel 用 CCU_IF 分支包含所有 opType 的子 kernel。
+    // CCU_IF 在 host 侧 DSL 翻译时会执行所有分支体以记录 rep，ReduceScatter 分支的
+    // LocalReduce 需要有效 reduceOp 才能通过 GetUBReduceType 检查。HalfAlltoAllv 本身
+    // 不做 reduce，此处填 SUM 仅满足翻译期约束，运行时 dispatch 不会走 ReduceScatter 分支。
+    param.reduceType = HcclReduceOp::HCCL_REDUCE_SUM;
     param.all2AllVDataDes.sendType = static_cast<HcclDataType>(ccTiling->srcDataType);
     param.all2AllVDataDes.recvType = static_cast<HcclDataType>(ccTiling->dstDataType);
     param.all2AllVDataDes.sendCounts = nullptr;
@@ -1023,6 +1028,10 @@ HcclResult ProcessCcuTiling(
     RunCcuSelectAlgCheck(ccTiling, tilingIndex);
 
     OpParam opParam{};
+    // scratch基址由AllocCcuOpResCtx填入res[0]，与设备侧ccuParam_.scratchAddr同源
+    // (hccl_ccu_v0.h: scratchAddr = hcclNewContext_->res[0])。模板CalcRes在建图期
+    // 需要该地址确定本端window基址，故在选路前透传给opParam。
+    opParam.ccuScratchAddr = opResCtx.res[0];
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     AlgorithmType algorithmType;

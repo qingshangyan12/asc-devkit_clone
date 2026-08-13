@@ -56,7 +56,17 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::CalcRes(
     kernelInfo.channels = channelDescs;
     // 本端 window 基址：设备侧 AlltoAllvWrite 契约不传 recvBuf，本 rank 自留分片的落点
     // 需在建图期确定（对应源实现 CtxArg 里的 cclBufferAddr），由 KfcServer 继承。
-    kernelInfo.localWinAddr = PointerToAddr(param.outputPtr);
+    //
+    // 取 param.ccuScratchAddr（= OpResCtx::res[0]，由 AllocCcuOpResCtx 分配的
+    // "_ccu_scratch"），与设备侧 ccuParam_.scratchAddr 同源。不能取 param.outputPtr
+    // （MC2 路径下恒为 nullptr），也不能取 buffInfo_.hcclBuff（HcclGetHcclBuffer 返回的
+    // cclBuffer 是另一块内存）——PreSync 会把该地址广播给所有对端当作 Write 目标，
+    // 取错会让全域写入落到错误地址，而非仅影响本 rank 的 GroupCopy。
+    if (param.ccuScratchAddr == 0) {
+        HCCL_ERROR("[CcuTempKfcHalfAlltoAllVMesh1D][CalcRes] ccuScratchAddr is zero, local window base unavailable.");
+        return HCCL_E_PARA;
+    }
+    kernelInfo.localWinAddr = param.ccuScratchAddr;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
 
     HCCL_DEBUG(
