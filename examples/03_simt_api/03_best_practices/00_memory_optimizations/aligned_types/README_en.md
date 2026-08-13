@@ -14,12 +14,13 @@
 
 ## Directory Structure
 
-  ```
-  ├── aligned_types
-  │   ├── aligned_types.asc      // SIMT implementation & invocation example
-  │   ├── CMakeLists.txt         // CMake build file
-  │   └── README.md
-  ```
+```text
+├── aligned_types
+│   ├── aligned_types.asc      // SIMT implementation & invocation example
+│   ├── CMakeLists.txt         // CMake build file
+│   ├── README.md              // Chinese sample documentation.
+│   └── README_en.md           // English sample documentation.
+```
 
 ## Example Description
 

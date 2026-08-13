@@ -21,8 +21,8 @@ A histogram is a statistical method used to count the frequency of each value in
 │   ├── figures                // Image resources for README
 │   ├── CMakeLists.txt         // Sample build script
 │   ├── histogram.asc          // Ascend C SIMT kernel implementation & Host invocation
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md              // Chinese sample documentation.
+│   └── README_en.md           // English sample documentation.
 ```
 
 ## Sample Description
@@ -179,14 +179,14 @@ These two factors work together: the vast majority of atomic operations not only
 
 ---
 
-## Performance Summary
+## Performance Comparison Summary
 
 | Case | Count Location | Task Duration (μs) | Relative to Baseline |
 |:---:|:---:|:---:|:---:|
 | 0 | GM | 424.22 | 1× |
 | 1 | UB block-local accumulation + GM merge | 7.95 | **~53×** |
 
-## Tuning Recommendations
+### Optimization Key Points Summary
 
 **Prefer UB for atomic accumulation, then merge to GM**: UB resides inside the AI Core with lower per-operation atomic overhead; UBs of each thread block are independent, with non-competing atomic operations that can execute in parallel — only the final merge of each Block's result to GM is needed.
 
@@ -230,7 +230,7 @@ Run the following steps in the root directory of this sample to build and execut
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
+### Performance Analysis
 
 Use the `msopprof` tool to obtain detailed performance data:
 

@@ -19,7 +19,8 @@ This example uses table-lookup sin computation to demonstrate data cache optimiz
 │   ├── CMakeLists.txt              // CMake build file
 │   ├── data_cache_hint.asc         // SIMT data cache example implementation
 │   ├── figures                     // Image resources for README
-│   └── README.md
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Example Description
@@ -183,7 +184,7 @@ asc_stcg(&output[idx], y);
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
+### Ascend 950PR Performance Comparison
 
 **Overall Optimization Effect**:
 - From Case 0 baseline to Case 1 optimized version, Task Duration decreases from 56.82us to 50.895us, a reduction of approximately 10.4%
@@ -194,7 +195,7 @@ asc_stcg(&output[idx], y);
 | Case 0       | 56.82             | **1x**                | Baseline version, all data competes for DCache space |
 | Case 1       | 50.895            | **0.90x latency**           | Data cache optimization, sin table resident in DCache space |
 
-## Tuning Recommendations
+### Optimization Key Points Summary
 
 1. **Identify hot data**: In table-lookup operators, the lookup table is frequently accessed hot data and should be prioritized for DCache residency.
 2. **Differentiate data access patterns**: For data accessed only once (such as input data), use `asc_ldcg` to avoid occupying DCache space; for data requiring frequent access (such as lookup tables), use `asc_ldca` to preferentially allocate cache space.
@@ -237,7 +238,7 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
+### Performance Analysis
 
 Use the `msOpProf` tool to collect detailed performance data:
 

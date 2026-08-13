@@ -13,11 +13,13 @@ This example uses the FloorMod computation to demonstrate performance tuning met
 | Case 2 | 2 | SIMT non-contiguous UB access | GM data is transferred to UB via data transfer interfaces. Each SIMT thread processes a contiguous segment, but adjacent threads within a Warp access non-contiguous addresses. |
 | Case 3 | 3 | SIMT contiguous UB access | GM data is transferred to UB via data transfer interfaces. Thread mapping is adjusted so that adjacent threads within a Warp access contiguous addresses. |
 
-## Supported Products and CANN Versions
+## Supported Products
 
-| Product | CANN Version |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+- Ascend 950PR/Ascend 950DT
+
+## Supported CANN Software Version
+
+- \>= CANN 9.2.0
 
 ## Directory Structure
 
@@ -27,7 +29,8 @@ This example uses the FloorMod computation to demonstrate performance tuning met
 │   ├── data_utils.h          // Data read/write functions
 │   ├── figures               // Illustrations
 │   ├── floor_mod.asc         // Ascend C example implementation
-│   ├── README.md             // Example documentation
+│   ├── README.md             // Chinese sample documentation.
+│   ├── README_en.md          // English sample documentation.
 │   └── scripts
 │       ├── gen_data.py       // Input data and ground truth generation script
 │       └── verify_result.py  // Ground truth comparison script
@@ -430,39 +433,38 @@ Run the following steps in the root directory of this example to build and run t
 
 ### Performance Analysis
 
-### Introduction to the msOpProf Tool
-
 `msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
 - On-device performance collection
 
-    On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+  On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
 
-    Run operator tuning on the executable demo with `msopprof`:
+  Run operator tuning on the executable demo with `msopprof`:
 
-    ```
-    msopprof ./demo
-    ```
+  ```bash
+  msopprof ./demo
+  ```
 
-    - Performance data description  
-      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+- Performance data description
 
-      ```bash
-      ├──dump                       # Raw performance data; users do not need to inspect it
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
-      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
-      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
-      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
-      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
-      ├──OpBasicInfo.csv            # Basic operator information
-      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
-      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
-      └──visualize_data.bin         # MindStudio Insight presentation file
-      ```
+  After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
-View the specific performance analysis results:
+  ```bash
+  ├──dump                       # Raw performance data; users do not need to inspect it
+  ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+  ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+  ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+  ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+  ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+  ├──OpBasicInfo.csv            # Basic operator information
+  ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+  ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+  └──visualize_data.bin         # MindStudio Insight presentation file
+  ```
 
-```bash
-# View Task Duration and various metrics
-cat ./OPPROF_*/PipeUtilization.csv
-```
+- View performance analysis results
+
+  ```bash
+  # View Task Duration and various metrics
+  cat ./OPPROF_*/PipeUtilization.csv
+  ```

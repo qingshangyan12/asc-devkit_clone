@@ -19,8 +19,8 @@ This example uses matrix transpose to demonstrate memory access optimization str
 │   ├── figures                     // Image resources for README
 │   ├── CMakeLists.txt              // Build project file
 │   ├── matrix_transpose.asc        // SIMT matrix transpose optimization path implementation
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Example Description
@@ -376,7 +376,7 @@ The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in F
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
+### Ascend 950PR Performance Comparison
 
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -394,7 +394,7 @@ The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in F
 - For the main transpose path Case 2 -> Case 5 -> Case 6 -> Case 7, Task Duration decreases from 36.337μs to 23.912μs, 15.152μs, and 12.074μs in turn, an improvement of approximately 3.01x over Case 2.
 - The lowest-latency Case 7 is approximately 1.93x the Case 0 copy baseline. The gap mainly comes from UB staging, thread block synchronization, and UB access overhead.
 
-## Tuning Recommendations
+### Optimization Key Points Summary
 
 When tuning memory-access operators, use contiguous copy first to confirm the GM transfer upper bound at the current data scale, and then use the most direct implementation to expose the main performance gap. In this example, the gap between direct transpose and the copy baseline mainly comes from non-contiguous GM writes. Therefore, the optimization direction is not to increase compute parallelism, but to reorganize memory access: contiguously load data into UB by 32x32 tiles, read data in the transpose direction within UB, and then write data to GM contiguously by rows of the output matrix.
 
@@ -440,7 +440,7 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy verification passed.
   ```
 
-## Performance Analysis
+### Performance Analysis
 
 Use the `msOpProf` tool to collect detailed performance data:
 
@@ -463,7 +463,7 @@ After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generate
 └── visualize_data.bin         # MindStudio Insight presentation file
 ```
 
-## Simulation Tuning
+#### Simulation Performance Collection
 
 Use `msopprof simulator` to perform simulation performance analysis and generate visualized instruction pipeline diagrams. The commands are as follows:
 

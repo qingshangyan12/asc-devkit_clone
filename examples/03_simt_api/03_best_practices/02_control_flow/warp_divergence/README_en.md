@@ -21,8 +21,8 @@ This sample uses sparse matrix-vector multiplication (SpMV) to demonstrate the i
 ├── warp_divergence
 │   ├── CMakeLists.txt              // cmake compilation file
 │   ├── spmv.asc                    // SIMT SpMV sample implementation
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Sample Description
@@ -163,7 +163,7 @@ if (lane_id == 0) {
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
+### Ascend 950PR Performance Comparison
 
 **Overall Optimization Effect**:
 - From the Case 1 baseline version to the Case 2 optimized version, the Task Duration decreases from 81.811μs to 31.772μs, reducing the duration by approximately 61.1%.
@@ -173,7 +173,7 @@ if (lane_id == 0) {
 | Case 1 | 81.811            | **1x**                | Baseline version: one thread processes one row of data          |
 | Case 2 | 31.772            | **0.39x duration**          | Warp cooperative processing of one row of data, reducing Warp Divergence, memory access coalescing |
 
-## Tuning Suggestions
+### Optimization Key Points Summary
 
 1. **Reduce Warp Divergence**: When threads within the same Warp enter different code execution paths due to branching, some threads need to wait for the remaining threads to complete the current branch, resulting in waste of computing resources. Common scenarios include inconsistent loop iterations and conditional branch differences. This sample addresses the scenario of inconsistent loop iterations by using Warp cooperative processing to make the loop iterations of threads within the same Warp basically the same, reducing Warp Divergence.
 
@@ -215,7 +215,7 @@ Perform the following steps in the root directory of this sample to compile and 
   [Success] Case accuracy verification passed.
   ```
 
-## Performance Data Collection
+### Performance Analysis
 
   Use the `msopprof` tool to collect performance data on a single component:
 

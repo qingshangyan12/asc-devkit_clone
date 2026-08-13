@@ -18,7 +18,9 @@ This example uses the Gather operator to demonstrate the impact of different thr
 ├── grid_dim_config
 │   ├── figures                // Image resources for README
 │   ├── CMakeLists.txt         // Build project file
-│   └── grid_config.asc        // Ascend C operator implementation & invocation example
+│   ├── grid_config.asc        // Ascend C operator implementation & invocation example
+│   ├── README.md              // Chinese sample documentation.
+│   └── README_en.md           // English sample documentation.
 ```
 
 ## Example Description
@@ -245,7 +247,7 @@ This example distinguishes large and small data volumes by the ratio of data vol
 - **Conclusion**: The optimal thread block count in small data scenarios varies with data volume and cannot directly follow the experience of "using all physical cores". Multiple thread block counts must be tested. In this example, `8*2048` corresponds to 16384 elements, and the measured optimal thread block count is 32, not the physical core count of 64, and this value is only valid for this data volume.
 - **Reason**: When the data volume is small, the workload assigned to each core is very small and the effective computation time is short. Continuing to increase the thread block count at this point (such as from 32 to 64, with latency increasing approximately 11.8%) causes the fixed launch and scheduling overhead from new thread blocks to exceed the parallelism benefit.
 
-## Tuning Recommendations
+### Optimization Key Points Summary
 
 1. **In large data scenarios, prioritize matching the thread block count to the physical core count**: Too few thread blocks cause insufficient parallel core count and heavier per-block workload; too many thread blocks introduce more thread block launch and scheduling overhead.
 2. **In small data scenarios, test thread block count empirically**: When the data volume is small and the per-core workload is very small, the fixed scheduling overhead from launching more thread blocks exceeds the benefit, and the optimal thread block count may not be the physical core count. Use the msopprof tool to measure performance and select the thread block count configuration with lower Task Duration.
@@ -284,7 +286,7 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
+### Performance Analysis
 
 Use the `msOpProf` tool to collect detailed performance data:
 
