@@ -16,7 +16,6 @@
 #include "dtype_common.h"
 #include "hccl_alloc_ctx_res.h"
 #include "hccl_mc2.h"
-#include "kfc_server_config.h"
 #include "sim_communicator.h"
 #include "sim_world.h"
 #include "topo_model.h"
@@ -170,20 +169,6 @@ TEST_F(CcuMc2AllToAllVTest, MultipleAllToAllVConfigsFallBackFromMc2Ccu)
     EXPECT_EQ(GetCcuKernelRegisterCount(), 0U);
 }
 
-TEST_F(CcuMc2AllToAllVTest, OpIdContainsAllToAllVMessageIdentity)
-{
-    OpParam param{};
-    param.opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
-    param.all2AllVDataDes.sendType = HCCL_DATA_TYPE_FP16;
-    param.all2AllVDataDes.recvType = HCCL_DATA_TYPE_FP32;
-
-    const uint64_t opId = BuildKfcOpId(param);
-    EXPECT_EQ(opId & 0x7fU, static_cast<uint64_t>(param.opType));
-    EXPECT_EQ((opId >> 8U) & 0x7fU, static_cast<uint64_t>(param.all2AllVDataDes.sendType));
-    EXPECT_EQ((opId >> 16U) & 0x7fU, 0U);
-    EXPECT_EQ((opId >> 24U) & 0x7fU, static_cast<uint64_t>(param.all2AllVDataDes.recvType));
-}
-
 TEST_F(CcuMc2AllToAllVTest, DefaultAlgorithmConfigFallsBackFromMc2Ccu)
 {
     Mc2CcTilingInner ccTiling = BuildAllToAllVTiling();
@@ -246,14 +231,13 @@ TEST_F(CcuMc2AllToAllVTest, KfcServerArgsUseAllocatedQueueAndToken)
     EXPECT_EQ(resourceCtx.kfcServerArgs[5], reinterpret_cast<uint64_t>(cclBuffer) + 0x1234U);
 }
 
-TEST_F(CcuMc2AllToAllVTest, CcuMsEngineDoesNotEnterMc2CcuPath)
+TEST_F(CcuMc2AllToAllVTest, RejectsCcuMsEngine)
 {
     Mc2CcTilingInner ccTiling = BuildAllToAllVTiling();
     ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_MS);
     const void* list[] = {&ccTiling};
     uint8_t engine = 0;
-    ASSERT_EQ(ObtainCommEngine(list, 1, engine), HCCL_SUCCESS);
-    EXPECT_EQ(engine, static_cast<uint8_t>(OpExecuteConfig::CCU_MS));
+    EXPECT_EQ(ObtainCommEngine(list, 1, engine), HCCL_E_NOT_SUPPORT);
 
     Mc2TilingTestData tiling = BuildMc2Tiling({ccTiling});
     void* opResCtx = nullptr;

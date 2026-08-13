@@ -39,8 +39,6 @@ Result CaptureKfcServerKernel(void *kernelArg)
     opParam.opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
     opParam.isMc2 = true;
     argument.opParam = opParam;
-    argument.supportedOpIds.push_back(config.opId);
-    argument.supportedOpParams.push_back(opParam);
 
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
     const CcuResult result = mc2_ops_hccl::CcuKfcServerKernel(static_cast<CcuKernelArg>(&argument));

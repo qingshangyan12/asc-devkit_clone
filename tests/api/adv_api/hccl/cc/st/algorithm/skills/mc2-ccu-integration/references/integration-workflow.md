@@ -41,7 +41,7 @@ MakeKfcRegistration(instance, serverHandle, collectiveHandle,
 
 注册算法专用 builder。不要在 `CcuKfcSimWorld::DispatchOne` 堆 collective 分支。
 
-当前 `CaptureKfcServerKernel` 把 `OpParam.opType` 写死为 AllToAllV。接入第二种 collective 时，将 `KfcServerKernelConfig` 扩展为 opId/opType 支持项列表，并循环填充 `supportedOpIds/supportedOpParams`。
+当前 `CaptureKfcServerKernel` 把 `OpParam.opType` 写死为 AllToAllV。接入第二种 collective 时，让 `KfcServerKernelConfig` 显式携带当前 Server 绑定的 opType，再填入单个 `OpParam`。产品框架按 primitive/algTag 分别申请 KFC Server 资源，ST 不应自行扩展为多 primitive 共享 Server。
 
 ## 4. 新增 Checker
 

@@ -278,35 +278,31 @@ PrepareXxxTaskArgs(launchConfig)
 
 当前 `CaptureKfcServerKernel` 把 `OpParam.opType` 写死为 `HCCL_CMD_ALLTOALLV`。因此第一种以外的 collective 不能只新增 `BuildXxxKfcTaskArgs`，还必须让 server 注册参数携带真实 opType。
 
-推荐把当前单 `opId` 配置扩展为明确的支持项，例如：
+当前产品框架按 primitive/`algTag` 为每个 KFC Server 分别申请资源，
+server 通过自身 `OpParam.opType` 选择唯一 collective 分支。接入第二种 collective 时，
+adapter 需要显式传入该 Server 绑定的 `opType`，不应在 ST 中先引入多 primitive 共享 Server 的产品机制。
+
+可将单 Server 配置扩展为：
 
 ```cpp
-struct KfcSupportedOpConfig {
-    uint64_t opId{0};
-    mc2_ops_hccl::HcclCMDType opType;
-};
-
 struct KfcServerKernelConfig {
     uint32_t rankId{0};
     uint32_t rankSize{0};
     std::vector<ChannelHandle> channels;
-    std::vector<KfcSupportedOpConfig> supportedOps;
+    mc2_ops_hccl::HcclCMDType opType;
 };
 ```
 
-然后让 `CaptureKfcServerKernel` 循环填充产品参数：
+然后让 `CaptureKfcServerKernel` 填充当前 Server 的产品参数：
 
 ```cpp
-for (const auto &supported : config.supportedOps) {
-    mc2_ops_hccl::OpParam opParam{};
-    opParam.opType = supported.opType;
-    opParam.isMc2 = true;
-    argument.supportedOpIds.push_back(supported.opId);
-    argument.supportedOpParams.push_back(opParam);
-}
+mc2_ops_hccl::OpParam opParam{};
+opParam.opType = config.opType;
+opParam.isMc2 = true;
+argument.opParam = opParam;
 ```
 
-原则上不需要为每个 collective 再复制一份 KFC server adapter，因为产品 KFC server kernel 是公共常驻调度器。collective 差异应落在：
+原则上不需要为每个 collective 再复制一份 KFC server adapter，因为产品 KFC server kernel 是公共实现，但每个资源上下文仍绑定单个 primitive。collective 差异应落在：
 
 - `CCU_KFC_XXX` identity；
 - `opId -> collective kernel handle` 注册；

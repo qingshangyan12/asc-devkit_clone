@@ -33,8 +33,6 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     bool loadFromMem;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
-    std::vector<uint64_t> supportedOpIds;
-    std::vector<OpParam> supportedOpParams;
 };
 
 // 第一层同步：missionId=0 与missionId>0之间的

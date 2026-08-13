@@ -14,7 +14,6 @@
 #include "kernel/ccu_kernel_kfc_server.h"
 #include "ccu_temp_kfc_server.h"
 #include "ccu_launch_dl.h"
-#include "kfc_server_config.h"
 
 namespace mc2_ops_hccl {
 // 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
@@ -24,13 +23,6 @@ void InheritKfcServerKernelArg(
 {
     std::string srcName(srcKernel.kernelFuncName);
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
-
-    KfcServerOpConfig config = g_kfcServerOpConfig;
-    if (config.opIds.empty()) {
-        AddKfcServerOp(config, param);
-    }
-    kfcArg->supportedOpIds = std::move(config.opIds);
-    kfcArg->supportedOpParams = std::move(config.opParams);
 
     const bool isAllGather =
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;

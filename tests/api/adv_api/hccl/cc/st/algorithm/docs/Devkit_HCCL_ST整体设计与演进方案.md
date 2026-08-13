@@ -1027,12 +1027,10 @@ Host testcase 直接编译真实 `hccl_mc2.cc` 和 `hccl_alloc_ctx_res.cc`，当
 
 - `AllocCcuOpResCtx` 初始化 workspace、XN、CKE、Rank；
 - tiling 选择 `CcuAlltoallVMesh1D`；
-- 多配置共享一个 KFC server；
-- opId 编码 collective 和 data type；
-- cache key 不错误复用不同配置；
+- 多配置按主线限制回退，不进入 MC2 CCU 资源路径；
 - `HcclAllocComResourceByTiling` 从 CCU tiling 分配资源；
 - KFC 六个 startup args 使用已分配 queue/token；
-- 两种 CCU engine 值和空指针边界。
+- `CCU_SCHED` engine 和空指针边界。
 
 `mc2_ccu/hccl_op_common_stub.cc` 只提供真实 Host 源所需的最小依赖；因此这一域验证资源控制逻辑，不等于普通 HCCL selector/executor 全链。
 

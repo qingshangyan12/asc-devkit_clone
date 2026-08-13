@@ -61,7 +61,7 @@ adapter 不实现 peer/rank 映射、LocalAddr/RemoteAddr、LocalCopy/Write/Redu
 - `opId -> collectiveHandle + taskArgBuilder` registration；
 - collective Program/MC2 Checker 和 testcase。
 
-同时把当前 `CaptureKfcServerKernel` 的 AllToAllV `opType` 硬编码改成由 `KfcServerKernelConfig.supportedOps` 提供。不要在 DispatchOne 中追加算法 `if/else`。
+同时把当前 `CaptureKfcServerKernel` 的 AllToAllV `opType` 硬编码改成由 `KfcServerKernelConfig.opType` 提供，每个 Server 仍绑定单个 primitive。不要在 DispatchOne 中追加算法 `if/else`。
 
 ## 5. ABI 核对
 

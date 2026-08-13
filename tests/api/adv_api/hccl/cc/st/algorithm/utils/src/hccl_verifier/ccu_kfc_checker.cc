@@ -88,7 +88,8 @@ CheckResult CcuKfcChecker::CheckServerProgram(const Program &program, uint64_t o
             ++whileCount;
         } else if (operation.code == OpCode::IF_BEGIN) {
             hasFinalize = hasFinalize || (operation.equal && operation.immediate == CCU_KFC_FINALIZE);
-            hasDispatch = hasDispatch || (operation.equal && operation.immediate == opId);
+            hasDispatch = hasDispatch ||
+                (operation.equal && operation.immediate == DecodeKfcCollective(opId));
             hasWrap = hasWrap || (operation.equal && operation.immediate == CCU_KFC_QUEUE_DEPTH);
         } else if (operation.code == OpCode::ASSIGN_IMM) {
             queueStrideConstants +=
