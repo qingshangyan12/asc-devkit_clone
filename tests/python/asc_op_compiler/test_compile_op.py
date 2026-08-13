@@ -544,6 +544,16 @@ class TestCompileOp(unittest.TestCase):
             ):
                 with (
                     mock.patch.object(
+                        compile_op_module,
+                        "compile_kernel_and_meta",
+                        wraps=compile_op_module.compile_kernel_and_meta,
+                    ) as mock_compile_kernel,
+                    mock.patch.object(
+                        compile_op_module,
+                        "compile_sk_bind",
+                        wraps=compile_op_module.compile_sk_bind,
+                    ) as mock_compile_sk_bind,
+                    mock.patch.object(
                         ascendc_common_utilityop_module,
                         "is_enable_ascendc_cov",
                         return_value=True,
@@ -566,6 +576,12 @@ class TestCompileOp(unittest.TestCase):
                     )
 
         binary_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".o")
+        self.assertEqual(mock_compile_kernel.call_count, 1)
+        self.assertEqual(
+            os.path.realpath(mock_compile_kernel.call_args.args[0].dst_file),
+            os.path.realpath(binary_file),
+        )
+        mock_compile_sk_bind.assert_not_called()
         json_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".json")
         manifest_dir = os.path.join(TOP_PATH, "kernel_meta", "manifest")
         manifest_file = os.path.join(manifest_dir, "manifest.json")
@@ -1589,9 +1605,20 @@ class TestCompileOp(unittest.TestCase):
         ascendc_common_utilityop_module = importlib.import_module(
             "asc_op_compile_base.asc_op_compiler.ascendc_common_utility"
         )
-        with asc_op_compile_base.common.context.op_context.OpContext():
-            with buildcfg.build_config():
+        with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+            ctx.add_addition("super_kernel_sub_combine", True)
+            with buildcfg.build_config(enable_super_kernel=True):
                 with (
+                    mock.patch.object(
+                        compile_op_module,
+                        "compile_kernel_and_meta",
+                        wraps=compile_op_module.compile_kernel_and_meta,
+                    ) as mock_compile_kernel,
+                    mock.patch.object(
+                        compile_op_module,
+                        "compile_sk_bind",
+                        wraps=compile_op_module.compile_sk_bind,
+                    ) as mock_compile_sk_bind,
                     mock.patch.object(
                         ascendc_common_utilityop_module,
                         "is_enable_ascendc_cov",
@@ -1611,6 +1638,13 @@ class TestCompileOp(unittest.TestCase):
                         op_compile_option,
                     )
 
+        binary_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".o")
+        self.assertEqual(mock_compile_kernel.call_count, 1)
+        self.assertEqual(
+            os.path.realpath(mock_compile_kernel.call_args.args[0].dst_file),
+            os.path.realpath(binary_file),
+        )
+        mock_compile_sk_bind.assert_not_called()
         self._assert_manifest_identity(op_info)
 
     def test_add_op_param_to_workspace(self):
