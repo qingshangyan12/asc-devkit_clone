@@ -20,6 +20,7 @@
 #include "topo_host.h"
 #include "alg_env_config.h"
 
+constexpr u32 PORT_IDX = 5;
 namespace mc2_ops_hccl {
 HcclResult CalcLevel0ChannelRequest(
     const OpParam& param, const TopoInfo* topoInfo, AlgHierarchyInfo& algHierarchyInfo, const AlgType& algType,
