@@ -8,7 +8,7 @@ This example uses the Gather computation to demonstrate thread block count confi
 
 - Ascend 950PR/Ascend 950DT
 
-## Supported CANN Versions
+## Supported CANN Software Version
 
 - \> CANN 9.0.0
 
@@ -19,7 +19,8 @@ This example uses the Gather computation to demonstrate thread block count confi
 │   ├── figures                // Image resources for README
 │   ├── CMakeLists.txt         // Build project file
 │   ├── grid_config.asc        // Ascend C operator implementation & invocation example
-│   └── README.md
+│   ├── README.md              // Chinese sample documentation.
+│   └── README_en.md           // English sample documentation.
 ```
 
 ## Example Description
@@ -273,8 +274,6 @@ For small shapes, the experience of "using all physical cores" cannot be directl
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
-
 **Scheduling overhead vs thread block count (Case 0)**:
 
 | SCENARIO_NUM | Thread Block Count | Task Duration(μs) |
@@ -361,39 +360,36 @@ Run the following steps in the root directory of this example to build and run t
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
-
-### Introduction to the msOpProf Tool
+### Performance Analysis
 
 `msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
-- On-device performance collection
+This sample only uses `msopprof` for on-device performance collection.
 
-    On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
 
-    Use the `msOpProf` tool to obtain detailed performance data:
+Use the `msOpProf` tool to obtain detailed performance data:
 
-    ```bash
-    msopprof ./grid_config   # Analyze performance
-    ```
+```bash
+msopprof ./grid_config
+```
 
-    - Performance data description  
-      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+After the command completes, a performance data folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The folder structure is as follows:
 
-      ```bash
-      ├──dump                       # Raw performance data; users do not need to inspect it
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
-      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
-      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
-      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
-      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
-      ├──OpBasicInfo.csv            # Basic operator information
-      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
-      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
-      └──visualize_data.bin         # MindStudio Insight presentation file
-      ```
+```bash
+├──dump                       # Raw performance data; users do not need to inspect it
+├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+├──OpBasicInfo.csv            # Basic operator information
+├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+└──visualize_data.bin         # MindStudio Insight presentation file
+```
 
-View the specific performance analysis results:
+View performance analysis results:
 
 ```bash
 # View Task Duration and various metrics

@@ -18,7 +18,9 @@
 ├── grid_dim_config
 │   ├── figures                // README中的图片资源
 │   ├── CMakeLists.txt         // 编译工程文件
-│   └── grid_config.asc        // Ascend C算子实现 & 调用样例
+│   ├── grid_config.asc        // Ascend C算子实现 & 调用样例
+│   ├── README.md              // 样例说明文档
+│   └── README_en.md           // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -284,7 +286,7 @@ for (uint32_t i = global_idx; i < index_total_length; i += stride) {
   [Success] Case accuracy is verification passed.
   ```
 
-## 性能分析
+### 性能分析
 
 使用`msOpProf`工具获取详细性能数据：
 
