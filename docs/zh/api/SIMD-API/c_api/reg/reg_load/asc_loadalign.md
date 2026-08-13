@@ -86,7 +86,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
                                           int32_t offset)
 ```
 
-### 带地址寄存器偏移搬入
+### 地址寄存器偏移搬入模式
 
 ```c
 // 搬入矢量数据寄存器。
@@ -112,7 +112,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
                                           addr_reg offset)
 ```
 
-### 非连续对齐搬入
+### 非连续对齐搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
@@ -168,7 +168,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 | src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
 | offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。当`dst`为`vector_bool`时，应使用b32模式。 |
 
-### 非连续对齐搬入
+### 非连续对齐搬入模式
 
 **表4** 参数说明
 
@@ -178,7 +178,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 | src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
 | block_stride | 输入 | 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。 |
 | repeat_stride | 输入 | 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。 |
-| mask | 输入 | 掩码寄存器，用于指示在计算过程中哪些元素参与计算。<br>&bull; 因该接口以`DataBlock`为数据搬运单元，当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。<br>&bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。 |
+| mask | 输入 | 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。<br>&bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。<br>&bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -197,11 +197,12 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 地址寄存器偏移搬入模式
-- 必须先调用`asc_update_addr_reg`接口。
+
+必须先调用`asc_update_addr_reg`接口。
 
 ### 非连续对齐搬入模式
-- 该模式不支持目的操作数为掩码寄存器。
-- 因该接口以`DataBlock`为数据搬运单元，当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+
+该模式不支持目的操作数为掩码寄存器。
 
 ## 调用示例
 
