@@ -38,7 +38,7 @@
 
 ```c
 __aicore__ inline void asc_sync_notify(pipe_t pipe,
-                                       pipe_t tpipe, 
+                                       pipe_t tpipe,
                                        event_t id)
 ```
 
@@ -79,7 +79,7 @@ PIPE_S
 
 - **`pipe`与`tpipe`并非任意组合，两者组合的取值存在限制**：针对不同产品，AIC与AIV中支持的组合不同，具体请参考[核内同步分类](intra_core_sync_overview.md#核内同步分类)中的[表2](intra_core_sync_overview.md#aic_intra_core_sync_combinations)和[表3](intra_core_sync_overview.md#aiv_intra_core_sync_combinations)。
 - 相同源流水、相同目标流水、相同id下，连续使用`asc_sync_notify`会引发未定义行为。
-- 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致，否则同步关系不成立。
+- 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致。
 - `pipe`与`tpipe`均不可取`PIPE_ALL`，否则触发异常。
 - 每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。
 - 本接口不会对 `pipe`与`tpipe`两条流水的后续指令不产生阻塞效果。
