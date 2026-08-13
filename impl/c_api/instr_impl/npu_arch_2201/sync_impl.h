@@ -77,21 +77,12 @@ __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id)
 
 __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg) { asc_sync_data_barrier_impl(arg); }
 
-__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint8_t flag_id)
-{
-    asc_sync_subblock_wait_impl(pipe, flag_id);
-}
-
 __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id)
 {
     asc_sync_subblock_wait_impl(pipe, flag_id);
 }
 
-__aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint8_t flag_id) { asc_sync_block_wait_impl(pipe, flag_id); }
-
 __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id) { asc_sync_block_wait_impl(pipe, flag_id); }
-
-__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id) { asc_sync_inter_wait_impl(pipe, flag_id); }
 
 __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id) { asc_sync_inter_wait_impl(pipe, flag_id); }
 
