@@ -15,6 +15,7 @@
 #include <vector>
 #include <ios>
 #include "ccu_kernel_alg_base.h"
+#include "ccu_kernel_utils.h"
 
 namespace mc2_ops_hccl {
 

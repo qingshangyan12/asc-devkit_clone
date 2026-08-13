@@ -503,8 +503,9 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
         ctx.sliceSize = ctx.normalSliceSize;
     }
     HCCL_INFO(
-        "[CCU_RS_KFC_DIAG] Kernel start rank[%u/%u], channels[%u], dataType[%d], outputType[%d], reduceOp[%d]",
-        rankId, rankSize, channelCount, dataType, outputType, reduceType);
+        "[CCU_RS_KFC_DIAG] Kernel start rank[%u/%u], channels[%u], dataType[%u], outputType[%u], reduceOp[%u]",
+        rankId, rankSize, channelCount, static_cast<uint32_t>(dataType), static_cast<uint32_t>(outputType),
+        static_cast<uint32_t>(reduceType));
     CCU_CHK_RET(PreSync(ctx));
     // Match hccl: zero-sized slices only participate in the surrounding
     // synchronization and must not register zero-length CCU operations.
