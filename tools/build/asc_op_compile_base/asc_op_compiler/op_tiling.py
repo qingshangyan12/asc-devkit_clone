@@ -394,7 +394,7 @@ def do_op_tiling(
             extra_params["_op_aicore_num"] = aicore_num
             extra_params["_op_vectorcore_num"] = vectorcore_num
         pcie_through = op_context.get_context().get_addition("_pcie_through_flag")
-        if pcie_through is True:
+        if pcie_through is not None:
             extra_params["_pcie_through_flag"] = pcie_through
 
 
