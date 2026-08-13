@@ -38,6 +38,17 @@ Use the `SCENARIO_NUM` build parameter to select a scenario. Every scenario uses
 | 4 | half | float | int8_t, ND | Vector `VQF322B8_PRE` | Yes | Yes |
 | 5 | int8_t | int32_t | int8_t, ND | Scalar `REQ8` | No | Yes |
 | 6 | int8_t | int32_t | int8_t, Nz | Vector `VREQ8` | Yes | No |
+| 7 | int8_t | int32_t | int4b_t, Nz | Vector `VREQ4` | Yes | No |
+| 8 | int8_t | int32_t | bfloat16_t, Nz | Vector `VQS322BF16_PRE` | No | No |
+| 9 | half | float | half, Nz | Vector `VQF322F16_PRE` | No | No |
+| 10 | half | float | bfloat16_t, Nz | Vector `VQF322BF16_PRE` | No | No |
+| 11 | half | float | int4b_t, Nz | Vector `VQF322S4_PRE` | No | No |
+| 12 | half | float | fp8_e4m3fn_t, Nz | Vector `VQF322FP8_PRE` | No | No |
+| 13 | half | float | hifloat8_t, Nz | Vector `VQF322HIF8_PRE` | No | No |
+| 14 | half | float | hifloat8_t, Nz | Vector `VQF322HIF8_PRE_HYBRID` | No | No |
+| 15 | half | float | float, Nz | Vector `VQF322F32_PRE` | No | No |
+| 16 | half | float | half, Nz | Cast `F322F16` | No | No |
+| 17 | half | float | bfloat16_t, Nz | Cast `F322BF16` | No | No |
 
 `SCENARIO_NUM` is passed by CMake as a compile-time macro. The kernel selects the corresponding scenario with `if constexpr`. After changing the scenario, recompile the project.
 
@@ -79,7 +90,73 @@ The device-side flow is as follows. Each K chunk follows `GMâ†’L1 Buffer (MTE2)â
 - Output: C `[128, 256]` in Nz `int8_t`
 - Implementation: Use `VREQ8` and enable ReLU
 
-For scenarios 2, 4, and 6, the parameters are moved from GM to L1 Buffer with `asc_copy_gm2l1`, then from L1 Buffer to Fixpipe Buffer with `asc_copy_l12fb`. `asc_set_l0c2gm_config` configures the vector-quantization parameter address. Its parameter address is expressed in 128B units, so the parameter file must be rounded up to 128B and any padding must be zero-filled. The `[256] uint64_t` parameters in this example occupy 2048B and already meet this requirement. Moving these parameters from L1 Buffer to Fixpipe Buffer transfers 2048B of data in 64B data blocks, so `len_burst` in `asc_copy_l12fb` is set to 32. `asc_sync_pipe(PIPE_FIX)` completes the L1 Buffer-to-Fixpipe Buffer movement and parameter configuration before Fixpipe moves the L0C Buffer result to GM.
+**Scenario 7: int8 input, vector quantization, and Nz int4b_t output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `int8_t`; `[256] uint64_t` quantization parameters
+- Output: C `[128, 256]` in Nz `int4b_t` (two int4 values packed per byte)
+- Implementation: Use `VREQ4` (int32_t to int4b_t) and enable ReLU
+
+**Scenario 8: int8 input, vector quantization, and Nz bfloat16_t output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `int8_t`; `[256] uint64_t` quantization parameters
+- Output: C `[128, 256]` in Nz `bfloat16_t`
+- Implementation: Use `VQS322BF16_PRE` (int32_t to bfloat16_t)
+
+**Scenario 9: half input, vector quantization, and Nz half output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `half`; `[256] uint64_t` quantization parameters
+- Output: C `[128, 256]` in Nz `half`
+- Implementation: Use `VQF322F16_PRE` (float to half)
+
+**Scenario 10: half input, vector quantization, and Nz bfloat16_t output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `half`; `[256] uint64_t` quantization parameters
+- Output: C `[128, 256]` in Nz `bfloat16_t`
+- Implementation: Use `VQF322BF16_PRE` (float to bfloat16_t)
+
+**Scenario 11: half input, vector quantization, and Nz int4b_t output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `half`; `[256] uint64_t` quantization parameters
+- Output: C `[128, 256]` in Nz `int4b_t` (two int4 values packed per byte)
+- Implementation: Use `VQF322S4_PRE` (float to int4b_t)
+
+**Scenario 12: half input, vector quantization, and Nz fp8_e4m3fn_t output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `half`; `[256] uint64_t` quantization parameters
+- Output: C `[128, 256]` in Nz `fp8_e4m3fn_t`
+- Implementation: Use `VQF322FP8_PRE` (float to fp8_e4m3fn_t)
+
+**Scenario 13: half input, vector quantization, and Nz hifloat8_t output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `half`; `[256] uint64_t` quantization parameters
+- Output: C `[128, 256]` in Nz `hifloat8_t`
+- Implementation: Use `VQF322HIF8_PRE` (float to hifloat8_t, Half to Away Round)
+
+**Scenario 14: half input, vector quantization, and Nz hifloat8_t output (Hybrid Round)**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `half`; `[256] uint64_t` quantization parameters
+- Output: C `[128, 256]` in Nz `hifloat8_t`
+- Implementation: Use `VQF322HIF8_PRE_HYBRID` (float to hifloat8_t, Hybrid Round)
+
+**Scenario 15: half input, vector quantization, and Nz float output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `half`; `[256] uint64_t` quantization parameters
+- Output: C `[128, 256]` in Nz `float`
+- Implementation: Use `VQF322F32_PRE` (float to float). Precision reaches 2/1000 but not 1/10000. For 1/10000 precision requirements, use the AscendDeQuant high-level API
+
+**Scenario 16: half input, cast conversion, and Nz half output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `half`
+- Output: C `[128, 256]` in Nz `half`
+- Implementation: Use `F322F16` (float cast to half), cast mode is CAST_RINT (round to nearest even)
+
+**Scenario 17: half input, cast conversion, and Nz bfloat16_t output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `half`
+- Output: C `[128, 256]` in Nz `bfloat16_t`
+- Implementation: Use `F322BF16` (float cast to bfloat16_t), cast mode is CAST_RINT (round to nearest even)
+
+For scenarios 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, and 15, the parameters are moved from GM to L1 Buffer with `asc_copy_gm2l1`, then from L1 Buffer to Fixpipe Buffer with `asc_copy_l12fb`. `asc_set_l0c2gm_config` configures the vector-quantization parameter address. Its parameter address is expressed in 128B units, so the parameter file must be rounded up to 128B and any padding must be zero-filled. The `[256] uint64_t` parameters in this example occupy 2048B and already meet this requirement. Moving these parameters from L1 Buffer to Fixpipe Buffer transfers 2048B of data in 64B data blocks, so `len_burst` in `asc_copy_l12fb` is set to 32. `asc_sync_pipe(PIPE_FIX)` completes the L1 Buffer-to-Fixpipe Buffer movement and parameter configuration before Fixpipe moves the L0C Buffer result to GM.
 
 ## Build and Run
 
@@ -120,7 +197,7 @@ Run the following steps in the example root directory.
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture for Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | 1-6 | Scenario number |
+  | `SCENARIO_NUM` | 1-17 | Scenario number |
 
 - Expected result
 

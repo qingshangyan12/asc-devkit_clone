@@ -76,6 +76,12 @@ SCENARIO_TABLE = {
     57: ('int8', 'int32',   'bfloat16',   'VQS322BF16_PRE',       'ND', True),
     58: ('int8', 'int32',   'bfloat16',   'QS322BF16_PRE',        'NZ', False),
     59: ('int8', 'int32',   'bfloat16',   'VQS322BF16_PRE',       'NZ', True),
+    # --- Boundary test scenarios (60-64) ---
+    60: ('float', 'float32', 'float32',    'NoQuant+Saturate',     'ND', False),
+    61: ('float', 'float32', 'float32',    'NoQuant+NonSaturate',  'ND', False),
+    62: ('half', 'float32', 'fp8_e4m3fn', 'QF322FP8_PRE+Saturate','ND', False),
+    63: ('half', 'float32', 'fp8_e4m3fn', 'QF322FP8_PRE+SaturateNan','ND', False),
+    64: ('half', 'float32', 'fp8_e4m3fn', 'QF322FP8_PRE+NonSaturate','ND', False),
 }
 
 NP_DTYPE = {
@@ -119,7 +125,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("output", help="output file path")
     parser.add_argument("golden", help="golden file path")
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 60))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 65))
     args = parser.parse_args()
     try:
         res = verify_result(args.output, args.golden, args.scenarioNum)

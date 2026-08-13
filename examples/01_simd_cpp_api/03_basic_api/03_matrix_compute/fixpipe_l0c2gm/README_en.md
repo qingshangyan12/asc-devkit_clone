@@ -125,56 +125,165 @@ For Ascend 950PR/Ascend 950DT (dav-3510 architecture), the complete data type co
 
 ### Scenario 1-7 Detailed Description
 
-**Scenario 1: Output format Nz, output data type float**
-- Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
-- Output: C [128, 256] float type, Nz format
-- Implementation: Use `Fixpipe<outputType, l0cType, AscendC::CFG_NZ>` to transfer data from L0C to GM, output in Nz format
-- Description: L0C data in Nz format directly output to GM in Nz format, data remains unchanged
+All scenarios share the same matrix multiplication pipeline; the only difference is the Fixpipe configuration in the CopyOut stage. The common computation flow is described first, followed by per-scenario Fixpipe configurations.
+
+#### Common Matrix Multiplication Pipeline
+
+All scenarios use input matrix specification [M, N, K] = [128, 256, 128], with K axis split into 2 iterations (`K_ROUND=2`), processing `baseK = K / K_ROUND = 64` per iteration.
+
+1. **CopyIn (GM → L1)**: Uses `DataCopy` with `Nd2NzParams` to convert ND format input matrices to NZ format in L1 Buffer
+   - A matrix `[128, 64]` half ND → L1 A1 (NZ format), `dstNzC0Stride = CeilAlign(128, 16) = 128`
+   - B matrix `[64, 256]` half ND → L1 B1 (NZ format), `dstNzC0Stride = CeilAlign(64, 16) = 64`
+
+2. **SplitA (L1 → L0A)**: NZ → Zz format conversion
+   - dav-3510: Uses `LoadData2DParamsV2`, single call for full transfer
+   - dav-2201: Uses `LoadData2DParams`, loops `CeilDivision(128, 16) = 8` times per block
+
+3. **SplitB (L1 → L0B)**: NZ → Zn format conversion (with transpose)
+   - Uses `LoadData2DParams`, `ifTranspose = true`, loops `CeilDivision(64, 16) = 4` times
+
+4. **Compute (Mmad)**: Matrix multiplication `C = A × B`, result stored in L0C Buffer (CO1)
+   - `MmadParams`: `m = 128`, `n = CeilAlign(256, 32) = 256`, `k = 64`
+   - First iteration: `cmatrixInitVal = true` (initialize L0C), subsequent: `cmatrixInitVal = false` (K accumulation)
+
+5. **CopyOut (L0C → GM)**: Uses `Fixpipe` to transfer L0C results to GM, with scenario-specific configurations
+
+#### Scenario 1: Output format Nz, output data type float
+
+- **Template instantiation**: `KernelFixpipe<half, float, float, 128, 64, 256>`
+- **Input**: A [128, 128] half ND format; B [128, 256] half ND format
+- **Output**: C [128, 256] float Nz format
+- **Fixpipe configuration**:
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::NZ> fixpipeParams;
+  fixpipeParams.mSize = 128;                          // M dimension size
+  fixpipeParams.nSize = CeilAlign(256, 16) = 256;    // N dimension aligned to 16
+  fixpipeParams.srcStride = CeilAlign(128, 16) = 128; // L0C NZ adjacent Z offset
+  fixpipeParams.dstStride = 128 * 16 = 2048;           // GM NZ adjacent Z offset
+  // quantPre = NoQuant (default)
+  Fixpipe<float, float, CFG_NZ>(cGM, c, fixpipeParams);
+  ```
+- **Description**: L0C NZ format data is directly transferred to GM in NZ format, with no format conversion or quantization. The NZ format C0 size is 16 elements (float 4 bytes × 16 = 64 bytes), preserving the original fractal structure.
 <p align="center">
   <img src="figures/fixpipe_l0c2gm_NZ2NZ.png" width="800">
 </p>
 
-**Scenario 2: Output format ND, output data type float**
-- Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
-- Output: C [128, 256] float type, ND format
-- Implementation: Use `Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>` to specify ROW_MAJOR format conversion
-- Description: Convert Nz format data in CO1 to ND format output to GM. ND format has no alignment requirements like Nz format; parameters should be configured based on actual size during output
+#### Scenario 2: Output format ND, output data type float
+
+- **Template instantiation**: `KernelFixpipe<half, float, float, 128, 64, 256>`
+- **Input**: A [128, 128] half ND format; B [128, 256] half ND format
+- **Output**: C [128, 256] float ND format
+- **Fixpipe configuration**:
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::ROW_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;       // ND format uses actual N size, no alignment needed
+  fixpipeParams.srcStride = 128;   // L0C NZ adjacent Z offset
+  fixpipeParams.dstStride = 256;   // ND format elements per row
+  // quantPre = NoQuant (default)
+  Fixpipe<float, float, CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
+  ```
+- **Description**: Converts NZ format data in L0C to ND format output to GM. The NZ2ND conversion rearranges 16×16 fractal data into a contiguous row-major matrix. ND format has no alignment requirements; `nSize` and `dstStride` use actual matrix dimensions.
 <p align="center">
   <img src="figures/fixpipe_l0c2gm_NZ2ND.png" width="800">
 </p>
 
-**Scenario 3: Output format DN, output data type float (only supported on Ascend 950PR/Ascend 950DT)**
-- Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
-- Output: C [256, 128] float type, DN format
-- Implementation: Use `Fixpipe<outputType, l0cType, AscendC::CFG_COLUMN_MAJOR>` to specify COLUMN_MAJOR format conversion
-- Description: Convert Nz format data in CO1 to DN format output to GM
+#### Scenario 3: Output format DN, output data type float (only supported on Ascend 950PR/Ascend 950DT)
+
+- **Template instantiation**: `KernelFixpipe<half, float, float, 128, 64, 256>`
+- **Input**: A [128, 128] half ND format; B [128, 256] half ND format
+- **Output**: C [256, 128] float DN format (transposed)
+- **Fixpipe configuration**:
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::COLUMN_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;       // N dimension size
+  fixpipeParams.srcStride = 128;   // L0C NZ adjacent Z offset
+  fixpipeParams.dstStride = 128;   // DN format adjacent column gap
+  fixpipeParams.params = {1, 0, 0, 1};  // {dnNum, srcNzMatrixStride, dstDnMatrixStride, srcNzC0Stride}
+  Fixpipe<float, float, CFG_COLUMN_MAJOR>(cGM, c, fixpipeParams);
+  ```
+- **Description**: Converts NZ format data in L0C to DN (column-major) format output to GM. DN format is exclusive to Ascend 950PR/950DT. The `TransformParams` controls multi-matrix transfer: `dnNum=1` for single matrix, `srcNzC0Stride=1` for source NZ C0 step. The output matrix dimensions are transposed (M×N → N×M).
 <p align="center">
   <img src="figures/fixpipe_l0c2gm_NZ2DN.png" width="800">
 </p>
 
-**Scenario 4: Output format ND, output data type int8_t, Scalar quantization enabled**
-- Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
-- Output: C [128, 256] int8_t type, ND format
-- Implementation: Set `fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE`, use Scalar quantization mode
-- Description: Quantize float type data to int8_t type, entire C matrix uses one quantization parameter
+#### Scenario 4: Output format ND, output data type int8_t, Scalar quantization enabled
 
-**Scenario 5: Output format ND, output data type int8_t, Vector quantization enabled**
-- Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
-- Output: C [128, 256] int8_t type, ND format
-- Implementation: Set `fixpipeParams.quantPre = QuantMode_t::VQF322B8_PRE`, use Vector quantization mode, pass per-column quantization parameters through quantAlphaTensor
-- Description: Quantize float type data to int8_t type, each column of C matrix corresponds to one quantization parameter, quantization parameters need to be copied from GM to L1
+- **Template instantiation**: `KernelFixpipe<half, int8_t, float, 128, 64, 256>`
+- **Input**: A [128, 128] half ND format; B [128, 256] half ND format
+- **Output**: C [128, 256] int8_t ND format
+- **Fixpipe configuration**:
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::ROW_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;
+  fixpipeParams.srcStride = 128;
+  fixpipeParams.dstStride = 256;
+  fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE;  // float→int8 scalar quant
+  // deqScalar: float 2.0 bit representation, with sign bit set (bit46=1, signed)
+  float quantScalar = 2.0;
+  uint64_t deqScalar = *reinterpret_cast<int32_t*>(&quantScalar);
+  deqScalar = (deqScalar & ~(1ULL << 46)) | (1ULL << 46);  // sign=1 for int8_t
+  fixpipeParams.deqScalar = deqScalar;
+  Fixpipe<int8_t, float, CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
+  ```
+- **Description**: Quantizes L0C float data to int8_t using Scalar quantization. The entire C matrix uses a single quantization parameter (`deqScalar`), which encodes the scale factor (M1=2.0), offset (offset=0), and sign (sign=1, signed int8). The quantization formula is: `output = round(data * scale + offset)`, then saturated to `[-128, 127]`.
 
-**Scenario 6: Output format ND, output data type float, ReLU enabled**
-- Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
-- Output: C [128, 256] float type, ND format
-- Implementation: Set `fixpipeParams.reluEn = true` to enable ReLU feature
-- Description: Perform ReLU operation during data transfer from L0C to GM, setting negative values to 0
+#### Scenario 5: Output format ND, output data type int8_t, Vector quantization enabled
 
-**Scenario 7: Output format Nz, output data type float, ChannelSplit enabled**
-- Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
-- Output: C [128, 512] float type, Nz format (channel split enabled)
-- Implementation: Set `fixpipeParams.isChannelSplit = true` to enable ChannelSplit feature
-- Description: Enable channel split during data transfer from L0C to GM, splitting 16x16 small z fractal matrices into two independent 16x8 small z fractal matrices output to GM. Fixpipe interface input and output must both be float type, and only Nz format is supported
+- **Template instantiation**: `KernelFixpipe<half, int8_t, float, 128, 64, 256>`
+- **Input**: A [128, 128] half ND format; B [128, 256] half ND format
+- **Output**: C [128, 256] int8_t ND format
+- **Fixpipe configuration**:
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::ROW_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;
+  fixpipeParams.srcStride = 128;
+  fixpipeParams.dstStride = 256;
+  fixpipeParams.quantPre = QuantMode_t::VQF322B8_PRE;  // float→int8 tensor quant
+  // Quantization parameters copied from GM to L1 (C1 Buffer)
+  LocalTensor<uint64_t> quantAlphaTensor(TPosition::C1, c1Addr, 256);
+  CopyQuantAlphaGmToL1(quantAlphaTensor);  // GM → L1 DataCopy
+  Fixpipe<int8_t, float, CFG_ROW_MAJOR>(cGM, c, quantAlphaTensor, fixpipeParams);
+  ```
+- **Description**: Quantizes L0C float data to int8_t using Tensor quantization. Unlike Scalar quantization (scenario 4), Tensor quantization provides independent quantization parameters for each column of the C matrix. The quantization parameters are stored in GM as `uint64_t` elements, each encoding one column's quantization coefficients. Before executing Fixpipe, the parameters must be copied from GM to L1 Buffer (C1) via `DataCopy`, then passed as `cbufWorkspace` to the Fixpipe interface.
+
+#### Scenario 6: Output format ND, output data type float, ReLU enabled
+
+- **Template instantiation**: `KernelFixpipe<half, float, float, 128, 64, 256>`
+- **Input**: A [128, 128] half ND format; B [128, 256] half ND format
+- **Output**: C [128, 256] float ND format (negative values zeroed)
+- **Fixpipe configuration**:
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::ROW_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;
+  fixpipeParams.srcStride = 128;
+  fixpipeParams.dstStride = 256;
+  fixpipeParams.reluEn = true;  // Enable inline ReLU
+  // quantPre = NoQuant (default)
+  Fixpipe<float, float, CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
+  ```
+- **Description**: Performs inline ReLU operation during data transfer from L0C to GM, setting all negative values to 0. ReLU is enabled via `reluEn = true` with no additional parameters required. ReLU can be used simultaneously with quantization, but this scenario only enables ReLU without quantization.
+
+#### Scenario 7: Output format Nz, output data type float, ChannelSplit enabled
+
+- **Template instantiation**: `KernelFixpipe<half, float, float, 128, 64, 256>`
+- **Input**: A [128, 128] half ND format; B [128, 256] half ND format
+- **Output**: C [128, 512] float Nz format (channel split enabled, C0 split from 16 to 8, output columns doubled)
+- **Fixpipe configuration**:
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::NZ> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.isChannelSplit = true;                    // Enable channel split
+  fixpipeParams.nSize = CeilAlign(256, 8) = 256;          // C0 split to 8
+  fixpipeParams.srcStride = CeilAlign(128, 16) = 128;     // L0C NZ adjacent Z offset
+  fixpipeParams.dstStride = 128 * 8 = 1024;                // GM NZ adjacent Z offset (C0=8)
+  Fixpipe<float, float, CFG_NZ>(cGM, c, fixpipeParams);
+  ```
+- **Description**: Enables channel split during data transfer from L0C to GM, splitting 16×16 small z fractal matrices into two independent 16×8 small z fractal matrices. Channel split only supports float input and output, and only Nz output format. After splitting, C0 changes from 16 to 8, and the output matrix N dimension data doubles (actual data unchanged, only layout differs).
 
 ### Scenario 8-41 Detailed Description (float L0C, dav-3510 only)
 

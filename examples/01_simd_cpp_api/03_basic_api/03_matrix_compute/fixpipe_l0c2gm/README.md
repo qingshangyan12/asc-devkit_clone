@@ -125,56 +125,165 @@
 
 ### 场景1-7详细说明
 
-**场景1：输出格式Nz，输出数据类型float**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [128, 256] float类型，Nz格式
-- 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_NZ>` 将数据从L0C搬出到GM，输出为Nz格式
-- 说明：L0C数据为Nz格式直接输出到GM的Nz格式，数据保持原格式不变
+所有场景共享相同的矩阵乘计算流水线，差异仅在于 CopyOut 阶段的 Fixpipe 配置。以下先介绍通用计算流程，再逐一说明各场景的 Fixpipe 配置。
+
+#### 通用矩阵乘计算流程
+
+所有场景的输入矩阵规格为 [M, N, K] = [128, 256, 128]，K 轴切分为 2 次（`K_ROUND=2`），每次处理 `baseK = K / K_ROUND = 64`。
+
+1. **CopyIn（GM → L1）**：使用 `DataCopy` + `Nd2NzParams` 将 ND 格式的输入矩阵转换为 NZ 格式存入 L1 Buffer
+   - A 矩阵 `[128, 64]` half ND → L1 A1（NZ格式），`dstNzC0Stride = CeilAlign(128, 16) = 128`
+   - B 矩阵 `[64, 256]` half ND → L1 B1（NZ格式），`dstNzC0Stride = CeilAlign(64, 16) = 64`
+
+2. **SplitA（L1 → L0A）**：NZ → Zz 格式转换
+   - dav-3510：使用 `LoadData2DParamsV2`，单次调用完成全部传输
+   - dav-2201：使用 `LoadData2DParams`，循环 `CeilDivision(128, 16) = 8` 次逐块传输
+
+3. **SplitB（L1 → L0B）**：NZ → Zn 格式转换（含转置）
+   - 使用 `LoadData2DParams`，`ifTranspose = true`，循环 `CeilDivision(64, 16) = 4` 次
+
+4. **Compute（Mmad）**：矩阵乘 `C = A × B`，结果存入 L0C Buffer（CO1）
+   - `MmadParams`：`m = 128`，`n = CeilAlign(256, 32) = 256`，`k = 64`
+   - 首次迭代 `cmatrixInitVal = true`（初始化 L0C），后续迭代 `cmatrixInitVal = false`（K 轴累加）
+
+5. **CopyOut（L0C → GM）**：使用 `Fixpipe` 将 L0C 结果搬出到 GM，各场景配置不同
+
+#### 场景1：输出格式Nz，输出数据类型float
+
+- **模板实例化**：`KernelFixpipe<half, float, float, 128, 64, 256>`
+- **输入**：A [128, 128] half ND格式；B [128, 256] half ND格式
+- **输出**：C [128, 256] float Nz格式
+- **Fixpipe 配置**：
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::NZ> fixpipeParams;
+  fixpipeParams.mSize = 128;                          // M方向大小
+  fixpipeParams.nSize = CeilAlign(256, 16) = 256;    // N方向对齐到16
+  fixpipeParams.srcStride = CeilAlign(128, 16) = 128; // L0C NZ相邻Z偏移
+  fixpipeParams.dstStride = 128 * 16 = 2048;           // GM NZ相邻Z偏移
+  // quantPre = NoQuant（默认）
+  Fixpipe<float, float, CFG_NZ>(cGM, c, fixpipeParams);
+  ```
+- **说明**：L0C中的NZ格式数据直接搬出到GM的NZ格式，不进行格式转换或量化。NZ格式的C0大小为16个元素（float 4字节 × 16 = 64字节），输出数据保持原始分形结构。
 <p align="center">
   <img src="figures/fixpipe_l0c2gm_NZ2NZ.png" width="800">
 </p>
 
-**场景2：输出格式ND，输出数据类型float**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [128, 256] float类型，ND格式
-- 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>` 指定ROW_MAJOR格式转换
-- 说明：将CO1中的Nz格式数据转换为ND格式输出到GM，ND格式没有Nz格式的对齐要求，输出时需要按实际大小配置参数
+#### 场景2：输出格式ND，输出数据类型float
+
+- **模板实例化**：`KernelFixpipe<half, float, float, 128, 64, 256>`
+- **输入**：A [128, 128] half ND格式；B [128, 256] half ND格式
+- **输出**：C [128, 256] float ND格式
+- **Fixpipe 配置**：
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::ROW_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;       // ND格式使用实际N大小，无需对齐
+  fixpipeParams.srcStride = 128;   // L0C NZ相邻Z偏移
+  fixpipeParams.dstStride = 256;   // ND格式每行元素个数
+  // quantPre = NoQuant（默认）
+  Fixpipe<float, float, CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
+  ```
+- **说明**：将L0C中的NZ格式数据转换为ND格式输出到GM。NZ2ND转换会将16×16分形数据重新排布为连续的行优先矩阵。ND格式没有NZ格式的对齐要求，`nSize`和`dstStride`使用实际矩阵大小。
 <p align="center">
   <img src="figures/fixpipe_l0c2gm_NZ2ND.png" width="800">
 </p>
 
-**场景3：输出格式DN，输出数据类型float（仅Ascend 950PR/Ascend 950DT支持）**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [256, 128] float类型，DN格式
-- 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_COLUMN_MAJOR>` 指定COLUMN_MAJOR格式转换
-- 说明：将CO1中的Nz格式数据转换为DN格式输出到GM
+#### 场景3：输出格式DN，输出数据类型float（仅Ascend 950PR/Ascend 950DT支持）
+
+- **模板实例化**：`KernelFixpipe<half, float, float, 128, 64, 256>`
+- **输入**：A [128, 128] half ND格式；B [128, 256] half ND格式
+- **输出**：C [256, 128] float DN格式（行列转置）
+- **Fixpipe 配置**：
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::COLUMN_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;       // N方向大小
+  fixpipeParams.srcStride = 128;   // L0C NZ相邻Z偏移
+  fixpipeParams.dstStride = 128;   // DN格式相邻列间距
+  fixpipeParams.params = {1, 0, 0, 1};  // {dnNum, srcNzMatrixStride, dstDnMatrixStride, srcNzC0Stride}
+  Fixpipe<float, float, CFG_COLUMN_MAJOR>(cGM, c, fixpipeParams);
+  ```
+- **说明**：将L0C中的NZ格式数据转换为DN（列优先）格式输出到GM。DN格式是Ascend 950PR/950DT独有的输出格式，`FixpipeParamsArch3510`的`TransformParams`参数控制多矩阵传输：`dnNum=1`表示单矩阵，`srcNzC0Stride=1`表示源NZ矩阵C0方向步长为1。输出矩阵的行列维度发生转置（M×N → N×M）。
 <p align="center">
   <img src="figures/fixpipe_l0c2gm_NZ2DN.png" width="800">
 </p>
 
-**场景4：输出格式ND，输出数据类型int8_t，使能Scalar量化**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [128, 256] int8_t类型，ND格式
-- 实现：设置 `fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE`，使用Scalar量化模式
-- 说明：将float类型数据量化为int8_t类型，整个C矩阵使用一个量化参数
+#### 场景4：输出格式ND，输出数据类型int8_t，使能Scalar量化
 
-**场景5：输出格式ND，输出数据类型int8_t，使能Vector量化**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [128, 256] int8_t类型，ND格式
-- 实现：设置 `fixpipeParams.quantPre = QuantMode_t::VQF322B8_PRE`，使用Vector量化模式，并通过quantAlphaTensor传入每列的量化参数
-- 说明：将float类型数据量化为int8_t类型，C矩阵的每一列对应一个量化参数，使用的量化参数需要从GM拷贝量化参数到L1
+- **模板实例化**：`KernelFixpipe<half, int8_t, float, 128, 64, 256>`
+- **输入**：A [128, 128] half ND格式；B [128, 256] half ND格式
+- **输出**：C [128, 256] int8_t ND格式
+- **Fixpipe 配置**：
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::ROW_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;
+  fixpipeParams.srcStride = 128;
+  fixpipeParams.dstStride = 256;
+  fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE;  // float→int8 scalar量化
+  // deqScalar: float 2.0 的比特表示，设置sign位(bit46=1, 有符号)
+  float quantScalar = 2.0;
+  uint64_t deqScalar = *reinterpret_cast<int32_t*>(&quantScalar);
+  deqScalar = (deqScalar & ~(1ULL << 46)) | (1ULL << 46);  // sign=1 for int8_t
+  fixpipeParams.deqScalar = deqScalar;
+  Fixpipe<int8_t, float, CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
+  ```
+- **说明**：将L0C中的float类型数据通过Scalar量化转换为int8_t类型。整个C矩阵使用同一个量化参数（`deqScalar`），该参数编码了量化系数（M1=2.0）、偏移量（offset=0）、符号位（sign=1，有符号int8）等信息。量化公式为：`output = round(data * scale + offset)`，然后饱和到`[-128, 127]`。
 
-**场景6：输出格式ND，输出数据类型float，使能ReLU**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [128, 256] float类型，ND格式
-- 实现：设置 `fixpipeParams.reluEn = true` 开启ReLU功能
-- 说明：在数据从L0C搬出到GM的过程中执行ReLU操作，即将负值置为0
+#### 场景5：输出格式ND，输出数据类型int8_t，使能Vector量化
 
-**场景7：输出格式Nz，输出数据类型float，使能ChannelSplit**
-- 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [128, 512] float类型，Nz格式（使能通道拆分）
-- 实现：设置 `fixpipeParams.isChannelSplit = true` 开启ChannelSplit功能
-- 说明：在数据从L0C搬出到GM的过程中开启通道拆分功能，即将16x16小z分形矩阵拆分成两个独立的16x8小z分形矩阵输出到GM，Fixpipe接口的输入输出必须均为float类型，且仅支持Nz格式
+- **模板实例化**：`KernelFixpipe<half, int8_t, float, 128, 64, 256>`
+- **输入**：A [128, 128] half ND格式；B [128, 256] half ND格式
+- **输出**：C [128, 256] int8_t ND格式
+- **Fixpipe 配置**：
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::ROW_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;
+  fixpipeParams.srcStride = 128;
+  fixpipeParams.dstStride = 256;
+  fixpipeParams.quantPre = QuantMode_t::VQF322B8_PRE;  // float→int8 tensor量化
+  // 量化参数从GM拷贝到L1 (C1 Buffer)
+  LocalTensor<uint64_t> quantAlphaTensor(TPosition::C1, c1Addr, 256);
+  CopyQuantAlphaGmToL1(quantAlphaTensor);  // GM → L1 DataCopy
+  Fixpipe<int8_t, float, CFG_ROW_MAJOR>(cGM, c, quantAlphaTensor, fixpipeParams);
+  ```
+- **说明**：将L0C中的float类型数据通过Tensor量化转换为int8_t类型。与场景4的Scalar量化不同，Tensor量化为C矩阵的每一列提供独立的量化参数。量化参数存储在GM中，类型为`uint64_t`，每个元素编码一列的量化系数。执行Fixpipe前需通过`DataCopy`将量化参数从GM拷贝到L1 Buffer（C1），然后作为`cbufWorkspace`传入Fixpipe接口。
+
+#### 场景6：输出格式ND，输出数据类型float，使能ReLU
+
+- **模板实例化**：`KernelFixpipe<half, float, float, 128, 64, 256>`
+- **输入**：A [128, 128] half ND格式；B [128, 256] half ND格式
+- **输出**：C [128, 256] float ND格式（负值置零）
+- **Fixpipe 配置**：
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::ROW_MAJOR> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.nSize = 256;
+  fixpipeParams.srcStride = 128;
+  fixpipeParams.dstStride = 256;
+  fixpipeParams.reluEn = true;  // 开启随路ReLU
+  // quantPre = NoQuant（默认）
+  Fixpipe<float, float, CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
+  ```
+- **说明**：在数据从L0C搬出到GM的过程中随路执行ReLU操作，将所有负值置为0。ReLU功能通过`reluEn = true`开启，无需额外参数。ReLU可与量化功能同时使用，但本场景仅使能ReLU不使能量化。
+
+#### 场景7：输出格式Nz，输出数据类型float，使能ChannelSplit
+
+- **模板实例化**：`KernelFixpipe<half, float, float, 128, 64, 256>`
+- **输入**：A [128, 128] half ND格式；B [128, 256] half ND格式
+- **输出**：C [128, 512] float Nz格式（使能通道拆分，N方向C0从16拆为8，输出列数翻倍）
+- **Fixpipe 配置**：
+  ```cpp
+  FixpipeParamsArch3510<CO2Layout::NZ> fixpipeParams;
+  fixpipeParams.mSize = 128;
+  fixpipeParams.isChannelSplit = true;                    // 开启通道拆分
+  fixpipeParams.nSize = CeilAlign(256, 8) = 256;          // C0拆为8
+  fixpipeParams.srcStride = CeilAlign(128, 16) = 128;     // L0C NZ相邻Z偏移
+  fixpipeParams.dstStride = 128 * 8 = 1024;                // GM NZ相邻Z偏移(C0=8)
+  Fixpipe<float, float, CFG_NZ>(cGM, c, fixpipeParams);
+  ```
+- **说明**：在数据从L0C搬出到GM的过程中开启通道拆分（ChannelSplit）功能，将L0C中16×16的小z分形矩阵拆分为两个独立的16×8小z分形矩阵输出到GM。通道拆分仅支持src和dst均为float类型，且仅支持Nz格式输出。拆分后C0从16变为8，输出矩阵N方向的数据量翻倍（实际数据量不变，仅排布方式变化）。
 
 ### 场景8-41详细说明（float L0C，仅dav-3510）
 
@@ -257,12 +366,16 @@
 
   在本样例目录下执行如下命令。
   ```bash
-  SCENARIO_NUM=15
-  mkdir -p build && cd build;      # 创建并进入build目录
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认npu模式
-  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
-  ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin -scenarioNum=$SCENARIO_NUM  # 验证输出结果是否正确
+  1-15 test paas
+  16b failed
+cd ..
+rm -rf build
+SCENARIO_NUM=17
+mkdir -p build && cd build;
+cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
+python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM
+./demo
+python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin -scenarioNum=$SCENARIO_NUM
   ```
 
   > **注意：** 场景3及场景8-59仅支持 `dav-3510` 架构。场景1-7同时支持 `dav-2201` 和 `dav-3510`。

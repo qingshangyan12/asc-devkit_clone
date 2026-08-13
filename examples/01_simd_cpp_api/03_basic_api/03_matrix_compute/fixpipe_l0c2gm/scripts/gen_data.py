@@ -93,6 +93,17 @@ SCENARIO_TABLE = {
     57: ('int8', 'int32',   'bfloat16',   'VQS322BF16_PRE',       'ND', True),
     58: ('int8', 'int32',   'bfloat16',   'QS322BF16_PRE',        'NZ', False),
     59: ('int8', 'int32',   'bfloat16',   'VQS322BF16_PRE',       'NZ', True),
+    # --- Boundary test scenarios (60-64) ---
+    # CTRL[48]=0 saturation: inf→±MAX, nan→0
+    60: ('float', 'float32', 'float32',    'NoQuant+Saturate',     'ND', False),
+    # CTRL[48]=1 non-saturation: inf/nan preserved
+    61: ('float', 'float32', 'float32',    'NoQuant+NonSaturate',  'ND', False),
+    # fp8 saturation: CTRL[48]=0, CTRL[50]=0 (nan→0)
+    62: ('half', 'float32', 'fp8_e4m3fn', 'QF322FP8_PRE+Saturate','ND', False),
+    # fp8 saturation: CTRL[48]=0, CTRL[50]=1 (nan preserved)
+    63: ('half', 'float32', 'fp8_e4m3fn', 'QF322FP8_PRE+SaturateNan','ND', False),
+    # fp8 non-saturation: CTRL[48]=1 (overflow→nan)
+    64: ('half', 'float32', 'fp8_e4m3fn', 'QF322FP8_PRE+NonSaturate','ND', False),
 }
 
 # Output type byte sizes for NZ block_cols calculation
@@ -104,14 +115,14 @@ TYPE_BYTE_SIZE = {
 
 # NP dtype mapping (for processing)
 NP_DTYPE = {
-    'half': np.float16, 'int8': np.int8, 'float32': np.float32, 'int32': np.int32,
+    'half': np.float16, 'float': np.float32, 'int8': np.int8, 'float32': np.float32, 'int32': np.int32,
     'uint8': np.uint8, 'float16': np.float16, 'bfloat16': np.float32,
     'fp8_e4m3fn': np.uint8, 'hifloat8': np.uint8,
 }
 
 # Save dtype mapping (for file I/O - may differ from processing dtype)
 SAVE_DTYPE = {
-    'half': np.float16, 'int8': np.int8, 'float32': np.float32, 'int32': np.int32,
+    'half': np.float16, 'float': np.float32, 'int8': np.int8, 'float32': np.float32, 'int32': np.int32,
     'uint8': np.uint8, 'float16': np.float16, 'bfloat16': np.uint16,
     'fp8_e4m3fn': np.uint8, 'hifloat8': np.uint8,
 }
@@ -204,11 +215,11 @@ def float32_to_fp8_e4m3fn_scalar(x):
         normalized = x_abs / (2.0 ** exp)
         mant = int(round((normalized - 1.0) * 8))
         if mant >= 8:
-            mant = 7
+            mant = 0
             biased_exp += 1
             if biased_exp > 15:
                 biased_exp = 15
-                mant = 6
+                mant = 6  # max normal value (448), not NaN (0x7F)
         if mant < 0:
             mant = 0
     return (sign << 7) | (biased_exp << 3) | mant
@@ -302,6 +313,19 @@ def cast_to_output_type(data, output_type, round_mode='default'):
 QUANT_SCALAR = 2.0
 
 
+def to_processor_float32(arr):
+    """Truncate IEEE 754 float32 to processor float32 (10 mantissa bits).
+
+    The AI processor stores float32 in L0C with only 10 mantissa bits
+    (1 sign + 8 exponent + 10 mantissa), instead of IEEE 754's 23 mantissa bits.
+    Golden data must match this precision by clearing the lower 13 bits of
+    the mantissa before applying quantization.
+    """
+    bits = arr.astype(np.float32).view(np.uint32).copy()
+    bits = bits & np.uint32(0xFFFFE000)
+    return bits.view(np.float32)
+
+
 def build_quant_tensor(n, output_type, is_tensor):
     """Build the quant parameter tensor for scalar or tensor quant."""
     quant_scalar = QUANT_SCALAR
@@ -313,7 +337,7 @@ def build_quant_tensor(n, output_type, is_tensor):
         if output_type != 'uint8':
             quant_tensor[i] = quant_tensor[i] | np.uint64(0x400000000000)
 
-    relu_alpha = 1.0
+    relu_alpha = QUANT_SCALAR
     relu_alpha_bits = struct.unpack("!I", struct.pack("!f", relu_alpha))[0]
     return quant_tensor, relu_alpha_bits
 
@@ -499,6 +523,88 @@ def reshape_to_nz(golden, output_type, m, n, channel_split=False):
 
 
 # ============================================================================
+# Boundary value saturation (scenarios 60-64)
+# ============================================================================
+
+# fp8_e4m3fn_t bit patterns
+FP8_MAX_POS = 0x7E   # +448 (exp=15, mant=6)
+FP8_MAX_NEG = 0xFE   # -448 (sign=1, exp=15, mant=6)
+FP8_NAN     = 0x7F   # nan (exp=15, mant=7)
+FP8_ZERO    = 0x00   # zero
+
+FP8_MAX_VALUE = 448.0
+
+
+def apply_boundary_saturation(golden, output_type, quant_mode, m, n):
+    """Apply CTRL[48]/CTRL[50] saturation for boundary test scenarios 60-64.
+
+    - Saturate mode (CTRL[48]=0): inf→±MAX, nan→0 (float) / overflow→MAX (fp8)
+    - NonSaturate mode (CTRL[48]=1): inf/nan preserved (float) / overflow→nan (fp8)
+    - For fp8: CTRL[50]=0 → nan→0, CTRL[50]=1 → nan preserved
+    """
+    if output_type == 'float32':
+        # Scenarios 60-61: L0C has inf from 1e30*1e30 matmul
+        if 'NonSaturate' in quant_mode:
+            # Non-saturation: inf/nan preserved as-is
+            return golden.astype(np.float32)
+        else:
+            # Saturation: inf→±MAX, nan→0
+            result = golden.astype(np.float32).copy()
+            pos_inf = np.isposinf(result)
+            neg_inf = np.isneginf(result)
+            nan_mask = np.isnan(result)
+            result[pos_inf] = np.finfo(np.float32).max
+            result[neg_inf] = np.finfo(np.float32).min
+            result[nan_mask] = 0.0
+            return result
+
+    elif output_type == 'fp8_e4m3fn':
+        # Scenarios 62-64: L0C normal values, quantize with scale=2.0, test fp8 overflow
+        # Apply scale factor (QUANT_SCALAR = 2.0)
+        scaled = golden.astype(np.float32) * 2.0
+
+        result = np.zeros((m, n), dtype=np.uint8)
+        is_non_saturate = 'NonSaturate' in quant_mode
+        is_nan_preserve = 'SaturateNan' in quant_mode  # CTRL[50]=1
+
+        for i in range(m):
+            for j in range(n):
+                val = float(scaled[i, j])
+
+                if np.isnan(val):
+                    if is_non_saturate:
+                        result[i, j] = FP8_NAN
+                    elif is_nan_preserve:
+                        result[i, j] = FP8_NAN  # CTRL[50]=1: nan preserved
+                    else:
+                        result[i, j] = FP8_ZERO  # CTRL[50]=0: nan→0
+                elif np.isposinf(val):
+                    if is_non_saturate:
+                        result[i, j] = FP8_NAN  # inf→nan in non-saturation
+                    else:
+                        result[i, j] = FP8_MAX_POS  # inf→+MAX
+                elif np.isneginf(val):
+                    if is_non_saturate:
+                        result[i, j] = FP8_NAN
+                    else:
+                        result[i, j] = FP8_MAX_NEG  # -inf→-MAX
+                elif val > FP8_MAX_VALUE:
+                    if is_non_saturate:
+                        result[i, j] = FP8_NAN  # overflow→nan
+                    else:
+                        result[i, j] = FP8_MAX_POS  # overflow→+MAX
+                elif val < -FP8_MAX_VALUE:
+                    if is_non_saturate:
+                        result[i, j] = FP8_NAN
+                    else:
+                        result[i, j] = FP8_MAX_NEG  # overflow→-MAX
+                else:
+                    result[i, j] = float32_to_fp8_e4m3fn_scalar(val)
+
+        return result
+
+
+# ============================================================================
 # Main golden data generation
 # ============================================================================
 
@@ -515,10 +621,18 @@ def gen_golden_data(scenarioNum=1):
     save_np_type = SAVE_DTYPE[output_type_str]
 
     # Generate input data
-    if input_type_str == 'half':
+    if input_type_str == 'float':
+        # Boundary test: use very large values to produce inf in L0C
+        x1_gm = np.full((M, K), 1e30, dtype=input_np_type)
+        x2_gm = np.full((K, N), 1e30, dtype=input_np_type)
+        golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float32)
+        golden = to_processor_float32(golden)  # Truncate to processor float32
+        # L0C is all inf (1e30 * 1e30 * 128 > float32 max)
+    elif input_type_str == 'half':
         x1_gm = np.random.uniform(-1, 3, [M, K]).astype(input_np_type)
         x2_gm = np.random.uniform(-1, 3, [K, N]).astype(input_np_type)
         golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float32)
+        golden = to_processor_float32(golden)
     else:  # int8
         x1_gm = np.random.randint(-3, 3, [M, K]).astype(input_np_type)
         x2_gm = np.random.randint(-3, 3, [K, N]).astype(input_np_type)
@@ -527,12 +641,16 @@ def gen_golden_data(scenarioNum=1):
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
-    # Handle ReLU
-    if 'ReLU' in quant_mode:
-        golden = np.maximum(golden, 0)
+    # Handle boundary test saturation modes
+    if 'Saturate' in quant_mode or 'NonSaturate' in quant_mode:
+        golden = apply_boundary_saturation(golden, output_type_str, quant_mode, M, N)
+    else:
+        # Handle ReLU
+        if 'ReLU' in quant_mode:
+            golden = np.maximum(golden, 0)
 
-    # Apply quantization
-    golden = apply_quantization(golden, output_type_str, quant_mode, is_tensor, M, N)
+        # Apply quantization
+        golden = apply_quantization(golden, output_type_str, quant_mode, is_tensor, M, N)
 
     # Reshape for NZ/DN format
     if fmt == 'NZ':
@@ -551,6 +669,6 @@ def gen_golden_data(scenarioNum=1):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 60))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 65))
     args = parser.parse_args()
     gen_golden_data(args.scenarioNum)
