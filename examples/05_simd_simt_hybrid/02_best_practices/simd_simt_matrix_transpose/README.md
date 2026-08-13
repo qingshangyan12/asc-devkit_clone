@@ -154,10 +154,9 @@ Case 1通过UB中转把非连续GM写转换为UB内转置访问，Task Duration�
 ```cpp
 uint32_t loop_start = block_idx * TILES_PER_BLOCK;
 uint32_t loop_step = block_num * TILES_PER_BLOCK;
-uint32_t loop_end = total_tiles;
 
 // Case 2固定Thread Block数，每个Thread Block按gridDim.x步长循环处理多个tile组。
-for (uint32_t tile_base = loop_start; tile_base < loop_end; tile_base += loop_step) {
+for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop_step) {
     asc_lock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
     copy_gm_2tile_to_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
     asc_unlock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);

@@ -155,10 +155,9 @@ Case 1 uses UB staging to convert non-contiguous GM writes into transpose access
 ```cpp
 uint32_t loop_start = block_idx * TILES_PER_BLOCK;
 uint32_t loop_step = block_num * TILES_PER_BLOCK;
-uint32_t loop_end = total_tiles;
 
 // Case 2 fixes the Thread Block count. Each Thread Block loops over multiple tile groups by gridDim.x.
-for (uint32_t tile_base = loop_start; tile_base < loop_end; tile_base += loop_step) {
+for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop_step) {
     asc_lock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
     copy_gm_2tile_to_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
     asc_unlock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
