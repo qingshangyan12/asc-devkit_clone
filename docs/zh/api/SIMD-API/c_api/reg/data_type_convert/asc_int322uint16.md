@@ -27,6 +27,7 @@
 ## 功能说明
 
 根据`mask`将`src`中的每个`int32_t`类型元素转换为`uint16_t`类型，并支持不同的饱和模式，结果写入`dst`。由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。参考伪代码：
+
 ```python
 def asc_int322uint16(dst, src, mask):
     for i in range(64):
@@ -45,6 +46,7 @@ def asc_int322uint16_v2(dst, src, mask):
         else:
             dst[2 * i + 1] = 0
 ```
+
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
 
 ## 函数原型
@@ -75,11 +77,11 @@ __simd_callee__ inline void asc_int322uint16(vector_uint16_t& dst,
 
 **表1** 参数说明
 
-| 参数名 | 输入/输出 | 描述                                                                                                             |
-| ------ | --------- | ---------------------------------------------------------------------------------------------------------------- |
-| `dst`    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                   |
-| `src`    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
-| `mask`   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| 参数名 | 输入/输出 | 描述                                                                                                               |
+| ------ | --------- | ------------------------------------------------------------------------------------------------------------------ |
+| `dst`  | 输出      | 目的操作数（矢量数据寄存器）。                                                                                     |
+| `src`  | 输入      | 源操作数（矢量数据寄存器）。                                                                                       |
+| `mask` | 输入      | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -94,9 +96,17 @@ __simd_callee__ inline void asc_int322uint16(vector_uint16_t& dst,
 
 ## 调用示例
 
-```cpp
-// 将代码保存为example.asc后，使用以下命令编译并运行：
-// bisheng example.asc -o main --npu-arch=dav-3510; ./main
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
