@@ -304,7 +304,12 @@ class BinParamBuilder(opdesc_parser.OpDesc):
     def gen_input_json_based_on_specified_json(
         self: any, ori_json: str, output_dir: str
     ):
-        generated_files = split_json_files(ori_json, output_dir)
+        generated_files = split_json_files(
+            ori_json,
+            output_dir,
+            expected_op_type=self.op_type,
+            require_simplified_key=True,
+        )
         index_value = -1
         if generated_files:
             for param_file in generated_files:
