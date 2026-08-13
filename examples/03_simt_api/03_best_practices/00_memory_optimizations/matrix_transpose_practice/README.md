@@ -19,8 +19,8 @@
 │   ├── figures                     // README中的图片资源
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── matrix_transpose.asc        // SIMT矩阵转置优化路径实现
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述

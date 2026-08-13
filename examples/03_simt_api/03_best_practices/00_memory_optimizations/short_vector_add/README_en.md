@@ -19,14 +19,16 @@ This example uses vector addition to demonstrate performance tuning methods for 
 
 ## Directory Structure
 
-```
-short_vector_add
+```text
+├── short_vector_add
 │   ├── scripts/             // Test script directory
 │   │   ├── gen_data.py      // Generate test input and golden data
 │   │   └── verify_result.py // Verify output results
 │   ├── CMakeLists.txt       // Build project file
 │   ├── data_utils.h         // Data read/write utility functions
-│   └── short_vector_add.asc // Ascend C operator implementation & invocation example
+│   ├── short_vector_add.asc // Ascend C operator implementation & invocation example
+│   ├── README.md            // Chinese sample documentation.
+│   └── README_en.md         // English sample documentation.
 ```
 
 ## Example Description

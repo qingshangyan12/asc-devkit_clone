@@ -16,10 +16,11 @@ This example uses sincos computation to demonstrate thread configuration optimiz
 ## Directory Structure
 
 ```text
-sincos_compute/
+├── sincos_compute
 │   ├── CMakeLists.txt              // CMake build file
 │   ├── sincos_compute.asc          // sincos example implementation
-│   └── README.md
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Example Description

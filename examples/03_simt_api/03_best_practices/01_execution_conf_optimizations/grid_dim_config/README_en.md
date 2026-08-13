@@ -18,7 +18,9 @@ This example uses the Gather operator to demonstrate the impact of different thr
 ├── grid_dim_config
 │   ├── figures                // Image resources for README
 │   ├── CMakeLists.txt         // Build project file
-│   └── grid_config.asc        // Ascend C operator implementation & invocation example
+│   ├── grid_config.asc        // Ascend C operator implementation & invocation example
+│   ├── README.md              // Chinese sample documentation.
+│   └── README_en.md           // English sample documentation.
 ```
 
 ## Example Description

@@ -21,8 +21,8 @@ A histogram is a statistical method used to count the frequency of each value in
 │   ├── figures                // Image resources for README
 │   ├── CMakeLists.txt         // Sample build script
 │   ├── histogram.asc          // Ascend C SIMT kernel implementation & Host invocation
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md              // Chinese sample documentation.
+│   └── README_en.md           // English sample documentation.
 ```
 
 ## Sample Description

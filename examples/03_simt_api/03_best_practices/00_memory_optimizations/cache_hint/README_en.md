@@ -19,7 +19,8 @@ This example uses table-lookup sin computation to demonstrate data cache optimiz
 │   ├── CMakeLists.txt              // CMake build file
 │   ├── data_cache_hint.asc         // SIMT data cache example implementation
 │   ├── figures                     // Image resources for README
-│   └── README.md
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Example Description
