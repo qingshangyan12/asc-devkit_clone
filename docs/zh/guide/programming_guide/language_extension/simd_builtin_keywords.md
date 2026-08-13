@@ -6,7 +6,7 @@
 
 -   <a id="npu-arch"></a>**\_\_NPU\_ARCH\_\_**
 
-    \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。该宏由四位数字组成，其中前三位数字用于标识AI Core的IP核\(Intellectual Property Core\)类型，第四位数字标识该AI Core同一个IP核的配置版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下：
+    \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下：
 
     <!-- npu="950" id1 -->
     - Ascend 950PR/Ascend 950DT：3510
@@ -120,12 +120,30 @@
 
 函数执行空间限定符（Function Execution Space Qualifier）指示函数是在Host侧执行还是在Device侧执行，以及它是否可从Host侧或Device侧调用。
 
+**表1**  函数执行空间限定符概览
+
+| 函数执行空间限定符 | 执行空间（Host） | 执行空间（Device） | 允许调用函数空间（Device） |
+| --- | --- | --- | --- |
+| \_\_global\_\_ | x | √ | x |
+| \_\_aicore\_\_ | x | √ | √ |
+| \_\_host\_\_，无限定符 | √ | x | x |
+| \_\_aicpu\_\_ | x | √ | x |
+| \_\_inline\_\_ | √ | √ | √ |
+| \_\_cube\_\_ | x | √ | x |
+| \_\_vector\_\_ | x | √ | x |
+| \_\_mix\_\_\(cube, vec\) | x | √ | x |
+| \_\_schedmode\_\_\(mode\) | x | √ | x |
+
+其中，`允许调用函数空间（Device）`表示使用相应限定符声明的函数是否允许被Device侧函数调用。
+
 -   **\_\_global\_\_**
 
-    \_\_global\_\_执行空间限定符声明一个核函数（Kernel）。核函数（Kernel）有如下性质：在Device上执行；只能被Host侧函数调用；\_\_global\_\_只是表示这是Device侧函数的入口，并不表示具体的设备类型，具体的设备类型由\_\_aicore\_\_标记。具有如下使用约束：
+    \_\_global\_\_执行空间限定符用于声明核函数（Kernel）它具有如下属性：
 
+    -   在Device侧执行且只能被Host侧函数调用
     -   一个\_\_global\_\_函数必须返回void类型，并且不能是class的成员函数。
-    -   主机侧调用\_\_global\_\_函数必须使用<<<\>\>\>异构调用语法。
+    -   必须搭配\_\_aicore\_\_ / \_\_aicpu\_\_ / \_\_cube\_\_ / \_\_vector\_\_ / \_\_mix\_\_\(cube, vec\)一起使用。
+    -   Host侧函数调用\_\_global\_\_函数时必须使用<<<\>\>\>异构调用语法。
     -   \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在device侧已经执行完成，如果需要同步，需要使用Runtime同步接口显式同步，如**aclrtSynchronizeStream**接口。
 
 -   **\_\_aicore\_\_**
@@ -133,7 +151,8 @@
     \_\_aicore\_\_执行空间限定符声明一个函数，它具有如下属性：
 
     -   在Device侧执行
-    -   只能被\_\_global\_\_函数，或者其他\_\_aicore\_\_函数调用
+    -   Device侧只能被\_\_global\_\_函数，或者其他\_\_aicore\_\_函数调用
+    -   Host侧函数调用\_\_global\_\_ \_\_aicore\_\_函数时必须使用<<<\>\>\>异构调用语法
 
     ```
     // Only callable from device functions with same kind
@@ -207,7 +226,7 @@
 
 -   **\_\_cube\_\_**
 
-    标识该核函数（Kernel）仅在Cube核执行。针对耦合模式的硬件架构，该修饰符不生效。
+    标识该核函数（Kernel）仅在Cube核执行。针对耦合模式的硬件架构，该修饰符不生效。在Host侧调用\_\_global\_\_ \_\_cube\_\_函数，并且必须使用<<<\>\>\>异构调用语法。
 
     ```
     extern "C" __global__ __cube__ void mmad_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c)
@@ -220,7 +239,7 @@
 
 -   **\_\_vector\_\_**
 
-    标识该核函数（Kernel）仅在Vector核执行。针对耦合模式的硬件架构，该修饰符不生效。
+    标识该核函数（Kernel）仅在Vector核执行。针对耦合模式的硬件架构，该修饰符不生效。在Host侧调用\_\_global\_\_ \_\_vector\_\_函数，并且必须使用<<<\>\>\>异构调用语法。
 
     ```
      __vector__ __global__ __aicore__ void add_custom(){}
@@ -228,7 +247,7 @@
 
 -   **\_\_mix\_\_\(cube, vec\)**
 
-    标识该核函数（Kernel）同时在Cube核和Vector核上执行。\(cube, vec\)分别表示核函数（Kernel）启动的Cube核和Vector核的配比，支持的配比为\(1, 0\)、\(0, 1\)、\(1, 1\)和\(1, 2\)。在该修饰符生效的非耦合架构上，`__mix__(1, 0)`等价于`__cube__`，`__mix__(0, 1)`等价于`__vector__`，可分别使用__cube__和__vector__替代。针对耦合模式的硬件架构，该修饰符不生效。
+    标识该核函数（Kernel）同时在Cube核和Vector核上执行。\(cube, vec\)分别表示核函数（Kernel）启动的Cube核和Vector核的配比，支持的配比为\(1, 0\)、\(0, 1\)、\(1, 1\)和\(1, 2\)。在该修饰符生效的非耦合架构上，`__mix__(1, 0)`等价于`__cube__`，`__mix__(0, 1)`等价于`__vector__`，可分别使用__cube__和__vector__替代。针对耦合模式的硬件架构，该修饰符不生效。在Host侧调用\_\_global\_\_ \_\_mix\_\_\(cube, vec\)函数，并且必须使用<<<\>\>\>异构调用语法。
 
 -   **\_\_schedmode\_\_\(mode\)**
 
@@ -312,14 +331,14 @@ AI Core具备多级独立片上存储，各个地址空间独立编址，具备�
 
 | 地址空间限定符 | AI Core物理存储空间 |
 |----------------|---------------------|
-| __gm__ | 设备侧内存GM |
-| __ubuf__ | Vector UB |
-| __ca__ | Cube L0A Buffer |
-| __cb__ | Cube L0B Buffer |
-| __cc__ | Cube L0C Buffer |
-| __cbuf__ | Cube L1 Buffer |
-| __fbuf__ | Fixpipe Buffer |
-| __ssbuf__ | SSBuffer |
+| \_\_gm\_\_ | 设备侧内存GM |
+| \_\_ubuf\_\_ | Vector UB |
+| \_\_ca\_\_ | Cube L0A Buffer |
+| \_\_cb\_\_ | Cube L0B Buffer |
+| \_\_cc\_\_ | Cube L0C Buffer |
+| \_\_cbuf\_\_ | Cube L1 Buffer |
+| \_\_fbuf\_\_ | Fixpipe Buffer |
+| \_\_ssbuf\_\_ | SSBuffer |
 
 地址空间限定符可以在变量声明中使用，用于指定对象分配的区域。如果对象的类型被地址空间名称限定，那么该对象将被分配在指定的地址空间中。同样地，对于指针，指向的类型可以通过地址空间进行限定，以指示所指向的对象所在的地址空间。
 
@@ -426,6 +445,7 @@ __ubuf__ int * __gm__ ptr;
 
 ## 内置常量<a name="section784531219338"></a>
 
+**表3**  内置常量
 | 常量名 | 取值 | 功能 |
 |--------|------|------|
 | constexpr int32_t g_coreType | AscendC::AIC<br>AscendC::AIV | 常量值由框架自动设置，AIC核下，配置为AscendC::AIC，AIV核下，配置为AscendC::AIV。可以通过对该常量值的判断，来实现了AIV与AIC核代码的区分和隔离。功能等同于直接使用ASCEND_IS_AIV、ASCEND_IS_AIC。 |
@@ -439,6 +459,8 @@ __ubuf__ int * __gm__ ptr;
 ## 内置变量<a name="section199434523343"></a>
 
 内置变量由框架自动设置，可在Device侧代码中直接引用，用于多核逻辑控制和数据分片。在Mix执行场景（本节指核函数使用`__mix__(1, 1)`或`__mix__(1, 2)`函数执行空间限定符）下，还需与部分非内置变量组合使用，各变量的说明及获取方式如下：
+
+**表4**  内置变量
 
 | 变量 | 说明 | 获取方式 |
 |------|------|---------|
@@ -458,6 +480,8 @@ $$
 
 下表以$\text{block\_num} = 4$为例，介绍不同场景下各个变量的取值以及logic_idx的计算方式（使用基础API [GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)可以直接获取logic_idx）：
 
+**表5**  不同场景下各个变量的取值以及logic_idx的计算方式
+
 | 场景 | 执行核 | block_idx | sub_block_num | sub_block_idx | logic_idx 
 |------|--------|-----------|---------------|---------------|-----------|
 | 纯Cube | AIC | 0、1、2、3 | 1 | 0 | 等于block_idx | 
@@ -475,6 +499,40 @@ $$
     <!-- end id7 -->
 
 -   使用**C API**时，对于纯Cube/纯Vector/Mix（1,1）场景，应使用内置变量block_idx获取当前核的逻辑位置；对于Mix（1,2）场景，应使用内置变量block_idx、asc_get_sub_block_num和asc_get_sub_block_id按公式计算logic_idx。
+
+## API内置数据类型<a name="section1835494915577"></a>
+
+使用以下数据类型时需要导入[SIMD API的头文件](../../../api/api_list.md#调用接口依赖的头文件和库文件说明)。
+
+**表6**  API内置数据类型
+
+| 类型 | 数据类型 | 描述 | Size（bit） | 取值范围 |
+| --- | --- | --- | --- | --- |
+| 整型 | int4b_t | 有符号4位整数。 | 4 | [-8, 7] |
+| 布尔型 | bool | 全0代表false，否则代表true。 | 8 | true、false |
+| 整型 | int4x2_t | 两个有符号4位整数打包为一个8比特存储单元。 | 8 | 每个元素的取值范围为[-8, 7]。 |
+| 整型 | int8_t | signed char | 8 | [-128, 127] |
+| 整型 | uint8_t | unsigned char | 8 | [0, 255] |
+| 浮点型 | fp4x2_e2m1_t | 两个由1位符号位、2位指数位和1位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-6, 6] |
+| 浮点型 | fp4x2_e1m2_t | 两个由1位符号位、1位指数位和2位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-7×2<sup>-2</sup>, 7×2<sup>-2</sup>] |
+| 浮点型 | hifloat8_t | 符号位宽为1，指数位宽和尾数位宽由点域编码决定。 | 8 | 点域编码决定数据精度与取值范围。 |
+| 浮点型 | fp8_e8m0_t | 符号位宽为0，指数位宽为8，尾数位宽为0。 | 8 | [2<sup>-127</sup>, 2<sup>127</sup>] |
+| 浮点型 | fp8_e5m2_t | 符号位宽为1，指数位宽为5，尾数位宽为2。 | 8 | [2<sup>13</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>13</sup>] |
+| 浮点型 | fp8_e4m3fn_t | 符号位宽为1，指数位宽为4，尾数位宽为3。 | 8 | [2<sup>6</sup> - 2<sup>9</sup>, 2<sup>9</sup> - 2<sup>6</sup>] |
+| 整型 | int16_t | signed short | 16 | [-32768, 32767] |
+| 整型 | uint16_t | unsigned short | 16 | [0, 65535] |
+| 浮点型 | half | 符号位宽为1，指数位宽为5，尾数位宽为10。 | 16 | [2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>] |
+| 浮点型 | bfloat16_t | 符号位宽为1，指数位宽为8，尾数位宽为7。 | 16 | [2<sup>120</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>120</sup>] |
+| 整型 | int32_t | signed int | 32 | [-2147483648, 2147483647] |
+| 整型 | uint32_t | unsigned int | 32 | [0, 4294967295] |
+| 浮点型 | float | 符号位宽为1，指数位宽为8，尾数位宽为23。 | 32 | [2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
+| 复数型 | complex32 | 实部和虚部都是half类型的复数。 | 32 | 实部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>]，虚部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>] |
+| 整型 | int64_t | signed long | 64 | [-9223372036854775808, 9223372036854775807] |
+| 整型 | uint64_t | unsigned long | 64 | [0, 18446744073709551615] |
+| 浮点型 | double | 符号位宽为1，指数位宽为11，尾数位宽为52。 | 64 | [2<sup>971</sup> - 2<sup>1024</sup>, 2<sup>1024</sup> - 2<sup>971</sup>] |
+| 复数型 | complex64 | 实部和虚部都是float类型的复数。 | 64 | 实部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>]，虚部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
+
+更多详细信息请参考[内置数据类型](../../../api/SIMD-API/basic_api/data_structures/builtin_data_types.md)
 
 ## 核函数（Kernel）配置<a name="核函数配置"></a><a name="section97005415463"></a>
 
