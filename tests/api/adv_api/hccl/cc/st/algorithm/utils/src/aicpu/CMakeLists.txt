@@ -110,6 +110,7 @@ add_library(${HCCL_CHECKER_EXECUTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sole_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_parallel_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc
+    ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_concurrent_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
@@ -162,6 +163,8 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/op_common/template/aicpu/kernel_launch.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/template/aicpu/dfx/task_exception_fun.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/template/aicpu/task_cache/mc2_aicpu_task_cache.cc
+    ${HCCL_DEV_BASE}/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_open_kernel_executor.cc
+    ${HCCL_DEV_BASE}/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/cann_dispatch_bridge.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/template/registry/alg_template_register.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/template/registry/alg_v2_template_register.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/template/wrapper/alg_data_trans_wrapper.cc
@@ -186,6 +189,7 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc
+    ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_concurrent_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
 
     ${HCCL_DEV_BASE}/src/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc

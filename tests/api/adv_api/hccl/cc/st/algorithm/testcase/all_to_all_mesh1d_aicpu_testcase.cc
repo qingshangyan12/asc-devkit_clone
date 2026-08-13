@@ -40,25 +40,27 @@ protected:
     void SetUp() override { ResetAlgEnvConfigInitState(); }
 };
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, route_uses_cann_bridge)
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, route_uses_local_registry)
 {
-    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL)));
-    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV)));
-    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_AICPU)));
-    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, COMM_ENGINE_AICPU)));
-
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL)));
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV)));
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE)));
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_AICPU)));
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, COMM_ENGINE_AICPU)));
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_CPU)));
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, COMM_ENGINE_CPU)));
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER)));
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, cann_registry_contains_mesh1d_algorithms)
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_migrated_algorithms)
 {
     const auto& registry = CollAlgExecRegistryV2::Instance();
 
     EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALLV, "InsAlltoAllVMesh1D"));
     EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1DSingleChannel"));
     EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1D"));
+    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLREDUCE, "InsAllReduceMesh1DOneShot"));
+    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLREDUCE, "InsAllReduceMesh1DTwoShot"));
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoall_multi_channel_threshold_is_strict_and_overflow_safe)
