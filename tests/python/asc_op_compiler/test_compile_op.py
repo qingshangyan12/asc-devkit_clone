@@ -68,6 +68,7 @@ from asc_op_compile_base.asc_op_compiler.compile_op import (
     _get_dcci_disable_cap_bitmap,
 )
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import (
+    build_static_compile_commands,
     call_bisheng_v220,
     get_compile_core_types,
     get_compile_target_options,
@@ -180,7 +181,7 @@ def manifest_compile_include_options():
     ]
 
 
-def compile_manifest_resources(manifest, manifest_dir):
+def compile_manifest_resources(manifest, manifest_dir, source_file_path):
     with TemporaryDirectory() as temp_dir:
         resource_root = os.path.join(temp_dir, manifest["resource_path"])
         shutil.copytree(
@@ -190,16 +191,18 @@ def compile_manifest_resources(manifest, manifest_dir):
         os.makedirs(output_root)
 
         for kernel in manifest["kernels"]:
-            static_input = kernel["static_inputs"][0]
-            template_path = os.path.join(resource_root, static_input["file"])
-            template = Path(template_path).read_text(encoding="utf-8")
-            static_value = (
-                "{" + ", ".join("0" for _ in range(static_input["byte_size"])) + "}"
-            )
-            Path(template_path).write_text(
-                template.replace(static_input["token"], static_value),
-                encoding="utf-8",
-            )
+            for constant_info in kernel["constant_infos"]:
+                template_path = constant_info["file"].replace("${resource}", temp_dir)
+                template = Path(template_path).read_text(encoding="utf-8")
+                static_value = (
+                    "{"
+                    + ", ".join("0" for _ in range(constant_info["byte_size"]))
+                    + "}"
+                )
+                Path(template_path).write_text(
+                    template.replace(constant_info["template"], static_value),
+                    encoding="utf-8",
+                )
 
             for obj in kernel["objects"]:
                 for command in sorted(obj["commands"], key=lambda item: item["stage"]):
@@ -215,18 +218,12 @@ def compile_manifest_resources(manifest, manifest_dir):
                                 "${env:ASCEND_HOME_PATH}",
                                 os.environ["ASCEND_HOME_PATH"],
                             )
-                            value = re.sub(
-                                r"\$\{resource:([^}]+)\}",
-                                lambda match: os.path.join(
-                                    resource_root, match.group(1)
-                                ),
-                                value,
+                            value = value.replace(
+                                "${source_file_path}",
+                                os.path.dirname(os.path.realpath(source_file_path)),
                             )
-                            value = re.sub(
-                                r"\$\{output:([^}]+)\}",
-                                lambda match: os.path.join(output_root, match.group(1)),
-                                value,
-                            )
+                            value = value.replace("${resource}", temp_dir)
+                            value = value.replace("${output}", output_root)
                             argv.append(value)
                     result = subprocess.run(
                         argv,
@@ -241,7 +238,7 @@ def compile_manifest_resources(manifest, manifest_dir):
                             f"{result.stdout}"
                         )
                 for output in obj["outputs"]:
-                    output_name = output[len("${output:") : -1]
+                    output_name = output[len("${output}/") :]
                     if not os.path.isfile(os.path.join(output_root, output_name)):
                         raise AssertionError(f"Manifest output is missing: {output}")
 
@@ -365,6 +362,52 @@ class TestCompileOp(unittest.TestCase):
         self.assertNotIn(
             "-D__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__",
             get_compile_target_options(compile_info, "1", True),
+        )
+
+    def test_static_compile_commands_include_all_constant_templates(self):
+        SetCurrentSocInfo("Ascend910B1")
+        with TemporaryDirectory() as temp_dir:
+            wrapper_path = os.path.join(temp_dir, "add_custom_kernel.cpp")
+            output_path = os.path.join(temp_dir, "add_custom.o")
+            template_paths = (
+                os.path.join(temp_dir, "tiling_data.h"),
+                os.path.join(temp_dir, "block_dim.h"),
+            )
+            Path(wrapper_path).touch()
+            for path in template_paths:
+                Path(path).touch()
+
+            compile_info = CompileInfo()
+            compile_info.kernel_name = "add_custom"
+            compile_info.origin_func_name = "add_custom"
+            compile_info.code_channel = CORE_TYPE_VEC
+            compile_info.no_set_kernel_type = True
+            compile_info.tiling_key_list = ["100000"]
+            compile_info.raw_tiling_key_kernel_type = {}
+            compile_info.gen_kernel_func_file = wrapper_path
+            compile_info.dst_file = output_path
+            global_var_storage.set_variable(
+                "ascendc_compiler_path", "/usr/local/Ascend/cann/bin/bisheng"
+            )
+
+            commands = build_static_compile_commands(
+                compile_info,
+                CompileOptionTuple([], []),
+                template_paths,
+                "c220",
+            )
+
+        self.assertEqual(len(commands), 1)
+        command = commands[0]
+        expected_paths = tuple(os.path.realpath(path) for path in template_paths)
+        self.assertEqual(command.constant_info_files, expected_paths)
+        self.assertEqual(
+            [
+                command.argv[index + 1]
+                for index, value in enumerate(command.argv[:-1])
+                if value == "-include"
+            ],
+            list(expected_paths),
         )
 
     def test_global_storage(self):
@@ -539,21 +582,32 @@ class TestCompileOp(unittest.TestCase):
             manifest = json.load(file_obj)
         self.assertEqual(manifest["resource_id"], resource_id)
         self.assertNotIn("intermediates", manifest)
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(
+                    manifest_dir,
+                    manifest["resource_path"],
+                    "src",
+                    manifest["source_file"],
+                )
+            )
+        )
         objects = manifest["kernels"][0]["objects"]
-        self.assertEqual({obj["obj_name"] for obj in objects}, {"basic", "sk"})
-        sk_object = next(obj for obj in objects if obj["obj_name"] == "sk")
+        self.assertEqual({obj["object_name"] for obj in objects}, {"basic", "sk"})
+        sk_object = next(obj for obj in objects if obj["object_name"] == "sk")
         self.assertEqual(
             [command["stage"] for command in sk_object["commands"]],
             [0, 0, 1, 1, 1],
         )
-        static_input = manifest["kernels"][0]["static_inputs"][0]
-        self.assertEqual(static_input["token"], "@@STATIC_VALUE_tiling_data@@")
-        template_ref = "${resource:" + static_input["file"] + "}"
+        constant_info = manifest["kernels"][0]["constant_infos"][0]
+        self.assertEqual(constant_info["template"], "@@STATIC_VALUE_tiling_data@@")
+        template_ref = constant_info["file"]
         template_file = os.path.join(
-            manifest_dir, manifest["resource_path"], static_input["file"]
+            manifest_dir,
+            template_ref.replace("${resource}/", ""),
         )
         with open(template_file, "r", encoding="utf-8") as file_obj:
-            self.assertEqual(file_obj.read().count(static_input["token"]), 1)
+            self.assertEqual(file_obj.read().count(constant_info["template"]), 1)
         compile_argv = [
             argument
             for kernel in manifest["kernels"]
@@ -570,18 +624,18 @@ class TestCompileOp(unittest.TestCase):
             )
         )
         wrapper_refs = {
-            argument[len("${resource:") : -1]
+            argument
             for argument in compile_argv
-            if argument.startswith("${resource:src/") and argument.endswith("}")
+            if argument.startswith("${resource}/" + manifest["resource_path"] + "/src/")
         }
         self.assertTrue(wrapper_refs)
         for wrapper_ref in wrapper_refs:
             wrapper_file = os.path.join(
-                manifest_dir, manifest["resource_path"], wrapper_ref
+                manifest_dir, wrapper_ref.replace("${resource}/", "")
             )
             with open(wrapper_file, "r", encoding="utf-8") as file_obj:
-                self.assertNotIn(static_input["token"], file_obj.read())
-        compile_manifest_resources(manifest, manifest_dir)
+                self.assertNotIn(constant_info["template"], file_obj.read())
+        compile_manifest_resources(manifest, manifest_dir, cce_file)
         os.remove(binary_file)
         os.remove(json_file)
 
@@ -2827,18 +2881,32 @@ class TestCompileOp(unittest.TestCase):
         assert os.path.exists(compile_info.gen_kernel_func_file) == False
         self.assertFalse(os.path.exists(compile_info.gen_kernel_func_file))
         global_var_storage.set_variable("ascendc_recognize_simtvf", True)
+        DFXSectionGenerator().dfx_info_reset(op_info)
+        kernel_options = CompileOptionTuple(compile_options, [])
         gen_kernel_fun(
             compile_info,
             origin_func_name,
             op_info,
             tiling_info,
-            CompileOptionTuple(compile_options, []),
+            kernel_options,
         )
         global_var_storage.set_variable("ascendc_recognize_simtvf", False)
         assert os.path.exists(compile_info.gen_kernel_func_file) == True, (
             "Problems Occurred during Kernel Function Generation!!!"
         )
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
+        wrapper_text = Path(compile_info.gen_kernel_func_file).read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(f'#include "{cce_file}"', wrapper_text)
+        source_include = ["-I", os.path.dirname(os.path.realpath(cce_file))]
+        self.assertEqual(
+            sum(
+                kernel_options.compile_options[index : index + 2] == source_include
+                for index in range(len(kernel_options.compile_options) - 1)
+            ),
+            0,
+        )
         os.remove(compile_info.gen_kernel_func_file)
         # compile_info.dump_info["dump_type"]= "assert"
         # assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
@@ -3012,21 +3080,29 @@ class TestCompileOp(unittest.TestCase):
             _get_tiling_struct_without_register_size,
         )
 
-        mock_output = """
-Contents of section
-0000 50000000 00000000 00000000 .ascendc_tiling.struct1_1234UL
-0000 60000000 00000000 00000000 .ascendc_tiling.struct2_5678
-0000 70000000 00000000 00000000 .ascendc_tiling.struct3
+        section_list = """
+Sections:
+.ascendc_tiling.struct1_1234UL.0
+"""
+        section_content = """
+Contents of section .ascendc_tiling.struct1_1234UL.0:
+ 0000 50000000 00000000                    P.......
 """
         mock_proc = mock.MagicMock()
-        mock_proc.communicate.return_value = (mock_output.encode("utf-8"), None)
+        mock_proc.communicate.side_effect = [
+            (section_list.encode("utf-8"), None),
+            (section_content.encode("utf-8"), None),
+        ]
         mock_popen.return_value = mock_proc
-        compile_info_old = mock.MagicMock()
+        compile_info_old = CompileInfo()
+        compile_info_old.dst_file = "/tmp/add_custom.o"
         tiling_key_struct_size_map = _get_tiling_struct_without_register_size(
             compile_info_old
         )
+        self.assertEqual(tiling_key_struct_size_map, {"1234": ("struct1", 80)})
+        self.assertEqual(compile_info_old.max_tiling_size, 80)
         self.assertEqual(
-            tiling_key_struct_size_map, {"1234": ("struct1", 0), "5678": ("struct2", 0)}
+            compile_info_old.static_compile_tiling_key_data_size, {"1234": 80}
         )
 
     def test_get_code_channel_v220_by_first_tiling_key(self):
@@ -7524,6 +7600,7 @@ Contents of section
 
         compile_info = CompileInfo()
         compile_info.kernel_name = kernel_name
+        compile_info.max_tiling_size = 96
         compile_info.enable_deterministic = enable_deterministic
         compile_info.dump_info = {"dump_type": ""}
         compile_info.super_kernel_info["timestamp_option"] = True
@@ -7573,6 +7650,7 @@ Contents of section
                 need_gen_placehoder,
                 dump_info,
             )
+        self.assertEqual(compile_info.static_compile_tiling_size, 96)
 
     def test_json_except_info(self):
         compile_info = CompileInfo()
@@ -9294,6 +9372,11 @@ void add_custom()
 
                 max_tiling_size = _get_tiling_struct_size(compile_info)
                 self.assertEqual(max_tiling_size, 40)
+                self.assertEqual(compile_info.static_compile_tiling_size, 40)
+                self.assertEqual(
+                    compile_info.static_compile_tiling_key_data_size,
+                    {"1": 40, "3": 40, "6": 40},
+                )
 
     def test_get_tiling_struct_size_c310(self):
         compile_info = CompileInfo()
