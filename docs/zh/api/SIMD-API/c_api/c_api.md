@@ -583,4 +583,4 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 
 | API名称 | 说明 |
 | --- | --- |
-| [获取流水线发射队列空闲槽位数量](experimental/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_FIX`发射队列的空闲槽位数量。 |
+| [指令发射队列空闲槽位查询](experimental/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_FIX`发射队列的空闲槽位数量。 |
