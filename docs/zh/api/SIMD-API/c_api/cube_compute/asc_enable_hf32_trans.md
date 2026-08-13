@@ -40,7 +40,7 @@ __aicore__ inline void asc_enable_hf32_trans(uint32_t mode)
 
 | 参数名 | 输入/输出 | 描述 |
 |:-------|:----------|:------|
-| mode | 输入 | HF32取整模式控制入参，uint32_t类型，支持如下2种取值：<br>0：FP32将以向最接近的值舍入，平局时向偶数舍入的方式舍入为HF32。<br>1：FP32将以向最接近的值舍入，平局时远离零的方式舍入为HF32。 |
+| mode | 输入 | HF32舍入模式控制参数，uint32_t类型，支持如下2种取值：<br>&nbsp;&nbsp;&bull; 0：FP32将以向最接近的值舍入，平局时向偶数舍入的方式舍入为HF32。<br>&nbsp;&nbsp;&bull; 1：FP32将以向最接近的值舍入，平局时远离零的方式舍入为HF32。 |
 
 ## 返回值说明
 
@@ -59,12 +59,12 @@ PIPE_S
 <!-- npu="950" id8 -->
 ## 调用示例
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
 
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
