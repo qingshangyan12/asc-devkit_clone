@@ -10,6 +10,8 @@
 #ifndef HCCL_CCU_KERNEL_KFC_REDUCE_SCATTER_MESH_1D_MEM2MEM_H
 #define HCCL_CCU_KERNEL_KFC_REDUCE_SCATTER_MESH_1D_MEM2MEM_H
 
+#include <array>
+#include <cstdint>
 #include <vector>
 #include <ios>
 #include "utils.h"
@@ -18,11 +20,12 @@
 #include "ccu_kernel_alg_base.h"
 
 namespace mc2_ops_hccl {
-using namespace hcomm;
 
 CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
-    ccu::Variable currentRankSliceInputOffset, ccu::Variable sliceSize, ccu::Variable repeatNum,
+    ccu::Variable currentRankSliceInputOffset, ccu::Variable normalSliceSize, ccu::Variable lastSliceSize,
+    ccu::Variable scratchRepeatStride, ccu::Variable repeatNum, ccu::Variable goSizeAddrOffset,
+    ccu::Variable goSizeLoopParam, ccu::Variable goSizeParallelParam, ccu::Variable goSizeResidual,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType);
 

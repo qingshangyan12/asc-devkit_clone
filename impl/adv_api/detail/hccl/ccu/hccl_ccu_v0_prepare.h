@@ -47,6 +47,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 {
     uint64_t dataSize = DATA_TYPE_MAP[commParam->dataType];
     xnData_[0] = GetOpId(commParam); // ccu xn0
+    // Keep the existing MC2 repeat-buffer contract until the producer-side
+    // layout is confirmed for ReduceScatter (especially strideCount != 0).
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
@@ -117,9 +119,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 {
     xnData_[0] = GetOpId(commParam); // ccu xn0
     auto dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commParam->dataType)];
-    uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
-    xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
-    xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
+    uint64_t inputSliceCount =
+        (commParam->strideCount == 0) ? commParam->count : commParam->strideCount;
+    uint64_t inputRepeatCount =
+        (ccuParam_.rankNum - 1) * inputSliceCount + commParam->count;
+    uint64_t inputOffset = inputRepeatCount * ccuParam_.repeatIndex * dataSize;
+    uint64_t outputOffset = commParam->count * ccuParam_.repeatIndex * dataSize;
+    xnData_[1] = (uint64_t)commParam->sendBuf + inputOffset; // ccu xn1
+    xnData_[2] = (uint64_t)commParam->recvBuf + outputOffset; // ccu xn2
 
     uint64_t tmpCount = commParam->count / ccuParam_.rankNum;
     uint64_t loopCount = CCU_LOOP_COUNT;
@@ -229,19 +236,28 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
 
     uint64_t loopCount = CCU_LOOP_COUNT_M2M_RE;
-    uint64_t sliceCount = commParam->count;
-    uint64_t sliceSize = sliceCount * dataSize;
+    // KFC currently follows the sole-executor one-shot contract. The executor
+    // supplies one independent round, so its normal and tail sizes are equal.
+    // Keep them as separate parameters because the CCU kernel selects the
+    // tail size for the last rank and uses both values when calculating goSize.
+    uint64_t normalSliceSize = commParam->count * dataSize;
+    uint64_t lastSliceSize = normalSliceSize;
 
     xnData_[3] = ccuParam_.scratchAddr;
     uint64_t rankSliceOffset =
-        ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
+        ccuParam_.rankId *
+        ((commParam->strideCount == 0) ? normalSliceSize : (commParam->strideCount * dataSize));
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
-    xnData_[7] = sliceSize;
+    xnData_[5] = normalSliceSize;
+    xnData_[6] = lastSliceSize;
+    xnData_[7] = ccuParam_.rankNum * normalSliceSize;
     xnData_[8] = UINT64_MAX - 1;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+    CalcGoSize(
+        (ccuParam_.rankId == ccuParam_.rankNum - 1) ? lastSliceSize : normalSliceSize, loopCount,
+        CCU_MEMSLICE_SIZE, &xnData_[9]);
 }
 } // namespace AscendC
 
