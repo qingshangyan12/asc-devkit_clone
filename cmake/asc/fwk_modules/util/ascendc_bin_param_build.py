@@ -18,12 +18,11 @@ import hashlib
 import re
 import copy
 from collections import defaultdict
-from typing import Set, NamedTuple
+from typing import Dict, Set, NamedTuple
 
 import const_var
 import opdesc_parser
 from split_opc_json_with_op_list import split_json_files
-from validate_custom_binary_json import validate_custom_binary_json
 
 PYF_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -35,28 +34,6 @@ class ParamInfo(NamedTuple):
     format_for_bin_list: dict
 
 
-SCALAR_CONFIG_OPTIONS = {
-    "--kernel-json-file",
-    "--input-param-file",
-    "--kernel-template-input",
-    "--simplified_key_mode",
-}
-
-
-class ScalarConfigCandidate(NamedTuple):
-    option: str
-    value: str
-    op_type: str
-    compute_unit: str
-    line_number: int
-
-
-class ParsedOpcConfig(NamedTuple):
-    tiling_key_info: dict
-    op_debug_config: dict
-    scalar_candidates: list
-
-
 class BinParamBuilder(opdesc_parser.OpDesc):
     def __init__(self: any, op_type: str):
         super().__init__(op_type)
@@ -66,7 +43,7 @@ class BinParamBuilder(opdesc_parser.OpDesc):
         self.op_debug_config = ""
         self.op_super_config = []
         self.kernel_template_input = ""
-        self.requested_simplified_key_mode = 0
+        self.simplified_key_mode = 0
 
     def set_soc_version(self: any, soc: str):
         self.soc = soc
@@ -550,9 +527,8 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
             param=param_file,
             impl="high_performance,optional",
         )
-        build_cmd_var += (
-            f" --simplified_key_mode={self.requested_simplified_key_mode}"
-        )
+        if self.simplified_key_mode is not None:
+            build_cmd_var += f" --simplified_key_mode={self.simplified_key_mode}"
 
         enable_tiling_keys = False
         if self.tiling_keys:
@@ -634,12 +610,8 @@ def _parse_soc_list(compute_unit_str):
 def _is_soc_match(compute_unit, target_soc):
     if not compute_unit or compute_unit == "ALL":
         return True
-    compute_units = [soc_ver.lower() for soc_ver in compute_unit.split(";")]
-    target_soc = target_soc.lower()
-    if target_soc in compute_units:
-        return True
     soc_lists = _parse_soc_list(compute_unit)
-    return target_soc in soc_lists or trans_soc_version(target_soc) in soc_lists
+    return target_soc in soc_lists
 
 
 def _process_tiling_key_option(op_type, options, tiling_key_info):
@@ -657,22 +629,30 @@ def _process_op_debug_config_option(op_type, options, op_debug_config):
             op_debug_config[op_type].add(_config)
 
 
-def _parse_scalar_candidate(option_text, op_type, compute_unit, line_number):
-    if "=" not in option_text:
-        if option_text in SCALAR_CONFIG_OPTIONS:
-            raise ValueError(
-                f"Invalid {option_text} at line {line_number}: "
-                "expected --option=value"
-            )
-        return None
-    option, value = option_text.split("=", 1)
-    if option not in SCALAR_CONFIG_OPTIONS:
-        return None
-    if not value:
-        raise ValueError(
-            f"Invalid {option} at line {line_number}: value must not be empty"
+def _process_kernel_json_file_option(op_type, options, kernel_json_file):
+    if "--kernel-json-file" in options:
+        json_file = _extract_option_value(options)
+        kernel_json_file[op_type] = json_file
+
+
+def _process_input_param_file_option(op_type, options, input_param_file):
+    if "--input-param-file" in options:
+        json_file = _extract_option_value(options)
+        input_param_file[op_type] = json_file
+
+
+def _process_kernel_template_input_option(op_type, options, kernel_template_input_info):
+    if "--kernel-template-input" in options:
+        kernel_template_input = _extract_option_value(options)
+        kernel_template_input_info[op_type] = kernel_template_input
+
+
+def _process_simplified_key_mode_option(op_type, options, simplified_key_mode_info):
+    if "--simplified_key_mode" in options:
+        simplified_key_mode = _extract_option_value(options)
+        simplified_key_mode_info[op_type] = (
+            None if simplified_key_mode == "None" else int(simplified_key_mode)
         )
-    return ScalarConfigCandidate(option, value, op_type, compute_unit, line_number)
 
 
 def _process_opc_options(
@@ -681,37 +661,50 @@ def _process_opc_options(
     soc,
     tiling_key_info,
     op_debug_config,
-    scalar_candidates,
-    line_number,
+    kernel_json_file,
+    input_param_file,
+    kernel_template_input_info,
+    simplified_key_mode_info,
 ):
     compute_unit = opc_configs[1]
+    if not _is_soc_match(compute_unit, soc):
+        return
+
     for options in opc_configs[2:]:
-        candidate = _parse_scalar_candidate(
-            options, op_type, compute_unit, line_number
-        )
-        if candidate is not None:
-            scalar_candidates.append(candidate)
-            continue
-        if not _is_soc_match(compute_unit, soc):
-            continue
         _process_tiling_key_option(op_type, options, tiling_key_info)
         _process_op_debug_config_option(op_type, options, op_debug_config)
+        _process_kernel_json_file_option(op_type, options, kernel_json_file)
+        _process_input_param_file_option(op_type, options, input_param_file)
+        _process_kernel_template_input_option(
+            op_type, options, kernel_template_input_info
+        )
+        _process_simplified_key_mode_option(
+            op_type, options, simplified_key_mode_info
+        )
 
 
-def parse_op_debug_config(opc_config_file: str, soc: str) -> ParsedOpcConfig:
+def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
     tiling_key_info = defaultdict(set)
     op_debug_config = defaultdict(set)
-    scalar_candidates = []
+    kernel_json_file = defaultdict(dict)
+    input_param_file = defaultdict(dict)
+    kernel_template_input_info = defaultdict(dict)
+    simplified_key_mode_info = defaultdict(dict)
 
     if not opc_config_file or not os.path.exists(opc_config_file):
-        return ParsedOpcConfig(
-            tiling_key_info, op_debug_config, scalar_candidates
+        return (
+            tiling_key_info,
+            op_debug_config,
+            kernel_json_file,
+            input_param_file,
+            kernel_template_input_info,
+            simplified_key_mode_info,
         )
 
     with open(opc_config_file, "r") as file:
         contents = file.readlines()
 
-    for line_number, _content in enumerate(contents, start=1):
+    for _content in contents:
         content = _content.strip()
         opc_configs = content.split("@")
         if len(opc_configs) < 3:
@@ -727,70 +720,20 @@ def parse_op_debug_config(opc_config_file: str, soc: str) -> ParsedOpcConfig:
             soc,
             tiling_key_info,
             op_debug_config,
-            scalar_candidates,
-            line_number,
+            kernel_json_file,
+            input_param_file,
+            kernel_template_input_info,
+            simplified_key_mode_info,
         )
 
-    return ParsedOpcConfig(
-        tiling_key_info, op_debug_config, scalar_candidates
+    return (
+        tiling_key_info,
+        op_debug_config,
+        kernel_json_file,
+        input_param_file,
+        kernel_template_input_info,
+        simplified_key_mode_info,
     )
-
-
-def _get_scope_rank(candidate, target_op_type, target_soc):
-    exact_op = candidate.op_type == target_op_type
-    all_op = candidate.op_type == "ALL"
-    if not exact_op and not all_op:
-        return None
-
-    all_soc = not candidate.compute_unit or candidate.compute_unit == "ALL"
-    exact_soc = not all_soc and _is_soc_match(candidate.compute_unit, target_soc)
-    if not all_soc and not exact_soc:
-        return None
-    if exact_op and exact_soc:
-        return 0
-    if exact_op and all_soc:
-        return 1
-    if all_op and exact_soc:
-        return 2
-    return 3
-
-
-def resolve_scalar_config(
-    candidates, option, target_op_type, target_soc, default=""
-):
-    ranked = [
-        (_get_scope_rank(item, target_op_type, target_soc), item)
-        for item in candidates
-        if item.option == option
-    ]
-    ranked = [(rank, item) for rank, item in ranked if rank is not None]
-    if not ranked:
-        return default
-
-    best_rank = min(rank for rank, _ in ranked)
-    selected = [item for rank, item in ranked if rank == best_rank]
-    values = {item.value for item in selected}
-    if len(values) > 1:
-        details = "\n".join(
-            f"  line {item.line_number}: op={item.op_type}, "
-            f"soc={item.compute_unit or 'ALL'}, value={item.value}"
-            for item in selected
-        )
-        raise ValueError(
-            f"Conflicting {option} for op '{target_op_type}', "
-            f"soc '{target_soc}':\n{details}"
-        )
-    return selected[0].value
-
-
-def parse_requested_mode(value, op_type, soc):
-    if value not in ("0", "1"):
-        raise ValueError(
-            f"Invalid --simplified_key_mode={value} for op '{op_type}', "
-            f"soc '{soc}': only 0 and 1 are accepted; configure non-empty "
-            "simplified_key in --kernel-json-file for custom mode."
-        )
-    return int(value)
 
 
 def gen_option_config(debug_config, super_config, op_debug_config):
@@ -820,9 +763,14 @@ def gen_bin_param_file(
     debug_config = defaultdict(set)
     super_config = defaultdict(set)
     op_descs = opdesc_parser.get_op_desc(cfgfile, [], [], BinParamBuilder, ops)
-    parsed_config = parse_op_debug_config(opc_config_file, soc)
-    tiling_key_info = parsed_config.tiling_key_info
-    op_debug_config = parsed_config.op_debug_config
+    (
+        tiling_key_info,
+        op_debug_config,
+        kernel_json_file,
+        input_param_file,
+        kernel_template_input_info,
+        simplified_key_mode_info,
+    ) = parse_op_debug_config(opc_config_file, soc)
     gen_option_config(debug_config, super_config, op_debug_config)
 
     auto_gen_path_dir = os.path.dirname(cfgfile)
@@ -842,48 +790,30 @@ def gen_bin_param_file(
             op_desc.set_tiling_key(tiling_key_info[op_desc.op_type])
         if all_soc_key in tiling_key_info:
             op_desc.set_tiling_key(tiling_key_info[all_soc_key])
-        op_desc.json_file = resolve_scalar_config(
-            parsed_config.scalar_candidates,
-            "--kernel-json-file",
-            op_desc.op_type,
-            soc,
-        )
-        key_params = resolve_scalar_config(
-            parsed_config.scalar_candidates,
-            "--input-param-file",
-            op_desc.op_type,
-            soc,
-        )
-        kernel_template_input = resolve_scalar_config(
-            parsed_config.scalar_candidates,
-            "--kernel-template-input",
-            op_desc.op_type,
-            soc,
-        )
-        simplified_key_mode = resolve_scalar_config(
-            parsed_config.scalar_candidates,
-            "--simplified_key_mode",
-            op_desc.op_type,
-            soc,
-            default="0",
-        )
-        op_desc.set_kernel_template_input(kernel_template_input)
-        op_desc.requested_simplified_key_mode = parse_requested_mode(
-            simplified_key_mode, op_desc.op_type, soc
-        )
+        if op_desc.op_type in kernel_json_file:
+            op_desc.json_file = kernel_json_file[op_desc.op_type]
+        if all_soc_key in kernel_json_file:
+            op_desc.json_file = kernel_json_file[all_soc_key]
+        if op_desc.op_type in simplified_key_mode_info:
+            op_desc.simplified_key_mode = simplified_key_mode_info[op_desc.op_type]
+        if all_soc_key in simplified_key_mode_info:
+            op_desc.simplified_key_mode = simplified_key_mode_info[all_soc_key]
+        if all_soc_key in kernel_template_input_info:
+            op_desc.set_kernel_template_input(kernel_template_input_info[all_soc_key])
+        if op_desc.op_type in kernel_template_input_info:
+            op_desc.set_kernel_template_input(
+                kernel_template_input_info[op_desc.op_type]
+            )
+
+        key_params = ""
+        if op_desc.op_type in input_param_file:
+            key_params = input_param_file[op_desc.op_type]
 
         if key_params:
             op_desc.gen_input_json_based_on_input_json(key_params, out_dir)
         elif op_desc.json_file == "":
             op_desc.gen_input_json(auto_gen_path_dir)
         else:
-            try:
-                validate_custom_binary_json(op_desc.json_file, op_desc.op_type)
-            except ValueError as error:
-                raise ValueError(
-                    f"Invalid final --kernel-json-file for op '{op_desc.op_type}', "
-                    f"soc '{soc}': {error}"
-                ) from error
             op_desc.gen_input_json_based_on_specified_json(op_desc.json_file, out_dir)
 
 
