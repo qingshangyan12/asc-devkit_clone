@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample implements float16 element-wise Add with the Ascend C C API. It provides scenarios with Ping/Pong Buffer optimization disabled and enabled. Both scenarios use the same inputs, core count, tiling, and vector arithmetic so that the effect of overlapping GM/UB data movement with Vector computation can be compared directly.
+This sample implements float16 element-wise Add with the Ascend C C API and compares single buffering with Ping/Pong double buffering. The double-buffer implementation alternates between two UB buffer groups so that input loading, Vector computation, and output storing can overlap across iterations.
 
 ## Supported Products and CANN Versions
 
@@ -47,7 +47,7 @@ The input, output, and golden data used for accuracy verification are listed bel
 | z | Output | `output/output.bin` | float16 | `[8192, 8192]` | Result computed by the Kernel |
 | golden | Golden data | `output/golden.bin` | float16 | `[8192, 8192]` | Generated using `(x + y).astype(np.float16)`. |
 
-Both scenarios use the same multicore partitioning and tile size. The matrix is evenly partitioned along the M axis across 64 cores. Each core processes 128 contiguous rows, or 1048576 elements, in 49 iterations: 48 full-tile iterations followed by one tail iteration.
+Both scenarios use the same core partitioning and tile parameters. The matrix is split along the M axis across 64 cores, with each core processing 128 contiguous rows. Table3 shows the calculations.
 
 **Table3**  Multicore Partitioning and Tile Parameters
 
@@ -57,13 +57,13 @@ Both scenarios use the same multicore partitioning and tile size. The matrix is 
 | Number of cores | 64 | Each core processes a contiguous range along the M axis. |
 | Rows per core | 128 | `8192 / 64` |
 | Elements per core | 1048576 | `128 * 8192` |
-| Iterations per core | 49 | 48 full tiles and one tail tile |
-| Valid elements in a full tile | 21760 | Corresponds to `DATA_COPY_LENGTH`. |
-| Valid elements in the tail tile | 4096 | `1048576 - 48 * 21760` |
 | Reserved length of each UB buffer | 21840 float16 elements | Corresponds to `MAX_DATA_COPY_LENGTH` and defines the UB address range of each buffer. |
+| Valid elements in a full tile | 21760 | Corresponds to `DATA_COPY_LENGTH`. |
+| Valid elements in the tail tile | 4096 | `1048576 % 21760` |
+| Iterations per core | 49 | `1048576 / 21760 = 48` with 4096 elements remaining, giving 48 full tiles and one tail tile. |
 | VF vector length | 256 bytes | Processes 128 float16 elements at a time; a full tile uses 170 VF iterations and the tail tile uses 32. |
 
-The `SCENARIO_NUM` build option enables or disables Ping/Pong Buffer optimization. Both scenarios use identical input data, multicore partitioning, tile size, and vector computation. They differ only in the number of UB buffers and pipeline synchronization.
+The `SCENARIO_NUM` build option selects single buffering or Ping/Pong double buffering. The two implementations differ only in the number of UB buffers and their synchronization; all other compute parameters are the same.
 
 **Table4**  Scenario Configuration
 
@@ -74,7 +74,7 @@ The `SCENARIO_NUM` build option enables or disables Ping/Pong Buffer optimizatio
 
 ### Scenario 0: Ping/Pong Buffer Optimization Disabled
 
-When Ping/Pong Buffer optimization is disabled, the Kernel `add_baseline` allocates only one x/y/z buffer group. The three buffers are contiguous in UB. Each buffer reserves 21840 float16 elements, while the current iteration accesses only the valid elements specified by `current_length`.
+`add_baseline` allocates one contiguous x/y/z buffer group. Each buffer reserves 21840 float16 elements, and `current_length` specifies the number of valid elements accessed in the current iteration.
 
 **Table5**  UB Layout with Ping/Pong Buffer Optimization Disabled
 
@@ -86,39 +86,39 @@ When Ping/Pong Buffer optimization is disabled, the Kernel `add_baseline` alloca
 
 Each iteration processes one tile in the following order:
 
-1. The MTE2 pipeline calls `asc_copy_gm2ub_align` twice to load the current x and y tiles from GM to UB.
-2. After loading the inputs, MTE2 calls `asc_unlock(PIPE_MTE2, 0)` to release Mutex 0. The Vector pipeline waits for the inputs with `asc_lock(PIPE_V, 0)` and then calls `add_vf`. A full tile executes 170 `asc_add` operations in groups of 128 float16 elements, while the tail tile executes 32 operations.
-3. Vector releases Mutex 0 after computation. MTE3 acquires the same Mutex and calls `asc_copy_ub2gm_align` to store z from UB to GM.
-4. When MTE2 acquires Mutex 0 in the next iteration, it waits for the preceding MTE3 stage to release the Mutex before overwriting the same UB addresses. After all iterations, one `asc_sync_pipe(PIPE_ALL)` completes the final synchronization.
+1. MTE2 calls `asc_copy_gm2ub_align` twice to load the current x and y tiles from GM to UB.
+2. After MTE2 releases Mutex 0, Vector acquires it and calls `add_vf`. A full tile executes 170 `asc_add` operations, while the tail tile executes 32.
+3. Vector releases Mutex 0, after which MTE3 acquires it and calls `asc_copy_ub2gm_align` to store z in GM.
+4. MTE3 releases Mutex 0 before MTE2 can overwrite the same UB addresses in the next iteration. After the loop, `asc_sync_pipe(PIPE_ALL)` waits for all operations to finish.
 
-Therefore, while the Vector pipeline is computing iteration n, MTE2 cannot load the inputs for iteration n+1. Similarly, while MTE3 is storing the result of iteration n, computation for iteration n+1 cannot begin. The pipelines follow their dependencies within each iteration but cannot overlap across iterations. This scenario provides the performance baseline with Ping/Pong Buffer optimization disabled.
+All three stages share one Mutex and run in the order MTE2, Vector, and MTE3. The next iteration cannot reuse UB until the current store finishes, so iterations do not overlap. This implementation serves as the performance baseline.
 
 ### Scenario 1: Ping/Pong Buffer Optimization Enabled
 
-When Ping/Pong Buffer optimization is enabled, the Kernel `add_double_buffer` divides UB into two independent x/y/z buffer groups. Even-numbered iterations use Ping and Mutex 0, while odd-numbered iterations use Pong and Mutex 1. Adjacent iterations use different buffers and Mutexes, so they neither access the same UB addresses nor block on the same synchronization resource.
+`add_double_buffer` allocates Ping and Pong x/y/z buffer groups in UB. Even iterations use Ping and odd iterations use Pong. Each group has two Mutexes: an input Mutex protects the loading and reading of x/y, and an output Mutex protects the writing and storing of z.
 
 **Table6**  Buffer Layout with Ping/Pong Buffer Optimization Enabled
 
-| Iteration | Buffer group | Mutex ID | x start offset | y start offset | z start offset |
-| --- | --- | --- | --- | --- | --- |
-| Even | Ping | 0 | 0 | 21840 | 43680 |
-| Odd | Pong | 1 | 65520 | 87360 | 109200 |
+| Iteration | Buffer group | Input Mutex ID | Output Mutex ID | x start offset | y start offset | z start offset |
+| --- | --- | --- | --- | --- | --- | --- |
+| Even | Ping | 0 | 2 | 0 | 21840 | 43680 |
+| Odd | Pong | 1 | 3 | 65520 | 87360 | 109200 |
 
-All offsets in the table are measured in float16 elements. Each group still reserves 21840 float16 elements for each of x, y, and z, so the data movement and Vector workload per iteration are identical to those with Ping/Pong Buffer optimization disabled. When the optimization is enabled, the Kernel does not perform a full pipeline synchronization at the end of each iteration. Instead, `asc_lock` and `asc_unlock` use a Mutex to manage the pipeline dependencies of each buffer group.
+Offsets are measured in float16 elements, and each buffer reserves 21840 elements. Double buffering does not change the amount of data moved or computed per iteration; `asc_lock` and `asc_unlock` only control when each buffer group can be reused.
 
 **Table7**  Synchronization Dependencies with Ping/Pong Buffer Optimization Enabled
 
 | Pipeline stage | Mutex ID | Synchronization operation | Enforced dependency |
 | --- | --- | --- | --- |
-| MTE2 load | 0 for Ping, 1 for Pong | Acquire with `asc_lock(PIPE_MTE2, mutex_id)`, load x and y, and then call `asc_unlock`. | Before reusing a group, wait for its preceding MTE3 store to finish. |
-| Vector computation | Matches the current buffer group | Acquire with `asc_lock(PIPE_V, mutex_id)`, call `add_vf`, and then call `asc_unlock`. | Vector waits for the current MTE2 stage to release the Mutex and cannot read incomplete inputs. |
-| MTE3 store | Matches the current buffer group | Acquire with `asc_lock(PIPE_MTE3, mutex_id)`, store z, and then call `asc_unlock`. | MTE3 waits for the current Vector stage to release the Mutex and cannot store an incomplete result. |
+| MTE2 load | Input Mutex: 0 for Ping, 1 for Pong | Acquire the input Mutex, load x and y, and then release it. | Before rewriting x and y in a group, wait for the preceding Vector stage to finish reading them. |
+| Vector computation | Input and output Mutexes for the current group | Acquire both Mutexes, call `add_vf`, and then release both. | Wait for the current x/y load and for the preceding MTE3 stage to finish reading z in the same group. |
+| MTE3 store | Output Mutex: 2 for Ping, 3 for Pong | Acquire the output Mutex, store z, and then release it. | Wait for the current Vector stage to finish writing z. |
 
-Each iteration selects Mutex 0 or 1 using `loop_idx & 1`, then acquires and releases that Mutex on the MTE2, Vector, and MTE3 pipelines in sequence. The same Mutex chains the three stages of one buffer group, while different Mutexes do not block one another. After all 49 iterations have been issued, the Kernel calls `asc_sync_pipe(PIPE_ALL)` once to ensure that the final data movement and computation have completed. See [asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md) and [asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md) for interface constraints and the double-buffer pattern.
+`loop_idx & 1` selects Ping or Pong. Input Mutexes are 0/1, and the corresponding output Mutexes are 2/3. Once Vector has finished reading x/y, MTE2 can load the next tile into the same group's input buffers. MTE3 independently waits on the output Mutex for z to be ready. Because MTE2 does not access z and MTE3 does not access x/y, these transfers can run concurrently. After all 49 iterations have been issued, one `asc_sync_pipe(PIPE_ALL)` completes the final synchronization. See [asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md) and [asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md) for API details.
 
-For example, iteration 0 uses Ping and Mutex 0, iteration 1 uses Pong and Mutex 1, and iteration 2 reuses Ping and Mutex 0. While Vector processes the Ping data for iteration 0, MTE2 can load the Pong data for iteration 1. While MTE3 stores the Ping result for iteration 0, Vector can process the Pong data for iteration 1. Iteration 2 waits for iteration 0 MTE3 to release Mutex 0 before reusing Ping. MTE2, Vector, and MTE3 can therefore process adjacent iterations concurrently and hide part of the GM-to-UB and UB-to-GM data movement latency.
+For example, iteration 0 uses Ping with Mutexes 0/2, iteration 1 uses Pong with 1/3, and iteration 2 returns to Ping with 0/2. Once iteration 0 Vector has finished reading x/y, iteration 2 MTE2 can overwrite Ping x/y while iteration 0 MTE3 is still reading Ping z. Iteration 2 Vector must still wait for that MTE3 store to finish before writing Ping z.
 
-The main differences between the two scenarios are summarized below.
+Table8 summarizes the main differences between the two implementations.
 
 **Table8**  Ping/Pong Buffer Optimization Comparison
 
@@ -126,17 +126,19 @@ The main differences between the two scenarios are summarized below.
 | --- | --- | --- |
 | UB buffers | One x/y/z group, 131040 bytes | Two x/y/z groups, 262080 bytes |
 | Addresses used by adjacent iterations | The same; reuse waits for the previous iteration to finish. | Different; alternates between Ping and Pong. |
-| End-of-iteration synchronization | Uses Mutex 0 to chain iterations and performs one full synchronization after all iterations. | Uses Mutex 0/1 for Ping/Pong dependencies and performs one full synchronization after all iterations. |
-| Cross-iteration pipeline overlap | Not supported | MTE2, Vector, and MTE3 can process different iterations. |
+| Pipeline synchronization | Uses Mutex 0 to chain iterations and performs one full synchronization after all iterations. | Uses input Mutexes 0/1 and output Mutexes 2/3 for Ping/Pong, then performs one full synchronization after all iterations. |
+| Cross-iteration pipeline overlap | Not supported | MTE2, Vector, and MTE3 can process different iterations; MTE2 loads and MTE3 stores for the same group can also overlap. |
 | Optimization cost | Lower UB usage | Doubles the UB address space to enable pipeline overlap. |
 
 <p align="center">
   <img src="figures/double_buffer.png" width="50%">
 </p>
 
+The diagram shows how MTE2, Vector, and MTE3 overlap while processing adjacent tiles.
+
 ## Performance Comparison
 
-The scenarios differ only in buffer count and synchronization. Collect both scenarios on the same hardware, CANN version, and system load, and verify accuracy before every performance collection.
+The two scenarios change only the buffer count and synchronization. For a valid comparison, use the same hardware, CANN version, input data, and system load, and verify accuracy before collecting performance data.
 
 ### Test Conditions
 
@@ -145,7 +147,7 @@ The scenarios differ only in buffer count and synchronization. Collect both scen
 | Configuration | Value |
 | --- | --- |
 | Chip version | Ascend 950PR |
-| CANN version | To be added (CANN 9.1.0 or later) |
+| CANN version | ANN 9.2.0 |
 | NPU architecture | `dav-3510` |
 | Input/output data type | float16 |
 | Input/output shape | `[8192, 8192]` |
@@ -153,7 +155,7 @@ The scenarios differ only in buffer count and synchronization. Collect both scen
 | Tile length | 21760 float16 elements; the tail tile contains 4096 float16 elements |
 | Number of measurements | Warm up each scenario once, collect at least five valid runs, and report the median Task Duration |
 
-Keep the device frequency, power mode, and system load consistent during testing, and ensure that no other task occupies the NPU. Both scenarios must use the same input data, core count, tiling parameters, and build options.
+Keep the device frequency and power mode unchanged during testing, and ensure that no other task occupies the NPU. Use the same input data, core count, tiling parameters, and build options for both scenarios.
 
 ### Performance Metrics
 
@@ -170,45 +172,44 @@ Use msOpProf to collect performance data and inspect the following fields in `Pi
 | `aiv_mte2_time(μs)` / `aiv_mte2_ratio` | Duration and ratio of GM-to-UB transfers on the MTE2 pipeline. |
 | `aiv_mte3_time(μs)` / `aiv_mte3_ratio` | Duration and ratio of UB-to-GM transfers on the MTE3 pipeline. |
 
-With Ping/Pong Buffer optimization enabled, different pipelines can overlap. Therefore, pipeline durations or ratios cannot be simply added to obtain `Task Duration`. Evaluate the optimization primarily by `Task Duration`, and use the MTE2, Vector, and MTE3 metrics to determine whether the bottleneck changes.
+Ping/Pong double buffering overlaps the pipelines, so their durations or ratios cannot be added directly. Use `Task Duration` for the end-to-end comparison and the other metrics to identify where time is spent.
 
 ### Ascend 950PR Performance Comparison
 
-The table below compares the performance data measured on the Ascend 950PR chip.
+Table11 shows the measurements collected on the Ascend 950PR.
 
 **Table11**  Ping/Pong Buffer Optimization Performance Comparison
 
 | Scenario | Configuration | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Scenario 0 | Ping/Pong Buffer optimization disabled | 271.472 | 270.18 | 11.117 | 0.041 | 1.553 | 0.006 | 188.566 | 0.698 | 67.182 | 0.249 |
-| Scenario 1 | Ping/Pong Buffer optimization enabled | 268.456 | 267.51 | 10.993 | 0.041 | 1.944 | 0.007 | 258.8 | 0.967 | 137.686 | 0.515 |
+| Scenario 0 | Ping/Pong Buffer optimization disabled | 273.59 | 272.31 | 11.225 | 0.041 | 1.739 | 0.006 | 190.77 | 0.701 | 66.739 | 0.245 |
+| Scenario 1 | Ping/Pong Buffer optimization enabled | 267.841 | 266.36 | 10.958 | 0.041 | 2.153 | 0.008 | 262.328 | 0.985 | 145.807 | 0.547 |
 
-**Optimization Effect Analysis**:
+**End-to-End Result**:
 
 Using Scenario 0 as the baseline, the speedup after enabling Ping/Pong Buffer optimization is
 
 $$
 S = \frac{T_{\text{baseline}}}{T_{\text{ping-pong}}}
-  = \frac{271.472}{268.456}
-  \approx 1.011
+  = \frac{273.59}{267.841}
+  \approx 1.021
 $$
 
 The end-to-end duration reduction is
 
 $$
 R = \frac{T_{\text{baseline}} - T_{\text{ping-pong}}}{T_{\text{baseline}}} \times 100\%
-  = \frac{271.472 - 268.456}{271.472} \times 100\%
-  \approx 1.11\%
+  = \frac{273.59 - 267.841}{273.59} \times 100\%
+  \approx 2.10\%
 $$
 
-- `Task Duration` decreases from 271.472μs to 268.456μs, a reduction of 3.016μs and an end-to-end improvement of approximately 1.11%.
-- `aiv_time` decreases from 270.18μs to 267.51μs, a reduction of approximately 0.99%.
-- `aiv_vec_time` decreases from 11.117μs to 10.993μs, a change of approximately 1.12%, indicating that the Vector workload and computational efficiency are essentially unchanged.
-- `aiv_scalar_time` increases by 0.391μs. Although this is a relative increase of approximately 25.18%, its absolute duration and ratio remain small and have little impact on overall performance.
+`Task Duration` decreases from 273.59μs to 267.841μs, a reduction of 5.749μs or 2.10%. `aiv_time` also decreases by 5.95μs, following the same trend as the end-to-end duration.
+
+The two `aiv_vec_time` values are 11.225μs and 10.958μs, a difference of 0.267μs, so Vector compute time is essentially unchanged. `aiv_scalar_time` increases by 0.414μs but remains below 1% of the total duration and has little effect on end-to-end performance.
 
 **Theoretical Performance Analysis**:
 
-For this sample, a theoretical Vector duration can be calculated for the Add computation alone, excluding data movement, pipeline synchronization, instruction scheduling, and other overhead. The Ascend 950PR processes 128 half elements per cycle at 1.65GHz. With 64 AI Vector Cores, the theoretical Vector duration is
+At 128 half elements per cycle, a frequency of 1.65GHz, and 64 AI Vector Cores, the ideal Vector duration for Add is
 
 $$
 T_{\text{theory}}
@@ -217,22 +218,15 @@ T_{\text{theory}}
 \approx 4.965\ \mu s
 $$
 
-The measured `aiv_vec_time` values are 11.117μs and 10.993μs, approximately 2.2 times the theoretical Vector duration. The theoretical value represents only the Add instruction duration at ideal throughput and excludes practical overhead such as VF loop control, address calculation, data movement, and pipeline synchronization. It therefore cannot be used as the theoretical end-to-end duration of the entire Kernel. The similar Vector durations in both scenarios, which are also much shorter than the MTE2 duration, show that pure Vector computation is not the end-to-end bottleneck.
-
-#### Double Buffer Optimization Summary
-
-- **Current effect**: Ping/Pong Buffer uses two independent UB buffer groups to overlap MTE2 loading, Vector computation, and MTE3 storing across iterations. It reduces `Task Duration` by 3.016μs and improves end-to-end performance by approximately 1.11%.
-- **Advantages**: It hides part of the pipeline wait time and increases read-write concurrency for consecutive tiles without changing the result or the workload of each iteration. Workloads whose computation and data movement durations are similar generally benefit more.
-- **Limitations**: UB usage increases from 131040 bytes to 262080 bytes, while Ping/Pong address selection and synchronization introduce additional overhead. In this sample, the measured Vector duration is approximately 11μs, while MTE2 takes more than 188μs. This large imbalance limits the amount of computation time that double buffering can hide, so the overall gain remains constrained by GM data movement.
-- **Future optimization**: Retain 512-byte alignment and the current L2 Cache bypass strategy while evaluating different tile sizes and core-count configurations, improving contiguous GM access and transfer parameters, and reducing Scalar address-calculation and synchronization overhead. In practical workloads, operator fusion can also increase the amount of computation and data reuse per load, improving the benefit of overlapping computation with data movement.
+The theoretical value includes only the Add instruction and excludes VF loop control, address calculation, data movement, and synchronization. The measured `aiv_vec_time` is about 11μs, or 2.2 times the theoretical value, but is still much shorter than MTE2. Pure Vector computation is therefore not the main cost.
 
 **Pipeline and Bandwidth Analysis**:
 
-In Scenario 0, the MTE2, MTE3, and Vector pipeline ratios sum to 98.8%, indicating that the pipelines execute mostly serially. In Scenario 1, the sum is 152.3%, exceeding 100%, which shows that loading, computation, and storing overlap across iterations after Ping/Pong Buffer is enabled.
+In Scenario 0, the MTE2, MTE3, and Vector ratios sum to 98.7%, so the three stages run mostly serially. In Scenario 1, they sum to 157.3%, showing that loading, computation, and storing overlap across iterations.
 
-The MTE2 and MTE3 durations reported by the profiler include pipeline execution and wait time. After the optimization is enabled, `aiv_mte2_time` increases from 188.566μs to 258.8μs and `aiv_mte3_time` increases from 67.182μs to 137.686μs. These values cannot be interpreted directly as an increase in the latency of each individual data transfer; they must be evaluated together with pipeline overlap and bandwidth.
+The MTE2 and MTE3 durations reported by the profiler include both execution and wait time. Double buffering changes the overlap between pipelines, so a higher value does not mean that an individual transfer became slower. The following estimates provide additional context.
 
-Scenario 0 does not use Ping/Pong Buffer, so its read and write pipelines execute mostly serially. Its read bandwidth is estimated from the total input data volume:
+Scenario 0 runs its read and write pipelines mostly serially. Its read bandwidth is estimated from the total input volume:
 
 $$
 D_{\text{read}} = M \times N \times sizeof(half) \times 2 = 268435456\ \text{B}
@@ -240,11 +234,11 @@ $$
 
 $$
 BW_{\text{read}} = \frac{D_{\text{read}}}{T_{mte2}}
-= \frac{268435456}{188.566 \times 10^{-6}}
-\approx 1.424\ \text{TB/s}
+= \frac{268435456}{190.77 \times 10^{-6}}
+\approx 1.407\ \text{TB/s}
 $$
 
-In Scenario 1, MTE2 and MTE3 execute concurrently after Ping/Pong Buffer is enabled. The read-write mixed bandwidth is estimated from the total input and output data volume:
+In Scenario 1, MTE2 and MTE3 run concurrently. Its mixed read-write bandwidth is estimated from the total input and output volume:
 
 $$
 D_{\text{write}} = M \times N \times sizeof(half) = 134217728\ \text{B}
@@ -252,11 +246,19 @@ $$
 
 $$
 BW_{\text{rw}} = \frac{D_{\text{read}} + D_{\text{write}}}{T_{mte2}}
-= \frac{402653184}{258.8 \times 10^{-6}}
-\approx 1.556\ \text{TB/s}
+= \frac{402653184}{262.328 \times 10^{-6}}
+\approx 1.535\ \text{TB/s}
 $$
 
-Scenario 1 has an `aiv_mte2_ratio` of 96.7%, showing that GM data movement remains the main bottleneck after optimization. Ping/Pong Buffer improves mixed read-write throughput through pipeline overlap. However, because Vector computation is much shorter than data movement, only a limited amount of computation time can be hidden, resulting in an end-to-end improvement of approximately 1.11%.
+Under these definitions, Scenario 0 reaches an estimated read bandwidth of 1.407TB/s, while Scenario 1 reaches an estimated mixed read-write bandwidth of 1.535TB/s. Because the definitions differ, these values describe data movement in each scenario and should not be treated as a direct optimization ratio.
+
+Scenario 1 has an `aiv_mte2_ratio` of 98.5%, so GM data movement remains the main cost. Vector computation is short, which limits how much wait time double buffering can hide; the end-to-end duration decreases by 2.10%.
+
+#### Conclusion
+
+Ping/Pong double buffering increases UB usage from 131040 bytes to 262080 bytes and allows MTE2, Vector, and MTE3 to overlap across iterations. In this test, `Task Duration` decreases by 5.749μs, or 2.10%.
+
+GM data movement still accounts for most of the execution time, while Vector computation is relatively short. Further optimization should focus on tile length, contiguous GM access, and the L2 Cache policy.
 
 ## Build and Run
 
