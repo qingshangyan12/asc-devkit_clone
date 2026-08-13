@@ -29,7 +29,7 @@
 本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其计算公式如下：
 
 $$
-C = A \times B + C
+C_{M \times N} = A_{M \times K} \times B_{K \times N} + C_{M \times N}
 $$
 
 其中，A、B、C分别为左、右、结果矩阵，C矩阵可以通过配置本接口的参数，初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，各矩阵的信息说明见下表：
@@ -42,7 +42,7 @@ $$
 | A | L0A Buffer | M×K | Nz | 16×K0 |
 | B | L0B Buffer | K×N | Zn | K0×16 |
 | C | L0C Buffer | M×N | Nz | 16×16 |
-| Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
+| Bias（用于C矩阵初始化） | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
 表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。
 <!-- end id8 -->
@@ -55,15 +55,17 @@ $$
 | A | L0A Buffer | M×K | Zz | 16×K0 |
 | B | L0B Buffer | K×N | Zn | K0×16 |
 | C | L0C Buffer | M×N | Nz | 16×16 |
-| Bias | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
+| Bias（用于C矩阵初始化） | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
-表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。特别的，当数据类型为`int4b_t`时，`K0 = 64`。
+表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。特别地，当数据类型为`int4b_t`时，`K0 = 64`。
 <!-- end id9 -->
 
 ## 函数原型
 
 <!-- npu="950" id12 -->
-**占位符形式（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）：**
+### 函数原型（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
+**占位符形式：**
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
@@ -78,7 +80,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 bool c_matrix_init_val)
 ```
 
-**dtype支持的数据类型（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）：**
+**dtype支持的数据类型：**
 
 `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
@@ -96,7 +98,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
 | `float` | `float` | `float` | `float` |
 
-**典型示例（[NPU架构版本3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）：**
+**典型示例：**
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
@@ -113,7 +115,9 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 <!-- end id12 -->
 
 <!-- npu="A3,910b" id13 -->
-**占位符形式（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）：**
+### 函数原型（[NPU架构版本2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
+
+**占位符形式：**
 
 - asc_mmad接口：
 
@@ -133,7 +137,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
   | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
   | `float` | `float` | `float` | `float` |
 
-- asc_mmad_s4接口：
+- asc_mmad_s4接口，当输入矩阵数据类型为`int4b_t`时调用此类借口：
 
   ```c
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
@@ -193,39 +197,39 @@ PIPE_M
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
 - `left_height`、`n_dim`、`right_width`中的任意一个值为0时，接口将被视为NOP（空操作）。
 
-- **内存使用约束说明**
-
+- 内存使用约束说明：
   <!-- npu="950" id10 -->
-  针对Ascend 950PR/Ascend 950DT:
+  - 针对Ascend 950PR/Ascend 950DT:
 
-  - L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
-  - 各矩阵的起始地址需满足[表5](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-  - 申请矩阵存储空间时，需使用按照分形大小补齐后的数值进行申请：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数，K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。`left_height`、`n_dim`和`right_width`仍传入矩阵的有效M、K、N值，补齐部分为无效数据，不参与结果矩阵有效区域的计算。
-  - 当M为1且`disable_gemv`为false时，将开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
+      - L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+      - 各矩阵的起始地址需满足[表5](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
+      - 申请矩阵存储空间时，需使用按照分形大小补齐后的数值进行申请：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数，K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。`left_height`、`n_dim`和`right_width`仍传入矩阵的有效M、K、N值，补齐部分为无效数据，不参与结果矩阵有效区域的计算。
+      - 当M为1且`disable_gemv`为false时，将开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
   <!-- end id10 -->
 
   <!-- npu="A3,910b" id11 -->
-  针对如下产品型号：
-  <!-- npu="A3" id16 -->
-  Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id16 -->
-  <!-- npu="910b" id17 -->
-  Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id17 -->
-  - L0C Buffer大小为128KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为1KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
-  <!-- end id11 -->
+  - 针对如下产品型号：
 
-- **同步约束说明**
+ 	  <!-- npu="A3" id16 -->
+    Atlas A3 训练系列产品/Atlas A3 推理系列产品
+ 	  <!-- end id16 -->
+ 	  <!-- npu="910b" id17 -->
+ 	  Atlas A2 训练系列产品/Atlas A2 推理系列产品
+ 	  <!-- end id17 -->
+ 	  L0C Buffer大小为128KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为1KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+ <!-- end id11 -->
 
-  - 针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(left_height / 16) * (right_width / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。
+- 同步约束说明：
 
-- **UnitFlag约束说明**
+  针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(left_height / 16) * (right_width / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。
+
+- UnitFlag约束说明：
 
   - 开启UnitFlag时，矩阵乘加指令与对应矩阵搬出指令需同时开启UnitFlag。当希望同一块L0C Buffer内存空间能持续只被多条矩阵乘加指令或多条矩阵搬出指令操作时，需将前n-1条指令的unitFlag值设置为2，维持被操作内存空间的持续占用状态，最后一条指令设置为3，解除被占用状态。
   - 开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致。矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](./asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](./asc_set_mmad_direction_m.md)。
   - 开启UnitFlag时，建议矩阵乘加的计算数据量与矩阵搬出的数据量保持一致。两者不一致可能导致执行异常。需要清除UnitFlag产生的残留状态时，可调用[asc_set_l0c2gm_config](./asc_set_l0c2gm_config.md)，并将`enable_unit_flag`设置为true，将L0C Buffer中所有内存块的单元标志位设置为0并关闭UnitFlag。
 
-- **特殊值/边界值约束说明**
+- 特殊值/边界值约束说明：
 
   浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../sys_var/asc_set_ctrl.md)接口配置CTRL寄存器的CTRL\[48\]比特位控制计算时的模式：
 
