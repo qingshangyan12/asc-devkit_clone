@@ -6,7 +6,7 @@
 
 -   <a id="npu-arch"></a>**\_\_NPU\_ARCH\_\_**
 
-    \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。该宏由四位数字组成，其中前三位数字用于标识AI Core的IP核\(Intellectual Property Core\)类型，第四位数字标识该AI Core同一个IP核的配置版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下：
+    \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下：
 
     <!-- npu="950" id1 -->
     - Ascend 950PR/Ascend 950DT：3510
@@ -119,6 +119,22 @@
 ## 函数执行空间限定符<a name="section1074418132518"></a>
 
 函数执行空间限定符（Function Execution Space Qualifier）指示函数是在Host侧执行还是在Device侧执行，以及它是否可从Host侧或Device侧调用。
+
+**表1**  函数执行空间限定符概览
+
+<a name="table121121062614"></a>
+
+| 函数执行空间限定符 | 执行空间（Host） | 执行空间（Device） | 允许调用函数空间（Host） | 允许调用函数空间（Device） |
+| --- | --- | --- | --- | --- |
+| \_\_global\_\_ | x | √ | √ | x |
+| \_\_aicore\_\_ | x | √ | x | √ |
+| \_\_host\_\_，无限定符 | √ | x | √ | x |
+| \_\_aicpu\_\_ | x | √ | √ | x |
+| \_\_inline\_\_ | x | √ | x | √ |
+| \_\_cube\_\_ | x | √ | √ | x |
+| \_\_vector\_\_ | x | √ | √ | x |
+| \_\_mix\_\_\(cube,vec\) | x | √ | √ | x |
+| \_\_schedmode\_\_\(mode\) | x | √ | √ | x |
 
 -   **\_\_global\_\_**
 
@@ -426,6 +442,7 @@ __ubuf__ int * __gm__ ptr;
 
 ## 内置常量<a name="section784531219338"></a>
 
+**表3**  内置常量
 | 常量名 | 取值 | 功能 |
 |--------|------|------|
 | constexpr int32_t g_coreType | AscendC::AIC<br>AscendC::AIV | 常量值由框架自动设置，AIC核下，配置为AscendC::AIC，AIV核下，配置为AscendC::AIV。可以通过对该常量值的判断，来实现了AIV与AIC核代码的区分和隔离。功能等同于直接使用ASCEND_IS_AIV、ASCEND_IS_AIC。 |
@@ -438,6 +455,7 @@ __ubuf__ int * __gm__ ptr;
 
 ## 内置变量<a name="section199434523343"></a>
 
+**表4**  内置变量
 | 变量名 | 相关API | 功能 |
 |-------|---------|------|
 | block_num | GetBlockNum | 当前任务配置的核数，用于代码内部的多核逻辑控制等。内置变量block_num的值与通过相关API GetBlockNum获取的值保持一致。 |
@@ -453,6 +471,40 @@ __ubuf__ int * __gm__ ptr;
 <!-- npu="310p" id7 -->
 例如，在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
 <!-- end id7 -->
+
+## API内置数据类型<a name="section1835494915577"></a>
+
+使用以下数据类型时需要导入SIMD API的头文件。
+
+**表5**  API内置数据类型
+
+| 类型 | 数据类型 | 描述 | Size（bit） | 取值范围 |
+| --- | --- | --- | --- | --- |
+| 整型 | int4b_t | 有符号4位整数。 | 4 | [-8, 7] |
+| 布尔型 | bool | 全0代表false，否则代表true。 | 8 | true、false |
+| 整型 | int4x2_t | 两个有符号4位整数打包为一个8比特存储单元。 | 8 | 每个元素的取值范围为[-8, 7]。 |
+| 整型 | int8_t | signed char | 8 | [-128, 127] |
+| 整型 | uint8_t | unsigned char | 8 | [0, 255] |
+| 浮点型 | fp4x2_e2m1_t | 两个由1位符号位、2位指数位和1位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-6, 6] |
+| 浮点型 | fp4x2_e1m2_t | 两个由1位符号位、1位指数位和2位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-7×2<sup>-2</sup>, 7×2<sup>-2</sup>] |
+| 浮点型 | hifloat8_t | 符号位宽为1，指数位宽和尾数位宽由点域编码决定。 | 8 | 点域编码决定数据精度与取值范围。 |
+| 浮点型 | fp8_e8m0_t | 符号位宽为0，指数位宽为8，尾数位宽为0。 | 8 | [2<sup>-127</sup>, 2<sup>127</sup>] |
+| 浮点型 | fp8_e5m2_t | 符号位宽为1，指数位宽为5，尾数位宽为2。 | 8 | [2<sup>13</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>13</sup>] |
+| 浮点型 | fp8_e4m3fn_t | 符号位宽为1，指数位宽为4，尾数位宽为3。 | 8 | [2<sup>6</sup> - 2<sup>9</sup>, 2<sup>9</sup> - 2<sup>6</sup>] |
+| 整型 | int16_t | signed short | 16 | [-32768, 32767] |
+| 整型 | uint16_t | unsigned short | 16 | [0, 65535] |
+| 浮点型 | half | 符号位宽为1，指数位宽为5，尾数位宽为10。 | 16 | [2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>] |
+| 浮点型 | bfloat16_t | 符号位宽为1，指数位宽为8，尾数位宽为7。 | 16 | [2<sup>120</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>120</sup>] |
+| 整型 | int32_t | signed int | 32 | [-2147483648, 2147483647] |
+| 整型 | uint32_t | unsigned int | 32 | [0, 4294967295] |
+| 浮点型 | float | 符号位宽为1，指数位宽为8，尾数位宽为23。 | 32 | [2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
+| 复数型 | complex32 | 实部和虚部都是half类型的复数。 | 64 | 实部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>]，虚部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>] |
+| 整型 | int64_t | signed long | 64 | [-9223372036854775808, 9223372036854775807] |
+| 整型 | uint64_t | unsigned long | 64 | [0, 18446744073709551615] |
+| 浮点型 | double | 符号位宽为1，指数位宽为11，尾数位宽为52。 | 64 | [2<sup>971</sup> - 2<sup>1024</sup>, 2<sup>1024</sup> - 2<sup>971</sup>] |
+| 复数型 | complex64 | 实部和虚部都是float类型的复数。 | 64 | 实部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>]，虚部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
+
+更多详细信息请参考[内置数据类型](../../../api/SIMD-API/basic_api/data_structures/builtin_data_types.md)
 
 ## 核函数（Kernel）配置<a name="核函数配置"></a><a name="section97005415463"></a>
 

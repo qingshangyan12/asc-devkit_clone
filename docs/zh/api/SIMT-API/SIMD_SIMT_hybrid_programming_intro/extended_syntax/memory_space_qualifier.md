@@ -1,8 +1,8 @@
-# 内存空间限定符
+# 地址空间限定符
 
 ## \_\_gm\_\_
 
-在SIMD与SIMT混合编程中使用内存空间限定符\_\_gm\_\_来表示分配于设备侧全局内存的对象，全局内存对象可以声明为标量、用户自定义结构体的指针。
+在SIMD与SIMT混合编程中使用地址空间限定符\_\_gm\_\_来表示分配于设备侧全局内存的对象，全局内存对象可以声明为标量、用户自定义结构体的指针。
 
 ```cpp
 __gm__ int *var; // var points to an array of int elements
@@ -32,4 +32,3 @@ __gm__ foo_t *info; // info points to an array of foo_t elements
     ```
 
     动态内存的实际内存大小需要在核函数（Kernel）启动时配置。
-
