@@ -348,7 +348,6 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_atomic_min_int16](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int16_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_atomic_none](simd_atomic/asc_set_atomic_none.md) | 清空原子操作的状态。 |
 | [asc_set_store_atomic_config_v1](simd_atomic/asc_set_store_atomic_config_v1.md) | 设置原子操作启用位与原子操作类型的值，适用于Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。 |
-| [asc_set_atomic_add_int（废弃）](simd_atomic/asc_set_atomic_add_int_deprecated.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。 |
 | [asc_set_atomic_max_int（废弃）](simd_atomic/asc_set_atomic_max_int_deprecated.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。 |
 | [asc_set_atomic_min_int（废弃）](simd_atomic/asc_set_atomic_min_int_deprecated.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_store_atomic_config_v2（废弃）](simd_atomic/asc_set_store_atomic_config_v2_deprecated.md) | 设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。 |
@@ -396,6 +395,8 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 | [asc_loadunalign_pre](reg/reg_load/asc_loadunalign_pre.md) | 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](reg/reg_load/asc_loadunalign.md)接口使用。 |
 | [asc_storealign](reg/reg_store/asc_storealign.md) | reg计算数据搬运接口，从矢量数据寄存器连续对齐搬出到UB，NORM搬出模式。 |
 | [asc_scatter](reg/reg_store/asc_scatter.md) | 根据索引值index将源操作数src中的元素分散到目的操作数dst中。 |
+| [asc_squeeze_and_storeunalign](reg/reg_store/asc_squeeze_and_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器中筛选出有效元素后按照连续非32B对齐的起始地址连续搬出到UB的场景。 |
+| [asc_squeeze_and_storeunalign_finalize](reg/reg_store/asc_squeeze_and_storeunalign_finalize.md) | reg计算数据搬运接口，适用于从矢量数据寄存器中筛选出有效元素后按照连续非32B对齐的起始地址连续搬出到UB的尾块场景。 |
 | [asc_store](reg/reg_store/asc_store.md) | reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，应尽量避免使用该接口。 |
 | [asc_storealign_1st](reg/reg_store/asc_storealign_1st.md) | reg计算数据搬运接口，忽略mask向dst搬出src第一个元素。 |
 | [asc_storealign_1st_postupdate](reg/reg_store/asc_storealign_1st_postupdate.md) | reg计算数据搬运接口，忽略mask向dst搬出src第一个元素，启用Post Update。 |
@@ -421,6 +422,8 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 | [asc_storealign_v4（废弃）](reg/reg_store/asc_storealign_v4_deprecated.md) | reg计算数据搬运接口，通过int32_t传入偏移并由硬件自动执行Post Update。 |
 | [asc_storealign_v5（废弃）](reg/reg_store/asc_storealign_v5_deprecated.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB，使用repeat stride模式。 |
 | [asc_scatter（废弃）](reg/reg_store/asc_scatter_deprecated.md) | 根据索引值index将源操作数src中的元素分散到目的操作数dst中。 |
+| [asc_storeunalign_post（废弃）](reg/reg_store/asc_storeunalign_post_deprecated.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的尾块场景。 |
+| [asc_storeunalign_postupdate（废弃）](reg/reg_store/asc_storeunalign_postupdate_deprecated.md) | reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 
 ## Reg矢量计算
 
@@ -460,7 +463,7 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_madd](reg/compound_compute/asc_madd.md) | madd（multiply-add），对源操作数执行逐元素乘法和加法。 |
 | [asc_and](reg/logic_compute/asc_and.md) | 对掩码寄存器操作：根据mask对源操作数src0、src1的有效bit进行逻辑与运算，得到新的掩码寄存器。 |
 | [asc_not](reg/logic_compute/asc_not.md) | 执行矢量非运算。 |
-| [asc_or](reg/logic_compute/asc_or.md) | 对源操作数src0和src1进行或（|）运算，将结果写入目的操作数dst。 |
+| [asc_or](reg/logic_compute/asc_or.md) | 对源操作数src0和src1进行或（\|）运算，将结果写入目的操作数dst。 |
 | [asc_shiftleft](reg/logic_compute/asc_shiftleft.md) | 根据掩码mask对输入数据src0，按照src1对应元素进行左移操作，完成后将结果写入dst中。 |
 | [asc_shiftleft_scalar](reg/logic_compute/asc_shiftleft_scalar.md) | 根据mask对源操作数src执行左移，左移的位数由输入参数value决定，将结果写入目的操作数dst。 |
 | [asc_shiftright](reg/logic_compute/asc_shiftright.md) | 根据掩码mask对输入数据src0，按照src1对应元素进行右移操作，完成后将结果写入dst中。 |
@@ -480,7 +483,7 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_ne_scalar](reg/compare_and_select/asc_ne_scalar.md) | src中的每个元素逐个与标量value比较大小，如果src_i != value，则输出结果dst对应比特位为1，否则为0。 |
 | [asc_select](reg/compare_and_select/asc_select.md) | 根据mask的比特位值，从源操作数src0、src1中选择元素，得到目的操作数dst。 |
 | [asc_squeeze](reg/compare_and_select/asc_squeeze.md) | 将src中被mask选择的有效元素依次复制到dst中，有效元素从低到高连续排列，剩余位置元素置为0。 |
-| [asc_squeeze_with_status](reg/compare_and_select/asc_squeeze_with_status.md) | 将src中被mask选择的有效元素依次复制到dst，并将有效数据大小保存至AR寄存器。 |
+| [asc_squeeze_with_status（废弃）](reg/compare_and_select/asc_squeeze_with_status_deprecated.md) | 将src中被mask选择的有效元素依次复制到dst，并将有效数据大小保存至AR寄存器。请使用[asc_squeeze_and_storeunalign](reg/reg_store/asc_squeeze_and_storeunalign.md)替换。 |
 | [asc_bfloat162float](reg/data_type_convert/asc_bfloat162float.md) | 将bfloat16_t类型转换为float类型，无舍入模式。 |
 | [asc_bfloat162half](reg/data_type_convert/asc_bfloat162half.md) | 将bfloat16_t类型转换为half类型，并支持多种舍入模式和饱和/非饱和模式。 |
 | [asc_bfloat162int32](reg/data_type_convert/asc_bfloat162int32.md) | 将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式。 |
@@ -533,14 +536,17 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_unpack](reg/data_compress/asc_unpack.md) | 矢量解包操作。 |
 | [asc_unsqueeze](reg/data_compress/asc_unsqueeze.md) | 根据mask进行解压缩，将生成的数据输出到dst。 |
 | [asc_duplicate](reg/data_fill/asc_duplicate.md) | 根据mask将源操作数src的最低位元素填充到目的操作数dst。 |
+| [asc_duplicate_merge](reg/data_fill/asc_duplicate_merge.md) | 根据mask将源操作数src的最低位元素填充到目的操作数dst，dst中未被mask筛选的元素保留原值。 |
 | [asc_duplicate_scalar](reg/data_fill/asc_duplicate_scalar.md) | 根据mask将value填充到目的操作数dst。 |
+| [asc_duplicate_scalar_merge](reg/data_fill/asc_duplicate_scalar_merge.md) | 根据mask将value填充到目的操作数dst，dst中未被mask筛选的元素保留原值。 |
 | [asc_deintlv](reg/data_rearrange/asc_deintlv.md) | 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。 |
 | [asc_intlv](reg/data_rearrange/asc_intlv.md) | 将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。 |
 | [asc_cumulative_histogram](reg/histogram_compute/asc_cumulative_histogram.md) | 对直方图数据进行累计统计。 |
 | [asc_frequency_histogram](reg/histogram_compute/asc_frequency_histogram.md) | 对直方图数据进行频率统计。 |
 | [asc_arange](reg/index_operate/asc_arange.md) | 以传入的value为起始值，生成递增/递减的索引，并将生成的索引保存在dst中。 |
 | [asc_mem_bar](reg/sync_control/asc_mem_bar.md) | Reg计算宏函数内不同流水线之间的同步指令。 |
-| [asc_clear_ar_spr](reg/system_variables_access/asc_clear_ar_spr.md) | 对AR寄存器进行清理，AR寄存器通常由[asc_squeeze_with_status](reg/compare_and_select/asc_squeeze_with_status.md)接口使用。 |
+| [asc_squeeze_and_storeunalign_init](reg/system_variables_access/asc_squeeze_and_storeunalign_init.md) | 对AR特殊寄存器进行清零操作。AR寄存器用于配合[asc_squeeze_and_storeunalign](../c_api/reg/reg_store/asc_squeeze_and_storeunalign.md)及[asc_squeeze_and_storeunalign_finalize](../c_api/reg/reg_store/asc_squeeze_and_storeunalign_finalize.md)使用。 |
+| [asc_clear_ar_spr（废弃）](reg/system_variables_access/asc_clear_ar_spr_deprecated.md) | 对AR寄存器进行清理。请使用[asc_squeeze_and_storeunalign_init](reg/system_variables_access/asc_squeeze_and_storeunalign_init.md)替换。 |
 | [asc_create_iter_reg（废弃）](reg/reg_data_types/asc_create_iter_reg_deprecated.md) | 该接口已废弃，请使用asc_update_addr_reg实现此功能。 |
 | [asc_muls（废弃）](reg/arithmetic_compute/asc_muls_deprecated.md) | 对源操作数src和value进行乘法运算再按照数据类型转换的ROUND舍入模式转成half类型，根据mask将结果写入目的操作数dst。 |
 | [asc_exp_sub（废弃）](reg/compound_compute/asc_exp_sub_deprecated.md) | 将src0与src1相减，差值作为e的指数计算。 |
@@ -575,11 +581,18 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_load_l2_cache_mode](enum/asc_load_l2_cache_mode.md) | 表示数据从GM搬运到UB时的L2 cache策略。 |
 | [asc_store_l2_cache_mode](enum/asc_store_l2_cache_mode.md) | 表示数据从UB搬运到GM时的L2 cache策略。 |
 
+## 废弃接口
+
+**表14** 废弃接口列表
+| 废弃接口 | 说明 |
+| [asc_abs_sync（废弃）](deprecated_interface/asc_abs_sync_deprecated.md) | 按元素取绝对值同步接口。 |
+| [asc_set_atomic_add_int（废弃）](deprecated_interface/asc_set_atomic_add_int_deprecated.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。 |
+
 ## 试验接口
 
 本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
 
-**表14**  试验接口列表
+**表15**  试验接口列表
 
 | API名称 | 说明 |
 | --- | --- |
