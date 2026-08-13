@@ -141,6 +141,8 @@ Mc2CcTilingConfig / Mc2CcTiling：生成并保存 mc2 初始化参数和 AllRedu
                     -> HcclGetThread
                     -> HcclGetChannel
                 -> HcclMemcpyCtxHostToDevice
+        -> 如果GetOpParamResCtx失败 and forcedAlgAccepted
+          -> 回退到select
       -> HcclAllocOpResCtx：保存基础 `OpParam` 和序列化资源上下文，生成 mc2 `OpResCtx`。
 ```
 
@@ -235,40 +237,55 @@ AscendC::Hccl::Wait：等待完成计数达到预期值，确保 AllReduce 输�
 
 ```text
 MC2_ALG_INFO
+MC2_FORCE_ALG
 AllReduceAutoSelector
 InsAllReduceMesh1DTwoShot
 InsV2AllReduceSoleExecutor
 CollAlgExecRegistryV2::GetAlgExec
 MC2_OPEN_DIAG
 MC2_BATCH
+HostCannBridge
+CannBridge
 ```
 
-### 7.1 Host 侧算法选择
+### 7.1 强制算法与 CANNBridge 路由判断
 
-首先检查 selector 是否选择标准 TwoShot：
+本迁移通过 `Mc2CcTilingInner::algConfig` 强制指定 `InsAllReduceMesh1DTwoShot`，Host 侧首先进入 `TryForcedAlgAndPrepareEngine`，不经过默认 selector。强制算法生效时应出现：
 
 ```text
-[AllReduceAutoSelector][SelectAicpuAlgo] Algo match [InsAllReduceMesh1DTwoShot]
+[MC2_FORCE_ALG] accepted, opType[...], algName[InsAllReduceMesh1DTwoShot].
 ```
 
-该日志说明当前拓扑满足单层 Mesh1D，或者满足 Mesh 链路全连接的单层 PCIE mixed Mesh1DClos。若未出现，检查是否存在以下拒绝日志：
+该日志只说明强制算法通过资源能力检查，不能单独证明是否走 CANNBridge。需要结合 `CheckForcedAlgResource -> GetAlgExecutorForOp` 的 executor 查询日志判断。
+
+Host 侧走 CANNBridge 时会出现：
 
 ```text
-[AllReduceAutoSelector] InsAllReduceMesh1DTwoShot only supports a single network level, actual[...]
-[AllReduceAutoSelector] topology[...] does not match Mesh1D TwoShot.
+[HostCannBridge][GetAlgExec] opType[...] algName[InsAllReduceMesh1DTwoShot] executor[...]
 ```
 
-随后检查本地 V2 registry 是否能够获取对应 executor：
+Host 侧走本地 non-CANNBridge registry 时会出现：
 
 ```text
 [asc][AlgoExecute][CollAlgExecRegistryV2::GetAlgExec] hit, opType[...], algName[InsAllReduceMesh1DTwoShot], executor[...]
 ```
 
-不能出现以下日志：
+一次强制算法资源初始化中可能出现两次相同的 `GetAlgExec` 日志：第一次来自 `CheckForcedAlgResource` 的资源能力检查，第二次来自 `GetOpParamResCtx` 的正式资源申请。两次都必须命中本地 `mc2_ops_hccl::CollAlgExecRegistryV2`，不能出现对应算法的 `[HostCannBridge][GetAlgExec]`。
+
+如果出现以下日志，说明强制算法未最终生效，后续会恢复默认 selector：
 
 ```text
-[asc][AlgoExecute][CollAlgExecRegistryV2::GetAlgExec] miss, opType[...], algName[InsAllReduceMesh1DTwoShot]
-Fail to find executor for algName[InsAllReduceMesh1DTwoShot]
+[MC2_FORCE_ALG] fallback, ...
+[MC2_FORCE_ALG] fallback to default selector, ...
+[MC2_FORCE_ALG] fallback to default selector after resource failure, ...
+```
+
+回退后若再出现以下日志，表示默认 selector 走了 CANNBridge；这不能作为强制 TwoShot 路径成功的证据：
+
+```text
+[asc][AlgoSelect][ExecuteSelector::Run] before SelectViaCann, ...
+[HostCannBridge][Select] before CANN ExecuteSelector::Run, ...
+[HostCannBridge][Select] CANN ExecuteSelector::Run success, ...
 ```
 
 ### 7.2 Host 侧资源计算
