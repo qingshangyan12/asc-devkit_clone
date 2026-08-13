@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/utils/utils_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -22,10 +22,11 @@
 #ifndef IMPL_TENSOR_API_UTILS_UTILS_IMPL_H
 #define IMPL_TENSOR_API_UTILS_UTILS_IMPL_H
 
+#include "impl/tensor_api/utils/macro_impl.h"
 #include "include/tensor_api/utils/utils.h"
+#include "impl/tensor_api/legacy/legacy_utils.h"
 #include "impl/tensor_api/utils/constant_impl.h"
 #include "impl/tensor_api/utils/extra_impl.h"
-#include "impl/tensor_api/utils/macro_impl.h"
 #include "impl/tensor_api/utils/map_impl.h"
 #include "impl/tensor_api/utils/location_impl.h"
 

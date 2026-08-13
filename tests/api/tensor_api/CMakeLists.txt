@@ -12,8 +12,6 @@ cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
 find_package(tikicpulib REQUIRED)
 
-add_subdirectory(ascendc_tensor_api_header_checker)
-
 set(ASCENDC_UT_PRODUCT_TYPE_LIST
     NPU_ARCH_3510_AIC
     NPU_ARCH_3510_AIV
@@ -94,3 +92,5 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         TASK_NUM 1
     )
 endforeach()
+
+add_subdirectory(runtime_validation)
