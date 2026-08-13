@@ -32,7 +32,10 @@ HcclResult InheritKfcServerKernelArg(
         srcName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isReduceScatter =
         srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+<<<<<<< HEAD
     const bool isAlltoAll = srcName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
+=======
+>>>>>>> 43f5e8505 (ccuAllReduce迁移修改)
     const bool isAllReduce =
         srcName == "CcuKernelAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
     if (isAllGatherNhr) {
@@ -45,7 +48,11 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->subCommRanks = srcArg->subCommRanks;
         kfcArg->nhrStepInfoVector = srcArg->stepInfoVector;
         kfcArg->nhrRank2ChannelIdx = srcArg->rank2ChannelIdx;
+<<<<<<< HEAD
     } else if (isAllGather || isReduceScatter || isAlltoAll || isAllReduce) {
+=======
+    } else if (isAllGather || isReduceScatter || isAllReduce) {
+>>>>>>> 43f5e8505 (ccuAllReduce迁移修改)
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;
