@@ -20,6 +20,7 @@ constexpr int POST_SYNC_ID = 3;
 constexpr int CKE_IDX_0 = 0;
 
 constexpr uint32_t BIT_NUM_PER_CKE = 16;
+constexpr uint32_t REDUCE_MS_CNT = 8;
 constexpr uint32_t REDUCE_SCATTER_LOOP_COUNT = 16;
 constexpr uint32_t REDUCE_SCATTER_GROUP_REDUCE_MAX_PIECE_CNT = 8;
 constexpr uint32_t RS_UNROLL_NUM = 16;
@@ -67,10 +68,23 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
 static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
     uint32_t channelIdx = 0;
-    if (ctx.channelCount == 0) {
-        HCCL_ERROR("[KfcKernelReduceScatterMesh1DMem2Mem] channels is empty!");
+    if (ctx.rankSize == 0 || ctx.rankId >= ctx.rankSize || ctx.channelCount + 1 != ctx.rankSize) {
+        HCCL_ERROR(
+            "[KfcKernelReduceScatterMesh1DMem2Mem] invalid rank/channel, rankSize[%u], rankId[%u], channelCount[%u]",
+            ctx.rankSize, ctx.rankId, ctx.channelCount);
         return CcuResult::CCU_E_INTERNAL;
     }
+
+    // Keep the V1 LoopGroup configuration identical to hccl. In particular,
+    // msInterleave is eight while msPerLoop remains the AllocGoResource
+    // default of one, so memSlice stays one CCU memory slice.
+    ctx.moConfig.loopCount = REDUCE_SCATTER_LOOP_COUNT;
+    ctx.moConfig.msInterleave = REDUCE_MS_CNT;
+    ctx.moConfig.memSlice = CCU_MS_SIZE;
+    HCCL_INFO(
+        "[CCU_RS_KFC_DIAG] InitResource rank[%u/%u], channels[%u], loopCount[%u], msInterleave[%u], memSlice[%llu]",
+        ctx.rankId, ctx.rankSize, ctx.channelCount, ctx.moConfig.loopCount, ctx.moConfig.msInterleave,
+        static_cast<unsigned long long>(ctx.moConfig.memSlice));
 
     ctx.input.resize(ctx.rankSize);
     ctx.scratch.resize(ctx.rankSize);
@@ -91,6 +105,9 @@ static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
     uint32_t eventNum = (ctx.rankSize + BIT_NUM_PER_CKE - 1) / BIT_NUM_PER_CKE;
     ctx.events.resize(RS_UNROLL_NUM * eventNum);
     ctx.constVar1 = 1;
+    HCCL_INFO(
+        "[CCU_RS_KFC_DIAG] InitResource eventNum[%u], totalEvents[%u], externalScratchSlices[%u]", eventNum,
+        RS_UNROLL_NUM * eventNum, ctx.rankSize);
     return CCU_SUCCESS;
 }
 
@@ -117,11 +134,15 @@ static CcuResult LoadArgs(
     ctx.goSize.loopParam = goSizeLoopParam;
     ctx.goSize.parallelParam = goSizeParallelParam;
     ctx.goSize.residual = goSizeResidual;
+    HCCL_INFO(
+        "[CCU_RS_KFC_DIAG] LoadArgs rank[%u], compressedParams[normal,last,scratchStride,repeat,go0..3] loaded",
+        ctx.rankId);
     return CCU_SUCCESS;
 }
 
 static CcuResult PreSync(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
+    HCCL_DEBUG("[CCU_RS_KFC_DIAG] PreSync begin rank[%u], channels[%u]", ctx.rankId, ctx.channelCount);
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         CCU_CHK_RET(ccu::WriteVariableWithNotify(
             ctx.channels[i], ctx.input[ctx.rankId], INPUT_XN_ID, CKE_IDX_0, 1 << INPUT_XN_ID));
@@ -134,17 +155,20 @@ static CcuResult PreSync(KfcReduceScatterMesh1DMem2MemContext& ctx)
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, allBit);
     }
+    HCCL_DEBUG("[CCU_RS_KFC_DIAG] PreSync registered rank[%u]", ctx.rankId);
     return CCU_SUCCESS;
 }
 
 static CcuResult PostSync(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
+    HCCL_DEBUG("[CCU_RS_KFC_DIAG] PostSync begin rank[%u], channels[%u]", ctx.rankId, ctx.channelCount);
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         ccu::NotifyRecord(ctx.channels[i], CKE_IDX_0, 1 << POST_SYNC_ID);
     }
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, 1 << POST_SYNC_ID);
     }
+    HCCL_DEBUG("[CCU_RS_KFC_DIAG] PostSync registered rank[%u]", ctx.rankId);
     return CCU_SUCCESS;
 }
 
@@ -188,7 +212,7 @@ static CcuResult DoReduceScatterRead(KfcReduceScatterMesh1DMem2MemContext& ctx, 
     uint32_t numEventsPerIter = (ctx.rankSize + BIT_NUM_PER_CKE - 1) / BIT_NUM_PER_CKE;
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
         uint32_t eventIdx = unrollIdx * numEventsPerIter + rankIdx / BIT_NUM_PER_CKE;
-        uint32_t rankMask = 1U << (rankIdx % BIT_NUM_PER_CKE);
+        uint16_t rankMask = static_cast<uint16_t>(1U << (rankIdx % BIT_NUM_PER_CKE));
         if (rankIdx == ctx.rankId) {
             if (ctx.rankSize <= REDUCE_SCATTER_GROUP_REDUCE_MAX_PIECE_CNT) {
                 ccu::EventRecord(ctx.events[eventIdx], rankMask);
@@ -238,7 +262,7 @@ static CcuResult DoReduceScatterWait(KfcReduceScatterMesh1DMem2MemContext& ctx, 
         if (ctx.rankSize % BIT_NUM_PER_CKE != 0 && i == (numEventsPerIter - 1)) {
             sigNum = ctx.rankSize % BIT_NUM_PER_CKE;
         }
-        uint32_t allBit = (1U << sigNum) - 1U;
+        uint16_t allBit = static_cast<uint16_t>((1U << sigNum) - 1U);
         ccu::EventWait(ctx.events[eventIdx], allBit);
     }
     return CCU_SUCCESS;
@@ -249,6 +273,9 @@ static CcuResult CreateReduceLoopV1(KfcReduceScatterMesh1DMem2MemContext& ctx)
     // Match hccl V1: memSlice is one CCU MS (4096 bytes). The 8-way value
     // belongs to msInterleave, not msPerLoop.
     CCU_CHK_RET(AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, REDUCE_SCATTER_LOOP_COUNT));
+    HCCL_INFO(
+        "[CCU_RS_KFC_DIAG] LoopResource allocated rank[%u], eventCount[%u], bufCount[%u]", ctx.rankId,
+        ctx.moRes.eventCount, ctx.moRes.bufCount);
     if (ctx.IsLoopEntityRegistered("reduceScatterLocalReduce")) {
         return CCU_SUCCESS;
     }
@@ -404,8 +431,10 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
     myOutput.token = ctx.token[ctx.rankId];
 
     if (ctx.rankSize <= REDUCE_SCATTER_GROUP_REDUCE_MAX_PIECE_CNT) {
+        HCCL_INFO("[CCU_RS_KFC_DIAG] Reduce path LoopGroupV1 rank[%u], rankSize[%u]", ctx.rankId, ctx.rankSize);
         CCU_CHK_RET(ReduceLoopGroupV1(ctx, myOutput, ctx.myInput, ctx.scratchMem));
     } else {
+        HCCL_INFO("[CCU_RS_KFC_DIAG] Reduce path Pairwise rank[%u], rankSize[%u]", ctx.rankId, ctx.rankSize);
         CCU_CHK_RET(PairwiseLocalReduce(ctx, myOutput, ctx.scratchMem));
     }
     return CCU_SUCCESS;
@@ -413,6 +442,7 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 
 static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
+    HCCL_INFO("[CCU_RS_KFC_DIAG] one-round pipeline begin rank[%u]", ctx.rankId);
     InitReduceScatterAddr(ctx);
     ctx.waitRepeatNum = ctx.repeatNum;
     ctx.readRepeatNum = ctx.repeatNum;
@@ -434,6 +464,7 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
 
     ResetReduceScatterAddr(ctx);
     CCU_CHK_RET(DoReduceScatter(ctx));
+    HCCL_INFO("[CCU_RS_KFC_DIAG] one-round pipeline registered rank[%u]", ctx.rankId);
     return CCU_SUCCESS;
 }
 
@@ -446,6 +477,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
 {
     KfcReduceScatterMesh1DMem2MemContext ctx;
+    InitCcuKernelCtxBase(ctx);
     ctx.channels = channels;
     ctx.channelCount = channelCount;
     ctx.rankSize = rankSize;
@@ -456,7 +488,6 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
         ctx.outputDataType = dataType;
     }
     ctx.reduceOp = reduceType;
-    ctx.resourceAllocated = false;
     ctx.flag = 0;
     ctx.constVar1 = 1;
 
@@ -471,6 +502,9 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     } else {
         ctx.sliceSize = ctx.normalSliceSize;
     }
+    HCCL_INFO(
+        "[CCU_RS_KFC_DIAG] Kernel start rank[%u/%u], channels[%u], dataType[%d], outputType[%d], reduceOp[%d]",
+        rankId, rankSize, channelCount, dataType, outputType, reduceType);
     CCU_CHK_RET(PreSync(ctx));
     // Match hccl: zero-sized slices only participate in the surrounding
     // synchronization and must not register zero-length CCU operations.
@@ -479,6 +513,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
         CCU_CHK_RET(DoRepeatReduceScatter(ctx));
     }
     CCU_CHK_RET(PostSync(ctx));
+    HCCL_INFO("[CCU_RS_KFC_DIAG] Kernel end rank[%u]", rankId);
     return CCU_SUCCESS;
 }
 

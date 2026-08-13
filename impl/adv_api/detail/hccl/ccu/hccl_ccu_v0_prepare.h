@@ -258,6 +258,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     CalcGoSize(
         (ccuParam_.rankId == ccuParam_.rankNum - 1) ? lastSliceSize : normalSliceSize, loopCount,
         CCU_MEMSLICE_SIZE, &xnData_[9]);
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "[CCU_RS_KFC_DIAG] rank[%u/%u], count[%llu], dtypeSize[%llu], inputOffset[%llu], normal[%llu], last[%llu], "
+        "scratchStride[%llu], repeat[%llu], go[%llu,%llu,%llu,%llu]",
+        ccuParam_.rankId, ccuParam_.rankNum, commParam->count, dataSize, rankSliceOffset, normalSliceSize,
+        lastSliceSize, ccuParam_.rankNum * normalSliceSize, UINT64_MAX - 1, xnData_[9], xnData_[10], xnData_[11],
+        xnData_[12]);
 }
 } // namespace AscendC
 
