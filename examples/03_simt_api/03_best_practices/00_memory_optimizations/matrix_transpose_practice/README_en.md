@@ -19,8 +19,8 @@ This example uses matrix transpose to demonstrate memory access optimization str
 │   ├── figures                     // Image resources for README
 │   ├── CMakeLists.txt              // Build project file
 │   ├── matrix_transpose.asc        // SIMT matrix transpose optimization path implementation
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Example Description
@@ -376,8 +376,6 @@ The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in F
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
-
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | 0 | 6.262 | 4.971 | 8201.7 | 4.516 | 0.909 | 0.443 | 0.089 |
@@ -440,7 +438,7 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy verification passed.
   ```
 
-## Performance Analysis
+### Performance Analysis
 
 Use the `msOpProf` tool to collect detailed performance data:
 
@@ -463,29 +461,29 @@ After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generate
 └── visualize_data.bin         # MindStudio Insight presentation file
 ```
 
-## Simulation Tuning
+- Simulation performance collection
 
-Use `msopprof simulator` to perform simulation performance analysis and generate visualized instruction pipeline diagrams. The commands are as follows:
+  Use `msopprof simulator` to perform simulation performance analysis and generate visualized instruction pipeline diagrams. The commands are as follows:
 
-```bash
-SCENARIO_NUM=7                                                                     # Select the execution scenario, options 0-7
-mkdir -p build && cd build;                                                        # Create and enter the build directory
-cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
-msopprof simulator --soc-version=<soc_version> ./matrix_transpose
-```
+  ```bash
+  SCENARIO_NUM=7                                                                     # Select the execution scenario, options 0-7
+  mkdir -p build && cd build;                                                        # Create and enter the build directory
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
+  msopprof simulator --soc-version=<soc_version> ./matrix_transpose
+  ```
 
-> Before using simulation tuning, add the `-g` compilation option to `CMakeLists.txt` to generate debug information. This allows the simulator to collect instruction pipeline diagrams. For how to obtain `soc_version` and for more simulation tuning information, see the [simulator sample](../../../01_utilities/07_simulator).
+  > Before using simulation tuning, add the `-g` compilation option to `CMakeLists.txt` to generate debug information. This allows the simulator to collect instruction pipeline diagrams. For how to obtain `soc_version` and for more simulation tuning information, see the [simulator sample](../../../01_utilities/07_simulator).
 
-After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the current directory. The artifact structure is as follows:
+  After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the current directory. The artifact structure is as follows:
 
-```text
-OPPROF_{timestamp}_XXX/
-├── dump                    // Raw performance data, which does not require user attention
-└── simulator
-    ├── core*.veccore*/     // Simulation instruction pipeline diagram files of each vector core
-    └── visualize_data.bin  // MindStudio Insight presentation file
-```
+  ```text
+  OPPROF_{timestamp}_XXX/
+  ├── dump                    // Raw performance data, which does not require user attention
+  └── simulator
+      ├── core*.veccore*/     // Simulation instruction pipeline diagram files of each vector core
+      └── visualize_data.bin  // MindStudio Insight presentation file
+  ```
 
-After the command completes, open `visualize_data.bin` in **MindStudio Insight** to view the visualized instruction pipeline diagrams.
+  After the command completes, open `visualize_data.bin` in **MindStudio Insight** to view the visualized instruction pipeline diagrams.
 
 For more information about how to use `msOpProf`, see [MindStudio Tool Tuning (msOpProf) Quick Start](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md).

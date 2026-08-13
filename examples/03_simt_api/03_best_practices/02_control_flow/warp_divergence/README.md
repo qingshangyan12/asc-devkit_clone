@@ -15,14 +15,14 @@
 
 - \>= CANN 9.1.0
 
-## 目录结构
+## 目录结构介绍
 
 ```text
 ├── warp_divergence
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── spmv.asc                    // SIMT SpMV 样例实现
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -163,8 +163,6 @@ if (lane_id == 0) {
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
-
 **综合优化效果**：
 - 从Case 1基线版本到Case 2优化版本，Task Duration从81.811μs降低到31.772μs，耗时下降约61.1%
 
@@ -215,7 +213,7 @@ if (lane_id == 0) {
   [Success] Case accuracy verification passed.
   ```
 
-## 性能数据获取
+### 性能分析
 
   使用 `msopprof` 工具获取单个组件上的性能数据：
 

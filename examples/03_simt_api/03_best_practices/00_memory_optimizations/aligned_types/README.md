@@ -8,18 +8,19 @@
 
   - Ascend 950PR/Ascend 950DT
 
-## 支持的 CANN 软件版本
+## 支持的CANN软件版本
 
   - \>= CANN 9.1.0
 
-## 目录结构
+## 目录结构介绍
 
-  ```
-  ├── aligned_types
-  │   ├── aligned_types.asc      // SIMT实现&调用样例
-  │   ├── CMakeLists.txt         // cmake编译文件
-  │   └── README.md
-  ```
+```text
+├── aligned_types
+│   ├── aligned_types.asc      // SIMT实现&调用样例
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── README.md              // 样例说明文档
+│   └── README_en.md           // 英文样例说明文档
+```
 
 ## 样例描述
 
