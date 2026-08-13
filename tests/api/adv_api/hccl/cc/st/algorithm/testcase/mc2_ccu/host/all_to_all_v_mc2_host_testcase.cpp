@@ -157,6 +157,15 @@ TEST_F(CcuMc2AllToAllVTest, SelectsAllToAllVMesh1D)
     EXPECT_EQ(GetCcuKernelRegisterCount(), 1U);
 }
 
+TEST_F(CcuMc2AllToAllVTest, InitializesReduceTypeForKfcKernelQuery)
+{
+    Mc2CcTilingInner tiling = BuildAllToAllVTiling();
+    OpParam opParam{};
+
+    ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reduce_type", &tiling, opParam), HCCL_SUCCESS);
+    EXPECT_EQ(opParam.reduceType, HcclReduceOp::HCCL_REDUCE_SUM);
+}
+
 TEST_F(CcuMc2AllToAllVTest, MultipleAllToAllVConfigsFallBackFromMc2Ccu)
 {
     Mc2CcTilingInner fp16 = BuildAllToAllVTiling(HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_FP16);
