@@ -50,7 +50,22 @@ __aicore__ inline void asc_sync_notify(pipe_t pipe,
 |---|---|---|
 | pipe | 输入 | 源流水类型，即“等待哪条流水的前序指令完成”。取值范围为`pipe_t`枚举：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。 |
 | tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。 |
-| id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`event_t`枚举类型：<pre>typedef enum {<br>    EVENT_ID0 = 0,<br>    EVENT_ID1 = 1,<br>    EVENT_ID2 = 2,<br>    EVENT_ID3 = 3,<br>    EVENT_ID4 = 4,<br>    EVENT_ID5 = 5,<br>    EVENT_ID6 = 6,<br>    EVENT_ID7 = 7<br>} event_t;</pre> |
+| id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。 |
+
+`event_t`枚举定义如下：
+
+```c
+typedef enum {
+    EVENT_ID0 = 0,
+    EVENT_ID1 = 1,
+    EVENT_ID2 = 2,
+    EVENT_ID3 = 3,
+    EVENT_ID4 = 4,
+    EVENT_ID5 = 5,
+    EVENT_ID6 = 6,
+    EVENT_ID7 = 7
+} event_t;
+```
 
 ## 返回值说明
 
@@ -62,11 +77,11 @@ PIPE_S
 
 ## 约束说明
 
-- **`pipe`与`tpipe`并非任意组合，两者组合的取值存在范围限制**：针对不同产品，AIC与AIV中支持的组合不同，具体请参考[核内同步分类](intra_core_sync_overview.md#核内同步分类)中的表2和表3。
+- **`pipe`与`tpipe`并非任意组合，两者组合的取值存在限制**：针对不同产品，AIC与AIV中支持的组合不同，具体请参考[核内同步分类](intra_core_sync_overview.md#核内同步分类)中的[表2](intra_core_sync_overview.md#aic_intra_core_sync_combinations)和[表3](intra_core_sync_overview.md#aiv_intra_core_sync_combinations)。
 - 相同源流水、相同目标流水、相同id下，连续使用`asc_sync_notify`会引发未定义行为。
 - 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致，否则同步关系不成立。
 - `pipe`与`tpipe`均不可取`PIPE_ALL`，否则触发异常。
-- 每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。
+- 每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。
 - 本接口不会对 `pipe`与`tpipe`两条流水的后续指令不产生阻塞效果。
 
 ## 调用示例

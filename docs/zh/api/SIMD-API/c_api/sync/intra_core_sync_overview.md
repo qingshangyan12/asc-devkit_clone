@@ -1,26 +1,26 @@
-# 核内同步能力概述<a name="ZH-CN_TOPIC_0000002555621170"></a>
+# 核内同步能力概述
 
-## 为什么需要核内同步<a name="zh-cn_topic_0000002542725361_section199075142046"></a>
+## 为什么需要核内同步
 
 AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行的方式运行，在读写同一存储资源时可能存在数据依赖关系。为确保数据一致性及计算正确性，需通过同步控制协调操作时序。
-
-<!-- npu="A3,910b" id1 -->
-
-针对[NPU架构2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
-
-**图1**  NPU架构2201（Atlas A2/Atlas A3）架构图    <a name="zh-cn_topic_0000002542725361_fig11732135516285"></a>    
-![](../../../figures/atlas_a2_a3_architecture.png)
-
-<!-- end id1 -->
 
 <!-- npu="950" id2 -->
 
 针对[NPU架构3510](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
 
-**图2**  NPU架构3510（Ascend 950PR/950DT）架构图    <a name="zh-cn_topic_0000002542725361_fig31512113433"></a>    
+**图1**  NPU架构3510架构图    
 ![](../../../figures/ascend_950pr_950dt_architecture.png "Ascend_950PR_950DT_硬件架构图")
 
 <!-- end id2 -->
+
+<!-- npu="A3,910b" id1 -->
+
+针对[NPU架构2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
+
+**图2**  NPU架构2201架构图    
+![](../../../figures/atlas_a2_a3_architecture.png)
+
+<!-- end id1 -->
 
 下图示例描述了一个常见的Vector计算数据流：
 
@@ -28,15 +28,15 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 2. 进行计算；
 3. 然后再通过DMA执行单元将计算结果从Local Memory搬出到Global Memory。
 
-**图3**  Vector计算数据流示意图
+**图3**  Vector计算数据流示意图    
 ![](../../../figures/vector_compute_data_flow.png "Vector_计算_数据流示意图")
 
-四个执行单元Scalar、Vector、DMA（MTE2）、DMA(MTE3)并行执行，若访问同一片Local Memory，需要同步机制来控制它们的访问时序：保证先搬入Local Memory后再计算，计算完成后再搬出。
+四个执行单元Scalar、Vector、DMA（MTE2）、DMA（MTE3）并行执行，若访问同一片Local Memory，需要同步机制来控制它们的访问时序：保证先搬入Local Memory后再计算，计算完成后再搬出。
 
-**图4**  核内并行流水执行时序示意图
+**图4**  核内并行流水执行时序示意图    
 ![](../../../figures/intra_core_parallel_pipeline_execution_timing.png "intra_core_parallel_pipeline_execution_timing")
 
-## 硬件流水类型<a name="zh-cn_topic_0000002542725361_section1272612276459"></a>
+## 硬件流水类型
 
 AI Core内部并行的指令流水类型和解释如下所示：
 
@@ -50,12 +50,12 @@ AI Core内部并行的指令流水类型和解释如下所示：
 | PIPE_S | 标量流水线，使用标量访存语句或标量计算接口访问GM、片上存储地址时为此流水 |
 | PIPE_V | 矢量计算流水及部分硬件架构下的L0C Buffer-&gt;UB数据搬运流水 |
 | PIPE_M | 矩阵计算流水 |
-| PIPE_MTE1 | L1 Buffer -&gt;L0A Buffer、L1 Buffer-&gt;L0B Buffer数据搬运流水 |
+| PIPE_MTE1 | L1 Buffer-&gt;L0A Buffer、L1 Buffer-&gt;L0B Buffer数据搬运流水 |
 | PIPE_MTE2 | GM-&gt;L1 Buffer、GM-&gt;UB等数据搬运流水 |
 | PIPE_MTE3 | UB-&gt;GM等数据搬运流水 |
-| PIPE_FIX | L0C Buffer-&gt;GM、L0C Buffer -&gt;L1等数据搬运流水 |
+| PIPE_FIX | L0C Buffer-&gt;GM、L0C Buffer-&gt;L1 Buffer等数据搬运流水 |
 
-## 核内同步分类<a name="zh-cn_topic_0000002542725361_section2167161594419"></a>
+## 核内同步分类
 
 对上述核内并行流水的同步控制分为两种：
 
@@ -71,13 +71,15 @@ AI Core内部并行的指令流水类型和解释如下所示：
      <!-- end id3 -->
      - `asc_lock`与`asc_unlock`与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水线解耦，可简化反向同步逻辑，具体说明请参考[功能说明](asc_lock.md#功能说明)。
 
-- 单流水同步：同一核内具有数据依赖的相同类型流水指令之间的同步。通过[asc_sync_pipe](asc_sync_pipe.md)接口进行相同流水线间的同步控制。同一流水中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。`asc_sync_pipe`指令可以保证前序指令中所有数据读写全部完成，后序指令才开始执行。注意该接口不支持PIPE\_S单流水的同步。
+- 单流水同步：同一核内具有数据依赖的相同类型流水指令之间的同步。通过[asc_sync_pipe](asc_sync_pipe.md)接口进行相同流水线间的同步控制。同一流水中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。`asc_sync_pipe`指令可以保证前序指令中所有数据读写全部完成，后序指令才开始执行。注意该接口不支持PIPE_S单流水的同步。
 - 通过[asc_sync_data_barrier](asc_sync_data_barrier.md)接口阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。开发者通过`arg`参数指定屏障作用的内存范围，确保屏障前后的内存访问指令按预期顺序完成。
 
 <!-- npu="A3,910b" id4 -->
-以[NPU架构2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)为例，该硬件架构下所有合法的核内同步组合如[表2](#zh-cn_topic_0000002542725361_table13753342164113)和[表3](#zh-cn_topic_0000002542725361_table1555712177426)所示。其中，"不涉及"表示硬件层面不存在此种同步组合，"暂无应用场景"表示存在此种同步组合，但在实际开发场景中暂不需要使用。
+以[NPU架构2201](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)为例，该硬件架构下所有合法的核内同步组合如[表2](#aic_intra_core_sync_combinations)和[表3](#aiv_intra_core_sync_combinations)所示。其中，“不涉及”表示硬件层面不存在此种同步组合，“暂无应用场景”表示存在此种同步组合，但在实际开发场景中暂不需要使用。
 
-**表2**  AIC中所有合法的核内同步组合<a name="zh-cn_topic_0000002542725361_table13753342164113"></a>
+<a name="aic_intra_core_sync_combinations"></a>
+
+**表2**  AIC中所有合法的核内同步组合
 
 | 源流水/目的流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -88,7 +90,9 @@ AI Core内部并行的指令流水类型和解释如下所示：
 | PIPE_MTE3 | 不涉及 | 不涉及 | asc_sync_notify(PIPE_MTE3, PIPE_MTE1, 0)<br>asc_sync_wait(PIPE_MTE3, PIPE_MTE1, 0) | asc_sync_notify(PIPE_MTE3, PIPE_MTE2, 0)<br>asc_sync_wait(PIPE_MTE3, PIPE_MTE2, 0) | asc_sync_pipe(PIPE_MTE3) | 暂无应用场景 |
 | PIPE_FIX | 不涉及 | asc_sync_notify(PIPE_FIX, PIPE_M, 0)<br>asc_sync_wait(PIPE_FIX, PIPE_M, 0) | asc_sync_notify(PIPE_FIX, PIPE_MTE1, 0)<br>asc_sync_wait(PIPE_FIX, PIPE_MTE1, 0) | 暂无应用场景 | 暂无应用场景 | asc_sync_pipe(PIPE_FIX) |
 
-**表3**  AIV中所有合法的核内同步组合<a name="zh-cn_topic_0000002542725361_table1555712177426"></a>
+<a name="aiv_intra_core_sync_combinations"></a>
+
+**表3**  AIV中所有合法的核内同步组合
 
 | 源流水/目的流水 | PIPE_S | PIPE_V | PIPE_MTE2 | PIPE_MTE3 |
 | --- | --- | --- | --- | --- |
