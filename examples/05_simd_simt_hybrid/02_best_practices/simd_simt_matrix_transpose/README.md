@@ -407,10 +407,6 @@ Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内�
   执行结果如下，说明精度对比成功。
 
   ```text
-  Usage: ./matrix_transpose [matrix_size] (compile-time SCENARIO_NUM=4)
-  Running case 4: transpose_mte_ub_2tile_pad_db...
-  Threads/Thread Block: 2048
-  Matrix shape: 1024 x 1024
   [Success] Case accuracy verification passed.
   ```
 
