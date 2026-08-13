@@ -10,8 +10,11 @@
 
 #include <vector>
 #include <atomic>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include "acl/acl_rt.h"
+#include "task_cache_test_stub.h"
 #include "acl/acl_base.h"
 #include "runtime/base.h"
 #include "runtime/stream.h"
@@ -33,6 +36,8 @@ uint32_t g_aclrtMemcpyCallCount = 0;
 } // namespace mc2_ops_hccl
 
 extern "C" unsigned int HcclLaunchAicpuKernel(OpParam* param);
+HcclResult LaunchOpenOpParamDataImpl(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
 
 #ifdef __cplusplus
 extern "C" {
@@ -295,7 +300,22 @@ aclError aclrtLaunchKernelWithConfig(
 
     ArgsBuffer* buffer = reinterpret_cast<ArgsBuffer*>(argsHandle);
     OpParam* param = reinterpret_cast<OpParam*>(buffer->data);
-    HcclLaunchAicpuKernel(param);
+    RecordAicpuLaunchAlgName(param->algName);
+    const char* useOpenExecutor = std::getenv("HCCL_ST_USE_OPEN_EXECUTOR");
+    if (useOpenExecutor != nullptr && std::strcmp(useOpenExecutor, "1") == 0) {
+        std::vector<char> serializedCtx(
+            static_cast<char*>(param->resCtx), static_cast<char*>(param->resCtx) + param->ctxSize);
+        AlgResourceCtxSerializable resCtx;
+        resCtx.DeSerialize(serializedCtx);
+        std::vector<uint8_t> openParam(sizeof(OpParam) + param->varMemSize);
+        std::memcpy(openParam.data(), param, openParam.size());
+        RecordOpenExecutorLaunch();
+        if (LaunchOpenOpParamDataImpl(openParam, resCtx) != HCCL_SUCCESS) {
+            return ACL_ERROR_INTERNAL_ERROR;
+        }
+    } else {
+        HcclLaunchAicpuKernel(param);
+    }
 
     if (argsHandle != nullptr) {
         // argsHandle内存由aclrtKernelArgsInit开辟此处释放

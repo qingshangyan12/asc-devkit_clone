@@ -90,6 +90,17 @@ void TopoModel::InitL1L2TopoInsts(uint32_t podNum)
 
 void TopoModel::InitTopoInstsMap(uint32_t serverId, uint32_t rankId, const std::vector<uint32_t>& phyIds)
 {
+    const char* ubxConcurrentTopo = std::getenv("HCCL_ST_UBX_CONCURRENT_TOPO");
+    if (ubxConcurrentTopo != nullptr && std::string(ubxConcurrentTopo) == "1") {
+        const auto allRanks = GetAllRanks(phyIds, rankId);
+        instId2RankIds_[serverId][0] = allRanks;
+        instId2RankIds_[serverId][SERVER_CLOS_INSTID] = allRanks;
+        for (auto phyId : phyIds) {
+            dev2TopoInsts_[serverId][phyId] = {0, SERVER_CLOS_INSTID};
+        }
+        is2D = true;
+        return;
+    }
     for (auto phyId : phyIds) {
         auto rowId = phyId / GRID_SIZE;
         auto rowInstId = rowId;
