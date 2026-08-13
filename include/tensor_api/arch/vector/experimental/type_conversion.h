@@ -22,8 +22,14 @@
 namespace asc {
 namespace te {
 
+#if __cplusplus >= 202002L
 template <typename To, cast_options Options = cast_options {}, typename From>
 __simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src);
+#else
+template <typename To, cast_layout Layout = cast_layout::zero, cast_round_mode Round = cast_round_mode::rint,
+    cast_sat_mode Sat = cast_sat_mode::not_sat, typename From>
+__simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src);
+#endif
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src);
