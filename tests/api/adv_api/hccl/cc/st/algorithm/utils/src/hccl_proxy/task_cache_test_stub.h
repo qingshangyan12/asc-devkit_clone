@@ -11,6 +11,8 @@
 #define TASK_CACHE_TEST_STUB_H
 
 #include "hccl_types.h"
+#include <string>
+#include <vector>
 
 struct Mc2TaskCacheTestStubState {
     HcclResult batchStartRet = HCCL_SUCCESS;
@@ -32,5 +34,11 @@ struct Mc2TaskCacheTestStubState {
 
 Mc2TaskCacheTestStubState& GetMc2TaskCacheTestStubState();
 void ResetMc2TaskCacheTestStubState();
+void RecordAicpuLaunchAlgName(const char* algName);
+std::vector<std::string> GetAicpuLaunchAlgNames();
+void ResetAicpuLaunchAlgNames();
+uint32_t GetOpenExecutorLaunchCount();
+void ResetOpenExecutorLaunchCount();
+void RecordOpenExecutorLaunch();
 
 #endif // TASK_CACHE_TEST_STUB_H
