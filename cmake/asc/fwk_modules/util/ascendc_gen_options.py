@@ -56,7 +56,23 @@ def _handle_kernel_template_input(opts):
     return input_value[1]
 
 
-def _parse_single_option(opts, opc_debug_config, opc_kernel_config):
+def _get_required_option_value(opts, option_name):
+    prefix = option_name + "="
+    if not opts.startswith(prefix):
+        raise RuntimeError(f"Invalid {option_name} option format: '{opts}'")
+    value = opts[len(prefix) :]
+    if not value:
+        raise RuntimeError(f"No value given for {option_name} option")
+    return value
+
+
+def _normalize_kernel_json_file(opts, base_dir):
+    value = _get_required_option_value(opts, "--kernel-json-file")
+    path = value if os.path.isabs(value) else os.path.join(base_dir, value)
+    return "--kernel-json-file=" + os.path.realpath(path)
+
+
+def _parse_single_option(opts, opc_debug_config, opc_kernel_config, base_dir):
     if "oom" in opts:
         _handle_oom_option(opts, opc_debug_config)
         return "debug_config", None
@@ -72,9 +88,10 @@ def _parse_single_option(opts, opc_debug_config, opc_kernel_config):
         opc_debug_config.append(opts)
         return "debug_config", None
     elif opts.startswith("--kernel-json-file"):
-        opc_kernel_config.append(opts)
+        opc_kernel_config.append(_normalize_kernel_json_file(opts, base_dir))
         return "kernel_config", None
     elif opts.startswith("--simplified_key_mode"):
+        _get_required_option_value(opts, "--simplified_key_mode")
         opc_kernel_config.append(opts)
         return "kernel_config", None
     elif "--tiling_key" in opts:
@@ -85,7 +102,7 @@ def _parse_single_option(opts, opc_debug_config, opc_kernel_config):
         return "compile_opt", opts
 
 
-def _parse_compile_options(compile_options):
+def _parse_compile_options(compile_options, base_dir):
     compile_opt = []
     opc_debug_config = []
     opc_kernel_config = []
@@ -95,7 +112,7 @@ def _parse_compile_options(compile_options):
 
     for opts in compile_options:
         category, value = _parse_single_option(
-            opts, opc_debug_config, opc_kernel_config
+            opts, opc_debug_config, opc_kernel_config, base_dir
         )
         if category == "compile_opt":
             compile_opt.append(opts)
@@ -166,10 +183,17 @@ def _write_input_param_file(opc_config_file, input_param_file, op_type, compute_
 
 
 def gen_compile_options(
-    compile_options_file: str, op_type: str, compute_unit: str, compile_options: list
+    compile_options_file: str,
+    op_type: str,
+    compute_unit: str,
+    compile_options: list,
+    base_dir: str = "",
 ):
-    base_dir = os.path.dirname(compile_options_file)
-    opc_config_file = os.path.join(base_dir, "custom_opc_options.ini")
+    if not base_dir:
+        base_dir = os.getcwd()
+    source_base_dir = os.path.realpath(base_dir)
+    config_dir = os.path.dirname(compile_options_file)
+    opc_config_file = os.path.join(config_dir, "custom_opc_options.ini")
 
     (
         compile_opt,
@@ -178,7 +202,7 @@ def gen_compile_options(
         opc_tiling_keys,
         input_param_file,
         opc_template_kernel_str,
-    ) = _parse_compile_options(compile_options)
+    ) = _parse_compile_options(compile_options, source_base_dir)
 
     _write_compile_options(compile_options_file, compile_opt, op_type, compute_unit)
 
@@ -224,18 +248,24 @@ if __name__ == "__main__":
         raise RuntimeError("arguments must greater than 4")
     compute_soc = ""
     comp_options = []
+    source_base_dir = os.getcwd()
     for i in range(len(sys.argv) - 3):
-        if sys.argv[i + 3].upper().startswith("ASCEND"):
-            compute_soc += sys.argv[i + 3] + ";"
-        elif sys.argv[i + 3].upper().startswith("KIRIN"):
-            compute_soc += sys.argv[i + 3] + ";"
-        elif sys.argv[i + 3].upper().startswith("MC62"):
-            compute_soc += sys.argv[i + 3] + ";"
+        argument = sys.argv[i + 3]
+        if argument.startswith("--source-base-dir="):
+            source_base_dir = argument.split("=", 1)[1]
+        elif argument.upper().startswith("ASCEND"):
+            compute_soc += argument + ";"
+        elif argument.upper().startswith("KIRIN"):
+            compute_soc += argument + ";"
+        elif argument.upper().startswith("MC62"):
+            compute_soc += argument + ";"
         else:
-            comp_options.append(sys.argv[i + 3])
+            comp_options.append(argument)
     if compute_soc != "":
         compute_soc = compute_soc[0:-1]
     final_options = []
     for opt in comp_options:
         final_options.extend(parse_options([opt]))
-    gen_compile_options(sys.argv[1], sys.argv[2], compute_soc, final_options)
+    gen_compile_options(
+        sys.argv[1], sys.argv[2], compute_soc, final_options, source_base_dir
+    )
