@@ -10,7 +10,7 @@
 
 - **[asc_float2int32](asc_float2int32.md)**
 
-- **[asc_ld_dev](asc_ld_dev.md)**
+- **[asc_load_dev](asc_load_dev.md)**
 
 - **[asc_popc](asc_popc.md)**
 

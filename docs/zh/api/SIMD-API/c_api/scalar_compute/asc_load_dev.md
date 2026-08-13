@@ -1,4 +1,4 @@
-# asc_ld_dev
+# asc_load_dev
 
 ## 产品支持情况
 
@@ -11,8 +11,8 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id4 -->
+- Atlas 训练系列产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
@@ -20,8 +20,8 @@
 <!-- npu="310p" id6 -->
 - Atlas 推理系列产品Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id7 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -32,21 +32,21 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline int64_t asc_ld_dev(__gm__ int8_t* addr)
+__aicore__ inline int64_t asc_load_dev(__gm__ int8_t* addr)
 
-__aicore__ inline uint64_t asc_ld_dev(__gm__ uint8_t* addr)
+__aicore__ inline uint64_t asc_load_dev(__gm__ uint8_t* addr)
 
-__aicore__ inline int64_t asc_ld_dev(__gm__ int16_t* addr)
+__aicore__ inline int64_t asc_load_dev(__gm__ int16_t* addr)
 
-__aicore__ inline uint64_t asc_ld_dev(__gm__ uint16_t* addr)
+__aicore__ inline uint64_t asc_load_dev(__gm__ uint16_t* addr)
 
-__aicore__ inline int64_t asc_ld_dev(__gm__ int32_t* addr)
+__aicore__ inline int64_t asc_load_dev(__gm__ int32_t* addr)
 
-__aicore__ inline uint64_t asc_ld_dev(__gm__ uint32_t* addr)
+__aicore__ inline uint64_t asc_load_dev(__gm__ uint32_t* addr)
 
-__aicore__ inline int64_t asc_ld_dev(__gm__ int64_t* addr)
+__aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr)
 
-__aicore__ inline uint64_t asc_ld_dev(__gm__ uint64_t* addr)
+__aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr)
 ```
 
 ## 参数说明
@@ -74,5 +74,5 @@ PIPE_S
 
 ```cpp
 // addr是外部输入的GM地址，类型为__gm__ int32_t*。
-int64_t value = asc_ld_dev(addr);
+int64_t value = asc_load_dev(addr);
 ```

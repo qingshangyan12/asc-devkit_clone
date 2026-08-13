@@ -32,11 +32,10 @@ enum class asc_store_l2_cache_mode : uint8_t {
 
 enum class asc_hf32_round_mode : uint8_t { NEAREST_ZERO, NEAREST_EVEN };
 
-enum class asc_position_mode { EVEN = 0, ODD, HIGHEST };
+enum class asc_position_mode { EVEN = 0, ODD };
 
 constexpr std::integral_constant<asc_position_mode, asc_position_mode::EVEN> ASC_POSITION_EVEN;
 constexpr std::integral_constant<asc_position_mode, asc_position_mode::ODD> ASC_POSITION_ODD;
-constexpr std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> ASC_POSITION_HIGHEST;
 
 enum class asc_position_quarter_mode {
     DISPERSE_FIRST_QUARTER = 0,

@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-merge模式下，将src的指定位置元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。未指定`src_pos`时广播最低位元素；指定`ASC_POSITION_HIGHEST`时广播最高位元素。
+merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
 
 ## 函数原型
 
@@ -43,19 +43,6 @@ __simd_callee__ inline void asc_duplicate_merge(vector_bfloat16_t& dst, vector_b
 __simd_callee__ inline void asc_duplicate_merge(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 __simd_callee__ inline void asc_duplicate_merge(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 __simd_callee__ inline void asc_duplicate_merge(vector_float& dst, vector_float src, vector_bool mask)
-
-__simd_callee__ inline void asc_duplicate_merge(vector_int8_t& dst, vector_int8_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_int16_t& dst, vector_int16_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_half& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_int32_t& dst, vector_int32_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
-__simd_callee__ inline void asc_duplicate_merge(vector_float& dst, vector_float src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::HIGHEST> src_pos)
 ```
 
 ## 参数说明
@@ -67,7 +54,6 @@ __simd_callee__ inline void asc_duplicate_merge(vector_float& dst, vector_float 
 | dst | 输入/输出 | 目的操作数（矢量数据寄存器）。merge模式下，未被mask筛选的元素保留原值。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
-| src_pos | 输入 | 可选的源元素位置。传入`ASC_POSITION_HIGHEST`时选择最高位元素；不传入时选择最低位元素。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -91,7 +77,7 @@ __simd_vf__ inline void duplicate_merge_vf(__ubuf__ half* dst_addr, __ubuf__ hal
         mask = asc_update_mask_b16(count);
         asc_loadalign(dst, dst_addr + i * one_repeat_size);
         asc_loadalign(src, src_addr + i * one_repeat_size);
-        asc_duplicate_merge(dst, src, mask, ASC_POSITION_HIGHEST);
+        asc_duplicate_merge(dst, src, mask);
         asc_storealign(dst_addr + i * one_repeat_size, dst, mask);
     }
 }
