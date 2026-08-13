@@ -8,6 +8,13 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning                                                                                                               \
+    "type_conversion_table.h is internal; include <tensor_api/arch/vector/experimental/type_conversion.h> instead."
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TYPE_CONVERSION_TABLE_H__
+#endif
+
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_TABLE_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_TABLE_H
 
@@ -543,3 +550,8 @@ ASC_REG_CAST_OP(fp4x2_e2m1_t, bfloat16_t, three, trunc, not_sat, asc_bfloat162e2
 #endif
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_TABLE_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TYPE_CONVERSION_TABLE_H__)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TYPE_CONVERSION_TABLE_H__
+#endif
