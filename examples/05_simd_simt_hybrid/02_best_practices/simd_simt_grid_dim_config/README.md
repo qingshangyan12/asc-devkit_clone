@@ -273,7 +273,7 @@ __global__ __vector__ void gather_kernel(..., uint32_t thread_num)
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
+### Ascend 950PR性能对比
 
 **调度开销随线程块数量变化（Case 0）**：
 
@@ -319,7 +319,7 @@ __global__ __vector__ void gather_kernel(..., uint32_t thread_num)
 
 - 最优线程块数量为 **32**（物理核数的1/2），不是打满的64核；线程块数量从32增加到64后耗时回升
 
-## 调优建议
+### 优化要点总结
 
 1. **大shape需优先匹配物理核数**：受硬件资源限制，实际可并行执行的物理核数量存在上限。线程块数量应尽量等于物理核数，避免线程块数量过多（排队等待、调度开销累积）或过少（并行度不足、单线程块工作量重）。
 2. **小shape需实测线程块数量性能**：小shape下每核工作量较小，启动更多线程块带来的调度头开销会反超收益，最优线程块数量不一定是最大物理核数。可参考Case 3通过分档测试寻找最优线程块数量。
@@ -361,9 +361,9 @@ __global__ __vector__ void gather_kernel(..., uint32_t thread_num)
   [Success] Case accuracy is verification passed.
   ```
 
-## 性能分析
+### 性能分析
 
-### msOpProf工具介绍
+#### msOpProf工具介绍
 msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
 - 上板性能采集

@@ -199,7 +199,7 @@ uint32_t result = (value + q) >> shift;
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
+### Ascend 950PR性能对比
 
 **综合优化效果**：
 
@@ -271,7 +271,7 @@ uint32_t result = (value + q) >> shift;
 
 ### 性能分析
 
-### msOpProf工具介绍
+#### msOpProf工具介绍
 msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
 - 上板性能采集

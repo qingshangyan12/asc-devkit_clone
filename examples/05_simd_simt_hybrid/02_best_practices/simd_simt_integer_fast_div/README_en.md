@@ -15,7 +15,7 @@ This example uses fixed-divisor integer division computation to demonstrate inte
 
 - Ascend 950PR/Ascend 950DT
 
-## Supported CANN Versions
+## Supported CANN Software Version
 
 - \>= CANN 9.2.0
 
@@ -199,7 +199,7 @@ uint32_t result = (value + q) >> shift;
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
+### Ascend 950PR Performance Comparison
 
 **Overall Optimization Effect**:
 
@@ -271,7 +271,7 @@ Run the following steps in the root directory of this example to build and run t
 
 ### Performance Analysis
 
-### Introduction to the msOpProf Tool
+#### Introduction to the msOpProf Tool
 
 `msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
