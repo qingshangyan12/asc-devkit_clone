@@ -174,6 +174,10 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 
 static CcuResult DoReduceScatterReadReduceFast(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
+    if (ctx.rankSize != 2) {
+        return CCU_SUCCESS;
+    }
+
     ccu::LocalAddr fastOutput;
     fastOutput.addr = ctx.output;
     fastOutput.addr += ctx.currentRankSliceOutputOffset;
@@ -223,12 +227,12 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
         {
             useFast = 1;
         }
-    }
 
-    CCU_IF(useFast != 0)
-    {
-        (void)DoReduceScatterReadReduceFast(ctx);
-        ctx.repeatNum = UINT64_MAX;
+        CCU_IF(useFast != 0)
+        {
+            (void)DoReduceScatterReadReduceFast(ctx);
+            ctx.repeatNum = UINT64_MAX;
+        }
     }
 
     ccu::Variable repeatNumAdd;
