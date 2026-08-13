@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例使用Ascend C C API实现float16类型逐元素Add，并提供未开启和开启Ping/Pong Buffer优化两个场景。两个场景使用相同的输入、核数、分块和矢量计算接口，用于观察Ping/Pong Buffer优化对GM/UB数据搬运与Vector计算流水重叠的作用。
+本样例使用Ascend C C API实现float16逐元素Add，并对比单Buffer和Ping/Pong双Buffer两种实现。双Buffer交替使用两组UB空间，使数据搬入、Vector计算和结果搬出可以跨轮并行。
 
 ## 支持的产品及CANN软件版本
 
@@ -47,7 +47,7 @@ $$
 | z | 输出 | `output/output.bin` | float16 | `[8192, 8192]` | Kernel计算结果 |
 | golden | 真值 | `output/golden.bin` | float16 | `[8192, 8192]` | 使用`(x + y).astype(np.float16)`生成。 |
 
-两个场景采用相同的多核切分和单轮数据块大小。矩阵沿M轴均分到64个核，每个核处理连续的128行，即1048576个元素。每核共执行49轮，前48轮为满块，最后一轮处理尾块。
+两个场景使用相同的切核和分块参数。矩阵沿M轴分给64个核，每核处理连续128行。具体计算见表3。
 
 **表3**  多核切分和分块参数
 
@@ -57,13 +57,13 @@ $$
 | 核数 | 64 | 每个核处理连续的M轴数据。 |
 | 每核处理行数 | 128 | `8192 / 64` |
 | 每核处理元素数 | 1048576 | `128 * 8192` |
-| 每核循环次数 | 49 | 48个满块和1个尾块 |
-| 满块有效元素数 | 21760 | 对应`DATA_COPY_LENGTH`。 |
-| 尾块有效元素数 | 4096 | `1048576 - 48 * 21760` |
 | 单个UB缓冲区预留长度 | 21840个float16元素 | 对应`MAX_DATA_COPY_LENGTH`，用于划分各缓冲区的UB地址。 |
+| 满块有效元素数 | 21760 | 对应`DATA_COPY_LENGTH`，取不超过21840且满足512字节对齐的最大长度。 |
+| 尾块有效元素数 | 4096 | `1048576 % 21760` |
+| 每核循环次数 | 49 | `1048576 / 21760 = 48`余4096个元素，因此包含48个满块和1个尾块。 |
 | VF向量长度 | 256字节 | 每次可处理128个float16元素；满块执行170次VF计算，尾块执行32次。 |
 
-编译参数`SCENARIO_NUM`用于选择未开启或开启Ping/Pong Buffer优化。两个场景的输入数据、多核切分、分块大小和向量计算均保持一致，仅UB缓冲区数量及流水同步方式不同。
+编译参数`SCENARIO_NUM`用于选择单Buffer或Ping/Pong双Buffer。两种实现只在UB Buffer数量和同步方式上有区别，其余计算参数相同。
 
 **表4**  场景配置
 
@@ -74,7 +74,7 @@ $$
 
 ### 场景0：未开启Ping/Pong Buffer优化
 
-未开启Ping/Pong Buffer优化时，Kernel `add_baseline`只分配一组x、y、z缓冲区，三段缓冲区在UB中连续排列。每段预留21840个float16元素，当前轮只读写`current_length`指定的有效数据。
+`add_baseline`只分配一组连续排列的x、y、z Buffer。每个Buffer预留21840个float16元素，实际读写长度由`current_length`指定。
 
 **表5**  未开启Ping/Pong Buffer优化时的UB布局
 
@@ -86,39 +86,39 @@ $$
 
 每轮按照以下顺序处理一个数据块：
 
-1. MTE2流水通过两次`asc_copy_gm2ub_align`，分别将当前块的x和y从GM搬入UB；
-2. MTE2完成搬入后调用`asc_unlock(PIPE_MTE2, 0)`释放Mutex 0，Vector流水通过`asc_lock(PIPE_V, 0)`等待输入就绪，随后调用`add_vf`。满块按128个float16元素为一组执行170次`asc_add`，尾块执行32次；
-3. Vector计算完成后释放Mutex 0，MTE3流水获取同一Mutex后，通过`asc_copy_ub2gm_align`将z从UB搬回GM；
-4. 下一轮MTE2再次获取Mutex 0时，会等待上一轮MTE3释放该Mutex，因此只能在上一轮搬出完成后覆盖同一组UB地址。全部循环结束后调用一次`asc_sync_pipe(PIPE_ALL)`完成收尾同步。
+1. MTE2调用两次`asc_copy_gm2ub_align`，将当前块的x和y从GM搬入UB；
+2. MTE2释放Mutex 0后，Vector获取该Mutex并调用`add_vf`。满块执行170次`asc_add`，尾块执行32次；
+3. Vector释放Mutex 0后，MTE3获取该Mutex并调用`asc_copy_ub2gm_align`，将z搬回GM；
+4. MTE3释放Mutex 0后，下一轮MTE2才能覆盖这组UB地址。循环结束时调用`asc_sync_pipe(PIPE_ALL)`等待所有操作完成。
 
-因此，假设第n轮正在进行Vector计算，第n+1轮的输入还不能搬入；第n轮正在搬出结果时，第n+1轮的计算也不能开始。各流水只能在单轮内部按依赖执行，无法跨轮重叠，该场景用于提供未开启Ping/Pong Buffer优化时的性能基线。
+三个阶段共用一个Mutex，执行顺序固定为MTE2、Vector、MTE3。下一轮必须等当前轮搬出完成后才能复用UB，因此不同轮次之间不能并行。该实现作为性能基线。
 
 ### 场景1：开启Ping/Pong Buffer优化
 
-开启Ping/Pong Buffer优化时，Kernel `add_double_buffer`将UB划分为两组相互独立的x、y、z缓冲区。偶数轮使用Ping和Mutex 0，奇数轮使用Pong和Mutex 1。相邻轮次使用不同的缓冲区和Mutex，不会读写同一段UB地址，也不会因同步资源相同而相互阻塞。
+`add_double_buffer`在UB中分配Ping和Pong两组x、y、z Buffer。偶数轮使用Ping，奇数轮使用Pong。每组使用两个Mutex：输入Mutex管理x、y的搬入和读取，输出Mutex管理z的写入和搬出。
 
 **表6**  开启Ping/Pong Buffer优化时的缓冲区布局
 
-| 轮次 | 缓冲区组 | Mutex ID | x起始偏移 | y起始偏移 | z起始偏移 |
-| --- | --- | --- | --- | --- | --- |
-| 偶数轮 | Ping | 0 | 0 | 21840 | 43680 |
-| 奇数轮 | Pong | 1 | 65520 | 87360 | 109200 |
+| 轮次 | 缓冲区组 | 输入Mutex ID | 输出Mutex ID | x起始偏移 | y起始偏移 | z起始偏移 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 偶数轮 | Ping | 0 | 2 | 0 | 21840 | 43680 |
+| 奇数轮 | Pong | 1 | 3 | 65520 | 87360 | 109200 |
 
-表中的偏移单位均为float16元素。每组缓冲区仍按x、y、z各预留21840个float16元素，单轮的数据搬运量和Vector计算量与未开启Ping/Pong Buffer优化的场景完全相同。区别在于开启优化后不再在每轮末尾执行全流水同步，而是使用`asc_lock`和`asc_unlock`按Mutex管理每组缓冲区的流水依赖。
+表中的偏移单位为float16元素，每个Buffer仍预留21840个元素。双Buffer不改变每轮的搬运量和计算量，只通过`asc_lock`和`asc_unlock`控制两组Buffer的使用顺序。
 
 **表7**  开启Ping/Pong Buffer优化时的同步关系
 
 | 流水阶段 | Mutex ID | 同步操作 | 保证的依赖 |
 | --- | --- | --- | --- |
-| MTE2搬入 | Ping为0，Pong为1 | `asc_lock(PIPE_MTE2, mutex_id)`后搬入x、y，完成后`asc_unlock`。 | 同一组缓冲区再次使用前，等待该组上一轮MTE3搬出完成。 |
-| Vector计算 | 与当前缓冲区组一致 | `asc_lock(PIPE_V, mutex_id)`后执行`add_vf`，完成后`asc_unlock`。 | Vector等待当前轮MTE2释放Mutex，防止读取尚未搬完的数据。 |
-| MTE3搬出 | 与当前缓冲区组一致 | `asc_lock(PIPE_MTE3, mutex_id)`后搬出z，完成后`asc_unlock`。 | MTE3等待当前轮Vector释放Mutex，防止搬出尚未计算完成的数据。 |
+| MTE2搬入 | 输入Mutex：Ping为0，Pong为1 | 获取输入Mutex后搬入x、y，完成后释放。 | 同一组x、y再次写入前，等待该组上一轮Vector读取完成。 |
+| Vector计算 | 当前组的输入Mutex和输出Mutex | 依次获取两个Mutex后执行`add_vf`，完成后分别释放。 | 等待当前轮x、y搬入完成，并等待上一轮MTE3读完同组z。 |
+| MTE3搬出 | 输出Mutex：Ping为2，Pong为3 | 获取输出Mutex后搬出z，完成后释放。 | 等待当前轮Vector写完z。 |
 
-每轮根据`loop_idx & 1`选择Mutex 0或1，并依次在MTE2、Vector和MTE3流水上获取、释放该Mutex。同一Mutex将一组缓冲区的三个阶段串联起来，不同Mutex之间互不阻塞。所有49轮指令下发后调用一次`asc_sync_pipe(PIPE_ALL)`，确保最后的搬运和计算结束。接口约束和双Buffer用法可参考[asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md)。
+`loop_idx & 1`用于选择Ping或Pong。输入Mutex为0/1，输出Mutex为对应的2/3。Vector读完x、y后，MTE2即可向同组Buffer搬入下一块数据；MTE3则通过输出Mutex等待z计算完成。由于MTE2不访问z，MTE3不访问x和y，这两个搬运可以同时执行。49轮指令全部下发后，再调用一次`asc_sync_pipe(PIPE_ALL)`完成收尾同步。接口说明参见[asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md)。
 
-以连续三轮为例：第0轮使用Ping和Mutex 0，第1轮使用Pong和Mutex 1，第2轮再次使用Ping和Mutex 0。当Vector处理第0轮Ping数据时，MTE2可以搬入第1轮Pong数据；当MTE3搬出第0轮Ping结果时，Vector可以处理第1轮Pong数据。第2轮复用Mutex 0时，需要等待第0轮MTE3释放该Mutex。由此，MTE2、Vector和MTE3能够处理相邻轮次的不同数据块，隐藏部分GM与UB之间的数据搬运等待时间。
+以连续三轮为例：第0轮使用Ping和Mutex 0/2，第1轮使用Pong和Mutex 1/3，第2轮再次使用Ping和Mutex 0/2。第0轮Vector读完x、y后，第2轮MTE2便可覆盖Ping中的x、y；与此同时，第0轮MTE3仍可读取Ping中的z。第2轮Vector写z之前，还需要等待第0轮MTE3读完z。
 
-两个场景的核心区别如下表所示。
+表8汇总两种实现的主要区别。
 
 **表8**  Ping/Pong Buffer优化对比
 
@@ -126,17 +126,19 @@ $$
 | --- | --- | --- |
 | UB缓冲区 | 一组x/y/z，共131040字节 | 两组x/y/z，共262080字节 |
 | 相邻轮次使用的地址 | 相同，必须等待上一轮结束后复用。 | 不同，在Ping和Pong之间交替。 |
-| 轮末同步 | 使用Mutex 0串联各轮，全部轮次结束后执行一次全同步。 | Ping/Pong分别使用Mutex 0/1管理依赖，全部轮次结束后执行一次全同步。 |
-| 跨轮流水重叠 | 不支持 | MTE2、Vector、MTE3可处理不同轮次。 |
+| 流水同步 | 使用Mutex 0串联各轮，全部轮次结束后执行一次全同步。 | Ping/Pong的输入Mutex为0/1、输出Mutex为2/3，全部轮次结束后执行一次全同步。 |
+| 跨轮流水重叠 | 不支持 | MTE2、Vector、MTE3可处理不同轮次；同组MTE2搬入与MTE3搬出也可并行。 |
 | 优化代价 | UB占用较少。 | 以增加一倍UB地址空间换取流水重叠机会。 |
 
 <p align="center">
   <img src="figures/double_buffer.png" width="50%">
 </p>
 
+上图展示了相邻数据块在MTE2、Vector和MTE3流水上的重叠关系。
+
 ## 性能对比方法
 
-两个场景除缓冲区数量和同步方式外，其余计算条件一致。测试时应在同一硬件、CANN版本和系统负载条件下分别采集两个场景，且每次性能采集前均需通过精度校验。
+两个场景只改变Buffer数量和同步方式。为保证数据可比，测试时使用相同的硬件、CANN版本、输入数据和系统负载，并在采集性能前完成精度校验。
 
 ### 测试条件
 
@@ -153,7 +155,7 @@ $$
 | 单次分块长度 | 21760个float16元素，尾块为4096个float16元素 |
 | 测试次数 | 每个场景预热1次，正式采集至少5次，取Task Duration中位数 |
 
-测试期间应保持设备频率、功耗模式及系统负载一致，避免其他任务占用NPU。两个场景必须使用同一组输入数据，并保持核数、分块参数和编译选项一致。
+测试期间保持设备频率和功耗模式不变，避免其他任务占用NPU。两个场景使用同一组输入数据，并采用相同的核数、分块参数和编译选项。
 
 ### 性能指标
 
@@ -170,45 +172,44 @@ $$
 | `aiv_mte2_time(μs)` / `aiv_mte2_ratio` | MTE2流水执行GM到UB搬入的耗时及其占比。 |
 | `aiv_mte3_time(μs)` / `aiv_mte3_ratio` | MTE3流水执行UB到GM搬出的耗时及其占比。 |
 
-开启Ping/Pong Buffer优化后，不同流水可以重叠执行，因此各流水耗时或占比不能简单相加得到`Task Duration`。最终优化效果应以`Task Duration`为主，并结合MTE2、Vector和MTE3指标判断瓶颈是否发生变化。
+Ping/Pong双Buffer会使不同流水重叠，各流水耗时或占比不能直接相加。端到端性能以`Task Duration`为准，其他指标用于定位主要耗时。
 
 ### Ascend 950PR性能对比
 
-下表为本样例在Ascend 950PR芯片上运行的性能数据对比。
+表11给出本样例在Ascend 950PR上的测试结果。
 
 **表11**  Ping/Pong Buffer优化性能对比
 
 | 场景 | 优化配置 | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 场景0 | 未开启Ping/Pong Buffer优化 | 271.472 | 270.18 | 11.117 | 0.041 | 1.553 | 0.006 | 188.566 | 0.698 | 67.182 | 0.249 |
-| 场景1 | 开启Ping/Pong Buffer优化 | 268.456 | 267.51 | 10.993 | 0.041 | 1.944 | 0.007 | 258.8 | 0.967 | 137.686 | 0.515 |
+| 场景0 | 未开启Ping/Pong Buffer优化 | 273.59 | 272.31 | 11.225 | 0.041 | 1.739 | 0.006 | 190.77 | 0.701 | 66.739 | 0.245 |
+| 场景1 | 开启Ping/Pong Buffer优化 | 267.841 | 266.36 | 10.958 | 0.041 | 2.153 | 0.008 | 262.328 | 0.985 | 145.807 | 0.547 |
 
-**优化效果分析**：
+**端到端结果**：
 
 以场景0为基线，开启Ping/Pong Buffer优化后的加速比为
 
 $$
 S = \frac{T_{\text{baseline}}}{T_{\text{ping-pong}}}
-  = \frac{271.472}{268.456}
-  \approx 1.011
+  = \frac{273.59}{267.841}
+  \approx 1.021
 $$
 
 端到端耗时下降比例为
 
 $$
 R = \frac{T_{\text{baseline}} - T_{\text{ping-pong}}}{T_{\text{baseline}}} \times 100\%
-  = \frac{271.472 - 268.456}{271.472} \times 100\%
-  \approx 1.11\%
+  = \frac{273.59 - 267.841}{273.59} \times 100\%
+  \approx 2.10\%
 $$
 
-- `Task Duration`由271.472μs下降至268.456μs，减少3.016μs，端到端性能提升约1.11%。
-- `aiv_time`由270.18μs下降至267.51μs，下降约0.99%。
-- `aiv_vec_time`由11.117μs下降至10.993μs，变化约1.12%，说明两个场景的Vector计算量和计算效率基本一致。
-- `aiv_scalar_time`增加0.391μs，虽然相对增幅约25.18%，但绝对耗时和占比均很小，对整体性能影响有限。
+`Task Duration`从273.59μs降至267.841μs，减少5.749μs，耗时下降2.10%。`aiv_time`也减少了5.95μs，与端到端耗时的变化趋势一致。
+
+两个场景的`aiv_vec_time`分别为11.225μs和10.958μs，相差0.267μs，Vector计算耗时基本不变。`aiv_scalar_time`增加了0.414μs，但在总耗时中的占比仍不到1%，对端到端性能影响较小。
 
 **理论性能分析**：
 
-本样例可以计算仅考虑Add向量计算、不包含数据搬运、流水同步、指令调度等开销的理论Vector耗时。Ascend 950PR每cycle可处理128个half数据，主频为1.65GHz，本样例使用64个AI Vector Core，因此理论Vector耗时为
+按Ascend 950PR每cycle处理128个half数据、主频1.65GHz和64个AI Vector Core计算，理想Add吞吐对应的Vector耗时为
 
 $$
 T_{\text{theory}}
@@ -217,15 +218,15 @@ T_{\text{theory}}
 \approx 4.965\ \mu s
 $$
 
-两个场景的`aiv_vec_time`分别为11.117μs和10.993μs，约为理论Vector耗时的2.2倍。理论值只表示Add计算指令在理想吞吐下的耗时，不包含VF循环控制、地址计算、数据搬运和流水同步等实际执行开销，因此不能作为整个Kernel的理论端到端耗时。两个场景的Vector耗时接近，且均远小于MTE2耗时，说明当前端到端瓶颈不在纯Vector计算。
+该理论值只包含Add指令，不包含VF循环、地址计算、数据搬运和同步。实测`aiv_vec_time`约为11μs，是理论值的2.2倍，但仍远小于MTE2耗时。因此，纯Vector计算不是当前的主要耗时。
 
 **流水与带宽分析**：
 
-场景0中MTE2、MTE3和Vector流水占比之和为98.8%，各流水基本串行执行。场景1中三条流水占比之和为152.3%，超过100%，说明开启Ping/Pong Buffer后，搬入、计算和搬出已经在不同轮次间发生重叠。
+场景0的MTE2、MTE3和Vector流水占比之和为98.7%，三个阶段基本串行。场景1的占比之和为157.3%，超过100%，说明搬入、计算和搬出已在不同轮次间重叠执行。
 
-Profiler统计的MTE2和MTE3耗时包含流水执行及等待时间。开启优化后，`aiv_mte2_time`由188.566μs增加至258.8μs，`aiv_mte3_time`由67.182μs增加至137.686μs，这些数值不能直接解释为单次数据搬运变慢，应结合流水重叠和带宽指标判断。
+Profiler中的MTE2和MTE3耗时包含流水执行和等待时间。双Buffer改变了流水重叠关系，因此耗时增加不等于单次搬运变慢。下面结合数据量估算带宽。
 
-场景0未开启Ping/Pong Buffer，读写流水基本串行，使用输入总数据量估算读带宽：
+场景0的读写流水基本串行，按输入总数据量估算读带宽：
 
 $$
 D_{\text{read}} = M \times N \times sizeof(half) \times 2 = 268435456\ \text{B}
@@ -233,11 +234,11 @@ $$
 
 $$
 BW_{\text{read}} = \frac{D_{\text{read}}}{T_{mte2}}
-= \frac{268435456}{188.566 \times 10^{-6}}
-\approx 1.424\ \text{TB/s}
+= \frac{268435456}{190.77 \times 10^{-6}}
+\approx 1.407\ \text{TB/s}
 $$
 
-场景1开启Ping/Pong Buffer后，MTE2和MTE3并行执行，使用输入和输出总数据量估算读写混合带宽：
+场景1中MTE2和MTE3并行，按输入和输出总数据量估算读写混合带宽：
 
 $$
 D_{\text{write}} = M \times N \times sizeof(half) = 134217728\ \text{B}
@@ -245,18 +246,19 @@ $$
 
 $$
 BW_{\text{rw}} = \frac{D_{\text{read}} + D_{\text{write}}}{T_{mte2}}
-= \frac{402653184}{258.8 \times 10^{-6}}
-\approx 1.556\ \text{TB/s}
+= \frac{402653184}{262.328 \times 10^{-6}}
+\approx 1.535\ \text{TB/s}
 $$
 
-场景1的`aiv_mte2_ratio`达到96.7%，说明优化后仍以GM数据搬运为主要瓶颈。Ping/Pong Buffer通过流水重叠提高了读写混合吞吐，但由于Vector计算耗时远小于数据搬运耗时，可被隐藏的计算时间有限，因此端到端收益约为1.11%。
+按上述口径估算，场景0的读带宽约为1.407TB/s，场景1的读写混合带宽约为1.535TB/s。两者的统计口径不同，主要用于观察各场景的数据搬运情况，不直接作为优化幅度。
 
-#### 双缓冲优化总结
+场景1的`aiv_mte2_ratio`为98.5%，说明主要耗时仍在GM数据搬运。Vector计算时间较短，能够通过流水重叠隐藏的时间有限，因此端到端耗时下降了2.10%。
 
-- **当前效果**：Ping/Pong Buffer通过两组独立UB缓冲区，使MTE2搬入、Vector计算和MTE3搬出能够跨轮重叠。`Task Duration`下降3.016μs，端到端性能提升约1.11%。
-- **优点**：在不改变计算结果和单轮计算量的情况下隐藏部分流水等待时间，提高连续分块处理时的读写并行度。当计算耗时与数据搬运耗时接近时，通常可以获得更明显的收益。
-- **局限**：UB占用由131040字节增加至262080字节，并引入Ping/Pong地址选择和同步管理开销。本样例实测Vector耗时约11μs，而MTE2耗时超过188μs，计算与搬运耗时差距较大，可被双缓冲隐藏的计算时间有限，因此整体收益受到GM数据搬运瓶颈限制。
-- **后续优化方向**：在保持512字节对齐和当前L2 Cache bypass策略的基础上，继续测试不同分块大小和核数配置，优化GM连续访问与搬运参数，减少Scalar地址计算和同步开销。对于实际业务，还可以通过算子融合增加单次数据搬入后的计算量和数据复用率，提高计算与搬运的重叠收益。
+#### 双Buffer结论
+
+Ping/Pong双Buffer将UB占用从131040字节增加到262080字节，使MTE2、Vector和MTE3能够跨轮并行。本次测试中，`Task Duration`减少5.749μs，耗时下降2.10%。
+
+当前主要耗时来自GM数据搬运，Vector计算只占较小部分，因此双Buffer带来的收益有限。后续优化应优先检查分块长度、GM连续访问和L2 Cache策略。
 
 ## 编译运行
 
