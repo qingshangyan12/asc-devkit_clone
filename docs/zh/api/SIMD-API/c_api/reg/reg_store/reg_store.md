@@ -1,18 +1,10 @@
 # reg数据搬出
 
-- **[asc_storealign_v1（废弃）](asc_storealign_v1_deprecated.md)**
-
-- **[asc_storealign_v2（废弃）](asc_storealign_v2_deprecated.md)**
-
-- **[asc_storealign_v3（废弃）](asc_storealign_v3_deprecated.md)**
-
-- **[asc_storealign_v4（废弃）](asc_storealign_v4_deprecated.md)**
-
-- **[asc_storealign_v5（废弃）](asc_storealign_v5_deprecated.md)**
-
 - **[asc_scatter](asc_scatter.md)**
 
-- **[asc_scatter](asc_scatter_deprecated.md)**
+- **[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)**
+
+- **[asc_squeeze_and_storeunalign_finalize](asc_squeeze_and_storeunalign_finalize.md)**
 
 - **[asc_store](asc_store.md)**
 
@@ -41,3 +33,19 @@
 - **[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)**
 
 - **[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)**
+
+- **[asc_storealign_v1（废弃）](asc_storealign_v1_deprecated.md)**
+
+- **[asc_storealign_v2（废弃）](asc_storealign_v2_deprecated.md)**
+
+- **[asc_storealign_v3（废弃）](asc_storealign_v3_deprecated.md)**
+
+- **[asc_storealign_v4（废弃）](asc_storealign_v4_deprecated.md)**
+
+- **[asc_storealign_v5（废弃）](asc_storealign_v5_deprecated.md)**
+
+- **[asc_scatter（废弃）](asc_scatter_deprecated.md)**
+
+- **[asc_storeunalign_post（废弃）](asc_storeunalign_post_deprecated.md)**
+
+- **[asc_storeunalign_postupdate（废弃）](asc_storeunalign_postupdate_deprecated.md)**

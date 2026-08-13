@@ -302,6 +302,11 @@ CollAlgExecRegistryV2& CollAlgExecRegistryV2::Instance()
     return instance;
 }
 
+bool CollAlgExecRegistryV2::IsRegistered(HcclCMDType opType, const std::string& algTag) const
+{
+    return opType == HcclCMDType::HCCL_CMD_ALLTOALLV && algTag == "CcuAlltoAllVMesh1D";
+}
+
 std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType opType, const std::string& algTag)
 {
     return std::make_unique<MockInsCollAlgBase>();
@@ -363,4 +368,9 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
 
     return HCCL_SUCCESS;
 }
+}
+
+extern "C" bool HcommIsSupportHcommBatchTransferOnThread(void)
+{
+    return false;
 }

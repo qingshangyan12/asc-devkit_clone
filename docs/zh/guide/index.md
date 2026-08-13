@@ -199,12 +199,12 @@
             -   [概述](算子实践参考/SIMD算子实现/矢量编程/概述.md)
             -   [基础矢量算子](算子实践参考/SIMD算子实现/矢量编程/基础矢量算子.md)
             -   [TBuf的使用](算子实践参考/SIMD算子实现/矢量编程/TBuf的使用.md)
-            -   [多核&Tiling切分](算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/概述.md)
-                -   [概述](算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/概述.md)
-                -   [多核Tiling](算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/多核Tiling.md)
-                -   [尾块Tiling](算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾块Tiling.md)
-                -   [尾核Tiling](算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾核Tiling.md)
-                -   [尾核&尾块](算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾核-尾块.md)
+            -   [多核Tiling切分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/概述.md)
+                -   [概述](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/概述.md)
+                -   [主块均分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/主块均分.md)
+                -   [尾块均分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/尾块均分.md)
+                -   [尾核切分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/尾核切分.md)
+                -   [尾核尾块切分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/尾核尾块切分.md)
 
             -   [DoubleBuffer场景](算子实践参考/SIMD算子实现/矢量编程/DoubleBuffer场景.md)
             -   [Broadcast场景](算子实践参考/SIMD算子实现/矢量编程/Broadcast场景.md)
@@ -291,7 +291,7 @@
             -   [避免UB的bank冲突](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免UB的bank冲突.md)
                 -   [概述](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/概述.md)
                 -   [避免bank冲突（NPU架构版本2201）](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/avoid_bank_conflict_npu_arch_2201.md)
-                -   [避免bank冲突（NPU架构版本3510）](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/avoid_bank_conflict_npu_arch_2201.md)
+                -   [避免bank冲突（NPU架构版本3510）](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/avoid_bank_conflict_npu_arch_3510.md)
 
             -   [L2 Cache切分](算子实践参考/SIMD算子性能优化/内存访问/L2-Cache切分.md)
 

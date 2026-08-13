@@ -68,7 +68,7 @@ Mc2CcTilingInner BuildAllToAllVTiling(
     tiling.srcDataType = static_cast<uint8_t>(sendType);
     tiling.dstDataType = static_cast<uint8_t>(recvType);
     strcpy(tiling.groupName, "test_group");
-    strcpy(tiling.algConfig, "default");
+    strcpy(tiling.algConfig, "CcuAlltoAllVMesh1D");
     return tiling;
 }
 
@@ -158,26 +158,16 @@ TEST_F(CcuMc2AllToAllVTest, SelectsAllToAllVMesh1D)
     EXPECT_EQ(GetCcuKernelRegisterCount(), 1U);
 }
 
-TEST_F(CcuMc2AllToAllVTest, MultipleAllToAllVConfigsShareOneServer)
+TEST_F(CcuMc2AllToAllVTest, MultipleAllToAllVConfigsFallBackFromMc2Ccu)
 {
-    OpResCtx resCtx{};
-    ASSERT_EQ(AllocCcuOpResCtx(comm_, "multi_ctx", TEST_RANK_SIZE, TEST_RANK_ID, resCtx), HCCL_SUCCESS);
     Mc2CcTilingInner fp16 = BuildAllToAllVTiling(HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_FP16);
     Mc2CcTilingInner fp32 = BuildAllToAllVTiling(HCCL_DATA_TYPE_FP32, HCCL_DATA_TYPE_FP32);
-    const void* tilingList[] = {&fp16, &fp32};
-    std::string tags[] = {"alltoallv_fp16", "alltoallv_fp32"};
+    Mc2TilingTestData tiling = BuildMc2Tiling({fp16, fp32});
+    void* opResCtx = nullptr;
 
-    ASSERT_EQ(CcuSelectAlgForTest(comm_, stream_, tags, tilingList, 2, resCtx), HCCL_SUCCESS);
-    EXPECT_EQ(GetCcuKernelRegisterCount(), 1U);
-
-    OpParam first{};
-    OpParam second{};
-    ASSERT_EQ(aclrtMemcpy(&first, sizeof(first), reinterpret_cast<void*>(resCtx.algInfo[0].opParam), sizeof(first),
-        ACL_MEMCPY_DEVICE_TO_HOST), ACL_SUCCESS);
-    ASSERT_EQ(aclrtMemcpy(&second, sizeof(second), reinterpret_cast<void*>(resCtx.algInfo[1].opParam), sizeof(second),
-        ACL_MEMCPY_DEVICE_TO_HOST), ACL_SUCCESS);
-    EXPECT_EQ(first.resCtx, second.resCtx);
-    EXPECT_EQ(first.ctxSize, second.ctxSize);
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_ALG_NOT_SUPPORTED);
+    EXPECT_EQ(opResCtx, nullptr);
+    EXPECT_EQ(GetCcuKernelRegisterCount(), 0U);
 }
 
 TEST_F(CcuMc2AllToAllVTest, OpIdContainsAllToAllVMessageIdentity)
@@ -194,31 +184,15 @@ TEST_F(CcuMc2AllToAllVTest, OpIdContainsAllToAllVMessageIdentity)
     EXPECT_EQ((opId >> 24U) & 0x7fU, static_cast<uint64_t>(param.all2AllVDataDes.recvType));
 }
 
-TEST_F(CcuMc2AllToAllVTest, MultiConfigCacheDoesNotReuseSingleConfigServer)
+TEST_F(CcuMc2AllToAllVTest, DefaultAlgorithmConfigFallsBackFromMc2Ccu)
 {
-    Mc2CcTilingInner fp16 = BuildAllToAllVTiling(HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_FP16);
-    Mc2CcTilingInner fp32 = BuildAllToAllVTiling(HCCL_DATA_TYPE_FP32, HCCL_DATA_TYPE_FP32);
+    Mc2CcTilingInner ccTiling = BuildAllToAllVTiling();
+    strcpy(ccTiling.algConfig, "default");
+    Mc2TilingTestData tiling = BuildMc2Tiling({ccTiling});
+    void* opResCtx = nullptr;
 
-    OpResCtx singleCtx{};
-    ASSERT_EQ(AllocCcuOpResCtx(comm_, "single_ctx", TEST_RANK_SIZE, TEST_RANK_ID, singleCtx), HCCL_SUCCESS);
-    const void* singleList[] = {&fp16};
-    std::string singleTags[] = {"same_first_tag"};
-    ASSERT_EQ(CcuSelectAlgForTest(comm_, stream_, singleTags, singleList, 1, singleCtx), HCCL_SUCCESS);
-
-    OpResCtx multiCtx{};
-    ASSERT_EQ(AllocCcuOpResCtx(comm_, "multi_cache_ctx", TEST_RANK_SIZE, TEST_RANK_ID, multiCtx), HCCL_SUCCESS);
-    const void* multiList[] = {&fp16, &fp32};
-    std::string multiTags[] = {"same_first_tag", "second_tag"};
-    ASSERT_EQ(CcuSelectAlgForTest(comm_, stream_, multiTags, multiList, 2, multiCtx), HCCL_SUCCESS);
-
-    EXPECT_EQ(GetCcuKernelRegisterCount(), 2U);
-    OpParam singleParam{};
-    OpParam multiParam{};
-    ASSERT_EQ(aclrtMemcpy(&singleParam, sizeof(singleParam), reinterpret_cast<void*>(singleCtx.algInfo[0].opParam),
-        sizeof(singleParam), ACL_MEMCPY_DEVICE_TO_HOST), ACL_SUCCESS);
-    ASSERT_EQ(aclrtMemcpy(&multiParam, sizeof(multiParam), reinterpret_cast<void*>(multiCtx.algInfo[0].opParam),
-        sizeof(multiParam), ACL_MEMCPY_DEVICE_TO_HOST), ACL_SUCCESS);
-    EXPECT_NE(singleParam.resCtx, multiParam.resCtx);
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_ALG_NOT_SUPPORTED);
+    EXPECT_EQ(opResCtx, nullptr);
 }
 
 TEST_F(CcuMc2AllToAllVTest, AllocatesAllToAllVResourceFromTiling)
@@ -272,20 +246,30 @@ TEST_F(CcuMc2AllToAllVTest, KfcServerArgsUseAllocatedQueueAndToken)
     EXPECT_EQ(resourceCtx.kfcServerArgs[5], reinterpret_cast<uint64_t>(cclBuffer) + 0x1234U);
 }
 
-TEST_F(CcuMc2AllToAllVTest, AcceptsBothCcuTilingEngineValues)
+TEST_F(CcuMc2AllToAllVTest, CcuMsEngineDoesNotEnterMc2CcuPath)
 {
-    Mc2CcTilingInner tilings[2] = {BuildAllToAllVTiling(), BuildAllToAllVTiling()};
-    tilings[0].commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_MS);
-    tilings[1].commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_MS);
-    const void* list[] = {&tilings[0], &tilings[1]};
+    Mc2CcTilingInner ccTiling = BuildAllToAllVTiling();
+    ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_MS);
+    const void* list[] = {&ccTiling};
     uint8_t engine = 0;
-    EXPECT_EQ(ObtainCommEngine(list, 2, engine), HCCL_SUCCESS);
+    ASSERT_EQ(ObtainCommEngine(list, 1, engine), HCCL_SUCCESS);
     EXPECT_EQ(engine, static_cast<uint8_t>(OpExecuteConfig::CCU_MS));
 
-    tilings[0].commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
-    tilings[1].commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
-    EXPECT_EQ(ObtainCommEngine(list, 2, engine), HCCL_SUCCESS);
-    EXPECT_EQ(engine, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    Mc2TilingTestData tiling = BuildMc2Tiling({ccTiling});
+    void* opResCtx = nullptr;
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(opResCtx, nullptr);
+}
+
+TEST_F(CcuMc2AllToAllVTest, UnknownAlgorithmConfigFallsBackFromMc2Ccu)
+{
+    Mc2CcTilingInner ccTiling = BuildAllToAllVTiling();
+    strcpy(ccTiling.algConfig, "CcuUnknownAllToAllV");
+    Mc2TilingTestData tiling = BuildMc2Tiling({ccTiling});
+    void* opResCtx = nullptr;
+
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_ALG_NOT_SUPPORTED);
+    EXPECT_EQ(opResCtx, nullptr);
 }
 
 TEST_F(CcuMc2AllToAllVTest, ValidatesNullInputs)
