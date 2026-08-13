@@ -24,8 +24,7 @@ constexpr int16_t ASC_C_API_LOAD_DEV_DEFAULT_OFFSET = 0;
 
 __aicore__ inline int64_t asc_load_dev_impl(__gm__ int8_t* addr)
 {
-    return static_cast<int8_t>(
-        ld_dev(reinterpret_cast<__gm__ uint8_t*>(addr), ASC_C_API_LOAD_DEV_DEFAULT_OFFSET));
+    return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
 __aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint8_t* addr)
@@ -35,8 +34,7 @@ __aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint8_t* addr)
 
 __aicore__ inline int64_t asc_load_dev_impl(__gm__ int16_t* addr)
 {
-    return static_cast<int16_t>(
-        ld_dev(reinterpret_cast<__gm__ uint16_t*>(addr), ASC_C_API_LOAD_DEV_DEFAULT_OFFSET));
+    return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
 __aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint16_t* addr)
@@ -46,8 +44,7 @@ __aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint16_t* addr)
 
 __aicore__ inline int64_t asc_load_dev_impl(__gm__ int32_t* addr)
 {
-    return static_cast<int32_t>(
-        ld_dev(reinterpret_cast<__gm__ uint32_t*>(addr), ASC_C_API_LOAD_DEV_DEFAULT_OFFSET));
+    return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
 __aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint32_t* addr)
@@ -57,8 +54,7 @@ __aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint32_t* addr)
 
 __aicore__ inline int64_t asc_load_dev_impl(__gm__ int64_t* addr)
 {
-    return static_cast<int64_t>(
-        ld_dev(reinterpret_cast<__gm__ uint64_t*>(addr), ASC_C_API_LOAD_DEV_DEFAULT_OFFSET));
+    return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
 __aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint64_t* addr)
