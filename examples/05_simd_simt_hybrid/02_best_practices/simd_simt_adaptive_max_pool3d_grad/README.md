@@ -10,7 +10,7 @@
 
 ## 支持的CANN软件版本
 
-- \>= CANN 9.2.0
+- CANN >= 9.2.0
 
 ## 目录结构介绍
 
@@ -257,7 +257,9 @@ asc_copy_ub2gm_align(output_data + output_base_offset, output_ub, active_output_
 
 使用混合编程时，SIMD和SIMT的性能优化手段可以复用，性能优化的上限更高。
 
-## 对比总结
+## 性能对比总结
+
+### Ascend 950PR性能对比
 
 所有Case的性能数据如下：
 
@@ -268,6 +270,8 @@ asc_copy_ub2gm_align(output_data + output_base_offset, output_ub, active_output_
 | 64 | 6763.949 | 455.944 | 340.51 | 294.406 |
 | 512 | 6997.266 | 2010.422 | 406.567 | 336.848 |
 | 4096 | 8182.059 | 9140.783 | 748.313 | 551.461 |
+
+### 优化要点总结
 
 在该样例中，存在连续（清零）和离散（梯度回填）两部分数据处理。对比四份核函数实现代码以及上面的性能数据，可以发现在代码编写方面，SIMT和Main Scalar的方式相比SIMD API更简单，而性能方面，SIMT比SIMD和Main Scalar耗时更低，且离散写的数据量越大，收益更高。因此，连续和离散（内存操作）并存的场景下，建议采用混合编程的方式，可以兼顾性能和良好的开发体验。
 
@@ -333,9 +337,9 @@ asc_copy_ub2gm_align(output_data + output_base_offset, output_ub, active_output_
   test pass!
   ```
 
-## 性能分析
+### 性能分析
 
-### msOpProf工具介绍
+#### msOpProf工具介绍
 msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
 - 上板性能采集

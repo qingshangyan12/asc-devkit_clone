@@ -14,11 +14,13 @@
 | Case 2 | 2 | SIMT非连续访问UB | 基于搬运接口将GM连续搬运到UB，SIMT每个线程处理一段连续元素，但Warp内相邻线程访问不连续。 |
 | Case 3 | 3 | SIMT连续访问UB | 基于搬运接口将GM连续搬运到UB，调整SIMT线程映射，使Warp内相邻线程访问连续地址。 |
 
-## 本样例支持的产品及CANN软件版本
+## 支持的产品
 
-| 产品 | CANN软件版本 |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+- Ascend 950PR/Ascend 950DT
+
+## 支持的CANN软件版本
+
+- CANN >= 9.2.0
 
 ## 目录结构介绍
 
@@ -431,7 +433,7 @@ __aicore__ inline void process_tiles(
 
 ### 性能分析
 
-### msOpProf工具介绍
+#### msOpProf工具介绍
 msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
 - 上板性能采集

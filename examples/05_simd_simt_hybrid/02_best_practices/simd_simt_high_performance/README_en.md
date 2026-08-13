@@ -13,11 +13,13 @@ This example uses the FloorMod computation to demonstrate performance tuning met
 | Case 2 | 2 | SIMT non-contiguous UB access | GM data is transferred to UB via data transfer interfaces. Each SIMT thread processes a contiguous segment, but adjacent threads within a Warp access non-contiguous addresses. |
 | Case 3 | 3 | SIMT contiguous UB access | GM data is transferred to UB via data transfer interfaces. Thread mapping is adjusted so that adjacent threads within a Warp access contiguous addresses. |
 
-## Supported Products and CANN Versions
+## Supported Products
 
-| Product | CANN Version |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+- Ascend 950PR/Ascend 950DT
+
+## Supported CANN Software Version
+
+- CANN >= 9.2.0
 
 ## Directory Structure
 
@@ -430,7 +432,7 @@ Run the following steps in the root directory of this example to build and run t
 
 ### Performance Analysis
 
-### Introduction to the msOpProf Tool
+#### Introduction to the msOpProf Tool
 
 `msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
