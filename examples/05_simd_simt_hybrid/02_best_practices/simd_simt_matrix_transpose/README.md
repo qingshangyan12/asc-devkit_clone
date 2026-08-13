@@ -8,9 +8,9 @@
 
 - Ascend 950PR/Ascend 950DT
 
-## 支持的CANN版本
+## 支持的CANN软件版本
 
-- CANN >= 9.2.0
+- \>= CANN 9.2.0
 
 ## 目录结构介绍
 
@@ -336,7 +336,7 @@ Case 3与Case 4的仿真指令流水图分别如图4、图5所示。从图4可�
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
+### Ascend 950PR性能对比
 
 下面给出各个Case处理1024×1024 float矩阵时，在Ascend 950PR上的性能数据。
 
@@ -364,7 +364,7 @@ $$
 
 Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内相邻线程写地址跨行分散，GM写无法形成理想连续访问。Case 1通过UB中转把非连续访问转移到UB内部，GM侧访问连续性改善，但按tile分组启动512个Thread Block，调度开销较高。Case 2固定Thread Block数后减少了启动和调度开销，但SIMT VF转置访问UB仍存在bank冲突。Case 3通过32×40的UB padding降低bank冲突后，耗时明显下降。Case 4进一步使用双缓冲，使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，Task Duration降低到6.831μs，对应等效GM读写带宽约1.23TB/s，约达到Ascend 950PR理论GM峰值带宽1.6TB/s的76.8%。该结果已经接近理论带宽上限，但仍高于5.243μs的理论耗时下限，主要来自UB读写、MTE与V之间的同步、`asc_vf_call`调用开销、地址计算以及流水无法完全并行等非GM带宽开销。这些开销属于当前实现路径下暂无明显进一步优化手段的部分。
 
-## 调优建议
+### 优化要点总结
 
 访存类算子调优时，应先用最直接的实现暴露主要差距，再结合理论带宽上限判断优化空间。本样例中，直接转置与理论下限的差距主要来自非连续GM写，因此优化方向不是增加计算并行度，而是重排访存：在SIMD与SIMT混合场景下，以32×32的tile为单位使用MTE连续搬入UB输入缓冲区，在UB内完成转置方向访问并写入UB输出缓冲区，再使用MTE3按输出矩阵行方向连续搬出到GM。
 
@@ -410,9 +410,7 @@ Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内�
   [Success] Case accuracy verification passed.
   ```
 
-## 性能分析
-
-### msOpProf工具介绍
+### 性能分析
 
 msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
@@ -422,33 +420,9 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
 
   基于可执行文件matrix_transpose通过msopprof执行算子调优：
 
-  ```
+  ```bash
   msopprof ./matrix_transpose
   ```
-
-  - 性能数据说明
-    命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹，性能数据文件夹结构示例如下：
-
-    ```bash
-    ├──dump                       # 原始的性能数据，用户无需关注
-    ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-    ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
-    ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
-    ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
-    ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
-    ├──OpBasicInfo.csv            # 算子基础信息
-    ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-    ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
-    └──visualize_data.bin         # MindStudio Insight呈现文件
-    ```
-
-  查看具体的性能分析结果：
-
-  ```bash
-  # 查看Task Duration 以及各项数据
-  cat ./OPPROF_*/PipeUtilization.csv
-  ```
-- 仿真性能采集
 
   可以使用 `msopprof simulator` 进行仿真性能分析，生成可视化的指令流水图等信息。命令如下：
 
@@ -474,4 +448,28 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
 
   执行后，可以在 **MindStudio Insight** 中打开 `visualize_data.bin` 查看可视化指令流水图。
 
-更多 `msOpProf` 工具使用方法，请参见[MindStudio工具调优（msOpProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。
+- 性能数据说明
+
+  命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹，性能数据文件夹结构示例如下：
+
+  ```bash
+  ├──dump                       # 原始的性能数据，用户无需关注
+  ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+  ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+  ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+  ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+  ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+  ├──OpBasicInfo.csv            # 算子基础信息
+  ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+  ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+  └──visualize_data.bin         # MindStudio Insight呈现文件
+  ```
+
+- 查看具体的性能分析结果
+
+  ```bash
+  # 查看Task Duration 以及各项数据
+  cat ./OPPROF_*/PipeUtilization.csv
+  ```
+
+  更多 `msOpProf` 工具使用方法，请参见[MindStudio工具调优（msOpProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。

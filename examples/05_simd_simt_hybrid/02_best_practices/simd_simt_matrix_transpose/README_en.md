@@ -8,9 +8,9 @@ Based on the [matrix_transpose_practice sample](../../../03_simt_api/03_best_pra
 
 - Ascend 950PR/Ascend 950DT
 
-## Supported CANN Version
+## Supported CANN Software Version
 
-- CANN >= 9.2.0
+- \>= CANN 9.2.0
 
 ## Directory Structure
 
@@ -339,7 +339,7 @@ Figure 6 shows that Case 4 uses double buffering to overlap adjacent iterations.
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
+### Ascend 950PR Performance Comparison
 
 The following table shows the performance data of each case when processing a 1024x1024 float matrix on Ascend 950PR.
 
@@ -367,7 +367,7 @@ $$
 
 Case 0 is far from the theoretical lower bound. The main reason is that transpose write-back makes write addresses of adjacent threads in the same Warp stride across rows, so GM writes cannot form ideal contiguous accesses. Case 1 uses UB staging to move non-contiguous access into UB, improving access continuity on the GM side. However, it launches 512 Thread Blocks by tile groups, which causes high scheduling overhead. Case 2 fixes the Thread Block count and reduces launch and scheduling overhead, but SIMT VF transpose access to UB still has bank conflicts. Case 3 uses 32x40 UB padding to reduce bank conflicts, so latency decreases significantly. Case 4 further uses double buffering to run the MTE2 load, SIMT VF transpose, and MTE3 store pipelines in parallel. Task Duration decreases to 6.831μs, corresponding to an equivalent GM read/write bandwidth of about 1.23TB/s, or about 76.8% of the 1.6TB/s theoretical GM peak bandwidth of Ascend 950PR. This result is close to the theoretical bandwidth limit, but still higher than the theoretical latency lower bound of 5.243μs. The remaining gap mainly comes from non-GM-bandwidth overheads, including UB reads and writes, synchronization between MTE and V, `asc_vf_call` overhead, address calculation, and incomplete pipeline parallelism. These overheads currently have no clear further optimization method in this implementation path.
 
-## Tuning Recommendations
+### Optimization Key Points Summary
 
 When tuning memory access operators, first use the most direct implementation to expose the main gap. Then use the theoretical bandwidth limit to estimate the available optimization space. In this sample, the gap between direct transpose and the theoretical lower bound mainly comes from non-contiguous GM writes. Therefore, the optimization direction is not to increase compute parallelism, but to reorder memory accesses. In SIMD and SIMT hybrid scenarios, use 32x32 tiles as the granularity. Use MTE to continuously move each tile into the UB input buffer, access it in the transpose direction inside UB, write the UB output buffer, and use MTE3 to continuously store it to GM along the row direction of the output matrix.
 
@@ -413,41 +413,64 @@ In the sample root directory, perform the following steps to build and run the s
   [Success] Case accuracy verification passed.
   ```
 
-## Performance Analysis
-
-### Introduction to the msOpProf Tool
+### Performance Analysis
 
 `msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
 - On-device performance collection
 
-    On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+  On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
 
-    Run operator tuning on the executable demo with `msopprof`:
+  Run operator tuning on the executable `matrix_transpose` with `msopprof`:
 
-    ```
-    msopprof ./demo
-    ```
+  ```bash
+  msopprof ./matrix_transpose
+  ```
 
-    - Performance data description
-      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+  You can also use `msopprof simulator` for simulation performance analysis to generate visualized instruction pipeline information. The command is as follows:
 
-      ```bash
-      ├──dump                       # Raw performance data; users do not need to inspect it
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
-      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
-      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
-      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
-      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
-      ├──OpBasicInfo.csv            # Basic operator information
-      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
-      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
-      └──visualize_data.bin         # MindStudio Insight presentation file
-      ```
+  ```bash
+  SCENARIO_NUM=4                                                                     # Select the execution scenario, options: 0-4
+  mkdir -p build && cd build;                                                        # Create and enter the build directory
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
+  msopprof simulator --soc-version=<soc_version> ./matrix_transpose
+  ```
 
-View the specific performance analysis results:
+  > Before using simulation tuning, add the `-g` compilation option in `CMakeLists.txt` to generate debug information so that the simulator can collect instruction pipeline diagrams. For how to obtain `soc_version` and other simulation tuning instructions, see the [simulation tuning sample](../../../01_simd_cpp_api/01_utilities/08_simulator).
+  >
 
-```bash
-# View Task Duration and various metrics
-cat ./OPPROF_*/PipeUtilization.csv
-```
+  After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the current directory. The output structure is as follows:
+
+  ```text
+  OPPROF_{timestamp}_XXX/
+  ├── dump                    // Raw performance data; users do not need to inspect it
+  └── simulator
+      ├── core*.veccore*/     // Simulation instruction pipeline files of each Vector Core
+      └── visualize_data.bin  // MindStudio Insight presentation file
+  ```
+
+  After execution, open `visualize_data.bin` in **MindStudio Insight** to view the visualized instruction pipeline.
+
+- Performance data description
+
+  After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+
+  ```bash
+  ├──dump                       # Raw performance data; users do not need to inspect it
+  ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+  ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+  ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+  ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+  ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+  ├──OpBasicInfo.csv            # Basic operator information
+  ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+  ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+  └──visualize_data.bin         # MindStudio Insight presentation file
+  ```
+
+- View performance analysis results
+
+  ```bash
+  # View Task Duration and various metrics
+  cat ./OPPROF_*/PipeUtilization.csv
+  ```
