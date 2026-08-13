@@ -663,6 +663,17 @@ HcclResult CalcChannelRequestNHRWithPriorityTopo(
     return HCCL_SUCCESS;
 }
 
+HcclResult CalcChannelRequestNhrMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
+{
+    // Phase one keeps the current Concurrent algorithm constraint: one CLOS
+    // channel per NHR peer. The interface is intentionally multi-Jetty ready.
+    (void)isIsolation;
+    return CalcChannelRequestNHRWithPriorityTopo(
+        comm, param, topoInfo, subcommInfo, channels, CommTopo::COMM_TOPO_CLOS);
+}
+
 HcclResult CreateChannelRequestByRankId(
     HcclComm comm, const OpParam& param, u32 myRank, u32 remoteRank, std::vector<HcclChannelDesc>& channels,
     u32 channelRepeatNum)
