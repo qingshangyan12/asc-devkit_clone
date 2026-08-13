@@ -148,6 +148,7 @@ template <typename EngineType, typename LayoutType>
 template <load_sideband_mode sideband_mode, typename Coord>
 __simd_callee__ inline decltype(auto) local_tensor<EngineType, LayoutType>::load(const Coord& coord) const
 {
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor::load");
     return detail::load_local_tensor<sideband_mode>(*this, coord);
 }
 
@@ -157,6 +158,7 @@ __simd_callee__ inline void local_tensor<EngineType, LayoutType>::load(const Coo
                                                                        reg_tensor<RegDataType>& dst0,
                                                                        reg_tensor<RegDataType>& dst1) const
 {
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor::load");
     detail::load_local_tensor<sideband_mode>(*this, coord, dst0, dst1);
 }
 
@@ -164,6 +166,7 @@ template <typename EngineType, typename LayoutType>
 template <broadcast_mode brc_mode, typename Coord>
 __simd_callee__ inline decltype(auto) local_tensor<EngineType, LayoutType>::load_broadcast(const Coord& coord) const
 {
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor::load_broadcast");
     return detail::load_broadcast_local_tensor<brc_mode>(*this, coord);
 }
 
@@ -172,6 +175,7 @@ template <store_sideband_mode sideband_mode, typename Coord, typename RegDataTyp
 __simd_callee__ inline void local_tensor<EngineType, LayoutType>::store(const Coord& coord,
                                                                         const reg_tensor<RegDataType>& src)
 {
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor::store");
     detail::store_local_tensor<sideband_mode>(*this, coord, src);
 }
 
@@ -181,6 +185,7 @@ __simd_callee__ inline void local_tensor<EngineType, LayoutType>::store(const Co
                                                                         const reg_tensor<RegDataType>& src0,
                                                                         const reg_tensor<RegDataType>& src1)
 {
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor::store");
     detail::store_local_tensor<sideband_mode>(*this, coord, src0, src1);
 }
 
