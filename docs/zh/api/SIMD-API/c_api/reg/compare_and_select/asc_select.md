@@ -25,7 +25,7 @@
 <!-- end id7 -->
 ## 功能说明
 
-根据mask从源操作数src0，src1中选择元素，得到目的操作数dst。选择的规则为：当mask的比特位为1时，从src0中选取对应位置的数；当mask的比特位为0时，从src1中选取对应位置的数。计算公式如下：
+根据`mask`从源操作数`src0`、`src1`中选择元素，得到目的操作数`dst`。选择的规则为：当`mask`的比特位为1时，从`src0`中选取对应位置的数；当`mask`的比特位为0时，从`src1`中选取对应位置的数。计算公式如下：
 
 $$
 dst_i =
@@ -48,7 +48,7 @@ __simd_callee__ inline void asc_select(vector_<dtype>& dst,
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`bool`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
+`dtype`支持的数据类型为`bool`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
@@ -65,10 +65,10 @@ __simd_callee__ inline void asc_select(vector_half& dst,
 **表1** 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（掩码寄存器或矢量数据寄存器）。 |
-| src0 | 输入 | 源操作数0（掩码寄存器或矢量数据寄存器）。 |
-| src1 | 输入 | 源操作数1（掩码寄存器或矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器）。指定选择src0或src1为有效数据。mask的比特位为1时，选取src0；mask的比特位为0时，选取src1。 |
+| `dst` | 输出 | 目的操作数（掩码寄存器或矢量数据寄存器）。 |
+| `src0` | 输入 | 源操作数0（掩码寄存器或矢量数据寄存器）。 |
+| `src1` | 输入 | 源操作数1（掩码寄存器或矢量数据寄存器）。 |
+| `mask` | 输入 | 源操作数掩码（掩码寄存器）。指定选择`src0`或`src1`为有效数据。`mask`的比特位为1时，选取`src0`；`mask`的比特位为0时，选取`src1`。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -78,10 +78,8 @@ __simd_callee__ inline void asc_select(vector_half& dst,
 
 ## 约束说明
 
-### 通用约束
-
-- 通过mask参数控制的未选中的元素保持源操作数的值而非清零。
-- src0、src1和dst的数据类型需要保持一致。
+- 通过`mask`参数控制的未选中的元素保持源操作数的值而非清零。
+- `src0`、`src1`和`dst`的数据类型需要保持一致。
 
 ## 调用示例
 
@@ -91,10 +89,8 @@ __simd_callee__ inline void asc_select(vector_half& dst,
 #include <cstdint>
 #include <iostream>
 #include <vector>
-
 #include "c_api/asc_simd.h"
 #include "acl/acl.h"
-
 namespace {
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
@@ -117,21 +113,6 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     }
     return true;
 }
-
-template <typename T>
-bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
-    size_t begin, size_t count, double tolerance = 0.0)
-{
-    if (begin + count > actual.size() || begin + count > expected.size()) return false;
-    for (size_t i = begin; i < begin + count; ++i) {
-        if (actual[i] == expected[i]) continue;
-        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
-        if (diff > tolerance || diff < -tolerance) return false;
-    }
-    return true;
-}
-
-
 
 constexpr uint32_t ELEMENT_COUNT = 64;
 
@@ -203,7 +184,9 @@ int main()
     print_data("Output", output);
     print_data("Golden", golden);
     const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_select passed." : "[Failed] asc_select failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_select passed."
+                         : "[Failed] asc_select failed.")
+              << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src0_device);
     aclrtFree(src1_device);

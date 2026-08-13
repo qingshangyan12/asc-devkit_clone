@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-根据mask将src中的每个int32_t类型数据转换成float类型，并支持多种舍入模式，结果写入dst。参考伪代码如下：
+根据`mask`将`src`中的每个`int32_t`类型数据转换成`float`类型，并支持多种舍入模式，结果写入`dst`。参考伪代码如下：
 ```python
 def asc_int322float_rn(dst, src, mask):
     for i in range(64):
@@ -49,7 +49,7 @@ __simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
 
 ### 占位符说明
 
-- `<round_mode>`表示支持的舍入模式，支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
+- `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 
 ### 典型示例
 
@@ -62,13 +62,13 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 
 ## 参数说明
 
-**表1**参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述                                                                                                             |
 | ------ | --------- | ---------------------------------------------------------------------------------------------------------------- |
-| dst    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                   |
-| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
-| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| `dst`    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                   |
+| `src`    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
+| `mask`   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -78,11 +78,9 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 
 ## 约束说明
 
-### 通用约束
-
-- src与dst的数据类型需要与函数原型匹配。
-- 掩码位为0时，dst对应元素置0。
-- 当int32_t的绝对值大于2^24时，按函数后缀指定的舍入模式进行舍入。
+- `src`与`dst`的数据类型需要与函数原型匹配。
+- 掩码位为0时，`dst`对应元素置0。
+- 当`int32_t`的绝对值大于2^24时，按函数后缀指定的舍入模式进行舍入。
 
 ## 调用示例
 
@@ -116,9 +114,6 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     }
     return true;
 }
-
-
-
 
 constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
@@ -201,7 +196,11 @@ int main()
     print_data("Output (raw bytes)", output);
     print_data("Golden 1.0 (raw bytes)", golden);
     const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_int322float_rn/asc_int322float_rna/asc_int322float_rd/asc_int322float_ru/asc_int322float_rz passed." : "[Failed] asc_int322float_rn/asc_int322float_rna/asc_int322float_rd/asc_int322float_ru/asc_int322float_rz failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_int322float_rn/asc_int322float_rna/"
+                           "asc_int322float_rd/asc_int322float_ru/asc_int322float_rz passed."
+                         : "[Failed] asc_int322float_rn/asc_int322float_rna/"
+                           "asc_int322float_rd/asc_int322float_ru/asc_int322float_rz failed.")
+              << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);
