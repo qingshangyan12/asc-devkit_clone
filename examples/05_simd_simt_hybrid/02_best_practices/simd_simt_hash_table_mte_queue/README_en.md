@@ -15,11 +15,13 @@ The following figure shows the data processing pipelines of the two cases.
 
 ![HashTable MTE value movement pipeline](./figures/hash_table_mte_pipeline.png)
 
-## Supported Products and CANN Software Version
+## Supported Products
 
-| Product | CANN Software Version |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+- Ascend 950PR/Ascend 950DT
+
+## Supported CANN Software Version
+
+- \>= CANN 9.2.0
 
 ## Directory Structure
 
@@ -252,7 +254,7 @@ __aicore__ inline void run_task() const
 
 ## Performance Comparison Summary
 
-### Performance Comparison on Ascend 950PR
+### Ascend 950PR Performance Comparison
 
 The performance data of each `dim` configuration is as follows:
 
@@ -264,7 +266,7 @@ The performance data of each `dim` configuration is as follows:
 | 128 | 376.517 | 131.696 | 2.86x |
 | 256 | 585.892 | 204.030 | 2.87x |
 
-### Optimization Summary
+### Optimization Key Points Summary
 
 | Optimization | Core Principle | Sample Implementation |
 |:---|:---|:---|
@@ -273,7 +275,7 @@ The performance data of each `dim` configuration is as follows:
 
 ---
 
-## Compilation and Running
+## Build and Run
 
 In the sample root directory, perform the following steps to compile and run the sample.
 

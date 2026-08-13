@@ -8,9 +8,9 @@ This sample uses the adaptive_max_pool3d_grad operator to compare the implementa
 
 - Ascend 950PR/Ascend 950DT
 
-## Supported CANN Version
+## Supported CANN Software Version
 
-- CANN >= 9.2.0
+- \>= CANN 9.2.0
 
 ## Directory Structure
 
@@ -258,7 +258,9 @@ When there are few gradients to scatter, there are also few discrete GM writes, 
 
 When using hybrid programming, SIMD and SIMT performance optimization methods can be reused together, providing a higher optimization ceiling.
 
-## Comparison Summary
+## Performance Comparison Summary
+
+### Ascend 950PR Performance Comparison
 
 The performance data of all cases is shown below:
 
@@ -269,6 +271,8 @@ The performance data of all cases is shown below:
 | 64 | 6763.949 | 455.944 | 340.51 | 294.406 |
 | 512 | 6997.266 | 2010.422 | 406.567 | 336.848 |
 | 4096 | 8182.059 | 9140.783 | 748.313 | 551.461 |
+
+### Optimization Key Points Summary
 
 This sample contains two parts: contiguous data processing for zeroing and discrete data processing for gradient scatter. Comparing the four kernel implementations and the performance data above, in terms of code writing, SIMT and Main Scalar are simpler than the SIMD API, while in terms of performance, SIMT has lower latency than both SIMD and Main Scalar, and the larger the amount of discrete-write data, the greater the benefit. Therefore, in scenarios where contiguous and discrete memory operations coexist, hybrid programming is recommended, as it delivers both good performance and a good development experience.
 
@@ -337,9 +341,7 @@ Run the following steps in the root directory of this sample to build and execut
   test pass!
   ```
 
-## Performance Analysis
-
-### msOpProf Tool Introduction
+### Performance Analysis
 
 msOpProf is a single-operator performance analysis tool. It provides two usage modes: `msopprof` and `msopprof simulator`. This tool helps users locate issues in operator memory access, operator code, and instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing in different run modes (on-device or simulation) and for different file forms (executable file or operator binary `.o` file).
 

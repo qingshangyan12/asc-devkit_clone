@@ -8,7 +8,7 @@ This example uses the Gather computation to demonstrate thread block count confi
 
 - Ascend 950PR/Ascend 950DT
 
-## Supported CANN Versions
+## Supported CANN Software Version
 
 - \> CANN 9.0.0
 
@@ -273,7 +273,7 @@ For small shapes, the experience of "using all physical cores" cannot be directl
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
+### Ascend 950PR Performance Comparison
 
 **Scheduling overhead vs thread block count (Case 0)**:
 
@@ -319,7 +319,7 @@ For small shapes, the experience of "using all physical cores" cannot be directl
 
 - The optimal thread block count is **32** (1/2 of physical cores), not the full 64 cores; latency increases after the thread block count grows from 32 to 64
 
-## Tuning Recommendations
+### Optimization Key Points Summary
 
 1. **Match thread block count to physical core count for large shapes**: Due to hardware resource limitations, the number of physical cores that can execute in parallel has an upper bound. The thread block count should be as close to the physical core count as possible, avoiding too many thread blocks (queuing and accumulated scheduling overhead) or too few (insufficient parallelism and heavy per-thread-block workload).
 2. **Measure thread block count performance for small shapes**: For small shapes, per-core workload is small, and the scheduling overhead from launching more thread blocks may exceed the benefit. The optimal thread block count is not necessarily the maximum physical core count. Refer to Case 3 and test multiple levels to find the optimal thread block count.
@@ -361,9 +361,7 @@ Run the following steps in the root directory of this example to build and run t
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
-
-### Introduction to the msOpProf Tool
+### Performance Analysis
 
 `msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
