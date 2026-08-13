@@ -113,20 +113,18 @@ __simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* d
 }
 
 template <typename T>
-__simd_vf__ inline void compile_reg_mask_and_fill(T value, uint32_t remain)
+__simd_vf__ inline void compile_reg_mask(uint32_t remain)
 {
     auto vl8_mask = make_mask<mask_pattern::vl8, T>();
     auto every3_mask = make_mask<mask_pattern::every3, T>();
     auto empty_mask = none_mask<T>();
     auto tail_mask = update_mask<T>(remain);
-    auto scalar_fill = fill(value, tail_mask);
-    auto register_fill = fill(scalar_fill, tail_mask);
     static_assert(std::is_same_v<decltype(vl8_mask), reg_tensor<bool>>);
     static_assert(std::is_same_v<decltype(every3_mask), reg_tensor<bool>>);
     (void)vl8_mask;
     (void)every3_mask;
     (void)empty_mask;
-    (void)register_fill;
+    (void)tail_mask;
 }
 
 TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
@@ -170,12 +168,12 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_store_pack;
     (void)compile_store_pack_quarter;
 
-    auto compile_reg_mask_and_fill_b8 = &compile_reg_mask_and_fill<uint8_t>;
-    auto compile_reg_mask_and_fill_b16 = &compile_reg_mask_and_fill<half>;
-    auto compile_reg_mask_and_fill_b32 = &compile_reg_mask_and_fill<float>;
-    (void)compile_reg_mask_and_fill_b8;
-    (void)compile_reg_mask_and_fill_b16;
-    (void)compile_reg_mask_and_fill_b32;
+    auto compile_reg_mask_b8 = &compile_reg_mask<uint8_t>;
+    auto compile_reg_mask_b16 = &compile_reg_mask<half>;
+    auto compile_reg_mask_b32 = &compile_reg_mask<float>;
+    (void)compile_reg_mask_b8;
+    (void)compile_reg_mask_b16;
+    (void)compile_reg_mask_b32;
 }
 
 } // namespace
