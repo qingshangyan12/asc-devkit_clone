@@ -270,7 +270,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        ccuUsedXnNum_ = 13;
+        ccuUsedXnNum_ = 14;
         CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
     }
 }
@@ -316,6 +316,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         handleParamGM_[handleId].dataType = static_cast<HcclDataType>(tilingPtr->srcDataType);
         handleParamGM_[handleId].dstDataType = static_cast<HcclDataType>(tilingPtr->dstDataType);
         handleParamGM_[handleId].op = static_cast<HcclReduceOp>(tilingPtr->reduceType);
+        handleParamGM_[handleId].skipLocalRankCopy = tilingPtr->skipLocalRankCopy;
     }
 
     ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;

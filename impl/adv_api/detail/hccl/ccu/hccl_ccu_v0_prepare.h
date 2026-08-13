@@ -242,6 +242,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[7] = sliceSize;
     xnData_[8] = UINT64_MAX - 1;
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+    xnData_[10] = commParam->skipLocalRankCopy;
 }
 } // namespace AscendC
 
