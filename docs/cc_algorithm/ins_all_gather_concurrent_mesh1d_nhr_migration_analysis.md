@@ -10,11 +10,14 @@
 
 | 项目 | 路径 | 分支 | 提交 |
 | --- | --- | --- | --- |
-| HCCL源仓 | `../hccl` | `master` | `406b6502dc3eaaeb36f835237738269119aba450` |
-| asc-devkit目标仓 | 当前仓 | `cc0806_2` | `b337078caf2f49e94c7053dee30fbe39109070f0` |
+| HCCL源仓 | `../hccl` | `master` | `4b5e0ea26707d3dbc28c31b34c7aca5bea9bd308` |
+| asc-devkit目标仓 | 当前仓 | `cc0806_2` | `6768ea9798d64b545dc457fbffc01aa1ba074947` |
+| asc-devkit主线基线 | 当前仓 | `trunk/master` | `c1693623cc896b7ea3244bb19abb944ca8ff0ac8` |
 | HCCL更新前提交 | `../hccl` | `master` | `530d77c111ede79f390e1e14cc27a50c93ae2e01` |
 
-HCCL已执行`git pull --ff-only`，当前`master`与`origin/master`一致，工作区干净。HCCL从更新前提交到当前提交的差异包含一次较大范围的格式整理，因此不能依据全文件diff直接迁移，必须按调用语义和资源不变量识别有效修改。
+HCCL已执行`git pull --ff-only`，当前`master`与`origin/master`一致，工作区干净。HCCL从更新前提交到当前提交的差异包含一次较大范围的格式整理，因此不能依据全文件diff直接迁移，必须按调用语义和资源不变量识别有效修改。`406b6502dc3eaaeb36f835237738269119aba450`之后与AllGather相关的提交`6375b0b8`统一了算法注册宏命名，不改变本文分析的Mesh1D和Concurrent算法语义。
+
+本文所称asc-devkit的`master`均指上游`trunk/master`。fork的`origin/master`当前为`b955827a49718562d2010d3e30fdc5d2835bcc7f`，不是本patch的直接基线，不用于本节E2E差异结论。`cc0806_2`的父提交就是上述`trunk/master`，因此有效patch区间为`trunk/master..cc0806_2`。
 
 本文使用以下状态标记：
 
@@ -36,6 +39,95 @@ HCCL已执行`git pull --ff-only`，当前`master`与`origin/master`一致，工
 **源码事实：**最新HCCL通用NHR模板已经支持多Jetty，但Concurrent executor尚未形成完整的多Jetty闭环。它一方面调用`CalcChannelRequestNhrMultiJetty`，另一方面又要求Mesh和NHR的channel描述总数相等。Mesh侧每个对端只取1条channel，因此该校验使当前Concurrent有效路径实际上只能使用NHR单Jetty。若真实拓扑返回多条NHR channel，`CalcRes`会直接失败。
 
 **迁移建议：**不得把Concurrent算法改成host侧连续启动两个`HcclLaunchAicpuKernel`。正确方案是保留一次入口launch，扩展并验证同一个`AlgResourceCtxSerializable`内的多thread、notify、channel和scratch资源。
+
+## cc0806_2与master的Mesh1D E2E差异
+
+### 结论和口径
+
+**源码事实：**若`InsAllGatherMesh1D`严格指注册名为`InsAllGatherMesh1D`的AICPU算法，则`cc0806_2`与`trunk/master`的E2E流程没有变化。以下关键文件在两个提交中的Git blob完全相同：
+
+| E2E层次 | 文件 | Git对象 |
+| --- | --- | --- |
+| AllGather算子入口和参数构造 | `src/ops/all_gather/all_gather_op.cc` | `7c6caeb61145045239373eda5f61611a031782d3` |
+| selector公共调度 | `src/ops/op_common/selector/execute_selector.cc` | `facd959346e09ff1e5b74408d512beed8e8a7332` |
+| 资源计算、缓存和引擎分派 | `src/ops/op_common/op_common.cc` | `5ffb682baaab93735ff4875dcc27eb74abf0b0f0` |
+| AICPU通用入口和executor调用 | `src/ops/op_common/template/aicpu/kernel_launch.cc` | `a2d44e8c97c27ef6ccb54d2b6dd1c312a624ca7f` |
+| Mesh1D单模板executor | `src/ops/all_gather/executor/ins_v2_all_gather_sole_executor.cc` | `99d85d1168be744f91893da5c231026de506677c` |
+| Mesh1D AICPU模板 | `src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc` | `3cede06c14a1f1bc73fe51e9f44378c15ef2c6b1` |
+
+AllGather selector文件虽然被patch修改，但改动只在`SelectCcuMsAlgo`和`SelectCcuScheduleLevel0Algo`。`SelectAicpuAlgo`逐行未变，仍在单层`MESH_1D`上选择`InsAllGatherMesh1D`，并在符合阈值的`MESH_1D_CLOS`场景按相同条件选择Mesh1D或Concurrent算法。
+
+**源码事实：**若“Mesh1D流程”泛指AllGather在Mesh1D拓扑上的所有执行引擎，则patch中的CCU/KFC流程与master不同。CCU注册名是`CcuAllGatherMesh1DMem2Mem`，不是`InsAllGatherMesh1D`。两者必须分开讨论。
+
+### AICPU E2E流程对比
+
+master和patch的AICPU路径是同一条链：
+
+```mermaid
+flowchart TD
+    A[MC2 tiling：AICPU_TS + AllGather] --> B[HcclAllocComResourceByTiling]
+    B --> C[AllocComResourceByTilingAicpu]
+    C --> D[GetOpParam / ExecuteSelector]
+    D --> E[AllGatherAutoSelector::SelectAicpuAlgo]
+    E --> F[algName = InsAllGatherMesh1D]
+    F --> G[本地CollAlgExecRegistryV2]
+    G --> H[TopoMatch1D + CalcRes]
+    H --> I[GetAlgResAICPU并序列化资源]
+    I --> J[一次HcclLaunchAicpuKernel]
+    J --> K[InsV2AllGatherSoleExecutor::Orchestrate]
+    K --> L[InsTempAllGatherMesh1D::KernelRun]
+    L --> M[LocalDataCopy]
+    M --> N[PreSyncInterThreads]
+    N --> O[每个对端一条thread/channel执行SendRecvRead]
+    O --> P[PostSyncInterThreads]
+```
+
+两个分支还具有以下相同属性：
+
+- `UseCannBridge`在master虽然会桥接AICPU AllReduce、AllToAll和AllToAllV，但从未包含AllGather；patch将其统一改为`false`，所以AllGather在两边都使用asc-devkit本地selector和executor。
+- `InsAllGatherMesh1D`仍通过`InsV2AllGatherSoleExecutor<TopoMatch1D, InsTempAllGatherMesh1D>`注册。
+- 资源量仍为`rankSize - 1`个thread、每个远端rank一条channel，以及对应的主从thread notify。
+- host侧仍只启动一次通用AICPU入口；template内部的本地复制、前同步、远端Read和尾同步顺序未变。
+- patch中的CCU多算子配置、共享KFC Server和dispatch修改均受`COMM_ENGINE_CCU`分支保护，不会进入本AICPU流程。
+
+因此，对AICPU `InsAllGatherMesh1D`而言，patch没有引入新的kernel、额外launch、不同资源格式、不同cache语义或不同数据切片。
+
+### CCU/KFC Mesh1D流程差异
+
+CCU路径的变化如下：
+
+| 差异点 | `trunk/master` | `cc0806_2` | 对E2E的影响 |
+| --- | --- | --- | --- |
+| 接受的执行配置 | 资源入口只接受`CCU_SCHED` | 同时接受`CCU_MS`和`CCU_SCHED` | `CCU_MS` AllGather在master会被拒绝，在patch可进入本地CCU资源流程 |
+| selector拓扑门禁 | `CCU_MS`允许`topoLevelNums <= 1`的Mesh1D；schedule仅排除`TWO_DIE_NOT_REGULAR` | 两条路径都要求单层、`MESH_1D`、`SINGLE_DIE` | patch主动收窄双die和非单die路径，符合本次单die范围 |
+| KFC资源组织 | 每个tiling逐个`ProcessCcuTiling`并准备资源 | 先选择全部primitive，再创建一份共享KFC Server资源 | 单算子也改用新的共享server构造；多算子可共享一个常驻server |
+| server cache tag | 以原算法tag组织 | 由首个算法tag和有序op配置生成hash tag | 不同dispatch集合不会错误复用同一server IR |
+| server dispatch | 资源中的单一`opParam.opType`决定分支 | 队列参数`opId`匹配预生成的`supportedOpIds` | AllGather与其他已迁移算子可由同一server按opId分发 |
+| 独立KFC op | master保留`kfc_server_op.cc/.h` | patch删除这两个文件 | KFC Server不再作为独立用户op选择，而是在CCU算法资源阶段注入 |
+
+CCU分流差异可概括为：
+
+```mermaid
+flowchart LR
+    A[AllGather Mesh1D tiling] --> B{执行配置}
+    B -->|AICPU_TS| C[master与patch相同：InsAllGatherMesh1D]
+    B -->|CCU_MS| D{分支}
+    D -->|master| E[ObtainCommEngine拒绝]
+    D -->|cc0806_2| F[单die门禁]
+    B -->|CCU_SCHED| G{单die门禁}
+    F --> H[CcuAllGatherMesh1DMem2Mem]
+    G --> H
+    H --> I[共享KFC Server资源]
+    I --> J[队列opId dispatch到AllGather CCU kernel]
+```
+
+### 行为判断和验证边界
+
+**源码事实：**`cc0806_2`没有改变AICPU `InsAllGatherMesh1D`的E2E实现；它改变的是同一Mesh1D拓扑下的CCU/KFC可达范围和server组织方式。把CCU变化描述为“`InsAllGatherMesh1D`算法变化”是不准确的，因为实际命中的注册算法名不同。
+
+**迁移判断：**对当前AllGather、单die、AICPU范围，patch相对master没有需要回迁或重新设计的Mesh1D流程差异。后续迁移Concurrent算法时可以继续把AICPU Mesh1D作为单模板参考基线，但不能照搬CCU共享KFC Server的`opId` dispatch模型来拆分AICPU双模板任务图。
+
+**待验证：**本节结论来自提交级源码、注册和调用链审计。本次文档更新未重新运行AICPU e2e或CCU host ST；已有测试结果不能替代对新patch提交的回归确认。若要把“源码等价”提升为“运行结果等价”，至少应在master和patch上使用相同tiling各执行一次强制`InsAllGatherMesh1D`的AICPU e2e，并比对selector命中日志、task graph和输出语义。
 
 ## HCCL调用链
 

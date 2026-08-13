@@ -135,4 +135,19 @@ HcclResult CalcDataSplitByPortGroupZAxisDetour(
 
     return HcclResult::HCCL_SUCCESS;
 }
+
+bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u32 netLayer, const CommTopo topoType)
+{
+    if (topoInfo == nullptr || topoInfo->netLayerDetails.localNetInsSizeOfLayer.size() <= netLayer
+        || topoInfo->topoInstDetailsOfLayer.size() <= netLayer) {
+        return false;
+    }
+    const u32 localRankSize = topoInfo->netLayerDetails.localNetInsSizeOfLayer[netLayer];
+    const auto& rankNumForTopoType = topoInfo->topoInstDetailsOfLayer[netLayer].rankNumForTopoType;
+    auto iter = rankNumForTopoType.find(topoType);
+    if (iter == rankNumForTopoType.end()) {
+        return false;
+    }
+    return std::find(iter->second.begin(), iter->second.end(), localRankSize) != iter->second.end();
+}
 } // namespace mc2_ops_hccl

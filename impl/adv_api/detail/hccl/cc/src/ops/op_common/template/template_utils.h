@@ -23,6 +23,8 @@ namespace mc2_ops_hccl {
 
 #define UINT32_MAX (4294967295U)
 constexpr u32 INVALID_U32 = UINT32_MAX;
+constexpr u32 MAX_JETTY_NUM = 4;
+constexpr u32 SMALL_SIZE_512KB = 512 * 1024;
 
 constexpr s32 INVALID_RANKID = INT32_MAX;
 
@@ -305,6 +307,9 @@ u32 GetNHRStepNum(u32 rankSize);
 
 inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc>& channels)
 {
+    if (channels.empty()) {
+        return 0;
+    }
     u32 channelsPerRank = 1;
     u32 currentRank = INVALID_VALUE_RANKID;
     u32 currentCount = 0;
@@ -313,11 +318,12 @@ inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc>& channels)
         if (channel.remoteRank == currentRank) {
             currentCount++;
         } else {
-            if (currentCount != channelsPerRank && channel.remoteRank != channels[0].remoteRank) {
+            if (currentCount != channelsPerRank && currentRank != channels[0].remoteRank
+                && currentRank != INVALID_VALUE_RANKID) {
                 HCCL_WARNING(
                     "[CalcChannelsPerRank] channel num[%u] of remote rank[%u] is not equal to "
                     "channel num[%u] of previous ranks.",
-                    currentCount, channel.remoteRank, channelsPerRank);
+                    currentCount, currentRank, channelsPerRank);
             }
             if (currentCount > channelsPerRank) {
                 channelsPerRank = currentCount;
@@ -334,6 +340,9 @@ inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc>& channels)
 
 inline u32 CalcChannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels)
 {
+    if (channels.empty()) {
+        return 0;
+    }
     u32 channelsPerRank = 1;
     for (const auto& channelsByRank : channels) {
         if (channelsByRank.second.size() > channelsPerRank) {
@@ -378,6 +387,8 @@ HcclResult CalcDataSplitByPortGroupZAxisDetour(
     const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
     std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset,
     const u32 level0ChannelNumPerRank, const u32 level1ChannelNumPerRank, const float level0DataRatio = 0.5f);
+
+bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u32 netLayer, const CommTopo topoType);
 
 } // namespace mc2_ops_hccl
 #endif

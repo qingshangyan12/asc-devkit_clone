@@ -9,6 +9,7 @@
  */
 
 #include "hccl/hccl_types.h"
+#include <atomic>
 #include "hccl/base.h"
 #include "hccl_res.h"
 #include "dtype_common.h"
@@ -102,6 +103,36 @@ Mc2TaskCacheTestStubState& GetMc2TaskCacheTestStubState()
 }
 
 void ResetMc2TaskCacheTestStubState() { GetMc2TaskCacheTestStubState() = Mc2TaskCacheTestStubState{}; }
+
+namespace {
+std::mutex g_aicpuLaunchAlgNameMutex;
+std::vector<std::string> g_aicpuLaunchAlgNames;
+std::atomic<uint32_t> g_openExecutorLaunchCount{0U};
+}
+
+void RecordAicpuLaunchAlgName(const char* algName)
+{
+    std::lock_guard<std::mutex> lock(g_aicpuLaunchAlgNameMutex);
+    g_aicpuLaunchAlgNames.emplace_back(algName == nullptr ? "" : algName);
+}
+
+std::vector<std::string> GetAicpuLaunchAlgNames()
+{
+    std::lock_guard<std::mutex> lock(g_aicpuLaunchAlgNameMutex);
+    return g_aicpuLaunchAlgNames;
+}
+
+void ResetAicpuLaunchAlgNames()
+{
+    std::lock_guard<std::mutex> lock(g_aicpuLaunchAlgNameMutex);
+    g_aicpuLaunchAlgNames.clear();
+}
+
+uint32_t GetOpenExecutorLaunchCount() { return g_openExecutorLaunchCount.load(); }
+
+void ResetOpenExecutorLaunchCount() { g_openExecutorLaunchCount.store(0U); }
+
+void RecordOpenExecutorLaunch() { ++g_openExecutorLaunchCount; }
 
 #ifdef __cplusplus
 extern "C" {
