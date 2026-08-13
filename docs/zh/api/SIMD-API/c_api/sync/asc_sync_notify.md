@@ -66,8 +66,8 @@ PIPE_S
 - 相同源流水、相同目标流水、相同id下，连续使用`asc_sync_notify`会引发未定义行为。
 - 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致，否则同步关系不成立。
 - `pipe`与`tpipe`均不可取`PIPE_ALL`，否则触发异常。
-- `id`取值范围为0~7，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。
-- 本接口不会对 `pipe`与`tpipe`两条流水的后续指令不产生阻塞效果。
+- 每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。例如`PIPE_M`与`PIPE_V`的组合和`PIPE_V`与`PIPE_MTE3`的组合可同时使用相同的`id`值而互不干扰。
+- 本接口不会对`pipe`与`tpipe`两条流水的后续指令产生阻塞效果。
 
 ## 调用示例
 

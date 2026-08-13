@@ -1,4 +1,4 @@
-# 关键特性说明<a name="ZH-CN_TOPIC_0000002555621184"></a>
+# 关键特性说明
 
 确定性计算是指在相同输入条件下，无论执行次数或执行环境如何变化，总能产生完全一致输出结果的计算过程。确定性计算为系统稳定性和实验可验证性提供保障。
 
@@ -6,9 +6,9 @@
 
 - 对于浮点数类型的原子累加，本文以`asc_set_atomic_add_float()`为例，更多原子操作类型参考[asc_set_atomic_add](asc_set_atomic_add.md)。
 - 对于原子最大和原子最小，本文以`asc_set_atomic_max_float()`和`asc_set_atomic_min_float()`为例，更多原子操作类型参考[asc_set_atomic_max](asc_set_atomic_max.md)和[asc_set_atomic_min](asc_set_atomic_min.md)。
-- 对于AIV和AIC中向GM搬运数据的接口，本文分别以`asc_copy_ub2gm()`和`asc_copy_l0c2gm()`为例，更多搬运接口参考[矢量数据搬运](../vector_data_move/)和[矩阵数据搬运](../cube_data_move/)。
+- 对于AIV和AIC中向GM搬运数据的接口，本文分别以`asc_copy_ub2gm()`和`asc_copy_l0c2gm()`为例，更多搬运接口参考[矢量数据搬运](../vector_data_move/vector_data_move.md)和[矩阵数据搬运](../cube_data_move/cube_data_move.md)。
 
-## 确定性计算概述<a name="ZH-CN_TOPIC_0000002555780816"></a>
+## 确定性计算概述
 
 为引出原子操作场景下非确定性计算的问题，我们构建如下常见的确定性计算场景：首先，通过单组浮点数数据搬运完成GM的初始化；随后，启动原子累加操作；最后，经由多次数据搬运，在GM上对多组浮点数数据进行累加。具体伪代码如下：
 
@@ -22,14 +22,14 @@
 
 如下图1所示，开发者的预期结果：指令发射的顺序能够严格对应实际指令执行顺序，多次执行该段代码，无论执行多少次，最终GM数据均为data0 + data1 + data2 + data3，结果完全一致，实现确定性计算。
 
-**图1**  确定性计算场景，GM上数据变化过程<a name="zh-cn_topic_0000002552941426_fig71821376818"></a>
+**图1**  确定性计算场景，GM上数据变化过程
 ![](../../../figures/deterministic_computation_gm_data_change_process.png "Deterministic computation scenario, GM data change process")
 
 但实际情况是，若开发者不做干预，程序每次运行时这些指令的执行顺序都可能发生变化，最终导致GM数据与预期结果不一致。下面列举两种可能的指令执行顺序及其对应的执行流程。
 
-## 非确定性计算，结果1<a name="zh-cn_topic_0000002552941426_section027603463315"></a>
+## 非确定性计算，结果1
 
-**图2**  非确定性计算场景1，GM上数据变化过程<a name="zh-cn_topic_0000002552941426_fig273814664819"></a>
+**图2**  非确定性计算场景1，GM上数据变化过程
 ![](../../../figures/non_deterministic_computation_1_gm_data_change_process.png "Non-deterministic computation scenario 1, GM data change process")
 
 如图2所示，该场景中指令执行流程如下：
@@ -49,9 +49,9 @@
 - 原子操作数据类型为浮点数（整数加法满足结合律）。
 - 带随路原子操作的搬运指令达到3条及以上（浮点数加法满足交换律，但是不满足结合律）。
 
-## 非确定性计算，结果2<a name="zh-cn_topic_0000002552941426_section1547411390818"></a>
+## 非确定性计算，结果2
 
-**图3**  非确定性计算场景2，GM上数据变化过程<a name="zh-cn_topic_0000002552941426_fig1829915169912"></a>
+**图3**  非确定性计算场景2，GM上数据变化过程
 ![](../../../figures/non_deterministic_computation_2_gm_data_change_process.png "Non-deterministic computation scenario 2, GM data change process")
 
 如图3所示，该场景中指令执行流程如下：
@@ -68,7 +68,7 @@
 
 此类乱序导致结果偏差无需满足任何前提条件，开发者无需再区分原子操作类型、原子操作数据类型，也无需考虑带随路原子操作的搬运指令数量是否达到3条及以上。
 
-## 确定性计算实现方案<a name="ZH-CN_TOPIC_0000002586300751"></a>
+## 确定性计算实现方案
 
 根据导致非确定性计算的两个根因，下面也从解决这两个方面描述确定性计算实现的方案。核心思想是在指令之间插入适当的同步，使每次程序运行时相关指令都按照预期确定的顺序执行，最终保证每次执行程序输出的结果都相同。具体来说包含以下两个方面：
 
@@ -80,8 +80,8 @@
 
     指令3与4、4与5之间插入同步，能够确保浮点数累加的顺序符合预期。
 
-    >[!CAUTION]注意
-    >开启原子操作的指令与后续搬运指令之间的同步由硬件保证。
+    > [!CAUTION]注意
+    > 开启原子操作的指令与后续搬运指令之间的同步由硬件保证。
 
 ```text
 // 整个原子累加在同一个核内执行，控制5个指令的执行顺序为“1→2→3→4→5”。
@@ -122,7 +122,7 @@ if (asc_get_block_idx() == 0) {
 
 下面介绍如何基于硬件同步指令实现核内同步，以及如何基于软件同步方案实现核间同步。
 
-## 核内同步<a name="zh-cn_topic_0000002583421469_section6896184932119"></a>
+## 核内同步
 
 搬运指令和开启原子操作的指令流水类型如下表所示，当上述指令在同一个核内执行时，开发者按需插入[asc_sync_pipe](../sync/asc_sync_pipe.md)或者[asc_sync_notify](../sync/asc_sync_notify.md)与[asc_sync_wait](../sync/asc_sync_wait.md)。
 
@@ -134,7 +134,7 @@ if (asc_get_block_idx() == 0) {
 | asc_copy_l0c2gm | PIPE_FIX |
 | asc_set_atomic_add_float()/asc_set_atomic_max_float()/asc_set_atomic_min_float() | PIPE_S |
 
-## 核间同步<a name="zh-cn_topic_0000002583421469_section331316523218"></a>
+## 核间同步
 
 由于当前未提供用于控制不同核之间执行顺序的硬件同步接口，因此确定性计算场景下的核间同步需通过软件仿真实现：通过GM中的信号量实现核间同步，先建立一对核（AIV或AIC）之间的同步，进而扩展至多个核之间的同步。
 
@@ -146,7 +146,7 @@ if (asc_get_block_idx() == 0) {
 
 - 当前核在执行搬运任务前，会通过Scalar单元不断读取该信号量的值。如果信号量不等于1，当前核会进入阻塞等待状态；当检测到信号量等于1时，当前核会解除阻塞，开始执行自己的数据搬运或原子操作。为确保信号量等于1之前，当前核不会执行搬运指令，需要在搬运指令之前插入核内同步3。
 
-**图4**  一对核之间软件同步方案流程图<a name="zh-cn_topic_0000002583421469_fig1491417244811"></a>    
+**图4**  一对核之间软件同步方案流程图    
 ![](../figures/software_synchronization_between_two_cores_flowchart.png "Software synchronization flowchart between two cores")
 
 Scalar单元访问GM上的信号量，存在两种访问方式：
@@ -162,5 +162,5 @@ Scalar单元访问GM上的信号量，存在两种访问方式：
 如图4所示，核间同步方案中也需要与核内同步配合使用，现将三处核内同步作用说明如下：
 
 - 核内同步1（可选）：核内存在多条数据搬运指令时，通过该同步保证各搬运操作严格按顺序执行。
-- 核内同步2（必备）：等待前一个核全部任务执行完毕后，才允许Scalar单元向全局内存信号量写入1。
+- 核内同步2（必备）：等待前一个核全部任务执行完毕后，才允许Scalar单元向GM信号量写入1。
 - 核内同步3（必备）：等待Scalar单元检测到信号量更新为1后，当前核再启动后续任务执行。

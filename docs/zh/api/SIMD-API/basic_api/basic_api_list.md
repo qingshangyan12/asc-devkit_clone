@@ -537,7 +537,7 @@
 | [GetStoreAtomicConfig(ISASI)](atomic_operations/GetStoreAtomicConfig_ISASI.md) | 获取原子操作开启位与原子操作类型的值。 |
 | [AtomicAdd](atomic_operations/AtomicAdd.md) | 调用该接口后，可在指定GM地址上进行原子加操作。 |
 | [AtomicMin](atomic_operations/AtomicMin.md) | 调用该接口后，可在指定GM地址上进行原子比较取小操作。 |
-| [AtomicMax](atomic_operations/AtomicMax.md) | 调用该接口后，可在指定GM地址上进行原子取大操作。 |
+| [AtomicMax](atomic_operations/AtomicMax.md) | 调用该接口后，可在指定GM地址上进行原子取最大值操作。 |
 | [AtomicCas](atomic_operations/AtomicCas.md) | 调用该接口后，可在指定GM地址上进行原子比较，如果和value1相等，则把value2的值赋值到GM上；如果和value1不相等，则GM上的值不变。 |
 | [AtomicExch](atomic_operations/AtomicExch.md) | 在GM内存中执行原子交换操作。具体来说，它读取指定GM地址上的数据，并将新的值存储回同一地址。函数返回旧值。 |
 
