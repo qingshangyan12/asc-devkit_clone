@@ -185,8 +185,9 @@ static CcuResult DoReduceScatterReadReduceFast(KfcReduceScatterMesh1DMem2MemCont
     peerAddr.addr += ctx.currentRankSliceInputOffset;
     peerAddr.token = ctx.token[peerId];
 
-    ccu::ReadReduce(ctx.channels[0], fastOutput, peerAddr, ctx.normalSliceSize, ctx.dataType, ctx.reduceOp, ctx.event, 1);
-    ccu::EventWait(ctx.event, 1);
+    (void)ccu::ReadReduce(ctx.channels[0], fastOutput, peerAddr, ctx.normalSliceSize, ctx.dataType, ctx.reduceOp,
+                          ctx.event, 1);
+    (void)ccu::EventWait(ctx.event, 1);
 
     return CCU_SUCCESS;
 }
@@ -226,32 +227,29 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
 
     CCU_IF(useFast != 0)
     {
-        CCU_CHK_RET(DoReduceScatterReadReduceFast(ctx));
+        (void)DoReduceScatterReadReduceFast(ctx);
+        ctx.repeatNum = UINT64_MAX;
     }
 
-    CCU_IF(useFast == 0)
+    ccu::Variable repeatNumAdd;
+    repeatNumAdd = 1;
+    ctx.flag = 0;
+    CCU_WHILE(ctx.repeatNum != UINT64_MAX)
     {
-        ccu::Variable repeatNumAdd;
-        repeatNumAdd = 1;
-        ctx.flag = 0;
-        // AIV encodes one round as UINT64_MAX - 1; keep the original sentinel protocol unchanged.
-        CCU_WHILE(ctx.repeatNum != UINT64_MAX)
+        ctx.repeatNum += repeatNumAdd;
+        CCU_IF(ctx.flag == 1)
         {
-            ctx.repeatNum += repeatNumAdd;
-            CCU_IF(ctx.flag == 1)
-            {
-                for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
-                    if (rankIdx == ctx.rankId) {
-                        ctx.myInput.addr += ctx.inputRepeatStride;
-                    } else {
-                        ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
-                    }
+            for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
+                if (rankIdx == ctx.rankId) {
+                    ctx.myInput.addr += ctx.inputRepeatStride;
+                } else {
+                    ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
                 }
-                ctx.output += ctx.outputRepeatStride;
             }
-            CCU_CHK_RET(DoReduceScatter(ctx));
-            ctx.flag = 1;
+            ctx.output += ctx.outputRepeatStride;
         }
+        CCU_CHK_RET(DoReduceScatter(ctx));
+        ctx.flag = 1;
     }
     return CCU_SUCCESS;
 }
