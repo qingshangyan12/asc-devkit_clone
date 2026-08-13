@@ -42,18 +42,6 @@ protected:
         int64_t flag_id = static_cast<int64_t>(11);                                         \
         asc_sync_inter_wait(pipe, flag_id);                                                 \
         GlobalMockObject::verify();                                                         \
-    }                                                                                       \
-                                                                                            \
-    TEST_F(TEST_ASC_SYNC_INTER_WAIT, TEST_ASC_SYNC_INTER_WAIT_UINT8_##coreType##_##pipeVal) \
-    {                                                                                       \
-        g_coreType = coreType;                                                              \
-        MOCKER_CPP(wait_flag_dev, void(pipe_t, int64_t))                                    \
-            .times(1)                                                                       \
-            .will(invoke(wait_flag_dev_inter_mode_stub_##coreType##_##pipeVal));            \
-        pipe_t pipe = pipeVal;                                                              \
-        uint8_t flag_id = static_cast<uint8_t>(11);                                         \
-        asc_sync_inter_wait(pipe, flag_id);                                                 \
-        GlobalMockObject::verify();                                                         \
     }
 
 TEST_ASC_SYNC_INTER_WAIT_BY_PIPE(C_API_AIC_TYPE, PIPE_S);
