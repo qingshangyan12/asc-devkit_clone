@@ -1309,6 +1309,7 @@
             -   [asc_set_l0c2gm_relu_alpha](SIMD-API/c_api/sys_var/asc_set_l0c2gm_relu_alpha.md)
             -   [asc_set_l12l0_padding_val](SIMD-API/c_api/sys_var/asc_set_l12l0_padding_val.md)
             -   [asc_set_l3d_rpt_b](SIMD-API/c_api/sys_var/asc_set_l3d_rpt_b.md)
+            -   [asc_get_pipe_idle_slot_count](SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md)
             -   [asc_get_ar_spr（废弃）](SIMD-API/c_api/sys_var/asc_get_ar_spr_deprecated.md)
         -   [缓存控制](SIMD-API/c_api/cache_ctrl/cache_control.md)
             -   [asc_datacache_preload](SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md)
@@ -1333,8 +1334,6 @@
             -   [asc_hf32_round_mode](SIMD-API/c_api/enum/asc_hf32_round_mode.md)
             -   [asc_load_l2_cache_mode](SIMD-API/c_api/enum/asc_load_l2_cache_mode.md)
             -   [asc_store_l2_cache_mode](SIMD-API/c_api/enum/asc_store_l2_cache_mode.md)
-        -   [实验接口](SIMD-API/c_api/experimental/experimental.md)
-            -   [asc_get_pipe_idle_slot_count](SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md)
 
     -   [高阶API](SIMD-API/adv_api/adv_api.md)
         -   [高阶API列表](SIMD-API/adv_api/adv_api_list.md)
