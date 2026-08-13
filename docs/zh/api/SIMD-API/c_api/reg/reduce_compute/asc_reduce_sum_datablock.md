@@ -58,13 +58,13 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_<dst_dtype>& dst,
 ### src_dtype与dst_dtype数据类型支持情况
 
 | `src_dtype` | `dst_dtype` |
-| --------- | --------- |
-| `int16_t` | `int32_t` |
-| `uint16_t` | `uint32_t` |
-| `half` | `half` |
-| `int32_t` | `int32_t` |
-| `uint32_t` | `uint32_t` |
-| `float` | `float` |
+| ----------- | ----------- |
+| `int16_t`   | `int32_t`   |
+| `uint16_t`  | `uint32_t`  |
+| `half`      | `half`      |
+| `int32_t`   | `int32_t`   |
+| `uint32_t`  | `uint32_t`  |
+| `float`     | `float`     |
 
 ### 典型示例
 
@@ -81,9 +81,9 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述                                     |
 | ------ | --------- | ---------------------------------------- |
-| `dst`    | 输出      | 目的操作数（矢量数据寄存器）。           |
-| `src`    | 输入      | 源操作数（矢量数据寄存器）。             |
-| `mask`   | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
+| `dst`  | 输出      | 目的操作数（矢量数据寄存器）。           |
+| `src`  | 输入      | 源操作数（矢量数据寄存器）。             |
+| `mask` | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -115,9 +115,17 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst,
 
 ## 调用示例
 
-```cpp
-// 将代码保存为example.asc后，使用以下命令编译并运行：
-// bisheng example.asc -o main --npu-arch=dav-3510; ./main
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
