@@ -60,6 +60,8 @@ $$
 表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。特别地，当数据类型为`int4b_t`时，`K0 = 64`。
 <!-- end id9 -->
 
+本接口为矩阵计算接口，仅在AIC上生效。
+
 ## 函数原型
 
 <!-- npu="950" id12 -->
@@ -137,7 +139,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
   | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
   | `float` | `float` | `float` | `float` |
 
-- asc_mmad_s4接口，当输入矩阵数据类型为`int4b_t`时调用此类借口：
+- asc_mmad_s4接口，当输入矩阵数据类型为`int4b_t`时调用此类接口：
 
   ```c
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
