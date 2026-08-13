@@ -13,6 +13,17 @@
 #include <cstdint>
 #include "stub_fun.h"
 
+// tikicpulib's host stub does not expose the complete predicate-pattern set
+// used by the Tensor API. These are host-test Literal values only.
+inline constexpr Literal PAT_VL1 = static_cast<Literal>(100);
+inline constexpr Literal PAT_VL2 = static_cast<Literal>(101);
+inline constexpr Literal PAT_VL3 = static_cast<Literal>(102);
+inline constexpr Literal PAT_VL4 = static_cast<Literal>(103);
+inline constexpr Literal PAT_VL128 = static_cast<Literal>(104);
+inline constexpr Literal PAT_M3 = static_cast<Literal>(105);
+inline constexpr Literal PAT_M4 = static_cast<Literal>(106);
+inline constexpr Literal PAT_Q = static_cast<Literal>(107);
+
 using float8_e4m3_t = fp8_e4m3fn_t;
 using float8_e5m2_t = fp8_e5m2_t;
 using float4_e1m2x2_t = fp4x2_e1m2_t;
