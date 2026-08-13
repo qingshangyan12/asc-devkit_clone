@@ -20,8 +20,8 @@ namespace mc2_ops_hccl {
 class InsTempAllReduceMesh1DOneShot : public InsAlgTemplateBase {
 public:
     InsTempAllReduceMesh1DOneShot() = default;
-    explicit InsTempAllReduceMesh1DOneShot(const OpParam& param, const u32 rankId,
-                                        const std::vector<std::vector<u32>>& subCommRanks);
+    explicit InsTempAllReduceMesh1DOneShot(
+        const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks);
     ~InsTempAllReduceMesh1DOneShot() override;
 
     std::string Describe() const override
@@ -31,10 +31,12 @@ public:
         return info;
     }
 
-    HcclResult KernelRun(const OpParam& param, const TemplateDataParams& tempAlgParams,
-                         const TemplateResource& templateResource) override;
-    HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-                       AlgResourceRequest& resourceRequest) override;
+    HcclResult KernelRun(
+        const OpParam& param, const TemplateDataParams& tempAlgParams,
+        const TemplateResource& templateResource) override;
+    HcclResult CalcRes(
+        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+        AlgResourceRequest& resourceRequest) override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
 
     void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub) override;
@@ -42,11 +44,13 @@ public:
 
 private:
     HcclResult CalcSlice(const u64 dataSize, RankSliceInfo& sliceInfoVec) const;
-    HcclResult RunAllReduce(const OpParam& param, const std::map<u32, std::vector<ChannelInfo>>& channels,
-                            const std::vector<ThreadHandle>& threads, const TemplateDataParams& tempAlgParams,
-                            const RankSliceInfo& sliceInfoVec);
-    HcclResult PostLocalReduce(const OpParam& param, const std::vector<ThreadHandle>& threads,
-                               const TemplateDataParams& tempAlgParams, const RankSliceInfo& sliceInfoVec);
+    HcclResult RunAllReduce(
+        const OpParam& param, const std::map<u32, std::vector<ChannelInfo>>& channels,
+        const std::vector<ThreadHandle>& threads, const TemplateDataParams& tempAlgParams,
+        const RankSliceInfo& sliceInfoVec);
+    HcclResult PostLocalReduce(
+        const OpParam& param, const std::vector<ThreadHandle>& threads, const TemplateDataParams& tempAlgParams,
+        const RankSliceInfo& sliceInfoVec);
     bool needAicpuReduce_{false};
     u64 processSize_{0};
     u64 count_{0};
