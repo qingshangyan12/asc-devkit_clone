@@ -309,6 +309,9 @@ struct CcuKernelInfo {
     void* kernelArg;
     // kernel所需channel
     std::vector<HcclChannelDesc> channels;
+    // 本端window基址，仅HALF_ALLTOALLV使用：设备侧AlltoAllvWrite契约不传recvBuf，
+    // 本rank自留分片的落点需在建图期确定，由模板CalcRes填充、KfcServer继承
+    uint64_t localWinAddr = 0;
 
 private:
     std::shared_ptr<CcuKernelArgBase> kernelArgSmartPtr;

@@ -54,6 +54,9 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::CalcRes(
 
     // CcuKernelKfcServer 在注册前替换该占位并复用这些 channel
     kernelInfo.channels = channelDescs;
+    // 本端 window 基址：设备侧 AlltoAllvWrite 契约不传 recvBuf，本 rank 自留分片的落点
+    // 需在建图期确定（对应源实现 CtxArg 里的 cclBufferAddr），由 KfcServer 继承。
+    kernelInfo.localWinAddr = PointerToAddr(param.outputPtr);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
 
     HCCL_DEBUG(
@@ -100,9 +103,12 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::KernelRun(
 
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
+    // 顺序须与设备侧 CcuPrepareForAllToAllVWrite 的 xnData_ 布局一致：
+    // xn[1]=sendBuf, xn[2]=sendSizes, xn[3]=sendOffsets, xn[4..7]=goSize, xn[8]=remoteWinOffset
+    (void)myBufferAddr;
     CHK_RET(FillCachedArgs(
-        submitInfo, userInAddr, myBufferAddr, token, sendSizeAddr, sendOffsetAddr, recvOffset, goSize[0], goSize[1],
-        goSize[2], goSize[3]));
+        submitInfo, userInAddr, sendSizeAddr, sendOffsetAddr, goSize[0], goSize[1], goSize[2], goSize[3], recvOffset,
+        token));
     templateResource.submitInfos.push_back(submitInfo);
     return HcclResult::HCCL_SUCCESS;
 }

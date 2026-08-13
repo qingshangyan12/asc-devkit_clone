@@ -30,6 +30,8 @@ struct KfcHalfAlltoAllVMesh1DContext : CcuKernelCtxBase {
 
     ccu::Variable userInAddr;
     ccu::Variable recvOffset;
+    // 建图期常量：本端 window 基址
+    ccu::Variable localWinAddr;
     // peerBuffer[peerId] 为对端 cclBuffer 首地址；本 rank 槽位由 myBufferAddr 填入
     std::vector<ccu::Variable> peerBuffer;
     std::vector<ccu::Variable> token;
@@ -74,12 +76,13 @@ static CcuResult InitResource(KfcHalfAlltoAllVMesh1DContext& ctx)
 }
 
 static CcuResult LoadArgsFromMem(
-    KfcHalfAlltoAllVMesh1DContext& ctx, ccu::Variable userInAddr, ccu::Variable myBufferAddr, ccu::Variable tokenInfo,
-    ccu::Variable sendSizeAddr, ccu::Variable sendOffsetAddr, ccu::Variable recvOffset, ccu::Variable goSize0,
-    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3)
+    KfcHalfAlltoAllVMesh1DContext& ctx, ccu::Variable userInAddr, ccu::Variable sendSizeAddr,
+    ccu::Variable sendOffsetAddr, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
+    ccu::Variable goSize3, ccu::Variable recvOffset, ccu::Variable tokenInfo)
 {
     ctx.userInAddr = userInAddr;
-    ctx.peerBuffer[ctx.rankId] = myBufferAddr;
+    // 本端 window 基址来自建图期的 kernelArg，非运行时 xn 参数
+    ctx.peerBuffer[ctx.rankId] = ctx.localWinAddr;
     ctx.token[ctx.rankId] = tokenInfo;
     ctx.recvOffset = recvOffset;
     ctx.goSize.addrOffset = goSize0;
@@ -192,10 +195,10 @@ static CcuResult DoHalfAlltoAllV(KfcHalfAlltoAllVMesh1DContext& ctx)
 }
 
 CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
-    ccu::Variable userInAddr, ccu::Variable myBufferAddr, ccu::Variable tokenInfo, ccu::Variable sendSizeAddr,
-    ccu::Variable sendOffsetAddr, ccu::Variable recvOffset, ccu::Variable goSize0, ccu::Variable goSize1,
-    ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
-    uint32_t rankSize, uint32_t rankId)
+    ccu::Variable userInAddr, ccu::Variable sendSizeAddr, ccu::Variable sendOffsetAddr, ccu::Variable goSize0,
+    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable recvOffset,
+    ccu::Variable tokenInfo, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
+    uint64_t localWinAddr)
 {
     KfcHalfAlltoAllVMesh1DContext ctx;
     ctx.channels = channels;
@@ -205,9 +208,9 @@ CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
     InitCcuKernelCtxBase(ctx);
 
     CCU_CHK_RET(InitResource(ctx));
+    ctx.localWinAddr = localWinAddr;
     CCU_CHK_RET(LoadArgsFromMem(
-        ctx, userInAddr, myBufferAddr, tokenInfo, sendSizeAddr, sendOffsetAddr, recvOffset, goSize0, goSize1, goSize2,
-        goSize3));
+        ctx, userInAddr, sendSizeAddr, sendOffsetAddr, goSize0, goSize1, goSize2, goSize3, recvOffset, tokenInfo));
     CCU_CHK_RET(PreSync(ctx));
     CCU_CHK_RET(DoHalfAlltoAllV(ctx));
     CCU_CHK_RET(PostSync(ctx));

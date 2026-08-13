@@ -234,6 +234,7 @@ const std::map<HcclCMDType, std::string> PROF_OP_NAME = {
     {HcclCMDType::HCCL_CMD_SCATTER, "hcom_scatter_"},
     {HcclCMDType::HCCL_CMD_ALLTOALL, "hcom_alltoall_"},
     {HcclCMDType::HCCL_CMD_ALLTOALLV, "hcom_alltoallv_"},
+    {HcclCMDType::HCCL_CMD_HALF_ALLTOALLV, "hcom_half_alltoallv_"},
     {HcclCMDType::HCCL_CMD_ALLGATHER_V, "hcom_allGatherv_"},
     {HcclCMDType::HCCL_CMD_REDUCE_SCATTER_V, "hcom_reduceScatterv_"},
     {HcclCMDType::HCCL_CMD_ALLTOALLVC, "hcom_alltoallvc_"},
