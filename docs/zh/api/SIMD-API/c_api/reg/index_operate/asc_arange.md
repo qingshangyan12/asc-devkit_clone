@@ -27,6 +27,7 @@
 ## 功能说明
 
 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../reg_data_types/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。算法逻辑表示如下：
+
 ```cpp
 // 递增
 {value, value + 1, value + 2, ... value + VL_T - 2, value + VL_T - 1}
@@ -114,7 +115,7 @@ __simd_callee__ inline void asc_arange_descend(vector_half& dst,
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
 <!-- end id8 -->
 
