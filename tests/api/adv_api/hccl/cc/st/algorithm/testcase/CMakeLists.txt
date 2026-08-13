@@ -60,3 +60,5 @@ run_llt_test(
     TARGET ${HCCL_CHECKER_TARGET}
     TASK_NUM 1
 )
+
+add_subdirectory(mc2_ccu)

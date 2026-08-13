@@ -233,6 +233,26 @@ TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedUsesCcuNewVersion)
         INIT_TILING_CCU_NEW_VERSION);
 }
 
+TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuMsUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuAlltoAllVMesh1D", 5U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuAlltoAllVMesh1D", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, AllToAllVUnregisteredAlgorithmUsesDefaultVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuUnknownAllToAllV", 6U, INIT_TILING_VERSION);
+}
+
 // ============================================================================
 // 以下用例覆盖 commit aaa3d79e5 的改动:
 // 修复 hccl_tiling.cpp 中不安全的动态库加载。
