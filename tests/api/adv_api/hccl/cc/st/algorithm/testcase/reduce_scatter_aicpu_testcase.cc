@@ -43,7 +43,11 @@ constexpr uint32_t DATATYPE_SIZE_TABLE_REDUCE_SCATTER[HCCL_DATA_TYPE_RESERVED] =
 
 class ST_REDUCE_SCATTER_AICPU_TEST : public ::testing::Test {
 protected:
-    void SetUp() override { ResetAlgEnvConfigInitState(); }
+    void SetUp() override
+    {
+        ResetAlgEnvConfigInitState();
+        GTEST_SKIP() << "ReduceScatter AICPU is routed through CANN HCCL bridge; local simulator ST is not applicable.";
+    }
     void TearDown() override
     {
         unsetenv("HCCL_OP_EXPANSION_MODE");

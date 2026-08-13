@@ -43,12 +43,20 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, route_uses_cann_bridge)
 {
     EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL)));
     EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV)));
+    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER)));
+    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_REDUCE_SCATTER)));
+    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE)));
     EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_AICPU)));
     EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, COMM_ENGINE_AICPU)));
+    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER, COMM_ENGINE_AICPU)));
+    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_REDUCE_SCATTER, COMM_ENGINE_AICPU)));
+    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, COMM_ENGINE_AICPU)));
 
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_CPU)));
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, COMM_ENGINE_CPU)));
-    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER)));
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER, COMM_ENGINE_CPU)));
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_REDUCE_SCATTER, COMM_ENGINE_CPU)));
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, COMM_ENGINE_CPU)));
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, cann_registry_contains_mesh1d_algorithms)
