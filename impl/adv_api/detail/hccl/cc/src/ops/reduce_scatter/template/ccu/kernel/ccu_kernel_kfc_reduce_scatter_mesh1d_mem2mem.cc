@@ -44,6 +44,7 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
     std::vector<ccu::RemoteAddr> remoteInput;
     std::vector<ccu::LocalAddr> scratchMem;
     ccu::Event event;
+    ccu::Event fastEvent;
     ccu::Variable flag;
     ccu::Variable skipLocalRankCopy;
 };
@@ -174,6 +175,10 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 
 static CcuResult DoReduceScatterReadReduceFast(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
+    if (ctx.rankSize != 2) {
+        return CCU_SUCCESS;
+    }
+
     ccu::LocalAddr fastOutput;
     fastOutput.addr = ctx.output;
     fastOutput.addr += ctx.currentRankSliceOutputOffset;
@@ -185,8 +190,9 @@ static CcuResult DoReduceScatterReadReduceFast(KfcReduceScatterMesh1DMem2MemCont
     peerAddr.addr += ctx.currentRankSliceInputOffset;
     peerAddr.token = ctx.token[peerId];
 
-    ccu::ReadReduce(ctx.channels[0], fastOutput, peerAddr, ctx.normalSliceSize, ctx.dataType, ctx.reduceOp, ctx.event, 1);
-    ccu::EventWait(ctx.event, 1);
+    (void)ccu::ReadReduce(ctx.channels[0], fastOutput, peerAddr, ctx.normalSliceSize, ctx.dataType, ctx.reduceOp,
+                          ctx.fastEvent, 1);
+    (void)ccu::EventWait(ctx.fastEvent, 1);
 
     return CCU_SUCCESS;
 }
@@ -215,43 +221,31 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
         ctx.scratchMem[rankIdx].token = ctx.token[ctx.rankId];
     }
 
-    ccu::Variable useFast;
-    useFast = 0;
-    if (ctx.rankSize == 2) {
+    ccu::Variable repeatNumAdd;
+    repeatNumAdd = 1;
+    ctx.flag = 0;
+    CCU_WHILE(ctx.repeatNum != UINT64_MAX)
+    {
+        ctx.repeatNum += repeatNumAdd;
+        CCU_IF(ctx.flag == 1)
+        {
+            for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
+                if (rankIdx == ctx.rankId) {
+                    ctx.myInput.addr += ctx.inputRepeatStride;
+                } else {
+                    ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
+                }
+            }
+            ctx.output += ctx.outputRepeatStride;
+        }
         CCU_IF(ctx.skipLocalRankCopy != 0)
         {
-            useFast = 1;
+            (void)DoReduceScatterReadReduceFast(ctx);
+            ctx.normalSliceSize = 0;
+            ctx.lastSliceSize = 0;
         }
-    }
-
-    CCU_IF(useFast != 0)
-    {
-        CCU_CHK_RET(DoReduceScatterReadReduceFast(ctx));
-    }
-
-    CCU_IF(useFast == 0)
-    {
-        ccu::Variable repeatNumAdd;
-        repeatNumAdd = 1;
-        ctx.flag = 0;
-        // AIV encodes one round as UINT64_MAX - 1; keep the original sentinel protocol unchanged.
-        CCU_WHILE(ctx.repeatNum != UINT64_MAX)
-        {
-            ctx.repeatNum += repeatNumAdd;
-            CCU_IF(ctx.flag == 1)
-            {
-                for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
-                    if (rankIdx == ctx.rankId) {
-                        ctx.myInput.addr += ctx.inputRepeatStride;
-                    } else {
-                        ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
-                    }
-                }
-                ctx.output += ctx.outputRepeatStride;
-            }
-            CCU_CHK_RET(DoReduceScatter(ctx));
-            ctx.flag = 1;
-        }
+        CCU_CHK_RET(DoReduceScatter(ctx));
+        ctx.flag = 1;
     }
     return CCU_SUCCESS;
 }
