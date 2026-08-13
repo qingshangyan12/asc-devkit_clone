@@ -18,7 +18,8 @@
 sincos_compute/
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── sincos_compute.asc          // sincos样例实现
-│   └── README.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述

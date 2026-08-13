@@ -27,7 +27,9 @@ short_vector_add
 │   │   └── verify_result.py // 验证输出结果
 │   ├── CMakeLists.txt       // 编译工程文件
 │   ├── data_utils.h         // 数据读写工具函数
-│   └── short_vector_add.asc // Ascend C算子实现 & 调用样例
+│   ├── short_vector_add.asc // Ascend C算子实现 & 调用样例
+│   ├── README.md            // 样例说明文档
+│   └── README_en.md         // 英文样例说明文档
 ```
 
 ## 样例描述
