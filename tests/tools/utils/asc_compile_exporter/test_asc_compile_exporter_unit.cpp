@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -45,6 +46,22 @@ private:
     std::streambuf* previous_;
 };
 
+class CoutCapture final {
+public:
+    CoutCapture() : previous_(std::cout.rdbuf(stream_.rdbuf())) {}
+
+    ~CoutCapture() { std::cout.rdbuf(previous_); }
+
+    std::string Content() const { return stream_.str(); }
+
+    CoutCapture(const CoutCapture&) = delete;
+    CoutCapture& operator=(const CoutCapture&) = delete;
+
+private:
+    std::ostringstream stream_;
+    std::streambuf* previous_;
+};
+
 bool ParseCommand(std::vector<std::string> arguments, BuildCollectedBundleRequest& request)
 {
     std::vector<char*> argv;
@@ -73,6 +90,22 @@ int RunProgramCommand(std::vector<std::string> arguments)
         argv.push_back(const_cast<char*>(argument.c_str()));
     }
     return AscCompileExporterProgramMain(static_cast<int>(argv.size()), argv.data());
+}
+
+size_t CountOccurrences(const std::string& text, const std::string& value)
+{
+    size_t count = 0U;
+    size_t position = 0U;
+    while ((position = text.find(value, position)) != std::string::npos) {
+        ++count;
+        position += value.size();
+    }
+    return count;
+}
+
+int ThrowingRun(int, char**)
+{
+    throw std::runtime_error("test exception");
 }
 
 TEST(CompileExporterCliUnitTest, ParseJobsAcceptsOnlyPositiveUint32Values)
@@ -221,6 +254,7 @@ TEST_F(ModuleTest, CliValidatesArgumentsWhenRead)
 
 TEST_F(ModuleTest, RunPassesValidatedArgumentsToCompiler)
 {
+    CerrCapture capture;
     const std::string manifestRoot = FileUtils::JoinPath(root_, "collection");
     const std::string output = FileUtils::JoinPath(root_, "output/bundle.so");
     ASSERT_TRUE(FileUtils::CreateDirectories(manifestRoot));
@@ -230,6 +264,7 @@ TEST_F(ModuleTest, RunPassesValidatedArgumentsToCompiler)
              "--cxx", "/usr/bin/c++"}),
         1);
     EXPECT_TRUE(FileUtils::IsDirectory(FileUtils::ParentPath(output)));
+    EXPECT_EQ(CountOccurrences(capture.Content(), "Compilation failed. Please check plog for details."), 1U);
 }
 
 TEST_F(ModuleTest, RunBuildsBundleWithKeywordArguments)
@@ -264,6 +299,34 @@ TEST(CompileExporterCliUnitTest, ProgramMainReturnsRunStatusAndPrintsArgument)
     EXPECT_NE(capture.Content().find("Usage:"), std::string::npos);
     EXPECT_NE(capture.Content().find("Required arguments:"), std::string::npos);
     EXPECT_NE(capture.Content().find("Optional arguments:"), std::string::npos);
+    EXPECT_EQ(CountOccurrences(capture.Content(), "Compilation failed. Please check plog for details."), 0U);
+}
+
+TEST(CompileExporterCliUnitTest, HelpOptionsPrintUsageToStdoutAndExitSuccessfully)
+{
+    {
+        CerrCapture errorCapture;
+        CoutCapture outputCapture;
+        EXPECT_EQ(RunProgramCommand({"asc_compile_exporter", "-h"}), 0);
+        EXPECT_NE(outputCapture.Content().find("Usage:"), std::string::npos);
+        EXPECT_NE(outputCapture.Content().find("  -h, --help"), std::string::npos);
+        EXPECT_EQ(errorCapture.Content(), "");
+    }
+
+    CerrCapture errorCapture;
+    CoutCapture outputCapture;
+    EXPECT_EQ(RunProgramCommand({"asc_compile_exporter", "--unknown", "--help"}), 0);
+    EXPECT_NE(outputCapture.Content().find("Usage:"), std::string::npos);
+    EXPECT_NE(outputCapture.Content().find("  -h, --help"), std::string::npos);
+    EXPECT_EQ(errorCapture.Content(), "");
+}
+
+TEST(CompileExporterCliUnitTest, ProgramMainDirectsUsersToPlogAfterException)
+{
+    CerrCapture capture;
+
+    EXPECT_EQ(RunWithExceptionHandling(0, nullptr, ThrowingRun), 1);
+    EXPECT_EQ(CountOccurrences(capture.Content(), "Compilation failed. Please check plog for details."), 1U);
 }
 
 } // namespace

@@ -24,7 +24,7 @@ namespace fs = boost::filesystem;
 
 void LogFilesystemError(const char* operation, const std::string& path, const boost::system::error_code& error)
 {
-    ASCENDLOGW("Failed to %s: path=%s error=%s", operation, path.c_str(), error.message().c_str());
+    ASCENDLOGE("Failed to %s: path=%s error=%s", operation, path.c_str(), error.message().c_str());
 }
 
 } // namespace
@@ -56,6 +56,26 @@ bool FileUtils::MakeAbsolutePath(const std::string& path, std::string& absolute)
     }
     absolute = result.string();
     ASCENDLOGD("Made path absolute: input=%s absolute=%s", path.c_str(), absolute.c_str());
+    return true;
+}
+
+bool FileUtils::IsSafeRelativePath(const std::string& path)
+{
+    if (path.empty() || path.find('\\') != std::string::npos || path.find('\0') != std::string::npos) {
+        return false;
+    }
+    const fs::path filesystemPath(path);
+    if (!filesystemPath.is_relative()) {
+        return false;
+    }
+    if (filesystemPath.lexically_normal().generic_string() != path) {
+        return false;
+    }
+    for (const fs::path& component : filesystemPath) {
+        if (component == fs::path(".") || component == fs::path("..")) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -133,7 +153,7 @@ bool FileUtils::ResolveDirectory(const std::string& path, std::string& resolved)
         return false;
     }
     if (fs::is_symlink(inputStatus)) {
-        ASCENDLOGW("Rejected symlink directory: path=%s", path.c_str());
+        ASCENDLOGE("Rejected symlink directory: path=%s", path.c_str());
         resolved.clear();
         return false;
     }
@@ -147,7 +167,7 @@ bool FileUtils::ResolveDirectory(const std::string& path, std::string& resolved)
         if (error) {
             LogFilesystemError("inspect resolved directory", canonical.string(), error);
         } else {
-            ASCENDLOGW("Resolved path is not a directory: path=%s resolved=%s", path.c_str(), canonical.c_str());
+            ASCENDLOGE("Resolved path is not a directory: path=%s resolved=%s", path.c_str(), canonical.c_str());
         }
         resolved.clear();
         return false;
@@ -166,7 +186,7 @@ bool FileUtils::ResolveSubdirectory(const std::string& path, const std::string& 
         return false;
     }
     if (!IsPathWithin(canonical, root)) {
-        ASCENDLOGW(
+        ASCENDLOGE(
             "Resolved directory is outside root: path=%s resolved=%s root=%s", path.c_str(), canonical.c_str(),
             root.c_str());
         resolved.clear();
@@ -193,7 +213,7 @@ bool FileUtils::CreateDirectories(const std::string& path)
         if (error) {
             LogFilesystemError("inspect created directory", path, error);
         } else {
-            ASCENDLOGW("Created path is not a directory: path=%s", path.c_str());
+            ASCENDLOGE("Created path is not a directory: path=%s", path.c_str());
         }
         return false;
     }
@@ -201,13 +221,13 @@ bool FileUtils::CreateDirectories(const std::string& path)
     return true;
 }
 
-bool FileUtils::RemoveAll(const std::string& path)
+bool FileUtils::RemoveAll(const std::string& path) noexcept
 {
     ASCENDLOGD("Removing path recursively: path=%s", path.c_str());
     boost::system::error_code error;
     (void)fs::remove_all(fs::path(path), error);
     if (error) {
-        LogFilesystemError("remove path recursively", path, error);
+        ASCENDLOGE("Failed to remove path recursively: path=%s error=%d", path.c_str(), error.value());
         return false;
     }
     ASCENDLOGI("Removed path recursively: path=%s", path.c_str());
@@ -224,7 +244,7 @@ bool FileUtils::ReadRegularFile(const std::string& path, uintmax_t maximum, std:
         if (error) {
             LogFilesystemError("inspect regular file", path, error);
         } else {
-            ASCENDLOGW("Rejected non-regular file: path=%s", path.c_str());
+            ASCENDLOGE("Rejected non-regular file: path=%s", path.c_str());
         }
         return false;
     }
@@ -235,12 +255,12 @@ bool FileUtils::ReadRegularFile(const std::string& path, uintmax_t maximum, std:
     }
     if (fileSize > maximum || fileSize > static_cast<uintmax_t>(std::numeric_limits<size_t>::max()) ||
         fileSize > static_cast<uintmax_t>(std::numeric_limits<std::streamsize>::max())) {
-        ASCENDLOGW("Regular file exceeds size limit: path=%s size=%ju maximum=%ju", path.c_str(), fileSize, maximum);
+        ASCENDLOGE("Regular file exceeds size limit: path=%s size=%ju maximum=%ju", path.c_str(), fileSize, maximum);
         return false;
     }
     std::ifstream input(path.c_str(), std::ios::binary);
     if (!input.is_open()) {
-        ASCENDLOGW("Failed to open regular file: path=%s", path.c_str());
+        ASCENDLOGE("Failed to open regular file: path=%s", path.c_str());
         return false;
     }
     data.resize(static_cast<size_t>(fileSize));
@@ -249,7 +269,7 @@ bool FileUtils::ReadRegularFile(const std::string& path, uintmax_t maximum, std:
     }
     input.close();
     if (!input) {
-        ASCENDLOGW("Failed to read or close regular file: path=%s", path.c_str());
+        ASCENDLOGE("Failed to read or close regular file: path=%s", path.c_str());
         data.clear();
         return false;
     }
@@ -265,7 +285,7 @@ bool FileUtils::FinalizeOutput(std::ofstream& output)
     output.close();
     const bool success = writeSucceeded && static_cast<bool>(output);
     if (!success) {
-        ASCENDLOGW("Failed to flush or close output stream");
+        ASCENDLOGE("Failed to flush or close output stream");
         return false;
     }
     ASCENDLOGD("Finalized output stream");
@@ -278,11 +298,11 @@ bool FileUtils::CopyFile(const std::string& source, const std::string& destinati
     boost::system::error_code error;
     if (!fs::copy_file(fs::path(source), fs::path(destination), fs::copy_options::none, error)) {
         if (error) {
-            ASCENDLOGW(
+            ASCENDLOGE(
                 "Failed to copy file: source=%s destination=%s error=%s", source.c_str(), destination.c_str(),
                 error.message().c_str());
         } else {
-            ASCENDLOGW("Failed to copy file: source=%s destination=%s", source.c_str(), destination.c_str());
+            ASCENDLOGE("Failed to copy file: source=%s destination=%s", source.c_str(), destination.c_str());
         }
         return false;
     }
