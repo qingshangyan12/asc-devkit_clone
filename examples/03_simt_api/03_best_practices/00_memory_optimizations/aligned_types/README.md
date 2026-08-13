@@ -4,22 +4,21 @@
 
   本样例量化展示**结构体类型对齐对Global Memory访存的影响**：结合Ascend 950PR/Ascend 950DT支持1B、2B、4B、8B、16B位宽的访存指令，构造多个大小不同的结构体做逐元素数据搬运，对比类型对齐带来的搬运效率差异。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-  - Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
-## 支持的 CANN 软件版本
+## 目录结构介绍
 
-  - \>= CANN 9.1.0
-
-## 目录结构
-
-  ```
-  ├── aligned_types
-  │   ├── aligned_types.asc      // SIMT实现&调用样例
-  │   ├── CMakeLists.txt         // cmake编译文件
-  │   └── README.md
-  ```
+```text
+├── aligned_types
+│   ├── aligned_types.asc      // SIMT实现&调用样例
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── README.md              // 样例说明文档
+│   └── README_en.md           // 英文样例说明文档
+```
 
 ## 样例描述
 
