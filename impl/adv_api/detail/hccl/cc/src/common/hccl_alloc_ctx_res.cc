@@ -271,8 +271,8 @@ HcclResult AllocWorkspaceMemory(
             return HCCL_E_INTERNAL;
         }
         HCCL_INFO(
-            "HcclEngineCtxGet success, tagWorkSpace[%s], workSpaceAddr[%p], workSpaceSize[%llu]",
-            tagWorkSpace.c_str(), workSpacePtr, actualSize);
+            "HcclEngineCtxGet success, tagWorkSpace[%s], workSpaceAddr[%p], workSpaceSize[%llu]", tagWorkSpace.c_str(),
+            workSpacePtr, actualSize);
     } else {
         CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), engine, requestedSize, &workSpacePtr));
         if (workSpacePtr == nullptr) {
@@ -303,8 +303,7 @@ HcclResult AllocWorkspaceMemory(
     }
     resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
     resCtx.workSpaceSize = requestedSize;
-    HCCL_INFO(
-        "HcclAllocOpResCtx the workSpace: workSpaceAddr[%p], workSpaceSize[%llu]", workSpacePtr, requestedSize);
+    HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%p], workSpaceSize[%llu]", workSpacePtr, requestedSize);
     return HCCL_SUCCESS;
 }
 
