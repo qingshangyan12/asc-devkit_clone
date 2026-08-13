@@ -106,20 +106,20 @@ The overall data flow is:
 ```text
 Physical Address                               Pipeline
   GM
-  |  A:CopyGM2L1 / ScaleA:CopyGM2L1   MTE2
-  |  B:CopyGM2L1 / ScaleB:CopyGM2L1   MTE2
+  |  A:copy_gm_to_l1 / ScaleA:copy_gm_to_l1   MTE2
+  |  B:copy_gm_to_l1 / ScaleB:copy_gm_to_l1   MTE2
   v
   L1
-  |  A:CopyL12L0A / ScaleA:CopyL12L0ScaleA        MTE1
-  |  B:CopyL12L0B / ScaleB:CopyL12L0ScaleB        MTE1
+  |  A:copy_l1_to_l0a / ScaleA:copy_l1_to_l0scalea        MTE1
+  |  B:copy_l1_to_l0b / ScaleB:copy_l1_to_l0scaleb        MTE1
   v
   L0A / L0B / L0ScaleA / L0ScaleB
   |
-  |  Mmad                              M
+  |  mmad                              M
   v
   L0C
   |
-  |  CopyL0C2GM: float -> bfloat16       FIX
+  |  copy_l0c_to_gm: float -> bfloat16       FIX
   v
   GM
 ```
@@ -141,8 +141,8 @@ The corresponding core index computation is:
 
 ```cpp
 constexpr uint32_t mIter = DivCeil(M, singleCoreM);
-uint32_t mIterIdx = AscendC::GetBlockIdx() % mIter;
-uint32_t nIterIdx = AscendC::GetBlockIdx() / mIter;
+uint32_t mIterIdx = asc_get_block_idx() % mIter;
+uint32_t nIterIdx = asc_get_block_idx() / mIter;
 ```
 
 #### 2. GM to L1: Matrix and Scale Entering Pipeline Together
@@ -151,25 +151,25 @@ MxMatmul input is not two-way but four-way: A, B, ScaleA, ScaleB. Therefore each
 
 | Data | Transfer Function | GM Data Shape | L1 Data Shape |
 |------|----------|-----------|---------|
-| A | `Copy` | `[singleCoreM, singleCoreK]` | `[baseM, stepK * baseK]` |
-| B | `Copy` | `[singleCoreN, singleCoreK]` | `[baseN, stepK * baseK]` |
-| ScaleA | `Copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseSK]` |
-| ScaleB | `Copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseSK]` |
+| A | `copy` | `[singleCoreM, singleCoreK]` | `[baseM, stepK * baseK]` |
+| B | `copy` | `[singleCoreN, singleCoreK]` | `[baseN, stepK * baseK]` |
+| ScaleA | `copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseSK]` |
+| ScaleB | `copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseSK]` |
 
 Through `stepK=2`, transfer `stepK * baseM * baseK` A matrix data and `stepK * baseN * baseK` B matrix data at once, reducing transfer instruction count and improving GM to L1 transfer efficiency.
 
 Scale transfer granularity is controlled by `scaleFactorK=4`, transferring `scaleFactorK * stepK * baseM * baseSK` ScaleA matrix data and `scaleFactorK * stepK * baseN * baseSK` ScaleB matrix data at once, where `baseSK = baseK / 32`. Its purpose is to make ScaleA/ScaleB cover a larger range in K direction compared to A/B per transfer, reducing MTE2 pressure from repeated scale transfers.
 
-Taking A matrix data transfer as example, `Copy` transfers `stepK` K direction base blocks at once, each base block being `baseM * baseK`:
+Taking A matrix data transfer as example, `copy` transfers `stepK` K direction base blocks at once, each base block being `baseM * baseK`:
 
 ```cpp
-AscendC::Te::Copy(gm2L1Atom, l1TensorAPing, a.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), AscendC::Te::MakeShape(curM, stepCurK)));
+asc::te::copy(gm2L1Atom, l1TensorAPing, a.slice(asc::te::make_coord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), asc::te::make_shape(curM, stepCurK)));
 ```
 
-Taking ScaleA matrix data transfer as example, `Copy` transfers `scaleFactorK * stepK` K direction base blocks at once, each base block being `baseM * baseSK` (where `baseSK = align_even(ceil(baseK / 32))`):
+Taking ScaleA matrix data transfer as example, `copy` transfers `scaleFactorK * stepK` K direction base blocks at once, each base block being `baseM * baseSK` (where `baseSK = align_even(ceil(baseK / 32))`):
 
 ```cpp
-AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), AscendC::Te::MakeShape(curM, stepCurScaleK)));
+asc::te::copy(gm2L1Atom, l1TensorAsPing, as.slice(asc::te::make_coord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), asc::te::make_shape(curM, stepCurScaleK)));
 ```
 
 #### 3. L1 to L0 Entering MX Computation Path
@@ -178,16 +178,16 @@ Standard Matmul only needs to load A/B; MxMatmul also needs to load correspondin
 
 After A/B and ScaleA/ScaleB enter L0, the Cube computation unit can complete scaled matrix multiplication accumulation according to MX semantics.
 
-Taking A matrix data transfer as example, `Copy` transfers 1 base block of `baseM * baseK` size at once:
+Taking A matrix data transfer as example, `copy` transfers 1 base block of `baseM * baseK` size at once:
 
 ```cpp
-AscendC::Te::Copy(l12l0AAtom, l0TensorA, l1ReadBufA.Slice(AscendC::Te::MakeCoord(0, kOffsetInDataChunk * baseK), AscendC::Te::MakeShape(curM, curK)));
+asc::te::copy(l12l0AAtom, l0TensorA, l1ReadBufA.slice(asc::te::make_coord(0, kOffsetInDataChunk * baseK), asc::te::make_shape(curM, curK)));
 ```
 
-Taking ScaleA matrix data transfer as example, `Copy` transfers 1 base block of `baseM * baseSK` size at once:
+Taking ScaleA matrix data transfer as example, `copy` transfers 1 base block of `baseM * baseSK` size at once:
 
 ```cpp
-AscendC::Te::Copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.Slice(AscendC::Te::MakeCoord(0, kOffsetInScaleChunk * baseScaleK), AscendC::Te::MakeShape(curM, curScaleK)));
+asc::te::copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.slice(asc::te::make_coord(0, kOffsetInScaleChunk * baseScaleK), asc::te::make_shape(curM, curScaleK)));
 ```
 
 #### 4. L0 Double Buffering: Overlapping Loading and Computation
@@ -202,9 +202,9 @@ The main buffer layout of this example is:
 | L1 | `B Ping/Pong` | B large packet data | Stores GM->L1 B data |
 | L1 | `ScaleA Ping/Pong` | Scale data corresponding to A | Stores A side MXScale |
 | L1 | `ScaleB Ping/Pong` | Scale data corresponding to B | Stores B side MXScale |
-| L0A | `A Ping/Pong` | Current K block A data | Cube `Mmad` left operand |
-| L0B | `B Ping/Pong` | Current K block B data | Cube `Mmad` right operand |
-| L0C | `C` | float accumulation result | `Mmad` output, for write-back to GM |
+| L0A | `A Ping/Pong` | Current K block A data | Cube `mmad` left operand |
+| L0B | `B Ping/Pong` | Current K block B data | Cube `mmad` right operand |
+| L0C | `C` | float accumulation result | `mmad` output, for write-back to GM |
 
 A simplified pipeline rhythm is:
 
@@ -213,8 +213,8 @@ time     |----------------------------------------------------------------------
 
 GM->L1   | A/B/ScaleA/ScaleB Ping | A/B/ScaleA/ScaleB Pong | A/B/ScaleA/ScaleB Ping |
 L1->L0                            | L0 Ping load --|       | L0 Pong load --|
-Cube                                               | Mmad Ping ---|   | Mmad Pong ---|
-L0C->GM                                                           | Copy L0C to GM ---
+Cube                                               | mmad Ping ---|   | mmad Pong ---|
+L0C->GM                                                           | copy L0C to GM ---
 ```
 
 The horizontal line lengths in the figure only express that different stages may have different durations and do not represent measured ratios; actual durations require `msopprof` collection results.
@@ -229,93 +229,82 @@ Each output sub-matrix loops in the K direction at the innermost level. Each rou
 for nBlock in N blocks:
   for mBlock in M blocks:
     for kBlock in K blocks:
-        Copy(A block, ScaleA block)
-        Copy(B block, ScaleB block)
-        Mmad accumulate
+        copy(A block, ScaleA block)
+        copy(B block, ScaleB block)
+        mmad accumulate
 ```
 
-`Mmad` input comes from L0A/L0B, output accumulates to L0C. The first K block initializes the accumulation result, subsequent K blocks continue accumulating until the complete K direction computation is finished.
+`mmad` input comes from L0A/L0B, output accumulates to L0C. The first K block initializes the accumulation result, subsequent K blocks continue accumulating until the complete K direction computation is finished.
 
 Key parameters in the computation stage include `m/n/k` dimensions and whether to initialize the C matrix:
 
 ```cpp
-AscendC::Te::MmadParams mmadParams{curM, curN, curK, 0, true};
-mmadParams.cmatrixInitVal = (kBlockIdx == 0);
-AscendC::Te::Mmad(mmadAtom.with(mmadParams), l0TensorC, l0TensorA, l0TensorB);
+asc::te::mmad_params mmadParams{curM, curN, curK, unit_flag_mode::disable, true};
+mmadParams.init_with_zero = (kBlockIdx == 0);
+asc::te::mmad(mmadAtom.with(mmadParams), l0TensorC, l0TensorA, l0TensorB);
 ```
 
-Where `cmatrixInitVal` controls the first K block to initialize the accumulation result, and subsequent K blocks continue accumulating on existing L0C data.
+Where `init_with_zero` controls the first K block to initialize the accumulation result, and subsequent K blocks continue accumulating on existing L0C data.
 
 #### 6. L0C Write-Back to GM: Converting from float to bfloat16 Output
 
-Cube side accumulation results are saved in L0C with float data type. After computation completes, `Copy` converts results to `bfloat16_t` and writes back to GM.
+Cube side accumulation results are saved in L0C with float data type. After computation completes, `copy` converts results to `bfloat16_t` and writes back to GM.
 
 ```text
 L0C float result
       |
-      | Copy, F32 -> BF16
+      | copy, F32 -> BF16
       v
 GM C [M, N]
 ```
 
 ```cpp
-AscendC::Te::FixpipeParams fixpipeParams;
-AscendC::Te::Copy(l0c2GmAtom.with(fixpipeParams), c.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, nBlockIdx * baseN), AscendC::Te::MakeShape(curM, curN)), l0TensorC);
+asc::te::l0c_to_gm_params fixpipeParams;
+asc::te::copy(l0c2GmAtom.with(fixpipeParams), c.slice(asc::te::make_coord(mBlockIdx * baseM, nBlockIdx * baseN), asc::te::make_shape(curM, curN)), l0TensorC);
 ```
 
-### Event Synchronization: Pipelining the Flow
+### Pipeline Synchronization
 
-When using static Tensor programming, synchronization is key to performance and correctness. This example primarily uses four types of events, with eventID controlled from `EVENT_ID0` to `EVENT_ID3`:
+When using static Tensor programming, synchronization is key to performance and correctness. This example uses `asc_lock` and `asc_unlock` to manage producer-consumer dependencies between pipelines and assigns independent slots to the Ping/Pong buffers at each level:
 
-| Event | Direction | Purpose | Flag Number |
-|------|------|------|----------|
-| `MTE2_MTE1` | GM->L1 notifies L1->L0 | After GM->L1 Copy completes, notifies L1->L0 Copy that L1 data can be read | `EVENT_ID0/1`: A+B Data Ping/Pong; `EVENT_ID2/3`: As+Bs Scale Ping/Pong |
-| `MTE1_MTE2` | L1->L0 notifies GM->L1 | After L1->L0 Copy consumes L1 data, notifies GM->L1 Copy that the buffer can be overwritten | Same as above |
-| `MTE1_M` | L1->L0 notifies Cube | After L1->L0 Copy completes, notifies Mmad that computation can start | `EVENT_ID0/1`: L0 Ping/Pong |
-| `M_MTE1` | Cube notifies L1->L0 | After Mmad consumes L0 buffer, notifies next L1->L0 Copy that it can write | `EVENT_ID0/1`: L0 Ping/Pong |
+| Data | Write Pipeline | Read Pipeline | Slot |
+|------|----------------|---------------|------|
+| A/B Data Ping/Pong | `PIPE_MTE2` | `PIPE_MTE1` | `0/1` |
+| ScaleA/ScaleB Ping/Pong | `PIPE_MTE2` | `PIPE_MTE1` | `2/3` |
+| L0A/L0B Ping/Pong | `PIPE_MTE1` | `PIPE_M` | `4/5` |
+| L0C Buffer | `PIPE_M` | `PIPE_FIX` | `6` |
 
-A/B data have the same lifecycle, so they are bound to the same event group by Ping/Pong phase; ScaleA/ScaleB have the same lifecycle, but scale chunks are typically larger than data chunks, so they use a separate Ping/Pong event group.
+A/B data have the same lifecycle, so they share slots by Ping/Pong phase. ScaleA/ScaleB also have the same lifecycle, but scale chunks are typically larger than data chunks, so they use a separate pair of Ping/Pong slots.
 
-Reverse synchronization needs to be preset before entering the main loop, otherwise the first wait for a writable buffer will block:
-
-```cpp
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0);
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1);
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2);
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3);
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);
-```
-
-Large packet granularity synchronization only waits for data readiness at the first element of the large packet and releases the buffer at the last element:
+Large-packet synchronization locks a buffer for reading at the start of the packet and releases it after the last element is consumed:
 
 ```cpp
 if (kOffsetInDataChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetDataEventId(dataReadIdx));
+    asc_lock(PIPE_MTE1, GetDataSlot(dataReadIdx));
 }
 if (((kOffsetInDataChunk + 1) == dataChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetDataEventId(dataReadIdx));
+    asc_unlock(PIPE_MTE1, GetDataSlot(dataReadIdx));
 }
 if (kOffsetInScaleChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetScaleEventId(scaleReadIdx));
+    asc_lock(PIPE_MTE1, GetScaleSlot(scaleReadIdx));
 }
 if (((kOffsetInScaleChunk + 1) == scaleChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetScaleEventId(scaleReadIdx));
+    asc_unlock(PIPE_MTE1, GetScaleSlot(scaleReadIdx));
 }
 ```
 
 From the pipeline perspective, these events connect three stages:
 
 ```text
-Copy(GM->L1)
+copy(GM->L1)
         |
         | MTE2_MTE1
         v
-Copy(L1->L0)
+copy(L1->L0)
         |
         | MTE1_M
         v
-Mmad(Cube)
+mmad(Cube)
         |
         | M_MTE1
         v
@@ -341,16 +330,16 @@ Performance metric description table:
 | `Task Duration(μs)` | Total execution time of the entire task, operator end-to-end execution time is determined by this parameter |
 | `Block Num` | Number of cores used, that is, the number of blocks launched by the kernel |
 | `aicore_time(μs)` | Average AI Core execution time |
-| `aic_mac_time(μs)` | Cube computation unit execution time, primarily corresponding to `Mmad` stage |
+| `aic_mac_time(μs)` | Cube computation unit execution time, primarily corresponding to `mmad` stage |
 | `aic_mac_ratio` | Cube computation unit time ratio, reflecting computation unit utilization |
 | `aic_scalar_time(μs)` | Scalar instruction execution time, reflecting loop scheduling, address computation, parameter configuration overhead |
 | `aic_scalar_ratio` | Scalar time ratio |
-| `aic_mte1_time(μs)` | MTE1 execution time, primarily corresponding to L1 to L0A/L0B `Copy` |
+| `aic_mte1_time(μs)` | MTE1 execution time, primarily corresponding to L1 to L0A/L0B `copy` |
 | `aic_mte1_ratio` | MTE1 time ratio, reflecting L1 to L0 data transfer pressure |
-| `aic_mte2_time(μs)` | MTE2 execution time, primarily corresponding to GM to L1 `Copy` |
+| `aic_mte2_time(μs)` | MTE2 execution time, primarily corresponding to GM to L1 `copy` |
 | `aic_mte2_ratio` | MTE2 time ratio, reflecting GM to L1 data loading pressure |
-| `aic_fixpipe_time(μs)` | L0C->GM `Copy` execution time, primarily corresponding to L0C to GM result write-back |
-| `aic_fixpipe_ratio` | L0C->GM `Copy` time ratio, reflecting result write-back memory access pressure |
+| `aic_fixpipe_time(μs)` | L0C->GM `copy` execution time, primarily corresponding to L0C to GM result write-back |
+| `aic_fixpipe_ratio` | L0C->GM `copy` time ratio, reflecting result write-back memory access pressure |
 
 Ascend 950PR chip performance data:
 

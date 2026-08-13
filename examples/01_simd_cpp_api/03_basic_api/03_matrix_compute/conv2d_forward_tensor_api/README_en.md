@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to implement Conv2D Forward computation using the Tensor API. It shows the complete pipeline: moving the FeatureMap from Global Memory to L1 Buffer, performing spatial unfolding via `CopyL12L0A` (Img2Col), accumulating matrix multiplication with `Mmad`, and moving results back to Global Memory via `CopyL0C2GM`.
+This sample demonstrates how to implement Conv2D Forward computation using the Tensor API. It shows the complete pipeline: moving the FeatureMap from Global Memory to L1 Buffer, performing spatial unfolding via `copy_l1_to_l0a` (Img2Col), accumulating matrix multiplication with `mmad`, and moving results back to Global Memory via `copy_l0c_to_gm`.
 
 This sample supports three Global Memory input/output data formats (NC1HWC0, NCHW, NHWC), switched via the compile-time parameter `SCENARIO_NUM`. It uses a 3x3 convolution kernel with padding, stride=2, dilation=2, and multiple C1 channel combinations to demonstrate common convolution scenarios and Tensor API usage.
 
@@ -76,25 +76,25 @@ This sample selects different Global Memory data formats via the compile paramet
 **Scenario 0: NC1HWC0 Input/Output**
 - Input: FeatureMap [1, 2, 9, 9, 16] half type, NC1HWC0 format; Weight [K, Cout] half type
 - Output: Output [1, 1, 5, 5, 16] half type, NC1HWC0 format
-- Implementation: Global Memory → L1 Buffer uses `CopyGM2L1` to directly copy NC1HWC0 data; L0C Buffer → Global Memory uses `CopyL0C2GM` direct copy
+- Implementation: Global Memory → L1 Buffer uses `copy_gm_to_l1` to directly copy NC1HWC0 data; L0C Buffer → Global Memory uses `copy_l0c_to_gm` direct copy
 
 **Scenario 1: NCHW Input/Output**
 - Input: FeatureMap [1, 32, 9, 9] half type, NCHW format; Weight [K, Cout] half type
 - Output: Output [1, 16, 5, 5] half type, NCHW format
-- Implementation: Global Memory → L1 Buffer uses `CopyGM2L1` to convert NCHW to NC1HWC0 on the fly (dn2nz); L0C Buffer → Global Memory uses `CopyL0C2GM` to convert NC1HWC0 to NCHW (nz2dn)
+- Implementation: Global Memory → L1 Buffer uses `copy_gm_to_l1` to convert NCHW to NC1HWC0 on the fly (dn2nz); L0C Buffer → Global Memory uses `copy_l0c_to_gm` to convert NC1HWC0 to NCHW (nz2dn)
 
 **Scenario 2: NHWC Input/Output**
 - Input: FeatureMap [1, 9, 9, 32] half type, NHWC format; Weight [K, Cout] half type
 - Output: Output [1, 5, 5, 16] half type, NHWC format
-- Implementation: Global Memory → L1 Buffer uses `CopyGM2L1` to convert NHWC to NC1HWC0 on the fly (nd2nz); L0C Buffer → Global Memory uses `CopyL0C2GM` to convert NC1HWC0 to NHWC (nz2nd)
+- Implementation: Global Memory → L1 Buffer uses `copy_gm_to_l1` to convert NHWC to NC1HWC0 on the fly (nd2nz); L0C Buffer → Global Memory uses `copy_l0c_to_gm` to convert NC1HWC0 to NHWC (nz2nd)
 
 Core workflow:
 
-1. Move the single-batch FeatureMap from Global Memory to L1 Buffer by calling the Copy interface via the `CopyGM2L1` `Operation` capability, unifying to the NC1HWC0 layout. `CopyGM2L1` auto-routes the copy path based on the Global Memory source format (NCHW via dn2nz, NHWC via nd2nz, NC1HWC0 direct). Simultaneously, move the Weight from Global Memory to L1 Buffer, performing ND-to-ZN format conversion.
-2. Perform img2col spatial unfolding of the FeatureMap on L1 Buffer to L0A Buffer, calling the Copy interface via the `CopyL12L0A` `Operation` Img2Col capability, completing the 3x3 kernel unfolding and padding under stride=2, dilation=2.
-3. Move the Weight from L1 Buffer to L0B Buffer, calling the Copy interface via the `CopyL12L0B` `Operation` capability.
-4. Use `Mmad` to perform matrix multiplication: L0A Buffer(NZ) × L0B Buffer(ZN) → L0C Buffer(NZ).
-5. Use `CopyL0C2GM` to move the L0C Buffer result back to Global Memory in the target format (NCHW via nz2dn, NHWC via nz2nd, NC1HWC0 direct).
+1. Move the single-batch FeatureMap from Global Memory to L1 Buffer by calling the copy interface via the `copy_gm_to_l1` `Operation` capability, unifying to the NC1HWC0 layout. `copy_gm_to_l1` auto-routes the copy path based on the Global Memory source format (NCHW via dn2nz, NHWC via nd2nz, NC1HWC0 direct). Simultaneously, move the Weight from Global Memory to L1 Buffer, performing ND-to-ZN format conversion.
+2. Perform img2col spatial unfolding of the FeatureMap on L1 Buffer to L0A Buffer, calling the copy interface via the `copy_l1_to_l0a` `Operation` Img2Col capability, completing the 3x3 kernel unfolding and padding under stride=2, dilation=2.
+3. Move the Weight from L1 Buffer to L0B Buffer, calling the copy interface via the `copy_l1_to_l0b` `Operation` capability.
+4. Use `mmad` to perform matrix multiplication: L0A Buffer(NZ) × L0B Buffer(ZN) → L0C Buffer(NZ).
+5. Use `copy_l0c_to_gm` to move the L0C Buffer result back to Global Memory in the target format (NCHW via nz2dn, NHWC via nz2nd, NC1HWC0 direct).
 
 ## Build and Run
 

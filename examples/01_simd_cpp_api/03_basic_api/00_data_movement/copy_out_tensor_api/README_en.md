@@ -1,9 +1,9 @@
-# Copy Out Tensor API Example
+# Tensor API copy-out Example
 
 
 ## Overview
 
-This example implements dynamic Shape matrix multiplication with Bias based on the Tensor API programming approach, demonstrating the usage of Copy Out APIs (L0C to GM, L0C to UB) and Mmad (matrix multiply-add) Tensor APIs. Select different write-back modes through the build-time parameter `SCENARIO_NUM`. Shape parameters are dynamically passed at runtime through the `MatmulTiling` structure.
+This example implements dynamic Shape matrix multiplication with Bias based on the Tensor API programming approach, demonstrating the usage of copy-out APIs (L0C to GM, L0C to UB) and mmad (matrix multiply-add) Tensor APIs. Select different write-back modes through the build-time parameter `SCENARIO_NUM`. Shape parameters are dynamically passed at runtime through the `MatmulTiling` structure.
 
 ## Supported Products and CANN Versions
 
@@ -29,7 +29,7 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
 ## Example Description
 
 - Example functionality:
-  This example implements dynamic Shape multi-core Matmul with Bias, performing L0C-to-GM or L0C-to-UB data transfer through the Copy API, and matrix multiply-add computation through the Mmad API.
+  This example implements dynamic Shape multi-core Matmul with Bias, performing L0C-to-GM or L0C-to-UB data transfer through the copy API, and matrix multiply-add computation through the mmad API.
 
   1. Dynamic Matmul Functionality
 
@@ -37,7 +37,7 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
 
   2. Bias Functionality
 
-  This example adds the Bias vector to the matrix multiplication result through the Mmad API in the first iteration of Matmul computation. Bias is a float-type one-dimensional vector with length N.
+  This example adds the Bias vector to the matrix multiplication result through the mmad API in the first iteration of Matmul computation. Bias is a float-type one-dimensional vector with length N.
 
   3. Multi-scenario Support
 
@@ -45,10 +45,10 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
 
   | SCENARIO_NUM | Write-back Mode | Write-back Path | Description |
   | :--- | :--- | :--- | :--- |
-  | 0 | Normal mode | L0C -> GM | Uses `CopyL0C2GM` to write computation results directly back to GM |
-  | 1 | unitFlag mode | L0C -> GM | Explicitly enables `unitFlag` in `CopyL0C2GM` |
-  | 2 | UB transfer mode M split | L0C -> UB -> GM | `CopyL0C2UB` uses `DUAL_DST_SPLIT_M`, AIV writes back split by M dimension |
-  | 3 | UB transfer mode N split | L0C -> UB -> GM | `CopyL0C2UB` uses `DUAL_DST_SPLIT_N`, AIV writes back split by N dimension |
+  | 0 | Normal mode | L0C -> GM | Uses `copy_l0c_to_gm` to write computation results directly back to GM |
+  | 1 | unitFlag mode | L0C -> GM | Explicitly enables `unitFlag` in `copy_l0c_to_gm` |
+  | 2 | UB transfer mode M split | L0C -> UB -> GM | `copy_l0c_to_ub` uses `DUAL_DST_SPLIT_M`, AIV writes back split by M dimension |
+  | 3 | UB transfer mode N split | L0C -> UB -> GM | `copy_l0c_to_ub` uses `DUAL_DST_SPLIT_N`, AIV writes back split by N dimension |
 
   - Normal mode (SCENARIO_NUM=0/1): L0C results are transferred directly to GM. Scenario 1 additionally enables `unitFlag`
   - UB transfer mode (SCENARIO_NUM=2/3): L0C results are first transferred to UB, then written back to GM by the AIV side

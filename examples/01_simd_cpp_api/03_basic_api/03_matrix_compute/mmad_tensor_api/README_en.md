@@ -1,8 +1,8 @@
-# Mmad Inline Quantization Example Based on Tensor API
+# mmad Inline Quantization Example Based on Tensor API
 
 ## Overview
 
-This example implements dynamic Shape matrix multiplication and inline quantization computation based on the Tensor API programming paradigm. Matrix A is not transposed, matrix B is stored transposed, A/B matrix data type is int8, Mmad accumulation type is int32, and output matrix C data type is half. The quantization coefficient quant is input in uint64_t format, scaling the int32 accumulation results in L0C during the Fixpipe phase and writing back to GM.
+This example implements dynamic Shape matrix multiplication and inline quantization computation based on the Tensor API programming paradigm. Matrix A is not transposed, matrix B is stored transposed, A/B matrix data type is int8, mmad accumulation type is int32, and output matrix C data type is half. The quantization coefficient quant is input in uint64_t format, scaling the int32 accumulation results in L0C during the Fixpipe phase and writing back to GM.
 
 ## Supported Products and CANN Versions
 
@@ -33,7 +33,7 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
 
   1. Dynamic Matmul functionality
 
-     The example constructs Tensor objects on GM, L1, L0A, L0B, L0C through Tensor API in the Kernel, uses the Copy interface to complete block transfers from GM to L1 and L1 to L0, and performs matrix multiplication through the Mmad interface. Matrix A is read in ND layout, matrix B is read in DN layout (stored as transposed [N, K] in input files). Shape parameters (M, N, K, singleCoreM, singleCoreN, singleCoreK) are passed to the Kernel at runtime, while baseM, baseN, baseK and stepM, stepN, stepK, ENABLE_UNITFLAG serve as compile-time template parameters determining L1/L0 Buffer allocation sizes and block stepping.
+     The example constructs Tensor objects on GM, L1, L0A, L0B, L0C through Tensor API in the Kernel, uses the copy interface to complete block transfers from GM to L1 and L1 to L0, and performs matrix multiplication through the mmad interface. Matrix A is read in ND layout, matrix B is read in DN layout (stored as transposed [N, K] in input files). Shape parameters (M, N, K, singleCoreM, singleCoreN, singleCoreK) are passed to the Kernel at runtime, while baseM, baseN, baseK and stepM, stepN, stepK, ENABLE_UNITFLAG serve as compile-time template parameters determining L1/L0 Buffer allocation sizes and block stepping.
 
   2. Fixpipe inline quantization/dequantization functionality
 
@@ -45,7 +45,7 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
   3. ENABLE_UNITFLAG
 
      The example controls the unitFlag feature switch through the `ENABLE_UNITFLAG` template parameter, with default value true.
-     For detailed unitFlag description, see [Mmad unitFlag Feature Example](../mmad_unitflag/README_en.md)
+     For detailed unitFlag description, see [mmad unitFlag Feature Example](../mmad_unitflag/README_en.md)
 
 - Example specifications:
 

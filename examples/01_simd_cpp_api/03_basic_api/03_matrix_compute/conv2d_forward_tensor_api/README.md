@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用Tensor API实现Conv2D Forward计算，展示FeatureMap从Global Memory搬入L1 Buffer、通过`CopyL12L0A`（Img2Col）完成空间展开、使用`Mmad`进行矩阵乘累加，并通过`CopyL0C2GM`将结果搬回Global Memory的完整流程。
+本样例介绍如何使用Tensor API实现Conv2D Forward计算，展示FeatureMap从Global Memory搬入L1 Buffer、通过`copy_l1_to_l0a`（Img2Col）完成空间展开、使用`mmad`进行矩阵乘累加，并通过`copy_l0c_to_gm`将结果搬回Global Memory的完整流程。
 
 本样例支持三种Global Memory输入/输出数据格式（NC1HWC0、NCHW、NHWC），通过编译时参数`SCENARIO_NUM`切换。选用3x3卷积核、padding、stride=2、dilation=2和多C1通道组合，演示常见卷积场景和Tensor API接口使用。
 
@@ -76,25 +76,25 @@ $$
 **场景0：NC1HWC0输入输出**
 - 输入：FeatureMap [1, 2, 9, 9, 16] half类型，NC1HWC0格式；Weight [K, Cout] half类型
 - 输出：Output [1, 1, 5, 5, 16] half类型，NC1HWC0格式
-- 实现：Global Memory→L1 Buffer使用`CopyGM2L1`直搬NC1HWC0数据，L0C Buffer→Global Memory使用`CopyL0C2GM`直搬
+- 实现：Global Memory→L1 Buffer使用`copy_gm_to_l1`直搬NC1HWC0数据，L0C Buffer→Global Memory使用`copy_l0c_to_gm`直搬
 
 **场景1：NCHW输入输出**
 - 输入：FeatureMap [1, 32, 9, 9] half类型，NCHW格式；Weight [K, Cout] half类型
 - 输出：Output [1, 16, 5, 5] half类型，NCHW格式
-- 实现：Global Memory→L1 Buffer使用`CopyGM2L1`将NCHW随路转换为NC1HWC0（dn2nz），L0C Buffer→Global Memory使用`CopyL0C2GM`将NC1HWC0转换为NCHW（nz2dn）
+- 实现：Global Memory→L1 Buffer使用`copy_gm_to_l1`将NCHW随路转换为NC1HWC0（dn2nz），L0C Buffer→Global Memory使用`copy_l0c_to_gm`将NC1HWC0转换为NCHW（nz2dn）
 
 **场景2：NHWC输入输出**
 - 输入：FeatureMap [1, 9, 9, 32] half类型，NHWC格式；Weight [K, Cout] half类型
 - 输出：Output [1, 5, 5, 16] half类型，NHWC格式
-- 实现：Global Memory→L1 Buffer使用`CopyGM2L1`将NHWC随路转换为NC1HWC0（nd2nz），L0C Buffer→Global Memory使用`CopyL0C2GM`将NC1HWC0转换为NHWC（nz2nd）
+- 实现：Global Memory→L1 Buffer使用`copy_gm_to_l1`将NHWC随路转换为NC1HWC0（nd2nz），L0C Buffer→Global Memory使用`copy_l0c_to_gm`将NC1HWC0转换为NHWC（nz2nd）
 
 核心流程如下：
 
-1. 将单batch FeatureMap从Global Memory搬到L1 Buffer，调用Copy接口通过`CopyGM2L1` `Operation`搬运能力，统一为NC1HWC0布局。`CopyGM2L1`根据Global Memory源端格式自动路由搬运路径（NCHW走dn2nz、NHWC走nd2nz、NC1HWC0直搬）。同时将Weight从Global Memory搬运到L1 Buffer，完成ND到ZN格式转换。
-2. 将L1 Buffer上的FeatureMap执行img2col空间展开搬到L0A Buffer，调用Copy接口通过`CopyL12L0A` `Operation`的Img2Col搬运能力，完成3x3卷积核在stride=2、dilation=2下的展开与padding填充。
-3. 将L1 Buffer上的Weight搬到L0B Buffer，调用Copy接口通过`CopyL12L0B` `Operation`搬运能力。
-4. 使用 `Mmad` 完成矩阵乘计算，L0A Buffer(NZ) × L0B Buffer(ZN) → L0C Buffer(NZ)。
-5. 使用 `CopyL0C2GM` 将L0C Buffer结果按目的格式搬回Global Memory（NCHW走nz2dn、NHWC走nz2nd、NC1HWC0直搬）。
+1. 将单batch FeatureMap从Global Memory搬到L1 Buffer，调用copy接口通过`copy_gm_to_l1` `Operation`搬运能力，统一为NC1HWC0布局。`copy_gm_to_l1`根据Global Memory源端格式自动路由搬运路径（NCHW走dn2nz、NHWC走nd2nz、NC1HWC0直搬）。同时将Weight从Global Memory搬运到L1 Buffer，完成ND到ZN格式转换。
+2. 将L1 Buffer上的FeatureMap执行img2col空间展开搬到L0A Buffer，调用copy接口通过`copy_l1_to_l0a` `Operation`的Img2Col搬运能力，完成3x3卷积核在stride=2、dilation=2下的展开与padding填充。
+3. 将L1 Buffer上的Weight搬到L0B Buffer，调用copy接口通过`copy_l1_to_l0b` `Operation`搬运能力。
+4. 使用 `mmad` 完成矩阵乘计算，L0A Buffer(NZ) × L0B Buffer(ZN) → L0C Buffer(NZ)。
+5. 使用 `copy_l0c_to_gm` 将L0C Buffer结果按目的格式搬回Global Memory（NCHW走nz2dn、NHWC走nz2nd、NC1HWC0直搬）。
 
 ## 编译运行
 

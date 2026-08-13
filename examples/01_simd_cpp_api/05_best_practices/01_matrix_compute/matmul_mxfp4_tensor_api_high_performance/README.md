@@ -106,20 +106,20 @@ $$
 ```text
 物理地址                               流水
   GM
-  |  A:CopyGM2L1 / ScaleA:CopyGM2L1   MTE2
-  |  B:CopyGM2L1 / ScaleB:CopyGM2L1   MTE2
+  |  A:copy_gm_to_l1 / ScaleA:copy_gm_to_l1   MTE2
+  |  B:copy_gm_to_l1 / ScaleB:copy_gm_to_l1   MTE2
   v
   L1
-  |  A:CopyL12L0A / ScaleA:CopyL12L0ScaleA        MTE1
-  |  B:CopyL12L0B / ScaleB:CopyL12L0ScaleB        MTE1
+  |  A:copy_l1_to_l0a / ScaleA:copy_l1_to_l0scalea        MTE1
+  |  B:copy_l1_to_l0b / ScaleB:copy_l1_to_l0scaleb        MTE1
   v
   L0A / L0B / L0ScaleA / L0ScaleB
   |
-  |  Mmad                              M
+  |  mmad                              M
   v
   L0C
   |
-  |  CopyL0C2GM: float -> bfloat16       FIX
+  |  copy_l0c_to_gm: float -> bfloat16       FIX
   v
   GM
 ```
@@ -141,8 +141,8 @@ Total blocks = 4 * 8 = 32
 
 ```cpp
 constexpr uint32_t mIter = DivCeil(M, singleCoreM);
-uint32_t mIterIdx = AscendC::GetBlockIdx() % mIter;
-uint32_t nIterIdx = AscendC::GetBlockIdx() / mIter;
+uint32_t mIterIdx = asc_get_block_idx() % mIter;
+uint32_t nIterIdx = asc_get_block_idx() / mIter;
 ```
 
 #### 2. GM 到 L1：矩阵和 scale 一起进流水
@@ -151,25 +151,25 @@ MxMatmul 的输入不是两路，而是四路：A、B、ScaleA、ScaleB。因此
 
 | 数据 | 搬运函数 | GM 数据shape | L1 数据shape |
 |------|----------|-----------|---------|
-| A | `Copy` | `[singleCoreM, singleCoreK]` | `[baseM, stepK * baseK]` |
-| B | `Copy` | `[singleCoreN, singleCoreK]` | `[baseN, stepK * baseK]` |
-| ScaleA | `Copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseSK]` |
-| ScaleB | `Copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseSK]` |
+| A | `copy` | `[singleCoreM, singleCoreK]` | `[baseM, stepK * baseK]` |
+| B | `copy` | `[singleCoreN, singleCoreK]` | `[baseN, stepK * baseK]` |
+| ScaleA | `copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseSK]` |
+| ScaleB | `copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseSK]` |
 
 通过 `stepK=2` 一次搬入 `stepK * baseM * baseK` 的 A 矩阵数据 和 `stepK * baseN * baseK` 的 B 矩阵数据，减少搬运指令数量，提高 GM 到 L1 的搬运效率。
 
 scale 的搬运粒度由 `scaleFactorK=4` 控制，一次搬入 `scaleFactorK * stepK * baseM * baseSK` 的 ScaleA 矩阵数据 和 `scaleFactorK * stepK * baseN * baseSK` 的 ScaleB 矩阵数据，其中`baseSK = baseK / 32`。它的作用是让 ScaleA/ScaleB 在 K 方向相比于 A/B 一次覆盖更大的范围，减少 scale 反复搬运带来的 MTE2 压力。
 
-以 A 矩阵数据搬运为例，`Copy` 一次搬入 `stepK` 个 K 方向 base 块，每个base块为 `baseM * baseK`：
+以 A 矩阵数据搬运为例，`copy` 一次搬入 `stepK` 个 K 方向 base 块，每个base块为 `baseM * baseK`：
 
 ```cpp
-AscendC::Te::Copy(gm2L1Atom, l1TensorAPing, a.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), AscendC::Te::MakeShape(curM, stepCurK)));
+asc::te::copy(gm2L1Atom, l1TensorAPing, a.slice(asc::te::make_coord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), asc::te::make_shape(curM, stepCurK)));
 ```
 
-以 ScaleA 矩阵数据搬运为例。`Copy` 一次搬入 `scaleFactorK * stepK` 个 K 方向 base 块，每个base块为 `baseM * baseSK`（其中 `baseSK = align_even(ceil(baseK / 32))`）：
+以 ScaleA 矩阵数据搬运为例。`copy` 一次搬入 `scaleFactorK * stepK` 个 K 方向 base 块，每个base块为 `baseM * baseSK`（其中 `baseSK = align_even(ceil(baseK / 32))`）：
 
 ```cpp
-AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), AscendC::Te::MakeShape(curM, stepCurScaleK)));
+asc::te::copy(gm2L1Atom, l1TensorAsPing, as.slice(asc::te::make_coord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), asc::te::make_shape(curM, stepCurScaleK)));
 ```
 
 #### 3. L1 到 L0 进入 MX 计算路径
@@ -178,16 +178,16 @@ AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBl
 
 当 A/B 和 ScaleA/ScaleB 进入 L0 后，Cube 计算单元就可以按照 MX 语义完成带缩放的矩阵乘累加。
 
-以 A 矩阵数据搬运为例，`Copy` 一次搬入 1 个`baseM * baseK` 大小的 base 块：
+以 A 矩阵数据搬运为例，`copy` 一次搬入 1 个`baseM * baseK` 大小的 base 块：
 
 ```cpp
-AscendC::Te::Copy(l12l0AAtom, l0TensorA, l1ReadBufA.Slice(AscendC::Te::MakeCoord(0, kOffsetInDataChunk * baseK), AscendC::Te::MakeShape(curM, curK)));
+asc::te::copy(l12l0AAtom, l0TensorA, l1ReadBufA.slice(asc::te::make_coord(0, kOffsetInDataChunk * baseK), asc::te::make_shape(curM, curK)));
 ```
 
-以 ScaleA 矩阵数据搬运为例，`Copy` 一次搬入 1 个`baseM * baseSK` 大小的 base 块：
+以 ScaleA 矩阵数据搬运为例，`copy` 一次搬入 1 个`baseM * baseSK` 大小的 base 块：
 
 ```cpp
-AscendC::Te::Copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.Slice(AscendC::Te::MakeCoord(0, kOffsetInScaleChunk * baseScaleK), AscendC::Te::MakeShape(curM, curScaleK)));
+asc::te::copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.slice(asc::te::make_coord(0, kOffsetInScaleChunk * baseScaleK), asc::te::make_shape(curM, curScaleK)));
 ```
 
 #### 4. L0 双缓冲：让加载和计算交叠
@@ -202,9 +202,9 @@ AscendC::Te::Copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.Slice(AscendC::Te::Ma
 | L1 | `B Ping/Pong` | B 的大包数据 | 存放 GM->L1 的 B 数据 |
 | L1 | `ScaleA Ping/Pong` | A 对应的 scale 数据 | 存放 A 侧 MXScale  |
 | L1 | `ScaleB Ping/Pong` | B 对应的 scale 数据 | 存放 B 侧 MXScale  |
-| L0A | `A Ping/Pong` | 当前 K block 的 A 数据 | Cube `Mmad` 左操作数 |
-| L0B | `B Ping/Pong` | 当前 K block 的 B 数据 | Cube `Mmad` 右操作数 |
-| L0C | `C` | float 累加结果 | `Mmad` 输出，供写回GM |
+| L0A | `A Ping/Pong` | 当前 K block 的 A 数据 | Cube `mmad` 左操作数 |
+| L0B | `B Ping/Pong` | 当前 K block 的 B 数据 | Cube `mmad` 右操作数 |
+| L0C | `C` | float 累加结果 | `mmad` 输出，供写回GM |
 
 一个简化的流水节奏如下：
 
@@ -213,8 +213,8 @@ time     |----------------------------------------------------------------------
 
 GM->L1   | A/B/ScaleA/ScaleB Ping | A/B/ScaleA/ScaleB Pong | A/B/ScaleA/ScaleB Ping |
 L1->L0                            | L0 Ping load --|       | L0 Pong load --|
-Cube                                               | Mmad Ping ---|   | Mmad Pong ---|
-L0C->GM                                                           | Copy L0C to GM ---
+Cube                                               | mmad Ping ---|   | mmad Pong ---|
+L0C->GM                                                           | copy L0C to GM ---
 ```
 
 图中横线长度只用于表达不同阶段耗时可能不同，并不代表实测比例；真实耗时需要以 `msopprof` 采集结果为准。
@@ -229,95 +229,82 @@ L0C->GM                                                           | Copy L0C to 
 for nBlock in N blocks:
   for mBlock in M blocks:
     for kBlock in K blocks:
-        Copy(A block, ScaleA block)
-        Copy(B block, ScaleB block)
-        Mmad accumulate
+        copy(A block, ScaleA block)
+        copy(B block, ScaleB block)
+        mmad accumulate
 ```
 
-`Mmad` 的输入来自 L0A/L0B，输出累加到 L0C。第一轮 K block 初始化累加结果，后续 K block 持续累加，直到完整 K 方向计算完成。
+`mmad` 的输入来自 L0A/L0B，输出累加到 L0C。第一轮 K block 初始化累加结果，后续 K block 持续累加，直到完整 K 方向计算完成。
 
 计算阶段的关键参数包括 `m/n/k` 尺寸、是否初始化 C 矩阵：
 
 ```cpp
-AscendC::Te::MmadParams mmadParams{curM, curN, curK, 0, true};
-mmadParams.cmatrixInitVal = (kBlockIdx == 0);
-AscendC::Te::Mmad(mmadAtom.with(mmadParams), l0TensorC, l0TensorA, l0TensorB);
+asc::te::mmad_params mmadParams{curM, curN, curK, unit_flag_mode::disable, true};
+mmadParams.init_with_zero = (kBlockIdx == 0);
+asc::te::mmad(mmadAtom.with(mmadParams), l0TensorC, l0TensorA, l0TensorB);
 ```
 
-其中 `cmatrixInitVal` 用于控制第一轮 K block 初始化累加结果，后续 K block 在已有 L0C 数据上继续累加。
+其中 `init_with_zero` 用于控制第一轮 K block 初始化累加结果，后续 K block 在已有 L0C 数据上继续累加。
 
 #### 6. L0C 写回 GM：从 float 转换到 bfloat16 输出
 
-Cube 侧累加结果保存在 L0C 中，数据类型为 float。计算结束后，`Copy` 负责把结果转换为 `bfloat16_t` 并写回 GM 中。
+Cube 侧累加结果保存在 L0C 中，数据类型为 float。计算结束后，`copy` 负责把结果转换为 `bfloat16_t` 并写回 GM 中。
 
 ```text
 L0C float result
       |
-      | Copy, F32 -> BF16
+      | copy, F32 -> BF16
       v
 GM C [M, N]
 ```
 
 ```cpp
-AscendC::Te::FixpipeParams fixpipeParams;
-AscendC::Te::Copy(l0c2GmAtom.with(fixpipeParams), c.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, nBlockIdx * baseN), AscendC::Te::MakeShape(curM, curN)), l0TensorC);
+asc::te::l0c_to_gm_params fixpipeParams;
+asc::te::copy(l0c2GmAtom.with(fixpipeParams), c.slice(asc::te::make_coord(mBlockIdx * baseM, nBlockIdx * baseN), asc::te::make_shape(curM, curN)), l0TensorC);
 ```
 
-### 事件同步：把流水并行起来
+### 流水同步
 
-使用静态Tensor编程时，同步是性能和正确性的关键。本样例主要使用四类事件，eventID 控制在
-`EVENT_ID0` 到 `EVENT_ID3`：
+使用静态Tensor编程时，同步是性能和正确性的关键。本样例通过`asc_lock`和`asc_unlock`管理不同流水之间的生产者和消费者依赖，并为各级Ping/Pong Buffer分配独立slot：
 
-| 事件 | 方向 | 作用 | flag 编号 |
-|------|------|------|----------|
-| `MTE2_MTE1` | GM->L1 通知 L1->L0 | GM->L1 Copy 完成后，通知 L1->L0 Copy 可以读取 L1 数据 | `EVENT_ID0/1`: A+B Data Ping/Pong；`EVENT_ID2/3`: As+Bs Scale Ping/Pong |
-| `MTE1_MTE2` | L1->L0 通知 GM->L1 | L1->L0 Copy 消费完 L1 数据后，通知 GM->L1 Copy 可以覆盖该缓冲区 | 同上 |
-| `MTE1_M` | L1->L0 通知 Cube | L1->L0 Copy 完成后，通知 Mmad 可以开始计算 | `EVENT_ID0/1`: L0 Ping/Pong |
-| `M_MTE1` | Cube 通知 L1->L0 | Mmad 消费完 L0 缓冲区后，通知下一轮 L1->L0 Copy 可以写入 | `EVENT_ID0/1`: L0 Ping/Pong |
+| 数据 | 写流水 | 读流水 | slot |
+|------|--------|--------|------|
+| A/B Data Ping/Pong | `PIPE_MTE2` | `PIPE_MTE1` | `0/1` |
+| ScaleA/ScaleB Ping/Pong | `PIPE_MTE2` | `PIPE_MTE1` | `2/3` |
+| L0A/L0B Ping/Pong | `PIPE_MTE1` | `PIPE_M` | `4/5` |
+| L0C Buffer | `PIPE_M` | `PIPE_FIX` | `6` |
 
-A/B data 的生命周期一致，因此按 Ping/Pong 相位绑定到同一组事件；ScaleA/ScaleB 的生命周期一致，但
-scale chunk 通常比 data chunk 更大，因此单独使用另一组 Ping/Pong 事件。
+A/B Data的生命周期一致，因此按Ping/Pong相位绑定到同一组slot；ScaleA/ScaleB的生命周期一致，但scale chunk通常比data chunk更大，因此使用另一组Ping/Pong slot。
 
-反向同步需要在进入主循环前预置，否则首次等待可写缓冲区时会阻塞：
-
-```cpp
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0);
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1);
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2);
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3);
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);
-```
-
-大包粒度的同步只在大包首元素等待数据就绪，在大包末元素释放缓冲区：
+大包粒度的同步只在大包首元素锁定待读Buffer，在大包末元素释放Buffer：
 
 ```cpp
 if (kOffsetInDataChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetDataEventId(dataReadIdx));
+    asc_lock(PIPE_MTE1, GetDataSlot(dataReadIdx));
 }
 if (((kOffsetInDataChunk + 1) == dataChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetDataEventId(dataReadIdx));
+    asc_unlock(PIPE_MTE1, GetDataSlot(dataReadIdx));
 }
 if (kOffsetInScaleChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetScaleEventId(scaleReadIdx));
+    asc_lock(PIPE_MTE1, GetScaleSlot(scaleReadIdx));
 }
 if (((kOffsetInScaleChunk + 1) == scaleChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetScaleEventId(scaleReadIdx));
+    asc_unlock(PIPE_MTE1, GetScaleSlot(scaleReadIdx));
 }
 ```
 
 从流水角度看，这些事件串起了三个阶段：
 
 ```text
-Copy(GM->L1)
+copy(GM->L1)
         |
         | MTE2_MTE1
         v
-Copy(L1->L0)
+copy(L1->L0)
         |
         | MTE1_M
         v
-Mmad(Cube)
+mmad(Cube)
         |
         | M_MTE1
         v
@@ -343,16 +330,16 @@ next LoadData
 | `Task Duration(μs)` | 整个任务执行的总时间，算子端到端执行时间以该参数为准 |
 | `Block Num` | 使用的核数，也就是 kernel 启动的 block 数量 |
 | `aicore_time(μs)` | AI Core 的平均执行时间 |
-| `aic_mac_time(μs)` | Cube 计算单元执行时间，主要对应 `Mmad` 阶段 |
+| `aic_mac_time(μs)` | Cube 计算单元执行时间，主要对应 `mmad` 阶段 |
 | `aic_mac_ratio` | Cube 计算单元时间占比，反映计算单元利用率 |
 | `aic_scalar_time(μs)` | Scalar 指令执行时间，反映循环调度、地址计算、参数配置等开销 |
 | `aic_scalar_ratio` | Scalar 时间占比 |
-| `aic_mte1_time(μs)` | MTE1 执行时间，主要对应 L1 到 L0A/L0B 的 `Copy` |
+| `aic_mte1_time(μs)` | MTE1 执行时间，主要对应 L1 到 L0A/L0B 的 `copy` |
 | `aic_mte1_ratio` | MTE1 时间占比，反映 L1 到 L0 的数据搬运压力 |
-| `aic_mte2_time(μs)` | MTE2 执行时间，主要对应 GM 到 L1 的 `Copy` |
+| `aic_mte2_time(μs)` | MTE2 执行时间，主要对应 GM 到 L1 的 `copy` |
 | `aic_mte2_ratio` | MTE2 时间占比，反映 GM 到 L1 的数据加载压力 |
-| `aic_fixpipe_time(μs)` | L0C->GM 的 `Copy` 执行时间，主要对应 L0C 到 GM 的结果写回 |
-| `aic_fixpipe_ratio` | L0C->GM 的 `Copy` 时间占比，反映结果写回的访存压力 |
+| `aic_fixpipe_time(μs)` | L0C->GM 的 `copy` 执行时间，主要对应 L0C 到 GM 的结果写回 |
+| `aic_fixpipe_ratio` | L0C->GM 的 `copy` 时间占比，反映结果写回的访存压力 |
 
 Ascend 950PR 芯片性能数据如下：
 

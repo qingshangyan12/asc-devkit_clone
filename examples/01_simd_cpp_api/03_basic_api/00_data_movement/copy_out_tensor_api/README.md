@@ -1,8 +1,8 @@
-# 基于Tensor API实现的Copy Out Tensor样例
+# 基于Tensor API实现的copy搬出样例
 
 ## 概述
 
-本样例基于Tensor API编程方式实现带Bias的动态Shape矩阵乘法运算，展示了Copy Out接口（L0C到GM、L0C到UB）和Mmad（矩阵乘加）等Tensor API的使用方法。通过编译时参数`SCENARIO_NUM`选择不同的回写模式，Shape参数通过`MatmulTiling`结构体在运行时动态传入。
+本样例基于Tensor API编程方式实现带Bias的动态Shape矩阵乘法运算，展示了copy搬出接口（L0C到GM、L0C到UB）和mmad（矩阵乘加）等Tensor API的使用方法。通过编译时参数`SCENARIO_NUM`选择不同的回写模式，Shape参数通过`MatmulTiling`结构体在运行时动态传入。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -28,7 +28,7 @@
 ## 样例描述
 
 - 样例功能：
-  本样例实现了带Bias的动态Shape多核Matmul功能，通过Copy接口完成L0C到GM或L0C到UB的数据搬运，通过Mmad接口完成矩阵乘加计算。
+  本样例实现了带Bias的动态Shape多核Matmul功能，通过copy接口完成L0C到GM或L0C到UB的数据搬运，通过mmad接口完成矩阵乘加计算。
 
   1. 动态Matmul功能
 
@@ -36,7 +36,7 @@
 
   2. Bias功能
 
-  本样例在Matmul计算的首次迭代中通过Mmad接口将Bias向量加到矩阵乘结果上，Bias为float类型的一维向量，长度为N。
+  本样例在Matmul计算的首次迭代中通过mmad接口将Bias向量加到矩阵乘结果上，Bias为float类型的一维向量，长度为N。
 
   3. 多场景支持
 
@@ -44,10 +44,10 @@
 
   | SCENARIO_NUM | 回写模式 | 回写路径 | 说明 |
   | :--- | :--- | :--- | :--- |
-  | 0 | 普通模式 | L0C -> GM | 使用`CopyL0C2GM`直接将计算结果写回GM |
-  | 1 | unitFlag模式 | L0C -> GM | 在`CopyL0C2GM`中显式使能`unitFlag` |
-  | 2 | UB搬运模式M拆分 | L0C -> UB -> GM | `CopyL0C2UB`采用`DUAL_DST_SPLIT_M`，由AIV按M维拆分回写 |
-  | 3 | UB搬运模式N拆分 | L0C -> UB -> GM | `CopyL0C2UB`采用`DUAL_DST_SPLIT_N`，由AIV按N维拆分回写 |
+  | 0 | 普通模式 | L0C -> GM | 使用`copy_l0c_to_gm`直接将计算结果写回GM |
+  | 1 | unitFlag模式 | L0C -> GM | 在`copy_l0c_to_gm`中显式使能`unitFlag` |
+  | 2 | UB搬运模式M拆分 | L0C -> UB -> GM | `copy_l0c_to_ub`采用`DUAL_DST_SPLIT_M`，由AIV按M维拆分回写 |
+  | 3 | UB搬运模式N拆分 | L0C -> UB -> GM | `copy_l0c_to_ub`采用`DUAL_DST_SPLIT_N`，由AIV按N维拆分回写 |
 
   - 普通模式（SCENARIO_NUM=0/1）：L0C结果直接搬运到GM，场景1额外使能`unitFlag`
   - UB搬运模式（SCENARIO_NUM=2/3）：L0C结果先搬到UB，再由AIV侧写回GM

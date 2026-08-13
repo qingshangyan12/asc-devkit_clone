@@ -32,11 +32,11 @@ C[b] = A[b] * B[b] + Bias[b], b = 0, 1, ..., B - 1
 
 本样例的数据流如下：
 
-1. Global Memory -> L1 Buffer：调用Copy接口通过`CopyGM2L1` `Operation`搬运能力，从Global Memory将`L1BatchSize`的矩阵A、矩阵B和Bias搬运到L1 Buffer。
-2. L1 Buffer -> L0A Buffer/L0B Buffer：调用Copy接口通过`CopyL12L0A`和`CopyL12L0B` `Operation`搬运能力，从L1 Buffer将`L0BatchSize`的矩阵A、矩阵B搬运到L0 Buffer。
-3. L1 Buffer -> BiasTable Buffer：调用Copy接口通过`CopyL12BT` `Operation`搬运能力，从L1 Buffer将`L0BatchSize`的Bias搬运到BiasTable Buffer。
-4. Mmad：循环遍历L0 Buffer上的矩阵A、B和Bias `L0BatchSize`次，每次计算一组batch的A、B矩阵乘加Bias的结果，并写入L0C Buffer。
-5. L0C Buffer -> Global Memory：调用Copy接口通过 `CopyL0C2GM` `Operation`搬运能力，一次性将`L0BatchSize`个结果矩阵C搬出到Global Memory。
+1. Global Memory -> L1 Buffer：调用copy接口通过`copy_gm_to_l1` `Operation`搬运能力，从Global Memory将`L1BatchSize`的矩阵A、矩阵B和Bias搬运到L1 Buffer。
+2. L1 Buffer -> L0A Buffer/L0B Buffer：调用copy接口通过`copy_l1_to_l0a`和`copy_l1_to_l0b` `Operation`搬运能力，从L1 Buffer将`L0BatchSize`的矩阵A、矩阵B搬运到L0 Buffer。
+3. L1 Buffer -> BiasTable Buffer：调用copy接口通过`copy_l1_to_biastable` `Operation`搬运能力，从L1 Buffer将`L0BatchSize`的Bias搬运到BiasTable Buffer。
+4. mmad：循环遍历L0 Buffer上的矩阵A、B和Bias `L0BatchSize`次，每次计算一组batch的A、B矩阵乘加Bias的结果，并写入L0C Buffer。
+5. L0C Buffer -> Global Memory：调用copy接口通过 `copy_l0c_to_gm` `Operation`搬运能力，一次性将`L0BatchSize`个结果矩阵C搬出到Global Memory。
 
 ### batch matmul定义
 
@@ -67,20 +67,20 @@ C[b] = A[b] * B[b] + Bias[b], b = 0, 1, ..., B - 1
 矩阵A、B、C在Global Memory的格式是`ND`，矩阵A、B在L1 Buffer的格式是`NZ`，矩阵A在L0 Buffer的格式是`NZ`，矩阵B在L0B Buffer的格式是`ZN`，矩阵C在L0C Buffer的格式是`NZ`，Bias在Global Memory、L1 Buffer、L0 Buffer的格式都是`ND`。
 
 ```cpp
-//通过MakeFrameLayout构造Layout，MakeTensor构建Tensor。
+//通过make_frame_layout构造Layout，make_tensor构建Tensor。
 
-auto gmA = MakeTensor(MakeMemPtr(a), MakeFrameLayout<NDExtLayoutPtn>(B, M, K));
-auto gmB = MakeTensor(MakeMemPtr(b), MakeFrameLayout<NDExtLayoutPtn>(B, K, N));
-auto gmC = MakeTensor(MakeMemPtr(c), MakeFrameLayout<NDExtLayoutPtn>(B, M, N));
-auto gmBias = MakeTensor(MakeMemPtr(bias), MakeFrameLayout<NDExtLayoutPtn>(B, 1, N));
+auto gmA = make_tensor(make_mem_ptr(a), make_frame_layout<nd_ext_layout_ptn>(B, M, K));
+auto gmB = make_tensor(make_mem_ptr(b), make_frame_layout<nd_ext_layout_ptn>(B, K, N));
+auto gmC = make_tensor(make_mem_ptr(c), make_frame_layout<nd_ext_layout_ptn>(B, M, N));
+auto gmBias = make_tensor(make_mem_ptr(bias), make_frame_layout<nd_ext_layout_ptn>(B, 1, N));
 
-auto l1ATensor = MakeTensor(MakeMemPtr(l1ABuf), MakeFrameLayout<NZLayoutPtn, T>(L1BatchSize, M, K));
-auto l1BTensor = MakeTensor(MakeMemPtr(l1BBuf), MakeFrameLayout<NZLayoutPtn, T>(L1BatchSize, K, N));
-auto l1BiasTensor = MakeTensor(MakeMemPtr(l1BiasBuf), MakeFrameLayout<NDExtLayoutPtn, T>(L1BatchSize, 1, N));
-auto l0ATensor = MakeTensor(MakeMemPtr(l0ABuf), MakeFrameLayout<NZLayoutPtn, T>(L0BatchSize, M, K));
-auto l0BTensor = MakeTensor(MakeMemPtr(l0BBuf), MakeFrameLayout<ZNLayoutPtn, T>(L0BatchSize, K, N));
-auto l0CTensor = MakeTensor(MakeMemPtr(l0CBuf), MakeFrameLayout<NZLayoutPtn>(L0BatchSize, M, N));
-auto l0BiasTensor = MakeTensor(MakeMemPtr(l0BiasBuf), MakeFrameLayout<NDExtLayoutPtn>(L0BatchSize, 1, N));
+auto l1ATensor = make_tensor(make_mem_ptr(l1ABuf), make_frame_layout<nz_layout_ptn, T>(L1BatchSize, M, K));
+auto l1BTensor = make_tensor(make_mem_ptr(l1BBuf), make_frame_layout<nz_layout_ptn, T>(L1BatchSize, K, N));
+auto l1BiasTensor = make_tensor(make_mem_ptr(l1BiasBuf), make_frame_layout<nd_ext_layout_ptn, T>(L1BatchSize, 1, N));
+auto l0ATensor = make_tensor(make_mem_ptr(l0ABuf), make_frame_layout<nz_layout_ptn, T>(L0BatchSize, M, K));
+auto l0BTensor = make_tensor(make_mem_ptr(l0BBuf), make_frame_layout<zn_layout_ptn, T>(L0BatchSize, K, N));
+auto l0CTensor = make_tensor(make_mem_ptr(l0CBuf), make_frame_layout<nz_layout_ptn>(L0BatchSize, M, N));
+auto l0BiasTensor = make_tensor(make_mem_ptr(l0BiasBuf), make_frame_layout<nd_ext_layout_ptn>(L0BatchSize, 1, N));
 ```
 
 ### 矩阵批量搬入
@@ -90,46 +90,46 @@ auto l0BiasTensor = MakeTensor(MakeMemPtr(l0BiasBuf), MakeFrameLayout<NDExtLayou
 ```cpp
 for (uint32_t l1batchIndex = BIndexStart; l1batchIndex < BIndexEnd; l1batchIndex += L1BatchSize) {
     uint32_t l1BatchSize = min(L1BatchSize, BIndexEnd - l1batchIndex);
-    Copy(copyGM2L1Atom, l1ATensor,
-         gmA.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(M, K))));
-    Copy(copyGM2L1Atom, l1BTensor,
-         gmB.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(K, N))));
-    Copy(copyGM2L1Atom, l1BiasTensor,
-         gmBias.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(1, N))));
+    copy(copyGM2L1Atom, l1ATensor,
+         gmA.slice(make_coord(l1batchIndex, make_coord(0, 0)), make_shape(l1BatchSize, make_shape(M, K))));
+    copy(copyGM2L1Atom, l1BTensor,
+         gmB.slice(make_coord(l1batchIndex, make_coord(0, 0)), make_shape(l1BatchSize, make_shape(K, N))));
+    copy(copyGM2L1Atom, l1BiasTensor,
+         gmBias.slice(make_coord(l1batchIndex, make_coord(0, 0)), make_shape(l1BatchSize, make_shape(1, N))));
 
     for (uint32_t l0BatchIndex = 0; l0BatchIndex < l1BatchSize; l0BatchIndex += L0BatchSize) {
         uint32_t l0BatchSize = min(L0BatchSize, l1BatchSize - l0BatchIndex);
-        Copy(copyL12L0AAtom, l0ATensor,
-             l1ATensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(M, K))));
-        Copy(copyL12L0BAtom, l0BTensor,
-             l1BTensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(K, N))));
-        Copy(copyL12BTAtom, l0BiasTensor,
-             l1BiasTensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(1, N))));
+        copy(copyL12L0AAtom, l0ATensor,
+             l1ATensor.slice(make_coord(l0BatchIndex, make_coord(0, 0)), make_shape(l0BatchSize, make_shape(M, K))));
+        copy(copyL12L0BAtom, l0BTensor,
+             l1BTensor.slice(make_coord(l0BatchIndex, make_coord(0, 0)), make_shape(l0BatchSize, make_shape(K, N))));
+        copy(copyL12BTAtom, l0BiasTensor,
+             l1BiasTensor.slice(make_coord(l0BatchIndex, make_coord(0, 0)), make_shape(l0BatchSize, make_shape(1, N))));
     }
 }
 ```
 
-### Mmad批量计算
+### mmad批量计算
 
-每个Batch的Mmad运算对应独立的Bias。由于硬件mad指令不支持Batch数据的矩阵乘加运算，需要在Batch维度循环执行Mmad运算，每次将单个输入矩阵A、矩阵B和Bias作为输入操作数执行计算。
+每个Batch的mmad运算对应独立的Bias。由于硬件mad指令不支持Batch数据的矩阵乘加运算，需要在Batch维度循环执行mmad运算，每次将单个输入矩阵A、矩阵B和Bias作为输入操作数执行计算。
 
 ```cpp
 for (uint32_t l0CBatchIndex = 0; l0CBatchIndex < l0BatchSize; l0CBatchIndex++) {
-    Mmad(mmadAtom.with(MmadParams{static_cast<uint16_t>(M), static_cast<uint16_t>(N), static_cast<uint16_t>(K), 0, true}),
-        l0CTensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(M, N))),
-        l0ATensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(M, K))),
-        l0BTensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(K, N))),
-        l0BiasTensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(1, N))));
+    mmad(mmadAtom.with(mmad_params{static_cast<uint16_t>(M), static_cast<uint16_t>(N), static_cast<uint16_t>(K), unit_flag_mode::disable, true}),
+        l0CTensor.slice(make_coord(l0CBatchIndex, make_coord(0, 0)), make_shape(1, make_shape(M, N))),
+        l0ATensor.slice(make_coord(l0CBatchIndex, make_coord(0, 0)), make_shape(1, make_shape(M, K))),
+        l0BTensor.slice(make_coord(l0CBatchIndex, make_coord(0, 0)), make_shape(1, make_shape(K, N))),
+        l0BiasTensor.slice(make_coord(l0CBatchIndex, make_coord(0, 0)), make_shape(1, make_shape(1, N))));
 }
 ```
 
 ### 矩阵批量搬出
 
-每次完成`L0BatchSize`数量的矩阵乘加计算后，调用Copy接口通过`CopyL0C2GM` `Operation`的数据搬运能力将L0C Buffer上的结果矩阵C搬出到Global Memory。
+每次完成`L0BatchSize`数量的矩阵乘加计算后，调用copy接口通过`copy_l0c_to_gm` `Operation`的数据搬运能力将L0C Buffer上的结果矩阵C搬出到Global Memory。
 ```cpp
-Copy(copyL0C2GMAtom,
-     gmC.Slice(MakeCoord(l1batchIndex + l0BatchIndex, MakeCoord(0, 0)),
-               MakeShape(l0BatchSize, MakeShape(M, N))),
+copy(copyL0C2GMAtom,
+     gmC.slice(make_coord(l1batchIndex + l0BatchIndex, make_coord(0, 0)),
+               make_shape(l0BatchSize, make_shape(M, N))),
      l0CTensor);
 ```
 

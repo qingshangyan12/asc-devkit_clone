@@ -32,11 +32,11 @@ C[b] = A[b] * B[b] + Bias[b], b = 0, 1, ..., B - 1
 
 The data flow of this example is as follows:
 
-1. Global Memory -> L1 Buffer: Call the Copy interface with `CopyGM2L1` `Operation` transfer capability to transfer `L1BatchSize` of matrix A, matrix B, and Bias from Global Memory to L1 Buffer.
-2. L1 Buffer -> L0A Buffer/L0B Buffer: Call the Copy interface with `CopyL12L0A` and `CopyL12L0B` `Operation` transfer capability to transfer `L0BatchSize` of matrix A and matrix B from L1 Buffer to L0 Buffer.
-3. L1 Buffer -> BiasTable Buffer: Call the Copy interface with `CopyL12BT` `Operation` transfer capability to transfer `L0BatchSize` of Bias from L1 Buffer to BiasTable Buffer.
-4. Mmad: Loop through matrices A, B, and Bias on L0 Buffer `L0BatchSize` times, computing one batch group of A, B matrix multiplication plus Bias each time and writing to L0C Buffer.
-5. L0C Buffer -> Global Memory: Call the Copy interface with `CopyL0C2GM` `Operation` transfer capability to transfer `L0BatchSize` result matrices C out to Global Memory at once.
+1. Global Memory -> L1 Buffer: Call the copy interface with `copy_gm_to_l1` `Operation` transfer capability to transfer `L1BatchSize` of matrix A, matrix B, and Bias from Global Memory to L1 Buffer.
+2. L1 Buffer -> L0A Buffer/L0B Buffer: Call the copy interface with `copy_l1_to_l0a` and `copy_l1_to_l0b` `Operation` transfer capability to transfer `L0BatchSize` of matrix A and matrix B from L1 Buffer to L0 Buffer.
+3. L1 Buffer -> BiasTable Buffer: Call the copy interface with `copy_l1_to_biastable` `Operation` transfer capability to transfer `L0BatchSize` of Bias from L1 Buffer to BiasTable Buffer.
+4. mmad: Loop through matrices A, B, and Bias on L0 Buffer `L0BatchSize` times, computing one batch group of A, B matrix multiplication plus Bias each time and writing to L0C Buffer.
+5. L0C Buffer -> Global Memory: Call the copy interface with `copy_l0c_to_gm` `Operation` transfer capability to transfer `L0BatchSize` result matrices C out to Global Memory at once.
 
 ### Batch Matmul Definition
 
@@ -67,20 +67,20 @@ The default batch quantity transferred from L1 Buffer to L0A Buffer, L0B Buffer,
 The format of matrices A, B, C in Global Memory is `ND`, the format of matrices A, B in L1 Buffer is `NZ`, the format of matrix A in L0 Buffer is `NZ`, the format of matrix B in L0B Buffer is `ZN`, the format of matrix C in L0C Buffer is `NZ`, and the format of Bias in Global Memory, L1 Buffer, and L0 Buffer is all `ND`.
 
 ```cpp
-//Construct Layout through MakeFrameLayout, build Tensor through MakeTensor.
+//Construct Layout through make_frame_layout, build Tensor through make_tensor.
 
-auto gmA = MakeTensor(MakeMemPtr(a), MakeFrameLayout<NDExtLayoutPtn>(B, M, K));
-auto gmB = MakeTensor(MakeMemPtr(b), MakeFrameLayout<NDExtLayoutPtn>(B, K, N));
-auto gmC = MakeTensor(MakeMemPtr(c), MakeFrameLayout<NDExtLayoutPtn>(B, M, N));
-auto gmBias = MakeTensor(MakeMemPtr(bias), MakeFrameLayout<NDExtLayoutPtn>(B, 1, N));
+auto gmA = make_tensor(make_mem_ptr(a), make_frame_layout<nd_ext_layout_ptn>(B, M, K));
+auto gmB = make_tensor(make_mem_ptr(b), make_frame_layout<nd_ext_layout_ptn>(B, K, N));
+auto gmC = make_tensor(make_mem_ptr(c), make_frame_layout<nd_ext_layout_ptn>(B, M, N));
+auto gmBias = make_tensor(make_mem_ptr(bias), make_frame_layout<nd_ext_layout_ptn>(B, 1, N));
 
-auto l1ATensor = MakeTensor(MakeMemPtr(l1ABuf), MakeFrameLayout<NZLayoutPtn, T>(L1BatchSize, M, K));
-auto l1BTensor = MakeTensor(MakeMemPtr(l1BBuf), MakeFrameLayout<NZLayoutPtn, T>(L1BatchSize, K, N));
-auto l1BiasTensor = MakeTensor(MakeMemPtr(l1BiasBuf), MakeFrameLayout<NDExtLayoutPtn, T>(L1BatchSize, 1, N));
-auto l0ATensor = MakeTensor(MakeMemPtr(l0ABuf), MakeFrameLayout<NZLayoutPtn, T>(L0BatchSize, M, K));
-auto l0BTensor = MakeTensor(MakeMemPtr(l0BBuf), MakeFrameLayout<ZNLayoutPtn, T>(L0BatchSize, K, N));
-auto l0CTensor = MakeTensor(MakeMemPtr(l0CBuf), MakeFrameLayout<NZLayoutPtn>(L0BatchSize, M, N));
-auto l0BiasTensor = MakeTensor(MakeMemPtr(l0BiasBuf), MakeFrameLayout<NDExtLayoutPtn>(L0BatchSize, 1, N));
+auto l1ATensor = make_tensor(make_mem_ptr(l1ABuf), make_frame_layout<nz_layout_ptn, T>(L1BatchSize, M, K));
+auto l1BTensor = make_tensor(make_mem_ptr(l1BBuf), make_frame_layout<nz_layout_ptn, T>(L1BatchSize, K, N));
+auto l1BiasTensor = make_tensor(make_mem_ptr(l1BiasBuf), make_frame_layout<nd_ext_layout_ptn, T>(L1BatchSize, 1, N));
+auto l0ATensor = make_tensor(make_mem_ptr(l0ABuf), make_frame_layout<nz_layout_ptn, T>(L0BatchSize, M, K));
+auto l0BTensor = make_tensor(make_mem_ptr(l0BBuf), make_frame_layout<zn_layout_ptn, T>(L0BatchSize, K, N));
+auto l0CTensor = make_tensor(make_mem_ptr(l0CBuf), make_frame_layout<nz_layout_ptn>(L0BatchSize, M, N));
+auto l0BiasTensor = make_tensor(make_mem_ptr(l0BiasBuf), make_frame_layout<nd_ext_layout_ptn>(L0BatchSize, 1, N));
 ```
 
 ### Matrix Batch Transfer In
@@ -90,46 +90,46 @@ The example controls the batch quantity entering L1 Buffer from Global Memory ea
 ```cpp
 for (uint32_t l1batchIndex = BIndexStart; l1batchIndex < BIndexEnd; l1batchIndex += L1BatchSize) {
     uint32_t l1BatchSize = min(L1BatchSize, BIndexEnd - l1batchIndex);
-    Copy(copyGM2L1Atom, l1ATensor,
-         gmA.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(M, K))));
-    Copy(copyGM2L1Atom, l1BTensor,
-         gmB.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(K, N))));
-    Copy(copyGM2L1Atom, l1BiasTensor,
-         gmBias.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(1, N))));
+    copy(copyGM2L1Atom, l1ATensor,
+         gmA.slice(make_coord(l1batchIndex, make_coord(0, 0)), make_shape(l1BatchSize, make_shape(M, K))));
+    copy(copyGM2L1Atom, l1BTensor,
+         gmB.slice(make_coord(l1batchIndex, make_coord(0, 0)), make_shape(l1BatchSize, make_shape(K, N))));
+    copy(copyGM2L1Atom, l1BiasTensor,
+         gmBias.slice(make_coord(l1batchIndex, make_coord(0, 0)), make_shape(l1BatchSize, make_shape(1, N))));
 
     for (uint32_t l0BatchIndex = 0; l0BatchIndex < l1BatchSize; l0BatchIndex += L0BatchSize) {
         uint32_t l0BatchSize = min(L0BatchSize, l1BatchSize - l0BatchIndex);
-        Copy(copyL12L0AAtom, l0ATensor,
-             l1ATensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(M, K))));
-        Copy(copyL12L0BAtom, l0BTensor,
-             l1BTensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(K, N))));
-        Copy(copyL12BTAtom, l0BiasTensor,
-             l1BiasTensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(1, N))));
+        copy(copyL12L0AAtom, l0ATensor,
+             l1ATensor.slice(make_coord(l0BatchIndex, make_coord(0, 0)), make_shape(l0BatchSize, make_shape(M, K))));
+        copy(copyL12L0BAtom, l0BTensor,
+             l1BTensor.slice(make_coord(l0BatchIndex, make_coord(0, 0)), make_shape(l0BatchSize, make_shape(K, N))));
+        copy(copyL12BTAtom, l0BiasTensor,
+             l1BiasTensor.slice(make_coord(l0BatchIndex, make_coord(0, 0)), make_shape(l0BatchSize, make_shape(1, N))));
     }
 }
 ```
 
-### Mmad Batch Computation
+### mmad Batch Computation
 
-Each Batch's Mmad operation corresponds to an independent Bias. Since the hardware mad instruction does not support batch data matrix multiply-add operations, Mmad operations must be looped along the Batch dimension, with each iteration taking a single input matrix A, matrix B, and Bias as input operands for computation.
+Each Batch's mmad operation corresponds to an independent Bias. Since the hardware mad instruction does not support batch data matrix multiply-add operations, mmad operations must be looped along the Batch dimension, with each iteration taking a single input matrix A, matrix B, and Bias as input operands for computation.
 
 ```cpp
 for (uint32_t l0CBatchIndex = 0; l0CBatchIndex < l0BatchSize; l0CBatchIndex++) {
-    Mmad(mmadAtom.with(MmadParams{static_cast<uint16_t>(M), static_cast<uint16_t>(N), static_cast<uint16_t>(K), 0, true}),
-        l0CTensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(M, N))),
-        l0ATensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(M, K))),
-        l0BTensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(K, N))),
-        l0BiasTensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(1, N))));
+    mmad(mmadAtom.with(mmad_params{static_cast<uint16_t>(M), static_cast<uint16_t>(N), static_cast<uint16_t>(K), unit_flag_mode::disable, true}),
+        l0CTensor.slice(make_coord(l0CBatchIndex, make_coord(0, 0)), make_shape(1, make_shape(M, N))),
+        l0ATensor.slice(make_coord(l0CBatchIndex, make_coord(0, 0)), make_shape(1, make_shape(M, K))),
+        l0BTensor.slice(make_coord(l0CBatchIndex, make_coord(0, 0)), make_shape(1, make_shape(K, N))),
+        l0BiasTensor.slice(make_coord(l0CBatchIndex, make_coord(0, 0)), make_shape(1, make_shape(1, N))));
 }
 ```
 
 ### Matrix Batch Transfer Out
 
-After completing `L0BatchSize` quantity of matrix multiply-add computations, call the Copy interface with `CopyL0C2GM` `Operation` data transfer capability to transfer result matrices C from L0C Buffer to Global Memory.
+After completing `L0BatchSize` quantity of matrix multiply-add computations, call the copy interface with `copy_l0c_to_gm` `Operation` data transfer capability to transfer result matrices C from L0C Buffer to Global Memory.
 ```cpp
-Copy(copyL0C2GMAtom,
-     gmC.Slice(MakeCoord(l1batchIndex + l0BatchIndex, MakeCoord(0, 0)),
-               MakeShape(l0BatchSize, MakeShape(M, N))),
+copy(copyL0C2GMAtom,
+     gmC.slice(make_coord(l1batchIndex + l0BatchIndex, make_coord(0, 0)),
+               make_shape(l0BatchSize, make_shape(M, N))),
      l0CTensor);
 ```
 
