@@ -672,6 +672,43 @@ HcclResult ProcessLinksForChannelMutiJetty(
     return HCCL_SUCCESS;
 }
 
+#ifndef AICPU_COMPILE
+static HcclResult CalcChannelRequestMeshClosMultiJettyByRank(
+    HcclComm comm, CommProtocol expectedProtocol, u32 localRank, u32 remoteRank, std::vector<HcclChannelDesc>& channels,
+    bool isIsolation, bool expectMesh)
+{
+    const size_t channelCountBefore = channels.size();
+    uint32_t* netLayers = nullptr;
+    uint32_t netLayerNum = 0U;
+    CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
+    CHK_PRT_RET(
+        netLayers == nullptr || netLayerNum == 0U,
+        HCCL_ERROR("[CalcChannelRequestMeshClosMultiJetty] no network layer."), HCCL_E_INTERNAL);
+    for (uint32_t netLayerIdx = 0U; netLayerIdx < netLayerNum; ++netLayerIdx) {
+        const uint32_t netLayer = netLayers[netLayerIdx];
+        CommLink* linkList = nullptr;
+        u32 listSize = 0U;
+        CHK_RET(HcclRankGraphGetLinks(comm, netLayer, localRank, remoteRank, &linkList, &listSize));
+        if (linkList == nullptr || listSize == 0U) {
+            continue;
+        }
+        const std::vector<CommLink> links(linkList, linkList + listSize);
+        CHK_RET(ProcessLinksForChannelMutiJetty(
+            comm, expectedProtocol, links, localRank, remoteRank, netLayer, channels, expectMesh, isIsolation));
+        if (channels.size() > channelCountBefore) {
+            break;
+        }
+    }
+    CHK_PRT_RET(
+        channels.size() == channelCountBefore,
+        HCCL_ERROR(
+            "[CalcChannelRequestMeshClosMultiJetty] no channel between local rank[%u] and remote rank[%u].", localRank,
+            remoteRank),
+        HCCL_E_INTERNAL);
+    return HCCL_SUCCESS;
+}
+#endif
+
 HcclResult CalcChannelRequestMeshClosMultiJetty(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation,
@@ -698,35 +735,8 @@ HcclResult CalcChannelRequestMeshClosMultiJetty(
         if (remoteRank == topoInfo->userRank) {
             continue;
         }
-        const size_t channelCountBefore = channels.size();
-        uint32_t* netLayers = nullptr;
-        uint32_t netLayerNum = 0U;
-        CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
-        CHK_PRT_RET(
-            netLayers == nullptr || netLayerNum == 0U,
-            HCCL_ERROR("[CalcChannelRequestMeshClosMultiJetty] no network layer."), HCCL_E_INTERNAL);
-        for (uint32_t netLayerIdx = 0U; netLayerIdx < netLayerNum; ++netLayerIdx) {
-            const uint32_t netLayer = netLayers[netLayerIdx];
-            CommLink* linkList = nullptr;
-            u32 listSize = 0U;
-            CHK_RET(HcclRankGraphGetLinks(comm, netLayer, topoInfo->userRank, remoteRank, &linkList, &listSize));
-            if (linkList == nullptr || listSize == 0U) {
-                continue;
-            }
-            const std::vector<CommLink> links(linkList, linkList + listSize);
-            CHK_RET(ProcessLinksForChannelMutiJetty(
-                comm, EXPECTED_PROTOCOL, links, topoInfo->userRank, remoteRank, netLayer, channels, expectMesh,
-                isIsolation));
-            if (channels.size() > channelCountBefore) {
-                break;
-            }
-        }
-        CHK_PRT_RET(
-            channels.size() == channelCountBefore,
-            HCCL_ERROR(
-                "[CalcChannelRequestMeshClosMultiJetty] no channel between local rank[%u] and remote rank[%u].",
-                topoInfo->userRank, remoteRank),
-            HCCL_E_INTERNAL);
+        CHK_RET(CalcChannelRequestMeshClosMultiJettyByRank(
+            comm, EXPECTED_PROTOCOL, topoInfo->userRank, remoteRank, channels, isIsolation, expectMesh));
     }
 #else
     (void)comm;
