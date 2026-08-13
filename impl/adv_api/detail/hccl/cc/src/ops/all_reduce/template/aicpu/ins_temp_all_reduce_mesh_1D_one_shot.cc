@@ -13,15 +13,15 @@
 
 namespace mc2_ops_hccl {
 InsTempAllReduceMesh1DOneShot::InsTempAllReduceMesh1DOneShot(
-    const OpParam& param, const u32 rankId,
-    const std::vector<std::vector<u32>>& subCommRanks)
+    const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
     : InsAlgTemplateBase(param, rankId, subCommRanks)
 {}
 
 InsTempAllReduceMesh1DOneShot::~InsTempAllReduceMesh1DOneShot() {}
 
-HcclResult InsTempAllReduceMesh1DOneShot::CalcRes(HcclComm comm, const OpParam& param,
-    const TopoInfoWithNetLayerDetails* topoInfo, AlgResourceRequest& resourceRequest)
+HcclResult InsTempAllReduceMesh1DOneShot::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    AlgResourceRequest& resourceRequest)
 {
     u32 threadNum = templateRankSize_ > 1 ? templateRankSize_ : 1;
     resourceRequest.slaveThreadNum = threadNum - 1;
@@ -54,14 +54,14 @@ HcclResult InsTempAllReduceMesh1DOneShot::CalcSlice(const u64 dataSize, RankSlic
     }
     CHK_PRT_RET(
         (sliceInfoVec[templateRankSize_ - 1][0].offset + sliceInfoVec[templateRankSize_ - 1][0].size !=
-            dataSize * templateRankSize_),
+         dataSize * templateRankSize_),
         HCCL_ERROR("[InsTempAllReduceMesh1DOneShot] Rank [%d], SliceInfo calculation error!", myRank_),
         HcclResult::HCCL_E_INTERNAL);
     return HCCL_SUCCESS;
 }
 
-HcclResult InsTempAllReduceMesh1DOneShot::KernelRun(const OpParam& param,
-    const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
+HcclResult InsTempAllReduceMesh1DOneShot::KernelRun(
+    const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
     threadNum_ = templateResource.threads.size();
     processSize_ = tempAlgParams.sliceSize;
@@ -71,9 +71,12 @@ HcclResult InsTempAllReduceMesh1DOneShot::KernelRun(const OpParam& param,
         dataType_ == HcclDataType::HCCL_DATA_TYPE_INT64 || dataType_ == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
         dataType_ == HcclDataType::HCCL_DATA_TYPE_FP64 || param.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
     HCCL_INFO("[InsTempAllReduceMesh1DOneShot] Run Start");
-    CHK_PRT_RET(threadNum_ != templateRankSize_,
-        HCCL_ERROR("[InsTempAllReduceMesh1DOneShot][KernelRun] thread num is invalid, need[%u], actual[%u].",
-            templateRankSize_, threadNum_), HcclResult::HCCL_E_INTERNAL);
+    CHK_PRT_RET(
+        threadNum_ != templateRankSize_,
+        HCCL_ERROR(
+            "[InsTempAllReduceMesh1DOneShot][KernelRun] thread num is invalid, need[%u], actual[%u].",
+            templateRankSize_, threadNum_),
+        HcclResult::HCCL_E_INTERNAL);
 
     RankSliceInfo sliceInfoVec;
     CHK_RET(CalcSlice(processSize_, sliceInfoVec));
@@ -93,18 +96,18 @@ HcclResult InsTempAllReduceMesh1DOneShot::KernelRun(const OpParam& param,
     return HCCL_SUCCESS;
 }
 
-HcclResult InsTempAllReduceMesh1DOneShot::RunAllReduce(const OpParam& param,
-    const std::map<u32, std::vector<ChannelInfo>>& channels,
+HcclResult InsTempAllReduceMesh1DOneShot::RunAllReduce(
+    const OpParam& param, const std::map<u32, std::vector<ChannelInfo>>& channels,
     const std::vector<ThreadHandle>& threads, const TemplateDataParams& tempAlgParams,
     const RankSliceInfo& sliceInfoVec)
 {
     (void)param;
     HCCL_INFO("[InsTempAllReduceMesh1DOneShot][RunAllReduce] send/recv: rank[%d]", myRank_);
 
-    DataSlice usrInSlices = DataSlice(tempAlgParams.buffInfo.inputPtr,
-        tempAlgParams.buffInfo.inBuffBaseOff, processSize_, count_);
-    DataSlice usrOutSlices = DataSlice(tempAlgParams.buffInfo.outputPtr,
-        tempAlgParams.buffInfo.outBuffBaseOff, processSize_, count_);
+    DataSlice usrInSlices =
+        DataSlice(tempAlgParams.buffInfo.inputPtr, tempAlgParams.buffInfo.inBuffBaseOff, processSize_, count_);
+    DataSlice usrOutSlices =
+        DataSlice(tempAlgParams.buffInfo.outputPtr, tempAlgParams.buffInfo.outBuffBaseOff, processSize_, count_);
 
     CHK_RET(static_cast<HcclResult>(LocalCopy(threads[0], usrInSlices, usrOutSlices)));
 
@@ -140,18 +143,18 @@ HcclResult InsTempAllReduceMesh1DOneShot::RunAllReduce(const OpParam& param,
         rxSrcSlices.push_back(rxSrcSlice);
         rxDstSlices.push_back(rxDstSlice);
 
-        SendRecvInfo sendRecvInfo{{linkSend, linkRecv},
-            {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}, dataType_};
-        CHK_PRT_RET(SendRecvBatchWrite(sendRecvInfo, threads[queIdx]),
-            HCCL_ERROR("[InsTempAllReduceMesh1DOneShot] RunAllReduce SendRecv failed"),
-            HcclResult::HCCL_E_INTERNAL);
+        SendRecvInfo sendRecvInfo{
+            {linkSend, linkRecv}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}, dataType_};
+        CHK_PRT_RET(
+            SendRecvBatchWrite(sendRecvInfo, threads[queIdx]),
+            HCCL_ERROR("[InsTempAllReduceMesh1DOneShot] RunAllReduce SendRecv failed"), HcclResult::HCCL_E_INTERNAL);
     }
 
     return HCCL_SUCCESS;
 }
 
-HcclResult InsTempAllReduceMesh1DOneShot::PostLocalReduce(const OpParam& param,
-    const std::vector<ThreadHandle>& threads, const TemplateDataParams& tempAlgParams,
+HcclResult InsTempAllReduceMesh1DOneShot::PostLocalReduce(
+    const OpParam& param, const std::vector<ThreadHandle>& threads, const TemplateDataParams& tempAlgParams,
     const RankSliceInfo& sliceInfoVec)
 {
     HCCL_INFO("[InsTempAllReduceMesh1DOneShot][PostLocalReduce] reduce: rank[%d]", myRank_);
@@ -163,8 +166,8 @@ HcclResult InsTempAllReduceMesh1DOneShot::PostLocalReduce(const OpParam& param,
         }
     }
 
-    DataSlice usrOutSlices = DataSlice(tempAlgParams.buffInfo.outputPtr,
-        tempAlgParams.buffInfo.outBuffBaseOff, processSize_, count_);
+    DataSlice usrOutSlices =
+        DataSlice(tempAlgParams.buffInfo.outputPtr, tempAlgParams.buffInfo.outBuffBaseOff, processSize_, count_);
 
     for (u32 rankIdx = 0; rankIdx < subCommRanks_[0].size(); rankIdx++) {
         u32 curRank = rankIdx;
