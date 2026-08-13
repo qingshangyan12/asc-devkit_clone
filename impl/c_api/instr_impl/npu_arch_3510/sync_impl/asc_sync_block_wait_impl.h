@@ -52,11 +52,6 @@ __aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, int64_t flag_id)
     }
 }
 
-__aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, uint8_t flag_id)
-{
-    asc_sync_block_wait_impl(pipe, static_cast<int64_t>(flag_id));
-}
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

@@ -52,11 +52,6 @@ __aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint64_t sync_id)
     }
 }
 
-__aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint8_t sync_id)
-{
-    asc_sync_intra_arrive_impl(pipe, static_cast<uint64_t>(sync_id));
-}
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
