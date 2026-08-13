@@ -15,14 +15,14 @@
 
 - \>= CANN 9.1.0
 
-## 目录结构
+## 目录结构介绍
 
 ```text
 ├── warp_divergence
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── spmv.asc                    // SIMT SpMV 样例实现
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -163,7 +163,7 @@ if (lane_id == 0) {
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
+### Ascend 950PR性能对比
 
 **综合优化效果**：
 - 从Case 1基线版本到Case 2优化版本，Task Duration从81.811μs降低到31.772μs，耗时下降约61.1%
@@ -173,7 +173,7 @@ if (lane_id == 0) {
 | Case 1 | 81.811            | **1x**                | 基线版本，一个线程处理一行数据          |
 | Case 2 | 31.772            | **0.39x耗时**          | Warp协作处理一行数据，减小Warp Divergence，访存合并 |
 
-## 调优建议
+### 优化要点总结
 
 1. **减小Warp Divergence**：当同一Warp内线程因分支进入不同代码执行路径时，部分线程需要等待其余线程完成当前分支，导致计算资源浪费。常见场景包括循环次数不一致、条件分支差异等。本样例针对循环次数不一致的场景，通过Warp协作处理方式，使同一Warp内线程循环次数基本相同，减小Warp Divergence。
 
@@ -215,7 +215,7 @@ if (lane_id == 0) {
   [Success] Case accuracy verification passed.
   ```
 
-## 性能数据获取
+### 性能分析
 
   使用 `msopprof` 工具获取单个组件上的性能数据：
 

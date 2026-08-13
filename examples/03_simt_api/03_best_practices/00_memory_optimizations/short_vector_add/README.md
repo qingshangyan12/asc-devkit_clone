@@ -20,14 +20,16 @@
 
 ## 目录结构介绍
 
-```
-short_vector_add
+```text
+├── short_vector_add
 │   ├── scripts/             // 测试脚本目录
 │   │   ├── gen_data.py      // 生成测试输入和golden数据
 │   │   └── verify_result.py // 验证输出结果
 │   ├── CMakeLists.txt       // 编译工程文件
 │   ├── data_utils.h         // 数据读写工具函数
-│   └── short_vector_add.asc // Ascend C算子实现 & 调用样例
+│   ├── short_vector_add.asc // Ascend C算子实现 & 调用样例
+│   ├── README.md            // 样例说明文档
+│   └── README_en.md         // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -249,7 +251,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
   test pass!
   ```
 
-## 性能数据获取
+### 性能分析
 
 使用 `msOpProf` 工具获取单个组件上的性能数据：
 

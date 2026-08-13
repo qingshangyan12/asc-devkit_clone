@@ -19,7 +19,8 @@
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── data_cache_hint.asc         // SIMT数据缓存样例实现
 │   ├── figures                     // README中的图片资源
-│   └── README.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -183,7 +184,7 @@ asc_stcg(&output[idx], y);
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
+### Ascend 950PR性能对比
 
 **综合优化效果**：
 - 从Case 0基线版本到Case 1优化版本，Task Duration从56.82μs降低到50.895μs，耗时下降约10.4%
@@ -194,7 +195,7 @@ asc_stcg(&output[idx], y);
 | Case 0       | 56.82             | **1x**                | 基线版本，所有数据共同竞争DCache空间 |
 | Case 1       | 50.895            | **0.90x耗时**           | 数据缓存优化，sin表常驻DCache空间 |
 
-## 调优建议
+### 优化要点总结
 
 1. **识别热点数据**：在查表类算子中，查找表是频繁访问的热点数据，应优先保证其常驻DCache。
 2. **区分数据访问模式**：对于仅访问一次的数据（如输入数据），使用`asc_ldcg`避免其对DCache空间的占用；对于需要频繁访问的数据（如查找表），使用`asc_ldca`优先分配Cache空间。
@@ -237,7 +238,7 @@ asc_stcg(&output[idx], y);
   [Success] Case accuracy is verification passed.
   ```
 
-## 性能分析
+### 性能分析
 
 使用 `msOpProf` 工具获取详细性能数据：
 

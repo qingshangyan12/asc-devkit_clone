@@ -19,8 +19,8 @@
 │   ├── figures                     // README中的图片资源
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── matrix_transpose.asc        // SIMT矩阵转置优化路径实现
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -379,7 +379,7 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示，其中耗时
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
+### Ascend 950PR性能对比
 
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | ---- | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
@@ -397,7 +397,7 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示，其中耗时
 - 转置主路径Case 2 -> Case 5 -> Case 6 -> Case 7，Task Duration由36.337μs依次降至23.912μs、15.152μs、12.074μs，相对Case 2提升约3.01倍。
 - 耗时最低的Case 7相对Case 0复制基线约为1.93倍，差距主要来自UB中转、Thread Block内同步以及UB访问开销。
 
-## 调优建议
+### 优化要点总结
 
 访存类算子调优时，建议先用连续复制确认当前规模下的GM搬运上限，再用最直接的实现暴露主要差距。本样例中，直接转置与复制基线的差距主要来自非连续GM写，因此优化方向不是增加计算并行度，而是重排访存：以32×32的tile为单位连续读入UB，在UB内完成转置方向读取，再按输出矩阵行方向连续写入GM。
 
@@ -445,7 +445,7 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示，其中耗时
   [Success] Case accuracy verification passed.
   ```
 
-## 性能分析
+### 性能分析
 
 使用 `msOpProf` 工具获取详细性能数据：
 
@@ -468,29 +468,29 @@ msopprof ./matrix_transpose   # 分析case的性能
 └── visualize_data.bin         // MindStudio Insight呈现文件
 ```
 
-## 仿真调优
+- 仿真性能采集
 
-可以使用 `msopprof simulator` 进行仿真性能分析，生成可视化的指令流水图等信息。命令如下：
+  可以使用 `msopprof simulator` 进行仿真性能分析，生成可视化的指令流水图等信息。命令如下：
 
-```bash
-SCENARIO_NUM=7                                                                     # 选择执行场景，可选0-7
-mkdir -p build && cd build;                                                        # 创建并进入build目录
-cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
-msopprof simulator --soc-version=<soc_version> ./matrix_transpose
-```
+  ```bash
+  SCENARIO_NUM=7                                                                     # 选择执行场景，可选0-7
+  mkdir -p build && cd build;                                                        # 创建并进入build目录
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
+  msopprof simulator --soc-version=<soc_version> ./matrix_transpose
+  ```
 
-> 使用仿真调优功能前，需要在 `CMakeLists.txt` 中添加 `-g` 编译选项，用于生成调试信息，使仿真器能够采集指令流水图。`soc_version` 获取方式及仿真调优其他说明可参考[仿真调优样例](../../../01_utilities/07_simulator)。
+  > 使用仿真调优功能前，需要在 `CMakeLists.txt` 中添加 `-g` 编译选项，用于生成调试信息，使仿真器能够采集指令流水图。`soc_version` 获取方式及仿真调优其他说明可参考[仿真调优样例](../../../01_utilities/07_simulator)。
 
-命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
+  命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
 
-```text
-OPPROF_{timestamp}_XXX/
-├── dump                    // 原始性能数据，用户无需关注
-└── simulator
-    ├── core*.veccore*/     // 各向量核的仿真指令流水图文件
-    └── visualize_data.bin  // MindStudio Insight呈现文件
-```
+  ```text
+  OPPROF_{timestamp}_XXX/
+  ├── dump                    // 原始性能数据，用户无需关注
+  └── simulator
+      ├── core*.veccore*/     // 各向量核的仿真指令流水图文件
+      └── visualize_data.bin  // MindStudio Insight呈现文件
+  ```
 
-执行后，可以在 **MindStudio Insight** 中打开 `visualize_data.bin` 查看可视化指令流水图。
+  执行后，可以在 **MindStudio Insight** 中打开 `visualize_data.bin` 查看可视化指令流水图。
 
 更多 `msOpProf` 工具使用方法，请参见[MindStudio工具调优（msOpProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。

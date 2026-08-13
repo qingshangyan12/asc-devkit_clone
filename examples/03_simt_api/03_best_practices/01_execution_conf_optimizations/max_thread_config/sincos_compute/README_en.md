@@ -16,10 +16,11 @@ This example uses sincos computation to demonstrate thread configuration optimiz
 ## Directory Structure
 
 ```text
-sincos_compute/
+├── sincos_compute
 │   ├── CMakeLists.txt              // CMake build file
 │   ├── sincos_compute.asc          // sincos example implementation
-│   └── README.md
+│   ├── README.md                   // Chinese sample documentation.
+│   └── README_en.md                // English sample documentation.
 ```
 
 ## Example Description
@@ -193,7 +194,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
+### Ascend 950PR Performance Comparison
 
 **Overall Optimization Effect**:
 - From Case 0 baseline to Case 1 optimized version, Task Duration decreases from 102.47us to 96.22us, a reduction of approximately 6.1%
@@ -204,7 +205,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 | Case 0       | 102.47             | **1x**                | Baseline version, register spill to Global Memory |
 | Case 1       | 96.22            | **0.94x latency**           | Configure launch bounds to avoid register spill |
 
-## Tuning Recommendations
+### Optimization Key Points Summary
 
 1. **Identify register spill**: Use the `--cce-res-usage` compilation option to view register usage
    - Stack size > 0: register spill exists
@@ -258,7 +259,7 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
+### Performance Analysis
 
 Use the `msOpProf` tool to collect detailed performance data:
 
