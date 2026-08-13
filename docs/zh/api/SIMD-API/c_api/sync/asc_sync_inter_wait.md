@@ -26,17 +26,18 @@
 
 ## 功能说明
 
-在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组间同步指不同group之间的同步，即所有block（所有AIC或所有AIV）之间的同步。
+头文件路径：`"c_api/sync/sync.h"`。
 
-核间同步指令，与[asc_sync_inter_arrive](asc_sync_inter_arrive.md)配合使用（通过flag_id关联），用于组间block的信号同步。
-
-每个flag_id均分配有计数器，执行asc_sync_inter_arrive后计数器将递增；执行asc_sync_inter_wait时如果对应的计数器数值为0则阻塞；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+核间同步等待接口，与`asc_sync_inter_arrive`配对使用，用于两个核（AIC与AIV，或两个AIV之间）之间的同步：被等待核执行`asc_sync_inter_arrive`在其前序流水任务完成后向FFTS（Fast Task Flow Synchronizer）发送到达通知并递增对应flag_id的计数器；本接口在等待核上执行，阻塞`pipe`流水线的后续指令，直到对应flag_id的FFTS计数器非零时将计数器减一、放行后续指令。两个接口通过相同的`flag_id`关联，构成一对核间同步原语。本接口与`asc_sync_inter_arrive`配套使用。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id)
-__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id)
+```c
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe,
+                                           uint8_t flag_id)
+
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe,
+                                           int64_t flag_id)
 ```
 
 ## 参数说明

@@ -26,14 +26,17 @@
 
 ## 功能说明
 
-在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组内subblock间同步指同一group内不同subblock（AIV）之间的同步。
+头文件路径：`"c_api/sync/sync.h"`。
 
-和[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配合使用（通过flag_id关联），用于组内subblock间的信号同步。通过向核间同步寄存器发送同步信号，标识当前pipeline已到达flag_id对应的同步点。每个flag_id对应一个初始值为0的计数器，执行asc_sync_subblock_arrive后flag_id对应的计数器增加1；执行asc_sync_subblock_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+核间subblock级同步投递原语，与`asc_sync_subblock_wait`配对使用，用于建立同一group内多个subblock之间的跨核同步依赖。本接口在`pipe`指定流水的前序指令全部提交后执行，向调度模块投递一个携带同步模式（inter-subblock）与flag ID的同步信号；同一group内所有subblock都投递同一flag ID后，调度模块向该group内所有subblock广播同步到达信号，配对的等待接口在收到到达信号后放行后续指令。
+
+本接口为非阻塞语义的投递操作——本接口在其前序指令提交后即投递同步信号，不阻塞本流水线的后续指令；配对的`asc_sync_subblock_wait`在未收到到达信号时阻塞其所在流水的后续指令，直到本接口及其他subblock的同flag ID投递全部完成才放行，从而构成一对跨核"投递-等待"同步闭环。当需与同一group内其他核的subblock建立跨核同步依赖、等待对端消费本接口投递的同步信号时，需要与`asc_sync_subblock_wait`配合使用。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id)
+```c
+__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe,
+                                                int64_t flag_id)
 ```
 
 ## 参数说明
@@ -94,7 +97,7 @@ constexpr uint32_t AIV_BYTES = ELEMENTS_PER_AIV * sizeof(float);
 constexpr uint32_t TOTAL_BYTES = TOTAL_ELEMENTS * sizeof(float);
 constexpr int64_t FLAG_ID = 8;
 
-__global__ __mix__(1, 2) void AscSyncSubblockKernel(__gm__ float* contributions, __gm__ float* output)
+__global__ __mix__(1, 2) void asc_sync_subblock_kernel(__gm__ float* contributions, __gm__ float* output)
 {
     asc_init();
     if ASC_IS_AIV {
@@ -130,7 +133,7 @@ int main()
     aclrtSetDevice(0);
     aclrtMalloc(reinterpret_cast<void**>(&contributions_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    AscSyncSubblockKernel<<<1, 0>>>(contributions_device, output_device);
+    asc_sync_subblock_kernel<<<1, 0>>>(contributions_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), TOTAL_BYTES, output_device, TOTAL_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;

@@ -26,15 +26,22 @@
 
 ## 功能说明
 
-在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组内subblock间同步指同一group内不同subblock（AIV）之间的同步。
+头文件路径：`"c_api/sync/sync.h"`。
 
-核间同步指令，每个flag_id均分配有计数器，执行asc_sync_subblock_arrive后计数器将递增；执行asc_sync_subblock_wait时如果对应的计数器数值为0则阻塞；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+亚块（subblock）间同步等待接口，与配套到达通知接口配合使用，用于同一group内N个亚块之间通过flag ID关联建立同步点。group由1个block与N个亚块组成（N≥1），亚块间比例为1：N。本接口在所在核的指定流水线上插入一个等待点：当对应flag ID的同步计数器为0时，本接口所在流水的后续指令被阻塞；当计数器变为非0时，本接口放行后续指令并将计数器减1。同步计数器由配套到达通知接口在参与同步的亚块执行到对应同步点时累加，调度模块感知到全部参与亚块到达后将计数器加1。
+
+本接口需与`asc_sync_subblock_arrive`配合使用。配套到达通知接口负责发送同步信息（包含同步模式与flag ID）到核间同步调度模块并累加计数器，本接口负责阻塞等待计数器变为非0。两者通过相同的flag ID关联，同步模式由配套到达通知接口一侧指定为亚块间同步模式，本接口不传同步模式，仅通过flag ID与pipe与配套到达通知接口对齐。
+
+本接口为同步原语，AIC与AIV上均可调用，无AIC/AIV守护限制。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint8_t flag_id)
-__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id)
+```c
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,
+                                              uint8_t flag_id)
+
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,
+                                              int64_t flag_id)
 ```
 
 ## 参数说明

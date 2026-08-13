@@ -26,14 +26,17 @@
 
 ## 功能说明
 
-在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组内block和subblock间同步指同一group内block（AIC）与subblock（AIV）之间的同步。
+头文件路径：`"c_api/sync/sync.h"`。
 
-和[asc_sync_block_wait](asc_sync_block_wait.md)配合使用（通过flag_id关联），用于组内block和subblock间的信号同步。通过向核间同步寄存器发送同步信号，标识当前pipeline已到达flag_id对应的同步点。每个flag_id对应一个初始值为0的计数器，执行asc_sync_block_arrive后flag_id对应的计数器增加1；执行asc_sync_block_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+向核间同步寄存器发送同步信号，与`asc_sync_block_wait`配对使用，用于建立核间同步点。本接口固定实现单AI Core内AIC与全部AIV之间的全核同步（mode 2）：当AIC执行本接口时，该AI Core内M个AIV各自对应`flag_id`的同步计数器增加1，各AIV上配对的`asc_sync_block_wait`检测到计数器非0后解除阻塞并将计数器减1；当M个AIV都执行本接口时，AIC对应`flag_id`的同步计数器增加1，AIC上配对的`asc_sync_block_wait`检测到计数器非0后解除阻塞并将计数器减1。
+
+本指令在所在核的`pipe`流水的当前指令位置插入一个到达通知，不阻塞同一流水中的后续指令，仅设置一个同步标志，待本指令之前的所有指令提交后才触发对端核配对的`asc_sync_block_wait`。本接口在AIC与AIV上均可调用，无AIC/AIV守护限制。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id)
+```c
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
+                                             int64_t flag_id)
 ```
 
 ## 参数说明
@@ -93,7 +96,7 @@ constexpr uint32_t MATRIX_BYTES = MATRIX_ELEMENTS * sizeof(half);
 constexpr uint32_t OUTPUT_BYTES = MATRIX_ELEMENTS * sizeof(float);
 constexpr int64_t FLAG_ID = 8;
 
-__global__ __mix__(1, 2) void AscSyncBlockKernel(__gm__ float* output)
+__global__ __mix__(1, 2) void asc_sync_block_kernel(__gm__ float* output)
 {
     asc_init();
     __cbuf__ half matrix_a_l1[MATRIX_ELEMENTS], matrix_b_l1[MATRIX_ELEMENTS];
@@ -143,7 +146,7 @@ int main()
     aclInit(nullptr);
     aclrtSetDevice(0);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    AscSyncBlockKernel<<<1, 0>>>(output_device);
+    asc_sync_block_kernel<<<1, 0>>>(output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;

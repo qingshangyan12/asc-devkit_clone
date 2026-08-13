@@ -26,15 +26,19 @@
 
 ## 功能说明
 
-在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。block内同步指同一block内block（AIC）与单个subblock（AIV）之间的同步。
+头文件路径：`"c_api/sync/sync.h"`。
 
-block内同步指令，与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应Vector Core与Cube Core中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他CORE对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+块内（intra-block）跨核同步等待原语，与配套投递接口配对使用，用于在mix-mode block内部建立CubeCore与VecCore之间的流水同步依赖。本接口阻塞`pipe`指定流水的后续指令，直到对端核通过配套投递接口投递到对应同步ID上的计数器值大于0；命中后将该计数器减1并放行后续指令。
+
+本接口为非阻塞语义的反向操作——配套投递接口在其前序指令提交后将对端核对应ID的4位计数器加1且不阻塞自身流水，本接口则在对应计数器为0时阻塞本流水的后续指令，直到对端投递使计数器变为非零，随后将计数器减1放行，从而构成一对跨核"投递-等待"同步闭环。需要与配套投递接口配合使用。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint8_t sync_id)
-__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id)
+```c
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
+                                           uint8_t sync_id)
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
+                                           uint64_t sync_id)
 ```
 
 ## 参数说明

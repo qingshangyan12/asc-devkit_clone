@@ -94,7 +94,7 @@ void PrintData(const char* label, const std::vector<float>& data)
     std::cout << " ..." << std::endl;
 }
 
-__global__ __vector__ void AscSyncPipeKernel(__gm__ float* output, __gm__ float* src0, __gm__ float* src1)
+__global__ __vector__ void asc_sync_pipe_kernel(__gm__ float* output, __gm__ float* src0, __gm__ float* src1)
 {
     asc_init();
     __ubuf__ float x[ELEMENTS], y[ELEMENTS], z[ELEMENTS];
@@ -124,7 +124,7 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&output_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(src0_device, BYTES, src0.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(src1_device, BYTES, src1.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
-    AscSyncPipeKernel<<<1, 0>>>(output_device, src0_device, src1_device);
+    asc_sync_pipe_kernel<<<1, 0>>>(output_device, src0_device, src1_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), BYTES, output_device, BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     PrintData("Input src0", src0);

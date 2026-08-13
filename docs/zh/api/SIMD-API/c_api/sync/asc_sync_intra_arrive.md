@@ -26,31 +26,19 @@
 
 ## 功能说明
 
-在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。block内同步指同一block内block（AIC）与单个subblock（AIV）之间的同步。
+头文件路径：`"c_api/sync/sync.h"`。
 
-block内同步指令，与[asc_sync_intra_wait](asc_sync_intra_wait.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应Vector Core与Cube Core中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他Core对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+块内（intra-block）跨核同步投递原语，用于在mix-mode block内部建立CubeCore与VecCore之间的流水同步依赖。本接口在 `pipe` 指定流水的前序指令全部提交后执行，将对端核对应同步ID上的4位计数器加1，且不阻塞本流水线的后续指令。
 
-block内同步场景可细分为两类：
-
-- AIC执行asc_sync_intra_arrive，对应的AIV执行asc_sync_intra_wait。当AIC执行完asc_sync_intra_arrive时，AIV对应sync_id的计数器增加1。若AIV该sync_id的计数器为非0，则解除AIV的阻塞，asc_sync_intra_wait后的指令继续执行，该sync_id的计数器减1。总计AIC 1次调用asc_sync_intra_arrive，单个AIV完成1次asc_sync_intra_wait才算配对使用。
-
-- 1个AIV执行asc_sync_intra_arrive，对应的AIC执行asc_sync_intra_wait。当AIV执行完asc_sync_intra_arrive时，AIC对应sync_id的计数器增加1。若AIC该sync_id的计数器为非0，则解除AIC的阻塞，asc_sync_intra_wait后的指令继续执行，该sync_id的计数器减1。总计单个AIV 1次asc_sync_intra_arrive，对应AIC 1次调用asc_sync_intra_wait才算配对使用。
-
-以图1为例，演示1个AI Core中AIV1与AIC进行同步（AIV1-2发起asc_sync_intra_arrive）。
-
-AIC 1中在执行asc_sync_intra_wait后，此时AIC 1 sync_id=0的计数器为0，后续所有指令全部被阻塞，需要等到1个AIV执行完asc_sync_intra_arrive。
-
-- AIV 1-1不需要执行asc_sync_intra_arrive。
-- AIV 1-2的PIPE_MTE3指令全部执行完毕后，asc_sync_intra_arrive生效。此时调度模块感知1个AIV已执行完asc_sync_intra_arrive，因此将AIC 1 sync_id=0的计数器值增加为1。AIC 1检测到对应的sync_id=0的计数器变为1，则AIC 1核解除阻塞，继续执行后续PIPE_FIX的指令，并且将计数器值减去1。
-
-**图1**  block内同步时序图（AIV进行asc_sync_intra_arrive）
-![](../../../figures/single_ai_core_aic_single_aiv_sync.png "block内同步时序图（AIV进行asc_sync_intra_arrive）")
+本接口为非阻塞语义的投递操作——对端核在对应计数器为0时阻塞其所在流水，直到本接口使该计数器变为非零后将其减1并放行，从而构成一对跨核"投递-等待"同步闭环。在mix-mode block内建立CubeCore与VecCore之间的跨核流水同步依赖时，需与 `asc_sync_intra_wait` 配合使用：本接口负责投递计数，配对的等待接口负责在对端核消费计数。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint8_t sync_id)
-__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id)
+```c
+__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe,
+                                             uint8_t sync_id)
+__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe,
+                                             uint64_t sync_id)
 ```
 
 ## 参数说明
@@ -114,7 +102,7 @@ constexpr uint32_t MATRIX_BYTES = MATRIX_ELEMENTS * sizeof(half);
 constexpr uint32_t OUTPUT_BYTES = MATRIX_ELEMENTS * sizeof(float);
 constexpr uint64_t SYNC_ID = 8;
 
-__global__ __mix__(1, 2) void AscSyncIntraKernel(__gm__ float* output)
+__global__ __mix__(1, 2) void asc_sync_intra_kernel(__gm__ float* output)
 {
     asc_init();
     __cbuf__ half matrix_a_l1[MATRIX_ELEMENTS], matrix_b_l1[MATRIX_ELEMENTS];
@@ -163,7 +151,7 @@ int main()
     aclInit(nullptr);
     aclrtSetDevice(0);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    AscSyncIntraKernel<<<1, 0>>>(output_device);
+    asc_sync_intra_kernel<<<1, 0>>>(output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;

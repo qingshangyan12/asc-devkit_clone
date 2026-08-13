@@ -26,15 +26,20 @@
 
 ## 功能说明
 
-在分离模式下，AIC（Cube Core）与AIV（Vector Core）按group划分，一个group由1个block（主核）和N个subblock（从核）组成，比例1:N。组间同步指不同group之间的同步，即所有block（所有AIC或所有AIV）之间的同步。
+头文件路径：`"c_api/sync/sync.h"`。
 
-和[asc_sync_inter_wait](asc_sync_inter_wait.md)配合使用（通过flag_id关联），用于组间block的信号同步。通过向核间同步寄存器发送同步信号，标识当前pipeline已到达flag_id对应的同步点。每个flag_id对应一个初始值为0的计数器，执行asc_sync_inter_arrive后flag_id对应的计数器增加1；执行asc_sync_inter_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+向核间同步寄存器发送到达通知，用于多个AI Core之间的组间block同步。本接口是硬件同步原语，将`(pipe, flag_id)`信息通过`pipe`流水派发到调度模块，由调度模块在收集到所有参与block对同一`flag_id`的到达通知后向各block回送同步信号，从而完成跨AI Core的block级同步。
+
+本接口需与`asc_sync_inter_wait`配对使用：本接口负责发送到达通知，`asc_sync_inter_wait`负责阻塞等待对应`flag_id`的事件完成。两者通过相同的`flag_id`关联，共同构成组间block同步的执行期闭环。
+
+本接口无AIC/AIV守护限制，AIC与AIV均可调用。
 
 ## 函数原型
 
-  ```cpp
-   __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id)
-  ```
+```c
+__aicore__ inline void asc_sync_inter_arrive(pipe_t pipe,
+                                             int64_t flag_id)
+```
 
 ## 参数说明
 
@@ -97,7 +102,7 @@ constexpr uint32_t AIV_BYTES = ELEMENTS_PER_AIV * sizeof(float);
 constexpr uint32_t TOTAL_BYTES = TOTAL_ELEMENTS * sizeof(float);
 constexpr int64_t FLAG_ID = 8;
 
-__schedmode__(1) __global__ __mix__(1, 2) void AscSyncInterKernel(
+__schedmode__(1) __global__ __mix__(1, 2) void asc_sync_inter_kernel(
     __gm__ float* contributions, __gm__ float* output)
 {
     asc_init();
@@ -134,7 +139,7 @@ int main()
     aclrtSetDevice(0);
     aclrtMalloc(reinterpret_cast<void**>(&contributions_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    AscSyncInterKernel<<<GROUP_NUM, 0>>>(contributions_device, output_device);
+    asc_sync_inter_kernel<<<GROUP_NUM, 0>>>(contributions_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), TOTAL_BYTES, output_device, TOTAL_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;

@@ -34,7 +34,7 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 四个执行单元Scalar、Vector、DMA（MTE2）、DMA（MTE3）并行执行，若访问同一片Local Memory，需要同步机制来控制它们的访问时序：保证先搬入Local Memory后再计算，计算完成后再搬出。
 
 **图4**  核内并行流水执行时序示意图    
-![](../../../figures/intra_core_parallel_pipeline_execution_timing.png "intra_core_parallel_pipeline_execution_timing")
+![](../../c_api/figures/asc_sync_notify.png)
 
 ## 硬件流水类型
 
