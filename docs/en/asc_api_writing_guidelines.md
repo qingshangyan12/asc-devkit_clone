@@ -41,7 +41,7 @@ Clauses in these guidelines are organized in the following structure:
 
 [Level] Mandatory
 
-[Description] The Ascend C API navigation directory structure (the directory structure in the left navigation panel of static pages or Ascend community documentation) is organized through an [index file](./api/README.md) that maps source files. The index file describes the hierarchical relationship between nodes in a list format. The source file directory structure must be consistent with the navigation directory structure. Each node in the navigation directory structure corresponds to an md file:
+[Description] The Ascend C API navigation directory structure (the directory structure in the left navigation panel of static pages or Ascend community documentation) is organized through an [index file](../zh/api/README.md) that maps source files. The index file describes the hierarchical relationship between nodes in a list format. The source file directory structure must be consistent with the navigation directory structure. Each node in the navigation directory structure corresponds to an md file:
 
 - **Directory node** (parent node): Corresponds to an index file with the same name as the source directory (such as `basic_api.md`), used to organize child nodes.
 - **Leaf node** (specific API): Corresponds to an API content md file.
@@ -703,7 +703,7 @@ For scenarios with too many function prototypes, using only unordered lists woul
 Parameter value data types:
 - Data types that are fixed in the prototype do not need separate explanation.
 - Data types with multiple possibilities must specify the supported data types.
-- When the interface supports data types only related to bit width, they can be expressed by bit width: b8, b16, b32, b64. For the complete ordering and writing of data types, refer to [Data Type Guidelines](#10-software-guidelines).
+- When the interface supports data types only related to bit width, they can be expressed by bit width: b8, b16, b32, b64. For the complete ordering and writing of data types, refer to [Data Type Guidelines](#api-software-01-data-types-must-be-arranged-in-a-fixed-order).
 
 [Positive Example]
 The unit and supported data types of the repeatTime parameter can be determined from the prototype definition, but its value range differs from the general description of the basic API. This section specifically describes its value range.
@@ -1054,7 +1054,7 @@ bool, int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0
 
 [Level] Mandatory
 
-[Description] Unified conceptual terminology must be used. For the terminology table, refer to: [LINK](./guide/技术附录/概念原理和术语/术语表.md).
+[Description] Unified conceptual terminology must be used. For the terminology table, refer to: [LINK](../zh/guide/技术附录/概念原理和术语/术语表.md).
 
 ## 12 Figure Guidelines
 
@@ -1257,7 +1257,7 @@ Before submitting documentation, check each item in the following checklist to e
 | 2 | Punctuation | Punctuation must be complete and accurate, avoiding unclosed parentheses, missing or extra punctuation. |
 | 3 | Punctuation | In mixed Chinese-English text, no spaces should be added before or after English words. |
 | 4 | Data Type | Data type writing in the documentation must be consistent with the code. The writing order of data types must be consistent (principle: from small to large bit width, signed -> unsigned -> floating-point, floating-point sorted by exponent bit size): bool, int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, complex32, int64_t, uint64_t, double, complex64. When the interface supports data types only related to bit width, they can be expressed by bit width: b8, b16, b32, b64. |
-| 5 | Terminology | Unified conceptual terminology must be used, such as L1 Buffer, L0A Buffer, AI Core, and so on. For the terminology table, refer to: [LINK](./guide/技术附录/概念原理和术语/术语表.md). |
+| 5 | Terminology | Unified conceptual terminology must be used, such as L1 Buffer, L0A Buffer, AI Core, and so on. For the terminology table, refer to: [LINK](../zh/guide/技术附录/概念原理和术语/术语表.md). |
 | 6 | Preview Format | After preview, check whether indentation and line breaks are correct, avoiding text connected to code/tables/images on the same line. |
 | 7 | Sentence Logic | Sentences must be fluent and logically clear, avoiding grammatical errors or semantic ambiguity. For example, "This section mainly describes the rounding behavior during precision conversion between different data types" should not be written as "This section mainly describes the rounding behavior during precision conversion between different data types for introduction." |
 | 8 | Link Reference | Link reference rule: Links between programming guides, APIs, and example samples within the same code repository must use relative links. |
