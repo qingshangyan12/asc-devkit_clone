@@ -97,7 +97,7 @@
 
     -   对于一维线程块，其线程ID为blockIdx.x \* blockDim.x + threadIdx.x。
 
-        ![](../../figures/thread_id_fig_1.png)
+        ![](../../figures/thread_id_1.png)
 
     -   对于二维线程块，其线程ID为二维结构，其计算公式为：
 

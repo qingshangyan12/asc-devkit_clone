@@ -69,7 +69,7 @@
 
     ![](../../../figures/zh-cn_image_0000002354202658.png)
 
--   优化前的Profiling数据如下，aic\_time平均耗时34.01us。![](../../../figures/zh-cn_image_000000235527660fig_4.png)
+-   优化前的Profiling数据如下，aic\_time平均耗时34.01us。![](../../../figures/zh-cn_image_0000002355276604.png)
 
 ## 设计优化方案<a name="section33901368431"></a>
 
@@ -110,7 +110,7 @@
 
     ![](../../../figures/zh-cn_image_0000002447772589.png)
 
--   优化后的Profiling数据如下，aic\_time平均耗时32.66us，较优化前的34.01us有所提升。![](../../../figures/zh-cn_image_000000238891682fig_1.png)
+-   优化后的Profiling数据如下，aic\_time平均耗时32.66us，较优化前的34.01us有所提升。![](../../../figures/zh-cn_image_0000002388916821.png)
 
 ## 总结<a name="section8281219125011"></a>
 

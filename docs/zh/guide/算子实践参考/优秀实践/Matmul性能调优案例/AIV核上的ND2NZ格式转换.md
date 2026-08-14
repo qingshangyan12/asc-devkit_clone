@@ -110,8 +110,8 @@
 ## 验证优化方案性能收益<a name="section19022397498"></a>
 
 -   优化后的Vector流水图如下所示，利用Vector计算单元的能力，完成B矩阵的数据格式转换。![](../../../figures/zh-cn_image_0000002409891270.png)
--   优化后的Cube流水图如下所示，不使用随路ND2NZ指令对B矩阵进行格式转换后，MTE2的占比明显下降。![](../../../figures/zh-cn_image_000000244325198fig_5.png)
--   优化后的Profiling数据如下，可以看到同时使用Cube单元和Vector单元，aic\_time最大耗时90.95us，其中aic\_mte2\_ratio占比明显降低。![](../../../figures/zh-cn_image_0000002381162386.png)![](../../../figures/zh-cn_image_000000241456186fig_1.png)
+-   优化后的Cube流水图如下所示，不使用随路ND2NZ指令对B矩阵进行格式转换后，MTE2的占比明显下降。![](../../../figures/zh-cn_image_0000002443251985.png)
+-   优化后的Profiling数据如下，可以看到同时使用Cube单元和Vector单元，aic\_time最大耗时90.95us，其中aic\_mte2\_ratio占比明显降低。![](../../../figures/zh-cn_image_0000002381162386.png)![](../../../figures/zh-cn_image_0000002414561861.png)
 
 **表2**  端到端性能对比
 

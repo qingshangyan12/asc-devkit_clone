@@ -131,7 +131,7 @@ for i in range(g):
 
 -   Vector计算没有开启double buffer，计算和数据搬运部分没有并行。
 
-    ![](../../figures/zh-cn_image_000000214598019fig_3.png)
+    ![](../../figures/zh-cn_image_0000002145980193.png)
 
 ## 设计优化方案<a name="section7611135813517"></a>
 
@@ -222,11 +222,11 @@ for i in range(g):
 
     可以采用4份workspace进行优化：
 
-    ![](../../figures/2_zh-cn_image_000000212115618fig_1.png)
+    ![](../../figures/img_2_cn.png)
 
     优化后，总耗时由154.2us下降为131.8us。指令流水图显示Vector、Cube计算各自间隙明显减小。
 
-    ![](../../figures/zh-cn_image_000000208555849fig_4.png)
+    ![](../../figures/zh-cn_image_0000002085558494.png)
 
 -   Vector计算开启double buffer，优化后执行总耗时从131.8us下降为128.1us。
 

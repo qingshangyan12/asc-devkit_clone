@@ -111,7 +111,7 @@ Cube计算的典型数据流图如下所示：
 
 Cube计算流程本质上也可归纳为CopyIn、Compute、CopyOut三个阶段。因其流程相对复杂，Matmul高阶API提供了高阶封装，有效简化了编程范式。
 
-![](../../../../figures/mat_pos_fig_3.png)
+![](../../../../figures/mat_pos_3.png)
 
 如图所示：CopyIn阶段对应[SetTensorA](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTensorA.md)、[SetTensorB](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTensorB.md)、[SetBias](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetBias.md)接口；Compute阶段对应[Iterate](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Iterate.md)接口；CopyOut阶段对应[GetTensorC](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetTensorC.md)接口。示例如下：
 
@@ -147,7 +147,7 @@ mm.End();
 - Cube的输出可作为Vector的输入：CO2→VECIN
 - Vector的输出也可作为Cube的输入：VECOUT→A1→A2、VECOUT→B1→B2
 
-![](../../../../figures/mat_pos_fig_4.png)
+![](../../../../figures/mat_pos_4.png)
 
 基于Matmul高阶API的融合算子编程范式，将上述数据流简化为以下步骤：
 
