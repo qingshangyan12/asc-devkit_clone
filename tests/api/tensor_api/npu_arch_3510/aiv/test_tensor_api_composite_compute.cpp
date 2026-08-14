@@ -28,7 +28,7 @@ constexpr uint8_t RESULT_TOKEN = 0x44;
 constexpr uint8_t MASK_TOKEN = 0x5A;
 
 template <typename T>
-void FillBytes(T& value, uint8_t byte)
+void fill_bytes(T& value, uint8_t byte)
 {
     std::array<uint8_t, sizeof(T)> bytes {};
     bytes.fill(byte);
@@ -36,7 +36,7 @@ void FillBytes(T& value, uint8_t byte)
 }
 
 template <typename T>
-bool HasByteValue(const T& value, uint8_t byte)
+bool has_byte_value(const T& value, uint8_t byte)
 {
     std::array<uint8_t, sizeof(T)> bytes {};
     std::memcpy(bytes.data(), &value, bytes.size());
@@ -49,21 +49,21 @@ bool HasByteValue(const T& value, uint8_t byte)
 }
 
 template <typename T>
-bool SameBytes(const T& lhs, const T& rhs)
+bool same_bytes(const T& lhs, const T& rhs)
 {
     return std::memcmp(&lhs, &rhs, sizeof(T)) == 0;
 }
 
 template <typename T>
-asc::te::reg_tensor<T> MakeReg(uint8_t token)
+asc::te::reg_tensor<T> make_reg(uint8_t token)
 {
     asc::te::reg_tensor<T> value {};
-    FillBytes(value.reg, token);
-    FillBytes(value.mask, MASK_TOKEN);
+    fill_bytes(value.reg, token);
+    fill_bytes(value.mask, MASK_TOKEN);
     return value;
 }
 
-struct Capture {
+struct capture {
     vector_bool expected_mask {};
     bool masks_match = true;
     bool operands_match = true;
@@ -73,68 +73,68 @@ struct Capture {
     std::array<float, 4> scalars {};
 };
 
-Capture g_capture;
+capture g_capture;
 
-void CaptureMask(const vector_bool& mask)
+void capture_mask(const vector_bool& mask)
 {
-    g_capture.masks_match = g_capture.masks_match && SameBytes(mask, g_capture.expected_mask);
+    g_capture.masks_match = g_capture.masks_match && same_bytes(mask, g_capture.expected_mask);
 }
 
-void AxpyStub(vector_float& dst, vector_float src, float scalar, vector_bool mask, Literal)
+void axpy_stub(vector_float& dst, vector_float src, float scalar, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
-    g_capture.operands_match = g_capture.operands_match && HasByteValue(dst, DST_TOKEN) &&
-        HasByteValue(src, SRC0_TOKEN);
+    capture_mask(mask);
+    g_capture.operands_match = g_capture.operands_match && has_byte_value(dst, DST_TOKEN) &&
+        has_byte_value(src, SRC0_TOKEN);
     g_capture.scalars[g_capture.calls++] = scalar;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void AbsdiffStub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
+void absdiff_stub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
-    g_capture.operands_match = g_capture.operands_match && HasByteValue(src0, SRC0_TOKEN) &&
-        HasByteValue(src1, SRC1_TOKEN);
+    capture_mask(mask);
+    g_capture.operands_match = g_capture.operands_match && has_byte_value(src0, SRC0_TOKEN) &&
+        has_byte_value(src1, SRC1_TOKEN);
     ++g_capture.calls;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void ExpSubStub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, int part)
+void exp_sub_stub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, int part)
 {
-    CaptureMask(mask);
-    g_capture.operands_match = g_capture.operands_match && HasByteValue(src0, SRC0_TOKEN) &&
-        HasByteValue(src1, SRC1_TOKEN);
+    capture_mask(mask);
+    g_capture.operands_match = g_capture.operands_match && has_byte_value(src0, SRC0_TOKEN) &&
+        has_byte_value(src1, SRC1_TOKEN);
     g_capture.parts[g_capture.part_calls++] = part;
     ++g_capture.calls;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void ExpSubHalfStub(vector_float& dst, vector_half, vector_half, vector_bool mask, int part)
+void exp_sub_half_stub(vector_float& dst, vector_half, vector_half, vector_bool mask, int part)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     g_capture.parts[g_capture.part_calls++] = part;
     ++g_capture.calls;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void FmaStub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
+void fma_stub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
-    g_capture.operands_match = g_capture.operands_match && HasByteValue(dst, SRC0_TOKEN) &&
-        HasByteValue(src0, SRC1_TOKEN) && HasByteValue(src1, DST_TOKEN);
+    capture_mask(mask);
+    g_capture.operands_match = g_capture.operands_match && has_byte_value(dst, SRC0_TOKEN) &&
+        has_byte_value(src0, SRC1_TOKEN) && has_byte_value(src1, DST_TOKEN);
     ++g_capture.calls;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void MulsCastStub(vector_half& dst, vector_float src, float scalar, vector_bool mask, int part)
+void muls_cast_stub(vector_half& dst, vector_float src, float scalar, vector_bool mask, int part)
 {
-    CaptureMask(mask);
-    g_capture.operands_match = g_capture.operands_match && HasByteValue(src, SRC0_TOKEN);
+    capture_mask(mask);
+    g_capture.operands_match = g_capture.operands_match && has_byte_value(src, SRC0_TOKEN);
     g_capture.scalars[g_capture.calls++] = scalar;
     g_capture.parts[g_capture.part_calls++] = part;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-class TestTensorApiCompositeCompute : public testing::Test {
+class test_tensor_api_composite_compute : public testing::Test {
 protected:
     void SetUp() override
     {
@@ -148,7 +148,7 @@ protected:
 };
 
 template <typename T>
-__aicore__ inline void CompileAxpy()
+__aicore__ inline void compile_axpy()
 {
     asc::te::reg_tensor<T> dst {};
     asc::te::reg_tensor<T> src {};
@@ -156,7 +156,7 @@ __aicore__ inline void CompileAxpy()
 }
 
 template <typename T>
-__aicore__ inline void CompileAbsdiff()
+__aicore__ inline void compile_absdiff()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -164,7 +164,7 @@ __aicore__ inline void CompileAbsdiff()
 }
 
 template <typename T>
-__aicore__ inline void CompileExpSub()
+__aicore__ inline void compile_exp_sub()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -172,7 +172,7 @@ __aicore__ inline void CompileExpSub()
 }
 
 template <typename T>
-__aicore__ inline void CompileFma()
+__aicore__ inline void compile_fma()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -180,17 +180,17 @@ __aicore__ inline void CompileFma()
     (void)asc::te::fma(src0, src1, src2);
 }
 
-TEST_F(TestTensorApiCompositeCompute, CompileFiveApisAndSupportedTypes)
+TEST_F(test_tensor_api_composite_compute, compile_five_apis_and_supported_types)
 {
     AscendC::SetGCoreType(0);
-    CompileAxpy<half>();
-    CompileAxpy<float>();
-    CompileAbsdiff<half>();
-    CompileAbsdiff<float>();
-    CompileExpSub<half>();
-    CompileExpSub<float>();
-    CompileFma<half>();
-    CompileFma<float>();
+    compile_axpy<half>();
+    compile_axpy<float>();
+    compile_absdiff<half>();
+    compile_absdiff<float>();
+    compile_exp_sub<half>();
+    compile_exp_sub<float>();
+    compile_fma<half>();
+    compile_fma<float>();
 
     static_assert(!asc::te::detail::supports_axpy_v<int64_t>);
     static_assert(!asc::te::detail::supports_absdiff_v<int64_t>);
@@ -201,25 +201,25 @@ TEST_F(TestTensorApiCompositeCompute, CompileFiveApisAndSupportedTypes)
     (void)asc::te::muls_cast(src, 2.0f);
 }
 
-TEST_F(TestTensorApiCompositeCompute, AccumulationApisUseFirstOperandMask)
+TEST_F(test_tensor_api_composite_compute, accumulation_apis_use_first_operand_mask)
 {
-    auto dst = MakeReg<float>(DST_TOKEN);
-    auto src0 = MakeReg<float>(SRC0_TOKEN);
-    auto src1 = MakeReg<float>(SRC1_TOKEN);
-    FillBytes(src0.mask, 0x70);
-    FillBytes(src1.mask, 0x71);
+    auto dst = make_reg<float>(DST_TOKEN);
+    auto src0 = make_reg<float>(SRC0_TOKEN);
+    auto src1 = make_reg<float>(SRC1_TOKEN);
+    fill_bytes(src0.mask, 0x70);
+    fill_bytes(src1.mask, 0x71);
     g_capture = {};
     g_capture.expected_mask = dst.mask;
     MOCKER_CPP(vaxpy, void(vector_float&, vector_float, float, vector_bool, Literal))
         .times(1)
-        .will(invoke(AxpyStub));
+        .will(invoke(axpy_stub));
     MOCKER_CPP(vmadd, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
         .times(1)
-        .will(invoke(FmaStub));
+        .will(invoke(fma_stub));
 
-    EXPECT_TRUE(HasByteValue(asc::te::axpy(dst, src0, 2.5f).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value(asc::te::axpy(dst, src0, 2.5f).reg, RESULT_TOKEN));
     g_capture.expected_mask = src0.mask;
-    EXPECT_TRUE(HasByteValue(asc::te::fma(src0, src1, dst).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value(asc::te::fma(src0, src1, dst).reg, RESULT_TOKEN));
 
     GlobalMockObject::verify();
     EXPECT_EQ(g_capture.calls, 2U);
@@ -228,27 +228,27 @@ TEST_F(TestTensorApiCompositeCompute, AccumulationApisUseFirstOperandMask)
     EXPECT_TRUE(g_capture.masks_match);
 }
 
-TEST_F(TestTensorApiCompositeCompute, DifferenceApisPreserveSourceOrderAndSupportedLayout)
+TEST_F(test_tensor_api_composite_compute, difference_apis_preserve_source_order_and_supported_layout)
 {
-    auto src0 = MakeReg<float>(SRC0_TOKEN);
-    auto src1 = MakeReg<float>(SRC1_TOKEN);
+    auto src0 = make_reg<float>(SRC0_TOKEN);
+    auto src1 = make_reg<float>(SRC1_TOKEN);
     g_capture = {};
     g_capture.expected_mask = src0.mask;
     MOCKER_CPP(vabsdif, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
         .times(1)
-        .will(invoke(AbsdiffStub));
+        .will(invoke(absdiff_stub));
     MOCKER_CPP(vexpdif, void(vector_float&, vector_float, vector_float, vector_bool, int))
         .times(1)
-        .will(invoke(ExpSubStub));
+        .will(invoke(exp_sub_stub));
     MOCKER_CPP(vexpdif, void(vector_float&, vector_half, vector_half, vector_bool, int))
         .times(1)
-        .will(invoke(ExpSubHalfStub));
+        .will(invoke(exp_sub_half_stub));
 
-    EXPECT_TRUE(HasByteValue(asc::te::absdiff(src0, src1).reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue(asc::te::exp_sub(src0, src1).reg, RESULT_TOKEN));
-    auto half_src0 = MakeReg<half>(SRC0_TOKEN);
-    auto half_src1 = MakeReg<half>(SRC1_TOKEN);
-    EXPECT_TRUE(HasByteValue(asc::te::exp_sub(half_src0, half_src1).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value(asc::te::absdiff(src0, src1).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value(asc::te::exp_sub(src0, src1).reg, RESULT_TOKEN));
+    auto half_src0 = make_reg<half>(SRC0_TOKEN);
+    auto half_src1 = make_reg<half>(SRC1_TOKEN);
+    EXPECT_TRUE(has_byte_value(asc::te::exp_sub(half_src0, half_src1).reg, RESULT_TOKEN));
 
     GlobalMockObject::verify();
     EXPECT_EQ(g_capture.calls, 3U);
@@ -258,16 +258,16 @@ TEST_F(TestTensorApiCompositeCompute, DifferenceApisPreserveSourceOrderAndSuppor
     EXPECT_TRUE(g_capture.masks_match);
 }
 
-TEST_F(TestTensorApiCompositeCompute, MulsCastMapsSupportedLayout)
+TEST_F(test_tensor_api_composite_compute, muls_cast_maps_supported_layout)
 {
-    auto src = MakeReg<float>(SRC0_TOKEN);
+    auto src = make_reg<float>(SRC0_TOKEN);
     g_capture = {};
     g_capture.expected_mask = src.mask;
     MOCKER_CPP(vmulscvt, void(vector_half&, vector_float, float, vector_bool, int))
         .times(1)
-        .will(invoke(MulsCastStub));
+        .will(invoke(muls_cast_stub));
 
-    EXPECT_TRUE(HasByteValue(asc::te::muls_cast(src, 1.5f).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value(asc::te::muls_cast(src, 1.5f).reg, RESULT_TOKEN));
 
     GlobalMockObject::verify();
     EXPECT_FLOAT_EQ(g_capture.scalars[0], 1.5f);
