@@ -235,9 +235,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[3] = ccuParam_.scratchAddr;
     uint64_t rankSliceOffset =
         ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
-    KERNEL_LOG(
-        KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
-        ccuParam_.scratchAddr, rankSliceOffset);
+    PRINTF(
+        "ApiClient RS prepare rankId:%u rankNum:%u repeatIndex:%u count:%llu dataSize:%llu sendBuf:0x%llx "
+        "recvBuf:0x%llx scratchAddr:0x%llx rankSliceOffset:%llu sliceSize:%llu\n",
+        static_cast<uint32_t>(ccuParam_.rankId), static_cast<uint32_t>(ccuParam_.rankNum),
+        static_cast<uint32_t>(ccuParam_.repeatIndex), static_cast<uint64_t>(commParam->count),
+        static_cast<uint64_t>(dataSize), static_cast<uint64_t>(commParam->sendBuf),
+        static_cast<uint64_t>(commParam->recvBuf), static_cast<uint64_t>(ccuParam_.scratchAddr),
+        static_cast<uint64_t>(rankSliceOffset), static_cast<uint64_t>(sliceSize));
     xnData_[4] = rankSliceOffset;
     xnData_[5] = 0; // inputRepeatStride, one KFC mission is one prepared slice
     xnData_[6] = 0; // outputRepeatStride, recvBuf already points to this rank's output slice
