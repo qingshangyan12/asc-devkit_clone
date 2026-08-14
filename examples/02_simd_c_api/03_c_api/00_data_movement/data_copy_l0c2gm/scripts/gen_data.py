@@ -564,7 +564,7 @@ def apply_qf322f32(value, quant_pre, relu_pre):
     value = np.float32(value)
     value *= alpha if value >= 0 else decode_relu_pre(relu_pre)
     value = value + offset
-    return to_processor_float32(np.array([value], dtype=np.float32))[0]
+    return value
 
 
 def apply_f322f16(value):
@@ -667,9 +667,6 @@ def gen_golden_data(scenario_num):
         x2 = np.random.uniform(-3.0, 3.0, (K, N)).astype(input_dtype)
 
     golden = np.matmul(x1.astype(mm_dtype), x2.astype(mm_dtype)).astype(mm_dtype)
-
-    if l0c_type == 'float':
-        golden = to_processor_float32(golden)
 
     quant_params = make_quant_params(output_type)
     golden = apply_prequant(golden, scenario_num, quant_params, output_type, quant_mode, is_relu)
