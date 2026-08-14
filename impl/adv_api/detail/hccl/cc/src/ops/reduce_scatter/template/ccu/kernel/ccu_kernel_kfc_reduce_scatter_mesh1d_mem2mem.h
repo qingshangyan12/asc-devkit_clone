@@ -22,7 +22,10 @@ using namespace hcomm;
 
 CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
-    ccu::Variable currentRankSliceInputOffset, ccu::Variable sliceSize, ccu::Variable repeatNum,
+    ccu::Variable currentRankSliceInputOffset, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
+    ccu::Variable sliceSize, ccu::Variable lastSliceSize, ccu::Variable repeatNum, ccu::Variable goSizeAddrOffset,
+    ccu::Variable goSizeLoopParam, ccu::Variable goSizeParallelParam, ccu::Variable goSizeResidual,
+    ccu::Variable scratchRepeatStride,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType);
 
