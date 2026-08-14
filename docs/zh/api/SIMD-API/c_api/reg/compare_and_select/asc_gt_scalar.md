@@ -49,14 +49,14 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst,
                                           vector_bool mask)
 ```
 
-### dtype支持数据类型
+### dtype支持的数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
+`dtype`支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
 ```c
-// 示例：half源向量与标量大于比较，结果写入vector_bool掩码寄存器
+// 示例：half类型的矢量数据寄存器与标量进行大于比较，结果写入vector_bool掩码寄存器。
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst,
                                           vector_half src,
                                           half value,
@@ -85,6 +85,17 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst,
 - 浮点数据类型比较，涉及`nan`时比较结果为0。
 
 ## 调用示例
+
+将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+"$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 \
+  -Wno-deprecated-declarations --asc-aicore-lang example.asc -lm -o main && ./main
+```
+<!-- end id8 -->
 
 ```cpp
 #include <cstdint>

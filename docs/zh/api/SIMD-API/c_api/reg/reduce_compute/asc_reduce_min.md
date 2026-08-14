@@ -43,14 +43,14 @@ __simd_callee__ inline void asc_reduce_min(vector_<dtype>& dst,
                                            vector_bool mask)
 ```
 
-#### dtype支持数据类型
+### dtype支持的数据类型
 
-dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`
+`dtype`支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
 ```c
-// 示例：对half矢量数据寄存器整向量归约取最小值
+// 示例：对half类型的矢量数据寄存器执行归约最小值操作。
 __simd_callee__ inline void asc_reduce_min(vector_half& dst,
                                            vector_half src,
                                            vector_bool mask)
@@ -62,9 +62,9 @@ __simd_callee__ inline void asc_reduce_min(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述                                     |
 | ------ | --------- | ---------------------------------------- |
-| dst    | 输出      | 目的操作数（矢量数据寄存器）。           |
-| src    | 输入      | 源操作数（矢量数据寄存器）。             |
-| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
+| `dst`  | 输出      | 目的操作数（矢量数据寄存器）。           |
+| `src`  | 输入      | 源操作数（矢量数据寄存器）。             |
+| `mask` | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -84,11 +84,20 @@ __simd_callee__ inline void asc_reduce_min(vector_half& dst,
 
 `dst`的索引按照`dst`的数据类型存储，比如`dst`为half类型时，索引按照half类型存储，因此读取索引需要使用  reinterpret\_cast方法转换到整数类型。若数据类型是half，需要使用reinterpret\_cast\<uint16_t\*\>；若数据类型是float，需要使用reinterpret\_cast\<uint32\_t\*\>。
 
-**提取结果（值+索引）：**
 
-归约产生两个有效结果，需要分别提取。
 
 ## 调用示例
+
+将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+"$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 \
+  -Wno-deprecated-declarations --asc-aicore-lang example.asc -lm -o main && ./main
+```
+<!-- end id8 -->
 
 ```cpp
 #include <cstdint>

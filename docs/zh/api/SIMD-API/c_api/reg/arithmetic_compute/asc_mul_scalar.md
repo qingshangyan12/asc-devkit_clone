@@ -43,14 +43,14 @@ __simd_callee__ inline void asc_mul_scalar(vector_<dtype>& dst,
                                            vector_bool mask)
 ```
 
-### dtype支持数据类型
+### dtype支持的数据类型
 
-dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`
+`dtype`支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
 ```c
-// 示例：half 寄存器形式（mask 控制有效元素范围）
+// 示例：half类型的矢量数据寄存器形式，mask控制有效元素范围。
 __simd_callee__ inline void asc_mul_scalar(vector_half& dst,
                                            vector_half src,
                                            half value,
@@ -78,6 +78,17 @@ __simd_callee__ inline void asc_mul_scalar(vector_half& dst,
 `mask`对应位置为0的元素不参与计算，且在输出中置零。
 
 ## 调用示例
+
+将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+"$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 \
+  -Wno-deprecated-declarations --asc-aicore-lang example.asc -lm -o main && ./main
+```
+<!-- end id8 -->
 
 ```cpp
 #include <algorithm>
