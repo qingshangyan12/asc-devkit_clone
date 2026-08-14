@@ -24,6 +24,9 @@
 
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
 #include "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/data_copy.h"
+#include "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/nz2nchw.h"
+#include "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/nz2ncdhw.h"
+#include "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/nz2nhwc.h"
 
 namespace AscendC {
 namespace Te {
@@ -64,6 +67,25 @@ struct CopyL0C2GMRouting<Version, NZLayoutPtn, NZLayoutPtn> {
     using type = DataCopyL0C2GM;
 };
 
+template <uint32_t Version>
+struct CopyL0C2GMRouting<Version, NC1HWC0LayoutPtn, NZLayoutPtn> {
+    using type = DataCopyL0C2GM;
+};
+
+template <uint32_t Version>
+struct CopyL0C2GMRouting<Version, NHWCLayoutPtn, NZLayoutPtn> {
+    using type = DataCopyL0C2GMNZ2NHWC;
+};
+
+template <uint32_t Version>
+struct CopyL0C2GMRouting<Version, NCHWLayoutPtn, NZLayoutPtn> {
+    using type = DataCopyL0C2GMNZ2NCHW;
+};
+
+template <uint32_t Version>
+struct CopyL0C2GMRouting<Version, NCDHWLayoutPtn, NZLayoutPtn> {
+    using type = DataCopyL0C2GMNZ2NCDHW;
+};
 } // namespace Te
 } // namespace AscendC
 

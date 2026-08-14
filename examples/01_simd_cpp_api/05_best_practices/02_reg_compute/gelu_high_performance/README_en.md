@@ -4,7 +4,7 @@
 
 This example uses Gelu computation to introduce RegBase vector performance tuning methods. The example demonstrates performance benefits from enabling VF fusion and loop unrolling.
 
-> **Prerequisite Reading**: [Gelu Operator Introduction Example](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/04_reg_compute/gelu/README_en.md). This example performs performance optimization based on the introduction example. It is recommended to read the introduction example first to understand basic concepts.
+> **Prerequisite Reading**: [Gelu Operator Introduction Example](../../../00_introduction/04_reg_compute/gelu/README_en.md). This example performs performance optimization based on the introduction example. It is recommended to read the introduction example first to understand basic concepts.
 
 **Optimization Path**:
 - Case 0: Gelu without VF fusion enabled (baseline)
@@ -272,19 +272,19 @@ Use the `msOpProf` tool to collect performance data for Case 0. Key metrics:
 
 | Keyword/Concept | Meaning | Detailed Documentation |
 |:---|:---|:---|
-| `__simd_vf__` | VF function declaration modifier, indicating that the function runs in the VF (Vector Function) execution domain | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `__ubuf__` | UB address-space qualifier, indicating that the pointer points to a UB memory region | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `RegTensor<T>` | Register-level Tensor object whose data resides in vector registers (unlike `LocalTensor`, whose data resides in UB) | [RegTensor](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md) |
-| `MaskReg` | Vector mask register that controls the number of elements participating in each computation | [MaskReg](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
-| `LoadAlign` | Contiguous aligned transfer that loads data from UB into registers | [Contiguous Aligned Load](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) |
-| `StoreAlign` | Contiguous aligned transfer that writes data from registers back to UB | [Contiguous Aligned Store](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md) |
-| `asc_vf_call` | VF function call entry point used to invoke a VF function from a kernel function | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `UpdateMask` | Updates the mask register based on the number of remaining elements | [UpdateMask](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
+| `__simd_vf__` | VF function declaration modifier, indicating that the function runs in the VF (Vector Function) execution domain | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) |
+| `__ubuf__` | UB address-space qualifier, indicating that the pointer points to a UB memory region | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) |
+| `RegTensor<T>` | Register-level Tensor object whose data resides in vector registers (unlike `LocalTensor`, whose data resides in UB) | [RegTensor](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/RegTensor.md) |
+| `MaskReg` | Vector mask register that controls the number of elements participating in each computation | [MaskReg](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md) |
+| `LoadAlign` | Contiguous aligned transfer that loads data from UB into registers | [Contiguous Aligned Load](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous.md) |
+| `StoreAlign` | Contiguous aligned transfer that writes data from registers back to UB | [Contiguous Aligned Store](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_continuous.md) |
+| `asc_vf_call` | VF function call entry point used to invoke a VF function from a kernel function | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) |
+| `UpdateMask` | Updates the mask register based on the number of remaining elements | [UpdateMask](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md) |
 
 **Principle Analysis**:
 
-RegBase API provides register-level vector computation interfaces. Combined with [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) to call VF functions, VF fusion can be achieved. Core advantages of VF fusion:
-- Within a VF function, after data is loaded from UB to registers, all intermediate computations are completed within registers, requiring only one [LoadAlign](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) and one [StoreAlign](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md), eliminating Load/Store overhead for intermediate results
+RegBase API provides register-level vector computation interfaces. Combined with [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) to call VF functions, VF fusion can be achieved. Core advantages of VF fusion:
+- Within a VF function, after data is loaded from UB to registers, all intermediate computations are completed within registers, requiring only one [LoadAlign](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous.md) and one [StoreAlign](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_continuous.md), eliminating Load/Store overhead for intermediate results
 - Supports VF dual-issue feature, standard computation instruction parallelism can reach 512 bytes/cycle, instruction dispatch efficiency (IPC) is significantly improved
 
 ```

@@ -2,7 +2,7 @@
 
 本入门示例基于Ascend C SIMD实现Hello World算子，带你快速上手实践，涵盖Device端核函数实现、Host端调用以及编译运行的完整流程，帮助开发者建立整体认知。
 
-开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请参考[hello\_world](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/00_quickstart/hello_world/README.md)。
+开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请参考[hello\_world](../../../../../../examples/01_simd_cpp_api/00_introduction/00_quickstart/hello_world/README.md)。
 
 - **Hello World功能介绍**：
 
@@ -17,7 +17,7 @@
         printf("Hello World!!!\n");
     }
     ```
-    > [!NOTE] 说明
+    > [!NOTE]说明
     > - SIMD算子的Kernel函数需要额外的修饰符，如[`__vector__`](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)修饰符说明该算子仅在向量计算单元上执行。
     
 - **Host端代码实现**：
@@ -49,7 +49,7 @@
     ```
     执行本样例，将打印了核号和`Hello World!!!`信息。
 
-    > [!NOTE] 说明
+    > [!NOTE]说明
     >- 该样例支持如下型号：
     >    <!-- npu="950" id1 -->
     >    - Ascend 950PR/Ascend 950DT

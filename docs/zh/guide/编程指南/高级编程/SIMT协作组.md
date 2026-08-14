@@ -8,9 +8,9 @@ Ascend C SIMT编程模型中仅提供`asc_syncthreads()`接口来实现线程块
 
 协作组中最重要的概念是使用一个对象表示一组线程，然后通过对象方法控制组内线程。对象可以明确表达开发者的意图，将协作组对象传递到某个函数可以清晰地表达“哪些线程必须共同调用该函数”。
 
-协作组提供了自定义线程组的方法以及操作线程组的接口，全量的协作组API列表可在[SIMT协作组API](../../../api/SIMT-API/协作组/协作组.md)中获取。使用协作组API时需要包含以下头文件，并使用协作组命名空间。
+协作组提供了自定义线程组的方法以及操作线程组的接口，全量的协作组API列表可在[SIMT协作组API](../../../api/SIMT-API/cooperative_groups/cooperative_groups.md)中获取。使用协作组API时需要包含以下头文件，并使用协作组命名空间。
 
-```c++
+```cpp
 #include <simt_api/cooperative_groups.h>
 
 using namespace cooperative_groups;
@@ -25,20 +25,39 @@ namespace cg = cooperative_groups;
 当前提供以下协作组类型：
 
 - 隐式组：
-    - [thread_block](../../../api/SIMT-API/协作组/thread_block/thread_block简介.md)：对线程块的抽象，提供线程块级别的线程管理和同步接口。
+    - [grid_group](../../../api/SIMT-API/cooperative_groups/grid_group/grid_group_intro.md)：对当前Grid中所有SIMT线程的抽象，提供Grid级别的信息查询和跨线程块同步接口。
+    - [thread_block](../../../api/SIMT-API/cooperative_groups/thread_block/thread_block_intro.md)：对线程块的抽象，提供线程块级别的线程管理和同步接口。
 - 显式组：
-    - [thread_block_tile](../../../api/SIMT-API/协作组/thread_block_tile/thread_block_tile简介.md)：由父组划分得到的固定大小线程子组，支持组内同步、shfl类和vote类线程操作。
-    - [coalesced_group](../../../api/SIMT-API/协作组/coalesced_group/coalesced_group简介.md)：当前Warp内处于同一执行路径的活跃线程集合，常用于处理分支发散后的线程协作。
+    - [thread_block_tile](../../../api/SIMT-API/cooperative_groups/thread_block_tile/thread_block_tile_intro.md)：由父组划分得到的固定大小线程子组，支持组内同步、shfl类和vote类线程操作。
+    - [coalesced_group](../../../api/SIMT-API/cooperative_groups/coalesced_group/coalesced_group_intro.md)：当前Warp内处于同一执行路径的活跃线程集合，常用于处理分支发散后的线程协作。
 
 **图1**  线程块中的协作组层次结构图
 
 ![线程块中的协作组层次结构](../../figures/cooperative_groups.png)
 
+### grid_group
+
+`grid_group`表示当前核函数启动的Grid协作组，覆盖Grid内所有线程块及其SIMT线程，通过`this_grid()`获取。它适合需要在多个线程块之间建立执行顺序的场景。
+
+```cpp
+grid_group grid = this_grid();
+```
+
+`grid_group`提供Grid级别的信息查询能力和跨线程块的同步能力，例如：
+
+- `thread_rank()`：获取当前线程在Grid内所有SIMT线程中的线性rank。
+- `block_rank()`：获取当前线程所属线程块在Grid内的线性rank。
+- `num_threads()`：获取Grid内SIMT线程总数。
+- `num_blocks()`：获取Grid内线程块总数。
+- `sync()`：同步Grid内所有SIMT线程。
+
+`grid_group`仅支持SIMT编程场景，不支持SIMD与SIMT混合编程场景。
+
 ### thread_block
 
 `thread_block`表示当前线程所在的线程块，通过`this_thread_block()`获取。它是进一步划分子协作组的常用起点。
 
-```c++
+```cpp
 thread_block block = this_thread_block();
 ```
 
@@ -53,7 +72,7 @@ thread_block block = this_thread_block();
 
 `thread_block_tile`表示由父组划分得到的固定大小线程子组。子组大小由模板参数指定，适合在编译期确定每个协作单元大小的场景。
 
-```c++
+```cpp
 thread_block block = this_thread_block();
 auto tile4 = tiled_partition<4>(block);
 ```
@@ -66,7 +85,7 @@ auto tile4 = tiled_partition<4>(block);
 
 示例代码中创建一个名为`active`的组，该组包含Warp中所有线程id为偶数的线程。
 
-```c++
+```cpp
 if (threadIdx.x % 2 == 0) {
     coalesced_group active = coalesced_threads();
     unsigned int rank = active.thread_rank();
@@ -80,14 +99,14 @@ if (threadIdx.x % 2 == 0) {
 
 协作组支持将父组划分为更小的子组。当前提供以下划分接口：
 
-- [tiled_partition](../../../api/SIMT-API/协作组/tiled_partition.md)：将父组划分为指定大小的子组。
-- [binary_partition](../../../api/SIMT-API/协作组/binary_partition.md)：根据布尔标签将父组划分为两个`coalesced_group`子组。
+- [tiled_partition](../../../api/SIMT-API/cooperative_groups/tiled_partition.md)：将父组划分为指定大小的子组。
+- [binary_partition](../../../api/SIMT-API/cooperative_groups/binary_partition.md)：根据布尔标签将父组划分为两个`coalesced_group`子组。
 
 ### tiled_partition
 
 `tiled_partition`用于按固定大小划分父组。模板版本在编译期指定子组大小，并返回`thread_block_tile`对象。
 
-```c++
+```cpp
 using namespace cooperative_groups;
 
 __global__ void simt_kernel(...)
@@ -100,7 +119,7 @@ __global__ void simt_kernel(...)
 }
 ```
 
-模板版本的划分大小必须满足`tiled_partition`接口约束，详细要求请参考[tiled_partition](../../../api/SIMT-API/协作组/tiled_partition.md)。
+模板版本的划分大小必须满足`tiled_partition`接口约束，详细要求请参考[tiled_partition](../../../api/SIMT-API/cooperative_groups/tiled_partition.md)。
 
 ### binary_partition
 
@@ -108,7 +127,7 @@ __global__ void simt_kernel(...)
 
 示例代码将一个包含32个线程的`thread_block_tile`划分为奇数组和偶数组。
 
-```c++
+```cpp
 using namespace cooperative_groups;
 
 __global__ void simt_kernel(int *input_arr)

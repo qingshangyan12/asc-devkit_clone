@@ -67,7 +67,8 @@ HcclResult GetGraphModeBuffers(
     HcclComm comm, ChannelHandle channelHandle, const char* inputBuffTag, const char* outputBuffTag,
     ChannelInfo& channel);
 HcclResult HcclGetCcuKernel(
-    HcclComm comm, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
+    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
 
 HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest);
 
@@ -116,8 +117,6 @@ HcclResult SaveMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle 
 
 HcclResult GetMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle& thread, u32& notifyNum);
 
-HcclResult CheckAsymmetricTopoSupport(HcclCMDType opType, const TopoInfoWithNetLayerDetails* topoInfo);
-
 HcclResult Selector(
     HcclComm comm, OpParam& param, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName);
 
@@ -157,6 +156,7 @@ HcclResult HcclGetRemoteBuff(
 
 HcclResult LogHcclExit(const std::string& opName, const char* tag, HcclUs startut);
 
+HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetails* topoInfo, bool& hostDPUOnly);
 } // namespace mc2_ops_hccl
 
 #endif

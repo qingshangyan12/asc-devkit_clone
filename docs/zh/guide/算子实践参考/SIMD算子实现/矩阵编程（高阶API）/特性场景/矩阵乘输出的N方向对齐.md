@@ -25,11 +25,11 @@ Matmul计算中N方向非32字节对齐，输出C矩阵的N方向要求32字节�
 
 ## 调用示例<a name="zh-cn_topic_0000002265055666_section15486294368"></a>
 
-完整的算子样例请参考[matmul\_nd\_align算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_format_nd_align)。
+完整的算子样例请参考[matmul\_nd\_align算子样例](../../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_format_nd_align)。
 
 -   Tiling实现
 
-    调用SetCType接口，设置C矩阵的数据格式为CubeFormat::ND\_ALIGN，其它Tiling实现与[基础场景](../算子实现.md#zh-cn_topic_0000001622514006_li19113114819525)相同。
+    调用SetCType接口，设置C矩阵的数据格式为CubeFormat::ND\_ALIGN，其它Tiling实现与[基础场景](../算子实现.md)相同。
 
     ```
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());

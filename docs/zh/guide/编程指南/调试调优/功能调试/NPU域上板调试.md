@@ -6,14 +6,14 @@ NPU域上板调试手段主要包含上板数据打印、msSanitizer内存异常
 
 printf主要用于打印标量和字符串信息，SIMT编程及SIMD编程均支持。
 
-printf示例如下，printf接口的使用说明和具体约束请参考[printf](../../../../api/Utils-API/调测接口/printf-290.md)。
+printf示例如下，printf接口的使用说明和具体约束请参考[printf](../../../../api/Utils-API/tuning_interface/printf.md)。
 
 ```
 printf("fmt string %d", 0x123);
 ```
 
 >[!NOTE]说明
->printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[printf](../../../../api/Utils-API/调测接口/printf-290.md)。
+>printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[printf](../../../../api/Utils-API/tuning_interface/printf.md)。
 
 ## SIMD编程通过DumpTensor打印进行调试<a name="section16452184823718"></a>
 
@@ -23,7 +23,7 @@ DumpTensor是SIMD编程场景独有的打印功能，用于NPU域上板打印指
 
 在算子kernel侧实现代码中需要输出日志信息的地方调用DumpTensor接口打印相关内容。
 
-如下所示，srcLocal表示待打印的Tensor；5表示用户的自定义附加信息，比如当前的代码行号；dataLen表示元素个数。DumpTensor接口的使用说明和具体约束请参考[DumpTensor](../../../../api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)。
+如下所示，srcLocal表示待打印的Tensor；5表示用户的自定义附加信息，比如当前的代码行号；dataLen表示元素个数。DumpTensor接口的使用说明和具体约束请参考[DumpTensor](../../../../api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md)。
 
 ```
 DumpTensor(srcLocal,5, dataLen);
@@ -45,8 +45,8 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 
 ```
 
-> [!NOTE] 说明
-> DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[DumpTensor](../../../../api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)。
+> [!NOTE]说明
+> DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[DumpTensor](../../../../api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md)。
 
 ## 使用msSanitizer工具进行异常检测<a name="section931475414217"></a>
 
@@ -61,7 +61,7 @@ msSanitizer工具是基于AI处理器的异常检测工具，包含了单算子�
 
 **异常检测程序编译**
 ```shell
-// bisheng编译时增加sanitizer命令行
+// bisheng编译时增加相关的sanitizer编译选项。
 bisheng add_custom.asc -o add_custom --sanitizer -lineinfo
 ```
 **异常检测工具的使用**
@@ -82,7 +82,6 @@ mssanitizer --tool=memcheck --tool=racecheck --tool=initcheck --tool=synccheck .
 ======    #2 ${ASCEND_HOME_PATH}/asc/include/basic_api/kernel_operator_data_copy_intf.h:443:5
 ======    #3 illegal_read_and_write/add_custom.cpp:18:5
 ```
-更多详细信息可以参考[《异常检测(msSanitizer)》](https://hiascend.com/document/redirect/mindstudio-op-error-check)。
 
 ## 使用msDebug工具进行算子调试<a name="section2072113416285"></a>
 

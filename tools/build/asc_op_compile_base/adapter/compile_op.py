@@ -384,13 +384,31 @@ the superkernel cannot be integrated with the operator.",
                 AscendCLogLevel.LOG_INFO,
             )
 
+    def _safe_int_conversion(value, default=-1):
+        if value is None:
+            return default
+        clean_value = str(value).strip()
+        try:
+            return int(clean_value)
+        except (ValueError, TypeError):
+            return default
+
     aicore_num = get_context().get_addition("_op_aicore_num")
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
+    has_platform_info = False
     if aicore_num is not None and vectorcore_num is not None:
         js["platformInfo"] = {
             "cubeCoreCnt": int(aicore_num),
             "vectorCoreCnt": int(vectorcore_num),
         }
+        has_platform_info = True
+    deterministic_level = _safe_int_conversion(
+        get_current_build_config("deterministic_level")
+    )
+    if deterministic_level != -1:
+        if not has_platform_info:
+            js["platformInfo"] = {}
+        js["platformInfo"]["deterministicLevel"] = int(deterministic_level)
 
     # set tilingdata of mc2 operator when online static compile
     if (
@@ -650,7 +668,6 @@ def _gen_set_workspace_codes(
         source += "    if (ffts_addr != nullptr) {\n"
         source += "        set_ffts_base_addr((uint64_t)ffts_addr);\n"
         source += "    }\n"
-        source += add_time_stamp_codes("TIME_STAMP_WRAP_FFTS_ADDR")
 
     # restart enable begin position
     if global_var_storage.get_variable("ascendc_enable_aicore_exception_restart"):
@@ -661,7 +678,6 @@ def _gen_set_workspace_codes(
         source += f"#ifdef {MIX_CORE_MACRO} \n"
         source += "    if constexpr (g_coreType == AscendC::AIC) {\n"
         source += "        matmul::clearWorkspace(workspace);\n"
-        source += add_time_stamp_codes("TIME_STAMP_WRAP_CLEAR_WK_SPAC", 2)
         source += "    }\n"
         source += "#endif\n"
     return source
@@ -830,7 +846,6 @@ def gen_kernel_fun(
         source += gen_init_dump_code()
         # set mc2 context
         source += _gen_set_mc2_ctx_param(opinfo)
-        source += add_time_stamp_codes("TIME_STAMP_WRAP_MC2_CTX")
         # implicit add aicore exception restart begin position
         # set workspace
         source += _gen_set_workspace_codes(
@@ -1938,11 +1953,12 @@ def compile_op_common_part(
             compile_info, compile_info_origin, compile_option_tuple, kernel_meta_dir
         )
 
-        # link norm.o and sk.o and sk_bind.o
+        # link norm.o, sk.o, sk_bind.o and optional meta_info.o
         link_sk_norm_combine(
             compile_info.dst_file,
             compile_info_origin.dst_file,
             sk_bind_dst_file,
+            compile_info_origin.tiling_and_dfx_utils_bin_path,
             compile_info.compile_log_path,
         )
 
@@ -2173,9 +2189,21 @@ def _compile_single_tiling(tiling_key, compile_info, tiling_info, compile_option
         tiling_info.tiling_data_file_path,
     )
     compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_key}UL"]
-    compile_cmd += [
-        f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey"
-    ]
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        tiling_data_hash_src = tiling_info.tiling_data
+        if isinstance(tiling_data_hash_src, str):
+            tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
+        elif not tiling_data_hash_src:
+            tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
+        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
+        compile_cmd += [
+            f"-D{compile_info.origin_func_name}="
+            f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_key}_tilingkey"
+        ]
+    else:
+        compile_cmd += [
+            f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey"
+        ]
     kernel_func_name = compile_info.kernel_name + "_%s" % tiling_key
     compile_cmd += [
         f"-Dauto_gen_{compile_info.origin_func_name}_kernel={kernel_func_name}"
@@ -2210,6 +2238,17 @@ def _compile_ascendc_cce(
         compile_cmd += [
             f"-Dauto_gen_{compile_info.origin_func_name}_kernel={compile_info.get_kernel_func_name()}"
         ]
+        if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+            tiling_data_hash_src = tiling_info.tiling_data
+            if isinstance(tiling_data_hash_src, str):
+                tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
+            elif not tiling_data_hash_src:
+                tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
+            tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
+            compile_cmd += [
+                f"-D{compile_info.origin_func_name}="
+                f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_info.tiling_key}_tilingkey"
+            ]
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
         new_sources += DFXSectionGenerator().generate_dfx_section(
             str(tiling_info.tiling_key),
@@ -2399,9 +2438,21 @@ def _get_compile_cmd_and_section_content(
     if kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1:
         compile_cmd += ["-D__MIX_CORE_AIC_RATION__=1"]
     compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_key}UL"]
-    compile_cmd += [
-        f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey"
-    ]
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        tiling_data_hash_src = tiling_info.tiling_data
+        if isinstance(tiling_data_hash_src, str):
+            tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
+        elif not tiling_data_hash_src:
+            tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
+        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
+        compile_cmd += [
+            f"-D{compile_info.origin_func_name}="
+            f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_key}_tilingkey"
+        ]
+    else:
+        compile_cmd += [
+            f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey"
+        ]
     section_content = _generate_section_content(
         current_kernel_name, tiling_key, kernel_type, tiling_info, compile_info
     )
@@ -3260,9 +3311,22 @@ def _compile_single_tiling_regbase(param: SingleTilingKeyCompileParams):
         param.tiling_info.tiling_data_file_path,
     )
     compile_cmd += [f"-D{TILING_KEY_MACRO}={param.tiling_key}UL"]
-    compile_cmd += [
-        f"-D{param.compile_info.origin_func_name}={param.compile_info.origin_func_name}_{param.tiling_key}_tilingkey"
-    ]
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        tiling_data_hash_src = param.tiling_info.tiling_data
+        if isinstance(tiling_data_hash_src, str):
+            tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
+        elif not tiling_data_hash_src:
+            tiling_data_hash_src = param.tiling_info.file_content.encode("utf-8")
+        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
+        compile_cmd += [
+            f"-D{param.compile_info.origin_func_name}="
+            f"{param.compile_info.origin_func_name}_{tiling_data_hash}_{param.tiling_key}_tilingkey"
+        ]
+    else:
+        compile_cmd += [
+            f"-D{param.compile_info.origin_func_name}="
+            f"{param.compile_info.origin_func_name}_{param.tiling_key}_tilingkey"
+        ]
     kernel_func_name = param.compile_info.kernel_name + "_%s" % param.tiling_key
     compile_cmd += [
         f"-Dauto_gen_{param.compile_info.origin_func_name}_kernel={kernel_func_name}"
@@ -3338,6 +3402,17 @@ def _call_bisheng_regbase(
         compile_cmd += [
             f"-Dauto_gen_{compile_info.origin_func_name}_kernel={compile_info.get_kernel_func_name()}"
         ]
+        if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+            tiling_data_hash_src = tiling_info.tiling_data
+            if isinstance(tiling_data_hash_src, str):
+                tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
+            elif not tiling_data_hash_src:
+                tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
+            tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
+            compile_cmd += [
+                f"-D{compile_info.origin_func_name}="
+                f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_info.tiling_key}_tilingkey"
+            ]
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
         new_sources += DFXSectionGenerator().generate_dfx_section(
             str(tiling_info.tiling_key),

@@ -10,7 +10,7 @@ SIMD与SIMT混合编程使用的函数执行空间限定符与SIMD编程一致�
 
 \_\_simt\_vf\_\_用于标记SIMT VF入口函数，函数无返回值。函数定义示例如下：
 
-```
+```cpp
 __simt_vf__ inline void function_name(
     __gm__ uint32_t* gm_param,
     __ubuf__ float* ubuf_param,
@@ -26,9 +26,9 @@ SIMT VF函数定义中的关键修饰符说明如下：
 | \_\_gm\_\_ | 内存空间修饰符，标识内存空间为GM。 |
 | \_\_ubuf\_\_ | 内存空间修饰符，标识内存空间为UB。 |
 
-只支持在核函数或\_\_aicore\_\_函数中调用SIMT VF函数，调用接口为[asc\_vf\_call](../../../api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md#asc_vf_call调用)，示例如下：
+只支持在核函数或\_\_aicore\_\_函数中调用SIMT VF函数，调用接口为[asc\_vf\_call](../../../api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config.md#asc_vf_call调用)，示例如下：
 
-```
+```cpp
 asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
 ```
 
@@ -42,13 +42,13 @@ SIMT VF函数有以下约束：
 
 \_\_simt\_callee\_\_子函数是SIMT VF函数内部调用的辅助函数，函数内部可以使用SIMT内置变量。定义示例如下：
 
-```
+```cpp
 __simt_callee__ uint32_t simt_helper(__gm__ uint32_t* gm_param, __ubuf__ float* ubuf_param, uint64_t scalar_param, ...);
 ```
 
 调用示例如下：
 
-```
+```cpp
 uint32_t result = simt_helper(arg1, arg2, ...);
 ```
 
@@ -72,7 +72,7 @@ SIMD与SIMT混合编程使用的地址空间限定符与SIMD编程一致，详�
 
 核函数是SIMD与SIMT混合编程的Device侧入口函数，负责协调整个算子的执行流程，包括VF的调度和调用。vector计算单元的混合编程场景下，函数定义语法为：
 
-```
+```cpp
 __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2, ...);
 ```
 
@@ -89,15 +89,15 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 
 ### \_\_launch\_bounds\_\_\(N\)
 
-在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程和线程块驻留在AI处理器上，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
+在多线程并发执行时，每个线程使用较少的寄存器可以让单个线程块内启动更多的线程，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
 \_\_launch\_bounds\_\_\(N\)：函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定SIMT VF启动的最大线程数，参数N的取值范围为1到2048。若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。
 
 最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动VF任务的dim3线程数保持一致。
 
-**表1**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
+**表1**  \_\_launch\_bounds\_\_(N)与每个线程可用寄存器个数的关系
 
-| Thread的个数(个) | 每个Thread可用寄存器个数(个) |
+| N | 每个线程可用寄存器个数 |
 | --- | --- |
 | 1025~2048 | 16 |
 | 513~1024 | 32 |
@@ -108,7 +108,7 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 
 SIMD与SIMT混合编程是在SIMD编程模型的核函数执行流程基础上引入SIMT VF（Vector Function）子任务。核函数仍按SIMD编程方式在Host侧通过<<<...\>\>\>启动，语法如下：
 
-```
+```cpp
 kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 ```
 
@@ -125,7 +125,7 @@ kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 ### SIMT VF的asc\_vf\_call调用
 SIMD与SIMT混合编程以SIMD核函数作为Device侧入口，在核函数或`__aicore__`函数中通过`asc_vf_call`启动SIMT VF子任务，通过参数配置，启动指定数目的线程，执行指定的SIMT VF函数。其函数原型如下：
 
-```
+```cpp
 template <auto funcPtr, typename... Args>
 __aicore__ inline void asc_vf_call(dim3 threadNums, Args &&...args)
 ```
@@ -148,7 +148,7 @@ __aicore__ inline void asc_vf_call(dim3 threadNums, Args &&...args)
 
 以下示例展示了SIMD与SIMT混合编程场景下如何使用asc\_vf\_call调用\_\_simt\_vf\_\_函数。
 
-```
+```cpp
 #include "simt_api/common_functions.h"
 __simt_vf__ inline void add_simt(
     __gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
@@ -168,7 +168,7 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 ### SIMD VF的asc\_vf\_call调用
 
 使用`asc_vf_call`接口调用SIMD VF入口函数启动VF子任务，详细接口说明参见
-[asc\_vf\_call接口说明](../../../api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md)。
+[asc\_vf\_call接口说明](../../../api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md)。
 
 ### SIMT VF与SIMD VF的调用差异
 

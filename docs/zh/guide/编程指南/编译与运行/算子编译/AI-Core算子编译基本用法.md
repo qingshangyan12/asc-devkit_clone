@@ -15,7 +15,7 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
 AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMD代码分为Cube代码和Vector代码，需分别编译成Cube二进制和Vector二进制，先将Cube二进制和Vector二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
 ![aicore编译流程示意图](../../../figures/aicore_compilation.png)
 
-- 异构编译，完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/04_compile/00_basic_compile/README.md)。
+- 异构编译，完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/04_compile/00_basic_compile/README.md)。
   ```shell
   // ----- add_kernel.asc -----
   //  指定核函数在AI Core上执行
@@ -28,10 +28,10 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   bisheng main.cpp add_kernel.asc -o main --npu-arch=dav-xxxx
   ```
 
-  > [!NOTE] 说明
+  > [!NOTE]说明
   > `${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
 
-- 单独编译，完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/04_compile/01_separate_compile/README.md)。
+- 单独编译，完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/04_compile/01_separate_compile/README.md)。
 
   bisheng异构编译默认采用的是全程序编译模式，该模式要求单个源文件X.asc中编译的设备程序没有任何未解析的外部设备函数和变量引用。设备函数可以调用其他编译单元中定义的设备函数或访问其中定义的设备变量，但必须在bisheng命令行中指定`-dc`编译选项，才能启用不同编译单元间设备代码的链接功能。这种支持跨编译单元链接设备代码与符号的能力，被称为单独编译。
 
@@ -63,15 +63,15 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   bisheng -c main.cpp -o main.o -I${INSTALL_DIR}/include
   bisheng add_compute.o add_kernel.o main.o -o program
   ```
-  > [!NOTE] 说明
+  > [!NOTE]说明
   > `${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
 
-- 动态库编译，完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/04_compile/02_dynamic_library_compile/README.md)。
+- 动态库编译，完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/04_compile/02_dynamic_library_compile/README.md)。
    ```shell
   bisheng -shared add_kernel.asc -o libadd_kernel.so -fPIC --npu-arch=dav-xxxx
   ```
 
-- 静态库编译，完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/04_compile/03_static_library_compile/README.md)。
+- 静态库编译，完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/04_compile/03_static_library_compile/README.md)。
   ```shell
   bisheng -lib add_kernel.asc -o libadd_kernel.a --npu-arch=dav-xxxx
   ```
@@ -113,9 +113,11 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | -fPIC | 否 | 告知编译器产生位置无关代码。 |
 | -O | 否 | 用于指定编译器的优化级别，当前支持-O3，-O2，-O0。 |
 | --run-mode=sim | 否 | sim模式：链接时用户添加仿真模式对应的实现库，实现代码在仿真模式下运行，可以查看仿真相关日志，方便用户性能调试。 |
-| --enable-simt | 否 | SIMT编程场景，指定SIMT方式编译。 |
+| --enable-simt | 否 | SIMT编程场景，指定SIMT方式编译。设置编译选项`--enable-simt`时，若包含[SIMD API](../../../../api/SIMD-API/SIMD-API.md)的头文件会导致编译失败。 |
 | --cce-disable-asc-reserved-ubuf | 否 | 禁用Ascend C接口使用预留UB空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。使用预留UB空间的API列表参考：[使用预留UB空间的API](../../编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md#使用预留ub空间的api范围)。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。 |
 | --cce-disable-vf-stack-reserved-ubuf | 否 | 禁用SIMD VF栈预留的UB空间。开启后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用。针对 [NPU架构版本2201](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，此编译选项无实际效果；针对 [NPU架构版本3510](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，此编译选项生效，当用户使用此编译选项后，编译器将无法使用预留的UB空间进行寄存器溢出的缓存，需要用户保证寄存器不溢出。 |
+| --cce-auto-sync | 否 | 开启毕昇编译器自动同步。AI Core内部的执行单元是异步并行的，Tensor的读写可能存在数据依赖，开启后可由毕昇编译器自动插入部分同步。详细内容请参考[关键特性说明](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/key_features.md)。 |
+| --cce-auto-sync-log=&lt;file&gt; | 否 | 输出毕昇编译器自动同步插入信息到&lt;file&gt;文件中。 |
 
 更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 
@@ -171,7 +173,7 @@ add_executable(demo
 )
 ```
 
-编译AI Core SIMT代码时，需要在编译选项中增加`--enable-simt`，或通过`CMAKE_ASC_ENABLE_SIMT`设置为ON启用SIMT编译模式，示例如下，完整样例请参考：[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)。
+编译AI Core SIMT代码时，需要在编译选项中增加`--enable-simt`，或通过`CMAKE_ASC_ENABLE_SIMT`设置为ON启用SIMT编译模式，示例如下，完整样例请参考：[LINK](../../../../../../examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)。
 
 ```cmake
 # CMAKE_ASC_ARCHITECTURES：指定NPU架构版本，可通过-DCMAKE_ASC_ARCHITECTURES=dav-xxxx覆盖默认值

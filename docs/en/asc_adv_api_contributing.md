@@ -22,7 +22,10 @@ Ascend C high-level API development process mainly includes the following steps:
 Below uses high-level API `Axpy` as an example to introduce how to develop a high-level API from scratch. This case removes some unnecessary code. You can view all code in the repository files [axpy.h](../../include/adv_api/math/axpy.h), [axpy_tiling.h](../../include/adv_api/math/axpy_tiling.h), [axpy_tiling_intf.h](../../include/adv_api/math/axpy_tiling_intf.h), [axpy_common_impl.h](../../impl/adv_api/detail/math/axpy/axpy_common_impl.h), [axpy_tiling_impl.cpp](../../impl/adv_api/tiling/math/axpy_tiling_impl.cpp).
 ### Design API
 Axpy's function is to multiply each element in source operand `srcTensor` with a scalar, then add it with the corresponding element in destination operand `dstTensor`. The calculation formula is as follows.
-$$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
+
+$$
+dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i
+$$
 
 - Kernel Side
 
@@ -53,9 +56,9 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     | calCount | Input | Number of elements participating in computation. |
 - Tiling Side
 
-    Kernel side interface computation requires developer to reserve/apply for temporary space. The size of this temporary space needs to be calculated on Tiling side based on obtained source operand shape size, computing high-level API required maximum (maxValue) temporary space and minimum temporary space (minValue) sizes. Therefore, Tiling side provides an interface for computing maxValue and minValue. Interface input parameters include source operand Tensor shape size and source operand data type byte size. Shape size parameter uses ge::Shape type, data type byte size uses `uint32_t` type. Output parameters include minValue and maxValue. Similar to isReuseSource parameter in Axpy interface, isReuseSource in Tiling interface is a reserved parameter.
+    Kernel side interface computation requires developer to reserve/apply for temporary space. The size of this temporary space needs to be calculated on Tiling side based on obtained source operand shape size, computing high-level API required maximum (maxValue) temporary space and minimum temporary space (minValue) sizes. Therefore, Tiling side provides an interface for computing maxValue and minValue. Interface input parameters include source operand Tensor shape size and source operand data type byte size. Shape size parameter uses AscendC::TensorShape type, data type byte size uses `uint32_t` type. Output parameters include minValue and maxValue. Similar to isReuseSource parameter in Axpy interface, isReuseSource in Tiling interface is a reserved parameter.
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+    void GetAxpyMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
     ```
     Interface parameter description
     | Parameter Name | Input/Output | Description |
@@ -82,7 +85,9 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     
     In the corresponding category directory under `include/adv_api/`, add new file [axpy_tiling.h](../../include/adv_api/math/axpy_tiling.h). Based on the above analyzed and designed Tiling side interface, write function declaration.
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+    #include "../utils/types.h"
+
+    void GetAxpyMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
     ```
 - Include header files in common files.
 
@@ -131,8 +136,14 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     \\ 
     Align32(tmpbufferSize) &T = float
     \end{cases}$$
-    $$round = calCount/stackSize$$
-    $$tail = calCount%stackSize$$
+
+    $$
+    round = calCount/stackSize
+    $$
+
+    $$
+    tail = calCount%stackSize
+    $$
     If tail is not 0, that is tail block exists, need extra processing for tail block data. Before tail block data computation, set compute unit working mode to Count mode through setMaskCount interface.
     ```c++
     template <typename T, typename U, bool isReuseSource = false>
@@ -207,7 +218,6 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     ```c++
     #include "lib/math/axpy_tiling.h"  // Tiling interface header file
     #include <cstdint>  // Type library
-    #include "graph/tensor.h" // ge::Shape uses this library
     #include "impl/host_log.h" // Log library
     ```
     Define constants used in Tiling computation.
@@ -219,7 +229,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     In `GetAxpyMaxMinTmpSize` interface, call `GetAxpyMaxTmpSize` interface to get required temporary space maximum value, call `GetAxpyMinTmpSize` interface to get required temporary space minimum value.
    
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
+    void GetAxpyMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource,
     uint32_t& maxValue, uint32_t& minValue)
     {
         (void)isReuseSource;
@@ -249,7 +259,10 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     Cast(dstTensor, tmp4)
     ```
     Considering Vector compute unit single Repeat computes 256 bytes of data, the maximum temporary space calculation formula is as follows:
-    $$MaxValue=\begin{cases}\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_HALF\_CALC\_PROC &dstType = half\\\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}$$
+
+    $$
+    MaxValue=\begin{cases}\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_HALF\_CALC\_PROC &dstType = half\\\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}
+    $$
     ```c++
     inline uint32_t GetAxpyMaxTmpSize(const uint32_t inputSize, const uint32_t typeSize)
     {
@@ -260,7 +273,10 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     }
     ```
     Analyze the computation of required temporary space minimum value. If temporary space is minimum, single computation data amount is minimum, that is each computation data amount is fixed as single Repeat processed data size, 256 bytes. The minimum temporary space calculation formula is as follows:
-    $$MinValue=\begin{cases}\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_HALF\_CALC\_PROC &dstType = half\\\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}$$
+
+    $$
+    MinValue=\begin{cases}\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_HALF\_CALC\_PROC &dstType = half\\\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}
+    $$
     ```c++
     inline uint32_t GetAxpyMinTmpSize(const uint32_t typeSize)
     {
@@ -397,10 +413,10 @@ TEST_F(TestTiling, TestAxpyTiling)
 {
     uint32_t maxVal = 0;
     uint32_t minVal = 0;
-    GetAxpyMaxMinTmpSize(ge::Shape({128}), 4, false, maxVal, minVal);
+    GetAxpyMaxMinTmpSize(AscendC::TensorShape({128}), 4, false, maxVal, minVal);
     EXPECT_EQ(maxVal, 0);
     EXPECT_EQ(minVal, 0);
-    GetAxpyMaxMinTmpSize(ge::Shape({256}), 2, false, maxVal, minVal);
+    GetAxpyMaxMinTmpSize(AscendC::TensorShape({256}), 2, false, maxVal, minVal);
     EXPECT_EQ(maxVal, 256 * 4 * 2);
     EXPECT_EQ(minVal, 256 * 4);
 }

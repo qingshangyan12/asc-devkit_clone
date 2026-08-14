@@ -8,6 +8,13 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_H
 
@@ -19,6 +26,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storealign_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_postupdate_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_squeeze_and_storeunalign_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_gather_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_gather_datablock_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ub2gm_loop_size_impl.h"
@@ -1489,100 +1497,310 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 }
 
 // ==========asc_storeunalign_postupdate(u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int8_t* dst, vector_store_unalign& src0, vector_int8_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint8_t* dst, vector_store_unalign& src0, vector_uint8_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int16_t* dst, vector_store_unalign& src0, vector_int16_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint16_t* dst, vector_store_unalign& src0, vector_uint16_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int32_t* dst, vector_store_unalign& src0, vector_int32_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint32_t* dst, vector_store_unalign& src0, vector_uint32_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int64_t* dst, vector_store_unalign& src0, vector_int64_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ half* dst, vector_store_unalign& src0, vector_half src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ float* dst, vector_store_unalign& src0, vector_float src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ bfloat16_t* dst, vector_store_unalign& src0, vector_bfloat16_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign& src0, vector_fp8_e4m3fn_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp8_e5m2_t* dst, vector_store_unalign& src0, vector_fp8_e5m2_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp8_e8m0_t* dst, vector_store_unalign& src0, vector_fp8_e8m0_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
+             "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int4b_t* dst, vector_store_unalign& src0, vector_int4x2_t src1)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ int8_t* dst_addr, vector_int8_t dst, vector_store_unalign& src0, vector_int8_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ uint8_t* dst_addr, vector_uint8_t dst, vector_store_unalign& src0, vector_uint8_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ int16_t* dst_addr, vector_int16_t dst, vector_store_unalign& src0, vector_int16_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ uint16_t* dst_addr, vector_uint16_t dst, vector_store_unalign& src0, vector_uint16_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ int32_t* dst_addr, vector_int32_t dst, vector_store_unalign& src0, vector_int32_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ uint32_t* dst_addr, vector_uint32_t dst, vector_store_unalign& src0, vector_uint32_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ half* dst_addr, vector_half dst, vector_store_unalign& src0, vector_half src1, vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ float* dst_addr, vector_float dst, vector_store_unalign& src0, vector_float src1, vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ bfloat16_t* dst_addr, vector_bfloat16_t dst, vector_store_unalign& src0, vector_bfloat16_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ fp8_e4m3fn_t* dst_addr, vector_fp8_e4m3fn_t dst, vector_store_unalign& src0, vector_fp8_e4m3fn_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ fp8_e5m2_t* dst_addr, vector_fp8_e5m2_t dst, vector_store_unalign& src0, vector_fp8_e5m2_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ fp8_e8m0_t* dst_addr, vector_fp8_e8m0_t dst, vector_store_unalign& src0, vector_fp8_e8m0_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ fp4x2_e2m1_t* dst_addr, vector_fp4x2_e2m1_t dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ fp4x2_e1m2_t* dst_addr, vector_fp4x2_e1m2_t dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign(
+    __ubuf__ int4b_t* dst_addr, vector_int4x2_t dst, vector_store_unalign& src0, vector_int4x2_t src1,
+    vector_bool squeeze_mask)
+{
+    asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int8_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ uint8_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int4b_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp8_e8m0_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp8_e5m2_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int16_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ uint16_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ half* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ bfloat16_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int32_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ uint32_t* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ float* dst, vector_store_unalign src)
+{
+    asc_storeunalign_post_impl(dst, src);
 }
 
 // ==========通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址=========
@@ -1699,6 +1917,18 @@ __simd_callee__ inline void asc_gather(
 
 __simd_callee__ inline void asc_gather(
     vector_uint16_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
 {
     asc_gather_impl(dst, src, index, mask);
 }
@@ -5759,86 +5989,89 @@ __simd_callee__ inline void asc_storealign(
 
 // ==========asc_storealign_postupdate(u8/s8/half/u16/s16/float/u32/s32/bf16/f8e4m3/f8e5m2/f8e8m0)=========
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ int8_t* dst_align32b, vector_int8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
+    __ubuf__ int8_t*& dst_align32b, vector_int8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
 
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ uint8_t* dst_align32b, vector_uint8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-{
-    asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
-}
-
-__simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ int16_t* dst_align32b, vector_int16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-{
-    asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
-}
-
-__simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ uint16_t* dst_align32b, vector_uint16_t src, uint16_t block_stride, uint16_t repeat_stride,
+    __ubuf__ uint8_t*& dst_align32b, vector_uint8_t src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
 
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ int32_t* dst_align32b, vector_int32_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-{
-    asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
-}
-
-__simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ uint32_t* dst_align32b, vector_uint32_t src, uint16_t block_stride, uint16_t repeat_stride,
+    __ubuf__ int16_t*& dst_align32b, vector_int16_t src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
 
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, uint16_t block_stride, uint16_t repeat_stride,
+    __ubuf__ uint16_t*& dst_align32b, vector_uint16_t src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
 
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src, uint16_t block_stride, uint16_t repeat_stride,
+    __ubuf__ int32_t*& dst_align32b, vector_int32_t src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
 
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src, uint16_t block_stride, uint16_t repeat_stride,
+    __ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
 
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src, uint16_t block_stride, uint16_t repeat_stride,
+    __ubuf__ bfloat16_t*& dst_align32b, vector_bfloat16_t src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
 
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src, uint16_t block_stride, uint16_t repeat_stride,
+    __ubuf__ fp8_e4m3fn_t*& dst_align32b, vector_fp8_e4m3fn_t src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
 
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ half* dst_align32b, vector_half src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
+    __ubuf__ hifloat8_t*& dst_align32b, vector_hifloat8_t src, uint16_t block_stride, uint16_t repeat_stride,
+    vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
 
 __simd_callee__ inline void asc_storealign_postupdate(
-    __ubuf__ float* dst_align32b, vector_float src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
+    __ubuf__ fp8_e5m2_t*& dst_align32b, vector_fp8_e5m2_t src, uint16_t block_stride, uint16_t repeat_stride,
+    vector_bool mask)
+{
+    asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
+}
+
+__simd_callee__ inline void asc_storealign_postupdate(
+    __ubuf__ fp8_e8m0_t*& dst_align32b, vector_fp8_e8m0_t src, uint16_t block_stride, uint16_t repeat_stride,
+    vector_bool mask)
+{
+    asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
+}
+
+__simd_callee__ inline void asc_storealign_postupdate(
+    __ubuf__ half*& dst_align32b, vector_half src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
+{
+    asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
+}
+
+__simd_callee__ inline void asc_storealign_postupdate(
+    __ubuf__ float*& dst_align32b, vector_float src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
     asc_storealign_postupdate_impl(dst_align32b, src, block_stride, repeat_stride, mask);
 }
@@ -5988,81 +6221,97 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int64_t* dst, vector_
 }
 
 //===========asc_storeunalign_post(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float/int64)===========
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int4b_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e8m0_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e5m2_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int16_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint16_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ half* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ bfloat16_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int32_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint32_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ float* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int64_t* dst, vector_store_unalign src)
 {
     asc_storeunalign_post_impl(dst, src);
@@ -6407,6 +6656,148 @@ __aicore__ inline void asc_set_ndim_pad_value(float pad_value) { return asc_set_
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
+    asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_ndim_copy_gm2ub_impl(
+        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
+        padding_mode, l2_cache_mode);
+}
+
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
+    uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
     asc_ndim_copy_gm2ub_impl(
@@ -6414,6 +6805,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6424,6 +6817,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6434,6 +6829,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6444,6 +6841,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6454,6 +6853,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6464,6 +6865,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6474,6 +6877,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6484,6 +6889,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6494,6 +6901,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6504,6 +6913,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6514,6 +6925,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6524,6 +6937,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6534,6 +6949,8 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
         padding_mode, cache_mode);
 }
 
+[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -6681,6 +7098,128 @@ asc_scatter(vector_float& src, __ubuf__ float* dst, vector_uint32_t index, vecto
 // ==========asc_copy_gm2ub_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ int16_t* dst, __gm__ int16_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ int32_t* dst, __gm__ int32_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ half* dst, __gm__ half* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ float* dst, __gm__ float* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint16_t n_burst, uint32_t len_burst,
+    uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode,
+    uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(
+        dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
+        src_stride, dst_stride);
+}
+
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
+__aicore__ inline void asc_copy_gm2ub_align(
+    __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride)
 {
@@ -6689,6 +7228,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6699,6 +7240,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6709,6 +7252,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int16_t* dst, __gm__ int16_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6719,6 +7264,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6729,6 +7276,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int32_t* dst, __gm__ int32_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6739,6 +7288,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ half* dst, __gm__ half* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6749,6 +7300,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ float* dst, __gm__ float* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6759,6 +7312,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6769,6 +7324,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6779,6 +7336,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -6789,6 +7348,8 @@ __aicore__ inline void asc_copy_gm2ub_align(
         src_stride, dst_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint16_t n_burst, uint32_t len_burst,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
@@ -6921,12 +7482,100 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ fp8_e4m3fn_t* dst, __g
 
 // ==========asc_copy_ub2gm_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
 __aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ int8_t* dst, __ubuf__ int8_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ int16_t* dst, __ubuf__ int16_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ int32_t* dst, __ubuf__ int32_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ half* dst, __ubuf__ half* src, uint16_t n_burst, uint32_t len_burst, asc_store_l2_cache_mode l2_cache_mode,
+    uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ float* dst, __ubuf__ float* src, uint16_t n_burst, uint32_t len_burst, asc_store_l2_cache_mode l2_cache_mode,
+    uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ hifloat8_t* dst, __ubuf__ hifloat8_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ fp8_e5m2_t* dst, __ubuf__ fp8_e5m2_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(
+    __gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint16_t n_burst, uint32_t len_burst,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
+__aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int8_t* dst, __ubuf__ int8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6934,6 +7583,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6941,6 +7592,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int16_t* dst, __ubuf__ int16_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6948,6 +7601,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6955,6 +7610,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int32_t* dst, __ubuf__ int32_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6962,6 +7619,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ half* dst, __ubuf__ half* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6969,6 +7628,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ float* dst, __ubuf__ float* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6976,6 +7637,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ hifloat8_t* dst, __ubuf__ hifloat8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6983,6 +7646,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6990,6 +7655,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ fp8_e5m2_t* dst, __ubuf__ fp8_e5m2_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -6997,6 +7664,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
+             "Please use enum class asc_store_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -8445,4 +9114,9 @@ asc_set_gm2ub_pad(uint32_t pad_val)
     asc_set_gm2ub_pad_impl(pad_val);
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif

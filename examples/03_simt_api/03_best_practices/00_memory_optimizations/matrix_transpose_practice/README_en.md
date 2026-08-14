@@ -170,7 +170,7 @@ Case 2 keeps the GM read contiguous while writing data directly to the transpose
 
 **Optimization Goal**: Introduce UB and tiling, converting the non-contiguous global memory write of Case 2 into UB-internal access, so that both GM read and write become contiguous again. This case sets the thread block count according to the number of partitioned tiles, with each thread block processing two 32x32 tiles.
 
-**Core Implementation**: The matrix is partitioned into 32x32 tiles, with the total tile count `tiles=(W/32)x(H/32)`. In this case, each thread block launches 2048 threads and can process two tiles at the same time, so the thread block count is set to `blocks_per_grid=ceil(tiles / 2)`. The thread configuration is `dim3(32,64,1)`, where `threadIdx.y=0..31` processes the first tile and `threadIdx.y=32..63` processes the second tile; the code obtains the tile index handled by the current thread within the thread block via `local_tile=threadIdx.y>>5`, and the in-tile row index via `ty=threadIdx.y&31`. Threads first write the tile into UB in the original layout, and after [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) synchronization, read it from UB in the transpose direction and write it back to GM contiguously.
+**Core Implementation**: The matrix is partitioned into 32x32 tiles, with the total tile count `tiles=(W/32)x(H/32)`. In this case, each thread block launches 2048 threads and can process two tiles at the same time, so the thread block count is set to `blocks_per_grid=ceil(tiles / 2)`. The thread configuration is `dim3(32,64,1)`, where `threadIdx.y=0..31` processes the first tile and `threadIdx.y=32..63` processes the second tile; the code obtains the tile index handled by the current thread within the thread block via `local_tile=threadIdx.y>>5`, and the in-tile row index via `ty=threadIdx.y&31`. Threads first write the tile into UB in the original layout, and after [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/sync_and_memory_fence/sync_interface/asc_syncthreads.md) synchronization, read it from UB in the transpose direction and write it back to GM contiguously.
 
 The core idea of UB staging is shown in the figure below: in the GM read phase, the tile is contiguously loaded into UB row by row according to the input matrix layout; in the GM writing phase, the output tile coordinates are swapped so that the same Warp writes one row of the output matrix. The originally non-contiguous GM write is transferred to a transpose-direction read within UB.
 
@@ -295,7 +295,7 @@ In SIMT programming, bank conflicts are more fine-grained subbank conflicts, mai
 - **Write-write conflict**: Multiple write operations access subbanks with the same index in the same bank group at the same time.
 - **Read-read conflict**: Multiple read operations access subbanks with the same index in the same bank group at the same time.
 
-For detailed low-bit UB address interleaving rules and conflict scenarios, see the [bank_conflict example](https://gitcode.com/cann/asc-devkit/blob/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict).
+For detailed low-bit UB address interleaving rules and conflict scenarios, see the [bank_conflict example](../../../02_features/01_api_features/00_memory_access/bank_conflict).
 
 **Figure 3: UB bank structure**
 
@@ -474,7 +474,7 @@ cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM
 msopprof simulator --soc-version=<soc_version> ./matrix_transpose
 ```
 
-> Before using simulation tuning, add the `-g` compilation option to `CMakeLists.txt` to generate debug information. This allows the simulator to collect instruction pipeline diagrams. For how to obtain `soc_version` and for more simulation tuning information, see the [simulator sample](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/01_utilities/07_simulator).
+> Before using simulation tuning, add the `-g` compilation option to `CMakeLists.txt` to generate debug information. This allows the simulator to collect instruction pipeline diagrams. For how to obtain `soc_version` and for more simulation tuning information, see the [simulator sample](../../../01_utilities/07_simulator).
 
 After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the current directory. The artifact structure is as follows:
 
