@@ -23,14 +23,13 @@
 namespace asc {
 namespace te {
 
-template <typename T, typename Scalar>
-__simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src, Scalar scalar)
+template <typename T, typename scalar_type>
+__simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src, scalar_type scalar)
 {
     static_assert(detail::supports_axpy_v<T>, "axpy supports half and float");
-    static_assert(!detail::is_reg_tensor_v<Scalar> &&
-            ::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<Scalar>, T>,
+    static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<scalar_type>, T>,
         "axpy requires the scalar and reg_tensor element types to match");
-    asc_axpy(dst.reg, src.reg, static_cast<T>(scalar), dst.mask);
+    asc_axpy(dst.reg, src.reg, scalar, dst.mask);
     return dst;
 }
 
@@ -44,12 +43,13 @@ __simd_callee__ inline decltype(auto) abs_sub(reg_tensor<T> src0, reg_tensor<T> 
     return dst;
 }
 
-template <reg_layout Layout, typename T>
+template <reg_layout layout, typename T>
 __simd_callee__ inline decltype(auto) exp_sub(reg_tensor<T> src0, reg_tensor<T> src1)
 {
     static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float");
-    static_assert(Layout == reg_layout::zero, "exp_sub only supports reg_layout::zero on the current device");
+    static_assert(layout == reg_layout::zero, "exp_sub only supports reg_layout::zero on the current device");
     reg_tensor<float> dst;
+    // asc_exp_sub returns float for both half and float inputs.
     asc_exp_sub(dst.reg, src0.reg, src1.reg, src0.mask);
     dst.mask = src0.mask;
     return dst;
@@ -76,10 +76,10 @@ __simd_callee__ inline decltype(auto) mul_add_dst(
     return result;
 }
 
-template <reg_layout Layout>
+template <reg_layout layout>
 __simd_callee__ inline decltype(auto) muls_cast(reg_tensor<float> src, float scalar)
 {
-    static_assert(Layout == reg_layout::zero, "muls_cast only supports reg_layout::zero");
+    static_assert(layout == reg_layout::zero, "muls_cast only supports reg_layout::zero");
     reg_tensor<half> dst;
     asc_muls(dst.reg, src.reg, scalar, src.mask);
     dst.mask = src.mask;

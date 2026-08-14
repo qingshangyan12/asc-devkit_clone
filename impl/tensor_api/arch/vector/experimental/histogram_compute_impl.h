@@ -23,21 +23,21 @@
 namespace asc {
 namespace te {
 
-template <histogram_bin Bin, histogram_type Type>
+template <histogram_bin bin, histogram_type histogram_mode>
 __simd_callee__ inline decltype(auto) histograms(reg_tensor<uint16_t> dst, reg_tensor<uint8_t> src)
 {
-    static_assert(Bin == histogram_bin::bin0 || Bin == histogram_bin::bin1, "unsupported histogram bin");
-    static_assert(Type == histogram_type::frequency || Type == histogram_type::accumulate,
+    static_assert(bin == histogram_bin::bin0 || bin == histogram_bin::bin1, "unsupported histogram bin");
+    static_assert(histogram_mode == histogram_type::frequency || histogram_mode == histogram_type::accumulate,
         "unsupported histogram type");
 
-    if constexpr (Type == histogram_type::frequency) {
-        if constexpr (Bin == histogram_bin::bin0) {
+    if constexpr (histogram_mode == histogram_type::frequency) {
+        if constexpr (bin == histogram_bin::bin0) {
             asc_frequency_histogram_bin0(dst.reg, src.reg, src.mask);
         } else {
             asc_frequency_histogram_bin1(dst.reg, src.reg, src.mask);
         }
     } else {
-        if constexpr (Bin == histogram_bin::bin0) {
+        if constexpr (bin == histogram_bin::bin0) {
             asc_cumulative_histogram_bin0(dst.reg, src.reg, src.mask);
         } else {
             asc_cumulative_histogram_bin1(dst.reg, src.reg, src.mask);
