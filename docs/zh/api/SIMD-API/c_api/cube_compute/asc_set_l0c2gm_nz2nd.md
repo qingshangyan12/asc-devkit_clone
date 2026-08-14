@@ -26,12 +26,14 @@
 
 ## 功能说明
 
-数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+本接口用于配置L0C Buffer搬出接口启用Nz格式转换为ND格式时所需的相关参数。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
+```c
+__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num,
+                                            uint64_t src_nd_stride,
+                                            uint64_t dst_nd_stride)
 ```
 
 ## 参数说明
@@ -40,9 +42,9 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_str
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| nd_num | 输入 | ND矩阵的个数，取值范围为[1, 65535]。 |
-| src_nd_stride | 输入 | 以分形大小为单位的源步长，源相邻NZ矩阵的偏移。取值范围为[0, 65535]，单位为32B。 |
-| dst_nd_stride | 输入 | 目的相邻ND矩阵的偏移。取值范围为[1, $2^{32}$ - 1]，单位为元素。 |
+| nd_num | 输入 | ND矩阵的数量，取值范围为[1, 65535]。 |
+| src_nd_stride | 输入 | 以分形大小为单位的源步长，源相邻Nz矩阵的偏移（头与头）。当nd_num配置为1时，src_nd_stride不生效，配置为0即可。取值范围为[0, 65535]，单位为C0_Size（16*sizeof(T)，T为L0C Buffer上数据的类型）。 |
+| dst_nd_stride | 输入 | 目的相邻ND矩阵的偏移（头与头）。取值范围为[0, 65535]，单位为element。 |
 
 ## 返回值说明
 
@@ -54,7 +56,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+- 调用L0C Buffer搬出接口并且需要进行随路Nz格式转换为ND格式之前，必须先调用本接口配置格式转换参数。
 
 ## 调用示例
 
