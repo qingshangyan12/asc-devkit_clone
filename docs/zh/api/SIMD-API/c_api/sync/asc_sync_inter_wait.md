@@ -26,9 +26,14 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
+本接口与[asc_sync_inter_arrive](asc_sync_inter_arrive.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下：
 
-核间同步等待接口，与`asc_sync_inter_arrive`配对使用，用于两个核（AIC与AIV，或两个AIV之间）之间的同步：被等待核执行`asc_sync_inter_arrive`在其前序流水任务完成后向FFTS（Fast Task Flow Synchronizer）发送到达通知并递增对应flag_id的计数器；本接口在等待核上执行，阻塞`pipe`流水线的后续指令，直到对应flag_id的FFTS计数器非零时将计数器减一、放行后续指令。两个接口通过相同的`flag_id`关联，构成一对核间同步原语。本接口与`asc_sync_inter_arrive`配套使用。
+- 全部AIC之间的同步场景：
+  - 所有参与同步的AIC都执行`asc_sync_inter_arrive`后向调度模块发送通知，接着调度模块将各AIC对应`flag_id`的计数器增加1。
+  - 各AIC上配对的`asc_sync_inter_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
+- 全部AIV之间的同步场景：
+  - 所有参与同步的AIV都执行`asc_sync_inter_arrive`后向调度模块发送通知，接着调度模块将各AIV对应`flag_id`的计数器增加1。
+  - 各AIV上配对的`asc_sync_inter_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
 

@@ -26,13 +26,14 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
+本接口与[asc_sync_inter_wait](asc_sync_inter_wait.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下：
 
-向核间同步寄存器发送到达通知，用于多个AI Core之间的组间block同步。本接口是硬件同步原语，将`(pipe, flag_id)`信息通过`pipe`流水派发到调度模块，由调度模块在收集到所有参与block对同一`flag_id`的到达通知后向各block回送同步信号，从而完成跨AI Core的block级同步。
-
-本接口需与`asc_sync_inter_wait`配对使用：本接口负责发送到达通知，`asc_sync_inter_wait`负责阻塞等待对应`flag_id`的事件完成。两者通过相同的`flag_id`关联，共同构成组间block同步的执行期闭环。
-
-本接口无AIC/AIV守护限制，AIC与AIV均可调用。
+- 全部AIC之间的同步场景：
+  - 所有参与同步的AIC都执行`asc_sync_inter_arrive`后向调度模块发送通知，接着调度模块将各AIC对应`flag_id`的计数器增加1。
+  - 各AIC上配对的`asc_sync_inter_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
+- 全部AIV之间的同步场景：
+  - 所有参与同步的AIV都执行`asc_sync_inter_arrive`后向调度模块发送通知，接着调度模块将各AIV对应`flag_id`的计数器增加1。
+  - 各AIV上配对的`asc_sync_inter_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
 
@@ -72,15 +73,15 @@ PIPE_S
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`声明核函数，并通过`__schedmode__(1)`开启batch mode。核函数启动2个group，共包含4个AIV。每个AIV先将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_inter_arrive`。各AIV在MTE2流水上调用`asc_sync_inter_wait`，等待所有AIV均到达同步点。同步完成后，由AIV0读取并输出全部AIV生成的数据。
+本示例采用`__mix__(1, 2)`声明核函数，并通过`__schedmode__(1)`开启batch mode。Host侧通过`numBlocks`设置启动2个AI Core；Kernel侧通过[asc_get_block_num](../sys_var/asc_get_block_num.md)获取AI Core数，通过[asc_get_sub_block_num](../sys_var/asc_get_sub_block_num.md)获取每个AI Core内的AIV数，通过[asc_get_block_idx](../sys_var/asc_get_block_idx.md)获取当前AI Core的索引，通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)获取当前AIV的ID，从而计算每个AIV的全局索引。每个AIV先将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_inter_arrive`。各AIV在MTE2流水上调用`asc_sync_inter_wait`，等待所有AIV均到达同步点。同步完成后，由AIV0读取并输出全部AIV生成的数据。
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
 <!-- npu="950" id17 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
 <!-- end id17 -->
 
@@ -93,11 +94,8 @@ bisheng examples.asc -o main --npu-arch=dav-3510; ./main
 
 namespace {
 
-constexpr uint32_t GROUP_NUM = 2;
-constexpr uint32_t AIV_PER_GROUP = 2;
-constexpr uint32_t AIV_NUM = GROUP_NUM * AIV_PER_GROUP;
 constexpr uint32_t ELEMENTS_PER_AIV = 8;
-constexpr uint32_t TOTAL_ELEMENTS = AIV_NUM * ELEMENTS_PER_AIV;
+constexpr uint32_t TOTAL_ELEMENTS = 4 * ELEMENTS_PER_AIV;
 constexpr uint32_t AIV_BYTES = ELEMENTS_PER_AIV * sizeof(float);
 constexpr uint32_t TOTAL_BYTES = TOTAL_ELEMENTS * sizeof(float);
 constexpr int64_t FLAG_ID = 8;
@@ -109,7 +107,11 @@ __schedmode__(1) __global__ __mix__(1, 2) void asc_sync_inter_kernel(
     if ASC_IS_AIV {
         __ubuf__ float local[ELEMENTS_PER_AIV];
         __ubuf__ float snapshot[TOTAL_ELEMENTS];
-        const uint32_t block_idx = asc_get_block_idx() * AIV_PER_GROUP + asc_get_sub_block_id();
+        const uint32_t block_num = asc_get_block_num();
+        const uint32_t sub_block_num = asc_get_sub_block_num();
+        const uint32_t block_idx = asc_get_block_idx() * sub_block_num + asc_get_sub_block_id();
+        const uint32_t total_elements = block_num * sub_block_num * ELEMENTS_PER_AIV;
+        const uint32_t total_bytes = total_elements * sizeof(float);
         for (uint32_t i = 0; i < ELEMENTS_PER_AIV; ++i) {
             local[i] = static_cast<float>(block_idx + 1);
         }
@@ -119,10 +121,10 @@ __schedmode__(1) __global__ __mix__(1, 2) void asc_sync_inter_kernel(
         asc_sync_inter_arrive(PIPE_MTE3, FLAG_ID);
         asc_sync_inter_wait(PIPE_MTE2, FLAG_ID);
         if (block_idx == 0) {
-            asc_copy_gm2ub_align(snapshot, contributions, TOTAL_BYTES);
+            asc_copy_gm2ub_align(snapshot, contributions, total_bytes);
             asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
             asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_copy_ub2gm_align(output, snapshot, TOTAL_BYTES);
+            asc_copy_ub2gm_align(output, snapshot, total_bytes);
         }
     }
     asc_sync_pipe(PIPE_ALL);
@@ -132,6 +134,7 @@ __schedmode__(1) __global__ __mix__(1, 2) void asc_sync_inter_kernel(
 
 int main()
 {
+    uint32_t numBlocks = 2;
     std::vector<float> output(TOTAL_ELEMENTS, 0.0f);
     float *contributions_device = nullptr, *output_device = nullptr;
 
@@ -139,7 +142,7 @@ int main()
     aclrtSetDevice(0);
     aclrtMalloc(reinterpret_cast<void**>(&contributions_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    asc_sync_inter_kernel<<<GROUP_NUM, 0>>>(contributions_device, output_device);
+    asc_sync_inter_kernel<<<numBlocks, 0>>>(contributions_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), TOTAL_BYTES, output_device, TOTAL_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;

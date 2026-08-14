@@ -26,20 +26,14 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
+本接口与[asc_sync_block_arrive](asc_sync_block_arrive.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下：
 
-核间同步等待接口，与配套到达通知接口配合使用，用于多个核之间通过flag ID关联建立同步点。本接口在所在核的指定流水线上插入一个等待点：当对应flag ID的同步计数器为0时，本接口所在流水的后续指令被阻塞；当计数器变为非0时，本接口放行后续指令并将计数器减1。同步计数器由配套到达通知接口在参与同步的核执行到对应同步点时累加，调度模块感知到全部参与核到达后将计数器加1。
-
-本接口需与`asc_sync_block_arrive`配合使用。配套到达通知接口负责发送同步信息（包含同步模式与flag ID）到核间同步调度模块并累加计数器，本接口负责阻塞等待计数器变为非0。两者通过相同的flag ID关联，同步模式由配套到达通知接口一侧指定，本接口不传同步模式，仅通过flag ID与pipe与配套到达通知接口对齐。
-
-本接口支持的同步场景由配套到达通知接口的同步模式决定：
-
-- **模式0（核间同步）**：多个AIC之间或多个AIV之间的全核同步，全部参与核都执行配套到达通知接口后，各核本接口后续指令才放行。
-- **模式1（核内AIV间同步）**：单个AI Core内全部AIV之间的同步，全部AIV都执行配套到达通知接口后，各AIV本接口后续指令才放行。
-- **模式2（核内AIC与AIV间同步）**：单个AI Core内AIC与全部AIV之间的同步，AIC与AIV任一侧发起到达通知、另一侧本接口等待。
-- **模式4（核内AIC与单个AIV间同步）**：单个AI Core内AIC与单个AIV之间的同步，第一个AIV单元的flag ID 0~15对应AIC的flag ID 0~15，第二个AIV单元的flag ID 0~15对应AIC的flag ID 16~31。
-
-本接口为同步原语，AIC与AIV上均可调用，无AIC/AIV守护限制。
+- 全部AIV等待单个AIC的场景：
+  - 单AI Core内AIC执行`asc_sync_block_arrive`后向调度模块发送通知，接着调度模块将该AI Core内M个AIV各自对应`flag_id`的计数器增加1。
+  - 各AIV上配对的`asc_sync_block_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
+- 单个AIC等待全部AIV的场景：
+  - 单AI Core内M个AIV都执行`asc_sync_block_arrive`后向调度模块发送通知，接着调度模块将AIC对应`flag_id`的计数器增加1。
+  - AIC上配对的`asc_sync_block_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
 

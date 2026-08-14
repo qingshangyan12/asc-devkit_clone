@@ -26,13 +26,10 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
+本接口与[asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#zh-cn_topic_0000002542605351_fig52727114018)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：
 
-亚块（subblock）间同步等待接口，与配套到达通知接口配合使用，用于同一group内N个亚块之间通过flag ID关联建立同步点。group由1个block与N个亚块组成（N≥1），亚块间比例为1：N。本接口在所在核的指定流水线上插入一个等待点：当对应flag ID的同步计数器为0时，本接口所在流水的后续指令被阻塞；当计数器变为非0时，本接口放行后续指令并将计数器减1。同步计数器由配套到达通知接口在参与同步的亚块执行到对应同步点时累加，调度模块感知到全部参与亚块到达后将计数器加1。
-
-本接口需与`asc_sync_subblock_arrive`配合使用。配套到达通知接口负责发送同步信息（包含同步模式与flag ID）到核间同步调度模块并累加计数器，本接口负责阻塞等待计数器变为非0。两者通过相同的flag ID关联，同步模式由配套到达通知接口一侧指定为亚块间同步模式，本接口不传同步模式，仅通过flag ID与pipe与配套到达通知接口对齐。
-
-本接口为同步原语，AIC与AIV上均可调用，无AIC/AIV守护限制。
+- 同一AI Core内所有AIV（subblock）都执行`asc_sync_subblock_arrive`后向调度模块发送通知，接着调度模块将各AIV（subblock）对应`flag_id`的计数器增加1。
+- 各AIV（subblock）上配对的`asc_sync_subblock_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
 

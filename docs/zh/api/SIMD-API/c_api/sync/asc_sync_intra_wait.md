@@ -26,11 +26,14 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
+本接口与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下：
 
-块内（intra-block）跨核同步等待原语，与配套投递接口配对使用，用于在mix-mode block内部建立CubeCore与VecCore之间的流水同步依赖。本接口阻塞`pipe`指定流水的后续指令，直到对端核通过配套投递接口投递到对应同步ID上的计数器值大于0；命中后将该计数器减1并放行后续指令。
-
-本接口为非阻塞语义的反向操作——配套投递接口在其前序指令提交后将对端核对应ID的4位计数器加1且不阻塞自身流水，本接口则在对应计数器为0时阻塞本流水的后续指令，直到对端投递使计数器变为非零，随后将计数器减1放行，从而构成一对跨核"投递-等待"同步闭环。需要与配套投递接口配合使用。
+- 单个AIV等待AIC的场景：
+  - 单AI Core内AIC执行`asc_sync_intra_arrive`后向调度模块发送通知，接着调度模块将该AI Core内单个AIV对应`sync_id`的计数器增加1。
+  - 单个AIV上配对的`asc_sync_intra_wait`检测到对应`sync_id`的计数器非0后解除阻塞并将计数器减1。
+- AIC等待单个AIV的场景：
+  - 单AI Core内单个AIV执行`asc_sync_intra_arrive`后向调度模块发送通知，接着调度模块将AIC对应`sync_id`的计数器增加1。
+  - AIC上配对的`asc_sync_intra_wait`检测到对应`sync_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
 

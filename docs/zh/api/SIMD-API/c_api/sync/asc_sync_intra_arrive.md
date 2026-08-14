@@ -26,11 +26,14 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
+本接口与[asc_sync_intra_wait](asc_sync_intra_wait.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下：
 
-块内（intra-block）跨核同步投递原语，用于在mix-mode block内部建立CubeCore与VecCore之间的流水同步依赖。本接口在 `pipe` 指定流水的前序指令全部提交后执行，将对端核对应同步ID上的4位计数器加1，且不阻塞本流水线的后续指令。
-
-本接口为非阻塞语义的投递操作——对端核在对应计数器为0时阻塞其所在流水，直到本接口使该计数器变为非零后将其减1并放行，从而构成一对跨核"投递-等待"同步闭环。在mix-mode block内建立CubeCore与VecCore之间的跨核流水同步依赖时，需与 `asc_sync_intra_wait` 配合使用：本接口负责投递计数，配对的等待接口负责在对端核消费计数。
+- 单个AIV等待AIC的场景：
+  - 单AI Core内AIC执行`asc_sync_intra_arrive`后向调度模块发送通知，接着调度模块将该AI Core内单个AIV对应`sync_id`的计数器增加1。
+  - 单个AIV上配对的`asc_sync_intra_wait`检测到对应`sync_id`的计数器非0后解除阻塞并将计数器减1。
+- AIC等待单个AIV的场景：
+  - 单AI Core内单个AIV执行`asc_sync_intra_arrive`后向调度模块发送通知，接着调度模块将AIC对应`sync_id`的计数器增加1。
+  - AIC上配对的`asc_sync_intra_wait`检测到对应`sync_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
 
@@ -75,15 +78,15 @@ PIPE_S
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`声明核函数。AIV0在UB中构造矩阵A和矩阵B，将矩阵搬运至共享L1 Buffer，然后在MTE3流水上调用`asc_sync_intra_arrive`。AIC在MTE1流水上调用`asc_sync_intra_wait`，等待AIV0到达同步点后，再读取L1 Buffer中的数据执行矩阵乘。AIV1不参与该次同步。
+本示例采用`__mix__(1, 2)`声明核函数。AIV0在UB中构造矩阵A和矩阵B，将矩阵搬运至共享L1 Buffer，然后在MTE3流水上调用`asc_sync_intra_arrive`。AIC在MTE1流水上调用`asc_sync_intra_wait`，等待AIV0到达同步点后，再读取L1 Buffer中的数据执行矩阵乘。通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)区分不同的AIV，仅AIV0参与该次同步，AIV1不参与该次同步。
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
 <!-- end id8 -->
 
@@ -145,13 +148,14 @@ __global__ __mix__(1, 2) void asc_sync_intra_kernel(__gm__ float* output)
 
 int main()
 {
+    uint32_t numBlocks = 1;
     std::vector<float> output(MATRIX_ELEMENTS, 0.0f);
     float* output_device = nullptr;
 
     aclInit(nullptr);
     aclrtSetDevice(0);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    asc_sync_intra_kernel<<<1, 0>>>(output_device);
+    asc_sync_intra_kernel<<<numBlocks, 0>>>(output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;

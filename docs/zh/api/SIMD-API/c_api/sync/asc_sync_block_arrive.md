@@ -26,11 +26,14 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
+本接口与[asc_sync_block_wait](asc_sync_block_wait.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下：
 
-向核间同步寄存器发送同步信号，与`asc_sync_block_wait`配对使用，用于建立核间同步点。本接口固定实现单AI Core内AIC与全部AIV之间的全核同步（mode 2）：当AIC执行本接口时，该AI Core内M个AIV各自对应`flag_id`的同步计数器增加1，各AIV上配对的`asc_sync_block_wait`检测到计数器非0后解除阻塞并将计数器减1；当M个AIV都执行本接口时，AIC对应`flag_id`的同步计数器增加1，AIC上配对的`asc_sync_block_wait`检测到计数器非0后解除阻塞并将计数器减1。
-
-本指令在所在核的`pipe`流水的当前指令位置插入一个到达通知，不阻塞同一流水中的后续指令，仅设置一个同步标志，待本指令之前的所有指令提交后才触发对端核配对的`asc_sync_block_wait`。本接口在AIC与AIV上均可调用，无AIC/AIV守护限制。
+- 全部AIV等待单个AIC的场景：
+  - 单AI Core内AIC执行`asc_sync_block_arrive`后向调度模块发送通知，接着调度模块将该AI Core内M个AIV各自对应`flag_id`的计数器增加1。
+  - 各AIV上配对的`asc_sync_block_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
+- 单个AIC等待全部AIV的场景：
+  - 单AI Core内M个AIV都执行`asc_sync_block_arrive`后向调度模块发送通知，接着调度模块将AIC对应`flag_id`的计数器增加1。
+  - AIC上配对的`asc_sync_block_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
 
@@ -45,8 +48,13 @@ __aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 设置这条指令所在的流水类型。|
-| flag_id | 输入 | 事件标号，用于标识同一组同步信号。取值范围为[0,15]。|
+| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。|
+| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0,15]。|
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| `pipe` | 输入 | 派发本同步指令的流水类型，即"在哪条流水的前序指令完成后才允许发送到达通知"。取值为`pipe_t`枚举成员：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。不可取`PIPE_ALL`，否则触发异常。AIC与AIV中可用的流水枚举范围不同，需按当前核类型选择合法组合。 |
+| `flag_id` | 输入 | 核间同步事件ID，用于区分组间block同步关系。取值范围[0, 15]。 |
 
 ## 返回值说明
 
@@ -58,6 +66,8 @@ PIPE_S
 
 ## 约束说明
 
+
+- 传入> 15的值会被按位宽截断处理为低4位（如16→0、17→1），硬件不报错但同步事件编号与预期不一致，调度模块按截断后的flag ID收集到达通知并回送同步信号，导致配对的`asc_sync_inter_wait`等待错误的flag ID或提前放行。需与配对的`asc_sync_inter_wait`调用中的`flag_id`保持一致。
 - 使用该同步接口时，需要按照如下规则设置Kernel类型：
   - 在纯Vector/Cube场景下，需设置Kernel类型为KERNEL_TYPE_MIX_AIV_1_0或KERNEL_TYPE_MIX_AIC_1_0。
   - 对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型。
@@ -69,15 +79,15 @@ PIPE_S
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`声明核函数，同一group内包含1个AIC和2个AIV。AIV0和AIV1分别在UB中构造矩阵A和矩阵B，并将矩阵搬运至共享L1 Buffer，然后在MTE3流水上调用`asc_sync_block_arrive`。AIC在MTE1流水上调用`asc_sync_block_wait`，等待两个AIV均到达同步点后，再读取L1 Buffer中的数据执行矩阵乘。
+本示例采用`__mix__(1, 2)`声明核函数，同一AI Core内包含1个AIC和2个AIV。AIV0和AIV1分别在UB中构造矩阵A和矩阵B，通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)区分不同的AIV，将矩阵搬运至共享L1 Buffer，然后在MTE3流水上调用`asc_sync_block_arrive`。AIC在MTE1流水上调用`asc_sync_block_wait`，等待两个AIV均到达同步点后，再读取L1 Buffer中的数据执行矩阵乘。
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
 <!-- end id8 -->
 
@@ -140,13 +150,14 @@ __global__ __mix__(1, 2) void asc_sync_block_kernel(__gm__ float* output)
 
 int main()
 {
+    uint32_t numBlocks = 1;
     std::vector<float> output(MATRIX_ELEMENTS, 0.0f);
     float* output_device = nullptr;
 
     aclInit(nullptr);
     aclrtSetDevice(0);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    asc_sync_block_kernel<<<1, 0>>>(output_device);
+    asc_sync_block_kernel<<<numBlocks, 0>>>(output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;

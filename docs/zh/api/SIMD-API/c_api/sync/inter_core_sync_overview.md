@@ -2,17 +2,17 @@
 
 核间同步的使用场景通常是：一个核计算所依赖的数据，需要等待其他相关核的计算全部完成后才能获取。  
 
-以图1为例，AIC需要依赖于AIV的ReduceSum计算结果。由于整体矢量较大，必须拆分为多个部分，由每个AIV分别完成部分计算。每个AIV将其部分计算结果通过原子累加写入GM。AIC需要读取的必须是所有AIV均完成累加后的最终结果，因此需要通过核间同步来保证AIC读取ReduceSum结果时的时序正确性。
+以图1为例，AIC需要依赖于AIV的asc_reduce计算结果。由于整体矢量较大，必须拆分为多个部分，由每个AIV分别完成部分计算。每个AIV将其部分计算结果通过原子累加写入GM。AIC需要读取的必须是所有AIV均完成累加后的最终结果，因此需要通过核间同步来保证AIC读取asc_reduce结果时的时序正确性。
 
 **图1**  核间同步业务场景示例图（AIC:AIV为1 : 2）<a name="zh-cn_topic_0000002542605351_fig1180684585013"></a>  
-![](../../../../figures/inter_core_sync_scenario_example.png "核间同步业务场景示例图（AIC-AIV为1-2）")
+![](../../../figures/inter_core_sync_scenario_example.png "核间同步业务场景示例图（AIC-AIV为1-2）")
 
 AIC/AIV多核结构如下图2所示，AIC/AIV按group划分。一个group内细分block及subblock，block与subblock比例为1:N（N>=1），block表示多少个“主核”，subblock表示一个“主核”带多少个“从核”。
 
 算子按计算特征可分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和Mix算子（同时包含矩阵和矢量计算）。如表1所示，算子类型决定了其所需的核间同步方式和可选的group配置模式。其中Mix算子通过函数修饰符指定AIC与AIV的block/subblock关系；Cube算子和Vector算子为单类核执行，不涉及block/subblock划分。AIV为block且AIC为subblock的配置（即Vector核为主、Cube核为辅的模式）当前不支持。表2总结了核间同步接口及其支持的同步场景。
 
 **图2**  block和subblock之间关系（灰色部分表示一个group，即1个block和N个subblock）<a name="zh-cn_topic_0000002542605351_fig52727114018"></a>
-![](../../../../figures/block_subblock_relationship_3510.png "（NPU架构版本3510）block和subblock之间关系（灰色部分表示一个group，即1个block和N个subblock）")
+![](../../../figures/block_subblock_relationship_3510.png "（NPU架构版本3510）block和subblock之间关系（灰色部分表示一个group，即1个block和N个subblock）")
 
 **表1**  group配置<a name="zh-cn_topic_0000002542605351_table17238184964217"></a>
 
@@ -27,10 +27,9 @@ AIC/AIV多核结构如下图2所示，AIC/AIV按group划分。一个group内细�
 
 **表2**  支持的核间同步场景
 
-| 接口名称 | 核间同步场景概述 | 同步类别 |
-| --- | --- | --- |
-| [CrossCoreSetFlag](CrossCoreSetFlag_ISASI.md)/[CrossCoreWaitFlag](CrossCoreWaitFlag_ISASI.md) | 多个AIC或AIV之间的同步控制。CrossCoreSetFlag负责发送通知，CrossCoreWaitFlag负责阻塞直到CrossCoreSetFlag发送通知。<br>支持以下同步场景：<br>&bull;（模式0）同步等待全部AIC或者同步等待全部AIV执行结束。<br>&bull;（模式1）单个AI Core内，全部AIV之间的同步。<br>&bull;（模式2）单个AI Core内，AIC与全部AIV之间的同步。<br>&bull;（模式4）单个AI Core内，AIC核与单个AIV之间同步。 | 硬件同步 |
-| [IBSet](IBSet.md)/[IBWait](IBWait.md) | IBSet和IBWait配合使用，用于一对AIV间的同步：等待核调用IBWait阻塞本核后续指令的执行，被等待核调用IBSet通知等待核解除阻塞。上述同步过程的原理如下：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1。 | 软件同步 |
-| [SyncAll](SyncAll.md) | 用于多个核之间的同步控制，支持以下同步场景：<br>&bull;纯Vector算子的全核同步，可参考[CrossCoreSetFlag的模式0](key_features.md)。<br>&bull;融合算子的全核同步，一次性实现三个核间同步能力（参考[CrossCoreSetFlag的关键特性说明](key_features.md)）：首先完成单个AI Core内，AIC与全部AIV之间的同步（AIC等AIV）；接着完成多个AI Core间，所有AIC的同步；最后完成单个AI Core内，所有AIV与AIC同步（AIV等AIC）。 | 硬件同步 |
-| [SyncAll](SyncAll.md) | 仅支持纯Vector算子的多核（参与同步的核数可通过入参指定）同步。每一个AIV都向全局内存对应位置写入信号值1，接着每一个AIV都持续轮询全局内存中所有AIV对应的信号值，直到所有AIV核对应的信号值都变为1。 | 软件同步 |
-| [InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md)/[NotifyNextBlock](NotifyNextBlock.md)/[WaitPreBlock](WaitPreBlock.md) | &bull; InitDetermineComputeWorkspace、NotifyNextBlock和WaitPreBlock三个接口必须组合使用，能够确保多个AIV核严格按照blockIdx的升序执行，适用于要求确定性计算的场景。<br>&bull; InitDetermineComputeWorkspace初始化GM共享内存的值，完成初始化后才可以调用NotifyNextBlock和WaitPreBlock。<br>&bull; NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。 | 软件同步 |
+| 接口名称 | 同步范围 | 对应模式 | 功能简述 |
+| --- | --- | --- | --- |
+| [asc_sync_inter_arrive](asc_sync_inter_arrive.md)/[asc_sync_inter_wait](asc_sync_inter_wait.md) | 组间同步，即不同group之间所有block（所有AIC或所有AIV）之间的同步。 | 模式0（同步等待全部AIC或全部AIV执行结束） | `asc_sync_inter_arrive`为生产者，负责发送通知；`asc_sync_inter_wait`为消费者，负责阻塞等待通知到达。 |
+| [asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)/[asc_sync_subblock_wait](asc_sync_subblock_wait.md) | 组内subblock间的同步，即同一group内不同subblock（AIV）之间的同步。 | 模式1（单个AI Core内，全部AIV之间的同步） | `asc_sync_subblock_arrive`为生产者，负责发送通知；`asc_sync_subblock_wait`为消费者，负责阻塞等待通知到达。 |
+| [asc_sync_block_arrive](asc_sync_block_arrive.md)/[asc_sync_block_wait](asc_sync_block_wait.md) |同一group内block（AIC）与所有subblock（AIV）之间的同步。 | 模式2（单个AI Core内，AIC与全部AIV之间的同步） | `asc_sync_block_arrive`为生产者，负责发送通知；`asc_sync_block_wait`为消费者，负责阻塞等待通知到达。 |
+| [asc_sync_intra_arrive](asc_sync_intra_arrive.md)/[asc_sync_intra_wait](asc_sync_intra_wait.md) | 同一group内block（AIC）与单个subblock（AIV）之间的同步。 | 模式4（单个AI Core内，AIC核与单个AIV之间同步） | `asc_sync_intra_arrive`为生产者，负责发送通知；`asc_sync_intra_wait`为消费者，负责阻塞等待通知到达。 |

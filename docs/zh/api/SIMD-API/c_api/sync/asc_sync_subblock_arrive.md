@@ -26,11 +26,10 @@
 
 ## 功能说明
 
-头文件路径：`"c_api/sync/sync.h"`。
+本接口与[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#zh-cn_topic_0000002542605351_fig52727114018)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：
 
-核间subblock级同步投递原语，与`asc_sync_subblock_wait`配对使用，用于建立同一group内多个subblock之间的跨核同步依赖。本接口在`pipe`指定流水的前序指令全部提交后执行，向调度模块投递一个携带同步模式（inter-subblock）与flag ID的同步信号；同一group内所有subblock都投递同一flag ID后，调度模块向该group内所有subblock广播同步到达信号，配对的等待接口在收到到达信号后放行后续指令。
-
-本接口为非阻塞语义的投递操作——本接口在其前序指令提交后即投递同步信号，不阻塞本流水线的后续指令；配对的`asc_sync_subblock_wait`在未收到到达信号时阻塞其所在流水的后续指令，直到本接口及其他subblock的同flag ID投递全部完成才放行，从而构成一对跨核"投递-等待"同步闭环。当需与同一group内其他核的subblock建立跨核同步依赖、等待对端消费本接口投递的同步信号时，需要与`asc_sync_subblock_wait`配合使用。
+- 同一AI Core内所有AIV（subblock）都执行`asc_sync_subblock_arrive`后向调度模块发送通知，接着调度模块将各AIV（subblock）对应`flag_id`的计数器增加1。
+- 各AIV（subblock）上配对的`asc_sync_subblock_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
 
@@ -69,15 +68,15 @@ PIPE_S
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`声明核函数，同一group内包含2个AIV。两个AIV分别将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_subblock_arrive`。两个AIV在MTE2流水上调用`asc_sync_subblock_wait`，等待彼此均到达同步点。同步完成后，由AIV0读取并输出两个AIV生成的数据。
+本示例采用`__mix__(1, 2)`声明核函数。Host侧通过`numBlocks`设置启动1个AI Core；Kernel侧通过[asc_get_sub_block_num](../sys_var/asc_get_sub_block_num.md)获取该AI Core内的AIV数，通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)获取当前AIV的ID。两个AIV分别将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_subblock_arrive`。两个AIV在MTE2流水上调用`asc_sync_subblock_wait`，等待彼此均到达同步点。同步完成后，由AIV0读取并输出两个AIV生成的数据。
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
 <!-- npu="950" id17 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng examples.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
 <!-- end id17 -->
 
@@ -90,9 +89,8 @@ bisheng examples.asc -o main --npu-arch=dav-3510; ./main
 
 namespace {
 
-constexpr uint32_t AIV_NUM = 2;
 constexpr uint32_t ELEMENTS_PER_AIV = 8;
-constexpr uint32_t TOTAL_ELEMENTS = AIV_NUM * ELEMENTS_PER_AIV;
+constexpr uint32_t TOTAL_ELEMENTS = 2 * ELEMENTS_PER_AIV;
 constexpr uint32_t AIV_BYTES = ELEMENTS_PER_AIV * sizeof(float);
 constexpr uint32_t TOTAL_BYTES = TOTAL_ELEMENTS * sizeof(float);
 constexpr int64_t FLAG_ID = 8;
@@ -103,7 +101,10 @@ __global__ __mix__(1, 2) void asc_sync_subblock_kernel(__gm__ float* contributio
     if ASC_IS_AIV {
         __ubuf__ float local[ELEMENTS_PER_AIV];
         __ubuf__ float snapshot[TOTAL_ELEMENTS];
+        const uint32_t sub_block_num = asc_get_sub_block_num();
         const uint32_t subblock_id = asc_get_sub_block_id();
+        const uint32_t total_elements = sub_block_num * ELEMENTS_PER_AIV;
+        const uint32_t total_bytes = total_elements * sizeof(float);
         for (uint32_t i = 0; i < ELEMENTS_PER_AIV; ++i) {
             local[i] = static_cast<float>(subblock_id + 1);
         }
@@ -113,10 +114,10 @@ __global__ __mix__(1, 2) void asc_sync_subblock_kernel(__gm__ float* contributio
         asc_sync_subblock_arrive(PIPE_MTE3, FLAG_ID);
         asc_sync_subblock_wait(PIPE_MTE2, FLAG_ID);
         if (subblock_id == 0) {
-            asc_copy_gm2ub_align(snapshot, contributions, TOTAL_BYTES);
+            asc_copy_gm2ub_align(snapshot, contributions, total_bytes);
             asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
             asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_copy_ub2gm_align(output, snapshot, TOTAL_BYTES);
+            asc_copy_ub2gm_align(output, snapshot, total_bytes);
         }
     }
     asc_sync_pipe(PIPE_ALL);
@@ -126,6 +127,7 @@ __global__ __mix__(1, 2) void asc_sync_subblock_kernel(__gm__ float* contributio
 
 int main()
 {
+    uint32_t numBlocks = 1;
     std::vector<float> output(TOTAL_ELEMENTS, 0.0f);
     float *contributions_device = nullptr, *output_device = nullptr;
 
@@ -133,7 +135,7 @@ int main()
     aclrtSetDevice(0);
     aclrtMalloc(reinterpret_cast<void**>(&contributions_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    asc_sync_subblock_kernel<<<1, 0>>>(contributions_device, output_device);
+    asc_sync_subblock_kernel<<<numBlocks, 0>>>(contributions_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), TOTAL_BYTES, output_device, TOTAL_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;
