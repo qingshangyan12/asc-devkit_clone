@@ -10,7 +10,7 @@ Ascend C资料体系包含五份核心文档，开发者可以通过提交PR对�
 | 编程指南 | 编程模型、编程范式、编译运行、硬件架构、高级编程 | `docs/zh/guide/编程指南` |
 | API参考手册 | 接口参数、约束、示例、API关联 | `docs/zh/api/` |
 | 算子实践参考 | 算子实现、性能优化、调优案例 | `docs/zh/guide/算子实践参考/` |
-| 跨代迁移兼容性指南 | API兼容策略、架构变更映射、迁移步骤 | `docs/zh/guide/跨代迁移兼容性指南/` |
+| 跨代迁移兼容性指南 | API兼容策略、架构变更映射、迁移步骤 | `docs/zh/guide/cross_gen_migration_guide/` |
 
 在阅读本文档前，请确保您已了解昇腾AI处理器硬件架构。零基础开发者推荐先阅读[入门教程](./guide/getting_started/ascend_c_overview_and_learning_path.md)；已有基础的开发者推荐先阅读[Ascend C编程指南](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)。
 

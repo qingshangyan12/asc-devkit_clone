@@ -129,7 +129,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 </div>
 <div style=" margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">🔄 跨代迁移</strong><br/>
-<a href="../跨代迁移兼容性指南/概述.md" style="color: #3b82f6; font-size: 14px;">跨代迁移兼容性指南</a>
+<a href="../cross_gen_migration_guide/overview.md" style="color: #3b82f6; font-size: 14px;">跨代迁移兼容性指南</a>
 </div>
 
 </div>
