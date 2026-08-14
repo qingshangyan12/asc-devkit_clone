@@ -173,7 +173,7 @@
 如图2所示，以b16输入类型为例，`asc_mmad`指令会按照A矩阵分形[16, 16]、B矩阵分形[16, 16]连续读入数据。此时，矩阵计算单元从L0A/L0B读入的分形总数分别为2 x 5 = 10和5 x 3 = 15，写入L0C的分形总数为2 x 3 = 6。
 
 <p align="center">
-  <img src="figures/mmad_f16_A5.png" width="900">
+  <img src="figures/mmad_f16_Afig_fig_5.png" width="900">
 </p>
 <p align="center">
 图2：bfloat16类型，L0A上Nz排布，Mmad数据排布示意图

@@ -642,7 +642,7 @@ complex64实部和虚部都是float类型，complex32实部和虚部都是half�
 
 **图7** int64_t转double示意图
 
-![int64_t转double示意图](../../../figures/int64.png)
+![int64_t转double示意图](../../../figures/int6fig_4.png)
 
 由于double只有52bit尾数，因此灰色部分要进行舍入：
 

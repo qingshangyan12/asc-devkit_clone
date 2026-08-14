@@ -124,7 +124,7 @@ Atlas A2/A3 系列产品上，Unified Buffer 总大小 192KB，划分为 48 个 
 
 **图：Atlas A2/A3 UB Bank 结构示意图**（箭头方向表示内存排布顺序）
 
-<img src="figures/ubBankStruct2201.png" width="80%">
+<img src="figures/ubBankStruct220fig_fig_1.png" width="80%">
 
 bank 冲突主要分为三类：
 
@@ -166,7 +166,7 @@ for (uint32_t k = 0; k < tileW / vecLenHalf; ++k) {
 
 **图：Case 1 紧凑排放下 ND 到 NZ 示意图**
 
-<img src="figures/datand2nzS1.png" width="80%">
+<img src="figures/datand2nzSfig_fig_1.png" width="80%">
 
 **Ping-Pong 流水**：
 
@@ -200,7 +200,7 @@ UB 的 16 个 bank group 各自可以并行接收写入；地址按 32B 一块�
 
 **图：Atlas A2/A3 Case 1 的 UB bank group 冲突示意图**
 
-<img src="figures/s1bank2201.png" width="80%">
+<img src="figures/s1bank220fig_fig_1.png" width="80%">
 
 **性能数据**（Atlas A2/A3 系列产品，当前 `144×128` 配置，48 核）：
 
@@ -252,7 +252,7 @@ Ping-Pong 流水与 Case 1 完全一致，参见上文。
 
 **图：Atlas A2/A3 Case 2 的 UB bank 落点示意图**
 
-<img src="figures/s2bank2201.png" width="80%">
+<img src="figures/s2bank220fig_fig_1.png" width="80%">
 
 **UB 占用变化**：
 
@@ -342,7 +342,7 @@ for (uint16_t k = 0; k < vecsPerRow; ++k) {
 
 **图：Case 1 紧凑排放下 ND 到 NZ 的示意图**
 
-<img src="figures/datand2nzS1.png" width="80%">
+<img src="figures/datand2nzSfig_fig_1.png" width="80%">
 
 **冲突原理**：
 

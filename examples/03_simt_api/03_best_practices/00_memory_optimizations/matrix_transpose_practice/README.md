@@ -179,7 +179,7 @@ UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向�
 
 **图2　Case 3 UB中转转置数据流向示意图**
 
-<img src="./figures/case3.png" width="60%">
+<img src="./figures/casefig_3.png" width="60%">
 
 Case 2的直接逐元素写入需要交换行列坐标，输出地址会沿列方向跨行分散，这是直接全局内存转置的主要问题。引入分块后，处理粒度从单个元素变为局部tile：线程先按输入矩阵的行方向将tile连续读入UB，再从UB中按转置方向读取数据，最后按输出矩阵的行方向连续写入GM。这样，转置带来的不连续访问被限制在UB内部，GM读写都保持连续访问模式。
 
@@ -302,7 +302,7 @@ SIMT编程方式下，bank冲突为更细粒度的subbank冲突，主要有以�
 
 **图3　UB bank结构示意图**
 
-<img src="./figures/bank结构示意图.png">
+<img src="./figures/bank_struct.png">
 
 Case 5中UB的tile数组按照行优先存储。按照地址低位交织规则，tile数组的第一行刚好覆盖bank0～bank3，第二行覆盖bank4～bank7，第三行覆盖bank8～bank11，其余行依次类推。每行32个float数据会恰好跨越4个bank存储。Case 5中，一个Warp的线程会读取tile的一列元素并写入GM输出矩阵；访问UB时，32个线程会集中访问两个bank group的subbank0，属于读读冲突场景。
 

@@ -32,7 +32,7 @@
 
 GeGLU是采用GELU作为激活函数的GLU变体。具体计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002316170544.png)
+![](../../../../figures/zh-cn_formulaimage_000000231617054fig_4.png)
 
 其中GELU激活函数的计算公式如下：
 
@@ -40,7 +40,7 @@ GeGLU是采用GELU作为激活函数的GLU变体。具体计算公式如下：
 
 上述公式中的erf为误差函数：![](../../../../figures/zh-cn_formulaimage_0000001707121636.png)
 
-误差函数没有解析表达式，按照业界普遍使用的tanh近似表达式：![](../../../../figures/zh-cn_formulaimage_0000001755028613.png)
+误差函数没有解析表达式，按照业界普遍使用的tanh近似表达式：![](../../../../figures/zh-cn_formulaimage_000000175502861fig_3.png)
 
 将GELU近似公式代入可得GeGLU表达式为：
 

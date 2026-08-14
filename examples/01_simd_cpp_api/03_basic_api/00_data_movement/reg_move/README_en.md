@@ -53,7 +53,7 @@ This example demonstrates and verifies data transfer from a RegTensor (the basic
 - Example implementation:
   1. Uses LoadAlign to load cond data into RegTensor with alignment
   2. Through MaskGenWithRegTensor&lt;int32, 0&gt;, extracts 64 bits of data from the first 8 bytes of condReg, fills them into a 256-bit MaskReg in downsampling mode: every 4 mask bits correspond to 1 src bit. Float element processing diagram:
-  <img src="figures/move_reg_1.png">
+  <img src="figures/move_reg_fig_fig_1.png">
   3. Uses StoreAlign to write mask data back to UB
 - Invocation implementation
   Uses the kernel invocation syntax `<<<>>>` to call the kernel function, launching 1 core.
@@ -76,7 +76,7 @@ This example demonstrates and verifies data transfer from a RegTensor (the basic
   1. Calls LoadAlign to load selection operands x, y into RegTensor
   2. Calls LoadUnAlignPre/LoadUnAlign to load the mask operand into RegTensor, loading 2 elements per iteration, that is, 8 bytes / 64 bits of data
   3. Calls MaskGenWithRegTensor to extract 64 bits of data from the first 8 bytes of mReg, fills them into a 256-bit MaskReg in downsampling mode: every 4 mask bits correspond to 1 src bit. Processing diagram:
-  <img src="figures/move_reg_1.png">
+  <img src="figures/move_reg_fig_fig_1.png">
   4. Calls the Select API to select elements from xReg or yReg element-wise based on maskReg, writing into zReg, as shown below
   <img src="figures/move_reg_2.png">
   5. Calls StoreAlign to write Select data back to UB

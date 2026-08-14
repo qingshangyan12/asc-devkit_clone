@@ -32,7 +32,7 @@
 
 按元素做Silu运算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002350049101.png)
+![](../../../../figures/zh-cn_formulaimage_000000235004910fig_1.png)
 
 ![](../../../../figures/zh-cn_formulaimage_0000001729001889.png)
 

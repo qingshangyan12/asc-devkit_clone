@@ -72,7 +72,7 @@ Tiling参数如下：
 
 -   优化前的流水图如下，默认不开启Tiling常量化，Tiling参数需要从Host侧拷贝到Kernel侧，导致Matmul初始化时的Scalar计算较多，第一个MTE2指令开始于3.536us左右，MTE2前的指令头开销在算子整个流水中占比较大，因此需要优化Scalar计算。
 
-    ![](../../../figures/zh-cn_image_0000002411422713.png)
+    ![](../../../figures/zh-cn_image_000000241142271fig_3.png)
 
 -   优化前的Profiling数据如下，从C列的aic\_time数据来看，多个核中最大算子执行耗时为10.62us，从G列的aic\_scalar\_time数据来看，Scalar平均耗时6.32us。
 
@@ -83,12 +83,12 @@ Tiling参数如下：
 如下图所示，默认不开启Tiling常量化功能时，开发者在host侧创建Tiling对象，通过调用API自动获取Tiling参数。然后将Tiling参数从Host侧传递到Kernel侧，在Kernel侧初始化操作时传入。在算子执行时，使用Tiling变量参数完成矩阵乘操作。
 
 **图1**  默认不开启Tiling常量化的Matmul计算流程示意图<a name="fig1911911419426"></a>  
-![](../../../figures/默认不使能Tiling常量化的Matmul计算流程示意图.png "默认不开启Tiling常量化的Matmul计算流程示意图")
+![](../../../figures/no_const_matmul.png "默认不开启Tiling常量化的Matmul计算流程示意图")
 
 如下图所示，开启Tiling常量化功能时，开发者只需要在Kernel侧创建Matmul对象时，调用GetMatmulApiTiling接口在编译期获取常量化Tiling信息，即可完成Tiling常量化。在算子执行时，使用常量化的Tiling参数完成矩阵乘操作，减少Scalar计算开销。
 
 **图2**  开启Tiling常量化的Matmul计算流程示意图<a name="fig146371949194314"></a>  
-![](../../../figures/使能Tiling常量化的Matmul计算流程示意图.png "开启Tiling常量化的Matmul计算流程示意图")
+![](../../../figures/const_matmul.png "开启Tiling常量化的Matmul计算流程示意图")
 
 Matmul API开启Tiling全量常量化的完整样例请参考[Matmul Tiling常量化的算子样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_constant_tiling)。开启Tiling全量常量化功能的步骤如下：
 

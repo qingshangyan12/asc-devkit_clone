@@ -326,7 +326,7 @@ if (taskRation != 0 && vecCount % taskRation != subBlockIdx) {
 
 通过PIPE流水图可以看到，Case 1 虽然已经引入双 AIV 分摊 Vector 任务，但由于 `PIPELINE_DEPTH=1`，Cube 与 Vector 仍然按照 Iterate 粒度串行同步，workspace 只有单个 Slot 可复用，因此流水中仍能看到明显的等待和断点。
 
-![Case 1 的 PIPE 流水图](./figures/CV流水优化1.png)
+![Case 1 的 PIPE 流水图](./figures/CV流水优化fig_1.png)
 
 **下一步优化方向**：引入4级Cube-Vector流水，提高Cube-Vector并行度，进一步提升整体计算效率。
 

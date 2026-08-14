@@ -32,7 +32,7 @@
 
 按元素做三角函数余弦运算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002218333665.png)
+![](../../../../figures/zh-cn_formulaimage_000000221833366fig_5.png)
 
 Cos\(x\)的泰勒展开式为：
 

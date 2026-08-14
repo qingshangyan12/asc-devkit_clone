@@ -53,14 +53,14 @@ Taking Ascend 950PR/Ascend 950DT as an example, the following figure shows the U
 In SIMT scenarios, multiple threads in the same Warp may access UB at the same time in one UB access instruction. When the accessed data belongs to subbank resources with the same index in the same bank group, for example, subbank2 in bank0 and subbank2 in bank8, the hardware cannot process all requests in one cycle, so the requests need to wait in sequence, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests, and no subbank conflict is formed.
 
 **Figure 1** Bank structure
-![](./figures/bank结构示意图.png)
+![](./figures/bank_struct.png)
 
 ### Address Encoding Rules
 
 UB addresses use low-bit interleaving. As shown in the following figure, consecutive addresses are mapped to bank0 through bank15 at 32B granularity: the first 32B address segment maps to bank0, the second maps to bank1, and so on. The 16th segment maps to bank15, and the 17th segment maps back to the next row of bank0.
 
 **Figure 2** Bank memory layout
-![](./figures/bank内存排布示意图.png)
+![](./figures/bank内存排布diagram.png)
 
 The main subbank conflict types in SIMT programming are as follows:
 
@@ -184,7 +184,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 The accesses of 32 threads cover a continuous 256B region and are distributed to 4 subbanks in 8 bank groups at 8B granularity. Under the same UB access instruction, each subbank in each bank group is accessed by only one thread. Therefore, this case can be used as a conflict-free access baseline. The access pattern is shown below:
 
-![](./figures/case1.png)
+![](./figures/casefig_1.png)
 
 **Performance Data**:
 
@@ -246,7 +246,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 According to the UB low-bit interleaving rule, a 512B access stride makes the addresses return to the same bank group, same bank, and same subbank, while the depth row ID increments. Therefore, the 32 threads in the same Warp simultaneously access different rows of the same-index subbank in the same bank, forming a subbank conflict. The access pattern is shown below:
 
-![](./figures/case3.png)
+![](./figures/casefig_3.png)
 
 **Performance Data**:
 
@@ -277,7 +277,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 `thread_id * 64` means that adjacent threads are spaced by 64 `float` elements, that is, 256B. A 256B access stride switches the bank ID inside the bank group but keeps the bank group ID and subbank ID unchanged. Therefore, the 32 threads in the same Warp concentrate on same-index subbank resources in the same bank group, forming a subbank conflict. The access pattern is shown below:
 
-![](./figures/case4.png)
+![](./figures/casefig_4.png)
 
 **Performance Data**:
 

@@ -138,7 +138,7 @@ This example controls execution branches through SCENARIO_NUM. Different values 
 ### 1. Cube and Vector Fused Computation Scenario
 #### 1.1 Overall Logic
 <p align="center">
-  <img src="figures/融合场景_示意图.png" width="100%">
+  <img src="figures/融合场景_diagram.png" width="100%">
    </p>
 <p align="center">
 Figure 1: Cube and Vector fused computation scenario, overall computation logic diagram
@@ -257,7 +257,7 @@ If the synchronization in the previous step is not inserted correctly, the data 
             return;
         }
 <p align="center">
-  <img src="figures/纯aiv_模式0示意图.png" width="100%">
+  <img src="figures/纯aiv_模式0diagram.png" width="100%">
 </p>
 <p align="center">
 Figure 6: Pure AIV scenario, mode 0 computation logic diagram

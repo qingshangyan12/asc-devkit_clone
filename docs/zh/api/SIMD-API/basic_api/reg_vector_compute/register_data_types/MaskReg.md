@@ -101,7 +101,7 @@ MaskReg
 
 **图7** bfloat16_t到fp4x2_e2m1_t类型转换过程<a id="fig7"></a>
 
-![](../../../../figures/bfloat16_to_fp4x2_e2m1.png "bfloat16_t到fp4x2_e2m1_t类型转换过程")
+![](../../../../figures/bfloat16_to_fp4x2_e2mfig_1.png "bfloat16_t到fp4x2_e2m1_t类型转换过程")
 
 ### Mask设置方式
 

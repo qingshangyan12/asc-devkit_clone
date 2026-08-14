@@ -26,7 +26,7 @@
 
 按元素做反双曲正弦函数计算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002182892064.png)
+![](../../../../figures/zh-cn_formulaimage_000000218289206fig_4.png)
 
 ![](../../../../figures/zh-cn_formulaimage_0000002188264602.png)
 

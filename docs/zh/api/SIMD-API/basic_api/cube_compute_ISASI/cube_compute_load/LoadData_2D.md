@@ -216,7 +216,7 @@ dstGap为2：表示目的操作数上，前一个数据分形的尾地址与后�
 
     ifTranspose=1：表示开启转置。
 
-    ![](../../../../figures/load2d_l12l0a_set_frac_trans_demo1.png)
+    ![](../../../../figures/load2d_l12l0a_set_frac_trans_demofig_1.png)
 
 - 从L1 Buffer搬运数据类型为half的6个数据分形到L0A Buffer，开启转置。
 

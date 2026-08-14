@@ -36,7 +36,7 @@ $$
 \{carry_i, dst_i\} = src0_i + src1_i + carry\_src_i
 $$
 
-![](../../figures/asc_addc_1.png)
+![](../../figures/asc_addc_fig_1.png)
 
 以uint64_t类型数据计算0xFFFFFFFF FFFFFFFF + 0x00000000 00000008 = 0x00000000 00000007为例，asc_add/asc_addc接口的适用场景如下图：
 

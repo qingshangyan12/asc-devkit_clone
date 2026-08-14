@@ -26,7 +26,7 @@
 
 获取输入数据x与2的n次方的乘积。
 
-![](../../../figures/zh-cn_formulaimage_0000002486622064.png)
+![](../../../figures/zh-cn_formulaimage_000000248662206fig_4.png)
 
 ## 函数原型
 

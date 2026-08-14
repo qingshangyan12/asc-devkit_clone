@@ -52,7 +52,7 @@ This example performs data type conversion on the input vector. When the input a
   - Compute: Call the asc_half2int32_rd API. The input-to-output bit width ratio is 1:2, so data is read from the 2\*N positions of x vector data register, type-converted, and sequentially written to y vector data register
   - Store: Call the asc_storealign API for standard store
   - Invocation implementation: Uses the kernel invocation syntax <<<>>> to call the kernel function.
-  <img src="figures/cast1.png">
+  <img src="figures/castfig_fig_1.png">
 
 **Scenario 2: Wide to Narrow Data Type Conversion**
 - Example functionality: Converts float-type data to int16_t-type data.

@@ -129,7 +129,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 **图2**  b4转置搬运示意图
 
-![b4转置搬运示意图](../../../../figures/transpose_b4.png)
+![b4转置搬运示意图](../../../../figures/transpose_bfig_4.png)
 
 #### b8转置搬运
 

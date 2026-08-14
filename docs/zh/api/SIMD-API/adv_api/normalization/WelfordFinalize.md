@@ -37,7 +37,7 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 
     -   方差系数未修正场景：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002188346134.png)
+        ![](../../../figures/zh-cn_formulaimage_000000218834613fig_4.png)
 
     -   方差系数修正场景：
 
@@ -46,7 +46,7 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 
     其中，Mean为均值输出，Var为方差输出。
 
-    Mean<sub>i</sub>代表输入的第i个均值，Var<sub>i</sub>代表输入的第i个方差。Ab代表Reduce轴切分后一次计算的大小，Rn代表Reduce轴按Ab拆分的次数，![](../../../figures/zh-cn_formulaimage_0000002235200305.png)代表<!-- npu="950" id14 -->未修正的<!-- end id14 -->方差系数rRec<!-- npu="950" id15 -->，![](../../../figures/zh-cn_image_0000002200279866.png)代表修正方差系数rRecWithCorrection<!-- end id15 -->。
+    Mean<sub>i</sub>代表输入的第i个均值，Var<sub>i</sub>代表输入的第i个方差。Ab代表Reduce轴切分后一次计算的大小，Rn代表Reduce轴按Ab拆分的次数，![](../../../figures/zh-cn_formulaimage_000000223520030fig_5.png)代表<!-- npu="950" id14 -->未修正的<!-- end id14 -->方差系数rRec<!-- npu="950" id15 -->，![](../../../figures/zh-cn_image_0000002200279866.png)代表修正方差系数rRecWithCorrection<!-- end id15 -->。
 
 -   带尾块/带counts参数场景：
 
@@ -61,10 +61,10 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 
     -   方差系数修正场景：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002223917381.png)
+        ![](../../../figures/zh-cn_formulaimage_000000222391738fig_1.png)
     <!-- end id8 -->
 
-    除上述参数含义外，counts<sub>i</sub>代表Mean<sub>i</sub>对应的系数，R代表未切分的原始Reduce轴长度，![](../../../figures/zh-cn_formulaimage_0000002200133484.png)代表<!-- npu="950" id16 -->未修正的<!-- end id16 -->方差系数rRec<!-- npu="950" id17 -->，![](../../../figures/zh-cn_image_0000002200279878.png)代表修正系数rRecWithCorrection<!-- end id17 -->。
+    除上述参数含义外，counts<sub>i</sub>代表Mean<sub>i</sub>对应的系数，R代表未切分的原始Reduce轴长度，![](../../../figures/zh-cn_formulaimage_000000220013348fig_4.png)代表<!-- npu="950" id16 -->未修正的<!-- end id16 -->方差系数rRec<!-- npu="950" id17 -->，![](../../../figures/zh-cn_image_0000002200279878.png)代表修正系数rRecWithCorrection<!-- end id17 -->。
 
 ## 函数原型
 

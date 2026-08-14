@@ -31,7 +31,7 @@
 
 计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002342367301.png)
+![](../../../../figures/zh-cn_formulaimage_000000234236730fig_1.png)
 
 ![](../../../../figures/zh-cn_formulaimage_0000002188545700.png)
 

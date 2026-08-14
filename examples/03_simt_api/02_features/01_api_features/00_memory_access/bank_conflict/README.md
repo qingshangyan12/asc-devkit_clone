@@ -53,14 +53,14 @@ Host侧构造输入数组并拷贝到GM，kernel先将输入数据从GM搬入UB�
 SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据属于同一个bank group的相同编号的subbank资源时，例如同时访问bank0和bank8的subbank2，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；如果这些访问数据属于同一个subbank的同一行内的8B地址范围，硬件会将这些请求合并处理，不会形成subbank冲突。
 
 **图 1**  bank结构示意图
-![](./figures/bank结构示意图.png)
+![](./figures/bank_struct.png)
 
 ### 地址编码规则
 
 UB地址采用低位交织，如下图所示，连续地址按32B粒度映射到bank0到bank15：第1个32B地址段映射到bank0，第2个映射到bank1，依次类推；第16个映射到bank15，第17个映射回bank0的下一行。
 
 **图 2**  bank内存排布示意图
-![](./figures/bank内存排布示意图.png)
+![](./figures/bank内存排布diagram.png)
 
 SIMT编程方式下subbank冲突主要有以下几种：
 
@@ -184,7 +184,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 32个线程的访问覆盖连续256B空间，并按照8B粒度分散到8个bank group的4个subbank上。同一条UB访问指令下，每个bank group的每个subbank只被一个线程访问，因此该case可作为无冲突访问基线。访问示意图如下：
 
-![](./figures/case1.png)
+![](./figures/casefig_1.png)
 
 **性能数据**：
 
@@ -246,7 +246,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 由于UB低位交织规则，512B访问间隔会使地址回到相同bank group、相同bank和相同subbank，但depth行号递增。因此，同一个Warp内32个线程会同时访问同一bank的同编号subbank的不同行，形成subbank冲突。访问示意图如下：
 
-![](./figures/case3.png)
+![](./figures/casefig_3.png)
 
 **性能数据**：
 
@@ -277,7 +277,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 `thread_id * 64`表示相邻线程间隔64个`float`元素，即256B。256B访问间隔会切换bank group内的bank编号，但bank group编号和subbank编号保持一致。因此，同一个Warp内32个线程会集中访问同一个bank group的同编号subbank资源，形成subbank冲突。访问示意图如下：
 
-![](./figures/case4.png)
+![](./figures/casefig_4.png)
 
 **性能数据**：
 

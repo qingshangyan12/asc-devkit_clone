@@ -175,7 +175,7 @@ $$
 
     **图2** fp4x2_e2m1_t数据类型二进制示意图
 
-    ![](../../../figures/f8_1.png)
+    ![](../../../figures/f8_fig_1.png)
 
 - fp4x2\_e1m2\_t
 
@@ -191,7 +191,7 @@ $$
 
     **图4** fp8_e8m0_t数据类型二进制示意图
 
-    ![](../../../figures/f8_1-1.png)
+    ![](../../../figures/f8_1-fig_1.png)
 
 - fp8\_e5m2\_t
 
@@ -319,7 +319,7 @@ $$
 
     **图12** half数据类型二进制示意图，值为1.75
 
-    ![half数据类型二进制示意图-值为1-75](../../../figures/half-binary-1-75.png)
+    ![half数据类型二进制示意图-值为1-75](../../../figures/half-binary-1-7fig_5.png)
 
     **表8** half类型特殊值bit位表示
 
@@ -341,7 +341,7 @@ $$
 
     **图13** bfloat16\_t数据类型二进制示意图，值为1.75<a name="zh-cn_topic_0000002563730205_fig760011915344"></a>
 
-    ![bfloat16_t数据类型二进制示意图-值为1.75](../../../figures/bfloat16_t-binary-1-75.png)
+    ![bfloat16_t数据类型二进制示意图-值为1.75](../../../figures/bfloat16_t-binary-1-7fig_5.png)
     
     **表9** bfloat16\_t类型特殊值
 
@@ -363,7 +363,7 @@ $$
 
     **图14** float数据类型二进制示意图，值为1.75<a name="zh-cn_topic_0000002563730205_fig54861751133412"></a>
     
-    ![float数据类型二进制示意图-值为1-75](../../../figures/float-binary-1-75.png)
+    ![float数据类型二进制示意图-值为1-75](../../../figures/float-binary-1-7fig_5.png)
 
     **表10** float类型特殊值
 

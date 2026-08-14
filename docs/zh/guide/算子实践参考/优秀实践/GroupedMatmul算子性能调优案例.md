@@ -115,12 +115,12 @@ for i in range(g):
 固定8核进行测试的情况下，通过msopprof命令获取指令的cycle占比数据如下：
 
 **图1**  指令的cycle占比数据ArithmeticUtilization.csv（性能总耗时为218.1us）<a name="fig394318012515"></a>  
-![](../../figures/指令的cycle占比数据ArithmeticUtilization-csv（性能总耗时为218-1us）.png "指令的cycle占比数据ArithmeticUtilization-csv（性能总耗时为218-1us）")
+![](../../figures/instr_cycle.png "指令的cycle占比数据ArithmeticUtilization-csv（性能总耗时为218-1us）")
 
 通过msopprof simulator获取到的指令流水图如下图所示：
 
 **图2**  指令流水图<a name="fig1566120572287"></a>  
-![](../../figures/指令流水图.png "指令流水图")
+![](../../figures/instr_pipe.png "指令流水图")
 
 结合上述两种数据（真实数据和仿真数据）进行性能分析：
 
@@ -131,7 +131,7 @@ for i in range(g):
 
 -   Vector计算没有开启double buffer，计算和数据搬运部分没有并行。
 
-    ![](../../figures/zh-cn_image_0000002145980193.png)
+    ![](../../figures/zh-cn_image_000000214598019fig_3.png)
 
 ## 设计优化方案<a name="section7611135813517"></a>
 
@@ -216,17 +216,17 @@ for i in range(g):
 
     Vector计算在等Cube计算输出的数据，Cube侧需要等Vector计算完释放workspace以存放下一轮的计算结果，当前为了让Cube、Vector计算流水并行，workspace使用了两份空间：
 
-    ![](../../figures/1_zh-cn_image_0000002085556446.png)
+    ![](../../figures/img_1_cn.png)
 
     因为Vector和Cube计算存在使用一份workspace进行数据传递的场景，存在数据依赖，所以会有等待的间隔。
 
     可以采用4份workspace进行优化：
 
-    ![](../../figures/2_zh-cn_image_0000002121156181.png)
+    ![](../../figures/2_zh-cn_image_000000212115618fig_1.png)
 
     优化后，总耗时由154.2us下降为131.8us。指令流水图显示Vector、Cube计算各自间隙明显减小。
 
-    ![](../../figures/zh-cn_image_0000002085558494.png)
+    ![](../../figures/zh-cn_image_000000208555849fig_4.png)
 
 -   Vector计算开启double buffer，优化后执行总耗时从131.8us下降为128.1us。
 

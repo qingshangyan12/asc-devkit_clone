@@ -39,7 +39,7 @@
 - dst_gap = 1，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔为1（单位：512B）；
 - dst_frac_gap = 0，表示每个迭代内目的操作数前一个分形的结束地址与后一个分形起始地址的间隔为0（单位：512B）。
 
-![](../../figures/asc_copy_l12l0_trans_b8_example1.png)
+![](../../figures/asc_copy_l12l0_trans_b8_examplefig_1.png)
 
 如下图示例：
 
@@ -64,7 +64,7 @@
   - dst_gap = 1，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔为1（单位：512B）；
   - dst_frac_gap = 0，表示每个迭代内目的操作数前一个分形结束地址与后一个分形起始地址的间隔为0（单位：512B）。
 
-![](../../figures/asc_copy_l12l0_trans_b32_example1.png)
+![](../../figures/asc_copy_l12l0_trans_b32_examplefig_1.png)
 
 如下图示例：
 - repeat_time和src_stride的解释和上图示例一致。

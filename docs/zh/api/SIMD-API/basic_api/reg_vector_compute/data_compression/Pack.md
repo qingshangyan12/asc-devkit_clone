@@ -33,7 +33,7 @@
 
 **图 1**  Pack示意图
 
-![Pack](../../../../figures/reg_pack_1.png)
+![Pack](../../../../figures/reg_pack_fig_1.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

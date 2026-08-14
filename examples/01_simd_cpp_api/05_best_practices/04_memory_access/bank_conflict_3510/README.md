@@ -152,7 +152,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### UB读写示意
 
-![case1](./figures/case1.png)
+![case1](./figures/casefig_1.png)
 
 ### 性能数据
 
@@ -204,7 +204,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### UB读写示意
 
-![case3](./figures/case3.png)
+![case3](./figures/casefig_3.png)
 
 ### 性能数据
 
@@ -230,7 +230,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### UB读写示意
 
-![case4](./figures/case4.png)
+![case4](./figures/casefig_4.png)
 
 ### 性能数据
 
@@ -254,7 +254,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### UB读写示意
 
-![case5](./figures/case5.png)
+![case5](./figures/casefig_5.png)
 
 ### 性能数据
 
@@ -421,7 +421,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### UB读写示意
 
-![case12](./figures/case11.png)
+![case12](./figures/case1fig_1.png)
 
 ### 性能数据
 
@@ -469,7 +469,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### UB读写示意
 
-![case14](./figures/case13.png)
+![case14](./figures/case1fig_3.png)
 
 ### 性能数据
 
@@ -511,22 +511,22 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ├── figures/                      // 各Case UB内存分布图
 │   ├── ub_arch.png               // UB架构图
 │   ├── ub_address.png            // UB地址编码图
-│   ├── case1.png
+│   ├── casefig_1.png
 │   ├── case1_trace.png           // Case1流水trace
 │   ├── case2.png
-│   ├── case3.png
+│   ├── casefig_3.png
 │   ├── case3_trace.png           // Case3流水trace（读写冲突）
-│   ├── case4.png
-│   ├── case5.png
+│   ├── casefig_4.png
+│   ├── casefig_5.png
 │   ├── case6_7.png
 │   ├── case6_trace.png           // Case6流水trace
 │   ├── case7_trace.png           // Case7流水trace
 │   ├── case8.png
 │   ├── case9.png
 │   ├── case10.png
-│   ├── case11.png
+│   ├── case1fig_1.png
 │   ├── case12.png
-│   └── case13.png
+│   └── case1fig_3.png
 ├── README.md                     // 本文档
 ├── scripts/
 │   ├── gen_data.py               // 测试数据生成

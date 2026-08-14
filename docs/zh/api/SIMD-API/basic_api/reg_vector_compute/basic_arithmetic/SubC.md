@@ -38,7 +38,7 @@ $$
 \{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, \sim srcReg1_i\} + \{32'b0,carrySrc_i\}
 $$
 
-![](../../../../figures/reg_subc_1.png)
+![](../../../../figures/reg_subc_fig_1.png)
 
 以int64_t类型数据计算-1 - 8 = -9为例，Sub/SubC接口的适用场景如下图：
 

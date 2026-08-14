@@ -68,18 +68,18 @@ Tiling参数如下：
 
 -   优化前的Profiling数据如下，Matmul默认为Norm模板。从C列的aic\_time数据可以看出，多个核中最大算子执行耗时为83.68us。从C列的aic\_time、L列的aic\_mte2\_time和M列的aic\_mte2\_ratio几组数据来看，MTE2平均耗时75.64us，耗时占比达到92%以上，因此需要优化MTE2流水的耗时。
 
-    ![](../../../figures/zh-cn_image_0000002444614021.png)
+    ![](../../../figures/zh-cn_image_000000244461402fig_1.png)
 
 -   优化前的流水图如下，MTE2分多次从Global Memory搬运基本块到L1 Buffer（A1/B1）。由于输入的矩阵Shape较大，MTE2循环搬运的次数多，但每次只搬运1个基本块，导致带宽利用率低，整体的MTE2搬运耗时长。进而影响后续的MTE1和MMAD流水，导致流水之间同步等待时间偏长。如红框所示，第一个基本块（baseM\*baseN）的计算需要调用16次MMAD指令（singleCoreK/baseK=16），从左侧的第1个MMAD指令调用开始，到右侧的第16个MMAD指令调用结束，期间耗时10.899us，其中大部分是流水同步等待耗时。
 
-    ![](../../../figures/zh-cn_image_0000002411385581.png)
+    ![](../../../figures/zh-cn_image_000000241138558fig_1.png)
 
 ## 设计优化方案<a name="section6251134218311"></a>
 
 下图是默认的Norm模板的Matmul计算流水示意图，MTE2分多次从Global Memory搬运基本块到L1 Buffer（A1或B1），每次只搬运一个基本块。Norm模板的优势为启动开销小，可以提前启动MTE1流水；Norm模板的劣势为在大Shape场景，MTE2搬运次数多，搬运带宽利用率低，整体性能开销大。
 
 **图1**  默认Norm模板流水示意图<a name="fig108684561130"></a>  
-![](../../../figures/默认Norm模板流水示意图.png "默认Norm模板流水示意图")
+![](../../../figures/norm_pipe.png "默认Norm模板流水示意图")
 
 实现Norm模板的具体步骤如下：
 
@@ -99,7 +99,7 @@ Tiling参数如下：
 下图是MDL模板的Matmul计算流水示意图，MTE2一次性从Global Memory搬运多个基本块到L1 Buffer（A1或B1），每次搬运stepM \* stepKa个基本块到A1或搬运stepN \* stepKb个基本块到B1。MDL模板的优势为MTE2一次性搬运多个基本块，带宽利用率高，后续的MTE1流水能尽可能复用A1或B1的缓存数据，MTE2重复搬运次数少。MDL模板的劣势为MTE2头开销时间较长，MTE1流水需要等待MTE2流水完成后才启动，MTE1启动时间晚。
 
 **图2**  MDL模板流水示意图<a name="fig15563371352"></a>  
-![](../../../figures/MDL模板流水示意图.png "MDL模板流水示意图")
+![](../../../figures/mdl_pipe.png "MDL模板流水示意图")
 
 Matmul API开启MDL模板的完整样例请参考[开启UnitFlag功能和MDL模板的Matmul样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_unitflag)。开启MDL模板的主要步骤如下：
 
@@ -120,11 +120,11 @@ Matmul API开启MDL模板的完整样例请参考[开启UnitFlag功能和MDL模�
 
 -   优化后的Profiling数据如下，从C列的aic\_time数据可以看出，多个核中最大算子执行耗时为53.4us，相较于优化前的83.68us有较大提升。从L列的aic\_mte2\_time数据可以看出，MTE2平均耗时下降较多，从优化前的75.64us降低至46.24us。
 
-    ![](../../../figures/zh-cn_image_0000002444614873.png)
+    ![](../../../figures/zh-cn_image_000000244461487fig_3.png)
 
 -   优化后的流水图如下，MDL模板相较于默认的Norm模板，MTE2可以一次性搬运多个基本块，整体的MTE2搬运次数减少了。同时因为MTE2一次搬运多个基本块到L1 Buffer（A1/B1），后续的MTE1流水能尽量复用A1/B1的缓存数据，减少了流水同步等待，提升了算子整体性能。如红框所示，第一个基本块（baseM\*baseN）的计算需要调用16次MMAD指令（singleCoreK/baseK=16），从左侧的第1个MMAD指令调用开始，到右侧的第16个MMAD指令调用结束耗时约5.198us，较优化前的10.899us提升较大，其中流水同步等待时间大幅减少。
 
-    ![](../../../figures/zh-cn_image_0000002411385293.png)
+    ![](../../../figures/zh-cn_image_000000241138529fig_3.png)
 
 ## 总结<a name="section1593812115413"></a>
 

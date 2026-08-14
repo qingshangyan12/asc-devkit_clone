@@ -38,7 +38,7 @@ $$
 \{carry_i, dstReg_i\} = srcReg0_i + srcReg1_i + carrySrc_i
 $$
 
-![](../../../../figures/reg_addc_1.png)
+![](../../../../figures/reg_addc_fig_1.png)
 
 以int64_t类型数据计算-1 + 8 = 7为例，Add/AddC接口的适用场景如下图：
 

@@ -26,7 +26,7 @@
 
 获取输入数据x的y次幂。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816365.png)
+![](../../../figures/zh-cn_formulaimage_000000251681636fig_5.png)
 
 ## 函数原型
 

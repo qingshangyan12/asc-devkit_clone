@@ -206,7 +206,7 @@ On Ascend 950PR/Ascend 950DT, UB is divided into 16 banks and organized as 8 ban
 
 **Figure 1: UB bank structure**
 
-<img src="./figures/bank结构示意图.png">
+<img src="./figures/bank_struct.png">
 
 When the SIMT VF accesses UB, bank conflicts are finer-grained subbank conflicts. This sample mainly involves the following two types of subbank conflicts:
 

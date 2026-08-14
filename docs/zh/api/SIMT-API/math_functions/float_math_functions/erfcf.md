@@ -26,7 +26,7 @@
 
 获取输入数据的互补误差函数值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816375.png)
+![](../../../figures/zh-cn_formulaimage_000000251681637fig_5.png)
 
 ## 函数原型
 

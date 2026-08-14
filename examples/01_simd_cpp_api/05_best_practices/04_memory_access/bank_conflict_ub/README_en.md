@@ -100,7 +100,7 @@ Detailed analysis for each scenario is provided in the corresponding sections be
 
 #### UB Read/Write Illustration
 
-![scenario1](./figures/scenario1.png)
+![scenario1](./figures/scenariofig_1.png)
 
 - Every 8 green data blocks (32B) represent the data read by src0 per repeat (256B);
 - Every 8 yellow data blocks (32B) represent the data read by src1 per repeat (256B);
@@ -148,7 +148,7 @@ Detailed analysis for each scenario is provided in the corresponding sections be
 
 #### UB Read/Write Illustration
 
-![scenario3](./figures/scenario3.png)
+![scenario3](./figures/scenariofig_3.png)
 
 - Every 8 green data blocks (32B) represent the data read by src0 per repeat (256B);
 - Every 8 yellow data blocks (32B) represent the data read by src1 per repeat (256B);
@@ -174,7 +174,7 @@ Detailed analysis for each scenario is provided in the corresponding sections be
 
 #### UB Read/Write Illustration
 
-![scenario4](./figures/scenario4.png)
+![scenario4](./figures/scenariofig_4.png)
 
 - Every 8 green data blocks (32B) represent the data read by src0 per repeat (256B);
 - Every 8 yellow data blocks (32B) represent the data read by src1 per repeat (256B);
@@ -218,7 +218,7 @@ Actual result: the hardware delays dst writes by 1 repeat, staggering them with 
 
 #### UB Read/Write Illustration
 
-![scenario5](./figures/scenario5.png)
+![scenario5](./figures/scenariofig_5.png)
 
 - Every 8 green data blocks (32B) represent the data read by src0 per repeat (256B);
 - Every 8 yellow data blocks (32B) represent the data read by src1 per repeat (256B);

@@ -153,7 +153,7 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 
 ### UB Read/Write Diagram
 
-![case1](./figures/case1.png)
+![case1](./figures/casefig_1.png)
 
 ### Performance Data
 
@@ -205,7 +205,7 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 
 ### UB Read/Write Diagram
 
-![case3](./figures/case3.png)
+![case3](./figures/casefig_3.png)
 
 ### Performance Data
 
@@ -231,7 +231,7 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 
 ### UB Read/Write Diagram
 
-![case4](./figures/case4.png)
+![case4](./figures/casefig_4.png)
 
 ### Performance Data
 
@@ -255,7 +255,7 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 
 ### UB Read/Write Diagram
 
-![case5](./figures/case5.png)
+![case5](./figures/casefig_5.png)
 
 ### Performance Data
 
@@ -422,7 +422,7 @@ Same as Case 6.
 
 ### UB Read/Write Diagram
 
-![case12](./figures/case11.png)
+![case12](./figures/case1fig_1.png)
 
 ### Performance Data
 
@@ -470,7 +470,7 @@ Same as Case 6.
 
 ### UB Read/Write Diagram
 
-![case14](./figures/case13.png)
+![case14](./figures/case1fig_3.png)
 
 ### Performance Data
 
@@ -512,22 +512,22 @@ Same as Case 6.
 ├── figures/                      // UB memory layout diagrams for each case
 │   ├── ub_arch.png               // UB architecture diagram
 │   ├── ub_address.png            // UB address encoding diagram
-│   ├── case1.png
+│   ├── casefig_1.png
 │   ├── case1_trace.png           // Case1 pipeline trace
 │   ├── case2.png
-│   ├── case3.png
+│   ├── casefig_3.png
 │   ├── case3_trace.png           // Case3 pipeline trace (read-write conflict)
-│   ├── case4.png
-│   ├── case5.png
+│   ├── casefig_4.png
+│   ├── casefig_5.png
 │   ├── case6_7.png
 │   ├── case6_trace.png           // Case6 pipeline trace
 │   ├── case7_trace.png           // Case7 pipeline trace
 │   ├── case8.png
 │   ├── case9.png
 │   ├── case10.png
-│   ├── case11.png
+│   ├── case1fig_1.png
 │   ├── case12.png
-│   └── case13.png
+│   └── case1fig_3.png
 ├── README.md                     // This document
 ├── scripts/
 │   ├── gen_data.py               // Test data generation

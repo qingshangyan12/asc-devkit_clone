@@ -100,7 +100,7 @@ UB的18位地址编码遵循如下规则：
 
 #### UB读写示意
 
-![scenario1](./figures/scenario1.png)
+![scenario1](./figures/scenariofig_1.png)
 
 - 每8个绿色数据块（32B）代表src0每次repeat读取的数据（256B）；
 - 每8个黄色数据块（32B）代表src1每次repeat读取的数据（256B）；
@@ -148,7 +148,7 @@ UB的18位地址编码遵循如下规则：
 
 #### UB读写示意
 
-![scenario3](./figures/scenario3.png)
+![scenario3](./figures/scenariofig_3.png)
 
 - 每8个绿色数据块（32B）代表src0每次repeat读取的数据（256B）；
 - 每8个黄色数据块（32B）代表src1每次repeat读取的数据（256B）；
@@ -174,7 +174,7 @@ UB的18位地址编码遵循如下规则：
 
 #### UB读写示意
 
-![scenario4](./figures/scenario4.png)
+![scenario4](./figures/scenariofig_4.png)
 
 - 每8个绿色数据块（32B）代表src0每次repeat读取的数据（256B）；
 - 每8个黄色数据块（32B）代表src1每次repeat读取的数据（256B）；
@@ -218,7 +218,7 @@ UB的18位地址编码遵循如下规则：
 
 #### UB读写示意
 
-![scenario5](./figures/scenario5.png)
+![scenario5](./figures/scenariofig_5.png)
 
 - 每8个绿色数据块（32B）代表src0每次repeat读取的数据（256B）；
 - 每8个黄色数据块（32B）代表src1每次repeat读取的数据（256B）；

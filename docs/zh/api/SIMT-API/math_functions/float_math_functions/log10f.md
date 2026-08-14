@@ -26,7 +26,7 @@
 
 获取以10为底，输入数据的对数。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816341.png)
+![](../../../figures/zh-cn_formulaimage_000000251681634fig_1.png)
 
 ## 函数原型
 

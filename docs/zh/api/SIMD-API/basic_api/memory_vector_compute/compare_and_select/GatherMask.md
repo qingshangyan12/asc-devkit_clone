@@ -96,7 +96,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 **图1**  GatherMask内置固定模式计算示意图
 
-![](../../../../figures/GatherMask1.png)
+![](../../../../figures/GatherMaskfig_1.png)
 
 <!-- npu="950,A3,910b,310b,310p" id18 -->
 **图2**  GatherMask用户自定义模式计算示意图（配置方式一）
@@ -107,7 +107,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 <!-- npu="310p" id19 -->
 **图3**  GatherMask用户自定义模式计算示意图（配置方式二）
 
-![](../../../../figures/GatherMask3.png)
+![](../../../../figures/GatherMaskfig_3.png)
 <!-- end id19 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
