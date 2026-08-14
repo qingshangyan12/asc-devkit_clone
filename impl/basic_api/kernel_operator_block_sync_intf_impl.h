@@ -67,7 +67,7 @@ __aicore__ inline void SetFlag(int32_t eventID)
         if constexpr (
             event == HardEvent::MTE2_V || event == HardEvent::V_MTE2 || event == HardEvent::MTE3_V ||
             event == HardEvent::V_MTE3 || event == HardEvent::V_V || event == HardEvent::S_V ||
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
             event == HardEvent::V_S || event == HardEvent::MTE2_MTE3 || event == HardEvent::MTE3_MTE2 ||
             event == HardEvent::MTE3_S || event == HardEvent::S_MTE3) {
 #else
@@ -93,7 +93,7 @@ __aicore__ inline void WaitFlag(int32_t eventID)
         if constexpr (
             event == HardEvent::MTE2_V || event == HardEvent::V_MTE2 || event == HardEvent::MTE3_V ||
             event == HardEvent::V_MTE3 || event == HardEvent::V_V || event == HardEvent::S_V ||
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
             event == HardEvent::V_S || event == HardEvent::MTE2_MTE3 || event == HardEvent::MTE3_MTE2 ||
             event == HardEvent::MTE3_S || event == HardEvent::S_MTE3) {
 #else
@@ -120,7 +120,8 @@ __aicore__ inline void PipeBarrier()
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
-     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || \
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
 template <MemDsbT arg0>
 __aicore__ inline void DataSyncBarrier()
 {
@@ -142,7 +143,8 @@ __aicore__ inline void IBSet(
     int32_t eventID)
 {
     int32_t blockNum = GetBlockNum();
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165)
 #if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
@@ -184,7 +186,8 @@ __aicore__ inline void IBWait(
     int32_t eventID)
 {
     int32_t blockNum = GetBlockNum();
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165)
 #if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
@@ -239,7 +242,7 @@ __aicore__ inline void SyncAll(
 #endif
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165)
 template <bool isAIVOnly, const SyncAllConfig& config>
 __aicore__ inline void SyncAll()
 {
@@ -265,7 +268,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     WaitEventImpl<modeId, pipe>(flagId);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165)
 template <pipe_t pipe, uint8_t subBlockSyncMode = 2>
 __aicore__ inline void NotifyEvent(uint16_t flagId)
 {

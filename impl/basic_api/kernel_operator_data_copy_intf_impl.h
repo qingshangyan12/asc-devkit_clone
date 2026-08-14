@@ -1683,7 +1683,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
 template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
@@ -1701,8 +1701,13 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     const uint8_t cacheMode = ExtractCacheMode(dst);
     if (srcHWPos == Hardware::UB) {
+#if (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+        DataCopyPadUB2GMImpl<T, mode>(
+            (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);
+#else
         DataCopyPadUB2GMImpl<T, mode>(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, cacheMode);
+#endif
     } else {
         ASCENDC_CHECK_TPOSITION(
             false, "src", "UB(VECIN/VECOUT)", "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams",
@@ -1725,9 +1730,9 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         dst, src, dataCopyParams, "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams");
 #endif
 #endif
-    // if ASCEND_IS_AIC { // chengn
-    //     return;
-    // }
+    if ASCEND_IS_AIC { // chengn
+        return;
+    }
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams)));
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     if (srcHWPos == Hardware::UB) {
