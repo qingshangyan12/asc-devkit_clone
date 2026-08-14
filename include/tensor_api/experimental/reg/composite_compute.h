@@ -21,20 +21,20 @@
 namespace asc {
 namespace te {
 
-template <typename T, typename Scalar>
-__simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src, Scalar scalar);
+template <typename T, typename scalar_type>
+__simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src, scalar_type scalar);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) absdiff(reg_tensor<T> src0, reg_tensor<T> src1);
 
-template <reg_layout Layout = reg_layout::zero, typename T>
+template <reg_layout layout = reg_layout::zero, typename T>
 __simd_callee__ inline decltype(auto) exp_sub(reg_tensor<T> src0, reg_tensor<T> src1);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) fma(
     reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<T> src2);
 
-template <reg_layout Layout = reg_layout::zero>
+template <reg_layout layout = reg_layout::zero>
 __simd_callee__ inline decltype(auto) muls_cast(reg_tensor<float> src, float scalar);
 
 } // namespace te
