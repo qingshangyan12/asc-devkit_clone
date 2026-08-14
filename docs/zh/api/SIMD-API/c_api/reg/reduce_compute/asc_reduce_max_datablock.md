@@ -26,22 +26,13 @@
 
 ## 功能说明
 
-根据mask将每个DataBlock(32B)中的最大值依次保存在dst中的最低位。参考伪代码：
+根据`mask`对每个`DataBlock`（32B）内的元素求最大值，并将各`DataBlock`的结果依次写入`dst`的低位。计算公式如下：
 
-```python
-def asc_reduce_max_datablock(dst, src, mask):
-    num_blocks = 8                      # 128元素 / 16元素每块 = 8块
-    elems_per_block = 16                # 32B / 2B(half) = 16
-    for b in range(num_blocks):
-        max_val = float('-inf')
-        for j in range(elems_per_block):
-            i = b * elems_per_block + j
-            if mask[i] and src[i] > max_val:
-                max_val = src[i]
-        dst[b] = max_val                # 每块最大值连续写入dst低位
-    for i in range(num_blocks, 128):
-        dst[i] = 0                      # 其余位置置0
-```
+$$
+dst_k = \max\{src_i \mid kB \le i < (k + 1)B,\ mask_i = 1\}
+$$
+
+其中，$k$表示`DataBlock`的索引，$B$为一个`DataBlock`内的元素个数。
 
 ## 函数原型
 
@@ -53,14 +44,14 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_<dtype>& dst,
                                                      vector_bool mask)
 ```
 
-#### dtype支持数据类型
+### dtype支持的数据类型
 
-dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`
+`dtype`支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
 ```c
-// 示例：half类型最大值归约
+// 示例：对half类型的矢量数据寄存器按DataBlock执行归约最大值操作。
 __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst,
                                                      vector_half src,
                                                      vector_bool mask)
@@ -72,9 +63,9 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述                                     |
 | ------ | --------- | ---------------------------------------- |
-| dst    | 输出      | 目的操作数（矢量数据寄存器）。           |
-| src    | 输入      | 源操作数（矢量数据寄存器）。             |
-| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
+| `dst`  | 输出      | 目的操作数（矢量数据寄存器）。           |
+| `src`  | 输入      | 源操作数（矢量数据寄存器）。             |
+| `mask` | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -84,14 +75,23 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst,
 
 ## 约束说明
 
-### 通用约束
-
-- dst与src的数据类型需要保持一致。
-- 找到源操作数中每个DataBlock内的最大值，连续写入到目的操作数，目的操作数中的其它元素置0。
-- 未被mask选中的元素被视为最小值（浮点数为-inf），如果一个DataBlock中所有元素都未被mask选中，最小值（浮点数为-inf）将被填充到目的操作数的指定位置。
-- 仅输出最值，不输出索引下标。
+- `dst`与`src`的数据类型需要保持一致。
+- 每个`DataBlock`内的最大值连续写入`dst`，`dst`中的其他元素置0。
+- 未被`mask`选中的元素被视为对应数据类型的最小值，浮点数类型的最小值为`-inf`。如果一个`DataBlock`中的所有元素均未被`mask`选中，则将该最小值写入`dst`的对应位置。
+- 仅输出最大值，不输出索引。
 
 ## 调用示例
+
+将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+"$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 \
+  -Wno-deprecated-declarations --asc-aicore-lang example.asc -lm -o main && ./main
+```
+<!-- end id8 -->
 
 ```cpp
 #include <cstdint>

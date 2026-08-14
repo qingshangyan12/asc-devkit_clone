@@ -26,22 +26,7 @@
 
 ## 功能说明
 
-根据mask对源操作数src进行归约最大值操作：将src中的最大值写入目的操作数dst的0位置，最大值在src中的索引写入目的操作数dst的1位置，dst的其他位置将被置为0，如果有多个最大值，第二个数为最小的下标，其余值都将被填充为0。参考伪代码：
-```python
-def asc_reduce_max(dst, src, mask):
-    max_val = float('-inf')
-    max_idx = 0
-    for i in range(128):
-        if mask[i] and src[i] > max_val:
-            max_val = src[i]
-            max_idx = i
-    dst[0] = max_val                    # 最大值
-    dst_bits[1] = unsigned_bits(max_idx) # 写入索引的原始位模式
-    for i in range(2, 128):
-        dst[i] = 0                      # 其余位置置0
-```
-
-计算公式如下：
+根据`mask`对源操作数`src`进行归约最大值操作，将最大值写入目的操作数`dst`的第0个元素，将最大值在`src`中的索引原始位模式写入`dst`的第1个元素，并将`dst`中的其他元素置0。如果存在多个最大值，则写入最小的索引。计算公式如下：
 
 $$
 dst_0 = \max\{src_i \mid mask_i = 1\} \\
@@ -58,13 +43,14 @@ __simd_callee__ inline void asc_reduce_max(vector_<dtype>& dst,
                                            vector_bool mask)
 ```
 
-#### dtype支持数据类型
+### dtype支持的数据类型
 
-dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`
+`dtype`支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
 ```c
+// 示例：对int16_t类型的矢量数据寄存器执行归约最大值操作。
 __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
                                            vector_int16_t src,
                                            vector_bool mask)
@@ -76,9 +62,9 @@ __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
 
 | 参数名 | 输入/输出 | 描述                                     |
 | ------ | --------- | ---------------------------------------- |
-| dst    | 输出      | 目的操作数（矢量数据寄存器）。           |
-| src    | 输入      | 源操作数（矢量数据寄存器）。             |
-| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
+| `dst`  | 输出      | 目的操作数（矢量数据寄存器）。           |
+| `src`  | 输入      | 源操作数（矢量数据寄存器）。             |
+| `mask` | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -88,23 +74,57 @@ __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
 
 ## 约束说明
 
-### 通用约束
-
-- 未被mask选中的元素被视为最小值（浮点数为-inf），如果一个repeat中所有元素都未被mask选中，最小值（浮点数为-inf）将被填充到目的操作数的第一个数，其余值都将被填充为0（包括下标）。
-- 在比较中，遵循max(-0, +0) = +0。
-- 如果输入数据存在nan，将nan写入目的操作数的第一个数，将第一个nan值的下标写入目的操作数的第二个数。
+- 未被`mask`选中的元素被视为对应数据类型的最小值，浮点数类型的最小值为`-inf`。如果`src`中的所有元素均未被`mask`选中，则将该最小值写入`dst`的第0个元素，并将其余元素置0。
+- 比较时遵循$max(-0, +0) = +0$。
+- 如果输入数据中存在nan，则将nan写入`dst`的第0个元素，并将第一个nan的索引写入`dst`的第1个元素。
 
 ## 关键特性
 
 **索引值需要强制类型转换**：
 
-索引不是dst数据类型的数值，而是按dst元素位宽保存的无符号整数原始位模式。读取`int16_t`、`uint16_t`或`half`结果中的索引时，应按`uint16_t`位模式解释；读取`int32_t`、`uint32_t`或`float`结果中的索引时，应按`uint32_t`位模式解释。
+提取索引时，索引值不是`dst`数据类型的数值，而是按`dst`元素位宽保存的无符号整数原始位模式。读取`int16_t`、`uint16_t`或`half`结果中的索引时，应按`uint16_t`位模式解释；读取`int32_t`、`uint32_t`或`float`结果中的索引时，应按`uint32_t`位模式解释。提取值与索引可以参考以下代码片段：
+```cpp
+__simd_vf__ inline void reduce_max_vf(
+    __ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t count)
+{
+    vector_half src, dst;
+    vector_bool mask = asc_update_mask_b16(count);
+    asc_loadalign(src, src_addr);
+    asc_reduce_max(dst, src, mask);
+    asc_storealign(dst_addr, dst, mask);
+}
 
-**提取结果（值+索引）：**
-
-归约产生两个有效结果，需要分别提取。
+__global__ __vector__ void reduce_max_kernel(
+    __gm__ uint8_t* src, __gm__ uint8_t* value_result, __gm__ uint8_t* index_result)
+{
+    asc_init();
+    __ubuf__ half src_local[KEY_FEATURE_COUNT];
+    __ubuf__ half dst_local[KEY_FEATURE_COUNT];
+    __ubuf__ half value_local[KEY_FEATURE_RESULT_COUNT];
+    __ubuf__ uint16_t index_local[KEY_FEATURE_RESULT_COUNT];
+    asc_copy_gm2ub(src_local, (__gm__ half*)src, KEY_FEATURE_BYTES);
+    asc_sync();
+    uint32_t count = KEY_FEATURE_COUNT;
+    reduce_max_vf(dst_local, src_local, count);
+    asc_sync();
+    half max_value = dst_local[0];
+    half index_bits = dst_local[1];
+    uint16_t max_index = *reinterpret_cast<uint16_t*>(&index_bits);
+}
+```
 
 ## 调用示例
+
+将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+"$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 \
+  -Wno-deprecated-declarations --asc-aicore-lang example.asc -lm -o main && ./main
+```
+<!-- end id8 -->
 
 ```cpp
 #include <cstdint>
