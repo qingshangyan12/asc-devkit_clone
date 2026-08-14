@@ -90,6 +90,8 @@ def split_json_files(
 
     op_type = binary_json.get("op_type")
     op_list = binary_json.get("op_list", list())
+    op_list_num = len(op_list)
+
     generated_files = []
 
     for idx, op in enumerate(op_list):
