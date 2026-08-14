@@ -18,8 +18,6 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_GET_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_GET_H
 
-#include <cstdint>
-
 #include "c_api/asc_simd.h"
 
 namespace asc {

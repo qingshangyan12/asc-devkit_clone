@@ -16,9 +16,6 @@
 #ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_H
 #define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_H
 
-#include <cstddef>
-#include <cstdint>
-
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/utils/utils.h"
 
