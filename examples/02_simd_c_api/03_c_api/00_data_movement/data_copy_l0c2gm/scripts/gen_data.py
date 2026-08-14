@@ -86,7 +86,10 @@ SAVE_DTYPE = {
 
 def decode_quant_pre(quant_pre):
     quant_pre = int(quant_pre)
-    alpha_bits = (quant_pre >> 13) & 0xFFFFF
+    # Per documentation: clear lower 13 bits of quantization parameter's mantissa
+    alpha_raw = quant_pre & 0xFFFFFFFF
+    alpha_raw = alpha_raw & 0xFFFFE000  # zero bits [12:0] (lower 13 mantissa bits)
+    alpha_bits = (alpha_raw >> 13) & 0xFFFFF
     sign_bit = (alpha_bits >> 18) & 0x1
     exponent = (alpha_bits >> 10) & 0xFF
     mantissa = alpha_bits & 0x3FF
@@ -584,8 +587,10 @@ def make_quant_params(output_type):
     """Build quant parameter tensor with alpha=2.0 for all N columns.
 
     Bit 46 (sign) is set for signed output types, cleared for unsigned.
+    Lower 13 bits of alpha mantissa are cleared per documentation.
     """
     alpha_bits = struct.unpack("!I", struct.pack("!f", 2.0))[0]
+    alpha_bits = alpha_bits & 0xFFFFE000  # clear lower 13 mantissa bits
     sign_bit = 0x400000000000 if output_type != 'uint8' else 0
     return np.full(N, np.uint64(alpha_bits | sign_bit), dtype=np.uint64)
 
