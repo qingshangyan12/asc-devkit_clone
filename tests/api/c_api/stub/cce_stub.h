@@ -636,7 +636,7 @@ inline void rls_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
 inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
 
 #if defined(__DAV_VEC__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "instr_impl/npu_arch_3510/utils_impl/utils_type.h"
+#include "c_api/defs/type.h"
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint16_t*& dst) {}
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
 #endif

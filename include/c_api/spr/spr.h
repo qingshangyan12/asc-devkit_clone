@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -8,22 +8,33 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "spr/spr.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/c_api/c_api_instr_impl/utils_c_api_impl/utils_c_api_type.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
 #endif
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_UTILS_C_API_TYPE_H
-#define IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_UTILS_C_API_TYPE_H
+#ifndef INCLUDE_C_API_SPR_SPR_H
+#define INCLUDE_C_API_SPR_SPR_H
 
-#include "impl/utils/sys_macros.h"
 #include "impl/utils/common_types.h"
+#include "c_api/defs/defs.h"
+#include "c_api/defs/type.h"
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
+#endif
+
+__simd_callee__ inline vector_bool asc_get_mask_spr_b16();
+
+__simd_callee__ inline vector_bool asc_get_mask_spr_b32();
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
 #endif

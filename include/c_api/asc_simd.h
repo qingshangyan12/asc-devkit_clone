@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -20,26 +20,35 @@
 #ifndef INCLUDE_C_API_ASC_SIMD_H
 #define INCLUDE_C_API_ASC_SIMD_H
 
-#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
+#include "c_api/defs/defs.h"
 #include "utils/base/helpers.h"
-
 #include "c_api/atomic/atomic.h"
 #include "c_api/cache_ctrl/cache_ctrl.h"
 #include "c_api/cube_compute/cube_compute.h"
 #include "c_api/cube_datamove/cube_datamove.h"
-#include "c_api/misc/misc.h"
+#include "c_api/utils/sys_init.h"
 #include "c_api/scalar_compute/scalar_compute.h"
 #include "c_api/sync/sync.h"
-#include "c_api/sys_var/sys_var.h"
+#include "c_api/utils/sys_var.h"
 #include "c_api/vector_datamove/vector_datamove.h"
 #include "c_api/vector_compute/vector_compute.h"
 
 #if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
-#include "c_api/reg_compute/reg_convert.h"
-#include "c_api/reg_compute/reg_load.h"
-#include "c_api/reg_compute/reg_store.h"
-#include "c_api/reg_compute/reg_vector.h"
-
+#include "c_api/reg_compute/reg_compute.h"
+#include "c_api/reg_compute/load/loadalign.h"
+#include "c_api/reg_compute/load/loadunalign.h"
+#include "c_api/reg_compute/gather/ub_gather_.h"
+#include "c_api/reg_compute/compute/reg_gather.h"
+#include "c_api/reg_compute/scatter/ub_scatter.h"
+#include "c_api/spr/spr.h"
+#include "c_api/reg_compute/store/storealign.h"
+#include "c_api/reg_compute/store/storeunalign.h"
+#include "c_api/composite/loadunalign.h"
+#include "c_api/composite/storeunalign.h"
+#include "utils/debug/asc_assert.h"
+#include "utils/debug/asc_dump.h"
+#include "utils/debug/asc_printf.h"
+#include "utils/debug/asc_time.h"
 #endif
 
 #endif
