@@ -5,7 +5,7 @@
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-# See LICENSE in the root of the software repository for the full text of the License.
+# See LICENSE in the root of the software repository for the full text of the license.
 # ----------------------------------------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.16)
@@ -14,17 +14,17 @@ set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
 if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
-    message(FATAL_ERROR "reg_compute_tensor_api only supports CMAKE_ASC_ARCHITECTURES=dav-3510")
+    message(FATAL_ERROR "composite_compute_tensor_api only supports dav-3510")
 endif()
 
 find_package(ASC REQUIRED)
-project(reg_compute_tensor_api LANGUAGES ASC CXX)
+project(composite_compute_tensor_api LANGUAGES ASC CXX)
 
-add_executable(demo reg_compute_tensor_api.asc)
-
-set(ASCEND_HOME "$ENV{ASCEND_HOME_PATH}")
-target_include_directories(demo PRIVATE "${ASCEND_HOME}/asc/")
-
+add_executable(demo composite_compute_tensor_api.asc)
+target_include_directories(demo PRIVATE
+    "$ENV{ASCEND_HOME_PATH}/asc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/.."
+)
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )

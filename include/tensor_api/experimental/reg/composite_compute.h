@@ -21,26 +21,25 @@
 namespace asc {
 namespace te {
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> axpy(
-    reg_tensor<T> dst, reg_tensor<T> src, detail::type_identity_t<T> scalar);
+template <typename T, typename Scalar>
+__simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src, Scalar scalar);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> abs_sub(reg_tensor<T> src0, reg_tensor<T> src1);
+__simd_callee__ inline decltype(auto) abs_sub(reg_tensor<T> src0, reg_tensor<T> src1);
 
 template <reg_layout Layout = reg_layout::zero, typename T>
-__simd_callee__ inline reg_tensor<float> exp_sub(reg_tensor<T> src0, reg_tensor<T> src1);
+__simd_callee__ inline decltype(auto) exp_sub(reg_tensor<T> src0, reg_tensor<T> src1);
+
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) mul_dst_add(
+    reg_tensor<T> dst, reg_tensor<U> src0, reg_tensor<U> src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> mul_dst_add(
-    reg_tensor<T> dst, reg_tensor<T> src0, reg_tensor<T> src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> mul_add_dst(
+__simd_callee__ inline decltype(auto) mul_add_dst(
     reg_tensor<T> dst, reg_tensor<T> src0, reg_tensor<T> src1);
 
 template <reg_layout Layout = reg_layout::zero>
-__simd_callee__ inline reg_tensor<half> muls_cast(reg_tensor<float> src, float scalar);
+__simd_callee__ inline decltype(auto) muls_cast(reg_tensor<float> src, float scalar);
 
 } // namespace te
 } // namespace asc
