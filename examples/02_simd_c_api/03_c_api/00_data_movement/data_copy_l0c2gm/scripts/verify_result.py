@@ -16,14 +16,6 @@ import sys
 import numpy as np
 
 
-RELATIVE_TOL = 1e-3
-ABSOLUTE_TOL = 1e-6
-ERROR_TOL = 1e-3
-# VQF322F32_PRE uses processor float32 (10 mantissa bits), precision ~2/1000.
-F32_RELATIVE_TOL = 2e-3
-F32_ABSOLUTE_TOL = 1e-6
-
-
 # scenario_num -> output_type
 #   'half'        -> np.float16
 #   'int8'        -> np.int8
@@ -76,27 +68,24 @@ def verify_result(scenario_num, output_path, golden_path):
         )
         return False
 
-    if output_type == 'float':
-        match = np.isclose(
-            output, golden, rtol=F32_RELATIVE_TOL, atol=F32_ABSOLUTE_TOL, equal_nan=True
-        )
-    elif output_type in ('half', 'bfloat16'):
-        if output_type == 'bfloat16':
-            output_cmp = (output.astype(np.uint32) << 16).view(np.float32)
-            golden_cmp = (golden.astype(np.uint32) << 16).view(np.float32)
-        else:
-            output_cmp = output
-            golden_cmp = golden
-        match = np.isclose(
-            output_cmp, golden_cmp, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True
-        )
-    elif output_type in ('fp8_e4m3fn', 'hifloat8'):
-        match = np.isclose(
-            output.astype(np.float64), golden.astype(np.float64),
-            rtol=0, atol=1, equal_nan=True
-        )
+    # Tolerance standards follow the basic_api fixpipe example.
+    if output_type in ('float', 'half', 'bfloat16'):
+        relative_tol = 1e-3
+        absolute_tol = 1e-6
+        error_tol = 1e-3
+    elif output_type in ('int8', 'int4b', 'fp8_e4m3fn', 'hifloat8'):
+        relative_tol = 0
+        absolute_tol = 1
+        error_tol = 1e-4
     else:
-        match = (output == golden)
+        relative_tol = 1e-6
+        absolute_tol = 1e-9
+        error_tol = 1e-4
+
+    match = np.isclose(
+        output.astype(np.float64), golden.astype(np.float64),
+        rtol=relative_tol, atol=absolute_tol, equal_nan=True
+    )
 
     mismatch_indices = np.where(~match)[0]
     for index in mismatch_indices[:101]:
@@ -105,7 +94,7 @@ def verify_result(scenario_num, output_path, golden_path):
             % (index, golden[index], output[index])
         )
     error_ratio = float(mismatch_indices.size) / golden.size
-    return error_ratio <= ERROR_TOL
+    return error_ratio <= error_tol
 
 
 if __name__ == "__main__":
