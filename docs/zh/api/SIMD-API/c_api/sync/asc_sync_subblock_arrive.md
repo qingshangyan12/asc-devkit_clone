@@ -68,7 +68,7 @@ PIPE_S
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`声明核函数。Host侧通过`numBlocks`设置启动1个AI Core；Kernel侧通过[asc_get_sub_block_num](../sys_var/asc_get_sub_block_num.md)获取该AI Core内的AIV数，通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)获取当前AIV的ID。两个AIV分别将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_subblock_arrive`。两个AIV在MTE2流水上调用`asc_sync_subblock_wait`，等待彼此均到达同步点。同步完成后，由AIV0读取并输出两个AIV生成的数据。
+本示例采用`__mix__(1, 2)`声明核函数，同一group内包含2个AIV。两个AIV分别将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_subblock_arrive`。两个AIV在MTE2流水上调用`asc_sync_subblock_wait`，等待彼此均到达同步点。同步完成后，由AIV0读取并输出两个AIV生成的数据。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 

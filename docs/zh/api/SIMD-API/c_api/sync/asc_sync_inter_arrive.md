@@ -73,7 +73,7 @@ PIPE_S
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`声明核函数，并通过`__schedmode__(1)`开启batch mode。Host侧通过`numBlocks`设置启动2个AI Core；Kernel侧通过[asc_get_block_num](../sys_var/asc_get_block_num.md)获取AI Core数，通过[asc_get_sub_block_num](../sys_var/asc_get_sub_block_num.md)获取每个AI Core内的AIV数，通过[asc_get_block_idx](../sys_var/asc_get_block_idx.md)获取当前AI Core的索引，通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)获取当前AIV的ID，从而计算每个AIV的全局索引。每个AIV先将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_inter_arrive`。各AIV在MTE2流水上调用`asc_sync_inter_wait`，等待所有AIV均到达同步点。同步完成后，由AIV0读取并输出全部AIV生成的数据。
+本示例采用`__mix__(1, 2)`声明核函数，并通过`__schedmode__(1)`开启batch mode。核函数启动2个group，共包含4个AIV。每个AIV先将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_inter_arrive`。各AIV在MTE2流水上调用`asc_sync_inter_wait`，等待所有AIV均到达同步点。同步完成后，由AIV0读取并输出全部AIV生成的数据。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
