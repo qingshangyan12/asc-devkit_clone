@@ -10,8 +10,10 @@
 
 #include <gtest/gtest.h>
 
+#include <atomic>
+#include <cstdlib>
+#include <new>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -21,6 +23,26 @@
 #define main AscCompileExporterProgramMain
 #include "asc_compile_exporter.cpp"
 #undef main
+
+namespace {
+std::atomic<bool> g_failNextAllocation{false};
+}
+
+void* operator new(std::size_t size)
+{
+    if (g_failNextAllocation.exchange(false)) {
+        throw std::bad_alloc();
+    }
+    void* allocation = std::malloc(size == 0U ? 1U : size);
+    if (allocation == nullptr) {
+        throw std::bad_alloc();
+    }
+    return allocation;
+}
+
+void operator delete(void* allocation) noexcept { std::free(allocation); }
+
+void operator delete(void* allocation, std::size_t) noexcept { std::free(allocation); }
 
 namespace {
 
@@ -79,7 +101,7 @@ int RunCommand(std::vector<std::string> arguments)
     for (std::string& argument : arguments) {
         argv.push_back(const_cast<char*>(argument.c_str()));
     }
-    return ::Run(static_cast<int>(argv.size()), argv.data());
+    return RunWithExceptionHandling(static_cast<int>(argv.size()), argv.data());
 }
 
 int RunProgramCommand(std::vector<std::string> arguments)
@@ -102,8 +124,6 @@ size_t CountOccurrences(const std::string& text, const std::string& value)
     }
     return count;
 }
-
-int ThrowingRun(int, char**) { throw std::runtime_error("test exception"); }
 
 TEST(CompileExporterCliUnitTest, ParseJobsAcceptsOnlyPositiveUint32Values)
 {
@@ -321,8 +341,15 @@ TEST(CompileExporterCliUnitTest, HelpOptionsPrintUsageToStdoutAndExitSuccessfull
 TEST(CompileExporterCliUnitTest, ProgramMainDirectsUsersToPlogAfterException)
 {
     CerrCapture capture;
+    std::vector<std::string> arguments = {"asc_compile_exporter", std::string(1024U, 'x')};
+    std::vector<char*> argv;
+    argv.reserve(arguments.size());
+    for (std::string& argument : arguments) {
+        argv.push_back(const_cast<char*>(argument.c_str()));
+    }
 
-    EXPECT_EQ(RunWithExceptionHandling(0, nullptr, ThrowingRun), 1);
+    g_failNextAllocation = true;
+    EXPECT_EQ(RunWithExceptionHandling(static_cast<int>(argv.size()), argv.data()), 1);
     EXPECT_EQ(CountOccurrences(capture.Content(), "Compilation failed. Please check plog for details."), 1U);
 }
 

@@ -13,14 +13,21 @@
 #include <functional>
 #include <string>
 
+#include <unistd.h>
+
+#include "file_utils.h"
 #include "nlohmann/json.hpp"
 #include "resource_manifest_validator.h"
+#include "test_support.h"
 
 namespace ascendc {
+namespace manifest_generator {
 namespace {
 
 using Json = nlohmann::json;
 using ManifestMutation = std::function<void(Json&)>;
+using asc_compile_exporter_test::ModuleTest;
+using asc_compile_exporter_test::WriteTestFile;
 
 Json MakeValidManifest()
 {
@@ -35,7 +42,7 @@ Json MakeValidManifest()
         {"type", "compile"},
         {"stage", Json::number_unsigned_t(0U)},
         {"cmd", Json::array(
-                    {"${options:common_compile}", "${source_dir}/kernel.cpp", "${resource}/resources/weight.bin",
+                    {"${options:common_compile}", "${source_file_path}", "${resource}/resources/weight.bin",
                      "${env:ASCEND_HOME_PATH}/include", "${source_file_path}", "${output}/kernel.o"})},
     };
     Json object = {
@@ -69,29 +76,40 @@ Json& Command(Json& manifest) { return Object(manifest)["commands"][0U]; }
 
 Json& Constant(Json& manifest) { return Kernel(manifest)["constant_infos"][0U]; }
 
-void ExpectInvalid(const char* scenario, const ManifestMutation& mutate)
-{
-    SCOPED_TRACE(scenario);
-    Json manifest = MakeValidManifest();
-    mutate(manifest);
-    EXPECT_FALSE(ValidateResourceManifest(manifest, scenario));
-}
+class ResourceManifestValidatorTest : public ModuleTest {
+protected:
+    void SetUp() override
+    {
+        ModuleTest::SetUp();
+        manifestPath_ = FileUtils::JoinPath(root_, "test_manifest.json");
+        WriteTestFile(FileUtils::JoinPath(root_, "resources/weight.bin"), "weight");
+        ASSERT_TRUE(FileUtils::CreateDirectories(FileUtils::JoinPath(root_, "resources/include")));
+    }
 
-TEST(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
+    bool Validate(const Json& manifest) const { return ValidateResourceManifest(manifest, manifestPath_); }
+
+    void ExpectInvalid(const char* scenario, const ManifestMutation& mutate) const
+    {
+        SCOPED_TRACE(scenario);
+        Json manifest = MakeValidManifest();
+        mutate(manifest);
+        EXPECT_FALSE(Validate(manifest));
+    }
+
+    std::string manifestPath_;
+};
+
+TEST_F(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
 {
-    EXPECT_TRUE(ValidateResourceManifest(MakeValidManifest(), "complete.json"));
+    EXPECT_TRUE(Validate(MakeValidManifest()));
 
     Json skManifest = MakeValidManifest();
     Object(skManifest)["object_type"] = "sk";
-    EXPECT_TRUE(ValidateResourceManifest(skManifest, std::string()));
-
-    Json customObjectType = MakeValidManifest();
-    Object(customObjectType)["object_type"] = "custom";
-    EXPECT_TRUE(ValidateResourceManifest(customObjectType, "custom-object-type.json"));
+    EXPECT_TRUE(Validate(skManifest));
 
     Json embeddedOutput = MakeValidManifest();
     Command(embeddedOutput)["cmd"].back() = "-o${output}/kernel.o";
-    EXPECT_TRUE(ValidateResourceManifest(embeddedOutput, "embedded-output.json"));
+    EXPECT_TRUE(Validate(embeddedOutput));
 
     Json minimal = MakeValidManifest();
     minimal.erase("source_file");
@@ -99,21 +117,27 @@ TEST(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
     minimal.erase("options");
     Kernel(minimal).erase("constant_infos");
     Kernel(minimal).erase("link_options");
-    Command(minimal)["cmd"] =
-        Json::array({"${source_dir}/kernel.cpp", "${env:ASCEND_HOME_PATH}/include", "${output}/kernel.o"});
-    EXPECT_TRUE(ValidateResourceManifest(minimal, "minimal.json"));
+    Command(minimal)["cmd"] = Json::array({"kernel.cpp", "${env:ASCEND_HOME_PATH}/include", "${output}/kernel.o"});
+    EXPECT_TRUE(Validate(minimal));
 
     Json noCommonCompile = MakeValidManifest();
     noCommonCompile["options"] = Json::object();
     Command(noCommonCompile)["cmd"].erase(Command(noCommonCompile)["cmd"].begin());
-    EXPECT_TRUE(ValidateResourceManifest(noCommonCompile, "no-common-options.json"));
+    EXPECT_TRUE(Validate(noCommonCompile));
 
     Json emptyCommonCompile = noCommonCompile;
     emptyCommonCompile["options"]["common_compile"] = Json::array();
-    EXPECT_TRUE(ValidateResourceManifest(emptyCommonCompile, "empty-common-options.json"));
+    EXPECT_TRUE(Validate(emptyCommonCompile));
+
+    Json namedOptions = MakeValidManifest();
+    namedOptions["options"]["custom_compile"] =
+        Json::array({"${env:CUSTOM_INCLUDE}/include", "${source_file_path}", "-I${resource}/resources/include"});
+    Command(namedOptions)["cmd"][0U] = "${options:custom_compile}";
+    Command(namedOptions)["cmd"].insert(Command(namedOptions)["cmd"].begin() + 1U, "${options:custom_compile}");
+    EXPECT_TRUE(Validate(namedOptions));
 }
 
-TEST(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
+TEST_F(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
 {
     ExpectInvalid("manifest is not an object", [](Json& manifest) { manifest = Json::array(); });
     ExpectInvalid("missing schema_version", [](Json& manifest) { manifest.erase("schema_version"); });
@@ -130,7 +154,7 @@ TEST(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
     ExpectInvalid("kernels is empty", [](Json& manifest) { manifest["kernels"] = Json::array(); });
 }
 
-TEST(ResourceManifestValidatorTest, ValidatesManifestPathsAndCommonOptions)
+TEST_F(ResourceManifestValidatorTest, ValidatesManifestPathsAndCommonOptions)
 {
     ExpectInvalid("source_file has wrong type", [](Json& manifest) { manifest["source_file"] = 1U; });
     ExpectInvalid(
@@ -150,7 +174,7 @@ TEST(ResourceManifestValidatorTest, ValidatesManifestPathsAndCommonOptions)
     });
 }
 
-TEST(ResourceManifestValidatorTest, ValidatesMarkersAndReferencedPaths)
+TEST_F(ResourceManifestValidatorTest, ValidatesMarkersAndReferencedPaths)
 {
     ExpectInvalid("command contains embedded NUL", [](Json& manifest) {
         Command(manifest)["cmd"][1U] = std::string("prefix\0suffix", 13U);
@@ -171,6 +195,20 @@ TEST(ResourceManifestValidatorTest, ValidatesMarkersAndReferencedPaths)
         Command(manifest)["cmd"][1U] = "${resource}/outside/file.cpp";
     });
     ExpectInvalid("resource marker with empty resource_path", [](Json& manifest) { manifest["resource_path"] = ""; });
+    ExpectInvalid("resource target is missing", [](Json& manifest) {
+        Command(manifest)["cmd"][1U] = "${resource}/resources/missing.bin";
+    });
+    const std::string symlinkTarget = FileUtils::JoinPath(root_, "resource-target.bin");
+    const std::string symlinkPath = FileUtils::JoinPath(root_, "resources/resource-link.bin");
+    WriteTestFile(symlinkTarget, "target");
+    ASSERT_EQ(symlink(symlinkTarget.c_str(), symlinkPath.c_str()), 0);
+    ExpectInvalid("resource target is a symlink", [&symlinkPath](Json& manifest) {
+        Command(manifest)["cmd"][1U] = "${resource}/resources/" + FileUtils::FileName(symlinkPath);
+    });
+    ExpectInvalid("source_file_path requires source_file", [](Json& manifest) { manifest.erase("source_file"); });
+    ExpectInvalid("environment marker name is invalid", [](Json& manifest) {
+        Command(manifest)["cmd"][3U] = "${env:INVALID-NAME}/include";
+    });
     ExpectInvalid("output has no relative path", [](Json& manifest) { Command(manifest)["cmd"].back() = "${output}"; });
     ExpectInvalid("output contains another marker", [](Json& manifest) {
         Command(manifest)["cmd"].back() = "${output}/${source_dir}/kernel.o";
@@ -179,7 +217,7 @@ TEST(ResourceManifestValidatorTest, ValidatesMarkersAndReferencedPaths)
         "output path traverses", [](Json& manifest) { Command(manifest)["cmd"].back() = "${output}/../kernel.o"; });
 }
 
-TEST(ResourceManifestValidatorTest, ValidatesConstants)
+TEST_F(ResourceManifestValidatorTest, ValidatesConstants)
 {
     ExpectInvalid(
         "constant is not an object", [](Json& manifest) { Kernel(manifest)["constant_infos"][0U] = "weight"; });
@@ -207,7 +245,7 @@ TEST(ResourceManifestValidatorTest, ValidatesConstants)
     });
 }
 
-TEST(ResourceManifestValidatorTest, ValidatesKernelStructure)
+TEST_F(ResourceManifestValidatorTest, ValidatesKernelStructure)
 {
     ExpectInvalid("kernel is not an object", [](Json& manifest) { manifest["kernels"][0U] = "kernel"; });
     ExpectInvalid("kernel name is missing", [](Json& manifest) { Kernel(manifest).erase("kernel_name"); });
@@ -223,7 +261,7 @@ TEST(ResourceManifestValidatorTest, ValidatesKernelStructure)
     ExpectInvalid("kernel name is duplicated", [](Json& manifest) { manifest["kernels"].push_back(Kernel(manifest)); });
 }
 
-TEST(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
+TEST_F(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
 {
     ExpectInvalid("object is not an object", [](Json& manifest) { Kernel(manifest)["objects"][0U] = "object"; });
     ExpectInvalid("object name is missing", [](Json& manifest) { Object(manifest).erase("object_name"); });
@@ -231,6 +269,7 @@ TEST(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
     ExpectInvalid("object name is empty", [](Json& manifest) { Object(manifest)["object_name"] = ""; });
     ExpectInvalid("object type is missing", [](Json& manifest) { Object(manifest).erase("object_type"); });
     ExpectInvalid("object type has wrong type", [](Json& manifest) { Object(manifest)["object_type"] = 1U; });
+    ExpectInvalid("object type is unsupported", [](Json& manifest) { Object(manifest)["object_type"] = "custom"; });
     ExpectInvalid("commands is missing", [](Json& manifest) { Object(manifest).erase("commands"); });
     ExpectInvalid("commands has wrong type", [](Json& manifest) { Object(manifest)["commands"] = Json::object(); });
     ExpectInvalid("commands is empty", [](Json& manifest) { Object(manifest)["commands"] = Json::array(); });
@@ -249,7 +288,7 @@ TEST(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
     });
 }
 
-TEST(ResourceManifestValidatorTest, ValidatesCommands)
+TEST_F(ResourceManifestValidatorTest, ValidatesCommands)
 {
     ExpectInvalid("command is not an object", [](Json& manifest) { Object(manifest)["commands"][0U] = "compile"; });
     ExpectInvalid("command type is missing", [](Json& manifest) { Command(manifest).erase("type"); });
@@ -262,7 +301,17 @@ TEST(ResourceManifestValidatorTest, ValidatesCommands)
     ExpectInvalid("common marker references empty options", [](Json& manifest) {
         manifest["options"]["common_compile"] = Json::array();
     });
+    ExpectInvalid("options marker references missing field", [](Json& manifest) {
+        Command(manifest)["cmd"][0U] = "${options:missing_compile}";
+    });
+    ExpectInvalid("options marker has invalid name", [](Json& manifest) {
+        Command(manifest)["cmd"][0U] = "${options:invalid-name}";
+    });
+    ExpectInvalid("options marker is embedded", [](Json& manifest) {
+        Command(manifest)["cmd"][0U] = "prefix${options:common_compile}";
+    });
 }
 
 } // namespace
+} // namespace manifest_generator
 } // namespace ascendc

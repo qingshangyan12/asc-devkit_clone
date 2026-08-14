@@ -243,31 +243,24 @@ bool ParseArguments(int argc, char** argv, ascendc::manifest_generator::BuildCol
     return true;
 }
 
-int Run(int argc, char** argv)
-{
-    if (IsHelpRequested(argc, argv)) {
-        PrintUsage(std::cout, argv[0]);
-        return 0;
-    }
-    ascendc::manifest_generator::BuildCollectedBundleRequest request;
-    if (!ParseArguments(argc, argv, request)) {
-        PrintUsage(std::cerr, argv[0]);
-        return 1;
-    }
-    ascendc::manifest_generator::ManifestBundleCompiler compiler(std::move(request));
-    if (!compiler.Compile()) {
-        std::cerr << "Compilation failed. Please check plog for details." << '\n';
-        return 1;
-    }
-    return 0;
-}
-
-using RunFunction = int (*)(int, char**);
-
-int RunWithExceptionHandling(int argc, char** argv, RunFunction run)
+int RunWithExceptionHandling(int argc, char** argv)
 {
     try {
-        return run(argc, argv);
+        if (IsHelpRequested(argc, argv)) {
+            PrintUsage(std::cout, argv[0]);
+            return 0;
+        }
+        ascendc::manifest_generator::BuildCollectedBundleRequest request;
+        if (!ParseArguments(argc, argv, request)) {
+            PrintUsage(std::cerr, argv[0]);
+            return 1;
+        }
+        ascendc::manifest_generator::ManifestBundleCompiler compiler(std::move(request));
+        if (!compiler.Compile()) {
+            std::cerr << "Compilation failed. Please check plog for details." << '\n';
+            return 1;
+        }
+        return 0;
     } catch (const std::exception& error) {
         ASCENDLOGE("asc_compile_exporter failed unexpectedly: %s", error.what());
         std::cerr << "Compilation failed. Please check plog for details." << '\n';
@@ -277,4 +270,4 @@ int RunWithExceptionHandling(int argc, char** argv, RunFunction run)
 
 } // namespace
 
-int main(int argc, char** argv) { return RunWithExceptionHandling(argc, argv, Run); }
+int main(int argc, char** argv) { return RunWithExceptionHandling(argc, argv); }
