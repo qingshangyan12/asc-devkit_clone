@@ -29,7 +29,7 @@ features:
   - icon: 🔄
     title: 跨代迁移兼容性指南
     details: Ascend C API 兼容策略，2201 到 3510 架构迁移指导。
-    link: /guide/跨代迁移兼容性指南/概述
+    link: /guide/cross_gen_migration_guide/overview
   - icon: 📋
     title: 技术附录
     details: C++ 标准支持说明、概念原理与术语表等参考内容。

@@ -10,7 +10,7 @@ Ascend C资料体系包含五份核心文档，开发者可以通过提交PR对�
 | 编程指南 | 编程模型、编程范式、编译运行、硬件架构、高级编程 | `docs/zh/guide/编程指南` |
 | API参考手册 | 接口参数、约束、示例、API关联 | `docs/zh/api/` |
 | 算子实践参考 | 算子实现、性能优化、调优案例 | `docs/zh/guide/算子实践参考/` |
-| 跨代迁移兼容性指南 | API兼容策略、架构变更映射、迁移步骤 | `docs/zh/guide/跨代迁移兼容性指南/` |
+| 跨代迁移兼容性指南 | API兼容策略、架构变更映射、迁移步骤 | `docs/zh/guide/cross_gen_migration_guide/` |
 
 在阅读本文档前，请确保您已了解昇腾AI处理器硬件架构。零基础开发者推荐先阅读[入门教程](./guide/getting_started/ascend_c_overview_and_learning_path.md)；已有基础的开发者推荐先阅读[Ascend C编程指南](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)。
 
@@ -68,9 +68,9 @@ Ascend C资料遵循《Ascend C资料设计规范》的三个维度要求：可�
 |---------|------|------|
 | 概述与学习路径 | 全景介绍：Ascend C是什么、学习路径推荐 | 深入技术细节（链接到编程指南） |
 | 环境准备 | 实操步骤：安装、配置、验证环境 | 重复编程指南中的编译运行详解 |
-| quick_start/异构系统与编程模型 | 入门概念：Host/Device、AI Core、SIMD/SIMT选型 | 深入编程模型原理（链接到编程指南） |
-| quick_start/simd_programming | 实践：HelloWorld + 首个算子（Add） | 重复编程指南的完整编程范式 |
-| quick_start/simt_programming | 实践：HelloWorld + 首个算子（Gather） | 重复编程指南的完整编程范式 |
+| 快速入门/异构系统与编程模型 | 入门概念：Host/Device、AI Core、SIMD/SIMT选型 | 深入编程模型原理（链接到编程指南） |
+| 快速入门/基于SIMD编程 | 实践：HelloWorld + 首个算子（Add） | 重复编程指南的完整编程范式 |
+| 快速入门/基于SIMT编程 | 实践：HelloWorld + 首个算子（Gather） | 重复编程指南的完整编程范式 |
 
 **目录结构映射**（与编程指南章节对应，不含技术附录）：
 
