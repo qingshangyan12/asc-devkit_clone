@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates register-based histogram compute with Tensor API. A `uint8_t` register represents input values from 0 to 255. The histogram API divides this range into two 128-bin regions, `bin0` and `bin1`, and supports frequency and cumulative modes.
+This sample demonstrates register-based histogram compute with Tensor API. A `uint8_t` register represents input values from 0 to 255. The histogram API divides this range into two 128-bin regions, `low` and `high`, and supports frequency and cumulative modes.
 
 The same input is evaluated with four template-argument combinations. This shows how the initial destination register contributes to the result and how template arguments select the underlying compute API at compile time.
 
@@ -29,10 +29,10 @@ The input contains 256 `uint8_t` elements. The output contains four rows of 128 
 
 | Output Row | Range and Mode |
 | --- | --- |
-| `frequency/bin0` | Frequencies for values 0 to 127 |
-| `frequency/bin1` | Frequencies for values 128 to 255 |
-| `accumulate/bin0` | Cumulative frequencies for values 0 to 127 |
-| `accumulate/bin1` | Cumulative frequencies for values 128 to 255 |
+| `frequency/low` | Frequencies for values 0 to 127 |
+| `frequency/high` | Frequencies for values 128 to 255 |
+| `cumulative/low` | Cumulative frequencies for values 0 to 127 |
+| `cumulative/high` | Cumulative frequencies for values 128 to 255 |
 
 Every destination lane is initialized to 3, and each histogram operation accumulates from this value. The kernel copies the input from GM to UB, loads it as `reg_tensor<uint8_t>`, calls `histograms`, and writes the `reg_tensor<uint16_t>` results back to GM. Verification requires every output element to match the NumPy result exactly.
 

@@ -34,9 +34,9 @@ __simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src,
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) abs_sub(reg_tensor<T> src0, reg_tensor<T> src1)
+__simd_callee__ inline decltype(auto) absdiff(reg_tensor<T> src0, reg_tensor<T> src1)
 {
-    static_assert(detail::supports_abs_sub_v<T>, "abs_sub supports half and float");
+    static_assert(detail::supports_absdiff_v<T>, "absdiff supports half and float");
     reg_tensor<T> dst;
     asc_abs_sub(dst.reg, src0.reg, src1.reg, src0.mask);
     dst.mask = src0.mask;
@@ -55,25 +55,15 @@ __simd_callee__ inline decltype(auto) exp_sub(reg_tensor<T> src0, reg_tensor<T> 
     return dst;
 }
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) mul_dst_add(
-    reg_tensor<T> dst, reg_tensor<U> src0, reg_tensor<U> src1)
-{
-    static_assert(detail::supports_mul_dst_add_v<T, U>,
-        "mul_dst_add requires matching half or float element types");
-    asc_madd(dst.reg, src0.reg, src1.reg, dst.mask);
-    return dst;
-}
-
 template <typename T>
-__simd_callee__ inline decltype(auto) mul_add_dst(
-    reg_tensor<T> dst, reg_tensor<T> src0, reg_tensor<T> src1)
+__simd_callee__ inline decltype(auto) fma(
+    reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<T> src2)
 {
-    static_assert(detail::supports_mul_add_dst_v<T>, "mul_add_dst supports half and float");
-    reg_tensor<T> result = src0;
-    asc_madd(result.reg, src1.reg, dst.reg, dst.mask);
-    result.mask = dst.mask;
-    return result;
+    static_assert(detail::supports_fma_v<T>, "fma supports half and float");
+    reg_tensor<T> dst = src0;
+    asc_madd(dst.reg, src1.reg, src2.reg, src0.mask);
+    dst.mask = src0.mask;
+    return dst;
 }
 
 template <reg_layout layout>
