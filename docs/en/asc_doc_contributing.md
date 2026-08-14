@@ -10,7 +10,7 @@ The Ascend C documentation system consists of five core documents. Developers ca
 | Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/zh/guide/编程指南` |
 | API Reference Manual | Interface parameters, constraints, examples, API associations | `docs/zh/api/` |
 | Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/zh/guide/算子实践参考/` |
-| Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/zh/guide/跨代迁移兼容性指南/` |
+| Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/zh/guide/cross_gen_migration_guide/` |
 
 Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the Getting Started Tutorial; developers with prior experience should read the Ascend C Programming Guide.
 
