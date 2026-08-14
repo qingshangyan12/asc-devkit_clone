@@ -672,9 +672,6 @@ def gen_golden_data(scenario_num):
 
     golden = np.matmul(x1.astype(mm_dtype), x2.astype(mm_dtype)).astype(mm_dtype)
 
-    if l0c_type == 'float':
-        golden = to_processor_float32(golden)
-
     quant_params = make_quant_params(output_type)
     golden = apply_prequant(golden, scenario_num, quant_params, output_type, quant_mode, is_relu)
 
