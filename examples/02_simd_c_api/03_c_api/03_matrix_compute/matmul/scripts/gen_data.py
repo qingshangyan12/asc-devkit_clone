@@ -16,7 +16,6 @@ from pathlib import Path
 
 import numpy as np
 
-
 M = 30
 K = 40
 N = 70

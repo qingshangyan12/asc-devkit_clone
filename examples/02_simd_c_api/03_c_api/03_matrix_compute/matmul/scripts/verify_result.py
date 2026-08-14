@@ -74,8 +74,8 @@ def verify(actual_path: Path, golden_path: Path) -> bool:
     max_abs_error = float(abs_error[worst_index])
     max_ulp_error = int(ulp_error.max())
     max_abs_error_ulp = int(ulp_error[worst_index])
-    maximum_error_ok = (
-        max_abs_error <= MAX_ABS_ERROR_LIMIT or max_abs_error_ulp <= MAX_ULP_ERROR_LIMIT
+    maximum_error_ok = bool(
+        np.all((abs_error <= MAX_ABS_ERROR_LIMIT) | (ulp_error <= MAX_ULP_ERROR_LIMIT))
     )
     passed = matched_ratio >= REQUIRED_MATCHED_RATIO and maximum_error_ok
 

@@ -11,6 +11,7 @@
 #ifndef MATMUL_DATA_UTILS_H
 #define MATMUL_DATA_UTILS_H
 
+#include <cerrno>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -58,9 +59,23 @@ inline bool WriteFileExact(const std::string& path, const void* buffer, size_t s
         std::fprintf(stderr, "[ERROR] failed to open output: %s\n", path.c_str());
         return false;
     }
-    const ssize_t written = write(fd, buffer, size);
-    const int closeResult = close(fd);
-    if (written != static_cast<ssize_t>(size) || closeResult != 0) {
+    const char* data = static_cast<const char*>(buffer);
+    size_t total_written = 0;
+    bool write_succeeded = true;
+    while (total_written < size) {
+        const ssize_t written = write(fd, data + total_written, size - total_written);
+        if (written > 0) {
+            total_written += static_cast<size_t>(written);
+            continue;
+        }
+        if (written < 0 && errno == EINTR) {
+            continue;
+        }
+        write_succeeded = false;
+        break;
+    }
+    const int close_result = close(fd);
+    if (!write_succeeded || close_result != 0) {
         std::fprintf(stderr, "[ERROR] failed to write complete output: %s\n", path.c_str());
         return false;
     }
