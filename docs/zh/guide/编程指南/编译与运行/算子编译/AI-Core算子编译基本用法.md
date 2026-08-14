@@ -123,6 +123,33 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | --cce-prec-sqrt=false/true | 否 | 是否使用精确的平方根函数，默认false。当前只支持SIMT。 |
 | --cce-use-fast-math=false/true | 否 | 是否开启快速计算模式，开启时相当于--cce-ftz=true --cce-prec-div=false --cce-prec-sqrt=false（若有冲突，以--cce-ftz，--cce-prec-div，--cce-prec-sqrt设置的为准）。当前只支持SIMT。 |
 
+>[!NOTE]说明
+><!-- npu="910b,910,310p,310b" id13 -->
+>- 针对如下产品：不支持使用编译选项：--cce-ftz，--cce-prec-div，--cce-prec-sqrt，--cce-use-fast-math。<br><br>
+>    <!-- npu="A3" id18 -->
+>    Atlas A3 训练系列产品/Atlas A3 推理系列产品
+>    <!-- end id18 -->
+>
+>    <!-- npu="910b" id14 -->
+>    Atlas A2 训练系列产品/Atlas A2 推理系列产品  
+>    <!-- end id14 -->
+>
+>    <!-- npu="310b" id15 -->
+>    Atlas 200I/500 A2 推理产品  
+>    <!-- end id15 -->
+>
+>    <!-- npu="310p" id16 -->
+>    Atlas 推理系列产品  
+>    <!-- end id16 -->
+>
+>    <!-- npu="910" id17 -->
+>    Atlas 训练系列产品<br><br> 
+>    <!-- end id17 -->
+><!-- end id13 -->
+><!-- npu="950" id19 -->
+>- 针对Ascend 950PR/Ascend 950DT，支持使用编译选项：--cce-ftz，--cce-prec-div，--cce-prec-sqrt，--cce-use-fast-math。
+><!-- end id19 -->
+
 更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 
 <a id="note-reference"></a>
