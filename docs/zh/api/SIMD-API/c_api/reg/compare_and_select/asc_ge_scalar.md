@@ -26,7 +26,8 @@
 
 ## 功能说明
 
-根据mask将源操作数src按元素与标量value进行比较，若$src_i \geq value$则目的操作数对应结果位为1，否则为0。每个元素的比较结果占一个bit。计算公式如下：
+根据`mask`将源操作数`src`按元素与标量`value`进行比较，若$src_i \geq value$，则目的操作数对应结果位为1，否则为0。每个元素的比较结果占一个比特。计算公式如下：
+
 $$
 dst_i = 
 \begin{cases}
@@ -48,14 +49,14 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst,
                                           vector_bool mask)
 ```
 
-### dtype支持数据类型
+### dtype支持的数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
+`dtype`支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
 ```c
-// 示例：half源向量与标量大于等于比较，结果写入vector_bool掩码寄存器
+// 示例：half类型的矢量数据寄存器与标量进行大于等于比较，结果写入vector_bool掩码寄存器。
 __simd_callee__ inline void asc_ge_scalar(vector_bool& dst,
                                           vector_half src,
                                           half value,
@@ -65,12 +66,13 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst,
 ## 参数说明
 
 **表1** 参数说明
+
 | 参数名 | 输入/输出 | 描述                                                                                                             |
 | :----- | :-------- | :--------------------------------------------------------------------------------------------------------------- |
-| dst    | 输出      | 目的操作数（掩码寄存器）。                                                                                       |
-| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
-| value  | 输入      | 源操作数（标量）。                                                                                               |
-| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| `dst`  | 输出      | 目的操作数（掩码寄存器）。                                                                                       |
+| `src`  | 输入      | 源操作数（矢量数据寄存器）。                                                                                     |
+| `value` | 输入     | 源操作数（标量）。                                                                                               |
+| `mask` | 输入      | 掩码寄存器，用于控制各元素是否参与比较。`mask`中与元素对应的比特位为1时，该元素参与比较；为0时，该元素不参与比较。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -80,13 +82,22 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst,
 
 ## 约束说明
 
-### 通用约束
-
-- src与value的数据类型需要保持一致。
-- mask掩码位为0时，dst对应比特位置0。
-- 浮点比较输入含nan时，dst对应比特位写0。
+- `src`与`value`的数据类型需要保持一致。
+- `mask`掩码位为0时，`dst`对应比特位置0。
+- 浮点比较输入包含nan时，`dst`对应比特位写0。
 
 ## 调用示例
+
+将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+"$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 \
+  -Wno-deprecated-declarations --asc-aicore-lang example.asc -lm -o main && ./main
+```
+<!-- end id8 -->
 
 ```cpp
 #include <cstdint>
