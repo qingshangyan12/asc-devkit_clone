@@ -398,7 +398,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
 
         for command in basic["commands"]:
             self.assertEqual(command["type"], "compile")
-            self.assertEqual(command["stage"], 0)
+            self.assertNotIn("stage", command)
             expanded_cmd = list(command["cmd"])
             option_index = expanded_cmd.index("${option:common_compile}")
             expanded_cmd[option_index : option_index + 1] = manifest["option"][
@@ -535,15 +535,318 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 1,
             )
 
-    def test_grouped_tiling_keys_are_not_supported(self):
+    def test_unused_grouped_tiling_keys_do_not_block_records(self):
         compile_context = self.make_compile_context()
         compile_context.tiling_key_group_map = {"100000": ["100001"]}
 
+        records = self.make_records(basic_context=compile_context)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0].tiling_key, "100000")
+
+    def test_missing_exact_tiling_size_uses_default_size(self):
+        records = self.make_records(
+            default_tiling_size=16,
+            tiling_key_data_size={"200000": 8},
+        )
+
+        self.assertEqual(records[0].constant_infos[0].byte_size, 16)
+
+    def test_grouped_tiling_key_reuses_master_compile_identity(self):
+        Path(self.metadata_path).write_text(
+            json.dumps(
+                {
+                    "kernelList": [
+                        {
+                            "kernelName": "add_custom_100000",
+                        },
+                        {
+                            "kernelName": "add_custom_100001",
+                        },
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        compile_context = self.make_compile_context(code_channel=0)
+        compile_context.tiling_key_group_map = {"100000": ["100001"]}
+
+        records = self.make_records(
+            basic_context=compile_context,
+            tiling_key_data_size={"100000": 8, "100001": 12},
+        )
+
+        self.assertEqual(
+            [(record.tiling_key, record.compile_tiling_key) for record in records],
+            [("100000", "100000"), ("100001", "100000")],
+        )
+        self.assertEqual(
+            [record.constant_infos[0].byte_size for record in records],
+            [8, 12],
+        )
+        master_commands, slave_commands = (
+            records[0].commands,
+            records[1].commands,
+        )
+        self.assertEqual(
+            [command.compile_symbol for command in slave_commands],
+            [command.compiled_symbol for command in master_commands],
+        )
+        self.assertEqual(
+            [command.compiled_symbol for command in slave_commands],
+            [
+                "add_custom_100001_mix_aic",
+                "add_custom_100001_mix_aiv",
+            ],
+        )
+        for command in slave_commands:
+            self.assertIn("-DTILING_KEY_VAR=100000UL", command.argv)
+            self.assertIn(
+                f"-Dauto_gen_add_custom_kernel={command.compile_symbol}",
+                command.argv,
+            )
+            self.assertIn(
+                "-Dadd_custom=add_custom_100000_tilingkey",
+                command.argv,
+            )
+
+        result = self.generate(self.make_request(records))
+        manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
+        self.assertEqual(
+            [kernel["kernel_name"] for kernel in manifest["kernels"]],
+            ["add_custom_100000", "add_custom_100001"],
+        )
+        slave_basic = manifest["kernels"][1]["objects"][0]
+        self.assertEqual(
+            slave_basic["outputs"],
+            [
+                "${output}/add_custom_100001.aic.o",
+                "${output}/add_custom_100001.aiv.o",
+            ],
+        )
+        for command in slave_basic["commands"]:
+            self.assertIn("-DTILING_KEY_VAR=100000UL", command["cmd"])
+            self.assertTrue(
+                any(
+                    value.startswith(
+                        "-Dauto_gen_add_custom_kernel=add_custom_100000_mix_ai"
+                    )
+                    for value in command["cmd"]
+                )
+            )
+
+        Path(self.metadata_path).write_text(
+            json.dumps(
+                {
+                    "kernelList": [
+                        {
+                            "kernelName": "add_custom_100001",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        exact_slave_records = self.make_records(
+            basic_context=compile_context,
+            tiling_key_data_size={"100001": 12},
+        )
+        self.assertEqual(exact_slave_records[0].constant_infos[0].byte_size, 12)
+
+        c310_records = self.make_records(
+            basic_context=compile_context,
+            chip_version="c310",
+            tiling_key_data_size={"100000": 8, "100001": 12},
+        )
+        c310_slave = c310_records[0]
+        self.assertEqual(c310_slave.compile_tiling_key, "100000")
+        self.assertTrue(
+            all(
+                "--cce-aicore-arch=dav-c310-" in " ".join(command.argv)
+                for command in c310_slave.commands
+            )
+        )
+
+    def test_grouped_tiling_key_rejects_ambiguous_or_missing_master(self):
+        first_context = self.make_compile_context()
+        first_context.tiling_key_group_map = {"100000": ["100001"]}
+        second_context = self.make_compile_context()
+        second_context.tiling_key_group_map = {"200000": ["100001"]}
         with self.assertRaisesRegex(
             generator.ManifestCommandError,
-            "grouped tiling keys are not supported",
+            "tiling key 100001 belongs to multiple masters",
         ):
-            self.make_records(basic_context=compile_context)
+            generator.build_tiling_key_group_index(
+                first_context,
+                second_context,
+            )
+
+        Path(self.metadata_path).write_text(
+            json.dumps({"kernelList": [{"kernelName": "add_custom_100001"}]}),
+            encoding="utf-8",
+        )
+        first_context.tiling_key_group_map = {"200000": ["100001"]}
+        with self.assertRaisesRegex(
+            generator.ManifestCommandError,
+            "master tiling key 200000 has no physical compile command",
+        ):
+            self.make_records(basic_context=first_context)
+
+        Path(self.metadata_path).write_text(
+            json.dumps({"kernelList": [{"kernelName": "add_custom_unknown"}]}),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(
+            generator.ManifestCommandError,
+            "cannot determine tiling key for kernel add_custom_unknown",
+        ):
+            self.make_records()
+
+    def test_grouped_tiling_key_sk_renames_slave_symbol_after_master_compile(self):
+        Path(self.metadata_path).write_text(
+            json.dumps(
+                {
+                    "kernelList": [
+                        {"kernelName": "add_custom_100001"},
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        basic_context = self.make_compile_context(
+            code_channel=0,
+            symbols=[
+                "add_custom_100000_mix_aic",
+                "add_custom_100000_mix_aiv",
+            ],
+        )
+        sk_context = self.make_compile_context(
+            kernel_name="add_custom_sk",
+            code_channel=0,
+            wrapper_path=self.sk_wrapper_path,
+            symbols=[
+                "add_custom_sk_100000_mix_aic",
+                "add_custom_sk_100000_mix_aiv",
+            ],
+        )
+        basic_context.tiling_key_group_map = {"100000": ["100001"]}
+        sk_context.tiling_key_group_map = {"100000": ["100001"]}
+        Path(self.sk_wrapper_path).write_text(
+            "#ifndef ADD_CUSTOM_SK_KERNEL\n"
+            "#define ADD_CUSTOM_SK_KERNEL\n"
+            f'#include "{self.source_path}"\n'
+            "namespace sk { class SkSystemArgs; }\n"
+            "#define __gm__\n"
+            'extern "C" void auto_gen_add_custom_kernel(\n'
+            "    __gm__ uint64_t *param, sk::SkSystemArgs *sargs) {}\n"
+            'extern "C" __sk__ void add_custom_sk_100001_mix_aic(\n'
+            "    uint64_t args_offset) {\n"
+            "    auto_gen_add_custom_kernel(param, sargs);\n"
+            "}\n"
+            "#endif\n",
+            encoding="utf-8",
+        )
+        options = self.make_options(source_include_style="joined")
+        records = self.make_records(
+            basic_context=basic_context,
+            basic_options=options,
+            sk_context=sk_context,
+            sk_options=options,
+            tiling_key_data_size={"100001": 12},
+        )
+
+        result = self.generate(
+            self.make_request(
+                records,
+                sk_cap_bitmap=3,
+                sk_kernel_attribute="__global__ [aicore]",
+                basic_kernel_attribute="__global__ [aicore]",
+                sk_bind_compile_options=options.compile_options,
+            )
+        )
+
+        manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
+        sk_object = manifest["kernels"][0]["objects"][1]
+        self.assertTrue(
+            all("stage" not in command for command in sk_object["commands"])
+        )
+        sk_compiles = sk_object["commands"][:2]
+        for core_suffix, command in zip(("aic", "aiv"), sk_compiles):
+            self.assertIn("-DTILING_KEY_VAR=100000UL", command["cmd"])
+            self.assertIn(
+                f"-Dauto_gen_add_custom_kernel="
+                f"add_custom_100000_mix_{core_suffix}_static_sk",
+                command["cmd"],
+            )
+            self.assertIn(
+                "-Dadd_custom=add_custom_100000_tilingkey",
+                command["cmd"],
+            )
+            self.assertIn(
+                f"${{output}}/add_custom_100001.{core_suffix}.sk_source.o",
+                command["cmd"],
+            )
+
+        logical_renames = sk_object["commands"][3:5]
+        for core_suffix, command in zip(("aic", "aiv"), logical_renames):
+            self.assertEqual(command["type"], "objcopy")
+            self.assertIn(
+                f"--redefine-sym=add_custom_sk_100001_mix_{core_suffix}="
+                f"add_custom_100001_mix_{core_suffix}_static_sk",
+                command["cmd"],
+            )
+            self.assertEqual(
+                command["cmd"][-1],
+                f"${{output}}/add_custom_100001.{core_suffix}.sk.o",
+            )
+
+        self.assertEqual(
+            sk_object["outputs"],
+            [
+                "${output}/add_custom_100001.aic.sk.o",
+                "${output}/add_custom_100001.aiv.sk.o",
+                "${output}/add_custom_100001.aic.sk_split1.o",
+                "${output}/add_custom_100001.aic.sk_split2.o",
+                "${output}/add_custom_100001.aic.sk_split3.o",
+                "${output}/add_custom_100001.aiv.sk_split1.o",
+                "${output}/add_custom_100001.aiv.sk_split2.o",
+                "${output}/add_custom_100001.aiv.sk_split3.o",
+                "${output}/add_custom_100001.sk_bind.o",
+            ],
+        )
+        bind_reference = next(
+            value
+            for value in sk_object["commands"][2]["cmd"]
+            if value.startswith("${resource}/resources/src/sk_bind_")
+        )
+        bind_source = Path(
+            self.output_root,
+            "manifest",
+            "resources",
+            self.resource_logical_path(manifest, bind_reference),
+        ).read_text(encoding="utf-8")
+        for core_suffix in ("aic", "aiv"):
+            self.assertIn(
+                f"SK_BIND(add_custom_100001_mix_{core_suffix}, 3, "
+                f"add_custom_100001_mix_{core_suffix}_static_sk,",
+                bind_source,
+            )
+        sk_wrapper_reference = next(
+            value
+            for value in sk_compiles[0]["cmd"]
+            if value.startswith("${resource}/resources/src/")
+        )
+        static_sk_wrapper = Path(
+            self.output_root,
+            "manifest",
+            "resources",
+            self.resource_logical_path(manifest, sk_wrapper_reference),
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "add_custom_sk_100001_mix_aic(\n"
+            "    __gm__ uint64_t *param, sk::SkSystemArgs *sargs)",
+            static_sk_wrapper,
+        )
+        self.assertNotIn("uint64_t args_offset", static_sk_wrapper)
 
     def test_sk_object_uses_static_symbol_bind_and_output_namespace(self):
         dynamic_sk_symbol = "add_custom_abcd1234_100000_tilingkey"
@@ -575,9 +878,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         sk_object = manifest["kernels"][0]["objects"][1]
         self.assertEqual(sk_object["object_name"], "sk")
         self.assertEqual(sk_object["object_type"], "sk")
-        self.assertEqual(
-            [command["stage"] for command in sk_object["commands"]],
-            [0, 0, 1, 1, 1],
+        self.assertTrue(
+            all("stage" not in command for command in sk_object["commands"])
         )
         self.assertEqual(
             sk_object["outputs"],
