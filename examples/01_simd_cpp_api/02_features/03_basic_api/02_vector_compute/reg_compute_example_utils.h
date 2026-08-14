@@ -19,7 +19,7 @@
 
 namespace example {
 
-inline bool CheckAcl(aclError result, const char* api)
+inline bool check_acl(aclError result, const char* api)
 {
     if (result == ACL_SUCCESS) {
         return true;
@@ -28,26 +28,26 @@ inline bool CheckAcl(aclError result, const char* api)
     return false;
 }
 
-class Runtime {
+class runtime {
 public:
-    Runtime() = default;
-    Runtime(const Runtime&) = delete;
-    Runtime& operator=(const Runtime&) = delete;
+    runtime() = default;
+    runtime(const runtime&) = delete;
+    runtime& operator=(const runtime&) = delete;
 
-    bool Init()
+    bool init()
     {
-        if (!CheckAcl(aclInit(nullptr), "aclInit")) {
+        if (!check_acl(aclInit(nullptr), "aclInit")) {
             return false;
         }
         initialized_ = true;
-        if (!CheckAcl(aclrtSetDevice(device_id_), "aclrtSetDevice")) {
+        if (!check_acl(aclrtSetDevice(device_id_), "aclrtSetDevice")) {
             return false;
         }
         device_set_ = true;
-        return CheckAcl(aclrtCreateStream(&stream_), "aclrtCreateStream");
+        return check_acl(aclrtCreateStream(&stream_), "aclrtCreateStream");
     }
 
-    ~Runtime()
+    ~runtime()
     {
         if (stream_ != nullptr) {
             (void)aclrtDestroyStream(stream_);
@@ -60,14 +60,14 @@ public:
         }
     }
 
-    aclrtStream Stream() const
+    aclrtStream stream() const
     {
         return stream_;
     }
 
-    bool Synchronize() const
+    bool synchronize() const
     {
-        return CheckAcl(aclrtSynchronizeStream(stream_), "aclrtSynchronizeStream");
+        return check_acl(aclrtSynchronizeStream(stream_), "aclrtSynchronizeStream");
     }
 
 private:
@@ -78,23 +78,23 @@ private:
 };
 
 template <typename T>
-class Buffer {
+class buffer {
 public:
-    Buffer() = default;
-    Buffer(const Buffer&) = delete;
-    Buffer& operator=(const Buffer&) = delete;
+    buffer() = default;
+    buffer(const buffer&) = delete;
+    buffer& operator=(const buffer&) = delete;
 
-    bool Allocate(size_t count)
+    bool allocate(size_t count)
     {
         bytes_ = count * sizeof(T);
-        if (!CheckAcl(aclrtMallocHost(reinterpret_cast<void**>(&host_), bytes_), "aclrtMallocHost")) {
+        if (!check_acl(aclrtMallocHost(reinterpret_cast<void**>(&host_), bytes_), "aclrtMallocHost")) {
             return false;
         }
-        return CheckAcl(
+        return check_acl(
             aclrtMalloc(reinterpret_cast<void**>(&device_), bytes_, ACL_MEM_MALLOC_HUGE_FIRST), "aclrtMalloc");
     }
 
-    ~Buffer()
+    ~buffer()
     {
         if (device_ != nullptr) {
             (void)aclrtFree(device_);
@@ -104,7 +104,7 @@ public:
         }
     }
 
-    bool Load(const std::string& path)
+    bool load(const std::string& path)
     {
         std::ifstream file(path, std::ios::binary | std::ios::ate);
         if (!file.is_open() || static_cast<size_t>(file.tellg()) != bytes_) {
@@ -115,35 +115,35 @@ public:
         return static_cast<bool>(file.read(reinterpret_cast<char*>(host_), bytes_));
     }
 
-    bool Save(const std::string& path) const
+    bool save(const std::string& path) const
     {
         std::ofstream file(path, std::ios::binary | std::ios::trunc);
         return file.is_open() && static_cast<bool>(file.write(reinterpret_cast<const char*>(host_), bytes_));
     }
 
-    bool CopyToDevice() const
+    bool copy_to_device() const
     {
-        return CheckAcl(aclrtMemcpy(device_, bytes_, host_, bytes_, ACL_MEMCPY_HOST_TO_DEVICE),
+        return check_acl(aclrtMemcpy(device_, bytes_, host_, bytes_, ACL_MEMCPY_HOST_TO_DEVICE),
             "aclrtMemcpy host to device");
     }
 
-    bool CopyToHost() const
+    bool copy_to_host() const
     {
-        return CheckAcl(aclrtMemcpy(host_, bytes_, device_, bytes_, ACL_MEMCPY_DEVICE_TO_HOST),
+        return check_acl(aclrtMemcpy(host_, bytes_, device_, bytes_, ACL_MEMCPY_DEVICE_TO_HOST),
             "aclrtMemcpy device to host");
     }
 
-    bool LoadToDevice(const std::string& path, size_t count)
+    bool load_to_device(const std::string& path, size_t count)
     {
-        return Allocate(count) && Load(path) && CopyToDevice();
+        return allocate(count) && load(path) && copy_to_device();
     }
 
-    bool SaveFromDevice(const std::string& path) const
+    bool save_from_device(const std::string& path) const
     {
-        return CopyToHost() && Save(path);
+        return copy_to_host() && save(path);
     }
 
-    T* Device() const
+    T* device() const
     {
         return device_;
     }
