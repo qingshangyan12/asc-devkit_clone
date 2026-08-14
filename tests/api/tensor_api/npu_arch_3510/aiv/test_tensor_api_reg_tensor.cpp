@@ -127,6 +127,21 @@ __simd_vf__ inline void compile_reg_mask(uint32_t remain)
     (void)tail_mask;
 }
 
+template <typename T>
+__simd_vf__ inline void compile_reg_mask_data_reorder(vector_bool src0, vector_bool src1)
+{
+    reg_tensor<bool> mask0 {src0};
+    reg_tensor<bool> mask1 {src1};
+    auto interleaved = interleave<T>(mask0, mask1);
+    static_assert(std::is_same_v<decltype(interleaved), reg_pair<bool>>);
+    static_assert(std::is_same_v<decltype(interleaved.first), reg_tensor<bool>>);
+    static_assert(std::is_same_v<decltype(interleaved.second), reg_tensor<bool>>);
+
+    auto restored = deinterleave<T>(interleaved.first, interleaved.second);
+    static_assert(std::is_same_v<decltype(restored), reg_pair<bool>>);
+    (void)restored;
+}
+
 TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
 {
     reg_tensor<float> value {};
@@ -174,6 +189,13 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_reg_mask_b8;
     (void)compile_reg_mask_b16;
     (void)compile_reg_mask_b32;
+
+    auto compile_reg_mask_data_reorder_b8 = &compile_reg_mask_data_reorder<uint8_t>;
+    auto compile_reg_mask_data_reorder_b16 = &compile_reg_mask_data_reorder<half>;
+    auto compile_reg_mask_data_reorder_b32 = &compile_reg_mask_data_reorder<float>;
+    (void)compile_reg_mask_data_reorder_b8;
+    (void)compile_reg_mask_data_reorder_b16;
+    (void)compile_reg_mask_data_reorder_b32;
 }
 
 } // namespace

@@ -24,84 +24,6 @@ namespace asc {
 namespace te {
 namespace detail {
 
-template <mask_pattern Pattern>
-struct mask_pattern_traits;
-
-template <>
-struct mask_pattern_traits<mask_pattern::all> {
-    static constexpr auto value = PAT_ALL;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::vl1> {
-    static constexpr auto value = PAT_VL1;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::vl2> {
-    static constexpr auto value = PAT_VL2;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::vl3> {
-    static constexpr auto value = PAT_VL3;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::vl4> {
-    static constexpr auto value = PAT_VL4;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::vl8> {
-    static constexpr auto value = PAT_VL8;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::vl16> {
-    static constexpr auto value = PAT_VL16;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::vl32> {
-    static constexpr auto value = PAT_VL32;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::vl64> {
-    static constexpr auto value = PAT_VL64;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::vl128> {
-    static constexpr auto value = PAT_VL128;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::every3> {
-    static constexpr auto value = PAT_M3;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::every4> {
-    static constexpr auto value = PAT_M4;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::half> {
-    static constexpr auto value = PAT_H;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::quarter> {
-    static constexpr auto value = PAT_Q;
-};
-
-template <>
-struct mask_pattern_traits<mask_pattern::none> {
-    static constexpr auto value = PAT_ALLF;
-};
-
 template <typename DataType, auto Pattern>
 __simd_callee__ inline reg_tensor<bool> make_reg_mask()
 {
@@ -143,7 +65,39 @@ __simd_callee__ inline reg_tensor<bool> make_updated_reg_mask(uint32_t& remain)
 template <mask_pattern Pattern, typename DataType>
 __simd_callee__ inline reg_tensor<bool> make_mask()
 {
-    return detail::make_reg_mask<DataType, detail::mask_pattern_traits<Pattern>::value>();
+    if constexpr (Pattern == mask_pattern::all) {
+        return detail::make_reg_mask<DataType, PAT_ALL>();
+    } else if constexpr (Pattern == mask_pattern::vl1) {
+        return detail::make_reg_mask<DataType, PAT_VL1>();
+    } else if constexpr (Pattern == mask_pattern::vl2) {
+        return detail::make_reg_mask<DataType, PAT_VL2>();
+    } else if constexpr (Pattern == mask_pattern::vl3) {
+        return detail::make_reg_mask<DataType, PAT_VL3>();
+    } else if constexpr (Pattern == mask_pattern::vl4) {
+        return detail::make_reg_mask<DataType, PAT_VL4>();
+    } else if constexpr (Pattern == mask_pattern::vl8) {
+        return detail::make_reg_mask<DataType, PAT_VL8>();
+    } else if constexpr (Pattern == mask_pattern::vl16) {
+        return detail::make_reg_mask<DataType, PAT_VL16>();
+    } else if constexpr (Pattern == mask_pattern::vl32) {
+        return detail::make_reg_mask<DataType, PAT_VL32>();
+    } else if constexpr (Pattern == mask_pattern::vl64) {
+        return detail::make_reg_mask<DataType, PAT_VL64>();
+    } else if constexpr (Pattern == mask_pattern::vl128) {
+        return detail::make_reg_mask<DataType, PAT_VL128>();
+    } else if constexpr (Pattern == mask_pattern::every3) {
+        return detail::make_reg_mask<DataType, PAT_M3>();
+    } else if constexpr (Pattern == mask_pattern::every4) {
+        return detail::make_reg_mask<DataType, PAT_M4>();
+    } else if constexpr (Pattern == mask_pattern::half) {
+        return detail::make_reg_mask<DataType, PAT_H>();
+    } else if constexpr (Pattern == mask_pattern::quarter) {
+        return detail::make_reg_mask<DataType, PAT_Q>();
+    } else if constexpr (Pattern == mask_pattern::none) {
+        return detail::make_reg_mask<DataType, PAT_ALLF>();
+    } else {
+        static_assert(Pattern == mask_pattern::all, "unsupported mask pattern");
+    }
 }
 
 template <typename DataType>

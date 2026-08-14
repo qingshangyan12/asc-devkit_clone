@@ -62,6 +62,12 @@ struct reg_tensor {
     vector_bool mask;
 };
 
+template <typename DataType>
+struct reg_pair {
+    reg_tensor<DataType> first;
+    reg_tensor<DataType> second;
+};
+
 } // namespace te
 } // namespace asc
 
