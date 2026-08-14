@@ -24,7 +24,6 @@
 namespace asc {
 namespace te {
 
-/** @brief Selects the even or odd half of a register for widening/narrowing composite operations. */
 enum class reg_layout {
     zero,
     one,
@@ -33,27 +32,39 @@ enum class reg_layout {
 namespace detail {
 
 template <typename T>
-struct type_identity {
-    using type = T;
-};
-
-template <typename T>
-using type_identity_t = typename type_identity<T>::type;
-
-template <typename T>
 struct is_reg_tensor : ::AscendC::Std::false_type {};
 
 template <typename T>
 struct is_reg_tensor<reg_tensor<T>> : ::AscendC::Std::true_type {};
 
 template <typename T>
-using enable_if_scalar_t =
-    ::AscendC::Std::enable_if_t<!is_reg_tensor<::AscendC::Std::remove_cvref_t<T>>::value, int>;
+inline constexpr bool is_reg_tensor_v = is_reg_tensor<::AscendC::Std::remove_cvref_t<T>>::value;
 
-// These capability sets are the intersection of the documented Ascend 950
-// type matrices and the operations implemented by the current reg_tensor/C
-// API backend. Software-emulated types are enabled only where the corresponding
-// multi-register implementation has been ported to reg_tensor.
+template <typename T>
+struct reg_tensor_traits;
+
+template <typename T>
+struct reg_tensor_traits<reg_tensor<T>> {
+    using elem_type = T;
+};
+
+template <typename T>
+using reg_elem_t = typename reg_tensor_traits<::AscendC::Std::remove_cvref_t<T>>::elem_type;
+
+template <typename T, typename U, bool = is_reg_tensor_v<T>>
+struct binary_elem_type {
+    static_assert(is_reg_tensor_v<U>, "at least one operand must be reg_tensor");
+    using type = reg_elem_t<U>;
+};
+
+template <typename T, typename U>
+struct binary_elem_type<T, U, true> {
+    using type = reg_elem_t<T>;
+};
+
+template <typename T, typename U>
+using binary_elem_t = typename binary_elem_type<T, U>::type;
+
 template <typename T>
 inline constexpr bool supports_abs_v =
     ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
@@ -73,6 +84,12 @@ inline constexpr bool supports_add_sub_v =
     ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
 
 template <typename T>
+inline constexpr bool supports_carry_v = ::AscendC::Std::is_same_v<T, uint32_t>;
+
+template <typename T>
+inline constexpr bool supports_mull_v = ::AscendC::Std::is_one_of_v<T, int32_t, uint32_t>;
+
+template <typename T>
 inline constexpr bool supports_mul_v =
     ::AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
 
@@ -90,11 +107,21 @@ inline constexpr bool supports_min_max_v =
 
 template <typename T>
 inline constexpr bool supports_not_v =
-    ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>;
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t,
+        uint32_t, float>;
 
 template <typename T>
-inline constexpr bool supports_bitwise_v =
-    ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>;
+inline constexpr bool supports_and_v =
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+        half, bfloat16_t, int32_t, uint32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_or_v =
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_xor_v =
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>;
 
 template <typename T>
 inline constexpr bool supports_shift_v =
@@ -107,24 +134,20 @@ inline constexpr bool supports_shift_pair_v =
     (::AscendC::Std::is_one_of_v<T, int32_t, uint32_t> && ::AscendC::Std::is_same_v<ShiftT, int32_t>);
 
 template <typename T>
-inline constexpr bool supports_compare_v =
-    ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
+inline constexpr bool supports_axpy_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
-inline constexpr bool supports_axpy_v = ::AscendC::Std::is_one_of_v<T, half, float, int64_t, uint64_t>;
-
-template <typename T>
-inline constexpr bool supports_abs_sub_v = ::AscendC::Std::is_one_of_v<T, half, float, int64_t>;
+inline constexpr bool supports_abs_sub_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
 inline constexpr bool supports_exp_sub_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
-template <typename T>
-inline constexpr bool supports_mul_dst_add_v = ::AscendC::Std::is_one_of_v<T, half, bfloat16_t, float>;
+template <typename T, typename U>
+inline constexpr bool supports_mul_dst_add_v =
+    ::AscendC::Std::is_same_v<T, U> && ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
-inline constexpr bool supports_mul_add_dst_v =
-    ::AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t, uint64_t>;
+inline constexpr bool supports_mul_add_dst_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 } // namespace detail
 } // namespace te

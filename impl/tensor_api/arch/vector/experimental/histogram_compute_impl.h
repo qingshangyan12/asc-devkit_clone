@@ -15,26 +15,20 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE_IMPL
 #endif
 
-/*!
- * \file histogram_compute_impl.h
- * \brief Register histogram compute API implementations for asc::te.
- */
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_HISTOGRAM_COMPUTE_IMPL_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_HISTOGRAM_COMPUTE_IMPL_H
 
-#include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
+#include "impl/tensor_api/arch/utils/reg_compute_traits.h"
 
 namespace asc {
 namespace te {
 
 template <histogram_bin Bin, histogram_type Type>
-__simd_callee__ inline reg_tensor<uint16_t> histograms(
-    reg_tensor<uint16_t> dst, reg_tensor<uint8_t> src)
+__simd_callee__ inline decltype(auto) histograms(reg_tensor<uint16_t> dst, reg_tensor<uint8_t> src)
 {
-    static_assert(Bin == histogram_bin::bin0 || Bin == histogram_bin::bin1,
-        "histograms supports histogram_bin::bin0 and histogram_bin::bin1");
+    static_assert(Bin == histogram_bin::bin0 || Bin == histogram_bin::bin1, "unsupported histogram bin");
     static_assert(Type == histogram_type::frequency || Type == histogram_type::accumulate,
-        "histograms supports histogram_type::frequency and histogram_type::accumulate");
+        "unsupported histogram type");
 
     if constexpr (Type == histogram_type::frequency) {
         if constexpr (Bin == histogram_bin::bin0) {

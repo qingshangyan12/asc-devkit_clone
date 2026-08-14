@@ -21,68 +21,23 @@
 namespace asc {
 namespace te {
 
-// Bitwise operations
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator!(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) operator!(reg_tensor<T> src);
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator&(reg_tensor<T> src0, reg_tensor<T> src1);
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator&(T a, U b);
 
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> Enable = 0>
-__simd_callee__ inline reg_tensor<T> operator&(reg_tensor<T> src, Scalar value);
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator|(T a, U b);
 
-template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar> Enable = 0>
-__simd_callee__ inline reg_tensor<T> operator&(Scalar value, reg_tensor<T> src);
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator^(T a, U b);
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator|(reg_tensor<T> src0, reg_tensor<T> src1);
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator<<(reg_tensor<T> src, U shift);
 
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> Enable = 0>
-__simd_callee__ inline reg_tensor<T> operator|(reg_tensor<T> src, Scalar value);
-
-template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar> Enable = 0>
-__simd_callee__ inline reg_tensor<T> operator|(Scalar value, reg_tensor<T> src);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator^(reg_tensor<T> src0, reg_tensor<T> src1);
-
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> Enable = 0>
-__simd_callee__ inline reg_tensor<T> operator^(reg_tensor<T> src, Scalar value);
-
-template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar> Enable = 0>
-__simd_callee__ inline reg_tensor<T> operator^(Scalar value, reg_tensor<T> src);
-
-template <typename T, typename ShiftT>
-__simd_callee__ inline reg_tensor<T> operator<<(reg_tensor<T> src, reg_tensor<ShiftT> shift);
-
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> Enable = 0>
-__simd_callee__ inline reg_tensor<T> operator<<(reg_tensor<T> src, Scalar shift);
-
-template <typename T, typename ShiftT>
-__simd_callee__ inline reg_tensor<T> operator>>(reg_tensor<T> src, reg_tensor<ShiftT> shift);
-
-template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> Enable = 0>
-__simd_callee__ inline reg_tensor<T> operator>>(reg_tensor<T> src, Scalar shift);
-
-// Comparisons
-#define ASC_TE_DECLARE_COMPARISON(OP)                                                                                  \
-    template <typename T>                                                                                              \
-    __simd_callee__ inline reg_tensor<bool> operator OP(reg_tensor<T> src0, reg_tensor<T> src1);                      \
-                                                                                                                       \
-    template <typename T, typename Scalar, detail::enable_if_scalar_t<Scalar> Enable = 0>                              \
-    __simd_callee__ inline reg_tensor<bool> operator OP(reg_tensor<T> src, Scalar value);                             \
-                                                                                                                       \
-    template <typename Scalar, typename T, detail::enable_if_scalar_t<Scalar> Enable = 0>                              \
-    __simd_callee__ inline reg_tensor<bool> operator OP(Scalar value, reg_tensor<T> src)
-
-ASC_TE_DECLARE_COMPARISON(==);
-ASC_TE_DECLARE_COMPARISON(!=);
-ASC_TE_DECLARE_COMPARISON(<);
-ASC_TE_DECLARE_COMPARISON(<=);
-ASC_TE_DECLARE_COMPARISON(>);
-ASC_TE_DECLARE_COMPARISON(>=);
-
-#undef ASC_TE_DECLARE_COMPARISON
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator>>(reg_tensor<T> src, U shift);
 
 } // namespace te
 } // namespace asc

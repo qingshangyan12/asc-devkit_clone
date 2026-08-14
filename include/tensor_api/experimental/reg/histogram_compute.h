@@ -32,8 +32,7 @@ enum class histogram_type {
 };
 
 template <histogram_bin Bin, histogram_type Type>
-__simd_callee__ inline reg_tensor<uint16_t> histograms(
-    reg_tensor<uint16_t> dst, reg_tensor<uint8_t> src);
+__simd_callee__ inline decltype(auto) histograms(reg_tensor<uint16_t> dst, reg_tensor<uint8_t> src);
 
 } // namespace te
 } // namespace asc
