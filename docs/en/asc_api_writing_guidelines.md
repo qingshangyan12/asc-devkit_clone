@@ -296,25 +296,25 @@ Some interfaces are Host interfaces that do not differentiate by product. In thi
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT: Supported
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
-- Atlas A3 Training Series Products/Atlas A3 Inference Series Products: Not supported
 <!-- end id2 -->
-<!-- npu="910b" id3 -->
-- Atlas A2 Training Series Products/Atlas A2 Inference Series Products: Not supported
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 Inference Products: Not supported
+<!-- npu="A3" id3 -->
+- Atlas A3 Training Series Products/Atlas A3 Inference Series Products: Not supported
 <!-- end id4 -->
-<!-- npu="310p" id5 -->
-- Atlas Inference Series Products AI Core: Not supported
-<!-- end id5 -->
-<!-- npu="310p" id6 -->
-- Atlas Inference Series Products Vector Core: Not supported
+<!-- npu="910b" id5 -->
+- Atlas A2 Training Series Products/Atlas A2 Inference Series Products: Not supported
 <!-- end id6 -->
-<!-- npu="910" id7 -->
+<!-- npu="310b" id7 -->
+- Atlas 200I/500 A2 Inference Products: Not supported
+<!-- end id8 -->
+<!-- npu="310p" id9 -->
+- Atlas Inference Series Products AI Core: Not supported
+<!-- end id10 -->
+<!-- npu="310p" id11 -->
+- Atlas Inference Series Products Vector Core: Not supported
+<!-- end id12 -->
+<!-- npu="910" id13 -->
 - Atlas Training Series Products: Not supported
-<!-- end id7 -->
+<!-- end id14 -->
 ```
 
 ### API-PROD-02 Product Support Must Use Chip Filter Tags
@@ -328,27 +328,27 @@ Some interfaces are Host interfaces that do not differentiate by product. In thi
 ```text
 ## Product Support
 
-<!-- npu="950" id1 -->
+<!-- npu="950" id15 -->
 - Ascend 950PR/Ascend 950DT: Supported
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
+<!-- end id16 -->
+<!-- npu="A3" id17 -->
 - Atlas A3 Training Series Products/Atlas A3 Inference Series Products: Not supported
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
+<!-- end id18 -->
+<!-- npu="910b" id19 -->
 - Atlas A2 Training Series Products/Atlas A2 Inference Series Products: Not supported
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
+<!-- end id20 -->
+<!-- npu="310b" id21 -->
 - Atlas 200I/500 A2 Inference Products: Not supported
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
+<!-- end id22 -->
+<!-- npu="310p" id23 -->
 - Atlas Inference Series Products AI Core: Not supported
-<!-- end id5 -->
-<!-- npu="310p" id6 -->
+<!-- end id24 -->
+<!-- npu="310p" id25 -->
 - Atlas Inference Series Products Vector Core: Not supported
-<!-- end id6 -->
-<!-- npu="910" id7 -->
+<!-- end id26 -->
+<!-- npu="910" id27 -->
 - Atlas Training Series Products: Not supported
-<!-- end id7 -->
+<!-- end id28 -->
 ```
 
 ## 4 Function Description
@@ -595,59 +595,59 @@ For scenarios with too many function prototypes, using only unordered lists woul
 [Description] When different prototypes support different chip models, the supported hardware models for each prototype must be clearly specified.
 
 ```text
-<!-- npu="950,A3,910b,310b,x90,9030" id10 -->
+<!-- npu="950,A3,910b,310b,x90,9030" id29 -->
 - This prototype supports the following product models:
 
-    <!-- npu="950" id1 -->
+    <!-- npu="950" id30 -->
     Ascend 950PR/Ascend 950DT 
-    <!-- end id1 -->
+    <!-- end id31 -->
 
-    <!-- npu="A3" id2 -->
+    <!-- npu="A3" id32 -->
     Atlas A3 Training Series Products/Atlas A3 Inference Series Products 
-    <!-- end id2 -->
+    <!-- end id33 -->
 
-    <!-- npu="910b" id3 -->
+    <!-- npu="910b" id34 -->
     Atlas A2 Training Series Products/Atlas A2 Inference Series Products 
-    <!-- end id3 -->
+    <!-- end id35 -->
 
-    <!-- npu="310b" id4 -->
+    <!-- npu="310b" id36 -->
     Atlas 200I/500 A2 Inference Products 
-    <!-- end id4 -->
+    <!-- end id37 -->
 
-    <!-- npu="x90" id5 -->
+    <!-- npu="x90" id38 -->
     Kirin X90 
-    <!-- end id5 -->
+    <!-- end id39 -->
 
-    <!-- npu="9030" id6 -->
+    <!-- npu="9030" id40 -->
     Kirin 9030 
-    <!-- end id6 -->
+    <!-- end id41 -->
 
     ```cpp
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
     __aicore__ inline void SetNextTaskStart()
     ```
-<!-- end id10 -->
+<!-- end id42 -->
 
-<!-- npu="310p,910" id11 -->
+<!-- npu="310p,910" id43 -->
 - This prototype supports the following product models:
 
-    <!-- npu="310p" id7 -->
+    <!-- npu="310p" id44 -->
     Atlas Inference Series Products AI Core 
-    <!-- end id7 -->
+    <!-- end id45 -->
 
-    <!-- npu="310p" id8 -->
+    <!-- npu="310p" id46 -->
     Atlas Inference Series Products Vector Core 
-    <!-- end id8 -->
+    <!-- end id47 -->
 
-    <!-- npu="910" id9 -->
+    <!-- npu="910" id48 -->
     Atlas Training Series Products 
-    <!-- end id9 -->
+    <!-- end id49 -->
 
     ```cpp
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3, bool FORCE = false>
     __aicore__ inline void SetNextTaskStart()
     ```
-<!-- end id11 -->
+<!-- end id50 -->
 ```
 
 ## 6 Parameter Description
@@ -789,13 +789,13 @@ Only lists the parameter units as 16 Bytes and 32 Bytes without the necessary pr
 ### flagId Value Range<a id="flagid-value-range"></a>
 
 - When the inter-core synchronization mode is mode 0, 1, or 2, the supported value range is 0-15.
-<!-- npu="950" id17 -->
+<!-- npu="950" id51 -->
 - For Ascend 950PR/Ascend 950DT, when the inter-core synchronization mode is mode 4, the supported value range is as follows:
     - CrossCoreSetFlag operations with flagId 0-10 initiated by AIV0 correspond to CrossCoreWaitFlag operations with flagId 0-10 on AIC.
     - CrossCoreSetFlag operations with flagId 0-10 initiated by AIV1 correspond to CrossCoreWaitFlag operations with flagId 16-26 on AIC.
     - CrossCoreSetFlag operations with flagId 0-10 initiated by AIC correspond to CrossCoreWaitFlag operations with flagId 0-10 on AIV0.
     - CrossCoreSetFlag operations with flagId 16-26 initiated by AIC correspond to CrossCoreWaitFlag operations with flagId 0-10 on AIV1.
-<!-- end id17 -->
+<!-- end id52 -->
 ```
 
 ### API-PARAM-08 Complex Parameter Configuration Methods Must Be Explained
@@ -1192,9 +1192,9 @@ Content customization refers to the ability to dynamically display different con
 [Positive Example]
 
 ```text
-<!-- npu="950" id1 -->
+<!-- npu="950" id53 -->
 This interface supports counter mode on Ascend 950PR/Ascend 950DT.
-<!-- end id1 -->
+<!-- end id54 -->
 ```
 
 ### API-CUSTOM-01 IDs Must Be Unique Within the Same Document

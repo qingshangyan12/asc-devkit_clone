@@ -297,25 +297,25 @@ Neg_ISASI.md的内容如下：
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
 <!-- end id2 -->
-<!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="A3" id3 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
 <!-- end id4 -->
-<!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-<!-- end id5 -->
-<!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+<!-- npu="910b" id5 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
+<!-- npu="310b" id7 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id8 -->
+<!-- npu="310p" id9 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id10 -->
+<!-- npu="310p" id11 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id12 -->
+<!-- npu="910" id13 -->
 - Atlas 训练系列产品：不支持
-<!-- end id7 -->
+<!-- end id14 -->
 ```
 
 ### API-PROD-02 产品支持情况须使用芯片过滤标签
@@ -329,27 +329,27 @@ Neg_ISASI.md的内容如下：
 ```text
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
+<!-- npu="950" id15 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
+<!-- end id16 -->
+<!-- npu="A3" id17 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
+<!-- end id18 -->
+<!-- npu="910b" id19 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
+<!-- end id20 -->
+<!-- npu="310b" id21 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
+<!-- end id22 -->
+<!-- npu="310p" id23 -->
 - Atlas 推理系列产品AI Core：不支持
-<!-- end id5 -->
-<!-- npu="310p" id6 -->
+<!-- end id24 -->
+<!-- npu="310p" id25 -->
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id6 -->
-<!-- npu="910" id7 -->
+<!-- end id26 -->
+<!-- npu="910" id27 -->
 - Atlas 训练系列产品：不支持
-<!-- end id7 -->
+<!-- end id28 -->
 ```
 
 ## 4 功能说明规范
@@ -596,59 +596,59 @@ Gather的功能说明中未给出图示说明，仅通过文字难以理解。
 【描述】不同原型支持的芯片型号不同时，须明确写明每种原型支持的硬件型号。
 
 ```text
-<!-- npu="950,A3,910b,310b,x90,9030" id10 -->
+<!-- npu="950,A3,910b,310b,x90,9030" id29 -->
 - 该原型支持如下产品型号：
 
-    <!-- npu="950" id1 -->
+    <!-- npu="950" id30 -->
     Ascend 950PR/Ascend 950DT 
-    <!-- end id1 -->
+    <!-- end id31 -->
 
-    <!-- npu="A3" id2 -->
+    <!-- npu="A3" id32 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品 
-    <!-- end id2 -->
+    <!-- end id33 -->
 
-    <!-- npu="910b" id3 -->
+    <!-- npu="910b" id34 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品 
-    <!-- end id3 -->
+    <!-- end id35 -->
 
-    <!-- npu="310b" id4 -->
+    <!-- npu="310b" id36 -->
     Atlas 200I/500 A2 推理产品 
-    <!-- end id4 -->
+    <!-- end id37 -->
 
-    <!-- npu="x90" id5 -->
+    <!-- npu="x90" id38 -->
     Kirin X90 
-    <!-- end id5 -->
+    <!-- end id39 -->
 
-    <!-- npu="9030" id6 -->
+    <!-- npu="9030" id40 -->
     Kirin 9030 
-    <!-- end id6 -->
+    <!-- end id41 -->
 
     ```cpp
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
     __aicore__ inline void SetNextTaskStart()
     ```
-<!-- end id10 -->
+<!-- end id42 -->
 
-<!-- npu="310p,910" id11 -->
+<!-- npu="310p,910" id43 -->
 - 该原型支持如下产品型号：
 
-    <!-- npu="310p" id7 -->
+    <!-- npu="310p" id44 -->
     Atlas 推理系列产品AI Core 
-    <!-- end id7 -->
+    <!-- end id45 -->
 
-    <!-- npu="310p" id8 -->
+    <!-- npu="310p" id46 -->
     Atlas 推理系列产品Vector Core 
-    <!-- end id8 -->
+    <!-- end id47 -->
 
-    <!-- npu="910" id9 -->
+    <!-- npu="910" id48 -->
     Atlas 训练系列产品 
-    <!-- end id9 -->
+    <!-- end id49 -->
 
     ```cpp
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3, bool FORCE = false>
     __aicore__ inline void SetNextTaskStart()
     ```
-<!-- end id11 -->
+<!-- end id50 -->
 ```
 
 ## 6 参数说明规范
@@ -790,13 +790,13 @@ dataCopyParams给出了其数据类型所在的头文件目录和详细介绍。
 ### flagId取值范围说明<a id="flagId取值范围说明"></a>
 
 - 核间同步的模式为模式0、1、2时，支持的取值范围为0-15。
-<!-- npu="950" id17 -->
+<!-- npu="950" id51 -->
 - 针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，支持的取值范围情况如下：
     - AIV0发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 0-10的操作。
     - AIV1发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 16-26的操作。
     - AIC发起的flagId 0-10的CrossCoreSetFlag操作对应AIV0 CrossCoreWaitFlag中flagId 0-10的操作。
     - AIC发起的flagId 16-26的CrossCoreSetFlag操作对应AIV1 CrossCoreWaitFlag中flagId 0-10的操作。
-<!-- end id17 -->
+<!-- end id52 -->
 ```
 
 ### API-PARAM-08 复杂参数配置方法须提供说明
@@ -1193,9 +1193,9 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 【正例】
 
 ```text
-<!-- npu="950" id1 -->
+<!-- npu="950" id53 -->
 本接口在Ascend 950PR/Ascend 950DT上支持counter模式。
-<!-- end id1 -->
+<!-- end id54 -->
 ```
 
 ### API-CUSTOM-01 同一文档内的id须唯一
