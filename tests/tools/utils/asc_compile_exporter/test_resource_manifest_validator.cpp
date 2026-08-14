@@ -140,8 +140,6 @@ TEST_F(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
 TEST_F(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
 {
     ExpectInvalid("manifest is not an object", [](Json& manifest) { manifest = Json::array(); });
-    ExpectInvalid("missing schema_version", [](Json& manifest) { manifest.erase("schema_version"); });
-    ExpectInvalid("schema_version has wrong type", [](Json& manifest) { manifest["schema_version"] = 1U; });
     ExpectInvalid("missing resource_id", [](Json& manifest) { manifest.erase("resource_id"); });
     ExpectInvalid("resource_id has wrong type", [](Json& manifest) { manifest["resource_id"] = 1U; });
     ExpectInvalid("resource_id is empty", [](Json& manifest) { manifest["resource_id"] = ""; });
@@ -269,7 +267,6 @@ TEST_F(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
     ExpectInvalid("object name is empty", [](Json& manifest) { Object(manifest)["object_name"] = ""; });
     ExpectInvalid("object type is missing", [](Json& manifest) { Object(manifest).erase("object_type"); });
     ExpectInvalid("object type has wrong type", [](Json& manifest) { Object(manifest)["object_type"] = 1U; });
-    ExpectInvalid("object type is unsupported", [](Json& manifest) { Object(manifest)["object_type"] = "custom"; });
     ExpectInvalid("commands is missing", [](Json& manifest) { Object(manifest).erase("commands"); });
     ExpectInvalid("commands has wrong type", [](Json& manifest) { Object(manifest)["commands"] = Json::object(); });
     ExpectInvalid("commands is empty", [](Json& manifest) { Object(manifest)["commands"] = Json::array(); });

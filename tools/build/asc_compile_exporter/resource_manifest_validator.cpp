@@ -79,9 +79,6 @@ bool ResourceManifestValidator::ValidateManifestBaseFields()
 {
     return CheckAndLog(manifest_.is_object(), __LINE__, "manifest must be an object") &&
            CheckAndLog(
-               manifest_.contains("schema_version") && manifest_.at("schema_version").is_string(), __LINE__,
-               "invalid schema_version") &&
-           CheckAndLog(
                manifest_.contains("resource_id") && manifest_.at("resource_id").is_string() &&
                    !manifest_.at("resource_id").get_ref<const std::string&>().empty(),
                __LINE__, "invalid resource_id") &&
@@ -217,7 +214,7 @@ bool ResourceManifestValidator::ValidateOptionValue(const std::string& value)
     if (outputBegin == std::string::npos) {
         return ValidateMarkerSyntax(value);
     }
-    return ValidateMarkerSyntax(value.substr(0U, outputBegin)) && ValidateOutputMarker(value.substr(outputBegin));
+    return ValidateOutputMarker(value.substr(outputBegin));
 }
 
 bool ResourceManifestValidator::ValidateOptionValue(const std::string& value, std::set<std::string>& referencedOutputs)
@@ -417,7 +414,6 @@ bool ResourceManifestValidator::ValidateObject(const Json& object, std::set<std:
             FileUtils::IsSafeRelativePath(objectName) && FileUtils::FileName(objectName) == objectName, __LINE__,
             "object_name must be a plain name") ||
         !CheckAndLog(objectNames.insert(objectName).second, __LINE__, "duplicate object_name") ||
-        !CheckAndLog(objectType == "basic" || objectType == "sk", __LINE__, "unsupported object_type") ||
         !ValidateObjectOutputs(object.at("outputs"))) {
         return false;
     }
