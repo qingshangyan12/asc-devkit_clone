@@ -137,17 +137,13 @@ template <typename T>
 inline constexpr bool supports_axpy_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
-inline constexpr bool supports_abs_sub_v = ::AscendC::Std::is_one_of_v<T, half, float>;
+inline constexpr bool supports_absdiff_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
 inline constexpr bool supports_exp_sub_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
-template <typename T, typename U>
-inline constexpr bool supports_mul_dst_add_v =
-    ::AscendC::Std::is_same_v<T, U> && ::AscendC::Std::is_one_of_v<T, half, float>;
-
 template <typename T>
-inline constexpr bool supports_mul_add_dst_v = ::AscendC::Std::is_one_of_v<T, half, float>;
+inline constexpr bool supports_fma_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 } // namespace detail
 } // namespace te

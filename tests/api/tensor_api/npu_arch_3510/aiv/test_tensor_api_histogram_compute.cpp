@@ -25,6 +25,12 @@ constexpr uint8_t DST_TOKEN = 0x2A;
 constexpr uint8_t SRC_TOKEN = 0x3B;
 constexpr uint8_t MASK_TOKEN = 0x4C;
 constexpr uint8_t RESULT_TOKEN = 0x5D;
+constexpr asc::te::histogram_options frequency_high_options {
+    asc::te::histogram_half::high, asc::te::histogram_mode::frequency};
+constexpr asc::te::histogram_options cumulative_low_options {
+    asc::te::histogram_half::low, asc::te::histogram_mode::cumulative};
+constexpr asc::te::histogram_options cumulative_high_options {
+    asc::te::histogram_half::high, asc::te::histogram_mode::cumulative};
 
 template <typename T>
 void FillBytes(T& value, uint8_t byte)
@@ -107,11 +113,9 @@ TEST_F(TestTensorApiHistogramCompute, CompileReturnValueApiAndTypeMatrix)
     asc::te::reg_tensor<uint16_t> dst {};
     asc::te::reg_tensor<uint8_t> src {};
 
-    static_assert(std::is_same_v<decltype(asc::te::histograms<
-                                     asc::te::histogram_bin::bin0, asc::te::histogram_type::frequency>(dst, src)),
+    static_assert(std::is_same_v<decltype(asc::te::histograms(dst, src)),
         asc::te::reg_tensor<uint16_t>>);
-    static_assert(std::is_same_v<decltype(asc::te::histograms<
-                                     asc::te::histogram_bin::bin1, asc::te::histogram_type::accumulate>(dst, src)),
+    static_assert(std::is_same_v<decltype(asc::te::histograms<cumulative_high_options>(dst, src)),
         asc::te::reg_tensor<uint16_t>>);
 }
 
@@ -133,14 +137,10 @@ TEST_F(TestTensorApiHistogramCompute, MapsFourModesToExistingCannHistogramApis)
         .times(2)
         .will(invoke(CumulativeHistogramStub));
 
-    auto frequencyBin0 = asc::te::histograms<
-        asc::te::histogram_bin::bin0, asc::te::histogram_type::frequency>(dst, src);
-    auto frequencyBin1 = asc::te::histograms<
-        asc::te::histogram_bin::bin1, asc::te::histogram_type::frequency>(dst, src);
-    auto cumulativeBin0 = asc::te::histograms<
-        asc::te::histogram_bin::bin0, asc::te::histogram_type::accumulate>(dst, src);
-    auto cumulativeBin1 = asc::te::histograms<
-        asc::te::histogram_bin::bin1, asc::te::histogram_type::accumulate>(dst, src);
+    auto frequency_low = asc::te::histograms(dst, src);
+    auto frequency_high = asc::te::histograms<frequency_high_options>(dst, src);
+    auto cumulative_low = asc::te::histograms<cumulative_low_options>(dst, src);
+    auto cumulative_high = asc::te::histograms<cumulative_high_options>(dst, src);
 
     GlobalMockObject::verify();
     EXPECT_EQ(gCapture.frequencyCalls, 2U);
@@ -151,14 +151,14 @@ TEST_F(TestTensorApiHistogramCompute, MapsFourModesToExistingCannHistogramApis)
     EXPECT_EQ(gCapture.cumulativeBins[1], static_cast<uint32_t>(Bin_N1));
     EXPECT_TRUE(gCapture.operandsMatch);
     EXPECT_TRUE(gCapture.masksMatch);
-    EXPECT_TRUE(HasByteValue(frequencyBin0.reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue(frequencyBin1.reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue(cumulativeBin0.reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue(cumulativeBin1.reg, RESULT_TOKEN));
-    EXPECT_TRUE(SameBytes(frequencyBin0.mask, dst.mask));
-    EXPECT_TRUE(SameBytes(frequencyBin1.mask, dst.mask));
-    EXPECT_TRUE(SameBytes(cumulativeBin0.mask, dst.mask));
-    EXPECT_TRUE(SameBytes(cumulativeBin1.mask, dst.mask));
+    EXPECT_TRUE(HasByteValue(frequency_low.reg, RESULT_TOKEN));
+    EXPECT_TRUE(HasByteValue(frequency_high.reg, RESULT_TOKEN));
+    EXPECT_TRUE(HasByteValue(cumulative_low.reg, RESULT_TOKEN));
+    EXPECT_TRUE(HasByteValue(cumulative_high.reg, RESULT_TOKEN));
+    EXPECT_TRUE(SameBytes(frequency_low.mask, dst.mask));
+    EXPECT_TRUE(SameBytes(frequency_high.mask, dst.mask));
+    EXPECT_TRUE(SameBytes(cumulative_low.mask, dst.mask));
+    EXPECT_TRUE(SameBytes(cumulative_high.mask, dst.mask));
 }
 
 } // namespace

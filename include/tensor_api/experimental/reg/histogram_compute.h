@@ -21,17 +21,24 @@
 namespace asc {
 namespace te {
 
-enum class histogram_bin {
-    bin0,
-    bin1,
+enum class histogram_half {
+    low,
+    high,
 };
 
-enum class histogram_type {
+enum class histogram_mode {
     frequency,
-    accumulate,
+    cumulative,
 };
 
-template <histogram_bin Bin, histogram_type Type>
+struct histogram_options {
+    histogram_half half = histogram_half::low;
+    histogram_mode mode = histogram_mode::frequency;
+};
+
+inline constexpr histogram_options default_histogram_options {};
+
+template <const histogram_options& Options = default_histogram_options>
 __simd_callee__ inline decltype(auto) histograms(reg_tensor<uint16_t> dst, reg_tensor<uint8_t> src);
 
 } // namespace te

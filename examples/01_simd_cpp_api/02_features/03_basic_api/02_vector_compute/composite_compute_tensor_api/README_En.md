@@ -4,7 +4,7 @@
 
 This sample demonstrates composite register compute with Tensor API. Composite APIs express operations such as multiply-add, absolute difference, exponential difference, and multiply-cast directly, so callers do not have to manage intermediate registers for each elementary operation.
 
-Two `float` vectors are loaded as `reg_tensor<float>` values. The sample calls six composite compute APIs and stores each result in a separate output row.
+Two `float` vectors are loaded as `reg_tensor<float>` values. The sample calls five composite compute APIs and stores each result in a separate output row.
 
 ## Supported Products
 
@@ -25,15 +25,14 @@ composite_compute_tensor_api
 
 ## Sample Description
 
-The input contains two vectors of 64 `float` elements. The sample produces six result rows:
+The input contains two vectors of 64 `float` elements. The sample produces five result rows:
 
 | API | Computation in This Sample |
 | --- | --- |
 | `axpy` | `src_b + 0.25 * src_a` |
-| `abs_sub` | `abs(src_a - src_b)` |
+| `absdiff` | `abs(src_a - src_b)` |
 | `exp_sub` | `exp(src_a - src_b)` |
-| `mul_dst_add` | `src_a * src_b + src_b` |
-| `mul_add_dst` | `src_a + src_b * src_b` |
+| `fma` | `src_a * src_b + src_b` |
 | `muls_cast` | Multiply `float` by 1.5, cast to `half`, and convert back to `float` for uniform storage and verification |
 
 The kernel copies data from GM to UB, loads registers and calls the composite APIs in `compute`, stores the results, and copies the output back to GM. `gen_data.py` creates the inputs and NumPy golden data. `verify_result.py` performs element-wise accuracy checks.

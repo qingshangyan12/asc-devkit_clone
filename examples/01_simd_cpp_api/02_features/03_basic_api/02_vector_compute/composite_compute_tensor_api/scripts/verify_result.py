@@ -6,7 +6,7 @@ import sys
 import numpy as np
 
 
-ROWS = 6
+ROWS = 5
 VECTOR_LENGTH = 64
 
 

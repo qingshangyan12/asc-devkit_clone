@@ -23,7 +23,6 @@ def main() -> None:
             np.abs(src_a - src_b),
             np.exp(src_a - src_b),
             src_a * src_b + src_b,
-            src_a + src_b * src_b,
             (src_a * np.float32(1.5)).astype(np.float16).astype(np.float32),
         ]
     ).astype(np.float32)
