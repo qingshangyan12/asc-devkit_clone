@@ -11,13 +11,13 @@ hero:
       link: /guide/
     - theme: alt
       text: 入门教程
-      link: /guide/入门教程/Ascend-C概述与学习路径
+      link: /guide/getting_started/ascend_c_overview_and_learning_path
 
 features:
   - icon: 🚀
     title: 入门教程
     details: 从环境准备到 HelloWorld，快速上手 Ascend C 算子开发。
-    link: /guide/入门教程/Ascend-C概述与学习路径
+    link: /guide/getting_started/ascend_c_overview_and_learning_path
   - icon: 📖
     title: 编程指南
     details: SIMD/SIMT 编程模型、编译运行、语言扩展、调试调优完整指南。

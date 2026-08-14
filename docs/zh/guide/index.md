@@ -1,17 +1,17 @@
 # Ascend C算子开发指南
 
--   [入门教程](入门教程/Ascend-C概述与学习路径.md)
-    -   [Ascend C概述与学习路径](入门教程/Ascend-C概述与学习路径.md)
-    -   [环境准备](入门教程/环境准备.md)
-    -   [快速入门](入门教程/快速入门/异构系统与编程模型.md)
-        -   [异构系统与编程模型](入门教程/快速入门/异构系统与编程模型.md)
-        -   [基于SIMD编程](入门教程/快速入门/基于SIMD编程/基于SIMD编程.md)
-            -   [HelloWorld](入门教程/快速入门/基于SIMD编程/HelloWorld.md)
-            -   [Add算子快速入门](入门教程/快速入门/基于SIMD编程/Add算子快速入门.md)
+-   [入门教程](getting_started/ascend_c_overview_and_learning_path.md)
+    -   [Ascend C概述与学习路径](getting_started/ascend_c_overview_and_learning_path.md)
+    -   [环境准备](getting_started/environment_setup.md)
+    -   [快速入门](getting_started/quick_start/heterogeneous_system_and_programming_model.md)
+        -   [异构系统与编程模型](getting_started/quick_start/heterogeneous_system_and_programming_model.md)
+        -   [基于SIMD编程](getting_started/quick_start/simd_programming/simd_programming.md)
+            -   [HelloWorld](getting_started/quick_start/simd_programming/hello_world.md)
+            -   [Add算子快速入门](getting_started/quick_start/simd_programming/add_op_quick_start.md)
 
-        -   [基于SIMT编程](入门教程/快速入门/基于SIMT编程/基于SIMT编程.md)
-            -   [HelloWorld](入门教程/快速入门/基于SIMT编程/HelloWorld.md)
-            -   [Gather算子快速入门](入门教程/快速入门/基于SIMT编程/Gather算子快速入门.md)
+        -   [基于SIMT编程](getting_started/quick_start/simt_programming/simt_programming.md)
+            -   [HelloWorld](getting_started/quick_start/simt_programming/hello_world.md)
+            -   [Gather算子快速入门](getting_started/quick_start/simt_programming/gather_op_quick_start.md)
 
 -   [编程指南](编程指南/本文档组织结构.md)
     -   [本文档组织结构](编程指南/本文档组织结构.md)
