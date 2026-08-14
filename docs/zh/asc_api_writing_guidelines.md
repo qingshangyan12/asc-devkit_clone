@@ -1094,25 +1094,21 @@ bool、int4b_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、f
 
 【反例】（列表下的内容无缩进）：
 
-```text
 - tensor前n个数据计算
 
 ```cpp
 template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 ```
-```
 
 【正例】（列表下的代码块缩进4个空格）：
 
-```text
 - tensor前n个数据计算
 
     ```cpp
     template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
     __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
     ```
-```
 
 ### API-FORMAT-01 须使用Markdown简易表格
 
@@ -1181,7 +1177,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 【正例】
 
 ```
-支持的流水参考[硬件流水类型](../核内同步能力概述.md#硬件流水类型)。
+支持的流水参考[硬件流水类型](../core_sync_overview.md#硬件流水类型)。
 ```
 
 ## 14 芯片版本过滤定制
