@@ -16,6 +16,7 @@
 #include "executor_v2_base.h"
 #include "gtest/gtest.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
+#include "coll_alg_v2_exec_registry.h"
 
 using namespace mc2_ops_hccl;
 
@@ -39,11 +40,11 @@ protected:
     void SetUp() override { ResetAlgEnvConfigInitState(); }
 };
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, route_uses_cann_bridge)
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, route_uses_expected_bridge)
 {
-    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL)));
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL)));
     EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV)));
-    EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_AICPU)));
+    EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_AICPU)));
     EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, COMM_ENGINE_AICPU)));
 
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_CPU)));
@@ -51,11 +52,16 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, route_uses_cann_bridge)
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER)));
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, cann_registry_contains_mesh1d_algorithms)
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, registry_contains_expected_algorithms)
 {
     EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALLV, "InsAlltoAllVMesh1D"), nullptr);
-    EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1DSingleChannel"), nullptr);
-    EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1D"), nullptr);
+    EXPECT_NE(
+        CollAlgExecRegistryV2::Instance().GetAlgExec(
+            HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1DSingleChannel"),
+        nullptr);
+    EXPECT_NE(
+        CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1D"), nullptr);
+    EXPECT_NE(CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshUBX"), nullptr);
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoall_multi_channel_threshold_is_strict_and_overflow_safe)
