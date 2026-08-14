@@ -127,11 +127,11 @@ template <typename T>
 inline constexpr bool supports_shift_v =
     ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>;
 
-template <typename T, typename ShiftT>
+template <typename T, typename shift_type>
 inline constexpr bool supports_shift_pair_v =
-    (::AscendC::Std::is_one_of_v<T, int8_t, uint8_t> && ::AscendC::Std::is_same_v<ShiftT, int8_t>) ||
-    (::AscendC::Std::is_one_of_v<T, int16_t, uint16_t> && ::AscendC::Std::is_same_v<ShiftT, int16_t>) ||
-    (::AscendC::Std::is_one_of_v<T, int32_t, uint32_t> && ::AscendC::Std::is_same_v<ShiftT, int32_t>);
+    (::AscendC::Std::is_one_of_v<T, int8_t, uint8_t> && ::AscendC::Std::is_same_v<shift_type, int8_t>) ||
+    (::AscendC::Std::is_one_of_v<T, int16_t, uint16_t> && ::AscendC::Std::is_same_v<shift_type, int16_t>) ||
+    (::AscendC::Std::is_one_of_v<T, int32_t, uint32_t> && ::AscendC::Std::is_same_v<shift_type, int32_t>);
 
 template <typename T>
 inline constexpr bool supports_axpy_v = ::AscendC::Std::is_one_of_v<T, half, float>;

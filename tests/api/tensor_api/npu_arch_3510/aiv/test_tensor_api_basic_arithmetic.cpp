@@ -28,7 +28,7 @@ constexpr uint8_t RESULT_TOKEN = 0x44;
 constexpr uint8_t MASK_TOKEN = 0x5A;
 
 template <typename T>
-void FillBytes(T& value, uint8_t byte)
+void fill_bytes(T& value, uint8_t byte)
 {
     std::array<uint8_t, sizeof(T)> bytes {};
     bytes.fill(byte);
@@ -36,7 +36,7 @@ void FillBytes(T& value, uint8_t byte)
 }
 
 template <typename T>
-bool HasByteValue(const T& value, uint8_t byte)
+bool has_byte_value(const T& value, uint8_t byte)
 {
     std::array<uint8_t, sizeof(T)> bytes {};
     std::memcpy(bytes.data(), &value, bytes.size());
@@ -49,29 +49,29 @@ bool HasByteValue(const T& value, uint8_t byte)
 }
 
 template <typename T>
-bool SameBytes(const T& lhs, const T& rhs)
+bool same_bytes(const T& lhs, const T& rhs)
 {
     return std::memcmp(&lhs, &rhs, sizeof(T)) == 0;
 }
 
 template <typename T>
-asc::te::reg_tensor<T> MakeReg(uint8_t reg_token = SRC0_TOKEN)
+asc::te::reg_tensor<T> make_reg(uint8_t reg_token = SRC0_TOKEN)
 {
     asc::te::reg_tensor<T> value {};
-    FillBytes(value.reg, reg_token);
-    FillBytes(value.mask, MASK_TOKEN);
+    fill_bytes(value.reg, reg_token);
+    fill_bytes(value.mask, MASK_TOKEN);
     return value;
 }
 
 template <typename T>
-void ExpectResult(const asc::te::reg_tensor<T>& result, const vector_bool& mask,
+void expect_result(const asc::te::reg_tensor<T>& result, const vector_bool& mask,
     uint8_t result_token = RESULT_TOKEN)
 {
-    EXPECT_TRUE(HasByteValue(result.reg, result_token));
-    EXPECT_TRUE(SameBytes(result.mask, mask));
+    EXPECT_TRUE(has_byte_value(result.reg, result_token));
+    EXPECT_TRUE(same_bytes(result.mask, mask));
 }
 
-struct Capture {
+struct capture {
     vector_bool expected_mask {};
     bool masks_match = true;
     bool operands_match = true;
@@ -81,84 +81,84 @@ struct Capture {
     std::array<float, 8> scalars {};
 };
 
-Capture g_capture;
+capture g_capture;
 
-void ResetCapture(const vector_bool& mask)
+void reset_capture(const vector_bool& mask)
 {
     g_capture = {};
     g_capture.expected_mask = mask;
 }
 
-void CaptureMask(const vector_bool& mask)
+void capture_mask(const vector_bool& mask)
 {
-    g_capture.masks_match = g_capture.masks_match && SameBytes(mask, g_capture.expected_mask);
+    g_capture.masks_match = g_capture.masks_match && same_bytes(mask, g_capture.expected_mask);
 }
 
-void UnaryFloatStub(vector_float& dst, vector_float, vector_bool mask, Literal)
+void unary_float_stub(vector_float& dst, vector_float, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     ++g_capture.calls;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void LnStub(vector_float& dst, vector_float, vector_bool mask, Literal)
+void ln_stub(vector_float& dst, vector_float, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     ++g_capture.calls;
-    FillBytes(dst, SRC1_TOKEN);
+    fill_bytes(dst, SRC1_TOKEN);
 }
 
-void ScalarFloatStub(vector_float& dst, vector_float src, float scalar, vector_bool mask, Literal)
+void scalar_float_stub(vector_float& dst, vector_float src, float scalar, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     g_capture.operands_match = g_capture.operands_match &&
-        (HasByteValue(src, SRC0_TOKEN) || HasByteValue(src, SRC1_TOKEN));
+        (has_byte_value(src, SRC0_TOKEN) || has_byte_value(src, SRC1_TOKEN));
     g_capture.scalars[g_capture.scalar_calls++] = scalar;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void BinaryFloatStub(vector_float& dst, vector_float, vector_float, vector_bool mask, Literal)
+void binary_float_stub(vector_float& dst, vector_float, vector_float, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     ++g_capture.calls;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void DuplicateFloatStub(vector_float& dst, float scalar, vector_bool mask, Literal)
+void duplicate_float_stub(vector_float& dst, float scalar, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     g_capture.scalars[g_capture.scalar_calls++] = scalar;
     ++g_capture.duplicate_calls;
-    FillBytes(dst, BROADCAST_TOKEN);
+    fill_bytes(dst, BROADCAST_TOKEN);
 }
 
-void OrderedFloatStub(vector_float& dst, vector_float left, vector_float right, vector_bool mask, Literal)
+void ordered_float_stub(vector_float& dst, vector_float left, vector_float right, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     constexpr std::array<uint8_t, 3> left_tokens {SRC0_TOKEN, SRC0_TOKEN, BROADCAST_TOKEN};
     constexpr std::array<uint8_t, 3> right_tokens {SRC1_TOKEN, BROADCAST_TOKEN, SRC0_TOKEN};
     size_t call = g_capture.calls++;
     g_capture.operands_match = g_capture.operands_match && call < left_tokens.size() &&
-        HasByteValue(left, left_tokens[call]) && HasByteValue(right, right_tokens[call]);
-    FillBytes(dst, RESULT_TOKEN);
+        has_byte_value(left, left_tokens[call]) && has_byte_value(right, right_tokens[call]);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void PreluStub(vector_float& dst, vector_float src, vector_float slope, vector_bool mask, Literal)
+void prelu_stub(vector_float& dst, vector_float src, vector_float slope, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
-    g_capture.operands_match = HasByteValue(src, SRC0_TOKEN) && HasByteValue(slope, SRC1_TOKEN);
-    FillBytes(dst, RESULT_TOKEN);
+    capture_mask(mask);
+    g_capture.operands_match = has_byte_value(src, SRC0_TOKEN) && has_byte_value(slope, SRC1_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void LeakyReluStub(vector_float& dst, vector_float src, float scalar, vector_bool mask, Literal)
+void leaky_relu_stub(vector_float& dst, vector_float src, float scalar, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
-    g_capture.operands_match = g_capture.operands_match && HasByteValue(src, SRC0_TOKEN);
+    capture_mask(mask);
+    g_capture.operands_match = g_capture.operands_match && has_byte_value(src, SRC0_TOKEN);
     g_capture.scalars[g_capture.scalar_calls++] = scalar;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-class TestTensorApiBasicArithmetic : public testing::Test {
+class test_tensor_api_basic_arithmetic : public testing::Test {
 protected:
     void SetUp() override
     {
@@ -172,7 +172,7 @@ protected:
 };
 
 template <typename T>
-__aicore__ inline void CompileUnaryArithmetic()
+__aicore__ inline void compile_unary_arithmetic()
 {
     asc::te::reg_tensor<T> src {};
     (void)asc::te::abs(src);
@@ -180,7 +180,7 @@ __aicore__ inline void CompileUnaryArithmetic()
 }
 
 template <typename T>
-__aicore__ inline void CompileFloatMath()
+__aicore__ inline void compile_float_math()
 {
     asc::te::reg_tensor<T> src {};
     asc::te::reg_tensor<T> slope {};
@@ -194,14 +194,14 @@ __aicore__ inline void CompileFloatMath()
 }
 
 template <typename T>
-__aicore__ inline void CompileRelu()
+__aicore__ inline void compile_relu()
 {
     asc::te::reg_tensor<T> src {};
     (void)asc::te::relu(src);
 }
 
 template <typename T>
-__aicore__ inline void CompileAddSub()
+__aicore__ inline void compile_add_sub()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -215,7 +215,7 @@ __aicore__ inline void CompileAddSub()
 }
 
 template <typename T>
-__aicore__ inline void CompileMul()
+__aicore__ inline void compile_mul()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -223,7 +223,7 @@ __aicore__ inline void CompileMul()
 }
 
 template <typename T>
-__aicore__ inline void CompileMulDivScalar()
+__aicore__ inline void compile_mul_div_scalar()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -236,7 +236,7 @@ __aicore__ inline void CompileMulDivScalar()
 }
 
 template <typename T>
-__aicore__ inline void CompileMinMax()
+__aicore__ inline void compile_min_max()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -250,7 +250,7 @@ __aicore__ inline void CompileMinMax()
 }
 
 template <typename T>
-__aicore__ inline void CompileCarryAndMull()
+__aicore__ inline void compile_carry_and_mull()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -264,7 +264,7 @@ __aicore__ inline void CompileCarryAndMull()
 }
 
 template <typename T>
-__aicore__ inline void CompileMull()
+__aicore__ inline void compile_mull()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -272,7 +272,7 @@ __aicore__ inline void CompileMull()
     (void)asc::te::mull(high, src0, src1);
 }
 
-TEST_F(TestTensorApiBasicArithmetic, CompilePublicApisAndSupportedTypes)
+TEST_F(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)
 {
     AscendC::SetGCoreType(0);
     asc::te::reg_tensor<float> float_src {};
@@ -302,78 +302,78 @@ TEST_F(TestTensorApiBasicArithmetic, CompilePublicApisAndSupportedTypes)
     (void)asc::te::sub_c(carry, uint_src0, uint_src1, carry);
     (void)asc::te::mull(int_src1, int_src0, int_src1);
 
-    CompileUnaryArithmetic<int8_t>();
-    CompileUnaryArithmetic<int16_t>();
-    CompileUnaryArithmetic<half>();
-    CompileUnaryArithmetic<int32_t>();
-    CompileUnaryArithmetic<float>();
-    CompileFloatMath<half>();
-    CompileFloatMath<float>();
-    CompileRelu<half>();
-    CompileRelu<int32_t>();
-    CompileRelu<float>();
+    compile_unary_arithmetic<int8_t>();
+    compile_unary_arithmetic<int16_t>();
+    compile_unary_arithmetic<half>();
+    compile_unary_arithmetic<int32_t>();
+    compile_unary_arithmetic<float>();
+    compile_float_math<half>();
+    compile_float_math<float>();
+    compile_relu<half>();
+    compile_relu<int32_t>();
+    compile_relu<float>();
 
-    CompileAddSub<int8_t>();
-    CompileAddSub<uint8_t>();
-    CompileAddSub<int16_t>();
-    CompileAddSub<uint16_t>();
-    CompileAddSub<half>();
-    CompileAddSub<bfloat16_t>();
-    CompileAddSub<int32_t>();
-    CompileAddSub<uint32_t>();
-    CompileAddSub<float>();
+    compile_add_sub<int8_t>();
+    compile_add_sub<uint8_t>();
+    compile_add_sub<int16_t>();
+    compile_add_sub<uint16_t>();
+    compile_add_sub<half>();
+    compile_add_sub<bfloat16_t>();
+    compile_add_sub<int32_t>();
+    compile_add_sub<uint32_t>();
+    compile_add_sub<float>();
 
-    CompileMul<int16_t>();
-    CompileMul<uint16_t>();
-    CompileMul<half>();
-    CompileMul<bfloat16_t>();
-    CompileMul<int32_t>();
-    CompileMul<uint32_t>();
-    CompileMul<float>();
+    compile_mul<int16_t>();
+    compile_mul<uint16_t>();
+    compile_mul<half>();
+    compile_mul<bfloat16_t>();
+    compile_mul<int32_t>();
+    compile_mul<uint32_t>();
+    compile_mul<float>();
 
-    CompileMulDivScalar<int16_t>();
-    CompileMulDivScalar<uint16_t>();
-    CompileMulDivScalar<half>();
-    CompileMulDivScalar<int32_t>();
-    CompileMulDivScalar<uint32_t>();
-    CompileMulDivScalar<float>();
+    compile_mul_div_scalar<int16_t>();
+    compile_mul_div_scalar<uint16_t>();
+    compile_mul_div_scalar<half>();
+    compile_mul_div_scalar<int32_t>();
+    compile_mul_div_scalar<uint32_t>();
+    compile_mul_div_scalar<float>();
 
-    CompileMinMax<int8_t>();
-    CompileMinMax<uint8_t>();
-    CompileMinMax<int16_t>();
-    CompileMinMax<uint16_t>();
-    CompileMinMax<half>();
-    CompileMinMax<bfloat16_t>();
-    CompileMinMax<int32_t>();
-    CompileMinMax<uint32_t>();
-    CompileMinMax<float>();
-    CompileCarryAndMull<uint32_t>();
-    CompileMull<int32_t>();
+    compile_min_max<int8_t>();
+    compile_min_max<uint8_t>();
+    compile_min_max<int16_t>();
+    compile_min_max<uint16_t>();
+    compile_min_max<half>();
+    compile_min_max<bfloat16_t>();
+    compile_min_max<int32_t>();
+    compile_min_max<uint32_t>();
+    compile_min_max<float>();
+    compile_carry_and_mull<uint32_t>();
+    compile_mull<int32_t>();
     static_assert(!asc::te::detail::supports_carry_v<int32_t>);
 }
 
-TEST_F(TestTensorApiBasicArithmetic, UnaryAndLogApisForwardMask)
+TEST_F(test_tensor_api_basic_arithmetic, unary_and_log_apis_forward_mask)
 {
-    auto src = MakeReg<float>();
-    ResetCapture(src.mask);
-    MOCKER_CPP(vabs, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(UnaryFloatStub));
-    MOCKER_CPP(vexp, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(UnaryFloatStub));
-    MOCKER_CPP(vsqrt, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(UnaryFloatStub));
-    MOCKER_CPP(vln, void(vector_float&, vector_float, vector_bool, Literal)).times(3).will(invoke(LnStub));
-    MOCKER_CPP(vneg, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(UnaryFloatStub));
-    MOCKER_CPP(vrelu, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(UnaryFloatStub));
+    auto src = make_reg<float>();
+    reset_capture(src.mask);
+    MOCKER_CPP(vabs, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(unary_float_stub));
+    MOCKER_CPP(vexp, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(unary_float_stub));
+    MOCKER_CPP(vsqrt, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(unary_float_stub));
+    MOCKER_CPP(vln, void(vector_float&, vector_float, vector_bool, Literal)).times(3).will(invoke(ln_stub));
+    MOCKER_CPP(vneg, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(unary_float_stub));
+    MOCKER_CPP(vrelu, void(vector_float&, vector_float, vector_bool, Literal)).times(1).will(invoke(unary_float_stub));
     MOCKER_CPP(vmuls, void(vector_float&, vector_float, float, vector_bool, Literal))
         .times(2)
-        .will(invoke(ScalarFloatStub));
+        .will(invoke(scalar_float_stub));
 
-    ExpectResult(asc::te::abs(src), src.mask);
-    ExpectResult(asc::te::exp(src), src.mask);
-    ExpectResult(asc::te::sqrt(src), src.mask);
-    ExpectResult(asc::te::log(src), src.mask, SRC1_TOKEN);
-    ExpectResult(asc::te::log2(src), src.mask);
-    ExpectResult(asc::te::log10(src), src.mask);
-    ExpectResult(-src, src.mask);
-    ExpectResult(asc::te::relu(src), src.mask);
+    expect_result(asc::te::abs(src), src.mask);
+    expect_result(asc::te::exp(src), src.mask);
+    expect_result(asc::te::sqrt(src), src.mask);
+    expect_result(asc::te::log(src), src.mask, SRC1_TOKEN);
+    expect_result(asc::te::log2(src), src.mask);
+    expect_result(asc::te::log10(src), src.mask);
+    expect_result(-src, src.mask);
+    expect_result(asc::te::relu(src), src.mask);
 
     GlobalMockObject::verify();
     EXPECT_FLOAT_EQ(g_capture.scalars[0], 1.4426950408889634f);
@@ -381,20 +381,20 @@ TEST_F(TestTensorApiBasicArithmetic, UnaryAndLogApisForwardMask)
     EXPECT_TRUE(g_capture.masks_match);
 }
 
-TEST_F(TestTensorApiBasicArithmetic, ActivationApisPreserveOperandsAndMask)
+TEST_F(test_tensor_api_basic_arithmetic, activation_apis_preserve_operands_and_mask)
 {
-    auto src = MakeReg<float>();
-    auto slope = MakeReg<float>(SRC1_TOKEN);
-    ResetCapture(src.mask);
+    auto src = make_reg<float>();
+    auto slope = make_reg<float>(SRC1_TOKEN);
+    reset_capture(src.mask);
     MOCKER_CPP(vprelu, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
         .times(1)
-        .will(invoke(PreluStub));
+        .will(invoke(prelu_stub));
     MOCKER_CPP(vlrelu, void(vector_float&, vector_float, float, vector_bool, Literal))
         .times(1)
-        .will(invoke(LeakyReluStub));
+        .will(invoke(leaky_relu_stub));
 
-    ExpectResult(asc::te::prelu(src, slope), src.mask);
-    ExpectResult(asc::te::leaky_relu(src, 0.2f), src.mask);
+    expect_result(asc::te::prelu(src, slope), src.mask);
+    expect_result(asc::te::leaky_relu(src, 0.2f), src.mask);
 
     GlobalMockObject::verify();
     EXPECT_FLOAT_EQ(g_capture.scalars[0], 0.2f);
@@ -402,30 +402,30 @@ TEST_F(TestTensorApiBasicArithmetic, ActivationApisPreserveOperandsAndMask)
     EXPECT_TRUE(g_capture.masks_match);
 }
 
-TEST_F(TestTensorApiBasicArithmetic, AddAndMultiplyChooseRegisterOrScalarIntrinsic)
+TEST_F(test_tensor_api_basic_arithmetic, add_and_multiply_choose_register_or_scalar_intrinsic)
 {
-    auto src0 = MakeReg<float>();
-    auto src1 = MakeReg<float>(SRC1_TOKEN);
-    ResetCapture(src0.mask);
+    auto src0 = make_reg<float>();
+    auto src1 = make_reg<float>(SRC1_TOKEN);
+    reset_capture(src0.mask);
     MOCKER_CPP(vadd, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
         .times(1)
-        .will(invoke(BinaryFloatStub));
+        .will(invoke(binary_float_stub));
     MOCKER_CPP(vadds, void(vector_float&, vector_float, float, vector_bool, Literal))
         .times(2)
-        .will(invoke(ScalarFloatStub));
+        .will(invoke(scalar_float_stub));
     MOCKER_CPP(vmul, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
         .times(1)
-        .will(invoke(BinaryFloatStub));
+        .will(invoke(binary_float_stub));
     MOCKER_CPP(vmuls, void(vector_float&, vector_float, float, vector_bool, Literal))
         .times(2)
-        .will(invoke(ScalarFloatStub));
+        .will(invoke(scalar_float_stub));
 
-    ExpectResult(src0 + src1, src0.mask);
-    ExpectResult(src0 + 2.0f, src0.mask);
-    ExpectResult(2.0f + src0, src0.mask);
-    ExpectResult(src0 * src1, src0.mask);
-    ExpectResult(src0 * 3.0f, src0.mask);
-    ExpectResult(3.0f * src0, src0.mask);
+    expect_result(src0 + src1, src0.mask);
+    expect_result(src0 + 2.0f, src0.mask);
+    expect_result(2.0f + src0, src0.mask);
+    expect_result(src0 * src1, src0.mask);
+    expect_result(src0 * 3.0f, src0.mask);
+    expect_result(3.0f * src0, src0.mask);
 
     GlobalMockObject::verify();
     EXPECT_EQ(g_capture.calls, 2U);
@@ -433,30 +433,30 @@ TEST_F(TestTensorApiBasicArithmetic, AddAndMultiplyChooseRegisterOrScalarIntrins
     EXPECT_TRUE(g_capture.masks_match);
 }
 
-TEST_F(TestTensorApiBasicArithmetic, SubtractAndDividePreserveOperandOrder)
+TEST_F(test_tensor_api_basic_arithmetic, subtract_and_divide_preserve_operand_order)
 {
-    auto src0 = MakeReg<float>();
-    auto src1 = MakeReg<float>(SRC1_TOKEN);
-    ResetCapture(src0.mask);
+    auto src0 = make_reg<float>();
+    auto src1 = make_reg<float>(SRC1_TOKEN);
+    reset_capture(src0.mask);
     MOCKER_CPP(vdup, void(vector_float&, float, vector_bool, Literal))
         .times(4)
-        .will(invoke(DuplicateFloatStub));
+        .will(invoke(duplicate_float_stub));
     MOCKER_CPP(vsub, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
         .times(3)
-        .will(invoke(OrderedFloatStub));
+        .will(invoke(ordered_float_stub));
 
-    ExpectResult(src0 - src1, src0.mask);
-    ExpectResult(src0 - 4.0f, src0.mask);
-    ExpectResult(4.0f - src0, src0.mask);
+    expect_result(src0 - src1, src0.mask);
+    expect_result(src0 - 4.0f, src0.mask);
+    expect_result(4.0f - src0, src0.mask);
     EXPECT_EQ(g_capture.calls, 3U);
     g_capture.calls = 0;
 
     MOCKER_CPP(vdiv, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
         .times(3)
-        .will(invoke(OrderedFloatStub));
-    ExpectResult(src0 / src1, src0.mask);
-    ExpectResult(src0 / 8.0f, src0.mask);
-    ExpectResult(8.0f / src0, src0.mask);
+        .will(invoke(ordered_float_stub));
+    expect_result(src0 / src1, src0.mask);
+    expect_result(src0 / 8.0f, src0.mask);
+    expect_result(8.0f / src0, src0.mask);
 
     GlobalMockObject::verify();
     EXPECT_EQ(g_capture.calls, 3U);

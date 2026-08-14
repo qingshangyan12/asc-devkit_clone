@@ -27,7 +27,7 @@ constexpr uint8_t MASK_TOKEN = 0x5A;
 constexpr uint8_t PREDICATE_TOKEN = 0x6B;
 
 template <typename T>
-void FillBytes(T& value, uint8_t byte)
+void fill_bytes(T& value, uint8_t byte)
 {
     std::array<uint8_t, sizeof(T)> bytes {};
     bytes.fill(byte);
@@ -35,7 +35,7 @@ void FillBytes(T& value, uint8_t byte)
 }
 
 template <typename T>
-bool HasByteValue(const T& value, uint8_t byte)
+bool has_byte_value(const T& value, uint8_t byte)
 {
     std::array<uint8_t, sizeof(T)> bytes {};
     std::memcpy(bytes.data(), &value, bytes.size());
@@ -48,21 +48,21 @@ bool HasByteValue(const T& value, uint8_t byte)
 }
 
 template <typename T>
-bool SameBytes(const T& lhs, const T& rhs)
+bool same_bytes(const T& lhs, const T& rhs)
 {
     return std::memcmp(&lhs, &rhs, sizeof(T)) == 0;
 }
 
 template <typename T>
-asc::te::reg_tensor<T> MakeReg(uint8_t token = SRC_TOKEN)
+asc::te::reg_tensor<T> make_reg(uint8_t token = SRC_TOKEN)
 {
     asc::te::reg_tensor<T> value {};
-    FillBytes(value.reg, token);
-    FillBytes(value.mask, MASK_TOKEN);
+    fill_bytes(value.reg, token);
+    fill_bytes(value.mask, MASK_TOKEN);
     return value;
 }
 
-struct Capture {
+struct capture {
     vector_bool expected_mask {};
     bool masks_match = true;
     size_t binary_calls = 0;
@@ -70,47 +70,47 @@ struct Capture {
     std::array<int16_t, 2> shifts {};
 };
 
-Capture g_capture;
+capture g_capture;
 
-void CaptureMask(const vector_bool& mask)
+void capture_mask(const vector_bool& mask)
 {
-    g_capture.masks_match = g_capture.masks_match && SameBytes(mask, g_capture.expected_mask);
+    g_capture.masks_match = g_capture.masks_match && same_bytes(mask, g_capture.expected_mask);
 }
 
-void BinaryIntStub(vector_int32_t& dst, vector_int32_t, vector_int32_t, vector_bool mask, Literal)
+void binary_int_stub(vector_int32_t& dst, vector_int32_t, vector_int32_t, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     ++g_capture.binary_calls;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void ShiftScalarStub(vector_int32_t& dst, vector_int32_t, int16_t shift, vector_bool mask, Literal)
+void shift_scalar_stub(vector_int32_t& dst, vector_int32_t, int16_t shift, vector_bool mask, Literal)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     g_capture.shifts[g_capture.scalar_calls++] = shift;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void EqZeroStub(vector_bool& dst, vector_int32_t, int32_t value, vector_bool mask)
+void eq_zero_stub(vector_bool& dst, vector_int32_t, int32_t value, vector_bool mask)
 {
-    CaptureMask(mask);
+    capture_mask(mask);
     EXPECT_EQ(value, 0);
-    FillBytes(dst, PREDICATE_TOKEN);
+    fill_bytes(dst, PREDICATE_TOKEN);
 }
 
-void DuplicateIntStub(vector_int32_t& dst, int32_t value, vector_bool mask, Literal)
+void duplicate_int_stub(vector_int32_t& dst, int32_t value, vector_bool mask, Literal)
 {
     if (value == 0) {
-        CaptureMask(mask);
-        FillBytes(dst, 0);
+        capture_mask(mask);
+        fill_bytes(dst, 0);
     } else {
         EXPECT_EQ(value, 1);
-        EXPECT_TRUE(HasByteValue(mask, PREDICATE_TOKEN));
-        FillBytes(dst, RESULT_TOKEN);
+        EXPECT_TRUE(has_byte_value(mask, PREDICATE_TOKEN));
+        fill_bytes(dst, RESULT_TOKEN);
     }
 }
 
-class TestTensorApiLogicalCompute : public testing::Test {
+class test_tensor_api_logical_compute : public testing::Test {
 protected:
     void SetUp() override
     {
@@ -124,14 +124,14 @@ protected:
 };
 
 template <typename T>
-__aicore__ inline void CompileLogicalNot()
+__aicore__ inline void compile_logical_not()
 {
     asc::te::reg_tensor<T> src {};
     (void)!src;
 }
 
 template <typename T>
-__aicore__ inline void CompileBitwiseAnd()
+__aicore__ inline void compile_bitwise_and()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -142,7 +142,7 @@ __aicore__ inline void CompileBitwiseAnd()
 }
 
 template <typename T>
-__aicore__ inline void CompileBitwiseOr()
+__aicore__ inline void compile_bitwise_or()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -153,7 +153,7 @@ __aicore__ inline void CompileBitwiseOr()
 }
 
 template <typename T>
-__aicore__ inline void CompileBitwiseXor()
+__aicore__ inline void compile_bitwise_xor()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
@@ -163,64 +163,64 @@ __aicore__ inline void CompileBitwiseXor()
     (void)(scalar ^ src0);
 }
 
-template <typename T, typename ShiftT>
-__aicore__ inline void CompileShift()
+template <typename T, typename shift_type>
+__aicore__ inline void compile_shift()
 {
     asc::te::reg_tensor<T> src {};
-    asc::te::reg_tensor<ShiftT> shift {};
+    asc::te::reg_tensor<shift_type> shift {};
     (void)(src << shift);
     (void)(src << static_cast<int16_t>(2));
     (void)(src >> shift);
     (void)(src >> static_cast<int16_t>(2));
 }
 
-TEST_F(TestTensorApiLogicalCompute, CompilePublicApisAndSupportedTypes)
+TEST_F(test_tensor_api_logical_compute, compile_public_apis_and_supported_types)
 {
     AscendC::SetGCoreType(0);
-    CompileLogicalNot<int8_t>();
-    CompileLogicalNot<uint8_t>();
-    CompileLogicalNot<int16_t>();
-    CompileLogicalNot<uint16_t>();
-    CompileLogicalNot<half>();
-    CompileLogicalNot<bfloat16_t>();
-    CompileLogicalNot<int32_t>();
-    CompileLogicalNot<uint32_t>();
-    CompileLogicalNot<float>();
+    compile_logical_not<int8_t>();
+    compile_logical_not<uint8_t>();
+    compile_logical_not<int16_t>();
+    compile_logical_not<uint16_t>();
+    compile_logical_not<half>();
+    compile_logical_not<bfloat16_t>();
+    compile_logical_not<int32_t>();
+    compile_logical_not<uint32_t>();
+    compile_logical_not<float>();
 
-    CompileBitwiseAnd<int8_t>();
-    CompileBitwiseAnd<uint8_t>();
-    CompileBitwiseAnd<fp8_e5m2_t>();
-    CompileBitwiseAnd<fp8_e4m3fn_t>();
-    CompileBitwiseAnd<int16_t>();
-    CompileBitwiseAnd<uint16_t>();
-    CompileBitwiseAnd<half>();
-    CompileBitwiseAnd<bfloat16_t>();
-    CompileBitwiseAnd<int32_t>();
-    CompileBitwiseAnd<uint32_t>();
-    CompileBitwiseAnd<float>();
+    compile_bitwise_and<int8_t>();
+    compile_bitwise_and<uint8_t>();
+    compile_bitwise_and<fp8_e5m2_t>();
+    compile_bitwise_and<fp8_e4m3fn_t>();
+    compile_bitwise_and<int16_t>();
+    compile_bitwise_and<uint16_t>();
+    compile_bitwise_and<half>();
+    compile_bitwise_and<bfloat16_t>();
+    compile_bitwise_and<int32_t>();
+    compile_bitwise_and<uint32_t>();
+    compile_bitwise_and<float>();
 
-    CompileBitwiseOr<int8_t>();
-    CompileBitwiseOr<uint8_t>();
-    CompileBitwiseOr<int16_t>();
-    CompileBitwiseOr<uint16_t>();
-    CompileBitwiseOr<half>();
-    CompileBitwiseOr<int32_t>();
-    CompileBitwiseOr<uint32_t>();
-    CompileBitwiseOr<float>();
+    compile_bitwise_or<int8_t>();
+    compile_bitwise_or<uint8_t>();
+    compile_bitwise_or<int16_t>();
+    compile_bitwise_or<uint16_t>();
+    compile_bitwise_or<half>();
+    compile_bitwise_or<int32_t>();
+    compile_bitwise_or<uint32_t>();
+    compile_bitwise_or<float>();
 
-    CompileBitwiseXor<int8_t>();
-    CompileBitwiseXor<uint8_t>();
-    CompileBitwiseXor<int16_t>();
-    CompileBitwiseXor<uint16_t>();
-    CompileBitwiseXor<int32_t>();
-    CompileBitwiseXor<uint32_t>();
+    compile_bitwise_xor<int8_t>();
+    compile_bitwise_xor<uint8_t>();
+    compile_bitwise_xor<int16_t>();
+    compile_bitwise_xor<uint16_t>();
+    compile_bitwise_xor<int32_t>();
+    compile_bitwise_xor<uint32_t>();
 
-    CompileShift<int8_t, int8_t>();
-    CompileShift<uint8_t, int8_t>();
-    CompileShift<int16_t, int16_t>();
-    CompileShift<uint16_t, int16_t>();
-    CompileShift<int32_t, int32_t>();
-    CompileShift<uint32_t, int32_t>();
+    compile_shift<int8_t, int8_t>();
+    compile_shift<uint8_t, int8_t>();
+    compile_shift<int16_t, int16_t>();
+    compile_shift<uint16_t, int16_t>();
+    compile_shift<int32_t, int32_t>();
+    compile_shift<uint32_t, int32_t>();
 
     asc::te::reg_tensor<bool> predicate0 {};
     asc::te::reg_tensor<bool> predicate1 {};
@@ -238,74 +238,74 @@ TEST_F(TestTensorApiLogicalCompute, CompilePublicApisAndSupportedTypes)
     static_assert(!asc::te::detail::supports_shift_v<int64_t>);
 }
 
-TEST_F(TestTensorApiLogicalCompute, LogicalNotReturnsOneForZeroLanes)
+TEST_F(test_tensor_api_logical_compute, logical_not_returns_one_for_zero_lanes)
 {
-    auto src = MakeReg<int32_t>();
+    auto src = make_reg<int32_t>();
     g_capture = {};
     g_capture.expected_mask = src.mask;
     MOCKER_CPP(vcmps_eq, void(vector_bool&, vector_int32_t, int32_t, vector_bool))
         .times(1)
-        .will(invoke(EqZeroStub));
+        .will(invoke(eq_zero_stub));
     MOCKER_CPP(vdup, void(vector_int32_t&, int32_t, vector_bool, Literal))
         .times(2)
-        .will(invoke(DuplicateIntStub));
+        .will(invoke(duplicate_int_stub));
 
     auto result = !src;
 
     GlobalMockObject::verify();
-    EXPECT_TRUE(HasByteValue(result.reg, RESULT_TOKEN));
-    EXPECT_TRUE(SameBytes(result.mask, src.mask));
+    EXPECT_TRUE(has_byte_value(result.reg, RESULT_TOKEN));
+    EXPECT_TRUE(same_bytes(result.mask, src.mask));
     EXPECT_TRUE(g_capture.masks_match);
 }
 
-TEST_F(TestTensorApiLogicalCompute, RegisterBitwiseAndShiftApisForwardMask)
+TEST_F(test_tensor_api_logical_compute, register_bitwise_and_shift_apis_forward_mask)
 {
-    auto src = MakeReg<int32_t>();
-    auto other = MakeReg<int32_t>(0x22);
-    auto shift = MakeReg<int32_t>(0x33);
+    auto src = make_reg<int32_t>();
+    auto other = make_reg<int32_t>(0x22);
+    auto shift = make_reg<int32_t>(0x33);
     g_capture = {};
     g_capture.expected_mask = src.mask;
     MOCKER_CPP(vand, void(vector_int32_t&, vector_int32_t, vector_int32_t, vector_bool, Literal))
         .times(1)
-        .will(invoke(BinaryIntStub));
+        .will(invoke(binary_int_stub));
     MOCKER_CPP(vor, void(vector_int32_t&, vector_int32_t, vector_int32_t, vector_bool, Literal))
         .times(1)
-        .will(invoke(BinaryIntStub));
+        .will(invoke(binary_int_stub));
     MOCKER_CPP(vxor, void(vector_int32_t&, vector_int32_t, vector_int32_t, vector_bool, Literal))
         .times(1)
-        .will(invoke(BinaryIntStub));
+        .will(invoke(binary_int_stub));
     MOCKER_CPP(vshl, void(vector_int32_t&, vector_int32_t, vector_int32_t, vector_bool, Literal))
         .times(1)
-        .will(invoke(BinaryIntStub));
+        .will(invoke(binary_int_stub));
     MOCKER_CPP(vshr, void(vector_int32_t&, vector_int32_t, vector_int32_t, vector_bool, Literal))
         .times(1)
-        .will(invoke(BinaryIntStub));
+        .will(invoke(binary_int_stub));
 
-    EXPECT_TRUE(HasByteValue((src & other).reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue((src | other).reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue((src ^ other).reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue((src << shift).reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue((src >> shift).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value((src & other).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value((src | other).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value((src ^ other).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value((src << shift).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value((src >> shift).reg, RESULT_TOKEN));
 
     GlobalMockObject::verify();
     EXPECT_EQ(g_capture.binary_calls, 5U);
     EXPECT_TRUE(g_capture.masks_match);
 }
 
-TEST_F(TestTensorApiLogicalCompute, ScalarShiftUsesInt16Immediate)
+TEST_F(test_tensor_api_logical_compute, scalar_shift_uses_int16_immediate)
 {
-    auto src = MakeReg<int32_t>();
+    auto src = make_reg<int32_t>();
     g_capture = {};
     g_capture.expected_mask = src.mask;
     MOCKER_CPP(vshls, void(vector_int32_t&, vector_int32_t, int16_t, vector_bool, Literal))
         .times(1)
-        .will(invoke(ShiftScalarStub));
+        .will(invoke(shift_scalar_stub));
     MOCKER_CPP(vshrs, void(vector_int32_t&, vector_int32_t, int16_t, vector_bool, Literal))
         .times(1)
-        .will(invoke(ShiftScalarStub));
+        .will(invoke(shift_scalar_stub));
 
-    EXPECT_TRUE(HasByteValue((src << static_cast<int16_t>(2)).reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue((src >> static_cast<int16_t>(3)).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value((src << static_cast<int16_t>(2)).reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value((src >> static_cast<int16_t>(3)).reg, RESULT_TOKEN));
 
     GlobalMockObject::verify();
     EXPECT_EQ(g_capture.shifts[0], 2);

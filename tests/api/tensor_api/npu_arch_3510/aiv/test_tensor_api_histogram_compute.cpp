@@ -33,7 +33,7 @@ constexpr asc::te::histogram_options cumulative_high_options {
     asc::te::histogram_half::high, asc::te::histogram_mode::cumulative};
 
 template <typename T>
-void FillBytes(T& value, uint8_t byte)
+void fill_bytes(T& value, uint8_t byte)
 {
     std::array<uint8_t, sizeof(T)> bytes {};
     bytes.fill(byte);
@@ -41,7 +41,7 @@ void FillBytes(T& value, uint8_t byte)
 }
 
 template <typename T>
-bool HasByteValue(const T& value, uint8_t byte)
+bool has_byte_value(const T& value, uint8_t byte)
 {
     std::array<uint8_t, sizeof(T)> bytes {};
     std::memcpy(bytes.data(), &value, bytes.size());
@@ -54,47 +54,47 @@ bool HasByteValue(const T& value, uint8_t byte)
 }
 
 template <typename T>
-bool SameBytes(const T& lhs, const T& rhs)
+bool same_bytes(const T& lhs, const T& rhs)
 {
     return std::memcmp(&lhs, &rhs, sizeof(T)) == 0;
 }
 
-struct HistogramCapture {
-    vector_bool expectedMask {};
-    bool operandsMatch = true;
-    bool masksMatch = true;
-    size_t frequencyCalls = 0;
-    size_t cumulativeCalls = 0;
-    std::array<uint32_t, 2> frequencyBins {};
-    std::array<uint32_t, 2> cumulativeBins {};
+struct histogram_capture {
+    vector_bool expected_mask {};
+    bool operands_match = true;
+    bool masks_match = true;
+    size_t frequency_calls = 0;
+    size_t cumulative_calls = 0;
+    std::array<uint32_t, 2> frequency_bins {};
+    std::array<uint32_t, 2> cumulative_bins {};
 };
 
-HistogramCapture gCapture;
+histogram_capture g_capture;
 
-void CaptureCall(vector_u16& dst, vector_u8 src, vector_bool mask, uint32_t bin,
+void capture_call(vector_u16& dst, vector_u8 src, vector_bool mask, uint32_t bin,
     std::array<uint32_t, 2>& bins, size_t& calls)
 {
-    gCapture.operandsMatch =
-        gCapture.operandsMatch && HasByteValue(dst, DST_TOKEN) && HasByteValue(src, SRC_TOKEN);
-    gCapture.masksMatch = gCapture.masksMatch && SameBytes(mask, gCapture.expectedMask);
+    g_capture.operands_match =
+        g_capture.operands_match && has_byte_value(dst, DST_TOKEN) && has_byte_value(src, SRC_TOKEN);
+    g_capture.masks_match = g_capture.masks_match && same_bytes(mask, g_capture.expected_mask);
     if (calls < bins.size()) {
         bins[calls] = bin;
     }
     ++calls;
-    FillBytes(dst, RESULT_TOKEN);
+    fill_bytes(dst, RESULT_TOKEN);
 }
 
-void FrequencyHistogramStub(vector_u16& dst, vector_u8 src, vector_bool mask, uint32_t bin)
+void frequency_histogram_stub(vector_u16& dst, vector_u8 src, vector_bool mask, uint32_t bin)
 {
-    CaptureCall(dst, src, mask, bin, gCapture.frequencyBins, gCapture.frequencyCalls);
+    capture_call(dst, src, mask, bin, g_capture.frequency_bins, g_capture.frequency_calls);
 }
 
-void CumulativeHistogramStub(vector_u16& dst, vector_u8 src, vector_bool mask, uint32_t bin)
+void cumulative_histogram_stub(vector_u16& dst, vector_u8 src, vector_bool mask, uint32_t bin)
 {
-    CaptureCall(dst, src, mask, bin, gCapture.cumulativeBins, gCapture.cumulativeCalls);
+    capture_call(dst, src, mask, bin, g_capture.cumulative_bins, g_capture.cumulative_calls);
 }
 
-class TestTensorApiHistogramCompute : public testing::Test {
+class test_tensor_api_histogram_compute : public testing::Test {
 protected:
     void SetUp() override
     {
@@ -107,7 +107,7 @@ protected:
     }
 };
 
-TEST_F(TestTensorApiHistogramCompute, CompileReturnValueApiAndTypeMatrix)
+TEST_F(test_tensor_api_histogram_compute, compile_return_value_api_and_type_matrix)
 {
     AscendC::SetGCoreType(0);
     asc::te::reg_tensor<uint16_t> dst {};
@@ -119,23 +119,23 @@ TEST_F(TestTensorApiHistogramCompute, CompileReturnValueApiAndTypeMatrix)
         asc::te::reg_tensor<uint16_t>>);
 }
 
-TEST_F(TestTensorApiHistogramCompute, MapsFourModesToExistingCannHistogramApis)
+TEST_F(test_tensor_api_histogram_compute, maps_four_modes_to_existing_cann_histogram_apis)
 {
     asc::te::reg_tensor<uint16_t> dst {};
     asc::te::reg_tensor<uint8_t> src {};
-    FillBytes(dst.reg, DST_TOKEN);
-    FillBytes(dst.mask, 0x6E);
-    FillBytes(src.reg, SRC_TOKEN);
-    FillBytes(src.mask, MASK_TOKEN);
-    gCapture = {};
-    gCapture.expectedMask = src.mask;
+    fill_bytes(dst.reg, DST_TOKEN);
+    fill_bytes(dst.mask, 0x6E);
+    fill_bytes(src.reg, SRC_TOKEN);
+    fill_bytes(src.mask, MASK_TOKEN);
+    g_capture = {};
+    g_capture.expected_mask = src.mask;
 
     MOCKER_CPP(dhistv2, void(vector_u16&, vector_u8, vector_bool, uint32_t))
         .times(2)
-        .will(invoke(FrequencyHistogramStub));
+        .will(invoke(frequency_histogram_stub));
     MOCKER_CPP(chistv2, void(vector_u16&, vector_u8, vector_bool, uint32_t))
         .times(2)
-        .will(invoke(CumulativeHistogramStub));
+        .will(invoke(cumulative_histogram_stub));
 
     auto frequency_low = asc::te::histograms(dst, src);
     auto frequency_high = asc::te::histograms<frequency_high_options>(dst, src);
@@ -143,22 +143,22 @@ TEST_F(TestTensorApiHistogramCompute, MapsFourModesToExistingCannHistogramApis)
     auto cumulative_high = asc::te::histograms<cumulative_high_options>(dst, src);
 
     GlobalMockObject::verify();
-    EXPECT_EQ(gCapture.frequencyCalls, 2U);
-    EXPECT_EQ(gCapture.cumulativeCalls, 2U);
-    EXPECT_EQ(gCapture.frequencyBins[0], static_cast<uint32_t>(Bin_N0));
-    EXPECT_EQ(gCapture.frequencyBins[1], static_cast<uint32_t>(Bin_N1));
-    EXPECT_EQ(gCapture.cumulativeBins[0], static_cast<uint32_t>(Bin_N0));
-    EXPECT_EQ(gCapture.cumulativeBins[1], static_cast<uint32_t>(Bin_N1));
-    EXPECT_TRUE(gCapture.operandsMatch);
-    EXPECT_TRUE(gCapture.masksMatch);
-    EXPECT_TRUE(HasByteValue(frequency_low.reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue(frequency_high.reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue(cumulative_low.reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue(cumulative_high.reg, RESULT_TOKEN));
-    EXPECT_TRUE(SameBytes(frequency_low.mask, dst.mask));
-    EXPECT_TRUE(SameBytes(frequency_high.mask, dst.mask));
-    EXPECT_TRUE(SameBytes(cumulative_low.mask, dst.mask));
-    EXPECT_TRUE(SameBytes(cumulative_high.mask, dst.mask));
+    EXPECT_EQ(g_capture.frequency_calls, 2U);
+    EXPECT_EQ(g_capture.cumulative_calls, 2U);
+    EXPECT_EQ(g_capture.frequency_bins[0], static_cast<uint32_t>(Bin_N0));
+    EXPECT_EQ(g_capture.frequency_bins[1], static_cast<uint32_t>(Bin_N1));
+    EXPECT_EQ(g_capture.cumulative_bins[0], static_cast<uint32_t>(Bin_N0));
+    EXPECT_EQ(g_capture.cumulative_bins[1], static_cast<uint32_t>(Bin_N1));
+    EXPECT_TRUE(g_capture.operands_match);
+    EXPECT_TRUE(g_capture.masks_match);
+    EXPECT_TRUE(has_byte_value(frequency_low.reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value(frequency_high.reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value(cumulative_low.reg, RESULT_TOKEN));
+    EXPECT_TRUE(has_byte_value(cumulative_high.reg, RESULT_TOKEN));
+    EXPECT_TRUE(same_bytes(frequency_low.mask, dst.mask));
+    EXPECT_TRUE(same_bytes(frequency_high.mask, dst.mask));
+    EXPECT_TRUE(same_bytes(cumulative_low.mask, dst.mask));
+    EXPECT_TRUE(same_bytes(cumulative_high.mask, dst.mask));
 }
 
 } // namespace
