@@ -195,10 +195,7 @@ TEST_CUBE_COMPUTE_FIXPIPE_L0C2L1_INSTR(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_t
 TEST_CUBE_COMPUTE_FIXPIPE_L0C2L1_S4_INSTR(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf_s4, int4b_t, float);
 TEST_CUBE_COMPUTE_FIXPIPE_L0C2L1_S4_INSTR(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf_s4, int4b_t, int32_t);
 
-TEST_F(TestCubeDatamoveL0C2L1Full, asc_copy_l0c2l1_half_float_full_params_Succ)
-{
-    TestAscCopyL0C2L1FullParams<half>();
-}
+TEST_F(TestCubeDatamoveL0C2L1Full, asc_copy_l0c2l1_half_float_full_params_Succ) { TestAscCopyL0C2L1FullParams<half>(); }
 
 TEST_F(TestCubeDatamoveL0C2L1Full, asc_copy_l0c2l1_bfloat16_t_float_full_params_Succ)
 {
