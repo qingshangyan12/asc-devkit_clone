@@ -58,7 +58,6 @@ Json MakeValidManifest()
         {"link_options", Json::array()},
     };
     return {
-        {"schema_version", "1.0"},
         {"resource_id", "test-resource"},
         {"soc_version", "Ascend910B"},
         {"source_file", "kernel.cpp"},
@@ -207,12 +206,17 @@ TEST_F(ResourceManifestValidatorTest, ValidatesMarkersAndReferencedPaths)
     ExpectInvalid("environment marker name is invalid", [](Json& manifest) {
         Command(manifest)["cmd"][3U] = "${env:INVALID-NAME}/include";
     });
+    ExpectInvalid(
+        "environment marker name is empty", [](Json& manifest) { Command(manifest)["cmd"][3U] = "${env:}/include"; });
     ExpectInvalid("output has no relative path", [](Json& manifest) { Command(manifest)["cmd"].back() = "${output}"; });
     ExpectInvalid("output contains another marker", [](Json& manifest) {
         Command(manifest)["cmd"].back() = "${output}/${source_dir}/kernel.o";
     });
     ExpectInvalid(
         "output path traverses", [](Json& manifest) { Command(manifest)["cmd"].back() = "${output}/../kernel.o"; });
+    ExpectInvalid("output contains a directory", [](Json& manifest) {
+        Command(manifest)["cmd"].back() = "${output}/objects/kernel.o";
+    });
 }
 
 TEST_F(ResourceManifestValidatorTest, ValidatesConstants)

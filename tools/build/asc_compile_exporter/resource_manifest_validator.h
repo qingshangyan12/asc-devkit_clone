@@ -48,7 +48,8 @@ private:
     bool ValidateOutputMarker(const std::string& value);
 
     static bool IsIdentifier(const std::string& value);
-    static bool ParseNamedMarker(const std::string& marker, const std::string& prefix, std::string& name);
+    static bool IsNamedMarker(const std::string& marker, const std::string& prefix);
+    static std::string ExtractNamedMarkerName(const std::string& marker, const std::string& prefix);
 
     const nlohmann::json& manifest_;
     std::string manifestPath_;

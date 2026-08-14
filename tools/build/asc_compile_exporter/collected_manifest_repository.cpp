@@ -69,7 +69,7 @@ private:
     size_t fileCount_{0U};
 };
 
-bool ReadResourcePath(const std::string& text, const std::string& manifestPath, std::string& resourcePath)
+bool ValidateAndExtractResourcePath(const std::string& text, const std::string& manifestPath, std::string& resourcePath)
 {
     const Json manifest = Json::parse(text, nullptr, false);
     if (manifest.is_discarded()) {
@@ -241,7 +241,7 @@ bool LoadUnit(const std::string& manifestPath, ResourceBudget& budget, ManifestU
     }
     unit.json.assign(manifestBytes.begin(), manifestBytes.end());
     std::string resourcePath;
-    if (!ReadResourcePath(unit.json, manifestPath, resourcePath)) {
+    if (!ValidateAndExtractResourcePath(unit.json, manifestPath, resourcePath)) {
         return false;
     }
     if (resourcePath.empty()) {
