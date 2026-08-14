@@ -58,13 +58,6 @@ constexpr uint32_t FIFO_MAX_WAIT_ITERS = 15U;
 
 /* ── FIFO protocol structures ───────────────────────────────────────── */
 
-struct RingBufCookie {
-    uint8_t* ringBase;      /* base address of the ring buffer data area */
-    uint32_t ringBufLen;    /* total size of the ring buffer data area    */
-    uint32_t writeOffset;   /* current write offset (wraps mod ringBufLen) */
-    uint32_t bytesWritten;  /* total bytes written so far                 */
-};
-
 struct AicpuPrintfMemInfo {
     uint64_t printfMemAddr = 0U;
     uint32_t printfMemSize = 0U;
@@ -259,34 +252,31 @@ inline bool CheckAicpuRingBuf(BlockRingBufInfo* blockInfo, uint32_t tlvLen)
     return true;
 }
 
-static ssize_t RingBufCookieWrite(void* cookie, const char* buf, size_t size)
-{
-    auto* c = static_cast<RingBufCookie*>(cookie);
-    uint32_t off = c->writeOffset;
-    uint32_t tailSpace = c->ringBufLen - off;
+/* ── Temp buffer for split-write (allocated on demand, freed at program exit) ── */
 
-    if (size <= tailSpace) {
-        /* Fits in the tail — single memcpy. */
-        (void)memcpy(c->ringBase + off, buf, size);
-        c->writeOffset = off + static_cast<uint32_t>(size);
-    } else {
-        /* Spans tail and head — two memcpys. */
-        uint32_t part1 = tailSpace;
-        uint32_t part2 = static_cast<uint32_t>(size) - part1;
-        (void)memcpy(c->ringBase + off, buf, part1);
-        (void)memcpy(c->ringBase, buf + part1, part2);
-        c->writeOffset = part2;
+class FifoTempBuf {
+public:
+    ~FifoTempBuf()
+    {
+        if (buf_ != nullptr) {
+            free(buf_);
+            buf_ = nullptr;
+        }
     }
-    c->bytesWritten += static_cast<uint32_t>(size);
-    return static_cast<ssize_t>(size);
-}
 
-inline FILE* RingBufOpenStream(RingBufCookie* cookie)
-{
-    cookie_io_functions_t hooks = {};
-    hooks.write = RingBufCookieWrite;
-    return fopencookie(cookie, "w", hooks);
-}
+    uint8_t* Get(uint32_t size)
+    {
+        if (buf_ == nullptr) {
+            buf_ = static_cast<uint8_t*>(malloc(size));
+        }
+        return buf_;
+    }
+
+private:
+    uint8_t* buf_ = nullptr;
+};
+
+static FifoTempBuf g_fifoTempBuf;
 
 /* ── Legacy printf (linear buffer) ──────────────────────────────────── */
 
@@ -336,11 +326,10 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     // 1. calculate write info length and check whether there is enough free space
     uint32_t strLen = CalcFormattedLen(fmt, otherArgs);
     uint32_t tlvLen = CalcTlvLen(strLen);
-    /* Lock the whole reservation + write to guarantee atomicity. */
+    /* Lock the whole reservation + write to guarantee atomicity, auto unlock wehn return. */
     std::lock_guard<std::mutex> lock(g_aicpuFifoMutex);
 
     if (!CheckAicpuRingBuf(blockInfo, tlvLen)) {
-        // TODO 是否涉及解锁
         return; /* drop on overflow / timeout */
     }
     // 2. atomically reserve space.
@@ -362,7 +351,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     infoHead.printfLength = tlvLen - sizeof(uint32_t[2]);
     infoHead.blockIdx     = 0U;
     infoHead.resv         = 0U;
-    infoHead.fmtOffset    = sizeof(PrintfInfo);
+    infoHead.fmtOffset    = 8U;
     // 4. write print info
     if (!needSplit) {
         uint8_t* tlvWriteAddr = ringBase + wOff;
@@ -374,26 +363,28 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         size_t count = (strLen < destMax) ? strLen : (destMax - 1U);
         (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
     } else {
-        // copy printTLV to ringbuf by bytes
-        const uint8_t* headBytes = reinterpret_cast<const uint8_t*>(&infoHead);
-        uint32_t off = static_cast<uint32_t>(wOff);
-        for (uint32_t i = 0U; i < sizeof(PrintfInfo); ++i) {
-            ringBase[off] = headBytes[i];
-            off = (off + 1U) % ringBufLen;
+        // Split-write: entry spans the tail and the head.
+        // 1. malloc a temp buffer (ringBufLen size) if not yet allocated.
+        // 2. vsnprintf_s the formatted string into the temp buffer after the header.
+        // 3. Copy the temp buffer to ringbuf in two parts: tail then head.
+        uint8_t* tempBuf = g_fifoTempBuf.Get(ringBufLen);
+        if (tempBuf == nullptr) {
+            __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->bufOffset),
+                             wOff, __ATOMIC_SEQ_CST);
+            return;
         }
-        // set up cookie for string write
-        RingBufCookie cookie;
-        cookie.ringBase = ringBase;
-        cookie.ringBufLen = ringBufLen;
-        cookie.writeOffset = off;
-        cookie.bytesWritten = 0U;
-        // Format directly into the ringbuf via fopencookie + vfprintf.
-        FILE* fp = RingBufOpenStream(&cookie);
-        if (fp != nullptr) {
-            (void)vfprintf(fp, fmt, otherArgs);
-            (void)fclose(fp);
-            ringBase[cookie.writeOffset] = '\0';
-        }
+        // Write header to temp buffer.
+        (void)memcpy(tempBuf, &infoHead, sizeof(PrintfInfo));
+        // Write formatted string to temp buffer after header.
+        char* strDest = reinterpret_cast<char*>(tempBuf + sizeof(PrintfInfo));
+        size_t destMax = static_cast<size_t>(ringBufLen) - sizeof(PrintfInfo);
+        size_t count = (strLen < destMax) ? strLen : (destMax - 1U);
+        (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
+        // Copy tlvLen bytes from temp buffer to ringbuf with split.
+        uint32_t part1 = tailSpace;
+        uint32_t part2 = tlvLen - part1;
+        (void)memcpy(ringBase + static_cast<uint32_t>(wOff), tempBuf, part1);
+        (void)memcpy(ringBase, tempBuf + part1, part2);
     }
 /* ── Step 7: Release the entry to the rts reader ─────────────────── */
     /* Ensure all data writes are visible before flipping the type. */
