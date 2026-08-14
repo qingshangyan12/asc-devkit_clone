@@ -140,8 +140,8 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <h2 style="color: #1a1a1a; margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">📚 技术附录</h2>
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
 <div style="flex: 1; min-width: 200px;">
-<a href="../技术附录/概念原理和术语/术语表.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 基本概念与术语</a>
-<a href="../技术附录/CPP标准支持/概述.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🔧 C++语言标准支持</a>
+<a href="../technical_appendix/concepts_and_terms/glossary.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 基本概念与术语</a>
+<a href="../technical_appendix/cpp_standard_support/overview.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🔧 C++语言标准支持</a>
 </div>
 <div style="flex: 1; min-width: 200px;">
 <a href="../../api/api_list.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 Ascend C API参考</a>

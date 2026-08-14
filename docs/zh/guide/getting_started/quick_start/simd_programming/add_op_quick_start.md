@@ -210,7 +210,7 @@
 
 <!-- npu="950" id6 -->
 > [!NOTE]说明
-> Ascend 950PR/Ascend 950DT新一代架构在传统[UB](../../../技术附录/概念原理和术语/术语表.md)缓存体系的基础上，开放了寄存器（Register）可编程能力，单个寄存器大小为256B。基于寄存器的矢量计算称为Reg矢量计算，而基于传统UB的矢量计算称为Memory矢量计算。
+> Ascend 950PR/Ascend 950DT新一代架构在传统[UB](../../../technical_appendix/concepts_and_terms/glossary.md)缓存体系的基础上，开放了寄存器（Register）可编程能力，单个寄存器大小为256B。基于寄存器的矢量计算称为Reg矢量计算，而基于传统UB的矢量计算称为Memory矢量计算。
 <!-- end id6 -->
 
 若要深入理解Ascend C的SIMD与SIMT编程模型，请参阅[Ascend C编程模型概述](../../../编程指南/编程模型/编程模型概述.md)。

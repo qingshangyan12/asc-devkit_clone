@@ -33,7 +33,7 @@ features:
   - icon: 📋
     title: 技术附录
     details: C++ 标准支持说明、概念原理与术语表等参考内容。
-    link: /guide/技术附录/概念原理和术语/术语表
+    link: /guide/technical_appendix/concepts_and_terms/glossary
   - icon: 📦
     title: Ascend C API
     details: SIMD API、SIMT API、AI CPU API、Utils API 等完整接口参考。
