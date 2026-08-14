@@ -622,10 +622,6 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     u8 varData[0];
     u64 ccuKfcArgs[4];  // 测试，ccu-kfc作为通信算子
     bool isKfc = false; // 标记是否使用KFC Server kernel
-    // CCU scratch基址(OpResCtx::res[0])，与设备侧ccuParam_.scratchAddr同源。
-    // HALF_ALLTOALLV的本端window基址取此值：AlltoAllvWrite契约不传recvBuf，
-    // 而PreSync会把该地址广播给对端作为Write目标，故必须与设备侧严格一致。
-    u64 ccuScratchAddr = 0;
 };
 
 struct AlgDesc {

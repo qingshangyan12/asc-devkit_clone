@@ -9,6 +9,7 @@
  */
 #include "channel.h"
 #include "hccl_ccu_res.h"
+#include "hccl_res.h"
 #include "ccu_assist_pub.h"
 #include "ccu_kernel_alg_base.h"
 #include "ccu_temp_kfc_half_alltoallv_mesh_1D.h"
@@ -54,21 +55,36 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::CalcRes(
 
     // CcuKernelKfcServer 在注册前替换该占位并复用这些 channel
     kernelInfo.channels = channelDescs;
+
     // 本端 window 基址：设备侧 AlltoAllvWrite 契约不传 recvBuf，本 rank 自留分片的落点
     // 需在建图期确定（对应源实现 CtxArg 里的 cclBufferAddr），由 KfcServer 继承。
     //
-    // 取 param.ccuScratchAddr（= OpResCtx::res[0]，由 AllocCcuOpResCtx 分配的
-    // "_ccu_scratch"），与设备侧 ccuParam_.scratchAddr 同源。不能取 param.outputPtr
-    // （MC2 路径下恒为 nullptr），也不能取 buffInfo_.hcclBuff（HcclGetHcclBuffer 返回的
-    // cclBuffer 是另一块内存）——PreSync 会把该地址广播给所有对端当作 Write 目标，
-    // 取错会让全域写入落到错误地址，而非仅影响本 rank 的 GroupCopy。
-    if (param.ccuScratchAddr == 0) {
-        HCCL_ERROR("[CcuTempKfcHalfAlltoAllVMesh1D][CalcRes] ccuScratchAddr is zero, local window base unavailable.");
+    // 取 cclBuffer，理由是它与 token 同源：kernel 里 localDst/dst 用的 token 来自
+    // kfcServerArgs[5]，由 HcclAllocAlgResourceCcu 用 GetTokenFromBuffInfo(cclBufferAddr,
+    // cclBufferSize) 算出。token 是"地址+长度"的访问凭证，addr 与 token 必须配对，
+    // 否则 CCU 侧访问校验不通过。
+    //
+    // 不能取 param.outputPtr（MC2 路径下 PrepareOpsCommParam 恒置 nullptr）。
+    // 也不能取 OpResCtx::res[0]（"_ccu_scratch"）——虽然设备侧 ccuParam_.scratchAddr
+    // 指向它，但 CcuPrepareForAllToAllVWrite 从不读该字段（只有 AllReduce/ReduceScatter
+    // 的 M2M prepare 用它），且它与上述 token 不同源。
+    //
+    // PreSync 会把该地址广播给所有对端当作 Write 目标，取错不只影响本 rank 的
+    // GroupCopy，而是全域写入落到错误地址。
+    void* cclBufferAddr = nullptr;
+    uint64_t cclBufferSize = 0;
+    CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
+    if (cclBufferAddr == nullptr) {
+        HCCL_ERROR("[CcuTempKfcHalfAlltoAllVMesh1D][CalcRes] cclBuffer is null, local window base unavailable.");
         return HCCL_E_PARA;
     }
-    kernelInfo.localWinAddr = param.ccuScratchAddr;
+    kernelInfo.localWinAddr = PointerToAddr(cclBufferAddr);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
 
+    // localWinAddr 是跨端契约：设备侧回读结果必须用同一地址，故按 RUN_INFO 打出便于核对
+    HCCL_RUN_INFO(
+        "[CcuTempKfcHalfAlltoAllVMesh1D::CalcRes] localWinAddr[0x%llx], cclBufferSize[%llu]",
+        static_cast<unsigned long long>(kernelInfo.localWinAddr), static_cast<unsigned long long>(cclBufferSize));
     HCCL_DEBUG(
         "[CcuTempKfcHalfAlltoAllVMesh1D::CalcRes] channelDescs.size()=%llu, dimsize=%llu, ccuKernelInfos.size()=%llu",
         channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());

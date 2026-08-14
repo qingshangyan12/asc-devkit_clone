@@ -1028,10 +1028,6 @@ HcclResult ProcessCcuTiling(
     RunCcuSelectAlgCheck(ccTiling, tilingIndex);
 
     OpParam opParam{};
-    // scratch基址由AllocCcuOpResCtx填入res[0]，与设备侧ccuParam_.scratchAddr同源
-    // (hccl_ccu_v0.h: scratchAddr = hcclNewContext_->res[0])。模板CalcRes在建图期
-    // 需要该地址确定本端window基址，故在选路前透传给opParam。
-    opParam.ccuScratchAddr = opResCtx.res[0];
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     AlgorithmType algorithmType;
