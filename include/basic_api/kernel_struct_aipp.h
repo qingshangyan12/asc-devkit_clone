@@ -31,7 +31,6 @@ enum class AippInputFormat : uint8_t {
     XRGB8888_U8 = 1,
     RGB888_U8 = 4,
     YUV400_U8 = 9,
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
     NC1HWC0_DI_FP16 = 2,
     NC1HWC0_DI_U8 = 3,
     ARGB888_U8 = 5,
@@ -51,7 +50,6 @@ enum class AippInputFormat : uint8_t {
     R11G11B10_FLOAT = 26,
     R10G10B10A2_UNORM = 28,
     YUV444SP_U8 =29
-#endif
 };
 
 enum class AippPaddingMode : uint32_t {
@@ -135,6 +133,19 @@ enum class AippDtcPadMode : uint32_t {
     PAD_AS_1ZERO_U12_3ZERO
 };
 
+/* for RAW input_format */
+enum class AippPatternIndicator: uint8_t {
+    BAYER_PATTERN = 0,
+    QUADRA_PATTERN
+};
+
+enum class AippStartComponent: uint8_t {
+    R_COMPONENT = 0,
+    Gr_COMPONENT = 1,
+    Gb_COMPONENT = 2,
+    B_COMPONENT = 3
+};
+
 struct AippDataTypeConvParams {
     uint8_t dtcMeanCh0{0};
     uint8_t dtcMeanCh1{0};
@@ -198,6 +209,8 @@ struct AippParams {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
     AippFlipParams flipParams;
     AippChannelTransformMode channelTransformMode{AippChannelTransformMode::NONE};
+    AippPatternIndicator patternIndicator{AippPatternIndicator::BAYER_PATTERN};
+    AippStartComponent startComponent{AippStartComponent::R_COMPONENT};
     AippScalingParams scalingParams;
     AippConcatMode concatMode{AippConcatMode::NONE};
     uint32_t outputStride{0};
