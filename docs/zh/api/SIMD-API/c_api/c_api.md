@@ -1,6 +1,6 @@
 # C API
 
-C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
+C API文档目录。除试验接口外，整体使用时可以引入`asc_simd.h`，C API列表如下：
 
 ## 数据结构
 
@@ -272,7 +272,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 ## 系统变量
 
-系统变量类API，单独使用时可以引入sys_var.h，此类API列表如下：
+系统变量类API列表如下。除试验接口外，单独使用时可以引入`sys_var.h`；试验接口需按对应接口文档引入头文件并开启试验特性。
 
 **表7** 系统变量API列表
 
@@ -303,6 +303,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_l0c2gm_relu_alpha](sys_var/asc_set_l0c2gm_relu_alpha.md) | 设置RELU_ALPHA寄存器的值。 |
 | [asc_set_l12l0_padding_val](sys_var/asc_set_l12l0_padding_val.md) | 设置PADDING_B寄存器的值。 |
 | [asc_set_l3d_rpt_b](sys_var/asc_set_l3d_rpt_b.md) | 用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运的repeat参数。 |
+| [指令发射队列空闲槽位查询](sys_var/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_FIX`发射队列的空闲槽位数量。本接口为试验接口。 |
 | [asc_get_ar_spr（废弃）](sys_var/asc_get_ar_spr_deprecated.md) | 读取指定特殊寄存器的值。 |
 
 ## 缓存控制
@@ -587,13 +588,3 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | 废弃接口 | 说明 |
 | [asc_abs_sync（废弃）](deprecated_interface/asc_abs_sync_deprecated.md) | 按元素取绝对值同步接口。 |
 | [asc_set_atomic_add_int（废弃）](deprecated_interface/asc_set_atomic_add_int_deprecated.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。 |
-
-## 试验接口
-
-本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
-
-**表15**  试验接口列表
-
-| API名称 | 说明 |
-| --- | --- |
-| [指令发射队列空闲槽位查询](experimental/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_FIX`发射队列的空闲槽位数量。 |
