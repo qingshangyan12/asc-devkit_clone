@@ -132,12 +132,16 @@ def snap_near_half_integer(value, epsilon=1e-5):
 
 
 def to_processor_float32(arr):
-    """Truncate IEEE 754 float32 to processor float32 (10 mantissa bits).
+    """Round IEEE 754 float32 to processor float32 (10 mantissa bits).
 
     The AI processor stores float32 in L0C with only 10 mantissa bits
     (1 sign + 8 exponent + 10 mantissa), instead of IEEE 754's 23 mantissa bits.
+    Uses round-to-nearest-even (RNE) to match the hardware's L0C storage behavior.
     """
     bits = arr.astype(np.float32).view(np.uint32).copy()
+    lsb = (bits >> np.uint32(13)) & np.uint32(1)
+    rounding_bias = np.uint32(0x0FFF) + lsb
+    bits = bits + rounding_bias
     bits = bits & np.uint32(0xFFFFE000)
     return bits.view(np.float32)
 
