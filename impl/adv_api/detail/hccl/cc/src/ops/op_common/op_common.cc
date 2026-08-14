@@ -48,6 +48,7 @@
 #include "hccl_ccu_res_dl.h"
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
+#include "hccl_alloc_ctx_res.h"
 
 #ifndef MC2_CLIENT_ENABLE_CCU
 #define MC2_CLIENT_ENABLE_CCU 0
@@ -1309,16 +1310,8 @@ HcclResult GetAlgResCcu(
     uint64_t size = seq.size();
 
     void* ctx = nullptr;
-    uint64_t actualSize = size;
-    if (HcclEngineCtxGet(comm, param.algTag, COMM_ENGINE_AIV, &ctx, &actualSize) == HCCL_SUCCESS) {
-        HCCL_INFO(
-            "[GetAlgResCcu]HcclEngineCtxGet success, algTag[%s], ctxAddr[%p], ctxSize[%llu].", param.algTag, ctx,
-            static_cast<unsigned long long>(actualSize));
-    } else {
-        CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AIV, size, &ctx));
-        HCCL_INFO("[GetAlgResCcu]HcclEngineCtxCreate successfully!");
-    }
-    aclError aclRet = aclrtMemcpy(ctx, actualSize, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
+    CHK_RET(GetOrCreateCcuCtx(comm, param.algTag, size, &ctx));
+    aclError aclRet = aclrtMemcpy(ctx, size, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
     if (aclRet != ACL_SUCCESS) {
         HCCL_ERROR(
             "[GetAlgResCcu] aclrtMemcpy H2D failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet, ctx, seq.data(),
