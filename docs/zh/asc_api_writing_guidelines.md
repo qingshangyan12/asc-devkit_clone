@@ -65,8 +65,8 @@ Ascend C API文档须遵循以下总体原则：
 对应的源码文件的目录结构应组织如下：
 ``` text
 |-- README.md  
-|-- simd_api  
-|--|-- simd_api.md
+|-- SIMD-API  
+|--|-- SIMD-API.md
 |--|-- basic_api
 |--|--|-- basic_api.md
 |--|--|-- Add.md
@@ -75,8 +75,8 @@ Ascend C API文档须遵循以下总体原则：
 |--|--|-- c_api.md
 |--|--|-- asc_add.md
 |--|--|-- asc_sub.md
-|-- simt_api
-|--|-- simt_api.md
+|-- SIMT-API
+|--|-- SIMT-API.md
 |--|-- acosf.md
 |--|-- asinf.md
 ```
@@ -85,16 +85,16 @@ Ascend C API文档须遵循以下总体原则：
 对应的索引文件README.md中的内容为：
 
 ``` text
--   [SIMD API](simd_api/simd_api.md)
-    -   [基础API](simd_api/basic_api/basic_api.md)
-        -   [Add](simd_api/basic_api/Add.md)
-        -   [Sub](simd_api/basic_api/Sub.md)
-    -   [C API](simd_api/c_api/c_api.md)
-        -   [asc_add](simd_api/c_api/asc_add.md)
-        -   [asc_sub](simd_api/c_api/asc_sub.md)
--   [SIMT API](simt_api/simt_api.md)
-    -   [acosf](simt_api/acosf.md)
-    -   [asinf](simt_api/asinf.md)
+-   [SIMD API](SIMD-API/SIMD-API.md)
+    -   [基础API](SIMD-API/basic_api/basic_api.md)
+        -   [Add](SIMD-API/basic_api/Add.md)
+        -   [Sub](SIMD-API/basic_api/Sub.md)
+    -   [C API](SIMD-API/c_api/c_api.md)
+        -   [asc_add](SIMD-API/c_api/asc_add.md)
+        -   [asc_sub](SIMD-API/c_api/asc_sub.md)
+-   [SIMT API](SIMT-API/SIMT-API.md)
+    -   [acosf](SIMT-API/acosf.md)
+    -   [asinf](SIMT-API/asinf.md)
 ```
 
 ### API-STRUCT-01 导航目录中不同的节点不能对应同一个md源码文件
@@ -110,13 +110,13 @@ Ascend C API文档须遵循以下总体原则：
 如下索引文件中，矩阵计算（Tensor_API）和矩阵计算目录下的GEMV节点对应同一个源码文件，会导致URL冲突。
 
 ``` text
--   [SIMD API](simd_api/simd_api.md)
-    -   [基础API](simd_api/basic_api/basic_api.md)
+-   [SIMD API](SIMT-API/SIMT-API.md)
+    -   [基础API](SIMT-API/basic_api/basic_api.md)
         -   [矩阵计算](SIMD-API/basic_api/cube_compute/cube_compute.md)
             -   [Mmad计算](SIMD-API/basic_api/cube_compute/mmad_compute/mmad_compute.md)
                 -   [关键特性说明](SIMD-API/basic_api/cube_compute/mmad_compute/features/features.md)
                     -   [GEMV](SIMD-API/basic_api/cube_compute/mmad_compute/features/GEMV.md)
-        -   [矩阵计算（Tensor_API）](SIMD-API/basic_api/cube_compute/cube_compute_TensorAPI.md)
+        -   [矩阵计算（Tensor_API）](SIMD-API/basic_api/cube_compute_TensorAPI/cube_compute_TensorAPI.md)
             -   [GEMV](SIMD-API/basic_api/cube_compute/mmad_compute/features/GEMV.md)
 ``` 
 ### API-STRUCT-02 API源码目录和文件名命名规范
@@ -130,7 +130,7 @@ Ascend C API文档须遵循以下总体原则：
 【例外】
 - API接口名采用大写英文驼峰命名时，文件名应与API名称保持一致，采用大写风格，如基础API中的Add.md。
 
-- 概念和术语中以大写英文命名的，可保留大写风格，如基础API中的Neg_ISASI.md。
+- 概念和术语中以大写英文命名的，可保留大写风格，如基础API中的Neg_ISASI.md（ISASI为概念术语）。
 
 
 ### API-STRUCT-03 导航目录层级不能超过5级
@@ -146,8 +146,8 @@ Ascend C API文档须遵循以下总体原则：
 如下索引文件中，`GEMV`为6级目录，不符合要求。
 
 ``` text
--   [SIMD API](simd_api/simd_api.md)
-    -   [基础API](simd_api/basic_api/basic_api.md)
+-   [SIMD API](SIMD-API/SIMD-API.md)
+    -   [基础API](SIMD-API/basic_api/basic_api.md)
         -   [矩阵计算](SIMD-API/basic_api/cube_compute/cube_compute.md)
             -   [Mmad计算](SIMD-API/basic_api/cube_compute/mmad_compute/mmad_compute.md)
                 -   [关键特性说明](SIMD-API/basic_api/cube_compute/mmad_compute/features/features.md)
@@ -167,8 +167,8 @@ Ascend C API文档须遵循以下总体原则：
 关键特性说明目录下只有一个节点，无需增加这一层级。
 
 ``` text
--   [SIMD API](simd_api/simd_api.md)
-    -   [基础API](simd_api/basic_api/basic_api.md)
+-   [SIMD API](SIMD-API/SIMD-API.md)
+    -   [基础API](SIMD-API/basic_api/basic_api.md)
         -   [矩阵计算](SIMD-API/basic_api/cube_compute/cube_compute.md)
             -   [Mmad计算](SIMD-API/basic_api/cube_compute/mmad_compute/mmad_compute.md)
                 -   [关键特性说明](SIMD-API/basic_api/cube_compute/mmad_compute/feature/feature.md)
@@ -177,8 +177,8 @@ Ascend C API文档须遵循以下总体原则：
 
 【正例】
 ``` text
--   [SIMD API](simd_api/simd_api.md)
-    -   [基础API](simd_api/basic_api/basic_api.md)
+-   [SIMD API](SIMD-API/SIMD-API.md)
+    -   [基础API](SIMD-API/basic_api/basic_api.md)
         -   [矩阵计算](SIMD-API/basic_api/cube_compute/cube_compute.md)
             -   [Mmad计算](SIMD-API/basic_api/cube_compute/mmad_compute/mmad_compute.md)
                 -   [GEMV关键特性说明](SIMD-API/basic_api/cube_compute/mmad_compute/GEMV_feature.md)
@@ -210,18 +210,14 @@ C API中的asc_copy_gm2ub接口在2201版本和3510版本差异较大，在一�
 基础API中DataCopy和LoadData接口，每个接口都对应了多种搬运场景，拆分成多个md进行组织。
 
 ```text
-                -   [矩阵数据搬入至L1-Buffer](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/矩阵数据搬入至L1-Buffer.md)
-                    -   [GMToL1-2D矩阵搬运（LoadData）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1-2D矩阵搬运（LoadData）.md)
-                    -   [GMToL1-2D矩阵搬运V2（LoadData）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1-2D矩阵搬运V2（LoadData）.md)
-                    -   [GMToL1连续数据搬运（DataCopy）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1连续数据搬运（DataCopy）.md)
-                    -   [GMToL1高维切分数据搬运（DataCopy）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1高维切分数据搬运（DataCopy）.md)
-                    -   [GMToL1非对齐数据搬运（DataCopyPad）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1非对齐数据搬运（DataCopyPad）.md)
-                    -   [GMToL1随路转换-DN2NZ搬运（DataCopy）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1随路转换-DN2NZ搬运（DataCopy）.md)
-                    -   [GMToL1随路转换-ND2NZ搬运（DataCopy）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1随路转换-ND2NZ搬运（DataCopy）.md)
-                    -   [UBToL1连续数据搬运（DataCopy）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1连续数据搬运（DataCopy）.md)
-                    -   [UBToL1高维切分数据搬运（DataCopy）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1高维切分数据搬运（DataCopy）.md)
-                    -   [UBToL1非对齐数据搬运（DataCopyPad）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1非对齐数据搬运（DataCopyPad）.md)
-                    -   [UBToL1随路转换-ND2NZ搬运（DataCopy）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1随路转换-ND2NZ搬运（DataCopy）.md)
+            -   [矩阵计算的搬入](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/cube_compute_load.md)
+                -   [总体说明](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/overall_description.md)
+                -   [矩阵计算输入搬运约束](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/cube_compute_input_move_constraint.md)
+                -   [L1 Buffer/L0A Buffer/L0B Buffer内存结构介绍](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/L1_L0A_B_memory_structure_intro.md)
+                -   [LoadData（GMToL1-2D矩阵搬运）](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_GMToL1_2D.md)
+                -   [LoadData（GMToL1-2D矩阵搬运V2）](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_GMToL1_2DV2.md)
+                -   [DataCopy（GMToL1连续数据搬运）](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_continuous.md)
+                -   [DataCopy（GMToL1高维切分数据搬运）](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_highdim_split.md)
 ```
 
 
@@ -238,8 +234,8 @@ Neg接口的导航标题为Neg（ISASI），但Neg_ISASI.md中的标题名为Neg
 索引文件内容如下：
 
 ``` text
--   [SIMD API](simd_api/simd_api.md)
-    -   [基础API](simd_api/basic_api/basic_api.md)
+-   [SIMD API](SIMD-API/SIMD-API.md)
+    -   [基础API](SIMD-API/basic_api/basic_api.md)
         -   [Add](SIMD-API/basic_api/Add.md)
         -   [Neg（ISASI）](SIMD-API/basic_api/Neg_ISASI.md)
     -   [C API](SIMD-API/c_api/c_api.md)
@@ -368,21 +364,26 @@ Neg_ISASI.md的内容如下：
   - 用户价值：使用该API后用户体验的变化？
   - 基本用法：如何使用该API？
 
-【正例】  
-设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入计算数据量，实际迭代次数由Vector计算单元自动推断。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式，并通过[SetVectorMask](api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetVectorMask.md)设置Counter模式下参与计算的元素个数。
+【正例】
+
+```text  
+设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入计算数据量，实际迭代次数由Vector计算单元自动推断。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式，并通过[SetVectorMask](./SetVectorMask.md)设置Counter模式下参与计算的元素个数。
+```
 
 
 上述接口说明中明确了功能作用、用户价值、基本用法。
 
 - 功能作用：设置Mask模式为Counter模式。
 - 用户价值：该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入计算数据量，实际迭代次数由Vector计算单元自动推断。
-- 基本用法：本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式，并通过[SetVectorMask](api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetVectorMask.md)设置Counter模式下参与计算的元素个数。
+- 基本用法：本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式，并通过SetVectorMask设置Counter模式下参与计算的元素个数。
 
 【反例】
 
 如下功能说明仅列出了接口的功能，未给出用户价值和基本用法：
 
+```text
 获取ICache的Preload的状态。
+```
 
 ### API-FUNC-01 须提供头文件说明
 
@@ -405,7 +406,10 @@ Neg_ISASI.md的内容如下：
 
 【正例】
 如下的功能说明中，直接给出了Counter模式的介绍。
-设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入计算数据量，实际迭代次数由Vector计算单元自动推断。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式，并通过[SetVectorMask](api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetVectorMask.md)设置Counter模式下参与计算的元素个数。
+
+```text
+设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入计算数据量，实际迭代次数由Vector计算单元自动推断。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式，并通过[SetVectorMask](./SetVectorMask.md)设置Counter模式下参与计算的元素个数。
+```
 
 ### API-FUNC-03 与其他API配合使用时须增加关联API的超链接
 
@@ -416,17 +420,23 @@ Neg_ISASI.md的内容如下：
 【正例】
 SetAippFunctions接口须与LoadImageToLocal接口配合使用，增加了LoadImageToLocal接口的超链接。
 
-设置图片预处理（AIPP，AI Core pre-process）相关参数。与[LoadImageToLocal](./api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/LoadImageToLocal.md)接口配合使用。设置后，调用LoadImageToLocal接口可在搬运过程中完成图像预处理操作：包括数据填充、通道交换、单行读取、数据类型转换、通道填充、色域转换。
+```text
+设置图片预处理（AIPP，AI Core pre-process）相关参数。与[LoadImageToLocal](./LoadImageToLocal.md)接口配合使用。设置后，调用LoadImageToLocal接口可在搬运过程中完成图像预处理操作：包括数据填充、通道交换、单行读取、数据类型转换、通道填充、色域转换。
+```
 
 【正例】
 TransDataTo5HD接口给出了完成转置功能时与Transpose接口的区别。
 
-数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别地，也可用于二维矩阵数据块的转置。完成转置功能时，相比于[Transpose](./api/SIMD-API/基础API/Memory矢量计算/数据排布转换/Transpose.md)接口，Transpose仅支持16×16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个datablock），根据数据类型不同，支持不同shape的矩阵转置（如数据类型为half时，单次repeat可完成16×16大小的矩阵转置），同时还可支持多次repeat操作。
+```
+数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别地，也可用于二维矩阵数据块的转置。完成转置功能时，相比于[Transpose](./Transpose.md)接口，Transpose仅支持16×16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个datablock），根据数据类型不同，支持不同shape的矩阵转置（如数据类型为half时，单次repeat可完成16×16大小的矩阵转置），同时还可支持多次repeat操作。
+```
 
 【反例】
 SetFixPipeConfig接口与DataCopy接口配合实现的功能与Fixpipe接口等同，但SetFixPipeConfig中既未给出Fixpipe接口的链接，也未给出两种方式的对比描述。
 
+```text
 在DataCopy（CO1-\>GM）的流程中，会涉及relu和quant流程，分别用于relu和quant计算。通过该接口设置relu和quant的源操作数。
+```
 
 ### API-FUNC-04 计算类接口须使用公式描述功能
 
@@ -437,21 +447,25 @@ SetFixPipeConfig接口与DataCopy接口配合实现的功能与Fixpipe接口等�
 【正例】
 如下接口中给出了乘法的计算公式，使用\times标准写法。
 
+```text
 该接口根据mask对输入数据srcReg0、srcReg1按元素相乘操作，将结果写入dstReg。计算公式如下：
 
 $$
 dstReg_i = srcReg0_i \times srcReg1_i
 $$
+```
 
 
 【反例】
 如下接口中给出了乘法的计算公式，使用*不规范用法。
 
+```text
 该接口根据mask对输入数据srcReg0、srcReg1按元素相乘操作，将结果写入dstReg。计算公式如下：
 
 $$
 dstReg_i = srcReg0_i * srcReg1_i
 $$
+```
 
 ### API-FUNC-05 复杂接口功能须增加图示说明
 
@@ -462,17 +476,20 @@ $$
 【正例】
 `ReduceSum`接口中给出了接口求和计算的示意图。
 
+```text
 `ReduceSum`接口对所有输入数据进行求和，计算过程如下。
 
 **图1** `ReduceSum`计算示意图<a id="fig1"></a>
 
 ![ReduceSum计算示意图](api/figures/ReduceSum_basic_api.png "ReduceSum计算示意图")
+```
 
 【反例】
 Gather的功能说明中未给出图示说明，仅通过文字难以理解。
 
+```text
 给定输入的张量和一个地址偏移张量，Gather指令根据偏移地址将输入张量按元素收集到结果张量中。
-
+```
 
 ## 5 函数原型规范
 
@@ -484,6 +501,7 @@ Gather的功能说明中未给出图示说明，仅通过文字难以理解。
 
 【正例】
 
+```text
 - 整个tensor参与计算
 
     ```cpp
@@ -511,10 +529,12 @@ Gather的功能说明中未给出图示说明，仅通过文字难以理解。
         template <typename T, bool isSetMask = true>
         __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
         ```
+```
 
 【例外】
 对于函数原型过多的场景，仅使用无序列表会导致嵌套层次深、篇幅过长，可以采取无序列表+代码注释相结合的方式进行拆分。
 
+```text
 - 前n个数据计算
     ```cpp
     // RINT舍入模式
@@ -542,7 +562,7 @@ Gather的功能说明中未给出图示说明，仅通过文字难以理解。
     // TRUNC舍入模式
     __aicore__ inline void asc_half2int16_rz(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
-
+```
 
 ### API-PROTO-01 函数原型须与头文件严格一致
 
@@ -558,9 +578,15 @@ Gather的功能说明中未给出图示说明，仅通过文字难以理解。
 
 【正例】
 
-```cpp
-template <typename T, bool isReuseSource = false>
-__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+```text
+
+- tensor前n个数据连续计算
+
+    ```cpp
+    template <typename T>
+    __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count)
+    ```
+
 ```
 
 ### API-PROTO-03 须明确写明每种原型支持的硬件型号
@@ -569,6 +595,7 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 【描述】不同原型支持的芯片型号不同时，须明确写明每种原型支持的硬件型号。
 
+```text
 <!-- npu="950,A3,910b,310b,x90,9030" id10 -->
 - 该原型支持如下产品型号：
 
@@ -622,6 +649,7 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
     __aicore__ inline void SetNextTaskStart()
     ```
 <!-- end id11 -->
+```
 
 ## 6 参数说明规范
 
@@ -633,6 +661,7 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 【正例】
 
+```text
 **表1**  模板参数说明
 
 | 参数名 | 描述 |
@@ -643,9 +672,10 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
-| src0、src1 | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>两个源操作数的数据类型需要与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
+| src0、src1 | 输入 | 源操作数。<br>类型为[LocalTensor](LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>两个源操作数的数据类型需要与目的操作数保持一致。 |
 | count | 输入 | 参与计算的元素个数。 |
+```
 
 ### API-PARAM-01 参数名须与函数原型严格一致
 
@@ -724,6 +754,7 @@ DataCopyExtParams结构体参数定义如下：
 | srcGap | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为DataBlock（32字节）。uint16_t类型，srcGap不要超出该数据类型的取值范围。 |
 | dstGap | 目的操作数相邻连续数据块间的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为DataBlock（32字节）。uint16_t类型，dstGap不要超出该数据类型的取值范围。特别地，当dstLocal位于C2PIPE2GM时，单位为128B；当dstLocal位于C2时，单位为64B。 |
 
+
 ### API-PARAM-06 参数单位须解释其原理和含义
 
 【级别】建议
@@ -781,7 +812,7 @@ isHasfinish配置为false时，finishedLocal只需进行定义，无需赋值，
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| finishedLocal | 输入 | 源操作数。用于指定某些行的排序是无效排序，其shape为(outter, 1)。类型为[LocalTensor](zh-cn_topic_0000001443533838.md)，支持的TPosition为VECIN/VECCALC/VECOUT。该参数和模板参数isHasfinish配合使用，Normal模式下支持isHasfinish配置为true/false，Small模式下仅支持isHasfinish配置为false。 |
+| finishedLocal | 输入 | 源操作数。用于指定某些行的排序是无效排序，其shape为(outter, 1)。类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。该参数和模板参数isHasfinish配合使用，Normal模式下支持isHasfinish配置为true/false，Small模式下仅支持isHasfinish配置为false。 |
 
   - isHasfinish配置为true
     - finishedLocal对应的outter行的值为true时，该行排序无效，排序后输出的dstIndexLocal的k个索引值会全部被置为n。
@@ -801,15 +832,19 @@ LocalTensor<bool> finishedLocal;
 【正例】
 IBSHARE参数与IBShare模板配合使用，参数说明中描述了其配合关系，并增加了至关联参数/API的超链接。
 
+```text
 | 参数名 | 描述 |
 |---|---|
-| IBSHARE | 是否使能IBShare。IBShare的功能是能够复用L1上相同的A矩阵或B矩阵数据，不支持同时复用A矩阵和B矩阵的数据，即A矩阵和B矩阵同时只有一个可以使能IBShare。与[Matmul模板参数](./api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul模板参数.md)中的IBShare模板配合使用，具体参数设置详见表2。 |
+| IBSHARE | 是否使能IBShare。IBShare的功能是能够复用L1上相同的A矩阵或B矩阵数据，不支持同时复用A矩阵和B矩阵的数据，即A矩阵和B矩阵同时只有一个可以使能IBShare。与[Matmul模板参数](./Matmul_template_params.md)中的IBShare模板配合使用，具体参数设置详见表2。 |
+```
 
 ### API-PARAM-10 单个参数的约束信息须就近填写
 
 【级别】建议
 
-【描述】单个参数说明的约束信息须就近填写。特殊值的处理也须在参数说明中体现。
+【描述】单个参数说明的约束信息须就近填写。
+
+> 参数说明中给出的约束多为概括性描述，在约束说明中应给出特殊值、异常值处理等具体的约束信息、多个参数的关联约束等。两者可以有适度的重复。
 
 ### API-PARAM-11 复杂参数功能须增加图示说明
 
@@ -820,9 +855,11 @@ IBSHARE参数与IBShare模板配合使用，参数说明中描述了其配合关
 【正例】
 DataCopy的使用说明中给出了DataCopyParams结构体参数的配置图示。
 
+```text
 以下样例呈现了DataCopyParams结构体参数的使用方法，样例中完成了2个连续传输数据块的搬运，每个数据块含有8个datablock，源操作数相邻数据块之间无间隔，目的操作数相邻数据块尾与头之间间隔1个datablock。
 
 ![DataCopyParams结构体参数使用方法示意图](api/figures/repeat-times.png)
+```
 
 ## 7 返回值说明规范
 
@@ -865,7 +902,9 @@ DataCopy的使用说明中给出了DataCopyParams结构体参数的配置图示�
 
 【正例】
 
-该接口仅在矢量计算API的isSetMask模板参数为false时生效，使用完成后需要使用[ResetMask](zh-cn_topic_0000001857638449.md)将mask恢复为默认值。
+```text
+该接口仅在矢量计算API的isSetMask模板参数为false时生效，使用完成后需要使用[ResetMask](./ResetMask.md)将mask恢复为默认值。
+```
 
 ## 9 调用示例规范
 
@@ -877,7 +916,7 @@ DataCopy的使用说明中给出了DataCopyParams结构体参数的配置图示�
 
 【正例】
 
-```
+```cpp
 AscendC::Tpipe pipe;
 AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
 pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize 通过Host侧tiling参数获取
@@ -901,6 +940,7 @@ AscendC::Cos(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 【正例】
 
+```text
 详细示例请参考[ReduceMax样例](../../examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_computation)。
 
 - tensor高维切分计算样例-`mask`连续模式：
@@ -918,7 +958,7 @@ AscendC::Cos(dstLocal, srcLocal, sharedTmpBuffer, 512);
     uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
     ```
-
+```
 ### API-EXAMPLE-02 样例代码须增加注释说明
 
 【级别】建议
@@ -943,11 +983,6 @@ AscendC::Cos(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 【描述】调用示例不应与算子开发方式（Kernel直调开发方式和工程化开发方式）强相关，只能在某一种开发方式下使用的API属于例外场景。
 
-### API-EXAMPLE-06 样例代码须使用规范的命名空间和宏定义
-
-【级别】强制
-
-【描述】样例代码中不应出现`using namespace AscendC`、`__CCE_AICORE__ == 300 || defined(__DAV_M310__)`等不规范用法。
 
 ## 10 业务规范
 
@@ -1005,9 +1040,6 @@ bool、int4b_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、f
 
 【描述】完成绘制后，须点击页面适应到绘图，并增加白底背景，以确保在IDE和浏览器的深色风格下，仍能够清晰地显示图中的深色线条。
 
-【反例】
-![源操作数搬运场景示例](./api/figures/源操作数搬运场景示例.png)
-
 ### API-FIGURE-03 图元之间的连线应选择无跳线样式
 
 【级别】建议
@@ -1025,21 +1057,25 @@ bool、int4b_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、f
 
 【反例】（列表下的内容无缩进）：
 
+```text
 - tensor前n个数据计算
 
 ```cpp
 template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 ```
+```
 
 【正例】（列表下的代码块缩进4个空格）：
 
+```text
 - tensor前n个数据计算
 
     ```cpp
     template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
     __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
     ```
+```
 
 ### API-FORMAT-01 须使用Markdown简易表格
 
