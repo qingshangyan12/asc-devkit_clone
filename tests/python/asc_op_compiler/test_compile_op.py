@@ -205,7 +205,7 @@ def compile_manifest_resources(manifest, manifest_dir, source_file_path):
                 )
 
             for obj in kernel["objects"]:
-                for command in sorted(obj["commands"], key=lambda item: item["stage"]):
+                for command in obj["commands"]:
                     argv = []
                     for argument in command["cmd"]:
                         values = (
@@ -611,9 +611,8 @@ class TestCompileOp(unittest.TestCase):
         objects = manifest["kernels"][0]["objects"]
         self.assertEqual({obj["object_name"] for obj in objects}, {"basic", "sk"})
         sk_object = next(obj for obj in objects if obj["object_name"] == "sk")
-        self.assertEqual(
-            [command["stage"] for command in sk_object["commands"]],
-            [0, 0, 1, 1, 1],
+        self.assertTrue(
+            all("stage" not in command for command in sk_object["commands"])
         )
         constant_info = manifest["kernels"][0]["constant_infos"][0]
         self.assertEqual(constant_info["template"], "@@STATIC_VALUE_tiling_data@@")
