@@ -83,6 +83,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_sqrtf_precise_impl
     constexpr float scale_down = 0.000244140625f; // 2^-12
     constexpr float half = 0.5f;
 
+    // Return early for zero and positive infinity.
+    if (x == 0.0f || x == ASCRT_INF_F) {
+        return x;
+    }
+
     // Scale inputs smaller than 1 to the normal range.
     bool scaled = x < 1.0f;
     float b = scaled ? x * scale_up : x;
