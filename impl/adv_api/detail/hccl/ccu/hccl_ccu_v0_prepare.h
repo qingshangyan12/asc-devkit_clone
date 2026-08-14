@@ -17,6 +17,7 @@
 
 #include "hccl_ccu_xn_utils.h"
 #include "../impl/platform_v310/hccl_ccu_v0_def.h"
+#include "utils/debug/asc_printf.h"
 
 namespace AscendC {
 template <const auto& config>
@@ -258,8 +259,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     CalcGoSize(
         (ccuParam_.rankId == ccuParam_.rankNum - 1) ? lastSliceSize : normalSliceSize, loopCount,
         CCU_MEMSLICE_SIZE, &xnData_[9]);
-    KERNEL_LOG(
-        KERNEL_INFO,
+    AscendC::PRINTF(
         "[CCU_RS_KFC_DIAG] rank[%u/%u], count[%llu], dtypeSize[%llu], inputOffset[%llu], normal[%llu], last[%llu], "
         "scratchStride[%llu], repeat[%llu], go[%llu,%llu,%llu,%llu]",
         ccuParam_.rankId, ccuParam_.rankNum, commParam->count, dataSize, rankSliceOffset, normalSliceSize,
