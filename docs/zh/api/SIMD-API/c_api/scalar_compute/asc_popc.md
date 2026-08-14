@@ -26,11 +26,11 @@
 
 ## 功能说明
 
-获取一个uint64_t类型数字的二进制中1的个数。
+获取一个`uint64_t`类型数字的二进制中1的个数。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline int64_t asc_popc(uint64_t value)
 ```
 
@@ -38,26 +38,112 @@ __aicore__ inline int64_t asc_popc(uint64_t value)
 
 **表1** 参数说明
 
-|参数名|输入/输出|描述|
+| 参数名 | 输入/输出 | 描述 |
 | :------ | :--- | :------------ |
-|value   |输入   |被统计的二进制数字。               |
+| `value` | 输入 | 被统计的二进制数字。 |
 
 ## 返回值说明
 
-value的二进制中1的个数。
-
-## 流水类型
-
-PIPE_S
+`value`的二进制中1的个数。
 
 ## 约束说明
 
-无
+- 本接口为标量单目位运算，操作数的`dtype`固定为`uint64_t`。
+- 返回值取值范围为[0, 64]，调用方接收返回值后按`int64_t`解释即可，结果恒为非负数，不会出现负值。
+- 本接口运行在标量流水上，与后续依赖该返回值的指令之间存在标量数据依赖，由标量流水本身的顺序执行保证，无需额外插入同步指令。
 
 ## 调用示例
 
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
 ```cpp
-uint64_t scalar = 33;
-// 输出数据count_one为2
-int64_t count_one = asc_popc(scalar);
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+template <typename T>
+bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t ELEMENTS = 8;
+
+__global__ __vector__ void asc_popc_kernel(__gm__ int64_t* output)
+{
+    asc_init();
+    output[0] = asc_popc(15);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<int64_t> input = {0};
+    std::vector<int64_t> golden = {4};
+    input.resize(ELEMENTS, 0);
+    golden.resize(ELEMENTS, 0);
+    std::vector<int64_t> output(ELEMENTS, -1);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int64_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (ELEMENTS) * sizeof(int64_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(output_device, input.size() * sizeof(int64_t), input.data(), input.size() * sizeof(int64_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_popc_kernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int64_t), output_device, output.size() * sizeof(int64_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden);
+    std::cout << (passed ? "[Success] asc_popc passed." : "[Failed] asc_popc failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
