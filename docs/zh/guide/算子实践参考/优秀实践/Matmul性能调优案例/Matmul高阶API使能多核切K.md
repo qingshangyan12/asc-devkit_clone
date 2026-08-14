@@ -70,7 +70,7 @@
 开启多核切K后，矩阵的K方向数据可以进行切分。如下图所示，C矩阵中的R矩阵块，是通过A1\*B1+A2\*B2+A3\*B3累加得到的，其中，A1\*B1、A2\*B2、A3\*B3可在多个核上并行计算。
 
 **图1**  开启多核切K<a name="fig194841921104410"></a>  
-![](../../../figures/开启多核切K.png "开启多核切K")
+![](../../../figures/multi_k.png "开启多核切K")
 
 开启多核切K功能的方式为：在GetTiling接口前调用EnableMultiCoreSplitK接口，开启多核切K，并在Kernel实现中，对C矩阵的Global Memory地址清零后开启AtomicAdd。开启多核切K的完整样例请参考[多核切K场景的算子样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_splitk)。具体步骤如下：
 
@@ -113,9 +113,9 @@
 
 -   优化后的流水图如下，开启多核切K后，切分原始矩阵的K方向，单核处理K方向的数据量由原来的1024变为512，单核处理的数据量减半，MTE2流水变短。
 
-    ![](../../../figures/zh-cn_image_0000002408742265.png)
+    ![](../../../figures/zh-cn_image_000000240874226fig_5.png)
 
--   优化后的Profiling数据如下，可以看到算子在两个核上执行，aic\_time平均耗时约为13.70us，较优化前的19.60us有较大提升。![](../../../figures/zh-cn_image_0000002375184084.png)
+-   优化后的Profiling数据如下，可以看到算子在两个核上执行，aic\_time平均耗时约为13.70us，较优化前的19.60us有较大提升。![](../../../figures/zh-cn_image_000000237518408fig_4.png)
 
 ## 总结<a name="section8281219125011"></a>
 
