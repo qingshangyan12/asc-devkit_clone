@@ -137,7 +137,7 @@ PIPE_MTE1
 
 - 对应的feature map格式如下图：
 
-![ ](../../figures/load3d_01.png)
+![ ](../../figures/load3d_0fig_1.png)
 
 - 对应的filter的格式如下图：
 
@@ -147,7 +147,7 @@ PIPE_MTE1
 
 实际操作中，由于存储空间或者计算能力限制，我们通常会将整个卷积计算分块，一次只搬运并计算一小块数据。
 
-![ ](../../figures/load3d_03.png)
+![ ](../../figures/load3d_0fig_3.png)
 
 对于L0A Buffer中的feature map来说有两种方案，水平分块和垂直分块。分别对应参数中repeatMode的0和1。
 
@@ -155,11 +155,11 @@ PIPE_MTE1
 
 repeatMode =0时，每次repeat会改变在filter窗口中读取数据点的位置，然后跳到下一个C0的位置。
 
-![ ](../../figures/load3d_04.png)
+![ ](../../figures/load3d_0fig_4.png)
 
 repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个repeat在feature map中前进C0个元素。
 
-![ ](../../figures/load3d_05.png)
+![ ](../../figures/load3d_0fig_5.png)
 
 
 

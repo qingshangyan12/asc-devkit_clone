@@ -26,7 +26,7 @@
 
 获取输入数据x的标准正态分布的累积分布函数值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816385.png)
+![](../../../figures/zh-cn_formulaimage_000000251681638fig_5.png)
 
 ## 函数原型
 

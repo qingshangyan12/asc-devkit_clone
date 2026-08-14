@@ -26,7 +26,7 @@
 
 获取输入数据x、y的平方和x^2 + y^2的平方根的倒数。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776404.png)
+![](../../../figures/zh-cn_formulaimage_000000248477640fig_4.png)
 
 ## 函数原型
 

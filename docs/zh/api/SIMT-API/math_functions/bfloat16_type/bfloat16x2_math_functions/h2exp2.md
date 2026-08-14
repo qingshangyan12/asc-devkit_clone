@@ -26,7 +26,7 @@
 
 指定输入x，对x的各元素，获取2的该元素次方。
 
-![](../../../../figures/zh-cn_formulaimage_0000002576421061.png)
+![](../../../../figures/zh-cn_formulaimage_000000257642106fig_1.png)
 
 ## 函数原型
 

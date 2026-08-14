@@ -80,12 +80,12 @@
 如下图所示，未开启UnitFlag功能时，MMAD和FIXPIPE是指令级别的同步，FIXPIPE指令需要等MMAD指令执行完成才进行结果搬出，MMAD和FIXPIPE之间流水串行。
 
 **图1**  未开启UnitFlag功能<a name="fig108452036134412"></a>  
-![](../../../figures/未开启UnitFlag功能.png "未开启UnitFlag功能")
+![](../../../figures/no_unitflag.png "未开启UnitFlag功能")
 
 如下图所示，开启UnitFlag功能时，MMAD和FIXPIPE指令是512B大小的细粒度同步。在一条MMAD指令执行过程中，每当完成一个512B数据结果的计算，FIXPIPE立即开始搬出该512B的数据，从而实现MMAD和FIXPIPE之间的流水并行，提升算子性能。
 
 **图2**  开启UnitFlag功能<a name="fig58335714416"></a>  
-![](../../../figures/开启UnitFlag功能.png "开启UnitFlag功能")
+![](../../../figures/unitflag.png "开启UnitFlag功能")
 
 Matmul API开启UnitFlag功能的完整样例请参考[开启UnitFlag功能和MDL模板的Matmul样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_unitflag)。开启UnitFlag功能的主要步骤如下：
 
@@ -119,7 +119,7 @@ Matmul API开启UnitFlag功能的完整样例请参考[开启UnitFlag功能和MD
 
 -   优化后的Profiling数据如下，从C列的aic\_time数据可以看出，多个核中最大算子执行耗时为34.66us，较优化前的37.39us有约7.3%的性能提升。
 
-    ![](../../../figures/zh-cn_image_0000002447501485.png)
+    ![](../../../figures/zh-cn_image_000000244750148fig_5.png)
 
 ## 总结<a name="section8281219125011"></a>
 

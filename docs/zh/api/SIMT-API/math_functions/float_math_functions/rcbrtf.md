@@ -26,7 +26,7 @@
 
 获取输入数据x的立方根的倒数。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816373.png)
+![](../../../figures/zh-cn_formulaimage_000000251681637fig_3.png)
 
 ## 函数原型
 

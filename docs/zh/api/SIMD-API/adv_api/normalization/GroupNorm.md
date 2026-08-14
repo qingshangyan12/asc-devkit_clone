@@ -32,7 +32,7 @@
 
 ![](../../../figures/zh-cn_formulaimage_0000002080756222.png)
 
-![](../../../figures/zh-cn_formulaimage_0000002116310613.png)
+![](../../../figures/zh-cn_formulaimage_000000211631061fig_3.png)
 
 其中，ε是一个很小的常数，S表示参与计算的数据的集合，m表示集合的大小。不同类型的特征标准化方法（BatchNorm、LayerNorm、InstanceNorm、GroupNorm等）的主要区别在于参与计算的数据集合的选取上。不同Norm类算子参与计算的数据集合的选取方式如下：
 
@@ -40,7 +40,7 @@
 
 对于一个shape为\[N, C, H, W\]的输入，GroupNorm将每个\[C, H, W\]在C维度上分为groupNum组，然后对每一组进行标准化。最后对标准化后的特征进行缩放和平移。其中缩放参数γ和平移参数β是可训练的。
 
-![](../../../figures/zh-cn_formulaimage_0000002081645994.png)
+![](../../../figures/zh-cn_formulaimage_000000208164599fig_4.png)
 
 ## 函数原型
 

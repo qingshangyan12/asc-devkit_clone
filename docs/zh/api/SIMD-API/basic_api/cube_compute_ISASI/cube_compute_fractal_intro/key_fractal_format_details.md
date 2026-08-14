@@ -30,7 +30,7 @@
   <!-- end id8 -->
 
   **图1** 矩阵乘法场景涉及的数据格式<a name="zh-cn_topic_0000002545089965_fig18172115901518"></a>  
-  ![](../../../../figures/fractals_involved_in_matrix_calculation_a2a3.png "矩阵乘法场景涉及的数据格式")
+  ![](../../../../figures/fractals_involved_in_matrix_calculation_a2afig_3.png "矩阵乘法场景涉及的数据格式")
 <!-- end id1 -->
 
 <!-- npu="950" id9 -->

@@ -182,7 +182,7 @@ Img2Col搬运不支持b4数据类型，即不支持`fp4x2_e2m1_t`和`fp4x2_e1m2_
 
 **图2**  b4转置搬运示意图
 
-![b4转置搬运示意图](../../../../figures/transpose_b4.png)
+![b4转置搬运示意图](../../../../figures/transpose_bfig_4.png)
 
 #### b8转置搬运
 

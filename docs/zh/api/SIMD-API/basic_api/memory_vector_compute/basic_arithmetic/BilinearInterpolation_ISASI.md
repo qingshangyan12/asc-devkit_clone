@@ -36,7 +36,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 **图1** BilinearInterpolation计算流程示意图
 
-![](../../../../figures/bilinearInterpolation_1.png)
+![](../../../../figures/bilinearInterpolation_fig_1.png)
 
 ![](../../../../figures/bilinearInterpolation_2.png)
 

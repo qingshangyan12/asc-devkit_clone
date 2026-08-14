@@ -26,7 +26,7 @@
 
 获取输入数据的双曲正弦值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816353.png)
+![](../../../figures/zh-cn_formulaimage_000000251681635fig_3.png)
 
 ## 函数原型
 

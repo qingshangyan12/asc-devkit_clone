@@ -8,7 +8,7 @@ Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下�
 
 <!-- npu="910b,A3" id2 -->
 **图1** [NPU架构版本2201](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)矩阵计算单元架构图<a name="zh-cn_topic_0000002513373312_fig88330137205"></a>  
-![](../../../../figures/architecture_of_cube_compute_unit_a2a3.png "矩阵计算单元架构图-A2A3")
+![](../../../../figures/architecture_of_cube_compute_unit_a2afig_3.png "矩阵计算单元架构图-A2A3")
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->

@@ -26,7 +26,7 @@
 
 获取输入数据x的立方根。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776414.png)
+![](../../../figures/zh-cn_formulaimage_000000248477641fig_4.png)
 
 ## 函数原型
 

@@ -28,7 +28,7 @@
 
 ![](../../../../figures/zh-cn_formulaimage_0000002259196489.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002259356401.png)
+![](../../../../figures/zh-cn_formulaimage_000000225935640fig_1.png)
 
 举例如下：
 

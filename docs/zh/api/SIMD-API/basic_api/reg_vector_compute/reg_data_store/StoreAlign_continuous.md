@@ -48,7 +48,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 **图 1**  数据搬出分布模式图示<a id="fig-storealign-dist"></a>
 
-![图1 数据搬出分布模式图示](../../../../figures/reg_storealign_1.png)
+![图1 数据搬出分布模式图示](../../../../figures/reg_storealign_fig_1.png)
 
 连续对齐搬入/搬出的三类搬运接口在迭代内调用方式请参考：[关键特性说明](#关键特性说明)。
 

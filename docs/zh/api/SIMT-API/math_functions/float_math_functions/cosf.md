@@ -26,7 +26,7 @@
 
 获取输入数据的三角函数余弦值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816345.png)
+![](../../../figures/zh-cn_formulaimage_000000251681634fig_5.png)
 
 ## 函数原型
 

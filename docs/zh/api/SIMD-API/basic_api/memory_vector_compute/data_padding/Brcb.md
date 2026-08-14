@@ -153,7 +153,7 @@ dstRepStride为8：说明相邻迭代间目的操作数中首尾DataBlock地址�
 
 **图1**  目的操作数连续
 
-![目的操作数连续](../../../../figures/Brcb_1.png)
+![目的操作数连续](../../../../figures/Brcb_fig_1.png)
 
 ### 目的操作数非连续
 

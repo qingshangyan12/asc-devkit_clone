@@ -33,7 +33,7 @@
 
 **图 1**  UnPack示意图
 
-![UnPack](../../../../figures/reg_unpack_1.png)
+![UnPack](../../../../figures/reg_unpack_fig_1.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

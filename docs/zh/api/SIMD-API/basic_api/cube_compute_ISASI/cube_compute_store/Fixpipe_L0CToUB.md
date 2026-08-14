@@ -306,7 +306,7 @@ M方向切分：
 
 **图6** 开启NZ2DN单搬运模式示意图1<a name="fig19772110476"></a>  
 
-![](../../../../figures/enable_nz2dn_single_mode1.png "开启NZ2DN单搬运模式示意图1")
+![](../../../../figures/enable_nz2dn_single_modefig_1.png "开启NZ2DN单搬运模式示意图1")
 
 示例二，参数取值说明如下，示意图见[图7](#fig769114585716)：
 

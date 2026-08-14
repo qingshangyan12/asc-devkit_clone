@@ -152,7 +152,7 @@
 
         blockLen+leftPadding+rightPadding不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
-        ![](../../../../figures/datacopypad1.png)
+        ![](../../../../figures/datacopypadfig_1.png)
 
     - 示例2：非32字节对齐场景
 

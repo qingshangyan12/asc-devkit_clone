@@ -32,7 +32,7 @@
 
 按元素做逻辑回归Tanh，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002218327685.png)
+![](../../../../figures/zh-cn_formulaimage_000000221832768fig_5.png)
 
 ![](../../../../figures/zh-cn_formulaimage_0000002193334172.png)
 

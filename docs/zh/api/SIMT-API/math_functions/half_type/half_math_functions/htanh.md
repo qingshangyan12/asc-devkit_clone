@@ -26,7 +26,7 @@
 
 获取输入数据的三角函数双曲正切值。
 
-![](../../../../figures/zh-cn_formulaimage_0000002501372254.png)
+![](../../../../figures/zh-cn_formulaimage_000000250137225fig_4.png)
 
 ## 函数原型
 

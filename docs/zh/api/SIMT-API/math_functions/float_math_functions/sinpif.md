@@ -26,7 +26,7 @@
 
 获取输入数据与π相乘的正弦值。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776394.png)
+![](../../../figures/zh-cn_formulaimage_000000248477639fig_4.png)
 
 ## 函数原型
 
