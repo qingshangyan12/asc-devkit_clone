@@ -22,11 +22,6 @@ namespace {
 
 namespace fs = boost::filesystem;
 
-void LogFilesystemError(const char* operation, const std::string& path, const boost::system::error_code& error)
-{
-    ASCENDLOGE("Failed to %s: path=%s error=%s", operation, path.c_str(), error.message().c_str());
-}
-
 } // namespace
 
 std::string FileUtils::JoinPath(const std::string& left, const std::string& right)
@@ -50,7 +45,7 @@ bool FileUtils::MakeAbsolutePath(const std::string& path, std::string& absolute)
     boost::system::error_code error;
     const fs::path result = fs::absolute(fs::path(path), error);
     if (error) {
-        LogFilesystemError("make path absolute", path, error);
+        ASCENDLOGE("Failed to make path absolute: path=%s error=%s", path.c_str(), error.message().c_str());
         absolute.clear();
         return false;
     }
@@ -133,7 +128,7 @@ bool FileUtils::ResolveCanonicalPath(const std::string& path, std::string& resol
     boost::system::error_code error;
     const fs::path canonical = fs::canonical(fs::path(path), error);
     if (error) {
-        LogFilesystemError("resolve canonical path", path, error);
+        ASCENDLOGE("Failed to resolve canonical path: path=%s error=%s", path.c_str(), error.message().c_str());
         resolved.clear();
         return false;
     }
@@ -148,7 +143,7 @@ bool FileUtils::ResolveDirectory(const std::string& path, std::string& resolved)
     boost::system::error_code error;
     const fs::file_status inputStatus = fs::symlink_status(fs::path(path), error);
     if (error) {
-        LogFilesystemError("inspect directory", path, error);
+        ASCENDLOGE("Failed to inspect directory: path=%s error=%s", path.c_str(), error.message().c_str());
         resolved.clear();
         return false;
     }
@@ -159,13 +154,15 @@ bool FileUtils::ResolveDirectory(const std::string& path, std::string& resolved)
     }
     const fs::path canonical = fs::canonical(fs::path(path), error);
     if (error) {
-        LogFilesystemError("resolve directory", path, error);
+        ASCENDLOGE("Failed to resolve directory: path=%s error=%s", path.c_str(), error.message().c_str());
         resolved.clear();
         return false;
     }
     if (!fs::is_directory(canonical, error) || error) {
         if (error) {
-            LogFilesystemError("inspect resolved directory", canonical.string(), error);
+            ASCENDLOGE(
+                "Failed to inspect resolved directory: path=%s error=%s", canonical.string().c_str(),
+                error.message().c_str());
         } else {
             ASCENDLOGE("Resolved path is not a directory: path=%s resolved=%s", path.c_str(), canonical.c_str());
         }
@@ -206,12 +203,12 @@ bool FileUtils::CreateDirectories(const std::string& path)
     boost::system::error_code error;
     fs::create_directories(fs::path(path), error);
     if (error) {
-        LogFilesystemError("create directories", path, error);
+        ASCENDLOGE("Failed to create directories: path=%s error=%s", path.c_str(), error.message().c_str());
         return false;
     }
     if (!fs::is_directory(fs::path(path), error) || error) {
         if (error) {
-            LogFilesystemError("inspect created directory", path, error);
+            ASCENDLOGE("Failed to inspect created directory: path=%s error=%s", path.c_str(), error.message().c_str());
         } else {
             ASCENDLOGE("Created path is not a directory: path=%s", path.c_str());
         }
@@ -242,7 +239,7 @@ bool FileUtils::ReadRegularFile(const std::string& path, uintmax_t maximum, std:
     const fs::file_status inputStatus = fs::symlink_status(fs::path(path), error);
     if (error || fs::is_symlink(inputStatus) || !fs::is_regular_file(inputStatus)) {
         if (error) {
-            LogFilesystemError("inspect regular file", path, error);
+            ASCENDLOGE("Failed to inspect regular file: path=%s error=%s", path.c_str(), error.message().c_str());
         } else {
             ASCENDLOGE("Rejected non-regular file: path=%s", path.c_str());
         }
@@ -250,7 +247,7 @@ bool FileUtils::ReadRegularFile(const std::string& path, uintmax_t maximum, std:
     }
     const uintmax_t fileSize = fs::file_size(fs::path(path), error);
     if (error) {
-        LogFilesystemError("read regular file size", path, error);
+        ASCENDLOGE("Failed to read regular file size: path=%s error=%s", path.c_str(), error.message().c_str());
         return false;
     }
     if (fileSize > maximum || fileSize > static_cast<uintmax_t>(std::numeric_limits<size_t>::max()) ||
