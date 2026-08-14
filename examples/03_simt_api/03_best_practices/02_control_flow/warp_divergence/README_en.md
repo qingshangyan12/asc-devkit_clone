@@ -183,7 +183,7 @@ if (lane_id == 0) {
 
 Perform the following steps in the root directory of this sample to compile and run the sample.
 - Configure environment variables  
-  Configure the environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development toolkit on the current environment.
+  Configure the environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development toolkit on the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
