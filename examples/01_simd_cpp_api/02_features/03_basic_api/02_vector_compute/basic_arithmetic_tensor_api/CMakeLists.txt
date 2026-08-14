@@ -23,7 +23,7 @@ project(basic_arithmetic_tensor_api LANGUAGES ASC CXX)
 add_executable(demo basic_arithmetic_tensor_api.asc)
 target_include_directories(demo PRIVATE
     "$ENV{ASCEND_HOME_PATH}/asc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/.."
+    "${CMAKE_CURRENT_LIST_DIR}/.."
 )
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
