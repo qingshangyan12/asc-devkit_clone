@@ -328,27 +328,27 @@ Some interfaces are Host interfaces that do not differentiate by product. In thi
 ```text
 ## Product Support
 
-<!-- npu="950" id1 -->
+<!-- npu="950" id8 -->
 - Ascend 950PR/Ascend 950DT: Supported
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
+<!-- end id8 -->
+<!-- npu="A3" id9 -->
 - Atlas A3 Training Series Products/Atlas A3 Inference Series Products: Not supported
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
+<!-- end id9 -->
+<!-- npu="910b" id10 -->
 - Atlas A2 Training Series Products/Atlas A2 Inference Series Products: Not supported
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
+<!-- end id10 -->
+<!-- npu="310b" id11 -->
 - Atlas 200I/500 A2 Inference Products: Not supported
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
+<!-- end id11 -->
+<!-- npu="310p" id12 -->
 - Atlas Inference Series Products AI Core: Not supported
-<!-- end id5 -->
-<!-- npu="310p" id6 -->
+<!-- end id12 -->
+<!-- npu="310p" id13 -->
 - Atlas Inference Series Products Vector Core: Not supported
-<!-- end id6 -->
-<!-- npu="910" id7 -->
+<!-- end id13 -->
+<!-- npu="910" id14 -->
 - Atlas Training Series Products: Not supported
-<!-- end id7 -->
+<!-- end id14 -->
 ```
 
 ## 4 Function Description
@@ -595,59 +595,59 @@ For scenarios with too many function prototypes, using only unordered lists woul
 [Description] When different prototypes support different chip models, the supported hardware models for each prototype must be clearly specified.
 
 ```text
-<!-- npu="950,A3,910b,310b,x90,9030" id10 -->
+<!-- npu="950,A3,910b,310b,x90,9030" id15 -->
 - This prototype supports the following product models:
 
-    <!-- npu="950" id1 -->
+    <!-- npu="950" id16 -->
     Ascend 950PR/Ascend 950DT 
-    <!-- end id1 -->
+    <!-- end id16 -->
 
-    <!-- npu="A3" id2 -->
+    <!-- npu="A3" id17 -->
     Atlas A3 Training Series Products/Atlas A3 Inference Series Products 
-    <!-- end id2 -->
+    <!-- end id17 -->
 
-    <!-- npu="910b" id3 -->
+    <!-- npu="910b" id18 -->
     Atlas A2 Training Series Products/Atlas A2 Inference Series Products 
-    <!-- end id3 -->
+    <!-- end id18 -->
 
-    <!-- npu="310b" id4 -->
+    <!-- npu="310b" id19 -->
     Atlas 200I/500 A2 Inference Products 
-    <!-- end id4 -->
+    <!-- end id19 -->
 
-    <!-- npu="x90" id5 -->
+    <!-- npu="x90" id20 -->
     Kirin X90 
-    <!-- end id5 -->
+    <!-- end id20 -->
 
-    <!-- npu="9030" id6 -->
+    <!-- npu="9030" id21 -->
     Kirin 9030 
-    <!-- end id6 -->
+    <!-- end id21 -->
 
     ```cpp
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
     __aicore__ inline void SetNextTaskStart()
     ```
-<!-- end id10 -->
+<!-- end id15 -->
 
-<!-- npu="310p,910" id11 -->
+<!-- npu="310p,910" id22 -->
 - This prototype supports the following product models:
 
-    <!-- npu="310p" id7 -->
+    <!-- npu="310p" id23 -->
     Atlas Inference Series Products AI Core 
-    <!-- end id7 -->
+    <!-- end id23 -->
 
-    <!-- npu="310p" id8 -->
+    <!-- npu="310p" id24 -->
     Atlas Inference Series Products Vector Core 
-    <!-- end id8 -->
+    <!-- end id24 -->
 
-    <!-- npu="910" id9 -->
+    <!-- npu="910" id25 -->
     Atlas Training Series Products 
-    <!-- end id9 -->
+    <!-- end id25 -->
 
     ```cpp
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3, bool FORCE = false>
     __aicore__ inline void SetNextTaskStart()
     ```
-<!-- end id11 -->
+<!-- end id22 -->
 ```
 
 ## 6 Parameter Description
@@ -789,13 +789,13 @@ Only lists the parameter units as 16 Bytes and 32 Bytes without the necessary pr
 ### flagId Value Range<a id="flagid-value-range"></a>
 
 - When the inter-core synchronization mode is mode 0, 1, or 2, the supported value range is 0-15.
-<!-- npu="950" id17 -->
+<!-- npu="950" id26 -->
 - For Ascend 950PR/Ascend 950DT, when the inter-core synchronization mode is mode 4, the supported value range is as follows:
     - CrossCoreSetFlag operations with flagId 0-10 initiated by AIV0 correspond to CrossCoreWaitFlag operations with flagId 0-10 on AIC.
     - CrossCoreSetFlag operations with flagId 0-10 initiated by AIV1 correspond to CrossCoreWaitFlag operations with flagId 16-26 on AIC.
     - CrossCoreSetFlag operations with flagId 0-10 initiated by AIC correspond to CrossCoreWaitFlag operations with flagId 0-10 on AIV0.
     - CrossCoreSetFlag operations with flagId 16-26 initiated by AIC correspond to CrossCoreWaitFlag operations with flagId 0-10 on AIV1.
-<!-- end id17 -->
+<!-- end id26 -->
 ```
 
 ### API-PARAM-08 Complex Parameter Configuration Methods Must Be Explained
@@ -1192,9 +1192,9 @@ Content customization refers to the ability to dynamically display different con
 [Positive Example]
 
 ```text
-<!-- npu="950" id1 -->
+<!-- npu="950" id27 -->
 This interface supports counter mode on Ascend 950PR/Ascend 950DT.
-<!-- end id1 -->
+<!-- end id27 -->
 ```
 
 ### API-CUSTOM-01 IDs Must Be Unique Within the Same Document
