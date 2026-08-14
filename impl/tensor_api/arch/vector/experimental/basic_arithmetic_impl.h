@@ -25,13 +25,17 @@ namespace te {
 
 namespace detail {
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> broadcast_scalar(T value, vector_bool mask)
+template <typename T, typename U>
+__simd_callee__ inline reg_tensor<T> make_arithmetic_operand(U value, vector_bool mask)
 {
-    reg_tensor<T> dst;
-    asc_duplicate_scalar(dst.reg, value, mask);
-    dst.mask = mask;
-    return dst;
+    if constexpr (is_reg_tensor_v<U>) {
+        return value;
+    } else {
+        reg_tensor<T> dst;
+        asc_duplicate_scalar(dst.reg, static_cast<T>(value), mask);
+        dst.mask = mask;
+        return dst;
+    }
 }
 
 template <typename T, typename U>
@@ -146,12 +150,12 @@ __simd_callee__ inline decltype(auto) prelu(reg_tensor<T> src_reg, reg_tensor<T>
     return dst;
 }
 
-template <typename T, typename Scalar>
-__simd_callee__ inline decltype(auto) leaky_relu(reg_tensor<T> src_reg, Scalar slope)
+template <typename T, typename scalar_type>
+__simd_callee__ inline decltype(auto) leaky_relu(reg_tensor<T> src_reg, scalar_type slope)
 {
     static_assert(detail::supports_float_math_v<T>, "leaky_relu supports half and float");
-    static_assert(!detail::is_reg_tensor_v<Scalar> &&
-            ::AscendC::Std::is_convertible_v<::AscendC::Std::remove_cvref_t<Scalar>, T>,
+    static_assert(!detail::is_reg_tensor_v<scalar_type> &&
+            ::AscendC::Std::is_convertible_v<::AscendC::Std::remove_cvref_t<scalar_type>, T>,
         "leaky_relu requires a scalar convertible to the reg_tensor element type");
     reg_tensor<T> dst;
     asc_leakyrelu(dst.reg, src_reg.reg, static_cast<T>(slope), src_reg.mask);
@@ -209,19 +213,8 @@ __simd_callee__ inline decltype(auto) operator-(T a, U b)
     static_assert(detail::supports_add_sub_v<elem_type>, "operator- does not support this element type");
 
     vector_bool mask = detail::binary_mask(a, b);
-    reg_tensor<elem_type> left;
-    reg_tensor<elem_type> right;
-    if constexpr (detail::is_reg_tensor_v<T>) {
-        left = a;
-    } else {
-        left = detail::broadcast_scalar(static_cast<elem_type>(a), mask);
-    }
-    if constexpr (detail::is_reg_tensor_v<U>) {
-        right = b;
-    } else {
-        right = detail::broadcast_scalar(static_cast<elem_type>(b), mask);
-    }
-
+    auto left = detail::make_arithmetic_operand<elem_type>(a, mask);
+    auto right = detail::make_arithmetic_operand<elem_type>(b, mask);
     reg_tensor<elem_type> dst;
     asc_sub(dst.reg, left.reg, right.reg, mask);
     dst.mask = mask;
@@ -295,19 +288,8 @@ __simd_callee__ inline decltype(auto) operator/(T a, U b)
     static_assert(detail::supports_div_v<elem_type>, "operator/ does not support this element type");
 
     vector_bool mask = detail::binary_mask(a, b);
-    reg_tensor<elem_type> left;
-    reg_tensor<elem_type> right;
-    if constexpr (detail::is_reg_tensor_v<T>) {
-        left = a;
-    } else {
-        left = detail::broadcast_scalar(static_cast<elem_type>(a), mask);
-    }
-    if constexpr (detail::is_reg_tensor_v<U>) {
-        right = b;
-    } else {
-        right = detail::broadcast_scalar(static_cast<elem_type>(b), mask);
-    }
-
+    auto left = detail::make_arithmetic_operand<elem_type>(a, mask);
+    auto right = detail::make_arithmetic_operand<elem_type>(b, mask);
     reg_tensor<elem_type> dst;
     asc_div(dst.reg, left.reg, right.reg, mask);
     dst.mask = mask;
@@ -342,19 +324,8 @@ __simd_callee__ inline decltype(auto) min(T a, U b)
     static_assert(detail::supports_min_max_v<elem_type>, "min does not support this element type");
 
     vector_bool mask = detail::binary_mask(a, b);
-    reg_tensor<elem_type> left;
-    reg_tensor<elem_type> right;
-    if constexpr (detail::is_reg_tensor_v<T>) {
-        left = a;
-    } else {
-        left = detail::broadcast_scalar(static_cast<elem_type>(a), mask);
-    }
-    if constexpr (detail::is_reg_tensor_v<U>) {
-        right = b;
-    } else {
-        right = detail::broadcast_scalar(static_cast<elem_type>(b), mask);
-    }
-
+    auto left = detail::make_arithmetic_operand<elem_type>(a, mask);
+    auto right = detail::make_arithmetic_operand<elem_type>(b, mask);
     reg_tensor<elem_type> dst;
     asc_min(dst.reg, left.reg, right.reg, mask);
     dst.mask = mask;

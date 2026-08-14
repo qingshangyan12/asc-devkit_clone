@@ -36,13 +36,17 @@ __simd_callee__ inline vector_bool full_predicate_mask()
     return asc_create_mask_b8(PAT_ALL);
 }
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> broadcast_logic_scalar(T value, vector_bool mask)
+template <typename T, typename U>
+__simd_callee__ inline reg_tensor<T> make_logic_operand(U value, vector_bool mask)
 {
-    reg_tensor<T> dst;
-    asc_duplicate_scalar(dst.reg, value, mask);
-    dst.mask = mask;
-    return dst;
+    if constexpr (is_reg_tensor_v<U>) {
+        return value;
+    } else {
+        reg_tensor<T> dst;
+        asc_duplicate_scalar(dst.reg, static_cast<T>(value), mask);
+        dst.mask = mask;
+        return dst;
+    }
 }
 
 template <typename T, typename U>
@@ -65,33 +69,33 @@ __simd_callee__ inline void check_logic_reg_types()
     }
 }
 
-template <bitwise_op Op, typename T>
+template <bitwise_op op, typename T>
 __simd_callee__ inline void check_bitwise_type()
 {
-    if constexpr (Op == bitwise_op::bit_and) {
+    if constexpr (op == bitwise_op::bit_and) {
         static_assert(supports_and_v<T>, "operator& does not support this element type");
-    } else if constexpr (Op == bitwise_op::bit_or) {
+    } else if constexpr (op == bitwise_op::bit_or) {
         static_assert(supports_or_v<T>, "operator| does not support this element type");
     } else {
         static_assert(supports_xor_v<T>, "operator^ does not support this element type");
     }
 }
 
-template <bitwise_op Op, typename T, typename U>
+template <bitwise_op op, typename T, typename U>
 __simd_callee__ inline decltype(auto) bitwise_compute(T a, U b)
 {
     using elem_type = binary_elem_t<T, U>;
     check_logic_reg_types<T, U>();
-    check_bitwise_type<Op, elem_type>();
+    check_bitwise_type<op, elem_type>();
 
     if constexpr (::AscendC::Std::is_same_v<elem_type, bool>) {
         static_assert(is_reg_tensor_v<T> && is_reg_tensor_v<U>,
             "bool bitwise operators require two reg_tensor<bool> operands");
         reg_tensor<bool> dst;
         vector_bool mask = full_predicate_mask();
-        if constexpr (Op == bitwise_op::bit_and) {
+        if constexpr (op == bitwise_op::bit_and) {
             asc_and(dst.reg, a.reg, b.reg, mask);
-        } else if constexpr (Op == bitwise_op::bit_or) {
+        } else if constexpr (op == bitwise_op::bit_or) {
             asc_or(dst.reg, a.reg, b.reg, mask);
         } else {
             asc_xor(dst.reg, a.reg, b.reg, mask);
@@ -99,23 +103,12 @@ __simd_callee__ inline decltype(auto) bitwise_compute(T a, U b)
         return dst;
     } else {
         vector_bool mask = logic_mask(a, b);
-        reg_tensor<elem_type> left;
-        reg_tensor<elem_type> right;
-        if constexpr (is_reg_tensor_v<T>) {
-            left = a;
-        } else {
-            left = broadcast_logic_scalar(static_cast<elem_type>(a), mask);
-        }
-        if constexpr (is_reg_tensor_v<U>) {
-            right = b;
-        } else {
-            right = broadcast_logic_scalar(static_cast<elem_type>(b), mask);
-        }
-
+        auto left = make_logic_operand<elem_type>(a, mask);
+        auto right = make_logic_operand<elem_type>(b, mask);
         reg_tensor<elem_type> dst;
-        if constexpr (Op == bitwise_op::bit_and) {
+        if constexpr (op == bitwise_op::bit_and) {
             asc_and(dst.reg, left.reg, right.reg, mask);
-        } else if constexpr (Op == bitwise_op::bit_or) {
+        } else if constexpr (op == bitwise_op::bit_or) {
             asc_or(dst.reg, left.reg, right.reg, mask);
         } else {
             asc_xor(dst.reg, left.reg, right.reg, mask);
@@ -179,7 +172,7 @@ __simd_callee__ inline decltype(auto) operator<<(reg_tensor<T> src, U shift)
     } else {
         static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
             "scalar operator<< requires an int16_t shift value");
-        asc_shiftleft_scalar(dst.reg, src.reg, static_cast<int16_t>(shift), src.mask);
+        asc_shiftleft_scalar(dst.reg, src.reg, shift, src.mask);
     }
     dst.mask = src.mask;
     return dst;
@@ -199,7 +192,7 @@ __simd_callee__ inline decltype(auto) operator>>(reg_tensor<T> src, U shift)
     } else {
         static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
             "scalar operator>> requires an int16_t shift value");
-        asc_shiftright_scalar(dst.reg, src.reg, static_cast<int16_t>(shift), src.mask);
+        asc_shiftright_scalar(dst.reg, src.reg, shift, src.mask);
     }
     dst.mask = src.mask;
     return dst;
