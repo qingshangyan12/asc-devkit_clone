@@ -68,7 +68,6 @@ struct Capture {
     bool masks_match = true;
     bool operands_match = true;
     size_t calls = 0;
-    size_t accumulation_calls = 0;
     size_t part_calls = 0;
     std::array<int, 4> parts {};
     std::array<float, 4> scalars {};
@@ -90,7 +89,7 @@ void AxpyStub(vector_float& dst, vector_float src, float scalar, vector_bool mas
     FillBytes(dst, RESULT_TOKEN);
 }
 
-void AbsSubStub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
+void AbsdiffStub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
 {
     CaptureMask(mask);
     g_capture.operands_match = g_capture.operands_match && HasByteValue(src0, SRC0_TOKEN) &&
@@ -117,17 +116,11 @@ void ExpSubHalfStub(vector_float& dst, vector_half, vector_half, vector_bool mas
     FillBytes(dst, RESULT_TOKEN);
 }
 
-void AccumulateStub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
+void FmaStub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, Literal)
 {
     CaptureMask(mask);
-    if (g_capture.accumulation_calls == 0) {
-        g_capture.operands_match = g_capture.operands_match && HasByteValue(dst, DST_TOKEN) &&
-            HasByteValue(src0, SRC0_TOKEN) && HasByteValue(src1, SRC1_TOKEN);
-    } else {
-        g_capture.operands_match = g_capture.operands_match && HasByteValue(dst, SRC0_TOKEN) &&
-            HasByteValue(src0, SRC1_TOKEN) && HasByteValue(src1, DST_TOKEN);
-    }
-    ++g_capture.accumulation_calls;
+    g_capture.operands_match = g_capture.operands_match && HasByteValue(dst, SRC0_TOKEN) &&
+        HasByteValue(src0, SRC1_TOKEN) && HasByteValue(src1, DST_TOKEN);
     ++g_capture.calls;
     FillBytes(dst, RESULT_TOKEN);
 }
@@ -163,11 +156,11 @@ __aicore__ inline void CompileAxpy()
 }
 
 template <typename T>
-__aicore__ inline void CompileAbsSub()
+__aicore__ inline void CompileAbsdiff()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
-    (void)asc::te::abs_sub(src0, src1);
+    (void)asc::te::absdiff(src0, src1);
 }
 
 template <typename T>
@@ -178,49 +171,37 @@ __aicore__ inline void CompileExpSub()
     (void)asc::te::exp_sub(src0, src1);
 }
 
-template <typename T, typename U>
-__aicore__ inline void CompileMulDstAdd()
-{
-    asc::te::reg_tensor<T> dst {};
-    asc::te::reg_tensor<U> src0 {};
-    asc::te::reg_tensor<U> src1 {};
-    (void)asc::te::mul_dst_add(dst, src0, src1);
-}
-
 template <typename T>
-__aicore__ inline void CompileMulAddDst()
+__aicore__ inline void CompileFma()
 {
-    asc::te::reg_tensor<T> dst {};
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
-    (void)asc::te::mul_add_dst(dst, src0, src1);
+    asc::te::reg_tensor<T> src2 {};
+    (void)asc::te::fma(src0, src1, src2);
 }
 
-TEST_F(TestTensorApiCompositeCompute, CompileSixApisAndSupportedTypes)
+TEST_F(TestTensorApiCompositeCompute, CompileFiveApisAndSupportedTypes)
 {
     AscendC::SetGCoreType(0);
     CompileAxpy<half>();
     CompileAxpy<float>();
-    CompileAbsSub<half>();
-    CompileAbsSub<float>();
+    CompileAbsdiff<half>();
+    CompileAbsdiff<float>();
     CompileExpSub<half>();
     CompileExpSub<float>();
-    CompileMulDstAdd<half, half>();
-    CompileMulDstAdd<float, float>();
-    CompileMulAddDst<half>();
-    CompileMulAddDst<float>();
+    CompileFma<half>();
+    CompileFma<float>();
 
     static_assert(!asc::te::detail::supports_axpy_v<int64_t>);
-    static_assert(!asc::te::detail::supports_abs_sub_v<int64_t>);
-    static_assert(!asc::te::detail::supports_mul_dst_add_v<float, half>);
-    static_assert(!asc::te::detail::supports_mul_add_dst_v<int32_t>);
+    static_assert(!asc::te::detail::supports_absdiff_v<int64_t>);
+    static_assert(!asc::te::detail::supports_fma_v<int32_t>);
 
     asc::te::reg_tensor<float> src {};
     static_assert(std::is_same_v<decltype(asc::te::muls_cast(src, 2.0f)), asc::te::reg_tensor<half>>);
     (void)asc::te::muls_cast(src, 2.0f);
 }
 
-TEST_F(TestTensorApiCompositeCompute, AccumulationApisUseDestinationMask)
+TEST_F(TestTensorApiCompositeCompute, AccumulationApisUseFirstOperandMask)
 {
     auto dst = MakeReg<float>(DST_TOKEN);
     auto src0 = MakeReg<float>(SRC0_TOKEN);
@@ -233,15 +214,15 @@ TEST_F(TestTensorApiCompositeCompute, AccumulationApisUseDestinationMask)
         .times(1)
         .will(invoke(AxpyStub));
     MOCKER_CPP(vmadd, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
-        .times(2)
-        .will(invoke(AccumulateStub));
+        .times(1)
+        .will(invoke(FmaStub));
 
     EXPECT_TRUE(HasByteValue(asc::te::axpy(dst, src0, 2.5f).reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue(asc::te::mul_dst_add(dst, src0, src1).reg, RESULT_TOKEN));
-    EXPECT_TRUE(HasByteValue(asc::te::mul_add_dst(dst, src0, src1).reg, RESULT_TOKEN));
+    g_capture.expected_mask = src0.mask;
+    EXPECT_TRUE(HasByteValue(asc::te::fma(src0, src1, dst).reg, RESULT_TOKEN));
 
     GlobalMockObject::verify();
-    EXPECT_EQ(g_capture.calls, 3U);
+    EXPECT_EQ(g_capture.calls, 2U);
     EXPECT_FLOAT_EQ(g_capture.scalars[0], 2.5f);
     EXPECT_TRUE(g_capture.operands_match);
     EXPECT_TRUE(g_capture.masks_match);
@@ -255,7 +236,7 @@ TEST_F(TestTensorApiCompositeCompute, DifferenceApisPreserveSourceOrderAndSuppor
     g_capture.expected_mask = src0.mask;
     MOCKER_CPP(vabsdif, void(vector_float&, vector_float, vector_float, vector_bool, Literal))
         .times(1)
-        .will(invoke(AbsSubStub));
+        .will(invoke(AbsdiffStub));
     MOCKER_CPP(vexpdif, void(vector_float&, vector_float, vector_float, vector_bool, int))
         .times(1)
         .will(invoke(ExpSubStub));
@@ -263,7 +244,7 @@ TEST_F(TestTensorApiCompositeCompute, DifferenceApisPreserveSourceOrderAndSuppor
         .times(1)
         .will(invoke(ExpSubHalfStub));
 
-    EXPECT_TRUE(HasByteValue(asc::te::abs_sub(src0, src1).reg, RESULT_TOKEN));
+    EXPECT_TRUE(HasByteValue(asc::te::absdiff(src0, src1).reg, RESULT_TOKEN));
     EXPECT_TRUE(HasByteValue(asc::te::exp_sub(src0, src1).reg, RESULT_TOKEN));
     auto half_src0 = MakeReg<half>(SRC0_TOKEN);
     auto half_src1 = MakeReg<half>(SRC1_TOKEN);

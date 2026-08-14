@@ -4,7 +4,7 @@
 
 本样例演示如何使用Tensor API完成可由单条或一组底层指令表达的复合寄存器计算。相较于把乘、加、绝对值、指数和类型转换拆成多个调用，复合接口可以直接表达完整计算意图，并减少用户维护中间寄存器的工作。
 
-样例将两组`float`向量加载为`reg_tensor<float>`，调用6个复合计算接口，并将每个接口的结果写入独立输出行。
+样例将两组`float`向量加载为`reg_tensor<float>`，调用5个复合计算接口，并将每个接口的结果写入独立输出行。
 
 ## 支持的产品
 
@@ -25,15 +25,14 @@ composite_compute_tensor_api
 
 ## 样例描述
 
-输入包含两组各64个`float`元素，样例计算以下6行结果：
+输入包含两组各64个`float`元素，样例计算以下5行结果：
 
 | 接口 | 样例中的计算 |
 | --- | --- |
 | `axpy` | `src_b + 0.25 * src_a` |
-| `abs_sub` | `abs(src_a - src_b)` |
+| `absdiff` | `abs(src_a - src_b)` |
 | `exp_sub` | `exp(src_a - src_b)` |
-| `mul_dst_add` | `src_a * src_b + src_b` |
-| `mul_add_dst` | `src_a + src_b * src_b` |
+| `fma` | `src_a * src_b + src_b` |
 | `muls_cast` | `float`乘1.5后转换为`half`，再转回`float`用于统一保存和校验 |
 
 内核先完成GM到UB的数据搬运，再在`compute`中加载寄存器、调用复合接口并存储结果，最后将输出搬回GM。`gen_data.py`使用NumPy生成输入和golden数据，`verify_result.py`完成逐元素精度比较。
