@@ -29,6 +29,8 @@
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 
 #define ASCRT_FOUR_BYTE_LEN_U 32U
+constexpr float __internal_subnormal_boundary =
+    1.17549435e-38f; // 1.17549435e-38f: subnormal floating-point number boundary
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lroundf(float x)
 {
@@ -108,9 +110,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_expf(float x) { return __
 #ifdef __ASC_PREC_SQRT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
 {
-    constexpr float subnormal_boundary = 1.17549435e-38f; // 1.17549435e-38f: subnormal floating-point number boundary
     // Treat positive subnormal inputs as 0 before entering the precise sqrt path.
-    if (x > 0.0f && x < subnormal_boundary) {
+    if (x > 0.0f && x < __internal_subnormal_boundary) {
         x = 0.0f;
     }
     return __internal_sqrtf_precise_impl(x);
@@ -123,10 +124,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x) { return _
 #ifndef __ASC_FTZ__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_expf(float x)
 {
-    constexpr float subnormal_boundary = 1.17549435e-38f; // 1.17549435e-38f: subnormal floating-point number boundary
-
     float y = __expf(x);
-    if (y >= 0.0f && y < subnormal_boundary) {
+    if (y >= 0.0f && y < __internal_subnormal_boundary) {
         float half_y = __expf(x * 0.5f);
         return half_y * half_y;
     }
@@ -138,11 +137,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x) { return _
 #else
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
 {
-    constexpr float subnormal_boundary = 1.17549435e-38f; // 1.17549435e-38f: subnormal floating-point number boundary
-    constexpr float scale_up = 16777216.0f;               // 2^24
-    constexpr float scale_down = 0.000244140625f;         // 2^-12
+    constexpr float scale_up = 16777216.0f;       // 2^24
+    constexpr float scale_down = 0.000244140625f; // 2^-12
     // Scale positive subnormal inputs to the normal range, then scale the result back.
-    if (x > 0.0f && x < subnormal_boundary) {
+    if (x > 0.0f && x < __internal_subnormal_boundary) {
         return __sqrtf(x * scale_up) * scale_down;
     }
     return __sqrtf(x);
