@@ -727,33 +727,31 @@ repeatTime参数的单位和支持的数据类型在原型定义中可以明确�
 【描述】数据结构类参数，须列出数据结构的定义（结构定义过长可不在文档列出，但须给出所在头文件目录）并给出详细介绍（或增加至详细介绍的超链接）。若结构体参数被多个API使用，经评估在单个API中呈现不合理，须将结构体定义提炼至公共位置，并在本API内增加至该结构体定义的说明。
 
 【正例】
-dataCopyParams给出了其数据类型定义。
+dataCopyParams给出了其数据类型所在的头文件目录和详细介绍。
+
+```text
+*表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-|---|---|---|
-| dataCopyParams | 输入 | 搬运参数。 |
+| :--- | :---: | :--- |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，存储位置为Unified Buffer，目的地址需要32字节对齐。 |
+| src | 输入 | 源操作数，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor_intro.md)，存储位置为Global Memory，源地址需要1字节对齐。 |
+| dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，具体参数说明请参考[表3](#table_gm2ub_pad_3)。 |
+| padParams | 输入 | 从Global Memory搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考[表4](#table_gm2ub_pad_4)。 |
 
-DataCopyExtParams类型，定义如下：
+下文表格中列出的结构体参数定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。
 
-```cpp
-struct DataCopyExtParams {
-    uint16_t blockCount = 0;
-    uint32_t blockLen = 0;
-    uint32_t srcStride = 0;
-    uint32_t dstStride = 0;
-    uint32_t rsv = 0; // reserved information
-};
+**表3**  DataCopyExtParams结构体参数定义<a name="table_gm2ub_pad_3"></a>
+
+| 参数名 | 描述 |
+| :--- | :--- |
+| blockCount | 搬运的数据块个数，数据类型为uint16_t，取值范围：blockCount∈[0, 4095]，默认值为1。 |
+| blockLen | 搬运的每个数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]，单位：1B。<br>**blockLen必须是sizeof(T)的整数倍，需要注意不要超过UB空间大小。** |
+| srcStride | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint32_t，取值范围：srcStride∈[0, 2^32 - 1]，单位：1B。不同产品中srcStride的数据类型和支持的取值范围可能不同，详细请参考[约束说明](#section633mcpsimp)。 |
+| dstStride | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint32_t，取值范围：dstStride∈[0, 2^32 - 1]，单位：dataBlock（32B）。不同产品中dstStride的数据类型和支持的取值范围可能不同，详细请参考[约束说明](#section633mcpsimp)。若PaddingMode为Compact模式，该参数无效，默认值为0，取默认值即可。<br>**注：需要注意不要超过UB空间大小**。 |
+| rsv | 保留字段。数据类型为uint16_t，默认值为0。 |
+
 ```
-
-DataCopyExtParams结构体参数定义如下：
-
-| 参数名称 | 含义 |
-|---|---|
-| blockCount | 待搬运的连续传输数据块个数。uint16_t类型，取值范围：blockCount∈[1, 4095]。 |
-| blockLen | 待搬运的每个连续传输数据块长度，单位为DataBlock（32字节）。uint16_t类型，取值范围：blockLen∈[1, 65535]。特别地，当dst位于C2PIPE2GM时，单位为128B；当dst位于C2时，表示源操作数的连续传输数据块长度，单位为64B。 |
-| srcGap | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为DataBlock（32字节）。uint16_t类型，srcGap不要超出该数据类型的取值范围。 |
-| dstGap | 目的操作数相邻连续数据块间的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为DataBlock（32字节）。uint16_t类型，dstGap不要超出该数据类型的取值范围。特别地，当dstLocal位于C2PIPE2GM时，单位为128B；当dstLocal位于C2时，单位为64B。 |
-
 
 ### API-PARAM-06 参数单位须解释其原理和含义
 
