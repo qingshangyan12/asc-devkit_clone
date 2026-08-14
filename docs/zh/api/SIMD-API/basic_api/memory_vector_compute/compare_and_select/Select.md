@@ -218,9 +218,9 @@ Kirin 9030，支持模式0、1、2。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md)。
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md)。
 
 <!-- npu="950" id10 -->
 - 当参数count或repeatTime取值为0时，针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容，不保证该接口将被视为NOP（空操作）。
