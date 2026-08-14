@@ -15,6 +15,7 @@
 #include <atomic>
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
+#include <cerrno>
 #include <fstream>
 #include <map>
 #include <sstream>
@@ -60,10 +61,14 @@ bool ReplaceFileAtomically(const fs::path& targetFilePath, const std::string& co
     {
         std::ofstream outputStream(temporaryFilePath, std::ios::out | std::ios::binary | std::ios::trunc);
         if (!outputStream) {
+            ACLRTC_LOG_ERROR("Failed to create temporary source patch file: path=%s errno=%d",
+                             temporaryFilePath.c_str(), errno);
             return false;
         }
         outputStream.write(contents.data(), static_cast<std::streamsize>(contents.size()));
         if (!outputStream) {
+            ACLRTC_LOG_ERROR("Failed to write temporary source patch file: path=%s errno=%d",
+                             temporaryFilePath.c_str(), errno);
             boost::system::error_code ignoredError;
             fs::remove(temporaryFilePath, ignoredError);
             return false;
@@ -72,6 +77,8 @@ bool ReplaceFileAtomically(const fs::path& targetFilePath, const std::string& co
     boost::system::error_code renameError;
     fs::rename(temporaryFilePath, targetFilePath, renameError);
     if (renameError) {
+        ACLRTC_LOG_ERROR("Failed to replace patched source file: source=%s target=%s error=%d",
+                         temporaryFilePath.c_str(), targetFilePath.c_str(), renameError.value());
         boost::system::error_code ignoredError;
         fs::remove(temporaryFilePath, ignoredError);
         return false;
@@ -92,8 +99,8 @@ KernelCompilationWorkspace::~KernelCompilationWorkspace()
     boost::system::error_code cleanupError;
     fs::remove_all(worktreePath_, cleanupError);
     if (cleanupError) {
-        ACLRTC_LOG_WARNING("Failed to clean resource worktree %s: %s", worktreePath_.c_str(),
-                           cleanupError.message().c_str());
+        ACLRTC_LOG_WARNING("Failed to clean resource worktree: path=%s error=%d", worktreePath_.c_str(),
+                           cleanupError.value());
     }
 }
 
@@ -108,6 +115,8 @@ aclError KernelCompilationWorkspace::MaterializeCompilationInputs(const KernelCo
         boost::system::error_code directoryError;
         fs::create_directories(outputDirectoryPath, directoryError);
         if (directoryError) {
+            ACLRTC_LOG_ERROR("Failed to create compilation output directory: path=%s error=%d",
+                             outputDirectoryPath.c_str(), directoryError.value());
             return ACLRTC_ERROR_FAILURE;
         }
     }
@@ -119,10 +128,14 @@ aclError KernelCompilationWorkspace::MaterializeCompilationInputs(const KernelCo
     for (const auto& filePatches : patchesByFile) {
         std::string patchedSourceText;
         if (!ReadFile(filePatches.first, patchedSourceText)) {
+            ACLRTC_LOG_ERROR("Failed to read source patch file: %s", filePatches.first.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        for (const KernelSourcePatch* sourcePatch : filePatches.second) {
+        for (size_t patchIndex = 0U; patchIndex < filePatches.second.size(); ++patchIndex) {
+            const KernelSourcePatch* sourcePatch = filePatches.second[patchIndex];
             if (!ReplaceTemplateOnce(patchedSourceText, sourcePatch->templateText, sourcePatch->replacementText)) {
+                ACLRTC_LOG_ERROR("Source patch template was not found: path=%s patch_index=%zu",
+                                 filePatches.first.c_str(), patchIndex);
                 return ACLRTC_ERROR_FAILURE;
             }
         }
@@ -145,6 +158,8 @@ aclError KernelCompilationWorkspace::FinalizeBeforePublishingKernelElf()
     boost::system::error_code cleanupError;
     fs::remove_all(worktreePath_, cleanupError);
     if (cleanupError) {
+        ACLRTC_LOG_ERROR("Failed to clean resource worktree before publishing ELF: path=%s error=%d",
+                         worktreePath_.c_str(), cleanupError.value());
         return ACLRTC_ERROR_FAILURE;
     }
     worktreeFinalized_ = true;

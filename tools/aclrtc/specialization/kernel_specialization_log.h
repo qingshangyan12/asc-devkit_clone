@@ -19,6 +19,18 @@
     dlog_warn(static_cast<int32_t>(ASCENDCKERNEL), "[aclrtc-specialization] " format "\n", ##__VA_ARGS__)
 #define ACLRTC_LOG_INFO(format, ...) \
     dlog_info(static_cast<int32_t>(ASCENDCKERNEL), "[aclrtc-specialization] " format "\n", ##__VA_ARGS__)
+#elif defined(UT_TEST)
+namespace ascendc {
+namespace aclrtc {
+void RecordKernelSpecializationTestLog(const char* severity, const char* format, ...) noexcept;
+} // namespace aclrtc
+} // namespace ascendc
+#define ACLRTC_LOG_ERROR(format, ...) \
+    ::ascendc::aclrtc::RecordKernelSpecializationTestLog("ERROR", format, ##__VA_ARGS__)
+#define ACLRTC_LOG_WARNING(format, ...) \
+    ::ascendc::aclrtc::RecordKernelSpecializationTestLog("WARNING", format, ##__VA_ARGS__)
+#define ACLRTC_LOG_INFO(format, ...) \
+    ::ascendc::aclrtc::RecordKernelSpecializationTestLog("INFO", format, ##__VA_ARGS__)
 #else
 #define ACLRTC_LOG_ERROR(format, ...) ((void)0)
 #define ACLRTC_LOG_WARNING(format, ...) ((void)0)

@@ -58,6 +58,7 @@ bool ResolveEnvironmentReferences(const std::string& text, std::string& resolved
         const size_t namePosition = referencePosition + sizeof(ENVIRONMENT_REFERENCE_PREFIX) - 1U;
         const size_t closingBracePosition = text.find('}', namePosition);
         if (closingBracePosition == std::string::npos || closingBracePosition == namePosition) {
+            ACLRTC_LOG_ERROR("Manifest contains a malformed environment variable placeholder");
             return false;
         }
         const std::string environmentName = text.substr(namePosition, closingBracePosition - namePosition);
@@ -171,10 +172,29 @@ aclError BuildSourcePatches(const Json& selectedKernel,
         const uint64_t parameterIndex = constantInfo.at("parameter_index").get<uint64_t>();
         const uint64_t constantByteCount = constantInfo.at("byte_size").get<uint64_t>();
         if (specializationRequest.borrowedKernelArgumentAddresses == nullptr ||
-            specializationRequest.borrowedKernelArgumentByteCounts == nullptr ||
-            parameterIndex >= specializationRequest.kernelArgumentCount ||
-            specializationRequest.borrowedKernelArgumentAddresses[parameterIndex] == nullptr ||
-            specializationRequest.borrowedKernelArgumentByteCounts[parameterIndex] < constantByteCount) {
+            specializationRequest.borrowedKernelArgumentByteCounts == nullptr) {
+            ACLRTC_LOG_ERROR("constant parameter_index %llu requires argsAddr and argsBytes",
+                             static_cast<unsigned long long>(parameterIndex));
+            return ACLRTC_ERROR_INVALID_INPUT;
+        }
+        if (parameterIndex >= specializationRequest.kernelArgumentCount) {
+            ACLRTC_LOG_ERROR("constant parameter_index %llu is outside argsCount %llu",
+                             static_cast<unsigned long long>(parameterIndex),
+                             static_cast<unsigned long long>(specializationRequest.kernelArgumentCount));
+            return ACLRTC_ERROR_INVALID_INPUT;
+        }
+        if (specializationRequest.borrowedKernelArgumentAddresses[parameterIndex] == nullptr) {
+            ACLRTC_LOG_ERROR("argsAddr[%llu] must not be null for a static constant",
+                             static_cast<unsigned long long>(parameterIndex));
+            return ACLRTC_ERROR_INVALID_INPUT;
+        }
+        const uint64_t suppliedByteCount =
+            specializationRequest.borrowedKernelArgumentByteCounts[parameterIndex];
+        if (suppliedByteCount < constantByteCount) {
+            ACLRTC_LOG_ERROR("argsBytes[%llu]=%llu is smaller than required byte_size %llu",
+                             static_cast<unsigned long long>(parameterIndex),
+                             static_cast<unsigned long long>(suppliedByteCount),
+                             static_cast<unsigned long long>(constantByteCount));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
 
@@ -203,6 +223,8 @@ aclError BuildManifestCommand(const Json& commandJson, const Json& resourceManif
     } else if (commandType == "objcopy") {
         compilationCommand.commandKind = CompilationCommandKind::ObjectCopy;
     } else {
+        ACLRTC_LOG_ERROR("Manifest object %s command[%zu] has unsupported type %s",
+                         selectedObject.objectType.c_str(), commandIndex, commandType.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
     const auto parallelStage = commandJson.find("stage");
@@ -214,12 +236,19 @@ aclError BuildManifestCommand(const Json& commandJson, const Json& resourceManif
 
     const std::vector<std::string> manifestArguments = commandJson.at("cmd").get<std::vector<std::string>>();
     if (manifestArguments.empty()) {
+        ACLRTC_LOG_ERROR("Manifest command %s has an empty cmd array",
+                         compilationCommand.diagnosticLabel.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
     std::vector<std::string> expandedExecutable;
     aclError result = ExpandManifestArgument(manifestArguments.front(), resourceManifest, resourceWorktreePath,
                                              outputDirectoryPath, sourceFilePath, expandedExecutable);
-    if (result != ACLRTC_SUCCESS || expandedExecutable.size() != 1U) {
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+    if (expandedExecutable.size() != 1U) {
+        ACLRTC_LOG_ERROR("Manifest command %s executable must expand to exactly one argv item",
+                         compilationCommand.diagnosticLabel.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
     compilationCommand.executablePath = std::move(expandedExecutable.front());
@@ -235,6 +264,8 @@ aclError BuildManifestCommand(const Json& commandJson, const Json& resourceManif
     if (compilationCommand.commandKind == CompilationCommandKind::Compile) {
         size_t outputOptionPosition = 0U;
         if (!FindCompilerOutputOption(compilationCommand.commandArguments, outputOptionPosition)) {
+            ACLRTC_LOG_ERROR("Manifest compile command %s must contain an output option",
+                             compilationCommand.diagnosticLabel.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         const std::vector<std::string>& userOptions = selectedObject.objectType == "basic"
@@ -244,7 +275,12 @@ aclError BuildManifestCommand(const Json& commandJson, const Json& resourceManif
             compilationCommand.commandArguments.begin() + static_cast<std::ptrdiff_t>(outputOptionPosition),
             userOptions.begin(), userOptions.end());
     }
-    return IsExecutableRegularFile(compilationCommand.executablePath) ? ACLRTC_SUCCESS : ACLRTC_ERROR_FAILURE;
+    if (!IsExecutableRegularFile(compilationCommand.executablePath)) {
+        ACLRTC_LOG_ERROR("Manifest command %s executable is unavailable or not executable: %s",
+                         compilationCommand.diagnosticLabel.c_str(), compilationCommand.executablePath.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    return ACLRTC_SUCCESS;
 }
 
 aclError SelectManifestObjects(const Json& selectedKernel, CompilationVariant compilationVariant,
@@ -261,11 +297,13 @@ aclError SelectManifestObjects(const Json& selectedKernel, CompilationVariant co
         }
     }
     if (basicObject == nullptr) {
+        ACLRTC_LOG_ERROR("Selected kernel does not contain a basic object");
         return ACLRTC_ERROR_FAILURE;
     }
     selectedObjects.push_back({basicObject, "basic"});
     if (compilationVariant == CompilationVariant::BasicWithSuperKernel) {
         if (superKernelObject == nullptr) {
+            ACLRTC_LOG_ERROR("Super-kernel compilation was requested but the selected kernel has no sk object");
             return ACLRTC_ERROR_FAILURE;
         }
         selectedObjects.push_back({superKernelObject, "sk"});
@@ -313,7 +351,11 @@ aclError BuildLinkCommand(const Json& selectedKernel, const std::vector<Selected
     requiredOutputDirectories.emplace(linkedKernelElfPath.parent_path());
     linkCommand.commandArguments.emplace_back("-o");
     linkCommand.commandArguments.emplace_back(linkedKernelElfPath.string());
-    return IsExecutableRegularFile(linkCommand.executablePath) ? ACLRTC_SUCCESS : ACLRTC_ERROR_FAILURE;
+    if (!IsExecutableRegularFile(linkCommand.executablePath)) {
+        ACLRTC_LOG_ERROR("Linker is unavailable or not executable: %s", linkCommand.executablePath.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    return ACLRTC_SUCCESS;
 }
 } // namespace
 
@@ -327,12 +369,30 @@ KernelCompilationPlanBuilder::KernelCompilationPlanBuilder(
 aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const
 {
     try {
-        boost::system::error_code fileError;
-        if (!resourceWorktreePath_.is_absolute() || !sourceFilePath_.is_absolute() ||
-            !fs::is_directory(resourceWorktreePath_, fileError) || fileError ||
-            !fs::is_regular_file(sourceFilePath_, fileError) || fileError ||
-            resourceManifest_.at("schema_version").get<std::string>() != SUPPORTED_MANIFEST_SCHEMA_VERSION) {
-            ACLRTC_LOG_ERROR("Resource worktree, source file, or manifest schema is unavailable");
+        if (!resourceWorktreePath_.is_absolute()) {
+            ACLRTC_LOG_ERROR("Resource worktree path must be absolute: %s", resourceWorktreePath_.c_str());
+            return ACLRTC_ERROR_FAILURE;
+        }
+        boost::system::error_code worktreeError;
+        if (!fs::is_directory(resourceWorktreePath_, worktreeError) || worktreeError) {
+            ACLRTC_LOG_ERROR("Resource worktree is unavailable: path=%s error=%d",
+                             resourceWorktreePath_.c_str(), worktreeError.value());
+            return ACLRTC_ERROR_FAILURE;
+        }
+        if (!sourceFilePath_.is_absolute()) {
+            ACLRTC_LOG_ERROR("sourceFilePath must be absolute: %s", sourceFilePath_.c_str());
+            return ACLRTC_ERROR_FAILURE;
+        }
+        boost::system::error_code sourceFileError;
+        if (!fs::is_regular_file(sourceFilePath_, sourceFileError) || sourceFileError) {
+            ACLRTC_LOG_ERROR("sourceFilePath is unavailable: path=%s error=%d",
+                             sourceFilePath_.c_str(), sourceFileError.value());
+            return ACLRTC_ERROR_FAILURE;
+        }
+        const std::string schemaVersion = resourceManifest_.at("schema_version").get<std::string>();
+        if (schemaVersion != SUPPORTED_MANIFEST_SCHEMA_VERSION) {
+            ACLRTC_LOG_ERROR("Unsupported Manifest schema_version %s; expected %s", schemaVersion.c_str(),
+                             SUPPORTED_MANIFEST_SCHEMA_VERSION);
             return ACLRTC_ERROR_FAILURE;
         }
 
