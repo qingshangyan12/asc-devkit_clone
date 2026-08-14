@@ -34,18 +34,39 @@ $$
 dst_i = \sim src_i
 $$
 
+本接口仅在AIV上执行有效，在AIC上调用为空操作。
+
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_not(vector_bool& dst, vector_bool src, vector_bool mask)
-__simd_callee__ inline void asc_not(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
-__simd_callee__ inline void asc_not(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
-__simd_callee__ inline void asc_not(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
-__simd_callee__ inline void asc_not(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
-__simd_callee__ inline void asc_not(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_not(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-__simd_callee__ inline void asc_not(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
-__simd_callee__ inline void asc_not(vector_float& dst, vector_float src, vector_bool mask)
+### 矢量数据寄存器按位取反
+
+#### 模板原型（占位符形式）
+
+```c
+__simd_callee__ inline void asc_not(vector_<dtype>& dst,
+                                    vector_<dtype> src,
+                                    vector_bool mask)
+```
+
+#### dtype支持数据类型
+
+dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
+
+#### 典型示例
+
+```c
+// 示例：对half矢量数据寄存器执行按位取反
+__simd_callee__ inline void asc_not(vector_half& dst,
+                                    vector_half src,
+                                    vector_bool mask)
+```
+
+### 掩码寄存器按位取反
+
+```c
+__simd_callee__ inline void asc_not(vector_bool& dst,
+                                    vector_bool src,
+                                    vector_bool mask)
 ```
 
 ## 参数说明
@@ -64,23 +85,135 @@ __simd_callee__ inline void asc_not(vector_float& dst, vector_float src, vector_
 
 无
 
+## 流水类型
+
+PIPE_V
+
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- mask必须为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- 参与计算的元素个数由矢量长度（VL）决定，矢量数据寄存器按位与中元素个数 = VL ÷ sizeof(dtype)；掩码寄存器按位与中比特个数 = VL。
+- src0、src1、dst的dtype需要保持一致。
+- mask比特位为0时，dst对应比特位写0。
+
+### 矢量数据寄存器按位取反约束
+
+dtype支持int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float共8种数据类型。
+
+### 掩码寄存器按位取反约束
+
+dst、src必须均为`vector_bool`类型。
 
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void not_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values)
 {
-    vector_half dst;
-    vector_half src;
-    vector_bool mask;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        mask = asc_update_mask_b16(count);
-        asc_loadalign(src, src_addr + i * one_repeat_size);
-        asc_not(dst, src, mask);
-        asc_storealign(dst_addr + i * one_repeat_size, dst, mask);
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
     }
+    return true;
+}
+
+template <typename T>
+bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+
+__simd_vf__ inline void compute(__ubuf__ int32_t* dst, __ubuf__ int32_t* src)
+{
+    vector_int32_t dst_reg;
+    vector_int32_t src_reg;
+    uint32_t count = ELEMENT_COUNT;
+    vector_bool mask = asc_update_mask_b32(count);
+    asc_loadalign(src_reg, src);
+    asc_not(dst_reg, src_reg, mask);
+    asc_storealign(dst, dst_reg, mask);
+}
+
+__global__ __vector__ void asc_not_kernel(__gm__ int32_t* dst, __gm__ int32_t* src)
+{
+    asc_init();
+    __ubuf__ int32_t dst_local[ELEMENT_COUNT];
+    __ubuf__ int32_t src_local[ELEMENT_COUNT];
+    asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(int32_t));
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    compute(dst_local, src_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(int32_t));
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<int32_t> src(ELEMENT_COUNT);
+    std::vector<int32_t> output(ELEMENT_COUNT, 0);
+    std::vector<int32_t> golden(ELEMENT_COUNT);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+        src[i] = static_cast<int32_t>(0x0f0f0000U + i);
+        golden[i] = ~src[i];
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int32_t* src_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), (ELEMENT_COUNT) * sizeof(int32_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    int32_t* dst_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(int32_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src_device, src.size() * sizeof(int32_t), src.data(), src.size() * sizeof(int32_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_not_kernel<<<1, 0>>>(dst_device, src_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), dst_device, output.size() * sizeof(int32_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", src);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden);
+    std::cout << (passed ? "[Success] asc_not passed." : "[Failed] asc_not failed.") << std::endl;
+    aclrtFree(dst_device);
+    aclrtFree(src_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```
