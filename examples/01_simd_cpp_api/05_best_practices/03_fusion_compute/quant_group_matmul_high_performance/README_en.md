@@ -325,7 +325,7 @@ From the time-consuming relationship, the end-to-end time consumption is less th
 
 As can be seen from the PIPE pipeline diagram, although Case 1 has introduced dual AIVs to share Vector tasks, due to `PIPELINE_DEPTH=1`, Cube and Vector are still serially synchronized according to Iterate granularity, and the workspace only has a single Slot for reuse, so obvious waits and breakpoints can still be seen in the pipeline.
 
-![PIPE flow chart of Case 1 ](./figures/CV流水优化1.png)
+![PIPE flow chart of Case 1 ](./figures/CV流水优化fig_1.png)
 
 **Next step optimization direction**: Introduce 4-level Cube-Vector pipeline to improve Cube-Vector parallelism and further improve overall computing efficiency.
 

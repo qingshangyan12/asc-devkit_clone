@@ -84,7 +84,7 @@
 3.  Muls步骤：将输出数据每个元素除以keepProb。
 
 **图2**  Dropout算法框图  
-![](../../../figures/dropout_algorithm_diagram_1.png "Dropout算法框图-55")
+![](../../../figures/dropout_algorithm_diagram_fig_1.png "Dropout算法框图-55")
 
 计算过程在Vector上进行，循环srcM次，每次对srcN个元素进行如下操作：
 

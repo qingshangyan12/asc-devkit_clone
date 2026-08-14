@@ -123,7 +123,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 
     **图3**  fp4x2_e2m1_t到bfloat16_t转换过程<a id="fig3"></a>  
     
-    ![](../../../../figures/reg_cast_1.png)
+    ![](../../../../figures/reg_cast_fig_1.png)
 
     **图4**  bfloat16_t到fp4x2_e2m1_t转换过程<a id="fig4"></a>  
     ![](../../../../figures/reg_cast_2.png)

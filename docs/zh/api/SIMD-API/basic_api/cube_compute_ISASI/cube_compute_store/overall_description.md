@@ -11,13 +11,13 @@
 <!-- npu="A3,910b" id2 -->
 **图1** 矩阵计算的搬出整体流程图（[NPU架构版本2201](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
-![](../../../../figures/fixpipe_execution_flow_a2a3.png)
+![](../../../../figures/fixpipe_execution_flow_a2afig_3.png)
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
 **图2** 矩阵计算的搬出整体流程图（[NPU架构版本3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）
 
-![](../../../../figures/fixpipe_execution_flow_a5.png)
+![](../../../../figures/fixpipe_execution_flow_afig_5.png)
 <!-- end id3 -->
 
 其中，Fixpipe Buffer不同的量化模式对应的内存排布如下：

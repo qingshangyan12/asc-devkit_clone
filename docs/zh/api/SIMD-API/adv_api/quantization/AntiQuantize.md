@@ -36,7 +36,7 @@ AntiQuantize与[AscendAntiQuant](AscendAntiQuant.md)的功能类似，本接口�
 
 -   PER\_CHANNEL场景（按通道量化）：srcTensor的shape为\[m, n\]，每个channel维度对应一个量化参数，scale和offset的shape为\[1, n\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002295275093.png)
+    ![](../../../figures/zh-cn_formulaimage_000000229527509fig_3.png)
 
 -   PER\_TOKEN场景（按token量化）：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一个量化参数，srcTensor的shape为\[m, n\]时，scale和offset的shape为\[m, 1\]。
 
@@ -49,7 +49,7 @@ AntiQuantize与[AscendAntiQuant](AscendAntiQuant.md)的功能类似，本接口�
     -   fp4x2\_e2m1\_t/fp4x2\_e1m2\_t场景（float4场景）
         -   k为m方向，即公式中i轴为group的计算方向（kDim=0）：
 
-            ![](../../../figures/zh-cn_formulaimage_0000002260652804.png)
+            ![](../../../figures/zh-cn_formulaimage_000000226065280fig_4.png)
 
         -   k为n方向，即公式中j轴为group的计算方向（kDim=1）：
 

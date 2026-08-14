@@ -70,7 +70,7 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
 
     **图2** RegTensor搬运complex64<a id="fig2"></a>
 
-    ![](../../../../figures/regtensor_move_complex64.png "RegTensor搬运complex64")
+    ![](../../../../figures/regtensor_move_complex6fig_4.png "RegTensor搬运complex64")
 
     complex64是一个包含两个float（实部real、虚部imag）类型的复合类型，通常是连续存储，低位为实部高位为虚部。
     
@@ -84,7 +84,7 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
 
     **图3** RegTensor搬运b64<a id="fig3"></a>
 
-    ![](../../../../figures/regtensor_move_b64.png "RegTensor搬运b64")
+    ![](../../../../figures/regtensor_move_b6fig_4.png "RegTensor搬运b64")
 
     在RegTraitNumOne场景下，从UB（src0Addr）中以DIST_NORM模式搬运VL数据量。
     

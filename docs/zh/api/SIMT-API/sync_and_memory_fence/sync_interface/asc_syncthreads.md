@@ -36,7 +36,7 @@ asc\_syncthreads接口用于**阻塞当前线程块内所有线程**，直到所
 
 下图展示了同一个线程块内多线程共享数据场景可能出现的问题：
 
-![](../../../figures/syncthreads_1.png)
+![](../../../figures/syncthreads_fig_1.png)
 
 asc\_syncthreads接口的执行流程示意图如下：
 

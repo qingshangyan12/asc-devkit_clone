@@ -176,7 +176,7 @@ The core idea of UB staging is shown in the figure below: in the GM read phase, 
 
 **Figure 2: Case 3 UB staging transpose data flow**
 
-<img src="./figures/case3.png" width="60%">
+<img src="./figures/casefig_3.png" width="60%">
 
 The direct element-wise GM write in Case 2 needs to swap row and column coordinates, so output addresses stride across rows by column. This is the main issue with direct global memory transpose. After tiling, the processing granularity changes from a single element to a local tile: threads first contiguously load the tile into UB row by row according to the input matrix layout, then read from UB in the transpose direction, and finally write to GM contiguously row by row according to the output matrix layout. This confines the non-contiguous access introduced by transpose to within UB, while GM read and write both maintain contiguous access patterns.
 
@@ -299,7 +299,7 @@ For detailed low-bit UB address interleaving rules and conflict scenarios, see t
 
 **Figure 3: UB bank structure**
 
-<img src="./figures/bank结构示意图.png">
+<img src="./figures/bank_struct.png">
 
 In Case 5, the tile array in UB is stored in row-major order. According to the low-bit address interleaving rule, the first row of the tile array covers bank0 through bank3, the second row covers bank4 through bank7, the third row covers bank8 through bank11, and the remaining rows follow the same pattern. Each row of 32 float elements spans exactly 4 banks. In Case 5, one Warp of threads reads one column of the tile and writes it to the GM output matrix; when accessing UB, the 32 threads concentrate on subbank 0 in two bank groups, which is a read-read conflict scenario.
 

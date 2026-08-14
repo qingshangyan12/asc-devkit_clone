@@ -78,7 +78,7 @@
 
 **图 1**  源操作数搬运场景示例
 
-<img src="figures/datacopypad1.png" width="80%">
+<img src="figures/datacopypadfig_fig_1.png" width="80%">
 
 **图 2**  目的操作数Compact模式搬运场景示例
 
@@ -96,7 +96,7 @@
 
 **图 3**  目的操作数Normal模式搬运场景示例
 
-<img src="figures/datacopypad3.png">
+<img src="figures/datacopypadfig_fig_3.png">
 
 **场景6：使用SetLoopModePara使能loop mode（Normal模式）进行五维数据搬运 ----此场景仅在 Ascend 950PR/Ascend 950DT产品支持**
 - 输入shape：[2, 4, 3, 128, 126]，五维数据

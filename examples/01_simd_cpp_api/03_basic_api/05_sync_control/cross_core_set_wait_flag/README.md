@@ -138,7 +138,7 @@
 ### 1. Cube与Vector融合计算场景
 #### 1.1 整体逻辑
 <p align="center">
-  <img src="figures/融合场景_示意图.png" width="100%">
+  <img src="figures/融合场景_diagram.png" width="100%">
    </p>
 <p align="center">
 图1：Cube与Vector场景融合计算场景，整体计算逻辑示意图
@@ -257,7 +257,7 @@ $$
             return;
         }
 <p align="center">
-  <img src="figures/纯aiv_模式0示意图.png" width="100%">
+  <img src="figures/纯aiv_模式0diagram.png" width="100%">
 </p>
 <p align="center">
 图6：纯AIV场景，模式0计算逻辑示意图

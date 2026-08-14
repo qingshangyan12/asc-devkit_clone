@@ -135,7 +135,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 **图 1**  非对齐数据搬出（ureg为空）<a id="fig-storeunalign-1"></a>
 
-![](../../../../figures/reg_storeunalign_1.png)
+![](../../../../figures/reg_storeunalign_fig_1.png)
 
 **场景二：ureg不为空**（除第一次迭代）
 

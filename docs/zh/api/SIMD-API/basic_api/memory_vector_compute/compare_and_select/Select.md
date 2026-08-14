@@ -50,7 +50,7 @@
 
 - 模式1（VSEL\_TENSOR\_SCALAR\_MODE）：根据selMask在1个tensor（src0）和1个scalar（src1）中选取元素。每次迭代使用selMask的位数为256/sizeof\(T\)，多轮迭代连续消耗selMask的不同部分。
 
-    ![](../../../../figures/select_mode1.png)
+    ![](../../../../figures/select_modefig_1.png)
 
 - 模式2（VSEL\_TENSOR\_TENSOR\_MODE）：根据selMask在两个tensor中选取元素。每次迭代使用selMask的位数为256/sizeof\(T\)，多轮迭代连续消耗selMask的不同部分。
 

@@ -123,7 +123,7 @@ On Atlas A2/A3 Series Products, the Unified Buffer is 192KB total, divided into 
 
 **Figure: Atlas A2/A3 UB Bank Structure Diagram** (arrow direction indicates memory layout order)
 
-<img src="figures/ubBankStruct2201.png" width="80%">
+<img src="figures/ubBankStruct220fig_fig_1.png" width="80%">
 
 Bank conflicts are mainly categorized into three types:
 
@@ -165,7 +165,7 @@ The layout of 8 datablock data fetched per beat in the NZ matrix is shown below.
 
 **Figure: Case 1 Compact Layout ND to NZ Diagram**
 
-<img src="figures/datand2nzS1.png" width="80%">
+<img src="figures/datand2nzSfig_fig_1.png" width="80%">
 
 **Ping-Pong Pipeline**:
 
@@ -199,7 +199,7 @@ The figure below shows the blue portion as data read from NDBUF per beat and the
 
 **Figure: Atlas A2/A3 Case 1 UB Bank Group Conflict Diagram**
 
-<img src="figures/s1bank2201.png" width="80%">
+<img src="figures/s1bank220fig_fig_1.png" width="80%">
 
 **Performance Data** (Atlas A2/A3 Series Products, current `144×128` configuration, 48 cores):
 
@@ -251,7 +251,7 @@ Landing points of 8 writes from a single copy() on UB:
 
 **Figure: Atlas A2/A3 Case 2 UB Bank Landing Point Diagram**
 
-<img src="figures/s2bank2201.png" width="80%">
+<img src="figures/s2bank220fig_fig_1.png" width="80%">
 
 **UB Usage Change**:
 
@@ -341,7 +341,7 @@ The layout of 8 datablock data fetched per beat in the NZ matrix is shown below.
 
 **Figure: Case 1 Compact Layout ND to NZ Diagram**
 
-<img src="figures/datand2nzS1.png" width="80%">
+<img src="figures/datand2nzSfig_fig_1.png" width="80%">
 
 **Conflict Principle**:
 

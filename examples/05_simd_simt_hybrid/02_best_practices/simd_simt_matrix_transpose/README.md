@@ -205,7 +205,7 @@ Case 2将Thread Block数固定为硬件vector core数。相比Case 1按tile分�
 
 **图1　UB bank结构示意图**
 
-<img src="./figures/bank结构示意图.png">
+<img src="./figures/bank_struct.png">
 
 SIMT VF内访问UB时的bank冲突为更细粒度的subbank冲突，主要有以下两类subbank冲突：
 

@@ -113,11 +113,11 @@ repeatStride是指相邻迭代间相同DataBlock的地址步长。
 
 - **连续计算场景：** 假设定义一个Tensor供目的操作数和源操作数同时使用（即地址重叠），repeatStride取值为8。此时，矢量计算单元第一次迭代读取连续8个DataBlock，第二轮迭代读取下一个连续的8个DataBlock，通过多次迭代即可完成所有输入数据的计算。
 
-    ![连续计算场景](figures/repeatStride_4.png)
+    ![连续计算场景](figures/repeatStride_fig_4.png)
 
 - **非连续计算场景：** repeatStride取值大于8（如取10）时，则相邻迭代间矢量计算单元读取的数据在地址上不连续，出现2个DataBlock的间隔。
 
-    ![非连续计算场景](figures/repeatStride_3.png)
+    ![非连续计算场景](figures/repeatStride_fig_3.png)
 
 - **反复计算场景：** repeatStride取值为0时，矢量计算单元会对首个连续的8个DataBlock进行反复读取和计算。
 
@@ -125,7 +125,7 @@ repeatStride是指相邻迭代间相同DataBlock的地址步长。
 
 - **部分重复计算：** repeatStride取值大于0且小于8时，相邻迭代间部分数据会被矢量计算单元重复读取和计算，此种情形一般场景不涉及。
 
-    ![部分重复计算](figures/repeatStride_1.png)
+    ![部分重复计算](figures/repeatStride_fig_1.png)
 
 ## 掩码操作
 
@@ -159,7 +159,7 @@ asc_add(dstLocal, src0Local, src1Local, repeatTime, dst_block_stride, src0_block
 
 mask过程如下：<br/>
 mask={6148914691236517205, 6148914691236517205}（注：6148914691236517205表示64位二进制数0b010101....01，mask按照低位到高位的顺序排布）
-![int16_t高维切分求和示例](figures/mask_proc1.png)
+![int16_t高维切分求和示例](figures/mask_procfig_1.png)
 
 ```cpp
 // 数据类型为int32_t

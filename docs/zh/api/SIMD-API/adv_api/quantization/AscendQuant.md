@@ -54,12 +54,12 @@
 
         -   kDim = 1:
 
-            ![](../../../figures/zh-cn_formulaimage_0000002292493825.png)
+            ![](../../../figures/zh-cn_formulaimage_000000229249382fig_5.png)
 
     -   int8\_t/hifloat8\_t/fp8\_e5m2\_t/fp8\_e4m3fn\_t场景（b8场景）
         -   kDim=0：
 
-            ![](../../../figures/zh-cn_formulaimage_0000002292493833.png)
+            ![](../../../figures/zh-cn_formulaimage_000000229249383fig_3.png)
 
         -   kDim=1：
 

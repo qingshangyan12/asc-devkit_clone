@@ -88,7 +88,7 @@
 
         -   k为m方向，即公式中i轴为group的计算方向：（kDim=0同时isTranspose=False）或者（kDim=1同时isTranspose= True）
 
-            ![](../../../figures/zh-cn_formulaimage_0000002106594713.png)
+            ![](../../../figures/zh-cn_formulaimage_000000210659471fig_3.png)
 
         -   k为n方向，即公式中j轴为group的计算方向：（kDim=0同时isTranspose=True）或者（kDim=1同时isTranspose =False）
 

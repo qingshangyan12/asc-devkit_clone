@@ -26,7 +26,7 @@
 
 获取输入数据y/x的反正切值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816331.png)
+![](../../../figures/zh-cn_formulaimage_000000251681633fig_1.png)
 
 ## 函数原型
 

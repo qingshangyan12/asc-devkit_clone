@@ -32,11 +32,11 @@
 
 -   当输出为浮点类型时：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002224017961.png)
+    ![](../../../../figures/zh-cn_formulaimage_000000222401796fig_1.png)
 
 -   当输出为bool类型时：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002224061861.png)
+    ![](../../../../figures/zh-cn_formulaimage_000000222406186fig_1.png)
 
 ## 函数原型
 

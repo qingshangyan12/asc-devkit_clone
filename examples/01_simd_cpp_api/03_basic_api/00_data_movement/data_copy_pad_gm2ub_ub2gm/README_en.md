@@ -78,7 +78,7 @@ This example selects different scenarios through the build parameter `SCENARIO_N
 
 **Figure 1**  Source operand transfer scenario example
 
-<img src="figures/datacopypad1.png" width="80%">
+<img src="figures/datacopypadfig_fig_1.png" width="80%">
 
 **Figure 2**  Destination operand Compact mode transfer scenario example
 
@@ -96,7 +96,7 @@ This example selects different scenarios through the build parameter `SCENARIO_N
 
 **Figure 3**  Destination operand Normal mode transfer scenario example
 
-<img src="figures/datacopypad3.png">
+<img src="figures/datacopypadfig_fig_3.png">
 
 **Scenario 6: Five-Dimensional Data Transfer Using SetLoopModePara (Normal Mode) ----This scenario is only supported on Ascend 950PR/Ascend 950DT products**
 - Input shape: [2, 4, 3, 128, 126], five-dimensional data

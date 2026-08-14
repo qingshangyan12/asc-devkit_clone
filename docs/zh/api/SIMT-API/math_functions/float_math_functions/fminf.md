@@ -26,7 +26,7 @@
 
 获取两个输入数据中的最小值。
 
-![](../../../figures/zh-cn_formulaimage_0000002518941923.png)
+![](../../../figures/zh-cn_formulaimage_000000251894192fig_3.png)
 
 ## 函数原型
 

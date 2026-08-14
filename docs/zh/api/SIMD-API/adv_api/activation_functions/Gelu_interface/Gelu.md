@@ -34,7 +34,7 @@
 
 ![](../../../../figures/zh-cn_formulaimage_0000002316009816.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000001750683329.png)，化简后可得![](../../../../figures/zh-cn_formulaimage_0000001702905034.png)
+![](../../../../figures/zh-cn_formulaimage_0000001750683329.png)，化简后可得![](../../../../figures/zh-cn_formulaimage_000000170290503fig_4.png)
 
 ## 函数原型
 

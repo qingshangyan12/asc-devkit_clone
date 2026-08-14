@@ -36,7 +36,7 @@ $$
 \{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, \sim src1_i\} + \{32'b0,carry\_src_i\}
 $$
 
-![](../../figures/asc_subc_1.png)
+![](../../figures/asc_subc_fig_1.png)
 
 以uint64_t类型数据计算0xFFFFFFFF FFFFFFFF - 0x00000000 00000008 = 0xFFFFFFFF FFFFFFF7为例，asc_sub/asc_subc接口的适用场景如下图：
 

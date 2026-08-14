@@ -26,7 +26,7 @@
 
 计算以2为底，输入数据的对数，并对结果向下取整，返回浮点数。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816343.png)
+![](../../../figures/zh-cn_formulaimage_000000251681634fig_3.png)
 
 ## 函数原型
 

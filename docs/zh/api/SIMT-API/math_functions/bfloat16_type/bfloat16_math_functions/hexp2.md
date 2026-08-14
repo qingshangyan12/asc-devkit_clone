@@ -26,7 +26,7 @@
 
 指定输入x，获取2的x次方。
 
-![](../../../../figures/zh-cn_formulaimage_0000002576421045.png)
+![](../../../../figures/zh-cn_formulaimage_000000257642104fig_5.png)
 
 ## 函数原型
 

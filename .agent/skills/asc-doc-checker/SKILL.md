@@ -68,7 +68,7 @@ description: |
 - [ ] 路径使用正斜杠 `/`（不是反斜杠 `\`）
 - [ ] 使用 `![](图片路径)` 格式
 - [ ] 所有图片统一存放在 `docs/zh/api/figures/` 目录下，引用时根据不同文档位置计算相对路径
-- [ ] 所有图片的文件名必须是英文小写加下划线（如：atomic_operation_pipelined_data_movement_diagram.png、atomic_operation_3.png）
+- [ ] 所有图片的文件名必须是英文小写加下划线（如：atomic_operation_pipelined_data_movement_diagram.png、atomic_operation_fig_fig_3.png）
 - [ ] 如果有图注（没有图注的话就忽略），图注（如"图 1"、"图 2"）必须写在图片上方，格式为 `**图 n**  图片标题`（注意 `**图 n**` 和标题之间是两个空格）
   **正确示例（在 `docs/zh/api/SIMD-API/basic_api/atomic_operations/atomic_operations_overview.md` 中引用）：**
   ```

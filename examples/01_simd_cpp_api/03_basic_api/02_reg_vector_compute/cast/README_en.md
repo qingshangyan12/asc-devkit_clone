@@ -60,7 +60,7 @@ This example performs data type conversion on the input vector. When the input a
   - Compute: Call the Cast API. The input-to-output bit width ratio is 1:2, so data is read from the 2\*N positions of xReg, type-converted, and sequentially written to yReg
   - Store: Call the StoreAlign API for standard store
   - Invocation implementation: Uses the kernel invocation syntax <<<>>> to call the kernel function.
-  <img src="figures/reg_cast_1.png">
+  <img src="figures/reg_cast_fig_fig_1.png">
 
 **Scenario 2: Wide to Narrow Data Type Conversion**
 - Example functionality: Converts float-type data to int16_t-type data.

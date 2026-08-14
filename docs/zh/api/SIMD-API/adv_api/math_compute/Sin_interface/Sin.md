@@ -38,7 +38,7 @@
 
 Sin\(x\)的泰勒展开式为：
 
-![](../../../../figures/zh-cn_formulaimage_0000002192023094.png)
+![](../../../../figures/zh-cn_formulaimage_000000219202309fig_4.png)
 
 ## 函数原型
 

@@ -172,7 +172,7 @@ Note that when executing the `asc_mmad` instruction, the matrix computation unit
 As shown in Figure 2, taking b16 input type as an example, the `asc_mmad` instruction reads data continuously according to A matrix fractal [16, 16] and B matrix fractal [16, 16]. At this point, the total number of fractals read by the matrix computation unit from L0A/L0B are 2 x 5 = 10 and 5 x 3 = 15 respectively, and the total number of fractals written to L0C is 2 x 3 = 6.
 
 <p align="center">
-  <img src="figures/mmad_f16_A5.png" width="900">
+  <img src="figures/mmad_f16_Afig_fig_5.png" width="900">
 </p>
 <p align="center">
 Figure 2: bfloat16 type, Nz layout on L0A, Mmad data layout diagram

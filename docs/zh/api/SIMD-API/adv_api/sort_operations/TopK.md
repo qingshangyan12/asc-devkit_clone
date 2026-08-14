@@ -54,7 +54,7 @@
 
 ## 实现原理
 
-TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算法，两种算法在执行速度、时间复杂度和算法稳定性上表现不同。MERGE\_SORT算法的时间复杂度是O\(![](../../../figures/zh-cn_formulaimage_0000002108561704.png)\)，是一种稳定的排序算法，执行速度相对较慢；RADIX\_SELECT算法的时间复杂度是O\(n\)，通常不关心稳定性，执行速度较快。
+TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算法，两种算法在执行速度、时间复杂度和算法稳定性上表现不同。MERGE\_SORT算法的时间复杂度是O\(![](../../../figures/zh-cn_formulaimage_000000210856170fig_4.png)\)，是一种稳定的排序算法，执行速度相对较慢；RADIX\_SELECT算法的时间复杂度是O\(n\)，通常不关心稳定性，执行速度较快。
 
 -   **MERGE\_SORT算法**
 
@@ -64,7 +64,7 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
     ![](../../../figures/topk_diagram.png "TopK算法框图")
 
     **图2**  TopK算法框图  
-    ![](../../../figures/topk_diagram_1.png "TopK算法框图-51")
+    ![](../../../figures/topk_diagram_fig_1.png "TopK算法框图-51")
 
     根据TopKMode不同的模式选择，可分为两个分支。
 

@@ -48,7 +48,7 @@ Atlas 推理系列产品AI Core采用方式二。
 
     -   数据类型为float，每个结构占据8Bytes。
 
-        ![](../../../figures/zh-cn_image_0000002043076745.png)
+        ![](../../../figures/zh-cn_image_000000204307674fig_5.png)
 
     -   数据类型为half，每个结构也占据8Bytes，中间有2Bytes保留。
 
