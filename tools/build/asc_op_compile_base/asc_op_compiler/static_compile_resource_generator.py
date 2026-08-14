@@ -44,7 +44,9 @@ class ManifestPublishError(ManifestGenerationError):
 @dataclass(frozen=True)
 class StaticCompileCommand:
     tiling_key: str
+    compile_tiling_key: str
     compiled_symbol: str
+    compile_symbol: str
     object_type: str
     core_type: str
     source_path: str
@@ -66,6 +68,7 @@ class ConstantInfoRecord:
 class KernelCompileRecord:
     kernel_name: str
     tiling_key: str
+    compile_tiling_key: str
     constant_infos: Tuple[ConstantInfoRecord, ...]
     commands: Tuple[StaticCompileCommand, ...]
     link_option: Tuple[str, ...] = _LINK_OPTION
@@ -112,7 +115,9 @@ def _build_context_commands(
     return tuple(
         StaticCompileCommand(
             tiling_key=spec.tiling_key,
+            compile_tiling_key=spec.tiling_key,
             compiled_symbol=spec.compiled_symbol,
+            compile_symbol=spec.compiled_symbol,
             object_type=object_type,
             core_type=spec.core_type,
             source_path=spec.source_path,
@@ -129,6 +134,50 @@ def _build_context_commands(
     )
 
 
+def build_tiling_key_group_index(*compile_contexts):
+    master_to_slaves = {}
+    slave_to_master = {}
+    for context in compile_contexts:
+        if context is None:
+            continue
+        group_map = getattr(context, "tiling_key_group_map", {}) or {}
+        for master, slaves in group_map.items():
+            master = str(master)
+            known_slaves = list(master_to_slaves.setdefault(master, ()))
+            for slave in slaves:
+                slave = str(slave)
+                if slave == master:
+                    raise ManifestCommandError(
+                        f"tiling key {master} cannot be both master and slave"
+                    )
+                previous_master = slave_to_master.get(slave)
+                if previous_master is not None and previous_master != master:
+                    raise ManifestCommandError(
+                        f"tiling key {slave} belongs to multiple masters"
+                    )
+                slave_to_master[slave] = master
+                if slave not in known_slaves:
+                    known_slaves.append(slave)
+            master_to_slaves[master] = tuple(known_slaves)
+    for master in master_to_slaves:
+        if master in slave_to_master:
+            raise ManifestCommandError(
+                f"tiling key {master} cannot be both master and slave"
+            )
+    return master_to_slaves, slave_to_master
+
+
+def _logical_symbol(compile_symbol, compile_tiling_key, logical_tiling_key):
+    if logical_tiling_key == compile_tiling_key:
+        return compile_symbol
+    if compile_tiling_key not in compile_symbol:
+        raise ManifestCommandError(
+            f"compile symbol {compile_symbol} does not contain master tiling key "
+            f"{compile_tiling_key}"
+        )
+    return compile_symbol.replace(compile_tiling_key, logical_tiling_key, 1)
+
+
 def build_kernel_compile_records(
     *,
     basic_compile_info,
@@ -142,19 +191,15 @@ def build_kernel_compile_records(
     sk_compile_option_tuple=None,
     link_option: Sequence[str] = _LINK_OPTION,
 ):
-    compile_contexts = (basic_compile_info, sk_compile_info)
-    if any(
-        getattr(context, "tiling_key_group_map", None)
-        for context in compile_contexts
-        if context is not None
-    ):
-        raise ManifestCommandError("grouped tiling keys are not supported")
     constant_infos = tuple(constant_infos)
     constant_info_files = tuple(
         dict.fromkeys(item.template_path for item in constant_infos)
     )
     metadata = json.loads(Path(metadata_json_path).read_text(encoding="utf-8"))
     kernel_list = metadata["kernelList"]
+    _, slave_to_master = build_tiling_key_group_index(
+        basic_compile_info, sk_compile_info
+    )
 
     all_commands = list(
         _build_context_commands(
@@ -181,6 +226,7 @@ def build_kernel_compile_records(
     for command in all_commands:
         commands_by_key.setdefault(command.tiling_key, []).append(command)
     known_keys = set(commands_by_key)
+    logical_keys = known_keys | set(slave_to_master)
     exact_sizes = {
         name: {str(key): value for key, value in sizes.items()}
         for name, sizes in (constant_info_size_by_tiling_key or {}).items()
@@ -189,23 +235,54 @@ def build_kernel_compile_records(
     for item in kernel_list:
         tiling_key_value = item.get("tilingKey")
         if tiling_key_value is None:
-            tiling_key = next(
-                key
-                for key in sorted(known_keys, key=len, reverse=True)
-                if item["kernelName"].endswith("_" + key)
-            )
+            try:
+                tiling_key = next(
+                    key
+                    for key in sorted(logical_keys, key=len, reverse=True)
+                    if item["kernelName"].endswith("_" + key)
+                )
+            except StopIteration as error:
+                raise ManifestCommandError(
+                    f"cannot determine tiling key for kernel {item['kernelName']}"
+                ) from error
         else:
             tiling_key = str(tiling_key_value)
-        commands = commands_by_key[tiling_key]
+        compile_tiling_key = slave_to_master.get(tiling_key, tiling_key)
+        try:
+            physical_commands = commands_by_key[compile_tiling_key]
+        except KeyError as error:
+            raise ManifestCommandError(
+                f"master tiling key {compile_tiling_key} has no physical "
+                "compile command"
+            ) from error
+        commands = tuple(
+            replace(
+                command,
+                tiling_key=tiling_key,
+                compile_tiling_key=compile_tiling_key,
+                compiled_symbol=_logical_symbol(
+                    command.compile_symbol,
+                    compile_tiling_key,
+                    tiling_key,
+                ),
+            )
+            for command in physical_commands
+        )
         resolved_constant_infos = []
         for constant_info in constant_infos:
             sizes = exact_sizes.get(constant_info.name, {})
-            byte_size = sizes[tiling_key] if sizes else constant_info.byte_size
+            if tiling_key in sizes:
+                byte_size = sizes[tiling_key]
+            elif compile_tiling_key in sizes:
+                byte_size = sizes[compile_tiling_key]
+            else:
+                byte_size = constant_info.byte_size
             resolved_constant_infos.append(replace(constant_info, byte_size=byte_size))
         records.append(
             KernelCompileRecord(
                 kernel_name=item["kernelName"],
                 tiling_key=tiling_key,
+                compile_tiling_key=compile_tiling_key,
                 constant_infos=tuple(resolved_constant_infos),
                 commands=tuple(commands),
                 link_option=tuple(link_option),
@@ -277,14 +354,22 @@ def static_tiling_template_text(dynamic_header):
     return result
 
 
-def _portable_wrapper_text(source_content, original_source_path):
+def _portable_wrapper_text(source_content, original_source_path, sk_slave_symbols=()):
     wrapper_text = source_content.decode("utf-8")
     absolute_include = f'#include "{original_source_path}"'
-    return wrapper_text.replace(
+    wrapper_text = wrapper_text.replace(
         absolute_include,
         f'#include "{os.path.basename(original_source_path)}"',
         1,
     )
+    for symbol in sk_slave_symbols:
+        pattern = (
+            rf"(\bvoid\s+{re.escape(symbol)}\s*\(\s*)"
+            r"uint64_t\s+args_offset(\s*\))"
+        )
+        replacement = r"\1__gm__ uint64_t *param, sk::SkSystemArgs *sargs\2"
+        wrapper_text = re.sub(pattern, replacement, wrapper_text, count=1)
+    return wrapper_text
 
 
 def _add_resource(resources, logical_path, content):
@@ -578,8 +663,17 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                     source_content = _read_regular_file(
                         command.source_path, "generated wrapper"
                     )
+                    sk_slave_symbols = tuple(
+                        record.compiled_symbol
+                        for record in all_records
+                        if record.source_path == command.source_path
+                        and record.object_type == "sk"
+                        and record.tiling_key != record.compile_tiling_key
+                    )
                     wrapper = _portable_wrapper_text(
-                        source_content, request.source_file_path
+                        source_content,
+                        request.source_file_path,
+                        sk_slave_symbols,
                     ).encode("utf-8")
                     wrapper_paths[key] = _add_resource(
                         resources, logical, content=wrapper
@@ -630,7 +724,7 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                         constant_info_logicals,
                         output_name,
                     )
-                    command = {"type": "compile", "stage": 0, "cmd": cmd}
+                    command = {"type": "compile", "cmd": cmd}
                     basic_commands.append(command)
                     wrapper_commands.append(command)
                     outputs.append(_output_placeholder(output_name))
@@ -657,17 +751,27 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                     }
                     sk_commands = []
                     sk_outputs = []
+                    logical_rename_specs = []
                     split_specs = []
                     bind_pairs = []
                     multiple_cores = len(sk_records) > 1
                     for record in sk_records:
                         basic_record = basic_by_core[record.core_type]
                         static_sk_symbol = basic_record.compiled_symbol + "_static_sk"
+                        compile_static_sk_symbol = (
+                            basic_record.compile_symbol + "_static_sk"
+                        )
                         core_suffix = _core_suffix(record.core_type)
-                        sk_output_name = (
+                        final_sk_output_name = (
                             f"{kernel.kernel_name}.{core_suffix}.sk.o"
                             if multiple_cores
                             else f"{kernel.kernel_name}.sk.o"
+                        )
+                        is_slave = kernel.tiling_key != kernel.compile_tiling_key
+                        compile_output_name = (
+                            final_sk_output_name.replace(".sk.o", ".sk_source.o")
+                            if is_slave
+                            else final_sk_output_name
                         )
                         cmd = _normalize_compile_command(
                             record,
@@ -675,16 +779,26 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                             resource_path,
                             wrapper_paths[record.source_path],
                             constant_info_logicals,
-                            sk_output_name,
+                            compile_output_name,
                             origin_func_name=request.origin_func_name,
-                            target_symbol=static_sk_symbol,
-                            tiling_key=kernel.tiling_key,
+                            target_symbol=compile_static_sk_symbol,
+                            tiling_key=kernel.compile_tiling_key,
                         )
-                        command = {"type": "compile", "stage": 0, "cmd": cmd}
+                        command = {"type": "compile", "cmd": cmd}
                         sk_commands.append(command)
                         wrapper_commands.append(command)
-                        sk_output = _output_placeholder(sk_output_name)
-                        sk_outputs.append(sk_output)
+                        compile_output = _output_placeholder(compile_output_name)
+                        final_sk_output = _output_placeholder(final_sk_output_name)
+                        if is_slave:
+                            logical_rename_specs.append(
+                                (
+                                    record.compiled_symbol,
+                                    static_sk_symbol,
+                                    compile_output,
+                                    final_sk_output,
+                                )
+                            )
+                        sk_outputs.append(final_sk_output)
                         bind_pairs.append(
                             (basic_record.compiled_symbol, static_sk_symbol)
                         )
@@ -697,7 +811,7 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                             split_specs.append(
                                 (
                                     static_sk_symbol,
-                                    sk_output,
+                                    final_sk_output,
                                     split_index,
                                     split_name,
                                 )
@@ -719,7 +833,6 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                     sk_commands.append(
                         {
                             "type": "compile",
-                            "stage": 0,
                             "cmd": _static_bind_command(
                                 request,
                                 resource_path,
@@ -729,6 +842,24 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                         }
                     )
                     for (
+                        dynamic_slave_symbol,
+                        static_sk_symbol,
+                        compile_output,
+                        final_sk_output,
+                    ) in logical_rename_specs:
+                        sk_commands.append(
+                            {
+                                "type": "objcopy",
+                                "cmd": [
+                                    "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                                    f"--redefine-sym={dynamic_slave_symbol}="
+                                    f"{static_sk_symbol}",
+                                    compile_output,
+                                    final_sk_output,
+                                ],
+                            }
+                        )
+                    for (
                         static_sk_symbol,
                         sk_output,
                         split_index,
@@ -737,7 +868,6 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                         sk_commands.append(
                             {
                                 "type": "objcopy",
-                                "stage": 1,
                                 "cmd": [
                                     "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
                                     f"--redefine-sym={static_sk_symbol}="
