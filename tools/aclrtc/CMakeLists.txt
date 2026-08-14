@@ -8,9 +8,11 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/ SRC)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/specialization SPECIALIZATION_SRC)
 
 add_library(acl_rtc SHARED
     ${SRC}
+    ${SPECIALIZATION_SRC}
 )
 
 if(BUILD_OPEN_PROJECT)
@@ -41,12 +43,21 @@ target_link_directories(acl_rtc PRIVATE
 
 target_link_libraries(acl_rtc PRIVATE
     $<BUILD_INTERFACE:intf_pub>
+    Boost::filesystem
+    json
+    unified_dlog
     dl
     c_sec_static
 )
 
+target_compile_definitions(acl_rtc PRIVATE
+    ACLRTC_FUNC_VISIBILITY
+)
+
 target_compile_options(acl_rtc PRIVATE
     -fPIE
+    -fvisibility=hidden
+    -fvisibility-inlines-hidden
     -fno-strict-aliasing
     -fno-common
     -Wall
@@ -61,6 +72,8 @@ target_compile_options(acl_rtc PRIVATE
 target_link_options(acl_rtc PRIVATE
     -Wl,-z,relro,-z,now,-z,noexecstack
     -Wl,-Bsymbolic
+    -Wl,--exclude-libs,ALL
+    -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/acl_rtc.map
     -Wl,--gc-sections
     $<$<CONFIG:Release>:-s>
 )

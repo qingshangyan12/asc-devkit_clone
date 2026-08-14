@@ -16,6 +16,7 @@ set(ACLRTC_TEST_HEADERS_FILES
 
 file(GLOB ACLRTC_SRC_FILES
     ${ASCENDC_DIR}/tools/aclrtc/*.cpp
+    ${ASCENDC_DIR}/tools/aclrtc/specialization/*.cpp
 )
 
 file(GLOB TEST_ACLRTC_SRC_FILES
@@ -36,6 +37,7 @@ target_compile_definitions(ascendc_ut_aclrtc PRIVATE
 
 target_include_directories(ascendc_ut_aclrtc PRIVATE
     ${ACLRTC_TEST_HEADERS_FILES}
+    ${ASCENDC_DIR}/tools/aclrtc
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/acl
 )
@@ -50,6 +52,8 @@ target_link_directories(ascendc_ut_aclrtc PRIVATE
 
 target_link_libraries(ascendc_ut_aclrtc PRIVATE
     $<BUILD_INTERFACE:intf_llt_pub_basic>
+    Boost::filesystem
+    json
     -Wl,--no-as-needed
     c_sec
     dl
