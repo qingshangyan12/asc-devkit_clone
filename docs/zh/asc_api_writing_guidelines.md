@@ -981,6 +981,45 @@ AscendC::Cos(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 【描述】调用示例不应与算子开发方式（Kernel直调开发方式和工程化开发方式）强相关，只能在某一种开发方式下使用的API属于例外场景。
 
+ ### API-EXAMPLE-06 样例代码须使用规范的命名空间和宏定义 
+ 
+ 
+ 【级别】强制 
+ 
+ 
+ 【描述】样例代码中不应出现`using namespace AscendC`等不规范用法，在调用接口、枚举时需要加上命名空间限定。
+
+ 【级别】强制
+
+ 【正例】枚举值和接口名都加上AscendC命名空间。
+
+```cpp
+AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
+AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
+
+// 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后“Maxs和Mins（PIPE_V）读src0Local”。
+// 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步。
+AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+
+AscendC::Maxs(tmpTensor1, src0Local, inputVal, tileLength);
+AscendC::Mins(tmpTensor2, src0Local, inputVal, tileLength);
+```
+
+【反例】枚举值MTE2_V没有加AscendC命名空间。
+
+```cpp
+AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
+AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
+
+// 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后“Maxs和Mins（PIPE_V）读src0Local”。
+// 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步。
+AscendC::SetFlag<MTE2_V>(EVENT_ID0);
+AscendC::WaitFlag<MTE2_V>(EVENT_ID0);
+
+AscendC::Maxs(tmpTensor1, src0Local, inputVal, tileLength);
+AscendC::Mins(tmpTensor2, src0Local, inputVal, tileLength);
+```
 
 ## 10 业务规范
 
