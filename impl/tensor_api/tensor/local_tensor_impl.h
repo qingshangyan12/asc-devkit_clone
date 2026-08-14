@@ -8,6 +8,13 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning                                                                                                               \
+    "impl/tensor_api/tensor/local_tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use tensor_api/tensor/local_tensor.h instead."
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define __UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOCAL_TENSOR_IMPL_H__
+#endif
+
 #ifndef IMPL_TENSOR_API_TENSOR_LOCAL_TENSOR_IMPL_H
 #define IMPL_TENSOR_API_TENSOR_LOCAL_TENSOR_IMPL_H
 
@@ -193,3 +200,8 @@ __simd_callee__ inline void local_tensor<EngineType, LayoutType>::store(const Co
 } // namespace asc
 
 #endif // IMPL_TENSOR_API_TENSOR_LOCAL_TENSOR_IMPL_H
+
+#if defined(__UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOCAL_TENSOR_IMPL_H__)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef __UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOCAL_TENSOR_IMPL_H__
+#endif

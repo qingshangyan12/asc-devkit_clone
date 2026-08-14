@@ -110,18 +110,21 @@ struct base_tensor {
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord)
     {
+        TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor operator[]");
         return data()[layout()(coord)];
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const
     {
+        TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor operator[]");
         return data()[layout()(coord)];
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord)
     {
+        TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor operator()");
         auto slice_engine = engine() + layout()(coord);
         auto coord_layout = make_coord_layout(coord, layout());
         return make_sub_tensor(slice_engine, coord_layout);
@@ -130,6 +133,7 @@ struct base_tensor {
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const
     {
+        TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor operator()");
         auto slice_engine = engine() + layout()(coord);
         auto coord_layout = make_coord_layout(coord, layout());
         return make_sub_tensor(slice_engine, coord_layout);
@@ -150,6 +154,7 @@ struct base_tensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info)
     {
+        TENSOR_API_DEBUG_CHECK(debug_check_slice_args, layout(), coord, info);
         auto slice_engine = engine() + layout()(coord);
         auto coord_layout = make_slice_layout(coord, layout(), info);
         return make_sub_tensor(slice_engine, coord_layout);
@@ -158,6 +163,7 @@ struct base_tensor {
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info) const
     {
+        TENSOR_API_DEBUG_CHECK(debug_check_slice_args, layout(), coord, info);
         auto slice_engine = engine() + layout()(coord);
         auto coord_layout = make_slice_layout(coord, layout(), info);
         return make_sub_tensor(slice_engine, coord_layout);
@@ -306,6 +312,7 @@ __aicore__ inline constexpr auto make_tensor(const Iterator& iter, const Args&..
 {
     static_assert(is_hardware_mem_ptr_v<Iterator>,
                   "make_tensor expects the first argument to be a memory pointer or iterator");
+    TENSOR_API_DEBUG_CHECK(debug_check_make_tensor_shape, args...);
     return make_tensor_builder<Iterator>{}(iter, args...);
 }
 
