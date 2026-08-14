@@ -15,7 +15,7 @@
 - Concurrent executor已同步资源校验、AICPU `37:25`数据切分、scratch余量修复和子template错误传播。
 - NHR template已同步按channel分段、通信thread与PostCopy thread并行、DMA Read/Batch Write、末步直达output和传输错误传播等性能实现。
 - `channelsPerRank_`和按port group切分能力已下沉到现有AICPU template公共基类；运行期channel map会恢复template状态。
-- `CalcChannelRequestNhrMultiJetty`接口已接入，但第一阶段实现有意只为每个NHR对端申请一条CLOS channel，同时保留Mesh/NHR channel总数相等检查。因此本阶段只支持HCCL当前可达的单Jetty路径，不能据此宣称支持真实多Jetty。
+- `CalcChannelRequestNhrMultiJetty`及其直接依赖已同步为HCCL当前实现：按engine选择UBC CTP或UB MEM协议，按CLOS拓扑和EID port筛选并保留同一NHR对端的全部合格channel。Concurrent executor仍保留Mesh/NHR channel总数相等检查，因此当前E2E只支持有效单Jetty资源；真实多Jetty会在资源申请阶段明确失败，不能据此宣称已完成第二阶段。
 - KFC适配只涉及MC2 AICPU open executor。没有修改CCU、`DispatchKfcSubKernel`或KFC Server的CCU dispatch。
 - 普通Concurrent E2E完成selector、资源申请、AICPU launch、Concurrent executor、双template多thread任务图和`CheckAllGather`语义校验。
 - MC2 open executor E2E会反序列化真实`AlgResourceCtxSerializable`，调用产品`LaunchOpenOpParamDataImpl`，并进入本地registry、task cache runner和Concurrent `Orchestrate`。该用例逐rank断言open executor入口被调用；由于常驻KFC Server的初始thread wait不在本用例捕获窗口内，它不重复执行`CheckAllGather`。完整任务图和结果语义由同参数的普通Concurrent E2E负责验证。
@@ -327,7 +327,9 @@ nhrSlaveThreadNum = nhrThreadNum - 1
 
 第一阶段保持HCCL当前约束：Mesh和NHR channel描述总数相等。它只能证明单Jetty Concurrent正确，但与当前上游可达行为一致。
 
-第一阶段实现中，`CalcChannelRequestNhrMultiJetty`复用按CLOS优先拓扑申请channel的能力，每个NHR对端只返回一条channel。Concurrent按`rankSize - 1`切分Mesh和NHR channel段，运行期据此恢复两个template的`channelsPerRank_`。这个资源顺序和线程切分仅对当前单Jetty约束成立。
+第一阶段最初实现中，`CalcChannelRequestNhrMultiJetty`复用按CLOS优先拓扑申请channel的能力，每个NHR对端只返回一条channel。后续为缩小与HCCL源码的差异，该helper及其直接依赖已同步为HCCL当前的真实筛选逻辑，会返回同一NHR对端的全部合格CLOS Jetty channel；Concurrent仍用等量channel门禁将成功路径限制为单Jetty。运行期继续按`rankSize - 1`切分Mesh和NHR channel段，这个资源顺序和线程切分仅对门禁允许的单Jetty约束成立。
+
+这次同步不等于进入第二阶段。保留门禁的原因是：一旦真实多Jetty channel进入执行器，固定切分边界会把NHR channel误分到Mesh侧，而且当前thread和notify资源在恢复运行期`channelsPerRank_`之前已经切分。直接移除门禁会导致channel、thread、notify和task cache任务图不一致。第二阶段必须完成下列资源模型改造并增加真实多Jetty ST后再解除门禁。
 
 第二阶段满足以下门禁后才移除等量检查：
 
@@ -395,7 +397,7 @@ Concurrent的核心cache风险不是key冲突，而是HCOMM是否在一次captur
 - 保证每个目标rank看到一个覆盖预期rank的Mesh实例和一个CLOS实例。
 - 为同一rank pair分别生成可由priority topo选择的Mesh链路和CLOS链路，而不是两条不可区分的同协议链路。
 - 在topology计算后断言`level0Topo == MESH_1D_CLOS`、两个实例rank数相等且`level0PcieMix == false`。
-- 在channel stub中实现`CalcChannelRequestNhrMultiJetty`，按第一阶段约束为每个NHR对端生成一条CLOS channel。
+- channel stub中的`CalcChannelRequestNhrMultiJetty`按第一阶段E2E约束为每个NHR对端生成一条CLOS channel；产品`channel.cc`已经同步HCCL多Jetty筛选逻辑。该stub不能作为产品EID port过滤和多Jetty枚举已通过测试的证据。
 
 ST没有继续依靠物理ID启发式拼出UBX。显式开关下，拓扑模型为4 rank用例构造完整Mesh和CLOS实例，channel stub分别按优先拓扑生成两组通信资源；非Concurrent用例保持原模型。
 
