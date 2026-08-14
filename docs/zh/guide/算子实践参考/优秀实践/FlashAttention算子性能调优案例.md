@@ -14,13 +14,13 @@
 
 ![](../../figures/zh-cn_formulaimage_0000001943999757.png)
 
-![](../../figures/zh-cn_formulaimage_000000194399984fig_5.png)
+![](../../figures/zh-cn_formulaimage_0000001943999845.png)
 
 则注意力的反向计算公式为：
 
 ![](../../figures/zh-cn_formulaimage_0000001910041146.png)
 
-![](../../figures/zh-cn_formulaimage_000000191008213fig_4.png)
+![](../../figures/zh-cn_formulaimage_0000001910082134.png)
 
 ![](../../figures/zh-cn_formulaimage_0000001910042246.png)
 
@@ -51,7 +51,7 @@
 
 5.  计算dk，本计算将转置后的ds结果与query做matmul计算，并将结果与scale相乘得到结果dk。
 
-    ![](../../figures/zh-cn_formulaimage_000000209851778fig_1.png)
+    ![](../../figures/zh-cn_formulaimage_0000002098517781.png)
 
 6.  计算dv，本计算将p的结果做drop计算，转置后与dy做matmul计算。
 

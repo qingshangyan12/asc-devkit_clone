@@ -40,7 +40,7 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 -   Bias为矩阵乘偏置，形状为\[1, N\]。对\(scaleA ⊗ A\) \* \(scaleB ⊗ B\)结果矩阵的每一行都采用该Bias进行偏置。
 
 **图2**  MxMatmul矩阵乘示意图<a name="zh-cn_topic_0000002270097206_fig1942919398330"></a>  
-![](../../../../figures/Mxmm_diag.png "MxMatmul矩阵乘示意图")
+![](../../../../figures/mx_matmul.png "MxMatmul矩阵乘示意图")
 
 矩阵A、scaleA、B、scaleB在不同位置中的排布格式分别如下图所示。
 
@@ -51,10 +51,10 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 ![](../../../../figures/b_matrix_pos.png "B矩阵在不同位置的排布格式")
 
 **图5**  scaleA矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig107863142019"></a>  
-![](../../../../figures/scalea_matrix_pos.png "scaleA矩阵在不同位置的排布格式")
+![](../../../../figures/scale_a_pos.png "scaleA矩阵在不同位置的排布格式")
 
 **图6**  scaleB矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig76682054103416"></a>  
-![](../../../../figures/scaleb_matrix_pos.png "scaleB矩阵在不同位置的排布格式")
+![](../../../../figures/scale_b_pos.png "scaleB矩阵在不同位置的排布格式")
 
 ## 使用场景
 

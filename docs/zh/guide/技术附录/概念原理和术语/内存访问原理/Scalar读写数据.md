@@ -4,7 +4,7 @@ AI Core中Scalar计算单元负责各类型的标量数据运算和程序的流�
 
 ## Scalar读写Global Memory<a name="section7480536235"></a>
 
-![](../../../figures/aicore_3fig_1.png)
+![](../../../figures/aicore_31.png)
 
 如上图所示，Scalar读写GM数据时会经过DataCache，DataCache主要用于提高标量访存指令的执行效率，每一个AIC/AIV核内均有一个独立的DataCache。下面通过一个具体示例来讲解DataCache的具体工作机制。
 
