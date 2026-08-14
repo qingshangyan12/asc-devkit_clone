@@ -306,8 +306,7 @@ def _gen_compile_cmd_v516(
     # fix: need dav-516r2
     compile_cmd += [
         src_file,
-        "--cce-aicore-arch=dav-l510",
-        "-D__NPU_ARCH__=5162"
+        "--cce-aicore-arch=dav-516r2",
         "--cce-aicore-only",
         "-o",
         dst_file,
