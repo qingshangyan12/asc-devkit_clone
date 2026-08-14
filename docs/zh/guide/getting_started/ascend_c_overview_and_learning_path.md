@@ -53,16 +53,16 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <p style="color: #555; font-size: 14px; line-height: 1.6; min-height: 65px; margin-bottom: 10px;">初级阶段的目标是让您在最短时间内跑通第一个算子，理解Ascend C的基本工作方式。</p>
 <div style="margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">🔧 环境搭建</strong><br/>
-<a href="./环境准备.md" style="color: #3b82f6; font-size: 14px;">CANN环境安装</a>
+<a href="./environment_setup.md" style="color: #3b82f6; font-size: 14px;">CANN环境安装</a>
 </div>
 <div style="margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">📖 编程模型概览</strong><br/>
-<a href="./快速入门/异构系统与编程模型.md" style="color: #3b82f6; font-size: 14px;">异构系统与SIMD/SIMT编程模型介绍</a>
+<a href="./quick_start/heterogeneous_system_and_programming_model.md" style="color: #3b82f6; font-size: 14px;">异构系统与SIMD/SIMT编程模型介绍</a>
 </div>
 <div style="margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;"><span style="color: #3b82f6;">💻</span> 动手实践</strong><br/><span style="color: #666; font-size: 14px;">• 
-<a href="./快速入门/基于SIMD编程/基于SIMD编程.md" style="color: #3b82f6; font-size: 14px;">SIMD算子快速入门</a><br/><span style="color: #666; font-size: 14px;">• 
-<a href="./快速入门/基于SIMT编程/基于SIMT编程.md" style="color: #3b82f6; font-size: 14px;">SIMT算子快速入门</a>
+<a href="./quick_start/simd_programming/simd_programming.md" style="color: #3b82f6; font-size: 14px;">SIMD算子快速入门</a><br/><span style="color: #666; font-size: 14px;">• 
+<a href="./quick_start/simt_programming/simt_programming.md" style="color: #3b82f6; font-size: 14px;">SIMT算子快速入门</a>
 </div>
 </div>
 
