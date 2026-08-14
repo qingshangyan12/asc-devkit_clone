@@ -9,8 +9,6 @@
  */
 
 #include "register/op_def_registry.h"
-#include "register/op_impl_registry.h"
-#include "securec.h"
 #include "../../op_kernel/add_custom_template/add_custom_template_tiling.h"
 #include "../../op_kernel/add_custom_template/tiling_key_add_custom_template.h"
 
@@ -46,28 +44,6 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
     currentWorkspace[0] = 0;
     return ge::GRAPH_SUCCESS;
 }
-
-static ge::graphStatus GenSimplifiedKeyFunc(gert::TilingContext* context, ge::char_t* simplifiedKey)
-{
-    constexpr size_t CUSTOM_SIMPLIFIED_KEY_MAX_LEN = 256U;
-    if (context == nullptr || simplifiedKey == nullptr || context->GetInputDesc(0) == nullptr) {
-        return ge::GRAPH_FAILED;
-    }
-
-    const char* key = nullptr;
-    switch (context->GetInputDesc(0)->GetDataType()) {
-        case ge::DT_FLOAT16:
-            key = "custom_fp16";
-            break;
-        case ge::DT_FLOAT:
-            key = "custom_fp32";
-            break;
-        default:
-            return ge::GRAPH_FAILED;
-    }
-    return strcpy_s(simplifiedKey, CUSTOM_SIMPLIFIED_KEY_MAX_LEN, key) == EOK ? ge::GRAPH_SUCCESS : ge::GRAPH_FAILED;
-}
-
 } // namespace optiling
 
 namespace ge {
@@ -105,10 +81,7 @@ public:
             .Format({ge::FORMAT_ND, ge::FORMAT_ND});
 
         this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
-        this->AICore()
-            .SetTiling(optiling::TilingFunc)
-            .SetGenSimplifiedKey(optiling::GenSimplifiedKeyFunc)
-            .AddConfig("ascend910b");
+        this->AICore().SetTiling(optiling::TilingFunc).AddConfig("ascend910b");
     }
 };
 OP_ADD(AddCustomTemplate);
