@@ -1129,6 +1129,24 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 【描述】当只有一个条目时，不应使用项目符号，直接以正文形式呈现即可。
 
+### API-FORMAT-05 锚点须使用有意义的名称
+
+【级别】强制
+
+【描述】文档中的锚点（`<a name="...">`或`#锚点`）须使用有实际含义的名称，不得使用无意义的自动生成ID（如`section184751024101111`）。
+
+**反例：**
+
+```
+详细情况参考[Lock约束说明](Lock.md#section184751024101111)。
+```
+
+**正例：**
+
+```
+支持的流水参考[硬件流水类型](../核内同步能力概述.md#硬件流水类型)。
+```
+
 ## 14 芯片版本过滤定制
 
 内容定制是指通过芯片过滤标签（npu标签）实现同一篇API文档按不同芯片版本动态展示不同内容的能力。
@@ -1155,11 +1173,35 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 ## 15 接口废弃或变更规范
 
-### API-DEPRECATED-00 接口改名或废弃时须同步更新废弃接口文档和接口变更说明
+### API-DEPRECATED-00 接口废弃时须同步更新废弃接口文档列表
 
 【级别】强制
 
-【描述】当接口改名或废弃时，须在废弃接口文档和接口变更说明文档中做相应的修改，确保废弃接口文档中标注废弃状态并指向新接口名称（如有），接口变更说明文档中记录改名或废弃信息。
+【描述】当接口废弃时，须在接口文档中做相应的修改：标题后增加（废弃），增加替代接口的链接（如有），并在附录中的废弃接口列表中记录废弃信息。
+
+【正例】
+
+asc_get_ar_spr接口文档示例如下：
+
+```text
+# asc_get_ar_spr (废弃)
+
+## 功能说明
+
+头文件路径：`"c_api/sys_var/sys_var.h"`。
+
+**该接口已废弃，请使用[asc_get_squeeze_status](asc_get_squeeze_status.md)实现此功能。**
+```
+
+附录中的废弃接口列表示例如下：
+
+```text
+### 系统变量
+
+- [asc_get_ar_spr](../SIMD-API/C-API/sys_var/asc_get_ar_spr_deprecated.md)接口
+
+    此接口后续版本会废弃，请使用[asc_get_squeeze_status](../SIMD-API/C-API/sys_var/asc_get_squeeze_status.md)接口。
+```
 
 ### API-DEPRECATED-01 接口文档中引用其他接口时不得使用已废弃或已更名的接口
 
