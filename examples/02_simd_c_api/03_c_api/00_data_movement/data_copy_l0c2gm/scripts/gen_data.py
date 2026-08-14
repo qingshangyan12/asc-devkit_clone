@@ -53,6 +53,8 @@ SCENARIOS = {
     17: ('half', 'float', 'bfloat16',   'F322BF16',              False, False, False),
 }
 
+CUBE_BLOCK = 16
+
 # C0 block size in bytes (hardware constant for dav-3510)
 C0_BYTES = 32
 
@@ -648,7 +650,7 @@ def apply_prequant(matrix, scenario_num, quant_params, output_type, quant_mode, 
 def get_nz_block_columns(output_type):
     """Get the number of columns per Nz C0 block for the output type."""
     byte_size = TYPE_BYTE_SIZE[output_type]
-    return int(C0_BYTES / byte_size)
+    return max(CUBE_BLOCK, int(C0_BYTES / byte_size))
 
 
 def gen_golden_data(scenario_num):
