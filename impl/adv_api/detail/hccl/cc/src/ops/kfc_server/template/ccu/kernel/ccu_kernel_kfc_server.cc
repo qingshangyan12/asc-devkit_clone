@@ -121,6 +121,13 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
 {
     ccu::Variable opType;
     opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
+    HCCL_INFO(
+        "[CCU_RS_KFC_DIAG] Dispatch static rank[%u/%llu], channels[%u], opType[%u], dataType[%u], outputType[%u], "
+        "reduceOp[%u], tokenHandle[%llu]",
+        ctx.arg->rankId, static_cast<unsigned long long>(ctx.arg->rankSize), ctx.arg->channelCount,
+        static_cast<uint32_t>(ctx.arg->opParam.opType), static_cast<uint32_t>(ctx.arg->opParam.DataDes.dataType),
+        static_cast<uint32_t>(ctx.arg->opParam.DataDes.outputType), static_cast<uint32_t>(ctx.arg->opParam.reduceType),
+        static_cast<unsigned long long>(ctx.token.handle));
     // CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
     // {
     //     CcuKfcAllGatherMesh1DMem2MemKernel(
