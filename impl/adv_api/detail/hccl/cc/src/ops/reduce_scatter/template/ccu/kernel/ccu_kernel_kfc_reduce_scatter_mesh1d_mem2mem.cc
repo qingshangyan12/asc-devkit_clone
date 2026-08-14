@@ -153,7 +153,7 @@ static CcuResult PreSync(KfcReduceScatterMesh1DMem2MemContext& ctx)
     }
     uint32_t allBit = (1U << INPUT_XN_ID) | (1U << SCRATCH_XN_ID) | (1U << TOKEN_XN_ID);
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
-        ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, allBit);
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, allBit));
     }
     HCCL_DEBUG("[CCU_RS_KFC_DIAG] PreSync registered rank[%u]", ctx.rankId);
     return CCU_SUCCESS;
@@ -163,10 +163,10 @@ static CcuResult PostSync(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
     HCCL_DEBUG("[CCU_RS_KFC_DIAG] PostSync begin rank[%u], channels[%u]", ctx.rankId, ctx.channelCount);
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
-        ccu::NotifyRecord(ctx.channels[i], CKE_IDX_0, 1 << POST_SYNC_ID);
+        CCU_CHK_RET(ccu::NotifyRecord(ctx.channels[i], CKE_IDX_0, 1 << POST_SYNC_ID));
     }
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
-        ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, 1 << POST_SYNC_ID);
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], CKE_IDX_0, 1 << POST_SYNC_ID));
     }
     HCCL_DEBUG("[CCU_RS_KFC_DIAG] PostSync registered rank[%u]", ctx.rankId);
     return CCU_SUCCESS;
@@ -215,15 +215,15 @@ static CcuResult DoReduceScatterRead(KfcReduceScatterMesh1DMem2MemContext& ctx, 
         uint16_t rankMask = static_cast<uint16_t>(1U << (rankIdx % BIT_NUM_PER_CKE));
         if (rankIdx == ctx.rankId) {
             if (ctx.rankSize <= REDUCE_SCATTER_GROUP_REDUCE_MAX_PIECE_CNT) {
-                ccu::EventRecord(ctx.events[eventIdx], rankMask);
+                CCU_CHK_RET(ccu::EventRecord(ctx.events[eventIdx], rankMask));
             } else {
-                ccu::LocalCopy(
-                    ctx.scratchMem[rankIdx], ctx.myInput, ctx.sliceSize, ctx.events[eventIdx], rankMask);
+                CCU_CHK_RET(ccu::LocalCopy(
+                    ctx.scratchMem[rankIdx], ctx.myInput, ctx.sliceSize, ctx.events[eventIdx], rankMask));
             }
         } else {
-            ccu::Read(
+            CCU_CHK_RET(ccu::Read(
                 ctx.channels[channelId], ctx.scratchMem[rankIdx], ctx.remoteInput[rankIdx], ctx.sliceSize,
-                ctx.events[eventIdx], rankMask);
+                ctx.events[eventIdx], rankMask));
             channelId++;
         }
     }
@@ -263,7 +263,7 @@ static CcuResult DoReduceScatterWait(KfcReduceScatterMesh1DMem2MemContext& ctx, 
             sigNum = ctx.rankSize % BIT_NUM_PER_CKE;
         }
         uint16_t allBit = static_cast<uint16_t>((1U << sigNum) - 1U);
-        ccu::EventWait(ctx.events[eventIdx], allBit);
+        CCU_CHK_RET(ccu::EventWait(ctx.events[eventIdx], allBit));
     }
     return CCU_SUCCESS;
 }
@@ -342,83 +342,36 @@ static CcuResult ReduceLoopGroupV1(
 
     expansionSlice = ctx.moConfig.memSlice;
 
-    CCU_IF(ctx.goSize.loopParam != 0)
-    {
-        loopParam = GetLoopParam(0, ctx.moConfig.memSlice * ctx.moConfig.loopCount, 0);
-        loopParam = loopParam + ctx.goSize.loopParam;
-        sliceSize = ctx.moConfig.memSlice;
-        expandedSliceSize = expansionSlice;
-        for (uint32_t i = 1; i < expansionNum; i++) {
-            expandedSliceSize += expansionSlice;
-        }
-        for (uint32_t i = 0; i < size; i++) {
-            ctx.loopScratch[0][i].addr = scratchOrg[i].addr;
-            ctx.loopScratch[0][i].token = scratchOrg[i].token;
-        }
-        ctx.loopSrc[0].addr = source.addr;
-        ctx.loopSrc[0].token = source.token;
-        ctx.loopDst[0].addr = dst.addr;
-        ctx.loopDst[0].token = dst.token;
-        ctx.loopLen[0] = sliceSize;
-        ctx.loopLenExp[0] = expandedSliceSize;
-        parallelParam = GetParallelParam(ctx.moConfig.loopCount - 1, 0, 1);
-        offsetParam = GetOffsetParam(ctx.moConfig.memSlice, ctx.moConfig.msInterleave, 1);
-        loops.loopParam[0] = loopParam;
-        std::vector<ccu::Loop> loopList{*loops.loops[0]};
-        ccu::LoopGroup group(parallelParam, offsetParam, ctx.moConfig.loopCount, loopList);
+    // KFC small-message mode: register exactly one LoopGroup. The CCU_IF
+    // branches used by the full hccl implementation are intentionally not
+    // constructed here because KFC registration executes both branch bodies;
+    // reusing the same Loop in both groups violates the hcomm LoopGroup
+    // lifetime/ownership contract.
+    source.addr += ctx.goSize.addrOffset;
+    for (uint32_t i = 0; i < expansionNum; i++) {
+        dst.addr += ctx.goSize.addrOffset;
     }
+    expandedSliceSize = 0;
+    for (uint32_t i = 0; i < expansionNum; i++) {
+        expandedSliceSize += ctx.goSize.residual;
+    }
+    for (uint32_t i = 0; i < size; i++) {
+        ctx.loopScratch[0][i].addr = scratchOrg[i].addr;
+        ctx.loopScratch[0][i].token = scratchOrg[i].token;
+        ctx.loopScratch[0][i].addr += ctx.goSize.addrOffset;
+    }
+    ctx.loopSrc[0].addr = source.addr;
+    ctx.loopSrc[0].token = source.token;
+    ctx.loopDst[0].addr = dst.addr;
+    ctx.loopDst[0].token = dst.token;
+    ctx.loopLen[0] = ctx.goSize.residual;
+    ctx.loopLenExp[0] = expandedSliceSize;
 
-    CCU_IF(ctx.goSize.parallelParam != 0)
-    {
-        source.addr += ctx.goSize.addrOffset;
-        for (uint32_t i = 0; i < expansionNum; i++) {
-            dst.addr += ctx.goSize.addrOffset;
-        }
-
-        expandedSliceSize = ctx.goSize.residual;
-        for (uint32_t i = 1; i < expansionNum; i++) {
-            expandedSliceSize += ctx.goSize.residual;
-        }
-        for (uint32_t i = 0; i < size; i++) {
-            ctx.loopScratch[0][i].addr = scratchOrg[i].addr;
-            ctx.loopScratch[0][i].token = scratchOrg[i].token;
-            ctx.loopScratch[0][i].addr += ctx.goSize.addrOffset;
-        }
-        ctx.loopSrc[0].addr = source.addr;
-        ctx.loopSrc[0].token = source.token;
-        ctx.loopDst[0].addr = dst.addr;
-        ctx.loopDst[0].token = dst.token;
-        ctx.loopLen[0] = ctx.goSize.residual;
-        ctx.loopLenExp[0] = expandedSliceSize;
-
-        for (uint32_t i = 0; i < size; i++) {
-            ctx.loopScratch[1][i].addr = ctx.loopScratch[0][i].addr;
-            ctx.loopScratch[1][i].token = ctx.loopScratch[0][i].token;
-            ctx.loopScratch[1][i].addr += ctx.goSize.residual;
-        }
-        ctx.loopSrc[1].addr = source.addr;
-        ctx.loopSrc[1].token = source.token;
-        ctx.loopSrc[1].addr += ctx.goSize.residual;
-        ctx.loopDst[1].addr = dst.addr;
-        ctx.loopDst[1].token = dst.token;
-        for (uint32_t i = 0; i < expansionNum; i++) {
-            ctx.loopDst[1].addr += ctx.goSize.residual;
-        }
-        ctx.loopLen[1] = ctx.moConfig.memSlice;
-        ctx.loopLenExp[1] = expansionSlice;
-        for (uint32_t i = 1; i < expansionNum; i++) {
-            ctx.loopLenExp[1] += expansionSlice;
-        }
-
-        ccu::Variable loopCfg0;
-        ccu::Variable loopCfg1;
-        loopCfg0 = GetLoopParam(0, 0, 1);
-        loopCfg1 = GetLoopParam(0, 0, 1);
-        offsetParam = GetOffsetParam(ctx.moConfig.memSlice, ctx.moConfig.msInterleave, 1);
-        loops.loopParam[0] = loopCfg0;
-        loops.loopParam[1] = loopCfg1;
-        std::vector<ccu::Loop> loopList{*loops.loops[0], *loops.loops[1]};
-        ccu::LoopGroup group(ctx.goSize.parallelParam, offsetParam, ctx.moConfig.loopCount, loopList);
+    loopParam = GetLoopParam(0, 0, 1);
+    offsetParam = GetOffsetParam(ctx.moConfig.memSlice, ctx.moConfig.msInterleave, 1);
+    loops.loopParam[0] = loopParam;
+    std::vector<ccu::Loop> loopList{*loops.loops[0]};
+    ccu::LoopGroup group(ctx.goSize.parallelParam, offsetParam, 1, loopList);
     }
     return CCU_SUCCESS;
 }
@@ -450,7 +403,7 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
     CCU_IF(ctx.repeatNum != UINT64_MAX)
     {
         ctx.repeatNum += ctx.constVar1;
-        DoReduceScatterRead(ctx, 0);
+        CCU_CHK_RET(DoReduceScatterRead(ctx, 0));
     }
 
     // KFC currently supplies one round from the sole executor. Keep the
@@ -459,7 +412,7 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
     CCU_IF(ctx.waitRepeatNum != UINT64_MAX)
     {
         ctx.waitRepeatNum += ctx.constVar1;
-        DoReduceScatterWait(ctx, 0);
+        CCU_CHK_RET(DoReduceScatterWait(ctx, 0));
     }
 
     ResetReduceScatterAddr(ctx);
@@ -503,9 +456,11 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
         ctx.sliceSize = ctx.normalSliceSize;
     }
     HCCL_INFO(
-        "[CCU_RS_KFC_DIAG] Kernel start rank[%u/%u], channels[%u], dataType[%u], outputType[%u], reduceOp[%u]",
+        "[CCU_RS_KFC_DIAG] Kernel start rank[%u/%u], channels[%u], dataType[%u], outputType[%u], reduceOp[%u], "
+        "effectiveOutputType[%u], expansionNum[%u]",
         rankId, rankSize, channelCount, static_cast<uint32_t>(dataType), static_cast<uint32_t>(outputType),
-        static_cast<uint32_t>(reduceType));
+        static_cast<uint32_t>(reduceType), static_cast<uint32_t>(ctx.outputDataType),
+        GetReduceExpansionNum(ctx.reduceOp, ctx.dataType, ctx.outputDataType));
     CCU_CHK_RET(PreSync(ctx));
     // Match hccl: zero-sized slices only participate in the surrounding
     // synchronization and must not register zero-length CCU operations.
