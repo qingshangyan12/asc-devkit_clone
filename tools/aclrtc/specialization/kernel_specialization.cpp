@@ -51,6 +51,7 @@ bool CopyFileContents(int sourceFileDescriptor, int destinationFileDescriptor)
             if (errno == EINTR) {
                 continue;
             }
+            ACLRTC_LOG_ERROR("Failed to read linked kernel ELF while publishing: errno=%d", errno);
             return false;
         }
         ssize_t writtenByteCount = 0;
@@ -61,6 +62,7 @@ bool CopyFileContents(int sourceFileDescriptor, int destinationFileDescriptor)
                 continue;
             }
             if (writeResult <= 0) {
+                ACLRTC_LOG_ERROR("Failed to write linked kernel ELF while publishing: errno=%d", errno);
                 return false;
             }
             writtenByteCount += writeResult;
@@ -82,16 +84,24 @@ bool CreateTemporaryOutputFile(const fs::path& outputElfPath, fs::path& temporar
             return true;
         }
         if (errno != EEXIST) {
+            ACLRTC_LOG_ERROR("Failed to create temporary output ELF: path=%s errno=%d",
+                             temporaryOutputPath.c_str(), errno);
             return false;
         }
     }
+    ACLRTC_LOG_ERROR("Failed to create a unique temporary output ELF after %zu attempts: output=%s",
+                     MAX_TEMPORARY_FILE_ATTEMPTS, outputElfPath.c_str());
     return false;
 }
 
 void RemoveTemporaryOutputFile(const fs::path& temporaryOutputPath)
 {
-    boost::system::error_code ignoredError;
-    fs::remove(temporaryOutputPath, ignoredError);
+    boost::system::error_code removeError;
+    fs::remove(temporaryOutputPath, removeError);
+    if (removeError) {
+        ACLRTC_LOG_WARNING("Failed to remove temporary output ELF: path=%s error=%d",
+                           temporaryOutputPath.c_str(), removeError.value());
+    }
 }
 } // namespace
 
@@ -102,7 +112,12 @@ KernelSpecializationSession::KernelSpecializationSession(JitResourceRegistryAdap
 aclError KernelSpecializationSession::RunKernelSpecialization(
     const aclrtcKernelSpecRequest* apiRequest, const char* outputElfPath)
 {
-    if (apiRequest == nullptr || outputElfPath == nullptr) {
+    if (apiRequest == nullptr) {
+        ACLRTC_LOG_ERROR("aclrtcKernelSpecialization request must not be null");
+        return ACLRTC_ERROR_INVALID_INPUT;
+    }
+    if (outputElfPath == nullptr) {
+        ACLRTC_LOG_ERROR("aclrtcKernelSpecialization outPath must not be null");
         return ACLRTC_ERROR_INVALID_INPUT;
     }
 
@@ -134,9 +149,16 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     KernelCompilationWorkspace compilationWorkspace(std::move(registeredResource.resourceWorktreePath),
                                                     saveKernelMetaEnabled);
     diagnostics.RecordResourceWorktreePath(compilationWorkspace.GetWorktreePath());
-    if (registeredResource.resourceManifest == nullptr || compilationWorkspace.GetWorktreePath().empty() ||
-        registeredResource.sourceFilePath.empty()) {
-        ACLRTC_LOG_ERROR("ResourceRegistry returned incomplete JIT resource data");
+    if (registeredResource.resourceManifest == nullptr) {
+        ACLRTC_LOG_ERROR("ResourceRegistry returned a null resource Manifest");
+        return finishRequest(ACLRTC_ERROR_FAILURE, false);
+    }
+    if (compilationWorkspace.GetWorktreePath().empty()) {
+        ACLRTC_LOG_ERROR("ResourceRegistry returned an empty resource worktree path");
+        return finishRequest(ACLRTC_ERROR_FAILURE, false);
+    }
+    if (registeredResource.sourceFilePath.empty()) {
+        ACLRTC_LOG_ERROR("ResourceRegistry returned an empty sourceFilePath");
         return finishRequest(ACLRTC_ERROR_FAILURE, false);
     }
     diagnostics.SaveManifestForDiagnostics(*registeredResource.resourceManifest);
@@ -170,20 +192,34 @@ aclError KernelSpecializationSession::PublishKernelElf(
 {
     const int linkedKernelFileDescriptor = open(linkedKernelElfPath.c_str(), O_RDONLY | O_CLOEXEC);
     if (linkedKernelFileDescriptor < 0) {
+        ACLRTC_LOG_ERROR("Failed to open linked kernel ELF: path=%s errno=%d", linkedKernelElfPath.c_str(), errno);
         return ACLRTC_ERROR_FAILURE;
     }
 
     fs::path temporaryOutputPath;
     int temporaryOutputFileDescriptor = -1;
     if (!CreateTemporaryOutputFile(outputElfPath, temporaryOutputPath, temporaryOutputFileDescriptor)) {
-        close(linkedKernelFileDescriptor);
+        if (close(linkedKernelFileDescriptor) != 0) {
+            ACLRTC_LOG_WARNING("Failed to close linked kernel ELF after publish setup failure: path=%s errno=%d",
+                               linkedKernelElfPath.c_str(), errno);
+        }
         return ACLRTC_ERROR_FAILURE;
     }
 
     const bool copySucceeded = CopyFileContents(linkedKernelFileDescriptor, temporaryOutputFileDescriptor);
     const bool sourceCloseSucceeded = close(linkedKernelFileDescriptor) == 0;
+    const int sourceCloseError = sourceCloseSucceeded ? 0 : errno;
     const bool destinationCloseSucceeded = close(temporaryOutputFileDescriptor) == 0;
+    const int destinationCloseError = destinationCloseSucceeded ? 0 : errno;
     if (!copySucceeded || !sourceCloseSucceeded || !destinationCloseSucceeded) {
+        if (!sourceCloseSucceeded) {
+            ACLRTC_LOG_ERROR("Failed to close linked kernel ELF: path=%s errno=%d",
+                             linkedKernelElfPath.c_str(), sourceCloseError);
+        }
+        if (!destinationCloseSucceeded) {
+            ACLRTC_LOG_ERROR("Failed to close temporary output ELF: path=%s errno=%d",
+                             temporaryOutputPath.c_str(), destinationCloseError);
+        }
         RemoveTemporaryOutputFile(temporaryOutputPath);
         return ACLRTC_ERROR_FAILURE;
     }
@@ -197,6 +233,8 @@ aclError KernelSpecializationSession::PublishKernelElf(
     boost::system::error_code renameError;
     fs::rename(temporaryOutputPath, outputElfPath, renameError);
     if (renameError) {
+        ACLRTC_LOG_ERROR("Failed to publish kernel ELF: source=%s target=%s error=%d",
+                         temporaryOutputPath.c_str(), outputElfPath.c_str(), renameError.value());
         RemoveTemporaryOutputFile(temporaryOutputPath);
         return ACLRTC_ERROR_FAILURE;
     }

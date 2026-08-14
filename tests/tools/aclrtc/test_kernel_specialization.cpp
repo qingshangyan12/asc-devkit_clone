@@ -10,6 +10,7 @@
 
 #include "acl/acl_rt_compile.h"
 #include "specialization/kernel_specialization_types.h"
+#include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
 
@@ -132,6 +133,39 @@ TEST(KernelSpecializationRequestTest, RejectsInvalidAbiFields)
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_INPUT);
+}
+
+TEST(KernelSpecializationRequestTest, ReportsSpecificRequestValidationFailures)
+{
+    using ascendc::aclrtc::CapturedKernelSpecializationLogsContain;
+    using ascendc::aclrtc::ClearCapturedKernelSpecializationLogs;
+    ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
+
+    aclrtcKernelSpecRequest request = CreateValidRequest();
+    request.reserved[7] = 1U;
+    ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, "/tmp/kernel.elf", normalizedRequest),
+              ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("reserved[7] must be zero"));
+
+    request = CreateValidRequest();
+    request.optionCount = 1U;
+    ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, "/tmp/kernel.elf", normalizedRequest),
+              ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("options must not be null"));
+
+    const char* options[] = {"-o"};
+    request = CreateValidRequest();
+    request.options = options;
+    request.optionCount = 1U;
+    ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, "/tmp/kernel.elf", normalizedRequest),
+              ACL_ERROR_RTC_INVALID_OPTION);
+    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("options[0] cannot override compiler output"));
 }
 
 TEST(KernelSpecializationRequestTest, RejectsOptionsThatCanRedirectCompilerInputsOrOutputs)
