@@ -65,19 +65,40 @@ bool RewritesCompilerOutput(const std::string& option)
            option.compare(0, sizeof("--output=") - 1U, "--output=") == 0;
 }
 
-bool IsStructurallySafeCompilerOption(const std::string& option)
+aclError ValidateCompilerOptionStructure(const std::string& option, const char* optionFieldName,
+                                         uint64_t optionIndex, bool validateCompilerBoundaries)
 {
-    return option.front() != '@' && !ContainsAsciiControlCharacter(option) && !RewritesCompilerOutput(option);
+    if (ContainsAsciiControlCharacter(option)) {
+        ACLRTC_LOG_ERROR("%s[%llu] contains an ASCII control character", optionFieldName,
+                         static_cast<unsigned long long>(optionIndex));
+        return ACLRTC_ERROR_INVALID_OPTION;
+    }
+    if (!validateCompilerBoundaries) {
+        return ACLRTC_SUCCESS;
+    }
+    if (option.front() == '@') {
+        ACLRTC_LOG_ERROR("%s[%llu] cannot use a compiler response file", optionFieldName,
+                         static_cast<unsigned long long>(optionIndex));
+        return ACLRTC_ERROR_INVALID_OPTION;
+    }
+    if (RewritesCompilerOutput(option)) {
+        ACLRTC_LOG_ERROR("%s[%llu] cannot override compiler output", optionFieldName,
+                         static_cast<unsigned long long>(optionIndex));
+        return ACLRTC_ERROR_INVALID_OPTION;
+    }
+    return ACLRTC_SUCCESS;
 }
 
 aclError CopyUserOptions(const char* const* apiOptions, uint64_t apiOptionCount,
-                         bool validateStructuralCompilerBoundaries,
+                         const char* optionFieldName, bool validateCompilerBoundaries,
                          std::vector<std::string>& copiedOptions, size_t& totalTextBytes)
 {
     if (apiOptionCount == 0U) {
         return ACLRTC_SUCCESS;
     }
     if (apiOptions == nullptr) {
+        ACLRTC_LOG_ERROR("%s must not be null when its count is %llu", optionFieldName,
+                         static_cast<unsigned long long>(apiOptionCount));
         return ACLRTC_ERROR_INVALID_INPUT;
     }
 
@@ -85,11 +106,14 @@ aclError CopyUserOptions(const char* const* apiOptions, uint64_t apiOptionCount,
     for (uint64_t optionIndex = 0; optionIndex < apiOptionCount; ++optionIndex) {
         std::string copiedOption;
         if (!ReadBoundedString(apiOptions[optionIndex], copiedOption, totalTextBytes)) {
+            ACLRTC_LOG_ERROR("%s[%llu] must be a non-empty string within request size limits", optionFieldName,
+                             static_cast<unsigned long long>(optionIndex));
             return ACLRTC_ERROR_INVALID_OPTION;
         }
-        if (ContainsAsciiControlCharacter(copiedOption) ||
-            (validateStructuralCompilerBoundaries && !IsStructurallySafeCompilerOption(copiedOption))) {
-            return ACLRTC_ERROR_INVALID_OPTION;
+        const aclError validationResult = ValidateCompilerOptionStructure(
+            copiedOption, optionFieldName, optionIndex, validateCompilerBoundaries);
+        if (validationResult != ACLRTC_SUCCESS) {
+            return validationResult;
         }
         copiedOptions.emplace_back(std::move(copiedOption));
     }
@@ -105,38 +129,53 @@ std::string CreateRequestId()
 aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& apiRequest, const char* outputElfPath,
                                               NormalizedKernelSpecializationRequest& normalizedRequest)
 {
-    if (std::any_of(std::begin(apiRequest.reserved), std::end(apiRequest.reserved),
-                    [](uint8_t value) { return value != 0U; })) {
+    const auto firstNonZeroReservedByte = std::find_if(
+        std::begin(apiRequest.reserved), std::end(apiRequest.reserved), [](uint8_t value) { return value != 0U; });
+    if (firstNonZeroReservedByte != std::end(apiRequest.reserved)) {
+        ACLRTC_LOG_ERROR("aclrtcKernelSpecRequest.reserved[%zu] must be zero; zero-initialize the request before use",
+                         static_cast<size_t>(firstNonZeroReservedByte - std::begin(apiRequest.reserved)));
         return ACLRTC_ERROR_INVALID_INPUT;
     }
 
     size_t totalTextBytes = 0U;
     NormalizedKernelSpecializationRequest request;
-    if (!ReadBoundedString(apiRequest.resourceId, request.resourceId, totalTextBytes) ||
-        !IsLowercaseSha256(request.resourceId) ||
-        !ReadBoundedString(apiRequest.kernelEntry, request.kernelName, totalTextBytes)) {
+    if (!ReadBoundedString(apiRequest.resourceId, request.resourceId, totalTextBytes)) {
+        ACLRTC_LOG_ERROR("resourceId must be a non-empty string within request size limits");
+        return ACLRTC_ERROR_INVALID_INPUT;
+    }
+    if (!IsLowercaseSha256(request.resourceId)) {
+        ACLRTC_LOG_ERROR("resourceId must contain exactly 64 lowercase hexadecimal characters");
+        return ACLRTC_ERROR_INVALID_INPUT;
+    }
+    if (!ReadBoundedString(apiRequest.kernelEntry, request.kernelName, totalTextBytes)) {
+        ACLRTC_LOG_ERROR("kernelEntry must be a non-empty string within request size limits");
         return ACLRTC_ERROR_INVALID_INPUT;
     }
 
     std::string copiedOutputElfPath;
-    if (!ReadBoundedString(outputElfPath, copiedOutputElfPath, totalTextBytes) ||
-        !boost::filesystem::path(copiedOutputElfPath).is_absolute()) {
+    if (!ReadBoundedString(outputElfPath, copiedOutputElfPath, totalTextBytes)) {
+        ACLRTC_LOG_ERROR("outPath must be a non-empty string within request size limits");
+        return ACLRTC_ERROR_INVALID_INPUT;
+    }
+    if (!boost::filesystem::path(copiedOutputElfPath).is_absolute()) {
+        ACLRTC_LOG_ERROR("outPath must be an absolute path");
         return ACLRTC_ERROR_INVALID_INPUT;
     }
     request.outputElfPath = std::move(copiedOutputElfPath);
 
     if (apiRequest.optionCount > MAX_USER_OPTION_COUNT ||
         apiRequest.skOptionCount > MAX_USER_OPTION_COUNT - apiRequest.optionCount) {
+        ACLRTC_LOG_ERROR("optionCount + skOptionCount must not exceed %zu", MAX_USER_OPTION_COUNT);
         return ACLRTC_ERROR_INVALID_INPUT;
     }
-    aclError result = CopyUserOptions(apiRequest.options, apiRequest.optionCount, true,
+    aclError result = CopyUserOptions(apiRequest.options, apiRequest.optionCount, "options", true,
                                       request.compilerOptions.basicOptions, totalTextBytes);
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
 
     std::vector<std::string> copiedSuperKernelOptions;
-    result = CopyUserOptions(apiRequest.skOptions, apiRequest.skOptionCount, false,
+    result = CopyUserOptions(apiRequest.skOptions, apiRequest.skOptionCount, "skOptions", false,
                              copiedSuperKernelOptions, totalTextBytes);
     if (result != ACLRTC_SUCCESS) {
         return result;
@@ -145,16 +184,19 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
     const size_t enableOptionCount = static_cast<size_t>(std::count(
         copiedSuperKernelOptions.begin(), copiedSuperKernelOptions.end(), SUPER_KERNEL_ENABLE_OPTION));
     if (enableOptionCount > 1U) {
+        ACLRTC_LOG_ERROR("skOptions must contain --enable-super-kernel at most once");
         return ACLRTC_ERROR_INVALID_OPTION;
     }
     if (enableOptionCount == 1U) {
         request.compilationVariant = CompilationVariant::BasicWithSuperKernel;
-        for (std::string& superKernelOption : copiedSuperKernelOptions) {
+        for (size_t optionIndex = 0U; optionIndex < copiedSuperKernelOptions.size(); ++optionIndex) {
+            std::string& superKernelOption = copiedSuperKernelOptions[optionIndex];
             if (superKernelOption == SUPER_KERNEL_ENABLE_OPTION) {
                 continue;
             }
-            if (!IsStructurallySafeCompilerOption(superKernelOption)) {
-                return ACLRTC_ERROR_INVALID_OPTION;
+            result = ValidateCompilerOptionStructure(superKernelOption, "skOptions", optionIndex, true);
+            if (result != ACLRTC_SUCCESS) {
+                return result;
             }
             request.compilerOptions.superKernelOptions.emplace_back(std::move(superKernelOption));
         }

@@ -10,6 +10,7 @@
 
 #include "specialization/kernel_specialization.h"
 #include "specialization/resource_registry_adapter.h"
+#include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
@@ -270,8 +271,13 @@ TEST(KernelSpecializationSessionTest, CleansWorktreeWhenRegistryReturnsIncomplet
 TEST(KernelSpecializationApiTest, RejectsNullPointersBeforeResourceLookup)
 {
     aclrtcKernelSpecRequest request {};
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(aclrtcKernelSpecialization(nullptr, "/tmp/kernel.elf"),
               ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("request must not be null"));
+
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(aclrtcKernelSpecialization(&request, nullptr), ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("outPath must not be null"));
 }
 } // namespace

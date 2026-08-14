@@ -9,6 +9,7 @@
  */
 
 #include "specialization/kernel_compilation_plan_builder.h"
+#include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
@@ -348,9 +349,12 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMissingRuntimeConstantBuffer)
     NormalizedKernelSpecializationRequest request = CreateRequest(workspace, nullptr, nullptr);
 
     KernelCompilationPlan plan;
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
                                            workspace.SourceFilePath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "constant parameter_index 0 requires argsAddr and argsBytes"));
 }
 } // namespace

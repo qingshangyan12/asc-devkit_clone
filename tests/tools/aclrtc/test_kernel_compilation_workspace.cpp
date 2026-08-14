@@ -9,6 +9,7 @@
  */
 
 #include "specialization/kernel_compilation_workspace.h"
+#include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
 
@@ -75,7 +76,10 @@ TEST(KernelCompilationWorkspaceTest, ReportsMissingPatchTemplateAsResourceFailur
     plan.sourcePatches = {{sourcePath, "@@MISSING@@", "{0x01}"}};
 
     KernelCompilationWorkspace workspace(worktreePath, true);
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(workspace.MaterializeCompilationInputs(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "patch template was not found"));
     EXPECT_EQ(ReadFile(sourcePath), "unchanged\n");
 
     boost::system::error_code ignoredError;
