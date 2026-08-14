@@ -15,10 +15,6 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC_IMPL
 #endif
 
-/*!
- * \file basic_arithmetic_impl.h
- * \brief Register arithmetic API implementations for asc::te.
- */
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_BASIC_ARITHMETIC_IMPL_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_BASIC_ARITHMETIC_IMPL_H
 
@@ -33,396 +29,337 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> broadcast_scalar(T value, vector_bool mask)
 {
     reg_tensor<T> dst;
-    asc_duplicate_scalar(dst.reg, static_cast<T>(value), mask);
+    asc_duplicate_scalar(dst.reg, value, mask);
     dst.mask = mask;
     return dst;
 }
 
+template <typename T, typename U>
+__simd_callee__ inline vector_bool binary_mask(T a, U b)
+{
+    static_assert(is_reg_tensor_v<T> || is_reg_tensor_v<U>, "at least one operand must be reg_tensor");
+    if constexpr (is_reg_tensor_v<T>) {
+        return a.mask;
+    } else {
+        return b.mask;
+    }
+}
+
+template <typename T, typename U>
+__simd_callee__ inline void check_binary_reg_types()
+{
+    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
+        static_assert(::AscendC::Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
+            "the reg_tensor operands must have the same element type");
+    }
+}
+
 } // namespace detail
 
-// =============================================================================
-// Unary arithmetic
-// =============================================================================
-
-/** @brief Element-wise absolute value. */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> abs(reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) abs(reg_tensor<T> src_reg)
 {
+    static_assert(detail::supports_abs_v<T>, "abs does not support this element type");
     reg_tensor<T> dst;
-    static_assert(detail::supports_abs_v<T>,
-        "abs supports int8_t, int16_t, half, int32_t, and float; documented int64_t/complex inputs "
-        "require software-emulation support that has not been ported to reg_tensor yet");
-    if constexpr (detail::supports_abs_v<T>) {
-        asc_abs(dst.reg, src.reg, src.mask);
-        dst.mask = src.mask;
-    }
+    asc_abs(dst.reg, src_reg.reg, src_reg.mask);
+    dst.mask = src_reg.mask;
     return dst;
 }
 
-/** @brief Element-wise natural exponential. */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> exp(reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) exp(reg_tensor<T> src_reg)
 {
-    reg_tensor<T> dst;
     static_assert(detail::supports_float_math_v<T>, "exp supports half and float");
-    if constexpr (detail::supports_float_math_v<T>) {
-        asc_exp(dst.reg, src.reg, src.mask);
-        dst.mask = src.mask;
-    }
+    reg_tensor<T> dst;
+    asc_exp(dst.reg, src_reg.reg, src_reg.mask);
+    dst.mask = src_reg.mask;
     return dst;
 }
 
-/** @brief Element-wise square root. */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sqrt(reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) sqrt(reg_tensor<T> src_reg)
 {
-    reg_tensor<T> dst;
     static_assert(detail::supports_float_math_v<T>, "sqrt supports half and float");
-    if constexpr (detail::supports_float_math_v<T>) {
-        asc_sqrt(dst.reg, src.reg, src.mask);
-        dst.mask = src.mask;
-    }
+    reg_tensor<T> dst;
+    asc_sqrt(dst.reg, src_reg.reg, src_reg.mask);
+    dst.mask = src_reg.mask;
     return dst;
 }
 
-/** @brief Element-wise natural logarithm. */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log(reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) log(reg_tensor<T> src_reg)
 {
-    reg_tensor<T> dst;
     static_assert(detail::supports_float_math_v<T>, "log supports half and float");
-    if constexpr (detail::supports_float_math_v<T>) {
-        asc_ln(dst.reg, src.reg, src.mask);
-        dst.mask = src.mask;
-    }
+    reg_tensor<T> dst;
+    asc_ln(dst.reg, src_reg.reg, src_reg.mask);
+    dst.mask = src_reg.mask;
     return dst;
 }
 
-/** @brief Element-wise base-2 logarithm. */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log2(reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) log2(reg_tensor<T> src_reg)
 {
+    auto natural_log = log(src_reg);
     reg_tensor<T> dst;
-    static_assert(detail::supports_float_math_v<T>, "log2 supports half and float");
-    if constexpr (detail::supports_float_math_v<T>) {
-        reg_tensor<T> ln = log(src);
-        asc_mul_scalar(dst.reg, ln.reg, static_cast<T>(1.4426950408889634), src.mask);
-        dst.mask = src.mask;
-    }
+    asc_mul_scalar(dst.reg, natural_log.reg, static_cast<T>(1.4426950408889634), src_reg.mask);
+    dst.mask = src_reg.mask;
     return dst;
 }
 
-/** @brief Element-wise base-10 logarithm. */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log10(reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) log10(reg_tensor<T> src_reg)
 {
+    auto natural_log = log(src_reg);
     reg_tensor<T> dst;
-    static_assert(detail::supports_float_math_v<T>, "log10 supports half and float");
-    if constexpr (detail::supports_float_math_v<T>) {
-        reg_tensor<T> ln = log(src);
-        asc_mul_scalar(dst.reg, ln.reg, static_cast<T>(0.4342944819032518), src.mask);
-        dst.mask = src.mask;
-    }
+    asc_mul_scalar(dst.reg, natural_log.reg, static_cast<T>(0.4342944819032518), src_reg.mask);
+    dst.mask = src_reg.mask;
     return dst;
 }
 
-/** @brief Element-wise arithmetic negation. */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) operator-(reg_tensor<T> src_reg)
 {
+    static_assert(detail::supports_neg_v<T>, "unary operator- does not support this element type");
     reg_tensor<T> dst;
-    static_assert(detail::supports_neg_v<T>,
-        "unary operator- supports int8_t, int16_t, half, int32_t, and float; documented int64_t support "
-        "requires software emulation that has not been ported to reg_tensor yet");
-    if constexpr (detail::supports_neg_v<T>) {
-        asc_neg(dst.reg, src.reg, src.mask);
-        dst.mask = src.mask;
-    }
+    asc_neg(dst.reg, src_reg.reg, src_reg.mask);
+    dst.mask = src_reg.mask;
     return dst;
 }
 
-/** @brief Element-wise ReLU. */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> relu(reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) relu(reg_tensor<T> src_reg)
 {
+    static_assert(detail::supports_relu_v<T>, "relu supports half, int32_t, and float");
     reg_tensor<T> dst;
-    static_assert(detail::supports_relu_v<T>,
-        "relu supports half, int32_t, and float; documented int64_t support requires software emulation "
-        "that has not been ported to reg_tensor yet");
-    if constexpr (detail::supports_relu_v<T>) {
-        asc_relu(dst.reg, src.reg, src.mask);
-        dst.mask = src.mask;
-    }
+    asc_relu(dst.reg, src_reg.reg, src_reg.mask);
+    dst.mask = src_reg.mask;
     return dst;
 }
 
-/**
- * @brief Element-wise PReLU.
- * @param src Input values.
- * @param slope Per-lane negative-axis slopes.
- */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> prelu(reg_tensor<T> src, reg_tensor<T> slope)
+__simd_callee__ inline decltype(auto) prelu(reg_tensor<T> src_reg, reg_tensor<T> slope)
 {
-    reg_tensor<T> dst;
     static_assert(detail::supports_float_math_v<T>, "prelu supports half and float");
-    if constexpr (detail::supports_float_math_v<T>) {
-        asc_prelu(dst.reg, src.reg, slope.reg, src.mask);
-        dst.mask = src.mask;
-    }
+    reg_tensor<T> dst;
+    asc_prelu(dst.reg, src_reg.reg, slope.reg, src_reg.mask);
+    dst.mask = src_reg.mask;
     return dst;
 }
 
-/** @brief Element-wise PReLU with a broadcast scalar slope. */
-template <typename T>
-__simd_callee__ inline reg_tensor<T> prelu(reg_tensor<T> src, detail::type_identity_t<T> slope)
+template <typename T, typename Scalar>
+__simd_callee__ inline decltype(auto) leaky_relu(reg_tensor<T> src_reg, Scalar slope)
 {
-    return prelu(src, detail::broadcast_scalar<T>(slope, src.mask));
-}
-
-/** @brief Element-wise PReLU with the one-argument form's default slope. */
-template <typename T>
-__simd_callee__ inline reg_tensor<T> prelu(reg_tensor<T> src)
-{
-    return prelu(src, static_cast<T>(0.25f));
-}
-
-/** @brief Element-wise Leaky ReLU with a scalar negative-axis slope. */
-template <typename T>
-__simd_callee__ inline reg_tensor<T> leaky_relu(reg_tensor<T> src, detail::type_identity_t<T> slope)
-{
-    reg_tensor<T> dst;
     static_assert(detail::supports_float_math_v<T>, "leaky_relu supports half and float");
-    if constexpr (detail::supports_float_math_v<T>) {
-        asc_leakyrelu(dst.reg, src.reg, slope, src.mask);
-        dst.mask = src.mask;
-    }
-    return dst;
-}
-
-/** @brief Element-wise Leaky ReLU with the one-argument form's default slope. */
-template <typename T>
-__simd_callee__ inline reg_tensor<T> leaky_relu(reg_tensor<T> src)
-{
-    return leaky_relu(src, static_cast<T>(0.01f));
-}
-
-// =============================================================================
-// Binary arithmetic
-// =============================================================================
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(reg_tensor<T> src0, reg_tensor<T> src1)
-{
+    static_assert(!detail::is_reg_tensor_v<Scalar> &&
+            ::AscendC::Std::is_convertible_v<::AscendC::Std::remove_cvref_t<Scalar>, T>,
+        "leaky_relu requires a scalar convertible to the reg_tensor element type");
     reg_tensor<T> dst;
-    static_assert(detail::supports_add_sub_v<T>,
-        "operator+ supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, "
-        "and float; documented 64-bit/complex types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_add_sub_v<T>) {
-        asc_add(dst.reg, src0.reg, src1.reg, src0.mask);
-        dst.mask = src0.mask;
+    asc_leakyrelu(dst.reg, src_reg.reg, static_cast<T>(slope), src_reg.mask);
+    dst.mask = src_reg.mask;
+    return dst;
+}
+
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator+(T a, U b)
+{
+    using elem_type = detail::binary_elem_t<T, U>;
+    detail::check_binary_reg_types<T, U>();
+    static_assert(detail::supports_add_sub_v<elem_type>, "operator+ does not support this element type");
+
+    reg_tensor<elem_type> dst;
+    vector_bool mask = detail::binary_mask(a, b);
+    if constexpr (detail::is_reg_tensor_v<T> && detail::is_reg_tensor_v<U>) {
+        asc_add(dst.reg, a.reg, b.reg, mask);
+    } else if constexpr (detail::is_reg_tensor_v<T>) {
+        asc_add_scalar(dst.reg, a.reg, static_cast<elem_type>(b), mask);
+    } else {
+        asc_add_scalar(dst.reg, b.reg, static_cast<elem_type>(a), mask);
     }
+    dst.mask = mask;
     return dst;
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(reg_tensor<T> src, detail::type_identity_t<T> value)
+__simd_callee__ inline decltype(auto) add(
+    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1)
 {
+    static_assert(detail::supports_carry_v<T>, "add with carry supports uint32_t");
     reg_tensor<T> dst;
-    static_assert(detail::supports_add_sub_v<T>,
-        "scalar operator+ supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, "
-        "and float; documented 64-bit/complex types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_add_sub_v<T>) {
-        asc_add_scalar(dst.reg, src.reg, value, src.mask);
-        dst.mask = src.mask;
-    }
+    asc_add(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
+    dst.mask = src0.mask;
     return dst;
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(detail::type_identity_t<T> value, reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) add_c(
+    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<bool> carry_src)
 {
-    return src + value;
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(reg_tensor<T> src0, reg_tensor<T> src1)
-{
+    static_assert(detail::supports_carry_v<T>, "add_c supports uint32_t");
     reg_tensor<T> dst;
-    static_assert(detail::supports_add_sub_v<T>,
-        "binary operator- supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, "
-        "and float; documented 64-bit/complex types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_add_sub_v<T>) {
-        asc_sub(dst.reg, src0.reg, src1.reg, src0.mask);
-        dst.mask = src0.mask;
+    asc_addc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
+    dst.mask = src0.mask;
+    return dst;
+}
+
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator-(T a, U b)
+{
+    using elem_type = detail::binary_elem_t<T, U>;
+    detail::check_binary_reg_types<T, U>();
+    static_assert(detail::supports_add_sub_v<elem_type>, "operator- does not support this element type");
+
+    vector_bool mask = detail::binary_mask(a, b);
+    reg_tensor<elem_type> left;
+    reg_tensor<elem_type> right;
+    if constexpr (detail::is_reg_tensor_v<T>) {
+        left = a;
+    } else {
+        left = detail::broadcast_scalar(static_cast<elem_type>(a), mask);
     }
+    if constexpr (detail::is_reg_tensor_v<U>) {
+        right = b;
+    } else {
+        right = detail::broadcast_scalar(static_cast<elem_type>(b), mask);
+    }
+
+    reg_tensor<elem_type> dst;
+    asc_sub(dst.reg, left.reg, right.reg, mask);
+    dst.mask = mask;
     return dst;
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(reg_tensor<T> src, detail::type_identity_t<T> value)
+__simd_callee__ inline decltype(auto) sub(
+    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1)
 {
-    static_assert(detail::supports_add_sub_v<T>,
-        "scalar operator- supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, "
-        "and float; documented 64-bit/complex types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_add_sub_v<T>) {
-        return src - detail::broadcast_scalar<T>(value, src.mask);
-    }
-    return {};
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(detail::type_identity_t<T> value, reg_tensor<T> src)
-{
-    static_assert(detail::supports_add_sub_v<T>,
-        "reversed scalar operator- supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, "
-        "uint32_t, and float; documented 64-bit/complex types require pending software emulation");
-    if constexpr (detail::supports_add_sub_v<T>) {
-        return detail::broadcast_scalar<T>(value, src.mask) - src;
-    }
-    return {};
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(reg_tensor<T> src0, reg_tensor<T> src1)
-{
+    static_assert(detail::supports_carry_v<T>, "sub with carry supports uint32_t");
     reg_tensor<T> dst;
-    static_assert(detail::supports_mul_v<T>,
-        "binary operator* supports int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, and float; "
-        "documented 64-bit/complex types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_mul_v<T>) {
-        asc_mul(dst.reg, src0.reg, src1.reg, src0.mask);
-        dst.mask = src0.mask;
-    }
+    asc_sub(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
+    dst.mask = src0.mask;
     return dst;
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(reg_tensor<T> src, detail::type_identity_t<T> value)
+__simd_callee__ inline decltype(auto) sub_c(
+    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<bool> carry_src)
 {
+    static_assert(detail::supports_carry_v<T>, "sub_c supports uint32_t");
     reg_tensor<T> dst;
-    static_assert(detail::supports_mul_scalar_v<T>,
-        "scalar operator* supports int16_t, uint16_t, half, int32_t, uint32_t, and float; documented "
-        "64-bit/complex types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_mul_scalar_v<T>) {
-        asc_mul_scalar(dst.reg, src.reg, value, src.mask);
-        dst.mask = src.mask;
+    asc_subc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
+    dst.mask = src0.mask;
+    return dst;
+}
+
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator*(T a, U b)
+{
+    using elem_type = detail::binary_elem_t<T, U>;
+    detail::check_binary_reg_types<T, U>();
+    if constexpr (detail::is_reg_tensor_v<T> && detail::is_reg_tensor_v<U>) {
+        static_assert(detail::supports_mul_v<elem_type>, "operator* does not support this element type");
+    } else {
+        static_assert(
+            detail::supports_mul_scalar_v<elem_type>, "scalar operator* does not support this element type");
     }
+
+    reg_tensor<elem_type> dst;
+    vector_bool mask = detail::binary_mask(a, b);
+    if constexpr (detail::is_reg_tensor_v<T> && detail::is_reg_tensor_v<U>) {
+        asc_mul(dst.reg, a.reg, b.reg, mask);
+    } else if constexpr (detail::is_reg_tensor_v<T>) {
+        asc_mul_scalar(dst.reg, a.reg, static_cast<elem_type>(b), mask);
+    } else {
+        asc_mul_scalar(dst.reg, b.reg, static_cast<elem_type>(a), mask);
+    }
+    dst.mask = mask;
     return dst;
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(detail::type_identity_t<T> value, reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) mull(
+    reg_tensor<T>& high, reg_tensor<T> src0, reg_tensor<T> src1)
 {
-    return src * value;
+    static_assert(detail::supports_mull_v<T>, "mull supports int32_t and uint32_t");
+    reg_tensor<T> low;
+    asc_mull(low.reg, high.reg, src0.reg, src1.reg, src0.mask);
+    low.mask = src0.mask;
+    high.mask = src0.mask;
+    return low;
 }
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator/(reg_tensor<T> src0, reg_tensor<T> src1)
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator/(T a, U b)
 {
-    reg_tensor<T> dst;
-    static_assert(detail::supports_div_v<T>,
-        "operator/ supports int16_t, uint16_t, half, int32_t, uint32_t, and float; documented 64-bit/complex "
-        "types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_div_v<T>) {
-        asc_div(dst.reg, src0.reg, src1.reg, src0.mask);
-        dst.mask = src0.mask;
+    using elem_type = detail::binary_elem_t<T, U>;
+    detail::check_binary_reg_types<T, U>();
+    static_assert(detail::supports_div_v<elem_type>, "operator/ does not support this element type");
+
+    vector_bool mask = detail::binary_mask(a, b);
+    reg_tensor<elem_type> left;
+    reg_tensor<elem_type> right;
+    if constexpr (detail::is_reg_tensor_v<T>) {
+        left = a;
+    } else {
+        left = detail::broadcast_scalar(static_cast<elem_type>(a), mask);
     }
+    if constexpr (detail::is_reg_tensor_v<U>) {
+        right = b;
+    } else {
+        right = detail::broadcast_scalar(static_cast<elem_type>(b), mask);
+    }
+
+    reg_tensor<elem_type> dst;
+    asc_div(dst.reg, left.reg, right.reg, mask);
+    dst.mask = mask;
     return dst;
 }
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator/(reg_tensor<T> src, detail::type_identity_t<T> value)
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) max(T a, U b)
 {
-    static_assert(detail::supports_div_v<T>,
-        "scalar operator/ supports int16_t, uint16_t, half, int32_t, uint32_t, and float; documented "
-        "64-bit/complex types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_div_v<T>) {
-        return src / detail::broadcast_scalar<T>(value, src.mask);
-    }
-    return {};
-}
+    using elem_type = detail::binary_elem_t<T, U>;
+    detail::check_binary_reg_types<T, U>();
+    static_assert(detail::supports_min_max_v<elem_type>, "max does not support this element type");
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator/(detail::type_identity_t<T> value, reg_tensor<T> src)
-{
-    static_assert(detail::supports_div_v<T>,
-        "reversed scalar operator/ supports int16_t, uint16_t, half, int32_t, uint32_t, and float; "
-        "documented 64-bit/complex types require pending software emulation");
-    if constexpr (detail::supports_div_v<T>) {
-        return detail::broadcast_scalar<T>(value, src.mask) / src;
+    reg_tensor<elem_type> dst;
+    vector_bool mask = detail::binary_mask(a, b);
+    if constexpr (detail::is_reg_tensor_v<T> && detail::is_reg_tensor_v<U>) {
+        asc_max(dst.reg, a.reg, b.reg, mask);
+    } else if constexpr (detail::is_reg_tensor_v<T>) {
+        asc_max_scalar(dst.reg, a.reg, static_cast<elem_type>(b), mask);
+    } else {
+        asc_max_scalar(dst.reg, b.reg, static_cast<elem_type>(a), mask);
     }
-    return {};
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> max(reg_tensor<T> src0, reg_tensor<T> src1)
-{
-    reg_tensor<T> dst;
-    static_assert(detail::supports_min_max_v<T>,
-        "max supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, and float; "
-        "documented 64-bit types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_min_max_v<T>) {
-        asc_max(dst.reg, src0.reg, src1.reg, src0.mask);
-        dst.mask = src0.mask;
-    }
+    dst.mask = mask;
     return dst;
 }
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> max(reg_tensor<T> src, detail::type_identity_t<T> value)
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) min(T a, U b)
 {
-    reg_tensor<T> dst;
-    static_assert(detail::supports_min_max_v<T>,
-        "scalar max supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, "
-        "and float; documented 64-bit types require pending software emulation");
-    if constexpr (detail::supports_min_max_v<T>) {
-        asc_max_scalar(dst.reg, src.reg, value, src.mask);
-        dst.mask = src.mask;
+    using elem_type = detail::binary_elem_t<T, U>;
+    detail::check_binary_reg_types<T, U>();
+    static_assert(detail::supports_min_max_v<elem_type>, "min does not support this element type");
+
+    vector_bool mask = detail::binary_mask(a, b);
+    reg_tensor<elem_type> left;
+    reg_tensor<elem_type> right;
+    if constexpr (detail::is_reg_tensor_v<T>) {
+        left = a;
+    } else {
+        left = detail::broadcast_scalar(static_cast<elem_type>(a), mask);
     }
+    if constexpr (detail::is_reg_tensor_v<U>) {
+        right = b;
+    } else {
+        right = detail::broadcast_scalar(static_cast<elem_type>(b), mask);
+    }
+
+    reg_tensor<elem_type> dst;
+    asc_min(dst.reg, left.reg, right.reg, mask);
+    dst.mask = mask;
     return dst;
 }
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> max(detail::type_identity_t<T> value, reg_tensor<T> src)
-{
-    return max(src, value);
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> min(reg_tensor<T> src0, reg_tensor<T> src1)
-{
-    reg_tensor<T> dst;
-    static_assert(detail::supports_min_max_v<T>,
-        "min supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, and float; "
-        "documented 64-bit types require software emulation that has not been ported yet");
-    if constexpr (detail::supports_min_max_v<T>) {
-        asc_min(dst.reg, src0.reg, src1.reg, src0.mask);
-        dst.mask = src0.mask;
-    }
-    return dst;
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> min(reg_tensor<T> src, detail::type_identity_t<T> value)
-{
-    static_assert(detail::supports_min_max_v<T>,
-        "scalar min supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, "
-        "and float; documented 64-bit types require pending software emulation");
-    if constexpr (detail::supports_min_max_v<T>) {
-        // asc_min_scalar has no bfloat16_t overload in the current backend.
-        // Broadcasting preserves the documented combination without widening.
-        return min(src, detail::broadcast_scalar<T>(value, src.mask));
-    }
-    return {};
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> min(detail::type_identity_t<T> value, reg_tensor<T> src)
-{
-    return min(src, value);
-}
-
 
 } // namespace te
 } // namespace asc

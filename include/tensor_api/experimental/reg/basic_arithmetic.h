@@ -21,100 +21,73 @@
 namespace asc {
 namespace te {
 
-// Unary arithmetic
 template <typename T>
-__simd_callee__ inline reg_tensor<T> abs(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) abs(reg_tensor<T> src_reg);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> exp(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) exp(reg_tensor<T> src_reg);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sqrt(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) sqrt(reg_tensor<T> src_reg);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) log(reg_tensor<T> src_reg);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log2(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) log2(reg_tensor<T> src_reg);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log10(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) log10(reg_tensor<T> src_reg);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) operator-(reg_tensor<T> src_reg);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> relu(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) relu(reg_tensor<T> src_reg);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> prelu(reg_tensor<T> src, reg_tensor<T> slope);
+__simd_callee__ inline decltype(auto) prelu(reg_tensor<T> src_reg, reg_tensor<T> slope);
+
+template <typename T, typename Scalar>
+__simd_callee__ inline decltype(auto) leaky_relu(reg_tensor<T> src_reg, Scalar slope);
+
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator+(T a, U b);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> prelu(reg_tensor<T> src, detail::type_identity_t<T> slope);
+__simd_callee__ inline decltype(auto) add(
+    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> prelu(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) add_c(
+    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<bool> carry_src);
+
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator-(T a, U b);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> leaky_relu(reg_tensor<T> src, detail::type_identity_t<T> slope);
+__simd_callee__ inline decltype(auto) sub(
+    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> leaky_relu(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) sub_c(
+    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<bool> carry_src);
 
-// Binary arithmetic
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(reg_tensor<T> src0, reg_tensor<T> src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(reg_tensor<T> src, detail::type_identity_t<T> value);
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator*(T a, U b);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(detail::type_identity_t<T> value, reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) mull(
+    reg_tensor<T>& high, reg_tensor<T> src0, reg_tensor<T> src1);
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(reg_tensor<T> src0, reg_tensor<T> src1);
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator/(T a, U b);
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(reg_tensor<T> src, detail::type_identity_t<T> value);
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) max(T a, U b);
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(detail::type_identity_t<T> value, reg_tensor<T> src);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(reg_tensor<T> src0, reg_tensor<T> src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(reg_tensor<T> src, detail::type_identity_t<T> value);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(detail::type_identity_t<T> value, reg_tensor<T> src);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator/(reg_tensor<T> src0, reg_tensor<T> src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator/(reg_tensor<T> src, detail::type_identity_t<T> value);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator/(detail::type_identity_t<T> value, reg_tensor<T> src);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> max(reg_tensor<T> src0, reg_tensor<T> src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> max(reg_tensor<T> src, detail::type_identity_t<T> value);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> max(detail::type_identity_t<T> value, reg_tensor<T> src);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> min(reg_tensor<T> src0, reg_tensor<T> src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> min(reg_tensor<T> src, detail::type_identity_t<T> value);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> min(detail::type_identity_t<T> value, reg_tensor<T> src);
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) min(T a, U b);
 
 } // namespace te
 } // namespace asc
