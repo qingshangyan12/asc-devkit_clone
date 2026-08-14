@@ -225,8 +225,9 @@ HcclResult AlltoAllVConstructOpParam(const void *sendBuf, const void *sendCounts
     u64 outputSize = 0;
     CHK_RET(CalcInputOutputSize(sendCountsData, recvCountsData, sdisplsData, rdisplsData,
         userRankSize, inputSize, outputSize));
-    param.inputSize = inputSize;
-    param.outputSize = outputSize;
+    u64 perDataSize = DATATYPE_SIZE_TABLE[dataType];
+    param.inputSize = inputSize * perDataSize;
+    param.outputSize = outputSize * perDataSize;
 
     param.enableDetour = false;
     param.opType = opType;
