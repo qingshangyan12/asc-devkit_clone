@@ -130,10 +130,6 @@ void CreateOpParamByBaseOpParam(
         param->all2AllVDataDes.recvCounts = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(extMsg.recvCounts));
         param->all2AllVDataDes.sdispls = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(extMsg.sendOffset));
         param->all2AllVDataDes.rdispls = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(extMsg.recvOffset));
-        uint64_t perDataSize = GetDataTypeSize(static_cast<HcclDataType>(msg.addMsg.v1Msg.hcclDataType));
-        uint64_t totalDataCnt = (msg.strideCount > 0) ? (msg.strideCount * rankNum) : (msg.dataCnt * rankNum);
-        param->inputSize = totalDataCnt * perDataSize;
-        param->outputSize = totalDataCnt * perDataSize;
     } else {
         param->DataDes.dataType = param->DataDes.outputType = static_cast<HcclDataType>(msg.addMsg.v1Msg.hcclDataType);
         param->DataDes.count = msg.dataCnt;
