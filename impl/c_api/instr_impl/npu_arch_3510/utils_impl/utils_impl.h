@@ -11,7 +11,8 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_UTILS_C_API_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_UTILS_C_API_IMPL_H
 
-#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
+#define ASC_IS_AIV ASCEND_IS_AIV
+#define ASC_IS_AIC ASCEND_IS_AIC
 
 union asc_gm2l1_loop_size_config {
     uint64_t config;
