@@ -10,6 +10,7 @@
 
 #include "specialization/compilation_command_executor.h"
 #include "specialization/kernel_specialization_diagnostics.h"
+#include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
 
@@ -138,9 +139,12 @@ TEST(CompilationCommandExecutorTest, UsesInjectedShortTimeoutInUnitTests)
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/sleep", {"10"}));
 
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     const auto startedAt = std::chrono::steady_clock::now();
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
     EXPECT_LT(std::chrono::steady_clock::now() - startedAt, 2s);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "Command test-command exceeded its 20 ms execution timeout"));
 }
 
 TEST(CompilationCommandExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeaderExits)

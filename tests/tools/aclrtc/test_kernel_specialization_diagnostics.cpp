@@ -9,6 +9,7 @@
  */
 
 #include "specialization/kernel_specialization_diagnostics.h"
+#include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
@@ -90,6 +91,26 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
     EXPECT_EQ(result.at("output_path"), "/tmp/kernel.elf");
     EXPECT_TRUE(result.at("output_published"));
     EXPECT_FALSE(result.contains("result"));
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationDiagnosticsTest, ReportsDiagnosticDirectoryCreationFailureWithPath)
+{
+    static uint64_t sequence = 0U;
+    const fs::path testRoot = fs::temp_directory_path() /
+                              ("aclrtc_diagnostics_error_test_" + std::to_string(getpid()) + "_" +
+                               std::to_string(sequence++));
+    fs::create_directories(testRoot);
+    std::ofstream(testRoot / "kernel_meta") << "blocks directory creation";
+    {
+        ScopedCurrentDirectory currentDirectory(testRoot);
+        ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+        KernelSpecializationDiagnostics diagnostics("session_error", DiagnosticCollectionMode::Enabled);
+        EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+            (testRoot / "kernel_meta" / std::to_string(getpid()) / "aclrtc_session_error").string()));
+    }
 
     boost::system::error_code ignoredError;
     fs::remove_all(testRoot, ignoredError);
