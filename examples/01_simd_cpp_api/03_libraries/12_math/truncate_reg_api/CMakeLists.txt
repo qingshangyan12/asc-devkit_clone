@@ -32,10 +32,9 @@ add_executable(demo
 )
 
 set(ASCEND_HOME "$ENV{ASCEND_HOME_PATH}")
+set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
 include_directories(
-    "${ASCEND_HOME}/asc/"
-    "${ASC_DEVKIT_ROOT}"
-    "${ASC_DEVKIT_ROOT}/include"
+    "${ASC_INCLUDE_DIR}"
 )
 
 target_compile_definitions(demo PRIVATE
