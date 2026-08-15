@@ -56,15 +56,16 @@ const char* GetTerminationName(CompilationProcessTermination termination)
 } // namespace
 
 KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
-    std::string requestId, DiagnosticCollectionMode collectionMode)
-    : requestId_(std::move(requestId)), diagnosticsEnabled_(collectionMode == DiagnosticCollectionMode::Enabled)
+    std::string specializationSessionId, DiagnosticCollectionMode collectionMode)
+    : specializationSessionId_(std::move(specializationSessionId)),
+      diagnosticsEnabled_(collectionMode == DiagnosticCollectionMode::Enabled)
 {
     if (!diagnosticsEnabled_) {
         return;
     }
     try {
         diagnosticDirectoryPath_ = fs::current_path() / "kernel_meta" / std::to_string(getpid()) /
-                                   ("aclrtc_" + requestId_);
+                                   ("aclrtc_" + specializationSessionId_);
         boost::system::error_code directoryError;
         fs::create_directories(diagnosticDirectoryPath_, directoryError);
         if (directoryError) {
@@ -162,7 +163,7 @@ void KernelSpecializationDiagnostics::RecordSpecializationResult(
     }
     try {
         nlohmann::json resultJson {
-            {"request_id", requestId_},
+            {"specialization_session_id", specializationSessionId_},
             {"output_path", outputElfPath.string()},
             {"output_published", publicationStatus == OutputPublicationStatus::Published},
         };

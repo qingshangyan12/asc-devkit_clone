@@ -169,7 +169,7 @@ C++ 字符串校验内容与操作系统实际接收内容不一致。管道、s
 `ASCEND_OP_COMPILE_SAVE_KERNEL_META=1` 时保留 worktree，并在当前目录写入：
 
 ```text
-kernel_meta/<pid>/aclrtc_<requestId>/
+kernel_meta/<pid>/aclrtc_<specializationSessionId>/
 ├── manifest.json
 ├── replay.sh
 ├── compile.log

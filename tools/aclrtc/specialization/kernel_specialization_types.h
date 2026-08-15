@@ -55,14 +55,14 @@ struct KernelCompilerOptions {
 };
 
 struct NormalizedKernelSpecializationRequest {
-    std::string requestId;
+    std::string specializationSessionId;
     std::string resourceId;
     std::string kernelName;
     boost::filesystem::path outputElfPath;
     CompilationVariant compilationVariant {CompilationVariant::Basic};
     KernelCompilerOptions compilerOptions;
     uint64_t kernelArgumentCount {0};
-    const void* const* borrowedKernelArgumentAddresses {nullptr};
+    const void* const* borrowedKernelArgumentDataPointers {nullptr};
     const uint64_t* borrowedKernelArgumentByteCounts {nullptr};
 };
 

@@ -61,7 +61,7 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
     fs::create_directories(testRoot);
     {
         ScopedCurrentDirectory currentDirectory(testRoot);
-        KernelSpecializationDiagnostics diagnostics("request_1", DiagnosticCollectionMode::Enabled);
+        KernelSpecializationDiagnostics diagnostics("session_1", DiagnosticCollectionMode::Enabled);
         diagnostics.SaveManifestForDiagnostics(nlohmann::json {{"schema_version", "1.0"}});
         diagnostics.RecordResourceWorktreePath("/tmp/resource-worktree");
 
@@ -75,7 +75,7 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
     }
 
     const fs::path diagnosticDirectory =
-        testRoot / "kernel_meta" / std::to_string(getpid()) / "aclrtc_request_1";
+        testRoot / "kernel_meta" / std::to_string(getpid()) / "aclrtc_session_1";
     EXPECT_TRUE(fs::is_regular_file(diagnosticDirectory / "manifest.json"));
     EXPECT_TRUE(fs::is_regular_file(diagnosticDirectory / "replay.sh"));
     EXPECT_TRUE(fs::is_regular_file(diagnosticDirectory / "compile.log"));
@@ -86,7 +86,7 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
     EXPECT_NE(replayScript.find("'/bin/echo' 'argument with space' 'quote'\"'\"'value'"), std::string::npos);
 
     const nlohmann::json result = nlohmann::json::parse(ReadTextFile(diagnosticDirectory / "result.json"));
-    EXPECT_EQ(result.at("request_id"), "request_1");
+    EXPECT_EQ(result.at("specialization_session_id"), "session_1");
     EXPECT_EQ(result.at("output_path"), "/tmp/kernel.elf");
     EXPECT_TRUE(result.at("output_published"));
     EXPECT_FALSE(result.contains("result"));

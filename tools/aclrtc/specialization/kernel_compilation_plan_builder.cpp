@@ -186,7 +186,7 @@ aclError BuildSourcePatches(const Json& selectedKernel,
     for (const Json& constantInfo : *constantInfos) {
         const uint64_t parameterIndex = constantInfo.at("parameter_index").get<uint64_t>();
         const uint64_t constantByteCount = constantInfo.at("byte_size").get<uint64_t>();
-        if (specializationRequest.borrowedKernelArgumentAddresses == nullptr ||
+        if (specializationRequest.borrowedKernelArgumentDataPointers == nullptr ||
             specializationRequest.borrowedKernelArgumentByteCounts == nullptr) {
             ACLRTC_LOG_ERROR("constant parameter_index %llu requires argsAddr and argsBytes",
                              static_cast<unsigned long long>(parameterIndex));
@@ -198,7 +198,7 @@ aclError BuildSourcePatches(const Json& selectedKernel,
                              static_cast<unsigned long long>(specializationRequest.kernelArgumentCount));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
-        if (specializationRequest.borrowedKernelArgumentAddresses[parameterIndex] == nullptr) {
+        if (specializationRequest.borrowedKernelArgumentDataPointers[parameterIndex] == nullptr) {
             ACLRTC_LOG_ERROR("argsAddr[%llu] must not be null for a static constant",
                              static_cast<unsigned long long>(parameterIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
@@ -220,7 +220,7 @@ aclError BuildSourcePatches(const Json& selectedKernel,
         }
         sourcePatches.push_back(
             {resolvedTargetFilePath, constantInfo.at("template").get<std::string>(),
-             EncodeConstantBytes(specializationRequest.borrowedKernelArgumentAddresses[parameterIndex],
+             EncodeConstantBytes(specializationRequest.borrowedKernelArgumentDataPointers[parameterIndex],
                                  constantByteCount)});
     }
     return ACLRTC_SUCCESS;
@@ -422,7 +422,7 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
 
         KernelCompilationPlan builtPlan;
         const fs::path outputDirectoryPath =
-            resourceWorktreePath_ / (".aclrtc_" + specializationRequest_.requestId) / "outputs";
+            resourceWorktreePath_ / (".aclrtc_" + specializationRequest_.specializationSessionId) / "outputs";
         const ManifestExpansionContext expansionContext {
             resourceManifest_, resourceWorktreePath_, outputDirectoryPath, sourceFilePath_};
         aclError result = BuildSourcePatches(*selectedKernel, specializationRequest_, expansionContext,
