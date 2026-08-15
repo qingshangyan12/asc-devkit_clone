@@ -128,9 +128,15 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     }
 
     const bool saveKernelMetaEnabled = IsKernelMetaSavingEnabled();
-    KernelSpecializationDiagnostics diagnostics(specializationRequest.requestId, saveKernelMetaEnabled);
-    auto finishRequest = [&](aclError specializationResult, bool outputElfPublished) {
-        diagnostics.RecordSpecializationResult(specializationRequest.outputElfPath, outputElfPublished);
+    const DiagnosticCollectionMode diagnosticCollectionMode = saveKernelMetaEnabled
+        ? DiagnosticCollectionMode::Enabled
+        : DiagnosticCollectionMode::Disabled;
+    KernelSpecializationDiagnostics diagnostics(specializationRequest.requestId, diagnosticCollectionMode);
+    auto finishRequest = [&](aclError specializationResult) {
+        const OutputPublicationStatus publicationStatus = specializationResult == ACLRTC_SUCCESS
+            ? OutputPublicationStatus::Published
+            : OutputPublicationStatus::NotPublished;
+        diagnostics.RecordSpecializationResult(specializationRequest.outputElfPath, publicationStatus);
         if (specializationResult == ACLRTC_SUCCESS) {
             ACLRTC_LOG_INFO("Kernel %s specialization completed", specializationRequest.kernelName.c_str());
         } else {
@@ -143,47 +149,51 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     RegisteredJitResource registeredResource;
     result = resourceRegistryAdapter_.LoadAndLookupJitResource(specializationRequest.resourceId, registeredResource);
     if (result != ACLRTC_SUCCESS) {
-        return finishRequest(result, false);
+        return finishRequest(result);
     }
 
-    KernelCompilationWorkspace compilationWorkspace(std::move(registeredResource.resourceWorktreePath),
-                                                    saveKernelMetaEnabled);
+    const WorktreeRetentionPolicy worktreeRetentionPolicy = saveKernelMetaEnabled
+        ? WorktreeRetentionPolicy::RetainForDiagnostics
+        : WorktreeRetentionPolicy::RemoveAfterCompilation;
+    KernelCompilationWorkspace compilationWorkspace(
+        std::move(registeredResource.ownedWorktreePath), worktreeRetentionPolicy);
     diagnostics.RecordResourceWorktreePath(compilationWorkspace.GetWorktreePath());
-    if (registeredResource.resourceManifest == nullptr) {
+    if (registeredResource.borrowedManifest == nullptr) {
         ACLRTC_LOG_ERROR("ResourceRegistry returned a null resource Manifest");
-        return finishRequest(ACLRTC_ERROR_FAILURE, false);
+        return finishRequest(ACLRTC_ERROR_FAILURE);
     }
     if (compilationWorkspace.GetWorktreePath().empty()) {
         ACLRTC_LOG_ERROR("ResourceRegistry returned an empty resource worktree path");
-        return finishRequest(ACLRTC_ERROR_FAILURE, false);
+        return finishRequest(ACLRTC_ERROR_FAILURE);
     }
-    if (registeredResource.sourceFilePath.empty()) {
+    if (registeredResource.externalSourceFilePath.empty()) {
         ACLRTC_LOG_ERROR("ResourceRegistry returned an empty sourceFilePath");
-        return finishRequest(ACLRTC_ERROR_FAILURE, false);
+        return finishRequest(ACLRTC_ERROR_FAILURE);
     }
-    diagnostics.SaveManifestForDiagnostics(*registeredResource.resourceManifest);
+    diagnostics.SaveManifestForDiagnostics(*registeredResource.borrowedManifest);
 
     KernelCompilationPlan compilationPlan;
-    result = KernelCompilationPlanBuilder(specializationRequest, *registeredResource.resourceManifest,
-                                          compilationWorkspace.GetWorktreePath(), registeredResource.sourceFilePath)
+    result = KernelCompilationPlanBuilder(specializationRequest, *registeredResource.borrowedManifest,
+                                          compilationWorkspace.GetWorktreePath(),
+                                          registeredResource.externalSourceFilePath)
                  .BuildCompilationPlan(compilationPlan);
     if (result != ACLRTC_SUCCESS) {
-        return finishRequest(result, false);
+        return finishRequest(result);
     }
     result = compilationWorkspace.MaterializeCompilationInputs(compilationPlan);
     if (result != ACLRTC_SUCCESS) {
-        return finishRequest(result, false);
+        return finishRequest(result);
     }
 
     CompilationCommandExecutor commandExecutor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     result = commandExecutor.ExecuteCompilationPlan(compilationPlan);
     if (result != ACLRTC_SUCCESS) {
-        return finishRequest(result, false);
+        return finishRequest(result);
     }
 
     result = PublishKernelElf(compilationPlan.linkedKernelElfPath, specializationRequest.outputElfPath,
                               compilationWorkspace);
-    return finishRequest(result, result == ACLRTC_SUCCESS);
+    return finishRequest(result);
 }
 
 aclError KernelSpecializationSession::PublishKernelElf(

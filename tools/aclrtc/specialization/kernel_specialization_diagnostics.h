@@ -14,15 +14,26 @@
 #include "kernel_specialization_types.h"
 
 #include <boost/filesystem/path.hpp>
+#include <cstdint>
 #include <nlohmann/json.hpp>
 #include <string>
 
 namespace ascendc {
 namespace aclrtc {
 
+enum class DiagnosticCollectionMode : uint32_t {
+    Disabled,
+    Enabled,
+};
+
+enum class OutputPublicationStatus : uint32_t {
+    NotPublished,
+    Published,
+};
+
 class KernelSpecializationDiagnostics final {
 public:
-    KernelSpecializationDiagnostics(std::string requestId, bool saveKernelMetaEnabled);
+    KernelSpecializationDiagnostics(std::string requestId, DiagnosticCollectionMode collectionMode);
 
     void SaveManifestForDiagnostics(const nlohmann::json& resourceManifest) noexcept;
     void RecordResourceWorktreePath(const boost::filesystem::path& resourceWorktreePath) noexcept;
@@ -30,13 +41,13 @@ public:
     void RecordCompilationProcessResult(const CompilationCommand& compilationCommand,
                                         const CompilationProcessResult& processResult) noexcept;
     void RecordSpecializationResult(const boost::filesystem::path& outputElfPath,
-                                    bool outputElfPublished) noexcept;
+                                    OutputPublicationStatus publicationStatus) noexcept;
 
 private:
     void AppendDiagnosticText(const boost::filesystem::path& filePath, const std::string& text) noexcept;
 
     std::string requestId_;
-    bool saveKernelMetaEnabled_ {false};
+    bool diagnosticsEnabled_ {false};
     boost::filesystem::path diagnosticDirectoryPath_;
 };
 

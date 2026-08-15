@@ -154,10 +154,10 @@ private:
     bool spawnAttributesInitialized_ {false};
 };
 
-bool SignalProcessGroup(pid_t childProcessId, int signalNumber) noexcept
+void SignalProcessGroup(pid_t childProcessId, int signalNumber) noexcept
 {
     if (kill(-childProcessId, signalNumber) == 0) {
-        return true;
+        return;
     }
     const int processGroupError = errno;
     if (processGroupError != ESRCH) {
@@ -165,20 +165,19 @@ bool SignalProcessGroup(pid_t childProcessId, int signalNumber) noexcept
                            static_cast<int>(childProcessId), signalNumber, processGroupError);
     }
     if (kill(childProcessId, signalNumber) == 0 || errno == ESRCH) {
-        return processGroupError == ESRCH;
+        return;
     }
     ACLRTC_LOG_WARNING("Failed to signal command process leader: pid=%d signal=%d errno=%d",
                        static_cast<int>(childProcessId), signalNumber, errno);
-    return false;
 }
 
-bool TerminateAndReapProcessGroup(pid_t childProcessId, std::chrono::milliseconds terminationGracePeriod,
+void TerminateAndReapProcessGroup(pid_t childProcessId, std::chrono::milliseconds terminationGracePeriod,
                                   int& childStatus) noexcept
 {
-    bool cleanupSucceeded = SignalProcessGroup(childProcessId, SIGTERM);
+    SignalProcessGroup(childProcessId, SIGTERM);
     // Keep the leader unreaped during the grace period so its PID cannot be reused as another process group ID.
     std::this_thread::sleep_for(terminationGracePeriod);
-    cleanupSucceeded = SignalProcessGroup(childProcessId, SIGKILL) && cleanupSucceeded;
+    SignalProcessGroup(childProcessId, SIGKILL);
 
     pid_t waitResult;
     do {
@@ -186,9 +185,7 @@ bool TerminateAndReapProcessGroup(pid_t childProcessId, std::chrono::millisecond
     } while (waitResult < 0 && errno == EINTR);
     if (waitResult != childProcessId) {
         ACLRTC_LOG_ERROR("Failed to reap command process: pid=%d errno=%d", static_cast<int>(childProcessId), errno);
-        return false;
     }
-    return cleanupSucceeded;
 }
 
 class RunningProcessGroup final {
@@ -216,15 +213,13 @@ public:
         running_ = false;
     }
 
-    bool TerminateAndReap(int& childStatus) noexcept
+    void TerminateAndReap(int& childStatus) noexcept
     {
         if (!running_) {
-            return true;
+            return;
         }
-        const bool cleanupSucceeded =
-            TerminateAndReapProcessGroup(childProcessId_, terminationGracePeriod_, childStatus);
+        TerminateAndReapProcessGroup(childProcessId_, terminationGracePeriod_, childStatus);
         running_ = false;
-        return cleanupSucceeded;
     }
 
 private:
@@ -416,9 +411,8 @@ aclError CompilationCommandExecutor::ExecuteCompilationCommand(
     const SteadyClock::time_point executionDeadline =
         startedAt + GetCommandExecutionTimeout(compilationCommand.commandKind);
     int childStatus = 0;
-    bool childExited = false;
     bool infrastructureFailure = false;
-    while (!childExited) {
+    while (true) {
         if (!AppendAvailableProcessOutput(outputReadFileDescriptor.GetFileDescriptor(),
                                           executionLimits_.capturedOutputByteLimit, processResult)) {
             infrastructureFailure = true;
@@ -427,7 +421,6 @@ aclError CompilationCommandExecutor::ExecuteCompilationCommand(
         const pid_t waitResult = waitpid(childProcessId, &childStatus, WNOHANG);
         if (waitResult == childProcessId) {
             runningProcessGroup.MarkReaped();
-            childExited = true;
             break;
         }
         if (waitResult < 0) {
@@ -442,7 +435,6 @@ aclError CompilationCommandExecutor::ExecuteCompilationCommand(
         if (SteadyClock::now() >= executionDeadline) {
             processResult.termination = CompilationProcessTermination::TimedOut;
             runningProcessGroup.TerminateAndReap(childStatus);
-            childExited = true;
             break;
         }
 

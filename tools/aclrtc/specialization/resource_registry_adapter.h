@@ -21,9 +21,9 @@ namespace ascendc {
 namespace aclrtc {
 
 struct RegisteredJitResource {
-    const nlohmann::json* resourceManifest {nullptr};
-    boost::filesystem::path resourceWorktreePath;
-    boost::filesystem::path sourceFilePath;
+    const nlohmann::json* borrowedManifest {nullptr};
+    boost::filesystem::path ownedWorktreePath;
+    boost::filesystem::path externalSourceFilePath;
 };
 
 class JitResourceRegistryAdapter final {
