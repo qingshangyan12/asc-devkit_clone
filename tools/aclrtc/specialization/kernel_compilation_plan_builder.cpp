@@ -176,12 +176,13 @@ std::string EncodeConstantBytes(const void* constantAddress, uint64_t constantBy
 
 aclError BuildSourcePatches(const Json& selectedKernel,
                             const NormalizedKernelSpecializationRequest& specializationRequest,
-                            const ManifestExpansionContext& expansionContext,
-                            std::vector<KernelSourcePatch>& sourcePatches)
+    const ManifestExpansionContext& expansionContext,
+    std::vector<KernelSourcePatch>& sourcePatches)
 {
     const auto constantInfos = selectedKernel.find("constant_infos");
-    if (constantInfos == selectedKernel.end()) {
-        return ACLRTC_SUCCESS;
+    if (constantInfos == selectedKernel.end() || constantInfos->empty()) {
+        ACLRTC_LOG_ERROR("Selected kernel must contain at least one constant_info for static compilation");
+        return ACLRTC_ERROR_FAILURE;
     }
     for (const Json& constantInfo : *constantInfos) {
         const uint64_t parameterIndex = constantInfo.at("parameter_index").get<uint64_t>();

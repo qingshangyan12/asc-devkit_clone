@@ -114,7 +114,7 @@ worktree，查询成功后清理责任转移给 ACLRTC；`sourceFilePath` 是本
 ACLRTC 只读取当前请求实际使用的字段：
 
 - 顶层：`schema_version`、`options`、`kernels`。
-- 目标 Kernel：`kernel_name`、可选的 `constant_infos`、可选的 `link_options`、`objects`。
+- 目标 Kernel：`kernel_name`、至少包含一项的 `constant_infos`、可选的 `link_options`、`objects`。
 - 所选对象：`object_type`、`commands`、`outputs`。
 - command：`type`、`cmd`，以及可选的 `stage`。
 

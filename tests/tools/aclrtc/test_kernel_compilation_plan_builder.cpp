@@ -322,23 +322,52 @@ TEST(KernelCompilationPlanBuilderTest, DoesNotRecursivelyExpandEnvironmentOrUser
               commandArguments.end());
 }
 
-TEST(KernelCompilationPlanBuilderTest, AcceptsKernelWithoutConstantsOrLinkOptions)
+TEST(KernelCompilationPlanBuilderTest, AcceptsKernelWithoutLinkOptions)
 {
     KernelPlanTestWorkspace workspace;
     ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
     Json manifest = CreateManifest();
-    manifest["kernels"][1].erase("constant_infos");
     manifest["kernels"][1].erase("link_options");
-    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, nullptr, nullptr);
+    const uint8_t tilingBytes[] = {0x01, 0x02};
+    const void* argumentAddresses[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
+    NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentAddresses, argumentByteCounts);
 
     KernelCompilationPlan plan;
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceFilePath())
                   .BuildCompilationPlan(plan),
               0);
-    EXPECT_TRUE(plan.sourcePatches.empty());
+    EXPECT_EQ(plan.sourcePatches.size(), 1U);
     ASSERT_EQ(plan.compilationCommands.size(), 2U);
     EXPECT_EQ(plan.compilationCommands.back().commandKind, CompilationCommandKind::Link);
+}
+
+TEST(KernelCompilationPlanBuilderTest, RejectsKernelWithoutStaticConstants)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, nullptr, nullptr);
+    KernelCompilationPlan plan;
+
+    Json manifestWithoutConstants = CreateManifest();
+    manifestWithoutConstants["kernels"][1].erase("constant_infos");
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithoutConstants, workspace.ResourcePath(),
+                                           workspace.SourceFilePath())
+                  .BuildCompilationPlan(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "Selected kernel must contain at least one constant_info"));
+
+    Json manifestWithEmptyConstants = CreateManifest();
+    manifestWithEmptyConstants["kernels"][1]["constant_infos"] = Json::array();
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithEmptyConstants, workspace.ResourcePath(),
+                                           workspace.SourceFilePath())
+                  .BuildCompilationPlan(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
 TEST(KernelCompilationPlanBuilderTest, RejectsMissingRuntimeConstantBuffer)
