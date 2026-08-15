@@ -32,18 +32,27 @@ data_copy_l0c2l1
 
 通过编译参数`SCENARIO_NUM`选择场景。所有场景的矩阵乘规格均为`[M, K, N] = [128, 128, 128]`，其中K轴拆分为两个`[128, 64]`分块，内核函数名为`data_copy_l0c2l1`。
 
-| SCENARIO_NUM | A/B类型 | L0C类型 | 输出类型与格式 | 量化模式 |
-|---|---|---|---|---|
-| 1 | half | float | int8_t，Nz | 标量`QF322B8_PRE` |
-| 2 | half | float | int8_t，Nz | Vector `VQF322B8_PRE` |
-| 3 | int8_t | int32_t | int8_t，Nz | 标量`REQ8` |
-| 4 | int8_t | int32_t | int8_t，Nz | Vector `VREQ8` |
-| 5 | half | float | half，Nz | Cast `F322F16` |
-| 6 | half | float | half，Nz | Vector `VQF322F16_PRE` |
-| 7 | int8_t | int32_t | half，Nz | 标量`DEQF16`（int32→half反量化） |
-| 8 | int8_t | int32_t | half，Nz | Vector `VDEQF16`（int32→half反量化） |
+| SCENARIO_NUM | A/B类型 | L0C类型 | 输出类型与格式 | 量化模式 | 第二次Mmad类型 |
+|---|---|---|---|---|---|
+| 1 | half | float | int8_t，Nz | 标量`QF322B8_PRE` | int8×int8→int32 |
+| 2 | half | float | int8_t，Nz | Vector `VQF322B8_PRE` | int8×int8→int32 |
+| 3 | int8_t | int32_t | int8_t，Nz | 标量`REQ8` | int8×int8→int32 |
+| 4 | int8_t | int32_t | int8_t，Nz | Vector `VREQ8` | int8×int8→int32 |
+| 5 | half | float | half，Nz | Cast `F322F16` | half×half→float |
+| 6 | half | float | half，Nz | Vector `VQF322F16_PRE` | half×half→float |
+| 7 | int8_t | int32_t | half，Nz | 标量`DEQF16`（int32→half反量化） | half×half→float |
+| 8 | int8_t | int32_t | half，Nz | Vector `VDEQF16`（int32→half反量化） | half×half→float |
+| 9 | half | float | bfloat16_t，Nz | Cast `F322BF16` | bf16×bf16→float |
+| 10 | half | float | bfloat16_t，Nz | Vector `VQF322BF16_PRE` | bf16×bf16→float |
+| 11 | int8_t | int32_t | int4b_t，Nz | Vector `VREQ4` | int4b×int4b→int32 |
+| 12 | int8_t | int32_t | bfloat16_t，Nz | Vector `VQS322BF16_PRE` | bf16×bf16→float |
+| 13 | half | float | int4b_t，Nz | Vector `VQF322S4_PRE` | int4b×int4b→int32 |
+| 14 | half | float | fp8_e4m3fn_t，Nz | Vector `VQF322FP8_PRE` | fp8×fp8→float |
+| 15 | half | float | hifloat8_t，Nz | Vector `VQF322HIF8_PRE` | hif8×hif8→float |
+| 16 | half | float | hifloat8_t，Nz | Vector `VQF322HIF8_PRE_HYBRID` | hif8×hif8→float |
+| 17 | half | float | float，Nz | Vector `VQF322F32_PRE` | float×float→float |
 
-> **说明：** 场景1-8已在当前CANN版本验证编译通过。`gen_data.py`和`verify_result.py`还额外支持场景9-17的测试数据生成与验证（涵盖`F322BF16`、`VQF322BF16_PRE`、`VREQ4`、`VQS322BF16_PRE`、`VQF322S4_PRE`、`VQF322FP8_PRE`、`VQF322HIF8_PRE`、`VQF322HIF8_PRE_HYBRID`、`VQF322F32_PRE`），这些场景需要更新的CANN版本支持对应的`asc_copy_l0c2l1`函数重载。
+> **说明：** 场景9-17需要CANN版本支持对应的`asc_copy_l0c2l1`、`asc_copy_l12l0a`、`asc_copy_l12l0b_trans`和`asc_mmad`函数重载（int4b_t、bfloat16_t、fp8_e4m3fn_t、hifloat8_t、float类型）。
 
 `SCENARIO_NUM`由CMake作为编译期宏传入，内核通过`if constexpr`选择对应场景。切换场景后，需要重新编译。
 
@@ -97,7 +106,7 @@ data_copy_l0c2l1
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | 1-8 | 场景编号 |
+  | `SCENARIO_NUM` | 1-17 | 场景编号 |
 
 - 执行结果
 

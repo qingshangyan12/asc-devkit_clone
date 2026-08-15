@@ -32,14 +32,27 @@ data_copy_l0c2l1
 
 Use the `SCENARIO_NUM` build parameter to select a scenario. Every scenario uses the matrix-multiplication shape `[M, K, N] = [128, 128, 128]`; the K axis is split into two `[128, 64]` chunks. The kernel is named `data_copy_l0c2l1`.
 
-| SCENARIO_NUM | A/B type | L0C type | Output type and format | Quantization mode |
-|---|---|---|---|---|
-| 1 | half | float | int8_t, Nz | Scalar `QF322B8_PRE` |
-| 2 | half | float | int8_t, Nz | Vector `VQF322B8_PRE` |
-| 3 | int8_t | int32_t | int8_t, Nz | Scalar `REQ8` |
-| 4 | int8_t | int32_t | int8_t, Nz | Vector `VREQ8` |
-| 5 | half | float | half, Nz | Cast `F322F16` |
-| 6 | half | float | half, Nz | Vector `VQF322F16_PRE` |
+| SCENARIO_NUM | A/B type | L0C type | Output type and format | Quantization mode | 2nd Mmad type |
+|---|---|---|---|---|---|
+| 1 | half | float | int8_t, Nz | Scalar `QF322B8_PRE` | int8×int8→int32 |
+| 2 | half | float | int8_t, Nz | Vector `VQF322B8_PRE` | int8×int8→int32 |
+| 3 | int8_t | int32_t | int8_t, Nz | Scalar `REQ8` | int8×int8→int32 |
+| 4 | int8_t | int32_t | int8_t, Nz | Vector `VREQ8` | int8×int8→int32 |
+| 5 | half | float | half, Nz | Cast `F322F16` | half×half→float |
+| 6 | half | float | half, Nz | Vector `VQF322F16_PRE` | half×half→float |
+| 7 | int8_t | int32_t | half, Nz | Scalar `DEQF16` | half×half→float |
+| 8 | int8_t | int32_t | half, Nz | Vector `VDEQF16` | half×half→float |
+| 9 | half | float | bfloat16_t, Nz | Cast `F322BF16` | bf16×bf16→float |
+| 10 | half | float | bfloat16_t, Nz | Vector `VQF322BF16_PRE` | bf16×bf16→float |
+| 11 | int8_t | int32_t | int4b_t, Nz | Vector `VREQ4` | int4b×int4b→int32 |
+| 12 | int8_t | int32_t | bfloat16_t, Nz | Vector `VQS322BF16_PRE` | bf16×bf16→float |
+| 13 | half | float | int4b_t, Nz | Vector `VQF322S4_PRE` | int4b×int4b→int32 |
+| 14 | half | float | fp8_e4m3fn_t, Nz | Vector `VQF322FP8_PRE` | fp8×fp8→float |
+| 15 | half | float | hifloat8_t, Nz | Vector `VQF322HIF8_PRE` | hif8×hif8→float |
+| 16 | half | float | hifloat8_t, Nz | Vector `VQF322HIF8_PRE_HYBRID` | hif8×hif8→float |
+| 17 | half | float | float, Nz | Vector `VQF322F32_PRE` | float×float→float |
+
+> **Note:** Scenarios 9-17 require CANN support for the corresponding `asc_copy_l0c2l1`, `asc_copy_l12l0a`, `asc_copy_l12l0b_trans`, and `asc_mmad` overloads (int4b_t, bfloat16_t, fp8_e4m3fn_t, hifloat8_t, float types).
 
 `SCENARIO_NUM` is passed by CMake as a compile-time macro. The kernel selects the corresponding scenario with `if constexpr`. After changing the scenario, recompile the project.
 
@@ -91,7 +104,7 @@ Run the following steps in the example root directory.
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture for Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | 1-6 | Scenario number |
+  | `SCENARIO_NUM` | 1-17 | Scenario number |
 
 - Expected result
 
