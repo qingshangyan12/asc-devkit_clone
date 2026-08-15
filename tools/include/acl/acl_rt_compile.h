@@ -137,7 +137,8 @@ ACLRTC_API aclError aclrtcGetCompileLog(aclrtcProg prog, char* log);
  * @brief Specializes and compiles an ACLNN kernel from a registered JIT resource.
  * @param[in] request Kernel resource, entry, constant argument, and compiler option request.
  *                    The structure must be zero-initialized before setting fields.
- * @param[in] outPath Absolute path for the linked kernel ELF.
+ * @param[in] outPath Output path for the linked kernel ELF. A relative path is resolved against the current
+ *                    working directory when this function is called.
  * @return aclError: ACL_SUCCESS or ACL_ERROR_RTC_XXX
  */
 ACLRTC_API aclError aclrtcKernelSpecialization(const aclrtcKernelSpecRequest* request, const char* outPath);
