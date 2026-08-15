@@ -63,7 +63,7 @@ __simd_callee__ inline decltype(auto) operator>=(reg_tensor<T> src0, T src1);
 } // namespace asc
 
 #if defined(__NPU_ARCH__)
-#include "impl/tensor_api/arch/vector/experimetnal/compare_and_select_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/compare_and_select_impl.h"
 #endif
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_COMPARE_AND_SELECT_H
