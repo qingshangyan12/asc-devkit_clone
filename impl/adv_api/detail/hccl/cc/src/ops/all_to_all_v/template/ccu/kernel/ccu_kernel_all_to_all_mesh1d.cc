@@ -150,10 +150,10 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     if (arg->loadFromMem) {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r == arg->rankId) {
-                // GroupCopy(ctx, localDst, src[r], ctx.goSize);
+                GroupCopy(ctx, localDst, src[r], ctx.goSize);
             }
             else {
-                // ccu::Write disabled for testing
+                ccu::Write(arg->channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
                 channelId++;
             }
         }
@@ -162,10 +162,10 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     } else {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r == arg->rankId) {
-                // GroupCopy(ctx, localDst, src[r], ctx.goSize);
+                GroupCopy(ctx, localDst, src[r], ctx.goSize);
             }
             else {
-                // ccu::Write disabled for testing
+                ccu::Write(arg->channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
                 channelId++;
             }
         }
