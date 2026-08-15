@@ -20,6 +20,8 @@ constexpr int CKE_IDX_1    = 1;
 constexpr int CKE_IDX_2    = 2;
 
 constexpr uint64_t LOCAL_COPY_MS = 8;
+constexpr uint64_t MAX_DMA_TRANS_SIZE = 256ULL * 1024 * 1024;
+constexpr uint64_t NEG_ONE = 0xFFFFFFFFFFFFFFFFULL;
 
 static CcuResult ParseKernelArg(AlltoAllMesh1DContext &ctx, CcuKernelArgAlltoAllMesh1D *kernelArg)
 {
@@ -57,7 +59,7 @@ static CcuResult InitResource(AlltoAllMesh1DContext &ctx)
 static CcuResult LoadArgs(AlltoAllMesh1DContext &ctx, ccu::Variable inputAddr, ccu::Variable outputAddr,
     ccu::Variable tokenInfo, ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset,
     ccu::Variable dstOffset, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-    ccu::Variable goSize4)
+    ccu::Variable goSize4, ccu::Variable writeFullLoopCount, ccu::Variable writeTailSize)
 {
     const auto *arg = ctx.arg;
     ctx.input[arg->rankId] = inputAddr;
@@ -71,6 +73,8 @@ static CcuResult LoadArgs(AlltoAllMesh1DContext &ctx, ccu::Variable inputAddr, c
     ctx.goSize.loopParam = goSize2;
     ctx.goSize.parallelParam = goSize3;
     ctx.goSize.residual = goSize4;
+    ctx.writeFullLoopCount = writeFullLoopCount;
+    ctx.writeTailSize = writeTailSize;
     ctx.srcOffset += ctx.input[arg->rankId];
     return CCU_SUCCESS;
 }
@@ -141,10 +145,22 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     if (arg->loadFromMem) {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r == arg->rankId) {
-                ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1 << r);
+                GroupCopy(ctx, localDst, src[r], ctx.goSize);
             }
             else {
-                ccu::Write(arg->channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
+                ccu::RemoteAddr curDst = dst[r];
+                ccu::LocalAddr curSrc = src[r];
+                CCU_WHILE(ctx.writeFullLoopCount != 0)
+                {
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, MAX_DMA_TRANS_SIZE, ctx.event, 1 << r);
+                    curDst.addr += MAX_DMA_TRANS_SIZE;
+                    curSrc.addr += MAX_DMA_TRANS_SIZE;
+                    ctx.writeFullLoopCount += NEG_ONE;
+                }
+                CCU_IF(ctx.writeTailSize != 0)
+                {
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, ctx.writeTailSize, ctx.event, 1 << r);
+                }
                 channelId++;
             }
         }
@@ -153,10 +169,22 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     } else {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r == arg->rankId) {
-                ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1 << r);
+                GroupCopy(ctx, localDst, src[r], ctx.goSize);
             }
             else {
-                ccu::Write(arg->channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
+                ccu::RemoteAddr curDst = dst[r];
+                ccu::LocalAddr curSrc = src[r];
+                CCU_WHILE(ctx.writeFullLoopCount != 0)
+                {
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, MAX_DMA_TRANS_SIZE, ctx.event, 1 << r);
+                    curDst.addr += MAX_DMA_TRANS_SIZE;
+                    curSrc.addr += MAX_DMA_TRANS_SIZE;
+                    ctx.writeFullLoopCount += NEG_ONE;
+                }
+                CCU_IF(ctx.writeTailSize != 0)
+                {
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, ctx.writeTailSize, ctx.event, 1 << r);
+                }
                 channelId++;
             }
         }
@@ -173,6 +201,7 @@ CcuResult CcuAlltoAllMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
     ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4,
+    ccu::Variable writeFullLoopCount, ccu::Variable writeTailSize,
     CcuKernelArg &arg)
 {
     auto *kernelArg = static_cast<CcuKernelArgAlltoAllMesh1D *>(arg);
@@ -191,7 +220,7 @@ CcuResult CcuAlltoAllMesh1DKernel(
     CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset,
-        goSize1, goSize2, goSize3, goSize4));
+        goSize1, goSize2, goSize3, goSize4, writeFullLoopCount, writeTailSize));
 
     PreSync(ctx);
 

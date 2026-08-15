@@ -102,3 +102,36 @@ run_llt_test(
     TARGET ${HCCL_MC2_CCU_SELECTOR_TARGET}
     TASK_NUM 1
 )
+
+# ============================================================================
+# Target: CalGoSize overflow unit test (standalone, no product code dependency)
+# ============================================================================
+set(HCCL_MC2_CCU_GOSIZE_TARGET ascendc_ut_adv_api_hccl_ccu_gosize_overflow)
+
+add_executable(${HCCL_MC2_CCU_GOSIZE_TARGET}
+    ${ASCENDC_DIR}/tests/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/calc_gosize_overflow_test.cpp
+)
+
+target_include_directories(${HCCL_MC2_CCU_GOSIZE_TARGET} PRIVATE
+    ${UT_COMMON_INCLUDE_LIST}
+)
+
+target_compile_options(${HCCL_MC2_CCU_GOSIZE_TARGET} PRIVATE
+    -std=c++17
+    -O0
+    -g
+    -Wno-unused-variable
+    -Wno-unused-parameter
+)
+
+target_link_libraries(${HCCL_MC2_CCU_GOSIZE_TARGET} PRIVATE
+    intf_llt_pub_basic
+    pthread
+    dl
+)
+
+run_llt_test(
+    TARGET ${HCCL_MC2_CCU_GOSIZE_TARGET}
+    TASK_NUM 1
+)
