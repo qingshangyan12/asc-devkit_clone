@@ -175,7 +175,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 {
                     ccu::Write(arg->channels[channelId], curDst, curSrc, remaining, ctx.event, 1 << r);
                 }
-                CCU_IF(remaining == 0)
+                CCU_ELSE
                 {
                     ccu::EventRecord(ctx.event, 1 << r);
                 }
@@ -207,7 +207,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 {
                     ccu::Write(arg->channels[channelId], curDst, curSrc, remaining, ctx.event, 1 << r);
                 }
-                CCU_IF(remaining == 0)
+                CCU_ELSE
                 {
                     ccu::EventRecord(ctx.event, 1 << r);
                 }
