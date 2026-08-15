@@ -33,7 +33,8 @@ enum class OutputPublicationStatus : uint32_t {
 
 class KernelSpecializationDiagnostics final {
 public:
-    KernelSpecializationDiagnostics(std::string requestId, DiagnosticCollectionMode collectionMode);
+    KernelSpecializationDiagnostics(std::string specializationSessionId,
+                                    DiagnosticCollectionMode collectionMode);
 
     void SaveManifestForDiagnostics(const nlohmann::json& resourceManifest) noexcept;
     void RecordResourceWorktreePath(const boost::filesystem::path& resourceWorktreePath) noexcept;
@@ -46,7 +47,7 @@ public:
 private:
     void AppendDiagnosticText(const boost::filesystem::path& filePath, const std::string& text) noexcept;
 
-    std::string requestId_;
+    std::string specializationSessionId_;
     bool diagnosticsEnabled_ {false};
     boost::filesystem::path diagnosticDirectoryPath_;
 };

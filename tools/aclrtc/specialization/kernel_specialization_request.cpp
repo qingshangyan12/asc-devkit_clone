@@ -166,11 +166,11 @@ aclError ParseSuperKernelOptions(const aclrtcKernelSpecRequest& apiRequest,
     return ACLRTC_SUCCESS;
 }
 
-std::string CreateRequestId()
+std::string CreateSpecializationSessionId()
 {
-    static std::atomic<uint64_t> requestSequence {0};
+    static std::atomic<uint64_t> specializationSessionSequence {0};
     return std::to_string(getpid()) + "_" +
-           std::to_string(requestSequence.fetch_add(1U, std::memory_order_relaxed));
+           std::to_string(specializationSessionSequence.fetch_add(1U, std::memory_order_relaxed));
 }
 } // namespace
 
@@ -231,9 +231,9 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
         return result;
     }
 
-    request.requestId = CreateRequestId();
+    request.specializationSessionId = CreateSpecializationSessionId();
     request.kernelArgumentCount = apiRequest.argsCount;
-    request.borrowedKernelArgumentAddresses = apiRequest.argsAddr;
+    request.borrowedKernelArgumentDataPointers = apiRequest.argsAddr;
     request.borrowedKernelArgumentByteCounts = apiRequest.argsBytes;
     normalizedRequest = std::move(request);
     return ACLRTC_SUCCESS;

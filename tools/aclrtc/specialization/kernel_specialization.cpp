@@ -131,7 +131,8 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     const DiagnosticCollectionMode diagnosticCollectionMode = saveKernelMetaEnabled
         ? DiagnosticCollectionMode::Enabled
         : DiagnosticCollectionMode::Disabled;
-    KernelSpecializationDiagnostics diagnostics(specializationRequest.requestId, diagnosticCollectionMode);
+    KernelSpecializationDiagnostics diagnostics(
+        specializationRequest.specializationSessionId, diagnosticCollectionMode);
     auto finishRequest = [&](aclError specializationResult) {
         const OutputPublicationStatus publicationStatus = specializationResult == ACLRTC_SUCCESS
             ? OutputPublicationStatus::Published
