@@ -20,6 +20,9 @@ constexpr int CKE_IDX_1    = 1;
 constexpr int CKE_IDX_2    = 2;
 
 constexpr uint64_t LOCAL_COPY_MS = 8;
+constexpr uint64_t MAX_DMA_TRANS_SIZE = 256ULL * 1024 * 1024;
+constexpr uint64_t NEG_256MB = 0xFFFFFFFF00000000ULL;
+constexpr uint64_t NEG_512MB = 0xFFFFFFFE00000000ULL;
 
 static CcuResult ParseKernelArg(AlltoAllMesh1DContext &ctx, CcuKernelArgAlltoAllMesh1D *kernelArg)
 {
@@ -136,7 +139,12 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     }
 
     uint32_t channelId = 0;
-    uint16_t allBit = ((1 << arg->rankSize) - 1) & (~(1 << arg->rankId)); // 仅rankid位为0，其他位为1，代表远端准备好了
+    uint16_t allBit = ((1 << arg->rankSize) - 1) & (~(1 << arg->rankId));
+
+    ccu::Variable chunkSize;
+    chunkSize = MAX_DMA_TRANS_SIZE;
+    ccu::Variable neg256MB;
+    neg256MB = NEG_256MB;
 
     if (arg->loadFromMem) {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
@@ -144,16 +152,53 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1 << r);
             }
             else {
-                ccu::Write(arg->channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
+                ccu::RemoteAddr curDst = dst[r];
+                ccu::LocalAddr curSrc = src[r];
+
+                // 第1块 256MB
+                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
+                curDst.addr += chunkSize;
+                curSrc.addr += chunkSize;
+
+                // 第2块 256MB
+                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
+                curDst.addr += chunkSize;
+                curSrc.addr += chunkSize;
+
+                // 尾块 (sliceSize - 512MB, 512MB=0时为sliceSize本身, 但512MB场景tailSize=0)
+                ccu::Variable tailSize;
+                tailSize = ctx.sliceSize + neg256MB + neg256MB;
+                CCU_IF(tailSize != 0)
+                {
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, tailSize, ctx.event, 1 << r);
+                }
                 channelId++;
             }
         }
-        // 等读完所有对端
         ccu::EventWait(ctx.event, (1 << arg->rankSize) - 1);
     } else {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r != arg->rankId) {
-                ccu::Write(arg->channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
+                ccu::RemoteAddr curDst = dst[r];
+                ccu::LocalAddr curSrc = src[r];
+
+                // 第1块 256MB
+                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
+                curDst.addr += chunkSize;
+                curSrc.addr += chunkSize;
+
+                // 第2块 256MB
+                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
+                curDst.addr += chunkSize;
+                curSrc.addr += chunkSize;
+
+                // 尾块
+                ccu::Variable tailSize;
+                tailSize = ctx.sliceSize + neg256MB + neg256MB;
+                CCU_IF(tailSize != 0)
+                {
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, tailSize, ctx.event, 1 << r);
+                }
                 channelId++;
             }
         }
