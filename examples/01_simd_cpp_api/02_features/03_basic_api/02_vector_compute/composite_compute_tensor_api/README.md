@@ -32,10 +32,10 @@ composite_compute_tensor_api
   本样例对两组各64个`float`元素执行5种复合计算，整体处理流程如下：
 
   1. 在Host侧生成并读取`src_a.bin`和`src_b.bin`，将输入复制到Device。
-  2. 在Kernel中构造GM Tensor和UB Tensor，通过`CopyGM2UB`完成输入搬运。
+  2. 在Kernel中构造GM Tensor和UB Tensor，通过`copy_gm_to_ub`完成输入搬运。
   3. 使用全有效mask加载两组输入，得到`reg_tensor<float>`对象`a`和`b`。
   4. 调用复合计算接口，并将每种接口的结果写入输出Tensor的独立行中。
-  5. 通过`CopyUB2GM`将结果写回GM，并保存为`output/output.bin`。
+  5. 通过`copy_ub_to_gm`将结果写回GM，并保存为`output/output.bin`。
   6. 使用NumPy生成的`output/golden.bin`逐元素校验计算结果。
 
   样例覆盖的接口和计算表达式如下：

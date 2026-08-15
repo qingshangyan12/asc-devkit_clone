@@ -28,7 +28,7 @@ ENABLE_BUILD_DEVICE=ON
 USE_CXX11_ABI=0
 CMAKE_TOOLCHAIN_FILE_VAL=""
 UTILS_SOURCE_REPO=${ASC_DEVKIT_UTILS_REPO:-"https://gitcode.com/cann/asc-devkit.git"}
-UTILS_SOURCE_BRANCH=${ASC_DEVKIT_UTILS_BRANCH:-"9.0.0"}
+UTILS_SOURCE_BRANCH=${ASC_DEVKIT_UTILS_BRANCH:-"master"}
 
 dotted_line="----------------------------------------------------------------"
 
@@ -473,6 +473,13 @@ function sync_utils_from_asc_devkit()
   mkdir -p "${CURRENT_DIR}/impl" "${CURRENT_DIR}/include"
   cp -a "${tmp_dir}/impl/utils" "${CURRENT_DIR}/impl/"
   cp -a "${tmp_dir}/include/utils" "${CURRENT_DIR}/include/"
+
+  local asc_simd_header="${CURRENT_DIR}/include/c_api/asc_simd.h"
+  if [[ ! -f "${asc_simd_header}" ]]; then
+    log "Error: ${asc_simd_header} was not found."
+    exit 1
+  fi
+  sed -i '/^[[:space:]]*#include[[:space:]]*"utils\/base\/helpers\.h"[[:space:]]*$/d' "${asc_simd_header}"
 
   local utils_cmake="${CURRENT_DIR}/impl/utils/CMakeLists.txt"
   if [[ -f "${utils_cmake}" ]]; then

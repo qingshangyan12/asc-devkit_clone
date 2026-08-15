@@ -64,7 +64,7 @@ template <typename T, typename U>
 __simd_callee__ inline void check_logic_reg_types()
 {
     if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
-        static_assert(::AscendC::Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
+        static_assert(Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
             "the reg_tensor operands must have the same element type");
     }
 }
@@ -88,7 +88,7 @@ __simd_callee__ inline decltype(auto) bitwise_compute(T a, U b)
     check_logic_reg_types<T, U>();
     check_bitwise_type<op, elem_type>();
 
-    if constexpr (::AscendC::Std::is_same_v<elem_type, bool>) {
+    if constexpr (Std::is_same_v<elem_type, bool>) {
         static_assert(is_reg_tensor_v<T> && is_reg_tensor_v<U>,
             "bool bitwise operators require two reg_tensor<bool> operands");
         reg_tensor<bool> dst;
@@ -125,7 +125,7 @@ __simd_callee__ inline decltype(auto) operator!(reg_tensor<T> src)
 {
     static_assert(detail::supports_not_v<T>, "operator! does not support this element type");
 
-    if constexpr (::AscendC::Std::is_same_v<T, bool>) {
+    if constexpr (Std::is_same_v<T, bool>) {
         reg_tensor<bool> dst;
         asc_not(dst.reg, src.reg, detail::full_predicate_mask());
         return dst;
@@ -170,7 +170,7 @@ __simd_callee__ inline decltype(auto) operator<<(reg_tensor<T> src, U shift)
             "register operator<< requires a signed shift register of the same width");
         asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
     } else {
-        static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
+        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
             "scalar operator<< requires an int16_t shift value");
         asc_shiftleft_scalar(dst.reg, src.reg, shift, src.mask);
     }
@@ -190,7 +190,7 @@ __simd_callee__ inline decltype(auto) operator>>(reg_tensor<T> src, U shift)
             "register operator>> requires a signed shift register of the same width");
         asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
     } else {
-        static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
+        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
             "scalar operator>> requires an int16_t shift value");
         asc_shiftright_scalar(dst.reg, src.reg, shift, src.mask);
     }

@@ -27,7 +27,7 @@ template <typename T, typename scalar_type>
 __simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src, scalar_type scalar)
 {
     static_assert(detail::supports_axpy_v<T>, "axpy supports half and float");
-    static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<scalar_type>, T>,
+    static_assert(Std::is_same_v<Std::remove_cvref_t<scalar_type>, T>,
         "axpy requires the scalar and reg_tensor element types to match");
     asc_axpy(dst.reg, src.reg, scalar, dst.mask);
     return dst;

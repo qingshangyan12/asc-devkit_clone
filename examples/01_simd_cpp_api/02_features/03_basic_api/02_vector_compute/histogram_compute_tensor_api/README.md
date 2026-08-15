@@ -32,11 +32,11 @@ histogram_compute_tensor_api
   本样例使用同一组输入执行`low/high`与`frequency/cumulative`的4种模板参数组合，整体处理流程如下：
 
   1. 在Host侧生成256个`uint8_t`输入元素，并将`input.bin`复制到Device。
-  2. 在Kernel中构造GM Tensor和UB Tensor，通过`CopyGM2UB`完成输入搬运。
+  2. 在Kernel中构造GM Tensor和UB Tensor，通过`copy_gm_to_ub`完成输入搬运。
   3. 使用全有效mask加载输入，得到`reg_tensor<uint8_t>`对象`src`。
   4. 创建`reg_tensor<uint16_t>`目的寄存器，并将每个lane初始化为3，用于验证结果在原始目标数据上累加的语义。
   5. 分别调用4种配置的`histograms`接口，将结果写入输出Tensor的独立行中。
-  6. 通过`CopyUB2GM`将4行结果写回GM，并使用NumPy真值逐元素精确校验。
+  6. 通过`copy_ub_to_gm`将4行结果写回GM，并使用NumPy真值逐元素精确校验。
 
   直方图接口使用`histogram_options`在编译期选择统计区间和统计模式：
 

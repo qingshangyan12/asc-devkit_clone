@@ -32,10 +32,10 @@ logical_compute_tensor_api
   本样例对64个`int32_t`元素执行8组逐lane逻辑计算，整体处理流程如下：
 
   1. 在Host侧读取`src_a.bin`、`src_b.bin`和`shifts.bin`，并将输入复制到Device。
-  2. 在Kernel中构造GM Tensor和UB Tensor，通过`CopyGM2UB`完成输入搬运。
+  2. 在Kernel中构造GM Tensor和UB Tensor，通过`copy_gm_to_ub`完成输入搬运。
   3. 使用全有效mask加载三个输入Tensor，得到`reg_tensor<int32_t>`对象`a`、`b`和`shift`。
   4. 直接使用C++逻辑和移位运算符完成计算，并将每组结果写入输出Tensor的独立行中。
-  5. 通过`CopyUB2GM`将8行结果写回GM，并保存为`output/output.bin`。
+  5. 通过`copy_ub_to_gm`将8行结果写回GM，并保存为`output/output.bin`。
   6. 使用NumPy生成的`output/golden.bin`逐元素精确校验结果。
 
   样例覆盖的运算符和操作数形式如下：

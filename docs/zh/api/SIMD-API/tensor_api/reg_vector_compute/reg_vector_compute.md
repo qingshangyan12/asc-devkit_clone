@@ -20,10 +20,10 @@ Tensor API Reg 矢量计算接口以 `asc::te::reg_tensor<T>` 为输入和返回
 
 ```cpp
 auto mask = asc::te::ones<float>();
-auto src0 = input0.load(MakeCoord(0, 0)).with_mask(mask);
-auto src1 = input1.load(MakeCoord(0, 0)).with_mask(mask);
+auto src0 = input0.load(make_coord(0, 0)).with_mask(mask);
+auto src1 = input1.load(make_coord(0, 0)).with_mask(mask);
 auto result = asc::te::abs(src0) + src1;
-output.store(MakeCoord(0, 0), result);
+output.store(make_coord(0, 0), result);
 ```
 
 接口只能在支持 `__simd_callee__` 调用的设备侧函数中使用。当前实现面向 `__NPU_ARCH__ == 3510`。

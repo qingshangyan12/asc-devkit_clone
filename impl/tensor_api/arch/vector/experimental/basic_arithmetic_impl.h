@@ -53,7 +53,7 @@ template <typename T, typename U>
 __simd_callee__ inline void check_binary_reg_types()
 {
     if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
-        static_assert(::AscendC::Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
+        static_assert(Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
             "the reg_tensor operands must have the same element type");
     }
 }
@@ -155,7 +155,7 @@ __simd_callee__ inline decltype(auto) leaky_relu(reg_tensor<T> src_reg, scalar_t
 {
     static_assert(detail::supports_float_math_v<T>, "leaky_relu supports half and float");
     static_assert(!detail::is_reg_tensor_v<scalar_type> &&
-            ::AscendC::Std::is_convertible_v<::AscendC::Std::remove_cvref_t<scalar_type>, T>,
+            Std::is_convertible_v<Std::remove_cvref_t<scalar_type>, T>,
         "leaky_relu requires a scalar convertible to the reg_tensor element type");
     reg_tensor<T> dst;
     asc_leakyrelu(dst.reg, src_reg.reg, static_cast<T>(slope), src_reg.mask);

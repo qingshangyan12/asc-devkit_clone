@@ -45,7 +45,7 @@ __simd_callee__ inline decltype(auto) abs(reg_tensor<T> src_reg);
 ## 调用示例
 
 ```cpp
-auto src_reg = input.load(MakeCoord(0, 0)).with_mask(asc::te::ones<float>());
+auto src_reg = input.load(make_coord(0, 0)).with_mask(asc::te::ones<float>());
 auto dst_reg = asc::te::abs(src_reg);
-output.store(MakeCoord(0, 0), dst_reg);
+output.store(make_coord(0, 0), dst_reg);
 ```

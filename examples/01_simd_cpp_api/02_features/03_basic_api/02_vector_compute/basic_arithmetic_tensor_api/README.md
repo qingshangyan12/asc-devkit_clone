@@ -32,10 +32,10 @@ basic_arithmetic_tensor_api
   本样例对64个`float`元素执行16组逐元素基础计算，整体处理流程如下：
 
   1. 在Host侧读取`src_a.bin`、`src_b.bin`和`slope.bin`，并将输入数据复制到Device。
-  2. 在Kernel中使用Tensor API构造GM Tensor和UB Tensor，通过`CopyGM2UB`将输入数据搬运至UB。
+  2. 在Kernel中使用Tensor API构造GM Tensor和UB Tensor，通过`copy_gm_to_ub`将输入数据搬运至UB。
   3. 使用全有效mask加载`src_a`、`src_b`和`slope`，得到三个`reg_tensor<float>`对象。
   4. 调用基础计算接口，将每种接口的结果保存到输出Tensor的独立行中。
-  5. 通过`CopyUB2GM`将16行结果写回GM，并在Host侧保存为`output/output.bin`。
+  5. 通过`copy_ub_to_gm`将16行结果写回GM，并在Host侧保存为`output/output.bin`。
   6. 使用NumPy生成的`output/golden.bin`逐元素校验计算结果。
 
   样例覆盖的接口和计算表达式如下：
