@@ -19,9 +19,9 @@ namespace Hccl {
 
 class DataBuffer {
 public:
-    DataBuffer(uintptr_t addr, std::size_t size) : addr(addr), size(size){};
+    DataBuffer(uintptr_t addr, std::size_t size) : addr(addr), size(size) {};
 
-    explicit DataBuffer(std::size_t size) : size(size){};
+    explicit DataBuffer(std::size_t size) : size(size) {};
 
     virtual ~DataBuffer() = default;
 

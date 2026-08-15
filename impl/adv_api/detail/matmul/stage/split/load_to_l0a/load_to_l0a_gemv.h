@@ -79,9 +79,9 @@ public:
     __aicore__ inline LoadToL0A(){};
     __aicore__ inline ~LoadToL0A(){};
 
-    __aicore__ inline void SetScalar(A_T scalar){};
+    __aicore__ inline void SetScalar(A_T scalar) {};
 
-    __aicore__ inline void Prepare(bool isATranspose, uint16_t aL1K, uint16_t aL1M){};
+    __aicore__ inline void Prepare(bool isATranspose, uint16_t aL1K, uint16_t aL1M) {};
 
     __aicore__ inline void Load(
         LocalTensor<A_T>& l0A, const LocalTensor<A_T>& l1A, uint16_t aL1M, uint16_t aL1K, uint16_t madM, uint16_t madK,
@@ -127,9 +127,9 @@ public:
     __aicore__ inline LoadToL0A(){};
     __aicore__ inline ~LoadToL0A(){};
 
-    __aicore__ inline void SetScalar(A_T scalar){};
+    __aicore__ inline void SetScalar(A_T scalar) {};
 
-    __aicore__ inline void Prepare(bool isATranspose, uint16_t aL1K, uint16_t aL1M){};
+    __aicore__ inline void Prepare(bool isATranspose, uint16_t aL1K, uint16_t aL1M) {};
 
     __aicore__ inline void Load(
         LocalTensor<L0A_T>& l0A, const LocalTensor<A_T>& l1A, uint16_t aL1M, uint16_t aL1K, uint16_t madM,

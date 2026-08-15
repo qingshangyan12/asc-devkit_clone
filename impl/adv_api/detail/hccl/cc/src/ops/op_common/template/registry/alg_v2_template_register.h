@@ -31,7 +31,7 @@ static InsAlgTemplateBase* DefaultTemplateCreatorV2()
 class InsAlgTemplateRegistry {
 public:
     static InsAlgTemplateRegistry& Instance();
-    InsAlgTemplateRegistry(){};
+    InsAlgTemplateRegistry() {};
     HcclResult Register(const std::string& name, const InsAlgTemplateCreator& algTemplateCreator);
     std::unique_ptr<InsAlgTemplateBase> GetAlgTemplate(const std::string& name);
 

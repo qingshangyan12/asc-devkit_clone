@@ -80,7 +80,7 @@ public:
 
     virtual bool HasNext() { return iter != end; }
 
-    virtual ~BaseConstIterator(){};
+    virtual ~BaseConstIterator() {};
 
 protected:
     typename Sequence<T>::const_iterator iter;

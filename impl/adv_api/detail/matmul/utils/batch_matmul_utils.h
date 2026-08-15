@@ -36,14 +36,14 @@ constexpr bool IsBmmEnableScheduler =
      (A_TYPE::layout == LayoutMode::NORMAL && ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1));
 
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool IsBmmBatchScheduler = DoMatmulNorm(MM_CFG) &&
-                                     ((A_TYPE::layout != LayoutMode::NONE &&
-                                       ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1));
+constexpr bool IsBmmBatchScheduler =
+    DoMatmulNorm(MM_CFG) &&
+    ((A_TYPE::layout != LayoutMode::NONE && ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1));
 
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool IsBmmSingleScheduler = DoMatmulNorm(MM_CFG) &&
-                                      (A_TYPE::layout == LayoutMode::NORMAL &&
-                                       ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1);
+constexpr bool IsBmmSingleScheduler =
+    DoMatmulNorm(MM_CFG) &&
+    (A_TYPE::layout == LayoutMode::NORMAL && ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1);
 
 struct BatchOffsetInfo {
     int32_t modA;

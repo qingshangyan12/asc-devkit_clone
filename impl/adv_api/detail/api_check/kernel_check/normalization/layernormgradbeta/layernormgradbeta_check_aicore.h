@@ -36,7 +36,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& outputPdGamma, const LocalTensor<T>& outputPdBeta, const LocalTensor<T>& resForGamma,
         const LocalTensor<T>& inputDy, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const LayerNormGradBetaTiling& tiling){};
+        const LayerNormGradBetaTiling& tiling) {};
 };
 
 } // namespace HighLevelApiCheck

@@ -39,8 +39,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
 
     hcclContext_ = (__gm__ OpResCtx*)context;
-    ASCENDC_HCCL_API_ASSERT(
-        hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
+    ASCENDC_HCCL_API_ASSERT(hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
 }
 

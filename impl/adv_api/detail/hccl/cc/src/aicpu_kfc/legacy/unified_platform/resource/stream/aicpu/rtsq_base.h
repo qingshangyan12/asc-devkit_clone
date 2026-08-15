@@ -23,8 +23,8 @@
 
 #include "ascend_hal.h"
 namespace aicpu {
-void __attribute__((weak)) __attribute__((visibility("default")))
-GetSqeId(const uint32_t num, uint32_t& start, uint32_t& end);
+void __attribute__((weak)) __attribute__((visibility("default"))) GetSqeId(
+    const uint32_t num, uint32_t& start, uint32_t& end);
 }
 
 namespace Hccl {

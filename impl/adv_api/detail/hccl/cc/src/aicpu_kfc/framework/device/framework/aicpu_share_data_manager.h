@@ -19,8 +19,8 @@ namespace hccl {
 // 管理aicpu和custom进程的公共数据
 class AicpuShareDataManager {
 public:
-    AicpuShareDataManager(){};
-    ~AicpuShareDataManager(){};
+    AicpuShareDataManager() {};
+    ~AicpuShareDataManager() {};
     HcclResult Init(u64 addr, u64 size);
 
     // taskException

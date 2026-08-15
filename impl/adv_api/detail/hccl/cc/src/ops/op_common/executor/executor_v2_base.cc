@@ -30,8 +30,10 @@ HcclResult InsCollAlgBase::RestoreChannelMap(
     const size_t infosSize = algHierarchyInfo.infos.size();
     const size_t channelsSize = resCtx.channels.size();
     if (infosSize > channelsSize) {
-        HCCL_ERROR("[MC2_OPEN_DIAG][RestoreChannelMap] channel level out of range, infosSize[%zu], "
-            "channelsSize[%zu]", infosSize, channelsSize);
+        HCCL_ERROR(
+            "[MC2_OPEN_DIAG][RestoreChannelMap] channel level out of range, infosSize[%zu], "
+            "channelsSize[%zu]",
+            infosSize, channelsSize);
         return HcclResult::HCCL_E_INTERNAL;
     }
     rankIdToChannelInfo.resize(infosSize);

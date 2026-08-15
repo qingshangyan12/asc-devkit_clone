@@ -38,7 +38,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
         const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, LayerNormTiling& tiling){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, LayerNormTiling& tiling) {};
 };
 
 template <typename U, typename T, bool isReuseSource = false, const LayerNormConfig& config = LNCFG_NORM>
@@ -52,7 +52,7 @@ public:
         const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd,
         const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon,
         const LocalTensor<uint8_t>& sharedTmpBuffer, const LayerNormPara& para,
-        const LayerNormSeparateTiling& tiling){};
+        const LayerNormSeparateTiling& tiling) {};
 };
 
 } // namespace HighLevelApiCheck

@@ -31,7 +31,7 @@ const uint32_t CUBE_HALF_SIZE = CUBE_MAX_SIZE / 2;
 
 template <typename T>
 struct ConfusionTranspose0213Params {
-    __aicore__ ConfusionTranspose0213Params(){};
+    __aicore__ ConfusionTranspose0213Params() {};
 
     int32_t i;
     int32_t j;
