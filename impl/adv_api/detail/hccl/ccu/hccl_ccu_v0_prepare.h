@@ -239,9 +239,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
+    xnData_[5] = 0; // inputRepeatStride, one KFC mission is one prepared slice
+    xnData_[6] = 0; // outputRepeatStride, recvBuf already points to this rank's output slice
     xnData_[7] = sliceSize;
-    xnData_[8] = UINT64_MAX - 1;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+    xnData_[8] = sliceSize; // lastSliceSize; MC2 currently uses equal rank-local slices
+    xnData_[9] = UINT64_MAX - 1; // repeatNum sentinel for single-round KFC mission
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[10]);
+    xnData_[14] = ccuParam_.rankNum * sliceSize; // scratchRepeatStride
 }
 } // namespace AscendC
 
