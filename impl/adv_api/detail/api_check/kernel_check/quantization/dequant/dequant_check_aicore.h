@@ -39,7 +39,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams& params, uint32_t calCount){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams& params, uint32_t calCount) {};
 };
 
 template <typename dstT, typename scaleT, bool isPureDqParams, DeQuantMode mode>
@@ -51,7 +51,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const scaleT deqScale,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams& params){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams& params) {};
 };
 
 } // namespace HighLevelApiCheck

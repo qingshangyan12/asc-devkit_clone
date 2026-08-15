@@ -31,7 +31,7 @@ public:
     __aicore__ inline CheckFuncClassInitGlobalMemory(__gm__ const char* apiName){};
 
 public:
-    __aicore__ inline void VerifyingParameters(GlobalTensor<T>& gmWorkspaceAddr, const uint64_t size, const T value){};
+    __aicore__ inline void VerifyingParameters(GlobalTensor<T>& gmWorkspaceAddr, const uint64_t size, const T value) {};
 };
 
 } // namespace HighLevelApiCheck

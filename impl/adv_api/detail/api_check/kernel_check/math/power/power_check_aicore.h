@@ -33,13 +33,13 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount) {};
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount) {};
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount) {};
 };
 
 } // namespace HighLevelApiCheck

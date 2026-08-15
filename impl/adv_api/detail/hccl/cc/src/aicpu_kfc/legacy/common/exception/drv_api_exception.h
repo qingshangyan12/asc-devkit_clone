@@ -17,7 +17,7 @@ namespace Hccl {
 class DrvApiException : public HcclException {
 public:
     DrvApiException(const std::string& userDefinedMsg)
-        : HcclException(ExceptionType::DRV_API_EXCEPTION, userDefinedMsg){};
+        : HcclException(ExceptionType::DRV_API_EXCEPTION, userDefinedMsg) {};
 };
 
 } // namespace Hccl

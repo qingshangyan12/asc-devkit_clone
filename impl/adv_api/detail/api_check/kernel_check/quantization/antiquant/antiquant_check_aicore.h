@@ -39,7 +39,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<DstType>& dst, const LocalTensor<SrcType>& src, const LocalTensor<DstType>& scale,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K, const AntiQuantShapeInfo& shapeInfo = {}){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K, const AntiQuantShapeInfo& shapeInfo = {}) {};
 };
 
 template <typename SrcType, typename DstType, bool isTranspose>
@@ -51,7 +51,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<DstType>& dst, const LocalTensor<SrcType>& src, const DstType scale,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K, const AntiQuantShapeInfo& shapeInfo = {}){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K, const AntiQuantShapeInfo& shapeInfo = {}) {};
 };
 
 template <typename SrcType, typename DstType, bool isTranspose>
@@ -64,7 +64,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<DstType>& dst, const LocalTensor<SrcType>& src, const LocalTensor<DstType>& offset,
         const LocalTensor<DstType>& scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K,
-        const AntiQuantShapeInfo& shapeInfo = {}){};
+        const AntiQuantShapeInfo& shapeInfo = {}) {};
 };
 
 template <typename SrcType, typename DstType, bool isTranspose>
@@ -76,7 +76,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<DstType>& dst, const LocalTensor<SrcType>& src, const DstType offset, const DstType scale,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K, const AntiQuantShapeInfo& shapeInfo = {}){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K, const AntiQuantShapeInfo& shapeInfo = {}) {};
 };
 
 } // namespace HighLevelApiCheck

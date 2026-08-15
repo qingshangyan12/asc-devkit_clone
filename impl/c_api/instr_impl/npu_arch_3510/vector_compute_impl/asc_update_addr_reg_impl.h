@@ -18,7 +18,7 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
-#define ASC_DEFINE_UPDATE_ADDR_REG_IMPL(bxx)                                                                    \
+#define ASC_DEFINE_UPDATE_ADDR_REG_IMPL(bxx)                                                             \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx##_impl(uint32_t offset)                    \
     {                                                                                                    \
         if ASC_IS_AIV {                                                                                  \

@@ -89,7 +89,7 @@ public:
     inline u32 SizeOfSlaves() const { return slaves.size(); };
 
 protected:
-    HierarchicalQueue() : id(0), masterFlag(true){};
+    HierarchicalQueue() : id(0), masterFlag(true) {};
 
     QId id;
     bool masterFlag;

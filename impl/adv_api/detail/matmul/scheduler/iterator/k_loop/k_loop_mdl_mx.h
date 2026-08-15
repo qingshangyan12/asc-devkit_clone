@@ -36,7 +36,7 @@ namespace Detail {
 template <typename IMPL, typename TRANS_T, class A_TYPE, const auto& MM_CFG>
 class KLoop<
     IMPL, TRANS_T, A_TYPE, MM_CFG,
-    enable_if_t<(DoMatmulMDL(MM_CFG) && !IsKdimReorderLoad<MM_CFG>)&&HasScalePosition<A_TYPE>::value>>
+    enable_if_t<(DoMatmulMDL(MM_CFG) && !IsKdimReorderLoad<MM_CFG>) && HasScalePosition<A_TYPE>::value>>
     : public KLoopMDLBase<IMPL, TRANS_T, A_TYPE, MM_CFG> {
     MATMUL_USE_MODULE(MLoop);
     MATMUL_USE_MODULE(NLoop);
