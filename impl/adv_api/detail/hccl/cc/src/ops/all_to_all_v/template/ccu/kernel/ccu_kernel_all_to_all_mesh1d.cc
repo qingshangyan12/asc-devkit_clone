@@ -142,6 +142,11 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     uint32_t channelId = 0;
     uint16_t allBit = ((1 << arg->rankSize) - 1) & (~(1 << arg->rankId)); // 仅rankid位为0，其他位为1，代表远端准备好了
 
+    ccu::Variable chunkSize;
+    chunkSize = MAX_DMA_TRANS_SIZE;
+    ccu::Variable negOne;
+    negOne = NEG_ONE;
+
     if (arg->loadFromMem) {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r == arg->rankId) {
@@ -152,10 +157,10 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 ccu::LocalAddr curSrc = src[r];
                 CCU_WHILE(ctx.writeFullLoopCount != 0)
                 {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, MAX_DMA_TRANS_SIZE, ctx.event, 1 << r);
-                    curDst.addr += MAX_DMA_TRANS_SIZE;
-                    curSrc.addr += MAX_DMA_TRANS_SIZE;
-                    ctx.writeFullLoopCount += NEG_ONE;
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
+                    curDst.addr += chunkSize;
+                    curSrc.addr += chunkSize;
+                    ctx.writeFullLoopCount += negOne;
                 }
                 CCU_IF(ctx.writeTailSize != 0)
                 {
@@ -176,10 +181,10 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 ccu::LocalAddr curSrc = src[r];
                 CCU_WHILE(ctx.writeFullLoopCount != 0)
                 {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, MAX_DMA_TRANS_SIZE, ctx.event, 1 << r);
-                    curDst.addr += MAX_DMA_TRANS_SIZE;
-                    curSrc.addr += MAX_DMA_TRANS_SIZE;
-                    ctx.writeFullLoopCount += NEG_ONE;
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
+                    curDst.addr += chunkSize;
+                    curSrc.addr += chunkSize;
+                    ctx.writeFullLoopCount += negOne;
                 }
                 CCU_IF(ctx.writeTailSize != 0)
                 {
