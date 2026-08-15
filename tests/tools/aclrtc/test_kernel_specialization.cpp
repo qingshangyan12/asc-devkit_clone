@@ -12,6 +12,7 @@
 #include "specialization/kernel_specialization_types.h"
 #include "stub/kernel_specialization_log.h"
 
+#include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 
 #include <array>
@@ -77,6 +78,20 @@ TEST(KernelSpecializationRequestTest, NormalizesBasicRequestAndCopiesOptions)
     EXPECT_TRUE(normalizedRequest.compilerOptions.superKernelOptions.empty());
 }
 
+TEST(KernelSpecializationRequestTest, AcceptsOpaqueResourceIdAndNormalizesRelativeOutputPath)
+{
+    aclrtcKernelSpecRequest request = CreateValidRequest();
+    request.resourceId = "vendor/operator/resource-v1";
+
+    ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
+    ASSERT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, "relative/kernel.elf", normalizedRequest),
+              0);
+    EXPECT_EQ(normalizedRequest.resourceId, request.resourceId);
+    EXPECT_EQ(normalizedRequest.outputElfPath,
+              boost::filesystem::absolute("relative/kernel.elf").lexically_normal());
+}
+
 TEST(KernelSpecializationRequestTest, EnablesSuperKernelAndRemovesControlOption)
 {
     const char *skOptions[] = {"-g", "--enable-super-kernel", "-DDCCI_OFF"};
@@ -113,11 +128,11 @@ TEST(KernelSpecializationRequestTest, RejectsInvalidAbiFields)
     ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
 
     aclrtcKernelSpecRequest request = CreateValidRequest();
-    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, "relative.elf", normalizedRequest),
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, "", normalizedRequest),
               ACL_ERROR_RTC_INVALID_INPUT);
 
     request = CreateValidRequest();
-    request.resourceId = "not-a-resource-id";
+    request.resourceId = "";
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_INPUT);
@@ -184,6 +199,19 @@ TEST(KernelSpecializationRequestTest, RejectsOptionsThatCanRedirectCompilerInput
                       request, "/tmp/kernel.elf", normalizedRequest),
                   ACL_ERROR_RTC_INVALID_OPTION);
     }
+}
+
+TEST(KernelSpecializationRequestTest, RejectsSuperKernelOptionsThatRedirectCompilerOutputWhenForwarded)
+{
+    const char* skOptions[] = {"--enable-super-kernel", "-o", "unexpected.elf"};
+    aclrtcKernelSpecRequest request = CreateValidRequest();
+    request.skOptions = skOptions;
+    request.skOptionCount = 3U;
+
+    ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, "/tmp/kernel.elf", normalizedRequest),
+              ACL_ERROR_RTC_INVALID_OPTION);
 }
 
 TEST(KernelSpecializationRequestTest, TreatsShellMetacharactersAsLiteralArgvText)

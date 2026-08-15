@@ -32,7 +32,8 @@ aclError aclrtcKernelSpecialization(
     const char *outPath);
 ```
 
-请求必须零初始化，`resourceId` 是 64 位小写十六进制 SHA-256，`outPath` 是绝对文件路径。
+请求必须零初始化。`resourceId` 是 Registry 使用的不透明查询键。`outPath` 可以是绝对路径或相对路径；
+相对路径在接口调用时基于当前工作目录转换为绝对路径。
 `argsAddr[index]` 必须是同步调用期间可读的 host 地址，`argsBytes[index]` 是对应 buffer 的字节数。
 
 basic 编译示例：
@@ -49,7 +50,7 @@ const char *options[] = {"-g"};
 request.options = options;
 request.optionCount = 1;
 
-aclError result = aclrtcKernelSpecialization(&request, "/absolute/path/kernel.elf");
+aclError result = aclrtcKernelSpecialization(&request, "kernel.elf");
 ```
 
 SK 编译在 `skOptions` 中加入 `--enable-super-kernel`。该控制项只选择 basic + SK，不传给

@@ -14,8 +14,9 @@
 
 #include <algorithm>
 #include <atomic>
+#include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include <cctype>
+#include <boost/system/error_code.hpp>
 #include <cstring>
 #include <unistd.h>
 
@@ -44,13 +45,6 @@ bool ReadBoundedString(const char* input, std::string& output, size_t& totalText
     return true;
 }
 
-bool IsLowercaseSha256(const std::string& resourceId)
-{
-    return resourceId.size() == 64U && std::all_of(resourceId.begin(), resourceId.end(), [](char character) {
-        return (character >= '0' && character <= '9') || (character >= 'a' && character <= 'f');
-    });
-}
-
 bool ContainsAsciiControlCharacter(const std::string& option)
 {
     return std::any_of(option.begin(), option.end(), [](unsigned char character) {
@@ -65,17 +59,19 @@ bool RewritesCompilerOutput(const std::string& option)
            option.compare(0, sizeof("--output=") - 1U, "--output=") == 0;
 }
 
-aclError ValidateCompilerOptionStructure(const std::string& option, const char* optionFieldName,
-                                         uint64_t optionIndex, bool validateCompilerBoundaries)
+aclError ValidateUserOptionText(const std::string& option, const char* optionFieldName, uint64_t optionIndex)
 {
     if (ContainsAsciiControlCharacter(option)) {
         ACLRTC_LOG_ERROR("%s[%llu] contains an ASCII control character", optionFieldName,
                          static_cast<unsigned long long>(optionIndex));
         return ACLRTC_ERROR_INVALID_OPTION;
     }
-    if (!validateCompilerBoundaries) {
-        return ACLRTC_SUCCESS;
-    }
+    return ACLRTC_SUCCESS;
+}
+
+aclError ValidateForwardedCompilerOption(const std::string& option, const char* optionFieldName,
+                                         uint64_t optionIndex)
+{
     if (option.front() == '@') {
         ACLRTC_LOG_ERROR("%s[%llu] cannot use a compiler response file", optionFieldName,
                          static_cast<unsigned long long>(optionIndex));
@@ -90,8 +86,8 @@ aclError ValidateCompilerOptionStructure(const std::string& option, const char* 
 }
 
 aclError CopyUserOptions(const char* const* apiOptions, uint64_t apiOptionCount,
-                         const char* optionFieldName, bool validateCompilerBoundaries,
-                         std::vector<std::string>& copiedOptions, size_t& totalTextBytes)
+                         const char* optionFieldName, std::vector<std::string>& copiedOptions,
+                         size_t& totalTextBytes)
 {
     if (apiOptionCount == 0U) {
         return ACLRTC_SUCCESS;
@@ -110,12 +106,23 @@ aclError CopyUserOptions(const char* const* apiOptions, uint64_t apiOptionCount,
                              static_cast<unsigned long long>(optionIndex));
             return ACLRTC_ERROR_INVALID_OPTION;
         }
-        const aclError validationResult = ValidateCompilerOptionStructure(
-            copiedOption, optionFieldName, optionIndex, validateCompilerBoundaries);
+        const aclError validationResult = ValidateUserOptionText(copiedOption, optionFieldName, optionIndex);
         if (validationResult != ACLRTC_SUCCESS) {
             return validationResult;
         }
         copiedOptions.emplace_back(std::move(copiedOption));
+    }
+    return ACLRTC_SUCCESS;
+}
+
+aclError ValidateForwardedCompilerOptions(const std::vector<std::string>& options, const char* optionFieldName)
+{
+    for (size_t optionIndex = 0U; optionIndex < options.size(); ++optionIndex) {
+        const aclError validationResult =
+            ValidateForwardedCompilerOption(options[optionIndex], optionFieldName, optionIndex);
+        if (validationResult != ACLRTC_SUCCESS) {
+            return validationResult;
+        }
     }
     return ACLRTC_SUCCESS;
 }
@@ -143,10 +150,6 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
         ACLRTC_LOG_ERROR("resourceId must be a non-empty string within request size limits");
         return ACLRTC_ERROR_INVALID_INPUT;
     }
-    if (!IsLowercaseSha256(request.resourceId)) {
-        ACLRTC_LOG_ERROR("resourceId must contain exactly 64 lowercase hexadecimal characters");
-        return ACLRTC_ERROR_INVALID_INPUT;
-    }
     if (!ReadBoundedString(apiRequest.kernelEntry, request.kernelName, totalTextBytes)) {
         ACLRTC_LOG_ERROR("kernelEntry must be a non-empty string within request size limits");
         return ACLRTC_ERROR_INVALID_INPUT;
@@ -157,25 +160,33 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
         ACLRTC_LOG_ERROR("outPath must be a non-empty string within request size limits");
         return ACLRTC_ERROR_INVALID_INPUT;
     }
-    if (!boost::filesystem::path(copiedOutputElfPath).is_absolute()) {
-        ACLRTC_LOG_ERROR("outPath must be an absolute path");
+    boost::system::error_code outputPathError;
+    const boost::filesystem::path normalizedOutputElfPath =
+        boost::filesystem::absolute(copiedOutputElfPath, outputPathError).lexically_normal();
+    if (outputPathError) {
+        ACLRTC_LOG_ERROR("Failed to resolve outPath against the current working directory: error=%d",
+                         outputPathError.value());
         return ACLRTC_ERROR_INVALID_INPUT;
     }
-    request.outputElfPath = std::move(copiedOutputElfPath);
+    request.outputElfPath = normalizedOutputElfPath;
 
     if (apiRequest.optionCount > MAX_USER_OPTION_COUNT ||
         apiRequest.skOptionCount > MAX_USER_OPTION_COUNT - apiRequest.optionCount) {
         ACLRTC_LOG_ERROR("optionCount + skOptionCount must not exceed %zu", MAX_USER_OPTION_COUNT);
         return ACLRTC_ERROR_INVALID_INPUT;
     }
-    aclError result = CopyUserOptions(apiRequest.options, apiRequest.optionCount, "options", true,
+    aclError result = CopyUserOptions(apiRequest.options, apiRequest.optionCount, "options",
                                       request.compilerOptions.basicOptions, totalTextBytes);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+    result = ValidateForwardedCompilerOptions(request.compilerOptions.basicOptions, "options");
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
 
     std::vector<std::string> copiedSuperKernelOptions;
-    result = CopyUserOptions(apiRequest.skOptions, apiRequest.skOptionCount, "skOptions", false,
+    result = CopyUserOptions(apiRequest.skOptions, apiRequest.skOptionCount, "skOptions",
                              copiedSuperKernelOptions, totalTextBytes);
     if (result != ACLRTC_SUCCESS) {
         return result;
@@ -194,7 +205,7 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
             if (superKernelOption == SUPER_KERNEL_ENABLE_OPTION) {
                 continue;
             }
-            result = ValidateCompilerOptionStructure(superKernelOption, "skOptions", optionIndex, true);
+            result = ValidateForwardedCompilerOption(superKernelOption, "skOptions", optionIndex);
             if (result != ACLRTC_SUCCESS) {
                 return result;
             }
