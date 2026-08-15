@@ -23,13 +23,13 @@
 #ifndef IMPL_MATH_NDTRI_NDTRI_3510_IMPL_H
 #define IMPL_MATH_NDTRI_NDTRI_3510_IMPL_H
 
-#include "../../../../../include/basic_api/kernel_basic_intf.h"
-#include "../../../../../include/basic_api/kernel_tensor.h"
-#include "../../common/check.h"
+#include "basic_api/kernel_basic_intf.h"
+#include "basic_api/kernel_tensor.h"
+#include "impl/adv_api/detail/common/check.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/math/ndtri/ndtri_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/math/ndtri/ndtri_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 namespace AscendC {
 namespace NdtriInternal {
@@ -40,13 +40,13 @@ union FloatU32Union {
     uint32_t u32;
 };
 
-constexpr FloatU32Union POSITIVE_INFINITY(0x7f800000U);
-constexpr FloatU32Union NEGATIVE_INFINITY(0xff800000U);
-constexpr FloatU32Union QUIET_NAN(0x7fc00000U);
-constexpr float NDTRI_CENTER_REGION_BOUNDARY = 0.425f;
-constexpr float NDTRI_NEAR_TAIL_BOUNDARY = 5.0f;
-constexpr float NDTRI_TAIL_PROBABILITY_SCALE = 1.8446744073709552e19f;
-constexpr float NDTRI_TAIL_LOG_SCALE_OFFSET = -44.3614195558364998f;
+constexpr FloatU32Union positiveInfinity(0x7f800000U);
+constexpr FloatU32Union negativeInfinity(0xff800000U);
+constexpr FloatU32Union quietNan(0x7fc00000U);
+constexpr float centerRegionBoundary = 0.425f;
+constexpr float nearTailBoundary = 5.0f;
+constexpr float tailProbabilityScale = 1.8446744073709552e19f;
+constexpr float tailLogScaleOffset = -44.3614195558364998f;
 
 __simd_callee__ inline void MulAdds(
     Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& lhsReg, Reg::RegTensor<float>& rhsReg, const float scalar,
@@ -56,35 +56,34 @@ __simd_callee__ inline void MulAdds(
     Reg::Adds(dstReg, dstReg, scalar, mask);
 }
 
-// Task formula: sqrt(2) * sum(c_k * x^(2k + 1)), x = 2p - 1. The first 24 terms cover |x| <= 0.85.
-__simd_callee__ inline void ComputeTaskSeries(
+__simd_callee__ inline void ComputeCenterSeries(
     Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& qReg, Reg::MaskReg mask)
 {
-    constexpr float C0 = 0.88622695207595825f;
-    constexpr float C1 = 0.23201367259025574f;
-    constexpr float C2 = 0.12755617499351501f;
-    constexpr float C3 = 0.086552128195762634f;
-    constexpr float C4 = 0.064959615468978882f;
-    constexpr float C5 = 0.051731280982494354f;
-    constexpr float C6 = 0.042836721986532211f;
-    constexpr float C7 = 0.036465927958488464f;
-    constexpr float C8 = 0.031689006835222244f;
-    constexpr float C9 = 0.027980633080005646f;
-    constexpr float C10 = 0.025022275745868683f;
-    constexpr float C11 = 0.022609863430261612f;
-    constexpr float C12 = 0.020606780424714088f;
-    constexpr float C13 = 0.018918218091130257f;
-    constexpr float C14 = 0.017476370558142662f;
-    constexpr float C15 = 0.01623150147497654f;
-    constexpr float C16 = 0.015146315097808838f;
-    constexpr float C17 = 0.014192315749824047f;
-    constexpr float C18 = 0.013347364030778408f;
-    constexpr float C19 = 0.012594005092978477f;
-    constexpr float C20 = 0.011918296106159687f;
-    constexpr float C21 = 0.011308969929814339f;
-    constexpr float C22 = 0.010756825096905231f;
-    constexpr float C23 = 0.010254274122416973f;
-    constexpr float SQRT_TWO = 1.4142135623730951f;
+    constexpr float c0 = 0.88622695207595825f;
+    constexpr float c1 = 0.23201367259025574f;
+    constexpr float c2 = 0.12755617499351501f;
+    constexpr float c3 = 0.086552128195762634f;
+    constexpr float c4 = 0.064959615468978882f;
+    constexpr float c5 = 0.051731280982494354f;
+    constexpr float c6 = 0.042836721986532211f;
+    constexpr float c7 = 0.036465927958488464f;
+    constexpr float c8 = 0.031689006835222244f;
+    constexpr float c9 = 0.027980633080005646f;
+    constexpr float c10 = 0.025022275745868683f;
+    constexpr float c11 = 0.022609863430261612f;
+    constexpr float c12 = 0.020606780424714088f;
+    constexpr float c13 = 0.018918218091130257f;
+    constexpr float c14 = 0.017476370558142662f;
+    constexpr float c15 = 0.01623150147497654f;
+    constexpr float c16 = 0.015146315097808838f;
+    constexpr float c17 = 0.014192315749824047f;
+    constexpr float c18 = 0.013347364030778408f;
+    constexpr float c19 = 0.012594005092978477f;
+    constexpr float c20 = 0.011918296106159687f;
+    constexpr float c21 = 0.011308969929814339f;
+    constexpr float c22 = 0.010756825096905231f;
+    constexpr float c23 = 0.010254274122416973f;
+    constexpr float sqrtTwo = 1.4142135623730951f;
 
     Reg::RegTensor<float> xReg;
     Reg::RegTensor<float> xSquaredReg;
@@ -92,124 +91,124 @@ __simd_callee__ inline void ComputeTaskSeries(
     Reg::Muls(xReg, qReg, 2.0f, mask);
     Reg::Mul(xSquaredReg, xReg, xReg, mask);
 
-    Reg::Duplicate(seriesReg, C23, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C22, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C21, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C20, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C19, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C18, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C17, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C16, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C15, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C14, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C13, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C12, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C11, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C10, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C9, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C8, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C7, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C6, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C5, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C4, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C3, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C2, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C1, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, C0, mask);
+    Reg::Duplicate(seriesReg, c23, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c22, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c21, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c20, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c19, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c18, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c17, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c16, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c15, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c14, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c13, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c12, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c11, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c10, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c9, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c8, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c7, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c6, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c5, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c4, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c3, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c2, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c1, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c0, mask);
 
     Reg::Mul(dstReg, xReg, seriesReg, mask);
-    Reg::Muls(dstReg, dstReg, SQRT_TWO, mask);
+    Reg::Muls(dstReg, dstReg, sqrtTwo, mask);
 }
 
-// AS241 tail approximation for sqrt(-ln(min(p, 1-p))) <= 5.
+// Rational approximation for the near tail region.
 __simd_callee__ inline void ComputeNearTail(
     Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& rReg, Reg::MaskReg mask)
 {
-    constexpr float C0 = 1.42343711074968357734f;
-    constexpr float C1 = 4.63033784615654529590f;
-    constexpr float C2 = 5.76949722146069140550f;
-    constexpr float C3 = 3.64784832476320460504f;
-    constexpr float C4 = 1.27045825245236838258f;
-    constexpr float C5 = 0.241780725177450611770f;
-    constexpr float C6 = 0.0227238449892691845833f;
-    constexpr float C7 = 0.000774545014278341407640f;
-    constexpr float D0 = 1.0f;
-    constexpr float D1 = 2.05319162663775882187f;
-    constexpr float D2 = 1.67638483018380384940f;
-    constexpr float D3 = 0.689767334985100004550f;
-    constexpr float D4 = 0.148103976427480074590f;
-    constexpr float D5 = 0.0151986665636164571966f;
-    constexpr float D6 = 0.000547593808499534494600f;
-    constexpr float D7 = 1.05075007164441684324e-9f;
+    constexpr float c0 = 1.42343711074968357734f;
+    constexpr float c1 = 4.63033784615654529590f;
+    constexpr float c2 = 5.76949722146069140550f;
+    constexpr float c3 = 3.64784832476320460504f;
+    constexpr float c4 = 1.27045825245236838258f;
+    constexpr float c5 = 0.241780725177450611770f;
+    constexpr float c6 = 0.0227238449892691845833f;
+    constexpr float c7 = 0.000774545014278341407640f;
+    constexpr float d0 = 1.0f;
+    constexpr float d1 = 2.05319162663775882187f;
+    constexpr float d2 = 1.67638483018380384940f;
+    constexpr float d3 = 0.689767334985100004550f;
+    constexpr float d4 = 0.148103976427480074590f;
+    constexpr float d5 = 0.0151986665636164571966f;
+    constexpr float d6 = 0.000547593808499534494600f;
+    constexpr float d7 = 1.05075007164441684324e-9f;
 
     Reg::RegTensor<float> zReg;
     Reg::RegTensor<float> numeratorReg;
     Reg::RegTensor<float> denominatorReg;
     Reg::Adds(zReg, rReg, -1.6f, mask);
 
-    Reg::Duplicate(numeratorReg, C7, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, C6, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, C5, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, C4, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, C3, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, C2, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, C1, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, C0, mask);
+    Reg::Duplicate(numeratorReg, c7, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, c6, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, c5, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, c4, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, c3, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, c2, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, c1, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, c0, mask);
 
-    Reg::Duplicate(denominatorReg, D7, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, D6, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, D5, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, D4, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, D3, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, D2, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, D1, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, D0, mask);
+    Reg::Duplicate(denominatorReg, d7, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, d6, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, d5, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, d4, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, d3, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, d2, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, d1, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, d0, mask);
     Reg::Div(dstReg, numeratorReg, denominatorReg, mask);
 }
 
-// AS241 tail approximation for sqrt(-ln(min(p, 1-p))) > 5.
+// Rational approximation for the far tail region.
 __simd_callee__ inline void ComputeFarTail(
     Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& rReg, Reg::MaskReg mask)
 {
-    constexpr float E0 = 6.65790464350110377720f;
-    constexpr float E1 = 5.46378491116411436990f;
-    constexpr float E2 = 1.78482653991729133580f;
-    constexpr float E3 = 0.29656057182850489123f;
-    constexpr float E4 = 0.026532189526576123093f;
-    constexpr float E5 = 0.00124266094738807843860f;
-    constexpr float E6 = 2.71155556874348757815e-5f;
-    constexpr float E7 = 2.01033439929228813265e-7f;
-    constexpr float F0 = 1.0f;
-    constexpr float F1 = 0.599832206555887937690f;
-    constexpr float F2 = 0.136929880922735805310f;
-    constexpr float F3 = 0.0148753612908506148525f;
-    constexpr float F4 = 0.00078686913114561325910f;
-    constexpr float F5 = 1.84631831751005468180e-5f;
-    constexpr float F6 = 1.42151175831644588870e-7f;
-    constexpr float F7 = 2.04426310338993978564e-15f;
+    constexpr float e0 = 6.65790464350110377720f;
+    constexpr float e1 = 5.46378491116411436990f;
+    constexpr float e2 = 1.78482653991729133580f;
+    constexpr float e3 = 0.29656057182850489123f;
+    constexpr float e4 = 0.026532189526576123093f;
+    constexpr float e5 = 0.00124266094738807843860f;
+    constexpr float e6 = 2.71155556874348757815e-5f;
+    constexpr float e7 = 2.01033439929228813265e-7f;
+    constexpr float f0 = 1.0f;
+    constexpr float f1 = 0.599832206555887937690f;
+    constexpr float f2 = 0.136929880922735805310f;
+    constexpr float f3 = 0.0148753612908506148525f;
+    constexpr float f4 = 0.00078686913114561325910f;
+    constexpr float f5 = 1.84631831751005468180e-5f;
+    constexpr float f6 = 1.42151175831644588870e-7f;
+    constexpr float f7 = 2.04426310338993978564e-15f;
 
     Reg::RegTensor<float> zReg;
     Reg::RegTensor<float> numeratorReg;
     Reg::RegTensor<float> denominatorReg;
     Reg::Adds(zReg, rReg, -5.0f, mask);
 
-    Reg::Duplicate(numeratorReg, E7, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, E6, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, E5, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, E4, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, E3, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, E2, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, E1, mask);
-    MulAdds(numeratorReg, numeratorReg, zReg, E0, mask);
+    Reg::Duplicate(numeratorReg, e7, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, e6, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, e5, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, e4, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, e3, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, e2, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, e1, mask);
+    MulAdds(numeratorReg, numeratorReg, zReg, e0, mask);
 
-    Reg::Duplicate(denominatorReg, F7, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, F6, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, F5, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, F4, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, F3, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, F2, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, F1, mask);
-    MulAdds(denominatorReg, denominatorReg, zReg, F0, mask);
+    Reg::Duplicate(denominatorReg, f7, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, f6, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, f5, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, f4, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, f3, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, f2, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, f1, mask);
+    MulAdds(denominatorReg, denominatorReg, zReg, f0, mask);
     Reg::Div(dstReg, numeratorReg, denominatorReg, mask);
 }
 
@@ -236,32 +235,32 @@ __simd_callee__ inline void Compute(Reg::RegTensor<float>& dstReg, Reg::RegTenso
 
     Reg::Adds(qReg, srcReg, -0.5f, mask);
     Reg::Abs(absQReg, qReg, mask);
-    ComputeTaskSeries(centralReg, qReg, mask);
+    ComputeCenterSeries(centralReg, qReg, mask);
 
     Reg::Muls(tmpReg, srcReg, -1.0f, mask);
     Reg::Adds(tmpReg, tmpReg, 1.0f, mask);
     Reg::Min(tailProbabilityReg, srcReg, tmpReg, mask);
     // Scale before Ln so float32 subnormal probabilities remain representable. Restore the log scale afterwards.
-    Reg::Muls(logInputReg, tailProbabilityReg, NDTRI_TAIL_PROBABILITY_SCALE, mask);
+    Reg::Muls(logInputReg, tailProbabilityReg, tailProbabilityScale, mask);
     Reg::Ln(tailRadiusReg, logInputReg, mask);
-    Reg::Adds(tailRadiusReg, tailRadiusReg, NDTRI_TAIL_LOG_SCALE_OFFSET, mask);
+    Reg::Adds(tailRadiusReg, tailRadiusReg, tailLogScaleOffset, mask);
     Reg::Neg(tailRadiusReg, tailRadiusReg, mask);
     Reg::Sqrt(tailRadiusReg, tailRadiusReg, mask);
     ComputeNearTail(nearTailReg, tailRadiusReg, mask);
     ComputeFarTail(farTailReg, tailRadiusReg, mask);
 
-    Reg::CompareScalar<float, CMPMODE::LE>(nearTailMask, tailRadiusReg, NDTRI_NEAR_TAIL_BOUNDARY, mask);
+    Reg::CompareScalar<float, CMPMODE::LE>(nearTailMask, tailRadiusReg, nearTailBoundary, mask);
     Reg::Select(tailReg, nearTailReg, farTailReg, nearTailMask);
     Reg::CompareScalar<float, CMPMODE::LT>(negativeMask, qReg, 0.0f, mask);
     Reg::Neg(tmpReg, tailReg, mask);
     Reg::Select(tailReg, tmpReg, tailReg, negativeMask);
 
-    Reg::CompareScalar<float, CMPMODE::LE>(centerMask, absQReg, NDTRI_CENTER_REGION_BOUNDARY, mask);
+    Reg::CompareScalar<float, CMPMODE::LE>(centerMask, absQReg, centerRegionBoundary, mask);
     Reg::Select(dstReg, centralReg, tailReg, centerMask);
 
-    Reg::Duplicate(positiveInfReg, POSITIVE_INFINITY.f32, mask);
-    Reg::Duplicate(negativeInfReg, NEGATIVE_INFINITY.f32, mask);
-    Reg::Duplicate(nanReg, QUIET_NAN.f32, mask);
+    Reg::Duplicate(positiveInfReg, positiveInfinity.f32, mask);
+    Reg::Duplicate(negativeInfReg, negativeInfinity.f32, mask);
+    Reg::Duplicate(nanReg, quietNan.f32, mask);
 
     Reg::CompareScalar<float, CMPMODE::EQ>(specialMask, srcReg, 0.0f, mask);
     Reg::Select(dstReg, negativeInfReg, dstReg, specialMask);

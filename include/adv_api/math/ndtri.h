@@ -22,13 +22,13 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NDTRI_H__
 #endif
 
-#ifndef LIB_MATH_NDTRI_H
-#define LIB_MATH_NDTRI_H
+#ifndef ASCENDC_ADV_API_MATH_NDTRI_H
+#define ASCENDC_ADV_API_MATH_NDTRI_H
 
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#include "../../../impl/adv_api/detail/math/ndtri/ndtri_3510_impl.h"
+#include "impl/adv_api/detail/math/ndtri/ndtri_3510_impl.h"
 #endif
 
 namespace AscendC {
@@ -36,7 +36,9 @@ namespace AscendC {
 
 /*!
  * \ingroup Ndtri
- * \brief Computes Ndtri for calCount elements.
+ * \brief Computes the inverse standard normal cumulative distribution function for calCount elements.
+ * The calculation satisfies \f$\operatorname{Ndtri}(p) = \Phi^{-1}(p)\f$, where
+ * \f$\Phi(x) = \frac{1}{2}(1 + \operatorname{erf}(x / \sqrt{2}))\f$.
  * \tparam T: input and output data type, only float is supported.
  * \tparam isReuseSource: reserved parameter, use the default value false.
  * \param [out] dstTensor, output LocalTensor.
@@ -57,7 +59,9 @@ __aicore__ inline void Ndtri(const LocalTensor<T>& dstTensor, const LocalTensor<
 
 /*!
  * \ingroup Ndtri
- * \brief Computes Ndtri for all elements in srcTensor.
+ * \brief Computes the inverse standard normal cumulative distribution function for all elements in srcTensor.
+ * The calculation satisfies \f$\operatorname{Ndtri}(p) = \Phi^{-1}(p)\f$, where
+ * \f$\Phi(x) = \frac{1}{2}(1 + \operatorname{erf}(x / \sqrt{2}))\f$.
  * \tparam T: input and output data type, only float is supported.
  * \tparam isReuseSource: reserved parameter, use the default value false.
  * \param [out] dstTensor, output LocalTensor.
@@ -77,7 +81,7 @@ __aicore__ inline void Ndtri(const LocalTensor<T>& dstTensor, const LocalTensor<
 #pragma end_pipe
 } // namespace AscendC
 
-#endif // LIB_MATH_NDTRI_H
+#endif // ASCENDC_ADV_API_MATH_NDTRI_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NDTRI_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

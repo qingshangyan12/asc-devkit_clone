@@ -28,20 +28,14 @@
 
 $$\Phi(x)=p$$
 
-任务书给出的计算公式为：
+输入数据取值及对应输出如下：
 
-$$
-\mathrm{Ndtri}(p)=\sqrt{2}\,\sum_{k=0}^{\infty}c_k
-\left(\frac{p-1/2}{1/2}\right)^{2k+1}
-$$
-
-其中，$c_k$为逆误差函数幂级数系数。令$u=(p-1/2)/(1/2)=2p-1$，则该公式等价于$\mathrm{Ndtri}(p)=\sqrt{2}\,\mathrm{erf}^{-1}(u)$。Ascend 950PR实现对$|u|\le0.85$使用上述级数前24项，对接近0或1的概率使用尾部延拓，以满足float32极端概率精度要求。
-
-输入边界值的处理规则如下：
-
--   p等于0时，返回负无穷。
--   p等于1时，返回正无穷。
--   p小于0、p大于1、p为NaN或正负无穷时，返回NaN。
+| 输入p | 输出x |
+| --- | --- |
+| 0 | 负无穷 |
+| 1 | 正无穷 |
+| (0, 1) | 满足$\Phi(x)=p$的值 |
+| 小于0、大于1、NaN或正负无穷 | NaN |
 
 ## 函数原型
 
@@ -59,8 +53,6 @@ $$
     template <typename T, bool isReuseSource = false>
     __aicore__ inline void Ndtri(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
     ```
-
-Ascend 950PR实现使用Reg矢量计算API，中间结果均保存在RegTensor和MaskReg中，接口不需要额外Local Memory临时空间。
 
 ## 参数说明
 
@@ -91,7 +83,6 @@ Ascend 950PR实现使用Reg矢量计算API，中间结果均保存在RegTensor�
 -   srcTensor和dstTensor地址分离时，调用后srcTensor中的数据保持不变。
 -   支持srcTensor和dstTensor使用完全相同的起始地址进行原地计算。原地计算后，同一存储中的输入被输出结果覆盖。
 -   不支持srcTensor和dstTensor部分地址重叠。
--   非32字节整数倍的有效元素尾部由Vector Mask处理。GM与Local Memory之间的非对齐搬运由调用方负责，不属于本接口功能。
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 
 ## 调用示例

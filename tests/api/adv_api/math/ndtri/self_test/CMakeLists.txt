@@ -36,6 +36,7 @@ target_link_libraries(demo PRIVATE
 
 if(ASC_DEVKIT_PATH)
     target_include_directories(demo BEFORE PRIVATE
+        ${ASC_DEVKIT_PATH}
         ${ASC_DEVKIT_PATH}/include
         ${ASC_DEVKIT_PATH}/impl
     )
