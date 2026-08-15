@@ -154,24 +154,30 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 ccu::RemoteAddr curDst = dst[r];
                 ccu::LocalAddr curSrc = src[r];
 
-                // 第1块 256MB
-                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
-                curDst.addr += chunkSize;
-                curSrc.addr += chunkSize;
-
-                // 第2块 256MB
-                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
-                curDst.addr += chunkSize;
-                curSrc.addr += chunkSize;
-
-                // 尾块 (sliceSize - 512MB, 512MB时tailSize=0)
+                // 尾块计算 (sliceSize - 512MB, 512MB时tailSize=0)
                 ccu::Variable tailSize;
                 tailSize = ctx.sliceSize;
                 tailSize += neg256MB;
                 tailSize += neg256MB;
+
+                // 第1块 256MB - mask=0，不设event bit
+                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 0);
+                curDst.addr += chunkSize;
+                curSrc.addr += chunkSize;
+
                 CCU_IF(tailSize != 0)
                 {
+                    // 第2块 256MB - mask=0
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 0);
+                    curDst.addr += chunkSize;
+                    curSrc.addr += chunkSize;
+                    // 尾块 - mask=1<<r，最后一块设event bit
                     ccu::Write(arg->channels[channelId], curDst, curSrc, tailSize, ctx.event, 1 << r);
+                }
+                CCU_IF(tailSize == 0)
+                {
+                    // 第2块 256MB - mask=1<<r，无尾块时第二块是最后一块
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
                 }
                 channelId++;
             }
@@ -183,24 +189,30 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 ccu::RemoteAddr curDst = dst[r];
                 ccu::LocalAddr curSrc = src[r];
 
-                // 第1块 256MB
-                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
-                curDst.addr += chunkSize;
-                curSrc.addr += chunkSize;
-
-                // 第2块 256MB
-                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
-                curDst.addr += chunkSize;
-                curSrc.addr += chunkSize;
-
-                // 尾块
+                // 尾块计算
                 ccu::Variable tailSize;
                 tailSize = ctx.sliceSize;
                 tailSize += neg256MB;
                 tailSize += neg256MB;
+
+                // 第1块 256MB - mask=0
+                ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 0);
+                curDst.addr += chunkSize;
+                curSrc.addr += chunkSize;
+
                 CCU_IF(tailSize != 0)
                 {
+                    // 第2块 256MB - mask=0
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 0);
+                    curDst.addr += chunkSize;
+                    curSrc.addr += chunkSize;
+                    // 尾块 - mask=1<<r
                     ccu::Write(arg->channels[channelId], curDst, curSrc, tailSize, ctx.event, 1 << r);
+                }
+                CCU_IF(tailSize == 0)
+                {
+                    // 第2块 256MB - mask=1<<r
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
                 }
                 channelId++;
             }
