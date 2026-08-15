@@ -16,6 +16,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
 #include <cerrno>
+#include <cstring>
 #include <fstream>
 #include <map>
 #include <sstream>
@@ -30,11 +31,17 @@ bool ReadFile(const fs::path& filePath, std::string& contents)
 {
     std::ifstream inputStream(filePath, std::ios::in | std::ios::binary);
     if (!inputStream) {
+        const int openError = errno;
+        ACLRTC_LOG_ERROR("Failed to open source patch file: path=%s errno=%d message=%s",
+                         filePath.c_str(), openError, std::strerror(openError));
         return false;
     }
     std::ostringstream contentsStream;
     contentsStream << inputStream.rdbuf();
     if (inputStream.bad()) {
+        const int readError = errno;
+        ACLRTC_LOG_ERROR("Failed to read source patch file: path=%s errno=%d message=%s",
+                         filePath.c_str(), readError, std::strerror(readError));
         return false;
     }
     contents = contentsStream.str();
@@ -61,14 +68,16 @@ bool ReplaceFileAtomically(const fs::path& targetFilePath, const std::string& co
     {
         std::ofstream outputStream(temporaryFilePath, std::ios::out | std::ios::binary | std::ios::trunc);
         if (!outputStream) {
-            ACLRTC_LOG_ERROR("Failed to create temporary source patch file: path=%s errno=%d",
-                             temporaryFilePath.c_str(), errno);
+            const int createError = errno;
+            ACLRTC_LOG_ERROR("Failed to create temporary source patch file: path=%s errno=%d message=%s",
+                             temporaryFilePath.c_str(), createError, std::strerror(createError));
             return false;
         }
         outputStream.write(contents.data(), static_cast<std::streamsize>(contents.size()));
         if (!outputStream) {
-            ACLRTC_LOG_ERROR("Failed to write temporary source patch file: path=%s errno=%d",
-                             temporaryFilePath.c_str(), errno);
+            const int writeError = errno;
+            ACLRTC_LOG_ERROR("Failed to write temporary source patch file: path=%s errno=%d message=%s",
+                             temporaryFilePath.c_str(), writeError, std::strerror(writeError));
             boost::system::error_code ignoredError;
             fs::remove(temporaryFilePath, ignoredError);
             return false;
@@ -77,8 +86,9 @@ bool ReplaceFileAtomically(const fs::path& targetFilePath, const std::string& co
     boost::system::error_code renameError;
     fs::rename(temporaryFilePath, targetFilePath, renameError);
     if (renameError) {
-        ACLRTC_LOG_ERROR("Failed to replace patched source file: source=%s target=%s error=%d",
-                         temporaryFilePath.c_str(), targetFilePath.c_str(), renameError.value());
+        ACLRTC_LOG_ERROR("Failed to replace patched source file: source=%s target=%s error=%d message=%s",
+                         temporaryFilePath.c_str(), targetFilePath.c_str(), renameError.value(),
+                         renameError.message().c_str());
         boost::system::error_code ignoredError;
         fs::remove(temporaryFilePath, ignoredError);
         return false;
@@ -101,8 +111,8 @@ KernelCompilationWorkspace::~KernelCompilationWorkspace()
     boost::system::error_code cleanupError;
     fs::remove_all(worktreePath_, cleanupError);
     if (cleanupError) {
-        ACLRTC_LOG_WARNING("Failed to clean resource worktree: path=%s error=%d", worktreePath_.c_str(),
-                           cleanupError.value());
+        ACLRTC_LOG_WARNING("Failed to clean resource worktree: path=%s error=%d message=%s",
+                           worktreePath_.c_str(), cleanupError.value(), cleanupError.message().c_str());
     }
 }
 
@@ -117,8 +127,9 @@ aclError KernelCompilationWorkspace::MaterializeCompilationInputs(const KernelCo
         boost::system::error_code directoryError;
         fs::create_directories(outputDirectoryPath, directoryError);
         if (directoryError) {
-            ACLRTC_LOG_ERROR("Failed to create compilation output directory: path=%s error=%d",
-                             outputDirectoryPath.c_str(), directoryError.value());
+            ACLRTC_LOG_ERROR("Failed to create compilation output directory: path=%s error=%d message=%s",
+                             outputDirectoryPath.c_str(), directoryError.value(),
+                             directoryError.message().c_str());
             return ACLRTC_ERROR_FAILURE;
         }
     }
@@ -130,14 +141,15 @@ aclError KernelCompilationWorkspace::MaterializeCompilationInputs(const KernelCo
     for (const auto& filePatches : patchesByFile) {
         std::string patchedSourceText;
         if (!ReadFile(filePatches.first, patchedSourceText)) {
-            ACLRTC_LOG_ERROR("Failed to read source patch file: %s", filePatches.first.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         for (size_t patchIndex = 0U; patchIndex < filePatches.second.size(); ++patchIndex) {
             const KernelSourcePatch* sourcePatch = filePatches.second[patchIndex];
             if (!ReplaceTemplateOnce(patchedSourceText, sourcePatch->templateText, sourcePatch->replacementText)) {
-                ACLRTC_LOG_ERROR("Source patch template was not found: path=%s patch_index=%zu",
-                                 filePatches.first.c_str(), patchIndex);
+                ACLRTC_LOG_ERROR(
+                    "Source patch template was not found: path=%s patch_index=%zu; regenerate the JIT resource "
+                    "from matching source files",
+                    filePatches.first.c_str(), patchIndex);
                 return ACLRTC_ERROR_FAILURE;
             }
         }
@@ -160,8 +172,9 @@ aclError KernelCompilationWorkspace::FinalizeBeforePublishingKernelElf()
     boost::system::error_code cleanupError;
     fs::remove_all(worktreePath_, cleanupError);
     if (cleanupError) {
-        ACLRTC_LOG_ERROR("Failed to clean resource worktree before publishing ELF: path=%s error=%d",
-                         worktreePath_.c_str(), cleanupError.value());
+        ACLRTC_LOG_ERROR(
+            "Failed to clean resource worktree before publishing ELF: path=%s error=%d message=%s",
+            worktreePath_.c_str(), cleanupError.value(), cleanupError.message().c_str());
         return ACLRTC_ERROR_FAILURE;
     }
     worktreeDispositionFinalized_ = true;

@@ -233,6 +233,30 @@ TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilatio
     EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
 }
 
+TEST(KernelSpecializationSessionTest, ReportsHowToCorrectMissingOutputDirectory)
+{
+    EndToEndTestResource testResource(FakeCompilerOutcome::Success);
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
+    ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
+    boost::system::error_code removeError;
+    fs::remove_all(testResource.OutputElfPath().parent_path(), removeError);
+    ASSERT_FALSE(removeError);
+    JitResourceRegistryAdapter registryAdapter(EndToEndTestResource::Lookup, &testResource);
+    const uint8_t constantBytes[] = {0x01, 0xfe};
+    const void* constantAddresses[] = {constantBytes};
+    const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
+    aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
+
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    KernelSpecializationSession session(registryAdapter);
+    EXPECT_EQ(session.RunKernelSpecialization(&request, testResource.OutputElfPath().c_str()),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "create the output parent directory and ensure it is writable"));
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        testResource.OutputElfPath().parent_path().string()));
+}
+
 TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingIsEnabled)
 {
     EndToEndTestResource testResource(FakeCompilerOutcome::Success);

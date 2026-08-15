@@ -14,6 +14,8 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
+#include <cerrno>
+#include <cstring>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -70,16 +72,22 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
         fs::create_directories(diagnosticDirectoryPath_, directoryError);
         if (directoryError) {
             diagnosticsEnabled_ = false;
-            ACLRTC_LOG_WARNING("Failed to create diagnostic directory: %s", directoryError.message().c_str());
+            ACLRTC_LOG_WARNING("Failed to create diagnostic directory: path=%s error=%d message=%s",
+                               diagnosticDirectoryPath_.c_str(), directoryError.value(),
+                               directoryError.message().c_str());
             return;
         }
-        AppendDiagnosticText(diagnosticDirectoryPath_ / "replay.sh", "#!/bin/sh\nset -eu\n");
-        if (chmod((diagnosticDirectoryPath_ / "replay.sh").c_str(), 0700) != 0) {
-            ACLRTC_LOG_WARNING("Failed to make replay script executable");
+        const fs::path replayScriptPath = diagnosticDirectoryPath_ / "replay.sh";
+        AppendDiagnosticText(replayScriptPath, "#!/bin/sh\nset -eu\n");
+        if (chmod(replayScriptPath.c_str(), 0700) != 0) {
+            const int chmodError = errno;
+            ACLRTC_LOG_WARNING("Failed to make replay script executable: path=%s errno=%d message=%s",
+                               replayScriptPath.c_str(), chmodError, std::strerror(chmodError));
         }
     } catch (...) {
         diagnosticsEnabled_ = false;
-        ACLRTC_LOG_WARNING("Failed to initialize specialization diagnostics");
+        ACLRTC_LOG_WARNING("Failed to initialize specialization diagnostics: session=%s path=%s",
+                           specializationSessionId_.c_str(), diagnosticDirectoryPath_.c_str());
     }
 }
 
@@ -89,14 +97,23 @@ void KernelSpecializationDiagnostics::RecordManifest(const nlohmann::json& resou
         return;
     }
     try {
-        std::ofstream manifestStream(diagnosticDirectoryPath_ / "manifest.json", std::ios::out | std::ios::trunc);
+        const fs::path manifestPath = diagnosticDirectoryPath_ / "manifest.json";
+        std::ofstream manifestStream(manifestPath, std::ios::out | std::ios::trunc);
         if (!manifestStream) {
-            ACLRTC_LOG_WARNING("Failed to save specialization manifest");
+            const int openError = errno;
+            ACLRTC_LOG_WARNING("Failed to open specialization manifest for writing: path=%s errno=%d message=%s",
+                               manifestPath.c_str(), openError, std::strerror(openError));
             return;
         }
         manifestStream << resourceManifest.dump(2) << '\n';
+        if (!manifestStream) {
+            const int writeError = errno;
+            ACLRTC_LOG_WARNING("Failed to write specialization manifest: path=%s errno=%d message=%s",
+                               manifestPath.c_str(), writeError, std::strerror(writeError));
+        }
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to serialize specialization manifest");
+        ACLRTC_LOG_WARNING("Failed to record specialization manifest: path=%s",
+                           (diagnosticDirectoryPath_ / "manifest.json").c_str());
     }
 }
 
@@ -109,7 +126,8 @@ void KernelSpecializationDiagnostics::RecordWorktree(const fs::path& resourceWor
         AppendDiagnosticText(diagnosticDirectoryPath_ / "compile.log",
                              "resource_worktree=" + resourceWorktreePath.string() + "\n");
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record resource worktree path");
+        ACLRTC_LOG_WARNING("Failed to record resource worktree path: path=%s",
+                           (diagnosticDirectoryPath_ / "compile.log").c_str());
     }
 }
 
@@ -126,7 +144,9 @@ void KernelSpecializationDiagnostics::RecordCommand(const CompilationCommand& co
         replayLine += '\n';
         AppendDiagnosticText(diagnosticDirectoryPath_ / "replay.sh", replayLine);
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record compilation command");
+        ACLRTC_LOG_WARNING("Failed to record command %s: path=%s",
+                           compilationCommand.diagnosticLabel.c_str(),
+                           (diagnosticDirectoryPath_ / "replay.sh").c_str());
     }
 }
 
@@ -148,7 +168,9 @@ void KernelSpecializationDiagnostics::RecordCommandResult(
         }
         AppendDiagnosticText(diagnosticDirectoryPath_ / "compile.log", resultText.str());
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record compilation process result");
+        ACLRTC_LOG_WARNING("Failed to record result for command %s: path=%s",
+                           compilationCommand.diagnosticLabel.c_str(),
+                           (diagnosticDirectoryPath_ / "compile.log").c_str());
     }
 }
 
@@ -164,14 +186,23 @@ void KernelSpecializationDiagnostics::RecordFinalResult(
             {"output_path", outputElfPath.string()},
             {"output_published", publicationStatus == OutputPublicationStatus::Published},
         };
-        std::ofstream resultStream(diagnosticDirectoryPath_ / "result.json", std::ios::out | std::ios::trunc);
+        const fs::path resultPath = diagnosticDirectoryPath_ / "result.json";
+        std::ofstream resultStream(resultPath, std::ios::out | std::ios::trunc);
         if (!resultStream) {
-            ACLRTC_LOG_WARNING("Failed to save specialization result");
+            const int openError = errno;
+            ACLRTC_LOG_WARNING("Failed to open specialization result for writing: path=%s errno=%d message=%s",
+                               resultPath.c_str(), openError, std::strerror(openError));
             return;
         }
         resultStream << resultJson.dump(2) << '\n';
+        if (!resultStream) {
+            const int writeError = errno;
+            ACLRTC_LOG_WARNING("Failed to write specialization result: path=%s errno=%d message=%s",
+                               resultPath.c_str(), writeError, std::strerror(writeError));
+        }
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to serialize specialization result");
+        ACLRTC_LOG_WARNING("Failed to record specialization result: path=%s",
+                           (diagnosticDirectoryPath_ / "result.json").c_str());
     }
 }
 
@@ -184,12 +215,19 @@ void KernelSpecializationDiagnostics::AppendDiagnosticText(
     try {
         std::ofstream diagnosticStream(filePath, std::ios::out | std::ios::app);
         if (!diagnosticStream) {
-            ACLRTC_LOG_WARNING("Failed to append diagnostic file: %s", filePath.c_str());
+            const int openError = errno;
+            ACLRTC_LOG_WARNING("Failed to open diagnostic file for append: path=%s errno=%d message=%s",
+                               filePath.c_str(), openError, std::strerror(openError));
             return;
         }
         diagnosticStream << text;
+        if (!diagnosticStream) {
+            const int writeError = errno;
+            ACLRTC_LOG_WARNING("Failed to append diagnostic file: path=%s errno=%d message=%s",
+                               filePath.c_str(), writeError, std::strerror(writeError));
+        }
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to write specialization diagnostics");
+        ACLRTC_LOG_WARNING("Failed to append diagnostic file: path=%s", filePath.c_str());
     }
 }
 

@@ -318,6 +318,7 @@ TEST(KernelCompilationPlanBuilderTest, ReportsMalformedEnvironmentPlaceholderDet
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
         "Unterminated environment variable placeholder at basic/compile[0].cmd[2] byte 0"));
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("regenerate the JIT resource"));
 
     Json manifestWithEmptyEnvironmentName = CreateManifest();
     manifestWithEmptyEnvironmentName["kernels"][1]["objects"][0]["commands"][0]["cmd"][2] = "${env:}";
@@ -328,6 +329,30 @@ TEST(KernelCompilationPlanBuilderTest, ReportsMalformedEnvironmentPlaceholderDet
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
         "Environment variable placeholder at basic/compile[0].cmd[2] byte 0 has an empty name"));
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("regenerate the JIT resource"));
+}
+
+TEST(KernelCompilationPlanBuilderTest, ReportsUndefinedOptionReferenceLocation)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t tilingBytes[] = {0x01, 0x02};
+    const void* argumentDataPointers[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
+    NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    Json manifest = CreateManifest();
+    manifest["kernels"][1]["objects"][0]["commands"][0]["cmd"][1] = "${options:missing}";
+
+    KernelCompilationPlan plan;
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceFilePath())
+                  .BuildCompilationPlan(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "basic/compile[0].cmd[1] references undefined options key 'missing'"));
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("regenerate the JIT resource"));
 }
 
 TEST(KernelCompilationPlanBuilderTest, DoesNotRecursivelyExpandEnvironmentOrUserOptions)
