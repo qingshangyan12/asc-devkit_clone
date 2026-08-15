@@ -152,13 +152,15 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
         ccu::EventWait(ctx.event, (1 << arg->rankSize) - 1);
     } else {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
-            if (r != arg->rankId) {
+            if (r == arg->rankId) {
+                ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1 << r);
+            }
+            else {
                 ccu::Write(arg->channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
                 channelId++;
             }
         }
-        GroupCopy(ctx, localDst, src[arg->rankId], ctx.goSize);
-        ccu::EventWait(ctx.event, allBit);
+        ccu::EventWait(ctx.event, (1 << arg->rankSize) - 1);
     }
 
     return CCU_SUCCESS;
