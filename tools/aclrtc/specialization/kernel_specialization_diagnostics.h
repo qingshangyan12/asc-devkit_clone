@@ -36,13 +36,13 @@ public:
     KernelSpecializationDiagnostics(std::string specializationSessionId,
                                     DiagnosticCollectionMode collectionMode);
 
-    void SaveManifestForDiagnostics(const nlohmann::json& resourceManifest) noexcept;
-    void RecordResourceWorktreePath(const boost::filesystem::path& resourceWorktreePath) noexcept;
-    void RecordCompilationCommand(const CompilationCommand& compilationCommand) noexcept;
-    void RecordCompilationProcessResult(const CompilationCommand& compilationCommand,
-                                        const CompilationProcessResult& processResult) noexcept;
-    void RecordSpecializationResult(const boost::filesystem::path& outputElfPath,
-                                    OutputPublicationStatus publicationStatus) noexcept;
+    void RecordManifest(const nlohmann::json& resourceManifest) noexcept;
+    void RecordWorktree(const boost::filesystem::path& resourceWorktreePath) noexcept;
+    void RecordCommand(const CompilationCommand& compilationCommand) noexcept;
+    void RecordCommandResult(const CompilationCommand& compilationCommand,
+                             const CompilationProcessResult& processResult) noexcept;
+    void RecordFinalResult(const boost::filesystem::path& outputElfPath,
+                           OutputPublicationStatus publicationStatus) noexcept;
 
 private:
     void AppendDiagnosticText(const boost::filesystem::path& filePath, const std::string& text) noexcept;
