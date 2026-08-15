@@ -61,7 +61,8 @@ void ReplaceAllLiteralReferences(std::string& text, const std::string& reference
     }
 }
 
-bool ResolveEnvironmentReferences(const std::string& text, std::string& resolvedText)
+bool ResolveEnvironmentReferences(
+    const std::string& text, const std::string& manifestValueLocation, std::string& resolvedText)
 {
     resolvedText.clear();
     size_t sourcePosition = 0U;
@@ -74,15 +75,26 @@ bool ResolveEnvironmentReferences(const std::string& text, std::string& resolved
         resolvedText.append(text, sourcePosition, referencePosition - sourcePosition);
         const size_t namePosition = referencePosition + sizeof(ENVIRONMENT_REFERENCE_PREFIX) - 1U;
         const size_t closingBracePosition = text.find('}', namePosition);
-        if (closingBracePosition == std::string::npos || closingBracePosition == namePosition) {
-            ACLRTC_LOG_ERROR("Manifest contains a malformed environment variable placeholder");
+        if (closingBracePosition == std::string::npos) {
+            ACLRTC_LOG_ERROR(
+                "Unterminated environment variable placeholder at %s byte %zu",
+                manifestValueLocation.c_str(), referencePosition);
+            return false;
+        }
+        if (closingBracePosition == namePosition) {
+            ACLRTC_LOG_ERROR(
+                "Environment variable placeholder at %s byte %zu has an empty name",
+                manifestValueLocation.c_str(), referencePosition);
             return false;
         }
         const std::string environmentName = text.substr(namePosition, closingBracePosition - namePosition);
         const char* environmentValue = std::getenv(environmentName.c_str());
         if (environmentValue == nullptr) {
-            ACLRTC_LOG_ERROR("Environment variable %s is not set; set it with: export %s=<value>",
-                             environmentName.c_str(), environmentName.c_str());
+            ACLRTC_LOG_ERROR(
+                "Environment variable %s referenced at %s byte %zu is not set; "
+                "set it with: export %s=<value>",
+                environmentName.c_str(), manifestValueLocation.c_str(), referencePosition,
+                environmentName.c_str());
             return false;
         }
         resolvedText.append(environmentValue);
@@ -91,15 +103,17 @@ bool ResolveEnvironmentReferences(const std::string& text, std::string& resolved
     return true;
 }
 
-bool ResolveManifestText(const std::string& manifestText, const ManifestExpansionContext& expansionContext,
-                         std::string& resolvedText)
+bool ResolvePathAndEnvironmentPlaceholders(
+    const std::string& manifestText, const std::string& manifestValueLocation,
+    const ManifestExpansionContext& expansionContext,
+    std::string& resolvedText)
 {
     std::string pathResolvedText = manifestText;
     ReplaceAllLiteralReferences(pathResolvedText, "${resource}", expansionContext.resourceWorktreePath.string());
     ReplaceAllLiteralReferences(pathResolvedText, "${output}", expansionContext.outputDirectoryPath.string());
     ReplaceAllLiteralReferences(pathResolvedText, "${source_file_path}",
                                 expansionContext.sourceFilePath.parent_path().string());
-    return ResolveEnvironmentReferences(pathResolvedText, resolvedText);
+    return ResolveEnvironmentReferences(pathResolvedText, manifestValueLocation, resolvedText);
 }
 
 bool ParseOptionReference(const std::string& argument, std::string& optionName)
@@ -113,14 +127,15 @@ bool ParseOptionReference(const std::string& argument, std::string& optionName)
     return !optionName.empty();
 }
 
-aclError ExpandManifestArgument(const std::string& manifestArgument,
+aclError ExpandManifestArgument(const std::string& manifestArgument, const std::string& argumentLocation,
                                 const ManifestExpansionContext& expansionContext,
                                 std::vector<std::string>& expandedArguments)
 {
     std::string optionName;
     if (!ParseOptionReference(manifestArgument, optionName)) {
         std::string resolvedArgument;
-        if (!ResolveManifestText(manifestArgument, expansionContext, resolvedArgument)) {
+        if (!ResolvePathAndEnvironmentPlaceholders(
+                manifestArgument, argumentLocation, expansionContext, resolvedArgument)) {
             return ACLRTC_ERROR_FAILURE;
         }
         expandedArguments.emplace_back(std::move(resolvedArgument));
@@ -129,9 +144,12 @@ aclError ExpandManifestArgument(const std::string& manifestArgument,
 
     const Json& optionTable = expansionContext.resourceManifest.at("options");
     const std::vector<std::string> optionArguments = optionTable.at(optionName).get<std::vector<std::string>>();
-    for (const std::string& optionArgument : optionArguments) {
+    for (size_t optionIndex = 0U; optionIndex < optionArguments.size(); ++optionIndex) {
         std::string resolvedArgument;
-        if (!ResolveManifestText(optionArgument, expansionContext, resolvedArgument)) {
+        const std::string optionLocation =
+            "options['" + optionName + "'][" + std::to_string(optionIndex) + "]";
+        if (!ResolvePathAndEnvironmentPlaceholders(
+                optionArguments[optionIndex], optionLocation, expansionContext, resolvedArgument)) {
             return ACLRTC_ERROR_FAILURE;
         }
         expandedArguments.emplace_back(std::move(resolvedArgument));
@@ -184,7 +202,8 @@ aclError BuildSourcePatches(const Json& selectedKernel,
         ACLRTC_LOG_ERROR("Selected kernel must contain at least one constant_info for static compilation");
         return ACLRTC_ERROR_FAILURE;
     }
-    for (const Json& constantInfo : *constantInfos) {
+    for (size_t constantIndex = 0U; constantIndex < constantInfos->size(); ++constantIndex) {
+        const Json& constantInfo = constantInfos->at(constantIndex);
         const uint64_t parameterIndex = constantInfo.at("parameter_index").get<uint64_t>();
         const uint64_t constantByteCount = constantInfo.at("byte_size").get<uint64_t>();
         if (specializationRequest.borrowedKernelArgumentDataPointers == nullptr ||
@@ -215,8 +234,11 @@ aclError BuildSourcePatches(const Json& selectedKernel,
         }
 
         std::string resolvedTargetFilePath;
-        if (!ResolveManifestText(constantInfo.at("file").get<std::string>(), expansionContext,
-                                 resolvedTargetFilePath)) {
+        const std::string constantFileLocation =
+            "constant_infos[" + std::to_string(constantIndex) + "].file";
+        if (!ResolvePathAndEnvironmentPlaceholders(
+                constantInfo.at("file").get<std::string>(), constantFileLocation, expansionContext,
+                resolvedTargetFilePath)) {
             return ACLRTC_ERROR_FAILURE;
         }
         sourcePatches.push_back(
@@ -258,7 +280,9 @@ aclError BuildManifestCommand(const Json& commandJson, const SelectedManifestObj
         return ACLRTC_ERROR_FAILURE;
     }
     std::vector<std::string> expandedExecutable;
-    aclError result = ExpandManifestArgument(manifestArguments.front(), expansionContext, expandedExecutable);
+    aclError result = ExpandManifestArgument(
+        manifestArguments.front(), compilationCommand.diagnosticLabel + ".cmd[0]", expansionContext,
+        expandedExecutable);
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
@@ -270,7 +294,9 @@ aclError BuildManifestCommand(const Json& commandJson, const SelectedManifestObj
     compilationCommand.executablePath = std::move(expandedExecutable.front());
 
     for (size_t argumentIndex = 1U; argumentIndex < manifestArguments.size(); ++argumentIndex) {
-        result = ExpandManifestArgument(manifestArguments[argumentIndex], expansionContext,
+        const std::string argumentLocation = compilationCommand.diagnosticLabel + ".cmd[" +
+                                             std::to_string(argumentIndex) + "]";
+        result = ExpandManifestArgument(manifestArguments[argumentIndex], argumentLocation, expansionContext,
                                         compilationCommand.commandArguments);
         if (result != ACLRTC_SUCCESS) {
             return result;
@@ -334,25 +360,37 @@ aclError BuildLinkCommand(const Json& selectedKernel, const std::vector<Selected
     linkCommand.commandKind = CompilationCommandKind::Link;
     linkCommand.diagnosticLabel = "link";
     std::string linkerPath;
-    if (!ResolveManifestText("${env:ASCEND_HOME_PATH}/bin/ld.lld", expansionContext, linkerPath)) {
+    if (!ResolvePathAndEnvironmentPlaceholders(
+            "${env:ASCEND_HOME_PATH}/bin/ld.lld", "internal linker executable", expansionContext,
+            linkerPath)) {
         return ACLRTC_ERROR_FAILURE;
     }
     linkCommand.executablePath = linkerPath;
 
     const auto linkOptions = selectedKernel.find("link_options");
     if (linkOptions != selectedKernel.end()) {
-        for (const std::string& linkOption : linkOptions->get<std::vector<std::string>>()) {
+        const std::vector<std::string> configuredLinkOptions = linkOptions->get<std::vector<std::string>>();
+        for (size_t linkOptionIndex = 0U; linkOptionIndex < configuredLinkOptions.size(); ++linkOptionIndex) {
             std::string resolvedLinkOption;
-            if (!ResolveManifestText(linkOption, expansionContext, resolvedLinkOption)) {
+            const std::string linkOptionLocation =
+                "link_options[" + std::to_string(linkOptionIndex) + "]";
+            if (!ResolvePathAndEnvironmentPlaceholders(
+                    configuredLinkOptions[linkOptionIndex], linkOptionLocation, expansionContext,
+                    resolvedLinkOption)) {
                 return ACLRTC_ERROR_FAILURE;
             }
             linkCommand.commandArguments.emplace_back(std::move(resolvedLinkOption));
         }
     }
     for (const SelectedManifestObject& selectedObject : selectedObjects) {
-        for (const std::string& output : selectedObject.object->at("outputs").get<std::vector<std::string>>()) {
+        const std::vector<std::string> outputs =
+            selectedObject.object->at("outputs").get<std::vector<std::string>>();
+        for (size_t outputIndex = 0U; outputIndex < outputs.size(); ++outputIndex) {
             std::string resolvedOutput;
-            if (!ResolveManifestText(output, expansionContext, resolvedOutput)) {
+            const std::string outputLocation = std::string(GetSelectedObjectKindName(selectedObject.kind)) +
+                                               ".outputs[" + std::to_string(outputIndex) + "]";
+            if (!ResolvePathAndEnvironmentPlaceholders(
+                    outputs[outputIndex], outputLocation, expansionContext, resolvedOutput)) {
                 return ACLRTC_ERROR_FAILURE;
             }
             linkCommand.commandArguments.emplace_back(resolvedOutput);

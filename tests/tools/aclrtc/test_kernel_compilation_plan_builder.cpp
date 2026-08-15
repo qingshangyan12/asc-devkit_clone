@@ -296,6 +296,40 @@ TEST(KernelCompilationPlanBuilderTest, RequiresOnlyEnvironmentUsedBySelectedObje
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
+TEST(KernelCompilationPlanBuilderTest, ReportsMalformedEnvironmentPlaceholderDetails)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t tilingBytes[] = {0x01, 0x02};
+    const void* argumentDataPointers[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
+    NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    KernelCompilationPlan plan;
+
+    Json manifestWithUnterminatedPlaceholder = CreateManifest();
+    manifestWithUnterminatedPlaceholder["kernels"][1]["objects"][0]["commands"][0]["cmd"][2] =
+        "${env:ACLRTC_TEST_TOOLCHAIN";
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithUnterminatedPlaceholder, workspace.ResourcePath(),
+                                           workspace.SourceFilePath())
+                  .BuildCompilationPlan(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "Unterminated environment variable placeholder at basic/compile[0].cmd[2] byte 0"));
+
+    Json manifestWithEmptyEnvironmentName = CreateManifest();
+    manifestWithEmptyEnvironmentName["kernels"][1]["objects"][0]["commands"][0]["cmd"][2] = "${env:}";
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithEmptyEnvironmentName, workspace.ResourcePath(),
+                                           workspace.SourceFilePath())
+                  .BuildCompilationPlan(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "Environment variable placeholder at basic/compile[0].cmd[2] byte 0 has an empty name"));
+}
+
 TEST(KernelCompilationPlanBuilderTest, DoesNotRecursivelyExpandEnvironmentOrUserOptions)
 {
     KernelPlanTestWorkspace workspace;
