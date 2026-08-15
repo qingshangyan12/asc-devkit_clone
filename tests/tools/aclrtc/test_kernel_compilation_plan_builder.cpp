@@ -386,4 +386,25 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMissingRuntimeConstantBuffer)
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
         "constant parameter_index 0 requires argsAddr and argsBytes"));
 }
+
+TEST(KernelCompilationPlanBuilderTest, RejectsMismatchedRuntimeConstantByteCount)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t oversizedTilingBytes[] = {0x01, 0x02, 0x03};
+    const void* argumentDataPointers[] = {oversizedTilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(oversizedTilingBytes)};
+    NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+
+    KernelCompilationPlan plan;
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
+                                           workspace.SourceFilePath())
+                  .BuildCompilationPlan(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "argsBytes[0]=3 does not match required byte_size 2"));
+}
 } // namespace
