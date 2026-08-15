@@ -28,8 +28,6 @@ constexpr size_t MAX_USER_OPTION_COUNT = 4096U;
 constexpr size_t MAX_REQUEST_TEXT_BYTES = 4U * 1024U * 1024U;
 constexpr char SUPER_KERNEL_ENABLE_OPTION[] = "--enable-super-kernel";
 
-std::atomic<uint64_t> gRequestSequence {0};
-
 bool ReadBoundedString(const char* input, std::string& output, size_t& totalTextBytes)
 {
     if (input == nullptr) {
@@ -59,7 +57,7 @@ bool RewritesCompilerOutput(const std::string& option)
            option.compare(0, sizeof("--output=") - 1U, "--output=") == 0;
 }
 
-aclError ValidateUserOptionText(const std::string& option, const char* optionFieldName, uint64_t optionIndex)
+aclError ValidateOptionCharacters(const std::string& option, const char* optionFieldName, uint64_t optionIndex)
 {
     if (ContainsAsciiControlCharacter(option)) {
         ACLRTC_LOG_ERROR("%s[%llu] contains an ASCII control character", optionFieldName,
@@ -69,8 +67,8 @@ aclError ValidateUserOptionText(const std::string& option, const char* optionFie
     return ACLRTC_SUCCESS;
 }
 
-aclError ValidateForwardedCompilerOption(const std::string& option, const char* optionFieldName,
-                                         uint64_t optionIndex)
+aclError ValidateCompilerOptionForwardingRestrictions(
+    const std::string& option, const char* optionFieldName, uint64_t optionIndex)
 {
     if (option.front() == '@') {
         ACLRTC_LOG_ERROR("%s[%llu] cannot use a compiler response file", optionFieldName,
@@ -85,9 +83,9 @@ aclError ValidateForwardedCompilerOption(const std::string& option, const char* 
     return ACLRTC_SUCCESS;
 }
 
-aclError CopyUserOptions(const char* const* apiOptions, uint64_t apiOptionCount,
-                         const char* optionFieldName, std::vector<std::string>& copiedOptions,
-                         size_t& totalTextBytes)
+aclError CopyAndValidateOptionStrings(const char* const* apiOptions, uint64_t apiOptionCount,
+                                      const char* optionFieldName, std::vector<std::string>& copiedOptions,
+                                      size_t& totalTextBytes)
 {
     if (apiOptionCount == 0U) {
         return ACLRTC_SUCCESS;
@@ -106,7 +104,7 @@ aclError CopyUserOptions(const char* const* apiOptions, uint64_t apiOptionCount,
                              static_cast<unsigned long long>(optionIndex));
             return ACLRTC_ERROR_INVALID_OPTION;
         }
-        const aclError validationResult = ValidateUserOptionText(copiedOption, optionFieldName, optionIndex);
+        const aclError validationResult = ValidateOptionCharacters(copiedOption, optionFieldName, optionIndex);
         if (validationResult != ACLRTC_SUCCESS) {
             return validationResult;
         }
@@ -115,11 +113,12 @@ aclError CopyUserOptions(const char* const* apiOptions, uint64_t apiOptionCount,
     return ACLRTC_SUCCESS;
 }
 
-aclError ValidateForwardedCompilerOptions(const std::vector<std::string>& options, const char* optionFieldName)
+aclError ValidateCompilerOptionListForwardingRestrictions(
+    const std::vector<std::string>& options, const char* optionFieldName)
 {
     for (size_t optionIndex = 0U; optionIndex < options.size(); ++optionIndex) {
         const aclError validationResult =
-            ValidateForwardedCompilerOption(options[optionIndex], optionFieldName, optionIndex);
+            ValidateCompilerOptionForwardingRestrictions(options[optionIndex], optionFieldName, optionIndex);
         if (validationResult != ACLRTC_SUCCESS) {
             return validationResult;
         }
@@ -127,9 +126,51 @@ aclError ValidateForwardedCompilerOptions(const std::vector<std::string>& option
     return ACLRTC_SUCCESS;
 }
 
+aclError ParseSuperKernelOptions(const aclrtcKernelSpecRequest& apiRequest,
+                                 NormalizedKernelSpecializationRequest& normalizedRequest,
+                                 size_t& totalTextBytes)
+{
+    std::vector<std::string> copiedSuperKernelOptions;
+    aclError result = CopyAndValidateOptionStrings(apiRequest.skOptions, apiRequest.skOptionCount, "skOptions",
+                                                   copiedSuperKernelOptions, totalTextBytes);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+
+    const size_t enableOptionCount = static_cast<size_t>(std::count(
+        copiedSuperKernelOptions.begin(), copiedSuperKernelOptions.end(), SUPER_KERNEL_ENABLE_OPTION));
+    if (enableOptionCount > 1U) {
+        ACLRTC_LOG_ERROR("skOptions must contain --enable-super-kernel at most once");
+        return ACLRTC_ERROR_INVALID_OPTION;
+    }
+    if (enableOptionCount == 0U) {
+        if (!copiedSuperKernelOptions.empty()) {
+            ACLRTC_LOG_WARNING(
+                "skOptions were provided without --enable-super-kernel; ignoring skOptions and compiling basic only");
+        }
+        return ACLRTC_SUCCESS;
+    }
+
+    normalizedRequest.compilationVariant = CompilationVariant::BasicWithSuperKernel;
+    for (size_t optionIndex = 0U; optionIndex < copiedSuperKernelOptions.size(); ++optionIndex) {
+        std::string& superKernelOption = copiedSuperKernelOptions[optionIndex];
+        if (superKernelOption == SUPER_KERNEL_ENABLE_OPTION) {
+            continue;
+        }
+        result = ValidateCompilerOptionForwardingRestrictions(superKernelOption, "skOptions", optionIndex);
+        if (result != ACLRTC_SUCCESS) {
+            return result;
+        }
+        normalizedRequest.compilerOptions.superKernelOptions.emplace_back(std::move(superKernelOption));
+    }
+    return ACLRTC_SUCCESS;
+}
+
 std::string CreateRequestId()
 {
-    return std::to_string(getpid()) + "_" + std::to_string(gRequestSequence.fetch_add(1U, std::memory_order_relaxed));
+    static std::atomic<uint64_t> requestSequence {0};
+    return std::to_string(getpid()) + "_" +
+           std::to_string(requestSequence.fetch_add(1U, std::memory_order_relaxed));
 }
 } // namespace
 
@@ -175,45 +216,19 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
         ACLRTC_LOG_ERROR("optionCount + skOptionCount must not exceed %zu", MAX_USER_OPTION_COUNT);
         return ACLRTC_ERROR_INVALID_INPUT;
     }
-    aclError result = CopyUserOptions(apiRequest.options, apiRequest.optionCount, "options",
-                                      request.compilerOptions.basicOptions, totalTextBytes);
+    aclError result = CopyAndValidateOptionStrings(apiRequest.options, apiRequest.optionCount, "options",
+                                                   request.compilerOptions.basicOptions, totalTextBytes);
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
-    result = ValidateForwardedCompilerOptions(request.compilerOptions.basicOptions, "options");
-    if (result != ACLRTC_SUCCESS) {
-        return result;
-    }
-
-    std::vector<std::string> copiedSuperKernelOptions;
-    result = CopyUserOptions(apiRequest.skOptions, apiRequest.skOptionCount, "skOptions",
-                             copiedSuperKernelOptions, totalTextBytes);
+    result = ValidateCompilerOptionListForwardingRestrictions(request.compilerOptions.basicOptions, "options");
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
 
-    const size_t enableOptionCount = static_cast<size_t>(std::count(
-        copiedSuperKernelOptions.begin(), copiedSuperKernelOptions.end(), SUPER_KERNEL_ENABLE_OPTION));
-    if (enableOptionCount > 1U) {
-        ACLRTC_LOG_ERROR("skOptions must contain --enable-super-kernel at most once");
-        return ACLRTC_ERROR_INVALID_OPTION;
-    }
-    if (enableOptionCount == 1U) {
-        request.compilationVariant = CompilationVariant::BasicWithSuperKernel;
-        for (size_t optionIndex = 0U; optionIndex < copiedSuperKernelOptions.size(); ++optionIndex) {
-            std::string& superKernelOption = copiedSuperKernelOptions[optionIndex];
-            if (superKernelOption == SUPER_KERNEL_ENABLE_OPTION) {
-                continue;
-            }
-            result = ValidateForwardedCompilerOption(superKernelOption, "skOptions", optionIndex);
-            if (result != ACLRTC_SUCCESS) {
-                return result;
-            }
-            request.compilerOptions.superKernelOptions.emplace_back(std::move(superKernelOption));
-        }
-    } else if (!copiedSuperKernelOptions.empty()) {
-        ACLRTC_LOG_WARNING(
-            "skOptions were provided without --enable-super-kernel; ignoring skOptions and compiling basic only");
+    result = ParseSuperKernelOptions(apiRequest, request, totalTextBytes);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
     }
 
     request.requestId = CreateRequestId();

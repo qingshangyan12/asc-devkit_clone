@@ -30,6 +30,11 @@ using ascendc::aclrtc::JitResourceRegistryAdapter;
 using ascendc::aclrtc::KernelSpecializationSession;
 using ascendc::aclrtc::RegisteredJitResource;
 
+enum class FakeCompilerOutcome : uint32_t {
+    Success,
+    Failure,
+};
+
 constexpr char RESOURCE_ID[] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 
 class ScopedEnvironmentVariable final {
@@ -65,7 +70,7 @@ private:
 
 class EndToEndTestResource final {
 public:
-    explicit EndToEndTestResource(bool compileSucceeds)
+    explicit EndToEndTestResource(FakeCompilerOutcome compilerOutcome)
     {
         static uint64_t sequence = 0;
         rootPath_ = fs::temp_directory_path() /
@@ -82,7 +87,8 @@ public:
         WriteFile(sourceFilePath_, "// user source\n");
         WriteFile(worktreePath_ / "resources/include/constants.h", "TILING=@@STATIC_TILING@@;\n");
         WriteFile(worktreePath_ / "resources/src/basic.cpp", "// basic source\n");
-        WriteExecutable(toolchainPath_ / "bin/bisheng", compileSucceeds ? CreateOutputScript("object")
+        WriteExecutable(toolchainPath_ / "bin/bisheng",
+                        compilerOutcome == FakeCompilerOutcome::Success ? CreateOutputScript("object")
                                                                         : "#!/bin/sh\nexit 2\n");
         WriteExecutable(toolchainPath_ / "bin/ld.lld", CreateOutputScript("linked-elf"));
         manifest_ = CreateManifest();
@@ -101,9 +107,9 @@ public:
         if (resourceId != RESOURCE_ID) {
             return ascendc::aclrtc::ACLRTC_ERROR_FAILURE;
         }
-        resource.resourceManifest = &testResource.manifest_;
-        resource.resourceWorktreePath = testResource.worktreePath_;
-        resource.sourceFilePath = testResource.sourceFilePath_;
+        resource.borrowedManifest = &testResource.manifest_;
+        resource.ownedWorktreePath = testResource.worktreePath_;
+        resource.externalSourceFilePath = testResource.sourceFilePath_;
         return 0;
     }
 
@@ -192,7 +198,7 @@ std::string ReadFile(const fs::path& path)
 
 TEST(KernelSpecializationSessionTest, RunsLookupPatchCompileLinkPublishAndCleanup)
 {
-    EndToEndTestResource testResource(true);
+    EndToEndTestResource testResource(FakeCompilerOutcome::Success);
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
     JitResourceRegistryAdapter registryAdapter(EndToEndTestResource::Lookup, &testResource);
@@ -210,7 +216,7 @@ TEST(KernelSpecializationSessionTest, RunsLookupPatchCompileLinkPublishAndCleanu
 
 TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilationFails)
 {
-    EndToEndTestResource testResource(false);
+    EndToEndTestResource testResource(FakeCompilerOutcome::Failure);
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
     std::ofstream(testResource.OutputElfPath()) << "previous-elf";
@@ -229,7 +235,7 @@ TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilatio
 
 TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingIsEnabled)
 {
-    EndToEndTestResource testResource(true);
+    EndToEndTestResource testResource(FakeCompilerOutcome::Success);
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "1");
     JitResourceRegistryAdapter registryAdapter(EndToEndTestResource::Lookup, &testResource);
@@ -254,7 +260,7 @@ TEST(KernelSpecializationSessionTest, CleansWorktreeWhenRegistryReturnsIncomplet
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
     auto returnIncompleteResource = [](const std::string&, RegisteredJitResource& resource,
                                        void* context) -> aclError {
-        resource.resourceWorktreePath = *static_cast<const fs::path*>(context);
+        resource.ownedWorktreePath = *static_cast<const fs::path*>(context);
         return 0;
     };
     JitResourceRegistryAdapter registryAdapter(returnIncompleteResource, &worktreePath);

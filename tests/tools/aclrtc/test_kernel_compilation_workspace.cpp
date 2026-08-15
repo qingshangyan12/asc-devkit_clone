@@ -23,6 +23,7 @@ namespace {
 namespace fs = boost::filesystem;
 using ascendc::aclrtc::KernelCompilationPlan;
 using ascendc::aclrtc::KernelCompilationWorkspace;
+using ascendc::aclrtc::WorktreeRetentionPolicy;
 
 fs::path CreateWorkspacePath(const std::string& name)
 {
@@ -58,7 +59,7 @@ TEST(KernelCompilationWorkspaceTest, CreatesOutputDirectoriesAndAppliesAllPatche
         {sourcePath, "@@B@@", "{0x02}"},
     };
 
-    KernelCompilationWorkspace workspace(worktreePath, true);
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
     EXPECT_EQ(workspace.MaterializeCompilationInputs(plan), 0);
     EXPECT_TRUE(fs::is_directory(worktreePath / "outputs/nested"));
     EXPECT_EQ(ReadFile(sourcePath), "A={0x01}; B={0x02};\n");
@@ -75,7 +76,7 @@ TEST(KernelCompilationWorkspaceTest, ReportsMissingPatchTemplateAsResourceFailur
     KernelCompilationPlan plan;
     plan.sourcePatches = {{sourcePath, "@@MISSING@@", "{0x01}"}};
 
-    KernelCompilationWorkspace workspace(worktreePath, true);
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(workspace.MaterializeCompilationInputs(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
@@ -90,13 +91,13 @@ TEST(KernelCompilationWorkspaceTest, DeletesWorktreeByDefaultAndRetainsItWhenReq
 {
     const fs::path removedWorktreePath = CreateWorkspacePath("aclrtc_workspace_remove");
     {
-        KernelCompilationWorkspace workspace(removedWorktreePath, false);
+        KernelCompilationWorkspace workspace(removedWorktreePath, WorktreeRetentionPolicy::RemoveAfterCompilation);
     }
     EXPECT_FALSE(fs::exists(removedWorktreePath));
 
     const fs::path retainedWorktreePath = CreateWorkspacePath("aclrtc_workspace_retain");
     {
-        KernelCompilationWorkspace workspace(retainedWorktreePath, true);
+        KernelCompilationWorkspace workspace(retainedWorktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
     }
     EXPECT_TRUE(fs::is_directory(retainedWorktreePath));
     boost::system::error_code ignoredError;
@@ -106,7 +107,7 @@ TEST(KernelCompilationWorkspaceTest, DeletesWorktreeByDefaultAndRetainsItWhenReq
 TEST(KernelCompilationWorkspaceTest, FinalizesCleanupBeforeOutputPublication)
 {
     const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_finalize");
-    KernelCompilationWorkspace workspace(worktreePath, false);
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RemoveAfterCompilation);
     EXPECT_EQ(workspace.FinalizeBeforePublishingKernelElf(), 0);
     EXPECT_FALSE(fs::exists(worktreePath));
 }

@@ -25,7 +25,6 @@ namespace ascendc {
 namespace aclrtc {
 namespace {
 namespace fs = boost::filesystem;
-std::atomic<uint64_t> gPatchFileSequence {0};
 
 bool ReadFile(const fs::path& filePath, std::string& contents)
 {
@@ -55,9 +54,10 @@ bool ReplaceTemplateOnce(std::string& sourceText, const std::string& templateTex
 
 bool ReplaceFileAtomically(const fs::path& targetFilePath, const std::string& contents)
 {
+    static std::atomic<uint64_t> temporaryPatchFileSequence {0};
     const fs::path temporaryFilePath =
         targetFilePath.string() + ".aclrtc_patch_" + std::to_string(getpid()) + "_" +
-        std::to_string(gPatchFileSequence.fetch_add(1U, std::memory_order_relaxed));
+        std::to_string(temporaryPatchFileSequence.fetch_add(1U, std::memory_order_relaxed));
     {
         std::ofstream outputStream(temporaryFilePath, std::ios::out | std::ios::binary | std::ios::trunc);
         if (!outputStream) {
@@ -87,13 +87,15 @@ bool ReplaceFileAtomically(const fs::path& targetFilePath, const std::string& co
 }
 } // namespace
 
-KernelCompilationWorkspace::KernelCompilationWorkspace(fs::path worktreePath, bool retainWorktree)
-    : worktreePath_(std::move(worktreePath)), retainWorktree_(retainWorktree)
+KernelCompilationWorkspace::KernelCompilationWorkspace(
+    fs::path worktreePath, WorktreeRetentionPolicy retentionPolicy)
+    : worktreePath_(std::move(worktreePath)), retentionPolicy_(retentionPolicy)
 {}
 
 KernelCompilationWorkspace::~KernelCompilationWorkspace()
 {
-    if (worktreeFinalized_ || retainWorktree_ || worktreePath_.empty()) {
+    if (worktreeDispositionFinalized_ || retentionPolicy_ == WorktreeRetentionPolicy::RetainForDiagnostics ||
+        worktreePath_.empty()) {
         return;
     }
     boost::system::error_code cleanupError;
@@ -148,11 +150,11 @@ aclError KernelCompilationWorkspace::MaterializeCompilationInputs(const KernelCo
 
 aclError KernelCompilationWorkspace::FinalizeBeforePublishingKernelElf()
 {
-    if (worktreeFinalized_) {
+    if (worktreeDispositionFinalized_) {
         return ACLRTC_SUCCESS;
     }
-    if (retainWorktree_) {
-        worktreeFinalized_ = true;
+    if (retentionPolicy_ == WorktreeRetentionPolicy::RetainForDiagnostics) {
+        worktreeDispositionFinalized_ = true;
         return ACLRTC_SUCCESS;
     }
     boost::system::error_code cleanupError;
@@ -162,7 +164,7 @@ aclError KernelCompilationWorkspace::FinalizeBeforePublishingKernelElf()
                          worktreePath_.c_str(), cleanupError.value());
         return ACLRTC_ERROR_FAILURE;
     }
-    worktreeFinalized_ = true;
+    worktreeDispositionFinalized_ = true;
     return ACLRTC_SUCCESS;
 }
 
