@@ -176,8 +176,8 @@ std::string EncodeConstantBytes(const void* constantAddress, uint64_t constantBy
 
 aclError BuildSourcePatches(const Json& selectedKernel,
                             const NormalizedKernelSpecializationRequest& specializationRequest,
-    const ManifestExpansionContext& expansionContext,
-    std::vector<KernelSourcePatch>& sourcePatches)
+                            const ManifestExpansionContext& expansionContext,
+                            std::vector<KernelSourcePatch>& sourcePatches)
 {
     const auto constantInfos = selectedKernel.find("constant_infos");
     if (constantInfos == selectedKernel.end() || constantInfos->empty()) {
@@ -206,8 +206,8 @@ aclError BuildSourcePatches(const Json& selectedKernel,
         }
         const uint64_t suppliedByteCount =
             specializationRequest.borrowedKernelArgumentByteCounts[parameterIndex];
-        if (suppliedByteCount < constantByteCount) {
-            ACLRTC_LOG_ERROR("argsBytes[%llu]=%llu is smaller than required byte_size %llu",
+        if (suppliedByteCount != constantByteCount) {
+            ACLRTC_LOG_ERROR("argsBytes[%llu]=%llu does not match required byte_size %llu",
                              static_cast<unsigned long long>(parameterIndex),
                              static_cast<unsigned long long>(suppliedByteCount),
                              static_cast<unsigned long long>(constantByteCount));
