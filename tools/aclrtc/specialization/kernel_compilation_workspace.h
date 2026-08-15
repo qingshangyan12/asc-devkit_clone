@@ -14,13 +14,19 @@
 #include "kernel_specialization_types.h"
 
 #include <boost/filesystem/path.hpp>
+#include <cstdint>
 
 namespace ascendc {
 namespace aclrtc {
 
+enum class WorktreeRetentionPolicy : uint32_t {
+    RemoveAfterCompilation,
+    RetainForDiagnostics,
+};
+
 class KernelCompilationWorkspace final {
 public:
-    KernelCompilationWorkspace(boost::filesystem::path worktreePath, bool retainWorktree);
+    KernelCompilationWorkspace(boost::filesystem::path worktreePath, WorktreeRetentionPolicy retentionPolicy);
     ~KernelCompilationWorkspace();
 
     KernelCompilationWorkspace(const KernelCompilationWorkspace&) = delete;
@@ -32,8 +38,8 @@ public:
 
 private:
     boost::filesystem::path worktreePath_;
-    bool retainWorktree_ {false};
-    bool worktreeFinalized_ {false};
+    WorktreeRetentionPolicy retentionPolicy_ {WorktreeRetentionPolicy::RemoveAfterCompilation};
+    bool worktreeDispositionFinalized_ {false};
 };
 
 } // namespace aclrtc

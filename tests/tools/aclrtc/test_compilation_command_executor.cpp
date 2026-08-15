@@ -33,6 +33,7 @@ using ascendc::aclrtc::CompilationCommandKind;
 using ascendc::aclrtc::CompilationProcessResult;
 using ascendc::aclrtc::CompilationProcessTermination;
 using ascendc::aclrtc::CompilationVariant;
+using ascendc::aclrtc::DiagnosticCollectionMode;
 using ascendc::aclrtc::KernelCompilationPlan;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
 
@@ -78,7 +79,7 @@ TEST(CompilationCommandExecutorTest, ExecutesCommandsWithoutShellParsing)
 {
     boost::system::error_code ignoredError;
     fs::remove("/tmp/aclrtc_should_not_exist", ignoredError);
-    KernelSpecializationDiagnostics diagnostics("executor_success", false);
+    KernelSpecializationDiagnostics diagnostics("executor_success", DiagnosticCollectionMode::Disabled);
     CompilationCommandExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(
@@ -90,7 +91,7 @@ TEST(CompilationCommandExecutorTest, ExecutesCommandsWithoutShellParsing)
 
 TEST(CompilationCommandExecutorTest, RejectsEmbeddedNullBeforeSpawningProcess)
 {
-    KernelSpecializationDiagnostics diagnostics("executor_embedded_null", false);
+    KernelSpecializationDiagnostics diagnostics("executor_embedded_null", DiagnosticCollectionMode::Disabled);
     CompilationCommandExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
 
     std::string executableWithEmbeddedNull("/bin/true");
@@ -114,7 +115,7 @@ TEST(CompilationCommandExecutorTest, RejectsEmbeddedNullBeforeSpawningProcess)
 
 TEST(CompilationCommandExecutorTest, MapsCompileAndLinkFailuresToDifferentErrors)
 {
-    KernelSpecializationDiagnostics diagnostics("executor_failure", false);
+    KernelSpecializationDiagnostics diagnostics("executor_failure", DiagnosticCollectionMode::Disabled);
     CompilationCommandExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/false", {}));
@@ -126,7 +127,7 @@ TEST(CompilationCommandExecutorTest, MapsCompileAndLinkFailuresToDifferentErrors
 
 TEST(CompilationCommandExecutorTest, UsesInjectedShortTimeoutInUnitTests)
 {
-    KernelSpecializationDiagnostics diagnostics("executor_timeout", false);
+    KernelSpecializationDiagnostics diagnostics("executor_timeout", DiagnosticCollectionMode::Disabled);
     CompilationCommandExecutionLimits limits;
     limits.compileCommandTimeout = 20ms;
     limits.objectCopyAndLinkCommandTimeout = 20ms;
@@ -147,7 +148,7 @@ TEST(CompilationCommandExecutorTest, TimeoutTerminatesDescendantsAfterCommandLea
     const fs::path descendantProcessIdPath =
         fs::temp_directory_path() /
         ("aclrtc_descendant_pid_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
-    KernelSpecializationDiagnostics diagnostics("executor_process_group", false);
+    KernelSpecializationDiagnostics diagnostics("executor_process_group", DiagnosticCollectionMode::Disabled);
     CompilationCommandExecutionLimits limits {20ms, 20ms, 20ms, 1024U};
     CompilationCommandExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
@@ -183,7 +184,7 @@ TEST(CompilationCommandExecutorTest, ReportsSpawnFailureAsInfrastructureFailure)
     const fs::path diagnosticDirectoryPath = GetDiagnosticDirectoryPath(requestId);
     boost::system::error_code ignoredError;
     fs::remove_all(diagnosticDirectoryPath, ignoredError);
-    KernelSpecializationDiagnostics diagnostics(requestId, true);
+    KernelSpecializationDiagnostics diagnostics(requestId, DiagnosticCollectionMode::Enabled);
     CompilationCommandExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(
@@ -202,7 +203,7 @@ TEST(CompilationCommandExecutorTest, BoundsCapturedProcessOutput)
     const fs::path diagnosticDirectoryPath = GetDiagnosticDirectoryPath(requestId);
     boost::system::error_code ignoredError;
     fs::remove_all(diagnosticDirectoryPath, ignoredError);
-    KernelSpecializationDiagnostics diagnostics(requestId, true);
+    KernelSpecializationDiagnostics diagnostics(requestId, DiagnosticCollectionMode::Enabled);
     CompilationCommandExecutionLimits limits = CompilationCommandExecutionLimits::ProductionDefaults();
     limits.capturedOutputByteLimit = 8U;
     CompilationCommandExecutor executor(diagnostics, limits);

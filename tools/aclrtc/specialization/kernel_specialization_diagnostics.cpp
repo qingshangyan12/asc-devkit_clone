@@ -55,10 +55,11 @@ const char* GetTerminationName(CompilationProcessTermination termination)
 }
 } // namespace
 
-KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(std::string requestId, bool saveKernelMetaEnabled)
-    : requestId_(std::move(requestId)), saveKernelMetaEnabled_(saveKernelMetaEnabled)
+KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
+    std::string requestId, DiagnosticCollectionMode collectionMode)
+    : requestId_(std::move(requestId)), diagnosticsEnabled_(collectionMode == DiagnosticCollectionMode::Enabled)
 {
-    if (!saveKernelMetaEnabled_) {
+    if (!diagnosticsEnabled_) {
         return;
     }
     try {
@@ -67,7 +68,7 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(std::string req
         boost::system::error_code directoryError;
         fs::create_directories(diagnosticDirectoryPath_, directoryError);
         if (directoryError) {
-            saveKernelMetaEnabled_ = false;
+            diagnosticsEnabled_ = false;
             ACLRTC_LOG_WARNING("Failed to create diagnostic directory: %s", directoryError.message().c_str());
             return;
         }
@@ -76,7 +77,7 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(std::string req
             ACLRTC_LOG_WARNING("Failed to make replay script executable");
         }
     } catch (...) {
-        saveKernelMetaEnabled_ = false;
+        diagnosticsEnabled_ = false;
         ACLRTC_LOG_WARNING("Failed to initialize specialization diagnostics");
     }
 }
@@ -84,7 +85,7 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(std::string req
 void KernelSpecializationDiagnostics::SaveManifestForDiagnostics(
     const nlohmann::json& resourceManifest) noexcept
 {
-    if (!saveKernelMetaEnabled_) {
+    if (!diagnosticsEnabled_) {
         return;
     }
     try {
@@ -102,7 +103,7 @@ void KernelSpecializationDiagnostics::SaveManifestForDiagnostics(
 void KernelSpecializationDiagnostics::RecordResourceWorktreePath(
     const fs::path& resourceWorktreePath) noexcept
 {
-    if (!saveKernelMetaEnabled_) {
+    if (!diagnosticsEnabled_) {
         return;
     }
     try {
@@ -116,7 +117,7 @@ void KernelSpecializationDiagnostics::RecordResourceWorktreePath(
 void KernelSpecializationDiagnostics::RecordCompilationCommand(
     const CompilationCommand& compilationCommand) noexcept
 {
-    if (!saveKernelMetaEnabled_) {
+    if (!diagnosticsEnabled_) {
         return;
     }
     try {
@@ -134,7 +135,7 @@ void KernelSpecializationDiagnostics::RecordCompilationCommand(
 void KernelSpecializationDiagnostics::RecordCompilationProcessResult(
     const CompilationCommand& compilationCommand, const CompilationProcessResult& processResult) noexcept
 {
-    if (!saveKernelMetaEnabled_) {
+    if (!diagnosticsEnabled_) {
         return;
     }
     try {
@@ -154,16 +155,16 @@ void KernelSpecializationDiagnostics::RecordCompilationProcessResult(
 }
 
 void KernelSpecializationDiagnostics::RecordSpecializationResult(
-    const fs::path& outputElfPath, bool outputElfPublished) noexcept
+    const fs::path& outputElfPath, OutputPublicationStatus publicationStatus) noexcept
 {
-    if (!saveKernelMetaEnabled_) {
+    if (!diagnosticsEnabled_) {
         return;
     }
     try {
         nlohmann::json resultJson {
             {"request_id", requestId_},
             {"output_path", outputElfPath.string()},
-            {"output_published", outputElfPublished},
+            {"output_published", publicationStatus == OutputPublicationStatus::Published},
         };
         std::ofstream resultStream(diagnosticDirectoryPath_ / "result.json", std::ios::out | std::ios::trunc);
         if (!resultStream) {
@@ -179,7 +180,7 @@ void KernelSpecializationDiagnostics::RecordSpecializationResult(
 void KernelSpecializationDiagnostics::AppendDiagnosticText(
     const fs::path& filePath, const std::string& text) noexcept
 {
-    if (!saveKernelMetaEnabled_) {
+    if (!diagnosticsEnabled_) {
         return;
     }
     try {

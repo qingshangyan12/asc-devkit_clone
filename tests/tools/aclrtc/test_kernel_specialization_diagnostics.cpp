@@ -24,7 +24,9 @@ namespace fs = boost::filesystem;
 using ascendc::aclrtc::CompilationCommand;
 using ascendc::aclrtc::CompilationCommandKind;
 using ascendc::aclrtc::CompilationProcessResult;
+using ascendc::aclrtc::DiagnosticCollectionMode;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
+using ascendc::aclrtc::OutputPublicationStatus;
 
 class ScopedCurrentDirectory final {
 public:
@@ -59,7 +61,7 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
     fs::create_directories(testRoot);
     {
         ScopedCurrentDirectory currentDirectory(testRoot);
-        KernelSpecializationDiagnostics diagnostics("request_1", true);
+        KernelSpecializationDiagnostics diagnostics("request_1", DiagnosticCollectionMode::Enabled);
         diagnostics.SaveManifestForDiagnostics(nlohmann::json {{"schema_version", "1.0"}});
         diagnostics.RecordResourceWorktreePath("/tmp/resource-worktree");
 
@@ -69,7 +71,7 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
         CompilationProcessResult processResult;
         processResult.capturedOutput = "compiler output\n";
         diagnostics.RecordCompilationProcessResult(command, processResult);
-        diagnostics.RecordSpecializationResult("/tmp/kernel.elf", true);
+        diagnostics.RecordSpecializationResult("/tmp/kernel.elf", OutputPublicationStatus::Published);
     }
 
     const fs::path diagnosticDirectory =
