@@ -94,19 +94,11 @@ struct is_supported<float> {
 
 } // namespace detail
 
-#if __cplusplus >= 202002L
-template <typename To, cast_options Options, typename From>
-__simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src)
-{
-    return detail::cast_impl<To, Options.layout, Options.round, Options.sat>(src);
-}
-#else
 template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat, typename From>
 __simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src)
 {
     return detail::cast_impl<To, Layout, Round, Sat>(src);
 }
-#endif
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src)
