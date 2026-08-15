@@ -31,7 +31,6 @@ namespace ascendc {
 namespace aclrtc {
 namespace {
 namespace fs = boost::filesystem;
-std::atomic<uint64_t> gPublishedOutputSequence {0};
 
 bool IsKernelMetaSavingEnabled()
 {
@@ -74,10 +73,11 @@ bool CreateTemporaryOutputFile(const fs::path& outputElfPath, fs::path& temporar
                                int& temporaryOutputFileDescriptor)
 {
     constexpr size_t MAX_TEMPORARY_FILE_ATTEMPTS = 32U;
+    static std::atomic<uint64_t> temporaryOutputFileSequence {0};
     for (size_t attempt = 0U; attempt < MAX_TEMPORARY_FILE_ATTEMPTS; ++attempt) {
         temporaryOutputPath =
             outputElfPath.string() + ".aclrtc_tmp_" + std::to_string(getpid()) + "_" +
-            std::to_string(gPublishedOutputSequence.fetch_add(1U, std::memory_order_relaxed));
+            std::to_string(temporaryOutputFileSequence.fetch_add(1U, std::memory_order_relaxed));
         temporaryOutputFileDescriptor =
             open(temporaryOutputPath.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0644);
         if (temporaryOutputFileDescriptor >= 0) {
