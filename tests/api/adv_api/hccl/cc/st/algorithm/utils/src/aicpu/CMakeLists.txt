@@ -10,6 +10,7 @@
 
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/types
     ${HCCL_DEV_BASE}/src/common
     ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
 
@@ -141,6 +142,8 @@ target_compile_definitions(${HCCL_CHECKER_EXECUTOR_TARGET} PRIVATE
 )
 
 add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
+    ${HCCL_DEV_BASE}/src/common/hccl_alloc_ctx_res.cc
+    ${HCCL_DEV_BASE}/src/common/hccl_mc2.cc
     ${HCCL_DEV_BASE}/src/common/utils.cc
     # ${HCCL_DEV_BASE}/src/common/adapter_acl.cc
     ${HCCL_DEV_BASE}/src/common/config_log.cc
