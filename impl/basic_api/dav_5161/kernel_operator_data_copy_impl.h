@@ -31,25 +31,25 @@ namespace AscendC {
 // all input params: C220 version, not C310 version, thus need conversion by *32
 constexpr uint8_t BYTE_32_ALIGN = 32; // in unit of 32 bytes
 
-__aicore__ inline void ValidateUbL1Address(uint64_t absUbAddr, uint64_t absL1Addr, uint32_t tensorSize)
-{
-    ASCENDC_ASSERT((absUbAddr < TOTAL_UB_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "absUbAddr is 0x%lx, which should be in range of [0, %u)", absUbAddr, TOTAL_UB_SIZE);
-    });
-    ASCENDC_ASSERT((static_cast<uint64_t>(absUbAddr + tensorSize) < TOTAL_UB_SIZE), {
-        KERNEL_LOG(
-            KERNEL_ERROR, "absUbAddr is 0x%lx, tensorSize is %u, which exceeds the limit of ub %d)", absUbAddr,
-            tensorSize, TOTAL_UB_SIZE);
-    });
-    ASCENDC_ASSERT((absL1Addr < TOTAL_L1_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "absL1Addr is 0x%lx, which should be in range [0, %u)", absL1Addr, TOTAL_L1_SIZE);
-    });
-    ASCENDC_ASSERT((static_cast<uint64_t>(absL1Addr + tensorSize) < TOTAL_L1_SIZE), {
-        KERNEL_LOG(
-            KERNEL_ERROR, "absL1Addr is 0x%lx, tensorSize is %u, which exceeds the limit of l1 %u)", absL1Addr,
-            tensorSize, TOTAL_L1_SIZE);
-    });
-}
+// __aicore__ inline void ValidateUbL1Address(uint64_t absUbAddr, uint64_t absL1Addr, uint32_t tensorSize)
+// {
+//     ASCENDC_ASSERT((absUbAddr < TOTAL_UB_SIZE), {
+//         KERNEL_LOG(KERNEL_ERROR, "absUbAddr is 0x%lx, which should be in range of [0, %u)", absUbAddr, TOTAL_UB_SIZE);
+//     });
+//     ASCENDC_ASSERT((static_cast<uint64_t>(absUbAddr + tensorSize) < TOTAL_UB_SIZE), {
+//         KERNEL_LOG(
+//             KERNEL_ERROR, "absUbAddr is 0x%lx, tensorSize is %u, which exceeds the limit of ub %d)", absUbAddr,
+//             tensorSize, TOTAL_UB_SIZE);
+//     });
+//     ASCENDC_ASSERT((absL1Addr < TOTAL_L1_SIZE), {
+//         KERNEL_LOG(KERNEL_ERROR, "absL1Addr is 0x%lx, which should be in range [0, %u)", absL1Addr, TOTAL_L1_SIZE);
+//     });
+//     ASCENDC_ASSERT((static_cast<uint64_t>(absL1Addr + tensorSize) < TOTAL_L1_SIZE), {
+//         KERNEL_LOG(
+//             KERNEL_ERROR, "absL1Addr is 0x%lx, tensorSize is %u, which exceeds the limit of l1 %u)", absL1Addr,
+//             tensorSize, TOTAL_L1_SIZE);
+//     });
+// }
 
 // only support VecCore    PIPE_MTE2
 // GM -> UB: copy_gm_to_ubuf_align_v2: support changing padding value
@@ -60,7 +60,7 @@ __aicore__ inline void CopyGmToUbufAlignV2(
     const uint8_t rightPaddingCount, const int64_t srcStride, const int64_t dstStride, const bool isDataCopyPad,
     const bool isPad = true)
 {
-    // if ASCEND_IS_AIV { // chengn
+    // if ASCEND_IS_AIV {
         // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte
         uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
         uint32_t burstLength = blockLen * unitOfBytes;
@@ -1570,58 +1570,58 @@ __aicore__ inline void NdDmaDciImpl()
 #endif
 }
 
-template <uint8_t dim, const NdDmaConfig& config>
-__aicore__ inline void SetNDDMALoopInfo(
-    const MultiCopyLoopInfo<dim>& params, const uint8_t idx, uint64_t& padCount, uint32_t& loopSize,
-    uint64_t& loopStride)
-{
-    constexpr uint8_t loopEncodingOffset = 16;
-    constexpr uint8_t lpEncodingOffset = 16;
-    constexpr uint8_t rpEncodingOffset = 8;
-    constexpr uint8_t srcStrideEncodingOffset = 20;
+// template <uint8_t dim, const NdDmaConfig& config>
+// __aicore__ inline void SetNDDMALoopInfo(
+//     const MultiCopyLoopInfo<dim>& params, const uint8_t idx, uint64_t& padCount, uint32_t& loopSize,
+//     uint64_t& loopStride)
+// {
+//     constexpr uint8_t loopEncodingOffset = 16;
+//     constexpr uint8_t lpEncodingOffset = 16;
+//     constexpr uint8_t rpEncodingOffset = 8;
+//     constexpr uint8_t srcStrideEncodingOffset = 20;
 
-    const uint8_t loopLpSize = config.loopLpSize == NdDmaConfig::unsetPad ? params.loopLpSize[idx] : config.loopLpSize;
-    const uint8_t loopRpSize = config.loopRpSize == NdDmaConfig::unsetPad ? params.loopRpSize[idx] : config.loopRpSize;
+//     const uint8_t loopLpSize = config.loopLpSize == NdDmaConfig::unsetPad ? params.loopLpSize[idx] : config.loopLpSize;
+//     const uint8_t loopRpSize = config.loopRpSize == NdDmaConfig::unsetPad ? params.loopRpSize[idx] : config.loopRpSize;
 
-    padCount |= static_cast<uint64_t>(loopLpSize & 0xff) << (loopEncodingOffset * idx - lpEncodingOffset);
-    padCount |= static_cast<uint64_t>(loopRpSize & 0xff) << (loopEncodingOffset * idx - rpEncodingOffset);
-    loopSize = params.loopSize[idx];
-    loopStride = (params.loopSrcStride[idx] << srcStrideEncodingOffset) |
-                 static_cast<uint64_t>(params.loopDstStride[idx] & 0xfffff);
-}
+//     padCount |= static_cast<uint64_t>(loopLpSize & 0xff) << (loopEncodingOffset * idx - lpEncodingOffset);
+//     padCount |= static_cast<uint64_t>(loopRpSize & 0xff) << (loopEncodingOffset * idx - rpEncodingOffset);
+//     loopSize = params.loopSize[idx];
+//     loopStride = (params.loopSrcStride[idx] << srcStrideEncodingOffset) |
+//                  static_cast<uint64_t>(params.loopDstStride[idx] & 0xfffff);
+// }
 
-template <uint8_t dim>
-__aicore__ inline MultiCopyLoopInfo<dim> BuildLoopInfoForTwiceB32(const MultiCopyLoopInfo<dim>& params)
-{
-    MultiCopyLoopInfo<dim> newParams;
-    for (uint32_t i = 0; i < dim; i++) {
-        newParams.loopSize[i] = params.loopSize[i];
-        newParams.loopSrcStride[i] = params.loopSrcStride[i] * 2;
-        newParams.loopDstStride[i] = params.loopDstStride[i] * 2;
-        newParams.loopLpSize[i] = params.loopLpSize[i];
-        newParams.loopRpSize[i] = params.loopRpSize[i];
-    }
-    return newParams;
-}
+// template <uint8_t dim>
+// __aicore__ inline MultiCopyLoopInfo<dim> BuildLoopInfoForTwiceB32(const MultiCopyLoopInfo<dim>& params)
+// {
+//     MultiCopyLoopInfo<dim> newParams;
+//     for (uint32_t i = 0; i < dim; i++) {
+//         newParams.loopSize[i] = params.loopSize[i];
+//         newParams.loopSrcStride[i] = params.loopSrcStride[i] * 2;
+//         newParams.loopDstStride[i] = params.loopDstStride[i] * 2;
+//         newParams.loopLpSize[i] = params.loopLpSize[i];
+//         newParams.loopRpSize[i] = params.loopRpSize[i];
+//     }
+//     return newParams;
+// }
 
-template <uint8_t prevDim, uint8_t actualDim, bool hasPad>
-__aicore__ inline MultiCopyLoopInfo<actualDim> BuildLoopInfoByFuseAxis(const MultiCopyLoopInfo<prevDim> params)
-{
-    MultiCopyLoopInfo<actualDim> newParams;
-    newParams.loopSize[0] = 2;
-    newParams.loopSrcStride[0] = 1;
-    newParams.loopDstStride[0] = 1;
-    for (uint32_t i = 1; i < actualDim; i++) {
-        newParams.loopSize[i] = params.loopSize[i - 1];
-        newParams.loopSrcStride[i] = params.loopSrcStride[i - 1] * 2;
-        newParams.loopDstStride[i] = params.loopDstStride[i - 1] * 2;
-        if constexpr (hasPad) {
-            newParams.loopLpSize[i] = params.loopLpSize[i - 1];
-            newParams.loopRpSize[i] = params.loopRpSize[i - 1];
-        }
-    }
-    return newParams;
-}
+// template <uint8_t prevDim, uint8_t actualDim, bool hasPad>
+// __aicore__ inline MultiCopyLoopInfo<actualDim> BuildLoopInfoByFuseAxis(const MultiCopyLoopInfo<prevDim> params)
+// {
+//     MultiCopyLoopInfo<actualDim> newParams;
+//     newParams.loopSize[0] = 2;
+//     newParams.loopSrcStride[0] = 1;
+//     newParams.loopDstStride[0] = 1;
+//     for (uint32_t i = 1; i < actualDim; i++) {
+//         newParams.loopSize[i] = params.loopSize[i - 1];
+//         newParams.loopSrcStride[i] = params.loopSrcStride[i - 1] * 2;
+//         newParams.loopDstStride[i] = params.loopDstStride[i - 1] * 2;
+//         if constexpr (hasPad) {
+//             newParams.loopLpSize[i] = params.loopLpSize[i - 1];
+//             newParams.loopRpSize[i] = params.loopRpSize[i - 1];
+//         }
+//     }
+//     return newParams;
+// }
 
 template <typename T, uint8_t dim, const NdDmaConfig& config>
 __aicore__ inline void DataCopyWithNDDMAB64Impl(
