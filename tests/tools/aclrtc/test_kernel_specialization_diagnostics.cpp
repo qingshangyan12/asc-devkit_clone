@@ -62,16 +62,16 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
     {
         ScopedCurrentDirectory currentDirectory(testRoot);
         KernelSpecializationDiagnostics diagnostics("session_1", DiagnosticCollectionMode::Enabled);
-        diagnostics.SaveManifestForDiagnostics(nlohmann::json {{"schema_version", "1.0"}});
-        diagnostics.RecordResourceWorktreePath("/tmp/resource-worktree");
+        diagnostics.RecordManifest(nlohmann::json {{"schema_version", "1.0"}});
+        diagnostics.RecordWorktree("/tmp/resource-worktree");
 
         const CompilationCommand command {CompilationCommandKind::Compile, 0U, "basic/compile[0]",
                                           "/bin/echo", {"argument with space", "quote'value"}};
-        diagnostics.RecordCompilationCommand(command);
+        diagnostics.RecordCommand(command);
         CompilationProcessResult processResult;
         processResult.capturedOutput = "compiler output\n";
-        diagnostics.RecordCompilationProcessResult(command, processResult);
-        diagnostics.RecordSpecializationResult("/tmp/kernel.elf", OutputPublicationStatus::Published);
+        diagnostics.RecordCommandResult(command, processResult);
+        diagnostics.RecordFinalResult("/tmp/kernel.elf", OutputPublicationStatus::Published);
     }
 
     const fs::path diagnosticDirectory =
