@@ -33,9 +33,8 @@ add_executable(demo
 )
 
 set(ASCEND_HOME "$ENV{ASCEND_HOME_PATH}")
-set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
-include_directories(
-    "${ASC_INCLUDE_DIR}"
+target_include_directories(demo PRIVATE
+    "${ASCEND_HOME}/include"
 )
 
 target_compile_definitions(demo PRIVATE
@@ -44,7 +43,7 @@ target_compile_definitions(demo PRIVATE
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-    $<$<COMPILE_LANGUAGE:ASC>:-std=c++20>
+    $<$<COMPILE_LANGUAGE:ASC>:-std=c++17>
 )
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
