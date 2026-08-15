@@ -153,23 +153,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 // GroupCopy(ctx, localDst, src[r], ctx.goSize);
             }
             else {
-                ccu::RemoteAddr curDst = dst[r];
-                ccu::LocalAddr curSrc = src[r];
-                ccu::Variable loopCnt;
-                loopCnt = ctx.writeFullLoopCount;
-                ccu::Variable tailSz;
-                tailSz = ctx.writeTailSize;
-                CCU_WHILE(loopCnt != 0)
-                {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
-                    curDst.addr += chunkSize;
-                    curSrc.addr += chunkSize;
-                    loopCnt += negOne;
-                }
-                CCU_IF(tailSz != 0)
-                {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, tailSz, ctx.event, 1 << r);
-                }
+                // ccu::Write disabled for testing
                 channelId++;
             }
         }
@@ -181,23 +165,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 // GroupCopy(ctx, localDst, src[r], ctx.goSize);
             }
             else {
-                ccu::RemoteAddr curDst = dst[r];
-                ccu::LocalAddr curSrc = src[r];
-                ccu::Variable loopCnt;
-                loopCnt = ctx.writeFullLoopCount;
-                ccu::Variable tailSz;
-                tailSz = ctx.writeTailSize;
-                CCU_WHILE(loopCnt != 0)
-                {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
-                    curDst.addr += chunkSize;
-                    curSrc.addr += chunkSize;
-                    loopCnt += negOne;
-                }
-                CCU_IF(tailSz != 0)
-                {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, tailSz, ctx.event, 1 << r);
-                }
+                // ccu::Write disabled for testing
                 channelId++;
             }
         }
