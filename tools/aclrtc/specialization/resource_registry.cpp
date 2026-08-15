@@ -67,15 +67,6 @@ const char* SourceTypeName(ResourceSourceType sourceType) noexcept
     return "unknown";
 }
 
-void LogResourceConflict(const std::string& resourceId, const ResourceEntry& incoming, const ResourceEntry& existing)
-{
-    ASCENDLOGE(
-        "Duplicate resource_id in load transaction: resource_id=%s incoming_source_type=%s incoming_so=%s "
-        "existing_source_type=%s existing_so=%s",
-        resourceId.c_str(), SourceTypeName(incoming.sourceType), incoming.sourceSoPath.c_str(),
-        SourceTypeName(existing.sourceType), existing.sourceSoPath.c_str());
-}
-
 void CleanupPath(const std::string& path) noexcept
 {
     if (path.empty()) {
@@ -603,7 +594,11 @@ ResourceStatus ResourceRegistry::LoadManifest(
     entry->sourceType = spec.sourceType;
     const auto existing = staged.resources.find(resourceId);
     if (existing != staged.resources.end()) {
-        LogResourceConflict(resourceId, *entry, *existing->second);
+        ASCENDLOGE(
+            "Duplicate resource_id in load transaction: resource_id=%s incoming_source_type=%s incoming_so=%s "
+            "existing_source_type=%s existing_so=%s",
+            resourceId.c_str(), SourceTypeName(entry->sourceType), entry->sourceSoPath.c_str(),
+            SourceTypeName(existing->second->sourceType), existing->second->sourceSoPath.c_str());
         return ResourceStatus::Conflict;
     }
     staged.resources.emplace(resourceId, std::move(entry));
@@ -710,7 +705,11 @@ bool ResourceRegistry::HasCommitConflict(const ResourceStore& incoming, const Re
     for (const auto& item : incoming) {
         const auto existing = committed.find(item.first);
         if (existing != committed.end()) {
-            LogResourceConflict(item.first, *item.second, *existing->second);
+            ASCENDLOGE(
+                "Duplicate resource_id in load transaction: resource_id=%s incoming_source_type=%s incoming_so=%s "
+                "existing_source_type=%s existing_so=%s",
+                item.first.c_str(), SourceTypeName(item.second->sourceType), item.second->sourceSoPath.c_str(),
+                SourceTypeName(existing->second->sourceType), existing->second->sourceSoPath.c_str());
             return true;
         }
     }
@@ -830,13 +829,21 @@ ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, Reso
     const std::string resourceRoot = FileUtils::JoinPath(categoryRoot, resourceId);
     fs::path canonicalRoot;
     ResourceStatus status = ResourceStatus::IoError;
+    const char* failureStage = "create_directories";
     if (FileUtils::CreateDirectories(resourceRoot)) {
         canonicalRoot = fs::canonical(resourceRoot, error);
+        failureStage = error ? "canonicalize_root" : "validate_root_identity";
         if (!error && canonicalRoot == fs::path(resourceRoot).lexically_normal()) {
+            failureStage = "write_files";
             status = WriteMaterializedFiles(entry.files, canonicalRoot.string());
         }
     }
     if (status != ResourceStatus::Success) {
+        ASCENDLOGE(
+            "Failed to materialize compile resource: resource_id=%s source_type=%s so=%s stage=%s root=%s "
+            "canonical=%s error=%s status=%d",
+            resourceId.c_str(), SourceTypeName(entry.sourceType), entry.sourceSoPath.c_str(), failureStage,
+            resourceRoot.c_str(), canonicalRoot.string().c_str(), error.message().c_str(), static_cast<int>(status));
         CleanupPath(categoryRoot);
         entry.data.resourceDir.clear();
         return status;

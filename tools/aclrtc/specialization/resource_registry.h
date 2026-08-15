@@ -80,7 +80,7 @@ struct LibraryDeleter {
 
 using LibraryHandle = std::unique_ptr<void, LibraryDeleter>;
 
-class ResourceRegistry final {
+class ResourceRegistry {
 public:
     /**
      * @brief Returns the process-wide compile resource registry instance.
