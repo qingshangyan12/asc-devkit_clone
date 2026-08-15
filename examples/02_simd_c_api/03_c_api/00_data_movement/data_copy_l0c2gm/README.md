@@ -38,6 +38,17 @@ data_copy_l0c2gm
 | 4 | half | float | int8_t，ND | Vector `VQF322B8_PRE` | 是 | 是 |
 | 5 | int8_t | int32_t | int8_t，ND | 标量`REQ8` | 否 | 是 |
 | 6 | int8_t | int32_t | int8_t，Nz | Vector `VREQ8` | 是 | 否 |
+| 7 | int8_t | int32_t | int4b_t，Nz | Vector `VREQ4` | 是 | 否 |
+| 8 | int8_t | int32_t | bfloat16_t，Nz | Vector `VQS322BF16_PRE` | 否 | 否 |
+| 9 | half | float | half，Nz | Vector `VQF322F16_PRE` | 否 | 否 |
+| 10 | half | float | bfloat16_t，Nz | Vector `VQF322BF16_PRE` | 否 | 否 |
+| 11 | half | float | int4b_t，Nz | Vector `VQF322S4_PRE` | 否 | 否 |
+| 12 | half | float | fp8_e4m3fn_t，Nz | Vector `VQF322FP8_PRE` | 否 | 否 |
+| 13 | half | float | hifloat8_t，Nz | Vector `VQF322HIF8_PRE` | 否 | 否 |
+| 14 | half | float | hifloat8_t，Nz | Vector `VQF322HIF8_PRE_HYBRID` | 否 | 否 |
+| 15 | half | float | float，Nz | Vector `VQF322F32_PRE` | 否 | 否 |
+| 16 | half | float | half，Nz | Cast `F322F16` | 否 | 否 |
+| 17 | half | float | bfloat16_t，Nz | Cast `F322BF16` | 否 | 否 |
 
 `SCENARIO_NUM`由CMake作为编译期宏传入，内核通过`if constexpr`选择对应场景。切换场景后，需要重新编译。
 
@@ -79,7 +90,73 @@ data_copy_l0c2gm
 - 输出：C `[128, 256]`，Nz格式`int8_t`
 - 实现：使用`VREQ8`模式并启用ReLU
 
-对于场景2、4和6，量化参数先通过`asc_copy_gm2l1`从GM搬运到L1 Buffer，再通过`asc_copy_l12fb`搬运到Fixpipe Buffer，最后调用`asc_set_l0c2gm_config`配置Vector量化参数地址。`asc_set_l0c2gm_config`的参数地址以128B为单位，因此参数文件需按128B向上对齐，不足部分补0。本样例的`[256] uint64_t`参数共2048B，已满足要求。量化参数从L1 Buffer搬运至Fixpipe Buffer时，需要搬运2048B数据，数据搬运单位为64B，对应`asc_copy_l12fb`的`len_burst`配置为32。量化参数从L1 Buffer搬运至Fixpipe Buffer后，通过`asc_sync_pipe(PIPE_FIX)`确保参数和配置生效，随后通过Fixpipe将L0C Buffer中的计算结果搬运到GM（Global Memory）。
+**场景7：int8输入、Vector量化并输出Nz int4b_t**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`int8_t`；量化参数`[256] uint64_t`
+- 输出：C `[128, 256]`，Nz格式`int4b_t`（每字节打包2个int4值）
+- 实现：使用`VREQ4`模式（int32_t量化成int4b_t），启用ReLU
+
+**场景8：int8输入、Vector量化并输出Nz bfloat16_t**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`int8_t`；量化参数`[256] uint64_t`
+- 输出：C `[128, 256]`，Nz格式`bfloat16_t`
+- 实现：使用`VQS322BF16_PRE`模式（int32_t量化成bfloat16_t）
+
+**场景9：half输入、Vector量化并输出Nz half**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`half`；量化参数`[256] uint64_t`
+- 输出：C `[128, 256]`，Nz格式`half`
+- 实现：使用`VQF322F16_PRE`模式（float量化成half）
+
+**场景10：half输入、Vector量化并输出Nz bfloat16_t**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`half`；量化参数`[256] uint64_t`
+- 输出：C `[128, 256]`，Nz格式`bfloat16_t`
+- 实现：使用`VQF322BF16_PRE`模式（float量化成bfloat16_t）
+
+**场景11：half输入、Vector量化并输出Nz int4b_t**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`half`；量化参数`[256] uint64_t`
+- 输出：C `[128, 256]`，Nz格式`int4b_t`（每字节打包2个int4值）
+- 实现：使用`VQF322S4_PRE`模式（float量化成int4b_t）
+
+**场景12：half输入、Vector量化并输出Nz fp8_e4m3fn_t**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`half`；量化参数`[256] uint64_t`
+- 输出：C `[128, 256]`，Nz格式`fp8_e4m3fn_t`
+- 实现：使用`VQF322FP8_PRE`模式（float量化成fp8_e4m3fn_t）
+
+**场景13：half输入、Vector量化并输出Nz hifloat8_t**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`half`；量化参数`[256] uint64_t`
+- 输出：C `[128, 256]`，Nz格式`hifloat8_t`
+- 实现：使用`VQF322HIF8_PRE`模式（float量化成hifloat8_t，Half to Away Round）
+
+**场景14：half输入、Vector量化并输出Nz hifloat8_t（Hybrid Round）**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`half`；量化参数`[256] uint64_t`
+- 输出：C `[128, 256]`，Nz格式`hifloat8_t`
+- 实现：使用`VQF322HIF8_PRE_HYBRID`模式（float量化成hifloat8_t，Hybrid Round）
+
+**场景15：half输入、Vector量化并输出Nz float**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`half`；量化参数`[256] uint64_t`
+- 输出：C `[128, 256]`，Nz格式`float`
+- 实现：使用`VQF322F32_PRE`模式（float量化成float），精度可以达到双千分之一，无法达到双万分之一。如果有双万分之一的精度要求，建议使用AscendDeQuant高阶API
+
+**场景16：half输入、Cast转换并输出Nz half**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`half`
+- 输出：C `[128, 256]`，Nz格式`half`
+- 实现：使用`F322F16`模式（float cast成half），cast mode为CAST_RINT模式（round to nearest even）
+
+**场景17：half输入、Cast转换并输出Nz bfloat16_t**
+
+- 输入：A `[128, 128]`、B `[128, 256]`，均为ND格式`half`
+- 输出：C `[128, 256]`，Nz格式`bfloat16_t`
+- 实现：使用`F322BF16`模式（float cast成bfloat16_t），cast mode为CAST_RINT模式（round to nearest even）
+
+对于场景2、4、6、7、8、9、10、11、12、13、14和15，量化参数先通过`asc_copy_gm2l1`从GM搬运到L1 Buffer，再通过`asc_copy_l12fb`搬运到Fixpipe Buffer，最后调用`asc_set_l0c2gm_config`配置Vector量化参数地址。`asc_set_l0c2gm_config`的参数地址以128B为单位，因此参数文件需按128B向上对齐，不足部分补0。本样例的`[256] uint64_t`参数共2048B，已满足要求。量化参数从L1 Buffer搬运至Fixpipe Buffer时，需要搬运2048B数据，数据搬运单位为64B，对应`asc_copy_l12fb`的`len_burst`配置为32。量化参数从L1 Buffer搬运至Fixpipe Buffer后，通过`asc_sync_pipe(PIPE_FIX)`确保参数和配置生效，随后通过Fixpipe将L0C Buffer中的计算结果搬运到GM（Global Memory）。
 
 ## 编译运行
 
@@ -98,12 +175,26 @@ data_copy_l0c2gm
 - NPU运行
 
   ```bash
-  SCENARIO_NUM=1
-  mkdir -p build && cd build;      # 创建并进入build目录
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认NPU模式
-  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据和真值数据
-  ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin  # 验证输出结果是否正确
+  
+9 还有2个报错
+14报错
+9 14 15 16有问题
+
+
+
+1-8 pass 11 13 12  17 10
+
+
+9 14 15 16有问题
+一点报错没有的  1-8 10 11 12 13 17
+cd ..
+rm -rf build
+SCENARIO_NUM=14
+mkdir -p build && cd build;      # 创建并进入build目录
+cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认NPU模式
+python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据和真值数据
+./demo                           # 执行编译生成的可执行程序，执行样例
+python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin  # 验证输出结果是否正确
   ```
 
 - NPU仿真
@@ -120,7 +211,7 @@ data_copy_l0c2gm
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | 1-6 | 场景编号 |
+  | `SCENARIO_NUM` | 1-17 | 场景编号 |
 
 - 执行结果
 
