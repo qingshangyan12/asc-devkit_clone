@@ -165,9 +165,11 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 curDst.addr += chunkSize;
                 curSrc.addr += chunkSize;
 
-                // 尾块 (sliceSize - 512MB, 512MB=0时为sliceSize本身, 但512MB场景tailSize=0)
+                // 尾块 (sliceSize - 512MB, 512MB时tailSize=0)
                 ccu::Variable tailSize;
-                tailSize = ctx.sliceSize + neg256MB + neg256MB;
+                tailSize = ctx.sliceSize;
+                tailSize += neg256MB;
+                tailSize += neg256MB;
                 CCU_IF(tailSize != 0)
                 {
                     ccu::Write(arg->channels[channelId], curDst, curSrc, tailSize, ctx.event, 1 << r);
@@ -194,7 +196,9 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
 
                 // 尾块
                 ccu::Variable tailSize;
-                tailSize = ctx.sliceSize + neg256MB + neg256MB;
+                tailSize = ctx.sliceSize;
+                tailSize += neg256MB;
+                tailSize += neg256MB;
                 CCU_IF(tailSize != 0)
                 {
                     ccu::Write(arg->channels[channelId], curDst, curSrc, tailSize, ctx.event, 1 << r);
