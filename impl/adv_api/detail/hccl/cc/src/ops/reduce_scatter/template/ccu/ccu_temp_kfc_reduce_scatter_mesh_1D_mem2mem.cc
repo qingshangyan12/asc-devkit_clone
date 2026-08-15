@@ -25,6 +25,12 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     AlgResourceRequest& resourceRequest)
 {
+    HCCL_INFO(
+        "[CcuTempKfcReduceScatterMesh1DMem2Mem][CalcRes] rank[%u] rankSize[%u] count[%llu] "
+        "dataType[%d] outputType[%d] reduceOp[%d] engine[%d]",
+        topoInfo->userRank, topoInfo->userRankSize, static_cast<unsigned long long>(param.DataDes.count),
+        static_cast<int>(param.DataDes.dataType), static_cast<int>(param.DataDes.outputType),
+        static_cast<int>(param.reduceType), static_cast<int>(param.engine));
     CHK_RET(GetRes(resourceRequest));
     resourceRequest.ccuKernelNum.push_back(1);
 
@@ -37,12 +43,22 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
     // CcuKernelKfcServer replaces this placeholder before registration and reuses these Mesh1D channels.
     kernelInfo.channels = channelDescs;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
+    HCCL_INFO(
+        "[CcuTempKfcReduceScatterMesh1DMem2Mem][CalcRes] channels[%llu] ccuKernelNum[%llu] kernelName[%s]",
+        static_cast<unsigned long long>(channelDescs.size()),
+        static_cast<unsigned long long>(resourceRequest.ccuKernelInfos.size()), kernelInfo.kernelFuncName);
     return HcclResult::HCCL_SUCCESS;
 }
 
 HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::KernelRun(
     const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
+    HCCL_INFO(
+        "[CcuTempKfcReduceScatterMesh1DMem2Mem][KernelRun] placeholder path count[%llu] input[%p] output[%p] "
+        "engine[%d] channels[%llu] ccuKernels[%llu]",
+        static_cast<unsigned long long>(param.DataDes.count), param.inputPtr, param.outputPtr,
+        static_cast<int>(param.engine), static_cast<unsigned long long>(templateResource.channels.size()),
+        static_cast<unsigned long long>(templateResource.ccuKernels.size()));
     // Per-round parameters are written by CcuPrepareForReduceScatterM2M and consumed by KFC server.
     (void)param;
     (void)templateDataParams;
