@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-根据掩码对源操作数矢量数据寄存器中的元素执行Leaky ReLU操作，并将结果写入目的操作数。源操作数中大于0的元素直接写入目的操作数，小于或等于0的元素乘以标量立即数后写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在目的矢量数据寄存器中置零。计算公式如下：
+根据掩码对源矢量数据寄存器中的元素执行Leaky ReLU操作，并将结果写入目的矢量数据寄存器。源操作数中大于0的元素直接写入目的操作数，小于或等于0的元素乘以标量立即数后写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在目的矢量数据寄存器中置零。计算公式如下：
 
 $$
 dst_i = \begin{cases} src_i & src_i > 0 \\ src_i \times value & src_i \leq 0 \end{cases}
@@ -38,9 +38,9 @@ $$
 
 ```c
 __simd_callee__ inline void asc_leakyrelu(vector_<dtype>& dst,
-                                                 vector_<dtype> src,
-                                                 dtype value,
-                                                 vector_bool mask)
+                                          vector_<dtype> src,
+                                          dtype value,
+                                          vector_bool mask)
 ```
 
 ### dtype支持数据类型
@@ -51,9 +51,9 @@ dtype支持的数据类型为`half`、`float`。
 
 ```c
 __simd_callee__ inline void asc_leakyrelu(vector_half& dst,
-                                                 vector_half src,
-                                                 half value,
-                                                 vector_bool mask)
+                                          vector_half src,
+                                          half value,
+                                          vector_bool mask)
 ```
 
 ## 参数说明
