@@ -83,8 +83,7 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
     }
 }
 
-void KernelSpecializationDiagnostics::SaveManifestForDiagnostics(
-    const nlohmann::json& resourceManifest) noexcept
+void KernelSpecializationDiagnostics::RecordManifest(const nlohmann::json& resourceManifest) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;
@@ -101,8 +100,7 @@ void KernelSpecializationDiagnostics::SaveManifestForDiagnostics(
     }
 }
 
-void KernelSpecializationDiagnostics::RecordResourceWorktreePath(
-    const fs::path& resourceWorktreePath) noexcept
+void KernelSpecializationDiagnostics::RecordWorktree(const fs::path& resourceWorktreePath) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;
@@ -115,8 +113,7 @@ void KernelSpecializationDiagnostics::RecordResourceWorktreePath(
     }
 }
 
-void KernelSpecializationDiagnostics::RecordCompilationCommand(
-    const CompilationCommand& compilationCommand) noexcept
+void KernelSpecializationDiagnostics::RecordCommand(const CompilationCommand& compilationCommand) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;
@@ -133,7 +130,7 @@ void KernelSpecializationDiagnostics::RecordCompilationCommand(
     }
 }
 
-void KernelSpecializationDiagnostics::RecordCompilationProcessResult(
+void KernelSpecializationDiagnostics::RecordCommandResult(
     const CompilationCommand& compilationCommand, const CompilationProcessResult& processResult) noexcept
 {
     if (!diagnosticsEnabled_) {
@@ -155,7 +152,7 @@ void KernelSpecializationDiagnostics::RecordCompilationProcessResult(
     }
 }
 
-void KernelSpecializationDiagnostics::RecordSpecializationResult(
+void KernelSpecializationDiagnostics::RecordFinalResult(
     const fs::path& outputElfPath, OutputPublicationStatus publicationStatus) noexcept
 {
     if (!diagnosticsEnabled_) {

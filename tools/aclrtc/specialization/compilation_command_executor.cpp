@@ -341,10 +341,10 @@ aclError CompilationCommandExecutor::ExecuteCompilationPlan(const KernelCompilat
         for (const CompilationCommand& compilationCommand : compilationPlan.compilationCommands) {
             ACLRTC_LOG_INFO("Executing command %s with %s", compilationCommand.diagnosticLabel.c_str(),
                             compilationCommand.executablePath.c_str());
-            specializationDiagnostics_.RecordCompilationCommand(compilationCommand);
+            specializationDiagnostics_.RecordCommand(compilationCommand);
             CompilationProcessResult processResult;
             const aclError executionResult = ExecuteCompilationCommand(compilationCommand, processResult);
-            specializationDiagnostics_.RecordCompilationProcessResult(compilationCommand, processResult);
+            specializationDiagnostics_.RecordCommandResult(compilationCommand, processResult);
             if (executionResult != ACLRTC_SUCCESS) {
                 constexpr size_t MAX_LOGGED_PROCESS_OUTPUT_BYTES = 4096U;
                 const int loggedOutputByteCount = static_cast<int>(
