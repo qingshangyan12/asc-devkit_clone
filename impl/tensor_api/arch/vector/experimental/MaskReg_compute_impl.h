@@ -24,8 +24,8 @@ namespace asc {
 namespace te {
 namespace detail {
 
-template <typename DataType, auto Pattern>
-__simd_callee__ inline reg_tensor<bool> make_reg_mask()
+template <typename DataType, typename PatternType>
+__simd_callee__ inline reg_tensor<bool> make_reg_mask(PatternType pattern)
 {
     static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t)
                       || sizeof(DataType) == sizeof(uint32_t),
@@ -33,11 +33,11 @@ __simd_callee__ inline reg_tensor<bool> make_reg_mask()
 
     reg_tensor<bool> result;
     if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
-        result.reg = asc_create_mask_b32(Pattern);
+        result.reg = asc_create_mask_b32(pattern);
     } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
-        result.reg = asc_create_mask_b16(Pattern);
+        result.reg = asc_create_mask_b16(pattern);
     } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
-        result.reg = asc_create_mask_b8(Pattern);
+        result.reg = asc_create_mask_b8(pattern);
     }
     return result;
 }
@@ -66,35 +66,35 @@ template <mask_pattern Pattern, typename DataType>
 __simd_callee__ inline reg_tensor<bool> make_mask()
 {
     if constexpr (Pattern == mask_pattern::all) {
-        return detail::make_reg_mask<DataType, PAT_ALL>();
+        return detail::make_reg_mask<DataType>(PAT_ALL);
     } else if constexpr (Pattern == mask_pattern::vl1) {
-        return detail::make_reg_mask<DataType, PAT_VL1>();
+        return detail::make_reg_mask<DataType>(PAT_VL1);
     } else if constexpr (Pattern == mask_pattern::vl2) {
-        return detail::make_reg_mask<DataType, PAT_VL2>();
+        return detail::make_reg_mask<DataType>(PAT_VL2);
     } else if constexpr (Pattern == mask_pattern::vl3) {
-        return detail::make_reg_mask<DataType, PAT_VL3>();
+        return detail::make_reg_mask<DataType>(PAT_VL3);
     } else if constexpr (Pattern == mask_pattern::vl4) {
-        return detail::make_reg_mask<DataType, PAT_VL4>();
+        return detail::make_reg_mask<DataType>(PAT_VL4);
     } else if constexpr (Pattern == mask_pattern::vl8) {
-        return detail::make_reg_mask<DataType, PAT_VL8>();
+        return detail::make_reg_mask<DataType>(PAT_VL8);
     } else if constexpr (Pattern == mask_pattern::vl16) {
-        return detail::make_reg_mask<DataType, PAT_VL16>();
+        return detail::make_reg_mask<DataType>(PAT_VL16);
     } else if constexpr (Pattern == mask_pattern::vl32) {
-        return detail::make_reg_mask<DataType, PAT_VL32>();
+        return detail::make_reg_mask<DataType>(PAT_VL32);
     } else if constexpr (Pattern == mask_pattern::vl64) {
-        return detail::make_reg_mask<DataType, PAT_VL64>();
+        return detail::make_reg_mask<DataType>(PAT_VL64);
     } else if constexpr (Pattern == mask_pattern::vl128) {
-        return detail::make_reg_mask<DataType, PAT_VL128>();
+        return detail::make_reg_mask<DataType>(PAT_VL128);
     } else if constexpr (Pattern == mask_pattern::every3) {
-        return detail::make_reg_mask<DataType, PAT_M3>();
+        return detail::make_reg_mask<DataType>(PAT_M3);
     } else if constexpr (Pattern == mask_pattern::every4) {
-        return detail::make_reg_mask<DataType, PAT_M4>();
+        return detail::make_reg_mask<DataType>(PAT_M4);
     } else if constexpr (Pattern == mask_pattern::half) {
-        return detail::make_reg_mask<DataType, PAT_H>();
+        return detail::make_reg_mask<DataType>(PAT_H);
     } else if constexpr (Pattern == mask_pattern::quarter) {
-        return detail::make_reg_mask<DataType, PAT_Q>();
+        return detail::make_reg_mask<DataType>(PAT_Q);
     } else if constexpr (Pattern == mask_pattern::none) {
-        return detail::make_reg_mask<DataType, PAT_ALLF>();
+        return detail::make_reg_mask<DataType>(PAT_ALLF);
     } else {
         static_assert(Pattern == mask_pattern::all, "unsupported mask pattern");
     }
