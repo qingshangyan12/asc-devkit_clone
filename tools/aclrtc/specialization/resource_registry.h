@@ -82,8 +82,28 @@ using LibraryHandle = std::unique_ptr<void, LibraryDeleter>;
 
 class ResourceRegistry final {
 public:
+    /**
+     * @brief Returns the process-wide compile resource registry instance.
+     * @return ResourceRegistry& The process-wide registry instance.
+     */
     static ResourceRegistry& Instance();
+
+    /**
+     * @brief Loads compile resources from an explicit path or the configured OPP search paths.
+     * @param[in] directory Resource shared object or directory to load. Pass nullptr or an empty string to use
+     * automatic OPP discovery.
+     * @return ResourceStatus::Success on success; otherwise, a status describing the discovery, validation, loading,
+     * I/O, or conflict failure.
+     */
     ResourceStatus Load(const char* directory);
+
+    /**
+     * @brief Looks up a registered compile resource and materializes its bundled files.
+     * @param[in] resourceId Non-empty identifier of the resource to look up.
+     * @param[out] resource Receives the resource data on success. It is set to nullptr when the lookup fails.
+     * @return ResourceStatus::Success on success; otherwise, ResourceStatus::NotFound, ResourceStatus::InvalidResource,
+     * or a status describing the materialization failure.
+     */
     ResourceStatus Lookup(const char* resourceId, const ResourceData*& resource);
 
     ResourceRegistry(const ResourceRegistry&) = delete;
@@ -100,8 +120,7 @@ private:
         const std::string& root, ResourceSourceType sourceType, bool recursive, std::set<std::string>& found);
     static bool CollectAutomaticLibraries(
         const std::vector<std::string>& roots, ResourceSourceType sourceType, std::set<std::string>& found);
-    static ResourceStatus DiscoverLibraries(
-        const char* directory, std::vector<LibrarySpec>& libraries);
+    static ResourceStatus DiscoverLibraries(const char* directory, std::vector<LibrarySpec>& libraries);
     static ResourceStatus GetBundle(
         const LibraryHandle& library, const LibrarySpec& spec, const AcCompileResourceBundle*& bundle);
     static ResourceStatus ResolveSourceRoot(
@@ -118,16 +137,12 @@ private:
     static ResourceStatus CopyManifestFiles(
         const AcCompileResourceManifest& unit, const std::string& resourceId, ResourceEntry& entry,
         StagedResources& staged);
-    static StagedResources& SelectStagedResources(
-        StageState& stage, ResourceSourceType sourceType);
+    static StagedResources& SelectStagedResources(StageState& stage, ResourceSourceType sourceType);
     static ResourceStatus LoadManifest(
         const AcCompileResourceManifest& unit, const LibrarySpec& spec, uint64_t manifestIndex, StageState& stage);
-    static ResourceStatus LoadLibrary(const LibrarySpec& spec,
-                                                                      StageState& stage);
-    static ResourceStatus LoadLibraries(
-        const std::vector<LibrarySpec>& libraries, StageState& stage);
-    static ResourceStatus WriteMaterializedFiles(
-        const std::vector<ResourceFileData>& files, const std::string& root);
+    static ResourceStatus LoadLibrary(const LibrarySpec& spec, StageState& stage);
+    static ResourceStatus LoadLibraries(const std::vector<LibrarySpec>& libraries, StageState& stage);
+    static ResourceStatus WriteMaterializedFiles(const std::vector<ResourceFileData>& files, const std::string& root);
 
     ResourceEntry* FindResource(const std::string& resourceId) noexcept;
     ResourceStatus Materialize(const std::string& resourceId, ResourceEntry& entry);
@@ -148,7 +163,5 @@ private:
 
 } // namespace specialization_compile
 } // namespace ascendc
-
-#undef ASCENDC_RESOURCE_REGISTRY_HIDDEN
 
 #endif // ASCENDC_ACLRTC_SPECIALIZATION_RESOURCE_REGISTRY_H

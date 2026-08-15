@@ -67,13 +67,13 @@ const char* SourceTypeName(ResourceSourceType sourceType) noexcept
     return "unknown";
 }
 
-void LogResourceConflict(const std::string& resourceId, const ResourceEntry& incoming,
-                         const ResourceEntry& existing)
+void LogResourceConflict(const std::string& resourceId, const ResourceEntry& incoming, const ResourceEntry& existing)
 {
-    ASCENDLOGE("Duplicate resource_id in load transaction: resource_id=%s incoming_source_type=%s incoming_so=%s "
-               "existing_source_type=%s existing_so=%s", resourceId.c_str(),
-               SourceTypeName(incoming.sourceType), incoming.sourceSoPath.c_str(),
-               SourceTypeName(existing.sourceType), existing.sourceSoPath.c_str());
+    ASCENDLOGE(
+        "Duplicate resource_id in load transaction: resource_id=%s incoming_source_type=%s incoming_so=%s "
+        "existing_source_type=%s existing_so=%s",
+        resourceId.c_str(), SourceTypeName(incoming.sourceType), incoming.sourceSoPath.c_str(),
+        SourceTypeName(existing.sourceType), existing.sourceSoPath.c_str());
 }
 
 void CleanupPath(const std::string& path) noexcept
@@ -93,8 +93,9 @@ ResourceStatus CreateTemporaryRoot(std::string& temporaryRoot)
     boost::system::error_code error;
     const fs::path parent = fs::canonical(configured, error);
     if (error || !fs::is_directory(parent, error) || error) {
-        ASCENDLOGE("Compile resource temporary parent is unavailable: configured=%s error=%s",
-                   configured.c_str(), error.message().c_str());
+        ASCENDLOGE(
+            "Compile resource temporary parent is unavailable: configured=%s error=%s", configured.c_str(),
+            error.message().c_str());
         return ResourceStatus::IoError;
     }
     const std::string pattern = (parent / "aclrtc-resource-XXXXXX").string();
@@ -102,14 +103,16 @@ ResourceStatus CreateTemporaryRoot(std::string& temporaryRoot)
     writable.push_back('\0');
     char* created = mkdtemp(writable.data());
     if (created == nullptr) {
-        ASCENDLOGE("Failed to create compile resource temporary root: parent=%s error=%s",
-                   parent.c_str(), std::strerror(errno));
+        ASCENDLOGE(
+            "Failed to create compile resource temporary root: parent=%s error=%s", parent.c_str(),
+            std::strerror(errno));
         return ResourceStatus::IoError;
     }
     const fs::path canonical = fs::canonical(created, error);
     if (error || canonical != fs::path(created).lexically_normal()) {
-        ASCENDLOGE("Compile resource temporary root identity is invalid: path=%s canonical=%s error=%s",
-                   created, canonical.c_str(), error.message().c_str());
+        ASCENDLOGE(
+            "Compile resource temporary root identity is invalid: path=%s canonical=%s error=%s", created,
+            canonical.c_str(), error.message().c_str());
         CleanupPath(created);
         return ResourceStatus::IoError;
     }
@@ -191,8 +194,8 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
         }
         for (const std::string& vendor : SplitList(line.substr(separator + 1U).c_str(), ',')) {
             if (IsPlainName(vendor)) {
-                roots.custom.push_back(FileUtils::JoinPath(
-                    FileUtils::JoinPath(oppRoot, "vendors/" + vendor), RELATIVE_JIT_ROOT));
+                roots.custom.push_back(
+                    FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "vendors/" + vendor), RELATIVE_JIT_ROOT));
             }
         }
         break;
@@ -204,10 +207,10 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
 bool ResourceRegistry::IsLibraryName(const std::string& path)
 {
     const std::string name = FileUtils::FileName(path);
-    return name.size() > std::strlen("lib") + std::strlen(LIBRARY_NAME_SUFFIX) &&
-           name.rfind("lib", 0U) == 0U &&
-           name.compare(name.size() - std::strlen(LIBRARY_NAME_SUFFIX), std::strlen(LIBRARY_NAME_SUFFIX),
-                        LIBRARY_NAME_SUFFIX) == 0;
+    return name.size() > std::strlen("lib") + std::strlen(LIBRARY_NAME_SUFFIX) && name.rfind("lib", 0U) == 0U &&
+           name.compare(
+               name.size() - std::strlen(LIBRARY_NAME_SUFFIX), std::strlen(LIBRARY_NAME_SUFFIX), LIBRARY_NAME_SUFFIX) ==
+               0;
 }
 
 void ResourceRegistry::AddLibrary(const std::string& path, std::set<std::string>& found)
@@ -221,8 +224,8 @@ void ResourceRegistry::AddLibrary(const std::string& path, std::set<std::string>
     }
 }
 
-bool ResourceRegistry::CollectLibraries(const std::string& root, ResourceSourceType sourceType, bool recursive,
-                                        std::set<std::string>& found)
+bool ResourceRegistry::CollectLibraries(
+    const std::string& root, ResourceSourceType sourceType, bool recursive, std::set<std::string>& found)
 {
     std::vector<std::string> pending = {root};
     boost::system::error_code error;
@@ -232,8 +235,9 @@ bool ResourceRegistry::CollectLibraries(const std::string& root, ResourceSourceT
         fs::directory_iterator current(currentRoot, fs::directory_options::none, error);
         const fs::directory_iterator end;
         if (error) {
-            ASCENDLOGE("Failed to scan compile resource directory: source_type=%s path=%s error=%s",
-                       SourceTypeName(sourceType), currentRoot.c_str(), error.message().c_str());
+            ASCENDLOGE(
+                "Failed to scan compile resource directory: source_type=%s path=%s error=%s",
+                SourceTypeName(sourceType), currentRoot.c_str(), error.message().c_str());
             return false;
         }
         while (current != end) {
@@ -241,8 +245,9 @@ bool ResourceRegistry::CollectLibraries(const std::string& root, ResourceSourceT
             AddLibrary(path, found);
             const fs::file_status status = recursive ? current->symlink_status(error) : fs::file_status();
             if (error) {
-                ASCENDLOGE("Failed to inspect compile resource path: source_type=%s path=%s error=%s",
-                           SourceTypeName(sourceType), path.c_str(), error.message().c_str());
+                ASCENDLOGE(
+                    "Failed to inspect compile resource path: source_type=%s path=%s error=%s",
+                    SourceTypeName(sourceType), path.c_str(), error.message().c_str());
                 return false;
             }
             if (recursive && fs::is_directory(status)) {
@@ -250,8 +255,9 @@ bool ResourceRegistry::CollectLibraries(const std::string& root, ResourceSourceT
             }
             current.increment(error);
             if (error) {
-                ASCENDLOGE("Failed to scan compile resource directory: source_type=%s path=%s error=%s",
-                           SourceTypeName(sourceType), currentRoot.c_str(), error.message().c_str());
+                ASCENDLOGE(
+                    "Failed to scan compile resource directory: source_type=%s path=%s error=%s",
+                    SourceTypeName(sourceType), currentRoot.c_str(), error.message().c_str());
                 return false;
             }
         }
@@ -259,14 +265,14 @@ bool ResourceRegistry::CollectLibraries(const std::string& root, ResourceSourceT
     return true;
 }
 
-bool ResourceRegistry::CollectAutomaticLibraries(const std::vector<std::string>& roots,
-                                                  ResourceSourceType sourceType,
-                                                  std::set<std::string>& found)
+bool ResourceRegistry::CollectAutomaticLibraries(
+    const std::vector<std::string>& roots, ResourceSourceType sourceType, std::set<std::string>& found)
 {
     for (const std::string& root : roots) {
         if (!FileUtils::IsDirectory(root)) {
-            ASCENDLOGD("Skipping missing automatic compile resource root: source_type=%s path=%s",
-                       SourceTypeName(sourceType), root.c_str());
+            ASCENDLOGD(
+                "Skipping missing automatic compile resource root: source_type=%s path=%s", SourceTypeName(sourceType),
+                root.c_str());
             continue;
         }
         if (!CollectLibraries(root, sourceType, true, found)) {
@@ -318,64 +324,68 @@ ResourceStatus ResourceRegistry::DiscoverLibraries(const char* directory, std::v
     return libraries.empty() ? ResourceStatus::NotFound : ResourceStatus::Success;
 }
 
-ResourceStatus ResourceRegistry::GetBundle(const LibraryHandle& library, const LibrarySpec& spec,
-                                           const AcCompileResourceBundle*& bundle)
+ResourceStatus ResourceRegistry::GetBundle(
+    const LibraryHandle& library, const LibrarySpec& spec, const AcCompileResourceBundle*& bundle)
 {
     dlerror();
-    const auto getter = reinterpret_cast<AscendcGetCompileResourceBundleFn>(
-        dlsym(library.get(), "AscendcGetCompileResourceBundle"));
+    const auto getter =
+        reinterpret_cast<AscendcGetCompileResourceBundleFn>(dlsym(library.get(), "AscendcGetCompileResourceBundle"));
     if (dlerror() != nullptr || getter == nullptr) {
-        ASCENDLOGE("Compile resource SO has no bundle entry point: source_type=%s so=%s",
-                   SourceTypeName(spec.sourceType), spec.path.c_str());
+        ASCENDLOGE(
+            "Compile resource SO has no bundle entry point: source_type=%s so=%s", SourceTypeName(spec.sourceType),
+            spec.path.c_str());
         return ResourceStatus::LoadError;
     }
     const AcCompileResourceBundleHeader* header = getter();
     if (header == nullptr || header->magic != AC_COMPILE_RESOURCE_MAGIC ||
         header->abiVersion != AC_COMPILE_RESOURCE_ABI_VERSION ||
         header->structSize != sizeof(AcCompileResourceBundle) || header->flags != 0U) {
-        ASCENDLOGE("Invalid compile resource bundle header: source_type=%s so=%s",
-                   SourceTypeName(spec.sourceType), spec.path.c_str());
+        ASCENDLOGE(
+            "Invalid compile resource bundle header: source_type=%s so=%s", SourceTypeName(spec.sourceType),
+            spec.path.c_str());
         return ResourceStatus::InvalidResource;
     }
     bundle = reinterpret_cast<const AcCompileResourceBundle*>(header);
     if (bundle->manifestCount == 0U || bundle->manifestCount > MAX_MANIFEST_COUNT || bundle->manifests == nullptr) {
-        ASCENDLOGE("Invalid compile resource manifest table: so=%s count=%" PRIu64, spec.path.c_str(),
-                   bundle->manifestCount);
+        ASCENDLOGE(
+            "Invalid compile resource manifest table: so=%s count=%" PRIu64, spec.path.c_str(), bundle->manifestCount);
         return ResourceStatus::InvalidResource;
     }
     return ResourceStatus::Success;
 }
 
-ResourceStatus ResourceRegistry::ResolveSourceRoot(const fs::path& searchRoot, const std::string& resourceId,
-                                                   std::string& canonicalRoot)
+ResourceStatus ResourceRegistry::ResolveSourceRoot(
+    const fs::path& searchRoot, const std::string& resourceId, std::string& canonicalRoot)
 {
     boost::system::error_code error;
     const fs::file_status status = fs::symlink_status(searchRoot, error);
     if (error) {
-        if (error == boost::system::errc::no_such_file_or_directory) {
-            return ResourceStatus::InvalidResource;
-        }
-        ASCENDLOGE("Failed to inspect compile source root: resource_id=%s root=%s error=%s",
-                   resourceId.c_str(), searchRoot.c_str(), error.message().c_str());
-        return ResourceStatus::IoError;
+        ASCENDLOGE(
+            "Failed to inspect compile source root: resource_id=%s root=%s error=%s", resourceId.c_str(),
+            searchRoot.c_str(), error.message().c_str());
+        return error == boost::system::errc::no_such_file_or_directory ? ResourceStatus::InvalidResource :
+                                                                         ResourceStatus::IoError;
     }
     if (fs::is_symlink(status) || !fs::is_directory(status)) {
+        ASCENDLOGE(
+            "Compile source root must be a non-symlink directory: resource_id=%s root=%s", resourceId.c_str(),
+            searchRoot.c_str());
         return ResourceStatus::InvalidResource;
     }
     const fs::path canonical = fs::canonical(searchRoot, error);
     if (error) {
-        ASCENDLOGE("Failed to resolve compile source root: resource_id=%s root=%s error=%s",
-                   resourceId.c_str(), searchRoot.c_str(), error.message().c_str());
+        ASCENDLOGE(
+            "Failed to resolve compile source root: resource_id=%s root=%s error=%s", resourceId.c_str(),
+            searchRoot.c_str(), error.message().c_str());
         return ResourceStatus::IoError;
     }
     canonicalRoot = canonical.string();
     return ResourceStatus::Success;
 }
 
-ResourceStatus ResourceRegistry::AddSourceMatch(const fs::path& candidate, const std::string& sourceFile,
-                                                const std::string& canonicalRoot,
-                                                const std::string& resourceId,
-                                                std::set<std::string>& matches)
+ResourceStatus ResourceRegistry::AddSourceMatch(
+    const fs::path& candidate, const std::string& sourceFile, const std::string& canonicalRoot,
+    const std::string& resourceId, std::set<std::string>& matches)
 {
     if (candidate.filename() != sourceFile) {
         return ResourceStatus::Success;
@@ -383,48 +393,52 @@ ResourceStatus ResourceRegistry::AddSourceMatch(const fs::path& candidate, const
     boost::system::error_code error;
     const fs::file_status status = fs::symlink_status(candidate, error);
     if (error) {
-        ASCENDLOGE("Failed to inspect compile source candidate: resource_id=%s path=%s error=%s",
-                   resourceId.c_str(), candidate.c_str(), error.message().c_str());
+        ASCENDLOGE(
+            "Failed to inspect compile source candidate: resource_id=%s path=%s error=%s", resourceId.c_str(),
+            candidate.c_str(), error.message().c_str());
         return ResourceStatus::IoError;
     }
-    if (fs::is_symlink(status) || !fs::is_regular_file(status)) {
+    if (!fs::is_regular_file(status)) {
         return ResourceStatus::Success;
     }
     const fs::path canonical = fs::canonical(candidate, error);
     if (error) {
-        ASCENDLOGE("Failed to resolve compile source candidate: resource_id=%s path=%s error=%s",
-                   resourceId.c_str(), candidate.c_str(), error.message().c_str());
+        ASCENDLOGE(
+            "Failed to resolve compile source candidate: resource_id=%s path=%s error=%s", resourceId.c_str(),
+            candidate.c_str(), error.message().c_str());
         return ResourceStatus::IoError;
     }
     if (!FileUtils::IsPathWithin(canonical.string(), canonicalRoot)) {
-        ASCENDLOGE("Compile source candidate escaped root: resource_id=%s candidate=%s canonical=%s root=%s",
-                   resourceId.c_str(), candidate.c_str(), canonical.c_str(), canonicalRoot.c_str());
+        ASCENDLOGE(
+            "Compile source candidate escaped root: resource_id=%s candidate=%s canonical=%s root=%s",
+            resourceId.c_str(), candidate.c_str(), canonical.c_str(), canonicalRoot.c_str());
         return ResourceStatus::InvalidResource;
     }
     matches.insert(canonical.parent_path().string());
     return ResourceStatus::Success;
 }
 
-ResourceStatus ResourceRegistry::LocateSourceFile(const LibrarySpec& spec, const std::string& resourceId,
-                                                  const std::string& sourceFile, std::string& located)
+ResourceStatus ResourceRegistry::LocateSourceFile(
+    const LibrarySpec& spec, const std::string& resourceId, const std::string& sourceFile, std::string& located)
 {
+    // Relative path example:
+    //   kernel/jit/ascend910b/libfoo_compile_database.so  <- resource SO
+    //   kernel/ascend910b/impl/foo.cpp                    <- source file
+    // Derive the SoC and kernel root from the SO path, then recursively search the sibling kernel/<soc> tree.
+    // Exactly one regular-file match is required; located is set to that file's parent directory.
     const fs::path soPath(spec.path);
     const fs::path soc = soPath.parent_path().filename();
     const fs::path jitRoot = soPath.parent_path().parent_path();
     const fs::path kernelRoot = jitRoot.parent_path();
     if (soc.empty() || jitRoot.filename() != "jit" || kernelRoot.filename() != "kernel") {
-        ASCENDLOGE("Compile resource SO is outside kernel/jit/<soc>: resource_id=%s source_type=%s so=%s",
-                   resourceId.c_str(), SourceTypeName(spec.sourceType), spec.path.c_str());
+        ASCENDLOGE(
+            "Compile resource SO is outside kernel/jit/<soc>: resource_id=%s source_type=%s so=%s", resourceId.c_str(),
+            SourceTypeName(spec.sourceType), spec.path.c_str());
         return ResourceStatus::InvalidResource;
     }
     const fs::path searchRoot = kernelRoot / soc;
     std::string canonicalRoot;
     ResourceStatus status = ResolveSourceRoot(searchRoot, resourceId, canonicalRoot);
-    if (status == ResourceStatus::InvalidResource) {
-        ASCENDLOGE("Compile source match count is invalid: resource_id=%s root=%s source_file=%s matches=0",
-                   resourceId.c_str(), searchRoot.c_str(), sourceFile.c_str());
-        return status;
-    }
     if (status != ResourceStatus::Success) {
         return status;
     }
@@ -440,13 +454,15 @@ ResourceStatus ResourceRegistry::LocateSourceFile(const LibrarySpec& spec, const
         current.increment(error);
     }
     if (error) {
-        ASCENDLOGE("Failed to search compile source: resource_id=%s root=%s error=%s",
-                   resourceId.c_str(), searchRoot.c_str(), error.message().c_str());
+        ASCENDLOGE(
+            "Failed to search compile source: resource_id=%s root=%s error=%s", resourceId.c_str(), searchRoot.c_str(),
+            error.message().c_str());
         return ResourceStatus::IoError;
     }
     if (matches.size() != 1U) {
-        ASCENDLOGE("Compile source match count is invalid: resource_id=%s root=%s source_file=%s matches=%zu",
-                   resourceId.c_str(), searchRoot.c_str(), sourceFile.c_str(), matches.size());
+        ASCENDLOGE(
+            "Compile source match count is invalid: resource_id=%s root=%s source_file=%s matches=%zu",
+            resourceId.c_str(), searchRoot.c_str(), sourceFile.c_str(), matches.size());
         return ResourceStatus::InvalidResource;
     }
     located = *matches.begin();
@@ -468,9 +484,9 @@ bool ResourceRegistry::FindPathConflict(const std::set<std::string>& paths)
     return false;
 }
 
-ResourceStatus ResourceRegistry::AppendFile(const AcCompileResourceFile& file, const std::string& resourceId,
-                                            ResourceEntry& entry, std::set<std::string>& paths,
-                                            uint64_t& manifestBytes, StagedResources& staged)
+ResourceStatus ResourceRegistry::AppendFile(
+    const AcCompileResourceFile& file, const std::string& resourceId, ResourceEntry& entry,
+    std::set<std::string>& paths, uint64_t& manifestBytes, StagedResources& staged)
 {
     std::string fileName;
     std::string relativePath;
@@ -478,14 +494,14 @@ ResourceStatus ResourceRegistry::AppendFile(const AcCompileResourceFile& file, c
     if (status == ResourceStatus::Success) {
         status = CopyString(file.filePath, "resource.filePath", MAX_PATH_SIZE, relativePath);
     }
-    if (status != ResourceStatus::Success || !IsPlainName(fileName) ||
-        !FileUtils::IsSafeRelativePath(relativePath) || FileUtils::FileName(relativePath) != fileName ||
-        !paths.insert(relativePath).second || file.size > MAX_RESOURCE_FILE_SIZE ||
-        (file.size != 0U && file.data == nullptr) ||
+    if (status != ResourceStatus::Success || !IsPlainName(fileName) || !FileUtils::IsSafeRelativePath(relativePath) ||
+        FileUtils::FileName(relativePath) != fileName || !paths.insert(relativePath).second ||
+        file.size > MAX_RESOURCE_FILE_SIZE || (file.size != 0U && file.data == nullptr) ||
         !TryAddWithinLimit(file.size, MAX_MANIFEST_RESOURCE_SIZE, manifestBytes) ||
         !TryAddWithinLimit(file.size, MAX_REGISTRY_RESOURCE_SIZE, staged.bytes)) {
-        ASCENDLOGE("Invalid bundled resource file: resource_id=%s path=%s size=%" PRIu64,
-                   resourceId.c_str(), relativePath.c_str(), file.size);
+        ASCENDLOGE(
+            "Invalid bundled resource file: resource_id=%s path=%s size=%" PRIu64, resourceId.c_str(),
+            relativePath.c_str(), file.size);
         return ResourceStatus::InvalidResource;
     }
     std::vector<uint8_t> bytes;
@@ -496,14 +512,13 @@ ResourceStatus ResourceRegistry::AppendFile(const AcCompileResourceFile& file, c
     return ResourceStatus::Success;
 }
 
-ResourceStatus ResourceRegistry::CopyManifestFiles(const AcCompileResourceManifest& unit,
-                                                   const std::string& resourceId, ResourceEntry& entry,
-                                                   StagedResources& staged)
+ResourceStatus ResourceRegistry::CopyManifestFiles(
+    const AcCompileResourceManifest& unit, const std::string& resourceId, ResourceEntry& entry, StagedResources& staged)
 {
     if (unit.fileCount > MAX_FILE_COUNT || (unit.fileCount == 0U) != (unit.files == nullptr) ||
         staged.files > MAX_REGISTRY_FILE_COUNT || unit.fileCount > MAX_REGISTRY_FILE_COUNT - staged.files) {
-        ASCENDLOGE("Invalid bundle resource file table: resource_id=%s files=%" PRIu64,
-                   resourceId.c_str(), unit.fileCount);
+        ASCENDLOGE(
+            "Invalid bundle resource file table: resource_id=%s files=%" PRIu64, resourceId.c_str(), unit.fileCount);
         return ResourceStatus::InvalidResource;
     }
     entry.files.reserve(static_cast<size_t>(unit.fileCount));
@@ -533,11 +548,12 @@ StagedResources& ResourceRegistry::SelectStagedResources(StageState& stage, Reso
     return sourceType == ResourceSourceType::BuiltIn ? stage.builtIn : stage.external;
 }
 
-ResourceStatus ResourceRegistry::LoadManifest(const AcCompileResourceManifest& unit, const LibrarySpec& spec,
-                                              uint64_t manifestIndex, StageState& stage)
+ResourceStatus ResourceRegistry::LoadManifest(
+    const AcCompileResourceManifest& unit, const LibrarySpec& spec, uint64_t manifestIndex, StageState& stage)
 {
-    ASCENDLOGI("Loading compile resource manifest: source_type=%s so=%s manifest=%" PRIu64,
-               SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex);
+    ASCENDLOGI(
+        "Loading compile resource manifest: source_type=%s so=%s manifest=%" PRIu64, SourceTypeName(spec.sourceType),
+        spec.path.c_str(), manifestIndex);
     std::string manifestText;
     ResourceStatus status = CopyString(unit.json, "manifest.json", MAX_MANIFEST_SIZE, manifestText);
     Json document;
@@ -556,15 +572,18 @@ ResourceStatus ResourceRegistry::LoadManifest(const AcCompileResourceManifest& u
         resourceId = document.at("resource_id").get<std::string>();
         hasSourceFile = document.contains("source_file");
         if (hasSourceFile && !document.at("source_file").is_string()) {
-            ASCENDLOGE("Compile resource manifest has invalid ownership fields");
+            ASCENDLOGE(
+                "Compile resource manifest field has invalid type: field=source_file expected=string actual=%s",
+                document.at("source_file").type_name());
             status = ResourceStatus::InvalidResource;
         } else if (hasSourceFile) {
             sourceFile = document.at("source_file").get<std::string>();
         }
         if (status == ResourceStatus::Success &&
             (!IsPlainName(resourceId) || (hasSourceFile && !IsPlainName(sourceFile)))) {
-            ASCENDLOGE("Compile resource manifest has unsafe ownership fields: resource_id=%s source_file=%s",
-                       resourceId.c_str(), sourceFile.c_str());
+            ASCENDLOGE(
+                "Compile resource manifest has unsafe ownership fields: resource_id=%s source_file=%s",
+                resourceId.c_str(), sourceFile.c_str());
             status = ResourceStatus::InvalidResource;
         }
     }
@@ -593,13 +612,13 @@ ResourceStatus ResourceRegistry::LoadManifest(const AcCompileResourceManifest& u
 
 ResourceStatus ResourceRegistry::LoadLibrary(const LibrarySpec& spec, StageState& stage)
 {
-    ASCENDLOGI("Loading compile resource SO: source_type=%s so=%s",
-               SourceTypeName(spec.sourceType), spec.path.c_str());
+    ASCENDLOGI("Loading compile resource SO: source_type=%s so=%s", SourceTypeName(spec.sourceType), spec.path.c_str());
     LibraryHandle library(dlopen(spec.path.c_str(), RTLD_NOW | RTLD_LOCAL));
     if (!library) {
         const char* error = dlerror();
-        ASCENDLOGE("Failed to open compile resource SO: source_type=%s so=%s error=%s",
-                   SourceTypeName(spec.sourceType), spec.path.c_str(), error == nullptr ? "unknown" : error);
+        ASCENDLOGE(
+            "Failed to open compile resource SO: source_type=%s so=%s error=%s", SourceTypeName(spec.sourceType),
+            spec.path.c_str(), error == nullptr ? "unknown" : error);
         return ResourceStatus::LoadError;
     }
     const AcCompileResourceBundle* bundle = nullptr;
@@ -610,14 +629,15 @@ ResourceStatus ResourceRegistry::LoadLibrary(const LibrarySpec& spec, StageState
     for (uint64_t manifestIndex = 0U; manifestIndex < bundle->manifestCount; ++manifestIndex) {
         status = LoadManifest(bundle->manifests[manifestIndex], spec, manifestIndex, stage);
         if (status != ResourceStatus::Success) {
-            ASCENDLOGE("Failed to load compile resource manifest: source_type=%s so=%s manifest=%" PRIu64
-                       " status=%d", SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex,
-                       static_cast<int>(status));
+            ASCENDLOGE(
+                "Failed to load compile resource manifest: source_type=%s so=%s manifest=%" PRIu64 " status=%d",
+                SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex, static_cast<int>(status));
             return status;
         }
     }
-    ASCENDLOGI("Loaded compile resource SO: source_type=%s so=%s manifests=%" PRIu64,
-               SourceTypeName(spec.sourceType), spec.path.c_str(), bundle->manifestCount);
+    ASCENDLOGI(
+        "Loaded compile resource SO: source_type=%s so=%s manifests=%" PRIu64, SourceTypeName(spec.sourceType),
+        spec.path.c_str(), bundle->manifestCount);
     return ResourceStatus::Success;
 }
 
@@ -628,8 +648,9 @@ ResourceStatus ResourceRegistry::LoadLibraries(const std::vector<LibrarySpec>& l
         SelectStagedResources(stage, library.sourceType).discovered = true;
         const ResourceStatus status = LoadLibrary(library, stage);
         if (status != ResourceStatus::Success) {
-            ASCENDLOGE("Stopped loading compile resource SO list: source_type=%s so=%s status=%d",
-                       SourceTypeName(library.sourceType), library.path.c_str(), static_cast<int>(status));
+            ASCENDLOGE(
+                "Stopped loading compile resource SO list: source_type=%s so=%s status=%d",
+                SourceTypeName(library.sourceType), library.path.c_str(), static_cast<int>(status));
             return status;
         }
     }
@@ -637,8 +658,8 @@ ResourceStatus ResourceRegistry::LoadLibraries(const std::vector<LibrarySpec>& l
     return ResourceStatus::Success;
 }
 
-ResourceStatus ResourceRegistry::WriteMaterializedFiles(const std::vector<ResourceFileData>& files,
-                                                        const std::string& root)
+ResourceStatus ResourceRegistry::WriteMaterializedFiles(
+    const std::vector<ResourceFileData>& files, const std::string& root)
 {
     for (const ResourceFileData& file : files) {
         const std::string path = FileUtils::JoinPath(root, file.relativePath);
@@ -650,8 +671,8 @@ ResourceStatus ResourceRegistry::WriteMaterializedFiles(const std::vector<Resour
             return ResourceStatus::IoError;
         }
         if (!file.bytes.empty()) {
-            output.write(reinterpret_cast<const char*>(file.bytes.data()),
-                         static_cast<std::streamsize>(file.bytes.size()));
+            output.write(
+                reinterpret_cast<const char*>(file.bytes.data()), static_cast<std::streamsize>(file.bytes.size()));
         }
         if (!FileUtils::FinalizeOutput(output)) {
             return ResourceStatus::IoError;
@@ -668,10 +689,7 @@ ResourceRegistry& ResourceRegistry::Instance()
 
 ResourceRegistry::ResourceRegistry() = default;
 
-ResourceRegistry::~ResourceRegistry()
-{
-    CleanupPath(temporaryRoot_);
-}
+ResourceRegistry::~ResourceRegistry() { CleanupPath(temporaryRoot_); }
 
 ResourceEntry* ResourceRegistry::FindResource(const std::string& resourceId) noexcept
 {
@@ -703,29 +721,34 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
 {
     std::lock_guard<std::mutex> lock(registryMutex_);
     ResourceStatus status = ResourceStatus::Success;
-    auto checkCategory = [&](StagedResources& staged, ResourceStore& committed) {
-        if (!staged.discovered || staged.conflict) {
-            status = staged.conflict ? ResourceStatus::Conflict : status;
+    auto checkCategory = [&](StagedResources& staged, ResourceStore& committed, ResourceSourceType sourceType) {
+        if (!staged.discovered && !staged.conflict) {
             return;
         }
-        if (HasCommitConflict(staged.resources, committed)) {
+        if (!staged.conflict && HasCommitConflict(staged.resources, committed)) {
             staged.conflict = true;
-            status = ResourceStatus::Conflict;
-        } else {
-            committed.reserve(committed.size() + staged.resources.size());
         }
+        if (staged.conflict) {
+            ASCENDLOGW(
+                "Skipping compile resource category because conflicts were detected: source_type=%s resource_count=%zu",
+                SourceTypeName(sourceType), staged.resources.size());
+            status = ResourceStatus::Conflict;
+            return;
+        }
+        committed.reserve(committed.size() + staged.resources.size());
     };
-    checkCategory(stage.external, externalResources_);
-    checkCategory(stage.custom, customResources_);
-    checkCategory(stage.builtIn, builtInResources_);
+    checkCategory(stage.external, externalResources_, ResourceSourceType::External);
+    checkCategory(stage.custom, customResources_, ResourceSourceType::Custom);
+    checkCategory(stage.builtIn, builtInResources_, ResourceSourceType::BuiltIn);
     uint64_t bytes = resourceBytes_;
     uint64_t files = resourceFileCount_;
     for (const StagedResources* staged : {&stage.external, &stage.custom, &stage.builtIn}) {
         if (staged->discovered && !staged->conflict &&
             (!TryAddWithinLimit(staged->bytes, MAX_REGISTRY_RESOURCE_SIZE, bytes) ||
              !TryAddWithinLimit(staged->files, MAX_REGISTRY_FILE_COUNT, files))) {
-            ASCENDLOGE("Compile resource registry limit exceeded: bytes=%" PRIu64 " files=%" PRIu64,
-                       staged->bytes, staged->files);
+            ASCENDLOGE(
+                "Compile resource registry limit exceeded: bytes=%" PRIu64 " files=%" PRIu64, staged->bytes,
+                staged->files);
             return ResourceStatus::InvalidResource;
         }
     }
@@ -748,17 +771,19 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     const bool automatic = directory == nullptr || *directory == '\0';
     std::lock_guard<std::mutex> loadLock(loadMutex_);
     if (automatic && automaticLoadAttempted_) {
-        ASCENDLOGI("Returning cached automatic resource load status: status=%d",
-                   static_cast<int>(automaticLoadStatus_));
+        ASCENDLOGI(
+            "Returning cached automatic resource load status: status=%d", static_cast<int>(automaticLoadStatus_));
         return automaticLoadStatus_;
     }
-    ASCENDLOGI("Loading compile resources: mode=%s directory=%s", automatic ? "automatic" : "explicit",
-               automatic ? "<environment>" : directory);
+    ASCENDLOGI(
+        "Loading compile resources: mode=%s directory=%s", automatic ? "automatic" : "explicit",
+        automatic ? "<environment>" : directory);
     std::vector<LibrarySpec> libraries;
     ResourceStatus status = DiscoverLibraries(directory, libraries);
     if (status != ResourceStatus::Success) {
-        ASCENDLOGE("Failed to discover compile resource libraries: mode=%s status=%d",
-                   automatic ? "automatic" : "explicit", static_cast<int>(status));
+        ASCENDLOGE(
+            "Failed to discover compile resource libraries: mode=%s status=%d", automatic ? "automatic" : "explicit",
+            static_cast<int>(status));
     } else {
         StageState stage;
         status = LoadLibraries(libraries, stage);
@@ -770,8 +795,11 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
         automaticLoadAttempted_ = true;
         automaticLoadStatus_ = status;
     }
-    ASCENDLOGI("Finished loading compile resources: mode=%s libraries=%zu status=%d",
-               automatic ? "automatic" : "explicit", libraries.size(), static_cast<int>(status));
+    if (status == ResourceStatus::Success) {
+        ASCENDLOGI(
+            "Finished loading compile resources: mode=%s libraries=%zu status=%d", automatic ? "automatic" : "explicit",
+            libraries.size(), static_cast<int>(status));
+    }
     return status;
 }
 
@@ -792,8 +820,9 @@ ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, Reso
     boost::system::error_code error;
     const fs::path randomComponent = fs::unique_path("materialize-%%%%%%%%%%%%%%%%", error);
     if (error || randomComponent.empty() || randomComponent.has_parent_path()) {
-        ASCENDLOGE("Failed to generate compile resource materialization path: source_type=%s error=%s",
-                   SourceTypeName(entry.sourceType), error.message().c_str());
+        ASCENDLOGE(
+            "Failed to generate compile resource materialization path: source_type=%s error=%s",
+            SourceTypeName(entry.sourceType), error.message().c_str());
         entry.data.resourceDir.clear();
         return ResourceStatus::IoError;
     }
@@ -813,8 +842,9 @@ ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, Reso
         return status;
     }
     entry.data.resourceDir = canonicalRoot.string();
-    ASCENDLOGI("Compile resource materialized: resource_id=%s source_type=%s so=%s files=%zu",
-               resourceId.c_str(), SourceTypeName(entry.sourceType), entry.sourceSoPath.c_str(), entry.files.size());
+    ASCENDLOGI(
+        "Compile resource materialized: resource_id=%s source_type=%s so=%s files=%zu", resourceId.c_str(),
+        SourceTypeName(entry.sourceType), entry.sourceSoPath.c_str(), entry.files.size());
     return ResourceStatus::Success;
 }
 
