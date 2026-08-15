@@ -120,7 +120,8 @@ ACLRTC 只读取当前请求实际使用的字段：
 - command：`type`、`cmd`，以及可选的 `stage`。
 
 basic 请求不深读 SK 对象，无关 Kernel 在找到目标入口后不再读取。pack 是完整 Manifest validator；
-ACLRTC 不重复校验字段白名单、唯一性、stage/output 依赖图或 template 唯一性。
+占位符语法、字段白名单、唯一性、stage/output 依赖图和 template 唯一性均由 pack 校验。
+ACLRTC 不重复实现这些校验，只在消费所选值时做防御性解析；异常资源的日志包含消费位置和字节偏移。
 
 `stage` 未设置时内部保持未设置状态，不生成默认值。当前版本不做同 stage 并行调度，所有 command
 均按所选 object 和 command 在 Manifest 中的声明顺序串行执行，link command 固定追加在最后。
