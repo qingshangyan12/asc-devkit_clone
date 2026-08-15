@@ -66,7 +66,7 @@ Besides the systematic development documentation introduced above, you can also 
     - [Ascend C Operator Performance Optimization Practical Tips 04 - Tiling Optimization](https://www.hiascend.com/zh/developer/techArticles/20240920-1)
     - [Ascend C Operator Performance Optimization Practical Tips 05 - API Usage Optimization](https://www.hiascend.com/zh/developer/techArticles/20241107-1)
   - Best Practices
-    - [Matmul Operator Performance Optimization Best Practice Based on Ascend C](https://www.hiascend.com/zh/developer/techArticles/20240816-1)
+    - [Matmul Operator Performance Optimization Best Practice Based on Ascend C](https://www.hiascend.com/zh/developer/techArticles/20240816-2)
     - [FlashAttention Operator Performance Optimization Best Practice Based on Ascend C](https://www.hiascend.com/zh/developer/techArticles/20240607-1)
 
 
