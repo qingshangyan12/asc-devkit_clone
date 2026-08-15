@@ -21,8 +21,7 @@ constexpr int CKE_IDX_2    = 2;
 
 constexpr uint64_t LOCAL_COPY_MS = 8;
 constexpr uint64_t MAX_DMA_TRANS_SIZE = 256ULL * 1024 * 1024;
-constexpr uint64_t NEG_256MB = 0xFFFFFFFF00000000ULL;
-constexpr uint64_t NEG_512MB = 0xFFFFFFFE00000000ULL;
+constexpr uint64_t NEG_256MB = 0xFFFFFFFFF0000000ULL;
 
 static CcuResult ParseKernelArg(AlltoAllMesh1DContext &ctx, CcuKernelArgAlltoAllMesh1D *kernelArg)
 {
