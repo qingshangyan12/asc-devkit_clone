@@ -34,7 +34,8 @@ aclError aclrtcKernelSpecialization(
 
 请求必须零初始化。`resourceId` 是 Registry 使用的不透明查询键。`outPath` 可以是绝对路径或相对路径；
 相对路径在接口调用时基于当前工作目录转换为绝对路径。
-`argsAddr[index]` 必须是同步调用期间可读的 host 地址，`argsBytes[index]` 是对应 buffer 的字节数。
+`argsAddr[index]` 必须是同步调用期间可读的 host 地址，`argsBytes[index]` 是对应 buffer 的字节数，
+且必须与所选 Kernel 中对应 `constant_info.byte_size` 完全一致。
 
 basic 编译示例：
 
