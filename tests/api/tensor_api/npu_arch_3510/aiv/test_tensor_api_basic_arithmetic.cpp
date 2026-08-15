@@ -250,17 +250,15 @@ __aicore__ inline void compile_min_max()
 }
 
 template <typename T>
-__aicore__ inline void compile_carry_and_mull()
+__aicore__ inline void compile_carry()
 {
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
-    asc::te::reg_tensor<T> high {};
     asc::te::reg_tensor<bool> carry {};
     (void)asc::te::add(carry, src0, src1);
     (void)asc::te::add_c(carry, src0, src1, carry);
     (void)asc::te::sub(carry, src0, src1);
     (void)asc::te::sub_c(carry, src0, src1, carry);
-    (void)asc::te::mull(high, src0, src1);
 }
 
 template <typename T>
@@ -347,9 +345,11 @@ TEST_F(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types
     compile_min_max<int32_t>();
     compile_min_max<uint32_t>();
     compile_min_max<float>();
-    compile_carry_and_mull<uint32_t>();
+    compile_carry<int32_t>();
+    compile_carry<uint32_t>();
     compile_mull<int32_t>();
-    static_assert(!asc::te::detail::supports_carry_v<int32_t>);
+    compile_mull<uint32_t>();
+    static_assert(!asc::te::detail::supports_carry_v<int16_t>);
 }
 
 TEST_F(test_tensor_api_basic_arithmetic, unary_and_log_apis_forward_mask)

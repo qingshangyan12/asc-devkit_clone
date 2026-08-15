@@ -16,7 +16,7 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_REG_LOGICAL_COMPUTE_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_REG_LOGICAL_COMPUTE_H
 
-#include "impl/tensor_api/arch/utils/reg_compute_traits.h"
+#include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
 
 namespace asc {
 namespace te {
