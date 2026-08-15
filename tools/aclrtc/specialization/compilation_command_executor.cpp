@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <csignal>
+#include <cstring>
 #include <exception>
 #include <fcntl.h>
 #include <new>
@@ -295,6 +296,21 @@ bool HasEmbeddedNull(const std::string& text) noexcept
     return text.find('\0') != std::string::npos;
 }
 
+const char* GetProcessTerminationName(CompilationProcessTermination termination) noexcept
+{
+    switch (termination) {
+        case CompilationProcessTermination::Exited:
+            return "exited";
+        case CompilationProcessTermination::Signaled:
+            return "signaled";
+        case CompilationProcessTermination::TimedOut:
+            return "timed_out";
+        case CompilationProcessTermination::InfrastructureFailure:
+        default:
+            return "infrastructure_failure";
+    }
+}
+
 bool CreateSpawnArguments(const CompilationCommand& compilationCommand, std::vector<std::string>& ownedArguments,
                           std::vector<char*>& spawnArguments)
 {
@@ -304,10 +320,11 @@ bool CreateSpawnArguments(const CompilationCommand& compilationCommand, std::vec
                          compilationCommand.diagnosticLabel.c_str());
         return false;
     }
-    for (const std::string& argument : compilationCommand.commandArguments) {
+    for (size_t argumentIndex = 0U; argumentIndex < compilationCommand.commandArguments.size(); ++argumentIndex) {
+        const std::string& argument = compilationCommand.commandArguments[argumentIndex];
         if (HasEmbeddedNull(argument)) {
-            ACLRTC_LOG_ERROR("Command %s has an argv item containing an embedded NUL",
-                             compilationCommand.diagnosticLabel.c_str());
+            ACLRTC_LOG_ERROR("Command %s argv[%zu] contains an embedded NUL; regenerate the JIT resource",
+                             compilationCommand.diagnosticLabel.c_str(), argumentIndex);
             return false;
         }
     }
@@ -350,10 +367,13 @@ aclError CompilationCommandExecutor::ExecuteCompilationPlan(const KernelCompilat
                 const int loggedOutputByteCount = static_cast<int>(
                     std::min(processResult.capturedOutput.size(), MAX_LOGGED_PROCESS_OUTPUT_BYTES));
                 ACLRTC_LOG_ERROR(
-                    "Command %s failed: termination=%u code=%d elapsed_ms=%lld output=%.*s",
-                    compilationCommand.diagnosticLabel.c_str(), static_cast<uint32_t>(processResult.termination),
+                    "Command %s failed: termination=%s code=%d elapsed_ms=%lld output_truncated=%s output=%.*s",
+                    compilationCommand.diagnosticLabel.c_str(),
+                    GetProcessTerminationName(processResult.termination),
                     static_cast<int>(processResult.terminationCode),
-                    static_cast<long long>(processResult.elapsedTime.count()), loggedOutputByteCount,
+                    static_cast<long long>(processResult.elapsedTime.count()),
+                    processResult.capturedOutputTruncated ? "true" : "false",
+                    loggedOutputByteCount,
                     processResult.capturedOutput.c_str());
                 return executionResult;
             }
@@ -402,14 +422,16 @@ aclError CompilationCommandExecutor::ExecuteCompilationCommand(
     }
     outputWriteFileDescriptor.Close();
     if (spawnResult != 0) {
-        ACLRTC_LOG_ERROR("Failed to spawn command %s: error=%d", compilationCommand.diagnosticLabel.c_str(),
-                         spawnResult);
+        ACLRTC_LOG_ERROR("Failed to spawn command %s: error=%d message=%s executable=%s",
+                         compilationCommand.diagnosticLabel.c_str(), spawnResult, std::strerror(spawnResult),
+                         compilationCommand.executablePath.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
     RunningProcessGroup runningProcessGroup(childProcessId, executionLimits_.terminationGracePeriod);
 
-    const SteadyClock::time_point executionDeadline =
-        startedAt + GetCommandExecutionTimeout(compilationCommand.commandKind);
+    const std::chrono::milliseconds commandExecutionTimeout =
+        GetCommandExecutionTimeout(compilationCommand.commandKind);
+    const SteadyClock::time_point executionDeadline = startedAt + commandExecutionTimeout;
     int childStatus = 0;
     bool infrastructureFailure = false;
     while (true) {
@@ -434,6 +456,11 @@ aclError CompilationCommandExecutor::ExecuteCompilationCommand(
         }
         if (SteadyClock::now() >= executionDeadline) {
             processResult.termination = CompilationProcessTermination::TimedOut;
+            ACLRTC_LOG_ERROR(
+                "Command %s exceeded its %lld ms execution timeout; inspect the compiler output or a stalled "
+                "tool process",
+                compilationCommand.diagnosticLabel.c_str(),
+                static_cast<long long>(commandExecutionTimeout.count()));
             runningProcessGroup.TerminateAndReap(childStatus);
             break;
         }

@@ -81,7 +81,26 @@ TEST(KernelCompilationWorkspaceTest, ReportsMissingPatchTemplateAsResourceFailur
     EXPECT_EQ(workspace.MaterializeCompilationInputs(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
         "patch template was not found"));
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "regenerate the JIT resource from matching source files"));
     EXPECT_EQ(ReadFile(sourcePath), "unchanged\n");
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(worktreePath, ignoredError);
+}
+
+TEST(KernelCompilationWorkspaceTest, ReportsUnreadablePatchFileWithSystemReason)
+{
+    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_missing_file");
+    const fs::path missingSourcePath = worktreePath / "resources/missing_constants.h";
+    KernelCompilationPlan plan;
+    plan.sourcePatches = {{missingSourcePath, "@@MISSING@@", "{0x01}"}};
+
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(workspace.MaterializeCompilationInputs(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(missingSourcePath.string()));
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message="));
 
     boost::system::error_code ignoredError;
     fs::remove_all(worktreePath, ignoredError);

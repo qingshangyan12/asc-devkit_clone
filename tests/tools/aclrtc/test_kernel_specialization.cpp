@@ -183,6 +183,50 @@ TEST(KernelSpecializationRequestTest, ReportsSpecificRequestValidationFailures)
     EXPECT_TRUE(CapturedKernelSpecializationLogsContain("options[0] cannot override compiler output"));
 }
 
+TEST(KernelSpecializationRequestTest, ReportsHowToCorrectInvalidRequestText)
+{
+    using ascendc::aclrtc::CapturedKernelSpecializationLogsContain;
+    using ascendc::aclrtc::ClearCapturedKernelSpecializationLogs;
+    ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
+
+    aclrtcKernelSpecRequest request = CreateValidRequest();
+    request.resourceId = nullptr;
+    ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, "/tmp/kernel.elf", normalizedRequest),
+              ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("resourceId must not be null"));
+
+    request = CreateValidRequest();
+    request.kernelEntry = "";
+    ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, "/tmp/kernel.elf", normalizedRequest),
+              ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("kernelEntry must not be empty"));
+
+    const char* nullOption[] = {nullptr};
+    request = CreateValidRequest();
+    request.options = nullOption;
+    request.optionCount = 1U;
+    ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, "/tmp/kernel.elf", normalizedRequest),
+              ACL_ERROR_RTC_INVALID_OPTION);
+    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("options[0] must not be null"));
+
+    const char* optionWithControlByte[] = {"-DVALUE=line\nbreak"};
+    request = CreateValidRequest();
+    request.options = optionWithControlByte;
+    request.optionCount = 1U;
+    ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, "/tmp/kernel.elf", normalizedRequest),
+              ACL_ERROR_RTC_INVALID_OPTION);
+    EXPECT_TRUE(CapturedKernelSpecializationLogsContain(
+        "options[0] contains prohibited control byte 0x0a at byte 12"));
+}
+
 TEST(KernelSpecializationRequestTest, RejectsOptionsThatCanRedirectCompilerInputsOrOutputs)
 {
     const std::array<const char *, 6> invalidOptions = {

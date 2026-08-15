@@ -32,8 +32,10 @@ aclError JitResourceRegistryAdapter::LoadAndLookupJitResource(
     RegisteredJitResource loadedResource;
     const aclError result = loadAndLookupFunction_(resourceId, loadedResource, functionContext_);
     if (result != ACLRTC_SUCCESS) {
-        ACLRTC_LOG_ERROR("ResourceRegistry Load/Lookup failed for resourceId %s with aclError %d",
-                         resourceId.c_str(), result);
+        ACLRTC_LOG_ERROR(
+            "ResourceRegistry Load/Lookup failed for resourceId '%s' with aclError %d; verify the resource was "
+            "loaded and resourceId is correct",
+            resourceId.c_str(), result);
         return result;
     }
     resource = std::move(loadedResource);
