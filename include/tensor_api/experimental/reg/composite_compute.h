@@ -16,7 +16,7 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_REG_COMPOSITE_COMPUTE_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_REG_COMPOSITE_COMPUTE_H
 
-#include "impl/tensor_api/arch/utils/reg_compute_traits.h"
+#include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
 
 namespace asc {
 namespace te {
@@ -27,14 +27,13 @@ __simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src,
 template <typename T>
 __simd_callee__ inline decltype(auto) absdiff(reg_tensor<T> src0, reg_tensor<T> src1);
 
-template <reg_layout layout = reg_layout::zero, typename T>
+template <typename T>
 __simd_callee__ inline decltype(auto) exp_sub(reg_tensor<T> src0, reg_tensor<T> src1);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) fma(
     reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<T> src2);
 
-template <reg_layout layout = reg_layout::zero>
 __simd_callee__ inline decltype(auto) muls_cast(reg_tensor<float> src, float scalar);
 
 } // namespace te

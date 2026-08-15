@@ -43,11 +43,10 @@ __simd_callee__ inline decltype(auto) absdiff(reg_tensor<T> src0, reg_tensor<T> 
     return dst;
 }
 
-template <reg_layout layout, typename T>
+template <typename T>
 __simd_callee__ inline decltype(auto) exp_sub(reg_tensor<T> src0, reg_tensor<T> src1)
 {
     static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float");
-    static_assert(layout == reg_layout::zero, "exp_sub only supports reg_layout::zero on the current device");
     reg_tensor<float> dst;
     // asc_exp_sub returns float for both half and float inputs.
     asc_exp_sub(dst.reg, src0.reg, src1.reg, src0.mask);
@@ -66,10 +65,8 @@ __simd_callee__ inline decltype(auto) fma(
     return dst;
 }
 
-template <reg_layout layout>
 __simd_callee__ inline decltype(auto) muls_cast(reg_tensor<float> src, float scalar)
 {
-    static_assert(layout == reg_layout::zero, "muls_cast only supports reg_layout::zero");
     reg_tensor<half> dst;
     asc_muls(dst.reg, src.reg, scalar, src.mask);
     dst.mask = src.mask;

@@ -187,7 +187,7 @@ template <typename T>
 __simd_callee__ inline decltype(auto) add(
     reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1)
 {
-    static_assert(detail::supports_carry_v<T>, "add with carry supports uint32_t");
+    static_assert(detail::supports_carry_v<T>, "add with carry supports int32_t and uint32_t");
     reg_tensor<T> dst;
     asc_add(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
     dst.mask = src0.mask;
@@ -198,7 +198,7 @@ template <typename T>
 __simd_callee__ inline decltype(auto) add_c(
     reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<bool> carry_src)
 {
-    static_assert(detail::supports_carry_v<T>, "add_c supports uint32_t");
+    static_assert(detail::supports_carry_v<T>, "add_c supports int32_t and uint32_t");
     reg_tensor<T> dst;
     asc_addc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
     dst.mask = src0.mask;
@@ -225,7 +225,7 @@ template <typename T>
 __simd_callee__ inline decltype(auto) sub(
     reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1)
 {
-    static_assert(detail::supports_carry_v<T>, "sub with carry supports uint32_t");
+    static_assert(detail::supports_carry_v<T>, "sub with carry supports int32_t and uint32_t");
     reg_tensor<T> dst;
     asc_sub(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
     dst.mask = src0.mask;
@@ -236,7 +236,7 @@ template <typename T>
 __simd_callee__ inline decltype(auto) sub_c(
     reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<bool> carry_src)
 {
-    static_assert(detail::supports_carry_v<T>, "sub_c supports uint32_t");
+    static_assert(detail::supports_carry_v<T>, "sub_c supports int32_t and uint32_t");
     reg_tensor<T> dst;
     asc_subc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
     dst.mask = src0.mask;

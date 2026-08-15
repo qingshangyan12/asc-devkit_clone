@@ -228,7 +228,7 @@ TEST_F(test_tensor_api_composite_compute, accumulation_apis_use_first_operand_ma
     EXPECT_TRUE(g_capture.masks_match);
 }
 
-TEST_F(test_tensor_api_composite_compute, difference_apis_preserve_source_order_and_supported_layout)
+TEST_F(test_tensor_api_composite_compute, difference_apis_preserve_source_order_and_result_part)
 {
     auto src0 = make_reg<float>(SRC0_TOKEN);
     auto src1 = make_reg<float>(SRC1_TOKEN);
@@ -258,7 +258,7 @@ TEST_F(test_tensor_api_composite_compute, difference_apis_preserve_source_order_
     EXPECT_TRUE(g_capture.masks_match);
 }
 
-TEST_F(test_tensor_api_composite_compute, muls_cast_maps_supported_layout)
+TEST_F(test_tensor_api_composite_compute, muls_cast_uses_supported_result_part)
 {
     auto src = make_reg<float>(SRC0_TOKEN);
     g_capture = {};
