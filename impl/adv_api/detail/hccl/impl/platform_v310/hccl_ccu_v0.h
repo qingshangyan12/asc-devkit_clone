@@ -116,7 +116,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
 {
     using T = decltype(config);
     static_assert(std::is_same<T, const HcclServerConfig&>::value);
-    KERNEL_LOG(KERNEL_INFO, "Working core type %u id %u.", static_cast<uint8_t>(config.type), config.blockId);
+    PRINTF( "Working core type %u id %u.", static_cast<uint8_t>(config.type), config.blockId);
     if constexpr (config.type == CoreType::ON_AIV) {
         workingFlag_ = (g_coreType == AscendC::AIV && GetBlockIdx() == config.blockId);
     } else if constexpr (config.type == CoreType::ON_AIC) {
@@ -143,15 +143,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     if (msgAddr & 0x1ff) {
         msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
     }
-    KERNEL_LOG(
-        KERNEL_INFO, "ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx", msgAddr,
+    PRINTF( "ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx", msgAddr,
         newCcuFlag_ ? hcclNewContext_->workspace : hcclContext_->workSpace);
 
     uint64_t xnAddr = newCcuFlag_ ? hcclNewContext_->xnAddr : reinterpret_cast<uint64_t>(hcclContext_->xnOffset);
     uint64_t ckeAddr = newCcuFlag_ ? hcclNewContext_->ckeAddr : reinterpret_cast<uint64_t>(hcclContext_->ckeOffset);
 #ifndef ASCENDC_CPU_DEBUG
     ASCENDC_ASSERT((reinterpret_cast<uintptr_t>(xnAddr) % ALIGN_64_BYTE == 0), {
-        KERNEL_LOG(KERNEL_ERROR, "xnAddr is not 64-byte aligned!");
+        PRINTF( "xnAddr is not 64-byte aligned!");
     });
 #endif
 
@@ -180,8 +179,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     }
 
     isInited_ = true;
-    KERNEL_LOG(
-        KERNEL_INFO, "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx/n",
+    PRINTF( "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx/n",
         newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId,
         newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum, xnAddr, ckeAddr,
         reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt));
@@ -227,7 +225,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     ASCENDC_HCCL_API_ASSERT(
         opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
         "Call SetCcTiling failed, ensure cmdType is valid");
-    KERNEL_LOG(KERNEL_INFO, "CmdType = %d, ccOpTilingData = %lu ", opType, reinterpret_cast<uint64_t>(ccOpTilingData));
+    PRINTF( "CmdType = %d, ccOpTilingData = %lu ", opType, reinterpret_cast<uint64_t>(ccOpTilingData));
     ccOpTilingDataTable_[opType] = reinterpret_cast<uint64_t>(ccOpTilingData);
     return HCCL_SUCCESS;
 }
@@ -270,7 +268,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        ccuUsedXnNum_ = 13;
+        ccuUsedXnNum_ = 15;
         CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
     }
 }
@@ -283,7 +281,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         if (msgQueueIsAvailable_[globalCurResId_] == false) {
             break;
         }
-        KERNEL_LOG(KERNEL_INFO, "ApiClient do ccu prepare repeatIdx = %d, globalCurResId_ = %d.", i, globalCurResId_);
+        PRINTF( "ApiClient do ccu prepare repeatIdx = %d, globalCurResId_ = %d.", i, globalCurResId_);
 
         ccuParam_.repeatIndex = i;
         ccuParam_.alltoallvCnt = globalCurResId_;
@@ -417,8 +415,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
     }
 
-    KERNEL_LOG(
-        KERNEL_INFO,
+    PRINTF(
         "ApiClient CcuSendMsg ccuMsg_.xnAddr, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: "
         "0x%llx, Id6: 0x%llx, Id7: 0x%llx, Id8: 0x%llx, Id9: 0x%llx, Id10: 0x%llx, Id11: 0x%llx, Id12: 0x%llx, Id13: "
         "0x%llx, Id14: 0x%llx",
@@ -481,14 +478,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         "Call Commit failed, please ensure Hccl::Init func has been called successfully already!");
 
     if (unlikely(handleId >= HCCL_MAX_HANDLE_ID || handleId <= INVALID_HANDLE_ID)) {
-        KERNEL_LOG(KERNEL_ERROR, "Call Commit failed, handleId[%u] is invalid.", handleId);
+        PRINTF( "Call Commit failed, handleId[%u] is invalid.", handleId);
         return;
     }
 
     handleNeedCommitCnt_[handleId]++;
     if (msgQueueIsAvailable_[globalCurResId_] == false) {
-        KERNEL_LOG(
-            KERNEL_ERROR, "Call Commit failed, the th msg is not avaliable! handleId = %d", globalCurResId_, handleId);
+        PRINTF("Call Commit failed, the th msg is not avaliable! handleId = %d", globalCurResId_, handleId);
         return;
     }
 
@@ -509,13 +505,12 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         "Call Wait failed,  handleId = %u is invalid please call Preapre Interface before Wait.", handleId);
 
     if (unlikely(handleId >= HCCL_MAX_HANDLE_ID || handleId <= INVALID_HANDLE_ID)) {
-        KERNEL_LOG(KERNEL_ERROR, "Call Wait failed, handleId[%u] is invalid.", handleId);
+        PRINTF( "Call Wait failed, handleId[%u] is invalid.", handleId);
         return HCCL_FAILED;
     }
 
     if (unlikely(handleNeedCommitCnt_[handleId] <= 0)) {
-        KERNEL_LOG(
-            KERNEL_ERROR, "Call Wait failed, handleNeedCommitCnt_[%u] = %u is invalid.", handleId,
+        PRINTF("Call Wait failed, handleNeedCommitCnt_[%u] = %u is invalid.", handleId,
             handleNeedCommitCnt_[handleId]);
         return HCCL_FAILED;
     }
@@ -560,8 +555,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         }
     }
 
-    KERNEL_LOG(
-        KERNEL_INFO, "ApiClient Wait finish finishCntGM_:%d, finishCnt_:%d", *finishCntGM_, handleFinishCnt_[handleId]);
+    PRINTF( "ApiClient Wait finish finishCntGM_:%d, finishCnt_:%d", *finishCntGM_, handleFinishCnt_[handleId]);
     return HCCL_SUCCESS;
 }
 
@@ -580,7 +574,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
             Wait(handleId);
         }
 
-        KERNEL_LOG(KERNEL_INFO, "ApiClient Finalize handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
+        PRINTF( "ApiClient Finalize handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
 
         ccuMsg_.commitCKEAddr = GetCommitCkeAddr(globalCurWaitId_);
         GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
@@ -588,8 +582,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
         FlushDataCache(ccuMsg_.xnAddr);
         WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
-        KERNEL_LOG(
-            KERNEL_INFO, "ApiClient Finalize success handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
+        PRINTF( "ApiClient Finalize success handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
     }
 }
 
