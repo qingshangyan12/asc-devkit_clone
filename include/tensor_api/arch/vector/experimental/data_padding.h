@@ -30,7 +30,7 @@ __simd_callee__ inline decltype(auto) fill(reg_tensor<T> val, reg_tensor<bool> m
 } // namespace asc
 
 #if defined(__NPU_ARCH__)
-#include "impl/tensor_api/arch/vector/experimetnal/data_padding_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/data_padding_impl.h"
 #endif
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_DATA_PADDING_H

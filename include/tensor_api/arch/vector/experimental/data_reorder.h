@@ -29,7 +29,7 @@ __simd_callee__ inline decltype(auto) deinterleave(reg_tensor<T> src0, reg_tenso
 } // namespace asc
 
 #if defined(__NPU_ARCH__)
-#include "impl/tensor_api/arch/vector/experimetnal/data_reorder_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/data_reorder_impl.h"
 #endif
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_DATA_REORDER_H
