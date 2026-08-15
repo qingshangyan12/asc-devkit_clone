@@ -57,7 +57,7 @@ static CcuResult InitResource(AlltoAllMesh1DContext &ctx)
 }
 
 static CcuResult LoadArgs(AlltoAllMesh1DContext &ctx, ccu::Variable inputAddr, ccu::Variable outputAddr,
-    ccu::Variable tokenInfo, ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset,
+    ccu::Variable tokenInfo, ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable writeLoopCount,
     ccu::Variable dstOffset, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
     ccu::Variable goSize4)
 {
@@ -67,7 +67,8 @@ static CcuResult LoadArgs(AlltoAllMesh1DContext &ctx, ccu::Variable inputAddr, c
     ctx.token[arg->rankId] = tokenInfo;
     ctx.sliceSize = sliceSize;
     ctx.srcStride = srcStride;
-    ctx.srcOffset = srcOffset;
+    ctx.writeLoopCount = writeLoopCount;
+    ctx.srcOffset = 0;
     ctx.dstOffset = dstOffset;
     ctx.goSize.addrOffset = goSize1;
     ctx.goSize.loopParam = goSize2;
@@ -144,6 +145,8 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     chunkSize = MAX_DMA_TRANS_SIZE;
     ccu::Variable neg256MB;
     neg256MB = NEG_256MB;
+    ccu::Variable constOne;
+    constOne = 1;
 
     if (arg->loadFromMem) {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
@@ -154,23 +157,27 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 ccu::RemoteAddr curDst = dst[r];
                 ccu::LocalAddr curSrc = src[r];
 
-                // 尾块计算 (sliceSize - 256MB)
-                ccu::Variable tailSize;
-                tailSize = ctx.sliceSize;
-                tailSize += neg256MB;
+                ccu::Variable loopCount;
+                loopCount = ctx.writeLoopCount;
+                ccu::Variable remaining;
+                remaining = ctx.sliceSize;
 
-                CCU_IF(tailSize != 0)
+                CCU_WHILE(loopCount != UINT64_MAX)
                 {
-                    // sliceSize > 256MB: 第1块 mask=0, 尾块 mask=1<<r
                     ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 0);
                     curDst.addr += chunkSize;
                     curSrc.addr += chunkSize;
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, tailSize, ctx.event, 1 << r);
+                    remaining += neg256MB;
+                    loopCount += constOne;
                 }
-                CCU_IF(tailSize == 0)
+
+                CCU_IF(remaining != 0)
                 {
-                    // sliceSize == 256MB: 只传1块 mask=1<<r
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, remaining, ctx.event, 1 << r);
+                }
+                CCU_IF(remaining == 0)
+                {
+                    ccu::EventRecord(ctx.event, 1 << r);
                 }
                 channelId++;
             }
@@ -182,23 +189,27 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
                 ccu::RemoteAddr curDst = dst[r];
                 ccu::LocalAddr curSrc = src[r];
 
-                // 尾块计算 (sliceSize - 256MB)
-                ccu::Variable tailSize;
-                tailSize = ctx.sliceSize;
-                tailSize += neg256MB;
+                ccu::Variable loopCount;
+                loopCount = ctx.writeLoopCount;
+                ccu::Variable remaining;
+                remaining = ctx.sliceSize;
 
-                CCU_IF(tailSize != 0)
+                CCU_WHILE(loopCount != UINT64_MAX)
                 {
-                    // sliceSize > 256MB: 第1块 mask=0, 尾块 mask=1<<r
                     ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 0);
                     curDst.addr += chunkSize;
                     curSrc.addr += chunkSize;
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, tailSize, ctx.event, 1 << r);
+                    remaining += neg256MB;
+                    loopCount += constOne;
                 }
-                CCU_IF(tailSize == 0)
+
+                CCU_IF(remaining != 0)
                 {
-                    // sliceSize == 256MB: 只传1块 mask=1<<r
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, remaining, ctx.event, 1 << r);
+                }
+                CCU_IF(remaining == 0)
+                {
+                    ccu::EventRecord(ctx.event, 1 << r);
                 }
                 channelId++;
             }
@@ -215,7 +226,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
 // ============================================================================
 CcuResult CcuAlltoAllMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-    ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+    ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable writeLoopCount, ccu::Variable dstOffset,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4,
     CcuKernelArg &arg)
 {
@@ -234,7 +245,7 @@ CcuResult CcuAlltoAllMesh1DKernel(
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D run");
     CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset,
+    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, writeLoopCount, dstOffset,
         goSize1, goSize2, goSize3, goSize4));
 
     PreSync(ctx);

@@ -39,6 +39,7 @@ struct AlltoAllMesh1DContext: CcuKernelCtxBase {
     ccu::Variable sliceSize;
     ccu::Variable srcStride;
     ccu::Variable srcOffset;
+    ccu::Variable writeLoopCount;
     ccu::Variable dstOffset;
     GroupOpSizeVars goSize;
 
@@ -54,7 +55,7 @@ struct AlltoAllMesh1DContext: CcuKernelCtxBase {
 
 CcuResult CcuAlltoAllMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-    ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+    ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable writeLoopCount, ccu::Variable dstOffset,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4,
     CcuKernelArg &arg);
 
