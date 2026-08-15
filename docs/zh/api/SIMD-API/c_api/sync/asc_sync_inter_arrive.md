@@ -35,6 +35,8 @@
   - 所有参与同步的AIV都执行`asc_sync_inter_arrive`后向调度模块发送通知，接着调度模块将各AIV对应`flag_id`的计数器增加1。
   - 各AIV上配对的`asc_sync_inter_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
 
+核间同步具体使用方法，请参考[调用示例](#调用示例)。
+
 ## 函数原型
 
 ```c
@@ -48,8 +50,8 @@ __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 设置这条指令所在的流水类型。|
-| flag_id | 输入 | 事件标号，用于标识同一组同步信号。取值范围为[0,15]。|
+| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。|
+| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0,15]，每个flag ID各自拥有独立的4位计数器。|
 
 ## 返回值说明
 
@@ -61,19 +63,15 @@ PIPE_S
 
 ## 约束说明
 
-- 不建议开发者同时使用该接口和Matmul高阶API，否则会有flag_id冲突的风险。
-- 同一flag_id的计数器最多设置15次。
-
-- 必须保证配套使用asc_sync_inter_arrive和[asc_sync_inter_wait](asc_sync_inter_wait.md)，否则会出现未定义行为。
-- 需要保证每个flag_id的计数器不溢出，否则将引发异常。
-- pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_ALL和PIPE_S。
-- flag_id的值超出取值范围时，会截取最低4位为准。
-- 一个核连续发出的asc_sync_inter_arrive，硬件不保证执行顺序。
-- 使用该接口时，建议开启batchmode模式，使算子独占全部所需核资源，否则在多流并发场景下（≥2条执行流、≥2个算子并发、核数总和超过物理核数）可能导致死锁。
+- 用户需要确保配套使用（`flag_id`必须完全一致）`asc_sync_inter_arrive`和`asc_sync_inter_wait`，否则会出现未定义行为。
+- 每个计数器取值范围为[0, 15]，必须保证计数器的值不会溢出，否则触发异常。
+- `pipe`不支持的取值：`PIPE_ALL`和`PIPE_S`。
+- 本接口不阻塞`pipe`流水中的后续指令。
+- `flag_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（如16->0、17->1）。
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`声明核函数，并通过`__schedmode__(1)`开启batch mode。核函数启动2个group，共包含4个AIV。每个AIV先将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_inter_arrive`。各AIV在MTE2流水上调用`asc_sync_inter_wait`，等待所有AIV均到达同步点。同步完成后，由AIV0读取并输出全部AIV生成的数据。
+本示例采用`__mix__(1, 2)`标识核函数，核函数启动2个AI Core，共包含4个AIV。每个AIV将一组数据从UB搬运至GM（PIPE_MTE3）操作执行完后，才能执行`asc_sync_inter_arrive`向调度模块发送通知。各AIV中从GM读取数据（PIPE_MTE2）的操作被`asc_sync_inter_wait`阻塞，直到所有AIV均执行了`asc_sync_inter_arrive`后才能执行。同步完成后，由AIV0读取并输出全部AIV生成的数据。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
@@ -100,7 +98,7 @@ constexpr uint32_t AIV_BYTES = ELEMENTS_PER_AIV * sizeof(float);
 constexpr uint32_t TOTAL_BYTES = TOTAL_ELEMENTS * sizeof(float);
 constexpr int64_t FLAG_ID = 8;
 
-__schedmode__(1) __global__ __mix__(1, 2) void asc_sync_inter_kernel(
+__global__ __mix__(1, 2) void asc_sync_inter_kernel(
     __gm__ float* contributions, __gm__ float* output)
 {
     asc_init();

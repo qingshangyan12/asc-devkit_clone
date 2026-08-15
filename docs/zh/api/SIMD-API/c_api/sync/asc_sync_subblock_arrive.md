@@ -26,10 +26,12 @@
 
 ## 功能说明
 
-本接口与[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#zh-cn_topic_0000002542605351_fig52727114018)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：
+本接口与[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：
 
 - 同一AI Core内所有AIV（subblock）都执行`asc_sync_subblock_arrive`后向调度模块发送通知，接着调度模块将各AIV（subblock）对应`flag_id`的计数器增加1。
 - 各AIV（subblock）上配对的`asc_sync_subblock_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
+
+核间同步具体使用方法，请参考[调用示例](#调用示例)。
 
 ## 函数原型
 
@@ -44,8 +46,8 @@ __aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 设置这条指令所在的流水类型。|
-| flag_id | 输入 | 事件标号，用于标识同一组同步信号。取值范围为[0,15]。|
+| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。|
+| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0,15]，每个flag ID各自拥有独立的4位计数器。|
 
 ## 返回值说明
 
@@ -57,18 +59,15 @@ PIPE_S
 
 ## 约束说明
 
-- 不建议开发者同时使用该接口和Matmul高阶API，否则会有flag_id冲突的风险。
-- 同一flag_id的计数器最多设置15次。
-
-- 必须保证配套使用asc_sync_subblock_arrive和[asc_sync_subblock_wait](asc_sync_subblock_wait.md)，否则会出现未定义行为。
-- 需要保证每个flag_id的计数器不溢出，否则将引发异常。
-- pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_ALL和PIPE_S。
-- flag_id的值超出取值范围时，会截取最低4位为准。
-- 一个核连续发出的asc_sync_subblock_arrive，硬件不保证执行顺序。
+- 用户需要确保配套使用（`flag_id`必须完全一致）`asc_sync_subblock_arrive`和`asc_sync_subblock_wait`，否则会出现未定义行为。
+- 每个计数器取值范围为[0, 15]，必须保证计数器的值不会溢出，否则触发异常。
+- `pipe`不支持的取值：`PIPE_ALL`和`PIPE_S`。
+- 本接口不阻塞`pipe`流水中的后续指令。
+- `flag_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（如16->0、17->1）。
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`声明核函数，同一group内包含2个AIV。两个AIV分别将一组数据搬运至GM，然后在MTE3流水上调用`asc_sync_subblock_arrive`。两个AIV在MTE2流水上调用`asc_sync_subblock_wait`，等待彼此均到达同步点。同步完成后，由AIV0读取并输出两个AIV生成的数据。
+本示例采用`__mix__(1, 2)`标识核函数，同一AI Core内包含2个AIV。两个AIV分别将一组数据从UB搬运至GM（PIPE_MTE3）操作执行完后，才能执行`asc_sync_subblock_arrive`向调度模块发送通知。各AIV中从GM读取数据（PIPE_MTE2）的操作被`asc_sync_subblock_wait`阻塞，直到两个AIV均执行了`asc_sync_subblock_arrive`后才能执行。同步完成后，由AIV0读取并输出两个AIV生成的数据。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 

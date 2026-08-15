@@ -51,8 +51,8 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 需要执行同步指令的流水类型。|
-| flag_id | 输入 | 事件标号，取值范围[0,15]。|
+| pipe | 输入 | 标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。|
+| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0,15]，每个flag ID各自拥有独立的4位计数器。|
 
 ## 返回值说明
 
@@ -64,11 +64,22 @@ PIPE_S
 
 ## 约束说明
 
-- flag_id的取值范围为0至15，每个flag_id的计数器范围为0至15。
-- 必须保证每个flag_id的四位计数器不溢出，否则将引发异常。
-- 必须保证相同的flag_id在同一时间仅被一条流水线使用。
-- pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_ALL和PIPE_S。
-- flag_id的值超出取值范围时，会截取最低4位为准。
+- 不同产品对模板参数`modeId`和`pipe`的生效情况如下：
+    <!-- npu="950" id8 -->
+    - Ascend 950PR/Ascend 950DT，硬件支持配置核间同步模式和流水类型，输入参数`pipe`**生效**，此时`asc_sync_block_wait`会阻塞**指定流水**的后续指令。
+    <!-- end id8 -->
+    <!-- npu="A3,910b" id9 -->
+    - 针对如下产品，硬件不支持配置核间同步模式和流水类型，输入参数`pipe`**不生效**，此时`asc_sync_block_wait`会阻塞**全部流水**的后续指令。
+        <!-- npu="A3" id10 -->
+        - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+        <!-- end id10 -->
+        <!-- npu="910b" id11 -->
+        - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+        <!-- end id11 -->
+    <!-- end id9 -->
+- 用户需要确保配套使用（`flag_id`必须完全一致）`asc_sync_block_arrive`和`asc_sync_block_wait`，否则会出现未定义行为。
+- 每个计数器取值范围为[0, 15]，必须保证计数器的值不会溢出，否则触发异常。
+- `flag_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（如16->0、17->1）。
 
 ## 调用示例
 
