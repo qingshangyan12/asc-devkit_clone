@@ -63,6 +63,8 @@ struct mmad_params {
 
 enum class round_mode : uint8_t { default_round = 0, hybrid = 1 };
 
+enum class reduce_scope : uint8_t { vector, datablock, pair };
+
 enum dual_dst_mode : uint8_t { disable = 0, split_m = 1, split_n = 2 };
 
 struct fixpipe_params {
