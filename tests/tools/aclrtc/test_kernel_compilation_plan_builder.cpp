@@ -163,12 +163,12 @@ NormalizedKernelSpecializationRequest CreateRequest(const KernelPlanTestWorkspac
                                                     const uint64_t* argumentByteCounts)
 {
     NormalizedKernelSpecializationRequest request;
-    request.requestId = "request_1";
+    request.specializationSessionId = "session_1";
     request.resourceId = "resource";
     request.kernelName = "add_custom_100000";
     request.outputElfPath = workspace.ResourcePath() / "published.elf";
     request.kernelArgumentCount = 1;
-    request.borrowedKernelArgumentAddresses = argumentAddresses;
+    request.borrowedKernelArgumentDataPointers = argumentAddresses;
     request.borrowedKernelArgumentByteCounts = argumentByteCounts;
     return request;
 }
@@ -206,11 +206,11 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
                                         "-I" + (workspace.ToolchainPath() / "include").string(),
                                         (workspace.ResourcePath() / "resources/src/basic.cpp").string(), "-g",
                                         "-DVALUE=1", "-o",
-                                        (workspace.ResourcePath() / ".aclrtc_request_1/outputs/basic.o").string()}));
+        (workspace.ResourcePath() / ".aclrtc_session_1/outputs/basic.o").string()}));
     EXPECT_EQ(plan.compilationCommands[1].commandKind, CompilationCommandKind::Link);
     EXPECT_EQ(plan.compilationCommands[1].executablePath, workspace.ToolchainPath() / "bin/ld.lld");
     EXPECT_EQ(plan.linkedKernelElfPath,
-              workspace.ResourcePath() / ".aclrtc_request_1/outputs/linked_kernel.elf");
+              workspace.ResourcePath() / ".aclrtc_session_1/outputs/linked_kernel.elf");
 }
 
 TEST(KernelCompilationPlanBuilderTest, AcceptsCommandWithoutStageAndPreservesManifestOrder)

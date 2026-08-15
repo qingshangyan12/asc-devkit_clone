@@ -55,9 +55,10 @@ CompilationCommand CreateCommand(CompilationCommandKind commandKind, const char*
     return {commandKind, 0U, "test-command", executable, std::move(arguments)};
 }
 
-fs::path GetDiagnosticDirectoryPath(const std::string& requestId)
+fs::path GetDiagnosticDirectoryPath(const std::string& specializationSessionId)
 {
-    return fs::current_path() / "kernel_meta" / std::to_string(getpid()) / ("aclrtc_" + requestId);
+    return fs::current_path() / "kernel_meta" / std::to_string(getpid()) /
+           ("aclrtc_" + specializationSessionId);
 }
 
 std::string ReadTextFile(const fs::path& filePath)
@@ -180,11 +181,11 @@ TEST(CompilationCommandExecutorTest, TimeoutTerminatesDescendantsAfterCommandLea
 
 TEST(CompilationCommandExecutorTest, ReportsSpawnFailureAsInfrastructureFailure)
 {
-    const std::string requestId = "executor_spawn_failure";
-    const fs::path diagnosticDirectoryPath = GetDiagnosticDirectoryPath(requestId);
+    const std::string specializationSessionId = "executor_spawn_failure";
+    const fs::path diagnosticDirectoryPath = GetDiagnosticDirectoryPath(specializationSessionId);
     boost::system::error_code ignoredError;
     fs::remove_all(diagnosticDirectoryPath, ignoredError);
-    KernelSpecializationDiagnostics diagnostics(requestId, DiagnosticCollectionMode::Enabled);
+    KernelSpecializationDiagnostics diagnostics(specializationSessionId, DiagnosticCollectionMode::Enabled);
     CompilationCommandExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(
@@ -199,11 +200,11 @@ TEST(CompilationCommandExecutorTest, ReportsSpawnFailureAsInfrastructureFailure)
 
 TEST(CompilationCommandExecutorTest, BoundsCapturedProcessOutput)
 {
-    const std::string requestId = "executor_output_limit";
-    const fs::path diagnosticDirectoryPath = GetDiagnosticDirectoryPath(requestId);
+    const std::string specializationSessionId = "executor_output_limit";
+    const fs::path diagnosticDirectoryPath = GetDiagnosticDirectoryPath(specializationSessionId);
     boost::system::error_code ignoredError;
     fs::remove_all(diagnosticDirectoryPath, ignoredError);
-    KernelSpecializationDiagnostics diagnostics(requestId, DiagnosticCollectionMode::Enabled);
+    KernelSpecializationDiagnostics diagnostics(specializationSessionId, DiagnosticCollectionMode::Enabled);
     CompilationCommandExecutionLimits limits = CompilationCommandExecutionLimits::ProductionDefaults();
     limits.capturedOutputByteLimit = 8U;
     CompilationCommandExecutor executor(diagnostics, limits);
