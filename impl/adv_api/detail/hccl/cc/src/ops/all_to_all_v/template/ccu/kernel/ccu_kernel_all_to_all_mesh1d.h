@@ -41,8 +41,6 @@ struct AlltoAllMesh1DContext: CcuKernelCtxBase {
     ccu::Variable srcOffset;
     ccu::Variable dstOffset;
     GroupOpSizeVars goSize;
-    ccu::Variable writeFullLoopCount;
-    ccu::Variable writeTailSize;
 
     ccu::LocalAddr                   myDst;
     std::vector<ccu::RemoteAddr>     dstAddr;
@@ -58,7 +56,6 @@ CcuResult CcuAlltoAllMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
     ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4,
-    ccu::Variable writeFullLoopCount, ccu::Variable writeTailSize,
     CcuKernelArg &arg);
 
 }// namespace mc2_ops_hccl
