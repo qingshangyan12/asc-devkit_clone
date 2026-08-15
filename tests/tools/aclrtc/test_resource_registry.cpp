@@ -48,10 +48,7 @@ uint32_t gDlcloseCalls = 0U;
 bool gDlsymReportsError = false;
 uint32_t gDlerrorCalls = 0U;
 
-const AcCompileResourceBundleHeader* TestBundleGetter()
-{
-    return gBundleHeader;
-}
+const AcCompileResourceBundleHeader* TestBundleGetter() { return gBundleHeader; }
 
 void* DlopenSuccess(const char*, int)
 {
@@ -86,10 +83,7 @@ char* DlerrorControlled()
     return nullptr;
 }
 
-char* DlerrorFailure()
-{
-    return const_cast<char*>("loader error");
-}
+char* DlerrorFailure() { return const_cast<char*>("loader error"); }
 
 int DlcloseSuccess(void*)
 {
@@ -103,10 +97,7 @@ int DlcloseFailure(void*)
     return -1;
 }
 
-AcString StringView(const std::string& value)
-{
-    return {value.data(), static_cast<uint64_t>(value.size())};
-}
+AcString StringView(const std::string& value) { return {value.data(), static_cast<uint64_t>(value.size())}; }
 
 AcCompileResourceBundle MakeBundle(const AcCompileResourceManifest* manifests, uint64_t count)
 {
@@ -193,10 +184,7 @@ protected:
         ASSERT_EQ(unsetenv(name.c_str()), 0);
     }
 
-    fs::path Path(const std::string& relative) const
-    {
-        return fs::path(root_) / relative;
-    }
+    fs::path Path(const std::string& relative) const { return fs::path(root_) / relative; }
 
     void MakeDirectory(const fs::path& path)
     {
@@ -225,8 +213,8 @@ protected:
     SourceLayout CreateLayout(const std::string& prefix, const std::string& sourceFile = "source.cpp")
     {
         const fs::path kernel = Path(prefix) / "op_impl/ai_core/tbe/kernel";
-        const fs::path so = kernel / "jit/Ascend910B" / ("lib" + fs::path(prefix).filename().string() +
-                                                          "_compile_database.so");
+        const fs::path so =
+            kernel / "jit/Ascend910B" / ("lib" + fs::path(prefix).filename().string() + "_compile_database.so");
         const fs::path sourceDirectory = kernel / "Ascend910B/impl";
         const fs::path source = sourceDirectory / sourceFile;
         WriteFile(so);
@@ -269,8 +257,9 @@ protected:
 TEST_F(ResourceRegistryTest, AutomaticSearchRootsParsesCustomVendorAndBuiltInPaths)
 {
     const fs::path opp = Path("opp");
-    WriteFile(opp / "vendors/config.ini",
-              "ignored=value\n load_priority = vendor_a, ../escape, vendor_b, vendor_a, , /absolute\n");
+    WriteFile(
+        opp / "vendors/config.ini",
+        "ignored=value\n load_priority = vendor_a, ../escape, vendor_b, vendor_a, , /absolute\n");
     SetEnvironment("ASCEND_CUSTOM_OPP_PATH", "  /custom/one:/custom/two:/custom/one::  ");
     SetEnvironment("ASCEND_OPP_PATH", opp.string());
 
@@ -327,16 +316,14 @@ TEST_F(ResourceRegistryTest, CollectAndDiscoverLibrariesHandleExplicitAndAutomat
     WriteFile(explicitRoot / "bad.so");
 
     std::set<std::string> found;
-    EXPECT_TRUE(ResourceRegistry::CollectLibraries(explicitRoot.string(), ResourceSourceType::External, false,
-                                                   found));
+    EXPECT_TRUE(ResourceRegistry::CollectLibraries(explicitRoot.string(), ResourceSourceType::External, false, found));
     ASSERT_EQ(found.size(), 1U);
     EXPECT_EQ(*found.begin(), fs::canonical(top).string());
     found.clear();
-    EXPECT_TRUE(ResourceRegistry::CollectLibraries(explicitRoot.string(), ResourceSourceType::External, true,
-                                                   found));
+    EXPECT_TRUE(ResourceRegistry::CollectLibraries(explicitRoot.string(), ResourceSourceType::External, true, found));
     EXPECT_EQ(found.size(), 2U);
-    EXPECT_FALSE(ResourceRegistry::CollectLibraries(Path("missing").string(), ResourceSourceType::External, true,
-                                                    found));
+    EXPECT_FALSE(
+        ResourceRegistry::CollectLibraries(Path("missing").string(), ResourceSourceType::External, true, found));
 
     std::vector<LibrarySpec> libraries;
     EXPECT_EQ(ResourceRegistry::DiscoverLibraries(top.string().c_str(), libraries), ResourceStatus::Success);
@@ -352,20 +339,20 @@ TEST_F(ResourceRegistryTest, CollectAndDiscoverLibrariesHandleExplicitAndAutomat
     MakeDirectory(empty);
     libraries.clear();
     EXPECT_EQ(ResourceRegistry::DiscoverLibraries(empty.string().c_str(), libraries), ResourceStatus::NotFound);
-    EXPECT_EQ(ResourceRegistry::DiscoverLibraries(Path("absent").string().c_str(), libraries),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::DiscoverLibraries(Path("absent").string().c_str(), libraries),
+        ResourceStatus::InvalidResource);
 
     const fs::path link = Path("explicit-link");
     boost::system::error_code error;
     fs::create_symlink(explicitRoot, link, error);
     ASSERT_FALSE(error);
-    EXPECT_EQ(ResourceRegistry::DiscoverLibraries(link.string().c_str(), libraries),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(ResourceRegistry::DiscoverLibraries(link.string().c_str(), libraries), ResourceStatus::InvalidResource);
     const fs::path fileLink = Path("explicit-file-link.so");
     fs::create_symlink(top, fileLink, error);
     ASSERT_FALSE(error);
-    EXPECT_EQ(ResourceRegistry::DiscoverLibraries(fileLink.string().c_str(), libraries),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::DiscoverLibraries(fileLink.string().c_str(), libraries), ResourceStatus::InvalidResource);
 
     const SourceLayout custom = CreateLayout("custom");
     const SourceLayout builtIn = CreateLayout("opp/built-in");
@@ -380,8 +367,8 @@ TEST_F(ResourceRegistryTest, CollectAndDiscoverLibrariesHandleExplicitAndAutomat
     EXPECT_EQ(libraries[1].sourceType, ResourceSourceType::BuiltIn);
 
     found.clear();
-    EXPECT_TRUE(ResourceRegistry::CollectAutomaticLibraries({Path("absent-auto").string()},
-                                                            ResourceSourceType::Custom, found));
+    EXPECT_TRUE(
+        ResourceRegistry::CollectAutomaticLibraries({Path("absent-auto").string()}, ResourceSourceType::Custom, found));
 }
 
 TEST_F(ResourceRegistryTest, ResolveSourceRootAndAddSourceMatchValidateFilesystemIdentity)
@@ -394,48 +381,55 @@ TEST_F(ResourceRegistryTest, ResolveSourceRootAndAddSourceMatchValidateFilesyste
     std::string canonicalRoot;
     EXPECT_EQ(ResourceRegistry::ResolveSourceRoot(sourceRoot, "resource", canonicalRoot), ResourceStatus::Success);
     EXPECT_EQ(canonicalRoot, fs::canonical(sourceRoot).string());
-    EXPECT_EQ(ResourceRegistry::ResolveSourceRoot(Path("missing-root"), "resource", canonicalRoot),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::ResolveSourceRoot(Path("missing-root"), "resource", canonicalRoot),
+        ResourceStatus::InvalidResource);
 
     const fs::path regularRoot = Path("regular-root");
     WriteFile(regularRoot);
-    EXPECT_EQ(ResourceRegistry::ResolveSourceRoot(regularRoot, "resource", canonicalRoot),
-              ResourceStatus::InvalidResource);
-    EXPECT_EQ(ResourceRegistry::ResolveSourceRoot(regularRoot / "child", "resource", canonicalRoot),
-              ResourceStatus::IoError);
+    EXPECT_EQ(
+        ResourceRegistry::ResolveSourceRoot(regularRoot, "resource", canonicalRoot), ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::ResolveSourceRoot(regularRoot / "child", "resource", canonicalRoot), ResourceStatus::IoError);
     const fs::path linkedRoot = Path("linked-root");
     boost::system::error_code error;
     fs::create_symlink(sourceRoot, linkedRoot, error);
     ASSERT_FALSE(error);
-    EXPECT_EQ(ResourceRegistry::ResolveSourceRoot(linkedRoot, "resource", canonicalRoot),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::ResolveSourceRoot(linkedRoot, "resource", canonicalRoot), ResourceStatus::InvalidResource);
 
     std::set<std::string> matches;
-    EXPECT_EQ(ResourceRegistry::AddSourceMatch(other, "source.cpp", canonicalRoot, "resource", matches),
-              ResourceStatus::Success);
+    EXPECT_EQ(
+        ResourceRegistry::AddSourceMatch(other, "source.cpp", canonicalRoot, "resource", matches),
+        ResourceStatus::Success);
     EXPECT_TRUE(matches.empty());
-    EXPECT_EQ(ResourceRegistry::AddSourceMatch(source, "source.cpp", canonicalRoot, "resource", matches),
-              ResourceStatus::Success);
+    EXPECT_EQ(
+        ResourceRegistry::AddSourceMatch(source, "source.cpp", canonicalRoot, "resource", matches),
+        ResourceStatus::Success);
     ASSERT_EQ(matches.size(), 1U);
     EXPECT_EQ(*matches.begin(), fs::canonical(source).parent_path().string());
 
     const fs::path matchingDirectory = sourceRoot / "source.cpp";
     MakeDirectory(matchingDirectory);
-    EXPECT_EQ(ResourceRegistry::AddSourceMatch(matchingDirectory, "source.cpp", canonicalRoot, "resource", matches),
-              ResourceStatus::Success);
+    EXPECT_EQ(
+        ResourceRegistry::AddSourceMatch(matchingDirectory, "source.cpp", canonicalRoot, "resource", matches),
+        ResourceStatus::Success);
     const fs::path matchingLink = sourceRoot / "link/source.cpp";
     MakeDirectory(matchingLink.parent_path());
     fs::create_symlink(source, matchingLink, error);
     ASSERT_FALSE(error);
-    EXPECT_EQ(ResourceRegistry::AddSourceMatch(matchingLink, "source.cpp", canonicalRoot, "resource", matches),
-              ResourceStatus::Success);
+    EXPECT_EQ(
+        ResourceRegistry::AddSourceMatch(matchingLink, "source.cpp", canonicalRoot, "resource", matches),
+        ResourceStatus::Success);
 
     const fs::path outside = Path("outside/source.cpp");
     WriteFile(outside);
-    EXPECT_EQ(ResourceRegistry::AddSourceMatch(outside, "source.cpp", canonicalRoot, "resource", matches),
-              ResourceStatus::InvalidResource);
-    EXPECT_EQ(ResourceRegistry::AddSourceMatch(Path("missing/source.cpp"), "source.cpp", canonicalRoot, "resource",
-                                               matches), ResourceStatus::IoError);
+    EXPECT_EQ(
+        ResourceRegistry::AddSourceMatch(outside, "source.cpp", canonicalRoot, "resource", matches),
+        ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::AddSourceMatch(Path("missing/source.cpp"), "source.cpp", canonicalRoot, "resource", matches),
+        ResourceStatus::IoError);
 }
 
 TEST_F(ResourceRegistryTest, LocateSourceFileRequiresValidLayoutAndUniqueMatch)
@@ -443,27 +437,26 @@ TEST_F(ResourceRegistryTest, LocateSourceFileRequiresValidLayoutAndUniqueMatch)
     const SourceLayout valid = CreateLayout("locate");
     LibrarySpec spec{valid.soPath, ResourceSourceType::External};
     std::string located;
-    EXPECT_EQ(ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located),
-              ResourceStatus::Success);
+    EXPECT_EQ(ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located), ResourceStatus::Success);
     EXPECT_EQ(located, fs::canonical(valid.sourcePath).parent_path().string());
 
     WriteFile(fs::path(valid.sourceRoot) / "duplicate/source.cpp");
-    EXPECT_EQ(ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located),
-              ResourceStatus::InvalidResource);
-    EXPECT_EQ(ResourceRegistry::LocateSourceFile(spec, "resource", "missing.cpp", located),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located), ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::LocateSourceFile(spec, "resource", "missing.cpp", located), ResourceStatus::InvalidResource);
 
     spec.path = Path("bad-layout/libx_compile_database.so").string();
-    EXPECT_EQ(ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located), ResourceStatus::InvalidResource);
 
     const SourceLayout missing = CreateLayout("missing-source-root");
     boost::system::error_code error;
     (void)fs::remove_all(missing.sourceRoot, error);
     ASSERT_FALSE(error);
     spec.path = missing.soPath;
-    EXPECT_EQ(ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located), ResourceStatus::InvalidResource);
 
     const SourceLayout linked = CreateLayout("linked-source-root");
     const fs::path actual = Path("actual-source-root");
@@ -472,8 +465,8 @@ TEST_F(ResourceRegistryTest, LocateSourceFileRequiresValidLayoutAndUniqueMatch)
     fs::create_symlink(actual, linked.sourceRoot, error);
     ASSERT_FALSE(error);
     spec.path = linked.soPath;
-    EXPECT_EQ(ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located), ResourceStatus::InvalidResource);
 }
 
 TEST_F(ResourceRegistryTest, GetBundleRejectsMissingSymbolAndInvalidAbi)
@@ -537,14 +530,15 @@ TEST_F(ResourceRegistryTest, AppendFileCopiesPayloadAndRejectsInvalidFieldsAndLi
     std::set<std::string> paths;
     uint64_t manifestBytes = 0U;
     StagedResources staged;
-    EXPECT_EQ(ResourceRegistry::AppendFile(file, "resource", entry, paths, manifestBytes, staged),
-              ResourceStatus::Success);
+    EXPECT_EQ(
+        ResourceRegistry::AppendFile(file, "resource", entry, paths, manifestBytes, staged), ResourceStatus::Success);
     ASSERT_EQ(entry.files.size(), 1U);
     EXPECT_EQ(entry.files[0].bytes, payload);
     EXPECT_EQ(manifestBytes, payload.size());
     EXPECT_EQ(staged.bytes, payload.size());
-    EXPECT_EQ(ResourceRegistry::AppendFile(file, "resource", entry, paths, manifestBytes, staged),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::AppendFile(file, "resource", entry, paths, manifestBytes, staged),
+        ResourceStatus::InvalidResource);
 
     auto expectInvalid = [&](const AcCompileResourceFile& invalid, uint64_t initialManifest = 0U,
                              uint64_t initialRegistry = 0U) {
@@ -552,8 +546,9 @@ TEST_F(ResourceRegistryTest, AppendFileCopiesPayloadAndRejectsInvalidFieldsAndLi
         std::set<std::string> localPaths;
         StagedResources localStaged;
         localStaged.bytes = initialRegistry;
-        EXPECT_EQ(ResourceRegistry::AppendFile(invalid, "resource", localEntry, localPaths, initialManifest,
-                                               localStaged), ResourceStatus::InvalidResource);
+        EXPECT_EQ(
+            ResourceRegistry::AppendFile(invalid, "resource", localEntry, localPaths, initialManifest, localStaged),
+            ResourceStatus::InvalidResource);
     };
 
     AcCompileResourceFile invalid = file;
@@ -594,8 +589,9 @@ TEST_F(ResourceRegistryTest, AppendFileCopiesPayloadAndRejectsInvalidFieldsAndLi
     std::set<std::string> emptyPaths;
     manifestBytes = 0U;
     staged = {};
-    EXPECT_EQ(ResourceRegistry::AppendFile(empty, "resource", emptyEntry, emptyPaths, manifestBytes, staged),
-              ResourceStatus::Success);
+    EXPECT_EQ(
+        ResourceRegistry::AppendFile(empty, "resource", emptyEntry, emptyPaths, manifestBytes, staged),
+        ResourceStatus::Success);
     EXPECT_TRUE(emptyEntry.files[0].bytes.empty());
 }
 
@@ -623,30 +619,31 @@ TEST_F(ResourceRegistryTest, CopyManifestFilesValidatesTablesConflictsAndSorts)
     ResourceEntry local;
     StagedResources localStage;
     AcCompileResourceManifest invalid{StringView(json), files, 0U};
-    EXPECT_EQ(ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage), ResourceStatus::InvalidResource);
     invalid = {StringView(json), nullptr, 1U};
-    EXPECT_EQ(ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage), ResourceStatus::InvalidResource);
     invalid = {StringView(json), files, TEST_MAX_FILE_COUNT + 1U};
-    EXPECT_EQ(ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage), ResourceStatus::InvalidResource);
     invalid = {StringView(json), nullptr, 0U};
     localStage.files = TEST_MAX_REGISTRY_FILE_COUNT + 1U;
-    EXPECT_EQ(ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage), ResourceStatus::InvalidResource);
     localStage.files = TEST_MAX_REGISTRY_FILE_COUNT;
     invalid = {StringView(json), files, 1U};
-    EXPECT_EQ(ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::CopyManifestFiles(invalid, "resource", local, localStage), ResourceStatus::InvalidResource);
 
     const std::string invalidPath = "../a.bin";
     AcCompileResourceFile invalidFile{StringView(nameA), StringView(invalidPath), bytes.data(), bytes.size()};
     ResourceEntry invalidEntry;
     StagedResources invalidStage;
     invalid = {StringView(json), &invalidFile, 1U};
-    EXPECT_EQ(ResourceRegistry::CopyManifestFiles(invalid, "resource", invalidEntry, invalidStage),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::CopyManifestFiles(invalid, "resource", invalidEntry, invalidStage),
+        ResourceStatus::InvalidResource);
 
     const std::string parentName = "dir";
     const std::string childName = "child.bin";
@@ -658,8 +655,9 @@ TEST_F(ResourceRegistryTest, CopyManifestFilesValidatesTablesConflictsAndSorts)
     ResourceEntry conflictEntry;
     StagedResources conflictStage;
     invalid = {StringView(json), conflicting, 2U};
-    EXPECT_EQ(ResourceRegistry::CopyManifestFiles(invalid, "resource", conflictEntry, conflictStage),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::CopyManifestFiles(invalid, "resource", conflictEntry, conflictStage),
+        ResourceStatus::InvalidResource);
 }
 
 TEST_F(ResourceRegistryTest, LoadManifestValidatesJsonOwnershipSourceAndDuplicates)
@@ -678,12 +676,9 @@ TEST_F(ResourceRegistryTest, LoadManifestValidatesJsonOwnershipSourceAndDuplicat
     EXPECT_EQ(loadText(R"({"resource_id":"metadata-only"})"), ResourceStatus::Success);
     EXPECT_TRUE(stage.external.resources.at("metadata-only")->data.sourceFilePath.empty());
     EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":1})"), ResourceStatus::InvalidResource);
-    EXPECT_EQ(loadText(R"({"resource_id":"../bad","source_file":"source.cpp"})"),
-              ResourceStatus::InvalidResource);
-    EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":"../source.cpp"})"),
-              ResourceStatus::InvalidResource);
-    EXPECT_EQ(loadText(R"({"resource_id":"missing","source_file":"missing.cpp"})"),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(loadText(R"({"resource_id":"../bad","source_file":"source.cpp"})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":"../source.cpp"})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(loadText(R"({"resource_id":"missing","source_file":"missing.cpp"})"), ResourceStatus::InvalidResource);
 
     const std::string valid = R"({"resource_id":"resource","source_file":"source.cpp","value":3})";
     EXPECT_EQ(loadText(valid), ResourceStatus::Success);
@@ -703,18 +698,18 @@ TEST_F(ResourceRegistryTest, LoadManifestStagesExternalCustomAndBuiltInResources
     };
     for (const auto& item : cases) {
         const SourceLayout layout = CreateLayout(item.second);
-        const std::string json = "{\"resource_id\":\"" + item.second +
-                                 "\",\"source_file\":\"source.cpp\"}";
+        const std::string json = "{\"resource_id\":\"" + item.second + "\",\"source_file\":\"source.cpp\"}";
         AcCompileResourceManifest unit{StringView(json), nullptr, 0U};
-        EXPECT_EQ(ResourceRegistry::LoadManifest(unit, {layout.soPath, item.first}, 0U, stage),
-                  ResourceStatus::Success);
+        EXPECT_EQ(
+            ResourceRegistry::LoadManifest(unit, {layout.soPath, item.first}, 0U, stage), ResourceStatus::Success);
     }
     ASSERT_EQ(stage.external.resources.size(), 1U);
     ASSERT_EQ(stage.custom.resources.size(), 1U);
     ASSERT_EQ(stage.builtIn.resources.size(), 1U);
     const fs::path externalSource = Path("external/op_impl/ai_core/tbe/kernel/Ascend910B/impl/source.cpp");
-    EXPECT_EQ(stage.external.resources.at("external")->data.sourceFilePath,
-              fs::canonical(externalSource).parent_path().string());
+    EXPECT_EQ(
+        stage.external.resources.at("external")->data.sourceFilePath,
+        fs::canonical(externalSource).parent_path().string());
 }
 
 TEST_F(ResourceRegistryTest, LibraryDeleterHandlesNullAndSuccessfulClose)
@@ -738,8 +733,8 @@ TEST_F(ResourceRegistryTest, LoadLibraryReportsOpenFailure)
     MOCKER(dlopen).expects(once()).will(invoke(DlopenFailure));
     MOCKER(dlerror).stubs().will(invoke(DlerrorFailure));
     StageState stage;
-    EXPECT_EQ(ResourceRegistry::LoadLibrary({"missing.so", ResourceSourceType::External}, stage),
-              ResourceStatus::LoadError);
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibrary({"missing.so", ResourceSourceType::External}, stage), ResourceStatus::LoadError);
     EXPECT_EQ(gDlopenCalls, 1U);
 }
 
@@ -750,8 +745,8 @@ TEST_F(ResourceRegistryTest, LoadLibraryReportsBundleFailureAndClosesHandle)
     MOCKER(dlerror).stubs().will(invoke(DlerrorControlled));
     MOCKER(dlclose).expects(once()).will(invoke(DlcloseSuccess));
     StageState stage;
-    EXPECT_EQ(ResourceRegistry::LoadLibrary({"invalid.so", ResourceSourceType::Custom}, stage),
-              ResourceStatus::LoadError);
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibrary({"invalid.so", ResourceSourceType::Custom}, stage), ResourceStatus::LoadError);
     EXPECT_EQ(gDlcloseCalls, 1U);
 }
 
@@ -764,8 +759,9 @@ TEST_F(ResourceRegistryTest, LoadLibraryReportsManifestFailure)
     gBundleHeader = &bundle.header;
     MockSuccessfulLoader();
     StageState stage;
-    EXPECT_EQ(ResourceRegistry::LoadLibrary({layout.soPath, ResourceSourceType::BuiltIn}, stage),
-              ResourceStatus::InvalidResource);
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibrary({layout.soPath, ResourceSourceType::BuiltIn}, stage),
+        ResourceStatus::InvalidResource);
 }
 
 TEST_F(ResourceRegistryTest, LoadLibraryLoadsValidManifest)
@@ -777,8 +773,8 @@ TEST_F(ResourceRegistryTest, LoadLibraryLoadsValidManifest)
     gBundleHeader = &bundle.header;
     MockSuccessfulLoader();
     StageState stage;
-    EXPECT_EQ(ResourceRegistry::LoadLibrary({layout.soPath, ResourceSourceType::Custom}, stage),
-              ResourceStatus::Success);
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibrary({layout.soPath, ResourceSourceType::Custom}, stage), ResourceStatus::Success);
     EXPECT_EQ(stage.custom.resources.size(), 1U);
     EXPECT_EQ(gDlcloseCalls, 1U);
 }
@@ -807,8 +803,9 @@ TEST_F(ResourceRegistryTest, LoadLibrariesLoadsValidList)
     gBundleHeader = &bundle.header;
     MockSuccessfulLoader();
     StageState stage;
-    EXPECT_EQ(ResourceRegistry::LoadLibraries({{layout.soPath, ResourceSourceType::External}}, stage),
-              ResourceStatus::Success);
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibraries({{layout.soPath, ResourceSourceType::External}}, stage),
+        ResourceStatus::Success);
     EXPECT_TRUE(stage.external.discovered);
     EXPECT_EQ(stage.external.resources.size(), 1U);
 }
