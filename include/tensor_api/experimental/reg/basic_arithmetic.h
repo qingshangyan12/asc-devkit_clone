@@ -51,8 +51,14 @@ __simd_callee__ inline decltype(auto) prelu(reg_tensor<T> src_reg, reg_tensor<T>
 template <typename T, typename scalar_type>
 __simd_callee__ inline decltype(auto) leaky_relu(reg_tensor<T> src_reg, scalar_type slope);
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator+(T a, U b);
+template <typename T>
+__simd_callee__ inline decltype(auto) operator+(reg_tensor<T> src0, reg_tensor<T> src1);
+
+template <typename T>
+__simd_callee__ inline decltype(auto) operator+(reg_tensor<T> src, T scalar);
+
+template <typename T>
+__simd_callee__ inline decltype(auto) operator+(T scalar, reg_tensor<T> src);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) add(
