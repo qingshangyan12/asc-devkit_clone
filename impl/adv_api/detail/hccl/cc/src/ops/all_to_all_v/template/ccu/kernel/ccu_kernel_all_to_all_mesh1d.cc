@@ -150,21 +150,25 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     if (arg->loadFromMem) {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r == arg->rankId) {
-                GroupCopy(ctx, localDst, src[r], ctx.goSize);
+                // GroupCopy(ctx, localDst, src[r], ctx.goSize);
             }
             else {
                 ccu::RemoteAddr curDst = dst[r];
                 ccu::LocalAddr curSrc = src[r];
-                CCU_WHILE(ctx.writeFullLoopCount != 0)
+                ccu::Variable loopCnt;
+                loopCnt = ctx.writeFullLoopCount;
+                ccu::Variable tailSz;
+                tailSz = ctx.writeTailSize;
+                CCU_WHILE(loopCnt != 0)
                 {
                     ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
                     curDst.addr += chunkSize;
                     curSrc.addr += chunkSize;
-                    ctx.writeFullLoopCount += negOne;
+                    loopCnt += negOne;
                 }
-                CCU_IF(ctx.writeTailSize != 0)
+                CCU_IF(tailSz != 0)
                 {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, ctx.writeTailSize, ctx.event, 1 << r);
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, tailSz, ctx.event, 1 << r);
                 }
                 channelId++;
             }
@@ -174,21 +178,25 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     } else {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r == arg->rankId) {
-                GroupCopy(ctx, localDst, src[r], ctx.goSize);
+                // GroupCopy(ctx, localDst, src[r], ctx.goSize);
             }
             else {
                 ccu::RemoteAddr curDst = dst[r];
                 ccu::LocalAddr curSrc = src[r];
-                CCU_WHILE(ctx.writeFullLoopCount != 0)
+                ccu::Variable loopCnt;
+                loopCnt = ctx.writeFullLoopCount;
+                ccu::Variable tailSz;
+                tailSz = ctx.writeTailSize;
+                CCU_WHILE(loopCnt != 0)
                 {
                     ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 1 << r);
                     curDst.addr += chunkSize;
                     curSrc.addr += chunkSize;
-                    ctx.writeFullLoopCount += negOne;
+                    loopCnt += negOne;
                 }
-                CCU_IF(ctx.writeTailSize != 0)
+                CCU_IF(tailSz != 0)
                 {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, ctx.writeTailSize, ctx.event, 1 << r);
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, tailSz, ctx.event, 1 << r);
                 }
                 channelId++;
             }
