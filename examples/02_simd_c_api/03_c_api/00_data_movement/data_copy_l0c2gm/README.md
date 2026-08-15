@@ -175,9 +175,21 @@ data_copy_l0c2gm
 - NPU运行
 
   ```bash
+  
+9 还有2个报错
+14报错
+9 14 15 16有问题
+
+
+
+1-8 pass 11 13 12  17 10
+
+
+9 14 15 16有问题
+一点报错没有的  1-8 10 11 12 13 17
 cd ..
 rm -rf build
-SCENARIO_NUM=6
+SCENARIO_NUM=14
 mkdir -p build && cd build;      # 创建并进入build目录
 cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认NPU模式
 python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据和真值数据
