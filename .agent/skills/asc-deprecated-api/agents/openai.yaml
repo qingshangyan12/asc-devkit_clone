@@ -1,0 +1,4 @@
+interface:
+  display_name: "AscendC 废弃接口处理"
+  short_description: "规范化处理 AscendC API 的标记废弃、文档迁移、兼容验证与删除门禁"
+  default_prompt: "Use $asc-deprecated-api to deprecate an AscendC API while preserving compatibility and updating its documentation."

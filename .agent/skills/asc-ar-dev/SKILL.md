@@ -17,6 +17,7 @@ Use this skill for reusable AscendC engineering work in `asc-devkit` or a user-p
 Boundary with other repository skills:
 
 - API UT generation and coverage backfill belong to [`../asc-api-ut-gen/SKILL.md`](../asc-api-ut-gen/SKILL.md).
+- API deprecation lifecycle, compatibility migration, deprecated documentation, and removal gates belong to [`../asc-deprecated-api/SKILL.md`](../asc-deprecated-api/SKILL.md). Use this skill alongside it only when kernel implementation or architecture behavior also needs analysis.
 - Chip names, `SocVersion`, `__NPU_ARCH__`, dtype facts, and architecture support boundaries belong to [`../asc-npu-arch/SKILL.md`](../asc-npu-arch/SKILL.md). This skill may reference those facts but must not maintain a duplicated full chip or dtype table.
 - Markdown documentation style checks belong to `asc-doc-checker` when that skill is available.
 

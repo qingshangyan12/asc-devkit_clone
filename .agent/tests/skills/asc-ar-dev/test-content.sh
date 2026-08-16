@@ -58,6 +58,7 @@ reject_tree_pattern "$SKILL_DIR" 'z[0-9]{8}|/home/[^/]+/|commit [0-9a-f]{7,40}|0
 expect_pattern "$SKILL_FILE" '^description:.*(当用户需要|触发).*AscendC' "description trigger condition"
 expect_fixed "$SKILL_FILE" "../asc-npu-arch/SKILL.md" "asc-npu-arch boundary"
 expect_fixed "$SKILL_FILE" "../asc-api-ut-gen/SKILL.md" "asc-api-ut-gen boundary"
+expect_fixed "$SKILL_FILE" "../asc-deprecated-api/SKILL.md" "asc-deprecated-api boundary"
 expect_fixed "$SKILL_FILE" "must not maintain a duplicated full chip or dtype table" "no duplicated chip dtype table"
 expect_fixed "$SKILL_FILE" "DEVKIT_PATH" "DEVKIT_PATH input"
 expect_fixed "$SKILL_FILE" "CANN_PATH" "CANN_PATH input"

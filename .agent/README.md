@@ -15,6 +15,7 @@
 |------|------|------|
 | `asc-api-ut-gen` | 生成或补齐 `tests/api/` 下的 AscendC API UT | `skills/asc-api-ut-gen/SKILL.md` |
 | `asc-ar-dev` | AscendC 需求分析、实现方案、host/device 代码评审与验证规划 | `skills/asc-ar-dev/SKILL.md` |
+| `asc-deprecated-api` | AscendC API 废弃、兼容迁移、文档归档与删除门禁 | `skills/asc-deprecated-api/SKILL.md` |
 | `asc-npu-arch` | 维护芯片、架构、`SocVersion`、`__NPU_ARCH__` 和 dtype 事实 | `skills/asc-npu-arch/SKILL.md` |
 | `public-skills` | 从 `https://gitcode.com/cann-agent/skills.git` 安装或更新公共远程 skill | `skills/public-skills/SKILL.md` |
 | `gitcode-pr` | 通过公共远程 skill 处理 GitCode PR、评论、讨论和变更查询 | `skills/gitcode-pr/SKILL.md` |
@@ -45,7 +46,7 @@
 
 ### 默认使用
 
-仓内本地维护 `asc-api-ut-gen`、`asc-ar-dev`、`asc-npu-arch` 和 `public-skills`。`gitcode-pr` 等公共通用 skill
+仓内本地维护 `asc-api-ut-gen`、`asc-ar-dev`、`asc-deprecated-api`、`asc-npu-arch` 和 `public-skills`。`gitcode-pr` 等公共通用 skill
 使用 `skills/public-skills/scripts/install-public-skills.sh` 从 `cann-agent/skills` 安装到
 `.agent/skills/_remote/`，并通过 `skills/gitcode-pr -> _remote/gitcode-pr` 这类一级软链暴露给客户端。
 
@@ -97,6 +98,7 @@ bash .agent/tests/skills/run-all.sh
 ```bash
 bash .agent/tests/skills/asc-api-ut-gen/test.sh
 bash .agent/tests/skills/asc-ar-dev/test.sh
+bash .agent/tests/skills/asc-deprecated-api/test.sh
 bash .agent/tests/skills/asc-npu-arch/test.sh
 ```
 
@@ -119,6 +121,7 @@ bash .agent/tests/skills/asc-npu-arch/test.sh
 | 芯片、架构、`SocVersion`、`__NPU_ARCH__`、dtype | `skills/asc-npu-arch/references/npu-arch-facts.json` |
 | 架构和 dtype 人工说明 | `skills/asc-npu-arch/references/npu-arch-guide.md` |
 | AscendC 需求分析、实现评审、调用层级和环境解析 | `skills/asc-ar-dev/SKILL.md` 和 `skills/asc-ar-dev/references/` |
+| API 废弃、兼容迁移、文档归档和删除门禁 | `skills/asc-deprecated-api/SKILL.md` 和 `skills/asc-deprecated-api/references/` |
 | API 类型、目录和 UT 目录映射 | `skills/asc-api-ut-gen/references/foundations/api-directory-map.md` |
 | API 类型限制和生成器约束 | `skills/asc-api-ut-gen/references/foundations/generation-constraints.json` |
 | UT 生成流程、覆盖率和报告要求 | `skills/asc-api-ut-gen/references/workflows/` |
