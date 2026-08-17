@@ -40,7 +40,7 @@ __simd_callee__ inline decltype(auto) interleave(reg_tensor<T> src0, reg_tensor<
     asc_intlv(dst0.reg, dst1.reg, src0.reg, src1.reg);
     //dst0.mask = with_mask(all_mask<uint8_t>());;
     //dst1.mask = dst0.mask;
-    return {dst0, dst1};
+    return Std::make_tuple(dst0, dst1);
 }
 
 template <typename T>
@@ -53,7 +53,7 @@ __simd_callee__ inline decltype(auto) deinterleave(reg_tensor<T> src0, reg_tenso
     asc_deintlv(dst0.reg, dst1.reg, src0.reg, src1.reg);
     //dst0.mask = with_mask(all_mask<uint8_t>());;
     //dst1.mask = dst0.mask;
-    return {dst0, dst1};
+    return Std::make_tuple(dst0, dst1);
 }
 } // namespace te
 } // namespace asc

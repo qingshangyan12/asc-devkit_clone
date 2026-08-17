@@ -32,9 +32,9 @@ inline constexpr bool is_fill_support_type = Std::is_one_of_v<T, uint8_t, int8_t
 //todo:all_mask<T>
 template <size_t N = 1, typename T>
 __simd_callee__ inline decltype(auto) fill(T value, reg_tensor<bool> mask) {
-    static_assert(detail::is_fill_support_type<T>, "fill only supports uint8_t, int8_t,
-        fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t
-        and float.");
+    static_assert(detail::is_fill_support_type<T>, "fill only supports uint8_t, int8_t, "
+        "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
+        "and float.");
     static_assert(N == 1, "fill only supports N==1.");
     reg_tensor<T> dst;
     asc_duplicate(dst.reg, value, mask.reg);
@@ -44,9 +44,9 @@ __simd_callee__ inline decltype(auto) fill(T value, reg_tensor<bool> mask) {
 
 template <size_t N = 1, typename T>
 __simd_callee__ inline decltype(auto) fill(reg_tensor<T> val, reg_tensor<bool> mask) {
-    static_assert(detail::is_fill_support_type<T>, "fill only supports uint8_t, int8_t,
-        fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t
-        and float.");
+    static_assert(detail::is_fill_support_type<T>, "fill only supports uint8_t, int8_t, "
+        "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
+        "and float.");
     static_assert(N == 1, "fill only supports N==1.");
     reg_tensor<T> dst;
     asc_duplicate_scalar(dst.reg, val.reg, mask.reg);
