@@ -29,7 +29,6 @@ inline constexpr bool is_fill_support_type = Std::is_one_of_v<T, uint8_t, int8_t
     fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t, float>;
 }
 
-//todo:all_mask<T>
 template <size_t N = 1, typename T>
 __simd_callee__ inline decltype(auto) fill(T value, reg_tensor<bool> mask = all_mask<T>()) {
     static_assert(detail::is_fill_support_type<T>, "fill only supports uint8_t, int8_t, "

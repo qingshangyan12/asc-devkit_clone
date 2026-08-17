@@ -46,7 +46,6 @@ __simd_callee__ inline decltype(auto) select(reg_tensor<bool> condition,reg_tens
     return dst;
 }
 
-//uint8_t/int8_t/uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float/int64_t/uint64_t
 template <typename T>
 __simd_callee__ inline decltype(auto) operator==(reg_tensor<T> src0, reg_tensor<T> src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator== only supports uint8_t, int8_t, "

@@ -20,7 +20,6 @@
 
 namespace asc {
 namespace te {
-// all_mask()
 template <size_t N = 1, typename T>
 __simd_callee__ inline decltype(auto) fill(T value, reg_tensor<bool> mask = all_mask<T>());
 
