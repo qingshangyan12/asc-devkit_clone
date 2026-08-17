@@ -25,10 +25,12 @@ namespace te {
 namespace detail {
 template <typename T>
 //TODO: support uint64_t/int64_t
+template <typename T>
 inline constexpr bool is_select_support_type = Std::is_one_of_v<T, bool, uint8_t, int8_t, fp8_e4m3fn_t,
     hifloat8_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t, float>;
 
 //TODO: support uint64_t/int64_t
+template <typename T>
 inline constexpr bool is_cmp_support_type = Std::is_one_of_v<T, uint8_t, int8_t, uint16_t, int16_t,
     half, bfloat16_t, uint32_t, int32_t, float>;
 }
@@ -105,7 +107,7 @@ __simd_callee__ inline decltype(auto) operator==(reg_tensor<T> src0, T src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator== only supports uint8_t, int8_t,
         uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
-    asc_eq(mask.reg, src0.reg, src1, src0.mask);
+    asc_eq_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
 
@@ -114,7 +116,7 @@ __simd_callee__ inline decltype(auto) operator!=(reg_tensor<T> src0, T src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator!= only supports uint8_t, int8_t,
         uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
-    asc_ne(mask.reg, src0.reg, src1, src0.mask);
+    asc_ne_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
 
@@ -123,7 +125,7 @@ __simd_callee__ inline decltype(auto) operator<(reg_tensor<T> src0, T src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator< only supports uint8_t, int8_t,
         uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
-    asc_lt(mask.reg, src0.reg, src1, src0.mask);
+    asc_lt_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
 
@@ -132,7 +134,7 @@ __simd_callee__ inline decltype(auto) operator<=(reg_tensor<T> src0, T src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator<= only supports uint8_t, int8_t,
         uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
-    asc_le(mask.reg, src0.reg, src1, src0.mask);
+    asc_le_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
 
@@ -141,7 +143,7 @@ __simd_callee__ inline decltype(auto) operator>(reg_tensor<T> src0, T src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator> only supports uint8_t, int8_t,
         uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
-    asc_gt(mask.reg, src0.reg, src1, src0.mask);
+    asc_gt_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
 
@@ -150,7 +152,7 @@ __simd_callee__ inline decltype(auto) operator>=(reg_tensor<T> src0, T src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator>= only supports uint8_t, int8_t,
         uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
-    asc_ge(mask.reg, src0.reg, src1, src0.mask);
+    asc_ge_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
 } // namespace te

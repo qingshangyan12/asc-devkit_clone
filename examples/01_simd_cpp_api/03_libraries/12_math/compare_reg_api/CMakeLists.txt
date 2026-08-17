@@ -19,7 +19,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    cmp_reg_api.asc
+    compare_reg_api.asc
 )
 
 set(ASCEND_HOME "$ENV{ASCEND_HOME_PATH}")

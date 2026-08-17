@@ -23,8 +23,8 @@
 namespace asc {
 namespace te {
 namespace detail {
-template <typename T>
 //TODO: support uint64_t/int64_t/complex64
+template <typename T>
 inline constexpr bool is_fill_support_type = Std::is_one_of_v<T, uint8_t, int8_t, fp8_e4m3fn_t,
     fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t, float>;
 }
@@ -49,7 +49,7 @@ __simd_callee__ inline decltype(auto) fill(reg_tensor<T> val, reg_tensor<bool> m
         and float.");
     static_assert(N == 1, "fill only supports N==1.");
     reg_tensor<T> dst;
-    asc_duplicate(dst.reg, val.reg, mask.value);
+    asc_duplicate_scalar(dst.reg, val.reg, mask.value);
     dst.mask = mask;
     return dst;
 }
