@@ -336,9 +336,23 @@ function existingSections($, article) {
   return sections
 }
 
+export function isCatalogOnlyArticle($, article) {
+  const listItems = article.find('li')
+  if (listItems.length === 0 || article.find('a[href]').length === 0) return false
+  if (article.find('pre,table,blockquote,dl').length > 0) return false
+
+  const standaloneParagraphs = article.find('p').filter((_, element) => (
+    $(element).parents('li').length === 0
+  ))
+  if (standaloneParagraphs.length > 0) return false
+
+  return listItems.toArray().every(element => $(element).find('a[href]').length > 0)
+}
+
 async function analyzeRecord(intermediateHtmlDirectory, record) {
   const signals = new Map()
   const fallback = {
+    catalogOnly: false,
     signals,
     identityTokens: identityTokens([record.meta.title, routeSegments(record.url).at(-1)]),
     structuredIdentifierCount: 0,
@@ -362,6 +376,7 @@ async function analyzeRecord(intermediateHtmlDirectory, record) {
   const $ = load(html)
   const article = $('.markdown-body').first()
   if (!article.length) return fallback
+  const catalogOnly = isCatalogOnlyArticle($, article)
   const excerpt = extractExcerpt($, article)
   const sections = existingSections($, article)
   const headings = article.find('h1,h2,h3,h4,h5,h6').map((_, element) => $(element).text()).get()
@@ -443,6 +458,7 @@ async function analyzeRecord(intermediateHtmlDirectory, record) {
   const structuredIdentifierCount = [...signals.values()]
     .filter(signal => signal.list > 0 || signal.table > 0).length
   return {
+    catalogOnly,
     signals,
     identityTokens: identityTokens([record.meta.title, routeSegments(record.url).at(-1), ...headings]),
     structuredIdentifierCount,
@@ -508,7 +524,12 @@ function createRecord(route, rawTitle, rawContent = '') {
 }
 
 function createIdentifierIndex(records, analyses, pageRanks) {
-  const pages = records.map((record, pageId) => [record.url, record.meta.title, analyses[pageId].excerpt])
+  const pages = records.map((record, pageId) => [
+    record.url,
+    record.meta.title,
+    analyses[pageId].excerpt,
+    analyses[pageId].catalogOnly ? 1 : 0,
+  ])
   const snippets = []
   const snippetIds = new Map()
   const sections = []
@@ -566,7 +587,7 @@ function createIdentifierIndex(records, analyses, pageRanks) {
     })
     return [key, pageIds, contextIds, selectedSectionIds]
   }).sort((left, right) => left[0] < right[0] ? -1 : left[0] > right[0] ? 1 : 0)
-  return { v: 7, p: pages, i: entries, s: snippets, h: sections }
+  return { v: 8, p: pages, i: entries, s: snippets, h: sections }
 }
 
 function decodeFragment(buffer) {

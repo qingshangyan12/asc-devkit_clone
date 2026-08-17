@@ -16,7 +16,9 @@ import { getScrollOffset, useData, useRouter, withBase } from 'vitepress'
 import { useLocalStorage, useMagicKeys } from '@vueuse/core'
 
 import { searchConfig as _searchConfig } from 'virtual:pagefind'
+import { isApiRouteUnsupported } from '../../../scripts/api-support.mjs'
 import LogoPagefind from './LogoPagefind.vue'
+import { selectedFilter } from './filter-state.js'
 import { highlightSearchText, initializePagefindSearch, MAX_QUERY_LENGTH, searchPagefind } from './pagefind-search.mjs'
 import type { SearchConfig } from './type'
 import { formatShowDate } from './utils'
@@ -32,7 +34,7 @@ if (typeof window !== 'undefined' && !window.__pagefind__) {
 const searchResult = ref<{ route: string; meta: Record<string, any>; score: number }[]>([])
 const searchConfig: SearchConfig = _searchConfig
 
-const { localeIndex, site, lang } = useData()
+const { localeIndex, site, lang, theme } = useData()
 
 const finalSearchConfig = computed<SearchConfig>(() => ({
   ...searchConfig,
@@ -127,7 +129,7 @@ function getPagefind() {
 }
 
 watch(
-  () => searchWords.value,
+  [() => searchWords.value, () => selectedFilter.value],
   async () => {
     const request = ++activeSearchRequest
     if (!searchWords.value) {
@@ -151,7 +153,11 @@ watch(
       }
 
       const pagefind = await getPagefind()
-      const rankedResults = await searchPagefind(pagefind, String(searchText).normalize('NFKC').trim())
+      const rankedResults = await searchPagefind(
+        pagefind,
+        String(searchText).normalize('NFKC').trim(),
+        route => !isApiRouteUnsupported(theme.value.apiUnsupportedIndex, route, selectedFilter.value)
+      )
       if (request !== activeSearchRequest) return
       const allResults = rankedResults
         .map(result => ({
@@ -348,7 +354,10 @@ function dirLabel(url: string) {
                   <div class="link">
                     <div v-if="dirLabel(item.route)" class="breadcrumb-row">{{ dirLabel(item.route) }}</div>
                     <div class="title">
-                      <span class="headings">{{ item.meta.title }}</span>
+                      <span
+                        class="headings"
+                        v-html="highlightSearchText(item.meta.title, searchWords)"
+                      />
                       <span
                         v-if="item.meta.sectionTitle" class="section-title"
                         v-html="highlightSearchText(item.meta.sectionTitle, searchWords)"
