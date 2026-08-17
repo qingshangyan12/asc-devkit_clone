@@ -173,6 +173,24 @@ TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KERNEL_TEST, registration_ir_matches_current_mesh
     EXPECT_TRUE(result.Ok()) << result.message;
 }
 
+TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KERNEL_TEST, checker_rejects_rank_bitmap_pre_sync)
+{
+    const std::vector<KernelHandle> handles = RegisterAllRanks(4);
+    ASSERT_EQ(handles.size(), 4U);
+    const Program *program = RegisterManager::Global().GetProgram(handles[2]);
+    ASSERT_NE(program, nullptr);
+
+    Program corrupt = *program;
+    auto preWait = std::find_if(corrupt.operations.begin(), corrupt.operations.end(), [](const Operation &operation) {
+        return operation.code == OpCode::NOTIFY_WAIT && operation.index == 0;
+    });
+    ASSERT_NE(preWait, corrupt.operations.end());
+    preWait->mask = static_cast<uint16_t>(((1U << 4) - 1U) & ~(1U << 2));
+
+    CheckResult result = CcuAllToAllVSemanticsChecker().CheckRegistration(corrupt, BuildKernelConfig(2, 4));
+    EXPECT_FALSE(result.Ok());
+}
+
 TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KERNEL_TEST, ten_dynamic_arguments_fit_one_task_mission)
 {
     AllToAllVLaunchConfig config;
@@ -199,6 +217,20 @@ TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KERNEL_TEST, two_rank_asymmetric_sizes_and_offset
 TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KERNEL_TEST, four_rank_supports_zero_length_peers)
 {
     VerifyScenario({{5, 0, 17, 9}, {3, 7, 0, 11}, {0, 13, 19, 2}, {23, 0, 6, 15}});
+}
+
+TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KERNEL_TEST, eight_rank_fixed_semantic_sync_completes)
+{
+    VerifyScenario({
+        {5, 0, 7, 9, 11, 13, 15, 17},
+        {3, 7, 0, 11, 13, 15, 17, 19},
+        {0, 13, 19, 2, 5, 7, 9, 11},
+        {23, 0, 6, 15, 17, 19, 21, 3},
+        {7, 9, 11, 0, 13, 15, 17, 19},
+        {11, 13, 15, 17, 0, 19, 21, 23},
+        {17, 19, 21, 23, 5, 0, 7, 9},
+        {19, 21, 23, 5, 7, 9, 0, 11},
+    });
 }
 
 TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KERNEL_TEST, launch_rejects_out_of_range_parameter_table)

@@ -61,7 +61,7 @@ CheckResult CcuAllToAllVSemanticsChecker::CheckRegistration(
     if (Count(program, OpCode::LOAD_MEMORY) != config.rankSize * ALL_TO_ALL_V_EXT_FIELD_COUNT ||
         Count(program, OpCode::WRITE_VARIABLE_NOTIFY) != 2 * channelCount ||
         Count(program, OpCode::NOTIFY_RECORD) != channelCount ||
-        Count(program, OpCode::NOTIFY_WAIT) != 3 * channelCount ||
+        Count(program, OpCode::NOTIFY_WAIT) != 2 * channelCount ||
         Count(program, OpCode::WRITE) != channelCount || Count(program, OpCode::LOCAL_COPY) != 1 ||
         Count(program, OpCode::IF_BEGIN) != config.rankSize ||
         Count(program, OpCode::EVENT_WAIT) != config.rankSize) {
@@ -78,37 +78,35 @@ CheckResult CcuAllToAllVSemanticsChecker::CheckRegistration(
         }
     }
 
-    const uint16_t selfBit = static_cast<uint16_t>(1U << config.rankId);
-    const uint16_t allOtherBit = static_cast<uint16_t>(((1U << config.rankSize) - 1U) & ~selfBit);
+    constexpr uint32_t preSyncCkeIndex = 0;
+    constexpr uint32_t postSyncCkeIndex = 1;
+    constexpr uint16_t outputBit = 1U << 0;
+    constexpr uint16_t tokenBit = 1U << 1;
+    constexpr uint16_t preSyncBits = outputBit | tokenBit;
+    constexpr uint16_t postSyncBit = 1U << 5;
     size_t outputPublish = 0;
     size_t tokenPublish = 0;
-    size_t outputWait = 0;
-    size_t tokenWait = 0;
+    size_t preWait = 0;
     size_t postRecord = 0;
     size_t postWait = 0;
     for (const Operation &operation : program.operations) {
         if (operation.code == OpCode::WRITE_VARIABLE_NOTIFY) {
-            if (operation.mask != selfBit) {
-                return Failure("AllToAllV pre-sync publish mask is invalid");
-            }
-            outputPublish += operation.index == 0 && operation.immediate == 1;
-            tokenPublish += operation.index == 1 && operation.immediate == 2;
+            outputPublish += operation.index == 0 && operation.immediate == preSyncCkeIndex &&
+                operation.mask == outputBit;
+            tokenPublish += operation.index == 1 && operation.immediate == preSyncCkeIndex &&
+                operation.mask == tokenBit;
         } else if (operation.code == OpCode::NOTIFY_WAIT) {
-            if (operation.mask != allOtherBit) {
-                return Failure("AllToAllV wait mask is invalid");
-            }
-            outputWait += operation.index == 1;
-            tokenWait += operation.index == 2;
-            postWait += operation.index == 0;
+            preWait += operation.index == preSyncCkeIndex && operation.mask == preSyncBits;
+            postWait += operation.index == postSyncCkeIndex && operation.mask == postSyncBit;
         } else if (operation.code == OpCode::NOTIFY_RECORD) {
-            postRecord += operation.index == 0 && operation.mask == selfBit;
+            postRecord += operation.index == postSyncCkeIndex && operation.mask == postSyncBit;
         } else if ((operation.code == OpCode::WRITE || operation.code == OpCode::LOCAL_COPY) &&
             (operation.mask != 1 || program.events.count(operation.immediate) != 1)) {
             return Failure("AllToAllV data operation event contract is invalid");
         }
     }
-    if (outputPublish != channelCount || tokenPublish != channelCount || outputWait != channelCount ||
-        tokenWait != channelCount || postRecord != channelCount || postWait != channelCount) {
+    if (outputPublish != channelCount || tokenPublish != channelCount || preWait != channelCount ||
+        postRecord != channelCount || postWait != channelCount) {
         return Failure("AllToAllV pre/post synchronization contract is invalid");
     }
     return {};
