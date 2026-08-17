@@ -255,6 +255,7 @@ __simd_vf__ inline void DigammaImpl(__ubuf__ float* dstUb, __ubuf__ float* srcUb
             Reg::Muls(tmpReg4, tmpReg4, DIGAMMA_PI, fullMask);
             Reg::Add(resultReg, resultReg, tmpReg4, fullMask);
         }
+        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
         Reg::LoadAlign(dstReg, dstUb + i * sregLower);
         DigammaSelect(dstReg, resultReg, tmpCal3, mask0);
         Reg::StoreAlign(dstUb + i * sregLower, dstReg, mask);
