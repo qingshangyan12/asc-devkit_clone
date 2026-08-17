@@ -2369,6 +2369,22 @@ TEST_F(TestTiling, testReduceSumTiling)
     EXPECT_EQ(minSize, 0);
 }
 
+TEST_F(TestTiling, TestBesselI0Tiling)
+{
+    std::vector<int64_t> shapeDims = {128, 128};
+    auto besselI0Shape = ge::Shape(shapeDims);
+    uint32_t maxValue = 0;
+    uint32_t minValue = 0;
+    GetBesselI0MaxMinTmpSize(besselI0Shape, 4, false, maxValue, minValue);
+    EXPECT_EQ(maxValue, 0);
+    EXPECT_EQ(minValue, 0);
+    uint32_t maxLiveNodeCnt = 1;
+    uint32_t extraBuf = 1;
+    GetBesselI0TmpBufferFactorSize(4, maxLiveNodeCnt, extraBuf);
+    EXPECT_EQ(maxLiveNodeCnt, 0);
+    EXPECT_EQ(extraBuf, 0);
+}
+
 #else
 TEST_F(TestTiling, MultiCoreSmallMN)
 {
