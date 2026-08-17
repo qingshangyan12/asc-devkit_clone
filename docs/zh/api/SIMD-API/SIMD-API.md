@@ -4,6 +4,8 @@
 
 -   **[基础API](basic_api/basic_api.md)**
 
+-   **[Tensor API（试验特性）](tensor_api/tensor_api.md)**
+
 -   **[高阶API](adv_api/adv_api.md)**
 
 -   **[C API](c_api/c_api.md)**
