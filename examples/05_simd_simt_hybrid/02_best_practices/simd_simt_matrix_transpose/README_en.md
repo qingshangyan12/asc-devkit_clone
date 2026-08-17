@@ -10,7 +10,7 @@ Based on the [matrix_transpose_practice sample](https://gitcode.com/cann/asc-dev
 
 ## Supported CANN Version
 
-- CANN >= 9.2.0
+- \>= CANN 9.2.0
 
 ## Directory Structure
 

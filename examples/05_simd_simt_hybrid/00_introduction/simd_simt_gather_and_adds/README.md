@@ -5,11 +5,13 @@
 本样例基于SIMD和SIMT混合编程模式实现gather和adds计算，以SIMT编程方式实现离散内存访问操作gather，以SIMD编程方式实现连续内存访问操作adds。
 
 
-## 本样例支持的产品及CANN软件版本
+## 支持的产品
 
-| 产品 | CANN软件版本 |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+- Ascend 950PR/Ascend 950DT
+
+## 支持的CANN软件版本
+
+- \>= CANN 9.2.0
 
 ## 目录结构介绍
 
