@@ -476,6 +476,16 @@ HcclResult CalcChannelRequestNhr(
         std::vector<uint32_t> netLayersVector(netLayers, netLayers + netLayerNum);
 
         for (auto netLayer : netLayersVector) {
+            // PCIE-SW场景，需要建立PCIE的clos链路
+            bool isNeedLevel0NhrChannel
+                = ((topoInfo->level0Topo == Level0Shape::CLOS || topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS)
+                   && topoInfo->level0PcieMix && topoInfo->serverNum == 1);
+            HCCL_INFO(
+                "[CalcChannelRequestNhr] isNeedLevel0NhrChannel[%d] Need to calc NHR channel in level0",
+                isNeedLevel0NhrChannel);
+            if (netLayerNum > 1 && netLayer == 0 && !isNeedLevel0NhrChannel) {
+                continue; // 跨框场景，nhr算法只取layer1的链路
+            }
             CommLink* linkList = nullptr;
             u32 listSize;
             CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, subcommInfo[0][rankIdx], &linkList, &listSize));
@@ -493,6 +503,10 @@ HcclResult CalcChannelRequestNhr(
                 break;
             }
         }
+
+        HCCL_INFO(
+            "[CalcChannelRequestNhr] myRank=%u, remoteRank=%u, channelsCreated=%zu, totalChannels=%zu.", myRank,
+            subcommInfo[0][rankIdx], channels.size() - channelCountBefore, channels.size());
 
         CHK_PRT_RET(
             channels.size() == channelCountBefore,
