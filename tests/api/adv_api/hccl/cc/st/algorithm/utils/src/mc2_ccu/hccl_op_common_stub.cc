@@ -157,7 +157,7 @@ ExecuteSelector::ExecuteSelector()
 HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* topoInfo, std::string& algName) const
 {
     static const std::map<HcclCMDType, std::string> ccuAlgMap = {
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuAllGatherMesh1D"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuSchedAllGatherSoleMesh"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuReduceScatterMesh1D"},
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuAllReduceMesh1DMem2Mem"},
         {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuAlltoAllMesh1D"},
@@ -307,6 +307,16 @@ std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType op
     return std::make_unique<MockInsCollAlgBase>();
 }
 
+bool CollAlgExecRegistryV2::IsRegistered(HcclCMDType opType, const std::string& algTag) const
+{
+    return true;
+}
+
+const std::map<HcclCMDType, std::vector<HcclAlgoType>> GetExternalInputHcclAlgoConfigAllType()
+{
+    return {};
+}
+
 HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor,
     TopoInfoWithNetLayerDetails* topoInfo, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost,
     void** resCtxDevice, bool& isResourceReused)
@@ -363,4 +373,16 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
 
     return HCCL_SUCCESS;
 }
+
+} // namespace mc2_ops_hccl
+
+extern "C" bool HcommIsSupportHcommBatchTransferOnThread()
+{
+    return false;
+}
+
+HcclResult LaunchOpenOpParamDataImpl(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+{
+    return HCCL_SUCCESS;
 }

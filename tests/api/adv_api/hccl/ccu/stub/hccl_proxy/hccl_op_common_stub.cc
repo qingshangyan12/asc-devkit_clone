@@ -122,7 +122,7 @@ ExecuteSelector::ExecuteSelector() {}
 HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* topoInfo, std::string& algName) const
 {
     static const std::map<HcclCMDType, std::string> ccuAlgMap = {
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuAllGatherMesh1D"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuSchedAllGatherSoleMesh"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuReduceScatterMesh1D"},
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuAllReduceMesh1D"},
         {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuAlltoAllMesh1D"},
